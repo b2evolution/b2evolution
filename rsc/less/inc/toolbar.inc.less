@@ -1,0 +1,174 @@
+// Evo Toolbar:
+// Note: there may be some properties that seem overkill but the fact is we need to override
+// any too general styles a skin may want to bring in for its own body/general display.
+@evobar-bg-color: #d2d2d2;
+@evobar-bg-color-hover: #bfbfbf;
+@evobar-text-color: #4f4f4f;
+@evobar-text-color-disabled: #999;
+@evobar-border-color: #aeaeae;
+div#evo_toolbar {
+	background-color: @evobar-bg-color;
+	color: ButtonText;
+	border-bottom: 1px solid @evobar-border-color;
+	text-align: left;
+	margin: 0;
+	font: 14px "Helvetica Neue", Helvetica, sans-serif, Arial;
+
+	position: fixed;
+	z-index: 11000;
+	left: 0px;
+	top: 0px;
+	width:100%; // Safari Windows
+	-webkit-text-size-adjust: none; // iPhone
+}
+// Devices with max width <= 1024px (iPhone,iPad):
+// Don't fix a position of the evo toolbar
+@media only screen and (max-device-width: 1024px) {
+	div#evo_toolbar {
+		position: relative;
+	}
+	div#skin_wrapper.skin_wrapper_loggedin {
+		margin-top: 0;
+	}
+}
+div.skin_wrapper_loggedin {
+	margin-top: 26px;
+	padding-top: 1px;
+}
+div#evo_toolbar {
+	.actions_left {
+		float: left;
+	}
+	.actions_right {
+		float: right;
+	}
+}
+// Hide "Dev" button when <480px width
+@media (max-width: 479px) {
+	div#evo_toolbar .actions_right .debug_dev_button {
+		display: none;
+	}
+}
+.evobar-menu, .evobar-menu * {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	box-sizing: content-box;
+	-webkit-font-smoothing: antialiased;
+}
+.evobar-menu {
+	ul {
+		position: absolute;
+		top: -99999em;
+		opacity: 0;
+		width: 25ex; // left offset of submenus need to match (see below)
+		border: 1px solid @evobar-border-color;
+		box-shadow: 2px 2px 4px -1px rgba(0, 0, 0, 0.25);
+		.transition( opacity .2s ease-in-out );
+		li {
+			width: 100%;
+		}
+	}
+	> li:hover > ul {
+		opacity: 1;
+		z-index: 99;
+		top: 26px;
+	}
+	li {
+		float: left;
+		position: relative;
+		&:hover li ul {
+			top: -999em;
+		}
+		ul li:last-child a {
+			border: none;
+		}
+		li {
+			ul {
+				top: -999em;
+				left: 25ex;
+			}
+			&:hover {
+				ul {
+					top: 0;
+					opacity: 1;
+				}
+				li ul {
+					top: -999em;
+					opacity: 0;
+				}
+			}
+			li:hover ul {
+				top: 0;
+				opacity: 1;
+			}
+			a, a:hover, a:link, a:visited {
+				display: block;
+				background-color: @evobar-bg-color;
+				color: @evobar-text-color;
+			}
+			a:hover {
+				background-color: @evobar-bg-color-hover;
+			}
+		}
+		&.separator {
+			background-color: @evobar-bg-color;
+			hr {
+				border: none;
+				background-color: @evobar-text-color;
+				height: 1px;
+				margin: 10px 4px;
+			}
+		}
+		u {	// This is used to hide a part of the text on small screens
+			text-decoration: none;
+		}
+	}
+	a {
+		display: inline-block;
+		position: relative;
+		background-color: @evobar-bg-color;
+		.transition( background-color .15s ease-out );
+		padding: 6px 1ex;  // .5em need to macth global height above
+		text-decoration:none;
+		min-height: 14px;
+		line-height: 14px;
+		color: @evobar-text-color;
+		// Set one color for each link status to don't rewrite from skins
+		&:hover, &:link, &:visited {
+			color: @evobar-text-color;
+		}
+		&:hover {
+			background-color: @evobar-bg-color-hover;
+			.transition( none );
+			text-decoration: none;
+		}
+		&.disabled, &.disabled:hover {
+			color: @evobar-text-color-disabled;
+		}
+	}
+	// .evobar-icon-down, .evobar-icon-right, .evobar-icon-left
+	[class^=evobar-icon-] {
+		margin-left: 6px;
+		float: right;
+	}
+}
+// Hide several menu entries on small screens
+@media (max-width: 800px) {
+	.evobar-menu li.rwdhide,
+	.evobar-menu li u {
+		display: none;
+	}
+}
+.actions_left .evobar-menu.evobar-menu-left {
+	float: left;
+}
+.actions_right .evobar-menu {
+	> li > ul {
+		right: 0;
+	}
+	li li ul {
+		left: -25.3ex;
+		z-index: -1;
+	}
+}

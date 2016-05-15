@@ -25,7 +25,7 @@ load_class( 'links/model/_linkuser.class.php', 'LinkUser' );
  * @param string link type ( item, comment, ... )
  * @param integer the corresponding object ID
  */
-function get_link_owner( $link_type, $object_ID )
+function & get_link_owner( $link_type, $object_ID )
 {
 	switch( $link_type )
 	{
@@ -120,7 +120,7 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 		$iframe_name = 'attach_'.generate_random_key( 16 );
 	}
 
-	$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' ).' - '.action_icon( T_('Refresh'), 'refresh', $admin_url.'?ctrl=links&amp;action=edit_links&amp;link_type='.$LinkOwner->type.'&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;link_object_ID='.$LinkOwner->get_ID(), T_('Refresh'), 3, 4, array( 'target' => $iframe_name ) );
+	$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' );
 
 	if( $current_User->check_perm( 'files', 'view', false, $Blog->ID )
 		&& $LinkOwner->check_perm( 'edit', false ) )
@@ -145,10 +145,25 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 				array( 'target' => '_blank' ) );
 	}
 
+	$fieldset_title .= '<span class="floatright">&nbsp;'
+			.action_icon( T_('Refresh'), 'refresh', $admin_url
+					.'?ctrl=links&amp;action=edit_links&amp;link_type='.$LinkOwner->type.'&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;link_object_ID='.$LinkOwner->get_ID(),
+					T_('Refresh'), 3, 4, array( 'target' => $iframe_name, 'class' => 'action_icon btn btn-default btn-sm' ) )
+
+					.action_icon( T_('Sort'), 'ascending', $admin_url
+					.'?ctrl=links&amp;action=sort_links&amp;link_type='.$LinkOwner->type.'&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;'.url_crumb( 'link' ),
+					T_('Sort'), 3, 4, array( 'target' => $iframe_name, 'class' => 'action_icon btn btn-default btn-sm' ) )
+
+			.'</span>';
+
 	// Get a count of links in order to deny folding when there is at least one link
 	$links_count = count( $LinkOwner->get_Links() );
 
-	$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_links', 'fold' => $fold, 'deny_fold' => ( $links_count > 0 ) ) );
+	$Form->begin_fieldset( $fieldset_title, array(
+			'id' => $LinkOwner->type == 'comment' ? 'cmntform_links' : 'itemform_links',
+			'fold' => $fold,
+			'deny_fold' => ( $links_count > 0 )
+		) );
 
 	echo '<div id="attachmentframe_wrapper">'
 				.'<iframe src="'.$admin_url.'?ctrl=links&amp;link_type='.$LinkOwner->type
@@ -159,13 +174,10 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 
 	$Form->end_fieldset();
 
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
 ?>
 <script type="text/javascript">
-<?php
-// Initialize JavaScript to build and open window
-echo_modalwindow_js();
-?>
-
 function link_attachment_window( iframe_name, link_owner_type, link_owner_ID, root, path, fm_highlight )
 {
 	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
@@ -211,9 +223,14 @@ jQuery( document ).ready( function()
 		jQuery( '#attachmentframe_wrapper' ).css( 'max-height', body_height );
 	}
 
+	var attachmentframe_is_loaded = false;
 	jQuery( '#attachmentframe' ).bind( 'load', function()
 	{ // Set proper height on frame loading:
-		update_attachment_frame_height();
+		if( ! attachmentframe_is_loaded )
+		{ // Only on first loading
+			update_attachment_frame_height();
+			attachmentframe_is_loaded = true;
+		}
 	} );
 
 	jQuery( '#icon_folding_itemform_links, #title_folding_itemform_links' ).click( function()
@@ -260,7 +277,9 @@ function display_attachments( & $LinkOwner, $params = array() )
 
 	$params = array_merge( array(
 			'block_start' => '<div class="attachment_list">',
-			'block_end' => '</div>',
+			'block_end'   => '</div>',
+			'table_start' => '<table class="grouped" cellspacing="0" cellpadding="0">',
+			'table_end'   => '</table>',
 		), $params );
 
 	$links = $LinkOwner->get_Links();
@@ -272,8 +291,8 @@ function display_attachments( & $LinkOwner, $params = array() )
 
 	$redirect_to = urlencode( empty( $redirect_to ) ? regenerate_url( '', '', '', '&' ) : $redirect_to );
 
-	echo $params[ 'block_start' ];
-	echo '<table class="grouped table-striped table-bordered table-hover table-condensed" cellspacing="0" cellpadding="0">';
+	echo $params['block_start'];
+	echo $params['table_start'];
 	echo '<thead>';
 	echo '<th class="firstcol shrinkwrap"><span>'.T_('Icon/Type').'</span></th>';
 	echo '<th class="nowrap"><span>'.T_('Path').'</span></th>';
@@ -293,7 +312,7 @@ function display_attachments( & $LinkOwner, $params = array() )
 		echo $link_File->get_preview_thumb( 'fulltype' );
 		echo '</td><td class="nowrap left">';
 		echo $link_File->get_view_link();
-		echo '</td><td class="shrinkwrap">';
+		echo '</td><td class="lastcol shrinkwrap">';
 		if( $current_User->check_perm( 'files', 'edit' ) )
 		{ // display delete link action
 			$delete_url = $samedomain_htsrv_url.'action.php?mname=collections&amp;action=unlink&amp;link_ID='.$Link->ID.'&amp;crumb_collections_unlink='.get_crumb( 'collections_unlink' ).'&amp;redirect_to='.$redirect_to;
@@ -301,8 +320,57 @@ function display_attachments( & $LinkOwner, $params = array() )
 		}
 		echo '</td></tr>';
 	}
-	echo '</tbody></table>';
-	echo $params[ 'block_end' ];
+	echo '</tbody>';
+	echo $params['table_end'];
+	echo $params['block_end'];
+}
+
+
+/*
+ * Get a link destination
+ *
+ * @return string
+ */
+function link_destination()
+{
+	/**
+	 * @var File
+	 */
+	global $current_File;
+
+	if( empty( $current_File ) )
+	{
+		return '?';
+	}
+
+	$r = '';
+
+	// File relative path & name:
+	if( $current_File->is_dir() )
+	{ // Directory
+		$r .= $current_File->get_view_link();
+	}
+	else
+	{ // File
+		if( $view_link = $current_File->get_view_link() )
+		{
+			$r .= $view_link;
+			// Use this hidden field to solve the conflicts on quick upload
+			$r .= '<input type="hidden" value="'.$current_File->get_root_and_rel_path().'" />';
+		}
+		else
+		{ // File extension unrecognized
+			$r .= $current_File->dget( '_name' );
+		}
+	}
+
+	$title = $current_File->dget('title');
+	if( $title !== '' )
+	{
+		$r .= '<span class="filemeta"> - '.$title.'</span>';
+	}
+
+	return $r;
 }
 
 
@@ -348,7 +416,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 
 	if( $current_File && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
 	{ // Locate file
-		$title = $current_File->is_dir() ? T_('Locate this directory!') : T_('Locate this file!');
+		$title = $current_File->dir_or_file( T_('Locate this directory!'), T_('Locate this file!') );
 		$url = $current_File->get_linkedit_url( $LinkOwner->type, $LinkOwner->get_ID() );
 		$rdfp_path = ( $current_File->is_dir() ? $current_File->get_rdfp_rel_path() : dirname( $current_File->get_rdfp_rel_path() ) ).'/';
 
@@ -365,16 +433,49 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 	// Delete link.
 	if( $LinkOwner->check_perm( 'edit' ) )
 	{ // Check that we have permission to edit LinkOwner object:
-		$r .= action_icon( T_('Delete this link!'), 'unlink',
+		$LinkCache = & get_LinkCache();
+		$Link = & $LinkCache->get_by_ID( $link_ID, false, false );
+		if( $Link && $Link->can_be_file_deleted() )
+		{	// If current user has a permission to delete a file completely
+			$File = & $Link->get_File();
+			$r .= action_icon( T_('Delete this file!'), 'delete',
+						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=delete'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
+						array( 'onclick' => 'return confirm( \''
+								.sprintf( TS_('Are you sure want to DELETE the file &laquo;%s&raquo;?\nThis CANNOT be reversed!'), utf8_strip_tags( link_destination() ) )
+								.'\' ) && item_unlink('.$link_ID.')' ) );
+		}
+		else
+		{	// If current user can only unlink
+			$r .= action_icon( T_('Delete this link!'), 'unlink',
 						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=unlink'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
 						array( 'onclick' => 'item_unlink('.$link_ID.')' ) );
+		}
 	}
 
 	if( $link_type == 'item' && $current_File )
-	{ // Display icon to insert image into post inline
-		$type = $current_File->is_image() ? 'image' : 'file';
+	{ // Display icon to insert image|video into post inline
+		$type = $current_File->get_file_type();
+
+		// valid file types: audio, video, image, other. See @link File::set_file_type()
+		switch( $type )
+		{
+			case 'audio':
+			  // no inline audio, show file download link using [file:] short tag
+				$type = 'file';
+				break;
+
+			case 'video':
+				break;
+
+			case 'image':
+				break;
+
+			case 'other':
+				$type = 'file';
+				break;
+		}
 		$r .= ' '.get_icon( 'add', 'imgtag', array(
-				'title'   => T_('Insert image into the post'),
+				'title'   => sprintf( T_('Insert %s into the post'), $type ),
 				'onclick' => 'insert_inline_link( \''.$type.'\', '.$link_ID.', \'\' )',
 				'style'   => 'cursor:default;'
 			) );
@@ -434,6 +535,58 @@ jQuery( document ).on( 'change', 'select[id^=display_position_]', {
 }, function( event )
 {
 	evo_display_position_onchange( this, event.data.url, event.data.crumb );
+} );
+</script>
+<?php
+}
+
+
+/**
+ * Print out JavaScript to make the links table sortable
+ */
+function echo_link_sortable_js()
+{
+	global $htsrv_url;
+?>
+<script type="text/javascript">
+jQuery( document ).ready( function()
+{
+	jQuery( '#link_ajax_content table' ).sortable(
+	{
+		containerSelector: 'table',
+		itemPath: '> tbody',
+		itemSelector: 'tr',
+		placeholder: '<tr class="placeholder"/>',
+		onDrop: function( $item, container, _super )
+		{
+			jQuery( '#link_ajax_content table tr' ).removeClass( 'odd even' );
+			jQuery( '#link_ajax_content table tr:odd' ).addClass( 'even' );
+			jQuery( '#link_ajax_content table tr:even' ).addClass( 'odd' );
+
+			var link_IDs = '';
+			jQuery( '#link_ajax_content table tr' ).each( function()
+			{
+				var link_ID_cell = jQuery( this ).find( '.link_id_cell' );
+				if( link_ID_cell.length > 0 )
+				{
+					link_IDs += link_ID_cell.html() + ',';
+				}
+			} );
+			link_IDs = link_IDs.slice( 0, -1 );
+
+			jQuery.ajax(
+			{
+				url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+				type: 'POST',
+				data:
+				{
+					'action': 'update_links_order',
+					'links': link_IDs,
+					'crumb_link': '<?php echo get_crumb( 'link' ); ?>',
+				}
+			} );
+		}
+	} );
 } );
 </script>
 <?php
@@ -636,5 +789,30 @@ function link_vote( $link_ID, $user_ID, $vote_action, $checked = 1 )
 	{
 		$DB->rollback();
 	}
+}
+
+
+function sort_links_by_filename( $a, $b )
+{
+	$a_File = $a->get_File();
+	$b_File = $b->get_File();
+
+	$a_type = $a_File->dir_or_file();
+	$b_type = $b_File->dir_or_file();
+
+	if( $a_type === $b_type )
+	{
+		$r = strnatcmp( $a_File->_name, $b_File->_name );
+	}
+	elseif( $a_type == 'directory' )
+	{
+		$r = -1;
+	}
+	else
+	{
+		$r = 1;
+	}
+
+	return $r;
 }
 ?>

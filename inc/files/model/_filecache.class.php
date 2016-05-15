@@ -32,7 +32,7 @@ class FileCache extends DataObjectCache
 	/**
 	 * Constructor
 	 */
-	function FileCache()
+	function __construct()
 	{
 		parent::__construct( 'File', false, 'T_files', 'file_', 'file_ID' );
 	}

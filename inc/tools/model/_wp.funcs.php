@@ -344,9 +344,9 @@ function wpxml_import()
 					}
 				}
 				$User->set( 'source', $author['author_source'] );
-				$User->set_datecreated( empty( $author['author_created_ts'] ) ? mktime() : intval( $author['author_created_ts'] ) );
+				$User->set_datecreated( empty( $author['author_created_ts'] ) ? time() : intval( $author['author_created_ts'] ) );
 				$User->set( 'lastseen_ts', ( empty( $author['author_lastseen_ts'] ) ? NULL : $author['author_lastseen_ts'] ), true );
-				$User->set( 'profileupdate_date', empty( $author['author_profileupdate_date'] ) ? date( 'Y-m-d', mktime() ): $author['author_profileupdate_date'] );
+				$User->set( 'profileupdate_date', empty( $author['author_profileupdate_date'] ) ? date( 'Y-m-d', time() ): $author['author_profileupdate_date'] );
 				$User->dbinsert();
 				$user_ID = $User->ID;
 				if( !empty( $user_ID ) && !empty( $author['author_created_fromIPv4'] ) )

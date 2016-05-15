@@ -363,6 +363,19 @@ function format_to_output( $content, $format = 'htmlbody' )
 			$content = trim($content);
 			break;
 
+		case 'syslog':
+			// Replace special chars to &amp;, &quot;, &#039;|&apos;, &lt; and &gt; :
+			if( version_compare( phpversion(), '5.4', '>=' ) )
+			{	// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
+				$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
+			}
+			else
+			{	// Handles & " ' < > to &amp; &quot; &#039; &lt; &gt;
+				$content = htmlspecialchars( $content, ENT_QUOTES, $evo_charset );
+			}
+			$content = preg_replace( "/\[\[(.+?)]]/is", "<code>$1</code>", $content ); // Replaces [[...]] into <code>...</code>
+			break;
+
 		default:
 			debug_die( 'Output format ['.$format.'] not supported.' );
 	}
@@ -844,7 +857,7 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 	{	// $pattern matches, call the callback method on full text except of matching blocks
 
 		// Create an unique string in order to replace all matching blocks temporarily
-		$unique_replacement = md5( mktime() + rand() );
+		$unique_replacement = md5( time() + rand() );
 
 		$matches_search = array();
 		$matches_replace = array();
@@ -913,17 +926,44 @@ function replace_content_outcode( $search, $replace, $content, $replace_function
  * @param array|string Search list
  * @param array|string Replace list
  * @param string Type of function: 'preg' -> preg_replace(), 'str' -> str_replace()
+ * @param string The maximum possible replacements for each pattern in each subject string. Defaults to -1 (no limit).
  * @return string Replaced content
  */
-function replace_content( $content, $search, $replace, $type = 'preg' )
+function replace_content( $content, $search, $replace, $type = 'preg', $limit = -1 )
 {
-	if( $type == 'str' )
-	{
-		return str_replace( $search, $replace, $content );
+	if( $limit == 0 )
+	{	// Strange request to nothing replace, Return original content:
+		return $content;
 	}
-	else
+
+	switch( $type )
 	{
-		return preg_replace( $search, $replace, $content );
+		case 'str':
+			if( $limit == -1 )
+			{	// Unlimited replace:
+				return str_replace( $search, $replace, $content );
+			}
+			else
+			{	// Limited replace:
+				$pos = strpos( $content, $search );
+				if( $pos !== false )
+				{	// Do the limited replacements:
+					for( $p = 0; $p < $limit; $p++ )
+					{
+						if( $pos === false )
+						{	// Stop searching:
+							break;
+						}
+						$content = substr_replace( $content, $replace, $pos, strlen( $search ) );
+						// Go to next searched substring:
+						$pos = strpos( $content, $search, $pos + strlen( $replace ) );
+					}
+				}
+				return $content;
+			}
+
+		default: // 'preg'
+			return preg_replace( $search, $replace, $content, $limit );
 	}
 }
 
@@ -1039,15 +1079,17 @@ function split_outcode( $separators, $content, $capture_separator = false )
  * @param string Url delimeter
  * @param string Callback function name
  * @param string Additional attributes for tag <a>
+ * @param boolean TRUE to exclude links from header tags like h1, h2, etc.
  * @return string
  */
-function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickable_callback', $additional_attrs = '' )
+function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickable_callback', $additional_attrs = '', $exclude_headers = false )
 {
 	$r = '';
 	$inside_tag = false;
 	$in_a_tag = false;
 	$in_code_tag = false;
 	$in_tag_quote = false;
+	$in_header_tag = false;
 	$from_pos = 0;
 	$i = 0;
 	$n = strlen($text);
@@ -1102,6 +1144,7 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 						$from_pos = $i;
 						$in_a_tag = false;
 						$in_tag_quote = false;
+						$in_header_tag = false;
 					}
 					break;
 			}
@@ -1121,6 +1164,24 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 						$from_pos = $i;
 						$in_code_tag = false;
 						$in_tag_quote = false;
+						$in_header_tag = false;
+					}
+					break;
+			}
+		}
+		elseif( $in_header_tag )
+		{	// In a code but no longer inside <h#>...</h#> tags or any other embedded tag like <strong> or whatever
+			switch( $text[$i] )
+			{
+				case '<':
+					if( strtolower( substr( $text, $i+1, 3 ) ) == '/'.$in_header_tag )
+					{	// Ok, this is the end tag of the header:
+						$i += 5;
+						$r .= substr( $text, $from_pos, $i - $from_pos );
+						$from_pos = $i;
+						$in_code_tag = false;
+						$in_tag_quote = false;
+						$in_header_tag = false;
 					}
 					break;
 			}
@@ -1148,15 +1209,13 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 				$in_code_tag = true;
 			}
 
+			if( $exclude_headers && preg_match( '/^h[1-6]$/', substr( $text, $i+1, 2 ), $h_match ) )
+			{	// opening "h1" - "h6" tags:
+				$in_header_tag = $h_match[0];
+			}
+
 			// Make the text before the opening < clickable:
-			if( is_array($callback) )
-			{
-				$r .= $callback[0]->$callback[1]( substr($text, $from_pos, $i-$from_pos), $moredelim, $additional_attrs );
-			}
-			else
-			{
-				$r .= $callback( substr($text, $from_pos, $i-$from_pos), $moredelim, $additional_attrs );
-			}
+			$r .= call_user_func_array( $callback, array( substr( $text, $from_pos, $i-$from_pos ), $moredelim, $additional_attrs ) );
 			$from_pos = $i;
 
 			// $i += 2;
@@ -1172,14 +1231,7 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 	}
 	else
 	{	// Make remplacements in the remaining part:
-		if( is_array($callback) )
-		{
-			$r .= $callback[0]->$callback[1]( substr($text, $from_pos), $moredelim, $additional_attrs );
-		}
-		else
-		{
-			$r .= $callback( substr($text, $from_pos), $moredelim, $additional_attrs );
-		}
+		$r .= call_user_func_array( $callback, array( substr( $text, $from_pos ), $moredelim, $additional_attrs ) );
 	}
 
 	return $r;
@@ -1255,7 +1307,13 @@ function date2mysql( $ts )
 function mysql2timestamp( $m, $useGM = false )
 {
 	$func = $useGM ? 'gmmktime' : 'mktime';
-	return $func( substr( $m, 11, 2 ), substr( $m, 14, 2 ), substr( $m, 17, 2 ), substr( $m, 5, 2 ), substr( $m, 8, 2 ), substr( $m, 0, 4 ) );
+	return $func(
+		intval( substr( $m, 11, 2 ) ),  // hour
+		intval( substr( $m, 14, 2 ) ),  // minute
+		intval( substr( $m, 17, 2 ) ),  // second
+		intval( substr( $m, 5, 2 ) ),   // month
+		intval( substr( $m, 8, 2 ) ),   // day
+		intval( substr( $m, 0, 4 ) ) ); // year
 }
 
 /**
@@ -1708,6 +1766,44 @@ function get_duration_title( $duration, $titles = array() )
 	}
 }
 
+function get_lastseen_date( $date, $view = 'exact_date', $cheat = 0 )
+{
+	$result = mysql2localedate( $date );
+
+	if( $view == 'blurred_date' )
+	{
+		$result = (int)( ( ( time() - strtotime( $date ) ) / 86400 ) - $cheat);
+
+		if( $result < 0 )
+		{
+			$result = 0;
+		}
+
+		if( $result < 3 )
+		{
+			$result = T_('less than 3 days ago');
+		}
+		elseif( $result < 7 )
+		{
+			$result = T_('less than a week ago');
+		}
+		elseif( $result < 30 )
+		{
+			$result = T_('less than a month ago');
+		}
+		elseif( $result < 90 )
+		{
+			$result = T_('less than 3 months ago');
+		}
+		else
+		{
+			$result = T_('more than 3 months ago');
+		}
+	}
+
+	return $result;
+}
+
 
 /**
  * Validate variable
@@ -1921,7 +2017,7 @@ function is_valid_login( $login, $force_strict_logins = false )
 
 	// Step 1
 	// Forbid the following characters in logins
-	if( preg_match( '~[\'"><@\s]~', $login ) )
+	if( preg_match( '~[\'"><@&\s]~', $login ) )
 	{	// WARNING: allowing ' or " or > or < will open security issues!
 		// NOTE: allowing @ will make some "average" users use their email address (not good for their spam health)
 		// NOTE: we do not allow whitespace in logins
@@ -2005,11 +2101,42 @@ function is_windows()
  */
 function get_atags( $content )
 {
-	$tag = 'a';
-	$regexp = '{<'.$tag.'[^>]*>(.*?)</'.$tag.'>}';
+	$tags = array();
 
-	preg_match_all( $regexp, $content, $result );
-	return $result[0];
+	if( preg_match_all( '#(<a[^>]+>(.*?)</a>|&lt;a.+&gt;(.*?)&lt;/a&gt;)#i', $content, $result ) )
+	{
+		$tags = $result[0];
+	}
+
+	return $tags;
+}
+
+
+/**
+ * Add class to an html tag
+ *
+ * @param string HTML content
+ * @param string Class to add to the tag in the HTML
+ * @param integer Number of tags to add the class to
+ * @return string HTML content with the added class
+ */
+function add_tag_class( $content, $class, $limit = 1 )
+{
+	// Check if there's an opening tag
+	if( preg_match( '/<.*>/i', $content ) )
+	{
+		// Check if class attribute is already defined
+		if( preg_match( '/\sclass\s*=/i', $content) )
+		{ // Insert class
+			$content = preg_replace( '/(<.*)(class\s*=\s*")(.*)"/i', '$1$2$3 '.$class.'"', $content, $limit );
+		}
+		else
+		{
+			$content = preg_replace( '/>/i', ' class="'.$class.'"$1>', $content, $limit );
+		}
+	}
+
+	return $content;
 }
 
 
@@ -2548,7 +2675,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 function debug_die( $additional_info = '', $params = array() )
 {
 	global $debug, $baseurl;
-	global $log_app_errors, $app_name, $is_cli, $display_errors_on_production;
+	global $log_app_errors, $app_name, $is_cli, $display_errors_on_production, $is_api_request;
 
 	$params = array_merge( array(
 		'status'     => '500 Internal Server Error',
@@ -2560,7 +2687,21 @@ function debug_die( $additional_info = '', $params = array() )
 		$additional_info = $params['debug_info'];
 	}
 
-	if( $is_cli )
+	if( $is_api_request )
+	{	// REST API or XMLRPC request:
+
+		// Set JSON content type:
+		headers_content_mightcache( 'application/json', 0, '#', false ); // Do NOT cache error messages! (Users would not see they fixed them)
+		header_http_response( $params['status'] );
+
+		echo json_encode( array(
+				'error_status' => $params['status'],
+				'error_info'   => $additional_info,
+			) );
+
+		die(1); // Error code 1. Note: This will still call the shutdown function.
+	}
+	elseif( $is_cli )
 	{ // Command line interface, e.g. in cron_exec.php:
 		echo '== '.T_('An unexpected error has occurred!')." ==\n";
 		echo T_('If this error persists, please report it to the administrator.')."\n";
@@ -2696,7 +2837,22 @@ function debug_die( $additional_info = '', $params = array() )
  */
 function bad_request_die( $additional_info = '' )
 {
-	global $debug, $baseurl;
+	global $debug, $baseurl, $is_api_request;
+
+	if( $is_api_request )
+	{	// REST API or XMLRPC request:
+
+		// Set JSON content type:
+		headers_content_mightcache( 'application/json', 0, '#', false ); // Do NOT cache error messages! (Users would not see they fixed them)
+		header_http_response( '400 Bad Request' );
+
+		echo json_encode( array(
+				'error_status' => '400 Bad Request',
+				'error_info'   => $additional_info,
+			) );
+
+		die(2); // Error code 2. Note: this will still call the shutdown function.
+	}
 
 	// Attempt to output an error header (will not work if the output buffer has already flushed once):
 	// This should help preventing indexing robots from indexing the error :P
@@ -2782,7 +2938,9 @@ function debug_info( $force = false, $force_clean = false )
 		if( stripos($header, 'content-type:') !== false )
 		{ // content type sent
 			# "Content-Type:text/html;charset=utf-8" => "text/html"
-			$content_type = trim(array_shift(explode(';', array_pop(explode(':', $header, 2)))));
+			$content_type = explode( ':', $header, 2 );
+			$content_type = explode( ';', array_pop( $content_type ) );
+			$content_type = trim( array_shift( $content_type ) );
 			break;
 		}
 	}
@@ -3052,7 +3210,12 @@ function debug_info( $force = false, $force_clean = false )
 		echo '<div class="log_container"><div>';
 		echo 'Opcode cache: '.get_active_opcode_cache();
 		echo $clean ? "\n" : '<p>';
+
+		// ================================ User caching ================================
+		echo 'User cache: '.get_active_user_cache();
+		echo $clean ? "\n" : '<p>';
 		echo '</div></div>';
+
 
 		// ================================ Memory Usage ================================
 		echo '<div class="log_container"><div>';
@@ -3244,16 +3407,16 @@ function debug_info( $force = false, $force_clean = false )
  * Exit when request is blocked
  *
  * @param string Block type: 'IP', 'Domain', 'Country'
- * @param string Debug message
+ * @param string Log message
  * @param string Syslog origin type: 'core', 'plugin'
  * @param integer Syslog origin ID
  */
-function exit_blocked_request( $block_type, $debug_message, $syslog_origin_type = 'core', $syslog_origin_ID = NULL )
+function exit_blocked_request( $block_type, $log_message, $syslog_origin_type = 'core', $syslog_origin_ID = NULL )
 {
 	global $debug;
 
 	// Write system log for the request:
-	syslog_insert( $debug_message, 'warning', NULL, NULL, $syslog_origin_type, $syslog_origin_ID );
+	syslog_insert( $log_message, 'warning', NULL, NULL, $syslog_origin_type, $syslog_origin_ID );
 
 	// Print out this text to inform an user:
 	echo 'Blocked.';
@@ -3432,7 +3595,7 @@ function user_get_notification_sender( $user_ID, $setting )
  */
 function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name = NULL, $headers = array(), $user_ID = NULL )
 {
-	global $servertimenow;
+	global $servertimenow, $email_send_simulate_only;
 
 	// Stop a request from the blocked IP addresses or Domains
 	antispam_block_request();
@@ -3562,20 +3725,25 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		return false;
 	}
 
-	// SEND MESSAGE:
-	if( $debug > 1 )
-	{ // We agree to die for debugging...
-		if( ! evo_mail( $to, $subject, $message_data, $headers, $additional_parameters ) )
-		{
+	if( $email_send_simulate_only )
+	{	// The email sending is turned on simulation mode, Don't send a real message:
+		$send_mail_result = true;
+	}
+	else
+	{	// Send email message on real mode:
+		$send_mail_result = evo_mail( $to, $subject, $message_data, $headers, $additional_parameters );
+	}
+
+	if( ! $send_mail_result )
+	{	// The message has not been sent successfully
+		if( $debug > 1 )
+		{ // We agree to die for debugging...
 			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error' );
 
 			debug_die( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.' );
 		}
-	}
-	else
-	{ // Soft debugging only....
-		if( ! evo_mail( $to, $subject, $message_data, $headers, $additional_parameters ) )
-		{
+		else
+		{ // Soft debugging only....
 			$Debuglog->add( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.', 'error' );
 
 			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error' );
@@ -3586,7 +3754,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	$Debuglog->add( 'Sent mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo;.' );
 
-	mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'ok' );
+	mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, ( $email_send_simulate_only ? 'simulated' : 'ok' ) );
 
 	return true;
 }
@@ -3805,16 +3973,22 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 		emailskin_include( $template_name.$ext, $params );
 		$formated_message .= ob_get_clean();
 
-		if( !empty( $User ) )
+		if( ! empty( $User ) )
 		{ // Replace $login$ with gender colored link + icon in HTML format,
 		  //   and with simple login text in PLAIN TEXT format
-			$user_login = $format == 'html' ? $User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'use_style' => true ) ) : $User->login;
+			if( $format == 'html' )
+			{
+				$user_login = $User->get_colored_login( array(
+						'mask'      => '$avatar$ $login$',
+						'use_style' => true,
+						'protocol'  => 'http:',
+					) );
+			}
+			else
+			{
+				$user_login = $User->login;
+			}
 			$formated_message = str_replace( '$login$', $user_login, $formated_message );
-		}
-
-		if( $format == 'html' )
-		{ // Use "http://" for protocol-relative urls because email browsers cannot load such urls:
-			$formated_message = preg_replace( '~(src|href)="//~', '$1="http://', $formated_message );
 		}
 
 		$template_message .= $formated_message;
@@ -4829,6 +5003,7 @@ function is_create_action( $action )
 		// The following one's a bit far fetched, but can happen if we have no sheet display:
 		case 'unlink':
 		case 'view':
+		case 'extract':
 			return false;
 
 		default:
@@ -5426,10 +5601,21 @@ function generate_link_from_params( $link_params, $params = array() )
 function send_javascript_message( $methods = array(), $send_as_html = false, $target = '' )
 {
 	// lets spit out any messages
-	global $Messages;
+	global $Messages, $param_input_err_messages;
 	ob_start();
 	$Messages->display();
 	$output = ob_get_clean();
+
+	// Initialize JavaScript params to send what field should be marked are error
+	$js_error_params = array();
+	if( ! empty( $param_input_err_messages ) && is_array( $param_input_err_messages ) )
+	{
+		foreach( $param_input_err_messages as $param_name => $param_error )
+		{
+			$js_error_params[] = $param_name.': \''.format_to_js( $param_error ).'\'';
+		}
+	}
+	$js_error_params = '{'.implode( ', ', $js_error_params ).'}';
 
 	// set target
 	$target = ( $target ? $target : param( 'js_target', 'string' ) );
@@ -5446,7 +5632,7 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 
 	if( $output )
 	{	// we have some messages
-		$output = $target.'DisplayServerMessages( \''.format_to_js( $output ).'\');'."\n";
+		$output = $target.'DisplayServerMessages( \''.format_to_js( $output ).'\', '.$js_error_params.' );'."\n";
 	}
 
 	if( !empty( $methods ) )
@@ -5614,18 +5800,24 @@ function array_to_option_list( $array, $default = '', $allow_none = array() )
  * @param boolean success (by reference)
  * @return mixed True in case of success, false in case of failure. NULL, if no backend is available.
  */
-function get_from_mem_cache($key, & $success )
+function get_from_mem_cache( $key, & $success )
 {
 	global $Timer;
 
-	$Timer->resume('get_from_mem_cache', false);
+	$Timer->resume( 'get_from_mem_cache', false );
 
-	if( function_exists('apc_fetch') )
+	if( function_exists( 'apc_fetch' ) )
+	{	// APC
 		$r = apc_fetch( $key, $success );
-	elseif( function_exists('xcache_get') && ini_get('xcache.var_size') > 0 )
-		$r = xcache_get($key);
-	elseif( function_exists('eaccelerator_get') )
-		$r = eaccelerator_get($key);
+	}
+	elseif( function_exists( 'xcache_get' ) && ini_get( 'xcache.var_size' ) > 0 )
+	{	// XCache
+		$r = xcache_get( $key );
+	}
+	elseif( function_exists( 'apcu_fetch' ) )
+	{	// APCu
+		$r = apcu_fetch( $key, $success );
+	}
 
 	if( ! isset($success) )
 	{ // set $success for implementation that do not set it itself (only APC does so)
@@ -5636,10 +5828,11 @@ function get_from_mem_cache($key, & $success )
 		$r = NULL;
 
 		global $Debuglog;
-		$Debuglog->add('No caching backend available for reading "'.$key.'".', 'cache');
+		$Debuglog->add( 'No caching backend available for reading "'.$key.'".', 'cache' );
 	}
 
-	$Timer->pause('get_from_mem_cache', false);
+	$Timer->pause( 'get_from_mem_cache', false );
+
 	return $r;
 }
 
@@ -5655,25 +5848,32 @@ function get_from_mem_cache($key, & $success )
  * @param int Time to live (seconds). Default is 0 and means "forever".
  * @return mixed
  */
-function set_to_mem_cache($key, $payload, $ttl = 0)
+function set_to_mem_cache( $key, $payload, $ttl = 0 )
 {
 	global $Timer;
 
-	$Timer->resume('set_to_mem_cache', false);
+	$Timer->resume( 'set_to_mem_cache', false );
 
-	if( function_exists('apc_store') )
+	if( function_exists( 'apc_store' ) )
+	{	// APC
 		$r = apc_store( $key, $payload, $ttl );
-	elseif( function_exists('xcache_set') && ini_get('xcache.var_size') > 0 )
+	}
+	elseif( function_exists( 'xcache_set' ) && ini_get( 'xcache.var_size' ) > 0 )
+	{	// XCache
 		$r = xcache_set( $key, $payload, $ttl );
-	elseif( function_exists('eaccelerator_put') )
-		$r = eaccelerator_put( $key, $payload, $ttl );
-	else {
+	}
+	elseif( function_exists( 'apcu_store' ) )
+	{	// APCu
+		$r = apcu_store( $key, $payload, $ttl );
+	}
+	else
+	{	// No available cache module:
 		global $Debuglog;
-		$Debuglog->add('No caching backend available for writing "'.$key.'".', 'cache');
+		$Debuglog->add( 'No caching backend available for writing "'.$key.'".', 'cache' );
 		$r = NULL;
 	}
 
-	$Timer->pause('set_to_mem_cache', false);
+	$Timer->pause( 'set_to_mem_cache', false );
 
 	return $r;
 }
@@ -5685,16 +5885,22 @@ function set_to_mem_cache($key, $payload, $ttl = 0)
  * @param string key
  * @return boolean True on success, false on failure. NULL if no backend available.
  */
-function unset_from_mem_cache($key)
+function unset_from_mem_cache( $key )
 {
-	if( function_exists('apc_delete') )
+	if( function_exists( 'apc_delete' ) )
+	{	// APC
 		return apc_delete( $key );
+	}
 
-	if( function_exists('xcache_unset') )
-		return xcache_unset(gen_key_for_cache($key));
+	if( function_exists( 'xcache_unset' ) )
+	{	// XCache
+		return xcache_unset( gen_key_for_cache( $key ) );
+	}
 
-	if( function_exists('eaccelerator_rm') )
-		return eaccelerator_rm(gen_key_for_cache($key));
+	if( function_exists( 'apcu_delete' ) )
+	{	// APCu
+		return apcu_delete( $key );
+	}
 }
 
 
@@ -5804,6 +6010,43 @@ function get_active_opcode_cache()
 		{
 			return 'eAccelerator';
 		}
+	}
+
+	if( ini_get( 'opcache.enable' ) )
+	{
+		return 'OPCache';
+	}
+
+	if( function_exists( 'apcu_cache_info' ) && ini_get( 'apc.enabled' ) )
+	{
+		return 'APCu';
+	}
+
+	return 'none';
+}
+
+
+/**
+ * Get name of active user cache, or "none".
+ * {@internal Anyone using something else, please extend.}}
+ * @return string
+ */
+function get_active_user_cache()
+{
+	if( function_exists( 'apc_cache_info' ) && ini_get( 'apc.enabled' ) )
+	{
+		return 'APC';
+	}
+
+	if( function_exists( 'apcu_cache_info' ) && ini_get( 'apc.enabled' ) )
+	{
+		return 'APCu';
+	}
+
+	// xcache: xcache.var_size must be > 0. xcache_set is not necessary (might have been disabled).
+	if( ini_get('xcache.size') > 0 )
+	{
+		return 'xcache';
 	}
 
 	return 'none';
@@ -6883,7 +7126,10 @@ jQuery( document ).ready( function()
 			else
 			{ // Use simple fade effect
 			?>
-			evoFadeSuccess( this );
+			if( typeof( evoFadeSuccess ) == 'function' )
+			{
+				evoFadeSuccess( this );
+			}
 			<?php } ?>
 		},
 		onsubmit: function( settings, original ) {},
@@ -6893,7 +7139,10 @@ jQuery( document ).ready( function()
 		},
 		onerror : function( settings, original, xhr )
 		{
-			evoFadeFailure( original );
+			if( typeof( evoFadeFailure ) == 'function' )
+			{
+				evoFadeFailure( original );
+			}
 			var input = jQuery( original ).find( 'input' );
 			if( input.length > 0 )
 			{
@@ -7005,92 +7254,6 @@ function echo_modalwindow_js()
 		return;
 	}
 
-	echo <<< JS_CODE
-/*
- * Build and open modal window
- *
- * @param string HTML content
- * @param string Width value in css format
- * @param string Height value in css format
- * @param boolean TRUE - to use transparent template
- * @param string Title of modal window (Used in bootstrap)
- * @param string|boolean Button to submit a form (Used in bootstrap), FALSE - to hide bottom panel with buttons
- */
-function openModalWindow( body_html, width, height, transparent, title, button )
-{
-	var overlay_class = 'overlay_page_active';
-	if( typeof transparent != 'undefined' && transparent == true )
-	{
-		overlay_class = 'overlay_page_active_transparent';
-	}
-
-	if( typeof width == 'undefined' )
-	{
-		width = '560px';
-	}
-	var style_height = '';
-	if( typeof height != 'undefined' && ( height > 0 || height != '' ) )
-	{
-		style_height = ' style="height:' + height + '"';
-	}
-	if( jQuery( '#overlay_page' ).length > 0 )
-	{ // placeholder already exist
-		jQuery( '#overlay_page' ).html( body_html );
-		return;
-	}
-	// add placeholder for form:
-	jQuery( 'body' ).append( '<div id="screen_mask"></div><div id="overlay_wrap" style="width:' + width + '"><div id="overlay_layout"><div id="overlay_page"' + style_height + '></div></div></div>' );
-	jQuery( '#screen_mask' ).fadeTo(1,0.5).fadeIn(200);
-	jQuery( '#overlay_page' ).html( body_html ).addClass( overlay_class );
-	jQuery( document ).on( 'click', '#close_button, #screen_mask, #overlay_page', function( e )
-	{
-		if( jQuery( this ).attr( 'id' ) == 'overlay_page' )
-		{
-			var form_obj = jQuery( '#overlay_page form' );
-			if( form_obj.length )
-			{
-				var top = form_obj.position().top + jQuery( '#overlay_wrap' ).position().top;
-				var bottom = top + form_obj.height();
-				if( ! ( e.clientY > top && e.clientY < bottom ) )
-				{
-					closeModalWindow();
-				}
-			}
-			return true;
-		}
-		closeModalWindow();
-		return false;
-	} );
-}
-
-/**
- * Close modal window
- */
-function closeModalWindow( document_obj )
-{
-	if( typeof( document_obj ) == 'undefined' )
-	{
-		document_obj = window.document;
-	}
-
-	jQuery( '#overlay_page', document_obj ).hide();
-	jQuery( '.action_messages', document_obj).remove();
-	jQuery( '#server_messages', document_obj ).insertBefore( '.first_payload_block' );
-	jQuery( '#overlay_wrap', document_obj ).remove();
-	jQuery( '#screen_mask', document_obj ).remove();
-	return false;
-}
-
-// Close ajax popup if Escape key is pressed:
-jQuery(document).keyup(function(e)
-{
-	if( e.keyCode == 27 )
-	{
-		closeModalWindow();
-	}
-} );
-JS_CODE;
-
 	$modal_window_js_initialized = true;
 }
 
@@ -7099,187 +7262,11 @@ JS_CODE;
  */
 function echo_modalwindow_js_bootstrap()
 {
-?>
-var modal_window_js_initialized = false;
-/*
- * Build and open madal window
- *
- * @param string HTML content
- * @param string Width value in css format
- * @param boolean TRUE - to use transparent template
- * @param string Title of modal window (Used in bootstrap)
- * @param string|boolean Button to submit a form (Used in bootstrap), FALSE - to hide bottom panel with buttons
- * @param boolean FALSE by default, TRUE - to don't remove bootstrap panels
- * @param boolean TRUE - to clear all previous windows
- * @param string ID of iframe where all contents
- */
-function openModalWindow( body_html, width, height, transparent, title, buttons, is_new_window, keep_panels, iframe_id )
-{
-	var style_width = ( typeof( width ) == 'undefined' || width == 'auto' ) ? '' : 'width:' + width + ';';
-	var style_height = ( typeof( height ) == 'undefined' || height == 0 || height == '' ) ? '': 'height:' + height;
-	var style_height_fixed = style_height.match( /%$/i ) ? ' style="height:100%;overflow:hidden;"' : '';
-	var style_body_height = height.match( /px/i ) ? ' style="min-height:' + ( height.replace( 'px', '' ) - 157 ) + 'px"' : '';
-	var use_buttons = ( typeof( buttons ) == 'undefined' || buttons != false );
-
-	if( typeof( buttons ) != 'undefined' && buttons != '' )
-	{
-		if( typeof( buttons ) == 'object' )
-		{ // Specific button with params
-			var button_title = buttons[0];
-			var button_class = buttons[1];
-			var button_form = typeof( buttons[2] ) == 'undefined' ? 'form' : buttons[2];
-		}
-		else
-		{ // Standard button to submit a single form
-			var button_title = buttons;
-			var button_class = 'btn-primary';
-			var button_form = 'form';
-		}
-	}
-
-	if( typeof( is_new_window ) != 'undefined' && is_new_window )
-	{ // Clear previous opened window
-		jQuery( '#modal_window' ).remove();
-	}
-
-	if( jQuery( '#modal_window' ).length == 0 )
-	{ // Build modal window
-		var modal_html = '<div id="modal_window" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"><div class="modal-dialog" style="' + style_width + style_height +'"><div class="modal-content"' + style_height_fixed + '>';
-		if( typeof title != 'undefined' && title != '' )
-		{
-			modal_html += '<div class="modal-header">' +
-					'<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
-					'<h4 class="modal-title">' + title + '</h4>' +
-				'</div>';
-		}
-		modal_html += '<div class="modal-body"' + style_height_fixed + style_body_height + '>' + body_html + '</div>';
-
-		if( use_buttons )
-		{
-			modal_html += '<div class="modal-footer">';
-			if( typeof( buttons ) != 'undefined' && buttons != '' )
-			{
-				modal_html += '<button class="btn ' + button_class + '" type="submit" style="display:none">' + button_title + '</button>';
-			}
-			modal_html += '<button class="btn btn-default" data-dismiss="modal" aria-hidden="true"><?php echo TS_( 'Close' ) ?></button></div>';
-		}
-		modal_html += '</div></div></div>';
-		jQuery( 'body' ).append( modal_html );
-	}
-	else
-	{ // Use existing modal window
-		jQuery( '#modal_window .modal-body' ).html( body_html );
-	}
-
-	if( typeof( iframe_id ) != 'undefined' )
-	{
-		jQuery( '#' + iframe_id ).load( function()
-		{	// Prepare modal window only after loading full content:
-			prepareModalWindow( jQuery( this ).contents(), button_form, use_buttons, keep_panels );
-			jQuery( '#modal_window .loader_img' ).remove();
-			jQuery( '#' + iframe_id ).show();
-		} );
-	}
-	else
-	{
-		prepareModalWindow( '#modal_window', button_form, use_buttons, keep_panels );
-	}
-
-	// Init modal window and show
-	var options = {};
-	if( modal_window_js_initialized )
-	{
-		options = 'show';
-	}
-	jQuery( '#modal_window' ).modal( options );
-	if( style_width == '' )
-	{
-		jQuery( '#modal_window .modal-dialog' ).css( { 'display': 'table', 'width': 'auto' } );
-		jQuery( '#modal_window .modal-dialog .modal-content' ).css( { 'display': 'table-cell' } );
-	}
-
-	jQuery( '#modal_window').on( 'hidden', function ()
-	{ // Remove modal window on hide event to draw new window in next time with new title and button
-		jQuery( this ).remove();
-	} );
-
-	modal_window_js_initialized = true;
+	// Initialize variables for the file "bootstrap-evo_modal_window.js":
+	echo '<script type="text/javascript">
+		var evo_js_lang_close = \''.TS_('Close').'\';
+	</script>';
 }
-
-function prepareModalWindow( modal_document, button_form, use_buttons, keep_panels )
-{
-	if( use_buttons )
-	{
-		if( typeof( keep_panels ) == 'undefined' || ! keep_panels )
-		{ // Remove these elements, they are displayed as title and button of modal window
-			jQuery( 'legend', modal_document ).remove();
-			jQuery( '#close_button', modal_document ).remove();
-			jQuery( '.panel, .panel-body', modal_document ).removeClass( 'panel panel-default panel-body' );
-		}
-
-		if( jQuery( button_form + ' input[type=submit]', modal_document ).length == 0 )
-		{ // Hide a submit button in the footer if real submit input doesn't exist
-			jQuery( '#modal_window .modal-footer button[type=submit]' ).hide();
-		}
-		else
-		{
-			jQuery( button_form + ' input[type=submit]', modal_document ).hide();
-			jQuery( '#modal_window .modal-footer button[type=submit]' ).show();
-		}
-
-		jQuery( button_form, modal_document ).change( function()
-		{ // Find the submit inputs when html is changed
-			var input_submit = jQuery( this ).find( 'input[type=submit]' )
-			if( input_submit.length > 0 )
-			{ // Hide a real submit input and Show button of footer
-				input_submit.hide();
-				jQuery( '#modal_window .modal-footer button[type=submit]' ).show();
-			}
-			else
-			{ // Hide button of footer if real submit input doesn't exist
-				jQuery( '#modal_window .modal-footer button[type=submit]' ).hide();
-			}
-		} );
-
-		jQuery( '#modal_window .modal-footer button[type=submit]' ).click( function()
-		{ // Copy a click event from real submit input to button of footer
-			jQuery( button_form + ' input[type=submit]', modal_document ).click();
-		} );
-	}
-
-	jQuery( button_form + ' a.btn', modal_document ).each( function()
-	{ // Move all buttons to the footer
-		jQuery( '#modal_window .modal-footer' ).prepend( '<a href=' + jQuery( this ).attr( 'href' ) + '>' +
-			'<button type="button" class="' + jQuery( this ).attr( 'class' ) + '">' +
-			jQuery( this ).html() +
-			'</button></a>' );
-		jQuery( this ).remove();
-	} );
-
-	if( jQuery( button_form + ' #current_modal_title', modal_document ).length > 0 )
-	{ // Change window title
-		jQuery( '#modal_window .modal-title' ).html( jQuery( button_form + ' #current_modal_title', modal_document ).html() );
-	}
-}
-
-/**
- * Close modal window
- *
- * @param object Document object
- */
-function closeModalWindow( document_obj )
-{
-	if( typeof( document_obj ) == 'undefined' )
-	{
-		document_obj = window.document;
-	}
-
-	jQuery( '#modal_window', document_obj ).remove();
-
-	return false;
-}
-<?php
-} // end of echo_modalwindow_js_bootstrap
 
 
 /**
@@ -7501,21 +7488,22 @@ function save_fieldset_folding_values( $blog_ID = NULL )
 function get_status_dropdown_button( $params = array() )
 {
 	$params = array_merge( array(
-			'name'         => '',
-			'value'        => '',
-			'title_format' => '',
-			'options'      => NULL,
+			'name'             => '',
+			'value'            => '',
+			'title_format'     => '',
+			'options'          => NULL,
+			'exclude_statuses' => array( 'trash' ),
 		), $params );
 
 	if( $params['options'] === NULL )
 	{	// Get status options by title format:
-		$status_options = get_visibility_statuses( $params['title_format'] );
+		$status_options = get_visibility_statuses( $params['title_format'], $params['exclude_statuses'] );
 	}
 	else
 	{	// Use status options from params:
 		$status_options = $params['options'];
 	}
-	$status_icon_options = get_visibility_statuses( 'icons' );
+	$status_icon_options = get_visibility_statuses( 'icons', $params['exclude_statuses'] );
 
 	$r = '<div class="btn-group dropdown autoselected">';
 	$r .= '<button type="button" class="btn btn-status-'.$params['value'].' dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'
@@ -7606,10 +7594,15 @@ function get_script_baseurl()
  *
  * @param string Type: 'coll', 'user'
  * @param string Manual URL, '#' - default, false - don't set URL
+ * @param string Text
+ * @param string Title
+ * @param string Value
  * @return string
  */
-function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title = '#' )
+function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title = '#', $value = NULL )
 {
+	$badge_class = 'badge badge-warning';
+
 	switch( $type )
 	{
 		case 'coll':
@@ -7642,6 +7635,21 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
 			}
 			break;
 
+		case 'group':
+			if( $value == 'primary' )
+			{	// Use text for primary group:
+				$text = T_('Primary');
+				$badge_class = 'label label-primary';
+			}
+			else
+			{	// Use text for secondary group:
+				$text = T_('Secondary');
+				$badge_class = 'label label-info';
+			}
+			$title = '';
+			$manual_url = '';
+			break;
+
 		default:
 			// Unknown badge type:
 			return '';
@@ -7655,7 +7663,12 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
 	{	// Use link:
 		$r = ' <a href="'.get_manual_url( $manual_url ).'" target="_blank"';
 	}
-	$r .= ' class="badge badge-warning" data-toggle="tooltip" data-placement="top" title="'.format_to_output( $title, 'htmlattr' ).'">';
+	$r .= ' class="'.$badge_class.'"';
+	if( ! empty( $title ) && $title != '#' )
+	{	// Use title for tooltip:
+		$r .= ' data-toggle="tooltip" data-placement="top" title="'.format_to_output( $title, 'htmlattr' ).'"';
+	}
+	$r .= '>';
 	$r .= $text;
 	if( empty( $manual_url ) )
 	{	// End of text formatted badge:
@@ -7673,7 +7686,7 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
 /**
  * Compares two "PHP-standardized" version number strings
  *
- * @param string First version number
+ * @param string First version number, Use 'current' for global $app_version
  * @param string Second version number
  * @param string If the third optional operator argument is specified, test for a particular relationship.
  *               The possible operators are: <, lt, <=, le, >, gt, >=, ge, ==, =, eq, !=, <>, ne respectively.
@@ -7683,15 +7696,21 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
  */
 function evo_version_compare( $version1, $version2, $operator = NULL )
 {
+	if( $version1 === 'current' )
+	{	// Use current version of application:
+		global $app_version;
+		$version1 = $app_version;
+	}
+
 	// Remove part after "-" from versions like "6.6.6-stable":
 	$version1 = preg_replace( '/(-.+)?/', '', $version1 );
 
 	if( is_null( $operator ) )
-	{	// To return integer
+	{	// To return integer:
 		return version_compare( $version1, $version2 );
 	}
 	else
-	{ // To return boolean
+	{	// To return boolean:
 		return version_compare( $version1, $version2, $operator );
 	}
 }

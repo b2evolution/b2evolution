@@ -33,6 +33,7 @@ $schema_queries = array(
 		"CREATE TABLE T_groups (
 			grp_ID                           int(11) NOT NULL auto_increment,
 			grp_name                         varchar(50) NOT NULL default '',
+			grp_usage                        ENUM('primary','secondary') COLLATE ascii_general_ci NOT NULL DEFAULT 'primary',
 			grp_level                        int unsigned DEFAULT 0 NOT NULL,
 			grp_perm_blogs                   enum('user','viewall','editall') COLLATE ascii_general_ci NOT NULL default 'user',
 			grp_perm_bypass_antispam         TINYINT(1) NOT NULL DEFAULT 0,
@@ -175,7 +176,8 @@ $schema_queries = array(
 			ivc_code      varchar(32) COLLATE ascii_general_ci NOT NULL,
 			ivc_expire_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			ivc_source    varchar(30) NULL,
-			ivc_grp_ID    int(4) NOT NULL,
+			ivc_grp_ID    int(4) NULL,
+			ivc_level     int unsigned NULL,
 			PRIMARY KEY ( ivc_ID ),
 			UNIQUE ivc_code ( ivc_code )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -183,9 +185,12 @@ $schema_queries = array(
 	'T_users__organization' => array(
 		'Creating table for User organizations',
 		"CREATE TABLE T_users__organization (
-			org_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-			org_name VARCHAR(255) NOT NULL,
-			org_url  VARCHAR(2000) NULL,
+			org_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			org_owner_user_ID INT(11) UNSIGNED NOT NULL,
+			org_name          VARCHAR(255) NOT NULL,
+			org_url           VARCHAR(2000) NULL,
+			org_accept        ENUM( 'yes', 'owner', 'no' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'owner',
+			org_perm_role     ENUM( 'owner and member', 'owner' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'owner and member',
 			PRIMARY KEY ( org_ID ),
 			UNIQUE org_name ( org_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -198,6 +203,14 @@ $schema_queries = array(
 			uorg_accepted TINYINT(1) DEFAULT 0,
 			uorg_role     VARCHAR(255) NULL,
 			PRIMARY KEY ( uorg_user_ID, uorg_org_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_users__secondary_user_groups' => array(
+		'Creating table for secondary user groups',
+		"CREATE TABLE T_users__secondary_user_groups (
+			sug_user_ID INT(11) UNSIGNED NOT NULL,
+			sug_grp_ID  INT(11) UNSIGNED NOT NULL,
+			PRIMARY KEY ( sug_user_ID, sug_grp_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_i18n_original_string' => array(
@@ -291,7 +304,7 @@ $schema_queries = array(
 		'Creating plugin settings table',
 		"CREATE TABLE T_pluginsettings (
 			pset_plug_ID INT(11) UNSIGNED NOT NULL,
-			pset_name VARCHAR( 30 ) COLLATE ascii_general_ci NOT NULL,
+			pset_name VARCHAR( 60 ) COLLATE ascii_general_ci NOT NULL,
 			pset_value TEXT NULL,
 			PRIMARY KEY ( pset_plug_ID, pset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -318,12 +331,13 @@ $schema_queries = array(
 	'T_cron__task' => array(
 		'Creating cron tasks table',
 		"CREATE TABLE T_cron__task(
-			ctsk_ID              int(10) unsigned not null AUTO_INCREMENT,
-			ctsk_start_datetime  datetime not null DEFAULT '2000-01-01 00:00:00',
-			ctsk_repeat_after    int(10) unsigned,
-			ctsk_key             varchar(50) COLLATE ascii_general_ci not null,
-			ctsk_name            varchar(255) null COMMENT 'Specific name of this task. This value is set only if this job name was modified by an admin user',
-			ctsk_params          varchar(255),
+			ctsk_ID               int(10) unsigned not null AUTO_INCREMENT,
+			ctsk_start_datetime   datetime not null DEFAULT '2000-01-01 00:00:00',
+			ctsk_repeat_after     int(10) unsigned,
+			ctsk_repeat_variation int(10) unsigned DEFAULT 0,
+			ctsk_key              varchar(50) COLLATE ascii_general_ci not null,
+			ctsk_name             varchar(255) null COMMENT 'Specific name of this task. This value is set only if this job name was modified by an admin user',
+			ctsk_params           varchar(255),
 			PRIMARY KEY (ctsk_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -333,7 +347,7 @@ $schema_queries = array(
 			clog_ctsk_ID              int(10) unsigned   not null,
 			clog_realstart_datetime   datetime           not null DEFAULT '2000-01-01 00:00:00',
 			clog_realstop_datetime    datetime,
-			clog_status               enum('started','finished','error','timeout') COLLATE ascii_general_ci not null default 'started',
+			clog_status               enum('started','finished','error','timeout','warning') COLLATE ascii_general_ci not null default 'started',
 			clog_messages             text,
 			PRIMARY KEY (clog_ctsk_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -426,7 +440,7 @@ $schema_queries = array(
 			emlog_timestamp TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			emlog_user_ID   INT(10) UNSIGNED DEFAULT NULL,
 			emlog_to        VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
-			emlog_result    ENUM( 'ok', 'error', 'blocked' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ok',
+			emlog_result    ENUM( 'ok', 'error', 'blocked', 'simulated' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ok',
 			emlog_subject   VARCHAR(255) DEFAULT NULL,
 			emlog_headers   TEXT DEFAULT NULL,
 			emlog_message   TEXT DEFAULT NULL,
@@ -467,14 +481,18 @@ $schema_queries = array(
 	'T_email__campaign' => array(
 		'Creating email campaigns table',
 		"CREATE TABLE T_email__campaign (
-			ecmp_ID          INT NOT NULL AUTO_INCREMENT,
-			ecmp_date_ts     TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-			ecmp_name        VARCHAR(255) NOT NULL,
-			ecmp_email_title VARCHAR(255) NULL,
-			ecmp_email_html  TEXT NULL,
-			ecmp_email_text  TEXT NULL,
-			ecmp_sent_ts     TIMESTAMP NULL,
-			PRIMARY KEY      (ecmp_ID)
+			ecmp_ID              INT NOT NULL AUTO_INCREMENT,
+			ecmp_date_ts         TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			ecmp_name            VARCHAR(255) NOT NULL,
+			ecmp_email_title     VARCHAR(255) NULL,
+			ecmp_email_html      TEXT NULL,
+			ecmp_email_text      TEXT NULL,
+			ecmp_email_plaintext TEXT NULL,
+			ecmp_sent_ts         TIMESTAMP NULL,
+			ecmp_renderers       VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			ecmp_use_wysiwyg     TINYINT(1) NOT NULL DEFAULT 0,
+			ecmp_send_ctsk_ID    INT(10) UNSIGNED NULL DEFAULT NULL,
+			PRIMARY KEY          (ecmp_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
 	'T_email__campaign_send' => array(
@@ -500,7 +518,7 @@ $schema_queries = array(
 			slg_message   VARCHAR(255) NOT NULL,
 			PRIMARY KEY   (slg_ID),
 			INDEX         slg_object (slg_object, slg_object_ID)
-		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" )
+		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 );
 
 ?>

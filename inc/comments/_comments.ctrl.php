@@ -79,6 +79,10 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( $check_permname, $check_permlevel, true, $edited_Comment );
 
+		// Restrict comment status by parent item:
+		$update_restricted_status = ( $action != 'edit' && $action != 'switch_view' );
+		$edited_Comment->restrict_status_by_item( $update_restricted_status );
+
 		$comment_title = '';
 		$comment_content = htmlspecialchars_decode( $edited_Comment->content );
 
@@ -181,7 +185,7 @@ switch( $action )
 // Set the third level tab
 param( 'tab3', 'string', '', true );
 
-$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
 $AdminUI->breadcrumbpath_add( T_('Comments'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;filter=restore' );
 switch( $tab3 )
 {
@@ -191,6 +195,13 @@ switch( $tab3 )
 
 	case 'fullview':
 		$AdminUI->breadcrumbpath_add( T_('Full text view'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;tab3='.$tab3.'&amp;filter=restore' );
+		break;
+
+	case 'meta':
+		// Check permission for meta comments:
+		$current_User->check_perm( 'meta_comment', 'blog', true, $Blog );
+
+		$AdminUI->breadcrumbpath_add( T_('Meta discussion'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;tab3='.$tab3.'&amp;filter=restore' );
 		break;
 }
 
@@ -234,8 +245,24 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
 
-		if( ! $edited_Comment->get_author_User() )
-		{ // If this is not a member comment
+		// Update the folding positions for current user per collection:
+		save_fieldset_folding_values( $Blog->ID );
+
+		if( $edited_Comment->get_author_User() )
+		{	// This comment has been created by member
+			if( $current_User->check_perm( 'users', 'edit' ) && param( 'comment_author_login', 'string', NULL ) !== NULL )
+			{	// Only admins can change the author
+				if( param_check_not_empty( 'comment_author_login', T_('Please enter valid author login.') ) && param_check_login( 'comment_author_login', true ) )
+				{
+					if( ( $author_User = & $UserCache->get_by_login( $comment_author_login ) ) !== false )
+					{	// Update author user:
+						$edited_Comment->set_author_User( $author_User );
+					}
+				}
+			}
+		}
+		else
+		{	// If this is not a member comment
 			param( 'newcomment_author', 'string', true );
 			param( 'newcomment_author_email', 'string' );
 			param( 'newcomment_author_url', 'string' );
@@ -377,6 +404,10 @@ switch( $action )
 			$edited_Comment->set( 'status', $comment_status );
 		}
 
+		// Restrict comment status by parent item:
+		$edited_Comment->restrict_status_by_item( true );
+		$comment_status = $edited_Comment->get( 'status' );
+
 		param( 'comment_nofollow', 'integer', 0 );
 		$edited_Comment->set_from_Request( 'nofollow' );
 
@@ -395,10 +426,12 @@ switch( $action )
 		{ // UPDATE DB:
 			$edited_Comment->dbupdate();	// Commit update to the DB
 
-			if( $edited_Comment->status == 'published' )
-			{ // comment status was set to published or it was already published, needs to handle notifications
-				$edited_Comment->handle_notifications( false, $current_User->ID );
-			}
+			// Get params to skip/force/mark email notifications:
+			param( 'comment_members_notified', 'string', NULL );
+			param( 'comment_community_notified', 'string', NULL );
+
+			// Execute or schedule email notifications:
+			$edited_Comment->handle_notifications( NULL, false, $comment_members_notified, $comment_community_notified );
 
 			$Messages->add( T_('Comment has been updated.'), 'success' );
 
@@ -427,8 +460,12 @@ switch( $action )
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
-		// comment status was set to published, needs to handle notifications
-		$edited_Comment->handle_notifications( false, $current_User->ID );
+		// Get params to skip/force/mark email notifications:
+		param( 'comment_members_notified', 'string', NULL );
+		param( 'comment_community_notified', 'string', NULL );
+
+		// Execute or schedule email notifications:
+		$edited_Comment->handle_notifications( NULL, false, $comment_members_notified, $comment_community_notified );
 
 		// Set the success message corresponding for the new status
 		switch( $edited_Comment->status )
@@ -573,12 +610,43 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
 
-		$item_content = $edited_Comment->get_author_name().' '.T_( 'wrote' ).': <blockquote>'.$edited_Comment->get_content().'</blockquote>';
+		$type = param( 'type', 'string', 'quote' );
+
 		$new_Item = new Item();
 		$new_Item->set( 'status', 'draft' );
-		$new_Item->set_creator_by_login( $current_User->login );
 		$new_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
 		$new_Item->set( 'title', T_( 'Elevated from comment' ) );
+
+		if( $type == 'quote' )
+		{ // Set a post data for a quote mode:
+			$item_content = $edited_Comment->get_author_name().' '.T_( 'wrote' ).':';
+			if( $new_Item->get_type_setting( 'allow_html' ) )
+			{ // Use html quote format if HTML is allowed for new creating post:
+				$item_content .= ' <blockquote>'.$edited_Comment->get_content( 'raw_text' ).'</blockquote>';
+			}
+			else
+			{ // Use markdown quote format if HTML is NOT allowed for new creating post:
+				$item_content .= "\n> ".str_replace( "\n", "\n> ", $edited_Comment->get_content( 'raw_text' ) );
+			}
+			// Set creator as current user:
+			$new_Item->set_creator_by_login( $current_User->login );
+		}
+		else // $type == 'original'
+		{ // Set a post data for an original mode:
+			// Use an original comment content for new creating post:
+			$item_content = $edited_Comment->get_content( 'raw_text' );
+
+			// Set a post creator:
+			$author_User = & $edited_Comment->get_author_User();
+			if( empty( $author_User ) )
+			{ // Use current user:
+				$new_Item->set_creator_by_login( $current_User->login );
+			}
+			else
+			{ // Use a comment author:
+				$new_Item->set_creator_by_login( $author_User->login );
+			}
+		}
 		$new_Item->set( 'content', $item_content );
 
 		if( ! $new_Item->dbinsert() )
@@ -605,7 +673,7 @@ switch( $action )
 		$AdminUI->title_titlearea = T_('Latest comments');
 
 		// Generate available blogs list:
-		$AdminUI->set_coll_list_params( 'blog_comments', 'edit', array( 'ctrl' => 'comments', 'filter' => 'restore' ) );
+		$AdminUI->set_coll_list_params( 'blog_comments', 'edit', array( 'ctrl' => 'comments', 'filter' => 'restore', 'tab3' => $tab3 ) );
 
 		/*
 		 * Add sub menu entries:
@@ -633,11 +701,21 @@ switch( $action )
 		$CommentList = new CommentList2( $Blog, NULL, 'CommentCache', $comments_list_param_prefix, $tab3 );
 
 		// Filter list:
-		$CommentList->set_default_filters( array(
-				'statuses' => get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) ),
-				//'comments' => $UserSettings->get( 'results_per_page' ),
-				'order' => 'DESC',
-			) );
+		if( $tab3 == 'meta' )
+		{	// Meta comments:
+			$CommentList->set_default_filters( array(
+					'types' => array( 'meta' ),
+					'order' => 'DESC',
+				) );
+		}
+		else
+		{	// Normal comments:
+			$CommentList->set_default_filters( array(
+					'statuses' => get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) ),
+					//'comments' => $UserSettings->get( 'results_per_page' ),
+					'order' => 'DESC',
+				) );
+		}
 
 		$CommentList->load_from_Request();
 
@@ -679,14 +757,16 @@ switch( $action )
 
 $AdminUI->set_path( 'collections', 'comments' );
 
-if( $tab3 == 'fullview' )
+if( $tab3 == 'fullview' || $tab3 == 'meta' )
 { // Load jquery UI to animate background color on change comment status and to transfer a comment to recycle bin
 	require_js( '#jqueryUI#' );
 }
 
-if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit', 'elevate' ) ) )
+if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit', 'elevate', 'switch_view' ) ) )
 { // Initialize date picker for _comment.form.php
 	init_datepicker_js();
+	// Init JS to autocomplete the user logins:
+	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 }
 
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
@@ -780,7 +860,7 @@ switch( $action )
 		}
 
 		// Display VIEW:
-		if( $tab3 == 'fullview' )
+		if( $tab3 == 'fullview' || $tab3 == 'meta' )
 		{
 			$AdminUI->disp_view( 'comments/views/_browse_comments.view.php' );
 		}

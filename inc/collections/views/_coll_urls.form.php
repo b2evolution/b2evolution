@@ -231,6 +231,87 @@ jQuery( '[id$=_assets_absolute_url]' ).focus( function()
 $Form->end_fieldset();
 
 
+$Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_manual_link( 'assets-url-cdn-settings' ) );
+
+	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+	{ // Permission to edit advanced admin settings
+		global $rsc_url, $media_url, $skins_url;
+
+		$option_labels = array(
+			'basic' => T_('URL configured in Basic Config'),
+			'relative' => T_('%s folder relative to current collection'),
+			'absolute' => T_('Absolute URL').':'
+		);
+		$absolute_url_note = T_('Enter path to %s folder ending with / -- This may be located in a CDN zone');
+		$assets_url_data = array();
+		// rsc url:
+		$assets_url_data['rsc_assets_url_type'] = array(
+				'label'        => T_('Load generic /rsc/ assets from'),
+				'url'          => $rsc_url,
+				'absolute_url' => 'rsc_assets_absolute_url',
+				'folder'       => '/rsc/',
+				'local_url'    => $edited_Blog->get_local_rsc_url( 'relative' )
+			);
+		// media url:
+		$assets_url_data['media_assets_url_type'] = array(
+				'label'        => T_('Load /media/ assets from')
+			);
+		if( $edited_Blog->get( 'media_location' ) == 'none' )
+		{ // if media location is disabled
+			$assets_url_data['media_assets_url_type']['info'] = sprintf( T_('The media directory is <a %s>turned off</a> for this collection'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$edited_Blog->ID.'#media_dir_location"' );
+		}
+		elseif( $edited_Blog->get( 'media_location' ) == 'custom' )
+		{ // if media location is customized
+			$assets_url_data['media_assets_url_type']['info'] = sprintf( T_('A custom location has already been set in the <a %s>advanced properties</a>'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$edited_Blog->ID.'"' );
+		}
+		else
+		{
+			$assets_url_data['media_assets_url_type'] += array(
+					'url'          => $media_url,
+					'absolute_url' => 'media_assets_absolute_url',
+					'folder'       => '/media/',
+					'local_url'    => $edited_Blog->get_local_media_url( 'relative' )
+				);
+		}
+		// skins url:
+		$assets_url_data['skins_assets_url_type'] = array(
+				'label'        => T_('Load /skins/ assets from'),
+				'url'          => $skins_url,
+				'absolute_url' => 'skins_assets_absolute_url',
+				'folder'       => '/skins/',
+				'local_url'    => $edited_Blog->get_local_skins_url( 'relative' )
+			);
+
+		foreach( $assets_url_data as $asset_url_type => $asset_url_data )
+		{
+			if( isset( $asset_url_data['info'] ) )
+			{ // Display only info for this url type
+				$Form->info( $asset_url_data['label'], $asset_url_data['info'] );
+			}
+			else
+			{ // Display options full list
+				$Form->radio( $asset_url_type, $edited_Blog->get_setting( $asset_url_type ), array(
+					array( 'basic', $option_labels['basic'], $asset_url_data['url'] ),
+					array( 'relative', sprintf( $option_labels['relative'], $asset_url_data['folder'] ), '<span id="'.$asset_url_type.'_relative">'.$asset_url_data['local_url'].'</span>' ),
+					array( 'absolute', $option_labels['absolute'], '',
+						'<input type="text" id="'.$asset_url_data['absolute_url'].'" class="form_text_input form-control" name="'.$asset_url_data['absolute_url'].'"
+						size="50" maxlength="120" onfocus="document.getElementsByName(\''.$asset_url_type.'\')[2].checked=true;" value="'.$edited_Blog->get_setting( $asset_url_data['absolute_url'] ).'" />
+						<span class="notes">'.sprintf( $absolute_url_note, $asset_url_data['folder'] ).'</span>'
+					)
+				), $asset_url_data['label'], true );
+			}
+		}
+	}
+	else
+	{ // Preview assets urls
+		$Form->info( T_('Load generic /rsc/ assets from'), $edited_Blog->get_local_rsc_url() );
+		$Form->info( T_('Load /media/ assets from'), $edited_Blog->get_local_media_url() );
+		$Form->info( T_('Load /skins/ assets from'), $edited_Blog->get_local_skins_url() );
+	}
+
+$Form->end_fieldset();
+
+
 $Form->begin_fieldset( T_('Date archive URLs').get_manual_link('date-archive-url-settings')  );
 
 	$Form->radio( 'archive_links', $edited_Blog->get_setting('archive_links'),

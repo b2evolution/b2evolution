@@ -6,6 +6,13 @@
  * Override this with style.css in your skin folder.
  */
 
+@import "inc/star_rating.inc.less";
+@import "inc/video-js-overrides.inc.less";
+
+*[class^="listnav_distance_"], *[class*=" listnav_distance_"] {
+	display: none;
+}
+
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
 	-moz-border-radius: @radius;
@@ -61,6 +68,7 @@ table.bCalendarTable caption {
 	margin: auto;
 	padding: 3px 0;
 	white-space: nowrap;
+	text-align: center;
 }
 table.bCalendarTable {
 	margin: 0 auto 1em auto;
@@ -422,77 +430,6 @@ div.results {
 	overflow: auto;
 }
 
-// Rating Summary for all comments of the selected post on disp=single
-// TODO: put ALL of teh followinf into a separate .less file and @import + clean up duplicate styles in individual skins
-.ratings_table {
-	padding: 10px;
-	margin-right: 10px;
-	display: inline-block;
-}
-table.rating_summary {
-	float: left;
-	margin: 0;
-	th, td {
-		border: none;
-		font-size: 10px;
-		line-height: 13px;
-		font-weight: normal;
-		padding: 0;
-	}
-	th{
-		padding-right: 5px;
-		background-color: transparent;
-	}
-	.progress {
-		width: 60px;
-		background: #eeeecc;
-		padding: 0;
-		box-shadow: none; // override bootstrap
-	}
-	.progress div{
-		background: #ffcc66;
-	}
-	td{
-		text-align: right;
-		padding-left: 5px;
-	}
-}
-div.rating_summary_total{
-	float: left;
-	padding: 5px 0 0 20px;
-}
-div.average_rating{
-	padding-top: 5px;
-}
-div.average_rating span{
-	float: left;
-	font-size: 11px;
-	line-height: 12px;
-	padding-left: 10px;
-}
-div.star_rating, div.star_rating div{
-	width: 60px;
-	height: 12px;
-	background: url(../icons/icons_sprite.png) repeat-x -64px -160px;
-	overflow: hidden;
-	text-indent: 100px;
-}
-div.star_rating div{
-	background-position: 0 -160px;
-}
-div.average_rating .star_rating{
-	float: left;
-}
-.rating_recap{
-	clear: both;
-	font-size: 10px;
-}
-.rating_recap div{
-	float: left;
-	padding-right: 10px;
-}
-// END OF TODO
-
 // Styles for in-skin editing
 form.inskin{
 	padding: 10px;
@@ -791,6 +728,7 @@ div.results span[class*=status_] span {
 
 .search_title {
 	font-size: 125%;
+	color: #666;
 }
 .search_title a {
 	text-decoration: underline;
@@ -973,8 +911,65 @@ input.btn-lg {
 	}
 }
 
+.evo_content_block table.evo_poll__table {
+	border-spacing: 0;
+	border-collapse: collapse;
+	margin: 1em 0;
+	th {
+		padding: 2px 10px 2px 0;
+		background-color: #eee;
+	}
+	td {
+		padding: 2px 10px 2px 0;
+		vertical-align: top;
+	}
+}
+
 // Images gallery:
 .evo_post_gallery__image {
 	display: inline-block;
 	margin: 0 1ex 1ex 0;
+}
+
+// Poll table:
+.evo_poll__table {
+	margin-bottom: 14px;
+	width: 100%;
+	td {
+		padding: 2px 10px 2px 0;
+		vertical-align: top;
+	}
+	tr td:last-child {
+		padding-right: 0;
+	}
+	input[type=radio], label {
+		margin: 0;
+	}
+	.evo_poll__percent_bar {
+		width: 100%;
+		min-width: 40px;
+		padding-right: 6px;
+		> div {
+			width: 100%;
+			vertical-align: middle;
+			display: inline-block;
+			> div {
+				background: #ffcc66;
+				height: 12px;
+				min-width: 1px;
+			}
+		}
+	}
+	.evo_poll__selector {
+		width: 5px;
+	}
+	.evo_poll__title {
+		white-space: nowrap;
+	}
+	.evo_poll_percentage {
+		max-width: 50px;
+	}
+}
+.evo_container__sidebar .evo_poll__title {
+	white-space: normal;
 }

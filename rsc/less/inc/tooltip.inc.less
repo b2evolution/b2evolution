@@ -1,0 +1,52 @@
+// Bubble tips & Popover:
+.bubbletip_user {
+	ul {
+		padding: 0;
+		margin: 0;
+		li {
+			margin: 0.5ex 0;
+			padding: 0;
+			list-style: none;
+			text-align: center;
+		}
+	}
+	
+}
+.bubbletip_user__buttons {
+	text-align: center;
+	margin: 0;
+	color: #FFF;
+	a.btn {
+		color: #FFF;
+		margin: 5px 0 0 0;
+		&:first-child {
+			margin: 0;
+		}
+	}
+}
+.bubbletip_anon {
+	text-align: center;
+	div {
+		margin-top: 5px;
+	}
+}
+// Overlay text on the bubble tips
+.bubletip_overlay_text {
+	position: relative;
+	div {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		text-align: center;
+		text-shadow: -1px -1px #000, -2px 0 #000, -1px 1px #000, 0 2px #000, 1px 1px #000, 2px 0 #000, 1px -1px #000, 0 -2px #000;
+		color: #FFF;
+		font-weight: bold;
+	}
+}
+a.overlay_link:hover {
+	text-decoration: none;
+	b {
+		text-decoration: underline;
+	}
+}

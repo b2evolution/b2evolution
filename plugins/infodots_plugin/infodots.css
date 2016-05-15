@@ -30,6 +30,7 @@
 	border: 1px solid transparent; /* Fix for IE to correct working of border-radius */
 }
 .infodots_image .infodots_dot:before {
+	box-sizing: content-box;
 	content: "";
 	z-index: 1;
 	position: absolute;

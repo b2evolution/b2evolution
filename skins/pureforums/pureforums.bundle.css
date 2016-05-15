@@ -12,21 +12,23 @@
   margin-top: 43px;
 }
 .header .header_top {
+  /* autoprefixer: off */
   background-color: #242D36;
-  background-image: -webkit-linear-gradient(#1e252d, #2b3540);
-  background-image: -moz-linear-gradient(#1e252d, #2b3540);
-  background-image: linear-gradient(#1e252d, #2b3540);
+  background-image: -webkit-linear-gradient(#1E252D, #2B3540);
+  background-image: -moz-linear-gradient(#1E252D, #2B3540);
+  background-image: linear-gradient(#1E252D, #2B3540);
   height: 36px;
   line-height: 36px;
   color: #9FB5C9;
   font-weight: bold;
 }
 .header .header_bottom {
+  /* autoprefixer: off */
   background-color: #3C597F;
-  background-image: -webkit-linear-gradient(#50739b, #283f63);
-  background-image: -moz-linear-gradient(#50739b, #283f63);
-  background-image: linear-gradient(#50739b, #283f63);
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 1px #5d8cb7 inset;
+  background-image: -webkit-linear-gradient(#50739B, #283F63);
+  background-image: -moz-linear-gradient(#50739B, #283F63);
+  background-image: linear-gradient(#50739B, #283F63);
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 1px #5D8CB7 inset;
   text-align: center;
 }
 .header .header_bottom .layout_width {
@@ -67,11 +69,12 @@
   padding: 11px;
 }
 .header .widget_core_coll_search_form form .search_field {
+  /* autoprefixer: off */
   outline: none;
   background-color: #EAECF1;
-  background-image: -webkit-linear-gradient(white, #d5d9e3);
-  background-image: -moz-linear-gradient(white, #d5d9e3);
-  background-image: linear-gradient(white, #d5d9e3);
+  background-image: -webkit-linear-gradient(#FFFFFF, #D5D9E3);
+  background-image: -moz-linear-gradient(#FFFFFF, #D5D9E3);
+  background-image: linear-gradient(#FFFFFF, #D5D9E3);
   border: medium none;
   border-radius: 5px;
   box-shadow: 0 1px 2px rgba(36, 44, 51, 0.5);
@@ -85,16 +88,17 @@
   width: 135px;
 }
 .header .widget_core_coll_search_form form .search_submit {
-  background: transparent url("../../rsc/icons/icons_sprite.png") -16px -176px no-repeat;
+  background: transparent none repeat scroll 0 0;
   border: medium none;
-  width: 16px;
-  height: 16px;
-  margin: 9px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: FontAwesome;
+  height: 34px;
+  margin: 0;
   overflow: hidden;
   position: absolute;
-  right: 15px;
-  text-indent: -10000px;
-  cursor: pointer;
+  right: 13px;
+  width: 25px;
 }
 
 body.mobile_device div.pageHeader.site_skins,
@@ -335,6 +339,16 @@ form#user_checkchanges.bComment {
   height: 9px;
   margin: 0 3px 0 2px;
 }
+.ficon.width_increase {
+  background-position: 0 -75px;
+  width: 32px;
+  height: 32px;
+}
+.ficon.width_decrease {
+  background-position: -32px -75px;
+  width: 32px;
+  height: 32px;
+}
 
 .form_add_contacts .controls {
   padding-left: 0;
@@ -394,11 +408,12 @@ form#user_checkchanges.bComment {
 .forums_table .meta_category th,
 .forums_table thead th,
 .messages_list > h2 {
+  /* autoprefixer: off */
   padding: 12px 20px;
   background-color: #ECEDF3;
-  background-image: -webkit-linear-gradient(#f1f2f6, #e7e9f0);
-  background-image: -moz-linear-gradient(#f1f2f6, #e7e9f0);
-  background-image: linear-gradient(#f1f2f6, #e7e9f0);
+  background-image: -webkit-linear-gradient(#F1F2F6, #E7E9F0);
+  background-image: -moz-linear-gradient(#F1F2F6, #E7E9F0);
+  background-image: linear-gradient(#F1F2F6, #E7E9F0);
   color: #535C66;
   font-size: 14px;
   font-weight: bold;
@@ -508,6 +523,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
 }
 
 .topics_table .table_title th {
+  /* autoprefixer: off */
   text-align: left;
   padding: 8px 25px 8px 20px;
   color: #535c66;
@@ -546,6 +562,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
 
 .topics_table tr.panel td, .topics_table tr.panel:hover td,
 .forums_table th.fieldset {
+  /* autoprefixer: off */
   background-image: -webkit-linear-gradient(#f5f6fa, #e6e7f0);
   background-image: -moz-linear-gradient(#f5f6fa, #e6e7f0);
   background-image: linear-gradient(#f5f6fa, #e6e7f0);
@@ -590,6 +607,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
 }
 
 .navigation a, .navigation .current_page {
+  /* autoprefixer: off */
   background-image: -webkit-linear-gradient(#d4d9e1, #bec4d1);
   background-image: -moz-linear-gradient(#d4d9e1, #bec4d1);
   background-image: linear-gradient(#d4d9e1, #bec4d1);
@@ -621,6 +639,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
 }
 
 .navigation a.prev, .navigation a.next {
+  /* autoprefixer: off */
   background-image: -webkit-linear-gradient(#9fa3ac, #787d88);
   background-image: -moz-linear-gradient(#9fa3ac, #787d88);
   background-image: linear-gradient(#9fa3ac, #787d88);
@@ -632,8 +651,6 @@ body.round_avatars .forums_table .ft_author_avatar img {
 }
 
 .navigation .current_page {
-  -webkit-box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25);
-  -moz-box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25);
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25);
   color: #FFF;
 }
@@ -644,11 +661,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
 
 .ft_search .search_field {
   border-radius: 3px;
-  -webkit-transition: box-shadow 150ms ease;
-  -moz-transition: box-shadow 150ms ease;
   transition: box-shadow 150ms ease;
-  -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
-  -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
   padding: 6px 7px;
   border: 1px solid #999;
@@ -660,6 +673,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
 }
 
 .ft_search .search_submit {
+  /* autoprefixer: off */
   display: inline-block;
   border: 1px solid #666;
   border-radius: 3px;
@@ -678,6 +692,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
 }
 
 .ft_search .search_submit:hover {
+  /* autoprefixer: off */
   background-image: -webkit-linear-gradient(#787d88, #9fa3ac);
   background-image: -moz-linear-gradient(#787d88, #9fa3ac);
   background-image: linear-gradient(#787d88, #9fa3ac);
@@ -788,15 +803,16 @@ ul.legend span.note {
 }
 
 .breadcrumbs a {
+  /* autoprefixer: off */
   position: relative;
   display: inline-block;
   padding: 0 12px;
   background-color: #A3ACBE;
-  background-image: -webkit-linear-gradient(#b5bdcb, #929bb1);
-  background-image: -moz-linear-gradient(#b5bdcb, #929bb1);
-  background-image: linear-gradient(#b5bdcb, #929bb1);
+  background-image: -webkit-linear-gradient(#B5BDCB, #929BB1);
+  background-image: -moz-linear-gradient(#B5BDCB, #929BB1);
+  background-image: linear-gradient(#B5BDCB, #929BB1);
   border: 1px solid #000;
-  border-color: rgba(0, 0, 0, 0) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.3);
+  border-color: transparent rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.3);
   border-right: none;
   color: #FFF;
   font-size: 12px;
@@ -810,15 +826,17 @@ ul.legend span.note {
 }
 
 .breadcrumbs a:last-child {
+  /* autoprefixer: off */
   background-color: #848C9D;
-  background-image: -webkit-linear-gradient(#98a0af, #70788c);
-  background-image: -moz-linear-gradient(#98a0af, #70788c);
-  background-image: linear-gradient(#98a0af, #70788c);
+  background-image: -webkit-linear-gradient(#98A0AF, #70788C);
+  background-image: -moz-linear-gradient(#98A0AF, #70788C);
+  background-image: linear-gradient(#98A0AF, #70788C);
   border-bottom-right-radius: 3px;
   border-top-right-radius: 3px;
 }
 
 .breadcrumbs a:last-child:before {
+  /* autoprefixer: off */
   content: "";
   height: 20px;
   margin-top: -10.5px;
@@ -826,9 +844,9 @@ ul.legend span.note {
   right: -8px;
   top: 50%;
   width: 20px;
-  background-image: -webkit-linear-gradient(45deg, #98a0af, #70788c);
-  background-image: -moz-linear-gradient(45deg, #98a0af, #70788c);
-  background-image: linear-gradient(45deg, #98a0af, #70788c);
+  background-image: -webkit-linear-gradient(45deg, #98A0AF, #70788C);
+  background-image: -moz-linear-gradient(45deg, #98A0AF, #70788C);
+  background-image: linear-gradient(45deg, #98A0AF, #70788C);
   -webkit-transform: rotate(135deg) skew(-10deg, -10deg);
   -moz-transform: rotate(135deg) skew(-10deg, -10deg);
   -ms-transform: rotate(135deg) skew(-10deg, -10deg);
@@ -938,9 +956,10 @@ div.results div.filters {
 }
 
 #edit_group_contacts {
-  background-image: -webkit-linear-gradient(#f1f2f6, #e7e9f0);
-  background-image: -moz-linear-gradient(#f1f2f6, #e7e9f0);
-  background-image: linear-gradient(#f1f2f6, #e7e9f0);
+  /* autoprefixer: off */
+  background-image: -webkit-linear-gradient(#F1F2F6, #E7E9F0);
+  background-image: -moz-linear-gradient(#F1F2F6, #E7E9F0);
+  background-image: linear-gradient(#F1F2F6, #E7E9F0);
   border: none;
   padding: 10px;
   box-sizing: border-box;

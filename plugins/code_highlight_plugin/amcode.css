@@ -24,7 +24,7 @@ div.codeblock .amc_code_even{ background:#F2F1F0; color:#666; }
 
 /* code plugin line numbers */
 
-div.codeblock td.amc_line { padding:0 5px; font-size:0; width:auto; }
+div.codeblock td.amc_line { padding:0 5px; font-size:0; width:auto; vertical-align: middle; border-left: 1px solid #ddd; }
 div.codeblock td.amc_line div { padding-right:9px; height:10px; }
 .codeblock .amc0 { background-position:90% -90px; }
 .codeblock .amc1 { background-position:90% 0; }

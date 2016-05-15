@@ -271,6 +271,7 @@ if( $action != 'view' )
 	$Form->radio( 'edited_user_gender', $edited_User->get('gender'), array(
 			array( 'M', T_('A man') ),
 			array( 'F', T_('A woman') ),
+			array( 'O', T_('Other') ),
 		), T_('I am'), false, '', $Settings->get( 'registration_require_gender' ) == 'required' );
 
 	$button_refresh_regional = '<button id="%s" type="submit" name="actionArray[refresh_regional]" class="action_icon refresh_button">'.get_icon( 'refresh' ).'</button>';
@@ -332,11 +333,16 @@ if( $action != 'view' )
 			);
 	}
 
-	$Form->interval( 'edited_user_age_min', $edited_User->age_min, 'edited_user_age_max', $edited_User->age_max, 3, T_('My age group') );
+	$Form->begin_line( T_('My age group'), 'edited_user_age_min' );
+		$Form->text( 'edited_user_age_min', $edited_User->age_min, 3, '' );
+		$Form->text( 'edited_user_age_max', $edited_User->age_max, 3, T_('to') );
+	$Form->end_line();
 
 	// Organization select fields:
 	$OrganizationCache = & get_OrganizationCache();
-	$OrganizationCache->load_all();
+	$OrganizationCache->clear();
+	// Load only organizations that allow to join members or own organizations of the current user:
+	$OrganizationCache->load_where( '( org_accept != "no" OR org_owner_user_ID = "'.$current_User->ID.'" )' );
 	$count_all_orgs = count( $OrganizationCache->cache );
 	$count_user_orgs = 0;
 	if( $count_all_orgs > 0 )
@@ -355,9 +361,15 @@ if( $action != 'view' )
 		$add_org_icon_style = ( $count_all_orgs > 1 && $count_all_orgs > $count_user_orgs ) ? '' : ';display:none';
 		$org_add_icon = ' '.get_icon( 'add', 'imgtag', array( 'class' => 'add_org', 'style' => 'cursor:pointer'.$add_org_icon_style ) );
 
-		$perm_edit_users = $current_User->check_perm( 'users', 'edit' );
 		foreach( $user_orgs as $org_ID => $org_data )
 		{
+			$perm_edit_orgs = false;
+			if( ! empty( $org_ID ) )
+			{	// $org_ID can be 0 for case when user didn't select an organization yet
+				$user_Organization = & $OrganizationCache->get_by_ID( $org_ID );
+				$perm_edit_orgs = $current_User->check_perm( 'orgs', 'edit', false, $user_Organization );
+			}
+
 			// Display a button to remove user from organization
 			$remove_org_icon_style = $org_ID > 0 ? '' : ';display:none';
 			$org_remove_icon = ' '.get_icon( 'minus', 'imgtag', array( 'class' => 'remove_org', 'style' => 'cursor:pointer'.$remove_org_icon_style ) );
@@ -367,7 +379,7 @@ if( $action != 'view' )
 			$inputstart_icon = '';
 			if( $org_ID > 0 )
 			{ // User is assigned to this organization, Display the accepted status icon
-				if( $perm_edit_users )
+				if( $perm_edit_orgs )
 				{ // Set the spec params for icon if user is admin
 					$accept_icon_params = array( 'style' => 'cursor:pointer', 'rel' => 'org_status_'.( $org_data['accepted'] ? 'y' : 'n' ).'_'.$org_ID.'_'.$edited_User->ID );
 				}
@@ -386,10 +398,10 @@ if( $action != 'view' )
 				$inputstart_icon = $accept_icon.' ';
 			}
 
-			if( $org_ID > 0 && ! $perm_edit_users && $org_data['accepted'] )
+			if( $org_ID > 0 && ! $perm_edit_orgs && $org_data['accepted'] )
 			{ // Display only info of the assigned organization
 				$Form->infostart = $Form->infostart.$inputstart_icon;
-				$org_role_input = ' &nbsp; <strong>'.T_('Role').':</strong> '.$org_data['role'].' &nbsp; ';
+				$org_role_input = ( empty( $org_data['role'] ) ? '' : ' &nbsp; <strong>'.T_('Role').':</strong> '.$org_data['role'] ).' &nbsp; ';
 				$org_hidden_fields = '<input type="hidden" name="organizations[]" value="'.$org_ID.'" />';
 				$Form->info_field( T_('Organization'), $org_data['name'], array(
 						'field_suffix' => $org_role_input.$org_add_icon.$org_remove_icon.$org_hidden_fields,
@@ -397,10 +409,24 @@ if( $action != 'view' )
 					) );
 			}
 			else
-			{ // Allow to update the oraganization fields
+			{ // Allow to update the organization fields
+				$perm_edit_org_role = false;
+				if( ! empty( $org_ID ) )
+				{
+					$perm_edit_org_role = ( $user_Organization->owner_user_ID == $current_User->ID ) || ( $user_Organization->perm_role == 'owner and member' && $org_data['accepted'] );
+				}
+
 				$Form->output = false;
 				$Form->switch_layout( 'none' );
-				$org_role_input = ' &nbsp; <strong>'.T_('Role').':</strong> '.$Form->text_input( 'org_roles[]', $org_data['role'], 20, '', '', array( 'maxlength' => 255 ) ).' &nbsp; ';
+				if( $perm_edit_org_role )
+				{
+					$org_role_input = ' &nbsp; <strong>'.T_('Role').':</strong> '.
+							$Form->text_input( 'org_roles[]', $org_data['role'], 20, '', '', array( 'maxlength' => 255 ) ).' &nbsp; ';
+				}
+				else
+				{
+					$org_role_input = ( empty( $org_data['role'] ) ? '' : ' &nbsp; <strong>'.T_('Role').':</strong> '.$org_data['role'] ).' &nbsp; ';
+				}
 				$Form->switch_layout( NULL );
 				$Form->output = true;
 

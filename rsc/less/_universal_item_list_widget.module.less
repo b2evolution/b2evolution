@@ -5,7 +5,62 @@
 @placeholder-background-color: #f0f0f0; // Background color of the Placeholder
 @placeholder-icon-color: #dcdcdc; // Color of the icon inside the Placeholder element
 
-div.widget_core_coll_item_list, div.widget_core_coll_post_list {
+div.widget_core_coll_item_list, 
+div.widget_core_coll_featured_posts,
+div.widget_core_coll_post_list,
+div.widget_core_coll_page_list,
+div.widget_core_coll_related_post_list {
+
+	// RWD layout
+	&.evo_layout_rwd {
+	
+		.widget_rwd_content {
+			padding: 8px;
+			margin: 14px 0;
+			overflow: hidden;
+			background-color: #fafafa;
+			border-radius: 4px;
+		}
+		// With teaser or with excerpt
+		&.evo_withteaser, &.evo_withexcerpt {
+			// Wrapper div
+			.widget_rwd_blocks {
+				// 
+				> div {
+					display: inline-block;
+					float: none; // We removed default bootstrap's style here because of the issue with floating divs with uneven height in multiple rows
+					vertical-align: top;
+					// zoom: 1; testing if this is necessary
+					// min-height: 200px; testing if this is necessary
+				}
+			
+				.widget_rwd_content {
+					
+					// Important for limiting the max image size to it's parent's max width
+					.item_first_image img {
+						max-width: 100%;
+						max-height: 380px;
+						width:auto;
+						height:auto;
+						margin: auto;
+					}
+					.item_title {
+						font-size: 16px;
+						font-weight: 700;
+						line-height: 1.5em;
+						margin: 10px 0 5px;
+					}
+					// testing if this is necessary
+					//.item_content {
+					//	& > p, & > a {
+					//		display: inline;
+					//	}
+					//}
+				}
+			}
+		}
+	}
+
 	// If "Display first picture" and "Special treatment"
 	&.evo_1pic__special {
 		// Widget title font-size when special placement on Main Collection.
@@ -61,12 +116,15 @@ div.widget_core_coll_item_list, div.widget_core_coll_post_list {
 				}
 			}
 		}
-		// First image when selected "Display first image"
-		div.item_first_image {
-			float: left; 
-			margin-right: 6px;
-		}
 	}
+
+	// FP: I did not find a better way than to include this in &.evo_layout_list
+	// First image when selected "Display first image"
+	&.evo_layout_list div.item_first_image {
+		float: left; 
+		margin-right: 6px;
+	}
+
 	// If "Display all pictures" and "No special treatment"
 	&.evo_pics {
 		div.item_images {
@@ -122,7 +180,6 @@ div.widget_core_coll_item_list, div.widget_core_coll_post_list {
 	}
 	// With teaser specific layout (with "..." button)
 	&.evo_noexcerpt.evo_withteaser {
-		ul li {
 			div.item_content {
 				p {
 					margin: 0;
@@ -169,7 +226,6 @@ div.widget_core_coll_item_list, div.widget_core_coll_post_list {
 						text-decoration: none;
 					}
 				}
-			}
 		} 
 		// Special blockquote style for teaser layout
 		&.evo_1pic__special ul li div.item_content {
@@ -186,35 +242,49 @@ div.widget_core_coll_item_list, div.widget_core_coll_post_list {
 	}
 	img {
 		border-radius: 3px;
+		// Preventing images to exceed the parent's width
+		max-width: 100%;
+		max-height: 380px;
+		width:auto;
+		height:auto;
+		margin: auto;
 	}
 	// If grouped, bigger group title
 	&.evo_withgroup > ul > li {
 		font-size: 17px;
 	}
+	
+	div.item_first_image {
+		text-align: center;
+	}
 }
 
 // Only when in Sidebar or Sidebar 2
-div.evo_container__sidebar, div.evo_container__sidebar2 {
-div.widget_core_coll_item_list, div.widget_core_coll_post_list {
-	// If special placement, without teaser, without excerpt
-	&.evo_1pic__special.evo_noexcerpt.evo_noteaser {
-		div.item_title a {
-			font-size: 16px;
+div.evo_container__sidebar, 
+div.evo_container__sidebar2 {
+	div.widget_core_coll_item_list, 
+	div.widget_core_coll_post_list {
+		// If special placement, without teaser, without excerpt
+		&.evo_1pic__special.evo_noexcerpt.evo_noteaser {
+			div.item_title a {
+				font-size: 16px;
+			}
 		}
 	}
-}
 }
 
 // Responsive layout of the post title when no teaser, no excerpt and special placement
 @media (max-width: 1599px) {
-		div.widget_core_coll_item_list, div.widget_core_coll_post_list {
+		div.widget_core_coll_item_list, 
+		div.widget_core_coll_post_list {
 			&.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
 				font-size: 20px;
 			}
 		}
 }
 @media (max-width: 1199px) {
-		div.widget_core_coll_item_list, div.widget_core_coll_post_list {
+		div.widget_core_coll_item_list, 
+		div.widget_core_coll_post_list {
 			&.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
 				font-size: 18px;
 			}

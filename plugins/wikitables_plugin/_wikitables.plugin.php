@@ -67,7 +67,8 @@ See manual for more.');
 			$default_params['default_post_rendering'] = 'opt-out';
 		}
 
-		return parent::get_coll_setting_definitions( array_merge( $params, $default_params ) );
+		$tmp_params = array_merge( $params, $default_params );
+		return parent::get_coll_setting_definitions( $tmp_params );
 	}
 
 
@@ -319,9 +320,13 @@ See manual for more.');
 
 
 	/**
-	 * @see Plugin::SkinBeginHtmlHead()
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
 	 */
-	function SkinBeginHtmlHead()
+	function SkinBeginHtmlHead( & $params )
 	{
 		global $Blog;
 
@@ -337,11 +342,14 @@ See manual for more.');
 
 
 	/**
-	 * @see Plugin::AdminEndHtmlHead()
+	 * Event handler: Called when ending the admin html head section.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
 	 */
-	function AdminEndHtmlHead()
+	function AdminEndHtmlHead( & $params )
 	{
-		$this->SkinBeginHtmlHead();
+		$this->SkinBeginHtmlHead( $params );
 	}
 }
 

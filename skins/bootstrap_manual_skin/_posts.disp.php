@@ -72,7 +72,7 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 			) );
 
 		// Button to create a new page
-		$write_new_intro_url = $Blog->get_write_item_url( $cat, '', '', 1520 );
+		$write_new_intro_url = $Blog->get_write_item_url( $cat, '', '', 'intro-cat' );
 		if( !empty( $write_new_intro_url ) )
 		{ // Display button to write a new intro
 			echo '<a href="'.$write_new_intro_url.'" class="'.button_class( 'text' ).'">'

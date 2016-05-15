@@ -103,7 +103,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 
 	// Check that this login request is not a CSRF hacked request:
 	$Session->assert_received_crumb( 'loginform' );
-	// fp> NOTE: TODO: now that we require goign through the login form, all the login logic that is here can probably be moved to login.php ?
+	// fp> NOTE: TODO: now that we require going through the login form (instead of URL params), all the login logic that is here can probably be moved to login.php ?
 
 	// Note: login and password cannot include ' or " or > or <
 	// Note: login cannot include @
@@ -228,7 +228,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 				}
 			}
 			else
-			{
+			{	// Password NOT hashed by Javascript:
 				$pass_ok = ( $User->pass == md5( $User->salt.$pass, true ) );
 				$Debuglog->add( 'Login: Compared raw passwords. Result: '.(int)$pass_ok, '_init_login' );
 			}

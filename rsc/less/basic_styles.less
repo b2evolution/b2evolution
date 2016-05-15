@@ -3,6 +3,13 @@
  * These are included in basic.css but also in item_base.css so they are available in WYSIWYG editors
  */
 
+@import "inc/sprite_flags.inc.less";
+@import "inc/sprite_icons.inc.less";
+@import "inc/visibility_status_colors.inc.less";
+@import "inc/fontawesome_icons.inc.less";
+@import "inc/userfield_icons.inc.less";
+@import "inc/current_filters.inc.less";
+
 // Use special font for code blocks in order to have the same width for each char
 code, samp {
 	font-family: Menlo, Monaco, "Courier New", Courier, monospace;
@@ -168,93 +175,10 @@ img.rightmargin, div.rightmargin {
 	margin-bottom:.2ex;
 }
 
-/* Sprite style for the all flags */
-
-/* The sprite image file is located: "/rsc/icons/flags_sprite.png"
- * **** To change this file use the original file from: "/rsc/icons/src/flags.PSD"
- * **** You should save the changed file as PNG-8 with 256 colors to the "flags_sprite.png"
- * **** Also don't forget to save the "flags.PSD"
- *
- * NEW ADDED FLAGS:
- *   aq - Antarctica
- *   ax - Aland Islands
- *   bl - Saint Barthelemy
- *   cc - Cocos Islands
- *   cx - Christmas Island
- *   sj - Svalbard And Jan Mayen
- *
- * CHANGED FLAGS TO 16px WIDTH:
- *   np - Nepal
- *   ch - Switzerland
- */
-span.flag {
-	border: 1px solid #000000;
-	background: url(../icons/flags_sprite.png) no-repeat;
-	width: 16px;
-	height: 11px;
-	line-height: 11px;
-	padding: 0 !important;
-	font-size: 6px;
-	display: inline-block !important;
-	margin-bottom: -2px;
-}
-
-// Sprite style for the all icons:
-span.icon {
-	background: url(../icons/icons_sprite.png) no-repeat -112px -48px;
-	width: 16px;
-	height: 16px;
-	line-height: 16px;
-	padding: 0 !important;
-	font-size: 9px;
-	display: inline-block;
-	overflow: hidden;
-	vertical-align: middle;
-}
-span.icon.voted {
-	margin: 0 2px;
-}
-// The fixes for rollover icon on IE8+
-@fix-IE8-visibility: ~"visible\0/";
-a.rollover_sprite:hover span.icon {
-	visibility: hidden;
-	visibility: @fix-IE8-visibility;/* IE8 */
-}
-@fix-IE9-10-media-min-width: ~"screen and (min-width: 0\0)";
-@media @fix-IE9-10-media-min-width { /* IE9-10 */
-	a.rollover_sprite:hover span.icon {
-		visibility: visible;
-	}
-}
-a.rollover_sprite:hover span.icon:before {
-	visibility: visible !important;
-	background: inherit;
-	float: left;
-	width: 32px;
-	height: 16px;
-	content: "";
-	margin-left: -16px;
-}
-.vote_spam span.icon.voted {
-	margin: auto;
-}
-
-.action_icon:hover {
-	text-decoration: none;
-}
-.action_icon.hoverlink:hover {
-	text-decoration: underline;
-}
-button.action_icon {
-	background: none;
-	border: none;
-	padding: 0;
-	cursor: pointer;
-}
-// ---------------- //
 
 // The links that look as buttons with round corners:
 a.roundbutton, a.roundbutton_text, span.roundbutton {
+	/* autoprefixer: off */
 	font: 11.28px Verdana, Geneva, Arial, Helvetica, sans-serif;
 	display: inline-block;
 	position: relative;
@@ -294,6 +218,7 @@ a.roundbutton.middle {
 }
 
 a.roundbutton:hover, a.roundbutton_text:hover {
+	/* autoprefixer: off */
 	cursor: default;
 	text-decoration: none;
 	color: inherit;
@@ -312,6 +237,7 @@ a.roundbutton:hover, a.roundbutton_text:hover {
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#a0a0a0', endColorstr='#d2d2d2');
 }
 a.roundbutton.roundbutton_selected, a.roundbutton_text.roundbutton_selected, span.roundbutton {
+	/* autoprefixer: off */
 	cursor: default;
 	background: #989898;
 	/* Safari 4-5, Chrome 1-9 */
@@ -329,6 +255,7 @@ a.roundbutton.roundbutton_selected, a.roundbutton_text.roundbutton_selected, spa
 }
 a.roundbutton_green, span.roundbutton_green,
 a.roundbutton_green:hover, span.roundbutton_green:hover {
+	/* autoprefixer: off */
 	cursor: default;
 	background: #09f197;
 	/* Safari 4-5, Chrome 1-9 */
@@ -346,6 +273,7 @@ a.roundbutton_green:hover, span.roundbutton_green:hover {
 }
 a.roundbutton_red, span.roundbutton_red,
 a.roundbutton_red:hover, span.roundbutton_red:hover {
+	/* autoprefixer: off */
 	cursor: default;
 	background: #fa7171;
 	/* Safari 4-5, Chrome 1-9 */
@@ -434,6 +362,7 @@ a.roundbutton_text span, a.roundbutton_text_noicon span {
 }
 // Black style for round buttons (NOW it is used ONLY for photoalbums skin to switch between posts on disp=single)
 .roundbutton.rbtn_black, .roundbutton_group .roundbutton.rbtn_black {
+	/* autoprefixer: off */
 	border-color: #1a1a1a;
 	background-color: #3a3a3a;
 	background-size : 30px 30px;
@@ -586,178 +515,6 @@ span.roundbutton.rbtn_black:hover, .roundbutton_group span.roundbutton.rbtn_blac
 		color: #fff;
 	}
 }
-
-
-
-// Colors for statuses of posts and comments
-@status_color_draft:            #ff9;
-@status_color_draft_hover:      #f3f392;
-@status_color_review:           #CC0099;
-@status_color_review_hover:     #c20092;
-@status_color_community:        #2E8BB9;
-@status_color_community_hover:  #2c84b0;
-@status_color_protected:        #FF9C2A;
-@status_color_protected_hover:  #f39528;
-@status_color_private:          #DC143C;
-@status_color_private_hover:    #d21339;
-@status_color_published:        #99EE44;
-@status_color_published_hover:  #92e341;
-@status_color_deprecated:       #000;
-@status_color_deprecated_hover: #333;
-@status_color_redirected:       #663399;
-@status_color_redirected_hover: #613192;
-@status_color_trash:            #f66;
-@status_color_trash_hover:      #f44;
-@status_color_meta:             #5133ab;
-
-// Status colors:
-.status_color_draft {
-	color: @status_color_draft;
-}
-.status_color_review {
-	color: @status_color_review;
-}
-.status_color_community {
-	color: @status_color_community;
-}
-.status_color_protected {
-	color: @status_color_protected;
-}
-.status_color_private {
-	color: @status_color_private;
-}
-.status_color_published {
-	color: @status_color_published;
-}
-.status_color_deprecated {
-	color: @status_color_deprecated;
-}
-.status_color_redirected {
-	color: @status_color_redirected;
-}
-.status_color_trash {
-	color: @status_color_trash;
-}
-.status_color_meta {
-	color: @status_color_meta;
-}
-
-// Buttons for the post statuses
-.btn[class*=btn-status-] {
-	border: 1px solid #ccc;
-}
-.btn-status-draft {
-	color: #000;
-	background-color: @status_color_draft;
-	border-color: #dfdfdf;
-}
-.btn-status-draft:hover {
-	color: #000;
-	background-color: @status_color_draft_hover;
-}
-.btn-status-review {
-	color: #fff;
-	background-color: @status_color_review;
-}
-.btn-status-review:hover {
-	color: #fff;
-	background-color: @status_color_review_hover;
-}
-.btn-status-community {
-	color: #fff;
-	background-color: @status_color_community;
-}
-.btn-status-community:hover {
-	color: #fff;
-	background-color: @status_color_community_hover;
-}
-.btn-status-protected {
-	color: #fff;
-	background-color: @status_color_protected;
-}
-.btn-status-protected:hover {
-	color: #fff;
-	background-color: @status_color_protected_hover;
-}
-.btn-status-private {
-	color: #fff;
-	background-color: @status_color_private;
-}
-.btn-status-private:hover {
-	color: #fff;
-	background-color: @status_color_private_hover;
-}
-.btn-status-published {
-	color: #000;
-	background-color: @status_color_published;
-	.glyphicon {
-		color: inherit !important;
-	}
-}
-.btn-status-published:hover {
-	color: #000;
-	background-color: @status_color_published_hover;
-}
-.btn-status-deprecated {
-	color: #fff;
-	background-color: @status_color_deprecated;
-}
-.btn-status-deprecated:hover {
-	color: #fff;
-	background-color: @status_color_deprecated_hover;
-}
-.btn-status-redirected {
-	color: #fff;
-	background-color: @status_color_redirected;
-}
-.btn-status-redirected:hover {
-	color: #fff;
-	background-color: @status_color_redirected_hover;
-}
-.btn-status-trash {
-	color: #fff;
-	background-color: @status_color_trash;
-}
-.btn-status-trash:hover {
-	color: #fff;
-	background-color: @status_color_trash_hover;
-}
-// ---------------- //
-
-// Additional styles for FontAwesome icons:
-span.fa {
-	line-height: inherit;
-	font-size: 14px;
-}
-a.action_icon span.fa {
-	margin-right: 2px;
-}
-a.roundbutton .fa, a.roundbutton:hover .fa,
-a.roundbutton_text .fa, a.roundbutton_text:hover .fa {
-	color: #000;
-}
-a:hover .fa-x-rollover-green {color: #0C0 !important;}
-a:hover .fa-x-rollover-red {color: #C00 !important;}
-a:hover .fa-x-rollover-red-light {color: #F00 !important;}
-a:hover .fa-x-rollover-orange {color: #F90 !important;}
-a:hover .fa-x-rollover-black {color: #000 !important;}
-// Use together with .fa-external-link
-.fa-x-external-link--nudge:before {
-	position: relative;
-	top: 0.05em;
-	left: 0.11em;
-}
-// Use together with .fa-linkedin
-.fa-x-linkedin--nudge:before {
-	position: relative;
-	top: -0.05em;
-	left: 0.04em;
-}
-// Use together with .fa-google-plus
-.fa-x-google-plus--nudge:before {
-	position: relative;
-	left: 0.1em;
-}
 // ---------------- //
 
 // Toolbars with buttons before the edit post/comment forms:
@@ -820,119 +577,6 @@ span.loader_img.loader_user_deldata {
 // ---------------- //
 
 // Styles of filters for current selection of the posts (widget "Current filters"):
-.filter_item {
-	display: inline-block;
-	vertical-align: middle;
-	margin: 1px;
-	// text-shadow: 0 1px rgba(0, 0, 0, 0.4), 1px 0 1px #000;
-	div {
-		margin: 0;
-		padding: 3px 5px;
-		color: #FFF;
-		float: left;
-		height: 16px;
-		line-height: 16px;
-		&:first-child {
-			border-radius: 5px 0 0 5px;
-		}
-		&.icon {
-			border-radius: 0 5px 5px 0;
-			float: right;
-			padding: 0;
-			height: 22px;
-			a {
-				display: block;
-				padding: 4px 5px 5px;
-				margin: 0;
-			}
-		}
-	}
+.filter_item div.icon {
+	height: 22px;
 }
-// green
-.filter_item .name { background: #3d8f3d; }
-.filter_item:hover .name,
-.filter_item div.group,
-.filter_item div.icon { background: #45a145; }
-.filter_item div.icon:hover { background: #4db34d; }
-// yellow
-.filter_item.yellow .name { background: #caca3f; }
-.filter_item.yellow:hover .name,
-.filter_item.yellow div.group,
-.filter_item.yellow div.icon { background: #dbdb57; }
-.filter_item.yellow div.icon:hover { background: #ecec73; }
-// orange
-.filter_item.orange .name { background: #d18335; }
-.filter_item.orange:hover .name,
-.filter_item.orange div.group,
-.filter_item.orange div.icon { background: #e09952; }
-.filter_item.orange div.icon:hover { background: #edac6b; }
-// red
-.filter_item.red .name { background: #c12d2d; }
-.filter_item.red:hover .name,
-.filter_item.red div.group,
-.filter_item.red div.icon { background: #cb4d4d; }
-.filter_item.red div.icon:hover { background: #e57373; }
-// magenta
-.filter_item.magenta .name { background: #8618bd; }
-.filter_item.magenta:hover .name,
-.filter_item.magenta div.group,
-.filter_item.magenta div.icon { background: #9933cc; }
-.filter_item.magenta div.icon:hover { background: #b053df; }
-// blue
-.filter_item.blue .name { background: #2f60c0; }
-.filter_item.blue:hover .name,
-.filter_item.blue div.group,
-.filter_item.blue div.icon { background: #4d77cb; }
-.filter_item.blue div.icon:hover { background: #6a91df; }
-// ---------------- //
-
-// User field icons: //
-.ufld_yahooim {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #7b0099; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #7b0099; }
-}
-.ufld_skype {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #00aff0; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #00aff0; }
-}
-.ufld_twitter {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #00aced; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #00aced; }
-}
-.ufld_facebook {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #3b5998; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #3b5998; }
-}
-.ufld_googleplus {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #dd4b39; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #dd4b39; }
-}
-.ufld_linkedin {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #007bb6; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #007bb6; }
-}
-.ufld_github {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #333333; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #333333; }
-}
-.ufld_flickr {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #ff0084; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #ff0084; }
-}
-.ufld_youtube {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #bb0000; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #bb0000; }
-}
-.ufld_digg {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #356aa0; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #356aa0; }
-}
-.ufld_stumbleupon {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #eb4924; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #eb4924; }
-}
-.ufld_pinterest {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #cb2027; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #cb2027; }
-}
-// ---------------- //

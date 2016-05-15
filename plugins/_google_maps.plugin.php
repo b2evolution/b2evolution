@@ -60,15 +60,14 @@ class google_maps_plugin extends Plugin
 
 
 	/**
-	 * Get the settings that the plugin can use.
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
 	 *
-	 * Those settings are transfered into a Settings member object of the plugin
-	 * and can be edited in the backoffice (Settings / Plugins).
-	 *
-	 * @see Plugin::GetDefaultSettings()
-	 * @see PluginSettings
-	 * @see Plugin::PluginSettingsValidateSet()
-	 * @return array
+	 * @param array Associative array of parameters (since v1.9).
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
+	 * @return array see {@link Plugin::GetDefaultSettings()}.
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
+	 * and assign an array with the following keys to them (only 'label' is required):
 	 */
 	function GetDefaultSettings( & $params )
 	{
@@ -127,6 +126,7 @@ class google_maps_plugin extends Plugin
 		return $r;
 	}
 
+
 	/**
 	 * Get keys for block/widget caching
 	 *
@@ -151,12 +151,13 @@ class google_maps_plugin extends Plugin
 	/**
 	 * Define the PER-USER settings of the plugin here. These can then be edited by each user.
 	 *
-	 * @see Plugin::GetDefaultUserSettings()
-	 * @see PluginUserSettings
-	 * @see Plugin::PluginUserSettingsValidateSet()
-	 * @return array
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
-	function GetDefaultUserSettings()
+	function GetDefaultUserSettings( & $params )
 	{
 		return array();
 	}
@@ -845,14 +846,19 @@ function locate()
 
 
 	/**
-	 * @see Plugin::SkinBeginHtmlHead()
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
 	 */
-	function SkinBeginHtmlHead()
+	function SkinBeginHtmlHead( & $params )
 	{
 		require_js( '#jquery#', 'blog' );
 	}
 
-	function SkinTag( $params )
+
+	function SkinTag( & $params )
 	{
 		global $Blog, $Item;
 
@@ -945,7 +951,7 @@ function locate()
 	 * Event handler: Called before the plugin is going to be un-installed.
 	 * @see Plugin::BeforeUninstall()
 	 */
-	function BeforeUninstall()
+	function BeforeUninstall( & $params )
 	{
 		$this->msg( T_('Google Maps plugin sucessfully un-installed.') );
 		return true;

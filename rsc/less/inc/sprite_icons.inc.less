@@ -1,0 +1,52 @@
+// Sprite style for the all icons:
+span.icon {
+	background: url(../icons/icons_sprite.png) no-repeat -112px -48px;
+	width: 16px;
+	height: 16px;
+	line-height: 16px;
+	padding: 0 !important;
+	font-size: 9px;
+	display: inline-block;
+	overflow: hidden;
+	vertical-align: middle;
+	&.voted {
+		margin: 0 2px;
+	}
+}
+// The fixes for rollover icon on IE8+
+@fix-IE8-visibility: ~"visible\0/";
+a.rollover_sprite:hover span.icon {
+	visibility: hidden;
+	visibility: @fix-IE8-visibility;/* IE8 */
+}
+@fix-IE9-10-media-min-width: ~"screen and (min-width: 0\0)";
+@media @fix-IE9-10-media-min-width { /* IE9-10 */
+	a.rollover_sprite:hover span.icon {
+		visibility: visible;
+	}
+}
+a.rollover_sprite:hover span.icon:before {
+	visibility: visible !important;
+	background: inherit;
+	float: left;
+	width: 32px;
+	height: 16px;
+	content: "";
+	margin-left: -16px;
+}
+.vote_spam span.icon.voted {
+	margin: auto;
+}
+
+.action_icon:hover {
+	text-decoration: none;
+}
+.action_icon.hoverlink:hover {
+	text-decoration: underline;
+}
+button.action_icon {
+	background: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+}

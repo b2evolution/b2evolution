@@ -8,7 +8,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $dbm_tables_count;
 
-load_funcs('tools/model/_dbmaintenance.funcs.php');
+load_funcs('tools/model/_maintenance.funcs.php');
 
 $simple_keys = array( 0, 1, 2, 3 );
 $failed_results = array();

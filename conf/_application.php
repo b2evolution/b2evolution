@@ -15,7 +15,7 @@ $app_shortname = 'b2evo';
  * Note: This has to be compatible with {@link http://us2.php.net/en/version-compare}.
  * @global string
  */
-$app_version = '6.6.9-stable';
+$app_version = '6.7.2-stable';
 
 /**
  * Release date (ISO)
@@ -31,12 +31,12 @@ $app_version_long = $app_version.'-'.$app_date;
 /**
  * This is used to check if the database is up to date.
  *
- * This will be incrememented by 100 with each change in {@link upgrade_b2evo_tables()}
+ * This will be incrememented by 5 with each change in {@link upgrade_b2evo_tables()}
  * in order to leave space for maintenance releases.
  *
  * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 11486;
+$new_db_version = 11770;
 
 /**
  * Minimum PHP version required for b2evolution to function properly. It will contain each module own minimum PHP version as well.
@@ -60,7 +60,7 @@ $app_footer_text = '<a href="http://b2evolution.net/" title="visit b2evolution\'
 $copyright_text = '<span class="nobr">&copy;2003-2016 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/about/about-us">others</a>.</span>';
 
 /**
- * Do you want to display the help links to online documentaion?
+ * Do you want to display the help links to online documentation?
  *
  * @global boolean
  */
@@ -79,6 +79,7 @@ $online_help_links = true;
 $modules = array(
 		'_core',
 		'collections',  // TODO: installer won't work without this module
+		'polls',
 		'files',
 		'sessions',
 		'messaging',

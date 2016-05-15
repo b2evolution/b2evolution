@@ -32,21 +32,21 @@ $Form->begin_fieldset( T_('Test saved settings').get_manual_link( 'return-path-c
 
 	$url = '?ctrl=email&amp;tab=return&amp;tab3=test&amp;'.url_crumb('emailsettings').'&amp;action=';
 	$Form->info_field( T_('Perform tests'),
-				'<a href="'.$url.'test_1">['.T_('server connection').']</a>&nbsp;&nbsp;'.
+				'<a href="'.$url.'test_1">['.T_('connect to server and list folders').']</a>&nbsp;&nbsp;'.
 				'<a href="'.$url.'test_2">['.T_('get one returned email').']</a>&nbsp;&nbsp;'.
 				'<a href="'.$url.'test_3">['.T_('Paste an error message/returned email').']</a>' );
 
 	if( $action == 'test_3' )
 	{ // Display a textarea to fill a sample error message
-		$Form->textarea( 'test_error_message', param( 'test_error_message', 'raw', '' ), 15, T_('Test error message'), '', 50 );
-		$Form->buttons( array( array( 'submit', 'actionArray[test_3]', T_('Test'), 'SaveButton' ) ) );
+		$Form->textarea( 'test_error_message', param( 'test_error_message', 'raw', '' ), 15, T_('Test error message'), T_('Use this to paste an email returned with an error message to check if b2evolution can decode it.'), 50 );
+		$Form->buttons( array( array( 'submit', 'actionArray[test_3]', T_('Process the contents as if it were a returned email'), 'SaveButton' ) ) );
 	}
 
 	if( !empty( $repath_test_output ) )
 	{
 		echo '<div style="margin-top:25px"></div>';
 		// Display scrollable div
-		echo '<div style="padding: 6px; margin:5px; border: 1px solid #CCC; min-height: 350px">'.$repath_test_output.'</div>';
+		echo '<div style="padding: 6px; margin:5px; border: 1px solid #CCC; overflow:scroll; height: 350px">'.$repath_test_output.'</div>';
 	}
 
 $Form->end_fieldset();

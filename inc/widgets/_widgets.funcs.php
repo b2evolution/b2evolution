@@ -58,7 +58,7 @@ function add_basic_widget( $blog_ID, $container_name, $code, $type, $order, $par
 
 
 /**
- * Insert the widgets for the blog
+ * Insert the basic widgets for a collection
  *
  * @param integer should never be 0
  * @param boolean should be true only when it's called after initial install
@@ -66,7 +66,7 @@ function add_basic_widget( $blog_ID, $container_name, $code, $type, $order, $par
  */
 function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 {
-	global $DB, $test_install_all_features, $basic_widgets_insert_sql_rows;
+	global $DB, $install_test_features, $basic_widgets_insert_sql_rows;
 
 	// Initialize this array first time and clear after previous call of this function
 	$basic_widgets_insert_sql_rows = array();
@@ -145,13 +145,27 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 
 	/* Item Single */
-	if( ( $blog_id == $blog_a_ID || ( !empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && $test_install_all_features )
-	{
-		add_basic_widget( $blog_id, 'Item Single', 'evo_Gmaps', 'plugin', 1 );
-		// add blog collection setting to activate additional fields
-		$DB->query( 'REPLACE INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
-							VALUES ( '.$blog_id.', "show_location_coordinates" , 1 )' );
+	add_basic_widget( $blog_id, 'Item Single', 'item_content', 'core', 10 );
+	if( $blog_id != $blog_a_ID && $kind != 'forum' && ( empty( $events_blog_ID ) || $blog_id != $events_blog_ID ) )
+	{ // Item Tags
+		add_basic_widget( $blog_id, 'Item Single', 'item_tags', 'core', 20 );
 	}
+	if( $blog_id == $blog_b_ID )
+	{ // About Author
+		add_basic_widget( $blog_id, 'Item Single', 'item_about_author', 'core', 25 );
+	}
+	if( ( $blog_id == $blog_a_ID || ( ! empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && $install_test_features )
+	{ // Google Maps
+		add_basic_widget( $blog_id, 'Item Single', 'evo_Gmaps', 'plugin', 30 );
+	}
+	if( $blog_id == $blog_a_ID || $kind == 'manual' )
+	{ // Small Print
+		add_basic_widget( $blog_id, 'Item Single', 'item_small_print', 'core', 40, array( 'format' => ( $blog_id == $blog_a_ID ? 'standard' : 'revision' ) ) );
+	}
+	// Seen by
+	add_basic_widget( $blog_id, 'Item Single', 'item_seen_by', 'core', 50, NULL,
+		// Disable this widget for "forum" collections by default:
+		$kind == 'forum' ? 0 : 1 );
 
 
 	/* Sidebar Single */
@@ -174,7 +188,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	}
 	else
 	{
-		if( $test_install_all_features )
+		if( $install_test_features )
 		{
 			if( $kind != 'forum' && $kind != 'manual' )
 			{ // Current filters widget
@@ -196,9 +210,10 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 			if( $blog_id == $blog_home_ID )
 			{ // Advertisements, Install only for blog #1 home blog
+				$advertisement_type_ID = $DB->get_var( 'SELECT ityp_ID FROM T_items__type WHERE ityp_name = "Advertisement"' );
 				add_basic_widget( $blog_id, 'Sidebar', 'coll_item_list', 'core', 70, array(
 						'title' => 'Advertisement (Demo)',
-						'item_type' => 4000,
+						'item_type' => empty( $advertisement_type_ID ) ? '#' : $advertisement_type_ID,
 						'blog_ID' => $blog_id,
 						'order_by' => 'RAND',
 						'limit' => 1,
@@ -216,7 +231,15 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 			}
 			if( ! empty( $blog_home_ID ) && ( $blog_id == $blog_a_ID || $blog_id == $blog_b_ID ) )
 			{
-				add_basic_widget( $blog_id, 'Sidebar', 'linkblog', 'core', 90, array( 'blog_ID' => $blog_home_ID, 'item_type' => '3000' ) );
+				$sidebar_type_ID = $DB->get_var( 'SELECT ityp_ID FROM T_items__type WHERE ityp_name = "Sidebar link"' );
+				add_basic_widget( $blog_id, 'Sidebar', 'coll_item_list', 'core', 90, array(
+						'blog_ID'              => $blog_home_ID,
+						'item_type'            => empty( $sidebar_type_ID ) ? '#' : $sidebar_type_ID,
+						'title'                => 'Linkblog',
+						'item_group_by'        => 'chapter',
+						'item_title_link_type' => 'auto',
+						'item_type_usage'      => 'special',
+					) );
 			}
 		}
 		add_basic_widget( $blog_id, 'Sidebar', 'coll_xml_feeds', 'core', 100 );
@@ -228,7 +251,12 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	add_basic_widget( $blog_id, 'Sidebar 2', 'coll_post_list', 'core', 1 );
 	if( $blog_id == $blog_b_ID )
 	{
-		add_basic_widget( $blog_id, 'Sidebar 2', 'coll_link_list', 'core', 5, array( 'title' => 'Sidebar links', 'order_by' => 'RAND' ) );
+		add_basic_widget( $blog_id, 'Sidebar 2', 'coll_item_list', 'core', 5, array(
+				'title'                => 'Sidebar links',
+				'order_by'             => 'RAND',
+				'item_title_link_type' => 'auto',
+				'item_type_usage'      => 'special',
+			) );
 	}
 	add_basic_widget( $blog_id, 'Sidebar 2', 'coll_comment_list', 'core', 10 );
 	add_basic_widget( $blog_id, 'Sidebar 2', 'coll_media_index', 'core', 15, 'a:11:{s:5:"title";s:13:"Recent photos";s:10:"thumb_size";s:10:"crop-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"3";s:5:"limit";s:1:"9";s:8:"order_by";s:9:"datestart";s:9:"order_dir";s:4:"DESC";'.$default_blog_param.'s:11:"widget_name";s:11:"Photo index";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
@@ -241,30 +269,48 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_title', 'core', 1 );
 		add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_tagline', 'core', 2 );
 	}
-	$featured_intro_params = NULL;
+
+
 	if( $kind == 'main' )
 	{ // Hide a title of the front intro post
 		$featured_intro_params = array( 'disp_title' => 0 );
 	}
+	else
+	{
+		$featured_intro_params = NULL;
+	}
 	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_featured_intro', 'core', 10, $featured_intro_params );
+
 	if( $kind == 'main' )
 	{ // Add user links widget only for main kind blogs
 		add_basic_widget( $blog_id, 'Front Page Main Area', 'user_links', 'core', 15 );
 	}
-	$post_list_params = NULL;
+
 	if( $kind == 'main' )
 	{ // Display the posts from all other blogs if it is allowed by blogs setting "Collections to aggregate"
 		$post_list_params = array(
 				'blog_ID'          => '',
 				'limit'            => 5,
-				'attached_pics'    => 'first',
-				'disp_first_image' => 'special',
+				'layout'           => 'list',
+				'thumb_size'       => 'crop-80x80',
 			);
 	}
-	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_post_list', 'core', 20, $post_list_params );
+	else
+	{
+		$post_list_params = NULL;
+	}
+	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_featured_posts', 'core', 20, $post_list_params );
+
+	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_post_list', 'core', 25, array( 'title' => T_('More Posts'), 'featured' => 'other' ) );
+
 	if( $kind != 'main' )
 	{ // Don't install the "Recent Commnets" widget for Main blogs
 		add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_comment_list', 'core', 30 );
+	}
+
+	if( $blog_id == $blog_b_ID )
+	{	// Install widget "Poll" only for Blog B on install:
+		add_basic_widget( $blog_id, 'Front Page Main Area', 'poll', 'core', 40, array( 'poll_ID' => 1 ) );
 	}
 
 

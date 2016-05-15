@@ -55,7 +55,7 @@ switch( $action )
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_UserfieldGroup = duplicate( $edited_UserfieldGroup ); // PHP4/5 abstraction
+			$edited_UserfieldGroup = clone $edited_UserfieldGroup;
 			$edited_UserfieldGroup->ID = 0;
 		}
 		break;

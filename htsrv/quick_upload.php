@@ -302,7 +302,7 @@ if( $upload )
 		$message['text'] = $error_filename;
 		$message['status'] = 'error';
 		out_echo( $message, $specialchars );
-		syslog_insert( sprintf( 'The uploaded file %s has an unrecognized extension', '<b>'.$newName.'</b>' ), 'warning', 'file' );
+		syslog_insert( sprintf( 'The uploaded file %s has an unrecognized extension', '[['.$newName.']]' ), 'warning', 'file' );
 		exit();
 	}
 
@@ -433,17 +433,25 @@ if( $upload )
 		{ // Success uploading
 			$message['text'] = $newFile->get_preview_thumb( 'fulltype' );
 			$message['status'] = 'success';
+			report_user_upload( $newFile );
 		}
 
 		$message['newname'] = $newName;
 		$message['newpath'] = $newFile->get_root_and_rel_path();
 		$message['warning'] = $warning;
 		$message['path'] = rawurlencode( $newFile->get_rdfp_rel_path() );
+		$message['checkbox'] = '<span name="surround_check" class="checkbox_surround_init">'
+				.'<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"'
+					.' name="fm_selected[]" value="'.rawurlencode( $newFile->get_rdfp_rel_path() ).'" id="cb_filename_u'.$newFile->ID.'" />'
+			.'</span>'
+			.'<input type="hidden" name="img_tag_u'.$newFile->ID.'" id="img_tag_u'.$newFile->ID.'"'
+				.' value="'.format_to_output( $newFile->get_tag(), 'formvalue' ).'" />';
 
 		if( ! empty( $new_Link ) )
 		{ // Send also the link data if it was created
 			$message['link_ID'] = $new_Link->ID;
 			$message['link_url'] = $newFile->get_view_link();
+			$message['link_preview'] = $new_Link->get_preview_thumb();
 			$message['link_actions'] = link_actions( $new_Link->ID, 'last', $link_owner_type );
 			$mask_row = (object) array(
 					'link_ID'       => $new_Link->ID,

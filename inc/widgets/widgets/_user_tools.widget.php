@@ -27,10 +27,10 @@ class user_tools_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function user_tools_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'user_tools' );
+		parent::__construct( $db_row, 'core', 'user_tools' );
 	}
 
 

@@ -37,15 +37,21 @@ $from_User = ( $params['from_User'] == NULL ) ? $current_User : $params['from_Us
 echo '<p'.emailskin_style( '.p' ).'>';
 if( $params['new_thread'] )
 {
-	echo sprintf( T_( '%s just sent you a message with the title %s.' ), $from_User->get_colored_login( array( 'mask' => '$avatar$ $login$' ) ), '<b>'.$Message->Thread->title.'</b>' );
+	echo sprintf( T_( '%s just sent you a private message with the title %s.' ),
+				$from_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:' ) ),
+				'<b>'.$Message->Thread->title.'</b>' );
 }
 elseif( count( $params['thrd_recipients'] ) == 1 )
 {
-	echo sprintf( T_( '%s just replied to your message in the %s conversation. ' ), $from_User->get_colored_login( array( 'mask' => '$avatar$ $login$' ) ), '<b>'.$Message->Thread->title.'</b>' );
+	echo sprintf( T_( '%s just replied to your private message in the %s conversation.' ),
+				$from_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:' ) ),
+				'<b>'.$Message->Thread->title.'</b>' );
 }
 else
 {
-	echo sprintf( T_( '%s just replied to the %s conversation.' ), $from_User->get_colored_login( array( 'mask' => '$avatar$ $login$' ) ), '<b>'.$Message->Thread->title.'</b>' );
+	echo sprintf( T_( '%s just replied to the %s conversation.' ),
+				$from_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:' ) ),
+				'<b>'.$Message->Thread->title.'</b>' );
 }
 echo "</p>\n";
 
@@ -70,7 +76,7 @@ else
 
 if( count( $params['other_unread_threads'] ) > 0 )
 { // Display other unread threads
-	echo '<p'.emailskin_style( '.p' ).'>'.T_( 'In addition to this new message, you also have unread messages in the following conversations' ).":</p>\n";
+	echo '<p'.emailskin_style( '.p' ).'>'.T_( 'In addition to this new message, you also have unread private messages in the following conversations' ).":</p>\n";
 	echo '<ul>';
 	foreach( $params['other_unread_threads'] as $unread_thread )
 	{

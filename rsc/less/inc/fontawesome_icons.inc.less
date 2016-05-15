@@ -1,0 +1,37 @@
+// Additional styles for FontAwesome icons:
+span.fa {
+	line-height: inherit;
+	font-size: 14px;
+	.btn & {
+		line-height: 14px;
+	}
+	a.action_icon & {
+		margin-right: 2px;
+	}
+}
+a.roundbutton .fa, a.roundbutton:hover .fa,
+a.roundbutton_text .fa, a.roundbutton_text:hover .fa {
+	color: #000;
+}
+a:hover .fa-x-rollover-green {color: #0C0 !important;}
+a:hover .fa-x-rollover-red {color: #C00 !important;}
+a:hover .fa-x-rollover-red-light {color: #F00 !important;}
+a:hover .fa-x-rollover-orange {color: #F90 !important;}
+a:hover .fa-x-rollover-black {color: #000 !important;}
+// Use together with .fa-external-link
+.fa-x-external-link--nudge:before {
+	position: relative;
+	top: 0.05em;
+	left: 0.11em;
+}
+// Use together with .fa-linkedin
+.fa-x-linkedin--nudge:before {
+	position: relative;
+	top: -0.05em;
+	left: 0.04em;
+}
+// Use together with .fa-google-plus
+.fa-x-google-plus--nudge:before {
+	position: relative;
+	left: 0.1em;
+}

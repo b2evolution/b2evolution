@@ -23,8 +23,6 @@ global $month, $month_abbrev, $weekday, $weekday_abbrev; /* for localized calend
 global $debug, $Hit, $AdminUI;
 
 headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache the admin pages!
-require_js( 'functions.js' ); // General functions
-require_js( 'ajax.js' );	// Functions to work with AJAX response data
 ?>
 <!DOCTYPE html>
 <html lang="<?php locale_lang() ?>">
@@ -39,23 +37,19 @@ require_js( 'ajax.js' );	// Functions to work with AJAX response data
 	$robots_follow = false;
 	robots_tag();
 
-	global $rsc_path, $rsc_url, $htsrv_url;
+	global $rsc_path, $rsc_url, $htsrv_url, $restapi_url;
 
 	// var htsrv_url is used for AJAX callbacks
 	add_js_headline( "// Paths used by JS functions:
 		var htsrv_url = '$htsrv_url';
+		var restapi_url = '$restapi_url';
 		var blog_id = '".param( 'blog', 'integer' )."';
 		var is_backoffice = true;" );
 
 	init_bubbletip_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) ); // Init popover windows for usernames
 	init_results_js(); // Add functions to work with Results tables
 
-	require_js( 'form_extensions.js'); // script allowing to check and uncheck all boxes in forms -- TODO: jQueryfy
-
-	require_js( 'extracats.js' );
-	require_js( 'dynamic_select.js' );
 	require_js( '#jqueryUI#' ); // Need to animate background, e.g. in function evoFadeBg()
-	require_js( 'backoffice.js' );
 
 
 	global $UserSettings;

@@ -6,6 +6,105 @@
  * Override this with style.css in your skin folder.
  */
 
+@import "inc/star_rating.inc.less";
+@import "inc/video-js-overrides.inc.less";
+
+// Hides pager elements with active_distance > 1 on small devices
+
+// this will hide pseudo prev_list and pseudo next_list links by default
+li[class^="listnav_distance_"], li[class*=" listnav_distance_"] {
+	display: none;
+}
+
+// Do the following the screen is greater than or equal to 320px
+@media only screen and (min-width: 320px) {
+	// hide all active distance first
+	li[class^="active_distance_"], li[class*=" active_distance_"] {
+		display: none;
+	}
+
+	// hide previous and next
+	li.listnav_prev, li.listnav_next {
+		display: none;
+	}
+
+	// hide previous list and next list
+	li.listnav_prev_list, li.listnav_next_list {
+		display: none;
+	}
+
+	// round the corners of the first and last page
+	li.listnav_first > a {
+		border-top-left-radius: 4px;
+		border-bottom-left-radius: 4px;
+	}
+
+	li.listnav_last > a {
+		border-top-right-radius: 4px;
+		border-bottom-right-radius: 4px;
+	}
+
+	// show only active distance 1
+	li[class="active_distance_1"] {
+		display: inline;
+	}
+
+	// show pseudo previous/next list 1
+	li[class="listnav_distance_1"] {
+		display: inline;
+	}
+}
+
+@media only screen and (min-width: 480px) {
+	// show active distance 2
+	li[class="active_distance_2"] {
+		display: inline;
+	}
+
+	// hide pseudo previous/next 1...
+	li[class="listnav_distance_1"] {
+		display: none;
+	}
+
+	// ...and show next pseudo previous/next list 2
+	li[class="listnav_distance_2"] {
+		display: inline;
+	}
+}
+
+@media only screen and (min-width: 768px) {
+	// show all active distance
+	li[class^="active_distance_"], li[class*=" active_distance_"] {
+		display: inline;
+	}
+
+	// hide all pseudo previous/next lists
+	li[class^="listnav_distance_"], li[class*=" listnav_distance_"] {
+		display: none;
+	}
+
+	// show previous/next list pages
+	li.listnav_prev_list, li.listnav_next_list {
+		display: inline;
+	}
+}
+
+@media only screen and (min-width: 992px) {
+	// show previous/next pages
+	li.listnav_prev, li.listnav_next {
+		display: inline;
+	}
+
+	// remove round corners on the first and last page
+	li.listnav_first > a {
+		border-radius: 0;
+	}
+
+	li.listnav_last > a {
+		border-radius: 0;
+	}
+}
+
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
 	-moz-border-radius: @radius;
@@ -71,6 +170,7 @@ table.bCalendarTable caption {
 	margin: auto;
 	padding: 3px 0;
 	white-space: nowrap;
+	text-align: center;
 }
 table.bCalendarTable {
 	margin: 15px auto;
@@ -221,12 +321,17 @@ textarea.form_textarea_input {
 	text-align: center;
 }
 
-
 // Avatar widget
 div.widget_core_coll_avatar {
 	// margin-top: 1em;
 	// margin-bottom: 1em;
 	text-align:center;
+}
+
+// Profile menu link widget alignment issue fix
+.widget_core_profile_menu_link ul li a img {
+	vertical-align: middle;
+	.border-radius;
 }
 
 // Search widget
@@ -329,84 +434,6 @@ div.results {
 		margin-bottom: 4px;
 	}
 }
-
-// Rating Summary for all comments of the selected post on disp=single
-// TODO: put ALL of teh followinf into a separate .less file and @import + clean up duplicate styles in individual skins
-.evo_content_block .ratings_table {
-	margin: 0 10px 10px 0;
-	display: inline-block;
-	.rating_summary {
-		border-spacing: 1px;
-		border-collapse: separate;
-	}
-	.progress {
-		border-radius: 0;
-		height: 13px;
-	}
-}
-.evo_content_block table.rating_summary {
-	float: left;
-	margin: 0;
-	th, td {
-		border: none;
-		font-size: 10px;
-		line-height: 13px;
-		font-weight: normal;
-		padding: 0;
-	}
-	th{
-		padding-right: 5px;
-		background-color: transparent;
-	}
-	.progress {
-		width: 60px;
-		background: #eeeecc;
-		padding: 0;
-		box-shadow: none; // override bootstrap
-	}
-	.progress div{
-		background: #ffcc66;
-	}
-	td{
-		text-align: right;
-		padding-left: 5px;
-	}
-}
-div.rating_summary_total{
-	float: left;
-	padding: 5px 0 0 20px;
-}
-div.average_rating{
-	padding-top: 5px;
-}
-div.average_rating span{
-	float: left;
-	font-size: 11px;
-	line-height: 12px;
-	padding-left: 10px;
-}
-div.star_rating, div.star_rating div{
-	width: 60px;
-	height: 12px;
-	background: url(../icons/icons_sprite.png) repeat-x -64px -160px;
-	overflow: hidden;
-	text-indent: 100px;
-}
-div.star_rating div{
-	background-position: 0 -160px;
-}
-div.average_rating .star_rating{
-	float: left;
-}
-.rating_recap{
-	clear: both;
-	font-size: 10px;
-}
-.rating_recap div{
-	float: left;
-	padding-right: 10px;
-}
-// END OF TODO
 
 // Styles for in-skin editing
 form.inskin{
@@ -669,6 +696,7 @@ div.results .status_meta span {
 
 .search_title {
 	font-size: 125%;
+	color: #666;
 }
 .search_title a {
 	text-decoration: underline;
@@ -763,10 +791,17 @@ form#comment_edit {
 	clear: both;
 }
 
-// Remove padding around attachment frame:
+// Post/comment attachment blocks:
 #post_attachments, #comment_attachments {
 	.panel-body {
 		padding: 0;
+	}
+}
+.attachment_list.results {
+	margin: 0;
+	.table-bordered {
+		border: none;
+		margin: 0;
 	}
 }
 
@@ -776,12 +811,6 @@ input.btn-lg {
 
 #download_timer_js, #download_info_nojs {
 	font-size: 84%;
-	background: #CCC;
-	padding: 3px 5px;
-	border-radius: 3px;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	-khtml-border-radius: 3px;
 }
 
 // Profile page:
@@ -875,6 +904,20 @@ input.btn-lg {
 	}
 }
 
+.evo_content_block table.evo_poll__table {
+	margin: 1em 0;
+	th {
+		border: 0;
+		padding: 2px 10px 2px 0;
+		background-color: #eee;
+	}
+	td {
+		border: 0;
+		padding: 2px 10px 2px 0;
+		vertical-align: top;
+	}
+}
+
 // Fix the form elements:
 .evo_form__comment {
 	.panel {
@@ -954,4 +997,70 @@ input.btn-lg {
 .evo_post_gallery__image {
 	display: inline-block;
 	margin: 0 1em 1em 0;
+}
+
+// Post workflow properties form:
+.evo_item_workflow_form .evo_item_workflow_form__fields {
+	display: flex;
+	display: -webkit-flex;
+	justify-content: space-around;
+	-webkit-justify-content: space-around;
+	flex-wrap: wrap;
+	-webkit-flex-wrap: wrap;
+	.form-group {
+		display: inline-block;
+		.control-label {
+			width: auto;
+		}
+		.controls {
+			display: inline-block;
+			width: auto;
+		}
+	}
+	.btn {
+		margin-bottom: 15px;
+	}
+}
+
+// Poll table:
+.evo_poll__table {
+	margin-bottom: 14px;
+	width: 100%;
+	td {
+		padding: 2px 10px 2px 0;
+		vertical-align: top;
+	}
+	tr td:last-child {
+		padding-right: 0;
+	}
+	input[type=radio], label {
+		margin: 0;
+	}
+	.evo_poll__percent_bar {
+		width: 100%;
+		min-width: 40px;
+		padding-right: 6px;
+		> div {
+			width: 100%;
+			vertical-align: middle;
+			display: inline-block;
+			> div {
+				background: #ffcc66;
+				height: 12px;
+				min-width: 1px;
+			}
+		}
+	}
+	.evo_poll__selector {
+		width: 5px;
+	}
+	.evo_poll__title {
+		white-space: nowrap;
+	}
+	.evo_poll_percentage {
+		max-width: 50px;
+	}
+}
+.evo_container__sidebar .evo_poll__title {
+	white-space: normal;
 }

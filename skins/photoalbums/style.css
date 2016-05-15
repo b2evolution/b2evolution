@@ -456,7 +456,7 @@ div.tabs div.selected a {
 }
 
 .search_title {
-	color: #EEE;
+	color: #999;
 }
 
 .nav_album {
@@ -517,20 +517,6 @@ div.tabs div.selected a {
 
 	background-repeat:repeat-x;
 	background-position :0;
-	background-image : -moz-linear-gradient(
-		90deg,
-		rgba(0,0,0,0) 0%,
-		rgba(0,0,0,0) 50%,
-		rgba(255,255,255,0.1) 50%,
-		rgba(255,255,255,0.3) 100%
-		);
-	background-image : -o-linear-gradient(
-		90deg,
-		rgba(0,0,0,0) 0%,
-		rgba(0,0,0,0) 50%,
-		rgba(255,255,255,0.1) 50%,
-		rgba(255,255,255,0.3) 100%
-		);
 	background-image : -webkit-linear-gradient(
 		90deg,
 		rgba(0,0,0,0) 0%,
@@ -552,10 +538,12 @@ div.tabs div.selected a {
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-o-user-select: none;
-	user-select: none;
+	-ms-user-select: none;
+	    user-select: none;
 }
 
 #ios-arrow-left:before{
+	/* autoprefixer: off */
 	position:absolute;
 	content : ' ';
 	left:-8px;
@@ -567,20 +555,6 @@ div.tabs div.selected a {
 	background-repeat:repeat-x;
 	background-size : 30px 30px;
 	background-position :-1px 2px;
-	background-image : -moz-linear-gradient(
-		45deg,
-		rgba(0,0,0,0) 0%,
-		rgba(0,0,0,0) 52%,
-		rgba(255,255,255,0.1) 52%,
-		rgba(255,255,255,0.4) 100%
-		);
-	background-image : -o-linear-gradient(
-		45deg,
-		rgba(0,0,0,0) 0%,
-		rgba(0,0,0,0) 52%,
-		rgba(255,255,255,0.1) 52%,
-		rgba(255,255,255,0.4) 100%
-		);
 	background-image : -webkit-linear-gradient(
 		45deg,
 		rgba(0,0,0,0) 0%,
@@ -588,6 +562,8 @@ div.tabs div.selected a {
 		rgba(255,255,255,0.1) 52%,
 		rgba(255,255,255,0.4) 100%
 		);
+	background-image : -webkit-linear-gradient(45deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 52%, rgba(255,255,255,0.1) 52%, rgba(255,255,255,0.4) 100%);
+	background-image : -moz-linear-gradient(45deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 52%, rgba(255,255,255,0.1) 52%, rgba(255,255,255,0.4) 100%);
 	background-image : linear-gradient(
 		45deg,
 		rgba(0,0,0,0) 0%,
@@ -595,13 +571,9 @@ div.tabs div.selected a {
 		rgba(255,255,255,0.1) 52%,
 		rgba(255,255,255,0.4) 100%
 		);
-
-
-	-moz-transform : rotateZ(-45deg) skewY(-10deg) skewX(-10deg);
-	-o-transform : rotateZ(-45deg) skewY(-10deg) skewX(-10deg);
 	-webkit-transform : rotateZ(-45deg) skewY(-10deg) skewX(-10deg);
 	-ms-transform : rotate(-45deg) skewY(-10deg) skewX(-11deg);
-	transform : rotateZ(-45deg) skewY(-10deg) skewX(-10deg);
+	     transform : rotateZ(-45deg) skewY(-10deg) skewX(-10deg);
 	border-top-right-radius : 11px;
 	border-top-left-radius :0px;
 	border-bottom-right-radius : 0;
@@ -632,20 +604,6 @@ div.tabs div.selected a {
 	background-position :-1px -2.5px;
 	box-shadow :0 -3px 1px -2px rgba(0,0,0,0.3)inset,
 				0 4px 2px -3px rgba(0,0,0,0.8)inset;
-	background-image : -webkit-linear-gradient(
-		90deg,
-		rgba(0,0,0,0) 0%,
-		rgba(0,0,0,0) 50%,
-		rgba(255,255,255,0.1) 50%,
-		rgba(255,255,255,0.3) 100%
-		);
-	background-image : -moz-linear-gradient(
-		90deg,
-		rgba(0,0,0,0) 0%,
-		rgba(0,0,0,0) 50%,
-		rgba(255,255,255,0.1) 50%,
-		rgba(255,255,255,0.3) 100%
-		);
 	background-image : -o-linear-gradient(
 		90deg,
 		rgba(0,0,0,0) 0%,

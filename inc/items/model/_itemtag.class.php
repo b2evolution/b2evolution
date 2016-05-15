@@ -32,10 +32,10 @@ class ItemTag extends DataObject
 	 *
 	 * @param object table Database row
 	 */
-	function ItemTag( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_items__tag', 'tag_', 'tag_ID' );
+		parent::__construct( 'T_items__tag', 'tag_', 'tag_ID' );
 
 		if( $db_row != NULL )
 		{

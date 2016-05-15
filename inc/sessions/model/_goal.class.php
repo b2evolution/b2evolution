@@ -38,10 +38,10 @@ class Goal extends DataObject
 	 *
 	 * @param object Database row
 	 */
-	function Goal( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_track__goal', 'goal_', 'goal_ID' );
+		parent::__construct( 'T_track__goal', 'goal_', 'goal_ID' );
 
 		if( $db_row )
 		{
@@ -230,11 +230,18 @@ class Goal extends DataObject
 	/**
 	 * Check existence of specified goal in goal_key unique field.
 	 *
+	 * @param string Name of unique field  OR array of Names (for UNIQUE index with MULTIPLE fields)
+	 * @param mixed specified value        OR array of Values (for UNIQUE index with MULTIPLE fields)
 	 * @return int ID if goal exists otherwise NULL/false
 	 */
-	function dbexists()
+	function dbexists( $unique_fields = 'goal_key', $values = NULL )
 	{
-		return parent::dbexists('goal_key', $this->key);
+		if( is_null( $values ) )
+		{
+			$values = $this->key;
+		}
+
+		return parent::dbexists( $unique_fields, $values );
 	}
 
 

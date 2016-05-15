@@ -160,98 +160,60 @@ switch( $action )
 		}
 		break;
 
-	case 'get_login_list':
-		// Get users login list for username form field hintbox.
+	case 'update_links_order':
+		// Update the order of all links at one time:
 
-		// current user must have at least view permission to see users login
-		$current_User->check_perm( 'users', 'view', true );
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'link' );
 
-		// What data type return: 'json' or as multilines by default
-		$data_type = param( 'data_type', 'string', '' );
+		$link_IDs = param( 'links', 'string' );
 
-		// What users return: 
-		$user_type = param( 'user_type', 'string', '' );
-
-		$text = trim( urldecode( param( 'q', 'string', '' ) ) );
-
-		/**
-		 * sam2kb> The code below decodes percent-encoded unicode string produced by Javascript "escape"
-		 * function in format %uxxxx where xxxx is a Unicode value represented as four hexadecimal digits.
-		 * Example string "MAMA" (cyrillic letters) encoded with "escape": %u041C%u0410%u041C%u0410
-		 * Same word encoded with "encodeURI": %D0%9C%D0%90%D0%9C%D0%90
-		 *
-		 * jQuery hintbox plugin uses "escape" function to encode URIs
-		 *
-		 * More info here: http://en.wikipedia.org/wiki/Percent-encoding#Non-standard_implementations
-		 */
-		if( preg_match( '~%u[0-9a-f]{3,4}~i', $text ) && version_compare(PHP_VERSION, '5', '>=') )
-		{	// Decode UTF-8 string (PHP 5 and up)
-			$text = preg_replace( '~%u([0-9a-f]{3,4})~i', '&#x\\1;', $text );
-			$text = html_entity_decode( $text, ENT_COMPAT, 'UTF-8' );
+		if( empty( $link_IDs ) )
+		{ // No links to update, wrong request, exit here:
+			break;
 		}
 
-		if( !empty( $text ) )
+		$link_IDs = explode( ',', $link_IDs );
+
+		// Check permission by first link:
+		$LinkCache = & get_LinkCache();
+		if( ( $Link = & $LinkCache->get_by_ID( $link_IDs[0] ) ) === false )
+		{ // Bad request with incorrect link ID
+			exit(0);
+		}
+		$LinkOwner = & $Link->get_LinkOwner();
+		// Check permission:
+		$LinkOwner->check_perm( 'edit', true );
+
+		$DB->begin( 'SERIALIZABLE' );
+
+		// Get max order value of the links:
+		$max_link_order = intval( $DB->get_var( 'SELECT MAX( link_order )
+			 FROM T_links
+			WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' ) );
+
+		// Initialize parts of sql queries to update the links order:
+		$fake_sql_update_strings = '';
+		$real_sql_update_strings = '';
+		$real_link_order = 0;
+		foreach( $link_IDs as $link_ID )
 		{
-			switch( $user_type )
-			{
-				case 'assignees':
-					// Get only the assignees of this blog:
-
-					$blog_ID = param( 'blog', 'integer', true );
-
-					// Get users which are assignees of the blog:
-					$user_perms_SQL = new SQL();
-					$user_perms_SQL->SELECT( 'user_login' );
-					$user_perms_SQL->FROM( 'T_users' );
-					$user_perms_SQL->FROM_add( 'INNER JOIN T_coll_user_perms ON user_ID = bloguser_user_ID' );
-					$user_perms_SQL->WHERE( 'user_login LIKE "'.$DB->escape( $text ).'%"' );
-					$user_perms_SQL->WHERE_and( 'bloguser_blog_ID = '.$DB->quote( $blog_ID ) );
-					$user_perms_SQL->WHERE_and( 'bloguser_can_be_assignee <> 0' );
-
-					// Get users which groups are assignees of the blog:
-					$group_perms_SQL = new SQL();
-					$group_perms_SQL->SELECT( 'user_login' );
-					$group_perms_SQL->FROM( 'T_users' );
-					$group_perms_SQL->FROM_add( 'INNER JOIN T_coll_group_perms ON user_grp_ID = bloggroup_group_ID' );
-					$group_perms_SQL->WHERE( 'user_login LIKE "'.$DB->escape( $text ).'%"' );
-					$group_perms_SQL->WHERE_and( 'bloggroup_blog_ID = '.$DB->quote( $blog_ID ) );
-					$group_perms_SQL->WHERE_and( 'bloggroup_can_be_assignee <> 0' );
-
-					// Union two sql queries to execute one query and save an order as one list
-					$users_sql = '( '.$user_perms_SQL->get().' )'
-						.' UNION '
-						.'( '.$group_perms_SQL->get().' )'
-						.' ORDER BY user_login'
-						.' LIMIT 10';
-					break;
-
-				default:
-					// Get all users:
-					$SQL = new SQL();
-					$SQL->SELECT( 'user_login' );
-					$SQL->FROM( 'T_users' );
-					$SQL->WHERE( 'user_login LIKE "'.$DB->escape( $text ).'%"' );
-					$SQL->LIMIT( '10' );
-					$SQL->ORDER_BY('user_login');
-					$users_sql = $SQL->get();
-					break;
-			}
-
-			$user_logins = $DB->get_col( $users_sql );
-
-			if( $data_type == 'json' )
-			{ // Return data in JSON format
-				echo evo_json_encode( $user_logins );
-				exit(0); // Exit here to don't break JSON data by following debug data
-			}
-			else
-			{ // Return data as multilines
-				echo implode( "\n", $user_logins );
-			}
+			$max_link_order++;
+			$fake_sql_update_strings .= ' WHEN link_ID = '.$DB->quote( $link_ID ).' THEN '.$max_link_order;
+			$real_link_order++;
+			$real_sql_update_strings .= ' WHEN link_ID = '.$DB->quote( $link_ID ).' THEN '.$real_link_order;
 		}
 
-		// don't show ajax response end comment, because the result will be processed with jquery hintbox
-		$add_response_end_comment = false;
+		// Do firstly fake ordering start with max order, to avoid duplicate entry error:
+		$DB->query( 'UPDATE T_links
+			  SET link_order = CASE '.$fake_sql_update_strings.' ELSE link_order END
+			WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' );
+		// Do real ordering start with number 1:
+		$DB->query( 'UPDATE T_links
+			  SET link_order = CASE '.$real_sql_update_strings.' ELSE link_order END
+			WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' );
+
+		$DB->commit();
 		break;
 
 	case 'edit_comment':
@@ -480,9 +442,10 @@ switch( $action )
 
 			echo_item_comments( $blog, $item_ID, $status_list, $currentpage, NULL, array(), '', $expiry_status, $comment_type );
 		}
-		elseif( $request_from == 'dashboard' )
+		elseif( $request_from == 'dashboard' || $request_from == 'coll_settings' )
 		{ // AJAX request goes from backoffice dashboard
-			get_comments_awaiting_moderation( $blog );
+			load_funcs( 'dashboard/model/_dashboard.funcs.php' );
+			show_comments_awaiting_moderation( $blog, NULL, 10, array(), false );
 		}
 		break;
 
@@ -694,11 +657,19 @@ switch( $action )
 
 			case 'status':
 				// Update task status
-				$new_value = param( 'new_status', 'integer', NULL );
+				$new_value = param( 'new_status', 'string', NULL );
+				// Remove '_' that is used to don't break a sorting by name on jeditable:
+				$new_value = intval( str_replace( '_', '', $new_value ) );
+				set_param( 'new_status', $new_value );
+
 				$Item->set_from_Request( 'pst_ID', 'new_status', true );
 				$Item->dbupdate();
 
 				$new_title = empty( $Item->pst_ID ) ? T_('No status') : $Item->get( 't_extra_status' );
+				if( ! empty( $new_value ) )
+				{	// Add '_' to don't break a sorting by name on jeditable:
+					$new_value = '_'.$new_value;
+				}
 				break;
 		}
 
@@ -765,70 +736,6 @@ switch( $action )
 		{
 			echo '<option value="'.$goal_ID.'">'.$goal_name.'</option>';
 		}
-
-		break;
-
-	case 'change_user_org_status':
-		// Used in the identity user form to change an accept status of organization by Admin users
-
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'userorg' );
-
-		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
-
-		/**
-		 * This string is value of "rel" attibute of span icon element
-		 * The format of this string is: 'org_status_y_1_2' or 'org_status_n_1_2', where:
-		 *     'y' - organization was accepted by admin,
-		 *     'n' - not accepted
-		 *     '1' - this number is ID of organization - uorg_org_ID from the DB table T_users__user_org
-		 *     '2' - this number is ID of user - uorg_user_ID from the DB table T_users
-		 */
-		$status = explode( '_', param( 'status', 'string' ) );
-
-		// ID of organization
-		$org_ID = isset( $status[3] ) ? intval( $status[3] ) : 0;
-
-		// ID of organization
-		$user_ID = isset( $status[4] ) ? intval( $status[4] ) : 0;
-
-		if( count( $status ) != 5 || ( $status[2] != 'y' && $status[2] != 'n' ) || $org_ID == 0 )
-		{ // Incorrect format of status param
-			$Ajaxlog->add( /* DEBUG: do not translate */ 'Incorrect request to accept organization!', 'error' );
-			break;
-		}
-
-		// Use the glyph or font-awesome icons if it is defined by skin
-		param( 'b2evo_icons_type', 'string', '' );
-
-		if( $status[2] == 'y' )
-		{ // Status will be change to "Not accepted"
-			$org_is_accepted = false;
-		}
-		else
-		{ // Status will be change to "Accepted"
-			$org_is_accepted = true;
-		}
-
-		// Change an accept status of organization for edited user
-		$DB->query( 'UPDATE T_users__user_org
-			  SET uorg_accepted = '.$DB->quote( $org_is_accepted ? 1 : 0 ).'
-			WHERE uorg_user_ID = '.$DB->quote( $user_ID ).'
-			  AND uorg_org_ID = '.$DB->quote( $org_ID ) );
-
-		$accept_icon_params = array( 'style' => 'cursor: pointer;', 'rel' => 'org_status_'.( $org_is_accepted ? 'y' : 'n' ).'_'.$org_ID.'_'.$user_ID );
-		if( $org_is_accepted )
-		{ // Organization is accepted by admin
-			$accept_icon = get_icon( 'allowback', 'imgtag', array_merge( array( 'title' => T_('Accepted') ), $accept_icon_params ) );
-		}
-		else
-		{ // Organization is not accepted by admin yet
-			$accept_icon = get_icon( 'bullet_red', 'imgtag', array_merge( array( 'title' => T_('Not accepted') ), $accept_icon_params ) );
-		}
-
-		// Display icon with new status
-		echo $accept_icon;
 
 		break;
 
@@ -949,19 +856,6 @@ if( !$incorrect_action )
 	}
 
 	exit(0);
-}
-
-/**
- * Get comments awaiting moderation
- *
- * @param integer blog_ID
- */
-function get_comments_awaiting_moderation( $blog_ID )
-{
-	$limit = 30;
-
-	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
-	show_comments_awaiting_moderation( $blog_ID, NULL, $limit, array(), false );
 }
 
 ?>

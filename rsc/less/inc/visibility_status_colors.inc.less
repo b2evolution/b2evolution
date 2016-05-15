@@ -1,0 +1,134 @@
+// Colors for statuses of posts and comments:
+@status_color_draft:            #ff9;
+@status_color_draft_hover:      #f3f392;
+@status_color_review:           #CC0099;
+@status_color_review_hover:     #c20092;
+@status_color_community:        #2E8BB9;
+@status_color_community_hover:  #2c84b0;
+@status_color_protected:        #FF9C2A;
+@status_color_protected_hover:  #f39528;
+@status_color_private:          #DC143C;
+@status_color_private_hover:    #d21339;
+@status_color_published:        #99EE44;
+@status_color_published_hover:  #92e341;
+@status_color_deprecated:       #000;
+@status_color_deprecated_hover: #333;
+@status_color_redirected:       #663399;
+@status_color_redirected_hover: #613192;
+@status_color_trash:            #f66;
+@status_color_trash_hover:      #f44;
+@status_color_meta:             #5133ab;
+@status_color_meta_bg:          #f7f4ff;
+
+// Status colors:
+.status_color_draft {
+	color: @status_color_draft;
+}
+.status_color_review {
+	color: @status_color_review;
+}
+.status_color_community {
+	color: @status_color_community;
+}
+.status_color_protected {
+	color: @status_color_protected;
+}
+.status_color_private {
+	color: @status_color_private;
+}
+.status_color_published {
+	color: @status_color_published;
+}
+.status_color_deprecated {
+	color: @status_color_deprecated;
+}
+.status_color_redirected {
+	color: @status_color_redirected;
+}
+.status_color_trash {
+	color: @status_color_trash;
+}
+.status_color_meta {
+	color: @status_color_meta;
+}
+
+// Buttons for the post statuses
+.btn[class*=btn-status-] {
+	border: 1px solid #ccc;
+}
+.btn-status-draft {
+	color: #000;
+	background-color: @status_color_draft;
+	border-color: #dfdfdf;
+}
+.btn-status-draft:hover {
+	color: #000;
+	background-color: @status_color_draft_hover;
+}
+.btn-status-review {
+	color: #fff;
+	background-color: @status_color_review;
+}
+.btn-status-review:hover {
+	color: #fff;
+	background-color: @status_color_review_hover;
+}
+.btn-status-community {
+	color: #fff;
+	background-color: @status_color_community;
+}
+.btn-status-community:hover {
+	color: #fff;
+	background-color: @status_color_community_hover;
+}
+.btn-status-protected {
+	color: #fff;
+	background-color: @status_color_protected;
+}
+.btn-status-protected:hover {
+	color: #fff;
+	background-color: @status_color_protected_hover;
+}
+.btn-status-private {
+	color: #fff;
+	background-color: @status_color_private;
+}
+.btn-status-private:hover {
+	color: #fff;
+	background-color: @status_color_private_hover;
+}
+.btn-status-published {
+	color: #000;
+	background-color: @status_color_published;
+	.glyphicon {
+		color: inherit !important;
+	}
+}
+.btn-status-published:hover {
+	color: #000;
+	background-color: @status_color_published_hover;
+}
+.btn-status-deprecated {
+	color: #fff;
+	background-color: @status_color_deprecated;
+}
+.btn-status-deprecated:hover {
+	color: #fff;
+	background-color: @status_color_deprecated_hover;
+}
+.btn-status-redirected {
+	color: #fff;
+	background-color: @status_color_redirected;
+}
+.btn-status-redirected:hover {
+	color: #fff;
+	background-color: @status_color_redirected_hover;
+}
+.btn-status-trash {
+	color: #fff;
+	background-color: @status_color_trash;
+}
+.btn-status-trash:hover {
+	color: #fff;
+	background-color: @status_color_trash_hover;
+}

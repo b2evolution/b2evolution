@@ -27,10 +27,10 @@ class image_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function image_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'image' );
+		parent::__construct( $db_row, 'core', 'image' );
 	}
 
 
@@ -109,19 +109,35 @@ class image_Widget extends ComponentWidget
 																		'error'=>T_('Invalid filename.') ),
 					'size' => 128,
 				),
-				'width' => array(
-					'label' => T_('Image width'),
-					'note' => T_('pixels'),
-					'type' => 'integer',
-					'defaultvalue' => '300',
-					'allow_empty' => true,
+				'size_begin_line' => array(
+					'type' => 'begin_line',
+					'label' => T_('Image size'),
 				),
-				'height' => array(
-					'label' => T_('Image height'),
-					'note' => T_('pixels'),
-					'type' => 'integer',
-					'defaultvalue' => '',
-					'allow_empty' => true,
+					'width' => array(
+						'label' => T_('Image width'),
+						'note' => '',
+						'type' => 'integer',
+						'defaultvalue' => '300',
+						'allow_empty' => true,
+						'size' => 4,
+						'hide_label' => true,
+					),
+					'size_separator' => array(
+						'label' => ' x ',
+						'type' => 'string',
+					),
+					'height' => array(
+						'label' => T_('Image height'),
+						'note' => '',
+						'type' => 'integer',
+						'defaultvalue' => '',
+						'allow_empty' => true,
+						'size' => 4,
+						'hide_label' => true,
+					),
+				'size_end_line' => array(
+					'type' => 'end_line',
+					'label' => T_('pixels'),
 				),
 				'check_file' => array(
 					'label' => T_('Check file'),

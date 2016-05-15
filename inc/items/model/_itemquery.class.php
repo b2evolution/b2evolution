@@ -35,6 +35,7 @@ class ItemQuery extends SQL
 	var $assignees_login;
 	var $statuses;
 	var $types;
+	var $itemtype_usage;
 	var $dstart;
 	var $dstop;
 	var $timestamp_min;
@@ -53,7 +54,7 @@ class ItemQuery extends SQL
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
 	 */
-	function ItemQuery( $dbtablename, $dbprefix = '', $dbIDname )
+	function __construct( $dbtablename, $dbprefix = '', $dbIDname )
 	{
 		$this->dbtablename = $dbtablename;
 		$this->dbprefix = $dbprefix;
@@ -225,7 +226,7 @@ class ItemQuery extends SQL
 		$this->cat_array = $cat_array;
 		$this->cat_modifier = $cat_modifier;
 
-		if( $cat_focus == 'wide' || $cat_focus == 'extra' )
+		if( ! empty( $cat_array ) && ( $cat_focus == 'wide' || $cat_focus == 'extra' ) )
 		{
 			$sql_join_categories = ( $cat_focus == 'extra' ) ? ' AND post_main_cat_ID != cat_ID' : '';
 			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
@@ -315,12 +316,11 @@ class ItemQuery extends SQL
 		// Check status permission for multiple blogs
 		if( $aggregate_coll_IDs == '*' )
 		{ // Get the status restrictions for all blogs
-			global $DB;
-			$blog_IDs = $DB->get_col( 'SELECT blog_ID FROM T_blogs ORDER BY blog_ID' );
 			// Load all collections in single query, because otherwise we may have too many queries (1 query for each collection) later:
 			// fp> TODO: PERF: we probably want to remove this later when we restrict the use of '*'
 			$BlogCache = & get_BlogCache();
 			$BlogCache->load_all();
+			$blog_IDs = $BlogCache->get_ID_array();
 		}
 		else
 		{ // Get the status restrictions for several blogs
@@ -615,6 +615,43 @@ class ItemQuery extends SQL
 
 
 	/**
+	 * Restrict to specific post types usage
+	 *
+	 * @param string List of types usage to restrict to (must have been previously validated):
+	 *               Allowed values: post, page, intro-front, intro-main, intro-cat, intro-tag, intro-sub, intro-all, special
+	 */
+	function where_itemtype_usage( $itemtype_usage )
+	{
+		global $DB;
+
+		$this->itemtype_usage = $itemtype_usage;
+
+		if( empty( $itemtype_usage ) )
+		{
+			return;
+		}
+
+		$this->FROM_add( 'LEFT JOIN T_items__type ON ityp_ID = '.$this->dbprefix.'ityp_ID' );
+
+		if( $itemtype_usage == '-' )
+		{	// List is ONLY a MINUS sign (we want only those not assigned)
+			$this->WHERE_and( $this->dbprefix.'ityp_ID IS NULL' );
+		}
+		elseif( substr( $itemtype_usage, 0, 1 ) == '-' )
+		{	// List starts with MINUS sign:
+			$itemtype_usage = explode( ',', substr( $itemtype_usage, 1 ) );
+			$this->WHERE_and( '( '.$this->dbprefix.'ityp_ID IS NULL
+			                  OR ityp_usage NOT IN ( '.$DB->quote( $itemtype_usage ).' ) )' );
+		}
+		else
+		{
+			$itemtype_usage = explode( ',', $itemtype_usage );
+			$this->WHERE_and( 'ityp_usage IN ( '.$DB->quote( $itemtype_usage ).' )' );
+		}
+	}
+
+
+	/**
 	 * Restricts the datestart param to a specific date range.
 	 *
 	 * Start date gets restricted to minutes only (to make the query more
@@ -807,7 +844,7 @@ class ItemQuery extends SQL
 	 * @param string Keyword search string
 	 * @param string Search for entire phrase or for individual words: 'OR', 'AND', 'sentence'(or '1')
 	 * @param string Require exact match of title or contents — does NOT apply to tags which are always an EXACT match
-	 * @param string Scope of keyword search string: 'title', 'content'
+	 * @param string Scope of keyword search string: 'title', 'content', 'tags', 'excerpt', 'titletag', 'metadesc', 'metakeywords'
 	 */
 	function where_keywords( $keywords, $phrase, $exact, $keyword_scope = 'title,content' )
 	{
@@ -846,6 +883,24 @@ class ItemQuery extends SQL
 					$this->GROUP_BY( 'post_ID' );
 					// Tags are always an EXACT match:
 					$search_sql[] = 'tag_name = '.$DB->quote( $keywords );
+					break;
+
+				case 'excerpt':
+					$search_fields[] = $this->dbprefix.'excerpt';
+					break;
+
+				case 'titletag':
+					$search_fields[] = $this->dbprefix.'titletag';
+					break;
+
+				case 'metadesc':
+					$this->FROM_add( 'LEFT JOIN T_items__item_settings AS is_md ON post_ID = is_md.iset_item_ID AND is_md.iset_name = "metadesc"' );
+					$search_fields[] = 'is_md.iset_value';
+					break;
+
+				case 'metakeywords':
+					$this->FROM_add( 'LEFT JOIN T_items__item_settings AS is_mk ON post_ID = is_mk.iset_item_ID AND is_mk.iset_name = "metakeywords"' );
+					$search_fields[] = 'is_mk.iset_value';
 					break;
 
 				// TODO: add more.

@@ -156,8 +156,9 @@ else
 
 	$DB->halt_on_error = false;
 	$DB->show_errors = false;
+	$cron_timestart = $localtimenow;
 	$sql = 'INSERT INTO T_cron__log( clog_ctsk_ID, clog_realstart_datetime, clog_status)
-					VALUES( '.$ctsk_ID.', '.$DB->quote( date2mysql($localtimenow) ).', "started" )';
+					VALUES( '.$ctsk_ID.', '.$DB->quote( date2mysql( $cron_timestart ) ).', "started" )';
 	// Duplicate query for tests!
 	// $DB->query( $sql, 'Request lock' );
 	if( $DB->query( $sql, 'Request lock' ) != 1 )
@@ -169,20 +170,24 @@ else
 	else
 	{
 		if( !empty( $task->ctsk_repeat_after ) )
-		{	// This task wants to be repeated:
+		{ // This task wants to be repeated:
 			// Note: we use the current time for 2 reasons: 1) prevent scheduling something in the past AND 2) introduce variety so that everyone doesn't run his repeated tasks at the same exact time, especially pings, pollings...
 			if( $task->ctsk_key == 'poll-antispam-blacklist' )
-			{	// THIS IS A HACK. Guess why we need that!? :P  Please do not override or you'll kill our server :(
+			{ // THIS IS A HACK. Guess why we need that!? :P  Please do not override or you'll kill our server :(
 				$new_start_datetime = $localtimenow + rand( 43200, 86400 ); // 12 to 24 hours
 			}
 			else
-			{	// Normal
+			{ // Normal
 				$new_start_datetime = $localtimenow + $task->ctsk_repeat_after;
+				if( ! empty( $task->ctsk_repeat_variation ) )
+				{ // Include variation param as random +/- time value
+					$new_start_datetime += rand( 0, 2 * $task->ctsk_repeat_variation ) - $task->ctsk_repeat_variation;
+				}
 			}
 			$ctsk_name_insert = empty( $task->ctsk_name ) ? 'NULL' : $DB->quote( $task->ctsk_name );
-			$sql = 'INSERT INTO T_cron__task( ctsk_start_datetime, ctsk_repeat_after, ctsk_name, ctsk_key, ctsk_params )
-							VALUES( '.$DB->quote(date2mysql($new_start_datetime)).', '.$DB->quote($task->ctsk_repeat_after).', '
-												.$ctsk_name_insert.', '.$DB->quote($task->ctsk_key).', '.$DB->quote($task->ctsk_params).' )';
+			$sql = 'INSERT INTO T_cron__task( ctsk_start_datetime, ctsk_repeat_after, ctsk_repeat_variation, ctsk_name, ctsk_key, ctsk_params )
+							VALUES( '.$DB->quote( date2mysql( $new_start_datetime ) ).', '.$DB->quote( $task->ctsk_repeat_after ).', '.$DB->quote( $task->ctsk_repeat_variation ).', '
+												.$ctsk_name_insert.', '.$DB->quote( $task->ctsk_key ).', '.$DB->quote( $task->ctsk_params ).' )';
 			$DB->query( $sql, 'Schedule repeated task.' );
 		}
 
@@ -204,6 +209,7 @@ else
 
 		// EXECUTE
 		$error_message = call_job( $task->ctsk_key, $cron_params );
+
 		if( !empty( $error_message ) )
 		{
 			$error_task = array(
@@ -214,9 +220,14 @@ else
 		}
 
 		// Record task as finished:
-		if( empty($timestop) )
+		if( empty( $timestop ) )
 		{
 			$timestop = time() + $time_difference;
+		}
+
+		if( $result_status == 'finished' && $timestop - $cron_timestart > 60 )
+		{ // Record a finished task as warning if it has run for more than 60 seconds
+			$result_status = 'warning';
 		}
 
 		if( is_array( $result_message ) )
@@ -225,7 +236,7 @@ else
 		}
 
 		$sql = ' UPDATE T_cron__log
-								SET clog_status = '.$DB->quote($result_status).',
+								SET clog_status = '.$DB->quote( $result_status ).',
 										clog_realstop_datetime = '.$DB->quote( date2mysql( $timestop ) ).',
 										clog_messages = '.$DB->quote( $result_message ) /* May be NULL */.'
 							WHERE clog_ctsk_ID = '.$ctsk_ID;

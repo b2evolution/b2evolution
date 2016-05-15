@@ -35,7 +35,8 @@ $Form->begin_form( 'fform' );
 
 $Form->add_crumb( 'emailsettings' );
 $Form->hidden( 'ctrl', 'email' );
-$Form->hidden( 'tab', 'settings' );
+$Form->hidden( 'tab', get_param( 'tab' ) );
+$Form->hidden( 'tab2', get_param( 'tab2' ) );
 $Form->hidden( 'tab3', get_param( 'tab3' ) );
 $Form->hidden( 'action', 'settings' );
 
@@ -43,7 +44,7 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 {
 	$Form->begin_fieldset( T_('Test saved settings').get_manual_link( 'smtp-gateway-settings' ) );
 
-		$url = '?ctrl=email&amp;tab=settings&amp;tab3=smtp&amp;'.url_crumb('emailsettings').'&amp;action=';
+		$url = '?ctrl=email&amp;tab='.get_param( 'tab' ).'&amp;tab2='.get_param( 'tab2' ).'&amp;tab3='.get_param( 'tab3' ).'&amp;'.url_crumb('emailsettings').'&amp;action=';
 		$Form->info_field( T_('Perform tests'),
 					'<a href="'.$url.'test_smtp">['.T_('server connection').']</a>&nbsp;&nbsp;'.
 					'<a href="'.$url.'test_email">['.T_('send test email').']</a>&nbsp;&nbsp;' );
@@ -57,6 +58,18 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 
 	$Form->end_fieldset();
 }
+
+
+$Form->begin_fieldset( T_( 'Email service settings' ).get_manual_link( 'email-service-settings' ) );
+
+$Form->radio( 'email_service', $Settings->get( 'email_service' ), array(
+			array( 'mail', T_('Regular PHP "mail" function'), ),
+			array( 'smtp', T_('External SMTP Server defined below'), ),
+		), T_('Primary email service'), true );
+$Form->checkbox( 'force_email_sending', $Settings->get( 'force_email_sending' ), T_('Force email sending'), T_('If the primary email service is not available, the secondary option will be used.') );
+
+$Form->end_fieldset();
+
 
 $Form->begin_fieldset( T_('SMTP Server connection settings').get_manual_link('smtp-gateway-settings') );
 

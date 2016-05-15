@@ -12,7 +12,8 @@ global $servertimenow, $htsrv_url, $unread_message_reminder_delay, $unread_messs
 $threshold_date = date2mysql( $servertimenow - $unread_messsage_reminder_threshold );
 // New unread messages reminder should be sent to a user if the last one was sent at least x days ago, where x depends from the configuration
 // Get the minimum delay value from the configuration array
-$minimum_delay = array_shift( array_values( $unread_message_reminder_delay ) );
+$minimum_delay = array_values( $unread_message_reminder_delay );
+$minimum_delay = array_shift( $minimum_delay );
 // Get the datetime which corresponds to the minimum delay value.
 // If the last unread message reminder for a specific user is after this datetime, then notification must not be send to that user now.
 $reminder_threshold = date2mysql( $servertimenow - ( $minimum_delay * 86400 ) );
@@ -104,8 +105,8 @@ if( empty( $users_to_remind_ids ) )
 global $is_admin_page;
 $is_admin_page = true;
 
-// Get all those user threads and their recipients where the corresponding users have unread messages
-$unread_threads = get_users_unread_threads( $users_to_remind_ids, NULL, 'array', 'html' );
+// Get all those user threads and their recipients where the corresponding users have unread messages:
+$unread_threads = get_users_unread_threads( $users_to_remind_ids, NULL, 'array', 'html', 'http:' );
 
 // Get unread thread urls
 list( $threads_link ) = get_messages_link_to();

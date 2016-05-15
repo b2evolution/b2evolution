@@ -99,6 +99,19 @@ class prism_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Called before at the beginning, if an email form gets sent (and received).
+	 */
+	function EmailFormSent( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( $this->is_renderer_enabled( $apply_rendering, $params['renderers'] ) )
+		{	// render code blocks in message:
+			$this->FilterItemContents( $params );
+		}
+	}
+
+
+	/**
 	 * Perform rendering
 	 *
 	 * @see Plugin::RenderItemAsHtml()
@@ -175,7 +188,14 @@ class prism_plugin extends Plugin
 			$code_class .= ' language-'.$lang;
 		}
 
-		$r = '<code'.( empty( $code_class ) ? '' : ' class="'.trim( $code_class ).'"' ).'>'.$block[3].'</code>';
+		$content = $block[3];
+
+		if( $type == 'codeblock' )
+		{	// Remove first empty line from codeblock content:
+			$content = preg_replace( '/^\r?\n/', '', $content );
+		}
+
+		$r = '<code'.( empty( $code_class ) ? '' : ' class="'.trim( $code_class ).'"' ).'>'.$content.'</code>';
 
 		if( $type == 'codeblock' )
 		{ // Set special template and attributes only for codeblock
@@ -215,6 +235,8 @@ class prism_plugin extends Plugin
 	 */
 	function unfilter_code_callback( $block )
 	{
+		$content = $block[6];
+
 		if( empty( $block[1] ) )
 		{ // [codespan]
 			$code_tag = 'codespan';
@@ -227,6 +249,9 @@ class prism_plugin extends Plugin
 			// Detect number of start line:
 			preg_match( '/.*data-start="(-?[0-9]+)".*/i', html_entity_decode( $block[1] ), $line );
 			$line = ' line="'.( isset( $line[1] ) ? intval( $line[1] ) : '1' ).'"';
+
+			// Revert back first empty line:
+			$content = "\r\n".$content;
 		}
 
 		$lang = trim( strtolower( $block[5] ) );
@@ -246,7 +271,7 @@ class prism_plugin extends Plugin
 
 		// Build codeblock:
 		$r = '['.$code_tag.$lang.$line.']';
-		$r .= $block[6];
+		$r .= $content;
 		$r .= '[/'.$code_tag.']';
 
 		return $r;
@@ -254,9 +279,13 @@ class prism_plugin extends Plugin
 
 
 	/**
-	 * @see Plugin::SkinBeginHtmlHead()
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
 	 */
-	function SkinBeginHtmlHead()
+	function SkinBeginHtmlHead( & $params )
 	{
 		global $Blog;
 
@@ -269,6 +298,24 @@ class prism_plugin extends Plugin
 
 		require_js( $this->get_plugin_url().'/js/prism.min.js', true );
 		require_css( $this->get_plugin_url().'/css/prism.min.css', true );
+	}
+
+
+	/**
+	 * Event handler: Called when ending the admin html head section.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
+	 */
+	function AdminEndHtmlHead( & $params )
+	{
+		global $ctrl;
+
+		if( $ctrl == 'campaigns' && get_param( 'tab' ) == 'send' && $this->get_email_setting( 'email_apply_rendering' ) )
+		{	// Load this only on form to preview email campaign:
+			require_js( $this->get_plugin_url().'/js/prism.min.js', 'relative' );
+			require_css( $this->get_plugin_url().'/css/prism.min.css', 'relative' );
+		}
 	}
 
 
@@ -317,6 +364,23 @@ class prism_plugin extends Plugin
 	function DisplayMessageToolbar( & $params )
 	{
 		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{
+			return $this->display_toolbar();
+		}
+		return false;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{
 			return $this->display_toolbar();

@@ -1,0 +1,77 @@
+// Rating Summary for all comments of the selected post on disp=single
+.ratings_table {
+	margin: 0 10px 10px 0;
+	display: inline-block;
+	.rating_summary {
+		border-spacing: 1px;
+		border-collapse: separate;
+	}
+	.progress {
+		border-radius: 0;
+		height: 13px;
+	}
+}
+table.rating_summary {
+	float: left;
+	margin: 0;
+	tr {
+		th, td {
+			border: none;
+			font-size: 10px;
+			line-height: 13px;
+			font-weight: normal;
+			padding: 0;
+		}
+		th{
+			padding-right: 5px;
+			background-color: transparent;
+		}
+		td{
+			text-align: right;
+			padding-left: 5px;
+		}
+	}
+	.progress {
+		width: 60px;
+		background: #eeeecc;
+		padding: 0;
+		box-shadow: none; // override bootstrap
+	}
+	.progress div{
+		background: #ffcc66;
+	}
+}
+div.rating_summary_total{
+	float: left;
+	padding: 5px 0 0 20px;
+}
+div.average_rating{
+	padding-top: 5px;
+}
+div.average_rating span{
+	float: left;
+	font-size: 11px;
+	line-height: 12px;
+	padding-left: 10px;
+}
+div.star_rating, div.star_rating div{
+	width: 60px;
+	height: 12px;
+	background: url(../icons/icons_sprite.png) repeat-x -64px -160px;
+	overflow: hidden;
+	text-indent: 100px;
+}
+div.star_rating div{
+	background-position: 0 -160px;
+}
+div.average_rating .star_rating{
+	float: left;
+}
+.rating_recap{
+	clear: both;
+	font-size: 10px;
+}
+.rating_recap div{
+	float: left;
+	padding-right: 10px;
+}

@@ -114,7 +114,7 @@ function score_text( $text, $search_term, $words = array(), $quoted_terms = arra
  *
  * @param string Text to score
  * @param string The search keywords to score by
- * @param integer Score multiplier 
+ * @param integer Score multiplier
  * @return integer Result score
  */
 function score_tags( $tag_name, $search_term, $score_weight = 4 )
@@ -191,7 +191,7 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
 	switch( $type )
 	{
 		case 'item':
-			$searched_parts = array( 'title', 'content', 'tags' );
+			$searched_parts = array( 'title', 'content', 'tags', 'excerpt', 'titletag' );
 			break;
 
 		case 'comment':
@@ -261,19 +261,15 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
  */
 function search_and_score_items( $search_term, $keywords, $quoted_parts )
 {
-	global $DB, $Blog, $posttypes_perms;
-
-	// Exclude from search: 'sidebar' type posts and from reserved type with ID 5000
-	$filter_post_types = isset( $posttypes_perms['sidebar'] ) ? $posttypes_perms['sidebar'] : array();
-	$filter_post_types = array_merge( $filter_post_types, array( 5000 ) );
+	global $DB, $Blog;
 
 	// Prepare filters:
 	$search_ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), '', 'ItemCache', 'search_item' );
 	$search_ItemList->set_filters( array(
 			'keywords'      => $search_term,
-			'keyword_scope' => 'title,content,tags', // TODO: add more fields
+			'keyword_scope' => 'title,content,tags,excerpt,titletag', // TODO: add more fields
 			'phrase'        => 'OR',
-			'types'         => '-'.implode( ',', $filter_post_types ),
+			'itemtype_usage'=> '-sidebar', // Exclude from search: 'sidebar' item types
 			'orderby'       => 'datemodified',
 			'order'         => 'DESC',
 			'posts'         => 1000
@@ -283,7 +279,8 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 	$search_ItemList->query_init();
 
 	// Make a custom search query:
-	$search_query = 'SELECT DISTINCT post_ID, post_datemodified, post_title, post_content, user_login as creator_login, tag_name'
+	$search_query = 'SELECT DISTINCT post_ID, post_datemodified, post_title, post_content,'
+		.' user_login as creator_login, tag_name, post_excerpt, post_titletag'
 		.$search_ItemList->ItemQuery->get_from()
 		.' LEFT JOIN T_users ON post_creator_user_ID = user_ID'
 		.$search_ItemList->ItemQuery->get_where()
@@ -303,6 +300,8 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 		$scores_map['title'] = score_text( $row->post_title, $search_term, $keywords, $quoted_parts, /* multiplier: */ 5 );
 		$scores_map['content'] = score_text( $row->post_content, $search_term, $keywords, $quoted_parts );
 		$scores_map['tags'] = score_tags( $row->tag_name, $search_term, /* multiplier: */ 4 );
+		$scores_map['excerpt'] = score_text( $row->post_excerpt, $search_term, $keywords, $quoted_parts );
+		$scores_map['titletag'] = score_text( $row->post_titletag, $search_term, $keywords, $quoted_parts, 4 );
 		if( !empty( $search_term ) && !empty( $row->creator_login ) && strpos( $row->creator_login, $search_term ) !== false )
 		{
 			$scores_map['creator_login'] = 5;
@@ -312,6 +311,8 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
 		$final_score = $scores_map['title']['score']
 			+ $scores_map['content']['score']
 			+ $scores_map['tags']['score']
+			+ $scores_map['excerpt']['score']
+			+ $scores_map['titletag']['score']
 			+ ( isset( $scores_map['creator_login'] ) ? $scores_map['creator_login'] : 0 )
 			+ $scores_map['last_mod_date'];
 
@@ -515,13 +516,15 @@ function search_and_score_tags( $search_term, $keywords, $quoted_parts )
 
 
 /**
- * Perform a scrored search 
+ * Perform a scrored search
  * This searches matching objects and gives a match-quality-score to each found object
  *
  * @param string the search keywords
+ * @param string What types search: 'all', 'item', 'comment', 'category', 'tag'
+ *               Use ','(comma) as separator to use several kinds, e.g: 'item,comment' or 'tag,comment,category'
  * @return array scored search result, each element is an array( type, ID, score )
  */
-function perform_scored_search( $search_keywords )
+function perform_scored_search( $search_keywords, $search_types = 'all' )
 {
 	$keywords = trim( $search_keywords );
 	if( empty( $keywords ) )
@@ -529,7 +532,7 @@ function perform_scored_search( $search_keywords )
 		return array();
 	}
 
-	global $Blog, $DB, $posttypes_perms, $debug;
+	global $Blog, $DB, $debug;
 	global $scores_map, $score_prefix, $score_map_key, $Debuglog;
 
 	// Get quoted parts parts of the search query
@@ -570,39 +573,66 @@ function perform_scored_search( $search_keywords )
 // TODO: return NULL and display a specific error message like "Please enter some keywords to search."
 	}
 
-	// Perform search on Items:
-	$item_search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts );
-	if( $debug )
-	{
-		echo '<p class="text-muted">Just found '.count( $item_search_result ).' Items.</p>';
-		evo_flush();
+	if( $search_types == 'all' )
+	{	// Search all result types:
+		$search_type_item = true;
+		$search_type_comment = true;
+		$search_type_category = true;
+		$search_type_tag = true;
+	}
+	else
+	{	// Check what types should be searched:
+		$search_types = explode( ',', $search_types );
+		$search_type_item = in_array( 'item', $search_types );
+		$search_type_comment = in_array( 'comment', $search_types );
+		$search_type_category = in_array( 'category', $search_types );
+		$search_type_tag = in_array( 'tag', $search_types );
 	}
 
-	// Perform search on Comments:
-	$comment_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts );
-	$search_result = array_merge( $item_search_result, $comment_search_result );
-	if( $debug )
-	{
-		echo '<p class="text-muted">Just found '.count( $comment_search_result ).' Comments.</p>';
-		evo_flush();
+	$search_result = array();
+
+	if( $search_type_item )
+	{	// Perform search on Items:
+		$item_search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts );
+		$search_result = $item_search_result;
+		if( $debug )
+		{
+			echo '<p class="text-muted">Just found '.count( $item_search_result ).' Items.</p>';
+			evo_flush();
+		}
 	}
 
-	// Perform search on Chapters:
-	$cats_search_result = search_and_score_chapters( $search_keywords, $keywords, $quoted_parts );
-	$search_result = array_merge( $search_result, $cats_search_result );
-	if( $debug )
-	{
-		echo '<p class="text-muted">Just found '.count( $cats_search_result ).' Catageories.</p>';
-		evo_flush();
+	if( $search_type_comment )
+	{	// Perform search on Comments:
+		$comment_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts );
+		$search_result = array_merge( $search_result, $comment_search_result );
+		if( $debug )
+		{
+			echo '<p class="text-muted">Just found '.count( $comment_search_result ).' Comments.</p>';
+			evo_flush();
+		}
 	}
 
-	// Perform search on Tags:
-	$tags_search_result = search_and_score_tags( $search_keywords, $keywords, $quoted_parts );
-	$search_result = array_merge( $search_result, $tags_search_result );
-	if( $debug )
-	{
-		echo '<p class="text-muted">Just found '.count( $tags_search_result ).' Tags.</p>';
-		evo_flush();
+	if( $search_type_category )
+	{	// Perform search on Chapters:
+		$cats_search_result = search_and_score_chapters( $search_keywords, $keywords, $quoted_parts );
+		$search_result = array_merge( $search_result, $cats_search_result );
+		if( $debug )
+		{
+			echo '<p class="text-muted">Just found '.count( $cats_search_result ).' Catageories.</p>';
+			evo_flush();
+		}
+	}
+
+	if( $search_type_tag )
+	{	// Perform search on Tags:
+		$tags_search_result = search_and_score_tags( $search_keywords, $keywords, $quoted_parts );
+		$search_result = array_merge( $search_result, $tags_search_result );
+		if( $debug )
+		{
+			echo '<p class="text-muted">Just found '.count( $tags_search_result ).' Tags.</p>';
+			evo_flush();
+		}
 	}
 
 	// Sort results by score:
@@ -618,10 +648,22 @@ function perform_scored_search( $search_keywords )
 		$first_result = $search_result[0];
 		$max_percentage = get_percentage_from_result_map( $first_result['type'], $first_result['scores_map'], $quoted_parts, $keywords );
 		$search_result[0]['percentage'] = $max_percentage;
-		$search_result[0]['nr_of_items'] = count( $item_search_result );
-		$search_result[0]['nr_of_comments'] = count( $comment_search_result );
-		$search_result[0]['nr_of_cats'] = count( $cats_search_result );
-		$search_result[0]['nr_of_tags'] = count( $tags_search_result );
+		if( $search_type_item )
+		{
+			$search_result[0]['nr_of_items'] = count( $item_search_result );
+		}
+		if( $search_type_comment )
+		{
+			$search_result[0]['nr_of_comments'] = count( $comment_search_result );
+		}
+		if( $search_type_category )
+		{
+			$search_result[0]['nr_of_cats'] = count( $cats_search_result );
+		}
+		if( $search_type_tag )
+		{
+			$search_result[0]['nr_of_tags'] = count( $tags_search_result );
+		}
 	}
 
 	return $search_result;
@@ -644,7 +686,7 @@ function search_result_block( $params = array() )
 	$search_params = $Session->get( 'search_params' );
 	$search_result = $Session->get( 'search_result' );
 	$search_result_loaded = false;
-	if( empty( $search_params ) 
+	if( empty( $search_params )
 		|| ( $search_params['search_keywords'] != $search_keywords )	// We had saved search results but for a different search string
 		|| ( $search_params['search_blog'] != $Blog->ID ) 		// We had saved search results but for a different collection
 		|| ( $search_result === NULL ) )
@@ -657,14 +699,14 @@ function search_result_block( $params = array() )
 		// Flush first part of the page before starting search, which can be long...
 		evo_flush();
 
-		$search_params = array( 
-			'search_keywords' => $search_keywords, 
-			'search_blog' => $Blog->ID 
+		$search_params = array(
+			'search_keywords' => $search_keywords,
+			'search_blog' => $Blog->ID
 		);
 
 		// Perform new search:
 		$search_result = perform_scored_search( $search_keywords );
-		
+
 		// Save results into session:
 		$Session->set( 'search_params', $search_params );
 		$Session->set( 'search_result', $search_result );
@@ -676,10 +718,10 @@ function search_result_block( $params = array() )
 		{	// Display counts
 			echo '<div class="text-muted">';
 			echo '<p>We found the desired saved search results in the Session:</p>';
-			echo '<ul><li>'.sprintf( '%d posts', $search_result[0]['nr_of_items'] ).'</li>';
-			echo '<li>'.sprintf( '%d comments', $search_result[0]['nr_of_comments'] ).'</li>';
-			echo '<li>'.sprintf( '%d chapters', $search_result[0]['nr_of_cats'] ).'</li>';
-			echo '<li>'.sprintf( '%d tags', $search_result[0]['nr_of_tags'] ).'</li></ul>';
+			echo '<ul><li>'.sprintf( '%d posts', empty( $search_result[0]['nr_of_items'] ) ? 0 : $search_result[0]['nr_of_items'] ).'</li>';
+			echo '<li>'.sprintf( '%d comments', empty( $search_result[0]['nr_of_comments'] ) ? 0 : $search_result[0]['nr_of_comments'] ).'</li>';
+			echo '<li>'.sprintf( '%d chapters', empty( $search_result[0]['nr_of_cats'] ) ? 0 : $search_result[0]['nr_of_cats'] ).'</li>';
+			echo '<li>'.sprintf( '%d tags', empty( $search_result[0]['nr_of_tags'] ) ? 0 : $search_result[0]['nr_of_tags'] ).'</li></ul>';
 			echo '</div>';
 		}
 
@@ -812,13 +854,13 @@ function search_result_block( $params = array() )
 				{ // This Item was deleted, since the search process was executed
 					continue 2; // skip from switch and skip to the next item in loop
 				}
-				
+
 				$display_params = array(
 					'title'   => $Item->get_title( array( 'link_type' => 'permalink' ) ).$params['title_suffix_post'],
 					'excerpt' => $Item->get_excerpt2(),
 					'chapter' => sprintf( T_('In %s'), $Item->get_chapter_links() ),
 				);
-				
+
 				if( $params['use_editor'] )
 				{ // Get editor info to display:
 					$lastedit_User = & $Item->get_lastedit_User();
@@ -889,7 +931,7 @@ function search_result_block( $params = array() )
 				);
 				break;
 
-			default: 
+			default:
 				// Other type of result is not implemented
 
 				// TODO: maybe find collections (especially in case of aggregation)? users? files?
@@ -979,33 +1021,100 @@ function search_page_links( $params = array() )
 
 	if( $current_page > 1 )
 	{ // A link to previous page:
-		echo $params['page_item_before'];
+		echo add_tag_class( $params['page_item_before'], 'listnav_prev' );
 		$prev_attrs = empty( $params['prev_class'] ) ? '' : ' class="'.$params['prev_class'].'"';
 		echo '<a href="'.url_add_param( $page_url, 'page='.( $current_page - 1 ) ).'" rel="prev"'.$prev_attrs.'>'.$params['prev_text'].'</a>';
 		echo $params['page_item_after'];
 	}
 
-	if( $page_list_start > 1 )
-	{ // The pages list doesn't contain the first page
-		// Display a link to first page:
-		echo $params['page_item_before'];
+	// Display a link to first page:
+	if( $current_page == 1 )
+	{
+		echo add_tag_class( $params['page_item_current_before'], 'listnav_first' );
+		echo '<a href="'.url_add_param( $page_url, 'page=1' ).'">1</a>';
+		echo $params['page_item_current_after'];
+	}
+	else
+	{
+		echo add_tag_class( $params['page_item_before'], 'listnav_first' );
 		echo '<a href="'.url_add_param( $page_url, 'page=1' ).'">1</a>';
 		echo $params['page_item_after'];
+	}
 
-		if( $page_list_start > 2 )
-		{ // Display a link to previous pages range:
-			$page_no = ceil( $page_list_start / 2 );
-			echo $params['page_item_before'];
-			echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
-			echo $params['page_item_after'];
+	if( $page_list_start > 2 )
+	{ // Display a link to previous pages range:
+		$page_no = ceil( $page_list_start / 2 );
+		echo add_tag_class( $params['page_item_before'], 'listnav_prev_list' );
+		echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
+		echo $params['page_item_after'];
+	}
+
+	$hidden_active_distances = array( 1, 2 );
+	$page_prev_i = $current_page - 1;
+	$page_next_i = $current_page + 1;
+	$pib = add_tag_class( $params['page_item_before'], '**active_distance_**' );
+
+	// Do not include first page in the page list range
+	if( $page_list_start == 1 )
+	{
+		$page_list_start++;
+		if( ( $page_list_end + 1 ) < $total_pages )
+		{
+			$page_list_end++;
 		}
 	}
 
-	$page_prev_i = $current_page - 1;
-	$page_next_i = $current_page + 1;
+	// Also, do not include last page in the page list range
+	if( $page_list_end == $total_pages )
+	{
+		$page_list_end--;
+		if( $page_list_start > 2 )
+		{
+			$page_list_start--;
+		}
+	}
+
 	for( $i = $page_list_start; $i <= $page_list_end; $i++ )
 	{
-		
+		if( $current_page <= 4 )
+		{
+			$a = ( $i - 4 );
+			$active_dist = $a > 0 ? $a : null;
+		}
+		elseif( $current_page > ( $total_pages - 3 ) )
+		{
+			if( $i > ( $total_pages - 3 ) )
+			{
+				$active_dist = null;
+			}
+			else
+			{
+				$active_dist = ( ( $total_pages - 3 ) - $i );
+			}
+		}
+		else
+		{
+			$active_dist = abs( $current_page - $i );
+		}
+
+		if( in_array( $active_dist, $hidden_active_distances ) && ( $i < $current_page ) && ( $i > 2 ) && ( $current_page > 4 ) )
+		{
+			$page_no = ceil( $page_list_start / 2 );
+			if( $page_no == 1 )
+			{
+				$page_no++;
+			}
+			if( isset( $params['page_item_before'] ) && trim( $params['page_item_before'] ) )
+			{
+				echo add_tag_class( $params['page_item_before'], 'listnav_distance_'.$active_dist );
+				echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
+			}
+			else
+			{
+				echo add_tag_class( '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>', 'listnav_distance_'.$active_dist );
+			}
+			echo $params['page_item_after'];
+		}
 		if( $i == $current_page )
 		{ // Current page
 			echo $params['page_item_current_before'];
@@ -1023,31 +1132,66 @@ function search_page_links( $params = array() )
 			{ // Add attribute rel="next" for next page
 				$attr_rel = ' rel="next"';
 			}
-			echo $params['page_item_before'];
+
+			if( $active_dist )
+			{
+				echo str_replace( '**active_distance_**', 'active_distance_'.$active_dist, $pib );
+			}
+			else
+			{
+				echo str_replace( '**active_distance_**', '', $pib );
+			}
 			echo '<a href="'.url_add_param( $page_url, 'page='.$i ).'"'.$attr_rel.'>'.$i.'</a>';
+			echo $params['page_item_after'];
+		}
+
+		if( in_array( $active_dist, $hidden_active_distances ) && ( $i > $current_page ) && ( $i < ( $total_pages - 1 ) ) )
+		{
+			$page_no = $page_list_end + floor( ( $total_pages - $page_list_end ) / 2 );
+			if( $page_no == $total_pages )
+			{
+				$page_no--;
+			}
+			if( isset( $params['page_item_before'] ) && trim( $params['page_item_before'] ) )
+			{
+				echo add_tag_class( $params['page_item_before'], 'listnav_distance_'.$active_dist );
+				echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
+			}
+			else
+			{
+				echo add_tag_class( '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>', 'listnav_distance_'.$active_dist );
+			}
 			echo $params['page_item_after'];
 		}
 	}
 
-	if( $page_list_end < $total_pages )
-	{ // The pages list doesn't contain the last page
-		if( $page_list_end < $total_pages - 1 )
-		{ // Display a link to next pages range:
-			$page_no = $page_list_end + floor( ( $total_pages - $page_list_end ) / 2 );
-			echo $params['page_item_before'];
-			echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
-			echo $params['page_item_after'];
-		}
+	if( ( $page_list_end < $total_pages ) && ( $page_list_end < $total_pages - 1 ) )
+	{ // Display a link to next pages range:
+		$page_no = $page_list_end + floor( ( $total_pages - $page_list_end ) / 2 );
+		echo add_tag_class( $params['page_item_before'], 'listnav_next_list' );
+		echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
+		echo $params['page_item_after'];
+	}
 
-		// Display a link to last page:
-		echo $params['page_item_before'];
+	// Display a link to last page:
+	if( $current_page == $total_pages )
+	{
+		echo add_tag_class( $params['page_item_current_before'], 'listnav_last' );
+		echo '<a href="'.url_add_param( $page_url, 'page='.$total_pages ).'">'.$total_pages.'</a>';
+		echo $params['page_item_current_after'];
+	}
+	else
+	{
+		echo add_tag_class( $params['page_item_before'], 'listnav_last' );
 		echo '<a href="'.url_add_param( $page_url, 'page='.$total_pages ).'">'.$total_pages.'</a>';
 		echo $params['page_item_after'];
 	}
 
+
+
 	if( $current_page < $total_pages )
 	{ // A link to next page:
-		echo $params['page_item_before'];
+		echo add_tag_class( $params['page_item_before'], 'listnav_next' );
 		$next_attrs = empty( $params['next_class'] ) ? '' : ' class="'.$params['next_class'].'"';
 		echo ' <a href="'.url_add_param( $page_url, 'page='.( $current_page + 1 ) ).'" rel="next"'.$next_attrs.'>'.$params['next_text'].'</a>';
 		echo $params['page_item_after'];
@@ -1209,7 +1353,7 @@ function display_score_map( $params )
 					// Example: We searched [several images attached] and we matched it in:
 					//  - [This post has several images attached to it]
 					// OR we searched [wild] and we matched it in:
-					//  - [I was bewildered!] 
+					//  - [I was bewildered!]
 					//  - [A wild cat!]
 					echo '<li>'.sprintf( '%d points for whole term match', $scores ).'</li>';
 					continue;

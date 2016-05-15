@@ -26,6 +26,7 @@ class Cronjob extends DataObject
 {
 	var $start_datetime;
 	var $repeat_after = NULL;
+	var $repeat_variation = 0;
 	var $name;
 	var $key;
 
@@ -39,20 +40,21 @@ class Cronjob extends DataObject
 	 *
 	 * @param table Database row
 	 */
-	function Cronjob( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_cron__task', 'ctsk_', 'ctsk_ID', '', '', '', '' );
+		parent::__construct( 'T_cron__task', 'ctsk_', 'ctsk_ID', '', '', '', '' );
 
 		if( $db_row != NULL )
 		{	// Loading an object from DB:
-			$this->ID              = $db_row->ctsk_ID;
-			$this->start_datetime  = $db_row->ctsk_start_datetime;
-			$this->start_timestamp = strtotime( $db_row->ctsk_start_datetime );
-			$this->repeat_after    = $db_row->ctsk_repeat_after;
-			$this->name            = $db_row->ctsk_name;
-			$this->key             = $db_row->ctsk_key;
-			$this->params          = $db_row->ctsk_params;
+			$this->ID               = $db_row->ctsk_ID;
+			$this->start_datetime   = $db_row->ctsk_start_datetime;
+			$this->start_timestamp  = strtotime( $db_row->ctsk_start_datetime );
+			$this->repeat_after     = $db_row->ctsk_repeat_after;
+			$this->repeat_variation = $db_row->ctsk_repeat_variation;
+			$this->name             = $db_row->ctsk_name;
+			$this->key              = $db_row->ctsk_key;
+			$this->params           = $db_row->ctsk_params;
 		}
 		else
 		{	// New object:
@@ -138,6 +140,9 @@ class Cronjob extends DataObject
 			$cjob_repeat_after = NULL;
 		}
 		$this->set( 'repeat_after', $cjob_repeat_after );
+
+		// repeat after:
+		$this->set( 'repeat_variation', param_duration( 'cjob_repeat_variation' ) );
 
 		// name:
 		if( !empty( $cjob_name ) && $cjob_name != $this->get( 'name' ) )

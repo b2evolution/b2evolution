@@ -166,6 +166,12 @@ if( ! empty( $import_files ) )
 
 $Form->end_form();
 
+if( $import_perm_view )
+{ // Current user must has access to the import dir
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+}
 ?>
 <script type="text/javascript">
 jQuery( '.table_scroll td' ).click( function()
@@ -175,9 +181,6 @@ jQuery( '.table_scroll td' ).click( function()
 <?php
 if( $import_perm_view )
 { // Current user must has access to the import dir
-
-	// Initialize JavaScript to build and open window
-	echo_modalwindow_js();
 ?>
 
 function import_files_window()

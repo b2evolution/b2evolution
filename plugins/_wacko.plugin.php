@@ -58,11 +58,6 @@ class wacko_plugin extends Plugin
 		);
 
 	/**
-	 * Minimum heading level
-	 */
-	var $min_h_level = 2;
-
-	/**
 	 * Init
 	 */
 	function PluginInit( & $params )
@@ -88,22 +83,7 @@ class wacko_plugin extends Plugin
 	function get_coll_setting_definitions( & $params )
 	{
 		$default_params = array_merge( $params, array( 'default_post_rendering' => 'opt-in' ) );
-		return array_merge( parent::get_coll_setting_definitions( $default_params ),
-			array(
-				'min_h_level' => array(
-						'label' => T_( 'Top Heading Level' ),
-						'type' => 'integer',
-						'size' => 1,
-						'maxlength' => 1,
-						'note' => T_( 'This plugin will adjust headings so they always start at the level you want: 2 for &lt;H2&gt;, 3 for &lt;H3&gt;, etc.' ),
-						'defaultvalue' => 2,
-						'valid_range' => array(
-							'min' => 2, // from <h2>
-							'max' => 6, // to <h6>
-						),
-					),
-			)
-		);
+		return parent::get_coll_setting_definitions( $default_params );
 	}
 
 
@@ -118,31 +98,6 @@ class wacko_plugin extends Plugin
 	function RenderItemAsHtml( & $params )
 	{
 		$content = & $params['data'];
-
-		if( !empty( $params['Item'] ) )
-		{ // Get Item from params
-			$Item = & $params['Item'];
-		}
-		elseif( !empty( $params['Comment'] ) )
-		{ // Get Item from Comment
-			$Comment = & $params['Comment'];
-			$Item = & $Comment->get_Item();
-		}
-
-		if( ! empty( $Item ) )
-		{ // We are rendering Item or Comment now, Get a setting depending on Blog
-			$item_Blog = & $Item->get_Blog();
-			$this->min_h_level = $this->get_coll_setting( 'min_h_level', $item_Blog );
-		}
-
-		if( $this->min_h_level > 2 && $this->min_h_level <= 6 )
-		{ // Restrict <h_> tags by minimum heading level
-			foreach( $this->replace as $r => $replace )
-			{ // Do replace
-				$this->replace[ $r ] = preg_replace_callback( '#([^<]*<)(h[2-6])(>[^<]*</)\2(>)#i',
-					array( $this, 'restrict_min_h_level' ), $replace );
-			}
-		}
 
 		$content = replace_content_outcode( $this->search, $this->replace, $content );
 
@@ -159,27 +114,6 @@ class wacko_plugin extends Plugin
 		}
 
 		return true;
-	}
-
-
-	/**
-	 * Restrict <h_> tags by minimum heading level
-	 *
-	 * @param array Match array
-	 * @return string
-	 */
-	function restrict_min_h_level( $match )
-	{
-		$h_tag = $match[2];
-		$h_tag_level = substr( $match[2], 1 );
-
-		$h_tag_level += $this->min_h_level - 2;
-		if( $h_tag_level > 6 )
-		{ // Max level is 6
-			$h_tag_level = 6;
-		}
-
-		return $match[1].'h'.$h_tag_level.$match[3].'h'.$h_tag_level.$match[4];
 	}
 
 

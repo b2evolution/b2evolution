@@ -37,6 +37,7 @@ $Form->begin_form( 'fform', $creating ? T_('New scheduled job') : T_('Edit sched
 			// Exclude these cron jobs from manual creating
 			unset( $cron_jobs_names['send-post-notifications'] );
 			unset( $cron_jobs_names['send-comment-notifications'] );
+			unset( $cron_jobs_names['send-email-campaign'] );
 			$Form->select_input_array( 'cjob_type', get_param( 'cjob_type' ), $cron_jobs_names, T_('Job type') );
 		}
 		else
@@ -51,13 +52,26 @@ $Form->begin_form( 'fform', $creating ? T_('New scheduled job') : T_('Edit sched
 			$Form->text_input( 'cjob_name', $edited_Cronjob->name, 50, T_('Job name'), '', array( 'maxlength' => 255 ) );
 		}
 
-		$Form->date_input( 'cjob_date', date2mysql( $edited_Cronjob->start_timestamp ), T_('Schedule date'), array(
-							 'required' => true ) );
+		$Form->begin_line( T_('Schedule date'), 'cjob_date', '', array( 'required' => true ) );
 
-		$Form->time_input( 'cjob_time', date2mysql( $edited_Cronjob->start_timestamp ), T_('Schedule time'), array(
-							 'required' => true ) );
+			$Form->date_input( 'cjob_date', date2mysql( $edited_Cronjob->start_timestamp ), '' );
 
-		$Form->duration_input( 'cjob_repeat_after', $edited_Cronjob->repeat_after, T_('Repeat every'), 'days', 'minutes', array( 'minutes_step' => 1 ) );
+			$Form->time_input( 'cjob_time', date2mysql( $edited_Cronjob->start_timestamp ), T_('at') );
+
+		$Form->end_line();
+
+		$Form->begin_line( T_('Repeat every') );
+			$Form->duration_input( 'cjob_repeat_after', $edited_Cronjob->repeat_after, '', 'days', 'minutes', array( 'minutes_step' => 1 ) );
+
+			if( $edited_Cronjob->key == 'poll-antispam-blacklist' )
+			{ // Don't allow to edit this param for cron job "Poll the antispam blacklist"
+				$Form->info( T_('+/- variation of:'), T_('Auto') );
+			}
+			else
+			{
+				$Form->duration_input( 'cjob_repeat_variation', $edited_Cronjob->repeat_variation, T_('+/- variation of:'), 'days', 'minutes', array( 'minutes_step' => 1 ) );
+			}
+		$Form->end_line();
 
 	$Form->end_fieldset();
 

@@ -33,21 +33,10 @@ $Form->begin_form( 'fform', T_('Scheduled job') );
 		$Form->info( T_('Job #'), $cjob_row->ctsk_ID );
 		$Form->info( T_('Job name'), cron_job_name( $cjob_row->ctsk_key, $cjob_row->ctsk_name, $cjob_row->ctsk_params ).$manual_link );
 		$Form->info( T_('Scheduled at'), mysql2localedatetime($cjob_row->ctsk_start_datetime) );
-		$cjob_repeat_after = '';
-		if( $cjob_repeat_after_days = floor( $cjob_row->ctsk_repeat_after / 86400 ) )
-		{
-			$cjob_repeat_after .= $cjob_repeat_after_days.' '.T_('days').' ';
-		}
-		if( $cjob_repeat_after_hours = floor( ($cjob_row->ctsk_repeat_after % 86400 ) / 3600 ) )
-		{
-			$cjob_repeat_after .= $cjob_repeat_after_hours.' '.T_('hours').' ';
-		}
-		if( $cjob_repeat_after_minutes = floor( ($cjob_row->ctsk_repeat_after % 3600 ) / 60 ) )
-		{
-			$cjob_repeat_after .= $cjob_repeat_after_minutes.' '.T_('minutes');
-		}
-
-		$Form->info( T_('Repeat every'), $cjob_repeat_after );
+		$Form->begin_line( T_('Repeat every'), NULL, 'info' );
+			$Form->info( '', seconds_to_period( $cjob_row->ctsk_repeat_after ) );
+			$Form->info( T_('+/- variation of:'), seconds_to_period( $cjob_row->ctsk_repeat_variation ) );
+		$Form->end_line( NULL, 'info' );
 
 	$Form->end_fieldset();
 
@@ -59,10 +48,13 @@ $Form->begin_form( 'fform', T_('Scheduled job') );
 		}
 		else
 		{
-			$Form->info( T_('Status'), '<span class="cron_'.$cjob_row->clog_status.'">'.$cjob_row->clog_status.'</span>' );
-			$Form->info( T_('Real start time'), mysql2localedatetime($cjob_row->clog_realstart_datetime) );
-			$Form->info( T_('Real stop time'), mysql2localedatetime($cjob_row->clog_realstop_datetime) );
-			$Form->info( T_('Duration'), seconds_to_period( strtotime( $cjob_row->clog_realstop_datetime ) - strtotime( $cjob_row->clog_realstart_datetime ) ) );
+			$duration_seconds = strtotime( $cjob_row->clog_realstop_datetime ) - strtotime( $cjob_row->clog_realstart_datetime );
+			$duration_icon = ( $duration_seconds > 60 ) ? ' '.get_icon( 'warning_yellow', 'imgtag', array( 'title' => T_('Execution time is more than 60 seconds!') ) ) : '';
+
+			$Form->info( T_('Status'), '<span style="background-color:'.cron_status_color ( $cjob_row->clog_status ).';padding:0 5px;">'.$cjob_row->clog_status.'</span>'.$duration_icon );
+			$Form->info( T_('Real start time'), mysql2localedatetime( $cjob_row->clog_realstart_datetime ) );
+			$Form->info( T_('Real stop time'), mysql2localedatetime( $cjob_row->clog_realstop_datetime ) );
+			$Form->info( T_('Duration'), seconds_to_period( $duration_seconds ) );
 			$cron_messages_data = @unserialize( $cjob_row->clog_messages );
 			if( !is_array( $cron_messages_data ) )
 			{	// Simple messages

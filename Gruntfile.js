@@ -84,6 +84,18 @@ module.exports = function(grunt) {
 			}
 		},
 
+		// Configuration for Autoprefixing tasks:
+		autoprefixer: {
+			options: {
+				// by default autoprefixer will remove old, no longer needed, prefixes:
+				browsers: ['last 5 versions']
+			},
+			dist: {
+				src: ['rsc/build/*.css','rsc/css/*.css','rsc/css/colorbox/*.css','skins/**/*.css','skins_adm/**/*.css', // INCLUDE patterns
+						'!**/*.bundle.css','!**/*.bmin.css','!**/*.min.css'] // EXCLUDE patterns
+			}
+		},
+
 		// Configuration for the concatenate tasks:
 		concat: {
 			options: { 
@@ -210,10 +222,10 @@ module.exports = function(grunt) {
 			// Popover (Analog of bubbletip on bootstrap skins)
 			popover: {
 				options: {
-					banner: '/* This includes 4 files: bootstrap/usernames.js, bootstrap/plugins.js, bootstrap/userfields.js, bootstrap/colorpicker.js */\n'
+					banner: '/* This includes 5 files: bootstrap/usernames.js, bootstrap/plugins.js, bootstrap/userfields.js, bootstrap/colorpicker.js, bootstrap/formfields.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/bootstrap/usernames.js', 'rsc/js/bootstrap/plugins.js', 'rsc/js/bootstrap/userfields.js', 'rsc/js/bootstrap/colorpicker.js'],
+				src: ['rsc/js/bootstrap/usernames.js', 'rsc/js/bootstrap/plugins.js', 'rsc/js/bootstrap/userfields.js', 'rsc/js/bootstrap/colorpicker.js', 'rsc/js/bootstrap/formfields.js'],
 				dest: 'rsc/js/build/popover.bmin.js'
 			},
 			// Textcomplete plugin to suggest user names in textareas with '@username'
@@ -224,6 +236,72 @@ module.exports = function(grunt) {
 				nonull: true, // Display missing files
 				src: ['rsc/js/jquery/jquery.textcomplete.js', 'rsc/js/textcomplete.init.js'],
 				dest: 'rsc/js/build/textcomplete.bmin.js'
+			},
+			// JS files that are used on front-office standard skins:
+			evo_frontoffice: {
+				options: {
+					banner: '/* This includes 4 files: src/evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js */\n'
+				},
+				nonull: true, // Display missing files
+				src: ['rsc/js/src/evo_modal_window.js',
+							'rsc/js/src/evo_user_crop.js',
+							'rsc/js/src/evo_user_report.js',
+							'rsc/js/src/evo_user_contact_groups.js',
+							'rsc/js/src/evo_rest_api.js'],
+				dest: 'rsc/js/build/evo_frontoffice.bmin.js'
+			},
+			// JS files that are used on front-office bootstrap skins:
+			evo_frontoffice_bootstrap: {
+				options: {
+					banner: '/* This includes 4 files: src/bootstrap-evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js */\n'
+				},
+				nonull: true, // Display missing files
+				src: ['rsc/js/src/bootstrap-evo_modal_window.js',
+							'rsc/js/src/evo_user_crop.js',
+							'rsc/js/src/evo_user_report.js',
+							'rsc/js/src/evo_user_contact_groups.js',
+							'rsc/js/src/evo_rest_api.js'],
+				dest: 'rsc/js/build/bootstrap-evo_frontoffice.bmin.js'
+			},
+			// JS files that are used on back-office standard skins:
+			evo_backoffice: {
+				options: {
+					banner: '/* This includes 11 files: functions.js, ajax.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, src/evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js, src/evo_user_org.js, src/evo_rest_api.js */\n'
+				},
+				nonull: true, // Display missing files
+				src: ['rsc/js/functions.js',
+							'rsc/js/ajax.js',
+							'rsc/js/form_extensions.js',
+							'rsc/js/extracats.js',
+							'rsc/js/dynamic_select.js',
+							'rsc/js/backoffice.js',
+							'rsc/js/src/evo_modal_window.js',
+							'rsc/js/src/evo_user_crop.js',
+							'rsc/js/src/evo_user_report.js',
+							'rsc/js/src/evo_user_deldata.js',
+							'rsc/js/src/evo_user_org.js',
+							'rsc/js/src/evo_rest_api.js'],
+				dest: 'rsc/js/build/evo_backoffice.bmin.js'
+			},
+			// JS files that are used on back-office bootstrap skins:
+			evo_backoffice_bootstrap: {
+				options: {
+					banner: '/* This includes 11 files: functions.js, ajax.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, src/bootstrap-evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js, src/evo_user_org.js, src/evo_rest_api.js */\n'
+				},
+				nonull: true, // Display missing files
+				src: ['rsc/js/functions.js',
+							'rsc/js/ajax.js',
+							'rsc/js/form_extensions.js',
+							'rsc/js/extracats.js',
+							'rsc/js/dynamic_select.js',
+							'rsc/js/backoffice.js',
+							'rsc/js/src/bootstrap-evo_modal_window.js',
+							'rsc/js/src/evo_user_crop.js',
+							'rsc/js/src/evo_user_report.js',
+							'rsc/js/src/evo_user_deldata.js',
+							'rsc/js/src/evo_user_org.js',
+							'rsc/js/src/evo_rest_api.js'],
+				dest: 'rsc/js/build/bootstrap-evo_backoffice.bmin.js'
 			},
 		},
 
@@ -266,7 +344,7 @@ module.exports = function(grunt) {
 			},
 			*/
 			less: {
-				// Which files to watch (all .less files recursively in the whole blogs directory)
+				// Which files to watch (all .less files recursively)
 				files: ['**/*.less'],
 				tasks: ['less'],
 				options: {
@@ -274,17 +352,17 @@ module.exports = function(grunt) {
 				}
 			},
 			sass: {
-				// Which files to watch (all .scss files recursively in the scss directory)
+				// Which files to watch (all .scss files recursively)
 				files: ['**/*.scss'],
 				tasks: ['sass'],
 				options: {
 					nospawn: true,
 				}
 			},
-			concat_cssmin: {
-				// Which files to watch (all .css files recursively in the whole blogs directory)
+			concat_autoprefixer_cssmin: {
+				// Which files to watch (all .css files recursively)
 				files: ['**/*.css'],
-				tasks: ['concat','cssmin'],
+				tasks: ['autoprefixer','concat','cssmin'],
 				options: {
 					nospawn: true,
 				}
@@ -293,21 +371,21 @@ module.exports = function(grunt) {
 				files: ['readme.md','readme.template.html','skins_adm/conf_error.main.md','skins_adm/conf_error.main.template.php'],
 				tasks: ['markdown']
 			}
-		}
-
+		},
 
 	});
 
 	// Load the plugin that provides the tasks ( "uglify", "less", "sass", etc. ):
-	grunt.loadNpmTasks('grunt-contrib-concat');
-	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-contrib-sass');
+	grunt.loadNpmTasks('grunt-autoprefixer');
+	grunt.loadNpmTasks('grunt-contrib-concat');
+	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-markdown');
 
 	// Default task(s):
-	grunt.registerTask('default', ['less','sass','concat','cssmin','uglify','markdown']);
+	grunt.registerTask('default', ['less','sass','autoprefixer','concat','cssmin','uglify','markdown']);
 
 };

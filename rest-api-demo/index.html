@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>REST API demo page</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link type="text/css" rel="stylesheet" href="../rsc/css/bootstrap/bootstrap.min.css">
+<link type="text/css" rel="stylesheet" href="../rsc/css/font-awesome.min.css">
+<link type="text/css" rel="stylesheet" href="style.css">
+<link href='https://fonts.googleapis.com/css?family=Raleway:400,700,900' rel='stylesheet' type='text/css'>
+<script type="text/javascript" src="../rsc/js/jquery.min.js"></script>
+<script type="text/javascript">
+/**
+ * Print out a message of request
+ *
+ * @param string Object selector
+ * @param object Error data: 'message', 'code', 'data.status'
+ */
+function rest_api_print_message( obj_selector, msg )
+{
+	var msg_text;
+
+	if( typeof( msg.code ) == 'undefined' )
+	{	// Unknown non-json response:
+		msg_text = '<h4 class="text-danger">Unknown error: ' + msg + '</h4>';
+	}
+	else
+	{	// JSON error data accepted:
+		switch( msg.data.status )
+		{
+			case 200:
+				msg_text = '<h4 class="text-message">' + msg.message + '</h4>';
+				break;
+
+			default:
+				msg_text = '<h4 class="text-danger">' + msg.message + '</h4>'
+					+ '<div><b>Code:</b> ' + msg.code + '</div>'
+					+ '<div><b>Status:</b> ' + msg.data.status + '</div>';
+				break;
+		}
+	}
+	rest_api_end_loading( obj_selector, msg_text );
+}
+
+
+/**
+ * Execute REST API request
+ *
+ * @param string URL
+ * @param string Object selector
+ * @param function Function on success request
+ */
+function rest_api_request( url, obj_selector, func )
+{
+	jQuery.ajax(
+	{
+		contentType: 'application/json; charset=utf-8',
+		url: '../api/v1/' + url
+	} )
+	.then( function( data, textStatus, jqXHR )
+	{
+		if( typeof( jqXHR.responseJSON ) == 'object' )
+		{	// Call function only when we get correct JSON response:
+			eval( func )( data, textStatus, jqXHR );
+		}
+		else
+		{	// Wrong resonse format, Display error and full response text:
+			rest_api_print_message( obj_selector, '<b>Response is not JSON data:</b> ' + jQuery( '<span>' ).text( data ).html() );
+		}
+	}, function( jqXHR )
+	{	// Error request, Display the error data:
+		rest_api_print_message( obj_selector, typeof( jqXHR.responseJSON ) == 'undefined' ? jqXHR.statusText : jqXHR.responseJSON );
+	} );
+}
+
+
+/**
+ * Set style during loading new content
+ *
+ * @param string Object selector
+ */
+function rest_api_start_loading( obj_selector )
+{
+	jQuery( obj_selector ).addClass( 'api_loading' )
+		.append( '<div class="dots-loader">loading...</div>' );
+}
+
+
+/**
+ * Remove style after loading new content
+ *
+ * @param string Object selector
+ * @param string New content
+ */
+function rest_api_end_loading( obj_selector, content )
+{
+	jQuery( obj_selector ).removeClass( 'api_loading' )
+		.html( content )
+		.find( '.dots-loader' ).remove();
+}
+
+
+// Load all public collections on page loading:
+jQuery( document ).ready( function()
+{
+	rest_api_start_loading( '#api_collections_list' );
+	rest_api_request( 'collections', '#api_collections_list', function( data )
+	{	// Display the collections list in first column on success request:
+		var r = '<ul>';
+		for( var c in data.colls )
+		{
+			var coll = data.colls[c];
+			r += '<li><a href="#" data-urlname="' + coll.urlname + '">' + coll.name + '</a></li>';
+		}
+		r += '</ul>';
+		rest_api_end_loading( '#api_collections_list', r );
+	} );
+} );
+
+// Load the posts of the selected collection:
+jQuery( document ).on( 'click', '#api_collections_list a', function()
+{
+	rest_api_start_loading( '#api_column_2' );
+	jQuery( '#api_column_3' ).html( '' );
+
+	var coll_urlname = jQuery( this ).data( 'urlname' );
+	var coll_name = jQuery( this ).html();
+
+	rest_api_request( 'collections/' + coll_urlname + '/posts', '#api_column_2', function( data )
+	{	// Display the posts in second column on success request:
+		var r = '<h2>' + coll_name + '</h2>' +
+			'<form class="form-inline" id="api_search__form" data-urlname="' + coll_urlname + '" style="margin-bottom:10px">' +
+				'<div class="input-group">' +
+					'<input type="text" id="api_search__input" class="form-control">' +
+					'<span class="input-group-btn"><button id="api_search__submit" class="btn btn-primary">Search</button></span>' +
+				'</div> ' +
+				'<button id="api_search__clear" class="btn btn-default">Clear</button>' +
+			'</form>' +
+			'<div id="api_posts_list">' +
+				'<ul>';
+
+		for( var p in data.items )
+		{
+			var post = data.items[p];
+			r += '<li><a href="#" data-id="' + post.id + '" data-urlname="' + coll_urlname + '">' + post.title + '</a></li>';
+		}
+		r += '</ul>' +
+			'</div>';
+		rest_api_end_loading( '#api_column_2', r );
+	} );
+
+	// To prevent link default event:
+	return false;
+} );
+
+// Load the data of the selected post:
+jQuery( document ).on( 'click', '#api_posts_list a:not([target])', function()
+{
+	rest_api_start_loading( '#api_column_3' );
+
+	var coll_urlname = jQuery( this ).data( 'urlname' );
+	var post_id = jQuery( this ).data( 'id' );
+
+	rest_api_request( 'collections/' + coll_urlname + '/items/' + post_id, '#api_column_3', function( item )
+	{	// Display the post data in third column on success request:
+
+		// Item title:
+		var item_content = '<h2>' + item.title + '</h2><a class="title_permalink" href="' + item.URL + '" target="_blank"><span class="fa fa-external-link"></span></a>';
+		// Item attachments, Only images and on teaser positions:
+		if( typeof( item.attachments ) == 'object' && item.attachments.length > 0 )
+		{
+			item_content += '<div id="api_post_attachments">';
+			for( var a in item.attachments )
+			{
+				var attachment = item.attachments[a];
+				if( attachment.type == 'image' &&
+						( attachment.position == 'teaser' ||
+							attachment.position == 'teaserperm' ||
+							attachment.position == 'teaserlink' )
+					)
+				{
+					item_content += '<img src="' + attachment.url + '" />';
+				}
+			}
+			item_content += '</div>';
+		}
+		// Item content:
+		item_content += item.content;
+
+		rest_api_end_loading( '#api_column_3', item_content );
+	} );
+
+	// To prevent link default event:
+	return false;
+} );
+
+// Submit a search form:
+jQuery( document ).on( 'submit', '#api_search__form', function()
+{
+	rest_api_start_loading( '#api_posts_list' );
+	jQuery( '#api_column_3' ).html( '' );
+
+	var coll_urlname = jQuery( this ).data( 'urlname' );
+	var search_keyword = jQuery( '#api_search__input' ).val();
+
+	rest_api_request( 'collections/' + coll_urlname + '/search/' + search_keyword, '#api_posts_list', function( data )
+	{	// Display the post data in third column on success request:
+		if( typeof( data.code ) != 'undefined' )
+		{	// Error code was responsed:
+			rest_api_print_message( '#api_posts_list', data );
+			return;
+		}
+
+		var r = '<ul>';
+		for( var s in data.results )
+		{
+			var search_item = data.results[s];
+			r += '<li>' + search_item.kind + ': ';
+			if( search_item.kind == 'item' )
+			{ // item: (Display this as link to load data in third column)
+				r += '<a href="#" data-id="' + search_item.id + '" data-urlname="' + coll_urlname + '">' + search_item.title + '</a>';
+			}
+			else
+			{	// category, comment, tag:
+				r += search_item.title;
+			}
+			r += ' <a href="' + search_item.permalink + '" target="_blank"><span class="fa fa-external-link"></span></a> ';
+			r += '</li>';
+		}
+		r += '</ul>';
+		rest_api_end_loading( '#api_posts_list', r );
+	} );
+
+	// To prevent link default event:
+	return false;
+} );
+
+// Clear the search results:
+jQuery( document ).on( 'click', '#api_search__clear', function()
+{
+	rest_api_start_loading( '#api_posts_list' );
+	jQuery( '#api_column_3' ).html( '' );
+
+	var coll_urlname = jQuery( '#api_search__form' ).data( 'urlname' );
+
+	rest_api_request( 'collections/' + coll_urlname + '/posts', '#api_posts_list', function( data )
+	{	// Display the posts in second column on success request:
+		var r = '<ul>';
+		for( var p in data.items )
+		{
+			var post = data.items[p];
+			r += '<li><a href="#" data-id="' + post.id + '" data-urlname="' + coll_urlname + '">' + post.title + '</a></li>';
+		}
+		r += '</ul>';
+		rest_api_end_loading( '#api_posts_list', r );
+	} );
+
+	// To prevent link default event:
+	return false;
+} );
+
+</script>
+</head>
+<body>
+	<div class="container">
+	
+		<h1>b2evolution REST API demo</h1>
+
+		<h4 class="api_documentation"><a href="http://b2evolution.net/man/rest-api" title="b2evolution API Documentation">API Documentation</a></h4>
+		
+			<div class="col-lg-3 col-sm-6 col-xs-12" id="api_column_1">
+				<h2>Collections</h2>
+				<div id="api_collections_list">loading...</div>
+			</div>
+
+			<div class="col-lg-4 col-sm-6 col-xs-12" id="api_column_2"></div>
+
+			<div class="col-lg-5 col-sm-12 col-xs-12" id="api_column_3"></div>
+		
+	</div>
+</body>
+</html>

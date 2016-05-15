@@ -143,9 +143,14 @@ class twitter_plugin extends Plugin
 		return $this->send_a_tweet( $content, $params['Item'], $params['xmlrpcresp'] );
 	}
 
+
 	/**
-	 * Allowing the user to specify their twitter account name and password.
+	 * Define the PER-USER settings of the plugin here. These can then be edited by each user.
 	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating
 	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
 	function GetDefaultUserSettings( & $params )
@@ -347,7 +352,7 @@ class twitter_plugin extends Plugin
 
 		if( $target_type == 'blog' )
 		{ // redirect to blog settings
-			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=plugin_settings&blog='.$target_id );
+			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=renderers&blog='.$target_id );
 		}
 		else if ($target_type == 'user' )
 		{ // redirect to user advanced preferences form
@@ -446,7 +451,7 @@ class twitter_plugin extends Plugin
 
 		if( $target_type == 'blog' )
 		{ // Blog settings
-			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=plugin_settings&blog='.$target_id );
+			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=renderers&blog='.$target_id );
 
 			$BlogCache = & get_BlogCache();
 			$Blog = $BlogCache->get_by_ID( $target_id );

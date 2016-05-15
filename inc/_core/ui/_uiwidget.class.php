@@ -56,7 +56,7 @@ class Widget
 	 *
 	 * @param string template name to get from $AdminUI
 	 */
-	function Widget( $ui_template = NULL )
+	function __construct( $ui_template = NULL )
 	{
 		global $AdminUI;
 
@@ -347,9 +347,9 @@ class Table extends Widget
 	 * @param string template name to get from $AdminUI
 	 * @param string prefix to differentiate page/order/filter params
 	 */
-	function Table( $ui_template = NULL, $param_prefix = '' )
+	function __construct( $ui_template = NULL, $param_prefix = '' )
 	{
-		parent::Widget( $ui_template );
+		parent::__construct( $ui_template );
 
 		$this->param_prefix = $param_prefix;
 
@@ -388,14 +388,16 @@ class Table extends Widget
 			}
 		}
 
-		if( ! empty( $this->params ) )
-		{ // Initialize default params
-			$this->params = array_merge( array(
-					'filter_button_class'  => 'filter',
-					'filter_button_before' => '',
-					'filter_button_after'  => '',
-				), $this->params );
+		if( empty( $this->params ) )
+		{
+			$this->params = array();
 		}
+		// Initialize default params
+		$this->params = array_merge( array(
+				'filter_button_class'  => 'filter',
+				'filter_button_before' => '',
+				'filter_button_after'  => '',
+			), $this->params );
 
 		if( $fadeout == 'session' )
 		{	// Get fadeout_array from session:
@@ -1133,9 +1135,9 @@ class Table extends Widget
 		// Make variable substitution for RAWS:
 		while (preg_match('!\# (\w+) \#!ix', $content, $matchesarray))
 		{ // Replace all matches to the content of the current row's cell. That means that several variables can be inserted to the class.
-			if (! empty($this->rows[$this->current_idx]->$matchesarray[1]))
+			if (! empty($this->rows[$this->current_idx]->{$matchesarray[1]}))
 			{
-				$content = str_replace($matchesarray[0],$this->rows[$this->current_idx]->$matchesarray[1] , $content);
+				$content = str_replace($matchesarray[0],$this->rows[$this->current_idx]->{$matchesarray[1]} , $content);
 			}
 			else
 			{

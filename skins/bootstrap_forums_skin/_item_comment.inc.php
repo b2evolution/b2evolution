@@ -56,10 +56,10 @@ if( $current_cat == 0 )
 }
 
 if( ! isset( $comment_template_counter ) )
-{
-$comment_template_counter = isset( $params['comment_number'] ) ? $params['comment_number'] : 1;
-if( $disp == 'single' || $disp == 'post' )
-	{ // Increase a number, because Item has 1st number
+{	// Initialize global comment counter:
+	$comment_template_counter = isset( $params['comment_number'] ) ? $params['comment_number'] : 1;
+	if( $disp == 'single' || $disp == 'post' )
+	{	// Increase a number, because Item has 1st number:
 		$comment_template_counter++;
 	}
 }
@@ -82,7 +82,7 @@ $Comment->get_Item();
 $Comment->anchor();
 
 echo update_html_tag_attribs( $params['comment_start'], array(
-		'class' => 'vs_'.$Comment->status, // Add style class for proper comment status
+		'class' => 'vs_'.$Comment->status.( $Comment->is_meta() ? ' evo_comment__meta' : '' ), // Add style class for proper comment status
 		'id'    => 'comment_'.$Comment->ID // Add id to know what comment is used on AJAX status changing
 	), array( 'id' => 'skip' ) );
 
@@ -141,7 +141,16 @@ switch( $Comment->get( 'type' ) )
 		
 	// ON *DISP = SINGLE* SHOW THE FOLLOWING TITLE FOR EACH COMMENT
 	case 'comment': // Display a comment:
-		?><a href="<?php echo $Comment->get_permanent_url(); ?>" class="permalink">#<?php echo $comment_template_counter; ?></a> <?php
+	case 'meta': // Display a meta comment:
+
+		if( $Comment->is_meta() )
+		{	// Meta comment:
+			?><span class="badge badge-info"><?php echo $comment_template_counter; ?></span> <?php
+		}
+		else
+		{	// Normal comment:
+			?><a href="<?php echo $Comment->get_permanent_url(); ?>" class="permalink">#<?php echo $comment_template_counter; ?></a> <?php
+		}
 		if( empty($Comment->ID) )
 		{	// PREVIEW comment
 			echo '<span class="evo_comment_type_preview">'.T_('PREVIEW Comment from:').'</span> ';
@@ -314,5 +323,12 @@ echo $params['comment_body_after'];
 
 <?php echo $params['comment_end'];
 
-$comment_template_counter++;
+if( $Comment->is_meta() )
+{	// Decrease a counter for meta comments:
+	$comment_template_counter--;
+}
+else
+{	// Increase a counter for normal comments:
+	$comment_template_counter++;
+}
 ?>

@@ -29,10 +29,10 @@ class UserfieldGroup extends DataObject
 	 *
 	 * @param object Database row
 	 */
-	function UserfieldGroup( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_users__fieldgroups', 'ufgp_', 'ufgp_ID' );
+		parent::__construct( 'T_users__fieldgroups', 'ufgp_', 'ufgp_ID' );
 
 		if( $db_row != NULL )
 		{
@@ -68,6 +68,10 @@ class UserfieldGroup extends DataObject
 		$this->set_from_Request( 'name' );
 
 		// Order
+		if( param( 'ufgp_order', 'integer' ) !== 0 ) // Allow zero value
+		{
+			param_check_not_empty( 'ufgp_order', T_('Please enter an order number.') );
+		}
 		$this->set( 'order', param( 'ufgp_order', 'integer' ) );
 
 		return ! param_errors_detected();

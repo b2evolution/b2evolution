@@ -3,6 +3,13 @@
  * These are included in basic.css but also in item_base.css so they are available in WYSIWYG editors
  */
 
+@import "inc/sprite_flags.inc.less";
+@import "inc/sprite_icons.inc.less";
+@import "inc/visibility_status_colors.inc.less";
+@import "inc/fontawesome_icons.inc.less";
+@import "inc/userfield_icons.inc.less";
+@import "inc/current_filters.inc.less";
+
 // Use special font for code blocks in order to have the same width for each char
 code, samp {
 	font-family: Menlo, Monaco, "Courier New", Courier, monospace;
@@ -177,131 +184,6 @@ img.rightmargin, div.rightmargin {
 	margin-bottom:.2ex;
 }
 
-/* Sprite style for the all flags */
-
-/* The sprite image file is located: "/rsc/icons/flags_sprite.png"
- * **** To change this file use the original file from: "/rsc/icons/src/flags.PSD"
- * **** You should save the changed file as PNG-8 with 256 colors to the "flags_sprite.png"
- * **** Also don't forget to save the "flags.PSD"
- *
- * NEW ADDED FLAGS:
- *   aq - Antarctica
- *   ax - Aland Islands
- *   bl - Saint Barthelemy
- *   cc - Cocos Islands
- *   cx - Christmas Island
- *   sj - Svalbard And Jan Mayen
- *
- * CHANGED FLAGS TO 16px WIDTH:
- *   np - Nepal
- *   ch - Switzerland
- */
-span.flag {
-	border: 1px solid #000000;
-	background: url(../icons/flags_sprite.png) no-repeat;
-	width: 16px;
-	height: 11px;
-	line-height: 11px;
-	padding: 0 !important;
-	font-size: 6px;
-	display: inline-block !important;
-	margin-bottom: -2px;
-	box-sizing: content-box;
-}
-
-// Sprite style for the all icons:
-span.icon {
-	background: url(../icons/icons_sprite.png) no-repeat -112px -48px;
-	width: 16px;
-	height: 16px;
-	line-height: 16px;
-	padding: 0 !important;
-	font-size: 9px;
-	display: inline-block;
-	overflow: hidden;
-	vertical-align: middle;
-}
-span.icon.voted {
-	margin: 0 2px;
-}
-// The fixes for rollover icon on IE8+
-@fix-IE8-visibility: ~"visible\0/";
-a.rollover_sprite:hover span.icon {
-	visibility: hidden;
-	visibility: @fix-IE8-visibility;/* IE8 */
-}
-@fix-IE9-10-media-min-width: ~"screen and (min-width: 0\0)";
-@media @fix-IE9-10-media-min-width { /* IE9-10 */
-	a.rollover_sprite:hover span.icon {
-		visibility: visible;
-	}
-}
-a.rollover_sprite:hover span.icon:before {
-	visibility: visible !important;
-	background: inherit;
-	float: left;
-	width: 32px;
-	height: 16px;
-	content: "";
-	margin-left: -16px;
-}
-.vote_spam span.icon.voted {
-	margin: auto;
-}
-
-.action_icon:hover {
-	text-decoration: none;
-}
-.action_icon.hoverlink:hover {
-	text-decoration: underline;
-}
-button.action_icon {
-	background: none;
-	border: none;
-	padding: 0;
-	cursor: pointer;
-}
-// ---------------- //
-
-// Additional styles for FontAwesome icons:
-span.fa {
-	line-height: inherit;
-	font-size: 14px;
-	.btn & {
-		line-height: 14px;
-	}
-	a.action_icon & {
-		margin-right: 2px;
-	}
-}
-a.roundbutton .fa, a.roundbutton:hover .fa,
-a.roundbutton_text .fa, a.roundbutton_text:hover .fa {
-	color: #000;
-}
-a:hover .fa-x-rollover-green {color: #0C0 !important;}
-a:hover .fa-x-rollover-red {color: #C00 !important;}
-a:hover .fa-x-rollover-red-light {color: #F00 !important;}
-a:hover .fa-x-rollover-orange {color: #F90 !important;}
-a:hover .fa-x-rollover-black {color: #000 !important;}
-// Use together with .fa-external-link
-.fa-x-external-link--nudge:before {
-	position: relative;
-	top: 0.05em;
-	left: 0.11em;
-}
-// Use together with .fa-linkedin
-.fa-x-linkedin--nudge:before {
-	position: relative;
-	top: -0.05em;
-	left: 0.04em;
-}
-// Use together with .fa-google-plus
-.fa-x-google-plus--nudge:before {
-	position: relative;
-	left: 0.1em;
-}
-// ---------------- //
-
 // GIF animation is used while AJAX request is loading:
 span.loader_img {
 	display: inline-block;
@@ -356,32 +238,9 @@ span.loader_img.loader_user_deldata {
 // ---------------- //
 
 // Styles of filters for current selection of the posts (widget "Current filters"):
-.filter_item {
-	display: inline-block;
-	vertical-align: middle;
-	margin: 1px;
-	// text-shadow: 0 1px rgba(0, 0, 0, 0.4), 1px 0 1px #000;
-	div {
-		margin: 0;
-		padding: 3px 5px;
-		color: #FFF;
-		float: left;
-		height: 24px !important;
-		line-height: 18px !important;
-		&:first-child {
-			border-radius: 5px 0 0 5px;
-		}
-		&.icon {
-			border-radius: 0 5px 5px 0;
-			float: right;
-			padding: 0;
-			a {
-				display: block;
-				padding: 4px 5px 5px;
-				margin: 0;
-			}
-		}
-	}
+.filter_item div {
+	height: 24px !important;
+	line-height: 18px !important;
 }
 div.filters .filter_item {
 	margin: 1px;
@@ -389,91 +248,19 @@ div.filters .filter_item {
 		margin: 0;
 	}
 }
-// green
-.filter_item .name { background: #3d8f3d; }
-.filter_item:hover .name,
-.filter_item div.group,
-.filter_item div.icon { background: #45a145; }
-.filter_item div.icon:hover { background: #4db34d; }
-// yellow
-.filter_item.yellow .name { background: #caca3f; }
-.filter_item.yellow:hover .name,
-.filter_item.yellow div.group,
-.filter_item.yellow div.icon { background: #dbdb57; }
-.filter_item.yellow div.icon:hover { background: #ecec73; }
-// orange
-.filter_item.orange .name { background: #d18335; }
-.filter_item.orange:hover .name,
-.filter_item.orange div.group,
-.filter_item.orange div.icon { background: #e09952; }
-.filter_item.orange div.icon:hover { background: #edac6b; }
-// red
-.filter_item.red .name { background: #c12d2d; }
-.filter_item.red:hover .name,
-.filter_item.red div.group,
-.filter_item.red div.icon { background: #cb4d4d; }
-.filter_item.red div.icon:hover { background: #e57373; }
-// magenta
-.filter_item.magenta .name { background: #8618bd; }
-.filter_item.magenta:hover .name,
-.filter_item.magenta div.group,
-.filter_item.magenta div.icon { background: #9933cc; }
-.filter_item.magenta div.icon:hover { background: #b053df; }
-// blue
-.filter_item.blue .name { background: #2f60c0; }
-.filter_item.blue:hover .name,
-.filter_item.blue div.group,
-.filter_item.blue div.icon { background: #4d77cb; }
-.filter_item.blue div.icon:hover { background: #6a91df; }
-// ---------------- //
 
-// User field icons: //
-.ufld_yahooim {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #7b0099; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #7b0099; }
+// Meta comments:
+.evo_comment__meta {
+	border: 2px solid @status_color_meta;
+	&:last-child {
+		margin-bottom: 0;
+	}
+	.panel-heading {
+		border-bottom: 1px solid @status_color_meta;
+		background-color: @status_color_meta_bg;
+	}
+	.panel-footer {
+		border-top: 1px solid @status_color_meta;
+		background-color: @status_color_meta_bg;
+	}
 }
-.ufld_skype {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #00aff0; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #00aff0; }
-}
-.ufld_twitter {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #00aced; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #00aced; }
-}
-.ufld_facebook {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #3b5998; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #3b5998; }
-}
-.ufld_googleplus {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #dd4b39; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #dd4b39; }
-}
-.ufld_linkedin {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #007bb6; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #007bb6; }
-}
-.ufld_github {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #333333; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #333333; }
-}
-.ufld_flickr {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #ff0084; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #ff0084; }
-}
-.ufld_youtube {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #bb0000; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #bb0000; }
-}
-.ufld_digg {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #356aa0; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #356aa0; }
-}
-.ufld_stumbleupon {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #eb4924; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #eb4924; }
-}
-.ufld_pinterest {
-	&.ufld__textcolor, &.ufld__hovertextcolor:hover { color: #cb2027; }
-	&.ufld__bgcolor, &.ufld__hoverbgcolor:hover { background-color: #cb2027; }
-}
-// ---------------- //

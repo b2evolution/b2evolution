@@ -105,9 +105,6 @@ if( $Item = & get_featured_Item() )
 // Display message if no post:
 display_if_empty();
 
-// Load posts read statuses if required
-$MainList->load_content_read_statuses();
-
 echo '<div class="evo_content_block">'; // Beginning of posts display
 while( $Item = & mainlist_get_item() )
 {	// For each blog post:

@@ -74,7 +74,7 @@ class DataObject
 	 * @param string User ID field name
 	 * @param string datetime field name
 	 */
-	function DataObject( $tablename, $prefix = '', $dbIDname = 'ID', $datecreated_field = '', $datemodified_field = '', $creator_field = '', $lasteditor_field = '' )
+	function __construct( $tablename, $prefix = '', $dbIDname = 'ID', $datecreated_field = '', $datemodified_field = '', $creator_field = '', $lasteditor_field = '' )
 	{
 		$this->dbtablename        = $tablename;
 		$this->dbprefix           = $prefix;
@@ -385,11 +385,26 @@ class DataObject
 
 	/**
 	 * Update the DB based on previously recorded changes
+ 	 *
+	 * This will be typically overriden by child classses.
+	 *
+	 * @return boolean true on success, false on failure to update, NULL if no update necessary
+	 */
+	function dbupdate()
+	{
+		return $this->dbupdate_worker();
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 *
+	 * This does the nitty gritty work and accepts optional params. (extracted from dbupdate() for PHP7 compatibility)
 	 *
 	 * @param boolean do we want to auto track the mod date?
 	 * @return boolean true on success, false on failure to update, NULL if no update necessary
 	 */
-	function dbupdate( $auto_track_modification = true )
+	protected function dbupdate_worker( $auto_track_modification = true )
 	{
 		global $DB, $Plugins, $localtimenow, $current_User;
 
@@ -583,7 +598,7 @@ class DataObject
 		else
 		{	// Object already serialized, let's update!
 			// echo 'UPDATE';
-			return $this->dbupdate();
+			return $this->dbupdate_worker();
 		}
 	}
 
@@ -591,9 +606,25 @@ class DataObject
 	/**
 	 * Delete object from DB.
 	 *
+	 * This will be typically overriden by child classses.
+	 *
 	 * @return boolean true on success
 	 */
-	function dbdelete( $ignore_restrictions = array() )
+	function dbdelete()
+	{
+		return $this->dbdelete_worker();
+	}
+
+
+	/**
+	 * Delete object from DB.
+	 *
+	 * This does the nitty gritty work and accepts optional params. (extracted from dbupdate() for PHP7 compatibility)
+	 *
+	 * @param array list of foreign keys to ignore
+	 * @return boolean true on success
+	 */
+	protected function dbdelete_worker( $ignore_restrictions = array() )
 	{
 		global $DB, $Messages, $Plugins, $db_config;
 
@@ -609,7 +640,7 @@ class DataObject
 		}
 
 		if( ! $this->check_delete( T_('Some restrictions prevent deletion:'), $ignore_restrictions ) )
-		{ // Some restrictions still prevent deletion
+		{	// Some restrictions still prevent deletion
 			// Note: This restrictions must be handled previously before dbdelete is called.
 			// If this code is executed it means there is an implementation issue and restricitons must be check there.
 			$DB->rollback();
@@ -786,6 +817,8 @@ class DataObject
 		echo str_replace( 'panel-default', 'panel-danger', $block_item_Widget->replace_vars( $block_item_Widget->params[ 'block_start' ] ) );
 
 		$restriction_Messages = $this->check_relations( 'delete_cascades' );
+
+		$restriction_Messages->params['class_note'] .= ' text-warning';
 
 		if( !empty( $additional_messages ) )
 		{ // Initialaize additional messages

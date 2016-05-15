@@ -105,6 +105,20 @@ $Form->begin_form( '', '', $params );
 <div class="left_col col-lg-9 col-md-8">
 
 	<?php
+	// ############################ INSTRUCTIONS ##############################
+	$ItemType = & $edited_Item->get_ItemType();
+	if( $ItemType && $ItemType->get( 'back_instruction' ) == 1 && $ItemType->get( 'instruction' ) )
+	{
+		?>
+		<div class="alert alert-dismissable alert-info fade in">
+			<button type="button" class="close" data-dismiss="alert">
+				<span aria-hidden="true">x</span>
+			</button>
+			<?php echo $ItemType->get( 'instruction' );?>
+		</div>
+		<?php
+	}
+
 	// ############################ POST CONTENTS #############################
 
 	$item_type_link = $edited_Item->get_type_edit_link( 'link', $edited_Item->get( 't_type' ), T_('Change type') );
@@ -217,7 +231,12 @@ $Form->begin_form( '', '', $params );
 	echo '<div class="pull-left">';
 	// CALL PLUGINS NOW:
 	ob_start();
-	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'expert' ) );
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
+			'target_type'   => 'Item',
+			'target_object' => $edited_Item,
+			'content_id'    => 'itemform_post_content',
+			'edit_layout'   => 'expert',
+		) );
 	$plugin_button = ob_get_flush();
 	if( empty( $plugin_button ) )
 	{	// If button is not displayed by any plugin
@@ -241,7 +260,7 @@ $Form->begin_form( '', '', $params );
 	echo_publish_buttons( $Form, $creating, $edited_Item );
 	echo '</div>';
 
-	echo '<div class="clear"></div>';
+	echo '<div class="clearfix"></div>';
 
 	echo '</div>';
 
@@ -324,7 +343,18 @@ $Form->begin_form( '', '', $params );
 				.'<input id="suggest_item_tags" name="suggest_item_tags" value="1" type="checkbox"'.( $UserSettings->get( 'suggest_item_tags' ) ? ' checked="checked"' : '' ).' /> '
 				.T_('Auto-suggest tags as you type (based on existing tags)').$link_to_tags_manager
 			.'</label>';
-		$Form->text_input( 'item_tags', $item_tags, 40, '', $suggest_checkbox, array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+		$Form->text_input( 'item_tags', $item_tags, 40, '', $suggest_checkbox, array(
+				'maxlength' => 255,
+				'style'     => 'width: 100%;',
+				'input_prefix' => '<div class="input-group">',
+				'input_suffix' => '<span class="input-group-btn">'
+						.'<input class="btn btn-primary" type="button" name="actionArray[extract_tags]"'
+							.' onclick="return b2edit_confirm( \''.TS_('This will save your changes, then analyze your post to find existing tags. Are you sure?').'\','
+							.' \''.$admin_url.'?ctrl=items&amp;blog='.$edited_Item->get_blog_ID().'\','
+							.' \'extract_tags\' );"'
+							.' value="'.format_to_output( T_('Extract'), 'htmlattr' ).'" />'
+					.'</span></div>',
+			) );
 		echo '</td></tr>';
 	}
 	else
@@ -494,10 +524,10 @@ $Form->begin_form( '', '', $params );
 
 		// comments_container value shows, current Item ID
 		echo '<div class="evo_content_block">';
-		echo '<div id="comments_container" value="'.$edited_Item->ID.'">';
+		echo '<div id="comments_container" value="'.$edited_Item->ID.'" class="evo_comments_container">';
 		// display comments
 		$CommentList->display_if_empty( array(
-				'before'    => '<div class="bComment"><p>',
+				'before'    => '<div class="evo_comment"><p>',
 				'after'     => '</p></div>',
 				'msg_empty' => T_('No feedback for this post yet...'),
 			) );
@@ -528,7 +558,7 @@ $Form->begin_form( '', '', $params );
 
 	// ############################ WORKFLOW #############################
 
-	if( $Blog->get_setting( 'use_workflow' ) )
+	if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 	{	// We want to use workflow properties for this blog:
 		$Form->begin_fieldset( T_('Workflow properties').get_manual_link( 'post-edit-workflow-panel' ), array( 'id' => 'itemform_workflow_props', 'fold' => true ) );
 
@@ -547,7 +577,7 @@ $Form->begin_form( '', '', $params );
 			if( count( $UserCache->cache ) > 20 )
 			{
 				$assigned_User = & $UserCache->get_by_ID( $edited_Item->get( 'assigned_user_ID' ), false, false );
-				$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees' );
+				$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees', array( 'size' => 10 ) );
 			}
 			else
 			{
@@ -647,7 +677,7 @@ $Form->begin_form( '', '', $params );
 	// ################### TEXT RENDERERS ###################
 
 	$Form->begin_fieldset( T_('Text Renderers').get_manual_link( 'post-renderers-panel' )
-					.action_icon( T_('Plugins'), 'edit', $admin_url.'?ctrl=coll_settings&amp;tab=plugin_settings&amp;blog='.$Blog->ID, T_('Plugins'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
+					.action_icon( T_('Plugins'), 'edit', $admin_url.'?ctrl=coll_settings&amp;tab=renderers&amp;blog='.$Blog->ID, T_('Plugins'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
 				array( 'id' => 'itemform_renderers', 'fold' => true ) );
 
 	// fp> TODO: there should be no param call here (shld be in controller)
@@ -752,6 +782,59 @@ $Form->begin_form( '', '', $params );
 	$Form->end_fieldset();
 
 
+	// ################### NOTIFICATIONS ###################
+
+	$Form->begin_fieldset( T_('Notifications').get_manual_link( 'post-notifications-panel' ), array( 'id' => 'itemform_notifications', 'fold' => true ) );
+
+		$Form->info( T_('Moderators'), $edited_Item->check_notifications_flags( 'moderators_notified' ) ? T_('Notified at least once') : T_('Not notified yet') );
+
+		$notify_types = array(
+				'members_notified'   => T_('Members'),
+				'community_notified' => T_('Community'),
+				'pings_sent'         => T_('Public pings'),
+		);
+
+		foreach( $notify_types as $notify_type => $notify_title )
+		{
+			if( ! $edited_Item->notifications_allowed() )
+			{	// Notifications are not allowed for the Item:
+				$Form->info( $notify_title, T_('Not Possible for this post type') );
+			}
+			else
+			{	// Notifications are allowed for the Item:
+				if( $edited_Item->check_notifications_flags( $notify_type ) )
+				{	// Nofications/Pings were sent:
+					$notify_status = ( $notify_type == 'pings_sent' ) ? T_('Sent') : T_('Notified');
+					$notify_select_options = array(
+							''      => T_('Done'),
+							'force' => ( $notify_type == 'pings_sent' ) ? T_('Send again') : T_('Notify again')
+						);
+				}
+				elseif( $edited_Item->get_type_setting( 'usage' ) != 'post' )
+				{	// Item type is not applicable and Nofications/Pings are not sent yet:
+					$notify_status = T_('Not Recommended');
+					$notify_select_options = array(
+							''      => T_('Do nothing'),
+							'force' => ( $notify_type == 'pings_sent' ) ? T_('Send anyways') : T_('Notify anyways'),
+							'mark'  => ( $notify_type == 'pings_sent' ) ? T_('Mark as Sent') : T_('Mark as Notified')
+						);
+				}
+				else
+				{	// Nofications/Pings are not sent yet:
+					$notify_status = ( $notify_type == 'pings_sent' ) ? T_('To be sent') : T_('To be notified');
+					$notify_select_options = array(
+							''     => ( $notify_type == 'pings_sent' ) ? T_('Send on next save') : T_('Notify on next save'),
+							'skip' => T_('Skip on next save'),
+							'mark' => ( $notify_type == 'pings_sent' ) ? T_('Mark as Sent') : T_('Mark as Notified')
+						);
+				}
+				$Form->select_input_array( 'item_'.$notify_type, get_param( 'item_'.$notify_type ), $notify_select_options, $notify_title, NULL, array( 'input_prefix' => $notify_status.' &nbsp; &nbsp; ' ) );
+			}
+		}
+
+	$Form->end_fieldset();
+
+
 	// ################### QUICK SETTINGS ###################
 
 	$item_ID = get_param( 'p' ) > 0 ? get_param( 'p' ) : $edited_Item->ID;
@@ -789,7 +872,7 @@ $Form->begin_form( '', '', $params );
 
 </div>
 
-<div class="clear"></div>
+<div class="clearfix"></div>
 
 </div>
 
@@ -814,8 +897,6 @@ else
 echo_onchange_newcat();
 // Location
 echo_regional_js( 'item', $edited_Item->region_visible() );
-// Post type
-echo_onchange_item_type_js();
 // Goal
 echo_onchange_goal_cat();
 // Fieldset folding

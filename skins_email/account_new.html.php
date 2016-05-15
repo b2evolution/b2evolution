@@ -19,7 +19,8 @@ global $admin_url, $htsrv_url;
 // Default params:
 $params = array_merge( array(
 		'country'     => '',
-		'firstname'   => '',
+		'reg_country' => '',
+		'fullname '   => '',
 		'gender'      => '',
 		'locale'      => '',
 		'source'      => '',
@@ -34,20 +35,33 @@ $params = array_merge( array(
 echo '<p'.emailskin_style( '.p' ).'>'.T_('A new user has registered on the site').':</p>'."\n";
 
 echo '<table'.emailskin_style( 'table.email_table' ).'>'."\n";
-echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Login').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_user_colored_login_link( $params['login'], array( 'use_style' => true ) ).'</td></tr>'."\n";
+echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Login').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_user_colored_login_link( $params['login'], array( 'use_style' => true, 'protocol' => 'http:' ) ).'</td></tr>'."\n";
 echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Email').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['email'].'</td></tr>'."\n";
+
+if( $params['fullname'] != '' )
+{ // Full name is entered
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Full name').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['fullname'].'</td></tr>'."\n";
+}
+
+if( $params['reg_country'] > 0 )
+{ // Country field is entered
+	load_class( 'regional/model/_country.class.php', 'Country' );
+	$CountryCache = & get_CountryCache();
+	$reg_Country = $CountryCache->get_by_ID( $params['reg_country'] );
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Country').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$reg_Country->get_name().'</td></tr>'."\n";
+}
 
 if( $params['country'] > 0 )
 { // Country field is entered
 	load_class( 'regional/model/_country.class.php', 'Country' );
 	$CountryCache = & get_CountryCache();
 	$user_Country = $CountryCache->get_by_ID( $params['country'] );
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Country').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$user_Country->get_name().'</td></tr>'."\n";
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Profile Country').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$user_Country->get_name().'</td></tr>'."\n";
 }
 
-if( $params['firstname'] != '' )
-{ // First name is entered
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('First name').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['firstname'].'</td></tr>'."\n";
+if( !empty( $params['source'] ) )
+{ // Source is defined
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Source').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['source'].'</td></tr>'."\n";
 }
 
 if( $params['gender'] == 'M' )
@@ -65,20 +79,27 @@ if( !empty( $params['locale'] ) )
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Locale').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$locales[ $params['locale'] ]['name'].'</td></tr>'."\n";
 }
 
-if( !empty( $params['source'] ) )
-{ // Source is defined
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Source').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['source'].'</td></tr>'."\n";
-}
-
 if( !empty( $params['trigger_url'] ) )
 { // Trigger page
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Trigger Page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $params['trigger_url'], '', '.a' ).'</td></tr>'."\n";
 }
 
-if( !empty ( $params['initial_hit'] ) )
+if( ! empty( $params['initial_hit'] ) )
 { // Hit info
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('Collection')." ".$params['initial_hit']->hit_coll_ID." - ".$params['initial_hit']->hit_uri.'</td></tr>'."\n";
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial referer').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $params['initial_hit']->hit_referer, '', '.a' ).'</td></tr>'."\n";
+}
+
+echo '<tr><td'.emailskin_style( 'table.email_table td' ).' colspan=2>&nbsp;</td></tr>'."\n";
+
+if( ! empty( $params['level'] ) )
+{	// User level:
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Assigned Level').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['level'].'</td></tr>'."\n";
+}
+
+if( ! empty( $params['group'] ) )
+{	// User group:
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Assigned Group').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['group'].'</td></tr>'."\n";
 }
 
 echo '</table>'."\n";

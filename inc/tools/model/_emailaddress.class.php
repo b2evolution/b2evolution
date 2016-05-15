@@ -51,10 +51,10 @@ class EmailAddress extends DataObject
 	 *
 	 * @param object table Database row
 	 */
-	function EmailAddress( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_email__address', 'emadr_', 'emadr_ID' );
+		parent::__construct( 'T_email__address', 'emadr_', 'emadr_ID' );
 
 		if( $db_row != NULL )
 		{
@@ -103,7 +103,7 @@ class EmailAddress extends DataObject
 		{	// Check if a email address already exists with the same address
 			global $admin_url;
 			param_error( 'emadr_address', sprintf( T_('This email address already exists. Do you want to <a %s>edit the existing email address</a>?'),
-				'href="'.$admin_url.'?ctrl=email&amp;tab=blocked&amp;emadr_ID='.$existing_emadr_ID.'"' ) );
+				'href="'.$admin_url.'?ctrl=email&amp;emadr_ID='.$existing_emadr_ID.'"' ) );
 		}
 		$this->set_from_Request( 'address' );
 

@@ -16,6 +16,13 @@
 	border-radius: @radius;
 }
 
+// Favorite star
+h2.page-title {
+	.fa.coll-fav {
+		font-size: 26px;
+	}
+}
+
 // Page content
 .page-content {
 	// Add space above page content when no navigation level2 and level3 before this
@@ -63,7 +70,7 @@ td.shrinkwrap {
 
 // A colored status icon before <select>
 div.status_icon {
-	float: left;
+	display: inline-block;
 	padding: 2px 5px 0 0;
 }
 
@@ -176,6 +183,9 @@ div.avatartag {
 	.PreviewButton, .pull-left {
 		margin-right: 10px;
 	}
+	.quick-publish {
+		margin-left: 5px;
+	}
 	.html_status {
 		margin-top: 14px;
 		display: inline-block;
@@ -222,40 +232,24 @@ div.delete_messages ul {
 /*
  * Browse pages of items and comments ( ?ctrl=items and ?ctrl=comments - full views )
  */
-div.bPost {
+.evo_post {
 	clear: both;
 	margin: 0 0 1ex;
 	padding: 0;
-	border: 1px solid #CCC;
-	.border-radius;
 	overflow: hidden; /* to normal view of border-radius */
+	.evo_post__tags {
+		border-top: 1px solid #ddd;
+	}
+	.panel-body h3 {
+		margin: 8px 0;
+	}
 }
-.bSmallHead {
-	background-color: #F5F5F5;
-	border-bottom: 1px solid #CCC;
-	color: #666666;
-	font-size: 85%;
-	margin: 0;
-	padding: 1ex;
+.evo_post, .evo_comment {
+	.panel-heading, .panel-body, .panel-footer {
+		padding: 1ex;
+	}
 }
-.bSmallHeadRight {
-	 float: right;
-	 text-align: right;
-	 padding-left: 1em; /* do not pad on text in .bSmallHead */
-}
-.bSmallPrint {
-	border-top: 1px solid #becdd6;
-	font-size: 85%;
-	padding: 1ex;
-	color: #929292;
-}
-.bContent {
-	padding: 1ex;
-}
-.bCommentContent, .bFeedback {
-	margin: 1ex;
-}
-#comments_container {
+.evo_comments_container {
 	border: none;
 	.bCommentAvatar {
 		border: 0;
@@ -264,18 +258,19 @@ div.bPost {
 		margin: 4px 10px 10px 0;
 		float: left;
 	}
-}
-#comments_container.full_comment_list {
-	border: none;
-	div.bComment {
-		margin-left: 0;
-		margin-right: 0;
+	&.evo_comments_container__full_list {
+		border: none;
+		.evo_comment {
+			margin-left: 0;
+			margin-right: 0;
+		}
 	}
 }
-.bFeedback {
-	#comments_container {
+.evo_post__comments {
+	margin: 1ex;
+	.evo_comments_container {
 		border: none;
-		div.bComment {
+		.evo_comment {
 			margin-left: 0;
 			margin-right: 0;
 		}
@@ -291,7 +286,7 @@ div.bPost {
 		background: #F5F5F5;
 		border: none;
 	}
-	.form-horizontal {
+	.evo_form__comment.form-horizontal {
 		margin: 0;
 		padding: 1ex;
 		border: 1px solid #ddd;
@@ -328,68 +323,62 @@ div.bPost {
 	}
 }
 
-#comments_container {
-	div.bComment {
+.evo_comments_container {
+	.evo_comment {
 		overflow: hidden;
 		padding: 0;
 		margin: 1ex;
-		border: 1px solid #ddd;
-		.border-radius;
 		> p {
 			margin: 0;
 		}
-		&.bCommentdraft {
+		&.evo_comment__status_draft {
 			border: 1px solid #fc3;
 			background-color: #ffb;
 		}
-		&.bCommentdeprecated {
+		&.evo_comment__status_deprecated {
 			border: 1px solid #000;
 			background-color: #eee;
 			color: #888;
 		}
-		&.bCommentmeta {
+		&.evo_comment__status_meta {
 			border: 2px solid #5133ab;
-			.bSmallHead, .CommentActionsArea {
+			.panel-heading, .panel-footer {
 				background-color: #f7f4ff;
 				border-bottom: 1px solid #5133ab;
 			}
-			.CommentActionsArea {
+			.panel-footer {
 				border-top: 1px solid #5133ab;
 				border-bottom: none;
 			}
 		}
-		&.bCommenttrash {
+		&.evo_comment__status_trash {
 			border: 1px solid #f66;
 			background-color: #fcc;
-			.bSmallHead {
+			.panel-heading {
 				border-bottom: 1px solid #f66;
 				background-color: #faa;
 			}
-			.CommentActionsArea {
+			.panel-footer {
 				border-top: 1px solid #f66;
 				background-color: #faa;
 			}
 		}
 	}
+	.editable_comment_content {
+		margin-bottom: 5px;
+	}
 }
-#fieldset_wrapper_itemform_meta_cmnt #comments_container {
+#fieldset_wrapper_itemform_meta_cmnt .evo_comments_container {
 	border: none;
 	margin: 0;
-	div.bComment {
+	.evo_comment {
 		margin: 0 0 1ex 0;
 		&:not([class*=meta]) {
 			border: none;
 		}
 	}
 }
-div.PostActionsArea, div.CommentActionsArea {
-	background-color: #F5F5F5;
-	border-top: 1px solid #CCC;
-	clear: both;
-	margin: 0;
-	padding: 1ex;
-}
-.bPostAttachments {
+.evo_post__attachments {
 	margin: 1ex;
 }
 .feedback-tabs {
@@ -422,52 +411,53 @@ div.PostActionsArea, div.CommentActionsArea {
 	top: -8px;
 }
 // The colored blocks for special post statuses
-div.bPostcommunity {
+.evo_post__status_community {
 	border: 1px solid #2E8BB9;
-	> div.bSmallHead {
+	> .panel-heading {
 		border-bottom: inherit;
 	}
-	> .PostActionsArea {
+	> .panel-footer {
 		border-top: inherit;
 	}
 }
-div.bPostprotected {
+.evo_post__status_protected {
 	border: 1px solid #fc9;
-	> div.bSmallHead {
+	> .panel-heading {
 		border-bottom: inherit;
 	}
-	> .PostActionsArea {
+	> .panel-footer {
 		border-top: inherit;
 	}
 }
-div.bPostreview {
+.evo_post__status_review {
 	border: 1px solid #CC0099;
-	> div.bSmallHead {
+	> .panel-heading {
 		border-bottom: inherit;
 	}
-	> .PostActionsArea {
+	> .panel-footer {
 		border-top: inherit;
 	}
 }
-div.bPostprivate {
+.evo_post__status_private {
 	border: 1px solid #f99;
-	> div.bSmallHead {
+	> .panel-heading {
 		border-bottom: inherit;
 	}
-	> .PostActionsArea {
+	> .panel-footer {
 		border-top: inherit;
 	}
 }
-div.bPostdraft, div.bCommentdraft {
+.evo_post__status_draft, .evo_comment__status_draft {
 	border: 1px solid #fc3;
-	> .bContent {
+	> .panel-body {
 		background-color: #ffb;
 	}
-	.bSmallHead {
+	.panel-heading {
 		border-bottom: 1px solid #fc3;
 		background-color: #ff9;
 	}
-	.CommentActionsArea, .PostActionsArea {
+	.panel-footer {
+		border-top: 1px solid #fc3;
 		background-color: #ff9;
 	}
 	span.bStatus {
@@ -479,30 +469,30 @@ div.bPostdraft, div.bCommentdraft {
 		background-color: #FFCC33;
 	}
 }
-div.bPostdeprecated, div.bCommentdeprecated {
+.evo_post__status_deprecated, .evo_comment__status_deprecated {
 	border: 1px solid #000;
-	> .bContent {
+	> .panel-body {
 		background-color: #eee;
 	}
-	> div.bSmallHead {
+	> .panel-heading {
 		border-bottom: inherit;
 		background-color: #ccc;
 	}
-	> .PostActionsArea, .CommentActionsArea {
+	> .panel-footer {
 		border-top: inherit;
 		background-color: #ccc;
 	}
 }
-div.bPostredirected {
+.evo_post__status_redirected {
 	border: 1px solid #639;
-	> .bContent {
+	> .panel-body {
 		background-color: #dcf;
 	}
-	> div.bSmallHead {
+	> .panel-heading {
 		border-bottom: inherit;
 		background-color: #c0b0e0;
 	}
-	> .PostActionsArea {
+	> .panel-footer {
 		border-top: inherit;
 		background-color: #c0b0e0;
 	}
@@ -562,12 +552,9 @@ fieldset ul {
 	margin: 0;
 	padding: 0;
 }
-.bContent h3 {
-	margin: 8px 0;
-}
 
 // Dashboard
-#comments_container, .items_container {
+.evo_comments_container, .items_container {
 	border: 1px solid #DDD;
 	.border-radius;
 	margin-bottom: 20px;
@@ -607,7 +594,7 @@ fieldset ul {
 			.border-radius(0);
 		}
 	}
-	#comments_container {
+	.evo_comments_container {
 		border: none;
 		margin: 0;
 	}
@@ -630,6 +617,11 @@ fieldset ul {
 	}
 	.notes {
 		margin-top: 1px;
+	}
+}
+.dashboard_comments_block__meta {
+	.panel-body {
+		background-color: #f7f4ff;
 	}
 }
 // Charts on dashboard
@@ -684,6 +676,10 @@ fieldset ul {
 		width: 100%;
 		max-width: 100%;
 	}
+	.input-group ul.token-input-list-facebook {
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
+	}
 }
 #itemform_comments {
 	label {
@@ -695,7 +691,7 @@ fieldset ul {
 		display: inline-block;
 	}
 }
-#itemform_links {
+#itemform_links, #cmntform_links {
 	.panel {
 		overflow: hidden;
 	}
@@ -864,7 +860,6 @@ tr#fileuploader_form td {
 	background: #f5f5f5;
 }
 .file_browser {
-	overflow: hidden; // to fix overlapping of the corners on rounded borders
 	.panel-body {
 		padding: 0;
 		#fm_browser {
@@ -1020,7 +1015,7 @@ table.table {
 		color: darken( #848484, 5%);
 		text-align: center;
 		a {
-			color: darken( #848484, 5%); 
+			color: darken( #848484, 5%);
 		}
 		a.basic_current,
 		a:hover {
@@ -1030,7 +1025,7 @@ table.table {
 	tbody tr.group td {
 		background: lighten( #e8e8e8, 3%);
 		color: #848484;
-		a {
+		a:not(.label) {
 			color: #337ab7;
 		}
 	}
@@ -1100,7 +1095,7 @@ table.coll_kind {
 		padding: 10px 10px 10px 0;
 	}
 	td.coll_kind__desc {
-		padding-top: 18px;	
+		padding-top: 18px;
 	}
 	.btn {
 		width: 100%;
@@ -1192,9 +1187,17 @@ div.level2 {
 nav.level1 {
 	z-index: 1;
 }
-div.level3 nav .nav>li>a {
-	padding: 4px 10px;
-	font-size: 92%;
+div.level3 nav .nav > li {
+	> a {
+		padding: 4px 10px;
+		font-size: 92%;
+		background-color: #eee;
+	}
+	&.active a,
+	&.active a:hover,
+	&.active a:focus {
+		background-color: #337ab7;
+	}
 }
 .user_header_content {
 	div.level3 {
@@ -1490,9 +1493,130 @@ table.diff {
 	}
 }
 
-// Mark checkbox with red background color, e.g. on advanced collection permissions:
-.red-bordered-checkbox {
-	background-color: #F00;
-	padding: 1px;
-	padding-top: 0;
+// Fix alignment of radio buttons on post features form:
+.radio input[type="radio"][name^="timestamp_"][value="duration"] {
+	position: relative;
+	margin-right: 4px;
+}
+
+// Attachments table:
+#iframe_wrapper .results_compact.panel {
+	margin: 0;
+	border: none;
+	box-shadow: none;
+	border-radius: 0;
+	.table-bordered {
+		border: none;
+		tr:first-child td {
+			border-top: none;
+		}
+	}
+}
+
+// Format date columns:
+.timestamp {
+	white-space: nowrap;
+	text-align: center;
+}
+.timestamp .time {
+	font-size: 84%;
+}
+.compact_data {
+	white-space: nowrap;
+}
+
+// Style fixes for email preview from back-office:
+#skin_wrapper {
+	.email_wrap {
+		.email_payload > p:first-child {
+			margin-top: 10px;
+		}
+		.user img {
+			top: -1px;
+		}
+		ul {
+			margin: 0 0 10px 25px;
+			list-style: disc;
+		}
+	}
+}
+
+.evo_poll__table {
+	margin-bottom: 14px;
+	width: 100%;
+	td {
+		padding: 2px 10px 2px 0;
+		vertical-align: top;
+	}
+	tr td:last-child {
+		padding-right: 0;
+	}
+	input[type=radio], label {
+		margin: 0;
+	}
+	.evo_poll__percent_bar {
+		width: 100%;
+		min-width: 40px;
+		padding-right: 6px;
+		> div {
+			width: 100%;
+			vertical-align: middle;
+			display: inline-block;
+			> div {
+				background: #ffcc66;
+				height: 12px;
+				min-width: 1px;
+			}
+		}
+	}
+	.evo_poll__selector {
+		width: 5px;
+	}
+	.evo_poll__title {
+		white-space: nowrap;
+	}
+	.evo_poll_percentage {
+		max-width: 50px;
+	}
+}
+
+// Status checkboxes, e.g. on advanced collection permissions:
+@import "../../../../rsc/less/inc/visibility_status_colors.inc.less";
+.evo_checkbox_status {
+	padding: 0 1px 1px 1px;
+	border-radius: 2px;
+}
+.evo_checkbox_status__default {
+	border: 1px solid #F00;
+	padding: 1px 1px 2px 1px;
+}
+.evo_checkbox_status__published {
+	background-color: @status_color_published;
+}
+.evo_checkbox_status__community {
+	background-color: @status_color_community;
+}
+.evo_checkbox_status__protected {
+	background-color: @status_color_protected;
+}
+.evo_checkbox_status__review {
+	background-color: @status_color_review;
+}
+.evo_checkbox_status__private {
+	background-color: @status_color_private;
+}
+.evo_checkbox_status__draft {
+	background-color: @status_color_draft;
+}
+.evo_checkbox_status__deprecated {
+	background-color: @status_color_deprecated;
+}
+.evo_checkbox_status__redirected {
+	background-color: @status_color_redirected;
+}
+.evo_checkbox_status__trash {
+	background-color: @status_color_trash;
+}
+.evo_checkbox_status__meta {
+	background-color: @status_color_meta;
 }

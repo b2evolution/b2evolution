@@ -146,10 +146,8 @@ h2 {
 
 .wptouch-videos {
 	-webkit-transform: translate3d(0,0,0);
-	-moz-transform: translate3d(0,0,0);
-	-o-transform: translate3d(0,0,0);
 	-ms-transform: translate3d(0,0,0);
-	transform: translate3d(0,0,0);
+	     transform: translate3d(0,0,0);
 }
 
 /* @end */
@@ -178,7 +176,6 @@ h2 {
 	margin: 0;
 	border-style: none;
 	padding-bottom: 4px;
-	-o-text-overflow: ellipsis;
 	-ms-text-overflow: ellipsis;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -225,7 +222,6 @@ h2 {
 	background-color: rgba(0,0,0,.3);
 	border: 1px solid rgba(0,0,0,.8);
 	border-radius: 4px;
-	-webkit-box-shadow: rgba(255,255,255,.2) 0px 1px 0px, inset rgba(255,255,255,.2) 0px 1px 0px;
 	box-shadow: rgba(255,255,255,.2) 0px 1px 0px, inset rgba(255,255,255,.2) 0px 1px 0px;
 	font-weight: bold;
 	cursor: pointer;
@@ -236,7 +232,6 @@ h2 {
 
 #headerbar-menu .open {
 	background-color: rgba(0,0,0,.3);
-	-webkit-box-shadow: rgba(255,255,255,.2) 0px 1px 0px, inset rgba(0,0,0,.5) 0px 1px 6px;
 	box-shadow: rgba(255,255,255,.2) 0px 1px 0px, inset rgba(0,0,0,.5) 0px 1px 6px;
 }
 
@@ -246,7 +241,6 @@ h2 {
 	width: 100%;
 	display: block;
 	position: relative;
-	-webkit-box-shadow: #000 0 2px 3px;
 	box-shadow: #000 0 2px 3px;
 	text-align: right;
 	border-top: 1px solid #3e3e3e;
@@ -367,7 +361,6 @@ h2 {
 	position: absolute;
 	z-index: 2;
 	top: 45px;
-	-webkit-box-shadow: #333 -6px 6px 6px;
 	box-shadow: #333 -6px 6px 6px;
 }
 
@@ -402,7 +395,6 @@ h2 {
 	margin-left: -1px;
 	margin-right: -1px;
 	color: #fff !important;
-	-webkit-box-shadow: rgba(0,0,0,.5) 0px -1px 1px;
 	box-shadow: rgba(0,0,0,.5) 0px -1px 1px;
 	text-shadow: #000000 0 -1px 1px;
 	border: 1px solid #2c2c2c;
@@ -474,7 +466,6 @@ img.head-close {
 	border-radius: 8px;
 	position: relative;
 	z-index: 0;
-	-webkit-box-shadow: rgba(255,255,255,.8) 0px 1px 0px;
 	box-shadow: rgba(255,255,255,.8) 0px 1px 0px;
 }
 
@@ -489,28 +480,16 @@ a.post-arrow {
 	cursor: default;
 	border-radius: 5px;
 	-webkit-transform: scale(1.0) rotate(0deg);
-	-moz-transform: scale(1.0) rotate(0deg);
-	-o-transform: scale(1.0) rotate(0deg);
 	-ms-transform: scale(1.0) rotate(0deg);
-	transform: scale(1.0) rotate(0deg);
-	-webkit-transition-duration: 0.3s;
-	-moz-transition-duration: 0.3s;
-	-o-transition-duration: 0.3s;
-	-ms-transition-duration: 0.3s;
+	     transform: scale(1.0) rotate(0deg);
 	transition-duration: 0.3s;
 	-webkit-touch-callout: none;
 }
 
 a.post-arrow-down {
 	-webkit-transform: scale(1.0) rotate(90deg);
-	-moz-transform: scale(1.0) rotate(90deg);
-	-o-transform: scale(1.0) rotate(90deg);
 	-ms-transform: scale(1.0) rotate(90deg);
-	transform: scale(1.0) rotate(90deg);
-	-webkit-transition-duration: 0.3s;
-	-moz-transition-duration: 0.3s;
-	-o-transition-duration: 0.3s;
-	-ms-transition-duration: 0.3s;
+	     transform: scale(1.0) rotate(90deg);
 	transition-duration: 0.3s;
 }
 
@@ -559,14 +538,7 @@ a.h2, h2.post-title {
 }
 
 .comment-bubble,.comment-bubble-big {
-	background: -webkit-gradient(linear, left top, left bottom, from(#de939e), to(#a40717), color-stop(0.5, #be4958));
 	background: -webkit-linear-gradient(top, #de939e, #a40717, #be4958 0.5);
-	background: -moz-linear-gradient(top, #de939e, #a40717, #be4958 0.5);
-	background: -o-linear-gradient(top, #de939e 0%, #be4958 50%, #a40717 100%);
-	background: -ms-linear-gradient(top, #de939e, #a40717, #be4958 0.5);
-	background: linear-gradient(top, #de939e, #a40717, #be4958 0.5);
-	-webkit-background-clip: padding-box;
-	-moz-background-clip: padding-box;
 	background-clip: padding-box;
 	height: 16px;
 	display: block;
@@ -577,7 +549,6 @@ a.h2, h2.post-title {
 	text-align: center;
 	border-style: solid;
 	border-width: 2px;
-	-webkit-box-shadow: rgba(0,0,0, .6) 0px 2px 3px;
 	box-shadow: rgba(0,0,0, .6) 0px 2px 3px;
 	position: absolute;
 	top: 3px;
@@ -617,17 +588,13 @@ a.h2, h2.post-title {
 	border-radius-bottomright: 7px;
 	border-top-left-radius: 7px;
 	border-bottom-right-radius: 7px;
-	-webkit-background-clip: padding-box;
-	-moz-background-clip: padding-box;
 	background-clip: padding-box;
 	top: 3px;
 	float: left;
-	-webkit-box-shadow: #c6c6c6 1px 1px 3px;
 	box-shadow: #c6c6c6 1px 1px 3px;
 }
 
 .cal-month {
-	-webkit-border-top-left-radius: 6px;
 	border-radius-topleft: 6px;
 	border-top-left-radius: 6px;
 	font-size: 10px;
@@ -642,7 +609,6 @@ a.h2, h2.post-title {
 	color: #222;
 	background-color: #e9e9e9;
 	text-shadow: white -1px -1px 1px;
-	-webkit-border-bottom-right-radius: 6px;
 	border-radius-bottomright: 6px;
 	border-bottom-right-radius: 6px;
 	letter-spacing: -2px;
@@ -942,7 +908,6 @@ ol.commentlist li {
 	border-left: 1px solid #b1b1b1;
 	position: relative;
 	line-height: 17px;
-	-webkit-box-shadow: rgba(255,255,255,.8) 0px 1px 0px;
 	box-shadow: rgba(255,255,255,.8) 0px 1px 0px;
 }
 
@@ -968,14 +933,8 @@ h3#com-head img#com-arrow {
 	position: relative;
 	top: 1px;
 	-webkit-transform: scale(1.0) rotate(0deg);
-	-moz-transform: scale(1.0) rotate(0deg);
-	-o-transform: scale(1.0) rotate(0deg);
 	-ms-transform: scale(1.0) rotate(0deg);
-	transform: scale(1.0) rotate(0deg);
-	-webkit-transition-duration: 0.6s;
-	-moz-transition-duration: 0.6s;
-	-o-transition-duration: 0.6s;
-	-ms-transition-duration: 0.6s;
+	     transform: scale(1.0) rotate(0deg);
 	transition-duration: 0.6s;
 }
 
@@ -988,14 +947,8 @@ h3#com-head img#com-arrow {
 
 .com-arrow-down {
 	-webkit-transform: scale(1.0) rotate(90deg) !important;
-	-moz-transform: scale(1.0) rotate(90deg) !important;
-	-o-transform: scale(1.0) rotate(90deg) !important;
 	-ms-transform: scale(1.0) rotate(90deg) !important;
-	transform: scale(1.0) rotate(90deg) !important;
-	-webkit-transition-duration: 0.6s !important;
-	-moz-transition-duration: 0.6s !important;
-	-o-transition-duration: 0.6s !important;
-	-ms-transition-duration: 0.6s !important;
+	     transform: scale(1.0) rotate(90deg) !important;
 	transition-duration: 0.6s !important;
 }
 
@@ -1240,7 +1193,6 @@ textarea {
 	height: 110px;
 	width: 98%;
 	padding: 3px;
-	-webkit-box-shadow: rgba(255,255,255,.8) 0px 1px 0px;
 	box-shadow: rgba(255,255,255,.8) 0px 1px 0px;
 }
 
@@ -1295,8 +1247,6 @@ textarea {
 #switch div {
 	border: 1px solid #b1b1b1;
 	border-radius: 24px;
-	-webkit-background-clip: padding-box;
-	-moz-background-clip: padding-box;
 	background-clip: padding-box;
 	font-size: 13px;
 	position: absolute;
@@ -1304,12 +1254,7 @@ textarea {
 	right: 8px;
 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 	-webkit-touch-callout: none;
-	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#d3d3d3), color-stop(.5, #eee), color-stop(.51, #e9e9e9));
 	background: -webkit-linear-gradient(top, #fff, #d3d3d3, #eee .5, #e9e9e9 .51);
-	background: -moz-linear-gradient(top, #fff, #d3d3d3, #eee .5, #e9e9e9 .51);
-	background: -o-linear-gradient(top, #fff, #d3d3d3, #eee .5, #e9e9e9 .51);
-	background: -ms-linear-gradient(top, #fff, #d3d3d3, #eee .5, #e9e9e9 .51);
-	background: linear-gradient(top, #fff, #d3d3d3, #eee .5, #e9e9e9 .51);
 	text-shadow: #fff 0 1px 0;
 }
 
@@ -1319,8 +1264,6 @@ textarea {
 	display: block;
 	border-top-left-radius: 10px;
 	border-bottom-left-radius: 10px;
-	-webkit-background-clip: padding-box;
-	-moz-background-clip: padding-box;
 	background-clip: padding-box;
 	border-right: 1px solid #b1b1b1;
 }
@@ -1328,8 +1271,6 @@ textarea {
 #switch .off {
 	border-top-right-radius: 10px;
 	border-bottom-right-radius: 10px;
-	-webkit-background-clip: padding-box;
-	-moz-background-clip: padding-box;
 	background-clip: padding-box;
 	padding: 5px 8px 6px;
 	display: block;
@@ -1338,14 +1279,13 @@ textarea {
 }
 
 #switch .active {
+	/* autoprefixer: off */
 	background: -webkit-gradient(linear, left bottom, left top, from(#fff), to(#d3d3d3), color-stop(.5, #eee), color-stop(.51, #e9e9e9));
 	background: -webkit-linear-gradient(,, #fff, #d3d3d3, #eee .5, #e9e9e9 .51);
-	background: -moz-linear-gradient(,, #fff, #d3d3d3, #eee .5, #e9e9e9 .51);
-	background: -o-linear-gradient(,, #fff, #d3d3d3, #eee .5, #e9e9e9 .51);
-	background: -ms-linear-gradient(,, #fff, #d3d3d3, #eee .5, #e9e9e9 .51);
+	background: -webkit-linear-gradient(#fff, #d3d3d3, #eee .5, #e9e9e9 .51);
+	background: -moz-linear-gradient(#fff, #d3d3d3, #eee .5, #e9e9e9 .51);
 	background: linear-gradient(,, #fff, #d3d3d3, #eee .5, #e9e9e9 .51);
 	text-shadow: #FFF 0 1px 0;
-	-webkit-box-shadow: inset rgba(0,0,0,.4) 0px 0px 7px;
 	box-shadow: inset rgba(0,0,0,.4) 0px 0px 7px;
 	border-style: none;
 	color: #666;
@@ -1374,7 +1314,6 @@ textarea {
 	height: 54%;
 	text-shadow: #000000 -1px -1px 0;
 	border-radius: 15px;
-	-webkit-box-shadow: #444 0px 0px 15px;
 	box-shadow: #444 0px 0px 15px;
 	width: auto;
 	padding-right: 25px;
@@ -1500,7 +1439,6 @@ div.post-actions {
 	border-radius: 8px;
 	position: relative;
 	z-index: 0;
-	-webkit-box-shadow: rgba(255,255,255,.8) 0px 1px 0px;
 	box-shadow: rgba(255,255,255,.8) 0px 1px 0px;
 }
 
@@ -1551,7 +1489,6 @@ form.search {
 	border-radius: 8px;
 	position: relative;
 	z-index: 0;
-	-webkit-box-shadow: rgba(255,255,255,.8) 0px 1px 0px;
 	box-shadow: rgba(255,255,255,.8) 0px 1px 0px;
 }
 table.rating_summary{
@@ -1640,8 +1577,6 @@ div.average_rating .star_rating{
 
 div.results, p.msg_nothing {
 	padding: 0 10px;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
 tr.filters div, div.filters div {

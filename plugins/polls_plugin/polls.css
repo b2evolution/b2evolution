@@ -1,0 +1,8 @@
+#poll_wrapper {
+	min-width: 320px;
+	max-width: 1170px;
+}
+
+#poll_wrapper h2 {
+	margin: 0px 0px 15px 0px;
+}

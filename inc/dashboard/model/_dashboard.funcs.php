@@ -270,6 +270,9 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 
 		// Get ready for display (runs the query):
 		$CommentList->display_init();
+
+		// Load data of comments from the current page at once to cache variables:
+		$CommentList->load_list_data();
 	}
 
 	$index = 0;
@@ -278,20 +281,19 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 	{ // Loop through comments:
 		$new_comment_IDs[] = $Comment->ID;
 		$index = $index + 1;
-		// Only 5 commens should be visible, set hidden status for the rest
-		$hidden_status = ( $index > 5 ) ? ' hidden_comment' : '';
+		$is_meta = $Comment->is_meta();
+
+		// Only 5 normal comments should be visible, set hidden status for the rest:
+		$hidden_status = ( $index > 5 && ! $is_meta ) ? ' hidden_comment' : '';
 
 		echo '<div id="comment_'.$Comment->ID.'" class="dashboard_post dashboard_post_'.($CommentList->current_idx % 2 ? 'even' : 'odd' ).$hidden_status.'">';
 
-/* OLD:
-		echo '<div class="floatright"><span class="note status_'.$Comment->status.'"><span>';
-		$Comment->status();
-		echo '</span></span></div>';
-	NEW:
-*/
-		$Comment->format_status( array(
-				'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
-			) );
+		if( ! $is_meta )
+		{	// Display status banner only for normal comments:
+			$Comment->format_status( array(
+					'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+				) );
+		}
 
 		echo $Comment->get_author( array(
 				'before'      => '<div class="dashboard_comment_avatar">',
@@ -305,13 +307,14 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 			) );
 
 		echo '<h3 class="dashboard_comment_title">';
-		if( ( $Comment->status !== 'draft' ) || ( $Comment->author_user_ID == $current_User->ID ) )
+		if( ! $is_meta && ( $Comment->status !== 'draft' || $Comment->author_user_ID == $current_User->ID ) )
 		{ // Display Comment permalink icon
 			echo $Comment->get_permanent_link( '#icon#' ).' ';
 		}
 		echo $Comment->get_title( array(
 				'author_format' => '<strong>%s</strong>',
 				'link_text'     => 'login',
+				'linked_type'   => $is_meta,
 			) );
 		$comment_Item = & $Comment->get_Item();
 		echo ' '.T_('in response to')
@@ -332,7 +335,16 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		$Comment->spam_karma( ' &bull; '.T_('Spam Karma').': %s%', ' &bull; '.T_('No Spam Karma') );
 		echo '</div>';
 
+		$user_permission = $current_User->check_perm( 'meta_comment', 'edit', false, $Comment );
+		if( $user_permission )
+		{ // Put the meta comment content into this container to edit by ajax:
+			echo '<div id="editable_comment_'.$Comment->ID.'" class="editable_comment_content">';
+		}
 		$Comment->content( 'htmlbody', true );
+		if( $user_permission )
+		{ // End of the container that is used to edit meta comment by ajax:
+			echo '</div>';
+		}
 
 		echo '<div class="dashboard_action_area">';
 		// Display edit button if current user has the rights:
@@ -340,7 +352,7 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		if( ! $script )
 		{ // Set page, where to redirect, because the function is called from async.php (regenerate_url gives => async.php)
 			global $admin_url;
-			$redirect_to = $admin_url.'?ctrl=dashboard&blog='.$blog_ID;
+			$redirect_to = $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&blog='.$blog_ID;
 		}
 
 		echo '<div class="floatleft">';
@@ -360,12 +372,17 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 
 		echo '</div>';
 
-		// Display Spam Voting system
-		$Comment->vote_spam( '', '', '&amp;', true, true, array( 'button_group_class' => button_class( 'group' ).' btn-group-sm' ) );
+		if( ! $is_meta )
+		{	// Display Spam Voting system only for normal comment:
+			$Comment->vote_spam( '', '', '&amp;', true, true, array( 'button_group_class' => button_class( 'group' ).' btn-group-sm' ) );
+		}
 
 		echo '<div class="clear"></div>';
 		echo '</div>';
 		echo '</div>';
+
+		// Flush to immediately display the comment
+		evo_flush();
 	}
 
 	if( !$script )
@@ -381,13 +398,19 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
  * @param string Table name
  * @param string SQL WHERE
  * @param string SQL FROM
+ * @param string SQL title for better debug
  * @return integer A count of the records
  */
-function get_table_count( $table_name, $sql_where = '', $sql_from = '' )
+function get_table_count( $table_name, $sql_where = '', $sql_from = '', $sql_title = '' )
 {
 	global $DB;
 
-	$SQL = new SQL();
+	if( empty( $sql_title ) )
+	{	// Set default SQL title:
+		$sql_title = 'Get a count of the records in the DB table '.$table_name;
+	}
+
+	$SQL = new SQL( $sql_title );
 	$SQL->SELECT( 'COUNT( * )' );
 	$SQL->FROM( $table_name );
 	if( !empty( $sql_from ) )
@@ -399,7 +422,7 @@ function get_table_count( $table_name, $sql_where = '', $sql_from = '' )
 		$SQL->WHERE( $sql_where );
 	}
 
-	return intval( $DB->get_var( $SQL->get() ) );
+	return intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
 }
 
 
@@ -412,7 +435,7 @@ function get_table_count( $table_name, $sql_where = '', $sql_from = '' )
  */
 function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 {
-	global $Blog, $current_User;
+	global $Blog, $current_User, $admin_url;
 
 	// Create empty List:
 	$ItemList = new ItemList2( $Blog, NULL, NULL );
@@ -455,6 +478,10 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 			$block_title = T_('Recent posts awaiting moderation');
 			break;
 	}
+	// erhsatingin> I am not sure if I should hard-code the $param_prefix or set it when $ItemList is instantiated above
+	$param_prefix = 'items_type_';
+	$block_title = $block_title.' <a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;'.$param_prefix.'show_statuses[]='.$status.'&amp;'.$param_prefix.'sentence=AND&tab=type" style="text-decoration:none">'.
+				'<span id="badge" class="badge badge-important">'.$ItemList->get_total_rows().'</span></a>'.get_manual_link( 'dashboard-posts-awaiting-moderation' );
 	$block_item_Widget->title = $block_title;
 	$block_item_Widget->disp_template_replaced( 'block_start' );
 
@@ -524,12 +551,16 @@ function log10_percent( $value )
  */
 function display_charts( $chart_data )
 {
+	// We'll need to know where the chart will be displayed
+	global $ctrl;
+
 	if( empty( $chart_data ) )
 	{ // No data
 		return;
 	}
 
-	echo '<div class="charts">';
+	echo '<div class="charts'.( $ctrl == 'col_settings' ? ' row' : '' ).'">';
+
 	foreach( $chart_data as $chart_item )
 	{
 		if( $chart_item['type'] == 'number' )
@@ -548,11 +579,22 @@ function display_charts( $chart_data )
 		{ // Display a little chart for not null values
 			$chart_percent = 0.01;
 		}
+
 		// Display chart
-		echo '<div class="chart">
-				<div class="'.$chart_item['type'].'" data-percent="'.$chart_percent.'"><b style="color:'.$chart_color.'">'.$chart_item['value'].'</b></div>
-				<div class="label">'.$chart_item['title'].'</div>
-			</div>';
+		if( $ctrl == 'coll_settings' )
+		{ // in collection dashboard
+			echo '<div class="center col-xs-4 col-sm-4 col-md-12 col-lg-4"><div class="chart">
+					<div class="'.$chart_item['type'].'" data-percent="'.$chart_percent.'"><b style="color:'.$chart_color.'">'.$chart_item['value'].'</b></div>
+					<div class="label">'.$chart_item['title'].'</div>
+					</div></div>';
+		}
+		else
+		{ // in everything else
+			echo '<div class="chart">
+					<div class="'.$chart_item['type'].'" data-percent="'.$chart_percent.'"><b style="color:'.$chart_color.'">'.$chart_item['value'].'</b></div>
+					<div class="label">'.$chart_item['title'].'</div>
+					</div>';
+		}
 	}
 	echo '</div>';
 

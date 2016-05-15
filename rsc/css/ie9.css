@@ -1,5 +1,6 @@
 a.roundbutton, a.roundbutton_text, span.roundbutton {
-	filter: none !important;
+	-webkit-filter: none !important;
+	        filter: none !important;
 	background: #f4f4f4;
 	box-shadow: inset 0 -10px 10px rgba(0,0,0,0.24);
 }
@@ -26,18 +27,21 @@ a.roundbutton_red:hover, span.roundbutton_red:hover {
 }
 
 div.menu3 a:hover {
-	filter: none !important;
+	-webkit-filter: none !important;
+	        filter: none !important;
 	background: #919191;
 	box-shadow: inset 0 -4px 5px rgba(255,255,255,0.2);
 }
 div.menu3 .current a, div.menu3 .current a:hover {
-	filter: none;
+	-webkit-filter: none;
+	        filter: none;
 	background: #8b8d8d;
 	box-shadow: inset 0 4px 5px rgba(0,0,0,0.3);
 }
 
 #width_switcher a.roundbutton {
-	filter: none !important;
+	-webkit-filter: none !important;
+	        filter: none !important;
 	background: #f4f4f4;
 	box-shadow: inset 0 -20px 20px rgba(0,0,0,0.24);
 }
@@ -52,5 +56,6 @@ div.menu3 .current a, div.menu3 .current a:hover {
 
 #styled_content_block [class*='status_'] span,
 .evo_content_block [class*='status_'] span {
-	filter: none !important;
+	-webkit-filter: none !important;
+	        filter: none !important;
 }

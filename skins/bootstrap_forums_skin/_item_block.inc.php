@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $preview, $dummy_fields, $cat, $disp;
+global $Item, $preview, $dummy_fields, $cat, $current_User, $app_version;
 
 /**
  * @var array Save all statuses that used on this page in order to show them in the footer legend
@@ -87,7 +87,7 @@ skin_widget( array(
 
 <div class="forums_list single_topic evo_content_block">
 	<?php /* This empty row is used to fix columns width, when table has css property "table-layout:fixed" */ ?>
-	
+
 	<div class="single_page_title">
 		<?php
 		// Page title
@@ -126,17 +126,15 @@ skin_widget( array(
 						) );
 					?>
 					<?php
-						if( $Skin->get_setting( 'display_post_date' ) )
-						{ // We want to display the post date:
-							$Item->issue_time( array(
-									'before'      => '<span class="text-muted">',
-									'after'       => '</span> &nbsp; &nbsp; ',
-									'time_format' => 'M j, Y H:i',
-								) );
-						}
+						// We want to display the post date:
+						$Item->issue_time( array(
+								'before'      => '<span class="text-muted">',
+								'after'       => '</span> &nbsp; &nbsp; ',
+								'time_format' => 'M j, Y H:i',
+							) );
 					?>
 				</h4>
-			</div>	
+			</div>
 					<?php
 						if( $Skin->enabled_status_banner( $Item->status ) )
 						{ // Status banner
@@ -147,9 +145,9 @@ skin_widget( array(
 							$legend_statuses[] = $Item->status;
 							echo '</div>';
 						}
-					?>	
+					?>
 		</div>
-		
+
 		<div class="panel-body">
 			<div class="ft_avatar col-md-1 col-sm-2"><?php
 				$Item->author( array(
@@ -159,27 +157,38 @@ skin_widget( array(
 			?></div>
 			<div class="post_main col-md-11 col-sm-10">
 				<?php
+				if( $disp == 'single' )
+				{
+					?>
+					<div class="evo_container evo_container__item_single">
+					<?php
+					// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
+					// Display container contents:
+					skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+						'widget_context' => 'item',	// Signal that we are displaying within an Item
+						// The following (optional) params will be used as defaults for widgets included in this container:
+						// This will enclose each widget in a block:
+						'block_start' => '<div class="$wi_class$">',
+						'block_end' => '</div>',
+						// This will enclose the title of each widget:
+						'block_title_start' => '<h3>',
+						'block_title_end' => '</h3>',
+						// Params for skin file "_item_content.inc.php"
+						'widget_item_content_params' => $params,
+					) );
+					// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
+					?>
+					</div>
+					<?php
+				}
+				else
+				{
 					// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 					skin_include( '_item_content.inc.php', $params );
 					// Note: You can customize the default item content by copying the generic
 					// /skins/_item_content.inc.php file into the current skin folder.
 					// -------------------------- END OF POST CONTENT -------------------------
-
-					if( $disp == 'single' )
-					{
-						// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-						// Display container contents:
-						skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
-								// The following (optional) params will be used as defaults for widgets included in this container:
-								// This will enclose each widget in a block:
-								'block_start' => '<div class="$wi_class$">',
-								'block_end' => '</div>',
-								// This will enclose the title of each widget:
-								'block_title_start' => '<h3>',
-								'block_title_end' => '</h3>',
-						) );
-						// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
-					}
+				}
 
 				if( ! $Item->is_intro() )
 				{ // List all tags attached to this topic:
@@ -192,7 +201,7 @@ skin_widget( array(
 				?>
 			</div>
 		</div><!-- ../panel-body -->
-		
+
 		<div class="panel-footer clearfix">
 		<a href="<?php echo $Item->get_permanent_url(); ?>#skin_wrapper" class="to_top"><?php echo T_('Back to top'); ?></a>
 		<?php
@@ -228,7 +237,7 @@ skin_widget( array(
 			echo '</span>';
 			echo '</div>';
 		?>
-		
+
 		</div><!-- ../panel-footer -->
 	</div><!-- ../panel panel-default -->
 	</section><!-- ../table evo_content_block -->
@@ -260,6 +269,36 @@ skin_widget( array(
 		echo_comment_moderate_js();
 
 		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
+	?>
+
+	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
+		// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
+		skin_include( '_item_workflow.inc.php' );
+		// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
+	}
+	?>
+
+	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
+		// ------------------ META COMMENTS INCLUDED HERE ------------------
+		skin_include( '_item_meta_comments.inc.php', array(
+				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
+				'comment_end'           => '</article>',
+				'comment_post_before'   => '<h4 class="evo_comment_post_title ellipsis">',
+				'comment_post_after'    => '</h4>',
+				'comment_title_before'  => '<div class="panel-heading posts_panel_title_wrapper"><div class="cell1 ellipsis"><h4 class="evo_comment_title panel-title">',
+				'comment_status_before' => '</h4></div>',
+				'comment_title_after'   => '</div>',
+				'comment_avatar_before' => '<div class="panel-body"><span class="evo_comment_avatar col-md-1 col-sm-2">',
+				'comment_avatar_after'  => '</span>',
+				'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10">',
+				'comment_text_after'    => '</div>',
+			) );
+		// ---------------------- END OF META COMMENTS ---------------------
+	}
 	?>
 
 		</div><!-- .col -->

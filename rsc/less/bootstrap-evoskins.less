@@ -86,6 +86,13 @@ a.btn.action_icon {
 			margin: 0 5px;
 		}
 	}
+	// Info field with full height in value
+	.info_full_height {
+		.form-control-static {
+			padding-top: 0;
+			padding-bottom: 0;
+		}
+	}
 	// Part after label where input elements
 	.controls {
 		padding-left: 0;
@@ -387,6 +394,13 @@ div.filters {
 	}
 	&.panel-body {
 		padding: 15px;
+	}
+	// Fix style for fields with autocomplete usernames:
+	.twitter-typeahead {
+		vertical-align: middle;
+		.tt-dropdown-menu div {
+			margin-left: 0;
+		}
 	}
 }
 .table_scroll .table {
@@ -724,140 +738,6 @@ div.edit_toolbars, div.message_toolbars {
 	font-weight: 200;
 }
 
-// Colors for statuses of posts and comments
-@status_color_draft:            #ff9;
-@status_color_draft_hover:      #f3f392;
-@status_color_review:           #CC0099;
-@status_color_review_hover:     #c20092;
-@status_color_community:        #2E8BB9;
-@status_color_community_hover:  #2c84b0;
-@status_color_protected:        #FF9C2A;
-@status_color_protected_hover:  #f39528;
-@status_color_private:          #DC143C;
-@status_color_private_hover:    #d21339;
-@status_color_published:        #99EE44;
-@status_color_published_hover:  #92e341;
-@status_color_deprecated:       #000;
-@status_color_deprecated_hover: #333;
-@status_color_redirected:       #663399;
-@status_color_redirected_hover: #613192;
-@status_color_trash:            #f66;
-@status_color_trash_hover:      #f44;
-@status_color_meta:             #5133ab;
-
-// Status colors:
-.status_color_draft {
-	color: @status_color_draft;
-}
-.status_color_review {
-	color: @status_color_review;
-}
-.status_color_community {
-	color: @status_color_community;
-}
-.status_color_protected {
-	color: @status_color_protected;
-}
-.status_color_private {
-	color: @status_color_private;
-}
-.status_color_published {
-	color: @status_color_published;
-}
-.status_color_deprecated {
-	color: @status_color_deprecated;
-}
-.status_color_redirected {
-	color: @status_color_redirected;
-}
-.status_color_trash {
-	color: @status_color_trash;
-}
-.status_color_meta {
-	color: @status_color_meta;
-}
-
-// Buttons for the post statuses
-.btn[class*=btn-status-] {
-	border: 1px solid #ccc;
-}
-.btn-status-draft {
-	color: #000;
-	background-color: @status_color_draft;
-	border-color: #dfdfdf;
-}
-.btn-status-draft:hover {
-	color: #000;
-	background-color: @status_color_draft_hover;
-}
-.btn-status-review {
-	color: #fff;
-	background-color: @status_color_review;
-}
-.btn-status-review:hover {
-	color: #fff;
-	background-color: @status_color_review_hover;
-}
-.btn-status-community {
-	color: #fff;
-	background-color: @status_color_community;
-}
-.btn-status-community:hover {
-	color: #fff;
-	background-color: @status_color_community_hover;
-}
-.btn-status-protected {
-	color: #fff;
-	background-color: @status_color_protected;
-}
-.btn-status-protected:hover {
-	color: #fff;
-	background-color: @status_color_protected_hover;
-}
-.btn-status-private {
-	color: #fff;
-	background-color: @status_color_private;
-}
-.btn-status-private:hover {
-	color: #fff;
-	background-color: @status_color_private_hover;
-}
-.btn-status-published {
-	color: #000;
-	background-color: @status_color_published;
-	.glyphicon {
-		color: inherit !important;
-	}
-}
-.btn-status-published:hover {
-	color: #000;
-	background-color: @status_color_published_hover;
-}
-.btn-status-deprecated {
-	color: #fff;
-	background-color: @status_color_deprecated;
-}
-.btn-status-deprecated:hover {
-	color: #fff;
-	background-color: @status_color_deprecated_hover;
-}
-.btn-status-redirected {
-	color: #fff;
-	background-color: @status_color_redirected;
-}
-.btn-status-redirected:hover {
-	color: #fff;
-	background-color: @status_color_redirected_hover;
-}
-.btn-status-trash {
-	color: #fff;
-	background-color: @status_color_trash;
-}
-.btn-status-trash:hover {
-	color: #fff;
-	background-color: @status_color_trash_hover;
-}
-
 // Fix label width on TinyMCE modal windows
 .mce-container label.mce-label {
 	max-width: none;
@@ -876,30 +756,42 @@ div.edit_toolbars, div.message_toolbars {
 }
 
 // User links widget
-.ufld_icon_links a {
-	display: inline-block;
-	text-decoration: none;
-	color: #FFF;
-	background: #ddd;
-	border-radius: 50%;
-	width: 40px;
-	height: 40px;
-	margin: 2px;
-	position: relative;
-	-webkit-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
-	-moz-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
-	-o-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
-	transition: border-radius 250ms ease-out, background-color 250ms ease-out;
-	&:hover {
-		.border-radius;
+.ufld_icon_links {
+	a {
+		display: inline-block;
+		text-decoration: none;
 		color: #FFF;
-		background: #23527c;
-		// TODO: use @variable name
+		background: #ddd;
+		border-radius: 50%;
+		width: 40px;
+		height: 40px;
+		margin: 2px;
+		position: relative;
+		-webkit-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
+		-moz-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
+		-o-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
+		transition: border-radius 250ms ease-out, background-color 250ms ease-out;
+		&:hover {
+			.border-radius;
+			color: #FFF;
+			background: #23527c;
+			// TODO: use @variable name
+		}
+		.fa {
+			font-size: 20px;
+			line-height: 40px;
+			display: block;
+		}
 	}
-	.fa {
-		font-size: 20px;
-		line-height: 40px;
-		display: block;
+	&.small {
+		a {
+			width: 20px;
+			height: 20px;
+			.fa {
+				font-size: 10px;
+				line-height: 20px;
+			}
+		}
 	}
 }
 
@@ -938,5 +830,23 @@ div.edit_toolbars, div.message_toolbars {
 		&.results {
 			margin-bottom: 20px;
 		}
+	}
+}
+
+@media (min-width: 768px) {
+	div.coll-dashboard-block-3 {
+		float: left;
+	}
+}
+
+@media (min-width: 992px) {
+	div.coll-dashboard-block-3 {
+		float: left;
+	}
+}
+
+@media (min-width: 1200px) {
+	div.coll-dashboard-block-3 {
+		float: right;
 	}
 }

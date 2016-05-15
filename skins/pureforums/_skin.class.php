@@ -17,6 +17,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class pureforums_Skin extends Skin
 {
+	/**
+	 * Skin version
+	 * @var string
+	 */
+	var $version = '6.7.0';
+
   /**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.
@@ -55,12 +61,6 @@ class pureforums_Skin extends Skin
 						array( 'square', T_('Original pictures with square corners') ) ),
 					'field_lines' => true,
 				),
-				'display_post_date' => array(
-					'label' => T_('Post date'),
-					'note' => T_('Display the date of each post'),
-					'defaultvalue' => 1,
-					'type' => 'checkbox',
-				),
 				'colorbox' => array(
 					'label' => T_('Colorbox Image Zoom'),
 					'note' => T_('Check to enable javascript zooming on images (using the colorbox script)'),
@@ -74,8 +74,8 @@ class pureforums_Skin extends Skin
 					'type' => 'checkbox',
 				),
 				'colorbox_vote_post_numbers' => array(
-					'label' => T_('Display Votes'),
-					'note' => T_('Check to display number of likes and dislikes'),
+					'label' => T_('Display Post Votes'),
+					'note' => T_('Check to display number of post likes and dislikes'),
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
 				),
@@ -86,8 +86,8 @@ class pureforums_Skin extends Skin
 					'type' => 'checkbox',
 				),
 				'colorbox_vote_comment_numbers' => array(
-					'label' => T_('Display Votes'),
-					'note' => T_('Check to display number of likes and dislikes'),
+					'label' => T_('Display Comment Votes'),
+					'note' => T_('Check to display number of comment likes and dislikes'),
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
 				),
@@ -448,6 +448,12 @@ class pureforums_Skin extends Skin
 					'customend'         => '</td></tr>',
 					'note_format'       => ' <span class="notes">%s</span>',
 				);
+
+			case 'cat_array_mode':
+				// What category level use to display the items on disp=posts:
+				//   - 'children' - Get items from current category and from all its sub-categories recirsively
+				//   - 'parent' - Get items ONLY from current category WITHOUT sub-categories
+				return 'parent';
 
 			default:
 				// Delegate to parent class:

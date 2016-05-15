@@ -115,13 +115,23 @@ while( $Item = & mainlist_get_item() )
 						'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
 					) );
 			}
-			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-			skin_include( '_item_content.inc.php', array(
-					'image_size' => 'fit-256x256',
+		?>
+
+		<?php
+			// ------------------------- "Item - Single" CONTAINER EMBEDDED HERE --------------------------
+			// Display container contents:
+			skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+					// The following (optional) params will be used as defaults for widgets included in this container:
+					// This will enclose each widget in a block:
+					'block_start' => '<div class="widget $wi_class$">',
+					'block_end' => '</div>',
+					// This will enclose the title of each widget:
+					'block_title_start' => '<h3>',
+					'block_title_end' => '</h3>',
+					// Params for skin file "_item_content.inc.php"
+					'widget_item_content_params' => array( 'image_size' => 'fit-256x256' ),
 				) );
-			// Note: You can customize the default item content by copying the generic
-			// /skins/_item_content.inc.php file into the current skin folder.
-			// -------------------------- END OF POST CONTENT -------------------------
+			// ----------------------------- END OF "Item - Single" CONTAINER -----------------------------
 		?>
 
 		<?php

@@ -118,6 +118,16 @@ form#user_checkchanges.bComment {
 		height: 9px;
 		margin: 0 3px 0 2px;
 	}
+	&.width_increase {
+		background-position: 0 -75px;
+		width: 32px;
+		height: 32px;
+	}
+	&.width_decrease {
+		background-position: -32px -75px;
+		width: 32px;
+		height: 32px;
+	}
 }
 
 .form_add_contacts .controls {
@@ -168,6 +178,7 @@ form#user_checkchanges.bComment {
 .forums_table .meta_category th,
 .forums_table thead th,
 .messages_list > h2 {
+	/* autoprefixer: off */
 	padding: 12px 20px;
 	background-color: #ECEDF3;
 	background-image: -webkit-linear-gradient(#F1F2F6, #E7E9F0);
@@ -259,6 +270,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
 	border-bottom: none;
 }
 .topics_table .table_title th {
+	/* autoprefixer: off */
 	text-align: left;
 	padding: 8px 25px 8px 20px;
 	color: #535c66;
@@ -293,6 +305,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
 }
 .topics_table tr.panel td, .topics_table tr.panel:hover td,
 .forums_table th.fieldset {
+	/* autoprefixer: off */
 	background-image: -webkit-linear-gradient(#f5f6fa, #e6e7f0);
 	background-image: -moz-linear-gradient(#f5f6fa, #e6e7f0);
 	background-image: linear-gradient(#f5f6fa, #e6e7f0);
@@ -329,6 +342,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
 	margin-top: 2px;
 }
 .navigation a, .navigation .current_page {
+	/* autoprefixer: off */
 	background-image: -webkit-linear-gradient(#d4d9e1, #bec4d1);
 	background-image: -moz-linear-gradient(#d4d9e1, #bec4d1);
 	background-image: linear-gradient(#d4d9e1, #bec4d1);
@@ -357,6 +371,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
 	border-bottom-right-radius: 3px;
 }
 .navigation a.prev, .navigation a.next {
+	/* autoprefixer: off */
 	background-image: -webkit-linear-gradient(#9fa3ac, #787d88);
 	background-image: -moz-linear-gradient(#9fa3ac, #787d88);
 	background-image: linear-gradient(#9fa3ac, #787d88);
@@ -392,6 +407,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
 	font-size: 15px;
 }
 .ft_search .search_submit {
+	/* autoprefixer: off */
 	display: inline-block;
 	border: 1px solid #666;
 	border-radius: 3px;
@@ -409,6 +425,7 @@ body.round_avatars .forums_table .ft_author_avatar img {
 	font-size: 15px;
 }
 .ft_search .search_submit:hover {
+	/* autoprefixer: off */
 	background-image: -webkit-linear-gradient(#787d88, #9fa3ac);
 	background-image: -moz-linear-gradient(#787d88, #9fa3ac);
 	background-image: linear-gradient(#787d88, #9fa3ac);
@@ -501,6 +518,7 @@ ul.legend span.note {
 	margin-bottom: 10px;
 }
 .breadcrumbs a {
+	/* autoprefixer: off */
 	position: relative;
 	display: inline-block;
 	padding: 0 12px;
@@ -521,6 +539,7 @@ ul.legend span.note {
 	border-top-left-radius: 3px;
 }
 .breadcrumbs a:last-child {
+	/* autoprefixer: off */
 	background-color: #848C9D;
 	background-image: -webkit-linear-gradient(#98A0AF, #70788C);
 	background-image: -moz-linear-gradient(#98A0AF, #70788C);
@@ -529,6 +548,7 @@ ul.legend span.note {
 	border-top-right-radius: 3px;
 }
 .breadcrumbs a:last-child:before {
+	/* autoprefixer: off */
 	content: "";
 	height: 20px;
 	margin-top: -10.5px;
@@ -636,6 +656,7 @@ div.results div.filters {
 	padding-left: 22px;
 }
 #edit_group_contacts {
+	/* autoprefixer: off */
 	background-image: -webkit-linear-gradient(#F1F2F6, #E7E9F0);
 	background-image: -moz-linear-gradient(#F1F2F6, #E7E9F0);
 	background-image: linear-gradient(#F1F2F6, #E7E9F0);

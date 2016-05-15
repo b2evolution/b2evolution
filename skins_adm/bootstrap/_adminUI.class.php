@@ -64,7 +64,7 @@ class AdminUI extends AdminUI_general
 		{	// Use minified CSS:
 			require_css( 'bootstrap-backoffice-b2evo_base.bmin.css', 'rsc_url' ); // Concatenation + Minifaction of the above
 		}
-		
+
 		// Make sure standard CSS is called ahead of custom CSS generated below:
 		if( $debug )
 		{	// Use readable CSS:
@@ -74,6 +74,9 @@ class AdminUI extends AdminUI_general
 		{	// Use minified CSS:
 			require_css( 'skins_adm/bootstrap/rsc/css/style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
 		}
+
+		// Load general JS file:
+		require_js( 'build/bootstrap-evo_backoffice.bmin.js', 'rsc_url' );
 
 		// Set bootstrap css classes for messages
 		$Messages->set_params( array(
@@ -170,8 +173,12 @@ class AdminUI extends AdminUI_general
 
 		parent::disp_payload_begin();
 
-		// Display info & error messages
-		$Messages->display();
+		if( $display_messages )
+		{ // Display info & error messages:
+			$Messages->display();
+			// Clear the messages to avoid double displaying:
+			$Messages->clear();
+		}
 
 		echo '<div class="container-fluid page-content">'."\n\t"
 				.'<div class="row">'."\n\t\t"
@@ -421,6 +428,18 @@ class AdminUI extends AdminUI_general
 						) );
 				}
 				return $results_template;
+
+			case 'compact_results':
+				// Compact Results list:
+				return array_merge( $this->get_template( 'Results' ), array(
+						'before'           => '<div class="results results_compact panel panel-default">',
+						'header_text'      => '',
+						'head_title'       => '',
+						'no_results_start' => '<div class="table_scroll">'."\n"
+								.'<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0"><tbody>'."\n\n",
+						'no_results_end'   => '<tr class="lastline noresults"><td class="firstcol lastcol">$no_results$</td></tr>'
+								.'</tbody></table></div>'."\n\n",
+					) );
 
 			case 'blockspan_form':
 				// Form settings for filter area:
@@ -782,7 +801,7 @@ class AdminUI extends AdminUI_general
 
 			$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
 
-			if( $l_Blog->get( 'favorite' ) || $l_blog_ID == $blog )
+			if( $l_Blog->favorite() || $l_blog_ID == $blog )
 			{ // If blog is favorute OR current blog, Add blog as a button:
 				$buttons .= $template[ $l_blog_ID == $blog ? 'beforeEachSel' : 'beforeEach' ];
 
@@ -806,7 +825,7 @@ class AdminUI extends AdminUI_general
 				}
 			}
 
-			if( !$l_Blog->get( 'favorite' ) )
+			if( !$l_Blog->favorite() )
 			{ // If blog is not favorute, Add it into the select list:
 				$not_favorite_blogs = true;
 				$select_options .= '<li>';

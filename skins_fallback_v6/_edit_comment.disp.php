@@ -119,7 +119,10 @@ $Form->begin_form( 'evo_comment' );
 		if( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) )
 		{
 			$Form->begin_fieldset( T_('Attachments'), array( 'id' => 'comment_attachments' ) );
-			display_attachments( $LinkOwner );
+			display_attachments( $LinkOwner, array(
+						'block_start' => '<div class="attachment_list results">',
+						'table_start' => '<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0" cellpadding="0">',
+					)  );
 			$Form->end_fieldset();
 		}
 		else

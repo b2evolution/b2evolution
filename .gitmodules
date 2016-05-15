@@ -1,0 +1,11 @@
+[submodule "skins/horizon_blog_skin"]
+	path = skins/horizon_blog_skin
+	url = https://github.com/b2evolution/horizon_blog_skin.git
+	fetchrecursesubmodules = true
+[submodule "skins/horizon_main_skin"]
+	path = skins/horizon_main_skin
+	url = https://github.com/b2evolution/horizon_main_skin.git
+	fetchrecursesubmodules = true
+[submodule "skins/clean1_skin"]
+	path = skins/clean1_skin
+	url = https://fplanque@github.com/b2evolution/clean1_skin.git

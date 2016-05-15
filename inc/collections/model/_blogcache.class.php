@@ -202,23 +202,46 @@ class BlogCache extends DataObjectCache
 	/**
 	 * Load a list of public blogs into the cache
 	 *
-	 * @param string
+	 * @param string Order By
+	 * @param string Order Direction
 	 * @return array of IDs
 	 */
 	function load_public( $order_by = '', $order_dir = '' )
 	{
-		global $DB, $Settings, $Debuglog;
+		global $DB, $Debuglog;
 
 		$Debuglog->add( "Loading <strong>$this->objtype(public)</strong> into cache", 'dataobjects' );
 
+		$SQL = $this->get_public_colls_SQL( $order_by, $order_dir );
+
+		foreach( $DB->get_results( $SQL->get(), OBJECT, 'Load public blog list' ) as $row )
+		{	// Instantiate a custom object
+			$this->instantiate( $row );
+		}
+
+		return $DB->get_col( NULL, 0 );
+	}
+
+
+	/**
+	 * Get SQL to load a list of public collections
+	 *
+	 * @param string Order By
+	 * @param string Order Direction
+	 * @return object SQL
+	 */
+	function get_public_colls_SQL( $order_by = '', $order_dir = '' )
+	{
+		global $Settings;
+
 		if( $order_by == '' )
-		{	// Use default value from settings
-			$order_by = $Settings->get('blogs_order_by');
+		{	// Use default value from settings:
+			$order_by = $Settings->get( 'blogs_order_by' );
 		}
 
 		if( $order_dir == '' )
-		{	// Use default value from settings
-			$order_dir = $Settings->get('blogs_order_dir');
+		{	// Use default value from settings:
+			$order_dir = $Settings->get( 'blogs_order_dir' );
 		}
 
 		$SQL = new SQL();
@@ -226,9 +249,9 @@ class BlogCache extends DataObjectCache
 		$SQL->FROM( $this->dbtablename );
 		$sql_where = 'blog_in_bloglist = "public"';
 		if( is_logged_in() )
-		{ // Allow the blogs that available for logged in users
+		{	// Allow the collections that available for logged in users:
 			$sql_where .= ' OR blog_in_bloglist = "logged"';
-			// Allow the blogs that available for members
+			// Allow the collections that available for members:
 			global $current_User;
 			$sql_where .= ' OR ( blog_in_bloglist = "member" AND (
 					( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND bloguser_user_ID = '.$current_User->ID.' ) OR
@@ -238,12 +261,7 @@ class BlogCache extends DataObjectCache
 		$SQL->WHERE( '( '.$sql_where.' )' );
 		$SQL->ORDER_BY( gen_order_clause( $order_by, $order_dir, 'blog_', 'blog_ID' ) );
 
-		foreach( $DB->get_results( $SQL->get(), OBJECT, 'Load public blog list' ) as $row )
-		{	// Instantiate a custom object
-			$this->instantiate( $row );
-		}
-
-		return $DB->get_col( NULL, 0 );
+		return $SQL;
 	}
 
 
@@ -288,12 +306,16 @@ class BlogCache extends DataObjectCache
 	/**
 	 * Load blogs a user has permissions for.
 	 *
-	 * @param string permission: 'member' (default), 'browse' (files)
-	 * @param string
-	 * @param integer user ID
+	 * @param string Permission name: 'member' (default), 'browse' (files)
+	 * @param string Permission level: 'view', 'edit'
+	 * @param integer User ID
+	 * @param string Order by
+	 * @param string Order direction
+	 * @param integer Limit
+	 * @param string Filter: 'favorite' - to get only favorite collections for current user
 	 * @return array The blog IDs
 	 */
-	function load_user_blogs( $permname = 'blog_ismember', $permlevel = 'view', $user_ID = NULL, $order_by = '', $order_dir = '', $limit = NULL )
+	function load_user_blogs( $permname = 'blog_ismember', $permlevel = 'view', $user_ID = NULL, $order_by = '', $order_dir = '', $limit = NULL, $filter = NULL )
 	{
 		global $DB, $Settings, $Debuglog;
 
@@ -322,24 +344,48 @@ class BlogCache extends DataObjectCache
 		}
 		$for_User->get_Group();// ensure Group is set
 
+		if( $filter == 'favorite' )
+		{	// Get only favorite collections of the user:
+			$sql_filter = 'INNER JOIN T_coll_user_favs
+				 ON cufv_blog_ID = blog_ID
+				AND cufv_user_ID = '.$DB->quote( $user_ID );
+		}
+
 		$Group = $for_User->Group;
 		// First check if we have a global access perm:
- 		if( $Group->check_perm( 'blogs', $permlevel ) )
+		if( $Group->check_perm( 'blogs', $permlevel ) ||
+		    ( $permname == 'blog_media_browse' && $Group->check_perm( 'files', 'edit' ) ) )
 		{ // If group grants a global permission:
-			$this->load_all( $order_by, $order_dir );
+			$this->clear();
+			if( isset( $sql_filter ) )
+			{	// Filter collections:
+				$blog_SQL = $this->get_SQL_object();
+				$blog_SQL->FROM_add( $sql_filter );
+				$this->load_by_sql( $blog_SQL );
+			}
+			else
+			{	// Get all collections:
+				$this->load_all( $order_by, $order_dir );
+			}
 			return $this->get_ID_array();
 		}
 
 		// Note: We only JOIN in the advanced perms if any given blog has them enabled,
 		// otherwise they are ignored!
-		$sql = "SELECT DISTINCT T_blogs.*
+		$sql = 'SELECT DISTINCT T_blogs.*
 		          FROM T_blogs LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0
 		          																				AND blog_ID = bloguser_blog_ID
-		          																				AND bloguser_user_ID = {$user_ID} )
+		          																				AND bloguser_user_ID = '.$user_ID.' )
 		          		 LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0
 		          																	AND blog_ID = bloggroup_blog_ID
-		          																	AND bloggroup_group_ID = {$Group->ID} )
-		         WHERE ";
+		          																	AND bloggroup_group_ID = '.$Group->ID.' )';
+
+		if( isset( $sql_filter ) )
+		{	// Filter collections:
+			$sql .= $sql_filter;
+		}
+
+		$sql .= ' WHERE ';
 
 		if( $permname != 'blog_admin' )
 		{	// Only the admin perm is not convered by being the owner of the blog:

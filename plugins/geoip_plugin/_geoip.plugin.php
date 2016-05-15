@@ -79,15 +79,14 @@ class geoip_plugin extends Plugin
 
 
 	/**
-	 * Get the settings that the plugin can use.
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
 	 *
-	 * Those settings are transfered into a Settings member object of the plugin
-	 * and can be edited in the backoffice (Settings / Plugins).
-	 *
-	 * @see Plugin::GetDefaultSettings()
-	 * @see PluginSettings
-	 * @see Plugin::PluginSettingsValidateSet()
-	 * @return array
+	 * @param array Associative array of parameters (since v1.9).
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
+	 * @return array see {@link Plugin::GetDefaultSettings()}.
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
+	 * and assign an array with the following keys to them (only 'label' is required):
 	 */
 	function GetDefaultSettings( & $params )
 	{
@@ -99,9 +98,9 @@ class geoip_plugin extends Plugin
 		}
 		else
 		{
-			$datfile_info = '<span class="error">'.T_('Not found').'</span>';
+			$datfile_info = '<span class="error text-danger">'.T_('Not found').'</span>';
 		}
-		$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip">'.T_('Download update now!').'</a>';
+		$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip" class="btn btn-xs btn-warning">'.T_('Download update now!').'</a>';
 
 		return array(
 			'datfile' => array(
@@ -186,12 +185,12 @@ class geoip_plugin extends Plugin
 		$user_update_sql = '';
 		if( $this->Settings->get( 'force_account_creation' ) )
 		{	// Force country to the country detected by GeoIP
-			$user_update_sql = ', user_ctry_ID = '.$DB->quote( $Country->ID );
+			$User->set( 'ctry_ID', $Country->ID );
 		}
-		$DB->query( 'UPDATE T_users
-				  SET user_reg_ctry_ID = '.$DB->quote( $Country->ID ).
-				  $user_update_sql.'
-				WHERE user_ID = '.$DB->quote( $User->ID ) );
+
+		// Update user registration country
+		$User->set( 'reg_ctry_ID', $Country->ID );
+		$User->dbupdate();
 
 		// Move user to suspect group by Country ID
 		antispam_suspect_user_by_country( $Country->ID, $User->ID );
@@ -526,7 +525,7 @@ jQuery( document ).ready( function()
 	 *
 	 * @see Plugin::AdminToolPayload()
 	 */
-	function AdminToolPayload( $params )
+	function AdminToolPayload()
 	{
 		$action = param_action();
 
@@ -687,9 +686,24 @@ jQuery( document ).ready( function()
 				echo '<p>'.T_('This tool finds all users that do not have a registration country yet and then assigns them a registration country based on their registration IP.').
 						   get_manual_link('geoip-plugin').'</p>';
 
+				echo '<p>';
 				$Form->button( array(
 						'value' => T_('Find Registration Country for all Users NOW!')
 					) );
+				echo '</p>';
+
+				global $admin_url;
+				if( file_exists( $this->geoip_file_path ) )
+				{
+					$datfile_info = sprintf( T_('Last updated on %s'), date( locale_datefmt().' '.locale_timefmt(), filemtime( $this->geoip_file_path ) ) );
+				}
+				else
+				{
+					$datfile_info = '<span class="error text-danger">'.T_('Not found').'</span>';
+				}
+				$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip" class="btn btn-warning">'.T_('Download update now!').'</a>';
+				echo '<p><b>GeoIP.dat:</b> '.$datfile_info.'</p>';
+
 
 				if( !empty( $this->text_from_AdminTabAction ) )
 				{	// Display a report of executed action
@@ -805,8 +819,8 @@ jQuery( document ).ready( function()
 
 			if( antispam_block_by_country( $Country->ID, false ) )
 			{ // Block the action if the country is blocked
-				$debug_message = sprintf( 'A request with [ %s ] ip addresses was blocked because of \'%s\' is blocked.', implode( ', ', $request_ip_list ), $Country->get_name() );
-				exit_blocked_request( 'Country', $debug_message, 'plugin', $this->ID ); // WILL exit();
+				$log_message = sprintf( 'A request with [ %s ] ip addresses was blocked because of \'%s\' is blocked.', implode( ', ', $request_ip_list ), $Country->get_name() );
+				exit_blocked_request( 'Country', $log_message, 'plugin', $this->ID ); // WILL exit();
 			}
 		}
 	}

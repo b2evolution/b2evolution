@@ -79,7 +79,6 @@ class videoplug_plugin extends Plugin
 	}
 
 
-
 	/**
 	 * Perform rendering for XML feeds
 	 *
@@ -89,6 +88,7 @@ class videoplug_plugin extends Plugin
 	{
 		return $this->RenderItemAsHtml( $params );
 	}
+
 
 	/**
 	 * Event handler: Called when displaying editor toolbars on post/item form.
@@ -122,6 +122,42 @@ class videoplug_plugin extends Plugin
 		}
 
 		return $this->DisplayCodeToolbar();
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for message.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayMessageToolbar( & $params )
+	{
+		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{
+			return $this->DisplayCodeToolbar();
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{
+			return $this->DisplayCodeToolbar();
+		}
+
+		return false;
 	}
 
 

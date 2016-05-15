@@ -144,7 +144,7 @@ class Form extends Widget
 	 * @param string the form layout : 'fieldset', 'table' or '' (NULL means: if there is an {@link $AdminUI} object get it from there, otherwise use 'fieldset')
 	 * @param string Form encoding ("application/x-www-form-urlencoded" (default), "multipart/form-data" (uploads))
 	 */
-	function Form( $form_action = NULL, $form_name = '', $form_method = 'post', $layout = NULL, $enctype = '', $form_type = 'form' )
+	function __construct( $form_action = NULL, $form_name = '', $form_method = 'post', $layout = NULL, $enctype = '', $form_type = 'form' )
 	{
 		global $pagenow;
 
@@ -490,54 +490,6 @@ class Form extends Widget
 					$this->radio_oneline_end      = '';
 					break;
 
-				case 'chicago':		// Temporary dirty hack
-					$this->formclass      = '';
-					$this->formstart      = '<div>';// required before (no_)title_fmt for validation
-					$this->title_fmt      = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
-					$this->no_title_fmt   = '<span style="float:right">$global_icons$</span>'."\n";
-					$this->no_title_no_icons_fmt = "\n";
-					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
-																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
-					$this->fieldset_end   = '</fieldset>'."\n";
-					$this->fieldstart     = '<fieldset$ID$>'."\n";
-					$this->labelstart     = '<div class="label">';
-					$this->labelend       = "</div>\n";
-					$this->labelempty     = '<div class="label"></div>'; // so that IE6 aligns DIV.input correcctly
-					$this->inputstart     = '<div class="input">';
-					$this->inputend       = "</div>\n";
-					$this->infostart      = '<div class="info">';
-					$this->infoend        = "</div>\n";
-					$this->fieldend       = "</fieldset>\n\n";
-					$this->buttonsstart   = '<fieldset><div class="label"></div><div class="input">'; // DIV.label for IE6
-					$this->buttonsend     = "</div></fieldset>\n\n";
-					$this->customstart    = '<div class="custom_content">';
-					$this->customend      = "</div>\n";
-					$this->note_format    = ' <span class="notes">%s</span>';
-					$this->formend        = '</div>';
-					// Additional params depending on field type:
-					// - checkbox
-					$this->fieldstart_checkbox    = $this->fieldstart;
-					$this->fieldend_checkbox      = $this->fieldend;
-					$this->inputclass_checkbox    = 'checkbox';
-					$this->inputstart_checkbox    = $this->inputstart;
-					$this->inputend_checkbox      = $this->inputend;
-					$this->checkbox_newline_start = '';
-					$this->checkbox_newline_end   = "<br />\n";
-					$this->checkbox_basic_start   = '<label>';
-					$this->checkbox_basic_end     = '</label>';
-					// - radio
-					$this->fieldstart_radio       = $this->fieldstart;
-					$this->fieldend_radio         = $this->fieldend;
-					$this->inputclass_radio       = 'radio';
-					$this->inputstart_radio       = $this->inputstart;
-					$this->inputend_radio         = $this->inputend;
-					$this->radio_label_format     = '<label class="radiooption" for="$radio_option_ID$">$radio_option_label$</label>';
-					$this->radio_newline_start    = "<div>\n";
-					$this->radio_newline_end      = "</div>\n";
-					$this->radio_oneline_start    = '';
-					$this->radio_oneline_end      = '';
-					break;
-
 				case 'linespan':
 					$this->formclass      = '';
 					$this->formstart      = '';
@@ -737,7 +689,7 @@ class Form extends Widget
 	 * @param string Field type
 	 * @return The generated HTML
 	 */
-	function begin_field( $field_name = NULL, $field_label = NULL, $reset_common_params = false, $type = NULL )
+	function begin_field( $field_name = NULL, $field_label = NULL, $reset_common_params = false, $type = '' )
 	{
 		if( $reset_common_params )
 		{
@@ -810,13 +762,22 @@ class Form extends Widget
 
 		$r .= $this->get_label();
 
-		if( isset( $this->{'inputstart_'.$type} ) )
-		{ // Use special input start for element with type
+		if( $type == 'info' )
+		{ // Use info start:
+			$r .= $this->infostart;
+		}
+		elseif( isset( $this->{'inputstart_'.$type} ) )
+		{ // Use special input start for element with type:
 			$r .= $this->{'inputstart_'.$type};
 		}
 		else
-		{ // Use default input start
+		{ // Use default input start:
 			$r .= $this->inputstart;
+		}
+
+		if( isset( $this->_common_params['input_prefix'] ) )
+		{
+			$r .= $this->_common_params['input_prefix'];
 		}
 
 		return $r;
@@ -837,6 +798,10 @@ class Form extends Widget
 
 		if( !empty($this->_common_params['note']) )
 		{ // We have a note
+			if( ! empty( $this->is_lined_fields ) )
+			{ // Fix note format for fields that are used in one line
+				$this->_common_params['note_format'] = str_replace( 'class="', 'class="oneline ', $this->_common_params['note_format'] );
+			}
 			$r .= sprintf( $this->_common_params['note_format'], $this->_common_params['note'] );
 		}
 
@@ -845,12 +810,16 @@ class Form extends Widget
 			$r .= $this->_common_params['field_suffix'];
 		}
 
-		if( isset( $this->{'inputend_'.$type} ) )
-		{ // Use special input end for element with type
+		if( $type == 'info' )
+		{ // Use info end:
+			$r .= $this->infoend;
+		}
+		elseif( isset( $this->{'inputend_'.$type} ) )
+		{ // Use special input end for element with type:
 			$r .= $this->{'inputend_'.$type};
 		}
 		else
-		{ // Use default input end
+		{ // Use default input end:
 			$r .= $this->inputend;
 		}
 
@@ -1186,14 +1155,12 @@ class Form extends Widget
 	 * @param string class of the input field. Class name "only_assignees" provides to load only assignee users of the blog
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function username( $field_name, &$User, $field_label, $field_note = '', $field_class = '' )
+	function username( $field_name, &$User, $field_label, $field_note = '', $field_class = '', $field_params = array() )
 	{
-		$field_params = array();
-
-		if( !empty($field_note) )
-		{
-			$field_params['note'] = $field_note;
-		}
+		$field_params = array_merge( array(
+				'note' => $field_note,
+				'size' => 20,
+			), $field_params );
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
@@ -1201,7 +1168,7 @@ class Form extends Widget
 
 		$user_login = empty( $User ) ? '' : $User->login;
 
-		$r .= '<input type="text" class="form_text_input form-control autocomplete_login '.$field_class.'" value="'.$user_login.'" name="'.$field_name.'" id="'.$field_name.'" />';
+		$r .= '<input type="text" class="form_text_input form-control autocomplete_login '.$field_class.'" value="'.$user_login.'" name="'.$field_name.'" id="'.$field_name.'" size="'.$field_params['size'].'" />';
 
 		$r .= $this->end_field();
 
@@ -2070,7 +2037,8 @@ class Form extends Widget
 	 *  - "effective value": a boolean indicating whether the box should be checked or not on display
 	 *  - an optional boolean indicating whether the box is disabled or not
 	 *  - an optional note
-	 *  - 'required': is the box required to be checked (boolean; default: false)
+	 *  - an optional class (html attribute)
+	 *  - an optional boolean TRUE - to print out an option as hidden field instead of checkbox
 	 *
 	 * @todo Transform to $field_params schema.
 	 * @param array a two-dimensional array containing the parameters of the input tag
@@ -2094,20 +2062,27 @@ class Form extends Widget
 
 		$r = $this->begin_field( $field_name, $field_label );
 
-		$r .= $field_params['input_prefix'];
-
 		foreach( $options as $option )
 		{ //loop to construct the list of 'input' tags
+
+			$loop_field_name = $option[0];
+
+			if( ! empty( $option[7] ) )
+			{	// Print out this checkbox as hidden field:
+				if( $option[3] )
+				{	// Only if it is checked:
+					$this->hidden( $loop_field_name, 1 );
+				}
+				continue;
+			}
 
 			// Start of checkbox option for multi line format
 			$r .= $this->checkbox_newline_start;
 
-			$loop_field_name = $option[0];
-
-			$loop_field_note = isset($option[5]) ? $option[5] : '';
+			$loop_field_note = empty( $option[5] ) ? '' : $option[5];
 
 			// asimo>> add id for label: id = label_for_fieldname_fieldvalue
-			$r .= '<label'.( isset( $option[6] ) ? ' class="'.$option[6].'"' : '' ).' id="label_for_'.$loop_field_name.'_'.$option[1].'">';
+			$r .= '<label'.( empty( $option[6] ) ? '' : ' class="'.$option[6].'"' ).' id="label_for_'.$loop_field_name.'_'.$option[1].'">';
 
 			if( $add_highlight_spans )
 			{ // Need it to highlight checkbox for check_all and uncheck_all mouseover
@@ -2528,6 +2503,12 @@ class Form extends Widget
 
 		foreach( $field_options as $l_key => $l_option )
 		{
+			if( is_array( $l_option ) )
+			{	// If option is array then it is a group of the options:
+				$r .= Form::get_select_group_options_string( array( $l_key => $l_option ), $field_value, $force_keys_as_values, $color_array );
+				continue;
+			}
+
 			// Get the value attribute from key if is_string():
 			$l_value = ($force_keys_as_values || is_string($l_key)) ? $l_key : $l_option;
 
@@ -2549,6 +2530,30 @@ class Form extends Widget
 
 			$r .= '>'.format_to_output($l_option).'</option>';
 		}
+		return $r;
+	}
+
+
+	/**
+	 * Get the grouped OPTION list as string for use in a SELECT.
+	 *
+	 * @param array Groups ( title => array( Options (key => value) )
+	 * @param string Selected value (if any)
+	 * @param boolean Force keys from $options as values? (Default: false, only array keys,
+	 *                which are strings will be used).
+	 * @return string
+	 */
+	static function get_select_group_options_string( $group_options, $field_value = NULL, $force_keys_as_values = false, $color_array = false )
+	{
+		$r = '';
+
+		foreach( $group_options as $group_title => $group_options )
+		{
+			$r .= '<optgroup label="'.format_to_output( $group_title, 'htmlattr' ).'">';
+			$r .= Form::get_select_options_string( $group_options, $field_value, $force_keys_as_values, $color_array );
+			$r .= '</optgroup>';
+		}
+
 		return $r;
 	}
 
@@ -3421,6 +3426,8 @@ class Form extends Widget
 	/**
 	 * Builds an interval input fields.
 	 *
+	 * @deprecated Use $Form->begin_line(); ... $Form->end_line(); instead.
+	 *
 	 * @param string The name of the input field "From". This gets used for id also, if no id given in $field_params.
 	 * @param string Initial value "From"
 	 * @param string The name of the input field "To". This gets used for id also, if no id given in $field_params.
@@ -3607,6 +3614,11 @@ class Form extends Widget
 			unset( $field_params['inline'] );
 		}
 
+		if( isset( $field_params['hide_label'] ) )
+		{ // Delete 'hide_label' param from attributes list
+			unset( $field_params['hide_label'] );
+		}
+
 		if( isset( $field_params['input_required'] ) )
 		{ // Set html attribute "required" (used to highlight input with red border/shadow by bootstrap)
 			$field_params['required'] = $field_params['input_required'];
@@ -3736,6 +3748,11 @@ class Form extends Widget
 	{
 		$r = '';
 
+		if( isset( $this->_common_params['hide_label'] ) && $this->_common_params['hide_label'] )
+		{ // Hide label if it is required by param
+			return $r;
+		}
+
 		$label = $this->_common_params['label'];
 
 		if( strlen($label) )
@@ -3754,14 +3771,17 @@ class Form extends Widget
 			}
 			else
 			{
-				$r .= '<label'
-					.( ! empty( $this->labelclass )
-						? ' class="'.format_to_output( $this->labelclass, 'htmlattr' ).'"'
-						: '' )
-					.( ! empty( $this->_common_params['id'] )
-						? ' for="'.format_to_output( $this->_common_params['id'], 'htmlattr' ).'"'
-						: '' )
-					.'>';
+				if( empty( $this->is_lined_fields ) )
+				{ // Don't print a label tag for "lined" mode:
+					$r .= '<label'
+						.( ! empty( $this->labelclass )
+							? ' class="'.format_to_output( $this->labelclass, 'htmlattr' ).'"'
+							: '' )
+						.( ! empty( $this->_common_params['id'] )
+							? ' for="'.format_to_output( $this->_common_params['id'], 'htmlattr' ).'"'
+							: '' )
+						.'>';
+				}
 
 					if( ! empty( $this->_common_params['required'] ) )
 					{
@@ -3770,9 +3790,12 @@ class Form extends Widget
 
 					$r .= format_to_output($label, 'htmlbody');
 
-				$r .= $this->label_suffix;
+				if( empty( $this->is_lined_fields ) )
+				{ // Don't print a label tag and suffix for "lined" mode:
+					$r .= $this->label_suffix;
 
-				$r .= '</label>';
+					$r .= '</label>';
+				}
 			}
 
 			$r .= $this->labelend;
@@ -3868,6 +3891,12 @@ class Form extends Widget
 			unset( $field_params['field_suffix'] );
 		}
 
+		if( isset($field_params['input_prefix']) )
+		{
+			$this->_common_params['input_prefix'] = $field_params['input_prefix'];
+			unset( $field_params['input_prefix'] );
+		}
+
 		if( isset($field_params['required']) )
 		{
 			$this->_common_params['required'] = $field_params['required'];
@@ -3926,7 +3955,10 @@ class Form extends Widget
 
 			if( $this->disp_param_err_messages_with_fields )
 			{
-				$this->_common_params['note'] .= ' <span class="field_error">'.param_get_error_msg( $field_params['name'] ).'</span>';
+				$this->_common_params['note'] .= ' <span class="field_error"'
+						.' rel="'.$field_params['name'].'"'.'>'// May be used by JS, for example, to display errors in tooltip on bootstrap skins
+						.param_get_error_msg( $field_params['name'] )
+					.'</span>';
 			}
 		}
 
@@ -3940,6 +3972,12 @@ class Form extends Widget
 		{
 			$this->_common_params['inline'] = $field_params['inline'];
 			unset( $field_params['inline'] );
+		}
+
+		if( isset( $field_params['hide_label'] ) && $field_params['hide_label'] )
+		{
+			$this->_common_params['hide_label'] = $field_params['hide_label'];
+			unset( $field_params['hide_label'] );
 		}
 
 		#pre_dump( 'handle_common_params (after)', $field_params );
@@ -3980,6 +4018,55 @@ class Form extends Widget
 		return $this->display_or_return( $r );
 	}
 
+
+	/**
+	 * Begin line for several fields
+	 * Used to keep many fields on one line
+	 *
+	 * @param string Field title
+	 * @param string Field name (Used for attribute "for" af the label tag)
+	 * @param string Field type
+	 * @param array Params
+	 */
+	function begin_line( $field_label = NULL, $field_name = NULL, $field_type = '', $field_params = array() )
+	{
+		$this->handle_common_params( $field_params, $field_name, $field_label );
+
+		echo $this->begin_field( $field_name, $field_label, false, $field_type );
+
+		// Switch layout to keep all fields in one line:
+		$this->switch_layout( 'none' );
+
+		// Set TRUE to mark all calls of the next fields as lined:
+		$this->is_lined_fields = true;
+	}
+
+
+	/**
+	 * End line of several fields
+	 *
+	 * @param string Suffix
+	 * @param string Field type
+	 * @param array Params
+	 */
+	function end_line( $suffix_text = NULL, $field_type = '', $field_params = array() )
+	{
+		$this->handle_common_params( $field_params );
+
+		if( !is_null( $suffix_text ) )
+		{ // Display a suffix:
+			echo $suffix_text;
+		}
+
+		// Stop "lined" mode:
+		$this->is_lined_fields = false;
+
+		// Switch layout back:
+		$this->switch_layout( NULL );
+
+		// End field:
+		echo $this->end_field( $field_type );
+	}
 }
 
 ?>

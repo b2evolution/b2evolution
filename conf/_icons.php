@@ -398,6 +398,14 @@ function get_icon_info( $name )
 			'glyph' => 'user',
 			'fa' => 'users'
 		);
+		case 'user': return array(
+			'rollover' => true,
+			'alt' => T_('User'),
+			'size' => array( 0 ,0 ),
+			'xy' => array( 0, 0 ),
+			'glyph' => 'user',
+			'fa' => 'user'
+		);
 		case 'copy': return array(
 			'alt'  => T_('Copy'),
 			'size' => array( 14, 15 ),
@@ -533,6 +541,13 @@ function get_icon_info( $name )
 			'xy' => array( 32, 192 ),
 			'fa' => 'circle',
 			'color' => '#00F'
+		);
+		case 'bullet_light_blue': return array(
+			'alt'  => '&bull;',
+			'size' => array( 9, 9 ),
+			'xy' => array( 32, 192 ),
+			'fa' => 'circle',
+			'color' => '#5bc0de'
 		);
 		case 'bullet_red': return array(
 			'alt'  => '&bull;',
@@ -1011,7 +1026,8 @@ function get_icon_info( $name )
 			'size' => array( 16, 16 ),
 			'xy' => array( 32, 224 ),
 			'glyph' => 'plus-sign',
-			'fa' => 'plus-circle'
+			'fa' => 'plus-circle',
+			'color' => '#0C0'
 		);
 		case 'minus': return array(
 			'alt'  => T_('Remove'),
@@ -1060,18 +1076,6 @@ function get_icon_info( $name )
 			'xy' => array( 16, 0 ),
 			'glyph' => 'envelope',
 			'fa' => 'envelope-square'
-		);
-
-		// Width switcher tool:
-		case 'width_increase': return array(
-			'alt'  => T_('Increase width'),
-			'size' => array( 32, 32 ),
-			'xy' => array( 0, 240 )
-		);
-		case 'width_decrease': return array(
-			'alt'  => T_('Decrease width'),
-			'size' => array( 32, 32 ),
-			'xy' => array( 32, 240 )
 		);
 
 		case 'post': return array(

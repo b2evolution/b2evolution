@@ -104,6 +104,9 @@ if( !$Messages->has_errors() )
 { // no errors
 	switch( $action )
 	{
+
+		/*
+		 * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
 		case 'change_admin_skin':
 			// Skin switch from menu
 			param( 'new_admin_skin', 'string', true );
@@ -114,8 +117,9 @@ if( !$Messages->has_errors() )
 			$Messages->add( sprintf( T_('Admin skin changed to &laquo;%s&raquo;'), $new_admin_skin ), 'success' );
 
 			header_redirect();
-			/* EXITED */
+			// EXITED
 			break;
+		*/
 
 		case 'promote':
 			param( 'prom', 'string', true );
@@ -172,18 +176,21 @@ if( !$Messages->has_errors() )
 			}
 
 			// Init cascade relations: If we delete user as spammer we also should remove the comments and the messages
-			$edited_User->init_relations( param( 'deltype', 'string', '', true ) == 'spammer' );
+			$is_spammer = ( param( 'deltype', 'string', '', true ) == 'spammer' );
+			$edited_User->init_relations( $is_spammer );
 
 			$fullname = $edited_User->dget( 'fullname' );
 			if( param( 'confirm', 'integer', 0 ) )
 			{ // confirmed, Delete from DB:
 				if ( ! empty( $fullname ) )
 				{
-					$msg = sprintf( T_('User &laquo;%s&raquo; [%s] deleted.'), $fullname, $edited_User->dget( 'login' ) );
+					$msg_format = $is_spammer ? T_('Spammer &laquo;%s&raquo; [%s] deleted.') : T_('User &laquo;%s&raquo; [%s] deleted.');
+					$msg = sprintf( $msg_format, $fullname, $edited_User->dget( 'login' ) );
 				}
 				else
 				{
-					$msg = sprintf( T_('User &laquo;%s&raquo; deleted.'), $edited_User->dget( 'login' ) );
+					$msg_format = $is_spammer ? T_('Spammer &laquo;%s&raquo; deleted.') : T_('User &laquo;%s&raquo; deleted.');
+					$msg = sprintf( $msg_format, $edited_User->dget( 'login' ) );
 				}
 
 				$send_reportpm = param( 'send_reportpm', 'integer', 0 );
@@ -201,6 +208,7 @@ if( !$Messages->has_errors() )
 					unset( $edited_User );
 					forget_param( 'user_ID' );
 					$Messages->add( $msg, 'success' );
+					syslog_insert( sprintf( 'User %s was deleted.', '[['.$deleted_user_login.']]' ), 'info', 'user', $deleted_user_ID );
 
 					// Find other users with the same email address:
 					$message_same_email_users = find_users_with_same_email( $deleted_user_ID, $deleted_user_email, T_('Note: the same email address (%s) is still in use by: %s') );
@@ -237,7 +245,7 @@ if( !$Messages->has_errors() )
 					$msg = sprintf( T_('Cannot delete User &laquo;%s&raquo;'), $edited_User->dget( 'login' ) );
 				}
 
-				if( ! $edited_User->check_delete( $msg ) )
+				if( ! $edited_User->check_delete( $msg, array(), true ) )
 				{ // There are restrictions:
 					$action = 'view';
 				}
@@ -363,6 +371,14 @@ if( !$Messages->has_errors() )
 			header_redirect( $admin_url.'?ctrl=user&user_tab=activity&user_ID='.$edited_User->ID );
 			/* EXITED */
 			break;
+
+		case 'newsletter':
+			// This is a redirect from email campaign controller to select the recipients:
+
+			$current_User->check_perm( 'emails', 'edit', true );
+
+			$Messages->add( T_('Please select new recipients for this email campaign.'), 'success' );
+			break;
 	}
 }
 
@@ -425,20 +441,22 @@ switch( $action )
 
 		// We need to ask for confirmation:
 		$fullname = $edited_User->dget( 'fullname' );
-		if ( ! empty( $fullname ) )
-		{
-			$msg = sprintf( T_('Delete user &laquo;%s&raquo; [%s]?'), $fullname, $edited_User->dget( 'login' ) );
-		}
-		else
-		{
-			$msg = sprintf( T_('Delete user &laquo;%s&raquo;?'), $edited_User->dget( 'login' ) );
-		}
+		$del_user_name = empty( $fullname ) ? $edited_User->dget( 'login' ) : '"'.$fullname.'" ['.$edited_User->dget( 'login' ).']';
+		$msg = ( $deltype == 'spammer' ) ? T_('Delete SPAMMER %s?') : T_('Delete user %s?');
+		$msg = sprintf( $msg, $del_user_name );
 
 		$confirm_messages = array();
-		if( $deltype != 'spammer' )
-		{ // Display this note for standard deleting
-			$confirm_messages[] = array( T_('Note: this will not automatically delete private messages sent/received by this user. However, this will delete any new orphan private messages (which no longer have any existing sender or recipient).'), 'note' );
-			$confirm_messages[] = array( T_('Note: this will not delete comments made by this user. Instead it will transform them from member to visitor comments.'), 'note' );
+		if( $deltype == 'spammer' )
+		{	// Display the notes for spammer deleting:
+			$confirm_messages[] = array( T_('Note: this will also delete private messages sent/received by this user.'), 'note' );
+			$confirm_messages[] = array( T_('Note: this will also delete comments made by this user.'), 'note' );
+			$confirm_messages[] = array( T_('Note: this will also delete files uploaded by this user.'), 'note' );
+		}
+		else
+		{	// Display the notes for standard deleting:
+			$confirm_messages[] = array( T_('Note: this will <b>not</b> automatically delete private messages sent/received by this user. However, this will delete any new orphan private messages (which no longer have any existing sender or recipient).'), 'note' );
+			$confirm_messages[] = array( T_('Note: this will <b>not</b> delete comments made by this user. Instead it will transform them from member to visitor comments.'), 'note' );
+			$confirm_messages[] = array( T_('Note: this will <b>not</b> delete files uploaded by this user outside of the user root. Instead the creator ID of these files will be set to NULL.'), 'note' );
 		}
 
 		// Find other users with the same email address

@@ -20,8 +20,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $Settings;
 
-global $upload_maxmaxkb;
-
 /**
  * Javascript to init hidden/shown state of something (like a DIV) based on a checkbox
  *
@@ -164,7 +162,19 @@ $Form->begin_fieldset( T_('File creation options'), array( 'id' => 'ffset_filecr
 	$Form->checkbox( 'fm_enable_create_file', $Settings->get('fm_enable_create_file'), T_('Enable creation of files'), T_('Check to enable creation of files.' ) );
 	$Form->checkbox_input( 'upload_enabled', $Settings->get( 'upload_enabled', true ), T_('Enable upload of files'), array(
 		'note' => T_('Check to allow uploading files in general.' ), 'onclick' => JS_showhide_ffield_on_this('upload_maxkb') ) );
-	$Form->text_input( 'upload_maxkb', $Settings->get('upload_maxkb'), 6, T_('Maximum upload filesize'), sprintf( /* TRANS: first %s is php.ini limit, second is setting/var name, third is file name, 4th is limit in b2evo conf */ T_('KB. This cannot be higher than your PHP/Webserver setting (PHP: %s) and the limit of %s (in %s), which is currently %s!'), ini_get('upload_max_filesize').'/'.ini_get('post_max_size').' (upload_max_filesize/post_max_size)', '$upload_maxmaxkb', '/conf/_advanced.php', $upload_maxmaxkb.' '.T_('KB') ), array( 'maxlength'=>7, 'required'=>true ) );
+
+	load_funcs( 'tools/model/_system.funcs.php' );
+	$upload_max_filesize = get_php_bytes_size( ini_get( 'upload_max_filesize' ) );
+	$post_max_size = get_php_bytes_size( ini_get( 'post_max_size' ) );
+	$upload_maxkb = $Settings->get( 'upload_maxkb' ) * 1024;
+	$upload_maxkb_before_note = $upload_maxkb_after_note = '';
+	if( $upload_maxkb > $upload_max_filesize || $upload_maxkb > $post_max_size )
+	{ // Mark field with red when it is higher than system max sizes:
+		param_error( 'upload_maxkb', '' );
+		$upload_maxkb_before_note = '<span class="red">';
+		$upload_maxkb_after_note = '</span>';
+	}
+	$Form->text_input( 'upload_maxkb', $Settings->get('upload_maxkb'), 6, T_('Maximum upload filesize'), $upload_maxkb_before_note.sprintf( /* TRANS: first %s is php.ini limit, second is setting/var name, third is file name, 4th is limit in b2evo conf */ T_('KB. This cannot be higher than your PHP/Webserver setting (PHP: %s)!'), ini_get('upload_max_filesize').'/'.ini_get('post_max_size').' (upload_max_filesize/post_max_size)' ).$upload_maxkb_after_note, array( 'maxlength'=>7, 'required'=>true ) );
 	// Javascript to init hidden/shown state:
 	echo JS_showhide_ffield_on_checkbox( 'upload_maxkb', 'upload_enabled' );
 $Form->end_fieldset();
@@ -211,14 +221,12 @@ $Form->begin_fieldset( T_('Image options').get_manual_link( 'image-options' ) );
 
 	$Form->checkbox( 'exif_orientation', $Settings->get( 'exif_orientation' ), T_('Use EXIF info in photos'), T_('Use orientation tag to automatically rotate thumbnails to upright position.') );
 
-	$resize_input_suffix = ' '.T_('Fit to').' ';
-	$resize_input_suffix .= '<input type="text" id="fm_resize_width" name="fm_resize_width" class="form_text_input" size="4" maxlength="4" value="'.$Settings->get( 'fm_resize_width' ).'" />';
-	$resize_input_suffix .= ' x ';
-	$resize_input_suffix .= '<input type="text" id="fm_resize_height" name="fm_resize_height" class="form_text_input" size="4" maxlength="4" value="'.$Settings->get( 'fm_resize_height' ).'" />';
-	$resize_input_suffix .= ' '.T_('pixels').' ';
-	$resize_input_suffix .= '<input type="text" id="fm_resize_quality" name="fm_resize_quality" class="form_text_input" size="3" maxlength="3" style="margin-left:10px" value="'.$Settings->get( 'fm_resize_quality' ).'" />';
-	$resize_input_suffix .= ' % '.T_('quality').' ';
-	$Form->checkbox_input( 'fm_resize_enable', $Settings->get( 'fm_resize_enable' ), T_('Resize large images after upload'), array( 'input_suffix' => $resize_input_suffix ) );
+	$Form->begin_line( T_('Resize large images after upload'), 'fm_resize_enable' );
+		$Form->checkbox( 'fm_resize_enable', $Settings->get( 'fm_resize_enable' ), '' );
+		$Form->text( 'fm_resize_width', $Settings->get( 'fm_resize_width' ), 4, ' &nbsp; '.T_('Fit to') );
+		$Form->text( 'fm_resize_height', $Settings->get( 'fm_resize_height' ), 4, ' x ' );
+		$Form->text( 'fm_resize_quality', $Settings->get( 'fm_resize_quality' ), 3, T_('pixels').' &nbsp; ' );
+	$Form->end_line( ' % '.T_('quality') );
 
 $Form->end_fieldset();
 

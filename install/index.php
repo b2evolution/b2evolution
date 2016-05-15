@@ -69,7 +69,7 @@ if( ! $config_is_done )
 	$rsc_url = '../rsc/';
 }
 
-require_once $inc_path.'_core/_class5.funcs.php';
+require_once $inc_path.'_core/_class_loader.funcs.php';
 require_once $inc_path.'_core/_misc.funcs.php';
 
 /**
@@ -509,7 +509,7 @@ switch( $action )
 
 			echo '<h1>'.T_('Base configuration').'</h1>';
 
-			if( $config_is_done && $allow_evodb_reset != 1 )
+			if( $config_is_done && $allow_evodb_reset < 1 )
 			{
 				echo '<p><strong>'.T_('Resetting the base configuration is currently disabled for security reasons.').'</strong></p>';
 				echo '<p>'.sprintf( T_('To enable it, please go to the %s file and change: %s to %s'), '/conf/_basic_config.php', '<pre>$allow_evodb_reset = 0;</pre>', '<pre>$allow_evodb_reset = 1;</pre>' ).'</p>';
@@ -663,7 +663,7 @@ switch( $action )
 			</div>
 
 			<?php
-			if( $allow_evodb_reset == 1 )
+			if( $allow_evodb_reset >= 1 )
 			{
 			?>
 			<div class="radio">
@@ -691,7 +691,7 @@ switch( $action )
 			<?php
 
 
-			if( $allow_evodb_reset != 1 )
+			if( $allow_evodb_reset < 1 )
 			{
 				echo '<div class="pull-right"><a href="index.php?action=deletedb&amp;locale='.$default_locale.'">'.T_('Need to start anew?').' &raquo;</a></div>';
 			}
@@ -723,7 +723,7 @@ switch( $action )
 			<h2><?php echo T_('b2evolution is already installed') ?></h2>
 
 		<?php
-		if( $test_install_all_features && $allow_evodb_reset )
+		if( $allow_evodb_reset >= 2 || ( $allow_install_test_features && $allow_evodb_reset >= 1 ) )
 		{ // We can allow to continue installation with deleting DB
 		?>
 			<input type="hidden" name="action" value="menu-options" />
@@ -816,16 +816,17 @@ switch( $action )
 				</div>
 			</div>
 			<?php
-				if( $test_install_all_features )
-				{ // Checkbox to install all features
+			if( $allow_install_test_features )
+			{ // Checkbox to install all features
 			?>
-			<div class="checkbox" style="margin-top:15px">
-				<label>
-					<input accept=""type="checkbox" name="install_all_features" id="install_all_features" value="1" />
-					<?php echo T_('Also install all test features.')?>
-				</label>
-			</div>
+				<div class="checkbox" style="margin-top:15px">
+					<label>
+						<input accept=""type="checkbox" name="install_test_features" id="install_test_features" value="1" />
+						<?php echo T_('Also install all test features.')?>
+					</label>
+				</div>
 			<?php } ?>
+	
 			<div class="checkbox" style="margin:15px 0 15px">
 				<label>
 					<input type="checkbox" name="local_installation" id="local_installation" value="1"<?php echo check_local_installation() ? ' checked="checked"' : ''; ?> />
@@ -834,19 +835,25 @@ switch( $action )
 			</div>
 
 			<p class="evo_form__install_buttons">
-			<?php
-			if( $test_install_all_features && $allow_evodb_reset && $old_db_version = get_db_version() )
-			{ // We can allow to delete DB before installation
-			?>
-				<input type="hidden" name="delete_contents" value="1" />
-				<button id="cancel_button" type="submit" class="btn btn-danger btn-lg"><?php echo T_('DELETE ALL & RE-INSTALL!')?></button><?php
-			}
-			else
-			{ // Allow only install new DB without deleting previous DB
-			?>
-			<button id="cancel_button" type="submit" class="btn btn-success btn-lg"><?php echo T_('INSTALL!')?></button><?php
-			}
-			?><a href="index.php?locale=<?php echo $default_locale ?>" class="btn btn-default btn-lg"><?php echo T_('Cancel')?></a>
+			
+				<?php
+				if( ( ( $allow_evodb_reset >= 2 )
+				      || ( $allow_install_test_features && $allow_evodb_reset >= 1 ) )
+				    && $old_db_version = get_db_version() )
+				{ // We can allow to delete DB before installation
+				?>
+					<input type="hidden" name="delete_contents" value="1" />
+					<button id="cancel_button" type="submit" class="btn btn-danger btn-lg"><?php echo T_('DELETE ALL & RE-INSTALL!')?></button><?php
+				}
+				else
+				{ // Allow only install new DB without deleting previous DB
+				?>
+					<button id="cancel_button" type="submit" class="btn btn-success btn-lg"><?php echo T_('INSTALL!')?></button><?php
+				}
+				?>
+
+				<a href="index.php?locale=<?php echo $default_locale ?>" class="btn btn-default btn-lg"><?php echo T_('Cancel')?></a>
+	
 			</p>
 		</form>
 
@@ -905,14 +912,13 @@ switch( $action )
 
 		$create_sample_contents = param( 'create_sample_contents', 'string', '' );
 
-		$config_test_install_all_features = $test_install_all_features;
-		if( $test_install_all_features )
-		{ // Allow to use $test_install_all_features from request only when it is enabled in config
-			$test_install_all_features = param( 'install_all_features', 'boolean', false );
+		if( $allow_install_test_features )
+		{	// Allow to use $allow_install_test_features from request only when it is enabled in config:
+			$install_test_features = param( 'install_test_features', 'boolean', false );
 		}
 		else
 		{
-			$test_install_all_features = false;
+			$install_test_features = false;
 		}
 
 		// fp> TODO: this test should probably be made more generic and applied to upgrade too.
@@ -937,7 +943,7 @@ switch( $action )
 			echo $basic_config_file_result_messages;
 		}
 
-		if( $config_test_install_all_features && $allow_evodb_reset )
+		if( $allow_evodb_reset >= 2 || ( $allow_install_test_features && $allow_evodb_reset >= 1 ) )
 		{ // Allow to quick delete before new installation only when these two settings are enabled in config files
 			$delete_contents = param( 'delete_contents', 'integer', 0 );
 
@@ -1105,7 +1111,7 @@ switch( $action )
 		echo get_install_format_text( '<h2>'.T_('Deleting b2evolution tables from the database...').'</h2>', 'h2' );
 		evo_flush();
 
-		if( $allow_evodb_reset != 1 )
+		if( $allow_evodb_reset < 1 )
 		{
 			echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.');
 			echo get_install_format_text( '<p>'.sprintf( T_('To enable it, please go to the %s file and change: %s to %s'), '/conf/_basic_config.php', '<pre>$allow_evodb_reset = 0;</pre>', '<pre>$allow_evodb_reset = 1;</pre>' ).'</p>', 'p' );

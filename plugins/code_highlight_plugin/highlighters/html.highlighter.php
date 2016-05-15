@@ -45,7 +45,7 @@ class am_html_highlighter
 	 * @param object $parent
 	 * @return object am_html_highlighter
 	 */
-	function am_html_highlighter( & $parent )
+	function __construct( & $parent )
 	{
 		$this->parent = & $parent;
 		return $this;

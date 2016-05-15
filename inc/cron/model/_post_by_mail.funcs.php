@@ -346,7 +346,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 		if( ! empty($is_cron_mode) )
 		{	// Assign current User if we are in cron mode. This is needed in order to check user permissions
 			global $current_User;
-			$current_User = duplicate($pbmUser);
+			$current_User = clone $pbmUser;
 		}
 
 		// Activate User's locale
@@ -520,7 +520,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 			pbm_msg( sprintf( ('Item created?: %s'), ( isset( $edited_Item->ID ) ? 'yes' : 'no' ) ), $cron );
 
 			// Execute or schedule notifications & pings:
-			$edited_Item->handle_post_processing( true );
+			$edited_Item->handle_notifications( $pbmUser->ID, true );
 
 			if( !empty($pbm_item_files) )
 			{	// Attach files
@@ -690,7 +690,7 @@ function pbm_process_attachments( & $content, $mailAttachments, $mediadir, $medi
 		if( $error_filename = process_filename( $filename, true ) )
 		{
 			pbm_msg( ('Invalid filename').': '.$error_filename, $cron );
-			syslog_insert( sprintf( 'The posted by mail file %s has an unrecognized extension', '<b>'.$filename.'</b>' ), 'warning', 'file' );
+			syslog_insert( sprintf( 'The posted by mail file %s has an unrecognized extension', '[['.$filename.']]' ), 'warning', 'file' );
 			continue;
 		}
 
@@ -710,7 +710,7 @@ function pbm_process_attachments( & $content, $mailAttachments, $mediadir, $medi
 				if( $error_in_filename = process_filename( $filename, true ) )
 				{ // The file name is not valid, this is an unexpected situation, because the file name was already validated before
 					pbm_msg( ('Invalid filename').': '.$error_filename, $cron );
-					syslog_insert( sprintf( 'The posted by mail file %s has an unrecognized extension', '<b>'.$filename.'</b>' ), 'warning', 'file' );
+					syslog_insert( sprintf( 'The posted by mail file %s has an unrecognized extension', '[['.$filename.']]' ), 'warning', 'file' );
 					break;
 				}
 			}

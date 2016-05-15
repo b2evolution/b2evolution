@@ -33,10 +33,10 @@ class Country extends DataObject
 	 *
 	 * @param object database row
 	 */
-	function Country( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_regional__country', 'ctry_', 'ctry_ID' );
+		parent::__construct( 'T_regional__country', 'ctry_', 'ctry_ID' );
 
 		if( $db_row )
 		{
@@ -130,11 +130,18 @@ class Country extends DataObject
 	/**
 	 * Check existence of specified country code in ctry_code unique field.
 	 *
+	 * @param string Name of unique field  OR array of Names (for UNIQUE index with MULTIPLE fields)
+	 * @param mixed specified value        OR array of Values (for UNIQUE index with MULTIPLE fields)
 	 * @return int ID if country code exists otherwise NULL/false
 	 */
-	function dbexists()
+	function dbexists( $unique_fields = 'ctry_code', $values = NULL )
 	{
-		return parent::dbexists('ctry_code', $this->code);
+		if( is_null( $values ) )
+		{
+			$values = $this->code;
+		}
+
+		return parent::dbexists( $unique_fields, $values );
 	}
 }
 

@@ -36,14 +36,7 @@ $debug_pwd = '';
 
 // Most of the time you'll want to see all errors, including notices:
 // b2evo should run without any notices! (plugins too!)
-if( version_compare( phpversion(), '5.3', '>=' ) )
-{	// sam2kb> Disable E_STRICT messages on PHP > 5.3, there are numerous E_STRICT warnings displayed throughout the app
-	error_reporting( E_ALL & ~E_STRICT );
-}
-else
-{
-	error_reporting( E_ALL );
-}
+error_reporting( E_ALL | E_STRICT );
 /**
  * Do we want to display errors, even when not in debug mode?
  *
@@ -147,7 +140,7 @@ $demo_mode = false;
  *
  * @global boolean
  */
-$test_install_all_features = false;
+$allow_install_test_features = false;
 
 
 /**
@@ -482,40 +475,55 @@ $xmlsrv_subdir = 'xmlsrv/';              // Subdirectory relative to base
 $xmlsrv_url = $baseurl.$xmlsrv_subdir;   // You should not need to change this
 
 /**
+ * URL of the REST API.
+ * @global string $restapi_url
+ */
+$restapi_url = $htsrv_url.'rest.php?api_version=1&api_request='; // You should not need to change this
+
+/**
  * Location of the RSC folder.
  *
- * Note: This folder NEEDS to by accessible through HTTP.
+ * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
  *
  * @global string $rsc_subdir
  */
 $rsc_subdir = 'rsc/';                    // Subdirectory relative to base
 $rsc_path = $basepath.$rsc_subdir;       // You should not need to change this
-$rsc_url = $baseurl.$rsc_subdir;         // You should not need to change this
+$rsc_url = $assets_baseurl.$rsc_subdir;  // You should not need to change this
 $rsc_uri = $basesubpath.$rsc_subdir;
 
 /**
  * Location of the skins folder.
+ *
+ * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
+ *
  * @global string $skins_subdir
  */
 $skins_subdir = 'skins/';                // Subdirectory relative to base
 $skins_path = $basepath.$skins_subdir;   // You should not need to change this
-$skins_url = $baseurl.$skins_subdir;     // You should not need to change this
+$skins_url = $assets_baseurl.$skins_subdir;     // You should not need to change this
 
 /**
  * Location of the site skins folder.
+ *
+ * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
+ *
  * @global string $siteskins_subdir
  */
 $siteskins_subdir = 'skins_site/';       		    // Subdirectory relative to base
 $siteskins_path = $basepath.$siteskins_subdir;  // You should not need to change this
-$siteskins_url = $baseurl.$siteskins_subdir;    // You should not need to change this
+$siteskins_url = $assets_baseurl.$siteskins_subdir;    // You should not need to change this
 
 /**
  * Location of the email skins folder.
+ *
+ * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
+ *
  * @global string $emailskins_subdir
  */
 $emailskins_subdir = 'skins_email/';               // Subdirectory relative to base
 $emailskins_path = $basepath.$emailskins_subdir;   // You should not need to change this
-$emailskins_url = $baseurl.$emailskins_subdir;     // You should not need to change this
+$emailskins_url = $assets_baseurl.$emailskins_subdir;     // You should not need to change this
 
 /**
  * Location of the admin interface dispatcher
@@ -526,13 +534,13 @@ $admin_url = $baseurl.$dispatcher;
 /**
  * Location of the admin skins folder.
  *
- * Note: This folder NEEDS to by accessible by both PHP AND through HTTP.
+ * Note: This folder NEEDS to by accessible by both PHP AND through HTTP. It MAY be replicated on a CDN.
  *
  * @global string $adminskins_subdir
  */
 $adminskins_subdir = 'skins_adm/';         // Subdirectory relative to ADMIN
 $adminskins_path = $basepath.$adminskins_subdir; // You should not need to change this
-$adminskins_url = $baseurl.$adminskins_subdir;   // You should not need to change this
+$adminskins_url = $assets_baseurl.$adminskins_subdir;   // You should not need to change this
 
 /**
  * Location of the locales folder.
@@ -564,15 +572,15 @@ $plugins_url = $baseurl.$plugins_subdir;    // You should not need to change thi
  *
  * @global string $cron_subdir
  */
-$cron_subdir = 'cron/';   		             	// Subdirectory relative to base
-$cron_url = $baseurl.$cron_subdir;    // You should not need to change this
+$cron_subdir = 'cron/';            // Subdirectory relative to base
+$cron_url = $baseurl.$cron_subdir; // You should not need to change this
 
 /**
  * Location of the install folder.
  * @global string $install_subdir
  */
-$install_subdir = 'install/';            	  // Subdirectory relative to base
-$install_path = $basepath.$install_subdir;  // You should not need to change this
+$install_subdir = 'install/';            	 // Subdirectory relative to base
+$install_path = $basepath.$install_subdir; // You should not need to change this
 
 /**
  * Location of the rendered page cache folder.
@@ -582,8 +590,9 @@ $install_path = $basepath.$install_subdir;  // You should not need to change thi
  *
  * @global string $cache_subdir
  */
-$cache_subdir = '_cache/';             // Subdirectory relative to base
+$cache_subdir = '_cache/';              // Subdirectory relative to base
 $cache_path = $basepath.$cache_subdir; // You should not need to change this
+
 
 /**
  * Location of the root media folder.
@@ -593,9 +602,9 @@ $cache_path = $basepath.$cache_subdir; // You should not need to change this
  *
  * @global string $media_subdir
  */
-$media_subdir = 'media/';                // Subdirectory relative to base
-$media_path = $basepath.$media_subdir;   // You should not need to change this
-$media_url = $baseurl.$media_subdir;     // You should not need to change this
+$media_subdir = 'media/';                   // Subdirectory relative to base
+$media_path = $basepath.$media_subdir;      // You should not need to change this
+$media_url = $assets_baseurl.$media_subdir; // You should not need to change this
 
 
 /**
@@ -606,8 +615,8 @@ $media_url = $baseurl.$media_subdir;     // You should not need to change this
  *
  * @global string $backup_subdir
  */
-$backup_subdir = '_backup/';				// Subdirectory relative to base
-$backup_path = $basepath.$backup_subdir;	// You should not need to change this
+$backup_subdir = '_backup/';             // Subdirectory relative to base
+$backup_path = $basepath.$backup_subdir; // You should not need to change this
 
 
 /**
@@ -649,11 +658,6 @@ $cross_post_nav_in_same_blog = true;
  * File extensions that the admin will not be able to enable in the Settings
  */
 $force_upload_forbiddenext = array( 'cgi', 'exe', 'htaccess', 'htpasswd', 'php', 'php3', 'php4', 'php5', 'php6', 'phtml', 'pl', 'vbs' );
-
-/**
- * Admin can configure max file upload size, but he won't be able to set it higher than this "max max" value.
- */
-$upload_maxmaxkb = 32000;
 
 /**
  * The admin can configure the regexp for valid file names in the Settings interface
@@ -831,6 +835,15 @@ $sendmail_additional_params = '-r $return-address$';
 
 
 /**
+ * Turn this on to simulate email sends instead of really sending them through SMTP.
+ * This is useful if you are debugging a production database on a development machine.
+ * It will prevent from sending test notifications to real user accounts.
+ * You will still be able to see the emails that would have been sent through the Emails > Sent tab in the back-office.
+ */
+$email_send_simulate_only = false;
+
+
+/**
  * Would you like to use CDNs as definied in the array $library_cdn_urls below 
  * or do you prefer to load all files from the local source as defined in the array $library_local_urls below?
  *
@@ -872,7 +885,8 @@ $library_cdn_urls = array(
 			'#jqplot_canvasOverlay#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.canvasOverlay.min.js' ),
 			'#jqplot_donutRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.donutRenderer.min.js' ),
 			'#jqplot_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/jquery.jqplot.min.css' ),*/
-		//'#tinymce#' => array( '//tinymce.cachefly.net/4.1/tinymce.min.js' ),
+		//'#tinymce#' => array( '//cdn.tinymce.com/4/tinymce.min.js' ),
+		//'#tinymce_jquery#' => array( '//cdn.tinymce.com/4/jquery.tinymce.min.js' ),
 		//'#flowplayer#' => array( '//releases.flowplayer.org/5.4.4/flowplayer.min.js', '//releases.flowplayer.org/5.4.4/flowplayer.js' ),
 		//'#mediaelement#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/js/mediaelement-and-player.min.js', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/js/mediaelement-and-player.js' ),
 		//'#mediaelement_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.min.css', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.css' ),
@@ -912,7 +926,7 @@ $library_local_urls = array(
 		'#jqplot_donutRenderer#' => array( 'jquery/jqplot/jqplot.donutRenderer.min.js' ),
 		'#jqplot_css#' => array( 'jquery/jquery.jqplot.min.css', 'jquery/jquery.jqplot.css' ),
 		'#tinymce#' => array( 'tiny_mce/tinymce.min.js' ),
-		'#tinymce_gzip#' => array( 'tiny_mce/tinymce.gzip.js' ),
+		'#tinymce_jquery#' => array( 'tiny_mce/jquery.tinymce.min.js' ),
 		'#flowplayer#' => array( 'flowplayer/flowplayer.min.js', 'flowplayer/flowplayer.js' ),
 		'#mediaelement#' => array( 'mediaelement/mediaelement-and-player.min.js', 'mediaelement/mediaelement-and-player.js' ),
 		'#mediaelement_css#' => array( 'mediaelement/mediaelementplayer.min.css', 'mediaelement/mediaelementplayer.css' ),
@@ -937,8 +951,10 @@ $outgoing_proxy_password = '';
 /**
  * Check for old browsers like IE and display info message.
  * Set to false if you don't want this check and never inform users if they use an old browser.
+ * Note: new default is false because it's easy to annoy IE users with that and they wan't do anything about their enterprise settings that makes them advertsie an older IE than they really have
+ *       On our end though we'll send an 'IE-Edge' header and it will make the IE on the other end behva ethe best it can...
  */
-$check_browser_version = true;
+$check_browser_version = false;
 
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----

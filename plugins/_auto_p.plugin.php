@@ -58,9 +58,16 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 
 
 	/**
-	 * @return array
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
+	 *
+	 * @param array Associative array of parameters (since v1.9).
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
+	 * @return array see {@link Plugin::GetDefaultSettings()}.
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
+	 * and assign an array with the following keys to them (only 'label' is required):
 	 */
-	function GetDefaultSettings()
+	function GetDefaultSettings( & $params )
 	{
 		return array(
 				'br' => array(
@@ -144,6 +151,20 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 		// set params to allow rendering for messages by default
 		$default_params = array_merge( $params, array( 'default_msg_rendering' => 'stealth' ) );
 		return parent::get_msg_setting_definitions( $default_params );
+	}
+
+
+	/**
+	 * Define here default email settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_email_setting_definitions( & $params )
+	{
+		// set params to allow rendering for emails by default:
+		$default_params = array_merge( $params, array( 'default_email_rendering' => 'stealth' ) );
+		return parent::get_email_setting_definitions( $default_params );
 	}
 
 

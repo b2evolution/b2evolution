@@ -71,7 +71,6 @@ $schema_queries = array_merge( $schema_queries, array(
 			blog_media_url       VARCHAR( 255 ) NULL,
 			blog_type            ENUM( 'main', 'std', 'photo', 'group', 'forum', 'manual' ) COLLATE ascii_general_ci DEFAULT 'std' NOT NULL,
 			blog_order           int(11) NULL DEFAULT NULL,
-			blog_favorite        TINYINT(1) NOT NULL DEFAULT 1,
 			PRIMARY KEY blog_ID (blog_ID),
 			UNIQUE KEY blog_urlname (blog_urlname)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -151,6 +150,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_main_cat_ID            int(11) unsigned NOT NULL,
 			post_notifications_status   ENUM('noreq','todo','started','finished') COLLATE ascii_general_ci NOT NULL DEFAULT 'noreq',
 			post_notifications_ctsk_ID  INT(10) unsigned NULL DEFAULT NULL,
+			post_notifications_flags    SET('moderators_notified','members_notified','community_notified','pings_sent') NOT NULL DEFAULT '',
 			post_wordcount              int(11) default NULL,
 			post_comment_status         ENUM('disabled', 'open', 'closed') COLLATE ascii_general_ci NOT NULL DEFAULT 'open',
 			post_renderers              VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
@@ -214,6 +214,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_secret             CHAR(32) COLLATE ascii_general_ci NULL default NULL,
 			comment_notif_status       ENUM('noreq','todo','started','finished') COLLATE ascii_general_ci NOT NULL DEFAULT 'noreq' COMMENT 'Have notifications been sent for this comment? How far are we in the process?',
 			comment_notif_ctsk_ID      INT(10) unsigned NULL DEFAULT NULL COMMENT 'When notifications for this comment are sent through a scheduled job, what is the job ID?',
+			comment_notif_flags        SET('moderators_notified','members_notified','community_notified') NOT NULL DEFAULT '',
 			PRIMARY KEY comment_ID (comment_ID),
 			KEY comment_item_ID (comment_item_ID),
 			KEY comment_date (comment_date),
@@ -282,10 +283,14 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_ID                INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			ityp_name              VARCHAR(30) NOT NULL,
 			ityp_description       TEXT NULL DEFAULT NULL,
-			ityp_backoffice_tab    VARCHAR(30) NULL DEFAULT NULL,
+			ityp_usage             VARCHAR(20) COLLATE ascii_general_ci NOT NULL DEFAULT 'post',
 			ityp_template_name     VARCHAR(40) NULL DEFAULT NULL,
+			ityp_front_instruction TINYINT DEFAULT 0,
+			ityp_back_instruction  TINYINT DEFAULT 0,
+			ityp_instruction       TEXT NULL DEFAULT NULL,
 			ityp_use_title         ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'required',
 			ityp_use_url           ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
+			ityp_podcast           TINYINT(1) DEFAULT 0,
 			ityp_use_parent        ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
 			ityp_use_text          ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
 			ityp_allow_html        TINYINT DEFAULT 1,
@@ -397,6 +402,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloguser_perm_vote_spam_cmts  tinyint NOT NULL default 0,
 			bloguser_perm_cmtstatuses     set('review','draft','private','protected','deprecated','community','published') COLLATE ascii_general_ci NOT NULL default '',
 			bloguser_perm_edit_cmt        ENUM('no','own','anon','lt','le','all') COLLATE ascii_general_ci NOT NULL default 'no',
+			bloguser_perm_meta_comment    tinyint NOT NULL default 0,
 			bloguser_perm_cats            tinyint NOT NULL default 0,
 			bloguser_perm_properties      tinyint NOT NULL default 0,
 			bloguser_perm_admin           tinyint NOT NULL default 0,
@@ -424,6 +430,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloggroup_perm_vote_spam_cmts  tinyint NOT NULL default 0,
 			bloggroup_perm_cmtstatuses     set('review','draft','private','protected','deprecated','community','published') COLLATE ascii_general_ci NOT NULL default '',
 			bloggroup_perm_edit_cmt        ENUM('no','own','anon','lt','le','all') COLLATE ascii_general_ci NOT NULL default 'no',
+			bloggroup_perm_meta_comment    tinyint NOT NULL default 0,
 			bloggroup_perm_cats            tinyint NOT NULL default 0,
 			bloggroup_perm_properties      tinyint NOT NULL default 0,
 			bloggroup_perm_admin           tinyint NOT NULL default 0,
@@ -431,6 +438,14 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloggroup_perm_media_browse    tinyint NOT NULL default 0,
 			bloggroup_perm_media_change    tinyint NOT NULL default 0,
 			PRIMARY KEY bloggroup_pk (bloggroup_blog_ID,bloggroup_group_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_coll_user_favs' => array(
+		'Creating table for user favorite collections',
+		"CREATE TABLE T_coll_user_favs (
+			cufv_user_ID    int(10) unsigned NOT NULL,
+			cufv_blog_ID    int(10) unsigned NOT NULL,
+			PRIMARY KEY cufv_pk (cufv_user_ID, cufv_blog_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_links' => array(

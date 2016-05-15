@@ -59,7 +59,8 @@ class widescroll_plugin extends Plugin
 			}
 		}
 
-		return parent::get_coll_setting_definitions( array_merge( $params, $default_params ) );
+		$tmp_params = array_merge( $params, $default_params );
+		return parent::get_coll_setting_definitions( $tmp_params );
 	}
 
 
@@ -232,11 +233,58 @@ class widescroll_plugin extends Plugin
 
 
 	/**
-	 * Spits out the styles used
+	 * Event handler: Called when displaying editor toolbars.
 	 *
-	 * @see Plugin::SkinBeginHtmlHead()
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
 	 */
-	function SkinBeginHtmlHead()
+	function DisplayMessageToolbar( & $params )
+	{
+		global $Settings;
+
+		if( ! $Settings->get( 'allow_html_message' ) )
+		{	// Only when HTML is allowed in messages
+			return false;
+		}
+
+		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
+		{	// Plugin is not enabled for current case, so don't display a toolbar:
+			return false;
+		}
+
+		// Print toolbar on screen:
+		return $this->DisplayCodeToolbar();
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
+		{	// Plugin is not enabled for current case, so don't display a toolbar:
+			return false;
+		}
+
+		// Print toolbar on screen:
+		return $this->DisplayCodeToolbar();
+	}
+
+
+	/**
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinBeginHtmlHead( & $params )
 	{
 		global $Blog;
 
@@ -250,6 +298,25 @@ class widescroll_plugin extends Plugin
 		require_js( '#jquery#', 'blog' );
 		require_js( $this->get_plugin_url().'jquery.scrollwide.min.js', true );
 		require_css( $this->get_plugin_url().'jquery.scrollwide.css', true );
+	}
+
+
+	/**
+	 * Event handler: Called when ending the admin html head section.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
+	 */
+	function AdminEndHtmlHead( & $params )
+	{
+		global $ctrl;
+
+		if( $ctrl == 'campaigns' && get_param( 'tab' ) == 'send' && $this->get_email_setting( 'email_apply_rendering' ) )
+		{	// Load this only on form to preview email campaign:
+			require_js( '#jquery#', 'blog' );
+			require_js( $this->get_plugin_url().'jquery.scrollwide.min.js', 'relative' );
+			require_css( $this->get_plugin_url().'jquery.scrollwide.css', 'relative' );
+		}
 	}
 
 

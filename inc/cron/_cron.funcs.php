@@ -147,10 +147,11 @@ function cron_status_color( $status )
 {
 	$colors = array(
 			'pending'  => '808080',
-			'started'  => 'FFFF00',
-			'finished' => '008000',
-			'error'    => 'FF0000',
-			'timeout'  => 'FFA500',
+			'started'  => '4d77cb',
+			'warning'  => 'dbdb57',
+			'timeout'  => 'e09952',
+			'error'    => 'cb4d4d',
+			'finished' => '34b27d',
 		);
 
 	return isset( $colors[ $status ] ) ? '#'.$colors[ $status ] : 'none';
@@ -231,6 +232,21 @@ function cron_job_name( $job_key, $job_name = '', $job_params = '' )
 						}
 					}
 				}
+				break;
+
+			case 'send-email-campaign':
+				// Add email campaign title and chunk size to job name:
+				global $Settings;
+				$email_campaign_title = '';
+				if( ! empty( $job_params['ecmp_ID'] ) )
+				{
+					$EmailCampaignCache = & get_EmailCampaignCache();
+					if( $EmailCampaign = $EmailCampaignCache->get_by_ID( $job_params['ecmp_ID'], false, false ) )
+					{
+						$email_campaign_title = $EmailCampaign->get( 'email_title' );
+					}
+				}
+				$job_name = sprintf( $job_name, $Settings->get( 'email_campaign_chunk_size' ), $email_campaign_title );
 				break;
 		}
 	}

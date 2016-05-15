@@ -26,6 +26,8 @@ global $skins_path, $ads_current_skin_path, $disp, $ctrl;
 param( 'action', 'string', '' );
 $item_ID = param( 'p', 'integer' );
 $blog_ID = param( 'blog', 'integer' );
+// Initialize this array in order to don't load JS files twice in they have been already loaded on parent page:
+$required_js = param( 'required_js', 'array:string', array(), false, true );
 
 // Make sure the async responses are never cached:
 header_nocache();
@@ -373,7 +375,10 @@ switch( $action )
 
 			$edited_Comment->set_vote( 'spam', param( 'vote', 'string' ) );
 			$edited_Comment->dbupdate();
-			$edited_Comment->vote_spam( '', '', '&amp;', true, true, array( 'display' => true ) );
+			$edited_Comment->vote_spam( '', '', '&amp;', true, true, array(
+					'display'            => true,
+					'button_group_class' => button_class( 'group' ).( is_admin_page() ? ' btn-group-sm' : '' ),
+				) );
 		}
 
 		break;
@@ -503,6 +508,10 @@ switch( $action )
 					{ // Set field value
 						case 'like':
 							$field_value = 'yes';
+							break;
+
+						case 'noopinion':
+							$field_value = 'noopinion';
 							break;
 
 						case 'dontlike':
@@ -888,46 +897,6 @@ switch( $action )
 		call_user_func( $callback_function, $params );
 		break;
 
-	case 'get_recipients':
-		// Get list of users by search word
-		// Used for jQuery Tokeninput plugin ( when creating new messaging Thread )
-
-		if( !is_logged_in() || !$current_User->check_perm( 'perm_messaging', 'reply' ) )
-		{	// Check permission: User is not allowed to view threads
-			exit(0);
-		}
-
-		if( check_create_thread_limit() )
-		{	// user has already reached his limit, don't allow to get a users list
-			exit(0);
-		}
-
-		param( 'term', 'string' );
-
-		// Clear users cache and load only possible recipients who need right now, but keep shadow
-		$where_condition = '( user_login LIKE '.$DB->quote( '%'.$term.'%' ).' ) AND ( user_ID != '.$DB->quote( $current_User->ID ).' )';
-		$UserCache = & get_UserCache();
-		$UserCache->clear( true );
-		$UserCache->load_where( $where_condition );
-
-		$result_users = array();
-		while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
-		{ // Iterate through UserCache
-			if( !$iterator_User->check_status( 'can_receive_pm' ) )
-			{ // this user is probably closed so don't show it
-				continue;
-			}
-			$result_users[] = array(
-				'id'       => $iterator_User->ID,
-				'title'    => $iterator_User->get( 'login' ),
-				'fullname' => $iterator_User->get( 'fullname' ),
-				'picture'  => $iterator_User->get_avatar_imgtag( 'crop-top-32x32' )
-			);
-		}
-
-		echo evo_json_encode( $result_users );
-		exit(0);
-
 	case 'set_comment_status':
 		// Used for quick moderation of comments in dashboard, item list full view, comment list and front-office screens
 
@@ -963,10 +932,7 @@ switch( $action )
 				$result_success = $edited_Comment->dbupdate();
 				if( $result_success !== false )
 				{
-					if( $status == 'published' )
-					{
-						$edited_Comment->handle_notifications( false, $current_User->ID );
-					}
+					$edited_Comment->handle_notifications();
 				}
 			}
 		}
@@ -1037,7 +1003,8 @@ switch( $action )
 
 		$OrganizationCache = & get_OrganizationCache();
 		$OrganizationCache->clear();
-		$OrganizationCache->load_all();
+		// Load only organizations that allow to join members or own organizations of the current user:
+		$OrganizationCache->load_where( '( org_accept != "no" OR org_owner_user_ID = "'.$current_User->ID.'" )' );
 
 		$Form->output = false;
 		$Form->switch_layout( 'none' );
@@ -1060,36 +1027,75 @@ switch( $action )
 
 		break;
 
-	case 'autocomplete_usernames':
-		// Get usernames by first chars for autocomplete jQuery plugin & TinyMCE autocomplete plugin
-
-		$q = param( 'q', 'string', '' );
-
-		if( ! is_valid_login( $q ) || evo_strlen( $q ) < 4 )
-		{ // Restrict a wrong request
-			debug_die( 'Wrong request' );
+	case 'change_user_org_status':
+		// Used in the identity user form to change an accept status of organization by Admin users
+		if( ! is_logged_in() )
+		{ // User must be logged in
+			break;
 		}
-		// Add backslash for special char of sql operator LIKE
-		$q = str_replace( '_', '\_', $q );
 
-		if( utf8_strlen( $q ) == 0 )
-		{ // Don't search logins with empty request
-			$usernames = array();
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'userorg' );
+
+		/**
+		 * This string is value of "rel" attibute of span icon element
+		 * The format of this string is: 'org_status_y_1_2' or 'org_status_n_1_2', where:
+		 *     'y' - organization was accepted by admin,
+		 *     'n' - not accepted
+		 *     '1' - this number is ID of organization - uorg_org_ID from the DB table T_users__user_org
+		 *     '2' - this number is ID of user - uorg_user_ID from the DB table T_users
+		 */
+		$status = explode( '_', param( 'status', 'string' ) );
+
+		// ID of organization
+		$org_ID = isset( $status[3] ) ? intval( $status[3] ) : 0;
+
+		// ID of organization
+		$user_ID = isset( $status[4] ) ? intval( $status[4] ) : 0;
+
+		// Get organization by ID:
+		$OrganizationCache = & get_OrganizationCache();
+		$user_Organization = & $OrganizationCache->get_by_ID( $org_ID, false, false );
+
+		if( count( $status ) != 5 || ( $status[2] != 'y' && $status[2] != 'n' ) || $org_ID == 0 || ! $user_Organization )
+		{ // Incorrect format of status param
+			$Ajaxlog->add( /* DEBUG: do not translate */ 'Incorrect request to accept organization!', 'error' );
+			break;
+		}
+
+		// Check permission:
+		$current_User->check_perm( 'orgs', 'edit', true, $user_Organization );
+
+		// Use the glyph or font-awesome icons if it is defined by skin
+		param( 'b2evo_icons_type', 'string', '' );
+
+		if( $status[2] == 'y' )
+		{ // Status will be change to "Not accepted"
+			$org_is_accepted = false;
 		}
 		else
-		{
-			$SQL = new SQL();
-			$SQL->SELECT( 'user_login' );
-			$SQL->FROM( 'T_users' );
-			$SQL->WHERE( 'user_login LIKE '.$DB->quote( $q.'%' ) );
-			$SQL->WHERE_and( 'user_status = "activated" OR user_status = "autoactivated"' );
-			$SQL->ORDER_BY( 'user_login' );
-			$usernames = $DB->get_col( $SQL->get() );
+		{ // Status will be change to "Accepted"
+			$org_is_accepted = true;
 		}
 
-		echo evo_json_encode( $usernames );
+		// Change an accept status of organization for edited user
+		$DB->query( 'UPDATE T_users__user_org
+			  SET uorg_accepted = '.$DB->quote( $org_is_accepted ? 1 : 0 ).'
+			WHERE uorg_user_ID = '.$DB->quote( $user_ID ).'
+			  AND uorg_org_ID = '.$DB->quote( $org_ID ) );
 
-		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
+		$accept_icon_params = array( 'style' => 'cursor: pointer;', 'rel' => 'org_status_'.( $org_is_accepted ? 'y' : 'n' ).'_'.$org_ID.'_'.$user_ID );
+		if( $org_is_accepted )
+		{ // Organization is accepted by admin
+			$accept_icon = get_icon( 'allowback', 'imgtag', array_merge( array( 'title' => T_('Accepted') ), $accept_icon_params ) );
+		}
+		else
+		{ // Organization is not accepted by admin yet
+			$accept_icon = get_icon( 'bullet_red', 'imgtag', array_merge( array( 'title' => T_('Not accepted') ), $accept_icon_params ) );
+		}
+
+		// Display icon with new status
+		echo $accept_icon;
 
 		break;
 
@@ -1142,58 +1148,6 @@ switch( $action )
 
 		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
 		break;
-
-	case 'get_tags':
-		// Get list of item tags, where $term is part of the tag name (sorted)
-		// To be used for Tag autocompletion
-
-		// Crumb check and permission check are not required because this won't modify anything and it returns public info
-
-		$term = param( 'term', 'string' );
-
-		if( substr( $term, 0, 1 ) == '-' )
-		{ // Prevent chars '-' in first position
-			$term = preg_replace( '/^-+/', '', $term );
-		}
-
-		// Deny to use a comma in tag names:
-		$term = str_replace( ',', ' ', $term );
-
-		$term_is_new_tag = true;
-
-		if( ! empty( $term ) )
-		{ // Find tags in DB only when term is not empty
-			$tags = $DB->get_results( '
-				SELECT tag_name AS id, tag_name AS title
-				  FROM T_items__tag
-				 WHERE tag_name LIKE '.$DB->quote('%'.$term.'%').' COLLATE utf8_general_ci
-				 ORDER BY tag_name', ARRAY_A );
-			/* Yura: Here I added "COLLATE utf8_general_ci" because:
-			 * It allows to match "testA" with "testa", and otherwise "testa" with "testA".
-			 * It also allows to find "ee" when we type in "éè" and otherwise.
-			 */
-
-			// Check if current term is not an existing tag
-			foreach( $tags as $tag )
-			{
-				/* Yura: I have added "utf8_strtolower()" below in condition in order to:
-				 * When we enter new tag 'testA' and the tag 'testa' already exists
-				 * then we suggest only 'testa' instead of 'testA'.
-				 */
-				if( utf8_strtolower( $tag['title'] ) == utf8_strtolower( $term ) )
-				{ // Current term is an existing tag
-					$term_is_new_tag = false;
-				}
-			}
-		}
-
-		if( $term_is_new_tag && ! empty( $term ) )
-		{ // Add current term in the beginning of the tags list
-			array_unshift( $tags, array( 'id' => $term, 'title' => $term ) );
-		}
-
-		echo evo_json_encode( $tags );
-		exit(0);
 
 	case 'crop':
 		// Get form to crop profile picture
@@ -1322,6 +1276,7 @@ if( $current_debug || $current_debug_jslog )
 						), 'ul', 'jslog' );
 }
 
+// Add ajax response end comment:
 echo '<!-- Ajax response end -->';
 
 exit(0);

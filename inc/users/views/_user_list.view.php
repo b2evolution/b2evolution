@@ -20,7 +20,8 @@ if( !isset( $display_params ) )
 }
 
 users_results_block( array(
-		'display_params' => $display_params,
+		'display_sec_groups' => true,
+		'display_params'     => $display_params,
 	) );
 
 load_funcs( 'users/model/_user_js.funcs.php' );

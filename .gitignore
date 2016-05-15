@@ -9,8 +9,13 @@ _transifex/files.txt
 _transifex/messages.pot.bak
 _transifex/translations
 rsc/build/testless.css
-.idea
+npm-debug.log
+
+# IDE Files
+/nbproject/
+.idea/*
+media/blogs/a
+skins/business_skin
 conf/_local.php
 plugins/geoip_plugin/GeoIP.dat
 media/blogs/b
-npm-debug.log

@@ -86,6 +86,9 @@ $Form->begin_fieldset( T_('Settings to decode the returned emails').get_manual_l
 					T_('Password'), array( 'maxlength' => 255, 'note' => T_('Password for authenticating on your mail server.'), 'autocomplete' => 'off' ) );
 	}
 
+	$Form->text_input( 'repath_imap_folder', $Settings->get( 'repath_imap_folder' ), 25,
+				T_('IMAP Folder'), T_('Which folder holds your returned email.'), array( 'maxlength' => 255 ) );
+
 	$Form->checkbox( 'repath_ignore_read', $Settings->get( 'repath_ignore_read' ), T_('Ignore emails that have already been read'),
 				T_('Check this in order not to re-process emails that already have the "seen" flag on the server.') );
 

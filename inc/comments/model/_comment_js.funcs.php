@@ -7,6 +7,9 @@ global $Blog, $current_User, $Session, $admin_url, $status_list, $CommentList, $
 // Require this file because function evoAlert() is used here
 require_js( 'functions.js', 'blog', false, true );
 
+// Initialize JavaScript to build and open window:
+echo_modalwindow_js();
+
 ?>
 <script type="text/javascript">
 
@@ -145,7 +148,7 @@ function setCommentStatus( id, status, request_from, redirect_to )
 				jQuery( selector ).attr( 'class', class_name );
 				update_moderation_buttons( selector, statuses[1], statuses[2] );
 			}
-			else if( request_from == 'dashboard' )
+			else if( request_from == 'dashboard' || request_from == 'coll_settings' )
 			{
 				updateCommentsList( divid );
 			}
@@ -334,7 +337,7 @@ function deleteComment( commentId, request_from, comment_type )
 			var target_selector = ( comment_type == 'meta' ? '#comments' : '#recycle_bin' );
 			jQuery( selector ).effect( 'transfer', { to: jQuery( target_selector ) }, 700, function() {
 				delete modifieds[divid];
-				if( request_from == 'dashboard' ) {
+				if( request_from == 'dashboard' || request_from == 'coll_settings' ) {
 					updateCommentsList( divid );
 				} else {
 					jQuery( '#comments_container' ).html( ajax_debug_clear( result ) );
@@ -357,11 +360,6 @@ function deleteComment( commentId, request_from, comment_type )
 		}
 	});
 }
-
-<?php
-// Initialize JavaScript to build and open window
-echo_modalwindow_js();
-?>
 
 // Ban comment url
 function ban_url( authorurl )
@@ -500,7 +498,7 @@ function refreshComments( request_from )
 
 function startRefreshComments( request_from, item_id, currentpage, comment_type )
 {
-	if( request_from == "dashboard" ) {
+	if( request_from == "dashboard" || request_from == 'coll_settings' ) {
 		jQuery('#comments_container').slideUp('fast', refreshComments( request_from ) );
 	} else {
 		jQuery('#comments_container').fadeTo( 'slow', 0.1, function() {
@@ -643,7 +641,7 @@ function updateCommentsList( divid )
 	jQuery( '.dashboard_post:visible:even' ).addClass( 'dashboard_post_even' );
 	jQuery( '.dashboard_post:visible:odd' ).addClass( 'dashboard_post_odd' );
 
-	if( displayed < 12 )
+	if( displayed < 6 )
 	{ // Reload list to fill up the hidden comments list, so we always have enough comments to moderate.
 		refreshComments( 'dashboard' );
 	}

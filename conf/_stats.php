@@ -307,7 +307,8 @@ $hit_type_array = array (
 	'standard' => 'Standard',
 	'ajax'     => 'AJAX',
 	'service'  => 'Service',
-	'admin'    => 'Admin'
+	'admin'    => 'Admin',
+	'api'      => 'API'
 	);
 
 $hit_type_color = array(
@@ -317,7 +318,16 @@ $hit_type_color = array(
 	'ajax'             => '339966',
 	'admin'            => 'AAE0E0',
 	'standard_robot'   => 'FF9900',
-	'standard_browser' => 'FFCC00'
+	'standard_browser' => 'FFCC00',
+	'api'              => '5BC0DE'
+);
+
+$hit_method_color = array(
+	'GET'    => '000000',
+	'POST'   => 'FFBB00',
+	'PUT'    => 'ff00ff',
+	'DELETE' => 'FF0000',
+	'HEAD'   => '00CCFF',
 );
 
 $user_gender_color = array(

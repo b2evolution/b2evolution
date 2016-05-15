@@ -27,10 +27,10 @@ class org_members_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function org_members_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'org_members' );
+		parent::__construct( $db_row, 'core', 'org_members' );
 	}
 
 
@@ -105,6 +105,23 @@ class org_members_Widget extends ComponentWidget
 					'type' => 'integer',
 					'size' => 3,
 					'defaultvalue' => 1,
+				),
+				'layout' => array(
+					'label' => T_('Layout'),
+					'note' => T_('How to lay out the members'),
+					'type' => 'select',
+					'options' => array(
+							'rwd'  => T_( 'RWD Blocks' ),
+							'flow' => T_( 'Flowing Blocks' ),
+							'list' => T_( 'List' ),
+						),
+					'defaultvalue' => 'rwd',
+				),
+				'rwd_block_class' => array(
+					'label' => T_('RWD block class'),
+					'note' => T_('Specify the responsive column classes you want to use.'),
+					'size' => 60,
+					'defaultvalue' => 'col-lg-4 col-md-6 col-sm-6 col-xs-12',
 				),
 				'thumb_size' => array(
 					'label' => T_('Image size'),
@@ -226,11 +243,12 @@ class org_members_Widget extends ComponentWidget
 
 			if( count( $users ) )
 			{
-				echo '<div class="row">';
+				echo $this->get_layout_start();
+
 				$member_counter = 0;
 				foreach( $users as $org_User )
 				{
-					echo '<div class="evo_org_member col-lg-4 col-md-6 col-sm-6 text-center">';
+					echo $this->get_layout_item_start( $member_counter );
 
 					$user_url = $this->disp_params['link_profile'] ? $org_User->get_userpage_url( $Blog->ID, true ) : '';
 
@@ -305,23 +323,12 @@ class org_members_Widget extends ComponentWidget
 						echo '</p>';
 					}
 
-					echo '</div>';
-					
 					$member_counter++;
-					switch( $member_counter )
-					{
-						case 3:
-							echo '<div class="clearfix visible-lg-block"></div>';
-							break;
-						case 2:
-							echo '<div class="clearfix visible-sm-block visible-md-block"></div>';
-							break;
-						default:
-							// do nothing
-					}
+
+					echo $this->get_layout_item_end( $member_counter );
 				}
-				echo '<div class="clear"></div>';
-				echo '</div>';
+
+				echo $this->get_layout_end( $member_counter );
 			}
 		}
 

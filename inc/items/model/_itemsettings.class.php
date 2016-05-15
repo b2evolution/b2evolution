@@ -49,7 +49,7 @@ class ItemSettings extends AbstractSettings
 	/**
 	 * Constructor
 	 */
-	function ItemSettings()
+	function __construct()
 	{
 		parent::__construct( 'T_items__item_settings', array( 'iset_item_ID', 'iset_name' ), 'iset_value', 1 );
 	}
@@ -62,11 +62,12 @@ class ItemSettings extends AbstractSettings
 	 * @access protected
 	 * @param string First column key
 	 * @param string Second column key
+	 * @param string NOT USED (provided for compatibility with parent class)
 	 * @return boolean
 	 */
-	function _load( $item_ID, $arg )
+	function _load( $item_ID = NULL, $arg = NULL, $arg3 = NULL )
 	{
-		if( empty( $item_ID ) )
+		if( empty( $item_ID ) || empty( $arg ) )
 		{
 			return false;
 		}

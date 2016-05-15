@@ -5,26 +5,41 @@
  * Used only to initialize colorbox for the links with attribute "rel" ^= "lightbox"
  * Don't load this file directly, It is appended to "/build/jquery.colorbox.b2evo.min.js" by Grunt, because we load colorbox plugin asynchronously.
  */
+
+/**
+ * Initialize colorbox for a selected link
+ *
+ * @param object jQuery object
+ */
+function init_colorbox( this_obj )
+{
+	if( typeof( this_obj ) != 'object' || this_obj.length == 0 )
+	{ // Nothing to initialize
+		return;
+	}
+
+	var type = this_obj.attr( 'rel' ).match( /lightbox\[([a-z]+)/i );
+	type = type ? type[1] : '';
+	switch( type[1] )
+	{
+		case 'p': // post
+			this_obj.colorbox( b2evo_colorbox_params_post );
+			break;
+		case 'c': // comment
+			this_obj.colorbox( b2evo_colorbox_params_cmnt );
+			break;
+		case 'user': // user
+			this_obj.colorbox( b2evo_colorbox_params_user );
+			break;
+		default: // all others
+			this_obj.colorbox( b2evo_colorbox_params );
+	}
+}
 jQuery( document ).ready( function()
 {
 	jQuery( 'a[rel^="lightbox"]' ).each( function()
 	{
-		var type = jQuery( this ).attr( 'rel' ).match( /lightbox\[([a-z]+)/i );
-		type = type ? type[1] : '';
-		switch( type[1] )
-		{
-			case 'p': // post
-				jQuery( this ).colorbox( b2evo_colorbox_params_post );
-				break;
-			case 'c': // comment
-				jQuery( this ).colorbox( b2evo_colorbox_params_cmnt );
-				break;
-			case 'user': // user
-				jQuery( this ).colorbox( b2evo_colorbox_params_user );
-				break;
-			default: // all others
-				jQuery( this ).colorbox( b2evo_colorbox_params );
-		}
+		init_colorbox( jQuery( this ) );
 	} );
 
 	jQuery( '#colorbox' ).swipe(

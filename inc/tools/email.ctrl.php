@@ -28,12 +28,13 @@ load_funcs('tools/model/_email.funcs.php');
 
 param_action();
 
-$tab = param( 'tab', 'string', 'blocked', true );
+$tab = param( 'tab', 'string', 'addresses', true );
+$tab2 = param( 'tab2', 'string', '', true );
 $tab3 = param( 'tab3', 'string', '', true );
 
 param( 'action', 'string' );
 
-if( $tab == 'blocked' )
+if( $tab == 'addresses' )
 {	// Email addresses
 	if( param( 'emadr_ID', 'integer', '', true) )
 	{	// Load Email Address object
@@ -58,20 +59,8 @@ switch( $action )
 
 		switch( $tab3 )
 		{
-			case 'notifications':
-				/* Email service preferences: */
-
-				if( $Settings->get( 'smtp_enabled' ) )
-				{ // Only when SMTP gateway is enabled
-
-					// Preferred email service
-					$Settings->set( 'email_service', param( 'email_service', 'string', 'mail' ) );
-
-					// Force email sending
-					$Settings->set( 'force_email_sending', param( 'force_email_sending', 'integer', 0 ) );
-				}
-
-				/* Email notifications: */
+			case 'envelope':
+				/* Email envelope: */
 
 				// Sender email address
 				$sender_email = param( 'notification_sender_email', 'string', '' );
@@ -100,6 +89,48 @@ switch( $action )
 				$Settings->set( 'notification_logo',  param( 'notification_logo', 'string', '' ) );
 				break;
 
+			case 'renderers':
+				// Update email renderers settings:
+				load_funcs('plugins/_plugin.funcs.php');
+
+				$Plugins->restart();
+				while( $loop_Plugin = & $Plugins->get_next() )
+				{
+					$tmp_params = array( 'for_editing' => true );
+					$pluginsettings = $loop_Plugin->get_email_setting_definitions( $tmp_params );
+					if( empty( $pluginsettings ) )
+					{
+						continue;
+					}
+
+					// Loop through settings for this plugin:
+					foreach( $pluginsettings as $set_name => $set_meta )
+					{
+						autoform_set_param_from_request( $set_name, $set_meta, $loop_Plugin, 'EmailSettings' );
+					}
+
+					// Let the plugin handle custom fields:
+					// We use call_method to keep track of this call, although calling the plugins PluginSettingsUpdateAction method directly _might_ work, too.
+					$tmp_params = array();
+					$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params );
+
+					if( $ok_to_update === false )
+					{	// The plugin has said they should not get updated, Rollback settings:
+						$loop_Plugin->Settings->reset();
+					}
+					else
+					{	// Update message settings of the Plugin:
+						$loop_Plugin->Settings->dbupdate();
+					}
+				}
+
+				$Messages->add( T_('Settings updated.'), 'success' );
+
+				// Redirect so that a reload doesn't write to the DB twice:
+				header_redirect( '?ctrl=email&tab=settings&tab3='.$tab3, 303 ); // Will EXIT
+				// We have EXITed already at this point!!
+				break;
+
 			case 'settings':
 				// Settings to decode the returned emails:
 				param( 'repath_enabled', 'boolean', 0 );
@@ -126,6 +157,9 @@ switch( $action )
 				param( 'repath_password', 'string', true );
 				$Settings->set( 'repath_password', $repath_password );
 
+				param( 'repath_imap_folder', 'string', true );
+				$Settings->set( 'repath_imap_folder', $repath_imap_folder );
+
 				param( 'repath_ignore_read', 'boolean', 0 );
 				$Settings->set( 'repath_ignore_read', $repath_ignore_read );
 
@@ -149,6 +183,12 @@ switch( $action )
 
 			case 'smtp':
 				// SMTP gateway settings:
+
+				// Preferred email service
+				$Settings->set( 'email_service', param( 'email_service', 'string', 'mail' ) );
+
+				// Force email sending
+				$Settings->set( 'force_email_sending', param( 'force_email_sending', 'integer', 0 ) );
 
 				$old_smtp_enabled = $Settings->get( 'smtp_enabled' );
 
@@ -192,6 +232,19 @@ switch( $action )
 				}
 				break;
 
+			case 'other':
+				/* Campaign sending: */
+
+				// Sending:
+				$Settings->set( 'email_campaign_send_mode', param( 'email_campaign_send_mode', 'string', 'immediate' ) );
+
+				// Chunk Size:
+				$Settings->set( 'email_campaign_chunk_size', param( 'email_campaign_chunk_size', 'integer', 0 ) );
+
+				// Delay between chunks:
+				$Settings->set( 'email_campaign_cron_repeat', param_duration( 'email_campaign_cron_repeat' ) );
+				break;
+
 			default:
 				// Invalid tab3
 				break 2;
@@ -207,7 +260,7 @@ switch( $action )
 				}
 				$Messages->add( T_('Settings updated.'), 'success' );
 
-				if( $Settings->get( 'smtp_enabled' ) )
+				if( $tab3 == 'smtp' && $Settings->get( 'smtp_enabled' ) )
 				{ // Check if connection is available
 					global $smtp_connection_result;
 					// Test SMTP connection
@@ -226,7 +279,7 @@ switch( $action )
 				}
 				else
 				{ // Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( '?ctrl=email&tab='.$tab.'&tab3='.$tab3, 303 ); // Will EXIT
+					header_redirect( '?ctrl=email&tab='.$tab.'&tab2='.$tab2.'&tab3='.$tab3, 303 ); // Will EXIT
 					// We have EXITed already at this point!!
 				}
 			}
@@ -258,7 +311,7 @@ switch( $action )
 		switch( $action )
 		{
 			case 'test_1':
-				if( $mbox = dre_connect() )
+				if( $mbox = dre_connect( false, true ) )
 				{	// Close opened connection
 					imap_close( $mbox );
 				}
@@ -360,7 +413,7 @@ switch( $action )
 			$Messages->add( T_('The email address was updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=email&tab=blocked', 303 ); // Will EXIT
+			header_redirect( '?ctrl=email', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		break;
@@ -379,7 +432,7 @@ switch( $action )
 			$Messages->add( T_('The email address was deleted.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=email&tab=blocked', 303 ); // Will EXIT
+			header_redirect( '?ctrl=email', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		break;
@@ -393,6 +446,8 @@ switch( $tab )
 	case 'sent':
 		$AdminUI->breadcrumbpath_add( T_('Sent'), '?ctrl=email&amp;tab='.$tab );
 
+		$tab3 = 'log';
+
 		$emlog_ID = param( 'emlog_ID', 'integer', 0 );
 		if( empty( $emlog_ID ) )
 		{ // Initialize date picker on list page
@@ -403,7 +458,7 @@ switch( $tab )
 		$AdminUI->set_page_manual_link( 'sent-emails' );
 		break;
 
-	case 'blocked':
+	case 'addresses':
 		$AdminUI->breadcrumbpath_add( T_('Addresses'), '?ctrl=email&amp;tab='.$tab );
 		if( !isset( $edited_EmailAddress ) )
 		{ // List page with email addresses
@@ -430,14 +485,32 @@ switch( $tab )
 		switch( $tab3 )
 		{
 			case 'log':
-				$AdminUI->breadcrumbpath_add( T_('Log'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( T_('Return Log'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'email-returned' );
 				break;
 
 			case 'settings':
-				$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( T_('POP/IMAP Settings'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+
+				if( $Settings->get( 'repath_enabled' ) )
+				{ // If the decoding the returned emails is enabled
+					$repath_cron_SQL = new SQL();
+					$repath_cron_SQL->SELECT( 'ctsk_ID' );
+					$repath_cron_SQL->FROM( 'T_cron__task' );
+					$repath_cron_SQL->WHERE( 'ctsk_key = "process-return-path-inbox"' );
+					$repath_cron = $DB->get_var( $repath_cron_SQL->get() );
+					if( empty( $repath_cron ) )
+					{ // Display a warning if cron job "Process the return path inbox" doesn't exist:
+						$repath_warning = T_('There is no scheduled job configured to process your Return Path inbox.');
+						if( $current_User->check_perm( 'options', 'edit' ) )
+						{ // Suggest a link to create a job if current user has a permission:
+							$repath_warning .= ' '.sprintf( T_('<a %s>Click here</a> to create such a job.'), ' href="'.$admin_url.'?ctrl=crontab&amp;action=new&amp;cjob_type=process-return-path-inbox"' );
+						}
+						$Messages->add( $repath_warning, 'warning' );
+					}
+				}
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'return-path-configuration' );
@@ -458,15 +531,21 @@ switch( $tab )
 	case 'settings':
 		$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=email&amp;tab='.$tab );
 
+		if( $tab2 == 'sent' )
+		{	// The settings are opened from from tab "Sent"
+			$orig_tab = $tab;
+			$tab = $tab2;
+		}
+
 		if( empty( $tab3 ) )
-		{
-			$tab3 = 'notifications';
+		{	// Default tab3 for this case:
+			$tab3 = 'renderers';
 		}
 
 		switch( $tab3 )
 		{
-			case 'notifications':
-				$AdminUI->breadcrumbpath_add( T_('Notifications'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+			case 'envelope':
+				$AdminUI->breadcrumbpath_add( T_('Envelope'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'email-notification-settings' );
@@ -477,6 +556,26 @@ switch( $tab )
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'smtp-gateway-settings' );
+
+				if( $Settings->get( 'email_service' ) == 'smtp' && ! $Settings->get( 'smtp_enabled' ) )
+				{	// Display this error when primary email service is SMTP but it is not enabled:
+					$Messages->add( T_('Your external SMTP Server is not enabled.'), 'error' );
+				}
+				break;
+
+			case 'other':
+				$AdminUI->breadcrumbpath_add( T_('Other'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'email-other-settings' );
+				break;
+
+			case 'renderers':
+			default:
+				$AdminUI->breadcrumbpath_add( T_('Renderers'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'email-renderers-settings' );
 				break;
 		}
 
@@ -484,6 +583,10 @@ switch( $tab )
 }
 
 $AdminUI->set_path( 'email', $tab, $tab3 );
+if( ! empty( $orig_tab ) )
+{	// Restore original tab:
+	$tab = $orig_tab;
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -515,7 +618,7 @@ switch( $tab )
 		$AdminUI->disp_view( 'tools/views/_email_sent.view.php' );
 		break;
 
-	case 'blocked':
+	case 'addresses':
 		if( isset( $edited_EmailAddress ) )
 		{	// Display form to create/edit an email address
 			$AdminUI->disp_view( 'tools/views/_email_address.form.php' );
@@ -565,13 +668,21 @@ switch( $tab )
 	case 'settings':
 		switch( $tab3 )
 		{
+			case 'envelope':
+				$AdminUI->disp_view( 'tools/views/_email_settings.form.php' );
+				break;
+
 			case 'smtp':
 				$AdminUI->disp_view( 'tools/views/_email_smtp.form.php' );
 				break;
 
-			case 'notifications':
+			case 'other':
+				$AdminUI->disp_view( 'tools/views/_email_other.form.php' );
+				break;
+
+			case 'renderers':
 			default:
-				$AdminUI->disp_view( 'tools/views/_email_settings.form.php' );
+				$AdminUI->disp_view( 'tools/views/_email_renderers.form.php' );
 		}
 		break;
 

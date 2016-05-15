@@ -214,23 +214,6 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 		}
 	}
 
-	$allow_collection_redirect = false;
-	if( $external_redirect && $allow_redirects_to_different_domain == 'all_collections_and_redirected_posts' && ! $redirected_post )
-	{ // If a redirect is external and we allow to redirect to all collection domains:
-		$BlogCache = & get_BlogCache();
-		$BlogCache->load_all();
-		$redirect_to_domain = preg_replace( '~https?://([^/]+)/?.*~i', '$1', $redirect_to );
-		foreach( $BlogCache->cache as $url_Blog )
-		{
-			$blog_domain = preg_replace( '~https?://([^/]+)/?.*~i', '$1', $url_Blog->gen_baseurl() );
-			if( $blog_domain == $redirect_to_domain )
-			{ // We found current redirect goes to a collection domain, so it is not external
-				$allow_collection_redirect = true;
-				break;
-			}
-		}
-	}
-
 	// Check if we're trying to redirect to an external URL:
 	if( $external_redirect // Attempting external redirect
 		&& ( $allow_redirects_to_different_domain != 'always' ) // Always allow redirects to different domains is not set
@@ -416,7 +399,7 @@ function get_request_title( $params = array() )
 	$r = array();
 
 	$params = array_merge( array(
-			'auto_pilot'          => 'none',
+			'auto_pilot'          => 'none', // This can be used to override several params at once. Possible value: 'seo_title'
 			'title_before'        => '',
 			'title_after'         => '',
 			'title_none'          => '',
@@ -431,6 +414,8 @@ function get_request_title( $params = array() )
 			'title_terms_after'   => '#',
 			'glue'                => ' - ',
 			'format'              => 'htmlbody',
+			// Title for each disp:
+			// fp> TODO: Make a global array of $disp => Clear text disp
 			'arcdir_text'         => T_('Archive Directory'),
 			'catdir_text'         => T_('Category Directory'),
 			'mediaidx_text'       => T_('Photo Index'),
@@ -455,18 +440,16 @@ function get_request_title( $params = array() )
 			'subs_text'           => T_('Notifications'),
 			'comments_text'       => T_('Latest Comments'),
 			'feedback-popup_text' => T_('Feedback'),
-			'edit_text_create'    => T_('New post'),
-			'edit_text_update'    => T_('Editing post'),
-			'edit_text_copy'      => T_('Duplicating post'),
 			'edit_comment_text'   => T_('Editing comment'),
 			'front_text'          => '',		// We don't want to display a special title on the front page
-			'posts_text'          => '#',
+			'posts_text'          => '#',		// Automatic - display filters
 			'useritems_text'      => T_('User posts'),
 			'usercomments_text'   => T_('User comments'),
 			'download_head_text'  => T_('Download').' - $file_title$ - $post_title$',
 			'download_body_text'  => '',
+			// fp> TODO: verify if we really want this:
 			'display_edit_links'  => true, // Display the links to advanced editing on disp=edit|edit_comment
-			'edit_links_template' => array(), // Template for the links to advanced editing on disp=edit|edit_comment
+			'edit_links_template' => array(), // More params for the links to advanced editing on disp=edit|edit_comment
 			'tags_text'           => T_('Tags'),
 		), $params );
 
@@ -648,7 +631,7 @@ function get_request_title( $params = array() )
 				$after = $params['title_'.$disp.'_after'];
 			}
 			break;
-	
+
 		case 'download':
 			// We are displaying a download page:
 			global $download_Link;
@@ -684,21 +667,24 @@ function get_request_title( $params = array() )
 			break;
 
 		case 'edit':
+			global $edited_Item;
+			$type_name = $edited_Item->get_ItemType()->get_name();
+
 			$action = param_action(); // Edit post by switching into 'In skin' mode from Back-office
 			$p = param( 'p', 'integer', 0 ); // Edit post from Front-office
 			$post_ID = param ( 'post_ID', 'integer', 0 ); // Update the edited post( If user is redirected to edit form again with some error messages )
 			$cp = param( 'cp', 'integer', 0 ); // Copy post from Front-office
 			if( $action == 'edit_switchtab' || $p > 0 || $post_ID > 0 )
 			{	// Edit post
-				$title = $params['edit_text_update'];
+				$title = sprintf( T_('Edit %s'), $type_name );
 			}
 			else if( $cp > 0 )
 			{	// Copy post
-				$title = $params['edit_text_copy'];
+				$title = sprintf( T_('Duplicate %s'), $type_name );
 			}
 			else
 			{	// Create post
-				$title = $params['edit_text_create'];
+				$title = sprintf( T_('New %s'), $type_name );
 			}
 			if( $params['display_edit_links'] && $params['auto_pilot'] != 'seo_title' )
 			{ // Add advanced edit and close icon
@@ -795,7 +781,6 @@ function get_request_title( $params = array() )
 				break;
 			}
 			// No break if empty, Use title from default case
-
 		default:
 			if( isset( $MainList ) )
 			{
@@ -930,7 +915,7 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
 function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js', $version = '#' )
 {
 	global $library_local_urls, $library_cdn_urls, $use_cdns, $debug, $rsc_url;
-	global $Blog, $baseurl, $assets_baseurl;
+	global $Blog, $baseurl, $assets_baseurl, $ReqURL;
 
 	// Check if we have a public CDN we want to use for this library file:
 	if( $use_cdns && ! empty( $library_cdn_urls[ $lib_file ] ) )
@@ -961,7 +946,7 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 	{ // Make the file relative to current page <base>:
 		$lib_url = $lib_file;
 	}
-	elseif( preg_match('~^(https?:)?//~', $lib_file ) )
+	elseif( preg_match( '~^(https?:)?//~', $lib_file ) )
 	{ // It's already an absolute url, keep it as is:
 		$lib_url = $lib_file;
 	}
@@ -991,6 +976,11 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 		$lib_url = url_add_param( $lib_url, 'v='.$version );
 	}
 
+	if( preg_match( '~^https://~', $ReqURL ) )
+	{ // If base url is safe then fix all media urls to protocol-relative format:
+		$lib_url = preg_replace( '~^http://~', '//', $lib_url );
+	}
+
 	return $lib_url;
 }
 
@@ -1009,11 +999,16 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
  */
 function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output = false )
 {
-	static $required_js;
+	global $required_js; // Use this var as global and NOT static, because it is used in other functions(e.g. display_ajax_form())
 	global $dequeued_headlines;
 
 	if( isset( $dequeued_headlines[ $js_file ] ) )
 	{ // Don't require this file if it was dequeued before this request
+		return;
+	}
+
+	if( is_admin_page() && in_array( $js_file, array( 'functions.js', 'ajax.js', 'form_extensions.js', 'extracats.js', 'dynamic_select.js', 'backoffice.js' ) ) )
+	{	// Don't require this file on back-office because it is auto loaded by bundled file evo_backoffice.bmin.js:
 		return;
 	}
 
@@ -1602,7 +1597,7 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
  */
 function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintbox' )
 {
-	global $blog;
+	global $Blog;
 
 	require_js( '#jquery#', $relative_to ); // dependency
 
@@ -1610,31 +1605,52 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 	{
 		case 'typeahead':
 			// Use typeahead library of bootstrap
+			require_js( '#bootstrap_typeahead#', $relative_to );
 			add_js_headline( 'jQuery( document ).ready( function()
 			{
-				jQuery( "input.autocomplete_login" ).typeahead( null,
+				jQuery( "input.autocomplete_login" ).on( "added",function()
 				{
-					displayKey: "login",
-					source: function ( query, cb )
+					jQuery( "input.autocomplete_login" ).each( function()
 					{
-						jQuery.ajax(
+						if( jQuery( this ).hasClass( "tt-input" ) || jQuery( this ).hasClass( "tt-hint" ) )
+						{	// Skip this field because typeahead is initialized before:
+							return;
+						}
+						var ajax_url = "";
+						if( jQuery( this ).hasClass( "only_assignees" ) )
 						{
-							url: "'.get_secure_htsrv_url().'async.php?action=get_login_list",
-							type: "post",
-							data: { q: query, data_type: "json" },
-							dataType: "JSON",
-							success: function( logins )
+							ajax_url = restapi_url + "collections/'.$Blog->get( 'urlname' ).'/assignees";
+						}
+						else
+						{
+							ajax_url = restapi_url + "users/logins";
+						}
+						jQuery( this ).typeahead( null,
+						{
+							displayKey: "login",
+							source: function ( query, cb )
 							{
-								var json = new Array();
-								for( var l in logins )
+								jQuery.ajax(
 								{
-									json.push( { login: logins[ l ] } );
-								}
-								cb( json );
+									type: "GET",
+									dataType: "JSON",
+									url: ajax_url,
+									data: { q: query },
+									success: function( data )
+									{
+										var json = new Array();
+										for( var l in data.list )
+										{
+											json.push( { login: data.list[ l ] } );
+										}
+										cb( json );
+									}
+								} );
 							}
 						} );
-					}
+					} );
 				} );
+				jQuery( "input.autocomplete_login" ).trigger( "added" );
 				'
 				// Don't submit a form by Enter when user is editing the owner fields
 				.get_prevent_key_enter_js( 'input.autocomplete_login' ).'
@@ -1654,16 +1670,21 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 			require_js( 'jquery/jquery.hintbox.min.js', $relative_to );
 			add_js_headline( 'jQuery( document ).on( "focus", "input.autocomplete_login", function()
 			{
-				var ajax_params = "";
+				var ajax_url = "";
 				if( jQuery( this ).hasClass( "only_assignees" ) )
 				{
-					ajax_params = "&user_type=assignees&blog='.$blog.'";
+					ajax_url = restapi_url + "collections/'.$Blog->get( 'urlname' ).'/assignees";
+				}
+				else
+				{
+					ajax_url = restapi_url + "users/logins";
 				}
 				jQuery( this ).hintbox(
 				{
-					url: "'.get_secure_htsrv_url().'async.php?action=get_login_list" + ajax_params,
+					url: ajax_url,
 					matchHint: true,
-					autoDimentions: true
+					autoDimentions: true,
+					json: true,
 				} );
 				'
 				// Don't submit a form by Enter when user is editing the owner fields
@@ -1958,7 +1979,7 @@ function credits( $params = array() )
 
 	display_list( $cred_links, $params['list_start'], $params['list_end'], $params['separator'], $params['item_start'], $params['item_end'], NULL, $max_credits );
 
-	return $max_credits;	
+	return $max_credits;
 }
 
 
@@ -2143,13 +2164,19 @@ function is_recursive( /*array*/ & $array, /*array*/ & $alreadySeen = array() )
  */
 function display_ajax_form( $params )
 {
-	global $rsc_url, $samedomain_htsrv_url, $ajax_form_number;
+	global $rsc_url, $samedomain_htsrv_url, $ajax_form_number, $required_js;
 
 	if( is_recursive( $params ) )
 	{ // The params array contains recursion, don't try to encode, display error message instead
 		// We don't use translation because this situation should not really happen ( Probably it happesn with some wrong skin )
 		echo '<p style="color:red;font-weight:bold">'.T_( 'This section can\'t be displayed because wrong params were created by the skin.' ).'</p>';
 		return;
+	}
+
+	if( ! empty( $required_js ) )
+	{	// Send all loaded JS files to ajax request in order to don't load them twice:
+		// yura: It was done because JS of bootstrap modal doesn't work when jquery JS file is loaded twice.
+		$params['required_js'] = $required_js;
 	}
 
 	if( empty( $ajax_form_number ) )

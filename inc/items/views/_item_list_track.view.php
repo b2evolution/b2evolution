@@ -62,97 +62,14 @@ $ItemList->filter_area = array(
 */
 
 
-/**
- * Get title of the item/task cell by field type
- *
- * @param string Type of the field: 'priority', 'status', 'assigned'
- * @param object Item
- * @param integer Priority
- * @return string
- */
-function td_task_cell( $type, $Item )
-{
-	global $current_User;
-
-	switch( $type )
-	{
-		case 'priority':
-			$value = $Item->priority;
-			$title = item_priority_title( $Item->priority );
-			break;
-
-		case 'status':
-			$value = $Item->pst_ID;
-			$title = $Item->get( 't_extra_status' );
-			if( empty( $title ) )
-			{
-				$title = T_('No status');
-			}
-			break;
-
-		case 'assigned':
-			$value = $Item->assigned_user_ID;
-			if( empty( $value ) )
-			{
-				$title = T_('No user');
-			}
-			else
-			{
-				$UserCache = & get_UserCache();
-				$User = & $UserCache->get_by_ID( $Item->assigned_user_ID );
-				$title = $User->get_colored_login( array( 'mask' => '$avatar$ $login$' ) );
-			}
-			break;
-
-		default:
-			$value = 0;
-			$title = '';
-	}
-
-	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
-	{ // Current user can edit this item
-		return '<a href="#" rel="'.$value.'">'.$title.'</a>';
-	}
-	else
-	{ // No perms to edit item, Display only a title
-		return $title;
-	}
-}
-
-
-/**
- * Get a <td> class of a cell
- *
- * @param integer Post ID
- * @param integer $post_pst_ID
- * @param string Class name to make this cell editable
- * @return string
- */
-function td_task_class( $post_ID, $post_pst_ID, $editable_class )
-{
-	global $current_User;
-
-	$ItemCache = & get_ItemCache();
-	$Item = & $ItemCache->get_by_ID( $post_ID );
-
-	$class = 'nowrap tskst_'.$post_pst_ID;
-	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
-	{ // Current user can edit this item, Add a class to edit a priority by click from view list
-		$class .= ' '.$editable_class;
-	}
-
-	return $class;
-}
-
-
 $ItemList->title = T_('Task list');
 
 $ItemList->cols[] = array(
 						'th' => /* TRANS: abbrev for Priority */ T_('Priority'),
 						'order' => 'priority',
 						'th_class' => 'shrinkwrap',
-						'td_class' => '%td_task_class( #post_ID#, #post_pst_ID#, "task_priority_edit" )%',
-						'td' => '%td_task_cell( "priority", {Obj} )%',
+						'td_class' => '%item_td_task_class( #post_ID#, #post_pst_ID#, "task_priority_edit" )%',
+						'td' => '%item_td_task_cell( "priority", {Obj} )%',
 						'extra' => array( 'rel' => '#post_ID#', 'style' => 'background-color: %item_priority_color( "#post_priority#" )%;', 'format_to_output' => false )
 					);
 
@@ -167,8 +84,8 @@ $ItemList->cols[] = array(
 						'th' => T_('Assigned'),
 						'order' => 'assigned_user_ID',
 						'th_class' => 'shrinkwrap',
-						'td_class' => '%td_task_class( #post_ID#, #post_pst_ID#, "task_assigned_edit" )%',
-						'td' => '%td_task_cell( "assigned", {Obj} )%',
+						'td_class' => '%item_td_task_class( #post_ID#, #post_pst_ID#, "task_assigned_edit" )%',
+						'td' => '%item_td_task_cell( "assigned", {Obj} )%',
 						'extra' => array( 'rel' => '#post_ID#', 'format_to_output' => false )
 					);
 
@@ -176,8 +93,8 @@ $ItemList->cols[] = array(
 						'th' => T_('Status'),
 						'order' => 'pst_ID',
 						'th_class' => 'shrinkwrap',
-						'td_class' => '%td_task_class( #post_ID#, #post_pst_ID#, "task_status_edit" )%',
-						'td' => '%td_task_cell( "status", {Obj} )%',
+						'td_class' => '%item_td_task_class( #post_ID#, #post_pst_ID#, "task_status_edit" )%',
+						'td' => '%item_td_task_cell( "status", {Obj} )%',
 						'extra' => array( 'rel' => '#post_ID#', 'format_to_output' => false )
 					);
 
@@ -284,7 +201,8 @@ $ItemStatusCache->load_all();
 $task_statuses = array( 0 => T_('No status') );
 foreach( $ItemStatusCache->cache as $ItemStatus )
 {
-	$task_statuses[ $ItemStatus->ID ] = $ItemStatus->name;
+	// Add '_' to don't break a sorting by name on jeditable:
+	$task_statuses[ '_'.$ItemStatus->ID ] = $ItemStatus->name;
 }
 echo_editable_column_js( array(
 	'column_selector' => '.task_status_edit',

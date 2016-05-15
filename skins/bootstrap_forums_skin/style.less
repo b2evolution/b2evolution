@@ -1,6 +1,14 @@
 // --------- Universal item list widget & Recent posts widget --------- 
-	@import "../../rsc/less/_universal_item_list_widget.module.less";
+@import "../../rsc/less/_universal_item_list_widget.module.less";
 // --------------------------------------------------------------------
+
+// ------------------- Media Index widget -------------------- 
+@import "../../rsc/less/_coll_media_index_widget.module.less";
+// -----------------------------------------------------------
+
+// ----------- User Avatars (User List) widget ------------ 
+@import "../../rsc/less/_user_avatars_widget.module.less";
+// --------------------------------------------------------
 
 // ------------- Organization Members widget -------------
 @import "../../rsc/less/_org_members_widget.module.less";
@@ -95,7 +103,7 @@ ol.breadcrumb {
 		.post_button {
 			float: left;
 			vertical-align: top;
-		}		
+		}
 		.pagination {
 			display: inline-block;
 			vertical-align: top;
@@ -145,7 +153,7 @@ ol.breadcrumb {
 		.ft_title {
 			margin-left: 35px;
 			.fa {
-				margin: 5px 5px 0px 0px;
+				margin: 0px 5px 0px 0px;
 			}
 			.small {
 				font-size: 90%;
@@ -159,11 +167,8 @@ ol.breadcrumb {
 			display: inline-block;
 			white-space: normal !important;
 		}
-		.ft_author_info.shrinked {
-			display: none;
-		}
+
 		.ft_date {
-			margin-top: 14px;
 			text-align: left;
 			img {
 				border-radius: 50%;
@@ -173,7 +178,12 @@ ol.breadcrumb {
 			}
 		}
 		.ft_count {
-			margin-top: 8px;
+			margin-top: 12px;
+		}
+		.ft_assigned {
+			img {
+				border-radius: 50%;
+			}
 		}
 	}
 	.ft_status {
@@ -185,20 +195,82 @@ ol.breadcrumb {
 	.ft_status_topic {
 		width: 30px;
 		padding: 0px;
-		margin-top: 5px;
+		//margin-top: 5px;
 		float: left;
+		.fa.fa-comments {
+			color: #000000;
+		}
+		.fa.fa-comments:hover {
+			color: inherit;
+		}
 	}
 	.ft_count {
-		margin-top: 5px;
+		margin-top: 12px;
 		font-size: 90%;
 		a, div {
 			font-size: 16px;
 		}
 	}
+	.ft_assigned {
+		font-size: 90%;
+		line-height: 16px;
+		margin-top: 3px;
+		div.ft_assigned_header {
+				margin-bottom: 5px;
+			}
+		span.user.anonymous, span.identity_link_username {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 100%;
+			display: inline-block;
+		}
+		.ft_assigned_info {
+			padding-left: 42px;
+		}
+	}
+
+	.ft_not_assigned {
+		font-size: 90%;
+		line-height: 16px;
+		margin-top: 3px;
+		div.ft_assigned_header {
+				margin-bottom: 5px;
+			}
+		span.user.anonymous, span.identity_link_username {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 100%;
+			display: inline-block;
+		}
+		.ft_assigned_info {
+			padding-left: 0px;
+		}
+	}
+
+
+	.ft_not_assigned {
+		font-size: 90%;
+		line-height: 16px;
+		margin-top: 13px;
+	}
+
 	.ft_date {
-		margin-top: 17px;
 		color: #8b96a1;
 		font-size: 90%;
+		line-height: 16px;
+		margin-top: 3px;
+		div.ft_date_header {
+				margin-bottom: 5px;
+			}
+		span.user.anonymous, span.identity_link_username {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 100%;
+			display: inline-block;
+		}
 	}
 	.ft_title >	a.forumlink {
 		font-size: 21px;
@@ -211,13 +283,33 @@ ol.breadcrumb {
 		text-align: center;
 		color: #8B96A1;
 	}
+	.ft_assigned_avatar {
+		float: left;
+		margin-right: 10px;
+		display: block;
+		.ft_assigned_avatar {
+			float: none;
+			margin-right: 0;
+		}
+	}
 	.ft_date {
 		text-align: center;
 		white-space: nowrap;
-		line-height: 16px;
 	}
 	.ft_date_shrinked, .ft_date_shrinked_more {
 		display: none;
+		line-height: 16px;
+		margin-top: 3px;
+		div.ft_date_header {
+				margin-bottom: 5px;
+			}
+		span.user.anonymous, span.identity_link_username {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 100%;
+			display: inline-block;
+		}
 	}
 	.ft_author_avatar {
 		float: left;
@@ -258,9 +350,6 @@ ol.breadcrumb {
 			margin: 0px;
 			display: inline;
 		}
-		.ft_author_info.shrinked {
-			display: none;
-		}
 	}
 }
 .evo_comment_title {
@@ -269,7 +358,7 @@ ol.breadcrumb {
 		&:hover {
 			color: #23527c;
 		}
-	}	
+	}
 }
 .bCommentAvatar {
 	border-radius: 50%;
@@ -456,10 +545,7 @@ ul.legend {
 
 // Single topic view
 .single_page_title {
-	margin-bottom: 20px;	
-		.ft_author_info.shrinked {
-			display: none;
-		}
+	margin-bottom: 20px;
 }
 .single_topic {
 	.ft_post_info {
@@ -611,7 +697,7 @@ label.control-label[for=post_title] {
 	}
 	.posts_panel {
 		.ft_count {
-			margin-top: 10px !important;			
+			margin-top: 12px !important;
 		}
 	}
 }
@@ -626,7 +712,7 @@ label.control-label[for=post_title] {
 	.posts_panel {
 		.ft_status_topic {
 			vertical-align: top;
-			margin-top: 5px;
+			//margin-top: 5px;
 		}
 		.ft_title .floatright {
 			display: inline-block;
@@ -641,6 +727,9 @@ label.control-label[for=post_title] {
 @media screen and (max-width: 767px) {
 	.ft_date {
 		display: none !important;
+	}
+	.ft_assigned {
+		margin-top: 4px;
 	}
 	.ft_date_shrinked {
 		display: inline-block !important;
@@ -657,12 +746,15 @@ label.control-label[for=post_title] {
 		.ft_count {
 			margin: 0px;
 			text-align: left;
-			margin-top: 0px !important;
-			margin-left: 45px;
-			padding-left: 5px;
+			margin-top: 4px !important;
+			padding-left: 50px;
+			//padding-left: 5px;
 			div {
 				display: inline-block;
 			}
+		}
+		.ft_assigned {
+			margin-top: 4px;
 		}
 		.ft_date_shrinked {
 			text-align: left;
@@ -735,8 +827,8 @@ label.control-label[for=post_title] {
 		}
 		.ft_count {
 			text-align: left;
-			margin-top: 2px !important;
-			width: 80px;
+			margin-top: 4px !important;
+			//width: 80px;
 			padding-right: 5px;
 			div {
 				display: inline-block !important;
@@ -746,10 +838,20 @@ label.control-label[for=post_title] {
 				margin-left: 0px;
 			}
 		}
+		.ft_not_assigned {
+			padding-left: 0px;
+			margin-top: 4px;
+		}
+
+		.ft_assigned {
+			padding-left: 0px;
+			margin-top: 4px;
+		}
 		.ft_date_shrinked {
 			text-align: right;
 			float: right;
 			margin-top: 6px;
+			margin-left: 5px;
 		}
 	}
 	.front_panel {
@@ -757,9 +859,12 @@ label.control-label[for=post_title] {
 			display: inline-block !important;
 			padding-left: 5px !important;
 			margin-left: 55px;
-			&:second_of_class {				
+			&:second_of_class {
 			margin-left: 0px !important;
 			}
+		}
+		.ft_assigned {
+			margin-top: 4px;
 		}
 		.ft_date_shrinked {
 			margin-top: 4px;
@@ -768,7 +873,7 @@ label.control-label[for=post_title] {
 		}
 	}
 	.posts_panel {
-		.small { 
+		.small {
 			display: none;
 		}
 		.ft_date_shrinked.item_list {
@@ -795,20 +900,23 @@ label.control-label[for=post_title] {
 	.page_title, .panel-heading h2 {
 		font-size: 170%;
 	}
+
+	.forums_list
+		img.ft_assigned_avatar {
+			display: none;
+		}
+
 	.ft_date_shrinked_more {
 		display: block !important;
 		text-align: right;
 		padding-right: 15px;
 		margin-top: 2px;
 		color: #8b96a1;
-		font-size: 90%;
+		font-size: 80%;
 	}
-	.single_page_title {		
+	.single_page_title {
 		.ft_author_info {
 			display: none;
-			&.shrinked {
-				display: block !important;
-			}
 		}
 	}
 	/* Disp front */
@@ -822,26 +930,33 @@ label.control-label[for=post_title] {
 				margin-left: 5px;
 			}
 		}
-		.ft_date_shrinked {			
+		.ft_date_shrinked {
 			width: 70px;
 		}
 	}
 	/* Disp posts */
-	.posts_panel {		
+	.posts_panel {
 		.ft_status_topic {
 			vertical-align: top;
 			margin-top: 8px;
 		}
 		.ft_count {
 			margin-top: 0px;
-			margin-left: 50px;
-			padding-left: 0px;
+			padding-left: 50px;
+			//padding-left: 0px;
+		}
+		.ft_assigned {
+			font-size: 90%;
+			.ft_assigned_info {
+				padding-left: 0;
+			}
+		}
+		.ft_date_shrinked.item_list {
+			font-size: 90%;
+			margin-top: 4px;
 		}
 		.ft_author_info {
 			display: none !important;
-		}
-		.ft_author_info.shrinked {
-			display: inline;
 		}
 	}
 	/* Disp Single */
@@ -850,9 +965,7 @@ label.control-label[for=post_title] {
 			display: none;
 		}
 	}
-	.ft_author_info.shrinked {
-		display: block !important;
-	}
+
 	.evo_comment_avatar, .single_topic .evo_content_block .panel-body .ft_avatar {
 		margin-right: 0px !important;
 		a img, span img {
@@ -869,7 +982,7 @@ label.control-label[for=post_title] {
 				float: none;
 				vertical-align: top;
 				margin-bottom: 15px;
-			}		
+			}
 			.pagination {
 				float: none;
 				display: block;
@@ -934,7 +1047,7 @@ a.to_top {
 	}
 }
 
-// 
+//
 .popover img {
 	.border-radius !important;
 }
@@ -958,4 +1071,22 @@ a.to_top {
 .comments_link__pagination .alert {
 	margin: 0;
 	text-align: left;
+}
+
+// Class for box-shadow on post images
+.raised img {
+	-webkit-box-shadow: 0px 0px 11px 0px rgba(0,0,0,0.3);
+	-moz-box-shadow: 0px 0px 11px 0px rgba(0,0,0,0.3);
+	box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
+}
+
+// Class for thumbnail format on post images
+.thumbnail {
+	max-width: 200px !important;
+	max-height: 200px !important;
+    min-height: auto !important;
+	display: inline-block;
+}
+.thumbnail img {
+	min-height: auto !important;
 }

@@ -139,7 +139,7 @@ class AdminUI_general extends Menu
 	/**
 	 * Constructor.
 	 */
-	function AdminUI_general()
+	function __construct()
 	{
 		global $mode; // TODO: make it a real property
 		global $htsrv_url, $baseurl;
@@ -159,6 +159,9 @@ class AdminUI_general extends Menu
 
 		require_js( '#jquery#', 'rsc_url' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
+
+		// Load general JS file:
+		require_js( 'build/evo_backoffice.bmin.js', 'rsc_url' );
 
 		if( $check_browser_version && $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
 		{	// Display info message if browser IE < 9 version and it is allowed by config var:
@@ -203,7 +206,7 @@ class AdminUI_general extends Menu
 
 		if( $add_blog && isset( $Blog ) )
 		{ // Add path to Blog
-			$this->breadcrumbpath_add( $Blog->dget('shortname'), !empty( $blog_url ) ? $blog_url : $admin_url.'?ctrl=dashboard&amp;blog=$blog$' );
+			$this->breadcrumbpath_add( $Blog->dget('shortname'), !empty( $blog_url ) ? $blog_url : $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' );
 		}
 
 		// Initialize the default manual link, this is always visible when explicit manual link is not set for a page
@@ -774,7 +777,7 @@ class AdminUI_general extends Menu
 
 			$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
 
-			if( $l_Blog->get( 'favorite' ) || $l_blog_ID == $blog )
+			if( $l_Blog->favorite() || $l_blog_ID == $blog )
 			{ // If blog is favorute OR current blog, Add blog as a button:
 				$buttons .= $template[ $l_blog_ID == $blog ? 'beforeEachSel' : 'beforeEach' ];
 
@@ -798,7 +801,7 @@ class AdminUI_general extends Menu
 				}
 			}
 
-			if( !$l_Blog->get( 'favorite' ) )
+			if( !$l_Blog->favorite() )
 			{ // If blog is not favorute, Add it into the select list:
 				$not_favorite_blogs = true;
 				$select_options .= '<option value="'.$l_blog_ID.'"';
@@ -1568,7 +1571,7 @@ class AdminUI_general extends Menu
 
 	/**
 	 * Get show evobar setting. Default true for every admin skin.
-	 * @return boolean 
+	 * @return boolean
 	 */
 	function get_show_evobar()
 	{

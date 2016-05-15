@@ -5,6 +5,93 @@
  *
  * Override this with style.css in your skin folder.
  */
+.ratings_table {
+  margin: 0 10px 10px 0;
+  display: inline-block;
+}
+.ratings_table .rating_summary {
+  border-spacing: 1px;
+  border-collapse: separate;
+}
+.ratings_table .progress {
+  border-radius: 0;
+  height: 13px;
+}
+table.rating_summary {
+  float: left;
+  margin: 0;
+}
+table.rating_summary tr th,
+table.rating_summary tr td {
+  border: none;
+  font-size: 10px;
+  line-height: 13px;
+  font-weight: normal;
+  padding: 0;
+}
+table.rating_summary tr th {
+  padding-right: 5px;
+  background-color: transparent;
+}
+table.rating_summary tr td {
+  text-align: right;
+  padding-left: 5px;
+}
+table.rating_summary .progress {
+  width: 60px;
+  background: #eeeecc;
+  padding: 0;
+  box-shadow: none;
+}
+table.rating_summary .progress div {
+  background: #ffcc66;
+}
+div.rating_summary_total {
+  float: left;
+  padding: 5px 0 0 20px;
+}
+div.average_rating {
+  padding-top: 5px;
+}
+div.average_rating span {
+  float: left;
+  font-size: 11px;
+  line-height: 12px;
+  padding-left: 10px;
+}
+div.star_rating,
+div.star_rating div {
+  width: 60px;
+  height: 12px;
+  background: url(../icons/icons_sprite.png) repeat-x -64px -160px;
+  overflow: hidden;
+  text-indent: 100px;
+}
+div.star_rating div {
+  background-position: 0 -160px;
+}
+div.average_rating .star_rating {
+  float: left;
+}
+.rating_recap {
+  clear: both;
+  font-size: 10px;
+}
+.rating_recap div {
+  float: left;
+  padding-right: 10px;
+}
+.videojs_block .vjs-default-skin .vjs-big-play-button {
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+*[class^="listnav_distance_"],
+*[class*=" listnav_distance_"] {
+  display: none;
+}
 table.prevnext_post {
   width: 95%;
   margin: 0 auto;
@@ -42,6 +129,7 @@ table.bCalendarTable caption {
   margin: auto;
   padding: 3px 0;
   white-space: nowrap;
+  text-align: center;
 }
 table.bCalendarTable {
   margin: 0 auto 1em auto;
@@ -247,7 +335,6 @@ textarea.form_textarea_input {
   background-color: #fec;
   padding: 1px;
   margin: 4px;
-  -moz-border-radius: 3px;
   border-radius: 3px;
 }
 .form_footer_notes {
@@ -384,75 +471,6 @@ div.results {
   width: 100%;
   overflow: auto;
 }
-.ratings_table {
-  padding: 10px;
-  margin-right: 10px;
-  display: inline-block;
-}
-table.rating_summary {
-  float: left;
-  margin: 0;
-}
-table.rating_summary th,
-table.rating_summary td {
-  border: none;
-  font-size: 10px;
-  line-height: 13px;
-  font-weight: normal;
-  padding: 0;
-}
-table.rating_summary th {
-  padding-right: 5px;
-  background-color: transparent;
-}
-table.rating_summary .progress {
-  width: 60px;
-  background: #eeeecc;
-  padding: 0;
-  box-shadow: none;
-}
-table.rating_summary .progress div {
-  background: #ffcc66;
-}
-table.rating_summary td {
-  text-align: right;
-  padding-left: 5px;
-}
-div.rating_summary_total {
-  float: left;
-  padding: 5px 0 0 20px;
-}
-div.average_rating {
-  padding-top: 5px;
-}
-div.average_rating span {
-  float: left;
-  font-size: 11px;
-  line-height: 12px;
-  padding-left: 10px;
-}
-div.star_rating,
-div.star_rating div {
-  width: 60px;
-  height: 12px;
-  background: url(../icons/icons_sprite.png) repeat-x -64px -160px;
-  overflow: hidden;
-  text-indent: 100px;
-}
-div.star_rating div {
-  background-position: 0 -160px;
-}
-div.average_rating .star_rating {
-  float: left;
-}
-.rating_recap {
-  clear: both;
-  font-size: 10px;
-}
-.rating_recap div {
-  float: left;
-  padding-right: 10px;
-}
 form.inskin {
   padding: 10px;
 }
@@ -577,8 +595,6 @@ div.item_location {
   border: 1px solid #BBB;
   background: #D4D4D4;
   padding: 0 5px 5px 5px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
   -khtml-border-radius: 4px;
   border-radius: 4px;
 }
@@ -732,6 +748,7 @@ div.results span[class*=status_] span {
 }
 .search_title {
   font-size: 125%;
+  color: #666;
 }
 .search_title a {
   text-decoration: underline;
@@ -847,8 +864,6 @@ div.results span[class*=status_] span {
   text-align: center;
   vertical-align: middle;
   border: 1px solid #999;
-  -moz-border-radius: 2px;
-  -webkit-border-radius: 2px;
   -khtml-border-radius: 2px;
   border-radius: 2px;
   padding: 2px;
@@ -887,20 +902,12 @@ input.btn-lg {
   margin: 0 auto;
 }
 .main_profile_picture {
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
   border-radius: 4px;
 }
 .other_profile_pictures {
   margin-bottom: 10px;
 }
 .other_profile_pictures img {
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
   border-radius: 4px;
 }
 .profile_column_left {
@@ -954,7 +961,62 @@ input.btn-lg {
   padding: 8px;
   vertical-align: top;
 }
+.evo_content_block table.evo_poll__table {
+  border-spacing: 0;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+.evo_content_block table.evo_poll__table th {
+  padding: 2px 10px 2px 0;
+  background-color: #eee;
+}
+.evo_content_block table.evo_poll__table td {
+  padding: 2px 10px 2px 0;
+  vertical-align: top;
+}
 .evo_post_gallery__image {
   display: inline-block;
   margin: 0 1ex 1ex 0;
+}
+.evo_poll__table {
+  margin-bottom: 14px;
+  width: 100%;
+}
+.evo_poll__table td {
+  padding: 2px 10px 2px 0;
+  vertical-align: top;
+}
+.evo_poll__table tr td:last-child {
+  padding-right: 0;
+}
+.evo_poll__table input[type=radio],
+.evo_poll__table label {
+  margin: 0;
+}
+.evo_poll__table .evo_poll__percent_bar {
+  width: 100%;
+  min-width: 40px;
+  padding-right: 6px;
+}
+.evo_poll__table .evo_poll__percent_bar > div {
+  width: 100%;
+  vertical-align: middle;
+  display: inline-block;
+}
+.evo_poll__table .evo_poll__percent_bar > div > div {
+  background: #ffcc66;
+  height: 12px;
+  min-width: 1px;
+}
+.evo_poll__table .evo_poll__selector {
+  width: 5px;
+}
+.evo_poll__table .evo_poll__title {
+  white-space: nowrap;
+}
+.evo_poll__table .evo_poll_percentage {
+  max-width: 50px;
+}
+.evo_container__sidebar .evo_poll__title {
+  white-space: normal;
 }

@@ -58,9 +58,9 @@ $params = array_merge( array(
 		'image_size'               => 'fit-1280x720',
 		'image_limit'              =>  1000,
 		'image_link_to'            => 'original', // Can be 'original', 'single' or empty
-		'excerpt_image_class'      => 'img-responsive',
-		'excerpt_image_size'       => 'fit-1280x720',
-		'excerpt_image_limit'      => 1,
+		'excerpt_image_class'      => '',
+		'excerpt_image_size'       => 'fit-80x80',
+		'excerpt_image_limit'      => 0,
 		'excerpt_image_link_to'    => 'single',
 		'include_cover_images'     => false, // Set to true if you want cover images to appear with teaser images.
 
@@ -175,7 +175,7 @@ switch( $content_mode )
 		// Compact display:
 		echo $params['content_start_excerpt'];
 
-		if( !empty($params['excerpt_image_size']) )
+		if( !empty($params['excerpt_image_size']) && !empty($params['excerpt_image_limit']) )
 		{
 			// Display images that are linked to this post:
 			$Item->images( array(

@@ -30,8 +30,8 @@ $Form = new Form( NULL, 'itemtype_checkchanges' );
 if( $edited_Itemtype->ID > 0 )
 {
 	$default_ids = ItemType::get_default_ids();
-	if( ! $edited_Itemtype->is_special() && ! in_array( $edited_Itemtype->ID, $default_ids ) )
-	{ // Allow delete post type only if it is not default of blogs
+	if( ! in_array( $edited_Itemtype->ID, $default_ids ) )
+	{	// Allow delete post type only if it is not default of blogs:
 		$Form->global_icon( T_('Delete this Post Type!'), 'delete', regenerate_url( 'action', 'action=delete&amp;crumb_itemtype='.get_crumb( 'itemtype' ) ) );
 	}
 }
@@ -42,25 +42,15 @@ $Form->begin_form( 'fform', ( $edited_Itemtype->ID > 0 ? T_('Edit post type') : 
 $Form->add_crumb( 'itemtype' );
 $Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',ityp_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
-$Form->begin_fieldset( $creating ?  T_('New Post Type').get_manual_link('item-type-form') : T_('Post type').get_manual_link('item-type-form') );
+$Form->begin_fieldset( T_('General').get_manual_link('item-type-general') );
 
-	if( $creating )
-	{
-		$Form->text_input( 'new_ityp_ID', get_param( 'new_ityp_ID' ), 8, T_('ID'), '', array( 'maxlength'=> 10, 'required'=>true ) );
-	}
-	else
-	{
-		$Form->hidden( 'ityp_ID', $edited_Itemtype->ID );
-	}
+	$Form->hidden( 'ityp_ID', $edited_Itemtype->ID );
 
-	if( $edited_Itemtype->is_special() )
-	{ // Don't edit a name of special post types
-		$Form->info( T_('Name'), $edited_Itemtype->name );
-	}
-	else
-	{ // Display a field to edit a name
-		$Form->text_input( 'ityp_name', $edited_Itemtype->name, 50, T_('Name'), '', array( 'maxlength' => 30, 'required' => true ) );
-	}
+	$ItemTypeCache = & get_ItemTypeCache();
+	$Form->select_input_array( 'ityp_usage', $edited_Itemtype->usage, $ItemTypeCache->get_usage_option_array(), T_('Usage'), '', array( 'required' => true ) );
+
+	// Display a field to edit a name:
+	$Form->text_input( 'ityp_name', $edited_Itemtype->name, 50, T_('Name'), '', array( 'maxlength' => 30, 'required' => true ) );
 
 	$Form->textarea_input( 'ityp_description', $edited_Itemtype->description, 2, T_('Description'), array( 'cols' => 47 ) );
 	$Form->radio( 'ityp_perm_level', $edited_Itemtype->perm_level, array(
@@ -68,9 +58,16 @@ $Form->begin_fieldset( $creating ?  T_('New Post Type').get_manual_link('item-ty
 			array( 'restricted', T_('Restricted') ),
 			array( 'admin',      T_('Admin') )
 		), T_('Permission level') );
-	$Form->text_input( 'ityp_backoffice_tab', $edited_Itemtype->backoffice_tab, 25, T_('Back-office tab'), T_('Items of this type will be listed in this back-office tab. If empty, items will be found only in the "All" tab.'), array( 'maxlength' => 30 ) );
 	$Form->text_input( 'ityp_template_name', $edited_Itemtype->template_name, 25, T_('Template name'), T_('b2evolution will automatically append .main.php or .disp.php'), array( 'maxlength' => 40 ) );
 
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Use of Instructions').get_manual_link( 'item-type-instructions' ), array( 'id' => 'itemtype_instructions' ) );
+	$Form->checklist( array(
+		array( 'ityp_front_instruction', 1, T_('In front-office edit screen'),$edited_Itemtype->front_instruction ),
+		array( 'ityp_back_instruction', 1, T_('In back-office edit screen'), $edited_Itemtype->back_instruction )
+	), 'ityp_instruction_enable', T_('Display instructions') );
+	$Form->textarea_input( 'ityp_instruction', $edited_Itemtype->instruction, 5, T_('Instructions'), array( 'cols' => 47 ) );
 $Form->end_fieldset();
 
 $options = array(
@@ -80,7 +77,7 @@ $options = array(
 	);
 
 // Check if current type is intro and set specific params for the fields "ityp_allow_breaks" and "ityp_allow_featured":
-$intro_type_disabled = ItemType::is_intro( $edited_Itemtype->ID );
+$intro_type_disabled = $edited_Itemtype->is_intro();
 $intro_type_note = $intro_type_disabled ? T_('This feature is not compatible with Intro posts.') : '';
 
 $Form->begin_fieldset( T_('Features').get_manual_link( 'item-type-features' ), array( 'id' => 'itemtype_features' ) );
@@ -96,6 +93,7 @@ $Form->begin_fieldset( T_('Use of Advanced Properties').get_manual_link( 'item-t
 	$Form->radio( 'ityp_use_tags', $edited_Itemtype->use_tags, $options, T_('Use tags') );
 	$Form->radio( 'ityp_use_excerpt', $edited_Itemtype->use_excerpt, $options, T_('Use excerpt') );
 	$Form->radio( 'ityp_use_url', $edited_Itemtype->use_url, $options, T_('Use URL') );
+	$Form->checkbox( 'ityp_podcast', $edited_Itemtype->podcast, '', T_('Treat as Podcast Media') );
 	$Form->radio( 'ityp_use_parent', $edited_Itemtype->use_parent, $options, T_('Use Parent ID') );
 	$Form->radio( 'ityp_use_title_tag', $edited_Itemtype->use_title_tag, $options, htmlspecialchars( T_('Use <title> tag') ) );
 	$Form->radio( 'ityp_use_meta_desc', $edited_Itemtype->use_meta_desc, $options, htmlspecialchars( T_('Use <meta> description') ) );

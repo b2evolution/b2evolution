@@ -11,6 +11,7 @@
 		margin-top: 43px;
 	}
 	.header_top {
+		/* autoprefixer: off */
 		background-color: #242D36;
 		background-image: -webkit-linear-gradient(#1E252D, #2B3540);
 		background-image: -moz-linear-gradient(#1E252D, #2B3540);
@@ -21,6 +22,7 @@
 		font-weight: bold;
 	}
 	.header_bottom {
+		/* autoprefixer: off */
 		background-color: #3C597F;
 		background-image: -webkit-linear-gradient(#50739B, #283F63);
 		background-image: -moz-linear-gradient(#50739B, #283F63);
@@ -65,6 +67,7 @@
 	.widget_core_coll_search_form form {
 		padding: 11px;
 		.search_field {
+			/* autoprefixer: off */
 			outline: none;
 			background-color: #EAECF1;
 			background-image: -webkit-linear-gradient(#FFFFFF, #D5D9E3);
@@ -83,16 +86,17 @@
 			}
 		}
 		.search_submit {
-			background: transparent url("../../rsc/icons/icons_sprite.png") -16px -176px no-repeat;
+			background: transparent none repeat scroll 0 0;
 			border: medium none;
-			width: 16px;
-			height: 16px;
-			margin: 9px;
+			border-radius: 5px;
+			cursor: pointer;
+			font-family: FontAwesome;
+			height: 34px;
+			margin: 0;
 			overflow: hidden;
 			position: absolute;
-			right: 15px;
-			text-indent: -10000px;
-			cursor: pointer;
+			right: 13px;
+			width: 25px;
 		}
 	}
 }

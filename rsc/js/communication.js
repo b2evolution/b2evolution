@@ -2,7 +2,6 @@
  * Server communication functions - Ajax without the pain
  * b2evolution - http://b2evolution.net/
  * @author yabs {@link http://innervisions.org.uk/ }
- * @version $Id: communication.js 9233 2015-05-28 12:33:56Z yura $
  */
 
 
@@ -95,10 +94,29 @@ function AttachServerRequest( whichForm )
  * Displays Messages ( @see Log::display() )
  *
  * @param string message The html to display
+ * @param array Field errors: key - field ID, value - field error
  */
-function DisplayServerMessages( messages )
-{	// display any server messages and highlight them
+function DisplayServerMessages( messages, field_errors )
+{ // display any server messages and highlight them
 	jQuery( '#server_messages' ).html( messages );
+
+	if( typeof( field_errors ) == 'object' )
+	{ // Mark all error fields:
+		jQuery( 'input.field_error, select.field_error, textarea.field_error' ).each( function()
+		{ // Clear all field with errors from previous submitting:
+			jQuery( this ).removeClass( 'field_error' );
+			var note_error = jQuery( this ).next();
+			if( note_error.hasClass( 'notes' ) && note_error.get( 0 ).tagName == 'SPAN' )
+			{
+				note_error.remove();
+			}
+		} );
+		jQuery.each( field_errors, function( field_error_ID, field_error_message )
+		{ // Add error class and error messages for current submitting:
+			jQuery( '#' + field_error_ID ).addClass( 'field_error' )
+				.after( '<span class="oneline notes"> <span class="field_error" rel="' + field_error_ID + '">' + field_error_message + '</span></span>' );
+		} );
+	}
 
 	// highlight success message
 	jQuery( '#server_messages .log_success' ).animate({

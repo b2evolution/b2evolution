@@ -48,10 +48,7 @@ function tool_create_sample_collections( $num_collections, $perm_management, $al
 		// Set random of "Permission management" from the selected options:
 		$new_Blog->set( 'advanced_perms', $perm_management[ rand( 0, $perm_management_max_index ) ] == 'advanced' ? 1 : 0 );
 		// Set random of "Allow access to" from the selected options:
-		$new_Blog->set_setting( 'allow_access', $allow_access[ rand( 0, $allow_access_max_index ) ] );
-		// Don't show a sample collection on top menu in back-office:
-		// TODO: In another branch Erwin has implemented a rule similar to "only enable first 10 collections". This will be merged here at some point.
-		$new_Blog->set( 'favorite', 0 );
+		$new_Blog->set_setting( 'allow_access', $allow_access[ rand( 0, $allow_access_max_index ) ] );;
 
 		// Define collection settings by its kind:
 		$Plugins->trigger_event( 'InitCollectionKinds', array(
@@ -61,6 +58,10 @@ function tool_create_sample_collections( $num_collections, $perm_management, $al
 
 		// Do a creating new collection:
 		$new_Blog->create();
+
+		// Don't show a sample collection on top menu in back-office:
+		// TODO: In another branch Erwin has implemented a rule similar to "only enable first 10 collections". This will be merged here at some point.
+		$new_Blog->favorite( NULL, 0 );
 
 		// Clear the messages because we have at least 4 messages after each $new_Blog->create() which are the same:
 		$Messages->clear();
@@ -92,7 +93,7 @@ function tool_create_sample_collections( $num_collections, $perm_management, $al
  */
 function tool_create_sample_comments( $blog_ID, $num_comments, $num_posts )
 {
-	global $DB, $posttypes_specialtypes, $localtimenow, $Hit, $Messages, $Debuglog;
+	global $DB, $localtimenow, $Hit, $Messages, $Debuglog;
 
 	$BlogCache = & get_BlogCache();
 	$selected_Blog = $BlogCache->get_by_ID( $blog_ID, false, false );
@@ -125,10 +126,11 @@ function tool_create_sample_comments( $blog_ID, $num_comments, $num_posts )
 	$SQL->SELECT( 'post_ID' );
 	$SQL->FROM( 'T_items__item' );
 	$SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
+	$SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
 	$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $blog_ID ) );
 	$SQL->WHERE_and( 'post_status = '.$DB->quote( 'published' ) );
 	// Set condition to not create sample comments for special posts
-	$SQL->WHERE_and( 'post_ityp_ID NOT IN ( '.$DB->quote( $posttypes_specialtypes ).' )' );
+	$SQL->WHERE_and( 'post_ityp_ID IS NULL OR ityp_usage = "post"' );
 	$SQL->ORDER_BY( $curr_orderby.' '.$curr_orderdir.', post_ID '.$curr_orderdir );
 	$SQL->LIMIT( $num_posts );
 	$items_result = $DB->get_results( $SQL->get(), ARRAY_A, 'Find the x latest posts in blog' );
@@ -283,8 +285,8 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 	$DB->log_queries = false;
 
 	// Check if we should assign at least one advanced permission:
-	$tmp_adv_user_perm = array_intersect( $advanced_user_perms, array( 'member', 'moderator', 'admin' ) );
-	$assign_adv_user_perms = ! empty( $tmp_adv_user_perm );
+	$array_intersect = array_intersect( $advanced_user_perms, array( 'member', 'moderator', 'admin' ) );
+	$assign_adv_user_perms = ! empty( $array_intersect );
 
 	if( $assign_adv_user_perms )
 	{ // Get all collections with advanced perms:

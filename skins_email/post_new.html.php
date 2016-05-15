@@ -22,6 +22,7 @@ $params = array_merge( array(
 		'Item'           => NULL,
 		'recipient_User' => NULL,
 		'notify_type'    => '',
+		'is_new_item'    => true,
 	), $params );
 
 
@@ -33,7 +34,7 @@ if( $params['notify_full'] )
 {	/* Full notification */
 	echo '<p'.emailskin_style( '.p' ).'>'.T_('Collection').': '.get_link_tag( $Blog->gen_blogurl(), $Blog->get('shortname'), '.a' )."</p>\n";
 
-	echo '<p'.emailskin_style( '.p' ).'>'.T_('Author').': '.get_user_colored_login_link( $Item->creator_User->login, array( 'use_style' => true ) ).' ('.$Item->creator_User->get('login').")</p>\n";
+	echo '<p'.emailskin_style( '.p' ).'>'.T_('Author').': '.get_user_colored_login_link( $Item->creator_User->login, array( 'use_style' => true, 'protocol' => 'http:' ) ).' ('.$Item->creator_User->get('login').")</p>\n";
 
 	echo '<p'.emailskin_style( '.p' ).'>'.T_('Title').': '.$Item->get('title')."</p>\n";
 
@@ -73,7 +74,7 @@ if( $params['notify_full'] )
 }
 else
 { /* Short notification */
-	echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( '%s created a new post on %s with title %s.' ), $Item->creator_User->get_colored_login( array( 'mask' => '$avatar$ $login$' ) ), '<b>'.$Blog->get('shortname').'</b>', '<b>'.$Item->get('title').'</b>' )."</p>\n";
+	echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( '%s created a new post on %s with title %s.' ), $Item->creator_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:' ) ), '<b>'.$Blog->get('shortname').'</b>', '<b>'.$Item->get('title').'</b>' )."</p>\n";
 
 	if( $params['notify_type'] == 'moderator' )
 	{
@@ -101,9 +102,19 @@ echo "</div>\n";
 // Footer vars:
 if( $params['notify_type'] == 'moderator' )
 { // moderation email
-	$params['unsubscribe_text'] = T_( 'You are a moderator in this blog, and you are receiving notifications when a post may need moderation.' ).'<br />';
-	$params['unsubscribe_text'] .= T_( 'If you don\'t want to receive any more notifications about post moderation, click here' ).': '
-			.'<a href="'.$htsrv_url.'quick_unsubscribe.php?type=post_moderator&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
+	if( $params['is_new_item'] )
+	{	// about new item:
+		$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating new posts, click here' );
+		$unsubscribe_type = 'post_moderator';
+	}
+	else
+	{	// about updated item:
+		$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating updated posts, click here' );
+		$unsubscribe_type = 'post_moderator_edit';
+	}
+	$params['unsubscribe_text'] = T_( 'You are a moderator in this blog, and you are receiving notifications when a post may need moderation.' ).'<br />'
+			.$unsubscribe_text.': '
+			.'<a href="'.$htsrv_url.'quick_unsubscribe.php?type='.$unsubscribe_type.'&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
 			.T_('instant unsubscribe').'</a>.';
 }
 else

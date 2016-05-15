@@ -47,10 +47,23 @@ switch( $action )
 {
 	case 'new':
 		// New collection: Select blog type
+	case 'copy':
+		// Copy collection:
 		// Check permissions:
 		if( ! $current_User->check_perm( 'blogs', 'create' ) )
 		{
 			$Messages->add( T_('You don\'t have permission to create a collection.'), 'error' );
+			$redirect_to = param( 'redirect_to', 'url', $admin_url );
+			header_redirect( $redirect_to );
+		}
+
+		$user_Group = $current_User->get_Group();
+		$max_allowed_blogs = $user_Group->get_GroupSettings()->get( 'perm_max_createblog_num', $user_Group->ID );
+		$user_blog_count = $current_User->get_num_blogs();
+
+		if( $max_allowed_blogs != '' && $max_allowed_blogs <= $user_blog_count )
+		{
+			$Messages->add( sprintf( T_('You already own %d collection/s. You are not currently allowed to create any more.'), $user_blog_count ) );
 			$redirect_to = param( 'redirect_to', 'url', $admin_url );
 			header_redirect( $redirect_to );
 		}
@@ -119,8 +132,28 @@ switch( $action )
 			// We want to highlight the edited object on next list display:
 			// $Session->set( 'fadeout_array', array( 'blog_ID' => array($edited_Blog->ID) ) );
 
-			header_redirect( $admin_url.'?ctrl=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
+			header_redirect( $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
 		}
+		break;
+
+	case 'duplicate':
+		// Duplicate collection:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'collection' );
+
+		// Check permissions:
+		$current_User->check_perm( 'blogs', 'create', true );
+
+		if( $edited_Blog->duplicate() )
+		{	// The collection has been duplicated successfully:
+			$Messages->add( T_('The collection has been duplicated.'), 'success' );
+
+			header_redirect( $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
+		}
+
+		//
+		$action = 'copy';
 		break;
 
 
@@ -279,11 +312,12 @@ switch( $action )
 		$Settings->set( 'site_skins_enabled', param( 'site_skins_enabled', 'integer', 0 ) );
 		if( $old_site_skins_enabled != $Settings->get( 'site_skins_enabled' ) )
 		{ // If this setting has been changed we should clear all page caches:
-			load_funcs( 'tools/model/_dbmaintenance.funcs.php' );
+			load_funcs( 'tools/model/_maintenance.funcs.php' );
 			dbm_delete_pagecache( false );
 		}
 
 		// Terms & Conditions:
+		$Settings->set( 'site_terms_enabled', param( 'site_terms_enabled', 'integer', 0 ) );
 		$Settings->set( 'site_terms', param( 'site_terms', 'integer', '' ) );
 
 		// Default blog
@@ -357,7 +391,7 @@ switch( $tab )
 
 		$AdminUI->set_path( 'collections', 'settings', 'blog_settings' );
 
-		$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+		$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
 		$AdminUI->breadcrumbpath_add( T_('Settings'), $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('Common Settings'), $admin_url.'?ctrl=collections&amp;tab=blog_settings&amp;blog=$blog$' );
 
@@ -375,7 +409,7 @@ switch( $tab )
 		$AdminUI->set_path( 'collections' );
 		$AdminUI->clear_menu_entries( 'collections' );
 
-		$AdminUI->breadcrumbpath_init( false, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+		$AdminUI->breadcrumbpath_init( false, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
 		$AdminUI->breadcrumbpath_add( T_('New Collection'), $admin_url.'?ctrl=collections&amp;action=new' );
 
 		// Set an url for manual page:
@@ -398,7 +432,7 @@ switch( $tab )
 		$AdminUI->set_path( 'collections' );
 		$AdminUI->clear_menu_entries( 'collections' );
 
-		$AdminUI->breadcrumbpath_init( false, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+		$AdminUI->breadcrumbpath_init( false, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
 
 		// We should activate toolbar menu items for this controller and tab
 		$activate_collection_toolbar = true;
@@ -441,6 +475,17 @@ switch( $action )
 		$AdminUI->disp_payload_begin();
 
 		$next_action = 'create';
+
+		$AdminUI->disp_view( 'collections/views/_coll_general.form.php' );
+
+		$AdminUI->disp_payload_end();
+		break;
+
+
+	case 'copy':
+		$AdminUI->disp_payload_begin();
+
+		$next_action = 'duplicate';
 
 		$AdminUI->disp_view( 'collections/views/_coll_general.form.php' );
 

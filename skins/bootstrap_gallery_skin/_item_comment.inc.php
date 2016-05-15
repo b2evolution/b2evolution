@@ -12,6 +12,9 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+global $comment_template_counter;
+
 // Default params:
 $params = array_merge( array(
 		'comment_start'         => '<article class="evo_comment panel panel-default">',
@@ -42,6 +45,11 @@ $params = array_merge( array(
 		'Comment'               => NULL, // This object MUST be passed as a param!
 	), $params );
 
+if( ! isset( $comment_template_counter ) )
+{	// Initialize global comment counter:
+	$comment_template_counter = isset( $params['comment_number'] ) ? $params['comment_number'] : 1;
+}
+
 /**
  * @var Comment
  */
@@ -70,6 +78,12 @@ echo $params['comment_title_before'];
 switch( $Comment->get( 'type' ) )
 {
 	case 'comment': // Display a comment:
+	case 'meta': // Display a meta comment:
+		if( $Comment->is_meta() )
+		{	// Meta comment:
+			echo '<span class="badge badge-info">'.$comment_template_counter.'</span> ';
+		}
+
 		if( empty($Comment->ID) )
 		{	// PREVIEW comment
 			echo '<span class="evo_comment_type_preview">'.T_('PREVIEW Comment from:').'</span> ';
@@ -167,4 +181,7 @@ $Comment->date(); echo ' @ '; $Comment->time( '#short_time' );
 echo $params['comment_footer_after'];
 
 echo $params['comment_end'];
+
+// Decrease a counter for meta comments:
+$comment_template_counter--;
 ?>

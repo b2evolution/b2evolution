@@ -8,7 +8,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $dbm_tables_count;
 
-load_funcs('tools/model/_dbmaintenance.funcs.php');
+load_funcs('tools/model/_maintenance.funcs.php');
 
 // Execute query to get results of ANALYZE command
 $results = dbm_analyze_tables( false, false );

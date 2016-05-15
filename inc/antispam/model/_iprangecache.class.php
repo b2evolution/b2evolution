@@ -38,7 +38,7 @@ class IPRangeCache extends DataObjectCache
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
 	 */
-	function IPRangeCache( $objType = 'IPRange', $dbtablename = 'T_antispam__iprange', $dbprefix = 'aipr_', $dbIDname = 'aipr_ID' )
+	function __construct( $objType = 'IPRange', $dbtablename = 'T_antispam__iprange', $dbprefix = 'aipr_', $dbIDname = 'aipr_ID' )
 	{
 		parent::__construct( $objType, false, $dbtablename, $dbprefix, $dbIDname );
 	}

@@ -33,10 +33,10 @@ class City extends DataObject
 	 *
 	 * @param object database row
 	 */
-	function City( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_regional__city', 'city_', 'city_ID' );
+		parent::__construct( 'T_regional__city', 'city_', 'city_ID' );
 
 		if( $db_row )
 		{

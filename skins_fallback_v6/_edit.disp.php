@@ -60,8 +60,14 @@ $Form = new Form( $form_action, 'item_checkchanges', 'post' );
 
 $Form->switch_template_parts( $params['edit_form_params'] );
 
-// ================================ START OF EDIT FORM ================================
+// =================================== INSTRUCTION ====================================
+$ItemType = & $edited_Item->get_ItemType();
+if( $ItemType && ( $ItemType->get( 'front_instruction' ) == 1 ) && $ItemType->get( 'instruction' ) )
+{
+	echo '<div class="alert alert-info fade in">'.$ItemType->get( 'instruction' ).'</div>';
+}
 
+// ================================ START OF EDIT FORM ================================
 $form_params = array();
 $iframe_name = NULL;
 if( !empty( $bozo_start_modified ) )
@@ -114,7 +120,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'metadesc', $edited_Item->get_setting( 'metadesc' ) );
 		$Form->hidden( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ) );
 
-		if( $Blog->get_setting( 'use_workflow' ) )
+		if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 		{	// We want to use workflow properties for this blog:
 			$Form->hidden( 'item_priority', $edited_Item->priority );
 			$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
@@ -251,7 +257,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 			);
 	}
 	else
-	{ // Don't use two columns layout 
+	{ // Don't use two columns layout
 		$two_columns_layout = array(
 				'before'       => '',
 				'column_start' => '',
@@ -364,7 +370,10 @@ if( $edited_Item->get_type_setting( 'allow_attachments' ) )
 		if( $LinkOwner->count_links() )
 		{	// Display the attached files:
 			$Form->begin_fieldset( T_('Attachments'), array( 'id' => 'post_attachments' ) );
-				display_attachments( $LinkOwner );
+				display_attachments( $LinkOwner, array(
+						'block_start' => '<div class="attachment_list results">',
+						'table_start' => '<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0" cellpadding="0">',
+					) );
 			$Form->end_fieldset();
 		}
 	}
