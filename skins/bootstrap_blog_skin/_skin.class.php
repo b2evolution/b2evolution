@@ -18,6 +18,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class bootstrap_blog_Skin extends Skin
 {
 	/**
+	 * Skin version
+	 * @var string
+	 */
+	var $version = '6.7.0';
+
+	/**
 	 * Do we want to use style.min.css instead of style.css ?
 	 */
 	var $use_min_css = 'check';  // true|false|'check' Set this to true for better optimization
@@ -251,12 +257,12 @@ class bootstrap_blog_Skin extends Skin
 		if( $max_image_height > 0 )
 		{
 			add_css_headline( '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }' );
-		}	
-		
+		}
+
 		// Add custom CSS:
 		$custom_css = '';
-		
-		
+
+
 		// Font size customization
 		if( $font_size = $this->get_setting( 'font_size' ) )
 		{
@@ -265,9 +271,9 @@ class bootstrap_blog_Skin extends Skin
 				case 'default': // When default font size, no CSS entry
 				$custom_css = '';
 				break;
-				
+
 				case 'standard':// When standard layout
-				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 16px !important'." }\n";				
+				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 16px !important'." }\n";
 				$custom_css .= '.container input.search_field { height: 100%'." }\n";
 				$custom_css .= '.container h1 { font-size: 38px'." }\n";
 				$custom_css .= '.container h2 { font-size: 32px'." }\n";
@@ -279,7 +285,7 @@ class bootstrap_blog_Skin extends Skin
 				break;
 
 				case 'medium': // When default font size, no CSS entry
-				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 18px !important'." }\n";				
+				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 18px !important'." }\n";
 				$custom_css .= '.container input.search_field { height: 100%'." }\n";
 				$custom_css .= '.container h1 { font-size: 40px'." }\n";
 				$custom_css .= '.container h2 { font-size: 34px'." }\n";
@@ -289,9 +295,9 @@ class bootstrap_blog_Skin extends Skin
 				$custom_css .= '.container h6 { font-size: 16px'." }\n";
 				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
 				break;
-				
+
 				case 'large': // When default font size, no CSS entry
-				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 20px !important'." }\n";				
+				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 20px !important'." }\n";
 				$custom_css .= '.container input.search_field { height: 100%'." }\n";
 				$custom_css .= '.container h1 { font-size: 42px'." }\n";
 				$custom_css .= '.container h2 { font-size: 36px'." }\n";
@@ -301,9 +307,9 @@ class bootstrap_blog_Skin extends Skin
 				$custom_css .= '.container h6 { font-size: 18px'." }\n";
 				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
 				break;
-				
+
 				case 'very_large': // When default font size, no CSS entry
-				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 22px !important'." }\n";				
+				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 22px !important'." }\n";
 				$custom_css .= '.container input.search_field { height: 100%'." }\n";
 				$custom_css .= '.container h1 { font-size: 44px'." }\n";
 				$custom_css .= '.container h2 { font-size: 38px'." }\n";
@@ -315,7 +321,7 @@ class bootstrap_blog_Skin extends Skin
 				break;
 			}
 		}
-		
+
 		if( ! empty( $custom_css ) )
 		{ // Function for custom_css:
 		$custom_css = '<style type="text/css">
@@ -324,7 +330,7 @@ class bootstrap_blog_Skin extends Skin
 -->
 		</style>';
 		add_headline( $custom_css );
-		}			
+		}
 	}
 
 
