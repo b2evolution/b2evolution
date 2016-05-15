@@ -288,7 +288,6 @@ class ComponentWidget extends DataObject
 	 */
 	function get_param_definitions( $params )
 	{
-
 		$r = array();
 
 		if( $this->type == 'plugin' )
@@ -300,26 +299,35 @@ class ComponentWidget extends DataObject
 			}
 		}
 
-		$r_standart = array(
-				'widget_css_class' => array(
+		if( ! isset( $r['widget_css_class'] ) )
+		{
+			$r['widget_css_class'] = array(
 					'label' => '<span class="dimmed">'.T_( 'CSS Class' ).'</span>',
 					'size' => 20,
 					'note' => T_( 'Replaces $wi_class$ in your skins containers.'),
-				),
-				'widget_ID' => array(
+				);
+		}
+
+		if( ! isset( $r['widget_ID'] ) )
+		{
+			$r['widget_ID'] = array(
 					'label' => '<span class="dimmed">'.T_( 'DOM ID' ).'</span>',
 					'size' => 20,
 					'note' => T_( 'Replaces $wi_ID$ in your skins containers.'),
-				),
-				'allow_blockcache' => array(
+				);
+		}
+
+		if( ! isset( $r['allow_blockcache'] ) )
+		{
+			$r['allow_blockcache'] = array(
 					'label' => T_( 'Allow caching' ),
 					'note' => T_( 'Uncheck to prevent this widget from ever being cached in the block cache. (The whole page may still be cached.) This is only needed when a widget is poorly handling caching and cache keys.' ),
 					'type' => 'checkbox',
 					'defaultvalue' => true,
-				),
-			);
+				);
+		}
 
-		return array_merge($r,$r_standart);;
+		return $r;
 	}
 
 
@@ -645,9 +653,14 @@ class ComponentWidget extends DataObject
 	{
 		global $Blog;
 
+		if( $this->type == 'plugin' && $this->get_Plugin() )
+		{	// Get widget cache keys from plugin:
+			return $this->Plugin->get_widget_cache_keys( $this->ID );
+		}
+
 		return array(
-				'wi_ID'   => $this->ID,				// Have the widget settings changed ?
-				'set_coll_ID' => $Blog->ID,		// Have the settings of the blog changed ? (ex: new skin)
+				'wi_ID'       => $this->ID, // Have the widget settings changed ?
+				'set_coll_ID' => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 			);
 	}
 

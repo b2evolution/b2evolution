@@ -825,8 +825,17 @@ qq.extend(qq.FileUploader.prototype, {
 				qq.preventDefault(e);
 
 				var item = target.parentNode;
-				self._handler.cancel(item.qqFileId);
-				qq.remove(item);
+				if( typeof( item.qqFileId ) != 'undefined' )
+				{
+					self._handler.cancel(item.qqFileId);
+					qq.remove(item);
+				}
+				else
+				{
+					item = jQuery( target ).closest( 'tr' );
+					self._handler.cancel( item.attr( 'rel' ).replace( 'file_upload_', '' ) );
+					qq.remove( item.get(0) );
+				}
 			}
 		});
 	}

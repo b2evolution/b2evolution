@@ -95,7 +95,22 @@ skin_include( '_body_header.inc.php' );
 					// /skins/_item_content.inc.php file into the current skin folder.
 					// -------------------------- END OF POST CONTENT -------------------------
 				?>
-		
+
+				<?php
+					// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
+					// Display container contents:
+					skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+							// The following (optional) params will be used as defaults for widgets included in this container:
+							// This will enclose each widget in a block:
+							'block_start' => '<div class="$wi_class$">',
+							'block_end' => '</div>',
+							// This will enclose the title of each widget:
+							'block_title_start' => '<h3>',
+							'block_title_end' => '</h3>',
+					) );
+					// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
+				?>
+
 				<p class="postmetadata alt">
 					<small>
 						<?php
@@ -110,23 +125,23 @@ skin_include( '_body_header.inc.php' );
 							if( $Skin->get_setting( 'display_post_date' ) )
 							{	// We want to display the post date:
 								$Item->issue_time( array(
-										'before'      => /* TRANS: date */ T_('This entry was posted on '),
+										'before'      => /* TRANS: date */ T_('This entry was posted on').' ',
 										'time_format' => 'F jS, Y',
 									) );
 								$Item->issue_time( array(
-										'before'      => /* TRANS: time */ T_('at '),
+										'before'      => /* TRANS: at (time) */ T_('at').' ',
 										'time_format' => '#short_time',
 									) );
 								$Item->author( array(
 										'before'    => T_('by '),
-										'link_text' => 'preferredname',
+										'link_text' => 'auto',
 									) );
 							}
 							else
 							{
 								$Item->author( array(
-										'before'    => T_('This entry was posted by '),
-										'link_text' => 'preferredname',
+										'before'    => T_('This entry was posted by').' ',
+										'link_text' => 'auto',
 									) );
 							}
 						?>
@@ -162,7 +177,7 @@ skin_include( '_body_header.inc.php' );
 				skin_include( '_item_feedback.inc.php', array(
 						'before_section_title' => '<h3>',
 						'after_section_title'  => '</h3>',
-						'author_link_text'     => 'preferredname',
+						'author_link_text'     => 'auto',
 					) );
 				// Note: You can customize the default item feedback by copying the generic
 				// /skins/_item_feedback.inc.php file into the current skin folder.

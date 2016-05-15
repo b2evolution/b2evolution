@@ -2225,6 +2225,16 @@ class Comment extends DataObject
 	{
 		global $blog;
 
+		if( ! is_logged_in( false ) )
+		{
+			return false;
+		}
+
+		if( empty( $this->ID ) )
+		{	// Happens in Preview
+			return false;
+		}
+
 		$params = array_merge( array(
 				'detect_last' => true, // TRUE if we should find what button is last and visible, FALSE if we have some other buttons after moderation buttons (e.g. button to delete a comment)
 			), $params );

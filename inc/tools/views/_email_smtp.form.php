@@ -45,7 +45,8 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 
 		$url = '?ctrl=email&amp;tab=settings&amp;tab3=smtp&amp;'.url_crumb('emailsettings').'&amp;action=';
 		$Form->info_field( T_('Perform tests'),
-					'<a href="'.$url.'test_smtp">['.T_('server connection').']</a>&nbsp;&nbsp;' );
+					'<a href="'.$url.'test_smtp">['.T_('server connection').']</a>&nbsp;&nbsp;'.
+					'<a href="'.$url.'test_email">['.T_('send test email').']</a>&nbsp;&nbsp;' );
 
 		if( !empty( $smtp_test_output ) )
 		{
@@ -69,6 +70,16 @@ $Form->begin_fieldset( T_('SMTP Server connection settings').get_manual_link('sm
 				array( 'ssl', T_('SSL'), ),
 				array( 'tls', T_('TLS'), ),
 			), T_('Encryption Method') );
+
+	$smtp_server_novalidatecert_params = array( 'lines' => true );
+	if( $Settings->get( 'smtp_server_security' ) == 'none' || empty( $Settings->get( 'smtp_server_security' ) ) )
+	{
+		$smtp_server_novalidatecert_params['disabled'] = 'disabled';
+	}
+	$Form->radio_input( 'smtp_server_novalidatecert', $Settings->get( 'smtp_server_novalidatecert' ), array(
+			array( 'value' => 1, 'label' => T_('Do not validate the certificate from the TLS/SSL server. Check this if you are using a self-signed certificate.') ),
+			array( 'value' => 0, 'label' => T_('Validate that the certificate from the TLS/SSL server can be trusted. Use this if you have a correctly signed certificate.') )
+		), T_('Certificate validation'), $smtp_server_novalidatecert_params );
 
 	$Form->text_input( 'smtp_server_port', $Settings->get('smtp_server_port'), 5, T_('Port Number'), T_('Port number of your SMTP server (Defaults: SSL: 443, TLS: 587).'), array( 'maxlength' => 6 ) );
 
@@ -94,3 +105,19 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 }
 
 ?>
+<script type="text/javascript">
+jQuery( document ).ready( function()
+{
+	jQuery( 'input[name="smtp_server_security"]' ).click( function()
+	{	// Enable/Disable "Certificate validation" options depending on encryption method
+		if( jQuery( this ).val() == 'none' )
+		{
+			jQuery( 'input[name="smtp_server_novalidatecert"]' ).attr( 'disabled', 'disabled' );
+		}
+		else
+		{
+			jQuery( 'input[name="smtp_server_novalidatecert"]' ).removeAttr( 'disabled' );
+		}
+	} )
+} );
+</script>

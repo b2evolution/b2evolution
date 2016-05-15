@@ -107,7 +107,7 @@ skin_include( '_body_header.inc.php' );
 						'after_section_title'  => '</h3>',
 						'form_title_start'     => '<h3 class="comment_form_title">',
 						'form_title_end'       => '</h3>',
-						'author_link_text'     => 'preferredname',
+						'author_link_text'     => 'auto',
 					) );
 				// Note: You can customize the default item feedback by copying the generic
 				// /skins/_item_feedback.inc.php file into the current skin folder.

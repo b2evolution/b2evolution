@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $preview, $dummy_fields, $cat;
+global $Item, $preview, $dummy_fields, $cat, $disp;
 
 /**
  * @var array Save all statuses that used on this page in order to show them in the footer legend
@@ -98,7 +98,7 @@ skin_widget( array(
 			) );
 				// Author info:
 				echo '<div class="ft_author_info">'.T_('Thread started by');
-				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
+				$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
 				echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
 				echo '<span class="text-muted"> &ndash; '
 						.T_('Last touched:').' '.mysql2date( 'D M j, Y H:i', $Item->get( 'last_touched_ts' ) )
@@ -106,7 +106,7 @@ skin_widget( array(
 				echo '</div>';
 				// Author info - shrinked:
 				echo '<div class="ft_author_info shrinked">'.T_('Started by');
-				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
+				$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
 				echo ', '.mysql2date( 'm/j/y', $Item->datecreated );
 				echo '</div>';
 		?>
@@ -122,15 +122,15 @@ skin_widget( array(
 				<h4 class="evo_comment_title panel-title"><a href="<?php echo $Item->get_permanent_url(); ?>" class="permalink">#1</a>
 					<?php
 						$Item->author( array(
-							'link_text' => 'login',
+							'link_text' => 'auto',
 						) );
 					?>
 					<?php
 						if( $Skin->get_setting( 'display_post_date' ) )
 						{ // We want to display the post date:
 							$Item->issue_time( array(
-									'before'      => '',
-									'after'       => ' &nbsp; &nbsp; ',
+									'before'      => '<span class="text-muted">',
+									'after'       => '</span> &nbsp; &nbsp; ',
 									'time_format' => 'M j, Y H:i',
 								) );
 						}
@@ -164,6 +164,22 @@ skin_widget( array(
 					// Note: You can customize the default item content by copying the generic
 					// /skins/_item_content.inc.php file into the current skin folder.
 					// -------------------------- END OF POST CONTENT -------------------------
+
+					if( $disp == 'single' )
+					{
+						// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
+						// Display container contents:
+						skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+								// The following (optional) params will be used as defaults for widgets included in this container:
+								// This will enclose each widget in a block:
+								'block_start' => '<div class="$wi_class$">',
+								'block_end' => '</div>',
+								// This will enclose the title of each widget:
+								'block_title_start' => '<h3>',
+								'block_title_end' => '</h3>',
+						) );
+						// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
+					}
 
 				if( ! $Item->is_intro() )
 				{ // List all tags attached to this topic:
@@ -226,14 +242,14 @@ skin_widget( array(
 			'disp_section_title'    => false,
 			'disp_meta_comment_info' => false,
 
-			'comment_post_before'   => '<h4 class="evo_comment_post_title ellipsis">',
+			'comment_post_before'   => '<br /><h4 class="evo_comment_post_title ellipsis">',
 			'comment_post_after'    => '</h4>',
 
 			'comment_title_before'  => '<div class="panel-heading posts_panel_title_wrapper"><div class="cell1 ellipsis"><h4 class="evo_comment_title panel-title">',
 			'comment_status_before' => '</h4></div>',
 			'comment_title_after'   => '</div>',
 
-			'comment_avatar_before' => '<div class="panel-body"><span class="evo_comment_avatar col-md-1 col-sm-2">',
+			'comment_avatar_before' => '<span class="evo_comment_avatar col-md-1 col-sm-2">',
 			'comment_avatar_after'  => '</span>',
 			'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10">',
 			'comment_text_after'    => '</div>',

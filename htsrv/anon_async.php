@@ -146,11 +146,37 @@ switch( $action )
 
 			$Ajaxlog->add( 'User: #'.$user_ID.' '.$User->login );
 
+			if( is_logged_in() &&
+			    $current_User->can_moderate_user( $User->ID ) &&
+			    $current_User->check_status( 'can_access_admin' ) &&
+			    $current_User->check_perm( 'admin', 'restricted' ) )
+			{	// Display the moderation buttons only if current user has a permission:
+				$moderation_buttons = '<p class="bubbletip_user__buttons">';
+				if( ! is_admin_page() )
+				{
+					$moderation_buttons .= '<a href="'.url_add_param( $admin_url, 'ctrl=user&amp;user_ID='.$User->ID ).'" class="btn btn-sm btn-block btn-primary">'
+							.T_('Edit in Back-Office').'</a>';
+				}
+				if( $current_User->ID != $User->ID && $current_User->check_perm( 'users', 'edit' ) )
+				{	// Display a button to delete a spammer only for other users and if current user can edit them:
+					$moderation_buttons .= '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) )
+								.'" class="btn btn-sm btn-block btn-danger">'
+							.T_('Delete Spammer')
+						.'</a>';
+				}
+				$moderation_buttons .= '</p>';
+			}
+			else
+			{	// No permission to moderate users:
+				$moderation_buttons = '';
+			}
+
 			echo '<div class="bubbletip_user">';
 
 			if( $User->check_status( 'is_closed' ) )
 			{ // display only info about closed accounts
 				echo T_( 'This account has been closed.' );
+				echo $moderation_buttons;
 				echo '</div>'; /* end of: <div class="bubbletip_user"> */
 				break;
 			}
@@ -182,6 +208,7 @@ switch( $action )
 
 			if( ! ( $Settings->get( 'allow_anonymous_user_profiles' ) || ( is_logged_in() && $current_User->check_perm( 'user', 'view', false, $User ) ) ) )
 			{ // User is not logged in and anonymous users may NOT view user profiles, or if current User has no permission to view additional information about the User
+				echo $moderation_buttons;
 				echo '</div>'; /* end of: <div class="bubbletip_user"> */
 				break;
 			}
@@ -260,6 +287,7 @@ switch( $action )
 				echo '</ul>';
 			}
 
+			echo $moderation_buttons;
 			echo '</div>'; /* end of: <div class="bubbletip_user"> */
 		}
 		else if( $comment_ID > 0 )

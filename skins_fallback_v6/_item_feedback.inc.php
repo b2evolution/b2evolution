@@ -60,7 +60,7 @@ $params = array_merge( array(
 		'comment_error_end'     => '</article>',
 		'comment_template'      => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
 		'comment_image_size'    => 'fit-1280x720',
-		'author_link_text'      => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+		'author_link_text'      => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 		'link_to'               => 'userurl>userpage',		    // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		// Comment notification functions:
 		'disp_notification'     => true,

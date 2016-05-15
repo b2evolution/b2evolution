@@ -43,6 +43,7 @@ class google_maps_plugin extends Plugin
 	 */
 	var $number_of_installs = 1;
 	var $group = 'widget';
+	var $subgroup = 'infoitem';
 	var $number_of_widgets ;
 
 
@@ -97,7 +98,7 @@ class google_maps_plugin extends Plugin
 	 */
 	function get_widget_param_definitions( $params )
 	{
-		$r = array(
+		$r = array_merge( array(
 			'map_title' => array(
 				'label' => T_('Widget title'),
 				'defaultvalue' => T_('Google maps Widget'),
@@ -113,20 +114,42 @@ class google_maps_plugin extends Plugin
 				'label' => T_('Map height on page'),
 				'defaultvalue' => '300px',
 				'note' => '',
-			),
+				),
 			'map_type' => array(
 				'label' => T_( 'Map default view ' ),
 				'type' => 'radio',
 				'options' => array( array('map', T_( 'Map' ) ), array( 'satellite', T_( 'Satellite' ) ) ),
 				'defaultvalue' => 'map',
-				'note' => ''),
+				'note' => ''
+				),
+			), parent::get_widget_param_definitions( $params ) );
 
-			);
 		return $r;
 	}
 
 	/**
-	 * User settings.
+	 * Get keys for block/widget caching
+	 *
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @param integer Widget ID
+	 * @return array of keys this widget depends on
+	 */
+	function get_widget_cache_keys( $widget_ID = 0 )
+	{
+		global $Blog, $Item;
+
+		return array(
+				'wi_ID'        => $widget_ID, // Have the widget settings changed ?
+				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
+				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
+				'item_ID'      => $Item->ID, // Has the Item page changed?
+			);
+	}
+
+
+	/**
+	 * Define the PER-USER settings of the plugin here. These can then be edited by each user.
 	 *
 	 * @see Plugin::GetDefaultUserSettings()
 	 * @see PluginUserSettings
@@ -831,30 +854,27 @@ function locate()
 
 	function SkinTag( $params )
 	{
-		global $Item;
-		global $Blog;
+		global $Blog, $Item;
 
-		$this->number_of_widgets += 1;
-
-		if( ! empty( $Item ) && $Item->get_type_setting( 'use_coordinates' ) == 'never' )
-		{
+		if( empty( $Item ) )
+		{	// Don't display this widget when no Item object:
 			return;
 		}
 
-		if( !empty( $Item ) )
-		{
-			$lat = $Item->get_setting('latitude');
-			$lng = $Item->get_setting('longitude');
-			if (empty($lat) && empty($lng))
-			{
-				return;
-			}
+		$this->number_of_widgets += 1;
+
+		if( $Item->get_type_setting( 'use_coordinates' ) == 'never' )
+		{	// Coordinates are not allowed for the item type:
+			return;
 		}
-		else
-		{
-			$lat = 0;
-			$lng = 0;
+
+		$lat = $Item->get_setting( 'latitude' );
+		$lng = $Item->get_setting( 'longitude' );
+		if( empty( $lat ) && empty( $lng ) )
+		{	// Coordinates must be defined for the viewed Item:
+			return;
 		}
+
 		$width = $this->display_param($this->get_widget_setting('width', $params));
 		$width = 'width:'.$width;
 

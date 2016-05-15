@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $Blog;
+global $Item, $Blog, $disp;
 
 // Default params:
 $params = array_merge( array(
@@ -107,6 +107,22 @@ $params = array_merge( array(
 		// /skins/_item_content.inc.php file into the current skin folder.
 		// -------------------------- END OF POST CONTENT -------------------------
 
+		if( $disp == 'single' )
+		{
+			// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
+			// Display container contents:
+			skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+					// The following (optional) params will be used as defaults for widgets included in this container:
+					// This will enclose each widget in a block:
+					'block_start' => '<div class="$wi_class$">',
+					'block_end' => '</div>',
+					// This will enclose the title of each widget:
+					'block_title_start' => '<h3>',
+					'block_title_end' => '</h3>',
+			) );
+			// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
+		}
+
 		if( ! $Item->is_intro() && ! $Item->is_featured() )
 		{ // Don't display this additional info for intro posts
 
@@ -121,7 +137,7 @@ $params = array_merge( array(
 			$Item->lastedit_user( array(
 					'before'    => T_('Last edit by '),
 					'after'     => T_(' on ').$Item->get_mod_date( 'F jS, Y' ),
-					'link_text' => 'name',
+					'link_text' => 'auto',
 				) );
 			'</p>';
 			echo $Item->get_history_link( array(

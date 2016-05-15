@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $Skin;
+global $Item, $Skin, $disp;
 
 // Default params:
 $params = array_merge( array(
@@ -34,7 +34,7 @@ $params = array_merge( array(
 		'content_mode'               => 'auto',		// excerpt|full|normal|auto -- auto will auto select depending on $disp-detail
 		'image_class'                => 'img-responsive',
 		'image_size'                 => 'fit-1280x720',
-		'author_link_text'           => 'preferredname',
+		'author_link_text'           => 'auto',
 	), $params );
 
 
@@ -146,6 +146,24 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 		// /skins/_item_content.inc.php file into the current skin folder.
 		// -------------------------- END OF POST CONTENT -------------------------
 	// this will end a </section>
+	?>
+
+	<?php
+	if( $disp == 'single' )
+	{
+		// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
+		// Display container contents:
+		skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+				// The following (optional) params will be used as defaults for widgets included in this container:
+				// This will enclose each widget in a block:
+				'block_start' => '<div class="$wi_class$">',
+				'block_end' => '</div>',
+				// This will enclose the title of each widget:
+				'block_title_start' => '<h3>',
+				'block_title_end' => '</h3>',
+		) );
+		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
+	}
 	?>
 
 	<footer>

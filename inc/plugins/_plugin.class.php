@@ -634,15 +634,46 @@ class Plugin
 	}
 
 
-  /**
-   * Get definitions for widget specific editable params
-   *
+	/**
+	 * Get definitions for widget specific editable params
+	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param array Local params like 'for_editing' => true
 	 */
 	function get_widget_param_definitions( $params )
 	{
-		return array();
+		if( ! is_array( $params ) )
+		{	// Must be array:
+			$params = array();
+		}
+
+		// Load new widget to get default param definitions:
+		load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
+		$ComponentWidget = new ComponentWidget();
+
+		return array_merge( $ComponentWidget->get_param_definitions( array() ), $params );
+	}
+
+
+	/**
+	 * Get keys for block/widget caching
+	 *
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @param integer Widget ID
+	 * @return array of keys this widget depends on
+	 */
+	function get_widget_cache_keys( $widget_ID = 0 )
+	{
+		// Load new widget to get default cache keys:
+		load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
+		$ComponentWidget = new ComponentWidget();
+
+		$widget_cache_keys = $ComponentWidget->get_cache_keys();
+
+		$widget_cache_keys['wi_ID'] = $widget_ID;
+
+		return $widget_cache_keys;
 	}
 
 

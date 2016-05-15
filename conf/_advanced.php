@@ -66,7 +66,7 @@ $dev_menu = 0;
 // If you get blank pages or missing thumbnail images, PHP may be crashing because it doesn't have enough memory.
 // The default is 8 MB (in PHP < 5.2) and 128 MB (in PHP > 5.2)
 // Try uncommmenting the following line:
-// ini_set( 'memory_limit', '128M' );
+// @ini_set( 'memory_limit', '128M' );
 
 
 /**

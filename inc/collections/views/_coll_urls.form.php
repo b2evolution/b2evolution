@@ -105,7 +105,7 @@ $Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_li
 		}
 
 
-		$Form->radio( 'blog_access_type', $edited_Blog->get( 'access_type' ), array(
+		$access_type_options = array(
 			/* TODO: Tblue> This option only should be available if the
 			 *              current blog is set as the default blog, otherwise
 			 *              this setting is confusing. Another possible
@@ -158,13 +158,17 @@ $Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_li
 										onfocus="document.getElementsByName(\'blog_access_type\')[5].checked=true;
 										update_urlpreview( \''.$baseurl.'\', this.value );" /></span>'.$siteurl_relative_warning,
 										'onclick="document.getElementById( \'blog_siteurl_relative\' ).focus();"'
-			),
-			array( 'subdom', T_('Subdomain of basedomain'),
+			)
+		);
+		if( ! is_ip_url_domain( $baseurl ) )
+		{	// Don't allow subdomain for IP address:
+			$access_type_options[] = array( 'subdom', T_('Subdomain of basedomain'),
 										preg_replace( '#(https?://)#i', '$1<span class="blog_url_text">'.$edited_Blog->urlname.'</span>.', $baseurl ),
 										'',
 										'onclick="update_urlpreview( \'http://\'+document.getElementById( \'blog_urlname\' ).value+\'.'.preg_replace( '#(https?://)#i', '', $baseurl ).'\' )"'
-			),
-			array( 'absolute', T_('Absolute URL').':',
+			);
+		}
+		$access_type_options[] = array( 'absolute', T_('Absolute URL').':',
 										'',
 										'<input type="text" id="blog_siteurl_absolute" class="form_text_input form-control" name="blog_siteurl_absolute" size="50" maxlength="120" value="'
 											.format_to_output( $blog_siteurl_absolute, 'formvalue' )
@@ -172,8 +176,9 @@ $Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_li
 											onfocus="document.getElementsByName(\'blog_access_type\')[7].checked=true;
 											update_urlpreview( this.value );" />'.$siteurl_absolute_warning,
 										'onclick="document.getElementById( \'blog_siteurl_absolute\' ).focus();"'
-			),
-		), T_('Collection base URL'), true );
+		);
+
+		$Form->radio( 'blog_access_type', $edited_Blog->get( 'access_type' ), $access_type_options, T_('Collection base URL'), true );
 
 ?>
 <script type="text/javascript">

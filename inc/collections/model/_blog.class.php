@@ -1140,7 +1140,7 @@ class Blog extends DataObject
 	{
 		global $baseurl, $basedomain, $Settings;
 
-		switch( $this->access_type )
+		switch( $this->get( 'access_type' ) )
 		{
 			case 'baseurl':
 			case 'default':
@@ -1149,7 +1149,7 @@ class Blog extends DataObject
 					|| preg_match( '#^https?://#', $this->siteurl ) )
 				{ // Safety check! We only do that kind of linking if this is really the default blog...
 					// or if we call by absolute URL
-					if( $this->access_type == 'default' )
+					if( $this->get( 'access_type' ) == 'default' )
 					{
 						return $baseurl.$this->siteurl.'index.php';
 					}
@@ -1182,7 +1182,7 @@ class Blog extends DataObject
 				return $this->siteurl;
 
 			default:
-				debug_die( 'Unhandled Blog access type ['.$this->access_type.']' );
+				debug_die( 'Unhandled Blog access type ['.$this->get( 'access_type' ).']' );
 		}
 	}
 
@@ -1195,7 +1195,7 @@ class Blog extends DataObject
 	{
 		global $baseurl, $basedomain;
 
-		switch( $this->access_type )
+		switch( $this->get( 'access_type' ) )
 		{
 			case 'baseurl':
 				return $baseurl.$this->siteurl;
@@ -1224,7 +1224,7 @@ class Blog extends DataObject
 				break;
 
 			default:
-				debug_die( 'Unhandled Blog access type ['.$this->access_type.']' );
+				debug_die( 'Unhandled Blog access type ['.$this->get( 'access_type' ).']' );
 		}
 
 		if( substr( $url, -1 ) != '/' )
@@ -1867,6 +1867,14 @@ class Blog extends DataObject
 
 		switch( $parname )
 		{
+			case 'access_type':
+				$access_type_value = parent::get( $parname );
+				if( $access_type_value == 'subdom' && is_ip_url_domain( $baseurl ) )
+				{	// Don't allow subdomain for IP address:
+					$access_type_value = 'index.php';
+				}
+				return $access_type_value;
+
 			case 'blogurl':		// Deprecated
 			case 'link':  		// Deprecated
 			case 'url':
@@ -2374,7 +2382,7 @@ class Blog extends DataObject
 						WHERE blog_ID = '.$this->ID );
 			$Messages->add( sprintf(T_('The new blog has been associated with the stub file &laquo;%s&raquo;.'), $stub_filename ), 'success' );
 		}
-		elseif( $this->access_type == 'relative' )
+		elseif( $this->get( 'access_type' ) == 'relative' )
 		{ // Show error message only if stub file should exists!
 			$Messages->add( sprintf(T_('No stub file named &laquo;%s&raquo; was found. You must create it for the blog to function properly with the current settings.'), $stub_filename ), 'error' );
 		}

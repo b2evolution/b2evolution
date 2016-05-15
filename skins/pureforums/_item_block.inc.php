@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $preview, $dummy_fields, $cat;
+global $Item, $preview, $dummy_fields, $cat, $disp;
 
 /**
  * @var array Save all statuses that used on this page in order to show them in the footer legend
@@ -62,7 +62,7 @@ $Skin->display_breadcrumbs( $cat );
 			) );
 				// Author info:
 				echo '<div class="ft_author_info">'.T_('Started by');
-				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
+				$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
 				echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
 				echo '</div>';
 		?>
@@ -92,7 +92,7 @@ $Skin->display_breadcrumbs( $cat );
 	<tr class="ft_post_info">
 		<td><?php
 			$Item->author( array(
-				'link_text' => 'login',
+				'link_text' => 'auto',
 			) );
 		?></td>
 		<td><?php
@@ -132,6 +132,24 @@ $Skin->display_breadcrumbs( $cat );
 	// Note: You can customize the default item content by copying the generic
 	// /skins/_item_content.inc.php file into the current skin folder.
 	// -------------------------- END OF POST CONTENT -------------------------
+?>
+
+<?php
+if( $disp == 'single' )
+{
+	// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
+	// Display container contents:
+	skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+			// The following (optional) params will be used as defaults for widgets included in this container:
+			// This will enclose each widget in a block:
+			'block_start' => '<div class="$wi_class$">',
+			'block_end' => '</div>',
+			// This will enclose the title of each widget:
+			'block_title_start' => '<h3>',
+			'block_title_end' => '</h3>',
+	) );
+	// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
+}
 ?>
 		</td>
 	</tr>

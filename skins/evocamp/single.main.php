@@ -100,7 +100,7 @@ skin_include( '_body_header.inc.php' );
 					'profile_tab' => 'user',
 					'before'      => T_('By').' ',
 					'after'       => ' ',
-					'link_text'   => 'preferredname',
+					'link_text'   => 'auto',
 				) );
 			?>
 			<?php
@@ -150,6 +150,21 @@ skin_include( '_body_header.inc.php' );
 			?>
 
 			<?php
+				// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
+				// Display container contents:
+				skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+						// The following (optional) params will be used as defaults for widgets included in this container:
+						// This will enclose each widget in a block:
+						'block_start' => '<div class="$wi_class$">',
+						'block_end' => '</div>',
+						// This will enclose the title of each widget:
+						'block_title_start' => '<h3>',
+						'block_title_end' => '</h3>',
+				) );
+				// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
+			?>
+
+			<?php
 				// List all tags attached to this post:
 				$Item->tags( array(
 						'before' =>         '<div class="posttags">'.T_('Tags').': ',
@@ -167,7 +182,7 @@ skin_include( '_body_header.inc.php' );
 					'after_section_title'  => '</h3>',
 					'form_title_start'     => '<h3 class="comment_form_title">',
 					'form_title_end'       => '</h3>',
-					'author_link_text'     => 'preferredname',
+					'author_link_text'     => 'auto',
 				) );
 			// Note: You can customize the default item feedback by copying the generic
 			// /skins/_item_feedback.inc.php file into the current skin folder.

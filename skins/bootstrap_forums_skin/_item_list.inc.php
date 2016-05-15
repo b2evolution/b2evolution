@@ -111,12 +111,12 @@ elseif( $comments_number > 25 )
 					<?php
 					// Author info: (THIS HAS DOFFERENT RWD MOVES FROM WHAT'S ABOVE, so it should be in a different div)
 					echo T_('Started by');
-					$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
+					$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
 					echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
 					echo '</div>';
 					// Super small screen size Author info:
 					echo '<div class="ft_author_info shrinked ellipsis">'.T_('By');
-					$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
+					$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
 					echo ', '.mysql2date( 'M j, Y', $Item->datecreated );
 				?>
 				</div>
@@ -154,7 +154,7 @@ elseif( $comments_number > 25 )
 							'before_user' => '<br />',
 							'after'       => '',
 							'after_user'  => '',
-							'link_text'   => 'login'
+							'link_text'   => 'auto'
 						) );
 
 					echo ' <a href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest post').'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
@@ -172,7 +172,7 @@ elseif( $comments_number > 25 )
 					echo $Item->get_mod_date( 'D M j, Y H:i' );
 					echo $Item->author( array(
 							'before'    => '<br />',
-							'link_text' => 'login',
+							'link_text' => 'auto',
 						) );
 					echo ' <a href="'.$Item->get_permanent_url().'" title="'.T_('View latest post').'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
 				}
@@ -182,9 +182,9 @@ elseif( $comments_number > 25 )
 			<div class="ft_date_shrinked item_list"><?php
 				if( $latest_Comment = & $Item->get_latest_Comment() )
 				{ // Display info about last comment
-					$latest_Comment->date('m/j/y ');
+					$latest_Comment->date( 'm/j/y ');
 					$latest_Comment->author2( array(
-							'link_text'   => 'login'
+							'link_text' => 'auto'
 						) );
 
 					echo ' <a href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest post').'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
@@ -193,7 +193,7 @@ elseif( $comments_number > 25 )
 				{ // No comments, Display info of post
 					echo $Item->get_mod_date( 'm/j/y' );
 					echo $Item->author( array(
-							'link_text' => 'login',
+							'link_text' => 'auto',
 						) );
 					echo ' <a href="'.$Item->get_permanent_url().'" title="'.T_('View latest post').'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
 				}

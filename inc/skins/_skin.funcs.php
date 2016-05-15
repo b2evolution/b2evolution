@@ -1740,22 +1740,6 @@ function skin_include( $template_name, $params = array() )
 	$timer_name = 'skin_include('.$template_name.')';
 	$Timer->resume( $timer_name );
 
-	if( ! empty( $disp ) && ( $disp == 'single' || $disp == 'page' ) &&
-	    $template_name == '$disp$' &&
-	    ! empty( $Item ) && ( $ItemType = & $Item->get_ItemType() ) )
-	{ // Get template name for the current Item if it is defined by Item Type
-		$item_type_template_name = $ItemType->get( 'template_name' );
-		if( ! empty( $item_type_template_name ) )
-		{ // The item type has a specific template for this display:
-			$item_type_template_name = '_'.$item_type_template_name.'.disp.php';
-			if( file_exists( $ads_current_skin_path.$item_type_template_name ) ||
-			    skin_fallback_path( $item_type_template_name ) )
-			{ // Use template file name of the Item Type only if it exists
-				$template_name = $item_type_template_name;
-			}
-		}
-	}
-
 	if( $template_name == '$disp$' )
 	{ // This is a special case.
 		// We are going to include a template based on $disp:
@@ -1840,6 +1824,21 @@ function skin_include( $template_name, $params = array() )
 			return;
 		}
 
+		if( $template_name[0] != '#' && // if template is not handled by plugins
+		    ( $disp == 'single' || $disp == 'page' ) &&
+		    ! empty( $Item ) && ( $ItemType = & $Item->get_ItemType() ) )
+		{	// Get template name for the current Item if it is defined by Item Type:
+			$item_type_template_name = $ItemType->get( 'template_name' );
+			if( ! empty( $item_type_template_name ) )
+			{	// The item type has a specific template for this display:
+				$item_type_template_name = '_'.$item_type_template_name.'.disp.php';
+				if( file_exists( $ads_current_skin_path.$item_type_template_name ) ||
+						skin_fallback_path( $item_type_template_name ) )
+				{	// Use template file name of the Item Type only if it exists:
+					$template_name = $item_type_template_name;
+				}
+			}
+		}
 	}
 
 

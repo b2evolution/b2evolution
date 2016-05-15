@@ -4003,9 +4003,9 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 
 	if( $Item->Blog->get_setting( 'allow_comments' ) != 'never' )
 	{ // The current blog can have comments:
-		$nb_comments = generic_ctp_number( $Item->ID, 'feedback' );
+		$nb_comments = generic_ctp_number( $Item->ID, 'feedback', 'total' );
 		$comments_url = is_admin_page() ? $item_url : url_add_tail( $item_url, '#comments' );
-		$col .= '<a href="'.$comments_url.'" title="'.sprintf( T_('%d feedbacks'), $nb_comments ).'" class="">';
+		$col .= '<a href="'.$comments_url.'" title="'.sprintf( T_('%d feedbacks'), $nb_comments ).'">';
 		if( $nb_comments )
 		{
 			$col .= get_icon( 'comments' );
@@ -4015,6 +4015,18 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 			$col .= get_icon( 'nocomment' );
 		}
 		$col .= '</a> ';
+	}
+
+	if( $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
+	{	// Display icon of meta comments Only if current user can views meta comments:
+		$metas_count = generic_ctp_number( $Item->ID, 'metas', 'total' );
+		if( $metas_count > 0 )
+		{	// If at least one meta comment exists
+			$item_Blog = & $Item->get_Blog();
+			$col .= '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$item_Blog->ID.'&amp;p='.$Item->ID.'&amp;comment_type=meta#comments">'
+					.get_icon( 'comments', 'imgtag', array( 'style' => 'color:#F00', 'title' => T_('Meta comments') ) )
+				.'</a> ';
+		}
 	}
 
 	$col .= '<a href="'.$item_url.'" class="" title="'.

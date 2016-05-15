@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item;
+global $Item, $disp;
 
 // Default params:
 $params = array_merge( array(
@@ -47,7 +47,7 @@ $params = array_merge( array(
 		$Item->author( array(
 				'before'    => T_('by').' <strong>',
 				'after'     => '</strong>',
-				'link_text' => 'preferredname',
+				'link_text' => 'auto',
 			) );
 		$Item->msgform_link();
 	?></p>
@@ -57,6 +57,24 @@ $params = array_merge( array(
 		// Note: You can customize the default item content by copying the generic
 		// /skins/_item_content.inc.php file into the current skin folder.
 		// -------------------------- END OF POST CONTENT -------------------------
+	?>
+
+	<?php
+	if( $disp == 'single' )
+	{
+		// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
+		// Display container contents:
+		skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+				// The following (optional) params will be used as defaults for widgets included in this container:
+				// This will enclose each widget in a block:
+				'block_start' => '<div class="$wi_class$">',
+				'block_end' => '</div>',
+				// This will enclose the title of each widget:
+				'block_title_start' => '<h3>',
+				'block_title_end' => '</h3>',
+		) );
+		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
+	}
 	?>
 
 	<div class="post-footer">
@@ -140,7 +158,7 @@ $params = array_merge( array(
 		skin_include( '_item_feedback.inc.php', array(
 				'before_section_title' => '<h4>',
 				'after_section_title'  => '</h4>',
-				'author_link_text' => 'preferredname',
+				'author_link_text' => 'auto',
 			) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.

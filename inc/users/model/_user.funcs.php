@@ -1257,8 +1257,6 @@ function user_messaging_link( $before = '', $after = '', $link_text = '#', $link
  */
 function get_user_messaging_link( $before = '', $after = '', $link_text = '#', $link_title = '#', $show_badge = false )
 {
-	global $unread_messages_count;
-
 	$user_messaging_url = get_user_messaging_url();
 
 	if( !$user_messaging_url )
@@ -1277,9 +1275,13 @@ function get_user_messaging_link( $before = '', $after = '', $link_text = '#', $
 	}
 
 	$badge = '';
-	if( $show_badge && $unread_messages_count > 0 )
-	{
-		$badge = ' <span class="badge">'.$unread_messages_count.'</span>';
+	if( $show_badge )
+	{	// Show badge with count of uread messages:
+		$unread_messages_count = get_unread_messages_count();
+		if( $unread_messages_count > 0 )
+		{	// If at least one unread message:
+			$badge = ' <span class="badge">'.$unread_messages_count.'</span>';
+		}
 	}
 
 	$r = $before

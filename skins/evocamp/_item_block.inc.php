@@ -56,7 +56,7 @@ $params = array_merge( array(
 			$Item->author( array(
 				'before'    => T_('By').' ',
 				'after'     => ' ',
-				'link_text' => 'preferredname',
+				'link_text' => 'auto',
 			) );
 			$Item->issue_time( array(
 					'before'      => /* TRANS: date */ T_('on '),

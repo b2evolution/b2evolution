@@ -65,9 +65,13 @@ require_once  dirname(__FILE__).'/_formatting.php';     	// formatting settings
 require_once  dirname(__FILE__).'/_admin.php';          	// admin settings
 require_once  dirname(__FILE__).'/_stats.php';          	// stats/hitlogging settings
 require_once  dirname(__FILE__).'/_application.php';    	// application settings
-if( file_exists(dirname(__FILE__).'/_overrides_TEST.php') )
-{ // Override for testing in there:
-	include_once dirname(__FILE__).'/_overrides_TEST.php';	// FOR TESTING / DEVELOPMENT OVERRIDES
+if( file_exists(dirname(__FILE__).'/_local.php') )
+{ // Override for local config in there:
+	include_once dirname(__FILE__).'/_local.php';			// Will not be overridden on upgrade.
+}
+elseif( file_exists(dirname(__FILE__).'/_overrides_TEST.php') )
+{ // Legacy file (not recommended):
+	include_once dirname(__FILE__).'/_overrides_TEST.php';	// Will not be overridden on upgrade.
 }
 
 // Handle debug cookie:
@@ -153,12 +157,12 @@ if( $debug_jslog == 'pwd' )
 
 // To help debugging severe errors, you'll probably want PHP to display the errors on screen.
 if( $debug > 0 || $display_errors_on_production )
-{ // We are debugging or w want to display errors on screen production anyways:
-	ini_set( 'display_errors', 'On' );
+{	// We are debugging or we want to display errors on screen production anyways:
+	@ini_set( 'display_errors', 'On' );
 }
 else
 { // Do not display errors on screen:
-	ini_set( 'display_errors', 'Off' );
+	@ini_set( 'display_errors', 'Off' );
 }
 
 // Check compatibility. Server PHP version can't be lower then the application required PHP version.

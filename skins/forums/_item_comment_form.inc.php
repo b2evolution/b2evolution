@@ -270,7 +270,7 @@ function validateCommentForm(form)
 
 	if( check_user_status( 'is_validated' ) )
 	{ // User is logged in and activated:
-		$Form->info_field( T_('User'), '<strong>'.$current_User->get_identity_link( array( 'link_text' => 'name' ) ).'</strong>'
+		$Form->info_field( T_('User'), '<strong>'.$current_User->get_identity_link( array( 'link_text' => 'auto' ) ).'</strong>'
 			.' '.get_user_profile_link( ' [', ']', T_('Edit profile') ) );
 	}
 	else

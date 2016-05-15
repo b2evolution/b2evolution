@@ -574,7 +574,7 @@ class bootstrap_manual_Skin extends Skin
 			case 'disp_params':
 				// Params for skin_include( '$disp$', array( ) )
 				return array(
-					'author_link_text' => 'preferredname',
+					'author_link_text' => 'auto',
 					// Profile tabs to switch between user edit forms
 					'profile_tabs' => array(
 						'block_start'         => '<nav><ul class="nav nav-tabs profile_tabs">',

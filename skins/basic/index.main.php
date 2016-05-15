@@ -189,6 +189,24 @@ siteskin_include( '_site_body_header.inc.php' );
 					// -------------------------- END OF POST CONTENT -------------------------
 				?>
 
+				<?php
+				if( $disp == 'single' )
+				{
+					// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
+					// Display container contents:
+					skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+							// The following (optional) params will be used as defaults for widgets included in this container:
+							// This will enclose each widget in a block:
+							'block_start' => '<div class="$wi_class$">',
+							'block_end' => '</div>',
+							// This will enclose the title of each widget:
+							'block_title_start' => '<h3>',
+							'block_title_end' => '</h3>',
+					) );
+					// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
+				}
+				?>
+
 				<small>
 					<?php
 						// Link to comments, trackbacks, etc.:
@@ -241,7 +259,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				'disp_posts'  => '',		// We already handled this case above
 				'disp_single' => '',		// We already handled this case above
 				'disp_page'   => '',		// We already handled this case above
-				'author_link_text' => 'preferredname',
+				'author_link_text' => 'auto',
 			) );
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.

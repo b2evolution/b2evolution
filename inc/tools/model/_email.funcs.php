@@ -666,7 +666,7 @@ function & get_Swift_SmtpTransport()
 {
 	global $Settings;
 
-	// Load Swift Mailer functions
+	// Load Swift Mailer functions:
 	load_funcs( '_ext/swift/swift_required.php' );
 
 	$smtp_server_host = $Settings->get( 'smtp_server_host' );
@@ -675,18 +675,24 @@ function & get_Swift_SmtpTransport()
 	$smtp_server_username = $Settings->get( 'smtp_server_username' );
 	$smtp_server_password = $Settings->get( 'smtp_server_password' );
 
-	// Create the Transport
+	// Create the Transport:
 	$Swift_SmtpTransport = Swift_SmtpTransport::newInstance( $smtp_server_host, $smtp_server_port );
 	if( $smtp_server_security == 'ssl' || $smtp_server_security == 'tls' )
-	{ // Set encryption
+	{	// Set encryption:
 		$Swift_SmtpTransport->setEncryption( $smtp_server_security );
+
+		if( $Settings->get( 'smtp_server_novalidatecert' ) )
+		{	// Do not validate the certificate from the TLS/SSL server:
+			$options = array( 'ssl' => array( 'verify_peer' => false, 'verify_peer_name' => false ) );
+			$Swift_SmtpTransport->setStreamOptions( $options );
+		}
 	}
 	if( ! empty( $smtp_server_username ) )
-	{ // Set username if it is defined
+	{	// Set username if it is defined:
 		$Swift_SmtpTransport->setUsername( $smtp_server_username );
 	}
 	if( ! empty( $smtp_server_password ) )
-	{ // Set password if it is defined
+	{	// Set password if it is defined:
 		$Swift_SmtpTransport->setPassword( $smtp_server_password );
 	}
 
@@ -777,11 +783,17 @@ function evo_mail( $to, $subject, $message, $headers = array(), $additional_para
  */
 function evo_mail_smtp( $to, $subject, $message, $headers = array(), $additional_parameters = '' )
 {
+	global $smtp_mail_sending_log;
+
 	$headers_string = get_mail_headers( $headers );
 
 	// Check if we can use SMTP Swift Mailer
 	if( check_smtp_mailer() === true && ( $Swift_Mailer = & get_Swift_Mailer() ) )
 	{ // Use Swift Mailer to send emails using SMTP
+
+		// Register Swift plugin "ArrayLogger":
+		$Swift_Plugins_Loggers_ArrayLogger = new Swift_Plugins_Loggers_ArrayLogger();
+		$Swift_Mailer->registerPlugin( new Swift_Plugins_LoggerPlugin( $Swift_Plugins_Loggers_ArrayLogger ) );
 
 		// Get charset from content type part
 		$charset = ( isset( $headers['Content-Type'] ) && preg_match( '#charset=(.+)$#i', $headers['Content-Type'], $charset ) ) ? $charset[1] : NULL;
@@ -857,8 +869,22 @@ function evo_mail_smtp( $to, $subject, $message, $headers = array(), $additional
 			$Swift_Message->setDate( $headers['Date'] );
 		}
 
-		// Send the message
-		return $Swift_Mailer->send( $Swift_Message );
+		// Send the message by SMTP transport:
+		$r = $Swift_Mailer->send( $Swift_Message );
+
+		// Save SMTP log to global cache variable:
+		if( empty( $smtp_mail_sending_log ) )
+		{
+			$smtp_mail_sending_log = '';
+		}
+		$recipients = array();
+		foreach( $Swift_Message->getTo() as $recipient_address => $recipient_name )
+		{
+			$recipients[] = '"'.$recipient_name.' <'.$recipient_address.'>"';
+		}
+		$smtp_mail_sending_log .= PHP_EOL.implode( ', ', $recipients ).': '.$Swift_Plugins_Loggers_ArrayLogger->dump();
+
+		return $r;
 	}
 
 	// No email was sent
@@ -899,33 +925,98 @@ function smtp_connection_test()
 
 	// Check if Swift Mailer is enabled
 	$check_smtp_result = check_smtp_mailer();
-	$message = T_( 'Check SMTP settings... ' );
+	$message = T_('Check SMTP settings...').' ';
 	if( $check_smtp_result === true )
-	{ // Success
-		$smtp_messages[] = $message.'<span class="green">OK</span>';
-		syslog_insert( $message.'OK', 'info', NULL );
+	{	// Success:
+		$smtp_messages[] = '<b>'.$message.'</b><b class="green">OK</b>';
+		syslog_insert( $message.' OK', 'info', NULL );
 	}
 	else
-	{ // Error
-		$smtp_messages[] = $message.'<span class="red">'.$check_smtp_result.'</span>';
-		syslog_insert( $message.$check_smtp_result, 'warning', NULL );
+	{	// Error:
+		$smtp_messages[] = '<b>'.$message.'</b>'.$check_smtp_result.' <b class="red">'.T_('Failed').'</b>';
+		syslog_insert( $message.$check_smtp_result.' '.T_('Failed'), 'warning', NULL );
 		$smtp_connection_result = false;
 		return $smtp_messages;// EXIT
 	}
 
-	// Test a connection
+	// Create SMTP transport:
 	$Swift_SmtpTransport = & get_Swift_SmtpTransport();
+
+	// Register Swift plugin "ArrayLogger":
+	$Swift_Plugins_Loggers_ArrayLogger = new Swift_Plugins_Loggers_ArrayLogger();
+	$Swift_SmtpTransport->registerPlugin( new Swift_Plugins_LoggerPlugin( $Swift_Plugins_Loggers_ArrayLogger ) );
+
+	// Test SMTP connection:
 	$connection_result = test_smtp_transport( $Swift_SmtpTransport );
-	$message = T_( 'Test SMTP connection... ' );
+
+	// Get log of the connection:
+	$smtp_mail_connection_log = PHP_EOL.$Swift_Plugins_Loggers_ArrayLogger->dump();
+
+	$smtp_message = T_('Test SMTP connection...').' ';
+
+	// Set SMTP log text to display on the testing page:
+	$smtp_mail_sending_log_html = '<b>'.$smtp_message.'</b>'
+		.( empty( $smtp_mail_connection_log ) ? ' ' : nl2br( format_to_output( $smtp_mail_connection_log, 'htmlspecialchars' ) ).'<br />' );
+
 	if( $connection_result === true )
 	{ // Success
-		$smtp_messages[] = $message.'<span class="green">OK</span>';
-		syslog_insert( $message.'OK', 'info', NULL );
+		$smtp_messages[] = $smtp_mail_sending_log_html.'<b class="green">OK</b>';
+		syslog_insert( $smtp_message.$smtp_mail_connection_log.' OK', 'info', NULL );
 	}
 	else
 	{ // Error
-		$smtp_messages[] = $message.'<span class="red">'.$connection_result.'</span>';
-		syslog_insert( $message.$connection_result, 'warning', NULL );
+		$smtp_messages[] = $smtp_mail_sending_log_html.'<b class="red">'.T_('Failed').'</b>';
+		syslog_insert( $smtp_message.$smtp_mail_connection_log.' '.T_('Failed'), 'warning', NULL );
+		$smtp_connection_result = false;
+	}
+
+	return $smtp_messages;
+}
+
+
+/**
+ * Test email sending by SMTP gateway
+ *
+ * @return array Result messages
+ */
+function smtp_email_sending_test()
+{
+	global $smtp_connection_result, $Settings, $current_User, $smtp_mail_sending_log;
+
+	$smtp_connection_result = true;
+
+	// Firstly try to SMTP connect:
+	$smtp_messages = smtp_connection_test();
+
+	if( ! $smtp_connection_result )
+	{	// Errors on SMTP connections:
+		return $smtp_messages;
+		// Exit here.
+	}
+
+	$smtp_message = sprintf( T_( 'Send test email message to "%s"...' ), $current_User->get( 'email' ) ).' ';
+
+	// Force temporary to use ONLY SMTP sending:
+	$Settings->set( 'email_service', 'smtp' );
+	// DON'T force to send email by php "mail":
+	$Settings->set( 'force_email_sending', false );
+
+	// Send test email:
+	$sending_result = send_mail( $current_User->get( 'email' ), $current_User->get( 'login' ), 'Test SMTP email sending', 'Hello, this is a test.' );
+
+	// Set SMTP log text to display on the testing page:
+	$smtp_mail_sending_log_html = '<b>'.$smtp_message.'</b>'
+		.( empty( $smtp_mail_sending_log ) ? ' ' : nl2br( format_to_output( $smtp_mail_sending_log, 'htmlspecialchars' ) ).'<br />' );
+
+	if( $sending_result === true )
+	{	// Success:
+		$smtp_messages[] = $smtp_mail_sending_log_html.'<b class="green">OK</b>';
+		syslog_insert( $smtp_message.$smtp_mail_sending_log.' OK', 'info', NULL );
+	}
+	else
+	{	// Error:
+		$smtp_messages[] = $smtp_mail_sending_log_html.'<b class="red">'.T_('Failed').'</b>';
+		syslog_insert( $smtp_message.$smtp_mail_sending_log.' '.T_('Failed'), 'warning', NULL );
 		$smtp_connection_result = false;
 	}
 
