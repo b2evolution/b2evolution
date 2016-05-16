@@ -1932,9 +1932,17 @@ class Item extends ItemLight
 		$content_parts = $this->get_content_parts( $params );
 		$output = array_shift( $content_parts );
 
-		// Render Inline Images  [image:123:caption] or [file:123:caption] :
+		// Set this flag to check inline tags outside of codeblocks:
 		$params['check_code_block'] = true;
+
+		// Render Inline Images  [image:123:caption] or [file:123:caption] :
 		$output = $this->render_inline_files( $output, $params );
+
+		// Render Custom Fields [fields], [fields:second_numeric_field,first_text_field] or [field:first_text_field]:
+		$output = $this->render_custom_fields( $output, $params );
+
+		// Render Parent Data [parent], [parent:fields] and etc.:
+		$output = $this->render_parent_data( $output, $params );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -2191,11 +2199,24 @@ class Item extends ItemLight
 	 */
 	function custom_fields( $params = array() )
 	{
+		echo $this->get_custom_fields( $params );
+	}
+
+
+	/**
+	 * Get all custom fields of current Item
+	 *
+	 * @param array Params
+	 * @return string
+	 */
+	function get_custom_fields( $params = array() )
+	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'before'       => '<table class="item_custom_fields">',
 				'field_format' => '<tr><th>$title$:</th><td>$value$</td></tr>', // $title$ $value$
 				'after'        => '</table>',
+				'fields'       => '', // Empty string to display ALL fields, OR fields names separated by comma to display only requested fields in order what you want
 			), $params );
 
 		if( empty( $this->custom_fields ) )
@@ -2203,18 +2224,38 @@ class Item extends ItemLight
 			$this->custom_fields = $this->get_type_custom_fields();
 		}
 
-		if( count( $this->custom_fields ) == 0 )
-		{	// No custom fields
-			return;
+		$fields_exist = false;
+
+		if( empty( $params['fields'] ) )
+		{	// Display all fields:
+			$display_fields = array_keys( $this->custom_fields );
+		}
+		else
+		{	// Display only the requested fields:
+			$display_fields = explode( ',', $params['fields'] );
+			$fields_exist = true;
 		}
 
-		$fields_exist = false;
+		if( ! $fields_exist && count( $this->custom_fields ) == 0 )
+		{	// No custom fields:
+			return '';
+		}
 
 		$html = $params['before'];
 
 		$mask = array( '$title$', '$value$' );
-		foreach( $this->custom_fields as $field )
+		foreach( $display_fields as $field_name )
 		{
+			$field_name = trim( $field_name );
+			if( ! isset( $this->custom_fields[ $field_name ] ) )
+			{	// Wrong field:
+				$values = array( $field_name, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), $field_name ).'</span>' );
+				$html .= str_replace( $mask, $values, $params['field_format'] );
+				$fields_exist = true;
+				continue;
+			}
+
+			$field = $this->custom_fields[ $field_name ];
 			$custom_field_value = $this->get_setting( 'custom_'.$field['type'].'_'.$field['ID'] );
 			if( !empty( $custom_field_value ) ||
 			    ( $field['type'] == 'double' && $custom_field_value == '0' ) )
@@ -2229,8 +2270,154 @@ class Item extends ItemLight
 
 		if( $fields_exist )
 		{	// Print out if at least one field is filled for this item
-			echo $html;
+			return $html;
 		}
+		else
+		{
+			return '';
+		}
+	}
+
+
+	/**
+	 * Convert inline custom field tags like [fields], [fields:second_numeric_field,first_text_field] or [field:first_text_field] into HTML tags
+	 *
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_custom_fields( $content, $params = array() )
+	{
+		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call $this->render_custom_fields() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_custom_fields' ), array( $params ) );
+			return $content;
+		}
+
+		// Find all matches with tags of custom fields:
+		preg_match_all( '/\[(fields?):?([^\]]*)?\]/i', $content, $tags );
+
+		foreach( $tags[0] as $t => $source_tag )
+		{
+			switch( $tags[1][ $t ] )
+			{
+				case 'fields':
+					// Render several fields as HTML table:
+					$custom_fields_params = array( 'fields' => trim( $tags[2][ $t ] ) );
+						$field_value = $this->get_custom_fields( $custom_fields_params );
+						if( empty( $field_value ) )
+						{	// Fields don't exist:
+							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The item has no custom fields').'</span>', $content );
+						}
+						else
+						{	// Display fields:
+							$content = str_replace( $source_tag, $field_value, $content );
+						}
+					break;
+
+				case 'field':
+					// Render single field as text:
+					$field_index = trim( $tags[2][ $t ] );
+					$field_value = $this->get_custom_field_value( $field_index );
+					if( $field_value === false )
+					{	// Wrong field request, display error:
+						$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), $field_index ).'</span>', $content );
+					}
+					else
+					{	// Display field value:
+						$content = str_replace( $source_tag, $field_value, $content );
+					}
+					break;
+			}
+		}
+
+		return $content;
+	}
+
+
+	/**
+	 * Convert inline parent tags into HTML tags like:
+	 *    [parent]
+	 *    [parent:titlelink]
+	 *    [parent:url]
+	 *    [parent:fields:second_numeric_field,first_text_field]
+	 *    [parent:field:first_text_field]
+	 *
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_parent_data( $content, $params = array() )
+	{
+		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call $this->render_custom_fields() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_parent_data' ), array( $params ) );
+			return $content;
+		}
+
+		// Find all matches with tags of parent data:
+		preg_match_all( '/\[parent:([a-z]+):?([^\]]*)?\]/i', $content, $tags );
+
+		if( count( $tags[0] ) > 0 )
+		{	// If at least one parent tag is found in content:
+			if( ! ( $parent_Item = & $this->get_parent_Item() ) )
+			{	// If parent doesn't exist:
+				$content = str_replace( $tags[0], '<span class="text-danger">'.T_('This item has no parent.').'</span>', $content );
+				return $content;
+			}
+
+			foreach( $tags[0] as $t => $source_tag )
+			{
+				switch( $tags[1][ $t ] )
+				{
+					case 'fields':
+						// Render several parent custom fields as HTML table:
+						$custom_fields_params = array( 'fields' => trim( $tags[2][ $t ] ) );
+						$field_value = $parent_Item->get_custom_fields( $custom_fields_params );
+						if( empty( $field_value ) )
+						{	// Fields don't exist:
+							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The parent item has no custom fields').'</span>', $content );
+						}
+						else
+						{	// Display fields:
+							$content = str_replace( $source_tag, $field_value, $content );
+						}
+						break;
+
+					case 'field':
+						// Render single parent custom field as text:
+						$field_index = trim( $tags[2][ $t ] );
+						$field_value = $parent_Item->get_custom_field_value( $field_index );
+						if( $field_value === false )
+						{	// Wrong field request, display error:
+							$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), $field_index ).'</span>', $content );
+						}
+						else
+						{	// Display field value:
+							$content = str_replace( $source_tag, $field_value, $content );
+						}
+						break;
+
+					case 'titlelink':
+						// Render parent title with link:
+						$content = str_replace( $source_tag, $parent_Item->get_title(), $content );
+						break;
+
+					case 'url':
+						// Render parent URL:
+						$content = str_replace( $source_tag, $parent_Item->get_permanent_url(), $content );
+						break;
+				}
+			}
+		}
+
+		return $content;
 	}
 
 

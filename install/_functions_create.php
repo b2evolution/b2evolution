@@ -2170,9 +2170,18 @@ function create_demo_contents()
 		$edited_Item->set_setting( 'custom_double_2', '456' );
 		$edited_Item->set_setting( 'custom_varchar_3', 'abc' );
 		$edited_Item->set_setting( 'custom_varchar_4', 'Enter your own values' );
-		$post_custom_fields_ID = $edited_Item->insert( $jay_moderator_ID, T_('Custom Fields Example'), T_('<p>This post has a special post type called "Post with custom fields".</p>')
-				.T_('<p>This post type defines 4 custom fields.</p>')
-				.T_('<p>This post has sample values for these for 4 fields. You can see them below</p>'),
+		$post_custom_fields_ID = $edited_Item->insert( $jay_moderator_ID, T_('Custom Fields Example'),
+'<p>'.T_('This post has a special post type called "Post with custom fields".').'</p>
+
+<p>'.T_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>
+
+<p>[fields]</p>
+
+<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>
+
+<p>[fields:first_numeric_field, first_text_field,second_numeric_field]</p>
+
+<p>'.T_('Finally, we can also display just the value of a specific field, like this [field: first_text_field].').'</p>',
 			$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Post with Custom Fields' );
 
 		// Insert a post:
@@ -2180,7 +2189,18 @@ function create_demo_contents()
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'demo' );
 		$edited_Item->set( 'parent_ID', $post_custom_fields_ID ); // Set parent post ID
-		$edited_Item->insert( $jay_moderator_ID, T_('Child Post Example'), T_('<p>This post has a special post type called "Child Post".</p>'),
+		$edited_Item->insert( $jay_moderator_ID, T_('Child Post Example'),
+'<p>'.sprintf( T_('This post has a special post type called "Child Post". This allowed to specify a parent post ID. Consequently, this child post is linked to: %s.'), '[parent:titlelink] ([parent:url])' ).'</p>
+
+<p>'.T_('This also allows us to access the custom fields of the parent post:').'</p>
+
+<p>[parent:fields]</p>
+
+<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>
+
+<p>[parent:fields:first_numeric_field, first_text_field,second_numeric_field]</p>
+
+<p>'.T_('Finally, we can also display just the value of a specific field, like this [parent:field: first_text_field].').'</p>',
 			$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Child Post' );
 
 		// Insert a post:
