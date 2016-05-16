@@ -62,9 +62,16 @@
 	
 	// Flowing blocks Layout
 	&.evo_layout_flow {
-		div.widget_flow_blocks div {
-			width: 100%;
-			text-align: left;
+		// Wrapper div
+		.widget_flow_blocks {
+			// Inner divs
+			> div {
+				display: inline-block;
+				float: none; // We removed default bootstrap's style here because of the issue with floated divs with uneven heights in multiple rows
+				vertical-align: top;
+				text-align: center; // Centering the layout to prevent dislocation of content
+				margin: 3px 10px;
+			}
 		}
 	}
 }
