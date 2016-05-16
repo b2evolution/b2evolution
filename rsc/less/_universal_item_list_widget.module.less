@@ -11,8 +11,8 @@ div.widget_core_coll_post_list,
 div.widget_core_coll_page_list,
 div.widget_core_coll_related_post_list {
 
-	// RWD layout
-	&.evo_layout_rwd {
+	// RWD layout and Flowing blocks layout
+	&.evo_layout_rwd, &.evo_layout_flow {
 	
 		.widget_rwd_content {
 			padding: 8px;
@@ -24,30 +24,29 @@ div.widget_core_coll_related_post_list {
 		// With teaser or with excerpt
 		&.evo_withteaser, &.evo_withexcerpt {
 			// Wrapper div
-			.widget_rwd_blocks {
-				// 
+			.widget_rwd_blocks, .widget_flow_blocks {
+				// Inner divs
 				> div {
 					display: inline-block;
 					float: none; // We removed default bootstrap's style here because of the issue with floated divs with uneven heights in multiple rows
 					vertical-align: top;
 				}
+			}
 			
-				.widget_rwd_content {
-					
-					// Important for limiting the max image size to it's parent's max width
-					.item_first_image img {
-						max-width: 100%;
-						max-height: 380px;
-						width:auto;
-						height:auto;
-						margin: auto;
-					}
-					.item_title {
-						font-size: 16px;
-						font-weight: 700;
-						line-height: 1.5em;
-						margin: 10px 0 5px;
-					}
+			.widget_rwd_blocks .widget_rwd_content, .widget_flow_blocks > div {
+				// Important for limiting the max image size to it's parent's max width
+				.item_first_image img {
+					max-width: 100%;
+					max-height: 380px;
+					width:auto;
+					height:auto;
+					margin: auto;
+				}
+				.item_title {
+					font-size: 16px;
+					font-weight: 700;
+					line-height: 1.5em;
+					margin: 10px 0 5px;
 				}
 			}
 		}
@@ -252,12 +251,12 @@ div.widget_core_coll_related_post_list {
 	}
 	
 	// Flowing blocks Layout
-	&.evo_layout_flow {
+	/*&.evo_layout_flow {
 		div.widget_flow_blocks div {
 			width: 100%;
 			text-align: left;
 		}
-	}
+	}*/
 }
 
 // Only when in Sidebar or Sidebar 2
