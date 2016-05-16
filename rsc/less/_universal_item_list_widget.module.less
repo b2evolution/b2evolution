@@ -28,10 +28,8 @@ div.widget_core_coll_related_post_list {
 				// 
 				> div {
 					display: inline-block;
-					float: none; // We removed default bootstrap's style here because of the issue with floating divs with uneven height in multiple rows
+					float: none; // We removed default bootstrap's style here because of the issue with floated divs with uneven heights in multiple rows
 					vertical-align: top;
-					// zoom: 1; testing if this is necessary
-					// min-height: 200px; testing if this is necessary
 				}
 			
 				.widget_rwd_content {
@@ -50,12 +48,6 @@ div.widget_core_coll_related_post_list {
 						line-height: 1.5em;
 						margin: 10px 0 5px;
 					}
-					// testing if this is necessary
-					//.item_content {
-					//	& > p, & > a {
-					//		display: inline;
-					//	}
-					//}
 				}
 			}
 		}
@@ -74,7 +66,8 @@ div.widget_core_coll_related_post_list {
 			li {
 				list-style: none;
 				height: auto;
-				display: table;
+				// display: table; - testing if this can be replaced with display: block;
+				display: block;
 				clear: both;
 				margin: 5px 0;
 				padding: 0;
