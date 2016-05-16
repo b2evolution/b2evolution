@@ -587,6 +587,10 @@ textarea.message_text {
 .evo_post .small.text-muted a .glyphicon {
   color: inherit;
 }
+.evo_intro_post {
+  background-repeat: no-repeat;
+  background-size: 100%;
+}
 div.bSideItem {
   background: #F7F5FA;
   border-radius: 5px;
