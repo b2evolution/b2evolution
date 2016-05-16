@@ -685,15 +685,12 @@ class Skin extends DataObject
 	 */
 	function get_setting( $parname )
 	{
-		/**
-		 * @var Blog
-		 */
-		global $Blog;
+		global $Blog, $Settings;
 
-		// Name of the setting in the blog settings:
-		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
+		// Name of the setting in the settings:
+		$setting_name = 'skin'.$this->ID.'_'.$parname;
 
-		$value = $Blog->get_setting( $blog_setting_name );
+		$value = isset( $Blog ) ? $Blog->get_setting( $setting_name ) : $Settings->get( $setting_name );
 
 		if( ! is_null( $value ) )
 		{	// We have a value for this param:
@@ -766,22 +763,26 @@ class Skin extends DataObject
 
 
 	/**
-	 * Set a skin specific param value for current Blog
+	 * Set a skin specific param value for current Blog or Site
 	 *
 	 * @param string parameter name
 	 * @param mixed parameter value
 	 */
 	function set_setting( $parname, $parvalue )
 	{
-		/**
-		 * @var Blog
-		 */
-		global $Blog;
+		global $Blog, $Settings;
 
-		// Name of the setting in the blog settings:
-		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
+		// Name of the setting in the settings:
+		$setting_name = 'skin'.$this->ID.'_'.$parname;
 
-		$Blog->set_setting( $blog_setting_name, $parvalue );
+		if( isset( $Blog ) )
+		{	// Set collection skin setting:
+			$Blog->set_setting( $setting_name, $parvalue );
+		}
+		else
+		{ // Set site skin setting:
+			$Settings->set( $setting_name, $parvalue );
+		}
 	}
 
 
@@ -790,12 +791,16 @@ class Skin extends DataObject
 	 */
 	function dbupdate_settings()
 	{
-		/**
-		 * @var Blog
-		 */
-		global $Blog;
+		global $Blog, $Settings;
 
-		$Blog->dbupdate();
+		if( isset( $Blog ) )
+		{	// Update collection skin settings:
+			$Blog->dbupdate();
+		}
+		else
+		{	// Update site skin settings:
+			$Settings->dbupdate();
+		}
 	}
 
 

@@ -27,7 +27,7 @@ param( 'tab', 'string', 'manage_skins', true );
 
 param( 'redirect_to', 'url', $admin_url.'?ctrl=skins&tab='.$tab.( isset( $blog ) ? '&blog='.$blog : '' ) );
 
-if( $tab != 'system' )
+if( $tab != 'system' && $tab != 'site_skin' )
 {	// Memorize this as the last "tab" used in the Blog Settings:
 	$UserSettings->set( 'pref_coll_settings_tab', $tab );
 	$UserSettings->dbupdate();
@@ -91,6 +91,24 @@ switch( $action )
 			else
 			{	// Redirect to admin skins page if we change the skin for another device type:
 				header_redirect( $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID );
+			}
+		}
+		elseif( $tab == 'site_skin' )
+		{	// We installed the skin for the site:
+			$Settings->set( $edited_Skin->type.'_skin_ID', $edited_Skin->ID );
+			$Settings->dbupdate();
+
+			$Messages->add( T_('The site skin has been changed.')
+								.' <a href="'.$admin_url.'?ctrl=collections&amp;tab=site_skin">'.T_('Edit...').'</a>', 'success' );
+			if( ( !$Session->is_mobile_session() && !$Session->is_tablet_session() && $edited_Skin->type == 'normal' ) ||
+					( $Session->is_mobile_session() && $edited_Skin->type == 'mobile' ) ||
+					( $Session->is_tablet_session() && $edited_Skin->type == 'tablet' ) )
+			{	// Redirect to home page if we change the skin for current device type:
+				header_redirect( $baseurl );
+			}
+			else
+			{	// Redirect to admin skins page if we change the skin for another device type:
+				header_redirect( $admin_url.'?ctrl=collections&tab=site_skin' );
 			}
 		}
 		else
@@ -242,16 +260,30 @@ switch( $action )
 		param( 'skin_ID', 'integer', true );
 		param( 'blog', 'integer', true );
 
-		// At some point we may want to remove skin settings from all blogs
-		$DB->query('DELETE FROM T_coll_settings
-								 WHERE cset_coll_ID = '.$DB->quote($blog).'
-								 			 AND cset_name REGEXP "^skin'.$skin_ID.'_"');
-
 		$Messages->add( T_('Skin params have been reset to defaults.'), 'success' );
 
-		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( '?ctrl=coll_settings&tab=skin&blog='.$blog, 303 ); // Will EXIT
-		// We have EXITed already at this point!!
+		if( $blog > 0 )
+		{	// Collection skin:
+			// At some point we may want to remove skin settings from all blogs
+			$DB->query( 'DELETE FROM T_coll_settings
+				WHERE cset_coll_ID = '.$DB->quote( $blog ).'
+				  AND cset_name REGEXP "^skin'.$skin_ID.'_"' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$blog, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		else
+		{	// Site skin:
+			// At some point we may want to remove skin settings from all blogs
+			$DB->query( 'DELETE FROM T_settings
+				WHERE set_name REGEXP "^skin'.$skin_ID.'_"' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=collections&tab=site_skin', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+			
+		}
 		break;
 }
 
@@ -264,6 +296,15 @@ if( $tab == 'system' )
 	$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
 		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
 	$AdminUI->breadcrumbpath_add( T_('Skins'), $admin_url.'?ctrl=skins' );
+}
+elseif( $tab == 'site_skin' )
+{	// From Site Skin tab:
+	$AdminUI->set_path( 'site', 'skin', 'manage_skins' );
+
+	$AdminUI->breadcrumbpath_init( false );
+	$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
+	$AdminUI->breadcrumbpath_add( T_('Site skin'), $admin_url.'?ctrl=collections&amp;tab=site_skin' );
+	$AdminUI->breadcrumbpath_add( T_('Manage skins'), $admin_url.'?ctrl=skins&amp;tab=site_skin' );
 }
 else
 {	// From Blog settings:

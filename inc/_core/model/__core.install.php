@@ -59,7 +59,7 @@ $schema_queries = array(
 	'T_settings' => array(
 		'Creating table for Settings',
 		"CREATE TABLE T_settings (
-			set_name VARCHAR(30) COLLATE ascii_general_ci NOT NULL,
+			set_name VARCHAR(50) COLLATE ascii_general_ci NOT NULL,
 			set_value VARCHAR(5000) NULL,
 			PRIMARY KEY ( set_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),

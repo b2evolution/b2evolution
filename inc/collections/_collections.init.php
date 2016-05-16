@@ -666,6 +666,23 @@ class collections_Module extends Module
 					'text' => T_('Site Settings'),
 					'href' => $admin_url.'?ctrl=collections&amp;tab=site_settings'
 				);
+				if( $Settings->get( 'site_skins_enabled' ) )
+				{	// Display tab of site skin only when it is enabled:
+					$site_menu['entries']['skin'] = array(
+						'text' => T_('Site skin'),
+						'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin',
+						'entries' => array(
+							'current_skin' => array(
+								'text' => T_('Skins for this site'),
+								'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin'
+							),
+							'manage_skins' => array(
+								'text' => T_('Manage skins'),
+								'href' => $admin_url.'?ctrl=skins&amp;tab=site_skin'
+							),
+						),
+					);
+				}
 			}
 			if( $current_User->check_perm( 'slugs', 'view' ) )
 			{ // User has an access to view slugs

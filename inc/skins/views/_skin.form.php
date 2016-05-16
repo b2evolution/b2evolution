@@ -32,6 +32,7 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 	$Form->hidden_ctrl();
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'skin_ID', $edited_Skin->ID );
+	$Form->hidden( 'tab', get_param( 'tab' ) );
 
 	$Form->begin_fieldset( T_('Skin properties').get_manual_link( 'skin-system-settings' ) );
 

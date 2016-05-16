@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_Blog;
 
-global $admin_url, $Session;
+global $admin_url, $Session, $Settings;
 
 $skin_type = param( 'skin_type', 'string', 'normal' );
 
@@ -46,11 +46,11 @@ switch( $skin_type )
 }
 
 // Get what is the current skin ID from this kind of skin type
-$current_skin_ID = $edited_Blog->get_setting( $skin_type.'_skin_ID', true );
+$current_skin_ID = isset( $edited_Blog ) ? $edited_Blog->get_setting( $skin_type.'_skin_ID', true ) : $Settings->get( $skin_type.'_skin_ID', true );
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
-	$block_item_Widget->global_icon( T_('Install new skin...'), 'new', $admin_url.'?ctrl=skins&amp;tab=current_skin&amp;blog='.$edited_Blog->ID.'&amp;action=new&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','skinpage=selection','','&'), $admin_url)), T_('Install new').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+	$block_item_Widget->global_icon( T_('Install new skin...'), 'new', $admin_url.'?ctrl=skins&amp;tab='.( isset( $edited_Blog ) ? 'current_skin&amp;blog='.$edited_Blog->ID : 'site_skin' ).'&amp;action=new&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','skinpage=selection','','&'), $admin_url)), T_('Install new').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 	$block_item_Widget->global_icon( T_('Keep current skin!'), 'close', regenerate_url( 'skinpage' ), ' '.T_('Don\'t change'), 3, 4 );
 }
 
@@ -60,7 +60,7 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 
 	if( $current_User->check_perm( 'options', 'edit', false ) )
 	{ // A link to install new skin:
-		echo '<a href="'.$admin_url.'?ctrl=skins&amp;tab=current_skin&amp;action=new&amp;redirect_to='.rawurlencode( url_rel_to_same_host( regenerate_url( '','skinpage=selection','','&' ), $admin_url ) ).'" class="skinshot skinshot_new">'
+		echo '<a href="'.$admin_url.'?ctrl=skins&amp;tab='.( isset( $edited_Blog ) ? 'current_skin' : 'site_skin' ).'&amp;action=new&amp;redirect_to='.rawurlencode( url_rel_to_same_host( regenerate_url( '','skinpage=selection','','&' ), $admin_url ) ).'" class="skinshot skinshot_new">'
 				.get_icon( 'new' )
 				.T_('Install New').' &raquo;'
 			.'</a>';
@@ -72,7 +72,14 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 	if( $display_same_as_normal )
 	{
 		$skinshot_title = T_('Same as normal skin');
-		$select_url = '?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID=0&amp;'.url_crumb('collection');
+		if( isset( $edited_Blog ) )
+		{	// Collection skin:
+			$select_url = $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID=0&amp;'.url_crumb( 'collection' );
+		}
+		else
+		{	// Site skin:
+			$select_url = $admin_url.'?ctrl=collections&amp;tab=site_skin&amp;action=update_site_skin&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID=0&amp;'.url_crumb( 'siteskin' );
+		}
 		$disp_params = array(
 			'function'     => 'select',
 			'selected'     => $current_skin_ID == '0',
@@ -93,8 +100,16 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 
 		$selected = ( $current_skin_ID == $iterator_Skin->ID );
 		$blog_skin_param = $skin_type.'_skin_ID=';
-		$select_url = '?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$blog_skin_param.$iterator_Skin->ID.'&amp;'.url_crumb('collection');
-		$preview_url = url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode($iterator_Skin->folder) );
+		if( isset( $edited_Blog ) )
+		{	// Collection skin:
+			$select_url = $admin_url.'?ctrl=coll_settings&amp;tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID='.$iterator_Skin->ID.'&amp;'.url_crumb( 'collection' );
+			$preview_url = url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode( $iterator_Skin->folder ) );
+		}
+		else
+		{	// Site skin:
+			$select_url = $admin_url.'?ctrl=collections&amp;tab=site_skin&amp;action=update_site_skin&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID='.$iterator_Skin->ID.'&amp;'.url_crumb( 'siteskin' );
+			$preview_url = '';
+		}
 
 		$disp_params = array(
 			'function'     => 'select',

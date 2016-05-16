@@ -7487,6 +7487,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11775, 'Upgrading general settings table...' ) )
+	{	// part of 6.7.2-stable
+		$DB->query( 'ALTER TABLE T_settings
+			MODIFY set_name VARCHAR(50) COLLATE ascii_general_ci NOT NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
