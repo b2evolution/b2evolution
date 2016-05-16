@@ -132,10 +132,9 @@ class Skin extends DataObject
 
 
 	/**
-	 * Get default type for the skin.
+	 * Get default type/format for the skin.
 	 *
-	 * Possible values are normal, site and feed.
-	 * However a skin can be multi-purpose, so this is a bit deprecated now.
+	 * Possible values are normal, tablet, phone, feed, sitemap.
 	 */
 	function get_default_type()
 	{
