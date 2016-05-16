@@ -133,10 +133,31 @@ class Skin extends DataObject
 
 	/**
 	 * Get default type for the skin.
+	 *
+	 * Possible values are normal, site and feed.
+	 * However a skin can be multi-purpose, so this is a bit deprecated now.
 	 */
 	function get_default_type()
 	{
 		return (substr($this->folder,0,1) == '_' ? 'feed' : 'normal');
+	}
+
+
+	/**
+	 * Does this skin providesnormal (collection) skin functionality?
+	 */
+	function provides_collection_skin()
+	{
+		return true;	// If the skin doesn't override this, it will be a collection skin.
+	}
+
+
+	/**
+	 * Does this skin provide site-skin functionality?
+	 */
+	function provides_site_skin()
+	{
+		return false;	// If the skin doesn't override this, it will NOT be a site skin.
 	}
 
 
