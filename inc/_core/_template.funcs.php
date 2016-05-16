@@ -1619,7 +1619,7 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 						var ajax_url = "";
 						if( jQuery( this ).hasClass( "only_assignees" ) )
 						{
-							ajax_url = restapi_url + "collections/'.$Blog->get( 'urlname' ).'/assignees";
+							ajax_url = restapi_url + "'.( isset( $Blog ) ? 'collections/'.$Blog->get( 'urlname' ).'/assignees' : 'users/logins' ).'";
 						}
 						else
 						{
@@ -1673,7 +1673,7 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 				var ajax_url = "";
 				if( jQuery( this ).hasClass( "only_assignees" ) )
 				{
-					ajax_url = restapi_url + "collections/'.$Blog->get( 'urlname' ).'/assignees";
+					ajax_url = restapi_url + "'.( isset( $Blog ) ? 'collections/'.$Blog->get( 'urlname' ).'/assignees' : 'users/logins' ).'";
 				}
 				else
 				{
