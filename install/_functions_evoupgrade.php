@@ -7482,7 +7482,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 11770, 'Upgrading files table...' ) )
-	{ // part of 6.7.2-beta
+	{ // part of 6.7.3-beta
 		db_add_index( 'T_files', 'file_creator_user_id', 'file_creator_user_id' );
 		upg_task_end();
 	}
