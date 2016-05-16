@@ -2207,6 +2207,7 @@ class Item extends ItemLight
 	 * Get all custom fields of current Item
 	 *
 	 * @param array Params
+	 * @return string
 	 */
 	function get_custom_fields( $params = array() )
 	{
@@ -2223,11 +2224,6 @@ class Item extends ItemLight
 			$this->custom_fields = $this->get_type_custom_fields();
 		}
 
-		if( count( $this->custom_fields ) == 0 )
-		{	// No custom fields
-			return;
-		}
-
 		$fields_exist = false;
 
 		if( empty( $params['fields'] ) )
@@ -2238,6 +2234,11 @@ class Item extends ItemLight
 		{	// Display only the requested fields:
 			$display_fields = explode( ',', $params['fields'] );
 			$fields_exist = true;
+		}
+
+		if( ! $fields_exist && count( $this->custom_fields ) == 0 )
+		{	// No custom fields:
+			return '';
 		}
 
 		$html = $params['before'];
