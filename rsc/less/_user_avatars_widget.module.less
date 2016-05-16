@@ -4,14 +4,35 @@ div.widget_core_user_avatars {
 
 	// RWD layout
 	&.evo_layout_rwd {
-
 		.widget_rwd_content {
+			padding: 8px;
 			margin: 14px 0;
+			overflow: hidden;
+			background-color: #fafafa;
+			border-radius: 4px;
 		}
-
+	}
+	
+	// Wrapper div
+	.widget_rwd_blocks, .widget_flow_blocks {
+		// Inner divs
+		> div {
+			display: inline-block;
+			// float: none; // We removed default bootstrap's style here because of the issue with floated divs with uneven heights in multiple rows
+			vertical-align: top;
+		}
+	}
+	
+	.widget_rwd_blocks .widget_rwd_content, .widget_flow_blocks > div {
+		// Important for limiting the max image size to it's parent's max width
 		img {
-			width: 100%;
-			height: auto;
+			max-width: 100%;
+			max-height: 380px;
+			width:auto;
+			height:auto;
+			margin: auto;
+			display: block; // We need this to center the image with margin: auto, because there is no wrapper to the images that we could text-align: center
+			border-radius: 3px;
 		}
 	}
 
