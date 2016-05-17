@@ -158,8 +158,8 @@ class EvoUnitTestCase extends UnitTestCase
 		}
 
 		// Reload conf and vars.
-		require EVODIR.'blogs/conf/_config.php';
-		require EVODIR.'blogs/inc/_main.inc.php';
+		require EVODIR.'conf/_config.php';
+		require EVODIR.'inc/_main.inc.php';
 
 		$this->_saved_globals = array();
 		$this->_saved_server = array();
