@@ -396,6 +396,9 @@ if( $action == 'preview' )
 $Results->display_init( $display_params );
 $display_params['list_start'] = str_replace( 'class="grouped', 'class="grouped nohover', $Results->params['list_start'] );
 
+// Disable highlight on hover
+$display_params['list_start'] = str_replace( 'table-hover', '', $Results->params['list_start'] );
+
 // Dispaly message list
 $Results->display( $display_params );
 

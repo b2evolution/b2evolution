@@ -1602,7 +1602,7 @@ ol {
   margin: 0 0 10px 25px;
   padding: 0;
 }
-.table-hover:not(#fm_browser) > tbody > tr:hover {
+.table-hover > tbody > tr:hover {
   background-color: #ffc;
 }
 .btn.btn-success .fa,

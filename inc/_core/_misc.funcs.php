@@ -7702,8 +7702,9 @@ function evo_version_compare( $version1, $version2, $operator = NULL )
 		$version1 = $app_version;
 	}
 
-	// Remove part after "-" from versions like "6.6.6-stable":
-	$version1 = preg_replace( '/(-.+)?/', '', $version1 );
+	// Remove "stable" suffix to compare such versions as upper than "alpha", "beta" and etc.:
+	$version1 = str_replace( '-stable', '', $version1 );
+	$version2 = str_replace( '-stable', '', $version2 );
 
 	if( is_null( $operator ) )
 	{	// To return integer:
