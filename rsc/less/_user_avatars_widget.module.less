@@ -2,20 +2,19 @@
 
 div.widget_core_user_avatars {
 
-	// RWD layout
-	&.evo_layout_rwd {
-		.widget_rwd_content {
-			padding: 8px;
-			margin: 14px 0;
-			overflow: hidden;
-			background-color: #fafafa;
-			border-radius: 4px;
-		}
+	// RWD blocks layout - inner blocks div style
+	&.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content {
+		padding: 8px;
+		margin: 14px 0;
+		overflow: hidden;
+		background-color: #fafafa;
+		border-radius: 4px;
 	}
 	
-	// Wrapper div
-	.widget_rwd_blocks, .widget_flow_blocks {
-		// Inner divs
+	// RWD blocks and Flowing blocks layout
+	&.evo_layout_rwd .widget_rwd_blocks,
+	&.evo_layout_flow .widget_flow_blocks {
+		// Inner divs style
 		> div {
 			display: inline-block;
 			// float: none; // We removed default bootstrap's style here because of the issue with floated divs with uneven heights in multiple rows
@@ -23,7 +22,9 @@ div.widget_core_user_avatars {
 		}
 	}
 	
-	.widget_rwd_blocks .widget_rwd_content, .widget_flow_blocks > div {
+	// RWD blocks and Flowing blocks layout
+	&.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content,
+	&.evo_layout_flow .widget_flow_blocks > div {
 		// Important for limiting the max image size to it's parent's max width
 		img {
 			max-width: 100%;
@@ -35,5 +36,4 @@ div.widget_core_user_avatars {
 			border-radius: 3px;
 		}
 	}
-
 }

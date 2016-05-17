@@ -1,156 +1,48 @@
-div.widget_core_coll_item_list,
-div.widget_core_coll_featured_posts,
-div.widget_core_coll_post_list,
-div.widget_core_coll_page_list,
-div.widget_core_coll_related_post_list {
-  /*&.evo_layout_flow {
-		div.widget_flow_blocks div {
-			width: 100%;
-			text-align: left;
-		}
-	}*/
-}
-div.widget_core_coll_item_list.evo_layout_rwd .widget_rwd_content,
-div.widget_core_coll_featured_posts.evo_layout_rwd .widget_rwd_content,
-div.widget_core_coll_post_list.evo_layout_rwd .widget_rwd_content,
-div.widget_core_coll_page_list.evo_layout_rwd .widget_rwd_content,
-div.widget_core_coll_related_post_list.evo_layout_rwd .widget_rwd_content,
-div.widget_core_coll_item_list.evo_layout_flow .widget_rwd_content,
-div.widget_core_coll_featured_posts.evo_layout_flow .widget_rwd_content,
-div.widget_core_coll_post_list.evo_layout_flow .widget_rwd_content,
-div.widget_core_coll_page_list.evo_layout_flow .widget_rwd_content,
-div.widget_core_coll_related_post_list.evo_layout_flow .widget_rwd_content {
+div.widget_core_coll_item_list.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content,
+div.widget_core_coll_featured_posts.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content,
+div.widget_core_coll_post_list.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content,
+div.widget_core_coll_page_list.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content,
+div.widget_core_coll_related_post_list.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content {
   padding: 8px;
   margin: 14px 0;
   overflow: hidden;
   background-color: #fafafa;
   border-radius: 4px;
 }
-div.widget_core_coll_item_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks > div,
-div.widget_core_coll_featured_posts.evo_layout_rwd.evo_withteaser .widget_rwd_blocks > div,
-div.widget_core_coll_post_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks > div,
-div.widget_core_coll_page_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks > div,
-div.widget_core_coll_related_post_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks > div,
-div.widget_core_coll_item_list.evo_layout_flow.evo_withteaser .widget_rwd_blocks > div,
-div.widget_core_coll_featured_posts.evo_layout_flow.evo_withteaser .widget_rwd_blocks > div,
-div.widget_core_coll_post_list.evo_layout_flow.evo_withteaser .widget_rwd_blocks > div,
-div.widget_core_coll_page_list.evo_layout_flow.evo_withteaser .widget_rwd_blocks > div,
-div.widget_core_coll_related_post_list.evo_layout_flow.evo_withteaser .widget_rwd_blocks > div,
-div.widget_core_coll_item_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks > div,
-div.widget_core_coll_featured_posts.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks > div,
-div.widget_core_coll_post_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks > div,
-div.widget_core_coll_page_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks > div,
-div.widget_core_coll_related_post_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks > div,
-div.widget_core_coll_item_list.evo_layout_flow.evo_withexcerpt .widget_rwd_blocks > div,
-div.widget_core_coll_featured_posts.evo_layout_flow.evo_withexcerpt .widget_rwd_blocks > div,
-div.widget_core_coll_post_list.evo_layout_flow.evo_withexcerpt .widget_rwd_blocks > div,
-div.widget_core_coll_page_list.evo_layout_flow.evo_withexcerpt .widget_rwd_blocks > div,
-div.widget_core_coll_related_post_list.evo_layout_flow.evo_withexcerpt .widget_rwd_blocks > div,
-div.widget_core_coll_item_list.evo_layout_rwd.evo_withteaser .widget_flow_blocks > div,
-div.widget_core_coll_featured_posts.evo_layout_rwd.evo_withteaser .widget_flow_blocks > div,
-div.widget_core_coll_post_list.evo_layout_rwd.evo_withteaser .widget_flow_blocks > div,
-div.widget_core_coll_page_list.evo_layout_rwd.evo_withteaser .widget_flow_blocks > div,
-div.widget_core_coll_related_post_list.evo_layout_rwd.evo_withteaser .widget_flow_blocks > div,
-div.widget_core_coll_item_list.evo_layout_flow.evo_withteaser .widget_flow_blocks > div,
-div.widget_core_coll_featured_posts.evo_layout_flow.evo_withteaser .widget_flow_blocks > div,
-div.widget_core_coll_post_list.evo_layout_flow.evo_withteaser .widget_flow_blocks > div,
-div.widget_core_coll_page_list.evo_layout_flow.evo_withteaser .widget_flow_blocks > div,
-div.widget_core_coll_related_post_list.evo_layout_flow.evo_withteaser .widget_flow_blocks > div,
-div.widget_core_coll_item_list.evo_layout_rwd.evo_withexcerpt .widget_flow_blocks > div,
-div.widget_core_coll_featured_posts.evo_layout_rwd.evo_withexcerpt .widget_flow_blocks > div,
-div.widget_core_coll_post_list.evo_layout_rwd.evo_withexcerpt .widget_flow_blocks > div,
-div.widget_core_coll_page_list.evo_layout_rwd.evo_withexcerpt .widget_flow_blocks > div,
-div.widget_core_coll_related_post_list.evo_layout_rwd.evo_withexcerpt .widget_flow_blocks > div,
-div.widget_core_coll_item_list.evo_layout_flow.evo_withexcerpt .widget_flow_blocks > div,
-div.widget_core_coll_featured_posts.evo_layout_flow.evo_withexcerpt .widget_flow_blocks > div,
-div.widget_core_coll_post_list.evo_layout_flow.evo_withexcerpt .widget_flow_blocks > div,
-div.widget_core_coll_page_list.evo_layout_flow.evo_withexcerpt .widget_flow_blocks > div,
-div.widget_core_coll_related_post_list.evo_layout_flow.evo_withexcerpt .widget_flow_blocks > div {
-  display: inline-block;
-  float: none;
-  vertical-align: top;
-}
-div.widget_core_coll_item_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_featured_posts.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_post_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_page_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_related_post_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_item_list.evo_layout_flow.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_featured_posts.evo_layout_flow.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_post_list.evo_layout_flow.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_page_list.evo_layout_flow.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_related_post_list.evo_layout_flow.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_item_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_featured_posts.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_post_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_page_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_related_post_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_item_list.evo_layout_flow.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_featured_posts.evo_layout_flow.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_post_list.evo_layout_flow.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_page_list.evo_layout_flow.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_related_post_list.evo_layout_flow.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_item_list.evo_layout_rwd.evo_withteaser .widget_flow_blocks > div .item_first_image img,
-div.widget_core_coll_featured_posts.evo_layout_rwd.evo_withteaser .widget_flow_blocks > div .item_first_image img,
-div.widget_core_coll_post_list.evo_layout_rwd.evo_withteaser .widget_flow_blocks > div .item_first_image img,
-div.widget_core_coll_page_list.evo_layout_rwd.evo_withteaser .widget_flow_blocks > div .item_first_image img,
-div.widget_core_coll_related_post_list.evo_layout_rwd.evo_withteaser .widget_flow_blocks > div .item_first_image img,
-div.widget_core_coll_item_list.evo_layout_flow.evo_withteaser .widget_flow_blocks > div .item_first_image img,
-div.widget_core_coll_featured_posts.evo_layout_flow.evo_withteaser .widget_flow_blocks > div .item_first_image img,
-div.widget_core_coll_post_list.evo_layout_flow.evo_withteaser .widget_flow_blocks > div .item_first_image img,
-div.widget_core_coll_page_list.evo_layout_flow.evo_withteaser .widget_flow_blocks > div .item_first_image img,
-div.widget_core_coll_related_post_list.evo_layout_flow.evo_withteaser .widget_flow_blocks > div .item_first_image img,
-div.widget_core_coll_item_list.evo_layout_rwd.evo_withexcerpt .widget_flow_blocks > div .item_first_image img,
-div.widget_core_coll_featured_posts.evo_layout_rwd.evo_withexcerpt .widget_flow_blocks > div .item_first_image img,
-div.widget_core_coll_post_list.evo_layout_rwd.evo_withexcerpt .widget_flow_blocks > div .item_first_image img,
-div.widget_core_coll_page_list.evo_layout_rwd.evo_withexcerpt .widget_flow_blocks > div .item_first_image img,
-div.widget_core_coll_related_post_list.evo_layout_rwd.evo_withexcerpt .widget_flow_blocks > div .item_first_image img,
-div.widget_core_coll_item_list.evo_layout_flow.evo_withexcerpt .widget_flow_blocks > div .item_first_image img,
-div.widget_core_coll_featured_posts.evo_layout_flow.evo_withexcerpt .widget_flow_blocks > div .item_first_image img,
-div.widget_core_coll_post_list.evo_layout_flow.evo_withexcerpt .widget_flow_blocks > div .item_first_image img,
-div.widget_core_coll_page_list.evo_layout_flow.evo_withexcerpt .widget_flow_blocks > div .item_first_image img,
-div.widget_core_coll_related_post_list.evo_layout_flow.evo_withexcerpt .widget_flow_blocks > div .item_first_image img {
-  max-width: 100%;
-  max-height: 380px;
-  width: auto;
-  height: auto;
-  margin: auto;
-}
 div.widget_core_coll_item_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_title,
 div.widget_core_coll_featured_posts.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_title,
 div.widget_core_coll_post_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_title,
 div.widget_core_coll_page_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_title,
 div.widget_core_coll_related_post_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_item_list.evo_layout_flow.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_featured_posts.evo_layout_flow.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_post_list.evo_layout_flow.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_page_list.evo_layout_flow.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_related_post_list.evo_layout_flow.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_title,
 div.widget_core_coll_item_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_title,
 div.widget_core_coll_featured_posts.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_title,
 div.widget_core_coll_post_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_title,
 div.widget_core_coll_page_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_related_post_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_item_list.evo_layout_flow.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_featured_posts.evo_layout_flow.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_post_list.evo_layout_flow.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_page_list.evo_layout_flow.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_related_post_list.evo_layout_flow.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_item_list.evo_layout_rwd.evo_withteaser .widget_flow_blocks > div .item_title,
-div.widget_core_coll_featured_posts.evo_layout_rwd.evo_withteaser .widget_flow_blocks > div .item_title,
-div.widget_core_coll_post_list.evo_layout_rwd.evo_withteaser .widget_flow_blocks > div .item_title,
-div.widget_core_coll_page_list.evo_layout_rwd.evo_withteaser .widget_flow_blocks > div .item_title,
-div.widget_core_coll_related_post_list.evo_layout_rwd.evo_withteaser .widget_flow_blocks > div .item_title,
+div.widget_core_coll_related_post_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_title {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5em;
+  margin: 10px 0 5px;
+}
+div.widget_core_coll_item_list.evo_layout_rwd .widget_rwd_blocks > div,
+div.widget_core_coll_featured_posts.evo_layout_rwd .widget_rwd_blocks > div,
+div.widget_core_coll_post_list.evo_layout_rwd .widget_rwd_blocks > div,
+div.widget_core_coll_page_list.evo_layout_rwd .widget_rwd_blocks > div,
+div.widget_core_coll_related_post_list.evo_layout_rwd .widget_rwd_blocks > div,
+div.widget_core_coll_item_list.evo_layout_flow .widget_flow_blocks > div,
+div.widget_core_coll_featured_posts.evo_layout_flow .widget_flow_blocks > div,
+div.widget_core_coll_post_list.evo_layout_flow .widget_flow_blocks > div,
+div.widget_core_coll_page_list.evo_layout_flow .widget_flow_blocks > div,
+div.widget_core_coll_related_post_list.evo_layout_flow .widget_flow_blocks > div {
+  display: inline-block;
+  float: none;
+  vertical-align: top;
+}
 div.widget_core_coll_item_list.evo_layout_flow.evo_withteaser .widget_flow_blocks > div .item_title,
 div.widget_core_coll_featured_posts.evo_layout_flow.evo_withteaser .widget_flow_blocks > div .item_title,
 div.widget_core_coll_post_list.evo_layout_flow.evo_withteaser .widget_flow_blocks > div .item_title,
 div.widget_core_coll_page_list.evo_layout_flow.evo_withteaser .widget_flow_blocks > div .item_title,
 div.widget_core_coll_related_post_list.evo_layout_flow.evo_withteaser .widget_flow_blocks > div .item_title,
-div.widget_core_coll_item_list.evo_layout_rwd.evo_withexcerpt .widget_flow_blocks > div .item_title,
-div.widget_core_coll_featured_posts.evo_layout_rwd.evo_withexcerpt .widget_flow_blocks > div .item_title,
-div.widget_core_coll_post_list.evo_layout_rwd.evo_withexcerpt .widget_flow_blocks > div .item_title,
-div.widget_core_coll_page_list.evo_layout_rwd.evo_withexcerpt .widget_flow_blocks > div .item_title,
-div.widget_core_coll_related_post_list.evo_layout_rwd.evo_withexcerpt .widget_flow_blocks > div .item_title,
 div.widget_core_coll_item_list.evo_layout_flow.evo_withexcerpt .widget_flow_blocks > div .item_title,
 div.widget_core_coll_featured_posts.evo_layout_flow.evo_withexcerpt .widget_flow_blocks > div .item_title,
 div.widget_core_coll_post_list.evo_layout_flow.evo_withexcerpt .widget_flow_blocks > div .item_title,
@@ -243,14 +135,13 @@ div.widget_core_coll_post_list.evo_pics div.item_images,
 div.widget_core_coll_page_list.evo_pics div.item_images,
 div.widget_core_coll_related_post_list.evo_pics div.item_images {
   display: inline-block;
-  margin: 6px 6px 0 0;
 }
 div.widget_core_coll_item_list.evo_pics div.item_images img,
 div.widget_core_coll_featured_posts.evo_pics div.item_images img,
 div.widget_core_coll_post_list.evo_pics div.item_images img,
 div.widget_core_coll_page_list.evo_pics div.item_images img,
 div.widget_core_coll_related_post_list.evo_pics div.item_images img {
-  margin-right: 6px;
+  margin: 6px 6px 0 0;
 }
 div.widget_core_coll_item_list.evo_pics.evo_1pic__special li,
 div.widget_core_coll_featured_posts.evo_pics.evo_1pic__special li,
@@ -266,7 +157,6 @@ div.widget_core_coll_post_list.evo_pics.evo_1pic__special div.item_images,
 div.widget_core_coll_page_list.evo_pics.evo_1pic__special div.item_images,
 div.widget_core_coll_related_post_list.evo_pics.evo_1pic__special div.item_images {
   float: left;
-  margin: 6px 6px 6px 0;
 }
 div.widget_core_coll_item_list.evo_withexcerpt.evo_1pic__special ul li,
 div.widget_core_coll_featured_posts.evo_withexcerpt.evo_1pic__special ul li,
@@ -350,6 +240,30 @@ div.widget_core_coll_page_list.evo_withteaser ul li div.item_title a,
 div.widget_core_coll_related_post_list.evo_withteaser ul li div.item_title a {
   text-decoration: underline;
 }
+div.widget_core_coll_item_list.evo_withexcerpt.evo_pics div.item_images,
+div.widget_core_coll_featured_posts.evo_withexcerpt.evo_pics div.item_images,
+div.widget_core_coll_post_list.evo_withexcerpt.evo_pics div.item_images,
+div.widget_core_coll_page_list.evo_withexcerpt.evo_pics div.item_images,
+div.widget_core_coll_related_post_list.evo_withexcerpt.evo_pics div.item_images,
+div.widget_core_coll_item_list.evo_withteaser.evo_pics div.item_images,
+div.widget_core_coll_featured_posts.evo_withteaser.evo_pics div.item_images,
+div.widget_core_coll_post_list.evo_withteaser.evo_pics div.item_images,
+div.widget_core_coll_page_list.evo_withteaser.evo_pics div.item_images,
+div.widget_core_coll_related_post_list.evo_withteaser.evo_pics div.item_images {
+  margin-top: 6px;
+}
+div.widget_core_coll_item_list.evo_withexcerpt.evo_pics div.item_images img,
+div.widget_core_coll_featured_posts.evo_withexcerpt.evo_pics div.item_images img,
+div.widget_core_coll_post_list.evo_withexcerpt.evo_pics div.item_images img,
+div.widget_core_coll_page_list.evo_withexcerpt.evo_pics div.item_images img,
+div.widget_core_coll_related_post_list.evo_withexcerpt.evo_pics div.item_images img,
+div.widget_core_coll_item_list.evo_withteaser.evo_pics div.item_images img,
+div.widget_core_coll_featured_posts.evo_withteaser.evo_pics div.item_images img,
+div.widget_core_coll_post_list.evo_withteaser.evo_pics div.item_images img,
+div.widget_core_coll_page_list.evo_withteaser.evo_pics div.item_images img,
+div.widget_core_coll_related_post_list.evo_withteaser.evo_pics div.item_images img {
+  margin: 0 6px 6px 0;
+}
 div.widget_core_coll_item_list.evo_noexcerpt.evo_withteaser div.item_content p,
 div.widget_core_coll_featured_posts.evo_noexcerpt.evo_withteaser div.item_content p,
 div.widget_core_coll_post_list.evo_noexcerpt.evo_withteaser div.item_content p,
@@ -431,6 +345,20 @@ div.widget_core_coll_page_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.
 div.widget_core_coll_related_post_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
   font-size: 22px;
 }
+div.widget_core_coll_item_list.evo_1pic__special.evo_noexcerpt.evo_noteaser.evo_pics div.item_images,
+div.widget_core_coll_featured_posts.evo_1pic__special.evo_noexcerpt.evo_noteaser.evo_pics div.item_images,
+div.widget_core_coll_post_list.evo_1pic__special.evo_noexcerpt.evo_noteaser.evo_pics div.item_images,
+div.widget_core_coll_page_list.evo_1pic__special.evo_noexcerpt.evo_noteaser.evo_pics div.item_images,
+div.widget_core_coll_related_post_list.evo_1pic__special.evo_noexcerpt.evo_noteaser.evo_pics div.item_images {
+  margin-top: 6px;
+}
+div.widget_core_coll_item_list.evo_1pic__special.evo_noexcerpt.evo_noteaser.evo_pics div.item_images img,
+div.widget_core_coll_featured_posts.evo_1pic__special.evo_noexcerpt.evo_noteaser.evo_pics div.item_images img,
+div.widget_core_coll_post_list.evo_1pic__special.evo_noexcerpt.evo_noteaser.evo_pics div.item_images img,
+div.widget_core_coll_page_list.evo_1pic__special.evo_noexcerpt.evo_noteaser.evo_pics div.item_images img,
+div.widget_core_coll_related_post_list.evo_1pic__special.evo_noexcerpt.evo_noteaser.evo_pics div.item_images img {
+  margin: 0 6px 6px 0;
+}
 div.widget_core_coll_item_list img,
 div.widget_core_coll_featured_posts img,
 div.widget_core_coll_post_list img,
@@ -475,8 +403,7 @@ div.evo_container__sidebar2 div.widget_core_coll_post_list.evo_1pic__special.evo
     font-size: 18px;
   }
 }
-div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_content,
-div.widget_core_coll_media_index.evo_layout_flow .widget_rwd_content {
+div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content {
   padding: 8px;
   margin: 14px 0;
   overflow: hidden;
@@ -484,16 +411,12 @@ div.widget_core_coll_media_index.evo_layout_flow .widget_rwd_content {
   border-radius: 4px;
 }
 div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_blocks > div,
-div.widget_core_coll_media_index.evo_layout_flow .widget_rwd_blocks > div,
-div.widget_core_coll_media_index.evo_layout_rwd .widget_flow_blocks > div,
 div.widget_core_coll_media_index.evo_layout_flow .widget_flow_blocks > div {
   display: inline-block;
   float: none;
   vertical-align: top;
 }
 div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content img,
-div.widget_core_coll_media_index.evo_layout_flow .widget_rwd_blocks .widget_rwd_content img,
-div.widget_core_coll_media_index.evo_layout_rwd .widget_flow_blocks > div img,
 div.widget_core_coll_media_index.evo_layout_flow .widget_flow_blocks > div img {
   max-width: 100%;
   max-height: 380px;
@@ -504,25 +427,23 @@ div.widget_core_coll_media_index.evo_layout_flow .widget_flow_blocks > div img {
   border-radius: 3px;
 }
 div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content span.note,
-div.widget_core_coll_media_index.evo_layout_flow .widget_rwd_blocks .widget_rwd_content span.note,
-div.widget_core_coll_media_index.evo_layout_rwd .widget_flow_blocks > div span.note,
 div.widget_core_coll_media_index.evo_layout_flow .widget_flow_blocks > div span.note {
   display: block;
 }
-div.widget_core_user_avatars.evo_layout_rwd .widget_rwd_content {
+div.widget_core_user_avatars.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content {
   padding: 8px;
   margin: 14px 0;
   overflow: hidden;
   background-color: #fafafa;
   border-radius: 4px;
 }
-div.widget_core_user_avatars .widget_rwd_blocks > div,
-div.widget_core_user_avatars .widget_flow_blocks > div {
+div.widget_core_user_avatars.evo_layout_rwd .widget_rwd_blocks > div,
+div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div {
   display: inline-block;
   vertical-align: top;
 }
-div.widget_core_user_avatars .widget_rwd_blocks .widget_rwd_content img,
-div.widget_core_user_avatars .widget_flow_blocks > div img {
+div.widget_core_user_avatars.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content img,
+div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   max-width: 100%;
   max-height: 380px;
   width: auto;

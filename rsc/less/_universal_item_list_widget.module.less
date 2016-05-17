@@ -5,43 +5,52 @@
 @placeholder-background-color: #f0f0f0; // Background color of the Placeholder
 @placeholder-icon-color: #dcdcdc; // Color of the icon inside the Placeholder element
 
-div.widget_core_coll_item_list, 
-div.widget_core_coll_featured_posts,
-div.widget_core_coll_post_list,
-div.widget_core_coll_page_list,
-div.widget_core_coll_related_post_list {
+div.widget_core_coll_item_list, // Universal item list widget
+div.widget_core_coll_featured_posts, //Featured posts widget
+div.widget_core_coll_post_list, // Simple posts list widget
+div.widget_core_coll_page_list, // Simple page list widget
+div.widget_core_coll_related_post_list { // Simple related posts widget
 
-	// RWD layout and Flowing blocks layout
-	&.evo_layout_rwd, &.evo_layout_flow {
-	
-		.widget_rwd_content {
+	// RWD blocks layout
+	&.evo_layout_rwd {
+		// Inner blocks div style
+		.widget_rwd_blocks .widget_rwd_content {
 			padding: 8px;
 			margin: 14px 0;
 			overflow: hidden;
 			background-color: #fafafa;
 			border-radius: 4px;
 		}
+		
 		// With teaser or with excerpt
-		&.evo_withteaser, &.evo_withexcerpt {
-			// Wrapper div
-			.widget_rwd_blocks, .widget_flow_blocks {
-				// Inner divs
-				> div {
-					display: inline-block;
-					float: none; // We removed default bootstrap's style here because of the issue with floated divs with uneven heights in multiple rows
-					vertical-align: top;
-				}
+		&.evo_withteaser,
+		&.evo_withexcerpt {
+			.widget_rwd_blocks .widget_rwd_content .item_title {
+				font-size: 16px;
+				font-weight: 700;
+				line-height: 1.5em;
+				margin: 10px 0 5px;
 			}
-			
-			.widget_rwd_blocks .widget_rwd_content, .widget_flow_blocks > div {
-				// Important for limiting the max image size to it's parent's max width
-				.item_first_image img {
-					max-width: 100%;
-					max-height: 380px;
-					width:auto;
-					height:auto;
-					margin: auto;
-				}
+		}
+	}
+	
+	// RWD blocks and Flowing blocks layout
+	&.evo_layout_rwd .widget_rwd_blocks,
+	&.evo_layout_flow .widget_flow_blocks {
+		// Inner divs style
+		> div {
+			display: inline-block;
+			float: none; // We removed default bootstrap's style here because of the issue with floated divs with uneven heights in multiple rows
+			vertical-align: top;
+		}
+	}
+	
+	// Flowing blocks layout
+	&.evo_layout_flow {
+		// With teaser or with excerpt
+		&.evo_withteaser,
+		&.evo_withexcerpt {
+			.widget_flow_blocks > div {
 				.item_title {
 					font-size: 16px;
 					font-weight: 700;
@@ -110,7 +119,6 @@ div.widget_core_coll_related_post_list {
 		}
 	}
 
-	// FP: I did not find a better way than to include this in &.evo_layout_list
 	// First image when selected "Display first image"
 	&.evo_layout_list div.item_first_image {
 		float: left; 
@@ -121,9 +129,9 @@ div.widget_core_coll_related_post_list {
 	&.evo_pics {
 		div.item_images {
 			display: inline-block;
-			margin: 6px 6px 0 0;
 			img {
-				margin-right: 6px;
+				// margin-right: 6px; old style
+				margin: 6px 6px 0 0;
 			}
 		}
 	}
@@ -135,11 +143,11 @@ div.widget_core_coll_related_post_list {
 		}
 		div.item_images {
 			float: left;
-			margin: 6px 6px 6px 0;
 		}
 	}
 	// With excerpt or with teaser
-	&.evo_withexcerpt, &.evo_withteaser {
+	&.evo_withexcerpt,
+	&.evo_withteaser {
 		// Special treatment - remove bullets
 		&.evo_1pic__special ul li {
 			list-style: none;	
@@ -167,6 +175,13 @@ div.widget_core_coll_related_post_list {
 				a {
 					text-decoration: underline;
 				}
+			}
+		}
+		// With teaser or with excerpt, ONLY when all images are shown
+		&.evo_pics div.item_images {
+			margin-top: 6px;
+			img {
+				margin: 0 6px 6px 0;
 			}
 		}
 	}
@@ -231,10 +246,17 @@ div.widget_core_coll_related_post_list {
 		div.item_title a {
 			font-size: 22px;
 		}
+		// Without teaser, without excerpt, ONLY when all images are shown
+		&.evo_pics div.item_images {
+			margin-top: 6px;
+			img {
+				margin: 0 6px 6px 0;
+			}
+		}
 	}
 	img {
 		border-radius: 3px;
-		// Preventing images to exceed the parent's width
+		// Important for limiting the max image size to it's parent's max width
 		max-width: 100%;
 		max-height: 380px;
 		width:auto;
@@ -249,14 +271,6 @@ div.widget_core_coll_related_post_list {
 	div.item_first_image {
 		text-align: center;
 	}
-	
-	// Flowing blocks Layout
-	/*&.evo_layout_flow {
-		div.widget_flow_blocks div {
-			width: 100%;
-			text-align: left;
-		}
-	}*/
 }
 
 // Only when in Sidebar or Sidebar 2

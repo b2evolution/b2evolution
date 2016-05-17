@@ -1,5 +1,4 @@
-div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_content,
-div.widget_core_coll_media_index.evo_layout_flow .widget_rwd_content {
+div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content {
   padding: 8px;
   margin: 14px 0;
   overflow: hidden;
@@ -7,16 +6,12 @@ div.widget_core_coll_media_index.evo_layout_flow .widget_rwd_content {
   border-radius: 4px;
 }
 div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_blocks > div,
-div.widget_core_coll_media_index.evo_layout_flow .widget_rwd_blocks > div,
-div.widget_core_coll_media_index.evo_layout_rwd .widget_flow_blocks > div,
 div.widget_core_coll_media_index.evo_layout_flow .widget_flow_blocks > div {
   display: inline-block;
   float: none;
   vertical-align: top;
 }
 div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content img,
-div.widget_core_coll_media_index.evo_layout_flow .widget_rwd_blocks .widget_rwd_content img,
-div.widget_core_coll_media_index.evo_layout_rwd .widget_flow_blocks > div img,
 div.widget_core_coll_media_index.evo_layout_flow .widget_flow_blocks > div img {
   max-width: 100%;
   max-height: 380px;
@@ -27,25 +22,23 @@ div.widget_core_coll_media_index.evo_layout_flow .widget_flow_blocks > div img {
   border-radius: 3px;
 }
 div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content span.note,
-div.widget_core_coll_media_index.evo_layout_flow .widget_rwd_blocks .widget_rwd_content span.note,
-div.widget_core_coll_media_index.evo_layout_rwd .widget_flow_blocks > div span.note,
 div.widget_core_coll_media_index.evo_layout_flow .widget_flow_blocks > div span.note {
   display: block;
 }
-div.widget_core_user_avatars.evo_layout_rwd .widget_rwd_content {
+div.widget_core_user_avatars.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content {
   padding: 8px;
   margin: 14px 0;
   overflow: hidden;
   background-color: #fafafa;
   border-radius: 4px;
 }
-div.widget_core_user_avatars .widget_rwd_blocks > div,
-div.widget_core_user_avatars .widget_flow_blocks > div {
+div.widget_core_user_avatars.evo_layout_rwd .widget_rwd_blocks > div,
+div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div {
   display: inline-block;
   vertical-align: top;
 }
-div.widget_core_user_avatars .widget_rwd_blocks .widget_rwd_content img,
-div.widget_core_user_avatars .widget_flow_blocks > div img {
+div.widget_core_user_avatars.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content img,
+div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   max-width: 100%;
   max-height: 380px;
   width: auto;
