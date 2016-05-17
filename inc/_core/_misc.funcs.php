@@ -5219,15 +5219,19 @@ function update_html_tag_attribs( $html_tag, $new_attribs, $attrib_actions = arr
 	$html_tag_name = $tag_match[1];
 
 	$old_attribs = array();
+	$updated_attribs = array();
 	if( preg_match_all( '@(\S+)=("|\'|)(.*)("|\'|>)@isU', $html_tag, $attr_matches ) )
 	{	// Get all existing attributes:
 		foreach( $attr_matches[1] as $o => $old_attr_name )
 		{
 			$old_attribs[ $old_attr_name ] = $attr_matches[3][ $o ];
+			if( ! isset( $new_attribs[ $old_attr_name ] ) )
+			{	// This attribute is not updated, keep current value:
+				$updated_attribs[] = $old_attr_name.'="'.format_to_output( $attr_matches[3][ $o ], 'formvalue' ).'"';
+			}
 		}
 	}
 
-	$updated_attribs = array();
 	foreach( $new_attribs as $new_attrib_name => $new_attrib_value )
 	{
 		if( isset( $old_attribs[ $new_attrib_name ] ) )

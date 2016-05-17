@@ -153,6 +153,18 @@ class bootstrap_blog_Skin extends Skin
 						'defaultvalue' => '#23527c',
 						'type' => 'color',
 					),
+					'bgimg_text_color' => array(
+						'label' => T_('Text color on background image'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),
+					'bgimg_link_color' => array(
+						'label' => T_('Link color on background image'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#6cb2ef',
+						'type' => 'color',
+					),
 					'current_tab_text_color' => array(
 						'label' => T_('Current tab text color'),
 						'note' => T_('E-g: #00ff00 for green'),
@@ -316,6 +328,14 @@ class bootstrap_blog_Skin extends Skin
 		if( $color = $this->get_setting( 'page_hover_link_color' ) )
 		{ // Custom page link color on hover:
 			$custom_css .= 'a:hover { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'bgimg_text_color' ) )
+		{	// Custom text color on background image:
+			$custom_css .= '.evo_hasbgimg { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'bgimg_link_color' ) )
+		{	// Custom link color on background image:
+			$custom_css .= '.evo_hasbgimg a { color: '.$color." }\n";
 		}
 		if( $color = $this->get_setting( 'current_tab_text_color' ) )
 		{ // Custom current tab text color:
