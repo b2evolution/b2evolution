@@ -5,6 +5,9 @@ div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_blocks .widget_rwd_c
   background-color: #fafafa;
   border-radius: 4px;
 }
+div.widget_core_coll_media_index.evo_layout_list ul li img {
+  margin: 0 6px 6px 0;
+}
 div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_blocks > div,
 div.widget_core_coll_media_index.evo_layout_flow .widget_flow_blocks > div {
   display: inline-block;
@@ -55,6 +58,10 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   text-align: center;
   margin-top: 20px;
   margin-bottom: 30px;
+  padding: 8px;
+  overflow: hidden;
+  background-color: #fafafa;
+  border-radius: 4px;
 }
 .widget_core_org_members img {
   display: inline-block;
