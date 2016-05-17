@@ -4540,7 +4540,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					}
 					if( isset( $icon['size-'.$icon_param_name][1] ) )
 					{ // Height
-						$styles['width'] = 'height:'.$icon['size-'.$icon_param_name][1].'px';
+						$styles['height'] = 'height:'.$icon['size-'.$icon_param_name][1].'px';
 					}
 				}
 
