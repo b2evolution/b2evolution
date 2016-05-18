@@ -71,10 +71,17 @@ switch( $action )
 
 		$Messages->add( T_('Skin has been installed.'), 'success' );
 
-		if( $tab == 'current_skin' && ! empty( $blog ) )
+		if( $tab == 'coll_skin' && ! empty( $blog ) )
 		{	// We installed the skin for the selected collection:
 			$BlogCache = & get_BlogCache();
 			$edited_Blog = & $BlogCache->get_by_ID( $blog );
+
+			if( ! skin_check_compatibility( $edited_Skin->ID, 'coll' ) )
+			{	// Redirect to admin skins page selector if the skin cannot be selected:
+				$Messages->add( T_('The skin cannot be used for collections.'), 'error' );
+				header_redirect( $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&skinpage=selection&skin_type='.$edited_Skin->type );
+				break;
+			}
 
 			// Set new installed skins for the selected collection:
 			$edited_Blog->set_setting( $edited_Skin->type.'_skin_ID', $edited_Skin->ID );
@@ -95,6 +102,13 @@ switch( $action )
 		}
 		elseif( $tab == 'site_skin' )
 		{	// We installed the skin for the site:
+			if( ! skin_check_compatibility( $edited_Skin->ID, 'site' ) )
+			{	// Redirect to admin skins page selector if the skin cannot be selected:
+				$Messages->add( T_('The skin cannot be used for site.'), 'error' );
+				header_redirect( $admin_url.'?ctrl=collections&tab=site_skin&skinpage=selection&skin_type='.$edited_Skin->type );
+				break;
+			}
+
 			$Settings->set( $edited_Skin->type.'_skin_ID', $edited_Skin->ID );
 			$Settings->dbupdate();
 

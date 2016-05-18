@@ -375,33 +375,46 @@ switch( $action )
 
 		if( $skinpage == 'selection' )
 		{
+			$SkinCache = & get_SkinCache();
+
 			if( param( 'normal_skin_ID', 'integer', NULL ) !== NULL )
 			{	// Normal skin ID:
-				$Settings->set( 'normal_skin_ID', get_param( 'normal_skin_ID' ) );
+				$updated_skin_type = 'normal';
+				$updated_skin_ID = get_param( 'normal_skin_ID' );
+				$Settings->set( 'normal_skin_ID', $updated_skin_ID );
 			}
-
-			if( param( 'mobile_skin_ID', 'integer', NULL ) !== NULL )
+			elseif( param( 'mobile_skin_ID', 'integer', NULL ) !== NULL )
 			{	// Mobile skin ID:
-				if( get_param( 'mobile_skin_ID' ) == 0 )
+				$updated_skin_type = 'mobile';
+				$updated_skin_ID = get_param( 'mobile_skin_ID' );
+				if( $updated_skin_ID == 0 )
 				{	// Don't store this empty setting in DB:
 					$Settings->delete( 'mobile_skin_ID' );
 				}
 				else
 				{	// Set mobile skin:
-					$Settings->set( 'mobile_skin_ID', get_param( 'mobile_skin_ID' ) );
+					$Settings->set( 'mobile_skin_ID', $updated_skin_ID );
 				}
 			}
-
-			if( param( 'tablet_skin_ID', 'integer', NULL ) !== NULL )
+			elseif( param( 'tablet_skin_ID', 'integer', NULL ) !== NULL )
 			{	// Tablet skin ID:
-				if( get_param( 'tablet_skin_ID' ) == 0 )
+				$updated_skin_type = 'tablet';
+				$updated_skin_ID = get_param( 'tablet_skin_ID' );
+				if( $updated_skin_ID == 0 )
 				{	// Don't store this empty setting in DB:
 					$Settings->delete( 'tablet_skin_ID' );
 				}
 				else
 				{	// Set tablet skin:
-					$Settings->set( 'tablet_skin_ID', get_param( 'tablet_skin_ID' ) );
+					$Settings->set( 'tablet_skin_ID', $updated_skin_ID );
 				}
+			}
+
+			if( ! empty( $updated_skin_ID ) && ! skin_check_compatibility( $updated_skin_ID, 'site' ) )
+			{	// Redirect to admin skins page selector if the skin cannot be selected:
+				$Messages->add( T_('The skin cannot be used for site.'), 'error' );
+				header_redirect( $admin_url.'?ctrl=collections&tab=site_skin&skinpage=selection&skin_type='.$updated_skin_type );
+				break;
 			}
 
 			if( $Settings->dbupdate() )
@@ -456,7 +469,7 @@ switch( $tab )
 			// Check minimum permission:
 			$current_User->check_perm( 'options', 'view', true );
 
-			$AdminUI->set_path( 'site', 'skin', 'current_skin' );
+			$AdminUI->set_path( 'site', 'skin', 'site_skin' );
 
 			$AdminUI->breadcrumbpath_init( false );
 			$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );

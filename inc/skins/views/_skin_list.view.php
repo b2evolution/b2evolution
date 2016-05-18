@@ -53,10 +53,36 @@ $Results->cols[] = array(
 						'td' => '%get_skin_version( #skin_ID# )%'
 					);
 
+function skin_col_provide_type( $Skin, $type )
+{
+	// Check if the Skin is provided for site or collection:
+	$is_type_provided = ( $type == 'site' ) ? $Skin->provides_site_skin() : $Skin->provides_collection_skin();
+
+	// Display black dot icon only when the Skin can be used for the requested type:
+	return $is_type_provided ? get_icon( 'bullet_full', 'imgtag', array( 'title' => '' ) ) : '&nbsp;';
+}
 $Results->cols[] = array(
-						'th' => T_('Skin type'),
+						'th_group' => T_('Skin type'),
+						'th' => T_('Site'),
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap',
+						'td' => '%skin_col_provide_type( {Obj}, "site" )%',
+					);
+
+$Results->cols[] = array(
+						'th_group' => T_('Skin type'),
+						'th' => T_('Coll.'),
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap',
+						'td' => '%skin_col_provide_type( {Obj}, "coll" )%',
+					);
+
+$Results->cols[] = array(
+						'th_group' => T_('Skin type'),
+						'th' => T_('Format'),
+						'th_class' => 'shrinkwrap',
 						'order' => 'skin_type',
-						'td_class' => 'center',
+						'td_class' => 'shrinkwrap',
 						'td' => '$skin_type$',
 					);
 

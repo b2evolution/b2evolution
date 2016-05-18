@@ -672,7 +672,7 @@ class collections_Module extends Module
 						'text' => T_('Site skin'),
 						'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin',
 						'entries' => array(
-							'current_skin' => array(
+							'site_skin' => array(
 								'text' => T_('Skins for this site'),
 								'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin'
 							),
@@ -825,7 +825,7 @@ class collections_Module extends Module
 						'text' => T_('Skin'),
 						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog,
 						'entries' => array(
-							'current_skin' => array(
+							'coll_skin' => array(
 								'text' => T_('Skins for this blog'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog
 							)

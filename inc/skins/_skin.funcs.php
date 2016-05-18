@@ -2470,9 +2470,21 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 			echo '<span>'.( isset( $edited_Skin->version ) ? $edited_Skin->version : 'unknown' ).'</span>';
 		echo '</div>';
 
-		// Skin type
+		// Site Skin:
 		echo '<div class="skin_setting_row">';
-			echo '<label>'.T_('Skin type').':</label>';
+			echo '<label>'.T_('Site Skin').':</label>';
+			echo '<span>'.( $edited_Skin->provides_site_skin() ? T_('Yes') : T_('No') ).'</span>';
+		echo '</div>';
+
+		// Collection Skin:
+		echo '<div class="skin_setting_row">';
+			echo '<label>'.T_('Collection Skin').':</label>';
+			echo '<span>'.( $edited_Skin->provides_collection_skin() ? T_('Yes') : T_('No') ).'</span>';
+		echo '</div>';
+
+		// Skin format:
+		echo '<div class="skin_setting_row">';
+			echo '<label>'.T_('Skin format').':</label>';
 			echo '<span>'.$edited_Skin->type.'</span>';
 		echo '</div>';
 
@@ -2639,5 +2651,28 @@ function get_skin_version( $skin_ID )
 	}
 
 	return 'unknown';
+}
+
+
+/**
+ * Check compatibility skin with requested type
+ *
+ * @param integer Skin ID
+ * @param string Type: 'site' or 'coll'
+ * @return boolean
+ */
+function skin_check_compatibility( $skin_ID, $type )
+{
+	$SkinCache = & get_SkinCache();
+	$Skin = & $SkinCache->get_by_ID( $skin_ID, false, false );
+
+	if( ! $Skin ||
+	    ( $type == 'coll' && ! $Skin->provides_collection_skin() ) ||
+	    ( $type == 'site' && ! $Skin->provides_site_skin() ) )
+	{	// Skin cannot be used for requested type:
+		return false;
+	}
+
+	return true;
 }
 ?>

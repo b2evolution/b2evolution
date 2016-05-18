@@ -53,9 +53,21 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 				echo '<span>'.( isset( $edited_Skin->version ) ? $edited_Skin->version : 'unknown' ).'</span>';
 			echo '</div>';
 
-			// Skin type
+			// Site Skin:
 			echo '<div class="skin_setting_row">';
-				echo '<label>'.T_('Skin type').':</label>';
+				echo '<label>'.T_('Site Skin').':</label>';
+				echo '<span>'.( $edited_Skin->provides_site_skin() ? T_('Yes') : T_('No') ).'</span>';
+			echo '</div>';
+
+			// Collection Skin:
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Collection Skin').':</label>';
+				echo '<span>'.( $edited_Skin->provides_collection_skin() ? T_('Yes') : T_('No') ).'</span>';
+			echo '</div>';
+
+			// Skin format:
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Skin format').':</label>';
 				echo '<span>'.$edited_Skin->type.'</span>';
 			echo '</div>';
 

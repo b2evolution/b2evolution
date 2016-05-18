@@ -643,7 +643,7 @@ class Skin extends DataObject
 							echo '<a href="'.$skin_url.'" title="'.T_('Install NOW!').'">';
 							echo T_('Install NOW!').'</a>';
 						}
-						if( empty( $kind ) && get_param( 'tab' ) != 'current_skin' )
+						if( empty( $kind ) && get_param( 'tab' ) != 'coll_skin' && get_param( 'tab' ) != 'site_skin' )
 						{	// Don't display the checkbox on new collection creating form and when we install one skin for the selected collection:
 							$skin_name_before = '<label><input type="checkbox" name="skin_folders[]" value="'.$skin_name.'" /> ';
 							$skin_name_after = '</label>';
