@@ -67,8 +67,8 @@ else
 						'item_end' => '',
 						'item_selected_start' => '',
 						'item_selected_end' => '',
-						'link_selected_class' => 'swhead_item swhead_item_selected',
-						'link_default_class' => 'swhead_item ',
+						'link_selected_class' => 'swhead_item swhead_item_nav_md swhead_item_selected',
+						'link_default_class' => 'swhead_item swhead_item_nav_md ',
 						'blog_ID' => $Settings->get( 'info_blog_ID' ),
 						'item_group_by' => 'none',
 						'order_by' => 'order',		// Order (as explicitly specified)
@@ -91,8 +91,8 @@ else
 						'item_end' => '',
 						'item_selected_start' => '',
 						'item_selected_end' => '',
-						'link_selected_class' => 'swhead_item swhead_item_selected',
-						'link_default_class' => 'swhead_item ',
+						'link_selected_class' => 'swhead_item swhead_item_nav_md swhead_item_selected',
+						'link_default_class' => 'swhead_item swhead_item_nav_md ',
 						'link_type' => 'ownercontact',
 				) );
 	// --------------------------------- END OF CONTACT LINK --------------------------------
@@ -134,6 +134,8 @@ else
 				'widget' => 'msg_menu_link',
 				// Optional display params
 				'link_type' => 'messages',
+				'link_selected_class' => 'swhead_item swhead_item_nav_sm swhead_item_selected',
+				'link_default_class' => 'swhead_item swhead_item_nav_sm'
 			) ) );
 
 			// Logout link:
@@ -174,6 +176,7 @@ else
 	</div>
 	<div class="clear"></div>
 </nav>
+
 <input type="checkbox" id="nav-trigger" class="nav-trigger">
 <div class="sitewide_header_menu_wrapper">
 	<ul class="sitewide_header_menu">
@@ -189,9 +192,9 @@ else
 					'block_display_title' => false,
 					'list_start' => '',
 					'list_end' => '',
-					'item_start' => '<li>',
+					'item_start' => '<li class="swhead_item swhead_item_menu_sm">',
 					'item_end' => '</li>',
-					'item_selected_start' => '<li>',
+					'item_selected_start' => '<li class="swhead_item swhead_item_menu_sm">',
 					'item_selected_end' => '</li>',
 					'link_selected_class' => 'swhead_item_selected',
 					'link_default_class' => ''
@@ -211,9 +214,9 @@ else
 						'block_display_title' => false,
 						'list_start' => '',
 						'list_end' => '',
-						'item_start' => '<li>',
+						'item_start' => '<li class="swhead_item swhead_item_menu_md">',
 						'item_end' => '</li>',
-						'item_selected_start' => '<li>',
+						'item_selected_start' => '<li class="swhead_item swhead_item_menu_md">',
 						'item_selected_end' => '</li>',
 						'link_selected_class' => 'swhead_item_selected',
 						'link_default_class' => '',
@@ -235,12 +238,12 @@ else
 					'block_display_title' => false,
 					'list_start' => '',
 					'list_end' => '',
-					'item_start' => '<li>',
+					'item_start' => '<li class="swhead_item swhead_item_menu_md">',
 					'item_end' => '</li>',
-					'item_selected_start' => '<li>',
+					'item_selected_start' => '<li class="swhead_item swhead_item_menu_md">',
 					'item_selected_end' => '</li>',
-					'link_selected_class' => 'swhead_item_selected',
-					'link_default_class' => '',
+					'link_selected_class' => 'swhead_item swhead_item_selected',
+					'link_default_class' => 'swhead_item',
 					'link_type' => 'ownercontact',
 			) );
 			// --------------------------------- END OF CONTACT LINK --------------------------------
@@ -256,8 +259,10 @@ else
 					'widget' => 'msg_menu_link',
 					// Optional display params
 					'link_type' => 'messages',
-					'item_start' => '<li>',
+					'item_start' => '<li class="swhead_item_menu_sm">',
 					'item_end' => '</li>',
+					'item_selected_start' => '<li class="swhead_item_menu_sm ">',
+					'item_selected_end' => '</li>',
 					'link_default_class' => ''
 				) ) );
 
@@ -268,7 +273,7 @@ else
 					'widget' => 'menu_link',
 					// Optional display params
 					'link_type' => 'logout',
-					'item_start' => '<li>',
+					'item_start' => '<li class="swhead_item_menu_sm">',
 					'item_end' => '</li>',
 					'link_default_class' => ''
 				) ) );
@@ -283,7 +288,7 @@ else
 				'widget' => 'menu_link',
 				// Optional display params
 				'link_type' => 'register',
-				'item_start' => '<li>',
+				'item_start' => '<li class="swhead_item_menu_sm">',
 				'item_end' => '</li>',
 				'link_selected_class' => 'swhead_item_white '.$right_menu_params['link_selected_class'],
 				'link_default_class' => 'swhead_item_white'
