@@ -11,16 +11,29 @@ div.widget_core_coll_post_list, // Simple posts list widget
 div.widget_core_coll_page_list, // Simple page list widget
 div.widget_core_coll_related_post_list { // Simple related posts widget
 
+	// RWD blocks and Flowing blocks layout
+	&.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content,
+	&.evo_layout_flow .widget_flow_blocks > div {
+	// Inner blocks div style
+		padding: 8px;
+		margin: 14px 0;
+		overflow: hidden;
+		background-color: #fafafa;
+		border-radius: 4px;
+	}
+	&.evo_layout_flow .widget_flow_blocks {
+		display: inline-block;
+		text-align: center;
+		> div {
+			margin-left: 14px;
+			margin-right: 14px;
+			text-align: left;
+			width: 250px; // Fixed widget for flowing blocks
+		}
+	}
+
 	// RWD blocks layout
 	&.evo_layout_rwd {
-		// Inner blocks div style
-		.widget_rwd_blocks .widget_rwd_content {
-			padding: 8px;
-			margin: 14px 0;
-			overflow: hidden;
-			background-color: #fafafa;
-			border-radius: 4px;
-		}
 		
 		// With teaser or with excerpt
 		&.evo_withteaser,
