@@ -2256,10 +2256,14 @@ class Item extends ItemLight
 			}
 
 			$field = $this->custom_fields[ $field_name ];
-			$custom_field_value = $this->get_setting( 'custom_'.$field['type'].'_'.$field['ID'] );
-			if( !empty( $custom_field_value ) ||
+			$custom_field_value = trim( $this->get_setting( 'custom_'.$field['type'].'_'.$field['ID'] ) );
+			if( ! empty( $custom_field_value ) ||
 			    ( $field['type'] == 'double' && $custom_field_value == '0' ) )
-			{ // Display only the filled field AND also numeric field with '0' value
+			{	// Display only the filled field AND also numeric field with '0' value:
+				if( $field['type'] == 'text' )
+				{	// Convert new lines to html <br> for text fields:
+					$custom_field_value = nl2br( $custom_field_value );
+				}
 				$values = array( $field['label'], $custom_field_value );
 				$html .= str_replace( $mask, $values, $params['field_format'] );
 				$fields_exist = true;
@@ -8205,7 +8209,7 @@ class Item extends ItemLight
 	/**
 	 * Get custom fields of post type
 	 *
-	 * @param string Type of custom field: 'all', 'varchar', 'double'
+	 * @param string Type(s) of custom field: 'all', 'varchar', 'double', 'text', 'html'. Use comma separator to get several types
 	 * @return array
 	 */
 	function get_type_custom_fields( $type = 'all' )

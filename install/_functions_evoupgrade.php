@@ -7487,6 +7487,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11775, 'Add new types "Text" and "HTML" for custom fields of item types...' ) )
+	{	// part of 6.7.3-stable
+		$DB->query( 'ALTER TABLE T_items__item_settings
+			MODIFY COLUMN iset_value varchar( 10000 ) NULL' );
+		$DB->query( 'ALTER TABLE T_items__type_custom_field
+			MODIFY COLUMN itcf_type ENUM( "double", "varchar", "text", "html" ) COLLATE ascii_general_ci NOT NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
