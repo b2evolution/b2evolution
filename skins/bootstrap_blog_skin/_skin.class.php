@@ -165,6 +165,12 @@ class bootstrap_blog_Skin extends Skin
 						'defaultvalue' => '#6cb2ef',
 						'type' => 'color',
 					),
+					'bgimg_hover_link_color' => array(
+						'label' => T_('Hover link color on background image'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#6cb2ef',
+						'type' => 'color',
+					),
 					'current_tab_text_color' => array(
 						'label' => T_('Current tab text color'),
 						'note' => T_('E-g: #00ff00 for green'),
@@ -319,8 +325,9 @@ class bootstrap_blog_Skin extends Skin
 		if( $color = $this->get_setting( 'page_link_color' ) )
 		{ // Custom page link color:
 			$custom_css .= 'a { color: '.$color." }\n";
-			$custom_css .= 'h4.evo_comment_title a, h4.panel-title a.evo_comment_type, .pagination li a, .pagination li span { color: '.$color." !important }\n";
-			if( $this->get_setting( 'gender_colored' ) !== 1 ) 
+			$custom_css .= 'h4.evo_comment_title a, h4.panel-title a.evo_comment_type, .pagination li:not(.active) a, .pagination li:not(.active) span { color: '.$color." !important }\n";
+			$custom_css .= '.pagination li.active a, .pagination li.active span { color: #fff; background-color: '.$color.' !important; border-color: '.$color." }\n";
+			if( $this->get_setting( 'gender_colored' ) !== 1 )
 			{ // If gender option is not enabled, choose custom link color. Otherwise, chose gender link colors:
 				$custom_css .= 'h4.panel-title a { color: '.$color." }\n";
 			}
@@ -336,6 +343,10 @@ class bootstrap_blog_Skin extends Skin
 		if( $color = $this->get_setting( 'bgimg_link_color' ) )
 		{	// Custom link color on background image:
 			$custom_css .= '.evo_hasbgimg a { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'bgimg_hover_link_color' ) )
+		{	// Custom link hover color on background image:
+			$custom_css .= '.evo_hasbgimg a:hover { color: '.$color." }\n";
 		}
 		if( $color = $this->get_setting( 'current_tab_text_color' ) )
 		{ // Custom current tab text color:
@@ -359,7 +370,7 @@ class bootstrap_blog_Skin extends Skin
 					break;
 
 				case 'standard':// When standard layout
-					$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 16px !important'." }\n";
+					$custom_css .= '.container { font-size: 16px !important'." }\n";
 					$custom_css .= '.container input.search_field { height: 100%'." }\n";
 					$custom_css .= '.container h1 { font-size: 38px'." }\n";
 					$custom_css .= '.container h2 { font-size: 32px'." }\n";
@@ -371,7 +382,7 @@ class bootstrap_blog_Skin extends Skin
 					break;
 
 				case 'medium': // When default font size, no CSS entry
-					$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 18px !important'." }\n";
+					$custom_css .= '.container { font-size: 18px !important'." }\n";
 					$custom_css .= '.container input.search_field { height: 100%'." }\n";
 					$custom_css .= '.container h1 { font-size: 40px'." }\n";
 					$custom_css .= '.container h2 { font-size: 34px'." }\n";
@@ -383,7 +394,7 @@ class bootstrap_blog_Skin extends Skin
 					break;
 
 				case 'large': // When default font size, no CSS entry
-					$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 20px !important'." }\n";
+					$custom_css .= '.container { font-size: 20px !important'." }\n";
 					$custom_css .= '.container input.search_field { height: 100%'." }\n";
 					$custom_css .= '.container h1 { font-size: 42px'." }\n";
 					$custom_css .= '.container h2 { font-size: 36px'." }\n";
@@ -395,7 +406,7 @@ class bootstrap_blog_Skin extends Skin
 					break;
 
 				case 'very_large': // When default font size, no CSS entry
-					$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 22px !important'." }\n";
+					$custom_css .= '.container { font-size: 22px !important'." }\n";
 					$custom_css .= '.container input.search_field { height: 100%'." }\n";
 					$custom_css .= '.container h1 { font-size: 44px'." }\n";
 					$custom_css .= '.container h2 { font-size: 38px'." }\n";
