@@ -3901,6 +3901,7 @@ class Blog extends DataObject
 					}
 					else
 					{ // Display a template from site skins
+						siteskin_init();
 						siteskin_include( $template );
 						exit;
 					}

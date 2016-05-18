@@ -94,6 +94,8 @@ class Skin extends DataObject
 						'and_condition' => '( cset_name = "normal_skin_ID" OR cset_name = "mobile_skin_ID" OR cset_name = "tablet_skin_ID" )' ),
 				array( 'table'=>'T_settings', 'fk'=>'set_value', 'msg'=>T_('This skin is set as default skin.'),
 						'and_condition' => '( set_name = "def_normal_skin_ID" OR set_name = "def_mobile_skin_ID" OR set_name = "def_tablet_skin_ID" )' ),
+				array( 'table'=>'T_settings', 'fk'=>'set_value', 'msg'=>T_('The site is using this skin.'),
+						'and_condition' => '( set_name = "normal_skin_ID" OR set_name = "mobile_skin_ID" OR set_name = "tablet_skin_ID" )' ),
 			);
 	}
 
@@ -1229,6 +1231,21 @@ class Skin extends DataObject
 		{ // Standard skin
 			require_js( 'build/evo_frontoffice.bmin.js', 'blog' );
 		}
+	}
+
+
+	/**
+	 * Get ready for displaying the site skin.
+	 *
+	 * This method may register some CSS or JS.
+	 * The default implementation can register a few common things that you may request in the $features param.
+	 * This is where you'd specify you want to use BOOTSTRAP, etc.
+	 *
+	 * If this doesn't do what you need you may add functions like the following to your skin's siteskin_init():
+	 * require_js() , require_css() , add_js_headline()
+	 */
+	function siteskin_init()
+	{
 	}
 
 

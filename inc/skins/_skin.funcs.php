@@ -78,6 +78,9 @@ function skin_init( $disp )
 
 	$Debuglog->add('skin_init: $disp='.$disp, 'skins' );
 
+	// Initialize site skin if it is enabled:
+	siteskin_init();
+
 	// This is the main template; it may be used to display very different things.
 	// Do inits depending on current $disp:
 	switch( $disp )
@@ -1556,12 +1559,25 @@ var downloadInterval = setInterval( function()
 
 function siteskin_init()
 {
-	// The following is temporary and should be moved to some SiteSkin class
 	global $Settings;
 
-	if( $Settings->get( 'site_skins_enabled' ) )
-	{ // Site skins are enabled
-		// Include the additional required files
+	if( ! $Settings->get( 'site_skins_enabled' ) )
+	{	// Site skins are not enabled:
+		return;
+	}
+
+	// Get site skin:
+	$skin_ID = $Settings->get( 'normal_skin_ID' );
+	$SkinCache = & get_SkinCache();
+	$site_Skin = & $SkinCache->get_by_ID( $skin_ID, false, false );
+
+	if( $site_Skin )
+	{	// Initialize site skin:
+		$site_Skin->siteskin_init();
+	}
+	else
+	{	// Fallback:
+		// The following is temporary and should be moved to some SiteSkin class
 		siteskin_include( '_skin_init.inc.php' );
 	}
 }
@@ -1919,7 +1935,7 @@ function skin_template_path( $template_name )
  */
 function siteskin_include( $template_name, $params = array(), $force = false )
 {
-	global $Settings, $siteskins_path, $Blog;
+	global $Settings, $siteskins_path, $skins_path, $Blog;
 
 	if( !$Settings->get( 'site_skins_enabled' ) && !$force )
 	{ // Site skins are not enabled and we don't want to force either
@@ -1945,14 +1961,25 @@ function siteskin_include( $template_name, $params = array(), $force = false )
 	$timer_name = 'siteskin_include('.$template_name.')';
 	$Timer->resume( $timer_name );
 
-	if( file_exists( $siteskins_path.'custom/'.$template_name ) )
-	{ // Use the custom template:
+	// Get site skin:
+	$skin_ID = $Settings->get( 'normal_skin_ID' );
+	$SkinCache = & get_SkinCache();
+	$site_Skin = & $SkinCache->get_by_ID( $skin_ID, false, false );
+
+	if( $site_Skin && file_exists( $skins_path.$site_Skin->folder.'/'.$template_name ) )
+	{	// Use site skin template:
+		$file = $skins_path.$site_Skin->folder.'/'.$template_name;
+		$debug_info = '<b>Site Skin template</b>: '.rel_path_to_base($file);
+		$disp_handled = 'skin';
+	}
+	elseif( file_exists( $siteskins_path.'custom/'.$template_name ) )
+	{	// Use the custom template:
 		$file = $siteskins_path.'custom/'.$template_name;
 		$debug_info = '<b>Custom template</b>: '.rel_path_to_base($file);
 		$disp_handled = 'custom';
 	}
 	elseif( file_exists( $siteskins_path.$template_name ) ) // Try to include standard template only if custom template doesn't exist
-	{ // Use the default/fallback template:
+	{	// Use the default/fallback template:
 		$file = $siteskins_path.$template_name;
 		$debug_info = '<b>Fallback to</b>: '.rel_path_to_base($file);
 		$disp_handled = 'fallback';

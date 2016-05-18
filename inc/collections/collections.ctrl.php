@@ -18,7 +18,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-param( 'tab', 'string', 'site_settings', true );
+param( 'tab', 'string', '', true );
 
 param_action( 'list' );
 
@@ -26,7 +26,8 @@ if( strpos( $action, 'new' ) !== false )
 { // Simulate tab to value 'new' for actions to create new blog
 	$tab = 'new';
 }
-if( ! in_array( $action, array( 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site', 'update_site_skin' ) ) )
+if( ! in_array( $action, array( 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site', 'update_site_skin' ) ) &&
+    ! in_array( $tab, array( 'site_settings', 'site_skin' ) ) )
 {
 	if( valid_blog_requested() )
 	{

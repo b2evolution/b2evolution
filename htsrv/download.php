@@ -45,7 +45,8 @@ if( ! (
 	) )
 { // Bad request, Display "404 not found" page
 	load_funcs( 'skins/_skin.funcs.php' );
-	require $siteskins_path.'_404_not_found.main.php'; // error & exit
+	siteskin_init();
+	siteskin_include( '_404_not_found.main.php' ); // error & exit
 	exit(0);
 }
 

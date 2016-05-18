@@ -102,6 +102,12 @@ $Results->cols[] = array(
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
+	global $Settings;
+	$site_skin_IDs = array(
+		intval( $Settings->get( 'normal_skin_ID' ) ),
+		intval( $Settings->get( 'mobile_skin_ID' ) ),
+		intval( $Settings->get( 'tablet_skin_ID' ) ),
+	);
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
 							'th_class' => 'shrinkwrap',
@@ -110,7 +116,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=edit\')%' )
 	                    .action_icon( TS_('Reload containers!'), 'reload',
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=reload&amp;'.url_crumb('skin').'\')%' )
-											.'~conditional( #nb_blogs# < 1, \''
+											.'~conditional( #nb_blogs# < 1 && ! in_array( #skin_ID#, array( '.implode( ',', $site_skin_IDs ).' ) ), \''
 											.action_icon( TS_('Uninstall this skin!'), 'delete',
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=delete&amp;'.url_crumb('skin').'\')%' ).'\', \''
 	                        .get_icon( 'delete', 'noimg' ).'\' )~',

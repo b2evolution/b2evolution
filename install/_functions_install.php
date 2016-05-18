@@ -544,6 +544,20 @@ function install_basic_skins( $install_mobile_skins = true )
 	skin_install( '_atom' );
 	skin_install( '_rss2' );
 
+	// Install default site skin:
+	$default_site_Skin = skin_install( 'default_site_skin' );
+	if( $default_site_Skin && $default_site_Skin->ID > 0 )
+	{	// Use the installed skin as default for site:
+		global $Settings;
+		if( empty( $Settings ) )
+		{	// Initialize general settings:
+			load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
+			$Settings = new GeneralSettings();
+		}
+		$Settings->set( 'normal_skin_ID', $default_site_Skin->ID );
+		$Settings->dbupdate();
+	}
+
 	task_end();
 }
 

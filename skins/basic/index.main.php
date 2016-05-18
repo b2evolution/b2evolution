@@ -23,9 +23,6 @@ skin_init( $disp );
 
 require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 
-// The following is temporary and should be moved to some SiteSkin class
-siteskin_init();
-
 // ----------------------------- HEADER BEGINS HERE ------------------------------
 ?>
 <html>

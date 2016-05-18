@@ -11,9 +11,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $page_title;
 
-// The following is temporary and should be moved to some SiteSkin class
-siteskin_init();
-
 ?>
 <html lang="<?php locale_lang() ?>">
 <head>
