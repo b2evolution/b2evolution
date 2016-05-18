@@ -83,10 +83,6 @@ $params = array_merge( array(
 		'url_link_url_template'    => '$url$', // $url$ will be replaced with saved URL address
 		'url_link_target'          => '', // Link target attribute e.g. '_blank'
 
-		'parent_link_before'       => '<p class="evo_post_parent">'.T_('Parent').': ',
-		'parent_link_after'        => '</p>',
-		'parent_link_not_found'    => '<i>'.T_('Item not found.').'</i>',
-
 		'before_more_link'         => '<p class="evo_post_more_link">',
 		'after_more_link'          => '</p>',
 		'more_link_text'           => '#',
@@ -269,13 +265,6 @@ switch( $content_mode )
 					'url_template'  => $params['url_link_url_template'],
 					'target'        => $params['url_link_target'],
 					'podcast'       => '#', // Auto display mp3 player if post type is podcast (=> false, to disable)
-				) );
-
-			// Parent link, if the post has one:
-			$Item->parent_link( array(
-					'before'         => $params['parent_link_before'],
-					'after'          => $params['parent_link_after'],
-					'not_found_text' => $params['parent_link_not_found'],
 				) );
 
 			// Display CONTENT (at least the TEASER part):
