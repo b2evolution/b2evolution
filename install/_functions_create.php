@@ -405,7 +405,9 @@ function create_default_data()
 			VALUES ( 3, "First numeric field", "first_numeric_field", "double" ),
 						 ( 3, "Second numeric field", "second_numeric_field", "double" ),
 						 ( 3, "First text field", "first_text_field", "varchar" ),
-						 ( 3, "Define you own labels", "define_you_own_labels", "varchar" )' );
+						 ( 3, "Define you own labels", "define_you_own_labels", "varchar" ),
+						 ( 3, "Multiline plain text field", "multiline_plain_text_field", "text" ),
+						 ( 3, "Multiline HTML field", "multiline_html_field", "html" )' );
 	task_end();
 
 
@@ -2170,6 +2172,9 @@ function create_demo_contents()
 		$edited_Item->set_setting( 'custom_double_2', '456' );
 		$edited_Item->set_setting( 'custom_varchar_3', 'abc' );
 		$edited_Item->set_setting( 'custom_varchar_4', 'Enter your own values' );
+		$edited_Item->set_setting( 'custom_text_5', 'This is a sample text field.
+It can have multiple lines.' );
+		$edited_Item->set_setting( 'custom_html_6', 'This is an <b>HTML</b> <i>field</i>.' );
 		$post_custom_fields_ID = $edited_Item->insert( $jay_moderator_ID, T_('Custom Fields Example'),
 '<p>'.T_('This post has a special post type called "Post with custom fields".').'</p>
 

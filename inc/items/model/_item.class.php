@@ -820,7 +820,20 @@ class Item extends ItemLight
 			$param_name = 'item_'.$custom_field['type'].'_'.$custom_field['ID'];
 			if( isset_param( $param_name ) )
 			{ // param is set
-				$param_type = ( $custom_field['type'] == 'varchar' ) ? 'string' : $custom_field['type'];
+				switch( $custom_field['type'] )
+				{
+					case 'double':
+						$param_type = 'double';
+						break;
+					case 'html':
+					case 'text': // Keep html tags for text fields, they will be escaped at display
+						$param_type = 'html';
+						break;
+					case 'varchar':
+					default:
+						$param_type = 'string';
+						break;
+				}
 				param( $param_name, $param_type, NULL ); // get par value
 				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
 				$this->set_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'], get_param( $param_name ), $custom_field_make_null );
@@ -2132,7 +2145,12 @@ class Item extends ItemLight
 	{
 		if( $this->load_custom_field_value( $field_index ) )
 		{
-			return $this->custom_fields[$field_index]['value'];
+			$custom_field_value = utf8_trim( $this->custom_fields[ $field_index ]['value'] );
+			if( $this->custom_fields[ $field_index ]['type'] == 'text' )
+			{	// Escape html tags and convert new lines to html <br> for text fields:
+				$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
+			}
+			return $custom_field_value;
 		}
 		return false;
 	}
@@ -2256,13 +2274,13 @@ class Item extends ItemLight
 			}
 
 			$field = $this->custom_fields[ $field_name ];
-			$custom_field_value = trim( $this->get_setting( 'custom_'.$field['type'].'_'.$field['ID'] ) );
+			$custom_field_value = utf8_trim( $this->get_setting( 'custom_'.$field['type'].'_'.$field['ID'] ) );
 			if( ! empty( $custom_field_value ) ||
 			    ( $field['type'] == 'double' && $custom_field_value == '0' ) )
 			{	// Display only the filled field AND also numeric field with '0' value:
 				if( $field['type'] == 'text' )
-				{	// Convert new lines to html <br> for text fields:
-					$custom_field_value = nl2br( $custom_field_value );
+				{	// Escape html tags and convert new lines to html <br> for text fields:
+					$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
 				}
 				$values = array( $field['label'], $custom_field_value );
 				$html .= str_replace( $mask, $values, $params['field_format'] );
