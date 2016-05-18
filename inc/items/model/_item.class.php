@@ -1951,7 +1951,7 @@ class Item extends ItemLight
 		// Render Inline Images  [image:123:caption] or [file:123:caption] :
 		$output = $this->render_inline_files( $output, $params );
 
-		// Render Custom Fields [fields], [fields:second_numeric_field,first_text_field] or [field:first_text_field]:
+		// Render Custom Fields [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field]:
 		$output = $this->render_custom_fields( $output, $params );
 
 		// Render Parent Data [parent], [parent:fields] and etc.:
@@ -2302,7 +2302,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Convert inline custom field tags like [fields], [fields:second_numeric_field,first_text_field] or [field:first_text_field] into HTML tags
+	 * Convert inline custom field tags like [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field] into HTML tags
 	 *
 	 * @param string Source content
 	 * @param array Params
@@ -2365,8 +2365,8 @@ class Item extends ItemLight
 	 *    [parent]
 	 *    [parent:titlelink]
 	 *    [parent:url]
-	 *    [parent:fields:second_numeric_field,first_text_field]
-	 *    [parent:field:first_text_field]
+	 *    [parent:fields:second_numeric_field,first_string_field]
+	 *    [parent:field:first_string_field]
 	 *
 	 * @param string Source content
 	 * @param array Params

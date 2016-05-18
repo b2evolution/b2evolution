@@ -404,7 +404,7 @@ function create_default_data()
 	$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type )
 			VALUES ( 3, "First numeric field", "first_numeric_field", "double" ),
 						 ( 3, "Second numeric field", "second_numeric_field", "double" ),
-						 ( 3, "First text field", "first_text_field", "varchar" ),
+						 ( 3, "First string field", "first_string_field", "varchar" ),
 						 ( 3, "Define you own labels", "define_you_own_labels", "varchar" ),
 						 ( 3, "Multiline plain text field", "multiline_plain_text_field", "text" ),
 						 ( 3, "Multiline HTML field", "multiline_html_field", "html" )' );
@@ -2184,9 +2184,9 @@ It can have multiple lines.' );
 
 <p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>
 
-<p>[fields:first_numeric_field, first_text_field,second_numeric_field]</p>
+<p>[fields:first_numeric_field, first_string_field,second_numeric_field]</p>
 
-<p>'.T_('Finally, we can also display just the value of a specific field, like this [field: first_text_field].').'</p>',
+<p>'.T_('Finally, we can also display just the value of a specific field, like this [field: first_string_field].').'</p>',
 			$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Post with Custom Fields' );
 
 		// Insert a post:
@@ -2203,9 +2203,9 @@ It can have multiple lines.' );
 
 <p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>
 
-<p>[parent:fields:first_numeric_field, first_text_field,second_numeric_field]</p>
+<p>[parent:fields:first_numeric_field, first_string_field,second_numeric_field]</p>
 
-<p>'.T_('Finally, we can also display just the value of a specific field, like this [parent:field: first_text_field].').'</p>',
+<p>'.T_('Finally, we can also display just the value of a specific field, like this [parent:field: first_string_field].').'</p>',
 			$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Child Post' );
 
 		// Insert a post:
