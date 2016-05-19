@@ -157,23 +157,18 @@ switch( $action )
 			// We have EXITed already at this point!!
 		}
 
-		if( $Messages->has_errors() )
-		{ // Reset js display mode in order to display a correct view after confirmation
-			$display_mode = '';
-			$mode = '';
-		}
-
-		param( 'request', 'string', '' );
-		if( $display_mode == 'js' && $request != 'checkban' )
-		{
+		if( $display_mode == 'js' && ! $Messages->has_errors() )
+		{	// Initialize JS functions to execute after action from modal window:
+			$javascript_messages = array();
 			if( $delcomments && $r ) // $r not null => means the commentlist was deleted successfully
 			{
-				send_javascript_message( array( 'refreshAfterBan' => array( $deleted_ids ), 'closeModalWindow' => array() ), true );
+				$javascript_messages['refreshAfterBan'] = array( $deleted_ids );
 			}
-			else
-			{
-				send_javascript_message( array( 'closeModalWindow' => array() ), true );
-			}
+			$javascript_messages['updateModalAfterBan'] = array( array(
+					'title' => T_('Open Antispam Blacklist'),
+					'url'   => $admin_url.'?ctrl=antispam',
+					'class' => 'btn btn-info'
+				) );
 		}
 
 		// We'll ask the user later what to do, if no "sub-action" given.
@@ -569,16 +564,16 @@ if( $display_mode != 'js' )
 	{
 		$AdminUI->append_path_level( $tab3 );
 	}
-
-	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-	$AdminUI->disp_html_head();
-	
-	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-	$AdminUI->disp_body_top();
-
-	// Begin payload block:
-	$AdminUI->disp_payload_begin();
 }
+
+// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+$AdminUI->disp_html_head();
+
+// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+$AdminUI->disp_body_top();
+
+// Begin payload block:
+$AdminUI->disp_payload_begin();
 
 switch( $tab3 )
 {
@@ -642,6 +637,11 @@ switch( $tab3 )
 
 	case 'blacklist':
 	default:
+		if( ! empty( $javascript_messages ) )
+		{	// Don't display form and list when we should update a content from modal window by JS:
+			break;
+		}
+
 		if( $action == 'ban' && ( ! $Messages->has_errors() || ! empty( $confirm ) ) && !( $delhits || $delcomments ) )
 		{	// Nothing to do, ask user:
 			$AdminUI->disp_view( 'antispam/views/_antispam_ban.form.php' );
@@ -654,12 +654,14 @@ switch( $tab3 )
 }
 
 // End payload block:
-if( $display_mode != 'js')
-{
-	$AdminUI->disp_payload_end();
+$AdminUI->disp_payload_end();
 
-	// Display body bottom, debug info and close </html>:
-	$AdminUI->disp_global_footer();
+// Display body bottom, debug info and close </html>:
+$AdminUI->disp_global_footer();
+
+
+if( ! empty( $javascript_messages ) )
+{	// Execute JS functions after action from modal window:
+	send_javascript_message( $javascript_messages, true, 'window.parent' );
 }
-
 ?>

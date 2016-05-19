@@ -11,9 +11,7 @@
 /**
  * A MIME Header.
  *
- * @package    Swift
- * @subpackage Mime
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 interface Swift_Mime_Header
 {
@@ -41,7 +39,7 @@ interface Swift_Mime_Header
      * @see TYPE_TEXT, TYPE_PARAMETERIZED, TYPE_MAILBOX
      * @see TYPE_DATE, TYPE_ID, TYPE_PATH
      *
-     * @return integer
+     * @return int
      */
     public function getFieldType();
 

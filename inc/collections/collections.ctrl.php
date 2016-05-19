@@ -147,7 +147,7 @@ switch( $action )
 
 		if( $edited_Blog->duplicate() )
 		{	// The collection has been duplicated successfully:
-			$Messages->add( T_('The new collection has been duplicated.'), 'success' );
+			$Messages->add( T_('The collection has been duplicated.'), 'success' );
 
 			header_redirect( $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
 		}
@@ -304,11 +304,6 @@ switch( $action )
 		param_check_url( 'notification_logo', 'http-https' );
 		$Settings->set( 'notification_logo', get_param( 'notification_logo' ) );
 
-		// Large site logo url
-		param( 'notification_logo_large', 'string', '' );
-		param_check_url( 'notification_logo_large', 'http-https' );
-		$Settings->set( 'notification_logo_large', get_param( 'notification_logo_large' ) );
-
 		// Site footer text
 		$Settings->set( 'site_footer_text', param( 'site_footer_text', 'string', '' ) );
 
@@ -322,6 +317,7 @@ switch( $action )
 		}
 
 		// Terms & Conditions:
+		$Settings->set( 'site_terms_enabled', param( 'site_terms_enabled', 'integer', 0 ) );
 		$Settings->set( 'site_terms', param( 'site_terms', 'integer', '' ) );
 
 		// Default blog

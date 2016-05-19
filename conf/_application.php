@@ -15,13 +15,13 @@ $app_shortname = 'b2evo';
  * Note: This has to be compatible with {@link http://us2.php.net/en/version-compare}.
  * @global string
  */
-$app_version = '6.7.0-alpha';
+$app_version = '6.7.3-stable';
 
 /**
  * Release date (ISO)
  * @global string
  */
-$app_date = '2016-03-04';
+$app_date = '2016-05-16';
 
 /**
  * Long version string for checking differences
@@ -36,7 +36,7 @@ $app_version_long = $app_version.'-'.$app_date;
  *
  * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 11750;
+$new_db_version = 11795;
 
 /**
  * Minimum PHP version required for b2evolution to function properly. It will contain each module own minimum PHP version as well.
@@ -60,7 +60,7 @@ $app_footer_text = '<a href="http://b2evolution.net/" title="visit b2evolution\'
 $copyright_text = '<span class="nobr">&copy;2003-2016 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/about/about-us">others</a>.</span>';
 
 /**
- * Do you want to display the help links to online documentaion?
+ * Do you want to display the help links to online documentation?
  *
  * @global boolean
  */

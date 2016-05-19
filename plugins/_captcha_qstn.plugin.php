@@ -42,11 +42,9 @@ class captcha_qstn_plugin extends Plugin
 
 
 	/**
-	 * Delete unnecessary captcha data from DB table.
-	 *
-	 * @todo This should be added to the "scheduler", once available
+	 * Init
 	 */
-	function captcha_qstn_plugin()
+	function PluginInit( & $params )
 	{
 		$this->name = $this->T_('Captcha questions');
 		$this->short_desc = $this->T_('Use questions to tell humans and robots apart.');

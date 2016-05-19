@@ -56,7 +56,7 @@ function add_basic_widget( $container_ID, $code, $type, $order, $params = NULL, 
 
 
 /**
- * Insert the widgets for the blog
+ * Insert the basic widgets for a collection
  *
  * @param integer should never be 0
  * @param array the list of skin ids which are set for the given blog ( normal, mobile and tablet skin ids )
@@ -65,7 +65,7 @@ function add_basic_widget( $container_ID, $code, $type, $order, $params = NULL, 
  */
 function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $kind = '' )
 {
-	global $DB, $test_install_all_features, $basic_widgets_insert_sql_rows;
+	global $DB, $install_test_features, $basic_widgets_insert_sql_rows;
 
 	// Initialize this array first time and clear after previous call of this function
 	$basic_widgets_insert_sql_rows = array();
@@ -194,7 +194,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		{ // About Author
 			add_basic_widget( $wico_id, 'item_about_author', 'core', 25 );
 		}
-		if( ( $blog_id == $blog_a_ID || ( ! empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && $test_install_all_features )
+		if( ( $blog_id == $blog_a_ID || ( ! empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && $install_test_features )
 		{ // Google Maps
 			add_basic_widget( $wico_id, 'evo_Gmaps', 'plugin', 30 );
 		}
@@ -240,7 +240,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		}
 		else
 		{
-			if( $test_install_all_features )
+			if( $install_test_features )
 			{
 				if( $kind != 'forum' && $kind != 'manual' )
 				{ // Current filters widget
@@ -345,11 +345,12 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 			$post_list_params = array(
 					'blog_ID'          => '',
 					'limit'            => 5,
-					'attached_pics'    => 'first',
-					'disp_first_image' => 'special',
+					'layout'           => 'list',
+					'thumb_size'       => 'crop-80x80',
 				);
 		}
-		add_basic_widget( $wico_id, 'coll_post_list', 'core', 20, $post_list_params );
+		add_basic_widget( $wico_id, 'coll_featured_posts', 'core', 20, $post_list_params );
+		add_basic_widget( $wico_id, 'coll_post_list', 'core', 25, array( 'title' => T_('More Posts'), 'featured' => 'other' ) );
 		if( $kind != 'main' )
 		{ // Don't install the "Recent Commnets" widget for Main blogs
 			add_basic_widget( $wico_id, 'coll_comment_list', 'core', 30 );

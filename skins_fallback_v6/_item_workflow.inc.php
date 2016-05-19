@@ -9,7 +9,6 @@
  * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
- * @subpackage bootstrap_forums_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -20,6 +19,7 @@ if( ( $disp == 'single' || $disp == 'page' ) &&
     ! empty( $Item ) &&
     is_logged_in() &&
     $Blog->get_setting( 'use_workflow' ) &&
+    $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) &&
     $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 { // Display workflow properties if current user can edit this post:
 	$Form = new Form( get_samedomain_htsrv_url().'item_edit.php' );
@@ -27,9 +27,11 @@ if( ( $disp == 'single' || $disp == 'page' ) &&
 	$Form->add_crumb( 'item' );
 	$Form->hidden( 'blog', $Blog->ID );
 	$Form->hidden( 'post_ID', $Item->ID );
+	$Form->hidden( 'redirect_to', $Item->get_permanent_url() );
 
 	$Form->begin_form( 'evo_item_workflow_form' );
 
+	echo '<a name="workflow_panel"></a>';
 	$Form->begin_fieldset( T_('Workflow properties') );
 
 	echo '<div class="evo_item_workflow_form__fields">';
@@ -44,7 +46,7 @@ if( ( $disp == 'single' || $disp == 'page' ) &&
 	if( count( $UserCache->cache ) > 20 )
 	{
 		$assigned_User = & $UserCache->get_by_ID( $Item->get( 'assigned_user_ID' ), false, false );
-		$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees' );
+		$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees', array( 'size' => 10 ) );
 	}
 	else
 	{

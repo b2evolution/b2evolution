@@ -28,21 +28,6 @@ if( $cat > 0 )
 	$ChapterCache = & get_ChapterCache();
 	$current_Chapter = & $ChapterCache->get_by_ID( $cat, false, false );
 
-	// Init MainList
-	$page = param( 'paged', 'integer', 1 );
-	$MainList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $Blog->get_setting('posts_per_page') );
-	$MainList->load_from_Request();
-	$MainList->set_filters( array(
-			'cat_array' => array( $cat ), // Limit only by selected cat (exclude posts from child categories)
-			'cat_modifier' => NULL,
-			'page' => $page
-		) );
-	$MainList->query();
-	$MainList->nav_target = $cat; // set navigation target, we are always navigating through category in this skin
-
-	// Load read statuses if required
-	$MainList->load_content_read_statuses();
-
 	// Breadcrumbs
 	$Skin->display_breadcrumbs( $cat );
 }

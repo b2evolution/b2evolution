@@ -1221,7 +1221,7 @@ function init_charsets( $req_io_charset )
  */
 function locales_load_available_defs()
 {
-	global $locales_path, $locales, $locales_loaded_form_disk;
+	global $locales_path, $locales, $locales_loaded_form_disk, $Messages;
 
 	if( ! empty( $locales_loaded_form_disk ) )
 	{ // All locales have been already loaded
@@ -1250,6 +1250,11 @@ function locales_load_available_defs()
 				'basename'	=> true,
 			);
 		$locale_def_files = get_filenames( $ad_locale_folder, $filename_params );
+		if( $locale_def_files === false )
+		{	// Impossible to read the locale folder:
+			$Messages->add( sprintf( T_('The locale %s is not readable. Please check file permissions.'), $locale_folder ), 'warning' );
+			continue;
+		}
 		// Go through files in locale folder:
 		foreach( $locale_def_files as $locale_def_file )
 		{	// Check if it's a definition file:
@@ -1417,12 +1422,12 @@ function locale_file_po_percent_done( $po_file_info )
  */
 function locale_insert_default()
 {
-	global $DB, $current_locale, $locales, $test_install_all_features;
+	global $DB, $current_locale, $locales, $install_test_features;
 
 	$activate_locales = array();
 
-	if( isset( $test_install_all_features ) && $test_install_all_features )
-	{ // Activate also additional locales on install
+	if( ! empty( $install_test_features ) )
+	{	// Activate also additional locales on install:
 		$activate_locales[] = 'en-US';
 		$activate_locales[] = 'de-DE';
 		$activate_locales[] = 'fr-FR';
@@ -1461,7 +1466,7 @@ function locale_insert_default()
 			$insert_data[] = '( '.$DB->quote( $a_locale ).', '
 				.$DB->quote( $locales[ $a_locale ]['datefmt'] ).', '
 				.$DB->quote( $locales[ $a_locale ]['timefmt'] ).', '
-				.$DB->quote( empty( $locales[ $a_locale ]['shorttimefmt'] ) ? $locales[ $a_locale ]['timefmt'] : $locales[ $a_locale ]['shorttimefmt'] ).', '
+				.$DB->quote( empty( $locales[ $a_locale ]['shorttimefmt'] ) ? str_replace( ':s', '', $locales[ $a_locale ]['timefmt'] ) : $locales[ $a_locale ]['shorttimefmt'] ).', '
 				.$DB->quote( $locales[ $a_locale ]['startofweek'] ).', '
 				.$DB->quote( $locales[ $a_locale ]['name'] ).', '
 				.$DB->quote( $locales[ $a_locale ]['messages'] ).', '
@@ -1516,7 +1521,7 @@ function locale_restore_defaults( $restored_locales )
 		$DB->query( 'UPDATE T_locales SET
 			loc_datefmt             = '.$DB->quote( $restored_locale['datefmt'] ).',
 			loc_timefmt             = '.$DB->quote( $restored_locale['timefmt'] ).',
-			loc_shorttimefmt        = '.$DB->quote( empty( $restored_locale['shorttimefmt'] ) ? $restored_locale['timefmt'] : $restored_locale['shorttimefmt'] ).',
+			loc_shorttimefmt        = '.$DB->quote( empty( $restored_locale['shorttimefmt'] ) ? str_replace( ':s', '', $restored_locale['timefmt'] ) : $restored_locale['shorttimefmt'] ).',
 			loc_startofweek         = '.$DB->quote( $restored_locale['startofweek'] ).',
 			loc_name                = '.$DB->quote( $restored_locale['name'] ).',
 			loc_messages            = '.$DB->quote( $restored_locale['messages'] ).',
@@ -1587,7 +1592,7 @@ function locale_check_default()
 			.$DB->quote( $current_default_locale ).', '
 			.$DB->quote( $locales[ $current_default_locale ]['datefmt'] ).', '
 			.$DB->quote( $locales[ $current_default_locale ]['timefmt'] ).', '
-			.$DB->quote( empty( $locales[ $current_default_locale ]['shorttimefmt'] ) ? $locales[ $current_default_locale ]['timefmt'] : $locales[ $current_default_locale ]['shorttimefmt'] ).', '
+			.$DB->quote( empty( $locales[ $current_default_locale ]['shorttimefmt'] ) ? str_replace( ':s', '', $locales[ $current_default_locale ]['timefmt'] ) : $locales[ $current_default_locale ]['shorttimefmt'] ).', '
 			.$DB->quote( $locales[ $current_default_locale ]['startofweek'] ).', '
 			.$DB->quote( $locales[ $current_default_locale ]['name'] ).', '
 			.$DB->quote( $locales[ $current_default_locale ]['messages'] ).', '

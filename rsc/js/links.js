@@ -42,7 +42,7 @@ function evo_display_position_onchange( selectInput, url, crumb )
 /**
  * Insert inline tag into the post ( example: [image:123:caption text] | [file:123:caption text] )
  *
- * @param strin Type: 'image', 'file'
+ * @param string Type: 'image', 'file', 'video'
  * @param integer File ID
  * @param string Caption text
  */
@@ -51,7 +51,16 @@ function insert_inline_link( type, link_ID, caption )
 	var b2evoCanvas = window.parent.document.getElementById('itemform_post_content');
 	if( b2evoCanvas != null )
 	{ // Canvas exists
-		var insert_tag = '[' + type + ':' + link_ID + ':' + caption + ']';
+		var insert_tag = '[' + type + ':' + link_ID;
+
+		if( caption.length )
+		{
+			console.log( caption.length );
+			insert_tag += ':' + caption;
+		}
+
+		insert_tag += ']';
+
 		// Insert an image tag
 		textarea_wrap_selection( b2evoCanvas, insert_tag, '', 0, window.parent.document );
 

@@ -1007,6 +1007,11 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
 		return;
 	}
 
+	if( is_admin_page() && in_array( $js_file, array( 'functions.js', 'ajax.js', 'form_extensions.js', 'extracats.js', 'dynamic_select.js', 'backoffice.js' ) ) )
+	{	// Don't require this file on back-office because it is auto loaded by bundled file evo_backoffice.bmin.js:
+		return;
+	}
+
 	if( is_admin_page() && ( $relative_to == 'blog' ) )
 	{ // Make sure we never use resource url relative to any blog url in case of an admin page ( important in case of multi-domain installations )
 		$relative_to = 'rsc_url';
@@ -1592,7 +1597,7 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
  */
 function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintbox' )
 {
-	global $blog;
+	global $Blog;
 
 	require_js( '#jquery#', $relative_to ); // dependency
 
@@ -1600,6 +1605,7 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 	{
 		case 'typeahead':
 			// Use typeahead library of bootstrap
+			require_js( '#bootstrap_typeahead#', $relative_to );
 			add_js_headline( 'jQuery( document ).ready( function()
 			{
 				jQuery( "input.autocomplete_login" ).on( "added",function()
@@ -1610,6 +1616,15 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 						{	// Skip this field because typeahead is initialized before:
 							return;
 						}
+						var ajax_url = "";
+						if( jQuery( this ).hasClass( "only_assignees" ) )
+						{
+							ajax_url = restapi_url + "'.( isset( $Blog ) ? 'collections/'.$Blog->get( 'urlname' ).'/assignees' : 'users/logins' ).'";
+						}
+						else
+						{
+							ajax_url = restapi_url + "users/logins";
+						}
 						jQuery( this ).typeahead( null,
 						{
 							displayKey: "login",
@@ -1617,16 +1632,16 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 							{
 								jQuery.ajax(
 								{
-									url: "'.get_secure_htsrv_url().'async.php?action=get_login_list",
-									type: "post",
-									data: { q: query, data_type: "json" },
+									type: "GET",
 									dataType: "JSON",
-									success: function( logins )
+									url: ajax_url,
+									data: { q: query },
+									success: function( data )
 									{
 										var json = new Array();
-										for( var l in logins )
+										for( var l in data.list )
 										{
-											json.push( { login: logins[ l ] } );
+											json.push( { login: data.list[ l ] } );
 										}
 										cb( json );
 									}
@@ -1655,16 +1670,21 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 			require_js( 'jquery/jquery.hintbox.min.js', $relative_to );
 			add_js_headline( 'jQuery( document ).on( "focus", "input.autocomplete_login", function()
 			{
-				var ajax_params = "";
+				var ajax_url = "";
 				if( jQuery( this ).hasClass( "only_assignees" ) )
 				{
-					ajax_params = "&user_type=assignees&blog='.$blog.'";
+					ajax_url = restapi_url + "'.( isset( $Blog ) ? 'collections/'.$Blog->get( 'urlname' ).'/assignees' : 'users/logins' ).'";
+				}
+				else
+				{
+					ajax_url = restapi_url + "users/logins";
 				}
 				jQuery( this ).hintbox(
 				{
-					url: "'.get_secure_htsrv_url().'async.php?action=get_login_list" + ajax_params,
+					url: ajax_url,
 					matchHint: true,
-					autoDimentions: true
+					autoDimentions: true,
+					json: true,
 				} );
 				'
 				// Don't submit a form by Enter when user is editing the owner fields

@@ -44,7 +44,7 @@ function create_default_data()
 	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $spam_Group, $blogb_Group;
 	global $DB, $locales, $current_locale, $baseurl;
 	// This will install all sorts of additional things... for testing purposes:
-	global $test_install_all_features, $create_sample_contents;
+	global $install_test_features, $create_sample_contents;
 
 	// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
 	load_class('plugins/model/_plugins_admin_no_db.class.php', 'Plugins_admin_no_DB' );
@@ -251,31 +251,163 @@ function create_default_data()
 
 	// added in Phoenix-Alpha
 	task_begin( 'Creating default Post Types... ' );
-	$DB->query( "
-		INSERT INTO T_items__type ( ityp_name, ityp_usage, ityp_template_name, ityp_allow_html,
-					 ityp_allow_breaks, ityp_allow_featured, ityp_perm_level, ityp_use_parent, ityp_use_url, ityp_podcast )
-		VALUES ( 'Post',                    'post',        'single', 1, 1, 1, 'standard',   'never',    'optional', 0 ),
-					 ( 'Podcast Episode',         'post',        'single', 1, 1, 1, 'standard',   'never',    'optional', 1 ),
-					 ( 'Post with Custom Fields', 'post',        'single', 1, 1, 1, 'standard',   'never',    'optional', 0 ),
-					 ( 'Child Post',              'post',        'single', 1, 1, 1, 'standard',   'required', 'optional', 0 ),
-					 ( 'Manual Page',             'post',        'single', 0, 1, 1, 'standard',   'never',    'optional', 0 ),
-					 ( 'Forum Topic',             'post',        'single', 0, 1, 1, 'standard',   'never',    'optional', 0 ),
-					 ( 'Photo Album',             'post',        'single', 1, 1, 1, 'standard',   'never',    'optional', 0 ),
-					 ( 'Standalone Page',         'page',        'page',   1, 1, 1, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Intro-Front',             'intro-front', NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Intro-Main',              'intro-main',  NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Intro-Cat',               'intro-cat',   NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Intro-Tag',               'intro-tag',   NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Intro-Sub',               'intro-sub',   NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Intro-All',               'intro-all',   NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Sidebar link',            'special',     NULL,     1, 1, 1, 'admin',      'never',    'optional', 0 ),
-					 ( 'Advertisement',           'special',     NULL,     1, 1, 1, 'admin',      'never',    'optional', 0 )" );
+	$post_types = array();
+	$post_types[] = array(
+			'name'           => 'Post',
+		);
+	$post_types[] = array(
+			'name'           => 'Podcast Episode',
+			'podcast'        => 1,
+		);
+	$post_types[] = array(
+			'name'           => 'Post with Custom Fields',
+		);
+	$post_types[] = array(
+			'name'           => 'Child Post',
+			'use_parent'     => 'required',
+		);
+	$post_types[] = array(
+			'name'           => 'Manual Page',
+			'allow_html'     => 0,
+		);
+	$post_types[] = array(
+			'name'           => 'Forum Topic',
+			'allow_html'     => 0,
+		);
+	$post_types[] = array(
+			'name'           => 'Photo Album',
+		);
+	$post_types[] = array(
+			'name'           => 'Standalone Page',
+			'usage'          => 'page',
+			'template_name'  => 'page',
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-Front',
+			'usage'          => 'intro-front',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-Main',
+			'usage'          => 'intro-main',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-Cat',
+			'usage'          => 'intro-cat',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-Tag',
+			'usage'          => 'intro-tag',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-Sub',
+			'usage'          => 'intro-sub',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-All',
+			'usage'          => 'intro-all',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Sidebar link',
+			'usage'          => 'special',
+			'template_name'  => NULL,
+			'perm_level'     => 'admin',
+		);
+	$post_types[] = array(
+			'name'           => 'Advertisement',
+			'usage'          => 'special',
+			'template_name'  => NULL,
+			'perm_level'     => 'admin',
+		);
+	$post_types[] = array(
+			'name'                   => 'Terms & Conditions',
+			'usage'                  => 'special',
+			'template_name'          => NULL,
+			'allow_breaks'           => 0,
+			'allow_featured'         => 0,
+			'perm_level'             => 'admin',
+			'description'            => 'Use this post type for terms & conditions of the site.',
+			'use_text'               => 'required',
+			'use_tags'               => 'never',
+			'use_excerpt'            => 'never',
+			'use_url'                => 'never',
+			'use_parent'             => 'never',
+			'use_title_tag'          => 'never',
+			'use_meta_desc'          => 'never',
+			'use_meta_keywds'        => 'never',
+			'use_comments'           => 0,
+			'allow_closing_comments' => 0,
+			'use_comment_expiration' => 'never',
+			'use_custom_fields'      => 0,
+		);
+	// Default settings:
+	$post_type_default_settings = array(
+			'name'                   => '',
+			'description'            => NULL,
+			'usage'                  => 'post',
+			'template_name'          => 'single',
+			'perm_level'             => 'standard',
+			'allow_html'             => 1,
+			'allow_breaks'           => 1,
+			'allow_featured'         => 1,
+			'use_text'               => 'optional',
+			'use_tags'               => 'optional',
+			'use_excerpt'            => 'optional',
+			'use_url'                => 'optional',
+			'podcast'                => 0,
+			'use_parent'             => 'never',
+			'use_title_tag'          => 'optional',
+			'use_meta_desc'          => 'optional',
+			'use_meta_keywds'        => 'optional',
+			'use_comments'           => 1,
+			'allow_closing_comments' => 1,
+			'use_comment_expiration' => 'optional',
+			'use_custom_fields'      => 1,
+		);
+	$post_types_sql = 'INSERT INTO T_items__type ( ityp_'.implode( ', ityp_', array_keys( $post_type_default_settings ) ).' ) VALUES ';
+	foreach( $post_types as $p => $post_type )
+	{
+		$post_type = array_merge( $post_type_default_settings, $post_type );
+		$post_types_sql .= '( '.$DB->quote( $post_type ).' )';
+		if( $p != count( $post_types ) - 1 )
+		{
+			$post_types_sql .= ',';
+		}
+	}
+	// Insert item types:
+	$DB->query( $post_types_sql );
 
 	$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type )
 			VALUES ( 3, "First numeric field", "first_numeric_field", "double" ),
 						 ( 3, "Second numeric field", "second_numeric_field", "double" ),
-						 ( 3, "First text field", "first_text_field", "varchar" ),
-						 ( 3, "Define you own labels", "define_you_own_labels", "varchar" )' );
+						 ( 3, "First string field", "first_string_field", "varchar" ),
+						 ( 3, "Define you own labels", "define_you_own_labels", "varchar" ),
+						 ( 3, "Multiline plain text field", "multiline_plain_text_field", "text" ),
+						 ( 3, "Multiline HTML field", "multiline_html_field", "html" )' );
 	task_end();
 
 
@@ -1146,7 +1278,7 @@ function create_blog(
 	$in_bloglist = 'public',
 	$owner_user_ID = 1 )
 {
-	global $default_locale, $test_install_all_features, $local_installation, $Plugins;
+	global $default_locale, $install_test_features, $local_installation, $Plugins;
 
 	$Blog = new Blog( NULL );
 
@@ -1176,24 +1308,31 @@ function create_blog(
 
 	$Blog->dbinsert();
 
-	if( $test_install_all_features )
+	if( $install_test_features )
 	{
 		$allow_rating_items = 'any';
 		$Blog->set_setting( 'skin'.$blog_skin_ID.'_bubbletip', '1' );
+		echo_install_log( 'TEST FEATURE: Activating username bubble tips on skin of collection #'.$Blog->ID );
 		$Blog->set_setting( 'skin'.$blog_skin_ID.'_gender_colored', '1' );
+		echo_install_log( 'TEST FEATURE: Activating gender colored usernames on skin of collection #'.$Blog->ID );
 		$Blog->set_setting( 'in_skin_editing', '1' );
+		echo_install_log( 'TEST FEATURE: Activating in-skin editing on collection #'.$Blog->ID );
 
 		if( $kind == 'manual' )
 		{	// Set a posts ordering by 'post_order ASC'
 			$Blog->set_setting( 'orderby', 'order' );
 			$Blog->set_setting( 'orderdir', 'ASC' );
+			echo_install_log( 'TEST FEATURE: Setting a posts ordering by asceding post order field on collection #'.$Blog->ID );
 		}
+
+		$Blog->set_setting( 'use_workflow', 1 );
+		echo_install_log( 'TEST FEATURE: Activating workflow on collection #'.$Blog->ID );
 	}
 	if( $allow_rating_items != '' )
 	{
 		$Blog->set_setting( 'allow_rating_items', $allow_rating_items );
 	}
-	if( $use_inskin_login || $test_install_all_features )
+	if( $use_inskin_login || $install_test_features )
 	{
 		$Blog->set_setting( 'in_skin_login', 1 );
 	}
@@ -1359,8 +1498,8 @@ function create_demo_contents()
 	global $blog_all_ID, $blog_home_ID, $blog_a_ID, $blog_b_ID;
 	global $DB;
 	global $default_locale, $default_country;
-	global $Plugins;
-	global $test_install_all_features;
+	global $Plugins, $Settings;
+	global $install_test_features;
 	global $user_org_IDs;
 
 	/**
@@ -1606,7 +1745,7 @@ function create_demo_contents()
 	if( $install_collection_home )
 	{ // Install Home blog
 		$blog_shortname = T_('Home');
-		$blog_home_access_type = ( $test_install_all_features ) ? 'default' : $default_blog_access_type;
+		$blog_home_access_type = ( $install_test_features ) ? 'default' : $default_blog_access_type;
 		$blog_more_longdesc = '<br />
 <br />
 <strong>'.T_('The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.').'</strong>';
@@ -1635,7 +1774,7 @@ function create_demo_contents()
 	if( $install_collection_bloga )
 	{ // Install Blog A
 		$blog_shortname = 'Blog A';
-		$blog_a_access_type = ( $test_install_all_features ) ? 'default' : $default_blog_access_type;
+		$blog_a_access_type = ( $install_test_features ) ? 'default' : $default_blog_access_type;
 		$blog_stub = 'a';
 		$blog_a_ID = create_blog(
 			T_('Public Blog'),
@@ -1656,7 +1795,7 @@ function create_demo_contents()
 	if( $install_collection_blogb )
 	{ // Install Blog B
 		$blog_shortname = 'Blog B';
-		$blog_b_access_type = ( $test_install_all_features ) ? 'index.php' : $default_blog_access_type;
+		$blog_b_access_type = ( $install_test_features ) ? 'index.php' : $default_blog_access_type;
 		$blog_stub = 'b';
 		$blog_b_ID = create_blog(
 			T_('Members-Only Blog'),
@@ -1919,6 +2058,20 @@ function create_demo_contents()
 <p>You can add collections at will. You can also remove them (including this "Home" collection) if you don\'t need one.</p>'),
 			$now, $cat_home_b2evo, array(), 'published', '#', '', '', 'open', array( 'default' ), 'Intro-Front' );
 
+		// Insert a post:
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
+		$edited_Item = new Item();
+		$edited_Item->set_tags_from_string( 'intro' );
+		$edited_Item->insert( $jay_moderator_ID, T_('Terms & Conditions'), '<p>Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum</p>
+
+<p>Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum</p>',
+			$now, $cat_home_b2evo, array(), 'published', '#', '', '', 'open', array( 'default' ), 'Terms & Conditions' );
+		if( $edited_Item->ID > 0 )
+		{	// Use this post as default terms & conditions:
+			$Settings->set( 'site_terms', $edited_Item->ID );
+			$Settings->dbupdate();
+		}
+
 		// Update the progress bar status
 		update_install_progress_bar();
 
@@ -1997,6 +2150,7 @@ function create_demo_contents()
 		// Insert a post:
 		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
+		$edited_Item->set( 'featured', 1 );
 		$edited_Item->set_tags_from_string( 'photo,demo' );
 		$edited_Item->insert( $jay_moderator_ID, T_('Extended post'), T_('<p>This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.</p>').$lorem_1paragraph
 	.'[teaserbreak]
@@ -2018,9 +2172,21 @@ function create_demo_contents()
 		$edited_Item->set_setting( 'custom_double_2', '456' );
 		$edited_Item->set_setting( 'custom_varchar_3', 'abc' );
 		$edited_Item->set_setting( 'custom_varchar_4', 'Enter your own values' );
-		$post_custom_fields_ID = $edited_Item->insert( $jay_moderator_ID, T_('Custom Fields Example'), T_('<p>This post has a special post type called "Post with custom fields".</p>')
-				.T_('<p>This post type defines 4 custom fields.</p>')
-				.T_('<p>This post has sample values for these for 4 fields. You can see them below</p>'),
+		$edited_Item->set_setting( 'custom_text_5', 'This is a sample text field.
+It can have multiple lines.' );
+		$edited_Item->set_setting( 'custom_html_6', 'This is an <b>HTML</b> <i>field</i>.' );
+		$post_custom_fields_ID = $edited_Item->insert( $jay_moderator_ID, T_('Custom Fields Example'),
+'<p>'.T_('This post has a special post type called "Post with custom fields".').'</p>
+
+<p>'.T_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>
+
+<p>[fields]</p>
+
+<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>
+
+<p>[fields:first_numeric_field, first_string_field,second_numeric_field]</p>
+
+<p>'.T_('Finally, we can also display just the value of a specific field, like this [field: first_string_field].').'</p>',
 			$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Post with Custom Fields' );
 
 		// Insert a post:
@@ -2028,13 +2194,25 @@ function create_demo_contents()
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'demo' );
 		$edited_Item->set( 'parent_ID', $post_custom_fields_ID ); // Set parent post ID
-		$edited_Item->insert( $jay_moderator_ID, T_('Child Post Example'), T_('<p>This post has a special post type called "Child Post".</p>'),
+		$edited_Item->insert( $jay_moderator_ID, T_('Child Post Example'),
+'<p>'.sprintf( T_('This post has a special post type called "Child Post". This allowed to specify a parent post ID. Consequently, this child post is linked to: %s.'), '[parent:titlelink] ([parent:url])' ).'</p>
+
+<p>'.T_('This also allows us to access the custom fields of the parent post:').'</p>
+
+<p>[parent:fields]</p>
+
+<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>
+
+<p>[parent:fields:first_numeric_field, first_string_field,second_numeric_field]</p>
+
+<p>'.T_('Finally, we can also display just the value of a specific field, like this [parent:field: first_string_field].').'</p>',
 			$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Child Post' );
 
 		// Insert a post:
 		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'photo,demo' );
+		$edited_Item->set( 'featured', 1 );
 		$edited_Item->insert( $jay_moderator_ID, T_('Image post'), T_('<p>This post has several images attached to it. Each one uses a different Attachment Position. Each may be displayed differently depending on the skin they are viewed in.</p>
 
 <p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>'), $now, $cat_bg );
@@ -2192,7 +2370,6 @@ function create_demo_contents()
 <p>To start customizing a skin, open its "<code>index.main.php</code>" file in an editor and read the comments in there. Note: you can also edit skins in the "Files" tab of the admin interface.</p>
 
 <p>And, of course, read the <a href="%s" target="_blank">manual on skins</a>!</p>'), get_manual_url( 'skin-structure' ) ), $now, $cat_b2evo );
-		$edited_Item->set( 'featured', 1 );
 		$edited_Item->dbsave();
 		// $edited_Item->insert_update_tags( 'update' );
 
@@ -2243,7 +2420,7 @@ function create_demo_contents()
 		$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley.jpg' );
 		$photo_link_5_ID = $edit_File->link_to_Object( $LinkOwner, 5 );
 
-		if( $test_install_all_features )
+		if( $install_test_features )
 		{ // Add examples for infodots plugin
 			$edited_Item->set_tags_from_string( 'photo,demo' );
 			$edited_Item->set( 'content', $edited_Item->get( 'content' )
@@ -2261,6 +2438,7 @@ a school bus stop where you wouldn\'t really expect it!
 [infodot:%s:104:99]cowboy and horse[enddot]
 [infodot:%s:207:28:15em]Red planet[enddot]', $photo_link_1_ID, $photo_link_2_ID, $photo_link_4_ID ) );
 			$edited_Item->dbupdate();
+			echo_install_log( 'TEST FEATURE: Adding examples for plugin "Info dots renderer" on item #'.$edited_Item->ID );
 		}
 
 		// Update the progress bar status
@@ -2849,7 +3027,7 @@ Hello
 		create_demo_comment( $new_created_item_ID, 'draft' );
 	}
 
-	if( $test_install_all_features && count( $additional_comments_item_IDs ) )
+	if( $install_test_features && count( $additional_comments_item_IDs ) )
 	{ // Create the additional comments when we install all features
 		foreach( $additional_comments_item_IDs as $additional_comments_item_ID )
 		{
@@ -2857,21 +3035,23 @@ Hello
 			{ // Insert the comments from each user
 				$now = date( 'Y-m-d H:i:s' );
 				$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_author_user_ID, comment_author_IP,
-						comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status )
+						comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status, comment_notif_flags )
 					VALUES( '.$DB->quote( $additional_comments_item_ID ).', '.$DB->quote( $i_user_ID ).', "127.0.0.1", '
 						.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( T_('Hi!
 
 This is a sample comment that has been approved by default!
-Admins and moderators can very quickly approve or reject comments from the collection dashboard.') ).', "default", "finished" )' );
+Admins and moderators can very quickly approve or reject comments from the collection dashboard.') ).', "default", "finished", "moderators_notified,members_notified,community_notified" )' );
 			}
 		}
+		echo_install_log( 'TEST FEATURE: Creating additional comments on items ('.implode( ', ', $additional_comments_item_IDs ).')' );
 	}
 
 	task_end();
 
 
-	if( $test_install_all_features )
+	if( $install_test_features )
 	{
+		echo_install_log( 'TEST FEATURE: Creating fake hit statistics' );
 		task_begin( 'Creating fake hit statistics... ' );
 		load_funcs('sessions/model/_hitlog.funcs.php');
 		load_funcs('_core/_url.funcs.php');
@@ -2966,10 +3146,10 @@ Admins and moderators can very quickly approve or reject comments from the colle
 
 	$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_status,
 			comment_author_user_ID, comment_author, comment_author_email, comment_author_url, comment_author_IP,
-			comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status )
+			comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status, comment_notif_flags )
 		VALUES( '.$DB->quote( $item_ID ).', '.$DB->quote( $status ).', '
 			.$DB->quote( $user_ID ).', '.$DB->quote( $author ).', '.$DB->quote( $author_email ).', '.$DB->quote( $author_email_url ).', "127.0.0.1", '
-			.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( $content ).', "default", "finished" )' );
+			.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( $content ).', "default", "finished", "moderators_notified,members_notified,community_notified" )' );
 }
 
 
@@ -2978,16 +3158,18 @@ Admins and moderators can very quickly approve or reject comments from the colle
  */
 function create_default_posts_location()
 {
-	global $test_install_all_features;
+	global $install_test_features;
 
-	if( $test_install_all_features )
+	if( $install_test_features )
 	{	// Set default location in test mode installation
 		global $DB;
 
 		$DB->query( 'UPDATE T_items__item SET
 			post_ctry_ID = '.$DB->quote( '74'/* France */ ).',
-			post_rgn_ID = '.$DB->quote( '60'/* �le-de-France */ ).',
+			post_rgn_ID = '.$DB->quote( '60'/* Île-de-France */ ).',
 			post_subrg_ID = '.$DB->quote( '76'/* Paris */ ) );
+
+		echo_install_log( 'TEST FEATURE: Defining default location "France, Île-de-France, Paris" for all posts' );
 	}
 }
 

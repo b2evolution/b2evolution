@@ -203,9 +203,6 @@ $Form->begin_fieldset( T_('Lists of collections').get_manual_link( 'collection-l
 											array( 'never', T_('Never') )
 										), T_('Show in front-office list'), true, T_('Select when you want this blog to appear in the list of blogs on this system.') );
 
-	$Form->checkbox( 'favorite', $edited_Blog->get( 'favorite' ),
-						T_( 'Show in back-office favorites' ), T_( 'Include in the quick blog selector at the top of the back office pages.' ) );
-
 $Form->end_fieldset();
 
 

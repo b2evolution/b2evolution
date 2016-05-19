@@ -91,7 +91,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 		$Form->hidden( 'tab', $tab );
 		$Form->hidden( 'blog', $Blog->ID );
 
-		echo '<fieldset class="clear">';
+		echo '<fieldset class="clearfix">';
 		echo '<legend>'.T_('Posts to show').'</legend>';
 		?>
 		<div>

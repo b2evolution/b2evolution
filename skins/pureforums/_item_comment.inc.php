@@ -81,14 +81,13 @@ $comment_class = ' class="'.$comment_class.'"';
 		<td class="ft_post_info"><?php
 			$Comment->anchor();
 			$Comment->author2( array(
-				'link_text' => 'login',
+				'link_text' => 'auto',
 			) );
 		?></td>
 		<td class="ft_post_info"><?php
-			if( $Skin->get_setting( 'display_post_date' ) )
-			{ // We want to display the post date:
-				$Comment->date( 'D M j, Y H:i' );
-			}
+			// We want to display the post date:
+			$Comment->date( 'D M j, Y H:i' );
+
 			$Comment->rating( array(
 					'before' => '',
 					'after'  => '',

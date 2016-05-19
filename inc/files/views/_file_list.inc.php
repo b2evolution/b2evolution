@@ -117,6 +117,11 @@ $Form->begin_form();
 			echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'type', /* TRANS: file type */ T_('Type') ).'</th>';
 		}
 
+		if( $UserSettings->get('fm_showcreator') )
+		{ // Show file creator
+			echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'creator_user_ID', /* TRANS: added by */ T_('Added by') ).'</th>';
+		}
+
 		if( $UserSettings->get('fm_showdownload') )
 		{  // Show download count column
 			echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'download_count', /* TRANS: download count */ T_('Downloads') ).'</th>';
@@ -256,13 +261,13 @@ $Form->begin_form();
 				if( $error_filename = validate_filename( $lFile->get_name() ) )
 				{ // TODO: Warning icon with hint
 					echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_filename ) );
-					syslog_insert( sprintf( 'The unrecognized extension is detected for file %s', '<b>'.$lFile->get_name().'</b>' ), 'warning', 'file', $lFile->ID );
+					syslog_insert( sprintf( 'The unrecognized extension is detected for file %s', '[['.$lFile->get_name().']]' ), 'warning', 'file', $lFile->ID );
 				}
 			}
 			elseif( $error_dirname = validate_dirname( $lFile->get_name() ) )
 			{ // TODO: Warning icon with hint
 				echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_dirname ) );
-				syslog_insert( sprintf( 'Invalid name is detected for folder %s', '<b>'.$lFile->get_name().'</b>' ), 'warning', 'file', $lFile->ID );
+				syslog_insert( sprintf( 'Invalid name is detected for folder %s', '[['.$lFile->get_name().']]' ), 'warning', 'file', $lFile->ID );
 			}
 
 			/****  Open in a new window  (only directories)  ****/
@@ -368,11 +373,25 @@ $Form->begin_form();
 			echo '<td class="type">'.$lFile->get_type().'</td>';
 		}
 
+		/*******************  Added by  *******************/
+
+		if( $UserSettings->get('fm_showcreator') )
+		{
+			if( $creator = $lFile->get_creator() )
+			{
+				echo '<td class="center">'.$creator->get( 'login' ).'</td>';
+			}
+			else
+			{
+				echo '<td class="center">unknown</td>';
+			}
+		}
+
 		/****************  Download Count  ****************/
-		
+
 		if( $UserSettings->get('fm_showdownload') )
 		{ // Show download count
-			// erhsatingin> Can't seem to find proper .less file to add the 'download' class, using class 'center' instead 
+			// erhsatingin> Can't seem to find proper .less file to add the 'download' class, using class 'center' instead
 			echo '<td class="center">'.$lFile->get_download_count().'</td>';
 		}
 
@@ -471,11 +490,13 @@ $Form->begin_form();
 	 */
 	$filetable_cols = 5
 		+ (int)$fm_flatmode
+		+ (int)$UserSettings->get('fm_showcreator')
 		+ (int)$UserSettings->get('fm_showtypes')
 		+ (int)($UserSettings->get('fm_showdate') != 'no')
 		+ (int)$UserSettings->get('fm_showfsperms')
 		+ (int)$UserSettings->get('fm_showfsowner')
 		+ (int)$UserSettings->get('fm_showfsgroup')
+		+ (int)$UserSettings->get('fm_showdownloads')
 		+ (int)$UserSettings->get('fm_imglistpreview');
 
 
@@ -545,6 +566,14 @@ $Form->begin_form();
 			{
 				$template_filerow .= '<td class="type">&nbsp;</td>';
 			}
+			if( $UserSettings->get( 'fm_showcreator' ) )
+			{
+				$template_filerow .= '<td class="center">&nbsp;</td>';
+			}
+			if( $UserSettings->get( 'fm_showdownload' ) )
+			{
+				$template_filerow .= '<td class="center">&nbsp;</td>';
+			}
 			$template_filerow .= '<td class="size"><span class="qq-upload-size">&nbsp;</span><span class="qq-upload-spinner">&nbsp;</span></td>';
 			if( $UserSettings->get('fm_showdate') != 'no' )
 			{
@@ -574,6 +603,7 @@ $Form->begin_form();
 			display_dragdrop_upload_button( array(
 					'fileroot_ID'         => $fm_FileRoot->ID,
 					'path'                => $path,
+					'listElement'         => 'jQuery( "#filelist_tbody" ).get(0)',
 					'list_style'          => 'table',
 					'template_filerow'    => $template_filerow,
 					'display_support_msg' => false,

@@ -68,6 +68,8 @@ $params = array_merge( array(
 		'display_regcountry'   => false,
 		'display_update'       => false,
 		'display_lastvisit'    => $Blog->get_setting( 'userdir_lastseen' ),
+		'display_lastvisit_view' => $Blog->get_setting( 'userdir_lastseen_view' ),
+		'display_lastvisit_cheat' => $Blog->get_setting( 'userdir_lastseen_cheat' ),
 		'display_contact'      => false,
 		'display_reported'     => false,
 		'display_group'        => false,
@@ -89,8 +91,8 @@ $params = array_merge( array(
 		'td_class_country'     => $Blog->get_setting( 'userdir_country_type' ) == 'flag' ? 'center' : 'nowrap',
 		'th_class_city'        => 'shrinkwrap',
 		'td_class_city'        => 'nowrap',
-		'th_class_lastvisit'   => 'shrinkwrap',
-		'td_class_lastvisit'   => 'center',
+		'th_class_lastvisit'   => $Blog->get_setting( 'userdir_lastseen_view' ) == 'blurred_date' ? '' : 'shrinkwrap',
+		'td_class_lastvisit'   => $Blog->get_setting( 'userdir_lastseen_view' ) == 'blurred_date' ? '' :'center',
 	), $params );
 
 users_results_block( $params );

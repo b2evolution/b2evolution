@@ -86,7 +86,7 @@ while( $Item = & mainlist_get_item() )
 					) );
 				$Item->author( array(
 						'before'    => ' > ',
-						'link_text' => 'preferredname',
+						'link_text' => 'auto',
 					) );
 			?>
 		<br>
@@ -119,7 +119,6 @@ while( $Item = & mainlist_get_item() )
 
 		<?php
 			// ------------------------- "Item - Single" CONTAINER EMBEDDED HERE --------------------------
-			// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 			// Display container contents:
 			skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 					// The following (optional) params will be used as defaults for widgets included in this container:
@@ -187,7 +186,7 @@ while( $Item = & mainlist_get_item() )
 	<?php
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array(
-				'author_link_text' => 'preferredname',
+				'author_link_text' => 'auto',
 			) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.

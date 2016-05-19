@@ -475,6 +475,22 @@ class Results extends Table
 	 * Run the query now!
 	 *
 	 * Will only run if it has not executed before.
+	 *
+	 * We need this query() stub in order to call it from restart() and still
+	 * let derivative classes override it (e-g: CommentList2)
+	 *
+	 * @deprecated Use new function run_query()
+	 */
+	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
+	{
+		$this->run_query( $create_default_cols_if_needed, $append_limit, $append_order_by );
+	}
+
+
+	/**
+	 * Run the query now!
+	 *
+	 * Will only run if it has not executed before.
 	 */
 	function run_query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true,
 										$query_title = 'Results::run_query()' )
@@ -855,7 +871,15 @@ class Results extends Table
 			$this->total_rows = $DB->get_var( $sql_count, 0, 0, ( empty( $this->query_title_prefix ) ? '' : $this->query_title_prefix.' - ' ).get_class( $this ).'::count_total_rows()' ); //count total rows
 		}
 
-		$this->total_pages = empty($this->limit) ? 1 : ceil($this->total_rows / $this->limit);
+		// Calculate total pages depending on total rows and page size:
+		if( empty( $this->limit ) )
+		{	// If no page limiting, Display all results on single page:
+			$this->total_pages = $this->total_rows > 0 ? 1 : 0;
+		}
+		else
+		{	// If the results should be limited by page size:
+			$this->total_pages = ceil( $this->total_rows / $this->limit );
+		}
 
 		// Make sure we're not requesting a page out of range:
 		if( $this->page > $this->total_pages )
@@ -1803,7 +1827,7 @@ class Results extends Table
 				$r = '';
 				if( isset( $this->params['page_item_before'] ) )
 				{
-					$r .= $this->params['page_item_before'];
+					$r .= add_tag_class( $this->params['page_item_before'], 'listnav_prev' );
 				}
 				$r .= '<a href="'
 						.regenerate_url( $this->page_param, (($this->page > 2) ? $this->page_param.'='.($this->page-1) : ''), $this->params['page_url'] ).'"';
@@ -1838,7 +1862,7 @@ class Results extends Table
 				$r = '';
 				if( isset( $this->params['page_item_before'] ) )
 				{
-					$r .= $this->params['page_item_before'];
+					$r .= add_tag_class( $this->params['page_item_before'], 'listnav_next' );
 				}
 				$r .= '<a href="'
 						.regenerate_url( $this->page_param, $this->page_param.'='.($this->page+1), $this->params['page_url'] ).'"';
@@ -1943,27 +1967,27 @@ class Results extends Table
 	 */
 	function display_first( $page_url = '' )
 	{
-		if( $this->first() > 1 )
-		{ // the list doesn't contain the first page
-			$r = '';
-			if( isset( $this->params['page_item_before'] ) )
+		$r = '';
+		if( $this->page == 1 )
+		{
+			if( isset( $this->params['page_item_current_before'] ) )
 			{
-				$r .= $this->params['page_item_before'];
+				$r .= add_tag_class( $this->params['page_item_current_before'], 'listnav_first' );
 			}
-
-			$r .= '<a href="'.regenerate_url( $this->page_param, '', $page_url ).'">1</a>';
-
-			if( isset( $this->params['page_item_after'] ) )
-			{
-				$r .= $this->params['page_item_after'];
-			}
-
-			return $r;
 		}
-		else
-		{ // the list already contains the first page
-			return NULL;
+		elseif( isset( $this->params['page_item_before'] ) )
+		{
+			$r .= add_tag_class( $this->params['page_item_before'], 'listnav_first' );
 		}
+
+		$r .= '<a href="'.regenerate_url( $this->page_param, '', $page_url ).'">1</a>';
+
+		if( isset( $this->params['page_item_after'] ) )
+		{
+			$r .= $this->params['page_item_after'];
+		}
+
+		return $r;
 	}
 
 
@@ -1972,27 +1996,27 @@ class Results extends Table
 	 */
 	function display_last( $page_url = '' )
 	{
-		if( $this->last() < $this->total_pages )
-		{ //the list doesn't contain the last page
-			$r = '';
-			if( isset( $this->params['page_item_before'] ) )
+		$r = '';
+		if( $this->page == $this->total_pages )
+		{
+			if( isset( $this->params['page_item_current_before'] ) )
 			{
-				$r .= $this->params['page_item_before'];
+				$r .= add_tag_class( $this->params['page_item_current_before'], 'listnav_last' );
 			}
-
-			$r .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$this->total_pages, $page_url ).'">'.$this->total_pages.'</a>';
-
-			if( isset( $this->params['page_item_after'] ) )
-			{
-				$r .= $this->params['page_item_after'];
-			}
-
-			return $r;
 		}
-		else
-		{ //the list already contains the last page
-			return NULL;
+		elseif( isset( $this->params['page_item_before'] ) )
+		{
+			$r .= add_tag_class( $this->params['page_item_before'], 'listnav_last' );
 		}
+
+		$r .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$this->total_pages, $page_url ).'">'.$this->total_pages.'</a>';
+
+		if( isset( $this->params['page_item_after'] ) )
+		{
+			$r .= $this->params['page_item_after'];
+		}
+
+		return $r;
 	}
 
 
@@ -2008,7 +2032,7 @@ class Results extends Table
 			$r = '';
 			if( isset( $this->params['page_item_before'] ) )
 			{
-				$r .= $this->params['page_item_before'];
+				$r .= add_tag_class( $this->params['page_item_before'], 'listnav_prev_list' );
 			}
 
 			$r .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$page_no, $page_url ).'">'
@@ -2032,12 +2056,12 @@ class Results extends Table
 	{
 		if( $this->last() < $this->total_pages-1 )
 		{ //the list has to be displayed
-			$page_no = $this->last() + floor(($this->total_pages-$this->last())/2);
+			$page_no = $this->last() + floor( ( $this->total_pages - $this->last() ) / 2 );
 
 			$r = '';
 			if( isset( $this->params['page_item_before'] ) )
 			{
-				$r .= $this->params['page_item_before'];
+				$r .= add_tag_class( $this->params['page_item_before'], 'listnav_next_list' );;
 			}
 
 			$r .= '<a href="'.regenerate_url( $this->page_param,$this->page_param.'='.$page_no, $page_url ).'">'
@@ -2112,8 +2136,30 @@ class Results extends Table
 	 */
 	function page_list( $min, $max, $page_url = '' )
 	{
+		$hidden_active_distances = array( 1, 2 ) ;
+
 		$i = 0;
 		$list = '';
+
+		// Do not include first page in the page list range
+		if( $this->first() == 1 )
+		{
+			$min++;
+			if( ( $this->last() + 1 ) < $this->total_pages )
+			{
+				$max++;
+			}
+		}
+
+		// Also, do not include last page in the page list range
+		if( $this->last() == $this->total_pages )
+		{
+			$max--;
+			if( $min > 2 )
+			{
+				$min--;
+			}
+		}
 
 		$page_prev_i = $this->page - 1;
 		$page_next_i = $this->page + 1;
@@ -2121,15 +2167,69 @@ class Results extends Table
 
 		for( $i=$min; $i<=$max; $i++)
 		{
+			if( $this->page <= 4 )
+			{
+				$a = $i - 4;
+				$active_dist = $a > 0 ? $a : null;
+			}
+			elseif( $this->page > ( $this->total_pages - 3 ) )
+			{
+				if( $i > ( $this->total_pages - 3 ) )
+				{
+					$active_dist = null;
+				}
+				else
+				{
+					$active_dist = ( $this->total_pages - 3 ) - $i;
+				}
+				//$active_dist = null;
+			}
+			else
+			{
+				$active_dist = abs( $this->page - $i );
+			}
+
+			if( in_array( $active_dist, $hidden_active_distances ) && ( $i < $this->page ) && ( $i > 2 ) && ( $this->page > 4 ) )
+			{ // show pseudo prev_list
+				$page_no = ceil($this->first()/2);
+				if( $page_no == 1 )
+				{
+					$page_no++;
+				}
+				if( isset( $this->params['page_item_before'] ) && trim( $this->params['page_item_before'] ) )
+				{
+					$list .= add_tag_class( $this->params['page_item_before'], 'listnav_distance_'.$active_dist );
+					$list .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$page_no, $page_url ).'">'
+									.$this->params['list_next_text'].'</a>';
+				}
+				else
+				{
+					$list_link = '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$page_no, $page_url ).'">'
+									.$this->params['list_next_text'].'</a>';
+					$list_link = add_tag_class( $list_link, 'listnav_distance_'.$active_dist );
+					$list .= $list_link;
+				}
+
+				if( isset( $this->params['page_item_after'] ) )
+				{
+					$list .= $this->params['page_item_after'];
+				}
+			}
+
 			if( $i == $this->page && isset( $this->params['page_item_current_before'] ) )
 			{ // current page
 				$list .= $this->params['page_item_current_before'];
 			}
 			elseif( isset( $this->params['page_item_before'] ) )
 			{ // other page
-				//$list .= $this->params['page_item_before'];
-				$active_dist = abs( $this->page - $i );
-				$list .= str_replace( '**active_distance_**', 'active_distance_'.$active_dist, $pib );
+				if( $active_dist )
+				{
+					$list .= str_replace( '**active_distance_**', 'active_distance_'.$active_dist, $pib );
+				}
+				else
+				{
+					$list .= str_replace( '**active_distance_**', '', $pib );
+				}
 			}
 
 			if( $i == $this->page )
@@ -2182,6 +2282,32 @@ class Results extends Table
 				else
 				{ // Use a space as default separator
 					$list .= ' ';
+				}
+			}
+
+			if( in_array( $active_dist, $hidden_active_distances ) && ( $i > $this->page ) && ( $i < ( $this->total_pages - 1 ) ) )
+			{ // show pseudo next_list
+				$page_no = $this->last() + floor( ( $this->total_pages - $this->last() ) / 2 );
+				if( $page_no == $this->total_pages )
+				{
+					$page_no--;
+				}
+				if( isset( $this->params['page_item_before'] ) && trim( $this->params['page_item_before'] ) )
+				{
+					$list .= add_tag_class( $this->params['page_item_before'], 'listnav_distance_'.$active_dist );
+					$list .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$page_no, $page_url ).'">'
+									.$this->params['list_next_text'].'</a>';
+				}
+				else
+				{
+					$list_link = '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$page_no, $page_url ).'">'
+									.$this->params['list_next_text'].'</a>';
+					$list .= add_tag_class( $list_link, 'listnav_distance_'.$active_dist );
+				}
+
+				if( isset( $this->params['page_item_after'] ) )
+				{
+					$list .= $this->params['page_item_after'];
 				}
 			}
 		}

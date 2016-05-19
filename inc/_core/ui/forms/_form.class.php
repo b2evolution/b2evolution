@@ -1158,7 +1158,8 @@ class Form extends Widget
 	function username( $field_name, &$User, $field_label, $field_note = '', $field_class = '', $field_params = array() )
 	{
 		$field_params = array_merge( array(
-				'note' => $field_note
+				'note' => $field_note,
+				'size' => 20,
 			), $field_params );
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
@@ -1167,7 +1168,7 @@ class Form extends Widget
 
 		$user_login = empty( $User ) ? '' : $User->login;
 
-		$r .= '<input type="text" class="form_text_input form-control autocomplete_login '.$field_class.'" value="'.$user_login.'" name="'.$field_name.'" id="'.$field_name.'" />';
+		$r .= '<input type="text" class="form_text_input form-control autocomplete_login '.$field_class.'" value="'.$user_login.'" name="'.$field_name.'" id="'.$field_name.'" size="'.$field_params['size'].'" />';
 
 		$r .= $this->end_field();
 
@@ -1548,7 +1549,7 @@ class Form extends Widget
 				    ( $p > 0 && $duration > $periods[ $p - 1 ]['seconds'] && $duration <= $period['seconds'] ) )
 				{
 					$period = $periods[ $p > 0 ? $p - 1 : 0 ];
-					$duration_value = ceil( $duration / $period['size'] );
+					$duration_value = floor( $duration / $period['size'] );
 					foreach( $periods_values as $v => $value )
 					{
 						if( $duration_value <= $value )

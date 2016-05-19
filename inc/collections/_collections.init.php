@@ -39,6 +39,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_categories'               => $tableprefix.'categories',
 		'T_coll_group_perms'         => $tableprefix.'bloggroups',
 		'T_coll_user_perms'          => $tableprefix.'blogusers',
+		'T_coll_user_favs'           => $tableprefix.'coll_favs',
 		'T_coll_settings'            => $tableprefix.'coll_settings',
 		'T_comments'                 => $tableprefix.'comments',
 		'T_comments__votes'          => $tableprefix.'comments__votes',
@@ -885,9 +886,9 @@ class collections_Module extends Module
 							'seo' => array(
 								'text' => T_('SEO'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=seo&amp;blog='.$blog, ),
-							'renderers' => array(
-								'text' => T_('Renderers'),
-								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=renderers&amp;blog='.$blog, ),
+							'plugins' => array(
+								'text' => T_('Plugins'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugins&amp;blog='.$blog, ),
 						),
 					),
 				) );
@@ -1021,13 +1022,19 @@ class collections_Module extends Module
 				'name'   => T_('Send notifications about new comment on &laquo;%s&raquo;'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_comment_notifications.job.php',
-				'params' => NULL, // 'comment_ID', 'except_moderators'
+				'params' => NULL, // 'comment_ID', 'executed_by_userid', 'is_new_comment', 'already_notified_user_IDs', 'force_members', 'force_community'
 			),
 			'send-post-notifications' => array( // not user schedulable
 				'name'   => T_('Send notifications for &laquo;%s&raquo;'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_post_notifications.job.php',
-				'params' => NULL, // 'item_ID'
+				'params' => NULL, // 'item_ID', 'executed_by_userid', 'is_new_item', 'already_notified_user_IDs', 'force_members', 'force_community', 'force_pings'
+			),
+			'send-email-campaign' => array( // not user schedulable
+				'name'   => T_('Send a chunk of %s emails for the campaign "%s"'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_email_campaign.job.php',
+				'params' => NULL, // 'ecmp_ID'
 			),
 			'send-unmoderated-comments-reminders' => array(
 				'name'   => T_('Send reminders about comments awaiting moderation'),

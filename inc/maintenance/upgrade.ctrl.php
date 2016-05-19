@@ -314,7 +314,7 @@ switch( $action )
 			{
 				echo '</p>';
 				// Additional check
-				@rmdir_r( $upgrade_dir );
+				rmdir_r( $upgrade_dir );
 			}
 		}
 

@@ -11,9 +11,7 @@
 /**
  * A MIME part, in a multipart message.
  *
- * @package    Swift
- * @subpackage Mime
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_Mime_MimePart extends Swift_Mime_SimpleMimeEntity
 {
@@ -126,19 +124,17 @@ class Swift_Mime_MimePart extends Swift_Mime_SimpleMimeEntity
     /**
      * Test if delsp is being used for this entity.
      *
-     * @return boolean
+     * @return bool
      */
     public function getDelSp()
     {
-        return ($this->_getHeaderParameter('Content-Type', 'delsp') == 'yes')
-            ? true
-            : false;
+        return 'yes' == $this->_getHeaderParameter('Content-Type', 'delsp') ? true : false;
     }
 
     /**
      * Turn delsp on or off for this entity.
      *
-     * @param boolean $delsp
+     * @param bool $delsp
      *
      * @return Swift_Mime_MimePart
      */
@@ -173,8 +169,6 @@ class Swift_Mime_MimePart extends Swift_Mime_SimpleMimeEntity
         $this->setCharset($charset);
     }
 
-    // -- Protected methods
-
     /** Fix the content-type and encoding of this entity */
     protected function _fixHeaders()
     {
@@ -205,7 +199,7 @@ class Swift_Mime_MimePart extends Swift_Mime_SimpleMimeEntity
             if (function_exists('mb_convert_encoding')) {
                 $string = mb_convert_encoding($string, $charset, 'utf-8');
             } elseif (function_exists('iconv')) {
-                $string = iconv($charset, 'utf-8//TRANSLIT//IGNORE', $string);
+                $string = iconv('utf-8//TRANSLIT//IGNORE', $charset, $string);
             } else {
                 throw new Swift_SwiftException('No suitable convert encoding function (use UTF-8 as your charset or install the mbstring or iconv extension).');
             }

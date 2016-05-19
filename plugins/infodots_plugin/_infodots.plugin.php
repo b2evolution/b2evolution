@@ -47,7 +47,7 @@ class infodots_plugin extends Plugin
 		$this->long_desc = T_('This plugin allows to render info dots over images by using the syntax [infodot:1234:40:60:20ex]html text[enddot] for example');
 
 		// Pattern to search the stars
-		$this->search_text = '#((<br />|<p>)\r?\n?)?\[infodot:(\d+):(-?\d+):(-?\d+)(:[\dpxecm%]+)?\](.+?)\[enddot\](\r?\n?(<br />|</p>))?#is';
+		$this->search_text = '#((<br />|<p>)\r?\n?)?\[infodot:(\d+):(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)(:\d+[pxecm%]*)?\](.+?)\[enddot\](\r?\n?(<br />|</p>))?#is';
 		// Function to build template for stars
 		$this->replace_func = array( $this, 'load_infodot_from_source' );
 	}
@@ -306,8 +306,8 @@ class infodots_plugin extends Plugin
 
 			// Add dot
 			$this->dots[ $link_ID ][] = array(
-					'x' => intval( $matches[4] ), // Left
-					'y' => intval( $matches[5] ), // Top
+					'x' => $matches[4].( strlen( intval( $matches[4] ) ) == strlen( $matches[4] ) ? 'px' : '' ), // Left
+					'y' => $matches[5].( strlen( intval( $matches[5] ) ) == strlen( $matches[5] ) ? 'px' : '' ), // Top
 				);
 		}
 
@@ -404,7 +404,7 @@ class infodots_plugin extends Plugin
 		$before_image = '<div class="infodots_image">'."\n";
 		foreach( $this->dots[ $Link->ID ] as $d => $dot )
 		{ // Init html element for each dot
-			$before_image .= '<div class="infodots_dot" rel="infodot_'.$Link->ID.'_'.( $d + 1 ).'" style="left:'.$dot['x'].'px;top:'.$dot['y'].'px"></div>'."\n";
+			$before_image .= '<div class="infodots_dot" rel="infodot_'.$Link->ID.'_'.( $d + 1 ).'" style="left:'.$dot['x'].';top:'.$dot['y'].'"></div>'."\n";
 		}
 
 		// Append info dots html to current image tag

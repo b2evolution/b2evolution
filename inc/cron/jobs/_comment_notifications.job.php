@@ -21,12 +21,11 @@ if( empty( $UserSettings ) )
 	$UserSettings = new UserSettings();
 }
 
-$except_moderators = ( ! empty( $job_params['except_moderators'] ) ) ? $job_params['except_moderators'] : false;
-$executed_by_userid = ( ! empty( $job_params['executed_by_userid'] ) ) ? $job_params['executed_by_userid'] : NULL;
-
 $comment_ID = $job_params['comment_ID'];
 
-// Notify that we are going to take care of that comment's notifications:
+// TRY TO OBTAIN A UNIQUE LOCK for processing the task.
+// This is to avoid that 2 cron jobs process the same comment at the same time:
+// Notify that this is the job that is going to take care of sending notifications for this comment:
 $DB->query( 'UPDATE T_comments
 								SET comment_notif_status = "started"
 							WHERE comment_ID = '.$comment_ID.'
@@ -35,7 +34,7 @@ $DB->query( 'UPDATE T_comments
 
 if( $DB->rows_affected != 1 )
 {	// We would not "lock" the requested post
-	$result_message = sprintf( T_('Could not lock comment #%d. It may already be processed.'), $comment_ID );
+	$result_message = sprintf( T_('Could not lock comment #%d. It is probably being processed or has already been processed by another scheduled task.'), $comment_ID );
 	return 4;
 }
 
@@ -46,16 +45,39 @@ $CommentCache = & get_CommentCache();
  */
 $edited_Comment = & $CommentCache->get_by_ID( $comment_ID );
 
-// Send email notifications now!
-$edited_Comment->send_email_notifications( false, $except_moderators, $executed_by_userid );
+$job_params = array_merge( array(
+		'executed_by_userid'        => NULL,
+		'is_new_comment'            => true,
+		'already_notified_user_IDs' => NULL,
+		'force_members'             => false,
+		'force_community'           => false,
+	), $job_params );
 
-// Record that processing has been done:
-$edited_Comment->set( 'notif_status', 'finished' );
+$previous_comment_visibility_status = '';
 
-// Save the new processing status to DB
-$edited_Comment->dbupdate();
+// Make a loop here because the visibility status of the post may evolve between the beginning and the end of sending the notifications (which may last minutes or even hours...):
+while( $edited_Comment->get( 'status' ) != $previous_comment_visibility_status )
+{
+	// Send email notifications to users who want to receive them for the collection of this comment: (will be different recipients depending on visibility)
+	$notified_flags = $edited_Comment->send_email_notifications( $job_params['executed_by_userid'], $job_params['is_new_comment'], $job_params['already_notified_user_IDs'], $job_params['force_members'], $job_params['force_community'] );
 
-$edited_Comment = $Messages->get_string( '', '', "\n" );
+	// Record that we have just notified the members and/or community:
+	$edited_Comment->set( 'notif_flags', $notified_flags );
+
+	// Record that processing has been done:
+	$edited_Comment->set( 'notif_status', 'finished' );
+
+	// Save the new processing status to DB:
+	$edited_Comment->dbupdate();
+
+	// Check if visibility status has been changed:
+	$previous_comment_visibility_status = $edited_Comment->get( 'status' );
+	// Destroy current Comment to get most recent comment from DB:
+	unset( $CommentCache->cache[ $edited_Comment->ID ] );
+	$edited_Comment = & $CommentCache->get_by_ID( $comment_ID );
+}
+
+$result_message = $Messages->get_string( '', '', "\n" );
 if( empty( $result_message ) )
 {
 	$result_message = T_('Done.');

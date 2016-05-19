@@ -302,7 +302,7 @@ class Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		// NOTE: the code below is just to handle stuff that has been deprecated since b2evolution 1.9. 
+		// NOTE: the code below is just to handle stuff that has been deprecated since b2evolution 1.9.
 		// You DON'T NEED to include this, if you override this method.
 
 		if( is_null($this->short_desc) )
@@ -574,10 +574,12 @@ class Plugin
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
+		/*
 		if( $this->group != 'rendering' )
 		{
 			return array();
 		}
+		*/
 
 		$render_note = '';
 		if( empty( $this->code ) )
@@ -685,15 +687,46 @@ class Plugin
 	}
 
 
-  /**
-   * Get definitions for widget specific editable params
-   *
+	/**
+	 * Get definitions for widget specific editable params
+	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param array Local params like 'for_editing' => true
 	 */
 	function get_widget_param_definitions( $params )
 	{
-		return array();
+		if( ! is_array( $params ) )
+		{	// Must be array:
+			$params = array();
+		}
+
+		// Load new widget to get default param definitions:
+		load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
+		$ComponentWidget = new ComponentWidget();
+
+		return array_merge( $ComponentWidget->get_param_definitions( array() ), $params );
+	}
+
+
+	/**
+	 * Get keys for block/widget caching
+	 *
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @param integer Widget ID
+	 * @return array of keys this widget depends on
+	 */
+	function get_widget_cache_keys( $widget_ID = 0 )
+	{
+		// Load new widget to get default cache keys:
+		load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
+		$ComponentWidget = new ComponentWidget();
+
+		$widget_cache_keys = $ComponentWidget->get_cache_keys();
+
+		$widget_cache_keys['wi_ID'] = $widget_ID;
+
+		return $widget_cache_keys;
 	}
 
 
@@ -892,7 +925,7 @@ class Plugin
 	/**
 	 * Event handler: Called when displaying editor buttons (in back-office).
 	 *
-	 * This method, if implemented, should output the buttons (probably as html INPUT elements) 
+	 * This method, if implemented, should output the buttons (probably as html INPUT elements)
 	 * and return true, if button(s) have been displayed.
 	 *
 	 * You should provide an unique html ID with each button.

@@ -68,6 +68,10 @@ else
 	}
 }
 
+if( $path == './' )
+{	// Fix name of root path to empty string in order to don't store this in DB before each file of root folder:
+	$path = '';
+}
 
 /*
  * Load linkable objects:
@@ -155,7 +159,7 @@ $fm_FileRoot = NULL;
 
 $FileRootCache = & get_FileRootCache();
 
-$available_Roots = FileRootCache::get_available_FileRoots( get_param( 'root' ) );
+$available_Roots = FileRootCache::get_available_FileRoots( get_param( 'root' ), 'favorite' );
 
 if( ! empty( $root ) )
 { // We have requested a root folder by string:
@@ -400,7 +404,7 @@ switch( $action )
 		if( $error_dirname = validate_dirname( $create_name ) )
 		{ // Not valid dirname
 			$Messages->add( $error_dirname, 'error' );
-			syslog_insert( sprintf( 'Invalid name is detected for folder %s', '<b>'.$create_name.'</b>' ), 'warning', 'file' );
+			syslog_insert( sprintf( 'Invalid name is detected for folder %s', '[['.$create_name.']]' ), 'warning', 'file' );
 			break;
 		}
 
@@ -462,7 +466,7 @@ switch( $action )
 		if( $error_filename = validate_filename( $create_name, $current_User->check_perm( 'files', 'all' ) ) )
 		{ // Not valid filename or extension
 			$Messages->add( $error_filename, 'error' );
-			syslog_insert( sprintf( 'The creating file %s has an unrecognized extension', '<b>'.$create_name.'</b>' ), 'warning', 'file' );
+			syslog_insert( sprintf( 'The creating file %s has an unrecognized extension', '[['.$create_name.']]' ), 'warning', 'file' );
 			break;
 		}
 
@@ -505,6 +509,7 @@ switch( $action )
 		$UserSettings->set( 'fm_showfsperms',      param( 'option_showfsperms',      'integer', 0 ) );
 		$UserSettings->set( 'fm_showfsowner',      param( 'option_showfsowner',      'integer', 0 ) );
 		$UserSettings->set( 'fm_showfsgroup',      param( 'option_showfsgroup',      'integer', 0 ) );
+		$UserSettings->set( 'fm_showcreator',      param( 'option_showcreator',      'integer', 0 ) );
 		$UserSettings->set( 'fm_showdownload',     param( 'option_showdownload',     'integer', 0 ) );
 
 		$UserSettings->set( 'fm_showhidden',       param( 'option_showhidden',       'integer', 0 ) );
@@ -1653,7 +1658,7 @@ if( $mode != 'modal' )
 	// Display VIEW:
 	$AdminUI->disp_view( 'files/views/_file_browse.view.php' );
 
-	
+
 	// End payload block:
 	$AdminUI->disp_payload_end();
 

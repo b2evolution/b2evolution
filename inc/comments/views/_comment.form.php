@@ -253,10 +253,46 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'cmntform_renderers', 'fold' => true  ) );
 	$edited_Comment->renderer_checkboxes();
 	$Form->end_fieldset();
+
+
+	// ################### NOTIFICATIONS ###################
+
+	$Form->begin_fieldset( T_('Notifications'), array( 'id' => 'cmntform_notifications', 'fold' => true ) );
+
+		$Form->info( T_('Moderators'), $edited_Comment->check_notifications_flags( 'moderators_notified' ) ? T_('Notified at least once') : T_('Not notified yet') );
+
+		$notify_types = array(
+				'members_notified'   => T_('Members'),
+				'community_notified' => T_('Community'),
+		);
+
+		foreach( $notify_types as $notify_type => $notify_title )
+		{
+			if( $edited_Comment->check_notifications_flags( $notify_type ) )
+			{	// Nofications were sent:
+				$notify_status = T_('Notified');
+				$notify_select_options = array(
+						''      => T_('Done'),
+						'force' => T_('Notify again')
+					);
+			}
+			else
+			{	// Nofications are not sent yet:
+				$notify_status = T_('To be notified');
+				$notify_select_options = array(
+						''     => T_('Notify on next save'),
+						'skip' => T_('Skip on next save'),
+						'mark' => T_('Mark as Notified')
+					);
+			}
+			$Form->select_input_array( 'comment_'.$notify_type, get_param( 'comment_'.$notify_type ), $notify_select_options, $notify_title, NULL, array( 'input_prefix' => $notify_status.' &nbsp; &nbsp; ' ) );
+		}
+
+	$Form->end_fieldset();
 	?>
 </div>
 
-<div class="clear"></div>
+<div class="clearfix"></div>
 
 </div>
 
