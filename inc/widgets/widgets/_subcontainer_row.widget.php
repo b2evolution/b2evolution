@@ -34,7 +34,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  *
  * @package evocore
  */
-class subcontainer_Widget extends ComponentWidget
+class subcontainer_row_Widget extends ComponentWidget
 {
 	/**
 	 * Constructor
@@ -42,7 +42,7 @@ class subcontainer_Widget extends ComponentWidget
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'subcontainer' );
+		parent::__construct( $db_row, 'core', 'subcontainer_row' );
 	}
 
 
@@ -51,7 +51,7 @@ class subcontainer_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		$title = T_( 'Sub-container' );
+		$title = T_( 'Sub-container row' );
 		return $title;
 	}
 
@@ -84,28 +84,37 @@ class subcontainer_Widget extends ComponentWidget
 		global $DB, $Blog;
 
 		$WidgetContainerCache = & get_WidgetContainerCache();
-		$container_options = array();
+		$container_options = array( '' => T_('None') );
 		foreach( $WidgetContainerCache->get_by_coll_ID( $Blog->ID ) as $WidgetContainer )
 		{
 			$container_options[$WidgetContainer->get( 'code' )] = $WidgetContainer->get( 'name' );
 		}
 
-		$r = array_merge( array(
-				'title' => array(
-					'label' => T_('Block title'),
-					'size' => 60,
-				),
-				'container' => array(
-					'label' => T_('Container'),
-					'note' => T_( 'The container which will be embedded.' ),
-					'type' => 'select',
-					'options' => $container_options,
-					'defaultvalue' => ''
-				),
-			), parent::get_param_definitions( $params )	);
+		$widget_params =  array(
+			'title' => array(
+				'label' => T_('Block title'),
+				'size' => 60,
+			) );
+		for( $i = 1; $i <= 6; $i++ )
+		{	// 6 columns for widget containers:
+			$widget_params['column'.$i.'_container'] = array(
+				'label' => sprintf( T_('Column %d Container'), $i ),
+				'note' => T_('The container which will be embedded.'),
+				'type' => 'select',
+				'options' => $container_options,
+				'defaultvalue' => ''
+			);
+			$widget_params['column'.$i.'_class'] = array(
+				'label' => sprintf( T_('Column %d Classes'), $i ),
+				'note' => T_('The style classes for container above.'),
+				'defaultvalue' => 'col-lg-4 col-md-6 col-sm-6 col-xs-12'
+			);
+		}
+
+		$r = array_merge( $widget_params, parent::get_param_definitions( $params ) );
 
 		if( isset( $r['allow_blockcache'] ) )
-		{ // Disable "allow blockcache"
+		{	// Disable "allow blockcache":
 			$r['allow_blockcache']['defaultvalue'] = false;
 			$r['allow_blockcache']['disabled'] = 'disabled';
 			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
@@ -122,10 +131,52 @@ class subcontainer_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog, $Timer, $displayed_subcontainers;
+		$this->init_display( $params );
 
-		// Set the subcontainer code which will be displayed:
-		$subcontainer_code = $this->disp_params['container'];
+		// START DISPLAY:
+		echo $this->disp_params['block_start'];
+
+		// Display title if requested
+		$this->disp_title();
+
+		echo $this->disp_params['block_body_start'];
+
+		echo $this->disp_params['rwd_start'];
+
+		for( $i = 1; $i <= 6; $i++ )
+		{
+			if( empty( $this->disp_params['column'.$i.'_container'] ) )
+			{	// Skip column without selected container:
+				continue;
+			}
+
+			echo str_replace( '$wi_rwd_block_class$', $this->disp_params['column'.$i.'_class'], $this->disp_params['rwd_block_start'] );
+
+			// Display widget container of the column:
+			$this->display_column_container( $this->disp_params['column'.$i.'_container'], $params );
+
+			echo $this->disp_params['rwd_block_end'];
+		}
+
+		echo $this->disp_params['rwd_end'];
+
+		echo $this->disp_params['block_body_end'];
+
+		echo $this->disp_params['block_end'];
+
+		return true;
+	}
+
+
+	/**
+	 * Display widget container of one column
+	 *
+	 * @param string Sub-container code
+	 * @param array Params
+	 */
+	function display_column_container( $subcontainer_code, $params )
+	{
+		global $Blog, $Timer, $displayed_subcontainers;
 
 		if( ! isset( $displayed_subcontainers ) )
 		{	// Initialize the dispalyed subcontainers array at first usage:
@@ -150,16 +201,6 @@ class subcontainer_Widget extends ComponentWidget
 		// Add this subcontainer to the displayed_containers array:
 		$displayed_subcontainers[] = $subcontainer_code;
 
-		$this->init_display( $params );
-
-		// START DISPLAY:
-		echo $this->disp_params['block_start'];
-
-		// Display title if requested
-		$this->disp_title();
-
-		echo $this->disp_params['block_body_start'];
-
 		// Get enabled widgets of the container:
 		$EnabledWidgetCache = & get_EnabledWidgetCache();
 		$container_widgets = & $EnabledWidgetCache->get_by_coll_container( $Blog->ID, $subcontainer_code, true );
@@ -175,14 +216,8 @@ class subcontainer_Widget extends ComponentWidget
 			}
 		}
 
-		echo $this->disp_params['block_body_end'];
-
-		echo $this->disp_params['block_end'];
-
 		// Remove the last item which must be this container from the end of the displayed containers:
 		array_pop( $displayed_subcontainers );
-
-		return true;
 	}
 }
 

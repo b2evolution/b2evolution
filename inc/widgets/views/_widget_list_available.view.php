@@ -116,11 +116,12 @@ $core_componentwidget_defs = array(
 			'user_tools',
 		),
 	'other' => array(
+			'subcontainer',
+			'subcontainer_row',
+			'inc_file',
 			'org_members',
 			'online_users',
 			'mobile_skin_switcher',
-			'subcontainer',
-			'inc_file',
 			'poll'
 		),
 );

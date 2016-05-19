@@ -155,10 +155,31 @@ class ComponentWidget extends DataObject
 
 	/**
 	 * Get the collection ID where this widget belongs to
+	 *
+	 * @return integer Collection ID
 	 */
 	function get_coll_ID()
 	{
-		return $this->get_WidgetContainer()->get( 'coll_ID' );
+		return $this->get_container_param( 'coll_ID' );
+	}
+
+
+	/**
+	 * Get param value of container
+	 *
+	 * @param string Param name
+	 * @return string Param value
+	 */
+	function get_container_param( $param )
+	{
+		$WidgetContainer = & $this->get_WidgetContainer();
+
+		if( empty( $WidgetContainer ) )
+		{
+			return NULL;
+		}
+
+		return $WidgetContainer->get( $param );
 	}
 
 
