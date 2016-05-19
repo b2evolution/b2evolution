@@ -45,15 +45,22 @@ class touch_Skin extends Skin
 	/**
 	 * Get the container codes of the skin main containers
 	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
 	 * @return array
 	 */
 	function get_declared_containers()
 	{
-		return array_merge( parent::get_declared_containers(), array(
-				'_body_header.inc.php' => array( 'mobile_navigation_menu', 'mobile_tools_menu' ),
-				'single.main.php' => array( 'item_single' ),
-				'_front.disp.php' => array( 'front_page_main_area' )
-			) );
+		// Note: second param below is the ORDER
+		return array(
+				'front_page_main_area'   => array( NT_('Front Page Main Area'), 40 ),
+				'item_single'            => array( NT_('Item Single'), 50 ),
+				'contact_page_main_area' => array( NT_('Contact Page Main Area'), 60 ),
+				'mobile_footer'          => array( NT_('Mobile: Footer'), 110 ),
+				'mobile_navigation_menu' => array( NT_('Mobile: Navigation Menu'), 120 ),
+				'mobile_tools_menu'      => array( NT_('Mobile: Tools Menu'), 130 ),
+			);
 	}
 
 

@@ -83,19 +83,14 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	$blog_manual_ID = intval( $blog_manual_ID );
 	$events_blog_ID = intval( $events_blog_ID );
 
-	// Get all global main widget container definitions
-	$main_containers = & get_widget_containers();
 	// Get all containers declared in the given blog's skins
 	$blog_containers = get_skin_containers( $skin_ids );
 
-	// Create rows to insert for all main containers
+	// Create rows to insert for all collection containers:
 	$widget_containers_sql_rows = array();
-	foreach( $main_containers as $wico_code => $wico_data )
+	foreach( $blog_containers as $wico_code => $wico_data )
 	{
-		if( array_key_exists( $wico_code, $blog_containers ) )
-		{ // Create only those containers which are part of the selected skins
-			$widget_containers_sql_rows[] = '( "'.$wico_code.'", "'.$wico_data['wico_name'].'", '.$blog_id.', '.$wico_data['wico_order'].' )';
-		}
+		$widget_containers_sql_rows[] = '( "'.$wico_code.'", "'.$wico_data[0].'", '.$blog_id.', '.$wico_data[1].' )';
 	}
 
 	// Insert widget containers records by one SQL query
@@ -105,7 +100,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	$insert_id = $DB->insert_id;
 	foreach( $blog_containers as $wico_code => $wico_data )
 	{
-		$main_containers[ $wico_code ]['wico_ID'] = $insert_id;
+		$blog_containers[ $wico_code ]['wico_ID'] = $insert_id;
 		$insert_id++;
 	}
 
@@ -120,7 +115,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	/* Header */
 	if( array_key_exists( 'header', $blog_containers ) )
 	{
-		$wico_id = $main_containers['header']['wico_ID'];
+		$wico_id = $blog_containers['header']['wico_ID'];
 		add_basic_widget( $wico_id, 'coll_title', 'core', 1 );
 		add_basic_widget( $wico_id, 'coll_tagline', 'core', 2 );
 	}
@@ -131,7 +126,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	{ // Don't add widgets to Menu container for Main collections
 		if( array_key_exists( 'menu', $blog_containers ) )
 		{
-			$wico_id = $main_containers['menu']['wico_ID'];
+			$wico_id = $blog_containers['menu']['wico_ID'];
 			// Home page
 			add_basic_widget( $wico_id, 'menu_link', 'core', 5, array( 'link_type' => 'home' ) );
 			if( $blog_id == $blog_b_ID )
@@ -184,7 +179,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	/* Item Single */
 	if( array_key_exists( 'item_single', $blog_containers ) )
 	{
-		$wico_id = $main_containers['item_single']['wico_ID'];
+		$wico_id = $blog_containers['item_single']['wico_ID'];
 		add_basic_widget( $wico_id, 'item_content', 'core', 10 );
 		if( $blog_id != $blog_a_ID && $kind != 'forum' && ( empty( $events_blog_ID ) || $blog_id != $events_blog_ID ) )
 		{ // Item Tags
@@ -214,7 +209,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	{
 		if( array_key_exists( 'sidebar_single', $blog_containers ) )
 		{
-			$wico_id = $main_containers['sidebar_single']['wico_ID'];
+			$wico_id = $blog_containers['sidebar_single']['wico_ID'];
 			add_basic_widget( $wico_id, 'coll_related_post_list', 'core', 1 );
 		}
 	}
@@ -223,7 +218,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	/* Page Top */
 	if( array_key_exists( 'page_top', $blog_containers ) )
 	{
-		$wico_id = $main_containers['page_top']['wico_ID'];
+		$wico_id = $blog_containers['page_top']['wico_ID'];
 		add_basic_widget( $wico_id, 'user_links', 'core', 10 );
 	}
 
@@ -231,7 +226,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	/* Sidebar */
 	if( array_key_exists( 'sidebar', $blog_containers ) )
 	{
-		$wico_id = $main_containers['sidebar']['wico_ID'];
+		$wico_id = $blog_containers['sidebar']['wico_ID'];
 		if( $kind == 'manual' )
 		{
 			$search_form_params = array( 'title' => T_('Search this manual:') );
@@ -303,7 +298,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	/* Sidebar 2 */
 	if( array_key_exists( 'sidebar_2', $blog_containers ) )
 	{
-		$wico_id = $main_containers['sidebar_2']['wico_ID'];
+		$wico_id = $blog_containers['sidebar_2']['wico_ID'];
 		add_basic_widget( $wico_id, 'coll_post_list', 'core', 1 );
 		if( $blog_id == $blog_b_ID )
 		{
@@ -323,7 +318,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	/* Front Page Main Area */
 	if( array_key_exists( 'front_page_main_area', $blog_containers ) )
 	{
-		$wico_id = $main_containers['front_page_main_area']['wico_ID'];
+		$wico_id = $blog_containers['front_page_main_area']['wico_ID'];
 		if( $kind == 'main' )
 		{ // Display blog title and tagline for main blogs
 			add_basic_widget( $wico_id, 'coll_title', 'core', 1 );
@@ -365,7 +360,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	/* Front Page Secondary Area */
 	if( array_key_exists( 'front_page_secondary_area', $blog_containers ) )
 	{
-		$wico_id = $main_containers['front_page_secondary_area']['wico_ID'];
+		$wico_id = $blog_containers['front_page_secondary_area']['wico_ID'];
 		add_basic_widget( $wico_id, 'org_members', 'core', 10 );
 	}
 
@@ -373,7 +368,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	/* Mobile Footer */
 	if( array_key_exists( 'mobile_footer', $blog_containers ) )
 	{
-		$wico_id = $main_containers['mobile_footer']['wico_ID'];
+		$wico_id = $blog_containers['mobile_footer']['wico_ID'];
 		add_basic_widget( $wico_id, 'coll_longdesc', 'core', 10 );
 		add_basic_widget( $wico_id, 'mobile_skin_switcher', 'core', 20 );
 	}
@@ -382,7 +377,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	/* Mobile Navigation Menu */
 	if( array_key_exists( 'mobile_navigation_menu', $blog_containers ) )
 	{
-		$wico_id = $main_containers['mobile_navigation_menu']['wico_ID'];
+		$wico_id = $blog_containers['mobile_navigation_menu']['wico_ID'];
 		add_basic_widget( $wico_id, 'coll_page_list', 'core', 10 );
 		add_basic_widget( $wico_id, 'menu_link', 'core', 20, array( 'link_type' => 'ownercontact' ) );
 		add_basic_widget( $wico_id, 'menu_link', 'core', 30, array( 'link_type' => 'home' ) );
@@ -396,7 +391,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	/* Mobile Tools Menu */
 	if( array_key_exists( 'mobile_tools_menu', $blog_containers ) )
 	{
-		$wico_id = $main_containers['mobile_tools_menu']['wico_ID'];
+		$wico_id = $blog_containers['mobile_tools_menu']['wico_ID'];
 		add_basic_widget( $wico_id, 'menu_link', 'core', 10, array( 'link_type' => 'login' ) );
 		add_basic_widget( $wico_id, 'msg_menu_link', 'core', 20, array( 'link_type' => 'messages' ) );
 		add_basic_widget( $wico_id, 'msg_menu_link', 'core', 30, array( 'link_type' => 'contacts', 'show_badge' => 0 ) );
@@ -421,8 +416,6 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
  */
 function & get_widget_container( $coll_ID, $container_fieldset_id )
 {
-	// Get global main widget container definitions
-	$main_containers = & get_widget_containers();
 	$WidgetContainerCache = & get_WidgetContainerCache();
 
 	if( substr( $container_fieldset_id, 0, 10 ) == 'wico_code_' )
@@ -433,7 +426,7 @@ function & get_widget_container( $coll_ID, $container_fieldset_id )
 		{ // The skin container didn't contain any widget before, and it was not saved in the database
 			$WidgetContainer = new WidgetContainer();
 			$WidgetContainer->set( 'code', $container_code );
-			$WidgetContainer->set( 'name', $main_containers[$container_code]['wico_name'] );
+			$WidgetContainer->set( 'name', $container_code );
 			$WidgetContainer->set( 'coll_ID', $coll_ID );
 		}
 	}

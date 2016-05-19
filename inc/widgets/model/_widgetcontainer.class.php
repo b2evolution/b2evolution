@@ -104,18 +104,9 @@ class WidgetContainer extends DataObject
 	 */
 	function load_from_Request()
 	{
-		global $Messages;
-
-		// Get main widget containers:
-		$main_containers = & get_widget_containers();
-
 		$wico_code = param( 'wico_code', 'string', true );
-		if( isset( $main_containers[$wico_code] ) &&
-		    ( $this->ID == 0 || $this->get( 'code' ) != $wico_code ) )
-		{	// Don't allow to create widget container with main reserved code:
-			$Messages->add( T_('The given container code is used by a main container, please type another.'), 'error' );
-		}
 		$this->set( 'code', $wico_code );
+
 		$this->set( 'name', param( 'wico_name', 'string', true ) );
 		if( $this->ID != 0 )
 		{

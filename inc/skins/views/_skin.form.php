@@ -61,7 +61,12 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 			// Containers
 			if( $skin_containers = $edited_Skin->get_containers() )
 			{
-				$container_ul = '<ul><li>'.implode( '</li><li>', $skin_containers ).'</li></ul>';
+				$skin_containers_names = array();
+				foreach( $skin_containers as $skin_container_data )
+				{
+					$skin_containers_names[] = $skin_container_data[0];
+				}
+				$container_ul = '<ul><li>'.implode( '</li><li>', $skin_containers_names ).'</li></ul>';
 			}
 			else
 			{

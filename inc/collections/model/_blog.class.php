@@ -3351,23 +3351,16 @@ class Blog extends DataObject
 	/**
 	 * Get blog main containers
 	 *
-	 * @return array main container codes => names
+	 * @return array main container codes => array( name, order )
 	 */
 	function get_main_containers()
 	{
 		load_funcs( 'skins/_skin.funcs.php' );
-		// Get all skins of the blog and get the merge of main containers from each skin
+		// Get all skins of the blog and get the merge of main containers from each skin:
 		$skin_ids = $this->get_skin_ids();
-		$blog_containers = get_skin_containers( $skin_ids );
 
-		if( empty( $blog_containers ) )
-		{ // Get all global main widget containers
-			$widget_containers = & get_widget_containers();
-			foreach( $widget_containers as $wico_code => $wico_data )
-			{
-				$blog_containers[$wico_code] = $wico_data['wico_name'];
-			}
-		}
+		// Get containers of all collection skins:
+		$blog_containers = get_skin_containers( $skin_ids );
 
 		return $blog_containers;
 	}
@@ -3380,8 +3373,6 @@ class Blog extends DataObject
 	{
 		global $DB, $Messages;
 
-		// Get all global main widget containers
-		$main_containers = & get_widget_containers();
 		// Get main widget containers defined by the blog's skins
 		$blog_main_containers = $this->get_main_containers();
 		// Get currently saved blog containers from the database
@@ -3389,12 +3380,11 @@ class Blog extends DataObject
 
 		// Check all main containers and create insert params for those which are not saved yet
 		$widget_containers_sql_rows = array();
-		foreach( $blog_main_containers as $wico_code => $wico_name )
+		foreach( $blog_main_containers as $wico_code => $wico_data )
 		{
 			if( ! in_array( $wico_code, $blog_containers ) )
-			{ // Create only those containers which are not saved yet
-				$container_data = $main_containers[$wico_code];
-				$widget_containers_sql_rows[] = '( "'.$wico_code.'", "'.$container_data['wico_name'].'", '.$this->ID.', '.$container_data['wico_order'].' )';
+			{	// Create only those containers which are not saved yet:
+				$widget_containers_sql_rows[] = '( "'.$wico_code.'", "'.$wico_data[0].'", '.$this->ID.', '.$wico_data[1].' )';
 			}
 		}
 

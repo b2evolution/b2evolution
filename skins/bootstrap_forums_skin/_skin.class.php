@@ -73,15 +73,26 @@ class bootstrap_forums_Skin extends Skin
 	/**
 	 * Get the container codes of the skin main containers
 	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
 	 * @return array
 	 */
 	function get_declared_containers()
 	{
-		return array_merge( parent::get_declared_containers(), array(
-				'index.main.php' => array( 'header', 'footer', 'menu', 'page_top' ),
-				'_item_block.inc.php' => array( 'item_single' ),
-				'_front.disp.php' => array()
-			) );
+		// Note: second param below is the ORDER
+		return array(
+				'page_top'               => array( NT_('Page Top'), 2 ),
+				'header'                 => array( NT_('Header'), 10 ),
+				'menu'                   => array( NT_('Menu'), 15 ),
+				'front_page_main_area'   => array( NT_('Front Page Main Area'), 40 ),
+				'item_single'            => array( NT_('Item Single'), 50 ),
+				'contact_page_main_area' => array( NT_('Contact Page Main Area'), 60 ),
+				'sidebar'                => array( NT_('Sidebar'), 80 ),
+				'sidebar_2'              => array( NT_('Sidebar 2'), 90 ),
+				'sidebar_single'         => array( NT_('Sidebar Single'), 95 ),
+				'footer'                 => array( NT_('Footer'), 100 ),
+			);
 	}
 
 

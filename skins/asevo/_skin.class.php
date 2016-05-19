@@ -45,14 +45,22 @@ class asevo_Skin extends Skin
 	/**
 	 * Get the container codes of the skin main containers
 	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
 	 * @return array
 	 */
 	function get_declared_containers()
 	{
-		return array_merge( parent::get_declared_containers(), array(
-				'index.main.php' => array( 'header', 'menu', 'sidebar' ),
-				'_item_block.inc.php' => array( 'item_single' )
-			) );
+		// Note: second param below is the ORDER
+		return array(
+				'header'                 => array( NT_('Header'), 10 ),
+				'menu'                   => array( NT_('Menu'), 15 ),
+				'front_page_main_area'   => array( NT_('Front Page Main Area'), 40 ),
+				'item_single'            => array( NT_('Item Single'), 50 ),
+				'contact_page_main_area' => array( NT_('Contact Page Main Area'), 60 ),
+				'sidebar'                => array( NT_('Sidebar'), 80 ),
+			);
 	}
 
 

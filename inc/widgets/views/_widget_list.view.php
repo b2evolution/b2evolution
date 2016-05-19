@@ -24,8 +24,8 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	echo '<div class="pull-right" style="margin-bottom:10px">';
 		echo action_icon( TS_('Add a new container!'), 'add',
 					'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container', T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default' ) );
-		echo action_icon( TS_('Recheck declared skin containers!'), 'reload',
-					'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;'.url_crumb('widget'), T_('Recheck skin containers'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
+		echo action_icon( TS_('Scan skins for containers'), 'reload',
+					'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;'.url_crumb('widget'), T_('Scan skins for containers'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
 	echo '</div>';
 }
 
@@ -279,14 +279,14 @@ echo '<fieldset id="current_widgets">'."\n"; // fieldsets are cool at rememberin
 $displayed_containers = array();
 $embedded_containers = array();
 $WidgetContainerCache = & get_WidgetContainerCache();
-foreach( $skins_container_list as $container_code => $container_name )
+foreach( $skins_container_list as $container_code => $container_data )
 {
 	$WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $container_code );
 	if( ! $WidgetContainer )
 	{
 		$WidgetContainer = new WidgetContainer();
 		$WidgetContainer->set( 'code', $container_code );
-		$WidgetContainer->set( 'name', $container_name );
+		$WidgetContainer->set( 'name', $container_data[0] );
 		$WidgetContainer->set( 'coll_ID', $Blog->ID );
 	}
 
