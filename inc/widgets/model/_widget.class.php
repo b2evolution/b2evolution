@@ -667,7 +667,8 @@ class ComponentWidget extends DataObject
 
 			if( $display_containers )
 			{ // DEBUG:
-				echo '<div class="dev-blocks dev-blocks--widget"><div class="dev-blocks-name" title="'.
+				$is_subcontainer = ( $this->get( 'code' ) == 'subcontainer' || $this->get( 'code' ) == 'subcontainer_row' );
+				echo '<div class="dev-blocks '.( $is_subcontainer ? 'dev-blocks--subcontainer' : 'dev-blocks--widget' ).'"><div class="dev-blocks-name" title="'.
 							( $Blog->get_setting('cache_enabled_widgets') ? 'Widget params have BlockCache turned off' : 'Collection params have BlockCache turned off' ).'">'
 							.'<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>'
 							.'Widget: <b>'.$this->get_name().'</b> - Cache OFF <i class="fa fa-info">?</i></div>'."\n";
