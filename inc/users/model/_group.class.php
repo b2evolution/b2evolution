@@ -234,7 +234,7 @@ class Group extends DataObject
 			{
 				$value = param( 'edited_grp_'.$name, 'string', '' );
 			}
-			if( ( $value != '') || ( $name == 'max_new_threads'/*allow empty*/ ) )
+			if( ( $value != '') || ( $name == 'max_new_threads'/*allow empty*/ ) || ( $name == 'perm_max_createblog_num' ) )
 			{ // if radio is not set, then doesn't change the settings
 				$GroupSettings->set( $name, $value, $this->ID );
 			}
@@ -515,7 +515,7 @@ class Group extends DataObject
 
 		// Create group permissions/settings for the current group
 		$GroupSettings = & $this->get_GroupSettings();
-		$GroupSettings->dbupdate( $this->ID );
+		$GroupSettings->update( $this->ID );
 
 		$DB->commit();
 	}
@@ -534,7 +534,7 @@ class Group extends DataObject
 
 		// Update group permissions/settings of the current group
 		$GroupSettings = & $this->get_GroupSettings();
-		$GroupSettings->dbupdate( $this->ID );
+		$GroupSettings->update( $this->ID );
 
 		$DB->commit();
 	}

@@ -57,6 +57,26 @@ class archives_plugin extends Plugin
 
 
 	/**
+	 * Get keys for block/widget caching
+	 *
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @param integer Widget ID
+	 * @return array of keys this widget depends on
+	 */
+	function get_widget_cache_keys( $widget_ID = 0 )
+	{
+		global $Blog;
+
+		return array(
+				'wi_ID'        => $widget_ID, // Have the widget settings changed ?
+				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
+				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
+			);
+	}
+
+
+	/**
 	 * Event handler: SkinTag
 	 *
 	 * @param array Associative array of parameters. Valid keys are:
@@ -79,7 +99,7 @@ class archives_plugin extends Plugin
 	 *                - 'day_date_format' : (Default: conf.)
 	 * @return boolean did we display?
 	 */
-	function SkinTag( $params )
+	function SkinTag( & $params )
 	{
 		global $month;
 
@@ -363,7 +383,7 @@ class ArchiveList extends Results
 	 * @param integer
 	 * @param boolean
 	 */
-	function ArchiveList(
+	function __construct(
 		$archive_mode = 'monthly',
 		$limit = 100,
 		$sort_order = 'date',
@@ -536,7 +556,7 @@ class ArchiveList extends Results
 	 * These queries are complex enough for us not to have to rewrite them:
 	 * dh> ???
 	 */
-	function count_total_rows()
+	function count_total_rows( $sql_count = NULL )
 	{
 		global $DB;
 
@@ -588,7 +608,7 @@ class ArchiveList extends Results
 	function restart()
 	{
 		// Make sure query has executed at least once:
-		$this->query();
+		$this->run_query();
 
 		$this->current_idx = 0;
 		$this->arc_w_last = '';

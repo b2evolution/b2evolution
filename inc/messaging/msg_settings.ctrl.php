@@ -75,7 +75,8 @@ switch ( $action )
 				$Plugins->restart();
 				while( $loop_Plugin = & $Plugins->get_next() )
 				{
-					$pluginsettings = $loop_Plugin->get_msg_setting_definitions( $tmp_params = array( 'for_editing' => true ) );
+					$tmp_params = array( 'for_editing' => true );
+					$pluginsettings = $loop_Plugin->get_msg_setting_definitions( $tmp_params );
 					if( empty( $pluginsettings ) )
 					{
 						continue;
@@ -89,7 +90,8 @@ switch ( $action )
 
 					// Let the plugin handle custom fields:
 					// We use call_method to keep track of this call, although calling the plugins PluginSettingsUpdateAction method directly _might_ work, too.
-					$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params = array() );
+					$tmp_params = array();
+					$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params );
 
 					if( $ok_to_update === false )
 					{	// The plugin has said they should not get updated, Rollback settings:

@@ -143,9 +143,14 @@ class twitter_plugin extends Plugin
 		return $this->send_a_tweet( $content, $params['Item'], $params['xmlrpcresp'] );
 	}
 
+
 	/**
-	 * Allowing the user to specify their twitter account name and password.
+	 * Define the PER-USER settings of the plugin here. These can then be edited by each user.
 	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating
 	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
 	function GetDefaultUserSettings( & $params )

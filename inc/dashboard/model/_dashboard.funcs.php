@@ -270,6 +270,9 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 
 		// Get ready for display (runs the query):
 		$CommentList->display_init();
+
+		// Load data of comments from the current page at once to cache variables:
+		$CommentList->load_list_data();
 	}
 
 	$index = 0;
@@ -278,12 +281,14 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 	{ // Loop through comments:
 		$new_comment_IDs[] = $Comment->ID;
 		$index = $index + 1;
+		$is_meta = $Comment->is_meta();
+
 		// Only 5 normal comments should be visible, set hidden status for the rest:
-		$hidden_status = ( $index > 5 && ! $Comment->is_meta() ) ? ' hidden_comment' : '';
+		$hidden_status = ( $index > 5 && ! $is_meta ) ? ' hidden_comment' : '';
 
 		echo '<div id="comment_'.$Comment->ID.'" class="dashboard_post dashboard_post_'.($CommentList->current_idx % 2 ? 'even' : 'odd' ).$hidden_status.'">';
 
-		if( ! $Comment->is_meta() )
+		if( ! $is_meta )
 		{	// Display status banner only for normal comments:
 			$Comment->format_status( array(
 					'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
@@ -302,14 +307,14 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 			) );
 
 		echo '<h3 class="dashboard_comment_title">';
-		if( ! $Comment->is_meta() && ( $Comment->status !== 'draft' || $Comment->author_user_ID == $current_User->ID ) )
+		if( ! $is_meta && ( $Comment->status !== 'draft' || $Comment->author_user_ID == $current_User->ID ) )
 		{ // Display Comment permalink icon
 			echo $Comment->get_permanent_link( '#icon#' ).' ';
 		}
 		echo $Comment->get_title( array(
 				'author_format' => '<strong>%s</strong>',
 				'link_text'     => 'login',
-				'linked_type'   => $Comment->is_meta(),
+				'linked_type'   => $is_meta,
 			) );
 		$comment_Item = & $Comment->get_Item();
 		echo ' '.T_('in response to')
@@ -330,12 +335,13 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		$Comment->spam_karma( ' &bull; '.T_('Spam Karma').': %s%', ' &bull; '.T_('No Spam Karma') );
 		echo '</div>';
 
-		if( $current_User->check_perm( 'meta_comment', 'edit', false, $Comment ) )
+		$user_permission = $current_User->check_perm( 'meta_comment', 'edit', false, $Comment );
+		if( $user_permission )
 		{ // Put the meta comment content into this container to edit by ajax:
 			echo '<div id="editable_comment_'.$Comment->ID.'" class="editable_comment_content">';
 		}
 		$Comment->content( 'htmlbody', true );
-		if( $current_User->check_perm( 'meta_comment', 'edit', false, $Comment ) )
+		if( $user_permission )
 		{ // End of the container that is used to edit meta comment by ajax:
 			echo '</div>';
 		}
@@ -366,7 +372,7 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 
 		echo '</div>';
 
-		if( ! $Comment->is_meta() )
+		if( ! $is_meta )
 		{	// Display Spam Voting system only for normal comment:
 			$Comment->vote_spam( '', '', '&amp;', true, true, array( 'button_group_class' => button_class( 'group' ).' btn-group-sm' ) );
 		}
@@ -374,6 +380,9 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		echo '<div class="clear"></div>';
 		echo '</div>';
 		echo '</div>';
+
+		// Flush to immediately display the comment
+		evo_flush();
 	}
 
 	if( !$script )
@@ -389,13 +398,19 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
  * @param string Table name
  * @param string SQL WHERE
  * @param string SQL FROM
+ * @param string SQL title for better debug
  * @return integer A count of the records
  */
-function get_table_count( $table_name, $sql_where = '', $sql_from = '' )
+function get_table_count( $table_name, $sql_where = '', $sql_from = '', $sql_title = '' )
 {
 	global $DB;
 
-	$SQL = new SQL();
+	if( empty( $sql_title ) )
+	{	// Set default SQL title:
+		$sql_title = 'Get a count of the records in the DB table '.$table_name;
+	}
+
+	$SQL = new SQL( $sql_title );
 	$SQL->SELECT( 'COUNT( * )' );
 	$SQL->FROM( $table_name );
 	if( !empty( $sql_from ) )
@@ -407,7 +422,7 @@ function get_table_count( $table_name, $sql_where = '', $sql_from = '' )
 		$SQL->WHERE( $sql_where );
 	}
 
-	return intval( $DB->get_var( $SQL->get() ) );
+	return intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
 }
 
 
@@ -463,7 +478,7 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 			$block_title = T_('Recent posts awaiting moderation');
 			break;
 	}
-	// erhsatingin> I am not sure if I should hard-code the $param_prefix or set it when $ItemList is instantiated above 
+	// erhsatingin> I am not sure if I should hard-code the $param_prefix or set it when $ItemList is instantiated above
 	$param_prefix = 'items_type_';
 	$block_title = $block_title.' <a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;'.$param_prefix.'show_statuses[]='.$status.'&amp;'.$param_prefix.'sentence=AND&tab=type" style="text-decoration:none">'.
 				'<span id="badge" class="badge badge-important">'.$ItemList->get_total_rows().'</span></a>'.get_manual_link( 'dashboard-posts-awaiting-moderation' );
@@ -538,7 +553,7 @@ function display_charts( $chart_data )
 {
 	// We'll need to know where the chart will be displayed
 	global $ctrl;
-    
+
 	if( empty( $chart_data ) )
 	{ // No data
 		return;
@@ -564,7 +579,7 @@ function display_charts( $chart_data )
 		{ // Display a little chart for not null values
 			$chart_percent = 0.01;
 		}
-        
+
 		// Display chart
 		if( $ctrl == 'coll_settings' )
 		{ // in collection dashboard

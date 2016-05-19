@@ -62,6 +62,14 @@ $Form->begin_fieldset( T_('General').get_manual_link('item-type-general') );
 
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Use of Instructions').get_manual_link( 'item-type-instructions' ), array( 'id' => 'itemtype_instructions' ) );
+	$Form->checklist( array(
+		array( 'ityp_front_instruction', 1, T_('In front-office edit screen'),$edited_Itemtype->front_instruction ),
+		array( 'ityp_back_instruction', 1, T_('In back-office edit screen'), $edited_Itemtype->back_instruction )
+	), 'ityp_instruction_enable', T_('Display instructions') );
+	$Form->textarea_input( 'ityp_instruction', $edited_Itemtype->instruction, 5, T_('Instructions'), array( 'cols' => 47 ) );
+$Form->end_fieldset();
+
 $options = array(
 		array( 'required', T_('Required') ),
 		array( 'optional', T_('Optional') ),
@@ -112,8 +120,34 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 	$Form->checkbox( 'ityp_use_custom_fields', $edited_Itemtype->use_custom_fields, T_('Use custom fields') );
 
 	$custom_field_types = array(
-			'double' => array( 'label' => T_('Numeric'), 'title' => T_('Add new numeric custom field'), 'note' => T_('Ex: Price, Weight, Length... &ndash; will be stored as a double floating point number.'), 'size' => 20, 'maxlength' => 40 ),
-			'varchar' => array( 'label' => T_('String'), 'title' => T_('Add new text custom field'), 'note' => T_('Ex: Color, Fabric... &ndash; will be stored as a varchar(2000) field.'), 'size' => 30, 'maxlength' => 60 )
+			'double' => array(
+					'label'     => T_('Numeric'),
+					'title'     => T_('Add new numeric custom field'),
+					'note'      => T_('Ex: Price, Weight, Length... &ndash; will be stored as a double floating point number.'),
+					'size'      => 20,
+					'maxlength' => 40
+				),
+			'varchar' => array(
+					'label'     => T_('String'),
+					'title'     => T_('Add new string custom field'),
+					'note'      => T_('Ex: Color, Fabric... &ndash; will be stored as a varchar(10000) field.'),
+					'size'      => 30,
+					'maxlength' => 60
+				),
+			'text' => array(
+					'label'     => T_('Text'),
+					'title'     => T_('Add new text custom field'),
+					'note'      => T_('Ex: Content, Description... &ndash; will be stored as a varchar(10000) field.'),
+					'size'      => 30,
+					'maxlength' => 60
+				),
+			'html' => array(
+					'label'     => 'HTML',
+					'title'     => T_('Add new HTML custom field'),
+					'note'      => T_('Ex: Content, Description... &ndash; will be stored as a varchar(10000) field.'),
+					'size'      => 30,
+					'maxlength' => 60
+				)
 	);
 
 	$custom_fields_names = array();
@@ -208,38 +242,41 @@ function guidGenerator()
 	return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4());
 }
 
+function add_new_custom_field( type, title, title_size )
+{
+	var count_custom = jQuery( 'input[name=count_custom_' + type + ']' ).attr( 'value' );
+	count_custom++;
+	var custom_ID = guidGenerator();
+	jQuery( '#custom_' + type + '_field_list' ).append( '<?php echo str_replace( array( '$ID$', "\n" ), array( 'ffield_custom_\' + type + \'_\' + count_custom + \'', '' ), $Form->fieldstart ); ?>' +
+			'<input type="hidden" name="custom_' + type + '_ID' + count_custom + '" value="' + custom_ID + '" />' +
+			'<input type="hidden" name="custom_' + type + '_new' + count_custom + '" value="1" />' +
+			'<?php echo $Form->labelstart; ?><label for="custom_' + type + '_' + count_custom + '"<?php echo empty( $Form->labelclass ) ? '' : ' class="'.$Form->labelclass.'"'; ?>>' + title + ':</label><?php echo str_replace( "\n", '', $Form->labelend ); ?>' +
+			'<?php echo $Form->inputstart; ?>' +
+				'<?php echo TS_('Title'); ?> <input type="text" id="custom_' + type + '_' + count_custom + '" name="custom_' + type + '_' + count_custom + '" class="form_text_input form-control new_custom_field_title" maxlength="255" size="' + title_size + '" />' +
+				' <?php echo TS_('Name'); ?> <input type="text" name="custom_' + type + '_fname' + count_custom + '" value="" class="form_text_input form-control custom_field_name" maxlength="255" />' +
+				' <?php echo TS_('Order'); ?> <input type="text" name="custom_' + type + '_order' + count_custom + '" value="" class="form_text_input form-control custom_field_order" maxlength="11" size="3" />' +
+			'<?php echo str_replace( "\n", '', $Form->inputend.$Form->fieldend ); ?>' );
+	jQuery( 'input[name=count_custom_' + type + ']' ).attr( 'value', count_custom );
+}
+
 jQuery( '#add_new_double_custom_field' ).click( function()
 {
-	var count_custom_double = jQuery( 'input[name=count_custom_double]' ).attr( 'value' );
-	count_custom_double++;
-	var custom_ID = guidGenerator();
-	jQuery( '#custom_double_field_list' ).append( '<?php echo str_replace( array( '$ID$', "\n" ), array( 'ffield_custom_double_\' + count_custom_double + \'', '' ), $Form->fieldstart ); ?>' +
-			'<input type="hidden" name="custom_double_ID' + count_custom_double + '" value="' + custom_ID + '" />' +
-			'<input type="hidden" name="custom_double_new' + count_custom_double + '" value="1" />' +
-			'<?php echo $Form->labelstart; ?><label for="custom_double_' + count_custom_double + '"<?php echo empty( $Form->labelclass ) ? '' : ' class="'.$Form->labelclass.'"'; ?>><?php echo TS_('Numeric'); ?>:</label><?php echo str_replace( "\n", '', $Form->labelend ); ?>' +
-			'<?php echo $Form->inputstart; ?>' +
-				'<?php echo TS_('Title'); ?> <input type="text" id="custom_double_' + count_custom_double + '" name="custom_double_' + count_custom_double + '" class="form_text_input form-control new_custom_field_title" size="20" maxlength="60" />' +
-				' <?php echo TS_('Name'); ?> <input type="text" name="custom_double_fname' + count_custom_double + '" value="" class="form_text_input form-control custom_field_name" maxlength="36" />' +
-				' <?php echo TS_('Order'); ?> <input type="text" name="custom_double_order' + count_custom_double + '" value="" class="form_text_input form-control custom_field_order" maxlength="36" size="3" />' +
-			'<?php echo str_replace( "\n", '', $Form->inputend.$Form->fieldend ); ?>' );
-	jQuery( 'input[name=count_custom_double]' ).attr( 'value', count_custom_double );
+	add_new_custom_field( 'double', '<?php echo TS_('Numeric'); ?>', 20 );
 } );
 
 jQuery( '#add_new_varchar_custom_field' ).click( function()
 {
-	var count_custom_varchar = jQuery( 'input[name=count_custom_varchar]' ).attr( 'value' );
-	count_custom_varchar++;
-	var custom_ID = guidGenerator();
-	jQuery( '#custom_varchar_field_list' ).append( '<?php echo str_replace( array( '$ID$', "\n" ), array( 'ffield_custom_string_\' + count_custom_varchar + \'', '' ), $Form->fieldstart ); ?>' +
-			'<input type="hidden" name="custom_varchar_ID' + count_custom_varchar + '" value="' + custom_ID + '" />' +
-			'<input type="hidden" name="custom_varchar_new' + count_custom_varchar + '" value="1" />' +
-			'<?php echo $Form->labelstart; ?><label for="custom_varchar_' + count_custom_varchar + '"<?php echo empty( $Form->labelclass ) ? '' : ' class="'.$Form->labelclass.'"'; ?>><?php echo TS_('String'); ?>:</label><?php echo str_replace( "\n", '', $Form->labelend ); ?>' +
-			'<?php echo $Form->inputstart; ?>' +
-				'<?php echo TS_('Title'); ?> <input type="text" id="custom_varchar_' + count_custom_varchar + '" name="custom_varchar_' + count_custom_varchar + '" class="form_text_input form-control new_custom_field_title" size="30" maxlength="40" />' +
-				' <?php echo TS_('Name'); ?> <input type="text" name="custom_varchar_fname' + count_custom_varchar + '" value="" class="form_text_input form-control custom_field_name" maxlength="36" />' +
-				' <?php echo TS_('Order'); ?> <input type="text" name="custom_varchar_order' + count_custom_varchar + '" value="" class="form_text_input form-control custom_field_order" maxlength="36" size="3" />' +
-			'<?php echo str_replace( "\n", '', $Form->inputend.$Form->fieldend ); ?>' );
-	jQuery( 'input[name=count_custom_varchar]' ).attr( 'value', count_custom_varchar );
+	add_new_custom_field( 'varchar', '<?php echo TS_('String'); ?>', 30 );
+} );
+
+jQuery( '#add_new_text_custom_field' ).click( function()
+{
+	add_new_custom_field( 'text', '<?php echo TS_('Text'); ?>', 30 );
+} );
+
+jQuery( '#add_new_html_custom_field' ).click( function()
+{
+	add_new_custom_field( 'html', 'HTML', 30 );
 } );
 
 jQuery( '[id^="delete_custom_"]' ).click( function()

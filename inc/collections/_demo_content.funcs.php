@@ -20,7 +20,7 @@ global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_
 global $blog_all_ID, $blog_home_ID, $blog_a_ID, $blog_b_ID;
 global $DB;
 global $default_locale, $default_country;
-global $Plugins;
+global $Plugins, $Settings;
 global $test_install_all_features;
 global $user_org_IDs;
 
@@ -128,7 +128,7 @@ function create_blog(
 		$in_bloglist = 'public',
 		$owner_user_ID = 1 )
 {
-	global $default_locale, $test_install_all_features, $local_installation, $Plugins;
+	global $default_locale, $install_test_features, $local_installation, $Plugins;
 
 	$Blog = new Blog( NULL );
 
@@ -158,24 +158,31 @@ function create_blog(
 
 	$Blog->dbinsert();
 
-	if( $test_install_all_features )
+	if( $install_test_features )
 	{
 		$allow_rating_items = 'any';
 		$Blog->set_setting( 'skin'.$blog_skin_ID.'_bubbletip', '1' );
+		echo_install_log( 'TEST FEATURE: Activating username bubble tips on skin of collection #'.$Blog->ID );
 		$Blog->set_setting( 'skin'.$blog_skin_ID.'_gender_colored', '1' );
+		echo_install_log( 'TEST FEATURE: Activating gender colored usernames on skin of collection #'.$Blog->ID );
 		$Blog->set_setting( 'in_skin_editing', '1' );
+		echo_install_log( 'TEST FEATURE: Activating in-skin editing on collection #'.$Blog->ID );
 
 		if( $kind == 'manual' )
 		{	// Set a posts ordering by 'post_order ASC'
 			$Blog->set_setting( 'orderby', 'order' );
 			$Blog->set_setting( 'orderdir', 'ASC' );
+			echo_install_log( 'TEST FEATURE: Setting a posts ordering by asceding post order field on collection #'.$Blog->ID );
 		}
+
+		$Blog->set_setting( 'use_workflow', 1 );
+		echo_install_log( 'TEST FEATURE: Activating workflow on collection #'.$Blog->ID );
 	}
 	if( $allow_rating_items != '' )
 	{
 		$Blog->set_setting( 'allow_rating_items', $allow_rating_items );
 	}
-	if( $use_inskin_login || $test_install_all_features )
+	if( $use_inskin_login || $install_test_features )
 	{
 		$Blog->set_setting( 'in_skin_login', 1 );
 	}
@@ -627,10 +634,10 @@ Admins and moderators can very quickly approve or reject comments from the colle
 
 	$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_status,
 			comment_author_user_ID, comment_author, comment_author_email, comment_author_url, comment_author_IP,
-			comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status )
+			comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status, comment_notif_flags )
 			VALUES( '.$DB->quote( $item_ID ).', '.$DB->quote( $status ).', '
 			.$DB->quote( $user_ID ).', '.$DB->quote( $author ).', '.$DB->quote( $author_email ).', '.$DB->quote( $author_email_url ).', "127.0.0.1", '
-			.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( $content ).', "default", "finished" )' );
+			.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( $content ).', "default", "finished", "moderators_notified,members_notified,community_notified" )' );
 }
 
 
@@ -645,7 +652,7 @@ Admins and moderators can very quickly approve or reject comments from the colle
  */
 function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = true, $timeshift = 86400 )
 {
-	global $test_install_all_features, $DB, $admin_url, $timestamp;
+	global $install_test_features, $DB, $admin_url, $timestamp;
 
 	$default_blog_longdesc = T_('This is the long description for the blog named \'%s\'. %s');
 	$default_blog_access_type = 'relative';
@@ -658,7 +665,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 		// =======================================================================================================
 		case 'main':
 			$blog_shortname = T_('Home');
-			$blog_home_access_type = ( $test_install_all_features ) ? 'default' : $default_blog_access_type;
+			$blog_home_access_type = ( $install_test_features ) ? 'default' : $default_blog_access_type;
 			$blog_more_longdesc = '<br />
 <br />
 <strong>'.T_('The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.').'</strong>';
@@ -697,7 +704,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 			{
 				$blog_shortname = 'Blog';
 			}
-			$blog_a_access_type = ( $test_install_all_features ) ? 'default' : $default_blog_access_type;
+			$blog_a_access_type = ( $install_test_features ) ? 'default' : $default_blog_access_type;
 			$blog_stub = 'a';
 			$blog_a_ID = create_blog(
 					T_('Public Blog'),
@@ -731,7 +738,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 			assign_secondary_groups( $owner_ID, array( $blogb_Group->ID ) );
 
 			$blog_shortname = 'Blog B';
-			$blog_b_access_type = ( $test_install_all_features ) ? 'index.php' : $default_blog_access_type;
+			$blog_b_access_type = ( $install_test_features ) ? 'index.php' : $default_blog_access_type;
 			$blog_stub = 'b';
 
 			$blog_b_ID = create_blog(
@@ -850,7 +857,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
  */
 function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo_user = true, $timeshift = 86400 )
 {
-	global $DB, $test_install_all_features, $timestamp, $admin_url;
+	global $DB, $install_test_features, $timestamp, $Settings, $admin_url;
 
 	$timestamp = time();
 	$item_IDs = array();
@@ -953,6 +960,20 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 
 <p>You can add collections at will. You can also remove them (including this "Home" collection) if you don\'t need one.</p>'),
 					$now, $cat_home_b2evo, array(), 'published', '#', '', '', 'open', array( 'default' ), 'Intro-Front' );
+
+			// Insert a post:
+			$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
+			$edited_Item = new Item();
+			$edited_Item->set_tags_from_string( 'intro' );
+			$edited_Item->insert( $owner_ID, T_('Terms & Conditions'), '<p>Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum</p>
+
+<p>Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum</p>',
+			$now, $cat_home_b2evo, array(), 'published', '#', '', '', 'open', array( 'default' ), 'Terms & Conditions' );
+			if( $edited_Item->ID > 0 )
+ 			{	// Use this post as default terms & conditions:
+ 				$Settings->set( 'site_terms', $edited_Item->ID );
+ 				$Settings->dbupdate();
+ 			}
 			$item_IDs[] = $edited_Item->ID;
 			break;
 
@@ -1042,6 +1063,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			// Insert a post:
 			$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 			$edited_Item = new Item();
+			$edited_Item->set( 'featured', 1 );
 			$edited_Item->set_tags_from_string( 'photo,demo' );
 			$edited_Item->insert( $owner_ID, T_('Extended post'), T_('<p>This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.</p>').get_filler_text( 'lorem_1paragraph')
 .'[teaserbreak]
@@ -1064,9 +1086,21 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$edited_Item->set_setting( 'custom_double_2', '456' );
 			$edited_Item->set_setting( 'custom_varchar_3', 'abc' );
 			$edited_Item->set_setting( 'custom_varchar_4', 'Enter your own values' );
-			$post_custom_fields_ID = $edited_Item->insert( $owner_ID, T_('Custom Fields Example'), T_('<p>This post has a special post type called "Post with custom fields".</p>')
-.T_('<p>This post type defines 4 custom fields.</p>')
-.T_('<p>This post has sample values for these for 4 fields. You can see them below</p>'),
+			$edited_Item->set_setting( 'custom_text_5', 'This is a sample text field.
+ It can have multiple lines.' );
+ 			$edited_Item->set_setting( 'custom_html_6', 'This is an <b>HTML</b> <i>field</i>.' );
+			$post_custom_fields_ID = $edited_Item->insert( $owner_ID, T_('Custom Fields Example'),
+'<p>'.T_('This post has a special post type called "Post with custom fields".').'</p>'.
+
+'<p>'.T_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>'.
+
+'<p>[fields]</p>'.
+
+'<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>'.
+
+'<p>[fields:first_numeric_field, first_string_field,second_numeric_field]</p>'.
+
+'<p>'.T_('Finally, we can also display just the value of a specific field, like this [field: first_string_field].').'</p>',
 					$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Post with Custom Fields' );
 			$item_IDs[] = $edited_Item->ID;
 
@@ -1075,13 +1109,26 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'demo' );
 			$edited_Item->set( 'parent_ID', $post_custom_fields_ID ); // Set parent post ID
-			$edited_Item->insert( $owner_ID, T_('Child Post Example'), T_('<p>This post has a special post type called "Child Post".</p>'),
+			/*$edited_Item->insert( $owner_ID, T_('Child Post Example'), T_('<p>This post has a special post type called "Child Post".</p>'),*/
+			$edited_Item->insert( $owner_ID, T_('Child Post Example'),
+'<p>'.sprintf( T_('This post has a special post type called "Child Post". This allowed to specify a parent post ID. Consequently, this child post is linked to: %s.'), '[parent:titlelink] ([parent:url])' ).'</p>
+
+<p>'.T_('This also allows us to access the custom fields of the parent post:').'</p>
+
+<p>[parent:fields]</p>
+
+<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>
+
+<p>[parent:fields:first_numeric_field, first_string_field,second_numeric_field]</p>
+
+<p>'.T_('Finally, we can also display just the value of a specific field, like this [parent:field: first_string_field].').'</p>',
 					$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Child Post' );
 			$item_IDs[] = $edited_Item->ID;
 
 			// Insert a post:
 			$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 			$edited_Item = new Item();
+			$edited_Item->set( 'featured', 1 );
 			$edited_Item->set_tags_from_string( 'photo,demo' );
 			$edited_Item->insert( $owner_ID, T_('Image post'), T_('<p>This post has several images attached to it. Each one uses a different Attachment Position. Each may be displayed differently depending on the skin they are viewed in.</p>
 
@@ -1246,7 +1293,6 @@ T_("<p>To get you started, the installer has automatically created several sampl
 <p>To start customizing a skin, open its "<code>index.main.php</code>" file in an editor and read the comments in there. Note: you can also edit skins in the "Files" tab of the admin interface.</p>
 
 <p>And, of course, read the <a href="%s" target="_blank">manual on skins</a>!</p>'), get_manual_url( 'skin-structure' ) ), $now, $cat_b2evo );
-			$edited_Item->set( 'featured', 1 );
 			$edited_Item->dbsave();
 			// $edited_Item->insert_update_tags( 'update' );
 			$item_IDs[] = $edited_Item->ID;
@@ -1295,7 +1341,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			$photo_link_5_ID = $edit_File->link_to_Object( $LinkOwner, 5, 'aftermore' );
 			$item_IDs[] = $edited_Item->ID;
 
-			if( $test_install_all_features )
+			if( $install_test_features )
 			{ // Add examples for infodots plugin
 				$edited_Item->set_tags_from_string( 'photo,demo' );
 				$edited_Item->set( 'content', $edited_Item->get( 'content' ).sprintf( '
@@ -1312,6 +1358,7 @@ a school bus stop where you wouldn\'t really expect it!
 [infodot:%s:104:99]cowboy and horse[enddot]
 [infodot:%s:207:28:15em]Red planet[enddot]', $photo_link_1_ID, $photo_link_2_ID, $photo_link_4_ID ) );
 				$edited_Item->dbupdate();
+				echo_install_log( 'TEST FEATURE: Adding examples for plugin "Info dots renderer" on item #'.$edited_Item->ID );
 				$item_IDs[] = $edited_Item->ID;
 			}
 			break;
@@ -1979,7 +2026,7 @@ Hello
 		create_demo_comment( $item_ID, $comment_users, 'draft');
 	}
 
-	if( $test_install_all_features && count( $additional_comments_item_IDs ) && $use_demo_user )
+	if( $install_test_features && count( $additional_comments_item_IDs ) && $use_demo_user )
 	{ // Create the additional comments when we install all features
 		foreach( $additional_comments_item_IDs as $additional_comments_item_ID )
 		{
@@ -1987,13 +2034,14 @@ Hello
 			{ // Insert the comments from each user
 				$now = date( 'Y-m-d H:i:s' );
 				$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_author_user_ID, comment_author_IP,
-						comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status )
+						comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status, comment_notif_flags )
 						VALUES( '.$DB->quote( $additional_comments_item_ID ).', '.$DB->quote( $demo_user->ID ).', "127.0.0.1", '
 						.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( T_('Hi!
 
 This is a sample comment that has been approved by default!
-Admins and moderators can very quickly approve or reject comments from the collection dashboard.') ).', "default", "finished" )' );
+Admins and moderators can very quickly approve or reject comments from the collection dashboard.') ).', "default", "finished", "moderators_notified,members_notified,community_notified" )' );
 			}
 		}
+		echo_install_log( 'TEST FEATURE: Creating additional comments on items ('.implode( ', ', $additional_comments_item_IDs ).')' );
 	}
 }

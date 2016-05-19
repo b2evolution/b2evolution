@@ -96,7 +96,8 @@ switch( $action )
 				$Plugins->restart();
 				while( $loop_Plugin = & $Plugins->get_next() )
 				{
-					$pluginsettings = $loop_Plugin->get_email_setting_definitions( $tmp_params = array( 'for_editing' => true ) );
+					$tmp_params = array( 'for_editing' => true );
+					$pluginsettings = $loop_Plugin->get_email_setting_definitions( $tmp_params );
 					if( empty( $pluginsettings ) )
 					{
 						continue;
@@ -110,7 +111,8 @@ switch( $action )
 
 					// Let the plugin handle custom fields:
 					// We use call_method to keep track of this call, although calling the plugins PluginSettingsUpdateAction method directly _might_ work, too.
-					$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params = array() );
+					$tmp_params = array();
+					$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params );
 
 					if( $ok_to_update === false )
 					{	// The plugin has said they should not get updated, Rollback settings:
@@ -194,19 +196,22 @@ switch( $action )
 				$Settings->set( 'smtp_enabled', param( 'smtp_enabled', 'boolean', 0 ) );
 
 				// SMTP Host
-				$Settings->set( 'smtp_server_host',  param( 'smtp_server_host', 'string', '' ) );
+				$Settings->set( 'smtp_server_host', param( 'smtp_server_host', 'string', '' ) );
 
 				// Port Number
-				$Settings->set( 'smtp_server_port',  param( 'smtp_server_port', 'integer' ) );
+				$Settings->set( 'smtp_server_port', param( 'smtp_server_port', 'integer' ) );
 
 				// Encryption Method
-				$Settings->set( 'smtp_server_security',  param( 'smtp_server_security', 'string', '' ) );
+				$Settings->set( 'smtp_server_security', param( 'smtp_server_security', 'string', '' ) );
+
+				// Accept certificate
+				$Settings->set( 'smtp_server_novalidatecert', param( 'smtp_server_novalidatecert', 'boolean', 0 ) );
 
 				// SMTP Username
-				$Settings->set( 'smtp_server_username',  param( 'smtp_server_username', 'string', '' ) );
+				$Settings->set( 'smtp_server_username', param( 'smtp_server_username', 'string', '' ) );
 
 				// SMTP Password
-				$Settings->set( 'smtp_server_password',  param( 'smtp_server_password', 'string', '' ) );
+				$Settings->set( 'smtp_server_password', param( 'smtp_server_password', 'string', '' ) );
 
 				// Check if we really can use SMTP mailer
 				if( $Settings->get( 'smtp_enabled' ) && ( $smtp_error = check_smtp_mailer() ) !== true )
@@ -230,8 +235,14 @@ switch( $action )
 			case 'other':
 				/* Campaign sending: */
 
+				// Sending:
+				$Settings->set( 'email_campaign_send_mode', param( 'email_campaign_send_mode', 'string', 'immediate' ) );
+
 				// Chunk Size:
 				$Settings->set( 'email_campaign_chunk_size', param( 'email_campaign_chunk_size', 'integer', 0 ) );
+
+				// Delay between chunks:
+				$Settings->set( 'email_campaign_cron_repeat', param_duration( 'email_campaign_cron_repeat' ) );
 				break;
 
 			default:
@@ -360,6 +371,22 @@ switch( $action )
 		$smtp_test_output = is_array( $smtp_messages ) ? implode( "<br />\n", $smtp_messages ) : '';
 		break;
 
+	case 'test_email':
+		// Test email sending by SMTP gateway:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'emailsettings' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
+		// Test email sending:
+		$smtp_messages = smtp_email_sending_test();
+
+		// Initialize this var to display a result on the page:
+		$smtp_test_output = is_array( $smtp_messages ) ? implode( "<br />\n", $smtp_messages ) : '';
+		break;
+
 	case 'blocked_new':
 		// Init Email Address to show on the form
 		$edited_EmailAddress = new EmailAddress();
@@ -386,7 +413,7 @@ switch( $action )
 			$Messages->add( T_('The email address was updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=email&tab=blocked', 303 ); // Will EXIT
+			header_redirect( '?ctrl=email', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		break;
@@ -405,7 +432,7 @@ switch( $action )
 			$Messages->add( T_('The email address was deleted.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=email&tab=blocked', 303 ); // Will EXIT
+			header_redirect( '?ctrl=email', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		break;

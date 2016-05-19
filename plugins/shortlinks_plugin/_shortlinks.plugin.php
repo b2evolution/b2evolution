@@ -668,17 +668,17 @@ class shortlinks_plugin extends Plugin
 		/**
 		 * Execute REST API request
 		 *
-		 * @param string URL
+		 * @param string REST API path
 		 * @param string Object selector
 		 * @param function Function on success request
 		 */
-		function shortlinks_api_request( url, obj_selector, func )
+		function shortlinks_api_request( api_path, obj_selector, func )
 		{
 			shortlinks_start_loading( obj_selector );
 
 			jQuery.ajax(
 			{
-				url: '<?php echo $baseurl; ?>api/v1/' + url
+				url: restapi_url + api_path
 			} )
 			.then( func, function( jqXHR )
 			{	// Error request, Display the error data:
@@ -826,9 +826,9 @@ class shortlinks_plugin extends Plugin
 				var r = '<div id="shortlinks_colls_list">'
 					+ '<h2><?php echo TS_('Collections'); ?></h2>'
 					+ '<select class="form-control">';
-				for( var c in data )
+				for( var c in data.colls )
 				{
-					var coll = data[c];
+					var coll = data.colls[c];
 					r += '<option value="' + coll.urlname + '"'
 						+ ( current_coll_urlname == coll.urlname ? ' selected="selected"' : '' )+ '>'
 						+ coll.name + '</option>';
@@ -890,7 +890,7 @@ class shortlinks_plugin extends Plugin
 
 			var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&paged=' + page;
 
-			shortlinks_api_request( 'collections/' + coll_urlname + '/items?orderby=datemodified&order=DESC' + page_param, '#shortlinks_posts_list', function( data )
+			shortlinks_api_request( 'collections/' + coll_urlname + '/items&orderby=datemodified&order=DESC' + page_param, '#shortlinks_posts_list', function( data )
 			{	// Display the posts on success request:
 				var r = '<ul>';
 				for( var p in data.items )
@@ -915,7 +915,7 @@ class shortlinks_plugin extends Plugin
 		{
 			var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&page=' + page;
 
-			shortlinks_api_request( 'collections/' + coll_urlname + '/search/' + search_keyword + '?kind=item' + page_param, '#shortlinks_posts_list', function( data )
+			shortlinks_api_request( 'collections/' + coll_urlname + '/search/' + search_keyword + '&kind=item' + page_param, '#shortlinks_posts_list', function( data )
 			{	// Display the post data in third column on success request:
 				if( typeof( data.code ) != 'undefined' )
 				{	// Error code was responsed:

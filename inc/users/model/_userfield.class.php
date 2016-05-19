@@ -89,7 +89,7 @@ class Userfield extends DataObject
 	 *
 	 * @return array
 	 */
-	function get_types()
+	static function get_types()
 	{
 		return array(
 			'email'  => T_('Email address'),

@@ -139,8 +139,7 @@ class AbstractSettings
 
 
 	/**
-	 * Loads the settings. Not meant to be called directly, but gets called
-	 * when needed.
+	 * Loads the settings. Not meant to be called directly, but gets called when needed.
 	 *
 	 * @access protected
 	 * @param string First column key
@@ -195,7 +194,7 @@ class AbstractSettings
 			FROM '.$this->db_table_name.(
 				isset( $whereList[0] )
 				? ' WHERE '.implode( ' AND ', $whereList )
-				: '' ) );
+				: '' ), OBJECT, 'Load settings from '.$this->db_table_name );
 
 		switch( $this->count_col_key_names )
 		{

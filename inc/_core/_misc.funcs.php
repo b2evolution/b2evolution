@@ -329,8 +329,15 @@ function format_to_output( $content, $format = 'htmlbody' )
 
 		case 'htmlspecialchars':
 		case 'formvalue':
-			// Replace special chars to &amp;, &quot;, &apos;, &lt; and &gt; :
-			$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );  // Handles &, ", ', < and >
+			// Replace special chars to &amp;, &quot;, &#039;|&apos;, &lt; and &gt; :
+			if( version_compare( phpversion(), '5.4', '>=' ) )
+			{	// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
+				$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
+			}
+			else
+			{	// Handles & " ' < > to &amp; &quot; &#039; &lt; &gt;
+				$content = htmlspecialchars( $content, ENT_QUOTES, $evo_charset );
+			}
 			break;
 
 		case 'xml':
@@ -354,6 +361,19 @@ function format_to_output( $content, $format = 'htmlbody' )
 			$content = strtr( $content, $trans_tbl );
 			$content = preg_replace( '/[ \t]+/', ' ', $content);
 			$content = trim($content);
+			break;
+
+		case 'syslog':
+			// Replace special chars to &amp;, &quot;, &#039;|&apos;, &lt; and &gt; :
+			if( version_compare( phpversion(), '5.4', '>=' ) )
+			{	// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
+				$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
+			}
+			else
+			{	// Handles & " ' < > to &amp; &quot; &#039; &lt; &gt;
+				$content = htmlspecialchars( $content, ENT_QUOTES, $evo_charset );
+			}
+			$content = preg_replace( "/\[\[(.+?)]]/is", "<code>$1</code>", $content ); // Replaces [[...]] into <code>...</code>
 			break;
 
 		default:
@@ -434,10 +454,14 @@ function excerpt( $str, $maxlen = 254, $tail = '&hellip;' )
 	$str = str_replace( array( '<p>', '<br' ), array( ' <p>', ' <br' ), $str );
 
 	// Remove <code>
-	$str = preg_replace( '#<code>(.+)</code>#i', '', $str );
+	$str = preg_replace( '#<code>(.+)</code>#is', '', $str );
 
-	// fp> Note: I'm not sure about using 'text' here, but there should definitely be no rendering here.
-	$str = format_to_output( $str, 'text' );
+	// Strip tags:
+	$str = strip_tags( $str );
+
+	// Remove spaces:
+	$str = preg_replace( '/[ \t]+/', ' ', $str);
+	$str = trim( $str );
 
 	// Ger rid of all new lines and Display the html tags as source text:
 	$str = trim( preg_replace( '#[\r\n\t\s]+#', ' ', $str ) );
@@ -833,7 +857,7 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 	{	// $pattern matches, call the callback method on full text except of matching blocks
 
 		// Create an unique string in order to replace all matching blocks temporarily
-		$unique_replacement = md5( mktime() + rand() );
+		$unique_replacement = md5( time() + rand() );
 
 		$matches_search = array();
 		$matches_replace = array();
@@ -902,17 +926,44 @@ function replace_content_outcode( $search, $replace, $content, $replace_function
  * @param array|string Search list
  * @param array|string Replace list
  * @param string Type of function: 'preg' -> preg_replace(), 'str' -> str_replace()
+ * @param string The maximum possible replacements for each pattern in each subject string. Defaults to -1 (no limit).
  * @return string Replaced content
  */
-function replace_content( $content, $search, $replace, $type = 'preg' )
+function replace_content( $content, $search, $replace, $type = 'preg', $limit = -1 )
 {
-	if( $type == 'str' )
-	{
-		return str_replace( $search, $replace, $content );
+	if( $limit == 0 )
+	{	// Strange request to nothing replace, Return original content:
+		return $content;
 	}
-	else
+
+	switch( $type )
 	{
-		return preg_replace( $search, $replace, $content );
+		case 'str':
+			if( $limit == -1 )
+			{	// Unlimited replace:
+				return str_replace( $search, $replace, $content );
+			}
+			else
+			{	// Limited replace:
+				$pos = strpos( $content, $search );
+				if( $pos !== false )
+				{	// Do the limited replacements:
+					for( $p = 0; $p < $limit; $p++ )
+					{
+						if( $pos === false )
+						{	// Stop searching:
+							break;
+						}
+						$content = substr_replace( $content, $replace, $pos, strlen( $search ) );
+						// Go to next searched substring:
+						$pos = strpos( $content, $search, $pos + strlen( $replace ) );
+					}
+				}
+				return $content;
+			}
+
+		default: // 'preg'
+			return preg_replace( $search, $replace, $content, $limit );
 	}
 }
 
@@ -1028,15 +1079,17 @@ function split_outcode( $separators, $content, $capture_separator = false )
  * @param string Url delimeter
  * @param string Callback function name
  * @param string Additional attributes for tag <a>
+ * @param boolean TRUE to exclude links from header tags like h1, h2, etc.
  * @return string
  */
-function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickable_callback', $additional_attrs = '' )
+function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickable_callback', $additional_attrs = '', $exclude_headers = false )
 {
 	$r = '';
 	$inside_tag = false;
 	$in_a_tag = false;
 	$in_code_tag = false;
 	$in_tag_quote = false;
+	$in_header_tag = false;
 	$from_pos = 0;
 	$i = 0;
 	$n = strlen($text);
@@ -1091,6 +1144,7 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 						$from_pos = $i;
 						$in_a_tag = false;
 						$in_tag_quote = false;
+						$in_header_tag = false;
 					}
 					break;
 			}
@@ -1110,6 +1164,24 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 						$from_pos = $i;
 						$in_code_tag = false;
 						$in_tag_quote = false;
+						$in_header_tag = false;
+					}
+					break;
+			}
+		}
+		elseif( $in_header_tag )
+		{	// In a code but no longer inside <h#>...</h#> tags or any other embedded tag like <strong> or whatever
+			switch( $text[$i] )
+			{
+				case '<':
+					if( strtolower( substr( $text, $i+1, 3 ) ) == '/'.$in_header_tag )
+					{	// Ok, this is the end tag of the header:
+						$i += 5;
+						$r .= substr( $text, $from_pos, $i - $from_pos );
+						$from_pos = $i;
+						$in_code_tag = false;
+						$in_tag_quote = false;
+						$in_header_tag = false;
 					}
 					break;
 			}
@@ -1137,15 +1209,13 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 				$in_code_tag = true;
 			}
 
+			if( $exclude_headers && preg_match( '/^h[1-6]$/', substr( $text, $i+1, 2 ), $h_match ) )
+			{	// opening "h1" - "h6" tags:
+				$in_header_tag = $h_match[0];
+			}
+
 			// Make the text before the opening < clickable:
-			if( is_array($callback) )
-			{
-				$r .= $callback[0]->$callback[1]( substr($text, $from_pos, $i-$from_pos), $moredelim, $additional_attrs );
-			}
-			else
-			{
-				$r .= $callback( substr($text, $from_pos, $i-$from_pos), $moredelim, $additional_attrs );
-			}
+			$r .= call_user_func_array( $callback, array( substr( $text, $from_pos, $i-$from_pos ), $moredelim, $additional_attrs ) );
 			$from_pos = $i;
 
 			// $i += 2;
@@ -1161,14 +1231,7 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 	}
 	else
 	{	// Make remplacements in the remaining part:
-		if( is_array($callback) )
-		{
-			$r .= $callback[0]->$callback[1]( substr($text, $from_pos), $moredelim, $additional_attrs );
-		}
-		else
-		{
-			$r .= $callback( substr($text, $from_pos), $moredelim, $additional_attrs );
-		}
+		$r .= call_user_func_array( $callback, array( substr( $text, $from_pos ), $moredelim, $additional_attrs ) );
 	}
 
 	return $r;
@@ -1244,7 +1307,13 @@ function date2mysql( $ts )
 function mysql2timestamp( $m, $useGM = false )
 {
 	$func = $useGM ? 'gmmktime' : 'mktime';
-	return $func( substr( $m, 11, 2 ), substr( $m, 14, 2 ), substr( $m, 17, 2 ), substr( $m, 5, 2 ), substr( $m, 8, 2 ), substr( $m, 0, 4 ) );
+	return $func(
+		intval( substr( $m, 11, 2 ) ),  // hour
+		intval( substr( $m, 14, 2 ) ),  // minute
+		intval( substr( $m, 17, 2 ) ),  // second
+		intval( substr( $m, 5, 2 ) ),   // month
+		intval( substr( $m, 8, 2 ) ),   // day
+		intval( substr( $m, 0, 4 ) ) ); // year
 }
 
 /**
@@ -1697,6 +1766,44 @@ function get_duration_title( $duration, $titles = array() )
 	}
 }
 
+function get_lastseen_date( $date, $view = 'exact_date', $cheat = 0 )
+{
+	$result = mysql2localedate( $date );
+
+	if( $view == 'blurred_date' )
+	{
+		$result = (int)( ( ( time() - strtotime( $date ) ) / 86400 ) - $cheat);
+
+		if( $result < 0 )
+		{
+			$result = 0;
+		}
+
+		if( $result < 3 )
+		{
+			$result = T_('less than 3 days ago');
+		}
+		elseif( $result < 7 )
+		{
+			$result = T_('less than a week ago');
+		}
+		elseif( $result < 30 )
+		{
+			$result = T_('less than a month ago');
+		}
+		elseif( $result < 90 )
+		{
+			$result = T_('less than 3 months ago');
+		}
+		else
+		{
+			$result = T_('more than 3 months ago');
+		}
+	}
+
+	return $result;
+}
+
 
 /**
  * Validate variable
@@ -1910,7 +2017,7 @@ function is_valid_login( $login, $force_strict_logins = false )
 
 	// Step 1
 	// Forbid the following characters in logins
-	if( preg_match( '~[\'"><@\s]~', $login ) )
+	if( preg_match( '~[\'"><@&\s]~', $login ) )
 	{	// WARNING: allowing ' or " or > or < will open security issues!
 		// NOTE: allowing @ will make some "average" users use their email address (not good for their spam health)
 		// NOTE: we do not allow whitespace in logins
@@ -1994,11 +2101,42 @@ function is_windows()
  */
 function get_atags( $content )
 {
-	$tag = 'a';
-	$regexp = '{<'.$tag.'[^>]*>(.*?)</'.$tag.'>}';
+	$tags = array();
 
-	preg_match_all( $regexp, $content, $result );
-	return $result[0];
+	if( preg_match_all( '#(<a[^>]+>(.*?)</a>|&lt;a.+&gt;(.*?)&lt;/a&gt;)#i', $content, $result ) )
+	{
+		$tags = $result[0];
+	}
+
+	return $tags;
+}
+
+
+/**
+ * Add class to an html tag
+ *
+ * @param string HTML content
+ * @param string Class to add to the tag in the HTML
+ * @param integer Number of tags to add the class to
+ * @return string HTML content with the added class
+ */
+function add_tag_class( $content, $class, $limit = 1 )
+{
+	// Check if there's an opening tag
+	if( preg_match( '/<.*>/i', $content ) )
+	{
+		// Check if class attribute is already defined
+		if( preg_match( '/\sclass\s*=/i', $content) )
+		{ // Insert class
+			$content = preg_replace( '/(<.*)(class\s*=\s*")(.*)"/i', '$1$2$3 '.$class.'"', $content, $limit );
+		}
+		else
+		{
+			$content = preg_replace( '/>/i', ' class="'.$class.'"$1>', $content, $limit );
+		}
+	}
+
+	return $content;
 }
 
 
@@ -2271,9 +2409,9 @@ function pre_dump( $var__var__var__var__ )
 	{ // xdebug already does fancy displaying:
 
 		// no limits:
-		$old_var_display_max_children = ini_set('xdebug.var_display_max_children', -1); // default: 128
-		$old_var_display_max_data = ini_set('xdebug.var_display_max_data', -1); // max string length; default: 512
-		$old_var_display_max_depth = ini_set('xdebug.var_display_max_depth', -1); // default: 3
+		$old_var_display_max_children = @ini_set('xdebug.var_display_max_children', -1); // default: 128
+		$old_var_display_max_data = @ini_set('xdebug.var_display_max_data', -1); // max string length; default: 512
+		$old_var_display_max_depth = @ini_set('xdebug.var_display_max_depth', -1); // default: 3
 
 		echo "\n<div style=\"padding:1ex;border:1px solid #00f;\">\n";
 		foreach( func_get_args() as $lvar )
@@ -2289,13 +2427,13 @@ function pre_dump( $var__var__var__var__ )
 		echo '</div>';
 
 		// restore xdebug settings:
-		ini_set('xdebug.var_display_max_children', $old_var_display_max_children);
-		ini_set('xdebug.var_display_max_data', $old_var_display_max_data);
-		ini_set('xdebug.var_display_max_depth', $old_var_display_max_depth);
+		@ini_set('xdebug.var_display_max_children', $old_var_display_max_children);
+		@ini_set('xdebug.var_display_max_data', $old_var_display_max_data);
+		@ini_set('xdebug.var_display_max_depth', $old_var_display_max_depth);
 	}
 	else
 	{
-		$orig_html_errors = ini_set('html_errors', 0); // e.g. xdebug would use fancy html, if this is on; we catch (and use) xdebug explicitly above, but just in case
+		$orig_html_errors = @ini_set('html_errors', 0); // e.g. xdebug would use fancy html, if this is on; we catch (and use) xdebug explicitly above, but just in case
 
 		echo "\n<pre style=\"padding:1ex;border:1px solid #00f;overflow:auto\">\n";
 		foreach( func_get_args() as $lvar )
@@ -2313,7 +2451,7 @@ function pre_dump( $var__var__var__var__ )
 			}
 		}
 		echo "</pre>\n";
-		ini_set('html_errors', $orig_html_errors);
+		@ini_set('html_errors', $orig_html_errors);
 	}
 	evo_flush();
 	return true;
@@ -2800,7 +2938,9 @@ function debug_info( $force = false, $force_clean = false )
 		if( stripos($header, 'content-type:') !== false )
 		{ // content type sent
 			# "Content-Type:text/html;charset=utf-8" => "text/html"
-			$content_type = trim(array_shift(explode(';', array_pop(explode(':', $header, 2)))));
+			$content_type = explode( ':', $header, 2 );
+			$content_type = explode( ';', array_pop( $content_type ) );
+			$content_type = trim( array_shift( $content_type ) );
 			break;
 		}
 	}
@@ -3070,7 +3210,12 @@ function debug_info( $force = false, $force_clean = false )
 		echo '<div class="log_container"><div>';
 		echo 'Opcode cache: '.get_active_opcode_cache();
 		echo $clean ? "\n" : '<p>';
+
+		// ================================ User caching ================================
+		echo 'User cache: '.get_active_user_cache();
+		echo $clean ? "\n" : '<p>';
 		echo '</div></div>';
+
 
 		// ================================ Memory Usage ================================
 		echo '<div class="log_container"><div>';
@@ -4395,7 +4540,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					}
 					if( isset( $icon['size-'.$icon_param_name][1] ) )
 					{ // Height
-						$styles['width'] = 'height:'.$icon['size-'.$icon_param_name][1].'px';
+						$styles['height'] = 'height:'.$icon['size-'.$icon_param_name][1].'px';
 					}
 				}
 
@@ -5054,6 +5199,68 @@ function get_field_attribs_as_string( $field_attribs, $format_to_output = true )
 
 
 /**
+ * Update values of HTML tag attributes
+ *
+ * @param string HTML tag
+ * @param array Attributes
+ * @param array Actions for each attribute:
+ *              'append'  - Append to existing attribute value (Default for all)
+ *              'skip'    - Skip if attribute already exists
+ *              'replace' - Replace attribute to new value completely
+ * @return string Updated HTML tag
+ */
+function update_html_tag_attribs( $html_tag, $new_attribs, $attrib_actions = array() )
+{
+	if( ! preg_match( '#^<([\S]+)[^>]*>$#i', $html_tag, $tag_match ) )
+	{	// Wrong HTML tag format, Return original string:
+		return $html_tag;
+	}
+
+	$html_tag_name = $tag_match[1];
+
+	$old_attribs = array();
+	$updated_attribs = array();
+	if( preg_match_all( '@(\S+)=("|\'|)(.*)("|\'|>)@isU', $html_tag, $attr_matches ) )
+	{	// Get all existing attributes:
+		foreach( $attr_matches[1] as $o => $old_attr_name )
+		{
+			$old_attribs[ $old_attr_name ] = $attr_matches[3][ $o ];
+			if( ! isset( $new_attribs[ $old_attr_name ] ) )
+			{	// This attribute is not updated, keep current value:
+				$updated_attribs[] = $old_attr_name.'="'.format_to_output( $attr_matches[3][ $o ], 'formvalue' ).'"';
+			}
+		}
+	}
+
+	foreach( $new_attribs as $new_attrib_name => $new_attrib_value )
+	{
+		if( isset( $old_attribs[ $new_attrib_name ] ) )
+		{	// If attribute exists in original HTML tag then Update it depending on selected action:
+			$attrib_action = isset( $attrib_actions[ $new_attrib_name ] ) ? $attrib_actions[ $new_attrib_name ] : 'append';
+			switch( $attrib_action )
+			{
+				case 'skip':
+					// Don't update old value:
+					$new_attrib_value = $old_attribs[ $new_attrib_name ];
+					break;
+
+				case 'append':
+				default:
+					// Append new value to old:
+					$new_attrib_value = $old_attribs[ $new_attrib_name ].' '.$new_attrib_value;
+					break;
+			}
+		}
+		// ELSE If attribute doesn't exist in original HTML tag then create new one.
+
+		$updated_attribs[] = $new_attrib_name.'="'.format_to_output( $new_attrib_value, 'formvalue' ).'"';
+	}
+
+	return '<'.$html_tag_name.' '.implode( ' ', $updated_attribs ).'>';
+}
+
+
+/**
  * Is the current page an install page?
  *
  * @return boolean
@@ -5443,8 +5650,12 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 			}
 			foreach( $param_list as $param )
 			{	// add each parameter to the output
-				if( !is_numeric( $param ) )
-				{	// this is a string, quote it
+				if( is_array( $param ) )
+				{	// This is an array:
+					$param = json_encode( $param );
+				}
+				elseif( !is_numeric( $param ) )
+				{	// this is a string, quote it:
 					$param = '\''.format_to_js( $param ).'\'';
 				}
 				$params[] = $param;// add param to the list
@@ -5456,14 +5667,20 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 
 	if( $send_as_html )
 	{	// we want to send as a html document
-		headers_content_mightcache( 'text/html', 0 );		// Do NOT cache interactive communications.
+		if( ! headers_sent() )
+		{	// Send headers only when they are not send yet to avoid an error:
+			headers_content_mightcache( 'text/html', 0 );		// Do NOT cache interactive communications.
+		}
 		echo '<html><head></head><body><script type="text/javascript">'."\n";
 		echo $output;
 		echo '</script></body></html>';
 	}
 	else
 	{	// we want to send as js
-		headers_content_mightcache( 'text/javascript', 0 );		// Do NOT cache interactive communications.
+		if( ! headers_sent() )
+		{	// Send headers only when they are not send yet to avoid an error:
+			headers_content_mightcache( 'text/javascript', 0 );		// Do NOT cache interactive communications.
+		}
 		echo $output;
 	}
 
@@ -5587,18 +5804,24 @@ function array_to_option_list( $array, $default = '', $allow_none = array() )
  * @param boolean success (by reference)
  * @return mixed True in case of success, false in case of failure. NULL, if no backend is available.
  */
-function get_from_mem_cache($key, & $success )
+function get_from_mem_cache( $key, & $success )
 {
 	global $Timer;
 
-	$Timer->resume('get_from_mem_cache', false);
+	$Timer->resume( 'get_from_mem_cache', false );
 
-	if( function_exists('apc_fetch') )
+	if( function_exists( 'apc_fetch' ) )
+	{	// APC
 		$r = apc_fetch( $key, $success );
-	elseif( function_exists('xcache_get') && ini_get('xcache.var_size') > 0 )
-		$r = xcache_get($key);
-	elseif( function_exists('eaccelerator_get') )
-		$r = eaccelerator_get($key);
+	}
+	elseif( function_exists( 'xcache_get' ) && ini_get( 'xcache.var_size' ) > 0 )
+	{	// XCache
+		$r = xcache_get( $key );
+	}
+	elseif( function_exists( 'apcu_fetch' ) )
+	{	// APCu
+		$r = apcu_fetch( $key, $success );
+	}
 
 	if( ! isset($success) )
 	{ // set $success for implementation that do not set it itself (only APC does so)
@@ -5609,10 +5832,11 @@ function get_from_mem_cache($key, & $success )
 		$r = NULL;
 
 		global $Debuglog;
-		$Debuglog->add('No caching backend available for reading "'.$key.'".', 'cache');
+		$Debuglog->add( 'No caching backend available for reading "'.$key.'".', 'cache' );
 	}
 
-	$Timer->pause('get_from_mem_cache', false);
+	$Timer->pause( 'get_from_mem_cache', false );
+
 	return $r;
 }
 
@@ -5628,25 +5852,32 @@ function get_from_mem_cache($key, & $success )
  * @param int Time to live (seconds). Default is 0 and means "forever".
  * @return mixed
  */
-function set_to_mem_cache($key, $payload, $ttl = 0)
+function set_to_mem_cache( $key, $payload, $ttl = 0 )
 {
 	global $Timer;
 
-	$Timer->resume('set_to_mem_cache', false);
+	$Timer->resume( 'set_to_mem_cache', false );
 
-	if( function_exists('apc_store') )
+	if( function_exists( 'apc_store' ) )
+	{	// APC
 		$r = apc_store( $key, $payload, $ttl );
-	elseif( function_exists('xcache_set') && ini_get('xcache.var_size') > 0 )
+	}
+	elseif( function_exists( 'xcache_set' ) && ini_get( 'xcache.var_size' ) > 0 )
+	{	// XCache
 		$r = xcache_set( $key, $payload, $ttl );
-	elseif( function_exists('eaccelerator_put') )
-		$r = eaccelerator_put( $key, $payload, $ttl );
-	else {
+	}
+	elseif( function_exists( 'apcu_store' ) )
+	{	// APCu
+		$r = apcu_store( $key, $payload, $ttl );
+	}
+	else
+	{	// No available cache module:
 		global $Debuglog;
-		$Debuglog->add('No caching backend available for writing "'.$key.'".', 'cache');
+		$Debuglog->add( 'No caching backend available for writing "'.$key.'".', 'cache' );
 		$r = NULL;
 	}
 
-	$Timer->pause('set_to_mem_cache', false);
+	$Timer->pause( 'set_to_mem_cache', false );
 
 	return $r;
 }
@@ -5658,16 +5889,22 @@ function set_to_mem_cache($key, $payload, $ttl = 0)
  * @param string key
  * @return boolean True on success, false on failure. NULL if no backend available.
  */
-function unset_from_mem_cache($key)
+function unset_from_mem_cache( $key )
 {
-	if( function_exists('apc_delete') )
+	if( function_exists( 'apc_delete' ) )
+	{	// APC
 		return apc_delete( $key );
+	}
 
-	if( function_exists('xcache_unset') )
-		return xcache_unset(gen_key_for_cache($key));
+	if( function_exists( 'xcache_unset' ) )
+	{	// XCache
+		return xcache_unset( gen_key_for_cache( $key ) );
+	}
 
-	if( function_exists('eaccelerator_rm') )
-		return eaccelerator_rm(gen_key_for_cache($key));
+	if( function_exists( 'apcu_delete' ) )
+	{	// APCu
+		return apcu_delete( $key );
+	}
 }
 
 
@@ -5777,6 +6014,43 @@ function get_active_opcode_cache()
 		{
 			return 'eAccelerator';
 		}
+	}
+
+	if( ini_get( 'opcache.enable' ) )
+	{
+		return 'OPCache';
+	}
+
+	if( function_exists( 'apcu_cache_info' ) && ini_get( 'apc.enabled' ) )
+	{
+		return 'APCu';
+	}
+
+	return 'none';
+}
+
+
+/**
+ * Get name of active user cache, or "none".
+ * {@internal Anyone using something else, please extend.}}
+ * @return string
+ */
+function get_active_user_cache()
+{
+	if( function_exists( 'apc_cache_info' ) && ini_get( 'apc.enabled' ) )
+	{
+		return 'APC';
+	}
+
+	if( function_exists( 'apcu_cache_info' ) && ini_get( 'apc.enabled' ) )
+	{
+		return 'APCu';
+	}
+
+	// xcache: xcache.var_size must be > 0. xcache_set is not necessary (might have been disabled).
+	if( ini_get('xcache.size') > 0 )
+	{
+		return 'xcache';
 	}
 
 	return 'none';
@@ -6409,6 +6683,26 @@ function ip2int( $ip )
 
 
 /**
+ * Check if URL has a domain in IP format
+ *
+ * @param string URL
+ * @return boolean
+ */
+function is_ip_url_domain( $url )
+{
+	$url_data = parse_url( $url );
+
+	if( $url_data === false || ! isset( $url_data['host'] ) )
+	{	// Wrong url:
+		return false;
+	}
+
+	// Check if host is IP address:
+	return is_valid_ip_format( $url_data['host'] );
+}
+
+
+/**
  * Provide array_combine for older versions of PHP (< 5.0.0)
  *
  * Creates an array by using one array for keys and another for its values
@@ -6994,7 +7288,7 @@ function evo_error_handler()
 		$evo_last_handled_error = $error;
 	}
 
-	// fp> WTF?!? and what about warnings? 
+	// fp> WTF?!? and what about warnings?
 	// fp> And where do we die()? why is there not a debug_die() here?
 	// There should be ONE MILLION COMMENTS in this function to explain what we do!
 
@@ -7192,7 +7486,7 @@ function save_fieldset_folding_values( $blog_ID = NULL )
 
 /**
  * Get html code of bootstrap dropdown element
- * 
+ *
  * @param array Params
  */
 function get_status_dropdown_button( $params = array() )
@@ -7395,8 +7689,8 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
 
 /**
  * Compares two "PHP-standardized" version number strings
- * 
- * @param string First version number
+ *
+ * @param string First version number, Use 'current' for global $app_version
  * @param string Second version number
  * @param string If the third optional operator argument is specified, test for a particular relationship.
  *               The possible operators are: <, lt, <=, le, >, gt, >=, ge, ==, =, eq, !=, <>, ne respectively.
@@ -7406,15 +7700,22 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
  */
 function evo_version_compare( $version1, $version2, $operator = NULL )
 {
-	// Remove part after "-" from versions like "6.6.6-stable":
-	$version1 = preg_replace( '/(-.+)?/', '', $version1 );
+	if( $version1 === 'current' )
+	{	// Use current version of application:
+		global $app_version;
+		$version1 = $app_version;
+	}
+
+	// Remove "stable" suffix to compare such versions as upper than "alpha", "beta" and etc.:
+	$version1 = str_replace( '-stable', '', $version1 );
+	$version2 = str_replace( '-stable', '', $version2 );
 
 	if( is_null( $operator ) )
-	{	// To return integer
+	{	// To return integer:
 		return version_compare( $version1, $version2 );
 	}
 	else
-	{ // To return boolean
+	{	// To return boolean:
 		return version_compare( $version1, $version2, $operator );
 	}
 }
@@ -7442,7 +7743,7 @@ function get_install_format_text( $text, $format = 'string' )
 	// Remove all new lines because we build them from requested format:
 	$text = str_replace( array( "\n", "\r" ), '', $text );
 
-	// Keep all URLs and display them 
+	// Keep all URLs and display them
 	$text = preg_replace( '/<a[^>]+href="([^"]+)"[^>]*>(.+)<\/a>/i', '$2(URL: $1)', $text );
 
 	// Remove HTML tags from text:

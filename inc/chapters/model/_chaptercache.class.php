@@ -81,7 +81,7 @@ class ChapterCache extends DataObjectCache
 	/**
 	 * Empty/reset the cache
 	 */
-	function clear()
+	function clear( $keep_shadow = false )
 	{
 		$this->subset_cache = array();
 		$this->loaded_subsets = array();
@@ -91,7 +91,7 @@ class ChapterCache extends DataObjectCache
 		$this->revealed_subsets = array();
 		$this->sorted_flags = array();
 		$this->urlname_index = array();
-		parent::clear();
+		parent::clear( $keep_shadow );
 	}
 
 

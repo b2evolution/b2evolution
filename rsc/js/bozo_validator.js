@@ -66,7 +66,7 @@ var bozo = {
 	{	// Get the target element
 		var target = bozo.findTarget( e );
 		// Update changes number for his parent form
-		bozo.tab_changes[ get_form( target ).id ]++;
+		bozo.tab_changes[ jQuery( target ).closest( 'form' ).attr( 'id' ) ]++;
 		// Update Total changes number
 		bozo.nb_changes++;
 	},
@@ -101,7 +101,7 @@ var bozo = {
 			// Loop on the forms changes array
 			for( i in bozo.tab_changes )
 			{
-				if ( ( i != get_form( target ).id ) && bozo.tab_changes[i] )
+				if ( ( i != jQuery( target ).closest( 'form' ).attr( 'id' ) ) && bozo.tab_changes[i] )
 				{	// Another form contains input changes
 					other_form_changes++;
 				}

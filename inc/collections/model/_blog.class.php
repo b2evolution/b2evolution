@@ -122,9 +122,9 @@ class Blog extends DataObject
 	var $type;
 
 	/**
-	 * @var boolean TRUE if blog is favorite
+	 * @var array Data of moderators which must be notified about new/edited comments
 	 */
-	var $favorite = 1;
+	var $comment_moderator_user_data;
 
 
 	/**
@@ -180,7 +180,6 @@ class Blog extends DataObject
 			$this->media_url = $db_row->blog_media_url;
 			$this->type = isset( $db_row->blog_type ) ? $db_row->blog_type : 'std';
 			$this->order = isset( $db_row->blog_order ) ? $db_row->blog_order : 0;
-			$this->favorite = isset( $db_row->blog_favorite ) ? $db_row->blog_favorite : 0;
 		}
 
 		$Timer->pause( 'Blog constructor' );
@@ -195,6 +194,7 @@ class Blog extends DataObject
 	static function get_delete_cascades()
 	{
 		return array(
+				array( 'table'=>'T_coll_user_favs', 'fk'=>'cufv_blog_ID', 'msg'=>T_('%d user favorites') ),
 				array( 'table'=>'T_coll_settings', 'fk'=>'cset_coll_ID', 'msg'=>T_('%d blog settings') ),
 				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user permission definitions') ),
 				array( 'table'=>'T_coll_group_perms', 'fk'=>'bloggroup_blog_ID', 'msg'=>T_('%d group permission definitions') ),
@@ -414,7 +414,43 @@ class Blog extends DataObject
 
 			// Collection permissions:
 			$this->set( 'advanced_perms', param( 'advanced_perms', 'integer', 0 ) );
+			$prev_allow_access = $this->get_setting( 'allow_access' );
 			$this->set_setting( 'allow_access', param( 'blog_allow_access', 'string', '' ) );
+			if( $prev_allow_access != $this->get_setting( 'allow_access' ) )
+			{	// If setting "Allow access to" is changed to:
+				switch( $this->get_setting( 'allow_access' ) )
+				{	// Automatically enable/disable moderation statuses:
+					case 'public':
+						// Enable "Community" and "Members":
+						$enable_moderation_statuses = array( 'community', 'protected' );
+						break;
+					case 'users':
+						// Disable "Community" and Enable "Members":
+						$disable_moderation_statuses = array( 'community' );
+						$enable_moderation_statuses = array( 'protected' );
+						break;
+					case 'members':
+						// Disable "Community" and "Members":
+						$disable_moderation_statuses = array( 'community', 'protected' );
+						break;
+				}
+				$post_moderation_statuses = $this->get_setting( 'post_moderation_statuses' );
+				$post_moderation_statuses = empty( $post_moderation_statuses ) ? array() : explode( ',', $post_moderation_statuses );
+				$comment_moderation_statuses = $this->get_setting( 'moderation_statuses' );
+				$comment_moderation_statuses = empty( $comment_moderation_statuses ) ? array() : explode( ',', $comment_moderation_statuses );
+				if( ! empty( $disable_moderation_statuses ) )
+				{	// Disable moderation statuses:
+					$post_moderation_statuses = array_diff( $post_moderation_statuses, $disable_moderation_statuses );
+					$comment_moderation_statuses = array_diff( $comment_moderation_statuses, $disable_moderation_statuses );
+				}
+				if( ! empty( $enable_moderation_statuses ) )
+				{	// Enable moderation statuses:
+					$post_moderation_statuses = array_unique( array_merge( $enable_moderation_statuses, $post_moderation_statuses ) );
+					$comment_moderation_statuses = array_unique( array_merge( $enable_moderation_statuses, $comment_moderation_statuses ) );
+				}
+				$this->set_setting( 'post_moderation_statuses', implode( ',', $post_moderation_statuses ) );
+				$this->set_setting( 'moderation_statuses', implode( ',', $comment_moderation_statuses ) );
+			}
 			if( $this->get_setting( 'allow_access' ) == 'users' || $this->get_setting( 'allow_access' ) == 'members' )
 			{ // Disable site maps, feeds and ping plugins when access is restricted on this blog
 				$this->set_setting( 'enable_sitemaps', 0 );
@@ -425,13 +461,16 @@ class Blog extends DataObject
 			// Lists of collections:
 			$this->set( 'order', param( 'blog_order', 'integer' ) );
 			$this->set( 'in_bloglist', param( 'blog_in_bloglist', 'string', 'public' ) );
-			$this->set( 'favorite',  param( 'favorite', 'integer', 0 ) );
 		}
 
 		if( param( 'archive_links', 'string', NULL ) !== NULL )
 		{ // Archive link type:
 			$this->set_setting( 'archive_links', get_param( 'archive_links' ) );
-			$this->set_setting( 'archive_posts_per_page', param( 'archive_posts_per_page', 'integer', NULL ), true );
+		}
+
+		if( param( 'archive_posts_per_page', 'integer', NULL ) !== NULL )
+		{	// Archive posts per page:
+			$this->set_setting( 'archive_posts_per_page', get_param( 'archive_posts_per_page' ) );
 		}
 
 		if( param( 'chapter_links', 'string', NULL ) !== NULL )
@@ -653,7 +692,7 @@ class Blog extends DataObject
 		}
 
 		if( in_array( 'features', $groups ) )
-		{ // we want to load the workflow checkboxes:
+		{ // we want to load the posts related features:
 			$this->set_setting( 'enable_goto_blog', param( 'enable_goto_blog', 'string', NULL ) );
 
 			$this->set_setting( 'editing_goto_blog', param( 'editing_goto_blog', 'string', NULL ) );
@@ -672,6 +711,9 @@ class Blog extends DataObject
 
 			$this->set_setting( 'orderby', param( 'orderby', 'string', true ) );
 			$this->set_setting( 'orderdir', param( 'orderdir', 'string', true ) );
+
+			$disp_featured_above_list = param( 'disp_featured_above_list', 'integer', 0 );
+			$this->set_setting( 'disp_featured_above_list', $disp_featured_above_list );
 
 			// Front office statuses
 			$this->load_inskin_statuses( 'post' );
@@ -738,6 +780,8 @@ class Blog extends DataObject
 			$this->set_setting( 'userdir_phone', param( 'userdir_phone', 'integer', 0 ) );
 			$this->set_setting( 'userdir_soclinks', param( 'userdir_soclinks', 'integer', 0 ) );
 			$this->set_setting( 'userdir_lastseen', param( 'userdir_lastseen', 'integer', 0 ) );
+			$this->set_setting( 'userdir_lastseen_view', param( 'userdir_lastseen_view', 'string' ) );
+			$this->set_setting( 'userdir_lastseen_cheat', param( 'userdir_lastseen_cheat', 'integer', 0 ) );
 		}
 
 		if( in_array( 'other', $groups ) )
@@ -1093,7 +1137,7 @@ class Blog extends DataObject
 								if( $error = validate_dirname($subdir) )
 								{
 									param_error( 'blog_media_subdir', T_('Media dir location').': '.$error );
-									syslog_insert( sprintf( 'Invalid name is detected for folder %s', '<b>'.$subdir.'</b>' ), 'warning', 'file' );
+									syslog_insert( sprintf( 'Invalid name is detected for folder %s', '[['.$subdir.']]' ), 'warning', 'file' );
 								}
 							}
 						}
@@ -1172,6 +1216,58 @@ class Blog extends DataObject
 
 
 	/**
+	 * Set favorite status of current_user
+	 *
+	 * @param integer User ID, leave empty for current user
+	 * @param integer Setting, leave empty to get favorite status
+	 * @return mixed Current favorite status or if set, True if the setting was changed  else false, NULL if unable to process
+	 */
+	function favorite( $user_ID = NULL, $setting = NULL )
+	{
+		global $DB, $current_User;
+
+		if( is_null( $user_ID ) && $current_User )
+		{
+			if( $current_User )
+			{
+				$user_ID = $current_User->ID;
+			}
+			else
+			{
+				return NULL;
+			}
+		}
+
+		if( $this->ID && $user_ID )
+		{
+			if( is_null( $setting ) )
+			{ // just return current favorite status
+				$fav_SQL = new SQL();
+				$fav_SQL->SELECT( 'COUNT(*)' );
+				$fav_SQL->FROM( 'T_coll_user_favs' );
+				$fav_SQL->WHERE( 'cufv_blog_ID = '.$DB->quote( $this->ID ) );
+				$fav_SQL->WHERE_and( 'cufv_user_ID = '.$DB->quote( $user_ID ) );
+
+				return $DB->get_var( $fav_SQL->get() );
+			}
+
+			if( $setting == 1 )
+			{
+				return $DB->query( 'REPLACE INTO T_coll_user_favs ( cufv_user_ID, cufv_blog_ID ) VALUES ( '.$user_ID.', '.$this->ID.' )' );
+			}
+			else
+			{
+				return $DB->query( 'DELETE FROM T_coll_user_favs WHERE cufv_user_ID = '.$user_ID.' AND cufv_blog_ID = '.$this->ID );
+			}
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+
+
+	/**
 	 * Set param value
 	 *
 	 * @param string Parameter name
@@ -1205,7 +1301,7 @@ class Blog extends DataObject
 	{
 		global $baseurl, $basedomain, $Settings;
 
-		switch( $this->access_type )
+		switch( $this->get( 'access_type' ) )
 		{
 			case 'baseurl':
 			case 'default':
@@ -1214,7 +1310,7 @@ class Blog extends DataObject
 					|| preg_match( '#^https?://#', $this->siteurl ) )
 				{ // Safety check! We only do that kind of linking if this is really the default blog...
 					// or if we call by absolute URL
-					if( $this->access_type == 'default' )
+					if( $this->get( 'access_type' ) == 'default' )
 					{
 						return $baseurl.$this->siteurl.'index.php';
 					}
@@ -1247,7 +1343,7 @@ class Blog extends DataObject
 				return $this->siteurl;
 
 			default:
-				debug_die( 'Unhandled Blog access type ['.$this->access_type.']' );
+				debug_die( 'Unhandled Blog access type ['.$this->get( 'access_type' ).']' );
 		}
 	}
 
@@ -1260,7 +1356,7 @@ class Blog extends DataObject
 	{
 		global $baseurl, $basedomain;
 
-		switch( $this->access_type )
+		switch( $this->get( 'access_type' ) )
 		{
 			case 'baseurl':
 				return $baseurl.$this->siteurl;
@@ -1289,7 +1385,7 @@ class Blog extends DataObject
 				break;
 
 			default:
-				debug_die( 'Unhandled Blog access type ['.$this->access_type.']' );
+				debug_die( 'Unhandled Blog access type ['.$this->get( 'access_type' ).']' );
 		}
 
 		if( substr( $url, -1 ) != '/' )
@@ -1987,6 +2083,14 @@ class Blog extends DataObject
 
 		switch( $parname )
 		{
+			case 'access_type':
+				$access_type_value = parent::get( $parname );
+				if( $access_type_value == 'subdom' && is_ip_url_domain( $baseurl ) )
+				{	// Don't allow subdomain for IP address:
+					$access_type_value = 'index.php';
+				}
+				return $access_type_value;
+
 			case 'blogurl':		// Deprecated
 			case 'link':  		// Deprecated
 			case 'url':
@@ -2177,7 +2281,6 @@ class Blog extends DataObject
 					return '';
 				}
 
-
 			default:
 				// All other params:
 				return parent::get( $parname );
@@ -2224,7 +2327,7 @@ class Blog extends DataObject
 		{
 			$warning = T_('ATTENTION: advanced <a href="%s">user</a> & <a href="%s">group</a> permissions are enabled and some logged in users may have less permissions than anonymous users.');
 			$advanced_perm_url = url_add_param( $admin_url, 'ctrl=coll_settings&amp;blog='.$this->ID.'&amp;tab=' );
-			return ' <span class="warning">'.sprintf( $warning, $advanced_perm_url.'perm', $advanced_perm_url.'permgroup' ).'</span>';
+			return ' <b class="warning text-danger">'.sprintf( $warning, $advanced_perm_url.'perm', $advanced_perm_url.'permgroup' ).'</b>';
 		}
 
 		return NULL;
@@ -2396,6 +2499,8 @@ class Blog extends DataObject
 
 	/**
 	 * Insert into the DB
+	 *
+	 * @return boolean Result
 	 */
 	function dbinsert()
 	{
@@ -2430,6 +2535,10 @@ class Blog extends DataObject
 
 		if( parent::dbinsert() )
 		{
+			// Reset "all_loaded" flag in order to allow getting new created collection by ID:
+			$BlogCache = & get_BlogCache();
+			$BlogCache->all_loaded = false;
+
 			if( $set_default_blog_ID )
 			{ // Use this blog as default because it is probably first created
 				$Settings->set( 'default_blog_ID', $this->ID );
@@ -2459,10 +2568,32 @@ class Blog extends DataObject
 			// Enable default item types for the inserted collection:
 			$this->enable_default_item_types();
 
+			// Owner automatically favorite the collection
+			$this->favorite( $this->owner_user_ID, 1 );
+
+			// All users automatically favorite the new blog if collection count < 5 and user count <= 10
+			load_funcs( 'tools/model/_system.funcs.php' );
+			$blog_count = count( system_get_blog_IDs( false ) );
+			$user_IDs = system_get_user_IDs();
+			$user_count = count( $user_IDs );
+			if( $blog_count < 5 && $user_count <= 10 )
+			{
+				foreach( $user_IDs as $id )
+				{
+					$this->favorite( $id, 1 );
+				}
+			}
+
 			$Plugins->trigger_event( 'AfterCollectionInsert', $params = array( 'Blog' => & $this ) );
+
+			$DB->commit();
+
+			return true;
 		}
 
-		$DB->commit();
+		$DB->rollback();
+
+		return false;
 	}
 
 
@@ -2490,7 +2621,7 @@ class Blog extends DataObject
 						WHERE blog_ID = '.$this->ID );
 			$Messages->add( sprintf(T_('The new blog has been associated with the stub file &laquo;%s&raquo;.'), $stub_filename ), 'success' );
 		}
-		elseif( $this->access_type == 'relative' )
+		elseif( $this->get( 'access_type' ) == 'relative' )
 		{ // Show error message only if stub file should exists!
 			$Messages->add( sprintf(T_('No stub file named &laquo;%s&raquo; was found. You must create it for the blog to function properly with the current settings.'), $stub_filename ), 'error' );
 		}
@@ -2560,6 +2691,155 @@ class Blog extends DataObject
 		// Commit changes in cache:
 		$BlogCache = & get_BlogCache();
 		$BlogCache->add( $this );
+	}
+
+
+	/**
+	 * Duplicate collection to new one
+	 *
+	 * @return boolean Result
+	 */
+	function duplicate()
+	{
+		global $DB;
+
+		$DB->begin();
+
+		// Remember ID of the duplicated collection and Reset it to allow create new one:
+		$duplicated_coll_ID = $this->ID;
+		$this->ID = 0;
+
+		// Get all fields of the duplicated collection:
+		$source_fields_SQL = new SQL( 'Get all fields of the duplicating collection #'.$duplicated_coll_ID );
+		$source_fields_SQL->SELECT( '*' );
+		$source_fields_SQL->FROM( 'T_blogs' );
+		$source_fields_SQL->WHERE( 'blog_ID = '.$DB->quote( $duplicated_coll_ID ) );
+		$source_fields = $DB->get_row( $source_fields_SQL->get(), ARRAY_A, NULL, $source_fields_SQL->title );
+		// Use field values of duplicated collection by default:
+		foreach( $source_fields as $source_field_name => $source_field_value )
+		{
+			// Cut prefix "blog_" of each field:
+			$source_field_name = substr( $source_field_name, 5 );
+			if( $source_field_name == 'ID' )
+			{	// Skip field ID:
+				continue;
+			}
+			if( isset( $this->$source_field_name ) )
+			{	// Unset current value in order to assing new below, especially to update this in array $this->dbchanges:
+				unset( $this->$source_field_name );
+			}
+			$this->set( $source_field_name, $source_field_value );
+		}
+
+		// Get all settings of the duplicated collection:
+		$source_settings_SQL = new SQL( 'Get all settings of the duplicating collection #'.$duplicated_coll_ID );
+		$source_settings_SQL->SELECT( 'cset_name, cset_value' );
+		$source_settings_SQL->FROM( 'T_coll_settings' );
+		$source_settings_SQL->WHERE( 'cset_coll_ID = '.$DB->quote( $duplicated_coll_ID ) );
+		$source_settings = $DB->get_assoc( $source_settings_SQL->get(), $source_settings_SQL->title );
+		// Use setting values of duplicated collection by default:
+		foreach( $source_settings as $source_setting_name => $source_setting_value )
+		{
+			$this->set_setting( $source_setting_name, $source_setting_value );
+		}
+
+		// Call this firstly to find all possible errors before inserting:
+		// Also to set new values from submitted form:
+		if( ! $this->load_from_Request() )
+		{	// Error on handle new values from form:
+			$this->ID = $duplicated_coll_ID;
+			$DB->rollback();
+			return false;
+		}
+
+		// Try insert new collection in DB:
+		if( ! $this->dbinsert() )
+		{	// Error on insert collection in DB:
+			$this->ID = $duplicated_coll_ID;
+			$DB->rollback();
+			return false;
+		}
+
+		// Initialize fields of collection permission tables which must be duplicated:
+		$coll_perm_fields = '{prefix}ismember, {prefix}can_be_assignee, {prefix}perm_poststatuses, {prefix}perm_item_type,
+				{prefix}perm_edit, {prefix}perm_delpost, {prefix}perm_edit_ts, {prefix}perm_delcmts,
+				{prefix}perm_recycle_owncmts, {prefix}perm_vote_spam_cmts, {prefix}perm_cmtstatuses,
+				{prefix}perm_edit_cmt, {prefix}perm_meta_comment, {prefix}perm_cats, {prefix}perm_properties,
+				{prefix}perm_admin, {prefix}perm_media_upload, {prefix}perm_media_browse, {prefix}perm_media_change';
+
+		// Copy all permissions "collection per user" from duplicated collection to new created:
+		$coll_user_perm_fields = 'bloguser_user_ID, '.str_replace( '{prefix}', 'bloguser_', $coll_perm_fields );
+		$DB->query( 'INSERT INTO T_coll_user_perms
+			  ( bloguser_blog_ID, '.$coll_user_perm_fields.' )
+			SELECT '.$this->ID.', '.$coll_user_perm_fields.'
+			  FROM T_coll_user_perms
+			 WHERE bloguser_blog_ID = '.$DB->quote( $duplicated_coll_ID ),
+			'Duplicate all coll-user permissions from collection #'.$duplicated_coll_ID.' to #'.$this->ID );
+
+		// Copy all permissions "collection per group" from duplicated collection to new created:
+		$coll_group_perm_fields = 'bloggroup_group_ID, '.str_replace( '{prefix}', 'bloggroup_', $coll_perm_fields );
+		$DB->query( 'INSERT INTO T_coll_group_perms
+			 ( bloggroup_blog_ID, '.$coll_group_perm_fields.' )
+			SELECT '.$this->ID.', '.$coll_group_perm_fields.'
+			  FROM T_coll_group_perms
+			 WHERE bloggroup_blog_ID = '.$DB->quote( $duplicated_coll_ID ),
+			'Duplicate all coll-group permissions from collection #'.$duplicated_coll_ID.' to #'.$this->ID );
+
+		// Copy all widgets from duplicated collection to new created:
+		$DB->query( 'INSERT INTO T_widget
+			        ( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params )
+			SELECT '.$this->ID.', wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params
+			  FROM T_widget
+			 WHERE wi_coll_ID = '.$DB->quote( $duplicated_coll_ID ),
+			'Duplicate all widgets from collection #'.$duplicated_coll_ID.' to #'.$this->ID );
+
+		// Copy all categories from duplicated collection to new created:
+		$source_cats_SQL = new SQL( 'Get all categories of the duplicating collection #'.$duplicated_coll_ID );
+		$source_cats_SQL->SELECT( '*' );
+		$source_cats_SQL->FROM( 'T_categories' );
+		$source_cats_SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $duplicated_coll_ID ) );
+		$source_cats = $DB->get_results( $source_cats_SQL->get(), ARRAY_A, $source_cats_SQL->title );
+		$new_cats = array(); // Store all new created categories with key as ID of copied category in order to correct assign parent IDs
+		$ChapterCache = & get_ChapterCache();
+		foreach( $source_cats as $source_cat_fields )
+		{	// Copy each category separately because of uniwue field "cat_urlname":
+			$new_Chapter = & $ChapterCache->new_obj( NULL, $this->ID );
+			foreach( $source_cat_fields as $source_cat_field_name => $source_cat_field_value )
+			{
+				// Cut prefix "cat_" of each field:
+				$source_cat_field_name = substr( $source_cat_field_name, 4 );
+				if( $source_cat_field_name == 'ID' || $source_cat_field_name == 'blog_ID' )
+				{	// Skip these fields, they must be new:
+					continue;
+				}
+				$new_Chapter->set( $source_cat_field_name, $source_cat_field_value );
+			}
+			// Insert the duplicated category:
+			if( $new_Chapter->dbinsert() )
+			{	// If category has been inserted successfully, then update IDs for correct parent hierarchy:
+				// Key - ID of copied category, Value - new created category:
+				$new_cats[ $source_cat_fields['cat_ID'] ] = $new_Chapter;
+			}
+		}
+		foreach( $new_cats as $duplicated_cat_ID => $new_Chapter )
+		{	// Update wrong parent IDs to IDs of new created categories:
+			$old_cat_parent_ID = intval( $new_Chapter->get( 'parent_ID' ) );
+			if( $old_cat_parent_ID > 0 && isset( $new_cats[ $old_cat_parent_ID ] ) )
+			{
+				$new_parent_Chapter = $new_cats[ $old_cat_parent_ID ];
+				$new_Chapter->set( 'parent_ID', $new_parent_Chapter->ID );
+				$new_Chapter->dbupdate();
+			}
+		}
+
+		// The duplicating is successful, So commit all above changes:
+		$DB->commit();
+
+		// Commit changes in cache:
+		$BlogCache = & get_BlogCache();
+		$BlogCache->add( $this );
+
+		return true;
 	}
 
 
@@ -2638,7 +2918,7 @@ class Blog extends DataObject
 				'perm_delcmts'         => 0,
 				'perm_recycle_owncmts' => 0,
 				'perm_vote_spam_cmts'  => 1,
-				'perm_cmtstatuses'     => '',
+				'perm_cmtstatuses'     => $this->get_setting( 'new_feedback_status' ),
 				'perm_edit_cmt'        => 'no',
 				'perm_meta_comment'    => 1,
 				'perm_cats'            => 0,
@@ -2729,7 +3009,7 @@ class Blog extends DataObject
 				'perm_delcmts'         => 0,
 				'perm_recycle_owncmts' => 0,
 				'perm_vote_spam_cmts'  => 0,
-				'perm_cmtstatuses'     => '',
+				'perm_cmtstatuses'     => $this->get_setting( 'new_feedback_status' ),
 				'perm_edit_cmt'        => 'no',
 				'perm_meta_comment'    => 0,
 				'perm_cats'            => 0,
@@ -2793,6 +3073,12 @@ class Blog extends DataObject
 		global $DB, $Plugins, $servertimenow;
 
 		$DB->begin();
+
+		// Favorite blog by new owner
+		if( isset( $this->dbchanges['blog_owner_user_ID'] ) )
+		{
+			$this->favorite( $this->owner_user_ID, 1 );
+		}
 
 		parent::dbupdate();
 
@@ -3501,6 +3787,35 @@ class Blog extends DataObject
 
 
 	/**
+	 * Has current user an access to this collection depending on settings
+	 *
+	 * @return boolean TRUE on success
+	 */
+	function has_access()
+	{
+		global $current_User;
+
+		$allow_access = $this->get_setting( 'allow_access' );
+
+		if( $allow_access == 'public' )
+		{	// Everyone has an access to this collection:
+			return true;
+		}
+
+		if( ! is_logged_in() )
+		{	// Only logged in users have an access to this collection:
+			return false;
+		}
+		elseif( $allow_access == 'members' && ! $current_User->check_perm( 'blog_ismember', 'view', false, $this->ID ) )
+		{	// Current user must be a member of this collection:
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
 	 * Check if current user has access to this blog depending on settings
 	 *
 	 * @return boolean TRUE on success
@@ -3857,6 +4172,57 @@ class Blog extends DataObject
 		{	// Insert records to enable the default item types for this collection:
 			$DB->query( $insert_sql );
 		}
+	}
+
+
+	/**
+	 * Get first Item in Main List on disp=posts
+	 *
+	 * @return object Item
+	 */
+	function & get_first_mainlist_Item()
+	{
+		$ItemList2 = new ItemList2( $this, $this->get_timestamp_min(), $this->get_timestamp_max(), 1, 'ItemCache', 'first', 'first' );
+
+		// Set additional debug info prefix for SQL queries to know what code executes it:
+		$ItemList2->query_title_prefix = 'Blog->get_first_mainlist_Item()';
+
+		// Run the query:
+		$ItemList2->query();
+
+		// Get the expected Item:
+		$first_mainlist_Item = & $ItemList2->get_item();
+
+		return $first_mainlist_Item;
+	}
+
+
+	/**
+	 * Get data of moderators which must be notified about new/edited comment
+	 *
+	 * @return array Array where each row is array with keys: user_email, user_ID, notify_comment_moderation, notify_edit_cmt_moderation
+	 */
+	function get_comment_moderator_user_data()
+	{
+		if( ! isset( $this->comment_moderator_user_data ) )
+		{	// Get it from DB only first time and then cache in array:
+			global $DB;
+
+			$SQL = new SQL( 'Get list of moderators to notify about new/edited comment of collection #'.$this->ID );
+			$SQL->SELECT( 'DISTINCT user_email, user_ID, s1.uset_value as notify_comment_moderation, s2.uset_value as notify_edit_cmt_moderation' );
+			$SQL->FROM( 'T_users' );
+			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings AS s1 ON s1.uset_user_ID = user_ID AND s1.uset_name = "notify_comment_moderation"' );
+			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings AS s2 ON s2.uset_user_ID = user_ID AND s2.uset_name = "notify_edit_cmt_moderation"' );
+			$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
+			$SQL->WHERE( 'LENGTH( TRIM( user_email ) ) > 0' );
+			$SQL->WHERE_and( '( grp_perm_blogs = "editall" )
+				OR ( user_ID IN ( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = '.$this->ID.' AND bloguser_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )
+				OR ( grp_ID IN ( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = '.$this->ID.' AND bloggroup_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )' );
+
+			$this->comment_moderator_user_data = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+		}
+
+		return $this->comment_moderator_user_data;
 	}
 }
 

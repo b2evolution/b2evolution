@@ -230,11 +230,18 @@ class Goal extends DataObject
 	/**
 	 * Check existence of specified goal in goal_key unique field.
 	 *
+	 * @param string Name of unique field  OR array of Names (for UNIQUE index with MULTIPLE fields)
+	 * @param mixed specified value        OR array of Values (for UNIQUE index with MULTIPLE fields)
 	 * @return int ID if goal exists otherwise NULL/false
 	 */
-	function dbexists()
+	function dbexists( $unique_fields = 'goal_key', $values = NULL )
 	{
-		return parent::dbexists('goal_key', $this->key);
+		if( is_null( $values ) )
+		{
+			$values = $this->key;
+		}
+
+		return parent::dbexists( $unique_fields, $values );
 	}
 
 

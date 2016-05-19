@@ -63,10 +63,36 @@ $Form->checkbox( 'userdir_city', $edited_Blog->get_setting( 'userdir_city' ), T_
 
 $Form->checkbox( 'userdir_phone', $edited_Blog->get_setting( 'userdir_phone' ), T_('Phone') );
 $Form->checkbox( 'userdir_soclinks', $edited_Blog->get_setting( 'userdir_soclinks' ), T_('Social links') );
-$Form->checkbox( 'userdir_lastseen', $edited_Blog->get_setting( 'userdir_lastseen' ), T_('Last seen date') );
+$Form->begin_line( T_('Last seen date'), 'userdir_lastseen' );
+	$Form->checkbox( 'userdir_lastseen', $edited_Blog->get_setting( 'userdir_lastseen' ), '' );
+	$Form->select_input_array( 'userdir_lastseen_view', $edited_Blog->get_setting( 'userdir_lastseen_view' ), array(
+			'exact_date' => T_('exact date'),
+			'blurred_date' => T_('blurred date')
+	), '', '', array( 'force_keys_as_values' => true ) );
+	$Form->text_input( 'userdir_lastseen_cheat', $edited_Blog->Get_setting( 'userdir_lastseen_cheat' ), 4, T_('Cheat by'), 'days' );
+$Form->end_line();
 
 $Form->end_fieldset();
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
-
 ?>
+<script>
+	var selLastSeenView = jQuery( 'select#userdir_lastseen_view' );
+	var selLastSeenCheat = jQuery( 'input#userdir_lastseen_cheat' );
+
+	var checkLastSeen = function()
+			{
+				if( selLastSeenView.val() == 'blurred_date' )
+				{
+					selLastSeenCheat.removeAttr( 'disabled' );
+				}
+				else
+				{
+					selLastSeenCheat.attr( 'disabled', 'disabled' );
+				}
+			};
+
+	selLastSeenView.on( 'change', checkLastSeen );
+
+	checkLastSeen();
+</script>

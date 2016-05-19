@@ -7,6 +7,8 @@
 <body>
 	<h1>b2evolution Automated Install/Upgrade</h1>
 	<p>Updated for version 6.6+</p>
+	<p>See <a href="http://b2evolution.net/man/automated-install">the online manual</a> for additional information.</p>
+
 	<h2>Purpose</h2>
 	<p>This document describes how you can most easily automate the installation of <a href="http://b2evolution.net/">b2evolution</a> on a hosting account.</p>
 	<p>This document also addresses automated upgrade of b2evolution.</p>
@@ -94,6 +96,17 @@
 			<p>
 				<label>E-mail:</label>
 				<input type="text" name="admin_email" value="postmaster@localhost" />
+			</p>
+		</fieldset>
+		<fieldset>
+			<legend>Technical options</legend>
+			<p>
+				<label>.htaccess handling:</label>
+				<select name="htaccess">
+					<option value="test">Test if supported &amp; install if no .htaccess found</option>
+					<option value="force">Force writing/updating .htaccess to latest version</option>
+					<option value="skip">Don't try to install .htaccess</option>
+				</select>
 			</p>
 		</fieldset>
 		<p>
@@ -196,6 +209,17 @@
 				<label>Display:</label>
 				<label><input type="radio" name="display" value="normal" /> Normal</label>
 				<label><input type="radio" name="display" value="compact" checked="checked" /> Compact</label>
+			</p>
+		</fieldset>
+		<fieldset>
+			<legend>Technical options</legend>
+			<p>
+				<label>.htaccess handling:</label>
+				<select name="htaccess">
+					<option value="test">Test if supported &amp; install if no .htaccess found</option>
+					<option value="force">Force writing/updating .htaccess to latest version</option>
+					<option value="skip">Don't try to install .htaccess</option>
+				</select>
 			</p>
 		</fieldset>
 		<p>

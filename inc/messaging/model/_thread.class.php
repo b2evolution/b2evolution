@@ -136,7 +136,7 @@ class Thread extends DataObject
 				{
 					$recipients_selected[] = array(
 						'id'    => $user_ID,
-						'title' => $user_login
+						'login' => $user_login
 					);
 				}
 			}
@@ -246,7 +246,7 @@ class Thread extends DataObject
 
 		if( !empty( $recipients_array ) )
 		{	// These data is created by jQuery plugin fbautocomplete
-			$recipients_list = $recipients_array['title'];
+			$recipients_list = $recipients_array['login'];
 		}
 		else
 		{	// For browsers without JavaScript

@@ -38,6 +38,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	global $htsrv_url;
 	static $has_array_type;
 
+	if( ! is_array( $parmeta ) )
+	{	// Must be array:
+		return;
+	}
+
 	if( ! empty($parmeta['no_edit']) )
 	{ // this setting is not editable
 		return;
@@ -190,22 +195,24 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			case 'UserSettings':
 				// NOTE: this assumes we come here only on recursion or with $use_value set..!
 				$set_value = $Obj->UserSettings->get( $parname, $set_target->ID );
-				$error_value = $Obj->PluginUserSettingsValidateSet( $tmp_params = array(
+				$tmp_params = array(
 					'name' => $parname,
 					'value' => & $set_value,
 					'meta' => $parmeta,
 					'User' => $set_target,
-					'action' => 'display' ) );
+					'action' => 'display' );
+				$error_value = $Obj->PluginUserSettingsValidateSet( $tmp_params );
 				break;
 
 			case 'Settings':
 				// NOTE: this assumes we come here only on recursion or with $use_value set..!
 				$set_value = $Obj->Settings->get( $parname );
-				$error_value = $Obj->PluginSettingsValidateSet( $tmp_params = array(
-					'name' => $parname,
-					'value' => & $set_value,
-					'meta' => $parmeta,
-					'action' => 'display' ) );
+				$tmp_params = array(
+					'name'   => $parname,
+					'value'  => & $set_value,
+					'meta'   => $parmeta,
+					'action' => 'display' );
+				$error_value = $Obj->PluginSettingsValidateSet( $tmp_params );
 				break;
 
 			default:
@@ -593,7 +600,8 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
 
 	// meta info for this setting:
 	$method = 'GetDefault'.$set_type; // GetDefaultSettings or GetDefaultUserSettings
-	$defaults = $Plugin->$method( $tmp_params = array('for_editing'=>true) );
+	$tmp_params = array( 'for_editing' => true );
+	$defaults = $Plugin->$method( $tmp_params );
 	if( ! isset($defaults[ $set_name ]) )
 	{
 		//debug_die( 'Invalid setting ('.$set_name.') - no meta data!' );
@@ -679,6 +687,11 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
  */
 function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type, $set_target = NULL, $set_value = NULL )
 {
+	if( ! is_array( $parmeta ) )
+	{	// Must be array:
+		return;
+	}
+
 	if( isset($parmeta['layout']) )
 	{ // a layout "setting"
 		return;
@@ -768,12 +781,13 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 
 		case 'UserSettings':
 			// Plugin User settings:
-			$error_value = $Obj->PluginUserSettingsValidateSet( $dummy = array(
+			$dummy = array(
 				'name' => $parname,
 				'value' => & $l_value,
 				'meta' => $parmeta,
 				'User' => $set_target,
-				'action' => 'set' ) );
+				'action' => 'set' );
+			$error_value = $Obj->PluginUserSettingsValidateSet( $dummy );
 			// Update the param value, because a plugin might have changed it (through reference):
 			$GLOBALS['edit_plugin_'.$Obj->ID.'_set_'.$parname] = $l_value;
 
@@ -789,11 +803,12 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 			// Plugin messages settings:
 		case 'EmailSettings':
 			// Plugin emails settings:
-			$error_value = $Obj->PluginSettingsValidateSet( $dummy = array(
-				'name' => $parname,
-				'value' => & $l_value,
-				'meta' => $parmeta,
-				'action' => 'set' ) );
+			$dummy = array(
+				'name'   => $parname,
+				'value'  => & $l_value,
+				'meta'   => $parmeta,
+				'action' => 'set' );
+			$error_value = $Obj->PluginSettingsValidateSet( $dummy );
 			// Update the param value, because a plugin might have changed it (through reference):
 			$GLOBALS['edit_plugin_'.$Obj->ID.'_set_'.$parname] = $l_value;
 
@@ -837,6 +852,11 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 function autoform_validate_param_value( $param_name, $value, $meta )
 {
 	global $Messages;
+
+	if( ! is_array( $meta ) )
+	{	// Must be array:
+		return;
+	}
 
 	if( is_array($value) && isset($meta['entries']) )
 	{

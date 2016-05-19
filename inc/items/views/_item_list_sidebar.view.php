@@ -91,7 +91,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 		$Form->hidden( 'tab', $tab );
 		$Form->hidden( 'blog', $Blog->ID );
 
-		echo '<fieldset class="clear">';
+		echo '<fieldset class="clearfix">';
 		echo '<legend>'.T_('Posts to show').'</legend>';
 		?>
 		<div>
@@ -295,6 +295,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 				'link_type' => 'context',
 				'display_checkboxes' => 1,
 				'show_locked' => true,
+				'max_colls' => 15,
 			) );
 		// ---------------------------------- END OF CATEGORY LIST ---------------------------------
 

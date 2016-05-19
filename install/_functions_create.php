@@ -45,7 +45,7 @@ function create_default_data()
 	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $spam_Group, $blogb_Group;
 	global $DB, $locales, $current_locale, $baseurl;
 	// This will install all sorts of additional things... for testing purposes:
-	global $test_install_all_features, $create_sample_contents;
+	global $install_test_features, $create_sample_contents;
 
 	// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
 	load_class('plugins/model/_plugins_admin_no_db.class.php', 'Plugins_admin_no_DB' );
@@ -236,31 +236,163 @@ function create_default_data()
 
 	// added in Phoenix-Alpha
 	task_begin( 'Creating default Post Types... ' );
-	$DB->query( "
-		INSERT INTO T_items__type ( ityp_name, ityp_usage, ityp_template_name, ityp_allow_html,
-					 ityp_allow_breaks, ityp_allow_featured, ityp_perm_level, ityp_use_parent, ityp_use_url, ityp_podcast )
-		VALUES ( 'Post',                    'post',        'single', 1, 1, 1, 'standard',   'never',    'optional', 0 ),
-					 ( 'Podcast Episode',         'post',        'single', 1, 1, 1, 'standard',   'never',    'optional', 1 ),
-					 ( 'Post with Custom Fields', 'post',        'single', 1, 1, 1, 'standard',   'never',    'optional', 0 ),
-					 ( 'Child Post',              'post',        'single', 1, 1, 1, 'standard',   'required', 'optional', 0 ),
-					 ( 'Manual Page',             'post',        'single', 0, 1, 1, 'standard',   'never',    'optional', 0 ),
-					 ( 'Forum Topic',             'post',        'single', 0, 1, 1, 'standard',   'never',    'optional', 0 ),
-					 ( 'Photo Album',             'post',        'single', 1, 1, 1, 'standard',   'never',    'optional', 0 ),
-					 ( 'Standalone Page',         'page',        'page',   1, 1, 1, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Intro-Front',             'intro-front', NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Intro-Main',              'intro-main',  NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Intro-Cat',               'intro-cat',   NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Intro-Tag',               'intro-tag',   NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Intro-Sub',               'intro-sub',   NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Intro-All',               'intro-all',   NULL,     1, 0, 0, 'restricted', 'never',    'optional', 0 ),
-					 ( 'Sidebar link',            'special',     NULL,     1, 1, 1, 'admin',      'never',    'optional', 0 ),
-					 ( 'Advertisement',           'special',     NULL,     1, 1, 1, 'admin',      'never',    'optional', 0 )" );
+	$post_types = array();
+	$post_types[] = array(
+			'name'           => 'Post',
+		);
+	$post_types[] = array(
+			'name'           => 'Podcast Episode',
+			'podcast'        => 1,
+		);
+	$post_types[] = array(
+			'name'           => 'Post with Custom Fields',
+		);
+	$post_types[] = array(
+			'name'           => 'Child Post',
+			'use_parent'     => 'required',
+		);
+	$post_types[] = array(
+			'name'           => 'Manual Page',
+			'allow_html'     => 0,
+		);
+	$post_types[] = array(
+			'name'           => 'Forum Topic',
+			'allow_html'     => 0,
+		);
+	$post_types[] = array(
+			'name'           => 'Photo Album',
+		);
+	$post_types[] = array(
+			'name'           => 'Standalone Page',
+			'usage'          => 'page',
+			'template_name'  => 'page',
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-Front',
+			'usage'          => 'intro-front',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-Main',
+			'usage'          => 'intro-main',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-Cat',
+			'usage'          => 'intro-cat',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-Tag',
+			'usage'          => 'intro-tag',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-Sub',
+			'usage'          => 'intro-sub',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-All',
+			'usage'          => 'intro-all',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Sidebar link',
+			'usage'          => 'special',
+			'template_name'  => NULL,
+			'perm_level'     => 'admin',
+		);
+	$post_types[] = array(
+			'name'           => 'Advertisement',
+			'usage'          => 'special',
+			'template_name'  => NULL,
+			'perm_level'     => 'admin',
+		);
+	$post_types[] = array(
+			'name'                   => 'Terms & Conditions',
+			'usage'                  => 'special',
+			'template_name'          => NULL,
+			'allow_breaks'           => 0,
+			'allow_featured'         => 0,
+			'perm_level'             => 'admin',
+			'description'            => 'Use this post type for terms & conditions of the site.',
+			'use_text'               => 'required',
+			'use_tags'               => 'never',
+			'use_excerpt'            => 'never',
+			'use_url'                => 'never',
+			'use_parent'             => 'never',
+			'use_title_tag'          => 'never',
+			'use_meta_desc'          => 'never',
+			'use_meta_keywds'        => 'never',
+			'use_comments'           => 0,
+			'allow_closing_comments' => 0,
+			'use_comment_expiration' => 'never',
+			'use_custom_fields'      => 0,
+		);
+	// Default settings:
+	$post_type_default_settings = array(
+			'name'                   => '',
+			'description'            => NULL,
+			'usage'                  => 'post',
+			'template_name'          => 'single',
+			'perm_level'             => 'standard',
+			'allow_html'             => 1,
+			'allow_breaks'           => 1,
+			'allow_featured'         => 1,
+			'use_text'               => 'optional',
+			'use_tags'               => 'optional',
+			'use_excerpt'            => 'optional',
+			'use_url'                => 'optional',
+			'podcast'                => 0,
+			'use_parent'             => 'never',
+			'use_title_tag'          => 'optional',
+			'use_meta_desc'          => 'optional',
+			'use_meta_keywds'        => 'optional',
+			'use_comments'           => 1,
+			'allow_closing_comments' => 1,
+			'use_comment_expiration' => 'optional',
+			'use_custom_fields'      => 1,
+		);
+	$post_types_sql = 'INSERT INTO T_items__type ( ityp_'.implode( ', ityp_', array_keys( $post_type_default_settings ) ).' ) VALUES ';
+	foreach( $post_types as $p => $post_type )
+	{
+		$post_type = array_merge( $post_type_default_settings, $post_type );
+		$post_types_sql .= '( '.$DB->quote( $post_type ).' )';
+		if( $p != count( $post_types ) - 1 )
+		{
+			$post_types_sql .= ',';
+		}
+	}
+	// Insert item types:
+	$DB->query( $post_types_sql );
 
 	$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type )
 			VALUES ( 3, "First numeric field", "first_numeric_field", "double" ),
 						 ( 3, "Second numeric field", "second_numeric_field", "double" ),
-						 ( 3, "First text field", "first_text_field", "varchar" ),
-						 ( 3, "Define you own labels", "define_you_own_labels", "varchar" )' );
+						 ( 3, "First string field", "first_string_field", "varchar" ),
+						 ( 3, "Define you own labels", "define_you_own_labels", "varchar" ),
+						 ( 3, "Multiline plain text field", "multiline_plain_text_field", "text" ),
+						 ( 3, "Multiline HTML field", "multiline_html_field", "html" )' );
 	task_end();
 
 
@@ -1219,7 +1351,7 @@ function create_demo_contents()
 	global $DB;
 	global $default_locale, $default_country;
 	global $Plugins;
-	global $test_install_all_features;
+	global $install_test_features;
 	global $user_org_IDs;
 	global $mary_moderator_ID, $jay_moderator_ID, $dave_blogger_ID, $paul_blogger_ID, $larry_user_ID, $kate_user_ID;
 	global $admin_user;
@@ -1367,8 +1499,9 @@ function create_demo_contents()
 	update_install_progress_bar();
 	task_end();
 
-	if( $test_install_all_features )
+	if( $install_test_features )
 	{
+		echo_install_log( 'TEST FEATURE: Creating fake hit statistics' );
 		task_begin( 'Creating fake hit statistics... ' );
 		load_funcs('sessions/model/_hitlog.funcs.php');
 		load_funcs('_core/_url.funcs.php');
@@ -1410,16 +1543,18 @@ function create_demo_contents()
  */
 function create_default_posts_location()
 {
-	global $test_install_all_features;
+	global $install_test_features;
 
-	if( $test_install_all_features )
+	if( $install_test_features )
 	{	// Set default location in test mode installation
 		global $DB;
 
 		$DB->query( 'UPDATE T_items__item SET
 			post_ctry_ID = '.$DB->quote( '74'/* France */ ).',
-			post_rgn_ID = '.$DB->quote( '60'/* �le-de-France */ ).',
+			post_rgn_ID = '.$DB->quote( '60'/* Île-de-France */ ).',
 			post_subrg_ID = '.$DB->quote( '76'/* Paris */ ) );
+
+		echo_install_log( 'TEST FEATURE: Defining default location "France, Île-de-France, Paris" for all posts' );
 	}
 }
 

@@ -109,11 +109,18 @@ class Currency extends DataObject
 	/**
 	 * Check existence of specified currency code in curr_code unique field.
 	 *
+	 * @param string Name of unique field  OR array of Names (for UNIQUE index with MULTIPLE fields)
+	 * @param mixed specified value        OR array of Values (for UNIQUE index with MULTIPLE fields)
 	 * @return int ID if currency code exists otherwise NULL/false
 	 */
-	function dbexists()
+	function dbexists( $unique_fields = 'curr_code', $values = NULL )
 	{
-		return parent::dbexists('curr_code', $this->code);
+		if( is_null( $values ) )
+		{
+			$values = $this->code;
+		}
+
+		return parent::dbexists( $unique_fields, $values );
 	}
 
 

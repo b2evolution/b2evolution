@@ -182,7 +182,7 @@ class TinyMCE_Compressor {
 		$hash = md5(implode('', $allFiles));
 
 		// Check if it supports gzip
-		$zlibOn = ini_get('zlib.output_compression') || (ini_set('zlib.output_compression', 0) === false);
+		$zlibOn = ini_get('zlib.output_compression') || (@ini_set('zlib.output_compression', 0) === false);
 		$encodings = (isset($_SERVER['HTTP_ACCEPT_ENCODING'])) ? strtolower($_SERVER['HTTP_ACCEPT_ENCODING']) : "";
 		$encoding = preg_match( '/\b(x-gzip|gzip)\b/', $encodings, $match) ? $match[1] : "";
 

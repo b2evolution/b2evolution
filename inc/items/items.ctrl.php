@@ -43,6 +43,7 @@ global $Blog;
 global $dispatcher;
 
 $action = param_action( 'list' );
+$orig_action = $action; // Used to know what action is called really
 
 $AdminUI->set_path( 'collections', 'posts' );	// Sublevel may be attached below
 
@@ -718,6 +719,11 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'item' );
 
+		// Get params to skip/force/mark notifications and pings:
+		param( 'item_members_notified', 'string', NULL );
+		param( 'item_community_notified', 'string', NULL );
+		param( 'item_pings_sent', 'string', NULL );
+
 		// We need early decoding of these in order to check permissions:
 		param( 'post_status', 'string', 'published' );
 
@@ -725,6 +731,9 @@ switch( $action )
 		{ // load publish status from param, because a post can be published to many status
 			$post_status = load_publish_status( true );
 		}
+
+		// Check if allowed to cross post.
+		check_cross_posting( $post_category, $post_extracats );
 
 		// Check if new category was started to create. If yes check if it is valid.
 		check_categories( $post_category, $post_extracats );
@@ -841,7 +850,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( true, $exit_after_save );
+		$edited_Item->handle_notifications( NULL, true, $item_members_notified, $item_community_notified, $item_pings_sent );
 
 		$Messages->add( T_('Post has been created.'), 'success' );
 
@@ -914,12 +923,23 @@ switch( $action )
 		// Update the folding positions for current user
 		save_fieldset_folding_values( $Blog->ID );
 
+		// Get params to skip/force/mark notifications and pings:
+		param( 'item_members_notified', 'string', NULL );
+		param( 'item_community_notified', 'string', NULL );
+		param( 'item_pings_sent', 'string', NULL );
+
 		// We need early decoding of these in order to check permissions:
 		param( 'post_status', 'string', 'published' );
 
 		if( $action == 'update_publish' )
 		{ // load publish status from param, because a post can be published to many status
 			$post_status = load_publish_status();
+		}
+
+		// Check if allowed to cross post.
+		if( ! check_cross_posting( $post_category, $post_extracats, $edited_Item->main_cat_ID ) )
+		{
+			break;
 		}
 
 		// Check if new category was started to create.  If yes check if it is valid.
@@ -930,8 +950,8 @@ switch( $action )
 		// Check permission on post type: (also verifies that post type is enabled and NOT reserved)
 		check_perm_posttype( $item_typ_ID, $post_extracats );
 
-		// Is this post already published?
-		$was_published = $edited_Item->status == 'published';
+		// Is this post publishing right now?
+		$is_publishing = ( $edited_Item->get( 'status' ) != 'published' && $post_status == 'published' );
 
 		// UPDATE POST:
 		// Set the params we already got:
@@ -942,6 +962,33 @@ switch( $action )
 
 		if( $isset_category )
 		{ // we change the categories only if the check was succesful
+
+			// get current extra_cats that are in collections where current user is not a coll admin
+			$ChapterCache = & get_ChapterCache();
+
+			$prev_extra_cat_IDs = postcats_get_byID( $edited_Item->ID );
+			$off_limit_cats = array();
+			$r = array();
+
+			foreach( $prev_extra_cat_IDs as $cat )
+			{
+				$cat_blog = get_catblog( $cat );
+				if( ! $current_User->check_perm( 'blog_admin', '', false, $cat_blog ) )
+				{
+					$Chapter = $ChapterCache->get_by_ID( $cat );
+					$off_limit_cats[$cat] = $Chapter;
+					$r[] = '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->dget( 'name' ).'</a>';
+				}
+			}
+
+			if( $off_limit_cats )
+			{
+				$Messages->add( sprintf( T_('Please note: this item is also cross-posted to the following other categories/collections: %s'),
+						implode( ', ', $r ) ), 'note' );
+			}
+
+			$post_extracats = array_unique( array_merge( $post_extracats,array_keys( $off_limit_cats ) ) );
+
 			$edited_Item->set( 'main_cat_ID', $post_category );
 			$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 		}
@@ -982,7 +1029,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( false, $exit_after_save );
+		$edited_Item->handle_notifications( NULL, false, $item_members_notified, $item_community_notified, $item_pings_sent );
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
@@ -1018,8 +1065,8 @@ switch( $action )
 		{	// Use the original $redirect_to if a post is updated from "manual" view tab:
 			$blog_redirect_setting = 'orig';
 		}
-		elseif( ! $was_published && $edited_Item->status == 'published' )
-		{ // The post's last status wasn't "published", but we're going to publish it now.
+		elseif( $is_publishing )
+		{	// The post's last status wasn't "published", but we're going to publish it now:
 			$edited_Item->load_Blog();
 			$blog_redirect_setting = $edited_Item->Blog->get_setting( 'enable_goto_blog' );
 		}
@@ -1161,8 +1208,12 @@ switch( $action )
 			// Update item to set new type right now
 			$edited_Item->dbupdate();
 
-			// Set redirect back to items list with new item type tab
-			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type='.$edited_Item->get_type_setting( 'usage' ).'&filter=restore';
+			// Execute or schedule notifications & pings:
+			$edited_Item->handle_notifications();
+
+			// Set redirect back to items list with new item type tab:
+			$tab = get_tab_by_item_type_usage( $edited_Item->get_type_setting( 'usage' ) );
+			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type='.( $tab ? $tab[0] : 'post' ).'&filter=restore';
 
 			// Highlight the updated item in list
 			$Session->set( 'highlight_id', $edited_Item->ID );
@@ -1238,9 +1289,11 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		$post_status = ( $action == 'publish_now' ) ? 'published' : param( 'post_status', 'string', 'published' );
+
 		// Check permissions:
 		/* TODO: Check extra categories!!! */
 		$current_User->check_perm( 'item_post!'.$post_status, 'edit', true, $edited_Item );
+
 		$edited_Item->set( 'status', $post_status );
 
 		if( $action == 'publish_now' )
@@ -1254,8 +1307,13 @@ switch( $action )
 		// UPDATE POST IN DB:
 		$edited_Item->dbupdate();
 
+		// Get params to skip/force/mark notifications and pings:
+		param( 'item_members_notified', 'string', NULL );
+		param( 'item_community_notified', 'string', NULL );
+		param( 'item_pings_sent', 'string', NULL );
+
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( false );
+		$edited_Item->handle_notifications( NULL, false, $item_members_notified, $item_community_notified, $item_pings_sent );
 
 		// Set the success message corresponding for the new status
 		switch( $edited_Item->status )
@@ -1409,7 +1467,7 @@ switch( $action )
  */
 function init_list_mode()
 {
-	global $tab, $tab_type, $Blog, $UserSettings, $ItemList, $AdminUI;
+	global $tab, $tab_type, $Blog, $UserSettings, $ItemList, $AdminUI, $current_User;
 
 	// set default itemslist param prefix
 	$items_list_param_prefix = 'items_';
@@ -1428,7 +1486,7 @@ function init_list_mode()
 		$UserSettings->param_Request( 'tab_type', 'pref_browse_tab_type', 'string', NULL, true /* memorize */, true /* force */ );
 	}
 
-	if( $tab == 'tracker' && ! $Blog->get_setting( 'use_workflow' ) )
+	if( $tab == 'tracker' && ( ! $Blog->get_setting( 'use_workflow' ) || ! $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) ) )
 	{ // Display workflow view only if it is enabled
 		global $Messages;
 		$Messages->add( T_('Workflow feature has not been enabled for this collection.'), 'note' );
@@ -1508,7 +1566,7 @@ function init_list_mode()
 			$AdminUI->breadcrumbpath_add( T_( 'Workflow view' ), '?ctrl=items&amp;blog=$blog$&amp;tab=tracker&amp;filter=restore' );
 
 			$AdminUI->set_page_manual_link( 'workflow-features' );
-			
+
 			// JS to edit priority of items from list view
 			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 			break;

@@ -31,7 +31,8 @@ class Link extends DataObject
 	 */
 	var $LinkOwner;
 	/**
-	 * @access protected Use {@link get_File()}
+	 * @access protected 
+	 * @see get_File()
 	 */
 	var $File;
 

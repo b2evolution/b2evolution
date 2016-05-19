@@ -68,6 +68,11 @@ $Form->begin_form();
 	$Form->hidden( 'md5_filelist', $fm_Filelist->md5_checksum() );
 	$Form->hidden( 'md5_cwd', md5($fm_Filelist->get_ads_list_path()) );
 	$Form->hiddens_by_key( get_memorized('fm_selected') ); // 'fm_selected' gets provided by the form itself
+
+	if( get_param( 'fm_sources_root' ) == '' )
+	{ // Set the root only when it is not defined, otherwise it is gone from memorized param
+		$Form->hidden( 'fm_sources_root', $fm_Filelist->_FileRoot->ID );
+	}
 ?>
 <table class="filelist table table-striped table-bordered table-hover table-condensed">
 	<thead>
@@ -110,6 +115,11 @@ $Form->begin_form();
 		if( $UserSettings->get('fm_showtypes') )
 		{ // Show file types column
 			echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'type', /* TRANS: file type */ T_('Type') ).'</th>';
+		}
+
+		if( $UserSettings->get('fm_showcreator') )
+		{ // Show file creator
+			echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'creator_user_ID', /* TRANS: added by */ T_('Added by') ).'</th>';
 		}
 
 		if( $UserSettings->get('fm_showdownload') )
@@ -251,13 +261,13 @@ $Form->begin_form();
 				if( $error_filename = validate_filename( $lFile->get_name() ) )
 				{ // TODO: Warning icon with hint
 					echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_filename ) );
-					syslog_insert( sprintf( 'The unrecognized extension is detected for file %s', '<b>'.$lFile->get_name().'</b>' ), 'warning', 'file', $lFile->ID );
+					syslog_insert( sprintf( 'The unrecognized extension is detected for file %s', '[['.$lFile->get_name().']]' ), 'warning', 'file', $lFile->ID );
 				}
 			}
 			elseif( $error_dirname = validate_dirname( $lFile->get_name() ) )
 			{ // TODO: Warning icon with hint
 				echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_dirname ) );
-				syslog_insert( sprintf( 'Invalid name is detected for folder %s', '<b>'.$lFile->get_name().'</b>' ), 'warning', 'file', $lFile->ID );
+				syslog_insert( sprintf( 'Invalid name is detected for folder %s', '[['.$lFile->get_name().']]' ), 'warning', 'file', $lFile->ID );
 			}
 
 			/****  Open in a new window  (only directories)  ****/
@@ -303,6 +313,9 @@ $Form->begin_form();
 					{
 						echo action_icon( T_('Use this as my profile picture!'), 'link',
 									regenerate_url( 'fm_selected', 'action=link_user&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
+									NULL, NULL, NULL, array() );
+						echo action_icon( T_('Duplicate and use as profile picture'), 'user',
+									regenerate_url( 'fm_selected', 'action=duplicate_user&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
 									NULL, NULL, NULL, array() );
 						echo ' ';
 					}
@@ -360,11 +373,25 @@ $Form->begin_form();
 			echo '<td class="type">'.$lFile->get_type().'</td>';
 		}
 
+		/*******************  Added by  *******************/
+
+		if( $UserSettings->get('fm_showcreator') )
+		{
+			if( $creator = $lFile->get_creator() )
+			{
+				echo '<td class="center">'.$creator->get( 'login' ).'</td>';
+			}
+			else
+			{
+				echo '<td class="center">unknown</td>';
+			}
+		}
+
 		/****************  Download Count  ****************/
-		
+
 		if( $UserSettings->get('fm_showdownload') )
 		{ // Show download count
-			// erhsatingin> Can't seem to find proper .less file to add the 'download' class, using class 'center' instead 
+			// erhsatingin> Can't seem to find proper .less file to add the 'download' class, using class 'center' instead
 			echo '<td class="center">'.$lFile->get_download_count().'</td>';
 		}
 
@@ -445,8 +472,8 @@ $Form->begin_form();
 
 			echo action_icon( T_('Edit properties...'), 'properties', regenerate_url( 'fm_selected', 'action=edit_properties&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;'.url_crumb('file') ), NULL, NULL, NULL,
 							array( 'onclick' => 'return file_properties( \''.get_param( 'root' ).'\', \''.get_param( 'path' ).'\', \''.rawurlencode( $lFile->get_rdfp_rel_path() ).'\' )' ) );
-			echo action_icon( T_('Move'), 'file_move', regenerate_url( 'fm_mode,fm_sources,fm_sources_root', 'fm_mode=file_move&amp;fm_sources[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
-			echo action_icon( T_('Copy'), 'file_copy', regenerate_url( 'fm_mode,fm_sources,fm_sources_root', 'fm_mode=file_copy&amp;fm_sources[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
+			echo action_icon( T_('Move'), 'file_move', regenerate_url( 'action,fm_selected,fm_sources_root', 'action=file_move&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
+			echo action_icon( T_('Copy'), 'file_copy', regenerate_url( 'action,fm_selected,fm_sources_root', 'action=file_copy&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
 			echo action_icon( T_('Delete'), 'file_delete', regenerate_url( 'fm_selected', 'action=delete&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;'.url_crumb('file') ) );
 		}
 		echo '</td>';
@@ -463,11 +490,13 @@ $Form->begin_form();
 	 */
 	$filetable_cols = 5
 		+ (int)$fm_flatmode
+		+ (int)$UserSettings->get('fm_showcreator')
 		+ (int)$UserSettings->get('fm_showtypes')
 		+ (int)($UserSettings->get('fm_showdate') != 'no')
 		+ (int)$UserSettings->get('fm_showfsperms')
 		+ (int)$UserSettings->get('fm_showfsowner')
 		+ (int)$UserSettings->get('fm_showfsgroup')
+		+ (int)$UserSettings->get('fm_showdownloads')
 		+ (int)$UserSettings->get('fm_imglistpreview');
 
 
@@ -537,6 +566,14 @@ $Form->begin_form();
 			{
 				$template_filerow .= '<td class="type">&nbsp;</td>';
 			}
+			if( $UserSettings->get( 'fm_showcreator' ) )
+			{
+				$template_filerow .= '<td class="center">&nbsp;</td>';
+			}
+			if( $UserSettings->get( 'fm_showdownload' ) )
+			{
+				$template_filerow .= '<td class="center">&nbsp;</td>';
+			}
 			$template_filerow .= '<td class="size"><span class="qq-upload-size">&nbsp;</span><span class="qq-upload-spinner">&nbsp;</span></td>';
 			if( $UserSettings->get('fm_showdate') != 'no' )
 			{
@@ -566,6 +603,7 @@ $Form->begin_form();
 			display_dragdrop_upload_button( array(
 					'fileroot_ID'         => $fm_FileRoot->ID,
 					'path'                => $path,
+					'listElement'         => 'jQuery( "#filelist_tbody" ).get(0)',
 					'list_style'          => 'table',
 					'template_filerow'    => $template_filerow,
 					'display_support_msg' => false,
@@ -612,6 +650,11 @@ $Form->begin_form();
 				// fp> TODO: use current as default but let user choose into which blog he wants to post
 				$field_options['make_post'] = T_('Make one post (including all images)');
 				$field_options['make_posts_pre'] = T_('Make multiple posts (1 per image)');
+			}
+
+			if( $edit_allowed_perm )
+			{ // User can edit:
+				$field_options['move_copy'] = T_('Copy/Move to another directory...');
 			}
 
 			if( $mode == 'upload' && isset( $LinkOwner ) && $LinkOwner->type == 'item' )

@@ -158,7 +158,7 @@ switch( $content_mode )
 		// Compact display:
 		echo $params['content_start_excerpt'];
 
-		if( !empty($params['excerpt_image_size']) )
+		if( !empty($params['excerpt_image_size']) && !empty($params['excerpt_image_limit']) )
 		{
 			// Display images that are linked to this post:
 			$Item->images( array(
@@ -337,11 +337,6 @@ switch( $content_mode )
 
 		// Display location info
 		$Item->location( '<div class="item_location"><strong>'.T_('Location').': </strong>', '</div>' );
-
-		if( $disp == 'single' )
-		{	// Display custom fields
-			$Item->custom_fields();
-		}
 
 		echo $params['content_end_full'];
 

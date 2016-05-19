@@ -167,7 +167,9 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 
 $Form->begin_fieldset( T_('Meta data').get_manual_link('blog_meta_data') );
 	// TODO: move stuff to coll_settings
-	$Form->text( 'blog_shortdesc', $edited_Blog->get( 'shortdesc' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!'), 250, 'large' );
+	$shortdesc_chars_count = utf8_strlen( html_entity_decode( $edited_Blog->get( 'shortdesc' ) ) );
+	$Form->text( 'blog_shortdesc', $edited_Blog->get( 'shortdesc' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!')
+		.' ('.sprintf( T_('%s characters'), '<span id="blog_shortdesc_chars_count">'.$shortdesc_chars_count.'</span>' ).')', 250, 'large' );
 	$Form->text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
 	$Form->text( 'blog_footer_text', $edited_Blog->get_setting( 'blog_footer_text' ), 60, T_('Blog footer'), sprintf(
 		T_('Use &lt;br /&gt; to insert a line break. You might want to put your copyright or <a href="%s" target="_blank">creative commons</a> notice here.'),
@@ -267,4 +269,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveBut
 	}
 	jQuery( 'input[name=blog_media_location]' ).click( function() { update_blog_media_url_preview(); } );
 	jQuery( 'input[name=blog_media_subdir], input[name=blog_media_url]' ).keyup( function() { update_blog_media_url_preview(); } );
+
+	jQuery( '#blog_shortdesc' ).keyup( function()
+	{	// Count characters of meta short description(each html entity is counted as single char):
+		jQuery( '#blog_shortdesc_chars_count' ).html( jQuery( this ).val().replace( /&[^;\s]+;/g, '&' ).length );
+	} );
 </script>

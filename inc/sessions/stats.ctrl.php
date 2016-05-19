@@ -205,9 +205,10 @@ switch( $action )
 		// load data from request
 		if( $edited_Domain->load_from_Request() )
 		{ // We could load data from form without errors:
-			// Insert in DB:
+			$is_creating = ( $edited_Domain->ID == 0 );
+			// Insert/Update in DB:
 			$edited_Domain->dbsave();
-			$Messages->add( T_('New domain created.'), 'success' );
+			$Messages->add( $is_creating ? T_('New domain created.') : T_('Domain has been updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			if( $tab_from == 'antispam' )

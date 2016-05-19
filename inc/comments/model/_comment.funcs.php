@@ -537,7 +537,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false, $params = 
 	global $admin_url, $current_User, $DB, $blog;
 
 	$params = array_merge( array(
-			'before' => '<div id="recycle_bin" class="floatright">',
+			'before' => '<div id="recycle_bin" class="pull-right">',
 			'after'  => ' </div>',
 			'class'  => 'action_icon btn btn-default btn-sm',
 		), $params );
@@ -545,7 +545,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false, $params = 
 	$show_recycle_bin = ( !$check_perm || $current_User->check_perm( 'blogs', 'editall' ) );
 	if( $show_recycle_bin && ( !$force_show ) )
 	{ // get number of trash comments:
-		$SQL = new SQL( 'Get number of trash comments' );
+		$SQL = new SQL( 'Get number of trash comments for open trash link' );
 		$SQL->SELECT( 'COUNT( comment_ID )' );
 		$SQL->FROM( 'T_comments' );
 		$SQL->FROM_add( 'INNER JOIN T_items__item ON comment_item_ID = post_ID' );
@@ -555,7 +555,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false, $params = 
 		{
 			$SQL->WHERE_and( 'cat_blog_ID = '.$DB->quote( $blog ) );
 		}
-		$show_recycle_bin = ( $DB->get_var( $SQL->get() ) > 0 );
+		$show_recycle_bin = ( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) > 0 );
 	}
 
 	$result = $params['before'];
@@ -706,7 +706,7 @@ function save_comment_to_session( $Comment )
 function get_comment_from_session()
 {
 	global $Session;
-	if( ( $mass_Comment = $Session->get( 'core.unsaved_Comment' ) ) && is_a( $mass_Comment, 'Comment' ) )
+	if( ( $mass_Comment = $Session->get( 'core.unsaved_Comment' ) ) && $mass_Comment instanceof Comment )
 	{
 		$Session->delete( 'core.unsaved_Comment' );
 		return $mass_Comment;
@@ -969,7 +969,7 @@ function comment_mass_delete_process( $mass_type, $deletable_comments_query )
 
 		while( ( $iterator_Comment = & $CommentCache->get_next() ) != NULL )
 		{ // Delete all comments from CommentCache
-			$iterator_Comment->dbdelete( $mass_type == 'delete' );
+			$iterator_Comment->dbdelete( ($mass_type == 'delete') );
 		}
 
 		// Display progress dot

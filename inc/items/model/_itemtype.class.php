@@ -27,6 +27,9 @@ class ItemType extends DataObject
 	var $description;
 	var $usage;
 	var $template_name;
+	var $front_instruction = 0;
+	var $back_instruction = 0;
+	var $instruction = '';
 	var $use_title = 'required';
 	var $use_url = 'optional';
 	var $podcast = 0;
@@ -91,6 +94,9 @@ class ItemType extends DataObject
 			$this->description = $db_row->ityp_description;
 			$this->usage = $db_row->ityp_usage;
 			$this->template_name = $db_row->ityp_template_name;
+			$this->front_instruction = $db_row->ityp_front_instruction;
+			$this->back_instruction = $db_row->ityp_back_instruction;
+			$this->instruction = $db_row->ityp_instruction;
 			$this->use_title = $db_row->ityp_use_title;
 			$this->use_url = $db_row->ityp_use_url;
 			$this->podcast = $db_row->ityp_podcast;
@@ -154,6 +160,8 @@ class ItemType extends DataObject
 	 */
 	function load_from_Request()
 	{
+		global $admin_url, $current_User;
+
 		// Name
 		param_string_not_empty( 'ityp_name', T_('Please enter a name.') );
 		$this->set_from_Request( 'name' );
@@ -173,6 +181,21 @@ class ItemType extends DataObject
 		// Template name
 		param( 'ityp_template_name', 'string' );
 		$this->set_from_Request( 'template_name', NULL, true );
+
+		// Show instruction in front-office
+		param( 'ityp_front_instruction', 'integer' );
+		$this->set_from_Request( 'front_instruction' );
+
+		// Show instruction in back-office
+		param( 'ityp_back_instruction', 'integer' );
+		$this->set_from_Request( 'back_instruction' );
+
+		// Post instruction
+		if( param( 'ityp_instruction', 'html', NULL ) !== NULL )
+		{
+			param_check_html( 'ityp_instruction', sprintf( T_('Invalid instruction format. You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'posting' );
+			$this->set_from_Request( 'instruction', NULL, true );
+		}
 
 		// Use title
 		param( 'ityp_use_title', 'string' );
@@ -302,7 +325,8 @@ class ItemType extends DataObject
 		// Empty and Initialize the custom fields from POST data
 		$this->custom_fields = array();
 
-		foreach( array( 'double', 'varchar' ) as $type )
+		$types = array( 'double', 'varchar', 'text', 'html' );
+		foreach( $types as $type )
 		{
 			$empty_title_error = false; // use this to display empty title fields error message only ones
 			$custom_field_count = param( 'count_custom_'.$type, 'integer', 0 ); // all custom fields count ( contains even deleted fields )
@@ -372,6 +396,7 @@ class ItemType extends DataObject
 		}
 	}
 
+
 	/**
 	 * Get the name of the ItemType
 	 * @return string
@@ -379,22 +404,6 @@ class ItemType extends DataObject
 	function get_name()
 	{
 		return $this->name;
-	}
-
-	/**
-	 * Check existence of specified post type ID in ityp_ID unique field.
-	 *
-	 * @return int ID if post type exists otherwise NULL/false
-	 */
-	function dbexists()
-	{
-		global $DB;
-
-		$sql = "SELECT $this->dbIDname
-						  FROM $this->dbtablename
-					   WHERE $this->dbIDname = $this->ID";
-
-		return $DB->get_var( $sql );
 	}
 
 
@@ -554,7 +563,7 @@ class ItemType extends DataObject
 	/**
 	 * Get the custom feilds
 	 *
-	 * @param string Type of custom field: 'all', 'varchar', 'double'
+	 * @param string Type of custom field: 'all', 'varchar', 'double', 'text', 'html'. Use comma separator to get several types
 	 * @param string Field name that is used as key of array: 'ID', 'ityp_ID', 'label', 'name', 'type', 'order'
 	 * @return array Custom fields
 	 */
@@ -581,7 +590,7 @@ class ItemType extends DataObject
 		$custom_fields = array();
 		foreach( $this->custom_fields as $custom_field )
 		{
-			if( $type == 'all' || $type == $custom_field['type'] )
+			if( $type == 'all' || strpos( $type, $custom_field['type'] ) !== false )
 			{
 				switch( $array_key )
 				{

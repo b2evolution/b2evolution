@@ -159,6 +159,26 @@ class calendar_plugin extends Plugin
 
 
 	/**
+	 * Get keys for block/widget caching
+	 *
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @param integer Widget ID
+	 * @return array of keys this widget depends on
+	 */
+	function get_widget_cache_keys( $widget_ID = 0 )
+	{
+		global $Blog;
+
+		return array(
+				'wi_ID'        => $widget_ID, // Have the widget settings changed ?
+				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
+				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
+			);
+	}
+
+
+	/**
 	 * Event handler: SkinTag (widget)
 	 *
 	 * @param array Associative array of parameters. Valid keys are:
@@ -196,7 +216,7 @@ class calendar_plugin extends Plugin
 	 *      - 'link_type' : 'canonic'|'context' (default: canonic)
 	 * @return boolean did we display?
 	 */
-	function SkinTag( $params )
+	function SkinTag( & $params )
 	{
 		// Prefix of the ItemList object
 		$itemlist_prefix = isset( $params['itemlist_prefix'] ) ? $params['itemlist_prefix'] : '';
@@ -477,7 +497,7 @@ class Calendar
 	 *      - 'min_timestamp' : Minimum unix timestamp the user can browse too or 'query' (Default: 2000-01-01)
 	 *      - 'max_timestamp' : Maximum unix timestamp the user can browse too or 'query' (Default: now + 1 year )
 	 */
-	function Calendar( $m = '', $params = array() )
+	function __construct( $m = '', $params = array() )
 	{
 		global $localtimenow;
 

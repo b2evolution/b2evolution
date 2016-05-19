@@ -44,6 +44,8 @@ $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
 												), '' );
 	$Form->end_line( T_('per page') );
 
+	$Form->checkbox( 'disp_featured_above_list', $edited_Blog->get_setting( 'disp_featured_above_list' ), T_('Featured post above list'), T_('Check to display a featured post above the list (as long as no Intro post is displayed.') );
+
 	$Form->output = false;
 	$Form->switch_layout( 'none' );
 	$timestamp_min_duration_input = $Form->duration_input( 'timestamp_min_duration', $edited_Blog->get_setting('timestamp_min_duration'), '' );
@@ -67,6 +69,13 @@ $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
 											), T_('Show future posts'), true );
 
 	$Form->checklist( get_inskin_statuses_options( $edited_Blog, 'post' ), 'post_inskin_statuses', T_('Front office statuses'), false, false, array( 'note' => 'Uncheck the statuses that should never appear in the front office.' ) );
+
+	$Form->radio( 'main_content', $edited_Blog->get_setting('main_content'),
+	array(
+			array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
+			array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
+			array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
+		), T_('Post contents'), true );
 
 $Form->end_fieldset();
 

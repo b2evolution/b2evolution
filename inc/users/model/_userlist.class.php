@@ -108,7 +108,8 @@ class UserList extends DataObjectList2
 				'age_max'             => NULL,    // integer, Age max
 				'userfields'          => array(), // Format of item: array( 'type' => type_ID, 'value' => search_words )
 				'order'               => '-D',    // Order
-				'users'               => array(), // User IDs
+				'users'               => array(), // User IDs - used to cache results
+				'userids'             => array(), // User IDs - used to filter by user IDs
 				'level_min'           => NULL,    // integer, Level min
 				'level_max'           => NULL,    // integer, Level max
 				'org'                 => NULL,    // integer, Organization ID
@@ -170,6 +171,11 @@ class UserList extends DataObjectList2
 			 * Selected filter preset:
 			 */
 			memorize_param( 'filter_preset', 'string', $this->default_filters['filter_preset'], $this->filters['filter_preset'] );  // List of authors to restrict to
+
+			/*
+			 * Restrict by user IDs
+			 */
+			memorize_param( 'userids', 'array:integer', $this->default_filters['userids'], $this->filters['userids'] );
 
 			/*
 			 * Restrict by membersonly
@@ -315,6 +321,11 @@ class UserList extends DataObjectList2
 			// Activate preset default filters if necessary:
 			$this->activate_preset_filters();
 		}
+
+		/*
+		 * Restrict by user IDs
+		 */
+		$this->filters['userids'] = param( 'userids', 'array:integer', $this->default_filters['userids'], true );
 
 		/*
 		 * Restrict by members
@@ -494,6 +505,7 @@ class UserList extends DataObjectList2
 		/*
 		 * filtering stuff:
 		 */
+		$this->UserQuery->where_user_IDs( $this->filters['userids'] );
 		$this->UserQuery->where_members( $this->filters['membersonly'] );
 		$this->UserQuery->where_keywords( $this->filters['keywords'] );
 		$this->UserQuery->where_gender( $this->filters['gender'] );
@@ -534,8 +546,23 @@ class UserList extends DataObjectList2
 
 	/**
 	 * Run Query: GET DATA ROWS *** HEAVY ***
+	 * 
+	 * We need this query() stub in order to call it from restart() and still
+	 * let derivative classes override it
+	 * 
+	 * @deprecated Use new function run_query()
 	 */
-	function query()
+	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
+	{
+		$this->run_query( $create_default_cols_if_needed, $append_limit, $append_order_by );
+	}
+
+
+	/**
+	 * Run Query: GET DATA ROWS *** HEAVY ***
+	 */
+	function run_query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true,
+											$query_title = 'Results::run_query()' )
 	{
 		global $DB, $Session, $localtimenow;
 
@@ -564,7 +591,7 @@ class UserList extends DataObjectList2
 			$step1_SQL = new SQL();
 			$step1_SQL->SELECT( 'T_users.user_ID, IF( user_avatar_file_ID IS NOT NULL, 1, 0 ) as has_picture' );
 			if( ! empty( $this->query_params['join_colls'] ) )
-			{	// Initialize a count of collections (used on order by this field):
+			{	// Initialize count of collections (used on order by this field):
 				$step1_SQL->SELECT_add( ', COUNT( DISTINCT blog_ID ) AS nb_blogs' );
 			}
 			if( !empty( $this->filters['reported'] ) && $this->filters['reported'] )
@@ -607,8 +634,7 @@ class UserList extends DataObjectList2
 
 		$this->sql = $step2_SQL->get();
 
-		// ATTENTION: we skip the parent on purpose here!! fp> refactor
-		DataObjectList2::query( false, false, false, 'UserList::Query() Step 2' );
+		parent::run_query( false, false, false, 'UserList::Query() Step 2' );
 	}
 
 

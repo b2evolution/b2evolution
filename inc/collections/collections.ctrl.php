@@ -47,10 +47,23 @@ switch( $action )
 {
 	case 'new':
 		// New collection: Select blog type
+	case 'copy':
+		// Copy collection:
 		// Check permissions:
 		if( ! $current_User->check_perm( 'blogs', 'create' ) )
 		{
 			$Messages->add( T_('You don\'t have permission to create a collection.'), 'error' );
+			$redirect_to = param( 'redirect_to', 'url', $admin_url );
+			header_redirect( $redirect_to );
+		}
+
+		$user_Group = $current_User->get_Group();
+		$max_allowed_blogs = $user_Group->get_GroupSettings()->get( 'perm_max_createblog_num', $user_Group->ID );
+		$user_blog_count = $current_User->get_num_blogs();
+
+		if( $max_allowed_blogs != '' && $max_allowed_blogs <= $user_blog_count )
+		{
+			$Messages->add( sprintf( T_('You already own %d collection/s. You are not currently allowed to create any more.'), $user_blog_count ) );
 			$redirect_to = param( 'redirect_to', 'url', $admin_url );
 			header_redirect( $redirect_to );
 		}
@@ -168,6 +181,26 @@ switch( $action )
 
 			header_redirect( $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
 		}
+		break;
+
+	case 'duplicate':
+		// Duplicate collection:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'collection' );
+
+		// Check permissions:
+		$current_User->check_perm( 'blogs', 'create', true );
+
+		if( $edited_Blog->duplicate() )
+		{	// The collection has been duplicated successfully:
+			$Messages->add( T_('The collection has been duplicated.'), 'success' );
+
+			header_redirect( $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
+		}
+
+		//
+		$action = 'copy';
 		break;
 
 
@@ -318,11 +351,6 @@ switch( $action )
 		param_check_url( 'notification_logo', 'http-https' );
 		$Settings->set( 'notification_logo', get_param( 'notification_logo' ) );
 
-		// Large site logo url
-		param( 'notification_logo_large', 'string', '' );
-		param_check_url( 'notification_logo_large', 'http-https' );
-		$Settings->set( 'notification_logo_large', get_param( 'notification_logo_large' ) );
-
 		// Site footer text
 		$Settings->set( 'site_footer_text', param( 'site_footer_text', 'string', '' ) );
 
@@ -336,6 +364,7 @@ switch( $action )
 		}
 
 		// Terms & Conditions:
+		$Settings->set( 'site_terms_enabled', param( 'site_terms_enabled', 'integer', 0 ) );
 		$Settings->set( 'site_terms', param( 'site_terms', 'integer', '' ) );
 
 		// Default blog
@@ -493,6 +522,17 @@ switch( $action )
 		$AdminUI->disp_payload_begin();
 
 		$next_action = 'create';
+
+		$AdminUI->disp_view( 'collections/views/_coll_general.form.php' );
+
+		$AdminUI->disp_payload_end();
+		break;
+
+
+	case 'copy':
+		$AdminUI->disp_payload_begin();
+
+		$next_action = 'duplicate';
 
 		$AdminUI->disp_view( 'collections/views/_coll_general.form.php' );
 

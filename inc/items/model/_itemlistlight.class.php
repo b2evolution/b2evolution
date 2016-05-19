@@ -146,7 +146,7 @@ class ItemListLight extends DataObjectList2
 				'ymdhms_max' => NULL,
 				'statuses' => NULL,
 				'types' => NULL, // Filter by item type IDs (separated by comma)
-				'itemtype_usage' => 'post', // Filter by item type usage (seprated by comma): post, page, intro-front, intro-main, intro-cat, intro-tag, intro-sub, intro-all, special
+				'itemtype_usage' => 'post', // Filter by item type usage (separated by comma): post, page, intro-front, intro-main, intro-cat, intro-tag, intro-sub, intro-all, special
 				'visibility_array' => get_inskin_statuses( is_null( $this->Blog ) ? NULL : $this->Blog->ID, 'post' ),
 				'orderby' => !is_null( $this->Blog ) ? $this->Blog->get_setting('orderby') : 'datestart',
 				'order' => !is_null( $this->Blog ) ? $this->Blog->get_setting('orderdir') : 'DESC',
@@ -750,13 +750,31 @@ class ItemListLight extends DataObjectList2
 	}
 
 
-  /**
+	/**
+	 * Run Query: GET DATA ROWS *** LIGHT ***
+	 *
+	 * Contrary to ItemList2, we only do 1 query here and we extract only a few selected params.
+	 * Basically all we want is being able to generate permalinks.
+	 * 
+	 * We need this query() stub in order to call it from restart() and still
+	 * let derivative classes override it
+	 * 
+	 * @deprecated Use new function run_query()
+	 */
+	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
+	{
+		$this->run_query( $create_default_cols_if_needed, $append_limit, $append_order_by );
+	}
+
+
+	/**
 	 * Run Query: GET DATA ROWS *** LIGHT ***
 	 *
 	 * Contrary to ItemList2, we only do 1 query here and we extract only a few selected params.
 	 * Basically all we want is being able to generate permalinks.
 	 */
-	function query()
+	function run_query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true,
+											$query_title = 'Results::run_query()' )
 	{
 		global $DB;
 
@@ -785,7 +803,7 @@ class ItemListLight extends DataObjectList2
 
 		// echo DB::format_query( $this->sql );
 
-		parent::query( false, false, false, 'ItemListLight::query()' );
+		parent::run_query( false, false, false, 'ItemListLight::query()' );
 	}
 
 

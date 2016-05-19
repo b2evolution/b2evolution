@@ -84,7 +84,7 @@ $fm_FileRoot = NULL;
 
 load_class( 'files/model/_filerootcache.class.php', 'FileRootCache' );
 
-$available_Roots = FileRootCache::get_available_FileRoots( get_param( 'root' ) );
+$available_Roots = FileRootCache::get_available_FileRoots( get_param( 'root' ), 'favorite' );
 
 if( ! empty( $root ) )
 { // We have requested a root folder by string:

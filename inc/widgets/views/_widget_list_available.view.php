@@ -80,11 +80,12 @@ $core_componentwidget_defs = array(
 			'coll_current_filters',
 		),
 	'content' => array(
+			'coll_featured_posts',    // Simplified UIL: Featured Posts
 			'coll_post_list',         // Simple Post list
 			'coll_page_list',         // Simple Page list
 			'coll_related_post_list', // Simple Related Posts list
 			'coll_item_list',         // Universal Item list
-			'coll_featured_intro',    // Featured/Intro Post 
+			'coll_featured_intro',    // Featured/Intro Post
 			'coll_media_index',       // Photo index
 			'coll_comment_list',      // Comment list
 		),
@@ -102,6 +103,7 @@ $core_componentwidget_defs = array(
 			'coll_longdesc',
 			'coll_member_count',
 			'coll_xml_feeds',
+			'coll_subscription',
 		),
 	'site' => array(
 			'colls_list_public',

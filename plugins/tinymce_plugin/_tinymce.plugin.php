@@ -41,16 +41,23 @@ class tinymce_plugin extends Plugin
 	var $number_of_installs = 1;
 
 
-	function PluginInit()
+	function PluginInit( & $params )
 	{
 		$this->short_desc = $this->T_('Javascript WYSIWYG editor');
 	}
 
 
 	/**
-	 * These are the plugins settings + defaults that will apply to all users unless they override
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
+	 *
+	 * @param array Associative array of parameters (since v1.9).
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
+	 * @return array see {@link Plugin::GetDefaultSettings()}.
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
+	 * and assign an array with the following keys to them (only 'label' is required):
 	 */
-	function GetDefaultSettings()
+	function GetDefaultSettings( & $params )
 	{
 		return array(
 			'default_use_tinymce' => array(
@@ -151,9 +158,15 @@ class tinymce_plugin extends Plugin
 
 
 	/**
-	 * We allow each user to disable the TinyMCE and override some of the default settings.
+	 * Define the PER-USER settings of the plugin here. These can then be edited by each user.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
-	function GetDefaultUserSettings()
+	function GetDefaultUserSettings( & $params )
 	{
 		$r = array(
 			'use_tinymce' => array(
@@ -215,28 +228,6 @@ class tinymce_plugin extends Plugin
 
 
 	/**
-	 * Get the URL to include TinyMCE.
-	 * @return string
-	 */
-	function get_tinymce_src_url()
-	{
-		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
-
-		if( $this->Settings->get( 'use_gzip_compressor' ) )
-		{
-			$url = get_require_url( '#tinymce_gzip#', $relative_to );
-			// dh> suffix of the file to compress. Looking at tiny_mce_gzip.php it only allows "_src". Needs investigation - maybe the tiny_mce_jquery.js would actually work when "_jquery" would be allowed.
-		}
-		else
-		{
-			$url = get_require_url( '#tinymce#', $relative_to );
-		}
-
-		return $url;
-	}
-
-
-	/**
 	 * Init the TinyMCE object (in backoffice).
 	 *
 	 * This is done late, so that scriptaculous has been loaded before,
@@ -244,7 +235,20 @@ class tinymce_plugin extends Plugin
 	 *
 	 * @todo dh> use jQuery's document.ready wrapper
 	 *
-	 * @return boolean
+	 * ---
+	 *
+	 * Event handler: Called when displaying editor buttons (in back-office).
+	 *
+	 * This method, if implemented, should output the buttons (probably as html INPUT elements) 
+	 * and return true, if button(s) have been displayed.
+	 *
+	 * You should provide an unique html ID with each button.
+	 *
+	 * @param array Associative array of parameters.
+	 *   - 'target_type': either 'Comment' or 'Item'.
+	 *   - 'edit_layout': "inskin", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
+	 *                    NOTE: Please respect the "inskin" mode, which should display only the most simple things!
+	 * @return boolean did we display a button?
 	 */
 	function AdminDisplayEditorButton( & $params )
 	{
@@ -323,7 +327,7 @@ class tinymce_plugin extends Plugin
 				{
 					tinymce_plugin_init_done = true;
 					// call this method on init again, with "null" id, so that mceAddControl gets called.
-					tinymce_plugin_load_tinymce( function() {tinymce_plugin_toggleEditor(null)} );
+					tinymce_plugin_init_tinymce( function() {tinymce_plugin_toggleEditor(null)} );
 					return;
 				}
 
@@ -393,58 +397,12 @@ class tinymce_plugin extends Plugin
 			// Load TinyMCE Javascript source file:
 			// This cannot be done through AJAX, since there appear to be scope problems on init then (TinyMCE problem?! - "u not defined").
 			// Anyway, not using AJAX to fetch the file makes it more cachable anyway.
-			echo '<script type="text/javascript" src="'.htmlspecialchars($this->get_tinymce_src_url()).'"></script>';
+			$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
+			require_js( '#tinymce#', $relative_to, false, true );
+			require_js( '#tinymce_jquery#', $relative_to, false, true );
 			?>
 
 			<script type="text/javascript">
-			/**
-			 * Javascript function to load and init TinyMCE.
-			 * This gets done dynamically, either "on loading" or by AJAX, if the toggle button
-			 * enables the editor.
-			 * @param function to call after init
-			 */
-			function tinymce_plugin_load_tinymce( oninit )
-			{
-				<?php
-				// Load TinyMCE Javascript source file:
-				if( $this->Settings->get('use_gzip_compressor') )
-				{
-					?>
-
-					<!-- Init tinyMCE_GZ: -->
-					if( typeof tinyMCE_GZ == "undefined" )
-					{
-						alert( '<?php echo str_replace("'", "\'",
-							sprintf( $this->T_('Compressed TinyMCE javascript could not be loaded. Check the "%s" plugin setting.'),
-								$this->T_('URL to TinyMCE') ) ) ?>' );
-						tinymce_plugin_displayed_error = true;
-						try {
-							tinymce_plugin_init_tinymce(oninit);
-						} catch(e) {}
-					}
-					else
-					{
-						tinyMCE_GZ.init({
-							themes: tmce_init.theme,
-							plugins: tmce_init.plugins,
-							languages: tmce_init.language,
-							disk_cache: true,
-							debug: false
-						}, function() {tinymce_plugin_init_tinymce(oninit)} );
-					}
-
-					<?php
-				}
-				else
-				{	// if not using compressor...
-					?>
-					tinymce_plugin_init_tinymce(oninit);
-					<?php
-				}
-				?>
-			}
-
-
 			function tinymce_plugin_init_tinymce(oninit)
 			{
 				// Init tinymce:
@@ -487,7 +445,7 @@ class tinymce_plugin extends Plugin
 									var inst = tinymce.get("<?php echo $params['content_id']; ?>");
 									if( ! inst ) return null;
 									return inst.selection.getContent();
-								} );
+								}, true );
 
 							// add a callback, that wraps a selection:
 							b2evo_Callbacks.register_callback( "wrap_selection_for_<?php echo $params['content_id']; ?>", function(params) {
@@ -506,7 +464,7 @@ class tinymce_plugin extends Plugin
 									inst.selection.setContent(value);
 
 									return true;
-								} );
+								}, true );
 
 							// add a callback, that replaces a string
 							b2evo_Callbacks.register_callback( "str_replace_for_<?php echo $params['content_id']; ?>", function(params) {
@@ -517,14 +475,14 @@ class tinymce_plugin extends Plugin
 									inst.setContent( inst.getContent().replace( params.search, params.replace ) );
 
 									return true;
-								} );
+								}, true );
 
 							// add a callback, that lets us insert raw content:
 							// DEPRECATED, used in b2evo 1.10.x
 							b2evo_Callbacks.register_callback( "insert_raw_into_<?php echo $params['content_id']; ?>", function(value) {
 									tinymce.execInstanceCommand( "<?php echo $params['content_id']; ?>", "mceInsertRawHTML", false, value );
 									return true;
-							} );
+							}, true );
 						}
 					}
 
@@ -533,7 +491,7 @@ class tinymce_plugin extends Plugin
 						ed.on( 'init', tmce_init.oninit );
 					}
 
-					tinymce.init(tmce_init);
+					jQuery( 'textarea#<?php echo $params['content_id']; ?>' ).tinymce( tmce_init );
 				}
 			}
 
@@ -563,7 +521,18 @@ class tinymce_plugin extends Plugin
 	/**
 	 * Init the TinyMCE object (in front office).
 	 *
-	 * @return boolean
+	 * Event handler: Called when displaying editor buttons (in front-office).
+	 *
+	 * This method, if implemented, should output the buttons (probably as html INPUT elements)
+	 * and return true, if button(s) have been displayed.
+	 *
+	 * You should provide an unique html ID with each button.
+	 *
+	 * @param array Associative array of parameters.
+	 *   - 'target_type': either 'Comment' or 'Item'.
+	 *   - 'edit_layout': "inskin", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
+	 *                    NOTE: Please respect the "inskin" mode, which should display only the most simple things!
+	 * @return boolean did we display a button?
 	 */
 	function DisplayEditorButton( & $params )
 	{
@@ -737,8 +706,10 @@ class tinymce_plugin extends Plugin
 
 		// Configuration: -- http://wiki.moxiecode.com/index.php/TinyMCE:Configuration
 		$init_options = array();
-		// Convert one specifc textarea to use TinyMCE:
-		$init_options[] = 'selector : "textarea#'.$content_id.'"';
+		if( $this->Settings->get( 'use_gzip_compressor' ) )
+		{	// Load script to use gzip compressor:
+			$init_options[] = 'script_url: "'.get_require_url( 'tiny_mce/tinymce.gzip.php', ( is_admin_page() ? 'rsc_url' : 'blog' ), 'js' ).'"';
+		}
 		// TinyMCE Theme+Skin+Variant to use:
 		$init_options[] = 'theme : "modern"';
 		$init_options[] = 'menubar : false';
@@ -806,7 +777,7 @@ class tinymce_plugin extends Plugin
 
 		// Autocomplete options
 		$init_options[] = 'autocomplete_options: autocomplete_static_options'; // Must be initialize before as string with usernames that are separated by comma
-		$init_options[] = 'autocomplete_options_url: htsrv_url + "anon_async.php?action=autocomplete_usernames"';
+		$init_options[] = 'autocomplete_options_url: restapi_url + "users/autocomplete"';
 
 		// remove_linebreaks : false,
 		// not documented:	auto_cleanup_word : true,
@@ -1013,9 +984,13 @@ class tinymce_plugin extends Plugin
 
 
 	/**
-	 * @see Plugin::SkinBeginHtmlHead()
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
 	 */
-	function SkinBeginHtmlHead()
+	function SkinBeginHtmlHead( & $params )
 	{
 		global $disp;
 
@@ -1027,9 +1002,12 @@ class tinymce_plugin extends Plugin
 
 
 	/**
-	 * @see Plugin::AdminEndHtmlHead()
+	 * Event handler: Called when ending the admin html head section.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
 	 */
-	function AdminEndHtmlHead()
+	function AdminEndHtmlHead( & $params )
 	{
 		global $ctrl;
 

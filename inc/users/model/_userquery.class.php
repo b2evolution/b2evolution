@@ -134,6 +134,24 @@ class UserQuery extends SQL
 
 
 	/**
+	 * Restrict by user IDs
+	 *
+	 * @param array User IDs
+	 */
+	function where_user_IDs( $user_IDs )
+	{
+		global $DB;
+
+		if( empty( $user_IDs ) )
+		{	// Don't restrict:
+			return;
+		}
+
+		$this->WHERE_and( 'user_ID IN ( '.$DB->quote( $user_IDs ).' ) ');
+	}
+
+
+	/**
 	 * Restrict by members
 	 *
 	 * @param boolean TRUE to select only member of the current Blog
@@ -185,7 +203,7 @@ class UserQuery extends SQL
 	 *
 	 * @param string Keyword search string
 	 */
-	function where_keywords( $keywords )
+	function where_keywords( $keywords, $search_kw_combine = 'AND' )
 	{
 		global $DB;
 
@@ -205,7 +223,7 @@ class UserQuery extends SQL
 
 		if( count( $search ) > 0 )
 		{
-			$this->WHERE_and( implode( ' AND ', $search ) );
+			$this->WHERE_and( implode( ' '.$search_kw_combine.' ', $search ) );
 		}
 	}
 
