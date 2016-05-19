@@ -7504,8 +7504,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			wico_name     VARCHAR( 40 ) NOT NULL,
 			wico_coll_ID  INT(10) NULL DEFAULT NULL,
 			wico_order    INT(10) NOT NULL,
-			PRIMARY KEY ( wico_ID ),
-			UNIQUE wico_order( wico_coll_ID, wico_name, wico_order )' );
+			PRIMARY KEY ( wico_ID )' );
 		upg_task_end();
 	}
 
@@ -7538,6 +7537,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$set_wico_codes_query .= ' WHEN wico_name = "'.$wico_name.'" THEN "'.$wico_code.'"';
 		}
 		$DB->query( $set_wico_codes_query.' END' );
+		// Set unique fields for wdiget containers only after updating code field:
+		$DB->query( 'ALTER TABLE T_widget__container
+			ADD UNIQUE wico_coll_ID_code ( wico_coll_ID, wico_code )' );
 		upg_task_end();
 	}
 

@@ -70,6 +70,8 @@ if( $display_mode == 'js' )
 }
 // This should probably be handled with teh existing $mode var
 
+param( 'wico_ID', 'integer', 0, true );
+
 /*
  * Init the objects we want to work on.
  */
@@ -79,7 +81,9 @@ switch( $action )
 	case 'list':
 	case 'reload':
 	case 'new_container':
+	case 'edit_container':
 	case 'create_container':
+	case 'update_container':
 	case 'activate':
 	case 'deactivate':
 		// Do nothing
@@ -184,10 +188,14 @@ switch( $action )
 		break;
 
 	case 'new_container':
-		// Display form for creating a new widget category
-
+		// Initialize widget container for creating form:
 		$edited_WidgetContainer = new WidgetContainer();
 		$edited_WidgetContainer->set( 'coll_ID', $Blog->ID );
+		break;
+
+	case 'edit_container':
+		// Initialize widget container for editing form:
+		$edited_WidgetContainer = $WidgetContainerCache->get_by_ID( $wico_ID );
 		break;
 
 	case 'create':
@@ -576,19 +584,27 @@ switch( $action )
 		break;
 
 	case 'create_container':
-		// Create a new widget container:
+	case 'update_container':
+		// Save widget container:
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget_container' );
 
- 		// Check permission:
+		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		$edited_WidgetContainer = new WidgetContainer();
-		$edited_WidgetContainer->set( 'coll_ID', $Blog->ID );
+		if( $wico_ID > 0 )
+		{	// Get the existing widget container:
+			$edited_WidgetContainer = & $WidgetContainerCache->get_by_ID( $wico_ID );
+		}
+		else
+		{	// Get new widget container:
+			$edited_WidgetContainer = new WidgetContainer();
+			$edited_WidgetContainer->set( 'coll_ID', $Blog->ID );
+		}
 		if( $edited_WidgetContainer->load_from_Request() )
 		{
-			$edited_WidgetContainer->dbinsert();
+			$edited_WidgetContainer->dbsave();
 			header_redirect( '?ctrl=widgets&blog='.$Blog->ID, 303 );
 		}
 		break;
@@ -694,7 +710,9 @@ switch( $action )
 		break;
 
 	case 'new_container':
+	case 'edit_container':
 	case 'create_container':
+	case 'update_container':
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
 

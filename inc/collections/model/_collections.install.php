@@ -93,7 +93,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			wico_coll_ID  INT(10) NULL DEFAULT NULL,
 			wico_order    INT(10) NOT NULL,
 			PRIMARY KEY ( wico_ID ),
-			UNIQUE wico_order( wico_coll_ID, wico_name, wico_order )
+			UNIQUE wico_coll_ID_code ( wico_coll_ID, wico_code )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_widget__widget' => array(

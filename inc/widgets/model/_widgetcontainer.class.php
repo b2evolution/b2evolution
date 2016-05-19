@@ -106,12 +106,13 @@ class WidgetContainer extends DataObject
 	{
 		global $Messages;
 
-		// Get main widget contianers
+		// Get main widget containers:
 		$main_containers = & get_widget_containers();
 
 		$wico_code = param( 'wico_code', 'string', true );
-		if( isset( $main_containers[$wico_code] ) )
-		{
+		if( isset( $main_containers[$wico_code] ) &&
+		    ( $this->ID == 0 || $this->get( 'code' ) != $wico_code ) )
+		{	// Don't allow to create widget container with main reserved code:
 			$Messages->add( T_('The given container code is used by a main container, please type another.'), 'error' );
 		}
 		$this->set( 'code', $wico_code );
@@ -123,6 +124,16 @@ class WidgetContainer extends DataObject
 		else
 		{
 			$this->set( 'order', param( 'wico_order', 'integer', 0 ) );
+		}
+
+		if( ! param_errors_detected() )
+		{	// Widget container code must be unique for collection, Check it only when no errors on the form:
+			if( $wico_ID = $this->dbexists( array( 'wico_code', 'wico_coll_ID' ), array( $this->get( 'code' ), $this->get( 'coll_ID' ) ) ) )
+			{	// We have a duplicate entry:
+				param_error( 'ufdf_code',
+					sprintf( T_('Another widget container already uses this code. Do you want to <a %s>edit the existing widget container</a>?'),
+						'href="?ctrl=widgets&amp;blog='.$this->get( 'coll_ID' ).'&amp;action=edit_container&amp;wico_ID='.$wico_ID.'"' ) );
+			}
 		}
 
 		return !param_errors_detected();

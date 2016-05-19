@@ -23,7 +23,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 {
 	echo '<div class="pull-right" style="margin-bottom:10px">';
 		echo action_icon( TS_('Add a new container!'), 'add',
-					'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;'.url_crumb('widget'), T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default' ) );
+					'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container', T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default' ) );
 		echo action_icon( TS_('Recheck declared skin containers!'), 'reload',
 					'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;'.url_crumb('widget'), T_('Recheck skin containers'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
 	echo '</div>';
@@ -44,8 +44,6 @@ function display_container( $WidgetContainer, $legend_suffix = '' )
 
 	$Table = new Table();
 
-	$Table->title = '<span class="container_name">'.T_( $WidgetContainer->get( 'name' ) ).'</span>'.$legend_suffix;
-
 	// Table ID - fp> needs to be handled cleanly by Table object
 	if( isset( $WidgetContainer->ID ) && ( $WidgetContainer->ID > 0 ) )
 	{
@@ -60,6 +58,15 @@ function display_container( $WidgetContainer, $legend_suffix = '' )
 		$add_widget_url = regenerate_url( '', 'action=new&amp;wico_code='.$wico_code.'&amp;container='.$table_id );
 		$destroy_container_url = url_add_param( $admin_url, 'ctrl=widgets&amp;action=destroy_container&amp;wico_code='.$wico_code );
 	}
+
+	$widget_container_name = T_( $WidgetContainer->get( 'name' ) );
+	if( ! empty( $WidgetContainer->ID ) )
+	{
+		$widget_container_name = '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=edit_container&amp;wico_ID='.$WidgetContainer->ID.'">'.$widget_container_name.'</a>';
+	}
+	$Table->title = '<span class="container_name" data-wico_id="'.$table_id.'">'.$widget_container_name.'</span>'
+		.' <span class="dimmed">'.$WidgetContainer->get( 'code' ).' '.$WidgetContainer->get( 'order' ).'</span>'
+		.$legend_suffix;
 
 	if( ! empty( $legend_suffix ) )
 	{ // Legend suffix is not empty when the container is not included into the selected skin
