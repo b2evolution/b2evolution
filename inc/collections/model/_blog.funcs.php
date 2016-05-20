@@ -1523,7 +1523,7 @@ function blogs_all_results_block( $params = array() )
 	$SQL->FROM( 'T_blogs INNER JOIN T_users ON blog_owner_user_ID = user_ID' );
 	if( $params['grouped'] )
 	{	// Get collection groups:
-		$SQL->SELECT_add( ', cgrp_parent_ID, cgrp_ID, cgrp_name' );
+		$SQL->SELECT_add( ', cgrp_ID, cgrp_name, cgrp_order' );
 		$SQL->FROM_add( 'LEFT JOIN T_coll_groups ON cgrp_ID = blog_cgrp_ID' );
 	}
 	$SQL->FROM_add( 'LEFT JOIN T_coll_user_favs ON ( cufv_blog_ID = blog_ID AND cufv_user_ID = '.$current_User->ID.' )' );
@@ -1557,7 +1557,9 @@ function blogs_all_results_block( $params = array() )
 	if( $current_User->check_perm( 'blogs', 'create' ) )
 	{
 		global $admin_url;
-		$blogs_Results->global_icon( T_('New Site').'...', 'new', url_add_param( $admin_url, 'ctrl=collections&amp;action=new' ), T_('New Site').'...', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+		$blogs_Results->global_icon( T_('New Collection Group').'...', 'new', url_add_param( $admin_url, 'ctrl=collections&amp;action=new_group' ), T_('New Collection Group').'...', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+		$blogs_Results->global_icon( T_('New Collection').'...', 'new', url_add_param( $admin_url, 'ctrl=collections&amp;action=new' ), T_('New Collection').'...', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+		
 	}
 
 	// Initialize Results object

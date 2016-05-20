@@ -7496,6 +7496,22 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11780, 'Creating collection groups table...' ) )
+	{	// part of 6.7.3-stable
+		db_create_table( 'T_coll_groups', '
+				cgrp_ID        INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+				cgrp_name      VARCHAR(255) NOT NULL,
+				cgrp_order     INT(11) UNSIGNED NOT NULL,
+				PRIMARY KEY ( cgrp_ID )' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11785, 'Upgrading collections table...' ) )
+	{	// part of 6.7.3-stable
+		db_add_col( 'T_blogs', 'blog_cgrp_ID', 'INT(11) UNSIGNED NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
