@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -173,6 +173,16 @@ function hits_results( & $Results, $params = array() )
 			'td' => '$hit_response_code$',
 			'td_class' => '%hit_response_code_class( #hit_response_code# )% shrinkwrap compact_data'
 		);
+	$Results->cols[] = array(
+			'th' => T_('HTTP meth'),
+			'order' => 'hit_method',
+			'td' => '$hit_method$',
+			'td_class' => 'shrinkwrap compact_data',
+			'extra' => array(
+					'style' => '%hit_method_style( "#hit_method#" )%',
+					'format_to_output'=> false
+				)
+		);
 
 	$Results->cols[] = array(
 			'th' => T_('Remote IP'),
@@ -331,10 +341,17 @@ function stat_session_login( $login )
  * @param string session ID
  * @param string link text
  */
-function stat_session_hits( $sess_ID,  $link_text )
+function stat_session_hits( $sess_ID, $link_text )
 {
-	global $blog;
-	return '<strong><a href="?ctrl=stats&tab='.get_param( 'tab' ).'&colselect_submit=Filter+list&sess_ID='.$sess_ID.'&remote_IP=&blog='.$blog.'">'.$link_text.'</a></strong>';
+	global $blog, $admin_url;
+
+	$tab = get_param( 'tab' );
+	if( empty( $tab ) )
+	{
+		$tab = 'hits';
+	}
+
+	return '<strong><a href="'.$admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;sess_ID='.$sess_ID.'&amp;blog='.$blog.'">'.$link_text.'</a></strong>';
 }
 
 
@@ -608,5 +625,29 @@ function hit_iprange_status_color( $IP_address )
 	}
 
 	return aipr_status_color( $ip_range_status );
+}
+
+
+/**
+ * Get style for hit method cell
+ *
+ * @param string Hit request method
+ * @return string Method style
+ */
+function hit_method_style( $hit_method )
+{
+	global $hit_method_color;
+
+	// Purple color for non traditional methods:
+	$color = '551A8B';
+
+	if( isset( $hit_method_color[ $hit_method ] ) )
+	{	// Get background color from config array:
+		$color = $hit_method_color[ $hit_method ];
+	}
+
+	$style = 'color: #'.$color;
+
+	return $style;
 }
 ?>

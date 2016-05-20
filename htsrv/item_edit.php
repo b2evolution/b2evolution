@@ -101,7 +101,7 @@ switch( $action )
 		$edited_Item->status = $post_status;		// 'published' or 'draft' or ...
 		// We know we can use at least one status,
 		// but we need to make sure the requested/default one is ok:
-		$edited_Item->status = $Blog->get_allowed_item_status ( $edited_Item->status );
+		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status );
 
 		// Check if new category was started to create. If yes then set up parameters for next page
 		check_categories_nosave( $post_category, $post_extracats );
@@ -180,6 +180,9 @@ switch( $action )
 		$edited_Item->set( 'main_cat_ID', $post_category );
 		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 
+		// Restrict item status to max allowed by item collection:
+		$edited_Item->restrict_status_by_collection( true );
+
 		// Set object params:
 		$edited_Item->load_from_Request( /* editing? */ ($action == 'create_edit'), /* creating? */ true );
 
@@ -234,7 +237,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( true, $exit_after_save );
+		$edited_Item->handle_notifications( NULL, true );
 
 		$Messages->add( T_('Post has been created.'), 'success' );
 
@@ -267,6 +270,9 @@ switch( $action )
 		// UPDATE POST:
 		// Set the params we already got:
 		$edited_Item->set ( 'status', $post_status );
+
+		// Restrict item status to max allowed by item collection:
+		$edited_Item->restrict_status_by_collection( true );
 
 		if( $isset_category )
 		{ // we change the categories only if the check was succesfull
@@ -306,7 +312,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( false, $exit_after_save );
+		$edited_Item->handle_notifications();
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
@@ -325,7 +331,7 @@ switch( $action )
 		}
 		else
 		{ // User can see this post in the Front-office
-			if( $edited_Item->ityp_ID == 1520 )
+			if( $edited_Item->get_type_setting( 'usage' ) == 'intro-cat' )
 			{ // If post is category intro we should redirect to page of that category
 				$main_Chapter = & $edited_Item->get_main_Chapter();
 				$redirect_to = $main_Chapter->get_permanent_url();
@@ -342,7 +348,10 @@ switch( $action )
 		break;
 
 	case 'update_workflow':
-		// Update workflow properties from disp=single
+		// Update workflow properties from disp=single:
+
+		$current_User->check_perm( 'blog_can_be_assignee', 'edit', true, $Blog->ID );
+
 		if( $Blog->get_setting( 'use_workflow' ) )
 		{ // Only if the workflow is enabled on collection
 			param( 'item_st_ID', 'integer', NULL );
@@ -364,8 +373,6 @@ switch( $action )
 				$Messages->add( T_('The workflow properties have been updated.'), 'success' );
 			}
 		}
-
-		$redirect_to = $edited_Item->get_permanent_url();
 
 		// REDIRECT / EXIT
 		header_redirect( $redirect_to );

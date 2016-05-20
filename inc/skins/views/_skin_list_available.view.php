@@ -7,13 +7,13 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $skins_path, $admin_url, $redirect_to, $action, $kind;
+global $skins_path, $admin_url, $redirect_to, $action, $kind, $blog;
 
 $skin_type = param( 'skin_type', 'string', '' );
 
@@ -25,7 +25,39 @@ $SkinCache->load_all();
 
 $block_item_Widget = new Widget( 'block_item' );
 
-$block_item_Widget->title = T_('Skins available for installation').get_manual_link('installing_skins');
+if( get_param( 'tab' ) == 'current_skin' )
+{	// We are installing new skin for collection:
+	$BlogCache = & get_BlogCache();
+	$Blog = & $BlogCache->get_by_ID( $blog );
+	switch( $skin_type )
+	{
+		case 'normal':
+			$skin_type_title = /* TRANS: Skin type name */ T_('Normal');
+			break;
+		case 'mobile':
+			$skin_type_title = /* TRANS: Skin type name */ T_('Mobile');
+			break;
+		case 'tablet':
+			$skin_type_title = /* TRANS: Skin type name */ T_('Tablet');
+			break;
+		case 'feed':
+			$skin_type_title = /* TRANS: Skin type name */ T_('Feed');
+			break;
+		case 'sitemap':
+			$skin_type_title = /* TRANS: Skin type name */ T_('Sitemap');
+			break;
+		default:
+			$skin_type_title = '';
+			break;
+	}
+	$block_title = sprintf( T_('Install a new %s skin for %s:'), $skin_type_title, $Blog->get( 'name' ) );
+}
+else
+{	// We are managing the skins:
+	$block_title = T_('Skins available for installation');
+}
+
+$block_item_Widget->title = $block_title.get_manual_link( 'installing_skins' );
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
@@ -40,6 +72,7 @@ $Form->hidden_ctrl();
 $Form->hidden( 'action', $action );
 $Form->hidden( 'redirect_to', $redirect_to );
 $Form->hidden( 'kind', get_param( 'kind' ) );
+$Form->hidden( 'tab', get_param( 'tab' ) );
 $Form->begin_form( 'skin_selector_filters' );
 $Form->select_input_array( 'skin_type', $skin_type, array(
 		''        => T_('All skins'),
@@ -137,7 +170,11 @@ foreach( $skin_folders as $skin_folder )
 
 		$disp_params = array(
 			'function'        => 'install',
-			'function_url'    => $admin_url.'?ctrl=skins&amp;action=create&amp;skin_folder='.rawurlencode( $skin_folder ).'&amp;redirect_to='.rawurlencode( $redirect_to_after_install ).'&amp;'.url_crumb( 'skin' ),
+			'function_url'    => $admin_url.'?ctrl=skins&amp;action=create&amp;tab='.get_param( 'tab' )
+			                     .( empty( $blog ) ? '' : '&amp;blog='.$blog )
+			                     .'&amp;skin_folder='.rawurlencode( $skin_folder )
+			                     .'&amp;redirect_to='.rawurlencode( $redirect_to_after_install )
+			                     .'&amp;'.url_crumb( 'skin' ),
 			'skin_compatible' => $skin_compatible,
 		);
 	}
@@ -151,8 +188,9 @@ foreach( $skin_folders as $skin_folder )
 echo '<div class="clear"></div>';
 echo '</div>';
 
-if( $skins_exist && empty( $kind ) )
-{ // Display form buttons only when at least one skin exists for installation
+if( $skins_exist && empty( $kind ) && get_param( 'tab' ) != 'current_skin' )
+{	// Display form buttons only when at least one skin exists for installation:
+	// Don't enabled this feature on new collection creating and on selecting new skin for the colleciton:
 	$form_buttons = array(
 		array( 'type' => 'button', 'id'  => 'check_all_skins', 'value' => T_('Check All'), 'class' => 'btn btn-default' ),
 		array( 'type' => 'submit', 'value' => T_('Install Checked'), 'class' => 'btn btn-primary' ),

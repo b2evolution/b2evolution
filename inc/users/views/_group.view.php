@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -23,7 +23,17 @@ $usedgroups = $DB->get_col( 'SELECT grp_ID
 
 // Create result set:
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE grp_ID, grp_name, grp_level, gset_value' );
+$SQL->SELECT( 'SQL_NO_CACHE grp_ID, grp_name, grp_usage, grp_level' );
+$SQL->SELECT_add( ', CASE
+	WHEN grp_usage  LIKE "secondary"  THEN "0"
+	WHEN gset_value LIKE "no_toolbar" THEN "1_no_toolbar"
+	WHEN gset_value LIKE "none"       THEN "2_none"
+	WHEN gset_value LIKE "restricted" THEN "3_restricted"
+	WHEN gset_value LIKE "normal"     THEN "4_normal"
+	ELSE "0"
+END AS backoffice' );
+$SQL->SELECT_add( ', (SELECT COUNT( user_ID ) FROM T_users WHERE user_grp_ID = grp_ID ) AS primary_users_count' );
+$SQL->SELECT_add( ', (SELECT COUNT( sug_grp_ID ) FROM T_users__secondary_user_groups WHERE sug_grp_ID = grp_ID ) AS secondary_users_count' );
 $SQL->FROM( 'T_groups' );
 $SQL->FROM_add( 'LEFT JOIN T_groups__groupsettings ON gset_grp_ID = grp_ID AND gset_name = "perm_admin"' );
 
@@ -31,7 +41,7 @@ $count_SQL = new SQL();
 $count_SQL->SELECT( 'SQL_NO_CACHE COUNT(grp_ID)' );
 $count_SQL->FROM( 'T_groups' );
 
-$Results = new Results( $SQL->get(), 'grp_', '---D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
+$Results = new Results( $SQL->get(), 'grp_', '--D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
 $Results->title = T_('Groups (for setting permissions)').get_manual_link( 'user-groups-tab' );
 
@@ -62,38 +72,78 @@ $Results->cols[] = array(
 				'$grp_name$',
 	);
 
-function grp_row_backoffice( $value )
-{
-	switch( $value )
-	{
-		case 'normal':
-			return T_( 'Normal' );
-		case 'restricted':
-			return T_( 'Restricted' );
-		case 'none':
-			return T_( 'No Access' );
-		case 'no_toolbar':
-		default:
-			return T_( 'No Toolbar' );
-	}
-}
-$Results->cols[] = array(
-		'th' => T_('Back-office access'),
-		'order' => 'gset_value',
-		'td' => '%grp_row_backoffice( #gset_value# )%',
-		'th_class' => 'shrinkwrap',
-		'td_class' => 'shrinkwrap',
-	);
-
 $Results->cols[] = array(
 		'th' => T_('Level'),
-		'th_class' => 'shrinkwrap small',
-		'td_class' => 'shrinkwrap small'.( $has_perm_users_edit ? ' group_level_edit' : '' ),
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'shrinkwrap '.( $has_perm_users_edit ? ' group_level_edit' : '' ),
 		'order' => 'grp_level',
 		'default_dir' => 'D',
 		'td' => $has_perm_users_edit ?
 				'<a href="#" rel="$grp_level$">$grp_level$</a>' :
 				'$grp_level$',
+	);
+
+$Results->cols[] = array(
+		'th' => T_('Usage'),
+		'order' => 'grp_usage',
+		'td' => '%get_admin_badge( "group", "", "", "", #grp_usage# )%',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'shrinkwrap',
+	);
+
+function grp_row_users_count( $group_ID, $primary_users_count, $secondary_users_count )
+{
+	if( $primary_users_count == 0 && $secondary_users_count == 0 )
+	{	// This group is not used at all
+		return '<span class="label label-default">0</span>';
+	}
+	else
+	{
+		global $admin_url;
+		$users_url = $admin_url.'?ctrl=users&amp;filter=new&amp;';
+		$r = '';
+		if( $primary_users_count > 0 )
+		{	// This group is used as primary for several users
+			$r .= ' <a href="'.$users_url.'group='.$group_ID.'" class="label label-primary">'.$primary_users_count.'</a> ';
+		}
+		if( $secondary_users_count > 0 )
+		{	// This group is used as secondary for several users
+			$r .= ' <a href="'.$users_url.'group2='.$group_ID.'" class="label label-info">'.$secondary_users_count.'</a> ';
+		}
+		return $r;
+	}
+}
+$Results->cols[] = array(
+		'th' => T_('User count'),
+		'order' => 'primary_users_count, secondary_users_count',
+		'td' => '%grp_row_users_count( #grp_ID#, #primary_users_count#, #secondary_users_count# )%',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'shrinkwrap',
+	);
+
+function grp_row_backoffice( $backoffice_access )
+{
+	switch( $backoffice_access )
+	{
+		case '4_normal':
+			return T_( 'Normal' );
+		case '3_restricted':
+			return T_( 'Restricted' );
+		case '2_none':
+			return T_( 'No Access' );
+		case '1_no_toolbar':
+			return T_( 'No Toolbar' );
+		default:
+			// Secondary group:
+			return '';
+	}
+}
+$Results->cols[] = array(
+		'th' => T_('Back-office access'),
+		'order' => 'backoffice, grp_ID',
+		'td' => '%grp_row_backoffice( #backoffice# )%',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'shrinkwrap',
 	);
 
 function grp_actions( & $row )
@@ -120,7 +170,7 @@ function grp_actions( & $row )
 }
 $Results->cols[] = array(
 		'th' => T_('Actions'),
-		'th_class' => 'shrinkwrap small',
+		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
 		'td' => '%grp_actions( {row} )%',
 	);

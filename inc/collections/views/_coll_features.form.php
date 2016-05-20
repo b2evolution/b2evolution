@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  *
@@ -44,6 +44,8 @@ $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
 												), '' );
 	$Form->end_line( T_('per page') );
 
+	$Form->checkbox( 'disp_featured_above_list', $edited_Blog->get_setting( 'disp_featured_above_list' ), T_('Featured post above list'), T_('Check to display a featured post above the list (as long as no Intro post is displayed.') );
+
 	$Form->output = false;
 	$Form->switch_layout( 'none' );
 	$timestamp_min_duration_input = $Form->duration_input( 'timestamp_min_duration', $edited_Blog->get_setting('timestamp_min_duration'), '' );
@@ -67,6 +69,13 @@ $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
 											), T_('Show future posts'), true );
 
 	$Form->checklist( get_inskin_statuses_options( $edited_Blog, 'post' ), 'post_inskin_statuses', T_('Front office statuses'), false, false, array( 'note' => 'Uncheck the statuses that should never appear in the front office.' ) );
+
+	$Form->radio( 'main_content', $edited_Blog->get_setting('main_content'),
+	array(
+			array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
+			array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
+			array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
+		), T_('Post contents'), true );
 
 $Form->end_fieldset();
 
@@ -108,12 +117,24 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Post moderation') . get_manual_link('post-moderation') );
 
+	// Get max allowed visibility status:
+	$max_allowed_status = get_highest_publish_status( 'comment', $edited_Blog->ID, false );
+
+	// Get those statuses which are not allowed for the current User to create posts in this blog
+	$exclude_statuses = array_merge( get_restricted_statuses( $edited_Blog->ID, 'blog_post!', 'create' ), array( 'trash' ) );
+	$default_post_status_index = array_search( $edited_Blog->get_setting( 'default_post_status' ), $exclude_statuses );
+	if( $default_post_status_index !== false )
+	{	// Allow to select status that is selected currently:
+		unset( $exclude_statuses[ $default_post_status_index ] );
+	}
+
 	if( isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
 	{	// Use dropdown for bootstrap skin:
 		$default_status_field = get_status_dropdown_button( array(
-				'name'         => 'default_post_status',
-				'value'        => $edited_Blog->get_setting('default_post_status'),
-				'title_format' => 'notes-string',
+				'name'             => 'default_post_status',
+				'value'            => $edited_Blog->get_setting('default_post_status'),
+				'title_format'     => 'notes-string',
+				'exclude_statuses' => $exclude_statuses,
 			) );
 		$Form->info( T_('Default status'), $default_status_field, T_('Default status for new posts') );
 		$Form->hidden( 'default_post_status', $edited_Blog->get_setting('default_post_status') );
@@ -121,22 +142,41 @@ $Form->begin_fieldset( T_('Post moderation') . get_manual_link('post-moderation'
 	}
 	else
 	{	// Use standard select element for other skins:
-		$Form->select_input_array( 'default_post_status', $edited_Blog->get_setting('default_post_status'), get_visibility_statuses( 'notes-string' ), T_('Default status'), T_('Default status for new posts') );
+		$Form->select_input_array( 'default_post_status', $edited_Blog->get_setting('default_post_status'), get_visibility_statuses( 'notes-string', $exclude_statuses ), T_('Default status'), T_('Default status for new posts') );
 	}
 
-	// Moderation statuses setting
-	$not_moderation_statuses = array_diff( get_visibility_statuses( 'keys', NULL ), get_visibility_statuses( 'moderation' ) );
-	// Get moderation statuses with status text
+	// Moderation statuses setting:
+	$all_statuses = get_visibility_statuses( 'keys', NULL );
+	$not_moderation_statuses = array_diff( $all_statuses, get_visibility_statuses( 'moderation' ) );
+	// Get moderation statuses with status text:
 	$moderation_statuses = get_visibility_statuses( '', $not_moderation_statuses );
 	$moderation_status_icons = get_visibility_statuses( 'icons', $not_moderation_statuses );
 	$blog_moderation_statuses = $edited_Blog->get_setting( 'post_moderation_statuses' );
 	$checklist_options = array();
-	foreach( $moderation_statuses as $status => $status_text )
-	{ // Add a checklist option for each possible modeartion status
-		$is_checked = ( strpos( $blog_moderation_statuses, $status) !== false );
-		$checklist_options[] = array( 'post_notif_'.$status, 1, $moderation_status_icons[ $status ].' '.$status_text, $is_checked );
+	// Set this flag to false in order to find first allowed status below:
+	$status_is_hidden = true;
+	foreach( $all_statuses as $status )
+	{	// Add a checklist option for each possible modeartion status:
+		if( $status == $max_allowed_status )
+		{	// This is first allowed status, then all next statuses are also allowed:
+			$status_is_hidden = false;
+		}
+		if( ! isset( $moderation_statuses[ $status ] ) )
+		{	// Don't display a checkbox for non moderation status:
+			continue;
+		}
+		$checklist_options[] = array(
+				'post_notif_'.$status, // Field name of checkbox
+				1, // Field value
+				$moderation_status_icons[ $status ].' '.$moderation_statuses[ $status ], // Text
+				( strpos( $blog_moderation_statuses, $status) !== false ), // Checked?
+				'', // Disabled?
+				'', // Note
+				'', // Class
+				$status_is_hidden, // Hidden field instead of checkbox?
+			);
 	}
-	$Form->checklist( $checklist_options, 'post_moderation_statuses', T_('Post moderation reminder statuses'), false, false, array( 'note' => 'Posts with the selected statuses will be notified on the "Send reminders about posts awaiting moderation" scheduled job.' ) );
+	$Form->checklist( $checklist_options, 'post_moderation_statuses', T_('"Require moderation" statuses'), false, false, array( 'note' => T_('Posts with the selected statuses will be considered to require moderation. They will trigger "moderation required" notifications and will appear as such on the collection dashboard.') ) );
 
 $Form->end_fieldset();
 

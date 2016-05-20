@@ -1,14 +1,13 @@
 <?php
 /**
- * This is the main public interface file!
+ * This is the main front-office interface file! This will we displayed if you haven't configured
+ * a default collection to display.
  *
- * This file is NOT mandatory. You can delete it if you want.
- * You can also replace the contents of this file with contents similar to the contents
- * of a_stub.php, a_noskin.php, multiblogs.php, etc.
+ * This file is NOT mandatory. You can delete it if you have configured a default collection.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage noskin
@@ -86,7 +85,11 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 						<li role="presentation" class="active"><a href="index.php"><?php echo T_('Your site'); ?></a></li>
 					</ul>
 				</nav>
-				<h3 class="text-muted"><a href="http://b2evolution.net/"><img class="b2evolution_plane_logo" src="rsc/img/b2evolution_254x52.svg" alt="b2evolution CCMS"></a></h3>
+				<h3 class="text-muted"><a href="http://b2evolution.net/">
+					<img src="rsc/img/b2evolution_254x52.png" width="254" height="52" alt="b2evolution" class="b2evolution_plane_logo"
+					  srcset="rsc/img/b2evolution_508x104.png 2x,
+						 		 rsc/img/b2evolution_762x156.png 3x" /></a>
+				</h3>
 			</div>
 
 		<!-- InstanceBeginEditable name="Main" -->

@@ -16,7 +16,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( version_compare( $app_version, '4.0.0-dev' ) < 0 )
+if( evo_version_compare( $app_version, '4.0.0-dev' ) < 0 )
 { // Older 2.x skins work on newer 2.x b2evo versions, but newer 2.x skins may not work on older 2.x b2evo versions.
 	die( 'This skin is designed for b2evolution 4.0.0 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
@@ -153,10 +153,10 @@ siteskin_include( '_site_body_header.inc.php' );
 					// CODE for the widget:
 					'widget' => 'coll_search_form',
 					// Optional display params
-					'block_start'         => '<li><div class="widget $wi_class$">',
-					'block_end'           => '</div></li>',
+					'block_start'         => '<li class="widget $wi_class$">',
+					'block_end'           => '</li>',
 					'block_display_title' => false,
-					'button'              => T_('Search')
+					'button'              => ('&#xf002;')
 				) );
 		?>
 				</ul>
@@ -300,10 +300,10 @@ if( ! empty( $cookie_skin_width_value ) )
 }
 
 $switcher_layout_top = is_logged_in() ? 26 : 3;
-$switcher_layout_top += $Settings->get( 'site_skins_enabled' ) ? 103 : 3; // 153 -> 106
+$switcher_layout_top += $Settings->get( 'site_skins_enabled' ) ? 89 : 3; // 153 -> 106
 
-$switcher_top = is_logged_in() ? 26 : 0;
-$switcher_top += $Settings->get( 'site_skins_enabled' ) ? 54 : 0;
+$switcher_top = is_logged_in() ? 26 : 10;
+$switcher_top += $Settings->get( 'site_skins_enabled' ) ? 54 : 47;
 
 $switcher_class = !$Settings->get( 'site_skins_enabled' ) ? ' fixed' : '';
 ?>
@@ -321,7 +321,7 @@ foreach( $width_switchers as $ws_size => $ws_icon )
 		$ws_class .= ' roundbutton_selected';
 	}
 	echo '<a href="#" onclick="switch_width( this, \''.$ws_size.'\', \''.$cookie_skin_width_name.'\', \''.$cookie_path.'\' ); return false;" class="'.$ws_class.'">';
-	echo get_icon( $ws_icon );
+	echo '<span class="ficon '.$ws_icon.'"></span>';
 	echo '</a>';
 	$ws++;
 }

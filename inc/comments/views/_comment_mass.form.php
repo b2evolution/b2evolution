@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -22,7 +22,7 @@ $Form->begin_form( 'fform' );
 $Form->add_crumb( 'comment' );
 $Form->hidden( 'ctrl', 'comments' );
 
-	$Form->begin_fieldset( T_('Mass deleting').get_manual_link( 'comment-mass-deletion' ).' '.action_icon( T_('Cancel deleting!'), 'close', $admin_url.'?ctrl=comments&blog='.$Blog->ID.'&tab3='.$tab3, '', 4, 1, array( 'class' => 'action_icon floatright btn btn-default btn-sm' ) ) );
+	$Form->begin_fieldset( T_('Mass deleting').get_manual_link( 'comment-mass-deletion' ).' '.action_icon( T_('Cancel deleting!'), 'close', $admin_url.'?ctrl=comments&blog='.$Blog->ID.'&tab3='.$tab3, '', 4, 1, array( 'class' => 'action_icon pull-right btn btn-default btn-sm' ) ) );
 
 	$mass_type_value = 'delete';
 	$mass_types = array();

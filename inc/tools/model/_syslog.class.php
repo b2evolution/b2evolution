@@ -35,10 +35,10 @@ class Syslog extends DataObject
 	 *
 	 * @param object database row
 	 */
-	function Syslog( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_syslog', 'slg_', 'slg_ID' );
+		parent::__construct( 'T_syslog', 'slg_', 'slg_ID' );
 
 		if( $db_row )
 		{

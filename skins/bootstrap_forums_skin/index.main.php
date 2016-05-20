@@ -16,7 +16,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( version_compare( $app_version, '6.4' ) < 0 )
+if( evo_version_compare( $app_version, '6.4' ) < 0 )
 { // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.
 	die( 'This skin is designed for b2evolution 6.4 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
@@ -48,9 +48,6 @@ if( $disp == 'posts' )
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array(
-	'edit_text_create'  => T_('New topic'),
-	'edit_text_update'  => T_('Edit topic'),
-	'edit_text_copy'    => T_('Duplicate topic'),
 	'catdir_text'       => T_('Forum'),
 	'category_text'     => T_('Forum').': ',
 	'comments_text'     => T_('Latest Replies'),
@@ -170,7 +167,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				// TODO: fp>yura : this MUST NOT be in the skin. It must be in the b2evolution core (somewhere where we determine $disp)
 				$p = param( 'p', 'integer', 0 ); // Edit post from Front-office
 			}
-			
+
 			// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
 			request_title( array(
 					'title_before'      => '<h2 class="page_title">',
@@ -179,9 +176,6 @@ siteskin_include( '_site_body_header.inc.php' );
 					'title_page_disp'   => false,
 					'format'            => 'htmlbody',
 					'display_edit_links'=> false,
-					'edit_text_create'  => T_('New topic'),
-					'edit_text_update'  => T_('Edit topic'),
-					'edit_text_copy'    => T_('Duplicate topic'),
 					'category_text'     => '',
 					'categories_text'   => '',
 					'catdir_text'       => '',
@@ -224,7 +218,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		<?php
 			// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
 			skin_include( '$disp$', array(
-					'author_link_text' => 'preferredname',
+					'author_link_text' => 'auto',
 					// Profile tabs to switch between user edit forms
 					'profile_tabs' => array(
 						'block_start'         => '<nav><ul class="nav nav-tabs profile_tabs">',
@@ -238,9 +232,11 @@ siteskin_include( '_site_body_header.inc.php' );
 					'pagination' => array(
 						'block_start'           => '<div class="center"><ul class="pagination">',
 						'block_end'             => '</ul></div>',
-						'page_current_template' => '<span><b>$page_num$</b></span>',
+						'page_current_template' => '<span>$page_num$</span>',
 						'page_item_before'      => '<li>',
 						'page_item_after'       => '</li>',
+						'page_item_current_before' => '<li class="active">',
+						'page_item_current_after'  => '</li>',
 						'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
 						'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 					),
@@ -286,10 +282,6 @@ siteskin_include( '_site_body_header.inc.php' );
 					'featured_intro_after'  => '</div>',
 					// Form "Sending a message"
 					'msgform_form_title' => T_('Sending a message'),
-					// Edit post form
-					'edit_text_create'  => T_('New topic'),
-					'edit_text_update'  => T_('Edit topic'),
-					'edit_text_copy'    => T_('Duplicate topic'),
 				) );
 			// Note: you can customize any of the sub templates included here by
 			// copying the matching php file into your skin directory.
@@ -307,52 +299,6 @@ siteskin_include( '_site_body_header.inc.php' );
 	?>
 	<aside class="col-md-3<?php echo ( $Skin->get_setting_layout() == 'left_sidebar' ? ' pull-left' : '' ); ?>">
 		<!-- =================================== START OF SIDEBAR =================================== -->
-		<?php
-		if( $disp == 'single' )
-		{	// Use special sidebar container for single post page:
-		?>
-		<div class="evo_container evo_container__sidebar_single">
-		<?php
-			// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
-			// Display container contents:
-			skin_container( NT_('Sidebar Single'), array(
-					// The following (optional) params will be used as defaults for widgets included in this container:
-					// This will enclose each widget in a block:
-					'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',
-					'block_end' => '</div>',
-					// This will enclose the title of each widget:
-					'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
-					'block_title_end' => '</h4></div>',
-					// This will enclose the body of each widget:
-					'block_body_start' => '<div class="panel-body">',
-					'block_body_end' => '</div>',
-					// If a widget displays a list, this will enclose that list:
-					'list_start' => '<ul>',
-					'list_end' => '</ul>',
-					// This will enclose each item in a list:
-					'item_start' => '<li>',
-					'item_end' => '</li>',
-					// This will enclose sub-lists in a list:
-					'group_start' => '<ul>',
-					'group_end' => '</ul>',
-					// This will enclose (foot)notes:
-					'notes_start' => '<div class="notes">',
-					'notes_end' => '</div>',
-					// Widget 'Search form':
-					'search_class'         => 'compact_search_form',
-					'search_input_before'  => '<div class="input-group">',
-					'search_input_after'   => '',
-					'search_submit_before' => '<span class="input-group-btn">',
-					'search_submit_after'  => '</span></div>',
-				) );
-			// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
-		?>
-		</div>
-		<?php
-		}
-		else
-		{	// Use the default sidebar containers for all other pages:
-		?>
 		<div class="evo_container evo_container__sidebar">
 		<?php
 			// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
@@ -428,9 +374,6 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
 		?>
 		</div>
-		<?php
-		}
-		?>
 	</aside><!-- .col -->
 	<?php } ?>
 
@@ -511,7 +454,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 		?>
 	</div><!-- .col -->
-	
+
 </footer><!-- .row -->
 
 

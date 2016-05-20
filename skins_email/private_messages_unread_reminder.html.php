@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -23,7 +23,7 @@ $params = array_merge( array(
 	), $params );
 
 
-echo '<p'.emailskin_style( '.p' ).'>'.T_( 'You have unread messages in the following conversations:' )."</p>\n";
+echo '<p'.emailskin_style( '.p' ).'>'.T_( 'You have unread private messages in the following conversations:' )."</p>\n";
 
 if( count( $params['unread_threads'] ) > 0 )
 {
@@ -37,11 +37,11 @@ if( count( $params['unread_threads'] ) > 0 )
 
 // Buttons:
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
-echo get_link_tag( $params['threads_link'], T_('Read your messages'), 'div.buttons a+a.button_green' )."\n";
+echo get_link_tag( $params['threads_link'], T_('Read your private messages'), 'div.buttons a+a.button_green' )."\n";
 echo "</div>\n";
 
 // Footer vars:
-$params['unsubscribe_text'] = T_( 'If you don\'t want to receive notifications for unread messages any more, click here:' )
+$params['unsubscribe_text'] = T_( 'If you don\'t want to receive notifications for unread private messages any more, click here:' )
 			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=unread_msg&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
 			.T_('instant unsubscribe').'</a>.';
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -40,7 +40,7 @@ class SQL
 	/**
 	 * Constructor.
 	 */
-	function SQL($title = NULL)
+	function __construct($title = NULL)
 	{
 		if( $title )
 			$this->title = $title;
@@ -367,12 +367,12 @@ class SQL
 	}
 
 	/**
-	 * create the filter whith the search field array
+	 * Create the filter whith the search field array
 	 *
 	 * @param string keywords separated by space
 	 * @param string operator( AND , OR , PHRASE ) for the filter
 	 */
-	function WHERE_keywords( $search, $search_kw_combine )
+	function WHERE_kw_search( $search, $search_kw_combine = 'AND' )
 	{
 		global $DB;
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -27,7 +27,7 @@ $Form->hidden( 'ecmp_ID', $edited_EmailCampaign->ID );
 
 $Form->begin_fieldset( T_('Campaign info').get_manual_link( 'creating-an-email-campaign' ) );
 	$Form->text_input( 'ecmp_name', $edited_EmailCampaign->get( 'name' ), 60, T_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
-	$Form->text_input( 'ecmp_email_title', $edited_EmailCampaign->get( 'email_title' ), 60, T_('Email title'), '', array( 'maxlength' => 255, 'required' => true ) );
+	$Form->text_input( 'ecmp_email_title', $edited_EmailCampaign->get( 'email_title' ) == '' ? $edited_EmailCampaign->get( 'name' ) : $edited_EmailCampaign->get( 'email_title' ), 60, T_('Email title'), '', array( 'maxlength' => 255, 'required' => true ) );
 	$Form->info( T_('Campaign created'), mysql2localedatetime_spans( $edited_EmailCampaign->get( 'date_ts' ), 'M-d' ) );
 	$Form->info( T_('Last sent'), $edited_EmailCampaign->get( 'sent_ts' ) ? mysql2localedatetime_spans( $edited_EmailCampaign->get( 'sent_ts' ), 'M-d' ) : T_('Not sent yet') );
 $Form->end_fieldset();

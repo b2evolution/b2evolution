@@ -12,7 +12,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( version_compare( $app_version, '3.0' ) < 0 )
+if( evo_version_compare( $app_version, '3.0' ) < 0 )
 { // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.
 	die( 'This skin is designed for b2evolution 3.0 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
@@ -65,7 +65,7 @@ siteskin_include( '_site_body_header.inc.php' );
 	<?php
 		skin_widget( array(
 			// CODE for the widget:
-			'widget' => 'member_count',
+			'widget' => 'coll_member_count',
 			// Optional display params
 			'before' => '(',
 			'after'  => ')',
@@ -134,13 +134,13 @@ if( $disp == 'single' )
 			'block_start' => '<div class="roundbutton_group nav_album_arrows">',
 			'next_class' => 'roundbutton rbtn_black',
 			'next_start'  => '',
-			'next_text' => get_icon( 'arrow_right_white' ),
-			'next_no_item' => '<span class="roundbutton rbtn_black">'.get_icon( 'arrow_right_grey' ).'</span>',
+			'next_text' => '<span class="arrow_right_white"></span>',
+			'next_no_item' => '<span class="roundbutton rbtn_black"><span class="arrow_right_grey"></span></span>',
 			'next_end'    => '',
 			'prev_class' => 'roundbutton rbtn_black',
 			'prev_start'  => '',
-			'prev_text' => get_icon( 'arrow_left_white' ),
-			'prev_no_item' => '<span class="roundbutton rbtn_black">'.get_icon( 'arrow_left_grey' ).'</span>',
+			'prev_text' => '<span class="arrow_left_white"></span>',
+			'prev_no_item' => '<span class="roundbutton rbtn_black"><span class="arrow_left_grey"></span></span>',
 			'prev_end'    => '',
 			'block_end'   => '</div>',
 		) );
@@ -236,7 +236,7 @@ if( $disp == 'single' )
 				'disp_single' => '', // We already handled this case above
 				'disp_page'   => '', // We already handled this case above
 				'mediaidx_thumb_size'  => $Skin->get_setting( 'mediaidx_thumb_size' ),
-				'author_link_text'     => 'preferredname',
+				'author_link_text'     => 'auto',
 				'login_page_before'    => '<div class="login_block"><div class="bDetails">',
 				'login_page_after'     => '</div></div>',
 				'register_page_before' => '<div class="login_block"><div class="bDetails">',

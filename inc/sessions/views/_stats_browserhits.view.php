@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -234,7 +234,7 @@ if( count($res_hits) )
 				<td class="right"><a href="<?php echo $link_text.'&referer_type=special'?>"><?php echo $hits['special'] ?></a></td>
 				<td class="right"><a href="<?php echo $link_text.'&referer_type=spam'?>"><?php echo $hits['spam'] ?></a></td>
 				<td class="right"><a href="<?php echo $link_text.'&hit_type=admin'?>"><?php echo $hits['admin'] ?></a></td>
-				<td class="lastcol right"><a href="<?php echo $link_text_total_day ?>"><?php echo array_sum($hits) ?></a></td>
+				<td class="lastcol right"><a href="<?php echo $link_text_total_day ?>"><?php echo array_sum( $hits ) - $hits['session'] ?></a></td>
 				</tr>
 				<?php
 					$hits = array(
@@ -302,7 +302,7 @@ if( count($res_hits) )
 				<td class="right"><a href="<?php echo $link_text.'&referer_type=special'?>"><?php echo $hits['special'] ?></a></td>
 				<td class="right"><a href="<?php echo $link_text.'&referer_type=spam'?>"><?php echo $hits['spam'] ?></a></td>
 				<td class="right"><a href="<?php echo $link_text.'&hit_type=admin'?>"><?php echo $hits['admin'] ?></a></td>
-				<td class="lastcol right"><a href="<?php echo $link_text_total_day ?>"><?php echo array_sum($hits) ?></a></td>
+				<td class="lastcol right"><a href="<?php echo $link_text_total_day ?>"><?php echo array_sum( $hits ) - $hits['session'] ?></a></td>
 			</tr>
 			<?php
 		}
@@ -323,7 +323,7 @@ if( count($res_hits) )
 		<td class="right"><a href="<?php echo $link_text_total.'&referer_type=special'?>"><?php echo $hits_total['special'] ?></a></td>
 		<td class="right"><a href="<?php echo $link_text_total.'&referer_type=spam'?>"><?php echo $hits_total['spam'] ?></a></td>
 		<td class="right"><a href="<?php echo $link_text_total.'&hit_type=admin'?>"><?php echo $hits_total['admin'] ?></a></td>
-		<td class="lastcol right"><a href="<?php echo $link_text_total?>"><?php echo array_sum($hits_total) ?></a></td>
+		<td class="lastcol right"><a href="<?php echo $link_text_total?>"><?php echo array_sum( $hits_total ) - $hits_total['session']?></a></td>
 		</tr>
 
 	</table>

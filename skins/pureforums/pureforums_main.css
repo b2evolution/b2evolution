@@ -7,8 +7,7 @@ body {
 a {
   color: #306595;
   text-decoration: none;
-  -webkit-transition: color 150ms ease 0s;
-          transition: color 150ms ease 0s;
+  transition: color 150ms ease 0s;
 }
 
 a:hover {
@@ -124,6 +123,16 @@ form#user_checkchanges.bComment {
   width: 7px;
   height: 9px;
   margin: 0 3px 0 2px;
+}
+.ficon.width_increase {
+  background-position: 0 -75px;
+  width: 32px;
+  height: 32px;
+}
+.ficon.width_decrease {
+  background-position: -32px -75px;
+  width: 32px;
+  height: 32px;
 }
 
 .form_add_contacts .controls {
@@ -437,7 +446,6 @@ body.round_avatars .forums_table .ft_author_avatar img {
 
 .ft_search .search_field {
   border-radius: 3px;
-  -webkit-transition: box-shadow 150ms ease;
   transition: box-shadow 150ms ease;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
   padding: 6px 7px;

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -25,10 +25,14 @@ class ItemType extends DataObject
 {
 	var $name;
 	var $description;
-	var $backoffice_tab;
+	var $usage;
 	var $template_name;
+	var $front_instruction = 0;
+	var $back_instruction = 0;
+	var $instruction = '';
 	var $use_title = 'required';
 	var $use_url = 'optional';
+	var $podcast = 0;
 	var $use_parent = 'never';
 	var $use_text = 'optional';
 	var $allow_html = 1;
@@ -75,10 +79,10 @@ class ItemType extends DataObject
 	 *
 	 * @param table Database row
 	 */
-	function ItemType( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_items__type', 'ityp_', 'ityp_ID' );
+		parent::__construct( 'T_items__type', 'ityp_', 'ityp_ID' );
 
 		// Allow inseting specific IDs
 		$this->allow_ID_insert = true;
@@ -88,10 +92,14 @@ class ItemType extends DataObject
 			$this->ID   = $db_row->ityp_ID;
 			$this->name = $db_row->ityp_name;
 			$this->description = $db_row->ityp_description;
-			$this->backoffice_tab = $db_row->ityp_backoffice_tab;
+			$this->usage = $db_row->ityp_usage;
 			$this->template_name = $db_row->ityp_template_name;
+			$this->front_instruction = $db_row->ityp_front_instruction;
+			$this->back_instruction = $db_row->ityp_back_instruction;
+			$this->instruction = $db_row->ityp_instruction;
 			$this->use_title = $db_row->ityp_use_title;
 			$this->use_url = $db_row->ityp_use_url;
+			$this->podcast = $db_row->ityp_podcast;
 			$this->use_parent = $db_row->ityp_use_parent;
 			$this->use_text = $db_row->ityp_use_text;
 			$this->allow_html = $db_row->ityp_allow_html;
@@ -152,19 +160,11 @@ class ItemType extends DataObject
 	 */
 	function load_from_Request()
 	{
-		// get new ID
-		if( param( 'new_ityp_ID', 'string', NULL ) !== NULL )
-		{
-			param_check_number( 'new_ityp_ID', T_('ID must be a number.'), true );
-			$this->set_from_Request( 'ID', 'new_ityp_ID' );
-		}
+		global $admin_url, $current_User;
 
 		// Name
-		if( ! $this->is_special() )
-		{ // Update the name only of not special post types
-			param_string_not_empty( 'ityp_name', T_('Please enter a name.') );
-			$this->set_from_Request( 'name' );
-		}
+		param_string_not_empty( 'ityp_name', T_('Please enter a name.') );
+		$this->set_from_Request( 'name' );
 
 		// Description
 		param( 'ityp_description', 'text' );
@@ -174,13 +174,28 @@ class ItemType extends DataObject
 		param( 'ityp_perm_level', 'string' );
 		$this->set_from_Request( 'perm_level' );
 
-		// Back-office tab
-		param( 'ityp_backoffice_tab', 'string' );
-		$this->set_from_Request( 'backoffice_tab', NULL, true );
+		// Usage
+		param( 'ityp_usage', 'string' );
+		$this->set_from_Request( 'usage', NULL, true );
 
 		// Template name
 		param( 'ityp_template_name', 'string' );
 		$this->set_from_Request( 'template_name', NULL, true );
+
+		// Show instruction in front-office
+		param( 'ityp_front_instruction', 'integer' );
+		$this->set_from_Request( 'front_instruction' );
+
+		// Show instruction in back-office
+		param( 'ityp_back_instruction', 'integer' );
+		$this->set_from_Request( 'back_instruction' );
+
+		// Post instruction
+		if( param( 'ityp_instruction', 'html', NULL ) !== NULL )
+		{
+			param_check_html( 'ityp_instruction', sprintf( T_('Invalid instruction format. You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'posting' );
+			$this->set_from_Request( 'instruction', NULL, true );
+		}
 
 		// Use title
 		param( 'ityp_use_title', 'string' );
@@ -189,6 +204,10 @@ class ItemType extends DataObject
 		// Use URL
 		param( 'ityp_use_url', 'string' );
 		$this->set_from_Request( 'use_url' );
+
+		// Treat as Podcast Media
+		param( 'ityp_podcast', 'integer', 0 );
+		$this->set_from_Request( 'podcast' );
 
 		// Use Parent ID
 		param( 'ityp_use_parent', 'string' );
@@ -306,7 +325,8 @@ class ItemType extends DataObject
 		// Empty and Initialize the custom fields from POST data
 		$this->custom_fields = array();
 
-		foreach( array( 'double', 'varchar' ) as $type )
+		$types = array( 'double', 'varchar', 'text', 'html' );
+		foreach( $types as $type )
 		{
 			$empty_title_error = false; // use this to display empty title fields error message only ones
 			$custom_field_count = param( 'count_custom_'.$type, 'integer', 0 ); // all custom fields count ( contains even deleted fields )
@@ -376,6 +396,7 @@ class ItemType extends DataObject
 		}
 	}
 
+
 	/**
 	 * Get the name of the ItemType
 	 * @return string
@@ -383,22 +404,6 @@ class ItemType extends DataObject
 	function get_name()
 	{
 		return $this->name;
-	}
-
-	/**
-	 * Check existence of specified post type ID in ityp_ID unique field.
-	 *
-	 * @return int ID if post type exists otherwise NULL/false
-	 */
-	function dbexists()
-	{
-		global $DB;
-
-		$sql = "SELECT $this->dbIDname
-						  FROM $this->dbtablename
-					   WHERE $this->dbIDname = $this->ID";
-
-		return $DB->get_var( $sql );
 	}
 
 
@@ -520,64 +525,13 @@ class ItemType extends DataObject
 
 
 	/**
-	 *  Returns array, which determinate the lower and upper limit of protected ID's
-	 *
-	 *  @return array
-	 */
-	function get_special_range()
-	{
-		return array( 1000, 5000 );
-	}
-
-
-	/**
-	 * Check if this post type is special( reserved in system )
-	 *
-	 * @param integer Use this param ID of post type when object is not created
-	 * @return boolean
-	 */
-	function is_special( $ID = NULL )
-	{
-		$special_range = ItemType::get_special_range();
-
-		if( $ID === NULL )
-		{ // Get ID of this object
-			$ID = $this->ID;
-		}
-
-		return $ID >= $special_range[0] && $ID <= $special_range[1];
-	}
-
-
-	/**
-	 * Check if this post type is reserved
-	 *
-	 * @param integer Use this param ID of post type when object is not created
-	 * @return boolean
-	 */
-	static function is_reserved( $ID = NULL )
-	{
-		global $posttypes_reserved_IDs;
-
-		if( $ID === NULL )
-		{ // Get ID of this object
-			$ID = $this->ID;
-		}
-
-		return in_array( $ID, $posttypes_reserved_IDs );
-	}
-
-
-	/**
 	 * Check if this post type is used for intro posts
 	 *
 	 * @return boolean
 	 */
-	static function is_intro( $ID = NULL )
+	function is_intro()
 	{
-		global $posttypes_perms;
-
-		return ( isset( $posttypes_perms['intro'] ) && in_array( $ID, $posttypes_perms['intro'] ) );
+		return in_array( $this->usage, array( 'intro-front', 'intro-main', 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all' ) );
 	}
 
 
@@ -609,7 +563,7 @@ class ItemType extends DataObject
 	/**
 	 * Get the custom feilds
 	 *
-	 * @param string Type of custom field: 'all', 'varchar', 'double'
+	 * @param string Type of custom field: 'all', 'varchar', 'double', 'text', 'html'. Use comma separator to get several types
 	 * @param string Field name that is used as key of array: 'ID', 'ityp_ID', 'label', 'name', 'type', 'order'
 	 * @return array Custom fields
 	 */
@@ -636,7 +590,7 @@ class ItemType extends DataObject
 		$custom_fields = array();
 		foreach( $this->custom_fields as $custom_field )
 		{
-			if( $type == 'all' || $type == $custom_field['type'] )
+			if( $type == 'all' || strpos( $type, $custom_field['type'] ) !== false )
 			{
 				switch( $array_key )
 				{

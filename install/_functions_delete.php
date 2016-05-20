@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
@@ -17,12 +17,12 @@ function db_delete()
 {
 	global $DB, $db_config, $tableprefix;
 
-	echo "Disabling foreign key checks...<br />\n";
+	echo get_install_format_text( "Disabling foreign key checks...<br />\n", 'br' );
 	$DB->query( 'SET FOREIGN_KEY_CHECKS=0' );
 
 	foreach( $db_config['aliases'] as $alias => $tablename )
 	{
-		echo "Dropping $tablename table...<br />\n";
+		echo get_install_format_text( "Dropping $tablename table...<br />\n", 'br' );
 		evo_flush();
 		$DB->query( 'DROP TABLE IF EXISTS '.$tablename );
 	}
@@ -31,7 +31,7 @@ function db_delete()
 	$remaining_tables = $DB->get_col( 'SHOW TABLES FROM `'.$db_config['name'].'` LIKE "'.$tableprefix.'%"' );
 	foreach( $remaining_tables as $tablename )
 	{
-		echo "Dropping $tablename table...<br />\n";
+		echo get_install_format_text( "Dropping $tablename table...<br />\n", 'br' );
 		evo_flush();
 		$DB->query( 'DROP TABLE IF EXISTS '.$tablename );
 	}
@@ -74,6 +74,6 @@ function uninstall_b2evolution()
 	/* REMOVE DATABASE */
 	db_delete();
 
-	echo '<p>'.T_('Reset done!').'</p>';
+	echo get_install_format_text( '<p>'.T_('Reset done!').'</p>', 'p' );
 }
 ?>

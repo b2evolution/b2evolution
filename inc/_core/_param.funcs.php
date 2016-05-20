@@ -15,7 +15,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -290,7 +290,8 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 
 						if( isset( $elements_regexp ) )
 						{ // Array contains elements which must match to the given regular expression
-							if( preg_match( $elements_regexp, $var_value ) )
+							if( ( $strict_typing == 'allow_empty' && empty( $var_value ) )
+							    || preg_match( $elements_regexp, $var_value ) )
 							{ // OK match, set the corresponding type
 								settype( $globals_var[$i][$j], $elements_type );
 							}
@@ -767,7 +768,7 @@ function param_check_valid_login( $var )
 		}
 		else
 		{
-			$msg = sprintf( T_('Logins cannot contain whitespace and the following characters: %s'), '\', ", >, <, @' );
+			$msg = sprintf( T_('Logins cannot contain whitespace and the following characters: %s'), '\', ", >, <, @, &' );
 		}
 		param_error( $var, $msg );
 		return false;
@@ -874,7 +875,7 @@ function param_check_filename( $var, $err_msg )
 	if( $error_filename = validate_filename( $GLOBALS[$var] ) )
 	{
 		param_error( $var, $error_filename );
-		syslog_insert( sprintf( 'File %s is invalid or has an unrecognized extension', '<b>'.$GLOBALS[$var].'</b>' ), 'warning', 'file' );
+		syslog_insert( sprintf( 'File %s is invalid or has an unrecognized extension', '[['.$GLOBALS[$var].']]' ), 'warning', 'file' );
 		return false;
 	}
 	return true;
@@ -2146,7 +2147,7 @@ function param_check_gender( $var, $required = false )
 	}
 
 	$gender_value = $GLOBALS[$var];
-	if( ( $gender_value != 'M' ) && ( $gender_value != 'F' ) )
+	if( ( $gender_value != 'M' ) && ( $gender_value != 'F' ) && ( $gender_value != 'O' ) )
 	{
 		param_error( $var, 'Gender value is invalid' );
 		return false;
@@ -2282,13 +2283,26 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 			break;
 
 		case 'head_extension':
-			$xhtmlvalidation  = true;
-			// We disable everything else, because the XMHTML validator will set explicit rules for the 'head_extension' context
-			$allow_css_tweaks = false;
-			$allow_javascript = false;
-			$allow_iframes    = false;
-			$allow_objects    = false;
-			$bypass_antispam  = false;
+		case 'body_extension':
+		case 'footer_extension':
+			$Group = $User->get_Group();
+			$xhtmlvalidation = $Group->perm_xhtmlvalidation == 'always';
+			if( $xhtmlvalidation )
+			{ // We disable everything else, because the XMHTML validator will set explicit rules for the 'head_extension' context
+				$allow_css_tweaks = false;
+				$allow_javascript = false;
+				$allow_iframes    = false;
+				$allow_objects    = false;
+				$bypass_antispam  = false;
+			}
+			else
+			{ // Use basic checking
+				$allow_css_tweaks = $Group->perm_xhtml_css_tweaks;
+				$allow_javascript = $Group->perm_xhtml_javascript;
+				$allow_iframes    = $Group->perm_xhtml_iframes;
+				$allow_objects    = $Group->perm_xhtml_objects;
+				$bypass_antispam  = $Group->perm_bypass_antispam;
+			}
 			// Do not add error messages in this context
 			$verbose = false;
 			break;
@@ -2304,6 +2318,27 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 
 	// ANTISPAM check:
 	$error = ( ( ! $bypass_antispam ) && ( $block = antispam_check($content) ) );
+
+	// Log incident in system log
+	if( $error )
+	{
+		switch( $context )
+		{
+			case 'commenting':
+				$object_type = 'comment';
+				break;
+
+			case 'posting':
+			case 'xmlrpc_posting':
+				$object_type = 'item';
+				break;
+
+			default:
+				$object_type = NULL;
+		}
+		syslog_insert( sprintf( T_('Antispam: Illegal content found. Content contains blacklisted word "%s".'), $block ), 'error', $object_type );
+	}
+
 	if( $error && $verbose )
 	{ // Add error message
 		if( $context == 'xmlrpc_posting' )

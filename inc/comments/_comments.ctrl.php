@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -78,6 +78,10 @@ switch( $action )
 		}
 		// Check permission:
 		$current_User->check_perm( $check_permname, $check_permlevel, true, $edited_Comment );
+
+		// Restrict comment status by parent item:
+		$update_restricted_status = ( $action != 'edit' && $action != 'switch_view' );
+		$edited_Comment->restrict_status_by_item( $update_restricted_status );
 
 		$comment_title = '';
 		$comment_content = htmlspecialchars_decode( $edited_Comment->content );
@@ -181,7 +185,7 @@ switch( $action )
 // Set the third level tab
 param( 'tab3', 'string', '', true );
 
-$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
 $AdminUI->breadcrumbpath_add( T_('Comments'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;filter=restore' );
 switch( $tab3 )
 {
@@ -240,6 +244,9 @@ switch( $action )
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
+
+		// Update the folding positions for current user per collection:
+		save_fieldset_folding_values( $Blog->ID );
 
 		if( $edited_Comment->get_author_User() )
 		{	// This comment has been created by member
@@ -397,6 +404,10 @@ switch( $action )
 			$edited_Comment->set( 'status', $comment_status );
 		}
 
+		// Restrict comment status by parent item:
+		$edited_Comment->restrict_status_by_item( true );
+		$comment_status = $edited_Comment->get( 'status' );
+
 		param( 'comment_nofollow', 'integer', 0 );
 		$edited_Comment->set_from_Request( 'nofollow' );
 
@@ -415,15 +426,22 @@ switch( $action )
 		{ // UPDATE DB:
 			$edited_Comment->dbupdate();	// Commit update to the DB
 
-			if( $edited_Comment->status == 'published' )
-			{ // comment status was set to published or it was already published, needs to handle notifications
-				$edited_Comment->handle_notifications( false, $current_User->ID );
-			}
+			// Get params to skip/force/mark email notifications:
+			param( 'comment_members_notified', 'string', NULL );
+			param( 'comment_community_notified', 'string', NULL );
+
+			// Execute or schedule email notifications:
+			$edited_Comment->handle_notifications( NULL, false, $comment_members_notified, $comment_community_notified );
 
 			$Messages->add( T_('Comment has been updated.'), 'success' );
 
-			if( $action != 'update_edit' )
-			{ // Redirect to previous page(e.g. comments list) after updating except of action "Save & Edit"
+			if( $action == 'update_edit' )
+			{	// Redirect back to the edit comment form in order to see the updated content correctly:
+				header_redirect( $admin_url.'?ctrl=comments&blog='.$blog.'&action=edit&comment_ID='.$edited_Comment->ID.'&redirect_to='.rawurlencode( $redirect_to ) );
+				/* exited */
+			}
+			else
+			{	// Redirect to previous page(e.g. comments list) after updating:
 				header_redirect( $redirect_to );
 				/* exited */
 			}
@@ -442,8 +460,12 @@ switch( $action )
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
-		// comment status was set to published, needs to handle notifications
-		$edited_Comment->handle_notifications( false, $current_User->ID );
+		// Get params to skip/force/mark email notifications:
+		param( 'comment_members_notified', 'string', NULL );
+		param( 'comment_community_notified', 'string', NULL );
+
+		// Execute or schedule email notifications:
+		$edited_Comment->handle_notifications( NULL, false, $comment_members_notified, $comment_community_notified );
 
 		// Set the success message corresponding for the new status
 		switch( $edited_Comment->status )
@@ -740,7 +762,7 @@ if( $tab3 == 'fullview' || $tab3 == 'meta' )
 	require_js( '#jqueryUI#' );
 }
 
-if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit', 'elevate' ) ) )
+if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit', 'elevate', 'switch_view' ) ) )
 { // Initialize date picker for _comment.form.php
 	init_datepicker_js();
 	// Init JS to autocomplete the user logins:

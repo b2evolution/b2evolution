@@ -12,7 +12,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( version_compare( $app_version, '3.0' ) < 0 )
+if( evo_version_compare( $app_version, '3.0' ) < 0 )
 { // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.
 	die( 'This skin is designed for b2evolution 3.0 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
@@ -134,7 +134,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ----------------------------END ITEM BLOCK  ----------------------------
 		}
 
-	if( $disp != 'front' && $disp != 'download' )
+	if( $disp != 'front' && $disp != 'download' && $disp != 'terms' )
 	{
 		// Display message if no post:
 		display_if_empty();
@@ -169,7 +169,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				'disp_posts'  => '',		// We already handled this case above
 				'disp_single' => '',		// We already handled this case above
 				'disp_page'   => '',		// We already handled this case above
-				'author_link_text' => 'preferredname',
+				'author_link_text' => 'auto',
 			) );
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.

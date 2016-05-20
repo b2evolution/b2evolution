@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  *
@@ -74,7 +74,7 @@ $SQL->FROM( 'T_antispam' );
 if( !empty( $keywords ) )
 {
 	$SQL->add_search_field( 'aspm_string' );
-	$SQL->WHERE_keywords( $keywords, 'AND' );
+	$SQL->WHERE_kw_search( $keywords, 'AND' );
 }
 
 // Create result set:

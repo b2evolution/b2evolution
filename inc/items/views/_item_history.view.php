@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -133,7 +133,7 @@ $Results->cols[] = array(
 						'default_dir' => 'D',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap',
-						'td' => '%mysql2localedatetime_spans( #iver_edit_datetime#, "M-d" )%',
+						'td' => '%mysql2localedatetime_spans( #iver_edit_datetime#, "Y-m-d", "H:i:s" )%',
 					);
 
 /**

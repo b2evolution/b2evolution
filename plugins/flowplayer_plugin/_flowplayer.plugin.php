@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author fplanque: Francois PLANQUE.
  * @author gorgeb: Bertrand GORGE / EPISTEMA
@@ -41,7 +41,11 @@ class flowplayer_plugin extends Plugin
 
 
 	/**
-	 * @see Plugin::SkinBeginHtmlHead()
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
@@ -66,7 +70,10 @@ class flowplayer_plugin extends Plugin
 
 
 	/**
-	 * @see Plugin::AdminEndHtmlHead()
+	 * Event handler: Called when ending the admin html head section.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
 	 */
 	function AdminEndHtmlHead( & $params )
 	{

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author tor
  * @author tblue246 (Tilman BLUMENBACH)
@@ -230,7 +230,7 @@ $mt_publishPost_doc = 'Published a post';
  */
 function mt_publishPost($m)
 {
-	global $localtimenow, $DB;
+	global $localtimenow, $DB, $current_User;
 
 	// CHECK LOGIN:
 	/**
@@ -270,7 +270,7 @@ function mt_publishPost($m)
 
 	// Execute or schedule notifications & pings:
 	logIO( 'mt_publishPost: Handling notifications...' );
-	$edited_Item->handle_post_processing( false, false );
+	$edited_Item->handle_notifications();
 
 	logIO( 'mt_publishPost: OK.' );
 

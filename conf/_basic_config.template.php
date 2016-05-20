@@ -70,14 +70,19 @@ $tableprefix = 'evo_';
 
 
 /**
- * If you want to be able to reset your existing b2evolution tables and start anew
- * you must set $allow_evodb_reset to 1.
+ * If you want to be able to reset your existing b2evolution tables and start anew,
+ * set $allow_evodb_reset to 1 or 2.
+ *
+ * $allow_evodb_reset = 1; will give you an option to delete the DB in the install menu.
+ * $allow_evodb_reset = 2; will allow you do auto-delete if you try to install again.
+ * Use option 2 only on developer installs where there is no chance to lose important data,
+ * not even important test data.
  *
  * NEVER LEAVE THIS SETTING ON ANYTHING ELSE THAN 0 (ZERO) ON A PRODUCTION SERVER.
- * IF THIS IS ON (1) AND YOU FORGET TO DELETE THE INSTALL FOLDER, ANYONE WOULD BE ABLE TO
- * ERASE YOUR B2EVOLUTION TABLES AND DATA BY A SINGLE CLICK!
+ * IF THIS IS ON (1 or 2) AND YOU FORGET TO DELETE THE INSTALL FOLDER, ANYONE WOULD BE ABLE
+ * TO ERASE YOUR B2EVOLUTION TABLES AND DATA BY A SINGLE CLICK!
  */
-$allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on production servers
+$allow_evodb_reset = 0;	// Set to 1 or 2 to enable. LEAVE this at 0 on production servers!
 
 
 /**
@@ -87,6 +92,16 @@ $allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on product
  * DO THIS ON DEVELOPMENT MACHINES ONLY! NEVER USE THIS SETTING ON A PRODUCTION SERVER!
  */
 // $install_password = 'easy';
+
+
+/**
+ * If you are a developer and you are making repeated installs of b2evolution, you might want to
+ * automatically force the install of the .htaccess file that matches the current version without
+ * requiring an extra confirmation.
+ *
+ * DO THIS ON DEVELOPMENT MACHINES ONLY! MAY BE DANGEROUS ON A PRODUCTION SERVER!
+ */
+// $htaccess = 'force';
 
 
 /**

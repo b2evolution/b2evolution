@@ -66,7 +66,7 @@ echo $params['html_tag'];
 	<?php skin_opengraph_tags(); ?>
 	<?php robots_tag(); ?>
 	<?php
-	global $htsrv_url;
+	global $htsrv_url, $restapi_url;
 	$js_blog_id = "";
 	if( ! empty( $Blog ) )
 	{ // Set global js var "blog_id"
@@ -74,7 +74,8 @@ echo $params['html_tag'];
 	}
 
 	add_js_headline( "// Paths used by JS functions:
-		var htsrv_url = '".get_samedomain_htsrv_url()."';"
+		var htsrv_url = '".get_samedomain_htsrv_url()."';
+		var restapi_url = '".$restapi_url."';"
 		.$js_blog_id );
 
 	// Meta tag with generator info (Please leave this for stats)
@@ -100,9 +101,14 @@ echo $params['html_tag'];
 <body<?php skin_body_attrs( array( 'class' => $params['body_class'] ) ); ?>>
 
 <?php
+$Blog->disp_setting( 'body_includes', 'raw');
+
 // ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
 require skin_fallback_path( '_toolbar.inc.php' );
 // ------------------------------- END OF TOOLBAR --------------------------------
+
+// Call BeforeSkinWrapper to display additional info:
+$Plugins->trigger_event( 'BeforeSkinWrapper' );
 
 echo "\n";
 if( show_toolbar() )

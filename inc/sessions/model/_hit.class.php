@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @todo dh> Lazily handle properties through getters (and do not detect/do much in the constructor)!
@@ -47,7 +47,7 @@ class Hit
 	/**
 	 * The type of hit.
 	 *
-	 * 'standard'|'rss'|'admin'|'ajax'|'service'
+	 * 'standard'|'rss'|'admin'|'ajax'|'service'|'api'
 	 *
 	 * @var string
 	 */
@@ -189,6 +189,12 @@ class Hit
 	var $hit_response_code = 200;
 
 	/**
+	 * Hit request method: 'unknown', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'COPY', 'HEAD', 'OPTIONS', 'LINK', 'UNLINK', 'PURGE', 'LOCK', 'UNLOCK', 'PROPFIND', 'VIEW'
+	 * This is value of $_SERVER['REQUEST_METHOD']
+	 */
+	var $method;
+
+	/**
 	 * Hit action
 	 */
 	var $action;
@@ -228,7 +234,7 @@ class Hit
 	 *
 	 * This may INSERT a basedomain and a useragent but NOT the HIT itself!
 	 */
-	function Hit( $referer = NULL, $IP = NULL, $session_id= NULL, $hit_time = NULL, $test_mode = NULL , $test_uri = NULL, $user_agent = NULL, $test_admin = NULL, $test_rss = NULL)
+	function __construct( $referer = NULL, $IP = NULL, $session_id= NULL, $hit_time = NULL, $test_mode = NULL , $test_uri = NULL, $user_agent = NULL, $test_admin = NULL, $test_rss = NULL)
 	{
 		global $debug;
 
@@ -835,7 +841,7 @@ class Hit
 		}
 		else
 		{
-			$blog_ID = $this->test_uri['blog_id'];
+			$blog_ID = isset( $this->test_uri['blog_id'] ) ? $this->test_uri['blog_id'] : NULL;
 			$ReqURI = $this->test_uri['link'];
 		}
 
@@ -873,9 +879,13 @@ class Hit
 
 		if( empty( $this->hit_type ) )
 		{
-			global $Skin;
+			global $Skin, $is_api_request;
 
-			if( ( isset( $Skin ) && $Skin->type == 'feed' ) || ! empty( $this->test_rss ) )
+			if( ! empty( $is_api_request ) )
+			{	// This is an API request:
+				$this->hit_type = 'api';
+			}
+			elseif( ( isset( $Skin ) && $Skin->type == 'feed' ) || ! empty( $this->test_rss ) )
 			{
 				$this->hit_type = 'rss';
 			}
@@ -889,6 +899,18 @@ class Hit
 				{
 					$this->hit_type = 'standard';
 				}
+			}
+		}
+
+		if( empty( $this->method ) )
+		{	// Initialize a request method:
+			if( isset( $_SERVER['REQUEST_METHOD'] ) && in_array( $_SERVER['REQUEST_METHOD'], array( 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'COPY', 'HEAD', 'OPTIONS', 'LINK', 'UNLINK', 'PURGE', 'LOCK', 'UNLOCK', 'PROPFIND', 'VIEW' ) ) )
+			{	// Current request method is allowed
+				$this->method = $_SERVER['REQUEST_METHOD'];
+			}
+			else
+			{	// Unknown method
+				$this->method = 'unknown';
 			}
 		}
 
@@ -910,7 +932,8 @@ class Hit
 				'hit_remote_addr'       => $DB->quote( $this->IP ),
 				'hit_agent_type'        => $DB->quote( $this->get_agent_type() ),
 				'hit_agent_ID'          => $DB->quote( $this->get_agent_ID() ),
-				'hit_response_code'     => $DB->quote( $this->hit_response_code )
+				'hit_response_code'     => $DB->quote( $this->hit_response_code ),
+				'hit_method'            => $DB->quote( $this->method )
 			);
 
 		if( empty( $this->test_mode ) )

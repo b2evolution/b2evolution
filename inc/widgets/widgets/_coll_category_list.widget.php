@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2008 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package evocore
@@ -28,10 +28,10 @@ class coll_category_list_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function coll_category_list_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'coll_category_list' );
+		parent::__construct( $db_row, 'core', 'coll_category_list' );
 	}
 
 
@@ -128,6 +128,13 @@ class coll_category_list_Widget extends ComponentWidget
 					'note' => T_('A comma-separated list of category IDs that you want to exclude from the list.'),
 					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
 																		'error'   => T_('Invalid list of Category IDs.') ),
+				),
+			'max_colls' => array(
+					'type' => 'text',
+					'label' => T_('Max collections'),
+					'note' => T_('This allows to limit processing time and list length in case of large aggregated collections.'),
+					'defaultvalue' => 15,
+					'size' => 2,
 				),
 			'start_level' => array(
 					'type' => 'text',
@@ -251,7 +258,7 @@ class coll_category_list_Widget extends ComponentWidget
 
 			if( $this->disp_params['option_all'] && intval( $this->disp_params['start_level'] ) < 2 )
 			{ // We want to display a link to all cats:
-				$tmp_disp .= $this->add_cat_class_attr( $this->disp_params['item_start'], 'all' );
+				$tmp_disp .= $this->add_cat_class_attr( $this->disp_params['item_start'], 'evo_cat_all' );
 				$tmp_disp .= '<a href="';
 				if( $this->disp_params['link_type'] == 'context' )
 				{	// We want to preserve current browsing context:
@@ -295,8 +302,17 @@ class coll_category_list_Widget extends ComponentWidget
 			{
 				$coll_ID_array = sanitize_id_list($aggregate_coll_IDs, true);
 			}
-			foreach( $coll_ID_array as $curr_blog_ID )
+
+			// Get max allowed collections for this widget:
+			$max_colls = intval( $this->disp_params['max_colls'] );
+
+			foreach( $coll_ID_array as $c => $curr_blog_ID )
 			{
+				if( $max_colls > 0 && $max_colls <= $c )
+				{	// Limit by max collections number:
+					break;
+				}
+
 				// Get blog:
 				$loop_Blog = & $BlogCache->get_by_ID( $curr_blog_ID, false );
 				if( empty($loop_Blog) )
@@ -468,18 +484,23 @@ class coll_category_list_Widget extends ComponentWidget
 		{ // This category should be selected
 			$start_tag = $this->disp_params['item_selected_start'];
 		}
-		else if( empty( $Chapter->children ) )
-		{ // This category has no children
-			$start_tag = $this->disp_params['item_last_start'];
-		}
 		else
 		{
 			$start_tag = $this->disp_params['item_start'];
 		}
 
+		if( empty( $Chapter->children ) )
+		{	// Add class name "evo_cat_leaf" for categories without children:
+			$start_tag = $this->add_cat_class_attr( $start_tag, 'evo_cat_leaf' );
+		}
+		else
+		{	// Add class name "evo_cat_node" for categories with children:
+			$start_tag = $this->add_cat_class_attr( $start_tag, 'evo_cat_node' );
+		}
+
 		if( $Chapter->meta )
-		{ // Add class name "meta" for meta categories
-			$start_tag = $this->add_cat_class_attr( $start_tag, 'meta' );
+		{	// Add class name "evo_cat_meta" for meta categories:
+			$start_tag = $this->add_cat_class_attr( $start_tag, 'evo_cat_meta' );
 		}
 
 		$r = $start_tag;

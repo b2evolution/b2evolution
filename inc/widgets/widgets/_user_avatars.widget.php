@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -28,10 +28,10 @@ class user_avatars_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function user_avatars_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'user_avatars' );
+		parent::__construct( $db_row, 'core', 'user_avatars' );
 	}
 
 
@@ -50,7 +50,7 @@ class user_avatars_Widget extends ComponentWidget
 				'label' => T_('Block title'),
 				'note' => T_( 'Title to display in your skin.' ),
 				'size' => 40,
-				'defaultvalue' => T_('Random Users'),
+				'defaultvalue' => T_('Users'),
 			),
 			'thumb_size' => array(
 				'label' => T_('Thumbnail size'),
@@ -63,18 +63,29 @@ class user_avatars_Widget extends ComponentWidget
 				'label' => T_('Layout'),
 				'note' => T_('How to lay out the thumbnails'),
 				'type' => 'select',
-				'options' => array( 'grid' => T_( 'Grid' ), 'list' => T_( 'List' ), 'flow' => T_( 'Flowing Blocks' ) ),
+				'options' => array(
+						'rwd'  => T_( 'RWD Blocks' ),
+						'flow' => T_( 'Flowing Blocks' ),
+						'list' => T_( 'List' ), 
+						'grid' => T_( 'Table' ),
+					 ),
 				'defaultvalue' => 'flow',
 			),
-			'grid_nb_cols' => array(
-				'label' => T_( 'Columns' ),
-				'note' => T_( 'Number of columns in grid mode.' ),
-				'size' => 4,
-				'defaultvalue' => 1,
+			'rwd_block_class' => array(
+				'label' => T_('RWD block class'),
+				'note' => T_('Specify the responsive column classes you want to use.'),
+				'size' => 60,
+				'defaultvalue' => 'col-lg-2 col-md-3 col-sm-4 col-xs-6',
 			),
 			'limit' => array(
 				'label' => T_( 'Max pictures' ),
 				'note' => T_( 'Maximum number of pictures to display.' ),
+				'size' => 4,
+				'defaultvalue' => 1,
+			),
+			'grid_nb_cols' => array(
+				'label' => T_( 'Columns' ),
+				'note' => T_( 'Number of columns in Table mode.' ),
 				'size' => 4,
 				'defaultvalue' => 1,
 			),
@@ -92,6 +103,7 @@ class user_avatars_Widget extends ComponentWidget
 						'random'  => T_('Random users'),
 						'regdate' => T_('Most recent registrations'),
 						'moddate' => T_('Most recent profile updates'),
+						'numposts' => T_('Number of posts'),
 					),
 				'defaultvalue' => 'random',
 			),
@@ -100,8 +112,9 @@ class user_avatars_Widget extends ComponentWidget
 				'note' => '',
 				'type' => 'select',
 				'options' => array(
-						'simple' => T_('Pictures only'),
-						'badges' => T_('User badges'),
+						'username' => T_('User Names'),
+						'badges' => T_('Profile Badges'),
+						'simple' => T_('Profile Pictures only'),
 					),
 				'defaultvalue' => 'simple',
 			),
@@ -152,7 +165,7 @@ class user_avatars_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Users pictures');
+		return T_('User list');
 	}
 
 
@@ -195,6 +208,9 @@ class user_avatars_Widget extends ComponentWidget
 			case 'moddate':
 				$sql_order = 'user_profileupdate_date DESC';
 				break;
+			case 'numposts':
+				$sql_order = 'user_numposts DESC';
+				break;
 			case 'random':
 			default:
 				$sql_order = 'RAND()';
@@ -205,7 +221,20 @@ class user_avatars_Widget extends ComponentWidget
 		$SQL = new SQL();
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_users' );
-		$SQL->WHERE( 'user_avatar_file_ID IS NOT NULL' );
+		if( $this->disp_params[ 'order_by' ] == 'numposts' )
+		{ // Highest number of posts
+			$SQL->FROM_add( 'LEFT JOIN
+							( SELECT items_item.post_creator_user_ID, count(*) as user_numposts
+								FROM T_items__item as items_item
+								WHERE items_item.post_status IN ( "published", "community", "protected" )
+    							GROUP BY items_item.post_creator_user_ID
+    						) user_posts
+    						ON user_posts.post_creator_user_ID = user_ID ' );
+		}
+		if( $this->disp_params[ 'style' ] == 'simple' )
+		{ //Display users with pictures
+			$SQL->WHERE( 'user_avatar_file_ID IS NOT NULL' );
+		}
 		$SQL->WHERE_and( 'user_status <> "closed"' );
 		if( is_logged_in() )
 		{ // Add filters
@@ -296,7 +325,7 @@ class user_avatars_Widget extends ComponentWidget
 
 		$UserList->sql = $SQL->get();
 
-		$UserList->query( false, false, false, 'User avatars widget' );
+		$UserList->run_query( false, false, false, 'User avatars widget' );
 
 		$avatar_link_attrs = '';
 		if( $this->disp_params[ 'style' ] == 'badges' )
@@ -307,7 +336,6 @@ class user_avatars_Widget extends ComponentWidget
 
 		$layout = $this->disp_params[ 'thumb_layout' ];
 
-		$nb_cols = intval( $this->disp_params[ 'grid_nb_cols' ] );
 		$count = 0;
 		$r = '';
 		/**
@@ -315,22 +343,7 @@ class user_avatars_Widget extends ComponentWidget
 		 */
 		while( $User = & $UserList->get_next() )
 		{
-			if( $layout == 'grid' )
-			{ // Grid layout
-				if( $count % $nb_cols == 0 )
-				{
-					$r .= $this->disp_params[ 'grid_colstart' ];
-				}
-				$r .= $this->disp_params[ 'grid_cellstart' ];
-			}
-			elseif( $layout == 'flow' )
-			{ // Flow block layout
-				$r .= $this->disp_params[ 'flow_block_start' ];
-			}
-			else
-			{ // List layout
-				$r .= $this->disp_params[ 'item_start' ];
-			}
+			$r .= $this->get_layout_item_start( $count );
 
 			$identity_url = get_user_identity_url( $User->ID );
 			$avatar_tag = $User->get_avatar_imgtag( $this->disp_params['thumb_size'] );
@@ -344,10 +357,18 @@ class user_avatars_Widget extends ComponentWidget
 			if( ! empty( $identity_url ) )
 			{
 				$r .= '<a href="'.$identity_url.'"'.$avatar_link_attrs.'>';
-				$r .= $avatar_tag;
+				if( $this->disp_params[ 'style' ] != 'username' )
+				{ // Display only username
+					$r .= $avatar_tag;
+				}
+
 				if( $this->disp_params[ 'style' ] == 'badges' )
 				{ // Add user login after picture
 					$r .= '<br >'.$User->get_colored_login();
+				}
+				elseif( $this->disp_params[ 'style' ] == 'username' )
+				{ // username without <br>
+					$r .= $User->get_colored_login();
 				}
 				$r .= '</a>';
 			}
@@ -358,22 +379,7 @@ class user_avatars_Widget extends ComponentWidget
 
 			++$count;
 
-			if( $layout == 'grid' )
-			{ // Grid layout
-				$r .= $this->disp_params[ 'grid_cellend' ];
-				if( $count % $nb_cols == 0 )
-				{
-					$r .= $this->disp_params[ 'grid_colend' ];
-				}
-			}
-			elseif( $layout == 'flow' )
-			{ // Flow block layout
-				$r .= $this->disp_params[ 'flow_block_end' ];				
-			}
-			else
-			{ // List layout
-				$r .= $this->disp_params[ 'item_end' ];
-			}
+			$r .= $this->get_layout_item_end( $count );
 		}
 
 		// Exit if no files found
@@ -386,38 +392,11 @@ class user_avatars_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		if( $layout == 'grid' )
-		{
-			echo $this->disp_params[ 'grid_start' ];
-		}
-		elseif( $layout == 'flow' )
-		{ // Flow block layout
-			echo $this->disp_params[ 'flow_start' ];
-		}
-		else
-		{
-			echo $this->disp_params[ 'list_start' ];
-		}
-		
+		echo $this->get_layout_start();
+
 		echo $r;
 
-		if( $layout == 'grid' )
-		{
-			if( $count && ( $count % $nb_cols != 0 ) )
-			{
-				echo $this->disp_params[ 'grid_colend' ];
-			}
-
-			echo $this->disp_params[ 'grid_end' ];
-		}
-		elseif ( $layout == 'flow' )
-		{ // Flow block layout
-			echo $this->disp_params[ 'flow_end' ];
-		}
-		else
-		{
-			echo $this->disp_params[ 'list_end' ];
-		}
+		echo $this->get_layout_end( $count );
 
 		echo $this->disp_params['block_body_end'];
 

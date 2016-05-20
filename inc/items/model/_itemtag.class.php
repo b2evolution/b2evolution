@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -32,10 +32,10 @@ class ItemTag extends DataObject
 	 *
 	 * @param object table Database row
 	 */
-	function ItemTag( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_items__tag', 'tag_', 'tag_ID' );
+		parent::__construct( 'T_items__tag', 'tag_', 'tag_ID' );
 
 		if( $db_row != NULL )
 		{
@@ -81,7 +81,7 @@ class ItemTag extends DataObject
 	{
 		// Name
 		$tag_name = param( 'tag_name', 'string', true );
-		param_check_regexp( 'tag_name', '/^[^,]+$/', T_('Tag cannot contain a comma.') );
+		param_check_regexp( 'tag_name', '/^[^,]+$/', T_('Tags cannot contain commas.') );
 		$this->set( 'name', $tag_name );
 		if( $existing_tag_ID = $this->dbexists( 'tag_name', $tag_name ) )
 		{ // Other tag already exists with the same name:

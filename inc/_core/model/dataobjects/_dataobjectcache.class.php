@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -125,7 +125,7 @@ class DataObjectCache
 	 * @param mixed  The value that gets used for the "None" option in the objects options list.
 	 * @param string Additional part for SELECT clause of sql query
 	 */
-	function DataObjectCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname, $name_field = NULL, $order_by = '', $allow_none_text = NULL, $allow_none_value = '', $select = '' )
+	function __construct( $objtype, $load_all, $tablename, $prefix = '', $dbIDname, $name_field = NULL, $order_by = '', $allow_none_text = NULL, $allow_none_value = '', $select = '' )
 	{
 		$this->objtype = $objtype;
 		$this->load_all = $load_all;
@@ -226,7 +226,7 @@ class DataObjectCache
 		if( empty( $req_list ) )
 			return false;
 
-		$SQL = $this->get_SQL_object();
+		$SQL = $this->get_SQL_object( 'Get the '.$this->objtype.' rows to load the objects into the cache by '.get_class().'->'.__FUNCTION__.'()' );
 		$SQL->WHERE_and($this->dbIDname.( $invert ? ' NOT' : '' ).' IN ('.implode(',', $req_list).')');
 
 		return $this->load_by_sql($SQL);
@@ -240,7 +240,7 @@ class DataObjectCache
 	 */
 	function load_where( $sql_where )
 	{
-		$SQL = $this->get_SQL_object();
+		$SQL = $this->get_SQL_object( 'Get the '.$this->objtype.' rows to load the objects into the cache by '.get_class().'->'.__FUNCTION__.'()' );
 		$SQL->WHERE($sql_where);
 		return $this->load_by_sql($SQL);
 	}
@@ -257,7 +257,7 @@ class DataObjectCache
 	{
 		global $DB, $Debuglog;
 
-		if( is_a($Debuglog, 'Log') )
+		if( $Debuglog instanceof Log )
 		{
 			$sql_where = trim($SQL->get_where(''));
 			if( empty($sql_where) )
@@ -271,6 +271,11 @@ class DataObjectCache
 			$SQL->WHERE_and($this->dbIDname.' NOT IN ('.implode(',', $loaded_IDs).')');
 		}
 
+		if( empty( $SQL->title ) )
+		{	// Set SQL title for debug info:
+			$SQL->title = 'Get the '.$this->objtype.' rows to load the objects into the cache by '.get_class().'->'.__FUNCTION__.'()';
+		}
+
 		return $this->instantiate_list($DB->get_results( $SQL->get(), OBJECT, $SQL->title ));
 	}
 
@@ -281,7 +286,7 @@ class DataObjectCache
 	 * @param string Optional query title
 	 * @return SQL
 	 */
-	function get_SQL_object($title = NULL)
+	function get_SQL_object( $title = NULL )
 	{
 		$select = '';
 		if( !empty( $this->select ) )
@@ -898,11 +903,24 @@ class DataObjectCache
 	 *
 	 * Load the cache if necessary
 	 *
+	 * @param array IDs to ignore.
+	 * @return string
+	 */
+	function get_option_array( $ignore_IDs = array() )
+	{
+		return $this->get_option_array_worker( 'get_name', $ignore_IDs );
+	}
+
+	/**
+	 * Returns option array with cache contents
+	 *
+	 * Load the cache if necessary
+	 *
 	 * @param string Callback method name
 	 * @param array IDs to ignore.
 	 * @return string
 	 */
-	function get_option_array( $method = 'get_name', $ignore_IDs = array() )
+	function get_option_array_worker( $method = 'get_name', $ignore_IDs = array() )
 	{
 		if( ! $this->all_loaded && $this->load_all )
 		{ // We have not loaded all items so far, but we're allowed to.

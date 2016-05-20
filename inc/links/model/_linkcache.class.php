@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -77,9 +77,9 @@ class LinkCache extends DataObjectCache
 	/**
 	 * Constructor
 	 */
-	function LinkCache()
+	function __construct()
 	{
-		parent::DataObjectCache( 'Link', false, 'T_links', 'link_', 'link_ID' );
+		parent::__construct( 'Link', false, 'T_links', 'link_', 'link_ID' );
 	}
 
 
@@ -274,12 +274,13 @@ class LinkCache extends DataObjectCache
 	 * Load a set of Links by the given link type into the cache.
 	 *
 	 * @param SQL SQL object
+	 * @param string Cache type
 	 */
 	function load_type_by_sql( $SQL, $cache_type )
 	{
 		global $DB;
 
-		$links = $DB->get_results( $SQL->get() );
+		$links = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
 
 		// Load linked files into the FileCache
 		$this->load_linked_files( $links );
@@ -333,7 +334,7 @@ class LinkCache extends DataObjectCache
 
 			$Debuglog->add( "Loading <strong>$this->objtype(Item #$item_ID)</strong> into cache", 'dataobjects' );
 
-			$SQL = new SQL( 'Get the links by item ID' );
+			$SQL = new SQL( 'Get the links by item ID #'.$item_ID );
 			$SQL->SELECT( '*' );
 			$SQL->FROM( 'T_links' );
 			$SQL->WHERE( 'link_itm_ID  = '.$DB->quote( $item_ID ) );
@@ -369,7 +370,7 @@ class LinkCache extends DataObjectCache
 
 		$Debuglog->add( "Loading <strong>$this->objtype(Comment #$comment_ID)</strong> into cache", 'dataobjects' );
 
-		$SQL = new SQL( 'Get the links by comment ID' );
+		$SQL = new SQL( 'Get the links by comment ID #'.$comment_ID );
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_cmt_ID  = '.$DB->quote( $comment_ID ) );
@@ -402,7 +403,7 @@ class LinkCache extends DataObjectCache
 
 		$Debuglog->add( "Loading <strong>$this->objtype(User #$user_ID)</strong> into cache", 'dataobjects' );
 
-		$SQL = new SQL( 'Get the links by user ID' );
+		$SQL = new SQL( 'Get the links by user ID #'.$user_ID );
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_usr_ID  = '.$DB->quote( $user_ID ) );
@@ -425,6 +426,11 @@ class LinkCache extends DataObjectCache
 	{
 		global $DB, $Debuglog;
 
+		if( empty( $itemIDarray ) )
+		{	// Nothing to load:
+			return false;
+		}
+
 		$item_list = implode( ',', $itemIDarray );
 
 		$Debuglog->add( "Loading <strong>$this->objtype(Items #$item_list)</strong> into cache", 'dataobjects' );
@@ -436,7 +442,7 @@ class LinkCache extends DataObjectCache
 			$this->loaded_cache_item[$item_ID] = true;
 		}
 
-		$SQL = new SQL( 'Get the links by item IDs' );
+		$SQL = new SQL( 'Get the links by item IDs: '.$item_list );
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_itm_ID IN ('.$item_list.')' );
@@ -445,6 +451,42 @@ class LinkCache extends DataObjectCache
 		$this->load_type_by_sql( $SQL, 'item' );
 
 		return true;
+	}
+
+
+	/**
+	 * Load links for a given Comment list
+	 *
+	 * @todo cache Link targets before letting the Link constructor handle it
+	 *
+	 * @param array Comment IDs to load links for
+	 */
+	function load_by_comment_list( $comment_IDs )
+	{
+		global $DB, $Debuglog;
+
+		if( empty( $comment_IDs ) )
+		{	// Nothing to load:
+			return;
+		}
+
+		$comment_list = implode( ',', $comment_IDs );
+
+		$Debuglog->add( "Loading <strong>$this->objtype(Comments #$comment_list)</strong> into cache", 'dataobjects' );
+
+		foreach( $comment_IDs as $comment_ID )
+		{ // Remember this special load for each comment in list:
+			$this->cache_comment[ $comment_ID ] = array();
+			$this->loaded_cache_comment[ $comment_ID ] = true;
+		}
+
+		$SQL = new SQL( 'Get the links by comment IDs: '.$comment_list );
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_links' );
+		$SQL->WHERE( 'link_cmt_ID IN ( '.$comment_list.' )' );
+		$SQL->ORDER_BY( 'link_ID' );
+
+		$this->load_type_by_sql( $SQL, 'comment' );
 	}
 
 
@@ -469,7 +511,7 @@ class LinkCache extends DataObjectCache
 
 		$Debuglog->add( "Loading <strong>$this->objtype(File #$file_ID)</strong> into cache", 'dataobjects' );
 
-		$SQL = new SQL( 'Get the links by file ID' );
+		$SQL = new SQL( 'Get the links by file ID #'.$file_ID );
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_file_ID = '.$DB->quote( $file_ID ) );

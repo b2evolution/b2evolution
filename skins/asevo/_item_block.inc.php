@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -21,7 +21,7 @@ $params = array_merge( array(
 		'content_mode'     => 'auto',		// 'auto' will auto select depending on $disp-detail
 		'item_class'       => 'evo_post evo_content_block',
 		'image_size'	     => 'fit-400x320',
-		'author_link_text' => 'preferredname',
+		'author_link_text' => 'auto',
 	), $params );
 
 echo '<div class="evo_content_block">'; // Beginning of post display
@@ -93,7 +93,6 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	if( $disp == 'single' )
 	{
 		// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-		// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 		// Display container contents:
 		skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 			// The following (optional) params will be used as defaults for widgets included in this container:
@@ -104,7 +103,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
 			// Params for skin file "_item_content.inc.php"
-			'widget_coll_item_content_params' => $params,
+			'widget_item_content_params' => $params,
 		) );
 		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 	}

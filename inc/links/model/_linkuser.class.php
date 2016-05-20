@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -28,10 +28,10 @@ class LinkUser extends LinkOwner
 	/**
 	 * Constructor
 	 */
-	function LinkUser( $User )
+	function __construct( $User )
 	{
 		// call parent contsructor
-		parent::LinkOwner( $User, 'user' );
+		parent::__construct( $User, 'user' );
 		$this->User = & $this->link_Object;
 
 		$this->_trans = array(
@@ -122,13 +122,14 @@ class LinkUser extends LinkOwner
 		if( $edited_Link->dbinsert() )
 		{
 			if( ! is_null( $this->Links ) )
-			{ // If user Links were already loaded update its content 
+			{ // If user Links were already loaded update its content
 				$this->Links[$edited_Link->ID] = & $edited_Link;
 			}
 			$FileCache = & get_FileCache();
 			$File = $FileCache->get_by_ID( $file_ID, false, false );
 			$file_name = empty( $File ) ? '' : $File->get_name();
-			syslog_insert( sprintf( 'File %s was linked to %s with ID=%s', '<b>'.$file_name.'</b>', $this->type, $this->link_Object->ID ), 'info', 'file', $file_ID );
+			$file_dir = $File->dir_or_file();
+			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s', ucfirst( $file_dir ), '[['.$file_name.']]', $this->type, $this->link_Object->ID ), 'info', 'file', $file_ID );
 
 			return $edited_Link->ID;
 		}

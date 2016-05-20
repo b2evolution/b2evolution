@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -75,7 +75,7 @@ $schema_queries['T_hitlog'] = array(
 			hit_disp              VARCHAR(30) DEFAULT NULL,
 			hit_ctrl              VARCHAR(30) COLLATE ascii_general_ci DEFAULT NULL,
 			hit_action            VARCHAR(30) DEFAULT NULL,
-			hit_type              ENUM('standard','rss','admin','ajax', 'service') COLLATE ascii_general_ci DEFAULT 'standard' NOT NULL,
+			hit_type              ENUM('standard','rss','admin','ajax', 'service', 'api') COLLATE ascii_general_ci DEFAULT 'standard' NOT NULL,
 			hit_referer_type      ENUM('search','special','spam','referer','direct','self') COLLATE ascii_general_ci NOT NULL,
 			hit_referer           VARCHAR(250) DEFAULT NULL,
 			hit_referer_dom_ID    INT UNSIGNED DEFAULT NULL,
@@ -87,6 +87,7 @@ $schema_queries['T_hitlog'] = array(
 			hit_agent_type        ENUM('robot','browser','unknown') COLLATE ascii_general_ci DEFAULT 'unknown' NOT NULL,
 			hit_agent_ID          SMALLINT UNSIGNED NULL DEFAULT NULL,
 			hit_response_code     SMALLINT DEFAULT NULL,
+			hit_method            ENUM('unknown','GET','POST','PUT','PATCH','DELETE','COPY','HEAD','OPTIONS','LINK','UNLINK','PURGE','LOCK','UNLOCK','PROPFIND','VIEW') COLLATE ascii_general_ci DEFAULT 'unknown' NOT NULL,
 			PRIMARY KEY              ( hit_ID ),
 			INDEX hit_coll_ID        ( hit_coll_ID ),
 			INDEX hit_uri            ( hit_uri ),

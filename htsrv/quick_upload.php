@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package htsrv
  */
@@ -302,7 +302,7 @@ if( $upload )
 		$message['text'] = $error_filename;
 		$message['status'] = 'error';
 		out_echo( $message, $specialchars );
-		syslog_insert( sprintf( 'The uploaded file %s has an unrecognized extension', '<b>'.$newName.'</b>' ), 'warning', 'file' );
+		syslog_insert( sprintf( 'The uploaded file %s has an unrecognized extension', '[['.$newName.']]' ), 'warning', 'file' );
 		exit();
 	}
 
@@ -433,6 +433,7 @@ if( $upload )
 		{ // Success uploading
 			$message['text'] = $newFile->get_preview_thumb( 'fulltype' );
 			$message['status'] = 'success';
+			report_user_upload( $newFile );
 		}
 
 		$message['newname'] = $newName;

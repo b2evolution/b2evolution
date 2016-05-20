@@ -1,4 +1,4 @@
-/* http://prismjs.com/download.html?themes=prism&languages=markup+css+clike+javascript+php+sql&plugins=line-numbers+show-language */
+/* http://prismjs.com/download.html?themes=prism&languages=markup+css+clike+javascript+apacheconf+php+sql&plugins=line-numbers+show-language */
 /**
  * prism.js default theme for JavaScript, CSS and HTML
  * Based on dabblet (http://dabblet.com)
@@ -63,6 +63,7 @@ pre[class*="language-"] {
 :not(pre) > code[class*="language-"] {
 	padding: .1em;
 	border-radius: .3em;
+	white-space: normal;
 }
 
 .token.comment,
@@ -176,13 +177,11 @@ pre.line-numbers > code {
 			padding-right: 0.8em;
 			text-align: right;
 		}
-pre[class*='language-'] {
+div.prism-show-language {
 	position: relative;
-	max-height: 28em;
-	padding-bottom: 0;
 }
-pre[class*='language-'][data-language]::before {
-	content: attr(data-language);
+
+div.prism-show-language > div.prism-show-language-label {
 	color: black;
 	background-color: #CFCFCF;
 	display: inline-block;
@@ -206,4 +205,17 @@ pre[class*='language-'][data-language]::before {
 	-ms-transform: none;
 	-o-transform: none;
 	transform: none;
+}
+
+/* Custom b2evo styles */
+pre[class*="language-"] {
+	max-height: 28em;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+pre[class*="language-"] code[class*="language-"] {
+	display: block;
+}
+.prism-show-language {
+	margin-top: .5em;
 }

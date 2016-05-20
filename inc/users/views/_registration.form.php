@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -85,8 +85,10 @@ $Form->begin_fieldset( T_('Default user settings').get_manual_link('default-user
 		array( 'notify_unread_messages', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'I have unread private messages for more than 24 hours.' ),  $Settings->get( 'def_notify_unread_messages' ), false, T_( 'This notification is sent only once every 3 days.' ) ),
 		array( 'notify_published_comments', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is published on one of <strong>my</strong> posts.' ), $Settings->get( 'def_notify_published_comments' ) ),
 		array( 'notify_comment_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is posted and I have permissions to moderate it.' ), $Settings->get( 'def_notify_comment_moderation' ) ),
+		array( 'notify_edit_cmt_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is modified and I have permissions to moderate it.' ), $Settings->get( 'def_notify_edit_cmt_moderation' ) ),
 		array( 'notify_meta_comments', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a meta comment is posted and I have permission to view it.' ), $Settings->get( 'def_notify_meta_comments' ) ),
 		array( 'notify_post_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a post is created and I have permissions to moderate it.' ), $Settings->get( 'def_notify_post_moderation' ) ),
+		array( 'notify_edit_pst_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a post is modified and I have permissions to moderate it.' ), $Settings->get( 'def_notify_edit_pst_moderation' ) ),
 	);
 	$Form->checklist( $notify_options, 'default_user_notification', T_( 'Notify me by email whenever' ) );
 
@@ -149,7 +151,7 @@ $Form->begin_fieldset( T_('Security options').get_manual_link('registration-secu
 
 	$Form->checkbox_input( 'passwd_special', (bool)$Settings->get('passwd_special'), T_('Require specials characters'), array( 'note'=>T_('Check to require at least 1 special character (not a letter nor a digit).')) );
 
-	$Form->checkbox_input( 'strict_logins', (bool)$Settings->get('strict_logins'), T_('Require strict logins'), array( 'note'=>sprintf( T_('Check to require only plain ACSII characters in user logins. Uncheck to allow any characters and symbols. The following characters are never allowed for security reasons: %s'), '\', ", >, <, @') ) );
+	$Form->checkbox_input( 'strict_logins', (bool)$Settings->get('strict_logins'), T_('Require strict logins'), array( 'note'=>sprintf( T_('Check to require only plain ACSII characters in user logins. Uncheck to allow any characters and symbols. The following characters are never allowed for security reasons: %s'), '\', ", >, <, @, &') ) );
 
 $Form->end_fieldset();
 

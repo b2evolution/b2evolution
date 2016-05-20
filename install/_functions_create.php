@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}
  * Parts of this file are copyright (c)2005 by Jason EDGECOMBE
  *
@@ -41,10 +41,10 @@ function create_tables()
  */
 function create_default_data()
 {
-	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $spam_Group;
+	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $spam_Group, $blogb_Group;
 	global $DB, $locales, $current_locale, $baseurl;
 	// This will install all sorts of additional things... for testing purposes:
-	global $test_install_all_features, $create_sample_contents;
+	global $install_test_features, $create_sample_contents;
 
 	// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
 	load_class('plugins/model/_plugins_admin_no_db.class.php', 'Plugins_admin_no_DB' );
@@ -116,6 +116,14 @@ function create_default_data()
 	$spam_Group->set( 'perm_blogs', 'user' );
 	$spam_Group->set( 'perm_stats', 'none' );
 	$spam_Group->dbinsert();
+
+	$blogb_Group = new Group(); // COPY !
+	$blogb_Group->set( 'name', 'Blog B Members' );
+	$blogb_Group->set( 'usage', 'secondary' );
+	$blogb_Group->set( 'level', 1 );
+	$blogb_Group->set( 'perm_blogs', 'user' );
+	$blogb_Group->set( 'perm_stats', 'none' );
+	$blogb_Group->dbinsert();
 	task_end();
 
 	task_begin( 'Creating groups for user field definitions... ' );
@@ -179,15 +187,16 @@ function create_default_data()
 	// Create organization
 	global $user_org_IDs;
 	$user_org_IDs = NULL;
-	if( $create_sample_contents )
-	{ // Only when demo content is installing
-		$Organization = new Organization();
-		$Organization->set( 'name', 'Company XYZ' );
-		$Organization->set( 'url', 'http://b2evolution.net/' );
-		if( $Organization->dbinsert() )
-		{ // Use this organization for new created users
-			$user_org_IDs = array( $Organization->ID );
-		}
+	
+	// A default organization will be created so that there will be something to
+	// display in the homepage's organization members widget
+	$Organization = new Organization();
+	$Organization->set( 'owner_user_ID', '1' );
+	$Organization->set( 'name', 'Company XYZ' );
+	$Organization->set( 'url', 'http://b2evolution.net/' );
+	if( $Organization->dbinsert() )
+	{ // Use this organization for new created users
+		$user_org_IDs = array( $Organization->ID );
 	}
 
 	// Set default country from locale code
@@ -242,31 +251,163 @@ function create_default_data()
 
 	// added in Phoenix-Alpha
 	task_begin( 'Creating default Post Types... ' );
-	$DB->query( "
-		INSERT INTO T_items__type ( ityp_ID, ityp_name, ityp_backoffice_tab, ityp_template_name,
-					 ityp_allow_html, ityp_allow_breaks, ityp_allow_featured, ityp_perm_level, ityp_use_parent )
-		VALUES ( 1,    'Post',          'Posts',         'single', 1, 1, 1, 'standard',   'never' ),
-					 ( 10,   'Custom Fields Example', 'Posts', 'single', 1, 1, 1, 'standard',   'never' ),
-					 ( 20,   'Child Post Example',    'Posts', 'single', 1, 1, 1, 'standard',   'required' ),
-					 ( 100,  'Manual Page',   'Posts',         'single', 0, 1, 1, 'standard',   'never' ),
-					 ( 200,  'Forum Topic',   'Posts',         'single', 0, 1, 1, 'standard',   'never' ),
-					 ( 1000, 'Page',          'Pages',         'page',   1, 1, 1, 'restricted', 'never' ),
-					 ( 1400, 'Intro-Front',   'Intros',        NULL,     1, 0, 0, 'restricted', 'never' ),
-					 ( 1500, 'Intro-Main',    'Intros',        NULL,     1, 0, 0, 'restricted', 'never' ),
-					 ( 1520, 'Intro-Cat',     'Intros',        NULL,     1, 0, 0, 'restricted', 'never' ),
-					 ( 1530, 'Intro-Tag',     'Intros',        NULL,     1, 0, 0, 'restricted', 'never' ),
-					 ( 1570, 'Intro-Sub',     'Intros',        NULL,     1, 0, 0, 'restricted', 'never' ),
-					 ( 1600, 'Intro-All',     'Intros',        NULL,     1, 0, 0, 'restricted', 'never' ),
-					 ( 2000, 'Podcast',       'Podcasts',      'single', 1, 1, 1, 'standard',   'never' ),
-					 ( 3000, 'Sidebar link',  'Sidebar links', NULL,     1, 1, 1, 'admin',      'never' ),
-					 ( 4000, 'Advertisement', 'Advertisement', NULL,     1, 1, 1, 'admin',      'never' ),
-					 ( 5000, 'Reserved',      NULL,            NULL,     1, 1, 1, 'standard',   'never' )" );
+	$post_types = array();
+	$post_types[] = array(
+			'name'           => 'Post',
+		);
+	$post_types[] = array(
+			'name'           => 'Podcast Episode',
+			'podcast'        => 1,
+		);
+	$post_types[] = array(
+			'name'           => 'Post with Custom Fields',
+		);
+	$post_types[] = array(
+			'name'           => 'Child Post',
+			'use_parent'     => 'required',
+		);
+	$post_types[] = array(
+			'name'           => 'Manual Page',
+			'allow_html'     => 0,
+		);
+	$post_types[] = array(
+			'name'           => 'Forum Topic',
+			'allow_html'     => 0,
+		);
+	$post_types[] = array(
+			'name'           => 'Photo Album',
+		);
+	$post_types[] = array(
+			'name'           => 'Standalone Page',
+			'usage'          => 'page',
+			'template_name'  => 'page',
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-Front',
+			'usage'          => 'intro-front',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-Main',
+			'usage'          => 'intro-main',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-Cat',
+			'usage'          => 'intro-cat',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-Tag',
+			'usage'          => 'intro-tag',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-Sub',
+			'usage'          => 'intro-sub',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Intro-All',
+			'usage'          => 'intro-all',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'perm_level'     => 'restricted',
+		);
+	$post_types[] = array(
+			'name'           => 'Sidebar link',
+			'usage'          => 'special',
+			'template_name'  => NULL,
+			'perm_level'     => 'admin',
+		);
+	$post_types[] = array(
+			'name'           => 'Advertisement',
+			'usage'          => 'special',
+			'template_name'  => NULL,
+			'perm_level'     => 'admin',
+		);
+	$post_types[] = array(
+			'name'                   => 'Terms & Conditions',
+			'usage'                  => 'special',
+			'template_name'          => NULL,
+			'allow_breaks'           => 0,
+			'allow_featured'         => 0,
+			'perm_level'             => 'admin',
+			'description'            => 'Use this post type for terms & conditions of the site.',
+			'use_text'               => 'required',
+			'use_tags'               => 'never',
+			'use_excerpt'            => 'never',
+			'use_url'                => 'never',
+			'use_parent'             => 'never',
+			'use_title_tag'          => 'never',
+			'use_meta_desc'          => 'never',
+			'use_meta_keywds'        => 'never',
+			'use_comments'           => 0,
+			'allow_closing_comments' => 0,
+			'use_comment_expiration' => 'never',
+			'use_custom_fields'      => 0,
+		);
+	// Default settings:
+	$post_type_default_settings = array(
+			'name'                   => '',
+			'description'            => NULL,
+			'usage'                  => 'post',
+			'template_name'          => 'single',
+			'perm_level'             => 'standard',
+			'allow_html'             => 1,
+			'allow_breaks'           => 1,
+			'allow_featured'         => 1,
+			'use_text'               => 'optional',
+			'use_tags'               => 'optional',
+			'use_excerpt'            => 'optional',
+			'use_url'                => 'optional',
+			'podcast'                => 0,
+			'use_parent'             => 'never',
+			'use_title_tag'          => 'optional',
+			'use_meta_desc'          => 'optional',
+			'use_meta_keywds'        => 'optional',
+			'use_comments'           => 1,
+			'allow_closing_comments' => 1,
+			'use_comment_expiration' => 'optional',
+			'use_custom_fields'      => 1,
+		);
+	$post_types_sql = 'INSERT INTO T_items__type ( ityp_'.implode( ', ityp_', array_keys( $post_type_default_settings ) ).' ) VALUES ';
+	foreach( $post_types as $p => $post_type )
+	{
+		$post_type = array_merge( $post_type_default_settings, $post_type );
+		$post_types_sql .= '( '.$DB->quote( $post_type ).' )';
+		if( $p != count( $post_types ) - 1 )
+		{
+			$post_types_sql .= ',';
+		}
+	}
+	// Insert item types:
+	$DB->query( $post_types_sql );
 
 	$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type )
-			VALUES ( 2, "First numeric field", "first_numeric_field", "double" ),
-						 ( 2, "Second numeric field", "second_numeric_field", "double" ),
-						 ( 2, "First text field", "first_text_field", "varchar" ),
-						 ( 2, "Define you own labels", "define_you_own_labels", "varchar" )' );
+			VALUES ( 3, "First numeric field", "first_numeric_field", "double" ),
+						 ( 3, "Second numeric field", "second_numeric_field", "double" ),
+						 ( 3, "First string field", "first_string_field", "varchar" ),
+						 ( 3, "Define you own labels", "define_you_own_labels", "varchar" ),
+						 ( 3, "Multiline plain text field", "multiline_plain_text_field", "text" ),
+						 ( 3, "Multiline HTML field", "multiline_html_field", "html" )' );
 	task_end();
 
 
@@ -336,6 +477,27 @@ function create_default_data()
 	task_begin( 'Creating default goal category... ' );
 	$DB->query( 'INSERT INTO T_track__goalcat ( gcat_name, gcat_color )
 		VALUES ( '.$DB->quote( 'Default' ).', '.$DB->quote( '#999999' ).' )' );
+	task_end();
+
+
+	task_begin( 'Creating default polls... ' );
+	$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text )
+		VALUES ( 1, "What is your favorite b2evolution feature?" )' );
+	$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
+		VALUES ( 1, "Multiple blogs",          1 ),
+		       ( 1, "Photo Galleries",         2 ),
+		       ( 1, "Forums",                  3 ),
+		       ( 1, "Online Manuals",          4 ),
+		       ( 1, "Newsletters / E-mailing", 5 ),
+		       ( 1, "Easy Maintenance",        6 )' );
+	$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
+		VALUES ( 1, 5, 1 ),
+		       ( 1, 6, 2 ),
+		       ( 1, 7, 2 ),
+		       ( 1, 2, 2 ),
+		       ( 1, 3, 3 ),
+		       ( 1, 4, 3 ),
+		       ( 1, 1, 6 )' );
 	task_end();
 
 	// Update the progress bar status
@@ -1117,7 +1279,7 @@ function create_blog(
 	$owner_user_ID = 1,
 	$group_ID = NULL )
 {
-	global $default_locale, $test_install_all_features, $local_installation, $Plugins;
+	global $default_locale, $install_test_features, $local_installation, $Plugins;
 
 	$Blog = new Blog( NULL );
 
@@ -1127,7 +1289,6 @@ function create_blog(
 
 	if( ( $kind == 'forum' || $kind == 'manual' ) && ( $Plugin = & $Plugins->get_by_code( 'b2evMark' ) ) !== false )
 	{ // Initialize special Markdown plugin settings for Forums and Manual blogs
-		$Blog->set_setting( 'plugin'.$Plugin->ID.'_coll_apply_rendering', 'opt-out' );
 		$Blog->set_setting( 'plugin'.$Plugin->ID.'_coll_apply_comment_rendering', 'opt-out' );
 		$Blog->set_setting( 'plugin'.$Plugin->ID.'_links', '1' );
 		$Blog->set_setting( 'plugin'.$Plugin->ID.'_images', '1' );
@@ -1150,24 +1311,31 @@ function create_blog(
 
 	$Blog->dbinsert();
 
-	if( $test_install_all_features )
+	if( $install_test_features )
 	{
 		$allow_rating_items = 'any';
 		$Blog->set_setting( 'skin'.$blog_skin_ID.'_bubbletip', '1' );
+		echo_install_log( 'TEST FEATURE: Activating username bubble tips on skin of collection #'.$Blog->ID );
 		$Blog->set_setting( 'skin'.$blog_skin_ID.'_gender_colored', '1' );
+		echo_install_log( 'TEST FEATURE: Activating gender colored usernames on skin of collection #'.$Blog->ID );
 		$Blog->set_setting( 'in_skin_editing', '1' );
+		echo_install_log( 'TEST FEATURE: Activating in-skin editing on collection #'.$Blog->ID );
 
 		if( $kind == 'manual' )
 		{	// Set a posts ordering by 'post_order ASC'
 			$Blog->set_setting( 'orderby', 'order' );
 			$Blog->set_setting( 'orderdir', 'ASC' );
+			echo_install_log( 'TEST FEATURE: Setting a posts ordering by asceding post order field on collection #'.$Blog->ID );
 		}
+
+		$Blog->set_setting( 'use_workflow', 1 );
+		echo_install_log( 'TEST FEATURE: Activating workflow on collection #'.$Blog->ID );
 	}
 	if( $allow_rating_items != '' )
 	{
 		$Blog->set_setting( 'allow_rating_items', $allow_rating_items );
 	}
-	if( $use_inskin_login || $test_install_all_features )
+	if( $use_inskin_login || $install_test_features )
 	{
 		$Blog->set_setting( 'in_skin_login', 1 );
 	}
@@ -1300,6 +1468,27 @@ function assign_profile_picture( & $User, $login = NULL )
 
 
 /**
+ * Assign secondary groups to user
+ *
+ * @param integer User ID
+ * @param array IDs of groups
+ */
+function assign_secondary_groups( $user_ID, $secondary_group_IDs )
+{
+	if( empty( $secondary_group_IDs ) )
+	{	// Nothing to assign, Exit here:
+		return;
+	}
+
+	global $DB;
+
+	$DB->query( 'INSERT INTO T_users__secondary_user_groups ( sug_user_ID, sug_grp_ID )
+			VALUES ( '.$user_ID.', '.implode( ' ), ( '.$user_ID.', ', $secondary_group_IDs ).' )',
+		'Assign secondary groups ('.implode( ', ', $secondary_group_IDs ).') to User #'.$user_ID );
+}
+
+
+/**
  * This is called only for fresh installs and fills the tables with
  * demo/tutorial things.
  */
@@ -1308,12 +1497,12 @@ function create_demo_contents()
 	global $baseurl, $admin_url, $new_db_version;
 	global $random_password, $query;
 	global $timestamp, $admin_email;
-	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group;
+	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $blogb_Group;
 	global $blog_all_ID, $blog_home_ID, $blog_a_ID, $blog_b_ID;
 	global $DB;
 	global $default_locale, $default_country;
-	global $Plugins;
-	global $test_install_all_features;
+	global $Plugins, $Settings;
+	global $install_test_features;
 	global $user_org_IDs;
 
 	/**
@@ -1337,16 +1526,18 @@ function create_demo_contents()
 	$User_Admin = & $UserCache->get_by_ID( 1 );
 
 	global $media_path;
+	$src_admin_dir = $media_path.'users/admin';
+	$dest_admin_dir = $media_path.'users/'.$User_Admin->login;
 	if( $User_Admin->login != 'admin' )
 	{ // If admin login is not "admin" we should try to rename folder of the admin avatars
-		if( ! file_exists( $media_path.'users/admin' ) ||
-		    ! is_dir( $media_path.'users/admin' ) ||
-		    ! @rename( $media_path.'users/admin', $media_path.'users/'.$User_Admin->login ) )
+		if( ! file_exists( $src_admin_dir ) ||
+		    ! is_dir( $src_admin_dir ) ||
+		    ! @rename( $src_admin_dir, $dest_admin_dir ) )
 		{ // Impossible to rename the admin folder to another name
 
 			// Display the errors:
-			echo '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to rename <code>/media/users/admin/</code> to <code>/media/users/%s/</code>.', $User_Admin->login ).'</evo:error></span> ';
-			echo '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to use "%s" for the admin account. Using "admin" instead.', $User_Admin->login ).'</evo:error></span> ';
+			echo get_install_format_text( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to rename <code>%s</code> to <code>%s</code>.', $src_admin_dir, $dest_admin_dir ).'</evo:error></span> ' );
+			echo get_install_format_text( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to use "%s" for the admin account. Using "admin" instead.', $User_Admin->login ).'</evo:error></span> ' );
 
 			// Change admin login to "admin":
 			$User_Admin->set( 'login', 'admin' );
@@ -1481,7 +1672,9 @@ function create_demo_contents()
 					'Micro bio' => 'Hi there!',
 				)
 		) );
-	assign_profile_picture( $UserCache->get_by_ID( $larry_user_ID ) );
+	$larry_User = & $UserCache->get_by_ID( $larry_user_ID );
+	assign_profile_picture( $larry_User );
+	assign_secondary_groups( $larry_User->ID, array( $blogb_Group->ID ) );
 	task_end();
 
 	task_begin('Creating demo user kate... ');
@@ -1565,7 +1758,7 @@ function create_demo_contents()
 	if( $install_collection_home )
 	{ // Install Home blog
 		$blog_shortname = T_('Home');
-		$blog_home_access_type = ( $test_install_all_features ) ? 'default' : $default_blog_access_type;
+		$blog_home_access_type = ( $install_test_features ) ? 'default' : $default_blog_access_type;
 		$blog_more_longdesc = '<br />
 <br />
 <strong>'.T_('The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.').'</strong>';
@@ -1575,7 +1768,7 @@ function create_demo_contents()
 			'home',
 			T_('Change this as you like'),
 			sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-			1, // Skin ID
+			2, // Skin ID
 			'main',
 			'any',
 			1,
@@ -1595,15 +1788,15 @@ function create_demo_contents()
 	if( $install_collection_bloga )
 	{ // Install Blog A
 		$blog_shortname = 'Blog A';
-		$blog_a_access_type = ( $test_install_all_features ) ? 'default' : $default_blog_access_type;
+		$blog_a_access_type = ( $install_test_features ) ? 'default' : $default_blog_access_type;
 		$blog_stub = 'a';
 		$blog_a_ID = create_blog(
-			T_('Blog A Title'),
+			T_('Public Blog'),
 			$blog_shortname,
 			$blog_stub,
-			T_('Tagline for Blog A'),
+			T_('This blog is completely public...'),
 			sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-			2, // Skin ID
+			1, // Skin ID
 			'std',
 			'any',
 			1,
@@ -1617,15 +1810,15 @@ function create_demo_contents()
 	if( $install_collection_blogb )
 	{ // Install Blog B
 		$blog_shortname = 'Blog B';
-		$blog_b_access_type = ( $test_install_all_features ) ? 'index.php' : $default_blog_access_type;
+		$blog_b_access_type = ( $install_test_features ) ? 'index.php' : $default_blog_access_type;
 		$blog_stub = 'b';
 		$blog_b_ID = create_blog(
-			T_('Blog B Title'),
+			T_('Members-Only Blog'),
 			$blog_shortname,
 			$blog_stub,
-			T_('Tagline for Blog B'),
+			T_('This blog has restricted access...'),
 			sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-			2, // Skin ID
+			1, // Skin ID
 			'std',
 			'',
 			0,
@@ -1640,6 +1833,8 @@ function create_demo_contents()
 		{
 			$b_Blog->set_setting( 'front_disp', 'front' );
 			$b_Blog->set_setting( 'skin2_layout', 'single_column' );
+			$b_Blog->set( 'advanced_perms', '1' );
+			$b_Blog->set_setting( 'allow_access', 'members' );
 			$b_Blog->dbupdate();
 		}
 	}
@@ -1787,34 +1982,37 @@ function create_demo_contents()
 	// Update the progress bar status
 	update_install_progress_bar();
 
+	// Use this var to shift the posts of the collections in time below:
+	$timeshift = 0;
+
 	if( $install_collection_home )
 	{ // ---------------- Insert the POSTS for Home blog ---------------- //
 		task_begin( 'Creating sample posts for Collection Home... ' );
 
 		// Insert three ADVERTISEMENTS for home blog:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'photo' );
 		$edited_Item->insert( $jay_moderator_ID, /* TRANS: sample ad content */ T_('b2evo: The software for blog pros!'), /* TRANS: sample ad content */ T_('The software for blog pros!'), $now, $cat_home_b2evo,
-			array(), 'published', '#', '', 'http://b2evolution.net', 'open', array('default'), 4000 );
+			array(), 'published', '#', '', 'http://b2evolution.net', 'open', array('default'), 'Advertisement' );
 		$edit_File = new File( 'shared', 0, 'banners/b2evo-125-pros.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
 		$edit_File->link_to_Object( $LinkOwner );
 
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'photo' );
 		$edited_Item->insert( $jay_moderator_ID, /* TRANS: sample ad content */ T_('b2evo: Better Blog Software!'), /* TRANS: sample ad content */ T_('Better Blog Software!'), $now, $cat_home_b2evo,
-			array(), 'published', '#', '', 'http://b2evolution.net', 'open', array('default'), 4000 );
+			array(), 'published', '#', '', 'http://b2evolution.net', 'open', array('default'), 'Advertisement' );
 		$edit_File = new File( 'shared', 0, 'banners/b2evo-125-better.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
 		$edit_File->link_to_Object( $LinkOwner );
 
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'photo' );
 		$edited_Item->insert( $jay_moderator_ID, /* TRANS: sample ad content */ T_('b2evo: The other blog tool!'), /* TRANS: sample ad content */ T_('The other blog tool!'), $now, $cat_home_b2evo,
-			array(), 'published', '#', '', 'http://b2evolution.net', 'open', array('default'), 4000 );
+			array(), 'published', '#', '', 'http://b2evolution.net', 'open', array('default'), 'Advertisement' );
 		$edit_File = new File( 'shared', 0, 'banners/b2evo-125-other.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
 		$edit_File->link_to_Object( $LinkOwner );
@@ -1823,37 +2021,37 @@ function create_demo_contents()
 		// walter : a weird line of code to create a post in the home a minute after the others.
 		// It will show a bug on home agregation by category
 		$timestamp++;
-		$now = date('Y-m-d H:i:s',$timestamp + 59);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
-		$edited_Item->insert( $jay_moderator_ID, 'Evo Factory', '', $now, $cat_home_contrib, array(), 'published', 'en-US', '', 'http://evofactory.com/', 'disabled', array(), 3000 );
+		$edited_Item->insert( $jay_moderator_ID, 'Evo Factory', '', $now, $cat_home_contrib, array(), 'published', 'en-US', '', 'http://evofactory.com/', 'disabled', array(), 'Sidebar link' );
 
 		// Insert a post into home:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
-		$edited_Item->insert( $jay_moderator_ID, 'Francois', '', $now, $cat_home_contrib, array(), 'published', 'fr-FR', '', 'http://fplanque.com/', 'disabled', array(), 3000 );
+		$edited_Item->insert( $jay_moderator_ID, 'Francois', '', $now, $cat_home_contrib, array(), 'published', 'fr-FR', '', 'http://fplanque.com/', 'disabled', array(), 'Sidebar link' );
 
 		// Insert a post into home:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
-		$edited_Item->insert( $jay_moderator_ID, 'Blog news', '', $now, $cat_home_b2evo, array(), 'published', 'en-US', '', 'http://b2evolution.net/news.php', 'disabled', array(), 3000 );
+		$edited_Item->insert( $jay_moderator_ID, 'Blog news', '', $now, $cat_home_b2evo, array(), 'published', 'en-US', '', 'http://b2evolution.net/news.php', 'disabled', array(), 'Sidebar link' );
 
 		// Insert a post into home:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
-		$edited_Item->insert( $jay_moderator_ID, 'Web hosting', '', $now, $cat_home_b2evo, array(), 'published', 'en-US', '', 'http://b2evolution.net/web-hosting/blog/', 'disabled', array(), 3000 );
+		$edited_Item->insert( $jay_moderator_ID, 'Web hosting', '', $now, $cat_home_b2evo, array(), 'published', 'en-US', '', 'http://b2evolution.net/web-hosting/blog/', 'disabled', array(), 'Sidebar link' );
 
 		// Insert a post into home:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
-		$edited_Item->insert( $jay_moderator_ID, 'Manual', '', $now, $cat_home_b2evo, array(), 'published',	'en-US', '', get_manual_url( NULL ), 'disabled', array(), 3000 );
+		$edited_Item->insert( $jay_moderator_ID, 'Manual', '', $now, $cat_home_b2evo, array(), 'published',	'en-US', '', get_manual_url( NULL ), 'disabled', array(), 'Sidebar link' );
 
 		// Insert a post into home:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
-		$edited_Item->insert( $jay_moderator_ID, 'Support', '', $now, $cat_home_b2evo, array(), 'published', 'en-US', '', 'http://forums.b2evolution.net/', 'disabled', array(), 3000 );
+		$edited_Item->insert( $jay_moderator_ID, 'Support', '', $now, $cat_home_b2evo, array(), 'published', 'en-US', '', 'http://forums.b2evolution.net/', 'disabled', array(), 'Sidebar link' );
 
 		// Insert a PAGE:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'photo' );
 		$edited_Item->insert( $jay_moderator_ID, T_("About this site"), T_("<p>This blog platform is powered by b2evolution.</p>
@@ -1863,13 +2061,13 @@ function create_demo_contents()
 <p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the menu instead.</p>
 
 <p>If needed, skins can format info pages differently from regular posts.</p>"), $now, $cat_home_b2evo,
-			array( $cat_home_b2evo ), 'published', '#', '', '', 'open', array('default'), 1000 );
-		$edit_File = new File( 'shared', 1, 'logos/b2evolution_272x64.png' );
+			array( $cat_home_b2evo ), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
+		$edit_File = new File( 'shared', 1, 'logos/b2evolution_1016x208_wbg.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
 		$edit_File->link_to_Object( $LinkOwner );
 
 		// Insert a post:
-		$now = date( 'Y-m-d H:i:s', $timestamp++ ); // A year ago
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'intro' );
 		$edited_Item->insert( $jay_moderator_ID, T_('Homepage post'), T_('<p>This is the Home page of this site.</p>
@@ -1877,7 +2075,21 @@ function create_demo_contents()
 <p>More specifically it is the "Front page" of the first collection of this site. This first collection is called "Home". Other sample collections have been created. You can access them by clicking "Blog A", "Blog B", "Photos", etc. in the menu bar at the top of this page.</p>
 
 <p>You can add collections at will. You can also remove them (including this "Home" collection) if you don\'t need one.</p>'),
-			$now, $cat_home_b2evo, array(), 'published', '#', '', '', 'open', array( 'default' ), 1400 );
+			$now, $cat_home_b2evo, array(), 'published', '#', '', '', 'open', array( 'default' ), 'Intro-Front' );
+
+		// Insert a post:
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
+		$edited_Item = new Item();
+		$edited_Item->set_tags_from_string( 'intro' );
+		$edited_Item->insert( $jay_moderator_ID, T_('Terms & Conditions'), '<p>Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum</p>
+
+<p>Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum</p>',
+			$now, $cat_home_b2evo, array(), 'published', '#', '', '', 'open', array( 'default' ), 'Terms & Conditions' );
+		if( $edited_Item->ID > 0 )
+		{	// Use this post as default terms & conditions:
+			$Settings->set( 'site_terms', $edited_Item->ID );
+			$Settings->dbupdate();
+		}
 
 		// Update the progress bar status
 		update_install_progress_bar();
@@ -1889,35 +2101,38 @@ function create_demo_contents()
 	{ // ---------------- Insert the POSTS for Blog A ---------------- //
 		task_begin( 'Creating sample posts for Collection Blog A... ' );
 
+		// Set all posts of this collection with 24 hours ago relating on previous collection:
+		$timeshift += 86400;
+
 		// Insert a post:
-		$now = date('Y-m-d H:i:s', ($timestamp++ - 31536000) ); // A year ago
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'intro' );
 		$edited_Item->insert( $jay_moderator_ID, T_('Main Intro post'), T_('This is the main intro post. It appears on the homepage only.'),
-			$now, $cat_ann_a, array(), 'published', '#', '', '', 'open', array('default'), 1500 );
+			$now, $cat_ann_a, array(), 'published', '#', '', '', 'open', array('default'), 'Intro-Main' );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->insert( $jay_moderator_ID, T_('First Post'), T_('<p>This is the first post.</p>
 
 <p>It appears in a single category.</p>'), $now, $cat_ann_a );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->insert( $jay_moderator_ID, T_('Second post'), T_('<p>This is the second post.</p>
 
 <p>It appears in multiple categories.</p>'), $now, $cat_news, array( $cat_ann_a ) );
 
 		// Insert a PAGE:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->insert( $jay_moderator_ID, T_("About Blog A"), sprintf( $info_page, T_('Blog A') ), $now, $cat_ann_a,
-			array(), 'published', '#', '', '', 'open', array('default'), 1000 );
+			array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'demo' );
 		$edited_Item->insert( $jay_moderator_ID, T_('This is a multipage post'), T_('<p>This is page 1 of a multipage post.</p>
@@ -1941,7 +2156,7 @@ function create_demo_contents()
 '.T_('<p>It is the last page.</p>'), $now, $cat_bg );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'demo' );
 		$edited_Item->insert( $jay_moderator_ID, T_('Extended post with no teaser'), T_('<p>This is an extended post with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.</p>').$lorem_1paragraph
@@ -1952,8 +2167,9 @@ function create_demo_contents()
 		$edited_Item->dbsave();
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
+		$edited_Item->set( 'featured', 1 );
 		$edited_Item->set_tags_from_string( 'photo,demo' );
 		$edited_Item->insert( $jay_moderator_ID, T_('Extended post'), T_('<p>This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.</p>').$lorem_1paragraph
 	.'[teaserbreak]
@@ -1968,30 +2184,54 @@ function create_demo_contents()
 		$edit_File->link_to_Object( $LinkOwner, 3, 'aftermore' );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'demo' );
 		$edited_Item->set_setting( 'custom_double_1', '123' );
 		$edited_Item->set_setting( 'custom_double_2', '456' );
 		$edited_Item->set_setting( 'custom_varchar_3', 'abc' );
 		$edited_Item->set_setting( 'custom_varchar_4', 'Enter your own values' );
-		$post_custom_fields_ID = $edited_Item->insert( $jay_moderator_ID, T_('Post with custom fields'), T_('<p>This post has a special post type called "Post with custom fields".</p>')
-				.T_('<p>This post type defines 4 custom fields.</p>')
-				.T_('<p>This post has sample values for these for 4 fields. You can see them below</p>'),
-			$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 10 );
+		$edited_Item->set_setting( 'custom_text_5', 'This is a sample text field.
+It can have multiple lines.' );
+		$edited_Item->set_setting( 'custom_html_6', 'This is an <b>HTML</b> <i>field</i>.' );
+		$post_custom_fields_ID = $edited_Item->insert( $jay_moderator_ID, T_('Custom Fields Example'),
+'<p>'.T_('This post has a special post type called "Post with custom fields".').'</p>
+
+<p>'.T_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>
+
+<p>[fields]</p>
+
+<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>
+
+<p>[fields:first_numeric_field, first_string_field,second_numeric_field]</p>
+
+<p>'.T_('Finally, we can also display just the value of a specific field, like this [field: first_string_field].').'</p>',
+			$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Post with Custom Fields' );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'demo' );
 		$edited_Item->set( 'parent_ID', $post_custom_fields_ID ); // Set parent post ID
-		$edited_Item->insert( $jay_moderator_ID, T_('Child Post'), T_('<p>This post has a special post type called "Child Post Example".</p>'),
-			$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 20 );
+		$edited_Item->insert( $jay_moderator_ID, T_('Child Post Example'),
+'<p>'.sprintf( T_('This post has a special post type called "Child Post". This allowed to specify a parent post ID. Consequently, this child post is linked to: %s.'), '[parent:titlelink] ([parent:url])' ).'</p>
+
+<p>'.T_('This also allows us to access the custom fields of the parent post:').'</p>
+
+<p>[parent:fields]</p>
+
+<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>
+
+<p>[parent:fields:first_numeric_field, first_string_field,second_numeric_field]</p>
+
+<p>'.T_('Finally, we can also display just the value of a specific field, like this [parent:field: first_string_field].').'</p>',
+			$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Child Post' );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'photo,demo' );
+		$edited_Item->set( 'featured', 1 );
 		$edited_Item->insert( $jay_moderator_ID, T_('Image post'), T_('<p>This post has several images attached to it. Each one uses a different Attachment Position. Each may be displayed differently depending on the skin they are viewed in.</p>
 
 <p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>'), $now, $cat_bg );
@@ -2006,7 +2246,7 @@ function create_demo_contents()
 		$edit_File->link_to_Object( $LinkOwner, 4, 'aftermore' );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'photo' );
 		$additional_comments_item_IDs[] = $edited_Item->insert( $jay_moderator_ID, T_("Welcome to your b2evolution-powered website!"),
@@ -2022,7 +2262,7 @@ function create_demo_contents()
 </ul>
 
 <p>You can add new collections of any type (blog, photos, forums, etc.), delete unwanted one and customize existing collections (title, sidebar, blog skin, widgets, etc.) from the admin interface.</p>"), $now, $cat_ann_a );
-		$edit_File = new File( 'shared', 0, 'logos/b2evolution_272x64.png' );
+		$edit_File = new File( 'shared', 0, 'logos/b2evolution_1016x208_wbg.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
 		$edit_File->link_to_Object( $LinkOwner );
 
@@ -2036,23 +2276,26 @@ function create_demo_contents()
 	{ // ---------------- Insert the POSTS for Blog B ---------------- //
 		task_begin( 'Creating sample posts for Collection Blog B... ' );
 
-		// Insert sidebar links into Blog B
-		$now = date('Y-m-d H:i:s',$timestamp++);
-		$edited_Item = new Item();
-		$edited_Item->insert( $paul_blogger_ID, 'Skin Faktory', '', $now, $cat_additional_skins, array(), 'published', 'en-US', '', 'http://www.skinfaktory.com/', 'open', array('default'), 3000 );
+		// Set all posts of this collection with 24 hours ago relating on previous collection:
+		$timeshift += 86400;
 
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		// Insert sidebar links into Blog B
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
-		$edited_Item->insert( $paul_blogger_ID, T_('b2evo skins repository'), '', $now, $cat_additional_skins, array(), 'published', 'en-US', '', 'http://skins.b2evolution.net/', 'open', array('default'), 3000 );
+		$edited_Item->insert( $paul_blogger_ID, 'Skin Faktory', '', $now, $cat_additional_skins, array(), 'published', 'en-US', '', 'http://www.skinfaktory.com/', 'open', array('default'), 'Sidebar link' );
+
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
+		$edited_Item = new Item();
+		$edited_Item->insert( $paul_blogger_ID, T_('b2evo skins repository'), '', $now, $cat_additional_skins, array(), 'published', 'en-US', '', 'http://skins.b2evolution.net/', 'open', array('default'), 'Sidebar link' );
 
 		// Insert a PAGE:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->insert( $paul_blogger_ID, T_("About Blog B"), sprintf( $info_page, T_('Blog B') ), $now, $cat_ann_b,
-			array(), 'published', '#', '', '', 'open', array('default'), 1000 );
+			array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s', ($timestamp++ - 31536000) ); // A year ago
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'intro' );
 		$edited_Item->insert( $paul_blogger_ID, T_('Welcome to Blog B'), sprintf( T_('<p>This is the intro post for the front page of Blog B.</p>
@@ -2063,25 +2306,25 @@ function create_demo_contents()
 <li>To view the blog\'s posts, click on "News" in the menu above.</li>
 <li>If you don\'t want to have such a front page, you can disable it in the Blog\'s settings > Features > <a %s>Front Page</a>. You can also see an example of a blog without a Front Page in Blog A</li>
 </ul>'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=home&amp;blog='.$blog_a_ID.'"' ),
-				$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), 1400 );
+				$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), 'Intro-Front' );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s', ($timestamp++ - 31536000) ); // A year ago
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'intro' );
 		$edited_Item->insert( $paul_blogger_ID, T_("b2evolution tips category &ndash; Sub Intro post"), T_("This uses post type \"Intro-Cat\" and is attached to the desired Category(ies)."),
-			$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), 1520 );
+			$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), 'Intro-Cat' );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s', ($timestamp++ - 31536000) ); // A year ago
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'widgets,intro' );
 		$edited_Item->insert( $paul_blogger_ID, T_("Widgets tag &ndash; Sub Intro post"), T_("This uses post type \"Intro-Tag\" and is tagged with the desired Tag(s)."),
-			$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), 1530 );
+			$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), 'Intro-Tag' );
 
 		// Insert a post:
 		// TODO: move to Blog A
-		$now = date('Y-m-d H:i:s', $timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->insert( $paul_blogger_ID, T_("Featured post"), T_("<p>This is a demo of a featured post.</p>
 
@@ -2093,7 +2336,7 @@ function create_demo_contents()
 		$edited_Item->dbsave();
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->insert( $paul_blogger_ID, T_("Apache optimization..."), sprintf( T_("<p>b2evolution comes with an <code>.htaccess</code> file destined to optimize the way b2evolution is handled by your webseerver (if you are using Apache). In some circumstances, that file may not be automatically activated at setup. Please se the man page about <a %s>Tricky Stuff</a> for more information.</p>
 
@@ -2104,7 +2347,7 @@ function create_demo_contents()
 			$now, $cat_b2evo, array( $cat_ann_b ) );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'skins' );
 		$edited_Item->insert( $paul_blogger_ID, T_("Skins, Stubs, Templates &amp; website integration..."), T_("<p>By default, blogs are displayed using an evoskin. (More on skins in another post.)</p>
@@ -2122,7 +2365,7 @@ function create_demo_contents()
 <p>Either way, make sure you go to the blogs admin and set the correct access method/URL for your blog. Otherwise, the permalinks will not function properly.</p>"), $now, $cat_b2evo );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'widgets' );
 		$edited_Item->insert( $paul_blogger_ID, T_("About widgets..."), T_('<p>b2evolution blogs are installed with a default selection of Widgets. For example, the sidebar of this blog includes widgets like a calendar, a search field, a list of categories, a list of XML feeds, etc.</p>
@@ -2132,7 +2375,7 @@ function create_demo_contents()
 <p>Note: in order to be displayed, widgets are placed in containers. Each container appears in a specific place in an evoskin. If you change your blog skin, the new skin may not use the same containers as the previous one. Make sure you place your widgets in containers that exist in the specific skin you are using.</p>'), $now, $cat_b2evo );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'skins' );
 		$edited_Item->insert( $paul_blogger_ID, T_("About skins..."), sprintf( T_('<p>By default, b2evolution blogs are displayed using an evoskin.</p>
@@ -2146,7 +2389,6 @@ function create_demo_contents()
 <p>To start customizing a skin, open its "<code>index.main.php</code>" file in an editor and read the comments in there. Note: you can also edit skins in the "Files" tab of the admin interface.</p>
 
 <p>And, of course, read the <a href="%s" target="_blank">manual on skins</a>!</p>'), get_manual_url( 'skin-structure' ) ), $now, $cat_b2evo );
-		$edited_Item->set( 'featured', 1 );
 		$edited_Item->dbsave();
 		// $edited_Item->insert_update_tags( 'update' );
 
@@ -2160,14 +2402,17 @@ function create_demo_contents()
 	{ // ---------------- Insert the POSTS for Photos blog ---------------- //
 		task_begin( 'Creating sample posts for Collection Photos... ' );
 
+		// Set all posts of this collection with 24 hours ago relating on previous collection:
+		$timeshift += 86400;
+
 		// Insert a PAGE:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->insert( $dave_blogger_ID, T_('About Photos'), sprintf( $info_page, T_('Photos') ), $now, $cat_photo_album,
-			array(), 'published', '#', '', '', 'open', array('default'), 1000 );
+			array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 
 		// Insert a post into photoblog:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'photo' );
 		$edited_Item->insert( $dave_blogger_ID, T_('Sunset'), '',
@@ -2177,7 +2422,7 @@ function create_demo_contents()
 		$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
 
 		// Insert a post into photoblog:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'photo' );
 		$edited_Item->insert( $dave_blogger_ID, T_('Bus Stop Ahead'), 'In the middle of nowhere: a school bus stop where you wouldn\'t really expect it!',
@@ -2194,7 +2439,7 @@ function create_demo_contents()
 		$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley.jpg' );
 		$photo_link_5_ID = $edit_File->link_to_Object( $LinkOwner, 5 );
 
-		if( $test_install_all_features )
+		if( $install_test_features )
 		{ // Add examples for infodots plugin
 			$edited_Item->set_tags_from_string( 'photo,demo' );
 			$edited_Item->set( 'content', $edited_Item->get( 'content' )
@@ -2212,6 +2457,7 @@ a school bus stop where you wouldn\'t really expect it!
 [infodot:%s:104:99]cowboy and horse[enddot]
 [infodot:%s:207:28:15em]Red planet[enddot]', $photo_link_1_ID, $photo_link_2_ID, $photo_link_4_ID ) );
 			$edited_Item->dbupdate();
+			echo_install_log( 'TEST FEATURE: Adding examples for plugin "Info dots renderer" on item #'.$edited_Item->ID );
 		}
 
 		// Update the progress bar status
@@ -2264,28 +2510,31 @@ The rain---not the reign---in Spain.');
 	{ // ---------------- Insert the POSTS for Forums Collection ---------------- //
 		task_begin( 'Creating sample posts for Collection Forums... ' );
 
+		// Set all posts of this collection with 24 hours ago relating on previous collection:
+		$timeshift += 86400;
+
 		// Insert a PAGE:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->insert( 1, T_("About Forums"), sprintf( $info_page, T_('Forums') ), $now, $cat_forums_ann,
-			array(), 'published', '#', '', '', 'open', array('default'), 1000 );
+			array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->insert( $mary_moderator_ID, T_('First Topic'), T_('<p>This is the first topic.</p>
 
 <p>It appears in a single category.</p>').$lorem_2more, $now, $cat_forums_ann );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->insert( $jay_moderator_ID, T_('Second topic'), T_('<p>This is the second topic.</p>
 
 <p>It appears in multiple categories.</p>').$lorem_2more, $now, $cat_forums_news, array( $cat_forums_ann ) );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'photo' );
 		$edited_Item->insert( $dave_blogger_ID, T_('Image topic'), T_('<p>This topic has an image attached to it. The image is automatically resized to fit the current blog skin. You can zoom in by clicking on the thumbnail.</p>
@@ -2296,7 +2545,7 @@ The rain---not the reign---in Spain.');
 		$edit_File->link_to_Object( $LinkOwner );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'demo' );
 		$edited_Item->insert( $paul_blogger_ID, T_('This is a multipage topic'), T_('<p>This is page 1 of a multipage topic.</p>
@@ -2320,7 +2569,7 @@ The rain---not the reign---in Spain.');
 '.T_('<p>It is the last page.</p>'), $now, $cat_forums_bg );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'demo' );
 		$edited_Item->insert( $larry_user_ID, T_('Extended topic with no teaser'), T_('<p>This is an extended topic with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.</p>
@@ -2332,7 +2581,7 @@ The rain---not the reign---in Spain.');
 		$edited_Item->dbsave();
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'demo' );
 		$edited_Item->insert( $kate_user_ID, T_('Extended topic'), T_('<p>This is an extended topic. This means you only see this small teaser by default and you must click on the link below to see more.</p>
@@ -2342,7 +2591,7 @@ The rain---not the reign---in Spain.');
 <p>This is the extended text. You only see it when you have clicked the "more" link.</p>'), $now, $cat_forums_bg );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'photo' );
 		$additional_comments_item_IDs[] = $edited_Item->insert( 1, T_("Welcome to your b2evolution-powered website!"),
@@ -2358,12 +2607,12 @@ The rain---not the reign---in Spain.');
 </ul>
 
 <p>You can add new collections of any type (blog, photos, forums, etc.), delete unwanted one and customize existing collections (title, sidebar, blog skin, widgets, etc.) from the admin interface.</p>"), $now, $cat_forums_ann );
-		$edit_File = new File( 'shared', 0, 'logos/b2evolution_272x64.png' );
+		$edit_File = new File( 'shared', 0, 'logos/b2evolution_1016x208_wbg.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
 		$edit_File->link_to_Object( $LinkOwner );
 
 		// Insert Markdown example post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'demo' );
 		$edited_Item->insert( $mary_moderator_ID, T_('Markdown examples'), $markdown_examples_content, $now, $cat_forums_news );
@@ -2378,8 +2627,11 @@ The rain---not the reign---in Spain.');
 	{ // ---------------- Insert the POSTS for Manual collection ---------------- //
 		task_begin( 'Creating sample posts for Collection Manual... ' );
 
+		// Set all posts of this collection with 24 hours ago relating on previous collection:
+		$timeshift += 86400;
+
 		// Insert a main intro:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'intro' );
 		$edited_Item->insert( $dave_blogger_ID, T_("Welcome here!"), T_('This is the main introduction for this demo online manual. It is a post using the type "Intro-Front". It will only appear on the front page of the manual.
@@ -2387,47 +2639,47 @@ The rain---not the reign---in Spain.');
 You may delete this post if you don\'t want such an introduction.
 
 Just to be clear: this is a **demo** of a manual. The user manual for b2evolution is here: http://b2evolution.net/man/.'), $now, $cat_manual_intro,
-			array(), 'published', '#', '', '', 'open', array('default'), 1400 );
+			array(), 'published', '#', '', '', 'open', array('default'), 'Intro-Front' );
 
 		// Insert a cat intro:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'intro' );
 		$edited_Item->insert( $dave_blogger_ID, T_("Chapter Intro"), T_('This is an introduction for this chapter. It is a post using the "intro-cat" type.'), $now, $cat_manual_intro,
-			array(), 'published', '#', '', '', 'open', array('default'), 1520 );
+			array(), 'published', '#', '', '', 'open', array('default'), 'Intro-Cat' );
 
 		// Insert a cat intro:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'intro' );
 		$edited_Item->insert( $dave_blogger_ID, T_("Chapter Intro"), T_('This is an introduction for this chapter. It is a post using the "intro-cat" type.')
 			."\n\n".T_('Contrary to the other sections which are explictely sorted by default, this section is sorted alphabetically by default.'), $now, $cat_manual_reference,
-			array(), 'published', '#', '', '', 'open', array('default'), 1520 );
+			array(), 'published', '#', '', '', 'open', array('default'), 'Intro-Cat' );
 
 		// Insert a PAGE:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->insert( $dave_blogger_ID, T_("About this manual"), sprintf( $info_page, T_('Manual') ), $now, $cat_manual_intro,
-			array(), 'published', '#', '', '', 'open', array('default'), 1000 );
+			array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->insert( $dave_blogger_ID, T_('First Page'), T_('<p>This is the first page.</p>
 
 <p>It appears in a single category.</p>'), $now, $cat_manual_intro, array(),
-		'published', '#', '', '', 'open', array('default'), 1, NULL, 10 );
+		'published', '#', '', '', 'open', array('default'), 'Manual Page', NULL, 10 );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->insert( $dave_blogger_ID, T_('Second Page'), T_('<p>This is the second page.</p>
 
 <p>It appears in multiple categories.</p>'), $now, $cat_manual_intro, array( $cat_manual_getstarted ),
-		'published', '#', '', '', 'open', array('default'), 1, NULL, 20 );
+		'published', '#', '', '', 'open', array('default'), 'Manual Page', NULL, 20 );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'demo' );
 		$edited_Item->insert( $dave_blogger_ID, T_('Wiki Tables'), /* DO NOT TRANSLATE - TOO COMPLEX */ '<p>This is the topic with samples of the wiki tables.</p>
@@ -2669,22 +2921,22 @@ Hello
 ! scope="row" colspan="2"| Total
 | $1.90
 |}', $now, $cat_manual_reference, array( $cat_manual_userguide ),
-			'published', '#', '', '', 'open', array('default'), 1, NULL, 50 );
+			'published', '#', '', '', 'open', array('default'), 'Manual Page', NULL, 50 );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'photo' );
 		$edited_Item->insert( $dave_blogger_ID, T_('Image topic'), T_('<p>This topic has an image attached to it. The image is automatically resized to fit the current blog skin. You can zoom in by clicking on the thumbnail.</p>
 
 <p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>'), $now, $cat_manual_getstarted, array( $cat_manual_blogs ),
-			'published', '#', '', '', 'open', array('default'), 1, NULL, 10 );
+			'published', '#', '', '', 'open', array('default'), 'Manual Page', NULL, 10 );
 		$edit_File = new File( 'shared', 0, 'monument-valley/monuments.jpg' );
 		$LinkOwner = new LinkItem( $edited_Item );
 		$edit_File->link_to_Object( $LinkOwner );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'demo' );
 		$edited_Item->insert( $dave_blogger_ID, T_('This is a multipage topic'), T_('<p>This is page 1 of a multipage topic.</p>
@@ -2706,10 +2958,10 @@ Hello
 '.sprintf( T_("<p>This is page %d.</p>"), 4 ).'
 
 '.T_('<p>It is the last page.</p>'), $now, $cat_manual_userguide, array(),
-			'published', '#', '', '', 'open', array('default'), 1, NULL, 30 );
+			'published', '#', '', '', 'open', array('default'), 'Manual Page', NULL, 30 );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'demo' );
 		$edited_Item->insert( $dave_blogger_ID, T_('Extended topic with no teaser'), T_('<p>This is an extended topic with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.</p>
@@ -2717,12 +2969,12 @@ Hello
 [teaserbreak]
 
 <p>This is the extended text. You only see it when you have clicked the "more" link.</p>'), $now, $cat_manual_userguide, array(),
-			'published', '#', '', '', 'open', array('default'), 1, NULL, 20 );
+			'published', '#', '', '', 'open', array('default'), 'Manual Page', NULL, 20 );
 		$edited_Item->set_setting( 'hide_teaser', '1' );
 		$edited_Item->dbsave();
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'demo' );
 		$edited_Item->insert( $dave_blogger_ID, T_('Extended topic'), T_('<p>This is an extended topic. This means you only see this small teaser by default and you must click on the link below to see more.</p>
@@ -2730,10 +2982,10 @@ Hello
 [teaserbreak]
 
 <p>This is the extended text. You only see it when you have clicked the "more" link.</p>'), $now, $cat_manual_userguide, array(),
-			'published', '#', '', '', 'open', array('default'), 1, NULL, 10 );
+			'published', '#', '', '', 'open', array('default'), 'Manual Page', NULL, 10 );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'photo' );
 		$additional_comments_item_IDs[] = $edited_Item->insert( $dave_blogger_ID, T_("Welcome to your b2evolution-powered website!"),
@@ -2749,29 +3001,29 @@ Hello
 </ul>
 
 <p>You can add new collections of any type (blog, photos, forums, etc.), delete unwanted one and customize existing collections (title, sidebar, blog skin, widgets, etc.) from the admin interface.</p>"), $now, $cat_manual_intro, array( $cat_manual_everyday ),
-			'published', '#', '', '', 'open', array('default'), 1, NULL, 30 );
-		$edit_File = new File( 'shared', 0, 'logos/b2evolution_272x64.png' );
+			'published', '#', '', '', 'open', array('default'), 'Manual Page', NULL, 30 );
+		$edit_File = new File( 'shared', 0, 'logos/b2evolution_1016x208_wbg.png' );
 		$LinkOwner = new LinkItem( $edited_Item );
 		$edit_File->link_to_Object( $LinkOwner );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->insert( $dave_blogger_ID, T_('Sports post'), T_('<p>This is the sports post.</p>
 
 <p>It appears in sports category.</p>'), $now, $cat_manual_blogs, array(),
-		'published', '#', '', '', 'open', array('default'), 1, NULL, 15 );
+		'published', '#', '', '', 'open', array('default'), 'Manual Page', NULL, 15 );
 
 		// Insert a post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->insert( $dave_blogger_ID, T_('Second sports post'), T_('<p>This is the second sports post.</p>
 
 <p>It appears in sports category.</p>'), $now, $cat_manual_blogs, array(),
-			'published', '#', '', '', 'open', array('default'), 1, NULL, 5 );
+			'published', '#', '', '', 'open', array('default'), 'Manual Page', NULL, 5 );
 
 		// Insert Markdown example post:
-		$now = date('Y-m-d H:i:s',$timestamp++);
+		$now = date( 'Y-m-d H:i:s', ( $timestamp++ - $timeshift ) );
 		$edited_Item = new Item();
 		$edited_Item->set_tags_from_string( 'demo' );
 		$edited_Item->insert( $dave_blogger_ID, T_('Markdown examples'), $markdown_examples_content, $now, $cat_manual_userguide );
@@ -2794,7 +3046,7 @@ Hello
 		create_demo_comment( $new_created_item_ID, 'draft' );
 	}
 
-	if( $test_install_all_features && count( $additional_comments_item_IDs ) )
+	if( $install_test_features && count( $additional_comments_item_IDs ) )
 	{ // Create the additional comments when we install all features
 		foreach( $additional_comments_item_IDs as $additional_comments_item_ID )
 		{
@@ -2802,21 +3054,23 @@ Hello
 			{ // Insert the comments from each user
 				$now = date( 'Y-m-d H:i:s' );
 				$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_author_user_ID, comment_author_IP,
-						comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status )
+						comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status, comment_notif_flags )
 					VALUES( '.$DB->quote( $additional_comments_item_ID ).', '.$DB->quote( $i_user_ID ).', "127.0.0.1", '
 						.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( T_('Hi!
 
 This is a sample comment that has been approved by default!
-Admins and moderators can very quickly approve or reject comments from the collection dashboard.') ).', "default", "finished" )' );
+Admins and moderators can very quickly approve or reject comments from the collection dashboard.') ).', "default", "finished", "moderators_notified,members_notified,community_notified" )' );
 			}
 		}
+		echo_install_log( 'TEST FEATURE: Creating additional comments on items ('.implode( ', ', $additional_comments_item_IDs ).')' );
 	}
 
 	task_end();
 
 
-	if( $test_install_all_features )
+	if( $install_test_features )
 	{
+		echo_install_log( 'TEST FEATURE: Creating fake hit statistics' );
 		task_begin( 'Creating fake hit statistics... ' );
 		load_funcs('sessions/model/_hitlog.funcs.php');
 		load_funcs('_core/_url.funcs.php');
@@ -2831,11 +3085,11 @@ Admins and moderators can very quickly approve or reject comments from the colle
 	// Admin for blog A:
 	$query = "INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
-							bloguser_perm_cats, bloguser_perm_properties,
+							bloguser_perm_meta_comment, bloguser_perm_cats, bloguser_perm_properties,
 							bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
 						VALUES
 							( $blog_a_ID, ".$User_Demo->ID.", 1,
-							'published,deprecated,protected,private,draft', 1, 1, 0, 0, 1, 1, 1 )";
+							'published,deprecated,protected,private,draft', 1, 1, 1, 0, 0, 1, 1, 1 )";
 	$DB->query( $query );
 	echo "OK.<br />\n";
 	*/
@@ -2911,10 +3165,10 @@ Admins and moderators can very quickly approve or reject comments from the colle
 
 	$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_status,
 			comment_author_user_ID, comment_author, comment_author_email, comment_author_url, comment_author_IP,
-			comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status )
+			comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status, comment_notif_flags )
 		VALUES( '.$DB->quote( $item_ID ).', '.$DB->quote( $status ).', '
 			.$DB->quote( $user_ID ).', '.$DB->quote( $author ).', '.$DB->quote( $author_email ).', '.$DB->quote( $author_email_url ).', "127.0.0.1", '
-			.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( $content ).', "default", "finished" )' );
+			.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( $content ).', "default", "finished", "moderators_notified,members_notified,community_notified" )' );
 }
 
 
@@ -2923,16 +3177,86 @@ Admins and moderators can very quickly approve or reject comments from the colle
  */
 function create_default_posts_location()
 {
-	global $test_install_all_features;
+	global $install_test_features;
 
-	if( $test_install_all_features )
+	if( $install_test_features )
 	{	// Set default location in test mode installation
 		global $DB;
 
 		$DB->query( 'UPDATE T_items__item SET
 			post_ctry_ID = '.$DB->quote( '74'/* France */ ).',
-			post_rgn_ID = '.$DB->quote( '60'/* �le-de-France */ ).',
+			post_rgn_ID = '.$DB->quote( '60'/* Île-de-France */ ).',
 			post_subrg_ID = '.$DB->quote( '76'/* Paris */ ) );
+
+		echo_install_log( 'TEST FEATURE: Defining default location "France, Île-de-France, Paris" for all posts' );
 	}
+}
+
+
+/**
+ * Create default email campaigns
+ */
+function create_default_email_campaigns()
+{
+	global $DB, $create_sample_contents;
+
+	task_begin( 'Creating default email campaigns... ' );
+
+	load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
+	load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+
+	if( $create_sample_contents )
+	{
+		$EmailCampaign = new EmailCampaign();
+		$EmailCampaign->set( 'name', T_('Markdown Example') );
+		$EmailCampaign->set( 'email_title', T_('Markdown Example') );
+		$EmailCampaign->set( 'email_text', T_('Heading
+=======
+
+Sub-heading
+-----------
+
+### H3 header
+
+#### H4 header ####
+
+> Email-style angle brackets
+> are used for blockquotes.
+
+> > And, they can be nested.
+
+> ##### Headers in blockquotes
+>
+> * You can quote a list.
+> * Etc.
+
+[This is a link](http://b2evolution.net/) if Links are turned on in the markdown plugin settings
+
+Paragraphs are separated by a blank line.
+
+    This is a preformatted
+    code block.
+
+Text attributes *Italic*, **bold**, `monospace`.
+
+Shopping list:
+
+* apples
+* oranges
+* pears
+
+The rain---not the reign---in Spain.') );
+
+		if( $EmailCampaign->dbinsert() )
+		{	// Add recipients after successfull email campaign creating:
+			$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
+			if( ! empty( $user_IDs ) )
+			{	// Only if we have found the users in DB
+				$EmailCampaign->add_users( $user_IDs );
+			}
+		}
+	}
+
+	task_end();
 }
 ?>

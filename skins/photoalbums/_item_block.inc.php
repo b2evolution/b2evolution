@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage photoalbums
@@ -58,7 +58,6 @@ $params = array_merge( array(
 		if( $disp == 'single' )
 		{
 			// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-			// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 			// Display container contents:
 			skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 				// The following (optional) params will be used as defaults for widgets included in this container:
@@ -69,10 +68,10 @@ $params = array_merge( array(
 				'block_title_start' => '<h3>',
 				'block_title_end' => '</h3>',
 				// Template params for "Item Tags" widget
-				'widget_coll_item_tags_before'    => '<div class="bText"><p>'.T_('Tags').': ',
-				'widget_coll_item_tags_after'     => '</p></div>',
+				'widget_item_tags_before'    => '<div class="bText"><p>'.T_('Tags').': ',
+				'widget_item_tags_after'     => '</p></div>',
 				// Params for skin file "_item_content.inc.php"
-				'widget_coll_item_content_params' => $params,
+				'widget_item_content_params' => $params,
 			) );
 			// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 		}
@@ -105,7 +104,7 @@ $params = array_merge( array(
 				skin_include( '_item_feedback.inc.php', array(
 						'before_section_title' => '<h4>',
 						'after_section_title'  => '</h4>',
-						'author_link_text'     => 'preferredname',
+						'author_link_text'     => 'auto',
 						'comment_image_size'   => 'fit-256x256',
 					) );
 				// Note: You can customize the default item feedback by copying the generic

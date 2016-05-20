@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -91,10 +91,10 @@ class Chapter extends DataObject
 	 * @param table Database row
  	 * @param integer|NULL subset to use for new object
 	 */
-	function Chapter( $db_row = NULL, $subset_ID = NULL )
+	function __construct( $db_row = NULL, $subset_ID = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_categories', 'cat_', 'cat_ID' );
+		parent::__construct( 'T_categories', 'cat_', 'cat_ID' );
 
 		if( is_null( $db_row ) )
 		{	// We are creating an object here:
@@ -262,7 +262,7 @@ class Chapter extends DataObject
 		}
 
 		// Sort children list
-		usort( $this->children, array( 'Chapter','compare_chapters' ) );
+		uasort( $this->children, array( 'Chapter','compare_chapters' ) );
 	}
 
 

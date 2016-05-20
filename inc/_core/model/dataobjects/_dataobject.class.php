@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -74,7 +74,7 @@ class DataObject
 	 * @param string User ID field name
 	 * @param string datetime field name
 	 */
-	function DataObject( $tablename, $prefix = '', $dbIDname = 'ID', $datecreated_field = '', $datemodified_field = '', $creator_field = '', $lasteditor_field = '' )
+	function __construct( $tablename, $prefix = '', $dbIDname = 'ID', $datecreated_field = '', $datemodified_field = '', $creator_field = '', $lasteditor_field = '' )
 	{
 		$this->dbtablename        = $tablename;
 		$this->dbprefix           = $prefix;
@@ -385,11 +385,26 @@ class DataObject
 
 	/**
 	 * Update the DB based on previously recorded changes
+ 	 *
+	 * This will be typically overriden by child classses.
+	 *
+	 * @return boolean true on success, false on failure to update, NULL if no update necessary
+	 */
+	function dbupdate()
+	{
+		return $this->dbupdate_worker();
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 *
+	 * This does the nitty gritty work and accepts optional params. (extracted from dbupdate() for PHP7 compatibility)
 	 *
 	 * @param boolean do we want to auto track the mod date?
 	 * @return boolean true on success, false on failure to update, NULL if no update necessary
 	 */
-	function dbupdate( $auto_track_modification = true )
+	protected function dbupdate_worker( $auto_track_modification = true )
 	{
 		global $DB, $Plugins, $localtimenow, $current_User;
 
@@ -583,7 +598,7 @@ class DataObject
 		else
 		{	// Object already serialized, let's update!
 			// echo 'UPDATE';
-			return $this->dbupdate();
+			return $this->dbupdate_worker();
 		}
 	}
 
@@ -591,9 +606,25 @@ class DataObject
 	/**
 	 * Delete object from DB.
 	 *
+	 * This will be typically overriden by child classses.
+	 *
 	 * @return boolean true on success
 	 */
-	function dbdelete( $ignore_restrictions = array() )
+	function dbdelete()
+	{
+		return $this->dbdelete_worker();
+	}
+
+
+	/**
+	 * Delete object from DB.
+	 *
+	 * This does the nitty gritty work and accepts optional params. (extracted from dbupdate() for PHP7 compatibility)
+	 *
+	 * @param array list of foreign keys to ignore
+	 * @return boolean true on success
+	 */
+	protected function dbdelete_worker( $ignore_restrictions = array() )
 	{
 		global $DB, $Messages, $Plugins, $db_config;
 
@@ -609,7 +640,7 @@ class DataObject
 		}
 
 		if( ! $this->check_delete( T_('Some restrictions prevent deletion:'), $ignore_restrictions ) )
-		{ // Some restrictions still prevent deletion
+		{	// Some restrictions still prevent deletion
 			// Note: This restrictions must be handled previously before dbdelete is called.
 			// If this code is executed it means there is an implementation issue and restricitons must be check there.
 			$DB->rollback();
@@ -644,7 +675,9 @@ class DataObject
 
 
 	/**
-	 * Check existence of specified value in unique field.
+	 * Check existence of a specified (key) value in a UNIQUE field.
+	 * Exclude the current DataObject->ID.
+	 * This is for finding a potential Duplicate or Conflicting DataObject in the DB.
 	 *
 	 * @param string Name of unique field  OR array of Names (for UNIQUE index with MULTIPLE fields)
 	 * @param mixed specified value        OR array of Values (for UNIQUE index with MULTIPLE fields)
@@ -669,9 +702,9 @@ class DataObject
 		}
 
 		$sql = "SELECT $this->dbIDname
-						  FROM $this->dbtablename
-					   WHERE $sql_where
-						   AND $this->dbIDname != $this->ID";
+					 FROM $this->dbtablename
+					WHERE $sql_where
+					  AND $this->dbIDname != $this->ID";
 
 		return $DB->get_var( $sql );
 	}
@@ -784,6 +817,8 @@ class DataObject
 		echo str_replace( 'panel-default', 'panel-danger', $block_item_Widget->replace_vars( $block_item_Widget->params[ 'block_start' ] ) );
 
 		$restriction_Messages = $this->check_relations( 'delete_cascades' );
+
+		$restriction_Messages->params['class_note'] .= ' text-warning';
 
 		if( !empty( $additional_messages ) )
 		{ // Initialaize additional messages

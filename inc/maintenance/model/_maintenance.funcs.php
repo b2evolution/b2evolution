@@ -57,7 +57,7 @@ function check_version( $new_version_dir )
 
 	require( $new_version_file );
 
-	$vc = version_compare( $app_version, $GLOBALS['app_version'] );
+	$vc = evo_version_compare( $app_version, $GLOBALS['app_version'] );
 
 	if( $vc < 0 )
 	{
@@ -138,7 +138,13 @@ function switch_maintenance_mode( $enable, $mode = 'all', $msg = '', $silent = f
 <hr />
 <p>Site administrators: please view the source of this page for details.</p>
 <!--
-If you need to manually put b2evolution out of maintenance mode, delete or rename the file /conf/maintenance.html
+If you need to manually put b2evolution OUT of maintenance mode, delete or rename the file
+/conf/maintenance.html or /conf/imaintenance.html or /conf/umaintenance.html .
+The presence of any of these files will make b2evolution show it is in maintenance mode.
+
+WARNING: If you just had an upgrade fail in the middle of it, it is a very bad idea to just
+get out of maintenance mode without immdiately restoring a DB backup first. Continuing without
+a clean DB may make it impossible to ever ugrade your b2evolution in the future.
 -->
 </body>
 </html>';
@@ -293,8 +299,8 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
 				$src_file_name = $src_file;
 			}
 			echo '<p style="color:red">'
-				.sprintf( T_( 'Unable to decompress &laquo;%s&raquo; ZIP archive.' ), $src_file_name ).'<br />'
-				.sprintf( T_( 'Error: %s' ), $PclZip->errorInfo( true ) )
+					.sprintf( T_( 'Error: %s' ), $PclZip->errorInfo( true ) ).'<br />'
+					.sprintf( T_( 'Unable to decompress &laquo;%s&raquo; ZIP archive.' ), $src_file_name )
 				.'</p>';
 			evo_flush();
 
@@ -897,5 +903,35 @@ function svnupgrade_display_steps( $current_step )
 		);
 
 	echo get_tool_steps( $steps, $current_step );
+}
+
+
+/**
+ * Callback function to decide what folders backup on zip
+ *
+ * @param integer Event number, e.g. PCLZIP_CB_PRE_ADD, see class PclZip
+ * @param array Params of current file/folder
+ * @return integer 1 - to include, 0 - to exclude
+ */
+function callback_backup_files( $p_event, & $p_header )
+{
+	global $backup_current_exclude_folders;
+
+	if( empty( $backup_current_exclude_folders ) )
+	{	// Nothing to exclude:
+		return 1;
+	}
+
+	foreach( $backup_current_exclude_folders as $exclude_folder_name )
+	{
+		if( $p_header['stored_filename'] == $exclude_folder_name ||
+		    strpos( $p_header['stored_filename'].'/', '/'.$exclude_folder_name.'/' ) !== false )
+		{	// Skip this file/folder:
+			return 0;
+		}
+	}
+
+	// Include this file/folder to backup zip archive:
+	return 1;
 }
 ?>

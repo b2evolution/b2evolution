@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -53,13 +53,16 @@ class UserList extends DataObjectList2
 	 * @param array Query params:
 	 *                    'join_group'   => true,
 	 *                    'join_session' => false,
-	 *                    'join_country' => true,
-	 *                    'join_city'    => true,
+	 *                    'join_country'   => true,
+	 *                    'join_region'    => false,
+	 *                    'join_subregion' => false,
+	 *                    'join_city'      => true,
+	 *                    'join_colls'     => true,
 	 *                    'keywords_fields'     - Fields of users table to search by keywords
 	 *                    'where_status_closed' - FALSE - to don't display closed users
 	 *                    'where_org_ID' - ID of organization
 	 */
-	function UserList(
+	function __construct(
 		$filterset_name = '', // Name to be used when saving the filterset (leave empty to use default)
 		$limit = 20, // Page size
 		$param_prefix = 'users_',
@@ -67,7 +70,7 @@ class UserList extends DataObjectList2
 		)
 	{
 		// Call parent constructor:
-		parent::DataObjectList2( get_Cache( 'UserCache' ), $limit, $param_prefix, NULL );
+		parent::__construct( get_Cache( 'UserCache' ), $limit, $param_prefix, NULL );
 
 		// Init query params, @see $this->query_init()
 		$this->query_params = $query_params;
@@ -93,18 +96,20 @@ class UserList extends DataObjectList2
 				'city'                => NULL,    // integer, City ID
 				'membersonly'         => false,   // boolean, Restrict by members
 				'keywords'            => NULL,    // string, Search words
-				'gender'              => NULL,    // string: 'M', 'F' or 'MF'
+				'gender'              => NULL,    // string: 'M', 'F', 'O', 'MF', 'MO', 'FO' or 'MFO'
 				'status_activated'    => NULL,    // string: 'activated'
 				'account_status'      => NULL,    // string: 'new', 'activated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'closed'
 				'reported'            => NULL,    // integer: 1 to show only reported users
 				'custom_sender_email' => NULL,    // integer: 1 to show only users with custom notifcation sender email address
 				'custom_sender_name'  => NULL,    // integer: 1 to show only users with custom notifaction sender name
-				'group'               => -1,      // string: User group ID, -1 = all groups but list is ungrouped, 0 - all groups with grouped list
+				'group'               => -1,      // integer: Primary user group ID, -1 = all groups but list is ungrouped, 0 - all groups with grouped list
+				'group2'              => -1,      // integer: Secondary user group ID, -1 = all groups but list is ungrouped, 0 - all groups with grouped list
 				'age_min'             => NULL,    // integer, Age min
 				'age_max'             => NULL,    // integer, Age max
 				'userfields'          => array(), // Format of item: array( 'type' => type_ID, 'value' => search_words )
 				'order'               => '-D',    // Order
-				'users'               => array(), // User IDs
+				'users'               => array(), // User IDs - used to cache results
+				'userids'             => array(), // User IDs - used to filter by user IDs
 				'level_min'           => NULL,    // integer, Level min
 				'level_max'           => NULL,    // integer, Level max
 				'org'                 => NULL,    // integer, Organization ID
@@ -168,6 +173,11 @@ class UserList extends DataObjectList2
 			memorize_param( 'filter_preset', 'string', $this->default_filters['filter_preset'], $this->filters['filter_preset'] );  // List of authors to restrict to
 
 			/*
+			 * Restrict by user IDs
+			 */
+			memorize_param( 'userids', 'array:integer', $this->default_filters['userids'], $this->filters['userids'] );
+
+			/*
 			 * Restrict by membersonly
 			 */
 			memorize_param( 'membersonly', 'integer', $this->default_filters['membersonly'], $this->filters['membersonly'] );
@@ -182,6 +192,7 @@ class UserList extends DataObjectList2
 			 */
 			memorize_param( 'gender_men', 'integer', strpos( $this->default_filters['gender'], 'M' ) !== false, strpos( $this->filters['gender'], 'M' ) !== false );
 			memorize_param( 'gender_women', 'integer', strpos( $this->default_filters['gender'], 'F' ) !== false, strpos( $this->filters['gender'], 'F' ) !== false );
+			memorize_param( 'gender_other', 'integer', strpos( $this->default_filters['gender'], 'O' ) !== false, strpos( $this->filters['gender'], 'O' ) !== false );
 
 			/*
 			 * Restrict by status
@@ -201,9 +212,14 @@ class UserList extends DataObjectList2
 			memorize_param( 'custom_sender_name', 'integer', $this->default_filters['custom_sender_name'], $this->filters['custom_sender_name'] );
 
 			/*
-			 * Restrict by user group
+			 * Restrict by primary user group:
 			 */
-			memorize_param( 'group', 'string', $this->default_filters['group'], $this->filters['group'] );
+			memorize_param( 'group', 'integer', $this->default_filters['group'], $this->filters['group'] );
+
+			/*
+			 * Restrict by secondary user group:
+			 */
+			memorize_param( 'group2', 'integer', $this->default_filters['group2'], $this->filters['group2'] );
 
 			/*
 			 * Restrict by locations
@@ -307,6 +323,11 @@ class UserList extends DataObjectList2
 		}
 
 		/*
+		 * Restrict by user IDs
+		 */
+		$this->filters['userids'] = param( 'userids', 'array:integer', $this->default_filters['userids'], true );
+
+		/*
 		 * Restrict by members
 		 */
 		$this->filters['membersonly'] = param( 'membersonly', 'boolean', $this->default_filters['membersonly'], true );
@@ -321,15 +342,23 @@ class UserList extends DataObjectList2
 		 */
 		$gender_men = param( 'gender_men', 'boolean', strpos( $this->default_filters['gender'], 'M' ), true );
 		$gender_women = param( 'gender_women', 'boolean', strpos( $this->default_filters['gender'], 'F' ), true );
-		if( ( $gender_men && ! $gender_women ) || ( ! $gender_men && $gender_women ) )
-		{	// Find men OR women
-			$this->filters['gender'] = $gender_men ? 'M' : 'F';
+		$gender_other = param( 'gender_other', 'boolean', strpos( $this->default_filters['gender'], 'O' ), true );
+		if( $gender_men || $gender_women || $gender_other )
+		{
+			if( $gender_men ) 
+			{
+				$this->filters['gender'] = 'M';
+			}
+			if( $gender_women ) 
+			{
+				$this->filters['gender'] .= 'F';
+			}
+			if( $gender_other ) 
+			{
+				$this->filters['gender'] .= 'O';
+			}
 		}
-		else if( $gender_men && $gender_women )
-		{	// Find men AND women
-			$this->filters['gender'] = 'MF';
-		}
-
+		
 		/*
 		 * Restrict by status
 		 */
@@ -356,9 +385,14 @@ class UserList extends DataObjectList2
 		$this->filters['custom_sender_name'] = param( 'custom_sender_name', 'integer', $this->default_filters['custom_sender_name'], true );
 
 		/*
-		 * Restrict by user group
+		 * Restrict by primary user group:
 		 */
-		$this->filters['group'] = param( 'group', 'string', $this->default_filters['group'], true );
+		$this->filters['group'] = param( 'group', 'integer', $this->default_filters['group'], true );
+
+		/*
+		 * Restrict by secondary user group:
+		 */
+		$this->filters['group2'] = param( 'group2', 'integer', $this->default_filters['group2'], true );
 
 		/*
 		 * Restrict by locations
@@ -471,6 +505,7 @@ class UserList extends DataObjectList2
 		/*
 		 * filtering stuff:
 		 */
+		$this->UserQuery->where_user_IDs( $this->filters['userids'] );
 		$this->UserQuery->where_members( $this->filters['membersonly'] );
 		$this->UserQuery->where_keywords( $this->filters['keywords'] );
 		$this->UserQuery->where_gender( $this->filters['gender'] );
@@ -479,6 +514,7 @@ class UserList extends DataObjectList2
 		$this->UserQuery->where_reported( $this->filters['reported'] );
 		$this->UserQuery->where_custom_sender( $this->filters['custom_sender_email'], $this->filters['custom_sender_name'] );
 		$this->UserQuery->where_group( $this->filters['group'] );
+		$this->UserQuery->where_secondary_group( $this->filters['group2'] );
 		$this->UserQuery->where_location( 'ctry', $ctry_filter );
 		$this->UserQuery->where_location( 'rgn', $this->filters['region'] );
 		$this->UserQuery->where_location( 'subrg', $this->filters['subregion'] );
@@ -487,10 +523,10 @@ class UserList extends DataObjectList2
 		$this->UserQuery->where_userfields( $this->filters['userfields'] );
 		$this->UserQuery->where_level( $this->filters['level_min'], $this->filters['level_max'] );
 		if( isset( $this->filters['org'] ) || isset( $this->query_params['where_org_ID'] ) )
-        { // Filter by organization ID
+		{	// Filter by organization ID:
 			$org_ID = isset( $this->query_params['where_org_ID'] ) ? $this->query_params['where_org_ID'] : $this->filters['org'];
 			$this->UserQuery->where_organization( $org_ID );
-        }
+		}
 		if( ! is_logged_in() )
 		{ // Restrict users by group level for anonymous users
 			global $Settings;
@@ -510,8 +546,23 @@ class UserList extends DataObjectList2
 
 	/**
 	 * Run Query: GET DATA ROWS *** HEAVY ***
+	 * 
+	 * We need this query() stub in order to call it from restart() and still
+	 * let derivative classes override it
+	 * 
+	 * @deprecated Use new function run_query()
 	 */
-	function query()
+	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
+	{
+		$this->run_query( $create_default_cols_if_needed, $append_limit, $append_order_by );
+	}
+
+
+	/**
+	 * Run Query: GET DATA ROWS *** HEAVY ***
+	 */
+	function run_query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true,
+											$query_title = 'Results::run_query()' )
 	{
 		global $DB, $Session, $localtimenow;
 
@@ -538,7 +589,11 @@ class UserList extends DataObjectList2
 			$Timer->start( 'Users_IDs', false );
 
 			$step1_SQL = new SQL();
-			$step1_SQL->SELECT( 'T_users.user_ID, IF( user_avatar_file_ID IS NOT NULL, 1, 0 ) as has_picture, COUNT( DISTINCT blog_ID ) AS nb_blogs' );
+			$step1_SQL->SELECT( 'T_users.user_ID, IF( user_avatar_file_ID IS NOT NULL, 1, 0 ) as has_picture' );
+			if( ! empty( $this->query_params['join_colls'] ) )
+			{	// Initialize count of collections (used on order by this field):
+				$step1_SQL->SELECT_add( ', COUNT( DISTINCT blog_ID ) AS nb_blogs' );
+			}
 			if( !empty( $this->filters['reported'] ) && $this->filters['reported'] )
 			{	// Filter is set to 'Reported users'
 				$step1_SQL->SELECT_add( ', COUNT( DISTINCT urep_reporter_ID ) AS user_rep' );
@@ -579,8 +634,7 @@ class UserList extends DataObjectList2
 
 		$this->sql = $step2_SQL->get();
 
-		// ATTENTION: we skip the parent on purpose here!! fp> refactor
-		DataObjectList2::query( false, false, false, 'UserList::Query() Step 2' );
+		parent::run_query( false, false, false, 'UserList::Query() Step 2' );
 	}
 
 

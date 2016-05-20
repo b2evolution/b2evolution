@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  *
@@ -32,21 +32,23 @@ class CollectionSettings extends AbstractSettings
 	var $_defaults = array(
 		// Home page settings:
 			'front_disp'             => 'posts',
-			'what_to_show'           => 'posts',        // posts, days
+
+		// Posts list settings:
+			'what_to_show'           => 'posts',      // posts, days
 			'main_content'           => 'normal',
 			'posts_per_page'         => '5',
+			'disp_featured_above_list' => 0,				// Don't display a featured post above the list by default
 			'canonical_homepage'     => 1,				// Redirect homepage to its canonical Url?
 			'relcanonical_homepage'  => 1,				// If no 301, fall back to rel="canoncial" ?
-			'default_noindex'        => '0',			// META NOINDEX on Default blog page
-			// the following are actually general params but are probably best understood if being presented with the home page params
+			'default_noindex'        => '0',				// META NOINDEX on Default blog page
 			'orderby'         => 'datestart',
 			'orderdir'        => 'DESC',
 			'title_link_type' => 'permalink',
 			'permalinks'      => 'single',				// single, archive, subchap
 
 		// Page 2,3,4..; settings:
-			'paged_noindex' => '1',						// META NOINDEX on following blog pages
-			'paged_nofollowto' => '0',					// NOFOLLOW on links to following blog pages
+			'paged_noindex' => '1',							// META NOINDEX on following blog pages
+			'paged_nofollowto' => '0',						// NOFOLLOW on links to following blog pages
 
 		// Single post settings:
 			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?
@@ -164,15 +166,33 @@ class CollectionSettings extends AbstractSettings
 			'post_categories' => 'main_extra_cat_post', // Post category setting
 			'post_navigation' => 'same_blog',           // Default post by post navigation should stay in the same blog, category, author or tag
 			'blog_head_includes' => '',
+			'blog_body_includes' => '',
 			'blog_footer_includes' => '',
 			'allow_html_comment' => 1, // Allow HTML in comments
 			'track_unread_content' => 0, // Should we track unread content on the specific blog. It can be modified on the Features/Other settings form.
 			'allow_access' => 'public', // Allow access to blog; Values: 'public' - Everyone (Public Blog), 'users' - Logged in users, 'members' - Members of the blog
 			'locale_source' => 'blog', // Source of the locale for navigation/widget: 'blog', 'user'
 			'post_locale_source' => 'post', // Source of the locale for post content: 'post', 'blog'
+			'new_item_locale_source' => 'select_coll', // Source of the locale for new items: 'use_coll', 'select_coll', 'select_user'
+
+		// User directory:
+			'userdir_picture' => 1,
+			'image_size_user_list' => 'crop-top-48x48',
+			'userdir_login' => 1,
+			'userdir_firstname' => 0,
+			'userdir_lastname' => 0,
+			'userdir_nickname' => 0,
+			'userdir_fullname' => 1,
+			'userdir_country' => 0,
+			'userdir_country_type' => 'both',
+			'userdir_region' => 0,
+			'userdir_subregion' => 0,
+			'userdir_city' => 1,
+			'userdir_phone' => 0,
+			'userdir_soclinks' => 0,
+			'userdir_lastseen' => 0,
 
 		// Other settings:
-			'image_size_user_list' => 'crop-top-48x48', // Used in disp = users
 			'image_size_messaging' => 'crop-top-32x32', // Used in disp = threads
 			'search_per_page'      => 20, // Number of results per page on disp=search
 			'latest_comments_num'  => 20, // Number of the shown comments on disp=comments
@@ -205,28 +225,57 @@ class CollectionSettings extends AbstractSettings
 	/**
 	 * Constructor
 	 */
-	function CollectionSettings()
+	function __construct()
 	{
-		parent::AbstractSettings( 'T_coll_settings', array( 'cset_coll_ID', 'cset_name' ), 'cset_value', 1 );
+		parent::__construct( 'T_coll_settings', array( 'cset_coll_ID', 'cset_name' ), 'cset_value', 1 );
 	}
+
 
 	/**
 	 * Loads the settings. Not meant to be called directly, but gets called
 	 * when needed.
 	 *
-	 * @access protected
 	 * @param string First column key
 	 * @param string Second column key
+	 * @param string NOT USED (provided for compatibility with parent class)
 	 * @return boolean
 	 */
-	function _load( $coll_ID, $arg )
+	function _load( $coll_ID = NULL, $arg = NULL, $arg3 = NULL )
 	{
-		if( empty( $coll_ID ) )
+		if( empty( $coll_ID ) || empty( $arg ) )
 		{
 			return false;
 		}
 
 		return parent::_load( $coll_ID, $arg );
+	}
+
+
+	/**
+	 * Get a setting from the DB settings table.
+	 *
+	 * @uses get_default()
+	 * @param string First column key
+	 * @param string Second column key
+	 * @return string|false|NULL value as string on success; NULL if not found; false in case of error
+	 */
+	function get( $col_key1, $col_key2 )
+	{
+		return parent::getx( $col_key1, $col_key2 );
+	}
+
+
+	/**
+	 * Temporarily sets a setting ({@link dbupdate()} writes it to DB).
+	 *
+	 * @param string First column key
+	 * @param string Second column key
+	 * @param mixed Value
+	 * @return boolean true, if the value has been set, false if it has not changed.
+	 */
+	function set( $col_key1, $col_key2, $value )
+	{
+		return parent::setx( $col_key1, $col_key2, $value );
 	}
 }
 

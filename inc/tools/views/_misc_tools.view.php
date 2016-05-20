@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -173,7 +173,8 @@ foreach( $tool_plugins as $loop_Plugin )
 {
 	$block_item_Widget->title = format_to_output($loop_Plugin->name);
 	$block_item_Widget->disp_template_replaced( 'block_start' );
-	$Plugins->call_method_if_active( $loop_Plugin->ID, 'AdminToolPayload', $params = array() );
+	$params = array();
+	$Plugins->call_method_if_active( $loop_Plugin->ID, 'AdminToolPayload', $params );
 	$block_item_Widget->disp_template_raw( 'block_end' );
 }
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -201,8 +201,9 @@ $Form->begin_fieldset( T_('Notifications') );
 	}
 	$is_comment_moderator = $edited_User->check_role( 'comment_moderator' );
 	if( $is_comment_moderator || $edited_User->check_role( 'comment_editor' ) )
-	{ // edited user has permission to edit other than his own comments at least in one status in one blog
+	{	// edited user has permission to edit other than his own comments at least in one status in one collection:
 		$notify_options[] = array( 'edited_user_notify_cmt_moderation', 1, T_('a comment is posted and I have permissions to moderate it.'), $UserSettings->get( 'notify_comment_moderation', $edited_User->ID ), $disabled );
+		$notify_options[] = array( 'edited_user_notify_edit_cmt_moderation', 1, T_('a comment is modified and I have permissions to moderate it.'), $UserSettings->get( 'notify_edit_cmt_moderation', $edited_User->ID ), $disabled );
 	}
 	if( $edited_User->check_perm( 'admin', 'restricted', false ) )
 	{ // edited user has a permission to back-office
@@ -215,6 +216,7 @@ $Form->begin_fieldset( T_('Notifications') );
 	if( $edited_User->check_role( 'post_moderator' ) )
 	{ // edited user is post moderator at least in one blog
 		$notify_options[] = array( 'edited_user_notify_post_moderation', 1, T_('a post is created and I have permissions to moderate it.'), $UserSettings->get( 'notify_post_moderation', $edited_User->ID ), $disabled );
+		$notify_options[] = array( 'edited_user_notify_edit_pst_moderation', 1, T_('a post is modified and I have permissions to moderate it.'), $UserSettings->get( 'notify_edit_pst_moderation', $edited_User->ID ), $disabled );
 		$notify_options[] = array( 'edited_user_send_pst_moderation_reminder', 1, sprintf( T_('posts are awaiting moderation for more than %s.'), seconds_to_period( $post_moderation_reminder_threshold ) ), $UserSettings->get( 'send_pst_moderation_reminder', $edited_User->ID ), $disabled );
 	}
 	if( $current_User->check_perm( 'users', 'edit' ) )

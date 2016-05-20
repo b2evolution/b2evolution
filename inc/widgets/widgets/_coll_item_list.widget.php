@@ -1,13 +1,13 @@
 <?php
 /**
- * This file implements the xyz Widget class.
+ * This file implements the Universal Item List Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
 
 /**
- * ComponentWidget Class
+ * Universal Item List Widget Class
  *
  * A ComponentWidget is a displayable entity that can be placed into a Container on a web page.
  *
@@ -27,10 +27,10 @@ class coll_item_list_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function coll_item_list_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'coll_item_list' );
+		parent::__construct( $db_row, 'core', 'coll_item_list' );
 	}
 
 
@@ -48,11 +48,16 @@ class coll_item_list_Widget extends ComponentWidget
 		 * @var ItemTypeCache
 		 */
 		$ItemTypeCache = & get_ItemTypeCache();
+
 		$item_type_options =
 			array(
-				'#' => T_('Default'),
 				''  => T_('All'),
-			) + $ItemTypeCache->get_option_array() ;
+			) + $ItemTypeCache->get_option_array();
+
+		$item_type_usage_options =
+			array(
+				'' => T_('All'),
+			) + $ItemTypeCache->get_usage_option_array();
 
 		$r = array_merge( array(
 				'title' => array(
@@ -67,6 +72,23 @@ class coll_item_list_Widget extends ComponentWidget
 					'type' => 'checkbox',
 					'defaultvalue' => false,
 				),
+				'layout' => array(
+					'label' => T_('Layout'),
+					'note' => T_('How to lay out the items'),
+					'type' => 'select',
+					'options' => array(
+							'rwd'  => T_( 'RWD Blocks' ),
+							'flow' => T_( 'Flowing Blocks' ),
+							'list' => T_( 'List' ),
+						),
+					'defaultvalue' => 'list',
+				),
+				'rwd_block_class' => array(
+					'label' => T_('RWD block class'),
+					'note' => T_('Specify the responsive column classes you want to use.'),
+					'size' => 60,
+					'defaultvalue' => 'col-lg-4 col-md-6 col-sm-6 col-xs-12',
+				),
 				'item_visibility' => array(
 					'label' => T_('Item visibility'),
 					'note' => T_('What post statuses should be included in the list?'),
@@ -77,12 +99,30 @@ class coll_item_list_Widget extends ComponentWidget
 							array( 'all', T_('show all posts the current user is allowed to see') ) ),
 					'defaultvalue' => 'all',
 				),
+				'item_type_usage' => array(
+					'label' => T_('Post type usage'),
+					'note' => T_('Restrict to a specific item type usage?'),
+					'type' => 'select',
+					'options' => $item_type_usage_options,
+					'defaultvalue' => '',
+				),
 				'item_type' => array(
-					'label' => T_('Post type'),
-					'note' => T_('What kind of items do you want to list?'),
+					'label' => T_('Exact post type'),
+					'note' => T_('What type of items do you want to list?'),
 					'type' => 'select',
 					'options' => $item_type_options,
-					'defaultvalue' => '#',
+					'defaultvalue' => '',
+				),
+				'featured' => array(
+					'label' => T_('Featured'),
+					'note' => T_('Do you want to restrict to featured contents?'),
+					'type' => 'radio',
+					'options' => array( 
+							array ('all', T_('All posts') ),
+							array ('featured', T_('Only featured') ),
+							array ('other', T_('Only NOT featured') ),
+						),
+					'defaultvalue' => 'all',
 				),
 				'follow_mainlist' => array(
 					'label' => T_('Follow Main List'),
@@ -136,7 +176,7 @@ class coll_item_list_Widget extends ComponentWidget
 					'label' => T_( 'Max items' ),
 					'note' => T_( 'Maximum number of items to display.' ),
 					'size' => 4,
-					'defaultvalue' => 20,
+					'defaultvalue' => 10,
 				),
 				'disp_title' => array(
 					'label' => T_( 'Titles' ),
@@ -166,18 +206,29 @@ class coll_item_list_Widget extends ComponentWidget
 							array( 'all', T_('Display all pictures') ) ),
 					'defaultvalue' => 'none',
 				),
+				'disp_first_image' => array(
+					'label' => T_('First picture'),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'special', T_('Special placement before title') ),
+							array( 'normal', T_('No special treatment (same as other pictures)') ) ),
+					'defaultvalue' => 'normal',
+				),
+				'max_pics' => array(
+					'label' => T_('Max pictures'),
+					'note' => T_('Maximum number of pictures to display after the title.'),
+					'size' => 4,
+					'type' => 'integer',
+					'defaultvalue' => '',
+					'allow_empty' => true,
+				),
 				'thumb_size' => array(
 					'label' => T_('Image size'),
 					'note' => T_('Cropping and sizing of thumbnails'),
 					'type' => 'select',
 					'options' => get_available_thumb_sizes(),
 					'defaultvalue' => 'crop-80x80',
-				),
-				'disp_first_image' => array(
-					'label' => T_( 'Order' ),
-					'note' => T_( 'Display first image separately and before title.' ),
-					'type' => 'checkbox',
-					'defaultvalue' => false,
 				),
 				'item_pic_link_type' => array(
 					'label' => T_('Link pictures'),
@@ -292,18 +343,19 @@ class coll_item_list_Widget extends ComponentWidget
 
 		// Define default template params that can be rewritten by skin
 		$this->disp_params = array_merge( array(
-				'item_first_image_before'  => '<div class="item_first_image">',
-				'item_first_image_after'   => '</div>',
-				'item_title_before'        => '<div class="item_title">',
-				'item_title_after'         => '</div>',
-				'item_title_single_before' => '',
-				'item_title_single_after'  => '',
-				'item_excerpt_before'      => '<div class="item_excerpt">',
-				'item_excerpt_after'       => '</div>',
-				'item_content_before'      => '<div class="item_content">',
-				'item_content_after'       => '</div>',
-				'item_images_before'       => '<div class="item_images">',
-				'item_images_after'        => '</div>',
+				'item_first_image_before'      => '<div class="item_first_image">',
+				'item_first_image_after'       => '</div>',
+				'item_first_image_placeholder' => '<div class="item_first_image_placeholder"><a href="$item_permaurl$"></a></div>',
+				'item_title_before'            => '<div class="item_title">',
+				'item_title_after'             => '</div>',
+				'item_title_single_before'     => '',
+				'item_title_single_after'      => '',
+				'item_excerpt_before'          => '<div class="item_excerpt">',
+				'item_excerpt_after'           => '</div>',
+				'item_content_before'          => '<div class="item_content">',
+				'item_content_after'           => '</div>',
+				'item_images_before'           => '<div class="item_images">',
+				'item_images_after'            => '</div>',
 			), $this->disp_params );
 
 		// Create ItemList
@@ -319,6 +371,9 @@ class coll_item_list_Widget extends ComponentWidget
 			load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
 			$ItemList = new ItemListLight( $listBlog, $listBlog->get_timestamp_min(), $listBlog->get_timestamp_max(), $limit, 'ItemCacheLight', $this->code.'_' );
 		}
+
+		// Set additional debug info prefix for SQL queries to know what widget executes it:
+		$ItemList->query_title_prefix = get_class( $this );
 
 		$cat_array = sanitize_id_list( $this->disp_params['cat_IDs'], true );
 
@@ -340,10 +395,26 @@ class coll_item_list_Widget extends ComponentWidget
 			$filters['page'] = $this->disp_params['page'];
 		}
 
-		if( $this->disp_params['item_type'] != '#' )
+		if( $this->disp_params['item_type'] != '' &&
+		    $this->disp_params['item_type'] != '#' /* deprecated value, it was used as default value of ItemList filter */ )
 		{	// Not "default", restrict to a specific type (or '' for all)
 			$filters['types'] = $this->disp_params['item_type'];
 		}
+
+		if( isset( $this->disp_params['item_type_usage'] ) )
+		{	// Not "default", restrict to a specific type usage (or '' for all):
+			$filters['itemtype_usage'] = $this->disp_params['item_type_usage'];
+		}
+
+		if( $this->disp_params['featured'] == 'featured' )
+		{	// Restrict to featured Items:
+			$filters['featured'] = true; 
+		}
+		elseif( $this->disp_params['featured'] == 'other' )
+		{	// Restrict to NOT featured Items:
+			$filters['featured'] = false; 
+		}
+
 
 		if( $this->disp_params['follow_mainlist'] == 'tags' )
 		{	// Restrict to Item tagged with some tag used in the Mainlist:
@@ -404,10 +475,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 		// Check if the widget displays only single title
 		$this->disp_params['disp_only_title'] = ! (
-				( $this->disp_params['attached_pics'] != 'none' && $this->disp_params['disp_first_image'] ) || // display first image
+				( $this->disp_params['attached_pics'] != 'none' ) || // display first and other images
 				( $this->disp_params['disp_excerpt'] ) || // display excerpt
-				( $this->disp_params['disp_teaser'] ) || // display teaser
-				( $this->disp_params['attached_pics'] == 'all' || ( $this->disp_params['attached_pics'] == 'first' && ! $this->disp_params['disp_first_image'] ) ) // display other images
+				( $this->disp_params['disp_teaser'] ) // display teaser
 			);
 
 		// Start to capture display content here in order to solve the issue to don't display empty widget
@@ -415,18 +485,16 @@ class coll_item_list_Widget extends ComponentWidget
 		// This variable used to display widget. Will be set to true when content is displayed
 		$content_is_displayed = false;
 
-		if( !$this->disp_params['disp_title'] && in_array( $this->disp_params[ 'attached_pics' ], array( 'first', 'all' ) ) )
-		{ // Don't display bullets when we show only the pictures
-			$block_css_class = 'nobullets';
-		}
+		// Get extra classes depending on widget settings:
+		$block_css_class = $this->get_widget_extra_class();
 
 		if( empty( $block_css_class ) )
-		{
+		{	// No extra class, Display default wrapper:
 			echo $this->disp_params['block_start'];
 		}
 		else
-		{ // Additional class for widget block
-			echo preg_replace( '/ class="([^"]+)"/', ' class="$1 '.$block_css_class.'"', $this->disp_params['block_start'] );
+		{	// Append extra classes for widget block:
+			echo preg_replace( '/ class="([^"]+)"/', ' class="$1'.$block_css_class.'"', $this->disp_params['block_start'] );
 		}
 
 		$title = sprintf( ( $this->disp_params[ 'title_link' ] ? '<a href="'.$listBlog->gen_blogurl().'" rel="nofollow">%s</a>' : '%s' ), $this->disp_params[ 'title' ] );
@@ -467,9 +535,10 @@ class coll_item_list_Widget extends ComponentWidget
 			}
 			else
 			{ // Display list start, all chapters are in the same group ( not grouped by blogs )
-				echo $this->disp_params['list_start'];
+				echo $this->get_layout_start();
 			}
 
+			$item_index = 0;
 			foreach( $chapters_of_loaded_items as $Chapter )
 			{
 				if( $group_by_blogs && $displayed_blog_ID != $Chapter->blog_ID )
@@ -477,19 +546,19 @@ class coll_item_list_Widget extends ComponentWidget
 					$Chapter->get_Blog();
 					if( $displayed_blog_ID != NULL )
 					{ // Display the end of the previous blog's chapter list
-						echo $this->disp_params['list_end'];
+						echo $this->get_layout_end( $item_index );
 					}
 					echo $this->disp_params['coll_start'].$Chapter->Blog->get('shortname'). $this->disp_params['coll_end'];
 					// Display start of blog's chapter list
-					echo $this->disp_params['list_start'];
+					echo $this->get_layout_start();
 					$displayed_blog_ID = $Chapter->blog_ID;
 				}
-				$content_is_displayed = $this->disp_chapter( $Chapter, $items_map_by_chapter ) || $content_is_displayed;
+				$content_is_displayed = $this->disp_chapter( $Chapter, $items_map_by_chapter, $item_index ) || $content_is_displayed;
 			}
 
 			if( $content_is_displayed )
 			{ // End of a chapter list - if some content was displayed this is always required
-				echo $this->disp_params['list_end'];
+				echo $this->get_layout_end( $item_index );
 			}
 
 			if( $group_by_blogs && isset( $this->disp_params['collist_end'] ) )
@@ -499,14 +568,15 @@ class coll_item_list_Widget extends ComponentWidget
 		}
 		else
 		{ // Plain list:
-			echo $this->disp_params['list_start'];
+			echo $this->get_layout_start();
 
+			$item_index = 0;
 			/**
 			 * @var ItemLight (or Item)
 			 */
 			while( $Item = & $ItemList->get_item() )
 			{ // Display contents of the Item depending on widget params:
-				$content_is_displayed = $this->disp_contents( $Item ) || $content_is_displayed;
+				$content_is_displayed = $this->disp_contents( $Item, false, $item_index ) || $content_is_displayed;
 			}
 
 			if( isset( $this->disp_params['page'] ) )
@@ -518,7 +588,7 @@ class coll_item_list_Widget extends ComponentWidget
 				$ItemList->page_links( $this->disp_params['pagination'] );
 			}
 
-			echo $this->disp_params['list_end'];
+			echo $this->get_layout_end( $item_index );
 		}
 
 		echo $this->disp_params['block_body_end'];
@@ -541,23 +611,25 @@ class coll_item_list_Widget extends ComponentWidget
 	 *
 	 * @param Chapter
 	 * @param array Items map by Chapter
+	 * @param integer Item index
 	 * @return boolean true if content was displayed, false otherwise
 	 */
-	function disp_chapter( $Chapter, & $items_map_by_chapter )
+	function disp_chapter( $Chapter, & $items_map_by_chapter, & $item_index )
 	{
 		$content_is_displayed = false;
 
 		if( isset( $items_map_by_chapter[$Chapter->ID] ) && ( count( $items_map_by_chapter[$Chapter->ID] ) > 0 ) )
 		{ // Display Chapter only if it has some items
-			echo $this->disp_params['item_start'];
+			echo $this->get_layout_item_start();
 			$Chapter->get_Blog();
 			echo '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get('name').'</a>';
-			echo $this->disp_params['item_end'];
+			echo $this->get_layout_item_end();
 			echo $this->disp_params['group_start'];
 
+			$item_index = 0;
 			foreach( $items_map_by_chapter[$Chapter->ID] as $iterator_Item )
 			{ // Display contents of the Item depending on widget params:
-				$content_is_displayed = $this->disp_contents( $iterator_Item, true ) || $content_is_displayed;
+				$content_is_displayed = $this->disp_contents( $iterator_Item, true, $item_index ) || $content_is_displayed;
 			}
 
 			// Close cat group
@@ -573,9 +645,10 @@ class coll_item_list_Widget extends ComponentWidget
 	 *
 	 * @param Item
 	 * @param boolean set to true if Items are displayed grouped by chapters, false otherwise
+	 * @param integer Item index
 	 * @return boolean TRUE - if content is displayed
 	 */
-	function disp_contents( & $disp_Item, $chapter_mode = false )
+	function disp_contents( & $disp_Item, $chapter_mode = false, & $item_index )
 	{
 		global $disp, $Item;
 
@@ -596,22 +669,44 @@ class coll_item_list_Widget extends ComponentWidget
 			$link_class = $this->disp_params['link_default_class'];
 		}
 
-		if( $link_class == $this->disp_params['link_selected_class'] )
-		{
-			echo $this->disp_params[$disp_param_prefix.'item_selected_start'];
+		$item_is_selected = ( $link_class == $this->disp_params['link_selected_class'] );
+
+		echo $this->get_layout_item_start( $item_index, $item_is_selected, $disp_param_prefix );
+
+		if( $this->disp_params['disp_first_image'] == 'special' )
+		{	// If we should display first picture before title then get "Cover" images and order them at top:
+			$cover_image_params = array(
+					'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore,inline',
+					// Sort the attachments to get firstly "Cover", then "Teaser", and "After more" as last order
+					'links_sql_select'  => ', CASE '
+							.'WHEN link_position = "cover"      THEN "1" '
+							.'WHEN link_position = "teaser"     THEN "2" '
+							.'WHEN link_position = "teaserperm" THEN "3" '
+							.'WHEN link_position = "teaserlink" THEN "4" '
+							.'WHEN link_position = "aftermore"  THEN "5" '
+							.'WHEN link_position = "inline"     THEN "6" '
+							// .'ELSE "99999999"' // Use this line only if you want to put the other position types at the end
+						.'END AS position_order',
+					'links_sql_orderby' => 'position_order, link_order',
+				);
 		}
 		else
 		{
-			echo $this->disp_params[$disp_param_prefix.'item_start'];
+			$cover_image_params = array();
 		}
 
-		if( $this->disp_params['attached_pics'] != 'none' && $this->disp_params['disp_first_image'] )
-		{ // Display first image before title
-			$this->disp_images( array(
-					'before' => $this->disp_params['item_first_image_before'],
-					'after'  => $this->disp_params['item_first_image_after'],
-					'Item'   => $disp_Item,
-				), $content_is_displayed );
+		if( $this->disp_params['attached_pics'] != 'none' && $this->disp_params['disp_first_image'] == 'special' )
+		{ // We want to display first image separately before the title
+			// Display before/after even if there is no image so we can use it as a placeholder.
+			$this->disp_images( array_merge( array(
+					'before'      => $this->disp_params['item_first_image_before'],
+					'after'       => $this->disp_params['item_first_image_after'],
+					'placeholder' => $this->disp_params['item_first_image_placeholder'],
+					'Item'        => $disp_Item,
+					'start'       => 1,
+					'limit'       => 1,
+				), $cover_image_params ),
+				$content_is_displayed );
 		}
 
 		if( $this->disp_params['disp_title'] )
@@ -660,26 +755,41 @@ class coll_item_list_Widget extends ComponentWidget
 		}
 
 		if( $this->disp_params['attached_pics'] == 'all' ||
-		    ( $this->disp_params['attached_pics'] == 'first' && ! $this->disp_params['disp_first_image'] ) )
+		   ( $this->disp_params['attached_pics'] == 'first' && $this->disp_params['disp_first_image'] == 'normal' ) )
 		{ // Display attached pictures
-			$picture_limit = $this->disp_params['attached_pics'] == 'first' ? 1 : 1000;
-			$this->disp_images( array(
+			if( $this->disp_params['attached_pics'] == 'first' )
+			{	// Display only one first image:
+				$picture_limit = 1;
+			}
+			else
+			{
+				$max_pics = intval( $this->disp_params['max_pics'] );
+				if( $max_pics > 0 )
+				{	// Limit images after title with widget param:
+					$picture_limit = $max_pics;
+					if( $this->disp_params['disp_first_image'] == 'special' )
+					{	// If first image is already displayed before title, then we should skip this first to get next images:
+						$picture_limit += 1;
+					}
+				}
+				else
+				{	// Don't limit the images:
+					$picture_limit = 1000;
+				}
+			}
+			$this->disp_images( array_merge( array(
 					'before' => $this->disp_params['item_images_before'],
 					'after'  => $this->disp_params['item_images_after'],
 					'Item'   => $disp_Item,
-					'start'  => ( $this->disp_params['disp_first_image'] ? 2 : 1 ), // Skip first image if it is displayed on top
+					'start'  => ( $this->disp_params['disp_first_image'] == 'special' ? 2 : 1 ), // Skip first image if it is displayed on top
 					'limit'  => $picture_limit,
-				), $content_is_displayed );
+				), $cover_image_params ),
+				$content_is_displayed );
 		}
 
-		if( $link_class == $this->disp_params['link_selected_class'] )
-		{
-			echo $this->disp_params[$disp_param_prefix.'item_selected_end'];
-		}
-		else
-		{
-			echo $this->disp_params[$disp_param_prefix.'item_end'];
-		}
+		++$item_index;
+
+		echo $this->get_layout_item_end( $item_index, $item_is_selected, $disp_param_prefix );
 
 		return $content_is_displayed;
 	}
@@ -694,25 +804,35 @@ class coll_item_list_Widget extends ComponentWidget
 	function disp_images( $params = array(), & $content_is_displayed )
 	{
 		$params = array_merge( array(
-				'before' => '',
-				'after'  => '',
-				'Item'   => NULL,
-				'start'  => 1,
-				'limit'  => 1,
+				'before'                     => '',
+				'after'                      => '',
+				'placeholder'                => '',
+				'Item'                       => NULL,
+				'start'                      => 1,
+				'limit'                      => 1,
+				'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore,inline',
+				'links_sql_select'           => '',
+				'links_sql_orderby'          => 'link_order',
 			), $params );
+
+		$links_params = array(
+				'sql_select_add' => $params['links_sql_select'],
+				'sql_order_by'   => $params['links_sql_orderby']
+			);
 
 		$disp_Item = & $params['Item'];
 
+		// Get list of ALL attached files:
 		$LinkOwner = new LinkItem( $disp_Item );
 
 		$images = '';
 
-		if( $FileList = $LinkOwner->get_attachment_FileList( $params['limit'], NULL, 'image' ) )
+		if( $LinkList = $LinkOwner->get_attachment_LinkList( $params['limit'], $params['restrict_to_image_position'], 'image', $links_params ) )
 		{	// Get list of attached files
 			$image_num = 1;
-			while( $File = & $FileList->get_next() )
+			while( $Link = & $LinkList->get_next() )
 			{
-				if( $File->is_image() )
+				if( ( $File = & $Link->get_File() ) && $File->is_image() )
 				{	// Get only images
 					if( $image_num < $params['start'] )
 					{ // Skip these first images
@@ -755,6 +875,94 @@ class coll_item_list_Widget extends ComponentWidget
 			echo $images;
 			echo $params['after'];
 		}
+		else
+		{	// Display placeholder if no images:
+			// Replace mask $item_permaurl$ with the item permanent URL:
+			echo str_replace( '$item_permaurl$', $disp_Item->get_permanent_url(), $params['placeholder'] );
+		}
+
+	}
+
+
+	/**
+	 * Get extra classes depending on widget settings
+	 *
+	 * @return string
+	 */
+	function get_widget_extra_class()
+	{
+		$block_css_class = '';
+
+		if( ! $this->disp_params['disp_title'] && in_array( $this->disp_params[ 'attached_pics' ], array( 'first', 'all' ) ) )
+		{	// Don't display bullets when we show only the pictures:
+			$block_css_class .= ' nobullets';
+		}
+
+		if( $this->disp_params['item_group_by'] == 'chapter' )
+		{	// If items are grouped by category/chapter:
+			$block_css_class .= ' evo_withgroup';
+		}
+		else
+		{	// No grouping:
+			$block_css_class .= ' evo_nogroup';
+		}
+
+		if( $this->disp_params['disp_title'] )
+		{	// If item title is displayed:
+			$block_css_class .= ' evo_withtitle';
+		}
+		else
+		{	// Item title is hidden:
+			$block_css_class .= ' evo_notitle';
+		}
+
+		if( $this->disp_params['attached_pics'] == 'first' )
+		{	// If only first picture is displayed:
+			$block_css_class .= ' evo_1pic';
+		}
+		elseif( $this->disp_params['attached_pics'] == 'all' )
+		{	// If all item pictures are displayed:
+			$block_css_class .= ' evo_pics';
+		}
+		else
+		{	// Item pictures are hidden:
+			$block_css_class .= ' evo_nopic';
+		}
+
+		if( $this->disp_params['attached_pics'] != 'none' )
+		{	// If at least one picture should be displayed:
+			if( $this->disp_params['disp_first_image'] == 'special' )
+			{	// Special placement for first image:
+				$block_css_class .= ' evo_1pic__special';
+			}
+			else
+			{	// Normal placement for first image:
+				$block_css_class .= ' evo_1pic__normal';
+			}
+
+			// Add class for each image size:
+			$block_css_class .= ' evo_imgsize_'.$this->disp_params['thumb_size'];
+		}
+
+		if( $this->disp_params['disp_excerpt'] )
+		{	// If item excerpt is displayed:
+			$block_css_class .= ' evo_withexcerpt';
+		}
+		else
+		{	// Item excerpt is hidden:
+			$block_css_class .= ' evo_noexcerpt';
+		}
+
+		if( $this->disp_params['disp_teaser'] )
+		{	// If item teaser is displayed:
+			$block_css_class .= ' evo_withteaser';
+		}
+		else
+		{	// Item teaser is hidden:
+			$block_css_class .= ' evo_noteaser';
+		}
+
+		return $block_css_class;
 	}
 
 

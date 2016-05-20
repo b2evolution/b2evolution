@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -151,12 +151,6 @@ $select_sql = $select_SQL->get();
 if( $action == 'preview' )
 { // Init PREVIEW message
 	global $localtimenow;
-
-	foreach( $recipient_status_list as $row )
-	{ // To make the unread status for each recipient
-		$read_status_list[ $row->user_ID ] = -1;
-		$leave_status_list[ $row->user_ID ] = 0;
-	}
 
 	$count_SQL->SELECT( 'COUNT(*) + 1' );
 
@@ -401,6 +395,9 @@ if( $action == 'preview' )
 // Disable rollover effect on table rows
 $Results->display_init( $display_params );
 $display_params['list_start'] = str_replace( 'class="grouped', 'class="grouped nohover', $Results->params['list_start'] );
+
+// Disable highlight on hover
+$display_params['list_start'] = str_replace( 'table-hover', '', $Results->params['list_start'] );
 
 // Dispaly message list
 $Results->display( $display_params );

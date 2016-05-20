@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -36,11 +36,11 @@ $from_User = ( $params['from_User'] == NULL ) ? $current_User : $params['from_Us
 
 if( $params['new_thread'] )
 {
-	echo sprintf( T_( '%s just sent you a message with the title %s.' ), $from_User->login, '"'.$Message->Thread->title.'"' );
+	echo sprintf( T_( '%s just sent you a private message with the title %s.' ), $from_User->login, '"'.$Message->Thread->title.'"' );
 }
 elseif( count( $params['thrd_recipients'] ) == 1 )
 {
-	echo sprintf( T_( '%s just replied to your message in the %s conversation. ' ), $from_User->login, '"'.$Message->Thread->title.'"' );
+	echo sprintf( T_( '%s just replied to your private message in the %s conversation.' ), $from_User->login, '"'.$Message->Thread->title.'"' );
 }
 else
 {
@@ -63,7 +63,7 @@ echo "\n";
 
 if( count( $params['other_unread_threads'] ) > 0 )
 { // Display other unread threads
-	echo "\n".T_( 'In addition to this new message, you also have unread messages in the following conversations' ).":\n";
+	echo "\n".T_( 'In addition to this new message, you also have unread private messages in the following conversations' ).":\n";
 	foreach( $params['other_unread_threads'] as $unread_thread )
 	{
 		echo "\t - ".strip_tags( $unread_thread )."\n";

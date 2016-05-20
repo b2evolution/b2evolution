@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -43,6 +43,7 @@ class google_maps_plugin extends Plugin
 	 */
 	var $number_of_installs = 1;
 	var $group = 'widget';
+	var $subgroup = 'infoitem';
 	var $number_of_widgets ;
 
 
@@ -59,15 +60,14 @@ class google_maps_plugin extends Plugin
 
 
 	/**
-	 * Get the settings that the plugin can use.
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
 	 *
-	 * Those settings are transfered into a Settings member object of the plugin
-	 * and can be edited in the backoffice (Settings / Plugins).
-	 *
-	 * @see Plugin::GetDefaultSettings()
-	 * @see PluginSettings
-	 * @see Plugin::PluginSettingsValidateSet()
-	 * @return array
+	 * @param array Associative array of parameters (since v1.9).
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
+	 * @return array see {@link Plugin::GetDefaultSettings()}.
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
+	 * and assign an array with the following keys to them (only 'label' is required):
 	 */
 	function GetDefaultSettings( & $params )
 	{
@@ -97,7 +97,7 @@ class google_maps_plugin extends Plugin
 	 */
 	function get_widget_param_definitions( $params )
 	{
-		$r = array(
+		$r = array_merge( array(
 			'map_title' => array(
 				'label' => T_('Widget title'),
 				'defaultvalue' => T_('Google maps Widget'),
@@ -113,27 +113,51 @@ class google_maps_plugin extends Plugin
 				'label' => T_('Map height on page'),
 				'defaultvalue' => '300px',
 				'note' => '',
-			),
+				),
 			'map_type' => array(
 				'label' => T_( 'Map default view ' ),
 				'type' => 'radio',
 				'options' => array( array('map', T_( 'Map' ) ), array( 'satellite', T_( 'Satellite' ) ) ),
 				'defaultvalue' => 'map',
-				'note' => ''),
+				'note' => ''
+				),
+			), parent::get_widget_param_definitions( $params ) );
 
-			);
 		return $r;
 	}
 
+
 	/**
-	 * User settings.
+	 * Get keys for block/widget caching
 	 *
-	 * @see Plugin::GetDefaultUserSettings()
-	 * @see PluginUserSettings
-	 * @see Plugin::PluginUserSettingsValidateSet()
-	 * @return array
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @param integer Widget ID
+	 * @return array of keys this widget depends on
 	 */
-	function GetDefaultUserSettings()
+	function get_widget_cache_keys( $widget_ID = 0 )
+	{
+		global $Blog, $Item;
+
+		return array(
+				'wi_ID'        => $widget_ID, // Have the widget settings changed ?
+				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
+				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
+				'item_ID'      => $Item->ID, // Has the Item page changed?
+			);
+	}
+
+
+	/**
+	 * Define the PER-USER settings of the plugin here. These can then be edited by each user.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function GetDefaultUserSettings( & $params )
 	{
 		return array();
 	}
@@ -822,39 +846,41 @@ function locate()
 
 
 	/**
-	 * @see Plugin::SkinBeginHtmlHead()
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
 	 */
-	function SkinBeginHtmlHead()
+	function SkinBeginHtmlHead( & $params )
 	{
 		require_js( '#jquery#', 'blog' );
 	}
 
-	function SkinTag( $params )
+
+	function SkinTag( & $params )
 	{
-		global $Item;
-		global $Blog;
+		global $Blog, $Item;
 
-		$this->number_of_widgets += 1;
-
-		if( ! empty( $Item ) && $Item->get_type_setting( 'use_coordinates' ) == 'never' )
-		{
+		if( empty( $Item ) )
+		{	// Don't display this widget when no Item object:
 			return;
 		}
 
-		if( !empty( $Item ) )
-		{
-			$lat = $Item->get_setting('latitude');
-			$lng = $Item->get_setting('longitude');
-			if (empty($lat) && empty($lng))
-			{
-				return;
-			}
+		$this->number_of_widgets += 1;
+
+		if( $Item->get_type_setting( 'use_coordinates' ) == 'never' )
+		{	// Coordinates are not allowed for the item type:
+			return;
 		}
-		else
-		{
-			$lat = 0;
-			$lng = 0;
+
+		$lat = $Item->get_setting( 'latitude' );
+		$lng = $Item->get_setting( 'longitude' );
+		if( empty( $lat ) && empty( $lng ) )
+		{	// Coordinates must be defined for the viewed Item:
+			return;
 		}
+
 		$width = $this->display_param($this->get_widget_setting('width', $params));
 		$width = 'width:'.$width;
 
@@ -925,7 +951,7 @@ function locate()
 	 * Event handler: Called before the plugin is going to be un-installed.
 	 * @see Plugin::BeforeUninstall()
 	 */
-	function BeforeUninstall()
+	function BeforeUninstall( & $params )
 	{
 		$this->msg( T_('Google Maps plugin sucessfully un-installed.') );
 		return true;

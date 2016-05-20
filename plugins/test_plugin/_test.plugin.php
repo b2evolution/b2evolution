@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -64,15 +64,14 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Get the settings that the plugin can use.
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
 	 *
-	 * Those settings are transfered into a Settings member object of the plugin
-	 * and can be edited in the backoffice (Settings / Plugins).
-	 *
-	 * @see Plugin::GetDefaultSettings()
-	 * @see PluginSettings
-	 * @see Plugin::PluginSettingsValidateSet()
-	 * @return array
+	 * @param array Associative array of parameters (since v1.9).
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
+	 * @return array see {@link Plugin::GetDefaultSettings()}.
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
+	 * and assign an array with the following keys to them (only 'label' is required):
 	 */
 	function GetDefaultSettings( & $params )
 	{
@@ -189,7 +188,7 @@ class test_plugin extends Plugin
 	 * @see Plugin::PluginUserSettingsValidateSet()
 	 * @return array
 	 */
-	function GetDefaultUserSettings()
+	function GetDefaultUserSettings( & $params )
 	{
 		return array(
 				'echo_random' => array(
@@ -289,7 +288,7 @@ class test_plugin extends Plugin
 	 *
 	 * @see Plugin::PluginUserSettingsUpdateAction()
 	 */
-	function PluginUserSettingsUpdateAction()
+	function PluginUserSettingsUpdateAction( & $params )
 	{
 		if( $this->UserSettings->get('echo_random') )
 		{
@@ -311,7 +310,6 @@ class test_plugin extends Plugin
 	/**
 	 * Event handler: Called when ending the admin html head section.
 	 *
-	 * @see Plugin::AdminEndHtmlHead()
 	 * @param array Associative array of parameters
 	 * @return boolean did we do something?
 	 */
@@ -339,7 +337,9 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Called when displaying editor toolbars.
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @see Plugin::AdminDisplayToolbar()
 	 * @param array Associative array of parameters
@@ -356,9 +356,16 @@ class test_plugin extends Plugin
 	/**
 	 * Event handler: Called when displaying editor buttons (in back-office).
 	 *
-	 * @see Plugin::AdminDisplayEditorButton()
-	 * @param array Associative array of parameters
-	 * @return boolean did we display ?
+	 * This method, if implemented, should output the buttons (probably as html INPUT elements) 
+	 * and return true, if button(s) have been displayed.
+	 *
+	 * You should provide an unique html ID with each button.
+	 *
+	 * @param array Associative array of parameters.
+	 *   - 'target_type': either 'Comment' or 'Item'.
+	 *   - 'edit_layout': "inskin", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
+	 *                    NOTE: Please respect the "inskin" mode, which should display only the most simple things!
+	 * @return boolean did we display a button?
 	 */
 	function AdminDisplayEditorButton( & $params )
 	{
@@ -372,9 +379,16 @@ class test_plugin extends Plugin
 	/**
 	 * Event handler: Called when displaying editor buttons (in front-office).
 	 *
-	 * @see Plugin::DisplayEditorButton()
-	 * @param array Associative array of parameters
-	 * @return boolean did we display ?
+	 * This method, if implemented, should output the buttons (probably as html INPUT elements)
+	 * and return true, if button(s) have been displayed.
+	 *
+	 * You should provide an unique html ID with each button.
+	 *
+	 * @param array Associative array of parameters.
+	 *   - 'target_type': either 'Comment' or 'Item'.
+	 *   - 'edit_layout': "inskin", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
+	 *                    NOTE: Please respect the "inskin" mode, which should display only the most simple things!
+	 * @return boolean did we display a button?
 	 */
 	function DisplayEditorButton( & $params )
 	{
@@ -408,9 +422,13 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * @see Plugin::SkinBeginHtmlHead()
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
 	 */
-	function SkinBeginHtmlHead()
+	function SkinBeginHtmlHead( & $params )
 	{
 		require_js( '#jquery#', 'blog' );
 	}
@@ -492,7 +510,7 @@ class test_plugin extends Plugin
 	 *
 	 * @see Plugin::AdminToolAction()
 	 */
-	function AdminToolAction( $params )
+	function AdminToolAction()
 	{
 		global $Messages;
 
@@ -505,7 +523,7 @@ class test_plugin extends Plugin
 	 *
 	 * @see Plugin::AdminToolPayload()
 	 */
-	function AdminToolPayload( $params )
+	function AdminToolPayload()
 	{
 		echo 'Hello, This is the AdminToolPayload for the TEST plugin.';
 	}
@@ -614,7 +632,7 @@ class test_plugin extends Plugin
 	 *
 	 * @see Plugin::RenderItemAsText()
 	 */
-	function RenderItemAsText( & $params )
+	function RenderItemAsText()
 	{
 		// Do nothing.
 	}
@@ -695,7 +713,7 @@ class test_plugin extends Plugin
 	 * Event handler: Called before the plugin is going to be un-installed.
 	 * @see Plugin::BeforeUninstall()
 	 */
-	function BeforeUninstall()
+	function BeforeUninstall( & $params )
 	{
 		$this->msg( 'TEST plugin sucessfully un-installed. All the hard work we did was adding this message.. ;)' );
 		return true;
@@ -706,7 +724,7 @@ class test_plugin extends Plugin
 	 * Event handler: called when a new user has registered.
 	 * @see Plugin::AfterUserRegistration()
 	 */
-	function AfterUserRegistration( $params )
+	function AfterUserRegistration( & $params )
 	{
 		$this->msg( 'The TEST plugin welcomes the new user '.$params['User']->dget('login').'!' );
 	}
@@ -726,7 +744,7 @@ class test_plugin extends Plugin
 	 * Event handler: Called when a user tries to login.
 	 * @see Plugin::LoginAttempt()
 	 */
-	function LoginAttempt()
+	function LoginAttempt( & $params )
 	{
 		$this->msg( 'This is the TEST plugin responding to the LoginAttempt event.', 'note' );
 	}
@@ -750,7 +768,7 @@ class test_plugin extends Plugin
 	 *
 	 * @see Plugin::AlternateAuthentication()
 	 */
-	function AlternateAuthentication()
+	function AlternateAuthentication( & $params )
 	{
 		if( 0 ) // you should only enable it for test purposes, because it automagically logs every user in as "demouser"!
 		{
@@ -820,7 +838,7 @@ class test_plugin extends Plugin
 	/**
 	 * @see Plugin::BeforeSessionsDelete()
 	 */
-	function BeforeSessionsDelete( $params )
+	function BeforeSessionsDelete( & $params )
 	{
 		$this->debug_log('BeforeSessionsDelete: Could have prevented the deletion of all sessions older than ' ).date('Y-m-d H:i:s', $params['cutoff_timestamp' ] );
 		return;
@@ -950,7 +968,7 @@ class test_plugin extends Plugin
 			if( $disp == 'page' )
 			{	// Get pages:
 				$params['MainList']->set_default_filters( array(
-						'types' => '1000',		// pages
+						'itemtype_usage' => 'page', // pages
 					) );
 			}
 
@@ -959,7 +977,7 @@ class test_plugin extends Plugin
 				$this->msg( 'TEST plugin: InitMainList() method allows us to search in both posts and pages.', 'note' );
 
 				$params['MainList']->set_default_filters( array(
-						'types' => '1,1000',
+						'itemtype_usage' => 'post,page'
 					) );
 			}
 

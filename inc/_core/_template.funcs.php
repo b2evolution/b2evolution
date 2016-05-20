@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -187,16 +187,29 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	$allow_collection_redirect = false;
 	if( $external_redirect && $allow_redirects_to_different_domain == 'all_collections_and_redirected_posts' && ! $redirected_post )
 	{ // If a redirect is external and we allow to redirect to all collection domains:
-		$BlogCache = & get_BlogCache();
-		$BlogCache->load_all();
+		global $basedomain;
+
 		$redirect_to_domain = preg_replace( '~https?://([^/]+)/?.*~i', '$1', $redirect_to );
-		foreach( $BlogCache->cache as $url_Blog )
-		{
-			$blog_domain = preg_replace( '~https?://([^/]+)/?.*~i', '$1', $url_Blog->gen_baseurl() );
-			if( $blog_domain == $redirect_to_domain )
+
+		if( preg_match( '~\.'.str_replace( '.', '\.', $basedomain ).'$~', $redirect_to_domain ) )
+		{ // Current redirect goes to subdomain, Allow this:
+			$allow_collection_redirect = true;
+		}
+		else
+		{ // Check if current redirect domain is used as absolute url at least for one collection in system:
+			global $DB;
+
+			$abs_url_coll_SQL = new SQL();
+			$abs_url_coll_SQL->SELECT( 'blog_ID' );
+			$abs_url_coll_SQL->FROM( 'T_blogs' );
+			$abs_url_coll_SQL->WHERE( 'blog_access_type = "absolute"' );
+			$abs_url_coll_SQL->WHERE_and( 'blog_siteurl LIKE '.$DB->quote( '%://'.str_replace( '_', '\_', $redirect_to_domain.'/%' ) ) );
+			$abs_url_coll_SQL->LIMIT( '1' );
+
+			$abs_url_coll_ID = $DB->get_var( $abs_url_coll_SQL->get() );
+			if( ! empty( $abs_url_coll_ID ) )
 			{ // We found current redirect goes to a collection domain, so it is not external
 				$allow_collection_redirect = true;
-				break;
 			}
 		}
 	}
@@ -396,6 +409,9 @@ function get_request_title( $params = array() )
 			'title_page_disp'     => true,
 			'title_page_before'   => '#',
 			'title_page_after'    => '#',
+			'title_terms_disp'    => true,
+			'title_terms_before'  => '#',
+			'title_terms_after'   => '#',
 			'glue'                => ' - ',
 			'format'              => 'htmlbody',
 			// Title for each disp:
@@ -424,9 +440,6 @@ function get_request_title( $params = array() )
 			'subs_text'           => T_('Notifications'),
 			'comments_text'       => T_('Latest Comments'),
 			'feedback-popup_text' => T_('Feedback'),
-			'edit_text_create'    => T_('New post'),
-			'edit_text_update'    => T_('Editing post'),
-			'edit_text_copy'      => T_('Duplicating post'),
 			'edit_comment_text'   => T_('Editing comment'),
 			'front_text'          => '',		// We don't want to display a special title on the front page
 			'posts_text'          => '#',		// Automatic - display filters
@@ -599,6 +612,7 @@ function get_request_title( $params = array() )
 
 		case 'single':
 		case 'page':
+		case 'terms':
 			// We are displaying a single message:
 			if( $preview )
 			{	// We are requesting a post preview:
@@ -617,7 +631,7 @@ function get_request_title( $params = array() )
 				$after = $params['title_'.$disp.'_after'];
 			}
 			break;
-	
+
 		case 'download':
 			// We are displaying a download page:
 			global $download_Link;
@@ -653,21 +667,24 @@ function get_request_title( $params = array() )
 			break;
 
 		case 'edit':
+			global $edited_Item;
+			$type_name = $edited_Item->get_ItemType()->get_name();
+
 			$action = param_action(); // Edit post by switching into 'In skin' mode from Back-office
 			$p = param( 'p', 'integer', 0 ); // Edit post from Front-office
 			$post_ID = param ( 'post_ID', 'integer', 0 ); // Update the edited post( If user is redirected to edit form again with some error messages )
 			$cp = param( 'cp', 'integer', 0 ); // Copy post from Front-office
 			if( $action == 'edit_switchtab' || $p > 0 || $post_ID > 0 )
 			{	// Edit post
-				$title = $params['edit_text_update'];
+				$title = sprintf( T_('Edit %s'), $type_name );
 			}
 			else if( $cp > 0 )
 			{	// Copy post
-				$title = $params['edit_text_copy'];
+				$title = sprintf( T_('Duplicate %s'), $type_name );
 			}
 			else
 			{	// Create post
-				$title = $params['edit_text_create'];
+				$title = sprintf( T_('New %s'), $type_name );
 			}
 			if( $params['display_edit_links'] && $params['auto_pilot'] != 'seo_title' )
 			{ // Add advanced edit and close icon
@@ -982,11 +999,16 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
  */
 function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output = false )
 {
-	static $required_js;
+	global $required_js; // Use this var as global and NOT static, because it is used in other functions(e.g. display_ajax_form())
 	global $dequeued_headlines;
 
 	if( isset( $dequeued_headlines[ $js_file ] ) )
 	{ // Don't require this file if it was dequeued before this request
+		return;
+	}
+
+	if( is_admin_page() && in_array( $js_file, array( 'functions.js', 'ajax.js', 'form_extensions.js', 'extracats.js', 'dynamic_select.js', 'backoffice.js' ) ) )
+	{	// Don't require this file on back-office because it is auto loaded by bundled file evo_backoffice.bmin.js:
 		return;
 	}
 
@@ -1174,12 +1196,12 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				$blog_param = empty( $blog ) ? '' : '&blog='.$blog;
 				// Colorbox params to translate the strings:
 				$colorbox_strings_params = 'current: "'.TS_('image {current} of {total}').'",
-					previous: "'.TS_('previous').'",
-					next: "'.TS_('next').'",
-					close: "'.TS_('close').'",
-					openNewWindowText: "'.TS_('open in new window').'",
-					slideshowStart: "'.TS_('start slideshow').'",
-					slideshowStop: "'.TS_('stop slideshow').'",';
+					previous: "'.TS_('Previous').'",
+					next: "'.TS_('Next').'",
+					close: "'.TS_('Close').'",
+					openNewWindowText: "'.TS_('Open in a new window').'",
+					slideshowStart: "'.TS_('Start slideshow').'",
+					slideshowStop: "'.TS_('Stop slideshow').'",';
 				// Colorbox params to display a voting panel:
 				$colorbox_voting_params = '{'.$colorbox_strings_params.'
 					displayVoting: true,
@@ -1575,7 +1597,7 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
  */
 function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintbox' )
 {
-	global $blog;
+	global $Blog;
 
 	require_js( '#jquery#', $relative_to ); // dependency
 
@@ -1583,31 +1605,52 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 	{
 		case 'typeahead':
 			// Use typeahead library of bootstrap
+			require_js( '#bootstrap_typeahead#', $relative_to );
 			add_js_headline( 'jQuery( document ).ready( function()
 			{
-				jQuery( "input.autocomplete_login" ).typeahead( null,
+				jQuery( "input.autocomplete_login" ).on( "added",function()
 				{
-					displayKey: "login",
-					source: function ( query, cb )
+					jQuery( "input.autocomplete_login" ).each( function()
 					{
-						jQuery.ajax(
+						if( jQuery( this ).hasClass( "tt-input" ) || jQuery( this ).hasClass( "tt-hint" ) )
+						{	// Skip this field because typeahead is initialized before:
+							return;
+						}
+						var ajax_url = "";
+						if( jQuery( this ).hasClass( "only_assignees" ) )
 						{
-							url: "'.get_secure_htsrv_url().'async.php?action=get_login_list",
-							type: "post",
-							data: { q: query, data_type: "json" },
-							dataType: "JSON",
-							success: function( logins )
+							ajax_url = restapi_url + "'.( isset( $Blog ) ? 'collections/'.$Blog->get( 'urlname' ).'/assignees' : 'users/logins' ).'";
+						}
+						else
+						{
+							ajax_url = restapi_url + "users/logins";
+						}
+						jQuery( this ).typeahead( null,
+						{
+							displayKey: "login",
+							source: function ( query, cb )
 							{
-								var json = new Array();
-								for( var l in logins )
+								jQuery.ajax(
 								{
-									json.push( { login: logins[ l ] } );
-								}
-								cb( json );
+									type: "GET",
+									dataType: "JSON",
+									url: ajax_url,
+									data: { q: query },
+									success: function( data )
+									{
+										var json = new Array();
+										for( var l in data.list )
+										{
+											json.push( { login: data.list[ l ] } );
+										}
+										cb( json );
+									}
+								} );
 							}
 						} );
-					}
+					} );
 				} );
+				jQuery( "input.autocomplete_login" ).trigger( "added" );
 				'
 				// Don't submit a form by Enter when user is editing the owner fields
 				.get_prevent_key_enter_js( 'input.autocomplete_login' ).'
@@ -1627,16 +1670,21 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 			require_js( 'jquery/jquery.hintbox.min.js', $relative_to );
 			add_js_headline( 'jQuery( document ).on( "focus", "input.autocomplete_login", function()
 			{
-				var ajax_params = "";
+				var ajax_url = "";
 				if( jQuery( this ).hasClass( "only_assignees" ) )
 				{
-					ajax_params = "&user_type=assignees&blog='.$blog.'";
+					ajax_url = restapi_url + "'.( isset( $Blog ) ? 'collections/'.$Blog->get( 'urlname' ).'/assignees' : 'users/logins' ).'";
+				}
+				else
+				{
+					ajax_url = restapi_url + "users/logins";
 				}
 				jQuery( this ).hintbox(
 				{
-					url: "'.get_secure_htsrv_url().'async.php?action=get_login_list" + ajax_params,
+					url: ajax_url,
 					matchHint: true,
-					autoDimentions: true
+					autoDimentions: true,
+					json: true,
 				} );
 				'
 				// Don't submit a form by Enter when user is editing the owner fields
@@ -1921,7 +1969,7 @@ function credits( $params = array() )
 		), $params );
 
 
-	$cred_links = $global_Cache->get( 'creds' );
+	$cred_links = $global_Cache->getx( 'creds' );
 	if( empty( $cred_links ) )
 	{	// Use basic default:
 		$cred_links = unserialize('a:2:{i:0;a:2:{i:0;s:24:"http://b2evolution.net/r";i:1;s:3:"CMS";}i:1;a:2:{i:0;s:36:"http://b2evolution.net/web-hosting/r";i:1;s:19:"quality web hosting";}}');
@@ -1931,7 +1979,7 @@ function credits( $params = array() )
 
 	display_list( $cred_links, $params['list_start'], $params['list_end'], $params['separator'], $params['item_start'], $params['item_end'], NULL, $max_credits );
 
-	return $max_credits;	
+	return $max_credits;
 }
 
 
@@ -1992,7 +2040,7 @@ function powered_by( $params = array() )
 
 	$img_url = str_replace( '$rsc$', $rsc_uri, $params['img_url'] );
 
-	$evo_links = $global_Cache->get( 'evo_links' );
+	$evo_links = $global_Cache->getx( 'evo_links' );
 	if( empty( $evo_links ) )
 	{	// Use basic default:
 		$evo_links = unserialize('a:1:{s:0:"";a:1:{i:0;a:3:{i:0;i:100;i:1;s:23:"http://b2evolution.net/";i:2;a:2:{i:0;a:2:{i:0;i:55;i:1;s:26:"powered by b2evolution CMS";}i:1;a:2:{i:0;i:100;i:1;s:29:"powered by an open-source CMS";}}}}}');
@@ -2116,13 +2164,19 @@ function is_recursive( /*array*/ & $array, /*array*/ & $alreadySeen = array() )
  */
 function display_ajax_form( $params )
 {
-	global $rsc_url, $samedomain_htsrv_url, $ajax_form_number;
+	global $rsc_url, $samedomain_htsrv_url, $ajax_form_number, $required_js;
 
 	if( is_recursive( $params ) )
 	{ // The params array contains recursion, don't try to encode, display error message instead
 		// We don't use translation because this situation should not really happen ( Probably it happesn with some wrong skin )
 		echo '<p style="color:red;font-weight:bold">'.T_( 'This section can\'t be displayed because wrong params were created by the skin.' ).'</p>';
 		return;
+	}
+
+	if( ! empty( $required_js ) )
+	{	// Send all loaded JS files to ajax request in order to don't load them twice:
+		// yura: It was done because JS of bootstrap modal doesn't work when jquery JS file is loaded twice.
+		$params['required_js'] = $required_js;
 	}
 
 	if( empty( $ajax_form_number ) )
@@ -2135,12 +2189,11 @@ function display_ajax_form( $params )
 
 	// Needs json_encode function to create json type params
 	$json_params = evo_json_encode( $params );
-	$ajax_loader = '<p class="ajax-loader"><span class="loader_img loader_ajax_form" title="'.T_('Loading...').'"></span><br />'.T_( 'Form is loading...' ).'</p>';
+
+	// Display loader gif until the ajax call returns:
+	echo '<p class="ajax-loader"><span class="loader_img loader_ajax_form" title="'.T_('Loading...').'"></span><br />'.T_( 'Form is loading...' ).'</p>';
 	?>
 	<script type="text/javascript">
-		// display loader gif until the ajax call returns
-		document.write( <?php echo "'".$ajax_loader."'"; ?> );
-
 		var ajax_form_offset_<?php echo $ajax_form_number; ?> = jQuery('#ajax_form_number_<?php echo $ajax_form_number; ?>').offset().top;
 		var request_sent_<?php echo $ajax_form_number; ?> = false;
 

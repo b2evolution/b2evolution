@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -21,13 +21,15 @@ load_class( 'users/model/_organization.class.php', 'Organization' );
 global $current_User;
 
 // Check minimum permission:
-$current_User->check_perm( 'users', 'view', true );
+$current_User->check_perm( 'orgs', 'create', true );
 
 // Set options path:
 $AdminUI->set_path( 'users', 'organizations' );
 
 // Get action parameter from request:
 param_action( '', true );
+
+param( 'display_mode', 'string', 'normal' );
 
 if( param( 'org_ID', 'integer', '', true ) )
 { // Load organization from cache:
@@ -46,7 +48,7 @@ switch( $action )
 {
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		$current_User->check_perm( 'orgs', 'create', true );
 
 		if( ! isset( $edited_Organization ) )
 		{ // We don't have a model to use, start with blank object:
@@ -54,14 +56,15 @@ switch( $action )
 		}
 		else
 		{ // Duplicate object in order no to mess with the cache:
-			$edited_Organization = duplicate( $edited_Organization ); // PHP4/5 abstraction
+			$edited_Organization = clone $edited_Organization;
 			$edited_Organization->ID = 0;
+			$edited_Organization->set( 'owner_user_ID', $current_User->ID );
 		}
 		break;
 
 	case 'edit':
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		$current_User->check_perm( 'orgs', 'view', true, $edited_Organization );
 
 		// Make sure we got an org_ID:
 		param( 'org_ID', 'integer', true );
@@ -77,7 +80,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'organization' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		$current_User->check_perm( 'orgs', 'create', true );
 
 		// load data from request
 		if( $edited_Organization->load_from_Request() )
@@ -136,7 +139,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'organization' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		$current_User->check_perm( 'orgs', 'edit', true, $edited_Organization );
 
 		// Make sure we got an org_ID:
 		param( 'org_ID', 'integer', true );
@@ -177,7 +180,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'organization' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		$current_User->check_perm( 'orgs', 'edit', true, $edited_Organization );
 
 		// Make sure we got an org_ID:
 		param( 'org_ID', 'integer', true );
@@ -202,23 +205,82 @@ switch( $action )
 			}
 		}
 		break;
+
+	case 'link_user':
+		// Add user to organization/ Edit membership:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'organization' );
+
+		// Check permission:
+		$current_User->check_perm( 'orgs', 'edit', true, $edited_Organization );
+
+		$user_login = param( 'user_login', 'string', NULL );
+		param_check_not_empty( 'user_login', T_('Please enter the login of the user you wish to add.') );
+		if( ! empty( $user_login ) )
+		{	// If the login is entered:
+			$UserCache = & get_UserCache();
+			$login_User = & $UserCache->get_by_login( $user_login );
+			if( empty( $login_User ) )
+			{	// Wrong entered login:
+				param_error( 'user_login', sprintf( T_('User &laquo;%s&raquo; does not exist!'), $user_login ) );
+			}
+		}
+
+		$accepted = param( 'accepted', 'string', '1' );
+		$role = param( 'role', 'string', '' );
+		$edit_mode = param( 'edit_mode', 'boolean' );
+
+		if( ! param_errors_detected() )
+		{	// Link user only when request has no errors:
+			$result = $DB->query( 'REPLACE INTO T_users__user_org ( uorg_user_ID, uorg_org_ID, uorg_accepted, uorg_role )
+				VALUES ( '.$login_User->ID.', '.$edited_Organization->ID.', '.$accepted.', '.$DB->quote( $role ).' ) ' );
+			if( $result )
+			{	// Display a message after successful linking:
+				if( $edit_mode )
+				{
+					$Messages->add( T_('Membership information updated.'), 'success');
+				}
+				else
+				{
+					$Messages->add( T_('Member has been added to the organization.'), 'success' );
+				}
+			}
+		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=organizations&action=edit&org_ID='.$edited_Organization->ID.'&filter=refresh', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
 }
 
-$AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
-$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
-$AdminUI->breadcrumbpath_add( T_('Organizations'), '?ctrl=organizations' );
+if( $display_mode != 'js')
+{
+	$AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
+	$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
+	$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
+	$AdminUI->breadcrumbpath_add( T_('Organizations'), '?ctrl=organizations' );
 
-// Set an url for manual page:
-$AdminUI->set_page_manual_link( 'organizations' );
+	if( $action == 'new' || $action == 'edit' || $action == 'add_user' )
+	{
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'organization-form' );
+		// Init JS to autcomplete the user logins:
+		init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+	}
+	else
+	{	// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'organizations' );
+	}
 
-// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-$AdminUI->disp_html_head();
+	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+	$AdminUI->disp_html_head();
 
-// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-$AdminUI->disp_body_top();
+	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+	$AdminUI->disp_body_top();
 
-$AdminUI->disp_payload_begin();
+	$AdminUI->disp_payload_begin();
+}
 
 /**
  * Display payload:
@@ -243,6 +305,29 @@ switch( $action )
 	case 'edit':
 	case 'update':	// we return in this state after a validation error
 		$AdminUI->disp_view( 'users/views/_organization.form.php' );
+		// Init JS for form to add user to organization:
+		echo_user_add_organization_js( $edited_Organization );
+		echo_user_edit_membership_js( $edited_Organization );
+		break;
+
+	case 'add_user':
+		// Form to add user to organization:
+		if( $display_mode == 'js')
+		{	// Do not append Debuglog & Debug JSlog to response!
+			$debug = false;
+			$debug_jslog = false;
+		}
+		$AdminUI->disp_view( 'users/views/_organization_user.form.php' );
+		break;
+
+	case 'edit_user':
+		// Form to edit user in organization
+		if( $display_mode == 'js' )
+		{
+			$debug = false;
+			$debug_jslog = false;
+		}
+		$AdminUI->disp_view( 'users/views/_organization_user_edit.form.php' );
 		break;
 
 
@@ -255,10 +340,11 @@ switch( $action )
 		break;
 
 }
+if( $display_mode != 'js')
+{
+	$AdminUI->disp_payload_end();
 
-$AdminUI->disp_payload_end();
-
-// Display body bottom, debug info and close </html>:
-$AdminUI->disp_global_footer();
-
+	// Display body bottom, debug info and close </html>:
+	$AdminUI->disp_global_footer();
+}
 ?>

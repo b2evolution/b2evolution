@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -106,7 +106,7 @@ class AbstractSettings
 	 * @param string The name of the DB column that holds the value.
 	 * @param integer The number of column keys to cache by. This are the first x keys of {@link $col_key_names}. 0 means 'load all'.
 	 */
-	function AbstractSettings( $db_table_name, $col_key_names, $col_value_name, $cache_by_col_keys = 0 )
+	function __construct( $db_table_name, $col_key_names, $col_value_name, $cache_by_col_keys = 0 )
 	{
 		$this->db_table_name = $db_table_name;
 		$this->col_key_names = $col_key_names;
@@ -139,8 +139,7 @@ class AbstractSettings
 
 
 	/**
-	 * Loads the settings. Not meant to be called directly, but gets called
-	 * when needed.
+	 * Loads the settings. Not meant to be called directly, but gets called when needed.
 	 *
 	 * @access protected
 	 * @param string First column key
@@ -195,7 +194,7 @@ class AbstractSettings
 			FROM '.$this->db_table_name.(
 				isset( $whereList[0] )
 				? ' WHERE '.implode( ' AND ', $whereList )
-				: '' ) );
+				: '' ), OBJECT, 'Load settings from '.$this->db_table_name );
 
 		switch( $this->count_col_key_names )
 		{
@@ -258,7 +257,7 @@ class AbstractSettings
 	 * @param string Third column key
 	 * @return string|false|NULL value as string on success; NULL if not found; false in case of error
 	 */
-	function get( $col_key1, $col_key2 = NULL, $col_key3 = NULL )
+	function getx( $col_key1, $col_key2 = NULL, $col_key3 = NULL )
 	{
 		global $debug;
 
@@ -431,7 +430,7 @@ class AbstractSettings
 	 *                         and {@link $col_value_name column value}. Must match order and count!
 	 * @return boolean true, if the value has been set, false if it has not changed.
 	 */
-	function set()
+	function setx()
 	{
 		global $Debuglog;
 

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -61,14 +61,14 @@ else
 $SQL = new SQL();
 $SQL->SELECT( 'user_ID, user_login, user_level, bloguser_perm_poststatuses + 0 as perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit, bloguser_can_be_assignee,'
 	. 'bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts, bloguser_perm_cmtstatuses + 0 as perm_cmtstatuses, bloguser_perm_edit_cmt,'
-	. 'bloguser_perm_delpost, bloguser_perm_edit_ts, bloguser_perm_cats,'
+	. 'bloguser_perm_delpost, bloguser_perm_edit_ts, bloguser_perm_meta_comment, bloguser_perm_cats,'
 	. 'bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,'
 	. 'bloguser_perm_media_browse, bloguser_perm_media_change,'
-	. 'IF( user_ID = "'.$edited_Blog->owner_user_ID.'", 1, bloguser_ismember ) AS bloguser_ismember,'
+	. 'IF( ( user_ID = "'.$edited_Blog->owner_user_ID.'" OR grp_perm_blogs = "viewall" OR grp_perm_blogs = "editall" ), 1, bloguser_ismember ) AS bloguser_ismember,'
 	. 'IF( user_ID = "'.$edited_Blog->owner_user_ID.'", 1, 0 ) AS bloguser_is_owner' );
-$SQL->FROM( 'T_users LEFT JOIN T_coll_user_perms ON (
-				 						user_ID = bloguser_user_ID
-										AND bloguser_blog_ID = '.$edited_Blog->ID.' )' );
+$SQL->FROM( 'T_users' );
+$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON ( user_ID = bloguser_user_ID AND bloguser_blog_ID = '.$edited_Blog->ID.' )' );
+$SQL->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
 $SQL->ORDER_BY( 'bloguser_is_owner DESC, bloguser_ismember DESC, *, user_login, user_ID' );
 
 if( !empty( $keywords ) )
@@ -78,7 +78,7 @@ if( !empty( $keywords ) )
 	$SQL->add_search_field( 'user_lastname' );
 	$SQL->add_search_field( 'user_nickname' );
 	$SQL->add_search_field( 'user_email' );
-	$SQL->WHERE_keywords( $keywords, 'AND' );
+	$SQL->WHERE_kw_search( $keywords, 'AND' );
 }
 
 // Display wide layout:
@@ -154,8 +154,9 @@ $Results->cols[] = array(
 						'td' => '%coll_perm_status_checkbox( {row}, \'bloguser_\', \'published\', \''.format_to_output( T_('Permission to post into this blog with published status'), 'htmlattr' ).'\', \'post\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloguser_\', \'community\', \''.format_to_output( T_('Permission to post into this blog with community status'), 'htmlattr' ).'\', \'post\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloguser_\', \'protected\', \''.format_to_output( T_('Permission to post into this blog with members status'), 'htmlattr' ).'\', \'post\' )%'.
-								'%coll_perm_status_checkbox( {row}, \'bloguser_\', \'review\', \''.format_to_output( T_('Permission to post into this blog with review status'), 'htmlattr' ).'\', \'post\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloguser_\', \'private\', \''.format_to_output( T_('Permission to post into this blog with private status'), 'htmlattr' ).'\', \'post\' )%'.
+								'<span style="display: inline-block; min-width: 5px;"></span>'.
+								'%coll_perm_status_checkbox( {row}, \'bloguser_\', \'review\', \''.format_to_output( T_('Permission to post into this blog with review status'), 'htmlattr' ).'\', \'post\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloguser_\', \'draft\', \''.format_to_output( T_('Permission to post into this blog with draft status'), 'htmlattr' ).'\', \'post\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloguser_\', \'deprecated\', \''.format_to_output( T_('Permission to post into this blog with deprecated status'), 'htmlattr' ).'\', \'post\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloguser_\', \'redirected\', \''.format_to_output( T_('Permission to post into this blog with redirected status'), 'htmlattr' ).'\', \'post\' )%',
@@ -206,10 +207,13 @@ $Results->cols[] = array(
 						'td' => '%coll_perm_status_checkbox( {row}, \'bloguser_\', \'published\', \''.format_to_output( T_('Permission to comment into this blog with published status'), 'htmlattr' ).'\', \'comment\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloguser_\', \'community\', \''.format_to_output( T_('Permission to comment into this blog with community status'), 'htmlattr' ).'\', \'comment\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloguser_\', \'protected\', \''.format_to_output( T_('Permission to comment into this blog with members status'), 'htmlattr' ).'\', \'comment\' )%'.
-								'%coll_perm_status_checkbox( {row}, \'bloguser_\', \'review\', \''.format_to_output( T_('Permission to comment into this blog with review status'), 'htmlattr' ).'\', \'comment\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloguser_\', \'private\', \''.format_to_output( T_('Permission to comment into this blog with private status'), 'htmlattr' ).'\', \'comment\' )%'.
+								'<span style="display: inline-block; min-width: 5px;"></span>'.
+								'%coll_perm_status_checkbox( {row}, \'bloguser_\', \'review\', \''.format_to_output( T_('Permission to comment into this blog with review status'), 'htmlattr' ).'\', \'comment\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloguser_\', \'draft\', \''.format_to_output( T_('Permission to comment into this blog with draft status'), 'htmlattr' ).'\', \'comment\' )%'.
-								'%coll_perm_status_checkbox( {row}, \'bloguser_\', \'deprecated\', \''.format_to_output( T_('Permission to comment into this blog with deprecated status'), 'htmlattr' ).'\', \'comment\' )%',
+								'%coll_perm_status_checkbox( {row}, \'bloguser_\', \'deprecated\', \''.format_to_output( T_('Permission to comment into this blog with deprecated status'), 'htmlattr' ).'\', \'comment\' )%'.
+								'<span style="display: inline-block; min-width: 5px;"></span>'.
+								'%coll_perm_checkbox( {row}, \'bloguser_\', \'perm_meta_comment\', \''.format_to_output( T_('Permission to post meta comments into this blog'), 'htmlattr' ).'\' )%',
 						'td_class' => 'center',
 					);
 

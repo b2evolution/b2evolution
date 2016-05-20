@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -17,9 +17,9 @@ global $blog, $admin_url, $UserSettings;
 
 // Create result set:
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE ivc_ID, ivc_code, ivc_expire_ts, ivc_source, ivc_grp_ID, grp_name, grp_level' );
+$SQL->SELECT( 'SQL_NO_CACHE ivc_ID, ivc_code, ivc_expire_ts, ivc_level, ivc_source, ivc_grp_ID, grp_name, grp_level' );
 $SQL->FROM( 'T_users__invitation_code' );
-$SQL->FROM_add( 'INNER JOIN T_groups ON grp_ID = ivc_grp_ID' );
+$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = ivc_grp_ID' );
 
 $count_SQL = new SQL();
 $count_SQL->SELECT( 'SQL_NO_CACHE COUNT( ivc_ID )' );
@@ -46,22 +46,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Expires'),
-		'order' => 'ivc_expire_ts',
-		'td_class' => 'shrinkwrap',
-		'td' => '$ivc_expire_ts$',
-	);
-
-$Results->cols[] = array(
-		'th' => T_('Group'),
-		'th_class' => 'shrinkwrap',
-		'td_class' => 'shrinkwrap',
-		'order' => 'grp_name',
-		'td' => '$grp_name$ ($grp_level$)',
-	);
-
-$Results->cols[] = array(
-		'th' => T_('Code'),
+		'th' => T_('Code').' | '.T_('Link'),
 		'order' => 'ivc_code',
 		'td' => $current_User->check_perm( 'users', 'edit', false )
 			? '<a href="'.$admin_url.'?ctrl=invitations&amp;action=edit&amp;ivc_ID=$ivc_ID$"><b>$ivc_code$</b></a>'
@@ -69,13 +54,49 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Code'),
-		'order' => 'ivc_code',
+		'th' => T_('Code').' | '.T_('Link'),
+		'td_class' => 'shrinkwrap',
 		'td' => '<a href="'.get_secure_htsrv_url().'register.php?invitation=$ivc_code$">'.T_('Link').'</a>',
 	);
 
 $Results->cols[] = array(
+		'th' => T_('Expires'),
+		'order' => 'ivc_expire_ts',
+		'td_class' => 'shrinkwrap',
+		'td' => '$ivc_expire_ts$',
+	);
+
+function ivc_group( $group_ID, $group_name, $group_level )
+{
+	if( $group_ID > 0 )
+	{
+		return $group_name.' ('.$group_level.')';
+	}
+	else
+	{
+		return '('.T_('Default group').')';
+	}
+}
+$Results->cols[] = array(
+		'th' => T_('Group'),
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'nowrap',
+		'order' => 'grp_name',
+		'td' => '%ivc_group( #ivc_grp_ID#, #grp_name#, #grp_level# )%',
+	);
+
+$Results->cols[] = array(
+		'th' => T_('Level'),
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'shrinkwrap',
+		'order' => 'ivc_level',
+		'td' => '$ivc_level$',
+	);
+
+$Results->cols[] = array(
 		'th' => T_('Source'),
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'nowrap',
 		'order' => 'ivc_source',
 		'td' => '$ivc_source$',
 	);

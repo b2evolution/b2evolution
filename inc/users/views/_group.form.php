@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -151,13 +151,35 @@ $Form->begin_fieldset( T_('General').get_manual_link('group_properties_general')
 
 	$Form->text( 'edited_grp_name', $edited_Group->name, 50, T_('Name'), '', 50, 'large' );
 
-	$Form->text_input( 'edited_grp_level', $edited_Group->get('level'), 2, T_('Group level'), '[0 - 10]', array( 'required' => true ) );
+	$Form->radio( 'edited_grp_usage', $edited_Group->get( 'usage' ), array(
+			array(
+					'primary',
+					// TRANS: Type: Primary Group, Secondary Group
+					sprintf( T_('%s Group'), get_admin_badge( 'group', '#', '#', '#', 'primary' ) ),
+					T_('General use case')
+				),
+			array(
+					'secondary',
+					// TRANS: Type: Primary Group, Secondary Group
+					sprintf( T_('%s Group'), get_admin_badge( 'group', '#', '#', '#', 'secondary' ) ),
+					T_('Use if you need multiple groups per users')
+				)
+		), T_('Group usage'), true );
 
-	display_pluggable_permissions( $Form, 'core_general' );
+	$Form->text_input( 'edited_grp_level', $edited_Group->get('level'), 2, T_('Group level'), '[0 - 10]', array( 'required' => true ) );
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Blogging permissions').get_manual_link('group_properties_blogging') );
+// Show/Hide the panels below depending on group usage:
+$primary_panels_style = $edited_Group->get( 'usage' ) == 'primary' ? '' : 'display:none';
+
+$Form->begin_fieldset( T_('Evobar & Back-office').get_manual_link('group_properties_evobar'), array( 'id' => 'evobar', 'style' => $primary_panels_style ) );
+
+	display_pluggable_permissions( $Form, 'core_evobar' );
+
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Blogging permissions').get_manual_link('group_properties_blogging'), array( 'id' => 'blogging', 'style' => $primary_panels_style ) );
 
 	$Form->radio( 'edited_grp_perm_blogs', $edited_Group->get('perm_blogs'),
 			array(  array( 'user', T_('Depending on each blog\'s permissions') ),
@@ -198,7 +220,7 @@ $Form->begin_fieldset( T_('Blogging permissions').get_manual_link('group_propert
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_properties_additional_permissions') );
+$Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_properties_additional_permissions'), array( 'id' => 'additional', 'style' => $primary_panels_style ) );
 
 	$Form->radio( 'edited_grp_perm_stats', $edited_Group->get('perm_stats'),
 			array(  $perm_none_option,
@@ -212,7 +234,7 @@ $Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_prope
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('System admin permissions').get_manual_link('group_properties_system_permissions') );
+$Form->begin_fieldset( T_('System admin permissions').get_manual_link('group_properties_system_permissions'), array( 'id' => 'system', 'style' => $primary_panels_style ) );
 
 	// Display pluggable permissions:
 	display_pluggable_permissions( $Form, 'core' );
@@ -227,7 +249,7 @@ $Form->begin_fieldset( T_('System admin permissions').get_manual_link('group_pro
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_( 'Notification options').get_manual_link('notification-options') );
+$Form->begin_fieldset( T_( 'Notification options').get_manual_link('notification-options'), array( 'id' => 'notification', 'style' => $primary_panels_style ) );
 
 	// Display pluggale notification options
 	display_pluggable_permissions( $Form, 'notifications');
@@ -258,6 +280,21 @@ jQuery( 'input[name=edited_grp_perm_options]' ).click( function()
 	else
 	{
 		jQuery( 'div#perm_options_children' ).show();
+	}
+} );
+
+jQuery( 'input[name=edited_grp_usage]' ).click( function()
+{	// Show/Hide the children permissions of the Settings permission
+	var primary_field_ids = '#fieldset_wrapper_evobar, #fieldset_wrapper_blogging, #fieldset_wrapper_additional, #fieldset_wrapper_system, #fieldset_wrapper_notification';
+	if( jQuery( this ).val() == 'primary' )
+	{
+		jQuery( primary_field_ids ).show();
+		jQuery( 'fieldset', primary_field_ids ).show();
+	}
+	else
+	{
+		jQuery( primary_field_ids ).hide();
+		jQuery( 'fieldset', primary_field_ids ).hide();
 	}
 } );
 </script>

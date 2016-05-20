@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
@@ -28,7 +28,7 @@ if( ! $config_is_done )
 	$rsc_url = '../rsc/';
 }
 
-require_once $inc_path.'_core/_class'.floor(PHP_VERSION).'.funcs.php';
+require_once $inc_path.'_core/_class_loader.funcs.php';
 require_once $inc_path.'_core/_misc.funcs.php';
 
 /**
@@ -282,7 +282,11 @@ header('Cache-Control: no-cache'); // no request to this page should get cached!
 						<li role="presentation"><a href="../index.php"><?php echo T_('Your site'); ?></a></li>
 					</ul>
 				</nav>
-				<h3 class="text-muted"><a href="http://b2evolution.net/"><img class="b2evolution_plane_logo" src="rsc/img/b2evolution_254x52.svg" alt="b2evolution CCMS"></a></h3>
+				<h3 class="text-muted"><a href="http://b2evolution.net/">
+					<img src="../rsc/img/b2evolution_254x52.png" width="254" height="52" alt="b2evolution" class="b2evolution_plane_logo"
+					  srcset="../rsc/img/b2evolution_508x104.png 2x,
+						 		 ../rsc/img/b2evolution_762x156.png 3x" /></a>
+				</h3>
 			</div>
 
 		<!-- InstanceBeginEditable name="Main" -->
@@ -348,7 +352,7 @@ $minimum_comment_interval = 1;<br />
 $debug = 1;<br />
 $debug_jslog = 1;<br />
 $allow_po_extraction = 1;<br />
-$test_install_all_features = true;<br />
+$allow_install_test_features = true;<br />
 $db_config[\'debug_dump_rows\'] = 20;<br />
 $db_config[\'debug_explain_joins\'] = false;<br />
 $display_errors_on_production = false;'

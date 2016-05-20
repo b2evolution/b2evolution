@@ -13,7 +13,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $app_version, $disp, $Blog, $Skin, $Settings;
 
-if( version_compare( $app_version, '4.0.0-dev' ) < 0 )
+if( evo_version_compare( $app_version, '4.0.0-dev' ) < 0 )
 { // Older 2.x skins work on newer 2.x b2evo versions, but newer 2.x skins may not work on older 2.x b2evo versions.
 	die( 'This skin is designed for b2evolution 4.0.0 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
@@ -224,7 +224,7 @@ foreach( $width_switchers as $ws_size => $ws_icon )
 		$ws_class .= ' roundbutton_selected';
 	}
 	echo '<a href="#" onclick="switch_width( this, \''.$ws_size.'\', \''.$cookie_skin_width_name.'\', \''.$cookie_path.'\' ); return false;" class="'.$ws_class.'">';
-	echo get_icon( $ws_icon );
+	echo '<span class="ficon '.$ws_icon.'"></span>';
 	echo '</a>';
 	$ws++;
 }

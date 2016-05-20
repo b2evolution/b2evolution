@@ -18,7 +18,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Credits go to the WordPress team (@link http://wordpress.org), where I got the basic
  * import-mt.php script with most of the core functions. Thank you!
@@ -64,7 +64,7 @@ if( function_exists( 'set_magic_quotes_runtime' ) )
 }
 else
 {
-	ini_set( 'magic_quotes_runtime', 0 );
+	@ini_set( 'magic_quotes_runtime', 0 );
 }
 
 // TODO: $io_charset !!

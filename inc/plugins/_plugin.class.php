@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -277,7 +277,7 @@ class Plugin
 	 * You should not use a constructor with your plugin, but the
 	 * {@link Plugin::PluginInit()} method instead!
 	 */
-	function Plugin()
+	function __construct()
 	{
 	}
 
@@ -287,8 +287,9 @@ class Plugin
 	 *
 	 * Should set name and description in a localizable fashion.
 	 *
-	 * This gets called on every instantiated plugin, also if it's just for
-	 * discovering the list of available plugins in the backoffice.
+	 * You DON'T NEED to include this, if you override this method.
+	 *
+	 * This gets called on every instantiated plugin, also if it's just for discovering the list of available plugins in the backoffice.
 	 *
 	 * Use this to validate Settings/requirements and/or cache them into class properties.
 	 *
@@ -301,8 +302,8 @@ class Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		// NOTE: the code below is just to handle stuff that has been deprecated since
-		//       b2evolution 1.9. You don't have to include this, if you override this method.
+		// NOTE: the code below is just to handle stuff that has been deprecated since b2evolution 1.9.
+		// You DON'T NEED to include this, if you override this method.
 
 		if( is_null($this->short_desc) )
 		{ // may have been set in plugin's constructor (which is deprecated since 1.9)
@@ -410,8 +411,7 @@ class Plugin
 	// Plugin information (settings, DB layout, ..): {{{
 
 	/**
-	 * Define default settings here.
-	 * Those can then be edited in the backoffice.
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
 	 *
 	 * You can access them in the plugin through the member object
 	 * {@link Plugin::$Settings}, e.g.:
@@ -434,7 +434,7 @@ class Plugin
 	 * @todo 3.0 fp> 2) This defines more than Default values ::  confusing name
 	 * @todo name tentative get_general_param_definitions()
 	 *
-	 * @param array Associative array of parameters (since 1.9).
+	 * @param array Associative array of parameters (since v1.9).
 	 *    'for_editing': true, if the settings get queried for editing;
 	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
 	 * @return array
@@ -478,7 +478,7 @@ class Plugin
 	 * 'disabled': if true, it adds a 'disabled="disabled"' html attribute to the element and the value cannot be changed
 	 * 'no_edit': if true, the setting is not editable. This is useful for internal settings.
 	 * 'allow_none': set this to true to have "None" in the options list for types 'select_group' and 'select_user'.
-	 * 'allow_empty': set this to true to allow save the empty values, e.g. when type=integer and setting may be empty
+	 * 'allow_empty': true to allow empty values, e.g. when type=integer but the value is not required
 	 * 'valid_pattern': A regular expression pattern that the value must match.
 	 *                      This is either just a regexp pattern as string or an array
 	 *                      with the keys 'pattern' and 'error' to define a custom error message.
@@ -525,7 +525,7 @@ class Plugin
 
 
 	/**
-	 * Define here default user settings that are then available in the backoffice.
+	 * Define the PER-USER settings of the plugin here. These can then be edited by each user.
 	 *
 	 * You can access them in the plugin through the member object
 	 * {@link $UserSettings}, e.g.:
@@ -551,6 +551,19 @@ class Plugin
 
 
 	/**
+	 * Define here default custom settings that are to be made available
+	 *     in the backoffice for collections, private messages and newsletters.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_custom_setting_definitions( & $params )
+	{
+		return array();
+	}
+
+
+	/**
 	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
 	 * @see Plugin::GetDefaultSettings()
@@ -561,10 +574,12 @@ class Plugin
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
+		/*
 		if( $this->group != 'rendering' )
 		{
 			return array();
 		}
+		*/
 
 		$render_note = '';
 		if( empty( $this->code ) )
@@ -592,7 +607,7 @@ class Plugin
 				),
 			);
 
-		return $r;
+		return array_merge( $r, $this->get_custom_setting_definitions( $params ) );
 	}
 
 
@@ -612,17 +627,17 @@ class Plugin
 			return array();
 		}
 
-		$render_note = $this->get_help_link();
+		$render_note = '';
 		if( empty( $this->code ) )
 		{
-			$render_note .= ' '.T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
+			$render_note .= T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
 		}
 		$admin_Plugins = & get_Plugins_admin();
 		$rendering_options = $admin_Plugins->get_apply_rendering_values( true );
 		$default_msg_rendering = ( isset( $params['default_msg_rendering'] ) && in_array( $params['default_msg_rendering'], $rendering_options ) ) ? $params['default_msg_rendering'] : 'never';
 		$r = array(
 			'msg_apply_rendering' => array(
-					'label' => sprintf( /* TRANS: Apply <plugin name> (rendering): always/never/stealth... etc */ T_('Apply %s'), $this->name ),
+					'label' => T_('Apply rendering to messages'),
 					'type' => 'select',
 					'options' => $rendering_options,
 					'defaultvalue' => $default_msg_rendering,
@@ -630,19 +645,88 @@ class Plugin
 				),
 			);
 
-		return $r;
+		return array_merge( $r, $this->get_custom_setting_definitions( $params ) );
 	}
 
 
-  /**
-   * Get definitions for widget specific editable params
-   *
+	/**
+	 * Define here default email settings that are to be made available in the backoffice.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$UserSettings}.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_email_setting_definitions( & $params )
+	{
+		if( $this->group != 'rendering' )
+		{
+			return array();
+		}
+
+		$render_note = '';
+		if( empty( $this->code ) )
+		{
+			$render_note .= T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
+		}
+		$admin_Plugins = & get_Plugins_admin();
+		$rendering_options = $admin_Plugins->get_apply_rendering_values( true );
+		$default_email_rendering = ( isset( $params['default_email_rendering'] ) && in_array( $params['default_email_rendering'], $rendering_options ) ) ? $params['default_email_rendering'] : 'never';
+		$r = array(
+			'email_apply_rendering' => array(
+					'label' => T_('Apply rendering to emails'),
+					'type' => 'select',
+					'options' => $rendering_options,
+					'defaultvalue' => $default_email_rendering,
+					'note' => $render_note,
+				),
+			);
+
+		return array_merge( $r, $this->get_custom_setting_definitions( $params ) );
+	}
+
+
+	/**
+	 * Get definitions for widget specific editable params
+	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param array Local params like 'for_editing' => true
 	 */
 	function get_widget_param_definitions( $params )
 	{
-		return array();
+		if( ! is_array( $params ) )
+		{	// Must be array:
+			$params = array();
+		}
+
+		// Load new widget to get default param definitions:
+		load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
+		$ComponentWidget = new ComponentWidget();
+
+		return array_merge( $ComponentWidget->get_param_definitions( array() ), $params );
+	}
+
+
+	/**
+	 * Get keys for block/widget caching
+	 *
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @param integer Widget ID
+	 * @return array of keys this widget depends on
+	 */
+	function get_widget_cache_keys( $widget_ID = 0 )
+	{
+		// Load new widget to get default cache keys:
+		load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
+		$ComponentWidget = new ComponentWidget();
+
+		$widget_cache_keys = $ComponentWidget->get_cache_keys();
+
+		$widget_cache_keys['wi_ID'] = $widget_ID;
+
+		return $widget_cache_keys;
 	}
 
 
@@ -841,11 +925,10 @@ class Plugin
 	/**
 	 * Event handler: Called when displaying editor buttons (in back-office).
 	 *
-	 * This method, if implemented, should output the buttons
-	 * (probably as html INPUT elements) and return true, if
-	 * button(s) have been displayed.
+	 * This method, if implemented, should output the buttons (probably as html INPUT elements)
+	 * and return true, if button(s) have been displayed.
 	 *
-	 * You should provide an unique html ID with your button.
+	 * You should provide an unique html ID with each button.
 	 *
 	 * @param array Associative array of parameters.
 	 *   - 'target_type': either 'Comment' or 'Item'.
@@ -853,7 +936,7 @@ class Plugin
 	 *                    NOTE: Please respect the "inskin" mode, which should display only the most simple things!
 	 * @return boolean did we display a button?
 	 */
-	function AdminDisplayEditorButton( $params )
+	function AdminDisplayEditorButton( & $params )
 	{
 		return false;		// Do nothing by default.
 	}
@@ -862,11 +945,10 @@ class Plugin
 	/**
 	 * Event handler: Called when displaying editor buttons (in front-office).
 	 *
-	 * This method, if implemented, should output the buttons
-	 * (probably as html INPUT elements) and return true, if
-	 * button(s) have been displayed.
+	 * This method, if implemented, should output the buttons (probably as html INPUT elements)
+	 * and return true, if button(s) have been displayed.
 	 *
-	 * You should provide an unique html ID with your button.
+	 * You should provide an unique html ID with each button.
 	 *
 	 * @param array Associative array of parameters.
 	 *   - 'target_type': either 'Comment' or 'Item'.
@@ -874,17 +956,18 @@ class Plugin
 	 *                    NOTE: Please respect the "inskin" mode, which should display only the most simple things!
 	 * @return boolean did we display a button?
 	 */
-	function DisplayEditorButton( $params )
+	function DisplayEditorButton( & $params )
 	{
 		return false;		// Do nothing by default.
 	}
 
 
 	/**
-	 * Event handler: Called when displaying editor toolbars.
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @param array Associative array of parameters
-	 *   - 'target_type': either 'Comment' or 'Item'.
 	 *   - 'edit_layout': "inskin", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
 	 *                    NOTE: Please respect the "inskin" mode, which should display only the most simple things!
 	 * @return boolean did we display a toolbar?
@@ -980,7 +1063,6 @@ class Plugin
 	 * @param array Associative array of parameters
 	 *   - 'MainList': The "MainList" object (by reference).
 	 *   - 'limit': The number of posts to display
-	 *
 	 * @return boolean True if you've created your own MainList object and queried the database, false otherwise.
 	 */
 	function InitMainList( & $params )
@@ -993,8 +1075,9 @@ class Plugin
 	/**
 	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
 	 *
-	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource
-	 * files (CSS, JavaScript, ..)).
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
@@ -1007,6 +1090,16 @@ class Plugin
 	 * Use this to add any HTML snippet at the end of the generated page.
 	 */
 	function SkinEndHtmlBody( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Gets called before skin wrapper.
+	 *
+	 * Use this to add any HTML code before skin wrapper and after evo toolbar.
+	 */
+	function BeforeSkinWrapper( & $params )
 	{
 	}
 
@@ -1603,7 +1696,7 @@ class Plugin
 	// Feedback (Comment/Trackback) events: {{{
 
 	/**
-	 * Event handler: Called when displaying editor toolbars.
+	 * Event handler: Called when displaying editor toolbars on comment form.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
@@ -2010,6 +2103,75 @@ class Plugin
 	// }}}
 
 
+	// Email form events: {{{
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		return false;		// Do nothing by default.
+	}
+
+
+	/**
+	 * Event handler: Called before at the beginning, if an email form gets sent (and received).
+	 *
+	 * Use this to filter input
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'content': the message text (by reference)
+	 */
+	function EmailFormSent( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called to filter the email's content
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'EmailCampaign': the {@link EmailCampaign} object
+	 */
+	function FilterEmailContent( & $params )
+	{
+		if( $this->group == 'rendering' )
+		{	// All plugin from 'rendering' group has a 'email_apply_rendering' setting
+			$EmailCampaign = & $params['EmailCampaign'];
+			if( in_array( $this->code, $EmailCampaign->get_renderers_validated() ) )
+			{ // Always allow rendering for $EmailCampaign
+				$render_params = array_merge( array( 'data' => & $EmailCampaign->email_text ), $params );
+				$this->RenderEmailAsHtml( $render_params );
+			}
+		}
+	}
+
+	/**
+	 * Event handler: Called when rendering email contents as HTML. (CACHED)
+	 *
+	 * The rendered content will be *cached* and the cached content will be reused on subsequent displays.
+	 * Use {@link DisplayContentAsHtml()} instead if you want to do rendering at display time.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'EmailCampaign': the {@link Item} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function RenderEmailAsHtml( & $params )
+	{
+		// Use this render by default temporarily
+		return $this->RenderItemAsHtml( $params );
+	}
+
+	// }}}
+
+
 	// Caching events: {{{
 
 	/**
@@ -2230,6 +2392,8 @@ class Plugin
 	{
 	}
 
+	// }}}
+
 	// PluginMsgSettings {{{
 	/**
 	 * Event handler: Called as action just before updating plugin's messages settings.
@@ -2237,6 +2401,18 @@ class Plugin
 	 * Use this to add notes/errors through {@link Plugin::msg()} or to process saved settings.
 	 */
 	function PluginMsgSettingsUpdateAction()
+	{
+	}
+
+	// }}}
+
+	// PluginEmailSettings {{{
+	/**
+	 * Event handler: Called as action just before updating plugin's messages settings.
+	 *
+	 * Use this to add notes/errors through {@link Plugin::msg()} or to process saved settings.
+	 */
+	function PluginEmailSettingsUpdateAction()
 	{
 	}
 
@@ -3223,7 +3399,7 @@ class Plugin
 
 			// Display additional info for help plugin icon only one time. It is used on plugins.js
 			$info_suffix_text = '<div id="help_plugin_info_suffix" style="display:none"><p><strong>'
-					.sprintf( T_('Click %s to access full documentaion for this plugin'), get_icon( 'help' ) )
+					.sprintf( T_('Click %s to access full documentation for this plugin'), get_icon( 'help' ) )
 				.'</strong></p></div>';
 		}
 		elseif( $target == '$readme' )
@@ -3484,7 +3660,8 @@ class Plugin
 	 */
 	function get_coll_default_setting( $parname, $blog_type = 'std' )
 	{
-		$params = $this->get_coll_setting_definitions( $tmp_params = array( 'for_editing' => true, 'blog_type' => $blog_type ) );
+		$tmp_params = array( 'for_editing' => true, 'blog_type' => $blog_type );
+		$params = $this->get_coll_setting_definitions( $tmp_params );
 		if( isset( $params[$parname]['defaultvalue'] ) )
 		{ // We have a default value:
 			return $params[$parname]['defaultvalue'] ;
@@ -3563,7 +3740,8 @@ class Plugin
 			$Plugins->instantiate_Settings( $this, 'Settings' );
 		}
 
-		$value = $this->Settings->get( $parname );
+		// Use prefix 'msg_' for all message settings except of "msg_apply_rendering":
+		$value = $this->Settings->get( $parname == 'msg_apply_rendering' ? $parname : 'msg_'.$parname );
 
 		if( ! is_null( $value ) )
 		{ // We have a value for this param:
@@ -3571,7 +3749,41 @@ class Plugin
 		}
 
 		// Try default values:
-		$params = $this->get_msg_setting_definitions( $tmp_params = array( 'for_editing' => true ) );
+		$tmp_params = array( 'for_editing' => true );
+		$params = $this->get_msg_setting_definitions( $tmp_params );
+		if( isset( $params[$parname]['defaultvalue'] ) )
+		{ // We have a default value:
+			return $params[$parname]['defaultvalue'] ;
+		}
+
+		return NULL;
+	}
+
+	/**
+	 * Get a email specific param value
+	 *
+	 * @param string Setting name
+	 * @return string Setting value
+	 */
+	function get_email_setting( $parname )
+	{
+		if( empty( $this->Settings ) )
+		{
+			global $Plugins;
+			$Plugins->instantiate_Settings( $this, 'Settings' );
+		}
+
+		// Use prefix 'email_' for all message settings except of "email_apply_rendering":
+		$value = $this->Settings->get( $parname == 'email_apply_rendering' ? $parname : 'email_'.$parname );
+
+		if( ! is_null( $value ) )
+		{	// We have a value for this param:
+			return $value;
+		}
+
+		// Try default values:
+		$tmp_params = array( 'for_editing' => true );
+		$params = $this->get_email_setting_definitions( $tmp_params );
 		if( isset( $params[$parname]['defaultvalue'] ) )
 		{ // We have a default value:
 			return $params[$parname]['defaultvalue'] ;

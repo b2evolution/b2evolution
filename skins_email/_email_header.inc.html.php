@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -31,7 +31,7 @@ if( file_exists( $emailskins_path.'_email_style.css' ) )
 <?php } ?>
 </head>
 <body<?php echo emailskin_style( 'body.email' ); ?>>
-<div<?php echo emailskin_style( 'div.email_wrap' ); ?>>
+<div class="email_wrap"<?php echo emailskin_style( 'div.email_wrap' ); ?>>
 <?php
 if( $Settings->get( 'notification_logo' ) != '' || $Settings->get( 'notification_long_name' ) != '' )
 { // Display email header if logo or long site name are defined

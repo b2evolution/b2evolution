@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -311,9 +311,23 @@ function get_messaging_url( $disp = 'threads' )
  * @param integer thread ID the corresponding thread ID to display messages, and null to display all threads
  * @return array( threads/messages url, messaging preferences url )
  */
-function get_messages_link_to( $thread_ID = NULL )
+function get_messages_link_to( $thread_ID = NULL, $user_ID = NULL )
 {
 	global $Settings, $admin_url;
+
+	if( $user_ID === NULL )
+	{	// Get current user:
+		global $current_User;
+		if( is_logged_in() )
+		{
+			$User = $current_User;
+		}
+	}
+	else
+	{	// Get user by requested ID:
+		$UserCache = & get_UserCache();
+		$User = & $UserCache->get_by_ID( $user_ID, false, false );
+	}
 
 	if( empty( $thread_ID ) )
 	{
@@ -324,15 +338,21 @@ function get_messages_link_to( $thread_ID = NULL )
 		$link_tail = 'messages&thrd_ID='.$thread_ID;
 	}
 
-	if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) )
-	{ // Link to blog that is used for messaging
+	if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) && ! empty( $User ) &&
+	    ( $msg_Blog->get_setting( 'allow_access' ) != 'members' || $User->check_perm( 'blog_ismember', 'view', false, $msg_Blog->ID ) ) )
+	{	// Link to blog that is used for messaging:
 		$message_link = url_add_param( $msg_Blog->gen_blogurl(), 'disp='.$link_tail );
 		$prefs_link = $msg_Blog->get( 'userprefsurl' );
 	}
-	else
-	{ // Link to admin messaging managment
+	elseif( ! empty( $User ) && $User->check_perm( 'admin', 'restricted' ) )
+	{	// Link to admin messaging managment:
 		$message_link = $admin_url.'?ctrl='.$link_tail;
 		$prefs_link = $admin_url.'?ctrl=user&user_tab=userprefs';
+	}
+	else
+	{	// No links:
+		$message_link = false;
+		$prefs_link = false;
 	}
 
 	return array( $message_link, $prefs_link );
@@ -371,9 +391,23 @@ function get_messaging_sub_entries( $is_admin )
 	if( $is_admin && $current_User->check_perm( 'options', 'edit' ) )
 	{
 		$messaging_sub_entries[ 'msgsettings' ] = array(
-													'text' => T_('Settings'),
-													'href' => $url.'msgsettings'
-												);
+				'text' => T_('Settings'),
+				'href' => $url.'msgsettings',
+				'entries' => array(
+						'general' => array(
+								'text' => T_('General'),
+								'href' => $url.'msgsettings',
+							),
+						'templates' => array(
+								'text' => T_('Templates'),
+								'href' => $url.'msgsettings&amp;tab=templates',
+							),
+						'renderers' => array(
+								'text' => T_('Renderers'),
+								'href' => $url.'msgsettings&amp;tab=renderers',
+							),
+					),
+			);
 	}
 	if( $current_User->check_perm( 'perm_messaging', 'abuse' ) )
 	{
@@ -1519,21 +1553,31 @@ function get_unread_messages_count( $user_ID = 0 )
 		$user_ID = $current_User->ID;
 	}
 
-	global $DB;
+	global $DB, $cache_unread_messages_count;
 
-	$SQL = new SQL();
-	$SQL->SELECT( 'COUNT(*)' );
-	$SQL->FROM( 'T_messaging__threadstatus ts' );
-	$SQL->FROM_add( 'LEFT OUTER JOIN T_messaging__message mu
-				ON ts.tsta_first_unread_msg_ID = mu.msg_ID' );
-	$SQL->FROM_add( 'INNER JOIN T_messaging__message mm
-				ON ts.tsta_thread_ID = mm.msg_thread_ID
-				AND mm.msg_datetime >= mu.msg_datetime' );
-	$SQL->WHERE( 'ts.tsta_first_unread_msg_ID IS NOT NULL' );
-	$SQL->WHERE_and( 'ts.tsta_thread_leave_msg_ID IS NULL OR ts.tsta_first_unread_msg_ID <= tsta_thread_leave_msg_ID' );
-	$SQL->WHERE_and( 'ts.tsta_user_ID = '.$DB->quote( $user_ID ) );
+	if( ! is_array( $cache_unread_messages_count ) )
+	{	// Initialize array first time:
+		$cache_unread_messages_count = array();
+	}
 
-	return (int) $DB->get_var( $SQL->get() );
+	if( ! isset( $cache_unread_messages_count[ $user_ID ] ) )
+	{	// Get a result from DB only first time and store it in global cache array:
+		$SQL = new SQL( 'Get a count of unread messages for user #'.$user_ID );
+		$SQL->SELECT( 'COUNT(*)' );
+		$SQL->FROM( 'T_messaging__threadstatus ts' );
+		$SQL->FROM_add( 'LEFT OUTER JOIN T_messaging__message mu
+					ON ts.tsta_first_unread_msg_ID = mu.msg_ID' );
+		$SQL->FROM_add( 'INNER JOIN T_messaging__message mm
+					ON ts.tsta_thread_ID = mm.msg_thread_ID
+					AND mm.msg_datetime >= mu.msg_datetime' );
+		$SQL->WHERE( 'ts.tsta_first_unread_msg_ID IS NOT NULL' );
+		$SQL->WHERE_and( 'ts.tsta_thread_leave_msg_ID IS NULL OR mm.msg_ID <= tsta_thread_leave_msg_ID' );
+		$SQL->WHERE_and( 'ts.tsta_user_ID = '.$DB->quote( $user_ID ) );
+
+		$cache_unread_messages_count[ $user_ID ] = intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
+	}
+
+	return $cache_unread_messages_count[ $user_ID ];
 }
 
 
@@ -1668,11 +1712,20 @@ function mark_as_read_by_user( $thrd_ID, $user_ID )
 {
 	global $DB;
 
-	// Update user unread message status in the given thread
+	// Update user unread message status in the given thread:
+	// NOTE: If user already left a thread then first unread message ID must be either NULL or first next existing message ID
+	//       (NULL means next future message ID that is not created yet)
+	$first_unread_msg_ID_subquery = '(SELECT msg_ID
+		 FROM T_messaging__message
+		WHERE tsta_thread_ID = msg_thread_ID
+		  AND msg_ID > tsta_thread_leave_msg_ID
+		ORDER BY msg_datetime ASC
+		LIMIT 1)';
 	$DB->query( 'UPDATE T_messaging__threadstatus
-					SET tsta_first_unread_msg_ID = NULL
-					WHERE tsta_thread_ID = '.$thrd_ID.'
-					AND tsta_user_ID = '.$user_ID );
+		  SET tsta_first_unread_msg_ID = IF( tsta_thread_leave_msg_ID IS NULL, NULL, '.$first_unread_msg_ID_subquery.' )
+		WHERE tsta_thread_ID = '.$thrd_ID.'
+		  AND tsta_user_ID = '.$user_ID,
+		'Update first unread message ID in thread #'.$thrd_ID.' for user #'.$user_ID );
 }
 
 
@@ -2103,7 +2156,7 @@ function col_thread_subject_link( $thrd_ID, $thrd_title, $thrd_msg_ID, $thrd_lea
 		if( !empty( $thrd_leave_msg_ID ) )
 		{ // Conversation is left
 			$read_icon = get_icon( 'bullet_black', 'imgtag', array( 'style' => 'margin:0 2px', 'alt' => T_( "Conversation left" ) ) );
-			if( $thrd_msg_ID > 0 )
+			if( $thrd_msg_ID > 0 && $thrd_msg_ID <= $thrd_leave_msg_ID )
 			{ // also show unread messages icon, because user has not seen all messages yet
 				$read_icon .= get_icon( 'bullet_red', 'imgtag', array( 'style' => 'margin:0 2px', 'alt' => T_( "You have unread messages" ) ) );
 			}
@@ -2313,11 +2366,11 @@ function col_msg_read_by( $message_ID )
 		}
 
 		$leave_msg_ID = $leave_status_list[ $user_ID ];
-		if( !empty( $leave_msg_ID ) && ( $leave_msg_ID < $message_ID ) )
+		if( $message_ID > 0 && ! empty( $leave_msg_ID ) && ( $leave_msg_ID < $message_ID ) )
 		{ // user has left the conversation and didn't receive this message
 			$left_recipients[] = $recipient_User->login;
 		}
-		elseif( empty( $first_unread_msg_ID ) || ( $first_unread_msg_ID > $message_ID ) )
+		elseif( $message_ID > 0 && ( empty( $first_unread_msg_ID ) || ( $first_unread_msg_ID > $message_ID ) ) )
 		{ // user has read all message from this thread or at least this message
 			// user didn't leave the conversation before this message
 			$read_recipients[] = $recipient_User->login;

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -254,7 +254,7 @@ class Filelist
 	 * @param boolean|string Default path for the files, false if you want to create an arbitrary list; NULL for the Fileroot's ads_path.
 	 * @param integer ID of the user, the group or the collection the file belongs to...
 	 */
-	function Filelist( $FileRoot, $path = NULL )
+	function __construct( $FileRoot, $path = NULL )
 	{
 		global $AdminUI;
 
@@ -379,7 +379,7 @@ class Filelist
 	 */
 	function add( & $File, $mustExist = false )
 	{
-		if( !is_a( $File, 'file' ) )
+		if( !( $File instanceof file ) )
 		{	// Passed object is not a File!! :(
 			return false;
 		}

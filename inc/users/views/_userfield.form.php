@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -42,7 +42,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New user field') : T_('User field')
 
 	$Form->text_input( 'ufdf_name', $edited_Userfield->name, 50, T_('Field name'), '', array( 'maxlength' => 255, 'required' => true ) );
 
-	$Form->text_input( 'ufdf_icon_name', $edited_Userfield->icon_name, 20, T_('Icon name'), '', array( 'maxlength' => 40 ) );
+	$Form->text_input( 'ufdf_icon_name', $edited_Userfield->icon_name, 20, T_('Icon name'), '', array( 'maxlength' => 100 ) );
 
 	$Form->select_input_array( 'ufdf_type', $edited_Userfield->type, $edited_Userfield->get_types(),
 		T_('Field type'), '', array( 'required' => true ) );

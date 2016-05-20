@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  *
@@ -28,6 +28,8 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Add a banned keywor
 	$Form->add_crumb('antispam');
 	$Form->hidden_ctrl();
 	$Form->hidden( 'action', 'ban' );
+	$Form->hidden( 'display_mode', $display_mode );
+	$Form->hidden( 'mode', get_param( 'mode' ) );
 
 	$button = array( 'submit', 'submit', T_('Check & ban...'), 'SaveButton' );
 	if( $display_mode == 'js' )
@@ -50,7 +52,7 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Add a banned keywor
 	{
 		$Form->buttons( array( $button ) );
 	}
-$Form->end_form( );
+$Form->end_form();
 
 
 $Form = new Form( NULL, 'antispam_ban', 'post', 'compact' );
@@ -69,6 +71,8 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 	$Form->hidden_ctrl();
 	$Form->hiddens_by_key( get_memorized() );
 	$Form->hidden( 'confirm', 'confirm' );
+	$Form->hidden( 'display_mode', $display_mode );
+	$Form->hidden( 'mode', get_param( 'mode' ) );
 
 	// Check for junk:
 

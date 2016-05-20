@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -45,13 +45,12 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 				echo '<span>'.$edited_Skin->name.'</span>';
 			echo '</div>';
 
-			if( isset( $edited_Skin->version ) )
-			{ // Skin version
-				echo '<div class="skin_setting_row">';
-					echo '<label>'.T_('Skin version').':</label>';
-					echo '<span>'.$edited_Skin->version.'</span>';
-				echo '</div>';
-			}
+
+			// Skin version
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Skin version').':</label>';
+				echo '<span>'.( isset( $edited_Skin->version ) ? $edited_Skin->version : 'unknown' ).'</span>';
+			echo '</div>';
 
 			// Skin type
 			echo '<div class="skin_setting_row">';
@@ -92,7 +91,7 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 											true // separate lines
 									 );
 			$Form->end_fieldset();
-		
+
 		echo '</div>';
 
 	$Form->end_fieldset();

@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( version_compare( $app_version, '4.0.0-dev' ) < 0 )
+if( evo_version_compare( $app_version, '4.0.0-dev' ) < 0 )
 { // Older 2.x skins work on newer 2.x b2evo versions, but newer 2.x skins may not work on older 2.x b2evo versions.
 	die( 'This skin is designed for b2evolution 4.0.0 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
@@ -86,7 +86,7 @@ skin_include( '_body_header.inc.php' );
 	<?php
 		// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
 		skin_include( '$disp$', array(
-				'author_link_text' => 'preferredname'
+				'author_link_text' => 'auto'
 			) );
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.

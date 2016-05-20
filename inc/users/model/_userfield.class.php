@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -45,10 +45,10 @@ class Userfield extends DataObject
 	 *
 	 * @param object Database row
 	 */
-	function Userfield( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_users__fielddefs', 'ufdf_', 'ufdf_ID' );
+		parent::__construct( 'T_users__fielddefs', 'ufdf_', 'ufdf_ID' );
 
 		// Allow inseting specific IDs
 		$this->allow_ID_insert = true;
@@ -89,7 +89,7 @@ class Userfield extends DataObject
 	 *
 	 * @return array
 	 */
-	function get_types()
+	static function get_types()
 	{
 		return array(
 			'email'  => T_('Email address'),

@@ -13,7 +13,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -33,6 +33,7 @@ $params = array_merge( array(
 		'disp_pingbacks'        => true,
 		'disp_meta_comments'    => false,
 		'disp_section_title'    => true,
+		'disp_meta_comment_info' => true,
 		'disp_rating_summary'   => true,
 		'before_section_title'  => '<div class="clearfix"></div><h3 class="evo_comment__list_title">',
 		'after_section_title'   => '</h3>',
@@ -54,13 +55,13 @@ $params = array_merge( array(
 		'comment_text_after'    => '</div>',
 		'comment_info_before'   => '<footer class="evo_comment_footer clear text-muted"><small>',
 		'comment_info_after'    => '</small></footer></div>',
-		'preview_start'         => '<div class="evo_comment evo_comment__preview panel panel-warning" id="comment_preview">',
-		'preview_end'           => '</div>',
-		'comment_error_start'   => '<div class="evo_comment evo_comment__error panel panel-default" id="comment_error">',
-		'comment_error_end'     => '</div>',
+		'preview_start'         => '<article class="evo_comment evo_comment__preview panel panel-warning" id="comment_preview">',
+		'preview_end'           => '</article>',
+		'comment_error_start'   => '<article class="evo_comment evo_comment__error panel panel-default" id="comment_error">',
+		'comment_error_end'     => '</article>',
 		'comment_template'      => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
 		'comment_image_size'    => 'fit-1280x720',
-		'author_link_text'      => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+		'author_link_text'      => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 		'link_to'               => 'userurl>userpage',		    // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		// Comment notification functions:
 		'disp_notification'     => true,
@@ -84,6 +85,7 @@ $params = array_merge( array(
 		'nav_page_item_after'   => '</li>',
 		'nav_page_current_template' => '<span><b>$page_num$</b></span>',
 		'comments_per_page'     => NULL, // Used instead of blog setting "comments_per_page"
+		'pagination'            => array(),
 	), $params );
 
 
@@ -237,8 +239,12 @@ if( $Item->can_see_comments( true ) )
 			echo $params['after_section_title'];
 		}
 
-		if( ! $params['disp_meta_comments'] && is_logged_in() && $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
-		{	// Display the meta comments info if current user can edit this post:
+		// // Display the meta comments info ?
+		if( $params['disp_meta_comment_info'] 	// If we want it
+			&& ! $params['disp_meta_comments'] 	// If we're not displaying the full list of meta comments anyways
+			&& is_logged_in() 						// If we're logged in
+			&& $current_User->check_perm( 'meta_comment', 'view', false, $Item ) ) // If we have permission to edit this post
+		{	// Display the meta comments info:
 			global $admin_url;
 			echo '<div class="evo_comment__meta_info">';
 			$meta_comments_count = generic_ctp_number( $Item->ID, 'metas', 'total' );
@@ -293,7 +299,7 @@ if( $Item->can_see_comments( true ) )
 
 		if( $params['disp_nav_top'] && ( $Blog->get_setting( 'paged_comments' ) || $params['comments_per_page'] !== NULL ) )
 		{ // Prev/Next page navigation
-			$CommentList->page_links( array(
+			$CommentList->page_links( array_merge( array(
 					'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
 					'block_start' => $params['nav_block_start'],
 					'block_end'   => $params['nav_block_end'],
@@ -304,7 +310,7 @@ if( $Item->can_see_comments( true ) )
 					'page_item_before'      => $params['nav_page_item_before'],
 					'page_item_after'       => $params['nav_page_item_after'],
 					'page_current_template' => $params['nav_page_current_template'],
-				) );
+				), $params['pagination'] ) );
 		}
 
 
@@ -392,7 +398,7 @@ if( $Item->can_see_comments( true ) )
 
 		if( $params['disp_nav_bottom'] && ( $Blog->get_setting( 'paged_comments' ) || $params['comments_per_page'] !== NULL ) )
 		{ // Prev/Next page navigation
-			$CommentList->page_links( array(
+			$CommentList->page_links( array_merge( array(
 					'page_url'    => url_add_tail( $Item->get_permanent_url(), '#comments' ),
 					'block_start' => $params['nav_block_start'],
 					'block_end'   => $params['nav_block_end'],
@@ -403,7 +409,7 @@ if( $Item->can_see_comments( true ) )
 					'page_item_before'      => $params['nav_page_item_before'],
 					'page_item_after'       => $params['nav_page_item_after'],
 					'page_current_template' => $params['nav_page_current_template'],
-				) );
+				), $params['pagination'] ) );
 		}
 
 		if( $params['nav_bottom_inside'] )

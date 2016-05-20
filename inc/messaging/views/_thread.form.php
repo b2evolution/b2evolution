@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -21,7 +21,7 @@ global $edited_Message;
 global $edited_Thread;
 global $creating_success;
 
-global $DB, $action, $Plugins;
+global $DB, $action, $Plugins, $restapi_url;
 
 global $Blog;
 
@@ -90,7 +90,7 @@ else
 	foreach( $recipients_selected as $recipient )
 	{
 		$Form->hidden( 'thrd_recipients_array[id][]', $recipient['id'] );
-		$Form->hidden( 'thrd_recipients_array[title][]', $recipient['title'] );
+		$Form->hidden( 'thrd_recipients_array[login][]', $recipient['login'] );
 	}
 }
 
@@ -130,7 +130,7 @@ if( !empty( $thrd_recipients_array ) )
 	{
 		$recipients_selected[] = array(
 			'id'    => $recipient_ID,
-			'title' => $thrd_recipients_array['title'][$rnum]
+			'login' => $thrd_recipients_array['login'][$rnum]
 		);
 	}
 }
@@ -151,33 +151,34 @@ jQuery( document ).ready( function()
 } );
 
 jQuery( '#thrd_recipients' ).tokenInput(
-	'<?php echo get_samedomain_htsrv_url(); ?>anon_async.php?action=get_recipients',
+	'<?php echo $restapi_url; ?>users/recipients',
 	{
 		theme: 'facebook',
-		queryParam: 'term',
-		propertyToSearch: 'title',
+		queryParam: 'q',
+		propertyToSearch: 'login',
 		preventDuplicates: true,
 		prePopulate: <?php echo evo_json_encode( $recipients_selected ) ?>,
 		hintText: '<?php echo TS_('Type in a username') ?>',
 		noResultsText: '<?php echo TS_('No results') ?>',
 		searchingText: '<?php echo TS_('Searching...') ?>',
-		tokenFormatter: function( item )
+		jsonContainer: 'users',
+		tokenFormatter: function( user )
 		{
 			return '<li>' +
-					item.title +
-					'<input type="hidden" name="thrd_recipients_array[id][]" value="' + item.id + '" />' +
-					'<input type="hidden" name="thrd_recipients_array[title][]" value="' + item.title + '" />' +
+					user.login +
+					'<input type="hidden" name="thrd_recipients_array[id][]" value="' + user.id + '" />' +
+					'<input type="hidden" name="thrd_recipients_array[login][]" value="' + user.login + '" />' +
 				'</li>';
 		},
-		resultsFormatter: function( item )
+		resultsFormatter: function( user )
 		{
-			var title = item.title;
-			if( item.fullname != null && item.fullname !== undefined )
+			var title = user.login;
+			if( user.fullname != null && user.fullname !== undefined )
 			{
-				title += '<br />' + item.fullname;
+				title += '<br />' + user.fullname;
 			}
 			return '<li>' +
-					item.picture +
+					user.avatar +
 					'<div>' +
 						title +
 					'</div><span></span>' +
@@ -208,7 +209,7 @@ jQuery( '#thrd_recipients' ).tokenInput(
  */
 function check_multiple_recipients()
 {
-	if( jQuery( 'input[name="thrd_recipients_array[title][]"]' ).length > 1 )
+	if( jQuery( 'input[name="thrd_recipients_array[login][]"]' ).length > 1 )
 	{
 		jQuery( '#multiple_recipients' ).show();
 	}

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004 by PROGIDISTRI - {@link http://progidistri.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
@@ -144,7 +144,7 @@ class Form extends Widget
 	 * @param string the form layout : 'fieldset', 'table' or '' (NULL means: if there is an {@link $AdminUI} object get it from there, otherwise use 'fieldset')
 	 * @param string Form encoding ("application/x-www-form-urlencoded" (default), "multipart/form-data" (uploads))
 	 */
-	function Form( $form_action = NULL, $form_name = '', $form_method = 'post', $layout = NULL, $enctype = '', $form_type = 'form' )
+	function __construct( $form_action = NULL, $form_name = '', $form_method = 'post', $layout = NULL, $enctype = '', $form_type = 'form' )
 	{
 		global $pagenow;
 
@@ -459,54 +459,6 @@ class Form extends Widget
 					$this->inputstart     = '<div class="input">';
 					$this->infostart      = '<div class="info">';
 					$this->inputend       = "</div>\n";
-					$this->fieldend       = "</fieldset>\n\n";
-					$this->buttonsstart   = '<fieldset><div class="label"></div><div class="input">'; // DIV.label for IE6
-					$this->buttonsend     = "</div></fieldset>\n\n";
-					$this->customstart    = '<div class="custom_content">';
-					$this->customend      = "</div>\n";
-					$this->note_format    = ' <span class="notes">%s</span>';
-					$this->formend        = '</div>';
-					// Additional params depending on field type:
-					// - checkbox
-					$this->fieldstart_checkbox    = $this->fieldstart;
-					$this->fieldend_checkbox      = $this->fieldend;
-					$this->inputclass_checkbox    = 'checkbox';
-					$this->inputstart_checkbox    = $this->inputstart;
-					$this->inputend_checkbox      = $this->inputend;
-					$this->checkbox_newline_start = '';
-					$this->checkbox_newline_end   = "<br />\n";
-					$this->checkbox_basic_start   = '<label>';
-					$this->checkbox_basic_end     = '</label>';
-					// - radio
-					$this->fieldstart_radio       = $this->fieldstart;
-					$this->fieldend_radio         = $this->fieldend;
-					$this->inputclass_radio       = 'radio';
-					$this->inputstart_radio       = $this->inputstart;
-					$this->inputend_radio         = $this->inputend;
-					$this->radio_label_format     = '<label class="radiooption" for="$radio_option_ID$">$radio_option_label$</label>';
-					$this->radio_newline_start    = "<div>\n";
-					$this->radio_newline_end      = "</div>\n";
-					$this->radio_oneline_start    = '';
-					$this->radio_oneline_end      = '';
-					break;
-
-				case 'chicago':		// Temporary dirty hack
-					$this->formclass      = '';
-					$this->formstart      = '<div>';// required before (no_)title_fmt for validation
-					$this->title_fmt      = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
-					$this->no_title_fmt   = '<span style="float:right">$global_icons$</span>'."\n";
-					$this->no_title_no_icons_fmt = "\n";
-					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
-																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
-					$this->fieldset_end   = '</fieldset>'."\n";
-					$this->fieldstart     = '<fieldset$ID$>'."\n";
-					$this->labelstart     = '<div class="label">';
-					$this->labelend       = "</div>\n";
-					$this->labelempty     = '<div class="label"></div>'; // so that IE6 aligns DIV.input correcctly
-					$this->inputstart     = '<div class="input">';
-					$this->inputend       = "</div>\n";
-					$this->infostart      = '<div class="info">';
-					$this->infoend        = "</div>\n";
 					$this->fieldend       = "</fieldset>\n\n";
 					$this->buttonsstart   = '<fieldset><div class="label"></div><div class="input">'; // DIV.label for IE6
 					$this->buttonsend     = "</div></fieldset>\n\n";
@@ -1203,14 +1155,12 @@ class Form extends Widget
 	 * @param string class of the input field. Class name "only_assignees" provides to load only assignee users of the blog
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function username( $field_name, &$User, $field_label, $field_note = '', $field_class = '' )
+	function username( $field_name, &$User, $field_label, $field_note = '', $field_class = '', $field_params = array() )
 	{
-		$field_params = array();
-
-		if( !empty($field_note) )
-		{
-			$field_params['note'] = $field_note;
-		}
+		$field_params = array_merge( array(
+				'note' => $field_note,
+				'size' => 20,
+			), $field_params );
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
@@ -1218,7 +1168,7 @@ class Form extends Widget
 
 		$user_login = empty( $User ) ? '' : $User->login;
 
-		$r .= '<input type="text" class="form_text_input form-control autocomplete_login '.$field_class.'" value="'.$user_login.'" name="'.$field_name.'" id="'.$field_name.'" />';
+		$r .= '<input type="text" class="form_text_input form-control autocomplete_login '.$field_class.'" value="'.$user_login.'" name="'.$field_name.'" id="'.$field_name.'" size="'.$field_params['size'].'" />';
 
 		$r .= $this->end_field();
 
@@ -1599,7 +1549,7 @@ class Form extends Widget
 				    ( $p > 0 && $duration > $periods[ $p - 1 ]['seconds'] && $duration <= $period['seconds'] ) )
 				{
 					$period = $periods[ $p > 0 ? $p - 1 : 0 ];
-					$duration_value = ceil( $duration / $period['size'] );
+					$duration_value = floor( $duration / $period['size'] );
 					foreach( $periods_values as $v => $value )
 					{
 						if( $duration_value <= $value )
@@ -2087,7 +2037,8 @@ class Form extends Widget
 	 *  - "effective value": a boolean indicating whether the box should be checked or not on display
 	 *  - an optional boolean indicating whether the box is disabled or not
 	 *  - an optional note
-	 *  - 'required': is the box required to be checked (boolean; default: false)
+	 *  - an optional class (html attribute)
+	 *  - an optional boolean TRUE - to print out an option as hidden field instead of checkbox
 	 *
 	 * @todo Transform to $field_params schema.
 	 * @param array a two-dimensional array containing the parameters of the input tag
@@ -2114,15 +2065,24 @@ class Form extends Widget
 		foreach( $options as $option )
 		{ //loop to construct the list of 'input' tags
 
+			$loop_field_name = $option[0];
+
+			if( ! empty( $option[7] ) )
+			{	// Print out this checkbox as hidden field:
+				if( $option[3] )
+				{	// Only if it is checked:
+					$this->hidden( $loop_field_name, 1 );
+				}
+				continue;
+			}
+
 			// Start of checkbox option for multi line format
 			$r .= $this->checkbox_newline_start;
 
-			$loop_field_name = $option[0];
-
-			$loop_field_note = isset($option[5]) ? $option[5] : '';
+			$loop_field_note = empty( $option[5] ) ? '' : $option[5];
 
 			// asimo>> add id for label: id = label_for_fieldname_fieldvalue
-			$r .= '<label'.( isset( $option[6] ) ? ' class="'.$option[6].'"' : '' ).' id="label_for_'.$loop_field_name.'_'.$option[1].'">';
+			$r .= '<label'.( empty( $option[6] ) ? '' : ' class="'.$option[6].'"' ).' id="label_for_'.$loop_field_name.'_'.$option[1].'">';
 
 			if( $add_highlight_spans )
 			{ // Need it to highlight checkbox for check_all and uncheck_all mouseover
@@ -2543,6 +2503,12 @@ class Form extends Widget
 
 		foreach( $field_options as $l_key => $l_option )
 		{
+			if( is_array( $l_option ) )
+			{	// If option is array then it is a group of the options:
+				$r .= Form::get_select_group_options_string( array( $l_key => $l_option ), $field_value, $force_keys_as_values, $color_array );
+				continue;
+			}
+
 			// Get the value attribute from key if is_string():
 			$l_value = ($force_keys_as_values || is_string($l_key)) ? $l_key : $l_option;
 
@@ -2564,6 +2530,30 @@ class Form extends Widget
 
 			$r .= '>'.format_to_output($l_option).'</option>';
 		}
+		return $r;
+	}
+
+
+	/**
+	 * Get the grouped OPTION list as string for use in a SELECT.
+	 *
+	 * @param array Groups ( title => array( Options (key => value) )
+	 * @param string Selected value (if any)
+	 * @param boolean Force keys from $options as values? (Default: false, only array keys,
+	 *                which are strings will be used).
+	 * @return string
+	 */
+	static function get_select_group_options_string( $group_options, $field_value = NULL, $force_keys_as_values = false, $color_array = false )
+	{
+		$r = '';
+
+		foreach( $group_options as $group_title => $group_options )
+		{
+			$r .= '<optgroup label="'.format_to_output( $group_title, 'htmlattr' ).'">';
+			$r .= Form::get_select_options_string( $group_options, $field_value, $force_keys_as_values, $color_array );
+			$r .= '</optgroup>';
+		}
+
 		return $r;
 	}
 

@@ -351,12 +351,19 @@ function b2evo_Callbacks() {
 };
 
 b2evo_Callbacks.prototype = {
-	register_callback : function(event, f) {
+	register_callback : function(event, f, single_event) {
 		if( typeof this.eventHandlers[event] == "undefined" )
 		{
 			this.eventHandlers[event] = new Array();
 		}
-		this.eventHandlers[event][this.eventHandlers[event].length] = f;
+		if( typeof( single_event ) != 'undefined' && single_event )
+		{	// Use only single last registered event:
+			this.eventHandlers[event][0] = f;
+		}
+		else
+		{	// Keep all registered events:
+			this.eventHandlers[event][this.eventHandlers[event].length] = f;
+		}
 	},
 
 	/**
@@ -444,7 +451,7 @@ evo_alert_events_initialized = false;
  */
 jQuery( document ).ready( function()
 {
-	jQuery( '[data-func]' ).each( function()
+	jQuery( document ).on( 'click', '[data-func]', function()
 	{
 		var func_args = jQuery( this ).data( 'func' ).match( /([^\\|]|\\\|)+/g );
 		var func_name = func_args[0];
@@ -464,16 +471,17 @@ jQuery( document ).ready( function()
 				func_args[ i ] = func_args[ i ].replace( /\\\|/g, '|' );
 			}
 		}
-		jQuery( this ).bind( 'click', function()
-		{ // Bind function on click event
-			if( jQuery( this ).closest( '.disabled[class*=_toolbar]' ).length > 0 )
-			{ // Deny action when toolbar is disabled
-				return false;
-			}
-			window[ func_name ].apply( null, func_args );
-		} );
-		// Remove attribute data-func
-		jQuery( this ).removeAttr( 'data-func' );
+
+		if( jQuery( this ).closest( '.disabled[class*=_toolbar]' ).length > 0 )
+		{	// Deny action when toolbar is disabled:
+			return false;
+		}
+
+		// Execute the function of this element:
+		window[ func_name ].apply( null, func_args );
+
+		// Prevent default event:
+		return false;
 	} );
 
 	// Enable/Disable plugin toolbars depending on selected plugins for current edit form:

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -205,9 +205,10 @@ switch( $action )
 		// load data from request
 		if( $edited_Domain->load_from_Request() )
 		{ // We could load data from form without errors:
-			// Insert in DB:
+			$is_creating = ( $edited_Domain->ID == 0 );
+			// Insert/Update in DB:
 			$edited_Domain->dbsave();
-			$Messages->add( T_('New domain created.'), 'success' );
+			$Messages->add( $is_creating ? T_('New domain created.') : T_('Domain has been updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			if( $tab_from == 'antispam' )
@@ -269,6 +270,13 @@ switch( $tab )
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'browser-hits-summary' );
+				break;
+
+			case 'api':
+				$AdminUI->breadcrumbpath_add( T_('API'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'api-hits-summary' );
 				break;
 
 			case 'robot':
@@ -448,6 +456,10 @@ switch( $AdminUI->get_path(1) )
 		{
 			case 'browser':
 				$AdminUI->disp_view( 'sessions/views/_stats_browserhits.view.php' );
+				break;
+
+			case 'api':
+				$AdminUI->disp_view( 'sessions/views/_stats_api.view.php' );
 				break;
 
 			case 'robot':

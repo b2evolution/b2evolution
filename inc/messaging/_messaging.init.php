@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -150,8 +150,8 @@ class messaging_Module extends Module
 		switch( $grp_ID )
 		{
 			case 1: // Administrators group ID equals 1
-				global $test_install_all_features;
-				$perm_messaging = $test_install_all_features ? 'abuse' : 'delete';
+				global $install_test_features;
+				$perm_messaging = ! empty( $install_test_features ) ? 'abuse' : 'delete';
 				$max_new_threads = ''; // empty = no limit
 				break;
 			case 2: // Moderators group equals 2
@@ -311,7 +311,6 @@ class messaging_Module extends Module
 		global $topleft_Menu, $topright_Menu;
 		global $admin_url;
 		global $current_User;
-		global $unread_messages_count;
 
 		$left_entries = array();
 		$right_entries = array();

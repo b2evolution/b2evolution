@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  * @ignore
@@ -53,6 +53,38 @@ class markdown_plugin extends Plugin
 
 
 	/**
+	 * Define here default custom settings that are to be made available
+	 *     in the backoffice for collections, private messages and newsletters.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_custom_setting_definitions()}.
+	 */
+	function get_custom_setting_definitions( & $params )
+	{
+		return array(
+			'links' => array(
+					'label' => T_( 'Links' ),
+					'type' => 'checkbox',
+					'note' => T_( 'Detect and convert markdown link markup.' ),
+					'defaultvalue' => 0,
+				),
+			'images' => array(
+					'label' => T_( 'Images' ),
+					'type' => 'checkbox',
+					'note' => T_( 'Detect and convert markdown image markup.' ),
+					'defaultvalue' => 0,
+				),
+			'text_styles' => array(
+					'label' => T_( 'Italic & Bold styles' ),
+					'type' => 'checkbox',
+					'note' => T_( 'Detect and convert markdown italics and bold markup.' ),
+					'defaultvalue' => 0,
+				),
+		);
+	}
+
+
+	/**
 	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
 	 * @param array Associative array of parameters.
@@ -62,31 +94,10 @@ class markdown_plugin extends Plugin
 	{
 		$default_params = array_merge( $params, array(
 				'default_comment_rendering' => 'never',
-				'default_post_rendering' => 'opt-in'
+				'default_post_rendering' => 'opt-out'
 			) );
 
-		return array_merge( parent::get_coll_setting_definitions( $default_params ),
-			array(
-				'links' => array(
-						'label' => T_( 'Links' ),
-						'type' => 'checkbox',
-						'note' => T_( 'Detect and convert markdown link markup.' ),
-						'defaultvalue' => 0,
-					),
-				'images' => array(
-						'label' => T_( 'Images' ),
-						'type' => 'checkbox',
-						'note' => T_( 'Detect and convert markdown image markup.' ),
-						'defaultvalue' => 0,
-					),
-				'text_styles' => array(
-						'label' => T_( 'Italic & Bold styles' ),
-						'type' => 'checkbox',
-						'note' => T_( 'Detect and convert markdown italics and bold markup.' ),
-						'defaultvalue' => 0,
-					),
-			)
-		);
+		return parent::get_coll_setting_definitions( $default_params );
 	}
 
 
@@ -99,8 +110,22 @@ class markdown_plugin extends Plugin
 	function get_msg_setting_definitions( & $params )
 	{
 		// set params to allow rendering for messages by default
-		$default_params = array_merge( $params, array( 'default_msg_rendering' => 'opt-in' ) );
+		$default_params = array_merge( $params, array( 'default_msg_rendering' => 'opt-out' ) );
 		return parent::get_msg_setting_definitions( $default_params );
+	}
+
+
+	/**
+	 * Define here default email settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_email_setting_definitions( & $params )
+	{
+		// set params to allow rendering for messages by default
+		$default_params = array_merge( $params, array( 'default_email_rendering' => 'opt-out' ) );
+		return parent::get_email_setting_definitions( $default_params );
 	}
 
 
@@ -134,10 +159,16 @@ class markdown_plugin extends Plugin
 			$images_enabled = $this->get_coll_setting( 'images', $item_Blog );
 		}
 		elseif( ! empty( $params['Message'] ) )
-		{ // We are rendering Message now, Use FALSE by default because we don't have the settings
-			$text_styles_enabled = false;
-			$links_enabled = false;
-			$images_enabled = false;
+		{	// We are rendering Message now:
+			$text_styles_enabled = $this->get_msg_setting( 'text_styles' );
+			$links_enabled = $this->get_msg_setting( 'links' );
+			$images_enabled = $this->get_msg_setting( 'images' );
+		}
+		elseif( ! empty( $params['EmailCampaign'] ) )
+		{	// We are rendering EmailCampaign now:
+			$text_styles_enabled = $this->get_email_setting( 'text_styles' );
+			$links_enabled = $this->get_email_setting( 'links' );
+			$images_enabled = $this->get_email_setting( 'images' );
 		}
 		else
 		{ // Unknown call, Don't render this case
@@ -188,7 +219,6 @@ class markdown_plugin extends Plugin
 		{
 			case 'forum':
 			case 'manual':
-				$params['Blog']->set_setting( 'plugin'.$this->ID.'_coll_apply_rendering', 'opt-out' );
 				$params['Blog']->set_setting( 'plugin'.$this->ID.'_coll_apply_comment_rendering', 'opt-out' );
 				$params['Blog']->set_setting( 'plugin'.$this->ID.'_images', '1' );
 				$params['Blog']->set_setting( 'plugin'.$this->ID.'_links', '1' );
@@ -198,7 +228,9 @@ class markdown_plugin extends Plugin
 
 
 	/**
-	 * Display a toolbar
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @todo dh> This seems to be a lot of Javascript. Please try exporting it in a
 	 *       (dynamically created) .js src file. Then we could use cache headers
@@ -223,20 +255,19 @@ class markdown_plugin extends Plugin
 			}
 		}
 
-		$coll_setting_name = ( $params['target_type'] == 'Comment' ) ? 'coll_apply_comment_rendering' : 'coll_apply_rendering';
-		$apply_rendering = $this->get_coll_setting( $coll_setting_name, $Blog );
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $Blog );
 		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
-		{ // Plugin is not enabled for current case, so don't display a toolbar:
+		{	// Plugin is not enabled for current case, so don't display a toolbar:
 			return false;
 		}
 
 		// Print toolbar on screen
-		return $this->DisplayCodeToolbar( $Blog );
+		return $this->DisplayCodeToolbar( 'coll', $Blog );
 	}
 
 
 	/**
-	 * Event handler: Called when displaying editor toolbars.
+	 * Event handler: Called when displaying editor toolbars on comment form.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
@@ -269,7 +300,7 @@ class markdown_plugin extends Plugin
 		}
 
 		// Print toolbar on screen
-		return $this->DisplayCodeToolbar( $Blog );
+		return $this->DisplayCodeToolbar( 'coll', $Blog );
 	}
 
 
@@ -284,7 +315,24 @@ class markdown_plugin extends Plugin
 		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{ // Print toolbar on screen
-			return $this->DisplayCodeToolbar( NULL, $params );
+			return $this->DisplayCodeToolbar( 'msg' );
+		}
+		return false;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{	// Print toolbar on screen:
+			return $this->DisplayCodeToolbar( 'email' );
 		}
 		return false;
 	}
@@ -293,9 +341,10 @@ class markdown_plugin extends Plugin
 	/**
 	 * Display Toolbar
 	 *
+	 * @param string Setting type: 'coll', 'msg', 'email'
 	 * @param object Blog
 	 */
-	function DisplayCodeToolbar( $Blog = NULL, $params = array() )
+	function DisplayCodeToolbar( $type = 'coll', $Blog = NULL )
 	{
 		global $Hit;
 
@@ -304,17 +353,28 @@ class markdown_plugin extends Plugin
 			return false;
 		}
 
-		if( empty( $Blog ) )
-		{ // Use FALSE by default because we don't have the settings for Message
-			$text_styles_enabled = false;
-			$links_enabled = false;
-			$images_enabled = false;
-		}
-		else
-		{ // Get plugin setting values depending on Blog
-			$text_styles_enabled = $this->get_coll_setting( 'text_styles', $Blog );
-			$links_enabled = $this->get_coll_setting( 'links', $Blog );
-			$images_enabled = $this->get_coll_setting( 'images', $Blog );
+		switch( $type )
+		{
+			case 'msg':
+				// Get plugin setting values for messages:
+				$text_styles_enabled = $this->get_msg_setting( 'text_styles' );
+				$links_enabled = $this->get_msg_setting( 'links' );
+				$images_enabled = $this->get_msg_setting( 'images' );
+				break;
+
+			case 'email':
+				// Get plugin setting values for emails:
+				$text_styles_enabled = $this->get_email_setting( 'text_styles' );
+				$links_enabled = $this->get_email_setting( 'links' );
+				$images_enabled = $this->get_email_setting( 'images' );
+				break;
+
+			default:
+				// Get plugin setting values for current collection:
+				$text_styles_enabled = $this->get_coll_setting( 'text_styles', $Blog );
+				$links_enabled = $this->get_coll_setting( 'links', $Blog );
+				$images_enabled = $this->get_coll_setting( 'images', $Blog );
+				break;
 		}
 
 		// Load js to work with textarea
@@ -447,23 +507,26 @@ class markdown_plugin extends Plugin
 				'', -1
 			);
 
-		function markdown_show_btn( button, i )
+		function markdown_get_btn( button, i )
 		{
+			var r = '';
 			if( button.id == 'mrkdwn_img' )
 			{ // Image
-				document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.title
-						+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="markdown_insert_lnkimg|b2evoCanvas|img" value="' + button.text + '" />');
+				r += '<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.title
+					+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="markdown_insert_lnkimg|b2evoCanvas|img" value="' + button.text + '" />';
 			}
 			else if( button.id == 'mrkdwn_link' )
 			{ // Link
-				document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.title
-						+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="markdown_insert_lnkimg|b2evoCanvas" value="' + button.text + '" />');
+				r += '<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.title
+					+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="markdown_insert_lnkimg|b2evoCanvas" value="' + button.text + '" />';
 			}
 			else
 			{ // Normal buttons:
-				document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.title
-						+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="markdown_insert_tag|b2evoCanvas|'+i+'" value="' + button.text + '" />');
+				r += '<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.title
+					+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="markdown_insert_tag|b2evoCanvas|'+i+'" value="' + button.text + '" />';
 			}
+
+			return r;
 		}
 
 		// Memorize a new open tag
@@ -521,19 +584,21 @@ class markdown_plugin extends Plugin
 
 		function markdown_toolbar( title )
 		{
-			document.write( '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>' );
-			document.write( '<?php echo $this->get_template( 'toolbar_group_before' ); ?>' );
+			var r = '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>'
+				+ '<?php echo $this->get_template( 'toolbar_group_before' ); ?>';
 			for( var i = 0; i < markdown_btns.length; i++ )
 			{
-				markdown_show_btn( markdown_btns[i], i );
+				r += markdown_get_btn( markdown_btns[i], i );
 				if( markdown_btns[i].grp_pos == 'last' && i > 0 && i < markdown_btns.length - 1 )
 				{ // Separator between groups
-					document.write( '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>' );
+					r += '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>';
 				}
 			}
-			document.write( '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>' );
-			document.write( '<input type="button" id="mrkdwn_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="markdown_close_all_tags" title="<?php echo format_to_output( T_('Close all tags'), 'htmlattr' ); ?>" value="X" />' );
-			document.write( '<?php echo $this->get_template( 'toolbar_group_after' ); ?>' );
+			r += '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>'
+				+ '<input type="button" id="mrkdwn_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="markdown_close_all_tags" title="<?php echo format_to_output( TS_('Close all tags'), 'htmlattr' ); ?>" value="X" />'
+				+ '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
+
+			jQuery( '.<?php echo $this->code ?>_toolbar' ).html( r );
 		}
 
 		function markdown_insert_tag( field, i )
@@ -610,8 +675,8 @@ class markdown_plugin extends Plugin
 		</script><?php
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
-		?><script type="text/javascript">markdown_toolbar( '<?php echo T_('Markdown').': '; ?>' );</script><?php
 		echo $this->get_template( 'toolbar_after' );
+		?><script type="text/javascript">markdown_toolbar( '<?php echo TS_('Markdown').': '; ?>' );</script><?php
 
 		return true;
 	}

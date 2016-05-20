@@ -4,7 +4,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -316,7 +316,7 @@ class files_Module extends Module
 				}
 		}
 
-		if( $perm && isset( $permtarget ) && ( is_a( $permtarget, 'FileRoot' ) ) )
+		if( $perm && isset( $permtarget ) && ( $permtarget instanceof FileRoot ) )
 		{
 			global $current_User;
 			switch( $permtarget->type )
@@ -343,13 +343,22 @@ class files_Module extends Module
 						return $permtarget->in_type_ID == $current_User->ID;
 					}
 				case 'collection':
-					if( $permlevel == 'edit_allowed' && $permvalue == 'edit_allowed' )
-					{
-						// Check specific blog perms:
-						$perm = $current_User->check_perm_blogusers( 'files', 'edit', $permtarget->in_type_ID );
+					if( $permvalue != 'edit' && $permvalue != 'all' )
+					{	// Check specific blog perms:
+						if( $current_User->check_perm_blogowner( $permtarget->in_type_ID ) )
+						{	// Collection owner has all permissions for files root:
+							$perm = true;
+							return $perm;
+						}
+						if( $current_User->check_perm( 'blogs', $permlevel ) )
+						{	// If current user has access to view or edit all collections:
+							$perm = true;
+							return $perm;
+						}
+						$perm = $current_User->check_perm_blogusers( 'files', $permlevel, $permtarget->in_type_ID );
 						if ( ! $perm )
 						{ // Check groups for permissions for this specific blog:
-							$perm = $current_User->Group->check_perm_bloggroups( 'files', 'edit', $permtarget->in_type_ID );
+							$perm = $current_User->Group->check_perm_bloggroups( 'files', $permlevel, $permtarget->in_type_ID );
 						}
 						return $perm;
 					}

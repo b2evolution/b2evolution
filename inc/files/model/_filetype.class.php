@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -35,10 +35,10 @@ class Filetype extends DataObject
 	 *
 	 * @param table Database row
 	 */
-	function Filetype( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_filetypes', 'ftyp_', 'ftyp_ID' );
+		parent::__construct( 'T_filetypes', 'ftyp_', 'ftyp_ID' );
 
 		if( $db_row != NULL )
 		{
@@ -315,14 +315,23 @@ class Filetype extends DataObject
 
 		$old_extensions = explode( ' ', $this->old_extensions );
 
-		if( preg_match( '#^audio/#', $this->old_mimetype ) && $this->mimetype != $this->old_mimetype )
-		{ // Previous mimetype was 'audio' but it is changed to other, We should update file type
+		if( preg_match( '#^(audio/|video/)#', $this->old_mimetype ) && $this->mimetype != $this->old_mimetype )
+		{ // Previous mimetype was 'audio' or 'video' but it is changed to other, We should update file type
 			$deleted_extensions = $old_extensions;
 		}
 
+		$current_file_type = null;
 		if( preg_match( '#^audio/#', $this->mimetype ) )
 		{ // Current file type is Audio format
+			$current_file_type = 'audio';
+		}
+		elseif( preg_match( '#^video/#', $this->mimetype ) )
+		{ // Current file type is Video format
+			$current_file_type = 'video';
+		}
 
+		if( $current_file_type )
+		{
 			$new_extensions = $this->get_extensions();
 			if( empty( $new_extensions ) && empty( $old_extensions ) )
 			{ // No extensions
@@ -343,7 +352,7 @@ class Filetype extends DataObject
 		if( ! empty( $added_extensions ) )
 		{ // Set audio file type for new extensions
 			$DB->query( 'UPDATE T_files
-					SET file_type = "audio"
+					SET file_type = "'.$current_file_type.'"
 				WHERE file_path LIKE "%.'.implode( '" OR file_path LIKE "%.', $added_extensions ).'"' );
 		}
 	}

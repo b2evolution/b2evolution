@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -48,7 +48,17 @@ class basic_antispam_plugin extends Plugin
 	}
 
 
-	function GetDefaultSettings()
+	/**
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
+	 *
+	 * @param array Associative array of parameters (since v1.9).
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
+	 * @return array see {@link Plugin::GetDefaultSettings()}.
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
+	 * and assign an array with the following keys to them (only 'label' is required):
+	 */
+	function GetDefaultSettings( & $params )
 	{
 		return array(
 				'check_dupes' => array(

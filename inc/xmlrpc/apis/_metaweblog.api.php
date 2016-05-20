@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author tor
  *
@@ -118,7 +118,12 @@ function mw_newpost($m, $item_type = 'post' )
 	$item_typ_ID = isset($contentstruct['wp_post_format']) ? $contentstruct['wp_post_format'] : 1;
 	if( $item_type == 'page' )
 	{	// Force post type 'page'
-		$item_typ_ID = 1000;
+		global $DB;
+		$page_type_ID = $DB->get_var( 'SELECT ityp_ID FROM T_items__type WHERE ityp_usage = "page" LIMIT 1' );
+		if( ! empty( $page_type_ID ) )
+		{
+			$item_typ_ID = $page_type_ID;
+		}
 	}
 
 	if( !empty( $contentstruct[$item_type.'_status'] ) )

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -86,9 +86,15 @@ function skin_init( $disp )
 		case 'posts':
 		case 'single':
 		case 'page':
+		case 'terms':
 		case 'download':
 		case 'feedback-popup':
 			// We need to load posts for this display:
+
+			if( $disp == 'terms' )
+			{	// Initialize the redirect param to know what page redirect after accepting of terms:
+				param( 'redirect_to', 'url', '' );
+			}
 
 			// Note: even if we request the same post as $Item above, the following will do more restrictions (dates, etc.)
 			// Init the MainList object:
@@ -126,9 +132,18 @@ function skin_init( $disp )
 		// CONTENT PAGES:
 		case 'single':
 		case 'page':
+		case 'terms':
+			if( $disp == 'terms' && ! $Item )
+			{	// Wrong post ID for terms page:
+				global $disp;
+				$disp = '404';
+				$Messages->add( sprintf( T_('Terms not found. (post ID #%s)'), get_param( 'p' ) ), 'error' );
+				break;
+			}
+
 			if( ( ! $preview ) && ( empty( $Item ) ) )
 			{ // No Item, incorrect request and incorrect state of the application, a 404 redirect should have already happened
-				debug_die( 'Invalid page URL!' );
+				//debug_die( 'Invalid page URL!' );
 			}
 
 			if( $disp == 'single' )
@@ -151,6 +166,25 @@ function skin_init( $disp )
 				// Redirect to the URL specified in the post:
 				$Debuglog->add( 'Redirecting to post URL ['.$Item->url.'].' );
 				header_redirect( $Item->url, true, true );
+			}
+
+			// Check if the post has 'deprecated' status:
+			if( isset( $Item->status ) && $Item->status == 'deprecated' )
+			{ // If the post is deprecated
+				global $disp;
+				$disp = '404';
+				$disp_detail = '404-deprecated-post' ;
+				break;
+			}
+
+			// Check if the post has allowed front office statuses
+			$allowed_statuses = get_inskin_statuses( $Blog->ID, 'post' );
+			if( ! in_array( $Item->status, $allowed_statuses ) )
+			{
+				global $disp;
+				$disp = '404';
+				$disp_detail = '404-disallowed-post-status';
+				break;
 			}
 
 			// Check if we want to redirect to a canonical URL for the post
@@ -552,7 +586,7 @@ var downloadInterval = setInterval( function()
 					$disp = 'login';
 					param( 'action', 'string', 'req_login' );
 					// override redirect to param
-					param( 'redirect_to', 'url', regenerate_url(), true, true );
+					$redirect_to = param( 'redirect_to', 'url', regenerate_url(), true, true );
 					if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) && $Blog->ID != $msg_Blog->ID )
 					{ // Redirect to special blog for messaging actions if it is defined in general settings
 						header_redirect( url_add_param( $msg_Blog->get( 'msgformurl', array( 'glue' => '&' ) ), 'redirect_to='.rawurlencode( $redirect_to ), '&' ) );
@@ -1205,35 +1239,8 @@ var downloadInterval = setInterval( function()
 			break;
 
 		case 'users':
-			if( !is_logged_in() && !$Settings->get( 'allow_anonymous_user_list' ) ) 
-			{ // Redirect to the login page if not logged in and allow anonymous user setting is OFF
-				$Messages->add( T_( 'You must log in to view the user directory.' ) );
-				header_redirect( get_login_url( 'cannot see user' ), 302 );
-				// will have exited
-			}
-
-			if( is_logged_in() && ( !check_user_status( 'can_view_users' ) ) )
-			{ // user status doesn't permit to view users list
-				if( check_user_status( 'can_be_validated' ) )
-				{ // user is logged in but his/her account is not active yet
-					// Redirect to the account activation page
-					$Messages->add( T_( 'You must activate your account before you can view the user directory. <b>See below:</b>' ) );
-					header_redirect( get_activate_info_url(), 302 );
-					// will have exited
-				}
-
-				// set where to redirect
-				$error_redirect_to = ( empty( $Blog) ? $baseurl : $Blog->gen_blogurl() );
-				$Messages->add( T_( 'Your account status currently does not permit to view the user directory.' ) );
-				header_redirect( $error_redirect_to, 302 );
-				// will have exited
-			}
-
-			if( has_cross_country_restriction( 'users', 'list' ) && empty( $current_User->ctry_ID ) )
-			{ // User may browse other users only from the same country
-				$Messages->add( T_('Please specify your country before attempting to contact other users.') );
-				header_redirect( get_user_profile_url() );
-			}
+			// Check if current user has an access to public list of the users:
+			check_access_users_list();
 
 			$seo_page_type = 'Users list';
 			$robots_index = false;
@@ -1242,81 +1249,9 @@ var downloadInterval = setInterval( function()
 		case 'user':
 			// get user_ID because we want it in redirect_to in case we need to ask for login.
 			$user_ID = param( 'user_ID', 'integer', '', true );
-			// set where to redirect in case of error
-			$error_redirect_to = ( empty( $Blog) ? $baseurl : $Blog->gen_blogurl() );
 
-			if( !is_logged_in() )
-			{ // Redirect to the login page if not logged in and allow anonymous user setting is OFF
-				$user_available_by_group_level = true;
-				if( ! empty( $user_ID ) )
-				{
-					$UserCache = & get_UserCache();
-					if( $User = & $UserCache->get_by_ID( $user_ID, false ) )
-					{ // If user exists we can check if the anonymous users have an access to view the user by group level limitation
-						$User->get_Group();
-						$user_available_by_group_level = $User->Group->level >= $Settings->get('allow_anonymous_user_level_min') && $User->Group->level <= $Settings->get('allow_anonymous_user_level_max');
-					}
-				}
-
-				if( ! $Settings->get( 'allow_anonymous_user_profiles' ) || ! $user_available_by_group_level || empty( $user_ID ) )
-				{ // If this user is not available for anonymous users
-					$Messages->add( T_('You must log in to view this user profile.') );
-					header_redirect( get_login_url('cannot see user'), 302 );
-					// will have exited
-				}
-			}
-
-			if( is_logged_in() && ( !check_user_status( 'can_view_user', $user_ID ) ) )
-			{ // user is logged in, but his/her status doesn't permit to view user profile
-				if( check_user_status('can_be_validated') )
-				{ // user is logged in but his/her account is not active yet
-					// Redirect to the account activation page
-					$Messages->add( T_('You must activate your account before you can view this user profile. <b>See below:</b>') );
-					header_redirect( get_activate_info_url(), 302 );
-					// will have exited
-				}
-
-				$Messages->add( T_('Your account status currently does not permit to view this user profile.') );
-				header_redirect( $error_redirect_to, 302 );
-				// will have exited
-			}
-
-			if( !empty($user_ID) )
-			{
-				$UserCache = & get_UserCache();
-				$User = & $UserCache->get_by_ID( $user_ID, false );
-
-				if( empty( $User ) )
-				{
-					$Messages->add( T_('The requested user does not exist!') );
-					header_redirect( $error_redirect_to );
-					// will have exited
-				}
-
-				if( $User->check_status('is_closed') )
-				{
-					$Messages->add( T_('The requested user account is closed!') );
-					header_redirect( $error_redirect_to );
-					// will have exited
-				}
-
-				if( has_cross_country_restriction( 'any' ) )
-				{
-					if( empty( $current_User->ctry_ID  ) )
-					{ // Current User country is not set
-						$Messages->add( T_('Please specify your country before attempting to contact other users.') );
-						header_redirect( get_user_profile_url() );
-						// will have exited
-					}
-
-					if( has_cross_country_restriction( 'users', 'profile' ) && ( $current_User->ctry_ID !== $User->ctry_ID ) )
-					{ // Current user country is different then edited user country and cross country user browsing is not enabled.
-						$Messages->add( T_('You don\'t have permission to view this user profile.') );
-						header_redirect( url_add_param( $error_redirect_to, 'disp=403', '&' ) );
-						// will have exited
-					}
-				}
-			}
+			// Check if current user has an access to view a profile of the requested user:
+			check_access_user_profile( $user_ID );
 
 			// Initialize users list from session cache in order to display prev/next links:
 			// It is used to navigate between users
@@ -1437,6 +1372,9 @@ var downloadInterval = setInterval( function()
 			$Item = $comment_Item;
 
 			$display_params = array();
+
+			// Restrict comment status by parent item:
+			$edited_Comment->restrict_status_by_item();
 			break;
 
 		case 'useritems':
@@ -1591,7 +1529,7 @@ var downloadInterval = setInterval( function()
 
 	// dummy var for backward compatibility with versions < 2.4.1 -- prevents "Undefined variable"
 	global $global_Cache, $credit_links;
-	$credit_links = $global_Cache->get( 'creds' );
+	$credit_links = $global_Cache->getx( 'creds' );
 
 	$Timer->pause( 'skin_init' );
 
@@ -1728,22 +1666,6 @@ function skin_include( $template_name, $params = array() )
 	$timer_name = 'skin_include('.$template_name.')';
 	$Timer->resume( $timer_name );
 
-	if( ! empty( $disp ) && ( $disp == 'single' || $disp == 'page' ) &&
-	    $template_name == '$disp$' &&
-	    ! empty( $Item ) && ( $ItemType = & $Item->get_ItemType() ) )
-	{ // Get template name for the current Item if it is defined by Item Type
-		$item_type_template_name = $ItemType->get( 'template_name' );
-		if( ! empty( $item_type_template_name ) )
-		{ // The item type has a specific template for this display:
-			$item_type_template_name = '_'.$item_type_template_name.'.disp.php';
-			if( file_exists( $ads_current_skin_path.$item_type_template_name ) ||
-			    skin_fallback_path( $item_type_template_name ) )
-			{ // Use template file name of the Item Type only if it exists
-				$template_name = $item_type_template_name;
-			}
-		}
-	}
-
 	if( $template_name == '$disp$' )
 	{ // This is a special case.
 		// We are going to include a template based on $disp:
@@ -1790,6 +1712,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_access_denied'  => '_access_denied.disp.php',
 				'disp_access_requires_login' => '_access_requires_login.disp.php',
 				'disp_tags'           => '_tags.disp.php',
+				'disp_terms'          => '_terms.disp.php',
 			);
 
 		// Add plugin disp handlers:
@@ -1827,6 +1750,21 @@ function skin_include( $template_name, $params = array() )
 			return;
 		}
 
+		if( $template_name[0] != '#' && // if template is not handled by plugins
+		    ( $disp == 'single' || $disp == 'page' ) &&
+		    ! empty( $Item ) && ( $ItemType = & $Item->get_ItemType() ) )
+		{	// Get template name for the current Item if it is defined by Item Type:
+			$item_type_template_name = $ItemType->get( 'template_name' );
+			if( ! empty( $item_type_template_name ) )
+			{	// The item type has a specific template for this display:
+				$item_type_template_name = '_'.$item_type_template_name.'.disp.php';
+				if( file_exists( $ads_current_skin_path.$item_type_template_name ) ||
+						skin_fallback_path( $item_type_template_name ) )
+				{	// Use template file name of the Item Type only if it exists:
+					$template_name = $item_type_template_name;
+				}
+			}
+		}
 	}
 
 
@@ -2526,13 +2464,11 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 			echo '<span>'.$edited_Skin->name.'</span>';
 		echo '</div>';
 
-		if( isset( $edited_Skin->version ) )
-		{ // Skin version
-			echo '<div class="skin_setting_row">';
-				echo '<label>'.T_('Skin version').':</label>';
-				echo '<span>'.$edited_Skin->version.'</span>';
-			echo '</div>';
-		}
+		// Skin version
+		echo '<div class="skin_setting_row">';
+			echo '<label>'.T_('Skin version').':</label>';
+			echo '<span>'.( isset( $edited_Skin->version ) ? $edited_Skin->version : 'unknown' ).'</span>';
+		echo '</div>';
 
 		// Skin type
 		echo '<div class="skin_setting_row">';
@@ -2557,7 +2493,8 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 		echo '</div>';
 		echo '<div class="skin_settings_form">';
 
-		$skin_params = $edited_Skin->get_param_definitions( $tmp_params = array( 'for_editing' => true ) );
+		$tmp_params = array( 'for_editing' => true );
+		$skin_params = $edited_Skin->get_param_definitions( $tmp_params );
 
 		if( empty( $skin_params ) )
 		{ // Advertise this feature!!
@@ -2674,11 +2611,11 @@ function skin_body_attrs( $params = array() )
 	// WARNING: Caching! We're not supposed to have Session dependent stuff in here. This is for debugging only!
 	if ( ! empty($Blog) )
 	{
-		if( $Session->get( 'display_includes_'.$Blog->ID ) ) 
+		if( $Session->get( 'display_includes_'.$Blog->ID ) )
 		{
 			$classes[] = 'dev_show_includes';
 		}
-		if( $Session->get( 'display_containers_'.$Blog->ID ) ) 
+		if( $Session->get( 'display_containers_'.$Blog->ID ) )
 		{
 			$classes[] = 'dev_show_containers';
 		}
@@ -2690,4 +2627,17 @@ function skin_body_attrs( $params = array() )
 	}
 }
 
+
+function get_skin_version( $skin_ID )
+{
+	$SkinCache = & get_SkinCache();
+	$Skin = $SkinCache->get_by_ID( $skin_ID );
+
+	if( isset( $Skin->version ) )
+	{
+		return $Skin->version;
+	}
+
+	return 'unknown';
+}
 ?>

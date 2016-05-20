@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -27,10 +27,10 @@ class coll_xml_feeds_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function coll_xml_feeds_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'coll_xml_feeds' );
+		parent::__construct( $db_row, 'core', 'coll_xml_feeds' );
 	}
 
 
@@ -170,7 +170,7 @@ class coll_xml_feeds_Widget extends ComponentWidget
 			 */
 			global $global_Cache;
 
-			$feedhlp = $global_Cache->get( 'feedhlp' );
+			$feedhlp = $global_Cache->getx( 'feedhlp' );
 			if( empty( $feedhlp ) )
 			{	// Use basic default: (fp> needs serious update) -- Note: no localization because destination is in English anyway.
 				$feedhlp = array( array( 'http://www.webreference.fr/defintions/rss-atom-xml', 'What is RSS?' ) );

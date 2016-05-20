@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -43,10 +43,9 @@ class bookmarklet_plugin extends Plugin
 	 *
 	 * @todo Do not create links/javascript code based on browser detection! But: test for functionality!
 	 *
-	 * @param array Associative array of parameters
 	 * @return boolean did we display a tool menu block?
 	 */
-	function AdminToolPayload( $params )
+	function AdminToolPayload()
 	{
 		global $Hit, $admin_url;
 

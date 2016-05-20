@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  *
@@ -43,9 +43,14 @@ class watermark_plugin extends Plugin
 
 
 	/**
-	 * Get the settings that the plugin can use.
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
 	 *
-	 * @return array
+	 * @param array Associative array of parameters (since v1.9).
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
+	 * @return array see {@link Plugin::GetDefaultSettings()}.
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
+	 * and assign an array with the following keys to them (only 'label' is required):
 	 */
 	function GetDefaultSettings( & $params )
 	{

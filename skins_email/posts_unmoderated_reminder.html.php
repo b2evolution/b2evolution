@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -33,7 +33,7 @@ foreach( $params['blogs'] as $blog_ID )
 	echo '<li>'.
 			$moderation_Blog->get( 'shortname' ).
 			' ('.sprintf( T_( '%s posts waiting' ), $params['posts'][$blog_ID] ).') - '.
-			get_link_tag( $admin_url.'?ctrl=dashboard&blog='.$blog_ID, T_('Click here to moderate').' &raquo;', '.a' ).
+			get_link_tag( $admin_url.'?coll_settings&amp;tab=&blog='.$blog_ID, T_('Click here to moderate').' &raquo;', '.a' ).
 		'</li>';
 }
 echo '</ul>';

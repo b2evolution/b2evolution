@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -50,13 +50,21 @@ $current_skin_ID = $edited_Blog->get_setting( $skin_type.'_skin_ID', true );
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
-	$block_item_Widget->global_icon( T_('Install new skin...'), 'new', $admin_url.'?ctrl=skins&amp;action=new&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','skinpage=selection','','&'), $admin_url)), T_('Install new').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+	$block_item_Widget->global_icon( T_('Install new skin...'), 'new', $admin_url.'?ctrl=skins&amp;tab=current_skin&amp;blog='.$edited_Blog->ID.'&amp;action=new&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','skinpage=selection','','&'), $admin_url)), T_('Install new').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 	$block_item_Widget->global_icon( T_('Keep current skin!'), 'close', regenerate_url( 'skinpage' ), ' '.T_('Don\'t change'), 3, 4 );
 }
 
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
 	echo '<div class="skin_selector_block">';
+
+	if( $current_User->check_perm( 'options', 'edit', false ) )
+	{ // A link to install new skin:
+		echo '<a href="'.$admin_url.'?ctrl=skins&amp;tab=current_skin&amp;action=new&amp;redirect_to='.rawurlencode( url_rel_to_same_host( regenerate_url( '','skinpage=selection','','&' ), $admin_url ) ).'" class="skinshot skinshot_new">'
+				.get_icon( 'new' )
+				.T_('Install New').' &raquo;'
+			.'</a>';
+	}
 
 	$SkinCache = & get_SkinCache();
 	$SkinCache->load_all();
@@ -101,14 +109,6 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 
 	// Flush fadeout
 	$Session->delete( 'fadeout_array');
-
-	if( $current_User->check_perm( 'options', 'edit', false ) )
-	{ // A link to install new skin:
-		echo '<a href="'.$admin_url.'?ctrl=skins&amp;action=new&amp;redirect_to='.rawurlencode( url_rel_to_same_host( regenerate_url( '','skinpage=selection','','&' ), $admin_url ) ).'" class="skinshot skinshot_new">'
-				.get_icon( 'new' )
-				.T_('Install New').' &raquo;'
-			.'</a>';
-	}
 
 	echo '<div class="clear"></div>';
 	echo '</div>';

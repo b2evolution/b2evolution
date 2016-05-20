@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -99,6 +99,19 @@ class prism_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Called before at the beginning, if an email form gets sent (and received).
+	 */
+	function EmailFormSent( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( $this->is_renderer_enabled( $apply_rendering, $params['renderers'] ) )
+		{	// render code blocks in message:
+			$this->FilterItemContents( $params );
+		}
+	}
+
+
+	/**
 	 * Perform rendering
 	 *
 	 * @see Plugin::RenderItemAsHtml()
@@ -160,12 +173,29 @@ class prism_plugin extends Plugin
 
 		// Language:
 		$lang = strtolower( preg_replace( '/.*lang="?([a-z]+)"?.*/i', '$1', html_entity_decode( $block[2] ) ) );
-		if( ! in_array( $lang, array( 'php', 'css', 'javascript', 'sql' ) ) )
+		if( ! in_array( $lang, array( 'php', 'css', 'javascript', 'sql', 'markup', 'apacheconf' ) ) )
 		{ // Use Markup for unknown language
-			$lang = 'markup';
+			$lang = '';
 		}
 
-		$r = '<code class="language-'.$lang.'">'.$block[3].'</code>';
+		$code_class = '';
+		if( $type == 'codespan' )
+		{	// Use standard class for codespan:
+			$code_class .= 'codespan';
+		}
+		if( ! empty( $lang ) )
+		{	// Use language class only for known language:
+			$code_class .= ' language-'.$lang;
+		}
+
+		$content = $block[3];
+
+		if( $type == 'codeblock' )
+		{	// Remove first empty line from codeblock content:
+			$content = preg_replace( '/^\r?\n/', '', $content );
+		}
+
+		$r = '<code'.( empty( $code_class ) ? '' : ' class="'.trim( $code_class ).'"' ).'>'.$content.'</code>';
 
 		if( $type == 'codeblock' )
 		{ // Set special template and attributes only for codeblock
@@ -190,7 +220,7 @@ class prism_plugin extends Plugin
 	 */
 	function unfilter_code( $content )
 	{
-		$content = preg_replace_callback( '#(<pre class="line-numbers"( data-start="(-?[0-9]+)")?>)?<code class="language-([a-z]+)">([\s\S]+?)?</code>(</pre>)?#i',
+		$content = preg_replace_callback( '#(<pre class="line-numbers"( data-start="(-?[0-9]+)")?>)?<code( class="([^"]+)")?>([\s\S]+?)?</code>(</pre>)?#i',
 								array( $this, 'unfilter_code_callback' ), $content );
 
 		return $content;
@@ -205,6 +235,8 @@ class prism_plugin extends Plugin
 	 */
 	function unfilter_code_callback( $block )
 	{
+		$content = $block[6];
+
 		if( empty( $block[1] ) )
 		{ // [codespan]
 			$code_tag = 'codespan';
@@ -217,11 +249,29 @@ class prism_plugin extends Plugin
 			// Detect number of start line:
 			preg_match( '/.*data-start="(-?[0-9]+)".*/i', html_entity_decode( $block[1] ), $line );
 			$line = ' line="'.( isset( $line[1] ) ? intval( $line[1] ) : '1' ).'"';
+
+			// Revert back first empty line:
+			$content = "\r\n".$content;
 		}
 
-		// Build codeblock
-		$r = '['.$code_tag.' lang="'.strtolower( $block[4] ).'"'.$line.']';
-		$r .= $block[5];
+		$lang = trim( strtolower( $block[5] ) );
+		if( ! empty( $lang ) )
+		{	// Add lang attribute only if it is defined:
+			preg_match( '/language-([a-z]+)/', $lang, $lang_match );
+			$lang = empty( $lang_match[1] ) ? '' : trim( $lang_match[1] );
+			if( empty( $lang ) || ! in_array( $lang_match[1], array( 'php', 'css', 'javascript', 'sql', 'markup', 'apacheconf' ) ) )
+			{	// Don't allow unknown language:
+				$lang = '';
+			}
+			else
+			{	// It is allowed language
+				$lang = ' lang="'.strtolower( $lang ).'"';
+			}
+		}
+
+		// Build codeblock:
+		$r = '['.$code_tag.$lang.$line.']';
+		$r .= $content;
 		$r .= '[/'.$code_tag.']';
 
 		return $r;
@@ -229,9 +279,13 @@ class prism_plugin extends Plugin
 
 
 	/**
-	 * @see Plugin::SkinBeginHtmlHead()
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
 	 */
-	function SkinBeginHtmlHead()
+	function SkinBeginHtmlHead( & $params )
 	{
 		global $Blog;
 
@@ -248,7 +302,25 @@ class prism_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Called when displaying editor toolbars.
+	 * Event handler: Called when ending the admin html head section.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
+	 */
+	function AdminEndHtmlHead( & $params )
+	{
+		global $ctrl;
+
+		if( $ctrl == 'campaigns' && get_param( 'tab' ) == 'send' && $this->get_email_setting( 'email_apply_rendering' ) )
+		{	// Load this only on form to preview email campaign:
+			require_js( $this->get_plugin_url().'/js/prism.min.js', 'relative' );
+			require_css( $this->get_plugin_url().'/css/prism.min.css', 'relative' );
+		}
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars on comment form.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
@@ -301,7 +373,26 @@ class prism_plugin extends Plugin
 
 
 	/**
-	 * Display a toolbar in admin
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{
+			return $this->display_toolbar();
+		}
+		return false;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
@@ -323,10 +414,9 @@ class prism_plugin extends Plugin
 			}
 		}
 
-		$coll_setting_name = ( $params['target_type'] == 'Comment' ) ? 'coll_apply_comment_rendering' : 'coll_apply_rendering';
-		$apply_rendering = $this->get_coll_setting( $coll_setting_name, $Blog );
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $Blog );
 		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
-		{ // Don't display toolbar
+		{	// Don't display toolbar:
 			return false;
 		}
 
@@ -346,20 +436,22 @@ class prism_plugin extends Plugin
 		echo $this->get_template( 'toolbar_title_before' ).T_('Codespan').': '.$this->get_template( 'toolbar_title_after' );
 		echo $this->get_template( 'toolbar_group_before' );
 		echo '<input type="button" title="'.T_('Insert Markup codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|markup|span" value="'.format_to_output( T_('Markup'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert CSS codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|css|span" value="'.format_to_output( T_('CSS'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert JavaScript codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|javascript|span" value="'.format_to_output( T_('JS'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert PHP codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|php|span" value="'.format_to_output( T_('PHP'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert SQL codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|sql|span" value="'.format_to_output( T_('SQL'), 'htmlattr' ).'" />';
+		echo '<input type="button" title="'.T_('Insert CSS codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|css|span" value="CSS" />';
+		echo '<input type="button" title="'.T_('Insert JavaScript codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|javascript|span" value="JS" />';
+		echo '<input type="button" title="'.T_('Insert PHP codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|php|span" value="PHP" />';
+		echo '<input type="button" title="'.T_('Insert SQL codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|sql|span" value="SQL" />';
+		echo '<input type="button" title="'.T_('Insert Apache codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|apacheconf|span" value="Apache" />';
 		echo $this->get_template( 'toolbar_group_after' );
 
 		// Codeblock buttons:
 		echo $this->get_template( 'toolbar_title_before' ).T_('Codeblock').': '.$this->get_template( 'toolbar_title_after' );
 		echo $this->get_template( 'toolbar_group_before' );
 		echo '<input type="button" title="'.T_('Insert Markup codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|markup" value="'.format_to_output( T_('Markup'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert CSS codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|css" value="'.format_to_output( T_('CSS'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert JavaScript codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|javascript" value="'.format_to_output( T_('JS'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert PHP codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|php" value="'.format_to_output( T_('PHP'), 'htmlattr' ).'" />';
-		echo '<input type="button" title="'.T_('Insert SQL codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|sql" value="'.format_to_output( T_('SQL'), 'htmlattr' ).'" />';
+		echo '<input type="button" title="'.T_('Insert CSS codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|css" value="CSS" />';
+		echo '<input type="button" title="'.T_('Insert JavaScript codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|javascript" value="JS" />';
+		echo '<input type="button" title="'.T_('Insert PHP codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|php" value="PHP" />';
+		echo '<input type="button" title="'.T_('Insert SQL codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|sql" value="SQL" />';
+		echo '<input type="button" title="'.T_('Insert Apache codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="prism_tag|apacheconf" value="Apache" />';
 		echo $this->get_template( 'toolbar_group_after' );
 
 		echo $this->get_template( 'toolbar_after' );

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -67,7 +67,7 @@ class FileRoot
 	 * @param integer ID of the user, the group or the collection the file belongs to...
 	 * @param boolean Create the directory, if it does not exist yet?
 	 */
-	function FileRoot( $root_type, $root_in_type_ID, $create = true )
+	function __construct( $root_type, $root_in_type_ID, $create = true )
 	{
 		/**
 		 * @var User
@@ -203,7 +203,7 @@ class FileRoot
 				return NT_('User roots');
 
 			case 'collection':
-				return NT_('Blog roots');
+				return NT_('Collection roots');
 
 			default:
 				return NT_('Special roots');

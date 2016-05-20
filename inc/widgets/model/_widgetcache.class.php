@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  *
@@ -43,9 +43,9 @@ class WidgetCache extends DataObjectCache
 	 *
 	 * @param boolean Load enabled widgets only?
 	 */
-	function WidgetCache( $enabled_only = false )
+	function __construct( $enabled_only = false )
 	{
-		parent::DataObjectCache( 'ComponentWidget', false, 'T_widget', 'wi_', 'wi_ID', NULL, NULL, NULL );
+		parent::__construct( 'ComponentWidget', false, 'T_widget', 'wi_', 'wi_ID', NULL, NULL, NULL );
 		$this->load_enabled_only = $enabled_only;
 	}
 

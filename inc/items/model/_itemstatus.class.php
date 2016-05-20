@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -31,10 +31,10 @@ class ItemStatus extends DataObject
 	 *
 	 * @param table Database row
 	 */
-	function ItemStatus( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_items__status', 'pst_', 'pst_ID' );
+		parent::__construct( 'T_items__status', 'pst_', 'pst_ID' );
 
 		// Allow inseting specific IDs
 		$this->allow_ID_insert = true;

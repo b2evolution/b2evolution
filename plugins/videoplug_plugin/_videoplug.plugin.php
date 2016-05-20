@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -68,16 +68,15 @@ class videoplug_plugin extends Plugin
 				'<div class="videoblock"><iframe src="//www.dailymotion.com/embed/video/\\1" width="425" height="335" frameborder="0" allowfullscreen></iframe></div>',
 				'<div class="videoblock"><iframe src="//player.vimeo.com/video/$1" width="400" height="225" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>',
 				// Unavailable services. Keep them for backwards compatibility
-				'<div class="videoblock">'.T_('This video service is not available anymore.').'</div>',
-				'<div class="videoblock">'.T_('This video service is not available anymore.').'</div>',
-				'<div class="videoblock">'.T_('This video service is not available anymore.').'</div>',
+				'<div class="videoblock">The Google video service is not available anymore.</div>',
+				'<div class="videoblock">The Live Video service is not available anymore.</div>',
+				'<div class="videoblock">The iFilm video service is not available anymore.</div>',
 			);
 
 		$content = replace_content_outcode( $search_list, $replace_list, $content );
 
 		return true;
 	}
-
 
 
 	/**
@@ -90,8 +89,11 @@ class videoplug_plugin extends Plugin
 		return $this->RenderItemAsHtml( $params );
 	}
 
+
 	/**
-	 * Display a toolbar in admin.
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
@@ -99,9 +101,81 @@ class videoplug_plugin extends Plugin
 	function AdminDisplayToolbar( & $params )
 	{
 		if( !empty( $params['Item'] ) )
-		{	// Item is set, get Blog from post
+		{	// Item is set, get Blog from post:
 			$edited_Item = & $params['Item'];
 			$Blog = & $edited_Item->get_Blog();
+		}
+
+		if( empty( $Blog ) )
+		{	// Item is not set, try global Blog:
+			global $Blog;
+			if( empty( $Blog ) )
+			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available:
+				return false;
+			}
+		}
+
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $Blog );
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
+		{	// Plugin is not enabled for current case, so don't display a toolbar:
+			return false;
+		}
+
+		return $this->DisplayCodeToolbar();
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for message.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayMessageToolbar( & $params )
+	{
+		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{
+			return $this->DisplayCodeToolbar();
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{
+			return $this->DisplayCodeToolbar();
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars on comment form.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCommentToolbar( & $params )
+	{
+		$Comment = & $params['Comment'];
+		if( $Comment )
+		{	// Get a post of the comment:
+			if( $comment_Item = & $Comment->get_Item() )
+			{
+				$Blog = & $comment_Item->get_Blog();
+			}
 		}
 
 		if( empty( $Blog ) )
@@ -113,13 +187,23 @@ class videoplug_plugin extends Plugin
 			}
 		}
 
-		$coll_setting_name = ( $params['target_type'] == 'Comment' ) ? 'coll_apply_comment_rendering' : 'coll_apply_rendering';
-		$apply_rendering = $this->get_coll_setting( $coll_setting_name, $Blog );
-		if( empty( $apply_rendering ) || $apply_rendering == 'never' || $params['edit_layout'] == 'inskin' )
-		{ // This is too complex for inskin mode, don't display it:
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog );
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
+		{	// Plugin is not enabled for current case, so don't display a toolbar:
 			return false;
 		}
 
+		return $this->DisplayCodeToolbar();
+	}
+
+
+	/**
+	 * Display a code toolbar
+	 *
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCodeToolbar()
+	{
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 
 		echo $this->get_template( 'toolbar_title_before' ).T_('Video').': '.$this->get_template( 'toolbar_title_after' );
@@ -140,7 +224,7 @@ class videoplug_plugin extends Plugin
 			{
 				while( 1 )
 				{
-					var p = '<?php echo TS_('Enter video ID or URL from %s:') ?>';
+					var p = '<?php echo TS_('Copy/paste the URL or the ID of your video from %s:') ?>';
 					var video_ID = prompt( p.replace( /%s/, tag ), '' );
 					if( ! video_ID )
 					{
@@ -155,7 +239,7 @@ class videoplug_plugin extends Plugin
 						case 'youtube':
 							// Allow HD video code with ?hd=1 at the end
 							regexp_ID = /^[a-z0-9_?=-]+$/i;
-							regexp_URL = /^(.+\?v=)?([a-z0-9_?=-]+)$/i;
+							regexp_URL = /^.+(video\/|\/watch\?v=|embed\/|\/)([a-z0-9_?=-]+)$/i;
 							break;
 
 						case 'dailymotion':
@@ -189,14 +273,14 @@ class videoplug_plugin extends Plugin
 							}
 							else
 							{	// Display error when URL doesn't match:
-								alert( '<?php echo TS_('The URL you provided could not be parsed.'); ?>' );
+								alert( '<?php echo TS_('The URL you provided could not be recognized.'); ?>' );
 								continue;
 							}
 						}
 					}
 
 					// Display error of wrong entered data:
-					alert( '<?php echo TS_('The video ID or URL is invalid.'); ?>' );
+					alert( '<?php echo TS_('The URL or video ID is invalid.'); ?>' );
 				}
 
 				tag = '[video:'+tag+':'+video_ID+']';

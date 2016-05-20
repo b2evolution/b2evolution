@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package admin
@@ -58,7 +58,7 @@ switch( $action )
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_ItemStatus = duplicate( $edited_ItemStatus ); // PHP4/5 abstraction
+			$edited_ItemStatus = clone $edited_ItemStatus;
 			// Reset ID of new post status:
 			$edited_ItemStatus->ID = 0;
 		}
@@ -175,7 +175,7 @@ switch( $action )
 // Generate available blogs list:
 $AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'itemstatuses', 'tab' => $tab, 'tab3' => 'statuses' ) );
 
-$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
 $AdminUI->breadcrumbpath_add( T_('Settings'), $admin_url.'?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 $AdminUI->breadcrumbpath_add( T_('Post Statuses'), $admin_url.'?ctrl=itemstatuses&amp;blog=$blog$&amp;tab=settings&amp;tab3=statuses' );
 

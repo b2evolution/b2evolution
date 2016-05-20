@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  *
@@ -59,7 +59,7 @@ class ResultSel extends Results
 		global $current_User;
 
 		// Call parent:
-		parent::Results( $sql, $param_prefix, $default_order, $limit, $count_sql );
+		parent::__construct( $sql, $param_prefix, $default_order, $limit, $count_sql );
 
 		if( ! $current_User->check_perm( 'selections', 'view' ) )
 		{	// User is NOT allowed to view selections

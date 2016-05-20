@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -24,7 +24,7 @@ global $current_User;
  */
 global $Settings;
 
-global $rsc_subdir, $pagenow, $servertimenow;
+global $rsc_subdir, $pagenow, $servertimenow, $localtimenow, $date_default_timezone;
 
 
 // JavaScript function to calculate time difference: {{{
@@ -103,9 +103,12 @@ if($neg)
 	$td_value = '-'.$td_value;
 }
 
-$Form->text_input( 'newtime_difference', $td_value, 8 /* hh:mm:ss */, T_('Time difference'), '['. T_('in hours, e.g. "1", "1:30" or "-1.5"'). '] '.T_('If you\'re not on the timezone of your server.'), array( 'maxlength'=> 8, 'required'=>true ) );
-$Form->info( T_('Current server time'), date_i18n( locale_timefmt(), $servertimenow ) );
-$Form->info( '', '<a href="#" onclick="calc_TimeDifference(); return false;">'.T_('Calculate time difference').'</a>' );
+$Form->info( T_('Timezone from php.ini'), ini_get( "date.timezone" ), '(date.timezone)' );
+$Form->info( T_('Timezone from /conf/_advanced.php'), empty( $date_default_timezone ) ? '-' : $date_default_timezone, '($date_default_timezone)' );
+$Form->info( T_('Effective timezone'), date_default_timezone_get() );
+$Form->info( T_('Current server time'), date_i18n( locale_timefmt(), $servertimenow ), date_default_timezone_get() );
+$Form->text_input( 'newtime_difference', $td_value, 8 /* hh:mm:ss */, T_('Time difference to apply'), '['. T_('in hours, e.g. "1", "1:30" or "-1.5"'). '] '.T_('If you\'re not on the timezone of your server.').' <a href="#" onclick="calc_TimeDifference(); return false;">'.T_('Calculate time difference').'</a>', array( 'maxlength'=> 8, 'required'=>true ) );
+$Form->info( T_('Local / corrected time'), date_i18n( locale_timefmt(), $localtimenow ) );
 
 $Form->end_fieldset();
 

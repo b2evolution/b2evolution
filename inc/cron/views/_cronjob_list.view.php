@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -206,11 +206,11 @@ function filter_crontab( & $Form )
 	$Form->text( 's', get_param( 's' ), 20, T_('Search'), '', 255 );
 
 	// Date/time filters:
-	$Form->date_input( 'datestartinput', $datestart, T_('Start Date') );
+	$Form->date_input( 'datestartinput', $datestart, T_('Start Date'), array( 'add_date_format_note' => true )  );
 	echo T_('at').' &nbsp;';
 	$Form->time_input( 'timestart', '           '.$timestart, '' );
 
-	$Form->date_input( 'datestopinput', $datestop, T_('End Date') );
+	$Form->date_input( 'datestopinput', $datestop, T_('End Date'), array( 'add_date_format_note' => true )  );
 	echo T_('at').' &nbsp;';
 	$Form->time_input( 'timestop', '           '.$timestop, '' );
 }

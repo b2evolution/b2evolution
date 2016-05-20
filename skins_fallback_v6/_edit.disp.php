@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -60,8 +60,14 @@ $Form = new Form( $form_action, 'item_checkchanges', 'post' );
 
 $Form->switch_template_parts( $params['edit_form_params'] );
 
-// ================================ START OF EDIT FORM ================================
+// =================================== INSTRUCTION ====================================
+$ItemType = & $edited_Item->get_ItemType();
+if( $ItemType && ( $ItemType->get( 'front_instruction' ) == 1 ) && $ItemType->get( 'instruction' ) )
+{
+	echo '<div class="alert alert-info fade in">'.$ItemType->get( 'instruction' ).'</div>';
+}
 
+// ================================ START OF EDIT FORM ================================
 $form_params = array();
 $iframe_name = NULL;
 if( !empty( $bozo_start_modified ) )
@@ -114,7 +120,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'metadesc', $edited_Item->get_setting( 'metadesc' ) );
 		$Form->hidden( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ) );
 
-		if( $Blog->get_setting( 'use_workflow' ) )
+		if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 		{	// We want to use workflow properties for this blog:
 			$Form->hidden( 'item_priority', $edited_Item->priority );
 			$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
@@ -202,7 +208,6 @@ $Form->begin_form( 'inskin', '', $form_params );
 		echo '<div class="edit_toolbars">';
 		// CALL PLUGINS NOW:
 		$Plugins->trigger_event( 'AdminDisplayToolbar', array(
-				'target_type' => 'Item',
 				'edit_layout' => 'expert',
 				'Item' => $edited_Item,
 			) );
@@ -252,7 +257,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 			);
 	}
 	else
-	{ // Don't use two columns layout 
+	{ // Don't use two columns layout
 		$two_columns_layout = array(
 				'before'       => '',
 				'column_start' => '',
@@ -311,19 +316,23 @@ else
 	{
 		$Form->begin_fieldset( T_('Additional fields') );
 
-		foreach( $custom_fields as $field )
-		{ // Display each custom field
-			if( $field['type'] == 'varchar' )
+		foreach( $custom_fields as $custom_field )
+		{	// Display each custom field:
+			switch( $custom_field['type'] )
 			{
-				$field_note = '';
-				$field_params = array( 'maxlength' => 255, 'style' => 'width:100%' );
+				case 'double':
+					$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_double_'.$custom_field['ID'] ), 10, $custom_field['label'], T_('can be decimal') );
+					break;
+				case 'varchar':
+					$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, $custom_field['label'], '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+					break;
+				case 'text':
+					$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_text_'.$custom_field['ID'] ), 5, $custom_field['label'] );
+					break;
+				case 'html':
+					$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_html_'.$custom_field['ID'] ), 5, $custom_field['label'], array( 'note' => T_('This field allows HTML code') ) );
+					break;
 			}
-			else
-			{	// type == double
-				$field_note = T_('can be decimal');
-				$field_params = array();
-			}
-			$Form->text_input( 'item_'.$field['type'].'_'.$field['ID'], $edited_Item->get_setting( 'custom_'.$field['type'].'_'.$field['ID'] ), 10, $field['label'], $field_note, $field_params );
 		}
 
 		$Form->end_fieldset();

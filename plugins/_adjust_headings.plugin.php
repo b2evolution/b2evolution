@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -44,6 +44,32 @@ class adjust_headings_plugin extends Plugin
 
 
 	/**
+	 * Define here default custom settings that are to be made available
+	 *     in the backoffice for collections, private messages and newsletters.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_custom_setting_definitions()}.
+	 */
+	function get_custom_setting_definitions( & $params )
+	{
+		return array(
+			'level' => array(
+					'label' => T_('Highest level heading'),
+					'type' => 'integer',
+					'size' => 1,
+					'maxlength' => 1,
+					'note' => T_('This plugin will adjust headings so they always start at the level you want: 1 for &lt;H1&gt;, 2 for &lt;H2&gt;, etc.'),
+					'defaultvalue' => 3,
+					'valid_range' => array(
+						'min' => 1, // from <h1>
+						'max' => 6, // to <h6>
+					),
+				),
+		);
+	}
+
+
+	/**
 	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
 	 * @param array Associative array of parameters.
@@ -56,22 +82,7 @@ class adjust_headings_plugin extends Plugin
 				'default_post_rendering' => 'opt-out'
 			) );
 
-		return array_merge( parent::get_coll_setting_definitions( $default_params ),
-			array(
-				'level' => array(
-						'label' => T_('Highest level heading'),
-						'type' => 'integer',
-						'size' => 1,
-						'maxlength' => 1,
-						'note' => T_('This plugin will adjust headings so they always start at the level you want: 1 for &lt;H1&gt;, 2 for &lt;H2&gt;, etc.'),
-						'defaultvalue' => 3,
-						'valid_range' => array(
-							'min' => 1, // from <h1>
-							'max' => 6, // to <h6>
-						),
-					),
-			)
-		);
+		return parent::get_coll_setting_definitions( $default_params );
 	}
 
 
@@ -102,6 +113,48 @@ class adjust_headings_plugin extends Plugin
 		// Get setting level of current blog:
 		$item_Blog = & $Item->get_Blog();
 		$this->setting_level = $this->get_coll_setting( 'level', $item_Blog );
+
+		// Adjust headings:
+		$content = $this->do_adjust_headings( $content );
+
+		return true;
+	}
+
+
+	/**
+	 * Perform rendering of Message content
+	 *
+	 * NOTE: Use default coll settings of comments as messages settings
+	 *
+	 * @see Plugin::RenderMessageAsHtml()
+	 */
+	function RenderMessageAsHtml( & $params )
+	{
+		$content = & $params['data'];
+
+		// Get setting level for messages:
+		$this->setting_level = $this->get_msg_setting( 'level' );
+
+		// Adjust headings:
+		$content = $this->do_adjust_headings( $content );
+
+		return true;
+	}
+
+
+	/**
+	 * Perform rendering of Email content
+	 *
+	 * NOTE: Use default coll settings of comments as messages settings
+	 *
+	 * @see Plugin::RenderEmailAsHtml()
+	 */
+	function RenderEmailAsHtml( & $params )
+	{
+		$content = & $params['data'];
+
+		// Get setting level for emails:
+		$this->setting_level = $this->get_email_setting( 'level' );
 
 		// Adjust headings:
 		$content = $this->do_adjust_headings( $content );

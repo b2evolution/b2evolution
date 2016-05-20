@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -55,7 +55,7 @@ function phpbb_init_config()
 	}
 	else
 	{	// Default config values
-		global $db_config, $test_install_all_features;
+		global $db_config, $allow_install_test_features;
 		$phpbb_db_config = array(
 				'host'     => $db_config['host'],
 				'name'     => '',
@@ -64,7 +64,7 @@ function phpbb_init_config()
 				'prefix'   => 'phpbb_',
 			);
 
-		if( $test_install_all_features )
+		if( $allow_install_test_features )
 		{	// Set maximum default values in test mode
 			$phpbb_db_config['password'] = $db_config['password'];
 			phpbb_set_var( 'blog_ID', '5' ); // Forums

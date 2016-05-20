@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2003 by Nobuo SAKIYAMA - {@link http://www.sakichan.org/}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
@@ -63,7 +63,7 @@ class XHTML_Validator
 	 * @param string Input encoding to use ('ISO-8859-1', 'UTF-8', 'US-ASCII' or '' for auto-detect)
 	 * @param string Message type for errors
 	 */
-	function XHTML_Validator( $context = 'posting', $allow_css_tweaks = false, $allow_iframes = false, $allow_javascript = false, $allow_objects = false, $encoding = NULL, $msg_type = 'error' )
+	function __construct( $context = 'posting', $allow_css_tweaks = false, $allow_iframes = false, $allow_javascript = false, $allow_objects = false, $encoding = NULL, $msg_type = 'error' )
 	{
 		global $inc_path;
 
@@ -85,6 +85,8 @@ class XHTML_Validator
 				break;
 
 			case 'head_extension':
+			case 'body_extension':
+			case 'footer_extension':
 				$this->tags = array(
 					'body' => 'meta link style script',
 					'meta' => '',
@@ -93,10 +95,10 @@ class XHTML_Validator
 					'script' => '#PCDATA'
 				);
 				$this->tagattrs = array(
-					'meta' => 'name content charset http-equiv',
-					'link' => 'charset href hreflang media rel sizes type',
-					'style' => 'media scoped type',
-					'script' => 'async charset defer src type'
+					'meta' => 'name content charset http-equiv data-*',
+					'link' => 'charset href hreflang media rel sizes type data-*',
+					'style' => 'media scoped type data-*',
+					'script' => 'async charset defer src type data-*'
 				);
 				break;
 
@@ -271,7 +273,12 @@ class XHTML_Validator
 		// Are tag attributes valid?
 		foreach( $attrs as $attr => $value )
 		{
-			if (!isset($this->tagattrs[$tag]) || !in_array($attr, explode(' ', $this->tagattrs[$tag])))
+			if( in_array( 'data-*', explode(' ', $this->tagattrs[$tag]) ) && preg_match( '/^data-/i', $attr ) )
+			{
+				$attr = 'data-*';
+			}
+			
+			if (!isset($this->tagattrs[$tag]) || !in_array($attr, explode(' ', $this->tagattrs[$tag])) )
 			{
 				$this->html_error( sprintf( T_('Tag &lt;%s&gt; may not have attribute %s="..."'), '<code>'.$tag.'</code>', '<code>'.$attr.'</code>' ) );
 			}

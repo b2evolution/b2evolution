@@ -1,6 +1,8 @@
-# b2evolution CCMS
+![b2evolution CMS](media/shared/global/logos/b2evolution_1016x208_wbg.png)
 
-This is WORK IN PROGRESS on version **6.7.0-stable**.
+# b2evolution CMS
+
+This is b2evolution CMS version **6.7.3-stable**.
 
 ## A complete engine for your website !
 
@@ -52,7 +54,5 @@ The installation script will detect that the b2evolution database is already ins
 There are [several other upgrade options](http://b2evolution.net/man/upgrading).
 
 ## GitHub
-
-This version of b2evolution comes from the "i7" (currently "master") branch on GitHub.
 
 All bug fixes and all new code are made available through GitHub before being packaged as releases. If you are interested in cutting-edge versions, we recommend you [follow us on GitHub](https://github.com/b2evolution/b2evolution).

@@ -13,7 +13,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -56,7 +56,7 @@ $params = array_merge( array(
 		'comment_error_end'    => '</div>',
 		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
 		'comment_image_size'   => 'fit-400x320',
-		'author_link_text'     => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+		'author_link_text'     => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 		'link_to'              => 'userurl>userpage',		    // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'form_title_start'     => '<h3>',
 		'form_title_end'       => '</h3>',

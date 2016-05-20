@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -64,6 +64,7 @@ function get_system_stats()
 	$system_stats['php_xml'] = extension_loaded('xml');
 	$system_stats['php_imap'] = extension_loaded('imap');
 	$system_stats['php_opcode_cache'] = get_active_opcode_cache();
+	$system_stats['php_user_cache'] = get_active_user_cache();
 
 	// GD:
 	$system_stats['gd_version'] = system_check_gd_version();
@@ -219,6 +220,19 @@ function system_get_blog_IDs( $only_cache_enabled )
 									AND cset_value = "1" )';
 	}
 	return $DB->get_col( $query );
+}
+
+
+/**
+ * Get user IDs
+ *
+ * @return array user IDs
+ */
+function system_get_user_IDs()
+{
+	global $DB;
+
+	return $DB->get_col( 'SELECT user_ID FROM T_users' );
 }
 
 

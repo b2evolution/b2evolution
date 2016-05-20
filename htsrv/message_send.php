@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package htsrv
@@ -82,8 +82,11 @@ if( empty( $message ) )
 { // message should not be empty!
 	$Messages->add( T_('Please do not send empty messages.'), 'error' );
 }
-elseif( $antispam_on_message_form && antispam_check( $message ) )
-{ // a blacklisted keyword ha sbeen found in the message:
+elseif( $antispam_on_message_form && ( $block = antispam_check( $message ) ) )
+{ // a blacklisted keyword has been found in the message:
+	// Log incident in system log
+	syslog_insert( sprintf( T_('Antispam: Supplied message is invalid / appears to be spam. Message contains blacklisted word "%s".'), $block ), 'error' );
+
 	$Messages->add( T_('The supplied message is invalid / appears to be spam.'), 'error' );
 }
 
@@ -149,8 +152,11 @@ if( empty($sender_address) )
 {
 	$Messages->add( T_('Please fill in your email.'), 'error' );
 }
-elseif( !is_email($sender_address) || antispam_check( $sender_address ) ) // TODO: dh> using antispam_check() here might not allow valid users to contact the admin in case of problems due to the antispam list itself.. :/
+elseif( !is_email($sender_address) || ( $block = antispam_check( $sender_address ) ) ) // TODO: dh> using antispam_check() here might not allow valid users to contact the admin in case of problems due to the antispam list itself.. :/
 {
+	// Log incident in system log
+	syslog_insert( sprintf( T_('Antispam: Supplied email address "%s" contains blacklisted word "%s".'), $sender_address, $block ), 'error' );
+
 	$Messages->add( T_('Supplied email address is invalid.'), 'error' );
 }
 

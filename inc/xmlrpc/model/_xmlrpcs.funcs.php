@@ -175,7 +175,7 @@ function _wp_mw_newmediaobject($m)
 		if( $error = validate_dirname($filepath_part) )
 		{	// invalid relative path:
 			logIO( $error );
-			syslog_insert( sprintf( 'Invalid name is detected for folder %s', '<b>'.$filepath_part.'</b>' ), 'warning', 'file' );
+			syslog_insert( sprintf( 'Invalid name is detected for folder %s', '[['.$filepath_part.']]' ), 'warning', 'file' );
 			return xmlrpcs_resperror( 6, $error );
 		}
 
@@ -1057,14 +1057,18 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 			}
 		}
 
-		if( !empty($author) && antispam_check( $author ) )
+		if( !empty($author) && ( $block = antispam_check( $author ) ) )
 		{
+			// Log incident in system log
+			syslog_insert( sprintf( T_('Antispam: Supplied name "%s" contains blacklisted word "%s".'), $author, $block ), 'error', 'comment', $commented_Item->ID );
 			return xmlrpcs_resperror( 5, T_('Supplied name is invalid.') );
 		}
 
 		if( !empty($email)
-			&& ( !is_email($email)|| antispam_check( $email ) ) )
+			&& ( !is_email($email)|| ( $block = antispam_check( $email ) ) ) )
 		{
+			// Log incident in system log
+			syslog_insert( sprintf( T_('Antispam: Supplied email address "%s" contains blacklisted word "%s".'), $email, $block ), 'error', 'comment', $commented_Item->ID );
 			return xmlrpcs_resperror( 5, T_('Supplied email address is invalid.') );
 		}
 
@@ -1204,7 +1208,7 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 		// Moderators will get emails about every new comment
 		// Subscribed user will only get emails about new published comments
 		$executed_by_userid = empty( $User ) ? NULL : $User->ID;
-		$Comment->handle_notifications( true, $executed_by_userid );
+		$Comment->handle_notifications( $executed_by_userid, true );
 	}
 	else
 	{
@@ -1281,7 +1285,7 @@ function xmlrpcs_edit_comment( $params = array(), & $edited_Comment )
 
 	// Execute or schedule notifications & pings:
 	logIO( 'Handling notifications...' );
-	$edited_Comment->handle_notifications( false, $current_User->ID );
+	$edited_Comment->handle_notifications();
 
 	logIO( 'OK.' );
 	return new xmlrpcresp( new xmlrpcval( true, 'boolean' ) );
@@ -1456,7 +1460,7 @@ function xmlrpcs_new_item( $params, & $Blog = NULL )
 
 	// Execute or schedule notifications & pings:
 	logIO( 'Handling notifications...' );
-	$edited_Item->handle_post_processing( true );
+	$edited_Item->handle_notifications( NULL, true );
 
  	logIO( 'OK.' );
 	return new xmlrpcresp(new xmlrpcval($edited_Item->ID));
@@ -1653,7 +1657,7 @@ function xmlrpcs_edit_item( & $edited_Item, $params )
 
 	// Execute or schedule notifications & pings:
 	logIO( 'Handling notifications...' );
-	$edited_Item->handle_post_processing( false );
+	$edited_Item->handle_notifications();
 
 	logIO( 'OK.' );
 	return new xmlrpcresp( new xmlrpcval( 1, 'boolean' ) );
@@ -1777,6 +1781,7 @@ function xmlrpc_get_items( $params, & $Blog )
 			'limit' => 0,
 			'item_ID' => 0,
 			'types' => '', // all post types
+			'itemtype_usage' => '', // all post types
 		), $params);
 
 	// Protected and private get checked by statuses_where_clause().
@@ -1792,9 +1797,10 @@ function xmlrpc_get_items( $params, & $Blog )
 		logIO('Getting item #'.$params['item_ID']);
 
 		$filters = array(
-				'visibility_array'	=> $statuses,
-				'types'				=> NULL,
-				'post_ID'			=> $params['item_ID'],
+				'visibility_array' => $statuses,
+				'types'            => NULL,
+				'itemtype_usage'   => NULL,
+				'post_ID'          => $params['item_ID'],
 			);
 	}
 	else
@@ -1802,10 +1808,11 @@ function xmlrpc_get_items( $params, & $Blog )
 		logIO( sprintf('Trying to get latest items (%s)', ($params['limit'] ? $params['limit'] : 'all')) );
 
 		$filters = array(
-				'visibility_array'	=> $statuses,
-				'types'				=> $params['types'],
-				'order'				=> 'DESC',
-				'unit'				=> 'posts',
+				'visibility_array' => $statuses,
+				'types'            => $params['types'],
+				'itemtype_usage'   => $params['itemtype_usage'],
+				'order'            => 'DESC',
+				'unit'             => 'posts',
 			);
 	}
 

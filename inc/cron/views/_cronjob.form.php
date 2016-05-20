@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -37,6 +37,7 @@ $Form->begin_form( 'fform', $creating ? T_('New scheduled job') : T_('Edit sched
 			// Exclude these cron jobs from manual creating
 			unset( $cron_jobs_names['send-post-notifications'] );
 			unset( $cron_jobs_names['send-comment-notifications'] );
+			unset( $cron_jobs_names['send-email-campaign'] );
 			$Form->select_input_array( 'cjob_type', get_param( 'cjob_type' ), $cron_jobs_names, T_('Job type') );
 		}
 		else

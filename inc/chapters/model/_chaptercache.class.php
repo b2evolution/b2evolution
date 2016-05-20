@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  *
@@ -69,9 +69,9 @@ class ChapterCache extends DataObjectCache
 	/**
 	 * Constructor
 	 */
-	function ChapterCache()
+	function __construct()
 	{
-		parent::DataObjectCache( 'Chapter', false, 'T_categories', 'cat_', 'cat_ID', 'cat_name' );
+		parent::__construct( 'Chapter', false, 'T_categories', 'cat_', 'cat_ID', 'cat_name' );
 
 		// This is the property by which we will filter out subsets, for exampel 'blog_ID' if we want to only load a specific collection:
 		$this->subset_property = 'blog_ID';
@@ -81,7 +81,7 @@ class ChapterCache extends DataObjectCache
 	/**
 	 * Empty/reset the cache
 	 */
-	function clear()
+	function clear( $keep_shadow = false )
 	{
 		$this->subset_cache = array();
 		$this->loaded_subsets = array();
@@ -91,7 +91,7 @@ class ChapterCache extends DataObjectCache
 		$this->revealed_subsets = array();
 		$this->sorted_flags = array();
 		$this->urlname_index = array();
-		parent::clear();
+		parent::clear( $keep_shadow );
 	}
 
 

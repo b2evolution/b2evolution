@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package htsrv
@@ -192,7 +192,7 @@ if( $Comment->ID == 0 )
 // asimo> this handles moderators and general users as well and use "outbound_notifications_mode" in case of general users
 // Moderators will get emails about every new trackback
 // Subscribed user will only get emails about new published trackback
-$Comment->handle_notifications( true );
+$Comment->handle_notifications( NULL, true );
 
 
 // Trigger event: a Plugin should cleanup any temporary data here..

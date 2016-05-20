@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -267,6 +267,9 @@ class sessions_Module extends Module
 										'browser' => array(
 											'text' => T_('Browser hits'),
 											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=browser&amp;blog='.$blog ),
+										'api' => array(
+											'text' => T_('API hits'),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=api&amp;blog='.$blog ),
 										'robot' => array(
 											'text' => T_('Robot hits'),
 											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=robot&amp;blog='.$blog ),

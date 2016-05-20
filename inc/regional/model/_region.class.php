@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -31,10 +31,10 @@ class Region extends DataObject
 	 *
 	 * @param object database row
 	 */
-	function Region( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_regional__region', 'rgn_', 'rgn_ID' );
+		parent::__construct( 'T_regional__region', 'rgn_', 'rgn_ID' );
 
 		if( $db_row )
 		{
@@ -125,14 +125,18 @@ class Region extends DataObject
 	/**
 	 * Check existence of specified region code in rgn_code unique field.
 	 *
+	 * @param string Name of unique field  OR array of Names (for UNIQUE index with MULTIPLE fields)
+	 * @param mixed specified value        OR array of Values (for UNIQUE index with MULTIPLE fields)
 	 * @return int ID if country + region code exist otherwise NULL/false
 	 */
-	function dbexists()
+	function dbexists( $unique_fields = array( 'rgn_ctry_ID', 'rgn_code' ), $values = NULL )
 	{
-		return parent::dbexists(
-				array( 'rgn_ctry_ID', 'rgn_code' ),
-				array( $this->ctry_ID, $this->code )
-			);
+		if( is_null( $values ) )
+		{
+			$values = array( $this->ctry_ID, $this->code );
+		}
+
+		return parent::dbexists( $unique_fields, $values );
 	}
 }
 

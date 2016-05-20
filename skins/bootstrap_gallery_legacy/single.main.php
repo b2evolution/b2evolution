@@ -11,10 +11,12 @@
  * @subpackage bootstrap_gallery_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
-if( version_compare( $app_version, '6.4' ) < 0 )
+
+if( evo_version_compare( $app_version, '6.4' ) < 0 )
 { // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.
 	die( 'This skin is designed for b2evolution 6.4 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
+
 global $Skin;
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
@@ -61,7 +63,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		<?php
 			skin_widget( array(
 				// CODE for the widget:
-				'widget' => 'member_count',
+				'widget' => 'coll_member_count',
 				// Optional display params
 				'before' => '(',
 				'after'  => ')',
@@ -231,7 +233,6 @@ siteskin_include( '_site_body_header.inc.php' );
 			<div class="evo_container evo_container__item_single">
 				<?php
 				// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-				// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 				// Display container contents:
 				skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 					'widget_context' => 'item',	// Signal that we are displaying within an Item
@@ -243,7 +244,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'block_title_start' => '<h3>',
 					'block_title_end' => '</h3>',
 					// Params for skin file "_item_content.inc.php"
-					'widget_coll_item_content_params' => array(
+					'widget_item_content_params' => array(
 							'feature_block'          => false,
 							'item_class'             => 'evo_post',
 							'item_type_class'        => 'evo_post__ptyp_',
@@ -263,8 +264,20 @@ siteskin_include( '_site_body_header.inc.php' );
 					skin_include( '_item_feedback.inc.php', array(
 							'before_section_title' => '<h4>',
 							'after_section_title'  => '</h4>',
-							'author_link_text'     => 'preferredname',
+							'author_link_text'     => 'auto',
 							'comment_image_size'   => 'fit-256x256',
+							// Pagination:
+							'pagination' => array(
+								'block_start'           => '<div class="center"><ul class="pagination">',
+								'block_end'             => '</ul></div>',
+								'page_current_template' => '<span>$page_num$</span>',
+								'page_item_before'      => '<li>',
+								'page_item_after'       => '</li>',
+								'page_item_current_before' => '<li class="active">',
+								'page_item_current_after'  => '</li>',
+								'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
+								'next_text'             => '<i class="fa fa-angle-double-right"></i>',
+							),
 						) );
 					// Note: You can customize the default item feedback by copying the generic
 					// /skins/_item_feedback.inc.php file into the current skin folder.
@@ -272,18 +285,24 @@ siteskin_include( '_site_body_header.inc.php' );
 				?>
 
 				<?php
+				if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+				{	// We are running at least b2evo 6.7, so we can include this file:
 					// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
 					skin_include( '_item_workflow.inc.php' );
 					// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
+				}
 				?>
 
 				<?php
+				if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+				{	// We are running at least b2evo 6.7, so we can include this file:
 					// ------------------ META COMMENTS INCLUDED HERE ------------------
 					skin_include( '_item_meta_comments.inc.php', array(
 							'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
 							'comment_end'           => '</article>',
 						) );
 					// ---------------------- END OF META COMMENTS ---------------------
+				}
 				?>
 			</div>
 

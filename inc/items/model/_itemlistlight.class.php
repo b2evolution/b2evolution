@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -84,7 +84,7 @@ class ItemListLight extends DataObjectList2
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
 	 * @param array restrictions for itemlist (position, contact, firm, ...) key: restriction name, value: ID of the restriction
 	 */
-	function ItemListLight(
+	function __construct(
 			& $Blog,
 			$timestamp_min = NULL,       // Do not show posts before this timestamp
 			$timestamp_max = NULL,   		 // Do not show posts after this timestamp
@@ -94,10 +94,10 @@ class ItemListLight extends DataObjectList2
 			$filterset_name = ''				// Name to be used when saving the filterset (leave empty to use default for collection)
 		)
 	{
-		global $Settings, $posttypes_specialtypes;
+		global $Settings;
 
 		// Call parent constructor:
-		parent::DataObjectList2( get_Cache($cache_name), $limit, $param_prefix, NULL );
+		parent::__construct( get_Cache($cache_name), $limit, $param_prefix, NULL );
 
 		// asimo> The ItemQuery init was moved into the query_init() method
 		// The SQL Query object:
@@ -145,7 +145,8 @@ class ItemListLight extends DataObjectList2
 				'ymdhms_min' => NULL,
 				'ymdhms_max' => NULL,
 				'statuses' => NULL,
-				'types' => '-'.implode(',',$posttypes_specialtypes),	// Keep content post types, Exclide pages, intros, sidebar links and ads
+				'types' => NULL, // Filter by item type IDs (separated by comma)
+				'itemtype_usage' => 'post', // Filter by item type usage (separated by comma): post, page, intro-front, intro-main, intro-cat, intro-tag, intro-sub, intro-all, special
 				'visibility_array' => get_inskin_statuses( is_null( $this->Blog ) ? NULL : $this->Blog->ID, 'post' ),
 				'orderby' => !is_null( $this->Blog ) ? $this->Blog->get_setting('orderby') : 'datestart',
 				'order' => !is_null( $this->Blog ) ? $this->Blog->get_setting('orderdir') : 'DESC',
@@ -270,6 +271,11 @@ class ItemListLight extends DataObjectList2
 			 * Restrict to selected post type:
 			 */
 			memorize_param( $this->param_prefix.'types', 'integer', $this->default_filters['types'], $this->filters['types'] );  // List of post types to restrict to
+
+			/*
+			 * Restrict to selected post type usage:
+			 */
+			memorize_param( $this->param_prefix.'itemtype_usage', 'string', $this->default_filters['itemtype_usage'], $this->filters['itemtype_usage'] );  // List of post types usage to restrict to
 
 			/*
 			 * Restrict by keywords
@@ -430,6 +436,10 @@ class ItemListLight extends DataObjectList2
 		 */
 		$this->filters['types'] = param( $this->param_prefix.'types', '/^(-|-[0-9]+|[0-9]+)(,[0-9]+)*$/', $this->default_filters['types'], true );      // List of types to restrict to
 
+		/*
+		 * Restrict to selected types usage:
+		 */
+		$this->filters['itemtype_usage'] = param( $this->param_prefix.'itemtype_usage', 'string', $this->default_filters['itemtype_usage'], true ); // List of types usage to restrict to
 
 		/*
 		 * Restrict by keywords
@@ -583,6 +593,7 @@ class ItemListLight extends DataObjectList2
 		$this->ItemQuery->where_locale( $this->filters['lc'] );
 		$this->ItemQuery->where_statuses( $this->filters['statuses'] );
 		$this->ItemQuery->where_types( $this->filters['types'] );
+		$this->ItemQuery->where_itemtype_usage( $this->filters['itemtype_usage'] );
 		$this->ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'], $this->filters['keyword_scope'] );
 		$this->ItemQuery->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
 		$this->ItemQuery->where_ID_list( $this->filters['post_ID_list'] );
@@ -739,13 +750,31 @@ class ItemListLight extends DataObjectList2
 	}
 
 
-  /**
+	/**
+	 * Run Query: GET DATA ROWS *** LIGHT ***
+	 *
+	 * Contrary to ItemList2, we only do 1 query here and we extract only a few selected params.
+	 * Basically all we want is being able to generate permalinks.
+	 * 
+	 * We need this query() stub in order to call it from restart() and still
+	 * let derivative classes override it
+	 * 
+	 * @deprecated Use new function run_query()
+	 */
+	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
+	{
+		$this->run_query( $create_default_cols_if_needed, $append_limit, $append_order_by );
+	}
+
+
+	/**
 	 * Run Query: GET DATA ROWS *** LIGHT ***
 	 *
 	 * Contrary to ItemList2, we only do 1 query here and we extract only a few selected params.
 	 * Basically all we want is being able to generate permalinks.
 	 */
-	function query()
+	function run_query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true,
+											$query_title = 'Results::run_query()' )
 	{
 		global $DB;
 
@@ -774,7 +803,7 @@ class ItemListLight extends DataObjectList2
 
 		// echo DB::format_query( $this->sql );
 
-		parent::query( false, false, false, 'ItemListLight::query()' );
+		parent::run_query( false, false, false, 'ItemListLight::query()' );
 	}
 
 
@@ -814,6 +843,7 @@ class ItemListLight extends DataObjectList2
 		$lastpost_ItemQuery->where_locale( $this->filters['lc'] );
 		$lastpost_ItemQuery->where_statuses( $this->filters['statuses'] );
 		$lastpost_ItemQuery->where_types( $this->filters['types'] );
+		$lastpost_ItemQuery->where_itemtype_usage( $this->filters['itemtype_usage'] );
 		$lastpost_ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'], $this->filters['keyword_scope'] );
 		$lastpost_ItemQuery->where_ID( $this->filters['post_ID'], $this->filters['post_title'] );
 		$lastpost_ItemQuery->where_datestart( $this->filters['ymdhms'], $this->filters['week'],
@@ -1683,7 +1713,7 @@ class ItemListLight extends DataObjectList2
 	 */
 	function date_if_changed( $params = array() )
 	{
-		if( $this->current_Obj->ityp_ID == 1000 )
+		if( $this->current_Obj->get_type_setting( 'usage' ) == 'page' )
 		{	// This is not applicable to pages
 			return;
 		}

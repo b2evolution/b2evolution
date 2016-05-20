@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author waltercruz
  *
@@ -220,7 +220,7 @@ function wp_getpagelist( $m )
 			'visibility_array' => $statuses,
 			'order' => 'DESC',
 			'unit' => 'posts',
-			'types' => '1000',
+			'itemtype_usage' => 'page',
 		) );
 
 	// Run the query:
@@ -289,7 +289,7 @@ function wp_getpages( $m )
 
 	$items = xmlrpc_get_items( array(
 			'limit' => $limit,
-			'types' => '1000',
+			'itemtype_usage' => 'page',
 		), $Blog );
 
 	if( empty($items) )
@@ -473,28 +473,24 @@ function wp_getpostformats( $m )
 		$contentstruct = xmlrpc_decode_recurse($xcontent);
 	}
 
-	global $posttypes_reserved_IDs, $posttypes_perms;
-
 	// Compile an array of post type IDs to exclude:
-	$exclude_posttype_IDs = $posttypes_reserved_IDs;
+	$exclude_posttype_IDs = array();
 
-	foreach( $posttypes_perms as $l_permname => $l_posttype_IDs )
+	// Get all item types with no "post" usage:
+	$nopost_item_type_IDs = $DB->get_assoc( 'SELECT ityp_ID, ityp_usage FROM T_items__type WHERE ityp_usage != "post"' );
+
+	foreach( $nopost_item_type_IDs as $ityp_ID => $ityp_usage )
 	{
-		if( ! $current_User->check_perm( 'blog_'.$l_permname, 'edit', false, $Blog->ID ) )
-		{	// No permission to use this post type(s):
-			$exclude_posttype_IDs = array_merge( $exclude_posttype_IDs, $l_posttype_IDs );
+		if( ! $current_User->check_perm( 'blog_'.$ityp_usage, 'edit', false, $Blog->ID ) )
+		{	// No permission to use this post type:
+			$exclude_posttype_IDs[] = $ityp_ID;
 		}
 	}
 
-	$saved_global = $posttypes_reserved_IDs; // save
-	$posttypes_reserved_IDs = $exclude_posttype_IDs;
-
 	$ItemTypeCache = & get_ItemTypeCache();
 
-	$supported = $ItemTypeCache->get_option_array();
+	$supported = $ItemTypeCache->get_option_array( $exclude_posttype_IDs );
 	ksort($supported);
-
-	$posttypes_reserved_IDs = $saved_global; // restore
 
 	$all = $ItemTypeCache->get_option_array();
 	ksort($all);

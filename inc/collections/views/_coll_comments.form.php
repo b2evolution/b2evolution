@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  *
@@ -90,17 +90,16 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedback-options') );
 
-	$advanced_perms_warning = $edited_Blog->get_advanced_perms_warning();
 	$Form->radio( 'allow_comments', $edited_Blog->get_setting( 'allow_comments' ),
 						array(  array( 'any', T_('Any user'), T_('Including anonymous users'),
-										$advanced_perms_warning, 'onclick="show_hide_feedback_details(this);"'),
+										'', 'onclick="show_hide_feedback_details(this);"'),
 								array( 'registered', T_('Registered users only'),  '',
 										'', 'onclick="show_hide_feedback_details(this);"'),
 								array( 'member', T_('Members only'),  T_( 'Users have to be members of this blog' ),
 										'', 'onclick="show_hide_feedback_details(this);"'),
 								array( 'never', T_('Not allowed'), '',
 										'', 'onclick="show_hide_feedback_details(this);"'),
-					), T_('Comment posting by'), true );
+					), T_('Comment posting by'), true, $edited_Blog->get_advanced_perms_warning() );
 
 	echo '<div class="feedback_details_container">';
 
@@ -169,6 +168,10 @@ $Form->end_fieldset();
 modules_call_method( 'display_collection_comments', array( 'Form' => & $Form, 'edited_Blog' => & $edited_Blog ) );
 
 $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moderation') );
+
+	// Get max allowed visibility status:
+	$max_allowed_status = get_highest_publish_status( 'comment', $edited_Blog->ID, false );
+
 	$is_bootstrap_skin = ( isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' );
 	$newstatus_warning_attrs = ' id="newstatus_warning" style="display:'.( $edited_Blog->get_setting('new_feedback_status') == 'published' ? 'inline' : 'none' ).'"';
 	$newstatus_warning = str_replace( '$attrs$', $newstatus_warning_attrs, $spammers_warning );
@@ -184,6 +187,19 @@ $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moder
 			unset( $status_options['published'] );
 		}
 	}
+	// Set this flag to false in order to find first allowed status below:
+	$status_is_allowed = false;
+	foreach( $status_options as $status_key => $status_option )
+	{
+		if( $status_key == $max_allowed_status )
+		{	// This is first allowed status, then all next statuses are also allowed:
+			$status_is_allowed = true;
+		}
+		if( ! $status_is_allowed && $edited_Blog->get_setting( 'new_feedback_status' ) != $status_key )
+		{	// Don't allow to select this status because it is not allowed by collection restriction:
+			unset( $status_options[ $status_key ] );
+		}
+	}
 	// put this on feedback details container, this way it won't be displayed if comment posting is not allowed
 	echo '<div class="feedback_details_container">';
 	
@@ -194,30 +210,49 @@ $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moder
 				'value'   => $edited_Blog->get_setting('new_feedback_status'),
 				'options' => $status_options,
 			) );
-		$Form->info( T_('New feedback status'), $new_status_field, $newstatus_warning.T_('Logged in users will get the highest possible status allowed by their permissions. Plugins may also override this default.') );
+		$Form->info( T_('Status for new Anonymous comments'), $new_status_field, $newstatus_warning.T_('Logged in users will get the highest possible status allowed by their permissions. Plugins may also override this default.') );
 		$Form->hidden( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status') );
 		echo_form_dropdown_js();
 	}
 	else
 	{	// Use standard select element for other skins:
 		$Form->select_input_array( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status'), $status_options,
-				T_('New feedback status'), $newstatus_warning.T_('Logged in users will get the highest possible status allowed by their permissions. Plugins may also override this default.') );
+				T_('Status for new Anonymous comments'), $newstatus_warning.T_('Logged in users will get the highest possible status allowed by their permissions. Plugins may also override this default.') );
 	}
 	echo '</div>';
 
-	// Moderation statuses setting
-	$not_moderation_statuses = array_diff( get_visibility_statuses( 'keys', NULL ), get_visibility_statuses( 'moderation' ) );
-	// Get moderation statuses with status text
+	// Moderation statuses setting:
+	$all_statuses = get_visibility_statuses( 'keys', NULL );
+	$not_moderation_statuses = array_diff( $all_statuses, get_visibility_statuses( 'moderation' ) );
+	// Get moderation statuses with status text:
 	$moderation_statuses = get_visibility_statuses( '', $not_moderation_statuses );
 	$moderation_status_icons = get_visibility_statuses( 'icons', $not_moderation_statuses );
 	$blog_moderation_statuses = $edited_Blog->get_setting( 'moderation_statuses' );
 	$checklist_options = array();
-	foreach( $moderation_statuses as $status => $status_text )
-	{ // Add a checklist option for each possible modeartion status
-		$is_checked = ( strpos( $blog_moderation_statuses, $status) !== false );
-		$checklist_options[] = array( 'notif_'.$status, 1, $moderation_status_icons[ $status ].' '.$status_text, $is_checked );
+	// Set this flag to false in order to find first allowed status below:
+	$status_is_hidden = true;
+	foreach( $all_statuses as $status )
+	{	// Add a checklist option for each possible moderation status:
+		if( $status == $max_allowed_status )
+		{	// This is first allowed status, then all next statuses are also allowed:
+			$status_is_hidden = false;
+		}
+		if( ! isset( $moderation_statuses[ $status ] ) )
+		{	// Don't display a checkbox for non moderation status:
+			continue;
+		}
+		$checklist_options[] = array(
+				'notif_'.$status, // Field name of checkbox
+				1, // Field value
+				$moderation_status_icons[ $status ].' '.$moderation_statuses[ $status ], // Text
+				( strpos( $blog_moderation_statuses, $status ) !== false ), // Checked?
+				'', // Disabled?
+				'', // Note
+				'', // Class
+				$status_is_hidden, // Hidden field instead of checkbox?
+			);
 	}
-	$Form->checklist( $checklist_options, 'moderation_statuses', T_('Comment moderation reminder statuses'), false, false, array( 'note' => 'Comments with the selected statuses will be notified on the "Send reminders about comments awaiting moderation" scheduled job.' ) );
+	$Form->checklist( $checklist_options, 'moderation_statuses', T_('"Require moderation" statuses'), false, false, array( 'note' => T_('Comments with the selected statuses will be considered to require moderation. They will trigger "moderation required" notifications and will appear as such on the collection dashboard.') ) );
 
 	$Form->radio( 'comment_quick_moderation', $edited_Blog->get_setting( 'comment_quick_moderation' ),
 					array(  array( 'never', T_('Never') ),

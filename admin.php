@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the main dispatcher for the admin interface.
+ * This is the main dispatcher for the admin interface, a.k.a. The Back-Office.
  *
  * ---------------------------------------------------------------------------------------------------------------
  * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT YOU DID NOT LOAD THIS FILE THROUGH A PHP WEB SERVER. 
@@ -12,7 +12,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -132,29 +132,21 @@ if( ! $admin_skin || ! file_exists( sprintf( $admin_skin_path, $admin_skin ) ) )
 			$Debuglog->add( 'The default admin skin ['.$admin_skin.'] does not exist!', array('skin','error') );
 		}
 
-		if( file_exists(sprintf( $admin_skin_path, 'chicago' )) )
-		{ // 'legacy' does exist
-			$admin_skin = 'chicago';
+		// Get the first one available one:
+		$admin_skin_dirs = get_admin_skins();
 
-			$Debuglog->add( 'Falling back to legacy admin skin.', 'skins' );
+		if( $admin_skin_dirs === false )
+		{
+			$Debuglog->add( 'No admin skin found! Check that the path '.$adminskins_path.' exists.', array('skin','error') );
+		}
+		elseif( empty($admin_skin_dirs) )
+		{ // No admin skin directories found
+			$Debuglog->add( 'No admin skin found! Check that there are skins in '.$adminskins_path.'.', array('skin','error') );
 		}
 		else
-		{ // get the first one available one
-			$admin_skin_dirs = get_admin_skins();
-
-			if( $admin_skin_dirs === false )
-			{
-				$Debuglog->add( 'No admin skin found! Check that the path '.$adminskins_path.' exists.', array('skin','error') );
-			}
-			elseif( empty($admin_skin_dirs) )
-			{ // No admin skin directories found
-				$Debuglog->add( 'No admin skin found! Check that there are skins in '.$adminskins_path.'.', array('skin','error') );
-			}
-			else
-			{
-				$admin_skin = array_shift($admin_skin_dirs);
-				$Debuglog->add( 'Falling back to first available skin.', 'skins' );
-			}
+		{
+			$admin_skin = array_shift($admin_skin_dirs);
+			$Debuglog->add( 'Falling back to first available skin.', 'skins' );
 		}
 	}
 }

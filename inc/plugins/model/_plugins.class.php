@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -145,7 +145,7 @@ class Plugins
 	/**
 	 * Constructor. Sets {@link $plugins_path} and load events.
 	 */
-	function Plugins()
+	function __construct()
 	{
 		global $basepath, $plugins_subdir, $Timer;
 
@@ -690,12 +690,13 @@ class Plugins
 		$Timer->pause( $Plugin->classname.'_(#'.$Plugin->ID.')' );
 
 		if( $set_type == 'Settings' )
-		{ // If general settings are requested we should also append messages settings
+		{	// If general settings are requested we should also append messages and emails settings:
 			if( empty( $defaults ) )
 			{
 				$defaults = array();
 			}
 			$defaults = array_merge( $defaults, $Plugin->get_msg_setting_definitions( $params ) );
+			$defaults = array_merge( $defaults, $Plugin->get_email_setting_definitions( $params ) );
 		}
 
 		if( empty( $defaults ) )
@@ -740,7 +741,7 @@ class Plugins
 			{
 				$set_Obj->_defaults[$l_name] = $l_meta['defaultvalue'];
 			}
-			elseif( isset( $l_meta['type'] ) && $l_meta['type'] == 'array' )
+			elseif( isset( $l_meta['type'] ) && strpos( $l_meta['type'], 'array' ) === 0 )
 			{
 				$set_Obj->_defaults[$l_name] = array();
 			}
@@ -1427,7 +1428,7 @@ class Plugins
 		$this->index_code_ID = array();
 		$this->sorted_IDs = array();
 
-		foreach( $DB->get_results( $this->sql_load_plugins_table, ARRAY_A ) as $row )
+		foreach( $DB->get_results( $this->sql_load_plugins_table, ARRAY_A, 'Loading plugins table data' ) as $row )
 		{ // Loop through installed plugins:
 			$this->index_ID_rows[$row['plug_ID']] = $row; // remember the rows to instantiate the Plugin on request
 			if( ! empty( $row['plug_code'] ) )
@@ -1485,8 +1486,9 @@ class Plugins
 	 *
 	 * @param String setting name ( 'coll_apply_rendering', 'coll_apply_comment_rendering' )
 	 * @param Object the Blog which apply rendering setting should be loaded
+	 * @param string Setting type: 'coll', 'msg', 'email'
 	 */
-	function load_index_apply_rendering( $setting_name, & $Blog )
+	function load_index_apply_rendering( $setting_name, & $Blog, $type = 'coll' )
 	{
 		if( is_null( $Blog ) )
 		{ // Use general settings (e.g. for Messages)
@@ -1513,13 +1515,26 @@ class Plugins
 			{ // This plugin doesn't belong to the rendering plugins group
 				continue;
 			}
-			if( $blog_ID > 0 )
-			{ // get and set the specific plugin collection setting
-				$rendering_value = $Plugin->get_coll_setting( $setting_name, $Blog );
-			}
-			else
-			{ // get and set the specific plugin message setting
-				$rendering_value = $Plugin->get_msg_setting( $setting_name );
+			switch( $type )
+			{
+				case 'coll':
+					// Get plugin collection setting value:
+					$rendering_value = $Plugin->get_coll_setting( $setting_name, $Blog );
+					break;
+
+				case 'msg':
+					// Get plugin message setting value:
+					$rendering_value = $Plugin->get_msg_setting( $setting_name );
+					break;
+
+				case 'email':
+					// Get plugin email setting value:
+					$rendering_value = $Plugin->get_email_setting( $setting_name );
+					break;
+
+				default:
+					debug_die( 'Invalid plugin setting type!' );
+					// EXIT HERE.
 			}
 			$this->index_apply_rendering_codes[$blog_ID][$setting_name][$rendering_value][] = $Plugin->code;
 		}
@@ -1914,6 +1929,7 @@ class Plugins
 			$Item = & $params['Item'];
 			$Blog = & $Item->get_Blog();
 			$setting_name = 'coll_apply_rendering';
+			$setting_type = 'coll';
 		}
 		elseif( isset( $params['Comment'] ) )
 		{ // Validate comment renderers
@@ -1921,17 +1937,25 @@ class Plugins
 			$Item = & $Comment->get_Item();
 			$Blog = & $Item->get_Blog();
 			$setting_name = 'coll_apply_comment_rendering';
+			$setting_type = 'coll';
 		}
 		elseif( isset( $params['Message'] ) )
 		{ // Validate message renderers
-			$Message = & $params['Message'];
 			$Blog = NULL;
 			$setting_name = 'msg_apply_rendering';
+			$setting_type = 'msg';
+		}
+		elseif( isset( $params['EmailCampaign'] ) )
+		{	// Validate message renderers:
+			$Blog = NULL;
+			$setting_name = 'email_apply_rendering';
+			$setting_type = 'email';
 		}
 		elseif( isset( $params['Blog'] ) && isset( $params['setting_name'] ) )
 		{ // Validate the given rendering option in the give Blog
 			$Blog = & $params['Blog'];
 			$setting_name = $params['setting_name'];
+			$setting_type = 'coll';
 			if( !in_array( $setting_name, array( 'coll_apply_rendering', 'coll_apply_comment_rendering' ) ) )
 			{
 				debug_die( 'Invalid apply rendering param name received!' );
@@ -1945,7 +1969,7 @@ class Plugins
 		$blog_ID = !is_null( $Blog ) ? $Blog->ID : 0;
 
 		// Make sure the requested apply_rendering settings are loaded
-		$this->load_index_apply_rendering( $setting_name, $Blog );
+		$this->load_index_apply_rendering( $setting_name, $Blog, $setting_type );
 
 		$validated_renderers = array();
 
@@ -2051,6 +2075,10 @@ class Plugins
 		{ // get Message apply_rendering setting
 			$setting_name = $params['setting_name'];
 		}
+		elseif( isset( $params['setting_name'] ) && $params['setting_name'] == 'email_apply_rendering' )
+		{	// get EmailCampaign apply_rendering setting:
+			$setting_name = $params['setting_name'];
+		}
 		elseif( isset( $params['Comment'] ) && !empty( $params['Comment'] ) )
 		{ // get Comment apply_rendering setting
 			$Comment = & $params['Comment'];
@@ -2081,6 +2109,11 @@ class Plugins
 				$RendererPlugins = $this->get_list_by_events( array('FilterMsgContent') );
 				break;
 
+			case 'email_apply_rendering':
+				// Get Message renderer plugins
+				$RendererPlugins = $this->get_list_by_events( array('FilterEmailContent') );
+				break;
+
 			case 'coll_apply_comment_rendering':
 				// Get Comment renderer plugins
 				$RendererPlugins = $this->get_list_by_events( array('FilterCommentContent') );
@@ -2102,7 +2135,7 @@ class Plugins
 			{ // No unique code!
 				continue;
 			}
-			if( empty( $setting_Blog ) && $setting_name != 'msg_apply_rendering' )
+			if( empty( $setting_Blog ) && $setting_name != 'msg_apply_rendering' && $setting_name != 'email_apply_rendering' )
 			{ // If $setting_Blog is not set we can't get collection apply_rendering options
 				continue;
 			}
@@ -2110,6 +2143,10 @@ class Plugins
 			if( $setting_name == 'msg_apply_rendering' )
 			{ // get rendering setting from plugin message settings
 				$apply_rendering = $loop_RendererPlugin->get_msg_setting( $setting_name );
+			}
+			elseif( $setting_name == 'email_apply_rendering' )
+			{	// get rendering setting from plugin email settings:
+				$apply_rendering = $loop_RendererPlugin->get_email_setting( $setting_name );
 			}
 			else
 			{ // get rendering setting from plugin coll settings
@@ -2183,7 +2220,14 @@ class Plugins
 						case 'msg_apply_rendering':
 							if( $current_User->check_perm( 'perm_messaging', 'reply' ) && $current_User->check_perm( 'options', 'edit' ) )
 							{ // Check if current user can edit the messaging settings
-								$settings_url = $admin_url.'?ctrl=msgsettings#fieldset_wrapper_msgplugins';
+								$settings_url = $admin_url.'?ctrl=msgsettings&amp;tab=renderers';
+							}
+							break;
+
+						case 'email_apply_rendering':
+							if( $current_User->check_perm( 'perm_messaging', 'reply' ) && $current_User->check_perm( 'options', 'edit' ) )
+							{ // Check if current user can edit the messaging settings
+								$settings_url = $admin_url.'?ctrl=email&amp;tab=settings&amp;tab3=renderers';
 							}
 							break;
 
@@ -2192,7 +2236,7 @@ class Plugins
 						default:
 							if( ! empty( $setting_Blog ) && $current_User->check_perm( 'blog_properties', 'edit', false, $setting_Blog->ID ) )
 							{ // Check if current user can edit the blog plugin settings
-								$settings_url = $admin_url.'?ctrl=coll_settings&amp;tab=plugin_settings&amp;blog='.$setting_Blog->ID;
+								$settings_url = $admin_url.'?ctrl=coll_settings&amp;tab=renderers&amp;blog='.$setting_Blog->ID;
 							}
 							break;
 					}

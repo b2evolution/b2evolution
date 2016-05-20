@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -45,11 +45,18 @@ class UserSettings extends AbstractSettings
 
 		// Folding settings, 1 - Hide, 0 - Show
 		'fold_itemform_links' => 1,
+		'fold_itemform_custom_fields' => 1,
 		'fold_itemform_googlemap' => 1,
 		'fold_itemform_meta_cmnt' => 1,
 		'fold_itemform_extra' => 1,
 		'fold_itemform_comments' => 1,
 		'fold_itemform_goals' => 1,
+		'fold_itemform_notifications' => 1,
+		'fold_cmntform_links' => 1,
+		'fold_cmntform_datetime' => 1,
+		'fold_cmntform_html' => 1,
+		'fold_cmntform_info' => 1,
+		'fold_cmntform_notifications' => 1,
 		'fold_upgrade_backup_options' => 1,
 		'fold_plugin_vars' => 1,
 		'fold_plugin_events' => 1,
@@ -121,8 +128,10 @@ class UserSettings extends AbstractSettings
 		'notify_messages' => 1, 	// Notify user when receives a private message
 		'notify_unread_messages' => 1, // Notify user when he has unread messages more then 24 hour, and he was not notified in the last 3 days
 		'notify_published_comments' => 1, // Notify user when a comment is published in an own post
-		'notify_comment_moderation' => 1, // Notify when a comment is awaiting moderation and the user has right to moderate that comment
-		'notify_post_moderation' => 1, // Notify when a post is awaiting moderation and the user has right to moderate that post
+		'notify_comment_moderation' => 1, // Notify when new comment is awaiting moderation and the user has right to moderate that comment
+		'notify_edit_cmt_moderation' => 1, // Notify when edited comment is awaiting moderation and the user has right to moderate that comment
+		'notify_post_moderation' => 1, // Notify when a new post is awaiting moderation and the user has right to moderate that post
+		'notify_edit_pst_moderation' => 1, // Notify when a edited post is awaiting moderation and the user has right to moderate that post
 		'notify_meta_comments' => 1, // Notify user when a META comment is published in a post where user can sees meta comments
 
 		'enable_PM' => 1,
@@ -139,9 +148,9 @@ class UserSettings extends AbstractSettings
 	/**
 	 * Constructor
 	 */
-	function UserSettings()
+	function __construct()
 	{ // constructor
-		parent::AbstractSettings( 'T_users__usersettings', array( 'uset_user_ID', 'uset_name' ), 'uset_value', 1 );
+		parent::__construct( 'T_users__usersettings', array( 'uset_user_ID', 'uset_name' ), 'uset_value', 1 );
 	}
 
 
@@ -172,7 +181,7 @@ class UserSettings extends AbstractSettings
 			$user_ID = $current_User->ID;
 		}
 
-		$result = parent::get( $user_ID, $setting );
+		$result = parent::getx( $user_ID, $setting );
 		if( $result == NULL )
 		{
 			$result = $Settings->get( 'def_'.$setting );
@@ -202,7 +211,7 @@ class UserSettings extends AbstractSettings
 			$user_ID = $current_User->ID;
 		}
 
-		return parent::set( $user_ID, $setting, $value );
+		return parent::setx( $user_ID, $setting, $value );
 	}
 
 

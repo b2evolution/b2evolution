@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link https://thequod.de/}.
  *
  * {@link db_delta()} is based on dbDelta() from {@link http://wordpress.com Wordpress}, see
@@ -914,8 +914,18 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 
 					if( $existing_default != $want_default ) // DEFAULT is case-sensitive
 					{ // Add a query to change the column's default value
+						$item_queries = array();
+						if( $existing_default == 'CURRENT_TIMESTAMP' )
+						{	// MySQL command "SET DEFAULT" does NOT upgrade a column with default value CURRENT_TIMESTAMP by some reason,
+							// So we must use the command "MODIFY" to update a column completely:
+							$item_queries[] = 'ALTER TABLE '.$table.' MODIFY '.$column_definition;
+						}
+						else
+						{	// Use "SET DEFAULT" for all other normal column types:
+							$item_queries[] = 'ALTER TABLE '.$table.' ALTER COLUMN '.$tablefield->Field.' SET DEFAULT '.$want_default_set;
+						}
 						$items[$table_lowered][] = array(
-							'queries' => array('ALTER TABLE '.$table.' ALTER COLUMN '.$tablefield->Field.' SET DEFAULT '.$want_default_set),
+							'queries' => $item_queries,
 							'note' => "Changed default value of {$table}.<strong>{$tablefield->Field}</strong> from $existing_default to $want_default_set",
 							'type' => 'change_default' );
 					}
@@ -1438,7 +1448,7 @@ function install_make_db_schema_current( $display = true )
 			{
 				if( count($itemlist) == 1 && $itemlist[0]['type'] == 'create_table' )
 				{
-					echo $itemlist[0]['note']."<br />\n";
+					echo get_install_format_text( $itemlist[0]['note']."<br />\n", 'br' );
 					evo_flush();
 					foreach( $itemlist[0]['queries'] as $query )
 					{ // should be just one, but just in case
@@ -1451,22 +1461,22 @@ function install_make_db_schema_current( $display = true )
 				}
 				else
 				{
-					echo 'Altering table &laquo;'.$table.'&raquo;...';
-					echo '<ul>';
+					echo get_install_format_text( 'Altering table &laquo;'.$table.'&raquo;...' );
+					echo get_install_format_text( '<ul>' );
 					foreach( $itemlist as $item )
 					{
-						echo '<li>'.$item['note'];
+						echo get_install_format_text( '<li>'.$item['note'], 'li' );
 						if( $debug )
 						{
 							pre_dump( $item['queries'] );
 						}
-						echo '</li>';
+						echo get_install_format_text( '</li>' );
 						foreach( $item['queries'] as $query )
 						{
 							$DB->query( $query );
 						}
 					}
-					echo "</ul>";
+					echo get_install_format_text( '</ul>' );
 				}
 			}
 		}

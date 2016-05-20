@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage pureforums
@@ -116,7 +116,7 @@ else
 				}
 				// Author info:
 				echo '<div class="ft_author_info">'.T_('Started by');
-				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
+				$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
 				echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
 				echo '</div>';
 			?></td>
@@ -147,7 +147,7 @@ else
 							'before_user' => '<br />',
 							'after'       => ' ',
 							'after_user'  => ' ',
-							'link_text'   => 'login'
+							'link_text'   => 'auto'
 						) );
 
 					echo ' <a href="'.$latest_Comment->get_permanent_url().'"><span class="ficon latestReply" title="'.T_('View latest post').'"></span></a>';
@@ -165,7 +165,7 @@ else
 					echo $Item->get_mod_date( 'D M j, Y H:i' );
 					echo $Item->author( array(
 							'before'    => '<br />',
-							'link_text' => 'login',
+							'link_text' => 'auto',
 						) );
 					echo '<a href="'.$Item->get_permanent_url().'"><span class="ficon latestReply" title="'.T_('View latest post').'"></span></a>';
 				}

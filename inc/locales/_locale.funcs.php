@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -878,8 +878,8 @@ function locale_updateDB()
 			$lnr = $matches[1];
 			$plocale = $pval;
 
-			if( $templocales[ $plocale ]['enabled'] )
-			{ // Collect previously enabled locales
+			if( $templocales[ $plocale ]['enabled'] || ( $plocale == $current_default_locale && ! isset( $_POST['loc_'.$lnr.'_enabled'] ) ) )
+			{	// Collect previously enabled locales AND if current default locale is not enabled yet:
 				$disabled_locales[ $plocale ] = $plocale;
 			}
 			// checkboxes default to 0
@@ -1221,7 +1221,7 @@ function init_charsets( $req_io_charset )
  */
 function locales_load_available_defs()
 {
-	global $locales_path, $locales, $locales_loaded_form_disk;
+	global $locales_path, $locales, $locales_loaded_form_disk, $Messages;
 
 	if( ! empty( $locales_loaded_form_disk ) )
 	{ // All locales have been already loaded
@@ -1250,6 +1250,11 @@ function locales_load_available_defs()
 				'basename'	=> true,
 			);
 		$locale_def_files = get_filenames( $ad_locale_folder, $filename_params );
+		if( $locale_def_files === false )
+		{	// Impossible to read the locale folder:
+			$Messages->add( sprintf( T_('The locale %s is not readable. Please check file permissions.'), $locale_folder ), 'warning' );
+			continue;
+		}
 		// Go through files in locale folder:
 		foreach( $locale_def_files as $locale_def_file )
 		{	// Check if it's a definition file:
@@ -1417,12 +1422,12 @@ function locale_file_po_percent_done( $po_file_info )
  */
 function locale_insert_default()
 {
-	global $DB, $current_locale, $locales, $test_install_all_features;
+	global $DB, $current_locale, $locales, $install_test_features;
 
 	$activate_locales = array();
 
-	if( isset( $test_install_all_features ) && $test_install_all_features )
-	{ // Activate also additional locales on install
+	if( ! empty( $install_test_features ) )
+	{	// Activate also additional locales on install:
 		$activate_locales[] = 'en-US';
 		$activate_locales[] = 'de-DE';
 		$activate_locales[] = 'fr-FR';
@@ -1461,7 +1466,7 @@ function locale_insert_default()
 			$insert_data[] = '( '.$DB->quote( $a_locale ).', '
 				.$DB->quote( $locales[ $a_locale ]['datefmt'] ).', '
 				.$DB->quote( $locales[ $a_locale ]['timefmt'] ).', '
-				.$DB->quote( empty( $locales[ $a_locale ]['shorttimefmt'] ) ? $locales[ $a_locale ]['timefmt'] : $locales[ $a_locale ]['shorttimefmt'] ).', '
+				.$DB->quote( empty( $locales[ $a_locale ]['shorttimefmt'] ) ? str_replace( ':s', '', $locales[ $a_locale ]['timefmt'] ) : $locales[ $a_locale ]['shorttimefmt'] ).', '
 				.$DB->quote( $locales[ $a_locale ]['startofweek'] ).', '
 				.$DB->quote( $locales[ $a_locale ]['name'] ).', '
 				.$DB->quote( $locales[ $a_locale ]['messages'] ).', '
@@ -1479,6 +1484,123 @@ function locale_insert_default()
 					 .'VALUES '.implode( ', ', $insert_data ) );
 		}
 	}
+}
+
+
+/**
+ * Restore default values of locales
+ *
+ * @param array Locale keys/codes
+ */
+function locale_restore_defaults( $restored_locales )
+{
+	global $DB, $locales;
+
+	if( empty( $restored_locales ) && ! is_array( $restored_locales ) )
+	{	// No locales to restore, Exit here:
+		return;
+	}
+
+	foreach( $restored_locales as $restored_locale_key )
+	{
+		if( ! isset( $locales[ $restored_locale_key ] ) )
+		{	// Skip an incorrect locale:
+			continue;
+		}
+
+		$restored_locale = $locales[ $restored_locale_key ];
+
+		// Make sure default transliteration_map is set:
+		$transliteration_map = '';
+		if( isset( $restored_locale['transliteration_map'] ) && is_array( $restored_locale['transliteration_map'] ) )
+		{
+			$transliteration_map = base64_encode( serialize( $restored_locale['transliteration_map'] ) );
+		}
+
+		// Restore all locale fields to default values:
+		$DB->query( 'UPDATE T_locales SET
+			loc_datefmt             = '.$DB->quote( $restored_locale['datefmt'] ).',
+			loc_timefmt             = '.$DB->quote( $restored_locale['timefmt'] ).',
+			loc_shorttimefmt        = '.$DB->quote( empty( $restored_locale['shorttimefmt'] ) ? str_replace( ':s', '', $restored_locale['timefmt'] ) : $restored_locale['shorttimefmt'] ).',
+			loc_startofweek         = '.$DB->quote( $restored_locale['startofweek'] ).',
+			loc_name                = '.$DB->quote( $restored_locale['name'] ).',
+			loc_messages            = '.$DB->quote( $restored_locale['messages'] ).',
+			loc_priority            = '.$DB->quote( $restored_locale['priority'] ).',
+			loc_transliteration_map = '.$DB->quote( $transliteration_map ).'
+			WHERE loc_locale = '.$DB->quote( $restored_locale_key ) );
+	}
+}
+
+
+/**
+ * Check default locale and enable if it is not yet
+ * Used after each upgrade process
+ */
+function locale_check_default()
+{
+	global $DB, $Settings, $default_locale, $locales;
+
+	// Get default locale from DB:
+	$current_default_locale = $Settings->get( 'default_locale' );
+
+	if( isset( $locales[ $current_default_locale ] ) && $locales[ $current_default_locale ]['enabled'] )
+	{	// Current default locale is correct and enabled
+		// Nothing to fix, Exit here:
+		return;
+	}
+
+	if( ! isset( $locales[ $current_default_locale ] ) )
+	{	// If current default locale is wrong and doesn't exist anymore then use default locale from config:
+		$current_default_locale = $default_locale;
+		// Fix wrong default locale to correct value:
+		$Settings->set( 'default_locale', $current_default_locale );
+		$Settings->dbupdate();
+	}
+
+	// Get a row of current default locale in order to check if it is enabled:
+	$SQL = new SQL();
+	$SQL->SELECT( 'loc_enabled' );
+	$SQL->FROM( 'T_locales' );
+	$SQL->WHERE( 'loc_locale = '.$DB->quote( $current_default_locale ) );
+	$current_default_locale_enabled = $DB->get_var( $SQL->get() );
+
+	if( $current_default_locale_enabled !== NULL )
+	{	// Current default locale exists in DB
+		if( ! $current_default_locale_enabled )
+		{	// Enable current default locale if it is not enabled yet:
+			$DB->query( 'UPDATE T_locales
+				  SET loc_enabled = 1
+				WHERE loc_locale = '.$DB->quote( $current_default_locale ) );
+		}
+	}
+	else
+	{	// No record of default locale
+
+		// Make sure default transliteration_map is set
+		$transliteration_map = '';
+		if( isset( $locales[ $current_default_locale ]['transliteration_map'] ) && is_array( $locales[ $current_default_locale ]['transliteration_map'] ) )
+		{
+			$transliteration_map = base64_encode( serialize( $locales[ $current_default_locale ]['transliteration_map'] ) );
+		}
+
+		// Insert default locale into DB in order to make it enabled:
+		$DB->query( 'INSERT INTO T_locales '
+			.'( loc_locale, loc_datefmt, loc_timefmt, loc_shorttimefmt, '
+			.'loc_startofweek, loc_name, loc_messages, loc_priority, '
+			.'loc_transliteration_map, loc_enabled ) '
+			.'VALUES ( '
+			.$DB->quote( $current_default_locale ).', '
+			.$DB->quote( $locales[ $current_default_locale ]['datefmt'] ).', '
+			.$DB->quote( $locales[ $current_default_locale ]['timefmt'] ).', '
+			.$DB->quote( empty( $locales[ $current_default_locale ]['shorttimefmt'] ) ? str_replace( ':s', '', $locales[ $current_default_locale ]['timefmt'] ) : $locales[ $current_default_locale ]['shorttimefmt'] ).', '
+			.$DB->quote( $locales[ $current_default_locale ]['startofweek'] ).', '
+			.$DB->quote( $locales[ $current_default_locale ]['name'] ).', '
+			.$DB->quote( $locales[ $current_default_locale ]['messages'] ).', '
+			.$DB->quote( $locales[ $current_default_locale ]['priority'] ).', '
+			.$DB->quote( $transliteration_map ).', '
+			.'1 )' );
+	}
+
 }
 
 ?>

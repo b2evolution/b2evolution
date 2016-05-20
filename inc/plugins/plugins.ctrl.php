@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -297,7 +297,7 @@ switch( $action )
 		{ // second step:
 			$edit_Plugin = & $admin_Plugins->get_by_ID( $plugin_ID );
 
-			if( ! is_a($edit_Plugin, 'Plugin') )
+			if( ! ( $edit_Plugin instanceof Plugin ) )
 			{
 				$Messages->add( sprintf( T_( 'The plugin with ID %d could not be instantiated.' ), $plugin_ID ), 'error' );
 				$action = 'list';
@@ -325,7 +325,8 @@ switch( $action )
 		$Messages->add( $msg, 'success' );
 
 		// Install completed:
-		$r = $admin_Plugins->call_method( $edit_Plugin->ID, 'AfterInstall', $params = array() );
+		$params = array();
+		$r = $admin_Plugins->call_method( $edit_Plugin->ID, 'AfterInstall', $params );
 
 		// invalidate all PageCaches
 		invalidate_pagecaches();
@@ -395,7 +396,8 @@ switch( $action )
 		}
 
 		// Ask plugin:
-		$uninstall_ok = $admin_Plugins->call_method( $edit_Plugin->ID, 'BeforeUninstall', $params = array( 'unattended' => false ) );
+		$params = array( 'unattended' => false );
+		$uninstall_ok = $admin_Plugins->call_method( $edit_Plugin->ID, 'BeforeUninstall', $params );
 
 		if( $uninstall_ok === false )
 		{ // Plugin said "NO":
@@ -575,14 +577,16 @@ switch( $action )
 			load_funcs('plugins/_plugin.funcs.php');
 
 			// Loop through settings for this plugin:
-			foreach( $edit_Plugin->GetDefaultSettings( $dummy = array('for_editing' => true) ) as $set_name => $set_meta )
+			$dummy = array( 'for_editing' => true );
+			foreach( $edit_Plugin->GetDefaultSettings( $dummy ) as $set_name => $set_meta )
 			{
 				autoform_set_param_from_request( $set_name, $set_meta, $edit_Plugin, 'Settings' );
 			}
 
 			// Let the plugin handle custom fields:
 			// We use call_method to keep track of this call, although calling the plugins PluginSettingsUpdateAction method directly _might_ work, too.
-			$ok_to_update = $admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params = array() );
+			$tmp_params = array();
+			$ok_to_update = $admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params );
 
 			if( $ok_to_update === false )
 			{	// Rollback settings: the plugin has said they should not get updated.
@@ -652,7 +656,8 @@ switch( $action )
 		$admin_Plugins->save_events( $edit_Plugin, array() );
 
 		// Inform Plugin that it gets edited:
-		$admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsEditAction', $tmp_params = array() );
+		$tmp_params = array();
+		$admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsEditAction', $tmp_params );
 
 		// Params for form:
 		$edited_plugin_name = $edit_Plugin->name;
@@ -966,7 +971,8 @@ switch( $action )
 
 			if( $uninstall_ok === NULL )
 			{ // Plugin requested this:
-				$admin_Plugins->call_method( $edit_Plugin->ID, 'BeforeUninstallPayload', $params = array( 'Form' => & $Form ) );
+				$params = array( 'Form' => & $Form );
+				$admin_Plugins->call_method( $edit_Plugin->ID, 'BeforeUninstallPayload', $params );
 			}
 
 			echo '<p>'.T_('THIS CANNOT BE UNDONE!').'</p>';

@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage pureforums
@@ -81,14 +81,13 @@ $comment_class = ' class="'.$comment_class.'"';
 		<td class="ft_post_info"><?php
 			$Comment->anchor();
 			$Comment->author2( array(
-				'link_text' => 'login',
+				'link_text' => 'auto',
 			) );
 		?></td>
 		<td class="ft_post_info"><?php
-			if( $Skin->get_setting( 'display_post_date' ) )
-			{ // We want to display the post date:
-				$Comment->date( 'D M j, Y H:i' );
-			}
+			// We want to display the post date:
+			$Comment->date( 'D M j, Y H:i' );
+
 			$Comment->rating( array(
 					'before' => '',
 					'after'  => '',

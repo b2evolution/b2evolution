@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -43,9 +43,9 @@ class ItemCache extends DataObjectCache
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
 	 */
-	function ItemCache( $objType = 'Item', $dbtablename = 'T_items__item', $dbprefix = 'post_', $dbIDname = 'post_ID' )
+	function __construct( $objType = 'Item', $dbtablename = 'T_items__item', $dbprefix = 'post_', $dbIDname = 'post_ID' )
 	{
-		parent::DataObjectCache( $objType, false, $dbtablename, $dbprefix, $dbIDname );
+		parent::__construct( $objType, false, $dbtablename, $dbprefix, $dbIDname );
 	}
 
 
@@ -94,7 +94,7 @@ class ItemCache extends DataObjectCache
 	 */
 	function load_by_categories( $cat_array, $coll_ID )
 	{
-		global $DB, $posttypes_specialtypes;
+		global $DB;
 
 		if( empty( $cat_array ) && empty( $coll_ID ) )
 		{ // Nothing to load
@@ -151,7 +151,7 @@ class ItemCache extends DataObjectCache
 		$ItemQuery->where_chapter2( $Blog, $not_loaded_cat_ids, "" );
 		$ItemQuery->where_visibility( $visibility_statuses );
 		$ItemQuery->where_datestart( NULL, NULL, NULL, NULL, $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
-		$ItemQuery->where_types( '-'.implode(',',$posttypes_specialtypes) );
+		$ItemQuery->where_itemtype_usage( 'post' );
 
 		// Clear previous items from the cache and load by the defined SQL
 		$this->clear( true );

@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage photoalbums
@@ -21,7 +21,7 @@ $params = array_merge( array(
 		'comment_start'        => '<div class="bComment">',
 		'comment_end'          => '</div>',
 		'link_to'              => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
-		'author_link_text'     => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+		'author_link_text'     => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 		'before_image'         => '<div class="image_block">',
 		'before_image_legend'  => '<div class="image_legend">',
 		'after_image_legend'   => '</div>',

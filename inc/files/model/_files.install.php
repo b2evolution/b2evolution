@@ -4,7 +4,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -26,7 +26,8 @@ $schema_queries['T_files'] = array(
 		'Creating table for File Meta Data',
 		"CREATE TABLE T_files (
 			file_ID                  int(11) unsigned  not null AUTO_INCREMENT,
-			file_type                enum('image', 'audio', 'other') COLLATE ascii_general_ci NULL DEFAULT NULL,
+			file_creator_user_ID     INT(10) UNSIGNED NULL DEFAULT NULL,
+			file_type                enum('image', 'audio', 'video', 'other') COLLATE ascii_general_ci NULL DEFAULT NULL,
 			file_root_type           enum('absolute','user','collection','shared','skins','import') COLLATE ascii_general_ci NOT NULL DEFAULT 'absolute',
 			file_root_ID             int(11) unsigned not null default 0,
 			file_path                varchar(767) not null default '',
@@ -36,6 +37,7 @@ $schema_queries['T_files'] = array(
 			file_hash                binary(16) default NULL,
 			file_path_hash           binary(16) default NULL,
 			file_can_be_main_profile TINYINT(1) NOT NULL DEFAULT 1,
+			file_download_count      INT(10) unsigned NOT NULL DEFAULT 0,
 			primary key (file_ID),
 			unique file_path (file_path_hash)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" );

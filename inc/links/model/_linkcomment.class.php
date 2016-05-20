@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -28,9 +28,9 @@ class LinkComment extends LinkOwner
 	/**
 	 * Constructor
 	 */
-	function LinkComment( $edited_Comment )
+	function __construct( $edited_Comment )
 	{
-		parent::LinkOwner( $edited_Comment, 'comment' );
+		parent::__construct( $edited_Comment, 'comment' );
 		$this->Comment = & $this->link_Object;
 
 		$this->_trans = array(
@@ -115,7 +115,8 @@ class LinkComment extends LinkOwner
 			$FileCache = & get_FileCache();
 			$File = $FileCache->get_by_ID( $file_ID, false, false );
 			$file_name = empty( $File ) ? '' : $File->get_name();
-			syslog_insert( sprintf( 'File %s was linked to %s with ID=%s', '<b>'.$file_name.'</b>', $this->type, $this->link_Object->ID ), 'info', 'file', $file_ID );
+			$file_dir = $File->dir_or_file();
+			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s', ucfirst( $file_dir ), '[['.$file_name.']]', $this->type, $this->link_Object->ID ), 'info', 'file', $file_ID );
 
 			if( $update_owner )
 			{ // Update last touched date of the Comment & Item

@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -55,7 +55,7 @@ switch( $action )
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_Userfield = duplicate( $edited_Userfield ); // PHP4/5 abstraction
+			$edited_Userfield = clone $edited_Userfield;
 			$edited_Userfield->ID = 0;
 		}
 		break;

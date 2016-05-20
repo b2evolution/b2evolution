@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -294,7 +294,7 @@ else
 		locale_temp_switch( $lkey );
 		$datefmt_preview = date_i18n( $locale_data['datefmt'], $localtimenow );
 		$timefmt_preview = date_i18n( $locale_data['timefmt'], $localtimenow );
-		$shorttimefmt_preview = date_i18n( ( isset( $locale_data['shorttimefmt'] ) ? $locale_data['shorttimefmt'] : str_replace( ':s', '', $locale_data['timefmt'] ) ), $localtimenow );
+		$shorttimefmt_preview = date_i18n( ( ! empty( $locale_data['shorttimefmt'] ) ? $locale_data['shorttimefmt'] : str_replace( ':s', '', $locale_data['timefmt'] ) ), $localtimenow );
 		locale_restore_previous();
 
 		?>
@@ -341,7 +341,7 @@ else
 					<input type="text" name="loc_'.$i.'_timefmt" value="'.format_to_output( $locale_data['timefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $timefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />
 				</td>
 				<td>
-					<input type="text" name="loc_'.$i.'_shorttimefmt" value="'.format_to_output( ( isset( $locale_data['shorttimefmt'] ) ? $locale_data['shorttimefmt'] : str_replace( ':s', '', $locale_data['timefmt'] ) ), 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $shorttimefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />
+					<input type="text" name="loc_'.$i.'_shorttimefmt" value="'.format_to_output( ( ! empty( $locale_data['shorttimefmt'] ) ? $locale_data['shorttimefmt'] : str_replace( ':s', '', $locale_data['timefmt'] ) ), 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $shorttimefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />
 				</td>
 				<td>';
 			$Form->switch_layout( 'none' );

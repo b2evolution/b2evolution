@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -386,15 +386,15 @@ echo '<div class="profile_column_right">';
 
 		$profileForm->info( T_('Number of posts'), $User->get_reputation_posts() );
 
-		$profileForm->info( T_('Comments'), $User->get_reputation_comments() );
+		$profileForm->info( T_('Comments'), '<span class="reputation_message">'.$User->get_reputation_comments().'</span>' );
 
-		$profileForm->info( T_('Photos'), $User->get_reputation_files( array( 'file_type' => 'image' ) ) );
+		$profileForm->info( T_('Photos'), '<span class="reputation_message">'.$User->get_reputation_files( array( 'file_type' => 'image' ) ).'</span>' );
 
-		$profileForm->info( T_('Audio'), $User->get_reputation_files( array( 'file_type' => 'audio' ) ) );
+		$profileForm->info( T_('Audio'), '<span class="reputation_message">'.$User->get_reputation_files( array( 'file_type' => 'audio' ) ).'</span>' );
 
-		$profileForm->info( T_('Other files'), $User->get_reputation_files( array( 'file_type' => 'other' ) ) );
+		$profileForm->info( T_('Other files'), '<span class="reputation_message">'.$User->get_reputation_files( array( 'file_type' => 'other' ) ).'</span>' );
 
-		$profileForm->info( T_('Spam fighter score'), $User->get_reputation_spam() );
+		$profileForm->info( T_('Spam fighter score'), '<span class="reputation_message">'.$User->get_reputation_spam().'</span>' );
 
 	$profileForm->end_fieldset();
 

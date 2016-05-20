@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -32,10 +32,10 @@ class Subregion extends DataObject
 	 *
 	 * @param object database row
 	 */
-	function Subregion( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_regional__subregion', 'subrg_', 'subrg_ID' );
+		parent::__construct( 'T_regional__subregion', 'subrg_', 'subrg_ID' );
 
 		if( $db_row )
 		{
@@ -142,14 +142,18 @@ class Subregion extends DataObject
 	/**
 	 * Check existence of specified sub-region code in subrg_code unique field.
 	 *
+	 * @param string Name of unique field  OR array of Names (for UNIQUE index with MULTIPLE fields)
+	 * @param mixed specified value        OR array of Values (for UNIQUE index with MULTIPLE fields)
 	 * @return int ID if region + sub-region code exist otherwise NULL/false
 	 */
-	function dbexists()
+	function dbexists( $unique_fields = array( 'subrg_rgn_ID', 'subrg_code' ), $values = NULL )
 	{
-		return parent::dbexists(
-				array( 'subrg_rgn_ID', 'subrg_code' ),
-				array( $this->rgn_ID, $this->code )
-			);
+		if( is_null( $values ) )
+		{
+			$values = array( $this->rgn_ID, $this->code );
+		}
+
+		return parent::dbexists( $unique_fields, $values );
 	}
 }
 

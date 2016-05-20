@@ -36,14 +36,7 @@ $debug_pwd = '';
 
 // Most of the time you'll want to see all errors, including notices:
 // b2evo should run without any notices! (plugins too!)
-if( version_compare( phpversion(), '5.3', '>=' ) )
-{	// sam2kb> Disable E_STRICT messages on PHP > 5.3, there are numerous E_STRICT warnings displayed throughout the app
-	error_reporting( E_ALL & ~E_STRICT );
-}
-else
-{
-	error_reporting( E_ALL );
-}
+error_reporting( E_ALL | E_STRICT );
 /**
  * Do we want to display errors, even when not in debug mode?
  *
@@ -66,7 +59,7 @@ $dev_menu = 0;
 // If you get blank pages or missing thumbnail images, PHP may be crashing because it doesn't have enough memory.
 // The default is 8 MB (in PHP < 5.2) and 128 MB (in PHP > 5.2)
 // Try uncommmenting the following line:
-// ini_set( 'memory_limit', '128M' );
+// @ini_set( 'memory_limit', '128M' );
 
 
 /**
@@ -122,6 +115,7 @@ $thumbnail_sizes = array(
 			'crop-15x15' => array( 'crop', 15, 15, 85 ),
 			'crop-top-320x320-blur-8' => array( 'crop-top', 320, 320, 80, 8 ),
 			'crop-top-320x320' => array( 'crop-top', 320, 320, 85 ),
+			'crop-top-200x200' => array( 'crop-top', 200, 200, 85 ),
 			'crop-top-160x160' => array( 'crop-top', 160, 160, 85 ),
 			'crop-top-80x80' => array( 'crop-top', 80, 80, 85 ),
 			'crop-top-64x64' => array( 'crop-top', 64, 64, 85 ),
@@ -146,7 +140,7 @@ $demo_mode = false;
  *
  * @global boolean
  */
-$test_install_all_features = false;
+$allow_install_test_features = false;
 
 
 /**
@@ -334,18 +328,19 @@ else
 	// fp> pb with domains like .co.uk !?
 }
 
-// echo $cookie_domain;
-
-/**#@+
- * Names for cookies.
+/**
+ * Name used for session cookies.
  */
-// The following remember the comment meta data for non registered users:
+$cookie_session = str_replace( '.', '_', 'session_'.$instance_name.'_'.$cookie_domain );
+
+/**
+ * Names used for other cookies.
+ *
+ * The following remember the comment meta data for non registered users:
+ */
 $cookie_name    = 'cookie'.$instance_name.'name';
 $cookie_email   = 'cookie'.$instance_name.'email';
 $cookie_url     = 'cookie'.$instance_name.'url';
-// The following handles the session:
-$cookie_session = str_replace( '.', '_', 'session_'.$instance_name.'_'.$cookie_domain );
-/**#@-*/
 
 /**
  * Expiration for comment meta data cookies.
@@ -478,6 +473,12 @@ $htsrv_url_sensitive = $htsrv_url;
  */
 $xmlsrv_subdir = 'xmlsrv/';              // Subdirectory relative to base
 $xmlsrv_url = $baseurl.$xmlsrv_subdir;   // You should not need to change this
+
+/**
+ * URL of the REST API.
+ * @global string $restapi_url
+ */
+$restapi_url = $htsrv_url.'rest.php?api_version=1&api_request='; // You should not need to change this
 
 /**
  * Location of the RSC folder.
@@ -816,9 +817,9 @@ $failed_logins_lockout = 600; // 10 minutes
  *
  * Possible values:
  *  - 'always' : Always allow redirects to a different domain
- *  - 'all_collections_and_redirected_posts' ( Default ): Allow redirects to all collection domains or redirect of posts with redirected status
+ *  - 'all_collections_and_redirected_posts' ( Default ): Allow redirects to all collection domains, ALL SUB-DOMAINS of $basedomain or redirects of posts with redirected status
  *  - 'only_redirected_posts' : Allow redirects to a different domain only in case of posts with redirected status
- *  - 'never' : Force redirects to the current domain in all case, and never allow redirects to a different domain
+ *  - 'never' : Force redirects to the same domain in all of the cases, and never allow redirect to a different domain
  */
 $allow_redirects_to_different_domain = 'all_collections_and_redirected_posts';
 
@@ -884,12 +885,13 @@ $library_cdn_urls = array(
 			'#jqplot_canvasOverlay#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.canvasOverlay.min.js' ),
 			'#jqplot_donutRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.donutRenderer.min.js' ),
 			'#jqplot_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/jquery.jqplot.min.css' ),*/
-		//'#tinymce#' => array( '//tinymce.cachefly.net/4.1/tinymce.min.js' ),
+		//'#tinymce#' => array( '//cdn.tinymce.com/4/tinymce.min.js' ),
+		//'#tinymce_jquery#' => array( '//cdn.tinymce.com/4/jquery.tinymce.min.js' ),
 		//'#flowplayer#' => array( '//releases.flowplayer.org/5.4.4/flowplayer.min.js', '//releases.flowplayer.org/5.4.4/flowplayer.js' ),
 		//'#mediaelement#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/js/mediaelement-and-player.min.js', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/js/mediaelement-and-player.js' ),
 		//'#mediaelement_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.min.css', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.css' ),
-		//'#videojs#' => array( 'http://vjs.zencdn.net/c/video.js' ),
-		//'#videojs_css#' => array( 'http://vjs.zencdn.net/c/video-js.css' ),
+		//'#videojs#' => array( 'http://vjs.zencdn.net/4.2.0/video.js' ),
+		//'#videojs_css#' => array( 'http://vjs.zencdn.net/4.2.0/video-js.css' ),
 		'#fontawesome#' => array('//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css', '//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css'),
 	);
 
@@ -924,7 +926,7 @@ $library_local_urls = array(
 		'#jqplot_donutRenderer#' => array( 'jquery/jqplot/jqplot.donutRenderer.min.js' ),
 		'#jqplot_css#' => array( 'jquery/jquery.jqplot.min.css', 'jquery/jquery.jqplot.css' ),
 		'#tinymce#' => array( 'tiny_mce/tinymce.min.js' ),
-		'#tinymce_gzip#' => array( 'tiny_mce/tinymce.gzip.js' ),
+		'#tinymce_jquery#' => array( 'tiny_mce/jquery.tinymce.min.js' ),
 		'#flowplayer#' => array( 'flowplayer/flowplayer.min.js', 'flowplayer/flowplayer.js' ),
 		'#mediaelement#' => array( 'mediaelement/mediaelement-and-player.min.js', 'mediaelement/mediaelement-and-player.js' ),
 		'#mediaelement_css#' => array( 'mediaelement/mediaelementplayer.min.css', 'mediaelement/mediaelementplayer.css' ),
@@ -949,8 +951,10 @@ $outgoing_proxy_password = '';
 /**
  * Check for old browsers like IE and display info message.
  * Set to false if you don't want this check and never inform users if they use an old browser.
+ * Note: new default is false because it's easy to annoy IE users with that and they wan't do anything about their enterprise settings that makes them advertsie an older IE than they really have
+ *       On our end though we'll send an 'IE-Edge' header and it will make the IE on the other end behva ethe best it can...
  */
-$check_browser_version = true;
+$check_browser_version = false;
 
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----

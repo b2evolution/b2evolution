@@ -40,22 +40,24 @@ class tinymce_plugin extends Plugin
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
-	/**
-	 * @var string ID of the textarea to bind to (?)
-	 * @todo fp>should be a param passed from core to pluginevent (editor can be invoked in many different places)
-	 */
-	var $tmce_editor_id = 'itemform_post_content';
 
-	function PluginInit()
+	function PluginInit( & $params )
 	{
 		$this->short_desc = $this->T_('Javascript WYSIWYG editor');
 	}
 
 
 	/**
-	 * These are the plugins settings + defaults that will apply to all users unless they override
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
+	 *
+	 * @param array Associative array of parameters (since v1.9).
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
+	 * @return array see {@link Plugin::GetDefaultSettings()}.
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
+	 * and assign an array with the following keys to them (only 'label' is required):
 	 */
-	function GetDefaultSettings()
+	function GetDefaultSettings( & $params )
 	{
 		return array(
 			'default_use_tinymce' => array(
@@ -156,9 +158,15 @@ class tinymce_plugin extends Plugin
 
 
 	/**
-	 * We allow each user to disable the TinyMCE and override some of the default settings.
+	 * Define the PER-USER settings of the plugin here. These can then be edited by each user.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
-	function GetDefaultUserSettings()
+	function GetDefaultUserSettings( & $params )
 	{
 		$r = array(
 			'use_tinymce' => array(
@@ -220,28 +228,6 @@ class tinymce_plugin extends Plugin
 
 
 	/**
-	 * Get the URL to include TinyMCE.
-	 * @return string
-	 */
-	function get_tinymce_src_url()
-	{
-		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
-
-		if( $this->Settings->get( 'use_gzip_compressor' ) )
-		{
-			$url = get_require_url( '#tinymce_gzip#', $relative_to );
-			// dh> suffix of the file to compress. Looking at tiny_mce_gzip.php it only allows "_src". Needs investigation - maybe the tiny_mce_jquery.js would actually work when "_jquery" would be allowed.
-		}
-		else
-		{
-			$url = get_require_url( '#tinymce#', $relative_to );
-		}
-
-		return $url;
-	}
-
-
-	/**
 	 * Init the TinyMCE object (in backoffice).
 	 *
 	 * This is done late, so that scriptaculous has been loaded before,
@@ -249,28 +235,66 @@ class tinymce_plugin extends Plugin
 	 *
 	 * @todo dh> use jQuery's document.ready wrapper
 	 *
-	 * @return boolean
+	 * ---
+	 *
+	 * Event handler: Called when displaying editor buttons (in back-office).
+	 *
+	 * This method, if implemented, should output the buttons (probably as html INPUT elements) 
+	 * and return true, if button(s) have been displayed.
+	 *
+	 * You should provide an unique html ID with each button.
+	 *
+	 * @param array Associative array of parameters.
+	 *   - 'target_type': either 'Comment' or 'Item'.
+	 *   - 'edit_layout': "inskin", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
+	 *                    NOTE: Please respect the "inskin" mode, which should display only the most simple things!
+	 * @return boolean did we display a button?
 	 */
 	function AdminDisplayEditorButton( & $params )
 	{
-		global $Blog;
-		/**
-		 * @global Item
-		 */
-		global $edited_Item;
-
-		if( $params['target_type'] != 'Item' )
-		{ // only for Items:
-			return;
-		}
-
-		if( ! empty( $edited_Item ) && ! $edited_Item->get_type_setting( 'allow_html' ) )
-		{ // Only when HTML is allowed in post
+		if( empty( $params['content_id'] ) )
+		{	// Value of html attribute "id" of textarea where tibymce is applied
+			// Don't allow empty id:
 			return false;
 		}
 
+		switch( $params['target_type'] )
+		{
+			case 'Item':
+				// Initialize settings for item:
+				global $Blog;
+
+				$edited_Item = & $params['target_object'];
+
+				if( ! empty( $edited_Item ) && ! $edited_Item->get_type_setting( 'allow_html' ) )
+				{	// Only when HTML is allowed in post:
+					return false;
+				}
+
+				$state_params = array(
+						'type' => $params['target_type'],
+						'blog' => $Blog->ID,
+						'item' => $edited_Item->ID,
+					);
+				break;
+
+			case 'EmailCampaign':
+				// Initialize settings for email campaign:
+				$edited_EmailCampaign = & $params['target_object'];
+
+				$state_params = array(
+						'type'  => $params['target_type'],
+						'email' => $edited_EmailCampaign->ID,
+					);
+				break;
+
+			default:
+				// Don't allow this plugin for another things:
+				return false;
+		}
+
 		// Get init params, depending on edit mode: simple|expert
-		$tmce_init = $this->get_tmce_init( $params['edit_layout'] );
+		$tmce_init = $this->get_tmce_init( $params['edit_layout'], $params['content_id'] );
 
 		?>
 
@@ -288,7 +312,7 @@ class tinymce_plugin extends Plugin
 				{ // Switch to WYSIWYG only after confirmation
 					return;
 				}
-				tinymce_plugin_toggleEditor('<?php echo $this->tmce_editor_id; ?>');
+				tinymce_plugin_toggleEditor('<?php echo $params['content_id']; ?>');
 			} );
 
 			/**
@@ -303,14 +327,14 @@ class tinymce_plugin extends Plugin
 				{
 					tinymce_plugin_init_done = true;
 					// call this method on init again, with "null" id, so that mceAddControl gets called.
-					tinymce_plugin_load_tinymce( function() {tinymce_plugin_toggleEditor(null)} );
+					tinymce_plugin_init_tinymce( function() {tinymce_plugin_toggleEditor(null)} );
 					return;
 				}
 
 				if( ! tinymce.get( id ) )
 				{ // Turn on WYSIWYG editor
 					tinymce.execCommand( 'mceAddEditor', false, id );
-					jQuery.get( '<?php echo $this->get_htsrv_url( 'save_editor_state', array( 'on' => 1, 'blog' => $Blog->ID, 'item' => $edited_Item->ID ), '&' ); ?>' );
+					jQuery.get( '<?php echo $this->get_htsrv_url( 'save_editor_state', array_merge( $state_params, array( 'on' => 1 ) ), '&' ); ?>' );
 					jQuery( '#tinymce_plugin_toggle_button_wysiwyg' ).addClass( 'active' );
 					jQuery( '#tinymce_plugin_toggle_button_html' ).removeAttr( 'disabled' );
 					jQuery( '[name="editor_code"]').attr('value', '<?php echo $this->code; ?>' );
@@ -329,7 +353,7 @@ class tinymce_plugin extends Plugin
 				else
 				{ // Hide the editor, Display only source HTML
 					tinymce.execCommand( 'mceRemoveEditor', false, id );
-					jQuery.get( '<?php echo $this->get_htsrv_url( 'save_editor_state', array( 'on' => 0, 'blog' => $Blog->ID, 'item' => $edited_Item->ID ), '&' ); ?>' );
+					jQuery.get( '<?php echo $this->get_htsrv_url( 'save_editor_state', array_merge( $state_params, array( 'on' => 0 ) ), '&' ); ?>' );
 					jQuery( '#tinymce_plugin_toggle_button_html' ).addClass( 'active' );
 					jQuery( '#tinymce_plugin_toggle_button_wysiwyg' ).removeAttr( 'disabled' );
 					jQuery( '[name="editor_code"]' ).attr( 'value', 'html' );
@@ -373,58 +397,12 @@ class tinymce_plugin extends Plugin
 			// Load TinyMCE Javascript source file:
 			// This cannot be done through AJAX, since there appear to be scope problems on init then (TinyMCE problem?! - "u not defined").
 			// Anyway, not using AJAX to fetch the file makes it more cachable anyway.
-			echo '<script type="text/javascript" src="'.htmlspecialchars($this->get_tinymce_src_url()).'"></script>';
+			$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
+			require_js( '#tinymce#', $relative_to, false, true );
+			require_js( '#tinymce_jquery#', $relative_to, false, true );
 			?>
 
 			<script type="text/javascript">
-			/**
-			 * Javascript function to load and init TinyMCE.
-			 * This gets done dynamically, either "on loading" or by AJAX, if the toggle button
-			 * enables the editor.
-			 * @param function to call after init
-			 */
-			function tinymce_plugin_load_tinymce( oninit )
-			{
-				<?php
-				// Load TinyMCE Javascript source file:
-				if( $this->Settings->get('use_gzip_compressor') )
-				{
-					?>
-
-					<!-- Init tinyMCE_GZ: -->
-					if( typeof tinyMCE_GZ == "undefined" )
-					{
-						alert( '<?php echo str_replace("'", "\'",
-							sprintf( $this->T_('Compressed TinyMCE javascript could not be loaded. Check the "%s" plugin setting.'),
-								$this->T_('URL to TinyMCE') ) ) ?>' );
-						tinymce_plugin_displayed_error = true;
-						try {
-							tinymce_plugin_init_tinymce(oninit);
-						} catch(e) {}
-					}
-					else
-					{
-						tinyMCE_GZ.init({
-							themes: tmce_init.theme,
-							plugins: tmce_init.plugins,
-							languages: tmce_init.language,
-							disk_cache: true,
-							debug: false
-						}, function() {tinymce_plugin_init_tinymce(oninit)} );
-					}
-
-					<?php
-				}
-				else
-				{	// if not using compressor...
-					?>
-					tinymce_plugin_init_tinymce(oninit);
-					<?php
-				}
-				?>
-			}
-
-
 			function tinymce_plugin_init_tinymce(oninit)
 			{
 				// Init tinymce:
@@ -459,19 +437,19 @@ class tinymce_plugin extends Plugin
 						oninit();
 
 						// Provide hooks for textarea manipulation (where other plugins should hook into):
-						var ed = tinymce.get("<?php echo $this->tmce_editor_id ?>");
+						var ed = tinymce.get("<?php echo $params['content_id']; ?>");
 						if( ed && typeof b2evo_Callbacks == "object" )
 						{
 							// add a callback, that returns the selected (raw) html:
-							b2evo_Callbacks.register_callback( "get_selected_text_for_itemform_post_content", function(value) {
-									var inst = tinymce.get("<?php echo $this->tmce_editor_id ?>");
+							b2evo_Callbacks.register_callback( "get_selected_text_for_<?php echo $params['content_id']; ?>", function(value) {
+									var inst = tinymce.get("<?php echo $params['content_id']; ?>");
 									if( ! inst ) return null;
 									return inst.selection.getContent();
-								} );
+								}, true );
 
 							// add a callback, that wraps a selection:
-							b2evo_Callbacks.register_callback( "wrap_selection_for_itemform_post_content", function(params) {
-									var inst = tinymce.get("<?php echo $this->tmce_editor_id ?>");
+							b2evo_Callbacks.register_callback( "wrap_selection_for_<?php echo $params['content_id']; ?>", function(params) {
+									var inst = tinymce.get("<?php echo $params['content_id']; ?>");
 									if( ! inst ) return null;
 									var sel = inst.selection.getContent();
 
@@ -486,25 +464,25 @@ class tinymce_plugin extends Plugin
 									inst.selection.setContent(value);
 
 									return true;
-								} );
+								}, true );
 
 							// add a callback, that replaces a string
-							b2evo_Callbacks.register_callback( "str_replace_for_itemform_post_content", function(params) {
-									var inst = tinymce.get("<?php echo $this->tmce_editor_id ?>");
+							b2evo_Callbacks.register_callback( "str_replace_for_<?php echo $params['content_id']; ?>", function(params) {
+									var inst = tinymce.get("<?php echo $params['content_id']; ?>");
 									if( ! inst ) return null;
 
 									// Replace substring with new value
 									inst.setContent( inst.getContent().replace( params.search, params.replace ) );
 
 									return true;
-								} );
+								}, true );
 
 							// add a callback, that lets us insert raw content:
 							// DEPRECATED, used in b2evo 1.10.x
-							b2evo_Callbacks.register_callback( "insert_raw_into_itemform_post_content", function(value) {
-									tinymce.execInstanceCommand( "<?php echo $this->tmce_editor_id ?>", "mceInsertRawHTML", false, value );
+							b2evo_Callbacks.register_callback( "insert_raw_into_<?php echo $params['content_id']; ?>", function(value) {
+									tinymce.execInstanceCommand( "<?php echo $params['content_id']; ?>", "mceInsertRawHTML", false, value );
 									return true;
-							} );
+							}, true );
 						}
 					}
 
@@ -513,37 +491,20 @@ class tinymce_plugin extends Plugin
 						ed.on( 'init', tmce_init.oninit );
 					}
 
-					tinymce.init(tmce_init);
+					jQuery( 'textarea#<?php echo $params['content_id']; ?>' ).tinymce( tmce_init );
 				}
 			}
 
 		</script>
 
 		<?php
-		$item_editor_code = ( is_object($edited_Item) ) ? $edited_Item->get_setting( 'editor_code' ) : NULL;
-		if( !empty( $item_editor_code ) )
-		{	// We have a preference for the current post, follow it:
-			// Use tinymce if code matched the code of the current plugin.
-			// fp> Note: this is a temporary solution; in the long term, this will be part of the API and the appropriate plugin will be selected.
-			$use_tinymce = ($item_editor_code == $this->code);
-		}
-		else
-		{	// We have no pref, fall back to whatever current user has last used:
-
-			// Has the user used MCE last time he edited this particular blog?
-			$use_tinymce = $this->UserSettings->get('use_tinymce_coll'.$Blog->ID );
-
-			if( is_null($use_tinymce) )
-			{	// We don't know for this blog, check if he used MCE last time he edited anything:
-				$use_tinymce = $this->UserSettings->get('use_tinymce');
-			}
-		}
+		$use_tinymce = $this->get_editor_state( $state_params );
 
 		$editor_code = 'html';
 		if( $use_tinymce )
 		{ // User used MCE last time, load MCE on document.ready:
 			$editor_code = $this->code;
-			echo '<script type="text/javascript">jQuery( tinymce_plugin_toggleEditor("'.$this->tmce_editor_id.'") );</script>';
+			echo '<script type="text/javascript">jQuery( tinymce_plugin_toggleEditor("'.$params['content_id'].'") );</script>';
 		}
 		// By default set the editor code to an empty string
 		echo '<input type="hidden" name="editor_code" value="">';
@@ -551,7 +512,7 @@ class tinymce_plugin extends Plugin
 		echo '<script type="text/javascript">jQuery(\'[name="editor_code"]\').attr(\'value\', \''.$editor_code.'\');</script>';
 
 		// We also want to save the 'last used/not-used' state: (if no NULLs, this won't change anything)
-		$this->htsrv_save_editor_state( array('on'=>$use_tinymce, 'blog'=>$Blog->ID, 'item'=>$edited_Item->ID ) );
+		$this->htsrv_save_editor_state( array_merge( $state_params, array( 'on' => $use_tinymce ) ) );
 
 		return true;
 	}
@@ -560,7 +521,18 @@ class tinymce_plugin extends Plugin
 	/**
 	 * Init the TinyMCE object (in front office).
 	 *
-	 * @return boolean
+	 * Event handler: Called when displaying editor buttons (in front-office).
+	 *
+	 * This method, if implemented, should output the buttons (probably as html INPUT elements)
+	 * and return true, if button(s) have been displayed.
+	 *
+	 * You should provide an unique html ID with each button.
+	 *
+	 * @param array Associative array of parameters.
+	 *   - 'target_type': either 'Comment' or 'Item'.
+	 *   - 'edit_layout': "inskin", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
+	 *                    NOTE: Please respect the "inskin" mode, which should display only the most simple things!
+	 * @return boolean did we display a button?
 	 */
 	function DisplayEditorButton( & $params )
 	{
@@ -575,9 +547,10 @@ class tinymce_plugin extends Plugin
 	 * @todo fp> valid_elements to try to generate less validation errors
 	 *
 	 * @param string simple|expert
+	 * @param string ID of the edidted content (value of html attribure "id")
 	 * @return string|false
 	 */
-	function get_tmce_init( $edit_layout )
+	function get_tmce_init( $edit_layout, $content_id )
 	{
 		global $Blog;
 		global $Plugins;
@@ -733,8 +706,10 @@ class tinymce_plugin extends Plugin
 
 		// Configuration: -- http://wiki.moxiecode.com/index.php/TinyMCE:Configuration
 		$init_options = array();
-		// Convert one specifc textarea to use TinyMCE:
-		$init_options[] = 'selector : "textarea#'.$this->tmce_editor_id.'"';
+		if( $this->Settings->get( 'use_gzip_compressor' ) )
+		{	// Load script to use gzip compressor:
+			$init_options[] = 'script_url: "'.get_require_url( 'tiny_mce/tinymce.gzip.php', ( is_admin_page() ? 'rsc_url' : 'blog' ), 'js' ).'"';
+		}
 		// TinyMCE Theme+Skin+Variant to use:
 		$init_options[] = 'theme : "modern"';
 		$init_options[] = 'menubar : false';
@@ -766,22 +741,24 @@ class tinymce_plugin extends Plugin
 		// note: $version may not be needed below because of automatic suffix? not sure..
 		// TODO: we don't want all of basic.css here
 
-		// Load the appropriate ITEM/POST styles depending on the blog's skin:
-		// Note: we are not aiming for perfect wysiwyg (too heavy), just for a relevant look & feel.
 		$content_css = '';
-		$blog_skin_ID = $Blog->get_skin_ID();
-		if( ! empty( $blog_skin_ID ) )
-		{
-			$SkinCache = & get_SkinCache();
-			/**
-			 * @var Skin
-			 */
-			$Skin = $SkinCache->get_by_ID( $blog_skin_ID );
-			$item_css_url = $skins_url.$Skin->folder.'/item.css';
-			// else: $item_css_url = $rsc_url.'css/item_base.css';
-			$content_css .= ','.$item_css_url;		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
+		if( ! empty( $Blog ) )
+		{	// Load the appropriate ITEM/POST styles depending on the blog's skin:
+			// Note: we are not aiming for perfect wysiwyg (too heavy), just for a relevant look & feel.
+			$blog_skin_ID = $Blog->get_skin_ID();
+			if( ! empty( $blog_skin_ID ) )
+			{
+				$SkinCache = & get_SkinCache();
+				/**
+				 * @var Skin
+				 */
+				$Skin = $SkinCache->get_by_ID( $blog_skin_ID );
+				$item_css_url = $skins_url.$Skin->folder.'/item.css';
+				// else: $item_css_url = $rsc_url.'css/item_base.css';
+				$content_css .= ','.$item_css_url;		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
+			}
+			// else item_default.css -- is it still possible to have no skin ?
 		}
-		// else item_default.css -- is it still possible to have no skin ?
 
 		// Load the content css files from 3rd party code, e.g. other plugins:
 		global $tinymce_content_css;
@@ -800,7 +777,7 @@ class tinymce_plugin extends Plugin
 
 		// Autocomplete options
 		$init_options[] = 'autocomplete_options: autocomplete_static_options'; // Must be initialize before as string with usernames that are separated by comma
-		$init_options[] = 'autocomplete_options_url: htsrv_url + "anon_async.php?action=autocomplete_usernames"';
+		$init_options[] = 'autocomplete_options_url: restapi_url + "users/autocomplete"';
 
 		// remove_linebreaks : false,
 		// not documented:	auto_cleanup_word : true,
@@ -854,26 +831,88 @@ class tinymce_plugin extends Plugin
 
 	/**
 	 * AJAX callback to save editor state (on or off).
+	 *
+	 * @param array Params
 	 */
-	function htsrv_save_editor_state($params)
+	function htsrv_save_editor_state( $params )
 	{
-		/**
-		 * @var DB
-		 */
-		global $DB;
-
-		if( ! isset($params['on']) )
-		{
+		if( ! isset( $params['on'] ) )
+		{	// Wrong request:
 			return;
 		}
 
-		// Save plugin usersettings
-		if( !empty($params['blog']) )
-		{	// This is in order to try & recall a specific state for each blog: (will be used for new posts especially)
-			$this->UserSettings->set( 'use_tinymce_coll'.(int)$params['blog'], (int)$params['on'] );
+		switch( $params['type'] )
+		{
+			case 'Item':
+				// Save an edit state for item edit form:
+
+				if( ! empty( $params['blog'] ) )
+				{	// This is in order to try & recall a specific state for each blog: (will be used for new posts especially)
+					$this->UserSettings->set( 'use_tinymce_coll'.intval( $params['blog'] ), intval( $params['on'] ) );
+				}
+				$this->UserSettings->set( 'use_tinymce', intval( $params['on'] ) );
+				$this->UserSettings->dbupdate();
+				break;
+
+			case 'EmailCampaign':
+				// Save an edit state for email campaign edit form:
+				$EmailCampaignCache = & get_EmailCampaignCache();
+				if( $EmailCampaign = & $EmailCampaignCache->get_by_ID( intval( $params['email'] ), false, false ) )
+				{
+					$EmailCampaign->set( 'use_wysiwyg', intval( $params['on'] ) );
+					$EmailCampaign->dbupdate();
+				}
+				break;
 		}
-		$this->UserSettings->set( 'use_tinymce', (int)$params['on'] );
-		$this->UserSettings->dbupdate();
+	}
+
+	/**
+	 * Get editor state
+	 *
+	 * @param array Params
+	 */
+	function get_editor_state( $params )
+	{
+		switch( $params['type'] )
+		{
+			case 'Item':
+				// Get an edit state for item edit form:
+
+				$ItemCache = & get_ItemCache();
+				$Item = & $ItemCache->get_by_ID( $params['item'], false, false );
+
+				$item_editor_code = ( empty( $Item ) ? NULL : $Item->get_setting( 'editor_code' ) );
+
+				if( ! empty( $item_editor_code ) )
+				{	// We have a preference for the current post, follow it:
+					// Use tinymce if code matched the code of the current plugin.
+					// fp> Note: this is a temporary solution; in the long term, this will be part of the API and the appropriate plugin will be selected.
+					$editor_state = ( $item_editor_code == $this->code );
+				}
+				else
+				{	// We have no pref, fall back to whatever current user has last used:
+
+					// Has the user used MCE last time he edited this particular blog?
+					$editor_state = $this->UserSettings->get( 'use_tinymce_coll'.$params['blog'] );
+
+					if( is_null( $editor_state ) )
+					{	// We don't know for this blog, check if he used MCE last time he edited anything:
+						$editor_state = $this->UserSettings->get( 'use_tinymce' );
+					}
+				}
+
+				return $editor_state;
+
+			case 'EmailCampaign':
+				// Get an edit state for email campaign edit form:
+				$EmailCampaignCache = & get_EmailCampaignCache();
+				if( $EmailCampaign = & $EmailCampaignCache->get_by_ID( intval( $params['email'] ), false, false ) )
+				{
+					return $EmailCampaign->get( 'use_wysiwyg' );
+				}
+		}
+
+		return 0;
 	}
 
 
@@ -916,7 +955,7 @@ class tinymce_plugin extends Plugin
 	 */
 	function GetHtsrvMethods()
 	{
-		return array('save_editor_state', 'get_item_content_css');
+		return array( 'save_editor_state'/*, 'get_item_content_css'*/ );
 	}
 
 
@@ -945,9 +984,13 @@ class tinymce_plugin extends Plugin
 
 
 	/**
-	 * @see Plugin::SkinBeginHtmlHead()
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
 	 */
-	function SkinBeginHtmlHead()
+	function SkinBeginHtmlHead( & $params )
 	{
 		global $disp;
 
@@ -959,13 +1002,16 @@ class tinymce_plugin extends Plugin
 
 
 	/**
-	 * @see Plugin::AdminEndHtmlHead()
+	 * Event handler: Called when ending the admin html head section.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
 	 */
-	function AdminEndHtmlHead()
+	function AdminEndHtmlHead( & $params )
 	{
 		global $ctrl;
 
-		if( $ctrl == 'items' )
+		if( $ctrl == 'items' || $ctrl == 'campaigns' )
 		{
 			require_css( $this->get_plugin_url( true ).'toolbar.css', 'blog' );
 		}

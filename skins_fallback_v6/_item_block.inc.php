@@ -7,13 +7,13 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $Skin;
+global $Item, $Skin, $app_version;
 
 // Default params:
 $params = array_merge( array(
@@ -22,6 +22,7 @@ $params = array_merge( array(
 		'item_class'                 => 'evo_post evo_content_block',
 		'item_type_class'            => 'evo_post__ptyp_',
 		'item_status_class'          => 'evo_post__',
+		'item_style'                 => '',
 		// Controlling the title:
 		'disp_title'                 => true,
 		'item_title_line_before'     => '<div class="evo_post_title">',	// Note: we use an extra class because it facilitates styling
@@ -34,14 +35,15 @@ $params = array_merge( array(
 		'content_mode'               => 'auto',		// excerpt|full|normal|auto -- auto will auto select depending on $disp-detail
 		'image_class'                => 'img-responsive',
 		'image_size'                 => 'fit-1280x720',
-		'author_link_text'           => 'preferredname',
+		'author_link_text'           => 'auto',
 	), $params );
 
 
 echo '<div class="evo_content_block">'; // Beginning of post display
 ?>
 
-<article id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>">
+<article id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>"<?php
+	echo empty( $params['item_style'] ) ? '' : ' style="'.format_to_output( $params['item_style'], 'htmlattr' ).'"' ?>>
 
 	<header>
 	<?php
@@ -145,7 +147,6 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 		<div class="evo_container evo_container__item_single">
 		<?php
 		// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-		// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 		// Display container contents:
 		skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
@@ -157,10 +158,10 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
 			// Template params for "Item Tags" widget
-			'widget_coll_item_tags_before'    => '<div class="small">'.T_('Tags').': ',
-			'widget_coll_item_tags_after'     => '</div>',
+			'widget_item_tags_before'    => '<div class="small">'.T_('Tags').': ',
+			'widget_item_tags_after'     => '</div>',
 			// Params for skin file "_item_content.inc.php"
-			'widget_coll_item_content_params' => $params,
+			'widget_item_content_params' => $params,
 		) );
 		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 		?>
@@ -182,14 +183,13 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	<footer>
 
 		<?php
-			if( ! $Item->is_intro() )
+			if( ! $Item->is_intro() ) // Do NOT apply tags, comments and feedback on intro posts
 			{ // List all tags attached to this post:
 				$Item->tags( array(
 						'before'    => '<nav class="small post_tags">',
 						'after'     => '</nav>',
 						'separator' => ' ',
 					) );
-			}
 		?>
 
 		<nav class="post_comments_link">
@@ -219,6 +219,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 						) );
 		?>
 		</nav>
+		<?php } ?>
 	</footer>
 
 	<?php
@@ -233,18 +234,24 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	?>
 
 	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
 		// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
 		skin_include( '_item_workflow.inc.php' );
 		// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
+	}
 	?>
 
 	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
 		// ------------------ META COMMENTS INCLUDED HERE ------------------
 		skin_include( '_item_meta_comments.inc.php', array(
 				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
 				'comment_end'           => '</article>',
 			) );
 		// ---------------------- END OF META COMMENTS ---------------------
+	}
 	?>
 
 	<?php

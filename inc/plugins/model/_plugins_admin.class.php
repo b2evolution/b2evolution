@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package plugins
@@ -89,7 +89,7 @@ class Plugins_admin extends Plugins
 				'AdminAfterPageFooter' => 'This gets called after the backoffice HTML footer has been displayed.',
 				'AdminDisplayEditorButton' => 'Display action buttons on the edit screens in the back-office',
 				'DisplayEditorButton' => 'Display action buttons on the edit screen in the front-office',
-				'AdminDisplayToolbar' => 'Display a toolbar on the edit screens',
+				'AdminDisplayToolbar' => 'Display a toolbar on the post/item form',
 				'AdminDisplayCommentFormFieldset' => 'Display form fieldsets on the backoffice comment editing form',
 				'AdminDisplayItemFormFieldset' => 'Display form fieldsets on the backoffice item editing screen(s)',
 				'DisplayItemFormFieldset' => 'Display form fieldsets on the frontoffice item editing screen(s)',
@@ -142,6 +142,8 @@ class Plugins_admin extends Plugins
 				'RenderItemAsText' => 'Renders content when generated as plain text.',
 				'RenderItemAttachment' => 'Renders item attachment.',
 				'RenderCommentAttachment' => 'Renders comment attachment.',
+				'RenderMessageAsHtml' => 'Renders message content when generated as HTML.',
+				'RenderEmailAsHtml' => 'Renders email content when generated as HTML.',
 
 
 				// fp> rename to "DispRender"
@@ -157,6 +159,9 @@ class Plugins_admin extends Plugins
 				'FilterCommentContent' => 'Filters the content of a comment.',
 
 				'FilterMsgContent' => 'Filters the content of a message.',
+				'FilterEmailContent' => 'Filters the content of an email.',
+
+				'EmailFormSent' => 'Called when the email form has been submitted.',
 
 				'AfterUserDelete' => 'This gets called after an user has been deleted from the database.',
 				'AfterUserInsert' => 'This gets called after an user has been inserted into the database.',
@@ -177,12 +182,13 @@ class Plugins_admin extends Plugins
 				'BeforeThumbCreate' => 'This gets called before an image thumbnail gets created.',
 				'AfterFileUpload' => 'Called before an uploaded file gets saved on server.',
 
-				'DisplayCommentToolbar' => 'Display a toolbar on the public feedback form',
+				'DisplayCommentToolbar' => 'Display a toolbar on the feedback/comment form',
 				'DisplayCommentFormButton' => 'Called in the submit button section of the frontend comment form.',
 				'DisplayCommentFormFieldset' => 'Called at the end of the frontend comment form.',
 				'DisplayMessageToolbar' => 'Display a toolbar on the message form',
 				'DisplayMessageFormButton' => 'Called in the submit button section of the frontend message form.',
 				'DisplayMessageFormFieldset' => 'Called at the end of the frontend message form.',
+				'DisplayEmailToolbar' => 'Display a toolbar on the email form',
 				'DisplayLoginFormFieldset' => 'Called when displaying the "Login" form.',
 				'DisplayRegisterFormBefore' => 'Called when displaying the "Register" form.',
 				'DisplayRegisterFormFieldset' => 'Called when displaying the "Register" form.',
@@ -232,6 +238,7 @@ class Plugins_admin extends Plugins
 				'SkinBeginHtmlHead' => 'Gets called at the top of the HTML HEAD section in a skin.',
 				'SkinEndHtmlBody' => 'Gets called at the end of the skin\'s HTML BODY section.',
 				'DisplayTrackbackAddr' => 'Called to display the trackback URL for an item.',
+				'BeforeSkinWrapper' => 'Gets called before skin wrapper.',
 
 				'GetCronJobs' => 'Gets a list of implemented cron jobs.',
 				'GetProvidedSkins' => 'Get a list of "skins" handled by the plugin.',
@@ -445,6 +452,7 @@ class Plugins_admin extends Plugins
 		{ // All Plugin from 'rendering' groups handle the FilterCommentContent
 			$plugin_class_methods[] = 'FilterCommentContent';
 			$plugin_class_methods[] = 'FilterMsgContent';
+			$plugin_class_methods[] = 'FilterEmailContent';
 		}
 
 		if( ! function_exists('token_get_all') )
@@ -1042,7 +1050,6 @@ class Plugins_admin extends Plugins
 				$DB->query( 'DELETE FROM T_items__prerendering WHERE 1=1' );
 				$ItemCache = & get_ItemCache();
 				$ItemCache->clear();
-				break;
 			}
 
 			return true;
@@ -1394,7 +1401,7 @@ class Plugins_admin extends Plugins
 								usort( $clean_versions, 'version_compare' );
 								$clean_oldest_enabled = array_shift($clean_versions);
 
-								if( version_compare( $clean_oldest_enabled, $clean_req_ver, '<' ) )
+								if( evo_version_compare( $clean_oldest_enabled, $clean_req_ver, '<' ) )
 								{ // at least one instance of the installed plugins is not the current version
 									$msgs['error'][] = sprintf( T_( 'The plugin requires at least version %s of the plugin %s, but you have %s.' ), $plugin_req[1], $plugin_req[0], $clean_oldest_enabled );
 								}
@@ -1426,7 +1433,7 @@ class Plugins_admin extends Plugins
 
 					case 'app_min':
 						// min b2evo version:
-						if( ! version_compare( $app_version, $type_params, '>=' ) )
+						if( ! evo_version_compare( $app_version, $type_params, '>=' ) )
 						{
 							if( $class == 'recommends' )
 							{

@@ -7,16 +7,20 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $UserSettings, $email, $statuses;
+global $blog, $admin_url, $UserSettings, $email, $statuses, $all_statuses;
 
 param( 'email', 'string', '', true );
 param( 'statuses', 'array:string', array( 'redemption', 'warning', 'suspicious3' ), true );
+if( param( 'all_statuses', 'integer', 0, true ) )
+{	// Filter to get email addresses with all statuses:
+	$statuses = array_keys( emadr_get_status_titles() );
+}
 
 // Create result set:
 
@@ -49,7 +53,7 @@ $Results = new Results( $SQL->get(), 'emadr_', '---D', $UserSettings->get( 'resu
 
 $Results->title = T_('Email addresses').get_manual_link( 'email-addresses' );
 
-$Results->global_icon( T_('Create a new email address...'), 'new', $admin_url.'?ctrl=email&amp;tab=blocked&amp;action=blocked_new', T_('Add an email address').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+$Results->global_icon( T_('Create a new email address...'), 'new', $admin_url.'?ctrl=email&amp;action=blocked_new', T_('Add an email address').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 
 /**
  * Callback to add filters on top of the result set
@@ -69,9 +73,9 @@ function filter_email_blocked( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_email_blocked',
 	'presets' => array(
-		'all'       => array( T_('All'), $admin_url.'?ctrl=email&amp;tab=blocked&amp;statuses[]=unknown&amp;statuses[]=redemption&amp;statuses[]=warning&amp;statuses[]=suspicious1&amp;statuses[]=suspicious2&amp;statuses[]=suspicious3&amp;statuses[]=prmerror&amp;statuses[]=spammer'),
-		'errors'    => array( T_('Errors'), $admin_url.'?ctrl=email&amp;tab=blocked&amp;statuses[]=warning&amp;statuses[]=suspicious1&amp;statuses[]=suspicious2&amp;statuses[]=suspicious3&amp;statuses[]=prmerror&amp;statuses[]=spammer'),
-		'attention' => array( T_('Need Attention'), $admin_url.'?ctrl=email&amp;tab=blocked&amp;statuses[]=redemption&amp;statuses[]=warning&amp;statuses[]=suspicious3'),
+		'all'       => array( T_('All'), $admin_url.'?ctrl=email&amp;all_statuses=1'),
+		'errors'    => array( T_('Errors'), $admin_url.'?ctrl=email&amp;statuses[]=warning&amp;statuses[]=suspicious1&amp;statuses[]=suspicious2&amp;statuses[]=suspicious3&amp;statuses[]=prmerror&amp;statuses[]=spammer'),
+		'attention' => array( T_('Need Attention'), $admin_url.'?ctrl=email&amp;statuses[]=redemption&amp;statuses[]=warning&amp;statuses[]=suspicious3'),
 		)
 	);
 
@@ -211,7 +215,7 @@ $Results->cols[] = array(
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
 		'td' => action_icon( T_('Filter the returned emails by this email address...'), 'magnifier', $admin_url.'?ctrl=email&amp;tab=return&amp;email=$emadr_address$' )
-			.action_icon( T_('Edit this email address...'), 'properties', $admin_url.'?ctrl=email&amp;tab=blocked&amp;emadr_ID=$emadr_ID$' )
+			.action_icon( T_('Edit this email address...'), 'properties', $admin_url.'?ctrl=email&amp;emadr_ID=$emadr_ID$' )
 			.action_icon( T_('Delete this email address!'), 'delete', url_decode_special_symbols( regenerate_url( 'emadr_ID,action', 'emadr_ID=$emadr_ID$&amp;action=blocked_delete&amp;'.url_crumb('email_blocked') ) ) )
 	);
 

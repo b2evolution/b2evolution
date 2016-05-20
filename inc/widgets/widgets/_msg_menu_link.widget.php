@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -33,10 +33,10 @@ class msg_menu_link_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function msg_menu_link_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'msg_menu_link' );
+		parent::__construct( $db_row, 'core', 'msg_menu_link' );
 	}
 
 
@@ -195,7 +195,7 @@ class msg_menu_link_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $current_User, $unread_messages_count;
+		global $current_User;
 		global $disp;
 
 		$this->init_display( $params );
@@ -276,17 +276,18 @@ class msg_menu_link_Widget extends ComponentWidget
 			$text = $this->disp_params[ 'link_text' ];
 		}
 
-		if( ( $this->disp_params[ 'show_badge' ] ) && ( $unread_messages_count > 0 ) )
-		{
-			$badge = ' <span class="badge badge-important">'.$unread_messages_count.'</span>';
-			if( isset( $this->BlockCache ) )
-			{ // Do not cache if bage is displayed because the number of unread messages are always changing
-				$this->BlockCache->abort_collect();
+		$badge = '';
+		if( ( $this->disp_params[ 'show_badge' ] ) )
+		{	// Show badge with count of uread messages:
+			$unread_messages_count = get_unread_messages_count();
+			if( $unread_messages_count > 0 )
+			{	// If at least one unread message:
+				$badge = ' <span class="badge badge-important">'.$unread_messages_count.'</span>';
+				if( isset( $this->BlockCache ) )
+				{	// Do not cache if bage is displayed because the number of unread messages are always changing:
+					$this->BlockCache->abort_collect();
+				}
 			}
-		}
-		else
-		{
-			$badge = '';
 		}
 
 		echo $this->disp_params['block_start'];

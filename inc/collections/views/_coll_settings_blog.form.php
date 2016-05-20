@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -80,8 +80,8 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Cross posting').get_manual_link('collections-cross-posting-settings') );
 	$Form->checklist( array(
-		array( 'cross_posting', 1, T_('Allow cross-posting posts to several blogs'), $Settings->get('cross_posting'), false, T_('(Extra cats in different blogs)') ),
-		array( 'cross_posting_blogs', 1, T_('Allow moving posts between different blogs'), $Settings->get('cross_posting_blogs'), false, T_('(Main cat can move to different blog)') ) ),
+		array( 'cross_posting', 1, T_('Allow admins to cross post to several collections'), $Settings->get('cross_posting'), false, T_('(Extra cats in different blogs)').get_admin_badge() ),
+		array( 'cross_posting_blogs', 1, T_('Allow admins to move posts between collections'), $Settings->get('cross_posting_blogs'), false, T_('(Main cat can move to different blog)').get_admin_badge() ) ),
 		'allow_cross_posting', T_('Cross Posting') );
 
 	$Form->checkbox_input( 'redirect_moved_posts', $Settings->get('redirect_moved_posts'), T_('Redirect if post has moved'), array( 'note'=>T_('check to allow redirects to the correct blog when a post was found in a different blog.') ) );

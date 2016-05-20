@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -28,10 +28,10 @@ class user_register_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function user_register_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'user_register' );
+		parent::__construct( $db_row, 'core', 'user_register' );
 	}
 
 
@@ -220,21 +220,43 @@ class user_register_Widget extends ComponentWidget
 		$Form->hidden( 'widget', $this->ID );
 		$Form->hidden( 'redirect_to', $redirect_to );
 
-		// E-mail
-		$email_value = isset( $widget_param_input_values[ $dummy_fields['email'] ] ) ? $widget_param_input_values[ $dummy_fields['email'] ] : '';
-		$Form->text_input( $dummy_fields['email'], $email_value, 50, T_('Your email'), '', array( 'maxlength' => 255, 'class' => 'input_text', 'required' => true ) );
-
 		if( $this->disp_params['ask_firstname'] != 'no' )
 		{ // First name
 			$firstname_value = isset( $widget_param_input_values['firstname'] ) ? $widget_param_input_values['firstname'] : '';
-			$Form->text_input( 'firstname', $firstname_value, 18, T_('First name'), '', array( 'maxlength' => 50, 'class' => 'input_text', 'required' => ( $this->disp_params['ask_firstname'] == 'required' ) ) );
+			$firstname_params = array(
+					'maxlength' => 50,
+					'class' => 'input_text'
+				);
+			if( $this->disp_params['ask_firstname'] == 'required' )
+			{	// Params if first name is required:
+				// Set css class "field_required":
+				$firstname_params['required'] = true;
+				// Set HTML5 attribute required="required" to display JS error before submit form:
+				$firstname_params['input_required'] = 'required';
+			}
+			$Form->text_input( 'firstname', $firstname_value, 18, T_('First name'), '', $firstname_params );
 		}
 
 		if( $this->disp_params['ask_lastname'] != 'no' )
 		{ // Last name
 			$lastname_value = isset( $widget_param_input_values['lastname'] ) ? $widget_param_input_values['lastname'] : '';
-			$Form->text_input( 'lastname', $lastname_value, 18, T_('Last name'), '', array( 'maxlength' => 50, 'class' => 'input_text', 'required' => ( $this->disp_params['ask_lastname'] == 'required' ) ) );
+			$lastname_params = array(
+					'maxlength' => 50,
+					'class' => 'input_text'
+				);
+			if( $this->disp_params['ask_lastname'] == 'required' )
+			{	// Params if first name is required:
+				// Set css class "field_required":
+				$lastname_params['required'] = true;
+				// Set HTML5 attribute required="required" to display JS error before submit form:
+				$lastname_params['input_required'] = 'required';
+			}
+			$Form->text_input( 'lastname', $lastname_value, 18, T_('Last name'), '', $lastname_params );
 		}
+
+		// E-mail
+		$email_value = isset( $widget_param_input_values[ $dummy_fields['email'] ] ) ? $widget_param_input_values[ $dummy_fields['email'] ] : '';
+		$Form->text_input( $dummy_fields['email'], $email_value, 50, T_('Your email'), '', array( 'maxlength' => 255, 'class' => 'input_text', 'required' => true, 'input_required' => 'required' ) );
 
 		// Submit button
 		$Form->begin_fieldset( '', array( 'class' => 'fieldset field_register_btn' ) );

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package main
@@ -524,12 +524,22 @@ elseif( !empty($preview) )
 elseif( $disp == '-' && !empty($Item) )
 { // We have not requested a specific disp but we have identified a specific post to be displayed
 	// We are going to display a single post
-	// if( in_array( $Item->ityp_ID, $posttypes_specialtypes ) )
 	if( preg_match( '|[&?](download=\d+)|', $ReqURI ) )
 	{
 		$disp = 'download';
+
+		// erhsatingin> Is this the right place to increment the download count?
+		$link_ID = param( 'download', 'integer', false);
+		$LinkCache = & get_LinkCache();
+		if( ( $download_Link = & $LinkCache->get_by_ID( $link_ID, false, false ) ) && // Link exists in DB
+				( $download_File = & $download_Link->get_File() ) && // Link has a correct File object
+				( $download_File->exists() ) // File exists on the disk
+			)
+		{
+			$download_File->increment_download_count();
+		}
 	}
-	elseif( $Item->ityp_ID == 1000 )
+	elseif( $Item->get_type_setting( 'usage' ) == 'page' )
 	{
 		$disp = 'page';
 	}
@@ -564,6 +574,21 @@ elseif( $disp == '-' )
 		}
 	}
 
+	if( $disp == 'single' )
+	{	// We must find first item from disp=posts and display it on front page:
+		if( $Item = & $Blog->get_first_mainlist_Item() )
+		{	// The item is found, Use it:
+			set_param( 'p', $Item->ID );
+			$c = 1; // Display comments
+		}
+
+		if( empty( $Item ) )
+		{	// If item is not found, display 404 page with below error message:
+			$Messages->add( sprintf( T_('Front page is set to display first post but there is nothing to display.'), $p ), 'error' );
+			$disp = '404';
+		}
+	}
+
 	if( $disp == 'page' )
 	{ // Specific page is displayed on front page
 		set_param( 'p', $Blog->get_setting('front_post_ID') );
@@ -585,6 +610,52 @@ elseif( ( ( $disp == 'page' ) || ( $disp == 'single' ) ) && empty( $Item ) )
 	// Note: The 'preview' action is the only one exception, but that is handled above in this if statement
 	$disp = '404';
 	$disp_detail = '404-post_not_found';
+}
+
+
+if( $disp == 'terms' )
+{	// Display a page of terms & conditions:
+	$terms_item_ID = intval( $Settings->get( 'site_terms' ) );
+	if( $Settings->get( 'site_terms_enabled' ) && $terms_item_ID  > 0 )
+	{	// Only if item ID is defined for terms page:
+		set_param( 'p', $terms_item_ID );
+		$c = 0; // Don't display comments
+
+		$ItemCache = & get_ItemCache();
+		$Item = & $ItemCache->get_by_ID( $p, false );
+
+		if( is_logged_in() && $UserSettings->get( 'terms_accepted', $current_User->ID ) )
+		{	// Display the message if current user already accepted the terms:
+			$Messages->add( T_('You already accepted these terms.'), 'success' );
+		}
+
+		// Don't redirect to permanent url of the page:
+		$redir = 'no';
+	}
+}
+
+// Check if terms & conditions should be accepted by current user:
+if( is_logged_in() && // Only for logged in users
+    ! in_array( $disp, array( 'terms', 'help', 'msgform', 'activateinfo' ) ) && // Allow these pages
+    $Settings->get( 'site_terms_enabled' ) && // Terms must be enabled
+    ! $UserSettings->get( 'terms_accepted', $current_User->ID ) ) // If it was not accepted yet
+{	// Current user didn't accept the terms yet:
+
+	// Get ID of page with terms & conditions from global settings:
+	$terms_page_ID = intval( $Settings->get( 'site_terms' ) );
+
+	$ItemCache = & get_ItemCache();
+	if( $terms_page_ID &&
+	    $terms_Item = & $ItemCache->get_by_ID( $terms_page_ID, false, false ) &&
+	    $terms_item_Blog = & $terms_Item->get_Blog() )
+	{	// Redirect to view page with terms & conditions if it is defined correctly in settings:
+		$Messages->add( T_('You need to accept the following before you can enter this site.'), 'note' );
+		header_redirect( $terms_item_Blog->get( 'termsurl', array(
+				'url_suffix' => 'redirect_to='.rawurlencode( $ReqURI ),
+				'glue'       => '&',
+			) ), 303 );
+		// EXIT HERE
+	}
 }
 
 
@@ -721,7 +792,8 @@ if( !empty( $skin ) )
 
 		if( $skin_provided_by_plugin = skin_provided_by_plugin( $skin ) )
 		{
-			$Plugins->call_method( $skin_provided_by_plugin, 'DisplaySkin', $tmp_params = array( 'skin' => $skin ) );
+			$tmp_params = array( 'skin' => $skin );
+			$Plugins->call_method( $skin_provided_by_plugin, 'DisplaySkin', $tmp_params );
 		}
 		else
 		{
@@ -759,6 +831,8 @@ if( !empty( $skin ) )
 					'download'       => 'download.main.php',
 					'access_requires_login' => 'access_requires_login.main.php',
 					'tags'           => 'tags.main.php',
+					'terms'          => 'terms.main.php',
+					'help'           => 'help.main.php',
 					// All others will default to index.main.php
 				);
 

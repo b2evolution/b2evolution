@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -47,9 +47,30 @@ class infodots_plugin extends Plugin
 		$this->long_desc = T_('This plugin allows to render info dots over images by using the syntax [infodot:1234:40:60:20ex]html text[enddot] for example');
 
 		// Pattern to search the stars
-		$this->search_text = '#((<br />|<p>)\r?\n?)?\[infodot:(\d+):(-?\d+):(-?\d+)(:[\dpxecm%]+)?\](.+?)\[enddot\](\r?\n?(<br />|</p>))?#is';
+		$this->search_text = '#((<br />|<p>)\r?\n?)?\[infodot:(\d+):(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)(:\d+[pxecm%]*)?\](.+?)\[enddot\](\r?\n?(<br />|</p>))?#is';
 		// Function to build template for stars
 		$this->replace_func = array( $this, 'load_infodot_from_source' );
+	}
+
+
+	/**
+	 * Define here default custom settings that are to be made available
+	 *     in the backoffice for collections, private messages and newsletters.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_custom_setting_definitions()}.
+	 */
+	function get_custom_setting_definitions( & $params )
+	{
+		return array(
+			'coll_min_width' => array(
+					'label' => T_('Min width'),
+					'type' => 'integer',
+					'size' => 4,
+					'defaultvalue' => 400,
+					'note' => T_('Enter the minimum pixel width an image must have for dots to be displayed.')
+				),
+		);
 	}
 
 
@@ -65,17 +86,7 @@ class infodots_plugin extends Plugin
 				'default_post_rendering' => 'opt-out'
 			) );
 
-		return array_merge( parent::get_coll_setting_definitions( $default_params ),
-			array(
-				'coll_min_width' => array(
-						'label' => 'Min width',
-						'type' => 'integer',
-						'size' => 4,
-						'defaultvalue' => 400,
-						'note' => T_('Enter the minimum pixel width an image must have for dots to be displayed.')
-					),
-			)
-		);
+		return parent::get_coll_setting_definitions( $default_params );
 	}
 
 
@@ -144,20 +155,26 @@ class infodots_plugin extends Plugin
 	}
 	
 
-
 	/**
-	 * @see Plugin::SkinBeginHtmlHead()
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
 	 */
-	function SkinBeginHtmlHead()
+	function SkinBeginHtmlHead( & $params )
 	{
 		$this->init_html_head( 'blog' );
 	}
 
 
 	/**
-	 * @see Plugin::AdminEndHtmlHead()
+	 * Event handler: Called when ending the admin html head section.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
 	 */
-	function AdminEndHtmlHead()
+	function AdminEndHtmlHead( & $params )
 	{
 		$this->init_html_head( 'rsc_url' );
 	}
@@ -190,6 +207,34 @@ class infodots_plugin extends Plugin
 	function RenderItemAsXml( & $params )
 	{
 		$this->RenderItemAsHtml( $params );
+	}
+
+
+	/**
+	 * Perform rendering of Message content
+	 *
+	 * NOTE: Use default coll settings of comments as messages settings
+	 *
+	 * @see Plugin::RenderMessageAsHtml()
+	 */
+	function RenderMessageAsHtml( & $params )
+	{
+		// This plugin cannot works with messages:
+		return true;
+	}
+
+
+	/**
+	 * Perform rendering of Email content
+	 *
+	 * NOTE: Use default coll settings of comments as messages settings
+	 *
+	 * @see Plugin::RenderEmailAsHtml()
+	 */
+	function RenderEmailAsHtml( & $params )
+	{
+		// This plugin cannot works with emails:
+		return true;
 	}
 
 
@@ -261,8 +306,8 @@ class infodots_plugin extends Plugin
 
 			// Add dot
 			$this->dots[ $link_ID ][] = array(
-					'x' => intval( $matches[4] ), // Left
-					'y' => intval( $matches[5] ), // Top
+					'x' => $matches[4].( strlen( intval( $matches[4] ) ) == strlen( $matches[4] ) ? 'px' : '' ), // Left
+					'y' => $matches[5].( strlen( intval( $matches[5] ) ) == strlen( $matches[5] ) ? 'px' : '' ), // Top
 				);
 		}
 
@@ -359,7 +404,7 @@ class infodots_plugin extends Plugin
 		$before_image = '<div class="infodots_image">'."\n";
 		foreach( $this->dots[ $Link->ID ] as $d => $dot )
 		{ // Init html element for each dot
-			$before_image .= '<div class="infodots_dot" rel="infodot_'.$Link->ID.'_'.( $d + 1 ).'" style="left:'.$dot['x'].'px;top:'.$dot['y'].'px"></div>'."\n";
+			$before_image .= '<div class="infodots_dot" rel="infodot_'.$Link->ID.'_'.( $d + 1 ).'" style="left:'.$dot['x'].';top:'.$dot['y'].'"></div>'."\n";
 		}
 
 		// Append info dots html to current image tag

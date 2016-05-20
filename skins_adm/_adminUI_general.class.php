@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -139,7 +139,7 @@ class AdminUI_general extends Menu
 	/**
 	 * Constructor.
 	 */
-	function AdminUI_general()
+	function __construct()
 	{
 		global $mode; // TODO: make it a real property
 		global $htsrv_url, $baseurl;
@@ -206,7 +206,7 @@ class AdminUI_general extends Menu
 
 		if( $add_blog && isset( $Blog ) )
 		{ // Add path to Blog
-			$this->breadcrumbpath_add( $Blog->dget('shortname'), !empty( $blog_url ) ? $blog_url : $admin_url.'?ctrl=dashboard&amp;blog=$blog$' );
+			$this->breadcrumbpath_add( $Blog->dget('shortname'), !empty( $blog_url ) ? $blog_url : $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' );
 		}
 
 		// Initialize the default manual link, this is always visible when explicit manual link is not set for a page
@@ -777,7 +777,7 @@ class AdminUI_general extends Menu
 
 			$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
 
-			if( $l_Blog->get( 'favorite' ) || $l_blog_ID == $blog )
+			if( $l_Blog->favorite() || $l_blog_ID == $blog )
 			{ // If blog is favorute OR current blog, Add blog as a button:
 				$buttons .= $template[ $l_blog_ID == $blog ? 'beforeEachSel' : 'beforeEach' ];
 
@@ -801,7 +801,7 @@ class AdminUI_general extends Menu
 				}
 			}
 
-			if( !$l_Blog->get( 'favorite' ) )
+			if( !$l_Blog->favorite() )
 			{ // If blog is not favorute, Add it into the select list:
 				$not_favorite_blogs = true;
 				$select_options .= '<option value="'.$l_blog_ID.'"';
@@ -1571,7 +1571,7 @@ class AdminUI_general extends Menu
 
 	/**
 	 * Get show evobar setting. Default true for every admin skin.
-	 * @return boolean 
+	 * @return boolean
 	 */
 	function get_show_evobar()
 	{

@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -14,17 +14,13 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $admin_url, $posttypes_reserved_IDs, $Blog, $edited_Item;
+global $admin_url, $Blog, $edited_Item;
 
 // Create query
 $SQL = new SQL();
 $SQL->SELECT( 'it.*' );
 $SQL->FROM( 'T_items__type AS it' );
 $SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID AND itc_coll_ID = '.$Blog->ID );
-if( ! empty( $posttypes_reserved_IDs ) )
-{ // Exclude the reserved post types
-	$SQL->WHERE( 'ityp_ID NOT IN ( '.implode( ', ', $posttypes_reserved_IDs ).' )' );
-}
 // Check what item types are allowed for current user and selected blog
 $item_type_perm_levels = array( 'standard', 'restricted', 'admin' );
 foreach( $item_type_perm_levels as $i => $item_type_perm_level )

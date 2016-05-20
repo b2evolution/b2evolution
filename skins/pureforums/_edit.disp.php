@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  * @subpackage pureforums
@@ -146,7 +146,7 @@ $Form->begin_form( 'inskin', '', $params );
 		$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
 		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
 
-		if( $Blog->get_setting( 'use_workflow' ) )
+		if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 		{	// We want to use workflow properties for this blog:
 			$Form->hidden( 'item_priority', $edited_Item->priority );
 			$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
@@ -223,7 +223,6 @@ $Form->begin_form( 'inskin', '', $params );
 		echo '<div class="edit_toolbars">';
 		// CALL PLUGINS NOW:
 		$Plugins->trigger_event( 'AdminDisplayToolbar', array(
-				'target_type' => 'Item',
 				'edit_layout' => 'expert',
 				'Item' => $edited_Item,
 			) );

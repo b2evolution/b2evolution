@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -29,14 +29,14 @@ $params = array_merge( array(
 		'download_file_name_before'     => '<p>',
 		'download_file_name_after'      => '</p>',
 		'download_file_desc_text'       => '<p>%s</p>',
-		'download_timer_text'           => '<p id="download_timer_js" style="display:none">'.T_( 'Your download will start in: %s seconds.' ).
+		'download_timer_text'           => '<div class="alert alert-info"><p id="download_timer_js" style="display:none">'.T_( 'Your download will start in: %s seconds.' ).
 		                                     '<span id="download_help_url" style="display:none"><br />'.
 		                                       T_( 'If your download hasn\'t started automatically, please <a %s>click here</a>.' ).
 		                                     '</span>'.
-		                                   '</p>',
-		'download_nojs_text'            => '<p id="download_info_nojs">'.T_( 'Your download will start shortly...' ).'<br />'.
+		                                   '</p></div>',
+		'download_nojs_text'            => '<div class="alert alert-info"><p class="alert alert-info" id="download_info_nojs">'.T_( 'Your download will start shortly...' ).'<br />'.
 		                                       T_( 'If nothing happens, please <a %s>click here</a>.' ).
-		                                   '</p>',
+		                                   '</p></div>',
 
 		'before_content_teaser'    => '',
 		'after_content_teaser'     => '',
@@ -51,17 +51,21 @@ $params = array_merge( array(
 		'image_link_to'            => 'original', // Can be 'original', 'single' or empty
 	), $params );
 
+/**
+ * @var The downloading File
+ */
+$download_File = & $download_Link->get_File();
 ?>
+<header>
+	<div class="evo_post_title"</div>
+		<h1>Download: <?php echo $download_File->get_name(); ?></h1>
+	</div>
+</header>
 <div id="<?php $download_Item->anchor_id() ?>" class="<?php $download_Item->div_classes( $params ) ?>" lang="<?php $download_Item->lang() ?>">
 <?php
 
 // Temporarily switch to post locale (useful for multilingual blogs)
 $download_Item->locale_temp_switch();
-
-/**
- * @var The downloading File
- */
-$download_File = & $download_Link->get_File();
 
 // File name
 echo $params['download_file_name_before'];

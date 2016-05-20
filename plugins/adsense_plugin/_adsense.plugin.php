@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -42,15 +42,14 @@ class adsense_plugin extends Plugin
 
 
 	/**
-	 * Get the settings that the plugin can use.
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
 	 *
-	 * Those settings are transfered into a Settings member object of the plugin
-	 * and can be edited in the backoffice (Settings / Plugins).
-	 *
-	 * @see Plugin::GetDefaultSettings()
-	 * @see PluginSettings
-	 * @see Plugin::PluginSettingsValidateSet()
-	 * @return array
+	 * @param array Associative array of parameters (since v1.9).
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
+	 * @return array see {@link Plugin::GetDefaultSettings()}.
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
+	 * and assign an array with the following keys to them (only 'label' is required):
 	 */
 	function GetDefaultSettings( & $params )
 	{
@@ -220,12 +219,118 @@ class adsense_plugin extends Plugin
 	}
 
 	/**
-	 * Display a toolbar in admin
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
 	function AdminDisplayToolbar( & $params )
+	{
+		if( !empty( $params['Item'] ) )
+		{	// Item is set, get Blog from post:
+			$edited_Item = & $params['Item'];
+			$Blog = & $edited_Item->get_Blog();
+		}
+
+		if( empty( $Blog ) )
+		{	// Item is not set, try global Blog:
+			global $Blog;
+			if( empty( $Blog ) )
+			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available:
+				return false;
+			}
+		}
+
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $Blog );
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
+		{	// Plugin is not enabled for current case, so don't display a toolbar:
+			return false;
+		}
+	
+		return $this->DisplayCodeToolbar();
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for message.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayMessageToolbar( & $params )
+	{
+		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{
+			return $this->DisplayCodeToolbar();
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{
+			return $this->DisplayCodeToolbar();
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars on comment form.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCommentToolbar( & $params )
+	{
+		$Comment = & $params['Comment'];
+		if( $Comment )
+		{	// Get a post of the comment:
+			if( $comment_Item = & $Comment->get_Item() )
+			{
+				$Blog = & $comment_Item->get_Blog();
+			}
+		}
+
+		if( empty( $Blog ) )
+		{	// Item is not set, try global Blog
+			global $Blog;
+			if( empty( $Blog ) )
+			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available
+				return false;
+			}
+		}
+
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog );
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
+		{	// Plugin is not enabled for current case, so don't display a toolbar:
+			return false;
+		}
+
+		return $this->DisplayCodeToolbar();
+	}
+
+
+	/**
+	 * Display a code toolbar
+	 *
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCodeToolbar()
 	{
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );

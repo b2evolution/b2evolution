@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -44,10 +44,10 @@ class Thread extends DataObject
 	 * Constructor
 	 * @param db_row database row
 	 */
-	function Thread( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_messaging__thread', 'thrd_', 'thrd_ID', 'datemodified' );
+		parent::__construct( 'T_messaging__thread', 'thrd_', 'thrd_ID', 'datemodified' );
 
 		if( $db_row != NULL )
 		{
@@ -136,7 +136,7 @@ class Thread extends DataObject
 				{
 					$recipients_selected[] = array(
 						'id'    => $user_ID,
-						'title' => $user_login
+						'login' => $user_login
 					);
 				}
 			}
@@ -246,7 +246,7 @@ class Thread extends DataObject
 
 		if( !empty( $recipients_array ) )
 		{	// These data is created by jQuery plugin fbautocomplete
-			$recipients_list = $recipients_array['title'];
+			$recipients_list = $recipients_array['login'];
 		}
 		else
 		{	// For browsers without JavaScript

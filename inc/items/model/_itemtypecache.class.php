@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -39,10 +39,10 @@ class ItemTypeCache extends DataObjectCache
 	 *
 	 * @param table Database row
 	 */
-	function ItemTypeCache()
+	function __construct()
 	{
 		// Call parent constructor:
-		parent::DataObjectCache( 'ItemType', true, 'T_items__type', 'ityp_', 'ityp_ID', 'ityp_name', 'ityp_ID' );
+		parent::__construct( 'ItemType', true, 'T_items__type', 'ityp_', 'ityp_ID', 'ityp_name', 'ityp_ID' );
 	}
 
 
@@ -65,22 +65,46 @@ class ItemTypeCache extends DataObjectCache
 	 */
 	function get_option_list_usable_only( $default = 0, $allow_none = false, $method = 'get_name' )
 	{
-		global $posttypes_reserved_IDs;
-
-		// Compile an array of post type IDs to exclude:
-		$exclude_posttype_IDs = $posttypes_reserved_IDs;
-
-		return $this->get_option_list( $default, $allow_none, $method, $exclude_posttype_IDs );
+		return $this->get_option_list( $default, $allow_none, $method );
 	}
+
 
 	/**
 	 * For use by Universal Item List widget
+	 *
+	 * @param array IDs to ignore.
+	 * @return array
 	 */
-	function get_option_array()
+	function get_option_array( $ignore_IDs = array() )
 	{
-		global $posttypes_reserved_IDs;
+		return $this->get_option_array_worker( 'get_name', $ignore_IDs );
+	}
 
-		return parent::get_option_array( 'get_name', $posttypes_reserved_IDs );
+
+	/**
+	 * For use by Universal Item List widget and item type edit form
+	 *
+	 * @return array
+	 */
+	function get_usage_option_array()
+	{
+		return array(
+				T_('In content flow') => array(
+						'post' => T_('Post')
+					),
+				T_('Out of content flow') => array(
+						'page'    => T_('Page'),
+						'special' => T_('Special'),
+					),
+				T_('Intros') => array(
+						'intro-front' => T_('Intro-Front'),
+						'intro-main'  => T_('Intro-Main'),
+						'intro-cat'   => T_('Intro-Cat'),
+						'intro-tag'   => T_('Intro-Tag'),
+						'intro-sub'   => T_('Intro-Sub'),
+						'intro-all'   => T_('Intro-All'),
+					),
+			);
 	}
 }
 

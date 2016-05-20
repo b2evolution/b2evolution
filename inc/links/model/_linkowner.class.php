@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -80,7 +80,7 @@ class LinkOwner
 	 * @param object the link owner object
 	 * @param string the link type ( item, comment, ... )
 	 */
-	function LinkOwner( $link_Object, $type )
+	function __construct( $link_Object, $type )
 	{
 		$this->link_Object = $link_Object;
 		$this->type = $type;
@@ -199,7 +199,7 @@ class LinkOwner
 		}
 
 		// Set links query. Note: Use inner join to make sure that result contains only existing files!
-		$SQL->SELECT( 'link_ID, link_ltype_ID, link_position, link_cmt_ID, link_itm_ID, file_ID, file_type, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash' );
+		$SQL->SELECT( 'link_ID, link_ltype_ID, link_position, link_cmt_ID, link_itm_ID, file_ID, file_creator_user_ID, file_type, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash' );
 		$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
 		$SQL->WHERE( $this->get_where_condition() );
 		$SQL->ORDER_BY( $order_by );
@@ -282,7 +282,7 @@ class LinkOwner
 		$FileList = new DataObjectList2( $FileCache ); // IN FUNC
 
 		$SQL = new SQL();
-		$SQL->SELECT( 'file_ID, file_type, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash, link_ID' );
+		$SQL->SELECT( 'file_ID, file_creator_user_ID, file_type, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash, link_ID' );
 		$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
 		$SQL->WHERE( $this->get_where_condition() );
 		if( !empty($position) )
@@ -300,7 +300,7 @@ class LinkOwner
 
 		$FileList->sql = $SQL->get();
 
-		$FileList->query( false, false, false, 'get_attachment_FileList' );
+		$FileList->run_query( false, false, false, 'get_attachment_FileList' );
 
 		if( $FileList->result_num_rows == 0 )
 		{	// Nothing found
@@ -363,7 +363,7 @@ class LinkOwner
 
 		$LinkList->sql = $SQL->get();
 
-		$LinkList->query( false, false, false, 'get_attachment_LinkList' );
+		$LinkList->run_query( false, false, false, 'get_attachment_LinkList' );
 
 		if( $LinkList->result_num_rows == 0 )
 		{ // Nothing found

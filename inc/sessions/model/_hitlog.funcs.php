@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal Origin:
@@ -125,7 +125,7 @@ function hits_results_block( $params = array() )
 
 	$SQL = new SQL();
 	$SQL->SELECT( 'SQL_NO_CACHE hit_ID, sess_ID, sess_device, hit_datetime, hit_type, hit_referer_type, hit_uri, hit_disp, hit_ctrl, hit_action, hit_coll_ID, hit_referer, hit_remote_addr,'
-		.'user_login, hit_agent_type, blog_shortname, dom_name, goal_name, hit_keyphrase, hit_serprank, hit_response_code, hit_agent_ID' );
+		.'user_login, hit_agent_type, blog_shortname, dom_name, goal_name, hit_keyphrase, hit_serprank, hit_response_code, hit_method, hit_agent_ID' );
 	$SQL->FROM( 'T_hitlog LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID'
 		.' LEFT JOIN T_sessions ON hit_sess_ID = sess_ID'
 		.' LEFT JOIN T_blogs ON hit_coll_ID = blog_ID'
@@ -516,7 +516,7 @@ function generate_random_ip()
  */
 function generate_hit_stat( $days, $min_interval, $max_interval, $display_process = false )
 {
-	global $baseurlroot, $admin_url, $user_agents, $DB, $htsrv_url;
+	global $baseurlroot, $admin_url, $user_agents, $DB, $htsrv_url, $is_api_request;
 
 	load_class('items/model/_itemlistlight.class.php', 'ItemListLight');
 	load_class('sessions/model/_hit.class.php', 'Hit');
@@ -527,8 +527,8 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 
 	$blogs_id = $BlogCache->load_public();
 
-	foreach ($blogs_id as $blog_id)
-	{ // handle all public blogs
+	foreach( $blogs_id as $blog_id )
+	{	// Handle all public blogs:
 			$listBlog = & $BlogCache->get_by_ID($blog_id);
 		if (empty($listBlog))
 		{
@@ -549,7 +549,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 		$linkblog_cat_array = array();
 		$linkblog_cat_modifier = '';
 
-		compile_cat_array($linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */ $linkblog_cat_modifier, $listBlog->ID);
+		compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */ $linkblog_cat_modifier, $listBlog->ID );
 
 		$filters['cat_array'] = $linkblog_cat_array;
 		$filters['cat_modifier'] = $linkblog_cat_modifier;
@@ -560,16 +560,16 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 		// Get the items list of current blog
 		$ItemList->query();
 
-		if (!$ItemList->result_num_rows)
-		{ // Nothing to display:
+		if( ! $ItemList->result_num_rows )
+		{	// Nothing to display:
 			continue;
 		}
 
-		while ($Item = & $ItemList->get_category_group())
+		while( $Item = & $ItemList->get_category_group() )
 		{
 			// Open new cat:
 			$Chapter = & $Item->get_main_Chapter();
-			while ($Item = & $ItemList->get_item())
+			while( $Item = & $ItemList->get_item() )
 			{
 				$links[] = array('link' => '/' . $listBlog->siteurl . '/' . $Chapter->get_url_path() . $Item->urltitle, // trim($Chapter->get_permanent_url(NULL ,' ')).
 					'blog_id' => $blog_id);
@@ -600,7 +600,30 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 				'link' => $htsrv_url.'anon_async.php',
 				'blog_id' => $blog_id
 			);
+
+		$links[] = array(
+				'link' => '/api/v1/collections/'.$listBlog->urlname.'/posts',
+				'blog_id' => $blog_id
+			);
+
+		$links[] = array(
+				'link' => '/api/v1/collections/'.$listBlog->urlname.'/search/post',
+				'blog_id' => $blog_id
+			);
+
+		$links[] = array(
+				'link' => '/xmlsrv/xmlrpc.php?blog='.$listBlog->ID,
+				'blog_id' => $blog_id
+			);
 	}
+
+	$links[] = array(
+			'link' => '/api/v1/collections',
+		);
+
+	$links[] = array(
+			'link' => '/xmlsrv/xmlrpc.php'
+		);
 
 	$referes = array('http://www.fake-referer1.com',
 		'http://www.fake-referer2.com',
@@ -634,6 +657,9 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 			'palm',
 			'gendvice'
 		);
+
+	$request_methods = array( 'GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'unknown' );
+	$request_methods_count = count( $request_methods ) - 1;
 
 	$robots = array();
 	foreach( $user_agents as $lUserAgent )
@@ -677,7 +703,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 	if( empty( $users_count ) )
 	{
 		$Messages->add( 'Cannot generate statistics without valid users.' );
-		break;
+		return;
 	}
 
 	// Calculate the period of testing
@@ -715,6 +741,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 		$rand_i = mt_rand(0, $users_count - 1);
 		$rand_link = mt_rand(0, $links_count - 1);
 		$cur_seesion = $sessions[$rand_i];
+		$rand_request_method = $request_methods[ mt_rand( 0, $request_methods_count - 1 ) ];
 
 
 		if (strstr($links[$rand_link]['link'], '$keywords$'))
@@ -728,7 +755,6 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 				$links[$rand_link]['s'] = $keywords;
 			}
 		}
-
 
 		if ($cur_seesion['sess_ID'] == -1)
 		{ // This session needs initialization:
@@ -749,7 +775,11 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 			$cur_seesion['sess_ID'] = $DB->insert_id;
 			$sessions[$rand_i] = $cur_seesion;
 
+			// Check if current url is api request:
+			$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 || strpos( $links[$rand_link]['link'], '/xmlsrv/xmlrpc.php' ) === 0 );
+
 			$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link]);
+			$Test_hit->method = $rand_request_method;
 			$Test_hit->log();
 		}
 		else
@@ -827,7 +857,12 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 						$link = array('link' => '/htsrv/login.php',
 							'blog_id' => 1);
 
+						// This is NOT api request:
+						$is_api_request = false;
+
 						$Test_hit = new Hit($ref_link, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $link);
+
+						$Test_hit->method = $rand_request_method;
 
 						$Test_hit->log();
 
@@ -836,12 +871,17 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 
 						$Test_hit = new Hit($baseurlroot, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'] + 3, 1, $link);
 
+						$Test_hit->method = $rand_request_method;
+
 						$Test_hit->log();
 
 						$cur_seesion['pervios_link'] = $baseurlroot . $link['link'];
 					}
 					else
 					{
+						// Check if current url is api request:
+						$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 || strpos( $links[$rand_link]['link'], '/xmlsrv/xmlrpc.php' ) === 0 );
+
 						if (mt_rand(0, 100) < 50)
 						{ // robot hit
 							$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link], $cur_seesion['robot']);
@@ -850,6 +890,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 						{ // rss/atom hit
 							$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link], NULL, NULL, 1);
 						}
+						$Test_hit->method = $rand_request_method;
 						$Test_hit->log();
 					}
 				}
@@ -857,13 +898,22 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 				{
 					if (mt_rand(0, 100) < 10)
 					{ // Test hit to admin page
+
+						// This is NOT api request:
+						$is_api_request = false;
+
 						$Test_hit = new Hit('', $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $admin_link, NULL, 1);
+						$Test_hit->method = $rand_request_method;
 						$Test_hit->log();
 						$cur_seesion['pervios_link'] = $admin_url;
 					}
 					else
 					{
+						// Check if current url is api request:
+						$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 || strpos( $links[$rand_link]['link'], '/xmlsrv/xmlrpc.php' ) === 0 );
+
 						$Test_hit = new Hit($ref_link, $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link]);
+						$Test_hit->method = $rand_request_method;
 						$Test_hit->log();
 						$cur_seesion['pervios_link'] = $baseurlroot . $links[$rand_link]['link'];
 					}
@@ -874,7 +924,11 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 				// Update session
 				$cur_seesion['sess_lastseen_ts'] = $time_shift;
 
+				// Check if current url is api request:
+				$is_api_request = ( strpos( $links[$rand_link]['link'], '/api/v1' ) === 0 || strpos( $links[$rand_link]['link'], '/xmlsrv/xmlrpc.php' ) === 0 );
+
 				$Test_hit = new Hit($cur_seesion['pervios_link'], $cur_seesion['sess_ipaddress'], $cur_seesion['sess_ID'], $cur_seesion['sess_lastseen_ts'], 1, $links[$rand_link]);
+				$Test_hit->method = $rand_request_method;
 				$Test_hit->log();
 
 
@@ -902,6 +956,9 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 			}
 		}
 	}
+
+	// Reset this back to from test values:
+	$is_api_request = false;
 
 	return $insert_data_count;
 }
@@ -1029,6 +1086,33 @@ function stats_dom_status_icon( $dom_status )
 
 
 /**
+ * Get top existing Domain object by subdomain name
+ *
+ * @param string Subdomain name
+ * @return onject Domain object
+ */
+function & get_Domain_by_subdomain( $subdomain_name )
+{
+	$DomainCache = & get_DomainCache();
+
+	$subdomain_name = explode( '.', $subdomain_name );
+
+	for( $i = 0; $i < count( $subdomain_name ); $i++ )
+	{
+		$domain_name = implode( '.', array_slice( $subdomain_name, $i ) );
+
+		if( $Domain = & $DomainCache->get_by_name( $domain_name, false, false ) )
+		{	// Domain exists with name, Get it:
+			return $Domain;
+		}
+	}
+
+	$Domain = NULL;
+	return $Domain;
+}
+
+
+/**
  * Get Domain object by url
  *
  * @param string URL
@@ -1036,24 +1120,11 @@ function stats_dom_status_icon( $dom_status )
  */
 function & get_Domain_by_url( $url )
 {
-	// Exctract domain name from url
+	// Exctract domain name from url:
 	$domain_name = url_part( $url, 'host' );
 
-	$DomainCache = & get_DomainCache();
-	while( empty( $Domain ) )
-	{
-		if( $Domain = & $DomainCache->get_by_name( $domain_name, false, false ) )
-		{ // Domain exists with name, Get it
-			return $Domain;
-		}
-		if( ! preg_match( '/[^\.]+\.(.+\..+)$/i', $domain_name, $matches ) )
-		{ // Find if DB contains the parent domain of current subdomain
-			break;
-		}
-		$domain_name = $matches[1];
-	}
+	$Domain = & get_Domain_by_subdomain( $domain_name );
 
-	$Domain = NULL;
 	return $Domain;
 }
 

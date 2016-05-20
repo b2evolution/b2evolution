@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}.
  * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte as
@@ -509,22 +509,23 @@ function antispam_block_request()
 
 		$DomainCache = & get_DomainCache();
 
+		load_funcs('sessions/model/_hitlog.funcs.php');
+
 		$user_domain = $UserSettings->get( 'user_domain', $current_User->ID );
 		if( ! empty( $user_domain ) &&
-		    $Domain = & $DomainCache->get_by_name( $user_domain, false, false ) &&
+		    $Domain = & get_Domain_by_subdomain( $user_domain ) &&
 		    $Domain->get( 'status' ) == 'blocked' )
 		{ // The request from this domain must be blocked
-			$log_message = sprintf( 'A request from \'%s\' domain was blocked because of this domain is blocked.', $user_domain );
+			$log_message = sprintf( 'A request from \'%s\' domain was blocked because of the domain \'%s\' is blocked.', $user_domain, $Domain->get( 'name' ) );
 			exit_blocked_request( 'Domain', $log_message ); // WILL exit();
 		}
 
-		load_funcs('sessions/model/_hitlog.funcs.php');
 		$initial_referer = $UserSettings->get( 'initial_referer', $current_User->ID );
 		if( ! empty( $initial_referer ) &&
 		    $Domain = & get_Domain_by_url( $initial_referer ) &&
 		    $Domain->get( 'status' ) == 'blocked' )
 		{ // The request from this domain must be blocked
-			$log_message = sprintf( 'A request from \'%s\' initial referer was blocked because of a blocked domain.', $initial_referer );
+			$log_message = sprintf( 'A request from \'%s\' initial referer was blocked because of the domain \'%s\' is blocked.', $initial_referer, $Domain->get( 'name' ) );
 			exit_blocked_request( 'Domain', $log_message ); // WILL exit();
 		}
 	}

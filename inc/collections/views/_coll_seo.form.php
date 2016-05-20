@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  *
@@ -74,9 +74,9 @@ $Form->begin_fieldset( T_('Browsing posts pages').' <span class="text-muted">(di
 
 	$Form->radio( 'main_content', $edited_Blog->get_setting('main_content'),
 		array(
-				array( 'excerpt', T_('Post excerpts') ),
-				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
-				array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
+				array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
+				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
+				array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
 			), T_('Post contents'), true );
 
  	$Form->radio( 'permalinks', $edited_Blog->get_setting('permalinks'), array(
@@ -147,9 +147,9 @@ $Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive_pages_s
 
 	$Form->radio( 'archive_content', $edited_Blog->get_setting('archive_content'),
 		array(
-				array( 'excerpt', T_('Post excerpts') ),
-				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
-				array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
+				array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
+				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
+				array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
 			), T_('Post contents'), true );
 
 	$Form->text( 'archive_posts_per_page', $edited_Blog->get_setting('archive_posts_per_page'), 4, T_('Posts per page'),
@@ -196,9 +196,9 @@ $Form->begin_fieldset( T_('Category pages').get_manual_link('category_pages_seo'
 
 	$Form->radio( 'chapter_content', $edited_Blog->get_setting('chapter_content'),
 		array(
-				array( 'excerpt', T_('Post excerpts') ),
-				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
-				array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
+				array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
+				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
+				array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
 			), T_('Post contents'), true );
 
 	$Form->text( 'chapter_posts_per_page', $edited_Blog->get_setting('chapter_posts_per_page'), 4, T_('Posts per page'),
@@ -244,9 +244,9 @@ $Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo'), array('
 
 	$Form->radio( 'tag_content', $edited_Blog->get_setting('tag_content'),
 		array(
-				array( 'excerpt', T_('Post excerpts') ),
-				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
-				array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
+				array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
+				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
+				array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
 			), T_('Post contents'), true );
 
 	$Form->text( 'tag_posts_per_page', $edited_Blog->get_setting('tag_posts_per_page'), 4, T_('Posts per page'),
@@ -296,9 +296,9 @@ $Form->begin_fieldset( T_('Other filtered pages').get_manual_link('other_filtere
 
 	$Form->radio( 'filtered_content', $edited_Blog->get_setting('filtered_content'),
 		array(
-				array( 'excerpt', T_('Post excerpts') ),
-				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
-				array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
+				array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
+				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
+				array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
 			), T_('Post contents'), true );
 $Form->end_fieldset();
 

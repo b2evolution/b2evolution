@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -61,13 +61,13 @@ switch( $action )
 		$Messages->add( T_('The email campaign was created. Please select the recipients.'), 'success' );
 
 		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( $admin_url.'?ctrl=users', 303 ); // Will EXIT
+		header_redirect( $admin_url.'?ctrl=users&action=newsletter', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
 	case 'switchtab':
 	case 'save':
-		// Save Campaign
+		// Save Campaign:
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'campaign' );
@@ -93,10 +93,12 @@ switch( $action )
 		// Redirect so that a reload doesn't write to the DB twice:
 		$redirect_tab_type = 'current';
 		if( $action == 'save' )
-		{
+		{	// Save & continue to next step:
 			$tab = $current_tab;
 			$redirect_tab_type = 'next';
 		}
+
+		// Redirect after saving:
 		header_redirect( get_campaign_tab_url( $tab, $edited_EmailCampaign->ID, $redirect_tab_type ), 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
@@ -104,10 +106,8 @@ switch( $action )
 	case 'change_users':
 		$Session->set( 'edited_campaign_ID', $edited_EmailCampaign->ID );
 
-		$Messages->add( T_('Please select new recipients for this email campaign.'), 'success' );
-
 		// Redirect to select users:
-		header_redirect( '?ctrl=users', 303 ); // Will EXIT
+		header_redirect( $admin_url.'?ctrl=users&action=newsletter', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
@@ -168,31 +168,6 @@ switch( $action )
 		}
 		break;
 
-	case 'extract_html':
-		// Extract text from HTML
-
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'campaign' );
-
-		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
-
-		$email_html = $edited_EmailCampaign->get( 'email_html' );
-
-		// Convert HTML to Plain Text
-		$email_text = preg_replace( '/<a[^>]+href="([^"]+)"[^>]*>[^<]*<\/a>/i', ' [ $1 ] ', $email_html );
-		$email_text = str_replace(
-			array( "\n", "\r", '</p><p>', '<p>',  '</p>', '<br>', '<br />', '<br/>' ),
-			array( '',   '',   "\n\n",    "\n\n", "\n\n", "\n",   "\n",     "\n" ),
-			$email_text );
-		$email_text = strip_tags( $email_text );
-
-		$edited_EmailCampaign->set( 'email_text', $email_text );
-
-		$action = 'edit';
-		$tab = param( 'current_tab', 'string' );
-		break;
-
 	case 'test':
 		// Send test email
 
@@ -237,7 +212,8 @@ switch( $action )
 		break;
 
 	case 'send':
-		// Send newsletter email for all users of this campaign
+	case 'create_cron':
+		// Send newsletter email for all users of this campaign OR create cron job to do this later:
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'campaign' );
@@ -257,13 +233,45 @@ switch( $action )
 			break;
 		}
 
-		// Execute a sending in template to display report in real time
-		$template_action = 'send_campaign';
+		if( $Settings->get( 'email_campaign_send_mode' ) == 'cron' )
+		{	// Asynchronous sending mode:
 
-		// Try to obtain some serious time to do some serious processing (15 minutes)
-		set_max_execution_time( 900 );
-		// Turn off the output buffering to do the correct work of the function flush()
-		@ini_set( 'output_buffering', 'off' );
+			// Create a scheduled job to send newsletters of this email campaign:
+			$edited_EmailCampaign->create_cron_job();
+		}
+		else
+		{	// Immediate sending mode:
+
+			// Execute a sending in template to display report in real time
+			$template_action = 'send_campaign';
+
+			// Try to obtain some serious time to do some serious processing (15 minutes)
+			set_max_execution_time( 900 );
+			// Turn off the output buffering to do the correct work of the function flush()
+			@ini_set( 'output_buffering', 'off' );
+		}
+		break;
+
+	case 'view_cron':
+		// Redirect to view cron job of the email campaign:
+
+		if( ! ( $email_campaign_Cronjob = & $edited_EmailCampaign->get_Cronjob() ) )
+		{	// No cron job found:
+			$action = 'edit';
+			$tab = param( 'current_tab', 'string' );
+			break;
+		}
+		
+		if( $current_User->check_perm( 'options', 'view' ) )
+		{	// No access to view cron jobs:
+			$Messages->add( T_('Sorry, you don\'t have an access to view scheduled jobs.' ), 'warning' );
+			$action = 'edit';
+			$tab = param( 'current_tab', 'string' );
+			break;
+		}
+
+		header_redirect( $admin_url.'?ctrl=crontab&action=view&cjob_ID='.$email_campaign_Cronjob->ID, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 		break;
 }
 
@@ -358,19 +366,16 @@ switch( $action )
 				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_info.form.php' );
 				break;
 
-			case 'html':
-				if( $edited_EmailCampaign->get( 'email_html' ) == '' && !param_errors_detected() )
+			case 'compose':
+				if( $edited_EmailCampaign->get( 'email_text' ) == '' && !param_errors_detected() )
 				{ // Set default value for HTML message
-					$edited_EmailCampaign->set( 'email_html', '<p>Hello $login$!</p>'."\r\n\r\n".'<p>This is our newsletter...</p>' );
+					$edited_EmailCampaign->set( 'email_text', 'Hello $login$!'."\r\n\r\n".'This is our newsletter...' );
 				}
-				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_html.form.php' );
-				break;
-
-			case 'text':
-				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_text.form.php' );
+				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_compose.form.php' );
 				break;
 
 			case 'send':
+			case 'create_cron':
 				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_send.form.php' );
 				break;
 		}

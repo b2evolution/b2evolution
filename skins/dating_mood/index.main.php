@@ -143,7 +143,7 @@ siteskin_include( '_site_body_header.inc.php' );
 ?>
 
 <?php
-if( $disp != 'front' && $disp != 'download' )
+if( $disp != 'front' && $disp != 'download' && $disp != 'terms' )
 {
 	// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 	mainlist_page_links( array(
@@ -191,7 +191,7 @@ if( $disp != 'front' && $disp != 'download' )
 				'disp_posts'  => '',		// We already handled this case above
 				'disp_single' => '',		// We already handled this case above
 				'disp_page'   => '',		// We already handled this case above
-				'author_link_text' => 'preferredname',
+				'author_link_text' => 'auto',
 			) );
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.

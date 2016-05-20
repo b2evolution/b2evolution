@@ -19,9 +19,7 @@
  * due to limitations of PHP's internal mail() function.  You'll get an
  * all-or-nothing result from sending.
  *
- * @package    Swift
- * @subpackage Transport
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_Transport_MailTransport implements Swift_Transport
 {
@@ -128,16 +126,14 @@ class Swift_Transport_MailTransport implements Swift_Transport
         $subjectHeader = $message->getHeaders()->get('Subject');
 
         if (!$toHeader) {
-            throw new Swift_TransportException(
-                'Cannot send message without a recipient'
-                );
+            $this->_throwException(new Swift_TransportException('Cannot send message without a recipient'));
         }
         $to = $toHeader->getFieldBody();
         $subject = $subjectHeader ? $subjectHeader->getFieldBody() : '';
 
         $reversePath = $this->_getReversePath($message);
 
-        //Remove headers that would otherwise be duplicated
+        // Remove headers that would otherwise be duplicated
         $message->getHeaders()->remove('To');
         $message->getHeaders()->remove('Subject');
 
@@ -146,30 +142,31 @@ class Swift_Transport_MailTransport implements Swift_Transport
         $message->getHeaders()->set($toHeader);
         $message->getHeaders()->set($subjectHeader);
 
-        //Separate headers from body
+        // Separate headers from body
         if (false !== $endHeaders = strpos($messageStr, "\r\n\r\n")) {
-            $headers = substr($messageStr, 0, $endHeaders) . "\r\n"; //Keep last EOL
+            $headers = substr($messageStr, 0, $endHeaders)."\r\n"; //Keep last EOL
             $body = substr($messageStr, $endHeaders + 4);
         } else {
-            $headers = $messageStr . "\r\n";
+            $headers = $messageStr."\r\n";
             $body = '';
         }
 
         unset($messageStr);
 
         if ("\r\n" != PHP_EOL) {
-            //Non-windows (not using SMTP)
+            // Non-windows (not using SMTP)
             $headers = str_replace("\r\n", PHP_EOL, $headers);
+            $subject = str_replace("\r\n", PHP_EOL, $subject);
             $body = str_replace("\r\n", PHP_EOL, $body);
         } else {
-            //Windows, using SMTP
+            // Windows, using SMTP
             $headers = str_replace("\r\n.", "\r\n..", $headers);
+            $subject = str_replace("\r\n.", "\r\n..", $subject);
             $body = str_replace("\r\n.", "\r\n..", $body);
         }
 
         if ($this->_invoker->mail($to, $subject, $body, $headers,
-            sprintf($this->_extraParams, $reversePath)))
-        {
+            sprintf($this->_extraParams, escapeshellarg($reversePath)))) {
             if ($evt) {
                 $evt->setResult(Swift_Events_SendEvent::RESULT_SUCCESS);
                 $evt->setFailedRecipients($failedRecipients);
@@ -207,7 +204,18 @@ class Swift_Transport_MailTransport implements Swift_Transport
         $this->_eventDispatcher->bindEventListener($plugin);
     }
 
-    // -- Private methods
+    /** Throw a TransportException, first sending it to any listeners */
+    protected function _throwException(Swift_TransportException $e)
+    {
+        if ($evt = $this->_eventDispatcher->createTransportExceptionEvent($this, $e)) {
+            $this->_eventDispatcher->dispatchEvent($evt, 'exceptionThrown');
+            if (!$evt->bubbleCancelled()) {
+                throw $e;
+            }
+        } else {
+            throw $e;
+        }
+    }
 
     /** Determine the best-use reverse path for this message */
     private function _getReversePath(Swift_Mime_Message $message)

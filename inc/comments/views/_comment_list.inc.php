@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -64,7 +64,7 @@ while( $Comment = & $CommentList->get_next() )
 	{ // if show only draft comments, and current comment status isn't draft, then continue with the next comment
 		continue;
 	}
-	echo_comment( $Comment->ID, $redirect_to, $save_context, $comment_index, $display_meta_title );
+	echo_comment( $Comment, $redirect_to, $save_context, $comment_index, $display_meta_title );
 	if( $comment_index !== false )
 	{	// Decrease a comment index only when it is requested:
 		$comment_index--;

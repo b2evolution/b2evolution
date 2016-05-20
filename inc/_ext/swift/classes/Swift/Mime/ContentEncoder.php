@@ -11,9 +11,7 @@
 /**
  * Interface for all Transfer Encoding schemes.
  *
- * @package    Swift
- * @subpackage Mime
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 interface Swift_Mime_ContentEncoder extends Swift_Encoder
 {
@@ -22,8 +20,8 @@ interface Swift_Mime_ContentEncoder extends Swift_Encoder
      *
      * @param Swift_OutputByteStream $os              to read from
      * @param Swift_InputByteStream  $is              to write to
-     * @param integer                $firstLineOffset
-     * @param integer                $maxLineLength   - 0 indicates the default length for this encoding
+     * @param int                    $firstLineOffset
+     * @param int                    $maxLineLength   - 0 indicates the default length for this encoding
      */
     public function encodeByteStream(Swift_OutputByteStream $os, Swift_InputByteStream $is, $firstLineOffset = 0, $maxLineLength = 0);
 

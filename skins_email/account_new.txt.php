@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -19,7 +19,8 @@ global $admin_url, $htsrv_url;
 // Default params:
 $params = array_merge( array(
 		'country'     => '',
-		'firstname'   => '',
+		'reg_country' => '',
+		'fullname'    => '',
 		'gender'      => '',
 		'locale'      => '',
 		'source'      => '',
@@ -36,17 +37,31 @@ echo "\n\n";
 
 echo T_('Login').": ".$params['login']."\n";
 echo T_('Email').": ".$params['email']."\n";
+
+if( $params['fullname'] != '' )
+{ // Full name is entered
+	echo T_('Full name').": ".$params['fullname']."\n";
+}
+
+if( $params['reg_country'] > 0 )
+{ // Country field is entered
+	load_class( 'regional/model/_country.class.php', 'Country' );
+	$CountryCache = & get_CountryCache();
+	$reg_Country = $CountryCache->get_by_ID( $params['reg_country'] );
+	echo T_('Registration Country').": ".$reg_Country->get_name()."\n";
+}
+
 if( $params['country'] > 0 )
 { // Country field is entered
 	load_class( 'regional/model/_country.class.php', 'Country' );
 	$CountryCache = & get_CountryCache();
 	$user_Country = $CountryCache->get_by_ID( $params['country'] );
-	echo T_('Country').": ".$user_Country->get_name()."\n";
+	echo T_('Profile Country').": ".$user_Country->get_name()."\n";
 }
 
-if( $params['firstname'] != '' )
-{ // First name is entered
-	echo T_('First name').": ".$params['firstname']."\n";
+if( !empty( $params['source'] ) )
+{ // Source is defined
+	echo T_('Registration Source').": ".$params['source']."\n";
 }
 
 if( $params['gender'] == 'M' )
@@ -64,11 +79,6 @@ if( !empty( $params['locale'] ) )
 	echo T_('Locale').": ".$locales[ $params['locale'] ]['name']."\n";
 }
 
-if( !empty( $params['source'] ) )
-{ // Source is defined
-	echo T_('Registration Source').": ".$params['source']."\n";
-}
-
 if( !empty( $params['trigger_url'] ) )
 { // Trigger page
 	echo T_('Registration Trigger Page').": ".$params['trigger_url']."\n";
@@ -78,6 +88,18 @@ if( !empty ( $params['initial_hit'] ) )
 { // Hit info
 	echo T_('Initial page').": ".T_('Collection')." ".$params['initial_hit']->hit_coll_ID." - ".$params['initial_hit']->hit_uri."\n";
 	echo T_('Initial referer').": ".$params['initial_hit']->hit_referer."\n";
+}
+
+echo "\n";
+
+if( ! empty ( $params['level'] ) )
+{	// User level:
+	echo T_('Assigned Level').": ".$params['level']."\n";
+}
+
+if( ! empty ( $params['group'] ) )
+{	// User group:
+	echo T_('Assigned Group').": ".$params['group']."\n";
 }
 
 echo "\n";

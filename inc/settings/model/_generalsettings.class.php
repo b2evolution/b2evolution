@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -32,7 +32,7 @@ class GeneralSettings extends AbstractSettings
 	 * @var array
 	 */
 	var $_defaults = array(
-		'admin_skin' => 'chicago',
+		'admin_skin' => 'bootstrap',
 
 		'antispam_last_update' => '2000-01-01 00:00:00',
 		'antispam_threshold_publish' => '-90',
@@ -60,6 +60,10 @@ class GeneralSettings extends AbstractSettings
 		'notification_short_name' => 'This site', // notification emails will use this as short site name
 		'notification_long_name' => '', // notification emails will use this as long site name
 		'notification_logo' => '', // notification emails will use this as url to site logo
+
+		'email_campaign_send_mode' => 'immediate', // Sending mode for campaign
+		'email_campaign_chunk_size' => 50, // Chunk size of emails to send a campaign at a time
+		'email_campaign_cron_repeat' => 300, // Delay between chunks on scheduled campaign job runs
 
 		'fm_enable_create_dir' => '1',
 		'fm_enable_create_file' => '1',
@@ -102,8 +106,10 @@ class GeneralSettings extends AbstractSettings
 		'def_notify_unread_messages' => '1',
 		'def_notify_published_comments' => '1',
 		'def_notify_comment_moderation' => '1',
+		'def_notify_edit_cmt_moderation' => '1',
 		'def_notify_meta_comments' => '1',
 		'def_notify_post_moderation' => '1',
+		'def_notify_edit_pst_moderation' => '1',
 		'def_newsletter_news' => '1',
 		'def_newsletter_ads' => '0',
 		'def_notification_email_limit' => '3',
@@ -185,6 +191,7 @@ class GeneralSettings extends AbstractSettings
 		'repath_method' => 'imap',
 		'repath_encrypt' => 'none',
 		'repath_server_port' => 143,
+		'repath_imap_folder' => 'INBOX',
 		'repath_subject' => 'Returned mail:
 Mail delivery failed:
 Undelivered Mail Returned to Sender
@@ -312,7 +319,7 @@ C message size exceeds',
 	 * Because the {@link $DB DB object} itself creates a connection when it gets
 	 * created "Error selecting database" occurs before we can check for it here.
 	 */
-	function GeneralSettings()
+	function __construct()
 	{
 		global $new_db_version, $DB, $demo_mode, $instance_name, $basehost;
 
@@ -322,7 +329,7 @@ C message size exceeds',
 		$DB->show_errors = false;
 
 		// Init through the abstract constructor. This should be the first DB connection.
-		parent::AbstractSettings( 'T_settings', array( 'set_name' ), 'set_value', 0 );
+		parent::__construct( 'T_settings', array( 'set_name' ), 'set_value', 0 );
 
 		// check DB version:
 		if( $this->get( 'db_version' ) != $new_db_version )
@@ -379,7 +386,7 @@ C message size exceeds',
 	/**
 	 * Get a member param by its name
 	 *
-	 * @param mixed Name of parameter
+	 * @param string Name of parameter
 	 * @param boolean true to return param's real value
 	 * @return mixed Value of parameter
 	 */
@@ -387,22 +394,35 @@ C message size exceeds',
 	{
 		if( $real_value )
 		{
-			return parent::get( $parname );
+			return parent::getx( $parname );
 		}
 
 		switch($parname)
 		{
 			case 'allow_avatars':
-				return ( parent::get( $parname ) && isset($GLOBALS['files_Module']) );
+				return ( parent::getx( $parname ) && isset($GLOBALS['files_Module']) );
 				break;
 
 			case 'upload_enabled':
-				return ( parent::get( $parname ) && isset($GLOBALS['files_Module']) );
+				return ( parent::getx( $parname ) && isset($GLOBALS['files_Module']) );
 				break;
 
 			default:
-				return parent::get( $parname );
+				return parent::getx( $parname );
 		}
+	}
+
+
+	/**
+	 * Temporarily sets a setting ({@link dbupdate()} writes it to DB).
+	 *
+	 * @param string Name of parameter
+	 * @param mixed Value
+	 * @return boolean true, if the value has been set, false if it has not changed.
+	 */
+	function set( $setting, $value )
+	{
+		return parent::setx( $setting, $value );
 	}
 
 }

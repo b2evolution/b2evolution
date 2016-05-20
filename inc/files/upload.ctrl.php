@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * (dh please re-add)
  *
  * {@internal Open Source relicensing agreement:
@@ -84,7 +84,7 @@ $fm_FileRoot = NULL;
 
 load_class( 'files/model/_filerootcache.class.php', 'FileRootCache' );
 
-$available_Roots = FileRootCache::get_available_FileRoots( get_param( 'root' ) );
+$available_Roots = FileRootCache::get_available_FileRoots( get_param( 'root' ), 'favorite' );
 
 if( ! empty( $root ) )
 { // We have requested a root folder by string:

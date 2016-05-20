@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package admin
@@ -37,11 +37,12 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 	$robots_follow = false;
 	robots_tag();
 
-	global $rsc_path, $rsc_url, $htsrv_url;
+	global $rsc_path, $rsc_url, $htsrv_url, $restapi_url;
 
 	// var htsrv_url is used for AJAX callbacks
 	add_js_headline( "// Paths used by JS functions:
 		var htsrv_url = '$htsrv_url';
+		var restapi_url = '$restapi_url';
 		var blog_id = '".param( 'blog', 'integer' )."';
 		var is_backoffice = true;" );
 

@@ -4,7 +4,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -39,6 +39,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_categories'               => $tableprefix.'categories',
 		'T_coll_group_perms'         => $tableprefix.'bloggroups',
 		'T_coll_user_perms'          => $tableprefix.'blogusers',
+		'T_coll_user_favs'           => $tableprefix.'coll_favs',
 		'T_coll_settings'            => $tableprefix.'coll_settings',
 		'T_coll_groups'              => $tableprefix.'coll_groups',
 		'T_comments'                 => $tableprefix.'comments',
@@ -422,12 +423,14 @@ class collections_Module extends Module
 				$permapi = 'always'; // Can use APIs
 				$permcreateblog = 'allowed'; // Creating new blogs
 				$permgetblog = 'denied'; // Automatically add a new blog to the new users
+				$permmaxcreateblognum = '';
 				break;
 
 			case 2:		// Moderators (group ID 2) have permission by default:
 				$permapi = 'always';
 				$permcreateblog = 'allowed';
 				$permgetblog = 'denied';
+				$permmaxcreateblognum = '';
 				break;
 
 			case 3:		// Editors (group ID 3) have permission by default:
@@ -435,6 +438,7 @@ class collections_Module extends Module
 				$permapi = 'always';
 				$permcreateblog = 'denied';
 				$permgetblog = 'denied';
+				$permmaxcreateblognum = '';
 				break;
 
 			default:
@@ -442,12 +446,18 @@ class collections_Module extends Module
 				$permapi = 'never';
 				$permcreateblog = 'denied';
 				$permgetblog = 'denied';
+				$permmaxcreateblognum = '';
 				break;
 		}
 
 		// We can return as many default permissions as we want:
 		// e.g. array ( permission_name => permission_value, ... , ... )
-		return $permissions = array( 'perm_api' => $permapi, 'perm_createblog' => $permcreateblog, 'perm_getblog' => $permgetblog );
+		return $permissions = array(
+				'perm_api' => $permapi,
+				'perm_createblog' => $permcreateblog,
+				'perm_getblog' => $permgetblog,
+				'perm_max_createblog_num' => $permmaxcreateblognum
+				);
 	}
 
 
@@ -490,6 +500,15 @@ class collections_Module extends Module
 				'perm_block' => 'blogging',
 				'perm_type' => 'checkbox',
 				'note' => T_( 'New users automatically get a new blog'),
+				),
+			'perm_max_createblog_num' => array(
+				'label' => T_('Maximum number of blogs allowed'),
+				'user_func' => 'check_createblog_user_perm',
+				'group_funct' => 'check_createblog_group_perm',
+				'perm_block' => 'blogging',
+				'perm_type' => 'text_input',
+				'maxlength' => 2,
+				'note' => T_('Leave empty for no limit'),
 				),
 			);
 		return $permissions;
@@ -674,7 +693,7 @@ class collections_Module extends Module
 					'site' => $site_menu,
 					'collections' => array(
 						'text' => T_('Collections'),
-						'href' => $admin_url.'?ctrl=dashboard&blog='.$working_blog
+						'href' => $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$working_blog
 					)
 				)
 			);
@@ -717,7 +736,7 @@ class collections_Module extends Module
 		$collection_menu_entries = array(
 				'dashboard' => array(
 					'text' => T_('Collection Dashboard'),
-					'href' => $admin_url.'?ctrl=dashboard&amp;blog='.$blog,
+					'href' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog='.$blog,
 					'order' => 'group_last' ),
 			);
 
@@ -775,6 +794,9 @@ class collections_Module extends Module
 							'comments' => array(
 								'text' => T_('Comments'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=comments&amp;blog='.$blog ),
+							'userdir' => array(
+								'text' => T_('User directory'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=userdir&amp;blog='.$blog ),
 							'other' => array(
 								'text' => T_('Other displays'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=other&amp;blog='.$blog ),
@@ -784,7 +806,7 @@ class collections_Module extends Module
 						),
 					),
 					'skin' => array(
-						'text' => T_('Skins'),
+						'text' => T_('Skin'),
 						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog,
 						'entries' => array(
 							'current_skin' => array(
@@ -793,9 +815,6 @@ class collections_Module extends Module
 							)
 						),
 					),
-					'plugin_settings' => array(
-						'text' => T_('Plugins'),
-						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugin_settings&amp;blog='.$blog, ),
 					'widgets' => array(
 						'text' => T_('Widgets'),
 						'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog,
@@ -813,6 +832,9 @@ class collections_Module extends Module
 							'seo' => array(
 								'text' => T_('SEO'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=seo&amp;blog='.$blog, ),
+							'plugins' => array(
+								'text' => T_('Plugins'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugins&amp;blog='.$blog, ),
 						),
 					),
 				) );
@@ -946,13 +968,19 @@ class collections_Module extends Module
 				'name'   => T_('Send notifications about new comment on &laquo;%s&raquo;'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_comment_notifications.job.php',
-				'params' => NULL, // 'comment_ID', 'except_moderators'
+				'params' => NULL, // 'comment_ID', 'executed_by_userid', 'is_new_comment', 'already_notified_user_IDs', 'force_members', 'force_community'
 			),
 			'send-post-notifications' => array( // not user schedulable
 				'name'   => T_('Send notifications for &laquo;%s&raquo;'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_post_notifications.job.php',
-				'params' => NULL, // 'item_ID'
+				'params' => NULL, // 'item_ID', 'executed_by_userid', 'is_new_item', 'already_notified_user_IDs', 'force_members', 'force_community', 'force_pings'
+			),
+			'send-email-campaign' => array( // not user schedulable
+				'name'   => T_('Send a chunk of %s emails for the campaign "%s"'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_email_campaign.job.php',
+				'params' => NULL, // 'ecmp_ID'
 			),
 			'send-unmoderated-comments-reminders' => array(
 				'name'   => T_('Send reminders about comments awaiting moderation'),
@@ -1062,6 +1090,64 @@ class collections_Module extends Module
 				}
 				header_redirect( $redirect_to );
 				break;
+
+			case 'subs_update':
+				// Subscribe/Unsubscribe user on the selected collection
+
+				if( $demo_mode && ( $current_User->ID <= 3 ) )
+				{ // don't allow default users profile change on demo mode
+					bad_request_die( 'Demo mode: you can\'t edit the admin and demo users profile!<br />[<a href="javascript:history.go(-1)">'
+								. T_('Back to profile') . '</a>]' );
+				}
+
+				// Get params
+				$blog = param( 'subscribe_blog', 'integer', true );
+				$notify_items = param( 'sub_items', 'integer', NULL );
+				$notify_comments = param( 'sub_comments', 'integer', NULL );
+
+				if( ( $notify_items < 0 ) || ( $notify_items > 1 ) || ( $notify_comments < 0 ) || ( $notify_comments > 1 ) )
+				{ // Invalid notify param. It should be 0 for unsubscribe and 1 for subscribe.
+					$Messages->add( 'Invalid params!', 'error' );
+				}
+
+				if( ! is_email( $current_User->get( 'email' ) ) )
+				{ // user doesn't have a valid email address
+					$Messages->add( T_( 'Your email address is invalid. Please set your email address first.' ), 'error' );
+				}
+
+				if( $Messages->has_errors() )
+				{ // errors detected
+					header_redirect();
+					// already exited here
+				}
+
+				if( set_user_subscription( $current_User->ID, $blog, $notify_items, $notify_comments ) )
+				{
+					if( $notify_items === 0 )
+					{
+						$Messages->add( T_( 'You have successfully unsubscribed to new posts notifications.' ), 'success' );
+					}
+					elseif( $notify_items === 1 )
+					{
+						$Messages->add( T_( 'You have successfully subscribed to new posts notifications.' ), 'success' );
+					}
+
+					if( $notify_comments === 0 )
+					{
+						$Messages->add( T_( 'You have successfully unsubscribed to new comments notifications.' ), 'success' );
+					}
+					elseif( $notify_comments === 1 )
+					{
+						$Messages->add( T_( 'You have successfully subscribed to new comments notifications.' ), 'success' );
+					}
+				}
+				else
+				{
+					$Messages->add( T_( 'Could not subscribe to notifications.' ), 'error' );
+				}
+
+				header_redirect();
+				break; // already exited here
 
 			case 'isubs_update':
 				// Subscribe/Unsubscribe user on the selected item

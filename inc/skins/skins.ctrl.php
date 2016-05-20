@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -15,9 +15,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-// Memorize this as the last "tab" used in the Blog Settings:
-$UserSettings->set( 'pref_coll_settings_tab', 'manage_skins' );
-$UserSettings->dbupdate();
 
 load_funcs( 'skins/_skin.funcs.php' );
 
@@ -26,9 +23,15 @@ $current_User->check_perm( 'options', 'view', true );
 
 
 param( 'action', 'string', 'list' );
-param( 'tab', 'string', 'manage', true );
+param( 'tab', 'string', 'manage_skins', true );
 
 param( 'redirect_to', 'url', $admin_url.'?ctrl=skins&tab='.$tab.( isset( $blog ) ? '&blog='.$blog : '' ) );
+
+if( $tab != 'system' )
+{	// Memorize this as the last "tab" used in the Blog Settings:
+	$UserSettings->set( 'pref_coll_settings_tab', $tab );
+	$UserSettings->dbupdate();
+}
 
 if( param( 'skin_ID', 'integer', '', true ) )
 {// Load file type:
@@ -68,11 +71,36 @@ switch( $action )
 
 		$Messages->add( T_('Skin has been installed.'), 'success' );
 
-		// We want to highlight the edited object on next list display:
-		$Session->set( 'fadeout_array', array( 'skin_ID' => array( $edited_Skin->ID ) ) );
+		if( $tab == 'current_skin' && ! empty( $blog ) )
+		{	// We installed the skin for the selected collection:
+			$BlogCache = & get_BlogCache();
+			$edited_Blog = & $BlogCache->get_by_ID( $blog );
 
-		// Replace a mask by value. Used for install skin on creating of new blog
-		$redirect_to = str_replace( '$skin_ID$', $edited_Skin->ID, $redirect_to );
+			// Set new installed skins for the selected collection:
+			$edited_Blog->set_setting( $edited_Skin->type.'_skin_ID', $edited_Skin->ID );
+			$edited_Blog->dbupdate();
+
+			$Messages->add( T_('The blog skin has been changed.')
+								.' <a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$edited_Blog->ID.'">'.T_('Edit...').'</a>', 'success' );
+			if( ( !$Session->is_mobile_session() && !$Session->is_tablet_session() && $edited_Skin->type == 'normal' ) ||
+					( $Session->is_mobile_session() && $edited_Skin->type == 'mobile' ) ||
+					( $Session->is_tablet_session() && $edited_Skin->type == 'tablet' ) )
+			{	// Redirect to blog home page if we change the skin for current device type:
+				header_redirect( $edited_Blog->gen_blogurl() );
+			}
+			else
+			{	// Redirect to admin skins page if we change the skin for another device type:
+				header_redirect( $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID );
+			}
+		}
+		else
+		{
+			// We want to highlight the edited object on next list display:
+			$Session->set( 'fadeout_array', array( 'skin_ID' => array( $edited_Skin->ID ) ) );
+
+			// Replace a mask by value. Used for install skin on creating of new blog
+			$redirect_to = str_replace( '$skin_ID$', $edited_Skin->ID, $redirect_to );
+		}
 
 		// PREVENT RELOAD & Switch to list mode:
 		header_redirect( $redirect_to );
@@ -229,7 +257,7 @@ switch( $action )
 
 
 if( $tab == 'system' )
-{ // From System tab
+{	// From System tab:
 	$AdminUI->set_path( 'options', 'skins' );
 
 	$AdminUI->breadcrumbpath_init( false );
@@ -238,21 +266,21 @@ if( $tab == 'system' )
 	$AdminUI->breadcrumbpath_add( T_('Skins'), $admin_url.'?ctrl=skins' );
 }
 else
-{ // From Blog settings
+{	// From Blog settings:
 
 	// We should activate toolbar menu items for this controller and tab
 	$activate_collection_toolbar = true;
 
-	$AdminUI->set_path( 'collections', 'skin', 'manage_skins' );
+	$AdminUI->set_path( 'collections', 'skin', $tab );
 
 	/**
 	 * Display page header, menus & messages:
 	 */
-	$AdminUI->set_coll_list_params( 'blog_properties', 'edit', array( 'ctrl' => 'skins' ) );
+	$AdminUI->set_coll_list_params( 'blog_properties', 'edit', array( 'ctrl' => 'coll_settings', 'tab' => 'skin' ) );
 
-	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
 	$AdminUI->breadcrumbpath_add( T_('Skin'), $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog=$blog$' );
-	$AdminUI->breadcrumbpath_add( T_('Manage skins'), $admin_url.'?ctrl=skins' );
+	$AdminUI->breadcrumbpath_add( T_('Skins for this blog'), $admin_url.'?ctrl=skins' );
 }
 
 // Set an url for manual page:

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -63,10 +63,10 @@ class menu_link_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function menu_link_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'menu_link' );
+		parent::__construct( $db_row, 'core', 'menu_link' );
 	}
 
 
@@ -172,14 +172,18 @@ class menu_link_Widget extends ComponentWidget
 					'size' => 30,
 					'defaultvalue' => '',
 				),
+				'highlight_current' => array(
+					'label' => T_('Highlight current'),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'yes', T_('Highlight the current item (not cacheable)') ),
+							array( 'no', T_('Do not try to highlight (cacheable)') )
+						),
+					'defaultvalue' => 'yes',
+					'field_lines' => true,
+				),
 			), parent::get_param_definitions( $params ) );
-
-		if( isset( $r['allow_blockcache'] ) )
-		{ // Disable "allow blockcache" because this widget uses the selected items
-			$r['allow_blockcache']['defaultvalue'] = false;
-			$r['allow_blockcache']['disabled'] = 'disabled';
-			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
-		}
 
 		return $r;
 	}
@@ -194,8 +198,10 @@ class menu_link_Widget extends ComponentWidget
 	{
 		parent::init_display( $params );
 
-		// Disable "allow blockcache" because this widget uses the selected items
-		$this->disp_params['allow_blockcache'] = 0;
+		if( $this->disp_params['highlight_current'] == 'yes' )
+		{	// Disable block caching for this widget when it highlights the selected items:
+			$this->disp_params['allow_blockcache'] = 0;
+		}
 	}
 
 
@@ -257,7 +263,7 @@ class menu_link_Widget extends ComponentWidget
 				}
 
 				$text = T_('Recently');
-				if( $disp == 'posts' )
+				if( $disp == 'posts' && $this->disp_params['highlight_current'] == 'yes' )
 				{	// Let's display the link as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
@@ -267,7 +273,7 @@ class menu_link_Widget extends ComponentWidget
 				$url = $current_Blog->get( 'searchurl' );
 				$text = T_('Search');
 				// Is this the current display?
-				if( $disp == 'search' )
+				if( $disp == 'search' && $this->disp_params['highlight_current'] == 'yes' )
 				{	// Let's display the link as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
@@ -276,7 +282,7 @@ class menu_link_Widget extends ComponentWidget
 			case 'arcdir':
 				$url = $current_Blog->get( 'arcdirurl' );
 				$text = T_('Archives');
-				if( $disp == 'arcdir' )
+				if( $disp == 'arcdir' && $this->disp_params['highlight_current'] == 'yes' )
 				{	// Let's display the link as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
@@ -285,7 +291,7 @@ class menu_link_Widget extends ComponentWidget
 			case 'catdir':
 				$url = $current_Blog->get( 'catdirurl' );
 				$text = T_('Categories');
-				if( $disp == 'catdir' )
+				if( $disp == 'catdir' && $this->disp_params['highlight_current'] == 'yes' )
 				{	// Let's display the link as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
@@ -294,7 +300,7 @@ class menu_link_Widget extends ComponentWidget
 			case 'tags':
 				$url = $current_Blog->get( 'tagsurl' );
 				$text = T_('Tags');
-				if( $disp == 'tags' )
+				if( $disp == 'tags' && $this->disp_params['highlight_current'] == 'yes' )
 				{	// Let's display the link as selected:
 					$link_class = $this->disp_params['link_selected_class'];
 				}
@@ -303,7 +309,7 @@ class menu_link_Widget extends ComponentWidget
 			case 'postidx':
 				$url = $current_Blog->get( 'postidxurl' );
 				$text = T_('Post index');
-				if( $disp == 'postidx' )
+				if( $disp == 'postidx' && $this->disp_params['highlight_current'] == 'yes' )
 				{	// Let's display the link as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
@@ -312,7 +318,7 @@ class menu_link_Widget extends ComponentWidget
 			case 'mediaidx':
 				$url = $current_Blog->get( 'mediaidxurl' );
 				$text = T_('Photo index');
-				if( $disp == 'mediaidx' )
+				if( $disp == 'mediaidx' && $this->disp_params['highlight_current'] == 'yes' )
 				{	// Let's display the link as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
@@ -321,7 +327,7 @@ class menu_link_Widget extends ComponentWidget
 			case 'sitemap':
 				$url = $current_Blog->get( 'sitemapurl' );
 				$text = T_('Site map');
-				if( $disp == 'sitemap' )
+				if( $disp == 'sitemap' && $this->disp_params['highlight_current'] == 'yes' )
 				{	// Let's display the link as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
@@ -334,7 +340,7 @@ class menu_link_Widget extends ComponentWidget
 				}
 				$url = $current_Blog->get( 'lastcommentsurl' );
 				$text = T_('Latest comments');
-				if( $disp == 'comments' )
+				if( $disp == 'comments' && $this->disp_params['highlight_current'] == 'yes' )
 				{	// Let's display the link as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
@@ -345,7 +351,8 @@ class menu_link_Widget extends ComponentWidget
 				$text = T_('Owner details');
 				// Is this the current display?
 				global $User;
-				if( $disp == 'user' && ! empty( $User ) && $User->ID == $current_Blog->owner_user_ID )
+				if( $disp == 'user' && $this->disp_params['highlight_current'] == 'yes' &&
+				    ! empty( $User ) && $User->ID == $current_Blog->owner_user_ID )
 				{	// Let's display the link as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
@@ -358,7 +365,8 @@ class menu_link_Widget extends ComponentWidget
 				}
 				$text = T_('Contact');
 				// Is this the current display?
-				if( $disp == 'msgform' || ( isset( $_GET['disp'] ) && $_GET['disp'] == 'msgform' ) )
+				if( ( $disp == 'msgform' || ( isset( $_GET['disp'] ) && $_GET['disp'] == 'msgform' ) ) &&
+				    $this->disp_params['highlight_current'] == 'yes' )
 				{ // Let's display the link as selected
 					// fp> I think it's interesting to select this link , even if the recipient ID is different from the owner
 					// odds are there is no other link to highlight in this case
@@ -381,7 +389,7 @@ class menu_link_Widget extends ComponentWidget
 				}
 				$text = T_('Log in');
 				// Is this the current display?
-				if( $disp == 'login' )
+				if( $disp == 'login' && $this->disp_params['highlight_current'] == 'yes' )
 				{ // Let's display the link as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
@@ -410,7 +418,7 @@ class menu_link_Widget extends ComponentWidget
 				}
 				$text = T_('Register');
 				// Is this the current display?
-				if( $disp == 'register' )
+				if( $disp == 'register' && $this->disp_params['highlight_current'] == 'yes' )
 				{	// Let's display the link as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
@@ -421,7 +429,8 @@ class menu_link_Widget extends ComponentWidget
 				$url = get_user_profile_url( $current_Blog->ID );
 				$text = T_('Edit profile');
 				// Is this the current display?  (Edit my Profile)
-				if( in_array( $disp, array( 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs' ) ) )
+				if( in_array( $disp, array( 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs' ) ) &&
+				    $this->disp_params['highlight_current'] == 'yes' )
 				{	// Let's display the link as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
@@ -445,7 +454,8 @@ class menu_link_Widget extends ComponentWidget
 				// Is this the current display?
 				// Note: If $user_ID is not set, it means we are viewing "My Profile" instead
 				global $user_ID;
-				if( $disp == 'users' || ($disp == 'user' && !empty($user_ID)) )
+				if( ( $disp == 'users' || ( $disp == 'user' && ! empty( $user_ID ) ) ) &&
+				    $this->disp_params['highlight_current'] == 'yes' )
 				{	// Let's display the link as selected
 					// Note: we also highlight this for any user profile that is displayed
 					$link_class = $this->disp_params['link_selected_class'];
@@ -467,7 +477,7 @@ class menu_link_Widget extends ComponentWidget
 				$text = $disp_Item->title;
 				// Is this the current item?
 				global $Item;
-				if( ! empty( $Item ) && $disp_Item->ID == $Item->ID )
+				if( $this->disp_params['highlight_current'] == 'yes' && ! empty( $Item ) && $disp_Item->ID == $Item->ID )
 				{ // The current page is currently displaying the Item this link is pointing to
 					// Let's display it as selected
 					$link_class = $this->disp_params['link_selected_class'];
@@ -492,7 +502,7 @@ class menu_link_Widget extends ComponentWidget
 				$url = url_add_param( $current_Blog->get( 'url' ), 'disp=edit' );
 				$text = T_('Write a new post');
 				// Is this the current display?
-				if( $disp == 'edit' )
+				if( $disp == 'edit' && $this->disp_params['highlight_current'] == 'yes' )
 				{	// Let's display the link as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
@@ -509,7 +519,7 @@ class menu_link_Widget extends ComponentWidget
 				global $user_ID, $current_User;
 				// If $user_ID is not set, it means we will fall back to the current user, so it's ok
 				// If $user_ID is set, it means we are browsing the directory instead
-				if( $disp == 'user' && empty( $user_ID ) )
+				if( $disp == 'user' && empty( $user_ID ) && $this->disp_params['highlight_current'] == 'yes' )
 				{	// Let's display the link as selected
 					$link_class = $this->disp_params['link_selected_class'];
 				}
@@ -531,16 +541,16 @@ class menu_link_Widget extends ComponentWidget
 				$url = $current_Blog->get( 'url' );
 				$text = T_('Front Page');
 				global $is_front;
-				if( $disp == 'front' || ! empty( $is_front ) )
+				if( ( $disp == 'front' || ! empty( $is_front ) ) && $this->disp_params['highlight_current'] == 'yes' )
 				{ // Let's display the link as selected on front page
 					$link_class = $this->disp_params['link_selected_class'];
 				}
 		}
 
 		// Override default link text?
-		if( ! empty( $this->param_array['link_text'] ) )
+		if( ! empty( $this->disp_params['link_text'] ) )
 		{ // We have a custom link text:
-			$text = $this->param_array['link_text'];
+			$text = $this->disp_params['link_text'];
 		}
 
 		echo $this->disp_params['block_start'];

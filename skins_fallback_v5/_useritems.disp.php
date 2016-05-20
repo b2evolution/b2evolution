@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -22,7 +22,7 @@ $params = array_merge( array(
 	), $params );
 
 
-$user_ItemList->title = sprintf( $params['user_itemlist_title'], $viewed_User->get_identity_link( array( 'link_text' => 'name' ) ) );
+$user_ItemList->title = sprintf( $params['user_itemlist_title'], $viewed_User->get_identity_link( array( 'link_text' => 'auto' ) ) );
 $user_ItemList->no_results_text = $params['user_itemlist_no_results'];
 
 // Initialize Results object

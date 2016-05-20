@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -57,13 +57,35 @@ class archives_plugin extends Plugin
 
 
 	/**
+	 * Get keys for block/widget caching
+	 *
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @param integer Widget ID
+	 * @return array of keys this widget depends on
+	 */
+	function get_widget_cache_keys( $widget_ID = 0 )
+	{
+		global $Blog;
+
+		return array(
+				'wi_ID'        => $widget_ID, // Have the widget settings changed ?
+				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
+				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
+			);
+	}
+
+
+	/**
 	 * Event handler: SkinTag
 	 *
 	 * @param array Associative array of parameters. Valid keys are:
 	 *                - 'block_start' : (Default: '<div class="bSideItem">')
 	 *                - 'block_end' : (Default: '</div>')
+	 *                - 'block_body_start' : (Default: '')
+	 *                - 'block_body_end' : (Default: '')
 	 *                - 'title' : (Default: T_('Archives'))
-	 *                - 'mode' : 'monthly'|'daily'|'weekly'|'postbypost' (Default: conf.)
+	 *                - 'mode' : 'monthly'|'daily'|'weekly'|'postbypost' (Default: 'monthly' )
 	 *                - 'sort_order' : 'date'|'title' (Default: date - used only if the mode is 'postbypost')
 	 *                - 'link_type' : 'canonic'|'context' (default: canonic)
 	 *                - 'context_isolation' : what params need override when changing date/range (Default: 'm,w,p,title,unit,dstart' )
@@ -77,7 +99,7 @@ class archives_plugin extends Plugin
 	 *                - 'day_date_format' : (Default: conf.)
 	 * @return boolean did we display?
 	 */
-	function SkinTag( $params )
+	function SkinTag( & $params )
 	{
 		global $month;
 
@@ -102,52 +124,47 @@ class archives_plugin extends Plugin
 		/**
 		 * Default params:
 		 */
-		// This is what will enclose the block in the skin:
-		if(!isset($params['block_start'])) $params['block_start'] = '<div class="bSideItem">';
-		if(!isset($params['block_end'])) $params['block_end'] = "</div>\n";
+		$params = array_merge( array(
+				// This is what will enclose the block in the skin:
+				'block_start'       => '<div class="bSideItem">',
+				'block_end'         => "</div>\n",
+				// Title:
+				'block_title_start' => '<h3>',
+				'block_title_end'   => '</h3>',
+				// This is what will enclose the body:
+				'block_body_start'  => '',
+				'block_body_end'    => '',
+				// This is what will enclose the list:
+				'list_start'        => '<ul>',
+				'list_end'          => "</ul>\n",
+				// This is what will separate the archive links:
+				'line_start'        => '<li>',
+				'line_end'          => "</li>\n",
+				// Archive mode:
+				'mode'              => $Blog->get_setting( 'archive_mode' ),
+				// Link type:
+				'link_type'         => 'canonic',
+				'context_isolation' => $itemlist_prefix.'m,'.$itemlist_prefix.'w,'.$itemlist_prefix.'p,'.$itemlist_prefix.'title,'.$itemlist_prefix.'unit,'.$itemlist_prefix.'dstart',
+				// Add form fields?:
+				'form'              => false,
+				// Number of archive entries to display:
+				'limit'             => 12,
+				// More link text:
+				'more_link'         => T_('More...'),
+			), $params );
 
-		// Title:
-		if(!isset($params['block_title_start'])) $params['block_title_start'] = '<h3>';
-		if(!isset($params['block_title_end'])) $params['block_title_end'] = '</h3>';
-
-		// Archive mode:
-		if(!isset($params['mode']))
-			$params['mode'] = $Blog->get_setting('archive_mode');
-
-		//Sort order (used only in postbypost mode):
-		if($params['mode'] !='postbypost')
+		// Sort order (used only in postbypost mode):
+		if( $params['mode'] != 'postbypost' )
 		{
 			$params['sort_order'] = 'date';
 		}
-		if(!isset($params['sort_order']))
-		{
-			$params['sort_order'] = $Blog->get_setting('archives_sort_order');
+		if( ! isset( $params['sort_order'] ) )
+		{	// Set default sort order:
+			$params['sort_order'] = $Blog->get_setting( 'archives_sort_order' );
 		}
 
-		// Link type:
-		if(!isset($params['link_type'])) $params['link_type'] = 'canonic';
-		if(!isset($params['context_isolation'])) $params['context_isolation'] = $itemlist_prefix.'m,'.$itemlist_prefix.'w,'.$itemlist_prefix.'p,'.$itemlist_prefix.'title,'.$itemlist_prefix.'unit,'.$itemlist_prefix.'dstart';
-
-		// Add form fields?:
-		if(!isset($params['form']))
-			$params['form'] = false;
-
-		// Number of archive entries to display:
-		if(!isset($params['limit'])) $params['limit'] = 12;
-
-		// More link text:
-		if(!isset($params['more_link'])) $params['more_link'] = T_('More...');
-
-		// This is what will enclose the list:
-		if(!isset($params['list_start'])) $params['list_start'] = '<ul>';
-		if(!isset($params['list_end'])) $params['list_end'] = "</ul>\n";
-
-		// This is what will separate the archive links:
-		if(!isset($params['line_start'])) $params['line_start'] = '<li>';
-		if(!isset($params['line_end'])) $params['line_end'] = "</li>\n";
-
 		// Daily archive date format?
-		if( (!isset($params['day_date_format'])) || ($params['day_date_format'] == '') )
+		if( ! isset( $params['day_date_format'] ) || $params['day_date_format'] == '' )
 		{
 			$dateformat = locale_datefmt();
 			$params['day_date_format'] = $dateformat;
@@ -164,6 +181,8 @@ class archives_plugin extends Plugin
 			echo $params['title'];
 			echo $params['block_title_end'];
 		}
+
+		echo $params['block_body_start'];
 
 		echo $params['list_start'];
 		while( $ArchiveList->get_item( $arc_year, $arc_month, $arc_dayofmonth, $arc_w, $arc_count, $post_ID, $post_title, $permalink) )
@@ -280,6 +299,8 @@ class archives_plugin extends Plugin
 
 		echo $params['list_end'];
 
+		echo $params['block_body_end'];
+
 		echo $params['block_end'];
 
 		return true;
@@ -306,6 +327,28 @@ class archives_plugin extends Plugin
 				'note' => T_( 'Maximum number of items to display.' ),
 				'size' => 4,
 				'defaultvalue' => 12,
+			),
+			'mode' => array(
+				'label' => T_('Archive grouping'),
+				'note' => T_('How do you want to browse the post archives? May also apply to permalinks.'),
+				'type' => 'radio',
+				'options' => array(
+						array( 'monthly', T_('monthly') ),
+						array( 'weekly', T_('weekly') ),
+						array( 'daily', T_('daily') ),
+						array( 'postbypost', T_('post by post') ),
+					),
+				'defaultvalue' => 'monthly',
+			),
+			'sort_order' => array(
+				'label' => T_('Archive sorting'),
+				'note' => T_('How to sort your archives? (only in post by post mode)'),
+				'type' => 'radio',
+				'options' => array(
+						array( 'date', T_('date') ),
+						array( 'title', T_('title') ),
+					),
+				'defaultvalue' => 'date',
 			),
 		);
 		return $r;
@@ -340,7 +383,7 @@ class ArchiveList extends Results
 	 * @param integer
 	 * @param boolean
 	 */
-	function ArchiveList(
+	function __construct(
 		$archive_mode = 'monthly',
 		$limit = 100,
 		$sort_order = 'date',
@@ -355,7 +398,6 @@ class ArchiveList extends Results
 		global $show_statuses;
 		global $author, $assgn, $status, $types;
 		global $s, $sentence, $exact;
-		global $posttypes_specialtypes;
 
 		$this->dbtable = $dbtable;
 		$this->dbprefix = $dbprefix;
@@ -419,7 +461,7 @@ class ArchiveList extends Results
 			$this->ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
 
 			// Include all types except pages, intros and sidebar links:
-			$this->ItemQuery->where_types( '-'.implode(',',$posttypes_specialtypes) );
+			$this->ItemQuery->where_itemtype_usage( 'post' );
 		}
 
 
@@ -468,7 +510,7 @@ class ArchiveList extends Results
 				$archives_list = new ItemListLight( $Blog , $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $this->total_rows );
 				$archives_list->set_filters( array(
 						'visibility_array' => array( 'published' ),  // We only want to advertised published items
-						'types' =>  '-'.implode(',',$posttypes_specialtypes),	// Include all types except pages, intros and sidebar links
+						'itemtype_usage' => 'post', // Include all types with usage "post"
 					) );
 
 				if($sort_order == 'title')
@@ -502,7 +544,7 @@ class ArchiveList extends Results
 			}
 		}
 
-		parent::Results( $sql, 'archivelist_', '', $limit );
+		parent::__construct( $sql, 'archivelist_', '', $limit );
 
 		$this->restart();
 	}
@@ -514,7 +556,7 @@ class ArchiveList extends Results
 	 * These queries are complex enough for us not to have to rewrite them:
 	 * dh> ???
 	 */
-	function count_total_rows()
+	function count_total_rows( $sql_count = NULL )
 	{
 		global $DB;
 
@@ -566,7 +608,7 @@ class ArchiveList extends Results
 	function restart()
 	{
 		// Make sure query has executed at least once:
-		$this->query();
+		$this->run_query();
 
 		$this->current_idx = 0;
 		$this->arc_w_last = '';

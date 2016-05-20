@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -54,7 +54,8 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		param( 'newdefault_locale', 'string', true );
+		// If default locale has not been selected on form use default locale from config var $default_locale:
+		param( 'newdefault_locale', 'string', $default_locale );
 		$Settings->set( 'default_locale', $newdefault_locale );
 
 		if( ( ! $Messages->has_errors() ) && ( locale_updateDB() ) )
@@ -207,9 +208,18 @@ switch( $action )
 		// forget DB locales:
 		unset( $locales );
 
-		// delete everything from locales table
-		$q = $DB->query( 'DELETE FROM T_locales'
-			.( empty( $nofile_locales ) ? '' : ' WHERE loc_locale NOT IN ( '.$DB->quote( $nofile_locales ).' )' ) );
+		// Get all enabled locales before restoring:
+		$locale_SQL = new SQL();
+		$locale_SQL->SELECT( 'loc_locale' );
+		$locale_SQL->FROM( 'T_locales' );
+		$locale_SQL->WHERE( 'loc_enabled = 1' );
+		$enabled_locales = $DB->get_col( $locale_SQL->get(), 0, 'Get all enabled locales before restoring' );
+
+		// Delete locales that are not enabled and have no file currently:
+		$q = $DB->query( 'DELETE FROM T_locales
+			WHERE loc_enabled != 1'
+			.( empty( $nofile_locales ) ? '' : ' AND loc_locale NOT IN ( '.$DB->quote( $nofile_locales ).' )' ),
+			'Delete locales that are not enabled and have no file currently' );
 
 		if( ! isset( $locales[ $current_locale ] ) )
 		{ // activate default locale
@@ -229,10 +239,11 @@ switch( $action )
 		}
 
 		// Load all available locale defintions from locale folders:
+		$locales_loaded_form_disk = false; // Reset to FALSE in order to load all locales again, to use them in func below:
 		locales_load_available_defs();
 
-		// Reenable default locale
-		locale_insert_default();
+		// Restore default values of the enabled locales:
+		locale_restore_defaults( $enabled_locales );
 
 		$Messages->add( T_('Locale definitions reset to defaults. (<code>/conf/_locales.php</code>)'), 'success' );
 

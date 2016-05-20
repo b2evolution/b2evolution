@@ -71,7 +71,7 @@ function get_icon_info( $name )
 			'size' => array( 16, 16 ),
 			'xy' => array( 112, 16 ),
 			'glyph' => 'circle-arrow-right',
-			'fa' => 'clipboard'
+			'fa' => 'arrow-right'
 		);
 		case 'file_delete': return array(   // delete a file/folder
 			'alt'  => T_('Del'),
@@ -397,6 +397,14 @@ function get_icon_info( $name )
 			'xy' => array( 0, 0 ),
 			'glyph' => 'user',
 			'fa' => 'users'
+		);
+		case 'user': return array(
+			'rollover' => true,
+			'alt' => T_('User'),
+			'size' => array( 0 ,0 ),
+			'xy' => array( 0, 0 ),
+			'glyph' => 'user',
+			'fa' => 'user'
 		);
 		case 'copy': return array(
 			'alt'  => T_('Copy'),
@@ -840,26 +848,6 @@ function get_icon_info( $name )
 			'fa' => 'arrow-up',
 			'color' => '#303030'
 		);
-		case 'arrow_left_white': return array(
-			'alt'  => T_('Previous'),
-			'size' => array( 10, 14 ),
-			'xy' => array( 128, 256 )
-		);
-		case 'arrow_right_white': return array(
-			'alt'  => T_('Next'),
-			'size' => array( 10, 14 ),
-			'xy' => array( 144, 256 )
-		);
-		case 'arrow_left_grey': return array(
-			'alt'  => T_('Previous'),
-			'size' => array( 10, 14 ),
-			'xy' => array( 128, 224 )
-		);
-		case 'arrow_right_grey': return array(
-			'alt'  => T_('Next'),
-			'size' => array( 10, 14 ),
-			'xy' => array( 144, 224 )
-		);
 
 		case 'check_all': return array(
 			'alt'  => T_('Check all'),
@@ -1038,7 +1026,8 @@ function get_icon_info( $name )
 			'size' => array( 16, 16 ),
 			'xy' => array( 32, 224 ),
 			'glyph' => 'plus-sign',
-			'fa' => 'plus-circle'
+			'fa' => 'plus-circle',
+			'color' => '#0C0'
 		);
 		case 'minus': return array(
 			'alt'  => T_('Remove'),
@@ -1087,17 +1076,6 @@ function get_icon_info( $name )
 			'xy' => array( 16, 0 ),
 			'glyph' => 'envelope',
 			'fa' => 'envelope-square'
-		);
-
-		case 'width_increase': return array(
-			'alt'  => T_('Increase width'),
-			'size' => array( 32, 32 ),
-			'xy' => array( 0, 240 )
-		);
-		case 'width_decrease': return array(
-			'alt'  => T_('Decrease width'),
-			'size' => array( 32, 32 ),
-			'xy' => array( 32, 240 )
 		);
 
 		case 'post': return array(

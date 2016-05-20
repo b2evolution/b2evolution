@@ -7,14 +7,14 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_forums
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $preview, $dummy_fields, $cat, $current_User;
+global $Item, $preview, $dummy_fields, $cat, $current_User, $app_version;
 
 /**
  * @var array Save all statuses that used on this page in order to show them in the footer legend
@@ -69,11 +69,11 @@ skin_widget( array(
 			// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
 			item_prevnext_links( array(
 					'block_start'     => '<ul class="pager col-lg-12 post_nav">',
-					'prev_start'      => '<li class="prev-left">',
+					'prev_start'      => '<li class="previous">',
 					'prev_text'       => '<span aria-hidden="true">&larr;</span> $title$',
 					'prev_end'        => '</li>',
 					'separator'       => ' ',
-					'next_start'      => '<li class="next-right">',
+					'next_start'      => '<li class="next">',
 					'next_text'       => '$title$ <span aria-hidden="true">&rarr;</span>',
 					'next_end'        => '</li>',
 					'block_end'       => '</ul>',
@@ -87,7 +87,7 @@ skin_widget( array(
 
 <div class="forums_list single_topic evo_content_block">
 	<?php /* This empty row is used to fix columns width, when table has css property "table-layout:fixed" */ ?>
-	
+
 	<div class="single_page_title">
 		<?php
 		// Page title
@@ -98,7 +98,7 @@ skin_widget( array(
 			) );
 				// Author info:
 				echo '<div class="ft_author_info">'.T_('Thread started by');
-				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
+				$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
 				echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
 				echo '<span class="text-muted"> &ndash; '
 						.T_('Last touched:').' '.mysql2date( 'D M j, Y H:i', $Item->get( 'last_touched_ts' ) )
@@ -106,12 +106,15 @@ skin_widget( array(
 				echo '</div>';
 				// Author info - shrinked:
 				echo '<div class="ft_author_info shrinked">'.T_('Started by');
-				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
+				$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
 				echo ', '.mysql2date( 'm/j/y', $Item->datecreated );
 				echo '</div>';
 		?>
 	</div>
-	
+
+	<div class="row">
+		<div class="<?php echo $Skin->get_column_class( 'single' ); ?>">
+
 	<section class="table evo_content_block">
 	<div class="panel panel-default">
 		<div class="panel-heading posts_panel_title_wrapper">
@@ -119,21 +122,19 @@ skin_widget( array(
 				<h4 class="evo_comment_title panel-title"><a href="<?php echo $Item->get_permanent_url(); ?>" class="permalink">#1</a>
 					<?php
 						$Item->author( array(
-							'link_text' => 'login',
+							'link_text' => 'auto',
 						) );
 					?>
 					<?php
-						if( $Skin->get_setting( 'display_post_date' ) )
-						{ // We want to display the post date:
-							$Item->issue_time( array(
-									'before'      => '',
-									'after'       => ' &nbsp; &nbsp; ',
-									'time_format' => 'M j, Y H:i',
-								) );
-						}
+						// We want to display the post date:
+						$Item->issue_time( array(
+								'before'      => '<span class="text-muted">',
+								'after'       => '</span> &nbsp; &nbsp; ',
+								'time_format' => 'M j, Y H:i',
+							) );
 					?>
 				</h4>
-			</div>	
+			</div>
 					<?php
 						if( $Skin->enabled_status_banner( $Item->status ) )
 						{ // Status banner
@@ -144,9 +145,9 @@ skin_widget( array(
 							$legend_statuses[] = $Item->status;
 							echo '</div>';
 						}
-					?>	
+					?>
 		</div>
-		
+
 		<div class="panel-body">
 			<div class="ft_avatar col-md-1 col-sm-2"><?php
 				$Item->author( array(
@@ -162,7 +163,6 @@ skin_widget( array(
 					<div class="evo_container evo_container__item_single">
 					<?php
 					// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-					// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 					// Display container contents:
 					skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 						'widget_context' => 'item',	// Signal that we are displaying within an Item
@@ -174,7 +174,7 @@ skin_widget( array(
 						'block_title_start' => '<h3>',
 						'block_title_end' => '</h3>',
 						// Params for skin file "_item_content.inc.php"
-						'widget_coll_item_content_params' => $params,
+						'widget_item_content_params' => $params,
 					) );
 					// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 					?>
@@ -201,7 +201,7 @@ skin_widget( array(
 				?>
 			</div>
 		</div><!-- ../panel-body -->
-		
+
 		<div class="panel-footer clearfix">
 		<a href="<?php echo $Item->get_permanent_url(); ?>#skin_wrapper" class="to_top"><?php echo T_('Back to top'); ?></a>
 		<?php
@@ -237,7 +237,7 @@ skin_widget( array(
 			echo '</span>';
 			echo '</div>';
 		?>
-		
+
 		</div><!-- ../panel-footer -->
 	</div><!-- ../panel panel-default -->
 	</section><!-- ../table evo_content_block -->
@@ -247,35 +247,42 @@ skin_widget( array(
 
 	<?php
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
-		skin_include( '_item_feedback.inc.php', array ( 
+		skin_include( '_item_feedback.inc.php', array_merge( $params, array(
 			'disp_section_title'    => false,
-			'comment_post_before'   => '<h4 class="evo_comment_post_title ellipsis">',
+			'disp_meta_comment_info' => false,
+
+			'comment_post_before'   => '<br /><h4 class="evo_comment_post_title ellipsis">',
 			'comment_post_after'    => '</h4>',
 
 			'comment_title_before'  => '<div class="panel-heading posts_panel_title_wrapper"><div class="cell1 ellipsis"><h4 class="evo_comment_title panel-title">',
 			'comment_status_before' => '</h4></div>',
 			'comment_title_after'   => '</div>',
 
-			'comment_avatar_before' => '<div class="panel-body"><span class="evo_comment_avatar col-md-1 col-sm-2">',
+			'comment_avatar_before' => '<span class="evo_comment_avatar col-md-1 col-sm-2">',
 			'comment_avatar_after'  => '</span>',
 			'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10">',
 			'comment_text_after'    => '</div>',
-		) );
+		) ) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
 
-echo_comment_moderate_js();
+		echo_comment_moderate_js();
 
 		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
 	?>
 
 	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
 		// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
 		skin_include( '_item_workflow.inc.php' );
 		// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
+	}
 	?>
 
 	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
 		// ------------------ META COMMENTS INCLUDED HERE ------------------
 		skin_include( '_item_meta_comments.inc.php', array(
 				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
@@ -291,7 +298,57 @@ echo_comment_moderate_js();
 				'comment_text_after'    => '</div>',
 			) );
 		// ---------------------- END OF META COMMENTS ---------------------
+	}
 	?>
+
+		</div><!-- .col -->
+
+		<?php
+		if( $Skin->is_visible_sidebar( 'single' ) )
+		{	// Display sidebar:
+		?>
+		<aside class="col-md-3<?php echo ( $Skin->get_setting_layout( 'single' ) == 'left_sidebar' ? ' pull-left' : '' ); ?>">
+			<div class="evo_container evo_container__sidebar_single">
+			<?php
+				// ------------------------- "Sidebar Single" CONTAINER EMBEDDED HERE --------------------------
+				// Display container contents:
+				skin_container( NT_('Sidebar Single'), array(
+						// The following (optional) params will be used as defaults for widgets included in this container:
+						// This will enclose each widget in a block:
+						'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',
+						'block_end' => '</div>',
+						// This will enclose the title of each widget:
+						'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
+						'block_title_end' => '</h4></div>',
+						// This will enclose the body of each widget:
+						'block_body_start' => '<div class="panel-body">',
+						'block_body_end' => '</div>',
+						// If a widget displays a list, this will enclose that list:
+						'list_start' => '<ul>',
+						'list_end' => '</ul>',
+						// This will enclose each item in a list:
+						'item_start' => '<li>',
+						'item_end' => '</li>',
+						// This will enclose sub-lists in a list:
+						'group_start' => '<ul>',
+						'group_end' => '</ul>',
+						// This will enclose (foot)notes:
+						'notes_start' => '<div class="notes">',
+						'notes_end' => '</div>',
+						// Widget 'Search form':
+						'search_class'         => 'compact_search_form',
+						'search_input_before'  => '<div class="input-group">',
+						'search_input_after'   => '',
+						'search_submit_before' => '<span class="input-group-btn">',
+						'search_submit_after'  => '</span></div>',
+					) );
+				// ----------------------------- END OF "Sidebar Single" CONTAINER -----------------------------
+			?>
+			</div>
+		</aside><!-- .col -->
+		<?php } ?>
+	</div><!-- .row -->
+
 </div><!-- ../forums_list single_topic -->
 
 	<?php

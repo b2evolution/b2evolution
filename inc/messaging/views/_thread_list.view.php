@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -15,7 +15,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $current_User;
-global $unread_messages_count;
 global $DB, $Blog;
 global $perm_abuse_management; // TRUE if we go from Abuse Management
 

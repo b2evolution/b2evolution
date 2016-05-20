@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -30,10 +30,10 @@ class Currency extends DataObject
 	 *
 	 * @param object database row
 	 */
-	function Currency( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_regional__currency', 'curr_', 'curr_ID' );
+		parent::__construct( 'T_regional__currency', 'curr_', 'curr_ID' );
 
 		if( $db_row )
 		{
@@ -109,11 +109,18 @@ class Currency extends DataObject
 	/**
 	 * Check existence of specified currency code in curr_code unique field.
 	 *
+	 * @param string Name of unique field  OR array of Names (for UNIQUE index with MULTIPLE fields)
+	 * @param mixed specified value        OR array of Values (for UNIQUE index with MULTIPLE fields)
 	 * @return int ID if currency code exists otherwise NULL/false
 	 */
-	function dbexists()
+	function dbexists( $unique_fields = 'curr_code', $values = NULL )
 	{
-		return parent::dbexists('curr_code', $this->code);
+		if( is_null( $values ) )
+		{
+			$values = $this->code;
+		}
+
+		return parent::dbexists( $unique_fields, $values );
 	}
 
 

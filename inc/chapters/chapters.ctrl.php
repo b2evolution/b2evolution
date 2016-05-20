@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -466,7 +466,7 @@ $AdminUI->set_coll_list_params( 'blog_cats', 'edit', array( 'ctrl' => $ctrl ) );
 
 $AdminUI->set_path( 'collections', 'categories' );
 
-$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=colls_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
 $AdminUI->breadcrumbpath_add( T_('Categories'), $admin_url.'?ctrl=chapters&amp;blog=$blog$' );
 
 $AdminUI->set_page_manual_link( 'categories-tab' );

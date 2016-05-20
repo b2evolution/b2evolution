@@ -17,6 +17,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class dating_mood_Skin extends Skin
 {
+	/**
+	 * Skin version
+	 * @var string
+	 */
+	var $version = '6.7.0';
+
   /**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.
@@ -35,7 +41,7 @@ class dating_mood_Skin extends Skin
 		return 'normal';
 	}
 
-	
+
 	/**
    * Get definitions for editable params
    *

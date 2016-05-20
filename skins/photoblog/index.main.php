@@ -12,7 +12,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( version_compare( $app_version, '3.0' ) < 0 )
+if( evo_version_compare( $app_version, '3.0' ) < 0 )
 { // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.
 	die( 'This skin is designed for b2evolution 3.0 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
@@ -160,7 +160,7 @@ siteskin_include( '_site_body_header.inc.php' );
 	?>
 
 	<?php
-	if( $disp != 'front' && $disp != 'download' )
+	if( $disp != 'front' && $disp != 'download' && $disp != 'terms' )
 	{
 		// ------------------------------------ START OF POSTS ----------------------------------------
 		// Display message if no post:
@@ -187,7 +187,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				'disp_single' => '',		// We already handled this case above
 				'disp_page'   => '',		// We already handled this case above
 				'mediaidx_thumb_size' => $Skin->get_setting( 'mediaidx_thumb_size' ),
-				'author_link_text' => 'preferredname',
+				'author_link_text' => 'auto',
 			) );
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.

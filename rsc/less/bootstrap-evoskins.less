@@ -86,6 +86,13 @@ a.btn.action_icon {
 			margin: 0 5px;
 		}
 	}
+	// Info field with full height in value
+	.info_full_height {
+		.form-control-static {
+			padding-top: 0;
+			padding-bottom: 0;
+		}
+	}
 	// Part after label where input elements
 	.controls {
 		padding-left: 0;
@@ -388,6 +395,13 @@ div.filters {
 	&.panel-body {
 		padding: 15px;
 	}
+	// Fix style for fields with autocomplete usernames:
+	.twitter-typeahead {
+		vertical-align: middle;
+		.tt-dropdown-menu div {
+			margin-left: 0;
+		}
+	}
 }
 .table_scroll .table {
 	margin-bottom: 0;
@@ -398,6 +412,7 @@ div.messages{
 
 // Popover
 .popover {
+	max-width: 100%;
 	color: #333;
 	&.right {
 		text-align: left;
@@ -540,6 +555,10 @@ legend.panel-heading {
 			color: #23527c;
 		}
 	}
+}
+.panel-warning > .panel-footer {
+	background-color: #fcf8e3;
+	border-color: #faebcc;
 }
 
 // Title of confirmation block to delete DB object
@@ -737,30 +756,42 @@ div.edit_toolbars, div.message_toolbars {
 }
 
 // User links widget
-.ufld_icon_links a {
-	display: inline-block;
-	text-decoration: none;
-	color: #FFF;
-	background: #ddd;
-	border-radius: 50%;
-	width: 40px;
-	height: 40px;
-	margin: 2px;
-	position: relative;
-	-webkit-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
-	-moz-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
-	-o-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
-	transition: border-radius 250ms ease-out, background-color 250ms ease-out;
-	&:hover {
-		.border-radius;
+.ufld_icon_links {
+	a {
+		display: inline-block;
+		text-decoration: none;
 		color: #FFF;
-		background: #23527c;
-		// TODO: use @variable name
+		background: #ddd;
+		border-radius: 50%;
+		width: 40px;
+		height: 40px;
+		margin: 2px;
+		position: relative;
+		-webkit-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
+		-moz-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
+		-o-transition: border-radius 250ms ease-out, background-color 250ms ease-out;
+		transition: border-radius 250ms ease-out, background-color 250ms ease-out;
+		&:hover {
+			.border-radius;
+			color: #FFF;
+			background: #23527c;
+			// TODO: use @variable name
+		}
+		.fa {
+			font-size: 20px;
+			line-height: 40px;
+			display: block;
+		}
 	}
-	.fa {
-		font-size: 20px;
-		line-height: 40px;
-		display: block;
+	&.small {
+		a {
+			width: 20px;
+			height: 20px;
+			.fa {
+				font-size: 10px;
+				line-height: 20px;
+			}
+		}
 	}
 }
 
@@ -799,5 +830,23 @@ div.edit_toolbars, div.message_toolbars {
 		&.results {
 			margin-bottom: 20px;
 		}
+	}
+}
+
+@media (min-width: 768px) {
+	div.coll-dashboard-block-3 {
+		float: left;
+	}
+}
+
+@media (min-width: 992px) {
+	div.coll-dashboard-block-3 {
+		float: left;
+	}
+}
+
+@media (min-width: 1200px) {
+	div.coll-dashboard-block-3 {
+		float: right;
 	}
 }

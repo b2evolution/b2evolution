@@ -36,9 +36,9 @@ class GroupSettings extends AbstractSettings
 	/**
 	 * Constructor
 	 */
-	function GroupSettings()
+	function __construct()
 	{ 	// call parent constructor
-		parent::AbstractSettings( 'T_groups__groupsettings', array( 'gset_grp_ID', 'gset_name' ), 'gset_value', 1 );
+		parent::__construct( 'T_groups__groupsettings', array( 'gset_grp_ID', 'gset_name' ), 'gset_value', 1 );
 	}
 
 
@@ -73,7 +73,7 @@ class GroupSettings extends AbstractSettings
 
 			// Set current group permissions
 			$existing_perm = array();
-			foreach( $DB->get_results( $SQL->get() ) as $row )
+			foreach( $DB->get_results( $SQL->get(), OBJECT, 'Load settings from group #'.$grp_ID ) as $row )
 			{
 				$existing_perm[] = $row->gset_name;
 				$this->permission_values[$row->gset_name] = $row->gset_value;
@@ -92,7 +92,7 @@ class GroupSettings extends AbstractSettings
 
 			if( $update_permissions )
 			{	// We can update permission as there are some new permnissions
-				$this->dbupdate( $grp_ID );
+				$this->update( $grp_ID );
 			}
 
 			$DB->commit();
@@ -131,7 +131,7 @@ class GroupSettings extends AbstractSettings
 	{
 		if( $grp_ID != 0 )
 		{	// We can get permission from database, because the current group setting are available in database
-			$this->permission_values[$permission] = parent::get( $grp_ID, $permission );
+			$this->permission_values[$permission] = parent::getx( $grp_ID, $permission );
 		}
 		return $this->permission_values[$permission];
 	}
@@ -149,19 +149,20 @@ class GroupSettings extends AbstractSettings
 		if( $grp_ID != 0 )
 		{	// We can set permission, because the current group is already in database
 			$this->permission_values[$permission] = $value;
-			return parent::set( $grp_ID, $permission, $value );
+			return parent::setx( $grp_ID, $permission, $value );
 		}
 
 		$this->_permissions[$permission] = $value;
 		return true;
 	}
 
+
 	/**
-	 * Update the DB based on previously recorded changes
+	 * Update all of the group permissions
 	 *
 	 * @param integer Group ID
 	 */
-	function dbupdate( $grp_ID )
+	function update( $grp_ID )
 	{
 		if( ! empty( $this->_permissions ) )
 		{	// Set temporary permissions. It is only for the new creating group
@@ -174,7 +175,7 @@ class GroupSettings extends AbstractSettings
 		}
 
 		// Update permissions
-		return parent::dbupdate();
+		return $this->dbupdate();
 	}
 
 

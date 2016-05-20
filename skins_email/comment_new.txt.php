@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -25,6 +25,7 @@ $params = array_merge( array(
 		'author_ID'   => NULL,
 		'author_name' => '',
 		'notify_type' => '',
+		'is_new_comment' => true,
 	), $params );
 
 
@@ -125,20 +126,36 @@ else
 
 $notify_message .= "\n\n";
 
+if( $params['notify_type'] == 'moderator' )
+{	// moderation email
+	if( ( $Blog->get_setting( 'comment_quick_moderation' ) != 'never' ) && ( !empty( $Comment->secret ) ) )
+	{	// quick moderation is permitted, and comment secret was set
+		$notify_message .= T_('Quick moderation').': '.'$secret_content_start$'.$htsrv_url.'comment_review.php?cmt_ID='.$Comment->ID.'&secret='.$Comment->secret.'$secret_content_end$'."\n\n";
+	}
+	$notify_message .= T_('Edit comment').': '.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID."\n\n";
+}
+
+echo $notify_message;
+
 // add unsubscribe and edit links
 $params['unsubscribe_text'] = '';
 switch( $params['notify_type'] )
 {
 	case 'moderator':
 		// moderation email
-		if( ( $Blog->get_setting( 'comment_quick_moderation' ) != 'never' ) && ( !empty( $Comment->secret ) ) )
-		{ // quick moderation is permitted, and comment secret was set
-			$notify_message .= T_('Quick moderation').': '.'$secret_content_start$'.$htsrv_url.'comment_review.php?cmt_ID='.$Comment->ID.'&secret='.$Comment->secret.'$secret_content_end$'."\n\n";
+		if( $params['is_new_comment'] )
+		{	// about new comment:
+			$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating new comments, click here' );
+			$unsubscribe_type = 'comment_moderator';
 		}
-		$notify_message .= T_('Edit comment').': '.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID."\n\n";
+		else
+		{	// about updated comment:
+			$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating updated comments, click here' );
+			$unsubscribe_type = 'comment_moderator_edit';
+		}
 		$params['unsubscribe_text'] = T_( 'You are a moderator of this blog and you are receiving notifications when a comment may need moderation.' )."\n"
-			.T_( 'If you don\'t want to receive any more notifications about comment moderation, click here' ).': '
-			.$htsrv_url.'quick_unsubscribe.php?type=comment_moderator&user_ID=$user_ID$&key=$unsubscribe_key$';
+			.$unsubscribe_text.': '
+			.$htsrv_url.'quick_unsubscribe.php?type='.$unsubscribe_type.'&user_ID=$user_ID$&key=$unsubscribe_key$';
 		break;
 
 	case 'blog_subscription':
@@ -171,8 +188,6 @@ switch( $params['notify_type'] )
 			.$htsrv_url.'quick_unsubscribe.php?type=meta_comment&user_ID=$user_ID$&key=$unsubscribe_key$';
 		break;
 }
-
-echo $notify_message;
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.txt.php', $params );

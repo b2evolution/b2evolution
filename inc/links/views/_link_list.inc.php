@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -58,7 +58,7 @@ function display_subtype( $link_ID )
 {
 	global $LinkOwner, $current_File;
 
-	$Link = & $LinkOwner->get_link_by_link_ID( $link_ID );
+	$Link = $LinkOwner->get_link_by_link_ID( $link_ID );
 	// Instantiate a File object for this line
 	$current_File = $Link->get_File();
 

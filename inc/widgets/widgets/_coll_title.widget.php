@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -27,10 +27,10 @@ class coll_title_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function coll_title_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'coll_title' );
+		parent::__construct( $db_row, 'core', 'coll_title' );
 	}
 
 

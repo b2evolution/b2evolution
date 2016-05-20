@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2007 by Yabba/Scott - {@link http://astonishme.co.uk/contact/}.
  *
  * @package plugins
@@ -114,15 +114,14 @@ class code_highlight_plugin extends Plugin
 
 
 	/**
-	 * Get the settings that the plugin can use.
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
 	 *
-	 * Those settings are transfered into a Settings member object of the plugin
-	 * and can be edited in the backoffice (Settings / Plugins).
-	 *
-	 * @see Plugin::GetDefaultSettings()
-	 * @see PluginSettings
-	 * @see Plugin::PluginSettingsValidateSet()
-	 * @return array
+	 * @param array Associative array of parameters (since v1.9).
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
+	 * @return array see {@link Plugin::GetDefaultSettings()}.
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
+	 * and assign an array with the following keys to them (only 'label' is required):
 	 */
 	function GetDefaultSettings( & $params )
 	{
@@ -145,15 +144,15 @@ class code_highlight_plugin extends Plugin
 
 
 	/**
-	 * Allowing the user to override the display of the toolbar.
+	 * Define the PER-USER settings of the plugin here. These can then be edited by each user.
 	 *
 	 * @see Plugin::GetDefaultSettings()
-	 * @see PluginSettings
-	 * @see Plugin::PluginSettingsValidateSet()
-	 *
-	 * @return array
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
-	function GetDefaultUserSettings()
+	function GetDefaultUserSettings( & $params )
 	{
 		return array(
 				'display_toolbar' => array(
@@ -180,7 +179,7 @@ class code_highlight_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Called when displaying editor toolbars.
+	 * Event handler: Called when displaying editor toolbars on comment form.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
@@ -237,7 +236,28 @@ class code_highlight_plugin extends Plugin
 
 
 	/**
-	 * Display a toolbar in admin
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( !empty( $apply_rendering ) && $apply_rendering != 'never'
+		&& ( ( is_logged_in() && $this->UserSettings->get( 'display_toolbar' ) )
+			|| ( !is_logged_in() && $this->Settings->get( 'toolbar_default' ) ) ) )
+		{
+			return $this->DisplayCodeToolbar();
+		}
+		return false;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
@@ -259,10 +279,9 @@ class code_highlight_plugin extends Plugin
 			}
 		}
 
-		$coll_setting_name = ( $params['target_type'] == 'Comment' ) ? 'coll_apply_comment_rendering' : 'coll_apply_rendering';
-		$apply_rendering = $this->get_coll_setting( $coll_setting_name, $Blog );
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $Blog );
 		if( empty( $apply_rendering ) || $apply_rendering == 'never' || ! $this->UserSettings->get( 'display_toolbar' ) )
-		{ // This plugin is disabled for this blog or user doesn't want the toolbar, don't display it:
+		{	// This plugin is disabled for this blog or user doesn't want the toolbar, don't display it:
 			return false;
 		}
 		$this->DisplayCodeToolbar();
@@ -430,7 +449,24 @@ class code_highlight_plugin extends Plugin
 	}
 
 
-	function BeforeCommentFormInsert( $params )
+	/**
+	 * Event handler: Called before at the beginning, if an email form gets sent (and received).
+	 */
+	function EmailFormSent( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( $this->is_renderer_enabled( $apply_rendering, $params['renderers'] ) )
+		{	// render code blocks in email:
+			$this->FilterItemContents( $params );
+			if( empty( $params['dont_remove_pre'] ) || !$params['dont_remove_pre'] )
+			{	// remove <pre>:
+				$params['content'] = preg_replace( '#(<\!--\s*codeblock[^-]*?\s*-->)<pre[^>]*><code>(.+?)</code></pre>(<\!--\s+/codeblock\s*-->)#is', '$1<code>$2</code>$3', $params['content'] );
+			}
+		}
+	}
+
+
+	function BeforeCommentFormInsert( & $params )
 	{
 		$Comment = & $params['Comment'];
 		$comment_Item = & $Comment->get_Item();
@@ -574,11 +610,13 @@ class code_highlight_plugin extends Plugin
 
 
 	/**
-	 * Spits out the styles used
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
 	 *
-	 * @see Plugin::SkinBeginHtmlHead()
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
 	 */
-	function SkinBeginHtmlHead()
+	function SkinBeginHtmlHead( & $params )
 	{
 		global $Blog;
 
@@ -594,13 +632,14 @@ class code_highlight_plugin extends Plugin
 
 
 	/**
-	 * Spits out the styles used
+	 * Event handler: Called when ending the admin html head section.
 	 *
-	 * @see Plugin::AdminEndHtmlHead()
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
 	 */
-	function AdminEndHtmlHead()
+	function AdminEndHtmlHead( & $params )
 	{
-		$this->SkinBeginHtmlHead();
+		$this->SkinBeginHtmlHead( $params );
 	}
 
 

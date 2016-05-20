@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -35,6 +35,42 @@ class bbcode_plugin extends Plugin
 	var $post_replace_list;
 	var $comment_search_list;
 	var $comment_replace_list;
+	var $msg_search_list;
+	var $msg_replace_list;
+	var $email_search_list;
+	var $email_replace_list;
+	var $default_search_list = '[b] #\[b](.+?)\[/b]#is
+[i] #\[i](.+?)\[/i]#is
+[s] #\[s](.+?)\[/s]#is
+[color] !\[color=(#?[A-Za-z0-9]+?)](.+?)\[/color]!is
+[size] #\[size=([0-9]+?)](.+?)\[/size]#is
+[font] #\[font=([A-Za-z0-9 ;\-]+?)](.+?)\[/font]#is
+ #\[quote(=?)](.+?)\[/quote]#is
+ #\[quote=([^\]\#]*?)\#([cp][0-9]+)](.+?)\[/quote]#is
+[quote] #\[quote=([^\]]*?)](.+?)\[/quote]#is
+[indent] #\[indent](.+?)\[/indent]#is
+[list=1] #\[list=1](.+?)\[/list]#is
+[list=a] #\[list=a](.+?)\[/list]#is
+[list] #\[list](.+?)\[/list]#is
+[*] #\[\*](.+?)(\n|\[/list\])#is
+[bg] !\[bg=(#?[A-Za-z0-9]+?)](.+?)\[/bg]!is
+[clear] #\[clear]#is';
+	var $default_replace_list = '<strong>$1</strong>
+<em>$1</em>
+<span style="text-decoration:line-through">$1</span>
+<span style="color:$1">$2</span>
+<span style="font-size:$1px">$2</span>
+<span style="font-family:$1">$2</span>
+<blockquote>$2</blockquote>
+<strong class="quote_author">$1 wrote <a href="#$2">earlier</a>:</strong><blockquote>$3</blockquote>
+<strong class="quote_author">$1 wrote:</strong><blockquote>$2</blockquote>
+<div class="indented">$1</div>
+<ol type="1">$1</ol>
+<ol type="a">$1</ol>
+<ul>$1</ul>
+<li>$1</li>
+<span style="background-color:$1">$2</span>
+<div class="clear"></div>';
 
 
 	/**
@@ -66,22 +102,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 					'type' => 'html_textarea',
 					'rows' => 10,
 					'cols' => 60,
-					'defaultvalue' => '[b] #\[b](.+?)\[/b]#is
-[i] #\[i](.+?)\[/i]#is
-[s] #\[s](.+?)\[/s]#is
-[color] !\[color=(#?[A-Za-z0-9]+?)](.+?)\[/color]!is
-[size] #\[size=([0-9]+?)](.+?)\[/size]#is
-[font] #\[font=([A-Za-z0-9 ;\-]+?)](.+?)\[/font]#is
- #\[quote(=?)](.+?)\[/quote]#is
- #\[quote=([^\]\#]*?)\#([cp][0-9]+)](.+?)\[/quote]#is
-[quote] #\[quote=([^\]]*?)](.+?)\[/quote]#is
-[indent] #\[indent](.+?)\[/indent]#is
-[list=1] #\[list=1](.+?)\[/list]#is
-[list=a] #\[list=a](.+?)\[/list]#is
-[list] #\[list](.+?)\[/list]#is
-[*] #\[\*](.+?)(\n|\[/list\])#is
-[bg] !\[bg=(#?[A-Za-z0-9]+?)](.+?)\[/bg]!is
-[clear] #\[clear]#is',
+					'defaultvalue' => $this->default_search_list,
 				),
 				'coll_post_replace_list' => array(
 					'label' => $this->T_( 'Replace list for posts'),
@@ -89,22 +110,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 					'type' => 'html_textarea',
 					'rows' => 10,
 					'cols' => 60,
-					'defaultvalue' => '<strong>$1</strong>
-<em>$1</em>
-<span style="text-decoration:line-through">$1</span>
-<span style="color:$1">$2</span>
-<span style="font-size:$1px">$2</span>
-<span style="font-family:$1">$2</span>
-<blockquote>$2</blockquote>
-<strong class="quote_author">$1 wrote <a href="#$2">earlier</a>:</strong><blockquote>$3</blockquote>
-<strong class="quote_author">$1 wrote:</strong><blockquote>$2</blockquote>
-<div class="indented">$1</div>
-<ol type="1">$1</ol>
-<ol type="a">$1</ol>
-<ul>$1</ul>
-<li>$1</li>
-<span style="background-color:$1">$2</span>
-<div class="clear"></div>',
+					'defaultvalue' => $this->default_replace_list,
 				),
 				'coll_comment_search_list' => array(
 					'label' => $this->T_( 'Search list for comments'),
@@ -112,22 +118,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 					'type' => 'html_textarea',
 					'rows' => 10,
 					'cols' => 60,
-					'defaultvalue' => '[b] #\[b](.+?)\[/b]#is
-[i] #\[i](.+?)\[/i]#is
-[s] #\[s](.+?)\[/s]#is
-[color] !\[color=(#?[A-Za-z0-9]+?)](.+?)\[/color]!is
-[size] #\[size=([0-9]+?)](.+?)\[/size]#is
-[font] #\[font=([A-Za-z0-9 ;\-]+?)](.+?)\[/font]#is
- #\[quote(=?)](.+?)\[/quote]#is
- #\[quote=([^\]\#]*?)\#([cp][0-9]+)](.+?)\[/quote]#is
-[quote] #\[quote=([^\]]*?)](.+?)\[/quote]#is
-[indent] #\[indent](.+?)\[/indent]#is
-[list=1] #\[list=1](.+?)\[/list]#is
-[list=a] #\[list=a](.+?)\[/list]#is
-[list] #\[list](.+?)\[/list]#is
-[*] #\[\*](.+?)(\n|\[/list\])#is
-[bg] !\[bg=(#?[A-Za-z0-9]+?)](.+?)\[/bg]!is
-[clear] #\[clear]#is',
+					'defaultvalue' => $this->default_search_list,
 				),
 				'coll_comment_replace_list' => array(
 					'label' => $this->T_( 'Replace list for comments'),
@@ -135,22 +126,69 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 					'type' => 'html_textarea',
 					'rows' => 10,
 					'cols' => 60,
-					'defaultvalue' => '<strong>$1</strong>
-<em>$1</em>
-<span style="text-decoration:line-through">$1</span>
-<span style="color:$1">$2</span>
-<span style="font-size:$1px">$2</span>
-<span style="font-family:$1">$2</span>
-<blockquote>$2</blockquote>
-<strong class="quote_author">$1 wrote <a href="#$2">earlier</a>:</strong><blockquote>$3</blockquote>
-<strong class="quote_author">$1 wrote:</strong><blockquote>$2</blockquote>
-<div class="indented">$1</div>
-<ol type="1">$1</ol>
-<ol type="a">$1</ol>
-<ul>$1</ul>
-<li>$1</li>
-<span style="background-color:$1">$2</span>
-<div class="clear"></div>',
+					'defaultvalue' => $this->default_replace_list,
+				),
+			)
+		);
+	}
+
+
+	/**
+	 * Define here default message settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_msg_setting_definitions( & $params )
+	{
+		return array_merge( parent::get_msg_setting_definitions( $params ),
+			array(
+				'search_list' => array(
+					'label' => $this->T_( 'Search list for messages'),
+					'note' => $this->T_( 'This is the BBcode search array for posts (one per line) ONLY CHANGE THESE IF YOU KNOW WHAT YOU\'RE DOING' ),
+					'type' => 'html_textarea',
+					'rows' => 10,
+					'cols' => 60,
+					'defaultvalue' => $this->default_search_list,
+				),
+				'replace_list' => array(
+					'label' => $this->T_( 'Replace list for messages'),
+					'note' => $this->T_( 'This is the replace array for posts (one per line) it must match the exact order of the search array' ),
+					'type' => 'html_textarea',
+					'rows' => 10,
+					'cols' => 60,
+					'defaultvalue' => $this->default_replace_list,
+				),
+			)
+		);
+	}
+
+
+	/**
+	 * Define here default email settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_email_setting_definitions( & $params )
+	{
+		return array_merge( parent::get_email_setting_definitions( $params ),
+			array(
+				'search_list' => array(
+					'label' => $this->T_( 'Search list for messages'),
+					'note' => $this->T_( 'This is the BBcode search array for posts (one per line) ONLY CHANGE THESE IF YOU KNOW WHAT YOU\'RE DOING' ),
+					'type' => 'html_textarea',
+					'rows' => 10,
+					'cols' => 60,
+					'defaultvalue' => $this->default_search_list,
+				),
+				'replace_list' => array(
+					'label' => $this->T_( 'Replace list for messages'),
+					'note' => $this->T_( 'This is the replace array for posts (one per line) it must match the exact order of the search array' ),
+					'type' => 'html_textarea',
+					'rows' => 10,
+					'cols' => 60,
+					'defaultvalue' => $this->default_replace_list,
 				),
 			)
 		);
@@ -167,14 +205,14 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 		$content = & $params['data'];
 		$Item = $params['Item'];
 		$item_Blog = & $Item->get_Blog();
-		if( !isset( $this->post_search_list ) )
-		{
-			$this->post_search_list = $this->prepare_search_list( 'coll_post_search_list', $item_Blog );
+		if( ! isset( $this->post_search_list ) )
+		{	// Init post search list only first time:
+			$this->post_search_list = $this->prepare_search_list( $this->get_coll_setting( 'coll_post_search_list', $item_Blog ) );
 		}
 
-		if( !isset( $this->post_replace_list ) )
-		{
-			$this->post_replace_list = explode( "\n", str_replace( "\r", '', $this->get_coll_setting( 'coll_post_replace_list', $item_Blog ) ) );
+		if( ! isset( $this->post_replace_list ) )
+		{	// Init post replace list only first time:
+			$this->post_replace_list = $this->prepare_replace_list( $this->get_coll_setting( 'coll_post_replace_list', $item_Blog ) );
 		}
 
 		$content = replace_content_outcode( $this->post_search_list, $this->post_replace_list, $content, array( $this, 'parse_bbcode' ) );
@@ -193,18 +231,45 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 	function RenderMessageAsHtml( & $params )
 	{
 		$content = & $params['data'];
-		$Blog = NULL;
-		if( !isset( $this->msg_search_list ) )
-		{
-			$this->msg_search_list = $this->prepare_search_list( 'coll_comment_search_list', $Blog, true );
+
+		if( ! isset( $this->msg_search_list ) )
+		{	// Init message search list only first time:
+			$this->msg_search_list = $this->prepare_search_list( $this->get_msg_setting( 'search_list' ) );
 		}
 
-		if( !isset( $this->msg_replace_list ) )
-		{
-			$this->msg_replace_list = explode( "\n", str_replace( "\r", '', $this->get_coll_setting( 'coll_comment_replace_list', $Blog, true ) ) );
+		if( ! isset( $this->msg_replace_list ) )
+		{	// Init message replace list only first time:
+			$this->msg_replace_list = $this->prepare_replace_list( $this->get_msg_setting( 'replace_list' ) );
 		}
 
 		$content = replace_content_outcode( $this->msg_search_list, $this->msg_replace_list, $content, array( $this, 'parse_bbcode' ) );
+
+		return true;
+	}
+
+
+	/**
+	 * Perform rendering of Email content
+	 *
+	 * NOTE: Use default coll settings of comments as messages settings
+	 *
+	 * @see Plugin::RenderEmailAsHtml()
+	 */
+	function RenderEmailAsHtml( & $params )
+	{
+		$content = & $params['data'];
+
+		if( ! isset( $this->email_search_list ) )
+		{	// Init email search list only first time:
+			$this->email_search_list = $this->prepare_search_list( $this->get_email_setting( 'search_list' ) );
+		}
+
+		if( ! isset( $this->email_replace_list ) )
+		{	// Init email replace list only first time:
+			$this->email_replace_list = $this->prepare_replace_list( $this->get_email_setting( 'replace_list' ) );
+		}
+
+		$content = replace_content_outcode( $this->email_search_list, $this->email_replace_list, $content, array( $this, 'parse_bbcode' ) );
 
 		return true;
 	}
@@ -386,13 +451,13 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 		{ // apply_comment_rendering is set to always render
 			$content = & $params['data'];
 			if( !isset( $this->comment_search_list ) )
-			{
-				$this->comment_search_list = $this->prepare_search_list( 'coll_comment_search_list', $item_Blog );
+			{	// Init comment search list only first time:
+				$this->comment_search_list = $this->prepare_search_list( $this->get_coll_setting( 'coll_comment_search_list', $item_Blog ) );
 			}
 
 			if( !isset( $this->comment_replace_list ) )
-			{
-				$this->comment_replace_list = explode( "\n", str_replace( "\r", '', $this->get_coll_setting( 'coll_comment_replace_list', $item_Blog ) ) );
+			{	// Init comment replace list only first time:
+				$this->comment_replace_list = $this->prepare_replace_list( $this->get_coll_setting( 'coll_comment_replace_list', $item_Blog ) );
 			}
 
 			$content = replace_content_outcode( $this->comment_search_list, $this->comment_replace_list, $content, array( $this, 'parse_bbcode' ) );
@@ -401,13 +466,16 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 
 
 	/**
-	 * Display a toolbar
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
+		$params['target_type'] = 'Item';
 		return $this->DisplayCodeToolbar( $params );
 	}
 
@@ -438,7 +506,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 				$Item = $params['Item'];
 				$item_Blog = & $Item->get_Blog();
 				$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $item_Blog );
-				$allow_null_blog = false;
+				$search_list = trim( $this->get_coll_setting( $search_list_setting_name, $item_Blog ) );
 				break;
 
 			case 'Comment':
@@ -455,13 +523,17 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 					$item_Blog = & $comment_Item->get_Blog();
 				}
 				$apply_rendering = $this->get_coll_setting( 'coll_apply_comment_rendering', $item_Blog );
-				$allow_null_blog = false;
+				$search_list = trim( $this->get_coll_setting( $search_list_setting_name, $item_Blog ) );
 				break;
 
 			case 'Message':
-				$search_list_setting_name = 'coll_comment_search_list';
 				$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
-				$allow_null_blog = true;
+				$search_list = trim( $this->get_msg_setting( 'search_list' ) );
+				break;
+
+			case 'EmailCampaign':
+				$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+				$search_list = trim( $this->get_email_setting( 'search_list' ) );
 				break;
 
 			default:
@@ -470,12 +542,10 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 				break;
 		}
 
-		if( $apply_rendering == 'never' )
-		{	// Don't display a toolbar if plugin is disabled
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
+		{	// Don't display a toolbar if plugin is disabled:
 			return false;
 		}
-
-		$search_list = trim( $this->get_coll_setting( $search_list_setting_name, $item_Blog, $allow_null_blog ) );
 
 		if( empty( $search_list ) )
 		{	// No list defined
@@ -670,52 +740,23 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 		</script><?php
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
-		?><script type="text/javascript">bbToolbar();</script><?php
 		echo $this->get_template( 'toolbar_after' );
+		?><script type="text/javascript">bbToolbar();</script><?php
 
 		return true;
 	}
 
 
 	/**
-	 * Event handler: Called when displaying editor toolbars.
+	 * Event handler: Called when displaying editor toolbars on comment form.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
 	 */
 	function DisplayCommentToolbar( & $params )
 	{
-		if( !empty( $params['Comment'] ) )
-		{ // Comment is set, get Blog from comment
-			$Comment = & $params['Comment'];
-			if( !empty( $Comment->item_ID ) )
-			{
-				$comment_Item = & $Comment->get_Item();
-				$Blog = & $comment_Item->get_Blog();
-			}
-		}
-
-		if( !empty( $params['Item'] ) )
-		{	// Get Blog from Item
-			$comment_Item = & $params['Item'];
-			$Blog = & $comment_Item->get_Blog();
-		}
-
-		if( empty( $Blog ) )
-		{ // Comment is not set, try global Blog
-			global $Blog;
-			if( empty( $Blog ) )
-			{ // We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available
-				return false;
-			}
-		}
-
-		if( $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) )
-		{
-			$params['target_type'] = 'Comment';
-			return $this->DisplayCodeToolbar( $params );
-		}
-		return false;
+		$params['target_type'] = 'Comment';
+		return $this->DisplayCodeToolbar( $params );
 	}
 
 
@@ -727,9 +768,23 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 	 */
 	function DisplayMessageToolbar( & $params )
 	{
-		if( $this->get_msg_setting( 'msg_apply_rendering' ) )
+		$params['target_type'] = 'Message';
+		return $this->DisplayCodeToolbar( $params );
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{
-			$params['target_type'] = 'Message';
+			$params['target_type'] = 'EmailCampaign';
 			return $this->DisplayCodeToolbar( $params );
 		}
 		return false;
@@ -739,30 +794,40 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 	/**
 	 * Prepare a search list
 	 *
-	 * @param string Setting name of search list (' post_search_list', 'comment_search_list' )
-	 * @param object Blog
-	 * @param boolean Allow empty Blog
-	 * @return array Search list
+	 * @param string String value of a search list
+	 * @return array The search list as array
 	 */
-	function prepare_search_list( $setting_name, $Blog = NULL, $allow_null_blog = false )
+	function prepare_search_list( $search_list_string )
 	{
-		$search_list = explode( "\n", str_replace( "\r", '', $this->get_coll_setting( $setting_name, $Blog, $allow_null_blog ) ) );
+		$search_list_array = explode( "\n", str_replace( "\r", '', $search_list_string ) );
 
-		foreach( $search_list as $l => $line )
+		foreach( $search_list_array as $l => $line )
 		{	// Remove button name from regexp string
 			$line = explode( ' ', $line, 2 );
 			$regexp = $line[1];
 			if( empty( $regexp ) )
 			{	// Bad format of search string
-				unset( $search_list[ $l ] );
+				unset( $search_list_array[ $l ] );
 			}
 			else
 			{	// Replace this line with regexp value (to delete a button name)
-				$search_list[ $l ] = $regexp;
+				$search_list_array[ $l ] = $regexp;
 			}
 		}
 
-		return $search_list;
+		return $search_list_array;
+	}
+
+
+	/**
+	 * Prepare a replace list
+	 *
+	 * @param string String value of a replace list
+	 * @return array The replace list as array
+	 */
+	function prepare_replace_list( $replace_list_string )
+	{
+		return explode( "\n", str_replace( "\r", '', $replace_list_string ) );
 	}
 }
 

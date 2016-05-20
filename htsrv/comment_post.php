@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package htsrv
  */
@@ -173,36 +173,42 @@ else
 	$perm_comment_edit = false;
 
 	// we need some id info from the anonymous user:
-	if ($require_name_email)
+	if ( $require_name_email )
 	{ // We want Name and EMail with comments
-		if( empty($author) )
+		if( empty( $author ) )
 		{
 			$Messages->add( T_('Please fill in your name.'), 'error' );
 		}
-		if( empty($email) )
+		if( empty( $email ) )
 		{
 			$Messages->add( T_('Please fill in your email.'), 'error' );
 		}
 	}
 
-	if( !empty($author) && antispam_check( $author ) )
+	if( !empty( $author ) && ( $block = antispam_check( $author ) ) )
 	{
+		// Log incident in system log
+		syslog_insert( sprintf( T_('Antispam: Supplied name "%s" contains blacklisted word "%s".'), $author, $block ), 'error', 'comment', $comment_item_ID );
+
 		$Messages->add( T_('Supplied name is invalid.'), 'error' );
 	}
 
-	if( !empty($email)
-		&& ( !is_email($email)|| antispam_check( $email ) ) )
+	if( !empty( $email )
+		&& ( !is_email( $email )|| ( $block = antispam_check( $email ) ) ) )
 	{
+		// Log incident in system log
+		syslog_insert( sprintf( T_('Antispam: Supplied email address "%s" contains blacklisted word "%s".'), $email, $block ), 'error', 'comment', $comment_item_ID );
+
 		$Messages->add( T_('Supplied email address is invalid.'), 'error' );
 	}
 
 
-	if( !stristr($url, '://') && !stristr($url, '@') )
+	if( !stristr( $url, '://' ) && !stristr( $url, '@' ) )
 	{ // add 'http://' if no protocol defined for URL; but not if the user seems to be entering an email address alone
 		$url = 'http://'.$url;
 	}
 
-	if( strlen($url) <= 8 )
+	if( strlen( $url ) <= 8 )
 	{	// ex: https:// is 8 chars
 		$url = '';
 	}
@@ -276,6 +282,9 @@ if( param( 'renderers_displayed', 'integer', 0 ) )
 // Def status will be the highest publish status what the current User ( or anonymous user if there is no current user ) can post
 $def_status = $Comment->is_meta() ? 'published' : get_highest_publish_status( 'comment', $commented_Item->Blog->ID, false );
 $Comment->set( 'status', $def_status );
+
+// Restrict comment status by parent item:
+$Comment->restrict_status_by_item( true );
 
 if( $action != 'preview' )
 {
@@ -602,8 +611,7 @@ if( $Comment->ID )
 	// asimo> this handle moderators and general users as well and use "outbound_notifications_mode" in case of general users
 	// Moderators will get emails about every new comment
 	// Subscribed user will only get emails about new published comments
-	$executed_by_userid = is_logged_in() ? $current_User->ID : NULL;
-	$Comment->handle_notifications( true, $executed_by_userid );
+	$Comment->handle_notifications( NULL, true );
 
 
 	// Add a message, according to the comment's status:

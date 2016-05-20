@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -123,14 +123,14 @@ class ItemLight extends DataObject
 	 * @param string User ID field name
 	 * @param string User ID field name
 	 */
-	function ItemLight( $db_row = NULL, $dbtable = 'T_items__item', $dbprefix = 'post_', $dbIDname = 'post_ID', $objtype = 'ItemLight',
+	function __construct( $db_row = NULL, $dbtable = 'T_items__item', $dbprefix = 'post_', $dbIDname = 'post_ID', $objtype = 'ItemLight',
 	               $datecreated_field = '', $datemodified_field = 'datemodified',
 	               $creator_field = '', $lasteditor_field = '' )
 	{
 		global $localtimenow, $default_locale, $current_User;
 
 		// Call parent constructor:
-		parent::DataObject( $dbtable, $dbprefix, $dbIDname, $datecreated_field, $datemodified_field,
+		parent::__construct( $dbtable, $dbprefix, $dbIDname, $datecreated_field, $datemodified_field,
 												$creator_field, $lasteditor_field );
 
 		$this->objtype = $objtype;
@@ -216,16 +216,48 @@ class ItemLight extends DataObject
 
 
 	/**
+	 * Get the ItemType object for the Item.
+	 *
+	 * @return object ItemType
+	 */
+	function & get_ItemType()
+	{
+		if( empty( $this->ItemType ) )
+		{
+			$ItemTypeCache = & get_ItemTypeCache();
+			$this->ItemType = & $ItemTypeCache->get_by_ID( $this->ityp_ID, false, false );
+		}
+
+		return $this->ItemType;
+	}
+
+
+	/**
+	 * Get setting of the post type
+	 *
+	 * @param string Setting name
+	 * @return string Setting value
+	 */
+	function get_type_setting( $setting_name )
+	{
+		if( ! $this->get_ItemType() )
+		{ // Unknown post type
+			return false;
+		}
+
+		return $this->ItemType->get( $setting_name );
+	}
+
+
+	/**
 	 * Is this a Special post (Page, Intros, Sidebar, Advertisement)
 	 *
 	 * @return boolean
 	 */
 	function is_special()
 	{
-		global $posttypes_specialtypes;
-
-		// Check if this post type is between the special post types
-		return in_array( $this->ityp_ID, $posttypes_specialtypes );
+		// Check if this post type usage is NOT "post":
+		return ( $this->get_type_setting( 'usage' ) != 'post' );
 	}
 
 
@@ -236,7 +268,12 @@ class ItemLight extends DataObject
 	 */
 	function is_intro()
 	{
-		return ItemType::is_intro( $this->ityp_ID );
+		if( ! $this->get_ItemType() )
+		{	// Unknown post type:
+			return false;
+		}
+
+		return $this->ItemType->is_intro();
 	}
 
 
@@ -247,7 +284,7 @@ class ItemLight extends DataObject
 	 */
 	function is_featured()
 	{
-		return !( empty($this->featured) || $this->is_intro() );
+		return ! empty( $this->featured ) && ! $this->is_intro();
 	}
 
 
@@ -388,21 +425,39 @@ class ItemLight extends DataObject
 	 */
 	function get_permanent_url( $permalink_type = '', $blogurl = '', $glue = '&amp;' )
 	{
-		global $DB, $cacheweekly, $Settings, $posttypes_specialtypes, $posttypes_nopermanentURL, $posttypes_catpermanentURL;
+		global $DB, $cacheweekly, $Settings;
+
+		if( $ItemType = & $this->get_ItemType() )
+		{	// Get type usage of this item:
+			$item_type_usage = $ItemType->get( 'usage' );
+		}
+		else
+		{	// Use default item type usage:
+			$item_type_usage = 'post';
+		}
 
 		$this->get_Blog();
-		if( $this->Blog->get_setting( 'front_disp' ) == 'page' &&
-		    $this->Blog->get_setting( 'front_post_ID' ) == $this->ID )
-		{ // This item is used as front specific page on the blog's home
-			$permalink_type = 'none';
+
+		// Special Items types/usages will have special permalink types
+		if( ( $this->Blog->get_setting( 'front_disp' ) == 'page' &&
+		      $this->Blog->get_setting( 'front_post_ID' ) == $this->ID ) ||
+		    ( $this->Blog->get_setting( 'front_disp' ) == 'single' &&
+		      ( $first_mainlist_Item = & $this->Blog->get_first_mainlist_Item() ) &&
+		      $first_mainlist_Item->ID == $this->ID ) )
+		{ // This item is used as front specific page or as first post on the blog's home
+			$permalink_type = 'front';
 		}
-		elseif( in_array( $this->ityp_ID, $posttypes_specialtypes ) ) // page, intros, sidebar
+		elseif( $item_type_usage != 'post' ) // page, intros, sidebar and other not "post"
 		{	// This is not an "in stream" post:
-			if( in_array( $this->ityp_ID, $posttypes_nopermanentURL ) )
+			if( in_array( $item_type_usage, array( 'intro-front', 'intro-main' ) ) )
+			{	// This type of post is not allowed to have a permalink:
+				$permalink_type = 'front';
+			}
+			elseif( in_array( $item_type_usage, array( 'special' ) ) )
 			{	// This type of post is not allowed to have a permalink:
 				$permalink_type = 'none';
 			}
-			elseif( in_array( $this->ityp_ID, $posttypes_catpermanentURL ) )
+			elseif( in_array( $item_type_usage, array( 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all' ) ) )
 			{	// This post has a permanent URL as url to main chapter:
 				$permalink_type = 'cat';
 			}
@@ -426,9 +481,12 @@ class ItemLight extends DataObject
 			case 'subchap':
 				return $this->get_chapter_url( $blogurl, $glue );
 
+			case 'front':
+				// Link to collection front page:
+				return $this->Blog->gen_blogurl();
+
 			case 'none':
 				// This is a silent fallback when we try to permalink to an Item that cannot be addressed directly:
-				// Link to blog home:
 				return $this->Blog->gen_blogurl();
 
 			case 'cat':
@@ -1199,7 +1257,7 @@ class ItemLight extends DataObject
 			$blogurl = $Blog->gen_blogurl();
 		}
 
-		$title = format_to_output( $this->$params['title_field'], $params['format'] );
+		$title = format_to_output( $this->{$params['title_field']}, $params['format'] );
 
 		if( $params['max_length'] != '' )
 		{	// Crop long title
@@ -1221,7 +1279,7 @@ class ItemLight extends DataObject
 			{	// We are on the single url already:
 				$params['link_type'] = 'none';
 			}
-			else if( $this->ityp_ID == 3000 )
+			else if( $this->get_type_setting( 'usage' ) == 'special' )
 			{	// tblue> This is a sidebar link, link to its "link to" URL by default:
 				$params['link_type'] = 'linkto_url';
 			}

@@ -7,15 +7,14 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_manual
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $cat;
-global $posttypes_specialtypes;
+global $Item, $Blog, $app_version;
 
 // Default params:
 $params = array_merge( array(
@@ -29,27 +28,6 @@ $params = array_merge( array(
 		'disp_comment_form' => true,
 		'item_link_type'    => 'post',
 	), $params );
-
-if( $disp == 'single' )
-{ // Display the breadcrumb path
-	if( empty( $cat ) )
-	{ // Set a category as main of current Item
-		$cat = $Item->main_cat_ID;
-
-		// Display the breadcrumbs only when global $cat is empty before line above
-		// Otherwise it is already displayed in header file
-		skin_widget( array(
-				// CODE for the widget:
-				'widget' => 'breadcrumb_path',
-				// Optional display params
-				'block_start'      => '<ol class="breadcrumb">',
-				'block_end'        => '</ol>',
-				'separator'        => '',
-				'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-				'item_active_mask' => '<li class="active">$title$</li>',
-			) );
-	}
-}
 ?>
 
 <div id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>">
@@ -91,7 +69,7 @@ if( $disp == 'single' )
 			'text'   => '#icon#',
 			'class'  => button_class(),
 		) );
-	if( $Item->is_intro() && $Item->ityp_ID > 1500 )
+	if( $Item->is_intro() )
 	{ // Link to edit category
 		$ItemChapter = & $Item->get_main_Chapter();
 		if( !empty( $ItemChapter ) )
@@ -129,7 +107,6 @@ if( $disp == 'single' )
 		<div class="evo_container evo_container__item_single">
 		<?php
 		// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-		// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 		// Display container contents:
 		skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
@@ -141,15 +118,15 @@ if( $disp == 'single' )
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
 			// Template params for "Item Tags" widget
-			'widget_coll_item_tags_before'    => '<div class="small text-muted">'.T_('Tags').': ',
-			'widget_coll_item_tags_after'     => '</div>',
-			'widget_coll_item_tags_separator' => ', ',
+			'widget_item_tags_before'    => '<div class="small text-muted">'.T_('Tags').': ',
+			'widget_item_tags_after'     => '</div>',
+			'widget_item_tags_separator' => ', ',
 			// Template params for "Small Print" widget
-			'widget_coll_small_print_before'         => '<p class="small text-muted">',
-			'widget_coll_small_print_after'          => '</p>',
-			'widget_coll_small_print_display_author' => false,
+			'widget_item_small_print_before'         => '<p class="small text-muted">',
+			'widget_item_small_print_after'          => '</p>',
+			'widget_item_small_print_display_author' => false,
 			// Params for skin file "_item_content.inc.php"
-			'widget_coll_item_content_params' => $params,
+			'widget_item_content_params' => $params,
 		) );
 		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 		?>
@@ -178,12 +155,12 @@ if( $disp == 'single' )
 			$Item->author( array(
 					'before'    => T_('Created by '),
 					'after'     => ' &bull; ',
-					'link_text' => 'name',
+					'link_text' => 'auto',
 				) );
 			$Item->lastedit_user( array(
 					'before'    => T_('Last edit by '),
 					'after'     => T_(' on ').$Item->get_mod_date( 'F jS, Y' ),
-					'link_text' => 'name',
+					'link_text' => 'auto',
 				) );
 			'</p>';
 			echo $Item->get_history_link( array(
@@ -206,18 +183,24 @@ if( $disp == 'single' )
 	?>
 
 	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
 		// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
 		skin_include( '_item_workflow.inc.php' );
 		// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
+	}
 	?>
 
 	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
 		// ------------------ META COMMENTS INCLUDED HERE ------------------
 		skin_include( '_item_meta_comments.inc.php', array(
 				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
 				'comment_end'           => '</article>',
 			) );
 		// ---------------------- END OF META COMMENTS ---------------------
+	}
 	?>
 
 	<?php

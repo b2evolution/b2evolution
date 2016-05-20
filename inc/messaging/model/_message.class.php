@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -63,10 +63,10 @@ class Message extends DataObject
 	 *
 	 * @param db_row database row
 	 */
-	function Message( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_messaging__message', 'msg_', 'msg_ID', 'datetime', '', 'author_user_ID' );
+		parent::__construct( 'T_messaging__message', 'msg_', 'msg_ID', 'datetime', '', 'author_user_ID' );
 
 		if( $db_row == NULL )
 		{
@@ -616,7 +616,7 @@ class Message extends DataObject
 	function send_email_notifications( $new_thread = true, $from_User = NULL )
 	{
 		global $DB, $current_User, $admin_url, $baseurl, $app_name;
-		global $Settings, $UserSettings, $servertimenow;
+		global $Settings, $UserSettings, $servertimenow, $Messages;
 
 		// Select recipients of the current thread:
 		$SQL = new SQL();
@@ -630,9 +630,6 @@ class Message extends DataObject
 		$SQL->WHERE( 'ts.tsta_thread_ID = '.$this->Thread->ID.' AND ts.tsta_user_ID <> '.$this->author_user_ID );
 
 		$thrd_recipients = $DB->get_assoc( $SQL->get() );
-
-		// set message link:
-		list( $message_link, $prefs_link ) = get_messages_link_to( $this->thread_ID );
 
 		// Construct message subject and body:
 		if( $new_thread )
@@ -665,6 +662,18 @@ class Message extends DataObject
 				continue;
 			}
 
+			$notify_User = $UserCache->get_by_ID( $recipient_ID );
+
+			// Get the messages link:
+			list( $message_link ) = get_messages_link_to( $this->thread_ID, $recipient_ID );
+
+			if( $message_link === false )
+			{	// If the recipient has no access to messages page:
+				$Messages->add( sprintf( T_('%s cannot be notified of this new message because we have no default messaging collection and %s has no access to the backoffice.'), $notify_User->get( 'login' ), $notify_User->get( 'login' ) ), 'error' );
+				syslog_insert( sprintf( T_('%s cannot be notified for new/pending private messages because we have no default messaging collection and %s has no access to the backoffice.'), $notify_User->get( 'login' ), $notify_User->get( 'login' ) ), 'error' );
+				continue;
+			}
+
 			$email_template_params = array(
 					'recipient_ID'         => $recipient_ID,
 					'new_thread'           => $new_thread,
@@ -674,7 +683,7 @@ class Message extends DataObject
 					'other_unread_threads' => $other_unread_threads[$recipient_ID],
 					'from_User'            => $from_User,
 				);
-			$notify_User = $UserCache->get_by_ID( $recipient_ID );
+
 			// Change locale here to localize the email subject and content
 			locale_temp_switch( $notify_User->get( 'locale' ) );
 			$sender_login = ( $from_User === NULL ) ? $current_User->login : $from_User->login;
@@ -817,6 +826,9 @@ class Message extends DataObject
 					 VALUES ( '.$this->ID.', '.$DB->quote( $format ).', '.$DB->quote( $message_renderers ).', '.$DB->quote( $r ).', '.$DB->quote( date2mysql( $servertimenow ) ).' )', 'Cache prerendered message content' );
 			}
 		}
+
+		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
+		$r = $Plugins->render( $r, $this->get_renderers_validated(), $format, array(), 'Display' );
 
 		return $r;
 	}

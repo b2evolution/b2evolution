@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -106,7 +106,7 @@ switch( $action )
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_Goal = duplicate( $edited_Goal ); // PHP4/5 abstraction
+			$edited_Goal = clone $edited_Goal;
 			$edited_Goal->ID = 0;
 		}
 		break;
@@ -269,7 +269,7 @@ switch( $action )
 		}
 		else
 		{ // Duplicate object in order no to mess with the cache:
-			$edited_GoalCategory = duplicate( $edited_GoalCategory ); // PHP4/5 abstraction
+			$edited_GoalCategory = clone $edited_GoalCategory;
 			$edited_GoalCategory->ID = 0;
 		}
 		break;

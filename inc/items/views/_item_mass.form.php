@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -86,7 +86,7 @@ $Form->begin_form( '', '', $params );
 	$Form->hidden( 'metadesc', $edited_Item->get_setting( 'metadesc' ) );
 	$Form->hidden( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ) );
 
-	if( $Blog->get_setting( 'use_workflow' ) )
+	if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 	{	// We want to use workflow properties for this blog:
 		$Form->hidden( 'item_priority', $edited_Item->priority );
 		$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
@@ -211,7 +211,7 @@ $Form->begin_form( '', '', $params );
 
 </div>
 
-<div class="clear"></div>
+<div class="clearfix"></div>
 
 <?php
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -32,6 +32,12 @@ if( !empty( $template_action ) )
 			tool_test_flush();
 			break;
 
+		case 'create_sample_collections':
+			// Create the collections and display a process of creating:
+			global $num_collections, $perm_management, $allow_access;
+			tool_create_sample_collections( $num_collections, $perm_management, $allow_access );
+			break;
+
 		case 'create_sample_comments':
 			// Create the comments and display a process of creating
 			global $blog_ID, $num_comments, $num_posts;
@@ -46,8 +52,8 @@ if( !empty( $template_action ) )
 
 		case 'create_sample_users':
 			// Create the users and display a process of creating
-			global $group_ID, $num_users;
-			tool_create_sample_users( $group_ID, $num_users );
+			global $user_groups, $num_users, $advanced_user_perms;
+			tool_create_sample_users( $user_groups, $num_users, $advanced_user_perms );
 			break;
 
 		case 'create_sample_hits':
@@ -76,6 +82,7 @@ if( $current_User->check_perm('options', 'edit') )
 	$block_item_Widget->disp_template_replaced( 'block_start' );
 	echo '<ul>';
 	echo '<li><a href="'.regenerate_url('action', 'action=test_flush&amp;'.url_crumb('tools')).'">'.T_('Test flush').'</a></li>';
+	echo '<li><a href="'.regenerate_url('action', 'action=show_create_collections&amp;'.url_crumb('tools')).'">'.T_('Create sample collections').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=show_create_comments&amp;'.url_crumb('tools')).'">'.T_('Create sample comments').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=show_create_posts&amp;'.url_crumb('tools')).'">'.T_('Create sample posts').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=show_create_users&amp;'.url_crumb('tools')).'">'.T_('Create sample users').'</a></li>';

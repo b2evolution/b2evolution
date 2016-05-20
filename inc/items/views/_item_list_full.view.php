@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -31,6 +31,7 @@ global $Item;
 global $action, $dispatcher, $blog, $posts, $poststart, $postend, $ReqURI;
 global $edit_item_url, $delete_item_url, $htsrv_url, $p, $dummy_fields;
 global $comment_allowed_tags, $comment_type;
+global $Plugins, $DB, $UserSettings, $Session, $Messages;
 
 $highlight = param( 'highlight', 'integer', NULL );
 
@@ -119,20 +120,20 @@ $ItemList->display_nav( 'header' );
 while( $Item = & $ItemList->get_item() )
 {
 	?>
-	<div id="<?php $Item->anchor_id() ?>" class="bPost bPost<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
+	<div id="<?php $Item->anchor_id() ?>" class="panel panel-default evo_post evo_post__status_<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
 		<?php
 		// We don't switch locales in the backoffice, since we use the user pref anyway
 		// Load item's creator user:
 		$Item->get_creator_User();
 		?>
-		<div class="bSmallHead <?php
+		<div class="panel-heading small <?php
 		if( $Item->ID == $highlight )
 		{
 			echo 'fadeout-ffff00" id="fadeout-1';
 		}
 		?>">
 			<?php
-				echo '<div class="bSmallHeadRight">';
+				echo '<div class="pull-right">';
 				$Item->permanent_link( array(
 						'before' => '',
 						'text'   => '#text#'
@@ -203,10 +204,10 @@ while( $Item = & $ItemList->get_item() )
 			?>
 		</div>
 
-		<div class="bContent">
+		<div class="panel-body">
 			<?php
 				$Item->format_status( array(
-						'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+						'template' => '<div class="pull-right"><span class="note status_$status$"><span>$status_title$</span></span></div>',
 					) );
 			?>
 			<!-- TODO: Tblue> Do not display link if item does not get displayed in the frontend (e. g. not published). -->
@@ -268,13 +269,13 @@ while( $Item = & $ItemList->get_item() )
 			// List all tags attached to this post:
 			$Item->tags( array(
 					'url' =>            regenerate_url( 'tag' ),
-					'before' =>         '<div class="bSmallPrint">'.T_('Tags').': ',
+					'before' =>         '<div class="panel-body small text-muted evo_post__tags">'.T_('Tags').': ',
 					'after' =>          '</div>',
 					'separator' =>      ', ',
 				) );
 		?>
 
-		<div class="PostActionsArea">
+		<div class="panel-footer">
 			<?php
 
 			echo '<span class="'.button_class( 'group' ).'">';
@@ -343,7 +344,7 @@ while( $Item = & $ItemList->get_item() )
 
 			?>
 
-			<div class="clear"></div>
+			<div class="clearfix"></div>
 		</div>
 
 		<?php
@@ -360,8 +361,8 @@ while( $Item = & $ItemList->get_item() )
 
 			if( isset($GLOBALS['files_Module']) )
 			{ // Files:
-				echo '<div class="bPostAttachments">';	// TODO
-	
+				echo '<div class="evo_post__attachments">';	// TODO
+
 				/**
 				 * Needed by file display funcs
 				 * @var Item
@@ -416,7 +417,7 @@ while( $Item = & $ItemList->get_item() )
 				<?php
 			}
 
-			echo '<div class="clear"></div>';
+			echo '<div class="clearfix"></div>';
 
 			$currentpage = param( 'currentpage', 'integer', 1 );
 			$total_comments_number = generic_ctp_number( $Item->ID, ( $comment_type == 'meta' ? 'metas' : 'total' ), 'total' );
@@ -443,7 +444,7 @@ while( $Item = & $ItemList->get_item() )
 				$expiry_statuses[] = 'expired';
 			}
 
-			global $CommentList, $UserSettings;
+			global $CommentList;
 			$CommentList = new CommentList2( $Blog );
 
 			// Filter list:
@@ -466,7 +467,7 @@ while( $Item = & $ItemList->get_item() )
 
 			// Display status filter
 			?>
-			<div class="bFeedback">
+			<div class="evo_post__comments">
 			<a id="comments"></a>
 			<?php
 			if( $display_params['disp_rating_summary'] )
@@ -509,10 +510,10 @@ while( $Item = & $ItemList->get_item() )
 			}
 
 			// comments_container value shows, current Item ID
-			echo '<div id="comments_container" value="'.$Item->ID.'">';
+			echo '<div id="comments_container" value="'.$Item->ID.'" class="evo_comments_container">';
 			// display comments
 			$CommentList->display_if_empty( array(
-					'before'    => '<div class="bComment"><p>',
+					'before'    => '<div class="evo_comment"><p>',
 					'after'     => '</p></div>',
 					'msg_empty' => T_('No feedback for this post yet...'),
 				) );
@@ -523,15 +524,56 @@ while( $Item = & $ItemList->get_item() )
 			if( ( $comment_type == 'meta' && $current_User->check_perm( 'meta_comment', 'add', false, $Item ) ) // User can add meta comment on the Item
 			    || $Item->can_comment() ) // User can add standard comment
 			{
+
+			// Try to get a previewed Comment and check if it is for current viewed Item:
+			$preview_Comment = $Session->get( 'core.preview_Comment' );
+			$preview_Comment = ( empty( $preview_Comment ) || $preview_Comment->item_ID != $Item->ID ) ? false : $preview_Comment;
+
+			if( $preview_Comment )
+			{	// Display a previewed comment:
+				echo '<h4 class="text-warning">'.T_('PREVIEW Comment:').'</h4>';
+				echo '<div class="evo_comments_container">';
+				echo_comment( $preview_Comment );
+				echo '</div>';
+
+				// Display the error message again after preview of comment:
+				$Messages->add( T_('This is a preview only! Do not forget to send your comment!'), 'error' );
+				$Messages->display();
+			}
+
 			?>
 			<!-- ========== FORM to add a comment ========== -->
 			<h4><?php echo $comment_type == 'meta' ? T_('Leave a meta comment') : T_('Leave a comment'); ?>:</h4>
 
 			<?php
 
-			$Form = new Form( $htsrv_url.'comment_post.php', 'comment_checkchanges' );
+			if( $preview_Comment )
+			{	// Get a Comment properties from preview request:
+				$Comment = $preview_Comment;
 
-			$Form->begin_form( 'bComment evo_form evo_form__comment '.( $comment_type == 'meta' ? ' evo_form__comment_meta' : '' ) );
+				// Form fields:
+				$comment_content = $Comment->original_content;
+				// All file IDs that have been attached:
+				$comment_attachments = $Comment->preview_attachments;
+				// All attachment file IDs which checkbox was checked in:
+				$checked_attachments = $Comment->checked_attachments;
+				// Get what renderer checkboxes were selected on form:
+				$comment_renderers = explode( '.', $Comment->get( 'renderers' ) );
+
+				// Delete any preview comment from session data:
+				$Session->delete( 'core.preview_Comment' );
+			}
+			else
+			{	// Create new Comment:
+				$Comment = new Comment();
+				$comment_content = $Comment->get( 'content' );
+				$comment_attachments = '';
+				$comment_renderers = $Comment->get_renderers();
+			}
+
+			$Form = new Form( $htsrv_url.'comment_post.php', 'comment_checkchanges', 'post', NULL, 'multipart/form-data' );
+
+			$Form->begin_form( 'evo_form evo_form__comment '.( $comment_type == 'meta' ? ' evo_form__comment_meta' : '' ) );
 
 			if( $comment_type == 'meta' )
 			{
@@ -544,21 +586,193 @@ while( $Item = & $ItemList->get_item() )
 			$Form->hidden( 'redirect_to', $ReqURI );
 
 			$Form->info( T_('User'), $current_User->get_identity_link( array( 'link_text' => 'name' ) ).' '.get_user_profile_link( ' [', ']', T_('Edit profile') )  );
-			$Form->textarea( $dummy_fields[ 'content' ], '', 12, T_('Comment text'), '', 40, 'bComment autocomplete_usernames' );
 
-			global $Plugins;
-			$Form->info( T_('Text Renderers'), $Plugins->get_renderer_checkboxes( array( 'default') , array( 'Blog' => & $Blog, 'setting_name' => 'coll_apply_comment_rendering' ) ) );
+			if( $Item->can_rate() )
+			{	// Comment rating:
+				ob_start();
+				$Comment->rating_input( array( 'item_ID' => $Item->ID ) );
+				$comment_rating = ob_get_clean();
+				$Form->info_field( T_('Your vote'), $comment_rating );
+			}
 
-			$Form->buttons_input( array(array('name'=>'submit', 'value'=>T_('Send comment'), 'class'=>'SaveButton' )) );
+			// Display plugin toolbars:
+			ob_start();
+			echo '<div class="comment_toolbars">';
+			$Plugins->trigger_event( 'DisplayCommentToolbar', array( 'Comment' => & $Comment, 'Item' => & $Item ) );
+			echo '</div>';
+			$comment_toolbar = ob_get_clean();
+
+			// Message field:
+			$form_inputstart = $Form->inputstart;
+			$Form->inputstart .= $comment_toolbar;
+			$Form->textarea_input( $dummy_fields['content'], $comment_content, 12, T_('Comment text'), array(
+					'cols'  => 40,
+					'class' => 'autocomplete_usernames'
+				) );
+			$Form->inputstart = $form_inputstart;
+
+			// Set b2evoCanvas for plugins:
+			echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields['content'].'" );</script>';
+
+			// Attach files:
+			if( !empty( $comment_attachments ) )
+			{	// display already attached files checkboxes
+				$FileCache = & get_FileCache();
+				$attachments = explode( ',', $comment_attachments );
+				$final_attachments = explode( ',', $checked_attachments );
+				// create attachments checklist
+				$list_options = array();
+				foreach( $attachments as $attachment_ID )
+				{
+					$attachment_File = $FileCache->get_by_ID( $attachment_ID, false );
+					if( $attachment_File )
+					{
+						// checkbox should be checked only if the corresponding file id is in the final attachments array
+						$checked = in_array( $attachment_ID, $final_attachments );
+						$list_options[] = array( 'preview_attachment'.$attachment_ID, 1, $attachment_File->get( 'name' ), $checked, false );
+					}
+				}
+				if( !empty( $list_options ) )
+				{	// display list
+					$Form->checklist( $list_options, 'comment_attachments', T_( 'Attached files' ) );
+				}
+				// memorize all attachments ids
+				$Form->hidden( 'preview_attachments', $comment_attachments );
+			}
+			if( $Item->can_attach() )
+			{	// Display attach file input field:
+				$Form->input_field( array(
+						'label' => T_('Attach files'),
+						'note'  => get_icon( 'help', 'imgtag', array(
+								'data-toggle'    => 'tooltip',
+								'data-placement' => 'top',
+								'data-html'      => 'true',
+								'title'          => htmlspecialchars( get_upload_restriction( array(
+										'block_after'     => '',
+										'block_separator' => '<br /><br />' ) ) )
+							) ),
+						'name'  => 'uploadfile[]',
+						'type'  => 'file'
+					) );
+			}
+
+			$Form->info( T_('Text Renderers'), $Plugins->get_renderer_checkboxes( $comment_renderers, array(
+					'Blog'         => & $Blog,
+					'setting_name' => 'coll_apply_comment_rendering'
+				) ) );
+
+			$preview_text = ( $Item->can_attach() ) ? T_('Preview/Add file') : T_('Preview');
+			$Form->buttons_input( array(
+					array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview btn-info', 'value' => $preview_text ),
+					array( 'name' => 'submit_comment_post_'.$Item->ID.'[save]', 'class' => 'submit SaveButton', 'value' => T_('Send comment') )
+				) );
+
 			?>
 
-				<div class="clear"></div>
+				<div class="clearfix"></div>
 			<?php
 				$Form->end_form();
 			?>
 			<!-- ========== END of FORM to add a comment ========== -->
 			<?php
+
+			// ========== START of links to manage subscriptions ========== //
+			echo '<br /><nav class="evo_post_comment_notification">';
+
+			$notification_icon = get_icon( 'notification' );
+
+			$not_subscribed = true;
+			$creator_User = $Item->get_creator_User();
+
+			if( $Blog->get_setting( 'allow_subscriptions' ) )
+			{
+				$sql = 'SELECT count( sub_user_ID ) FROM T_subscriptions
+							WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0';
+				if( $DB->get_var( $sql ) > 0 )
+				{
+					echo '<p class="text-center">'.$notification_icon.' <span>'.T_( 'You are receiving notifications when anyone comments on any post.' );
+					echo ' <a href="'.get_notifications_url().'">'.T_( 'Click here to manage your subscriptions.' ).'</a></span></p>';
+					$not_subscribed = false;
+				}
+			}
+
+			if( $not_subscribed && ( $creator_User->ID == $current_User->ID ) && ( $UserSettings->get( 'notify_published_comments', $current_User->ID ) != 0 ) )
+			{
+				echo '<p class="text-center">'.$notification_icon.' <span>'.T_( 'This is your post. You are receiving notifications when anyone comments on your posts.' );
+				echo ' <a href="'.get_notifications_url().'">'.T_( 'Click here to manage your subscriptions.' ).'</a></span></p>';
+				$not_subscribed = false;
+			}
+			if( $not_subscribed && $Blog->get_setting( 'allow_item_subscriptions' ) )
+			{
+				global $samedomain_htsrv_url;
+				if( get_user_isubscription( $current_User->ID, $Item->ID ) )
+				{
+					echo '<p class="text-center">'.$notification_icon.' <span>'.T_( 'You will be notified by email when someone comments here.' );
+					echo ' <a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></span></p>';
+				}
+				else
+				{
+					echo '<p class="text-center"><a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'collections_isubs_update' ).'" class="btn btn-default">'.$notification_icon.' '.T_( 'Notify me by email when someone comments here.' ).'</a></p>';
+				}
+			}
+
+			echo '</nav>';
+			// ========== END of links to manage subscriptions ========== //
+
 			} // / can comment
+
+			// ========== START of item workflow properties ========== //
+			if( is_logged_in() &&
+					$Blog->get_setting( 'use_workflow' ) &&
+					$current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) &&
+					$current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+			{	// Display workflow properties if current user can edit this post:
+				$Form = new Form( get_samedomain_htsrv_url().'item_edit.php' );
+
+				$Form->add_crumb( 'item' );
+				$Form->hidden( 'blog', $Blog->ID );
+				$Form->hidden( 'post_ID', $Item->ID );
+				$Form->hidden( 'redirect_to', $admin_url.'?ctrl=items&blog='.$Blog->ID.'&p='.$Item->ID );
+
+				$Form->begin_form( 'evo_item_workflow_form' );
+
+				$Form->begin_fieldset( T_('Workflow properties') );
+
+				echo '<div class="evo_item_workflow_form__fields">';
+
+				$Form->select_input_array( 'item_priority', $Item->priority, item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
+
+				// Load current blog members into cache:
+				$UserCache = & get_UserCache();
+				// Load only first 21 users to know when we should display an input box instead of full users list
+				$UserCache->load_blogmembers( $Blog->ID, 21, false );
+
+				if( count( $UserCache->cache ) > 20 )
+				{
+					$assigned_User = & $UserCache->get_by_ID( $Item->get( 'assigned_user_ID' ), false, false );
+					$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees' );
+				}
+				else
+				{
+					$Form->select_object( 'item_assigned_user_ID', NULL, $Item, T_('Assigned to'),
+															'', true, '', 'get_assigned_user_options' );
+				}
+
+				$ItemStatusCache = & get_ItemStatusCache();
+				$ItemStatusCache->load_all();
+				$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $Item->pst_ID, true ), T_('Task status') );
+
+				$Form->date( 'item_deadline', $Item->get('datedeadline'), T_('Deadline') );
+
+				$Form->button( array( 'submit', 'actionArray[update_workflow]', T_('Update'), 'SaveButton' ) );
+
+				echo '</div>';
+
+				$Form->end_fieldset();
+
+				$Form->end_form();
+			}
+			// ========== END of item workflow properties ========== //
 		?>
 		</div>
 		<?php

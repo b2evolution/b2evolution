@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -27,10 +27,10 @@ class org_members_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function org_members_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'org_members' );
+		parent::__construct( $db_row, 'core', 'org_members' );
 	}
 
 
@@ -89,6 +89,8 @@ class org_members_Widget extends ComponentWidget
 		{
 			$user_fields[ $UserField->get( 'code' ) ] = $UserField->get_name();
 		}
+		
+		load_funcs( 'files/model/_image.funcs.php' );
 
 		$r = array_merge( array(
 				'title' => array(
@@ -104,9 +106,53 @@ class org_members_Widget extends ComponentWidget
 					'size' => 3,
 					'defaultvalue' => 1,
 				),
+				'layout' => array(
+					'label' => T_('Layout'),
+					'note' => T_('How to lay out the members'),
+					'type' => 'select',
+					'options' => array(
+							'rwd'  => T_( 'RWD Blocks' ),
+							'flow' => T_( 'Flowing Blocks' ),
+							'list' => T_( 'List' ),
+						),
+					'defaultvalue' => 'rwd',
+				),
+				'rwd_block_class' => array(
+					'label' => T_('RWD block class'),
+					'note' => T_('Specify the responsive column classes you want to use.'),
+					'size' => 60,
+					'defaultvalue' => 'col-lg-4 col-md-6 col-sm-6 col-xs-12',
+				),
+				'thumb_size' => array(
+					'label' => T_('Image size'),
+					'note' => T_('Cropping and sizing of thumbnails'),
+					'type' => 'select',
+					'options' => get_available_thumb_sizes(),
+					'defaultvalue' => 'crop-top-200x200',
+				),
+				'order_by' => array(
+					'label' => T_('Order by'),
+					'note' => T_('Field used to determine the order in which the members are displayed'),
+					'type' => 'select',
+					'options' => array(
+							'user_id' => 'User ID', 
+							'user_level' => 'User Level',
+							'org_role' => 'Role in Organization',
+							'username' => 'Username',
+							'lastname' => 'Last Name, First Name',
+							'firstname' => 'First Name, Last Name'
+					),
+					'defaultvalue' => 'user_id',
+				),
 				'link_profile' => array(
 					'label' => T_('Link to profile'),
 					'note' => T_('Check this to link each user to his profile.'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
+				),
+				'display_role' => array(
+					'label' => T_('Role in organization'),
+					'note' => T_('Check this to display the role of the members in the organization'),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
 				),
@@ -133,10 +179,10 @@ class org_members_Widget extends ComponentWidget
 					'options' => array( '' => T_('None') ) + $user_fields,
 					'defaultvalue' => 'microbio',
 				),
-				'field_extra_height' => array(
-					'label' => T_('Height of extra info'),
+				'field_extra_lines' => array(
+					'label' => T_('Lines of extra info'),
 					'note' => T_('Use this to keep contact cards aligned.'),
-					'defaultvalue' => '6ex',
+					'defaultvalue' => '2',
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -151,7 +197,7 @@ class org_members_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $DB, $Item, $Blog;
+		global $DB, $Item, $Blog, $thumbnail_sizes;
 
 		$this->init_display( $params );
 
@@ -177,7 +223,8 @@ class org_members_Widget extends ComponentWidget
 		else
 		{
 			// Get all users of the selected organization
-			$users = $Organization->get_users();
+			$order_by = $this->disp_params['order_by'];
+			$users = $Organization->get_users( $order_by, true );
 
 			if( $this->disp_params['display_icons'] )
 			{ // Initialise css classes for icons depending on widget setting and only when they are displayed
@@ -196,9 +243,12 @@ class org_members_Widget extends ComponentWidget
 
 			if( count( $users ) )
 			{
+				echo $this->get_layout_start();
+
+				$member_counter = 0;
 				foreach( $users as $org_User )
 				{
-					echo '<div class="col-lg-4 col-sm-6 text-center">';
+					echo $this->get_layout_item_start( $member_counter );
 
 					$user_url = $this->disp_params['link_profile'] ? $org_User->get_userpage_url( $Blog->ID, true ) : '';
 
@@ -207,8 +257,12 @@ class org_members_Widget extends ComponentWidget
 						echo '<a href="'.$user_url.'" class="user_link">';
 					}
 
+					// Get image tag size based on thumb size param
+					$tag_size = $thumbnail_sizes[ $this->disp_params['thumb_size'] ];
+					$tag_size = $tag_size[1].'x'.$tag_size[2];
+
 					// Profile picture
-					echo $org_User->get_avatar_imgtag( 'crop-top-320x320', 'img-circle img-responsive img-center' );
+					echo $org_User->get_avatar_imgtag( $this->disp_params['thumb_size'], 'img-circle img-responsive img-center', '', false, '', '', $tag_size );
 
 					if( ! empty( $user_url ) )
 					{ // End of user link, see above
@@ -218,50 +272,63 @@ class org_members_Widget extends ComponentWidget
 					}
 
 					// Full name
-					echo '<h3>'.$org_User->get( 'fullname' ).'</h3>';
+					echo '<h3 class="evo_user_name">'.$org_User->get( 'fullname' ).'</h3>';
 
 					if( ! empty( $user_url ) )
 					{ // End of user link, see above
 						echo '</a>';
 					}
+					
+					// Organizational role
+					if( $this->disp_params['display_role'] == 1 )
+					{
+						$organizations_data = $org_User->get_organizations_data();
+						echo '<div class="evo_org_role text-muted">'.$organizations_data[$org_ID]['role'].'</div>';
+					}
 
 					if( $this->disp_params['display_icons'] )
 					{ // Display user links as icons
 						$url_fields = $org_User->userfields_by_type( 'url' );
+						echo '<div class="ufld_icon_links">';
 						if( count( $url_fields ) )
 						{
-							echo '<div class="ufld_icon_links">';
+							
 							foreach( $url_fields as $field )
 							{
 								echo '<a href="'.$field->uf_varchar.'"'.( empty( $icon_colors_classes ) ? '' : ' class="ufld_'.$field->ufdf_code.$icon_colors_classes.'"' ).'>'
 										.'<span class="'.$field->ufdf_icon_name.'"></span>'
 									.'</a>';
 							}
-							echo '</div>';
 						}
+						echo '</div>';
 					}
 
 					// Info
 					if( ! empty( $this->disp_params['field_code'] ) && ( $field_values = $org_User->userfield_values_by_code( $this->disp_params['field_code'] ) ) )
 					{
+						$field_extra_lines = intval( $this->disp_params['field_extra_lines'] );
 						echo '<p class="user_field"'
-							.( empty( $this->disp_params['field_extra_height'] ) ? '' : ' style="height:'.$this->disp_params['field_extra_height'].'"' )
+							.( empty( $field_extra_lines ) ? '' :
+									' style="height:'.( $field_extra_lines * 1.5 /* line-height */ ).'em;'
+										.'-webkit-line-clamp:'.$field_extra_lines.'"' )
 							.'>';
 						foreach( $field_values as $f => $field_value )
 						{
 							if( $f > 0 )
-							{ // New line between each field value
-								echo '<br />';
+							{ // Space between each field value
+								echo ' ';
 							}
-							echo nl2br( $field_value );
+							echo preg_replace( "/[\r\n]+/", ' ', $field_value );
 						}
 						echo '</p>';
 					}
 
-					echo '</div>';
+					$member_counter++;
+
+					echo $this->get_layout_item_end( $member_counter );
 				}
 
-				echo '<div class="clear"></div>';
+				echo $this->get_layout_end( $member_counter );
 			}
 		}
 
