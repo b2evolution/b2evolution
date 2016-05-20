@@ -27,10 +27,11 @@ echo '<table class="coll_kind">';
 
 if( $blog_kinds = get_collection_kinds() )
 {
+	$coll_url_suffix = get_param( 'cgrp_ID' ) ? '&amp;cgrp_ID='.get_param( 'cgrp_ID' ) : '';
 	foreach( $blog_kinds as $kind => $info )
 	{
 		echo '<tr>';
-			echo '<td class="coll_kind"><a href="?ctrl=collections&amp;action=new-selskin&amp;kind='.$kind.'" class="btn '.( !empty($info['class']) ? $info['class'] : 'btn-default' ).'">'.$info['name'].' &raquo;</a></td>';
+			echo '<td class="coll_kind"><a href="?ctrl=collections&amp;action=new-selskin&amp;kind='.$kind.$coll_url_suffix.'" class="btn '.( !empty($info['class']) ? $info['class'] : 'btn-default' ).'">'.$info['name'].' &raquo;</a></td>';
 			echo '<td class="coll_kind__desc"><p>'.$info['desc'].'</p>';
 			if( !empty($info['note']) )
 			{

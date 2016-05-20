@@ -95,6 +95,11 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 		$Form->info( T_('URL Name'), $edited_Blog->get( 'urlname' ), T_('Used to uniquely identify this blog in URLs.') /* Note: message voluntarily shorter than admin message */ );
 	}
 
+	// Collection group:
+	$CollGroupCache = & get_CollGroupCache();
+	$CollGroupCache->load_all();
+	$Form->select_input_object( 'cgrp_ID', $edited_Blog->get( 'cgrp_ID' ), $CollGroupCache, T_('Group'), array( 'allow_none' => true ) );
+
 $Form->end_fieldset();
 
 

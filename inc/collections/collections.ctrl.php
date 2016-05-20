@@ -26,7 +26,7 @@ if( strpos( $action, 'new' ) !== false )
 { // Simulate tab to value 'new' for actions to create new blog
 	$tab = 'new';
 }
-if( ! in_array( $action, array( 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site' ) ) )
+if( ! in_array( $action, array( 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site', 'new_collgroup', 'edit_collgroup', 'delete_collgroup' ) ) )
 {
 	if( valid_blog_requested() )
 	{
@@ -40,6 +40,25 @@ if( ! in_array( $action, array( 'new', 'new-selskin', 'new-installskin', 'new-na
 	}
 }
 
+if( strpos( $action, 'collgroup' ) !== false )
+{	// Initialize CollGroup object:
+	load_class( 'collections/model/_collgroup.class.php', 'CollGroup' );
+
+	param( 'cgrp_ID', 'integer', 0 );
+
+	$tab = 'collgroup';
+
+	if( $cgrp_ID > 0 )
+	{	// Try to get the existing collection group by requested ID:
+		$CollGroupCache = & get_CollGroupCache();
+		$edited_CollGroup = & $CollGroupCache->get_by_ID( $cgrp_ID );
+	}
+	else
+	{	// Create new colleciton group object:
+		$edited_CollGroup = new CollGroup();
+	}
+}
+
 /**
  * Perform action:
  */
@@ -47,6 +66,7 @@ switch( $action )
 {
 	case 'new':
 		// New collection: Select blog type
+		param( 'cgrp_ID', 'integer', 0, true );
 	case 'copy':
 		// Copy collection:
 		// Check permissions:
@@ -78,6 +98,7 @@ switch( $action )
 		$current_User->check_perm( 'blogs', 'create', true );
 
 		param( 'kind', 'string', true );
+		param( 'cgrp_ID', 'integer', 0, true );
 
 		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( /* TRANS: %s can become "Standard blog", "Photoblog", "Group blog" or "Forum" */ T_('New "%s" collection'), get_collection_kinds($kind) ) ) );
 		break;
@@ -95,6 +116,10 @@ switch( $action )
 		$edited_Blog->init_by_kind( $kind );
 
 		param( 'skin_ID', 'integer', true );
+		if( param( 'cgrp_ID', 'integer', 0 ) > 0 )
+		{
+			$edited_Blog->set( 'cgrp_ID', $cgrp_ID );
+		}
 
 		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( T_('New %s'), get_collection_kinds($kind) ) ) );
 		break;
@@ -363,6 +388,67 @@ switch( $action )
 		}
 
 		break;
+
+	case 'new_collgroup':
+	case 'edit_collgroup':
+		// New/Edit collection group:
+
+		// Check permissions:
+		$current_User->check_perm( 'blogs', 'create', true );
+		break;
+
+	case 'create_collgroup':
+	case 'update_collgroup':
+		// Create/Update collection group:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'collgroup' );
+
+		// Check permission:
+		$current_User->check_perm( 'blogs', 'create', true );
+
+		if( $edited_CollGroup->load_from_Request() )
+		{
+			if( $edited_CollGroup->dbsave() )
+			{
+				if( is_create_action( $action ) )
+				{
+					$Messages->add( T_('New collection group has been created.'), 'success' );
+				}
+				else
+				{
+					$Messages->add( T_('The collection group has been updated.'), 'success' );
+				}
+			}
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=dashboard' ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		break;
+
+	case 'delete_collgroup':
+		// Delete collection group:
+
+		// Check permissions:
+		$current_User->check_perm( 'blogs', 'create', true );
+
+		if( param( 'confirm', 'integer', 0 ) )
+		{	// confirmed, Delete from DB:
+			$msg = sprintf( T_('Collection group "%s" has been deleted.'), $edited_CollGroup->dget( 'name' ) );
+			$edited_CollGroup->dbdelete();
+			unset( $edited_CollGroup );
+			forget_param( 'cgrp_ID' );
+			$Messages->add( $msg, 'success' );
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=dashboard' ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		else
+		{	// not confirmed, Check for restrictions:
+			$edited_CollGroup->check_delete( sprintf( T_('Cannot delete collection group "%s"'), $edited_CollGroup->dget( 'name' ) ) );
+		}
+		break;
 }
 
 switch( $tab )
@@ -436,6 +522,17 @@ switch( $tab )
 
 		// We should activate toolbar menu items for this controller and tab
 		$activate_collection_toolbar = true;
+		break;
+	
+	case 'collgroup':
+		// Pages to create/edit/delete collection groups:
+		$AdminUI->set_path( 'site', 'dashboard' );
+
+		$AdminUI->breadcrumbpath_init( false );
+		$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
+		$AdminUI->breadcrumbpath_add( T_('Site Dashboard'), $admin_url.'?ctrl=dashboard' );
+
+		$AdminUI->set_page_manual_link( 'collection-group' );
 		break;
 }
 
@@ -535,6 +632,14 @@ switch( $action )
 			get_memorized( 'action' ), $delete_notes );
 		break;
 
+	case 'new_collgroup':
+	case 'edit_collgroup':
+	case 'create_collgroup':
+	case 'update_collgroup':
+	case 'delete_collgroup':
+		// Form to create/edit collection group:
+		$AdminUI->disp_view( 'collections/views/_coll_group.form.php' );
+		break;
 
 	default:
 		// List the blogs:

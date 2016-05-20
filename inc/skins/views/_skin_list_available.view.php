@@ -164,8 +164,9 @@ foreach( $skin_folders as $skin_folder )
 		$redirect_to_after_install = $redirect_to;
 		$skin_compatible = ( empty( $kind ) || $folder_Skin->type == 'normal' );
 		if( ! empty( $kind ) && $skin_compatible )
-		{ // If we are installing skin for a new collection we're currently creating:
-			$redirect_to_after_install = $admin_url.'?ctrl=collections&action=new-name&kind='.$kind.'&skin_ID=$skin_ID$';
+		{	// If we are installing skin for a new collection we're currently creating:
+			$coll_url_suffix = get_param( 'cgrp_ID' ) ? '&cgrp_ID='.get_param( 'cgrp_ID' ) : '';
+			$redirect_to_after_install = $admin_url.'?ctrl=collections&action=new-name&kind='.$kind.$coll_url_suffix.'&skin_ID=$skin_ID$';
 		}
 
 		$disp_params = array(

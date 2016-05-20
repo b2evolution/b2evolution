@@ -22,8 +22,11 @@ echo action_icon( T_('Abort creating new collection'), 'close', $admin_url.'?ctr
 echo '<h2 class="page-title">'.sprintf( T_('New %s'), $kind_title ).':</h2>';
 
 if( $action == 'new-selskin' )
-{ // Select an existing skin
-	echo '<h3>'.sprintf( T_('Pick an existing skin below: (or <a %s>install a new one now</a>)'), 'href="'.$admin_url.'?ctrl=collections&amp;action=new-installskin&amp;kind='.$kind.'&amp;skin_type=normal"' ).'</h3>';
+{	// Select an existing skin:
+
+	$coll_url_suffix = get_param( 'cgrp_ID' ) ? '&amp;cgrp_ID='.get_param( 'cgrp_ID' ) : '';
+
+	echo '<h3>'.sprintf( T_('Pick an existing skin below: (or <a %s>install a new one now</a>)'), 'href="'.$admin_url.'?ctrl=collections&amp;action=new-installskin&amp;kind='.$kind.$coll_url_suffix.'&amp;skin_type=normal"' ).'</h3>';
 
 	$SkinCache = & get_SkinCache();
 	$SkinCache->load_all();
@@ -38,7 +41,7 @@ if( $action == 'new-selskin' )
 
 		$disp_params = array(
 			'function' => 'pick',
-			'select_url' => '?ctrl=collections&amp;action=new-name&amp;kind='.$kind.'&amp;skin_ID='.$Skin->ID
+			'select_url' => '?ctrl=collections&amp;action=new-name&amp;kind='.$kind.'&amp;skin_ID='.$Skin->ID.$coll_url_suffix
 		);
 
 		// Display skinshot:

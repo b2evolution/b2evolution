@@ -410,6 +410,9 @@ class Blog extends DataObject
 			$this->set_from_Request( 'name' );
 			$this->set( 'shortname', param( 'blog_shortname', 'string', true ) );
 
+			// Collection group:
+			$this->set( 'cgrp_ID', param( 'cgrp_ID', 'integer', NULL ), NULL );
+
 			// Language / locale:
 			if( param( 'blog_locale', 'string', NULL ) !== NULL )
 			{ // These settings can be hidden when only one locale is enaled in the system

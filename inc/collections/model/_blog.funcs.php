@@ -1483,7 +1483,7 @@ function blogs_all_results_block( $params = array() )
 			'results_title'        => T_('List of Collections configured on this system').get_manual_link('site-collection-list'),
 			'results_no_text'      => T_('No blog has been created yet!'),
 			'results_no_perm_text' => T_('Sorry, you have no permission to edit/view any blog\'s properties.'),
-			'grouped'              => false,
+			'grouped'              => true,
 		), $params );
 
 	if( !is_logged_in() )
@@ -1525,6 +1525,8 @@ function blogs_all_results_block( $params = array() )
 	{	// Get collection groups:
 		$SQL->SELECT_add( ', cgrp_ID, cgrp_name, cgrp_order' );
 		$SQL->FROM_add( 'LEFT JOIN T_coll_groups ON cgrp_ID = blog_cgrp_ID' );
+		$SQL->GROUP_BY( 'blog_ID, cgrp_ID' );
+		$SQL->ORDER_BY( 'cgrp_order, cgrp_name' );
 	}
 	$SQL->FROM_add( 'LEFT JOIN T_coll_user_favs ON ( cufv_blog_ID = blog_ID AND cufv_user_ID = '.$current_User->ID.' )' );
 
@@ -1557,7 +1559,7 @@ function blogs_all_results_block( $params = array() )
 	if( $current_User->check_perm( 'blogs', 'create' ) )
 	{
 		global $admin_url;
-		$blogs_Results->global_icon( T_('New Collection Group').'...', 'new', url_add_param( $admin_url, 'ctrl=collections&amp;action=new_group' ), T_('New Collection Group').'...', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+		$blogs_Results->global_icon( T_('New Collection Group').'...', 'new', url_add_param( $admin_url, 'ctrl=collections&amp;action=new_collgroup' ), T_('New Collection Group').'...', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 		$blogs_Results->global_icon( T_('New Collection').'...', 'new', url_add_param( $admin_url, 'ctrl=collections&amp;action=new' ), T_('New Collection').'...', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 		
 	}
@@ -1733,12 +1735,18 @@ function blogs_results( & $blogs_Results, $params = array() )
 
 	if( $params['grouped'] )
 	{ // Display group rows:
+		global $current_User, $admin_url;
+
 		$blogs_Results->group_by = 'cgrp_ID';
 
 		$blogs_Results->grp_cols[] = array(
 				'td_class' => 'firstcol lastcol',
 				'td_colspan' => -1, // nb_colds - 1
-				'td' => '$cgrp_name$'
+				'td' => '<b>'.(
+						$current_User->check_perm( 'blogs', 'create' )
+						? '<a href="'.$admin_url.'?ctrl=collections&amp;action=edit_collgroup&amp;cgrp_ID=$cgrp_ID$">$cgrp_name$</a>'
+						: '$cgrp_name$' ).
+					'</b>'
 			);
 		$blogs_Results->grp_cols[] = array(
 				'td_class' => 'shrinkwrap',
@@ -2100,7 +2108,9 @@ function blog_row_grp_actions( & $row )
 
 	if( $current_User->check_perm( 'blogs', 'create' ) )
 	{
-		$r .= action_icon( T_('New Collection').'...', 'new', $admin_url.'?ctrl=collections&amp;action=new&amp;cgrp_ID='.$row->cgrp_ID, T_('New Collection').'...', 3, 4, array( 'class' => 'action_icon btn btn-sm btn-primary' ) );
+		$r .= action_icon( T_('New Collection').'...', 'new', $admin_url.'?ctrl=collections&amp;action=new&amp;cgrp_ID='.$row->cgrp_ID );
+		$r .= action_icon( T_('Edit this collection group'), 'edit', $admin_url.'?ctrl=collections&amp;action=edit_collgroup&amp;cgrp_ID='.$row->cgrp_ID );
+		$r .= action_icon( T_('Delete this collection group!'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete_collgroup&amp;cgrp_ID='.$row->cgrp_ID.'&amp;'.url_crumb( 'collgroup' ) );
 	}
 
 	return $r;
