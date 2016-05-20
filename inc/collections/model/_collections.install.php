@@ -35,14 +35,6 @@ $schema_queries = array_merge( $schema_queries, array(
 				KEY skin_name( skin_name )
 			) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
-	'T_skins__container' => array(
-		'Creating table for skin containers',
-		"CREATE TABLE T_skins__container (
-				sco_skin_ID   int(10) unsigned      NOT NULL,
-				sco_name      varchar(40)           NOT NULL,
-				PRIMARY KEY (sco_skin_ID, sco_name)
-			) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
-
 	'T_blogs' => array(
 		'Creating table for Blogs',
 		"CREATE TABLE T_blogs (

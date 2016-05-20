@@ -58,7 +58,6 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_links'                    => $tableprefix.'links',
 		'T_links__vote'              => $tableprefix.'links__vote',
 		'T_postcats'                 => $tableprefix.'postcats',
-		'T_skins__container'         => $tableprefix.'skins__container',
 		'T_skins__skin'              => $tableprefix.'skins__skin',
 		'T_subscriptions'            => $tableprefix.'subscriptions',
 		'T_widget__container'        => $tableprefix.'widget__container',

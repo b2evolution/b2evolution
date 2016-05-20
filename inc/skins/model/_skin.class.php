@@ -98,19 +98,6 @@ class Skin extends DataObject
 
 
 	/**
-	 * Get delete cascade settings
-	 *
-	 * @return array
-	 */
-	static function get_delete_cascades()
-	{
-		return array(
-				array( 'table'=>'T_skins__container', 'fk'=>'sco_skin_ID', 'msg'=>T_('%d linked containers') ),
-			);
-	}
-
-
-	/**
 	 * Install current skin to DB
 	 */
 	function install()
@@ -481,99 +468,6 @@ class Skin extends DataObject
 		}
 
 		return $this->container_list;
-	}
-
-
-	/**
-	 * Update the DB based on previously recorded changes
-	 *
-	 * @return boolean true
-	 */
-	function dbupdate()
-	{
-		global $DB;
-
-		$DB->begin();
-
-		if( parent::dbupdate() !== false )
-		{	// Skin updated, also save containers:
-			$this->db_save_containers();
-		}
-
-		$DB->commit();
-
-		return true;
-	}
-
-
-	/**
-	 * Insert object into DB based on previously recorded changes.
-	 *
-	 * @return boolean true
-	 */
-	function dbinsert()
-	{
-		global $DB;
-
-		$DB->begin();
-
-		if( parent::dbinsert() )
-		{	// Skin saved, also save containers:
-			$this->db_save_containers();
-		}
-
-		$DB->commit();
-
-		return true;
-	}
-
-
-	/**
-	 * Save containers
-	 *
-	 * to be called by dbinsert / dbupdate
-	 */
-	function db_save_containers()
-	{
-		global $DB;
-
-		// Get a list of all currently empty containers:
-		$sql = 'SELECT sco_name
-			FROM T_skins__container
-				LEFT JOIN T_widget__container ON sco_name = wico_name
-				LEFT JOIN T_widget__widget ON wico_ID = wi_wico_ID
-			WHERE sco_skin_ID = '.$this->ID.'
-			GROUP BY sco_name
-			HAVING COUNT(wi_ID) = 0';
-		$empty_containers_list = $DB->get_col( $sql, 0, 'Get empty containers' );
-		//pre_dump( $empty_containers_list );
-
-		// Look for containers in skin file:
-		$this->discover_containers();
-
-		// Delete empty containers:
-		foreach( $empty_containers_list as $empty_container )
-		{
-			$empty_container_code = preg_replace( '/[^a-z\d]+/', '_', strtolower( $empty_container ) );
-			if( ! in_array( $empty_container_code, $this->container_list ) )
-			{	// This container has been removed from the skin + it's empty, so delete it from DB:
-				$DB->query( 'DELETE FROM T_skins__container
-									WHERE sco_name = '.$DB->quote($empty_container) );
-			}
-		}
-
-		// Make sure new containers are added:
-		if( ! empty( $this->container_list ) )
-		{
-			$values = array();
-			foreach( $this->container_list as $container_data )
-			{
-				$values [] = '( '.$this->ID.', '.$DB->quote( $container_data[0] ).' )';
-			}
-
-			$DB->query( 'REPLACE INTO T_skins__container( sco_skin_ID, sco_name )
-										VALUES '.implode( ',', $values ), 'Insert containers' );
-		}
 	}
 
 

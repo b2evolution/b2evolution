@@ -170,30 +170,6 @@ switch( $action )
 		break;
 
 
-	case 'reload':
-		// Reload containers:
-
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'skin' );
-
-		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
-
-		// Make sure we got an skin_ID:
-		param( 'skin_ID', 'integer', true );
-
-		// Save to DB:
-		$edited_Skin->db_save_containers();
-
-		// We want to highlight the edited object on next list display:
-		$Session->set( 'fadeout_array', array( 'skin_ID' => array($edited_Skin->ID) ) );
-
-		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( $redirect_to, 303 ); // Will EXIT
-		// We have EXITed already at this point!!
-		break;
-
-
 	case 'delete':
 		// Uninstall a skin:
 
