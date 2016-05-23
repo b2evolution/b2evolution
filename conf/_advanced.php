@@ -59,7 +59,7 @@ $dev_menu = 0;
 // If you get blank pages or missing thumbnail images, PHP may be crashing because it doesn't have enough memory.
 // The default is 8 MB (in PHP < 5.2) and 128 MB (in PHP > 5.2)
 // Try uncommmenting the following line:
-// ini_set( 'memory_limit', '128M' );
+// @ini_set( 'memory_limit', '128M' );
 
 
 /**
@@ -140,7 +140,7 @@ $demo_mode = false;
  *
  * @global boolean
  */
-$test_install_all_features = false;
+$allow_install_test_features = false;
 
 
 /**
@@ -480,6 +480,12 @@ $restapi_url = $htsrv_url.'rest.php?api_version=1&api_request=';
  */
 $xmlsrv_subdir = 'xmlsrv/';              // Subdirectory relative to base
 $xmlsrv_url = $baseurl.$xmlsrv_subdir;   // You should not need to change this
+
+/**
+ * URL of the REST API.
+ * @global string $restapi_url
+ */
+$restapi_url = $htsrv_url.'rest.php?api_version=1&api_request='; // You should not need to change this
 
 /**
  * Location of the RSC folder.

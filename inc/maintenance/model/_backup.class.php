@@ -145,6 +145,12 @@ class Backup
 	var $exclude_folders;
 
 	/**
+	 * Ignore files and folders listed in "conf/backup_ignore.conf"
+	 * @var boolean
+	 */
+	var $ignore_config = true;
+
+	/**
 	 * All of the tables and their 'included' values defined in backup configuration file
 	 * @var array
 	 */
@@ -214,6 +220,8 @@ class Backup
 		{
 			$this->exclude_folders[$name] = param( 'exclude_bk_'.$name, 'boolean', 0, $memorize_params );
 		}
+
+		$this->ignore_config = param( 'ignore_bk_config', 'boolean', 0, $memorize_params );
 
 		// Load tables settings from request
 		foreach( $backup_tables as $name => $settings )
@@ -342,6 +350,27 @@ class Backup
 					// Exclude all subfolders with name:
 					$backup_current_exclude_folders[] = $name;
 				}
+			}
+		}
+
+		if( $this->ignore_config )
+		{	// Ignore files and folders listed in "conf/backup_ignore.conf":
+			global $conf_path;
+			$backup_ignore_file = $conf_path.'backup_ignore.conf';
+			if( file_exists( $backup_ignore_file ) && is_readable( $backup_ignore_file ) )
+			{
+				$backup_ignore_file_lines = preg_split( '/\r\n|\n|\r/', file_get_contents( $backup_ignore_file ) );
+				foreach( $backup_ignore_file_lines as $backup_ignore_file_line )
+				{
+					// Ignore root folder and file with name:
+					$excluded_files[] = trim( $backup_ignore_file_line ).'/';
+					$excluded_files[] = trim( $backup_ignore_file_line );
+				}
+			}
+			else
+			{
+				echo '<p style="color:red">'.sprintf( T_('Config file %s cannot be read.'), '<b>'.$backup_ignore_file.'</b>' ).'</p>';
+				evo_flush();
 			}
 		}
 

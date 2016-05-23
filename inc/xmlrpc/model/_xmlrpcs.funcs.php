@@ -1285,7 +1285,7 @@ function xmlrpcs_edit_comment( $params = array(), & $edited_Comment )
 
 	// Execute or schedule notifications & pings:
 	logIO( 'Handling notifications...' );
-	$edited_Comment->handle_notifications( $current_User->ID );
+	$edited_Comment->handle_notifications();
 
 	logIO( 'OK.' );
 	return new xmlrpcresp( new xmlrpcval( true, 'boolean' ) );
@@ -1460,7 +1460,7 @@ function xmlrpcs_new_item( $params, & $Blog = NULL )
 
 	// Execute or schedule notifications & pings:
 	logIO( 'Handling notifications...' );
-	$edited_Item->handle_notifications( true, true );
+	$edited_Item->handle_notifications( NULL, true );
 
  	logIO( 'OK.' );
 	return new xmlrpcresp(new xmlrpcval($edited_Item->ID));

@@ -346,12 +346,12 @@ class DB
 			{
 				$mysql_ext_file = is_windows() ? 'php_mysqli.dll' : 'mysqli.so';
 				$php_errormsg = null;
-				$old_track_errors = ini_set('track_errors', 1);
-				$old_html_errors = ini_set('html_errors', 0);
+				$old_track_errors = @ini_set('track_errors', 1);
+				$old_html_errors = @ini_set('html_errors', 0);
 				@dl( $mysql_ext_file );
 				$error_msg = $php_errormsg;
-				if( $old_track_errors !== false ) ini_set('track_errors', $old_track_errors);
-				if( $old_html_errors !== false ) ini_set('html_errors', $old_html_errors);
+				if( $old_track_errors !== false ) @ini_set('track_errors', $old_track_errors);
+				if( $old_html_errors !== false ) @ini_set('html_errors', $old_html_errors);
 			}
 			else
 			{
@@ -376,8 +376,8 @@ class DB
 			// mysqli::$connect_error is tied to an established connection
 			// if the connection fails we need a different method to get the error message
 			$php_errormsg = null;
-			$old_track_errors = ini_set('track_errors', 1);
-			$old_html_errors = ini_set('html_errors', 0);
+			$old_track_errors = @ini_set('track_errors', 1);
+			$old_html_errors = @ini_set('html_errors', 0);
 			$this->dbhandle = mysqli_init();
 			@mysqli_real_connect($this->dbhandle,
 				/* Persistent connections are only available in PHP 5.3+ */
@@ -386,8 +386,8 @@ class DB
 				'', ini_get('mysqli.default_port'), ini_get('mysqli.default_socket'),
 				$client_flags );
 			$mysql_error = $php_errormsg;
-			if( $old_track_errors !== false ) ini_set('track_errors', $old_track_errors);
-			if( $old_html_errors !== false ) ini_set('html_errors', $old_html_errors);
+			if( $old_track_errors !== false ) @ini_set('track_errors', $old_track_errors);
+			if( $old_html_errors !== false ) @ini_set('html_errors', $old_html_errors);
 		}
 
 		if( 0 != $this->dbhandle->connect_errno )

@@ -131,7 +131,6 @@ while( $Item = & mainlist_get_item() )
 
 		<?php
 			// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-			// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 			// Display container contents:
 			skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 				'widget_context' => 'item',	// Signal that we are displaying within an Item

@@ -1104,8 +1104,15 @@ function search_page_links( $params = array() )
 			{
 				$page_no++;
 			}
-			echo add_tag_class( $params['page_item_before'], 'listnav_distance_'.$active_dist );
-			echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
+			if( isset( $params['page_item_before'] ) && trim( $params['page_item_before'] ) )
+			{
+				echo add_tag_class( $params['page_item_before'], 'listnav_distance_'.$active_dist );
+				echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
+			}
+			else
+			{
+				echo add_tag_class( '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>', 'listnav_distance_'.$active_dist );
+			}
 			echo $params['page_item_after'];
 		}
 		if( $i == $current_page )
@@ -1145,8 +1152,15 @@ function search_page_links( $params = array() )
 			{
 				$page_no--;
 			}
-			echo add_tag_class( $params['page_item_before'], 'listnav_distance_'.$active_dist );
-			echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
+			if( isset( $params['page_item_before'] ) && trim( $params['page_item_before'] ) )
+			{
+				echo add_tag_class( $params['page_item_before'], 'listnav_distance_'.$active_dist );
+				echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
+			}
+			else
+			{
+				echo add_tag_class( '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>', 'listnav_distance_'.$active_dist );
+			}
 			echo $params['page_item_after'];
 		}
 	}

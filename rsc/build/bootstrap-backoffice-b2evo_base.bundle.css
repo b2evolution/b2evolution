@@ -1367,6 +1367,9 @@ form div.avatartag a {
 .jcrop-keymgr {
   visibility: hidden;
 }
+.evo_label_inline {
+  margin-left: 2ex;
+}
 div.right_icons,
 div.fieldset_icons {
   text-align: right;
@@ -1654,6 +1657,10 @@ a.btn.action_icon.hoverlink {
 }
 .form-horizontal .info_full .controls-info {
   margin: 0 5px;
+}
+.form-horizontal .info_full_height .form-control-static {
+  padding-top: 0;
+  padding-bottom: 0;
 }
 .form-horizontal .controls {
   padding-left: 0;

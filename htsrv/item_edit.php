@@ -237,7 +237,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_notifications( $exit_after_save, true );
+		$edited_Item->handle_notifications( NULL, true );
 
 		$Messages->add( T_('Post has been created.'), 'success' );
 
@@ -312,7 +312,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_notifications( $exit_after_save );
+		$edited_Item->handle_notifications();
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
@@ -348,7 +348,10 @@ switch( $action )
 		break;
 
 	case 'update_workflow':
-		// Update workflow properties from disp=single
+		// Update workflow properties from disp=single:
+
+		$current_User->check_perm( 'blog_can_be_assignee', 'edit', true, $Blog->ID );
+
 		if( $Blog->get_setting( 'use_workflow' ) )
 		{ // Only if the workflow is enabled on collection
 			param( 'item_st_ID', 'integer', NULL );

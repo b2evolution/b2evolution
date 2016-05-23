@@ -871,7 +871,15 @@ class Results extends Table
 			$this->total_rows = $DB->get_var( $sql_count, 0, 0, ( empty( $this->query_title_prefix ) ? '' : $this->query_title_prefix.' - ' ).get_class( $this ).'::count_total_rows()' ); //count total rows
 		}
 
-		$this->total_pages = empty($this->limit) ? 1 : ceil($this->total_rows / $this->limit);
+		// Calculate total pages depending on total rows and page size:
+		if( empty( $this->limit ) )
+		{	// If no page limiting, Display all results on single page:
+			$this->total_pages = $this->total_rows > 0 ? 1 : 0;
+		}
+		else
+		{	// If the results should be limited by page size:
+			$this->total_pages = ceil( $this->total_rows / $this->limit );
+		}
 
 		// Make sure we're not requesting a page out of range:
 		if( $this->page > $this->total_pages )
@@ -2188,12 +2196,20 @@ class Results extends Table
 				{
 					$page_no++;
 				}
-				if( isset( $this->params['page_item_before'] ) )
+				if( isset( $this->params['page_item_before'] ) && trim( $this->params['page_item_before'] ) )
 				{
 					$list .= add_tag_class( $this->params['page_item_before'], 'listnav_distance_'.$active_dist );
+					$list .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$page_no, $page_url ).'">'
+									.$this->params['list_next_text'].'</a>';
 				}
-				$list .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$page_no, $page_url ).'">'
-								.$this->params['list_next_text'].'</a>';
+				else
+				{
+					$list_link = '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$page_no, $page_url ).'">'
+									.$this->params['list_next_text'].'</a>';
+					$list_link = add_tag_class( $list_link, 'listnav_distance_'.$active_dist );
+					$list .= $list_link;
+				}
+
 				if( isset( $this->params['page_item_after'] ) )
 				{
 					$list .= $this->params['page_item_after'];
@@ -2276,12 +2292,19 @@ class Results extends Table
 				{
 					$page_no--;
 				}
-				if( isset( $this->params['page_item_before'] ) )
+				if( isset( $this->params['page_item_before'] ) && trim( $this->params['page_item_before'] ) )
 				{
 					$list .= add_tag_class( $this->params['page_item_before'], 'listnav_distance_'.$active_dist );
+					$list .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$page_no, $page_url ).'">'
+									.$this->params['list_next_text'].'</a>';
 				}
-				$list .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$page_no, $page_url ).'">'
-								.$this->params['list_next_text'].'</a>';
+				else
+				{
+					$list_link = '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$page_no, $page_url ).'">'
+									.$this->params['list_next_text'].'</a>';
+					$list .= add_tag_class( $list_link, 'listnav_distance_'.$active_dist );
+				}
+
 				if( isset( $this->params['page_item_after'] ) )
 				{
 					$list .= $this->params['page_item_after'];

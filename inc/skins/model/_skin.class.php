@@ -30,6 +30,12 @@ class Skin extends DataObject
 	var $type;
 
 	/**
+	 * Skin version
+	 * @var string
+	 */
+	var $version = NULL;
+
+	/**
 	 * Do we want to use style.min.css instead of style.css ?
 	 */
 	var $use_min_css = false;  // true|false|'check' Set this to true for better optimization
@@ -556,6 +562,7 @@ class Skin extends DataObject
 
 		// Display skinshot:
 		echo '<div class="'.$disp_params['skinshot_class'].'"'.( $disp_params['highlighted'] ? ' id="fadeout-'.$skin_folder : '' ).'">';
+		echo '<div class="skinshot">';
 		echo '<div class="skinshot_placeholder';
 		if( $disp_params[ 'selected' ] )
 		{
@@ -585,7 +592,7 @@ class Skin extends DataObject
 			echo '<div class="skinshot_noshot">'.T_('No skinshot available for').'</div>';
 			echo '<div class="skinshot_name">'.$select_a_begin.$skin_folder.$select_a_end.'</div>';
 		}
-		echo '</div>';
+		echo '</div></div>';
 
 		//
 		echo '<div class="legend">';
@@ -795,7 +802,7 @@ class Skin extends DataObject
 	/**
 	 * Get ready for displaying the skin.
 	 *
-	 * This method may register some CSS or JS. 
+	 * This method may register some CSS or JS.
 	 * The default implementation can register a few common things that you may request in the $features param.
 	 * This is where you'd specify you want to use BOOTSTRAP, etc.
 	 *
@@ -828,7 +835,7 @@ class Skin extends DataObject
 			// Get next feature to include:
 			$feature = $features[$i];
 
-			switch( $feature ) 
+			switch( $feature )
 			{
 				case 'jquery':
 					// Include jQuery:
@@ -900,12 +907,12 @@ class Skin extends DataObject
 						require_css( 'b2evo_base.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
 					}
 					break;
-				
+
 				case 'style_css':
 					// Include the default skin style.css:
 					// You should make sure this is called ahead of any custom generated CSS.
-					if( $this->use_min_css == false 
-						|| $debug 
+					if( $this->use_min_css == false
+						|| $debug
 						|| ( $this->use_min_css == 'check' && !file_exists(dirname(__FILE__).'/style.min.css' ) ) )
 					{	// Use readable CSS:
 						require_css( 'style.css', 'relative' );	// Relative to <base> tag (current skin folder)
@@ -934,7 +941,7 @@ class Skin extends DataObject
 				case 'disp_page':
 					// Specific features for disp=page:
 
-					global $Blog;
+					global $Blog, $current_User;
 
 					// Used to init functions for AJAX forms to add a comment:
 					init_ajax_forms( 'blog' );
@@ -956,7 +963,7 @@ class Skin extends DataObject
 						require_js( '#jqueryUI#', 'blog' );
 					}
 
-					if( is_logged_in() && $Blog->get_setting( 'use_workflow' ) )
+					if( is_logged_in() && $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 					{	// Initialize JS to autcomplete user logins and date picker to edit workflow properties:
 						init_autocomplete_login_js( 'blog', $this->get_template( 'autocomplete_plugin' ) );
 						init_datepicker_js( 'blog' );

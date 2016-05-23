@@ -61,7 +61,9 @@ class GeneralSettings extends AbstractSettings
 		'notification_long_name' => '', // notification emails will use this as long site name
 		'notification_logo' => '', // notification emails will use this as url to site logo
 
+		'email_campaign_send_mode' => 'immediate', // Sending mode for campaign
 		'email_campaign_chunk_size' => 50, // Chunk size of emails to send a campaign at a time
+		'email_campaign_cron_repeat' => 300, // Delay between chunks on scheduled campaign job runs
 
 		'fm_enable_create_dir' => '1',
 		'fm_enable_create_file' => '1',

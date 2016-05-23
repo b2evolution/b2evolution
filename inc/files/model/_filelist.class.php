@@ -379,7 +379,7 @@ class Filelist
 	 */
 	function add( & $File, $mustExist = false )
 	{
-		if( !is_a( $File, 'file' ) )
+		if( !( $File instanceof file ) )
 		{	// Passed object is not a File!! :(
 			return false;
 		}

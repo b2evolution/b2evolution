@@ -83,6 +83,8 @@ if( count( $backup_exclude_checkboxes ) )
 	$Form->checklist( $backup_exclude_checkboxes, 'exclude_bk', T_('Exclude folders') );
 }
 
+$Form->checkbox( 'ignore_bk_config', $current_Backup->ignore_config, 'backup_ignore.conf', sprintf( T_('Ignore files and folders listed in %s'), '<code>conf/backup_ignore.conf</code>' ) );
+
 $Form->end_fieldset();
 
 // Backup settings for database tables

@@ -48,8 +48,6 @@ $Ajaxlog = new Log();
 
 $Ajaxlog->add( sprintf( 'action: %s', $action ), 'note' );
 
-$add_response_end_comment = true;
-
 $params = param( 'params', 'array', array() );
 switch( $action )
 {
@@ -155,10 +153,12 @@ switch( $action )
 			    $current_User->check_status( 'can_access_admin' ) &&
 			    $current_User->check_perm( 'admin', 'restricted' ) )
 			{	// Display the moderation buttons only if current user has a permission:
-				$moderation_buttons = '<p class="bubbletip_user__buttons">'
-						.'<a href="'.url_add_param( $admin_url, 'ctrl=user&amp;user_ID='.$User->ID ).'" class="btn btn-sm btn-block btn-primary">'
-							.T_('Edit in Back-Office')
-						.'</a>';
+				$moderation_buttons = '<p class="bubbletip_user__buttons">';
+				if( ! is_admin_page() )
+				{
+					$moderation_buttons .= '<a href="'.url_add_param( $admin_url, 'ctrl=user&amp;user_ID='.$User->ID ).'" class="btn btn-sm btn-block btn-primary">'
+							.T_('Edit in Back-Office').'</a>';
+				}
 				if( $current_User->ID != $User->ID && $current_User->check_perm( 'users', 'edit' ) )
 				{	// Display a button to delete a spammer only for other users and if current user can edit them:
 					$moderation_buttons .= '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) )
@@ -897,46 +897,6 @@ switch( $action )
 		call_user_func( $callback_function, $params );
 		break;
 
-	case 'get_recipients':
-		// Get list of users by search word
-		// Used for jQuery Tokeninput plugin ( when creating new messaging Thread )
-
-		if( !is_logged_in() || !$current_User->check_perm( 'perm_messaging', 'reply' ) )
-		{	// Check permission: User is not allowed to view threads
-			exit(0);
-		}
-
-		if( check_create_thread_limit() )
-		{	// user has already reached his limit, don't allow to get a users list
-			exit(0);
-		}
-
-		param( 'term', 'string' );
-
-		// Clear users cache and load only possible recipients who need right now, but keep shadow
-		$where_condition = '( user_login LIKE '.$DB->quote( '%'.$term.'%' ).' ) AND ( user_ID != '.$DB->quote( $current_User->ID ).' )';
-		$UserCache = & get_UserCache();
-		$UserCache->clear( true );
-		$UserCache->load_where( $where_condition );
-
-		$result_users = array();
-		while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
-		{ // Iterate through UserCache
-			if( !$iterator_User->check_status( 'can_receive_pm' ) )
-			{ // this user is probably closed so don't show it
-				continue;
-			}
-			$result_users[] = array(
-				'id'       => $iterator_User->ID,
-				'title'    => $iterator_User->get( 'login' ),
-				'fullname' => $iterator_User->get( 'fullname' ),
-				'picture'  => $iterator_User->get_avatar_imgtag( 'crop-top-32x32' )
-			);
-		}
-
-		echo evo_json_encode( $result_users );
-		exit(0);
-
 	case 'set_comment_status':
 		// Used for quick moderation of comments in dashboard, item list full view, comment list and front-office screens
 
@@ -972,7 +932,7 @@ switch( $action )
 				$result_success = $edited_Comment->dbupdate();
 				if( $result_success !== false )
 				{
-					$edited_Comment->handle_notifications( $current_User->ID );
+					$edited_Comment->handle_notifications();
 				}
 			}
 		}
@@ -1139,39 +1099,6 @@ switch( $action )
 
 		break;
 
-	case 'autocomplete_usernames':
-		// Get usernames by first chars for autocomplete jQuery plugin & TinyMCE autocomplete plugin
-
-		$q = param( 'q', 'string', '' );
-
-		if( ! is_valid_login( $q ) || evo_strlen( $q ) < 4 )
-		{ // Restrict a wrong request
-			debug_die( 'Wrong request' );
-		}
-		// Add backslash for special char of sql operator LIKE
-		$q = str_replace( '_', '\_', $q );
-
-		if( utf8_strlen( $q ) == 0 )
-		{ // Don't search logins with empty request
-			$usernames = array();
-		}
-		else
-		{
-			$SQL = new SQL();
-			$SQL->SELECT( 'user_login' );
-			$SQL->FROM( 'T_users' );
-			$SQL->WHERE( 'user_login LIKE '.$DB->quote( $q.'%' ) );
-			$SQL->WHERE_and( 'user_status = "activated" OR user_status = "autoactivated"' );
-			$SQL->ORDER_BY( 'user_login' );
-			$usernames = $DB->get_col( $SQL->get() );
-		}
-
-		echo evo_json_encode( $usernames );
-
-		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
-
-		break;
-
 	case 'get_user_salt':
 		// Get the salt of the user from the given login info
 		// Note: If there are more users with the received login then give at most 3 salt values for the 3 most recently active users
@@ -1221,58 +1148,6 @@ switch( $action )
 
 		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
 		break;
-
-	case 'get_tags':
-		// Get list of item tags, where $term is part of the tag name (sorted)
-		// To be used for Tag autocompletion
-
-		// Crumb check and permission check are not required because this won't modify anything and it returns public info
-
-		$term = param( 'term', 'string' );
-
-		if( substr( $term, 0, 1 ) == '-' )
-		{ // Prevent chars '-' in first position
-			$term = preg_replace( '/^-+/', '', $term );
-		}
-
-		// Deny to use a comma in tag names:
-		$term = str_replace( ',', ' ', $term );
-
-		$term_is_new_tag = true;
-
-		if( ! empty( $term ) )
-		{ // Find tags in DB only when term is not empty
-			$tags = $DB->get_results( '
-				SELECT tag_name AS id, tag_name AS title
-				  FROM T_items__tag
-				 WHERE tag_name LIKE '.$DB->quote('%'.$term.'%').' COLLATE utf8_general_ci
-				 ORDER BY tag_name', ARRAY_A );
-			/* Yura: Here I added "COLLATE utf8_general_ci" because:
-			 * It allows to match "testA" with "testa", and otherwise "testa" with "testA".
-			 * It also allows to find "ee" when we type in "éè" and otherwise.
-			 */
-
-			// Check if current term is not an existing tag
-			foreach( $tags as $tag )
-			{
-				/* Yura: I have added "utf8_strtolower()" below in condition in order to:
-				 * When we enter new tag 'testA' and the tag 'testa' already exists
-				 * then we suggest only 'testa' instead of 'testA'.
-				 */
-				if( utf8_strtolower( $tag['title'] ) == utf8_strtolower( $term ) )
-				{ // Current term is an existing tag
-					$term_is_new_tag = false;
-				}
-			}
-		}
-
-		if( $term_is_new_tag && ! empty( $term ) )
-		{ // Add current term in the beginning of the tags list
-			array_unshift( $tags, array( 'id' => $term, 'title' => $term ) );
-		}
-
-		echo evo_json_encode( $tags );
-		exit(0);
 
 	case 'crop':
 		// Get form to crop profile picture
@@ -1384,130 +1259,6 @@ switch( $action )
 		require $inc_path.'users/views/_user_groups.form.php';
 		break;
 
-	case 'get_login_list':
-		// Get users login list for username form field hintbox:
-
-		if( ! is_logged_in() )
-		{	// Only logged in users can select users:
-			exit(0);
-		}
-
-		// Current user must have at least view permission to see users login:
-		//$current_User->check_perm( 'users', 'view', true );
-
-		// What data type return: 'json' or as multilines by default
-		$data_type = param( 'data_type', 'string', '' );
-
-		// What users return:
-		$user_type = param( 'user_type', 'string', '' );
-
-		$text = trim( urldecode( param( 'q', 'string', '' ) ) );
-
-		/**
-		 * sam2kb> The code below decodes percent-encoded unicode string produced by Javascript "escape"
-		 * function in format %uxxxx where xxxx is a Unicode value represented as four hexadecimal digits.
-		 * Example string "MAMA" (cyrillic letters) encoded with "escape": %u041C%u0410%u041C%u0410
-		 * Same word encoded with "encodeURI": %D0%9C%D0%90%D0%9C%D0%90
-		 *
-		 * jQuery hintbox plugin uses "escape" function to encode URIs
-		 *
-		 * More info here: http://en.wikipedia.org/wiki/Percent-encoding#Non-standard_implementations
-		 */
-		if( preg_match( '~%u[0-9a-f]{3,4}~i', $text ) && version_compare(PHP_VERSION, '5', '>=') )
-		{	// Decode UTF-8 string (PHP 5 and up)
-			$text = preg_replace( '~%u([0-9a-f]{3,4})~i', '&#x\\1;', $text );
-			$text = html_entity_decode( $text, ENT_COMPAT, 'UTF-8' );
-		}
-
-		if( !empty( $text ) )
-		{
-			switch( $user_type )
-			{
-				case 'assignees':
-					// Get only the assignees of this blog:
-
-					$blog_ID = param( 'blog', 'integer', true );
-
-					$BlogCache = & get_BlogCache();
-					$Blog = & $BlogCache->get_by_ID( $blog_ID );
-
-					if( $Blog->get( 'advanced_perms' ) )
-					{	// Load group and user permissions ONLY if collection advanced permissions are enabled:
-
-						// Get users which can be assignees of the collection:
-						$user_perms_SQL = new SQL();
-						$user_perms_SQL->SELECT( 'user_login' );
-						$user_perms_SQL->FROM( 'T_users' );
-						$user_perms_SQL->FROM_add( 'INNER JOIN T_coll_user_perms ON user_ID = bloguser_user_ID' );
-						$user_perms_SQL->WHERE( 'bloguser_blog_ID = '.$DB->quote( $blog_ID ) );
-						$user_perms_SQL->WHERE_and( 'bloguser_can_be_assignee <> 0' );
-						$users_sql[] = $user_perms_SQL->get();
-
-						// Get users which primary groups can be assignees of the collection:
-						$group_perms_SQL = new SQL();
-						$group_perms_SQL->SELECT( 'user_login' );
-						$group_perms_SQL->FROM( 'T_users' );
-						$group_perms_SQL->FROM_add( 'INNER JOIN T_coll_group_perms ON user_grp_ID = bloggroup_group_ID' );
-						$group_perms_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $blog_ID ) );
-						$group_perms_SQL->WHERE_and( 'bloggroup_can_be_assignee <> 0' );
-						$users_sql[] = $group_perms_SQL->get();
-
-						// Get users which secondary groups can be assignees of the collection:
-						$secondary_group_perms_SQL = new SQL();
-						$secondary_group_perms_SQL->SELECT( 'user_login' );
-						$secondary_group_perms_SQL->FROM( 'T_users' );
-						$secondary_group_perms_SQL->FROM_add( 'INNER JOIN T_users__secondary_user_groups ON sug_user_ID = user_ID' );
-						$secondary_group_perms_SQL->FROM_add( 'INNER JOIN T_coll_group_perms ON sug_grp_ID = bloggroup_group_ID' );
-						$secondary_group_perms_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $blog_ID ) );
-						$secondary_group_perms_SQL->WHERE_and( 'bloggroup_can_be_assignee <> 0' );
-						$users_sql[] = $secondary_group_perms_SQL->get();
-					}
-
-					// Get assignees which primary groups have a setting to EDIT ALL collections:
-					$group_setting_SQL = new SQL();
-					$group_setting_SQL->SELECT( 'user_login' );
-					$group_setting_SQL->FROM( 'T_users' );
-					$group_setting_SQL->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
-					$group_setting_SQL->WHERE( 'grp_perm_blogs = "editall"' );
-					$users_sql[] = $group_setting_SQL->get();
-
-					// Union sql queries to execute one query and save an order as one list:
-					$users_sql = 'SELECT user_login'
-						.' FROM ( ( '.implode( ' ) UNION ( ', $users_sql ).' ) ) AS uu'
-						.' WHERE uu.user_login LIKE "'.$DB->escape( $text ).'%"'
-						.' ORDER BY user_login'
-						.' LIMIT 10';
-					break;
-
-				default:
-					// Get all users:
-					$SQL = new SQL();
-					$SQL->SELECT( 'user_login' );
-					$SQL->FROM( 'T_users' );
-					$SQL->WHERE( 'user_login LIKE "'.$DB->escape( $text ).'%"' );
-					$SQL->LIMIT( '10' );
-					$SQL->ORDER_BY( 'user_login' );
-					$users_sql = $SQL->get();
-					break;
-			}
-
-			$user_logins = $DB->get_col( $users_sql );
-
-			if( $data_type == 'json' )
-			{	// Return data in JSON format:
-				echo evo_json_encode( $user_logins );
-				exit(0); // Exit here to don't break JSON data by following debug data
-			}
-			else
-			{	// Return data as multilines:
-				echo implode( "\n", $user_logins );
-			}
-		}
-
-		// Don't show ajax response end comment, because the result will be processed with jquery hintbox:
-		$add_response_end_comment = false;
-		break;
-
 	default:
 		$Ajaxlog->add( T_('Incorrect action!'), 'error' );
 		break;
@@ -1525,10 +1276,8 @@ if( $current_debug || $current_debug_jslog )
 						), 'ul', 'jslog' );
 }
 
-if( $add_response_end_comment )
-{	// Add ajax response end comment:
-	echo '<!-- Ajax response end -->';
-}
+// Add ajax response end comment:
+echo '<!-- Ajax response end -->';
 
 exit(0);
 

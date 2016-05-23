@@ -364,8 +364,15 @@ function format_to_output( $content, $format = 'htmlbody' )
 			break;
 
 		case 'syslog':
-			// Replace special chars to &amp;, &quot;, &apos;, &lt; and &gt; :
-			$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );  // Handles &, ", ', < and >
+			// Replace special chars to &amp;, &quot;, &#039;|&apos;, &lt; and &gt; :
+			if( version_compare( phpversion(), '5.4', '>=' ) )
+			{	// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
+				$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
+			}
+			else
+			{	// Handles & " ' < > to &amp; &quot; &#039; &lt; &gt;
+				$content = htmlspecialchars( $content, ENT_QUOTES, $evo_charset );
+			}
 			$content = preg_replace( "/\[\[(.+?)]]/is", "<code>$1</code>", $content ); // Replaces [[...]] into <code>...</code>
 			break;
 
@@ -447,10 +454,14 @@ function excerpt( $str, $maxlen = 254, $tail = '&hellip;' )
 	$str = str_replace( array( '<p>', '<br' ), array( ' <p>', ' <br' ), $str );
 
 	// Remove <code>
-	$str = preg_replace( '#<code>(.+)</code>#i', '', $str );
+	$str = preg_replace( '#<code>(.+)</code>#is', '', $str );
 
-	// fp> Note: I'm not sure about using 'text' here, but there should definitely be no rendering here.
-	$str = format_to_output( $str, 'text' );
+	// Strip tags:
+	$str = strip_tags( $str );
+
+	// Remove spaces:
+	$str = preg_replace( '/[ \t]+/', ' ', $str);
+	$str = trim( $str );
 
 	// Ger rid of all new lines and Display the html tags as source text:
 	$str = trim( preg_replace( '#[\r\n\t\s]+#', ' ', $str ) );
@@ -2398,9 +2409,9 @@ function pre_dump( $var__var__var__var__ )
 	{ // xdebug already does fancy displaying:
 
 		// no limits:
-		$old_var_display_max_children = ini_set('xdebug.var_display_max_children', -1); // default: 128
-		$old_var_display_max_data = ini_set('xdebug.var_display_max_data', -1); // max string length; default: 512
-		$old_var_display_max_depth = ini_set('xdebug.var_display_max_depth', -1); // default: 3
+		$old_var_display_max_children = @ini_set('xdebug.var_display_max_children', -1); // default: 128
+		$old_var_display_max_data = @ini_set('xdebug.var_display_max_data', -1); // max string length; default: 512
+		$old_var_display_max_depth = @ini_set('xdebug.var_display_max_depth', -1); // default: 3
 
 		echo "\n<div style=\"padding:1ex;border:1px solid #00f;\">\n";
 		foreach( func_get_args() as $lvar )
@@ -2416,13 +2427,13 @@ function pre_dump( $var__var__var__var__ )
 		echo '</div>';
 
 		// restore xdebug settings:
-		ini_set('xdebug.var_display_max_children', $old_var_display_max_children);
-		ini_set('xdebug.var_display_max_data', $old_var_display_max_data);
-		ini_set('xdebug.var_display_max_depth', $old_var_display_max_depth);
+		@ini_set('xdebug.var_display_max_children', $old_var_display_max_children);
+		@ini_set('xdebug.var_display_max_data', $old_var_display_max_data);
+		@ini_set('xdebug.var_display_max_depth', $old_var_display_max_depth);
 	}
 	else
 	{
-		$orig_html_errors = ini_set('html_errors', 0); // e.g. xdebug would use fancy html, if this is on; we catch (and use) xdebug explicitly above, but just in case
+		$orig_html_errors = @ini_set('html_errors', 0); // e.g. xdebug would use fancy html, if this is on; we catch (and use) xdebug explicitly above, but just in case
 
 		echo "\n<pre style=\"padding:1ex;border:1px solid #00f;overflow:auto\">\n";
 		foreach( func_get_args() as $lvar )
@@ -2440,7 +2451,7 @@ function pre_dump( $var__var__var__var__ )
 			}
 		}
 		echo "</pre>\n";
-		ini_set('html_errors', $orig_html_errors);
+		@ini_set('html_errors', $orig_html_errors);
 	}
 	evo_flush();
 	return true;
@@ -3199,7 +3210,12 @@ function debug_info( $force = false, $force_clean = false )
 		echo '<div class="log_container"><div>';
 		echo 'Opcode cache: '.get_active_opcode_cache();
 		echo $clean ? "\n" : '<p>';
+
+		// ================================ User caching ================================
+		echo 'User cache: '.get_active_user_cache();
+		echo $clean ? "\n" : '<p>';
 		echo '</div></div>';
+
 
 		// ================================ Memory Usage ================================
 		echo '<div class="log_container"><div>';
@@ -4524,7 +4540,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					}
 					if( isset( $icon['size-'.$icon_param_name][1] ) )
 					{ // Height
-						$styles['width'] = 'height:'.$icon['size-'.$icon_param_name][1].'px';
+						$styles['height'] = 'height:'.$icon['size-'.$icon_param_name][1].'px';
 					}
 				}
 
@@ -5203,15 +5219,19 @@ function update_html_tag_attribs( $html_tag, $new_attribs, $attrib_actions = arr
 	$html_tag_name = $tag_match[1];
 
 	$old_attribs = array();
+	$updated_attribs = array();
 	if( preg_match_all( '@(\S+)=("|\'|)(.*)("|\'|>)@isU', $html_tag, $attr_matches ) )
 	{	// Get all existing attributes:
 		foreach( $attr_matches[1] as $o => $old_attr_name )
 		{
 			$old_attribs[ $old_attr_name ] = $attr_matches[3][ $o ];
+			if( ! isset( $new_attribs[ $old_attr_name ] ) )
+			{	// This attribute is not updated, keep current value:
+				$updated_attribs[] = $old_attr_name.'="'.format_to_output( $attr_matches[3][ $o ], 'formvalue' ).'"';
+			}
 		}
 	}
 
-	$updated_attribs = array();
 	foreach( $new_attribs as $new_attrib_name => $new_attrib_value )
 	{
 		if( isset( $old_attribs[ $new_attrib_name ] ) )
@@ -5784,18 +5804,24 @@ function array_to_option_list( $array, $default = '', $allow_none = array() )
  * @param boolean success (by reference)
  * @return mixed True in case of success, false in case of failure. NULL, if no backend is available.
  */
-function get_from_mem_cache($key, & $success )
+function get_from_mem_cache( $key, & $success )
 {
 	global $Timer;
 
-	$Timer->resume('get_from_mem_cache', false);
+	$Timer->resume( 'get_from_mem_cache', false );
 
-	if( function_exists('apc_fetch') )
+	if( function_exists( 'apc_fetch' ) )
+	{	// APC
 		$r = apc_fetch( $key, $success );
-	elseif( function_exists('xcache_get') && ini_get('xcache.var_size') > 0 )
-		$r = xcache_get($key);
-	elseif( function_exists('eaccelerator_get') )
-		$r = eaccelerator_get($key);
+	}
+	elseif( function_exists( 'xcache_get' ) && ini_get( 'xcache.var_size' ) > 0 )
+	{	// XCache
+		$r = xcache_get( $key );
+	}
+	elseif( function_exists( 'apcu_fetch' ) )
+	{	// APCu
+		$r = apcu_fetch( $key, $success );
+	}
 
 	if( ! isset($success) )
 	{ // set $success for implementation that do not set it itself (only APC does so)
@@ -5806,10 +5832,11 @@ function get_from_mem_cache($key, & $success )
 		$r = NULL;
 
 		global $Debuglog;
-		$Debuglog->add('No caching backend available for reading "'.$key.'".', 'cache');
+		$Debuglog->add( 'No caching backend available for reading "'.$key.'".', 'cache' );
 	}
 
-	$Timer->pause('get_from_mem_cache', false);
+	$Timer->pause( 'get_from_mem_cache', false );
+
 	return $r;
 }
 
@@ -5825,25 +5852,32 @@ function get_from_mem_cache($key, & $success )
  * @param int Time to live (seconds). Default is 0 and means "forever".
  * @return mixed
  */
-function set_to_mem_cache($key, $payload, $ttl = 0)
+function set_to_mem_cache( $key, $payload, $ttl = 0 )
 {
 	global $Timer;
 
-	$Timer->resume('set_to_mem_cache', false);
+	$Timer->resume( 'set_to_mem_cache', false );
 
-	if( function_exists('apc_store') )
+	if( function_exists( 'apc_store' ) )
+	{	// APC
 		$r = apc_store( $key, $payload, $ttl );
-	elseif( function_exists('xcache_set') && ini_get('xcache.var_size') > 0 )
+	}
+	elseif( function_exists( 'xcache_set' ) && ini_get( 'xcache.var_size' ) > 0 )
+	{	// XCache
 		$r = xcache_set( $key, $payload, $ttl );
-	elseif( function_exists('eaccelerator_put') )
-		$r = eaccelerator_put( $key, $payload, $ttl );
-	else {
+	}
+	elseif( function_exists( 'apcu_store' ) )
+	{	// APCu
+		$r = apcu_store( $key, $payload, $ttl );
+	}
+	else
+	{	// No available cache module:
 		global $Debuglog;
-		$Debuglog->add('No caching backend available for writing "'.$key.'".', 'cache');
+		$Debuglog->add( 'No caching backend available for writing "'.$key.'".', 'cache' );
 		$r = NULL;
 	}
 
-	$Timer->pause('set_to_mem_cache', false);
+	$Timer->pause( 'set_to_mem_cache', false );
 
 	return $r;
 }
@@ -5855,16 +5889,22 @@ function set_to_mem_cache($key, $payload, $ttl = 0)
  * @param string key
  * @return boolean True on success, false on failure. NULL if no backend available.
  */
-function unset_from_mem_cache($key)
+function unset_from_mem_cache( $key )
 {
-	if( function_exists('apc_delete') )
+	if( function_exists( 'apc_delete' ) )
+	{	// APC
 		return apc_delete( $key );
+	}
 
-	if( function_exists('xcache_unset') )
-		return xcache_unset(gen_key_for_cache($key));
+	if( function_exists( 'xcache_unset' ) )
+	{	// XCache
+		return xcache_unset( gen_key_for_cache( $key ) );
+	}
 
-	if( function_exists('eaccelerator_rm') )
-		return eaccelerator_rm(gen_key_for_cache($key));
+	if( function_exists( 'apcu_delete' ) )
+	{	// APCu
+		return apcu_delete( $key );
+	}
 }
 
 
@@ -5974,6 +6014,43 @@ function get_active_opcode_cache()
 		{
 			return 'eAccelerator';
 		}
+	}
+
+	if( ini_get( 'opcache.enable' ) )
+	{
+		return 'OPCache';
+	}
+
+	if( function_exists( 'apcu_cache_info' ) && ini_get( 'apc.enabled' ) )
+	{
+		return 'APCu';
+	}
+
+	return 'none';
+}
+
+
+/**
+ * Get name of active user cache, or "none".
+ * {@internal Anyone using something else, please extend.}}
+ * @return string
+ */
+function get_active_user_cache()
+{
+	if( function_exists( 'apc_cache_info' ) && ini_get( 'apc.enabled' ) )
+	{
+		return 'APC';
+	}
+
+	if( function_exists( 'apcu_cache_info' ) && ini_get( 'apc.enabled' ) )
+	{
+		return 'APCu';
+	}
+
+	// xcache: xcache.var_size must be > 0. xcache_set is not necessary (might have been disabled).
+	if( ini_get('xcache.size') > 0 )
+	{
+		return 'xcache';
 	}
 
 	return 'none';
@@ -6602,6 +6679,26 @@ function ip2int( $ip )
 	}
 
 	return $result;
+}
+
+
+/**
+ * Check if URL has a domain in IP format
+ *
+ * @param string URL
+ * @return boolean
+ */
+function is_ip_url_domain( $url )
+{
+	$url_data = parse_url( $url );
+
+	if( $url_data === false || ! isset( $url_data['host'] ) )
+	{	// Wrong url:
+		return false;
+	}
+
+	// Check if host is IP address:
+	return is_valid_ip_format( $url_data['host'] );
 }
 
 
@@ -7609,8 +7706,9 @@ function evo_version_compare( $version1, $version2, $operator = NULL )
 		$version1 = $app_version;
 	}
 
-	// Remove part after "-" from versions like "6.6.6-stable":
-	$version1 = preg_replace( '/(-.+)?/', '', $version1 );
+	// Remove "stable" suffix to compare such versions as upper than "alpha", "beta" and etc.:
+	$version1 = str_replace( '-stable', '', $version1 );
+	$version2 = str_replace( '-stable', '', $version2 );
 
 	if( is_null( $operator ) )
 	{	// To return integer:

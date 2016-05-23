@@ -1746,7 +1746,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 					}
 					else
 					{
-						if (is_a($results, 'xmlrpcresp'))
+						if ($results instanceof xmlrpcresp)
 						{
 							$result = $results;
 						}
@@ -1966,7 +1966,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				if ($valtyp == '')
 				{
 					// user did not declare type of response value: try to guess it
-					if (is_object($this->val) && is_a($this->val, 'xmlrpcval'))
+					if (is_object($this->val) && $this->val instanceof xmlrpcval)
 					{
 						$this->valtyp = 'xmlrpcvals';
 					}
@@ -2059,7 +2059,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 			}
 			else
 			{
-				if(!is_object($this->val) || !is_a($this->val, 'xmlrpcval'))
+				if(!is_object($this->val) || !($this->val instanceof xmlrpcval))
 				{
 					if (is_string($this->val) && $this->valtyp == 'xml')
 					{
@@ -2198,7 +2198,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 		function addParam($par)
 		{
 			// add check: do not add to self params which are not xmlrpcvals
-			if(is_object($par) && is_a($par, 'xmlrpcval'))
+			if(is_object($par) && $par instanceof xmlrpcval)
 			{
 				$this->params[]=$par;
 				return true;
@@ -2968,7 +2968,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 							{
 								$rs.="<${typ}>${val}</${typ}>";
 							}
-							else if(is_a($val, 'DateTime'))
+							else if($val instanceof DateTime)
 							{
 								$rs.="<${typ}>".$val->format('Ymd\TH:i:s')."</${typ}>";
 							}
@@ -3333,7 +3333,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 						$result->setTimestamp($out);
 						return $result;
 					}
-					elseif (is_a($out, 'Datetime'))
+					elseif ($out instanceof Datetime)
 					{
 						return $out;
 					}
@@ -3463,11 +3463,11 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 				}
 				break;
 			case 'object':
-				if(is_a($php_val, 'xmlrpcval'))
+				if($php_val instanceof xmlrpcval)
 				{
 					$xmlrpc_val = $php_val;
 				}
-				else if(is_a($php_val, 'DateTime'))
+				else if($php_val instanceof DateTime)
 				{
 					$xmlrpc_val = new xmlrpcval($php_val->format('Ymd\TH:i:s'), $GLOBALS['xmlrpcStruct']);
 				}

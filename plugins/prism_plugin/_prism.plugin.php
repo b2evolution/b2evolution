@@ -188,7 +188,14 @@ class prism_plugin extends Plugin
 			$code_class .= ' language-'.$lang;
 		}
 
-		$r = '<code'.( empty( $code_class ) ? '' : ' class="'.trim( $code_class ).'"' ).'>'.$block[3].'</code>';
+		$content = $block[3];
+
+		if( $type == 'codeblock' )
+		{	// Remove first empty line from codeblock content:
+			$content = preg_replace( '/^\r?\n/', '', $content );
+		}
+
+		$r = '<code'.( empty( $code_class ) ? '' : ' class="'.trim( $code_class ).'"' ).'>'.$content.'</code>';
 
 		if( $type == 'codeblock' )
 		{ // Set special template and attributes only for codeblock
@@ -228,6 +235,8 @@ class prism_plugin extends Plugin
 	 */
 	function unfilter_code_callback( $block )
 	{
+		$content = $block[6];
+
 		if( empty( $block[1] ) )
 		{ // [codespan]
 			$code_tag = 'codespan';
@@ -240,6 +249,9 @@ class prism_plugin extends Plugin
 			// Detect number of start line:
 			preg_match( '/.*data-start="(-?[0-9]+)".*/i', html_entity_decode( $block[1] ), $line );
 			$line = ' line="'.( isset( $line[1] ) ? intval( $line[1] ) : '1' ).'"';
+
+			// Revert back first empty line:
+			$content = "\r\n".$content;
 		}
 
 		$lang = trim( strtolower( $block[5] ) );
@@ -259,7 +271,7 @@ class prism_plugin extends Plugin
 
 		// Build codeblock:
 		$r = '['.$code_tag.$lang.$line.']';
-		$r .= $block[6];
+		$r .= $content;
 		$r .= '[/'.$code_tag.']';
 
 		return $r;

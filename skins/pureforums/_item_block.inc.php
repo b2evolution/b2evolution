@@ -96,14 +96,12 @@ $Skin->display_breadcrumbs( $cat );
 			) );
 		?></td>
 		<td><?php
-			if( $Skin->get_setting( 'display_post_date' ) )
-			{ // We want to display the post date:
-				$Item->issue_time( array(
-						'before'      => '',
-						'after'       => ' &nbsp; &nbsp; ',
-						'time_format' => 'D M j, Y H:i',
-					) );
-			}
+			// We want to display the post date:
+			$Item->issue_time( array(
+					'before'      => '',
+					'after'       => ' &nbsp; &nbsp; ',
+					'time_format' => 'D M j, Y H:i',
+				) );
 		?>
 			<a href="<?php echo $Item->get_permanent_url(); ?>" class="permalink">#1</a>
 		</td>
@@ -130,7 +128,6 @@ $Skin->display_breadcrumbs( $cat );
 if( $disp == 'single' )
 {
 	// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-	// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 	// Display container contents:
 	skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 		'widget_context' => 'item',	// Signal that we are displaying within an Item

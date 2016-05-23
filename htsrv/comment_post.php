@@ -611,8 +611,7 @@ if( $Comment->ID )
 	// asimo> this handle moderators and general users as well and use "outbound_notifications_mode" in case of general users
 	// Moderators will get emails about every new comment
 	// Subscribed user will only get emails about new published comments
-	$executed_by_userid = is_logged_in() ? $current_User->ID : NULL;
-	$Comment->handle_notifications( $executed_by_userid, true );
+	$Comment->handle_notifications( NULL, true );
 
 
 	// Add a message, according to the comment's status:

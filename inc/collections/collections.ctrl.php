@@ -317,6 +317,7 @@ switch( $action )
 		}
 
 		// Terms & Conditions:
+		$Settings->set( 'site_terms_enabled', param( 'site_terms_enabled', 'integer', 0 ) );
 		$Settings->set( 'site_terms', param( 'site_terms', 'integer', '' ) );
 
 		// Default blog

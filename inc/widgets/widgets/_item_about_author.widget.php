@@ -210,6 +210,7 @@ class item_about_author_Widget extends ComponentWidget
 				'wi_ID'       => $this->ID, // Have the widget settings changed ?
 				'set_coll_ID' => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'user_ID'     => $creator_user_ID, // Has the creator User changed?
+				'item_ID'     => $Item->ID, // Has the Item page changed?
 			);
 	}
 }

@@ -45,6 +45,7 @@ class UserSettings extends AbstractSettings
 
 		// Folding settings, 1 - Hide, 0 - Show
 		'fold_itemform_links' => 1,
+		'fold_itemform_custom_fields' => 1,
 		'fold_itemform_googlemap' => 1,
 		'fold_itemform_meta_cmnt' => 1,
 		'fold_itemform_extra' => 1,
@@ -55,6 +56,7 @@ class UserSettings extends AbstractSettings
 		'fold_cmntform_datetime' => 1,
 		'fold_cmntform_html' => 1,
 		'fold_cmntform_info' => 1,
+		'fold_cmntform_notifications' => 1,
 		'fold_upgrade_backup_options' => 1,
 		'fold_plugin_vars' => 1,
 		'fold_plugin_events' => 1,

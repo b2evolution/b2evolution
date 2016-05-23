@@ -22,6 +22,7 @@ $params = array_merge( array(
 		'item_class'                 => 'evo_post evo_content_block',
 		'item_type_class'            => 'evo_post__ptyp_',
 		'item_status_class'          => 'evo_post__',
+		'item_style'                 => '',
 		// Controlling the title:
 		'disp_title'                 => true,
 		'item_title_line_before'     => '<div class="evo_post_title">',	// Note: we use an extra class because it facilitates styling
@@ -41,7 +42,8 @@ $params = array_merge( array(
 echo '<div class="evo_content_block">'; // Beginning of post display
 ?>
 
-<article id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>">
+<article id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>"<?php
+	echo empty( $params['item_style'] ) ? '' : ' style="'.format_to_output( $params['item_style'], 'htmlattr' ).'"' ?>>
 
 	<header>
 	<?php
@@ -149,7 +151,6 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 		<div class="evo_container evo_container__item_single">
 		<?php
 		// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-		// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 		// Display container contents:
 		skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 			'widget_context' => 'item',	// Signal that we are displaying within an Item

@@ -183,7 +183,6 @@ siteskin_include( '_site_body_header.inc.php' );
 				if( $disp == 'single' )
 				{
 					// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-					// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 					// Display container contents:
 					skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 						// The following (optional) params will be used as defaults for widgets included in this container:

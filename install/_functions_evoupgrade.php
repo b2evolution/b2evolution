@@ -2092,7 +2092,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		 */
 		function insert_basic_widgets_9408( $blog_id, $initial_install = false, $kind = '' )
 		{
-			global $DB, $test_install_all_features, $basic_widgets_insert_sql_rows;
+			global $DB, $install_test_features, $basic_widgets_insert_sql_rows;
 
 			// Initialize this array first time and clear after previous call of this function
 			$basic_widgets_insert_sql_rows = array();
@@ -2180,7 +2180,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			{ // About Author
 				add_basic_widget_9408( $blog_id, 'Item Single', 'item_about_author', 'core', 25 );
 			}
-			if( ( $blog_id == $blog_a_ID || ( ! empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && $test_install_all_features )
+			if( ( $blog_id == $blog_a_ID || ( ! empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && ! empty( $install_test_features ) )
 			{ // Google Maps
 				add_basic_widget_9408( $blog_id, 'Item Single', 'evo_Gmaps', 'plugin', 30 );
 			}
@@ -2203,7 +2203,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			}
 			else
 			{
-				if( $test_install_all_features )
+				if( ! empty( $install_test_features ) )
 				{
 					if( $kind != 'forum' && $kind != 'manual' )
 					{ // Current filters widget
@@ -4048,6 +4048,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$DB->query( 'ALTER TABLE T_basedomains DROP INDEX dom_name' );
 		$DB->query( 'ALTER TABLE T_basedomains DROP INDEX dom_type' );
 		$DB->query( 'ALTER TABLE T_basedomains ADD UNIQUE dom_type_name ( dom_type, dom_name )' );
+		task_end();
+
+		task_begin( 'Upgrading base domains table...' );
+		$DB->query( "ALTER TABLE T_basedomains
+			MODIFY dom_name VARCHAR(250) COLLATE utf8_bin NOT NULL DEFAULT ''" );
 		task_end();
 
 		/*** Update user_email_dom_ID for all already existing users ***/
@@ -7391,8 +7396,108 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11755, 'Upgrade table user post data...' ) )
-	{	// part of 6.7.1
+	if( upg_task_start( 11755, 'Creating collection user favorites table...' ) )
+	{ // part of 6.7.1-beta
+		db_create_table( 'T_coll_user_favs', '
+				cufv_user_ID INT(10) UNSIGNED NOT NULL,
+				cufv_blog_ID INT(11) UNSIGNED NOT NULL,
+				PRIMARY KEY cufv_pk ( cufv_user_ID, cufv_blog_ID )' );
+
+		// If system user count is less than or equal to 10, Add favorites based on previous blog_favorite settings
+		load_funcs( 'tools/model/_system.funcs.php' );
+		$user_IDs = system_get_user_IDs();
+		$user_count = count( $user_IDs );
+
+		$SQL = new SQL();
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_blogs' );
+		$SQL->ORDER_BY( 'blog_ID' );
+		$blogs = $DB->get_results( $SQL->get() );
+
+		$SQL = 'INSERT INTO T_coll_user_favs ( cufv_blog_ID, cufv_user_ID ) VALUES ';
+		$values = array();
+
+		// Collection owners will automatically favorite their collection
+		foreach( $blogs as $blog )
+		{
+			$values[] = '( '.$blog->blog_ID.', '.$blog->blog_owner_user_ID.' )';
+		}
+
+		if( $user_count <= 10 )
+		{
+			foreach( $blogs as $blog )
+			{
+				if( $blog->blog_favorite )
+				{ // currently has favorite status
+					foreach( $user_IDs as $user_ID )
+					{
+						$values[] = '( '.$blog->blog_ID.', '.$user_ID.' )';
+					}
+				}
+			}
+		}
+
+		$values = array_unique( $values );
+		if( $values )
+		{
+			$SQL .= implode( ', ', $values );
+			$DB->query( $SQL );
+		}
+
+		// Drop blog_favorite column
+		db_drop_col( 'T_blogs', 'blog_favorite' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11760, 'Upgrading email campaigns table...' ) )
+	{	// part of 6.7.1-beta
+		db_add_col( 'T_email__campaign', 'ecmp_send_ctsk_ID', 'INT(10) UNSIGNED NULL DEFAULT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11765, 'Upgrading files table...' ) )
+	{ // part of 6.7.1-beta
+		db_add_col( 'T_files', 'file_creator_user_ID', 'int(10) unsigned NULL default NULL AFTER file_ID' );
+
+		// Update file_creator_user_ID with the owner of the first link to a comment/post/message
+		$SQL = 'UPDATE T_files AS t1,
+				(
+					SELECT a.link_file_ID, a.link_creator_user_ID
+					FROM T_links AS a
+					INNER JOIN
+					(
+						SELECT link_file_ID, MIN( link_ID ) AS min_ID
+						FROM T_links
+						GROUP BY link_file_ID
+					) AS b
+						ON a.link_file_ID = b.link_file_ID AND a.link_ID = b.min_ID
+				) AS t2
+				SET
+					t1.file_creator_user_ID = t2.link_creator_user_ID
+				WHERE
+					t1.file_ID = t2.link_file_ID';
+		$DB->query( $SQL );
+
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11770, 'Upgrading files table...' ) )
+	{ // part of 6.7.3-beta
+		db_add_index( 'T_files', 'file_creator_user_id', 'file_creator_user_id' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11775, 'Add new types "Text" and "HTML" for custom fields of item types...' ) )
+	{	// part of 6.7.3-stable
+		$DB->query( 'ALTER TABLE T_items__item_settings
+			MODIFY COLUMN iset_value varchar( 10000 ) NULL' );
+		$DB->query( 'ALTER TABLE T_items__type_custom_field
+			MODIFY COLUMN itcf_type ENUM( "double", "varchar", "text", "html" ) COLLATE ascii_general_ci NOT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11780, 'Upgrade table user post data...' ) )
+	{	// part of 6.7.3-stable
 		$DB->query( 'RENAME TABLE '.$tableprefix.'users__postreadstatus TO T_items__user_data' );
 		$DB->query( "ALTER TABLE T_items__user_data
 			CHANGE uprs_user_ID         itud_user_ID          INT(11) UNSIGNED NOT NULL,

@@ -187,13 +187,24 @@ switch( $action )
 				}
 				break;
 
-			case 'renderers':
+			case 'plugins':
+				$plugin_group = param( 'plugin_group', 'string', NULL );
+				if( isset( $plugin_group ) )
+				{
+					$update_redirect_url .= '&plugin_group='.$plugin_group;
+				}
+
 				// Update Plugin params/Settings
 				load_funcs('plugins/_plugin.funcs.php');
 
 				$Plugins->restart();
 				while( $loop_Plugin = & $Plugins->get_next() )
 				{
+					if( $loop_Plugin->group != $plugin_group )
+					{
+						continue;
+					}
+
 					$tmp_params = array( 'for_editing' => true );
 					$pluginsettings = $loop_Plugin->get_coll_setting_definitions( $tmp_params );
 					if( empty($pluginsettings) )
@@ -324,7 +335,7 @@ switch( $action )
 		{
 			case 'fav':
 				// Favorite Blog
-				$edited_Blog->set( 'favorite', $setting_value );
+				$edited_Blog->favorite( $current_User->ID, $setting_value );
 				$result_message = T_('The collection setting has been updated.');
 				break;
 
@@ -496,7 +507,8 @@ if( $action == 'dashboard' )
 		echo '<div class="first_payload_block">'."\n";
 
 		$AdminUI->disp_payload_begin();
-		echo '<h2 class="page-title">'.$Blog->dget( 'name' ).'</h2>';
+		echo '<h2 class="page-title">'.get_coll_fav_icon( $Blog->ID, array( 'class' => 'coll-fav' ) ).'&nbsp;'.$Blog->dget( 'name' ).'</h2>';
+		load_funcs( 'collections/model/_blog_js.funcs.php' );
 		echo '<div class="row browse">';
 
 		// Block Group 1
@@ -580,7 +592,7 @@ if( $action == 'dashboard' )
 				echo '<div id="comments_block" class="dashboard_comments_block">';
 
 				$block_item_Widget->disp_template_replaced( 'block_start' );
-				echo '<div id="comments_container">';
+				echo '<div id="comments_container" class="evo_comments_container">';
 
 				// GET COMMENTS AWAITING MODERATION (the code generation is shared with the AJAX callback):
 				$Timer->start( 'show_comments_awaiting_moderation' );
@@ -674,7 +686,7 @@ if( $action == 'dashboard' )
 
 				$block_item_Widget->disp_template_replaced( 'block_start' );
 
-				echo '<div id="comments_container">';
+				echo '<div id="comments_container" class="evo_comments_container">';
 				// GET LATEST META COMMENTS:
 				show_comments_awaiting_moderation( $Blog->ID, $CommentList );
 				echo '</div>';
@@ -990,7 +1002,7 @@ else
 			$AdminUI->set_page_manual_link( 'seo-settings' );
 			break;
 
-		case 'renderers':
+		case 'plugins':
 			$AdminUI->set_path( 'collections', 'settings', $tab );
 			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 			$AdminUI->breadcrumbpath_add( T_('Plugins'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
@@ -1091,7 +1103,7 @@ else
 				case 'seo':
 					$AdminUI->disp_view( 'collections/views/_coll_seo.form.php' );
 					break;
-				case 'renderers':
+				case 'plugins':
 					$AdminUI->disp_view( 'collections/views/_coll_plugin_settings.form.php' );
 					break;
 				case 'advanced':

@@ -87,7 +87,7 @@ skin_widget( array(
 
 <div class="forums_list single_topic evo_content_block">
 	<?php /* This empty row is used to fix columns width, when table has css property "table-layout:fixed" */ ?>
-	
+
 	<div class="single_page_title">
 		<?php
 		// Page title
@@ -133,17 +133,15 @@ skin_widget( array(
 						) );
 					?>
 					<?php
-						if( $Skin->get_setting( 'display_post_date' ) )
-						{ // We want to display the post date:
-							$Item->issue_time( array(
-									'before'      => '<span class="text-muted">',
-									'after'       => '</span> &nbsp; &nbsp; ',
-									'time_format' => 'M j, Y H:i',
-								) );
-						}
+						// We want to display the post date:
+						$Item->issue_time( array(
+								'before'      => '<span class="text-muted">',
+								'after'       => '</span> &nbsp; &nbsp; ',
+								'time_format' => 'M j, Y H:i',
+							) );
 					?>
 				</h4>
-			</div>	
+			</div>
 					<?php
 						if( $Skin->enabled_status_banner( $Item->status ) )
 						{ // Status banner
@@ -154,9 +152,9 @@ skin_widget( array(
 							$legend_statuses[] = $Item->status;
 							echo '</div>';
 						}
-					?>	
+					?>
 		</div>
-		
+
 		<div class="panel-body">
 			<div class="ft_avatar col-md-1 col-sm-2"><?php
 				$Item->author( array(
@@ -172,7 +170,6 @@ skin_widget( array(
 					<div class="evo_container evo_container__item_single">
 					<?php
 					// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-					// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 					// Display container contents:
 					skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 						'widget_context' => 'item',	// Signal that we are displaying within an Item
@@ -211,7 +208,7 @@ skin_widget( array(
 				?>
 			</div>
 		</div><!-- ../panel-body -->
-		
+
 		<div class="panel-footer clearfix">
 		<a href="<?php echo $Item->get_permanent_url(); ?>#skin_wrapper" class="to_top"><?php echo T_('Back to top'); ?></a>
 		<?php
@@ -247,7 +244,7 @@ skin_widget( array(
 			echo '</span>';
 			echo '</div>';
 		?>
-		
+
 		</div><!-- ../panel-footer -->
 	</div><!-- ../panel panel-default -->
 	</section><!-- ../table evo_content_block -->

@@ -16,7 +16,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $dispatcher;
 global $current_User, $Settings;
-global $unread_messages_count;
 global $DB;
 
 if( !isset( $display_params ) )

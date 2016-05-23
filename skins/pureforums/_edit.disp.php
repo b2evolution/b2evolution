@@ -146,7 +146,7 @@ $Form->begin_form( 'inskin', '', $params );
 		$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
 		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
 
-		if( $Blog->get_setting( 'use_workflow' ) )
+		if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 		{	// We want to use workflow properties for this blog:
 			$Form->hidden( 'item_priority', $edited_Item->priority );
 			$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
@@ -231,7 +231,12 @@ $Form->begin_form( 'inskin', '', $params );
 		
 		// CALL PLUGINS NOW:
 		ob_start();
-		$Plugins->trigger_event( 'DisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'inskin' ) );
+		$Plugins->trigger_event( 'DisplayEditorButton', array(
+				'target_type'   => 'Item',
+				'target_object' => $edited_Item,
+				'content_id'    => 'itemform_post_content',
+				'edit_layout'   => 'inskin'
+			) );
 		$plugins_editor_button = ob_get_clean();
 
 		$Form->switch_template_parts( array(

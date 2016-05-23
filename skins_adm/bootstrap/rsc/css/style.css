@@ -7,6 +7,9 @@
  *
  * @package admin
  */
+h2.page-title .fa.coll-fav {
+  font-size: 26px;
+}
 .page-content {
   margin-top: 16px;
 }
@@ -195,89 +198,77 @@ div.delete_messages ul li {
 /*
  * Browse pages of items and comments ( ?ctrl=items and ?ctrl=comments - full views )
  */
-div.bPost {
+.evo_post {
   clear: both;
   margin: 0 0 1ex;
   padding: 0;
-  border: 1px solid #CCC;
-  border-radius: 4px;
   overflow: hidden;
   /* to normal view of border-radius */
 }
-.bSmallHead {
-  background-color: #F5F5F5;
-  border-bottom: 1px solid #CCC;
-  color: #666666;
-  font-size: 85%;
-  margin: 0;
+.evo_post .evo_post__tags {
+  border-top: 1px solid #ddd;
+}
+.evo_post .panel-body h3 {
+  margin: 8px 0;
+}
+.evo_post .panel-heading,
+.evo_comment .panel-heading,
+.evo_post .panel-body,
+.evo_comment .panel-body,
+.evo_post .panel-footer,
+.evo_comment .panel-footer {
   padding: 1ex;
 }
-.bSmallHeadRight {
-  float: right;
-  text-align: right;
-  padding-left: 1em;
-  /* do not pad on text in .bSmallHead */
-}
-.bSmallPrint {
-  border-top: 1px solid #becdd6;
-  font-size: 85%;
-  padding: 1ex;
-  color: #929292;
-}
-.bContent {
-  padding: 1ex;
-}
-.bCommentContent,
-.bFeedback {
-  margin: 1ex;
-}
-#comments_container {
+.evo_comments_container {
   border: none;
 }
-#comments_container .bCommentAvatar {
+.evo_comments_container .bCommentAvatar {
   border: 0;
   border-radius: 50%;
   padding: 0;
   margin: 4px 10px 10px 0;
   float: left;
 }
-#comments_container.full_comment_list {
+.evo_comments_container.evo_comments_container__full_list {
   border: none;
 }
-#comments_container.full_comment_list div.bComment {
+.evo_comments_container.evo_comments_container__full_list .evo_comment {
   margin-left: 0;
   margin-right: 0;
 }
-.bFeedback #comments_container {
+.evo_post__comments {
+  margin: 1ex;
+}
+.evo_post__comments .evo_comments_container {
   border: none;
 }
-.bFeedback #comments_container div.bComment {
+.evo_post__comments .evo_comments_container .evo_comment {
   margin-left: 0;
   margin-right: 0;
 }
-.bFeedback .tile {
+.evo_post__comments .tile {
   display: inline-block;
   padding-right: 10px;
 }
-.bFeedback .tile input,
-.bFeedback .tile label {
+.evo_post__comments .tile input,
+.evo_post__comments .tile label {
   display: inline-block;
 }
-.bFeedback .results_nav {
+.evo_post__comments .results_nav {
   background: #F5F5F5;
   border: none;
 }
-.bFeedback .bComment.form-horizontal {
+.evo_post__comments .evo_form__comment.form-horizontal {
   margin: 0;
   padding: 1ex;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
-.bFeedback .bComment.form-horizontal.evo_form__comment_meta {
+.evo_post__comments .evo_form__comment.form-horizontal.evo_form__comment_meta {
   border: 2px solid #5133ab;
   background-color: #f7f4ff;
 }
-.bFeedback .bComment.form-horizontal .form_info {
+.evo_post__comments .evo_form__comment.form-horizontal .form_info {
   display: block;
   text-align: center;
   padding: 10px;
@@ -298,71 +289,61 @@ div.bPost {
 #comment_filter_form .rating input[name=cmnt_fullview_rating_limit]:first-child {
   margin-left: 10px;
 }
-#comments_container div.bComment {
+.evo_comments_container .evo_comment {
   overflow: hidden;
   padding: 0;
   margin: 1ex;
-  border: 1px solid #ddd;
-  border-radius: 4px;
 }
-#comments_container div.bComment > p {
+.evo_comments_container .evo_comment > p {
   margin: 0;
 }
-#comments_container div.bComment.bCommentdraft {
+.evo_comments_container .evo_comment.evo_comment__status_draft {
   border: 1px solid #fc3;
   background-color: #ffb;
 }
-#comments_container div.bComment.bCommentdeprecated {
+.evo_comments_container .evo_comment.evo_comment__status_deprecated {
   border: 1px solid #000;
   background-color: #eee;
   color: #888;
 }
-#comments_container div.bComment.bCommentmeta {
+.evo_comments_container .evo_comment.evo_comment__status_meta {
   border: 2px solid #5133ab;
 }
-#comments_container div.bComment.bCommentmeta .bSmallHead,
-#comments_container div.bComment.bCommentmeta .CommentActionsArea {
+.evo_comments_container .evo_comment.evo_comment__status_meta .panel-heading,
+.evo_comments_container .evo_comment.evo_comment__status_meta .panel-footer {
   background-color: #f7f4ff;
   border-bottom: 1px solid #5133ab;
 }
-#comments_container div.bComment.bCommentmeta .CommentActionsArea {
+.evo_comments_container .evo_comment.evo_comment__status_meta .panel-footer {
   border-top: 1px solid #5133ab;
   border-bottom: none;
 }
-#comments_container div.bComment.bCommenttrash {
+.evo_comments_container .evo_comment.evo_comment__status_trash {
   border: 1px solid #f66;
   background-color: #fcc;
 }
-#comments_container div.bComment.bCommenttrash .bSmallHead {
+.evo_comments_container .evo_comment.evo_comment__status_trash .panel-heading {
   border-bottom: 1px solid #f66;
   background-color: #faa;
 }
-#comments_container div.bComment.bCommenttrash .CommentActionsArea {
+.evo_comments_container .evo_comment.evo_comment__status_trash .panel-footer {
   border-top: 1px solid #f66;
   background-color: #faa;
 }
-#comments_container .editable_comment_content {
+.evo_comments_container .editable_comment_content {
   margin-bottom: 5px;
 }
-#fieldset_wrapper_itemform_meta_cmnt #comments_container {
+#fieldset_wrapper_itemform_meta_cmnt .evo_comments_container {
   border: none;
   margin: 0;
 }
-#fieldset_wrapper_itemform_meta_cmnt #comments_container div.bComment {
+#fieldset_wrapper_itemform_meta_cmnt .evo_comments_container .evo_comment {
   margin: 0 0 1ex 0;
 }
-#fieldset_wrapper_itemform_meta_cmnt #comments_container div.bComment:not([class*=meta]) {
+#fieldset_wrapper_itemform_meta_cmnt .evo_comments_container .evo_comment:not([class*=meta]) {
   border: none;
 }
-div.PostActionsArea,
-div.CommentActionsArea {
-  background-color: #F5F5F5;
-  border-top: 1px solid #CCC;
-  clear: both;
-  margin: 0;
-  padding: 1ex;
-}
-.bPostAttachments {
+.evo_post__attachments {
   margin: 1ex;
 }
 .feedback-tabs {
@@ -393,102 +374,99 @@ div.CommentActionsArea {
   left: 8px;
   top: -8px;
 }
-div.bPostcommunity {
+.evo_post__status_community {
   border: 1px solid #2E8BB9;
 }
-div.bPostcommunity > div.bSmallHead {
+.evo_post__status_community > .panel-heading {
   border-bottom: inherit;
 }
-div.bPostcommunity > .PostActionsArea {
+.evo_post__status_community > .panel-footer {
   border-top: inherit;
 }
-div.bPostprotected {
+.evo_post__status_protected {
   border: 1px solid #fc9;
 }
-div.bPostprotected > div.bSmallHead {
+.evo_post__status_protected > .panel-heading {
   border-bottom: inherit;
 }
-div.bPostprotected > .PostActionsArea {
+.evo_post__status_protected > .panel-footer {
   border-top: inherit;
 }
-div.bPostreview {
+.evo_post__status_review {
   border: 1px solid #CC0099;
 }
-div.bPostreview > div.bSmallHead {
+.evo_post__status_review > .panel-heading {
   border-bottom: inherit;
 }
-div.bPostreview > .PostActionsArea {
+.evo_post__status_review > .panel-footer {
   border-top: inherit;
 }
-div.bPostprivate {
+.evo_post__status_private {
   border: 1px solid #f99;
 }
-div.bPostprivate > div.bSmallHead {
+.evo_post__status_private > .panel-heading {
   border-bottom: inherit;
 }
-div.bPostprivate > .PostActionsArea {
+.evo_post__status_private > .panel-footer {
   border-top: inherit;
 }
-div.bPostdraft,
-div.bCommentdraft {
+.evo_post__status_draft,
+.evo_comment__status_draft {
   border: 1px solid #fc3;
 }
-div.bPostdraft > .bContent,
-div.bCommentdraft > .bContent {
+.evo_post__status_draft > .panel-body,
+.evo_comment__status_draft > .panel-body {
   background-color: #ffb;
 }
-div.bPostdraft .bSmallHead,
-div.bCommentdraft .bSmallHead {
+.evo_post__status_draft .panel-heading,
+.evo_comment__status_draft .panel-heading {
   border-bottom: 1px solid #fc3;
   background-color: #ff9;
 }
-div.bPostdraft .CommentActionsArea,
-div.bCommentdraft .CommentActionsArea,
-div.bPostdraft .PostActionsArea,
-div.bCommentdraft .PostActionsArea {
+.evo_post__status_draft .panel-footer,
+.evo_comment__status_draft .panel-footer {
+  border-top: 1px solid #fc3;
   background-color: #ff9;
 }
-div.bPostdraft span.bStatus,
-div.bCommentdraft span.bStatus {
+.evo_post__status_draft span.bStatus,
+.evo_comment__status_draft span.bStatus {
   color: #f96;
   background-color: #ff9;
 }
-div.bPostdraft span.note.status_draft span,
-div.bCommentdraft span.note.status_draft span {
+.evo_post__status_draft span.note.status_draft span,
+.evo_comment__status_draft span.note.status_draft span {
   color: #fff;
   background-color: #FFCC33;
 }
-div.bPostdeprecated,
-div.bCommentdeprecated {
+.evo_post__status_deprecated,
+.evo_comment__status_deprecated {
   border: 1px solid #000;
 }
-div.bPostdeprecated > .bContent,
-div.bCommentdeprecated > .bContent {
+.evo_post__status_deprecated > .panel-body,
+.evo_comment__status_deprecated > .panel-body {
   background-color: #eee;
 }
-div.bPostdeprecated > div.bSmallHead,
-div.bCommentdeprecated > div.bSmallHead {
+.evo_post__status_deprecated > .panel-heading,
+.evo_comment__status_deprecated > .panel-heading {
   border-bottom: inherit;
   background-color: #ccc;
 }
-div.bPostdeprecated > .PostActionsArea,
-div.bCommentdeprecated > .PostActionsArea,
-div.bPostdeprecated .CommentActionsArea,
-div.bCommentdeprecated .CommentActionsArea {
+.evo_post__status_deprecated > .panel-footer,
+.evo_comment__status_deprecated > .panel-footer {
   border-top: inherit;
   background-color: #ccc;
 }
-div.bPostredirected {
+.evo_post__status_redirected {
   border: 1px solid #639;
 }
-div.bPostredirected > .bContent {
+.evo_post__status_redirected > .panel-body {
   background-color: #dcf;
 }
-div.bPostredirected > div.bSmallHead {
+.evo_post__status_redirected > .panel-heading {
   border-bottom: inherit;
   background-color: #c0b0e0;
 }
-div.bPostredirected > .PostActionsArea {
+.evo_post__status_redirected > .panel-footer {
   border-top: inherit;
   background-color: #c0b0e0;
 }
@@ -547,45 +525,42 @@ fieldset ul {
   margin: 0;
   padding: 0;
 }
-.bContent h3 {
-  margin: 8px 0;
-}
-#comments_container,
+.evo_comments_container,
 .items_container {
   border: 1px solid #DDD;
   border-radius: 4px;
   margin-bottom: 20px;
 }
-#comments_container .dashboard_post,
+.evo_comments_container .dashboard_post,
 .items_container .dashboard_post {
   border-top: 1px solid #DDD;
   padding: 8px;
   min-height: 80px;
 }
-#comments_container .dashboard_post .dashboard_post_title,
+.evo_comments_container .dashboard_post .dashboard_post_title,
 .items_container .dashboard_post .dashboard_post_title {
   font-size: 16px;
   line-height: 30px;
   margin: 0;
 }
-#comments_container .dashboard_post:first-child,
+.evo_comments_container .dashboard_post:first-child,
 .items_container .dashboard_post:first-child {
   border: none;
 }
-#comments_container .dashboard_float_actions,
+.evo_comments_container .dashboard_float_actions,
 .items_container .dashboard_float_actions {
   float: left;
   margin-right: 10px;
 }
-#comments_container .dashboard_float_actions .dashboard_thumbnails,
+.evo_comments_container .dashboard_float_actions .dashboard_thumbnails,
 .items_container .dashboard_float_actions .dashboard_thumbnails {
   margin-top: 5px;
 }
-#comments_container .dashboard_content,
+.evo_comments_container .dashboard_content,
 .items_container .dashboard_content {
   margin-left: 90px;
 }
-#comments_container span[class*=status_],
+.evo_comments_container span[class*=status_],
 .items_container span[class*=status_] {
   line-height: 20px;
 }
@@ -596,7 +571,7 @@ fieldset ul {
 .dashboard_comments_block .evo_content_block .popover a.user img {
   border-radius: 0;
 }
-.dashboard_comments_block #comments_container {
+.dashboard_comments_block .evo_comments_container {
   border: none;
   margin: 0;
 }
@@ -647,10 +622,13 @@ fieldset ul {
   display: block;
 }
 #itemform_adv_props div.tile,
-#itemform_adv_props div.controls {
+#itemform_custom_fields div.tile,
+#itemform_adv_props div.controls,
+#itemform_custom_fields div.controls {
   width: 100%;
 }
-#itemform_adv_props td.label {
+#itemform_adv_props td.label,
+#itemform_custom_fields td.label {
   background: none;
   color: #000;
   text-shadow: none;
@@ -658,7 +636,8 @@ fieldset ul {
   vertical-align: top;
   padding: 9px 10px 0 0;
 }
-#itemform_adv_props .help-inline label {
+#itemform_adv_props .help-inline label,
+#itemform_custom_fields .help-inline label {
   font-weight: normal;
   display: block;
 }
@@ -838,9 +817,6 @@ div#fileuploader_form {
 tr#fileuploader_form td {
   background: #f5f5f5;
 }
-.file_browser {
-  overflow: hidden;
-}
 .file_browser .panel-body {
   padding: 0;
 }
@@ -873,7 +849,6 @@ h2.user_title {
   font-weight: normal;
   color: #999;
   margin: 40px 0 30px;
-  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;
@@ -1135,6 +1110,12 @@ nav.level1 {
 div.level3 nav .nav > li > a {
   padding: 4px 10px;
   font-size: 92%;
+  background-color: #f6f6f6;
+}
+div.level3 nav .nav > li.active a,
+div.level3 nav .nav > li.active a:hover,
+div.level3 nav .nav > li.active a:focus {
+  background-color: #337ab7;
 }
 .user_header_content div.level3 {
   padding: 5px 0 15px;
@@ -1235,6 +1216,11 @@ div.level3 nav .nav > li > a {
 }
 .skinshot .legend {
   margin: 0 1ex;
+}
+.coll_settings_skinshot .skinshot {
+  padding: 0;
+  float: none;
+  margin: -1ex -1ex 1ex -1ex;
 }
 .skin_selector_block {
   margin: -15px 0 0 -15px;
@@ -1423,19 +1409,189 @@ table.diff td.diff-title-addedline {
   margin: 0 0 10px 25px;
   list-style: disc;
 }
-.evo_poll__percent_bar {
-  width: 100px;
-  margin-right: 2px;
+.evo_poll__table {
+  margin-bottom: 14px;
+  width: 100%;
+}
+.evo_poll__table td {
+  padding: 2px 10px 2px 0;
+  vertical-align: top;
+}
+.evo_poll__table tr td:last-child {
+  padding-right: 0;
+}
+.evo_poll__table input[type=radio],
+.evo_poll__table label {
+  margin: 0;
+}
+.evo_poll__table .evo_poll__percent_bar {
+  width: 100%;
+  min-width: 40px;
+  padding-right: 6px;
+}
+.evo_poll__table .evo_poll__percent_bar > div {
+  width: 100%;
   vertical-align: middle;
   display: inline-block;
 }
-.evo_poll__percent_bar > div {
+.evo_poll__table .evo_poll__percent_bar > div > div {
   background: #ffcc66;
   height: 12px;
   min-width: 1px;
 }
-.red-bordered-checkbox {
-  background-color: #F00;
-  padding: 1px;
-  padding-top: 0;
+.evo_poll__table .evo_poll__selector {
+  width: 5px;
+}
+.evo_poll__table .evo_poll__title {
+  white-space: nowrap;
+}
+.evo_poll__table .evo_poll_percentage {
+  max-width: 50px;
+}
+.status_color_draft {
+  color: #ffff99;
+}
+.status_color_review {
+  color: #cc0099;
+}
+.status_color_community {
+  color: #2e8bb9;
+}
+.status_color_protected {
+  color: #ff9c2a;
+}
+.status_color_private {
+  color: #dc143c;
+}
+.status_color_published {
+  color: #99ee44;
+}
+.status_color_deprecated {
+  color: #000000;
+}
+.status_color_redirected {
+  color: #663399;
+}
+.status_color_trash {
+  color: #ff6666;
+}
+.status_color_meta {
+  color: #5133ab;
+}
+.btn[class*=btn-status-] {
+  border: 1px solid #ccc;
+}
+.btn-status-draft {
+  color: #000;
+  background-color: #ffff99;
+  border-color: #dfdfdf;
+}
+.btn-status-draft:hover {
+  color: #000;
+  background-color: #f3f392;
+}
+.btn-status-review {
+  color: #fff;
+  background-color: #cc0099;
+}
+.btn-status-review:hover {
+  color: #fff;
+  background-color: #c20092;
+}
+.btn-status-community {
+  color: #fff;
+  background-color: #2e8bb9;
+}
+.btn-status-community:hover {
+  color: #fff;
+  background-color: #2c84b0;
+}
+.btn-status-protected {
+  color: #fff;
+  background-color: #ff9c2a;
+}
+.btn-status-protected:hover {
+  color: #fff;
+  background-color: #f39528;
+}
+.btn-status-private {
+  color: #fff;
+  background-color: #dc143c;
+}
+.btn-status-private:hover {
+  color: #fff;
+  background-color: #d21339;
+}
+.btn-status-published {
+  color: #000;
+  background-color: #99ee44;
+}
+.btn-status-published .glyphicon {
+  color: inherit !important;
+}
+.btn-status-published:hover {
+  color: #000;
+  background-color: #92e341;
+}
+.btn-status-deprecated {
+  color: #fff;
+  background-color: #000000;
+}
+.btn-status-deprecated:hover {
+  color: #fff;
+  background-color: #333333;
+}
+.btn-status-redirected {
+  color: #fff;
+  background-color: #663399;
+}
+.btn-status-redirected:hover {
+  color: #fff;
+  background-color: #613192;
+}
+.btn-status-trash {
+  color: #fff;
+  background-color: #ff6666;
+}
+.btn-status-trash:hover {
+  color: #fff;
+  background-color: #ff4444;
+}
+.evo_checkbox_status {
+  padding: 0 1px 1px 1px;
+  border-radius: 2px;
+}
+.evo_checkbox_status__default {
+  border: 1px solid #F00;
+  padding: 1px 1px 2px 1px;
+}
+.evo_checkbox_status__published {
+  background-color: #99ee44;
+}
+.evo_checkbox_status__community {
+  background-color: #2e8bb9;
+}
+.evo_checkbox_status__protected {
+  background-color: #ff9c2a;
+}
+.evo_checkbox_status__review {
+  background-color: #cc0099;
+}
+.evo_checkbox_status__private {
+  background-color: #dc143c;
+}
+.evo_checkbox_status__draft {
+  background-color: #ffff99;
+}
+.evo_checkbox_status__deprecated {
+  background-color: #000000;
+}
+.evo_checkbox_status__redirected {
+  background-color: #663399;
+}
+.evo_checkbox_status__trash {
+  background-color: #ff6666;
+}
+.evo_checkbox_status__meta {
+  background-color: #5133ab;
 }

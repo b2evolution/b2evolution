@@ -121,7 +121,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'metadesc', $edited_Item->get_setting( 'metadesc' ) );
 		$Form->hidden( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ) );
 
-		if( $Blog->get_setting( 'use_workflow' ) )
+		if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 		{	// We want to use workflow properties for this blog:
 			$Form->hidden( 'item_priority', $edited_Item->priority );
 			$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
@@ -231,7 +231,12 @@ $Form->begin_form( 'inskin', '', $form_params );
 		<?php
 		echo '<div class="edit_plugin_actions">';
 		// CALL PLUGINS NOW:
-		$Plugins->trigger_event( 'DisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'inskin' ) );
+		$Plugins->trigger_event( 'DisplayEditorButton', array(
+				'target_type'   => 'Item',
+				'target_object' => $edited_Item,
+				'content_id'    => 'itemform_post_content',
+				'edit_layout'   => 'inskin'
+			) );
 		echo '</div>';
 	}
 	else

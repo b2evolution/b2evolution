@@ -288,8 +288,6 @@ class UserCache extends DataObjectCache
 		{ // Load members of the blog
 			$cache_name = 'blogmembers';
 			$db_field = 'ismember';
-			// The collection's owner is member by default, Load it together with other members:
-			$owner_User = & $Blog->get_owner_User();
 		}
 
 		if( isset( $this->alreadyCached[ $cache_name ] ) && isset( $this->alreadyCached[ $cache_name ][ $blog_ID ] ) )
@@ -308,7 +306,8 @@ class UserCache extends DataObjectCache
 
 		$Debuglog->add( "Loading <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache[$cache_name]", 'dataobjects' );
 
-		if( isset( $owner_User ) )
+		// The collection's owner is member and can be assignee by default, Load it together with other members/assignees:
+		if( $owner_User = & $Blog->get_owner_User() )
 		{	// Add collection owner to the cache:
 			$this->add( $owner_User );
 		}

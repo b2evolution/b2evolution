@@ -11,9 +11,7 @@
 /**
  * A collection of MIME headers.
  *
- * @package    Swift
- * @subpackage Mime
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_Mime_SimpleHeaderSet implements Swift_Mime_HeaderSet
 {
@@ -73,8 +71,8 @@ class Swift_Mime_SimpleHeaderSet implements Swift_Mime_HeaderSet
     /**
      * Add a new Date header using $timestamp (UNIX time).
      *
-     * @param string  $name
-     * @param integer $timestamp
+     * @param string $name
+     * @param int    $timestamp
      */
     public function addDateHeader($name, $timestamp = null)
     {
@@ -133,10 +131,10 @@ class Swift_Mime_SimpleHeaderSet implements Swift_Mime_HeaderSet
      *
      * If multiple headers match, the actual one may be specified by $index.
      *
-     * @param string  $name
-     * @param integer $index
+     * @param string $name
+     * @param int    $index
      *
-     * @return boolean
+     * @return bool
      */
     public function has($name, $index = 0)
     {
@@ -155,7 +153,7 @@ class Swift_Mime_SimpleHeaderSet implements Swift_Mime_HeaderSet
      * offset.
      *
      * @param Swift_Mime_Header $header
-     * @param integer           $index
+     * @param int               $index
      */
     public function set(Swift_Mime_Header $header, $index = 0)
     {
@@ -168,8 +166,8 @@ class Swift_Mime_SimpleHeaderSet implements Swift_Mime_HeaderSet
      * If multiple headers match, the actual one may be specified by $index.
      * Returns NULL if none present.
      *
-     * @param string  $name
-     * @param integer $index
+     * @param string $name
+     * @param int    $index
      *
      * @return Swift_Mime_Header
      */
@@ -209,7 +207,7 @@ class Swift_Mime_SimpleHeaderSet implements Swift_Mime_HeaderSet
     }
 
     /**
-     * Return the name of all Headers
+     * Return the name of all Headers.
      *
      * @return array
      */
@@ -223,13 +221,13 @@ class Swift_Mime_SimpleHeaderSet implements Swift_Mime_HeaderSet
         return array_keys($headers);
     }
 
-  /**
+    /**
      * Remove the header with the given $name if it's set.
      *
      * If multiple headers match, the actual one may be specified by $index.
      *
-     * @param string  $name
-     * @param integer $index
+     * @param string $name
+     * @param int    $index
      */
     public function remove($name, $index = 0)
     {
@@ -327,8 +325,6 @@ class Swift_Mime_SimpleHeaderSet implements Swift_Mime_HeaderSet
         return $this->toString();
     }
 
-    // -- Private methods
-
     /** Save a Header to the internal collection */
     private function _storeHeader($name, Swift_Mime_Header $header, $offset = null)
     {
@@ -353,12 +349,13 @@ class Swift_Mime_SimpleHeaderSet implements Swift_Mime_HeaderSet
     {
         $lowerA = strtolower($a);
         $lowerB = strtolower($b);
-        $aPos = array_key_exists($lowerA, $this->_order)
-            ? $this->_order[$lowerA]
-            : -1;
-        $bPos = array_key_exists($lowerB, $this->_order)
-            ? $this->_order[$lowerB]
-            : -1;
+        $aPos = array_key_exists($lowerA, $this->_order) ? $this->_order[$lowerA] : -1;
+        $bPos = array_key_exists($lowerB, $this->_order) ? $this->_order[$lowerB] : -1;
+
+        if (-1 === $aPos && -1 === $bPos) {
+            // just be sure to be determinist here
+            return $a > $b ? -1 : 1;
+        }
 
         if ($aPos == -1) {
             return 1;
@@ -366,7 +363,7 @@ class Swift_Mime_SimpleHeaderSet implements Swift_Mime_HeaderSet
             return -1;
         }
 
-        return ($aPos < $bPos) ? -1 : 1;
+        return $aPos < $bPos ? -1 : 1;
     }
 
     /** Test if the given Header is always displayed */
@@ -381,6 +378,19 @@ class Swift_Mime_SimpleHeaderSet implements Swift_Mime_HeaderSet
         foreach ($this->_headers as $headerGroup) {
             foreach ($headerGroup as $header) {
                 $header->setCharset($charset);
+            }
+        }
+    }
+
+    /**
+     * Make a deep copy of object.
+     */
+    public function __clone()
+    {
+        $this->_factory = clone $this->_factory;
+        foreach ($this->_headers as $groupKey => $headerGroup) {
+            foreach ($headerGroup as $key => $header) {
+                $this->_headers[$groupKey][$key] = clone $header;
             }
         }
     }

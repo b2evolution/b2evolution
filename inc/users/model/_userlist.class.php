@@ -108,7 +108,8 @@ class UserList extends DataObjectList2
 				'age_max'             => NULL,    // integer, Age max
 				'userfields'          => array(), // Format of item: array( 'type' => type_ID, 'value' => search_words )
 				'order'               => '-D',    // Order
-				'users'               => array(), // User IDs
+				'users'               => array(), // User IDs - used to cache results
+				'userids'             => array(), // User IDs - used to filter by user IDs
 				'level_min'           => NULL,    // integer, Level min
 				'level_max'           => NULL,    // integer, Level max
 				'org'                 => NULL,    // integer, Organization ID
@@ -170,6 +171,11 @@ class UserList extends DataObjectList2
 			 * Selected filter preset:
 			 */
 			memorize_param( 'filter_preset', 'string', $this->default_filters['filter_preset'], $this->filters['filter_preset'] );  // List of authors to restrict to
+
+			/*
+			 * Restrict by user IDs
+			 */
+			memorize_param( 'userids', 'array:integer', $this->default_filters['userids'], $this->filters['userids'] );
 
 			/*
 			 * Restrict by membersonly
@@ -315,6 +321,11 @@ class UserList extends DataObjectList2
 			// Activate preset default filters if necessary:
 			$this->activate_preset_filters();
 		}
+
+		/*
+		 * Restrict by user IDs
+		 */
+		$this->filters['userids'] = param( 'userids', 'array:integer', $this->default_filters['userids'], true );
 
 		/*
 		 * Restrict by members
@@ -494,6 +505,7 @@ class UserList extends DataObjectList2
 		/*
 		 * filtering stuff:
 		 */
+		$this->UserQuery->where_user_IDs( $this->filters['userids'] );
 		$this->UserQuery->where_members( $this->filters['membersonly'] );
 		$this->UserQuery->where_keywords( $this->filters['keywords'] );
 		$this->UserQuery->where_gender( $this->filters['gender'] );

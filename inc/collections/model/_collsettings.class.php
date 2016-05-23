@@ -32,21 +32,23 @@ class CollectionSettings extends AbstractSettings
 	var $_defaults = array(
 		// Home page settings:
 			'front_disp'             => 'posts',
-			'what_to_show'           => 'posts',        // posts, days
+
+		// Posts list settings:
+			'what_to_show'           => 'posts',      // posts, days
 			'main_content'           => 'normal',
 			'posts_per_page'         => '5',
+			'disp_featured_above_list' => 0,				// Don't display a featured post above the list by default
 			'canonical_homepage'     => 1,				// Redirect homepage to its canonical Url?
 			'relcanonical_homepage'  => 1,				// If no 301, fall back to rel="canoncial" ?
-			'default_noindex'        => '0',			// META NOINDEX on Default blog page
-			// the following are actually general params but are probably best understood if being presented with the home page params
+			'default_noindex'        => '0',				// META NOINDEX on Default blog page
 			'orderby'         => 'datestart',
 			'orderdir'        => 'DESC',
 			'title_link_type' => 'permalink',
 			'permalinks'      => 'single',				// single, archive, subchap
 
 		// Page 2,3,4..; settings:
-			'paged_noindex' => '1',						// META NOINDEX on following blog pages
-			'paged_nofollowto' => '0',					// NOFOLLOW on links to following blog pages
+			'paged_noindex' => '1',							// META NOINDEX on following blog pages
+			'paged_nofollowto' => '0',						// NOFOLLOW on links to following blog pages
 
 		// Single post settings:
 			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?

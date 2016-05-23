@@ -196,7 +196,7 @@ function install_newdb()
 
 	if( $create_sample_contents )
 	{
-		global $Settings, $test_install_all_features;
+		global $Settings, $install_test_features;
 
 		echo get_install_format_text( '<h2>'.T_('Installing sample contents...').'</h2>', 'h2' );
 		evo_flush();
@@ -423,7 +423,7 @@ function create_default_settings( $override = array() )
 {
 	global $DB, $new_db_version, $default_locale;
 	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $spam_Group;
-	global $test_install_all_features, $create_sample_contents, $install_site_color, $local_installation;
+	global $install_test_features, $create_sample_contents, $install_site_color, $local_installation;
 
 	$defaults = array(
 		'db_version' => $new_db_version,
@@ -434,7 +434,7 @@ function create_default_settings( $override = array() )
 		'registration_is_public' => 1,
 		'quick_registration' => 1,
 	);
-	if( $test_install_all_features )
+	if( $install_test_features )
 	{
 		$defaults['gender_colored'] = 1;
 		echo_install_log( 'TEST FEATURE: Enabling colored gender usernames by default' );
@@ -567,7 +567,7 @@ function install_basic_plugins( $old_db_version = 0 )
 	/**
 	 * @var Plugins_admin
 	 */
-	global $Plugins_admin, $test_install_all_features;
+	global $Plugins_admin, $install_test_features;
 
 	$Plugins_admin = & get_Plugins_admin();
 
@@ -592,7 +592,7 @@ function install_basic_plugins( $old_db_version = 0 )
 
 	if( $old_db_version < 9290 )
 	{
-		if( $test_install_all_features )
+		if( $install_test_features )
 		{
 			echo_install_log( 'TEST FEATURE: Installing plugin "Smilies"' );
 			install_plugin( 'smilies_plugin' );
@@ -620,7 +620,7 @@ function install_basic_plugins( $old_db_version = 0 )
 	{ // Upgrade to 5.0.0
 		install_plugin( 'flowplayer_plugin' );
 
-		if( $test_install_all_features )
+		if( $install_test_features )
 		{
 			echo_install_log( 'TEST FEATURE: Installing plugin "Google Maps"' );
 			install_plugin( 'google_maps_plugin' );
@@ -629,7 +629,7 @@ function install_basic_plugins( $old_db_version = 0 )
 
 	if( $old_db_version < 11000 )
 	{ // Upgrade to 5.0.0-alpha-4
-		if( $test_install_all_features )
+		if( $install_test_features )
 		{
 			$captcha_qstn_plugin_settings = array(
 					'questions' => T_('What is the color of the sky? blue|grey|gray|dark')."\r\n".
@@ -654,8 +654,8 @@ function install_basic_plugins( $old_db_version = 0 )
 		// files
 		install_plugin( 'html5_mediaelementjs_plugin' );
 		install_plugin( 'html5_videojs_plugin' );
-		install_plugin( 'watermark_plugin', $test_install_all_features );
-		if( $test_install_all_features )
+		install_plugin( 'watermark_plugin', $install_test_features );
+		if( $install_test_features )
 		{
 			echo_install_log( 'TEST FEATURE: Activating plugin "Watermark"' );
 		}
@@ -663,23 +663,23 @@ function install_basic_plugins( $old_db_version = 0 )
 		install_plugin( 'generic_ping_plugin' );
 		// rendering
 		install_plugin( 'escapecode_plugin' );
-		install_plugin( 'bbcode_plugin', $test_install_all_features );
-		if( $test_install_all_features )
+		install_plugin( 'bbcode_plugin', $install_test_features );
+		if( $install_test_features )
 		{
 			echo_install_log( 'TEST FEATURE: Activating plugin "BB code"' );
 		}
-		install_plugin( 'star_plugin', $test_install_all_features );
-		if( $test_install_all_features )
+		install_plugin( 'star_plugin', $install_test_features );
+		if( $install_test_features )
 		{
 			echo_install_log( 'TEST FEATURE: Activating plugin "Star renderer"' );
 		}
-		install_plugin( 'prism_plugin', $test_install_all_features );
-		if( $test_install_all_features )
+		install_plugin( 'prism_plugin', $install_test_features );
+		if( $install_test_features )
 		{
 			echo_install_log( 'TEST FEATURE: Activating plugin "Prism"' );
 		}
-		install_plugin( 'code_highlight_plugin', $test_install_all_features );
-		if( $test_install_all_features )
+		install_plugin( 'code_highlight_plugin', $install_test_features );
+		if( $install_test_features )
 		{
 			echo_install_log( 'TEST FEATURE: Activating plugin "Code highlight"' );
 		}
@@ -688,8 +688,8 @@ function install_basic_plugins( $old_db_version = 0 )
 		install_plugin( 'shortlinks_plugin' );
 		install_plugin( 'wikitables_plugin' );
 		install_plugin( 'markdown_plugin' );
-		install_plugin( 'infodots_plugin', $test_install_all_features );
-		if( $test_install_all_features )
+		install_plugin( 'infodots_plugin', $install_test_features );
+		if( $install_test_features )
 		{
 			echo_install_log( 'TEST FEATURE: Activating plugin "Info dots renderer"' );
 		}
@@ -708,8 +708,8 @@ function install_basic_plugins( $old_db_version = 0 )
 
 	if( $old_db_version < 11490 )
 	{ // Upgrade to 6.7.1-stable
-		install_plugin( 'adjust_headings_plugin', $test_install_all_features );
-		if( $test_install_all_features )
+		install_plugin( 'adjust_headings_plugin', $install_test_features );
+		if( $install_test_features )
 		{
 			echo_install_log( 'TEST FEATURE: Activating plugin "Adjust headings"' );
 		}
@@ -735,7 +735,7 @@ function install_plugin( $plugin, $activate = true, $settings = array() )
 
 	task_begin( 'Installing plugin: '.$plugin.'... ' );
 	$edit_Plugin = & $Plugins_admin->install( $plugin, 'broken' ); // "broken" by default, gets adjusted later
-	if( ! is_a( $edit_Plugin, 'Plugin' ) )
+	if( ! ( $edit_Plugin instanceof Plugin ) )
 	{ // Broken plugin
 		echo get_install_format_text( '<span class="text-danger"><evo:error>'.$edit_Plugin.'</evo:error></span><br />'."\n", 'br' );
 		return false;
@@ -1278,12 +1278,12 @@ function update_install_progress_bar()
  */
 function get_install_steps_count()
 {
-	global $config_test_install_all_features, $allow_evodb_reset;
+	global $allow_install_test_features, $allow_evodb_reset;
 
 	$steps = 0;
 
 	// After Deleting b2evolution tables:
-	if( $allow_evodb_reset >= 2 || ($config_test_install_all_features && $allow_evodb_reset >= 1) )
+	if( $allow_evodb_reset >= 2 || ( $allow_install_test_features && $allow_evodb_reset >= 1 ) )
 	{ // Allow to quick delete before new installation only when these two settings are enabled in config files
 		$delete_contents = param( 'delete_contents', 'integer', 0 );
 

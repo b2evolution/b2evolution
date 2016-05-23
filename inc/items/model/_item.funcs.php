@@ -39,10 +39,17 @@ function init_MainList( $items_nb_limit )
 
 		if( ! $preview )
 		{
-			if( $disp == 'page' || $disp == 'terms' )
+			if( $disp == 'page' )
 			{	// Get pages:
 				$MainList->set_default_filters( array(
 						'itemtype_usage' => 'page' // pages
+					) );
+			}
+
+			if( $disp == 'terms' )
+			{	// Allow all post types:
+				$MainList->set_default_filters( array(
+						'itemtype_usage' => 'page,special'
 					) );
 			}
 
@@ -305,14 +312,18 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 
 		// SECOND: If no Intro, try to find an Featured post:
 
-		if( $FeaturedList->result_num_rows == 0 && $restrict_disp != 'front' )
+		if( isset($Blog) )
+
+		if( $FeaturedList->result_num_rows == 0 && $restrict_disp != 'front'
+			&& isset($Blog) 
+			&& $Blog->get_setting('disp_featured_above_list') )
 		{ // No Intro page was found, try to find a featured post instead:
 
 			$FeaturedList->reset();
 
 			$FeaturedList->set_filters( array(
 					'coll_IDs' => $coll_IDs,
-					'featured' => 1,  // Featured posts only (TODO!)
+					'featured' => 1,  // Featured posts only
 					// Types will already be reset to defaults here
 				), false /* Do NOT memorize!! */ );
 
@@ -1473,7 +1484,7 @@ function attach_browse_tabs( $display_tabs3 = true )
 		)
 	);
 
-	if( $Blog->get_setting( 'use_workflow' ) )
+	if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 	{ // We want to use workflow properties for this blog:
 		$menu_entries['tracker'] = array(
 			'text' => T_('Workflow view'),
@@ -1630,9 +1641,6 @@ function get_item_type_usage_by_tab( $tab_name )
 {
 	switch( $tab_name )
 	{
-		case 'post':
-			$type_usages = array( 'post' );
-			break;
 		case 'page':
 			$type_usages = array( 'page' );
 			break;
@@ -1641,6 +1649,10 @@ function get_item_type_usage_by_tab( $tab_name )
 			break;
 		case 'intro':
 			$type_usages = array( 'intro-front', 'intro-main', 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all' );
+			break;
+		case 'post':
+		default:
+			$type_usages = array( 'post' );
 			break;
 	}
 
@@ -2075,6 +2087,7 @@ function echo_status_dropdown_button_js( $type = 'post' )
  */
 function echo_autocomplete_tags()
 {
+	global $restapi_url;
 ?>
 	<script type="text/javascript">
 	function init_autocomplete_tags( selector )
@@ -2086,21 +2099,22 @@ function echo_autocomplete_tags()
 			tags = tags.split( ',' );
 			for( var t in tags )
 			{
-				tags_json.push( { id: tags[t], title: tags[t] } );
+				tags_json.push( { id: tags[t], name: tags[t] } );
 			}
 		}
 
-		jQuery( selector ).tokenInput( '<?php echo get_samedomain_htsrv_url().'anon_async.php?action=get_tags' ?>',
+		jQuery( selector ).tokenInput( '<?php echo $restapi_url.'tags' ?>',
 		{
 			theme: 'facebook',
-			queryParam: 'term',
-			propertyToSearch: 'title',
-			tokenValue: 'title',
+			queryParam: 's',
+			propertyToSearch: 'name',
+			tokenValue: 'name',
 			preventDuplicates: true,
 			prePopulate: tags_json,
 			hintText: '<?php echo TS_('Type in a tag') ?>',
 			noResultsText: '<?php echo TS_('No results') ?>',
-			searchingText: '<?php echo TS_('Searching...') ?>'
+			searchingText: '<?php echo TS_('Searching...') ?>',
+			jsonContainer: 'tags',
 		} );
 	}
 
@@ -2684,7 +2698,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 	$CommentList->display_init();
 
 	$CommentList->display_if_empty( array(
-		'before'    => '<div class="bComment"><p>',
+		'before'    => '<div class="evo_comment"><p>',
 		'after'     => '</p></div>',
 		'msg_empty' => T_('No feedback for this post yet...'),
 	) );
@@ -2697,21 +2711,16 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 /**
  * Display a comment corresponding the given comment id
  *
- * @param int comment id
+ * @param object Comment object
  * @param string where to redirect after comment edit
  * @param boolean true to set the new redirect param, false otherwise
  * @param integer Comment index in the current list, FALSE - to don't display a comment index
  * @param boolean TRUE to display info for meta comment
  */
-function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false, $comment_index = NULL, $display_meta_title = false )
+function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $comment_index = NULL, $display_meta_title = false )
 {
 	global $current_User, $localtimenow;
 
-	$CommentCache = & get_CommentCache();
-	/**
-	* @var Comment
-	*/
-	$Comment = $CommentCache->get_by_ID( $comment_ID );
 	$Item = & $Comment->get_Item();
 	$Blog = & $Item->get_Blog();
 
@@ -2719,8 +2728,8 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false, 
 	$expiry_delay = $Item->get_setting( 'comment_expiry_delay' );
 	$is_expired = ( !empty( $expiry_delay ) && ( ( $localtimenow - mysql2timestamp( $Comment->get( 'date' ) ) ) > $expiry_delay ) );
 
-	echo '<a name="c'.$comment_ID.'"></a>';
-	echo '<div id="comment_'.$comment_ID.'" class="bComment bComment';
+	echo '<a name="c'.$Comment->ID.'"></a>';
+	echo '<div id="comment_'.$Comment->ID.'" class="panel '.( $Comment->ID > 0 ? 'panel-default' : 'panel-warning' ).' evo_comment evo_comment__status_';
 	// check if comment is expired
 	if( $is_expired )
 	{ // comment is expired
@@ -2739,7 +2748,7 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false, 
 	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) ||
 	    ( $Comment->is_meta() && $current_User->check_perm( 'meta_comment', 'view', false, $Item ) ) )
 	{ // User can moderate this comment OR Comment is meta and current user can view it
-		echo '<div class="bSmallHead">';
+		echo '<div class="panel-heading small">';
 		echo '<div>';
 
 		if( $Comment->is_meta() )
@@ -2761,7 +2770,7 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false, 
 
 		if( ! $Comment->is_meta() )
 		{	// Display permalink oly for normal comments:
-			echo '<div class="bSmallHeadRight">';
+			echo '<div class="pull-right">';
 			$Comment->permanent_link( array(
 					'before' => '',
 					'text'   => '#text#'
@@ -2790,7 +2799,7 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false, 
 			echo '<div style="padding-top:3px">';
 			if( $is_expired )
 			{
-				echo '<div class="bSmallHeadRight">';
+				echo '<div class="pull-right">';
 				echo '<span class="bExpired">'.T_('EXPIRED').'</span>';
 				echo '</div>';
 			}
@@ -2801,11 +2810,11 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false, 
 		echo '</div>';
 		echo '</div>';
 
-		echo '<div class="bCommentContent">';
+		echo '<div class="panel-body">';
 		if( ! $Comment->is_meta() )
 		{	// Display status banner only for normal comments:
 			$Comment->format_status( array(
-					'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+					'template' => '<div class="pull-right"><span class="note status_$status$"><span>$status_title$</span></span></div>',
 				) );
 		}
 		if( ! $Comment->is_meta() )
@@ -2834,52 +2843,55 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false, 
 		echo '</div>';
 		echo '</div>';
 
-		echo '<div class="CommentActionsArea">';
+		if( ! empty( $Comment->ID ) )
+		{	// Display action buttons panel only for existing Comment in DB:
+			echo '<div class="panel-footer">';
 
-		echo '<div class="floatleft">';
+			echo '<div class="pull-left">';
 
-		// Display edit button if current user has the rights:
-		$Comment->edit_link( ' ', ' ', get_icon( 'edit_button' ).' '.T_('Edit'), '#', button_class( 'text_primary' ).' w80px', '&amp;', $save_context, $redirect_to );
+			// Display edit button if current user has the rights:
+			$Comment->edit_link( ' ', ' ', get_icon( 'edit_button' ).' '.T_('Edit'), '#', button_class( 'text_primary' ).' w80px', '&amp;', $save_context, $redirect_to );
 
-		echo '<span class="'.button_class( 'group' ).'">';
-		// Display publish NOW button if current user has the rights:
-		$link_params = array(
-			'class'        => button_class( 'text' ),
-			'save_context' => $save_context,
-			'ajax_button'  => true,
-			'redirect_to'  => $redirect_to,
-		);
-		$Comment->raise_link( $link_params );
+			echo '<span class="'.button_class( 'group' ).'">';
+			// Display publish NOW button if current user has the rights:
+			$link_params = array(
+				'class'        => button_class( 'text' ),
+				'save_context' => $save_context,
+				'ajax_button'  => true,
+				'redirect_to'  => $redirect_to,
+			);
+			$Comment->raise_link( $link_params );
 
-		// Display deprecate button if current user has the rights:
-		$Comment->lower_link( $link_params );
+			// Display deprecate button if current user has the rights:
+			$Comment->lower_link( $link_params );
 
-		$next_status_in_row = $Comment->get_next_status( false );
-		if( $next_status_in_row && $next_status_in_row[0] != 'deprecated' )
-		{ // Display deprecate button if current user has the rights:
-			$Comment->deprecate_link( '', '', get_icon( 'move_down_grey', 'imgtag', array( 'title' => '' ) ), '#', button_class(), '&amp;', true, true );
+			$next_status_in_row = $Comment->get_next_status( false );
+			if( $next_status_in_row && $next_status_in_row[0] != 'deprecated' )
+			{ // Display deprecate button if current user has the rights:
+				$Comment->deprecate_link( '', '', get_icon( 'move_down_grey', 'imgtag', array( 'title' => '' ) ), '#', button_class(), '&amp;', true, true );
+			}
+
+			// Display delete button if current user has the rights:
+			$Comment->delete_link( '', '', '#', '#', button_class( 'text' ), false, '&amp;', $save_context, true, '#', $redirect_to );
+			echo '</span>';
+
+			echo '</div>';
+
+			if( ! $Comment->is_meta() )
+			{ // Display Spam Voting system
+				$Comment->vote_spam( '', '', '&amp;', $save_context, true );
+			}
+
+			echo '<div class="clearfix"></div>';
+			echo '</div>';
 		}
-
-		// Display delete button if current user has the rights:
-		$Comment->delete_link( '', '', '#', '#', button_class( 'text' ), false, '&amp;', $save_context, true, '#', $redirect_to );
-		echo '</span>';
-
-		echo '</div>';
-
-		if( ! $Comment->is_meta() )
-		{ // Display Spam Voting system
-			$Comment->vote_spam( '', '', '&amp;', $save_context, true );
-		}
-
-		echo '<div class="clear"></div>';
-		echo '</div>';
 	}
 	else
 	{	// No permissions to moderate of this comment, just preview
-		echo '<div class="bSmallHead">';
+		echo '<div class="panel-heading small">';
 		echo '<div>';
 
-		echo '<div class="bSmallHeadRight">';
+		echo '<div class="pull-right">';
 		echo T_('Visibility').': ';
 		echo '<span class="bStatus">';
 		$Comment->status();
@@ -2897,7 +2909,7 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false, 
 
 		if( $is_published )
 		{
-			echo '<div class="bCommentContent">';
+			echo '<div class="panel-body">';
 			echo '<div class="bCommentTitle">';
 			echo $Comment->get_title();
 			echo '</div>';
@@ -4179,7 +4191,7 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 	if( $display_status && is_logged_in() )
 	{ // Display status
 		$col .= $Item->get_format_status( array(
-				'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+				'template' => '<div class="pull-right"><span class="note status_$status$"><span>$status_title$</span></span></div>',
 			) );
 	}
 
@@ -4201,12 +4213,24 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 
 	if( $Item->Blog->get_setting( 'allow_comments' ) != 'never' )
 	{ // The current blog can have comments:
-		$nb_comments = generic_ctp_number( $Item->ID, 'feedback' );
+		$nb_comments = generic_ctp_number( $Item->ID, 'feedback', 'total' );
 		$comments_url = is_admin_page() ? $item_url : url_add_tail( $item_url, '#comments' );
-		$col .= '<a href="'.$comments_url.'" title="'.sprintf( T_('%d feedbacks'), $nb_comments ).'" class="">';
+		$col .= '<a href="'.$comments_url.'" title="'.sprintf( T_('%d feedbacks'), $nb_comments ).'">';
 		if( $nb_comments )
 		{
-			$col .= get_icon( 'comments' );
+			$comments_icon_params = array();
+			$comment_moderation_statuses = $Item->Blog->get_setting( 'moderation_statuses' );
+			if( ! empty( $comment_moderation_statuses ) )
+			{	// Get a count of comments awaiting moderation:
+				$nb_comments_moderation = generic_ctp_number( $Item->ID, 'feedback', explode( ',', $comment_moderation_statuses ) );
+				if( $nb_comments_moderation > 0 )
+				{
+					$comments_icon_params['style'] = 'color:#cc0099';
+					$comments_icon_params['title'] = T_('There are come comments awaiting moderation.');
+				}
+			}
+
+			$col .= get_icon( 'comments', 'imgtag', $comments_icon_params );
 		}
 		else
 		{
@@ -4222,7 +4246,7 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 		{	// If at least one meta comment exists
 			$item_Blog = & $Item->get_Blog();
 			$col .= '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$item_Blog->ID.'&amp;p='.$Item->ID.'&amp;comment_type=meta#comments">'
-					.get_icon( 'comments', 'imgtag', array( 'style' => 'color:#F00' ) )
+					.get_icon( 'comments', 'imgtag', array( 'style' => 'color:#F00', 'title' => T_('Meta comments') ) )
 				.'</a> ';
 		}
 	}

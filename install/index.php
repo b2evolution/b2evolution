@@ -723,7 +723,7 @@ switch( $action )
 			<h2><?php echo T_('b2evolution is already installed') ?></h2>
 
 		<?php
-		if( $allow_evodb_reset >= 2 || ($test_install_all_features && $allow_evodb_reset >= 1) )
+		if( $allow_evodb_reset >= 2 || ( $allow_install_test_features && $allow_evodb_reset >= 1 ) )
 		{ // We can allow to continue installation with deleting DB
 		?>
 			<input type="hidden" name="action" value="menu-options" />
@@ -816,12 +816,12 @@ switch( $action )
 				</div>
 			</div>
 			<?php
-			if( $test_install_all_features )
+			if( $allow_install_test_features )
 			{ // Checkbox to install all features
 			?>
 				<div class="checkbox" style="margin-top:15px">
 					<label>
-						<input accept=""type="checkbox" name="install_all_features" id="install_all_features" value="1" />
+						<input accept=""type="checkbox" name="install_test_features" id="install_test_features" value="1" />
 						<?php echo T_('Also install all test features.')?>
 					</label>
 				</div>
@@ -837,9 +837,9 @@ switch( $action )
 			<p class="evo_form__install_buttons">
 			
 				<?php
-				if( ( ($allow_evodb_reset >= 2) 
-					 	|| ($test_install_all_features && $allow_evodb_reset >= 1) ) 
-					&& $old_db_version = get_db_version() )
+				if( ( ( $allow_evodb_reset >= 2 )
+				      || ( $allow_install_test_features && $allow_evodb_reset >= 1 ) )
+				    && $old_db_version = get_db_version() )
 				{ // We can allow to delete DB before installation
 				?>
 					<input type="hidden" name="delete_contents" value="1" />
@@ -912,14 +912,13 @@ switch( $action )
 
 		$create_sample_contents = param( 'create_sample_contents', 'string', '' );
 
-		$config_test_install_all_features = $test_install_all_features;
-		if( $test_install_all_features )
-		{ // Allow to use $test_install_all_features from request only when it is enabled in config
-			$test_install_all_features = param( 'install_all_features', 'boolean', false );
+		if( $allow_install_test_features )
+		{	// Allow to use $allow_install_test_features from request only when it is enabled in config:
+			$install_test_features = param( 'install_test_features', 'boolean', false );
 		}
 		else
 		{
-			$test_install_all_features = false;
+			$install_test_features = false;
 		}
 
 		// fp> TODO: this test should probably be made more generic and applied to upgrade too.
@@ -944,7 +943,7 @@ switch( $action )
 			echo $basic_config_file_result_messages;
 		}
 
-		if( $allow_evodb_reset >= 2 || ($config_test_install_all_features && $allow_evodb_reset >=1) )
+		if( $allow_evodb_reset >= 2 || ( $allow_install_test_features && $allow_evodb_reset >= 1 ) )
 		{ // Allow to quick delete before new installation only when these two settings are enabled in config files
 			$delete_contents = param( 'delete_contents', 'integer', 0 );
 
@@ -952,7 +951,7 @@ switch( $action )
 			{ // A quick deletion is requested before new installation
 				require_once( dirname(__FILE__). '/_functions_delete.php' );
 
-				echo get_install_format_text( '<h2>'.T_('Deleting b2evolution tables from the datatase...').'</h2>', 'h2' );
+				echo get_install_format_text( '<h2>'.T_('Deleting b2evolution tables from the database...').'</h2>', 'h2' );
 				evo_flush();
 
 				// Uninstall b2evolution: Delete DB & Cache files
@@ -1109,7 +1108,7 @@ switch( $action )
 			start_install_progress_bar( T_('Deletion in progress') );
 		}
 
-		echo get_install_format_text( '<h2>'.T_('Deleting b2evolution tables from the datatase...').'</h2>', 'h2' );
+		echo get_install_format_text( '<h2>'.T_('Deleting b2evolution tables from the database...').'</h2>', 'h2' );
 		evo_flush();
 
 		if( $allow_evodb_reset < 1 )

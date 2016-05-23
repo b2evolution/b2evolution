@@ -302,7 +302,7 @@ class Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		// NOTE: the code below is just to handle stuff that has been deprecated since b2evolution 1.9. 
+		// NOTE: the code below is just to handle stuff that has been deprecated since b2evolution 1.9.
 		// You DON'T NEED to include this, if you override this method.
 
 		if( is_null($this->short_desc) )
@@ -574,38 +574,66 @@ class Plugin
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
-		if( $this->group != 'rendering' )
+		$default_settings = array();
+
+		// Set default collection plugin settings depending on group:
+		switch( $this->group )
 		{
-			return array();
+			case 'rendering':
+				// Renderer plugins:
+				$render_note = '';
+				if( empty( $this->code ) )
+				{
+					$render_note .= T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
+				}
+				$admin_Plugins = & get_Plugins_admin();
+				$rendering_options = $admin_Plugins->get_apply_rendering_values( true );
+				$default_post_rendering = ( isset( $params['default_post_rendering'] ) && in_array( $params['default_post_rendering'], $rendering_options ) ) ? $params['default_post_rendering'] : 'opt-out';
+				$default_comment_rendering = ( isset( $params['default_comment_rendering'] ) && in_array( $params['default_comment_rendering'], $rendering_options ) ) ? $params['default_comment_rendering'] : 'never';
+				$default_settings = array(
+					'coll_apply_rendering' => array(
+							'label'        => T_('Apply rendering to posts'),
+							'type'         => 'select',
+							'options'      => $rendering_options,
+							'defaultvalue' => $default_post_rendering,
+							'note'         => $render_note,
+						),
+					'coll_apply_comment_rendering' => array(
+							'label'        => T_('Apply rendering to comments'),
+							'type'         => 'select',
+							'options'      => $rendering_options,
+							'defaultvalue' => $default_comment_rendering,
+							'note'         => $render_note,
+						),
+					);
+				break;
+
+			case 'editor':
+				// Editor plugins:
+				$default_post_using = isset( $params['default_post_using'] ) ? $params['default_post_using'] : 1;
+				if( $default_post_using != 'disabled' )
+				{
+					$default_settings['coll_use_for_posts'] = array(
+							'label'        => T_('Use for posts'),
+							'type'         => 'checkbox',
+							'defaultvalue' => $default_post_using,
+							'note'         => '',
+						);
+				}
+				$default_comment_using = isset( $params['default_comment_using'] ) ? $params['default_comment_using'] : 1;
+				if( $default_comment_using != 'disabled' )
+				{
+					$default_settings['coll_use_for_comments'] = array(
+							'label'        => T_('Use for comments'),
+							'type'         => 'checkbox',
+							'defaultvalue' => $default_comment_using,
+							'note'         => '',
+						);
+				}
+				break;
 		}
 
-		$render_note = '';
-		if( empty( $this->code ) )
-		{
-			$render_note .= T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
-		}
-		$admin_Plugins = & get_Plugins_admin();
-		$rendering_options = $admin_Plugins->get_apply_rendering_values( true );
-		$default_post_rendering = ( isset( $params['default_post_rendering'] ) && in_array( $params['default_post_rendering'], $rendering_options ) ) ? $params['default_post_rendering'] : 'opt-out';
-		$default_comment_rendering = ( isset( $params['default_comment_rendering'] ) && in_array( $params['default_comment_rendering'], $rendering_options ) ) ? $params['default_comment_rendering'] : 'never';
-		$r = array(
-			'coll_apply_rendering' => array(
-					'label' => T_('Apply rendering to posts'),
-					'type' => 'select',
-					'options' => $rendering_options,
-					'defaultvalue' => $default_post_rendering,
-					'note' => $render_note,
-				),
-			'coll_apply_comment_rendering' => array(
-					'label' => T_('Apply rendering to comments'),
-					'type' => 'select',
-					'options' => $rendering_options,
-					'defaultvalue' => $default_comment_rendering,
-					'note' => $render_note,
-				),
-			);
-
-		return array_merge( $r, $this->get_custom_setting_definitions( $params ) );
+		return array_merge( $default_settings, $this->get_custom_setting_definitions( $params ) );
 	}
 
 
@@ -685,15 +713,46 @@ class Plugin
 	}
 
 
-  /**
-   * Get definitions for widget specific editable params
-   *
+	/**
+	 * Get definitions for widget specific editable params
+	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param array Local params like 'for_editing' => true
 	 */
 	function get_widget_param_definitions( $params )
 	{
-		return array();
+		if( ! is_array( $params ) )
+		{	// Must be array:
+			$params = array();
+		}
+
+		// Load new widget to get default param definitions:
+		load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
+		$ComponentWidget = new ComponentWidget();
+
+		return array_merge( $ComponentWidget->get_param_definitions( array() ), $params );
+	}
+
+
+	/**
+	 * Get keys for block/widget caching
+	 *
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @param integer Widget ID
+	 * @return array of keys this widget depends on
+	 */
+	function get_widget_cache_keys( $widget_ID = 0 )
+	{
+		// Load new widget to get default cache keys:
+		load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
+		$ComponentWidget = new ComponentWidget();
+
+		$widget_cache_keys = $ComponentWidget->get_cache_keys();
+
+		$widget_cache_keys['wi_ID'] = $widget_ID;
+
+		return $widget_cache_keys;
 	}
 
 
@@ -892,7 +951,7 @@ class Plugin
 	/**
 	 * Event handler: Called when displaying editor buttons (in back-office).
 	 *
-	 * This method, if implemented, should output the buttons (probably as html INPUT elements) 
+	 * This method, if implemented, should output the buttons (probably as html INPUT elements)
 	 * and return true, if button(s) have been displayed.
 	 *
 	 * You should provide an unique html ID with each button.

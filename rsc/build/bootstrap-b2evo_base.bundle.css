@@ -1367,6 +1367,9 @@ form div.avatartag a {
 .jcrop-keymgr {
   visibility: hidden;
 }
+.evo_label_inline {
+  margin-left: 2ex;
+}
 div.right_icons,
 div.fieldset_icons {
   text-align: right;
@@ -1602,6 +1605,13 @@ div.average_rating .star_rating {
 .rating_recap div {
   float: left;
   padding-right: 10px;
+}
+.videojs_block .vjs-default-skin .vjs-big-play-button {
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
 }
 li[class^="listnav_distance_"],
 li[class*=" listnav_distance_"] {
@@ -2424,6 +2434,19 @@ input.btn-lg {
   padding: 8px;
   vertical-align: top;
 }
+.evo_content_block table.evo_poll__table {
+  margin: 1em 0;
+}
+.evo_content_block table.evo_poll__table th {
+  border: 0;
+  padding: 2px 10px 2px 0;
+  background-color: #eee;
+}
+.evo_content_block table.evo_poll__table td {
+  border: 0;
+  padding: 2px 10px 2px 0;
+  vertical-align: top;
+}
 .evo_form__comment .panel {
   margin: 0;
   border: none;
@@ -2552,6 +2575,9 @@ input.btn-lg {
 }
 .evo_poll__table .evo_poll__title {
   white-space: nowrap;
+}
+.evo_poll__table .evo_poll_percentage {
+  max-width: 50px;
 }
 .evo_container__sidebar .evo_poll__title {
   white-space: normal;
@@ -2691,6 +2717,10 @@ a.btn.action_icon.hoverlink {
 }
 .form-horizontal .info_full .controls-info {
   margin: 0 5px;
+}
+.form-horizontal .info_full_height .form-control-static {
+  padding-top: 0;
+  padding-bottom: 0;
 }
 .form-horizontal .controls {
   padding-left: 0;

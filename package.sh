@@ -6,6 +6,10 @@ rm -f package.json
 rm -f readme.md
 rm -f readme.template.html
 rm -f .bower.json
+echo Removing test skins
+rm -rf skins/clean1_skin
+rm -rf skins/horizon_blog_skin
+rm -rf skins/horizon_main_skin
 echo Removing myself now
 rm -f cleanup.sh
 echo Stepping out
