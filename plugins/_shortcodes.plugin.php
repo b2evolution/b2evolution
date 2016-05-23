@@ -37,6 +37,20 @@ class shortcodes_plugin extends Plugin
 
 
 	/**
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_coll_setting_definitions( & $params )
+	{
+		$default_params = array_merge( $params, array( 'default_comment_using' => 'disabled' ) );
+
+		return parent::get_coll_setting_definitions( $default_params );
+	}
+
+
+	/**
 	 * Event handler: Called when displaying editor toolbars on post/item form.
 	 *
 	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
@@ -56,8 +70,17 @@ class shortcodes_plugin extends Plugin
 			return false;
 		}
 
-		if( empty( $params['Item'] ) || $params['Item']->is_intro() || ! $params['Item']->get_type_setting( 'allow_breaks' ) )
+		$Item = & $params['Item'];
+
+		if( empty( $Item ) || $Item->is_intro() || ! $Item->get_type_setting( 'allow_breaks' ) )
 		{	// Teaser and page breaks are not allowed for current item type and for all intro items:
+			return false;
+		}
+
+		$item_Blog = & $Item->get_Blog();
+
+		if( ! $this->get_coll_setting( 'coll_use_for_posts', $item_Blog ) )
+		{	// This plugin is disabled to use for posts:
 			return false;
 		}
 
