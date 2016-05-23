@@ -39,21 +39,26 @@ function init_MainList( $items_nb_limit )
 
 		if( ! $preview )
 		{
-			if( $disp == 'page' )
-			{	// Get pages:
-				$MainList->set_default_filters( array(
-						'itemtype_usage' => 'page' // pages
-					) );
-			}
+			switch( $disp )
+			{
+				case 'page':
+					$MainList->set_default_filters( array(
+							'itemtype_usage' => 'page' // Only pages
+						) );
+					break;
 
-			if( $disp == 'terms' )
-			{	// Allow all post types:
-				$MainList->set_default_filters( array(
-						'itemtype_usage' => 'page,special'
-					) );
-			}
+				case 'terms':
+					$MainList->set_default_filters( array(
+							'itemtype_usage' => 'page,special' // Allow all post types
+						) );
+					break;
 
-			// else: we are in posts mode
+				case 'flagged':
+					$MainList->set_default_filters( array(
+							'flagged' => 1
+						) );
+					break;
+			}
 
 			// pre_dump( $MainList->default_filters );
 			$MainList->load_from_Request( false );

@@ -89,7 +89,16 @@ function skin_init( $disp )
 		case 'terms':
 		case 'download':
 		case 'feedback-popup':
+		case 'flagged':
 			// We need to load posts for this display:
+
+			if( $disp == 'flagged' && ! is_logged_in() )
+			{	// Forbid access to flagged content for not logged in users:
+				global $disp;
+				$disp = '403';
+				$Messages->add( T_('You must log in before you can see your flagged content.'), 'error' );
+				break;
+			}
 
 			if( $disp == 'terms' )
 			{	// Initialize the redirect param to know what page redirect after accepting of terms:
@@ -1503,9 +1512,15 @@ var downloadInterval = setInterval( function()
 
 	$Debuglog->add('skin_init: $disp='.$disp. ' / $disp_detail='.$disp_detail.' / $seo_page_type='.$seo_page_type, 'skins' );
 
-	// Make this switch block special only for 404 page
+	// Make this switch block special only for 403 and 404 pages:
 	switch( $disp )
 	{
+		case '403':
+			// We have a 403 forbidden content error:
+			header_http_response( '403 Forbidden' );
+			$robots_index = false;
+			break;
+
 		case '404':
 			// We have a 404 unresolved content error
 			// How do we want do deal with it?
@@ -1713,6 +1728,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_access_requires_login' => '_access_requires_login.disp.php',
 				'disp_tags'           => '_tags.disp.php',
 				'disp_terms'          => '_terms.disp.php',
+				'disp_flagged'        => '_flagged.disp.php',
 			);
 
 		// Add plugin disp handlers:
