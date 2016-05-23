@@ -178,6 +178,16 @@ class coll_item_list_Widget extends ComponentWidget
 					'size' => 4,
 					'defaultvalue' => 10,
 				),
+				'disp_cat' => array(
+					'label' => T_('Category'),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'no',   T_('No display') ),
+							array( 'main', T_('Display main category') ),
+							array( 'all',  T_('Display all categories') ) ),
+					'defaultvalue' => 'no',
+				),
 				'disp_title' => array(
 					'label' => T_( 'Titles' ),
 					'note' => T_( 'Display title.' ),
@@ -346,6 +356,9 @@ class coll_item_list_Widget extends ComponentWidget
 				'item_first_image_before'      => '<div class="item_first_image">',
 				'item_first_image_after'       => '</div>',
 				'item_first_image_placeholder' => '<div class="item_first_image_placeholder"><a href="$item_permaurl$"></a></div>',
+				'item_categories_before'       => '<div class="item_categories">',
+				'item_categories_after'        => ': </div>',
+				'item_categories_separator'    => ', ',
 				'item_title_before'            => '<div class="item_title">',
 				'item_title_after'             => '</div>',
 				'item_title_single_before'     => '',
@@ -475,6 +488,7 @@ class coll_item_list_Widget extends ComponentWidget
 
 		// Check if the widget displays only single title
 		$this->disp_params['disp_only_title'] = ! (
+				( $this->disp_params['disp_cat'] != 'no' ) || // display categories
 				( $this->disp_params['attached_pics'] != 'none' ) || // display first and other images
 				( $this->disp_params['disp_excerpt'] ) || // display excerpt
 				( $this->disp_params['disp_teaser'] ) // display teaser
@@ -707,6 +721,19 @@ class coll_item_list_Widget extends ComponentWidget
 					'limit'       => 1,
 				), $cover_image_params ),
 				$content_is_displayed );
+		}
+
+		if( $this->disp_params['disp_cat'] != 'no' )
+		{	// Display categories:
+			$disp_Item->categories( array(
+					'before'           => $this->disp_params['item_categories_before'],
+					'after'            => $this->disp_params['item_categories_after'],
+					'separator'        => $this->disp_params['item_categories_separator'],
+					'include_main'     => true,
+					'include_other'    => ( $this->disp_params['disp_cat'] == 'all' ),
+					'include_external' => ( $this->disp_params['disp_cat'] == 'all' ),
+					'link_categories'  => true,
+				) );
 		}
 
 		if( $this->disp_params['disp_title'] )
