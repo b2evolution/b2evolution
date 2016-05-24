@@ -533,6 +533,9 @@ switch( $tab )
 		$AdminUI->breadcrumbpath_add( T_('Site Dashboard'), $admin_url.'?ctrl=dashboard' );
 
 		$AdminUI->set_page_manual_link( 'collection-group' );
+
+		// Init JS to autcomplete the user logins:
+		init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 		break;
 }
 

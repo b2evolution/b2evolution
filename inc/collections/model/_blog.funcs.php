@@ -1496,22 +1496,38 @@ function blogs_all_results_block( $params = array() )
 	if( is_ajax_content() )
 	{
 		$order_action = param( 'order_action', 'string' );
+		$new_value = intval( param( 'new_value', 'string', 0 ) );
+		$order_data = param( 'order_data', 'string' );
 
 		if( $order_action == 'update' )
-		{ // Update an order to new value
-			$new_value = (int)param( 'new_value', 'string', 0 );
-			$order_data = param( 'order_data', 'string' );
-			$order_obj_ID = (int)str_replace( 'order-blog-', '', $order_data );
+		{	// Update colleciton order to new value:
+			$order_obj_ID = intval( str_replace( 'order-blog-', '', $order_data ) );
 			if( $order_obj_ID > 0 )
-			{ // Update blog order
+			{	// Update collection order if ID is valid integer:
 				$BlogCache = & get_BlogCache();
 				if( $updated_Blog = & $BlogCache->get_by_ID( $order_obj_ID, false ) )
 				{
 					if( $current_User->check_perm( 'blog_properties', 'edit', false, $updated_Blog->ID ) )
-					{ // Check permission to edit this Blog
+					{	// If current user can edit the collection:
 						$updated_Blog->set( 'order', $new_value );
 						$updated_Blog->dbupdate();
 						$BlogCache->clear();
+					}
+				}
+			}
+		}
+		elseif( $order_action == 'update_group' )
+		{	// Update colleciton group order to new value:
+			$order_obj_ID = intval( str_replace( 'order-collgroup-', '', $order_data ) );
+			if( $order_obj_ID > 0 )
+			{	// Update collection order if ID is valid integer:
+				$CollGroupCache = & get_CollGroupCache();
+				if( $updated_CollGroup = & $CollGroupCache->get_by_ID( $order_obj_ID, false ) )
+				{
+					if( $current_User->check_perm( 'blogs', 'create' ) )
+					{	// If current user can edit the collection groups:
+						$updated_CollGroup->set( 'order', $new_value );
+						$updated_CollGroup->dbupdate();
 					}
 				}
 			}
@@ -1523,7 +1539,7 @@ function blogs_all_results_block( $params = array() )
 	$SQL->FROM( 'T_blogs INNER JOIN T_users ON blog_owner_user_ID = user_ID' );
 	if( $params['grouped'] )
 	{	// Get collection groups:
-		$SQL->SELECT_add( ', cgrp_ID, cgrp_name, cgrp_order' );
+		$SQL->SELECT_add( ', cgrp_ID, cgrp_name, cgrp_order, cgrp_owner_user_ID' );
 		$SQL->FROM_add( 'LEFT JOIN T_coll_groups ON cgrp_ID = blog_cgrp_ID' );
 		$SQL->GROUP_BY( 'blog_ID, cgrp_ID' );
 		$SQL->ORDER_BY( 'cgrp_order, cgrp_name' );
@@ -1610,8 +1626,10 @@ function blogs_results( & $blogs_Results, $params = array() )
 			'grouped'          => false,
 		), $params );
 
+	$cols_num = 0;
+
 	if( $params['display_id'] )
-	{	// Display ID column
+	{	// Display ID column:
 		$blogs_Results->cols[] = array(
 				'th' => T_('ID'),
 				'order' => 'blog_ID',
@@ -1619,10 +1637,11 @@ function blogs_results( & $blogs_Results, $params = array() )
 				'td_class' => 'shrinkwrap',
 				'td' => '$blog_ID$',
 			);
+		$cols_num++;
 	}
 
 	if( $params['display_fav'] )
-	{ // Display Favorite column
+	{	// Display Favorite column:
 		$blogs_Results->cols[] = array(
 				'th' => T_('Fav'),
 				'th_title' => T_('Favorite'),
@@ -1631,19 +1650,21 @@ function blogs_results( & $blogs_Results, $params = array() )
 				'td_class' => 'shrinkwrap',
 				'td' => '%blog_row_setting( #blog_ID#, "fav", #blog_favorite# )%',
 			);
+		$cols_num++;
 	}
 
 	if( $params['display_name'] )
-	{ // Display Name column
+	{	// Display Name column:
 		$blogs_Results->cols[] = array(
 				'th' => T_('Name'),
 				'order' => 'blog_shortname',
 				'td' => '<strong>%blog_row_name( #blog_shortname#, #blog_ID# )%</strong>',
 			);
+		$cols_num++;
 	}
 
 	if( $params['display_type'] )
-	{ // Display Type column
+	{	// Display Type column:
 		$blogs_Results->cols[] = array(
 				'th' => T_('Type'),
 				'order' => 'blog_type',
@@ -1651,36 +1672,63 @@ function blogs_results( & $blogs_Results, $params = array() )
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
 			);
+		$cols_num++;
 	}
 
 	if( $params['display_fullname'] )
-	{ // Display Full Name column
+	{	// Display Full Name column:
 		$blogs_Results->cols[] = array(
 				'th' => T_('Full Name'),
 				'order' => 'blog_name',
 				'td' => '%blog_row_fullname( #blog_name#, #blog_ID# )%',
 			);
+		$cols_num++;
+	}
+
+	if( $params['grouped'] )
+	{	// Display group rows:
+		global $current_User, $admin_url;
+
+		$blogs_Results->group_by = 'cgrp_ID';
+
+		$blogs_Results->grp_cols[] = array(
+				'td_colspan' => $cols_num,
+				'td' => '<b>'.(
+						$current_User->check_perm( 'blogs', 'create' )
+						? '<a href="'.$admin_url.'?ctrl=collections&amp;action=edit_collgroup&amp;cgrp_ID=$cgrp_ID$">$cgrp_name$</a>'
+						: '$cgrp_name$' ).
+					'</b>'
+			);
 	}
 
 	if( $params['display_owner'] )
-	{ // Display Owner column
+	{	// Display Owner column:
 		$blogs_Results->cols[] = array(
 				'th' => T_('Owner'),
 				'order' => 'user_login',
 				'td' => '%get_user_identity_link( #user_login# )%',
 			);
+		$cols_num++;
+		if( $params['grouped'] )
+		{	// Group owner:
+			$blogs_Results->grp_cols[] = array(
+					'td' => '%get_user_identity_link( "", #cgrp_owner_user_ID# )%',
+				);
+			$cols_num = 0;
+		}
 	}
 
 	if( $params['display_url'] )
-	{ // Display Blog URL column
+	{	// Display Blog URL column:
 		$blogs_Results->cols[] = array(
 				'th' => T_('Blog URL'),
 				'td' => '<a href="@get(\'url\')@">@get(\'url\')@</a>',
 			);
+		$cols_num++;
 	}
 
 	if( $params['display_locale'] )
-	{ // Display Locale column
+	{	// Display Locale column:
 		$blogs_Results->cols[] = array(
 				'th' => T_('Locale'),
 				'order' => 'blog_locale',
@@ -1688,10 +1736,11 @@ function blogs_results( & $blogs_Results, $params = array() )
 				'td_class' => 'shrinkwrap',
 				'td' => '%blog_row_locale( #blog_locale#, #blog_ID# )%',
 			);
+		$cols_num++;
 	}
 
 	if( $params['display_plist'] )
-	{ // Display Listed column
+	{	// Display Listed column:
 		$blogs_Results->cols[] = array(
 				'th' => T_('Listed'),
 				'th_title' => T_('Public List'),
@@ -1700,10 +1749,11 @@ function blogs_results( & $blogs_Results, $params = array() )
 				'td_class' => 'shrinkwrap',
 				'td' => '%blog_row_listed( #blog_in_bloglist#, #blog_ID# )%',
 			);
+		$cols_num++;
 	}
 
 	if( $params['display_order'] )
-	{ // Display Order column
+	{	// Display Order column:
 		$blogs_Results->cols[] = array(
 				'th' => T_('Order'),
 				'order' => 'blog_order',
@@ -1711,47 +1761,51 @@ function blogs_results( & $blogs_Results, $params = array() )
 				'td_class' => 'shrinkwrap',
 				'td' => '%blog_row_order( #blog_ID#, #blog_order# )%',
 			);
+		$cols_num++;
+		if( $params['grouped'] )
+		{	// Group order:
+			$blogs_Results->grp_cols[] = array(
+					'td_colspan' => $cols_num - 1,
+					'td' => ''
+				);
+			$blogs_Results->grp_cols[] = array(
+					'td_class' => 'shrinkwrap',
+					'td' => '%blog_row_group_order( #cgrp_ID#, #cgrp_order# )%',
+				);
+			$cols_num = 0;
+		}
 	}
 
 	if( $params['display_caching'] )
-	{ // Display Order column
+	{	// Display Order column:
 		$blogs_Results->cols[] = array(
 				'th' => T_('Caching'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
 				'td' => '%blog_row_caching( {Obj} )%',
 			);
+		$cols_num++;
 	}
 
 	if( $params['display_actions'] )
-	{ // Display Actions column
+	{	// Display Actions column:
 		$blogs_Results->cols[] = array(
 				'th' => T_('Actions'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
 				'td' => '%blog_row_actions( #blog_ID# )%',
 			);
-	}
-
-	if( $params['grouped'] )
-	{ // Display group rows:
-		global $current_User, $admin_url;
-
-		$blogs_Results->group_by = 'cgrp_ID';
-
-		$blogs_Results->grp_cols[] = array(
-				'td_class' => 'firstcol lastcol',
-				'td_colspan' => -1, // nb_colds - 1
-				'td' => '<b>'.(
-						$current_User->check_perm( 'blogs', 'create' )
-						? '<a href="'.$admin_url.'?ctrl=collections&amp;action=edit_collgroup&amp;cgrp_ID=$cgrp_ID$">$cgrp_name$</a>'
-						: '$cgrp_name$' ).
-					'</b>'
-			);
-		$blogs_Results->grp_cols[] = array(
-				'td_class' => 'shrinkwrap',
-				'td' => '%blog_row_grp_actions( {row} )%',
-			);
+		if( $params['grouped'] )
+		{	// Group actions:
+			$blogs_Results->grp_cols[] = array(
+					'td_colspan' => $cols_num,
+					'td' => ''
+				);
+			$blogs_Results->grp_cols[] = array(
+					'td_class' => 'shrinkwrap',
+					'td' => '%blog_row_grp_actions( {row} )%',
+				);
+		}
 	}
 }
 
@@ -1931,6 +1985,33 @@ function blog_row_order( $blog_ID, $blog_order )
 		$r = $blog_order;
 	}
 	return $r;
+}
+
+
+/**
+ * Get a collection group order with link to edit
+ *
+ * @param integer Collection group ID
+ * @param integer Collection group order
+ * @return string Link or Text
+ */
+function blog_row_group_order( $cgrp_ID, $cgrp_order )
+{
+	global $current_User, $admin_url;
+
+	if( $current_User->check_perm( 'blogs', 'create' ) )
+	{	// Only if current user has a permission to edit collection groups:
+		$edit_url = $admin_url.'?ctrl=collections&amp;action=edit_collgroup&amp;cgrp_ID='.$cgrp_ID;
+		$r = '<a href="'.$edit_url.'" id="order-collgroup-'.$cgrp_ID.'" style="display:block;">';
+		$r .= $cgrp_order;
+		$r .= '</a>';
+	}
+	else
+	{
+		$r = $cgrp_order;
+	}
+
+	return '<b>'.$r.'</b>';
 }
 
 

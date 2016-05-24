@@ -79,9 +79,10 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_coll_groups' => array(
 		'Creating collection groups table',
 		"CREATE TABLE T_coll_groups (
-			cgrp_ID        INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-			cgrp_name      VARCHAR(255) NOT NULL,
-			cgrp_order     INT(11) UNSIGNED NOT NULL,
+			cgrp_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			cgrp_name          VARCHAR(255) NOT NULL,
+			cgrp_order         INT(11) UNSIGNED NOT NULL,
+			cgrp_owner_user_ID INT(11) UNSIGNED NOT NULL default 1,
 			PRIMARY KEY ( cgrp_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 

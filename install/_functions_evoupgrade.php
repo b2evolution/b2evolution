@@ -7499,9 +7499,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 11780, 'Creating collection groups table...' ) )
 	{	// part of 6.7.3-stable
 		db_create_table( 'T_coll_groups', '
-				cgrp_ID        INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-				cgrp_name      VARCHAR(255) NOT NULL,
-				cgrp_order     INT(11) UNSIGNED NOT NULL,
+				cgrp_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+				cgrp_name          VARCHAR(255) NOT NULL,
+				cgrp_order         INT(11) UNSIGNED NOT NULL,
+				cgrp_owner_user_ID INT(11) UNSIGNED NOT NULL default 1,
 				PRIMARY KEY ( cgrp_ID )' );
 		upg_task_end();
 	}

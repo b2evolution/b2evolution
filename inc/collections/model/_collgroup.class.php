@@ -23,6 +23,8 @@ class CollGroup extends DataObject
 {
 	var $name = '';
 	var $order = '';
+	var $owner_user_ID = 0;
+	var $owner_User = NULL;
 
 	/**
 	 * Constructor
@@ -36,9 +38,15 @@ class CollGroup extends DataObject
 
 		if( $db_row != NULL )
 		{
-			$this->ID    = $db_row->cgrp_ID;
-			$this->name  = $db_row->cgrp_name;
-			$this->order = $db_row->cgrp_order;
+			$this->ID            = $db_row->cgrp_ID;
+			$this->name          = $db_row->cgrp_name;
+			$this->order         = $db_row->cgrp_order;
+			$this->owner_user_ID = $db_row->cgrp_owner_user_ID;
+		}
+		else
+		{
+			global $current_User;
+			$this->owner_user_ID = $current_User->ID;
 		}
 	}
 
@@ -63,11 +71,25 @@ class CollGroup extends DataObject
 	 */
 	function load_from_Request()
 	{
-		// Name
+		// Name:
 		param_string_not_empty( 'cgrp_name', T_('Please enter a group name.') );
 		$this->set_from_Request( 'name' );
 
-		// Order
+		// Owner:
+		$cgrp_owner_login = param( 'cgrp_owner_login', 'string', '' );
+		$UserCache = & get_UserCache();
+		$owner_User = & $UserCache->get_by_login( $cgrp_owner_login );
+		if( empty( $owner_User ) )
+		{
+			param_error( 'owner_login', sprintf( T_('User &laquo;%s&raquo; does not exist!'), $cgrp_owner_login ) );
+		}
+		else
+		{
+			$this->set( 'owner_user_ID', $owner_User->ID );
+			$this->owner_User = & $owner_User;
+		}
+
+		// Order:
 		if( param( 'cgrp_order', 'integer' ) !== 0 ) // Allow zero value
 		{
 			param_check_not_empty( 'cgrp_order', T_('Please enter an order number.') );
@@ -86,6 +108,23 @@ class CollGroup extends DataObject
 	function get_name()
 	{
 		return $this->name;
+	}
+
+
+	/**
+	 * Get owner User
+	 *
+	 * @return User
+	 */
+	function & get_owner_User()
+	{
+		if( ! isset( $this->owner_User ) )
+		{
+			$UserCache = & get_UserCache();
+			$this->owner_User = & $UserCache->get_by_ID( $this->owner_user_ID );
+		}
+
+		return $this->owner_User;
 	}
 }
 ?>

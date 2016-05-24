@@ -41,6 +41,9 @@ $Form->begin_form( 'fform', $creating ?  T_('New collection group') : T_('Collec
 
 	$Form->text_input( 'cgrp_name', $edited_CollGroup->get( 'name' ), 50, T_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
 
+	$owner_User = & $edited_CollGroup->get_owner_User();
+	$Form->username( 'cgrp_owner_login', $owner_User, T_('Owner'), T_('Login of this collection group\'s owner.'), '', array( 'required' => true ) );
+
 	$Form->text_input( 'cgrp_order', $edited_CollGroup->get( 'order' ), 5, T_('Order number'), '', array( 'maxlength' => 11, 'required' => true ) );
 
 if( $creating )
