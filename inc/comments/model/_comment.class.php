@@ -1645,14 +1645,14 @@ class Comment extends DataObject
 		$params = array_merge( array(
 				'title_spam'          => T_('Cast a spam vote!'),
 				'title_spam_voted'    => T_('You sent a spam vote.'),
-				'title_notsure'       => T_('Cast a not sure vote!'),
-				'title_notsure_voted' => T_('You sent a not sure vote.'),
-				'title_ok'            => T_('Cast OK vote!'),
-				'title_ok_voted'      => T_('You sent OK vote.'),
+				'title_notsure'       => T_('Cast a "not sure" vote!'),
+				'title_notsure_voted' => T_('You sent a "not sure" vote.'),
+				'title_ok'            => T_('Cast an OK vote!'),
+				'title_ok_voted'      => T_('You sent an OK vote.'),
 				'title_yes'           => T_('Cast a helpful vote!'),
 				'title_yes_voted'     => T_('You sent helpful vote.'),
-				'title_no'            => T_('Cast a not helpful vote!'),
-				'title_no_voted'      => T_('You sent not helpful vote.'),
+				'title_no'            => T_('Cast a "not helpful" vote!'),
+				'title_no_voted'      => T_('You sent a "not helpful" vote.'),
 			), $params );
 
 		global $current_User, $admin_url;
@@ -1772,10 +1772,10 @@ class Comment extends DataObject
 				'display'             => false, // TRUE - to show this tool on loading(Used to make it visible only when JS is enalbed)
 				'title_spam'          => T_('Cast a spam vote!'),
 				'title_spam_voted'    => T_('You sent a spam vote.'),
-				'title_notsure'       => T_('Cast a not sure vote!'),
-				'title_notsure_voted' => T_('You sent a not sure vote.'),
-				'title_ok'            => T_('Cast OK vote!'),
-				'title_ok_voted'      => T_('You sent OK vote.'),
+				'title_notsure'       => T_('Cast a "not sure" vote!'),
+				'title_notsure_voted' => T_('You sent a "not sure" vote.'),
+				'title_ok'            => T_('Cast an OK vote!'),
+				'title_ok_voted'      => T_('You sent an OK vote.'),
 				'title_empty'         => T_('No votes on spaminess yet.'),
 				'button_group_class'  => button_class( 'group' ),
 			), $params );
@@ -1853,10 +1853,10 @@ class Comment extends DataObject
 				'helpful_text'          => T_('Is this comment helpful?'),
 				'title_yes'             => T_('Cast a helpful vote!'),
 				'title_yes_voted'       => T_('You sent helpful vote.'),
-				'title_noopinion'       => T_('Cast no opinion vote!'),
-				'title_noopinion_voted' => T_('You sent no opinion vote.'),
-				'title_no'              => T_('Cast a not helpful vote!'),
-				'title_no_voted'        => T_('You sent not helpful vote.'),
+				'title_noopinion'       => T_('Cast a "no opinion" vote!'),
+				'title_noopinion_voted' => T_('You sent a "no opinion" vote.'),
+				'title_no'              => T_('Cast a "not helpful" vote!'),
+				'title_no_voted'        => T_('You sent a "not helpful" vote.'),
 				'title_empty'           => T_('No user votes yet.'),
 				'class'                 => '',
 				'display_wrapper'       => true, // Use FALSE when you update this from AJAX request
