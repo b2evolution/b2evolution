@@ -1536,13 +1536,19 @@ function blogs_all_results_block( $params = array() )
 
 	$SQL = new SQL();
 	$SQL->SELECT( 'T_blogs.*, user_login, IF( cufv_user_id IS NULL, 0, 1 ) AS blog_favorite' );
-	$SQL->FROM( 'T_blogs INNER JOIN T_users ON blog_owner_user_ID = user_ID' );
 	if( $params['grouped'] )
-	{	// Get collection groups:
+	{	// Get collections with groups:
 		$SQL->SELECT_add( ', cgrp_ID, cgrp_name, cgrp_order, cgrp_owner_user_ID' );
-		$SQL->FROM_add( 'LEFT JOIN T_coll_groups ON cgrp_ID = blog_cgrp_ID' );
+		$SQL->FROM( 'T_coll_groups' );
+		$SQL->FROM_add( 'LEFT JOIN T_blogs ON cgrp_ID = blog_cgrp_ID' );
+		$SQL->FROM_add( 'LEFT JOIN T_users ON blog_owner_user_ID = user_ID' );
 		$SQL->GROUP_BY( 'blog_ID, cgrp_ID' );
 		$SQL->ORDER_BY( 'cgrp_order, cgrp_name' );
+	}
+	else
+	{	// Get collections without groups:
+		$SQL->FROM( 'T_blogs' );
+		$SQL->FROM_add( 'INNER JOIN T_users ON blog_owner_user_ID = user_ID' );
 	}
 	$SQL->FROM_add( 'LEFT JOIN T_coll_user_favs ON ( cufv_blog_ID = blog_ID AND cufv_user_ID = '.$current_User->ID.' )' );
 
@@ -1690,6 +1696,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 		global $current_User, $admin_url;
 
 		$blogs_Results->group_by = 'cgrp_ID';
+		$blogs_Results->ID_col = 'blog_ID';
 
 		$blogs_Results->grp_cols[] = array(
 				'td_colspan' => $cols_num,
@@ -1802,8 +1809,8 @@ function blogs_results( & $blogs_Results, $params = array() )
 					'td' => ''
 				);
 			$blogs_Results->grp_cols[] = array(
-					'td_class' => 'shrinkwrap',
-					'td' => '%blog_row_grp_actions( {row} )%',
+					'td_class' => 'nowrap',
+					'td' => '%blog_row_group_actions( {row} )%',
 				);
 		}
 	}
@@ -2181,7 +2188,7 @@ function blog_row_actions( $curr_blog_ID )
  * @param object Row
  * @return string Action links
  */
-function blog_row_grp_actions( & $row )
+function blog_row_group_actions( & $row )
 {
 	global $current_User, $admin_url;
 
@@ -2191,7 +2198,10 @@ function blog_row_grp_actions( & $row )
 	{
 		$r .= action_icon( T_('New Collection').'...', 'new', $admin_url.'?ctrl=collections&amp;action=new&amp;cgrp_ID='.$row->cgrp_ID );
 		$r .= action_icon( T_('Edit this collection group'), 'edit', $admin_url.'?ctrl=collections&amp;action=edit_collgroup&amp;cgrp_ID='.$row->cgrp_ID );
-		$r .= action_icon( T_('Delete this collection group!'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete_collgroup&amp;cgrp_ID='.$row->cgrp_ID.'&amp;'.url_crumb( 'collgroup' ) );
+		if( $row->blog_ID === NULL )
+		{	// Only groups without collections can be deleted:
+			$r .= action_icon( T_('Delete this collection group!'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete_collgroup&amp;cgrp_ID='.$row->cgrp_ID.'&amp;'.url_crumb( 'collgroup' ) );
+		}
 	}
 
 	return $r;
