@@ -939,42 +939,42 @@ function get_icon_info( $name )
 		);
 
 		case 'vote_spam': return array(
-			'alt'  => T_('Mark this comment as spam!'),
+			'alt'  => T_('Cast a spam vote!'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 16, 144 ),
 			'fa' => 'thumbs-o-down',
 			'color' => '#C00'
 		);
 		case 'vote_spam_disabled': return array(
-			'alt'  => T_('Mark this comment as spam!'),
+			'alt'  => T_('Cast a spam vote!'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 0, 144 ),
 			'fa' => 'thumbs-o-down fa-x-rollover-red',
 			'color' => '#333'
 		);
 		case 'vote_notsure': return array(
-			'alt'  => T_('Mark this comment as not sure!'),
+			'alt'  => T_('Cast a not sure vote!'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 48, 144 ),
 			'fa' => 'question-circle',
 			'color' => '#000'
 		);
 		case 'vote_notsure_disabled': return array(
-			'alt'  => T_('Mark this comment as not sure!'),
+			'alt'  => T_('Cast a not sure vote!'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 32, 144 ),
 			'fa' => 'question-circle fa-x-rollover-black',
 			'color' => '#666'
 		);
 		case 'vote_ok': return array(
-			'alt'  => T_('Mark this comment as OK!'),
+			'alt'  => T_('Cast OK vote!'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 80, 144 ),
 			'fa' => 'thumbs-o-up',
 			'color' => '#0C0'
 		);
 		case 'vote_ok_disabled': return array(
-			'alt'  => T_('Mark this comment as OK!'),
+			'alt'  => T_('Cast OK vote!'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 64, 144 ),
 			'fa' => 'thumbs-o-up fa-x-rollover-green',

@@ -979,12 +979,6 @@ class bootstrap_forums_Skin extends Skin
 		$Comment->vote_helpful( '', '', '&amp;', true, true, array_merge( array(
 				'before_title'          => '',
 				'helpful_text'          => T_('Is this reply helpful?'),
-				'title_yes'             => T_('Mark this reply as helpful!'),
-				'title_yes_voted'       => T_('You think this reply is helpful'),
-				'title_noopinion'       => T_('Mark this reply as no opinion!'),
-				'title_noopinion_voted' => T_('You have no opinion about this reply'),
-				'title_no'              => T_('Mark this reply as not helpful!'),
-				'title_no_voted'        => T_('You think this reply is not helpful'),
 				'class'                 => 'vote_helpful',
 				'skin_ID'               => $this->ID,
 			), $params ) );

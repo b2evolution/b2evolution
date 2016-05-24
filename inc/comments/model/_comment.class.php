@@ -1643,16 +1643,16 @@ class Comment extends DataObject
 	function get_vote_link( $vote_type, $vote_value, $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $params = array() )
 	{
 		$params = array_merge( array(
-				'title_spam'          => T_('Mark this comment as spam!'),
-				'title_spam_voted'    => T_('You think this comment is spam'),
-				'title_notsure'       => T_('Mark this comment as not sure!'),
-				'title_notsure_voted' => T_('You are not sure about this comment'),
-				'title_ok'            => T_('Mark this comment as OK!'),
-				'title_ok_voted'      => T_('You think this comment is OK'),
-				'title_yes'           => T_('Mark this comment as helpful!'),
-				'title_yes_voted'     => T_('You think this comment is helpful'),
-				'title_no'            => T_('Mark this comment as not helpful!'),
-				'title_no_voted'      => T_('You think this comment is not helpful'),
+				'title_spam'          => T_('Cast a spam vote!'),
+				'title_spam_voted'    => T_('You sent a spam vote.'),
+				'title_notsure'       => T_('Cast a not sure vote!'),
+				'title_notsure_voted' => T_('You sent a not sure vote.'),
+				'title_ok'            => T_('Cast OK vote!'),
+				'title_ok_voted'      => T_('You sent OK vote.'),
+				'title_yes'           => T_('Cast a helpful vote!'),
+				'title_yes_voted'     => T_('You sent helpful vote.'),
+				'title_no'            => T_('Cast a not helpful vote!'),
+				'title_no_voted'      => T_('You sent not helpful vote.'),
 			), $params );
 
 		global $current_User, $admin_url;
@@ -1770,12 +1770,12 @@ class Comment extends DataObject
 	{
 		$params = array_merge( array(
 				'display'             => false, // TRUE - to show this tool on loading(Used to make it visible only when JS is enalbed)
-				'title_spam'          => T_('Mark this comment as spam!'),
-				'title_spam_voted'    => T_('You think this comment is spam'),
-				'title_notsure'       => T_('Mark this comment as not sure!'),
-				'title_notsure_voted' => T_('You are not sure about this comment'),
-				'title_ok'            => T_('Mark this comment as OK!'),
-				'title_ok_voted'      => T_('You think this comment is OK'),
+				'title_spam'          => T_('Cast a spam vote!'),
+				'title_spam_voted'    => T_('You sent a spam vote.'),
+				'title_notsure'       => T_('Cast a not sure vote!'),
+				'title_notsure_voted' => T_('You sent a not sure vote.'),
+				'title_ok'            => T_('Cast OK vote!'),
+				'title_ok_voted'      => T_('You sent OK vote.'),
 				'title_empty'         => T_('No votes on spaminess yet.'),
 				'button_group_class'  => button_class( 'group' ),
 			), $params );
@@ -1851,12 +1851,12 @@ class Comment extends DataObject
 				'before_title'          => ' &nbsp; ',
 				'skin_ID'               => 0,
 				'helpful_text'          => T_('Is this comment helpful?'),
-				'title_yes'             => T_('Mark this comment as helpful!'),
-				'title_yes_voted'       => T_('You think this comment is helpful'),
-				'title_noopinion'       => T_('Mark this comment as no opinion!'),
-				'title_noopinion_voted' => T_('You have no opinion about this comment'),
-				'title_no'              => T_('Mark this comment as not helpful!'),
-				'title_no_voted'        => T_('You think this comment is not helpful'),
+				'title_yes'             => T_('Cast a helpful vote!'),
+				'title_yes_voted'       => T_('You sent helpful vote.'),
+				'title_noopinion'       => T_('Cast no opinion vote!'),
+				'title_noopinion_voted' => T_('You sent no opinion vote.'),
+				'title_no'              => T_('Cast a not helpful vote!'),
+				'title_no_voted'        => T_('You sent not helpful vote.'),
 				'title_empty'           => T_('No user votes yet.'),
 				'class'                 => '',
 				'display_wrapper'       => true, // Use FALSE when you update this from AJAX request

@@ -269,14 +269,7 @@ echo $params['comment_info_after'];
 	}
 
 	// Display Spam Voting system
-	$Comment->vote_spam( '', '', '&amp;', true, true, array(
-			'title_spam'          => T_('Mark this reply as spam!'),
-			'title_spam_voted'    => T_('You think this reply is spam'),
-			'title_notsure'       => T_('Mark this reply as not sure!'),
-			'title_notsure_voted' => T_('You are not sure in this reply'),
-			'title_ok'            => T_('Mark this reply as OK!'),
-			'title_ok_voted'      => T_('You think this reply is OK'),
-		) );
+	$Comment->vote_spam( '', '', '&amp;', true, true );
 
 	echo '<div class="pull-right">';
 		$comment_redirect_url = rawurlencode( $Comment->get_permanent_url() );
