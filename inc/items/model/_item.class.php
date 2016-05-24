@@ -8540,6 +8540,11 @@ class Item extends ItemLight
 			return false;
 		}
 
+		if( $this->get_type_setting( 'usage' ) != 'post' )
+		{	// Only "Post" items can be flagged:
+			return false;
+		}
+
 		return true;
 	}
 
