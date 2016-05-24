@@ -978,15 +978,17 @@ class ItemQuery extends SQL
 	 */
 	function where_flagged( $flagged = false )
 	{
+		global $current_User;
+
 		$this->flagged = $flagged;
 
-		if( ! $this->flagged )
-		{	// Don't restrict:
+		if( ! $this->flagged || ! is_logged_in() )
+		{	// Don't restrict if it is not requested or if user is not logged in:
 			return;
 		}
 
-		// Get items which are flagged by any user:
-		$this->FROM_add( 'INNER JOIN T_items__user_data ON '.$this->dbIDname.' = itud_item_ID AND itud_flagged_item = 1' );
+		// Get items which are flagged by current user:
+		$this->FROM_add( 'INNER JOIN T_items__user_data ON '.$this->dbIDname.' = itud_item_ID AND itud_flagged_item = 1 AND itud_user_ID = '.$current_User->ID );
 	}
 
 
