@@ -6632,6 +6632,49 @@ class User extends DataObject
 			return false;
 		}
 	}
+
+
+	/**
+	 * Get a count of flagged items by this user in current collection
+	 *
+	 * @return integer
+	 */
+	function get_flagged_items_count()
+	{
+		global $Blog;
+
+		if( ! is_logged_in() )
+		{	// Only logged in users can have the flagged items:
+			return 0;
+		}
+
+		if( empty( $Blog ) )
+		{	// Collection must be defined:
+			return 0;
+		}
+
+		if( ! isset( $this->flagged_items_count ) )
+		{	// Get it from DB only first time and then cache in var:
+			global $current_User;
+
+			$flagged_ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
+
+			// Set additional debug info prefix for SQL queries in order to know what code executes it:
+			$flagged_ItemList2->query_title_prefix = 'Flagged Items';
+
+			// Filter only the flagged items:
+			$flagged_ItemList2->set_default_filters( array(
+					'flagged' => 1
+				) );
+
+			// Run query initialization to get total rows:
+			$flagged_ItemList2->query_init();
+
+			$this->flagged_items_count = $flagged_ItemList2->total_rows;
+		}
+
+		return $this->flagged_items_count;
+	}
 }
 
 ?>
