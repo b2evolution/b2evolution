@@ -80,12 +80,20 @@ class item_vote_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		global $admin_url;
+
 		$r = array_merge( array(
 				'label' => array(
 					'label' => T_('Label'),
 					'size' => 40,
 					'note' => '',
 					'defaultvalue' => T_('My vote:'),
+				),
+				'note' => array(
+					'label' => T_('Note'),
+					'type' => 'info',
+					'info' => sprintf( T_('To configure what buttons to show (Positive/Neutral/Negative), go to Post Features &gt; <a %s>Voting Options</a>'),
+						'href="'.$admin_url.'?ctrl=coll_settings&tab=features&blog='.$this->coll_ID.'#fieldset_wrapper_voting_options"' ),
 				),
 				'display_summary' => array(
 					'label' => T_('Show summary'),
@@ -99,11 +107,11 @@ class item_vote_Widget extends ComponentWidget
 					'defaultvalue' => 'always',
 				),
 				'display_summary_author' => array(
-					'label' => T_('Show summary to author'),
+					'label' => T_('Always show summary to author'),
 					'size' => 40,
-					'note' => '',
+					'note' => T_('Author will always see a summary.'),
 					'type' => 'checkbox',
-					'defaultvalue' => T_('My vote:'),
+					'defaultvalue' => 1,
 				),
 			), parent::get_param_definitions( $params ) );
 

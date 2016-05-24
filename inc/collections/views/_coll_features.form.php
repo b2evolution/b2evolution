@@ -107,7 +107,7 @@ $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_setting
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Voting options').get_manual_link( 'item-voting-options' ) );
+$Form->begin_fieldset( T_('Voting options').get_manual_link( 'item-voting-options' ), array( 'id' => 'voting_options' ) );
 
 	$voting_disabled = ! $edited_Blog->get_setting( 'voting_positive' );
 
