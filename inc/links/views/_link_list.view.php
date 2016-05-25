@@ -57,7 +57,7 @@ function link_add_iframe( $link_destination )
 		$path = $current_File->get_rdfp_rel_path();
 
 		// this could be made more robust
-		$link_destination = str_replace( '<a ', "<a onclick=\"return window.parent.link_attachment_window( '${iframe_name}', '${link_type}', '${link_owner_ID}', '${root}', '${path}' );\" ", $link_destination );
+		$link_destination = str_replace( '<a ', "<a onclick=\"return link_attachment_window( '${link_type}', '${link_owner_ID}', '${root}', '${path}' );\" ", $link_destination );
 	}
 
 	return $link_destination;

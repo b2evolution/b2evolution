@@ -58,17 +58,16 @@ function & get_link_owner( $link_type, $object_ID )
 
 
 /**
- * Compose screen: display link files iframe
+ * Display attachments fieldset
  *
  * @param object Form
  * @param object LinkOwner object
- * @param string iframe name
  * @param boolean true if creating new owner object, false otherwise
  * @param boolean true to allow folding for this fieldset, false otherwise
  */
-function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creating = false, $fold = false )
+function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false, $fold = false )
 {
-	global $admin_url;
+	global $admin_url, $AdminUI;
 	global $current_User, $action;
 
 	if( $LinkOwner->type == 'item' && ! $LinkOwner->Item->get_type_setting( 'allow_attachments' ) )
@@ -115,11 +114,6 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 	// Editing link owner
 	$Blog = & $LinkOwner->get_Blog();
 
-	if( $iframe_name == NULL )
-	{
-		$iframe_name = 'attach_'.generate_random_key( 16 );
-	}
-
 	$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' );
 
 	if( $current_User->check_perm( 'files', 'view', false, $Blog->ID )
@@ -139,20 +133,17 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 		$fieldset_title .= ' - '
 			.action_icon( T_('Attach existing files'), 'folder', $attach_files_url,
 				T_('Attach existing files'), 3, 4,
-				array( 'onclick' => 'return link_attachment_window( \''.$iframe_name.'\', \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\' )' ) )
+				array( 'onclick' => 'return link_attachment_window( \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\' )' ) )
 			.action_icon( T_('Attach existing files'), 'permalink', $attach_files_url,
 				T_('Attach existing files'), 1, 0,
 				array( 'target' => '_blank' ) );
 	}
 
 	$fieldset_title .= '<span class="floatright">&nbsp;'
-			.action_icon( T_('Refresh'), 'refresh', $admin_url
-					.'?ctrl=links&amp;action=edit_links&amp;link_type='.$LinkOwner->type.'&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;link_object_ID='.$LinkOwner->get_ID(),
-					T_('Refresh'), 3, 4, array( 'target' => $iframe_name, 'class' => 'action_icon btn btn-default btn-sm' ) )
 
 					.action_icon( T_('Sort'), 'ascending', $admin_url
-					.'?ctrl=links&amp;action=sort_links&amp;link_type='.$LinkOwner->type.'&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;'.url_crumb( 'link' ),
-					T_('Sort'), 3, 4, array( 'target' => $iframe_name, 'class' => 'action_icon btn btn-default btn-sm' ) )
+					.'?ctrl=links&amp;action=sort_links&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;'.url_crumb( 'link' ),
+					T_('Sort'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm' ) )
 
 			.'</span>';
 
@@ -165,12 +156,11 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 			'deny_fold' => ( $links_count > 0 )
 		) );
 
-	echo '<div id="attachmentframe_wrapper">'
-				.'<iframe src="'.$admin_url.'?ctrl=links&amp;link_type='.$LinkOwner->type
-					.'&amp;action=edit_links&amp;mode=iframe&amp;iframe_name='.$iframe_name
-					.'&amp;link_object_ID='.$LinkOwner->get_ID().'" name="'.$iframe_name.'"'
-					.' width="100%" marginwidth="0" height="100%" marginheight="0" align="top" scrolling="auto" frameborder="0" id="attachmentframe"></iframe>'
-			.'</div>';
+	echo '<div id="attachments_fieldset_wrapper">';
+		echo '<div id="attachments_fieldset_table">';
+			$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+		echo '</div>';
+	echo '</div>';
 
 	$Form->end_fieldset();
 
@@ -178,7 +168,7 @@ function attachment_iframe( & $Form, & $LinkOwner, $iframe_name = NULL, $creatin
 	echo_modalwindow_js();
 ?>
 <script type="text/javascript">
-function link_attachment_window( iframe_name, link_owner_type, link_owner_ID, root, path, fm_highlight )
+function link_attachment_window( link_owner_type, link_owner_ID, root, path, fm_highlight )
 {
 	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
 		'90%', '80%', true, '<?php echo $window_title; ?>', '', true );
@@ -189,7 +179,6 @@ function link_attachment_window( iframe_name, link_owner_type, link_owner_ID, ro
 		data:
 		{
 			'action': 'link_attachment',
-			'iframe_name': iframe_name,
 			'link_owner_type': link_owner_type,
 			'link_owner_ID': link_owner_ID,
 			'crumb_link': '<?php echo get_crumb( 'link' ); ?>',
@@ -207,57 +196,18 @@ function link_attachment_window( iframe_name, link_owner_type, link_owner_ID, ro
 
 jQuery( document ).ready( function()
 {
-	function update_attachment_frame_height()
-	{
-		var body_height = jQuery( '#attachmentframe' ).contents().find( 'body' ).height();
-		if( body_height == 0 )
-		{ // Some browsers cannot get iframe body height correctly, Use this default min value:
-			body_height = 91;
-		}
-
-		if( body_height > jQuery( '#attachmentframe_wrapper' ).height() )
-		{ // Expand the frame height if it is more than wrapper height (but max height is 320px):
-			jQuery( '#attachmentframe_wrapper' ).css( 'height', body_height < 320 ? body_height : 320 );
-		}
-		// Set max-height on each iframe reload in order to avoid a space after upload button:
-		jQuery( '#attachmentframe_wrapper' ).css( 'max-height', body_height );
-	}
-
-	var attachmentframe_is_loaded = false;
-	jQuery( '#attachmentframe' ).bind( 'load', function()
-	{ // Set proper height on frame loading:
-		if( ! attachmentframe_is_loaded )
-		{ // Only on first loading
-			update_attachment_frame_height();
-			attachmentframe_is_loaded = true;
-		}
-	} );
-
-	jQuery( '#icon_folding_itemform_links, #title_folding_itemform_links' ).click( function()
-	{ // Use this hack to fix frame height on show attachments fieldset if it was hidden before:
-		update_attachment_frame_height();
-	} );
-
-	jQuery( '#attachmentframe_wrapper' ).resizable(
-	{ // Make the frame wrapper resizable
+	jQuery( '#attachments_fieldset_wrapper' ).resizable(
+	{	// Make the attachments fieldset wrapper resizable:
 		minHeight: 80,
 		handles: 's',
-		start: function( e, ui )
-		{ // Create a temp div to disable the mouse over events inside the frame
-			ui.element.append( '<div id="attachmentframe_disabler"></div>' );
-		},
-		stop: function( e, ui )
-		{ // Remove the temp div element
-			ui.element.find( '#attachmentframe_disabler' ).remove();
-		},
 		resize: function( e, ui )
-		{ // Limit max height
-			jQuery( '#attachmentframe_wrapper' ).resizable( 'option', 'maxHeight', jQuery( '#attachmentframe' ).contents().find( 'body' ).height() );
+		{	// Limit max height by table of attachments:
+			jQuery( '#attachments_fieldset_wrapper' ).resizable( 'option', 'maxHeight', jQuery( '#attachments_fieldset_table' ).height() );
 		}
 	} );
-	jQuery( document ).on( 'click', '#attachmentframe_wrapper .ui-resizable-handle', function()
-	{ // Increase height on click
-		jQuery( '#attachmentframe_wrapper' ).css( 'height', jQuery( '#attachmentframe_wrapper' ).height() + 80 );
+	jQuery( document ).on( 'click', '#attachments_fieldset_wrapper .ui-resizable-handle', function()
+	{	// Increase attachments fieldset height on click to resizable handler:
+		jQuery( '#attachments_fieldset_wrapper' ).css( 'height', jQuery( '#attachments_fieldset_wrapper' ).height() + 80 );
 	} );
 } );
 </script>
@@ -421,7 +371,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 		$rdfp_path = ( $current_File->is_dir() ? $current_File->get_rdfp_rel_path() : dirname( $current_File->get_rdfp_rel_path() ) ).'/';
 
 		// A link to open file manager in modal window:
-		$r .= ' <a href="'.$url.'" onclick="return window.parent.link_attachment_window( \''.$iframe_name.'\', \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\', \''.$current_File->get_FileRoot()->ID.'\', \''.$rdfp_path.'\', \''.rawurlencode( $current_File->get_name() ).'\' )"'
+		$r .= ' <a href="'.$url.'" onclick="return window.parent.link_attachment_window( \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\', \''.$current_File->get_FileRoot()->ID.'\', \''.$rdfp_path.'\', \''.rawurlencode( $current_File->get_name() ).'\' )"'
 					.' target="_parent" title="'.$title.'">'
 					.get_icon( 'locate', 'imgtag', array( 'title' => $title ) ).'</a> ';
 

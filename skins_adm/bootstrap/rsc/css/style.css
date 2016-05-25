@@ -668,33 +668,26 @@ fieldset ul {
 #itemform_goals td {
   padding-bottom: 2px;
 }
-#attachmentframe_wrapper {
+#attachments_fieldset_wrapper {
   width: 100%;
   height: 160px;
   position: relative;
-  overflow: hidden;
+  overflow: auto;
   padding-bottom: 6px;
   box-sizing: content-box;
 }
-#attachmentframe_wrapper .ui-resizable-s {
+#attachments_fieldset_wrapper .ui-resizable-s {
   background: #c0c0c0;
   height: 6px;
   bottom: 0;
 }
-#attachmentframe_wrapper .ui-resizable-s:after {
+#attachments_fieldset_wrapper .ui-resizable-s:after {
   content: "...";
   font-size: 10px;
   top: -7px;
   position: relative;
   text-align: center;
   display: block;
-}
-#attachmentframe_wrapper #attachmentframe_disabler {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
 }
 #filelist_tbody tr:first-child .action_icon_link_move_up,
 #filelist_tbody tr:last-child .action_icon_link_move_down {
@@ -849,7 +842,6 @@ h2.user_title {
   font-weight: normal;
   color: #999;
   margin: 40px 0 30px;
-  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;

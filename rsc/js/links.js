@@ -48,7 +48,7 @@ function evo_display_position_onchange( selectInput, url, crumb )
  */
 function insert_inline_link( type, link_ID, caption )
 {
-	var b2evoCanvas = window.parent.document.getElementById('itemform_post_content');
+	var b2evoCanvas = window.document.getElementById('itemform_post_content');
 	if( b2evoCanvas != null )
 	{ // Canvas exists
 		var insert_tag = '[' + type + ':' + link_ID;
@@ -62,7 +62,7 @@ function insert_inline_link( type, link_ID, caption )
 		insert_tag += ']';
 
 		// Insert an image tag
-		textarea_wrap_selection( b2evoCanvas, insert_tag, '', 0, window.parent.document );
+		textarea_wrap_selection( b2evoCanvas, insert_tag, '', 0, window.document );
 
 		var $position_selector = jQuery( '#display_position_' + link_ID );
 		if( $position_selector.length != 0 )
@@ -83,10 +83,10 @@ function insert_inline_link( type, link_ID, caption )
  */
 function item_unlink( link_ID )
 {
-	var b2evoCanvas = window.parent.document.getElementById( 'itemform_post_content' );
+	var b2evoCanvas = window.document.getElementById( 'itemform_post_content' );
 	if( b2evoCanvas != null )
 	{ // Canvas exists
 		var regexp = new RegExp( '\\\[(image|file|inline):' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
-		textarea_str_replace( b2evoCanvas, regexp, '', window.parent.document );
+		textarea_str_replace( b2evoCanvas, regexp, '', window.document );
 	}
 }

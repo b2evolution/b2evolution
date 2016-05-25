@@ -2485,8 +2485,8 @@ function display_dragdrop_upload_button( $params = array() )
 		?>
 		function update_iframe_height()
 		{
-			var wrapper_height = jQuery( 'body' ).height();
-			jQuery( 'div#attachmentframe_wrapper', window.parent.document ).css( { 'height': wrapper_height, 'max-height': wrapper_height } );
+			var table_height = jQuery( '#attachments_fieldset_table' ).height();
+			jQuery( '#attachments_fieldset_wrapper' ).css( { 'height': table_height, 'max-height': table_height } );
 		}
 		<?php } ?>
 
