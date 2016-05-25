@@ -961,6 +961,17 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 			$lib_url = $Blog->get_local_rsc_url().$subfolder.'/'.$lib_file;
 		}
 	}
+	elseif( $relative_to === 'siteskin' )
+	{	// Get the file from current site skin if it is enabled otherwise from relative current page or head tag <base>:
+		if( $site_Skin = & get_site_Skin() )
+		{
+			$lib_url = $site_Skin->get_url().$lib_file;
+		}
+		else
+		{
+			$lib_url = $lib_file;
+		}
+	}
 	else
 	{ // Get the file from $rsc_url:
 		$lib_url = $rsc_url.$subfolder.'/'.$lib_file;

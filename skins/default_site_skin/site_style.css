@@ -1,12 +1,17 @@
 /*
- * Site wide styles used when site wide body & footer are enabled
+ * Styles for Site skin "default_site_skin"
  */
+
 /* Override BODY from skin to make sure we touch the edges of the page: */
 body {
 	margin: 0;
 	padding: 0;
-} 
- 
+}
+
+.floatright {
+	float: right;
+}
+
 .sitewide_header,
 .sitewide_footer {
 	font-family:"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial;
@@ -54,7 +59,7 @@ body {
 	border-bottom:1px solid #666;
 }
 
-a.swhead_item,
+.swhead_item,
 a.swhead_sitename {
 	display: inline-block;
 	padding: 12px;
@@ -71,7 +76,7 @@ a.swhead_sitename.swhead_logo img {
 	color: #FFF;
 	font-weight: 400;
 }
-.sitewide_header a.swhead_item_selected,
+.sitewide_header .swhead_item_selected,
 .sitewide_header a.swhead_item:hover {
 	/* autoprefixer: off */
 	text-decoration: none;
@@ -82,7 +87,7 @@ a.swhead_sitename.swhead_logo img {
 	background: -ms-linear-gradient(top, #696c72, #333334);
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#696c72', endColorstr='#333334');
 }
-.sitewide_header .floatright a.swhead_item_selected,
+.sitewide_header .floatright .swhead_item_selected,
 .sitewide_header .floatright a.swhead_item:hover {
 	text-decoration: underline;
 	background: none;
@@ -90,23 +95,23 @@ a.swhead_sitename.swhead_logo img {
 	-webkit-filter: none;
 	        filter: none;
 }
-.sitewide_header a.swhead_item.swhead_item_white {
+.sitewide_header .swhead_item.swhead_item_white {
 	background: #FFF;
 	border-radius: 3px;
 	margin: 4px 15px 4px 0;
 	padding: 8px 9px;
 	color: #000;
 }
-.sitewide_header a.swhead_item.swhead_item_white.swhead_item_selected,
-.sitewide_header a.swhead_item.swhead_item_white:hover {
+.sitewide_header .swhead_item.swhead_item_white.swhead_item_selected,
+.sitewide_header .swhead_item.swhead_item_white:hover {
 	background: #FFF;
 }
-.sitewide_header a.swhead_item.user {
+.sitewide_header .swhead_item.user {
 	position: relative;
 	padding-left: 49px;
 	font-weight: normal;
 }
-.sitewide_header a.swhead_item.user img {
+.sitewide_header .swhead_item.user img {
 	position: absolute;
 	top: 0;
 	left: 12px;

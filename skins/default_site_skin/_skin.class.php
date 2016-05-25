@@ -84,8 +84,8 @@ class default_site_Skin extends Skin
 	 */
 	function siteskin_init()
 	{
-		// Note: the following will not try to have a different domain for each blog
-		require_css( 'sitewide_style.css', 'rsc_url' );
+		// Include the default skin style.css relative current SITE skin folder:
+		require_css( 'site_style.css', 'siteskin' );
 	}
 }
 

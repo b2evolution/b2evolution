@@ -53,7 +53,8 @@ $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 if( empty( $Blog ) )
 {
 	siteskin_init();
-	siteskin_include( '_404_blog_not_found.main.php' ); // error & exit
+	siteskin_include( '_404_blog_not_found.main.php' ); // error
+	exit(0);
 	// EXIT.
 }
 
@@ -514,7 +515,8 @@ unset( $catsel );
 if( $stats || $disp == 'stats' )
 {	// This used to be a spamfest...
 	siteskin_init();
-	siteskin_include( '_410_stats_gone.main.php' ); // error & exit
+	siteskin_include( '_410_stats_gone.main.php' ); // error
+	exit(0);
 	// EXIT.
 }
 elseif( !empty($preview) )

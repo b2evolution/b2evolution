@@ -4,7 +4,8 @@
  *
  * This happens when you request an url of the form http://.../some_stub_file.php/some_malformed_extra_path/...
  *
- * @package evocore
+ * @package skins
+ * @subpackage default_site_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -12,7 +13,7 @@ header_http_response('404 Not Found');
 
 $page_title = '404 Not Found';
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
-siteskin_include( '_html_header.inc.php', array(), true );	// force include even if site headers/footers are not enabled
+siteskin_include( '_html_header.inc.php' );
 // -------------------------------- END OF HEADER --------------------------------
 
 // ---------------------------- SITE HEADER INCLUDED HERE ----------------------------
@@ -29,8 +30,6 @@ siteskin_include( '_site_body_footer.inc.php' );
 // ------------------------------- END OF SITE FOOTER --------------------------------
 
 // -------------------------- HTML FOOTER INCLUDED HERE --------------------------
-siteskin_include( '_html_footer.inc.php', array(), true );	// force include even if site headers/footers are not enabled
+siteskin_include( '_html_footer.inc.php' );
 // -------------------------------- END OF FOOTER --------------------------------
-
-exit(0);
 ?>

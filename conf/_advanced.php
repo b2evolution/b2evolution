@@ -504,17 +504,6 @@ $skins_path = $basepath.$skins_subdir;   // You should not need to change this
 $skins_url = $assets_baseurl.$skins_subdir;     // You should not need to change this
 
 /**
- * Location of the site skins folder.
- *
- * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
- *
- * @global string $siteskins_subdir
- */
-$siteskins_subdir = 'skins_site/';       		    // Subdirectory relative to base
-$siteskins_path = $basepath.$siteskins_subdir;  // You should not need to change this
-$siteskins_url = $assets_baseurl.$siteskins_subdir;    // You should not need to change this
-
-/**
  * Location of the email skins folder.
  *
  * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
