@@ -7,7 +7,7 @@
  * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package skins
- * @subpackage bootstrap_site_skin
+ * @subpackage bootstrap_site_tabs_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

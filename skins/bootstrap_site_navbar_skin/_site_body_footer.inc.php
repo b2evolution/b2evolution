@@ -6,7 +6,7 @@
  * NOTE: each skin is ressponsible for calling siteskin_include( '_site_body_footer.inc.php' );
  *
  * @package skins
- * @subpackage bootstrap_site_skin
+ * @subpackage bootstrap_site_navbar_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -18,7 +18,7 @@ if( ! empty( $site_footer_text ) )
 {	// Display site footer only when it has a text:
 ?>
 
-<footer class="bootstrap_site_footer">
+<footer class="bootstrap_site_navbar_footer">
 	<div class="container">
 		<p class="text-muted"><?php
 			// Display site footer text:

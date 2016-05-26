@@ -31,7 +31,7 @@ else
 <a href="<?php echo $baseurl; ?>" class="swhead_sitename<?php echo $site_title_class; ?>"><?php echo $site_name_text; ?></a>
 
 <?php
-	// --------------------------------- START OF BLOG LIST --------------------------------
+	// --------------------------------- START OF COLLECTION LIST --------------------------------
 	// Call widget directly (without container):
 	skin_widget( array(
 						// CODE for the widget:
@@ -49,7 +49,7 @@ else
 						'link_selected_class' => 'swhead_item swhead_item_selected',
 						'link_default_class' => 'swhead_item ',
 				) );
-	// ---------------------------------- END OF BLOG LIST ---------------------------------
+	// ---------------------------------- END OF COLLECTION LIST ---------------------------------
 
 	if( $Settings->get( 'info_blog_ID' ) > 0 )
 	{ // We have a collection for info pages:

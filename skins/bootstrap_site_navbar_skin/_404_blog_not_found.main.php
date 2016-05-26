@@ -2,10 +2,10 @@
 /**
  * This page displays an error message when we cannot resolve the extra path.
  *
- * This happens when you request an invalid tracking code on track.php for example
+ * This happens when you request an url of the form http://.../some_stub_file.php/some_malformed_extra_path/...
  *
  * @package skins
- * @subpackage bootstrap_site_skin
+ * @subpackage bootstrap_site_navbar_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -22,7 +22,7 @@ siteskin_include( '_site_body_header.inc.php' );
 // ------------------------------- END OF SITE HEADER --------------------------------
 ?>
 <h1>404 Not Found</h1>
-<p>The page you requested doesn't seem to exist on <a href="<?php echo $baseurl ?>">this system</a>.</p>
+<p>The collection you requested doesn't seem to exist on <a href="<?php echo $baseurl ?>">this system</a>.</p>
 <?php
 // ---------------------------- SITE FOOTER INCLUDED HERE ----------------------------
 // If site footers are enabled, they will be included here:

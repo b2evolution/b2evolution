@@ -5,8 +5,8 @@
  * If enabled, this will be included at the top of all skins to provide a common identity and site wide navigation.
  * NOTE: each skin is responsible for calling siteskin_include( '_site_body_header.inc.php' );
  *
- * @package skins
- * @subpackage bootstrap_site_skin
+ * @package foyer
+ * @subpackage custom_site_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -94,7 +94,7 @@ if( $Settings->get( 'notification_logo' ) != '' )
 {
 	$site_title = $Settings->get( 'notification_long_name' ) != '' ? ' title="'.$Settings->get( 'notification_long_name' ).'"' : '';
 	$site_name_text = '<img src="'.$Settings->get( 'notification_logo' ).'" alt="'.$Settings->get( 'notification_short_name' ).'"'.$site_title.' />';
-	$site_title_class = ' navbar-header-with-logo';
+	$site_title_class = ' swhead_logo';
 }
 else
 {
@@ -103,17 +103,18 @@ else
 }
 ?>
 
-<div class="bootstrap_site_header">
+<div class="swhead_wrapper">
 
-	<nav class="navbar navbar-default">
+		<?php if( $Settings->get( 'notification_logo' ) != '' ) { ?>
+			<div class="swhead_sitename<?php echo $site_title_class; ?>">
+				<a href="<?php echo $baseurl; ?>"><?php echo $site_name_text; ?></a>
+			</div>
+		<?php } ?>
+	<div class="swhead_menus">
 		<div class="container-fluid level1">
 
-			<div class="navbar-header<?php echo $site_title_class; ?>">
-				<a href="<?php echo $baseurl; ?>" class="navbar-brand"><?php echo $site_name_text; ?></a>
-			</div>
-
-			<div class="navbar-collapse collapse">
-				<ul class="nav navbar-nav navbar-right">
+			<nav>				
+				<div class="pull-right">
 	<?php
 		// Optional display params for widgets below
 		$right_menu_params = array(
@@ -122,12 +123,12 @@ else
 				'block_display_title' => false,
 				'list_start' => '',
 				'list_end' => '',
-				'item_start' => '<li>',
-				'item_end' => '</li>',
-				'item_selected_start' => '<li>',
-				'item_selected_end' => '</li>',
-				'link_selected_class' => '',
-				'link_default_class' => '',
+				'item_start' => '',
+				'item_end' => '',
+				'item_selected_start' => '',
+				'item_selected_end' => '',
+				'link_selected_class' => 'btn btn-default active btn-sm ',
+				'link_default_class' => 'btn btn-default btn-sm ',
 			);
 
 		if( is_logged_in() )
@@ -179,13 +180,22 @@ else
 				'widget' => 'menu_link',
 				// Optional display params
 				'link_type' => 'register',
+				'link_selected_class' => 'swhead_item_white '.$right_menu_params['link_selected_class'],
+				'link_default_class' => 'swhead_item_white '.$right_menu_params['link_default_class'],
 			) ) );
 		}
 	?>
-				</ul><?php // END OF <ul class="nav navbar-nav navbar-right"> ?>
+				</div>
 
-				<ul class="nav navbar-nav">
-	<?php
+				<ul class="nav nav-tabs pull-left">
+				
+				<?php if( $Settings->get( 'notification_logo' ) == '' ) { ?>
+					<li class="swhead_sitename no_logo<?php echo $site_title_class; ?>">
+						<a href="<?php echo $baseurl; ?>"><?php echo $site_name_text; ?></a>
+					</li>
+<?php
+				}
+
 	foreach( $skin_tabs as $s => $skin_tab )
 	{
 		$skin_menu_url = '#';
@@ -229,11 +239,10 @@ else
 			.'</li>';
 	}
 ?>
-				</ul><?php // END OF <ul class="nav navbar-nav"> ?>
-			</div><?php // END OF <div class="navbar-collapse collapse"> ?>
+				</ul>
+			</nav>
 
 		</div><?php // END OF <div class="container-fluid level1"> ?>
-	</nav><?php // END OF <nav class="navbar navbar-default"> ?>
 
 <?php
 if( isset( $skin_tabs[ $skin_menu_selected ] ) && count( $skin_tabs[ $skin_menu_selected ]['colls'] ) > 1 )
@@ -274,6 +283,8 @@ if( isset( $skin_tabs[ $skin_menu_selected ] ) && count( $skin_tabs[ $skin_menu_
 								'item_end' => '</li>',
 								'item_selected_start' => '<li class="active">',
 								'item_selected_end' => '</li>',
+								'link_selected_class' => 'swhead_item swhead_item_selected',
+								'link_default_class' => 'swhead_item ',
 								'blog_ID' => $Settings->get( 'info_blog_ID' ),
 								'item_group_by' => 'none',
 								'order_by' => 'order',		// Order (as explicitly specified)
@@ -292,11 +303,12 @@ if( isset( $skin_tabs[ $skin_menu_selected ] ) && count( $skin_tabs[ $skin_menu_
 		}
 	}
 ?>
-		</ul><?php // END OF <ul class="nav nav-pills"> ?>
+		</ul>
 	</nav>
 </div><?php // END OF <div class="container-fluid level2"> ?>
 <?php
 }
 ?>
 
-</div><?php // END OF <div class="bootstrap_site_header"> ?>
+	</div><?php // END OF <div class="swhead_menus"> ?>
+</div><?php // END OF <div class="swhead_wrapper"> ?>

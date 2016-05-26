@@ -1,18 +1,18 @@
 <?php
 /**
- * This page displays an error message when we have detected access to the stats.
+ * This page displays an error message when we have detected referer spam.
  *
  * @package skins
- * @subpackage bootstrap_site_skin
+ * @subpackage bootstrap_site_tabs_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-// Note: if you have a really really good reason to bypass this, uncomment the following line:
-// return;
 
-header_http_response('410 Gone');
+load_funcs( 'skins/_skin.funcs.php' );
 
-$page_title = '410 Gone';
+header_http_response('403 Forbidden');
+
+$page_title = '403 Forbidden - Please stop referer spam.';
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 siteskin_include( '_html_header.inc.php' );
 // -------------------------------- END OF HEADER --------------------------------
@@ -22,8 +22,15 @@ siteskin_include( '_html_header.inc.php' );
 siteskin_include( '_site_body_header.inc.php' );
 // ------------------------------- END OF SITE HEADER --------------------------------
 ?>
-<h1>410 Gone</h1>
-<p><?php echo $app_name ?> does no longer publish referer statistics publicly in order not to attract spam robots.</p>
+<h1>403 Forbidden</h1>
+<h2>Please stop referer spam.</h2>
+<p>We have identified that you have been refered here by a known or supposed spammer.</p>
+<p>If you feel this is an error, please <a href="<?php global $ReqURI; echo $ReqURI; ?>">bypass this message</a>
+and leave us a comment about the error. We are sorry for the inconvenience.</p>
+<p>If you are actually doing referer spam, please note that this website/<?php global $app_name; echo $app_name; ?> no longer records and publishes referers. Not even legitimate ones!
+While we understand it was fun for you guys while it lasted, please understand our servers cannot take the load of
+all this cumulated spam any longer... Thank you.</p>
+<p>Also, please note that comment/trackback submitted URLs will be tagged with rel="nofollow" in order to be ignored by search engines.</p>
 <?php
 // ---------------------------- SITE FOOTER INCLUDED HERE ----------------------------
 // If site footers are enabled, they will be included here:

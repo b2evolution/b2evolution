@@ -6,7 +6,7 @@
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
  * @package skins
- * @subpackage bootstrap_site_skin
+ * @subpackage bootstrap_site_navbar_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * ATTENTION: if you make a new skin you have to change the class name below accordingly
  */
-class bootstrap_site_Skin extends Skin
+class bootstrap_site_navbar_Skin extends Skin
 {
 	/**
 	 * Skin version
@@ -34,7 +34,7 @@ class bootstrap_site_Skin extends Skin
 	 */
 	function get_default_name()
 	{
-		return 'Bootstrap Site';
+		return 'Bootstrap Site Navbar';
 	}
 
 

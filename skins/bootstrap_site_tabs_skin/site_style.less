@@ -1,0 +1,212 @@
+/*
+ * Styles for Site skin "bootstrap_site_tabs_skin"
+ */
+
+body {
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+// Foyer Font sizes
+.evo_container__menu li a{
+	font-size: 20px;
+}
+header h1 {
+	font-weight: 700;
+}
+h2 {
+	font-size: 24px;
+}
+.evo_post_title h1 {
+	font-size: 24px;
+}
+
+// Site header:
+.swhead_wrapper {
+	width: 100%;
+	font-family: Arial, Helvetica, sans-serif !important;
+	display: table;
+	.swhead_sitename {
+		display: table-cell;
+		vertical-align: middle;
+		white-space: nowrap;
+		padding: 0 10px;
+		&.swhead_logo {
+			vertical-align: top;
+			padding: 0;
+			img {
+				padding-top: 4px;
+				padding-bottom: 2px;
+				padding-left: 2px;
+				width: 55px;
+				background-color: #ddd;
+				border-bottom: 1px solid #ccc;
+			}
+		}
+	}
+	.swhead_menus {
+		display: table-cell;
+		width: 100%;
+		div.level1 {
+			nav .pull-right { 
+				margin-bottom: 4px;
+				margin-top: -7px; 
+			}
+			nav .pull-left li { 
+				margin-right: 2px;
+				a {
+					background-color: #eee;
+					border-color: #ddd;
+					border-bottom: 1px solid #ccc;
+					&:hover {
+						background-color: #fff;
+					}
+				}
+				&.swhead_sitename a:hover {
+					background-color: #ddd;
+				}
+			}
+			background-color: #ddd; 
+		}
+	}
+}
+div.level1 {
+	padding-top: 17px; // 18 px top padding (including pos relative in next style) if there is no coll-selector
+	padding-left: 6px;
+	background-color: #ddd;
+	border-bottom: 1px solid #ccc;
+	nav {
+		ul.nav.nav-tabs {
+			margin: 0;
+			position: relative;
+			top: 1px;
+			border-bottom: 1px solid #ccc;
+			li {
+				vertical-align: bottom;
+				display: inline-block;
+				float: none;
+				a {
+					-webkit-transition: 0.1s ease;
+					-moz-transition: 0.1s ease;
+					-o-transition: 0.1s ease;
+					transition: 0.1s ease;
+					&:hover {
+						border: 1px solid #ccc;
+					}
+				}
+
+				&.active a {
+					background: #FFF;
+					border-color: #ccc;
+					border-bottom-color: #FFF !important;
+					cursor: pointer;
+				}
+				&.no_logo {
+					padding-right: 0;
+					margin-right: 0;
+					a {
+						margin-right: 0;
+						background: transparent;
+						font-weight: 700;
+						padding-left: 0px;
+						padding-right: 0px;
+						margin-right: 10px;
+						&:hover {
+							border: 1px solid transparent;
+						}
+					}
+				}
+			}
+		}
+		div.pull-right {
+			.btn {
+				margin-left: 5px;
+				padding-top: 10px;
+				padding-bottom: 10px;
+				&.login {
+					padding-top: 3px;
+					padding-bottom: 3px;
+					img {
+						vertical-align: middle;
+					}
+				}
+				&.btn-default {
+					-webkit-transition: 0.1s ease;
+					-moz-transition: 0.1s ease;
+					-o-transition: 0.1s ease;
+					transition: 0.1s ease;					
+					&:hover {
+						//background-color: #ccc;
+						border: 1px solid #ccc;
+					}
+				}
+			}
+		}
+	}
+	.swhead_item.login.user {
+		padding: 4px;
+		img {
+			vertical-align: middle;
+			margin-right: 3px;
+		}
+	}
+}
+div.level2 {
+	padding: 6px 15px 15px 6px;
+	background: #FFF;
+	nav .nav {
+		margin: 0;
+		> li > a {
+			padding: 6px 10px 4px;
+			font-size: 92%;
+			background-color: #eee;
+		}
+		li {
+			margin-right: 4px;
+			&.active a,
+			&.active a:hover,
+			&.active a:focus {
+				background-color: #337ab7;
+			}
+		}
+	}
+}
+
+@media (max-width: 712px) {
+	.swhead_logo img {
+		padding: 21px 0px 22px 2px !important;
+	}
+}
+
+// Buttons paddings/margins - required because of the specific Font Family
+.evo_post_title .btn-group a {
+	padding-top: 2px;
+	padding-bottom: 0px;
+}
+.pagination {
+	li span, li a {
+		padding-top: 7px;
+		padding-bottom: 5px;
+	}
+	li a:last-child {
+		padding-top: 6px;
+		padding-bottom: 6px;
+	}
+}
+.small.post_tags a {
+	padding-top: 3px;
+	padding-bottom: 2px;
+}
+
+// Site footer:
+.sitewide_footer {
+	color: #777;
+	font-family: Arial, Helvetica, sans-serif !important;
+	background: #f5f5f5;
+	.container {
+		padding: 15px;
+		text-align: center;
+		p {
+			margin-bottom: 0px;
+		}
+	}
+}

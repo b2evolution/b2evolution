@@ -5,7 +5,7 @@
  * This happens when you request an invalid tracking code on track.php for example
  *
  * @package skins
- * @subpackage bootstrap_site_skin
+ * @subpackage bootstrap_site_tabs_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
