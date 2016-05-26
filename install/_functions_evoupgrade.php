@@ -7482,20 +7482,29 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 11770, 'Upgrading files table...' ) )
-	{ // part of 6.7.2-beta
+	{ // part of 6.7.3-beta
 		db_add_index( 'T_files', 'file_creator_user_id', 'file_creator_user_id' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11775, 'Upgrading general settings table...' ) )
-	{	// part of 6.7.2-stable
+	if( upg_task_start( 11775, 'Add new types "Text" and "HTML" for custom fields of item types...' ) )
+	{	// part of 6.7.3-stable
+		$DB->query( 'ALTER TABLE T_items__item_settings
+			MODIFY COLUMN iset_value varchar( 10000 ) NULL' );
+		$DB->query( 'ALTER TABLE T_items__type_custom_field
+			MODIFY COLUMN itcf_type ENUM( "double", "varchar", "text", "html" ) COLLATE ascii_general_ci NOT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11780, 'Upgrading general settings table...' ) )
+	{	// part of 6.7.3-stable
 		$DB->query( 'ALTER TABLE T_settings
 			MODIFY set_name VARCHAR(50) COLLATE ascii_general_ci NOT NULL' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11780, 'Install default site skin...' ) )
-	{	// part of 6.7.2-stable
+	if( upg_task_start( 11785, 'Install default site skin...' ) )
+	{	// part of 6.7.3-stable
 		load_funcs( 'skins/_skin.funcs.php' );
 		$SkinCache = & get_SkinCache();
 		if( ! ( $default_site_Skin = & $SkinCache->get_by_folder( 'default_site_skin', false ) ) )

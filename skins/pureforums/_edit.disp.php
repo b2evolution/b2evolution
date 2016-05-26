@@ -231,7 +231,12 @@ $Form->begin_form( 'inskin', '', $params );
 		
 		// CALL PLUGINS NOW:
 		ob_start();
-		$Plugins->trigger_event( 'DisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'inskin' ) );
+		$Plugins->trigger_event( 'DisplayEditorButton', array(
+				'target_type'   => 'Item',
+				'target_object' => $edited_Item,
+				'content_id'    => 'itemform_post_content',
+				'edit_layout'   => 'inskin'
+			) );
 		$plugins_editor_button = ob_get_clean();
 
 		$Form->switch_template_parts( array(

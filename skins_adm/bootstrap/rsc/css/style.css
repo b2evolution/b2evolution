@@ -622,10 +622,13 @@ fieldset ul {
   display: block;
 }
 #itemform_adv_props div.tile,
-#itemform_adv_props div.controls {
+#itemform_custom_fields div.tile,
+#itemform_adv_props div.controls,
+#itemform_custom_fields div.controls {
   width: 100%;
 }
-#itemform_adv_props td.label {
+#itemform_adv_props td.label,
+#itemform_custom_fields td.label {
   background: none;
   color: #000;
   text-shadow: none;
@@ -633,7 +636,8 @@ fieldset ul {
   vertical-align: top;
   padding: 9px 10px 0 0;
 }
-#itemform_adv_props .help-inline label {
+#itemform_adv_props .help-inline label,
+#itemform_custom_fields .help-inline label {
   font-weight: normal;
   display: block;
 }
@@ -1106,7 +1110,7 @@ nav.level1 {
 div.level3 nav .nav > li > a {
   padding: 4px 10px;
   font-size: 92%;
-  background-color: #eee;
+  background-color: #f6f6f6;
 }
 div.level3 nav .nav > li.active a,
 div.level3 nav .nav > li.active a:hover,
@@ -1193,7 +1197,7 @@ div.level3 nav .nav > li.active a:focus {
   border-radius: 4px;
   padding: 5px;
   float: left;
-  margin: 15px;
+  margin: 5px;
 }
 .skinshot .skinshot_placeholder {
   width: 240px;
@@ -1217,12 +1221,6 @@ div.level3 nav .nav > li.active a:focus {
   padding: 0;
   float: none;
   margin: -1ex -1ex 1ex -1ex;
-}
-.skin_selector_block {
-  margin: -15px 0 0 -15px;
-}
-.skin_selector_block .skinshot {
-  margin: 15px 0 0 15px;
 }
 .skinshot_new {
   text-align: center;

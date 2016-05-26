@@ -4540,7 +4540,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					}
 					if( isset( $icon['size-'.$icon_param_name][1] ) )
 					{ // Height
-						$styles['width'] = 'height:'.$icon['size-'.$icon_param_name][1].'px';
+						$styles['height'] = 'height:'.$icon['size-'.$icon_param_name][1].'px';
 					}
 				}
 
@@ -5219,15 +5219,19 @@ function update_html_tag_attribs( $html_tag, $new_attribs, $attrib_actions = arr
 	$html_tag_name = $tag_match[1];
 
 	$old_attribs = array();
+	$updated_attribs = array();
 	if( preg_match_all( '@(\S+)=("|\'|)(.*)("|\'|>)@isU', $html_tag, $attr_matches ) )
 	{	// Get all existing attributes:
 		foreach( $attr_matches[1] as $o => $old_attr_name )
 		{
 			$old_attribs[ $old_attr_name ] = $attr_matches[3][ $o ];
+			if( ! isset( $new_attribs[ $old_attr_name ] ) )
+			{	// This attribute is not updated, keep current value:
+				$updated_attribs[] = $old_attr_name.'="'.format_to_output( $attr_matches[3][ $o ], 'formvalue' ).'"';
+			}
 		}
 	}
 
-	$updated_attribs = array();
 	foreach( $new_attribs as $new_attrib_name => $new_attrib_value )
 	{
 		if( isset( $old_attribs[ $new_attrib_name ] ) )
@@ -7702,8 +7706,9 @@ function evo_version_compare( $version1, $version2, $operator = NULL )
 		$version1 = $app_version;
 	}
 
-	// Remove part after "-" from versions like "6.6.6-stable":
-	$version1 = preg_replace( '/(-.+)?/', '', $version1 );
+	// Remove "stable" suffix to compare such versions as upper than "alpha", "beta" and etc.:
+	$version1 = str_replace( '-stable', '', $version1 );
+	$version2 = str_replace( '-stable', '', $version2 );
 
 	if( is_null( $operator ) )
 	{	// To return integer:

@@ -53,7 +53,7 @@ echo '<div class="form-group">';
 $Form->switch_layout( 'linespan' );
 $Form->switch_template_parts( array(
 		'inputstart' => '<div class="control" style="display: inline-block;">',
-		'inputend' => '</block>',
+		'inputend' => '</div>',
 		'labelstart' => '<span style="padding-right: 15px;">',
 		'labelend' => '</span>',
 	) );

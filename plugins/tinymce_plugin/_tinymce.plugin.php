@@ -48,6 +48,20 @@ class tinymce_plugin extends Plugin
 
 
 	/**
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_coll_setting_definitions( & $params )
+	{
+		$default_params = array_merge( $params, array( 'default_comment_using' => 'disabled' ) );
+
+		return parent::get_coll_setting_definitions( $default_params );
+	}
+
+
+	/**
 	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
 	 *
 	 * @param array Associative array of parameters (since v1.9).
@@ -268,6 +282,13 @@ class tinymce_plugin extends Plugin
 
 				if( ! empty( $edited_Item ) && ! $edited_Item->get_type_setting( 'allow_html' ) )
 				{	// Only when HTML is allowed in post:
+					return false;
+				}
+
+				$item_Blog = & $edited_Item->get_Blog();
+
+				if( ! $this->get_coll_setting( 'coll_use_for_posts', $item_Blog ) )
+				{	// This plugin is disabled to use for posts:
 					return false;
 				}
 
