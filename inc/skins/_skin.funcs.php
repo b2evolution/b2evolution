@@ -78,6 +78,9 @@ function skin_init( $disp )
 
 	$Debuglog->add('skin_init: $disp='.$disp, 'skins' );
 
+	// Initialize site skin if it is enabled:
+	siteskin_init();
+
 	// This is the main template; it may be used to display very different things.
 	// Do inits depending on current $disp:
 	switch( $disp )
@@ -1554,15 +1557,60 @@ var downloadInterval = setInterval( function()
 	}
 }
 
+
+/**
+ * Get site Skin global object
+ *
+ * @return object Site Skin
+ */
+function & get_site_Skin()
+{
+	global $site_Skin;
+
+	if( ! isset( $site_Skin ) )
+	{	// Initialize site Skin only first time:
+
+		global $Settings;
+		if( ! $Settings->get( 'site_skins_enabled' ) )
+		{	// Site skins are not enabled:
+			$site_Skin = NULL;
+			return $site_Skin;
+		}
+
+		global $Session;
+		if( ! empty( $Session ) )
+		{	// Get site skin Id depending on current session:
+			if( $Session->is_mobile_session() )
+			{	// Mobile session:
+				$skin_ID = $Settings->get( 'mobile_skin_ID' );
+			}
+			elseif( $Session->is_tablet_session() )
+			{	// Tablet session:
+				$skin_ID = $Settings->get( 'tablet_skin_ID' );
+			}
+		}
+		if( empty( $skin_ID ) )
+		{	// Use normal skin ID by default when mobile and tablet skins are not defined for site:
+			$skin_ID = $Settings->get( 'normal_skin_ID' );
+		}
+
+		// Try to get site Skin from DB by ID:
+		$SkinCache = & get_SkinCache();
+		$site_Skin = & $SkinCache->get_by_ID( $skin_ID, false, false );
+	}
+
+	return $site_Skin;
+}
+
+
+/**
+ * Initalize site Skin
+ */
 function siteskin_init()
 {
-	// The following is temporary and should be moved to some SiteSkin class
-	global $Settings;
-
-	if( $Settings->get( 'site_skins_enabled' ) )
-	{ // Site skins are enabled
-		// Include the additional required files
-		siteskin_include( '_skin_init.inc.php' );
+	if( $site_Skin = & get_site_Skin() )
+	{	// Initialize site skin:
+		$site_Skin->siteskin_init();
 	}
 }
 
@@ -1915,14 +1963,13 @@ function skin_template_path( $template_name )
  *
  * @param string Template name
  * @param array Params
- * @param boolean force include even if sitewide header/footer not enabled
  */
-function siteskin_include( $template_name, $params = array(), $force = false )
+function siteskin_include( $template_name, $params = array() )
 {
-	global $Settings, $siteskins_path, $Blog;
+	global $Settings, $skins_path, $Blog;
 
-	if( !$Settings->get( 'site_skins_enabled' ) && !$force )
-	{ // Site skins are not enabled and we don't want to force either
+	if( ! $Settings->get( 'site_skins_enabled' ) )
+	{	// Site skins are not enabled:
 		return;
 	}
 
@@ -1945,20 +1992,17 @@ function siteskin_include( $template_name, $params = array(), $force = false )
 	$timer_name = 'siteskin_include('.$template_name.')';
 	$Timer->resume( $timer_name );
 
-	if( file_exists( $siteskins_path.'custom/'.$template_name ) )
-	{ // Use the custom template:
-		$file = $siteskins_path.'custom/'.$template_name;
-		$debug_info = '<b>Custom template</b>: '.rel_path_to_base($file);
-		$disp_handled = 'custom';
-	}
-	elseif( file_exists( $siteskins_path.$template_name ) ) // Try to include standard template only if custom template doesn't exist
-	{ // Use the default/fallback template:
-		$file = $siteskins_path.$template_name;
-		$debug_info = '<b>Fallback to</b>: '.rel_path_to_base($file);
-		$disp_handled = 'fallback';
+	// Get site Skin:
+	$site_Skin = & get_site_Skin();
+
+	if( $site_Skin && file_exists( $site_Skin->get_path().$template_name ) )
+	{	// Use site skin template:
+		$file = $site_Skin->get_path().$template_name;
+		$debug_info = '<b>Site Skin template</b>: '.rel_path_to_base( $file );
+		$disp_handled = 'skin';
 	}
 	else
-	{
+	{	// Site skin is wrong or the requested template file is not found in current site skin:
 		$disp_handled = false;
 	}
 
@@ -1977,30 +2021,25 @@ function siteskin_include( $template_name, $params = array(), $force = false )
 		$display_includes = false;
 	}
 	if( $display_includes )
-	{ // Wrap the include with a visible div:
+	{	// Wrap the include with a visible div:
 		echo '<div class="dev-blocks dev-blocks--siteinclude">';
 		echo '<div class="dev-blocks-name">siteskin_include( <b>'.$template_name.'</b> ) -> '.$debug_info.'</div>';
 	}
 
 
-	if($disp_handled)
-	{
-		$Debuglog->add('siteskin_include: '.rel_path_to_base($file), 'skins');
+	if( $disp_handled )
+	{	// Include site skin template file:
+		$Debuglog->add('siteskin_include: '.rel_path_to_base( $file ), 'skins');
 		require $file;
 	}
 	else
-	{	// nothing handled the display
-		printf( '<div class="skin_error">Site template [%s] not found.</div>', $template_name );
-		if( !empty($current_User) && $current_User->level == 10 )
-		{
-			printf( '<div class="skin_error">User level 10 help info: [%s]</div>', $siteskins_path.$template_name );
-		}
+	{	// Nothing handled the display:
+		printf( '<div class="skin_error">Site skin template [%s] not found.</div>', $template_name );
 	}
 
 
 	if( $display_includes )
-	{ // End of visible container:
-		// echo get_icon( 'pixel', 'imgtag', array( 'class' => 'clear' ) );
+	{	// End of visible container:
 		echo '</div>';
 	}
 
@@ -2470,9 +2509,21 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 			echo '<span>'.( isset( $edited_Skin->version ) ? $edited_Skin->version : 'unknown' ).'</span>';
 		echo '</div>';
 
-		// Skin type
+		// Site Skin:
 		echo '<div class="skin_setting_row">';
-			echo '<label>'.T_('Skin type').':</label>';
+			echo '<label>'.T_('Site Skin').':</label>';
+			echo '<span>'.( $edited_Skin->provides_site_skin() ? T_('Yes') : T_('No') ).'</span>';
+		echo '</div>';
+
+		// Collection Skin:
+		echo '<div class="skin_setting_row">';
+			echo '<label>'.T_('Collection Skin').':</label>';
+			echo '<span>'.( $edited_Skin->provides_collection_skin() ? T_('Yes') : T_('No') ).'</span>';
+		echo '</div>';
+
+		// Skin format:
+		echo '<div class="skin_setting_row">';
+			echo '<label>'.T_('Skin format').':</label>';
 			echo '<span>'.$edited_Skin->type.'</span>';
 		echo '</div>';
 
@@ -2639,5 +2690,28 @@ function get_skin_version( $skin_ID )
 	}
 
 	return 'unknown';
+}
+
+
+/**
+ * Check compatibility skin with requested type
+ *
+ * @param integer Skin ID
+ * @param string Type: 'site' or 'coll'
+ * @return boolean
+ */
+function skin_check_compatibility( $skin_ID, $type )
+{
+	$SkinCache = & get_SkinCache();
+	$Skin = & $SkinCache->get_by_ID( $skin_ID, false, false );
+
+	if( ! $Skin ||
+	    ( $type == 'coll' && ! $Skin->provides_collection_skin() ) ||
+	    ( $type == 'site' && ! $Skin->provides_site_skin() ) )
+	{	// Skin cannot be used for requested type:
+		return false;
+	}
+
+	return true;
 }
 ?>

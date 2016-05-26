@@ -2,7 +2,8 @@
 /**
  * This page displays an error message when we have detected access to the stats.
  *
- * @package evocore
+ * @package skins
+ * @subpackage default_site_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -13,7 +14,7 @@ header_http_response('410 Gone');
 
 $page_title = '410 Gone';
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
-siteskin_include( '_html_header.inc.php', array(), true );	// force include even if site headers/footers are not enabled
+siteskin_include( '_html_header.inc.php' );
 // -------------------------------- END OF HEADER --------------------------------
 
 // ---------------------------- SITE HEADER INCLUDED HERE ----------------------------
@@ -30,8 +31,6 @@ siteskin_include( '_site_body_footer.inc.php' );
 // ------------------------------- END OF SITE FOOTER --------------------------------
 
 // -------------------------- HTML FOOTER INCLUDED HERE --------------------------
-siteskin_include( '_html_footer.inc.php', array(), true );	// force include even if site headers/footers are not enabled
+siteskin_include( '_html_footer.inc.php' );
 // -------------------------------- END OF FOOTER --------------------------------
-
-exit(0);
 ?>

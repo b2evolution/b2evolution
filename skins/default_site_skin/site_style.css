@@ -1,6 +1,7 @@
 /*
- * Site wide styles used when site wide body & footer are enabled
+ * Styles for Site skin "default_site_skin"
  */
+
 /* Override BODY from skin to make sure we touch the edges of the page: */
 body {
 	margin: 0;

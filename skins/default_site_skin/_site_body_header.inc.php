@@ -5,7 +5,8 @@
  * If enabled, this will be included at the top of all skins to provide a common identity and site wide navigation.
  * NOTE: each skin is responsible for calling siteskin_include( '_site_body_header.inc.php' );
  *
- * @package site_skins
+ * @package skins
+ * @subpackage default_site_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -30,7 +31,7 @@ else
 <a href="<?php echo $baseurl; ?>" class="swhead_sitename<?php echo $site_title_class; ?>"><?php echo $site_name_text; ?></a>
 
 <?php
-	// --------------------------------- START OF BLOG LIST --------------------------------
+	// --------------------------------- START OF COLLECTION LIST --------------------------------
 	// Call widget directly (without container):
 	skin_widget( array(
 						// CODE for the widget:
@@ -48,7 +49,7 @@ else
 						'link_selected_class' => 'swhead_item swhead_item_selected',
 						'link_default_class' => 'swhead_item ',
 				) );
-	// ---------------------------------- END OF BLOG LIST ---------------------------------
+	// ---------------------------------- END OF COLLECTION LIST ---------------------------------
 
 	if( $Settings->get( 'info_blog_ID' ) > 0 )
 	{ // We have a collection for info pages:

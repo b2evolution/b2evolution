@@ -4,7 +4,8 @@
  *
  * This happens when you request an invalid tracking code on track.php for example
  *
- * @package evocore
+ * @package skins
+ * @subpackage bootstrap_site_tabs_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -13,7 +14,7 @@ header('Content-Type: text/html; charset=utf-8'); // no translation
 
 $page_title = '404 Not Found';
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
-siteskin_include( '_html_header.inc.php', array(), true );	// force include even if site headers/footers are not enabled
+siteskin_include( '_html_header.inc.php' );
 // -------------------------------- END OF HEADER --------------------------------
 
 ?>
@@ -22,8 +23,6 @@ siteskin_include( '_html_header.inc.php', array(), true );	// force include even
 <?php
 
 // -------------------------- HTML FOOTER INCLUDED HERE --------------------------
-siteskin_include( '_html_footer.inc.php', array(), true );	// force include even if site headers/footers are not enabled
+siteskin_include( '_html_footer.inc.php' );
 // -------------------------------- END OF FOOTER --------------------------------
-
-exit(0);
 ?>

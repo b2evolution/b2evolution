@@ -362,7 +362,7 @@ class Hit
 	{
 		global $Debuglog, $debug;
 		global $self_referer_list, $SpecialList;  // used to detect $referer_type
-		global $skins_path, $siteskins_path;
+		global $skins_path;
 		global $Settings;
 
 		if( isset($referer) )
@@ -458,7 +458,8 @@ class Hit
 
 			if( $Settings->get('antispam_block_spam_referers') )
 			{ // In order to preserve server resources, we're going to stop processing immediatly (no logging)!!
-				require $siteskins_path.'_403_referer_spam.main.php';	// error & exit
+				siteskin_init();
+				siteskin_include( '_403_referer_spam.main.php' ); // error
 				exit(0); // just in case.
 				// THIS IS THE END!!
 			}

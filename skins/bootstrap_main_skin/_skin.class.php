@@ -48,6 +48,15 @@ class bootstrap_main_Skin extends Skin
 
 
 	/**
+	 * Does this skin provide site-skin functionality?
+	 */
+	function provides_site_skin()
+	{
+		return true;	// not true yet, but we need this during testing...
+	}
+
+
+	/**
 	 * What evoSkins API does has this skin been designed with?
 	 *
 	 * This determines where we get the fallback templates from (skins_fallback_v*)

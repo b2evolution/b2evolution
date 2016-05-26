@@ -5,7 +5,8 @@
  * If enabled, this will be included at the bottom of all skins to provide site wide copyright info for example.
  * NOTE: each skin is ressponsible for calling siteskin_include( '_site_body_footer.inc.php' );
  *
- * @package site_skins
+ * @package skins
+ * @subpackage default_site_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

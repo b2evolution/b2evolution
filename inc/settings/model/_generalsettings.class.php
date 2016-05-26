@@ -399,6 +399,27 @@ C message size exceeds',
 
 		switch($parname)
 		{
+			case 'normal_skin_ID':
+				$result = parent::getx( $parname );
+				if( $result === NULL )
+				{	// Try to get default from the global settings:
+					$result = $this->get( 'def_'.$parname );
+				}
+				return $result;
+
+			case 'mobile_skin_ID':
+			case 'tablet_skin_ID':
+				$result = parent::getx( $parname );
+				if( $result === NULL )
+				{	// Try to get default from the global settings:
+					$result = $this->get( 'def_'.$parname );
+				}
+				if( ( $result === '0' ) && ! $real_value )
+				{	// 0 value means that use the same as normal case:
+					$result = $this->get( 'normal_skin_ID' );
+				}
+				return $result;
+
 			case 'allow_avatars':
 				return ( parent::getx( $parname ) && isset($GLOBALS['files_Module']) );
 				break;

@@ -28,9 +28,6 @@ $params = array_merge( array(
 	'body_class'    => NULL,
 ), $params );
 
-// The following is temporary and should be moved to some SiteSkin class
-siteskin_init();
-
 init_bubbletip_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) ); // Add jQuery bubbletip plugin
 require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 // CSS for IE9. NOTE: Don't use php checking here because of page caching!

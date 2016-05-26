@@ -974,7 +974,7 @@ else
 			break;
 
 		case 'skin':
-			$AdminUI->set_path( 'collections', 'skin', 'current_skin' );
+			$AdminUI->set_path( 'collections', 'skin', 'coll_skin' );
 			$AdminUI->breadcrumbpath_add( T_('Skin'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			if( $skinpage == 'selection' )
 			{

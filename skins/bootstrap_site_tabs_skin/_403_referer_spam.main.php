@@ -2,7 +2,8 @@
 /**
  * This page displays an error message when we have detected referer spam.
  *
- * @package evocore
+ * @package skins
+ * @subpackage bootstrap_site_tabs_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -13,7 +14,7 @@ header_http_response('403 Forbidden');
 
 $page_title = '403 Forbidden - Please stop referer spam.';
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
-siteskin_include( '_html_header.inc.php', array(), true );	// force include even if site headers/footers are not enabled
+siteskin_include( '_html_header.inc.php' );
 // -------------------------------- END OF HEADER --------------------------------
 
 // ---------------------------- SITE HEADER INCLUDED HERE ----------------------------
@@ -37,8 +38,6 @@ siteskin_include( '_site_body_footer.inc.php' );
 // ------------------------------- END OF SITE FOOTER --------------------------------
 
 // -------------------------- HTML FOOTER INCLUDED HERE --------------------------
-siteskin_include( '_html_footer.inc.php', array(), true );	// force include even if site headers/footers are not enabled
+siteskin_include( '_html_footer.inc.php' );
 // -------------------------------- END OF FOOTER --------------------------------
-
-exit(0);
 ?>

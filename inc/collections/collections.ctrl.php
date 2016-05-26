@@ -18,7 +18,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-param( 'tab', 'string', 'site_settings', true );
+param( 'tab', 'string', '', true );
 
 param_action( 'list' );
 
@@ -26,7 +26,8 @@ if( strpos( $action, 'new' ) !== false )
 { // Simulate tab to value 'new' for actions to create new blog
 	$tab = 'new';
 }
-if( ! in_array( $action, array( 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site', 'new_collgroup', 'edit_collgroup', 'delete_collgroup' ) ) )
+if( ! in_array( $action, array( 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site', 'new_collgroup', 'edit_collgroup', 'delete_collgroup', 'update_site_skin' ) ) &&
+    ! in_array( $tab, array( 'site_settings', 'site_skin' ) ) )
 {
 	if( valid_blog_requested() )
 	{
@@ -449,10 +450,126 @@ switch( $action )
 			$edited_CollGroup->check_delete( sprintf( T_('Cannot delete collection group "%s"'), $edited_CollGroup->dget( 'name' ) ) );
 		}
 		break;
+
+	case 'update_site_skin':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'siteskin' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		param( 'skinpage', 'string', '' );
+
+		if( $skinpage == 'selection' )
+		{
+			$SkinCache = & get_SkinCache();
+
+			if( param( 'normal_skin_ID', 'integer', NULL ) !== NULL )
+			{	// Normal skin ID:
+				$updated_skin_type = 'normal';
+				$updated_skin_ID = get_param( 'normal_skin_ID' );
+				$Settings->set( 'normal_skin_ID', $updated_skin_ID );
+			}
+			elseif( param( 'mobile_skin_ID', 'integer', NULL ) !== NULL )
+			{	// Mobile skin ID:
+				$updated_skin_type = 'mobile';
+				$updated_skin_ID = get_param( 'mobile_skin_ID' );
+				if( $updated_skin_ID == 0 )
+				{	// Don't store this empty setting in DB:
+					$Settings->delete( 'mobile_skin_ID' );
+				}
+				else
+				{	// Set mobile skin:
+					$Settings->set( 'mobile_skin_ID', $updated_skin_ID );
+				}
+			}
+			elseif( param( 'tablet_skin_ID', 'integer', NULL ) !== NULL )
+			{	// Tablet skin ID:
+				$updated_skin_type = 'tablet';
+				$updated_skin_ID = get_param( 'tablet_skin_ID' );
+				if( $updated_skin_ID == 0 )
+				{	// Don't store this empty setting in DB:
+					$Settings->delete( 'tablet_skin_ID' );
+				}
+				else
+				{	// Set tablet skin:
+					$Settings->set( 'tablet_skin_ID', $updated_skin_ID );
+				}
+			}
+
+			if( ! empty( $updated_skin_ID ) && ! skin_check_compatibility( $updated_skin_ID, 'site' ) )
+			{	// Redirect to admin skins page selector if the skin cannot be selected:
+				$Messages->add( T_('The skin cannot be used for site.'), 'error' );
+				header_redirect( $admin_url.'?ctrl=collections&tab=site_skin&skinpage=selection&skin_type='.$updated_skin_type );
+				break;
+			}
+
+			if( $Settings->dbupdate() )
+			{
+				$Messages->add( T_('The site skin has been changed.')
+									.' <a href="'.$admin_url.'?ctrl=collections&amp;tab=site_skin">'.T_('Edit...').'</a>', 'success' );
+				if( ( !$Session->is_mobile_session() && !$Session->is_tablet_session() && param( 'normal_skin_ID', 'integer', NULL ) !== NULL ) ||
+						( $Session->is_mobile_session() && param( 'mobile_skin_ID', 'integer', NULL ) !== NULL ) ||
+						( $Session->is_tablet_session() && param( 'tablet_skin_ID', 'integer', NULL ) !== NULL ) )
+				{	// Redirect to home page if we change the skin for current device type:
+					header_redirect( $baseurl );
+				}
+				else
+				{	// Redirect to admin skins page if we change the skin for another device type:
+					header_redirect( $admin_url.'?ctrl=collections&tab=site_skin' );
+				}
+			}
+		}
+		else
+		{	// Update site skin settings:
+			$SkinCache = & get_SkinCache();
+			$normal_Skin = & $SkinCache->get_by_ID( $Settings->get( 'normal_skin_ID' ) );
+			$mobile_Skin = & $SkinCache->get_by_ID( $Settings->get( 'mobile_skin_ID' ) );
+			$tablet_Skin = & $SkinCache->get_by_ID( $Settings->get( 'tablet_skin_ID' ) );
+
+			// Unset global blog vars in order to work with site skin:
+			unset( $Blog, $blog, $global_param_list['blog'], $edited_Blog );
+
+			$normal_Skin->load_params_from_Request();
+			$mobile_Skin->load_params_from_Request();
+			$tablet_Skin->load_params_from_Request();
+
+			if(	! param_errors_detected() )
+			{	// Update settings:
+				$normal_Skin->dbupdate_settings();
+				$mobile_Skin->dbupdate_settings();
+				$tablet_Skin->dbupdate_settings();
+				$Messages->add( T_('Skin settings have been updated'), 'success' );
+				// Redirect so that a reload doesn't write to the DB twice:
+				header_redirect( $admin_url.'?ctrl=collections&tab=site_skin', 303 ); // Will EXIT
+			}
+		}
+		break;
 }
 
 switch( $tab )
 {
+	case 'site_skin':
+		if( $Settings->get( 'site_skins_enabled' ) )
+		{
+			// Check minimum permission:
+			$current_User->check_perm( 'options', 'view', true );
+
+			$AdminUI->set_path( 'site', 'skin', 'site_skin' );
+
+			$AdminUI->breadcrumbpath_init( false );
+			$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
+			$AdminUI->breadcrumbpath_add( T_('Site skin'), $admin_url.'?ctrl=collections&amp;tab=site_skin' );
+
+			$AdminUI->set_page_manual_link( 'site-skin' );
+			break;
+		}
+		else
+		{
+			$tab = 'site_settings';
+			$Messages->add( T_('Please enable site skins to use them.'), 'error' );
+		}
+
 	case 'site_settings':
 		// Check minimum permission:
 		$current_User->check_perm( 'options', 'view', true );
@@ -652,6 +769,22 @@ switch( $action )
 		{
 			case 'site_settings':
 				$AdminUI->disp_view( 'collections/views/_coll_settings_site.form.php' );
+				break;
+
+			case 'site_skin':
+				param( 'skinpage', 'string', '' );
+
+				// Unset global blog vars in order to work with site skin:
+				unset( $Blog, $blog, $global_param_list['blog'], $edited_Blog );
+
+				if( $skinpage == 'selection' )
+				{
+					$AdminUI->disp_view( 'skins/views/_coll_skin.view.php' );
+				}
+				else
+				{
+					$AdminUI->disp_view( 'skins/views/_coll_skin_settings.form.php' );
+				}
 				break;
 
 			case 'blog_settings':

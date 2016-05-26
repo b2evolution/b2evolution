@@ -36,8 +36,10 @@ $Goal = & $GoalCache->get_by_name( $key, false, false );
 if( empty( $Goal ) )
 { // Goal key doesn't exist in DB
 	load_funcs( 'skins/_skin.funcs.php' );
-	require $siteskins_path.'_404_basic_not_found.main.php'; // error & exit
+	siteskin_init();
+	siteskin_include( '_404_basic_not_found.main.php' ); // error
 	exit(0);
+	// EXIT.
 }
 
 if( ! empty( $Goal->redir_url ) || ! empty( $Goal->temp_redir_url ) )

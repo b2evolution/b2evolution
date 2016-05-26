@@ -94,6 +94,8 @@ class Skin extends DataObject
 						'and_condition' => '( cset_name = "normal_skin_ID" OR cset_name = "mobile_skin_ID" OR cset_name = "tablet_skin_ID" )' ),
 				array( 'table'=>'T_settings', 'fk'=>'set_value', 'msg'=>T_('This skin is set as default skin.'),
 						'and_condition' => '( set_name = "def_normal_skin_ID" OR set_name = "def_mobile_skin_ID" OR set_name = "def_tablet_skin_ID" )' ),
+				array( 'table'=>'T_settings', 'fk'=>'set_value', 'msg'=>T_('The site is using this skin.'),
+						'and_condition' => '( set_name = "normal_skin_ID" OR set_name = "mobile_skin_ID" OR set_name = "tablet_skin_ID" )' ),
 			);
 	}
 
@@ -132,11 +134,31 @@ class Skin extends DataObject
 
 
 	/**
-	 * Get default type for the skin.
+	 * Get default type/format for the skin.
+	 *
+	 * Possible values are normal, tablet, phone, feed, sitemap.
 	 */
 	function get_default_type()
 	{
 		return (substr($this->folder,0,1) == '_' ? 'feed' : 'normal');
+	}
+
+
+	/**
+	 * Does this skin providesnormal (collection) skin functionality?
+	 */
+	function provides_collection_skin()
+	{
+		return true;	// If the skin doesn't override this, it will be a collection skin.
+	}
+
+
+	/**
+	 * Does this skin provide site-skin functionality?
+	 */
+	function provides_site_skin()
+	{
+		return false;	// If the skin doesn't override this, it will NOT be a site skin.
 	}
 
 
@@ -622,7 +644,7 @@ class Skin extends DataObject
 							echo '<a href="'.$skin_url.'" title="'.T_('Install NOW!').'">';
 							echo T_('Install NOW!').'</a>';
 						}
-						if( empty( $kind ) && get_param( 'tab' ) != 'current_skin' )
+						if( empty( $kind ) && get_param( 'tab' ) != 'coll_skin' && get_param( 'tab' ) != 'site_skin' )
 						{	// Don't display the checkbox on new collection creating form and when we install one skin for the selected collection:
 							$skin_name_before = '<label><input type="checkbox" name="skin_folders[]" value="'.$skin_name.'" /> ';
 							$skin_name_after = '</label>';
@@ -684,15 +706,12 @@ class Skin extends DataObject
 	 */
 	function get_setting( $parname )
 	{
-		/**
-		 * @var Blog
-		 */
-		global $Blog;
+		global $Blog, $Settings;
 
-		// Name of the setting in the blog settings:
-		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
+		// Name of the setting in the settings:
+		$setting_name = 'skin'.$this->ID.'_'.$parname;
 
-		$value = $Blog->get_setting( $blog_setting_name );
+		$value = isset( $Blog ) ? $Blog->get_setting( $setting_name ) : $Settings->get( $setting_name );
 
 		if( ! is_null( $value ) )
 		{	// We have a value for this param:
@@ -765,22 +784,26 @@ class Skin extends DataObject
 
 
 	/**
-	 * Set a skin specific param value for current Blog
+	 * Set a skin specific param value for current Blog or Site
 	 *
 	 * @param string parameter name
 	 * @param mixed parameter value
 	 */
 	function set_setting( $parname, $parvalue )
 	{
-		/**
-		 * @var Blog
-		 */
-		global $Blog;
+		global $Blog, $Settings;
 
-		// Name of the setting in the blog settings:
-		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
+		// Name of the setting in the settings:
+		$setting_name = 'skin'.$this->ID.'_'.$parname;
 
-		$Blog->set_setting( $blog_setting_name, $parvalue );
+		if( isset( $Blog ) )
+		{	// Set collection skin setting:
+			$Blog->set_setting( $setting_name, $parvalue );
+		}
+		else
+		{ // Set site skin setting:
+			$Settings->set( $setting_name, $parvalue );
+		}
 	}
 
 
@@ -789,12 +812,16 @@ class Skin extends DataObject
 	 */
 	function dbupdate_settings()
 	{
-		/**
-		 * @var Blog
-		 */
-		global $Blog;
+		global $Blog, $Settings;
 
-		$Blog->dbupdate();
+		if( isset( $Blog ) )
+		{	// Update collection skin settings:
+			$Blog->dbupdate();
+		}
+		else
+		{	// Update site skin settings:
+			$Settings->dbupdate();
+		}
 	}
 
 
@@ -1203,6 +1230,21 @@ class Skin extends DataObject
 		{ // Standard skin
 			require_js( 'build/evo_frontoffice.bmin.js', 'blog' );
 		}
+	}
+
+
+	/**
+	 * Get ready for displaying the site skin.
+	 *
+	 * This method may register some CSS or JS.
+	 * The default implementation can register a few common things that you may request in the $features param.
+	 * This is where you'd specify you want to use BOOTSTRAP, etc.
+	 *
+	 * If this doesn't do what you need you may add functions like the following to your skin's siteskin_init():
+	 * require_js() , require_css() , add_js_headline()
+	 */
+	function siteskin_init()
+	{
 	}
 
 

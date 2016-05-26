@@ -577,30 +577,45 @@ class Blog extends DataObject
 
 		if( param( 'normal_skin_ID', 'integer', NULL ) !== NULL )
 		{ // Normal skin ID:
-			$this->set_setting( 'normal_skin_ID', get_param( 'normal_skin_ID' ) );
+			$updated_skin_type = 'normal';
+			$updated_skin_ID = get_param( 'normal_skin_ID' );
+			$this->set_setting( 'normal_skin_ID', $updated_skin_ID );
 		}
 
 		if( param( 'mobile_skin_ID', 'integer', NULL ) !== NULL )
 		{ // Mobile skin ID:
-			if( get_param( 'mobile_skin_ID' ) == 0 )
+			$updated_skin_type = 'mobile';
+			$updated_skin_ID = get_param( 'mobile_skin_ID' );
+			if( $updated_skin_ID == 0 )
 			{ // Don't store this empty setting in DB
 				$this->delete_setting( 'mobile_skin_ID' );
 			}
 			else
 			{ // Set mobile skin
-				$this->set_setting( 'mobile_skin_ID', get_param( 'mobile_skin_ID' ) );
+				$this->set_setting( 'mobile_skin_ID', $updated_skin_ID );
 			}
 		}
 
 		if( param( 'tablet_skin_ID', 'integer', NULL ) !== NULL )
 		{ // Tablet skin ID:
-			if( get_param( 'tablet_skin_ID' ) == 0 )
+			$updated_skin_type = 'tablet';
+			$updated_skin_ID = get_param( 'tablet_skin_ID' );
+			if( $updated_skin_ID == 0 )
 			{ // Don't store this empty setting in DB
 				$this->delete_setting( 'tablet_skin_ID' );
 			}
 			else
 			{ // Set tablet skin
-				$this->set_setting( 'tablet_skin_ID', get_param( 'tablet_skin_ID' ) );
+				$this->set_setting( 'tablet_skin_ID', $updated_skin_ID );
+			}
+		}
+
+		if( ! empty( $updated_skin_ID ) )
+		{
+			load_funcs( 'skins/_skin.funcs.php' );
+			if( ! skin_check_compatibility( $updated_skin_ID, 'coll' ) )
+			{	// Redirect to admin skins page selector if the skin cannot be selected:
+				$Messages->add( T_('The skin cannot be used for collections.'), 'error' );
 			}
 		}
 
@@ -3896,6 +3911,7 @@ class Blog extends DataObject
 					}
 					else
 					{ // Display a template from site skins
+						siteskin_init();
 						siteskin_include( $template );
 						exit;
 					}
