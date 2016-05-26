@@ -574,40 +574,66 @@ class Plugin
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
-		/*
-		if( $this->group != 'rendering' )
-		{
-			return array();
-		}
-		*/
+		$default_settings = array();
 
-		$render_note = '';
-		if( empty( $this->code ) )
+		// Set default collection plugin settings depending on group:
+		switch( $this->group )
 		{
-			$render_note .= T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
-		}
-		$admin_Plugins = & get_Plugins_admin();
-		$rendering_options = $admin_Plugins->get_apply_rendering_values( true );
-		$default_post_rendering = ( isset( $params['default_post_rendering'] ) && in_array( $params['default_post_rendering'], $rendering_options ) ) ? $params['default_post_rendering'] : 'opt-out';
-		$default_comment_rendering = ( isset( $params['default_comment_rendering'] ) && in_array( $params['default_comment_rendering'], $rendering_options ) ) ? $params['default_comment_rendering'] : 'never';
-		$r = array(
-			'coll_apply_rendering' => array(
-					'label' => T_('Apply rendering to posts'),
-					'type' => 'select',
-					'options' => $rendering_options,
-					'defaultvalue' => $default_post_rendering,
-					'note' => $render_note,
-				),
-			'coll_apply_comment_rendering' => array(
-					'label' => T_('Apply rendering to comments'),
-					'type' => 'select',
-					'options' => $rendering_options,
-					'defaultvalue' => $default_comment_rendering,
-					'note' => $render_note,
-				),
-			);
+			case 'rendering':
+				// Renderer plugins:
+				$render_note = '';
+				if( empty( $this->code ) )
+				{
+					$render_note .= T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
+				}
+				$admin_Plugins = & get_Plugins_admin();
+				$rendering_options = $admin_Plugins->get_apply_rendering_values( true );
+				$default_post_rendering = ( isset( $params['default_post_rendering'] ) && in_array( $params['default_post_rendering'], $rendering_options ) ) ? $params['default_post_rendering'] : 'opt-out';
+				$default_comment_rendering = ( isset( $params['default_comment_rendering'] ) && in_array( $params['default_comment_rendering'], $rendering_options ) ) ? $params['default_comment_rendering'] : 'never';
+				$default_settings = array(
+					'coll_apply_rendering' => array(
+							'label'        => T_('Apply rendering to posts'),
+							'type'         => 'select',
+							'options'      => $rendering_options,
+							'defaultvalue' => $default_post_rendering,
+							'note'         => $render_note,
+						),
+					'coll_apply_comment_rendering' => array(
+							'label'        => T_('Apply rendering to comments'),
+							'type'         => 'select',
+							'options'      => $rendering_options,
+							'defaultvalue' => $default_comment_rendering,
+							'note'         => $render_note,
+						),
+					);
+				break;
 
-		return array_merge( $r, $this->get_custom_setting_definitions( $params ) );
+			case 'editor':
+				// Editor plugins:
+				$default_post_using = isset( $params['default_post_using'] ) ? $params['default_post_using'] : 1;
+				if( $default_post_using != 'disabled' )
+				{
+					$default_settings['coll_use_for_posts'] = array(
+							'label'        => T_('Use for posts'),
+							'type'         => 'checkbox',
+							'defaultvalue' => $default_post_using,
+							'note'         => '',
+						);
+				}
+				$default_comment_using = isset( $params['default_comment_using'] ) ? $params['default_comment_using'] : 1;
+				if( $default_comment_using != 'disabled' )
+				{
+					$default_settings['coll_use_for_comments'] = array(
+							'label'        => T_('Use for comments'),
+							'type'         => 'checkbox',
+							'defaultvalue' => $default_comment_using,
+							'note'         => '',
+						);
+				}
+				break;
+		}
+
+		return array_merge( $default_settings, $this->get_custom_setting_definitions( $params ) );
 	}
 
 
