@@ -157,8 +157,10 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 		) );
 
 	echo '<div id="attachments_fieldset_wrapper">';
-		echo '<div id="attachments_fieldset_table">';
-			$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+		echo '<div id="attachments_fieldset_block">';
+			echo '<div id="attachments_fieldset_table">';
+				$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+			echo '</div>';
 		echo '</div>';
 	echo '</div>';
 
@@ -196,6 +198,22 @@ function link_attachment_window( link_owner_type, link_owner_ID, root, path, fm_
 
 jQuery( document ).ready( function()
 {
+	var table_height = jQuery( '#attachments_fieldset_table' ).height();
+	var wrapper_height = jQuery( '#attachments_fieldset_wrapper' ).height();
+	if( table_height > wrapper_height )
+	{
+		wrapper_height = table_height;
+	}
+	if( wrapper_height > table_height )
+	{
+		wrapper_height = table_height;
+	}
+	if( wrapper_height > 320 )
+	{
+		wrapper_height = 320;
+	}
+	jQuery( '#attachments_fieldset_wrapper' ).height( wrapper_height );
+
 	jQuery( '#attachments_fieldset_wrapper' ).resizable(
 	{	// Make the attachments fieldset wrapper resizable:
 		minHeight: 80,
@@ -207,7 +225,9 @@ jQuery( document ).ready( function()
 	} );
 	jQuery( document ).on( 'click', '#attachments_fieldset_wrapper .ui-resizable-handle', function()
 	{	// Increase attachments fieldset height on click to resizable handler:
-		jQuery( '#attachments_fieldset_wrapper' ).css( 'height', jQuery( '#attachments_fieldset_wrapper' ).height() + 80 );
+		var max_height = jQuery( '#attachments_fieldset_table' ).height();
+		var height = jQuery( '#attachments_fieldset_wrapper' ).height() + 80;
+		jQuery( '#attachments_fieldset_wrapper' ).css( 'height', height > max_height ? max_height : height );
 	} );
 } );
 </script>
@@ -442,30 +462,11 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
  */
 function display_link_position( & $row )
 {
-	global $LinkOwner, $htsrv_url;
-	// TODO: fp>dh: can you please implement cumbs in here? I don't clearly understand your code.
-	// TODO: dh> only handle images
+	global $LinkOwner;
 
-	$id = 'display_position_'.$row->link_ID;
-
-	// NOTE: dh> using method=get so that we can use regenerate_url (for non-JS).
-	$r = '<form action="" method="post">
-		<select id="'.$id.'" name="link_position">'
-		.Form::get_select_options_string( $LinkOwner->get_positions( $row->file_ID ), $row->link_position, true).'</select>';
-
-	$r .= '<noscript>';
-	// Add hidden fields for non-JS
-	$url = regenerate_url( 'p,itm_ID,action', 'link_ID='.$row->link_ID.'&action=set_link_position&'.url_crumb('link'), '', '&' );
-	$params = explode('&', substr($url, strpos($url, '?')+1));
-
-	foreach($params as $param)
-	{
-		list($k, $v) = explode('=', $param);
-		$r .= '<input type="hidden" name="'.htmlspecialchars($k).'" value="'.htmlspecialchars($v).'" />';
-	}
-	$r .= '<input class="SaveButton" type="submit" value="&raquo;" />';
-	$r .= '</noscript>';
-	$r .= '</form>';
+	$r = '<select id="display_position_'.$row->link_ID.'">'
+			.Form::get_select_options_string( $LinkOwner->get_positions( $row->file_ID ), $row->link_position, true)
+		.'</select>';
 
 	return str_replace( array( "\r", "\n" ), '', $r );
 }

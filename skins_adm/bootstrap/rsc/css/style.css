@@ -672,9 +672,12 @@ fieldset ul {
   width: 100%;
   height: 160px;
   position: relative;
-  overflow: auto;
   padding-bottom: 6px;
   box-sizing: content-box;
+}
+#attachments_fieldset_wrapper #attachments_fieldset_block {
+  overflow: auto;
+  height: 100%;
 }
 #attachments_fieldset_wrapper .ui-resizable-s {
   background: #c0c0c0;

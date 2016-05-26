@@ -19,8 +19,8 @@ function evo_display_position_onchange( selectInput, url, crumb )
 	}, function(r, status) {
 		r = ajax_debug_clear( r );
 		if( r == "OK" ) {
-			evoFadeSuccess( jQuery(oThis.form).closest('tr') );
-			jQuery(oThis.form).closest('td').removeClass('error');
+			evoFadeSuccess( jQuery(oThis).closest('tr') );
+			jQuery(oThis).closest('td').removeClass('error');
 			if( new_position == 'cover' )
 			{ // Position "Cover" can be used only by one link
 				jQuery( 'select[name=link_position][id!=' + selectInput.id + '] option[value=cover]:selected' ).each( function()
@@ -31,7 +31,7 @@ function evo_display_position_onchange( selectInput, url, crumb )
 			}
 		} else {
 			jQuery(oThis).val(r);
-			evoFadeFailure( jQuery(oThis.form).closest('tr') );
+			evoFadeFailure( jQuery(oThis).closest('tr') );
 			jQuery(oThis.form).closest('td').addClass('error');
 		}
 	} );

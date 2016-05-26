@@ -236,10 +236,20 @@ switch( $action )
 			}
 		}
 
-		param( 'iframe_name', 'string', '', true );
-
-		// Need to specify where to redirect, otherwise referrer will be used
-		$redirect_url = $admin_url.'?ctrl=links&action=edit_links&link_type='.$LinkOwner->type.'&mode=iframe&iframe_name='.$iframe_name.'&link_object_ID='.$LinkOwner->get_ID();
+		// Need to specify where to redirect, otherwise referrer will be used:
+		switch( $LinkOwner->type )
+		{
+			case 'item':
+				$redirect_url = $admin_url.'?ctrl=items&action=edit&p='.$LinkOwner->get_ID();
+				break;
+			case 'comment':
+				$redirect_url = $admin_url.'?ctrl=comments&action=edit&comment_ID='.$LinkOwner->get_ID();
+				break;
+			default:
+				param( 'iframe_name', 'string', '', true );
+				$redirect_url = $admin_url.'?ctrl=links&action=edit_links&link_type='.$LinkOwner->type.'&mode=iframe&iframe_name='.$iframe_name.'&link_object_ID='.$LinkOwner->get_ID();
+				break;
+		}
 		header_redirect( $redirect_url );
 		break;
 
