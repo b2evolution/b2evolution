@@ -1581,7 +1581,7 @@ function blogs_all_results_block( $params = array() )
 	if( $current_User->check_perm( 'blogs', 'create' ) )
 	{
 		global $admin_url;
-		$blogs_Results->global_icon( T_('New Collection Group').'...', 'new', url_add_param( $admin_url, 'ctrl=collections&amp;action=new_collgroup' ), T_('New Collection Group').'...', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+		$blogs_Results->global_icon( T_('New collection group').'...', 'new', url_add_param( $admin_url, 'ctrl=collections&amp;action=new_collgroup' ), T_('New collection group').'...', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 		$blogs_Results->global_icon( T_('New Collection').'...', 'new', url_add_param( $admin_url, 'ctrl=collections&amp;action=new' ), T_('New Collection').'...', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 		
 	}

@@ -27,6 +27,11 @@ class CollGroup extends DataObject
 	var $owner_User = NULL;
 
 	/**
+	 * @var array Array of "Blog" objects, @see CollGroup::get_blogs()
+	 */
+	var $blogs;
+
+	/**
 	 * Constructor
 	 *
 	 * @param object Database row
@@ -125,6 +130,30 @@ class CollGroup extends DataObject
 		}
 
 		return $this->owner_User;
+	}
+
+
+	/**
+	 * Get collections of this group
+	 *
+	 * @return array Array of "Blog" objects
+	 */
+	function get_blogs()
+	{
+		if( empty( $this->ID ) )
+		{	// New creating group has no collections yet, Return an empty array:
+			return array();
+		}
+
+		if( ! isset( $this->blogs ) )
+		{	// Load collections of this group only on first request and cache the result:
+			$BlogCache = & get_BlogCache();
+			$BlogCache->clear();
+			$BlogCache->load_where( 'blog_cgrp_ID = '.$this->ID );
+			$this->blogs = $BlogCache->cache;
+		}
+
+		return $this->blogs;
 	}
 }
 ?>

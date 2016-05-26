@@ -1596,7 +1596,7 @@ function & get_site_Skin()
 
 		// Try to get site Skin from DB by ID:
 		$SkinCache = & get_SkinCache();
-		$site_Skin = & $SkinCache->get_by_ID( $skin_ID, false, false );
+		$site_Skin = $SkinCache->get_by_ID( $skin_ID, false, false );
 	}
 
 	return $site_Skin;
