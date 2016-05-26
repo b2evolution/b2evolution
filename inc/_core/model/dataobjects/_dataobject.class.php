@@ -598,7 +598,7 @@ class DataObject
 		else
 		{	// Object already serialized, let's update!
 			// echo 'UPDATE';
-			return $this->dbupdate_worker();
+			return $this->dbupdate();
 		}
 	}
 
