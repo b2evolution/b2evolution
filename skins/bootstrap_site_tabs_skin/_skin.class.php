@@ -90,7 +90,9 @@ class bootstrap_site_tabs_Skin extends Skin
 
 
 	/**
-	 * 
+	 * Get header tabs
+	 *
+	 * @return array
 	 */
 	function get_header_tabs()
 	{
@@ -120,10 +122,11 @@ class bootstrap_site_tabs_Skin extends Skin
 			// Check each collection if it can be viewed by current user:
 			foreach( $group_blogs as $i => $group_Blog )
 			{
+				$coll_is_active = false;
 				if( $current_blog_ID == $group_Blog->ID &&
 						( $Settings->get( 'info_blog_ID' ) != $current_blog_ID || ( $current_disp != 'page' && $current_disp != 'msgform' ) ) )
 				{	// Mark this menu as active:
-					$this->header_tab_active = $level0_index;
+					$coll_is_active = true;
 				}
 
 				$coll_data = array(
@@ -138,6 +141,10 @@ class bootstrap_site_tabs_Skin extends Skin
 				if( $in_bloglist == 'public' )
 				{	// Everyone can view this collection, Keep this in menu:
 					$tab_items[] = $coll_data;
+					if( $coll_is_active )
+					{
+						$this->header_tab_active = $level0_index;
+					}
 					continue;
 				}
 
@@ -158,6 +165,10 @@ class bootstrap_site_tabs_Skin extends Skin
 				}
 
 				$tab_items[] = $coll_data;
+				if( $coll_is_active )
+				{
+					$this->header_tab_active = $level0_index;
+				}
 			}
 
 			if( ! empty( $tab_items ) )
@@ -175,16 +186,16 @@ class bootstrap_site_tabs_Skin extends Skin
 		// Additional tab with pages and contact links:
 		if( isset( $Blog ) )
 		{
-			$tab_items = array();
+			$tab_items = array( 'pages' );
 
-			if( $current_disp == 'msgform' || $current_disp == 'page' )
+			if( $current_disp == 'msgform' )
 			{	// Mark this menu as active:
 				$this->header_tab_active = $level0_index;
 			}
 
-			if( $Settings->get( 'info_blog_ID' ) == $Blog->ID )
+			if( $current_disp == 'page' && $Settings->get( 'info_blog_ID' ) == $Blog->ID )
 			{	// If this menu contains the links to pages of the info collection:
-				$tab_items[] = 'pages';
+				$this->header_tab_active = $level0_index;
 			}
 
 			if( $contact_url = $Blog->get_contact_url( true ) )
