@@ -544,9 +544,9 @@ function wpxml_import()
 		{
 			if( empty( $tags[ (string) $tag['tag_name'] ] ) )
 			{	// Insert new tag into DB if tag doesn't exist with current name
-				mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'items__tag ( tag_name )
+				$DB->query( 'INSERT INTO '.$tableprefix.'items__tag ( tag_name )
 					VALUES ( '.$DB->quote( $tag['tag_name'] ).' )' );
-				$tag_ID = mysqli_insert_id( $DB->dbhandle );
+				$tag_ID = $DB->insert_id;
 				// Save new tag
 				$tags[ $tag['tag_name'] ] = (string) $tag_ID;
 				$tags_count++;
@@ -715,7 +715,7 @@ function wpxml_import()
 		{	// Set post parents
 			if( !empty( $post['post_parent'] ) && isset( $posts[ (string) $post['post_parent'] ] ) )
 			{
-				mysqli_query($DB->dbhandle, 'UPDATE '.$tableprefix.'items__item
+				$DB->query( 'UPDATE '.$tableprefix.'items__item
 						  SET post_parent_ID = '.$DB->quote( $posts[ (string) $post['post_parent'] ] ).'
 						WHERE post_ID = '.$DB->quote( $posts[ (string) $post['post_id'] ] ) );
 			}

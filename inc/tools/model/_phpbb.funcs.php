@@ -241,7 +241,7 @@ function phpbb_table_insert_links( $table_name, $links )
 		$links_data[] = '( '.(int)$phpbb_ID.', '.(int)$b2evo_ID.' )';
 		if( $l == 1000 )
 		{	// Insert data by 1000 records
-			mysqli_query( $DB->dbhandle, 'INSERT INTO '.phpbb_table_name( $table_name ).' ( phpbb_ID, b2evo_ID )
+			$DB->query( 'INSERT INTO '.phpbb_table_name( $table_name ).' ( phpbb_ID, b2evo_ID )
 					VALUES '.implode( ', ', $links_data ) );
 			$links_data = array();
 			$l = 1;
@@ -251,7 +251,7 @@ function phpbb_table_insert_links( $table_name, $links )
 
 	if( count( $links_data ) > 0 )
 	{	// Insert the rest records
-			mysql_query( $DB->dbhandle, 'INSERT INTO '.phpbb_table_name( $table_name ).' ( phpbb_ID, b2evo_ID )
+			$DB->query( 'INSERT INTO '.phpbb_table_name( $table_name ).' ( phpbb_ID, b2evo_ID )
 					VALUES '.implode( ', ', $links_data ) );
 	}
 }
@@ -644,16 +644,16 @@ function phpbb_import_users()
 			}
 
 			// *** EXECUTE QUERY TO INSERT NEW USER *** //
-			$user_insert_result = mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'users ( '.implode( ', ', array_keys( $user_data ) ).' )
+			$DB->query( 'INSERT INTO '.$tableprefix.'users ( '.implode( ', ', array_keys( $user_data ) ).' )
 					VALUES ( '.implode( ', ', $import_data ).' )');
 
-			if( !$user_insert_result )
+			if( !$DB->get_results() )
 			{	// User was not inserted
-				phpbb_log( sprintf( T_( 'User "%s" with ID %s cannot be imported. MySQL error: %s.' ) , $phpbb_user->username, $phpbb_user->user_id, mysqli_error( $DB->dbhandle ) ), 'error', ' ', '<br />' );
+				phpbb_log( sprintf( T_( 'User "%s" with ID %s cannot be imported. MySQL error: %s.' ) , $phpbb_user->username, $phpbb_user->user_id, $DB->last_error ), 'error', ' ', '<br />' );
 				continue;
 			}
 
-			$user_ID = mysqli_insert_id( $DB->dbhandle );
+			$user_ID = $DB->insert_id;
 
 			if( $do_import_avatars )
 			{	// Import user's avatar
@@ -774,7 +774,7 @@ function phpbb_import_user_fields( $phpbb_user, $b2evo_user_ID )
 
 	global $tableprefix;
 
-	mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'users__fields ( uf_user_ID, uf_ufdf_ID, uf_varchar )
+	$DB->query( 'INSERT INTO '.$tableprefix.'users__fields ( uf_user_ID, uf_ufdf_ID, uf_varchar )
 			VALUES '.implode( ', ', $import_data ) );
 }
 
@@ -817,7 +817,7 @@ function phpbb_import_user_settings( $phpbb_user, $b2evo_user_ID )
 
 	if( !empty( $import_data ) )
 	{	// *** EXECUTE QUERY TO INSERT NEW USERS SETTINGS *** //
-		mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'users__usersettings ( uset_user_ID, uset_name, uset_value )
+		$DB->query( 'INSERT INTO '.$tableprefix.'users__usersettings ( uset_user_ID, uset_name, uset_value )
 				VALUES '.implode( ', ', $import_data ) );
 	}
 }
@@ -881,16 +881,16 @@ function phpbb_import_invalid_user( $phpbb_user_ID, & $users_IDs, $phpbb_usernam
 				);
 
 			// *** EXECUTE QUERY TO INSERT NEW INVALID USER *** //
-			$user_insert_result = mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'users ( '.implode( ', ', array_keys( $user_data ) ).' )
+			$DB->query( 'INSERT INTO '.$tableprefix.'users ( '.implode( ', ', array_keys( $user_data ) ).' )
 					VALUES ( '.implode( ', ', $user_data ).' )' );
 
-			if( !$user_insert_result )
+			if( !$DB->get_results() )
 			{	// User was not inserted
-				phpbb_log( sprintf( T_( 'User "%s" cannot be imported. MySQL error: %s.' ) , $phpbb_user_ID, mysqli_error( $DB->dbhandle ) ), 'error', ' ', '<br />' );
+				phpbb_log( sprintf( T_( 'User "%s" cannot be imported. MySQL error: %s.' ) , $phpbb_user_ID, $DB->last_error ), 'error', ' ', '<br />' );
 				return false;
 			}
 
-			$b2evo_user_ID = mysqli_insert_id( $DB->dbhandle );
+			$b2evo_user_ID = $DB->insert_id;
 
 			$GroupCache = & get_GroupCache();
 			$Group = & $GroupCache->get_by_ID( $group_invalid_ID, false );
@@ -1241,22 +1241,22 @@ function phpbb_import_topics()
 			);
 
 			// *** EXECUTE QUERY TO INSERT NEW POST *** //
-			mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'items__item ( '.implode( ', ', $topic_fields ).' )
+			$DB->query( 'INSERT INTO '.$tableprefix.'items__item ( '.implode( ', ', $topic_fields ).' )
 					VALUES ( '.implode( ', ', $topic_data ).' )' );
 
-			$item_ID = mysqli_insert_id( $DB->dbhandle );
+			$item_ID = $DB->insert_id;
 
 			$topics_IDs[$phpbb_topic->topic_id] = $item_ID;
 
 			// Insert a link with a forum(category)
-			mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'postcats ( postcat_post_ID, postcat_cat_ID )
+			$DB->query( 'INSERT INTO '.$tableprefix.'postcats ( postcat_post_ID, postcat_cat_ID )
 					VALUES ( '.$DB->quote( $item_ID ).', '.$DB->quote( $forum_ID ).' )' );
 
 			// Insert a canonical and second slugs for the post
-			mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'slug ( slug_title, slug_type, slug_itm_ID ) VALUES
+			$DB->query( 'INSERT INTO '.$tableprefix.'slug ( slug_title, slug_type, slug_itm_ID ) VALUES
 					( '.$DB->quote( $canonical_slug ).', '.$DB->quote( 'item' ).', '.$DB->quote( $item_ID ).' ),
 					( '.$DB->quote( $second_slug ).', '.$DB->quote( 'item' ).', '.$DB->quote( $item_ID ).' )' );
-			$canonical_slug_ID = mysqli_insert_id( $DB->dbhandle );
+			$canonical_slug_ID = $DB->last_id;
 
 			// Insert a tiny slug for the post
 			/*
@@ -1266,7 +1266,7 @@ function phpbb_import_topics()
 			$tiny_slug_ID = $DB->insert_id;*/
 
 			// Update the slug's IDs of the post
-			mysqli_query( $DB->dbhandle, 'UPDATE '.$tableprefix.'items__item
+			$DB->query( 'UPDATE '.$tableprefix.'items__item
 					  SET post_canonical_slug_ID = '.$DB->quote( $canonical_slug_ID )/*.', post_tiny_slug_ID = '.$DB->quote( $tiny_slug_ID )*/.'
 					WHERE post_ID = '.$DB->quote( $item_ID ) );
 
@@ -1541,16 +1541,16 @@ function phpbb_import_replies()
 			if( count( $comments_import_data ) == 100 )
 			{	// Insert the 100 comments in one query
 				// *** EXECUTE QUERY TO INSERT NEW COMMENTS *** //
-				$comment_insert_result = mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'comments ( '.implode( ', ', $comment_fields ).' )
+				$DB->query( 'INSERT INTO '.$tableprefix.'comments ( '.implode( ', ', $comment_fields ).' )
 						VALUES '.implode( ', ', $comments_import_data ) );
-				if( !$comment_insert_result )
+				if( !$DB->get_results() )
 				{	// Some errors
-					phpbb_log( '<br />'.sprintf( T_( 'MySQL error: %s.' ) , mysqli_error( $DB->dbhandle ) ), 'error', ' ' );
+					phpbb_log( '<br />'.sprintf( T_( 'MySQL error: %s.' ) , $DB->last_error ), 'error', ' ' );
 				}
 				$comments_import_data = array();
 
 				// Insert the slugs for the replies
-				mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'slug ( slug_title, slug_type, slug_itm_ID )
+				$DB->query( 'INSERT INTO '.$tableprefix.'slug ( slug_title, slug_type, slug_itm_ID )
 						VALUES '.implode( ', ', $comments_slugs_import_data ) );
 				$comments_slugs_import_data = array();
 			}
@@ -1570,15 +1570,15 @@ function phpbb_import_replies()
 	if( count( $comments_import_data ) > 0 )
 	{	// Insert the rest comments
 		// *** EXECUTE QUERY TO INSERT NEW COMMENTS *** //
-		$comment_insert_result = mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'comments ( '.implode( ', ', $comment_fields ).' )
+		$DB->query( 'INSERT INTO '.$tableprefix.'comments ( '.implode( ', ', $comment_fields ).' )
 				VALUES '.implode( ', ', $comments_import_data ) );
-		if( !$comment_insert_result )
+		if( !$DB->get_results() )
 		{	// Some errors
-			phpbb_log( sprintf( T_( 'MySQL error: %s.' ) , mysqli_error( $DB->dbhandle ) ), 'error', ' ', '<br />' );
+			phpbb_log( sprintf( T_( 'MySQL error: %s.' ) , $DB->last_error ), 'error', ' ', '<br />' );
 		}
 
 		// Insert the slugs for the replies
-		mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'slug ( slug_title, slug_type, slug_itm_ID )
+		$DB->query( 'INSERT INTO '.$tableprefix.'slug ( slug_title, slug_type, slug_itm_ID )
 				VALUES '.implode( ', ', $comments_slugs_import_data ) );
 	}
 
@@ -1625,8 +1625,7 @@ function phpbb_post_is_topic( $post_id )
 	$SQL->WHERE( 'topic_status != 2' ); // Don't select MOVIED topics
 
 	$phpbb_cache_topics_posts = array();
-	$query = mysqli_query( $phpbb_DB->dbhandle, $SQL->get() );
-	while( $tp_row = mysqli_fetch_assoc( $query ) )
+	while( $tp_row = $phpbb_DB->get_row($SQL->get(), ARRAY_A) )
 	{
 		$phpbb_cache_topics_posts[ $tp_row['topic_first_post_id'] ] = $tp_row['topic_id'];
 	}
@@ -1717,10 +1716,10 @@ function phpbb_import_messages()
 				continue;
 			}
 
-			mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'messaging__thread ( thrd_title, thrd_datemodified )
+			$DB->query( 'INSERT INTO '.$tableprefix.'messaging__thread ( thrd_title, thrd_datemodified )
 					VALUES ( '.$DB->quote( $message->privmsgs_subject ).', '.$DB->quote( date( 'Y-m-d H:i:s', $message->privmsgs_date ) ).' )' );
 
-			$thread_ID = mysqli_insert_id( $DB->dbhandle );
+			$thread_ID = $DB->last_id;
 
 			// Import all messages from this thread
 			$count_messages = phpbb_import_messages_texts( $thread_ID, $message );
@@ -1798,10 +1797,10 @@ function phpbb_import_messages_texts( $thread_ID, $message )
 			' )';
 	}
 
-	mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'messaging__message ( msg_author_user_ID, msg_datetime, msg_thread_ID, msg_text, msg_renderers )
+	$DB->query( 'INSERT INTO '.$tableprefix.'messaging__message ( msg_author_user_ID, msg_datetime, msg_thread_ID, msg_text, msg_renderers )
 			VALUES '.implode( ', ', $message_import_data ) );
 
-	mysql_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'messaging__threadstatus ( tsta_thread_ID, tsta_user_ID, tsta_first_unread_msg_ID )
+	$DB->query( 'INSERT INTO '.$tableprefix.'messaging__threadstatus ( tsta_thread_ID, tsta_user_ID, tsta_first_unread_msg_ID )
 			VALUES '.implode( ', ', $threadstatus_import_data ) );
 
 	return count( $message_import_data );
@@ -1988,13 +1987,13 @@ function phpbb_import_avatar( $user_ID, $path_avatars, $user_avatar )
 		$imported_file_ID = copy_file( $path_avatars.$user_avatar, $root_ID, 'profile_pictures', false );
 		if( !empty( $imported_file_ID ) )
 		{	// Update user's avatar
-			mysqli_query( $DB->dbhandle, 'UPDATE '.$tableprefix.'users
+			$DB->query( 'UPDATE '.$tableprefix.'users
 					  SET user_avatar_file_ID = '.$DB->quote( $imported_file_ID ).'
 					WHERE user_ID = '.$DB->quote( $user_ID ).'
 					  AND user_avatar_file_ID IS NULL' );
 			// Insert a link with new file
 			global $localtimenow;
-			mysql_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'links
+			$DB->query( 'INSERT INTO '.$tableprefix.'links
 				       ( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_usr_ID, link_file_ID )
 				VALUES ( '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $imported_file_ID ).' )' );
 		}
