@@ -3887,13 +3887,12 @@ class Blog extends DataObject
 				$blog_skin_ID = $this->get_skin_ID();
 				if( ! empty( $blog_skin_ID ) )
 				{
-					// Use 'access_denied.main.php' instead of real template when current User is not a member of this blog
-					$template = 'access_denied.main.php';
-
 					$SkinCache = & get_SkinCache();
 					$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
 					$ads_current_skin_path = $skins_path.$Skin->folder.'/';
-					$skin_template_name = $ads_current_skin_path.$template;
+
+					// Use 'access_denied.main.php' instead of real template when current User is not a member of this blog:
+					$skin_template_name = $ads_current_skin_path.'access_denied.main.php';
 					if( file_exists( $skin_template_name ) )
 					{ // Display a special template of this skin
 						require $skin_template_name;
@@ -3902,7 +3901,7 @@ class Blog extends DataObject
 					else
 					{ // Display a template from site skins
 						siteskin_init();
-						siteskin_include( $template );
+						siteskin_include( '_access_denied_site.main.php' );
 						exit;
 					}
 				}

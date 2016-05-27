@@ -2001,6 +2001,12 @@ function siteskin_include( $template_name, $params = array() )
 		$debug_info = '<b>Site Skin template</b>: '.rel_path_to_base( $file );
 		$disp_handled = 'skin';
 	}
+	elseif( $fallback_template_path = skin_fallback_path( $template_name ) )
+	{	// Use the default/fallback template:
+		$file = $fallback_template_path;
+		$debug_info = '<b>Site Skin Fallback to</b>: '.rel_path_to_base( $file );
+		$disp_handled = 'fallback';
+	}
 	else
 	{	// Site skin is wrong or the requested template file is not found in current site skin:
 		$disp_handled = false;
