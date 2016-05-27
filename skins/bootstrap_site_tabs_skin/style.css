@@ -61,8 +61,11 @@ h2 {
 .swhead_wrapper .swhead_menus div.level1 nav .pull-left li a:hover {
   background-color: #fff;
 }
+.swhead_wrapper .swhead_menus div.level1 nav .pull-left li.swhead_sitename a {
+  border: 1px solid transparent;
+}
 .swhead_wrapper .swhead_menus div.level1 nav .pull-left li.swhead_sitename a:hover {
-  background-color: #ddd;
+  background-color: transparent;
 }
 div.level1 {
   padding-top: 17px;

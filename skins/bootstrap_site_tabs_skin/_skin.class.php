@@ -78,6 +78,166 @@ class bootstrap_site_tabs_Skin extends Skin
 
 
 	/**
+	 * Get definitions for editable params
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 * @return array
+	 */
+	function get_param_definitions( $params )
+	{
+		$r = array_merge( array(
+				'section_topmenu_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Top menu settings')
+				),
+					'menu_bar_bg_color' => array(
+						'label' => T_('Menu bar background color'),
+						'note' => T_('E-g: #ff0000 for red'),
+						'defaultvalue' => '#ddd',
+						'type' => 'color',
+					),
+					'tab_bg_color' => array(
+						'label' => T_('Tab background color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#eee',
+						'type' => 'color',
+					),
+					'tab_border_color' => array(
+						'label' => T_('Tab border color'),
+						'note' => T_('E-g: #0000ff for blue'),
+						'defaultvalue' => '#ddd',
+						'type' => 'color',
+					),
+					'tab_text_color' => array(
+						'label' => T_('Tab text color'),
+						'note' => T_('E-g: #ff0000 for red'),
+						'defaultvalue' => '#337ab7',
+						'type' => 'color',
+					),
+					'hover_tab_bg_color' => array(
+						'label' => T_('Hover tab color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),
+					'hover_tab_text_color' => array(
+						'label' => T_('Hover tab text color'),
+						'note' => T_('E-g: #0000ff for blue'),
+						'defaultvalue' => '#23527c',
+						'type' => 'color',
+					),
+					'selected_tab_bg_color' => array(
+						'label' => T_('Selected tab color'),
+						'note' => T_('E-g: #ff0000 for red'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),
+					'selected_tab_text_color' => array(
+						'label' => T_('Selected tab text color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#000',
+						'type' => 'color',
+					),
+				'section_topmenu_end' => array(
+					'layout' => 'end_fieldset',
+				),
+
+				'section_submenu_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Submenu settings')
+				),
+					'sub_tab_bg_color' => array(
+						'label' => T_('Tab background color'),
+						'note' => T_('E-g: #ff0000 for red'),
+						'defaultvalue' => '#eee',
+						'type' => 'color',
+					),
+					'sub_tab_border_color' => array(
+						'label' => T_('Tab border color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#eee',
+						'type' => 'color',
+					),
+					'sub_tab_text_color' => array(
+						'label' => T_('Tab text color'),
+						'note' => T_('E-g: #0000ff for blue'),
+						'defaultvalue' => '#337ab7',
+						'type' => 'color',
+					),
+					'sub_hover_tab_bg_color' => array(
+						'label' => T_('Hover tab color'),
+						'note' => T_('E-g: #ff0000 for red'),
+						'defaultvalue' => '#eee',
+						'type' => 'color',
+					),
+					'sub_hover_tab_border_color' => array(
+						'label' => T_('Hover tab border color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#eee',
+						'type' => 'color',
+					),
+					'sub_hover_tab_text_color' => array(
+						'label' => T_('Hover tab text color'),
+						'note' => T_('E-g: #0000ff for blue'),
+						'defaultvalue' => '#23527c',
+						'type' => 'color',
+					),
+					'sub_selected_tab_bg_color' => array(
+						'label' => T_('Selected tab color'),
+						'note' => T_('E-g: #ff0000 for red'),
+						'defaultvalue' => '#337ab7',
+						'type' => 'color',
+					),
+					'sub_selected_tab_border_color' => array(
+						'label' => T_('Selected tab border color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#337ab7',
+						'type' => 'color',
+					),
+					'sub_selected_tab_text_color' => array(
+						'label' => T_('Selected tab text color'),
+						'note' => T_('E-g: #0000ff for blue'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),
+				'section_submenu_end' => array(
+					'layout' => 'end_fieldset',
+				),
+
+				'section_footer_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Footer settings')
+				),
+					'footer_bg_color' => array(
+						'label' => T_('Background color'),
+						'note' => T_('E-g: #ff0000 for red'),
+						'defaultvalue' => '#f5f5f5',
+						'type' => 'color',
+					),
+					'footer_text_color' => array(
+						'label' => T_('Text color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#777',
+						'type' => 'color',
+					),
+					'footer_link_color' => array(
+						'label' => T_('Link color'),
+						'note' => T_('E-g: #0000ff for blue'),
+						'defaultvalue' => '#337ab7',
+						'type' => 'color',
+					),
+				'section_footer_end' => array(
+					'layout' => 'end_fieldset',
+				),
+
+			), parent::get_param_definitions( $params ) );
+
+		return $r;
+	}
+
+
+	/**
 	 * Get ready for displaying the site skin.
 	 *
 	 * This may register some CSS or JS...
@@ -86,6 +246,90 @@ class bootstrap_site_tabs_Skin extends Skin
 	{
 		// Include the default skin style.css relative current SITE skin folder:
 		require_css( 'style.min.css', 'siteskin' );
+
+		// Add custom styles:
+		// Top menu:
+		$menu_bar_bg_color = $this->get_setting( 'menu_bar_bg_color' );
+		$tab_bg_color = $this->get_setting( 'tab_bg_color' );
+		$tab_border_color = $this->get_setting( 'tab_border_color' );
+		$tab_text_color = $this->get_setting( 'tab_text_color' );
+		$hover_tab_bg_color = $this->get_setting( 'hover_tab_bg_color' );
+		$hover_tab_text_color = $this->get_setting( 'hover_tab_text_color' );
+		$selected_tab_bg_color = $this->get_setting( 'selected_tab_bg_color' );
+		$selected_tab_text_color = $this->get_setting( 'selected_tab_text_color' );
+		// Sub menu:
+		$sub_tab_bg_color = $this->get_setting( 'sub_tab_bg_color' );
+		$sub_tab_border_color = $this->get_setting( 'sub_tab_border_color' );
+		$sub_tab_text_color = $this->get_setting( 'sub_tab_text_color' );
+		$sub_hover_tab_bg_color = $this->get_setting( 'sub_hover_tab_bg_color' );
+		$sub_hover_tab_border_color = $this->get_setting( 'sub_hover_tab_border_color' );
+		$sub_hover_tab_text_color = $this->get_setting( 'sub_hover_tab_text_color' );
+		$sub_selected_tab_bg_color = $this->get_setting( 'sub_selected_tab_bg_color' );
+		$sub_selected_tab_border_color = $this->get_setting( 'sub_selected_tab_border_color' );
+		$sub_selected_tab_text_color = $this->get_setting( 'sub_selected_tab_text_color' );
+		// Footer:
+		$footer_bg_color = $this->get_setting( 'footer_bg_color' );
+		$footer_text_color = $this->get_setting( 'footer_text_color' );
+		$footer_link_color = $this->get_setting( 'footer_link_color' );
+
+		add_css_headline( '
+.swhead_wrapper .swhead_menus div.level1 {
+	background-color: '.$menu_bar_bg_color.';
+	border-color: '.$tab_border_color.';
+}
+.swhead_wrapper .swhead_menus div.level1 nav .pull-left li:not(.active):not(.swhead_sitename) a,
+.swhead_wrapper .swhead_menus div.level1 nav div.pull-right a.btn {
+	background-color: '.$tab_bg_color.';
+	border-color: '.$tab_border_color.';
+	color: '.$tab_text_color.';
+}
+.swhead_wrapper .swhead_menus div.level1 nav div.pull-right a.btn {
+	border-color: '.$tab_bg_color.';
+}
+.swhead_wrapper .swhead_menus div.level1 nav .pull-left li.active a {
+	background-color: '.$selected_tab_bg_color.';
+	border-color: '.$tab_border_color.';
+	color: '.$selected_tab_text_color.';
+}
+.swhead_wrapper .swhead_menus div.level1 nav .pull-left li.swhead_sitename a {
+	color: '.$tab_text_color.';
+}
+.swhead_wrapper .swhead_menus div.level1 nav .pull-left li:not(.active):not(.swhead_sitename) a:hover,
+.swhead_wrapper .swhead_menus div.level1 nav div.pull-right a.btn:hover {
+	background-color: '.$hover_tab_bg_color.';
+	color: '.$hover_tab_text_color.';
+}
+.swhead_wrapper .swhead_menus div.level1 nav div.pull-right a.btn:hover {
+	border-color: '.$hover_tab_bg_color.';
+}
+div.level1 nav ul.nav.nav-tabs {
+	border-color: '.$tab_border_color.';
+}
+
+div.level2 ul.nav.nav-pills li a {
+	background-color: '.$sub_tab_bg_color.';
+	border: 1px solid '.$sub_tab_border_color.';
+	color: '.$sub_tab_text_color.';
+}
+div.level2 ul.nav.nav-pills a:hover {
+	background-color: '.$sub_hover_tab_bg_color.';
+	border: 1px solid '.$sub_hover_tab_border_color.';
+	color: '.$sub_hover_tab_text_color.';
+}
+div.level2 ul.nav.nav-pills li.active a {
+	background-color: '.$sub_selected_tab_bg_color.';
+	border: 1px solid '.$sub_selected_tab_border_color.';
+	color: '.$sub_selected_tab_text_color.';
+}
+
+footer.sitewide_footer {
+	background-color: '.$footer_bg_color.';
+	color: '.$footer_text_color.';
+}
+footer.sitewide_footer .container a {
+	color: '.$footer_link_color.';
+}
+');
 	}
 
 

@@ -711,7 +711,18 @@ class Skin extends DataObject
 		// Name of the setting in the settings:
 		$setting_name = 'skin'.$this->ID.'_'.$parname;
 
-		$value = isset( $Blog ) ? $Blog->get_setting( $setting_name ) : $Settings->get( $setting_name );
+		if( isset( $Blog ) && $this->provides_collection_skin() )
+		{	// Get skin settings of the current collection only if skin is provided for collections:
+			$value = $Blog->get_setting( $setting_name );
+		}
+		elseif( $this->provides_site_skin() )
+		{	// Get skin settings of the site only if skin is provided for site:
+			$value = $Settings->get( $setting_name );
+		}
+		else
+		{
+			$value = NULL;
+		}
 
 		if( ! is_null( $value ) )
 		{	// We have a value for this param:
