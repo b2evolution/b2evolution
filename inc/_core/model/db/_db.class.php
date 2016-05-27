@@ -205,6 +205,12 @@ class DB
 	 */
 	var $connection_charset;
 
+	/**
+	 * Is the connection persistent?
+	 * @var boolean
+	 * @access protected
+	 */
+	var $is_persistent;
 
 	// DEBUG:
 
@@ -370,6 +376,9 @@ class DB
 		$new_link = isset( $params['new_link'] ) ? $params['new_link'] : false;
 		$client_flags = isset( $params['client_flags'] ) ? $params['client_flags'] : 0;
 
+		/* Persistent connections are only available in PHP 5.3+ */
+		$this->is_persistent = !$new_link && version_compare(PHP_VERSION, '5.3', '>=');
+
 		if( ! $this->dbhandle )
 		{ // Connect to the Database:
 			// echo "mysqli_real_connect( $this->dbhost, $this->dbuser, $this->dbpassword, $this->dbname, $this->dbport, $this->dbsocket, $client_flags  )";
@@ -380,8 +389,7 @@ class DB
 			$old_html_errors = @ini_set('html_errors', 0);
 			$this->dbhandle = mysqli_init();
 			@mysqli_real_connect($this->dbhandle,
-				/* Persistent connections are only available in PHP 5.3+ */
-				($new_link || version_compare(PHP_VERSION, '5.3', '<')) ? $this->dbhost : 'p:'.$this->dbhost,
+				$this->is_persistent ? 'p:'.$this->dbhost : $this->dbhost,
 				$this->dbuser, $this->dbpassword,
 				'', ini_get('mysqli.default_port'), ini_get('mysqli.default_socket'),
 				$client_flags );
@@ -448,6 +456,9 @@ class DB
 	{
 		@$this->flush();
 		@mysqli_close($this->dbhandle);
+
+		if (!$this->is_persistent)
+			@$this->dbhandle->kill($this->dbhandle->thread_id);
 	}
 
 
