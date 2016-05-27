@@ -58,8 +58,8 @@ module.exports = function(grunt) {
 					'skins/bootstrap_gallery_legacy/style.css': 'skins/bootstrap_gallery_legacy/style.less',
 					'skins/bootstrap_gallery_skin/style.css': 'skins/bootstrap_gallery_skin/style.less',
 					'skins/bootstrap_manual_skin/style.css':  'skins/bootstrap_manual_skin/style.less',
-					'skins/bootstrap_site_navbar_skin/site_style.css': 'skins/bootstrap_site_navbar_skin/site_style.less',
-					'skins/bootstrap_site_tabs_skin/site_style.css':   'skins/bootstrap_site_tabs_skin/site_style.less',
+					'skins/bootstrap_site_navbar_skin/style.css': 'skins/bootstrap_site_navbar_skin/style.less',
+					'skins/bootstrap_site_tabs_skin/style.css':   'skins/bootstrap_site_tabs_skin/style.less',
 					'skins_adm/bootstrap/rsc/css/style.css':  'skins_adm/bootstrap/rsc/css/style.less',
 
 					// Helper pages
@@ -163,8 +163,8 @@ module.exports = function(grunt) {
 					'skins/bootstrap_gallery_legacy/style.min.css': 'skins/bootstrap_gallery_legacy/style.css',
 					'skins/bootstrap_gallery_skin/style.min.css': 'skins/bootstrap_gallery_skin/style.css',
 					'skins/bootstrap_manual_skin/style.min.css':  'skins/bootstrap_manual_skin/style.css',
-					'skins/bootstrap_site_navbar_skin/site_style.min.css': 'skins/bootstrap_site_navbar_skin/site_style.css',
-					'skins/bootstrap_site_tabs_skin/site_style.min.css':   'skins/bootstrap_site_tabs_skin/site_style.css',
+					'skins/bootstrap_site_navbar_skin/style.min.css': 'skins/bootstrap_site_navbar_skin/style.css',
+					'skins/bootstrap_site_tabs_skin/style.min.css':   'skins/bootstrap_site_tabs_skin/style.css',
 					'skins_adm/bootstrap/rsc/css/style.min.css':  'skins_adm/bootstrap/rsc/css/style.css',
 				}	
 			},

@@ -85,7 +85,7 @@ class bootstrap_site_navbar_Skin extends Skin
 	function siteskin_init()
 	{
 		// Include the default skin style.css relative current SITE skin folder:
-		require_css( 'site_style.css', 'siteskin' );
+		require_css( 'style.css', 'siteskin' );
 	}
 
 
