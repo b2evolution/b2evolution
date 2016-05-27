@@ -1052,7 +1052,7 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
 		}
 		else
 		{ // Add script tag to <head>
-			add_headline( $script_tag, $js_file );
+			add_headline( $script_tag, $js_file, $relative_to );
 		}
 	}
 
@@ -1119,7 +1119,7 @@ function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media
 		}
 		else
 		{ // Add stylesheet tag to <head>
-			add_headline( $stylesheet_tag, $css_file );
+			add_headline( $stylesheet_tag, $css_file, $relative_to );
 		}
 	}
 }
@@ -1129,22 +1129,42 @@ function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media
  * Dequeue a file from $headlines array by file name or alias
  *
  * @param string alias, url or filename (relative to rsc/js) for javascript file
+ * @param boolean|string What group of headlines touch to dequeue
  */
-function dequeue( $file_name )
+function dequeue( $file_name, $group_relative_to = '#anygroup#' )
 {
 	global $headlines, $dequeued_headlines;
 
 	if( ! is_array( $dequeued_headlines ) )
-	{ // Initialize array firs time
+	{	// Initialize array first time:
 		$dequeued_headlines = array();
 	}
 
-	// Store each dequeued file in order to don't require this next time
-	$dequeued_headlines[ $file_name ] = true;
+	// Convert boolean, NULL and etc. values to string format:
+	$group_relative_to = strval( $group_relative_to );
 
-	if( isset( $headlines[ $file_name ] ) )
-	{ // Dequeue this file
-		unset( $headlines[ $file_name ] );
+	// Store each dequeued file in order to don't require this next time:
+	$dequeued_headlines[ $group_relative_to ][ $file_name ] = true;
+
+	if( $group_relative_to == '#anygroup#' )
+	{	// Dequeue the file from any group:
+		if( $headlines )
+		{
+			foreach( $headlines as $group_key => $group_headlines )
+			{
+				if( isset( $group_headlines[ $file_name ] ) )
+				{	// Dequeue this file:
+					unset( $headlines[ $group_key ][ $file_name ] );
+				}
+			}
+		}
+	}
+	else
+	{	// Dequeue the file only from requested group:
+		if( isset( $headlines[ $group_relative_to ][ $file_name ] ) )
+		{	// Dequeue this file:
+			unset( $headlines[ $group_relative_to ][ $file_name ] );
+		}
 	}
 }
 
@@ -1311,23 +1331,27 @@ function add_js_translation( $string, $translation )
  *
  * @param string HTML tag like <script></script> or <link />
  * @param string File name (used to index)
+ * @param boolean|string Group headlines by this group in order to allow use files with same names from several places
  */
-function add_headline( $headline, $file_name = NULL )
+function add_headline( $headline, $file_name = NULL, $group_relative_to = '#nogroup#' )
 {
 	global $headlines, $dequeued_headlines;
 
+	// Convert boolean, NULL and etc. values to string format:
+	$group_relative_to = strval( $group_relative_to );
+
 	if( is_null( $file_name ) )
-	{ // Use auto index if file name is not defined
-		$headlines[] = $headline;
+	{	// Use auto index if file name is not defined:
+		$headlines[ $group_relative_to ][] = $headline;
 	}
 	else
-	{ // Try to add headline with file name to array
-		if( isset( $dequeued_headlines[ $file_name ] ) )
-		{ // Don't require this file if it was dequeued before this request
+	{	// Try to add headline with file name to array:
+		if( isset( $dequeued_headlines[ $group_relative_to ][ $file_name ] ) || isset( $dequeued_headlines[ '#anygroup#' ][ $file_name ] ) )
+		{	// Don't require this file if it was dequeued before this request:
 			return;
 		}
-		// Use file name as key index in $headline array
-		$headlines[ $file_name ] = $headline;
+		// Use file name as key index in $headline array:
+		$headlines[ $group_relative_to ][ $file_name ] = $headline;
 	}
 }
 
@@ -1739,8 +1763,20 @@ function include_headlines()
 
 	if( $headlines )
 	{
-		echo "\n\t<!-- headlines: -->\n\t".implode( "\n\t", $headlines );
-		echo "\n\n";
+		$all_headlines = array();
+		foreach( $headlines as $group_headlines )
+		{	// Go through each group to include all headlines:
+			foreach( $group_headlines as $headline )
+			{
+				$all_headlines[] = $headline;
+			}
+		}
+
+		if( ! empty( $all_headlines ) )
+		{	// Include headlines only if at least one headline is found in any group:
+			echo "\n\t<!-- headlines: -->\n\t".implode( "\n\t", $all_headlines );
+			echo "\n\n";
+		}
 	}
 }
 
