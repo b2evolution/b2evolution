@@ -296,6 +296,8 @@ class DB
 	 *   Optional:
 	 *    - 'name': the name of the default database, see {@link DB::select()}
 	 *    - 'host': host of the database; Default: 'localhost'
+	 *    - 'port': the port on which the database listens
+	 *    - 'socket': the MySQL socket file
 	 *    - 'show_errors': Display SQL errors? (true/false); Default: don't change member default ({@link $show_errors})
 	 *    - 'halt_on_error': Halt on error? (true/false); Default: don't change member default ({@link $halt_on_error})
 	 *    - 'table_options': sets {@link $table_options}
@@ -373,6 +375,8 @@ class DB
 			}
 		}
 
+		$port = isset( $params['port'] ) ? $params['port'] : ini_get('mysqli.default_port');
+		$socket = isset( $params['socket'] ) ? $params['socket'] : ini_get('mysqli.default_socket');
 		$new_link = isset( $params['new_link'] ) ? $params['new_link'] : false;
 		$client_flags = isset( $params['client_flags'] ) ? $params['client_flags'] : 0;
 
@@ -391,8 +395,7 @@ class DB
 			@mysqli_real_connect($this->dbhandle,
 				$this->is_persistent ? 'p:'.$this->dbhost : $this->dbhost,
 				$this->dbuser, $this->dbpassword,
-				'', ini_get('mysqli.default_port'), ini_get('mysqli.default_socket'),
-				$client_flags );
+				'', $port, $socket, $client_flags );
 			$mysql_error = $php_errormsg;
 			if( $old_track_errors !== false ) @ini_set('track_errors', $old_track_errors);
 			if( $old_html_errors !== false ) @ini_set('html_errors', $old_html_errors);
