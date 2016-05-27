@@ -104,10 +104,9 @@ class DB
 
 	/**
 	 * Last query's resource
-	 * @access protected
-	 * @var resource
+	 * @var object
 	 */
-	var $result;
+	protected $result;
 
 	/**
 	 * Number of rows in result set
@@ -170,7 +169,7 @@ class DB
 	 * MySQL Database handle
 	 * @var object
 	 */
-	var $dbhandle;
+	protected $dbhandle;
 
 	/**
 	 * Database username
@@ -200,17 +199,15 @@ class DB
 	/**
 	 * Current connection charset
 	 * @var string
-	 * @access protected
 	 * @see DB::set_connection_charset()
 	 */
-	var $connection_charset;
+	protected $connection_charset;
 
 	/**
 	 * Is the connection persistent?
 	 * @var boolean
-	 * @access protected
 	 */
-	var $is_persistent;
+	protected $is_persistent;
 
 	// DEBUG:
 
