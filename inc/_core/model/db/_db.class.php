@@ -289,7 +289,7 @@ class DB
 	 *    - 'user': username to connect with
 	 *    - 'password': password to connect with
 	 *    OR
-	 *    - 'handle': a MySQL Database handle (from a previous {@link mysqli_init()})
+	 *    - 'handle': a MySQL Database handle (from a previous {@link mysqli::__construct()})
 	 *   Optional:
 	 *    - 'name': the name of the default database, see {@link DB::select()}
 	 *    - 'host': host of the database; Default: 'localhost'
@@ -382,17 +382,15 @@ class DB
 
 		if( ! $this->dbhandle )
 		{ // Connect to the Database:
-			// echo "mysqli_real_connect( $this->dbhost, $this->dbuser, $this->dbpassword, $this->dbname, $this->dbport, $this->dbsocket, $client_flags  )";
+			// echo "mysqli::real_connect( $this->dbhost, $this->dbuser, $this->dbpassword, $this->dbname, port, $socket, $client_flags )";
 			// mysqli::$connect_error is tied to an established connection
 			// if the connection fails we need a different method to get the error message
 			$php_errormsg = null;
 			$old_track_errors = @ini_set('track_errors', 1);
 			$old_html_errors = @ini_set('html_errors', 0);
-			$this->dbhandle = mysqli_init();
-			@mysqli_real_connect($this->dbhandle,
-				$this->is_persistent ? 'p:'.$this->dbhost : $this->dbhost,
-				$this->dbuser, $this->dbpassword,
-				'', $port, $socket, $client_flags );
+			$this->dbhandle = new mysqli();
+			@$this->dbhandle->real_connect($this->is_persistent ? 'p:'.$this->dbhost : $this->dbhost,
+				$this->dbuser, $this->dbpassword, '', $port, $socket, $client_flags );
 			$mysql_error = $php_errormsg;
 			if( $old_track_errors !== false ) @ini_set('track_errors', $old_track_errors);
 			if( $old_html_errors !== false ) @ini_set('html_errors', $old_html_errors);
@@ -455,7 +453,7 @@ class DB
 	function __destruct()
 	{
 		@$this->flush();
-		@mysqli_close($this->dbhandle);
+		@$this->dbhandle->close();
 
 		if (!$this->is_persistent)
 			@$this->dbhandle->kill($this->dbhandle->thread_id);
@@ -467,7 +465,7 @@ class DB
 	 */
 	function select($db)
 	{
-		if( !@mysqli_select_db($this->dbhandle, $db) )
+		if( !$this->dbhandle->select_db($db) )
 		{
 			$this->print_error( 'Error selecting database ['.$db.']!', '
 				<ol>
@@ -513,7 +511,7 @@ class DB
 	 */
 	function escape($str)
 	{
-		return mysqli_real_escape_string($this->dbhandle, $str);
+		return $this->dbhandle->real_escape_string($str);
 	}
 
 
@@ -599,7 +597,7 @@ class DB
 		if( ! strlen($title) )
 		{
 			if( $this->is_open() )
-			{ // use mysqli_error:
+			{ // use mysqli::error:
 				$this->last_error = $this->dbhandle->error.'(Errno='.$this->dbhandle->errno.')';
 			}
 			else
@@ -701,7 +699,7 @@ class DB
 	{
 		if( $this->has_result() )
 		{ // Free last result resource
-			mysqli_free_result($this->result);
+			$this->result->free();
 		}
 		$this->result = NULL;
 		$this->last_query = NULL;
@@ -829,7 +827,7 @@ class DB
 		// Keep track of the last query for debug..
 		$this->last_query = $query;
 
-		// Perform the query via std mysqli_query function..
+		// Perform the query via std mysqli::query method.
 		$this->num_queries++;
 
 		if( $this->log_queries )
@@ -850,7 +848,7 @@ class DB
 			$Timer->start( 'sql_query', false );
 
 			// Run query:
-			$this->result = @mysqli_query( $this->dbhandle, $query );
+			$this->result = @$this->dbhandle->query( $query );
 
 			if( $this->log_queries )
 			{	// We want to log queries:
@@ -864,7 +862,7 @@ class DB
 		else
 		{
 			// Run query:
-			$this->result = @mysqli_query( $this->dbhandle, $query );
+			$this->result = @$this->dbhandle->query( $query );
 		}
 
 		// If there is an error then take note of it..
@@ -872,7 +870,7 @@ class DB
 		{
 			if( $this->has_result() )
 			{
-				mysqli_free_result($this->result);
+				$this->result->free();
 			}
 			$last_errno = $this->dbhandle->errno;
 			if( $this->use_transactions && ( $this->transaction_isolation_level == 'SERIALIZABLE' ) && ( 1213 == $last_errno ) )
@@ -887,7 +885,7 @@ class DB
 		if( preg_match( '#^\s*(INSERT|DELETE|UPDATE|REPLACE)\s#i', $query, $match ) )
 		{ // Query was an insert, delete, update, replace:
 
-			$this->rows_affected = mysqli_affected_rows($this->dbhandle);
+			$this->rows_affected = $this->dbhandle->affected_rows;
 			if( $this->log_queries )
 			{	// We want to log queries:
 				$this->queries[ $this->num_queries - 1 ]['rows'] = $this->rows_affected;
@@ -897,7 +895,7 @@ class DB
 			$match[1] = strtoupper($match[1]);
 			if( $match[1] == 'INSERT' || $match[1] == 'REPLACE' )
 			{
-				$this->insert_id = mysqli_insert_id($this->dbhandle);
+				$this->insert_id = $this->dbhandle->insert_id;
 			}
 
 			// Return number of rows affected
@@ -907,7 +905,7 @@ class DB
 		{ // Query was a select, alter, etc...:
 			if( $this->has_result() )
 			{ // It's not a resource for CREATE or DROP for example and can even trigger a fatal error (see http://forums.b2evolution.net//viewtopic.php?t=9529)
-				$this->num_rows = mysqli_num_rows($this->result);
+				$this->num_rows = $this->result->num_rows;
 			}
 
 			if( $this->log_queries )
@@ -939,20 +937,20 @@ class DB
 
 				$this->num_rows = 0;
 
-				$this->result = @mysqli_query( $this->dbhandle, 'SHOW PROFILE' );
-				$this->num_rows = mysqli_num_rows($this->result);
+				$this->result = @$this->dbhandle->query( 'SHOW PROFILE' );
+				$this->num_rows = $this->result->num_rows;
 
 				if( $this->num_rows )
 				{
 					$this->queries[$this->num_queries-1]['profile'] = $this->debug_get_rows_table( 100, true );
 
 					// Get time information from PROFILING table (which corresponds to "SHOW PROFILE")
-					$this->result = mysqli_query( $this->dbhandle, 'SELECT FORMAT(SUM(DURATION), 6) AS DURATION FROM INFORMATION_SCHEMA.PROFILING GROUP BY QUERY_ID ORDER BY QUERY_ID DESC LIMIT 1' );
-					$this->queries[$this->num_queries-1]['time_profile'] = array_shift(mysqli_fetch_row($this->result));
+					$this->result = $this->dbhandle->query( 'SELECT FORMAT(SUM(DURATION), 6) AS DURATION FROM INFORMATION_SCHEMA.PROFILING GROUP BY QUERY_ID ORDER BY QUERY_ID DESC LIMIT 1' );
+					$this->queries[$this->num_queries-1]['time_profile'] = array_shift($this->result->fetch_row());
 				}
 
 				// Free "PROFILE" result resource:
-				mysqli_free_result($this->result);
+				$this->result->free();
 
 
 				// Restore:
@@ -985,9 +983,9 @@ class DB
 		}
 
 		if( $this->num_rows
-			&& ( $y === NULL || mysqli_data_seek($this->result, $y) ) )
+			&& ( $y === NULL || $this->result->data_seek( $y) ) )
 		{
-			$row = mysqli_fetch_row($this->result);
+			$row = $this->result->fetch_row();
 
 			if( isset($row[$x]) )
 			{
@@ -1017,7 +1015,7 @@ class DB
 		}
 
 		if( ! $this->num_rows
-			|| ( isset($y) && ! mysqli_data_seek($this->result, $y) ) )
+			|| ( isset($y) && ! $this->result->data_seek( $y) ) )
 		{
 			if( $output == OBJECT )
 				return NULL;
@@ -1029,13 +1027,13 @@ class DB
 		switch( $output )
 		{
 		case OBJECT:
-			return mysqli_fetch_object($this->result);
+			return $this->result->fetch_object();
 
 		case ARRAY_A:
-			return mysqli_fetch_assoc($this->result);
+			return $this->result->fetch_assoc();
 
 		case ARRAY_N:
-			return mysqli_fetch_row($this->result);
+			return $this->result->fetch_row();
 
 		default:
 			$this->print_error('DB::get_row(string query, output type, int offset) -- Output type must be one of: OBJECT, ARRAY_A, ARRAY_N', '', false);
@@ -1112,25 +1110,25 @@ class DB
 
 		if( $this->num_rows )
 		{
-			mysqli_data_seek($this->result, 0);
+			$this->result->data_seek(0);
 			switch( $output )
 			{
 			case OBJECT:
-				while( $row = mysqli_fetch_object($this->result) )
+				while( $row = $this->result->fetch_object() )
 				{
 					$r[] = $row;
 				}
 				break;
 
 			case ARRAY_A:
-				while( $row = mysqli_fetch_assoc($this->result) )
+				while( $row = $this->result->fetch_assoc() )
 				{
 					$r[] = $row;
 				}
 				break;
 
 			case ARRAY_N:
-				while( $row = mysqli_fetch_row($this->result) )
+				while( $row = $this->result->fetch_row() )
 				{
 					$r[] = $row;
 				}
@@ -1157,11 +1155,11 @@ class DB
 
 		// Get column info:
 		$col_info = array();
-		$n = mysqli_num_fields($this->result);
+		$n = $this->result->field_count;
 		$i = 0;
 		while( $i < $n )
 		{
-			$col_info[$i] = mysqli_fetch_field($this->result);
+			$col_info[$i] = $this->result->fetch_field();
 			$i++;
 		}
 
@@ -1181,7 +1179,7 @@ class DB
 		$i=0;
 		// fp> TODO: this should NOT try to print binary fields, eg: file hashes in the files table
 		// Rewind to first row (should be there already).
-		mysqli_data_seek($this->result, 0);
+		$this->result->data_seek(0);
 		while( $one_row = $this->get_row(NULL, ARRAY_N) )
 		{
 			$i++;
@@ -1217,7 +1215,7 @@ class DB
 			$r .= '</tr>';
 		}
 		// Rewind to first row again.
-		mysqli_data_seek($this->result, 0);
+		$this->result->data_seek(0);
 		if( $i >= $max_lines )
 		{
 			$r .= '<tr><td colspan="'.(count($col_info)+1).'">Max number of dumped rows has been reached.</td></tr>';
@@ -1448,10 +1446,10 @@ class DB
 			if( $this->debug_explain_joins && preg_match( '#^ [\s(]* SELECT \s #ix', $query['sql']) )
 			{ // Query was a select, let's try to explain joins...
 
-				$this->result = mysqli_query( $this->dbhandle, 'EXPLAIN '.$query['sql'] );
+				$this->result = $this->dbhandle->query( 'EXPLAIN '.$query['sql'] );
 				if( $this->has_result() )
 				{
-					$this->num_rows = mysqli_num_rows($this->result);
+					$this->num_rows = $this->result->num_rows;
 
 					if( $html )
 					{
@@ -1466,7 +1464,7 @@ class DB
 						echo $this->debug_get_rows_table( 100, true );
 					}
 				}
-				mysqli_free_result($this->result);
+				$this->result->free();
 			}
 
 			// Profile:
