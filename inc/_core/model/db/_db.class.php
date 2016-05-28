@@ -419,7 +419,7 @@ class DB
 		}
 		elseif( ! empty( $evo_charset ) )
 		{ // Use the internal charset if it is defined
-			$this->set_connection_charset( DB::php_to_mysql_charmap( $evo_charset ) );
+			$this->set_connection_charset( $evo_charset, true );
 		}
 
 		/*
