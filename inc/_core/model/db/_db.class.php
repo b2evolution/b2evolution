@@ -7,7 +7,6 @@
  * - nested transactions
  * - symbolic table names
  * - query log
- * - get_list
  * - dynamic extension loading
  * - Debug features (EXPLAIN...)
  * and more...
