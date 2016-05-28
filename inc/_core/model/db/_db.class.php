@@ -103,7 +103,7 @@ class DB
 	var $insert_id = 0;
 
 	/**
-	 * Last query's resource
+	 * Reference to the last query
 	 * @var object
 	 */
 	protected $result;
@@ -697,7 +697,7 @@ class DB
 	function flush()
 	{
 		if( $this->has_result() )
-		{ // Free last result resource
+		{ // Free last result
 			$this->result->free();
 		}
 		$this->result = NULL;
@@ -903,7 +903,7 @@ class DB
 		else
 		{ // Query was a select, alter, etc...:
 			if( $this->has_result() )
-			{ // It's not a resource for CREATE or DROP for example and can even trigger a fatal error (see http://forums.b2evolution.net//viewtopic.php?t=9529)
+			{ // There's no result for CREATE or DROP for example and can even trigger a fatal error (see http://forums.b2evolution.net//viewtopic.php?t=9529)
 				$this->num_rows = $this->result->num_rows;
 			}
 
@@ -948,7 +948,7 @@ class DB
 					$this->queries[$this->num_queries-1]['time_profile'] = array_shift($this->result->fetch_row());
 				}
 
-				// Free "PROFILE" result resource:
+				// Free "PROFILE" result:
 				$this->result->free();
 
 
