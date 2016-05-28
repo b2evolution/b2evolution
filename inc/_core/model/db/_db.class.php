@@ -481,6 +481,24 @@ class DB
 
 
 	/**
+	 * @return Is there a valid result available?
+	 */
+	function has_result()
+	{
+		return isset($this->result) && is_object($this->result);
+	}
+
+
+	/**
+	 * @return boolean Is the database open?
+	 */
+	function is_open()
+	{
+		return is_object($this->dbhandle);
+	}
+
+
+	/**
 	 * Escapes text for SQL LIKE special characters % and _
 	 */
 	function like_escape($str)
@@ -580,7 +598,7 @@ class DB
 		// If no special error string then use mysql default..
 		if( ! strlen($title) )
 		{
-			if( is_object($this->dbhandle) )
+			if( $this->is_open() )
 			{ // use mysqli_error:
 				$this->last_error = $this->dbhandle->error.'(Errno='.$this->dbhandle->errno.')';
 			}
@@ -681,7 +699,7 @@ class DB
 	 */
 	function flush()
 	{
-		if( isset($this->result) && is_object($this->result) )
+		if( $this->has_result() )
 		{ // Free last result resource
 			mysqli_free_result($this->result);
 		}
@@ -850,9 +868,9 @@ class DB
 		}
 
 		// If there is an error then take note of it..
-		if( is_object( $this->dbhandle ) && $this->dbhandle->errno != 0 )
+		if( $this->is_open() && $this->dbhandle->errno != 0 )
 		{
-			if( is_object( $this->result ) )
+			if( $this->has_result() )
 			{
 				mysqli_free_result($this->result);
 			}
@@ -887,7 +905,7 @@ class DB
 		}
 		else
 		{ // Query was a select, alter, etc...:
-			if( is_object($this->result) )
+			if( $this->has_result() )
 			{ // It's not a resource for CREATE or DROP for example and can even trigger a fatal error (see http://forums.b2evolution.net//viewtopic.php?t=9529)
 				$this->num_rows = mysqli_num_rows($this->result);
 			}
@@ -1431,7 +1449,7 @@ class DB
 			{ // Query was a select, let's try to explain joins...
 
 				$this->result = mysqli_query( $this->dbhandle, 'EXPLAIN '.$query['sql'] );
-				if( is_object($this->result) )
+				if( $this->has_result() )
 				{
 					$this->num_rows = mysqli_num_rows($this->result);
 
