@@ -453,10 +453,9 @@ class DB
 	function __destruct()
 	{
 		@$this->flush();
-		@$this->dbhandle->close();
-
 		if (!$this->is_persistent)
 			@$this->dbhandle->kill($this->dbhandle->thread_id);
+		@$this->dbhandle->close();
 	}
 
 
