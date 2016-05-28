@@ -17,14 +17,14 @@
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
  * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
- * Parts of this file are copyright (c)2004 by Justin Vincent - {@link http://php.justinvincent.com}
- * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ * Parts of this file are copyright (c)2004 by Justin Vincent - {@link http://justinvincent.com}
+ * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link https://daniel.hahler.de}.
  *
  * {@internal Origin:
  * This file is based on the following package (excerpt from ezSQL's readme.txt):
  * =======================================================================
- * Author:  Justin Vincent (justin@visunet.ie)
- * Web: 	 http://php.justinvincent.com
+ * Author:  Justin Vincent (jv@vip.ie)
+ * Web: 	 http://justinvincent.com
  * Name: 	 ezSQL
  * Desc: 	 Class to make it very easy to deal with database connections.
  * License: FREE / Donation (LGPL - You may do what you like with ezSQL - no exceptions.)
