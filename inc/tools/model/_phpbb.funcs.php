@@ -1625,7 +1625,8 @@ function phpbb_post_is_topic( $post_id )
 	$SQL->WHERE( 'topic_status != 2' ); // Don't select MOVIED topics
 
 	$phpbb_cache_topics_posts = array();
-	while( $tp_row = $phpbb_DB->get_row($SQL->get(), ARRAY_A) )
+	$phpbb_DB->query($SQL->get());
+	while( $tp_row = $phpbb_DB->get_row(NULL, ARRAY_A) )
 	{
 		$phpbb_cache_topics_posts[ $tp_row['topic_first_post_id'] ] = $tp_row['topic_id'];
 	}
