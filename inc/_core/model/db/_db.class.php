@@ -1032,10 +1032,10 @@ class DB
 			return mysqli_fetch_object($this->result);
 
 		case ARRAY_A:
-			return mysqli_fetch_array($this->result, MYSQLI_ASSOC);
+			return mysqli_fetch_assoc($this->result);
 
 		case ARRAY_N:
-			return mysqli_fetch_array($this->result, MYSQLI_NUM);
+			return mysqli_fetch_row($this->result);
 
 		default:
 			$this->print_error('DB::get_row(string query, output type, int offset) -- Output type must be one of: OBJECT, ARRAY_A, ARRAY_N', '', false);
@@ -1123,14 +1123,14 @@ class DB
 				break;
 
 			case ARRAY_A:
-				while( $row = mysqli_fetch_array($this->result, MYSQLI_ASSOC) )
+				while( $row = mysqli_fetch_assoc($this->result) )
 				{
 					$r[] = $row;
 				}
 				break;
 
 			case ARRAY_N:
-				while( $row = mysqli_fetch_array($this->result, MYSQLI_NUM) )
+				while( $row = mysqli_fetch_row($this->result) )
 				{
 					$r[] = $row;
 				}
