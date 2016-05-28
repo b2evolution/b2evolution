@@ -1721,8 +1721,6 @@ class DB
 	/**
 	 * Set the charset of the connection.
 	 *
-	 * WARNING: this will fail on MySQL 3.23
-	 *
 	 * @staticvar array "regular charset => mysql charset map"
 	 * @param string Charset
 	 * @param boolean Use the "regular charset => mysql charset map"?
