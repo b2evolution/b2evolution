@@ -26,6 +26,7 @@
  * Author:  Justin Vincent (jv@vip.ie)
  * Web: 	 http://justinvincent.com
  * Name: 	 ezSQL
+ * Version:	 1.25
  * Desc: 	 Class to make it very easy to deal with database connections.
  * License: FREE / Donation (LGPL - You may do what you like with ezSQL - no exceptions.)
  * =======================================================================
@@ -44,7 +45,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * ezSQL Constants
  */
-define( 'EZSQL_VERSION', '1.25' );
 define( 'OBJECT', 0);
 define( 'ARRAY_A', 1);
 define( 'ARRAY_N', 2);
