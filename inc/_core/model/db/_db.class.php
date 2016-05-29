@@ -45,9 +45,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * ezSQL Constants
  */
 define( 'EZSQL_VERSION', '1.25' );
-define( 'OBJECT', 'OBJECT', true );
-define( 'ARRAY_A', 'ARRAY_A', true);
-define( 'ARRAY_N', 'ARRAY_N', true);
+define( 'OBJECT', 0);
+define( 'ARRAY_A', 1);
+define( 'ARRAY_N', 2);
 
 
 /**
