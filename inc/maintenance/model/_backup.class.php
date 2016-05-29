@@ -362,8 +362,9 @@ class Backup
 				$backup_ignore_file_lines = preg_split( '/\r\n|\n|\r/', file_get_contents( $backup_ignore_file ) );
 				foreach( $backup_ignore_file_lines as $backup_ignore_file_line )
 				{
-					// Ignore root folder with name:
+					// Ignore root folder and file with name:
 					$excluded_files[] = trim( $backup_ignore_file_line ).'/';
+					$excluded_files[] = trim( $backup_ignore_file_line );
 				}
 			}
 			else

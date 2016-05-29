@@ -562,7 +562,6 @@ class Skin extends DataObject
 
 		// Display skinshot:
 		echo '<div class="'.$disp_params['skinshot_class'].'"'.( $disp_params['highlighted'] ? ' id="fadeout-'.$skin_folder : '' ).'">';
-		echo '<div class="skinshot">';
 		echo '<div class="skinshot_placeholder';
 		if( $disp_params[ 'selected' ] )
 		{
@@ -592,7 +591,7 @@ class Skin extends DataObject
 			echo '<div class="skinshot_noshot">'.T_('No skinshot available for').'</div>';
 			echo '<div class="skinshot_name">'.$select_a_begin.$skin_folder.$select_a_end.'</div>';
 		}
-		echo '</div></div>';
+		echo '</div>';
 
 		//
 		echo '<div class="legend">';

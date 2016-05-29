@@ -98,7 +98,7 @@ if( isset( $edited_User ) )
 	$Widget->disp_template_replaced( 'block_start' );
 ?>
 
-<table id="fm_browser" cellspacing="0" cellpadding="0" class="table table-striped table-bordered table-hover table-condensed">
+<table id="fm_browser" cellspacing="0" cellpadding="0" class="table table-striped table-bordered table-condensed">
 	<thead>
 		<tr>
 			<td colspan="2" id="fm_bar">

@@ -375,7 +375,9 @@ class bootstrap_main_Skin extends Skin
 			if( $link_color )
 			{ // Custom link color:
 				$custom_css .= 'body.pictured .main_page_wrapper .front_main_area a,
-				body.pictured .main_page_wrapper .front_main_area div.evo_withteaser div.item_content > a { color: '.$link_color." }\n";
+				body.pictured .main_page_wrapper .front_main_area div.evo_withteaser div.item_content > a { color: '.$link_color.' }
+				body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_item_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a,
+				body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_post_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a { color: '.$link_color." }\n";
 			}
 			if( $link_color && $icon_color )
 			{ // Custom icon color:
