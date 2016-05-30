@@ -1101,7 +1101,8 @@ function & get_Domain_by_subdomain( $subdomain_name )
 	{
 		$domain_name = implode( '.', array_slice( $subdomain_name, $i ) );
 
-		if( $Domain = & $DomainCache->get_by_name( $domain_name, false, false ) )
+		if( $Domain = & $DomainCache->get_by_name( $domain_name, false, false ) ||
+		    $Domain = & $DomainCache->get_by_name( '.'.$domain_name, false, false ) )
 		{	// Domain exists with name, Get it:
 			return $Domain;
 		}
