@@ -23,7 +23,7 @@ class star_plugin extends Plugin
 	var $code = 'b2evStar';
 	var $name = 'Star renderer';
 	var $priority = 55;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -64,7 +64,7 @@ class star_plugin extends Plugin
 		global $Blog;
 
 		if( ! isset( $Blog ) || (
-		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' && 
+		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
 		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
 		{ // Don't load css/js files when plugin is not enabled
 			return;

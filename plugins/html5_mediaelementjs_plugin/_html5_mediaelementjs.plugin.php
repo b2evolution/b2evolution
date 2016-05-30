@@ -22,7 +22,7 @@ class html5_mediaelementjs_plugin extends Plugin
 	var $code = 'b2evH5MP';
 	var $name = 'HTML 5 MediaElement.js Video Player';
 	var $priority = 80;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $group = 'files';
 	var $number_of_installs = 1;
 	var $allow_ext = array( 'flv', 'm4v', 'f4v', 'mp4', 'ogv', 'webm' );

@@ -34,7 +34,7 @@ class google_maps_plugin extends Plugin
 	var $name = 'Google Maps';
 	var $code = 'evo_Gmaps';
 	var $priority = 50;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -162,7 +162,7 @@ class google_maps_plugin extends Plugin
 		return array();
 	}
 
-	
+
 	/**
 	 *  Add 'px' to display param if need.
 	 *
@@ -338,7 +338,7 @@ class google_maps_plugin extends Plugin
 			<?php
 			break;
 	}
-	
+
 	if (!empty( $lat ) || !empty( $lng ) )
 	{
 		?>
@@ -690,7 +690,7 @@ function locate()
 					{
 						adress = adress + text;
 					}
-					else 
+					else
 					{
 						adress = adress + ', ' + text;
 					}
@@ -729,7 +729,7 @@ function locate()
 					{
 						adress = adress + text;
 					}
-					else 
+					else
 					{
 						adress = adress + ', ' + text;
 					}

@@ -36,7 +36,7 @@ class tinymce_plugin extends Plugin
 	var $code = 'evo_TinyMCE';
 	var $name = 'TinyMCE';
 	var $priority = 10;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -253,7 +253,7 @@ class tinymce_plugin extends Plugin
 	 *
 	 * Event handler: Called when displaying editor buttons (in back-office).
 	 *
-	 * This method, if implemented, should output the buttons (probably as html INPUT elements) 
+	 * This method, if implemented, should output the buttons (probably as html INPUT elements)
 	 * and return true, if button(s) have been displayed.
 	 *
 	 * You should provide an unique html ID with each button.
