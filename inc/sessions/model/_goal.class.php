@@ -188,6 +188,18 @@ class Goal extends DataObject
 		param( 'goal_notes', 'text' );
 		$this->set_from_Request( 'notes', 'goal_notes' );
 
+		if( ! param_errors_detected() )
+		{	// Check goal key for duplicating:
+			$existing_goal_ID = $this->dbexists( 'goal_key', $this->get( 'key' ) );
+			if( $existing_goal_ID )
+			{	// We have a duplicate goal:
+				global $Blog;
+				param_error( 'goal_key',
+					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
+						'href="?ctrl=goals&amp;action=edit'.( isset( $Blog ) ? '&amp;blog='.$Blog->ID : '' ).'&amp;goal_ID='.$existing_goal_ID.'"' ) );
+			}
+		}
+
 		return ! param_errors_detected();
 	}
 
@@ -224,24 +236,6 @@ class Goal extends DataObject
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
-	}
-
-
-	/**
-	 * Check existence of specified goal in goal_key unique field.
-	 *
-	 * @param string Name of unique field  OR array of Names (for UNIQUE index with MULTIPLE fields)
-	 * @param mixed specified value        OR array of Values (for UNIQUE index with MULTIPLE fields)
-	 * @return int ID if goal exists otherwise NULL/false
-	 */
-	function dbexists( $unique_fields = 'goal_key', $values = NULL )
-	{
-		if( is_null( $values ) )
-		{
-			$values = $this->key;
-		}
-
-		return parent::dbexists( $unique_fields, $values );
 	}
 
 

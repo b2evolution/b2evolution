@@ -36,7 +36,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class captcha_qstn_plugin extends Plugin
 {
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $group = 'antispam';
 	var $code = 'captcha_qstn';
 

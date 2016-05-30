@@ -180,7 +180,7 @@ $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moder
 	{
 		if( $perm_blog_admin )
 		{ // Only admin can set this setting to 'Public'
-			$status_options['published'] .= $is_bootstrap_skin ? get_admin_badge( 'coll', false ) : ' ['.T_('Admin').']';
+			//$status_options['published'] .= $is_bootstrap_skin ? get_admin_badge( 'coll', false ) : ' ['.T_('Admin').']';
 		}
 		else
 		{ // Remove published status for non-admin users
@@ -202,7 +202,7 @@ $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moder
 	}
 	// put this on feedback details container, this way it won't be displayed if comment posting is not allowed
 	echo '<div class="feedback_details_container">';
-	
+
 	if( $is_bootstrap_skin )
 	{	// Use dropdown for bootstrap skin:
 		$new_status_field = get_status_dropdown_button( array(
@@ -210,14 +210,14 @@ $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moder
 				'value'   => $edited_Blog->get_setting('new_feedback_status'),
 				'options' => $status_options,
 			) );
-		$Form->info( T_('Status for new Anonymous comments'), $new_status_field, $newstatus_warning.T_('Logged in users will get the highest possible status allowed by their permissions. Plugins may also override this default.') );
+		$Form->info( T_('Status for new Anonymous comments'), $new_status_field, $newstatus_warning.T_('Logged in users will get the highest possible status allowed by their permissions. Plugins may also override this default.').get_admin_badge() );
 		$Form->hidden( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status') );
 		echo_form_dropdown_js();
 	}
 	else
 	{	// Use standard select element for other skins:
 		$Form->select_input_array( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status'), $status_options,
-				T_('Status for new Anonymous comments'), $newstatus_warning.T_('Logged in users will get the highest possible status allowed by their permissions. Plugins may also override this default.') );
+				T_('Status for new Anonymous comments'), $newstatus_warning.T_('Logged in users will get the highest possible status allowed by their permissions. Plugins may also override this default.').' ['.T_('Admin').']' );
 	}
 	echo '</div>';
 
