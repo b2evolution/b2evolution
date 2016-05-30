@@ -1499,9 +1499,6 @@ switch( $fm_mode )
 		// We want to link file(s) to an object or view linked files to an object:
 		// TODO: maybe this should not be a mode and maybe we should handle linking as soon as we have an $edited_Item ...
 
-		// Add JavaScript to handle links modifications.
-		require_js( 'links.js' );
-
 		if( !isset( $LinkOwner ) )
 		{ // No Object to link to...
 			$fm_mode = NULL;

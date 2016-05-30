@@ -412,13 +412,13 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=delete'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
 						array( 'onclick' => 'return confirm( \''
 								.sprintf( TS_('Are you sure want to DELETE the file &laquo;%s&raquo;?\nThis CANNOT be reversed!'), utf8_strip_tags( link_destination() ) )
-								.'\' ) && item_unlink('.$link_ID.')' ) );
+								.'\' ) && evo_unlink_attachment( this, \''.$LinkOwner->type.'\', '.$link_ID.', \'delete\' )' ) );
 		}
 		else
 		{	// If current user can only unlink
 			$r .= action_icon( T_('Delete this link!'), 'unlink',
 						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=unlink'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
-						array( 'onclick' => 'item_unlink('.$link_ID.')' ) );
+						array( 'onclick' => 'return evo_unlink_attachment( this, \''.$LinkOwner->type.'\', '.$link_ID.', \'unlink\' )' ) );
 		}
 	}
 

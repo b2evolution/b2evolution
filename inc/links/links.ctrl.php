@@ -90,9 +90,6 @@ switch( $action )
 
 		// Check permission:
 		$LinkOwner->check_perm( 'edit', true );
-
-		// Add JavaScript to handle links modifications.
-		require_js( 'links.js' );
 		break;
 
 	case 'unlink': // Unlink a file from object:

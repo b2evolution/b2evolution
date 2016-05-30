@@ -1,5 +1,6 @@
 /**
  * This file implements links specific Javascript functions.
+ * (Used only in back-office)
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -77,16 +78,37 @@ function insert_inline_link( type, link_ID, caption )
 
 
 /**
- * Replace the inline image placeholders when file is unlinked from item
+ * Unlink an attachment from Item or Comment
  *
+ * @param object Event object
+ * @param string Type: 'item', 'comment'
  * @param integer Link ID
+ * @param string Action: 'unlink', 'delete'
  */
-function item_unlink( link_ID )
+function evo_unlink_attachment( event_object, type, link_ID, action )
 {
-	var b2evoCanvas = window.document.getElementById( 'itemform_post_content' );
-	if( b2evoCanvas != null )
-	{ // Canvas exists
-		var regexp = new RegExp( '\\\[(image|file|inline):' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
-		textarea_str_replace( b2evoCanvas, regexp, '', window.document );
+	if( type == 'item' )
+	{	// Replace the inline image placeholders when file is unlinked from Item:
+		var b2evoCanvas = window.document.getElementById( 'itemform_post_content' );
+		if( b2evoCanvas != null )
+		{ // Canvas exists
+			var regexp = new RegExp( '\\\[(image|file|inline):' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
+			textarea_str_replace( b2evoCanvas, regexp, '', window.document );
+		}
 	}
+
+	// Call REST API request to unlink/delete the attachment:
+	evo_rest_api_request( 'links/' + link_ID,
+	{
+		'action': action
+	},
+	function( data )
+	{
+		// Remove attachment row from table:
+		jQuery( event_object ).closest( 'tr' ).remove();
+	},
+	'DELETE' );
+
+
+	return false;
 }

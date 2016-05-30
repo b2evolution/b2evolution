@@ -1340,7 +1340,7 @@ class RestApi
 		global $current_User;
 
 		if( ! is_logged_in() || ! $current_User->check_perm( 'users', 'edit' ) )
-		{	// Current user has no permission to delate the requested user:
+		{	// Current user has no permission to delete the requested user:
 			$this->halt( T_('You have no permission to edit other users!'), 'no_access', 403 );
 			// Exit here.
 		}
@@ -1694,4 +1694,99 @@ class RestApi
 	}
 
 	/**** MODULE POLLS ---- END ****/
+
+
+	/**** MODULE LINKS ---- START ****/
+
+
+	/**
+	 * Call module to prepare request for links
+	 */
+	private function module_links()
+	{
+		// Set link controller '' by default:
+		$link_controller = '';
+
+		// Get link ID:
+		$link_ID = empty( $this->args[1] ) ? 0 : intval( $this->args[1] );
+
+		$LinkCache = & get_LinkCache();
+		if( ! ( $Link = & $LinkCache->get_by_ID( $link_ID, false, false ) ) )
+		{	// Wrong link request:
+			$this->halt( 'Invalid link ID', 'link_invalid_id' );
+			// Exit here.
+		}
+
+		$request_method = isset( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : 'GET';
+		switch( $request_method )
+		{
+			case 'DELETE':
+				// Set controller to unlink the requested link:
+				$link_controller = 'unlink';
+				break;
+		}
+
+		if( ! method_exists( $this, 'controller_link_'.$link_controller ) )
+		{	// Unknown controller:
+			$this->halt( 'Unknown link controller "'.$link_controller.'"', 'unknown_controller' );
+			// Exit here.
+		}
+
+		// Call collection controller to prepare current request:
+		$this->{'controller_link_'.$link_controller}();
+	}
+
+
+	/**
+	 * Call link controller to unlink the requested link
+	 */
+	private function controller_link_unlink()
+	{
+		global $current_User;
+
+		// Action: 'unlink - just unlink file from the owner, 'delete' - unlink and delete the file from disk and DB completely
+		$action = param( 'action', 'string' );
+
+		// Get link ID:
+		$link_ID = empty( $this->args[1] ) ? 0 : intval( $this->args[1] );
+
+		$LinkCache = & get_LinkCache();
+		$Link = & $LinkCache->get_by_ID( $link_ID, false, false );
+		$LinkOwner = & $Link->get_LinkOwner();
+
+		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
+		{	// Current user has no permission to unlink the requested link:
+			$this->halt( 'You have no permission to unlink the requested link!', 'no_access', 403 );
+			// Exit here.
+		}
+
+		if( $link_File = & $Link->get_File() )
+		{
+			syslog_insert( sprintf( 'File %s was unlinked from %s with ID=%s', '[['.$link_File->get_name().']]', $LinkOwner->type, $LinkOwner->link_Object->ID ), 'info', 'file', $link_File->ID );
+		}
+
+		if( $action == 'delete' && $Link->can_be_file_deleted() )
+		{	// Get a linked file to delete it after unlinking if it is allowed for current user:
+			$linked_File = & $Link->get_File();
+		}
+
+		// Unlink File from Item/Comment:
+		$deleted_link_ID = $Link->ID;
+		$Link->dbdelete();
+		unset( $Link );
+
+		$LinkOwner->after_unlink_action( $deleted_link_ID );
+
+		if( $action == 'delete' && ! empty( $linked_File ) )
+		{	// Delete a linked file from disk and DB completely:
+			$linked_File->unlink();
+		}
+
+		// The requested link has been deleted successfully:
+		$this->halt( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'delete_success', 200 );
+		// Exit here.
+	}
+
+
+	/**** MODULE LINKS ---- END ****/
 }
