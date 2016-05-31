@@ -206,7 +206,7 @@ class DB
 	 * Is the connection persistent?
 	 * @var boolean
 	 */
-	protected $is_persistent;
+	protected $use_persistent;
 
 	// DEBUG:
 
@@ -299,7 +299,7 @@ class DB
 	 *    - 'table_options': sets {@link $table_options}
 	 *    - 'use_transactions': sets {@link $use_transactions}
 	 *    - 'aliases': Aliases for tables (array( alias => table name )); Default: no aliases.
-	 *    - 'new_link': don't use a persistent connection
+	 *    - 'use_persistent': use a persistent connection
 	 *    - 'client_flags': optional settings like compression or SSL encryption. See {@link http://www.php.net/manual/en/mysqli.constants.php}.
 	 *       (requires PHP 4.3)
 	 *    - 'log_queries': should queries get logged internally? (follows $debug by default, and requires it to be enabled otherwise)
@@ -373,11 +373,10 @@ class DB
 
 		$port = isset( $params['port'] ) ? $params['port'] : ini_get('mysqli.default_port');
 		$socket = isset( $params['socket'] ) ? $params['socket'] : ini_get('mysqli.default_socket');
-		$new_link = isset( $params['new_link'] ) ? $params['new_link'] : false;
 		$client_flags = isset( $params['client_flags'] ) ? $params['client_flags'] : 0;
 
 		/* Persistent connections are only available in PHP 5.3+ */
-		$this->is_persistent = !$new_link && version_compare(PHP_VERSION, '5.3', '>=');
+		$this->use_persistent = isset($params['use_persistent']) ? $params['use_persistent'] : version_compare(PHP_VERSION, '5.3', '>=');
 
 		if( ! $this->dbhandle )
 		{ // Connect to the Database:
@@ -388,7 +387,7 @@ class DB
 			$old_track_errors = @ini_set('track_errors', 1);
 			$old_html_errors = @ini_set('html_errors', 0);
 			$this->dbhandle = new mysqli();
-			@$this->dbhandle->real_connect($this->is_persistent ? 'p:'.$this->dbhost : $this->dbhost,
+			@$this->dbhandle->real_connect($this->use_persistent ? 'p:'.$this->dbhost : $this->dbhost,
 				$this->dbuser, $this->dbpassword, '', $port, $socket, $client_flags );
 			$mysql_error = $php_errormsg;
 			if( $old_track_errors !== false ) @ini_set('track_errors', $old_track_errors);
@@ -452,7 +451,7 @@ class DB
 	function __destruct()
 	{
 		@$this->flush();
-		if (!$this->is_persistent)
+		if (!$this->use_persistent)
 			@$this->dbhandle->kill($this->dbhandle->thread_id);
 		@$this->dbhandle->close();
 	}
