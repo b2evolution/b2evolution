@@ -1704,25 +1704,29 @@ class RestApi
 	 */
 	private function module_links()
 	{
+		// Get action from request string:
+		$link_action = isset( $this->args[2] ) ? $this->args[2] : '';
+
 		// Set link controller '' by default:
 		$link_controller = '';
-
-		// Get link ID:
-		$link_ID = empty( $this->args[1] ) ? 0 : intval( $this->args[1] );
-
-		$LinkCache = & get_LinkCache();
-		if( ! ( $Link = & $LinkCache->get_by_ID( $link_ID, false, false ) ) )
-		{	// Wrong link request:
-			$this->halt( 'Invalid link ID', 'link_invalid_id' );
-			// Exit here.
-		}
 
 		$request_method = isset( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : 'GET';
 		switch( $request_method )
 		{
 			case 'DELETE':
-				// Set controller to unlink the requested link:
-				$link_controller = 'unlink';
+				// Set controller to unlink/delete the requested link:
+				$link_controller = 'delete';
+				break;
+
+			case 'POST':
+				// Actions to update the links:
+				switch( $link_action )
+				{
+					case 'move_up':
+					case 'move_down':
+						$link_controller = 'change_order';
+						break;
+				}
 				break;
 		}
 
@@ -1738,20 +1742,33 @@ class RestApi
 
 
 	/**
-	 * Call link controller to unlink the requested link
+	 * Get Link object
+	 *
+	 * @return object Link
 	 */
-	private function controller_link_unlink()
+	private function & get_Link()
 	{
-		global $current_User;
-
-		// Action: 'unlink - just unlink file from the owner, 'delete' - unlink and delete the file from disk and DB completely
-		$action = param( 'action', 'string' );
-
 		// Get link ID:
 		$link_ID = empty( $this->args[1] ) ? 0 : intval( $this->args[1] );
 
 		$LinkCache = & get_LinkCache();
 		$Link = & $LinkCache->get_by_ID( $link_ID, false, false );
+
+		return $Link;
+	}
+
+
+	/**
+	 * Check permission if current user can update the requested link
+	 */
+	private function link_check_perm()
+	{
+		if( ! ( $Link = & $this->get_Link() ) )
+		{	// Wrong link request:
+			$this->halt( 'Invalid link ID', 'link_invalid_id' );
+			// Exit here.
+		}
+
 		$LinkOwner = & $Link->get_LinkOwner();
 
 		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
@@ -1759,21 +1776,36 @@ class RestApi
 			$this->halt( 'You have no permission to unlink the requested link!', 'no_access', 403 );
 			// Exit here.
 		}
+	}
 
-		if( $link_File = & $Link->get_File() )
+
+	/**
+	 * Call link controller to unlink the requested link or delete file completely
+	 */
+	private function controller_link_delete()
+	{
+		// Check permission if current user can update the requested link:
+		$this->link_check_perm();
+
+		// Action: 'unlink - just unlink file from the owner, 'delete' - unlink and delete the file from disk and DB completely
+		$action = param( 'action', 'string', '' );
+
+		$deleted_Link = & $this->get_Link();
+		$LinkOwner = & $deleted_Link->get_LinkOwner();
+
+		if( $link_File = & $deleted_Link->get_File() )
 		{
 			syslog_insert( sprintf( 'File %s was unlinked from %s with ID=%s', '[['.$link_File->get_name().']]', $LinkOwner->type, $LinkOwner->link_Object->ID ), 'info', 'file', $link_File->ID );
 		}
 
-		if( $action == 'delete' && $Link->can_be_file_deleted() )
+		if( $action == 'delete' && $deleted_Link->can_be_file_deleted() )
 		{	// Get a linked file to delete it after unlinking if it is allowed for current user:
-			$linked_File = & $Link->get_File();
+			$linked_File = & $deleted_Link->get_File();
 		}
 
 		// Unlink File from Item/Comment:
-		$deleted_link_ID = $Link->ID;
-		$Link->dbdelete();
-		unset( $Link );
+		$deleted_link_ID = $deleted_Link->ID;
+		$deleted_Link->dbdelete();
 
 		$LinkOwner->after_unlink_action( $deleted_link_ID );
 
@@ -1785,6 +1817,79 @@ class RestApi
 		// The requested link has been deleted successfully:
 		$this->halt( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'delete_success', 200 );
 		// Exit here.
+	}
+
+
+	/**
+	 * Call link controller to change order the requested link
+	 */
+	private function controller_link_change_order()
+	{
+		// Check permission if current user can update the requested link:
+		$this->link_check_perm();
+
+		// Get action from request string:
+		$link_action = $this->args[2];
+
+		$edited_Link = & $this->get_Link();
+		$LinkOwner = & $edited_Link->get_LinkOwner();
+
+		$ownerLinks = $LinkOwner->get_Links();
+
+		// TODO fp> when moving an "after_more" above a "teaser" img, it should change to "teaser" too.
+		// TODO fp> when moving a "teaser" below an "aftermore" img, it should change to "aftermore" too.
+
+		// Switch order with the next/prev one:
+		if( $link_action == 'move_up' )
+		{
+			$switchcond = 'return ($loop_Link->get("order") > $i
+				&& $loop_Link->get("order") < '.$edited_Link->get( 'order' ).');';
+			$i = -1;
+		}
+		else
+		{
+			$switchcond = 'return ($loop_Link->get("order") < $i
+				&& $loop_Link->get("order") > '.$edited_Link->get( 'order' ).');';
+			$i = PHP_INT_MAX;
+		}
+		foreach( $ownerLinks as $loop_Link )
+		{	// Find nearest order:
+			if( $loop_Link == $edited_Link )
+				continue;
+
+			if( eval( $switchcond ) )
+			{
+				$i = $loop_Link->get( 'order' );
+				$switch_Link = $loop_Link;
+			}
+		}
+		if( $i > -1 && $i < PHP_INT_MAX )
+		{	// Switch the links:
+			$switch_Link->set( 'order', $edited_Link->get( 'order' ) );
+
+			// HACK: go through order=0 to avoid duplicate key conflict:
+			$edited_Link->set( 'order', 0 );
+			$edited_Link->dbupdate();
+			$switch_Link->dbupdate();
+
+			$edited_Link->set( 'order', $i );
+			$edited_Link->dbupdate();
+
+			// Update last touched date of Owners
+			$LinkOwner->update_last_touched_date();
+
+			// The requested link order has been changed successfully:
+			$this->halt( ( $link_action == 'move_up' )
+				? T_('Link has been moved up.')
+				: T_('Link has been moved down.'),
+				'change_order_success', 200 );
+			// Exit here.
+		}
+		else
+		{	// The requested link order has been changed successfully:
+			$this->halt( T_('Link order has not been changed.'), 'change_order_failed', 403 );
+			// Exit here.
+		}
 	}
 
 

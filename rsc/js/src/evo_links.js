@@ -7,12 +7,45 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois PLANQUE - {@link http://fplanque.com/}
  *
  * @package admin
  */
 
-function evo_display_position_onchange( selectInput, url, crumb )
+
+// Initialize attachments block:
+jQuery( document ).ready( function()
+{
+	var height = jQuery( '#attachments_fieldset_table' ).height();
+	height = ( height > 320 ) ? 320 : ( height < 97 ? 97 : height );
+	jQuery( '#attachments_fieldset_wrapper' ).height( height );
+
+	jQuery( '#attachments_fieldset_wrapper' ).resizable(
+	{	// Make the attachments fieldset wrapper resizable:
+		minHeight: 80,
+		handles: 's',
+		resize: function( e, ui )
+		{	// Limit max height by table of attachments:
+			jQuery( '#attachments_fieldset_wrapper' ).resizable( 'option', 'maxHeight', jQuery( '#attachments_fieldset_table' ).height() );
+		}
+	} );
+	jQuery( document ).on( 'click', '#attachments_fieldset_wrapper .ui-resizable-handle', function()
+	{	// Increase attachments fieldset height on click to resizable handler:
+		var max_height = jQuery( '#attachments_fieldset_table' ).height();
+		var height = jQuery( '#attachments_fieldset_wrapper' ).height() + 80;
+		jQuery( '#attachments_fieldset_wrapper' ).css( 'height', height > max_height ? max_height : height );
+	} );
+} );
+
+
+/**
+ * Change link position
+ *
+ * @param object Select element
+ * @param string URL
+ * @param string Crumb
+ */
+function evo_link_change_position( selectInput, url, crumb )
 {
 	var oThis = selectInput;
 	var new_position = selectInput.value;
@@ -47,7 +80,7 @@ function evo_display_position_onchange( selectInput, url, crumb )
  * @param integer File ID
  * @param string Caption text
  */
-function insert_inline_link( type, link_ID, caption )
+function evo_link_insert_inline( type, link_ID, caption )
 {
 	var b2evoCanvas = window.document.getElementById('itemform_post_content');
 	if( b2evoCanvas != null )
@@ -78,25 +111,15 @@ function insert_inline_link( type, link_ID, caption )
 
 
 /**
- * Unlink an attachment from Item or Comment
+ * Unlink/Delete an attachment from Item or Comment
  *
  * @param object Event object
  * @param string Type: 'item', 'comment'
  * @param integer Link ID
  * @param string Action: 'unlink', 'delete'
  */
-function evo_unlink_attachment( event_object, type, link_ID, action )
+function evo_link_delete( event_object, type, link_ID, action )
 {
-	if( type == 'item' )
-	{	// Replace the inline image placeholders when file is unlinked from Item:
-		var b2evoCanvas = window.document.getElementById( 'itemform_post_content' );
-		if( b2evoCanvas != null )
-		{ // Canvas exists
-			var regexp = new RegExp( '\\\[(image|file|inline):' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
-			textarea_str_replace( b2evoCanvas, regexp, '', window.document );
-		}
-	}
-
 	// Call REST API request to unlink/delete the attachment:
 	evo_rest_api_request( 'links/' + link_ID,
 	{
@@ -104,11 +127,58 @@ function evo_unlink_attachment( event_object, type, link_ID, action )
 	},
 	function( data )
 	{
+		if( type == 'item' )
+		{	// Replace the inline image placeholders when file is unlinked from Item:
+			var b2evoCanvas = window.document.getElementById( 'itemform_post_content' );
+			if( b2evoCanvas != null )
+			{ // Canvas exists
+				var regexp = new RegExp( '\\\[(image|file|inline):' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
+				textarea_str_replace( b2evoCanvas, regexp, '', window.document );
+			}
+		}
+
 		// Remove attachment row from table:
 		jQuery( event_object ).closest( 'tr' ).remove();
+
+		// Update the attachment block height after deleting row:
+		var table_height = jQuery( '#attachments_fieldset_table' ).height();
+		var wrapper_height = jQuery( '#attachments_fieldset_wrapper' ).height();
+		if( wrapper_height > table_height )
+		{
+			jQuery( '#attachments_fieldset_wrapper' ).height( jQuery( '#attachments_fieldset_table' ).height() );
+		}
 	},
 	'DELETE' );
 
+	return false;
+}
+
+
+/**
+ * Change an order of the Item/Comment attachment
+ *
+ * @param object Event object
+ * @param integer Link ID
+ * @param string Action: 'move_up', 'move_down'
+ */
+function evo_link_change_order( event_object, link_ID, action )
+{
+	// Call REST API request to change order of the attachment:
+	evo_rest_api_request( 'links/' + link_ID + '/' + action,
+	function( data )
+	{
+		// Change an order in the attachments table
+		var row = jQuery( event_object ).closest( 'tr' );
+		if( action == 'move_up' )
+		{	// Move up:
+			row.prev().before( row );
+		}
+		else
+		{	// Move down:
+			row.next().after( row );
+		}
+	},
+	'POST' );
 
 	return false;
 }

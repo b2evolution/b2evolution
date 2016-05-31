@@ -195,41 +195,6 @@ function link_attachment_window( link_owner_type, link_owner_ID, root, path, fm_
 	} );
 	return false;
 }
-
-jQuery( document ).ready( function()
-{
-	var table_height = jQuery( '#attachments_fieldset_table' ).height();
-	var wrapper_height = jQuery( '#attachments_fieldset_wrapper' ).height();
-	if( table_height > wrapper_height )
-	{
-		wrapper_height = table_height;
-	}
-	if( wrapper_height > table_height )
-	{
-		wrapper_height = table_height;
-	}
-	if( wrapper_height > 320 )
-	{
-		wrapper_height = 320;
-	}
-	jQuery( '#attachments_fieldset_wrapper' ).height( wrapper_height );
-
-	jQuery( '#attachments_fieldset_wrapper' ).resizable(
-	{	// Make the attachments fieldset wrapper resizable:
-		minHeight: 80,
-		handles: 's',
-		resize: function( e, ui )
-		{	// Limit max height by table of attachments:
-			jQuery( '#attachments_fieldset_wrapper' ).resizable( 'option', 'maxHeight', jQuery( '#attachments_fieldset_table' ).height() );
-		}
-	} );
-	jQuery( document ).on( 'click', '#attachments_fieldset_wrapper .ui-resizable-handle', function()
-	{	// Increase attachments fieldset height on click to resizable handler:
-		var max_height = jQuery( '#attachments_fieldset_table' ).height();
-		var height = jQuery( '#attachments_fieldset_wrapper' ).height() + 80;
-		jQuery( '#attachments_fieldset_wrapper' ).css( 'height', height > max_height ? max_height : height );
-	} );
-} );
 </script>
 <?php
 }
@@ -376,12 +341,14 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 		// Allow to move up all rows except of first, This action icon is hidden by CSS for first row
 		$r .= action_icon( T_('Move upwards'), 'move_up',
 						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=link_move_up'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
-						array( 'class' => 'action_icon_link_move_up' ) );
+						array( 'class' => 'action_icon_link_move_up',
+									 'onclick' => 'return evo_link_change_order( this, '.$link_ID.', \'move_up\' )' ) );
 
 		// Allow to move down all rows except of last, This action icon is hidden by CSS for last row
 		$r .= ' '.action_icon( T_('Move down'), 'move_down',
 						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=link_move_down'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
-						array( 'class' => 'action_icon_link_move_down' ) );
+						array( 'class' => 'action_icon_link_move_down',
+									 'onclick' => 'return evo_link_change_order( this, '.$link_ID.', \'move_down\' )' ) );
 	}
 
 	if( $current_File && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
@@ -412,13 +379,13 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=delete'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
 						array( 'onclick' => 'return confirm( \''
 								.sprintf( TS_('Are you sure want to DELETE the file &laquo;%s&raquo;?\nThis CANNOT be reversed!'), utf8_strip_tags( link_destination() ) )
-								.'\' ) && evo_unlink_attachment( this, \''.$LinkOwner->type.'\', '.$link_ID.', \'delete\' )' ) );
+								.'\' ) && evo_link_delete( this, \''.$LinkOwner->type.'\', '.$link_ID.', \'delete\' )' ) );
 		}
 		else
 		{	// If current user can only unlink
 			$r .= action_icon( T_('Delete this link!'), 'unlink',
 						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=unlink'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
-						array( 'onclick' => 'return evo_unlink_attachment( this, \''.$LinkOwner->type.'\', '.$link_ID.', \'unlink\' )' ) );
+						array( 'onclick' => 'return evo_link_delete( this, \''.$LinkOwner->type.'\', '.$link_ID.', \'unlink\' )' ) );
 		}
 	}
 
@@ -446,7 +413,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 		}
 		$r .= ' '.get_icon( 'add', 'imgtag', array(
 				'title'   => sprintf( T_('Insert %s into the post'), $type ),
-				'onclick' => 'insert_inline_link( \''.$type.'\', '.$link_ID.', \'\' )',
+				'onclick' => 'evo_link_insert_inline( \''.$type.'\', '.$link_ID.', \'\' )',
 				'style'   => 'cursor:default;'
 			) );
 	}
@@ -485,7 +452,7 @@ jQuery( document ).on( 'change', 'select[id^=display_position_]', {
 		crumb: '<?php echo get_crumb( 'link' ); ?>'
 }, function( event )
 {
-	evo_display_position_onchange( this, event.data.url, event.data.crumb );
+	evo_link_change_position( this, event.data.url, event.data.crumb );
 } );
 </script>
 <?php
