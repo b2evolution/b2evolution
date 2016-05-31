@@ -3384,7 +3384,7 @@ class Blog extends DataObject
 		{
 			if( ! in_array( $wico_code, $blog_containers ) )
 			{	// Create only those containers which are not saved yet:
-				$widget_containers_sql_rows[] = '( "'.$wico_code.'", "'.$wico_data[0].'", '.$this->ID.', '.$wico_data[1].' )';
+				$widget_containers_sql_rows[] = '( "'.$wico_code.'", "'.$wico_data[0].'", '.$this->ID.', '.$wico_data[1].', 1 )';
 			}
 		}
 
@@ -3395,7 +3395,7 @@ class Blog extends DataObject
 
 		if( ! empty( $widget_containers_sql_rows ) )
 		{ // Insert all containers defined by the blog skins into the database
-			$newly_created = $DB->query( 'REPLACE INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order ) VALUES'
+			$newly_created = $DB->query( 'REPLACE INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES'
 					.implode( ', ', $widget_containers_sql_rows ) );
 		}
 

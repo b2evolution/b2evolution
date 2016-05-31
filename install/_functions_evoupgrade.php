@@ -7605,6 +7605,31 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11805, 'Upgrading widget containers table...' ) )
+	{	// part of 6.7.3-stable
+		db_add_col( 'T_widget__container', 'wico_main', 'TINYINT(1) NOT NULL DEFAULT 0' );
+		// Update new flag to 1 for all main containers of existing collections:
+		if( ! is_object( $Settings ) )
+		{	// Create Settings object:
+			load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
+			$Settings = new GeneralSettings();
+		}
+		$BlogCache = & get_BlogCache();
+		$BlogCache->load_all();
+		foreach( $BlogCache->cache as $Blog )
+		{
+			$main_containers = $Blog->get_main_containers();
+			if( count( $main_containers ) )
+			{	// If at least one main container exists:
+				$DB->query( 'UPDATE T_widget__container
+					  SET wico_main = 1
+					WHERE wico_coll_ID = '.$Blog->ID.'
+					  AND wico_code IN ( '.$DB->quote( array_keys(  $main_containers ) ).' )' );
+			}
+		}
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

@@ -28,6 +28,7 @@ class WidgetContainer extends DataObject
 	var $name;
 	var $coll_ID;
 	var $order;
+	var $main;
 
 	/**
 	 * Constructor
@@ -46,6 +47,7 @@ class WidgetContainer extends DataObject
 			$this->name = $db_row->wico_name;
 			$this->coll_ID = $db_row->wico_coll_ID;
 			$this->order = $db_row->wico_order;
+			$this->main = $db_row->wico_main;
 		}
 	}
 

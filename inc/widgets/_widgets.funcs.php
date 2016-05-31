@@ -90,11 +90,11 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	$widget_containers_sql_rows = array();
 	foreach( $blog_containers as $wico_code => $wico_data )
 	{
-		$widget_containers_sql_rows[] = '( "'.$wico_code.'", "'.$wico_data[0].'", '.$blog_id.', '.$wico_data[1].' )';
+		$widget_containers_sql_rows[] = '( "'.$wico_code.'", "'.$wico_data[0].'", '.$blog_id.', '.$wico_data[1].', 1 )';
 	}
 
 	// Insert widget containers records by one SQL query
-	$DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order ) VALUES'
+	$DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES'
 		.implode( ', ', $widget_containers_sql_rows ) );
 
 	$insert_id = $DB->insert_id;
