@@ -233,6 +233,8 @@ switch( $action )
 			}
 		}
 
+		$Messages->add( T_('The attachments have been sorted by file name.'), 'success' );
+
 		// Need to specify where to redirect, otherwise referrer will be used:
 		switch( $LinkOwner->type )
 		{
