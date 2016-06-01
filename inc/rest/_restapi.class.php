@@ -1704,8 +1704,14 @@ class RestApi
 	 */
 	private function module_links()
 	{
-		// Get action from request string:
-		$link_action = isset( $this->args[2] ) ? $this->args[2] : '';
+		if( ! empty( $this->args[2] ) )
+		{	// Get action from request string:
+			$link_action = $this->args[2];
+		}
+		else
+		{	// Get action from param:
+			$link_action = param( 'action', 'string', '' );
+		}
 
 		// Set link controller '' by default:
 		$link_controller = '';
@@ -1718,6 +1724,7 @@ class RestApi
 				$link_controller = 'delete';
 				break;
 
+			case 'GET':
 			case 'POST':
 				// Actions to update the links:
 				switch( $link_action )
@@ -1725,6 +1732,10 @@ class RestApi
 					case 'move_up':
 					case 'move_down':
 						$link_controller = 'change_order';
+						break;
+
+					case 'attach':
+						$link_controller = 'attach';
 						break;
 				}
 				break;
@@ -1773,7 +1784,7 @@ class RestApi
 
 		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
 		{	// Current user has no permission to unlink the requested link:
-			$this->halt( 'You have no permission to unlink the requested link!', 'no_access', 403 );
+			$this->halt( 'You have no permission to edit the requested link!', 'no_access', 403 );
 			// Exit here.
 		}
 	}
@@ -1887,9 +1898,67 @@ class RestApi
 		}
 		else
 		{	// The requested link order has been changed successfully:
-			$this->halt( T_('Link order has not been changed.'), 'change_order_failed', 403 );
+			$this->halt( T_('Link order has not been changed.'), 'change_order_success', 403 );
 			// Exit here.
 		}
+	}
+
+
+	/**
+	 * Call link controller to change order the requested link
+	 */
+	private function controller_link_attach()
+	{
+		global $LinkOwner, $current_File;
+
+		$link_type = param( 'type', 'string' );
+		$link_object_ID = param( 'object_ID', 'string' );
+		$root = param( 'root', 'string' );
+		$file_path = param( 'path', 'string' );
+
+		$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+
+		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
+		{	// Current user has no permission to unlink the requested link:
+			$this->halt( 'You have no permission to edit the requested link!', 'no_access', 403 );
+			// Exit here.
+		}
+
+		$FileCache = & get_FileCache();
+		list( $root_type, $root_in_type_ID ) = explode( '_', $root, 2 );
+		if( ! ( $current_File = $FileCache->get_by_root_and_path( $root_type, $root_in_type_ID, $file_path ) ) )
+		{	// No file:
+			$this->halt( T_('Nothing selected.'), 'wrong_file', 403 );
+			// Exit here.
+		}
+
+		// Link the file to Item/Comment:
+		$link_ID = $current_File->link_to_Object( $LinkOwner );
+
+		$LinkCache = & get_LinkCache();
+		if( $Link = & $LinkCache->get_by_ID( $link_ID, false, false ) )
+		{	// Add data of new link to response:
+
+			// Use the glyph or font-awesome icons if requested by skin
+			param( 'b2evo_icons_type', 'string', 'fontawesome-glyphicons' );
+
+			$mask_row = (object) array(
+					'link_ID'       => $Link->ID,
+					'file_ID'       => $current_File->ID,
+					'link_position' => $Link->get( 'position' ),
+				);
+			$this->add_response( 'link', array(
+					'ID'       => $Link->ID,
+					'url'      => $current_File->get_view_link(),
+					'preview'  => $Link->get_preview_thumb(),
+					'actions'  => link_actions( $Link->ID, 'last', $link_type ),
+					'position' => display_link_position( $mask_row ),
+				) );
+		}
+
+		// File has been attached successfully:
+		$this->halt( $LinkOwner->translate( 'Selected files have been linked to xxx.' ), 'attach_success', 200 );
+		// Exit here.
 	}
 
 

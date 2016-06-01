@@ -41,7 +41,7 @@ $link_type = param( 'link_type', 'string', 'item', true );
 
 $SQL = $LinkOwner->get_SQL();
 
-$Results = new Results( $SQL->get(), 'link_', '', 1000 );
+$Results = new Results( $SQL->get(), '', '', 1000 );
 
 $Results->title = T_('Attachments');
 

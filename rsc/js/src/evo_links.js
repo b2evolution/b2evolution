@@ -182,3 +182,41 @@ function evo_link_change_order( event_object, link_ID, action )
 
 	return false;
 }
+
+
+/**
+ * Attach a file to Item/Comment
+ *
+ * @param string Type: 'item', 'comment'
+ * @param integer ID of Item or Comment
+ * @param string Root (example: 'collection_1')
+ * @param string Path to the file relative to root
+ */
+function evo_link_attach( type, object_ID, root, path )
+{
+	// Call REST API request to attach a file to Item/Comment:
+	evo_rest_api_request( 'links',
+	{
+		'action':    'attach',
+		'type':      type,
+		'object_ID': object_ID,
+		'root':      root,
+		'path':      path
+	},
+	function( data )
+	{
+		var table_obj = jQuery( '#attachments_fieldset_table table', window.parent.document );
+		if( table_obj.length > 0 && typeof( data.link ) != 'undefined' )
+		{	// Append new link to the attachments table:
+			table_obj.append( '<tr>' +
+					'<td class="firstcol shrinkwrap">' + data.link.preview + '</td>' +
+					'<td class="fm_filename">' + data.link.url + '</td>' +
+					'<td class="shrinkwrap link_id_cell">' + data.link.ID + '</td>' +
+					'<td class="shrinkwrap">' + data.link.actions + '</td>' +
+					'<td class="lastcol shrinkwrap">' + data.link.position + '</td>' +
+				'</tr>' );
+		}
+	} );
+
+	return false;
+}

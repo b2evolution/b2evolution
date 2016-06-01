@@ -26,7 +26,6 @@ function evo_rest_api_request( url, params_func, func_method, method )
 	{	// Use GET method by default:
 		method = 'GET';
 	}
-	console.log( method );
 
 	jQuery.ajax(
 	{
