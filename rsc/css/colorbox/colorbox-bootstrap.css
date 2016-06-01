@@ -101,7 +101,7 @@
   border: 1px solid #ccc;
 }
 #cboxLoadedContent {
-  margin-bottom: 28px;
+  margin-bottom: 50px;
 }
 #cboxTitle {
   position: absolute;
@@ -115,12 +115,20 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+#cboxInfoBar {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  min-height: 50px;
+}
 #cboxCurrent {
   position: absolute;
-  bottom: 4px;
-  left: 58px;
   color: #949494;
-  line-height: 17px;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+      -ms-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
 }
 #cboxSlideshow {
   position: absolute;
@@ -129,16 +137,26 @@
   color: #0092ef;
   line-height: 17px;
 }
+#cboxNavigation {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  top: 0;
+  width: 128px;
+}
 #cboxPrevious,
 #cboxNext,
 #cboxClose {
   position: absolute;
-  bottom: 0;
-  width: 23px;
-  height: 23px;
-  color: #666;
-  font: normal normal normal 23px/1 FontAwesome;
+  width: 32px;
+  height: 32px;
+  color: #999;
+  font: normal normal normal 32px/1 FontAwesome;
   visibility: hidden;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+          transform: translateY(-50%);
 }
 #cboxPrevious:before,
 #cboxNext:before,
@@ -157,13 +175,15 @@
   content: "\f190";
 }
 #cboxNext {
-  left: 27px;
+  right: 0;
 }
 #cboxNext:before {
   content: "\f18e";
 }
 #cboxClose {
+  position: absolute;
   right: 0;
+  bottom: 0;
 }
 #cboxClose:before {
   content: "\f05c";
@@ -175,18 +195,14 @@
   background: url(../img/ajax-loader/fff.gif) no-repeat center center;
 }
 #cboxVoting {
-  position: relative;
-  bottom: 25px;
-  min-height: 15px;
-  width: 100%;
-  padding: 5px 0 10px;
-  text-align: center;
+  padding-left: 128px;
+  padding-right: 32px;
   white-space: normal;
   -khtml-border-radius: 6px;
   border-radius: 6px;
 }
 #cboxVoting a {
-  margin: 0 10px 0 0;
+  margin: 0;
   vertical-align: middle;
   display: inline-block;
 }
@@ -195,7 +211,6 @@
   vertical-align: middle;
 }
 #cboxVoting span {
-  margin: 0 10px 0 0;
   display: inline-block;
 }
 #cboxVoting span.icon {
@@ -230,7 +245,53 @@
   width: 100%;
   height: 16px;
 }
+#cboxVoting .voting_wrapper {
+  display: block;
+  position: absolute;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+          transform: translateY(-50%);
+  width: -webkit-calc(100% - 128px - 32px);
+  width: calc(100% - 128px - 32px);
+  text-align: center;
+}
+#cboxVoting #votingLike,
+#cboxVoting #votingNoopinion,
+#cboxVoting #votingDontlike,
+#cboxVoting span.fa.voted {
+  font-size: 32px;
+  display: inline-block;
+  vertical-align: middle;
+  padding: 2px 12px;
+}
+#cboxVoting #votingInappropriate + span {
+  margin-right: 6px;
+}
+#cboxVoting div.btn-group {
+  display: inline-block;
+}
+#cboxVoting div.btn-group .voting_btn {
+  border: 1px solid #adadad;
+  margin-left: -1px;
+}
+#cboxVoting div.btn-group .voting_btn:hover {
+  background-color: #e6e6e6;
+}
+#cboxVoting div.btn-group .voted {
+  background-color: #e6e6e6;
+}
+#cboxVoting div.vote_title {
+  display: inline-block;
+  text-align: right;
+  padding-right: 6px;
+}
+#cboxVoting div.vote_others {
+  display: inline-block;
+  padding-left: 12px;
+}
 #cboxOpen {
+  display: none;
   position: absolute;
   bottom: 4px;
   left: 0;

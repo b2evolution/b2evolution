@@ -3831,15 +3831,18 @@ function display_voting_form( $params = array() )
 
 	$params_like = array(
 			'id' => 'votingLike',
-			'title' => $params['title_like']
+			'title' => $params['title_like'],
+			'class' => 'voting_btn'
 		);
 	$params_noopinion = array(
 			'id' => 'votingNoopinion',
-			'title' => $params['title_noopinion']
+			'title' => $params['title_noopinion'],
+			'class' => 'voting_btn'
 		);
 	$params_dontlike = array(
 			'id' => 'votingDontlike',
-			'title' => $params['title_dontlike']
+			'title' => $params['title_dontlike'],
+			'class' => 'voting_btn'
 		);
 	$params_inappropriate = array(
 			'id' => 'votingInappropriate',
@@ -3950,7 +3953,7 @@ function display_voting_form( $params = array() )
 				$icon_like = 'thumb_up_disabled';
 				$icon_noopinion = 'ban_disabled';
 				$icon_dontlike = 'thumb_down';
-				$params_dontlike['class'] = 'voted';
+				$params_dontlike['class'] .= ' voted';
 				$params_dontlike['title'] = $params['title_dontlike_voted'];
 				unset( $params_dontlike['id'] );
 				break;
@@ -3961,7 +3964,7 @@ function display_voting_form( $params = array() )
 				$icon_like = 'thumb_up_disabled';
 				$icon_noopinion = 'ban';
 				$icon_dontlike = 'thumb_down_disabled';
-				$params_noopinion['class'] = 'voted';
+				$params_noopinion['class'] .= ' voted';
 				$params_noopinion['title'] = $params['title_noopinion_voted'];
 				unset( $params_noopinion['id'] );
 				break;
@@ -3972,7 +3975,7 @@ function display_voting_form( $params = array() )
 				$icon_like = 'thumb_up';
 				$icon_noopinion = 'ban_disabled';
 				$icon_dontlike = 'thumb_down_disabled';
-				$params_like['class'] = 'voted';
+				$params_like['class'] .= ' voted';
 				$params_like['title'] = $params['title_like_voted'];
 				unset( $params_like['id'] );
 				break;
@@ -3992,7 +3995,8 @@ function display_voting_form( $params = array() )
 			$checked_spam = ' checked="checked"';
 		}
 	}
-
+	echo '<div class="voting_wrapper">';
+	echo '<div class="vote_title">';
 	echo '<span class="vote_title">'.$vote_numbers.'<span class="vote_title_text">'.$params['title_text'].'</span></span>';
 
 	$blog_param = empty( $blog ) ? '' : '&blog='.$blog;
@@ -4005,7 +4009,8 @@ function display_voting_form( $params = array() )
 	{	// Append a redirect param
 		$url .= '&redirect_to='.$redirect_to;
 	}
-
+	echo '</div>';
+	echo '<div class="btn-group">';
 	if( $params['display_like'] )
 	{	// Display 'Like' icon
 		$tag_icon = get_icon( $icon_like, 'imgtag', $params_like );
@@ -4051,6 +4056,9 @@ function display_voting_form( $params = array() )
 		}
 	}
 
+	echo '</div>';
+	echo '<div class="vote_others">';
+
 	if( $params['display_inappropriate'] || $params['display_spam'] )
 	{	// Display separator between icons and checkboxes
 		echo '<span class="separator">&nbsp;</span>';
@@ -4074,6 +4082,7 @@ function display_voting_form( $params = array() )
 
 	// Create a hidden input with current ID
 	echo '<input type="hidden" id="votingID" value="'.$params['vote_ID'].'" />';
+	echo '</div></div>';
 }
 
 

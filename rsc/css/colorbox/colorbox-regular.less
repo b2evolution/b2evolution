@@ -34,6 +34,12 @@
 #cboxTitle {
 	margin: 0;
 }
+#cboxInfoBar {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	min-height: 23px;
+}
 #cboxLoadingOverlay, #cboxLoadingGraphic {
 	position: absolute;
 	top: 0;
@@ -111,10 +117,10 @@
 }
 #cboxCurrent {
 	position: absolute;
-	bottom: 4px;
-	left: 58px;
 	color: #949494;
-	line-height: 17px;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
 }
 #cboxSlideshow {
 	position: absolute;
@@ -123,6 +129,14 @@
 	color: #0092ef;
 	line-height: 17px;
 }
+#cboxNavigation {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	top: 0;
+	width: 102px;
+}
+
 #cboxPrevious, #cboxNext, #cboxClose {
 	position: absolute;
 	bottom: 0;
@@ -140,11 +154,13 @@
 	background-position-x: -48px;
 }
 #cboxNext {
-	left: 27px;
+	right: 0;
 	background-position-x: -72px;
 }
 #cboxClose {
+	position: absolute;
 	right: 0;
+	bottom: 0;
 	background-position-x: -24px;
 }
 #cboxLoadingOverlay {
@@ -154,12 +170,8 @@
 	background: url(../img/ajax-loader/fff.gif) no-repeat center center;
 }
 #cboxVoting {
-	position: relative;
-	bottom: 25px;
-	min-height: 15px;
-	width: 100%;
-	padding: 5px 0 10px;
-	text-align: center;
+	padding-left: 102px;
+	padding-right: 23px;
 	white-space: normal;
 	-khtml-border-radius: 6px;
 	border-radius: 6px;
@@ -207,6 +219,28 @@
 		background: url(../img/ajax-loader.gif) no-repeat center;
 		width: 100%;
 		height: 16px;
+	}
+	.voting_wrapper {
+		display: block;
+		position: absolute;
+		//left: 0;
+		//right: 0;
+		top: 50%;
+		transform: translateY(-50%);
+		width: ~"calc(100% - 100px - 23px)";
+	}
+	div.vote_title {
+		display: inline-block;
+		//width: ~"calc(50% - 120px)";
+		text-align: right;
+		padding-right: 6px;
+	}
+	div.btn-group {
+		display: inline-block;
+	}
+	div.vote_others {
+		display: inline-block;
+		padding-left: 12px;
 	}
 }
 

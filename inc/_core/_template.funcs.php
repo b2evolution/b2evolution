@@ -1190,7 +1190,7 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				global $b2evo_icons_type, $blog;
 				$blog_param = empty( $blog ) ? '' : '&blog='.$blog;
 				// Colorbox params to translate the strings:
-				$colorbox_strings_params = 'current: "'.TS_('image {current} of {total}').'",
+				$colorbox_strings_params = 'current: "'.TS_('{current} / {total}').'",
 					previous: "'.TS_('Previous').'",
 					next: "'.TS_('Next').'",
 					close: "'.TS_('Close').'",

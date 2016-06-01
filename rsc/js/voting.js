@@ -187,7 +187,7 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
  *
  * @param object Layout
  * @param string Color
- * 
+ *
  */
 function votingFadeIn( obj, color )
 {
