@@ -210,9 +210,9 @@ class ItemQuery extends SQL
 	/**
 	 * Restrict to specific collection/chapters (blog/categories)
 	 *
-	 * @param Blog
-	 * @param array
-	 * @param string
+	 * @param object Blog
+	 * @param array Categories IDs
+	 * @param string Use '-' to exclude the categories
 	 * @param string 'wide' to search in extra cats too
 	 *               'main' for main cat only
 	 *               'extra' for extra cats only
@@ -227,15 +227,21 @@ class ItemQuery extends SQL
 		$this->cat_modifier = $cat_modifier;
 
 		if( ! empty( $cat_array ) && ( $cat_focus == 'wide' || $cat_focus == 'extra' ) )
-		{
+		{	// Select extra categories if we want filter by several categories:
 			$sql_join_categories = ( $cat_focus == 'extra' ) ? ' AND post_main_cat_ID != cat_ID' : '';
-			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
-												INNER JOIN T_categories ON postcat_cat_ID = cat_ID'.$sql_join_categories );
+			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID' );
+			$this->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID'.$sql_join_categories );
 			// fp> we try to restrict as close as possible to the posts but I don't know if it matters
 			$cat_ID_field = 'postcat_cat_ID';
 		}
+		elseif( get_allow_cross_posting() >= 1 )
+		{	// Select extra categories if cross posting is enabled:
+			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID' );
+			$this->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
+			$cat_ID_field = 'postcat_cat_ID';
+		}
 		else
-		{
+		{	// Select only main categories:
 			$this->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
 			$cat_ID_field = 'post_main_cat_ID';
 		}
