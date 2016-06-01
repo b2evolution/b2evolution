@@ -491,52 +491,24 @@ function get_ip_range( $ip_start, $ip_end, $aipr_ID = 0 )
  */
 function antispam_block_request()
 {
-	global $DB, $Plugins;
+	global $Plugins;
 
-	// Check block by IP
+	// Check to block by current IP addresses:
 	antispam_block_by_ip();
 
-	// Check block by domain
-	if( is_logged_in() )
-	{ // Current user is logged in, We also can check the domains with blocked status
-		global $current_User, $UserSettings;
+	// Check to block by current domain:
+	antispam_block_by_domain();
 
-		if( empty( $UserSettings ) )
-		{ // Initialize UserSettings
-			load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
-			$UserSettings = new UserSettings();
-		}
+	// Check to block by initial referer:
+	antispam_block_by_initial_referer();
 
-		$DomainCache = & get_DomainCache();
-
-		load_funcs('sessions/model/_hitlog.funcs.php');
-
-		$user_domain = $UserSettings->get( 'user_domain', $current_User->ID );
-		if( ! empty( $user_domain ) &&
-		    $Domain = & get_Domain_by_subdomain( $user_domain ) &&
-		    $Domain->get( 'status' ) == 'blocked' )
-		{ // The request from this domain must be blocked
-			$log_message = sprintf( 'A request from \'%s\' domain was blocked because of the domain \'%s\' is blocked.', $user_domain, $Domain->get( 'name' ) );
-			exit_blocked_request( 'Domain', $log_message ); // WILL exit();
-		}
-
-		$initial_referer = $UserSettings->get( 'initial_referer', $current_User->ID );
-		if( ! empty( $initial_referer ) &&
-		    $Domain = & get_Domain_by_url( $initial_referer ) &&
-		    $Domain->get( 'status' ) == 'blocked' )
-		{ // The request from this domain must be blocked
-			$log_message = sprintf( 'A request from \'%s\' initial referer was blocked because of the domain \'%s\' is blocked.', $initial_referer, $Domain->get( 'name' ) );
-			exit_blocked_request( 'Domain', $log_message ); // WILL exit();
-		}
-	}
-
-	// Check if plugins may block the request
+	// Check if plugins may block the request:
 	$Plugins->trigger_event( 'BeforeBlockableAction' );
 }
 
 
 /**
- * Block request by IP address
+ * Block request by current IP addresses
  */
 function antispam_block_by_ip()
 {
@@ -574,6 +546,59 @@ function antispam_block_by_ip()
 
 		$log_message = sprintf( 'A request with ( %s ) ip addresses was blocked because of a blocked IP range ID#%s.', implode( ', ', $request_ip_list ), $ip_range_ID );
 		exit_blocked_request( 'IP', $log_message ); // WILL exit();
+	}
+}
+
+
+/**
+ * Block request by current domain
+ */
+function antispam_block_by_domain()
+{
+	// Detect current IP adresses:
+	$current_ip_addreses = get_ip_list();
+
+	if( empty( $current_ip_addreses ) )
+	{	// Could not get any IP address, so can't check anything:
+		return;
+	}
+
+	load_funcs( 'sessions/model/_hitlog.funcs.php' );
+
+	foreach( $current_ip_addreses as $ip_address )
+	{
+		// Get domain name by current IP adress:
+		$ip_domain = gethostbyaddr( $ip_address );
+
+		if( ! empty( $ip_domain ) &&
+		    $Domain = & get_Domain_by_subdomain( $ip_domain ) &&
+		    $Domain->get( 'status' ) == 'blocked' )
+		{	// The request from this domain must be blocked:
+			$log_message = sprintf( 'A request from \'%s\' domain was blocked because of the domain \'%s\' is blocked.', $ip_domain, $Domain->get( 'name' ) );
+			exit_blocked_request( 'Domain', $log_message ); // WILL exit();
+		}
+	}
+}
+
+
+/**
+ * Block request by initial referer of current session
+ */
+function antispam_block_by_initial_referer()
+{
+	global $Session;
+
+	load_funcs( 'sessions/model/_hitlog.funcs.php' );
+
+	// Get first hit params of current session:
+	$first_hit_params = $Session->get_first_hit_params();
+
+	if( $first_hit_params && ! empty( $first_hit_params->hit_referer ) &&
+			$Domain = & get_Domain_by_url( $first_hit_params->hit_referer ) &&
+			$Domain->get( 'status' ) == 'blocked' )
+	{	// The request from this initial referer must be blocked:
+		$log_message = sprintf( 'A request from \'%s\' initial referer was blocked because of the domain \'%s\' is blocked.', $first_hit_params->hit_referer, $Domain->get( 'name' ) );
+		exit_blocked_request( 'Domain of initial referer', $log_message ); // WILL exit();
 	}
 }
 

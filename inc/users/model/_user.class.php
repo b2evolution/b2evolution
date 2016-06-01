@@ -5373,30 +5373,6 @@ class User extends DataObject
 		return NULL;
 	}
 
-	/**
-	 * Get session param from the user first session, hit
-	 * @param integer Session Id
-	 * @return object of params
-	 */
-	function get_first_session_hit_params( $sess_id )
-	{
-		global $DB;
-
-		$query = 'SELECT *
-					FROM T_hitlog
-					WHERE hit_sess_ID = '.$DB->quote( $sess_id ).'
-					ORDER BY hit_ID ASC
-					LIMIT 1';
-
-		$result = $DB->get_row( $query );
-
-		if( !empty( $result ) )
-		{
-			return $result;
-		}
-
-		return NULL;
-	}
 
 	/**
 	 * Send a welcome private message

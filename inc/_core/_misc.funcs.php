@@ -3419,7 +3419,7 @@ function exit_blocked_request( $block_type, $log_message, $syslog_origin_type = 
 	syslog_insert( $log_message, 'warning', NULL, NULL, $syslog_origin_type, $syslog_origin_ID );
 
 	// Print out this text to inform an user:
-	echo 'Blocked.';
+	echo 'This request has been blocked.';
 
 	if( $debug )
 	{ // Display additional info on debug mode:
