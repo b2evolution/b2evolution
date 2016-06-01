@@ -103,6 +103,12 @@ class flag_menu_link_Widget extends ComponentWidget
 					'type' => 'checkbox',
 					'defaultvalue' => true,
 				),
+				'hide_empty' => array(
+					'label' => T_( 'Hide if empty' ),
+					'note' => T_('Check to hide this menu if the list is empty.'),
+					'type' => 'checkbox',
+					'defaultvalue' => false,
+				),
 			), parent::get_param_definitions( $params ) );
 
 		if( isset( $r['allow_blockcache'] ) )
@@ -163,6 +169,11 @@ class flag_menu_link_Widget extends ComponentWidget
 
 		if( ! is_logged_in() )
 		{	// Only logged in user can flag items:
+			return false;
+		}
+
+		if( $this->disp_params['hide_empty'] && $current_User->get_flagged_items_count() == 0 )
+		{	// Hide this menu if current user has no flagged posts yet:
 			return false;
 		}
 

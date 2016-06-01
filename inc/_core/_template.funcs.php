@@ -451,6 +451,7 @@ function get_request_title( $params = array() )
 			'display_edit_links'  => true, // Display the links to advanced editing on disp=edit|edit_comment
 			'edit_links_template' => array(), // More params for the links to advanced editing on disp=edit|edit_comment
 			'tags_text'           => T_('Tags'),
+			'flagged_text'        => T_('Flagged posts'),
 		), $params );
 
 	if( $params['auto_pilot'] == 'seo_title' )
@@ -771,6 +772,11 @@ function get_request_title( $params = array() )
 		case 'tags':
 			// We are requesting the tags directory:
 			$r[] = $params['tags_text'];
+			break;
+
+		case 'flagged':
+			// We are requesting the flagged posts list:
+			$r[] = $params['flagged_text'];
 			break;
 
 		case 'posts':
