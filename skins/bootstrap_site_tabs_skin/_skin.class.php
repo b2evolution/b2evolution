@@ -29,11 +29,6 @@ class bootstrap_site_tabs_Skin extends Skin
 	var $use_min_css = true;  // true|false|'check' Set this to true for better optimization
 
 	/**
-	 * @var array All css files in the skin folder, @see get_css_files()
-	 */
-	var $css_files;
-
-	/**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.
 	 */
@@ -91,18 +86,6 @@ class bootstrap_site_tabs_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
-		$css_files = $this->get_css_files();
-		$css_files_options = array();
-		$css_files_options[] = array( 'style.min.css', 'style.min.css', 1 );
-		foreach( $css_files as $css_file )
-		{
-			if( $css_file == 'style.min.css' || $css_file == 'style.css' )
-			{	// Skip default styles:
-				continue;
-			}
-			$css_files_options[] = array( $css_file, $css_file, 0 );
-		}
-
 		$r = array_merge( array(
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
@@ -112,7 +95,12 @@ class bootstrap_site_tabs_Skin extends Skin
 						'label' => T_('CSS files'),
 						'note' => '',
 						'type' => 'checklist',
-						'options' => $css_files_options
+						'options' => array(
+								array( 'style.css',      'style.css', 0 ),
+								array( 'style.min.css',  'style.min.css', 1 ), // default
+								array( 'custom.css',     'custom.css', 0 ),
+								array( 'custom.min.css', 'custom.min.css', 0 ),
+							)
 					),
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
@@ -503,34 +491,6 @@ footer.sitewide_footer .container a {
 		}
 
 		return $header_tabs;
-	}
-
-
-	/**
-	 * Get all css files in the skin folder
-	 *
-	 * @return array
-	 */
-	function get_css_files()
-	{
-		if( ! isset( $this->css_files ) )
-		{	// Initalize the array only first time in order to don't scan skin folder on each setting request:
-			$this->css_files = array();
-			$skin_files = get_filenames( $this->get_path(), array(
-					'inc_dirs' => false,
-					'recurse'  => false,
-					'basename' => true,
-				) );
-			foreach( $skin_files as $skin_file )
-			{
-				if( preg_match( '/\.css$/i', $skin_file ) )
-				{
-					$this->css_files[] = $skin_file;
-				}
-			}
-		}
-
-		return $this->css_files;
 	}
 }
 
