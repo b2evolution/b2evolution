@@ -849,7 +849,6 @@ h2.user_title {
   font-weight: normal;
   color: #999;
   margin: 40px 0 30px;
-  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;
@@ -1108,6 +1107,10 @@ div.level2 {
 nav.level1 {
   z-index: 1;
 }
+div.level3 nav .nav > li {
+  margin-right: 3px;
+  margin-bottom: 3px;
+}
 div.level3 nav .nav > li > a {
   padding: 4px 10px;
   font-size: 92%;
@@ -1123,6 +1126,9 @@ div.level3 nav .nav > li.active a:focus {
 }
 .user_header_content .user_title .login {
   margin-left: 10px;
+}
+div.level3 nav .nav > li + li {
+  margin-left: 0px;
 }
 .footer {
   background-color: #f5f5f5;
@@ -1198,7 +1204,7 @@ div.level3 nav .nav > li.active a:focus {
   border-radius: 4px;
   padding: 5px;
   float: left;
-  margin: 15px;
+  margin: 5px;
 }
 .skinshot .skinshot_placeholder {
   width: 240px;
@@ -1222,12 +1228,6 @@ div.level3 nav .nav > li.active a:focus {
   padding: 0;
   float: none;
   margin: -1ex -1ex 1ex -1ex;
-}
-.skin_selector_block {
-  margin: -15px 0 0 -15px;
-}
-.skin_selector_block .skinshot {
-  margin: 15px 0 0 15px;
 }
 .skinshot_new {
   text-align: center;

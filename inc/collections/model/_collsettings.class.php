@@ -61,7 +61,7 @@ class CollectionSettings extends AbstractSettings
 			// 'post_moderation_statuses' => NULL,			// Possible values are a list of statuses from: 'community', 'protected', 'review', 'draft', but we don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 
 		// Comment settings:
-			// 'new_feedback_status' => 'review',		// Default status for new anonymous comments: 'published', 'community', 'protected', 'private', 'review', 'draft' or 'deprecated'. We don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
+			'new_feedback_status' => 'review',			// Default status for new anonymous comments: 'published', 'community', 'protected', 'private', 'review', 'draft' or 'deprecated'. We don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 			// 'moderation_statuses' => NULL,			// Possible values are a list of statuses from: 'community', 'protected', 'review', 'draft', but we don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 			// 'comment_inskin_statuses' => NULL,       // Possible value is a set of statuses wihtout the 'trash' status, but we don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 			// 'post_inskin_statuses' => NULL,          // Same as in case of comments

@@ -29,6 +29,13 @@ global $Plugins;
 global $mode, $month, $tab, $redirect_to, $comment_content;
 
 $Form = new Form( NULL, 'comment_checkchanges', 'post' );
+$Form->switch_template_parts(
+	array(
+		'labelclass' => 'control-label col-lg-3 col-md-3 col-sm-3',
+		'inputstart' => '<div class="controls col-lg-8 col-md-9 col-sm-9">',
+		'infostart' => '<div class="controls col-lg-8 col-md-8 col-sm-9"><div class="form-control-static">',
+		'inputstart_checkbox' => '<div class="controls col-lg-8 col-md-8 col-sm-9"><div class="checkbox"><label>' )
+);
 
 $link_attribs = array( 'style' => 'margin-left:3ex', 'class' => 'btn btn-sm btn-default action_icon' ); // Avoid misclicks by all means!
 if( $current_User->check_perm( 'blog_post!draft', 'edit', false, $Blog->ID ) )
@@ -72,7 +79,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	$Form->begin_fieldset( T_('Comment contents').get_manual_link( 'editing-comments' ) );
 
 	echo '<div class="row">';
-		echo '<div class="col-md-7 col-sm-12">';
+		echo '<div class="col-sm-12">';
 
 		$comment_Item = & $edited_Comment->get_Item();
 		$Form->info( T_('In response to'), $comment_Item->get_title( array(
@@ -81,19 +88,19 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 			) ) );
 
 		echo '</div>';
-		echo '<div class="col-md-5 col-sm-12">';
+		echo '<div class="col-sm-12">';
 
 		$Blog_owner_User = & $Blog->get_owner_User();
 		if( ( $Blog_owner_User->ID == $current_User->ID ) || $current_User->check_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
 		{	// User has permission to change comment's post, because user is the owner of the current blog, or user has admin full access permission for current blog
-			$Form->text_input( 'moveto_post', $comment_Item->ID, 20, T_('Move to post ID'), '', array( 'maxlength' => 100, 'style' => 'width:25%' ) );
+			$Form->text_input( 'moveto_post', $comment_Item->ID, 20, T_('Move to post ID'), '', array( 'maxlength' => 100, 'size' => 10 ) );
 		}
 
 		echo '</div>';
 	echo '</div>';
 
 	echo '<div class="row">';
-		echo '<div class="col-md-7 col-sm-12">';
+		echo '<div class="col-sm-12">';
 
 		if( $Blog->get_setting( 'threaded_comments' ) )
 		{	// Display a reply comment ID only when this feature is enabled in blog settings:
