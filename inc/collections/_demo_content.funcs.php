@@ -126,7 +126,8 @@ function create_blog(
 		$blog_access_type = 'relative', // Deprecated param for this func, because it is defined in $Blog->dbinsert()
 		$allow_html = true,
 		$in_bloglist = 'public',
-		$owner_user_ID = 1 )
+		$owner_user_ID = 1,
+		$blog_allow_access = 'public' )
 {
 	global $default_locale, $install_test_features, $local_installation, $Plugins;
 
@@ -193,6 +194,61 @@ function create_blog(
 	}
 
 	$Blog->set( 'order', $Blog->ID );
+
+	if( ! empty( $blog_allow_access ) )
+	{
+		$Blog->set_setting( 'allow_access', $blog_allow_access );
+		switch( $blog_allow_access )
+		{	// Automatically enable/disable moderation statuses:
+			case 'public':
+				// Enable "Community" and "Members":
+				$enable_moderation_statuses = array( 'community', 'protected' );
+				$enable_comment_moderation_statuses = array( 'community', 'protected', 'review', 'draft' );
+				$disable_comment_moderation_statuses = array( 'private' );
+				break;
+			case 'users':
+				// Disable "Community" and Enable "Members":
+				$disable_moderation_statuses = array( 'community' );
+				$enable_moderation_statuses = array( 'protected' );
+				$enable_comment_moderation_statuses = array( 'protected', 'review', 'draft' );
+				$disable_comment_moderation_statuses = array( 'community', 'private' );
+				break;
+			case 'members':
+				// Disable "Community" and "Members":
+				$disable_moderation_statuses = array( 'community', 'protected' );
+				$enable_comment_moderation_statuses = array( 'review', 'draft' );
+				$disable_comment_moderation_statuses = array( 'community', 'protected', 'private' );
+				break;
+		}
+		$post_moderation_statuses = $Blog->get_setting( 'post_moderation_statuses' );
+		$post_moderation_statuses = empty( $post_moderation_statuses ) ? array() : explode( ',', $post_moderation_statuses );
+		$comment_moderation_statuses = $Blog->get_setting( 'moderation_statuses' );
+		$comment_moderation_statuses = empty( $comment_moderation_statuses ) ? array() : explode( ',', $comment_moderation_statuses );
+
+		if( ! empty( $disable_moderation_statuses ) )
+		{	// Disable moderation statuses:
+			$post_moderation_statuses = array_diff( $post_moderation_statuses, $disable_moderation_statuses );
+			//$comment_moderation_statuses = array_diff( $comment_moderation_statuses, $disable_moderation_statuses );
+		}
+		if( ! empty( $enable_moderation_statuses ) )
+		{	// Enable moderation statuses:
+			$post_moderation_statuses = array_unique( array_merge( $enable_moderation_statuses, $post_moderation_statuses ) );
+			//$comment_moderation_statuses = array_unique( array_merge( $enable_moderation_statuses, $comment_moderation_statuses ) );
+		}
+
+		if( ! empty( $disable_comment_moderation_statuses ) )
+		{
+			$comment_moderation_statuses = array_diff( $comment_moderation_statuses, $disable_comment_moderation_statuses );
+		}
+		if( ! empty( $enable_comment_moderation_statuses ) )
+		{
+			$comment_moderation_statuses = array_unique( array_merge( $enable_comment_moderation_statuses, $comment_moderation_statuses ) );
+		}
+
+		$Blog->set_setting( 'post_moderation_statuses', implode( ',', $post_moderation_statuses ) );
+		// Force enabled statuses regardless of previous settings
+		$Blog->set_setting( 'moderation_statuses', implode( ',', $enable_comment_moderation_statuses ) );
+	}
 
 	$Blog->dbupdate();
 
@@ -592,9 +648,17 @@ function get_demo_user( $login, $create = false, $group = NULL, $user_org_IDs = 
  * @param array List of users as comment authors
  * @param string Comment status
  */
-function create_demo_comment( $item_ID, $comment_users , $status )
+function create_demo_comment( $item_ID, $comment_users , $status = NULL )
 {
 	global $DB, $now;
+
+	if( empty( $status ) )
+	{
+		$ItemCache = & get_ItemCache();
+		$commented_Item = $ItemCache->get_by_ID( $item_ID );
+		$commented_Item->load_Blog();
+		$status = $commented_Item->Blog->get_setting( 'new_feedback_status' );
+	}
 
 	// Get comment users
 	if( $comment_users )
@@ -754,7 +818,8 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					$blog_b_access_type,
 					true,
 					'public',
-					$owner_ID );
+					$owner_ID,
+					'members' );
 
 			$BlogCache = & get_BlogCache();
 			if( $b_Blog = $BlogCache->get_by_ID( $blog_b_ID, false, false ) )
@@ -762,7 +827,6 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 				$b_Blog->set_setting( 'front_disp', 'front' );
 				$b_Blog->set_setting( 'skin2_layout', 'single_column' );
 				$b_Blog->set( 'advanced_perms', '1' );
-				$b_Blog->set_setting( 'allow_access', 'members' );
 				$b_Blog->dbupdate();
 			}
 			$blog_ID = $blog_b_ID;
@@ -2023,7 +2087,7 @@ Hello
 	foreach( $item_IDs as $item_ID )
 	{
 		create_demo_comment( $item_ID, $comment_users, 'published');
-		create_demo_comment( $item_ID, $comment_users, 'draft');
+		create_demo_comment( $item_ID, $comment_users );
 	}
 
 	if( $install_test_features && count( $additional_comments_item_IDs ) && $use_demo_user )
