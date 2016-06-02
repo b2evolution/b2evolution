@@ -473,6 +473,37 @@ function excerpt( $str, $maxlen = 254, $tail = '&hellip;' )
 
 
 /**
+ * Get a limited text-only excerpt based on number of words
+ *
+ * @param string
+ * @param int Maximum length
+ * @return string
+ */
+function excerpt_words( $str, $maxwords = 50 )
+{
+	// Add spaces
+	$str = str_replace( array( '<p>', '<br' ), array( ' <p>', ' <br' ), $str );
+
+	// Remove <code>
+	$str = preg_replace( '#<code>(.+)</code>#is', '', $str );
+
+	// Strip tags:
+	$str = strip_tags( $str );
+
+	// Remove spaces:
+	$str = preg_replace( '/[ \t]+/', ' ', $str);
+	$str = trim( $str );
+
+	// Ger rid of all new lines and Display the html tags as source text:
+	$str = trim( preg_replace( '#[\r\n\t\s]+#', ' ', $str ) );
+
+	$str = strmaxwords( $str, $maxwords );
+
+	return $str;
+}
+
+
+/**
  * Crop string to maxlen with &hellip; (default tail) at the end if needed.
  *
  * If $format is not "raw", we make sure to not cut in the middle of an
