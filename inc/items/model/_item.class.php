@@ -3220,11 +3220,17 @@ class Item extends ItemLight
 				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
 				'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore',
 				'data'                       => '',
-				'attach_format'              => '$icon_link$ $file_link$ $file_size$', // $icon_link$ $icon$ $file_link$ $file_size$
-				'file_link_format'           => '$file_name$', // $icon$ $file_name$ $file_size$
+				'attach_format'              => '$icon_link$ $file_link$ $file_size$ $file_desc$', // $icon_link$ $icon$ $file_link$ $file_size$ $file_desc$
+				'file_link_format'           => '$file_name$', // $icon$ $file_name$ $file_size$ $file_desc$
 				'file_link_class'            => '',
+				'file_link_text'             => 'filename', // 'filename' - Always display Filename, 'title' - Display Title if available
 				'download_link_icon'         => 'download',
 				'download_link_title'        => T_('Download file'),
+				'display_download_icon'      => true,
+				'display_file_size'          => true,
+				'display_file_desc'          => false,
+				'before_file_desc'           => '<span class="evo_file_description">',
+				'after_file_desc'            => '</span>',
 			), $params );
 
 		// Get list of attached files
@@ -3296,36 +3302,55 @@ class Item extends ItemLight
 
 			// A link to download a file:
 
-			// Just icon with download icon
-			$icon = ( $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$icon$' ) !== false ) ?
+			// Just icon with download icon:
+			$icon = ( $params['display_download_icon'] && $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$icon$' ) !== false ) ?
 					get_icon( $params['download_link_icon'], 'imgtag', array( 'title' => $params['download_link_title'] ) ) : '';
 
-			// A link with icon to download
-			$icon_link = ( $File->exists() && strpos( $params['attach_format'], '$icon_link$' ) !== false ) ?
+			// A link with icon to download:
+			$icon_link = ( $params['display_download_icon'] && $File->exists() && strpos( $params['attach_format'], '$icon_link$' ) !== false ) ?
 					action_icon( $params['download_link_title'], $params['download_link_icon'], $Link->get_download_url(), '', 5 ) : '';
 
-			// File size info
-			$file_size = ( $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$file_size$' ) !== false ) ?
+			// File size info:
+			$file_size = ( $params['display_file_size'] && $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$file_size$' ) !== false ) ?
 					$params['before_attach_size'].bytesreadable( $File->get_size(), false, false ).$params['after_attach_size'] : '';
 
-			// A link with file name to download
+			// File description:
+			$file_desc = '';
+			if( $params['display_file_desc'] && $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$file_desc$' ) !== false )
+			{	// If description should be displayed:
+				$file_desc = nl2br( trim( $File->get( 'desc' ) ) );
+				if( $file_desc !== '' )
+				{	// If file has a filled description:
+					$params['before_file_desc'].$file_desc.$params['after_file_desc'];
+				}
+			}
+
+			// A link with file name or file title to download:
 			$file_link_format = str_replace( array( '$icon$', '$file_name$', '$file_size$' ),
 				array( $icon, '$text$', $file_size ),
 				$params['file_link_format'] );
-			if( $File->exists() )
-			{ // Get file link to download if file exists
-				$file_link = ( strpos( $params['attach_format'], '$file_link$' ) !== false ) ?
-						$File->get_view_link( $File->get_name(), NULL, NULL, $file_link_format, $params['file_link_class'], $Link->get_download_url() ) : '';
+			if( $params['file_link_text'] == 'filename' || trim( $File->get( 'title' ) ) === '' )
+			{	// Use file name for link text:
+				$file_link_text = $File->get_name();
 			}
 			else
-			{ // File doesn't exist, We cannot display a link, Display only file name and warning
+			{	// Use file title only if it filled:
+				$file_link_text = $File->get( 'title' );
+			}
+			if( $File->exists() )
+			{	// Get file link to download if file exists:
 				$file_link = ( strpos( $params['attach_format'], '$file_link$' ) !== false ) ?
-						$File->get_name().' - <span class="red nowrap">'.get_icon( 'warning_yellow' ).' '.T_('Missing attachment!').'</span>' : '';
+						$File->get_view_link( $file_link_text, NULL, NULL, $file_link_format, $params['file_link_class'], $Link->get_download_url() ) : '';
+			}
+			else
+			{	// File doesn't exist, We cannot display a link, Display only file name and warning:
+				$file_link = ( strpos( $params['attach_format'], '$file_link$' ) !== false ) ?
+						$file_link_text.' - <span class="red nowrap">'.get_icon( 'warning_yellow' ).' '.T_('Missing attachment!').'</span>' : '';
 			}
 
 			$r_file[$i] = $params['before_attach'];
-			$r_file[$i] .= str_replace( array( '$icon$', '$icon_link$', '$file_link$', '$file_size$' ),
-				array( $icon, $icon_link, $file_link, $file_size ),
+			$r_file[$i] .= str_replace( array( '$icon$', '$icon_link$', '$file_link$', '$file_size$', '$file_desc$' ),
+				array( $icon, $icon_link, $file_link, $file_size, $file_desc ),
 				$params['attach_format'] );
 			$r_file[$i] .= $params['after_attach'];
 
