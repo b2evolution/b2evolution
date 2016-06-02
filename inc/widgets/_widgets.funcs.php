@@ -319,6 +319,12 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	add_basic_widget( $blog_id, 'Front Page Secondary Area', 'org_members', 'core', 10 );
 
 
+	/* 404 Page */
+	add_basic_widget( $blog_id, '404 Page', 'page_404_not_found', 'core', 10 );
+	add_basic_widget( $blog_id, '404 Page', 'coll_search_form', 'core', 20 );
+	add_basic_widget( $blog_id, '404 Page', 'coll_tag_cloud', 'core', 30 );
+
+
 	/* Mobile Footer */
 	add_basic_widget( $blog_id, 'Mobile: Footer', 'coll_longdesc', 'core', 10 );
 	add_basic_widget( $blog_id, 'Mobile: Footer', 'mobile_skin_switcher', 'core', 20 );

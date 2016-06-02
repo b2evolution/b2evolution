@@ -7554,6 +7554,25 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11785, 'Create new widget container "404 Page"...' ) )
+	{	// part of 6.7.3-stable
+		$coll_IDs = $DB->get_col( 'SELECT blog_ID FROM T_blogs' );
+		if( $coll_IDs )
+		{
+			$page_404_widget_rows = array();
+			foreach( $coll_IDs as $coll_ID )
+			{
+				$page_404_widget_rows[] = '( '.$coll_ID.', "404 Page", 10, "page_404_not_found" )';
+				$page_404_widget_rows[] = '( '.$coll_ID.', "404 Page", 20, "coll_search_form" )';
+				$page_404_widget_rows[] = '( '.$coll_ID.', "404 Page", 30, "coll_tag_cloud" )';
+			}
+			// Insert new widgets for container "404 Page" into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
+			  VALUES '.implode( ', ', $page_404_widget_rows ) );
+		}
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
