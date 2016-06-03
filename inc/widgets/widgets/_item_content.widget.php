@@ -172,6 +172,7 @@ class item_content_Widget extends ComponentWidget
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
 				'item_ID'      => $Item->ID, // Has the Item page changed?
+				'item_page'    => isset( $GLOBALS['page'] ) ? $GLOBALS['page'] : 1, // Has a content page of the viewed Item changed?
 			);
 	}
 }
