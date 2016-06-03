@@ -39,6 +39,21 @@ jQuery( document ).ready( function()
 
 
 /**
+ * Fix height of attachments wrapper
+ * Used after content changing by AJAX loading
+ */
+function evo_link_fix_wrapper_height()
+{
+	var table_height = jQuery( '#attachments_fieldset_table' ).height();
+	var wrapper_height = jQuery( '#attachments_fieldset_wrapper' ).height();
+	if( wrapper_height > table_height )
+	{
+		jQuery( '#attachments_fieldset_wrapper' ).height( jQuery( '#attachments_fieldset_table' ).height() );
+	}
+}
+
+
+/**
  * Change link position
  *
  * @param object Select element
@@ -141,12 +156,7 @@ function evo_link_delete( event_object, type, link_ID, action )
 		jQuery( event_object ).closest( 'tr' ).remove();
 
 		// Update the attachment block height after deleting row:
-		var table_height = jQuery( '#attachments_fieldset_table' ).height();
-		var wrapper_height = jQuery( '#attachments_fieldset_wrapper' ).height();
-		if( wrapper_height > table_height )
-		{
-			jQuery( '#attachments_fieldset_wrapper' ).height( jQuery( '#attachments_fieldset_table' ).height() );
-		}
+		evo_link_fix_wrapper_height();
 	},
 	'DELETE' );
 
@@ -217,6 +227,70 @@ function evo_link_attach( type, object_ID, root, path )
 				'</tr>' );
 		}
 	} );
+
+	return false;
+}
+
+
+/**
+ * Set temporary content during ajax is loading
+ *
+ * @return object Overlay indicator of ajax loading
+ */
+function evo_link_ajax_loading_overlay()
+{
+	var table = jQuery( '#attachments_fieldset_table' );
+
+	var ajax_loading = false;
+
+	if( table.find( '.results_ajax_loading' ).length == 0 )
+	{	// Allow to add new overlay only when previous request is finished:
+		ajax_loading = jQuery( '<div class="results_ajax_loading"><div>&nbsp;</div></div>' );
+		table.css( 'position', 'relative' );
+		ajax_loading.css( {
+				'width':  table.width(),
+				'height': table.height(),
+			} );
+		table.append( ajax_loading );
+	}
+
+	return ajax_loading;
+}
+
+
+/**
+ * Refresh/Sort a list of Item/Comment attachments
+ *
+ * @param string Type: 'item', 'comment'
+ * @param integer ID of Item or Comment
+ * @param string Action: 'refresh', 'sort'
+ */
+function evo_link_refresh_list( type, object_ID, action )
+{
+	var ajax_loading = evo_link_ajax_loading_overlay();
+
+	if( ajax_loading )
+	{	// If new request is allowed in current time:
+
+		// Call REST API request to attach a file to Item/Comment:
+		evo_rest_api_request( 'links',
+		{
+			'action':    typeof( action ) == 'undefined' ? 'refresh' : 'sort',
+			'type':      type,
+			'object_ID': object_ID,
+		},
+		function( data )
+		{
+			// Refresh a content of the links list:
+			jQuery( '#attachments_fieldset_table' ).html( data.html );
+
+			// Remove temporary content of ajax loading indicator:
+			ajax_loading.remove();
+
+			// Update the attachment block height after refreshing:
+			evo_link_fix_wrapper_height();
+		} );
+	}
 
 	return false;
 }

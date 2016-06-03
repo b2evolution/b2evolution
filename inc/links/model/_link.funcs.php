@@ -144,11 +144,11 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 			.action_icon( T_('Refresh'), 'refresh', $admin_url.( $LinkOwner->type == 'item'
 					? '?ctrl=items&action=edit&p='.$LinkOwner->get_ID()
 					: '?ctrl=comments&action=edit&comment_ID='.$LinkOwner->get_ID() ),
-				T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm' ) )
+				T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\' )' ) )
 
 			.action_icon( T_('Sort'), 'ascending', $admin_url
 				.'?ctrl=links&amp;action=sort_links&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;'.url_crumb( 'link' ),
-				T_('Sort'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm' ) )
+				T_('Sort'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\', \'sort\' )' ) )
 
 		.'</span>';
 

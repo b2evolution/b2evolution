@@ -6961,7 +6961,12 @@ function get_file_permissions_message()
  */
 function evo_flush()
 {
-	global $Timer;
+	global $Timer, $disable_evo_flush;
+
+	if( isset( $disable_evo_flush ) && $disable_evo_flush )
+	{	// This function is disabled (for example, used for ajax/rest api requests)
+		return;
+	}
 
 	$zlib_output_compression = ini_get( 'zlib.output_compression' );
 	if( empty( $zlib_output_compression ) || $zlib_output_compression == 'Off' )

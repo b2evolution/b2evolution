@@ -1737,6 +1737,11 @@ class RestApi
 					case 'attach':
 						$link_controller = 'attach';
 						break;
+
+					case 'refresh':
+					case 'sort':
+						$link_controller = 'refresh';
+						break;
 				}
 				break;
 		}
@@ -1920,7 +1925,7 @@ class RestApi
 
 		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
 		{	// Current user has no permission to unlink the requested link:
-			$this->halt( 'You have no permission to edit the requested link!', 'no_access', 403 );
+			$this->halt( 'You have no permission to attach a file!', 'no_access', 403 );
 			// Exit here.
 		}
 
@@ -1959,6 +1964,87 @@ class RestApi
 		// File has been attached successfully:
 		$this->halt( $LinkOwner->translate( 'Selected files have been linked to xxx.' ), 'attach_success', 200 );
 		// Exit here.
+	}
+
+
+	/**
+	 * Call link controller to refresh a list of the links
+	 */
+	private function controller_link_refresh()
+	{
+		global $LinkOwner, $current_File, $disable_evo_flush;
+
+		$link_type = param( 'type', 'string' );
+		$link_object_ID = param( 'object_ID', 'string' );
+
+		$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+
+		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
+		{	// Current user has no permission to unlink the requested link:
+			$this->halt( 'You have no permission to list of the links!', 'no_access', 403 );
+			// Exit here.
+		}
+
+		if( get_param( 'action' ) == 'sort' )
+		{	// Sort the links:
+			$ownerLinks = $LinkOwner->get_Links();
+			usort( $ownerLinks, 'sort_links_by_filename' );
+
+			$max_order = 0;
+			$link_orders = array();
+			$link_count = count( $ownerLinks );
+			foreach( $ownerLinks as $link )
+			{
+				if( $link->order > $max_order )
+				{
+					$max_order = $link->order;
+				}
+				$link_orders[] = $link->order;
+			}
+
+			for( $i = 1; $i <= $link_count; $i++ )
+			{
+					$ownerLinks[$i - 1]->set( 'order', $i + $max_order );
+					$ownerLinks[$i - 1]->dbupdate();
+			}
+
+			for( $i = 1; $i <= $link_count; $i++ )
+			{
+				if( $ownerLinks[$i -1]->get( 'order' ) != $i )
+				{
+					$ownerLinks[$i - 1]->set( 'order', $i );
+					$ownerLinks[$i - 1]->dbupdate();
+				}
+			}
+		}
+
+		// Initialize admin skin:
+		global $current_User, $UserSettings, $is_admin_page, $adminskins_path, $AdminUI;
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		$is_admin_page = true;
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+		$AdminUI = new AdminUI();
+
+		// Disable function evo_flush() to correct handle a content below:
+		$disable_evo_flush = true;
+
+		// Get the refreshed content:
+		ob_start();
+		$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+		$refreshed_content = ob_get_clean();
+
+		$this->add_response( 'html', $refreshed_content );
+
+		if( get_param( 'action' ) == 'sort' )
+		{	// The sort has been done successfully:
+			$this->halt( T_('The attachments have been sorted by file name.'), 'sort_success', 200 );
+			// Exit here.
+		}
+		else
+		{	// The refresh has been done successfully:
+			$this->halt( 'A list of the links has been refreshed.', 'refresh_success', 200 );
+			// Exit here.
+		}
 	}
 
 
