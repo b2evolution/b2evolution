@@ -1151,9 +1151,6 @@ img.loadimg {
   min-height: 64px;
   background: url(../img/ajax-loader/fff.gif) no-repeat center;
 }
-img.loadimg.loadimg_loaded {
-  background: none;
-}
 figure {
   margin: 1em 0;
 }
