@@ -133,7 +133,7 @@ class phpsvnclient {
      */
     private $mime_array;
 
-    public function phpsvnclient($url = 'http://phpsvnclient.googlecode.com/svn/', $user = false, $pass = false) {
+    public function __construct($url = 'http://phpsvnclient.googlecode.com/svn/', $user = false, $pass = false) {
         $this->__construct($url, $user, $pass);
         register_shutdown_function(array(&$this, '__destruct'));
     }
