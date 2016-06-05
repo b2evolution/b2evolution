@@ -103,8 +103,8 @@ class UserCache extends DataObjectCache
 					  FROM T_users
 					 WHERE user_login = '".$DB->escape($login)."'", 0, 0, 'Get User login' ) )
 			{
-				$user_row = new User( $row );
-				$this->add( $user_row );
+				$new_user = new User( $row );
+				$this->add( $new_user );
 			}
 			else
 			{
