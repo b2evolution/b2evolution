@@ -4016,7 +4016,10 @@ function display_voting_form( $params = array() )
 		$tag_icon = get_icon( $icon_like, 'imgtag', $params_like );
 		if( $type_voted == 'like' )
 		{
-			echo $tag_icon;
+			//echo $tag_icon;
+			$url_like = '#';
+			$class = ( strpos( $icon_like, 'disabled' ) !== false ) ? ' rollover_sprite' : '';
+			echo '<a href="'.$url_like.'" class="action_icon'.$class.'">'.$tag_icon.'</a>';
 		}
 		else
 		{
@@ -4031,7 +4034,10 @@ function display_voting_form( $params = array() )
 		$tag_icon = get_icon( $icon_noopinion, 'imgtag', $params_noopinion );
 		if( $type_voted == 'noopinion' )
 		{
-			echo $tag_icon;
+			//echo $tag_icon;
+			$url_noopinion = '#';
+			$class = ( strpos( $icon_noopinion, 'disabled' ) !== false ) ? ' rollover_sprite' : '';
+			echo '<a href="'.$url_noopinion.'" class="action_icon'.$class.'">'.$tag_icon.'</a>';
 		}
 		else
 		{
@@ -4046,7 +4052,10 @@ function display_voting_form( $params = array() )
 		$tag_icon = get_icon( $icon_dontlike, 'imgtag', $params_dontlike );
 		if( $type_voted == 'dontlike' )
 		{
-			echo $tag_icon;
+			//echo $tag_icon;
+			$url_dontlike = '#';
+			$class = ( strpos( $icon_dontlike, 'disabled' ) !== false ) ? ' rollover_sprite' : '';
+			echo '<a href="'.$url_dontlike.'" class="action_icon'.$class.'">'.$tag_icon.'</a>';
 		}
 		else
 		{

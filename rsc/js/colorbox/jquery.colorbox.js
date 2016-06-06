@@ -483,22 +483,16 @@
 				if( $wrap.parent().width() <= 480 )
 				{
 					$current.hide();
-					//$next.css({ left: '32px' });
 					$nav.css({ width: prevWidth * 2  });
 					$voting.css({ paddingLeft: prevWidth * 2 });
 					$('div.voting_wrapper').css({ width: 'calc(100% - ' + prevWidth * 3 + 'px )' });
-					//$('div.vote_title').css({ display: 'none' });
-					//$loaded.css({ marginBottom: '50px' });
 				}
 				else
 				{
 					$current.show();
-					//$next.css({ left: '98px' });
 					$nav.css({ width: prevWidth * 4 })
 					$voting.css({ paddingLeft: prevWidth * 4 });
 					$('div.voting_wrapper').css({ width: 'calc(100% - ' + prevWidth * 5 + 'px )' });
-					//$('div.vote_title').css({ display: 'inline-block' });
-					//$loaded.css({ marginBottom: '36px' });
 				}
 				( $wrap.parent().width() < 380 ) ? $slideshow.hide() : $slideshow.show();
 			},
@@ -708,7 +702,7 @@
 				if( settings.displayVoting && settings.votingUrl != '' )
 				{	// If voting panel is enabled
 					voting_height = $voting.outerHeight()
-					//$voting.css( 'bottom', '9px' );
+					$voting.css( 'bottom', '9px' );
 				}
 				$title.css( 'margin-bottom', voting_height + $close.outerHeight() - 3 );
 				title_height = 15;
@@ -716,12 +710,10 @@
 			else
 			{	// No title
 				title_height = -15;
-				//$voting.css( 'bottom', '25px' );
+				$voting.css( 'bottom', '25px' );
 			}
-			//$loaded.css( 'margin-bottom', parseInt( $loaded.css( 'margin-bottom' ) ) + title_height );
-			//loadedHeight += title_height;
-			var voting_height = $( 'div.voting_wrapper' ).outerHeight();
-			$loaded.css( 'margin-bottom', parseInt( $loaded.css( 'margin-bottom' ) ) + voting_height );
+			$loaded.css( 'margin-bottom', parseInt( $loaded.css( 'margin-bottom' ) ) + title_height );
+			loadedHeight += title_height;
 		}
 		previous_title = settings.title;
 
@@ -731,9 +723,9 @@
 			{ // Fix positions of the control elements
 				if( loadedHeight == 0 )
 				{ // Fix height because sometimes it doesn't have a time for initialization
-					//loadedHeight = $loaded.outerHeight(true);
+					loadedHeight = $loaded.outerHeight(true);
 				}
-				//loadedHeight += $voting.outerHeight();
+				loadedHeight += $voting.outerHeight();
 				$voting.data( 'voting_positions_done', 1 );
 			}
 			$voting.show();
@@ -743,7 +735,7 @@
 		}
 		else if( $voting.html() != '' )
 		{ // Clear the voting panel if previous image displayed this
-			//loadedHeight -= ( $voting.outerHeight() + 32 );
+			loadedHeight -= $voting.outerHeight();
 			$voting.html( '' ).hide();
 			$voting.data( 'voting_positions_done', 0 );
 		}
