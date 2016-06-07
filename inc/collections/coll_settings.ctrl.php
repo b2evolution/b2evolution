@@ -1022,6 +1022,8 @@ else
 			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 			$AdminUI->breadcrumbpath_add( T_('User permissions'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			$AdminUI->set_page_manual_link( 'advanced-user-permissions' );
+			// Load JavaScript to toggle checkboxes:
+			require_js( 'collectionperms.js', 'rsc_url' );
 			break;
 
 		case 'permgroup':
@@ -1030,6 +1032,8 @@ else
 			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 			$AdminUI->breadcrumbpath_add( T_('Group permissions'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			$AdminUI->set_page_manual_link( 'advanced-group-permissions' );
+			// Load JavaScript to toggle checkboxes:
+			require_js( 'collectionperms.js', 'rsc_url' );
 			break;
 	}
 
