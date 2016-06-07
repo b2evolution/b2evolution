@@ -482,26 +482,38 @@
 				var prevWidth = $prev.width();
 				var voting_wrapper = $('div.voting_wrapper');
 				var voting_title = $('div.vote_title');
-				var voting_others = $('div.voting_others');
+				var voting_buttons = $('div.voting_wrapper > div.btn-group');
+				var voting_others = $('div.vote_others');
 
 				if( $wrap.parent().width() <= 480 )
 				{
 					$current.hide();
-					$nav.css({ width: prevWidth * 2  });
-					$voting.css({ paddingLeft: prevWidth * 2 });
-					voting_wrapper.css({ textAlign: 'center' });
-					voting_wrapper.css({ left: '80px' });
-					voting_title.css({ textAlign: 'center' });
+					$nav.css({ width: ( prevWidth * 2 ) + 'px'  });
+					$voting.css({ paddingLeft: ( prevWidth * 2 ) + 'px' });
+					voting_wrapper.css({ left: ( $prev.width() * 2 ) + 'px' });
 				}
 				else
 				{
 					$current.show();
-					$nav.css({ width: prevWidth * 4 })
-					$voting.css({ paddingLeft: prevWidth * 4 });
-					voting_wrapper.css({ left: '160px' });
+					$nav.css({ width: ( prevWidth * 4 ) + 'px' })
+					$voting.css({ paddingLeft: ( prevWidth * 4 ) + 'px' });
+					voting_wrapper.css({ left: ( $prev.width() * 4 ) + 'px' });
+				}
+
+				console.log( voting_wrapper.width(), ' <= ', ( voting_title.width() + voting_buttons.width() + voting_others.width() ) );
+				if( voting_wrapper.width() <= ( voting_title.width() + voting_buttons.width() + voting_others.width() ) )
+				{ // voting button, title and others will not fit in 1 line
+					voting_wrapper.css({ textAlign: 'center' });
+					voting_buttons.css({ display: 'block', 'margin': '3px auto 0' });
+					voting_title.css({ textAlign: 'center' });
+				}
+				else
+				{
 					voting_wrapper.css({ textAlign: 'left' });
+					voting_buttons.css({ display: 'inline-block', 'margin': '3px 0 0' });
 					voting_title.css({ textAlign: 'right' });
 				}
+
 				( $wrap.parent().width() < 380 ) ? $slideshow.hide() : $slideshow.show();
 			},
 			step: function () {

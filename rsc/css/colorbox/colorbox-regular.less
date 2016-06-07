@@ -34,12 +34,6 @@
 #cboxTitle {
 	margin: 0;
 }
-#cboxInfoBar {
-	position: absolute;
-	bottom: 0;
-	width: 100%;
-	min-height: 23px;
-}
 #cboxLoadingOverlay, #cboxLoadingGraphic {
 	position: absolute;
 	top: 0;
@@ -101,7 +95,7 @@
 	border: 1px solid #ccc;
 }
 #cboxLoadedContent {
-	margin-bottom: 28px;
+	margin-bottom: 50px;
 }
 #cboxTitle {
 	position: absolute;
@@ -114,6 +108,12 @@
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+#cboxInfoBar {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	min-height: 50px;
 }
 #cboxCurrent {
 	position: absolute;
@@ -140,6 +140,7 @@
 #cboxPrevious, #cboxNext, #cboxClose {
 	position: absolute;
 	bottom: 0;
+	transform: translateY(-50%);
 	background: url(../icons/icons_sprite.png) no-repeat;
 	width: 23px;
 	height: 23px;
@@ -170,13 +171,20 @@
 	background: url(../img/ajax-loader/fff.gif) no-repeat center center;
 }
 #cboxVoting {
-	padding-left: 102px;
-	padding-right: 23px;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 100%;
+	padding-left: 160px;
+	padding-right: 40px;
 	white-space: normal;
 	-khtml-border-radius: 6px;
 	border-radius: 6px;
 	a {
-		margin: 0 10px 0 0;
+		//margin: 0 10px 0 0;
+		margin: 0;
 		vertical-align: middle;
 		display: inline-block;
 		span {
@@ -185,7 +193,7 @@
 		}
 	}
 	span {
-		margin: 0 10px 0 0;
+		//margin: 0 10px 0 0;
 		display: inline-block;
 		&.icon {
 			vertical-align: middle;
@@ -221,13 +229,55 @@
 		height: 16px;
 	}
 	.voting_wrapper {
-		display: block;
 		position: absolute;
-		//left: 0;
-		//right: 0;
+		text-align: left;
 		top: 50%;
 		transform: translateY(-50%);
-		width: ~"calc(100% - 100px - 23px)";
+		left: 92px;
+		right: 23px;
+		a:first-child span {
+			border-top-left-radius: 4px;
+			border-bottom-left-radius: 4px;
+		}
+		a:last-child span {
+			border-top-right-radius: 4px;
+			border-bottom-right-radius: 4px;
+		}
+		div.btn-group {
+			display: inline-block;
+			min-width: 50px;
+			text-align: center;
+			margin-top: 3px;
+			white-space: nowrap;
+			.voting_btn {
+				border: 1px solid #adadad;
+				margin-left: -1px;
+				background-color: #ffffff;
+				&:hover {
+					background-color: #e6e6e6;
+				}
+			}
+			.voted {
+				background-color: #e6e6e6;
+			}
+		}
+		div.vote_title {
+			display: inline-block;
+			width: ~"calc(50% - 30px)";
+			white-space: nowrap;
+			margin-top: 3px;
+			text-align: right;
+			min-width: 150px;
+		}
+		div.vote_others {
+			display: inline-block;
+			white-space: nowrap;
+			margin-top: 3px;
+			min-width: 150px;
+			span.separator {
+				display: none;
+			}
+		}
 	}
 	div.vote_title {
 		display: inline-block;
@@ -240,11 +290,12 @@
 	}
 	div.vote_others {
 		display: inline-block;
-		padding-left: 12px;
+		//padding-left: 12px;
 	}
 }
 
 #cboxOpen {
+	display: none;
 	position: absolute;
 	bottom: 4px;
 	left: 0;

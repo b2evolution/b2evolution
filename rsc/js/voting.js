@@ -216,32 +216,41 @@ function votingFadeIn( obj, color )
 
 
 /**
- * Adjusts voting layout depending on wrapper width
+ * Adjusts voting layout depending on wrapper width after voting.
  */
 function votingAdjust()
 {
-	console.log("VotingAdjust");
 	$prev = jQuery("#cboxPrevious");
 	$wrap = jQuery("#cboxWrapper");
 	$voting = jQuery("#cboxVoting");
 
 	var prevWidth = $prev.width();
 	var voting_wrapper = $('div.voting_wrapper');
+	var voting_buttons = $('div.voting_wrapper > div.btn-group');
 	var voting_title = $('div.vote_title');
-	var voting_others = $('div.voting_others');
+	var voting_others = $('div.vote_others');
 
 	if( $wrap.parent().width() <= 480 )
 	{
-		$voting.css({ paddingLeft: prevWidth * 2 });
+		$voting.css({ paddingLeft: ( prevWidth * 2 ) + 'px' });
+		voting_wrapper.css({ left: ( prevWidth * 2 ) + 'px' });
+	}
+	else
+	{
+		$voting.css({ paddingLeft: ( prevWidth * 4 ) + 'px' });
+		voting_wrapper.css({ left: ( prevWidth * 4 ) + 'px' });
+	}
+
+	if( voting_wrapper.width() <= ( voting_title.width() + voting_buttons.width() + voting_others.width() ) )
+	{ // voting button, title and others will not fit in 1 line
 		voting_wrapper.css({ textAlign: 'center' });
-		voting_wrapper.css({ left: '80px' });
+		voting_buttons.css({ display: 'block', 'margin': '3px auto 0' });
 		voting_title.css({ textAlign: 'center' });
 	}
 	else
 	{
-		$voting.css({ paddingLeft: prevWidth * 4 });
-		voting_wrapper.css({ left: '160px' });
 		voting_wrapper.css({ textAlign: 'left' });
+		voting_buttons.css({ display: 'inline-block', 'margin': '3px 0 0' });
 		voting_title.css({ textAlign: 'right' });
 	}
 }
