@@ -412,6 +412,7 @@ body {
 .single-image .img-responsive {
   width: 100%;
   text-align: center;
+  display: inline-block;
 }
 .float-right {
   float: right;

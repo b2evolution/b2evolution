@@ -1146,19 +1146,18 @@ a[rel~=nofollow]:not([class~=btn]):hover {
   border-radius: 2px;
 }
 img.loadimg {
-  display: inline-block;
   min-width: 64px;
   min-height: 64px;
   background: url(../img/ajax-loader/fff.gif) no-repeat center;
-}
-img.loadimg.loadimg_loaded {
-  background: none;
 }
 figure {
   margin: 1em 0;
 }
 .evo_image_block {
   text-align: center;
+}
+.evo_image_block .img-responsive {
+  display: inline-block;
 }
 .replied_comment .evo_image_block img {
   max-width: 100%;
