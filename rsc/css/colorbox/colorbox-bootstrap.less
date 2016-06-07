@@ -181,8 +181,14 @@
 	background: url(../img/ajax-loader/fff.gif) no-repeat center center;
 }
 #cboxVoting {
-	padding-left: 128px;
-	padding-right: 32px;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 100%;
+	padding-left: 160px;
+	padding-right: 40px;
 	white-space: normal;
 	-khtml-border-radius: 6px;
 	border-radius: 6px;
@@ -233,12 +239,12 @@
 		height: 16px;
 	}
 	.voting_wrapper {
-		display: block;
 		position: absolute;
+		text-align: center;
 		top: 50%;
 		transform: translateY(-50%);
-		width: ~"calc(100% - 128px - 32px)";
-		text-align: center;
+		left: 160px;
+		right: 40px;
 		a:first-child span {
 			border-top-left-radius: 4px;
 			border-bottom-left-radius: 4px;
@@ -249,10 +255,14 @@
 		}
 		div.btn-group {
 			display: inline-block;
+			width: 160px;
+			text-align: center;
 			margin-top: 3px;
+			white-space: nowrap;
 			.voting_btn {
 				border: 1px solid #adadad;
 				margin-left: -1px;
+				background-color: #ffffff;
 				&:hover {
 					background-color: #e6e6e6;
 				}
@@ -263,15 +273,20 @@
 		}
 		div.vote_title {
 			display: inline-block;
-			//width: ~"calc(50% - 120px)";
+			width: ~"calc(50% - 80px)";
+			white-space: nowrap;
 			margin-top: 3px;
 			text-align: right;
-			padding-right: 6px;
+			min-width: 200px;
 		}
 		div.vote_others {
 			display: inline-block;
+			white-space: nowrap;
 			margin-top: 3px;
-			padding-left: 12px;
+			min-width: 200px;
+			span.separator {
+				display: none;
+			}
 		}
 	}
 	#votingLike, #votingNoopinion, #votingDontlike, span.fa.voted {
@@ -279,6 +294,15 @@
 		display: inline-block;
 		vertical-align: middle;
 		padding: 6px 12px;
+	}
+	#votingLike, span.fa.fa-thumbs-up.voted {
+		padding: 4px 12px 8px;
+	}
+	#votingNoopinion, span.fa.fa-ban.voted {
+		padding: 5px 12px 7px;
+	}
+	#votingDontlike, span.fa.fa-thumbs-down.voted {
+		padding: 4px 12px 8px;
 	}
 	#votingInappropriate + span {
 		margin-right: 6px;

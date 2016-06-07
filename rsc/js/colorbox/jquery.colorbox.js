@@ -480,19 +480,27 @@
 
 				//( $wrap.parent().width() <= 480 ) ? $current.hide() : $current.show();
 				var prevWidth = $prev.width();
+				var voting_wrapper = $('div.voting_wrapper');
+				var voting_title = $('div.vote_title');
+				var voting_others = $('div.voting_others');
+
 				if( $wrap.parent().width() <= 480 )
 				{
 					$current.hide();
 					$nav.css({ width: prevWidth * 2  });
 					$voting.css({ paddingLeft: prevWidth * 2 });
-					$('div.voting_wrapper').css({ width: 'calc(100% - ' + prevWidth * 3 + 'px )' });
+					voting_wrapper.css({ textAlign: 'center' });
+					voting_wrapper.css({ left: '80px' });
+					voting_title.css({ textAlign: 'center' });
 				}
 				else
 				{
 					$current.show();
 					$nav.css({ width: prevWidth * 4 })
 					$voting.css({ paddingLeft: prevWidth * 4 });
-					$('div.voting_wrapper').css({ width: 'calc(100% - ' + prevWidth * 5 + 'px )' });
+					voting_wrapper.css({ left: '160px' });
+					voting_wrapper.css({ textAlign: 'left' });
+					voting_title.css({ textAlign: 'right' });
 				}
 				( $wrap.parent().width() < 380 ) ? $slideshow.hide() : $slideshow.show();
 			},
@@ -713,7 +721,7 @@
 				$voting.css( 'bottom', '25px' );
 			}
 			$loaded.css( 'margin-bottom', parseInt( $loaded.css( 'margin-bottom' ) ) + title_height );
-			loadedHeight += title_height;
+			//loadedHeight += title_height;
 		}
 		previous_title = settings.title;
 
@@ -725,7 +733,7 @@
 				{ // Fix height because sometimes it doesn't have a time for initialization
 					loadedHeight = $loaded.outerHeight(true);
 				}
-				loadedHeight += $voting.outerHeight();
+				//loadedHeight += $voting.outerHeight();
 				$voting.data( 'voting_positions_done', 1 );
 			}
 			$voting.show();
@@ -735,7 +743,7 @@
 		}
 		else if( $voting.html() != '' )
 		{ // Clear the voting panel if previous image displayed this
-			loadedHeight -= $voting.outerHeight();
+			//loadedHeight -= $voting.outerHeight();
 			$voting.html( '' ).hide();
 			$voting.data( 'voting_positions_done', 0 );
 		}

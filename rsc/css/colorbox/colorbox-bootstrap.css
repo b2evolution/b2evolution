@@ -195,8 +195,14 @@
   background: url(../img/ajax-loader/fff.gif) no-repeat center center;
 }
 #cboxVoting {
-  padding-left: 128px;
-  padding-right: 32px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  padding-left: 160px;
+  padding-right: 40px;
   white-space: normal;
   -khtml-border-radius: 6px;
   border-radius: 6px;
@@ -246,15 +252,14 @@
   height: 16px;
 }
 #cboxVoting .voting_wrapper {
-  display: block;
   position: absolute;
+  text-align: center;
   top: 50%;
   -webkit-transform: translateY(-50%);
       -ms-transform: translateY(-50%);
           transform: translateY(-50%);
-  width: -webkit-calc(100% - 128px - 32px);
-  width: calc(100% - 128px - 32px);
-  text-align: center;
+  left: 160px;
+  right: 40px;
 }
 #cboxVoting .voting_wrapper a:first-child span {
   border-top-left-radius: 4px;
@@ -266,11 +271,15 @@
 }
 #cboxVoting .voting_wrapper div.btn-group {
   display: inline-block;
+  width: 160px;
+  text-align: center;
   margin-top: 3px;
+  white-space: nowrap;
 }
 #cboxVoting .voting_wrapper div.btn-group .voting_btn {
   border: 1px solid #adadad;
   margin-left: -1px;
+  background-color: #ffffff;
 }
 #cboxVoting .voting_wrapper div.btn-group .voting_btn:hover {
   background-color: #e6e6e6;
@@ -280,14 +289,21 @@
 }
 #cboxVoting .voting_wrapper div.vote_title {
   display: inline-block;
+  width: -webkit-calc(50% - 80px);
+  width: calc(50% - 80px);
+  white-space: nowrap;
   margin-top: 3px;
   text-align: right;
-  padding-right: 6px;
+  min-width: 200px;
 }
 #cboxVoting .voting_wrapper div.vote_others {
   display: inline-block;
+  white-space: nowrap;
   margin-top: 3px;
-  padding-left: 12px;
+  min-width: 200px;
+}
+#cboxVoting .voting_wrapper div.vote_others span.separator {
+  display: none;
 }
 #cboxVoting #votingLike,
 #cboxVoting #votingNoopinion,
@@ -297,6 +313,18 @@
   display: inline-block;
   vertical-align: middle;
   padding: 6px 12px;
+}
+#cboxVoting #votingLike,
+#cboxVoting span.fa.fa-thumbs-up.voted {
+  padding: 4px 12px 8px;
+}
+#cboxVoting #votingNoopinion,
+#cboxVoting span.fa.fa-ban.voted {
+  padding: 5px 12px 7px;
+}
+#cboxVoting #votingDontlike,
+#cboxVoting span.fa.fa-thumbs-down.voted {
+  padding: 4px 12px 8px;
 }
 #cboxVoting #votingInappropriate + span {
   margin-right: 6px;

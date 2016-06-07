@@ -81,6 +81,7 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
 					voting_layout.html( ajax_debug_clear( result ) );
 					update_colorbox_position();
 					votingFadeIn( voting_layout, voting_bg_color );
+					votingAdjust();
 				}
 			} );
 		} );
@@ -101,6 +102,7 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
 					voting_layout.html( ajax_debug_clear( result ) );
 					update_colorbox_position();
 					votingFadeIn( voting_layout, voting_bg_color );
+					votingAdjust();
 				}
 			} );
 		} );
@@ -121,6 +123,7 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
 					voting_layout.html( ajax_debug_clear( result ) );
 					update_colorbox_position();
 					votingFadeIn( voting_layout, voting_bg_color );
+					votingAdjust();
 				}
 			} );
 		} );
@@ -147,6 +150,7 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
 				success: function( result )
 				{
 					votingFadeIn( voting_layout, voting_bg_color );
+					votingAdjust();
 				}
 			} );
 		} );
@@ -173,6 +177,7 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
 				success: function( result )
 				{
 					votingFadeIn( voting_layout, voting_bg_color );
+					votingAdjust();
 				}
 			} );
 		} );
@@ -207,4 +212,36 @@ function votingFadeIn( obj, color )
 		}
 	}
 	obj.animate( { backgroundColor: color }, 200 );
+}
+
+
+/**
+ * Adjusts voting layout depending on wrapper width
+ */
+function votingAdjust()
+{
+	console.log("VotingAdjust");
+	$prev = jQuery("#cboxPrevious");
+	$wrap = jQuery("#cboxWrapper");
+	$voting = jQuery("#cboxVoting");
+
+	var prevWidth = $prev.width();
+	var voting_wrapper = $('div.voting_wrapper');
+	var voting_title = $('div.vote_title');
+	var voting_others = $('div.voting_others');
+
+	if( $wrap.parent().width() <= 480 )
+	{
+		$voting.css({ paddingLeft: prevWidth * 2 });
+		voting_wrapper.css({ textAlign: 'center' });
+		voting_wrapper.css({ left: '80px' });
+		voting_title.css({ textAlign: 'center' });
+	}
+	else
+	{
+		$voting.css({ paddingLeft: prevWidth * 4 });
+		voting_wrapper.css({ left: '160px' });
+		voting_wrapper.css({ textAlign: 'left' });
+		voting_title.css({ textAlign: 'right' });
+	}
 }
