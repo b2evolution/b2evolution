@@ -151,6 +151,53 @@ class central_antispam_Module extends Module
 				),
 			) ) );
 	}
+
+
+	/**
+	 * Upgrade this module's tables in b2evo database
+	 */
+	function upgrade_b2evo_tables()
+	{
+		global $DB, $tableprefix;
+
+		// Check if DB tables of this module were installed before:
+		$existing_tables = $DB->get_col( 'SHOW TABLES LIKE "'.$tableprefix.'centralantispam__%"' );
+
+		if( ! in_array( $tableprefix.'centralantispam__keyword', $existing_tables ) )
+		{	// Create a table only if it doesn't exist yet:
+			task_begin( 'Creating table for central antispam keywords...' );
+			db_create_table( 'T_centralantispam__keyword', '
+				cakw_ID              INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+				cakw_keyword         VARCHAR(2000) NULL,
+				cakw_status          ENUM("new", "published", "revoked") NOT NULL DEFAULT "new",
+				cakw_statuschange_ts TIMESTAMP NULL,
+				cakw_lastreport_ts   TIMESTAMP NULL,
+				PRIMARY KEY (cakw_ID)' );
+			task_end();
+		}
+
+		if( ! in_array( $tableprefix.'centralantispam__source', $existing_tables ) )
+		{	// Create a table only if it doesn't exist yet:
+			task_begin( 'Creating table for central antispam sources...' );
+			db_create_table( 'T_centralantispam__source', '
+				casrc_ID      INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+				casrc_baseurl VARCHAR(2000) NULL,
+				casrc_status  ENUM ("trusted", "promising", "unknown", "suspect", "blocked") NOT NULL DEFAULT "unknown",
+				PRIMARY KEY (casrc_ID)' );
+			task_end();
+		}
+
+		if( ! in_array( $tableprefix.'centralantispam__report', $existing_tables ) )
+		{	// Create a table only if it doesn't exist yet:
+			task_begin( 'Creating table for central antispam reports...' );
+			db_create_table( 'T_centralantispam__report', '
+				carpt_cakw_ID  INT(10) UNSIGNED NOT NULL,
+				carpt_casrc_ID INT(10) UNSIGNED NOT NULL,
+				carpt_ts       TIMESTAMP NULL,
+				PRIMARY KEY carpt_PK (carpt_cakw_ID, carpt_casrc_ID)' );
+			task_end();
+		}
+	}
 }
 
 $central_antispam_Module = new central_antispam_Module();

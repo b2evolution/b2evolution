@@ -7573,38 +7573,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11790, 'Creating table for central antispam keywords...' ) )
-	{	// part of 6.7.4-stable
-		db_create_table( 'T_centralantispam__keyword', '
-			cakw_ID              INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-			cakw_keyword         VARCHAR(2000) NULL,
-			cakw_status          ENUM("new", "published", "revoked") NOT NULL DEFAULT "new",
-			cakw_statuschange_ts TIMESTAMP NULL,
-			cakw_lastreport_ts   TIMESTAMP NULL,
-			PRIMARY KEY (cakw_ID)' );
-		upg_task_end();
-	}
-
-	if( upg_task_start( 11795, 'Creating table for central antispam sources...' ) )
-	{	// part of 6.7.4-stable
-		db_create_table( 'T_centralantispam__source', '
-			casrc_ID      INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-			casrc_baseurl VARCHAR(2000) NULL,
-			casrc_status  ENUM ("trusted", "promising", "unknown", "suspect", "blocked") NOT NULL DEFAULT "unknown",
-			PRIMARY KEY (casrc_ID)' );
-		upg_task_end();
-	}
-
-	if( upg_task_start( 11800, 'Creating table for central antispam reports...' ) )
-	{	// part of 6.7.4-stable
-		db_create_table( 'T_centralantispam__report', '
-			carpt_cakw_ID  INT(10) UNSIGNED NOT NULL,
-			carpt_casrc_ID INT(10) UNSIGNED NOT NULL,
-			carpt_ts       TIMESTAMP NULL,
-			PRIMARY KEY carpt_PK (carpt_cakw_ID, carpt_casrc_ID)' );
-		upg_task_end();
-	}
-
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
