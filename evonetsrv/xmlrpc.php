@@ -20,7 +20,12 @@ $b2evoreportabuse_doc = 'Report abuse to b2evo\'s centralized ban blacklist';
 function b2evoreportabuse( $m )
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $DB, $Settings, $Messages;
+	global $DB, $Settings, $Messages, $enable_blacklist_server_API;
+
+	if( empty( $enable_blacklist_server_API ) )
+	{	// Exit here if the server cannot be used as central antispam:
+		return new xmlrpcresp( 0, $xmlrpcerruser + 7, 'The server is not used as central antispam server.' ); // user error 7
+	}
 
 	$err = '';
 
@@ -172,11 +177,16 @@ $b2evopollabuse_doc = 'Get an update of banned strings from b2evo\'s centralized
 function b2evopollabuse( $m )
 {
 	global $xmlrpcerruser; // import user errcode value
-	global $DB, $Settings;
+	global $DB, $Settings, $enable_blacklist_server_API;
 	global $xmlrpcStruct, $xmlrpcDateTime;
 	$err = '';
 
 	logIO( 'Called function: b2evo.pollabuse' );
+
+	if( empty( $enable_blacklist_server_API ) )
+	{	// Exit here if the server cannot be used as central antispam:
+		return new xmlrpcresp( 0, $xmlrpcerruser + 7, 'The server is not used as central antispam server.' ); // user error 7
+	}
 
 	// This is the datetime we want to start at:
 	$startat = $m->getParam( 3 );
