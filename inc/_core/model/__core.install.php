@@ -251,14 +251,14 @@ $schema_queries = array(
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset COMMENT='saves available locales'
 		" ),
 
-	'T_antispam' => array(
+	'T_antispam__keyword' => array(
 		'Creating table for Antispam Blacklist',
-		"CREATE TABLE T_antispam (
-			aspm_ID bigint(11) NOT NULL auto_increment,
-			aspm_string varchar(80) NOT NULL,
-			aspm_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported',
-			PRIMARY KEY aspm_ID (aspm_ID),
-			UNIQUE aspm_string (aspm_string)
+		"CREATE TABLE T_antispam__keyword (
+			askw_ID bigint(11) NOT NULL auto_increment,
+			askw_string varchar(80) NOT NULL,
+			askw_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported',
+			PRIMARY KEY askw_ID (askw_ID),
+			UNIQUE askw_string (askw_string)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_antispam__iprange' => array(
