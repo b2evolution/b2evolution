@@ -606,7 +606,7 @@ function coll_perm_login( $user_ID, $user_login )
  * @param string Group usage
  * @return string
  */
-function coll_grp_perm_row_name( $grp_ID, $grp_name, $grp_usage )
+function coll_grp_perm_col_name( $grp_ID, $grp_name, $grp_usage )
 {
 	global $admin_url;
 
@@ -634,14 +634,20 @@ function coll_grp_perm_row_name( $grp_ID, $grp_name, $grp_usage )
  * @param object Row
  * @return string
  */
-function coll_grp_perm_row_member( $row )
+function coll_grp_perm_col_member( $row )
 {
+	$BlogCache = & get_BlogCache();
+	$row_Blog = & $BlogCache->get_by_ID( $row->blog_ID, false, false );
+
+	if( ! $row_Blog->get( 'advanced_perms' ) )
+	{	// Don't display if advanced permissions are not enabled for the collection:
+		return T_('Advanced permissions are not enabled for this collection');
+	}
+
 	$r = coll_perm_checkbox( $row, 'bloggroup_', 'ismember', format_to_output( T_('Permission to read members posts'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
 
-	$BlogCache = & get_BlogCache();
-	$Blog = & $BlogCache->get_by_ID( $row->blog_ID, false, false );
-	if( $Blog && $Blog->get_setting( 'use_workflow' ) )
-	{
+	if( $row_Blog->get_setting( 'use_workflow' ) )
+	{	// If the collection uses workflow:
 		$r .= coll_perm_checkbox( $row, 'bloggroup_', 'can_be_assignee', format_to_output( T_('Items can be assigned to members of this group'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
 	}
 
@@ -654,14 +660,13 @@ function coll_grp_perm_row_member( $row )
  *
  * @param object Results
  */
-function colls_groups_results( & $Results, $params = array() )
+function colls_groups_perms_results( & $Results, $params = array() )
 {
 	$params = array_merge( array(
 			'type'   => 'collection', // 'colleciton' OR 'group'
 			'object' => NULL,
 		), $params );
 
-	
 	if( $params['type'] == 'collection' )
 	{	// Collection:
 		$edited_Blog = & $params['object'];
@@ -708,7 +713,7 @@ function colls_groups_results( & $Results, $params = array() )
 		$Results->cols[] = array(
 				'th' => T_('Group'),
 				'order' => 'grp_name',
-				'td' => '%coll_grp_perm_row_name( #grp_ID#, #grp_name#, #grp_usage# )%',
+				'td' => '%coll_grp_perm_col_name( #grp_ID#, #grp_name#, #grp_usage# )%',
 			);
 
 		$Results->cols[] = array(
@@ -727,15 +732,19 @@ function colls_groups_results( & $Results, $params = array() )
 			);
 	}
 
-	$Results->cols[] = array(
+	$col_member = array(
 			'th' => $params['type'] == 'collection' ?
 					/* TRANS: SHORT table header on TWO lines */ sprintf( T_('Member of<br />%s'), $edited_Blog->get( 'shortname' ) ) :
 					T_('Member'),
 			'th_class' => 'checkright',
-			'td' => '%coll_grp_perm_row_member( {row} )%',
+			'td' => '%coll_grp_perm_col_member( {row} )%',
 			'td_class' => 'center',
-			'td_colspan' => 4
 		);
+	if( $params['type'] == 'group' )
+	{	// Group columns of collection wihtout enabled advanced permissions:
+		$col_member['td_colspan'] = '~conditional( #blog_advanced_perms# == 1, 1, -2 )~';
+	}
+	$Results->cols[] = $col_member;
 
 	$Results->cols[] = array(
 			'th_group' => T_('Permissions on Posts'),

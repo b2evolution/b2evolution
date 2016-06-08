@@ -1020,8 +1020,9 @@ class Table extends Widget
 	 * Start a column (data).
 	 *
 	 * @param array Additional attributes for the <td> tag (attr_name => attr_value).
+	 * @param object|NULL Current row data (The var $row is requested inside of $this->parse_col_content() )
 	 */
-	function display_col_start( $extra_attr = array() )
+	function display_col_start( $extra_attr = array(), $row = NULL )
 	{
 		// Get colum definitions for current column:
 		$col = $this->cols[$this->displayed_cols_count];
@@ -1062,6 +1063,42 @@ class Table extends Widget
 			$output = $this->params['col_start'];
 			// Replace the "class_attrib" in the total col start param by the td column class
 			$output = str_replace( '$class_attrib$', 'class="'.$class.'"', $output );
+		}
+
+		if( isset( $col['td_colspan'] ) )
+		{	// Initialize colspan attribute:
+			if( method_exists( $this, 'parse_col_content' ) )
+			{
+				$colspan = $this->parse_col_content( $col['td_colspan'] );
+				$colspan = eval( "return '$colspan';" );
+			}
+			else
+			{
+				$colspan = $col['td_colspan'];
+			}
+			if( $colspan < 0 )
+			{	// We want to substract columns from the total count:
+				$colspan = $this->nb_cols + $colspan;
+			}
+			elseif( $colspan == 0 )
+			{	// Use a count of columns:
+				$colspan = $this->nb_cols;
+			}
+			$colspan = intval( $colspan );
+			if( $colspan === 1 )
+			{	// Don't create attribute "colspan" with value "1":
+				$output = str_replace( '$colspan_attrib$', '', $output );
+			}
+			else
+			{
+				$output = str_replace( '$colspan_attrib$', 'colspan="'.$colspan.'"', $output );
+				// Store current colspan value in order to skip next columns:
+				$this->current_colspan = $colspan;
+			}
+		}
+		else
+		{	// Remove non-HTML attrib:
+			$output = str_replace( '$colspan_attrib$', '', $output );
 		}
 
 		// Custom attributes:

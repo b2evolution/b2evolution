@@ -88,7 +88,7 @@ $Results->filter_area = array(
 	);
 
 // Initialize Results object:
-colls_groups_results( $Results, array(
+colls_groups_perms_results( $Results, array(
 		'type'   => 'collection',
 		'object' => $edited_Blog,
 	) );
