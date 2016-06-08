@@ -79,11 +79,19 @@ class subcontainer_row_Widget extends ComponentWidget
 		global $DB, $Blog;
 
 		$WidgetContainerCache = & get_WidgetContainerCache();
-		$container_options = array( '' => T_('None') );
+		$container_options = array(
+				''                    => T_('None'),
+				T_('Sub-containers')  => array(),
+				T_('Main containers') => array(),
+			);
 		foreach( $WidgetContainerCache->get_by_coll_ID( $Blog->ID ) as $WidgetContainer )
 		{
 			$widget_group = $WidgetContainer->get( 'main' ) ? T_('Main containers') : T_('Sub-containers');
 			$container_options[ $widget_group ][ $WidgetContainer->get( 'code' ) ] = $WidgetContainer->get( 'name' );
+		}
+		if( empty( $container_options[ T_('Sub-containers') ] ) )
+		{
+			unset( $container_options[ T_('Sub-containers') ] );
 		}
 
 		$widget_params =  array(
