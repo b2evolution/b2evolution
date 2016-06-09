@@ -730,7 +730,7 @@ class ItemLight extends DataObject
 
 			foreach( $categoryIDs as $cat_ID )
 			{
-				if( $Chapter = & $ChapterCache->get_by_ID( $cat_ID, false ) )
+				if( $Chapter = & $ChapterCache->get_by_ID( $cat_ID, false, false ) )
 				{
 					$chapters[] = $Chapter;
 				}

@@ -732,11 +732,11 @@ switch( $action )
 			$post_status = load_publish_status( true );
 		}
 
-		// Check if allowed to cross post.
-		check_cross_posting( $post_category, $post_extracats );
-
 		// Check if new category was started to create. If yes check if it is valid.
 		check_categories( $post_category, $post_extracats );
+
+		// Check if allowed to cross post.
+		check_cross_posting( $post_category, $post_extracats );
 
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post!'.$post_status, 'create', true, $post_extracats );
@@ -936,14 +936,14 @@ switch( $action )
 			$post_status = load_publish_status();
 		}
 
+		// Check if new category was started to create.  If yes check if it is valid.
+		$isset_category = check_categories( $post_category, $post_extracats );
+
 		// Check if allowed to cross post.
 		if( ! check_cross_posting( $post_category, $post_extracats, $edited_Item->main_cat_ID ) )
 		{
 			break;
 		}
-
-		// Check if new category was started to create.  If yes check if it is valid.
-		$isset_category = check_categories( $post_category, $post_extracats );
 
 		// Get requested Post Type:
 		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
@@ -1850,7 +1850,7 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'browse-edit-tab' );
 		break;
 }
-if( $tab == 'manual' )
+if( get_param( 'tab' ) == 'manual' )
 {
 	$AdminUI->set_page_manual_link( 'manual-pages-editor' );
 }
