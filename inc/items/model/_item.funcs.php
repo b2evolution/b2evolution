@@ -2254,6 +2254,11 @@ function check_cross_posting( & $post_category, & $post_extracats, $prev_main_ca
 	$post_category = param( 'post_category', 'integer', -1 );
 	$post_extracats = param( 'post_extracats', 'array:integer', array() );
 
+	if( empty( $post_category ) )
+	{	// Don't check because new category is created only in current collection:
+		return true;
+	}
+
 	if( is_null( $prev_main_cat ) )
 	{ // new item, no need to check for previous main category
 		$prev_main_cat = $post_category;
@@ -2265,6 +2270,10 @@ function check_cross_posting( & $post_category, & $post_extracats, $prev_main_ca
 	// Check if any of the extracats belong to a blog other than the current one
 	foreach( $post_extracats as $key => $cat )
 	{
+		if( empty( $cat ) )
+		{	// Skip a checking for new creating category:
+			continue;
+		}
 		$cat_blog = get_catblog( $cat );
 		if( ( $cat_blog != $post_cat_blog ) && ! ( $allow_cross_posting % 2 == 1 && $current_User->check_perm( 'blog_admin', '', false, $cat_blog ) ) )
 		{ // this cat is not from the main category
