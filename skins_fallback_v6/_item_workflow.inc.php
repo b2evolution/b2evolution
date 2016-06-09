@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $disp;
 
 if( ( $disp == 'single' || $disp == 'page' ) &&
-    ! empty( $Item ) &&
+    isset( $Item ) && $Item->ID > 0 &&
     is_logged_in() &&
     $Blog->get_setting( 'use_workflow' ) &&
     $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) &&
