@@ -1850,7 +1850,7 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'browse-edit-tab' );
 		break;
 }
-if( $tab == 'manual' )
+if( get_param( 'tab' ) == 'manual' )
 {
 	$AdminUI->set_page_manual_link( 'manual-pages-editor' );
 }
