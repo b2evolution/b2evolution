@@ -1490,21 +1490,52 @@ class Results extends Table
 			$col_sort_values['current_order'] = '';
 		}
 
+		// Get index and direction of the current and previous orders
+		$current_order_index = false;
+		$previous_order_index = false;
+		for( $i = 0; $i < strlen( $this->order ); $i++ )
+		{
+			$order_char_i = substr( $this->order, $i, 1 );
+			if( $order_char_i == 'A' || $order_char_i == 'D' )
+			{
+				$current_order_index = $i;
+				$current_order_direction = $order_char_i;
+			}
+			if( $order_char_i == 'a' || $order_char_i == 'd' )
+			{
+				$previous_order_index = $i;
+				$previous_order_direction = $order_char_i;
+			}
+		}
+
 
 		// Generate sort values to use for sorting on the current column:
 		$order_asc = '';
 		$order_desc = '';
 		for( $i = 0; $i < $this->nb_cols; $i++ )
 		{
-			if(	$i == $col_idx )
+			if( $i == $col_idx )
 			{ // Link ordering the current column
 				$order_asc .= 'A';
 				$order_desc .= 'D';
 			}
 			else
 			{
-				$order_asc .= '-';
-				$order_desc .= '-';
+				if( $i === $current_order_index )
+				{ // Set an order direction of current order as lowercase char for next order column
+					$order_asc .= strtolower( $current_order_direction );
+					$order_desc .= strtolower( $current_order_direction );
+				}
+				elseif( $i === $previous_order_index && $col_idx === $current_order_index )
+				{ // Save an order direction of the previous, Used when user changes an order on the same column
+					$order_asc .= $previous_order_direction;
+					$order_desc .= $previous_order_direction;
+				}
+				else
+				{
+					$order_asc .= '-';
+					$order_desc .= '-';
+				}
 			}
 		}
 
@@ -1594,6 +1625,7 @@ class Results extends Table
 
 			$orders = array();
 			$this->order_callbacks = array();
+			$second_orders = array();
 
 			for( $i = 0; $i <= strlen( $this->order ); $i++ )
 			{	// For each position in order string:
@@ -1603,11 +1635,17 @@ class Results extends Table
 					switch( substr( $this->order, $i, 1 ) )
 					{
 						case 'A':
-							$orders[] = preg_replace( '~(?<!asc|desc)\s*,~i', ' ASC,', $this->cols[$i]['order'] ).' ASC';
+							$orders[]        = preg_replace( '~(?<!asc|desc)\s*,~i', ' ASC,', $this->cols[$i]['order'] ).' ASC';
+							break;
+						case 'a':
+							$second_orders[] = preg_replace( '~(?<!asc|desc)\s*,~i', ' ASC,', $this->cols[$i]['order'] ).' ASC';
 							break;
 
 						case 'D':
-							$orders[] = preg_replace( '~(asc|desc)?\s*,~i', ' DESC,', $this->cols[$i]['order'] ).' DESC';
+							$orders[]        = preg_replace( '~(asc|desc)?\s*,~i', ' DESC,', $this->cols[$i]['order'] ).' DESC';
+							break;
+						case 'd':
+							$second_orders[] = preg_replace( '~(asc|desc)?\s*,~i', ' DESC,', $this->cols[$i]['order'] ).' DESC';
 							break;
 					}
 				}
@@ -1652,7 +1690,7 @@ class Results extends Table
 					}
 				}
 			}
-			$this->order_field_list = implode( ',', $orders );
+			$this->order_field_list = implode( ', ', array_merge( $orders, $second_orders ) );
 		}
 		return $this->order_field_list;	// May be empty
 	}
