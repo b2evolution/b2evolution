@@ -454,6 +454,9 @@ switch( $action )
 	case 'delete_collgroup':
 		// Delete collection group:
 
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'collgroup' );
+
 		// Check permissions:
 		$current_User->check_perm( 'blog_group', 'view', true, $edited_CollGroup->ID );
 
@@ -470,7 +473,11 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			$edited_CollGroup->check_delete( sprintf( T_('Cannot delete collection group "%s"'), $edited_CollGroup->dget( 'name' ) ) );
+			memorize_param( 'cgrp_ID', 'integer', $cgrp_ID );
+			if( ! $edited_CollGroup->check_delete( sprintf( T_('Cannot delete collection group "%s"'), $edited_CollGroup->dget( 'name' ) ) ) )
+			{
+				$action = 'edit_collgroup';
+			}
 		}
 		break;
 
@@ -784,6 +791,15 @@ switch( $action )
 	case 'update_collgroup':
 	case 'delete_collgroup':
 		// Form to create/edit collection group:
+
+		if( $action == 'delete_collgroup' )
+		{	// We need to ask for confirmation:
+			set_param( 'redirect_to', $admin_url.'?ctrl=dashboard' );
+			$edited_CollGroup->confirm_delete(
+				sprintf( T_('Delete collection group "%s"?'),  $edited_CollGroup->dget( 'name' ) ),
+				'collgroup', $action, get_memorized( 'action' ) );
+		}
+
 		$AdminUI->disp_view( 'collections/views/_coll_group.form.php' );
 		break;
 
