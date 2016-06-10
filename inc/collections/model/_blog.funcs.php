@@ -1524,7 +1524,7 @@ function blogs_all_results_block( $params = array() )
 				$CollGroupCache = & get_CollGroupCache();
 				if( $updated_CollGroup = & $CollGroupCache->get_by_ID( $order_obj_ID, false ) )
 				{
-					if( $current_User->check_perm( 'blogs', 'create' ) )
+					if( $current_User->check_perm( 'blog_group', 'view', false, $order_obj_ID ) )
 					{	// If current user can edit the collection groups:
 						$updated_CollGroup->set( 'order', $new_value );
 						$updated_CollGroup->dbupdate();
@@ -1561,7 +1561,8 @@ function blogs_all_results_block( $params = array() )
 			. ' LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0'
 			. ' AND blog_ID = bloggroup_blog_ID'
 			. ' AND bloggroup_group_ID = ' . $current_User->grp_ID . ' )' );
-		$SQL->WHERE( 'blog_owner_user_ID = ' . $current_User->ID
+		$SQL->WHERE( ( $params['grouped'] ? 'cgrp_owner_user_ID = ' . $current_User->ID.' OR ' : '' )
+			. 'blog_owner_user_ID = ' . $current_User->ID
 			. ' OR bloguser_ismember <> 0'
 			. ' OR bloggroup_ismember <> 0' );
 
@@ -1578,8 +1579,8 @@ function blogs_all_results_block( $params = array() )
 	$blogs_Results->title = $params['results_title'];
 	$blogs_Results->no_results_text = $no_results;
 
-	if( $current_User->check_perm( 'blogs', 'create' ) )
-	{
+	if( $current_User->check_perm( 'blog_group', 'edit' ) )
+	{	// Display the links/buttons to create new collections and groups only if Current user has a permission:
 		global $admin_url;
 		$blogs_Results->global_icon( T_('New collection group').'...', 'new', url_add_param( $admin_url, 'ctrl=collections&amp;action=new_collgroup' ), T_('New collection group').'...', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 		$blogs_Results->global_icon( T_('New Collection').'...', 'new', url_add_param( $admin_url, 'ctrl=collections&amp;action=new' ), T_('New Collection').'...', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
@@ -1700,11 +1701,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 
 		$blogs_Results->grp_cols[] = array(
 				'td_colspan' => $cols_num,
-				'td' => '<b>'.(
-						$current_User->check_perm( 'blogs', 'create' )
-						? '<a href="'.$admin_url.'?ctrl=collections&amp;action=edit_collgroup&amp;cgrp_ID=$cgrp_ID$">$cgrp_name$</a>'
-						: '$cgrp_name$' ).
-					'</b>'
+				'td' => '%blog_row_group_name( #cgrp_ID#, #cgrp_name# )%',
 			);
 	}
 
@@ -1800,7 +1797,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 				'th' => T_('Actions'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
-				'td' => '%blog_row_actions( #blog_ID# )%',
+				'td' => '%blog_row_actions( #blog_ID#, #cgrp_ID# )%',
 			);
 		if( $params['grouped'] )
 		{	// Group actions:
@@ -1822,6 +1819,26 @@ function blogs_results( & $blogs_Results, $params = array() )
  * New ( not display helper ) functions must be created above blogs_results function
  */
 
+
+/**
+ * Get a name of collection group with link to edit form
+ *
+ * @param integer Collection group ID
+ * @param string Collection group name
+ * @return string Collection group name with link to edit form if user has a permission
+ */
+function blog_row_group_name( $cgrp_ID, $cgrp_name )
+{
+	global $current_User, $admin_url;
+
+	if( $current_User->check_perm( 'blog_group', 'view', false, $cgrp_ID ) )
+	{	// If user can view the collection group:
+		$cgrp_name = '<a href="'.$admin_url.'?ctrl=collections&amp;action=edit_collgroup&amp;cgrp_ID='.$cgrp_ID.'">'.$cgrp_name.'</a>';
+	}
+
+	return '<b>'.$cgrp_name.'</b>';
+}
+
 /**
  * Get a blog name with link to edit
  *
@@ -1832,7 +1849,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 function blog_row_name( $coll_name, $coll_ID )
 {
 	global $current_User, $ctrl, $admin_url;
-	if( $ctrl == 'dashboard' )
+	if( $ctrl == 'dashboard' && $current_User->check_perm( 'blog_ismember', 'view', false, $coll_ID ) )
 	{ // Dashboard
 		$edit_url = $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog='.$coll_ID;
 		$r = '<a href="'.$edit_url.'">';
@@ -2006,7 +2023,7 @@ function blog_row_group_order( $cgrp_ID, $cgrp_order )
 {
 	global $current_User, $admin_url;
 
-	if( $current_User->check_perm( 'blogs', 'create' ) )
+	if( $current_User->check_perm( 'blog_group', 'edit', false, $cgrp_ID ) )
 	{	// Only if current user has a permission to edit collection groups:
 		$edit_url = $admin_url.'?ctrl=collections&amp;action=edit_collgroup&amp;cgrp_ID='.$cgrp_ID;
 		$r = '<a href="'.$edit_url.'" id="order-collgroup-'.$cgrp_ID.'" style="display:block;">';
@@ -2159,9 +2176,10 @@ function blog_row_setting( $blog_ID, $setting_name, $setting_value )
  * Get available actions for current blog
  *
  * @param integer Blog ID
+ * @param integer Collection group ID
  * @return string Action links
  */
-function blog_row_actions( $curr_blog_ID )
+function blog_row_actions( $curr_blog_ID, $cgrp_ID )
 {
 	global $current_User, $admin_url;
 	$r = '';
@@ -2169,7 +2187,10 @@ function blog_row_actions( $curr_blog_ID )
 	if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
 	{
 		$r .= action_icon( T_('Edit properties...'), 'properties', $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$curr_blog_ID );
-		$r .= action_icon( T_('Duplicate this collection...'), 'copy', $admin_url.'?ctrl=collections&amp;action=copy&amp;blog='.$curr_blog_ID );
+		if( $current_User->check_perm( 'blog_group', 'view', false, $cgrp_ID ) )
+		{
+			$r .= action_icon( T_('Duplicate this collection...'), 'copy', $admin_url.'?ctrl=collections&amp;action=copy&amp;blog='.$curr_blog_ID );
+		}
 		$r .= action_icon( T_('Delete this blog...'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete&amp;blog='.$curr_blog_ID.'&amp;'.url_crumb('collection').'&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) ) );
 	}
 
@@ -2194,9 +2215,12 @@ function blog_row_group_actions( & $row )
 
 	$r = '';
 
-	if( $current_User->check_perm( 'blogs', 'create' ) )
-	{
+	if( $current_User->check_perm( 'blog_group', 'view', false, $row->cgrp_ID ) )
+	{	// If user can view the collection group:
 		$r .= action_icon( T_('New Collection').'...', 'new', $admin_url.'?ctrl=collections&amp;action=new&amp;cgrp_ID='.$row->cgrp_ID );
+	}
+	if( $current_User->check_perm( 'blog_group', 'edit', false, $row->cgrp_ID ) )
+	{	// If user can edit the collection group:
 		$r .= action_icon( T_('Edit this collection group'), 'edit', $admin_url.'?ctrl=collections&amp;action=edit_collgroup&amp;cgrp_ID='.$row->cgrp_ID );
 		if( $row->blog_ID === NULL )
 		{	// Only groups without collections can be deleted:

@@ -84,7 +84,8 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 
 	$Form->text( 'blog_shortname', $edited_Blog->get( 'shortname' ), 15, T_('Short name'), T_('Will be used in selection menus and throughout the admin interface.'), 255 );
 
-	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) ||
+	    $current_User->check_perm( 'blog_group', 'view', false, $edited_Blog->cgrp_ID ) )
 	{ // Permission to edit advanced admin settings
 		$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('URL "filename"'),
 				sprintf( T_('"slug" used to uniquely identify this blog in URLs. Also used as <a %s>default media folder</a>.'),
@@ -97,8 +98,17 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 
 	// Collection group:
 	$CollGroupCache = & get_CollGroupCache();
-	$CollGroupCache->load_all();
-	$Form->select_input_object( 'cgrp_ID', $edited_Blog->get( 'cgrp_ID' ), $CollGroupCache, T_('Group'), array( 'allow_none' => true ) );
+	if( $current_User->check_perm( 'blog_group', 'edit' ) )
+	{	// Allow to select all collection groups if Current user can has a permission for this:
+		$allow_none_coll_group = true;
+		$CollGroupCache->load_all();
+	}
+	else
+	{	// Load only available collection groups:
+		$allow_none_coll_group = false;
+		$CollGroupCache->load_where( 'cgrp_owner_user_ID = '.$current_User->ID );
+	}
+	$Form->select_input_object( 'cgrp_ID', $edited_Blog->get( 'cgrp_ID' ), $CollGroupCache, T_('Group'), array( 'allow_none' => $allow_none_coll_group ) );
 
 $Form->end_fieldset();
 

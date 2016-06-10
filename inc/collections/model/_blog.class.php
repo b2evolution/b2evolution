@@ -923,6 +923,38 @@ class Blog extends DataObject
 		/*
 		 * ADVANCED ADMIN SETTINGS
 		 */
+		if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ||
+		    ( $this->ID == 0 && $current_User->check_perm( 'blog_group', 'view', false, $this->cgrp_ID ) ) )
+		{	// We have permission to edit advanced admin settings,
+			// OR user is creating/copy new collection in own group:
+			if( ($blog_urlname = param( 'blog_urlname', 'string', NULL )) !== NULL )
+			{	// check urlname
+				if( param_check_not_empty( 'blog_urlname', T_('You must provide an URL collection name!') ) )
+				{
+					if( ! preg_match( '|^[A-Za-z0-9\-]+$|', $blog_urlname ) )
+					{
+						param_error( 'blog_urlname', sprintf( T_('The url name %s is invalid.'), "&laquo;$blog_urlname&raquo;" ) );
+						$blog_urlname = NULL;
+					}
+
+					if( isset($blog_urlname) && $DB->get_var( 'SELECT COUNT(*)
+															FROM T_blogs
+															WHERE blog_urlname = '.$DB->quote($blog_urlname).'
+															AND blog_ID <> '.$this->ID
+														) )
+					{ // urlname is already in use
+						param_error( 'blog_urlname', sprintf( T_('The URL name %s is already in use by another collection. Please choose another name.'), "&laquo;$blog_urlname&raquo;" ) );
+						$blog_urlname = NULL;
+					}
+
+					if( isset( $blog_urlname ) )
+					{ // Set new urlname and save old media dir in order to rename folder to new
+						$old_media_dir = $this->get_media_dir( false );
+						$this->set_from_Request( 'urlname' );
+					}
+				}
+			}
+		}
 		if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
 		{	// We have permission to edit advanced admin settings:
 
@@ -978,35 +1010,6 @@ class Blog extends DataObject
 				{
 					$this->set( 'owner_user_ID', $owner_User->ID );
 					$this->owner_User = & $owner_User;
-				}
-			}
-
-
-			if( ($blog_urlname = param( 'blog_urlname', 'string', NULL )) !== NULL )
-			{	// check urlname
-				if( param_check_not_empty( 'blog_urlname', T_('You must provide an URL collection name!') ) )
-				{
-					if( ! preg_match( '|^[A-Za-z0-9\-]+$|', $blog_urlname ) )
-					{
-						param_error( 'blog_urlname', sprintf( T_('The url name %s is invalid.'), "&laquo;$blog_urlname&raquo;" ) );
-						$blog_urlname = NULL;
-					}
-
-					if( isset($blog_urlname) && $DB->get_var( 'SELECT COUNT(*)
-															FROM T_blogs
-															WHERE blog_urlname = '.$DB->quote($blog_urlname).'
-															AND blog_ID <> '.$this->ID
-														) )
-					{ // urlname is already in use
-						param_error( 'blog_urlname', sprintf( T_('The URL name %s is already in use by another collection. Please choose another name.'), "&laquo;$blog_urlname&raquo;" ) );
-						$blog_urlname = NULL;
-					}
-
-					if( isset( $blog_urlname ) )
-					{ // Set new urlname and save old media dir in order to rename folder to new
-						$old_media_dir = $this->get_media_dir( false );
-						$this->set_from_Request( 'urlname' );
-					}
 				}
 			}
 

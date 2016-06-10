@@ -22,7 +22,7 @@ param( 'tab', 'string', '', true );
 
 param_action( 'list' );
 
-if( strpos( $action, 'new' ) !== false )
+if( strpos( $action, 'new' ) !== false || $action == 'copy' )
 { // Simulate tab to value 'new' for actions to create new blog
 	$tab = 'new';
 }
@@ -70,8 +70,22 @@ switch( $action )
 		param( 'cgrp_ID', 'integer', 0, true );
 	case 'copy':
 		// Copy collection:
+
+		if( empty( $cgrp_ID ) )
+		{
+			if( isset( $edited_Blog ) )
+			{
+				$cgrp_ID = $edited_Blog->cgrp_ID;
+				memorize_param( 'cgrp_ID', 'integer', $cgrp_ID );
+			}
+			else
+			{
+				$cgrp_ID = 0;
+			}
+		}
+
 		// Check permissions:
-		if( ! $current_User->check_perm( 'blogs', 'create' ) )
+		if( ! $current_User->check_perm( 'blog_group', 'view', false, $cgrp_ID ) )
 		{
 			$Messages->add( T_('You don\'t have permission to create a collection.'), 'error' );
 			$redirect_to = param( 'redirect_to', 'url', $admin_url );
@@ -95,19 +109,24 @@ switch( $action )
 	case 'new-selskin':
 	case 'new-installskin':
 		// New collection: Select or Install skin
+
+		param( 'cgrp_ID', 'integer', 0, true );
+
 		// Check permissions:
-		$current_User->check_perm( 'blogs', 'create', true );
+		$current_User->check_perm( 'blog_group', 'view', true, $cgrp_ID );
 
 		param( 'kind', 'string', true );
-		param( 'cgrp_ID', 'integer', 0, true );
 
 		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( /* TRANS: %s can become "Standard blog", "Photoblog", "Group blog" or "Forum" */ T_('New "%s" collection'), get_collection_kinds($kind) ) ) );
 		break;
 
 	case 'new-name':
 		// New collection: Set general parameters
+
+		param( 'cgrp_ID', 'integer', 0 );
+
 		// Check permissions:
-		$current_User->check_perm( 'blogs', 'create', true );
+		$current_User->check_perm( 'blog_group', 'view', true, $cgrp_ID );
 
 		$edited_Blog = new Blog( NULL );
 
@@ -117,7 +136,7 @@ switch( $action )
 		$edited_Blog->init_by_kind( $kind );
 
 		param( 'skin_ID', 'integer', true );
-		if( param( 'cgrp_ID', 'integer', 0 ) > 0 )
+		if( $cgrp_ID > 0 )
 		{
 			$edited_Blog->set( 'cgrp_ID', $cgrp_ID );
 		}
@@ -131,8 +150,10 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'collection' );
 
+		param( 'cgrp_ID', 'integer', 0 );
+
 		// Check permissions:
-		$current_User->check_perm( 'blogs', 'create', true );
+		$current_User->check_perm( 'blog_group', 'view', true, $cgrp_ID );
 
 		$edited_Blog = new Blog( NULL );
 
@@ -168,8 +189,10 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'collection' );
 
+		param( 'cgrp_ID', 'integer', 0 );
+
 		// Check permissions:
-		$current_User->check_perm( 'blogs', 'create', true );
+		$current_User->check_perm( 'blog_group', 'view', true, $cgrp_ID );
 
 		if( $edited_Blog->duplicate() )
 		{	// The collection has been duplicated successfully:
@@ -395,7 +418,7 @@ switch( $action )
 		// New/Edit collection group:
 
 		// Check permissions:
-		$current_User->check_perm( 'blogs', 'create', true );
+		$current_User->check_perm( 'blog_group', 'view', true, $edited_CollGroup->ID );
 		break;
 
 	case 'create_collgroup':
@@ -406,7 +429,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'collgroup' );
 
 		// Check permission:
-		$current_User->check_perm( 'blogs', 'create', true );
+		$current_User->check_perm( 'blog_group', 'edit', true, $edited_CollGroup->ID );
 
 		if( $edited_CollGroup->load_from_Request() )
 		{
@@ -432,7 +455,7 @@ switch( $action )
 		// Delete collection group:
 
 		// Check permissions:
-		$current_User->check_perm( 'blogs', 'create', true );
+		$current_User->check_perm( 'blog_group', 'view', true, $edited_CollGroup->ID );
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{	// confirmed, Delete from DB:

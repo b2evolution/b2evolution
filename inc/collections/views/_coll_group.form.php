@@ -25,8 +25,11 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'collgroup_checkchanges', 'post', 'compact' );
 
-if( ! $creating )
-{
+// Get permission to edit the collection group:
+$perm_blog_group_edit = $current_User->check_perm( 'blog_group', 'edit', false, $edited_CollGroup->ID );
+
+if( ! $creating && $perm_blog_group_edit )
+{	// Display a link to delete the collection group only if Current user has no permission to edit it:
 	$Form->global_icon( T_('Delete this collection group!'), 'delete', regenerate_url( 'action', 'action=delete_collgroup&amp;'.url_crumb( 'collgroup' ) ) );
 }
 $Form->global_icon( T_('Cancel editing!'), 'close', '?ctrl=dashboard' );
@@ -39,19 +42,47 @@ $Form->begin_form( 'fform', $creating ?  T_('New collection group') : T_('Collec
 
 	$Form->hidden( 'cgrp_ID', $edited_CollGroup->ID );
 
-	$Form->text_input( 'cgrp_name', $edited_CollGroup->get( 'name' ), 50, T_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
+	// Name:
+	if( $perm_blog_group_edit )
+	{
+		$Form->text_input( 'cgrp_name', $edited_CollGroup->get( 'name' ), 50, T_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
+	}
+	else
+	{
+		$Form->info( T_('Name'), $edited_CollGroup->get( 'name' ) );
+	}
 
+	// Owner:
 	$owner_User = & $edited_CollGroup->get_owner_User();
-	$Form->username( 'cgrp_owner_login', $owner_User, T_('Owner'), T_('Login of this collection group\'s owner.'), '', array( 'required' => true ) );
+	if( $perm_blog_group_edit )
+	{
+		$Form->username( 'cgrp_owner_login', $owner_User, T_('Owner'), T_('Login of this collection group\'s owner.'), '', array( 'required' => true ) );
+	}
+	else
+	{
+		$Form->info( T_('Owner'), $owner_User->get_identity_link() );
+	}
 
-	$Form->text_input( 'cgrp_order', $edited_CollGroup->get( 'order' ), 5, T_('Order number'), '', array( 'maxlength' => 11, 'required' => true ) );
+	// Order:
+	if( $perm_blog_group_edit )
+	{
+		$Form->text_input( 'cgrp_order', $edited_CollGroup->get( 'order' ), 5, T_('Order number'), '', array( 'maxlength' => 11, 'required' => true ) );
+	}
+	else
+	{
+		$Form->info( T_('Order number'), $edited_CollGroup->get( 'order' ) );
+	}
 
-if( $creating )
-{
+if( ! $perm_blog_group_edit )
+{	// Don't display a submit button if Current user has no permission to edit this colleciton group:
+	$Form->end_form();
+}
+elseif( $creating )
+{	// Display a button to create new collection group:
 	$Form->end_form( array( array( 'submit', 'actionArray[create_collgroup]', T_('Record'), 'SaveButton' ) ) );
 }
 else
-{
+{	// Display a button to update the collection group:
 	$Form->end_form( array( array( 'submit', 'actionArray[update_collgroup]', T_('Save Changes!'), 'SaveButton' ) ) );
 }
 

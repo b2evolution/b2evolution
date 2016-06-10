@@ -2580,6 +2580,20 @@ class User extends DataObject
 
 				break;
 
+			case 'blog_group':
+				// Check permissions for this user to the requested collection group:
+				$perm = $this->check_perm( 'blogs', 'create' );
+
+				if( ! $perm && $permlevel == 'view' )
+				{
+					$CollGroupCache = & get_CollGroupCache();
+					if( $CollGroup = & $CollGroupCache->get_by_ID( $perm_target_ID, false, false ) )
+					{	// Allow to view the collection group if this user is owner of it:
+						$perm = $CollGroup->owner_user_ID == $this->ID;
+					}
+				}
+				break;
+
 			case 'comment!CURSTATUS':
 				/**
 				 * @var Comment
