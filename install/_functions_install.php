@@ -558,6 +558,9 @@ function install_basic_skins( $install_mobile_skins = true )
 		$Settings->dbupdate();
 	}
 
+	skin_install( 'bootstrap_site_navbar_skin' );
+	skin_install( 'bootstrap_site_tabs_skin' );
+
 	task_end();
 }
 
