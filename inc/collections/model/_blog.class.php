@@ -162,7 +162,7 @@ class Blog extends DataObject
 			 *       Otherwise it may create issues during upgrade process from old to new DB:
 			 */
 			$this->ID = $db_row->blog_ID;
-			$this->cgrp_ID = $db_row->blog_cgrp_ID;
+			$this->cgrp_ID = isset( $db_row->blog_cgrp_ID ) ? $db_row->blog_cgrp_ID : NULL;
 			$this->shortname = $db_row->blog_shortname;
 			$this->name = $db_row->blog_name;
 			$this->owner_user_ID = $db_row->blog_owner_user_ID;
