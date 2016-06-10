@@ -30,6 +30,14 @@ $activate_collection_toolbar = true;
 // Do we have permission to view all stats (aggregated stats) ?
 $perm_view_all = $current_User->check_perm( 'stats', 'view' );
 
+// Collection group ID:
+param( 'cgrp_ID', 'integer', 0, true );
+if( ! $perm_view_all && ! $current_User->check_perm( 'blog_group', 'view', false, $cgrp_ID ) )
+{
+	forget_param( 'cgrp_ID' );
+	unset( $cgrp_ID );
+}
+
 $tab3 = param( 'tab3', 'string', 'goals', true );
 $AdminUI->set_path( 'stats', 'goals', $tab3 );
 
@@ -37,12 +45,13 @@ if( isset( $collections_Module ) )
 { // Display list of blogs:
 	if( $perm_view_all )
 	{
-		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => 'summary', 'tab3' => 'global' ), T_('All'),
-						$admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog=0' );
+		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'goals' ), T_('All'),
+						$admin_url.'?ctrl=goals&amp;blog=0', NULL, false, true );
 	}
 	else
 	{ // No permission to view aggregated stats:
-		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => 'summary', 'tab3' => $tab3 ) );
+		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'goals' ), NULL,
+						'', NULL, false, true );
 	}
 }
 

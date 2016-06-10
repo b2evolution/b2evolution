@@ -13,24 +13,29 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $rsc_url, $AdminUI, $agent_type_color;
+global $blog, $cgrp_ID, $admin_url, $rsc_url, $AdminUI, $agent_type_color;
 
 echo '<h2 class="page-title">'.T_('Hits from RSS/Atom feed readers - Summary').get_manual_link( 'feed-hits-summary' ).'</h2>';
 
 echo '<p class="notes">'.T_('Any user agent accessing the XML feeds will be flagged as an XML reader.').'</p>';
 
-$sql = "
-	SELECT SQL_NO_CACHE COUNT(*) AS hits, EXTRACT(YEAR FROM hit_datetime) AS year,
-			   EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day
-		FROM T_hitlog
-	 WHERE hit_type = 'rss'";
-if( $blog > 0 )
-{
-	$sql .= ' AND hit_coll_ID = '.$blog;
+$SQL = new SQL( 'Get RSS/Atom feed readers hits summary' );
+$SQL->SELECT( 'SQL_NO_CACHE COUNT(*) AS hits, EXTRACT(YEAR FROM hit_datetime) AS year,
+	EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day' );
+$SQL->FROM( 'T_hitlog' );
+$SQL->WHERE( 'hit_type = "rss"' );
+if( ! empty( $cgrp_ID ) )
+{	// Filter by collection group:
+	$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+	$SQL->WHERE_and( 'blog_cgrp_ID = '.$cgrp_ID );
 }
-$sql .= ' GROUP BY year, month, day
-					ORDER BY year DESC, month DESC, day DESC';
-$res_hits = $DB->get_results( $sql, ARRAY_A, 'Get rss summary' );
+if( $blog > 0 )
+{	// Filter by collection:
+	$SQL->WHERE_and( 'hit_coll_ID = ' . $blog );
+}
+$SQL->GROUP_BY( 'year, month, day' );
+$SQL->ORDER_BY( 'year DESC, month DESC, day DESC' );
+$res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
 
 
 /*
@@ -38,6 +43,10 @@ $res_hits = $DB->get_results( $sql, ARRAY_A, 'Get rss summary' );
  */
 if( count($res_hits) )
 {
+	// Initialize params to filter by selected collection and/or group:
+	$coll_group_params = empty( $blog ) ? '' : '&blog='.$blog;
+	$coll_group_params .= empty( $cgrp_ID ) ? '' : '&cgrp_ID='.$cgrp_ID;
+
 	$last_date = 0;
 
 	$chart[ 'chart_data' ][ 0 ] = array();
@@ -47,7 +56,7 @@ if( count($res_hits) )
 
 	// Initialize the data to open an url by click on bar item
 	$chart['link_data'] = array();
-	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&hit_type=$param1$';
+	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$coll_group_params.'&hit_type=$param1$';
 	$chart['link_data']['params'] = array(
 			array( 'rss' )
 		);

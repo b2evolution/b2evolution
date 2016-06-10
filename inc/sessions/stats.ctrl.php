@@ -32,6 +32,14 @@ $activate_collection_toolbar = true;
 // Do we have permission to view all stats (aggregated stats) ?
 $perm_view_all = $current_User->check_perm( 'stats', 'view' );
 
+// Collection group ID:
+param( 'cgrp_ID', 'integer', 0, true );
+if( ! $perm_view_all && ! $current_User->check_perm( 'blog_group', 'view', false, $cgrp_ID ) )
+{
+	forget_param( 'cgrp_ID' );
+	unset( $cgrp_ID );
+}
+
 // We set the default to -1 so that blog=0 will make its way into regenerate_url()s whenever watching global stats.
 memorize_param( 'blog', 'integer', -1 );
 
@@ -52,7 +60,7 @@ if( $tab == 'domains' && $current_User->check_perm( 'stats', 'edit' ) )
 	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 }
 
-if( $blog == 0 )
+if( $blog == 0 && empty( $cgrp_ID ) )
 {
 	if( ! $perm_view_all && isset( $collections_Module ) )
 	{ // Find a blog we can view stats for:
@@ -231,11 +239,12 @@ if( isset($collections_Module) && $tab_from != 'antispam' )
 	if( $perm_view_all )
 	{
 		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ), T_('All'),
-						$admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0' );
+						$admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0', NULL, false, true );
 	}
 	else
 	{	// No permission to view aggregated stats:
-		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ) );
+		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ), NULL,
+						'', NULL, false, true );
 	}
 }
 

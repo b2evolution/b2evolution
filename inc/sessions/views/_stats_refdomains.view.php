@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
 
-global $blog, $admin_url, $rsc_url, $current_User, $UserSettings, $tab3;
+global $blog, $cgrp_ID, $admin_url, $rsc_url, $current_User, $UserSettings, $tab3;
 
 global $dname, $dtyp_normal, $dtyp_searcheng, $dtyp_aggregator, $dtyp_email, $dtyp_unknown;
 
@@ -73,11 +73,17 @@ if( ! empty( $dname ) )
 //$where_clause .= ' AND hit_referer_type NOT IN ( "self", "admin" )';
 
 if( ! empty( $blog ) )
-{
+{	// Filter by collection:
 	$SQL->WHERE_and( 'hit_coll_ID = '.$blog.' OR hit_coll_ID IS NULL' );
 }
 
 $SQL->FROM( 'T_basedomains LEFT OUTER JOIN T_hitlog ON dom_ID = hit_referer_dom_ID' );
+
+if( ! empty( $cgrp_ID ) )
+{	// Filter by collection group:
+	$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+	$SQL->WHERE_and( 'blog_cgrp_ID = '.$cgrp_ID );
+}
 
 if( $tab3 == 'top' )
 { // Calculate the counts only for "top" tab
@@ -132,7 +138,12 @@ if( get_param( 'ctrl' ) == 'antispam' )
 }
 else
 { // Default url for stats controller
-	$current_url = $admin_url.'?ctrl=stats&amp;tab=domains&amp;tab3='.$tab3.'&amp;blog='.$blog;
+
+	// Initialize params to filter by selected collection and/or group:
+	$coll_group_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
+	$coll_group_params .= empty( $cgrp_ID ) ? '' : '&amp;cgrp_ID='.$cgrp_ID;
+
+	$current_url = $admin_url.'?ctrl=stats&amp;tab=domains&amp;tab3='.$tab3.$coll_group_params;
 }
 
 $Results->filter_area = array(

@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $AdminUI, $agent_type_color, $hit_type_color, $Hit;
+global $blog, $cgrp_ID, $admin_url, $AdminUI, $agent_type_color, $hit_type_color, $Hit;
 
 echo '<h2 class="page-title">'.T_('Global hits - Summary').get_manual_link('global_hits_summary').'</h2>';
 
@@ -22,24 +22,34 @@ echo '<h2 class="page-title">'.T_('Global hits - Summary').get_manual_link('glob
 // Solution : CAST to string
 // TODO: I've also limited this to hit_agent_type "browser" here, according to the change for "referers" (Rev 1.6)
 //       -> an RSS service that sends a referer is not a real referer (though it should be listed in the robots list)! (blueyed)
-$sql = '
-	SELECT SQL_NO_CACHE COUNT(*) AS hits, hit_agent_type, hit_type, EXTRACT(YEAR FROM hit_datetime) AS year,
-			   EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day
-		FROM T_hitlog';
-if( $blog > 0 )
-{
-	$sql .= ' WHERE hit_coll_ID = '.$blog;
+$SQL = new SQL( 'Get global hits summary' );
+$SQL->SELECT( 'SQL_NO_CACHE COUNT(*) AS hits, hit_agent_type, hit_type, EXTRACT(YEAR FROM hit_datetime) AS year,
+	EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day' );
+$SQL->FROM( 'T_hitlog' );
+
+if( ! empty( $cgrp_ID ) )
+{	// Filter by collection group:
+	$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+	$SQL->WHERE( 'blog_cgrp_ID = '.$DB->quote( $cgrp_ID ) );
 }
-$sql .= ' GROUP BY year, month, day, hit_agent_type, hit_type
-					ORDER BY year DESC, month DESC, day DESC, hit_agent_type, hit_type';
-$res_hits = $DB->get_results( $sql, ARRAY_A, 'Get hit summary' );
+if( $blog > 0 )
+{	// Filter by collection:
+	$SQL->WHERE( 'hit_coll_ID = '.$DB->quote( $blog ) );
+}
+$SQL->GROUP_BY( 'year, month, day, hit_agent_type, hit_type' );
+$SQL->ORDER_BY( 'year DESC, month DESC, day DESC, hit_agent_type, hit_type' );
+$res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
 
 
 /*
  * Chart
  */
-if( count($res_hits) )
+if( count( $res_hits ) )
 {
+	// Initialize params to filter by selected collection and/or group:
+	$coll_group_params = empty( $blog ) ? '' : '&blog='.$blog;
+	$coll_group_params .= empty( $cgrp_ID ) ? '' : '&cgrp_ID='.$cgrp_ID;
+
 	$last_date = 0;
 
 	// This defines what hits will go where
@@ -71,7 +81,7 @@ if( count($res_hits) )
 
 	// Initialize the data to open an url by click on bar item
 	$chart['link_data'] = array();
-	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&hit_type=$param1$&agent_type=$param2$';
+	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$coll_group_params.'&hit_type=$param1$&agent_type=$param2$';
 	$chart['link_data']['params'] = array(
 			array( 'rss',      '' ),
 			array( 'standard', 'robot' ),
@@ -186,14 +196,14 @@ if( count($res_hits) )
 	echo '<table class="grouped table table-striped table-bordered table-hover table-condensed" cellspacing="0">';
 	echo '<tr>';
 	echo '<th class="firstcol">'.T_('Date').'</th>';
-	echo '<th style="background-color: #'.$hit_type_color['rss'].'"><a href="?ctrl=stats&amp;tab=hits&amp;hit_type=rss&amp;blog='.$blog.'">'.T_('RSS/Atom').'</a></th>';
-	echo '<th style="background-color: #'.$hit_type_color['standard_robot'].'"><a href="?ctrl=stats&amp;tab=hits&amp;hit_type=standard&amp;agent_type=robot&amp;blog='.$blog.'">'.T_('Standard/Robots').'</a></th>';
-	echo '<th style="background-color: #'.$hit_type_color['standard_browser'].'"><a href="?ctrl=stats&amp;tab=hits&amp;hit_type=standard&amp;agent_type=browser&amp;blog='.$blog.'">'.T_('Standard/Browsers').'</a></th>';
-	echo '<th style="background-color: #'.$hit_type_color['ajax'].'"><a href="?ctrl=stats&amp;tab=hits&amp;hit_type=ajax&amp;blog='.$blog.'">'.T_('Ajax').'</a></th>';
-	echo '<th style="background-color: #'.$hit_type_color['service'].'"><a href="?ctrl=stats&amp;tab=hits&amp;hit_type=service&amp;blog='.$blog.'">'.T_('Service').'</a></th>';
-	echo '<th style="background-color: #'.$hit_type_color['admin'].'"><a href="?ctrl=stats&amp;tab=hits&amp;hit_type=admin&amp;blog='.$blog.'">'.T_('Admin').'</a></th>';
-	echo '<th style="background-color: #'.$hit_type_color['api'].'"><a href="?ctrl=stats&amp;tab=hits&amp;hit_type=api&amp;blog='.$blog.'">'.T_('API').'</a></th>';
-	echo '<th style="background-color: #'.$agent_type_color['unknown'].'"><a href="?ctrl=stats&amp;tab=hits&amp;agent_type=unknown&amp;blog='.$blog.'">'.T_('Other').'</a></th>';
+	echo '<th style="background-color: #'.$hit_type_color['rss'].'"><a href="?ctrl=stats&amp;tab=hits&amp;hit_type=rss'.$coll_group_params.'">'.T_('RSS/Atom').'</a></th>';
+	echo '<th style="background-color: #'.$hit_type_color['standard_robot'].'"><a href="?ctrl=stats&amp;tab=hits&amp;hit_type=standard&amp;agent_type=robot'.$coll_group_params.'">'.T_('Standard/Robots').'</a></th>';
+	echo '<th style="background-color: #'.$hit_type_color['standard_browser'].'"><a href="?ctrl=stats&amp;tab=hits&amp;hit_type=standard&amp;agent_type=browser'.$coll_group_params.'">'.T_('Standard/Browsers').'</a></th>';
+	echo '<th style="background-color: #'.$hit_type_color['ajax'].'"><a href="?ctrl=stats&amp;tab=hits&amp;hit_type=ajax'.$coll_group_params.'">'.T_('Ajax').'</a></th>';
+	echo '<th style="background-color: #'.$hit_type_color['service'].'"><a href="?ctrl=stats&amp;tab=hits&amp;hit_type=service'.$coll_group_params.'">'.T_('Service').'</a></th>';
+	echo '<th style="background-color: #'.$hit_type_color['admin'].'"><a href="?ctrl=stats&amp;tab=hits&amp;hit_type=admin'.$coll_group_params.'">'.T_('Admin').'</a></th>';
+	echo '<th style="background-color: #'.$hit_type_color['api'].'"><a href="?ctrl=stats&amp;tab=hits&amp;hit_type=api'.$coll_group_params.'">'.T_('API').'</a></th>';
+	echo '<th style="background-color: #'.$agent_type_color['unknown'].'"><a href="?ctrl=stats&amp;tab=hits&amp;agent_type=unknown'.$coll_group_params.'">'.T_('Other').'</a></th>';
 	echo '<th class="lastcol">'.T_('Total').'</th>';
 	echo '</tr>';
 
@@ -203,8 +213,8 @@ if( count($res_hits) )
 		$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
 		if( $last_date == 0 ) $last_date = $this_date;	// that'll be the first one
 
-		$link_text = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).'&blog='.$blog;
-		$link_text_total_day = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).'&blog='.$blog;
+		$link_text = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).$coll_group_params;
+		$link_text_total_day = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).$coll_group_params;
 
 
 		if( $last_date != $this_date )
@@ -215,7 +225,7 @@ if( count($res_hits) )
 					echo date( 'D '.locale_datefmt(), $last_date );
 					if( $current_User->check_perm( 'stats', 'edit' ) )
 					{
-						echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb('stats') ) );
+						echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary'.$coll_group_params.'&amp;'.url_crumb('stats') ) );
 					}
 				?></td>
 
@@ -268,15 +278,15 @@ if( count($res_hits) )
 	{ // We had a day pending:
 		$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
 
-		$link_text = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).'&blog='.$blog;
-		$link_text_total_day = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).'&blog='.$blog;
+		$link_text = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).$coll_group_params;
+		$link_text_total_day = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).$coll_group_params;
 		?>
 			<tr class="<?php echo ( $count%2 == 1 ) ? 'odd' : 'even'; ?>">
 			<td class="firstcol right"><?php
 				echo date( 'D '.locale_datefmt(), $this_date );
 				if( $current_User->check_perm( 'stats', 'edit' ) )
 				{
-					echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb('stats') ) );
+					echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary'.$coll_group_params.'&amp;'.url_crumb('stats') ) );
 				}
 			?></td>
 				<td class="right"><a href="<?php echo $link_text.'&hit_type=rss'?>"><?php echo $hits['rss'] ?></a></td>
@@ -294,7 +304,7 @@ if( count($res_hits) )
 
 	// Total numbers:
 
-	$link_text_total = $admin_url.'?ctrl=stats&tab=hits&blog='.$blog;
+	$link_text_total = $admin_url.'?ctrl=stats&tab=hits'.$coll_group_params;
 	?>
 
 	<tr class="total">

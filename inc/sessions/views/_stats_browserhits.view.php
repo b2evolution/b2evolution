@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $AdminUI, $referer_type_color, $hit_type_color, $Hit;
+global $blog, $cgrp_ID, $admin_url, $AdminUI, $referer_type_color, $hit_type_color, $Hit;
 
 echo '<h2 class="page-title">'.T_('Hits from web browsers - Summary').get_manual_link('browser_hits_summary').'</h2>';
 
@@ -28,27 +28,36 @@ echo '<h2 class="page-title">'.T_('Hits from web browsers - Summary').get_manual
 // http://dev.mysql.com/doc/refman/4.1/en/cast-functions.html
 // TODO: I've also limited this to agent_type "browser" here, according to the change for "referers" (Rev 1.6)
 //       -> an RSS service that sends a referer is not a real referer (though it should be listed in the robots list)! (blueyed)
-$sql = '
-	SELECT SQL_NO_CACHE COUNT(*) AS hits, CONCAT(hit_referer_type) AS referer_type, hit_type, hit_sess_ID,
-			   EXTRACT(YEAR FROM hit_datetime) AS year,
-			   EXTRACT(MONTH FROM hit_datetime) AS month,
-			   EXTRACT(DAY FROM hit_datetime) AS day
-		FROM T_hitlog
-	 WHERE hit_agent_type = "browser"';
+$SQL = new SQL( 'Get hits summary from web browsers' );
+$SQL->SELECT( 'SQL_NO_CACHE COUNT(*) AS hits, CONCAT(hit_referer_type) AS referer_type, hit_type, hit_sess_ID,
+	EXTRACT(YEAR FROM hit_datetime) AS year,
+	EXTRACT(MONTH FROM hit_datetime) AS month,
+	EXTRACT(DAY FROM hit_datetime) AS day' );
+$SQL->FROM( 'T_hitlog' );
+$SQL->WHERE( 'hit_agent_type = "browser"' );
 
-if( $blog > 0 )
-{
-	$sql .= ' AND hit_coll_ID = '.$blog;
+if( ! empty( $cgrp_ID ) )
+{	// Filter by collection group:
+	$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+	$SQL->WHERE_and( 'blog_cgrp_ID = '.$DB->quote( $cgrp_ID ) );
 }
-$sql .= ' GROUP BY year, month, day, referer_type, hit_type, hit_sess_ID
-					ORDER BY year DESC, month DESC, day DESC, referer_type, hit_type';
-$res_hits = $DB->get_results( $sql, ARRAY_A, 'Get hit summary' );
+if( $blog > 0 )
+{	// Filter by collection:
+	$SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
+}
+$SQL->GROUP_BY( 'year, month, day, referer_type, hit_type, hit_sess_ID' );
+$SQL->ORDER_BY( 'year DESC, month DESC, day DESC, referer_type, hit_type' );
+$res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
 
 /*
  * Chart
  */
-if( count($res_hits) )
+if( count( $res_hits ) )
 {
+	// Initialize params to filter by selected collection and/or group:
+	$coll_group_params = empty( $blog ) ? '' : '&blog='.$blog;
+	$coll_group_params .= empty( $cgrp_ID ) ? '' : '&cgrp_ID='.$cgrp_ID;
+
 	$last_date = 0;
 
 	$col_mapping = array(
@@ -81,7 +90,7 @@ if( count($res_hits) )
 
 	// Initialize the data to open an url by click on bar item
 	$chart['link_data'] = array();
-	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&agent_type=browser&referer_type=$param1$&hit_type=$param2$';
+	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$coll_group_params.'&agent_type=browser&referer_type=$param1$&hit_type=$param2$';
 	$chart['link_data']['params'] = array(
 			array( 'search',  '' ),
 			array( 'referer', '' ),
@@ -211,8 +220,8 @@ if( count($res_hits) )
 
 			if( $last_date == 0 ) $last_date = $this_date;	// that'll be the first one
 
-			$link_text = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).'&blog='.$blog.'&agent_type=browser';
-			$link_text_total_day = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).'&blog='.$blog.'&agent_type=browser';
+			$link_text = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).$coll_group_params.'&agent_type=browser';
+			$link_text_total_day = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).$coll_group_params.'&agent_type=browser';
 
 			if( $last_date != $this_date )
 			{ // We just hit a new day, let's display the previous one:
@@ -222,7 +231,7 @@ if( count($res_hits) )
 						echo date( 'D '.locale_datefmt(), $last_date );
 						if( $current_User->check_perm( 'stats', 'edit' ) )
 						{
-							echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb('stats') ) );
+							echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary'.$coll_group_params.'&amp;'.url_crumb('stats') ) );
 						}
 					?></td>
 				<td class="right"><?php echo $hits['session'] ?></td>
@@ -282,15 +291,15 @@ if( count($res_hits) )
 		{ // We had a day pending:
 			$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
 
-			$link_text = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).'&blog='.$blog.'&agent_type=browser';
-			$link_text_total_day = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).'&blog='.$blog.'&agent_type=browser';
+			$link_text = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).$coll_group_params.'&agent_type=browser';
+			$link_text_total_day = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).$coll_group_params.'&agent_type=browser';
 			?>
 				<tr class="<?php echo ( $count%2 == 1 ) ? 'odd' : 'even'; ?>">
 				<td class="firstcol right"><?php
 					echo date( 'D '.locale_datefmt(), $this_date );
 					if( $current_User->check_perm( 'stats', 'edit' ) )
 					{
-						echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb('stats') ) );
+						echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary'.$coll_group_params.'&amp;'.url_crumb('stats') ) );
 					}
 				?></td>
 				<td class="right"><?php echo $hits['session'] ?></td>
@@ -309,7 +318,7 @@ if( count($res_hits) )
 
 		// Total numbers:
 
-		$link_text_total = $admin_url.'?ctrl=stats&tab=hits&blog='.$blog.'&agent_type=browser';
+		$link_text_total = $admin_url.'?ctrl=stats&tab=hits'.$coll_group_params.'&agent_type=browser';
 		?>
 
 		<tr class="total">

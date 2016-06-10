@@ -33,7 +33,7 @@ function hits_results_block( $params = array() )
 		return;
 	}
 
-	global $blog, $current_User;
+	global $blog, $cgrp_ID, $current_User;
 
 	if( $blog == 0 )
 	{
@@ -211,8 +211,16 @@ function hits_results_block( $params = array() )
 	}
 
 
+	if( ! empty( $cgrp_ID ) )
+	{	// Filter by selected collection group:
+		$filter = 'blog_cgrp_ID = '.$DB->escape( $cgrp_ID );
+		$SQL->WHERE_and( $filter );
+		$count_SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+		$count_SQL->WHERE_and( $filter );
+	}
+
 	if( ! empty( $blog ) )
-	{
+	{	// Filter by selected collection:
 		$filter = 'hit_coll_ID = '.$DB->escape( $blog );
 		$SQL->WHERE_and( $filter );
 		$count_SQL->WHERE_and( $filter );
@@ -265,9 +273,10 @@ function refererList(
 	$type = "'referer'",		// was: 'referer' normal refer, 'invalid', 'badchar', 'blacklist', 'rss', 'robot', 'search'
 													// new: 'search', 'blacklist', 'referer', 'direct', ('spam' but spam is not logged)
 	$groupby = '', 	// dom_name
-	$blog_ID = '',
+	$blog_ID = '', // Collection ID
 	$get_total_hits = false, // Get total number of hits (needed for percentages)
-	$get_user_agent = false ) // Get the user agent
+	$get_user_agent = false, // Get the user agent
+	$cgrp_ID = 0 ) // Collection group ID
 {
 	global $DB, $res_stats, $stats_total_hits, $ReqURI;
 
@@ -309,10 +318,15 @@ function refererList(
 		$sql .= ', agnt_signature';
 	}
 
-	$sql_from_where = "
+	$sql_from_where = '
 			  FROM T_hitlog LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
-			 WHERE hit_referer_type IN (".$type.")
-			   AND hit_agent_type = 'browser'";
+			'.( empty( $cgrp_ID ) ? '' : ' LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' ).'
+			 WHERE hit_referer_type IN ('.$type.')
+			   AND hit_agent_type = "browser"';
+	if( ! empty( $cgrp_ID ) )
+	{	// Filter by collection group:
+		$sql_from_where .= " AND blog_cgrp_ID = '".$cgrp_ID."'";
+	}
 	if( !empty($blog_ID) )
 	{
 		$sql_from_where .= " AND hit_coll_ID = '".$blog_ID."'";

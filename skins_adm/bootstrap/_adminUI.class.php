@@ -308,7 +308,7 @@ class AdminUI extends AdminUI_general
 				// Template for a list of Collections (Blogs)
 				return array(
 						'before' => '<div class="container-fluid coll-selector"><nav><div class="btn-group">',
-						'after' => '</div>$button_add_blog$</nav></div>',
+						'after' => '</div>$button_add_blog$$collection_groups$</nav></div>',
 						'select_start' => '<div class="btn-group" role="group">',
 						'select_end' => '</div>',
 						'buttons_start' => '',
@@ -795,7 +795,6 @@ class AdminUI extends AdminUI_general
 		$buttons = '';
 		$select_options = '';
 		$not_favorite_blogs = false;
-
 		foreach( $blog_array as $l_blog_ID )
 		{ // Loop through all blogs that match the requested permission:
 
@@ -842,13 +841,23 @@ class AdminUI extends AdminUI_general
 
 		$r .= $title;
 
+		if( $this->coll_list_disp_groups )
+		{	// Check if filter by collection group is used currently:
+			$cgrp_ID = param( 'cgrp_ID', 'integer', 0 );
+			if( ! is_logged_in() || ! ( $current_User->check_perm( 'stats', 'view' ) || $current_User->check_perm( 'blog_group', 'view', false, $cgrp_ID ) ) )
+			{
+				$cgrp_ID = 0;
+				set_param( 'cgrp_ID', 0 );
+			}
+		}
+
 		if( !empty( $this->coll_list_all_title ) )
 		{ // We want to add an "all" button
-			$r .= $template[ $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
+			$r .= $template[ empty( $cgrp_ID ) && $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
 			$r .= '<a href="'.$this->coll_list_all_url
-						.'" class="btn btn-default'.( $blog == 0 ? ' active' : '' ).'">'
+						.'" class="btn btn-default'.( empty( $cgrp_ID ) && $blog == 0 ? ' active' : '' ).'">'
 						.$this->coll_list_all_title.'</a> ';
-			$r .= $template[ $blog == 0 ? 'afterEachSel' : 'afterEach' ];
+			$r .= $template[ empty( $cgrp_ID ) && $blog == 0 ? 'afterEachSel' : 'afterEach' ];
 		}
 
 		$r .= $template['buttons_start'];
@@ -867,17 +876,52 @@ class AdminUI extends AdminUI_general
 				.$template['select_end'];
 		}
 
-		// Button to add new collection
-		if( is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
-		{ // Display a button to add new collection if current user has a permission
+		// Button to add new collection:
+		if( $this->coll_list_disp_add && is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
+		{	// Display a button to add new collection if it is requested and current user has a permission
 			$button_add_blog = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new" class="btn btn-default" title="'.T_('New Collection').'"><span class="fa fa-plus"></span></a>';
 		}
 		else
-		{ // No permission to add new collection
+		{	// No request or permission to add new collection:
 			$button_add_blog = '';
 		}
 
-		$r .= str_replace( '$button_add_blog$', $button_add_blog, $template['after'] );
+		// Collection groups:
+		if( $this->coll_list_disp_groups )
+		{
+			$collection_groups = '';
+
+			$CollGroupCache = & get_CollGroupCache();
+			$CollGroupCache->clear();
+			if( $current_User->check_perm( 'stats', 'view' ) || $current_User->check_perm( 'blog_group', 'edit' ) )
+			{	// Allow to select all collection groups if Current user can has a permission for this:
+				$CollGroupCache->load_all();
+			}
+			else
+			{	// Load only available collection groups:
+				$CollGroupCache->load_where( 'cgrp_owner_user_ID = '.$current_User->ID );
+			}
+
+			foreach( $CollGroupCache->cache as $CollGroup )
+			{	// Loop through all collection groups that match the requested permission:
+				$collection_groups .= ( $CollGroup->ID == $cgrp_ID ) ? $template['beforeEachSel'] : $template['beforeEach'];
+
+				$collection_groups .= '<a href="'.$url_params.'blog=0&amp;cgrp_ID='.$CollGroup->ID
+					.'" class="btn btn-default'.( $CollGroup->ID == $cgrp_ID ? ' active' : '' ).'">'
+						.$CollGroup->dget( 'name', 'htmlbody' )
+					.'</a> ';
+
+				$collection_groups .= ( $CollGroup->ID == $cgrp_ID ) ? $template['afterEachSel'] : $template['afterEach'];
+			}
+
+			$collection_groups = empty( $collection_groups ) ? '' : '<div class="btn-group">'.$collection_groups.'</div>';
+		}
+		else
+		{
+			$collection_groups = '';
+		}
+
+		$r .= str_replace( array( '$button_add_blog$', '$collection_groups$' ), array( $button_add_blog, $collection_groups ), $template['after'] );
 
 		return $r;
 	}

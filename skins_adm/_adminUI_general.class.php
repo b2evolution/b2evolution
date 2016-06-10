@@ -113,6 +113,16 @@ class AdminUI_general extends Menu
 	 * @var string
 	 */
 	var $coll_list_onclick = NULL;
+	/**
+	 * Collection List buttons: display a link to add new collection
+	 * @var boolean
+	 */
+	var $coll_list_disp_add = true;
+	/**
+	 * Collection List buttons: display a list of collection groups
+	 * @var boolean
+	 */
+	var $coll_list_disp_groups = false;
 
 
 	/**
@@ -724,9 +734,11 @@ class AdminUI_general extends Menu
 	 * @param string Title for "all" button
 	 * @param string URL for "all" button
 	 * @param string onclick attribute format string, with %s for blog number. (NOTE: %s so that we can use this.value when selected through list)
+	 * @param boolean TRUE to display a link to add new collection
+	 * @param boolean TRUE to display a list of collection groups
 	 */
 	function set_coll_list_params( $permname = 'blog_ismember', $permlevel = 1, $url_params = array(),
-							$all_title = NULL, $all_url = '', $onclick = NULL )
+							$all_title = NULL, $all_url = '', $onclick = NULL, $display_add_link = true, $display_groups = false )
 	{
 		$this->coll_list_all_title = $all_title;
 		$this->coll_list_all_url = $all_url;
@@ -734,6 +746,8 @@ class AdminUI_general extends Menu
 		$this->coll_list_permlevel = $permlevel;
 		$this->coll_list_url_params = $url_params;
 		$this->coll_list_onclick = $onclick;
+		$this->coll_list_disp_add = $display_add_link;
+		$this->coll_list_disp_groups = $display_groups;
 	}
 
 

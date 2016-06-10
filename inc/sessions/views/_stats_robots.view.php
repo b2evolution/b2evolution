@@ -19,24 +19,29 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
 
-global $blog, $admin_url, $rsc_url, $AdminUI, $agent_type_color;
+global $blog, $cgrp_ID, $admin_url, $rsc_url, $AdminUI, $agent_type_color;
 
 echo '<h2 class="page-title">'.T_('Hits from indexing robots / spiders / crawlers - Summary').get_manual_link( 'robots-hits-summary' ).'</h2>';
 
 echo '<p class="notes">'.T_('In order to be detected, robots must be listed in /conf/_stats.php.').'</p>';
 
-$SQL = new SQL();
+$SQL = new SQL( 'Get robot hits summary' );
 $SQL->SELECT( 'SQL_NO_CACHE COUNT(*) AS hits, EXTRACT(YEAR FROM hit_datetime) AS year,'
 	. 'EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day' );
 $SQL->FROM( 'T_hitlog' );
 $SQL->WHERE( 'hit_agent_type = "robot"' );
+if( ! empty( $cgrp_ID ) )
+{	// Filter by collection group:
+	$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+	$SQL->WHERE_and( 'blog_cgrp_ID = '.$cgrp_ID );
+}
 if( $blog > 0 )
-{
+{	// Filter by collection:
 	$SQL->WHERE_and( 'hit_coll_ID = ' . $blog );
 }
 $SQL->GROUP_BY( 'year, month, day' );
 $SQL->ORDER_BY( 'year DESC, month DESC, day DESC' );
-$res_hits = $DB->get_results( $SQL->get(), ARRAY_A, 'Get robot summary' );
+$res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
 
 
 /*
@@ -44,6 +49,10 @@ $res_hits = $DB->get_results( $SQL->get(), ARRAY_A, 'Get robot summary' );
  */
 if( count($res_hits) )
 {
+	// Initialize params to filter by selected collection and/or group:
+	$coll_group_params = empty( $blog ) ? '' : '&blog='.$blog;
+	$coll_group_params .= empty( $cgrp_ID ) ? '' : '&cgrp_ID='.$cgrp_ID;
+
 	$last_date = 0;
 
 	$chart[ 'chart_data' ][ 0 ] = array();
@@ -53,7 +62,7 @@ if( count($res_hits) )
 
 	// Initialize the data to open an url by click on bar item
 	$chart['link_data'] = array();
-	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&agent_type=$param1$';
+	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$coll_group_params.'&agent_type=$param1$';
 	$chart['link_data']['params'] = array(
 			array( 'robot' )
 		);

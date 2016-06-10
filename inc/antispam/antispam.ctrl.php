@@ -463,11 +463,12 @@ if( $display_mode != 'js' )
 			if( $current_User->check_perm( 'stats', 'view' ) )
 			{
 				$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'antispam', 'tab' => $tab, 'tab3' => $tab3 ), T_('All'),
-								$admin_url.'?ctrl=antispam&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0' );
+								$admin_url.'?ctrl=antispam&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0', NULL, false, true );
 			}
 			else
 			{ // No permission to view aggregated stats:
-				$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'antispam', 'tab' => $tab, 'tab3' => $tab3 ) );
+				$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'antispam', 'tab' => $tab, 'tab3' => $tab3 ), NULL,
+						'', NULL, false, true );
 			}
 		}
 		$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Analytics'), 'url' => '?ctrl=stats&amp;blog=$blog$' ) );
