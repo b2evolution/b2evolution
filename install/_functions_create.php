@@ -187,7 +187,7 @@ function create_default_data()
 	// Create organization
 	global $user_org_IDs;
 	$user_org_IDs = NULL;
-	
+
 	// A default organization will be created so that there will be something to
 	// display in the homepage's organization members widget
 	$Organization = new Organization();
@@ -1815,7 +1815,7 @@ function create_demo_contents()
 		{
 			$b_Blog->set_setting( 'front_disp', 'front' );
 			$b_Blog->set_setting( 'skin2_layout', 'single_column' );
-			$b_Blog->set( 'advanced_perms', '1' );
+			$b_Blog->set( 'advanced_perms', 1 );
 			$b_Blog->set_setting( 'allow_access', 'members' );
 			$b_Blog->dbupdate();
 		}
@@ -1894,6 +1894,12 @@ function create_demo_contents()
 		$cat_sports = cat_create( T_('Sports'), $cat_life, $blog_a_ID );
 		$cat_movies = cat_create( T_('Movies'), $cat_life, $blog_a_ID );
 		$cat_music = cat_create( T_('Music'), $cat_life, $blog_a_ID );
+
+		if( $a_Blog = $BlogCache->get_by_ID( $blog_a_ID, false, false ) )
+		{
+			$a_Blog->set_setting( 'default_cat_ID', $cat_ann_a );
+			$a_Blog->dbupdate();
+		}
 	}
 
 	if( $install_collection_blogb )
@@ -1901,17 +1907,35 @@ function create_demo_contents()
 		$cat_ann_b = cat_create( T_('Announcements'), 'NULL', $blog_b_ID );
 		$cat_b2evo = cat_create( T_('b2evolution Tips'), 'NULL', $blog_b_ID );
 		$cat_additional_skins = cat_create( T_('Get additional skins'), 'NULL', $blog_b_ID );
+
+		if( $b_Blog = $BlogCache->get_by_ID( $blog_b_ID, false, false ) )
+		{
+			$b_Blog->set_setting( 'default_cat_ID', $cat_ann_b );
+			$b_Blog->dbupdate();
+		}
 	}
 
 	if( $install_collection_home )
 	{ // Create categories for home blog
 		$cat_home_b2evo = cat_create( 'b2evolution', 'NULL', $blog_home_ID );
 		$cat_home_contrib = cat_create( T_('Contributors'), 'NULL', $blog_home_ID );
+
+		if( $home_Blog = $BlogCache->get_by_ID( $blog_home_ID, false, false ) )
+		{
+			$home_Blog->set_setting( 'default_cat_ID', $cat_home_b2evo );
+			$home_Blog->dbupdate();
+		}
 	}
 
 	if( $install_collection_photos )
 	{ // Create categories for photoblog
 		$cat_photo_album = cat_create( T_('Landscapes'), 'NULL', $blog_photoblog_ID );
+
+		if( $photoblog_Blog = $BlogCache->get_by_ID( $blog_photoblog_ID, false, false ) )
+		{
+			$photoblog_Blog->set_setting( 'default_cat_ID', $cat_photo_album );
+			$photoblog_Blog->dbupdate();
+		}
 	}
 
 	if( $install_collection_forums )
@@ -1929,6 +1953,12 @@ function create_demo_contents()
 					$cat_forums_music = cat_create( T_('Music'), $cat_forums_life, $blog_forums_ID );
 					$cat_forums_sports = cat_create( T_('Sports'), $cat_forums_life, $blog_forums_ID );
 				$cat_forums_web = cat_create( T_('On the web'), $cat_forums_fun, $blog_forums_ID, NULL, false, 5 );
+
+		if( $forums_Blog = $BlogCache->get_by_ID( $blog_forums_ID, false, false ) )
+		{
+			$forums_Blog->set_setting( 'default_cat_ID', $cat_forums_forum_group );
+			$forums_Blog->dbupdate();
+		}
 	}
 
 	if( $install_collection_manual )
@@ -1944,6 +1974,12 @@ function create_demo_contents()
 		$cat_manual_blogs = cat_create( T_('Blogs'), $cat_manual_everyday, $blog_manual_ID, NULL, false, 35 );
 		$cat_manual_photos = cat_create( T_('Photo Albums'), $cat_manual_everyday, $blog_manual_ID, NULL, false, 25 );
 		$cat_manual_forums = cat_create( T_('Forums'), $cat_manual_everyday, $blog_manual_ID, NULL, false, 5 );
+
+		if( $manual_Blog = $BlogCache->get_by_ID( $blog_manual_ID, false, false ) )
+		{
+			$manual_Blog->set_setting( 'default_cat_ID', $cat_manual_intro );
+			$manual_Blog->dbupdate();
+		}
 	}
 
 	task_end();

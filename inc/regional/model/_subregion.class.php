@@ -100,6 +100,17 @@ class Subregion extends DataObject
 		param_check_regexp( 'subrg_code', '#^[A-Za-z0-9]{1,6}$#', T_('Sub-region code must be from 1 to 6 letters.') );
 		$this->set_from_Request( 'code', 'subrg_code' );
 
+		if( ! param_errors_detected() )
+		{	// Check sub-region code for duplicating:
+			$existing_subrg_ID = $this->dbexists( array( 'subrg_rgn_ID', 'subrg_code' ), array( $this->get( 'rgn_ID' ), $this->get( 'code' ) ) );
+			if( $existing_subrg_ID )
+			{	// We have a duplicate sub-region:
+				param_error( 'subrg_code',
+					sprintf( T_('This sub-region already exists. Do you want to <a %s>edit the existing sub-region</a>?'),
+						'href="?ctrl=subregions&amp;action=edit&amp;subrg_ID='.$existing_subrg_ID.'"' ) );
+			}
+		}
+
 		return ! param_errors_detected();
 	}
 
@@ -136,24 +147,6 @@ class Subregion extends DataObject
 	function get_name()
 	{
 		return $this->name;
-	}
-
-
-	/**
-	 * Check existence of specified sub-region code in subrg_code unique field.
-	 *
-	 * @param string Name of unique field  OR array of Names (for UNIQUE index with MULTIPLE fields)
-	 * @param mixed specified value        OR array of Values (for UNIQUE index with MULTIPLE fields)
-	 * @return int ID if region + sub-region code exist otherwise NULL/false
-	 */
-	function dbexists( $unique_fields = array( 'subrg_rgn_ID', 'subrg_code' ), $values = NULL )
-	{
-		if( is_null( $values ) )
-		{
-			$values = array( $this->rgn_ID, $this->code );
-		}
-
-		return parent::dbexists( $unique_fields, $values );
 	}
 }
 

@@ -179,7 +179,7 @@ function skin_init( $disp )
 
 			// Check if the post has allowed front office statuses
 			$allowed_statuses = get_inskin_statuses( $Blog->ID, 'post' );
-			if( ! in_array( $Item->status, $allowed_statuses ) )
+			if( ! $preview && ! in_array( $Item->status, $allowed_statuses ) )
 			{
 				global $disp;
 				$disp = '404';

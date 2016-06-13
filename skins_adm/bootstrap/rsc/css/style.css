@@ -1104,6 +1104,10 @@ div.level2 {
 nav.level1 {
   z-index: 1;
 }
+div.level3 nav .nav > li {
+  margin-right: 3px;
+  margin-bottom: 3px;
+}
 div.level3 nav .nav > li > a {
   padding: 4px 10px;
   font-size: 92%;
@@ -1119,6 +1123,9 @@ div.level3 nav .nav > li.active a:focus {
 }
 .user_header_content .user_title .login {
   margin-left: 10px;
+}
+div.level3 nav .nav > li + li {
+  margin-left: 0px;
 }
 .footer {
   background-color: #f5f5f5;

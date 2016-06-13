@@ -161,6 +161,7 @@ switch( $action )
 			load_class( 'sessions/model/_domain.class.php', 'Domain' );
 			$edited_Domain = new Domain();
 			$edited_Domain->set( 'name', param( 'dom_name', 'string', '' ) );
+			$edited_Domain->set( 'type', param( 'dom_type', 'string', 'unknown' ) );
 			$edited_Domain->set( 'status', param( 'dom_status', 'string', 'unknown' ) );
 		}
 		else

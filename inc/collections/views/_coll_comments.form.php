@@ -202,7 +202,7 @@ $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moder
 	}
 	// put this on feedback details container, this way it won't be displayed if comment posting is not allowed
 	echo '<div class="feedback_details_container">';
-	
+
 	if( $is_bootstrap_skin )
 	{	// Use dropdown for bootstrap skin:
 		$new_status_field = get_status_dropdown_button( array(

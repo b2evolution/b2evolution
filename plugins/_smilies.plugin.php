@@ -29,7 +29,7 @@ class smilies_plugin extends Plugin
 	 * fp> There is... I can't remember the exact problem thouh. Probably some interaction with the code highlight or the video plugins.
 	 */
 	var $priority = 25;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $group = 'rendering';
 	var $number_of_installs = 3; // QUESTION: dh> why 3?
 
@@ -191,7 +191,7 @@ XX(      graydead.gif
 	function AdminDisplayToolbar( & $params )
 	{
 		global $Blog;
-		
+
 		$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $Blog );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never'
 		    && is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
