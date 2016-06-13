@@ -38,6 +38,8 @@ $db_config['aliases']['T_track__goal'] = $tableprefix.'track__goal';
 $db_config['aliases']['T_track__goalhit'] = $tableprefix.'track__goalhit';
 $db_config['aliases']['T_track__goalcat'] = $tableprefix.'track__goalcat';
 $db_config['aliases']['T_track__keyphrase'] = $tableprefix.'track__keyphrase';
+$db_config['aliases']['T_vtest__test'] = $tableprefix.'vtest__test';
+$db_config['aliases']['T_vtest__variation'] = $tableprefix.'vtest__variation';
 
 
 /**
@@ -56,6 +58,7 @@ $db_config['aliases']['T_track__keyphrase'] = $tableprefix.'track__keyphrase';
  */
 $ctrl_mappings['stats'] = 'sessions/stats.ctrl.php';
 $ctrl_mappings['goals'] = 'sessions/goals.ctrl.php';
+$ctrl_mappings['variations'] = 'sessions/variations.ctrl.php';
 
 
 /**
@@ -97,6 +100,25 @@ function & get_GoalCategoryCache( $allow_none_text = NULL )
 	}
 
 	return $GoalCategoryCache;
+}
+
+
+/**
+ * Get the VariationCache
+ *
+ * @return VariationCache
+ */
+function & get_VariationTestCache()
+{
+	global $VariationTestCache;
+
+	if( ! isset( $VariationTestCache ) )
+	{ // Cache doesn't exist yet:
+		load_class( 'sessions/model/_variation_test.class.php', 'VariationTest' );
+		$VariationTestCache = new DataObjectCache( 'VariationTest', false, 'T_vtest__test', 'vtst_', 'vtst_ID', 'vtst_name', 'vtst_name', T_('No') ); // COPY (FUNC)
+	}
+
+	return $VariationTestCache;
 }
 
 
@@ -365,6 +387,10 @@ class sessions_Module extends Module
 								'stats' => array(
 									'text' => T_('Stats'),
 									'href' => $admin_url.'?ctrl=goals&amp;tab3=stats&amp;blog='.$blog
+									),
+								'variations' => array(
+									'text' => T_('A/B Variation Tests'),
+									'href' => $admin_url.'?ctrl=variations'
 									),
 								),
 							),

@@ -7585,6 +7585,27 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11795, 'Creating table for A/B Tests...' ) )
+	{	// part of 6.7.4-stable
+		$DB->query( 'CREATE TABLE T_vtest__test (
+			  vtst_ID     int(10) unsigned NOT NULL auto_increment,
+			  vtst_name   varchar(128) default NULL,
+			  PRIMARY KEY (vtst_ID)
+			) ENGINE = innodb' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11800, 'Creating table for Variations of A/B Tests...' ) )
+	{	// part of 6.7.4-stable
+		$DB->query( 'CREATE TABLE T_vtest__variation (
+			  tvar_ID      int(10) unsigned NOT NULL auto_increment,
+			  tvar_vtst_ID int(10) unsigned NOT NULL,
+			  tvar_name    varchar(128) default NULL,
+			  PRIMARY KEY (tvar_ID)
+			) ENGINE = innodb' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

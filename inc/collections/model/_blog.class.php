@@ -692,6 +692,7 @@ class Blog extends DataObject
 
 		if( in_array( 'authors', $groups ) )
 		{ // we want to load the workflow & permissions params
+			$this->set_setting( 'test_skin_variation',  param( 'blog_test_skin_variation', 'integer', 0 ) );
 			$this->set_setting( 'use_workflow',  param( 'blog_use_workflow', 'integer', 0 ) );
 		}
 

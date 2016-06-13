@@ -34,6 +34,12 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'advanced' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
+$Form->begin_fieldset( T_('A/B Variation Testing').get_manual_link('coll-variation-testing-settings') );
+	$VariationTestCache = & get_VariationTestCache();
+	$VariationTestCache->load_all();
+	$Form->select_input_object( 'blog_test_skin_variation', $edited_Blog->get_setting('test_skin_variation'), $VariationTestCache, T_('Test skin variations'), array( 'allow_none' => true ) );
+$Form->end_fieldset();
+
 
 $Form->begin_fieldset( T_('Workflow').get_manual_link('coll-workflow-settings') );
 	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );

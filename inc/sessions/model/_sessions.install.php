@@ -148,4 +148,21 @@ $schema_queries['T_track__goalcat'] = array(
 		  PRIMARY KEY (gcat_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
 
+$schema_queries['T_vtest_test'] = array(
+	'Creating table for A/B Tests',
+	"CREATE TABLE T_vtest__test (
+		  vtst_ID   int(10) unsigned NOT NULL auto_increment,
+		  vtst_name varchar(128) default NULL,
+		  PRIMARY KEY (vtst_ID)
+		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" );
+
+$schema_queries['T_vtest_variation'] = array(
+	'Creating table for Variations of A/B Tests',
+	"CREATE TABLE T_vtest__variation (
+		  tvar_ID      int(10) unsigned NOT NULL auto_increment,
+		  tvar_vtst_ID int(10) unsigned NOT NULL,
+		  tvar_name    varchar(128) default NULL,
+		  PRIMARY KEY (tvar_ID)
+		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" );
+
 ?>
