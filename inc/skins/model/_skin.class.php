@@ -1058,7 +1058,7 @@ class Skin extends DataObject
 				case 'disp_login':
 					// Specific features for disp=threads:
 
-					global $Settings, $Plugins;
+					global $Settings, $Plugins, $transmit_hashed_password;
 
 					$transmit_hashed_password = (bool)$Settings->get( 'js_passwd_hashing' ) && !(bool)$Plugins->trigger_event_first_true( 'LoginAttemptNeedsRawPassword' );
 					if( $transmit_hashed_password )
