@@ -1815,7 +1815,7 @@ function create_demo_contents()
 		{
 			$b_Blog->set_setting( 'front_disp', 'front' );
 			$b_Blog->set_setting( 'skin2_layout', 'single_column' );
-			$b_Blog->set( 'advanced_perms', '1' );
+			$b_Blog->set( 'advanced_perms', 1 );
 			$b_Blog->set_setting( 'allow_access', 'members' );
 			$b_Blog->dbupdate();
 		}
