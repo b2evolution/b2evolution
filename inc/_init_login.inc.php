@@ -233,8 +233,8 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 				$Debuglog->add( 'Login: Compared raw passwords. Result: '.(int)$pass_ok, '_init_login' );
 				if( $pass_ok )
 				{	// Report about this unsecure login action:
-					syslog_insert( sprintf( 'User %s logged in without password hashing.', $User->login ), 'warning' );
-					$Messages->add( T_('WARNING: password hashing did not work. You just logged in insecurely. Please report this to your administrator.'), 'warning' );
+				//	syslog_insert( sprintf( 'User %s logged in without password hashing.', $User->login ), 'warning' );
+				//	$Messages->add( T_('WARNING: password hashing did not work. You just logged in insecurely. Please report this to your administrator.'), 'warning' );
 				}
 			}
 		}
