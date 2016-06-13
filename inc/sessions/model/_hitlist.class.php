@@ -115,19 +115,26 @@ class Hitlist
 
 		$time_prune_before = ( $localtimenow - ( $Settings->get( 'auto_prune_stats' ) * 86400 ) ); // 1 day = 86400 seconds
 
+		// Aggregate the hits before they will be deleted below:
+		$hitlist_Timer->start( 'aggregate' );
+		$DB->query( 'REPLACE INTO T_hits__aggregate ( hagg_date, hagg_coll_ID, hagg_type, hagg_referer_type, hagg_agent_type, hagg_count )
+			SELECT DATE( hit_datetime ) AS hit_date, IFNULL( hit_coll_ID, 0 ), hit_type, hit_referer_type, hit_agent_type, COUNT( hit_ID )
+			  FROM T_hitlog
+			 GROUP BY hit_date, hit_coll_ID, hit_type, hit_referer_type, hit_agent_type', 'Aggregate hit log' );
+		$hitlist_Timer->stop( 'aggregate' );
 
 		// PRUNE HITLOG:
 		$hitlist_Timer->start( 'hitlog' );
-		$hitlog_rows_affected = $DB->query( "
+		$hitlog_rows_affected = $DB->query( '
 			DELETE FROM T_hitlog
-			WHERE hit_datetime < '".date( 'Y-m-d', $time_prune_before )."'", 'Autopruning hit log' );
+			WHERE hit_datetime < "'.date( 'Y-m-d', $time_prune_before ).'"', 'Autopruning hit log' );
 		$hitlist_Timer->stop( 'hitlog' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$hitlog_rows_affected.' rows from T_hitlog.', 'request' );
 
 
 		// PREPARE PRUNING SESSIONS: 
 		// Prune sessions that have timed out and are older than auto_prune_stats
-		$sess_prune_before = ($localtimenow - $Settings->get( 'timeout_sessions' ));
+		$sess_prune_before = ( $localtimenow - $Settings->get( 'timeout_sessions' ) );
 		// IMPORTANT: we cut off at the oldest date between session timeout and sessions pruning.
 		// So if session timeout is really long (2 years for example), the sessions table won't be pruned as small as expected from the pruning delay.
 		$smaller_time = min( $sess_prune_before, $time_prune_before );
@@ -192,6 +199,9 @@ class Hitlist
 					.sprintf( 'T_basedomains: %s - %s rows',
 						$tables[ $db_config['aliases']['T_basedomains'] ]['type'],
 						$tables[ $db_config['aliases']['T_basedomains'] ]['rows'] )."\n"
+					."\n"
+					.'AGGREGATING:'."\n"
+					.sprintf( 'Aggregate the rows from T_hitlog to T_hits__aggregate, Execution time: %s seconds', $hitlist_Timer->get_duration( 'aggregate' ) )."\n"
 					."\n"
 					.'PRUNING:'."\n"
 					.sprintf( '%s rows from T_hitlog, Execution time: %s seconds', $hitlog_rows_affected, $hitlist_Timer->get_duration( 'hitlog' ) )."\n"

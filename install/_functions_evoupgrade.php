@@ -7585,6 +7585,22 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11795, 'Creating table for Hits aggregations...' ) )
+	{	// part of 6.7.4-stable
+		$DB->query( "CREATE TABLE T_hits__aggregate (
+				hagg_ID           INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+				hagg_date         DATE NOT NULL DEFAULT '2000-01-01',
+				hagg_coll_ID      INT(11) UNSIGNED NULL DEFAULT NULL,
+				hagg_type         ENUM('standard','rss','admin','ajax', 'service', 'api') COLLATE ascii_general_ci DEFAULT 'standard' NOT NULL,
+				hagg_referer_type ENUM('search','special','spam','referer','direct','self') COLLATE ascii_general_ci NOT NULL,
+				hagg_agent_type   ENUM('robot','browser','unknown') COLLATE ascii_general_ci DEFAULT 'unknown' NOT NULL,
+				hagg_count        INT(11) UNSIGNED NOT NULL,
+				PRIMARY KEY       (hagg_ID),
+				UNIQUE            hagg_date_coll_ID_types (hagg_date, hagg_coll_ID, hagg_type, hagg_referer_type, hagg_agent_type)
+			) ENGINE = myisam" );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

@@ -49,24 +49,24 @@ $Form->begin_fieldset( T_('Hit & session logging').get_manual_link('hit_logging'
 	$Form->radio_input( 'auto_prune_stats_mode', $Settings->get('auto_prune_stats_mode'), array(
 			array(
 				'value'=>'off',
-				'label'=>T_('Off'),
+				'label'=>T_('Never'),
 				'note'=>T_('Not recommended! Your database will grow very large!'),
 				'onclick'=>'jQuery("#auto_prune_stats_container").hide();' ),
 			array(
 				'value'=>'page',
-				'label'=>T_('On every page'),
+				'label'=>T_('Once per day, triggered by any pageload'),
 				'note'=>T_('This is guaranteed to work but uses extra resources with every page displayed.'),
 				'onclick'=>'jQuery("#auto_prune_stats_container").show();' ),
 			array(
 				'value'=>'cron',
-				'label'=>T_('With a scheduled job'),
+				'label'=>T_('Once per day, with a scheduled job'),
 				'note'=>T_('Recommended if you have your scheduled jobs properly set up.'), 'onclick'=>'jQuery("#auto_prune_stats_container").show();' ) ),
-		T_('Auto pruning'),
+		T_('Aggregate & Prune'),
 		array( 'note' => T_('Note: Even if you don\'t log hits, you still need to prune sessions!'),
 		'lines' => true ) );
 
 	echo '<div id="auto_prune_stats_container">';
-	$Form->text_input( 'auto_prune_stats', $Settings->get('auto_prune_stats'), 5, T_('Prune after'), T_('days. How many days of hits & sessions do you want to keep in the database for stats?') );
+	$Form->text_input( 'auto_prune_stats', $Settings->get('auto_prune_stats'), 5, T_('Keep detailed hitlog for'), T_('days. How many days of hits & sessions do you want to keep in the database for stats?') );
 	echo '</div>';
 
 	if( $Settings->get('auto_prune_stats_mode') == 'off' )
