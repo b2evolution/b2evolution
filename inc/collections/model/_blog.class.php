@@ -718,6 +718,16 @@ class Blog extends DataObject
 
 			$this->set_setting( 'post_categories', param( 'post_categories', 'string', NULL ) );
 
+			if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
+			{	// We have permission to edit advanced admin settings:
+				$this->set_setting( 'in_skin_editing', param( 'in_skin_editing', 'integer', 0 ) );
+				if( $this->get_setting( 'in_skin_editing' ) )
+				{
+					$this->set_setting( 'in_skin_editing_renderers', param( 'in_skin_editing_renderers', 'integer', 0 ) );
+					$this->set_setting( 'in_skin_editing_category', param( 'in_skin_editing_category', 'integer', 0 ) );
+				}
+			}
+
 			$this->set_setting( 'post_navigation', param( 'post_navigation', 'string', NULL ) );
 
 			// Show x days or x posts?:

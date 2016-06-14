@@ -158,25 +158,32 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'suggest_item_tags', $UserSettings->get( 'suggest_item_tags' ) );
 	}
 
-	$disp_edit_categories = true;
-	if( ! $params['disp_edit_categories'] )
-	{	// When categories are hidden, we store a cat_ID in the hidden input
-		if( $edited_Item->ID > 0 )
-		{	// Get cat_ID from existing Item
-			$main_Chapter = $edited_Item->get_main_Chapter();
-			$cat = $main_Chapter->ID;
-		}
-		else
-		{	// Forums skin get cat_ID from $_GET
-			$cat = param( 'cat', 'integer', 0 );
-		}
+	if( $Blog->get_setting( 'in_skin_editing_category' ) || $edited_Item->ID == 0 )
+	{	// If categories are allowed to update from front-office:
+		$disp_edit_categories = true;
+		if( ! $params['disp_edit_categories'] )
+		{	// When categories are hidden, we store a cat_ID in the hidden input
+			if( $edited_Item->ID > 0 )
+			{	// Get cat_ID from existing Item
+				$main_Chapter = $edited_Item->get_main_Chapter();
+				$cat = $main_Chapter->ID;
+			}
+			else
+			{	// Forums skin get cat_ID from $_GET
+				$cat = param( 'cat', 'integer', 0 );
+			}
 
-		if( $cat > 0 )
-		{	// Store a cat_ID
-			$Form->hidden( 'post_category', $cat );
-			$Form->hidden( 'cat', $cat );
-			$disp_edit_categories = false;
+			if( $cat > 0 )
+			{	// Store a cat_ID
+				$Form->hidden( 'post_category', $cat );
+				$Form->hidden( 'cat', $cat );
+				$disp_edit_categories = false;
+			}
 		}
+	}
+	else
+	{	// Don't allow to update the categories:
+		$disp_edit_categories = false;
 	}
 
 ?>
@@ -275,7 +282,14 @@ $Form->begin_form( 'inskin', '', $form_params );
 	}
 
 	// ################### TEXT RENDERERS ###################
-	$item_renderer_checkboxes = $edited_Item->get_renderer_checkboxes();
+	if( $Blog->get_setting( 'in_skin_editing_renderers' ) )
+	{	// If text renderers are allowed to update from front-office:
+		$item_renderer_checkboxes = $edited_Item->get_renderer_checkboxes();
+	}
+	else
+	{	// Don't allow to update the text renderers:
+		$item_renderer_checkboxes = false;
+	}
 	if( !empty( $item_renderer_checkboxes ) )
 	{
 		$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers' ) );

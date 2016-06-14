@@ -134,7 +134,7 @@ function init_inskin_editing()
 		$ItemCache = & get_ItemCache ();
 		$edited_Item = $ItemCache->get_by_ID ( $post_ID );
 
-		check_categories_nosave ( $post_category, $post_extracats );
+		check_categories_nosave( $post_category, $post_extracats, $edited_Item, 'frontoffice' );
 		$post_extracats = postcats_get_byID( $post_ID );
 
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit&p='.$post_ID, '&' );
@@ -157,7 +157,7 @@ function init_inskin_editing()
 
 		modules_call_method( 'constructor_item', array( 'Item' => & $edited_Item ) );
 
-		check_categories_nosave( $post_category, $post_extracats );
+		check_categories_nosave( $post_category, $post_extracats, $edited_Item, 'frontoffice' );
 
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit', '&' );
 	}
@@ -169,7 +169,7 @@ function init_inskin_editing()
 		$edited_Item = new Item();
 		$def_status = get_highest_publish_status( 'post', $Blog->ID, false );
 		$edited_Item->set( 'status', $def_status );
-		check_categories_nosave( $post_category, $post_extracats );
+		check_categories_nosave( $post_category, $post_extracats, $edited_Item, 'frontoffice' );
 		$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 
 		// Set default locations from current user
@@ -2306,15 +2306,26 @@ function check_cross_posting( & $post_category, & $post_extracats, $prev_main_ca
  *
  * Function is called during post creation or post update
  *
- * @param Object Post category (by reference).
- * @param Array Post extra categories (by reference).
+ * @param integer Post category ID (by reference).
+ * @param array Post extra categories IDs (by reference).
+ * @param object Item
+ * @param string From 'backoffice' or 'frontoffice'
  * @return boolean true - if there is no new category, or new category created succesfull; false if new category creation failed.
  */
-function check_categories( & $post_category, & $post_extracats )
+function check_categories( & $post_category, & $post_extracats, $Item = NULL, $from = 'backoffice' )
 {
-	$post_category = param( 'post_category', 'integer', -1 );
-	$post_extracats = param( 'post_extracats', 'array:integer', array() );
 	global $Messages, $Blog, $blog;
+
+	if( $from == 'backoffice' || empty( $Item ) || $Item->ID == 0 || $Blog->get_setting( 'in_skin_editing_category' ) )
+	{	// If this is back-office OR categories are allowed to update from front-office:
+		$post_category = param( 'post_category', 'integer', -1 );
+		$post_extracats = param( 'post_extracats', 'array:integer', array() );
+	}
+	else
+	{	// The updating of categories is not allowed, Use the current saved:
+		$post_category = $Item->get( 'main_cat_ID' );
+		$post_extracats = postcats_get_byID( $Item->ID );
+	}
 
 	load_class( 'chapters/model/_chaptercache.class.php', 'ChapterCache' );
 	$ChapterCache = & get_ChapterCache();
@@ -2363,7 +2374,7 @@ function check_categories( & $post_category, & $post_extracats )
 		global $current_User;
 		if( ! $current_User->check_perm( 'blog_cats', '', false, $Blog->ID ) )
 		{	// Current user cannot add a categories for this blog
-			check_categories_nosave( $post_category, $post_extracats); // set up the category parameters
+			check_categories_nosave( $post_category, $post_extracats, $Item, $from ); // set up the category parameters
 			$Messages->add( T_('You are not allowed to create a new category.'), 'error' );
 			return false;
 		}
@@ -2372,7 +2383,7 @@ function check_categories( & $post_category, & $post_extracats )
 		if( $category_name == '' )
 		{
 			$show_error = ! $post_category;	// new main category without name => error message
-			check_categories_nosave( $post_category, $post_extracats); // set up the category parameters
+			check_categories_nosave( $post_category, $post_extracats, $Item, $from ); // set up the category parameters
 			if( $show_error )
 			{ // new main category without name
 				$Messages->add( T_('Please provide a name for new category.'), 'error' );
@@ -2457,15 +2468,25 @@ function check_categories( & $post_category, & $post_extracats )
  * Delete non existing category from extracats
  * It is called after simple/expert tab switch, and can be called during post creation or modification
  *
- * @param Object Post category (by reference).
- * @param Array Post extra categories (by reference).
- *
+ * @param integer Post category (by reference).
+ * @param array Post extra categories (by reference).
+ * @param object Item
+ * @param string From 'backoffice' or 'frontoffice'
  */
-function check_categories_nosave( & $post_category, & $post_extracats )
+function check_categories_nosave( & $post_category, & $post_extracats, $Item = NULL, $from = 'backoffice' )
 {
 	global $Blog;
-	$post_category = param( 'post_category', 'integer', $Blog->get_default_cat_ID() );
-	$post_extracats = param( 'post_extracats', 'array:integer', array() );
+
+	if( $from == 'backoffice' || empty( $Item ) || $Item->ID == 0 || $Blog->get_setting( 'in_skin_editing_category' ) )
+	{	// If this is back-office OR categories are allowed to update from front-office:
+		$post_category = param( 'post_category', 'integer', $Blog->get_default_cat_ID() );
+		$post_extracats = param( 'post_extracats', 'array:integer', array() );
+	}
+	else
+	{	// The updating of categories is not allowed, Use the current saved:
+		$post_category = $Item->get( 'main_cat_ID' );
+		$post_extracats = postcats_get_byID( $Item->ID );
+	}
 
 	if( ! $post_category )	// if category key is 0 => means it is a new category
 	{
@@ -2473,7 +2494,7 @@ function check_categories_nosave( & $post_category, & $post_extracats )
 		param( 'new_maincat', 'boolean', 1 );
 	}
 
-	if( ! empty( $post_extracats) && ( ( $extracat_key = array_search( '0', $post_extracats ) ) || $post_extracats[0] == '0' ) )
+	if( ! empty( $post_extracats ) && ( ( $extracat_key = array_search( '0', $post_extracats ) ) || $post_extracats[0] == '0' ) )
 	{
 		param( 'new_extracat', 'boolean', 1 );
 		if( $extracat_key )
