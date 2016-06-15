@@ -179,7 +179,7 @@ switch( $action )
 			// We want to highlight the edited object on next list display:
 			// $Session->set( 'fadeout_array', array( 'blog_ID' => array($edited_Blog->ID) ) );
 
-			header_redirect( $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
+			header_redirect( $edited_Blog->gen_blogurl() );// will save $Messages into Session
 		}
 		break;
 
