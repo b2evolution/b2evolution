@@ -316,7 +316,7 @@ function display_attachments( & $LinkOwner, $params = array() )
 		if( $current_User->check_perm( 'files', 'edit' ) )
 		{ // display delete link action
 			$delete_url = $samedomain_htsrv_url.'action.php?mname=collections&amp;action=unlink&amp;link_ID='.$Link->ID.'&amp;crumb_collections_unlink='.get_crumb( 'collections_unlink' ).'&amp;redirect_to='.$redirect_to;
-			echo action_icon( T_( 'Delete' ), 'delete', $delete_url );
+			echo action_icon( T_('Remove'), 'remove', $delete_url );
 		}
 		echo '</td></tr>';
 	}
