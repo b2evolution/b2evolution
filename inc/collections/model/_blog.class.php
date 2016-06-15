@@ -271,7 +271,7 @@ class Blog extends DataObject
 				$this->set( 'type', 'main' );
 				$this->set( 'name', empty( $name ) ? T_('Homepage Title') : $name );
 				$this->set( 'shortname', empty( $shortname ) ? T_('Home') : $shortname );
-				$this->set( 'urlname', empty( $urlname ) ? 'main' : $urlname );
+				$this->set( 'urlname', empty( $urlname ) ? 'home' : $urlname );
 				$this->set_setting( 'front_disp', 'front' );
 				$this->set_setting( 'aggregate_coll_IDs', '*' );
 				$this->set_setting( 'in_skin_login', '1' );
@@ -279,9 +279,9 @@ class Blog extends DataObject
 
 			case 'photo':
 				$this->set( 'type', 'photo' );
-				$this->set( 'name', empty($name) ? T_('My photoblog') : $name );
-				$this->set( 'shortname', empty($shortname) ? T_('Photoblog') : $shortname );
-				$this->set( 'urlname', empty($urlname) ? 'photo' : $urlname );
+				$this->set( 'name', empty($name) ? T_('Photos') : $name );
+				$this->set( 'shortname', empty($shortname) ? T_('Photos') : $shortname );
+				$this->set( 'urlname', empty($urlname) ? 'photos' : $urlname );
 				$this->set_setting( 'posts_per_page', 12 );
 				$this->set_setting( 'archive_mode', 'postbypost' );
 				$this->set_setting( 'front_disp', 'posts' );
@@ -299,17 +299,17 @@ class Blog extends DataObject
 
 			case 'group':
 				$this->set( 'type', 'group' );
-				$this->set( 'name', empty($name) ? T_('Our blog') : $name );
-				$this->set( 'shortname', empty($shortname) ? T_('Group') : $shortname );
-				$this->set( 'urlname', empty($urlname) ? 'group' : $urlname );
+				$this->set( 'name', empty($name) ? T_('Tracker Title') : $name );
+				$this->set( 'shortname', empty($shortname) ? T_('Tracker') : $shortname );
+				$this->set( 'urlname', empty($urlname) ? 'tracker' : $urlname );
 				$this->set_setting( 'use_workflow', 1 );
 				break;
 
 			case 'forum':
 				$this->set( 'type', 'forum' );
-				$this->set( 'name', empty($name) ? T_('My forum') : $name );
-				$this->set( 'shortname', empty($shortname) ? T_('Forum') : $shortname );
-				$this->set( 'urlname', empty($urlname) ? 'forum' : $urlname );
+				$this->set( 'name', empty($name) ? T_('Forums Title') : $name );
+				$this->set( 'shortname', empty($shortname) ? T_('Forums') : $shortname );
+				$this->set( 'urlname', empty($urlname) ? 'forums' : $urlname );
 				$this->set( 'advanced_perms', 1 );
 				$this->set_setting( 'post_navigation', 'same_category' );
 				$this->set_setting( 'allow_comments', 'registered' );
@@ -337,7 +337,7 @@ class Blog extends DataObject
 
 			case 'manual':
 				$this->set( 'type', 'manual' );
-				$this->set( 'name', empty($name) ? T_('Manual') : $name );
+				$this->set( 'name', empty($name) ? T_('Manual Title') : $name );
 				$this->set( 'shortname', empty($shortname) ? T_('Manual') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'manual' : $urlname );
 				$this->set_setting( 'post_navigation', 'same_category' );
@@ -361,7 +361,7 @@ class Blog extends DataObject
 			case 'std':
 			default:
 				$this->set( 'type', 'std' );
-				$this->set( 'name', empty($name) ? T_('My weblog') : $name );
+				$this->set( 'name', empty($name) ? T_('Public Blog') : $name );
 				$this->set( 'shortname', empty($shortname) ? T_('Blog') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'blog' : $urlname );
 				break;
@@ -717,6 +717,16 @@ class Blog extends DataObject
 			$this->set_setting( 'default_post_status', param( 'default_post_status', 'string', NULL ) );
 
 			$this->set_setting( 'post_categories', param( 'post_categories', 'string', NULL ) );
+
+			if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
+			{	// We have permission to edit advanced admin settings:
+				$this->set_setting( 'in_skin_editing', param( 'in_skin_editing', 'integer', 0 ) );
+				if( $this->get_setting( 'in_skin_editing' ) )
+				{
+					$this->set_setting( 'in_skin_editing_renderers', param( 'in_skin_editing_renderers', 'integer', 0 ) );
+					$this->set_setting( 'in_skin_editing_category', param( 'in_skin_editing_category', 'integer', 0 ) );
+				}
+			}
 
 			$this->set_setting( 'post_navigation', param( 'post_navigation', 'string', NULL ) );
 

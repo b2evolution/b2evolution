@@ -866,15 +866,22 @@ class Item extends ItemLight
 		modules_call_method( 'update_item_settings', array( 'edited_Item' => $this ) );
 
 		// RENDERERS:
-		if( param( 'renderers_displayed', 'integer', 0 ) )
-		{ // use "renderers" value only if it has been displayed (may be empty)
-			global $Plugins;
-			$renderers = $Plugins->validate_renderer_list( param( 'renderers', 'array:string', array() ), array( 'Item' => & $this ) );
-			$this->set( 'renderers', $renderers );
+		if( is_admin_page() || $item_Blog->get_setting( 'in_skin_editing_renderers' ) )
+		{	// If text renderers are allowed to update from front-office:
+			if( param( 'renderers_displayed', 'integer', 0 ) )
+			{	// Use "renderers" value only if it has been displayed (may be empty):
+				global $Plugins;
+				$renderers = $Plugins->validate_renderer_list( param( 'renderers', 'array:string', array() ), array( 'Item' => & $this ) );
+				$this->set( 'renderers', $renderers );
+			}
+			else
+			{
+				$renderers = $this->get_renderers_validated();
+			}
 		}
 		else
-		{
-			$renderers = $this->get_renderers_validated();
+		{	// Don't allow to update the text renderers:
+			$renderers = $this->get_renderers();
 		}
 
 		// CONTENT + TITLE:
@@ -6862,7 +6869,7 @@ class Item extends ItemLight
 				return $this->check_notifications_flags( 'pings_sent' );
 
 			case 'excerpt':
-				return $this->get_excerpt2();
+				return $this->get_excerpt2( array( 'update_db' => false )  );
 
 			case 'notifications_flags':
 				return empty( $this->notifications_flags ) ? array() : explode( ',', $this->notifications_flags );

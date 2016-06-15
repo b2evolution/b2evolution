@@ -134,7 +134,7 @@ function init_inskin_editing()
 		$ItemCache = & get_ItemCache ();
 		$edited_Item = $ItemCache->get_by_ID ( $post_ID );
 
-		check_categories_nosave ( $post_category, $post_extracats );
+		check_categories_nosave( $post_category, $post_extracats, $edited_Item, 'frontoffice' );
 		$post_extracats = postcats_get_byID( $post_ID );
 
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit&p='.$post_ID, '&' );
@@ -157,7 +157,7 @@ function init_inskin_editing()
 
 		modules_call_method( 'constructor_item', array( 'Item' => & $edited_Item ) );
 
-		check_categories_nosave( $post_category, $post_extracats );
+		check_categories_nosave( $post_category, $post_extracats, $edited_Item, 'frontoffice' );
 
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit', '&' );
 	}
@@ -169,7 +169,7 @@ function init_inskin_editing()
 		$edited_Item = new Item();
 		$def_status = get_highest_publish_status( 'post', $Blog->ID, false );
 		$edited_Item->set( 'status', $def_status );
-		check_categories_nosave( $post_category, $post_extracats );
+		check_categories_nosave( $post_category, $post_extracats, $edited_Item, 'frontoffice' );
 		$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 
 		// Set default locations from current user
@@ -625,7 +625,12 @@ function get_allowed_statuses_condition( $statuses, $dbprefix, $req_blog, $perm_
 	// init allowed statuses array
 	$allowed_statuses = array();
 
+	// Check if current user is logged in:
 	$is_logged_in = is_logged_in( false );
+
+	// Check if current user is member of the requested collection OR member of ALL collections when $req_blog === NULL (collection administrators):
+	$is_member = $is_logged_in && $current_User->check_perm( 'blog_ismember', 1, false, $req_blog );
+
 	$creator_coll_name = ( $dbprefix == 'post_' ) ? $dbprefix.'creator_user_ID' : $dbprefix.'author_user_ID';
 	// Iterate through all statuses and set allowed to true only if the corresponding status is allowed in case of any post/comments
 	// If the status is not allowed to show, but exists further conditions which may allow it, then set the condition.
@@ -633,16 +638,64 @@ function get_allowed_statuses_condition( $statuses, $dbprefix, $req_blog, $perm_
 	{
 		switch( $status )
 		{
-			case 'published': // Published post/comments are always allowed
-				$allowed = true;
+			case 'published':
+				if( $is_member )
+				{	// Published post/comments are always allowed for members:
+					$allowed = true;
+					break;
+				}
+				$BlogCache = & get_BlogCache();
+				if( ! ( $req_Blog = & $BlogCache->get_by_ID( $req_blog, false, false ) ) )
+				{	// Collection request without ID, can be used for coll admins:
+					$allowed = false;
+					break;
+				}
+				// Published post/comments are allowed depending on collection access level:
+				switch( $req_Blog->get_setting( 'allow_access' ) )
+				{
+					case 'members':
+						// Only for collection members:
+						$allowed = $is_member;
+						break;
+					case 'users':
+						// Only for logged in users:
+						$allowed = $is_logged_in;
+						break;
+					default: // 'public'
+						// Always:
+						$allowed = true;
+						break;
+				}
 				break;
 
-			case 'community': // It is always allowed for logged in users
-				$allowed = $is_logged_in;
+			case 'community':
+				if( $is_member )
+				{	// Community post/comments are always allowed for members:
+					$allowed = true;
+					break;
+				}
+				$BlogCache = & get_BlogCache();
+				if( ! ( $req_Blog = & $BlogCache->get_by_ID( $req_blog, false, false ) ) )
+				{	// Collection request without ID, can be used for coll admins:
+					$allowed = false;
+					break;
+				}
+				// Community post/comments are allowed depending on collection access level:
+				switch( $req_Blog->get_setting( 'allow_access' ) )
+				{
+					case 'members':
+						// Only for collection members:
+						$allowed = $is_member;
+						break;
+					default: // 'public' or 'users'
+						// Only for logged in users:
+						$allowed = $is_logged_in;
+						break;
+				}
 				break;
 
 			case 'protected': // It is always allowed for members
-				$allowed = ( $is_logged_in && ( $current_User->check_perm( 'blog_ismember', 1, false, $req_blog ) ) );
+				$allowed = $is_member;
 				break;
 
 			case 'private': // It is allowed for users who has global 'editall' permission
@@ -2254,6 +2307,11 @@ function check_cross_posting( & $post_category, & $post_extracats, $prev_main_ca
 	$post_category = param( 'post_category', 'integer', -1 );
 	$post_extracats = param( 'post_extracats', 'array:integer', array() );
 
+	if( empty( $post_category ) )
+	{	// Don't check because new category is created only in current collection:
+		return true;
+	}
+
 	if( is_null( $prev_main_cat ) )
 	{ // new item, no need to check for previous main category
 		$prev_main_cat = $post_category;
@@ -2265,6 +2323,10 @@ function check_cross_posting( & $post_category, & $post_extracats, $prev_main_ca
 	// Check if any of the extracats belong to a blog other than the current one
 	foreach( $post_extracats as $key => $cat )
 	{
+		if( empty( $cat ) )
+		{	// Skip a checking for new creating category:
+			continue;
+		}
 		$cat_blog = get_catblog( $cat );
 		if( ( $cat_blog != $post_cat_blog ) && ! ( $allow_cross_posting % 2 == 1 && $current_User->check_perm( 'blog_admin', '', false, $cat_blog ) ) )
 		{ // this cat is not from the main category
@@ -2297,15 +2359,26 @@ function check_cross_posting( & $post_category, & $post_extracats, $prev_main_ca
  *
  * Function is called during post creation or post update
  *
- * @param Object Post category (by reference).
- * @param Array Post extra categories (by reference).
+ * @param integer Post category ID (by reference).
+ * @param array Post extra categories IDs (by reference).
+ * @param object Item
+ * @param string From 'backoffice' or 'frontoffice'
  * @return boolean true - if there is no new category, or new category created succesfull; false if new category creation failed.
  */
-function check_categories( & $post_category, & $post_extracats )
+function check_categories( & $post_category, & $post_extracats, $Item = NULL, $from = 'backoffice' )
 {
-	$post_category = param( 'post_category', 'integer', -1 );
-	$post_extracats = param( 'post_extracats', 'array:integer', array() );
 	global $Messages, $Blog, $blog;
+
+	if( $from == 'backoffice' || empty( $Item ) || $Item->ID == 0 || $Blog->get_setting( 'in_skin_editing_category' ) )
+	{	// If this is back-office OR categories are allowed to update from front-office:
+		$post_category = param( 'post_category', 'integer', -1 );
+		$post_extracats = param( 'post_extracats', 'array:integer', array() );
+	}
+	else
+	{	// The updating of categories is not allowed, Use the current saved:
+		$post_category = $Item->get( 'main_cat_ID' );
+		$post_extracats = postcats_get_byID( $Item->ID );
+	}
 
 	load_class( 'chapters/model/_chaptercache.class.php', 'ChapterCache' );
 	$ChapterCache = & get_ChapterCache();
@@ -2354,7 +2427,7 @@ function check_categories( & $post_category, & $post_extracats )
 		global $current_User;
 		if( ! $current_User->check_perm( 'blog_cats', '', false, $Blog->ID ) )
 		{	// Current user cannot add a categories for this blog
-			check_categories_nosave( $post_category, $post_extracats); // set up the category parameters
+			check_categories_nosave( $post_category, $post_extracats, $Item, $from ); // set up the category parameters
 			$Messages->add( T_('You are not allowed to create a new category.'), 'error' );
 			return false;
 		}
@@ -2363,7 +2436,7 @@ function check_categories( & $post_category, & $post_extracats )
 		if( $category_name == '' )
 		{
 			$show_error = ! $post_category;	// new main category without name => error message
-			check_categories_nosave( $post_category, $post_extracats); // set up the category parameters
+			check_categories_nosave( $post_category, $post_extracats, $Item, $from ); // set up the category parameters
 			if( $show_error )
 			{ // new main category without name
 				$Messages->add( T_('Please provide a name for new category.'), 'error' );
@@ -2448,15 +2521,25 @@ function check_categories( & $post_category, & $post_extracats )
  * Delete non existing category from extracats
  * It is called after simple/expert tab switch, and can be called during post creation or modification
  *
- * @param Object Post category (by reference).
- * @param Array Post extra categories (by reference).
- *
+ * @param integer Post category (by reference).
+ * @param array Post extra categories (by reference).
+ * @param object Item
+ * @param string From 'backoffice' or 'frontoffice'
  */
-function check_categories_nosave( & $post_category, & $post_extracats )
+function check_categories_nosave( & $post_category, & $post_extracats, $Item = NULL, $from = 'backoffice' )
 {
 	global $Blog;
-	$post_category = param( 'post_category', 'integer', $Blog->get_default_cat_ID() );
-	$post_extracats = param( 'post_extracats', 'array:integer', array() );
+
+	if( $from == 'backoffice' || empty( $Item ) || $Item->ID == 0 || $Blog->get_setting( 'in_skin_editing_category' ) )
+	{	// If this is back-office OR categories are allowed to update from front-office:
+		$post_category = param( 'post_category', 'integer', $Blog->get_default_cat_ID() );
+		$post_extracats = param( 'post_extracats', 'array:integer', array() );
+	}
+	else
+	{	// The updating of categories is not allowed, Use the current saved:
+		$post_category = $Item->get( 'main_cat_ID' );
+		$post_extracats = postcats_get_byID( $Item->ID );
+	}
 
 	if( ! $post_category )	// if category key is 0 => means it is a new category
 	{
@@ -2464,7 +2547,7 @@ function check_categories_nosave( & $post_category, & $post_extracats )
 		param( 'new_maincat', 'boolean', 1 );
 	}
 
-	if( ! empty( $post_extracats) && ( ( $extracat_key = array_search( '0', $post_extracats ) ) || $post_extracats[0] == '0' ) )
+	if( ! empty( $post_extracats ) && ( ( $extracat_key = array_search( '0', $post_extracats ) ) || $post_extracats[0] == '0' ) )
 	{
 		param( 'new_extracat', 'boolean', 1 );
 		if( $extracat_key )

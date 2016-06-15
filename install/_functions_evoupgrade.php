@@ -7573,6 +7573,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11790, 'Rename table "T_antispam" to "T_antispam__keyword"...' ) )
+	{	// part of 6.7.4-stable
+		$DB->query( 'RENAME TABLE '.$tableprefix.'antispam TO T_antispam__keyword' );
+		$DB->query( "ALTER TABLE T_antispam__keyword
+			CHANGE aspm_ID     askw_ID     bigint(11) NOT NULL auto_increment,
+			CHANGE aspm_string askw_string varchar(80) NOT NULL,
+			CHANGE aspm_source askw_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported',
+			DROP INDEX aspm_string,
+			ADD UNIQUE askw_string ( askw_string )" );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

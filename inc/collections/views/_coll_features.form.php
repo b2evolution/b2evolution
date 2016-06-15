@@ -106,6 +106,15 @@ $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_setting
 			array( 'no_cat_post', T_('Don\'t allow category selections'), T_('(Main cat will be assigned automatically)') ) ),
 			T_('Post category options'), true );
 
+	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+	{	// Permission to edit advanced admin settings:
+		$Form->checklist( array(
+				array( 'in_skin_editing', 1, T_('Allow posting/editing from the Front-Office').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing' ) ),
+				array( 'in_skin_editing_renderers', 1, T_('Allow Text Renderers selection in Front-Office edit screen').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing_renderers' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) ),
+				array( 'in_skin_editing_category', 1, T_('Allow Category selection in Front-Office edit screen').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing_category' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) ),
+			), 'front_office_posting', T_('Front-Office posting') );
+	}
+
 	$Form->radio( 'post_navigation', $edited_Blog->get_setting('post_navigation'),
 		array( array( 'same_blog', T_('same blog') ),
 			array( 'same_category', T_('same category') ),
@@ -213,3 +222,18 @@ $Form->end_fieldset();
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>
+<script type="text/javascript">
+jQuery( 'input[name=in_skin_editing]' ).click( function()
+{
+	if( jQuery( this ).is( ':checked' ) )
+	{
+		jQuery( 'input[name=in_skin_editing_renderers]' ).removeAttr( 'disabled' );
+		jQuery( 'input[name=in_skin_editing_category]' ).removeAttr( 'disabled' );
+	}
+	else
+	{
+		jQuery( 'input[name=in_skin_editing_renderers]' ).attr( 'disabled', 'disabled' );
+		jQuery( 'input[name=in_skin_editing_category]' ).attr( 'disabled', 'disabled' );
+	}
+} );
+</script>

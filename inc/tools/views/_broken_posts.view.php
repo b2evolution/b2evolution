@@ -33,11 +33,41 @@ $Results->cols[] = array(
 	'td' => '$post_ID$',
 );
 
+
+/**
+ * Get a link to edit post if current user has a permission
+ *
+ * @param integer Post ID
+ * @param string Post title
+ * @return string
+ */
+function broken_post_edit_link( $post_ID, $post_title )
+{
+	global $current_User, $blog;
+
+	if( ! $current_User->check_perm( 'blogs', 'editall' ) )
+	{ // User has no permission, Display only post title as text
+		return $post_title;
+	}
+
+	if( empty( $blog ) )
+	{ // Set this variable, otherwise super admin will see only debug die error and cannot edit the broken posts
+		$blog = 1;
+	}
+
+	$ItemCache = & get_ItemCache();
+	$Item = & $ItemCache->get_by_ID( $post_ID, false, false );
+
+	// Display a link to edit a post
+	return $Item->get_edit_link( array(
+			'text' => $post_title,
+		) );
+}
 $Results->cols[] = array(
 	'th' => T_('Title'),
 	'th_class' => 'nowrap',
 	'order' => 'post_title',
-	'td' => '$post_title$',
+	'td' => '%broken_post_edit_link( #post_ID#, #post_title# )%',
 	'td_class' => 'small',
 );
 

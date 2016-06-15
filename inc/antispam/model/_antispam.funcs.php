@@ -37,8 +37,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * antispam_create(-)
  *
  * Insert a new abuse string into DB
+ *
+ * @param string Abuse string
+ * @param string Keyword source
+ * @return boolean TRUE if antispam keyword was inserted, FALSE if abuse string is empty or keyword is already in DB
  */
-function antispam_create( $abuse_string, $aspm_source = 'local' )
+function antispam_create( $abuse_string, $keyword_source = 'local' )
 {
 	global $DB;
 
@@ -50,15 +54,14 @@ function antispam_create( $abuse_string, $aspm_source = 'local' )
 	}
 
 	// Check if the string already is in the blacklist:
-	if( antispam_check($abuse_string) )
+	if( antispam_check( $abuse_string ) )
 	{
 		return false;
 	}
 
 	// Insert new string into DB:
-	$sql = "INSERT INTO T_antispam( aspm_string, aspm_source )
-					VALUES( '".$DB->escape($abuse_string)."', '$aspm_source' )";
-	$DB->query( $sql );
+	$DB->query( 'INSERT INTO T_antispam__keyword ( askw_string, askw_source )
+		VALUES ( '.$DB->quote( $abuse_string ).', '.$DB->quote( $keyword_source ).' )' );
 
 	return true;
 }
@@ -69,29 +72,32 @@ function antispam_create( $abuse_string, $aspm_source = 'local' )
  *
  * Note: We search by string because we sometimes don't know the ID
  * (e-g when download already in list/cache)
+ *
+ * @param string Abuse string
+ * @param string Keyword source
  */
-function antispam_update_source( $aspm_string, $aspm_source )
+function antispam_update_source( $abuse_string, $keyword_source )
 {
 	global $DB;
 
-	$sql = "UPDATE T_antispam
-					SET aspm_source = '$aspm_source'
-					WHERE aspm_string = '".$DB->escape($aspm_string)."'";
-	$DB->query( $sql );
+	$DB->query( 'UPDATE T_antispam__keyword
+		SET askw_source = '.$DB->quote( $keyword_source ).'
+		WHERE askw_string = '.$DB->quote( $abuse_string ) );
 }
 
 /*
  * antispam_delete(-)
  *
  * Remove an entry from the ban list
+ *
+ * @param integer antispam keyword ID
  */
-function antispam_delete( $string_ID )
+function antispam_delete( $keyword_ID )
 {
 	global $DB;
 
-	$sql = "DELETE FROM T_antispam
-					WHERE aspm_ID = $string_ID";
-	$DB->query( $sql );
+	$DB->query( 'DELETE FROM T_antispam__keyword
+		WHERE askw_ID = '.intval( $keyword_ID ) );
 }
 
 
@@ -116,13 +122,13 @@ function antispam_check( $haystack )
 {
 	global $DB, $Debuglog, $Timer;
 
-	// TODO: 'SELECT COUNT(*) FROM T_antispam WHERE aspm_string LIKE "%'.$url.'%" ?
+	// TODO: 'SELECT COUNT(*) FROM T_antispam__keyword WHERE askw_string LIKE "%'.$url.'%" ?
 
 	$Timer->resume( 'antispam_url' ); // resuming to get the total number..
 	$block = $DB->get_var(
-		'SELECT aspm_string
-		   FROM  T_antispam
-		  WHERE '.$DB->quote($haystack).' LIKE CONCAT("%",aspm_string,"%")
+		'SELECT askw_string
+		   FROM  T_antispam__keyword
+		  WHERE '.$DB->quote( $haystack ).' LIKE CONCAT("%",askw_string,"%")
 		  LIMIT 0, 1', 0, 0, 'Check URL against antispam blacklist' );
 	if( $block )
 	{

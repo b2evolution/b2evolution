@@ -1054,6 +1054,12 @@ class User extends DataObject
 				}
 
 			}
+
+			if( $_POST['edited_user_pass1'] != trim( $_POST['edited_user_pass1'] ) ||
+			    $_POST['edited_user_pass2'] != trim( $_POST['edited_user_pass2'] ) )
+			{ // If new password was entered with spaces then inform user about this
+				$Messages->add( T_('The leading and traling spaces have been trimmed from the new password.'), 'warning' );
+			}
 		}
 
 

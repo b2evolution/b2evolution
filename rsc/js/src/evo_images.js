@@ -10,13 +10,13 @@ jQuery( document ).ready( function()
 	{
 		if( jQuery( this ).prop( 'complete' ) )
 		{	// If image is loaded from cache:
-			jQuery( this ).addClass( 'loadimg_loaded' );
+			jQuery( this ).removeClass( 'loadimg' );
 		}
 		else
 		{	// After image has been loaded:
 			jQuery( this ).on( 'load', function()
 			{
-				jQuery( this ).addClass( 'loadimg_loaded' );
+				jQuery( this ).removeClass( 'loadimg' );
 			} );
 		}
 	} );
