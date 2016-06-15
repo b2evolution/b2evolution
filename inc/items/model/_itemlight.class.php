@@ -1368,7 +1368,7 @@ class ItemLight extends DataObject
 
 
 	/**
-	 * Template tag: get excerpt 
+	 * Template tag: get excerpt
 	 * This light version does display only. It never tries to auto-generate the excerpt.
 	 *
 	 *  May be used in ItemLight lists such as sitemaps, feeds, recent posts, post widgets where the exceprt might be used as a title, etc.
