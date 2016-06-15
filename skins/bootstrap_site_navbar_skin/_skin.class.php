@@ -78,6 +78,29 @@ class bootstrap_site_navbar_Skin extends Skin
 
 
 	/**
+	 * Get definitions for editable params
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 * @return array
+	 */
+	function get_param_definitions( $params )
+	{
+		$r = array_merge( array(
+				'grouping' => array(
+					'label' => T_('Grouping'),
+					'note' => T_('Check to group collections into tabs'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
+				),
+
+			), parent::get_param_definitions( $params ) );
+
+		return $r;
+	}
+
+
+	/**
 	 * Get ready for displaying the site skin.
 	 *
 	 * This may register some CSS or JS...

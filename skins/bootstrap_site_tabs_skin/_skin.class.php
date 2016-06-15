@@ -102,6 +102,12 @@ class bootstrap_site_tabs_Skin extends Skin
 								array( 'custom.min.css', 'custom.min.css', 0 ),
 							)
 					),
+					'grouping' => array(
+						'label' => T_('Grouping'),
+						'note' => T_('Check to group collections into tabs'),
+						'type' => 'checkbox',
+						'defaultvalue' => 1,
+					),
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
 				),

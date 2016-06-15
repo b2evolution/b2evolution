@@ -35,7 +35,7 @@ else
 	<div class="swhead_menus">
 		<div class="container-fluid level1">
 
-			<nav>				
+			<nav>
 				<div class="pull-right">
 	<?php
 		// Optional display params for widgets below
@@ -120,7 +120,8 @@ else
 <?php
 				}
 
-				// Get all skin header tabs:
+			if( $site_Skin->get_setting( 'grouping' ) )
+			{	// Display the grouped header tabs:
 				$header_tabs = $site_Skin->get_header_tabs();
 
 				foreach( $header_tabs as $s => $header_tab )
@@ -131,6 +132,77 @@ else
 					</li>
 <?php
 				}
+			}
+			else
+			{	// Display not grouped header tabs:
+
+				// --------------------------------- START OF COLLECTION LIST --------------------------------
+				// Call widget directly (without container):
+				skin_widget( array(
+									// CODE for the widget:
+									'widget' => 'colls_list_public',
+									// Optional display params
+									'block_start' => '',
+									'block_end' => '',
+									'block_display_title' => false,
+									'list_start' => '',
+									'list_end' => '',
+									'item_start' => '<li>',
+									'item_end' => '</li>',
+									'item_selected_start' => '<li class="active">',
+									'item_selected_end' => '</li>',
+									'link_selected_class' => 'active',
+									'link_default_class' => '',
+							) );
+				// ---------------------------------- END OF COLLECTION LIST ---------------------------------
+
+				if( $Settings->get( 'info_blog_ID' ) > 0 )
+				{	// We have a collection for info pages:
+					// --------------------------------- START OF PAGES LIST --------------------------------
+					// Call widget directly (without container):
+					skin_widget( array(
+									// CODE for the widget:
+									'widget' => 'coll_page_list',
+									// Optional display params
+									'block_start' => '',
+									'block_end' => '',
+									'block_display_title' => false,
+									'list_start' => '',
+									'list_end' => '',
+									'item_start' => '<li>',
+									'item_end' => '</li>',
+									'item_selected_start' => '<li class="active">',
+									'item_selected_end' => '</li>',
+									'link_selected_class' => 'active',
+									'link_default_class' => '',
+									'blog_ID' => $Settings->get( 'info_blog_ID' ),
+									'item_group_by' => 'none',
+									'order_by' => 'order',		// Order (as explicitly specified)
+							) );
+					// ---------------------------------- END OF PAGES LIST ---------------------------------
+				}
+
+				// --------------------------------- START OF CONTACT LINK --------------------------------
+				// Call widget directly (without container):
+				skin_widget( array(
+									// CODE for the widget:
+									'widget' => 'menu_link',
+									// Optional display params
+									'block_start' => '',
+									'block_end' => '',
+									'block_display_title' => false,
+									'list_start' => '',
+									'list_end' => '',
+									'item_start' => '<li>',
+									'item_end' => '</li>',
+									'item_selected_start' => '<li class="active">',
+									'item_selected_end' => '</li>',
+									'link_selected_class' => 'active',
+									'link_default_class' => '',
+									'link_type' => 'ownercontact',
+							) );
+				// --------------------------------- END OF CONTACT LINK --------------------------------
+			}
 ?>
 				</ul>
 			</nav>
@@ -138,7 +210,9 @@ else
 		</div><?php // END OF <div class="container-fluid level1"> ?>
 
 <?php
-if( isset( $header_tabs[ $site_Skin->header_tab_active ] ) && count( $header_tabs[ $site_Skin->header_tab_active ]['items'] ) > 1 )
+if( $site_Skin->get_setting( 'grouping' ) &&
+    isset( $header_tabs[ $site_Skin->header_tab_active ] ) &&
+    count( $header_tabs[ $site_Skin->header_tab_active ]['items'] ) > 1 )
 {	// Display sub menus of the selected level 0 tab only when at least two exist:
 ?>
 <div class="container-fluid level2">
