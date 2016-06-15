@@ -85,6 +85,80 @@ switch( $action )
 		}
 		$action = 'source_edit';
 		break;
+
+	case 'import':
+		if( ! param( 'confirm', 'integer', 0 ) )
+		{	// The import action must be confirmed:
+			break;
+		}
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'cakeywordsimport' );
+
+		$DB->begin();
+
+		$keywords_SQL = new SQL( 'Get keywords that will be imported as local reports' );
+		$keywords_SQL->SELECT( 'askw_string' );
+		$keywords_SQL->FROM( 'T_antispam__keyword' );
+		$keywords_SQL->WHERE( 'askw_string NOT IN ( SELECT cakw_keyword FROM T_centralantispam__keyword )' );
+		$keywords = $DB->get_col( $keywords_SQL->get(), 0, $keywords_SQL->title );
+
+		$keywords_imported_count = 0;
+		if( count( $keywords ) )
+		{	// If there are new keywords to import:
+			$time_difference = $Settings->get( 'time_difference' );
+
+			// Check if the Reporter/Source already exists in DB
+			$source_SQL = new SQL( 'Get source of current baseurl for central antispam' );
+			$source_SQL->SELECT( 'casrc_ID, casrc_status' );
+			$source_SQL->FROM( 'T_centralantispam__source' );
+			$source_SQL->WHERE( 'casrc_baseurl = '.$DB->quote( $baseurl ) );
+			$source_row = $DB->get_row( $source_SQL->get(), ARRAY_A, NULL, $source_SQL->title );
+			$source_ID = empty( $source_row ) ? 0 : intval( $source_row['casrc_ID'] );
+
+			if( empty( $source_ID ) )
+			{	// Create new reporter if it doesn't exist in DB yet:
+				$DB->query( 'INSERT INTO T_centralantispam__source
+						( casrc_baseurl, casrc_status ) VALUES
+						( '.$DB->quote( $baseurl ).', "trusted" )' );
+				$source_ID = $DB->insert_id;
+			}
+			elseif( $source_row['casrc_status'] != 'trusted' )
+			{	// Make current baseurl as trusted source:
+				$DB->query( 'UPDATE T_centralantispam__source
+					SET   casrc_status = "trusted"
+					WHERE casrc_ID = '.$source_ID );
+			}
+
+			$keywords_reports = array();
+			foreach( $keywords as $keyword )
+			{
+				$keyword_timestamp = date( 'Y-m-d H:i:s', ( time() + $time_difference ) );
+				// Insert new keyword:
+				$query_result = $DB->query( 'INSERT INTO T_centralantispam__keyword
+						( cakw_keyword, cakw_status, cakw_lastreport_ts ) VALUES
+						( '.$DB->quote( $keyword ).', "published", '.$DB->quote( $keyword_timestamp ).' )' );
+				if( $query_result )
+				{	// If new keyword has been inserted:
+					$keywords_imported_count++;
+					$keyword_ID = $DB->insert_id;
+					$keywords_reports[] = '( '.$DB->insert_id.', '.$source_ID.', '.$DB->quote( $keyword_timestamp ).' )';
+				}
+			}
+
+			if( $keywords_imported_count )
+			{	// Insert reports to know from what host new keyword was added:
+				$DB->query( 'INSERT INTO T_centralantispam__report
+					( carpt_cakw_ID, carpt_casrc_ID, carpt_ts ) VALUES '
+					.implode( ', ', $keywords_reports ) );
+			}
+		}
+
+		$Messages->add( sprintf( $central_antispam_Module->T_('%d new keywords have been imported as local reports.'), $keywords_imported_count ), 'success' );
+
+		$DB->commit();
+		$action = '';
+		break;
 }
 
 // Highlight the requested tab (if valid):
@@ -96,6 +170,10 @@ switch( $tab )
 {
 	case 'keywords':
 		$AdminUI->breadcrumbpath_add( $central_antispam_Module->T_('Keywords'), $admin_url.'?ctrl=central_antispam&amp;tab='.$tab );
+		if( $action == 'import' )
+		{
+			$AdminUI->breadcrumbpath_add( $central_antispam_Module->T_('Import'), $admin_url.'?ctrl=central_antispam&amp;action='.$action );
+		}
 		break;
 
 	case 'reporters':
@@ -119,6 +197,10 @@ switch( $action )
 
 	case 'source_edit':
 		$AdminUI->disp_view( 'central_antispam/views/_sources.form.php' );
+		break;
+
+	case 'import':
+		$AdminUI->disp_view( 'central_antispam/views/_keywords_import.view.php' );
 		break;
 
 	default:

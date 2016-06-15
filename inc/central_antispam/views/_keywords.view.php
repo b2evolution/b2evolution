@@ -41,6 +41,8 @@ $Results = new Results( $SQL->get(), 'cakw_', '-A', $UserSettings->get( 'results
 
 $Results->title = $central_antispam_Module->T_('Keywords');
 
+$Results->global_icon( $central_antispam_Module->T_('Import from local antispam list...'), 'new', regenerate_url( 'action', 'action=import' ), $central_antispam_Module->T_('Import from local antispam list...'), 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+
 $Results->cols[] = array(
 		'th' => $central_antispam_Module->T_('ID'),
 		'order' => 'cakw_ID',
