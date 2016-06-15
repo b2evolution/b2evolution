@@ -826,7 +826,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 			{
 				$b_Blog->set_setting( 'front_disp', 'front' );
 				$b_Blog->set_setting( 'skin2_layout', 'single_column' );
-				$b_Blog->set( 'advanced_perms', '1' );
+				$b_Blog->set( 'advanced_perms', 1 );
 				$b_Blog->dbupdate();
 			}
 			$blog_ID = $blog_b_ID;
