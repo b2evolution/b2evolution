@@ -593,12 +593,7 @@ function get_allowed_statuses_condition( $statuses, $dbprefix, $req_blog, $perm_
 	// init allowed statuses array
 	$allowed_statuses = array();
 
-	// Check if current user is logged in:
 	$is_logged_in = is_logged_in( false );
-
-	// Check if current user is member of the requested collection OR member of ALL collections when $req_blog === NULL (collection administrators):
-	$is_member = $is_logged_in && $current_User->check_perm( 'blog_ismember', 1, false, $req_blog );
-
 	$creator_coll_name = ( $dbprefix == 'post_' ) ? $dbprefix.'creator_user_ID' : $dbprefix.'author_user_ID';
 	// Iterate through all statuses and set allowed to true only if the corresponding status is allowed in case of any post/comments
 	// If the status is not allowed to show, but exists further conditions which may allow it, then set the condition.
@@ -606,64 +601,16 @@ function get_allowed_statuses_condition( $statuses, $dbprefix, $req_blog, $perm_
 	{
 		switch( $status )
 		{
-			case 'published':
-				if( $is_member )
-				{	// Published post/comments are always allowed for members:
-					$allowed = true;
-					break;
-				}
-				$BlogCache = & get_BlogCache();
-				if( ! ( $req_Blog = & $BlogCache->get_by_ID( $req_blog, false, false ) ) )
-				{	// Collection request without ID, can be used for coll admins:
-					$allowed = false;
-					break;
-				}
-				// Published post/comments are allowed depending on collection access level:
-				switch( $req_Blog->get_setting( 'allow_access' ) )
-				{
-					case 'members':
-						// Only for collection members:
-						$allowed = $is_member;
-						break;
-					case 'users':
-						// Only for logged in users:
-						$allowed = $is_logged_in;
-						break;
-					default: // 'public'
-						// Always:
-						$allowed = true;
-						break;
-				}
+			case 'published': // Published post/comments are always allowed
+				$allowed = true;
 				break;
 
-			case 'community':
-				if( $is_member )
-				{	// Community post/comments are always allowed for members:
-					$allowed = true;
-					break;
-				}
-				$BlogCache = & get_BlogCache();
-				if( ! ( $req_Blog = & $BlogCache->get_by_ID( $req_blog, false, false ) ) )
-				{	// Collection request without ID, can be used for coll admins:
-					$allowed = false;
-					break;
-				}
-				// Community post/comments are allowed depending on collection access level:
-				switch( $req_Blog->get_setting( 'allow_access' ) )
-				{
-					case 'members':
-						// Only for collection members:
-						$allowed = $is_member;
-						break;
-					default: // 'public' or 'users'
-						// Only for logged in users:
-						$allowed = $is_logged_in;
-						break;
-				}
+			case 'community': // It is always allowed for logged in users
+				$allowed = $is_logged_in;
 				break;
 
 			case 'protected': // It is always allowed for members
-				$allowed = $is_member;
+				$allowed = ( $is_logged_in && ( $current_User->check_perm( 'blog_ismember', 1, false, $req_blog ) ) );
 				break;
 
 			case 'private': // It is allowed for users who has global 'editall' permission but only on back-office
