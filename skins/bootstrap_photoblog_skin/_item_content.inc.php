@@ -92,14 +92,6 @@ $params = array_merge( array(
 		'more_link_to'             => 'single#anchor', // Can be 'single' or 'single#anchor' which is permalink + "#more55" where 55 is item ID
 		'anchor_text'              => '<p class="evo_post_more_anchor">...</p>', // Text to display as the more anchor (once the more link has been clicked, '#' defaults to "Follow up:")
 
-		'limit_attach'             => 1000,
-		'attach_list_start'        => '<div class="evo_post_attachments"><h3>'.T_('Attachments').':</h3><ul class="evo_files">',
-		'attach_list_end'          => '</ul></div>',
-		'attach_start'             => '<li class="evo_file">',
-		'attach_end'               => '</li>',
-		'before_attach_size'       => ' <span class="evo_file_size">(',
-		'after_attach_size'        => ')</span>',
-
 		'page_links_start'         => '<p class="evo_post_pagination">'.T_('Pages:').' ',
 		'page_links_end'           => '</p>',
 		'page_links_separator'     => '&middot; ',
@@ -282,20 +274,6 @@ switch( $content_mode )
 				) );
 
 			// echo $params['content_end_full_text'];  <-- We want to show this after the content footer in _item.block.inc.php
-		}
-
-		if( ! empty($params['limit_attach'])
-			&& ( $more || ! $Item->has_content_parts($params) ) )
-		{	// Display attachments/files that are linked to this post:
-			$Item->files( array(
-					'before' =>              $params['attach_list_start'],
-					'before_attach' =>       $params['attach_start'],
-					'before_attach_size' =>  $params['before_attach_size'],
-					'after_attach_size' =>   $params['after_attach_size'],
-					'after_attach' =>        $params['attach_end'],
-					'after' =>               $params['attach_list_end'],
-					'limit_attach' =>        $params['limit_attach'],
-				) );
 		}
 
 		// Display location info

@@ -78,14 +78,6 @@ $params = array_merge( array(
 		'more_link_to'             => 'single#anchor', // Can be 'single' or 'single#anchor' which is permalink + "#more55" where 55 is item ID
 		'anchor_text'              => '<p class="bMore">...</p>', // Text to display as the more anchor (once the more link has been clicked, '#' defaults to "Follow up:")
 
-		'limit_attach'             => 1000,
-		'attach_list_start'        => '<div class="attachments"><h3>'.T_('Attachments').':</h3><ul class="bFiles">',
-		'attach_list_end'          => '</ul></div>',
-		'attach_start'             => '<li>',
-		'attach_end'               => '</li>',
-		'before_attach_size'       => ' <span class="file_size">(',
-		'after_attach_size'        => ')</span>',
-
 		'page_links_start'         => '<p class="right">'.T_('Pages:').' ',
 		'page_links_end'           => '</p>',
 		'page_links_separator'     => '&middot; ',
@@ -319,20 +311,6 @@ switch( $content_mode )
 				) );
 
 			echo '</div>';
-		}
-
-		if( ! empty($params['limit_attach'])
-			&& ( $more || ! $Item->has_content_parts($params) ) )
-		{	// Display attachments/files that are linked to this post:
-			$Item->files( array(
-					'before' =>              $params['attach_list_start'],
-					'before_attach' =>       $params['attach_start'],
-					'before_attach_size' =>  $params['before_attach_size'],
-					'after_attach_size' =>   $params['after_attach_size'],
-					'after_attach' =>        $params['attach_end'],
-					'after' =>               $params['attach_list_end'],
-					'limit_attach' =>        $params['limit_attach'],
-				) );
 		}
 
 		// Display location info

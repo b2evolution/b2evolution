@@ -1,11 +1,11 @@
 <?php
 /**
- * This file implements the item_content Widget class.
+ * This file implements the item_attachments Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -20,8 +20,6 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
- *
- * @version $Id: _item_content.widget.php 10056 2015-10-16 12:47:15Z yura $
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -34,7 +32,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  *
  * @package evocore
  */
-class item_content_Widget extends ComponentWidget
+class item_attachments_Widget extends ComponentWidget
 {
 	/**
 	 * Constructor
@@ -42,7 +40,7 @@ class item_content_Widget extends ComponentWidget
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'item_content' );
+		parent::__construct( $db_row, 'core', 'item_attachments' );
 	}
 
 
@@ -53,7 +51,7 @@ class item_content_Widget extends ComponentWidget
 	 */
 	function get_help_url()
 	{
-		return get_manual_url( 'item-content-widget' );
+		return get_manual_url( 'item-attachments-widget' );
 	}
 
 
@@ -62,7 +60,7 @@ class item_content_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Content');
+		return T_('Item Attachments');
 	}
 
 
@@ -71,7 +69,7 @@ class item_content_Widget extends ComponentWidget
 	 */
 	function get_short_desc()
 	{
-		return format_to_output( T_('Item Content') );
+		return format_to_output( T_('Item Attachments') );
 	}
 
 
@@ -80,7 +78,7 @@ class item_content_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display item content.');
+		return T_('Display item attachments.');
 	}
 
 
@@ -93,12 +91,40 @@ class item_content_Widget extends ComponentWidget
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
-				'title' => array(
+			'title' => array(
 					'label' => T_( 'Title' ),
 					'size' => 40,
 					'note' => T_( 'This is the title to display' ),
 					'defaultvalue' => '',
-				)
+				),
+			'disp_download_icon' => array(
+					'type' => 'checkbox',
+					'label' => T_('Display download icon'),
+					'defaultvalue' => 1,
+					'note' => '',
+				),
+			'link_text' => array(
+					'label' => T_('Link'),
+					'note' => '',
+					'type' => 'radio',
+					'field_lines' => true,
+					'options' => array(
+							array( 'filename', T_('Always display Filename') ),
+							array( 'title', T_('Display Title if available') ) ),
+					'defaultvalue' => 'title',
+				),
+			'disp_file_size' => array(
+					'type' => 'checkbox',
+					'label' => T_('Display file size'),
+					'defaultvalue' => 1,
+					'note' => '',
+				),
+			'disp_file_desc' => array(
+					'type' => 'checkbox',
+					'label' => T_('Add descriptions'),
+					'defaultvalue' => 1,
+					'note' => T_('Display description if available.'),
+				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -122,34 +148,20 @@ class item_content_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		$this->disp_params = array_merge( array(
-				'widget_item_content_params' => array(),
+				'widget_item_attachments_params' => array(),
 			), $this->disp_params );
-
-		// Get the params to be transmitted to this widget:
-		if( isset($this->disp_params['widget_item_content_params']) )
-		{	// We have an array, with the new name:
-			$widget_item_content_params = $this->disp_params['widget_item_content_params'];
-		}
-		else
-		{	// We have none, use an empty array:
-			$widget_item_content_params = array();
-		}
-
-		// Now, for some skins (2015), merge in the OLD name:
-		if( isset($this->disp_params['widget_coll_item_content_params']) )
-		{	// The new correct stuff gets precedence over the old stuff:
-			$widget_item_content_params = array_merge( $widget_item_content_params, $this->disp_params['widget_coll_item_content_params'] );
-		}		
 
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
-		// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-		skin_include( '_item_content.inc.php', $widget_item_content_params );
-		// Note: You can customize the default item content by copying the generic
-		// /skins/_item_content.inc.php file into the current skin folder.
-		// -------------------------- END OF POST CONTENT -------------------------
+		// Display attachments/files that are linked to the current item:
+		$Item->files( array_merge( $this->disp_params['widget_item_attachments_params'], array(
+				'display_download_icon' => $this->disp_params['disp_download_icon'],
+				'file_link_text'        => $this->disp_params['link_text'],
+				'display_file_size'     => $this->disp_params['disp_file_size'],
+				'display_file_desc'     => $this->disp_params['disp_file_desc'],
+			) ) );
 
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
@@ -168,11 +180,10 @@ class item_content_Widget extends ComponentWidget
 		global $Blog, $Item;
 
 		return array(
-				'wi_ID'        => $this->ID, // Cache each widget separately + Have the widget settings changed ?
+				'wi_ID'        => $this->ID, // Have the widget settings changed ?
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
-				'item_ID'      => $Item->ID, // Cache each item separately + Has the Item changed?
-				'item_page'    => isset( $GLOBALS['page'] ) ? $GLOBALS['page'] : 1, // Cache each Item page separately
+				'item_ID'      => $Item->ID, // Has the Item page changed?
 			);
 	}
 }

@@ -354,7 +354,7 @@ switch( $action )
 		$DB->commit();
 		$UserCache->add( $new_User );
 
-		$initial_hit = $new_User->get_first_session_hit_params( $Session->ID );
+		$initial_hit = $Session->get_first_hit_params();
 		if( ! empty ( $initial_hit ) )
 		{	// Save User Settings
 			$UserSettings->set( 'initial_blog_ID' , $initial_hit->hit_coll_ID, $new_User->ID );

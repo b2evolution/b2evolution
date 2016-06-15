@@ -118,6 +118,13 @@ function create_default_data()
 	$spam_Group->set( 'perm_stats', 'none' );
 	$spam_Group->dbinsert();
 
+	$blogb_Group = new Group(); // COPY !
+	$blogb_Group->set( 'name', 'Blog B Members' );
+	$blogb_Group->set( 'usage', 'secondary' );
+	$blogb_Group->set( 'level', 1 );
+	$blogb_Group->set( 'perm_blogs', 'user' );
+	$blogb_Group->set( 'perm_stats', 'none' );
+	$blogb_Group->dbinsert();
 	task_end();
 
 	task_begin( 'Creating groups for user field definitions... ' );

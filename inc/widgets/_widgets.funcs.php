@@ -146,6 +146,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 	/* Item Single */
 	add_basic_widget( $blog_id, 'Item Single', 'item_content', 'core', 10 );
+	add_basic_widget( $blog_id, 'Item Single', 'item_attachments', 'core', 15 );
 	if( $blog_id != $blog_a_ID && $kind != 'forum' && ( empty( $events_blog_ID ) || $blog_id != $events_blog_ID ) )
 	{ // Item Tags
 		add_basic_widget( $blog_id, 'Item Single', 'item_tags', 'core', 20 );
@@ -323,6 +324,12 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 	/* Front Page Secondary Area */
 	add_basic_widget( $blog_id, 'Front Page Secondary Area', 'org_members', 'core', 10 );
+
+
+	/* 404 Page */
+	add_basic_widget( $blog_id, '404 Page', 'page_404_not_found', 'core', 10 );
+	add_basic_widget( $blog_id, '404 Page', 'coll_search_form', 'core', 20 );
+	add_basic_widget( $blog_id, '404 Page', 'coll_tag_cloud', 'core', 30 );
 
 
 	/* Mobile Footer */

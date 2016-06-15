@@ -1430,26 +1430,26 @@ function param_check_passwords( $var1, $var2, $required = false, $min_length = 6
 
 	if( ! strlen( $pass1 ) )
 	{
-		param_error( $var1, $params['msg_pass_new'] );
-		param_error( $var2, $params['msg_pass_twice'] );
+		param_error( $var1, '<span class="pass_check_new">'.$params['msg_pass_new'].'</span>' );
+		param_error( $var2, '<span class="pass_check_twice">'.$params['msg_pass_twice'].'</span>' );
 		return false;
 	}
 	if( ! strlen( $pass2 ) )
 	{
-		param_error( $var2, $params['msg_pass_twice'] );
+		param_error( $var2, '<span class="pass_check_twice">'.$params['msg_pass_twice'].'</span>' );
 		return false;
 	}
 
 	// checking the password has been typed twice the same:
 	if( $pass1 != $pass2 )
 	{
-		param_error_multiple( array( $var1, $var2 ), $params['msg_pass_diff'] );
+		param_error_multiple( array( $var1, $var2 ), '<span class="pass_check_diff">'.$params['msg_pass_diff'].'</span>' );
 		return false;
 	}
 
 	if( utf8_strlen( $pass1 ) < $min_length )
 	{ // Checking min length
-		param_error_multiple( array( $var1, $var2 ), sprintf( $params['msg_pass_min'], $min_length ) );
+		param_error_multiple( array( $var1, $var2 ), '<span class="pass_check_min">'.sprintf( $params['msg_pass_min'], $min_length ).'</span>' );
 		return false;
 	}
 

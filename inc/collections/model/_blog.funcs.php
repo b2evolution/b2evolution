@@ -18,10 +18,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Update the advanced user/group permissions for edited blog
  *
- * @param int Blog ID
- * @param string 'user' or 'group'
+ * @param integer Blog ID or Group ID
+ * @param string 'user', 'group' or 'coll'
  */
-function blog_update_perms( $blog, $context = 'user' )
+function blog_update_perms( $object_ID, $context = 'user' )
 {
 	global $DB;
 
@@ -30,36 +30,57 @@ function blog_update_perms( $blog, $context = 'user' )
 	 */
 	global $current_User;
 
-	if( $context == 'user' )
-	{
-		$table = 'T_coll_user_perms';
-		$prefix = 'bloguser_';
-		$ID_field = 'bloguser_user_ID';
-	}
-	else
-	{
-		$table = 'T_coll_group_perms';
-		$prefix = 'bloggroup_';
-		$ID_field = 'bloggroup_group_ID';
-	}
-
 	// Get affected user/group IDs:
 	$IDs = param( $context.'_IDs', '/^[0-9]+(,[0-9]+)*$/', '' );
 	$ID_array = explode( ',', $IDs );
 
-	// Can the current user touch advanced admin permissions?
-	if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $blog ) )
-	{ // We have no permission to touch advanced admins!
+	switch( $context )
+	{
+		case 'user':
+			$table = 'T_coll_user_perms';
+			$prefix = 'bloguser_';
+			$ID_field_main = 'bloguser_blog_ID';
+			$ID_field_edit = 'bloguser_user_ID';
+			$blog = $object_ID;
+			$coll_IDs = array( $blog );
+			break;
 
-		// Get the users/groups which are advanced admins
-		$admins_ID_array = $DB->get_col( "SELECT {$ID_field}
-																				FROM $table
-																			 WHERE {$ID_field} IN (".implode(',',$ID_array).")
-																							AND {$prefix}blog_ID = $blog
-																							AND {$prefix}perm_admin <> 0" );
+		case 'coll':
+			$table = 'T_coll_group_perms';
+			$prefix = 'bloggroup_';
+			$ID_field_main = 'bloggroup_group_ID';
+			$ID_field_edit = 'bloggroup_blog_ID';
+			$group_ID = $object_ID;
+			$coll_IDs = $ID_array;
+			break;
 
-		// Take the admins out of the list:
-		$ID_array = array_diff( $ID_array, $admins_ID_array );
+		case 'group':
+		default:
+			$table = 'T_coll_group_perms';
+			$prefix = 'bloggroup_';
+			$ID_field_main = 'bloggroup_blog_ID';
+			$ID_field_edit = 'bloggroup_group_ID';
+			$blog = $object_ID;
+			$coll_IDs = array( $blog );
+			break;
+	}
+
+	foreach( $coll_IDs as $coll_ID )
+	{
+		// Can the current user touch advanced admin permissions?
+		if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $coll_ID ) )
+		{ // We have no permission to touch advanced admins!
+
+			// Get the users/groups which are advanced admins
+			$admins_ID_array = $DB->get_col( "SELECT {$ID_field_edit}
+																					FROM $table
+																				 WHERE {$ID_field_edit} IN (".implode( ',',$ID_array ).")
+																								AND {$ID_field_main} = $object_ID
+																								AND {$prefix}perm_admin <> 0" );
+
+			// Take the admins out of the list:
+			$ID_array = array_diff( $ID_array, $admins_ID_array );
+		}
 	}
 
 	if( empty( $ID_array ) )
@@ -67,14 +88,18 @@ function blog_update_perms( $blog, $context = 'user' )
 		return;
 	}
 
-	// Delete old perms for this blog:
+	// Delete old perms for the edited collection/group:
 	$DB->query( "DELETE FROM $table
-								WHERE {$ID_field} IN (".implode(',',$ID_array).")
-											AND {$prefix}blog_ID = ".$blog );
+								WHERE {$ID_field_edit} IN (".implode( ',',$ID_array ).")
+											AND {$ID_field_main} = ".$object_ID );
 
 	$inserted_values = array();
 	foreach( $ID_array as $loop_ID )
 	{ // Check new permissions for each user:
+
+		// Get collection/object ID depedning on request:
+		$coll_ID = ( $context == 'coll' ? $loop_ID : $blog );
+		$main_object_ID = ( $context == 'coll' ? $group_ID : $blog );
 
 		// Use checkboxes
 		$perm_post = array();
@@ -129,7 +154,7 @@ function blog_update_perms( $blog, $context = 'user' )
 		$perm_cats = param( 'blog_perm_cats_'.$loop_ID, 'integer', 0 );
 		$perm_properties = param( 'blog_perm_properties_'.$loop_ID, 'integer', 0 );
 
-		if( $current_User->check_perm( 'blog_admin', 'edit', false, $blog ) )
+		if( $current_User->check_perm( 'blog_admin', 'edit', false, $coll_ID ) )
 		{ // We have permission to give advanced admins perm!
 			$perm_admin = param( 'blog_perm_admin_'.$loop_ID, 'integer', 0 );
 		}
@@ -150,7 +175,7 @@ function blog_update_perms( $blog, $context = 'user' )
 			$ismember = 1;	// Must have this permission
 
 			// insert new perms:
-			$inserted_values[] = " ( $blog, $loop_ID, $ismember, $can_be_assignee, ".$DB->quote( implode( ',',$perm_post ) ).",
+			$inserted_values[] = " ( $main_object_ID, $loop_ID, $ismember, $can_be_assignee, ".$DB->quote( implode( ',',$perm_post ) ).",
 																".$DB->quote( $perm_item_type ).", ".$DB->quote( $perm_edit ).",
 																$perm_delpost, $perm_edit_ts, $perm_delcmts, $perm_recycle_owncmts, $perm_vote_spam_comments, $perm_cmtstatuses,
 																".$DB->quote( $perm_edit_cmt ).",
@@ -162,7 +187,7 @@ function blog_update_perms( $blog, $context = 'user' )
 	// Proceed with insertions:
 	if( count( $inserted_values ) )
 	{
-		$DB->query( "INSERT INTO $table( {$prefix}blog_ID, {$ID_field}, {$prefix}ismember, {$prefix}can_be_assignee,
+		$DB->query( "INSERT INTO $table( {$ID_field_main}, {$ID_field_edit}, {$prefix}ismember, {$prefix}can_be_assignee,
 											{$prefix}perm_poststatuses, {$prefix}perm_item_type, {$prefix}perm_edit, {$prefix}perm_delpost, {$prefix}perm_edit_ts,
 											{$prefix}perm_delcmts, {$prefix}perm_recycle_owncmts, {$prefix}perm_vote_spam_cmts, {$prefix}perm_cmtstatuses, {$prefix}perm_edit_cmt,
 											{$prefix}perm_meta_comment, {$prefix}perm_cats, {$prefix}perm_properties, {$prefix}perm_admin,
@@ -177,21 +202,21 @@ function blog_update_perms( $blog, $context = 'user' )
 		  (
 		    SELECT cat_ID
 		      FROM T_categories
-		     WHERE cat_blog_ID = '.$DB->quote( $blog ).'
+		     WHERE cat_blog_ID IN ( '.$DB->quote( $coll_IDs ).' )
 		  )
 		  AND post_assigned_user_ID NOT IN
 		  (
 		    SELECT bloguser_user_ID
 		      FROM T_coll_user_perms
 		     WHERE bloguser_can_be_assignee = 1
-		       AND bloguser_blog_ID = '.$DB->quote( $blog ).'
+		       AND bloguser_blog_ID IN ( '.$DB->quote( $coll_IDs ).' )
 		  )
 		  AND post_assigned_user_ID NOT IN
 		  (
 		    SELECT user_ID
 		      FROM T_users INNER JOIN T_coll_group_perms ON user_grp_ID = bloggroup_group_ID
 		     WHERE bloggroup_can_be_assignee = 1
-		       AND bloggroup_blog_ID = '.$DB->quote( $blog ).'
+		       AND bloggroup_blog_ID IN ( '.$DB->quote( $coll_IDs ).' )
 		  )
 		  AND post_assigned_user_ID NOT IN
 		  (
@@ -199,7 +224,7 @@ function blog_update_perms( $blog, $context = 'user' )
 		      FROM T_users__secondary_user_groups
 		     INNER JOIN T_coll_group_perms ON sug_grp_ID = bloggroup_group_ID
 		     WHERE bloggroup_can_be_assignee = 1
-		       AND bloggroup_blog_ID = '.$DB->quote( $blog ).'
+		       AND bloggroup_blog_ID IN ( '.$DB->quote( $coll_IDs ).' )
 		  )' );
 
 	if( $DB->rows_affected > 0 )
@@ -209,7 +234,10 @@ function blog_update_perms( $blog, $context = 'user' )
 	}
 
 	// BLOCK CACHE INVALIDATION:
-	BlockCache::invalidate_key( 'set_coll_ID', $blog ); // Settings have changed
+	foreach( $coll_IDs as $coll_ID )
+	{
+		BlockCache::invalidate_key( 'set_coll_ID', $coll_ID ); // Settings have changed
+	}
 	BlockCache::invalidate_key( 'set_coll_ID', 'any' ); // Settings of a have changed (for widgets tracking a change on ANY blog)
 
 	// cont_coll_ID  // Content has not changed

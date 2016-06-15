@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $disp;
 
 if( ( $disp == 'single' || $disp == 'page' ) &&
-    ! empty( $Item ) &&
+    isset( $Item ) && $Item->ID > 0 &&
     is_logged_in() &&
     $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
 { // Display the meta comments if current user can edit this post:
