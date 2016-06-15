@@ -6,6 +6,7 @@ rm -f package.json
 rm -f readme.md
 rm -f readme.template.html
 rm -f .bower.json
+rm -f .gitmodules
 echo Removing myself now
 rm -f cleanup.sh
 echo Stepping out
