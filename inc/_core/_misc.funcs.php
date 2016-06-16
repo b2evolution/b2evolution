@@ -6936,13 +6936,14 @@ function is_ajax_content( $template_name = '' )
  * @param integer Object ID
  * @param string Origin type: 'core', 'plugin'
  * @param integer Origin ID
+ * @param integer User ID
  */
-function syslog_insert( $message, $log_type, $object_type = NULL, $object_ID = NULL, $origin_type = 'core', $origin_ID = NULL )
+function syslog_insert( $message, $log_type, $object_type = NULL, $object_ID = NULL, $origin_type = 'core', $origin_ID = NULL, $user_ID = NULL )
 {
 	global $servertimenow;
 
 	$Syslog = new Syslog();
-	$Syslog->set_user();
+	$Syslog->set_user( $user_ID );
 	$Syslog->set( 'type', $log_type );
 	$Syslog->set_origin( $origin_type, $origin_ID );
 	$Syslog->set_object( $object_type, $object_ID );
