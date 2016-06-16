@@ -810,6 +810,11 @@ function get_highest_publish_status( $type, $blog, $with_label = true, $restrict
 			$max_allowed_status = 'protected';
 		}
 	}
+	elseif( $requested_Blog->get_setting( 'allow_access' ) == 'users' )
+	{	// The collection is restricted for logged-in users only:
+		// Set max allowed visibility status to "Community":
+		$max_allowed_status = 'community';
+	}
 	else
 	{	// The collection has no restriction for visibility statuses
 		// Set max allowed visibility status to "Public":
