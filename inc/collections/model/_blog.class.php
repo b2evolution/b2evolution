@@ -421,11 +421,11 @@ class Blog extends DataObject
 			if( get_param( 'action' ) != 'update_confirm' && $this->ID > 0 &&
 			    ( $prev_allow_access != $new_allow_access || $prev_advanced_perms != $new_advanced_perms ) )
 			{	// One of these settings is changing, try to check if max allowed status will be changed too:
-				$prev_max_allowed_status = $this->get_allowed_item_status( 'published' );
+				$prev_max_allowed_status = $this->get_max_allowed_status();
 				$prev_access_title = $this->get_access_title();
 				$this->set( 'advanced_perms', $new_advanced_perms );
 				$this->set_setting( 'allow_access', $new_allow_access );
-				$new_max_allowed_status = $this->get_allowed_item_status( 'published' );
+				$new_max_allowed_status = $this->get_max_allowed_status();
 				$new_access_title = $this->get_access_title();
 
 				$status_orders = get_visibility_statuses( 'ordered-index' );
@@ -4296,6 +4296,34 @@ class Blog extends DataObject
 
 
 	/**
+	 * Get max allowed post/comment status on this collection depending on access settings
+	 *
+	 * @return string
+	 */
+	function get_max_allowed_status()
+	{
+		switch( $this->get_setting( 'allow_access' ) )
+		{
+			case 'members':
+				if( $this->get( 'advanced_perms' ) )
+				{
+					return 'protected';
+				}
+				else
+				{
+					return 'private';
+				}
+
+			case 'users':
+				return 'community';
+
+			default: // 'public'
+				return 'published';
+		}
+	}
+
+
+	/**
 	 * Get what statuses should be reduced by max allowed:
 	 *
 	 * @param string Max allowed status, NULL to get current
@@ -4305,7 +4333,7 @@ class Blog extends DataObject
 	{
 		if( $max_allowed_status === NULL )
 		{	// Get current max allowed status for posts and comments o this collection:
-			$max_allowed_status = $this->get_allowed_item_status( 'published' );
+			$max_allowed_status = $this->get_max_allowed_status();
 		}
 
 		$status_orders = get_visibility_statuses( 'ordered-index' );
@@ -4394,7 +4422,7 @@ class Blog extends DataObject
 		}
 
 		// Get max allowed status:
-		$max_allowed_status = $this->get_allowed_item_status( 'published' );
+		$max_allowed_status = $this->get_max_allowed_status();
 
 		// Update posts:
 		$DB->query( 'UPDATE T_items__item

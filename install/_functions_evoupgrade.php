@@ -7487,6 +7487,17 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11775, 'Upgrading posts and comments statuses depeding on max allowed status by their collections...' ) )
+	{	// part of 6.7.4-stable
+		$BlogCache = & get_BlogCache();
+		$BlogCache->load_all( 'ID', 'ASC' );
+		foreach( $BlogCache->cache as $Blog )
+		{
+			$Blog->update_reduced_status_data();
+		}
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
