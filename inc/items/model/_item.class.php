@@ -5455,6 +5455,9 @@ class Item extends ItemLight
 
 		$DB->begin( 'SERIALIZABLE' );
 
+		// Restrict item status to max allowed by item collection:
+		$this->restrict_status_by_collection( true );
+
 		if( $this->status != 'draft' )
 		{	// The post is getting published in some form, set the publish date so it doesn't get auto updated in the future:
 			$this->set( 'dateset', 1 );
@@ -5646,6 +5649,9 @@ class Item extends ItemLight
 		global $DB, $Plugins;
 
 		$DB->begin( 'SERIALIZABLE' );
+
+		// Restrict item status to max allowed by item collection:
+		$this->restrict_status_by_collection( true );
 
 		if( $this->status != 'draft' )
 		{	// The post is getting published in some form, set the publish date so it doesn't get auto updated in the future:
@@ -8484,9 +8490,9 @@ class Item extends ItemLight
 		{	// If current item status cannot be used for item collection
 			global $Messages;
 
+			$visibility_statuses = get_visibility_statuses();
 			if( $item_Blog->get_setting( 'allow_access' ) == 'members' )
 			{	// The collection is restricted for members or only for owner
-				$visibility_statuses = get_visibility_statuses();
 				if( ! $item_Blog->get( 'advanced_perms' ) )
 				{	// If advanced permissions are NOT enabled then only owner has an access for the collection
 					$Messages->add( sprintf( T_('Since this collection is "Private", the visibility of this post will be restricted to "%s".'), $visibility_statuses[ $this->status ] ), 'warning' );
@@ -8495,6 +8501,10 @@ class Item extends ItemLight
 				{	// Otherwise all members of this collection have an access for the collection
 					$Messages->add( sprintf( T_('Since this collection is "Members only", the visibility of this post will be restricted to "%s".'), $visibility_statuses[ $this->status ] ), 'warning' );
 				}
+			}
+			elseif( $item_Blog->get_setting( 'allow_access' ) == 'users' )
+			{	// The collection is restricted for logged-in users only:
+				$Messages->add( sprintf( T_('Since this collection is "Community only", the visibility of this post will be restricted to "%s".'), $visibility_statuses[ $this->status ] ), 'warning' );
 			}
 		}
 	}

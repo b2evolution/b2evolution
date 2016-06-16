@@ -233,7 +233,7 @@ $Form->begin_fieldset( T_('Collection permissions').get_manual_link( 'collection
 	$Form->radio( 'blog_allow_access', $edited_Blog->get_setting( 'allow_access' ),
 			array(
 				array( 'public', T_('Everyone (Public Blog)') ),
-				array( 'users', T_('Logged-in users only') ),
+				array( 'users', T_('Community only (Logged-in users only)') ),
 				array( 'members',
 									'<span id="allow_access_members_advanced_title"'.( $edited_Blog->get( 'advanced_perms' ) ? '' : ' style="display:none"' ).'>'.T_('Members only').'</span>'.
 									'<span id="allow_access_members_simple_title"'.( $edited_Blog->get( 'advanced_perms' ) ? ' style="display:none"' : '' ).'>'.T_('Only the owner').'</span>',

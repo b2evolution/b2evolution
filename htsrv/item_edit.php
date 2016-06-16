@@ -180,9 +180,6 @@ switch( $action )
 		$edited_Item->set( 'main_cat_ID', $post_category );
 		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 
-		// Restrict item status to max allowed by item collection:
-		$edited_Item->restrict_status_by_collection( true );
-
 		// Set object params:
 		$edited_Item->load_from_Request( /* editing? */ ($action == 'create_edit'), /* creating? */ true );
 
@@ -270,9 +267,6 @@ switch( $action )
 		// UPDATE POST:
 		// Set the params we already got:
 		$edited_Item->set ( 'status', $post_status );
-
-		// Restrict item status to max allowed by item collection:
-		$edited_Item->restrict_status_by_collection( true );
 
 		if( $isset_category )
 		{ // we change the categories only if the check was succesfull
