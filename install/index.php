@@ -260,7 +260,7 @@ if( $config_is_done || $try_db_connect )
 		$DB->show_errors = true;    // From now on, show errors (they're helpful in case of errors!).
 
 		// Check MySQL version
-		$mysql_version = $DB->get_version();
+		$mysql_version = $DB->version;
 		foreach( $required_mysql_version as $key => $value )
 		{ // check required MySQL version for the whole application and for each module
 			if( version_compare( $mysql_version, $value, '<' ) )

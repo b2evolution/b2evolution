@@ -1206,7 +1206,7 @@ function init_charsets( $req_io_charset )
 	// Make sure the DB send us text in the same charset as $evo_charset (override whatever may have been set before)
 	if( isset($DB) ) // not available in /install/index.php
 	{	// Set encoding for MySQL connection:
-		$DB->set_connection_charset( $evo_charset );
+		$DB->connection_charset = $evo_charset;
 	}
 
 	$Debuglog->add( 'evo_charset: '.$evo_charset, 'locale' );
