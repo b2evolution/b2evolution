@@ -3042,12 +3042,20 @@ Hello
 	{ // Create the additional comments when we install all features
 		foreach( $additional_comments_item_IDs as $additional_comments_item_ID )
 		{
+			// Restrict comment status by parent item:
+			$comment_status = 'published';
+			$Comment = new Comment();
+			$Comment->set( 'item_ID', $additional_comments_item_ID );
+			$Comment->set( 'status', $comment_status );
+			$Comment->restrict_status_by_item( true );
+			$comment_status = $Comment->get( 'status' );
+
 			for( $i_user_ID = 1; $i_user_ID <= 7; $i_user_ID++ )
 			{ // Insert the comments from each user
 				$now = date( 'Y-m-d H:i:s' );
-				$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_author_user_ID, comment_author_IP,
+				$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_status, comment_author_user_ID, comment_author_IP,
 						comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status, comment_notif_flags )
-					VALUES( '.$DB->quote( $additional_comments_item_ID ).', '.$DB->quote( $i_user_ID ).', "127.0.0.1", '
+					VALUES( '.$DB->quote( $additional_comments_item_ID ).', '.$DB->quote( $comment_status ).', '.$DB->quote( $i_user_ID ).', "127.0.0.1", '
 						.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( T_('Hi!
 
 This is a sample comment that has been approved by default!
@@ -3136,6 +3144,13 @@ function create_demo_comment( $item_ID, $status )
 		$author_email = 'missb2@example.com';
 		$author_email_url = 'http://example.com';
 	}
+
+	// Restrict comment status by parent item:
+	$Comment = new Comment();
+	$Comment->set( 'item_ID', $item_ID );
+	$Comment->set( 'status', $status );
+	$Comment->restrict_status_by_item( true );
+	$status = $Comment->get( 'status' );
 
 	// Set demo content depending on status
 	if( $status == 'published' )

@@ -5214,6 +5214,9 @@ class Item extends ItemLight
 
 		$DB->begin( 'SERIALIZABLE' );
 
+		// Restrict item status to max allowed by item collection:
+		$this->restrict_status_by_collection( true );
+
 		if( $this->status != 'draft' )
 		{	// The post is getting published in some form, set the publish date so it doesn't get auto updated in the future:
 			$this->set( 'dateset', 1 );
@@ -5405,6 +5408,9 @@ class Item extends ItemLight
 		global $DB, $Plugins;
 
 		$DB->begin( 'SERIALIZABLE' );
+
+		// Restrict item status to max allowed by item collection:
+		$this->restrict_status_by_collection( true );
 
 		if( $this->status != 'draft' )
 		{	// The post is getting published in some form, set the publish date so it doesn't get auto updated in the future:

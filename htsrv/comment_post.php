@@ -283,9 +283,6 @@ if( param( 'renderers_displayed', 'integer', 0 ) )
 $def_status = $Comment->is_meta() ? 'published' : get_highest_publish_status( 'comment', $commented_Item->Blog->ID, false );
 $Comment->set( 'status', $def_status );
 
-// Restrict comment status by parent item:
-$Comment->restrict_status_by_item( true );
-
 if( $action != 'preview' )
 {
 	/*
