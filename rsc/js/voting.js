@@ -17,15 +17,6 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
 	// Update the colorbox width and position when new voting panel is loaded
 	function update_colorbox_position()
 	{
-		if( voting_layout.closest( '#colorbox' ).width() <= 480 )
-		{
-			jQuery( '#colorbox .vote_title_text' ).hide();
-		}
-		else
-		{
-			jQuery( '#colorbox .vote_title_text' ).show();
-		}
-
 		if( voting_layout.attr( 'id' ) == 'cboxVoting' )
 		{
 			var colorbox_width = jQuery( '#colorbox' ).width();
@@ -53,6 +44,7 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
 			{
 				voting_layout.html( ajax_debug_clear( result ) );
 				update_colorbox_position();
+				votingAdjust();
 			}
 		} );
 	}
@@ -225,12 +217,15 @@ function votingAdjust()
 	$voting = jQuery("#cboxVoting");
 
 	var prevWidth = $prev.width();
-	var voting_wrapper = $('div.voting_wrapper');
-	var voting_buttons = $('div.voting_wrapper > div.btn-group');
-	var voting_title = $('div.vote_title');
-	var voting_others = $('div.vote_others');
+	var voting_wrapper = $('#colorbox div.voting_wrapper');
+	var voting_buttons = $('#colorbox div.voting_wrapper > div.btn-group');
+	var voting_title = $('#colorbox div.vote_title');
+	var voting_others = $('#colorbox div.vote_others');
+	var voting_separator = $('#colorbox .separator');
 
-	if( $wrap.parent().width() <= 480 )
+	var w = $wrap.parent().width();
+
+	if( w <= 480 )
 	{
 		$voting.css({ paddingLeft: ( prevWidth * 2 ) + 'px' });
 		voting_wrapper.css({ left: ( prevWidth * 2 ) + 'px' });
@@ -241,16 +236,18 @@ function votingAdjust()
 		voting_wrapper.css({ left: ( prevWidth * 4 ) + 'px' });
 	}
 
-	if( voting_wrapper.width() <= ( voting_title.width() + voting_buttons.width() + voting_others.width() ) )
+	// reset
+	voting_separator.show(); // show separator so it will be included in the calculation
+	voting_wrapper.css({ textAlign: 'left' });
+	voting_buttons.css({ display: 'inline-block', 'margin': '3px 0 0' });
+	voting_title.css({ textAlign: 'right' });
+
+	if( w <= ( voting_title.width() + voting_buttons.width() + voting_others.width() ) )
 	{ // voting button, title and others will not fit in 1 line
+		voting_separator.hide();
 		voting_wrapper.css({ textAlign: 'center' });
 		voting_buttons.css({ display: 'block', 'margin': '3px auto 0' });
 		voting_title.css({ textAlign: 'center' });
 	}
-	else
-	{
-		voting_wrapper.css({ textAlign: 'left' });
-		voting_buttons.css({ display: 'inline-block', 'margin': '3px 0 0' });
-		voting_title.css({ textAlign: 'right' });
-	}
+
 }

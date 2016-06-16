@@ -478,41 +478,7 @@
 					$window.bind('resize.' + prefix, publicMethod.position);
 				}, 1);
 
-				//( $wrap.parent().width() <= 480 ) ? $current.hide() : $current.show();
-				var prevWidth = $prev.width();
-				var voting_wrapper = $('div.voting_wrapper');
-				var voting_title = $('div.vote_title');
-				var voting_buttons = $('div.voting_wrapper > div.btn-group');
-				var voting_others = $('div.vote_others');
-
-				if( $wrap.parent().width() <= 480 )
-				{
-					$current.hide();
-					$nav.css({ width: ( prevWidth * 2 ) + 'px'  });
-					$voting.css({ paddingLeft: ( prevWidth * 2 ) + 'px' });
-					voting_wrapper.css({ left: ( $prev.width() * 2 ) + 'px' });
-				}
-				else
-				{
-					$current.show();
-					$nav.css({ width: ( prevWidth * 4 ) + 'px' })
-					$voting.css({ paddingLeft: ( prevWidth * 4 ) + 'px' });
-					voting_wrapper.css({ left: ( $prev.width() * 4 ) + 'px' });
-				}
-
-				console.log( voting_wrapper.width(), ' <= ', ( voting_title.width() + voting_buttons.width() + voting_others.width() ) );
-				if( voting_wrapper.width() <= ( voting_title.width() + voting_buttons.width() + voting_others.width() ) )
-				{ // voting button, title and others will not fit in 1 line
-					voting_wrapper.css({ textAlign: 'center' });
-					voting_buttons.css({ display: 'block', 'margin': '3px auto 0' });
-					voting_title.css({ textAlign: 'center' });
-				}
-				else
-				{
-					voting_wrapper.css({ textAlign: 'left' });
-					voting_buttons.css({ display: 'inline-block', 'margin': '3px 0 0' });
-					voting_title.css({ textAlign: 'right' });
-				}
+				publicMethod.resizeVoting();
 
 				( $wrap.parent().width() < 380 ) ? $slideshow.hide() : $slideshow.show();
 			},
@@ -951,6 +917,47 @@
 				}, 1);
 			});
 		}
+	};
+
+	publicMethod.resizeVoting = function() {
+
+		var prevWidth = $prev.width();
+		var voting_wrapper = $('#colorbox div.voting_wrapper');
+		var voting_title = $('#colorbox div.vote_title');
+		var voting_buttons = $('#colorbox div.voting_wrapper > div.btn-group');
+		var voting_others = $('#colorbox div.vote_others');
+		var voting_separator = $('#colorbox .separator');
+
+		var w = $wrap.parent().width();
+		if( w <= 480 )
+		{
+			$current.hide();
+			$nav.css({ width: ( prevWidth * 2 ) + 'px'  });
+			$voting.css({ paddingLeft: ( prevWidth * 2 ) + 'px' });
+			voting_wrapper.css({ left: ( $prev.width() * 2 ) + 'px' });
+		}
+		else
+		{
+			$current.show();
+			$nav.css({ width: ( prevWidth * 4 ) + 'px' })
+			$voting.css({ paddingLeft: ( prevWidth * 4 ) + 'px' });
+			voting_wrapper.css({ left: ( $prev.width() * 4 ) + 'px' });
+		}
+
+		// reset
+		voting_separator.show();
+		voting_wrapper.css({ textAlign: 'left' });
+		voting_buttons.css({ display: 'inline-block', 'margin': '3px 0 0' });
+		voting_title.css({ textAlign: 'right' });
+
+		if( w <= ( voting_title.width() + voting_buttons.width() + voting_others.width() ) )
+		{ // voting button, title and others will not fit in 1 line
+			voting_separator.hide();
+			voting_wrapper.css({ textAlign: 'center' });
+			voting_buttons.css({ display: 'block', 'margin': '3px auto 0' });
+			voting_title.css({ textAlign: 'center' });
+		}
+
 	};
 
 	// A method for fetching the current element ColorBox is referencing.
