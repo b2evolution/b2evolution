@@ -413,9 +413,45 @@ class Blog extends DataObject
 			}
 
 			// Collection permissions:
-			$this->set( 'advanced_perms', param( 'advanced_perms', 'integer', 0 ) );
+			$prev_advanced_perms = $this->get( 'advanced_perms' );
+			$new_advanced_perms = param( 'advanced_perms', 'integer', 0 );
 			$prev_allow_access = $this->get_setting( 'allow_access' );
-			$this->set_setting( 'allow_access', param( 'blog_allow_access', 'string', '' ) );
+			$new_allow_access = param( 'blog_allow_access', 'string', '' );
+
+			if( get_param( 'action' ) != 'update_confirm' && $this->ID > 0 &&
+			    ( $prev_allow_access != $new_allow_access || $prev_advanced_perms != $new_advanced_perms ) )
+			{	// One of these settings is changing, try to check if max allowed status will be changed too:
+				$prev_max_allowed_status = $this->get_allowed_item_status( 'published' );
+				$prev_access_title = $this->get_access_title();
+				$this->set( 'advanced_perms', $new_advanced_perms );
+				$this->set_setting( 'allow_access', $new_allow_access );
+				$new_max_allowed_status = $this->get_allowed_item_status( 'published' );
+				$new_access_title = $this->get_access_title();
+
+				$status_orders = get_visibility_statuses( 'ordered-index' );
+				if( $status_orders[ $new_max_allowed_status ] < $status_orders[ $prev_max_allowed_status ] )
+				{	// If max allowed status will be reduced after collection updating:
+					$count_reduced_status_data = $this->get_count_reduced_status_data( $new_max_allowed_status );
+					if( $count_reduced_status_data !== false )
+					{	// If some posts or comment will be updated:
+						$this->confirmation = array();
+						$this->confirmation['title'] = sprintf( T_('You changed the access setting of this collection from "%s" to "%s". This will also:'), $prev_access_title, $new_access_title );
+						$status_titles = get_visibility_statuses();
+						foreach( $count_reduced_status_data['posts'] as $status_key => $count )
+						{
+							$this->confirmation['messages'][] = sprintf( T_('change %d posts from "%s" to "%s"'), intval( $count ), $status_titles[ $status_key ], $status_titles[ $new_max_allowed_status ] );
+						}
+						foreach( $count_reduced_status_data['comments'] as $status_key => $count )
+						{
+							$this->confirmation['messages'][] = sprintf( T_('change %d comments from "%s" to "%s"'), intval( $count ), $status_titles[ $status_key ], $status_titles[ $new_max_allowed_status ] );
+						}
+					}
+				}
+			}
+
+			$this->set( 'advanced_perms', $new_advanced_perms );
+			$this->set_setting( 'allow_access', $new_allow_access );
+
 			if( $prev_allow_access != $this->get_setting( 'allow_access' ) )
 			{	// If setting "Allow access to" is changed to:
 				switch( $this->get_setting( 'allow_access' ) )
@@ -1152,7 +1188,7 @@ class Blog extends DataObject
 
 		}
 
-		return ! param_errors_detected();
+		return ! param_errors_detected() && empty( $this->confirmation );
 	}
 
 
@@ -3095,6 +3131,11 @@ class Blog extends DataObject
 
 		$Plugins->trigger_event( 'AfterCollectionUpdate', $params = array( 'Blog' => & $this ) );
 
+		if( get_param( 'action' ) == 'update_confirm' )
+		{	// Reduce statuses of posts and comments by max allowed status of this collection ONLY if this has been confirmed:
+			$this->update_reduced_status_data();
+		}
+
 		$DB->commit();
 
 		// BLOCK CACHE INVALIDATION:
@@ -4223,6 +4264,154 @@ class Blog extends DataObject
 		}
 
 		return $this->comment_moderator_user_data;
+	}
+
+
+	/**
+	 * Get collection type title depending on access settings:
+	 *
+	 * @return string
+	 */
+	function get_access_title()
+	{
+		switch( $this->get_setting( 'allow_access' ) )
+		{
+			case 'members':
+				if( $this->get( 'advanced_perms' ) )
+				{
+					return T_('Members only');
+				}
+				else
+				{
+					return T_('Private');
+				}
+
+			case 'users':
+				return T_('Community only');
+
+			default: // 'public'
+				return T_('Public');
+		}
+	}
+
+
+	/**
+	 * Get what statuses should be reduced by max allowed:
+	 *
+	 * @param string Max allowed status, NULL to get current
+	 * @return array Statuses
+	 */
+	function get_reduced_statuses( $max_allowed_status = NULL )
+	{
+		if( $max_allowed_status === NULL )
+		{	// Get current max allowed status for posts and comments o this collection:
+			$max_allowed_status = $this->get_allowed_item_status( 'published' );
+		}
+
+		$status_orders = get_visibility_statuses( 'ordered-index' );
+		$max_allowed_status_order = $status_orders[ $max_allowed_status ];
+
+		// Find what statuses should be reduced by max allowed:
+		$reduced_statuses = array();
+		foreach( $status_orders as $status_key => $status_order )
+		{
+			if( $max_allowed_status_order < $status_order )
+			{	// This status must be updated because the level is more than max allowed:
+				$reduced_statuses[] = $status_key;
+			}
+		}
+
+		return $reduced_statuses;
+	}
+
+
+	/**
+	 * Get a count how much statuses of posts and comments will be reduced after new max allowed status of this collection
+	 *
+	 * @return array|boolean Array with keys 'posts' and 'comments' where each is array with key as status and value as a count | FALSE if nothing to update
+	 */
+	function get_count_reduced_status_data( $new_max_allowed_status )
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{	// Collection must be created before:
+			return false;
+		}
+
+		// Get statuses that should be reduced by max allowed:
+		$reduced_statuses = $this->get_reduced_statuses( $new_max_allowed_status );
+
+		if( empty( $reduced_statuses ) )
+		{	// No status to update:
+			return false;
+		}
+
+		$posts_SQL = new SQL( 'Get how much posts will be updated after new max allowed status of the collection #'.$this->ID );
+		$posts_SQL->SELECT( 'post_status, COUNT( post_ID )' );
+		$posts_SQL->FROM( 'T_items__item' );
+		$posts_SQL->FROM_add( 'INNER JOIN T_categories ON cat_ID = post_main_cat_ID' );
+		$posts_SQL->WHERE( 'cat_blog_ID = '.$this->ID );
+		$posts_SQL->WHERE_and( 'post_status IN ( '.$DB->quote( $reduced_statuses ).' )' );
+		$posts_SQL->GROUP_BY( 'post_status' );
+		$posts = $DB->get_assoc( $posts_SQL->get(), $posts_SQL->title );
+
+		$comments_SQL = new SQL( 'Get how much comments will be updated after new max allowed status of the collection #'.$this->ID );
+		$comments_SQL->SELECT( 'comment_status, COUNT( comment_ID )' );
+		$comments_SQL->FROM( 'T_comments' );
+		$comments_SQL->FROM_add( 'INNER JOIN T_items__item ON comment_item_ID = post_ID' );
+		$comments_SQL->FROM_add( 'INNER JOIN T_categories ON cat_ID = post_main_cat_ID' );
+		$comments_SQL->WHERE( 'cat_blog_ID = '.$this->ID );
+		$comments_SQL->WHERE_and( 'comment_status IN ( '.$DB->quote( $reduced_statuses ).' )' );
+		$comments_SQL->GROUP_BY( 'comment_status' );
+		$comments = $DB->get_assoc( $comments_SQL->get(), $comments_SQL->title );
+
+		if( empty( $posts ) && empty( $comments ) )
+		{	// All posts and comments have a correct status:
+			return false;
+		}
+
+		return array(
+				'posts'    => $posts,
+				'comments' => $comments,
+			);
+	}
+
+
+	/**
+	 * Reduce statuses of posts and comments by max allowed status of this collection
+	 */
+	function update_reduced_status_data()
+	{
+		global $DB;
+
+		// Get statuses that should be reduced by max allowed:
+		$reduced_statuses = $this->get_reduced_statuses();
+
+		if( empty( $reduced_statuses ) )
+		{	// Nothing to update:
+			return;
+		}
+
+		// Get max allowed status:
+		$max_allowed_status = $this->get_allowed_item_status( 'published' );
+
+		// Update posts:
+		$DB->query( 'UPDATE T_items__item
+			INNER JOIN T_categories ON cat_ID = post_main_cat_ID
+			  SET post_status = '.$DB->quote( $max_allowed_status ).'
+			WHERE cat_blog_ID = '.$this->ID.'
+				AND post_status IN ( '.$DB->quote( $reduced_statuses ).' )',
+			'Reduce posts statuses by max allowed status of the collection #'.$this->ID );
+
+		// Update comments:
+		$DB->query( 'UPDATE T_comments
+			INNER JOIN T_items__item ON comment_item_ID = post_ID
+			INNER JOIN T_categories ON cat_ID = post_main_cat_ID
+			  SET comment_status = '.$DB->quote( $max_allowed_status ).'
+			WHERE cat_blog_ID = '.$this->ID.'
+				AND comment_status IN ( '.$DB->quote( $reduced_statuses ).' )',
+			'Reduce comments statuses by max allowed status of the collection #'.$this->ID );
 	}
 }
 
