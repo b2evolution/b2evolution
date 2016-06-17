@@ -36,10 +36,21 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Subscriptions').get_manual_link( 'subscriptions-other' ) );
+/*
 	$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post and/or comment.') );
+	$Form->checkbox( 'opt_out_subscription', $edited_Blog->get_setting( 'opt_out_subscription' ), '', T_('Consider collection members to be subscribed for each new post unless they specifically opt-out.') );
 	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
+	$Form->checkbox( 'opt_out_item_subscription', $edited_Blog->get_setting( 'opt_out_item_subscription' ), '', T_('Consider collection members to be subscribed for comments on a specific post unless they specifically opt-out.') );
 	// TODO: checkbox 'Enable RSS/Atom feeds'
 	// TODO2: which feeds (skins)?
+*/
+
+	$subscription_checkboxes = array();
+	$subscription_checkboxes[] = array( 'allow_subscriptions', 1, T_('Allow users to subscribe and receive email notifications for each new post and/or comment.'), $edited_Blog->get_setting( 'allow_subscriptions' ) );
+	$subscription_checkboxes[] = array( 'opt_out_subscription', 1, T_('Consider collection members to be subscribed for each new post unless they specifically opt-out.'), $edited_Blog->get_setting( 'opt_out_subscription' ) );
+	$subscription_checkboxes[] = array( 'allow_item_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ), $edited_Blog->get_setting( 'allow_item_subscriptions' ) );
+	$subscription_checkboxes[] = array( 'opt_out_item_subscription', 1, T_('Consider collection members to be subscribed for comments on a post unless they specifically opt-out.'), $edited_Blog->get_setting( 'opt_out_item_subscription' ) );
+	$Form->checklist( $subscription_checkboxes, 'subscriptions', T_('Email subscriptions') );
 $Form->end_fieldset();
 
 
