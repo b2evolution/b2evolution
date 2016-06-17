@@ -52,10 +52,11 @@ echo '</p>';
 
 if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 { // User can edit:
+	global $antispamsrv_tos_url;
 	?>
 	<p class="center">
 		[<a href="?ctrl=antispam&amp;action=poll&amp;<?php echo url_crumb('antispam') ?>"><?php echo T_('Request abuse update from centralized blacklist!') ?></a>]
-		[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
+		[<a href="<?php echo $antispamsrv_tos_url; ?>"><?php echo T_('Terms of service') ?></a>]
 	</p>
 	<?php
 }
