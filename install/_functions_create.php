@@ -1741,11 +1741,12 @@ function create_demo_contents()
 	}
 
 	task_begin( 'Creating default collection groups... ' );
-	$DB->query( 'INSERT INTO T_coll_groups ( cgrp_ID, cgrp_name, cgrp_order )
-		VALUES ( 1, "Home",      1 ),
-		       ( 2, "Blogs",     2 ),
-		       ( 3, "Community", 3 ),
-		       ( 4, "Home",      4 )' );
+	$DB->query( 'INSERT INTO T_coll_groups ( cgrp_ID, cgrp_name, cgrp_order, cgrp_owner_user_ID )
+		VALUES ( 1, "Home",   1, 1 ),
+		       ( 2, "Blogs",  2, '.$jay_moderator_ID.' ),
+		       ( 3, "Photos", 3, '.$dave_blogger_ID.' ),
+		       ( 4, "Forums", 4, '.$paul_blogger_ID.' ),
+		       ( 5, "Manual", 5, '.$dave_blogger_ID.' )' );
 	task_end();
 
 	task_begin( 'Creating default blogs... ' );
@@ -1869,7 +1870,7 @@ function create_demo_contents()
 			4, // Skin ID
 			'forum', 'any', 1, 'relative', false, 'public',
 			$paul_blogger_ID,
-			3 );
+			4 );
 	}
 
 	if( $install_collection_manual )
@@ -1885,7 +1886,7 @@ function create_demo_contents()
 			5, // Skin ID
 			'manual', 'any', 1, $default_blog_access_type, false, 'public',
 			$dave_blogger_ID,
-			4 );
+			5 );
 	}
 
 	$BlogCache = & get_BlogCache();
