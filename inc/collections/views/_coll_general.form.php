@@ -100,15 +100,13 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 	$CollGroupCache = & get_CollGroupCache();
 	if( $current_User->check_perm( 'blog_group', 'edit' ) )
 	{	// Allow to select all collection groups if Current user can has a permission for this:
-		$allow_none_coll_group = true;
 		$CollGroupCache->load_all();
 	}
 	else
 	{	// Load only available collection groups:
-		$allow_none_coll_group = false;
 		$CollGroupCache->load_where( 'cgrp_owner_user_ID = '.$current_User->ID );
 	}
-	$Form->select_input_object( 'cgrp_ID', $edited_Blog->get( 'cgrp_ID' ), $CollGroupCache, T_('Group'), array( 'allow_none' => $allow_none_coll_group ) );
+	$Form->select_input_object( 'cgrp_ID', $edited_Blog->get( 'cgrp_ID' ), $CollGroupCache, T_('Group'), array( 'required' => true ) );
 
 $Form->end_fieldset();
 

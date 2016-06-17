@@ -47,7 +47,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		'Creating table for Blogs',
 		"CREATE TABLE T_blogs (
 			blog_ID              int(11) unsigned NOT NULL auto_increment,
-			blog_cgrp_ID         INT(11) UNSIGNED NULL,
+			blog_cgrp_ID         INT(11) UNSIGNED NOT NULL,
 			blog_shortname       varchar(255) NULL default '',
 			blog_name            varchar(255) NOT NULL default '',
 			blog_owner_user_ID   int(11) unsigned NOT NULL default 1,

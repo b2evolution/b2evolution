@@ -411,6 +411,7 @@ class Blog extends DataObject
 			$this->set( 'shortname', param( 'blog_shortname', 'string', true ) );
 
 			// Collection group:
+			param_string_not_empty( 'cgrp_ID', T_('Please select a group.') );
 			$this->set( 'cgrp_ID', param( 'cgrp_ID', 'integer', NULL ), NULL );
 
 			// Language / locale:

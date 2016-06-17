@@ -219,6 +219,14 @@ function install_newdb()
 
 		create_demo_contents();
 	}
+	else
+	{	// We need to have at least one collection group because it is a required field for collection:
+		global $DB;
+		task_begin( 'Creating default collection group... ' );
+		$DB->query( 'INSERT INTO T_coll_groups ( cgrp_name, cgrp_order, cgrp_owner_user_ID )
+			VALUES ( "Default group", 1, 1 )' );
+		task_end();
+	}
 
 	evo_flush();
 	create_default_email_campaigns();
