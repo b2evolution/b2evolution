@@ -2215,17 +2215,17 @@ function blog_row_group_actions( & $row )
 
 	$r = '';
 
+	if( $current_User->check_perm( 'blog_group', 'edit', false, $row->cgrp_ID ) )
+	{	// If user can edit the collection group:
+		$r .= action_icon( T_('Edit this collection group'), 'edit', $admin_url.'?ctrl=collections&amp;action=edit_collgroup&amp;cgrp_ID='.$row->cgrp_ID );
+	}
 	if( $current_User->check_perm( 'blog_group', 'view', false, $row->cgrp_ID ) )
 	{	// If user can view the collection group:
 		$r .= action_icon( T_('New Collection').'...', 'new', $admin_url.'?ctrl=collections&amp;action=new&amp;cgrp_ID='.$row->cgrp_ID );
 	}
-	if( $current_User->check_perm( 'blog_group', 'edit', false, $row->cgrp_ID ) )
-	{	// If user can edit the collection group:
-		$r .= action_icon( T_('Edit this collection group'), 'edit', $admin_url.'?ctrl=collections&amp;action=edit_collgroup&amp;cgrp_ID='.$row->cgrp_ID );
-		if( $row->blog_ID === NULL )
-		{	// Only groups without collections can be deleted:
-			$r .= action_icon( T_('Delete this collection group!'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete_collgroup&amp;cgrp_ID='.$row->cgrp_ID.'&amp;'.url_crumb( 'collgroup' ) );
-		}
+	if( $current_User->check_perm( 'blog_group', 'edit', false, $row->cgrp_ID ) && $row->blog_ID === NULL )
+	{	// If user can delete the collection group(only without collections):
+		$r .= action_icon( T_('Delete this collection group!'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete_collgroup&amp;cgrp_ID='.$row->cgrp_ID.'&amp;'.url_crumb( 'collgroup' ) );
 	}
 
 	return $r;
