@@ -1098,7 +1098,7 @@ var downloadInterval = setInterval( function()
 			break;
 
 		case 'login':
-			global $Plugins, $transmit_hashed_password;
+			global $Plugins;
 
 			if( is_logged_in() )
 			{ // User is already logged in

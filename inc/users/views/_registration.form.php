@@ -23,7 +23,7 @@ global $Settings;
 
 global $dispatcher;
 
-global $collections_Module;
+global $collections_Module, $Plugins;
 
 global $baseurl;
 
@@ -142,21 +142,6 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-
-$Form->begin_fieldset( T_('Security options').get_manual_link('registration-security-settings') );
-
-	$Form->text_input( 'user_minpwdlen', (int)$Settings->get('user_minpwdlen'), 2, T_('Minimum password length'), T_('characters.'), array( 'maxlength'=>2, 'required'=>true ) );
-
-	$Form->checkbox_input( 'js_passwd_hashing', (bool)$Settings->get('js_passwd_hashing'), T_('Login password hashing'), array( 'note'=>T_('Check to enable the login form to hash the password with Javascript before transmitting it. This provides extra security on non-SSL connections.')) );
-
-	$Form->checkbox_input( 'passwd_special', (bool)$Settings->get('passwd_special'), T_('Require specials characters'), array( 'note'=>T_('Check to require at least 1 special character (not a letter nor a digit).')) );
-
-	$Form->checkbox_input( 'strict_logins', (bool)$Settings->get('strict_logins'), T_('Require strict logins'), array( 'note'=>sprintf( T_('Check to require only plain ACSII characters in user logins. Uncheck to allow any characters and symbols. The following characters are never allowed for security reasons: %s'), '\', ", >, <, @, &') ) );
-
-$Form->end_fieldset();
-
-// --------------------------------------------
-
 $Form->begin_fieldset( T_('Other options').get_manual_link('other-registration-settings') );
 
 	$Form->checkbox_input( 'registration_require_country', $Settings->get('registration_require_country'), T_('Require country'), array( 'note'=>T_('New users will have to specify their country in order to register.') ) );
@@ -190,6 +175,28 @@ $Form->begin_fieldset( T_('Other options').get_manual_link('other-registration-s
 				), T_( 'After registration' ), true );
 
 $Form->end_fieldset();
+
+// --------------------------------------------
+
+$Form->begin_fieldset( T_('Security options').get_manual_link('registration-security-settings') );
+
+	$Form->text_input( 'user_minpwdlen', (int)$Settings->get('user_minpwdlen'), 2, T_('Minimum password length'), T_('characters.'), array( 'maxlength'=>2, 'required'=>true ) );
+
+	$plugins_note = '';
+	$plugin_params = $Plugins->trigger_event_first_true( 'LoginAttemptNeedsRawPassword' );
+	if( ! empty( $plugin_params ) )
+	{
+		$Plugin = & $Plugins->get_by_ID( $plugin_params['plugin_ID'] );
+		$plugins_note = '<div class="red">'.sprintf( T_('WARNING: Plugin "%s" cannot use password hashing and will automatically disable this option during Login.'), $Plugin->name ).'</div>';
+	}
+	$Form->checkbox_input( 'js_passwd_hashing', (bool)$Settings->get('js_passwd_hashing'), T_('Password hashing during Login'), array( 'note' => T_('Check to enable the login form to hash the password with Javascript before transmitting it. This provides extra security on non-SSL connections.').$plugins_note ) );
+
+	$Form->checkbox_input( 'passwd_special', (bool)$Settings->get('passwd_special'), T_('Require specials characters'), array( 'note'=>T_('Check to require at least 1 special character (not a letter nor a digit).')) );
+
+	$Form->checkbox_input( 'strict_logins', (bool)$Settings->get('strict_logins'), T_('Require strict logins'), array( 'note'=>sprintf( T_('Check to require only plain ACSII characters in user logins. Uncheck to allow any characters and symbols. The following characters are never allowed for security reasons: %s'), '\', ", >, <, @, &') ) );
+
+$Form->end_fieldset();
+
 // --------------------------------------------
 
 if( $current_User->check_perm( 'users', 'edit' ) )
