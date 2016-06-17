@@ -90,6 +90,10 @@ $backup_paths = array(
  * @var array
  */
 $backup_exclude_folders = array(
+	'_cache' => array(
+		'path' => array( '_cache' ),
+		'excluded' => true ),
+
 	'cache' => array(
 		'path'     => array( '_evocache', '.evocache' ),
 		'excluded' => true ),

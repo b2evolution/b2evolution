@@ -1724,7 +1724,7 @@ class _core_Module extends Module
 								'text' => T_('Profiles'),
 								'href' => '?ctrl=usersettings' ),
 							'registration' => array(
-								'text' => T_('Registration'),
+								'text' => T_('Registration & Login'),
 								'href' => '?ctrl=registration' ),
 							'invitations' => array(
 								'text' => T_('Invitations'),
