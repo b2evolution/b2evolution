@@ -1033,10 +1033,9 @@ class Skin extends DataObject
 				case 'disp_access_requires_login':
 					// Specific features for disp=login and disp=access_requires_login:
 
-					global $Settings, $Plugins, $transmit_hashed_password;
+					global $Settings, $Plugins;
 
-					$transmit_hashed_password = (bool)$Settings->get( 'js_passwd_hashing' ) && !(bool)$Plugins->trigger_event_first_true( 'LoginAttemptNeedsRawPassword' );
-					if( $transmit_hashed_password )
+					if( transmit_hashed_password() )
 					{ // Include JS for client-side password hashing:
 						require_js( 'build/sha1_md5.bmin.js', 'blog' );
 					}

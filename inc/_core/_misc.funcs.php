@@ -7775,4 +7775,29 @@ function get_install_format_text( $text, $format = 'string' )
 
 	return $text;
 }
+
+
+/**
+ * Check if password should be transmitted in hashed format during Login
+ *
+ * @return boolean TRUE - hashed password will be transmitted, FALSE - raw password will be transmitted
+ */
+function transmit_hashed_password()
+{
+	global $transmit_hashed_password;
+
+	if( isset( $transmit_hashed_password ) )
+	{	// Get value from already defined var:
+		return $transmit_hashed_password;
+	}
+
+	global $Settings, $Plugins;
+
+	// Allow to transmit hashed password only when:
+	// - it is enabled by general setting "Password hashing during Login"
+	// - no plugins that automatically disable this option during Login
+	$transmit_hashed_password = (bool)$Settings->get( 'js_passwd_hashing' ) && !(bool)$Plugins->trigger_event_first_true( 'LoginAttemptNeedsRawPassword' );
+
+	return $transmit_hashed_password;
+}
 ?>
