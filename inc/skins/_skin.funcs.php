@@ -2162,32 +2162,35 @@ function skin_opengraph_tags()
 		}
 
 		$LinkOwner = new LinkItem( $Item );
-		if( ! $LinkList = $LinkOwner->get_attachment_LinkList( 1000 ) )
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000 ) )
 		{ // Item has no linked files
-			return;
-		}
+			while( $Link = & $LinkList->get_next() )
+			{
+				if( ! ( $File = & $Link->get_File() ) )
+				{ // No File object
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
+					continue;
+				}
 
-		while( $Link = & $LinkList->get_next() )
-		{
-			if( ! ( $File = & $Link->get_File() ) )
-			{ // No File object
-				global $Debuglog;
-				$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
-				continue;
-			}
+				if( ! $File->exists() )
+				{ // File doesn't exist
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+					continue;
+				}
 
-			if( ! $File->exists() )
-			{ // File doesn't exist
-				global $Debuglog;
-				$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
-				continue;
-			}
-
-			if( $File->is_image() )
-			{ // Use only image files for og:image tag
-				$og_images[] = $File->get_url();
+				if( $File->is_image() )
+				{ // Use only image files for og:image tag
+					$og_images[] = $File->get_url();
+				}
 			}
 		}
+
+		echo '<meta property="og:title" content="'.format_to_output( $Item->get( 'title' ), 'htmlattr' )."\" />\n";
+		echo '<meta property="og:url" content="'.format_to_output( $Item->get_url( 'public_view' ), 'htmlattr' )."\" />\n";
+		echo '<meta property="og:description" content="'.format_to_output( $Item->get_excerpt2(), 'htmlattr' )."\" />\n";
+		echo '<meta property="og:site_name" content="'.format_to_output( $Item->get_Blog()->get( 'name' ), 'htmlattr' )."\" />\n";
 	}
 
 	if( ! empty( $og_images ) )
