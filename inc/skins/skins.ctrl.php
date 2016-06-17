@@ -104,7 +104,7 @@ switch( $action )
 		{	// We installed the skin for the site:
 			if( ! skin_check_compatibility( $edited_Skin->ID, 'site' ) )
 			{	// Redirect to admin skins page selector if the skin cannot be selected:
-				$Messages->add( T_('The skin cannot be used for site.'), 'error' );
+				$Messages->add( T_('This skin cannot be used as a site skin.'), 'error' );
 				header_redirect( $admin_url.'?ctrl=collections&tab=site_skin&skinpage=selection&skin_type='.$edited_Skin->type );
 				break;
 			}

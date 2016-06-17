@@ -615,7 +615,7 @@ class Blog extends DataObject
 			load_funcs( 'skins/_skin.funcs.php' );
 			if( ! skin_check_compatibility( $updated_skin_ID, 'coll' ) )
 			{	// Redirect to admin skins page selector if the skin cannot be selected:
-				$Messages->add( T_('The skin cannot be used for collections.'), 'error' );
+				$Messages->add( T_('This skin cannot be used as a collection skin.'), 'error' );
 			}
 		}
 
