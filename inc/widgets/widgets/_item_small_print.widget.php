@@ -237,6 +237,8 @@ class item_small_print_Widget extends ComponentWidget
 				) );
 		}
 
+		echo '<div class="clearfix"></div>';
+
 		echo $this->disp_params['widget_item_small_print_after'];
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];

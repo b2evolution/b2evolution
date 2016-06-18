@@ -190,7 +190,7 @@ class item_about_author_Widget extends ComponentWidget
 		}
 
 		// Display user info only when it is defined for current author
-		echo add_tag_class( $this->disp_params['block_start'], 'clear' );
+		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
@@ -214,7 +214,7 @@ class item_about_author_Widget extends ComponentWidget
 			echo '</div>';
 		}
 		echo $user_info;
-		echo '<div class="clear"></div>';
+		echo '<div class="clearfix"></div>';
 
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
