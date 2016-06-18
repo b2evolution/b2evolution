@@ -111,14 +111,14 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 
 		// Author
 		$Item->author( array(
-			'before'    => ' '.T_('by').' ',
+			'before'    => /* TRANS: author name */ ' '.T_('by').' ',
 			'after'     => ' ',
 			'link_text' => $params['author_link_text'],
 		) );
 
 		// Categories
 		$Item->categories( array(
-			'before'          => T_('in').' ',
+			'before'          => /* TRANS: category name(s) */ T_('in').' ',
 			'after'           => ' ',
 			'include_main'    => true,
 			'include_other'   => true,
