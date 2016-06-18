@@ -179,6 +179,47 @@ class twitter_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinBeginHtmlHead( & $params )
+	{
+		global $Blog, $Item;
+
+		if( $Blog && $Blog->get_setting( 'tags_twitter_card' ) )
+		{
+			if( $Item )
+			{
+				$Item->get_creator_User();
+			}
+
+			$params = array_merge( array(
+					'blog_ID' => $Blog->ID,
+					'user_ID' => isset( $Item->creator_user_ID ) ? $Item->creator_user_ID : NULL
+				), $params );
+
+			$oauth_info = $this->get_oauth_info( $params );
+
+			if( ! empty( $oauth_info['token'] ) && isset( $oauth_info['contact'] ) )
+			{
+				echo '<meta property="twitter:creator" content="@'.$oauth_info['contact'].'" />'."\n";
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+
+	/**
 	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
 	 * @todo: ideally we'd want a warning if the twitter ping is not enabled
