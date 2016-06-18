@@ -98,11 +98,11 @@ class item_about_author_Widget extends ComponentWidget
 		$UserFieldCache->load_all();
 		$user_fields = $UserFieldCache->get_option_array();
 
-		// Set default user field as "About me"
+		// Set default user field as "Micro bio"
 		$default_user_field_ID = 0;
 		foreach( $user_fields as $user_field_ID => $user_field_name )
 		{
-			if( $user_field_name == 'About me' )
+			if( $user_field_name == 'Micro bio' )
 			{
 				$default_user_field_ID = $user_field_ID;
 				break;
