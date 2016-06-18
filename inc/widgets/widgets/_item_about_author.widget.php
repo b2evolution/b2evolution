@@ -190,7 +190,7 @@ class item_about_author_Widget extends ComponentWidget
 		}
 
 		// Display user info only when it is defined for current author
-		echo $this->disp_params['block_start'];
+		echo add_tag_class( $this->disp_params['block_start'], 'clear' );
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
