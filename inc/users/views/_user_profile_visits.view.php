@@ -72,8 +72,8 @@ $params = array_merge( array(
 		'page_url'             => get_dispctrl_url( 'visits', 'user_tab=visits&amp;user_ID='.$edited_User->ID ),
 		'filterset_name'       => '',
 		'results_param_prefix' => 'upv_',
-		'results_no_text'      => T_('No user profile viewer'),
-		'results_title'        => T_('Profile Visitors'),
+		'results_no_text'      => T_('No-one visited your profile yet. Please check back later.'),
+		'results_title'        => T_('People who have visited your profile'),
 		'results_order'        => '/upv_last_visit_ts/D',
 		'join_group'           => is_logged_in() ? false : true, /* Anonymous users have a limit by user group level */
 		'join_city'            => true,
