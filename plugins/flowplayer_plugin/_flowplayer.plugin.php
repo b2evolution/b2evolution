@@ -121,7 +121,8 @@ class flowplayer_plugin extends Plugin
 					'valid_range' => array( 'min' => 1 ),
 					),
 				'allow_download' => array(
-					'label' => T_('Allow downloading of the video file'),
+					'label' => T_('Display Download Link'),
+					'note' => T_('Check to display a "Download this video" link under the video.'),
 					'type' => 'checkbox',
 					'defaultvalue' => 0,
 					),
