@@ -154,7 +154,7 @@ class item_small_print_Widget extends ComponentWidget
 				'widget_item_small_print_separator' => ' &bull; ',
 			), $this->disp_params );
 
-		echo $this->disp_params['block_start'];
+		echo add_tag_class( $this->disp_params['block_start'], 'clearfix' );
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 		echo $this->disp_params['widget_item_small_print_before'];
@@ -236,8 +236,6 @@ class item_small_print_Widget extends ComponentWidget
 					'link_text' => T_('View history')
 				) );
 		}
-
-		echo '<div class="clearfix"></div>';
 
 		echo $this->disp_params['widget_item_small_print_after'];
 		echo $this->disp_params['block_body_end'];
