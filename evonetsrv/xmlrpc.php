@@ -24,7 +24,7 @@ function b2evoreportabuse( $m )
 
 	if( empty( $enable_blacklist_server_API ) )
 	{	// Exit here if the server cannot be used as central antispam:
-		return new xmlrpcresp( 0, $xmlrpcerruser + 7, 'The server is not used as central antispam server.' ); // user error 7
+		return new xmlrpcresp( 0, $xmlrpcerruser + 7, 'This server does not accept antispam reports.' ); // user error 7
 	}
 
 	$err = '';
@@ -185,7 +185,7 @@ function b2evopollabuse( $m )
 
 	if( empty( $enable_blacklist_server_API ) )
 	{	// Exit here if the server cannot be used as central antispam:
-		return new xmlrpcresp( 0, $xmlrpcerruser + 7, 'The server is not used as central antispam server.' ); // user error 7
+		return new xmlrpcresp( 0, $xmlrpcerruser + 7, 'This server does not serve an antispam blacklist.' ); // user error 7
 	}
 
 	// This is the datetime we want to start at:
