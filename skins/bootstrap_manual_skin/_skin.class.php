@@ -263,7 +263,7 @@ class bootstrap_manual_Skin extends Skin
 
 		if( $this->is_left_navigation_visible() )
 		{ // Include JS code for left navigation panel only when it is displayed:
-			require_js( $this->get_url().'left_navigation.js' );
+			$this->require_js( 'left_navigation.js' );
 		}
 	}
 

@@ -914,11 +914,11 @@ class Skin extends DataObject
 						|| $debug
 						|| ( $this->use_min_css == 'check' && !file_exists(dirname(__FILE__).'/style.min.css' ) ) )
 					{	// Use readable CSS:
-						require_css( 'style.css', 'relative' );	// Relative to <base> tag (current skin folder)
+						$this->require_css( 'style.css' );
 					}
 					else
 					{	// Use minified CSS:
-						require_css( 'style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
+						$this->require_css( 'style.min.css' );
 					}
 					break;
 
@@ -1738,6 +1738,34 @@ class Skin extends DataObject
 		}
 
 		return array();
+	}
+
+
+	/**
+	 * Memorize that a specific css that file will be required by the current page.
+	 * @see require_css() for full documentation,
+	 * this function is used to add unique version number for each skin
+	 *
+	 * @param string Name of CSS file relative to <base> tag (current skin folder):
+	 */
+	function require_css( $css_file )
+	{
+		global $app_version_long;
+		require_css( $css_file, 'relative', NULL, NULL, $this->folder.'+'.$this->version.'+'.$app_version_long );
+	}
+
+
+	/**
+	 * Memorize that a specific javascript file will be required by the current page.
+	 * @see require_js() for full documentation,
+	 * this function is used to add unique version number for each skin
+	 *
+	 * @param string Name of JavaScript file relative to <base> tag (current skin folder):
+	 */
+	function require_js( $js_file )
+	{
+		global $app_version_long;
+		require_js( $js_file, 'relative', false, false, $this->folder.'+'.$this->version.'+'.$app_version_long );
 	}
 }
 

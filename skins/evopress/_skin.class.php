@@ -156,10 +156,10 @@ class evopress_Skin extends Skin
 				'disp_auto',      // Automatically include additional CSS and/or JS required by certain disps (replace with 'disp_off' to disable this)
 			) );
 
-		// require_css( 'style.css', 'relative' );
-		// require_css( 'item.css', 'relative' );
-		// require_css( 'evopress.bundle.css', 'relative' ); // Concatenation of the above
-		require_css( 'evopress.bmin.css', 'relative' ); // Concatenation + Minifaction of the above
+		// $this->require_css( 'style.css' );
+		// $this->require_css( 'item.css' );
+		// $this->require_css( 'evopress.bundle.css' ); // Concatenation of the above
+		$this->require_css( 'evopress.bmin.css' ); // Concatenation + Minifaction of the above
 
 		// Add custom CSS:
 		$custom_css = '';
