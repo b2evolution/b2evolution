@@ -144,7 +144,7 @@ if( ! empty( $chapters ) )
 
 				// Categories
 				$Item->categories( array(
-					'before'          => T_('in').' ',
+					'before'          => /* TRANS: category name(s) */ T_('in').' ',
 					'after'           => ' ',
 					'include_main'    => true,
 					'include_other'   => true,

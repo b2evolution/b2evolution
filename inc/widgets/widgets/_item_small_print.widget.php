@@ -154,7 +154,7 @@ class item_small_print_Widget extends ComponentWidget
 				'widget_item_small_print_separator' => ' &bull; ',
 			), $this->disp_params );
 
-		echo $this->disp_params['block_start'];
+		echo add_tag_class( $this->disp_params['block_start'], 'clearfix' );
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 		echo $this->disp_params['widget_item_small_print_before'];
@@ -184,7 +184,7 @@ class item_small_print_Widget extends ComponentWidget
 						'time_format' => '#short_time',
 					) );
 				$Item->author( array(
-						'before'    => T_('by').' ',
+						'before'    => /* TRANS: author name */ T_('by').' ',
 						'link_text' => 'auto',
 					) );
 			}
@@ -227,7 +227,7 @@ class item_small_print_Widget extends ComponentWidget
 
 			$Item->lastedit_user( array(
 					'before'    => T_('Last edit by').' ',
-					'after'     => ' '.T_('on').' '.$Item->get_mod_date( 'F jS, Y' ),
+					'after'     => /* TRANS: "on" is followed by a date here */ ' '.T_('on').' '.$Item->get_mod_date( 'F jS, Y' ),
 					'link_text' => 'auto',
 				) );
 

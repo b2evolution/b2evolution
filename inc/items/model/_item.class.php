@@ -3297,16 +3297,6 @@ class Item extends ItemLight
 				continue;
 			}
 
-			if( $File->is_audio() )
-			{ // Player for audio file:
-				$r_file[$i]  = '<div class="podplayer">';
-				$r_file[$i] .= $this->get_player( $File->get_url() );
-				$r_file[$i] .= '</div>';
-				$i++;
-				$params = $temp_params;
-				continue;
-			}
-
 			// A link to download a file:
 
 			// Just icon with download icon:
@@ -5046,17 +5036,34 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get HTML code to display a flash audio player for playback of a
-	 * given URL.
+	 * Get HTML code to display video/audio player for playback of a given URL
 	 *
-	 * @param string The URL of a MP3 audio file.
-	 * @return string The HTML code.
+	 * @param string The URL of video/audio file
+	 * @return string The HTML code
 	 */
 	function get_player( $url )
 	{
-		global $rsc_url;
+		global $Plugins;
 
-		return '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0" width="200" height="20" id="dewplayer" align="middle"><param name="wmode" value="transparent"><param name="allowScriptAccess" value="sameDomain" /><param name="movie" value="'.$rsc_url.'swf/dewplayer.swf?mp3='.$url.'&amp;showtime=1" /><param name="quality" value="high" /><param name="bgcolor" value="" /><embed src="'.$rsc_url.'swf/dewplayer.swf?mp3='.$url.'&amp;showtime=1" quality="high" bgcolor="" width="200" height="20" name="dewplayer" wmode="transparent" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"></embed></object>';
+		$params = array(
+				'url'  => $url,
+				'data' => '',
+			);
+
+		$temp_params = $params;
+		foreach( $params as $param_key => $param_value )
+		{ // Pass all params by reference, in order to give possibility to modify them by plugin
+			// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
+			$params[ $param_key ] = & $params[ $param_key ];
+		}
+
+		if( count( $Plugins->trigger_event_first_true( 'RenderURL', $params ) ) != 0 )
+		{	// Display a rendered url, for example as video/audio player:
+			return $params['data'];
+		}
+
+		// Display URL as simple link:
+		return '<a href="'.$url.'">'.$url.'</a>';
 	}
 
 
