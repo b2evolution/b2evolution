@@ -1783,6 +1783,8 @@ class Item extends ItemLight
 	 */
 	function get_excerpt2( $params = array() )
 	{
+		global $current_User;
+
 		$params += array(
 			'allow_empty' => false,
 			'update_db' => true,
@@ -1790,7 +1792,7 @@ class Item extends ItemLight
 
 		if( ! $params['allow_empty'] )
 		{	// Make sure excerpt the excerpt is not empty by updating it automatically if needed:
-			if( $this->update_excerpt() && $params['update_db'] && $this->ID )
+			if( $this->update_excerpt() && $params['update_db'] && $this->ID && $current_User )
 			{	// We have updated... let's also update the DB:
 				$this->dbupdate( false );		// Do not auto track modification date.
 			}
