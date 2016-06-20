@@ -579,6 +579,9 @@ ol.breadcrumb {
 .forums_list .posts_panel .ft_date a.ft_author_avatar:hover {
   background-color: transparent !important;
 }
+.forums_list .posts_panel .ft_date .last_mod_date {
+  white-space: normal;
+}
 .forums_list .posts_panel .ft_count {
   margin-top: 12px;
 }
@@ -1020,13 +1023,16 @@ label.control-label[for=post_title] {
 .btn_recent_topics {
   margin: 0 0 20px 5px;
 }
-.widget_core_coll_search_form {
+main .widget_core_coll_search_form {
   float: right;
   width: 40%;
   min-width: 250px;
   margin: 0 0 20px 5px;
 }
-.widget_core_coll_search_form div.compact_search_form input.search_field {
+main .widget_core_coll_search_form div.compact_search_form input.search_field {
+  width: 100%;
+}
+aside .widget_core_coll_search_form div.compact_search_form input.search_field {
   width: 100%;
 }
 .extended_search_form {

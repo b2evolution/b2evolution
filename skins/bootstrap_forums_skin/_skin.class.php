@@ -365,7 +365,7 @@ class bootstrap_forums_Skin extends Skin
 			$custom_css = "@media screen and (min-width: 1200px) {
 				.forums_list .ft_date {
 					white-space: normal;
-					margin-top: 11px;
+					margin-top: 3px;
 				}
 				.disp_single .single_topic .evo_content_block .panel-body .evo_post__full, .disp_single .evo_comment .panel-body .evo_comment_text p, .disp_single .post_tags {
 					padding-left: 15px;

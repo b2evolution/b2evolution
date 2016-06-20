@@ -180,6 +180,9 @@ ol.breadcrumb {
 			a.ft_author_avatar:hover {
 				background-color: transparent !important;
 			}
+			.last_mod_date {
+				white-space: normal;
+			}
 		}
 		.ft_count {
 			margin-top: 12px;
@@ -652,11 +655,17 @@ label.control-label[for=post_title] {
 }
 
 // Search form
-.widget_core_coll_search_form {
+main .widget_core_coll_search_form {
 	float: right;
 	width: 40%;
 	min-width: 250px;
 	margin: 0 0 20px 5px;
+	div.compact_search_form input.search_field {
+		width: 100%;
+	}
+}
+
+aside .widget_core_coll_search_form {
 	div.compact_search_form input.search_field {
 		width: 100%;
 	}
