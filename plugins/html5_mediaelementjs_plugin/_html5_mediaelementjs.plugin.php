@@ -177,7 +177,7 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 					'valid_range' => array( 'min' => 1 ),
 					),
 				'allow_download' => array(
-					'label' => T_('Allow downloading of the file'),
+					'label' => T_('Display Download Link'),
 					'type' => 'checkbox',
 					'defaultvalue' => 0,
 					),
