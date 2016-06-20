@@ -2189,7 +2189,7 @@ function skin_opengraph_tags()
 
 		echo '<meta property="og:title" content="'.format_to_output( $Item->get( 'title' ), 'htmlattr' )."\" />\n";
 		echo '<meta property="og:url" content="'.format_to_output( $Item->get_url( 'public_view' ), 'htmlattr' )."\" />\n";
-		echo '<meta property="og:description" content="'.format_to_output( $Item->get_excerpt2( array( 'update_db' => false ) ), 'htmlattr' )."\" />\n";
+		echo '<meta property="og:description" content="'.format_to_output( $Item->get_excerpt2(), 'htmlattr' )."\" />\n";
 		echo '<meta property="og:site_name" content="'.format_to_output( $Item->get_Blog()->get( 'name' ), 'htmlattr' )."\" />\n";
 	}
 
@@ -2253,7 +2253,7 @@ function skin_twitter_tags()
 
 		echo '<meta property="twitter:card" content="summary" />'."\n";
 		echo '<meta property="twitter:title" content="'.format_to_output( $Item->get( 'title' ), 'htmlattr' )."\" />\n";
-		echo '<meta property="twitter:description" content="'.format_to_output( $Item->get_excerpt2( array( 'update_db' => false ) ), 'htmlattr' )."\" />\n";
+		echo '<meta property="twitter:description" content="'.format_to_output( $Item->get_excerpt2(), 'htmlattr' )."\" />\n";
 	}
 
 	if( ! empty( $twitter_image ) )
