@@ -454,7 +454,7 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 			$skins_path = dirname( $this->classfile_path ).'/skins';
 			if( file_exists( $skins_path.'/'.$skin.'/style.css' ) )
 			{	// Require css file only if it exists
-				require_css( $this->get_plugin_url().'skins/'.$skin.'/style.css', 'relative' );
+				$this->require_css( 'skins/'.$skin.'/style.css' );
 			}
 		}
 	}

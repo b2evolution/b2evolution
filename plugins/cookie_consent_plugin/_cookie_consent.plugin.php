@@ -135,7 +135,7 @@ class cookie_consent_plugin extends Plugin
 		}
 
 		// Initialize html block:
-		require_css( $this->get_plugin_url().'style.css', true, NULL, NULL, '#', true );
+		$this->require_css( 'style.css', true );
 		require_js( 'jquery/jquery.cookie.min.js', 'rsc_url', false, true );
 
 		$html_block = '<div id="eu_cookie_consent"'.( is_logged_in() ? ' class="eu_cookie_consent__loggedin"' : '' ).'>'

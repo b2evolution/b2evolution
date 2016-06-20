@@ -70,7 +70,7 @@ class star_plugin extends Plugin
 			return;
 		}
 
-		require_css( $this->get_plugin_url( true ).'star.css', 'blog' );
+		$this->require_css( 'star.css' );
 	}
 
 

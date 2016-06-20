@@ -296,7 +296,7 @@ class flowplayer_plugin extends Plugin
 		$skins_path = dirname( $this->classfile_path ).'/skin';
 		if( file_exists( $skins_path.'/'.$skin.'.css' ) )
 		{ // Require css file only if it exists
-			require_css( $this->get_plugin_url().'skin/'.$skin.'.css', 'relative' );
+			$this->require_css( 'skin/'.$skin.'.css' );
 		}
 	}
 

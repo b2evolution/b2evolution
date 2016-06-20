@@ -106,7 +106,7 @@ class infodots_plugin extends Plugin
 			return;
 		}
 
-		require_css( $this->get_plugin_url( true ).'infodots.css', $relative_to );
+		$this->require_css( 'infodots.css' );
 
 		// Bubbletip
 		require_js( '#jquery#', $relative_to );

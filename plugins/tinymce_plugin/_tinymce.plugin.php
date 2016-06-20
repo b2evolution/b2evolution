@@ -782,13 +782,13 @@ class tinymce_plugin extends Plugin
 		}
 
 		// Load the content css files from 3rd party code, e.g. other plugins:
-		global $tinymce_content_css;
+		global $tinymce_content_css, $app_version_long;
 		if( is_array( $tinymce_content_css ) && count( $tinymce_content_css ) )
 		{
 			$content_css .= ','.implode( ',', $tinymce_content_css );
 		}
 
-		$init_options[] = 'content_css : "'.$this->get_plugin_url().'editor.css?v='.( $debug ? $localtimenow : $this->version )
+		$init_options[] = 'content_css : "'.$this->get_plugin_url().'editor.css?v='.( $debug ? $localtimenow : $this->version.'+'.$app_version_long )
 									.$content_css.'"';
 
 		// Generated HTML code options:
@@ -1017,7 +1017,7 @@ class tinymce_plugin extends Plugin
 
 		if( $disp == 'edit' )
 		{
-			require_css( $this->get_plugin_url( true ).'toolbar.css', 'blog' );
+			$this->require_css( 'toolbar.css' );
 		}
 	}
 
@@ -1034,7 +1034,7 @@ class tinymce_plugin extends Plugin
 
 		if( $ctrl == 'items' || $ctrl == 'campaigns' )
 		{
-			require_css( $this->get_plugin_url( true ).'toolbar.css', 'blog' );
+			$this->require_css( 'toolbar.css' );
 		}
 	}
 }

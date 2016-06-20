@@ -270,7 +270,7 @@ class html5_videojs_plugin extends Plugin
 			$skins_path = dirname( $this->classfile_path ).'/skins';
 			if( file_exists( $skins_path.'/'.$skin.'/style.min.css' ) )
 			{	// Require css file only if it exists:
-				require_css( $this->get_plugin_url().'skins/'.$skin.'/style.min.css', 'relative' );
+				$this->require_css( 'skins/'.$skin.'/style.min.css' );
 			}
 		}
 	}

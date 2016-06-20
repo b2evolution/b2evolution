@@ -1746,7 +1746,7 @@ class Skin extends DataObject
 	 * @see require_css() for full documentation,
 	 * this function is used to add unique version number for each skin
 	 *
-	 * @param string Name of CSS file relative to <base> tag (current skin folder):
+	 * @param string Name of CSS file relative to <base> tag (current skin folder)
 	 */
 	function require_css( $css_file )
 	{
@@ -1760,7 +1760,7 @@ class Skin extends DataObject
 	 * @see require_js() for full documentation,
 	 * this function is used to add unique version number for each skin
 	 *
-	 * @param string Name of JavaScript file relative to <base> tag (current skin folder):
+	 * @param string Name of JavaScript file relative to <base> tag (current skin folder)
 	 */
 	function require_js( $js_file )
 	{
