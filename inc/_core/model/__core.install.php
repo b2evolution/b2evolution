@@ -251,14 +251,14 @@ $schema_queries = array(
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset COMMENT='saves available locales'
 		" ),
 
-	'T_antispam' => array(
+	'T_antispam__keyword' => array(
 		'Creating table for Antispam Blacklist',
-		"CREATE TABLE T_antispam (
-			aspm_ID bigint(11) NOT NULL auto_increment,
-			aspm_string varchar(80) NOT NULL,
-			aspm_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported',
-			PRIMARY KEY aspm_ID (aspm_ID),
-			UNIQUE aspm_string (aspm_string)
+		"CREATE TABLE T_antispam__keyword (
+			askw_ID bigint(11) NOT NULL auto_increment,
+			askw_string varchar(80) NOT NULL,
+			askw_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported',
+			PRIMARY KEY askw_ID (askw_ID),
+			UNIQUE askw_string (askw_string)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_antispam__iprange' => array(
@@ -491,6 +491,7 @@ $schema_queries = array(
 			ecmp_sent_ts         TIMESTAMP NULL,
 			ecmp_renderers       VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			ecmp_use_wysiwyg     TINYINT(1) NOT NULL DEFAULT 0,
+			ecmp_send_ctsk_ID    INT(10) UNSIGNED NULL DEFAULT NULL,
 			PRIMARY KEY          (ecmp_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 

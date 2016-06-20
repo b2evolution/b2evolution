@@ -81,6 +81,17 @@ div.average_rating .star_rating {
   float: left;
   padding-right: 10px;
 }
+.videojs_block .vjs-default-skin .vjs-big-play-button {
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+*[class^="listnav_distance_"],
+*[class*=" listnav_distance_"] {
+  display: none;
+}
 table.prevnext_post {
   width: 95%;
   margin: 0 auto;
@@ -324,7 +335,6 @@ textarea.form_textarea_input {
   background-color: #fec;
   padding: 1px;
   margin: 4px;
-  -moz-border-radius: 3px;
   border-radius: 3px;
 }
 .form_footer_notes {
@@ -585,8 +595,6 @@ div.item_location {
   border: 1px solid #BBB;
   background: #D4D4D4;
   padding: 0 5px 5px 5px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
   -khtml-border-radius: 4px;
   border-radius: 4px;
 }
@@ -856,8 +864,6 @@ div.results span[class*=status_] span {
   text-align: center;
   vertical-align: middle;
   border: 1px solid #999;
-  -moz-border-radius: 2px;
-  -webkit-border-radius: 2px;
   -khtml-border-radius: 2px;
   border-radius: 2px;
   padding: 2px;
@@ -896,20 +902,12 @@ input.btn-lg {
   margin: 0 auto;
 }
 .main_profile_picture {
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
   border-radius: 4px;
 }
 .other_profile_pictures {
   margin-bottom: 10px;
 }
 .other_profile_pictures img {
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
   border-radius: 4px;
 }
 .profile_column_left {
@@ -963,6 +961,19 @@ input.btn-lg {
   padding: 8px;
   vertical-align: top;
 }
+.evo_content_block table.evo_poll__table {
+  border-spacing: 0;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+.evo_content_block table.evo_poll__table th {
+  padding: 2px 10px 2px 0;
+  background-color: #eee;
+}
+.evo_content_block table.evo_poll__table td {
+  padding: 2px 10px 2px 0;
+  vertical-align: top;
+}
 .evo_post_gallery__image {
   display: inline-block;
   margin: 0 1ex 1ex 0;
@@ -1002,6 +1013,9 @@ input.btn-lg {
 }
 .evo_poll__table .evo_poll__title {
   white-space: nowrap;
+}
+.evo_poll__table .evo_poll_percentage {
+  max-width: 50px;
 }
 .evo_container__sidebar .evo_poll__title {
   white-space: normal;

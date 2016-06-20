@@ -37,7 +37,7 @@ jQuery( document ).ready(function()
 				{ // Get field info
 					type: 'POST',
 					url: htsrv_url + 'anon_async.php',
-					data: 'action=get_field_bubbletip' + '&field_ID=' + field_ID + '&b2evo_icons_type=glyphicons',
+					data: 'action=get_field_bubbletip' + '&field_ID=' + field_ID + '&b2evo_icons_type=fontawesome',
 					success: function( result )
 					{ // If success request - fill div with field data, save same data to the cache, init popover
 						if( ajax_response_is_correct( result ) )

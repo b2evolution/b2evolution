@@ -22,7 +22,7 @@ class shortcodes_plugin extends Plugin
 	var $code = 'evo_shortcodes';
 	var $name = 'Short Codes';
 	var $priority = 40;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -33,6 +33,20 @@ class shortcodes_plugin extends Plugin
 	{
 		$this->short_desc = T_('Short codes inserting');
 		$this->long_desc = T_('This plugin will display a toolbar with buttons to quickly insert short codes.');
+	}
+
+
+	/**
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_coll_setting_definitions( & $params )
+	{
+		$default_params = array_merge( $params, array( 'default_comment_using' => 'disabled' ) );
+
+		return parent::get_coll_setting_definitions( $default_params );
 	}
 
 
@@ -56,8 +70,17 @@ class shortcodes_plugin extends Plugin
 			return false;
 		}
 
-		if( empty( $params['Item'] ) || $params['Item']->is_intro() || ! $params['Item']->get_type_setting( 'allow_breaks' ) )
+		$Item = & $params['Item'];
+
+		if( empty( $Item ) || $Item->is_intro() || ! $Item->get_type_setting( 'allow_breaks' ) )
 		{	// Teaser and page breaks are not allowed for current item type and for all intro items:
+			return false;
+		}
+
+		$item_Blog = & $Item->get_Blog();
+
+		if( ! $this->get_coll_setting( 'coll_use_for_posts', $item_Blog ) )
+		{	// This plugin is disabled to use for posts:
 			return false;
 		}
 

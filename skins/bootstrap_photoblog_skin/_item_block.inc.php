@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $Skin;
+global $Item, $Skin, $app_version;
 
 // Default params:
 $params = array_merge( array(
@@ -34,7 +34,7 @@ $params = array_merge( array(
 		'content_mode'               => 'auto',		// excerpt|full|normal|auto -- auto will auto select depending on $disp-detail
 		'image_class'                => 'img-responsive',
 		'image_size'                 => 'fit-1280x720',
-		'author_link_text'           => 'preferredname',
+		'author_link_text'           => 'auto',
 	), $params );
 
 
@@ -150,14 +150,14 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 
 			// Author
 			$Item->author( array(
-				'before'    => ' '.T_('by').' ',
+				'before'    => /* TRANS: author name */ ' '.T_('by').' ',
 				'after'     => ' ',
 				'link_text' => $params['author_link_text'],
 			) );
 
 			// Categories
 			$Item->categories( array(
-				'before'          => T_('in').' ',
+				'before'          => /* TRANS: category name(s) */ T_('in').' ',
 				'after'           => ' ',
 				'include_main'    => true,
 				'include_other'   => true,
@@ -183,7 +183,6 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 		<div class="evo_container evo_container__item_single">
 		<?php
 		// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-		// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 		// Display container contents:
 		skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
@@ -199,6 +198,16 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			'widget_item_tags_after'     => '</div>',
 			// Params for skin file "_item_content.inc.php"
 			'widget_item_content_params' => $params,
+			// Template params for "Item Attachments" widget:
+			'widget_item_attachments_params' => array(
+					'limit_attach'       => 1000,
+					'before'             => '<div class="evo_post_attachments"><h3>'.T_('Attachments').':</h3><ul class="evo_files">',
+					'after'              => '</ul></div>',
+					'before_attach'      => '<li class="evo_file">',
+					'after_attach'       => '</li>',
+					'before_attach_size' => ' <span class="evo_file_size">(',
+					'after_attach_size'  => ')</span>',
+				),
 		) );
 		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 		?>
@@ -273,18 +282,24 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	?>
 
 	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
 		// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
 		skin_include( '_item_workflow.inc.php' );
 		// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
+	}
 	?>
 
 	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
 		// ------------------ META COMMENTS INCLUDED HERE ------------------
 		skin_include( '_item_meta_comments.inc.php', array(
 				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
 				'comment_end'           => '</article>',
 			) );
 		// ---------------------- END OF META COMMENTS ---------------------
+	}
 	?>
 
 	<?php

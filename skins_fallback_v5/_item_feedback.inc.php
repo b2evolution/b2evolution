@@ -56,7 +56,7 @@ $params = array_merge( array(
 		'comment_error_end'    => '</div>',
 		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
 		'comment_image_size'   => 'fit-400x320',
-		'author_link_text'     => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+		'author_link_text'     => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 		'link_to'              => 'userurl>userpage',		    // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'form_title_start'     => '<h3>',
 		'form_title_end'       => '</h3>',
@@ -223,9 +223,6 @@ if( $Item->can_see_comments( true ) )
 			) );
 
 		$CommentList->load_from_Request();
-
-		// Run SQL query to get results depending on current filters:
-		$CommentList->query();
 
 		// Get ready for display (runs the query):
 		$CommentList->display_init();

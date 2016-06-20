@@ -148,7 +148,6 @@ div#evo_toolbar .actions_right {
   border: 1px solid #aeaeae;
   box-shadow: 2px 2px 4px -1px rgba(0, 0, 0, 0.25);
   -webkit-transition: opacity 0.2s ease-in-out;
-  -o-transition: opacity 0.2s ease-in-out;
   transition: opacity 0.2s ease-in-out;
 }
 .evobar-menu ul li {
@@ -213,7 +212,6 @@ div#evo_toolbar .actions_right {
   position: relative;
   background-color: #d2d2d2;
   -webkit-transition: background-color 0.15s ease-out;
-  -o-transition: background-color 0.15s ease-out;
   transition: background-color 0.15s ease-out;
   padding: 6px 1ex;
   text-decoration: none;
@@ -229,7 +227,6 @@ div#evo_toolbar .actions_right {
 .evobar-menu a:hover {
   background-color: #bfbfbf;
   -webkit-transition: none;
-  -o-transition: none;
   transition: none;
   text-decoration: none;
 }
@@ -495,8 +492,6 @@ body {
 }
 a[rel~=nofollow]:not([class~=btn]):hover {
   background: #f8e0e0;
-  -moz-border-radius: 2px;
-  -webkit-border-radius: 2px;
   -khtml-border-radius: 2px;
   border-radius: 2px;
 }
@@ -515,7 +510,6 @@ img.flagtop {
   border: 1px solid #000;
 }
 img.loadimg {
-  display: inline-block;
   min-width: 64px;
   min-height: 64px;
   background: url(../img/ajax-loader/fff.gif) no-repeat center;
@@ -583,8 +577,6 @@ a.selected {
   border: 1px solid #CCC;
   padding: 2px;
   display: inline-block;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
   -khtml-border-radius: 4px;
   border-radius: 4px;
   text-align: center;
@@ -609,8 +601,6 @@ a.selected {
   background: #FFF;
   border: 1px solid #CCC;
   padding: 2px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
   -khtml-border-radius: 4px;
   border-radius: 4px;
   display: table;
@@ -785,6 +775,9 @@ input[type=checkbox] {
 }
 fieldset div.notes {
   margin: 0 0 1ex 3ex;
+}
+.evo_label_inline {
+  margin-left: 2ex;
 }
 div.right_icons,
 div.fieldset_icons {
@@ -1008,13 +1001,14 @@ table.widget_grid .note {
 .widget_flow_blocks,
 table.widget_grid {
   display: -webkit-box;
-  display: -moz-box;
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;
-  flex-flow: row wrap;
+  -ms-flex-flow: row wrap;
+      flex-flow: row wrap;
   -webkit-flex-flow: row wrap;
-  justify-content: space-around;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
   -webkit-justify-content: space-around;
 }
 .widget_flow_blocks div,

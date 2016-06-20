@@ -64,7 +64,7 @@ if( function_exists( 'set_magic_quotes_runtime' ) )
 }
 else
 {
-	ini_set( 'magic_quotes_runtime', 0 );
+	@ini_set( 'magic_quotes_runtime', 0 );
 }
 
 // TODO: $io_charset !!

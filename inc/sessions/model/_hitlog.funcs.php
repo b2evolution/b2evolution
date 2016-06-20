@@ -1086,6 +1086,34 @@ function stats_dom_status_icon( $dom_status )
 
 
 /**
+ * Get top existing Domain object by subdomain name
+ *
+ * @param string Subdomain name
+ * @return onject Domain object
+ */
+function & get_Domain_by_subdomain( $subdomain_name )
+{
+	$DomainCache = & get_DomainCache();
+
+	$subdomain_name = explode( '.', $subdomain_name );
+
+	for( $i = 0; $i < count( $subdomain_name ); $i++ )
+	{
+		$domain_name = implode( '.', array_slice( $subdomain_name, $i ) );
+
+		if( $Domain = & $DomainCache->get_by_name( $domain_name, false, false ) ||
+		    $Domain = & $DomainCache->get_by_name( '.'.$domain_name, false, false ) )
+		{	// Domain exists with name, Get it:
+			return $Domain;
+		}
+	}
+
+	$Domain = NULL;
+	return $Domain;
+}
+
+
+/**
  * Get Domain object by url
  *
  * @param string URL
@@ -1093,24 +1121,11 @@ function stats_dom_status_icon( $dom_status )
  */
 function & get_Domain_by_url( $url )
 {
-	// Exctract domain name from url
+	// Exctract domain name from url:
 	$domain_name = url_part( $url, 'host' );
 
-	$DomainCache = & get_DomainCache();
-	while( empty( $Domain ) )
-	{
-		if( $Domain = & $DomainCache->get_by_name( $domain_name, false, false ) )
-		{ // Domain exists with name, Get it
-			return $Domain;
-		}
-		if( ! preg_match( '/[^\.]+\.(.+\..+)$/i', $domain_name, $matches ) )
-		{ // Find if DB contains the parent domain of current subdomain
-			break;
-		}
-		$domain_name = $matches[1];
-	}
+	$Domain = & get_Domain_by_subdomain( $domain_name );
 
-	$Domain = NULL;
 	return $Domain;
 }
 

@@ -44,6 +44,8 @@ $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
 												), '' );
 	$Form->end_line( T_('per page') );
 
+	$Form->checkbox( 'disp_featured_above_list', $edited_Blog->get_setting( 'disp_featured_above_list' ), T_('Featured post above list'), T_('Check to display a featured post above the list (as long as no Intro post is displayed.') );
+
 	$Form->output = false;
 	$Form->switch_layout( 'none' );
 	$timestamp_min_duration_input = $Form->duration_input( 'timestamp_min_duration', $edited_Blog->get_setting('timestamp_min_duration'), '' );
@@ -67,6 +69,13 @@ $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
 											), T_('Show future posts'), true );
 
 	$Form->checklist( get_inskin_statuses_options( $edited_Blog, 'post' ), 'post_inskin_statuses', T_('Front office statuses'), false, false, array( 'note' => 'Uncheck the statuses that should never appear in the front office.' ) );
+
+	$Form->radio( 'main_content', $edited_Blog->get_setting('main_content'),
+	array(
+			array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
+			array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
+			array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
+		), T_('Post contents'), true );
 
 $Form->end_fieldset();
 
@@ -96,6 +105,15 @@ $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_setting
 			array( 'main_extra_cat_post', T_('Allow one main + several extra categories') ),
 			array( 'no_cat_post', T_('Don\'t allow category selections'), T_('(Main cat will be assigned automatically)') ) ),
 			T_('Post category options'), true );
+
+	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+	{	// Permission to edit advanced admin settings:
+		$Form->checklist( array(
+				array( 'in_skin_editing', 1, T_('Allow posting/editing from the Front-Office').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing' ) ),
+				array( 'in_skin_editing_renderers', 1, T_('Allow Text Renderers selection in Front-Office edit screen').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing_renderers' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) ),
+				array( 'in_skin_editing_category', 1, T_('Allow Category selection in Front-Office edit screen').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing_category' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) ),
+			), 'front_office_posting', T_('Front-Office posting') );
+	}
 
 	$Form->radio( 'post_navigation', $edited_Blog->get_setting('post_navigation'),
 		array( array( 'same_blog', T_('same blog') ),
@@ -204,3 +222,18 @@ $Form->end_fieldset();
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>
+<script type="text/javascript">
+jQuery( 'input[name=in_skin_editing]' ).click( function()
+{
+	if( jQuery( this ).is( ':checked' ) )
+	{
+		jQuery( 'input[name=in_skin_editing_renderers]' ).removeAttr( 'disabled' );
+		jQuery( 'input[name=in_skin_editing_category]' ).removeAttr( 'disabled' );
+	}
+	else
+	{
+		jQuery( 'input[name=in_skin_editing_renderers]' ).attr( 'disabled', 'disabled' );
+		jQuery( 'input[name=in_skin_editing_category]' ).attr( 'disabled', 'disabled' );
+	}
+} );
+</script>

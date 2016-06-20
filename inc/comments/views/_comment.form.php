@@ -29,6 +29,13 @@ global $Plugins;
 global $mode, $month, $tab, $redirect_to, $comment_content;
 
 $Form = new Form( NULL, 'comment_checkchanges', 'post' );
+$Form->switch_template_parts(
+	array(
+		'labelclass' => 'control-label col-lg-3 col-md-3 col-sm-3',
+		'inputstart' => '<div class="controls col-lg-8 col-md-9 col-sm-9">',
+		'infostart' => '<div class="controls col-lg-8 col-md-8 col-sm-9"><div class="form-control-static">',
+		'inputstart_checkbox' => '<div class="controls col-lg-8 col-md-8 col-sm-9"><div class="checkbox"><label>' )
+);
 
 $link_attribs = array( 'style' => 'margin-left:3ex', 'class' => 'btn btn-sm btn-default action_icon' ); // Avoid misclicks by all means!
 if( $current_User->check_perm( 'blog_post!draft', 'edit', false, $Blog->ID ) )
@@ -72,7 +79,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	$Form->begin_fieldset( T_('Comment contents').get_manual_link( 'editing-comments' ) );
 
 	echo '<div class="row">';
-		echo '<div class="col-md-7 col-sm-12">';
+		echo '<div class="col-sm-12">';
 
 		$comment_Item = & $edited_Comment->get_Item();
 		$Form->info( T_('In response to'), $comment_Item->get_title( array(
@@ -81,19 +88,19 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 			) ) );
 
 		echo '</div>';
-		echo '<div class="col-md-5 col-sm-12">';
+		echo '<div class="col-sm-12">';
 
 		$Blog_owner_User = & $Blog->get_owner_User();
 		if( ( $Blog_owner_User->ID == $current_User->ID ) || $current_User->check_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
 		{	// User has permission to change comment's post, because user is the owner of the current blog, or user has admin full access permission for current blog
-			$Form->text_input( 'moveto_post', $comment_Item->ID, 20, T_('Move to post ID'), '', array( 'maxlength' => 100, 'style' => 'width:25%' ) );
+			$Form->text_input( 'moveto_post', $comment_Item->ID, 20, T_('Move to post ID'), '', array( 'maxlength' => 100, 'size' => 10 ) );
 		}
 
 		echo '</div>';
 	echo '</div>';
 
 	echo '<div class="row">';
-		echo '<div class="col-md-7 col-sm-12">';
+		echo '<div class="col-sm-12">';
 
 		if( $Blog->get_setting( 'threaded_comments' ) )
 		{	// Display a reply comment ID only when this feature is enabled in blog settings:
@@ -177,7 +184,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	{
 		load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
 		$LinkOwner = new LinkComment( $edited_Comment );
-		attachment_iframe( $Form, $LinkOwner );
+		attachment_iframe( $Form, $LinkOwner, NULL, false, true );
 	}
 
 	// ####################### PLUGIN FIELDSETS #########################
@@ -194,7 +201,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	if( $comment_Item->can_rate()
 		|| !empty( $edited_Comment->rating ) )
 	{	// Rating is editable
-		$Form->begin_fieldset( T_('Rating') );
+		$Form->begin_fieldset( T_('Rating'), array( 'id' => 'cmntform_rating', 'fold' => true ) );
 
 		echo '<p>';
 		$edited_Comment->rating_input( array( 'reset' => true ) );
@@ -210,7 +217,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	// ####################### ADVANCED PROPERTIES #########################
 	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
-		$Form->begin_fieldset( T_('Date & Time') );
+		$Form->begin_fieldset( T_('Date & Time'), array( 'id' => 'cmntform_datetime', 'fold' => true ) );
 
 		$Form->switch_layout( 'fieldset' );
 
@@ -225,7 +232,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	}
 
 	// ####################### LINKS #########################
-	$Form->begin_fieldset( T_('Links') );
+	$Form->begin_fieldset( T_('Links'), array( 'id' => 'cmntform_html', 'fold' => true ) );
 		echo '<p>';
 		$Form->checkbox_basic_input( 'comment_nofollow', $edited_Comment->nofollow, T_('Nofollow website URL') );
 		// TODO: apply to all links  -- note: see basic antispam plugin that does this for x hours
@@ -234,7 +241,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 
 	// ####################### FEEDBACK INFO #########################
-	$Form->begin_fieldset( T_('Feedback info') );
+	$Form->begin_fieldset( T_('Feedback info'), array( 'id' => 'cmntform_info', 'fold' => true ) );
 ?>
 
 	<p><strong><?php echo T_('Type') ?>:</strong> <?php echo $edited_Comment->type; ?></p>
@@ -250,13 +257,49 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 	// ####################### TEXT RENDERERS #########################
 	global $Plugins;
-	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers' ) );
+	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'cmntform_renderers', 'fold' => true  ) );
 	$edited_Comment->renderer_checkboxes();
+	$Form->end_fieldset();
+
+
+	// ################### NOTIFICATIONS ###################
+
+	$Form->begin_fieldset( T_('Notifications'), array( 'id' => 'cmntform_notifications', 'fold' => true ) );
+
+		$Form->info( T_('Moderators'), $edited_Comment->check_notifications_flags( 'moderators_notified' ) ? T_('Notified at least once') : T_('Not notified yet') );
+
+		$notify_types = array(
+				'members_notified'   => T_('Members'),
+				'community_notified' => T_('Community'),
+		);
+
+		foreach( $notify_types as $notify_type => $notify_title )
+		{
+			if( $edited_Comment->check_notifications_flags( $notify_type ) )
+			{	// Nofications were sent:
+				$notify_status = T_('Notified');
+				$notify_select_options = array(
+						''      => T_('Done'),
+						'force' => T_('Notify again')
+					);
+			}
+			else
+			{	// Nofications are not sent yet:
+				$notify_status = T_('To be notified');
+				$notify_select_options = array(
+						''     => T_('Notify on next save'),
+						'skip' => T_('Skip on next save'),
+						'mark' => T_('Mark as Notified')
+					);
+			}
+			$Form->select_input_array( 'comment_'.$notify_type, get_param( 'comment_'.$notify_type ), $notify_select_options, $notify_title, NULL, array( 'input_prefix' => $notify_status.' &nbsp; &nbsp; ' ) );
+		}
+
 	$Form->end_fieldset();
 	?>
 </div>
 
-<div class="clear"></div>
+<div class="clearfix"></div>
 
 </div>
 
@@ -265,4 +308,6 @@ $Form->end_form();
 
 // JS code for status dropdown select button
 echo_status_dropdown_button_js( 'comment' );
+// JS code for fieldset folding:
+echo_fieldset_folding_js();
 ?>

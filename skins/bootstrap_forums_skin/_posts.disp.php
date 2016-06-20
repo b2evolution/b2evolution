@@ -33,21 +33,6 @@ if( $single_cat_ID )
 {
 	$ChapterCache = & get_ChapterCache();
 	$current_Chapter = & $ChapterCache->get_by_ID( $single_cat_ID, false, false );
-
-	// Init MainList
-	$page = param( 'paged', 'integer', 1 );
-	$MainList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $Blog->get_setting('posts_per_page') );
-	$MainList->load_from_Request();
-	$MainList->set_filters( array(
-			'cat_array' => array( $single_cat_ID ), // Limit only by selected cat (exclude posts from child categories)
-			'cat_modifier' => NULL,
-			'page' => $page
-		) );
-	$MainList->query();
-	$MainList->nav_target = $single_cat_ID; // set navigation target, we are always navigating through category in this skin
-
-	// Load read statuses if required
-	$MainList->load_content_read_statuses();
 }
 
 // Breadcrumbs
@@ -257,7 +242,7 @@ elseif( isset( $current_Chapter ) )
 		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 		mainlist_page_links( array(
 				'block_start'           => '<ul class="pagination">',
-				'block_end'             => '</ul></div>',
+				'block_end'             => '</ul>',
 				'page_current_template' => '<span>$page_num$</span>',
 				'page_item_before'      => '<li>',
 				'page_item_after'       => '</li>',

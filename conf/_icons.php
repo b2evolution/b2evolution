@@ -71,7 +71,7 @@ function get_icon_info( $name )
 			'size' => array( 16, 16 ),
 			'xy' => array( 112, 16 ),
 			'glyph' => 'circle-arrow-right',
-			'fa' => 'clipboard'
+			'fa' => 'arrow-right'
 		);
 		case 'file_delete': return array(   // delete a file/folder
 			'alt'  => T_('Del'),
@@ -397,6 +397,14 @@ function get_icon_info( $name )
 			'xy' => array( 0, 0 ),
 			'glyph' => 'user',
 			'fa' => 'users'
+		);
+		case 'user': return array(
+			'rollover' => true,
+			'alt' => T_('User'),
+			'size' => array( 0 ,0 ),
+			'xy' => array( 0, 0 ),
+			'glyph' => 'user',
+			'fa' => 'user'
 		);
 		case 'copy': return array(
 			'alt'  => T_('Copy'),

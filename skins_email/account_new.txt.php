@@ -19,7 +19,8 @@ global $admin_url, $htsrv_url;
 // Default params:
 $params = array_merge( array(
 		'country'     => '',
-		'firstname'   => '',
+		'reg_country' => '',
+		'fullname'    => '',
 		'gender'      => '',
 		'locale'      => '',
 		'source'      => '',
@@ -36,17 +37,31 @@ echo "\n\n";
 
 echo T_('Login').": ".$params['login']."\n";
 echo T_('Email').": ".$params['email']."\n";
+
+if( $params['fullname'] != '' )
+{ // Full name is entered
+	echo T_('Full name').": ".$params['fullname']."\n";
+}
+
+if( $params['reg_country'] > 0 )
+{ // Country field is entered
+	load_class( 'regional/model/_country.class.php', 'Country' );
+	$CountryCache = & get_CountryCache();
+	$reg_Country = $CountryCache->get_by_ID( $params['reg_country'] );
+	echo T_('Registration Country').": ".$reg_Country->get_name()."\n";
+}
+
 if( $params['country'] > 0 )
 { // Country field is entered
 	load_class( 'regional/model/_country.class.php', 'Country' );
 	$CountryCache = & get_CountryCache();
 	$user_Country = $CountryCache->get_by_ID( $params['country'] );
-	echo T_('Country').": ".$user_Country->get_name()."\n";
+	echo T_('Profile Country').": ".$user_Country->get_name()."\n";
 }
 
-if( $params['firstname'] != '' )
-{ // First name is entered
-	echo T_('First name').": ".$params['firstname']."\n";
+if( !empty( $params['source'] ) )
+{ // Source is defined
+	echo T_('Registration Source').": ".$params['source']."\n";
 }
 
 if( $params['gender'] == 'M' )
@@ -62,11 +77,6 @@ if( !empty( $params['locale'] ) )
 { // Locale field is entered
 	global $locales;
 	echo T_('Locale').": ".$locales[ $params['locale'] ]['name']."\n";
-}
-
-if( !empty( $params['source'] ) )
-{ // Source is defined
-	echo T_('Registration Source').": ".$params['source']."\n";
 }
 
 if( !empty( $params['trigger_url'] ) )

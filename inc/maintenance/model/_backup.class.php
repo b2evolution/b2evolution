@@ -90,6 +90,10 @@ $backup_paths = array(
  * @var array
  */
 $backup_exclude_folders = array(
+	'_cache' => array(
+		'path' => array( '_cache' ),
+		'excluded' => true ),
+
 	'cache' => array(
 		'path'     => array( '_evocache', '.evocache' ),
 		'excluded' => true ),
@@ -143,6 +147,12 @@ class Backup
 	 * @var array
 	 */
 	var $exclude_folders;
+
+	/**
+	 * Ignore files and folders listed in "conf/backup_ignore.conf"
+	 * @var boolean
+	 */
+	var $ignore_config = true;
 
 	/**
 	 * All of the tables and their 'included' values defined in backup configuration file
@@ -215,6 +225,8 @@ class Backup
 			$this->exclude_folders[$name] = param( 'exclude_bk_'.$name, 'boolean', 0, $memorize_params );
 		}
 
+		$this->ignore_config = param( 'ignore_bk_config', 'boolean', 0, $memorize_params );
+
 		// Load tables settings from request
 		foreach( $backup_tables as $name => $settings )
 		{
@@ -253,7 +265,7 @@ class Backup
 		// Backup directories and files
 		if( $success && $this->has_included( $this->backup_paths ) )
 		{
-			$backup_files_path = $this->pack_backup_files ? $cbackup_path : $cbackup_path.'files/';
+			$backup_files_path = $this->pack_backup_files ? $cbackup_path : $cbackup_path.'www/';
 
 			// Prepare files backup directory
 			if( $success = prepare_maintenance_dir( $backup_files_path, false ) )
@@ -265,12 +277,10 @@ class Backup
 		// Backup database
 		if( $success && $this->has_included( $this->backup_tables ) )
 		{
-			$backup_tables_path = $this->pack_backup_files ? $cbackup_path : $cbackup_path.'db/';
-
 			// Prepare database backup directory
-			if( $success = prepare_maintenance_dir( $backup_tables_path, false ) )
+			if( $success = prepare_maintenance_dir( $cbackup_path, false ) )
 			{	// We can backup database
-				$success = $this->backup_database( $backup_tables_path );
+				$success = $this->backup_database( $cbackup_path );
 			}
 		}
 
@@ -340,10 +350,31 @@ class Backup
 				foreach( $this->path_to_array( $backup_exclude_folders[$name]['path'] ) as $name )
 				{
 					// Exclude root folder with name:
-					$excluded_files[] = $name;
+					$excluded_files[] = $name.'/';
 					// Exclude all subfolders with name:
 					$backup_current_exclude_folders[] = $name;
 				}
+			}
+		}
+
+		if( $this->ignore_config )
+		{	// Ignore files and folders listed in "conf/backup_ignore.conf":
+			global $conf_path;
+			$backup_ignore_file = $conf_path.'backup_ignore.conf';
+			if( file_exists( $backup_ignore_file ) && is_readable( $backup_ignore_file ) )
+			{
+				$backup_ignore_file_lines = preg_split( '/\r\n|\n|\r/', file_get_contents( $backup_ignore_file ) );
+				foreach( $backup_ignore_file_lines as $backup_ignore_file_line )
+				{
+					// Ignore root folder and file with name:
+					$excluded_files[] = trim( $backup_ignore_file_line ).'/';
+					$excluded_files[] = trim( $backup_ignore_file_line );
+				}
+			}
+			else
+			{
+				echo '<p style="color:red">'.sprintf( T_('Config file %s cannot be read.'), '<b>'.$backup_ignore_file.'</b>' ).'</p>';
+				evo_flush();
 			}
 		}
 
@@ -352,7 +383,7 @@ class Backup
 
 		if( $this->pack_backup_files )
 		{ // Create ZIPped backup
-			$zip_filepath = $backup_dirpath.'files.zip';
+			$zip_filepath = $backup_dirpath.'www.zip';
 
 			// Pack using 'zlib' extension and PclZip wrapper
 
@@ -374,12 +405,15 @@ class Backup
 				evo_flush();
 
 				$file_list = $PclZip->add( no_trailing_slash( $basepath.$included_file ),
+					PCLZIP_OPT_ADD_PATH, 'www',
 					PCLZIP_OPT_REMOVE_PATH, no_trailing_slash( $basepath ),
 					PCLZIP_CB_PRE_ADD, 'callback_backup_files' );
 				if( $file_list == 0 )
 				{
-					echo '<p style="color:red">'.sprintf( T_('Unable to create &laquo;%s&raquo;'), $zip_filepath ).'<br />'
-						.sprintf( T_('Error: %s'), $PclZip->errorInfo( true ) ).'</p>';
+					echo '<p style="color:red">'
+							.sprintf( T_('Error: %s'), $PclZip->errorInfo( true ) ).'<br />'
+							.sprintf( T_('Unable to create &laquo;%s&raquo;'), $zip_filepath )
+						.'</p>';
 					evo_flush();
 
 					return false;
@@ -587,8 +621,10 @@ class Backup
 			$file_list = $PclZip->add( $backup_dirpath.$backup_sql_filename, PCLZIP_OPT_REMOVE_PATH, no_trailing_slash( $backup_dirpath ) );
 			if( $file_list == 0 )
 			{
-				echo '<p style="color:red">'.sprintf( T_('Unable to create &laquo;%s&raquo;'), $zip_filepath ).'<br />'
-					.sprintf( T_('Error: %s'), $PclZip->errorInfo( true ) ).'</p>';
+				echo '<p style="color:red">'
+						.sprintf( T_('Error: %s'), $PclZip->errorInfo( true ) ).'<br />'
+						.sprintf( T_('Unable to create &laquo;%s&raquo;'), $zip_filepath )
+					.'</p>';
 				evo_flush();
 
 				return false;

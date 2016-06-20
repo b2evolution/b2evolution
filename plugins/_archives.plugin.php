@@ -35,7 +35,7 @@ class archives_plugin extends Plugin
 	var $name;
 	var $code = 'evo_Arch';
 	var $priority = 50;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'navigation';
@@ -53,6 +53,26 @@ class archives_plugin extends Plugin
 		$this->dbtable = 'T_items__item';
 		$this->dbprefix = 'post_';
 		$this->dbIDname = 'post_ID';
+	}
+
+
+	/**
+	 * Get keys for block/widget caching
+	 *
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @param integer Widget ID
+	 * @return array of keys this widget depends on
+	 */
+	function get_widget_cache_keys( $widget_ID = 0 )
+	{
+		global $Blog;
+
+		return array(
+				'wi_ID'        => $widget_ID, // Have the widget settings changed ?
+				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
+				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
+			);
 	}
 
 

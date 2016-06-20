@@ -22,7 +22,7 @@ class quicktags_plugin extends Plugin
 	var $code = 'b2evQTag';
 	var $name = 'Quick Tags';
 	var $priority = 30;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -56,6 +56,13 @@ class quicktags_plugin extends Plugin
 			return false;
 		}
 
+		$item_Blog = & $Item->get_Blog();
+
+		if( ! $this->get_coll_setting( 'coll_use_for_posts', $item_Blog ) )
+		{	// This plugin is disabled to use for posts:
+			return false;
+		}
+
 		return $this->DisplayCodeToolbar( $params );
 	}
 
@@ -76,6 +83,13 @@ class quicktags_plugin extends Plugin
 
 		if( empty( $comment_Item ) || ! $comment_Item->get_type_setting( 'allow_html' ) )
 		{	// Only when HTML is allowed in post:
+			return false;
+		}
+
+		$item_Blog = & $comment_Item->get_Blog();
+
+		if( ! $this->get_coll_setting( 'coll_use_for_comments', $item_Blog ) )
+		{	// This plugin is disabled to use for comments:
 			return false;
 		}
 

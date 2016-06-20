@@ -216,100 +216,6 @@ switch( $action )
 		$DB->commit();
 		break;
 
-	case 'get_login_list':
-		// Get users login list for username form field hintbox.
-
-		// current user must have at least view permission to see users login
-		$current_User->check_perm( 'users', 'view', true );
-
-		// What data type return: 'json' or as multilines by default
-		$data_type = param( 'data_type', 'string', '' );
-
-		// What users return: 
-		$user_type = param( 'user_type', 'string', '' );
-
-		$text = trim( urldecode( param( 'q', 'string', '' ) ) );
-
-		/**
-		 * sam2kb> The code below decodes percent-encoded unicode string produced by Javascript "escape"
-		 * function in format %uxxxx where xxxx is a Unicode value represented as four hexadecimal digits.
-		 * Example string "MAMA" (cyrillic letters) encoded with "escape": %u041C%u0410%u041C%u0410
-		 * Same word encoded with "encodeURI": %D0%9C%D0%90%D0%9C%D0%90
-		 *
-		 * jQuery hintbox plugin uses "escape" function to encode URIs
-		 *
-		 * More info here: http://en.wikipedia.org/wiki/Percent-encoding#Non-standard_implementations
-		 */
-		if( preg_match( '~%u[0-9a-f]{3,4}~i', $text ) && version_compare(PHP_VERSION, '5', '>=') )
-		{	// Decode UTF-8 string (PHP 5 and up)
-			$text = preg_replace( '~%u([0-9a-f]{3,4})~i', '&#x\\1;', $text );
-			$text = html_entity_decode( $text, ENT_COMPAT, 'UTF-8' );
-		}
-
-		if( !empty( $text ) )
-		{
-			switch( $user_type )
-			{
-				case 'assignees':
-					// Get only the assignees of this blog:
-
-					$blog_ID = param( 'blog', 'integer', true );
-
-					// Get users which are assignees of the blog:
-					$user_perms_SQL = new SQL();
-					$user_perms_SQL->SELECT( 'user_login' );
-					$user_perms_SQL->FROM( 'T_users' );
-					$user_perms_SQL->FROM_add( 'INNER JOIN T_coll_user_perms ON user_ID = bloguser_user_ID' );
-					$user_perms_SQL->WHERE( 'user_login LIKE "'.$DB->escape( $text ).'%"' );
-					$user_perms_SQL->WHERE_and( 'bloguser_blog_ID = '.$DB->quote( $blog_ID ) );
-					$user_perms_SQL->WHERE_and( 'bloguser_can_be_assignee <> 0' );
-
-					// Get users which groups are assignees of the blog:
-					$group_perms_SQL = new SQL();
-					$group_perms_SQL->SELECT( 'user_login' );
-					$group_perms_SQL->FROM( 'T_users' );
-					$group_perms_SQL->FROM_add( 'INNER JOIN T_coll_group_perms ON user_grp_ID = bloggroup_group_ID' );
-					$group_perms_SQL->WHERE( 'user_login LIKE "'.$DB->escape( $text ).'%"' );
-					$group_perms_SQL->WHERE_and( 'bloggroup_blog_ID = '.$DB->quote( $blog_ID ) );
-					$group_perms_SQL->WHERE_and( 'bloggroup_can_be_assignee <> 0' );
-
-					// Union two sql queries to execute one query and save an order as one list
-					$users_sql = '( '.$user_perms_SQL->get().' )'
-						.' UNION '
-						.'( '.$group_perms_SQL->get().' )'
-						.' ORDER BY user_login'
-						.' LIMIT 10';
-					break;
-
-				default:
-					// Get all users:
-					$SQL = new SQL();
-					$SQL->SELECT( 'user_login' );
-					$SQL->FROM( 'T_users' );
-					$SQL->WHERE( 'user_login LIKE "'.$DB->escape( $text ).'%"' );
-					$SQL->LIMIT( '10' );
-					$SQL->ORDER_BY('user_login');
-					$users_sql = $SQL->get();
-					break;
-			}
-
-			$user_logins = $DB->get_col( $users_sql );
-
-			if( $data_type == 'json' )
-			{ // Return data in JSON format
-				echo evo_json_encode( $user_logins );
-				exit(0); // Exit here to don't break JSON data by following debug data
-			}
-			else
-			{ // Return data as multilines
-				echo implode( "\n", $user_logins );
-			}
-		}
-
-		// don't show ajax response end comment, because the result will be processed with jquery hintbox
-		$add_response_end_comment = false;
-		break;
-
 	case 'edit_comment':
 		// Used to edit a comment from back-office (Note: Only for meta comments now!)
 
@@ -536,9 +442,10 @@ switch( $action )
 
 			echo_item_comments( $blog, $item_ID, $status_list, $currentpage, NULL, array(), '', $expiry_status, $comment_type );
 		}
-		elseif( $request_from == 'dashboard' )
+		elseif( $request_from == 'dashboard' || $request_from == 'coll_settings' )
 		{ // AJAX request goes from backoffice dashboard
-			get_comments_awaiting_moderation( $blog );
+			load_funcs( 'dashboard/model/_dashboard.funcs.php' );
+			show_comments_awaiting_moderation( $blog, NULL, 10, array(), false );
 		}
 		break;
 
@@ -949,19 +856,6 @@ if( !$incorrect_action )
 	}
 
 	exit(0);
-}
-
-/**
- * Get comments awaiting moderation
- *
- * @param integer blog_ID
- */
-function get_comments_awaiting_moderation( $blog_ID )
-{
-	$limit = 30;
-
-	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
-	show_comments_awaiting_moderation( $blog_ID, NULL, $limit, array(), false );
 }
 
 ?>

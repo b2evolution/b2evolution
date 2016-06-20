@@ -58,7 +58,6 @@ $params = array_merge( array(
 		if( $disp == 'single' )
 		{
 			// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-			// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 			// Display container contents:
 			skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 				// The following (optional) params will be used as defaults for widgets included in this container:
@@ -105,7 +104,7 @@ $params = array_merge( array(
 				skin_include( '_item_feedback.inc.php', array(
 						'before_section_title' => '<h4>',
 						'after_section_title'  => '</h4>',
-						'author_link_text'     => 'preferredname',
+						'author_link_text'     => 'auto',
 						'comment_image_size'   => 'fit-256x256',
 					) );
 				// Note: You can customize the default item feedback by copying the generic

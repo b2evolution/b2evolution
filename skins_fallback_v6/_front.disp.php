@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 $params = array_merge( array(
-		'author_link_text'              => 'name',
+		'author_link_text'              => 'auto',
 		'featured_intro_before'         => '',
 		'featured_intro_after'          => '',
 		'front_block_start'             => '<div class="evo_widget $wi_class$">',

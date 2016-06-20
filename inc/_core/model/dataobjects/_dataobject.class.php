@@ -598,7 +598,7 @@ class DataObject
 		else
 		{	// Object already serialized, let's update!
 			// echo 'UPDATE';
-			return $this->dbupdate_worker();
+			return $this->dbupdate();
 		}
 	}
 
@@ -817,6 +817,8 @@ class DataObject
 		echo str_replace( 'panel-default', 'panel-danger', $block_item_Widget->replace_vars( $block_item_Widget->params[ 'block_start' ] ) );
 
 		$restriction_Messages = $this->check_relations( 'delete_cascades' );
+
+		$restriction_Messages->params['class_note'] .= ' text-warning';
 
 		if( !empty( $additional_messages ) )
 		{ // Initialaize additional messages

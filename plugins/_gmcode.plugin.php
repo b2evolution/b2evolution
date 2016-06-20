@@ -30,7 +30,7 @@ class gmcode_plugin extends custom_tags_plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $number_of_installs = 1;
 
 	var $configurable_post_list = false;

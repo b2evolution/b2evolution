@@ -98,16 +98,18 @@ class item_about_author_Widget extends ComponentWidget
 		$UserFieldCache->load_all();
 		$user_fields = $UserFieldCache->get_option_array();
 
-		// Set default user field as "About me"
+		// Set default user field as "Micro bio"
 		$default_user_field_ID = 0;
 		foreach( $user_fields as $user_field_ID => $user_field_name )
 		{
-			if( $user_field_name == 'About me' )
+			if( $user_field_name == 'Micro bio' )
 			{
 				$default_user_field_ID = $user_field_ID;
 				break;
 			}
 		}
+
+		load_funcs( 'files/model/_image.funcs.php' );
 
 		$r = array_merge( array(
 				'title' => array(
@@ -115,6 +117,19 @@ class item_about_author_Widget extends ComponentWidget
 					'size' => 40,
 					'note' => T_( 'This is the title to display' ),
 					'defaultvalue' => '',
+				),
+				'thumb_size' => array(
+					'label' => T_('Display user image'),
+					'note' => T_('Cropping and sizing of thumbnails'),
+					'type' => 'select',
+					'options' => array( '' => T_('None') ) + get_available_thumb_sizes(),
+					'defaultvalue' => 'crop-top-48x48',
+				),
+				'link_profile' => array(
+					'label' => T_('Link to profile'),
+					'note' => T_('link profile picture to user profile'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
 				),
 				'user_field' => array(
 					'label' => T_('Display user field'),
@@ -163,9 +178,9 @@ class item_about_author_Widget extends ComponentWidget
 		{
 			if( isset( $creator_User->userfields[ $user_field_ID ] ) )
 			{
-				$user_info .= $this->disp_params['item_start'];
+				$user_info .= '<div class="evo_author_display_field">';
 				$user_info .= $creator_User->userfields[ $user_field_ID ]->uf_varchar;
-				$user_info .= $this->disp_params['item_end'];
+				$user_info .= '</div>';
 			}
 		}
 
@@ -175,12 +190,31 @@ class item_about_author_Widget extends ComponentWidget
 		}
 
 		// Display user info only when it is defined for current author
-		echo $this->disp_params['block_start'];
+		echo add_tag_class( $this->disp_params['block_start'], 'clearfix' );
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
-		echo $this->disp_params['list_start'];
+
+		if( ! empty( $this->disp_params['thumb_size'] ) )
+		{
+			echo '<div class="evo_avatar">';
+
+			$user_url = $this->disp_params['link_profile'] ? $creator_User->get_userpage_url() : '';
+
+			if( ! empty( $user_url ) )
+			{
+				echo '<a href="'.$user_url.'" class="user_link" rel="bubbletip_user_'.$creator_User->ID.'">';
+			}
+
+			echo $creator_User->get_avatar_imgtag( $this->disp_params['thumb_size'] );
+			if( ! empty( $user_url ) )
+			{
+				echo '</a>';
+			}
+
+			echo '</div>';
+		}
 		echo $user_info;
-		echo $this->disp_params['list_end'];
+
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
 
@@ -210,6 +244,7 @@ class item_about_author_Widget extends ComponentWidget
 				'wi_ID'       => $this->ID, // Have the widget settings changed ?
 				'set_coll_ID' => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'user_ID'     => $creator_user_ID, // Has the creator User changed?
+				'item_ID'     => $Item->ID, // Has the Item page changed?
 			);
 	}
 }

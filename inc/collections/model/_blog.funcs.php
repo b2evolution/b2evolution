@@ -18,10 +18,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Update the advanced user/group permissions for edited blog
  *
- * @param int Blog ID
- * @param string 'user' or 'group'
+ * @param integer Blog ID or Group ID
+ * @param string 'user', 'group' or 'coll'
  */
-function blog_update_perms( $blog, $context = 'user' )
+function blog_update_perms( $object_ID, $context = 'user' )
 {
 	global $DB;
 
@@ -30,36 +30,57 @@ function blog_update_perms( $blog, $context = 'user' )
 	 */
 	global $current_User;
 
-	if( $context == 'user' )
-	{
-		$table = 'T_coll_user_perms';
-		$prefix = 'bloguser_';
-		$ID_field = 'bloguser_user_ID';
-	}
-	else
-	{
-		$table = 'T_coll_group_perms';
-		$prefix = 'bloggroup_';
-		$ID_field = 'bloggroup_group_ID';
-	}
-
 	// Get affected user/group IDs:
 	$IDs = param( $context.'_IDs', '/^[0-9]+(,[0-9]+)*$/', '' );
 	$ID_array = explode( ',', $IDs );
 
-	// Can the current user touch advanced admin permissions?
-	if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $blog ) )
-	{ // We have no permission to touch advanced admins!
+	switch( $context )
+	{
+		case 'user':
+			$table = 'T_coll_user_perms';
+			$prefix = 'bloguser_';
+			$ID_field_main = 'bloguser_blog_ID';
+			$ID_field_edit = 'bloguser_user_ID';
+			$blog = $object_ID;
+			$coll_IDs = array( $blog );
+			break;
 
-		// Get the users/groups which are advanced admins
-		$admins_ID_array = $DB->get_col( "SELECT {$ID_field}
-																				FROM $table
-																			 WHERE {$ID_field} IN (".implode(',',$ID_array).")
-																							AND {$prefix}blog_ID = $blog
-																							AND {$prefix}perm_admin <> 0" );
+		case 'coll':
+			$table = 'T_coll_group_perms';
+			$prefix = 'bloggroup_';
+			$ID_field_main = 'bloggroup_group_ID';
+			$ID_field_edit = 'bloggroup_blog_ID';
+			$group_ID = $object_ID;
+			$coll_IDs = $ID_array;
+			break;
 
-		// Take the admins out of the list:
-		$ID_array = array_diff( $ID_array, $admins_ID_array );
+		case 'group':
+		default:
+			$table = 'T_coll_group_perms';
+			$prefix = 'bloggroup_';
+			$ID_field_main = 'bloggroup_blog_ID';
+			$ID_field_edit = 'bloggroup_group_ID';
+			$blog = $object_ID;
+			$coll_IDs = array( $blog );
+			break;
+	}
+
+	foreach( $coll_IDs as $coll_ID )
+	{
+		// Can the current user touch advanced admin permissions?
+		if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $coll_ID ) )
+		{ // We have no permission to touch advanced admins!
+
+			// Get the users/groups which are advanced admins
+			$admins_ID_array = $DB->get_col( "SELECT {$ID_field_edit}
+																					FROM $table
+																				 WHERE {$ID_field_edit} IN (".implode( ',',$ID_array ).")
+																								AND {$ID_field_main} = $object_ID
+																								AND {$prefix}perm_admin <> 0" );
+
+			// Take the admins out of the list:
+			$ID_array = array_diff( $ID_array, $admins_ID_array );
+		}
 	}
 
 	if( empty( $ID_array ) )
@@ -67,14 +88,18 @@ function blog_update_perms( $blog, $context = 'user' )
 		return;
 	}
 
-	// Delete old perms for this blog:
+	// Delete old perms for the edited collection/group:
 	$DB->query( "DELETE FROM $table
-								WHERE {$ID_field} IN (".implode(',',$ID_array).")
-											AND {$prefix}blog_ID = ".$blog );
+								WHERE {$ID_field_edit} IN (".implode( ',',$ID_array ).")
+											AND {$ID_field_main} = ".$object_ID );
 
 	$inserted_values = array();
 	foreach( $ID_array as $loop_ID )
 	{ // Check new permissions for each user:
+
+		// Get collection/object ID depedning on request:
+		$coll_ID = ( $context == 'coll' ? $loop_ID : $blog );
+		$main_object_ID = ( $context == 'coll' ? $group_ID : $blog );
 
 		// Use checkboxes
 		$perm_post = array();
@@ -129,7 +154,7 @@ function blog_update_perms( $blog, $context = 'user' )
 		$perm_cats = param( 'blog_perm_cats_'.$loop_ID, 'integer', 0 );
 		$perm_properties = param( 'blog_perm_properties_'.$loop_ID, 'integer', 0 );
 
-		if( $current_User->check_perm( 'blog_admin', 'edit', false, $blog ) )
+		if( $current_User->check_perm( 'blog_admin', 'edit', false, $coll_ID ) )
 		{ // We have permission to give advanced admins perm!
 			$perm_admin = param( 'blog_perm_admin_'.$loop_ID, 'integer', 0 );
 		}
@@ -150,7 +175,7 @@ function blog_update_perms( $blog, $context = 'user' )
 			$ismember = 1;	// Must have this permission
 
 			// insert new perms:
-			$inserted_values[] = " ( $blog, $loop_ID, $ismember, $can_be_assignee, ".$DB->quote( implode( ',',$perm_post ) ).",
+			$inserted_values[] = " ( $main_object_ID, $loop_ID, $ismember, $can_be_assignee, ".$DB->quote( implode( ',',$perm_post ) ).",
 																".$DB->quote( $perm_item_type ).", ".$DB->quote( $perm_edit ).",
 																$perm_delpost, $perm_edit_ts, $perm_delcmts, $perm_recycle_owncmts, $perm_vote_spam_comments, $perm_cmtstatuses,
 																".$DB->quote( $perm_edit_cmt ).",
@@ -162,7 +187,7 @@ function blog_update_perms( $blog, $context = 'user' )
 	// Proceed with insertions:
 	if( count( $inserted_values ) )
 	{
-		$DB->query( "INSERT INTO $table( {$prefix}blog_ID, {$ID_field}, {$prefix}ismember, {$prefix}can_be_assignee,
+		$DB->query( "INSERT INTO $table( {$ID_field_main}, {$ID_field_edit}, {$prefix}ismember, {$prefix}can_be_assignee,
 											{$prefix}perm_poststatuses, {$prefix}perm_item_type, {$prefix}perm_edit, {$prefix}perm_delpost, {$prefix}perm_edit_ts,
 											{$prefix}perm_delcmts, {$prefix}perm_recycle_owncmts, {$prefix}perm_vote_spam_cmts, {$prefix}perm_cmtstatuses, {$prefix}perm_edit_cmt,
 											{$prefix}perm_meta_comment, {$prefix}perm_cats, {$prefix}perm_properties, {$prefix}perm_admin,
@@ -170,28 +195,36 @@ function blog_update_perms( $blog, $context = 'user' )
 									VALUES ".implode( ',', $inserted_values ) );
 	}
 
-	// Unassign users from the items of the blog
+	// Unassign users that no longer can be assignees from the items of the collection:
 	$DB->query( 'UPDATE T_items__item
 			SET post_assigned_user_ID = NULL
 		WHERE post_main_cat_ID IN
 		  (
 		    SELECT cat_ID
 		      FROM T_categories
-		     WHERE cat_blog_ID = '.$DB->quote( $blog ).'
+		     WHERE cat_blog_ID IN ( '.$DB->quote( $coll_IDs ).' )
 		  )
 		  AND post_assigned_user_ID NOT IN
 		  (
 		    SELECT bloguser_user_ID
 		      FROM T_coll_user_perms
 		     WHERE bloguser_can_be_assignee = 1
-		       AND bloguser_blog_ID = '.$DB->quote( $blog ).'
+		       AND bloguser_blog_ID IN ( '.$DB->quote( $coll_IDs ).' )
 		  )
 		  AND post_assigned_user_ID NOT IN
 		  (
 		    SELECT user_ID
 		      FROM T_users INNER JOIN T_coll_group_perms ON user_grp_ID = bloggroup_group_ID
 		     WHERE bloggroup_can_be_assignee = 1
-		       AND bloggroup_blog_ID = '.$DB->quote( $blog ).'
+		       AND bloggroup_blog_ID IN ( '.$DB->quote( $coll_IDs ).' )
+		  )
+		  AND post_assigned_user_ID NOT IN
+		  (
+		    SELECT sug_user_ID
+		      FROM T_users__secondary_user_groups
+		     INNER JOIN T_coll_group_perms ON sug_grp_ID = bloggroup_group_ID
+		     WHERE bloggroup_can_be_assignee = 1
+		       AND bloggroup_blog_ID IN ( '.$DB->quote( $coll_IDs ).' )
 		  )' );
 
 	if( $DB->rows_affected > 0 )
@@ -201,7 +234,10 @@ function blog_update_perms( $blog, $context = 'user' )
 	}
 
 	// BLOCK CACHE INVALIDATION:
-	BlockCache::invalidate_key( 'set_coll_ID', $blog ); // Settings have changed
+	foreach( $coll_IDs as $coll_ID )
+	{
+		BlockCache::invalidate_key( 'set_coll_ID', $coll_ID ); // Settings have changed
+	}
 	BlockCache::invalidate_key( 'set_coll_ID', 'any' ); // Settings of a have changed (for widgets tracking a change on ANY blog)
 
 	// cont_coll_ID  // Content has not changed
@@ -802,6 +838,11 @@ function get_highest_publish_status( $type, $blog, $with_label = true, $restrict
 			$max_allowed_status = 'protected';
 		}
 	}
+	elseif( $requested_Blog->get_setting( 'allow_access' ) == 'users' )
+	{	// The collection is restricted for logged-in users only:
+		// Set max allowed visibility status to "Community":
+		$max_allowed_status = 'community';
+	}
 	else
 	{	// The collection has no restriction for visibility statuses
 		// Set max allowed visibility status to "Public":
@@ -994,7 +1035,7 @@ function get_inskin_statuses_options( & $edited_Blog, $type )
 	foreach( $statuses as $status => $status_text )
 	{	// Add a checklist option for each possible front office post/comment status:
 		if( $max_allowed_status == $status )
-		{	// This is max allowed status, Then display all next statuses with 
+		{	// This is max allowed status, Then display all next statuses with
 			$status_is_hidden = false;
 		}
 
@@ -1254,20 +1295,21 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow
 		{	// Keep these statuses in array only to set $status_is_allowed in order to know when we can start allow the statuses:
 			continue;
 		}
-		if( ( $allow_status != $status && ! $status_is_allowed ) || ! $current_User->check_perm( $prefix.$status, 'create', false, $blog_ID ) )
+		if( ( $allow_status != $status && ! $status_is_allowed ) || ! ( is_logged_in() && $current_User->check_perm( $prefix.$status, 'create', false, $blog_ID ) ) )
 		{	// This status is not allowed
 			$result[] = $status;
 		}
 	}
 
 	// 'redirected' status is allowed to view/edit only in case of posts, and only if user has permission
-	if( ( $prefix == 'blog_post!' ) && !$current_User->check_perm( $prefix.'redirected', 'create', false, $blog_ID ) )
+	if( $prefix == 'blog_comment!' ||
+	    ( $prefix == 'blog_post!' && ! ( is_logged_in() && $current_User->check_perm( $prefix.'redirected', 'create', false, $blog_ID ) ) ) )
 	{ // not allowed
 		$result[] = 'redirected';
 	}
 
 	// 'trash' status is allowed only in case of comments, and only if user has global editall permission
-	if( ( $prefix == 'blog_comment!' ) && !$current_User->check_perm( 'blogs', 'editall', false ) )
+	if( $prefix == 'blog_comment!' && ! ( is_logged_in() && $current_User->check_perm( 'blogs', 'editall', false ) ) )
 	{ // not allowed
 		$result[] = 'trash';
 	}
@@ -1283,7 +1325,8 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow
 			{	// Set this var to TRUE to make all next statuses below are allowed because it is a max allowed status:
 				$status_is_allowed = true;
 			}
-			if( ( $allow_status != $status && ! $status_is_allowed ) || ! $current_User->check_perm( $prefix.$status, 'create', false, $blog_ID ) )
+			if( ( $allow_status != $status && ! $status_is_allowed ) ||
+			    ! ( is_logged_in() && $current_User->check_perm( $prefix.$status, 'create', false, $blog_ID ) ) )
 			{	// This status is not allowed
 				$result[] = $status;
 			}
@@ -1323,6 +1366,46 @@ function & get_setting_Blog( $setting_name, $halt_on_error = false, $halt_on_emp
 	return $setting_Blog;
 }
 
+
+/**
+ * Display collection favorite icon
+ *
+ * @param integer Blog ID
+ */
+function get_coll_fav_icon( $blog_ID, $params = array() )
+{
+	global $admin_url, $current_User;
+
+	$params = array_merge( array(
+			'title' => '',
+			'class' => '',
+		), $params );
+
+	$BlogCache = & get_BlogCache();
+	$edited_Blog = $BlogCache->get_by_ID( $blog_ID );
+	if( $edited_Blog->favorite() > 0 )
+	{
+		$icon = 'star_on';
+		$action = 'disable_setting';
+		$title = T_('The collection is a favorite');
+	}
+	else
+	{
+		$icon = 'star_off';
+		$action = 'enable_setting';
+		$title = T_('The collection is not a favorite');
+	}
+
+	return '<a href="'.$admin_url.'?ctrl=coll_settings'
+			.'&amp;tab=general'
+			.'&amp;action='.$action
+			.'&amp;setting=fav'
+			.'&amp;blog='.$blog_ID
+			.'&amp;'.url_crumb('collection').'" '
+			.'onclick="return toggleFavorite( this, \''.$edited_Blog->urlname.'\' );">'
+			.get_icon( $icon, 'imgtag', $params )
+			.'</a>';
+}
 
 /**
  * Display blogs results table
@@ -1468,8 +1551,9 @@ function blogs_all_results_block( $params = array() )
 	}
 
 	$SQL = new SQL();
-	$SQL->SELECT( 'T_blogs.*, user_login' );
+	$SQL->SELECT( 'T_blogs.*, user_login, IF( cufv_user_id IS NULL, 0, 1 ) AS blog_favorite' );
 	$SQL->FROM( 'T_blogs INNER JOIN T_users ON blog_owner_user_ID = user_ID' );
+	$SQL->FROM_add( 'LEFT JOIN T_coll_user_favs ON ( cufv_blog_ID = blog_ID AND cufv_user_ID = '.$current_User->ID.' )' );
 
 	if( ! $current_User->check_perm( 'blogs', 'view' ) )
 	{ // We do not have perm to view all blogs... we need to restrict to those we're a member of:
@@ -1975,42 +2059,11 @@ function blog_row_setting( $blog_ID, $setting_name, $setting_value )
 	switch( $setting_name )
 	{
 		case'fav':
-			// Favorite Blog
-			$title = $setting_value ?
-					T_('The blog is a favorite.') :
-					T_('The blog is not a favorite.');
-			break;
+			return get_coll_fav_icon( $blog_ID, array( 'class' => 'coll-fav' ) );
 
 		default:
 			// Incorrect setting name
 			return;
-	}
-
-	if( $setting_value )
-	{ // Setting is enabled
-		$action = 'disable_setting';
-		$icon = 'star_on';
-	}
-	else
-	{ // Setting is disabled
-		$action = 'enable_setting';
-		$icon = 'star_off';
-	}
-
-	if( $current_User->check_perm( 'blog_properties', 'false', false, $blog_ID ) )
-	{ // Link to update blog setting
-		return '<a href="'.$admin_url.'?ctrl=coll_settings'
-			.'&amp;tab=general'
-			.'&amp;action='.$action
-			.'&amp;setting='.$setting_name
-			.'&amp;blog='.$blog_ID
-			.'&amp;'.url_crumb('collection').'">'
-				.get_icon( $icon, 'imgtag', array( 'title' => $title ) )
-			.'</a>';
-	}
-	else
-	{ // Simple icon to display current value of blog setting
-		return get_icon( $icon, 'imgtag', array( 'title' => $title ) );
 	}
 }
 
@@ -2029,10 +2082,7 @@ function blog_row_actions( $curr_blog_ID )
 	if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
 	{
 		$r .= action_icon( T_('Edit properties...'), 'properties', $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$curr_blog_ID );
-	}
-
-	if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
-	{
+		$r .= action_icon( T_('Duplicate this collection...'), 'copy', $admin_url.'?ctrl=collections&amp;action=copy&amp;blog='.$curr_blog_ID );
 		$r .= action_icon( T_('Delete this blog...'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete&amp;blog='.$curr_blog_ID.'&amp;'.url_crumb('collection').'&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) ) );
 	}
 

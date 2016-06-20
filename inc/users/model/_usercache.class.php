@@ -103,7 +103,8 @@ class UserCache extends DataObjectCache
 					  FROM T_users
 					 WHERE user_login = '".$DB->escape($login)."'", 0, 0, 'Get User login' ) )
 			{
-				$this->add( new User( $row ) );
+				$new_user = new User( $row );
+				$this->add( $new_user );
 			}
 			else
 			{
@@ -180,7 +181,7 @@ class UserCache extends DataObjectCache
 			$index++;
 			if( empty( $pwd_hashed ) )
 			{
-				if( $row->user_pass != md5( $row->user_salt.$pass ) )
+				if( $row->user_pass != md5( $row->user_salt.$pass, true ) )
 				{ // password doesn't match
 					continue;
 				}
@@ -190,7 +191,7 @@ class UserCache extends DataObjectCache
 				$pwd_matched = false;
 				foreach( $pwd_hashed as $encrypted_password )
 				{
-					$pwd_matched = ( sha1($row->user_pass.$pwd_salt) == $encrypted_password );
+					$pwd_matched = ( sha1( bin2hex( $row->user_pass ).$pwd_salt ) == $encrypted_password );
 					if( $pwd_matched )
 					{ // The corresponding user was found
 						break;
@@ -288,10 +289,6 @@ class UserCache extends DataObjectCache
 		{ // Load members of the blog
 			$cache_name = 'blogmembers';
 			$db_field = 'ismember';
-			if( $owner_User = & $Blog->get_owner_User() )
-			{	// The collection's owner is member by default, Load it together with other members:
-				$load_owner_user_ID = $owner_User->ID;
-			}
 		}
 
 		if( isset( $this->alreadyCached[ $cache_name ] ) && isset( $this->alreadyCached[ $cache_name ][ $blog_ID ] ) )
@@ -308,69 +305,74 @@ class UserCache extends DataObjectCache
 		// Remember this special load:
 		$this->alreadyCached[ $cache_name ][ $blog_ID ] = true;
 
-		$Debuglog->add( "Loading <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache", 'dataobjects' );
+		$Debuglog->add( "Loading <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache[$cache_name]", 'dataobjects' );
 
-		if( ! $Blog->get( 'advanced_perms' ) )
-		{	// If only collection simple permissions are enabled then only owner can be member:
-			if( $cache_name = 'blogmembers' )
-			{
-				if( $owner_User = & $Blog->get_owner_User() )
-				{	// Add collection owner to the cache:
-					$this->add( $owner_User );
-				}
-			}
-
-			// Exit here, because the code below is only for case when advanced permissions are enabled:
-			return true;
+		// The collection's owner is member and can be assignee by default, Load it together with other members/assignees:
+		if( $owner_User = & $Blog->get_owner_User() )
+		{	// Add collection owner to the cache:
+			$this->add( $owner_User );
 		}
 
-		// Get users which are members of the blog:
-		$user_perms_SQL = new SQL();
-		$user_perms_SQL->SELECT( 'T_users.*' );
-		$user_perms_SQL->FROM( 'T_users' );
-		$user_perms_SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON user_ID = bloguser_user_ID' );
-		$user_perms_SQL->WHERE( '( bloguser_blog_ID = '.$DB->quote( $blog_ID )
-			.' AND bloguser_'.$db_field.' <> 0 )' );
-		if( ! empty( $load_owner_user_ID ) )
-		{	// Load collection's owner as well:
-			$user_perms_SQL->WHERE_or( 'user_ID = '.$DB->quote( $load_owner_user_ID ) );
+		$users_sql = array();
+		if( $Blog->get( 'advanced_perms' ) )
+		{	// Load group and user permissions ONLY if collection advanced permissions are enabled:
+
+			// Get users which are members or can be assignees of the collection:
+			$user_perms_SQL = new SQL();
+			$user_perms_SQL->SELECT( 'T_users.*' );
+			$user_perms_SQL->FROM( 'T_users' );
+			$user_perms_SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON user_ID = bloguser_user_ID' );
+			$user_perms_SQL->WHERE( 'bloguser_blog_ID = '.$DB->quote( $blog_ID ) );
+			$user_perms_SQL->WHERE_and( 'bloguser_'.$db_field.' <> 0' );
+			$users_sql[] = $user_perms_SQL->get();
+
+			// Get users which primary groups are members or can be assignees of the collection:
+			$group_perms_SQL = new SQL();
+			$group_perms_SQL->SELECT( 'T_users.*' );
+			$group_perms_SQL->FROM( 'T_users' );
+			$group_perms_SQL->FROM_add( 'INNER JOIN T_coll_group_perms ON user_grp_ID = bloggroup_group_ID' );
+			$group_perms_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $blog_ID ) );
+			$group_perms_SQL->WHERE_and( 'bloggroup_'.$db_field.' <> 0' );
+			$users_sql[] = $group_perms_SQL->get();
+
+			// Get users which secondary groups are members or can be assignees of the collection:
+			$secondary_group_perms_SQL = new SQL();
+			$secondary_group_perms_SQL->SELECT( 'T_users.*' );
+			$secondary_group_perms_SQL->FROM( 'T_users' );
+			$secondary_group_perms_SQL->FROM_add( 'INNER JOIN T_users__secondary_user_groups ON sug_user_ID = user_ID' );
+			$secondary_group_perms_SQL->FROM_add( 'INNER JOIN T_coll_group_perms ON sug_grp_ID = bloggroup_group_ID' );
+			$secondary_group_perms_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $blog_ID ) );
+			$secondary_group_perms_SQL->WHERE_and( 'bloggroup_'.$db_field.' <> 0' );
+			$users_sql[] = $secondary_group_perms_SQL->get();
 		}
 
-		// Get users which groups are members of the blog:
-		$group_perms_SQL = new SQL();
-		$group_perms_SQL->SELECT( 'T_users.*' );
-		$group_perms_SQL->FROM( 'T_users' );
-		$group_perms_SQL->FROM_add( 'INNER JOIN T_coll_group_perms ON user_grp_ID = bloggroup_group_ID' );
-		$group_perms_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $blog_ID ) );
-		$group_perms_SQL->WHERE_and( 'bloggroup_'.$db_field.' <> 0' );
-
+		// Get members or assignees which primary groups have a setting to VIEW/EDIT ALL collections:
+		$group_setting_SQL = new SQL();
+		$group_setting_SQL->SELECT( 'T_users.*' );
+		$group_setting_SQL->FROM( 'T_users' );
+		$group_setting_SQL->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
 		if( $load_members )
-		{	// Get users which groups have a setting to view ALL collection:
-			$group_setting_SQL = new SQL();
-			$group_setting_SQL->SELECT( 'T_users.*' );
-			$group_setting_SQL->FROM( 'T_users' );
-			$group_setting_SQL->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
+		{	// Get members which primary groups have a setting to VIEW/EDIT ALL collections:
 			$group_setting_SQL->WHERE( 'grp_perm_blogs = "viewall" OR grp_perm_blogs = "editall"' );
 		}
-
-		// Union two sql queries to execute one query and save an order as one list:
-		$users_sql = '( '.$user_perms_SQL->get().' )'
-			.' UNION '
-			.'( '.$group_perms_SQL->get().' )';
-		if( $load_members )
-		{
-			$users_sql .= ' UNION ( '.$group_setting_SQL->get().' )';
+		else
+		{	// Get assignees which primary groups have a setting to EDIT ALL collections:
+			$group_setting_SQL->WHERE( 'grp_perm_blogs = "editall"' );
 		}
+		$users_sql[] = $group_setting_SQL->get();
+
+		// Union sql queries to execute one query and save an order as one list:
+		$users_sql = '( '.implode( ' ) UNION ( ', $users_sql ).' )';
 		$users_sql .= ' ORDER BY user_login';
 		if( $limit > 0 )
 		{	// Limit the users:
 			$users_sql .= ' LIMIT '.$limit;
 		}
 
-		$users = $DB->get_results( $users_sql );
+		$users = $DB->get_results( $users_sql, OBJECT, 'Load all members of collection #'.$blog_ID.' into cache['.$cache_name.']' );
 		foreach( $users as $row )
 		{
-			if( !isset($this->cache[$row->user_ID]) )
+			if( ! isset( $this->cache[ $row->user_ID ] ) )
 			{ // Save reinstatiating User if it's already been added
 				$this->add( new User( $row ) );
 			}

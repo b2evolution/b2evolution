@@ -8,7 +8,8 @@
 .widget_core_org_members {
 	margin: 5em 0 30px;
 	color: @widget_core_org_members-color;
-	div.evo_org_member {
+	div.widget_rwd_content {
+		text-align: center;
 		margin-top: 20px;
 		margin-bottom: 30px;
 	}
@@ -45,6 +46,18 @@
 		// These default properties can be changed by param "Lines of extra info" of the widget "Organization Members":
 		-webkit-line-clamp: 2;
 		height: 3em; // = ( -webkit-line-clamp ) * ( line-height )
+	}
+	
+	// RWD Blocks Layout
+	.widget_rwd_blocks {
+		width: 100%;
+	}
+	
+	// List Layout
+	&.evo_layout_list {
+		ul li div.ufld_icon_links {
+			text-align: left;
+		}
 	}
 }
 

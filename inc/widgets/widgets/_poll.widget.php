@@ -162,7 +162,7 @@ class poll_Widget extends ComponentWidget
 						// Calculate a percent for style relating on max percent:
 						$style_percent = $max_poll_options_percent > 0 ? ceil( $poll_option->percent / $max_poll_options_percent * 100 ) : 0;
 						echo '<td class="evo_poll__percent_bar"><div><div style="width:'.$style_percent.'%"></div></div></td>';
-						echo '<td>'.$poll_option->percent.'%</td>';
+						echo '<td class="evo_poll__percentage">'.$poll_option->percent.'%</td>';
 					}
 					echo '</tr>';
 				}

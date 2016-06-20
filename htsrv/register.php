@@ -328,6 +328,7 @@ switch( $action )
 		if( $new_User->dbinsert() )
 		{ // Insert system log about user's registration
 			syslog_insert( 'User registration', 'info', 'user', $new_User->ID );
+			report_user_create( $new_User );
 		}
 
 		$new_user_ID = $new_User->ID; // we need this to "rollback" user creation if there's no DB transaction support
@@ -353,7 +354,7 @@ switch( $action )
 		$DB->commit();
 		$UserCache->add( $new_User );
 
-		$initial_hit = $new_User->get_first_session_hit_params( $Session->ID );
+		$initial_hit = $Session->get_first_hit_params();
 		if( ! empty ( $initial_hit ) )
 		{	// Save User Settings
 			$UserSettings->set( 'initial_blog_ID' , $initial_hit->hit_coll_ID, $new_User->ID );
@@ -378,8 +379,11 @@ switch( $action )
 
 		// Send notification email about new user registrations to users with edit users permission
 		$email_template_params = array(
-				'country'     => $country,
+				'country'     => $new_User->get( 'ctry_ID' ),
+				'reg_country' => $new_User->get( 'reg_ctry_ID' ),
 				'firstname'   => $firstname,
+				'lastname'    => $lastname,
+				'fullname'    => $new_User->get( 'fullname' ),
 				'gender'      => $gender,
 				'locale'      => $locale,
 				'source'      => $new_User->get( 'source' ),

@@ -262,7 +262,7 @@ class Chapter extends DataObject
 		}
 
 		// Sort children list
-		usort( $this->children, array( 'Chapter','compare_chapters' ) );
+		uasort( $this->children, array( 'Chapter','compare_chapters' ) );
 	}
 
 

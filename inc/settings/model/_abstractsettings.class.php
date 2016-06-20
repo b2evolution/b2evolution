@@ -194,7 +194,7 @@ class AbstractSettings
 			FROM '.$this->db_table_name.(
 				isset( $whereList[0] )
 				? ' WHERE '.implode( ' AND ', $whereList )
-				: '' ) );
+				: '' ), OBJECT, 'Load settings from '.$this->db_table_name );
 
 		switch( $this->count_col_key_names )
 		{

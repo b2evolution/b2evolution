@@ -45,7 +45,6 @@ a[rel~=nofollow]:not([class~=btn]):hover {
 
 // Image styles:
 img.loadimg {
-	display: inline-block;
 	min-width: 64px;
 	min-height: 64px;
 	background: url(../img/ajax-loader/fff.gif) no-repeat center;
@@ -56,6 +55,9 @@ figure {
 .evo_image_block {
 	// WARNING: this will screw out backoffice layout (fulltext edit screen)
 	text-align: center;
+	.img-responsive {
+		display: inline-block;
+	}
 }
 // Used to limit max width of the replied comments,
 // because width of the replied comment can be very small
@@ -259,8 +261,6 @@ form {
 .preview_cropped_image {
 	display: inline-block;
 	overflow: hidden;
-	margin-bottom: 10px;
-	margin-right: 10px;
 	box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.25);
 }
 .preview_cropped_image.circle {
@@ -272,20 +272,7 @@ form {
 .crop_button.top {
 	display: none;
 }
-#image_crop_block.short_width > div { display: block; }
-#image_crop_block.short_width .preview_cropped_images { text-align: left; width: auto; }
-#image_crop_block.short_width .preview_cropped_image { margin-right: 10px; }
-@media only screen and (max-width: 900px) {
-	#fieldset_wrapper_image_crop fieldset{ padding: 0 !important; }
-	//#target_cropped_image{ margin-right: 0; }
-	#image_crop_block > div { display: inline-block; }
-	#overlay_page .preview_cropped_images,
-	.preview_cropped_images { text-align: left !important; width: auto !important; display: inline-block; }
-	.preview_cropped_image { margin-right: 10px; }
-	.crop_button.top { display: block; }
-	.crop_button.bottom { display: none; }
-	#image_crop legend{ padding: 10px; box-sizing: border-box; }
-}
+
 // Fix to hide radio button
 .jcrop-keymgr {
 	visibility: hidden;
@@ -293,6 +280,9 @@ form {
 // ---------------- //
 
 // Form styles:
+.evo_label_inline {
+	margin-left: 2ex;
+}
 // Used for action icons
 div.right_icons,
 div.fieldset_icons {
@@ -457,7 +447,7 @@ table.widget_grid .note {
 
 // User links widget
 .ufld_icon_links {
-	text-align: center; 
+	text-align: center;
 	// milos> Already styled with 'text-align: right;' in Starter style.less (line 7)
 	// fp> I put this back because you say 'already'. It's not 'already'. starter/style.less comes after this basic style. If we want to remove this we have to know that this style is overriden by ALL boostrap skins.
 	a {
