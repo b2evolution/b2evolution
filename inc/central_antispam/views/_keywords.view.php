@@ -37,7 +37,7 @@ $CountSQL = new SQL();
 $CountSQL->SELECT( 'SQL_NO_CACHE COUNT( cakw_ID )' );
 $CountSQL->FROM( 'T_centralantispam__keyword' );
 
-$Results = new Results( $SQL->get(), 'cakw_', '-A', $UserSettings->get( 'results_per_page' ), $CountSQL->get() );
+$Results = new Results( $SQL->get(), 'cakw_', '---D', $UserSettings->get( 'results_per_page' ), $CountSQL->get() );
 
 $Results->title = $central_antispam_Module->T_('Keywords');
 
@@ -65,12 +65,30 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
+		'th' => $central_antispam_Module->T_('Last change'),
+		'th_class' => 'shrinkwrap',
+		'order' => 'cakw_statuschange_ts',
+		'default_dir' => 'D',
+		'td_class' => 'timestamp compact_data',
+		'td' => '%mysql2localedatetime_spans( #cakw_statuschange_ts# )%',
+	);
+
+$Results->cols[] = array(
 		'th' => $central_antispam_Module->T_('Reports'),
 		'order' => 'report_num',
 		'default_dir' => 'D',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'right',
 		'td' => '$report_num$',
+	);
+
+$Results->cols[] = array(
+		'th' => $central_antispam_Module->T_('Last report'),
+		'th_class' => 'shrinkwrap',
+		'order' => 'cakw_lastreport_ts',
+		'default_dir' => 'D',
+		'td_class' => 'timestamp compact_data',
+		'td' => '%mysql2localedatetime_spans( #cakw_lastreport_ts# )%',
 	);
 
 function ac_results_keyword_actions( $cakw_ID )
