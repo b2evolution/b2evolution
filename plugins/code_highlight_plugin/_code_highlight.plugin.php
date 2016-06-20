@@ -627,7 +627,7 @@ class code_highlight_plugin extends Plugin
 			return;
 		}
 
-		require_css( $this->get_plugin_url().'amcode.css', true );
+		$this->require_css( 'amcode.css' );
 	}
 
 

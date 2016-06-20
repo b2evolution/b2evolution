@@ -581,7 +581,7 @@ class shortlinks_plugin extends Plugin
 		require_js( 'functions.js', 'blog', true, true );
 
 		// Load css for modal window:
-		require_css( $this->get_plugin_url().'/shortlinks.css', 'relative', NULL, NULL, '#', true );
+		$this->require_css( 'shortlinks.css', true );
 
 		// Initialize JavaScript to build and open window:
 		echo_modalwindow_js();

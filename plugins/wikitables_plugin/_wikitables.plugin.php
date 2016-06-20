@@ -337,7 +337,7 @@ See manual for more.');
 			return;
 		}
 
-		require_css( $this->get_plugin_url( true ).'wikitables.css', 'blog' );
+		$this->require_css( 'wikitables.css' );
 	}
 
 

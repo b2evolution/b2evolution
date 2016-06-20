@@ -266,7 +266,7 @@ class polls_plugin extends Plugin
 		require_js( 'functions.js', 'blog', true, true );
 
 		// Load CSS for modal window
-		require_css( $this->get_plugin_url().'polls.css', 'relative', NULL, NULL, '#', true );
+		$this->require_css( 'polls.css', true );
 
 		// Initialize JavaScript to build and open window:
 		echo_modalwindow_js();
