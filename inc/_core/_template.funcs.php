@@ -971,6 +971,9 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 		if( $version == '#' )
 		{
 			global $app_version_long;
+
+// fp>yura TODO: if $relative_to == 'relative' && isset($Skin), add skin version
+
 			$version = $app_version_long;
 		}
 		$lib_url = url_add_param( $lib_url, 'v='.$version );
