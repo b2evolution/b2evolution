@@ -199,7 +199,7 @@ function antispam_report_abuse( $abuse_string )
 	}
 	else
 	{
-		$Messages->add( T_('Failed to report abuse to b2evolution.net.'), 'error' );
+		$Messages->add( sprintf( T_('Failed to report abuse to %s.'), $antispamsrv_host ), 'error' );
 	}
 
 	return $ret;

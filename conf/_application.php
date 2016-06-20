@@ -84,5 +84,6 @@ $modules = array(
 		'sessions',
 		'messaging',
 		'maintenance',
+		'central_antispam',
 	);
 ?>

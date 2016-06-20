@@ -965,6 +965,14 @@ $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
 $antispamsrv_host = 'antispam.b2evo.net';
 $antispamsrv_port = 80;
 $antispamsrv_uri = '/evonetsrv/xmlrpc.php';
+// For local testing, use something like:
+// $antispamsrv_uri = '/.../xmlsrv/xmlrpc.php';
+$antispamsrv_tos_url = 'http://b2evolution.net/about/terms.html';
+
+/**
+ * Set TRUE if THIS server should be used as central antispam server
+ */
+$enable_blacklist_server_API = false;
 
 // This is for plugins to add CS files to the TinyMCE editor window:
 $tinymce_content_css = array();
