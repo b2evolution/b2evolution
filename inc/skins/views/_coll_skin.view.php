@@ -29,7 +29,7 @@ $SkinCache->load_all();
 $skins = array();
 while( ( $skin = & $SkinCache->get_next() ) != NULL )
 {
-	if( $skin->type != 'normal' )
+	if( $skin->type != $skin_type )
 	{	// This skin cannot be used here...
 		continue;
 	}
@@ -95,22 +95,25 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 
 	$fadeout_array = $Session->get( 'fadeout_array' );
 
-	foreach( $skins['yes'] as $skin )
+	if( isset( $skins['yes'] ) )
 	{
-		$selected = ( $current_skin_ID == $skin->ID );
-		$blog_skin_param = $skin_type.'_skin_ID=';
-		$select_url = '?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$blog_skin_param.$skin->ID.'&amp;'.url_crumb('collection');
-		$preview_url = url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode($skin->folder) );
+		foreach( $skins['yes'] as $skin )
+		{
+			$selected = ( $current_skin_ID == $skin->ID );
+			$blog_skin_param = $skin_type.'_skin_ID=';
+			$select_url = '?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$blog_skin_param.$skin->ID.'&amp;'.url_crumb('collection');
+			$preview_url = url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode($skin->folder) );
 
-		$disp_params = array(
-			'function'     => 'select',
-			'selected'     => $selected,
-			'select_url'   => $select_url,
-			'function_url' => $preview_url,
-			'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $skin->ID, $fadeout_array['skin_ID'] ) ),
-		);
-		// Display skinshot:
-		Skin::disp_skinshot( $skin->folder, $skin->name, $disp_params );
+			$disp_params = array(
+				'function'     => 'select',
+				'selected'     => $selected,
+				'select_url'   => $select_url,
+				'function_url' => $preview_url,
+				'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $skin->ID, $fadeout_array['skin_ID'] ) ),
+			);
+			// Display skinshot:
+			Skin::disp_skinshot( $skin->folder, $skin->name, $disp_params );
+		}
 	}
 
 	// Flush fadeout
