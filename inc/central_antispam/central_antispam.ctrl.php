@@ -136,8 +136,8 @@ switch( $action )
 				$keyword_timestamp = date( 'Y-m-d H:i:s', ( time() + $time_difference ) );
 				// Insert new keyword:
 				$query_result = $DB->query( 'INSERT INTO T_centralantispam__keyword
-						( cakw_keyword, cakw_status, cakw_lastreport_ts ) VALUES
-						( '.$DB->quote( $keyword ).', "published", '.$DB->quote( $keyword_timestamp ).' )' );
+						( cakw_keyword, cakw_status, cakw_statuschange_ts, cakw_lastreport_ts ) VALUES
+						( '.$DB->quote( $keyword ).', "published", '.$DB->quote( $keyword_timestamp ).', '.$DB->quote( $keyword_timestamp ).' )' );
 				if( $query_result )
 				{	// If new keyword has been inserted:
 					$keywords_imported_count++;

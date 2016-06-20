@@ -201,11 +201,11 @@ function b2evopollabuse( $m )
 	xmlrpc_debugmsg( ' timestamp min = '.$timestamp_min.' date min = '.date2mysql( $timestamp_min ).' ' );
 
 	$SQL = new SQL();
-	$SQL->SELECT( 'cakw_keyword, cakw_lastreport_ts' );
+	$SQL->SELECT( 'cakw_keyword, cakw_statuschange_ts' );
 	$SQL->FROM( 'T_centralantispam__keyword' );
 	$SQL->WHERE( 'cakw_status = "published"' );
-	$SQL->WHERE_And( 'cakw_lastreport_ts >= '.$DB->quote( date2mysql( $timestamp_min ) ) );
-	$SQL->ORDER_BY( 'cakw_lastreport_ts' );
+	$SQL->WHERE_And( 'cakw_statuschange_ts >= '.$DB->quote( date2mysql( $timestamp_min ) ) );
+	$SQL->ORDER_BY( 'cakw_statuschange_ts' );
 	$keywords = $DB->get_results( $SQL->get() );
 
 	// Array of spam strings
@@ -218,7 +218,7 @@ function b2evopollabuse( $m )
 			// Add string to list:
 			$resp_array->addScalar( $keyword->cakw_keyword, 'string' );
 			// Datetime of last string
-			$last_timestamp = mysql2date( 'Ymd\TH:i:s', $keyword->cakw_lastreport_ts );
+			$last_timestamp = mysql2date( 'Ymd\TH:i:s', $keyword->cakw_statuschange_ts );
 		}
 	}
 	else
