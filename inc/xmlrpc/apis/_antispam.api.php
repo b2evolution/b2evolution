@@ -1,14 +1,15 @@
 <?php
-/*
- * EXPERIMENTAL
+/**
+ * XML-RPC : Central Antispam API
  *
- * fplanque
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
+ *
+ * @package xmlsrv
  */
-$xmlrpc_logging = 0; // Set to 1 if you want to enable logging
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-require_once dirname( __FILE__ ).'/../conf/_config.php';
-require_once $inc_path.'_main.inc.php';
-load_funcs( '/xmlrpc/model/_xmlrpc.funcs.php' );
 
 
 ### b2evo.reportabuse ###
@@ -166,6 +167,11 @@ function b2evoreportabuse( $m )
 	return new xmlrpcresp( new xmlrpcval( $return_string, 'string' ) );
 }
 
+$xmlrpc_procs['b2evo.reportabuse'] = array(
+		'function'  => 'b2evoreportabuse',
+		'signature' => $b2evoreportabuse_sig,
+		'docstring' => $b2evoreportabuse_doc
+	);
 
 
 ### b2evo.pollabuse ###
@@ -239,24 +245,8 @@ function b2evopollabuse( $m )
 	return new xmlrpcresp( $response );
 }
 
-
-/**** SERVER FUNCTIONS ARRAY ****/
-
-load_funcs( '/xmlrpc/model/_xmlrpcs.funcs.php' ); // This will add generic remote calls
-
-$s = new xmlrpc_server(
-	array(
-		'b2evo.reportabuse' => array(
-			'function'  => 'b2evoreportabuse',
-			'signature' => $b2evoreportabuse_sig,
-			'docstring' => $b2evoreportabuse_doc
-		),
-		'b2evo.pollabuse' => array(
-			'function'  => 'b2evopollabuse',
-			'signature' => $b2evopollabuse_sig,
-			'docstring' => $b2evopollabuse_doc
-		),
-	)
-);
-
-?>
+$xmlrpc_procs['b2evo.pollabuse'] = array(
+		'function'  => 'b2evopollabuse',
+		'signature' => $b2evopollabuse_sig,
+		'docstring' => $b2evopollabuse_doc
+	);
