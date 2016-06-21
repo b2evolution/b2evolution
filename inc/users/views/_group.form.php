@@ -113,6 +113,10 @@ function display_pluggable_permissions( &$Form, $perm_block )
 						case 'text_input':
 							$Form->text_input( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name], 5, $perm['label'], $perm['note'], array( 'maxlength' => $perm['maxlength'] ) );
 						break;
+
+						case 'select_object':
+							$Form->select_input_object( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name], $perm['object_cache'], $perm['label'] );
+						break;
 					}
 				}
 			}
@@ -182,10 +186,10 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Blogging permissions').get_manual_link('group_properties_blogging'), array( 'id' => 'blogging', 'style' => $primary_panels_style ) );
 
 	$Form->radio( 'edited_grp_perm_blogs', $edited_Group->get('perm_blogs'),
-			array(  array( 'user', T_('Depending on each blog\'s permissions') ),
-							array( 'viewall', T_('View all blogs') ),
-							array( 'editall', T_('Full Access').get_admin_badge( 'coll', '#', '#', T_('Select to give Collection Admin permission') ) )
-						), T_('Collections'), false );
+			array(  array( 'user', T_('Users can only see Collections they have access to and the Sections these collections belong to + all Collections in the Sections they own.') ),
+							array( 'viewall', T_('View all: User can see all Sections and call Collections (with no additional edit permissions as above)') ),
+							array( 'editall', sprintf( T_('Full Access %s: Users can edit all Sections and Collections, create and delete Collections in any Section, create new Sections and delete empty Sections.'), get_admin_badge( 'coll', '#', T_('Site Admin'), T_('Select to give Collection Admin permission') ) ) )
+						), T_('Collections & Site Sections'), true );
 
 	$Form->radio( 'perm_xhtmlvalidation', $edited_Group->get('perm_xhtmlvalidation'),
 			array(  array( 'always', T_('Force valid XHTML + strong security'),

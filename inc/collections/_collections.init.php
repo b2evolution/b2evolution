@@ -475,7 +475,8 @@ class collections_Module extends Module
 				'perm_api' => $permapi,
 				'perm_createblog' => $permcreateblog,
 				'perm_getblog' => $permgetblog,
-				'perm_max_createblog_num' => $permmaxcreateblognum
+				'perm_default_cgrp_ID' => 1,
+				'perm_max_createblog_num' => $permmaxcreateblognum,
 				);
 	}
 
@@ -487,6 +488,19 @@ class collections_Module extends Module
 	 */
 	function get_available_group_permissions()
 	{
+		global $current_User;
+
+		$SectionCache = & get_SectionCache();
+		$SectionCache->clear();
+		if( is_logged_in() && $current_User->check_perm( 'section', 'edit' ) )
+		{	// Allow to select all sections if Current user can has a permission for this:
+			$SectionCache->load_all();
+		}
+		else
+		{	// Load only available sections:
+			$SectionCache->load_where( 'cgrp_ID = 1'.( is_logged_in() ? ' OR cgrp_owner_user_ID = '.$current_User->ID : '' ) );
+		}
+
 		// 'label' is used in the group form as label for radio buttons group
 		// 'user_func' function used to check user permission. This function should be defined in Module.
 		// 'group_func' function used to check group permission. This function should be defined in Module.
@@ -510,7 +524,7 @@ class collections_Module extends Module
 				'group_func' => 'check_createblog_group_perm',
 				'perm_block' => 'blogging',
 				'perm_type' => 'checkbox',
-				'note' => T_( 'Users can create new blogs for themselves'),
+				'note' => T_( 'Users can create new collections for themselves (in any Section they own, or at a minimum, in the Section specified below)'),
 				),
 			'perm_getblog' => array(
 				'label' => '',
@@ -518,7 +532,16 @@ class collections_Module extends Module
 				'group_func' => 'check_getblog_group_perm',
 				'perm_block' => 'blogging',
 				'perm_type' => 'checkbox',
-				'note' => T_( 'New users automatically get a new blog'),
+				'note' => T_( 'New users automatically get a new collection (in the Section speciafied below)'),
+				),
+			'perm_default_cgrp_ID' => array(
+				'label' => T_('Default Section for new Collections'),
+				'user_func'  => 'check_default_cgrp_user_perm',
+				'group_func' => 'check_default_cgrp_group_perm',
+				'perm_block' => 'blogging',
+				'perm_type' => 'select_object',
+				'object_cache' => $SectionCache,
+				'note' => '',
 				),
 			'perm_max_createblog_num' => array(
 				'label' => T_('Maximum number of blogs allowed'),
