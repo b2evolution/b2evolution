@@ -1832,7 +1832,7 @@ class Blog extends DataObject
 
 		if( ! is_logged_in() )
 		{	// User must be logged in:
-			return NULL;
+			return $this->get_max_allowed_status( $status );
 		}
 
 		if( empty( $status ) )
@@ -4326,27 +4326,50 @@ class Blog extends DataObject
 	/**
 	 * Get max allowed post/comment status on this collection depending on access settings
 	 *
+	 * @param string|NULL Status to check and reduce by max allowed, NULL - to use max allowed status of this collection
 	 * @return string
 	 */
-	function get_max_allowed_status()
+	function get_max_allowed_status( $check_status = NULL )
 	{
 		switch( $this->get_setting( 'allow_access' ) )
 		{
 			case 'members':
 				if( $this->get( 'advanced_perms' ) )
 				{
-					return 'protected';
+					$max_allowed_status = 'protected';
 				}
 				else
 				{
-					return 'private';
+					$max_allowed_status = 'private';
 				}
+				break;
 
 			case 'users':
-				return 'community';
+				$max_allowed_status = 'community';
+				break;
 
 			default: // 'public'
-				return 'published';
+				$max_allowed_status = 'published';
+				break;
+		}
+
+		if( $check_status === NULL )
+		{	// Don't check the requested status:
+			return $max_allowed_status;
+		}
+
+		// Check if the requested status can be used on this collection:
+		$status_orders = get_visibility_statuses( 'ordered-index' );
+		$max_allowed_status_order = $status_orders[ $max_allowed_status ];
+		$check_status_order = $status_orders[ $check_status ];
+
+		if( $max_allowed_status_order >= $check_status_order )
+		{	// The requested status can be used on this collection:
+			return $check_status;
+		}
+		else
+		{	// Reduce the requested status by max allowed:
+			return $max_allowed_status;
 		}
 	}
 

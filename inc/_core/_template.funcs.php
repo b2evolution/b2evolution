@@ -970,11 +970,14 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 	{ // Be sure to get a fresh copy of this CSS file after application upgrades:
 		if( $version == '#' )
 		{
-			global $app_version_long;
-
-// fp>yura TODO: if $relative_to == 'relative' && isset($Skin), add skin version
+			global $app_version_long, $Skin;
 
 			$version = $app_version_long;
+
+			if( ( $relative_to == 'relative' || $relative_to === true ) && ! is_admin_page() && isset( $Skin ) )
+			{	// Prepand skin version to clear file from browser cache after skin switching:
+				$version = $Skin->folder.'+'.$Skin->version.'+'.$version;
+			}
 		}
 		$lib_url = url_add_param( $lib_url, 'v='.$version );
 	}
