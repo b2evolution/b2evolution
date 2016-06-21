@@ -109,7 +109,7 @@ button.action_icon {
   color: #ff6666;
 }
 .status_color_meta {
-  color: #5133ab;
+  color: #5bc0de;
 }
 .btn[class*=btn-status-] {
   border: 1px solid #ccc;
@@ -2797,7 +2797,7 @@ div.item_location {
 }
 .note.status_meta span {
   color: #fff;
-  background-color: #5133ab;
+  background-color: #5bc0de;
 }
 #styled_content_block span[class*=status_] span,
 .evo_content_block span[class*=status_] span {

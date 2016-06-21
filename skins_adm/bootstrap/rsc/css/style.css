@@ -265,14 +265,14 @@ div.delete_messages ul li {
   border-radius: 4px;
 }
 .evo_post__comments .evo_form__comment.form-horizontal.evo_form__comment_meta {
-  border: 2px solid #5133ab;
-  background-color: #f7f4ff;
+  border: 2px solid #5bc0de;
+  background-color: #d9edf7;
 }
 .evo_post__comments .evo_form__comment.form-horizontal .form_info {
   display: block;
   text-align: center;
   padding: 10px;
-  color: #5133ab;
+  color: #5bc0de;
 }
 #comment_filter_form fieldset {
   margin-bottom: 20px;
@@ -307,15 +307,15 @@ div.delete_messages ul li {
   color: #888;
 }
 .evo_comments_container .evo_comment.evo_comment__status_meta {
-  border: 2px solid #5133ab;
+  border: 2px solid #5bc0de;
 }
 .evo_comments_container .evo_comment.evo_comment__status_meta .panel-heading,
 .evo_comments_container .evo_comment.evo_comment__status_meta .panel-footer {
-  background-color: #f7f4ff;
-  border-bottom: 1px solid #5133ab;
+  background-color: #d9edf7;
+  border-bottom: 1px solid #5bc0de;
 }
 .evo_comments_container .evo_comment.evo_comment__status_meta .panel-footer {
-  border-top: 1px solid #5133ab;
+  border-top: 1px solid #5bc0de;
   border-bottom: none;
 }
 .evo_comments_container .evo_comment.evo_comment__status_trash {
@@ -596,7 +596,7 @@ fieldset ul {
   margin-top: 1px;
 }
 .dashboard_comments_block__meta .panel-body {
-  background-color: #f7f4ff;
+  background-color: #d9edf7;
 }
 .chart .label {
   color: #000;
@@ -1474,7 +1474,7 @@ table.diff td.diff-title-addedline {
   color: #ff6666;
 }
 .status_color_meta {
-  color: #5133ab;
+  color: #5bc0de;
 }
 .btn[class*=btn-status-] {
   border: 1px solid #ccc;
@@ -1591,5 +1591,5 @@ table.diff td.diff-title-addedline {
   background-color: #ff6666;
 }
 .evo_checkbox_status__meta {
-  background-color: #5133ab;
+  background-color: #5bc0de;
 }
