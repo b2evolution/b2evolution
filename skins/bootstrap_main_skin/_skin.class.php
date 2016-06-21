@@ -192,7 +192,7 @@ class bootstrap_main_Skin extends Skin
 				'3_end' => array(
 					'layout' => 'end_fieldset',
 				),
-				'4_start' => array(
+				'section_colorbox_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Colorbox Image Zoom')
 				),
@@ -238,10 +238,12 @@ class bootstrap_main_Skin extends Skin
 						'defaultvalue' => 1,
 						'type' => 'checkbox',
 					),
-				'4_end' => array(
+				'section_colorbox_end' => array(
 					'layout' => 'end_fieldset',
 				),
-				'5_start' => array(
+
+
+				'section_username_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Username options')
 				),
@@ -263,7 +265,7 @@ class bootstrap_main_Skin extends Skin
 						'defaultvalue' => 1,
 						'type' => 'checkbox',
 					),
-				'5_end' => array(
+				'section_username_end' => array(
 					'layout' => 'end_fieldset',
 				),
 
