@@ -68,7 +68,8 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 
 	if( $this->get_path( 0 ) == 'files'
 			|| ( $this->get_path_range( 0, 2 ) == array( 'collections', 'settings', 'perm' ) )
-			|| ( $this->get_path_range( 0, 2 ) == array( 'collections', 'settings', 'permgroup' ) ) )
+			|| ( $this->get_path_range( 0, 2 ) == array( 'collections', 'settings', 'permgroup' ) )
+			|| ( $this->get_path_range( 0, 2 ) == array( 'users', 'groups', 'collection' ) ) )
 	{{{ // -- Inject javascript ----------------
 		// gets initialized in _footer.php
 

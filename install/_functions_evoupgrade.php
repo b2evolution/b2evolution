@@ -7496,8 +7496,108 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11780, 'Creating collection groups table...' ) )
+	if( upg_task_start( 11780, 'Update widget container "Item Single"...' ) )
 	{	// part of 6.7.3-stable
+		$DB->begin();
+		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
+		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_code, wi_order' );
+		$SQL->FROM( 'T_widget' );
+		$SQL->WHERE( 'wi_sco_name = "Item Single"' );
+		$SQL->ORDER_BY( 'wi_coll_ID, wi_order' );
+		$coll_item_single_widgets = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+		$coll_widgets = array();
+		foreach( $coll_item_single_widgets as $coll_item_single_widget )
+		{
+			if( ! isset( $coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] ) )
+			{	// If the "Item Single" has no widget "Item Content":
+				$coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] = 1;
+			}
+			if( $coll_item_single_widget['wi_code'] == 'item_content' )
+			{	// If the "Item Single" contains widget "Item Content" then keep an order of this widget:
+				$coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] = $coll_item_single_widget['wi_order'] + 1;
+			}
+		}
+		$item_attachments_widget_rows = array();
+		foreach( $coll_widgets as $coll_ID => $widget_order )
+		{	// Insert new widget "Item Attachments" to each colleaction that has a container "Item Single":
+			$item_attachments_widget_rows[] = '( '.$coll_ID.', "Item Single", '.$widget_order.', "item_attachments" )';
+			// Check and update not unique widget orders:
+			$not_unique_widget_ID = $DB->get_var( 'SELECT wi_ID
+				 FROM T_widget
+				WHERE wi_coll_ID = '.$coll_ID.'
+					AND wi_sco_name = "Item Single"
+					AND wi_order = '.$widget_order );
+			if( $not_unique_widget_ID > 0 )
+			{	// The collection has not unique widget order:
+				$update_order_widgets = array();
+				foreach( $coll_item_single_widgets as $coll_item_single_widget )
+				{
+					if( $coll_item_single_widget['wi_coll_ID'] == $coll_ID && $coll_item_single_widget['wi_order'] >= $widget_order )
+					{	// Increase a widget order to avoid mysql errors of duplicate entry:
+						$update_order_widgets[] = $coll_item_single_widget['wi_ID'];
+					}
+				}
+				for( $w = count( $update_order_widgets ) - 1; $w >= 0 ; $w-- )
+				{	// Update not unique widget orders:
+					$DB->query( 'UPDATE T_widget
+							SET   wi_order = wi_order + 1
+							WHERE wi_ID = '.$update_order_widgets[ $w ] );
+				}
+			}
+		}
+		if( count( $item_attachments_widget_rows ) )
+		{	// Insert new widgets "Item Attachments" into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
+			  VALUES '.implode( ', ', $item_attachments_widget_rows ) );
+		}
+		$DB->commit();
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11785, 'Create new widget container "404 Page"...' ) )
+	{	// part of 6.7.3-stable
+		$coll_IDs = $DB->get_col( 'SELECT blog_ID FROM T_blogs' );
+		if( $coll_IDs )
+		{
+			$page_404_widget_rows = array();
+			foreach( $coll_IDs as $coll_ID )
+			{
+				$page_404_widget_rows[] = '( '.$coll_ID.', "404 Page", 10, "page_404_not_found" )';
+				$page_404_widget_rows[] = '( '.$coll_ID.', "404 Page", 20, "coll_search_form" )';
+				$page_404_widget_rows[] = '( '.$coll_ID.', "404 Page", 30, "coll_tag_cloud" )';
+			}
+			// Insert new widgets for container "404 Page" into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
+			  VALUES '.implode( ', ', $page_404_widget_rows ) );
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11790, 'Rename table "T_antispam" to "T_antispam__keyword"...' ) )
+	{	// part of 6.7.4-stable
+		$DB->query( 'RENAME TABLE '.$tableprefix.'antispam TO T_antispam__keyword' );
+		$DB->query( "ALTER TABLE T_antispam__keyword
+			CHANGE aspm_ID     askw_ID     bigint(11) NOT NULL auto_increment,
+			CHANGE aspm_string askw_string varchar(80) NOT NULL,
+			CHANGE aspm_source askw_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported',
+			DROP INDEX aspm_string,
+			ADD UNIQUE askw_string ( askw_string )" );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11795, 'Upgrading posts and comments statuses depeding on max allowed status by their collections...' ) )
+	{	// part of 6.7.4-stable
+		$BlogCache = & get_BlogCache();
+		$BlogCache->load_all( 'ID', 'ASC' );
+		foreach( $BlogCache->cache as $Blog )
+		{
+			$Blog->update_reduced_status_data();
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11800, 'Creating collection groups table...' ) )
+	{	// part of 6.8.0-alpha
 		db_create_table( 'T_coll_groups', '
 				cgrp_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 				cgrp_name          VARCHAR(255) NOT NULL,
@@ -7507,21 +7607,21 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11785, 'Upgrading collections table...' ) )
-	{	// part of 6.7.3-stable
+	if( upg_task_start( 11805, 'Upgrading collections table...' ) )
+	{	// part of 6.8.0-alpha
 		db_add_col( 'T_blogs', 'blog_cgrp_ID', 'INT(11) UNSIGNED NULL' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11790, 'Upgrading general settings table...' ) )
-	{	// part of 6.7.3-stable
+	if( upg_task_start( 11810, 'Upgrading general settings table...' ) )
+	{	// part of 6.8.0-alpha
 		$DB->query( 'ALTER TABLE T_settings
 			MODIFY set_name VARCHAR(50) COLLATE ascii_general_ci NOT NULL' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11795, 'Install default site skin...' ) )
-	{	// part of 6.7.3-stable
+	if( upg_task_start( 11815, 'Install default site skin...' ) )
+	{	// part of 6.8.0-alpha
 		load_funcs( 'skins/_skin.funcs.php' );
 		$SkinCache = & get_SkinCache();
 		if( ! ( $default_site_Skin = & $SkinCache->get_by_folder( 'default_site_skin', false ) ) )
@@ -7530,20 +7630,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		}
 		if( $default_site_Skin && $default_site_Skin->ID > 0 )
 		{	// Use the installed skin as default for site:
-			global $Settings;
-			if( empty( $Settings ) )
-			{	// Initialize general settings:
-				load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
-				$Settings = new GeneralSettings();
-			}
-			$Settings->set( 'normal_skin_ID', $default_site_Skin->ID );
-			$Settings->dbupdate();
+			$DB->query( 'REPLACE INTO T_settings ( set_name, set_value )
+				VALUES ( "normal_skin_ID", '.$default_site_Skin->ID.' )' );
 		}
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11800, 'Create default collection group...' ) )
-	{	// part of 6.7.3-stable
+	if( upg_task_start( 11820, 'Create default collection group...' ) )
+	{	// part of 6.8.0-alpha
 		$DB->query( 'INSERT INTO T_coll_groups ( cgrp_name, cgrp_order, cgrp_owner_user_ID )
 			VALUES ( "Default group", 1, 1 )' );
 		$coll_group_ID = $DB->insert_id;
@@ -7556,8 +7650,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11805, 'Upgrading collections table...' ) )
-	{	// part of 6.7.3-stable
+	if( upg_task_start( 11825, 'Upgrading collections table...' ) )
+	{	// part of 6.8.0-alpha
 		db_add_col( 'T_blogs', 'blog_cgrp_ID', 'INT(11) UNSIGNED NULL' );
 		$DB->query( 'ALTER TABLE T_blogs MODIFY COLUMN blog_cgrp_ID INT(11) UNSIGNED NOT NULL' );
 		upg_task_end();

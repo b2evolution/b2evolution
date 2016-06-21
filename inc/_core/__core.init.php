@@ -38,7 +38,7 @@ $required_mysql_version[ '_core' ] = '5.0.3';
  *  change {@link $tableprefix} in _basic_config.php)
  */
 $db_config['aliases'] = array(
-		'T_antispam'               => $tableprefix.'antispam',
+		'T_antispam__keyword'      => $tableprefix.'antispam__keyword',
 		'T_antispam__iprange'      => $tableprefix.'antispam__iprange',
 		'T_cron__log'              => $tableprefix.'cron__log',
 		'T_cron__task'             => $tableprefix.'cron__task',
@@ -1724,7 +1724,7 @@ class _core_Module extends Module
 								'text' => T_('Profiles'),
 								'href' => '?ctrl=usersettings' ),
 							'registration' => array(
-								'text' => T_('Registration'),
+								'text' => T_('Registration & Login'),
 								'href' => '?ctrl=registration' ),
 							'invitations' => array(
 								'text' => T_('Invitations'),

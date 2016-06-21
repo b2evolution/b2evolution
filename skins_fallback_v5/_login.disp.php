@@ -12,7 +12,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $action, $disp, $rsc_url, $Settings, $rsc_path, $transmit_hashed_password, $dummy_fields;
+global $blog, $action, $disp, $rsc_url, $Settings, $rsc_path, $dummy_fields;
 
 if( is_logged_in() )
 { // already logged in
@@ -58,7 +58,7 @@ $params = array_merge( array(
 		'login_action_value'       => '',
 		'login_form_reqID'         => '',
 		'login_form_sessID'        => '',
-		'transmit_hashed_password' => $transmit_hashed_password,
+		'transmit_hashed_password' => transmit_hashed_password(),
 		'display_abort_link'       => true,
 		'abort_link_position'      => 'above_form',
 		'abort_link_text'          => T_('Abort login!'),

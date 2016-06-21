@@ -248,9 +248,11 @@ $use_workflow = ( $disp == 'posts' ) &&
 			) );
 
 		// Last comment date
+		echo '<span class="last_mod_date">';
 		$latest_Comment->date( $use_workflow ? 'm/d/y' : 'D M j, Y H:i' );
+		echo '</span>';
 
-		echo ' <a href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest post')
+		echo ' <a class="nowrap"  href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest post')
 				.'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
 		echo '</div>';
 	}
@@ -277,9 +279,11 @@ $use_workflow = ( $disp == 'posts' ) &&
 			) );
 
 		// Last modification date
+		echo '<span class="last_mod_date">';
 		echo $use_workflow ? $Item->get_mod_date( 'm/d/y' ) : $Item->get_mod_date( 'D M j, Y H:i' );
+		echo '</span>';
 
-		echo ' <a href="'.$Item->get_permanent_url().'" title="'.T_('View latest post')
+		echo ' <a class="nowrap" href="'.$Item->get_permanent_url().'" title="'.T_('View latest post')
 				.'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
 		echo '</div>';
 	}

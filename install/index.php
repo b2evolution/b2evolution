@@ -3,10 +3,10 @@
  * This is the main install menu
  *
  * ---------------------------------------------------------------------------------------------------------------
- * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT YOU DID NOT LOAD THIS FILE THROUGH A PHP WEB SERVER. 
+ * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT YOU DID NOT LOAD THIS FILE THROUGH A PHP WEB SERVER.
  * TO GET STARTED, GO TO THIS PAGE: http://b2evolution.net/man/getting-started
  * ---------------------------------------------------------------------------------------------------------------
- * 
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
  * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
@@ -788,6 +788,7 @@ switch( $action )
 							'photos' => T_('Photos'),
 							'forums' => T_('Forums'),
 							'manual' => T_('Manual'),
+							'group'  => T_('Tracker'),
 						);
 
 					// Allow all modules to set what collections should be installed
@@ -815,18 +816,33 @@ switch( $action )
 					<?php } ?>
 				</div>
 			</div>
+
+			<div class="checkbox" style="margin-top: 15px">
+				<label>
+					<input type="checkbox" name="create_sample_organization" id="create_sample_organization" value="1" checked="checked" />
+					<?php echo T_('Create a sample organization');?>
+					</label>
+			</div>
+
+			<div class="checkbox" style="margin-top: 15px">
+				<label>
+					<input type="checkbox" name="create_demo_users" id="create_demo_users" value="1" checked="checked" />
+					<?php echo T_('Create demo users (in addition to the admin account)');?>
+					</label>
+			</div>
+
 			<?php
 			if( $allow_install_test_features )
 			{ // Checkbox to install all features
 			?>
 				<div class="checkbox" style="margin-top:15px">
 					<label>
-						<input accept=""type="checkbox" name="install_test_features" id="install_test_features" value="1" />
+						<input accept="" type="checkbox" name="install_test_features" id="install_test_features" value="1" />
 						<?php echo T_('Also install all test features.')?>
 					</label>
 				</div>
 			<?php } ?>
-	
+
 			<div class="checkbox" style="margin:15px 0 15px">
 				<label>
 					<input type="checkbox" name="local_installation" id="local_installation" value="1"<?php echo check_local_installation() ? ' checked="checked"' : ''; ?> />
@@ -835,7 +851,7 @@ switch( $action )
 			</div>
 
 			<p class="evo_form__install_buttons">
-			
+
 				<?php
 				if( ( ( $allow_evodb_reset >= 2 )
 				      || ( $allow_install_test_features && $allow_evodb_reset >= 1 ) )
@@ -853,7 +869,7 @@ switch( $action )
 				?>
 
 				<a href="index.php?locale=<?php echo $default_locale ?>" class="btn btn-default btn-lg"><?php echo T_('Cancel')?></a>
-	
+
 			</p>
 		</form>
 
@@ -910,7 +926,9 @@ switch( $action )
 		 */
 		track_step( 'install-start' );
 
-		$create_sample_contents = param( 'create_sample_contents', 'string', '' );
+		$create_sample_contents = param( 'create_sample_contents', 'boolean', false, true );
+		$create_sample_organization = param( 'create_sample_organization', 'boolean', false, true );
+		$create_demo_users = param( 'create_demo_users', 'boolean', false, true );
 
 		if( $allow_install_test_features )
 		{	// Allow to use $allow_install_test_features from request only when it is enabled in config:

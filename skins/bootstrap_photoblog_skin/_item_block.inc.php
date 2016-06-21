@@ -150,14 +150,14 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 
 			// Author
 			$Item->author( array(
-				'before'    => ' '.T_('by').' ',
+				'before'    => /* TRANS: author name */ ' '.T_('by').' ',
 				'after'     => ' ',
 				'link_text' => $params['author_link_text'],
 			) );
 
 			// Categories
 			$Item->categories( array(
-				'before'          => T_('in').' ',
+				'before'          => /* TRANS: category name(s) */ T_('in').' ',
 				'after'           => ' ',
 				'include_main'    => true,
 				'include_other'   => true,
@@ -198,6 +198,16 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			'widget_item_tags_after'     => '</div>',
 			// Params for skin file "_item_content.inc.php"
 			'widget_item_content_params' => $params,
+			// Template params for "Item Attachments" widget:
+			'widget_item_attachments_params' => array(
+					'limit_attach'       => 1000,
+					'before'             => '<div class="evo_post_attachments"><h3>'.T_('Attachments').':</h3><ul class="evo_files">',
+					'after'              => '</ul></div>',
+					'before_attach'      => '<li class="evo_file">',
+					'after_attach'       => '</li>',
+					'before_attach_size' => ' <span class="evo_file_size">(',
+					'after_attach_size'  => ')</span>',
+				),
 		) );
 		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 		?>

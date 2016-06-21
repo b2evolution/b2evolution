@@ -61,6 +61,7 @@ echo $params['html_tag'];
 	<?php skin_description_tag(); ?>
 	<?php skin_keywords_tag(); ?>
 	<?php skin_opengraph_tags(); ?>
+	<?php skin_twitter_tags(); ?>
 	<?php robots_tag(); ?>
 	<?php
 	global $htsrv_url, $restapi_url;

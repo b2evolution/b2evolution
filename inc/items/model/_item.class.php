@@ -866,15 +866,22 @@ class Item extends ItemLight
 		modules_call_method( 'update_item_settings', array( 'edited_Item' => $this ) );
 
 		// RENDERERS:
-		if( param( 'renderers_displayed', 'integer', 0 ) )
-		{ // use "renderers" value only if it has been displayed (may be empty)
-			global $Plugins;
-			$renderers = $Plugins->validate_renderer_list( param( 'renderers', 'array:string', array() ), array( 'Item' => & $this ) );
-			$this->set( 'renderers', $renderers );
+		if( is_admin_page() || $item_Blog->get_setting( 'in_skin_editing_renderers' ) )
+		{	// If text renderers are allowed to update from front-office:
+			if( param( 'renderers_displayed', 'integer', 0 ) )
+			{	// Use "renderers" value only if it has been displayed (may be empty):
+				global $Plugins;
+				$renderers = $Plugins->validate_renderer_list( param( 'renderers', 'array:string', array() ), array( 'Item' => & $this ) );
+				$this->set( 'renderers', $renderers );
+			}
+			else
+			{
+				$renderers = $this->get_renderers_validated();
+			}
 		}
 		else
-		{
-			$renderers = $this->get_renderers_validated();
+		{	// Don't allow to update the text renderers:
+			$renderers = $this->get_renderers();
 		}
 
 		// CONTENT + TITLE:
@@ -3220,11 +3227,17 @@ class Item extends ItemLight
 				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
 				'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore',
 				'data'                       => '',
-				'attach_format'              => '$icon_link$ $file_link$ $file_size$', // $icon_link$ $icon$ $file_link$ $file_size$
-				'file_link_format'           => '$file_name$', // $icon$ $file_name$ $file_size$
+				'attach_format'              => '$icon_link$ $file_link$ $file_size$ $file_desc$', // $icon_link$ $icon$ $file_link$ $file_size$ $file_desc$
+				'file_link_format'           => '$file_name$', // $icon$ $file_name$ $file_size$ $file_desc$
 				'file_link_class'            => '',
+				'file_link_text'             => 'filename', // 'filename' - Always display Filename, 'title' - Display Title if available
 				'download_link_icon'         => 'download',
 				'download_link_title'        => T_('Download file'),
+				'display_download_icon'      => true,
+				'display_file_size'          => true,
+				'display_file_desc'          => false,
+				'before_file_desc'           => '<span class="evo_file_description">',
+				'after_file_desc'            => '</span>',
 			), $params );
 
 		// Get list of attached files
@@ -3284,48 +3297,57 @@ class Item extends ItemLight
 				continue;
 			}
 
-			if( $File->is_audio() )
-			{ // Player for audio file:
-				$r_file[$i]  = '<div class="podplayer">';
-				$r_file[$i] .= $this->get_player( $File->get_url() );
-				$r_file[$i] .= '</div>';
-				$i++;
-				$params = $temp_params;
-				continue;
-			}
-
 			// A link to download a file:
 
-			// Just icon with download icon
-			$icon = ( $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$icon$' ) !== false ) ?
+			// Just icon with download icon:
+			$icon = ( $params['display_download_icon'] && $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$icon$' ) !== false ) ?
 					get_icon( $params['download_link_icon'], 'imgtag', array( 'title' => $params['download_link_title'] ) ) : '';
 
-			// A link with icon to download
-			$icon_link = ( $File->exists() && strpos( $params['attach_format'], '$icon_link$' ) !== false ) ?
+			// A link with icon to download:
+			$icon_link = ( $params['display_download_icon'] && $File->exists() && strpos( $params['attach_format'], '$icon_link$' ) !== false ) ?
 					action_icon( $params['download_link_title'], $params['download_link_icon'], $Link->get_download_url(), '', 5 ) : '';
 
-			// File size info
-			$file_size = ( $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$file_size$' ) !== false ) ?
+			// File size info:
+			$file_size = ( $params['display_file_size'] && $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$file_size$' ) !== false ) ?
 					$params['before_attach_size'].bytesreadable( $File->get_size(), false, false ).$params['after_attach_size'] : '';
 
-			// A link with file name to download
+			// File description:
+			$file_desc = '';
+			if( $params['display_file_desc'] && $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$file_desc$' ) !== false )
+			{	// If description should be displayed:
+				$file_desc = nl2br( trim( $File->get( 'desc' ) ) );
+				if( $file_desc !== '' )
+				{	// If file has a filled description:
+					$params['before_file_desc'].$file_desc.$params['after_file_desc'];
+				}
+			}
+
+			// A link with file name or file title to download:
 			$file_link_format = str_replace( array( '$icon$', '$file_name$', '$file_size$' ),
 				array( $icon, '$text$', $file_size ),
 				$params['file_link_format'] );
-			if( $File->exists() )
-			{ // Get file link to download if file exists
-				$file_link = ( strpos( $params['attach_format'], '$file_link$' ) !== false ) ?
-						$File->get_view_link( $File->get_name(), NULL, NULL, $file_link_format, $params['file_link_class'], $Link->get_download_url() ) : '';
+			if( $params['file_link_text'] == 'filename' || trim( $File->get( 'title' ) ) === '' )
+			{	// Use file name for link text:
+				$file_link_text = $File->get_name();
 			}
 			else
-			{ // File doesn't exist, We cannot display a link, Display only file name and warning
+			{	// Use file title only if it filled:
+				$file_link_text = $File->get( 'title' );
+			}
+			if( $File->exists() )
+			{	// Get file link to download if file exists:
 				$file_link = ( strpos( $params['attach_format'], '$file_link$' ) !== false ) ?
-						$File->get_name().' - <span class="red nowrap">'.get_icon( 'warning_yellow' ).' '.T_('Missing attachment!').'</span>' : '';
+						$File->get_view_link( $file_link_text, NULL, NULL, $file_link_format, $params['file_link_class'], $Link->get_download_url() ) : '';
+			}
+			else
+			{	// File doesn't exist, We cannot display a link, Display only file name and warning:
+				$file_link = ( strpos( $params['attach_format'], '$file_link$' ) !== false ) ?
+						$file_link_text.' - <span class="red nowrap">'.get_icon( 'warning_yellow' ).' '.T_('Missing attachment!').'</span>' : '';
 			}
 
 			$r_file[$i] = $params['before_attach'];
-			$r_file[$i] .= str_replace( array( '$icon$', '$icon_link$', '$file_link$', '$file_size$' ),
-				array( $icon, $icon_link, $file_link, $file_size ),
+			$r_file[$i] .= str_replace( array( '$icon$', '$icon_link$', '$file_link$', '$file_size$', '$file_desc$' ),
+				array( $icon, $icon_link, $file_link, $file_size, $file_desc ),
 				$params['attach_format'] );
 			$r_file[$i] .= $params['after_attach'];
 
@@ -5014,17 +5036,34 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get HTML code to display a flash audio player for playback of a
-	 * given URL.
+	 * Get HTML code to display video/audio player for playback of a given URL
 	 *
-	 * @param string The URL of a MP3 audio file.
-	 * @return string The HTML code.
+	 * @param string The URL of video/audio file
+	 * @return string The HTML code
 	 */
 	function get_player( $url )
 	{
-		global $rsc_url;
+		global $Plugins;
 
-		return '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0" width="200" height="20" id="dewplayer" align="middle"><param name="wmode" value="transparent"><param name="allowScriptAccess" value="sameDomain" /><param name="movie" value="'.$rsc_url.'swf/dewplayer.swf?mp3='.$url.'&amp;showtime=1" /><param name="quality" value="high" /><param name="bgcolor" value="" /><embed src="'.$rsc_url.'swf/dewplayer.swf?mp3='.$url.'&amp;showtime=1" quality="high" bgcolor="" width="200" height="20" name="dewplayer" wmode="transparent" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"></embed></object>';
+		$params = array(
+				'url'  => $url,
+				'data' => '',
+			);
+
+		$temp_params = $params;
+		foreach( $params as $param_key => $param_value )
+		{ // Pass all params by reference, in order to give possibility to modify them by plugin
+			// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
+			$params[ $param_key ] = & $params[ $param_key ];
+		}
+
+		if( count( $Plugins->trigger_event_first_true( 'RenderURL', $params ) ) != 0 )
+		{	// Display a rendered url, for example as video/audio player:
+			return $params['data'];
+		}
+
+		// Display URL as simple link:
+		return '<a href="'.$url.'">'.$url.'</a>';
 	}
 
 
@@ -5423,6 +5462,9 @@ class Item extends ItemLight
 
 		$DB->begin( 'SERIALIZABLE' );
 
+		// Restrict item status to max allowed by item collection:
+		$this->restrict_status_by_collection( true );
+
 		if( $this->status != 'draft' )
 		{	// The post is getting published in some form, set the publish date so it doesn't get auto updated in the future:
 			$this->set( 'dateset', 1 );
@@ -5614,6 +5656,9 @@ class Item extends ItemLight
 		global $DB, $Plugins;
 
 		$DB->begin( 'SERIALIZABLE' );
+
+		// Restrict item status to max allowed by item collection:
+		$this->restrict_status_by_collection( true );
 
 		if( $this->status != 'draft' )
 		{	// The post is getting published in some form, set the publish date so it doesn't get auto updated in the future:
@@ -5882,7 +5927,7 @@ class Item extends ItemLight
 	 */
 	function update_excerpt( $maxlen = 254, $tail = '&hellip;' )
 	{
-		if( empty($this->excerpt) || $this->excerpt_autogenerated )
+		if( empty($this->excerpt) || ( $this->excerpt_autogenerated && isset( $this->dbchanges['post_content'] ) ) )
 		{	// We want to regenerate the excerpt from the content:
 			$excerpt = $this->get_autogenerated_excerpt( $maxlen, $tail );
 
@@ -6837,7 +6882,7 @@ class Item extends ItemLight
 				return $this->check_notifications_flags( 'pings_sent' );
 
 			case 'excerpt':
-				return $this->get_excerpt2();
+				return $this->get_excerpt2( array( 'update_db' => false )  );
 
 			case 'notifications_flags':
 				return empty( $this->notifications_flags ) ? array() : explode( ',', $this->notifications_flags );
@@ -8452,9 +8497,9 @@ class Item extends ItemLight
 		{	// If current item status cannot be used for item collection
 			global $Messages;
 
+			$visibility_statuses = get_visibility_statuses();
 			if( $item_Blog->get_setting( 'allow_access' ) == 'members' )
 			{	// The collection is restricted for members or only for owner
-				$visibility_statuses = get_visibility_statuses();
 				if( ! $item_Blog->get( 'advanced_perms' ) )
 				{	// If advanced permissions are NOT enabled then only owner has an access for the collection
 					$Messages->add( sprintf( T_('Since this collection is "Private", the visibility of this post will be restricted to "%s".'), $visibility_statuses[ $this->status ] ), 'warning' );
@@ -8463,6 +8508,10 @@ class Item extends ItemLight
 				{	// Otherwise all members of this collection have an access for the collection
 					$Messages->add( sprintf( T_('Since this collection is "Members only", the visibility of this post will be restricted to "%s".'), $visibility_statuses[ $this->status ] ), 'warning' );
 				}
+			}
+			elseif( $item_Blog->get_setting( 'allow_access' ) == 'users' )
+			{	// The collection is restricted for logged-in users only:
+				$Messages->add( sprintf( T_('Since this collection is "Community only", the visibility of this post will be restricted to "%s".'), $visibility_statuses[ $this->status ] ), 'warning' );
 			}
 		}
 	}

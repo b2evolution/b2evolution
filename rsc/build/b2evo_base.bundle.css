@@ -1464,7 +1464,6 @@ img.flagtop {
   border: 1px solid #000;
 }
 img.loadimg {
-  display: inline-block;
   min-width: 64px;
   min-height: 64px;
   background: url(../img/ajax-loader/fff.gif) no-repeat center;

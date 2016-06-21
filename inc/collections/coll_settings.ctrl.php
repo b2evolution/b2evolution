@@ -102,6 +102,7 @@ else
 switch( $action )
 {
 	case 'update':
+	case 'update_confirm':
 		// Update DB:
 
 		// Check that this action request is not a CSRF hacked request:
@@ -117,6 +118,26 @@ switch( $action )
 			case 'urls':
 				if( $edited_Blog->load_from_Request( array() ) )
 				{ // Commit update to the DB:
+					global $Settings;
+
+					param( 'set_as_info_blog', 'boolean' );
+					param( 'set_as_login_blog', 'boolean' );
+					param( 'set_as_msg_blog', 'boolean' );
+
+					if( $set_as_info_blog && ! $Settings->get( 'info_blog_ID' ) )
+					{
+						$Settings->set( 'info_blog_ID', $edited_Blog->ID );
+					}
+					if( $set_as_login_blog && ! $Settings->get( 'login_blog_ID' ) )
+					{
+						$Settings->set( 'login_blog_ID', $edited_Blog->ID );
+					}
+					if( $set_as_msg_blog && ! $Settings->get( 'mgs_blog_ID' ) )
+					{
+						$Settings->set( 'msg_blog_ID', $edited_Blog->ID );
+					}
+					$Settings->dbupdate();
+
 					$edited_Blog->dbupdate();
 					$Messages->add( T_('The blog settings have been updated'), 'success' );
 					// Redirect so that a reload doesn't write to the DB twice:
@@ -481,6 +502,7 @@ if( $action == 'dashboard' )
 
 		// Check if we have comments and posts to moderate
 		$have_comments_to_moderate = $user_perm_moderate_cmt && $CommentList->result_num_rows;
+
 		$Timer->pause( 'Panel: Comments Awaiting Moderation' );
 
 		// Posts for Moderation
@@ -496,6 +518,7 @@ if( $action == 'dashboard' )
 		}
 		$posts_awaiting_moderation_content = ob_get_contents();
 		ob_clean();
+
 		$Timer->pause( 'Panel: Posts Awaiting Moderation' );
 
 		// Check if we have posts that $blog_moderation
@@ -561,6 +584,7 @@ if( $action == 'dashboard' )
 			echo '</div>';
 		}
 		echo '</div><!-- End of Block Group 1 -->';
+
 		$Timer->stop( 'Panel: Collection Metrics' );
 		evo_flush();
 
@@ -623,6 +647,7 @@ if( $action == 'dashboard' )
 			echo '<div style="min-height: 100px;" class="hidden-xs hidden-sm hidden-md"></div>';
 			echo '</div><!-- End of Block Group 2 -->';
 		}
+
 		evo_flush();
 
 		// Block Group 3
@@ -699,6 +724,7 @@ if( $action == 'dashboard' )
 		}
 
 		$Timer->start( 'Panel: Recently Edited Post' );
+
 		// Recently Edited Posts Block
 		// Create empty List:
 		$ItemList = new ItemList2( $Blog, NULL, NULL );
@@ -1022,6 +1048,8 @@ else
 			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 			$AdminUI->breadcrumbpath_add( T_('User permissions'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			$AdminUI->set_page_manual_link( 'advanced-user-permissions' );
+			// Load JavaScript to toggle checkboxes:
+			require_js( 'collectionperms.js', 'rsc_url' );
 			break;
 
 		case 'permgroup':
@@ -1030,6 +1058,8 @@ else
 			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 			$AdminUI->breadcrumbpath_add( T_('Group permissions'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			$AdminUI->set_page_manual_link( 'advanced-group-permissions' );
+			// Load JavaScript to toggle checkboxes:
+			require_js( 'collectionperms.js', 'rsc_url' );
 			break;
 	}
 

@@ -50,7 +50,7 @@ $params = array_merge( array(
 				'text' => '#icon#',
 			) );
 		$Item->author( array(
-				'before'       => ' '.T_('by').' <strong>',
+				'before'       => /* TRANS: author name */ ' '.T_('by').' <strong>',
 				'after'        => '</strong>',
 				'link_to'      => 'userpage',
 				'link_text'    => 'auto',

@@ -97,8 +97,47 @@ if( count($res_hits) )
 	CanvasBarsChart( $chart );
 	echo '</div>';
 
-}
 
+	/*
+	 * Table:
+	 */
+	echo '<table class="grouped table table-striped table-bordered table-hover table-condensed" cellspacing="0">';
+	echo '	<tr>';
+	echo '		<th class="firstcol shrinkwrap">'.T_('Date').'</th>';
+	echo '		<th class="lastcol" style="background-color: #'.$agent_type_color['robot'].'"><a href="'.$admin_url.'?ctrl=stats&amp;tab=hits&amp;agent_type=robot&amp;blog='.$blog.'">'.T_('Robot hits').'</a></th>';
+	echo '	</tr>';
+
+	$hits_total = 0;
+	foreach( $res_hits as $r => $row_stats )
+	{
+		$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
+		?>
+		<tr class="<?php echo ( $r % 2 == 1 ) ? 'odd' : 'even'; ?>">
+			<td class="firstcol shrinkwrap" style="text-align:right"><?php
+				echo date( 'D '.locale_datefmt(), $this_date );
+				if( $current_User->check_perm( 'stats', 'edit' ) )
+				{
+					echo action_icon( T_('Prune hits for this date!'), 'delete', $admin_url.'?ctrl=stats&amp;action=prune&amp;date='.$this_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb( 'stats' ) );
+				}
+			?></td>
+			<td class="lastcol right"><a href="<?php echo $admin_url.'?ctrl=stats&amp;tab=hits&amp;'
+				.'datestartinput='.urlencode( date( locale_datefmt() , $this_date ) ).'&amp;'
+				.'datestopinput='.urlencode( date( locale_datefmt(), $this_date ) ).'&amp;blog='.$blog.'&amp;agent_type=robot'; ?>"><?php echo $row_stats['hits']; ?></a></td>
+		</tr>
+		<?php
+		// Increment total hits counter:
+		$hits_total += $row_stats['hits'];
+	}
+
+	// Total numbers:
+	?>
+		<tr class="total">
+			<td class="firstcol"><?php echo T_('Total') ?></td>
+			<td class="lastcol right"><a href="<?php echo $admin_url.'?ctrl=stats&amp;tab=hits&amp;blog='.$blog.'&amp;agent_type=robot'; ?>"><?php echo $hits_total; ?></a></td>
+		</tr>
+	</table>
+	<?php
+}
 
 
 // TOP INDEXING ROBOTS

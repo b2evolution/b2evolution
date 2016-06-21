@@ -3878,6 +3878,35 @@ class Plugin
 	function GetAdditionalColumnsTable( & $params  )
 	{
 	}
+
+
+	/**
+	 * Memorize that a specific css that file will be required by the current page.
+	 * @see require_css() for full documentation,
+	 * this function is used to add unique version number for each plugin
+	 *
+	 * @param string Name of CSS file relative to current plugin folder
+	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 */
+	function require_css( $css_file, $output = false )
+	{
+		global $app_version_long;
+		require_css( $this->get_plugin_url().$css_file, 'relative', NULL, NULL, $this->version.'+'.$app_version_long, $output );
+	}
+
+
+	/**
+	 * Memorize that a specific javascript file will be required by the current page.
+	 * @see require_js() for full documentation,
+	 * this function is used to add unique version number for each plugin
+	 *
+	 * @param string Name of JavaScript file relative to plugin folder
+	 */
+	function require_js( $js_file )
+	{
+		global $app_version_long;
+		require_js( $this->get_plugin_url().$js_file, 'relative', false, false, $this->version.'+'.$app_version_long );
+	}
 }
 
 ?>

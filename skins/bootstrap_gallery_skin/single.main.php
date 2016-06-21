@@ -254,6 +254,16 @@ siteskin_include( '_site_body_header.inc.php' );
 							'image_size'             => '', // Do not display images in content block - Image is handled separately
 							'url_link_text_template' => '', // link will be displayed (except player if podcast)
 						),
+					// Template params for "Item Attachments" widget:
+					'widget_item_attachments_params' => array(
+							'limit_attach'       => 1000,
+							'before'             => '<div class="evo_post_attachments"><h3>'.T_('Attachments').':</h3><ul class="evo_files">',
+							'after'              => '</ul></div>',
+							'before_attach'      => '<li class="evo_file">',
+							'after_attach'       => '</li>',
+							'before_attach_size' => ' <span class="evo_file_size">(',
+							'after_attach_size'  => ')</span>',
+						),
 				) );
 				// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 				?>

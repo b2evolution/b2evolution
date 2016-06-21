@@ -4101,6 +4101,9 @@ class Comment extends DataObject
 	{
 		global $Plugins, $DB;
 
+		// Restrict comment status by parent item:
+		$this->restrict_status_by_item( true );
+
 		$dbchanges = $this->dbchanges;
 
 		if( count( $dbchanges ) )
@@ -4172,6 +4175,9 @@ class Comment extends DataObject
 		 */
 		global $Plugins;
 		global $Settings;
+
+		// Restrict comment status by parent item:
+		$this->restrict_status_by_item( true );
 
 		// Get karma percentage (interval -100 - 100)
 		$spam_karma = $Plugins->trigger_karma_collect( 'GetSpamKarmaForComment', array( 'Comment' => & $this ) );

@@ -21,7 +21,7 @@ class pureforums_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.0';
+	var $version = '6.7.3';
 
   /**
 	 * Get default name for the skin.
@@ -39,6 +39,34 @@ class pureforums_Skin extends Skin
 	function get_default_type()
 	{
 		return 'normal';
+	}
+
+
+	/**
+	 * Get supported collection kinds.
+	 *
+	 * This should be overloaded in skins.
+	 *
+	 * For each kind the answer could be:
+	 * - 'yes' : this skin does support that collection kind (the result will be was is expected)
+	 * - 'partial' : this skin is not a primary choice for this collection kind (but still produces an output that makes sense)
+	 * - 'maybe' : this skin has not been tested with this collection kind
+	 * - 'no' : this skin does not support that collection kind (the result would not be what is expected)
+	 * There may be more possible answers in the future...
+	 */
+	public function get_supported_coll_kinds()
+	{
+		$supported_kinds = array(
+				'main' => 'no',
+				'std' => 'no',		// Blog
+				'photo' => 'no',
+				'forum' => 'yes',
+				'manual' => 'no',
+				'group' => 'no',  // Tracker
+				// Any kind that is not listed should be considered as "maybe" supported
+			);
+
+		return $supported_kinds;
 	}
 
 
@@ -165,11 +193,11 @@ class pureforums_Skin extends Skin
 				'disp_auto',      // Automatically include additional CSS and/or JS required by certain disps (replace with 'disp_off' to disable this)
 			) );
 
-		// require_css( 'pureforums_header.css', 'relative' );
-		// require_css( 'pureforums_main.css', 'relative' );
-		// require_css( 'pureforums_footer.css', 'relative' );
-		// require_css( 'pureforums.bundle.css', 'relative' ); // Concatenation of the above
-		require_css( 'pureforums.bmin.css', 'relative' ); // Concatenation + Minifaction of the above
+		// $this->require_css( 'pureforums_header.css' );
+		// $this->require_css( 'pureforums_main.css' );
+		// $this->require_css( 'pureforums_footer.css' );
+		// $this->require_css( 'pureforums.bundle.css' ); // Concatenation of the above
+		$this->require_css( 'pureforums.bmin.css' ); // Concatenation + Minifaction of the above
 
 		if( $this->get_setting( 'width_switcher' ) )
 		{ // Functions to switch between the width sizes
@@ -367,9 +395,9 @@ class pureforums_Skin extends Skin
 							'line_start_odd' => '<tr class="odd">'."\n",
 							'line_start_last' => '<tr class="even lastline">'."\n",
 							'line_start_odd_last' => '<tr class="odd lastline">'."\n",
-								'col_start' => '<td $class_attrib$>',
-								'col_start_first' => '<td class="firstcol $class$">',
-								'col_start_last' => '<td class="lastcol $class$">',
+								'col_start' => '<td $class_attrib$ $colspan_attrib$>',
+								'col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+								'col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
 								'col_end' => "</td>\n",
 							'line_end' => "</tr>\n\n",
 							'grp_line_start' => '<tr class="group">'."\n",

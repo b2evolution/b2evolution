@@ -34,7 +34,7 @@ class geoip_plugin extends Plugin
 	var $name = 'GeoIP';
 	var $code = 'evo_GeoIP';
 	var $priority = 45;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $author = 'The b2evo Group';
 	var $group = 'antispam';
 

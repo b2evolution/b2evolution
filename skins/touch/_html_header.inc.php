@@ -18,8 +18,6 @@ $params = array_merge( array(
 	'auto_pilot' => 'seo_title',
 ), $params );
 
-require_css( 'style.css', 'relative' );
-
 init_bubbletip_js( 'blog' ); // Add jQuery bubbletip plugin
 init_results_js( 'blog' ); // Add functions to work with Results tables
 require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
@@ -38,6 +36,7 @@ require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 	<?php skin_description_tag(); ?>
 	<?php skin_keywords_tag(); ?>
 	<?php skin_opengraph_tags(); ?>
+	<?php skin_twitter_tags(); ?>
 	<?php robots_tag(); ?>
 	<?php
 	global $htsrv_url, $restapi_url;

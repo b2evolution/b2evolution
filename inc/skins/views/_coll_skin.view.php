@@ -17,37 +17,62 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @var Blog
  */
 global $edited_Blog;
-
 global $admin_url, $Session, $Settings;
 
 $skin_type = param( 'skin_type', 'string', 'normal' );
 
-$block_item_Widget = new Widget( 'block_item' );
-$display_same_as_normal = false;
-
 // If the edited Blog is defined then we choose a skin for collection otherwise for site:
 $is_collection_skin = isset( $edited_Blog );
 
-$manual_link = get_manual_link( $is_collection_skin ? 'skins-for-this-blog' : 'skins-for-this-site' );
+$kind_title = $is_collection_skin ? get_collection_kinds( $edited_Blog->type ) : '';
+
+$SkinCache = & get_SkinCache();
+$SkinCache->load_all();
+
+// Group together skins based on how well they support the selected collection type
+$skins = array();
+while( ( $iterator_Skin = & $SkinCache->get_next() ) != NULL )
+{
+	if( $iterator_Skin->type != $skin_type ||
+	    ( $is_collection_skin && ! $iterator_Skin->provides_collection_skin() ) ||
+	    ( ! $is_collection_skin && ! $iterator_Skin->provides_site_skin() ) )
+	{	// This skin cannot be used here...
+		continue;
+	}
+	$supported_kind = $is_collection_skin ? $iterator_Skin->supports_coll_kind( $edited_Blog->type ) : 'yes';
+	$skins[ $supported_kind ][] = $iterator_Skin;
+}
+
+// Skins that fully support the selected collection type
+$block_item_Widget = new Widget( 'block_item' );
+$display_same_as_normal = false;
+
 switch( $skin_type )
 {
 	case 'normal':
-		$block_item_Widget->title = T_('Choose a skin').$manual_link;
+		$block_item_Widget->title = $is_collection_skin ?
+			sprintf( T_('Recommended skins for a "%s" collection'), $kind_title ) :
+			T_('Choose a skin');
 		break;
 
 	case 'mobile':
-		$block_item_Widget->title = T_('Choose a Mobile Phone skin').$manual_link;
+		$block_item_Widget->title = $is_collection_skin ?
+			sprintf( T_('Recommended Mobile Phone skins for a "%s" collection'), $kind_title ) :
+			T_('Choose a Mobile Phone skin');
 		$display_same_as_normal = true;
 		break;
 
 	case 'tablet':
-		$block_item_Widget->title = T_('Choose a Tablet skin').$manual_link;
+		$block_item_Widget->title = $is_collection_skin ?
+			sprintf( T_('Recommended Tablet skins for a "%s" collection'), $kind_title ) :
+			T_('Choose a Tablet skin');
 		$display_same_as_normal = true;
 		break;
 
 	default:
 		debug_die( 'Invalid skin type!' );
 }
+$block_item_Widget->title .= get_manual_link( $is_collection_skin ? 'skins-for-this-blog' : 'skins-for-this-site' );
 
 // Get what is the current skin ID from this kind of skin type
 $current_skin_ID = $is_collection_skin ? $edited_Blog->get_setting( $skin_type.'_skin_ID', true ) : $Settings->get( $skin_type.'_skin_ID', true );
@@ -70,9 +95,6 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 			.'</a>';
 	}
 
-	$SkinCache = & get_SkinCache();
-	$SkinCache->load_all();
-
 	if( $display_same_as_normal )
 	{
 		$skinshot_title = T_('Same as normal skin');
@@ -94,38 +116,32 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 
 	$fadeout_array = $Session->get( 'fadeout_array' );
 
-	$SkinCache->rewind();
-	while( ( $iterator_Skin = & $SkinCache->get_next() ) != NULL )
+	if( isset( $skins['yes'] ) )
 	{
-		if( $iterator_Skin->type != $skin_type ||
-		    ( $is_collection_skin && ! $iterator_Skin->provides_collection_skin() ) ||
-		    ( ! $is_collection_skin && ! $iterator_Skin->provides_site_skin() ) )
-		{	// This skin cannot be used here...
-			continue;
-		}
+		foreach( $skins['yes'] as $iterator_Skin )
+		{
+			$selected = ( $current_skin_ID == $iterator_Skin->ID );
+			if( $is_collection_skin )
+			{	// Collection skin:
+				$select_url = $admin_url.'?ctrl=coll_settings&amp;tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID='.$iterator_Skin->ID.'&amp;'.url_crumb('collection');
+				$preview_url = url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode( $iterator_Skin->folder ) );
+			}
+			else
+			{	// Site skin:
+				$select_url = $admin_url.'?ctrl=collections&amp;tab=site_skin&amp;action=update_site_skin&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID='.$iterator_Skin->ID.'&amp;'.url_crumb( 'siteskin' );
+				$preview_url = '';
+			}
 
-		$selected = ( $current_skin_ID == $iterator_Skin->ID );
-		$blog_skin_param = $skin_type.'_skin_ID=';
-		if( $is_collection_skin )
-		{	// Collection skin:
-			$select_url = $admin_url.'?ctrl=coll_settings&amp;tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID='.$iterator_Skin->ID.'&amp;'.url_crumb( 'collection' );
-			$preview_url = url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode( $iterator_Skin->folder ) );
+			$disp_params = array(
+				'function'     => 'select',
+				'selected'     => $selected,
+				'select_url'   => $select_url,
+				'function_url' => $preview_url,
+				'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $iterator_Skin->ID, $fadeout_array['skin_ID'] ) ),
+			);
+			// Display skinshot:
+			Skin::disp_skinshot( $iterator_Skin->folder, $iterator_Skin->name, $disp_params );
 		}
-		else
-		{	// Site skin:
-			$select_url = $admin_url.'?ctrl=collections&amp;tab=site_skin&amp;action=update_site_skin&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID='.$iterator_Skin->ID.'&amp;'.url_crumb( 'siteskin' );
-			$preview_url = '';
-		}
-
-		$disp_params = array(
-			'function'     => 'select',
-			'selected'     => $selected,
-			'select_url'   => $select_url,
-			'function_url' => $preview_url,
-			'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $iterator_Skin->ID, $fadeout_array['skin_ID'] ) ),
-		);
-		// Display skinshot:
-		Skin::disp_skinshot( $iterator_Skin->folder, $iterator_Skin->name, $disp_params );
 	}
 
 	// Flush fadeout
@@ -136,4 +152,76 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 
 $block_item_Widget->disp_template_replaced( 'block_end' );
 
+
+// Skins that partially support the selected collection type
+if( isset( $skins['partial'] ) )
+{
+	$block_item_Widget = new Widget( 'block_item' );
+	$block_item_Widget->title = sprintf( T_('Skins that are not optimal for a "%s" collection'), $kind_title );
+	$block_item_Widget->disp_template_replaced( 'block_start' );
+		echo '<div class="skin_selector_block">';
+		$fadeout_array = $Session->get( 'fadeout_array' );
+
+
+		foreach( $skins['partial'] as $iterator_Skin )
+		{
+			$selected = ( $current_skin_ID == $iterator_Skin->ID );
+			$blog_skin_param = $skin_type.'_skin_ID=';
+			$select_url = '?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$blog_skin_param.$iterator_Skin->ID.'&amp;'.url_crumb('collection');
+			$preview_url = url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode($iterator_Skin->folder) );
+
+			$disp_params = array(
+				'function'     => 'select',
+				'selected'     => $selected,
+				'select_url'   => $select_url,
+				'function_url' => $preview_url,
+				'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $iterator_Skin->ID, $fadeout_array['skin_ID'] ) ),
+			);
+			// Display skinshot:
+			Skin::disp_skinshot( $iterator_Skin->folder, $iterator_Skin->name, $disp_params );
+		}
+
+		// Flush fadeout
+		$Session->delete( 'fadeout_array');
+
+		echo '<div class="clear"></div>';
+		echo '</div>';
+	$block_item_Widget->disp_template_replaced( 'block_end' );
+}
+
+
+// Skins that maybe support the selected collection type
+if( isset( $skins['maybe'] ) )
+{
+	$block_item_Widget = new Widget( 'block_item' );
+	$block_item_Widget->title = sprintf( T_('Other skins that might work for a "%s" collection'), $kind_title );
+	$block_item_Widget->disp_template_replaced( 'block_start' );
+		echo '<div class="skin_selector_block">';
+		$fadeout_array = $Session->get( 'fadeout_array' );
+
+		foreach( $skins['maybe'] as $iterator_Skin )
+		{
+			$selected = ( $current_skin_ID == $iterator_Skin->ID );
+			$blog_skin_param = $skin_type.'_skin_ID=';
+			$select_url = '?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$blog_skin_param.$iterator_Skin->ID.'&amp;'.url_crumb('collection');
+			$preview_url = url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode($iterator_Skin->folder) );
+
+			$disp_params = array(
+				'function'     => 'select',
+				'selected'     => $selected,
+				'select_url'   => $select_url,
+				'function_url' => $preview_url,
+				'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $iterator_Skin->ID, $fadeout_array['skin_ID'] ) ),
+			);
+			// Display skinshot:
+			Skin::disp_skinshot( $iterator_Skin->folder, $iterator_Skin->name, $disp_params );
+		}
+
+		// Flush fadeout
+		$Session->delete( 'fadeout_array');
+
+		echo '<div class="clear"></div>';
+		echo '</div>';
+	$block_item_Widget->disp_template_replaced( 'block_end' );
+}
 ?>

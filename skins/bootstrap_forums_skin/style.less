@@ -1,13 +1,17 @@
-// --------- Universal item list widget & Recent posts widget --------- 
+// --------- Universal item list widget & Recent posts widget ---------
 @import "../../rsc/less/_universal_item_list_widget.module.less";
 // --------------------------------------------------------------------
 
-// ------------------- Media Index widget -------------------- 
+// ------------------- Media Index widget --------------------
 @import "../../rsc/less/_coll_media_index_widget.module.less";
 // -----------------------------------------------------------
 
-// ----------- User Avatars (User List) widget ------------ 
+// ----------- User Avatars (User List) widget ------------
 @import "../../rsc/less/_user_avatars_widget.module.less";
+// --------------------------------------------------------
+
+// -----------------About Author widget -------------------
+@import "../../rsc/less/_about_author_widget.module.less";
 // --------------------------------------------------------
 
 // ------------- Organization Members widget -------------
@@ -175,6 +179,9 @@ ol.breadcrumb {
 			}
 			a.ft_author_avatar:hover {
 				background-color: transparent !important;
+			}
+			.last_mod_date {
+				white-space: normal;
 			}
 		}
 		.ft_count {
@@ -648,11 +655,17 @@ label.control-label[for=post_title] {
 }
 
 // Search form
-.widget_core_coll_search_form {
+main .widget_core_coll_search_form {
 	float: right;
 	width: 40%;
 	min-width: 250px;
 	margin: 0 0 20px 5px;
+	div.compact_search_form input.search_field {
+		width: 100%;
+	}
+}
+
+aside .widget_core_coll_search_form {
 	div.compact_search_form input.search_field {
 		width: 100%;
 	}

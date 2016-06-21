@@ -146,6 +146,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 	/* Item Single */
 	add_basic_widget( $blog_id, 'Item Single', 'item_content', 'core', 10 );
+	add_basic_widget( $blog_id, 'Item Single', 'item_attachments', 'core', 15 );
 	if( $blog_id != $blog_a_ID && $kind != 'forum' && ( empty( $events_blog_ID ) || $blog_id != $events_blog_ID ) )
 	{ // Item Tags
 		add_basic_widget( $blog_id, 'Item Single', 'item_tags', 'core', 20 );
@@ -242,25 +243,32 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 					) );
 			}
 		}
+		if( $kind == 'forum' )
+		{
+			add_basic_widget( $blog_id, 'Sidebar', 'user_avatars', 'core', 90, 'a:13:{s:5:"title";s:17:"Most Active Users";s:10:"thumb_size";s:14:"crop-top-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"6";s:9:"bubbletip";i:1;s:8:"order_by";s:8:"numposts";s:5:"style";s:6:"simple";s:6:"gender";s:3:"any";s:8:"location";s:3:"any";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;}' );
+		}
 		add_basic_widget( $blog_id, 'Sidebar', 'coll_xml_feeds', 'core', 100 );
 		add_basic_widget( $blog_id, 'Sidebar', 'mobile_skin_switcher', 'core', 110 );
 	}
 
 
 	/* Sidebar 2 */
-	add_basic_widget( $blog_id, 'Sidebar 2', 'coll_post_list', 'core', 1 );
-	if( $blog_id == $blog_b_ID )
+	if( $kind != 'forum' )
 	{
-		add_basic_widget( $blog_id, 'Sidebar 2', 'coll_item_list', 'core', 5, array(
-				'title'                => 'Sidebar links',
-				'order_by'             => 'RAND',
-				'item_title_link_type' => 'auto',
-				'item_type_usage'      => 'special',
-			) );
+		add_basic_widget( $blog_id, 'Sidebar 2', 'coll_post_list', 'core', 1 );
+		if( $blog_id == $blog_b_ID )
+		{
+			add_basic_widget( $blog_id, 'Sidebar 2', 'coll_item_list', 'core', 5, array(
+					'title'                => 'Sidebar links',
+					'order_by'             => 'RAND',
+					'item_title_link_type' => 'auto',
+					'item_type_usage'      => 'special',
+				) );
+		}
+		add_basic_widget( $blog_id, 'Sidebar 2', 'coll_comment_list', 'core', 10 );
+		add_basic_widget( $blog_id, 'Sidebar 2', 'coll_media_index', 'core', 15, 'a:11:{s:5:"title";s:13:"Recent photos";s:10:"thumb_size";s:10:"crop-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"3";s:5:"limit";s:1:"9";s:8:"order_by";s:9:"datestart";s:9:"order_dir";s:4:"DESC";'.$default_blog_param.'s:11:"widget_name";s:11:"Photo index";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
+		add_basic_widget( $blog_id, 'Sidebar 2', 'free_html', 'core', 20, 'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:162:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
 	}
-	add_basic_widget( $blog_id, 'Sidebar 2', 'coll_comment_list', 'core', 10 );
-	add_basic_widget( $blog_id, 'Sidebar 2', 'coll_media_index', 'core', 15, 'a:11:{s:5:"title";s:13:"Recent photos";s:10:"thumb_size";s:10:"crop-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"3";s:5:"limit";s:1:"9";s:8:"order_by";s:9:"datestart";s:9:"order_dir";s:4:"DESC";'.$default_blog_param.'s:11:"widget_name";s:11:"Photo index";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
-	add_basic_widget( $blog_id, 'Sidebar 2', 'free_html', 'core', 20, 'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:162:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
 
 
 	/* Front Page Main Area */
@@ -316,6 +324,12 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 	/* Front Page Secondary Area */
 	add_basic_widget( $blog_id, 'Front Page Secondary Area', 'org_members', 'core', 10 );
+
+
+	/* 404 Page */
+	add_basic_widget( $blog_id, '404 Page', 'page_404_not_found', 'core', 10 );
+	add_basic_widget( $blog_id, '404 Page', 'coll_search_form', 'core', 20 );
+	add_basic_widget( $blog_id, '404 Page', 'coll_tag_cloud', 'core', 30 );
 
 
 	/* Mobile Footer */

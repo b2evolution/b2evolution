@@ -431,8 +431,8 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 		$DomainCache = & get_DomainCache();
 		if( $Domain = & get_Domain_by_subdomain( $user_domain ) && $perm_stat_edit )
 		{	// Set a link to edit a top existing domain:
-			$user_domain_formatted = preg_replace( '#'.preg_quote( $Domain->get( 'name' ) ).'$#',
-				'<a href="'.$admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID.'">'.$Domain->get( 'name' ).'</a>',
+			$user_domain_formatted = preg_replace( '#('.preg_quote( trim( $Domain->get( 'name' ), '.' ) ).')$#i',
+				'<a href="'.$admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID.'">$1</a>',
 				$user_domain_formatted );
 		}
 	}
@@ -473,11 +473,12 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 		$initial_referer_formatted = format_to_output( $initial_referer );
 		if( $Domain && $perm_stat_edit )
 		{
-			$initial_referer_formatted = '<a href="'.$admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID.'" '
-					.'title="'.format_to_output( sprintf( T_('Edit domain %s'), $Domain->get( 'name' ) ), 'htmlattr' ).'">'
-				.$initial_referer_formatted.'</a>';
+			$initial_referer_formatted = preg_replace( '#^(.+)('.preg_quote( trim( $Domain->get( 'name' ), '.' ) ).')(/(.+)?|$)#i',
+				'$1<a href="'.$admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID.'" '
+					.'title="'.format_to_output( sprintf( T_('Edit domain %s'), $Domain->get( 'name' ) ), 'htmlattr' ).'">$2</a>$3',
+				$initial_referer_formatted );
 		}
-		$Form->info_field( '', $initial_referer_formatted );
+		$Form->info_field( '', '<a href="'.$initial_referer.'" target="_blank">'.get_icon( 'permalink' ).'</a> '.$initial_referer_formatted );
 		if( $display_initial_referer )
 		{ // User can view Domains
 			$domain_status = $Domain ? $Domain->get( 'status' ) : 'unknown';
@@ -489,7 +490,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 				$domain_status_action = '';
 				if( !$Domain || $initial_referer_domain != $Domain->get( 'name' ) )
 				{ // Link to create a new domain
-					$domain_status_action .= action_icon( sprintf( T_('Add domain %s'), $initial_referer_domain ), 'new', $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_new&amp;dom_name='.$initial_referer_domain.'&amp;dom_status=blocked' );
+					$domain_status_action .= action_icon( sprintf( T_('Add domain %s'), $initial_referer_domain ), 'new', $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_new&amp;dom_name='.$initial_referer_domain.'&amp;dom_status=blocked&amp;dom_type=normal' );
 				}
 				if( $Domain )
 				{ // Link to edit existing domain

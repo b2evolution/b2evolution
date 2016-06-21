@@ -516,7 +516,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		* @param array $dispmap the dispatch map withd efinition of exposed services
 		* @param boolean $servicenow set to false to prevent the server from runnung upon construction
 		*/
-		function xmlrpc_server($dispMap=null, $serviceNow=true)
+		function __construct($dispMap=null, $serviceNow=true)
 		{
 			// if ZLIB is enabled, let the server by default accept compressed requests,
 			// and compress responses sent to clients that support them

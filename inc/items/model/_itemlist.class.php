@@ -193,6 +193,7 @@ class ItemList2 extends ItemListLight
 			'' AS post_flags,
 			'noreq' AS post_notifications_status,
 			NULL AS post_notifications_ctsk_ID,
+			'' AS post_notifications_flags,
 			".bpost_count_words( $content )." AS post_wordcount,
 			".$DB->quote($post_comment_status)." AS post_comment_status,
 			'".$DB->escape( implode( '.', $renderers ) )."' AS post_renderers,

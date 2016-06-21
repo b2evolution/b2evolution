@@ -34,7 +34,7 @@ class test_plugin extends Plugin
 	var $name = 'Test';
 	var $code = 'evo_TEST';
 	var $priority = 50;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -356,7 +356,7 @@ class test_plugin extends Plugin
 	/**
 	 * Event handler: Called when displaying editor buttons (in back-office).
 	 *
-	 * This method, if implemented, should output the buttons (probably as html INPUT elements) 
+	 * This method, if implemented, should output the buttons (probably as html INPUT elements)
 	 * and return true, if button(s) have been displayed.
 	 *
 	 * You should provide an unique html ID with each button.

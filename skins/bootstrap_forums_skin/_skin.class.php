@@ -21,7 +21,7 @@ class bootstrap_forums_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.0';
+	var $version = '6.7.3';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -60,6 +60,34 @@ class bootstrap_forums_Skin extends Skin
 
 
 	/**
+	 * Get supported collection kinds.
+	 *
+	 * This should be overloaded in skins.
+	 *
+	 * For each kind the answer could be:
+	 * - 'yes' : this skin does support that collection kind (the result will be was is expected)
+	 * - 'partial' : this skin is not a primary choice for this collection kind (but still produces an output that makes sense)
+	 * - 'maybe' : this skin has not been tested with this collection kind
+	 * - 'no' : this skin does not support that collection kind (the result would not be what is expected)
+	 * There may be more possible answers in the future...
+	 */
+	public function get_supported_coll_kinds()
+	{
+		$supported_kinds = array(
+				'main' => 'maybe',
+				'std' => 'no',		// Blog
+				'photo' => 'no',
+				'forum' => 'yes',
+				'manual' => 'no',
+				'group' => 'partial',  // Tracker
+				// Any kind that is not listed should be considered as "maybe" supported
+			);
+
+		return $supported_kinds;
+	}
+
+
+	/*
 	 * What CSS framework does has this skin been designed with?
 	 *
 	 * This may impact default markup returned by Skin::get_template() for example
@@ -86,7 +114,7 @@ class bootstrap_forums_Skin extends Skin
 					'layout_general' => array(
 						'label' => T_('General Layout'),
 						'note' => '',
-						'defaultvalue' => 'no_sidebar',
+						'defaultvalue' => 'right_sidebar',
 						'options' => array(
 								'no_sidebar'    => T_('No Sidebar'),
 								'left_sidebar'  => T_('Left Sidebar'),
@@ -319,6 +347,14 @@ class bootstrap_forums_Skin extends Skin
 			require_js( '#jqueryUI#', 'blog' );
 		}
 
+		if( in_array( $disp, array( 'single', 'page' ) ) )
+		{	// Init JS to autcomplete the user logins
+			require_js( '#bootstrap_typeahead#', 'blog' );
+			init_autocomplete_login_js( 'blog', 'typeahead' );
+			// Initialize date picker for _item_expert.form.php
+			init_datepicker_js( 'blog' );
+		}
+
 		// Add custom CSS:
 		$custom_css = '';
 
@@ -329,7 +365,7 @@ class bootstrap_forums_Skin extends Skin
 			$custom_css = "@media screen and (min-width: 1200px) {
 				.forums_list .ft_date {
 					white-space: normal;
-					margin-top: 11px;
+					margin-top: 3px;
 				}
 				.disp_single .single_topic .evo_content_block .panel-body .evo_post__full, .disp_single .evo_comment .panel-body .evo_comment_text p, .disp_single .post_tags {
 					padding-left: 15px;

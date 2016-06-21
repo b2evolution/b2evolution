@@ -981,8 +981,14 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 	{ // Be sure to get a fresh copy of this CSS file after application upgrades:
 		if( $version == '#' )
 		{
-			global $app_version_long;
+			global $app_version_long, $Skin;
+
 			$version = $app_version_long;
+
+			if( ( $relative_to == 'relative' || $relative_to === true ) && ! is_admin_page() && isset( $Skin ) )
+			{	// Prepand skin version to clear file from browser cache after skin switching:
+				$version = $Skin->folder.'+'.$Skin->version.'+'.$version;
+			}
 		}
 		$lib_url = url_add_param( $lib_url, 'v='.$version );
 	}
@@ -1007,8 +1013,9 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
  * @param boolean|string Is the file's path relative to the base path/url?
  * @param boolean TRUE to add attribute "async" to load javascript asynchronously
  * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+ * @param string version number to append at the end of requested url to avoid getting an old version from the cache
  */
-function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output = false )
+function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output = false, $version = '#' )
 {
 	global $required_js; // Use this var as global and NOT static, because it is used in other functions(e.g. display_ajax_form())
 	global $dequeued_headlines;
@@ -1030,11 +1037,11 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
 
 	if( in_array( $js_file, array( '#jqueryUI#', 'communication.js', 'functions.js' ) ) )
 	{ // Dependency : ensure jQuery is loaded
-		require_js( '#jquery#', $relative_to, $async, $output );
+		require_js( '#jquery#', $relative_to, $async, $output, $version );
 	}
 
 	// Get library url of JS file by alias name
-	$js_url = get_require_url( $js_file, $relative_to, 'js' );
+	$js_url = get_require_url( $js_file, $relative_to, 'js', $version );
 
 	// Add to headlines, if not done already:
 	if( empty( $required_js ) || ! in_array( strtolower( $js_url ), $required_js ) )

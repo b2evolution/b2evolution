@@ -291,7 +291,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		$keywords = $DB->get_col('SELECT aspm_string FROM T_antispam');
+		$keywords = $DB->get_col( 'SELECT askw_string FROM T_antispam__keyword' );
 		$keywords = array_chunk( $keywords, 100 );
 		$rows_affected = 0;
 
@@ -326,7 +326,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		$keywords = $DB->get_col('SELECT aspm_string FROM T_antispam');
+		$keywords = $DB->get_col( 'SELECT askw_string FROM T_antispam__keyword' );
 		$keywords = array_chunk( $keywords, 100 );
 		$rows_affected = 0;
 
