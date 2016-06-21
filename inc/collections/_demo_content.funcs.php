@@ -128,13 +128,13 @@ function create_blog(
 		$in_bloglist = 'public',
 		$owner_user_ID = 1,
 		$blog_allow_access = 'public',
-		$group_ID = NULL )
+		$section_ID = NULL )
 {
 	global $default_locale, $install_test_features, $local_installation, $Plugins;
 
 	$Blog = new Blog( NULL );
 
-	$Blog->set( 'cgrp_ID', $group_ID );
+	$Blog->set( 'cgrp_ID', $section_ID );
 
 	$Blog->init_by_kind( $kind, $blog_name, $blog_shortname, $blog_urlname );
 
@@ -722,10 +722,10 @@ Admins and moderators can very quickly approve or reject comments from the colle
  * @param integer Owner ID
  * @param boolean Use demo users as comment authors
  * @param integer Shift post time in ms
- * @param integer Collection group ID
+ * @param integer Section ID
  * @return integer ID of created blog
  */
-function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = true, $timeshift = 86400, $group_ID = 1 )
+function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = true, $timeshift = 86400, $section_ID = 1 )
 {
 	global $install_test_features, $DB, $admin_url, $timestamp;
 
@@ -760,7 +760,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					'never',
 					$owner_ID,
 					'public',
-					$group_ID );
+					$section_ID );
 
 			if( ! empty( $blog_home_ID ) )
 			{ // Save ID of this blog in settings table, It is used on top menu, file "/skins_site/_site_body_header.inc.php"
@@ -798,7 +798,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					'public',
 					$owner_ID,
 					'public',
-					$group_ID );
+					$section_ID );
 			$blog_ID = $blog_a_ID;
 			break;
 
@@ -835,7 +835,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					'public',
 					$owner_ID,
 					'members',
-					$group_ID );
+					$section_ID );
 
 			$BlogCache = & get_BlogCache();
 			if( $b_Blog = $BlogCache->get_by_ID( $blog_b_ID, false, false ) )
@@ -865,7 +865,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					'photo', '', 0, 'relative', true, 'public',
 					$owner_ID,
 					'public',
-					$group_ID );
+					$section_ID );
 			$blog_ID = $blog_photoblog_ID;
 			break;
 
@@ -883,7 +883,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					'forum', 'any', 1, 'relative', false, 'public',
 					$owner_ID,
 					'public',
-					$group_ID );
+					$section_ID );
 			$blog_ID = $blog_forums_ID;
 			break;
 
@@ -901,7 +901,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					'manual', 'any', 1, $default_blog_access_type, false, 'public',
 					$owner_ID,
 					'public',
-					$group_ID );
+					$section_ID );
 			$blog_ID = $blog_manual_ID;
 			break;
 
@@ -919,7 +919,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					'group', 'any', 1, $default_blog_access_type, false, 'public',
 					$owner_ID,
 					'public',
-					$group_ID );
+					$section_ID );
 			$blog_ID = $blog_group_ID;
 			break;
 

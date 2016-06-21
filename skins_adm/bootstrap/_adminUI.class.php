@@ -841,10 +841,10 @@ class AdminUI extends AdminUI_general
 
 		$r .= $title;
 
-		if( $this->coll_list_disp_groups )
-		{	// Check if filter by collection group is used currently:
+		if( $this->coll_list_disp_sections )
+		{	// Check if filter by section is used currently:
 			$cgrp_ID = param( 'cgrp_ID', 'integer', 0 );
-			if( ! is_logged_in() || ! ( $current_User->check_perm( 'stats', 'view' ) || $current_User->check_perm( 'blog_group', 'view', false, $cgrp_ID ) ) )
+			if( ! is_logged_in() || ! ( $current_User->check_perm( 'stats', 'view' ) || $current_User->check_perm( 'section', 'view', false, $cgrp_ID ) ) )
 			{
 				$cgrp_ID = 0;
 				set_param( 'cgrp_ID', 0 );
@@ -886,32 +886,32 @@ class AdminUI extends AdminUI_general
 			$button_add_blog = '';
 		}
 
-		// Collection groups:
-		if( $this->coll_list_disp_groups )
+		// Sections:
+		if( $this->coll_list_disp_sections )
 		{
 			$collection_groups = '';
 
-			$CollGroupCache = & get_CollGroupCache();
-			$CollGroupCache->clear();
-			if( $current_User->check_perm( 'stats', 'view' ) || $current_User->check_perm( 'blog_group', 'edit' ) )
-			{	// Allow to select all collection groups if Current user can has a permission for this:
-				$CollGroupCache->load_all();
+			$SectionCache = & get_SectionCache();
+			$SectionCache->clear();
+			if( $current_User->check_perm( 'stats', 'view' ) || $current_User->check_perm( 'section', 'edit' ) )
+			{	// Allow to select all sections if Current user can has a permission for this:
+				$SectionCache->load_all();
 			}
 			else
-			{	// Load only available collection groups:
-				$CollGroupCache->load_where( 'cgrp_owner_user_ID = '.$current_User->ID );
+			{	// Load only available sections:
+				$SectionCache->load_where( 'cgrp_owner_user_ID = '.$current_User->ID );
 			}
 
-			foreach( $CollGroupCache->cache as $CollGroup )
-			{	// Loop through all collection groups that match the requested permission:
-				$collection_groups .= ( $CollGroup->ID == $cgrp_ID ) ? $template['beforeEachSel'] : $template['beforeEach'];
+			foreach( $SectionCache->cache as $Section )
+			{	// Loop through all sections that match the requested permission:
+				$collection_groups .= ( $Section->ID == $cgrp_ID ) ? $template['beforeEachSel'] : $template['beforeEach'];
 
-				$collection_groups .= '<a href="'.$url_params.'blog=0&amp;cgrp_ID='.$CollGroup->ID
-					.'" class="btn btn-default'.( $CollGroup->ID == $cgrp_ID ? ' active' : '' ).'">'
-						.$CollGroup->dget( 'name', 'htmlbody' )
+				$collection_groups .= '<a href="'.$url_params.'blog=0&amp;cgrp_ID='.$Section->ID
+					.'" class="btn btn-default'.( $Section->ID == $cgrp_ID ? ' active' : '' ).'">'
+						.$Section->dget( 'name', 'htmlbody' )
 					.'</a> ';
 
-				$collection_groups .= ( $CollGroup->ID == $cgrp_ID ) ? $template['afterEachSel'] : $template['afterEach'];
+				$collection_groups .= ( $Section->ID == $cgrp_ID ) ? $template['afterEachSel'] : $template['afterEach'];
 			}
 
 			$collection_groups = empty( $collection_groups ) ? '' : '<div class="btn-group">'.$collection_groups.'</div>';

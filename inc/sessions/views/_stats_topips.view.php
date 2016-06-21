@@ -33,7 +33,7 @@ $count_SQL->FROM( 'T_hitlog' );
 $count_SQL->GROUP_BY( 'hit_remote_addr' );
 
 if( ! empty( $cgrp_ID ) )
-{	// Filter by collection group:
+{	// Filter by section:
 	$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
 	$SQL->WHERE_and( 'blog_cgrp_ID = '.$cgrp_ID );
 	$count_SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );

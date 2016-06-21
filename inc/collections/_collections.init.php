@@ -120,21 +120,21 @@ function & get_BlogCache( $order_by = 'blog_order' )
 
 
 /**
- * Get the CollGroupCache
+ * Get the SectionCache
  *
- * @return CollGroupCache
+ * @return SectionCache
  */
-function & get_CollGroupCache()
+function & get_SectionCache()
 {
-	global $CollGroupCache;
+	global $SectionCache;
 
-	if( ! isset( $CollGroupCache ) )
+	if( ! isset( $SectionCache ) )
 	{	// Cache doesn't exist yet:
-		load_class( 'collections/model/_collgroup.class.php', 'CollGroup' );
-		$CollGroupCache = new DataObjectCache( 'CollGroup', false, 'T_coll_groups', 'cgrp_', 'cgrp_ID', 'cgrp_name', 'cgrp_order' ); // COPY (FUNC)
+		load_class( 'collections/model/_section.class.php', 'Section' );
+		$SectionCache = new DataObjectCache( 'Section', false, 'T_coll_groups', 'cgrp_', 'cgrp_ID', 'cgrp_name', 'cgrp_order' ); // COPY (FUNC)
 	}
 
-	return $CollGroupCache;
+	return $SectionCache;
 }
 
 

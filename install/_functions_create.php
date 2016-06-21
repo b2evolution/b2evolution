@@ -1419,13 +1419,13 @@ function create_demo_contents()
 		$install_collection_tracker = in_array( 'group', $collections );
 	}
 
-	task_begin( 'Creating default collection groups... ' );
+	task_begin( 'Creating default sections... ' );
 	$DB->query( 'INSERT INTO T_coll_groups ( cgrp_ID, cgrp_name, cgrp_order, cgrp_owner_user_ID )
-		VALUES ( 1, "Home",   1, 1 ),
-		       ( 2, "Blogs",  2, '.$jay_moderator_ID.' ),
-		       ( 3, "Photos", 3, '.$dave_blogger_ID.' ),
-		       ( 4, "Forums", 4, '.$paul_blogger_ID.' ),
-		       ( 5, "Manual", 5, '.$dave_blogger_ID.' )' );
+		VALUES ( 2, "Home",   2, 1 ),
+		       ( 3, "Blogs",  3, '.$jay_moderator_ID.' ),
+		       ( 4, "Photos", 4, '.$dave_blogger_ID.' ),
+		       ( 5, "Forums", 5, '.$paul_blogger_ID.' ),
+		       ( 6, "Manual", 6, '.$dave_blogger_ID.' )' );
 	task_end();
 
 	// Store the item IDs in this array in order to create additional comments
@@ -1437,7 +1437,7 @@ function create_demo_contents()
 	if( $install_collection_home )
 	{ // Install Home blog
 		task_begin( 'Creating Home collection...' );
-		create_demo_collection( 'main', $jay_moderator_ID, $create_demo_users, $timeshift, 1 );
+		create_demo_collection( 'main', $jay_moderator_ID, $create_demo_users, $timeshift, 2 );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -1446,7 +1446,7 @@ function create_demo_contents()
 	{ // Install Blog A
 		$timeshift += 86400;
 		task_begin( 'Creating Blog A collection...' );
-		create_demo_collection( 'blog_a', $jay_moderator_ID, $create_demo_users, $timeshift, 2 );
+		create_demo_collection( 'blog_a', $jay_moderator_ID, $create_demo_users, $timeshift, 3 );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -1455,7 +1455,7 @@ function create_demo_contents()
 	{ // Install Blog B
 		$timeshift += 86400;
 		task_begin( 'Creating Blog B collection...' );
-		create_demo_collection( 'blog_b', $paul_blogger_ID, $create_demo_users, $timeshift, 2 );
+		create_demo_collection( 'blog_b', $paul_blogger_ID, $create_demo_users, $timeshift, 3 );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -1464,7 +1464,7 @@ function create_demo_contents()
 	{ // Install Photos blog
 		$timeshift += 86400;
 		task_begin( 'Creating Photos collection...' );
-		create_demo_collection( 'photo', $dave_blogger_ID, $create_demo_users, $timeshift, 3 );
+		create_demo_collection( 'photo', $dave_blogger_ID, $create_demo_users, $timeshift, 4 );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -1473,7 +1473,7 @@ function create_demo_contents()
 	{ // Install Forums blog
 		$timeshift += 86400;
 		task_begin( 'Creating Forums collection...' );
-		create_demo_collection( 'forum', $paul_blogger_ID, $create_demo_users, $timeshift, 4 );
+		create_demo_collection( 'forum', $paul_blogger_ID, $create_demo_users, $timeshift, 5 );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -1482,7 +1482,7 @@ function create_demo_contents()
 	{ // Install Manual blog
 		$timeshift += 86400;
 		task_begin( 'Creating Manual collection...' );
-		create_demo_collection( 'manual', $dave_blogger_ID, $create_demo_users, $timeshift, 5 );
+		create_demo_collection( 'manual', $dave_blogger_ID, $create_demo_users, $timeshift, 6 );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -1491,7 +1491,7 @@ function create_demo_contents()
 	{ // Install Tracker blog
 		$timeshift += 86400;
 		task_begin( 'Creating Tracker collection...' );
-		create_demo_collection( 'group', $admin_user->ID, $create_demo_users, $timeshift, 2 );
+		create_demo_collection( 'group', $admin_user->ID, $create_demo_users, $timeshift, 1 );
 		update_install_progress_bar();
 		task_end();
 	}

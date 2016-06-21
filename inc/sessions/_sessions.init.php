@@ -251,8 +251,8 @@ class sessions_Module extends Module
 		{	// Permission to view stats for user's blogs:
 
 			// Initialize params to filter by selected collection and/or group:
-			$coll_group_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
-			$coll_group_params .= empty( $cgrp_ID ) ? '' : '&amp;cgrp_ID='.$cgrp_ID;
+			$section_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
+			$section_params .= empty( $cgrp_ID ) ? '' : '&amp;cgrp_ID='.$cgrp_ID;
 
 			$AdminUI->add_menu_entries(
 					NULL, // root
@@ -263,24 +263,24 @@ class sessions_Module extends Module
 							'entries' => array(
 								'summary' => array(
 									'text' => T_('Hit summary'),
-									'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global'.$coll_group_params,
+									'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global'.$section_params,
 									'order' => 'group_last',
 									'entries' => array(
 										'global' => array(
 											'text' => T_('Global hits'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global'.$coll_group_params ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global'.$section_params ),
 										'browser' => array(
 											'text' => T_('Browser hits'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=browser'.$coll_group_params ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=browser'.$section_params ),
 										'api' => array(
 											'text' => T_('API hits'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=api'.$coll_group_params ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=api'.$section_params ),
 										'robot' => array(
 											'text' => T_('Robot hits'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=robot'.$coll_group_params ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=robot'.$section_params ),
 										'feed' => array(
 											'text' => T_('RSS/Atom hits'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=feed'.$coll_group_params ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=feed'.$section_params ),
 										),
 									),
 								),
@@ -290,57 +290,57 @@ class sessions_Module extends Module
 
 			$ips_entries = array( 'top' => array(
 					'text' => T_('Top IPs'),
-					'href' => $admin_url.'?ctrl=stats&amp;tab=ips'.$coll_group_params
+					'href' => $admin_url.'?ctrl=stats&amp;tab=ips'.$section_params
 				) );
 			if( $current_User->check_perm( 'spamblacklist', 'view' ) )
 			{ // Display IP ranges only if current user has access to view Antispam tools
 				$ips_entries['ranges'] = array(
 					'text' => T_('IP Ranges'),
-					'href' => $admin_url.'?ctrl=antispam&amp;tab=stats&amp;tab3=ipranges'.$coll_group_params
+					'href' => $admin_url.'?ctrl=antispam&amp;tab=stats&amp;tab3=ipranges'.$section_params
 				);
 			}
 
 			$AdminUI->add_menu_entries( 'stats', array(
 								'refsearches' => array(
 									'text' => T_('Search B-hits'),
-									'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=hits'.$coll_group_params,
+									'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=hits'.$section_params,
 									'entries' => array(
 										'hits' => array(
 											'text' => T_('Search hits'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=hits'.$coll_group_params ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=hits'.$section_params ),
 										'keywords' => array(
 											'text' => T_('Keywords'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=keywords'.$coll_group_params ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=keywords'.$section_params ),
 										'topengines' => array(
 											'text' => T_('Top engines'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=topengines'.$coll_group_params ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=refsearches&amp;tab3=topengines'.$section_params ),
 										),
 									),
 								'referers' => array(
 									'text' => T_('Referered B-hits'),
-									'href' => $admin_url.'?ctrl=stats&amp;tab=referers'.$coll_group_params ),
+									'href' => $admin_url.'?ctrl=stats&amp;tab=referers'.$section_params ),
 								'other' => array(
 									'text' => T_('Direct B-hits'),
-									'href' => $admin_url.'?ctrl=stats&amp;tab=other'.$coll_group_params ),
+									'href' => $admin_url.'?ctrl=stats&amp;tab=other'.$section_params ),
 								'hits' => array(
 									'text' => T_('All Hits'),
-									'href' => $admin_url.'?ctrl=stats&amp;tab=hits'.$coll_group_params ),
+									'href' => $admin_url.'?ctrl=stats&amp;tab=hits'.$section_params ),
 								'domains' => array(
 									'text' => T_('Referring domains'),
-									'href' => $admin_url.'?ctrl=stats&amp;tab=domains'.$coll_group_params,
+									'href' => $admin_url.'?ctrl=stats&amp;tab=domains'.$section_params,
 									'order' => 'group_last',
 									'entries' => array(
 										'all' => array(
 											'text' => T_('All referrers'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=domains'.$coll_group_params ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=domains'.$section_params ),
 										'top' => array(
 											'text' => T_('Top referrers'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=domains&amp;tab3=top'.$coll_group_params ),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=domains&amp;tab3=top'.$section_params ),
 										),
 									),
 								'ips' => array(
 									'text' => T_('IPs'),
-									'href' => $admin_url.'?ctrl=stats&amp;tab=ips'.$coll_group_params,
+									'href' => $admin_url.'?ctrl=stats&amp;tab=ips'.$section_params,
 									'entries' => $ips_entries ),
 							)
 						);
@@ -353,29 +353,29 @@ class sessions_Module extends Module
 					array(
 						'goals' => array(
 							'text' => T_('Goals'),
-							'href' => $admin_url.'?ctrl=goals'.$coll_group_params,
+							'href' => $admin_url.'?ctrl=goals'.$section_params,
 							'entries' => array(
 								'goals' => array(
 									'text' => T_('Goals'),
-									'href' => $admin_url.'?ctrl=goals'.$coll_group_params
+									'href' => $admin_url.'?ctrl=goals'.$section_params
 									),
 								'cats' => array(
 									'text' => T_('Categories'),
-									'href' => $admin_url.'?ctrl=goals&amp;tab3=cats'.$coll_group_params
+									'href' => $admin_url.'?ctrl=goals&amp;tab3=cats'.$section_params
 									),
 								'hits' => array(
 									'text' => T_('Goal hits'),
-									'href' => $admin_url.'?ctrl=stats&amp;tab=goals&amp;tab3=hits'.$coll_group_params
+									'href' => $admin_url.'?ctrl=stats&amp;tab=goals&amp;tab3=hits'.$section_params
 									),
 								'stats' => array(
 									'text' => T_('Stats'),
-									'href' => $admin_url.'?ctrl=goals&amp;tab3=stats'.$coll_group_params
+									'href' => $admin_url.'?ctrl=goals&amp;tab3=stats'.$section_params
 									),
 								),
 							),
 						'settings' => array(
 							'text' => T_('Settings'),
-							'href' => $admin_url.'?ctrl=stats&amp;tab=settings'.$coll_group_params ),
+							'href' => $admin_url.'?ctrl=stats&amp;tab=settings'.$section_params ),
 						)
 				);
 			}

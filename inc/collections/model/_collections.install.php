@@ -47,7 +47,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		'Creating table for Blogs',
 		"CREATE TABLE T_blogs (
 			blog_ID              int(11) unsigned NOT NULL auto_increment,
-			blog_cgrp_ID         INT(11) UNSIGNED NOT NULL,
+			blog_cgrp_ID         INT(11) UNSIGNED NOT NULL DEFAULT 1,
 			blog_shortname       varchar(255) NULL default '',
 			blog_name            varchar(255) NOT NULL default '',
 			blog_owner_user_ID   int(11) unsigned NOT NULL default 1,
@@ -77,7 +77,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_coll_groups' => array(
-		'Creating collection groups table',
+		'Creating sections table',
 		"CREATE TABLE T_coll_groups (
 			cgrp_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			cgrp_name          VARCHAR(255) NOT NULL,

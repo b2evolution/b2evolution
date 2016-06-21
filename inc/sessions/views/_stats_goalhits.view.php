@@ -116,8 +116,8 @@ $Results = new Results( $sql, 'ghits_', '--D', $UserSettings->get( 'results_per_
 $Results->title = T_('Recent goal hits').get_manual_link( 'goal-hits' );
 
 // Initialize params to filter by selected collection and/or group:
-$coll_group_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
-$coll_group_params .= empty( $cgrp_ID ) ? '' : '&amp;cgrp_ID='.$cgrp_ID;
+$section_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
+$section_params .= empty( $cgrp_ID ) ? '' : '&amp;cgrp_ID='.$cgrp_ID;
 
 /**
  * Callback to add filters on top of the result set
@@ -143,8 +143,8 @@ $Results->filter_area = array(
 	'callback' => 'filter_goal_hits',
 	'url_ignore' => 'results_hits_page,exclude,sess_ID,goal_name,datestartinput,datestart,datestopinput,datestop',
 	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits'.$coll_group_params ),
-		'all_but_curr' => array( T_('All but current session'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits'.$coll_group_params.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1' ),
+		'all' => array( T_('All'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits'.$section_params ),
+		'all_but_curr' => array( T_('All but current session'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits'.$section_params.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1' ),
 		)
 	);
 

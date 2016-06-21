@@ -79,8 +79,8 @@ $Results->title = T_('Goals').get_manual_link( 'goal-settings' );
 
 
 // Initialize params to filter by selected collection and/or group:
-$coll_group_params = empty( $blog ) ? '' : '&blog='.$blog;
-$coll_group_params .= empty( $cgrp_ID ) ? '' : '&cgrp_ID='.$cgrp_ID;
+$section_params = empty( $blog ) ? '' : '&blog='.$blog;
+$section_params .= empty( $cgrp_ID ) ? '' : '&cgrp_ID='.$cgrp_ID;
 
 /**
  * Callback to add filters on top of the result set
@@ -100,8 +100,8 @@ $Results->filter_area = array(
 	'callback' => 'filter_goals',
 	'url_ignore' => 'results_goals_page,final',
 	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=goals'.$coll_group_params.'&amp;final=0&amp;s=&amp;cat=0' ),
-		'final' => array( T_('Final'), '?ctrl=goals'.$coll_group_params.'&amp;final=1' ),
+		'all' => array( T_('All'), '?ctrl=goals'.$section_params.'&amp;final=0&amp;s=&amp;cat=0' ),
+		'final' => array( T_('Final'), '?ctrl=goals'.$section_params.'&amp;final=1' ),
 		)
 	);
 

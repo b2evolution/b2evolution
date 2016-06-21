@@ -25,7 +25,7 @@ $SQL->SELECT( 'SQL_NO_CACHE COUNT(*) AS hits, EXTRACT(YEAR FROM hit_datetime) AS
 $SQL->FROM( 'T_hitlog' );
 $SQL->WHERE( 'hit_type = "rss"' );
 if( ! empty( $cgrp_ID ) )
-{	// Filter by collection group:
+{	// Filter by section:
 	$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
 	$SQL->WHERE_and( 'blog_cgrp_ID = '.$cgrp_ID );
 }
@@ -44,8 +44,8 @@ $res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
 if( count($res_hits) )
 {
 	// Initialize params to filter by selected collection and/or group:
-	$coll_group_params = empty( $blog ) ? '' : '&blog='.$blog;
-	$coll_group_params .= empty( $cgrp_ID ) ? '' : '&cgrp_ID='.$cgrp_ID;
+	$section_params = empty( $blog ) ? '' : '&blog='.$blog;
+	$section_params .= empty( $cgrp_ID ) ? '' : '&cgrp_ID='.$cgrp_ID;
 
 	$last_date = 0;
 
@@ -56,7 +56,7 @@ if( count($res_hits) )
 
 	// Initialize the data to open an url by click on bar item
 	$chart['link_data'] = array();
-	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$coll_group_params.'&hit_type=$param1$';
+	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$section_params.'&hit_type=$param1$';
 	$chart['link_data']['params'] = array(
 			array( 'rss' )
 		);

@@ -15,11 +15,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 
 /**
- * CollGroup Class
+ * Section Class
  *
  * @package evocore
  */
-class CollGroup extends DataObject
+class Section extends DataObject
 {
 	var $name = '';
 	var $order = '';
@@ -27,7 +27,7 @@ class CollGroup extends DataObject
 	var $owner_User = NULL;
 
 	/**
-	 * @var array Array of "Blog" objects, @see CollGroup::get_blogs()
+	 * @var array Array of "Blog" objects, @see Section::get_blogs()
 	 */
 	var $blogs;
 
@@ -77,8 +77,11 @@ class CollGroup extends DataObject
 	function load_from_Request()
 	{
 		// Name:
-		param_string_not_empty( 'cgrp_name', T_('Please enter a group name.') );
-		$this->set_from_Request( 'name' );
+		if( $this->ID != 1 )
+		{	// Only if not first default section:
+			param_string_not_empty( 'cgrp_name', T_('Please enter a section name.') );
+			$this->set_from_Request( 'name' );
+		}
 
 		// Owner:
 		$cgrp_owner_login = param( 'cgrp_owner_login', 'string', '' );
@@ -106,9 +109,9 @@ class CollGroup extends DataObject
 
 
 	/**
-	 * Get collection group name.
+	 * Get section name.
 	 *
-	 * @return string collection group name
+	 * @return string section name
 	 */
 	function get_name()
 	{
@@ -134,19 +137,19 @@ class CollGroup extends DataObject
 
 
 	/**
-	 * Get collections of this group
+	 * Get collections of this section
 	 *
 	 * @return array Array of "Blog" objects
 	 */
 	function get_blogs()
 	{
 		if( empty( $this->ID ) )
-		{	// New creating group has no collections yet, Return an empty array:
+		{	// New section creating has no collections yet, Return an empty array:
 			return array();
 		}
 
 		if( ! isset( $this->blogs ) )
-		{	// Load collections of this group only on first request and cache the result:
+		{	// Load collections of this section only on first request and cache the result:
 			$BlogCache = & get_BlogCache();
 			$BlogCache->clear();
 			$BlogCache->load_where( 'blog_cgrp_ID = '.$this->ID );

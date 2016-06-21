@@ -62,7 +62,7 @@ init_field_editor_js( array(
 		'action_url' => $admin_url.'?ctrl=dashboard&order_action=update&order_data=',
 	) );
 init_field_editor_js( array(
-		'field_prefix' => 'order-collgroup-',
+		'field_prefix' => 'order-section-',
 		'action_url' => $admin_url.'?ctrl=dashboard&order_action=update_group&order_data=',
 	) );
 

@@ -410,8 +410,8 @@ class Blog extends DataObject
 			$this->set_from_Request( 'name' );
 			$this->set( 'shortname', param( 'blog_shortname', 'string', true ) );
 
-			// Collection group:
-			param_string_not_empty( 'cgrp_ID', T_('Please select a group.') );
+			// Section:
+			param_string_not_empty( 'cgrp_ID', T_('Please select a section.') );
 			$this->set( 'cgrp_ID', param( 'cgrp_ID', 'integer', NULL ), NULL );
 
 			// Language / locale:
@@ -989,7 +989,7 @@ class Blog extends DataObject
 		 * ADVANCED ADMIN SETTINGS
 		 */
 		if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ||
-		    ( $this->ID == 0 && $current_User->check_perm( 'blog_group', 'view', false, $this->cgrp_ID ) ) )
+		    ( $this->ID == 0 && $current_User->check_perm( 'section', 'view', false, $this->cgrp_ID ) ) )
 		{	// We have permission to edit advanced admin settings,
 			// OR user is creating/copy new collection in own group:
 			if( ($blog_urlname = param( 'blog_urlname', 'string', NULL )) !== NULL )

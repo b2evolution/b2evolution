@@ -7596,7 +7596,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11800, 'Creating collection groups table...' ) )
+	if( upg_task_start( 11800, 'Creating sections table...' ) )
 	{	// part of 6.8.0-alpha
 		db_create_table( 'T_coll_groups', '
 				cgrp_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -7636,15 +7636,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11820, 'Create default collection group...' ) )
+	if( upg_task_start( 11820, 'Create default section...' ) )
 	{	// part of 6.8.0-alpha
-		$DB->query( 'INSERT INTO T_coll_groups ( cgrp_name, cgrp_order, cgrp_owner_user_ID )
-			VALUES ( "Default group", 1, 1 )' );
-		$coll_group_ID = $DB->insert_id;
-		if( $coll_group_ID > 0 )
+		$DB->query( 'INSERT INTO T_coll_groups ( cgrp_ID, cgrp_name, cgrp_order, cgrp_owner_user_ID )
+			VALUES ( 1, "No Section", 1, 1 )' );
+		$section_ID = $DB->insert_id;
+		if( $section_ID > 0 )
 		{
 			$DB->query( 'UPDATE T_blogs
-				SET blog_cgrp_ID = '.$coll_group_ID.'
+				SET blog_cgrp_ID = '.$section_ID.'
 				WHERE blog_cgrp_ID IS NULL' );
 		}
 		upg_task_end();
@@ -7653,7 +7653,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 11825, 'Upgrading collections table...' ) )
 	{	// part of 6.8.0-alpha
 		db_add_col( 'T_blogs', 'blog_cgrp_ID', 'INT(11) UNSIGNED NULL' );
-		$DB->query( 'ALTER TABLE T_blogs MODIFY COLUMN blog_cgrp_ID INT(11) UNSIGNED NOT NULL' );
+		$DB->query( 'ALTER TABLE T_blogs MODIFY COLUMN blog_cgrp_ID INT(11) UNSIGNED NOT NULL DEFAULT 1' );
 		upg_task_end();
 	}
 

@@ -30,9 +30,9 @@ $activate_collection_toolbar = true;
 // Do we have permission to view all stats (aggregated stats) ?
 $perm_view_all = $current_User->check_perm( 'stats', 'view' );
 
-// Collection group ID:
+// Section ID:
 param( 'cgrp_ID', 'integer', 0, true );
-if( ! $perm_view_all && ! $current_User->check_perm( 'blog_group', 'view', false, $cgrp_ID ) )
+if( ! $perm_view_all && ! $current_User->check_perm( 'section', 'view', false, $cgrp_ID ) )
 {
 	forget_param( 'cgrp_ID' );
 	unset( $cgrp_ID );

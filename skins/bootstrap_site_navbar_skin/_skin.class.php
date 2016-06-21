@@ -129,16 +129,16 @@ class bootstrap_site_navbar_Skin extends Skin
 		// Get current collection ID:
 		$current_blog_ID = isset( $Blog ) ? $Blog->ID : NULL;
 
-		// Load all collection groups:
-		$CollGroupCache = & get_CollGroupCache();
-		$CollGroupCache->load_all();
+		// Load all sections:
+		$SectionCache = & get_SectionCache();
+		$SectionCache->load_all();
 
 		$this->header_tab_active = NULL;
 		$level0_index = 0;
-		foreach( $CollGroupCache->cache as $CollGroup )
+		foreach( $SectionCache->cache as $Section )
 		{
 			$tab_items = array();
-			$group_blogs = $CollGroup->get_blogs();
+			$group_blogs = $Section->get_blogs();
 
 			$level0_is_active = false;
 
@@ -195,9 +195,9 @@ class bootstrap_site_navbar_Skin extends Skin
 			}
 
 			if( ! empty( $tab_items ) )
-			{	// Display collection group only if at least one collection is allowed for current display:
+			{	// Display section only if at least one collection is allowed for current display:
 				$header_tabs[] = array(
-						'name'  => $CollGroup->get_name(),
+						'name'  => $Section->get_name(),
 						'url'   => $tab_items[0]['url'],
 						'items' => $tab_items
 					);

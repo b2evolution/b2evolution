@@ -233,6 +233,13 @@ function install_newdb()
 		}
 	}
 
+	// We need to have at least one section because it is a required field for collection:
+	global $DB;
+	task_begin( 'Creating default section... ' );
+	$DB->query( 'INSERT INTO T_coll_groups ( cgrp_ID, cgrp_name, cgrp_order, cgrp_owner_user_ID )
+		VALUES ( 1, "No Section", 1, 1 )' );
+	task_end();
+
 	if( $create_sample_contents )
 	{
 		global $Settings, $install_test_features;
@@ -257,14 +264,6 @@ function install_newdb()
 		$GLOBALS['current_User'] = & $UserCache->get_by_ID( 1 );
 
 		create_demo_contents();
-	}
-	else
-	{	// We need to have at least one collection group because it is a required field for collection:
-		global $DB;
-		task_begin( 'Creating default collection group... ' );
-		$DB->query( 'INSERT INTO T_coll_groups ( cgrp_name, cgrp_order, cgrp_owner_user_ID )
-			VALUES ( "Default group", 1, 1 )' );
-		task_end();
 	}
 
 	evo_flush();

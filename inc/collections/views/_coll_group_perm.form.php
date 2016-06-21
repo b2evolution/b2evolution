@@ -66,7 +66,7 @@ if( !empty( $keywords ) )
 
 <?php
 
-$Results = new Results( $SQL->get(), 'collgroup_' );
+$Results = new Results( $SQL->get(), 'section_' );
 
 if( ! empty( $keywords ) )
 { // Display a button to reset the filters

@@ -38,16 +38,16 @@ function hits_results( & $Results, $params = array() )
 	$tab = get_param( 'tab' );
 
 	// Initialize params to filter by selected collection and/or group:
-	$coll_group_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
-	$coll_group_params .= empty( $cgrp_ID ) ? '' : '&amp;cgrp_ID='.$cgrp_ID;
+	$section_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
+	$section_params .= empty( $cgrp_ID ) ? '' : '&amp;cgrp_ID='.$cgrp_ID;
 
 	$filter_presets = array();
-	$filter_presets['all'] = array( T_('All'), isset( $preset_filter_all_url ) ? $preset_filter_all_url : $admin_url.'?ctrl=stats&amp;tab='.$tab.$coll_group_params.'&amp;'.$param_prefix.'order='.$params['default_order'] );
+	$filter_presets['all'] = array( T_('All'), isset( $preset_filter_all_url ) ? $preset_filter_all_url : $admin_url.'?ctrl=stats&amp;tab='.$tab.$section_params.'&amp;'.$param_prefix.'order='.$params['default_order'] );
 	if( !isset( $preset_referer_type ) )
 	{	// Show these presets only when referer type is not set
-		$filter_presets['all_but_curr'] = array( T_('All but current session'), $admin_url.'?ctrl=stats&amp;tab='.$tab.$coll_group_params.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1&amp;'.$param_prefix.'order='.$params['default_order'] );
-		$filter_presets['direct_hits'] = array( T_('Direct hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.$coll_group_params.'&amp;referer_type=direct&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
-		$filter_presets['refered_hits'] = array( T_('Refered hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.$coll_group_params.'&amp;referer_type=referer&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
+		$filter_presets['all_but_curr'] = array( T_('All but current session'), $admin_url.'?ctrl=stats&amp;tab='.$tab.$section_params.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1&amp;'.$param_prefix.'order='.$params['default_order'] );
+		$filter_presets['direct_hits'] = array( T_('Direct hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.$section_params.'&amp;referer_type=direct&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
+		$filter_presets['refered_hits'] = array( T_('Refered hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.$section_params.'&amp;referer_type=referer&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
 	}
 
 	$Results->filter_area = array(

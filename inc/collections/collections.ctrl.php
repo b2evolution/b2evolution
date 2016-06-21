@@ -26,7 +26,7 @@ if( strpos( $action, 'new' ) !== false || $action == 'copy' )
 { // Simulate tab to value 'new' for actions to create new blog
 	$tab = 'new';
 }
-if( ! in_array( $action, array( 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site', 'new_collgroup', 'edit_collgroup', 'delete_collgroup', 'update_site_skin' ) ) &&
+if( ! in_array( $action, array( 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site', 'new_section', 'edit_section', 'delete_section', 'update_site_skin' ) ) &&
     ! in_array( $tab, array( 'site_settings', 'site_skin' ) ) )
 {
 	if( valid_blog_requested() )
@@ -41,22 +41,22 @@ if( ! in_array( $action, array( 'new', 'new-selskin', 'new-installskin', 'new-na
 	}
 }
 
-if( strpos( $action, 'collgroup' ) !== false )
-{	// Initialize CollGroup object:
-	load_class( 'collections/model/_collgroup.class.php', 'CollGroup' );
+if( strpos( $action, 'section' ) !== false )
+{	// Initialize Section object:
+	load_class( 'collections/model/_section.class.php', 'Section' );
 
 	param( 'cgrp_ID', 'integer', 0 );
 
-	$tab = 'collgroup';
+	$tab = 'section';
 
 	if( $cgrp_ID > 0 )
-	{	// Try to get the existing collection group by requested ID:
-		$CollGroupCache = & get_CollGroupCache();
-		$edited_CollGroup = & $CollGroupCache->get_by_ID( $cgrp_ID );
+	{	// Try to get the existing section by requested ID:
+		$SectionCache = & get_SectionCache();
+		$edited_Section = & $SectionCache->get_by_ID( $cgrp_ID );
 	}
 	else
 	{	// Create new colleciton group object:
-		$edited_CollGroup = new CollGroup();
+		$edited_Section = new Section();
 	}
 }
 
@@ -85,7 +85,7 @@ switch( $action )
 		}
 
 		// Check permissions:
-		if( ! $current_User->check_perm( 'blog_group', 'view', false, $cgrp_ID ) )
+		if( ! $current_User->check_perm( 'section', 'view', false, $cgrp_ID ) )
 		{
 			$Messages->add( T_('You don\'t have permission to create a collection.'), 'error' );
 			$redirect_to = param( 'redirect_to', 'url', $admin_url );
@@ -113,7 +113,7 @@ switch( $action )
 		param( 'cgrp_ID', 'integer', 0, true );
 
 		// Check permissions:
-		$current_User->check_perm( 'blog_group', 'view', true, $cgrp_ID );
+		$current_User->check_perm( 'section', 'view', true, $cgrp_ID );
 
 		param( 'kind', 'string', true );
 
@@ -126,7 +126,7 @@ switch( $action )
 		param( 'cgrp_ID', 'integer', 0 );
 
 		// Check permissions:
-		$current_User->check_perm( 'blog_group', 'view', true, $cgrp_ID );
+		$current_User->check_perm( 'section', 'view', true, $cgrp_ID );
 
 		$edited_Blog = new Blog( NULL );
 
@@ -153,7 +153,7 @@ switch( $action )
 		param( 'cgrp_ID', 'integer', 0 );
 
 		// Check permissions:
-		$current_User->check_perm( 'blog_group', 'view', true, $cgrp_ID );
+		$current_User->check_perm( 'section', 'view', true, $cgrp_ID );
 
 		$edited_Blog = new Blog( NULL );
 
@@ -239,7 +239,7 @@ switch( $action )
 		param( 'cgrp_ID', 'integer', 0 );
 
 		// Check permissions:
-		$current_User->check_perm( 'blog_group', 'view', true, $cgrp_ID );
+		$current_User->check_perm( 'section', 'view', true, $cgrp_ID );
 
 		if( $edited_Blog->duplicate() )
 		{	// The collection has been duplicated successfully:
@@ -460,35 +460,35 @@ switch( $action )
 
 		break;
 
-	case 'new_collgroup':
-	case 'edit_collgroup':
-		// New/Edit collection group:
+	case 'new_section':
+	case 'edit_section':
+		// New/Edit section:
 
 		// Check permissions:
-		$current_User->check_perm( 'blog_group', 'view', true, $edited_CollGroup->ID );
+		$current_User->check_perm( 'section', 'view', true, $edited_Section->ID );
 		break;
 
-	case 'create_collgroup':
-	case 'update_collgroup':
-		// Create/Update collection group:
+	case 'create_section':
+	case 'update_section':
+		// Create/Update section:
 
 		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'collgroup' );
+		$Session->assert_received_crumb( 'section' );
 
 		// Check permission:
-		$current_User->check_perm( 'blog_group', 'edit', true, $edited_CollGroup->ID );
+		$current_User->check_perm( 'section', 'edit', true, $edited_Section->ID );
 
-		if( $edited_CollGroup->load_from_Request() )
+		if( $edited_Section->load_from_Request() )
 		{
-			if( $edited_CollGroup->dbsave() )
+			if( $edited_Section->dbsave() )
 			{
 				if( is_create_action( $action ) )
 				{
-					$Messages->add( T_('New collection group has been created.'), 'success' );
+					$Messages->add( T_('New section has been created.'), 'success' );
 				}
 				else
 				{
-					$Messages->add( T_('The collection group has been updated.'), 'success' );
+					$Messages->add( T_('The section has been updated.'), 'success' );
 				}
 			}
 
@@ -498,20 +498,27 @@ switch( $action )
 		}
 		break;
 
-	case 'delete_collgroup':
-		// Delete collection group:
+	case 'delete_section':
+		// Delete section:
 
 		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'collgroup' );
+		$Session->assert_received_crumb( 'section' );
 
 		// Check permissions:
-		$current_User->check_perm( 'blog_group', 'view', true, $edited_CollGroup->ID );
+		$current_User->check_perm( 'section', 'view', true, $edited_Section->ID );
+
+		if( $edited_Section->ID == 1 )
+		{	// Forbid to delete default section:
+			$Messages->add( T_('This section cannot be deleted.'), 'error' );
+			$action = 'edit_section';
+			break;
+		}
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{	// confirmed, Delete from DB:
-			$msg = sprintf( T_('Collection group "%s" has been deleted.'), $edited_CollGroup->dget( 'name' ) );
-			$edited_CollGroup->dbdelete();
-			unset( $edited_CollGroup );
+			$msg = sprintf( T_('Section "%s" has been deleted.'), $edited_Section->dget( 'name' ) );
+			$edited_Section->dbdelete();
+			unset( $edited_Section );
 			forget_param( 'cgrp_ID' );
 			$Messages->add( $msg, 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
@@ -521,9 +528,9 @@ switch( $action )
 		else
 		{	// not confirmed, Check for restrictions:
 			memorize_param( 'cgrp_ID', 'integer', $cgrp_ID );
-			if( ! $edited_CollGroup->check_delete( sprintf( T_('Cannot delete collection group "%s"'), $edited_CollGroup->dget( 'name' ) ) ) )
+			if( ! $edited_Section->check_delete( sprintf( T_('Cannot delete section "%s"'), $edited_Section->dget( 'name' ) ) ) )
 			{
-				$action = 'edit_collgroup';
+				$action = 'edit_section';
 			}
 		}
 		break;
@@ -721,8 +728,8 @@ switch( $tab )
 		$activate_collection_toolbar = true;
 		break;
 	
-	case 'collgroup':
-		// Pages to create/edit/delete collection groups:
+	case 'section':
+		// Pages to create/edit/delete sections:
 		$AdminUI->set_path( 'site', 'dashboard' );
 
 		$AdminUI->breadcrumbpath_init( false );
@@ -832,22 +839,22 @@ switch( $action )
 			get_memorized( 'action' ), $delete_notes );
 		break;
 
-	case 'new_collgroup':
-	case 'edit_collgroup':
-	case 'create_collgroup':
-	case 'update_collgroup':
-	case 'delete_collgroup':
-		// Form to create/edit collection group:
+	case 'new_section':
+	case 'edit_section':
+	case 'create_section':
+	case 'update_section':
+	case 'delete_section':
+		// Form to create/edit section:
 
-		if( $action == 'delete_collgroup' )
+		if( $action == 'delete_section' )
 		{	// We need to ask for confirmation:
 			set_param( 'redirect_to', $admin_url.'?ctrl=dashboard' );
-			$edited_CollGroup->confirm_delete(
-				sprintf( T_('Delete collection group "%s"?'),  $edited_CollGroup->dget( 'name' ) ),
-				'collgroup', $action, get_memorized( 'action' ) );
+			$edited_Section->confirm_delete(
+				sprintf( T_('Delete section "%s"?'), $edited_Section->dget( 'name' ) ),
+				'section', $action, get_memorized( 'action' ) );
 		}
 
-		$AdminUI->disp_view( 'collections/views/_coll_group.form.php' );
+		$AdminUI->disp_view( 'collections/views/_section.form.php' );
 		break;
 
 	default:
