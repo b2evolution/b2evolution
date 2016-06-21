@@ -25,6 +25,7 @@ class custom_tags_plugin extends Plugin
 	var $number_of_installs = 1;
 
 	// Internal
+	var $toolbar_label = 'Custom Tags:';
 	var $configurable_post_list = true;
 	var $configurable_comment_list = true;
 	var $configurable_message_list = true;
@@ -39,8 +40,8 @@ class custom_tags_plugin extends Plugin
 	var $email_search_list;
 	var $email_replace_list;
 
-	var $default_search_list = '#\[warning](.+?)\[/warning]#is
-#\[info](.+?)\[/info]#is';
+	var $default_search_list = '[warning] #\[warning](.+?)\[/warning]#is
+[info] #\[info](.+?)\[/info]#is';
 
 	var $default_replace_list = '<div class="alert alert-warning">$1</div>
 <div class="alert alert-info">$1</div>';
@@ -70,6 +71,21 @@ class custom_tags_plugin extends Plugin
 		}
 
 		$search_list_array = explode( "\n", str_replace( "\r", "", $search_list_string ) );
+
+		foreach( $search_list_array as $l => $line )
+		{
+			$line = explode( ' ', $line, 2 );
+			$regexp = $line[1];
+			if( empty( $regexp ) )
+			{ // Bad format of search string
+				unset( $search_list_array[$l] );
+			}
+			else
+			{ // Replace this line with regex value (to delete a button name)
+				$search_list_array[ $l ] = $regexp;
+			}
+		}
+
 		return $search_list_array;
 	}
 
@@ -125,7 +141,7 @@ class custom_tags_plugin extends Plugin
 					'note' => $this->T_('This is the search array for posts (one per line) ONLY CHANGE THESE IF YOU KNOW WHAT YOU\'RE DOING.'),
 					'rows' => 10,
 					'cols' => 60,
-					'defaultvalue' => $this->default_search_list
+					'defaultvalue' => str_replace( '\\\\', '\\\\\\\\', $this->default_search_list )
 				);
 			$plugin_params['coll_post_replace_list'] = array(
 					'label' => $this->T_('Replace list for posts'),
@@ -339,6 +355,295 @@ class custom_tags_plugin extends Plugin
 		$content = replace_content_outcode( $this->email_search_list, $this->email_replace_list, $content, $callback );
 
 		return true;
+	}
+
+	/**
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function AdminDisplayToolbar( & $params )
+	{
+		$params['target_type'] = 'Item';
+		return $this->DisplayCodeToolbar( $params );
+	}
+
+	/**
+	 * Display a code toolbar
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCodeToolbar( & $params )
+	{
+		global $Hit;
+
+		if( $Hit->is_lynx() )
+		{ // let's deactivate quicktags on Lynx, because they don't work there.
+			return false;
+		}
+
+		$params = array_merge( array(
+				'target_type' => 'Item'
+			), $params );
+
+		switch( $params['target_type'] )
+		{
+			case 'Item':
+				$search_list_setting_name = 'coll_post_search_list';
+				$Item = $params['Item'];
+				$item_Blog = & $Item->get_Blog();
+				$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $item_Blog );
+				$search_list = trim( $this->get_coll_setting( $search_list_setting_name, $item_Blog ) );
+				break;
+
+			case 'Comment':
+				$search_list_setting_name = 'coll_comment_search_list';
+				if( !empty( $params['Comment'] ) && !empty( $params['Comment']->item_ID ) )
+				{	// Get Blog from Comment
+					$Comment = & $params['Comment'];
+					$comment_Item = & $Comment->get_Item();
+					$item_Blog = & $comment_Item->get_Blog();
+				}
+				else if( !empty( $params['Item'] ) )
+				{	// Get Blog from Item
+					$comment_Item = & $params['Item'];
+					$item_Blog = & $comment_Item->get_Blog();
+				}
+				$apply_rendering = $this->get_coll_setting( 'coll_apply_comment_rendering', $item_Blog );
+				$search_list = trim( $this->get_coll_setting( $search_list_setting_name, $item_Blog ) );
+				break;
+
+			case 'Message':
+				$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
+				$search_list = trim( $this->get_msg_setting( 'search_list' ) );
+				break;
+
+			case 'EmailCampaign':
+				$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+				$search_list = trim( $this->get_email_setting( 'search_list' ) );
+				break;
+
+			default:
+				// Incorrect param
+				return false;
+				break;
+		}
+
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
+		{	// Don't display a toolbar if plugin is disabled:
+			return false;
+		}
+
+		if( empty( $search_list ) )
+		{	// No list defined
+			return false;
+		}
+
+		$search_list = explode( "\n", str_replace( array( '\r\n', '\n\n' ), '\n', $search_list ) );
+
+		$tagButtons = $this->get_tag_buttons( $search_list );
+
+		if( empty( $tagButtons ) )
+		{	// No buttons for toolbar
+			return false;
+		}
+
+		// Load js to work with textarea
+		require_js( 'functions.js', 'blog', true, true );
+
+		?><script type="text/javascript">
+		//<![CDATA[
+		<?php echo $this->code;?>_tagButtons = new Array();
+		<?php echo $this->code;?>_tagOpenTags = new Array();
+
+
+		<?php echo $this->code;?>_tagButton = function( id, display, style, tagStart, tagEnd, access, tit, open )
+		{
+			this.id = id;							// used to name the toolbar button
+			this.display = display;		// label on button
+			this.style = style;				// style on button
+			this.tagStart = tagStart; // open tag
+			this.tagEnd = tagEnd;			// close tag
+			this.access = access;			// access key
+			this.tit = tit;						// title
+			this.open = open;					// set to -1 if tag does not need to be closed
+		}
+
+		<?php
+		foreach( $tagButtons as $tagButton )
+		{	// Init each button
+		?>
+		<?php echo $this->code;?>_tagButtons[<?php echo $this->code;?>_tagButtons.length] = new <?php echo $this->code;?>_tagButton(
+				'tag_<?php echo $tagButton['title']; ?>'
+				,'<?php echo $tagButton['name']; ?>', ''
+				,'<?php echo $tagButton['start']; ?>', '<?php echo $tagButton['end']; ?>', ''
+				,'<?php echo $tagButton['title']; ?>'
+			);
+		<?php
+		}
+		?>
+
+		<?php echo $this->code;?>_tagGetButton = function( button, i )
+		{
+			return '<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit
+					+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $this->code;?>_tagInsertTag|b2evoCanvas|'+i+'" value="' + button.display + '" />';
+		}
+
+		// Memorize a new open tag
+		<?php echo $this->code;?>_tagAddTag = function( button )
+		{
+			if( <?php echo $this->code;?>_tagButtons[button].tagEnd != '' )
+			{
+				<?php echo $this->code;?>_tagOpenTags[<?php echo $this->code;?>_tagOpenTags.length] = button;
+				document.getElementById(<?php echo $this->code;?>_tagButtons[button].id).style.fontWeight = 'bold';
+			}
+		}
+
+		// Forget about an open tag
+		<?php echo $this->code;?>_tagRemoveTag = function( button )
+		{
+			for ( i = 0; i < <?php echo $this->code;?>_tagOpenTags.length; i++ )
+			{
+				if ( <?php echo $this->code;?>_tagOpenTags[i] == button)
+				{
+					<?php echo $this->code;?>_tagOpenTags.splice(i, 1);
+					document.getElementById(me.tagButtons[button].id).style.fontWeight = 'normal';
+				}
+			}
+		}
+
+		<?php echo $this->code;?>_tagCheckOpenTags = function( button )
+		{
+			var tag = 0;
+			for (i = 0; i < <?php echo $this->code;?>_tagOpenTags.length; i++)
+			{
+				if (<?php echo $this->code;?>_tagOpenTags[i] == button)
+				{
+					tag++;
+				}
+			}
+
+			if (tag > 0)
+			{
+				return true; // tag found
+			}
+			else
+			{
+				return false; // tag not found
+			}
+		}
+
+		<?php echo $this->code;?>_tagCloseAllTags = function()
+		{
+			var count = <?php echo $this->code;?>_tagOpenTags.length;
+			for (o = 0; o < count; o++)
+			{
+				<?php echo $this->code;?>_tagInsertTag(b2evoCanvas, <?php echo $this->code;?>_tagOpenTags[<?php echo $this->code;?>_tagOpenTags.length - 1] );
+			}
+		}
+
+		<?php echo $this->code;?>_tagToolbar = function()
+		{
+			var tagcode_toolbar = '<?php echo $this->get_template( 'toolbar_title_before' ).$this->toolbar_label.' '.$this->get_template( 'toolbar_title_after' ); ?>';
+			tagcode_toolbar += '<?php echo $this->get_template( 'toolbar_group_before' ); ?>';
+			for( var i = 0; i < <?php echo $this->code;?>_tagButtons.length; i++ )
+			{
+				tagcode_toolbar += <?php echo $this->code;?>_tagGetButton( <?php echo $this->code;?>_tagButtons[i], i );
+			}
+			tagcode_toolbar += '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>';
+			tagcode_toolbar += '<input type="button" id="tag_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $this->code;?>_tagCloseAllTags" title="<?php echo T_('Close all tags') ?>" value="X" />';
+			tagcode_toolbar += '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
+			jQuery( '.<?php echo $this->code; ?>_toolbar' ).html( tagcode_toolbar );
+		}
+
+		/**
+		 * insertion code
+		 */
+		<?php echo $this->code;?>_tagInsertTag = function( myField, i )
+		{
+			// we need to know if something is selected.
+			// First, ask plugins, then try IE and Mozilla.
+			var sel_text = b2evo_Callbacks.trigger_callback("get_selected_text_for_"+myField.id);
+			var focus_when_finished = false; // used for IE
+
+			if( sel_text == null )
+			{ // detect selection:
+				//IE support
+				if(document.selection)
+				{
+					myField.focus();
+					var sel = document.selection.createRange();
+					sel_text = sel.text;
+					focus_when_finished = true;
+				}
+				//MOZILLA/NETSCAPE support
+				else if(myField.selectionStart || myField.selectionStart == '0')
+				{
+					var startPos = myField.selectionStart;
+					var endPos = myField.selectionEnd;
+					sel_text = (startPos != endPos);
+				}
+			}
+
+			if( sel_text )
+			{ // some text selected
+				textarea_wrap_selection( myField, <?php echo $this->code;?>_tagButtons[i].tagStart, <?php echo $this->code;?>_tagButtons[i].tagEnd, 0 );
+			}
+			else
+			{
+				if( !<?php echo $this->code;?>_tagCheckOpenTags(i) || <?php echo $this->code;?>_tagButtons[i].tagEnd == '')
+				{
+					textarea_wrap_selection( myField, <?php echo $this->code;?>_tagButtons[i].tagStart, '', 0 );
+					<?php echo $this->code;?>_tagAddTag(i);
+				}
+				else
+				{
+					textarea_wrap_selection( myField, '', <?php echo $this->code;?>_tagButtons[i].tagEnd, 0 );
+					<?php echo $this->code;?>_tagRemoveTag(i);
+				}
+			}
+			if(focus_when_finished)
+			{
+				myField.focus();
+			}
+		}
+		//]]>
+		</script><?php
+
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
+		echo $this->get_template( 'toolbar_after' );
+		?><script type="text/javascript"><?php echo $this->code;?>_tagToolbar();</script><?php
+
+		return true;
+	}
+
+	function get_tag_buttons( $search_list )
+	{
+		$tagButtons = array();
+
+		foreach( $search_list as $line )
+		{	// Init buttons from regexp lines
+			$line = explode( ' ', $line, 2 );
+			$button_name = $line[0];
+			$button_exp = $line[1];
+			if( !empty( $button_name ) && !empty( $button_exp ) )
+			{
+				$start = preg_replace( '#(.+)\[([a-z0-1=\*\\\\]+)((\(.*\))*)\](.+)#is', '[$2]', $button_exp );
+				$end = preg_replace( '#(.+)\[\/(.+)\](.+)#is', '[/$2]', $button_exp );
+				$tagButtons[ $button_name ] = array(
+						'name'  => $button_name,
+						'start' => str_replace( '\\', '', $start ),
+						'end'   => $end == $button_exp ? '' : $end,
+						'title' => str_replace( array( '[', ']' ), '', $button_name ),
+					);
+			}
+		}
+
+		return $tagButtons;
 	}
 }
 ?>

@@ -758,7 +758,7 @@ function install_basic_plugins( $old_db_version = 0 )
 
 	if( $old_db_version < 11730 )
 	{
-		install_plugin( 'custom_tags_plugin', false );
+		install_plugin( 'custom_tags_plugin', true );
 	}
 }
 
