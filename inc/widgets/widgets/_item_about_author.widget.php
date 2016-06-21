@@ -174,15 +174,10 @@ class item_about_author_Widget extends ComponentWidget
 		}
 
 		$user_info = '';
-		foreach( $creator_User->userfields_by_type[ $this->disp_params['user_field'] ] as $user_field_ID )
-		{
-			if( isset( $creator_User->userfields[ $user_field_ID ] ) )
-			{
-				$user_info .= '<div class="evo_author_display_field">';
-				$user_info .= $creator_User->userfields[ $user_field_ID ]->uf_varchar;
-				$user_info .= '</div>';
-			}
-		}
+
+		$user_info .= '<div class="evo_author_display_field">';
+		$user_info .= $creator_User->userfield_value_by_ID( $this->disp_params['user_field'] );
+		$user_info .= '</div>';
 
 		if( empty( $user_info ) )
 		{ // No user info
