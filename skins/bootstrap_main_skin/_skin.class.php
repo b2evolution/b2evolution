@@ -175,7 +175,7 @@ class bootstrap_main_Skin extends Skin
 				'3_end' => array(
 					'layout' => 'end_fieldset',
 				),
-				'4_start' => array(
+				'section_colorbox_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Colorbox Image Zoom')
 				),
@@ -221,10 +221,12 @@ class bootstrap_main_Skin extends Skin
 						'defaultvalue' => 1,
 						'type' => 'checkbox',
 					),
-				'4_end' => array(
+				'section_colorbox_end' => array(
 					'layout' => 'end_fieldset',
 				),
-				'5_start' => array(
+
+
+				'section_username_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Username options')
 				),
@@ -246,7 +248,7 @@ class bootstrap_main_Skin extends Skin
 						'defaultvalue' => 1,
 						'type' => 'checkbox',
 					),
-				'5_end' => array(
+				'section_username_end' => array(
 					'layout' => 'end_fieldset',
 				),
 
@@ -419,7 +421,7 @@ class bootstrap_main_Skin extends Skin
 		switch( $name )
 		{
 			case 'Results':
-				// Results list:
+				// Results list (Used to view the lists of the users, messages, contacts and etc.):
 				return array(
 					'page_url' => '', // All generated links will refer to the current page
 					'before' => '<div class="results panel panel-default">',
@@ -563,7 +565,7 @@ class bootstrap_main_Skin extends Skin
 
 			case 'compact_form':
 			case 'Form':
-				// Default Form settings:
+				// Default Form settings (Used for any form on front-office):
 				return array(
 					'layout'         => 'fieldset',
 					'formclass'      => 'form-horizontal',
@@ -655,9 +657,9 @@ class bootstrap_main_Skin extends Skin
 					'radio_oneline_start'    => '<label class="radio-inline">',
 					'radio_oneline_end'      => "</label>\n",
 				);
-
+				
 			case 'fixed_form':
-				// Form with fixed label width:
+				// Form with fixed label width (Used for form on disp=user):
 				return array(
 					'layout'         => 'fieldset',
 					'formclass'      => 'form-horizontal',
@@ -702,7 +704,7 @@ class bootstrap_main_Skin extends Skin
 				);
 
 			case 'user_navigation':
-				// The Prev/Next links of users
+				// The Prev/Next links of users (Used on disp=user to navigate between users):
 				return array(
 					'block_start'  => '<ul class="pager">',
 					'prev_start'   => '<li class="previous">',
@@ -717,7 +719,7 @@ class bootstrap_main_Skin extends Skin
 				);
 
 			case 'button_classes':
-				// Button classes
+				// Button classes (Used to initialize classes for action buttons like buttons to spam vote, or edit an intro post):
 				return array(
 					'button'       => 'btn btn-default btn-xs',
 					'button_red'   => 'btn-danger',
@@ -728,12 +730,15 @@ class bootstrap_main_Skin extends Skin
 
 			case 'tooltip_plugin':
 				// Plugin name for tooltips: 'bubbletip' or 'popover'
+				// We should use 'popover' tooltip plugin for bootstrap skins
+				// This tooltips appear on mouse over user logins or on plugin help icons
 				return 'popover';
 				break;
 
 			case 'plugin_template':
-				// Template for plugins
+				// Template for plugins:
 				return array(
+						// This template is used to build a plugin toolbar with action buttons above edit item/comment area:
 						'toolbar_before'       => '<div class="btn-toolbar $toolbar_class$" role="toolbar">',
 						'toolbar_after'        => '</div>',
 						'toolbar_title_before' => '<div class="btn-toolbar-title">',
