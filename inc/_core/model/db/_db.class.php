@@ -222,6 +222,8 @@ class DB
 	 */
 	protected $use_persistent;
 
+	private $saved_error_states;
+
 	// DEBUG:
 
 	/**
