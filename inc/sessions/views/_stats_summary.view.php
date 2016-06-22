@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $cgrp_ID, $admin_url, $AdminUI, $agent_type_color, $hit_type_color, $Hit;
+global $blog, $sec_ID, $admin_url, $AdminUI, $agent_type_color, $hit_type_color, $Hit;
 
 echo '<h2 class="page-title">'.T_('Global hits - Summary').get_manual_link('global_hits_summary').'</h2>';
 
@@ -27,10 +27,10 @@ $SQL->SELECT( 'SQL_NO_CACHE COUNT(*) AS hits, hit_agent_type, hit_type, EXTRACT(
 	EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day' );
 $SQL->FROM( 'T_hitlog' );
 
-if( ! empty( $cgrp_ID ) )
+if( ! empty( $sec_ID ) )
 {	// Filter by section:
 	$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
-	$SQL->WHERE( 'blog_cgrp_ID = '.$DB->quote( $cgrp_ID ) );
+	$SQL->WHERE( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
 }
 if( $blog > 0 )
 {	// Filter by collection:
@@ -48,7 +48,7 @@ if( count( $res_hits ) )
 {
 	// Initialize params to filter by selected collection and/or group:
 	$section_params = empty( $blog ) ? '' : '&blog='.$blog;
-	$section_params .= empty( $cgrp_ID ) ? '' : '&cgrp_ID='.$cgrp_ID;
+	$section_params .= empty( $sec_ID ) ? '' : '&sec_ID='.$sec_ID;
 
 	$last_date = 0;
 

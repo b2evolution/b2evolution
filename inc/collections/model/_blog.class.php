@@ -30,7 +30,7 @@ class Blog extends DataObject
 	 * Group ID
 	 * @var integer
 	 */
-	var $cgrp_ID;
+	var $sec_ID;
 
 	/**
 	 * Short name for use in navigation menus
@@ -162,7 +162,7 @@ class Blog extends DataObject
 			 *       Otherwise it may create issues during upgrade process from old to new DB:
 			 */
 			$this->ID = $db_row->blog_ID;
-			$this->cgrp_ID = isset( $db_row->blog_cgrp_ID ) ? $db_row->blog_cgrp_ID : NULL;
+			$this->sec_ID = isset( $db_row->blog_sec_ID ) ? $db_row->blog_sec_ID : NULL;
 			$this->shortname = $db_row->blog_shortname;
 			$this->name = $db_row->blog_name;
 			$this->owner_user_ID = $db_row->blog_owner_user_ID;
@@ -411,8 +411,8 @@ class Blog extends DataObject
 			$this->set( 'shortname', param( 'blog_shortname', 'string', true ) );
 
 			// Section:
-			param_string_not_empty( 'cgrp_ID', T_('Please select a section.') );
-			$this->set( 'cgrp_ID', param( 'cgrp_ID', 'integer', NULL ), NULL );
+			param_string_not_empty( 'sec_ID', T_('Please select a section.') );
+			$this->set( 'sec_ID', param( 'sec_ID', 'integer', NULL ), NULL );
 
 			// Language / locale:
 			if( param( 'blog_locale', 'string', NULL ) !== NULL )
@@ -989,7 +989,7 @@ class Blog extends DataObject
 		 * ADVANCED ADMIN SETTINGS
 		 */
 		if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ||
-		    ( $this->ID == 0 && $current_User->check_perm( 'section', 'view', false, $this->cgrp_ID ) ) )
+		    ( $this->ID == 0 && $current_User->check_perm( 'section', 'view', false, $this->sec_ID ) ) )
 		{	// We have permission to edit advanced admin settings,
 			// OR user is creating/copy new collection in own group:
 			if( ($blog_urlname = param( 'blog_urlname', 'string', NULL )) !== NULL )

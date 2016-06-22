@@ -45,14 +45,14 @@ if( strpos( $action, 'section' ) !== false )
 {	// Initialize Section object:
 	load_class( 'collections/model/_section.class.php', 'Section' );
 
-	param( 'cgrp_ID', 'integer', 0 );
+	param( 'sec_ID', 'integer', 0 );
 
 	$tab = 'section';
 
-	if( $cgrp_ID > 0 )
+	if( $sec_ID > 0 )
 	{	// Try to get the existing section by requested ID:
 		$SectionCache = & get_SectionCache();
-		$edited_Section = & $SectionCache->get_by_ID( $cgrp_ID );
+		$edited_Section = & $SectionCache->get_by_ID( $sec_ID );
 	}
 	else
 	{	// Create new colleciton group object:
@@ -67,25 +67,25 @@ switch( $action )
 {
 	case 'new':
 		// New collection: Select blog type
-		param( 'cgrp_ID', 'integer', 0, true );
+		param( 'sec_ID', 'integer', 0, true );
 	case 'copy':
 		// Copy collection:
 
-		if( empty( $cgrp_ID ) )
+		if( empty( $sec_ID ) )
 		{
 			if( isset( $edited_Blog ) )
 			{
-				$cgrp_ID = $edited_Blog->cgrp_ID;
-				memorize_param( 'cgrp_ID', 'integer', $cgrp_ID );
+				$sec_ID = $edited_Blog->sec_ID;
+				memorize_param( 'sec_ID', 'integer', $sec_ID );
 			}
 			else
 			{
-				$cgrp_ID = 0;
+				$sec_ID = 0;
 			}
 		}
 
 		// Check permissions:
-		if( ! $current_User->check_perm( 'section', 'view', false, $cgrp_ID ) )
+		if( ! $current_User->check_perm( 'section', 'view', false, $sec_ID ) )
 		{
 			$Messages->add( T_('You don\'t have permission to create a collection.'), 'error' );
 			$redirect_to = param( 'redirect_to', 'url', $admin_url );
@@ -110,10 +110,10 @@ switch( $action )
 	case 'new-installskin':
 		// New collection: Select or Install skin
 
-		param( 'cgrp_ID', 'integer', 0, true );
+		param( 'sec_ID', 'integer', 0, true );
 
 		// Check permissions:
-		$current_User->check_perm( 'section', 'view', true, $cgrp_ID );
+		$current_User->check_perm( 'section', 'view', true, $sec_ID );
 
 		param( 'kind', 'string', true );
 
@@ -123,10 +123,10 @@ switch( $action )
 	case 'new-name':
 		// New collection: Set general parameters
 
-		param( 'cgrp_ID', 'integer', 0 );
+		param( 'sec_ID', 'integer', 0 );
 
 		// Check permissions:
-		$current_User->check_perm( 'section', 'view', true, $cgrp_ID );
+		$current_User->check_perm( 'section', 'view', true, $sec_ID );
 
 		$edited_Blog = new Blog( NULL );
 
@@ -136,9 +136,9 @@ switch( $action )
 		$edited_Blog->init_by_kind( $kind );
 
 		param( 'skin_ID', 'integer', true );
-		if( $cgrp_ID > 0 )
+		if( $sec_ID > 0 )
 		{
-			$edited_Blog->set( 'cgrp_ID', $cgrp_ID );
+			$edited_Blog->set( 'sec_ID', $sec_ID );
 		}
 
 		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( T_('New %s'), get_collection_kinds($kind) ) ) );
@@ -150,10 +150,10 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'collection' );
 
-		param( 'cgrp_ID', 'integer', 0 );
+		param( 'sec_ID', 'integer', 0 );
 
 		// Check permissions:
-		$current_User->check_perm( 'section', 'view', true, $cgrp_ID );
+		$current_User->check_perm( 'section', 'view', true, $sec_ID );
 
 		$edited_Blog = new Blog( NULL );
 
@@ -236,10 +236,10 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'collection' );
 
-		param( 'cgrp_ID', 'integer', 0 );
+		param( 'sec_ID', 'integer', 0 );
 
 		// Check permissions:
-		$current_User->check_perm( 'section', 'view', true, $cgrp_ID );
+		$current_User->check_perm( 'section', 'view', true, $sec_ID );
 
 		if( $edited_Blog->duplicate() )
 		{	// The collection has been duplicated successfully:
@@ -519,7 +519,7 @@ switch( $action )
 			$msg = sprintf( T_('Section "%s" has been deleted.'), $edited_Section->dget( 'name' ) );
 			$edited_Section->dbdelete();
 			unset( $edited_Section );
-			forget_param( 'cgrp_ID' );
+			forget_param( 'sec_ID' );
 			$Messages->add( $msg, 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=dashboard' ); // Will EXIT
@@ -527,7 +527,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			memorize_param( 'cgrp_ID', 'integer', $cgrp_ID );
+			memorize_param( 'sec_ID', 'integer', $sec_ID );
 			if( ! $edited_Section->check_delete( sprintf( T_('Cannot delete section "%s"'), $edited_Section->dget( 'name' ) ) ) )
 			{
 				$action = 'edit_section';

@@ -231,7 +231,7 @@ class sessions_Module extends Module
 	 */
 	function build_menu_1()
 	{
-		global $blog, $cgrp_ID, $admin_url;
+		global $blog, $sec_ID, $admin_url;
 		/**
 		 * @var User
 		 */
@@ -252,7 +252,7 @@ class sessions_Module extends Module
 
 			// Initialize params to filter by selected collection and/or group:
 			$section_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
-			$section_params .= empty( $cgrp_ID ) ? '' : '&amp;cgrp_ID='.$cgrp_ID;
+			$section_params .= empty( $sec_ID ) ? '' : '&amp;sec_ID='.$sec_ID;
 
 			$AdminUI->add_menu_entries(
 					NULL, // root

@@ -31,11 +31,11 @@ $activate_collection_toolbar = true;
 $perm_view_all = $current_User->check_perm( 'stats', 'view' );
 
 // Section ID:
-param( 'cgrp_ID', 'integer', 0, true );
-if( ! $perm_view_all && ! $current_User->check_perm( 'section', 'view', false, $cgrp_ID ) )
+param( 'sec_ID', 'integer', 0, true );
+if( ! $perm_view_all && ! $current_User->check_perm( 'section', 'view', false, $sec_ID ) )
 {
-	forget_param( 'cgrp_ID' );
-	unset( $cgrp_ID );
+	forget_param( 'sec_ID' );
+	unset( $sec_ID );
 }
 
 $tab3 = param( 'tab3', 'string', 'goals', true );

@@ -41,7 +41,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_coll_user_perms'          => $tableprefix.'blogusers',
 		'T_coll_user_favs'           => $tableprefix.'coll_favs',
 		'T_coll_settings'            => $tableprefix.'coll_settings',
-		'T_coll_groups'              => $tableprefix.'coll_groups',
+		'T_section'                  => $tableprefix.'section',
 		'T_comments'                 => $tableprefix.'comments',
 		'T_comments__votes'          => $tableprefix.'comments__votes',
 		'T_comments__prerendering'   => $tableprefix.'comments__prerendering',
@@ -131,7 +131,7 @@ function & get_SectionCache()
 	if( ! isset( $SectionCache ) )
 	{	// Cache doesn't exist yet:
 		load_class( 'collections/model/_section.class.php', 'Section' );
-		$SectionCache = new DataObjectCache( 'Section', false, 'T_coll_groups', 'cgrp_', 'cgrp_ID', 'cgrp_name', 'cgrp_order' ); // COPY (FUNC)
+		$SectionCache = new DataObjectCache( 'Section', false, 'T_section', 'sec_', 'sec_ID', 'sec_name', 'sec_order' ); // COPY (FUNC)
 	}
 
 	return $SectionCache;
@@ -475,7 +475,7 @@ class collections_Module extends Module
 				'perm_api' => $permapi,
 				'perm_createblog' => $permcreateblog,
 				'perm_getblog' => $permgetblog,
-				'perm_default_cgrp_ID' => 1,
+				'perm_default_sec_ID' => 1,
 				'perm_max_createblog_num' => $permmaxcreateblognum,
 				);
 	}
@@ -498,7 +498,7 @@ class collections_Module extends Module
 		}
 		else
 		{	// Load only available sections:
-			$SectionCache->load_where( 'cgrp_ID = 1'.( is_logged_in() ? ' OR cgrp_owner_user_ID = '.$current_User->ID : '' ) );
+			$SectionCache->load_where( 'sec_ID = 1'.( is_logged_in() ? ' OR sec_owner_user_ID = '.$current_User->ID : '' ) );
 		}
 
 		// 'label' is used in the group form as label for radio buttons group
@@ -534,10 +534,10 @@ class collections_Module extends Module
 				'perm_type' => 'checkbox',
 				'note' => T_( 'New users automatically get a new collection (in the Section speciafied below)'),
 				),
-			'perm_default_cgrp_ID' => array(
+			'perm_default_sec_ID' => array(
 				'label' => T_('Default Section for new Collections'),
-				'user_func'  => 'check_default_cgrp_user_perm',
-				'group_func' => 'check_default_cgrp_group_perm',
+				'user_func'  => 'check_default_sec_user_perm',
+				'group_func' => 'check_default_sec_group_perm',
 				'perm_block' => 'blogging',
 				'perm_type' => 'select_object',
 				'object_cache' => $SectionCache,

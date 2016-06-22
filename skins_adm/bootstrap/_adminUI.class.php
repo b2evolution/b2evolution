@@ -843,21 +843,21 @@ class AdminUI extends AdminUI_general
 
 		if( $this->coll_list_disp_sections )
 		{	// Check if filter by section is used currently:
-			$cgrp_ID = param( 'cgrp_ID', 'integer', 0 );
-			if( ! is_logged_in() || ! ( $current_User->check_perm( 'stats', 'view' ) || $current_User->check_perm( 'section', 'view', false, $cgrp_ID ) ) )
+			$sec_ID = param( 'sec_ID', 'integer', 0 );
+			if( ! is_logged_in() || ! ( $current_User->check_perm( 'stats', 'view' ) || $current_User->check_perm( 'section', 'view', false, $sec_ID ) ) )
 			{
-				$cgrp_ID = 0;
-				set_param( 'cgrp_ID', 0 );
+				$sec_ID = 0;
+				set_param( 'sec_ID', 0 );
 			}
 		}
 
 		if( !empty( $this->coll_list_all_title ) )
 		{ // We want to add an "all" button
-			$r .= $template[ empty( $cgrp_ID ) && $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
+			$r .= $template[ empty( $sec_ID ) && $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
 			$r .= '<a href="'.$this->coll_list_all_url
-						.'" class="btn btn-default'.( empty( $cgrp_ID ) && $blog == 0 ? ' active' : '' ).'">'
+						.'" class="btn btn-default'.( empty( $sec_ID ) && $blog == 0 ? ' active' : '' ).'">'
 						.$this->coll_list_all_title.'</a> ';
-			$r .= $template[ empty( $cgrp_ID ) && $blog == 0 ? 'afterEachSel' : 'afterEach' ];
+			$r .= $template[ empty( $sec_ID ) && $blog == 0 ? 'afterEachSel' : 'afterEach' ];
 		}
 
 		$r .= $template['buttons_start'];
@@ -899,19 +899,19 @@ class AdminUI extends AdminUI_general
 			}
 			else
 			{	// Load only available sections:
-				$SectionCache->load_where( 'cgrp_owner_user_ID = '.$current_User->ID );
+				$SectionCache->load_where( 'sec_owner_user_ID = '.$current_User->ID );
 			}
 
 			foreach( $SectionCache->cache as $Section )
 			{	// Loop through all sections that match the requested permission:
-				$collection_groups .= ( $Section->ID == $cgrp_ID ) ? $template['beforeEachSel'] : $template['beforeEach'];
+				$collection_groups .= ( $Section->ID == $sec_ID ) ? $template['beforeEachSel'] : $template['beforeEach'];
 
-				$collection_groups .= '<a href="'.$url_params.'blog=0&amp;cgrp_ID='.$Section->ID
-					.'" class="btn btn-default'.( $Section->ID == $cgrp_ID ? ' active' : '' ).'">'
+				$collection_groups .= '<a href="'.$url_params.'blog=0&amp;sec_ID='.$Section->ID
+					.'" class="btn btn-default'.( $Section->ID == $sec_ID ? ' active' : '' ).'">'
 						.$Section->dget( 'name', 'htmlbody' )
 					.'</a> ';
 
-				$collection_groups .= ( $Section->ID == $cgrp_ID ) ? $template['afterEachSel'] : $template['afterEach'];
+				$collection_groups .= ( $Section->ID == $sec_ID ) ? $template['afterEachSel'] : $template['afterEach'];
 			}
 
 			$collection_groups = empty( $collection_groups ) ? '' : '<div class="btn-group">'.$collection_groups.'</div>';

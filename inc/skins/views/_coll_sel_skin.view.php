@@ -22,7 +22,7 @@ echo '<h2 class="page-title">'.sprintf( T_('New %s'), $kind_title ).':</h2>';
 if( $action == 'new-selskin' )
 {	// Select an existing skin:
 
-	$coll_url_suffix = get_param( 'cgrp_ID' ) ? '&amp;cgrp_ID='.get_param( 'cgrp_ID' ) : '';
+	$coll_url_suffix = get_param( 'sec_ID' ) ? '&amp;sec_ID='.get_param( 'sec_ID' ) : '';
 
 	echo '<h3>'.sprintf( T_('Pick an existing skin below: (or <a %s>install a new one now</a>)'), 'href="'.$admin_url.'?ctrl=collections&amp;action=new-installskin&amp;kind='.$kind.$coll_url_suffix.'&amp;skin_type=normal"' ).'</h3>';
 

@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $cgrp_ID, $admin_url, $rsc_url;
+global $blog, $sec_ID, $admin_url, $rsc_url;
 global $Session, $UserSettings;
 
 /**
@@ -117,7 +117,7 @@ $Results->title = T_('Recent goal hits').get_manual_link( 'goal-hits' );
 
 // Initialize params to filter by selected collection and/or group:
 $section_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
-$section_params .= empty( $cgrp_ID ) ? '' : '&amp;cgrp_ID='.$cgrp_ID;
+$section_params .= empty( $sec_ID ) ? '' : '&amp;sec_ID='.$sec_ID;
 
 /**
  * Callback to add filters on top of the result set

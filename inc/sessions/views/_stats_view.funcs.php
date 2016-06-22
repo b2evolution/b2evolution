@@ -26,7 +26,7 @@ function hits_results( & $Results, $params = array() )
 			'default_order' => '--D'
 		), $params );
 
-	global $blog, $cgrp_ID, $Session, $sess_ID;
+	global $blog, $sec_ID, $Session, $sess_ID;
 	global $preset_results_title, $preset_referer_type, $preset_filter_all_url;
 	global $hide_columns, $admin_url;
 
@@ -39,7 +39,7 @@ function hits_results( & $Results, $params = array() )
 
 	// Initialize params to filter by selected collection and/or group:
 	$section_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
-	$section_params .= empty( $cgrp_ID ) ? '' : '&amp;cgrp_ID='.$cgrp_ID;
+	$section_params .= empty( $sec_ID ) ? '' : '&amp;sec_ID='.$sec_ID;
 
 	$filter_presets = array();
 	$filter_presets['all'] = array( T_('All'), isset( $preset_filter_all_url ) ? $preset_filter_all_url : $admin_url.'?ctrl=stats&amp;tab='.$tab.$section_params.'&amp;'.$param_prefix.'order='.$params['default_order'] );

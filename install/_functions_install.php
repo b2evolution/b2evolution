@@ -236,7 +236,7 @@ function install_newdb()
 	// We need to have at least one section because it is a required field for collection:
 	global $DB;
 	task_begin( 'Creating default section... ' );
-	$DB->query( 'INSERT INTO T_coll_groups ( cgrp_ID, cgrp_name, cgrp_order, cgrp_owner_user_ID )
+	$DB->query( 'INSERT INTO T_section ( sec_ID, sec_name, sec_order, sec_owner_user_ID )
 		VALUES ( 1, "No Section", 1, 1 )' );
 	task_end();
 

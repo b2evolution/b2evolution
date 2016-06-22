@@ -27,7 +27,7 @@ echo '<table class="coll_kind">';
 
 if( $blog_kinds = get_collection_kinds() )
 {
-	$coll_url_suffix = get_param( 'cgrp_ID' ) ? '&amp;cgrp_ID='.get_param( 'cgrp_ID' ) : '';
+	$coll_url_suffix = get_param( 'sec_ID' ) ? '&amp;sec_ID='.get_param( 'sec_ID' ) : '';
 	foreach( $blog_kinds as $kind => $info )
 	{
 		echo '<tr>';

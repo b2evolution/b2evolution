@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $cgrp_ID, $admin_url;
+global $blog, $sec_ID, $admin_url;
 
 $final = param( 'final', 'integer', 0, true );
 $goal_name = param( 'goal_name', 'string', NULL, true );
@@ -55,7 +55,7 @@ $goal_rows = $DB->get_results( $SQL->get(), OBJECT, 'Get list of all goals' );
 
 // Initialize params to filter by selected collection and/or group:
 $section_params = empty( $blog ) ? '' : '&blog='.$blog;
-$section_params .= empty( $cgrp_ID ) ? '' : '&cgrp_ID='.$cgrp_ID;
+$section_params .= empty( $sec_ID ) ? '' : '&sec_ID='.$sec_ID;
 
 /*
  * Chart

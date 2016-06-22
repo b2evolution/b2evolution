@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $cgrp_ID, $admin_url, $rsc_url;
+global $blog, $sec_ID, $admin_url, $rsc_url;
 global $Session;
 
 $perm_options_edit = $current_User->check_perm( 'options', 'edit', false );
@@ -80,7 +80,7 @@ $Results->title = T_('Goals').get_manual_link( 'goal-settings' );
 
 // Initialize params to filter by selected collection and/or group:
 $section_params = empty( $blog ) ? '' : '&blog='.$blog;
-$section_params .= empty( $cgrp_ID ) ? '' : '&cgrp_ID='.$cgrp_ID;
+$section_params .= empty( $sec_ID ) ? '' : '&sec_ID='.$sec_ID;
 
 /**
  * Callback to add filters on top of the result set

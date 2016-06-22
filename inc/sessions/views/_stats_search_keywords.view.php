@@ -21,7 +21,7 @@ require_once dirname(__FILE__).'/_stats_view.funcs.php';
 load_class( '/sessions/model/_goal.class.php', 'Goal' );
 load_funcs('/cron/_cron.funcs.php');
 
-global $blog, $cgrp_ID, $admin_url, $rsc_url, $goal_ID, $localtimenow;
+global $blog, $sec_ID, $admin_url, $rsc_url, $goal_ID, $localtimenow;
 global $datestartinput, $datestart, $datestopinput, $datestop;
 
 if( param_date( 'datestartinput', T_('Invalid date'), false,  NULL ) !== NULL )
@@ -124,10 +124,10 @@ else
 		$SQL->GROUP_BY( 'keyp_ID' );
 	}
 
-	if( ! empty( $cgrp_ID ) )
+	if( ! empty( $sec_ID ) )
 	{	// Filter by section:
 		$SQL->FROM_add( 'LEFT JOIN T_blogs ON T_hitlog.hit_coll_ID = blog_ID' );
-		$SQL->WHERE_and( 'blog_cgrp_ID = '.$cgrp_ID );
+		$SQL->WHERE_and( 'blog_sec_ID = '.$sec_ID );
 	}
 	if( ! empty($blog) )
 	{	// Filter by collection:
@@ -198,7 +198,7 @@ function filter_keyphrases( & $Form )
 
 // Initialize params to filter by selected collection and/or group:
 $section_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
-$section_params .= empty( $cgrp_ID ) ? '' : '&amp;cgrp_ID='.$cgrp_ID;
+$section_params .= empty( $sec_ID ) ? '' : '&amp;sec_ID='.$sec_ID;
 
 $today = date( 'Y-m-d', $localtimenow );
 $Results->filter_area = array(

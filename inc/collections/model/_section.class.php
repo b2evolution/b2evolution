@@ -39,14 +39,14 @@ class Section extends DataObject
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( 'T_coll_groups', 'cgrp_', 'cgrp_ID' );
+		parent::__construct( 'T_section', 'sec_', 'sec_ID' );
 
 		if( $db_row != NULL )
 		{
-			$this->ID            = $db_row->cgrp_ID;
-			$this->name          = $db_row->cgrp_name;
-			$this->order         = $db_row->cgrp_order;
-			$this->owner_user_ID = $db_row->cgrp_owner_user_ID;
+			$this->ID            = $db_row->sec_ID;
+			$this->name          = $db_row->sec_name;
+			$this->order         = $db_row->sec_order;
+			$this->owner_user_ID = $db_row->sec_owner_user_ID;
 		}
 		else
 		{
@@ -64,7 +64,7 @@ class Section extends DataObject
 	static function get_delete_restrictions()
 	{
 		return array(
-				array( 'table' => 'T_blogs', 'fk' => 'blog_cgrp_ID', 'msg' => T_('%d collections in this group') ),
+				array( 'table' => 'T_blogs', 'fk' => 'blog_sec_ID', 'msg' => T_('%d collections in this group') ),
 			);
 	}
 
@@ -79,17 +79,17 @@ class Section extends DataObject
 		// Name:
 		if( $this->ID != 1 )
 		{	// Only if not first default section:
-			param_string_not_empty( 'cgrp_name', T_('Please enter a section name.') );
+			param_string_not_empty( 'sec_name', T_('Please enter a section name.') );
 			$this->set_from_Request( 'name' );
 		}
 
 		// Owner:
-		$cgrp_owner_login = param( 'cgrp_owner_login', 'string', '' );
+		$sec_owner_login = param( 'sec_owner_login', 'string', '' );
 		$UserCache = & get_UserCache();
-		$owner_User = & $UserCache->get_by_login( $cgrp_owner_login );
+		$owner_User = & $UserCache->get_by_login( $sec_owner_login );
 		if( empty( $owner_User ) )
 		{
-			param_error( 'owner_login', sprintf( T_('User &laquo;%s&raquo; does not exist!'), $cgrp_owner_login ) );
+			param_error( 'owner_login', sprintf( T_('User &laquo;%s&raquo; does not exist!'), $sec_owner_login ) );
 		}
 		else
 		{
@@ -98,11 +98,11 @@ class Section extends DataObject
 		}
 
 		// Order:
-		if( param( 'cgrp_order', 'integer' ) !== 0 ) // Allow zero value
+		if( param( 'sec_order', 'integer' ) !== 0 ) // Allow zero value
 		{
-			param_check_not_empty( 'cgrp_order', T_('Please enter an order number.') );
+			param_check_not_empty( 'sec_order', T_('Please enter an order number.') );
 		}
-		$this->set( 'order', param( 'cgrp_order', 'integer' ) );
+		$this->set( 'order', param( 'sec_order', 'integer' ) );
 
 		return ! param_errors_detected();
 	}
@@ -152,7 +152,7 @@ class Section extends DataObject
 		{	// Load collections of this section only on first request and cache the result:
 			$BlogCache = & get_BlogCache();
 			$BlogCache->clear();
-			$BlogCache->load_where( 'blog_cgrp_ID = '.$this->ID );
+			$BlogCache->load_where( 'blog_sec_ID = '.$this->ID );
 			$this->blogs = $BlogCache->cache;
 		}
 

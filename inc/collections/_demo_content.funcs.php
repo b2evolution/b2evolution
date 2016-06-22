@@ -134,7 +134,7 @@ function create_blog(
 
 	$Blog = new Blog( NULL );
 
-	$Blog->set( 'cgrp_ID', $section_ID );
+	$Blog->set( 'sec_ID', $section_ID );
 
 	$Blog->init_by_kind( $kind, $blog_name, $blog_shortname, $blog_urlname );
 

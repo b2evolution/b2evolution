@@ -33,11 +33,11 @@ $activate_collection_toolbar = true;
 $perm_view_all = $current_User->check_perm( 'stats', 'view' );
 
 // Section ID:
-param( 'cgrp_ID', 'integer', 0, true );
-if( ! $perm_view_all && ! $current_User->check_perm( 'section', 'view', false, $cgrp_ID ) )
+param( 'sec_ID', 'integer', 0, true );
+if( ! $perm_view_all && ! $current_User->check_perm( 'section', 'view', false, $sec_ID ) )
 {
-	forget_param( 'cgrp_ID' );
-	unset( $cgrp_ID );
+	forget_param( 'sec_ID' );
+	unset( $sec_ID );
 }
 
 // We set the default to -1 so that blog=0 will make its way into regenerate_url()s whenever watching global stats.
@@ -60,7 +60,7 @@ if( $tab == 'domains' && $current_User->check_perm( 'stats', 'edit' ) )
 	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 }
 
-if( $blog == 0 && empty( $cgrp_ID ) )
+if( $blog == 0 && empty( $sec_ID ) )
 {
 	if( ! $perm_view_all && isset( $collections_Module ) )
 	{ // Find a blog we can view stats for:

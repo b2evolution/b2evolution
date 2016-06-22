@@ -1420,7 +1420,7 @@ function create_demo_contents()
 	}
 
 	task_begin( 'Creating default sections... ' );
-	$DB->query( 'INSERT INTO T_coll_groups ( cgrp_ID, cgrp_name, cgrp_order, cgrp_owner_user_ID )
+	$DB->query( 'INSERT INTO T_section ( sec_ID, sec_name, sec_order, sec_owner_user_ID )
 		VALUES ( 2, "Home",   2, 1 ),
 		       ( 3, "Blogs",  3, '.$jay_moderator_ID.' ),
 		       ( 4, "Photos", 4, '.$dave_blogger_ID.' ),

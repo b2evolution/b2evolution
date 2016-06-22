@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
 
-global $blog, $cgrp_ID, $admin_url, $rsc_url;
+global $blog, $sec_ID, $admin_url, $rsc_url;
 
 
 // TOP REFERRING SEARCH ENGINES
@@ -29,7 +29,7 @@ global $blog, $cgrp_ID, $admin_url, $rsc_url;
 
 <?php
 global $res_stats, $row_stats;
-refererList( 20, 'global', 0, 0, "'search'", 'dom_name', $blog, true, false, $cgrp_ID );
+refererList( 20, 'global', 0, 0, "'search'", 'dom_name', $blog, true, false, $sec_ID );
 if( count( $res_stats ) )
 {
 	?>

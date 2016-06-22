@@ -33,7 +33,7 @@ function hits_results_block( $params = array() )
 		return;
 	}
 
-	global $blog, $cgrp_ID, $current_User;
+	global $blog, $sec_ID, $current_User;
 
 	if( $blog == 0 )
 	{
@@ -211,9 +211,9 @@ function hits_results_block( $params = array() )
 	}
 
 
-	if( ! empty( $cgrp_ID ) )
+	if( ! empty( $sec_ID ) )
 	{	// Filter by selected section:
-		$filter = 'blog_cgrp_ID = '.$DB->escape( $cgrp_ID );
+		$filter = 'blog_sec_ID = '.$DB->escape( $sec_ID );
 		$SQL->WHERE_and( $filter );
 		$count_SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
 		$count_SQL->WHERE_and( $filter );
@@ -276,7 +276,7 @@ function refererList(
 	$blog_ID = '', // Collection ID
 	$get_total_hits = false, // Get total number of hits (needed for percentages)
 	$get_user_agent = false, // Get the user agent
-	$cgrp_ID = 0 ) // Section ID
+	$sec_ID = 0 ) // Section ID
 {
 	global $DB, $res_stats, $stats_total_hits, $ReqURI;
 
@@ -320,12 +320,12 @@ function refererList(
 
 	$sql_from_where = '
 			  FROM T_hitlog LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
-			'.( empty( $cgrp_ID ) ? '' : ' LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' ).'
+			'.( empty( $sec_ID ) ? '' : ' LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' ).'
 			 WHERE hit_referer_type IN ('.$type.')
 			   AND hit_agent_type = "browser"';
-	if( ! empty( $cgrp_ID ) )
+	if( ! empty( $sec_ID ) )
 	{	// Filter by section:
-		$sql_from_where .= " AND blog_cgrp_ID = '".$cgrp_ID."'";
+		$sql_from_where .= " AND blog_sec_ID = '".$sec_ID."'";
 	}
 	if( !empty($blog_ID) )
 	{

@@ -38,14 +38,14 @@ $Form->begin_form( 'fform', $creating ?  T_('New section') : T_('Section') );
 
 	$Form->add_crumb( 'section' );
 
-	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',cgrp_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
+	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',sec_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
-	$Form->hidden( 'cgrp_ID', $edited_Section->ID );
+	$Form->hidden( 'sec_ID', $edited_Section->ID );
 
 	// Name:
 	if( $perm_blog_group_edit && $edited_Section->ID != 1 )
 	{
-		$Form->text_input( 'cgrp_name', $edited_Section->get( 'name' ), 50, T_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
+		$Form->text_input( 'sec_name', $edited_Section->get( 'name' ), 50, T_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
 	}
 	else
 	{
@@ -56,7 +56,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New section') : T_('Section') );
 	$owner_User = & $edited_Section->get_owner_User();
 	if( $perm_blog_group_edit )
 	{
-		$Form->username( 'cgrp_owner_login', $owner_User, T_('Owner'), T_('Login of this section\'s owner.'), '', array( 'required' => true ) );
+		$Form->username( 'sec_owner_login', $owner_User, T_('Owner'), T_('Login of this section\'s owner.'), '', array( 'required' => true ) );
 	}
 	else
 	{
@@ -66,7 +66,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New section') : T_('Section') );
 	// Order:
 	if( $perm_blog_group_edit )
 	{
-		$Form->text_input( 'cgrp_order', $edited_Section->get( 'order' ), 5, T_('Order number'), '', array( 'maxlength' => 11, 'required' => true ) );
+		$Form->text_input( 'sec_order', $edited_Section->get( 'order' ), 5, T_('Order number'), '', array( 'maxlength' => 11, 'required' => true ) );
 	}
 	else
 	{

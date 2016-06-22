@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
 
-global $blog, $cgrp_ID, $admin_url, $rsc_url, $current_User, $UserSettings, $tab3;
+global $blog, $sec_ID, $admin_url, $rsc_url, $current_User, $UserSettings, $tab3;
 
 global $dname, $dtyp_normal, $dtyp_searcheng, $dtyp_aggregator, $dtyp_email, $dtyp_unknown;
 
@@ -79,10 +79,10 @@ if( ! empty( $blog ) )
 
 $SQL->FROM( 'T_basedomains LEFT OUTER JOIN T_hitlog ON dom_ID = hit_referer_dom_ID' );
 
-if( ! empty( $cgrp_ID ) )
+if( ! empty( $sec_ID ) )
 {	// Filter by section:
 	$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
-	$SQL->WHERE_and( 'blog_cgrp_ID = '.$cgrp_ID );
+	$SQL->WHERE_and( 'blog_sec_ID = '.$sec_ID );
 }
 
 if( $tab3 == 'top' )
@@ -141,7 +141,7 @@ else
 
 	// Initialize params to filter by selected collection and/or group:
 	$section_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
-	$section_params .= empty( $cgrp_ID ) ? '' : '&amp;cgrp_ID='.$cgrp_ID;
+	$section_params .= empty( $sec_ID ) ? '' : '&amp;sec_ID='.$sec_ID;
 
 	$current_url = $admin_url.'?ctrl=stats&amp;tab=domains&amp;tab3='.$tab3.$section_params;
 }

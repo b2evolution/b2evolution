@@ -173,7 +173,7 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 	$Form->text( 'blog_shortname', $edited_Blog->get( 'shortname' ), 15, T_('Short name'), T_('Will be used in selection menus and throughout the admin interface.'), 255 );
 
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) ||
-	    $current_User->check_perm( 'section', 'view', false, $edited_Blog->cgrp_ID ) )
+	    $current_User->check_perm( 'section', 'view', false, $edited_Blog->sec_ID ) )
 	{ // Permission to edit advanced admin settings
 		$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('URL "filename"'),
 				sprintf( T_('"slug" used to uniquely identify this blog in URLs. Also used as <a %s>default media folder</a>.'),
@@ -192,9 +192,9 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 	}
 	else
 	{	// Load only available sections:
-		$SectionCache->load_where( 'cgrp_ID = 1 OR cgrp_owner_user_ID = '.$current_User->ID );
+		$SectionCache->load_where( 'sec_ID = 1 OR sec_owner_user_ID = '.$current_User->ID );
 	}
-	$Form->select_input_object( 'cgrp_ID', $edited_Blog->get( 'cgrp_ID' ), $SectionCache, T_('Section'), array( 'required' => true ) );
+	$Form->select_input_object( 'sec_ID', $edited_Blog->get( 'sec_ID' ), $SectionCache, T_('Section'), array( 'required' => true ) );
 
 $Form->end_fieldset();
 

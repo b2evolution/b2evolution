@@ -1571,12 +1571,12 @@ function blogs_all_results_block( $params = array() )
 	$SQL->SELECT( 'T_blogs.*, user_login, IF( cufv_user_id IS NULL, 0, 1 ) AS blog_favorite' );
 	if( $params['grouped'] )
 	{	// Get collections with groups:
-		$SQL->SELECT_add( ', cgrp_ID, cgrp_name, cgrp_order, cgrp_owner_user_ID' );
-		$SQL->FROM( 'T_coll_groups' );
-		$SQL->FROM_add( 'LEFT JOIN T_blogs ON cgrp_ID = blog_cgrp_ID' );
+		$SQL->SELECT_add( ', sec_ID, sec_name, sec_order, sec_owner_user_ID' );
+		$SQL->FROM( 'T_section' );
+		$SQL->FROM_add( 'LEFT JOIN T_blogs ON sec_ID = blog_sec_ID' );
 		$SQL->FROM_add( 'LEFT JOIN T_users ON blog_owner_user_ID = user_ID' );
-		$SQL->GROUP_BY( 'blog_ID, cgrp_ID' );
-		$SQL->ORDER_BY( 'cgrp_order, cgrp_name' );
+		$SQL->GROUP_BY( 'blog_ID, sec_ID' );
+		$SQL->ORDER_BY( 'sec_order, sec_name' );
 	}
 	else
 	{	// Get collections without groups:
@@ -1594,7 +1594,7 @@ function blogs_all_results_block( $params = array() )
 			. ' LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0'
 			. ' AND blog_ID = bloggroup_blog_ID'
 			. ' AND bloggroup_group_ID = ' . $current_User->grp_ID . ' )' );
-		$SQL->WHERE( ( $params['grouped'] ? 'cgrp_owner_user_ID = ' . $current_User->ID.' OR ' : '' )
+		$SQL->WHERE( ( $params['grouped'] ? 'sec_owner_user_ID = ' . $current_User->ID.' OR ' : '' )
 			. 'blog_owner_user_ID = ' . $current_User->ID
 			. ' OR bloguser_ismember <> 0'
 			. ' OR bloggroup_ismember <> 0' );
@@ -1729,12 +1729,12 @@ function blogs_results( & $blogs_Results, $params = array() )
 	{	// Display group rows:
 		global $current_User, $admin_url;
 
-		$blogs_Results->group_by = 'cgrp_ID';
+		$blogs_Results->group_by = 'sec_ID';
 		$blogs_Results->ID_col = 'blog_ID';
 
 		$blogs_Results->grp_cols[] = array(
 				'td_colspan' => $cols_num,
-				'td' => '%blog_row_group_name( #cgrp_ID#, #cgrp_name# )%',
+				'td' => '%blog_row_group_name( #sec_ID#, #sec_name# )%',
 			);
 	}
 
@@ -1749,7 +1749,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 		if( $params['grouped'] )
 		{	// Group owner:
 			$blogs_Results->grp_cols[] = array(
-					'td' => '%get_user_identity_link( "", #cgrp_owner_user_ID# )%',
+					'td' => '%get_user_identity_link( "", #sec_owner_user_ID# )%',
 				);
 			$cols_num = 0;
 		}
@@ -1807,7 +1807,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 				);
 			$blogs_Results->grp_cols[] = array(
 					'td_class' => 'shrinkwrap',
-					'td' => '%blog_row_group_order( #cgrp_ID#, #cgrp_order# )%',
+					'td' => '%blog_row_group_order( #sec_ID#, #sec_order# )%',
 				);
 			$cols_num = 0;
 		}
@@ -1830,7 +1830,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 				'th' => T_('Actions'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
-				'td' => '%blog_row_actions( #blog_ID#, #cgrp_ID# )%',
+				'td' => '%blog_row_actions( #blog_ID#, #sec_ID# )%',
 			);
 		if( $params['grouped'] )
 		{	// Group actions:
@@ -1860,16 +1860,16 @@ function blogs_results( & $blogs_Results, $params = array() )
  * @param string Section name
  * @return string Section name with link to edit form if user has a permission
  */
-function blog_row_group_name( $cgrp_ID, $cgrp_name )
+function blog_row_group_name( $sec_ID, $sec_name )
 {
 	global $current_User, $admin_url;
 
-	if( $current_User->check_perm( 'section', 'view', false, $cgrp_ID ) )
+	if( $current_User->check_perm( 'section', 'view', false, $sec_ID ) )
 	{	// If user can view the section:
-		$cgrp_name = '<a href="'.$admin_url.'?ctrl=collections&amp;action=edit_section&amp;cgrp_ID='.$cgrp_ID.'">'.$cgrp_name.'</a>';
+		$sec_name = '<a href="'.$admin_url.'?ctrl=collections&amp;action=edit_section&amp;sec_ID='.$sec_ID.'">'.$sec_name.'</a>';
 	}
 
-	return '<b>'.$cgrp_name.'</b>';
+	return '<b>'.$sec_name.'</b>';
 }
 
 /**
@@ -2052,20 +2052,20 @@ function blog_row_order( $blog_ID, $blog_order )
  * @param integer Section order
  * @return string Link or Text
  */
-function blog_row_group_order( $cgrp_ID, $cgrp_order )
+function blog_row_group_order( $sec_ID, $sec_order )
 {
 	global $current_User, $admin_url;
 
-	if( $current_User->check_perm( 'section', 'edit', false, $cgrp_ID ) )
+	if( $current_User->check_perm( 'section', 'edit', false, $sec_ID ) )
 	{	// Only if current user has a permission to edit sections:
-		$edit_url = $admin_url.'?ctrl=collections&amp;action=edit_section&amp;cgrp_ID='.$cgrp_ID;
-		$r = '<a href="'.$edit_url.'" id="order-section-'.$cgrp_ID.'" style="display:block;">';
-		$r .= $cgrp_order;
+		$edit_url = $admin_url.'?ctrl=collections&amp;action=edit_section&amp;sec_ID='.$sec_ID;
+		$r = '<a href="'.$edit_url.'" id="order-section-'.$sec_ID.'" style="display:block;">';
+		$r .= $sec_order;
 		$r .= '</a>';
 	}
 	else
 	{
-		$r = $cgrp_order;
+		$r = $sec_order;
 	}
 
 	return '<b>'.$r.'</b>';
@@ -2212,7 +2212,7 @@ function blog_row_setting( $blog_ID, $setting_name, $setting_value )
  * @param integer Section ID
  * @return string Action links
  */
-function blog_row_actions( $curr_blog_ID, $cgrp_ID )
+function blog_row_actions( $curr_blog_ID, $sec_ID )
 {
 	global $current_User, $admin_url;
 	$r = '';
@@ -2220,7 +2220,7 @@ function blog_row_actions( $curr_blog_ID, $cgrp_ID )
 	if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
 	{
 		$r .= action_icon( T_('Edit properties...'), 'properties', $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$curr_blog_ID );
-		if( $current_User->check_perm( 'section', 'view', false, $cgrp_ID ) )
+		if( $current_User->check_perm( 'section', 'view', false, $sec_ID ) )
 		{
 			$r .= action_icon( T_('Duplicate this collection...'), 'copy', $admin_url.'?ctrl=collections&amp;action=copy&amp;blog='.$curr_blog_ID );
 		}
@@ -2248,17 +2248,17 @@ function blog_row_group_actions( & $row )
 
 	$r = '';
 
-	if( $current_User->check_perm( 'section', 'edit', false, $row->cgrp_ID ) )
+	if( $current_User->check_perm( 'section', 'edit', false, $row->sec_ID ) )
 	{	// If user can edit the section:
-		$r .= action_icon( T_('Edit this section'), 'edit', $admin_url.'?ctrl=collections&amp;action=edit_section&amp;cgrp_ID='.$row->cgrp_ID );
+		$r .= action_icon( T_('Edit this section'), 'edit', $admin_url.'?ctrl=collections&amp;action=edit_section&amp;sec_ID='.$row->sec_ID );
 	}
-	if( $current_User->check_perm( 'section', 'view', false, $row->cgrp_ID ) )
+	if( $current_User->check_perm( 'section', 'view', false, $row->sec_ID ) )
 	{	// If user can view the section:
-		$r .= action_icon( T_('New Collection').'...', 'new', $admin_url.'?ctrl=collections&amp;action=new&amp;cgrp_ID='.$row->cgrp_ID );
+		$r .= action_icon( T_('New Collection').'...', 'new', $admin_url.'?ctrl=collections&amp;action=new&amp;sec_ID='.$row->sec_ID );
 	}
-	if( $row->cgrp_ID != 1 && $row->blog_ID === NULL && $current_User->check_perm( 'section', 'edit', false, $row->cgrp_ID ) )
+	if( $row->sec_ID != 1 && $row->blog_ID === NULL && $current_User->check_perm( 'section', 'edit', false, $row->sec_ID ) )
 	{	// If user can delete the section(only without collections):
-		$r .= action_icon( T_('Delete this section!'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete_section&amp;cgrp_ID='.$row->cgrp_ID.'&amp;'.url_crumb( 'section' ) );
+		$r .= action_icon( T_('Delete this section!'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete_section&amp;sec_ID='.$row->sec_ID.'&amp;'.url_crumb( 'section' ) );
 	}
 
 	return $r;
