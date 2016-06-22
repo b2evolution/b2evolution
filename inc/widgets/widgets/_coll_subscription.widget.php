@@ -80,12 +80,19 @@ class coll_subscription_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		global $Blog, $admin_url;
+
 		$r = array_merge( array(
 				'title' => array(
 					'label' => T_('Block title'),
 					'note' => T_('Title to display in your skin.'),
 					'size' => 40,
 					'defaultvalue' => T_('Subscribe to Updates'),
+				),
+				'note' => array(
+					'label' => T_('Note'),
+					'info' => sprintf( T_('You can configure which subscriptions are possible in Features > Other > <a %s>Subscriptions</a>'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=more&amp;blog='.$Blog->ID.'"' ),
+					'type' => 'info',
 				),
 				'display_mode' => array(
 					'label' => T_('Display mode'),
@@ -122,9 +129,9 @@ class coll_subscription_Widget extends ComponentWidget
 		global $current_User;
 
 		$allow_subscriptions = $Blog->get_setting( 'allow_subscriptions'	);
-		$allow_item_subscriptions = $Blog->get_setting( 'allow_item_subscriptions' );
+		$allow_comment_subscriptions = $Blog->get_setting( 'allow_comment_subscriptions' );
 
-		if( $current_User && ( $allow_subscriptions || $allow_item_subscriptions ) )
+		if( $current_User && ( $allow_subscriptions || $allow_comment_subscriptions ) )
 		{
 			$samedomain_htsrv_url = get_samedomain_htsrv_url();
 			$subscriptions = get_user_subscription( $current_User->ID, $Blog->ID );
@@ -172,7 +179,7 @@ class coll_subscription_Widget extends ComponentWidget
 					{
 						$options[] = array( 'cb_sub_items', 1, T_('All posts'), $items_subscribed, false );
 					}
-					if( $allow_item_subscriptions )
+					if( $allow_comment_subscriptions )
 					{
 						$options[] = array( 'cb_sub_comments', 1, T_('All comments'), $comments_subscribed, false );
 					}
@@ -218,7 +225,7 @@ class coll_subscription_Widget extends ComponentWidget
 									in this collection.</p>';
 						}
 					}
-					if( $allow_item_subscriptions )
+					if( $allow_comment_subscriptions )
 					{
 						if( $comments_subscribed )
 						{

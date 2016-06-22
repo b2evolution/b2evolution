@@ -3732,7 +3732,7 @@ class Comment extends DataObject
 			}
 
 			// Get list of users who want to be notified about this blog comments:
-			if( $comment_item_Blog->get_setting( 'allow_subscriptions' ) )
+			if( $comment_item_Blog->get_setting( 'allow_comment_subscriptions' ) )
 			{	// If blog subscription is allowed:
 				$sql = 'SELECT DISTINCT user_ID
 								FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = user_ID
