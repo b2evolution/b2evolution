@@ -86,7 +86,7 @@ function item_unlink( link_ID )
 	var b2evoCanvas = window.parent.document.getElementById( 'itemform_post_content' );
 	if( b2evoCanvas != null )
 	{ // Canvas exists
-		var regexp = new RegExp( '\\\[(image|file|inline):' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
+		var regexp = new RegExp( '\\\[(image|file|inline|video|audio):' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
 		textarea_str_replace( b2evoCanvas, regexp, '', window.parent.document );
 	}
 }

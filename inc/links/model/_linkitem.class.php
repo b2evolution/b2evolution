@@ -271,7 +271,7 @@ class LinkItem extends LinkOwner
 
 		if( ! empty( $link_ID ) )
 		{ // Find inline image placeholders if link ID is defined
-			preg_match_all( '/\[(image|file|inline):'.$link_ID.':?[^\]]*\]/i', $this->Item->content, $inline_images );
+			preg_match_all( '/\[(image|file|inline|video|audio):'.$link_ID.':?[^\]]*\]/i', $this->Item->content, $inline_images );
 			if( ! empty( $inline_images[0] ) )
 			{ // There are inline image placeholders in the post content
 				$this->Item->set( 'content', str_replace( $inline_images[0], '', $this->Item->content ) );

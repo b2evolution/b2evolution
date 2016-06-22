@@ -3282,7 +3282,7 @@ class Item extends ItemLight
 				$params[ $param_key ] = & $params[ $param_key ];
 			}
 
-			if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $params ) ) != 0 )
+			if( $Link->get( 'position' ) != 'attachment' && count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $params ) ) != 0 )
 			{
 				continue;
 			}
@@ -5959,7 +5959,7 @@ class Item extends ItemLight
 		$content = array_shift( $content_parts );
 
 		// Remove inline images from excerpt // [image:123:caption:.class] [file:123:caption:.class] [inline:123:.class]
-		$content = preg_replace( '/\[(image|file|inline):\d+:?[^\]]*\]/i', '', $content );
+		$content = preg_replace( '/\[(image|file|inline|video|audio):\d+:?[^\]]*\]/i', '', $content );
 
 		return excerpt( $content, $maxlen, $tail );
 	}
@@ -7646,7 +7646,7 @@ class Item extends ItemLight
 		global $Plugins;
 
 		// Find all matches with inline tags
-		preg_match_all( '/\[(image|file|inline|video):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
+		preg_match_all( '/\[(image|file|inline|video|audio):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
 
 		if( !empty( $inlines[0] ) )
 		{ // There are inline tags in the content...
@@ -7664,7 +7664,7 @@ class Item extends ItemLight
 
 			foreach( $inlines[0] as $i => $current_link_tag )
 			{
-				$inline_type = $inlines[1][$i]; // image|file|inline|video
+				$inline_type = $inlines[1][$i]; // image|file|inline|video|audio
 				$current_link_ID = (int)$inlines[2][$i];
 
 				if( empty( $current_link_ID ) )
@@ -7837,6 +7837,37 @@ class Item extends ItemLight
 							// We need to assign the result of trigger_event_first_true to a variable before counting
 							// or else modifications to the params are not applied in PHP7
 							$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_video_params );
+							if( count( $r_params ) != 0 )
+							{
+								$link_tag = $r_params['data'];
+							}
+							else
+							{ // no plugin available or was able to render the tag
+								$link_tag = $current_link_tag;
+							}
+						}
+						else
+						{ // not a video file, do not process
+							$link_tag = $current_link_tag;
+						}
+						break;
+
+					case 'audio': // valid file type: audio
+						if( $File->is_audio() )
+						{
+							$current_audio_params = $params;
+							// Create an empty dummy element where the plugin is expected to append the rendered video
+							$current_audio_params['data'] = '';
+
+							foreach( $current_audio_params as $param_key => $param_value )
+							{ // Pass all params by reference, in order to give possibility to modify them by plugin
+								// So plugins can add some data before/after tags (E.g. used by infodots plugin)
+								$current_audio_params[ $param_key ] = & $current_audio_params[ $param_key ];
+							}
+
+							// We need to assign the result of trigger_event_first_true to a variable before counting
+							// or else modifications to the params are not applied in PHP7
+							$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_audio_params );
 							if( count( $r_params ) != 0 )
 							{
 								$link_tag = $r_params['data'];
