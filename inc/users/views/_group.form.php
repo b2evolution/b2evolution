@@ -301,4 +301,21 @@ jQuery( 'input[name=edited_grp_usage]' ).click( function()
 		jQuery( 'fieldset', primary_field_ids ).hide();
 	}
 } );
+
+function set_activity_default_section()
+{
+	if( jQuery( 'input[name=edited_grp_perm_createblog], input[name=edited_grp_perm_getblog]' ).is( ':checked' ) )
+	{	// Enable if at least one checkbox is checked:
+		jQuery( 'select[name=edited_grp_perm_default_sec_ID]' ).removeAttr( 'disabled' );
+	}
+	else
+	{	// Disable otherwise:
+		jQuery( 'select[name=edited_grp_perm_default_sec_ID]' ).attr( 'disabled', 'disabled' );
+	}
+}
+jQuery( 'input[name=edited_grp_perm_createblog], input[name=edited_grp_perm_getblog]' ).click( function()
+{	// Enable/Disable setting "Default Section" depending on checkboxes of "Creating new blogs":
+	set_activity_default_section();
+} );
+set_activity_default_section();
 </script>
