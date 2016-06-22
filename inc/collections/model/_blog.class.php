@@ -263,6 +263,7 @@ class Blog extends DataObject
 	{
 		// Allow email subscriptions by default:
 		$this->set_setting( 'allow_subscriptions', '1' );
+		$this->set_setting( 'allow_comment_subscriptions', '1' );
 		$this->set_setting( 'allow_item_subscriptions', '1' );
 
 		switch( $kind )
@@ -774,6 +775,10 @@ class Blog extends DataObject
 				}
 			}
 			$this->set_setting( 'post_moderation_statuses', implode( ',', $post_moderation_statuses ) );
+
+			// Subscriptions:
+			$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
+			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 		}
 
 		if( in_array( 'comments', $groups ) )
@@ -791,6 +796,7 @@ class Blog extends DataObject
 			$this->set_setting( 'moderation_statuses', implode( ',', $blog_moderation_statuses ) );
 
 			$this->set_setting( 'comment_quick_moderation',  param( 'comment_quick_moderation', 'string', 'expire' ) );
+			$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'comments_detect_email', param( 'comments_detect_email', 'integer', 0 ) );
 			$this->set_setting( 'comments_register', param( 'comments_register', 'integer', 0 ) );
@@ -846,6 +852,7 @@ class Blog extends DataObject
 
 			// Subscriptions:
 			$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
+			$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 
 			// Sitemaps:

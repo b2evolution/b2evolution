@@ -7498,6 +7498,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11780, 'Upgrading subscription settings of collections...' ) )
+	{	// part of 6.7.4-stable
+		$DB->query( 'REPLACE INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
+				SELECT cset_coll_ID, "allow_comment_subscriptions", 1
+				  FROM T_coll_settings
+				 WHERE cset_name = "allow_subscriptions"
+				   AND cset_value = 1' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
