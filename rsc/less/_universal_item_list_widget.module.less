@@ -5,7 +5,7 @@
 @placeholder-background-color: #f0f0f0; // Background color of the Placeholder
 @placeholder-icon-color: #dcdcdc; // Color of the icon inside the Placeholder element
 
-div.widget_core_coll_item_list, 
+div.widget_core_coll_item_list,
 div.widget_core_coll_featured_posts,
 div.widget_core_coll_post_list,
 div.widget_core_coll_page_list,
@@ -13,7 +13,7 @@ div.widget_core_coll_related_post_list {
 
 	// RWD layout
 	&.evo_layout_rwd {
-	
+
 		.widget_rwd_content {
 			padding: 8px;
 			margin: 14px 0;
@@ -25,15 +25,15 @@ div.widget_core_coll_related_post_list {
 		&.evo_withteaser, &.evo_withexcerpt {
 			// Wrapper div
 			.widget_rwd_blocks {
-				// 
+				//
 				> div {
 					display: inline-block;
 					float: none; // We removed default bootstrap's style here because of the issue with floated divs with uneven heights in multiple rows
 					vertical-align: top;
 				}
-			
+
 				.widget_rwd_content {
-					
+
 					// Important for limiting the max image size to it's parent's max width
 					.item_first_image img {
 						max-width: 100%;
@@ -114,7 +114,7 @@ div.widget_core_coll_related_post_list {
 	// FP: I did not find a better way than to include this in &.evo_layout_list
 	// First image when selected "Display first image"
 	&.evo_layout_list div.item_first_image {
-		float: left; 
+		float: left;
 		margin-right: 6px;
 	}
 
@@ -143,7 +143,7 @@ div.widget_core_coll_related_post_list {
 	&.evo_withexcerpt, &.evo_withteaser {
 		// Special treatment - remove bullets
 		&.evo_1pic__special ul li {
-			list-style: none;	
+			list-style: none;
 			display: table;
 			div.item_title a {
 				text-decoration: underline;
@@ -172,8 +172,8 @@ div.widget_core_coll_related_post_list {
 		}
 	}
 	// With teaser specific layout (with "..." button)
-	&.evo_noexcerpt.evo_withteaser {
-			div.item_content {
+	&.evo_noexcerpt.evo_withteaser,&.evo_withexcerpt.evo_withteaser,&.evo_withexcerpt.evo_noteaser {
+			div.item_content,div.item_excerpt {
 				p {
 					margin: 0;
 					&:last-of-type {
@@ -190,7 +190,7 @@ div.widget_core_coll_related_post_list {
 					padding: 5px 15px;
 				}
 				// Simulation of bootstrap's btn-default class
-				> a { 
+				> a {
 					margin-left: -3px;
 					display: inline-block;
 					height: 22px;
@@ -219,7 +219,7 @@ div.widget_core_coll_related_post_list {
 						text-decoration: none;
 					}
 				}
-		} 
+		}
 		// Special blockquote style for teaser layout
 		&.evo_1pic__special ul li div.item_content {
 			blockquote {
@@ -246,16 +246,16 @@ div.widget_core_coll_related_post_list {
 	&.evo_withgroup > ul > li {
 		font-size: 17px;
 	}
-	
+
 	div.item_first_image {
 		text-align: center;
 	}
 }
 
 // Only when in Sidebar or Sidebar 2
-div.evo_container__sidebar, 
+div.evo_container__sidebar,
 div.evo_container__sidebar2 {
-	div.widget_core_coll_item_list, 
+	div.widget_core_coll_item_list,
 	div.widget_core_coll_post_list {
 		// If special placement, without teaser, without excerpt
 		&.evo_1pic__special.evo_noexcerpt.evo_noteaser {
@@ -268,7 +268,7 @@ div.evo_container__sidebar2 {
 
 // Responsive layout of the post title when no teaser, no excerpt and special placement
 @media (max-width: 1599px) {
-		div.widget_core_coll_item_list, 
+		div.widget_core_coll_item_list,
 		div.widget_core_coll_post_list {
 			&.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
 				font-size: 20px;
@@ -276,7 +276,7 @@ div.evo_container__sidebar2 {
 		}
 }
 @media (max-width: 1199px) {
-		div.widget_core_coll_item_list, 
+		div.widget_core_coll_item_list,
 		div.widget_core_coll_post_list {
 			&.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
 				font-size: 18px;
