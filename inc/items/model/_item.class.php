@@ -3225,7 +3225,7 @@ class Item extends ItemLight
 				'limit_attach' =>        1000, // Max # of files displayed
 				'limit' =>               1000,
 				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
-				'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore',
+				'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore,attachment',
 				'data'                       => '',
 				'attach_format'              => '$icon_link$ $file_link$ $file_size$ $file_desc$', // $icon_link$ $icon$ $file_link$ $file_size$ $file_desc$
 				'file_link_format'           => '$file_name$', // $icon$ $file_name$ $file_size$ $file_desc$
@@ -3287,8 +3287,8 @@ class Item extends ItemLight
 				continue;
 			}
 
-			if( $File->is_image() )
-			{ // Skip images because these are displayed inline already
+			if( $File->is_image() && $Link->get( 'position' ) != 'attachment' )
+			{ // Skip images (except those in the attachment position) because these are displayed inline already
 				// fp> TODO: have a setting for each linked file to decide whether it should be displayed inline or as an attachment
 				continue;
 			}

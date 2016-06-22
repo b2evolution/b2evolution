@@ -67,7 +67,17 @@ class LinkItem extends LinkOwner
 	 */
 	function get_positions( $file_ID = NULL )
 	{
-		$positions = array(
+		$positions = array();
+
+		$FileCache = & get_FileCache();
+		$File = $FileCache->get_by_ID( $file_ID, false, false );
+		if( $File && $File->is_image() )
+		{ // Only images can have this position
+			// TRANS: Noun - we're talking about a cover image i-e: an image that used as cover for a post
+			$positions['cover'] = T_('Cover');
+		}
+
+		$positions = array_merge( $positions, array(
 				// TRANS: Noun - we're talking about a teaser image i-e: an image that appears before content
 				'teaser'     => T_('Teaser'),
 				// TRANS: Noun - we're talking about a teaser image i-e: an image that appears before content and with image url linked to permalink
@@ -77,17 +87,16 @@ class LinkItem extends LinkOwner
 				// TRANS: Noun - we're talking about a footer image i-e: an image that appears after "more" content separator
 				'aftermore'  => T_('After "more"'),
 				// TRANS: noun - we're talking about an inline image i-e: an image that appears in the middle of some text
-				'inline'     => T_('Inline'),
-				// TRANS: Noun - we're talking about a fallback image i-e: an image that used as fallback for video file
-				'fallback'   => T_('Fallback'),
-			);
+				'inline'     => T_('Inline')
+			) );
 
-		$FileCache = & get_FileCache();
-		if( ( $File = $FileCache->get_by_ID( $file_ID, false, false ) ) && $File->is_image() )
+		if( $File && $File->is_image() )
 		{ // Only images can have this position
-			// TRANS: Noun - we're talking about a cover image i-e: an image that used as cover for a post
-			$positions['cover'] = T_('Cover');
+			// TRANS: Noun - we're talking about a fallback image i-e: an image that used as fallback for video file
+			$positions['fallback'] = T_('Fallback');
 		}
+
+		$positions['attachment'] = T_('Attachment');
 
 		return $positions;
 	}
