@@ -472,7 +472,7 @@ function echo_link_sortable_js()
 <script type="text/javascript">
 jQuery( document ).ready( function()
 {
-	jQuery( '#link_ajax_content table' ).sortable(
+	jQuery( '#attachments_fieldset_table table' ).sortable(
 	{
 		containerSelector: 'table',
 		itemPath: '> tbody',
@@ -480,12 +480,12 @@ jQuery( document ).ready( function()
 		placeholder: '<tr class="placeholder"/>',
 		onDrop: function( $item, container, _super )
 		{
-			jQuery( '#link_ajax_content table tr' ).removeClass( 'odd even' );
-			jQuery( '#link_ajax_content table tr:odd' ).addClass( 'even' );
-			jQuery( '#link_ajax_content table tr:even' ).addClass( 'odd' );
+			jQuery( '#attachments_fieldset_table table tr' ).removeClass( 'odd even' );
+			jQuery( '#attachments_fieldset_table table tr:odd' ).addClass( 'even' );
+			jQuery( '#attachments_fieldset_table table tr:even' ).addClass( 'odd' );
 
 			var link_IDs = '';
-			jQuery( '#link_ajax_content table tr' ).each( function()
+			jQuery( '#attachments_fieldset_table table tr' ).each( function()
 			{
 				var link_ID_cell = jQuery( this ).find( '.link_id_cell' );
 				if( link_ID_cell.length > 0 )
