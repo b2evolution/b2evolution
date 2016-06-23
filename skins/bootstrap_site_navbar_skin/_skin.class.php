@@ -129,9 +129,9 @@ class bootstrap_site_navbar_Skin extends Skin
 		// Get current collection ID:
 		$current_blog_ID = isset( $Blog ) ? $Blog->ID : NULL;
 
-		// Load all sections:
+		// Load all sections except of "No Section":
 		$SectionCache = & get_SectionCache();
-		$SectionCache->load_all();
+		$SectionCache->load_where( 'sec_ID != 1' );
 
 		$this->header_tab_active = NULL;
 		$level0_index = 0;
@@ -204,6 +204,26 @@ class bootstrap_site_navbar_Skin extends Skin
 
 				$level0_index++;
 			}
+		}
+
+		// Load all collection from "No Section" and put them after all section tabs:
+		$BlogCache = & get_BlogCache();
+		$BlogCache->clear();
+		$BlogCache->load_where( 'blog_sec_ID = 1' );
+
+		foreach( $BlogCache->cache as $nosec_Blog )
+		{
+			$header_tabs[] = array(
+					'name' => $nosec_Blog->get( 'shortname' ),
+					'url'  => $nosec_Blog->get( 'url' ),
+				);
+
+			if( $current_blog_ID == $nosec_Blog->ID )
+			{	// Mark this tab as active if this is a current collection:
+				$this->header_tab_active = $level0_index;
+			}
+
+			$level0_index++;
 		}
 
 		// Additional tab with pages and contact links:

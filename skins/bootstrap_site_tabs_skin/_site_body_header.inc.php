@@ -211,7 +211,7 @@ else
 
 <?php
 if( $site_Skin->get_setting( 'grouping' ) &&
-    isset( $header_tabs[ $site_Skin->header_tab_active ] ) &&
+    isset( $header_tabs[ $site_Skin->header_tab_active ]['items'] ) &&
     count( $header_tabs[ $site_Skin->header_tab_active ]['items'] ) > 1 )
 {	// Display sub menus of the selected level 0 tab only when at least two exist:
 ?>
