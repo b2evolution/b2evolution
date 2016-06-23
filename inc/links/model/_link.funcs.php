@@ -419,6 +419,12 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 				'onclick' => 'evo_link_insert_inline( \''.$type.'\', '.$link_ID.', \'\' )',
 				'style'   => 'cursor:default;'
 			) );
+
+		$r .= ' '.get_icon( 'add__yellow', 'imgtag', array(
+				'title'   => T_('Insert thumbnail into the post'),
+				'onclick' => 'evo_link_insert_inline( \'thumbnail\', '.$link_ID.', \'medium:left\' )',
+				'style'   => 'cursor:default;'
+			) );
 	}
 
 	return $r;

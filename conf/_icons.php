@@ -1029,6 +1029,16 @@ function get_icon_info( $name )
 			'fa' => 'plus-circle',
 			'color' => '#0C0'
 		);
+
+		case 'add__yellow': return array(
+			'alt'  => T_('Add'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 32, 224 ),
+			'glyph' => 'plus-sign',
+			'fa' => 'plus-circle',
+			'color' => '#fc0'
+		);
+
 		case 'minus': return array(
 			'alt'  => T_('Remove'),
 			'size' => array( 16, 16 ),

@@ -1159,6 +1159,17 @@ figure {
 .evo_image_block .img-responsive {
   display: inline-block;
 }
+.evo_thumbnail {
+  max-width: 100%;
+}
+.evo_thumbnail__left {
+  float: left;
+  margin: 0 2px 2px 0;
+}
+.evo_thumbnail__right {
+  float: right;
+  margin: 0 0 2px 2px;
+}
 .replied_comment .evo_image_block img {
   max-width: 100%;
   height: auto;

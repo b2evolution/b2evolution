@@ -5959,7 +5959,7 @@ class Item extends ItemLight
 		$content = array_shift( $content_parts );
 
 		// Remove inline images from excerpt // [image:123:caption:.class] [file:123:caption:.class] [inline:123:.class]
-		$content = preg_replace( '/\[(image|file|inline|video|audio):\d+:?[^\]]*\]/i', '', $content );
+		$content = preg_replace( '/\[(image|file|inline|video|audio|thumbnail):\d+:?[^\]]*\]/i', '', $content );
 
 		return excerpt( $content, $maxlen, $tail );
 	}
@@ -7646,7 +7646,7 @@ class Item extends ItemLight
 		global $Plugins;
 
 		// Find all matches with inline tags
-		preg_match_all( '/\[(image|file|inline|video|audio):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
+		preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
 
 		if( !empty( $inlines[0] ) )
 		{ // There are inline tags in the content...
@@ -7664,7 +7664,7 @@ class Item extends ItemLight
 
 			foreach( $inlines[0] as $i => $current_link_tag )
 			{
-				$inline_type = $inlines[1][$i]; // image|file|inline|video|audio
+				$inline_type = $inlines[1][$i]; // image|file|inline|video|audio|thumbnail
 				$current_link_ID = (int)$inlines[2][$i];
 
 				if( empty( $current_link_ID ) )
@@ -7779,6 +7779,75 @@ class Item extends ItemLight
 						}
 						else
 						{ // not an image file, do not process
+							$link_tag = $current_link_tag;
+						}
+						break;
+
+					case 'thumbnail':
+						if( $File->is_image() )
+						{
+							global $thumbnail_sizes;
+
+							$thumbnail_size = 'medium';
+							$thumbnail_position = 'left';
+
+							$thumbnail_classes = array();
+
+							if( ! empty( $inlines[3][$i] ) ) // check if second colon is present
+							{
+								// Get the inline params: caption and class
+								$inline_params = explode( ':', $inlines[4][$i] );
+
+								$valid_thumbnail_sizes = array( 'small', 'medium', 'large' );
+								if( ! empty( $inline_params[0] ) && in_array( $inline_params[0], $valid_thumbnail_sizes ) )
+								{
+									$thumbnail_size = $inline_params[0];
+								}
+
+								$valid_thumbnail_positions = array( 'left', 'right' );
+								if( ! empty( $inline_params[1] ) && in_array( $inline_params[1], $valid_thumbnail_positions ) )
+								{
+									$thumbnail_position = $inline_params[1];
+								}
+
+								if( ! empty( $inline_params[2] ) )
+								{
+									$extra_classes = explode( '.', ltrim( $inline_params[2], '.' ) );
+								}
+							}
+
+							switch( $thumbnail_size )
+							{
+								case 'small':
+									$thumbnail_size = 'fit-128x128';
+									break;
+
+								case 'large':
+									$thumbnail_size = 'fit-320x320';
+									break;
+
+								case 'medium':
+								default:
+									$thumbnail_size = 'fit-192x192';
+									break;
+							}
+
+							$thumbnail_width = isset( $thumbnail_sizes[$thumbnail_size] ) ? $thumbnail_sizes[$thumbnail_size][1] : 192;
+							$thumbnail_height = isset( $thumbnail_sizes[$thumbnail_size] ) ? $thumbnail_sizes[$thumbnail_size][2] : 192;
+
+							$thumbnail_classes[] = 'evo_thumbnail';
+							$thumbnail_classes[] = 'evo_thumbnail__'.$thumbnail_position;
+							if( isset( $extra_classes ) )
+							{
+								$thumbnail_classes = array_merge( $thumbnail_classes, $extra_classes );
+							}
+
+							$link_tag = '<img src="'.$File->get_url().'"'.' width="'.$thumbnail_width.'" height="'.$thumbnail_height.'" '
+									.' class="'.implode(' ', $thumbnail_classes )
+									.'" />';
+						}
+						else
+						{
 							$link_tag = $current_link_tag;
 						}
 						break;
