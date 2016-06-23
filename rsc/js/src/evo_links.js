@@ -187,6 +187,7 @@ function evo_link_change_order( event_object, link_ID, action )
 		{	// Move down:
 			row.next().after( row );
 		}
+		evoFadeSuccess( row );
 	},
 	'POST' );
 
