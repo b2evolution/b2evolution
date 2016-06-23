@@ -511,7 +511,7 @@ class custom_tags_plugin extends Plugin
 				if ( <?php echo $this->code;?>_tagOpenTags[i] == button)
 				{
 					<?php echo $this->code;?>_tagOpenTags.splice(i, 1);
-					document.getElementById(me.tagButtons[button].id).style.fontWeight = 'normal';
+					document.getElementById(<?php echo $this->code;?>_tagButtons[button].id).style.fontWeight = 'normal';
 				}
 			}
 		}
@@ -570,7 +570,7 @@ class custom_tags_plugin extends Plugin
 			var sel_text = b2evo_Callbacks.trigger_callback("get_selected_text_for_"+myField.id);
 			var focus_when_finished = false; // used for IE
 
-			if( sel_text == null )
+			if( sel_text == null || sel_text == false )
 			{ // detect selection:
 				//IE support
 				if(document.selection)
