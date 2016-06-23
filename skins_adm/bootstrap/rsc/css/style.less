@@ -706,14 +706,17 @@ fieldset ul {
 }
 
 // Attachments / links
-#attachmentframe_wrapper {
+#attachments_fieldset_wrapper {
 	width: 100%;
 	height: 160px;
 	position: relative;
-	overflow: hidden;
 	padding-bottom: 6px;
 	box-sizing: content-box;
- .ui-resizable-s {
+	#attachments_fieldset_block {
+		overflow: auto;
+		height: 100%;
+	}
+	.ui-resizable-s {
 		background: #c0c0c0;
 		height: 6px;
 		bottom: 0;
@@ -725,13 +728,6 @@ fieldset ul {
 			text-align: center;
 			display: block;
 		}
-	}
-	#attachmentframe_disabler {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
 	}
 }
 #filelist_tbody {

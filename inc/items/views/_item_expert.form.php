@@ -273,9 +273,10 @@ $Form->begin_form( '', '', $params );
 		&& $current_User->check_perm( 'files', 'view', false ) )
 	{ // Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
 		load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
+		global $LinkOwner; // Initialize this object as global because this is used in many link functions
 		$LinkOwner = new LinkItem( $edited_Item );
 		$fold_images_attachments_block = ( $orig_action != 'update_edit' && $orig_action != 'create_edit' ); // don't fold the links block on these two actions
-		attachment_iframe( $Form, $LinkOwner, $iframe_name, $creating, $fold_images_attachments_block );
+		display_attachments_fieldset( $Form, $LinkOwner, $creating, $fold_images_attachments_block );
 	}
 
 

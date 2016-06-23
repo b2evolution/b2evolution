@@ -268,7 +268,9 @@ module.exports = function(grunt) {
 			// JS files that are used on back-office standard skins:
 			evo_backoffice: {
 				options: {
-					banner: '/* This includes 11 files: functions.js, ajax.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, src/evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js, src/evo_user_org.js, src/evo_rest_api.js */\n'
+					banner: '/* This includes 14 files: functions.js, ajax.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, '+
+						'src/evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js, '+
+						'src/evo_user_org.js, src/evo_rest_api.js, src/evo_links.js */\n'
 				},
 				nonull: true, // Display missing files
 				src: ['rsc/js/functions.js',
@@ -283,13 +285,16 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_report.js',
 							'rsc/js/src/evo_user_deldata.js',
 							'rsc/js/src/evo_user_org.js',
-							'rsc/js/src/evo_rest_api.js'],
+							'rsc/js/src/evo_rest_api.js',
+							'rsc/js/src/evo_links.js'],
 				dest: 'rsc/js/build/evo_backoffice.bmin.js'
 			},
 			// JS files that are used on back-office bootstrap skins:
 			evo_backoffice_bootstrap: {
 				options: {
-					banner: '/* This includes 11 files: functions.js, ajax.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, src/bootstrap-evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js, src/evo_user_org.js, src/evo_rest_api.js */\n'
+					banner: '/* This includes 14 files: functions.js, ajax.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, '+
+						'src/bootstrap-evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js, '+
+						'src/evo_user_org.js, src/evo_rest_api.js, src/evo_links.js */\n'
 				},
 				nonull: true, // Display missing files
 				src: ['rsc/js/functions.js',
@@ -304,7 +309,8 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_report.js',
 							'rsc/js/src/evo_user_deldata.js',
 							'rsc/js/src/evo_user_org.js',
-							'rsc/js/src/evo_rest_api.js'],
+							'rsc/js/src/evo_rest_api.js',
+							'rsc/js/src/evo_links.js'],
 				dest: 'rsc/js/build/bootstrap-evo_backoffice.bmin.js'
 			},
 		},

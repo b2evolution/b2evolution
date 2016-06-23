@@ -1800,8 +1800,16 @@ if( !empty( $Blog ) )
 */
 
 if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action, 'new' ) !== false )
-{ // Initialize js to autocomplete usernames in post/comment form
+{	// Initialize js to autocomplete usernames in post/comment form
 	init_autocomplete_usernames_js();
+	// Require colorbox js:
+	require_js_helper( 'colorbox' );
+	// Require File Uploader js and css:
+	require_js( 'multiupload/fileuploader.js' );
+	require_css( 'fileuploader.css' );
+	// Load JS files to make the links table sortable:
+	require_js( '#jquery#' );
+	require_js( 'jquery/jquery.sortable.min.js' );
 }
 
 if( in_array( $action, array( 'new', 'copy', 'create_edit', 'create_link', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish', 'extract_tags' ) ) )
