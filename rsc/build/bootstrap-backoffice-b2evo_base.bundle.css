@@ -1915,6 +1915,25 @@ div.results .pagination {
   margin-top: 5px;
   margin-bottom: 5px;
 }
+div.results tr.placeholder {
+  display: block;
+  background: red;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+div.results tr.placeholder:before {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+  border-left-color: red;
+  margin-top: -5px;
+  left: 0;
+  border-right: none;
+}
 div.filters {
   margin-bottom: 0;
   background: none;
