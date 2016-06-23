@@ -141,7 +141,7 @@ class custom_tags_plugin extends Plugin
 					'note' => $this->T_('This is the search array for posts (one per line) ONLY CHANGE THESE IF YOU KNOW WHAT YOU\'RE DOING.'),
 					'rows' => 10,
 					'cols' => 60,
-					'defaultvalue' => str_replace( '\\\\', '\\\\\\\\', $this->default_search_list )
+					'defaultvalue' => $this->default_search_list
 				);
 			$plugin_params['coll_post_replace_list'] = array(
 					'label' => $this->T_('Replace list for posts'),

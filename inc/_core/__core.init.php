@@ -1249,8 +1249,8 @@ class _core_Module extends Module
 										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=seo'.$blog_param,
 									),
 									'renderers' => array(
-										'text' => T_('Renderers').'&hellip;',
-										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=renderers'.$blog_param,
+										'text' => T_('Plugins').'&hellip;',
+										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugins'.$blog_param,
 									),
 								)
 						);
@@ -1308,7 +1308,7 @@ class _core_Module extends Module
 					$dev_entries['coll'] = array(
 						'text' => 'Collection = '.$Blog->shortname,
 						'disabled' => true,
-					);					
+					);
 				}
 
 				global $disp, $is_front;
@@ -1317,7 +1317,7 @@ class _core_Module extends Module
 					$dev_entries['disp'] = array(
 						'text' => '$disp = '.$disp,
 						'disabled' => true,
-					);					
+					);
 				}
 
 				global $disp_detail;
@@ -1326,7 +1326,7 @@ class _core_Module extends Module
 					$dev_entries['disp_detail'] = array(
 						'text' => '$disp_detail = '.$disp_detail,
 						'disabled' => true,
-					);					
+					);
 				}
 
 				if( ! empty( $seo_page_type ) )
@@ -1334,7 +1334,7 @@ class _core_Module extends Module
 					$dev_entries['seo_page_type'] = array(
 						'text' => '> '.$seo_page_type,
 						'disabled' => true,
-					);					
+					);
 				}
 
 				global $is_front;
@@ -1343,7 +1343,7 @@ class _core_Module extends Module
 					$dev_entries['front'] = array(
 						'text' => 'This is the FRONT page',
 						'disabled' => true,
-					);					
+					);
 				}
 
 				if( $robots_index === false )
@@ -1608,7 +1608,7 @@ class _core_Module extends Module
 					'href' => $user_subs_url,
 				);
 		}
-	
+
 		$entries['userprefs'] = array(
 				'text'    => '<strong>'.$current_User->get_colored_login( array( 'login_text' => 'name' ) ).'</strong>',
 				'href'    => get_user_profile_url(),
