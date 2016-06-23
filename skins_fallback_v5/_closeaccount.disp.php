@@ -48,13 +48,16 @@ else
 		$Form->radio_input( 'account_close_type', '', $reasons_options, '<b>'.T_('Reason').'</b>', array( 'lines' => true ) );
 	}
 
-	$Form->textarea_input( 'account_close_reason', '', 6, NULL, array( 'cols' => 40, 'maxlength' => 255 ) );
-	echo '<div id="character_counter" class="section_requires_javascript">';
-	echo '<div id="characters_left_block"></div>';
+	$Form->textarea_input( 'account_close_reason', '', 3, NULL, array( 'cols' => 40, 'maxlength' => 255 ) );
+	$Form->info_field( NULL, '%s characters left', array( 'class' => 'section_requires_javascript dimmed', 'name' => 'character_counter' ) );
 ?>
 	<script type="text/javascript">
 		<?php echo 'var counter_text = "'.T_( '%s characters left' ).'";';?>
-		jQuery("#characters_left_block").html( counter_text.replace( "%s", 255 ) );
+		var characterCounter = jQuery("#ffield_character_counter > div");
+
+		jQuery("#ffield_account_close_reason").css( { marginBottom: 0 } );
+		jQuery("div.form-group.radio-group").css( { marginBottom: 0 } );
+		characterCounter.html( counter_text.replace( "%s", 255 ) );
 		jQuery("#account_close_reason").bind( "keyup", function(event)
 		{
 			var char_left = 255 - this.value.length;
@@ -62,7 +65,7 @@ else
 			{
 				char_left = 0;
 			}
-			jQuery("#characters_left_block").html( counter_text.replace( "%s", char_left ) );
+			characterCounter.html( counter_text.replace( "%s", char_left ) );
 		} );
 	</script>
 	<noscript>
