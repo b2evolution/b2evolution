@@ -131,7 +131,8 @@ function & get_SectionCache()
 	if( ! isset( $SectionCache ) )
 	{	// Cache doesn't exist yet:
 		load_class( 'collections/model/_section.class.php', 'Section' );
-		$SectionCache = new DataObjectCache( 'Section', false, 'T_section', 'sec_', 'sec_ID', 'sec_name', 'sec_order' ); // COPY (FUNC)
+		load_class( 'collections/model/_sectioncache.class.php', 'SectionCache' );
+		$SectionCache = new SectionCache(); // COPY (FUNC)
 	}
 
 	return $SectionCache;
@@ -488,18 +489,8 @@ class collections_Module extends Module
 	 */
 	function get_available_group_permissions()
 	{
-		global $current_User;
-
 		$SectionCache = & get_SectionCache();
-		$SectionCache->clear();
-		if( is_logged_in() && $current_User->check_perm( 'section', 'edit' ) )
-		{	// Allow to select all sections if Current user can has a permission for this:
-			$SectionCache->load_all();
-		}
-		else
-		{	// Load only available sections:
-			$SectionCache->load_where( 'sec_ID = 1'.( is_logged_in() ? ' OR sec_owner_user_ID = '.$current_User->ID : '' ) );
-		}
+		$SectionCache->load_all();
 
 		// 'label' is used in the group form as label for radio buttons group
 		// 'user_func' function used to check user permission. This function should be defined in Module.
@@ -532,7 +523,7 @@ class collections_Module extends Module
 				'group_func' => 'check_getblog_group_perm',
 				'perm_block' => 'blogging',
 				'perm_type' => 'checkbox',
-				'note' => T_( 'New users automatically get a new collection (in the Section speciafied below)'),
+				'note' => T_('New users automatically get a new collection (in the Section specified below)'),
 				),
 			'perm_default_sec_ID' => array(
 				'label' => T_('Default Section for new Collections'),

@@ -892,15 +892,7 @@ class AdminUI extends AdminUI_general
 			$collection_groups = '';
 
 			$SectionCache = & get_SectionCache();
-			$SectionCache->clear();
-			if( $current_User->check_perm( 'stats', 'view' ) || $current_User->check_perm( 'section', 'edit' ) )
-			{	// Allow to select all sections if Current user can has a permission for this:
-				$SectionCache->load_all();
-			}
-			else
-			{	// Load only available sections:
-				$SectionCache->load_where( 'sec_owner_user_ID = '.$current_User->ID );
-			}
+			$SectionCache->load_available();
 
 			foreach( $SectionCache->cache as $Section )
 			{	// Loop through all sections that match the requested permission:

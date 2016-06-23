@@ -2586,20 +2586,6 @@ class User extends DataObject
 
 				break;
 
-			case 'section':
-				// Check permissions for this user to the requested section:
-				$perm = $this->check_perm( 'blogs', 'create' );
-
-				if( ! $perm && $permlevel == 'view' )
-				{
-					$SectionCache = & get_SectionCache();
-					if( $Section = & $SectionCache->get_by_ID( $perm_target_ID, false, false ) )
-					{	// Allow to view the section if this user is owner of it:
-						$perm = $Section->owner_user_ID == $this->ID;
-					}
-				}
-				break;
-
 			case 'comment!CURSTATUS':
 				/**
 				 * @var Comment
@@ -2965,7 +2951,7 @@ class User extends DataObject
 
 					// Other global permissions (see if the group can handle them).
 					// Forward request to group:
-					$perm = $this->Group->check_perm( $permname, $permlevel, $perm_target );
+					$perm = $this->Group->check_perm( $permname, $permlevel, $perm_target, $this );
 				}
 		}
 
@@ -3447,6 +3433,7 @@ class User extends DataObject
 				// TODO: sam2kb> Create a blog only when this user is validated!
 				$new_Blog = new Blog( NULL );
 				$shortname = $this->get( 'login' );
+				$new_Blog->set( 'sec_ID', $Group->get_setting( 'perm_default_sec_ID' ) );
 				$new_Blog->set( 'owner_user_ID', $this->ID );
 				$new_Blog->set( 'shortname', $shortname );
 				$new_Blog->set( 'name', $shortname.'\'s blog' );

@@ -295,9 +295,10 @@ class Group extends DataObject
 	 *                - messaging
 	 * @param string Requested permission level
 	 * @param mixed Permission target (blog ID, array of cat IDs...)
+	 * @param object|NULL User
 	 * @return boolean True on success (permission is granted), false if permission is not granted
 	 */
-	function check_perm( $permname, $permlevel = 'any', $perm_target = NULL )
+	function check_perm( $permname, $permlevel = 'any', $perm_target = NULL, $User = NULL )
 	{
 		global $Debuglog;
 
@@ -325,6 +326,27 @@ class Group extends DataObject
 		// Check group permission:
 		switch( $permname )
 		{
+			case 'section':
+				// Check permissions for this group to the requested section:
+				$perm = $this->check_perm( 'blogs', 'editall' );
+
+				if( ! $perm && ! empty( $perm_target ) )
+				{	// User has an access to any Section he owns, or at a minimum, in the Default Section of this group:
+					$SectionCache = & get_SectionCache();
+					if( $Section = & $SectionCache->get_by_ID( $perm_target, false, false ) )
+					{
+						if( $Section->ID == $this->get_setting( 'perm_default_sec_ID' ) )
+						{	// If the requested section is default of this group:
+							$perm = true;
+						}
+						if( ! $perm && $User && $Section->owner_user_ID == $User->ID )
+						{	// If user is owner of the requested section:
+							$perm = true;
+						}
+					}
+				}
+				break;
+
 			case 'blogs':
 				switch( $permvalue )
 				{ // Depending on current group permission:
@@ -344,8 +366,16 @@ class Group extends DataObject
 				}
 
 				if( ! $perm && ( $permlevel == 'create' ) && $this->check_perm( 'perm_createblog', 'allowed' ) )
-				{ // User is allowed to create a blog (for himself)
-					$perm = true;
+				{	// User can create a collection for himself (in any Section he owns, or at a minimum, in the Default Section of this group):
+					$perm = $this->check_perm( 'section', 'view', $perm_target, $User );
+					if( ! $perm && empty( $perm_target ) )
+					{	// If request to create a collection without specified Section, then try to create it in default Section of this group:
+						$SectionCache = & get_SectionCache();
+						if( $Section = & $SectionCache->get_by_ID( $this->get_setting( 'perm_default_sec_ID' ), false, false ) )
+						{	// If default section really exists in DB:
+							$perm = true;
+						}
+					}
 				}
 				break;
 
@@ -593,6 +623,19 @@ class Group extends DataObject
 
 		// Current user can assign this group if his group level is more than level of this group
 		return ( $this->get( 'level' ) < $user_Group->get( 'level' ) );
+	}
+
+
+	/**
+	 * Get group setting value
+	 * 
+	 * @param string Setting value
+	 */
+	function get_setting( $name )
+	{
+		$GroupSettings = & $this->get_GroupSettings();
+
+		return $GroupSettings->get( $name, $this->ID );
 	}
 }
 

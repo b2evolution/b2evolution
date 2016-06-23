@@ -154,6 +154,12 @@ class Blog extends DataObject
 			$this->owner_user_ID = 1; // DB default
 			$this->set( 'locale', $default_locale );
 			$this->set( 'access_type', 'extrapath' );
+			if( is_logged_in() )
+			{	// Set section what is used as default for group of current user:
+				global $current_User;
+				$user_Group = & $current_User->get_Group();
+				$this->set( 'sec_ID', $user_Group->get_setting( 'perm_default_sec_ID' ) );
+			}
 		}
 		else
 		{
@@ -412,7 +418,15 @@ class Blog extends DataObject
 
 			// Section:
 			param_string_not_empty( 'sec_ID', T_('Please select a section.') );
-			$this->set( 'sec_ID', param( 'sec_ID', 'integer', NULL ), NULL );
+			$new_sec_ID = param( 'sec_ID', 'integer', NULL );
+			if( $new_sec_ID != $this->get( 'sec_ID' ) )
+			{	// If section has been changed to new:
+				if( ! $current_User->check_perm( 'blogs', 'create', false, $new_sec_ID ) )
+				{
+					param_error( 'sec_ID', T_('You don\'t have a permission to create a collection in this section.') );
+				}
+				$this->set( 'sec_ID', $new_sec_ID );
+			}
 
 			// Language / locale:
 			if( param( 'blog_locale', 'string', NULL ) !== NULL )
@@ -989,9 +1003,9 @@ class Blog extends DataObject
 		 * ADVANCED ADMIN SETTINGS
 		 */
 		if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ||
-		    ( $this->ID == 0 && $current_User->check_perm( 'section', 'view', false, $this->sec_ID ) ) )
+		    ( $this->ID == 0 && $current_User->check_perm( 'blogs', 'create', false, $this->sec_ID ) ) )
 		{	// We have permission to edit advanced admin settings,
-			// OR user is creating/copy new collection in own group:
+			// OR user is creating/coping new collection in section where he has an access:
 			if( ($blog_urlname = param( 'blog_urlname', 'string', NULL )) !== NULL )
 			{	// check urlname
 				if( param_check_not_empty( 'blog_urlname', T_('You must provide an URL collection name!') ) )

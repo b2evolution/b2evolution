@@ -55,7 +55,7 @@ if( strpos( $action, 'section' ) !== false )
 		$edited_Section = & $SectionCache->get_by_ID( $sec_ID );
 	}
 	else
-	{	// Create new colleciton group object:
+	{	// Create new section object:
 		$edited_Section = new Section();
 	}
 }
@@ -85,7 +85,7 @@ switch( $action )
 		}
 
 		// Check permissions:
-		if( ! $current_User->check_perm( 'section', 'view', false, $sec_ID ) )
+		if( ! $current_User->check_perm( 'blogs', 'create', false, $sec_ID ) )
 		{
 			$Messages->add( T_('You don\'t have permission to create a collection.'), 'error' );
 			$redirect_to = param( 'redirect_to', 'url', $admin_url );
@@ -113,7 +113,7 @@ switch( $action )
 		param( 'sec_ID', 'integer', 0, true );
 
 		// Check permissions:
-		$current_User->check_perm( 'section', 'view', true, $sec_ID );
+		$current_User->check_perm( 'blogs', 'create', true, $sec_ID );
 
 		param( 'kind', 'string', true );
 
@@ -126,7 +126,7 @@ switch( $action )
 		param( 'sec_ID', 'integer', 0 );
 
 		// Check permissions:
-		$current_User->check_perm( 'section', 'view', true, $sec_ID );
+		$current_User->check_perm( 'blogs', 'create', true, $sec_ID );
 
 		$edited_Blog = new Blog( NULL );
 
@@ -153,7 +153,7 @@ switch( $action )
 		param( 'sec_ID', 'integer', 0 );
 
 		// Check permissions:
-		$current_User->check_perm( 'section', 'view', true, $sec_ID );
+		$current_User->check_perm( 'blogs', 'create', true, $sec_ID );
 
 		$edited_Blog = new Blog( NULL );
 
@@ -239,7 +239,7 @@ switch( $action )
 		param( 'sec_ID', 'integer', 0 );
 
 		// Check permissions:
-		$current_User->check_perm( 'section', 'view', true, $sec_ID );
+		$current_User->check_perm( 'blogs', 'create', true, $sec_ID );
 
 		if( $edited_Blog->duplicate() )
 		{	// The collection has been duplicated successfully:
@@ -505,7 +505,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'section' );
 
 		// Check permissions:
-		$current_User->check_perm( 'section', 'view', true, $edited_Section->ID );
+		$current_User->check_perm( 'section', 'edit', true, $edited_Section->ID );
 
 		if( $edited_Section->ID == 1 )
 		{	// Forbid to delete default section:
@@ -736,7 +736,7 @@ switch( $tab )
 		$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
 		$AdminUI->breadcrumbpath_add( T_('Site Dashboard'), $admin_url.'?ctrl=dashboard' );
 
-		$AdminUI->set_page_manual_link( 'collection-group' );
+		$AdminUI->set_page_manual_link( 'section' );
 
 		// Init JS to autcomplete the user logins:
 		init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );

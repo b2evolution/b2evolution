@@ -63,7 +63,7 @@ init_field_editor_js( array(
 	) );
 init_field_editor_js( array(
 		'field_prefix' => 'order-section-',
-		'action_url' => $admin_url.'?ctrl=dashboard&order_action=update_group&order_data=',
+		'action_url' => $admin_url.'?ctrl=dashboard&order_action=update_section&order_data=',
 	) );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

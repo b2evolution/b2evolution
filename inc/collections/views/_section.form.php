@@ -26,9 +26,9 @@ $creating = is_create_action( $action );
 $Form = new Form( NULL, 'section_checkchanges', 'post', 'compact' );
 
 // Get permission to edit the section:
-$perm_blog_group_edit = $current_User->check_perm( 'section', 'edit', false, $edited_Section->ID );
+$perm_section_edit = $current_User->check_perm( 'section', 'edit', false, $edited_Section->ID );
 
-if( ! $creating && $perm_blog_group_edit && $edited_Section->ID != 1 )
+if( ! $creating && $perm_section_edit && $edited_Section->ID != 1 )
 {	// Display a link to delete the section only if Current user has no permission to edit it:
 	$Form->global_icon( T_('Delete this section!'), 'delete', regenerate_url( 'action', 'action=delete_section&amp;'.url_crumb( 'section' ) ) );
 }
@@ -43,7 +43,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New section') : T_('Section') );
 	$Form->hidden( 'sec_ID', $edited_Section->ID );
 
 	// Name:
-	if( $perm_blog_group_edit && $edited_Section->ID != 1 )
+	if( $perm_section_edit && $edited_Section->ID != 1 )
 	{
 		$Form->text_input( 'sec_name', $edited_Section->get( 'name' ), 50, T_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
 	}
@@ -54,7 +54,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New section') : T_('Section') );
 
 	// Owner:
 	$owner_User = & $edited_Section->get_owner_User();
-	if( $perm_blog_group_edit )
+	if( $perm_section_edit )
 	{
 		$Form->username( 'sec_owner_login', $owner_User, T_('Owner'), T_('Login of this section\'s owner.'), '', array( 'required' => true ) );
 	}
@@ -64,7 +64,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New section') : T_('Section') );
 	}
 
 	// Order:
-	if( $perm_blog_group_edit )
+	if( $perm_section_edit )
 	{
 		$Form->text_input( 'sec_order', $edited_Section->get( 'order' ), 5, T_('Order number'), '', array( 'maxlength' => 11, 'required' => true ) );
 	}
@@ -73,8 +73,8 @@ $Form->begin_form( 'fform', $creating ?  T_('New section') : T_('Section') );
 		$Form->info( T_('Order number'), $edited_Section->get( 'order' ) );
 	}
 
-if( ! $perm_blog_group_edit )
-{	// Don't display a submit button if Current user has no permission to edit this colleciton group:
+if( ! $perm_section_edit )
+{	// Don't display a submit button if Current user has no permission to edit this section:
 	$Form->end_form();
 }
 elseif( $creating )
