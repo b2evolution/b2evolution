@@ -1479,6 +1479,12 @@ var downloadInterval = setInterval( function()
 				global $disp;
 				$disp = '404';
 			}
+			elseif( $Session->get( 'account_close_reason' ) )
+			{
+				global $account_close_reason;
+				$account_close_reason = $Session->get( 'account_close_reason' );
+				$Session->delete( 'account_close_reason' );
+			}
 			elseif( $Session->get( 'account_closing_success' ) )
 			{ // User has closed the account
 				global $account_closing_success;
