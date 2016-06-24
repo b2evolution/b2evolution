@@ -7601,7 +7601,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_create_table( 'T_section', '
 				sec_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 				sec_name          VARCHAR(255) NOT NULL,
-				sec_order         INT(11) UNSIGNED NOT NULL,
+				sec_order         INT(11) NOT NULL,
 				sec_owner_user_ID INT(11) UNSIGNED NOT NULL default 1,
 				PRIMARY KEY ( sec_ID )' );
 		upg_task_end();

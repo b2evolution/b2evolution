@@ -81,7 +81,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_section (
 			sec_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			sec_name          VARCHAR(255) NOT NULL,
-			sec_order         INT(11) UNSIGNED NOT NULL,
+			sec_order         INT(11) NOT NULL,
 			sec_owner_user_ID INT(11) UNSIGNED NOT NULL default 1,
 			PRIMARY KEY ( sec_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
