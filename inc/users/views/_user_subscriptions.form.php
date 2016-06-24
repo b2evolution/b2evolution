@@ -279,10 +279,8 @@ $Form->begin_fieldset( T_('Blog subscriptions'), array( 'id' => 'subs' ) );
 		$blog_subs_SQL->SELECT( 'blog_ID, sub_items, sub_comments' );
 		$blog_subs_SQL->FROM( 'T_blogs' );
 		$blog_subs_SQL->FROM_add( 'INNER JOIN T_subscriptions ON blog_ID = sub_coll_ID AND sub_user_ID = '.$edited_User->ID );
-		$blog_subs_SQL->FROM_add( 'INNER JOIN T_coll_settings ON blog_ID = cset_coll_ID AND cset_value = 1'
-			.' AND (    ( cset_name = "allow_subscriptions" AND sub_items = 1 )'
-			.'       OR ( cset_name = "allow_comment_subscriptions" AND sub_comments = 1 ) )' );
-		$blog_subs_SQL->GROUP_BY( 'blog_ID' );
+		$blog_subs_SQL->WHERE( 'sub_items = 1' );
+		$blog_subs_SQL->WHERE_or( 'sub_comments = 1' );
 		$blog_subs = $DB->get_results( $blog_subs_SQL->get(), OBJECT, $blog_subs_SQL->title );
 
 		$BlogCache = & get_BlogCache();
@@ -291,6 +289,11 @@ $Form->begin_fieldset( T_('Blog subscriptions'), array( 'id' => 'subs' ) );
 		{
 			if( ! ( $sub_Blog = & $BlogCache->get_by_ID( $blog_sub->blog_ID, false, false ) ) )
 			{	// Skip wrong collection:
+				continue;
+			}
+			if( ! ( $sub_Blog->get_setting( 'allow_subscriptions' ) && $blog_sub->sub_items ) &&
+			    ! ( $sub_Blog->get_setting( 'allow_comment_subscriptions' ) && $blog_sub->sub_comments ) )
+			{	// Skip because the collection doesn't allow any subscription:
 				continue;
 			}
 
@@ -316,44 +319,10 @@ if( $is_admin_page && $Settings->get( 'subscribe_new_blogs' ) == 'page' )
 else
 {	// To subscribe from current list of blogs
 
-	// Init $BlogCache object to display a select list to subscribe
+	// Load collections which have the enabled settings to subscribe on new posts or comments:
 	$BlogCache = new BlogCache();
-	$BlogCache_SQL = $BlogCache->get_SQL_object();
+	$BlogCache->load_subscription_colls( $edited_User, $subs_blog_IDs );
 
-	load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
-	$CollectionSettings = new CollectionSettings();
-	if( $CollectionSettings->get_default( 'allow_subscriptions' ) == 0 && $CollectionSettings->get_default( 'allow_comment_subscriptions' ) == 0 )
-	{	// If default setting disables to subscribe on blogs, we should get only the blogs which allow the subsriptions
-		$BlogCache_SQL->FROM_add( 'LEFT JOIN T_coll_settings ON cset_coll_ID = blog_ID' );
-		$BlogCache_SQL->WHERE_and( '( cset_name = "allow_subscriptions" OR cset_name = "allow_comment_subscriptions" )' );
-		$BlogCache_SQL->WHERE_and( 'cset_value = 1' );
-	}
-	else// 'allow_subscriptions' == 1
-	{	// If default setting enables to subscribe on blogs, we should exclude the blogs which don't allow the subsriptions
-		$blogs_settings_SQL = new SQL( 'Get blogs which don\'t allow the subscriptions' );
-		$blogs_settings_SQL->SELECT( 'cset_coll_ID' );
-		$blogs_settings_SQL->FROM( 'T_coll_settings' );
-		$blogs_settings_SQL->WHERE( '( cset_name = "allow_subscriptions" OR cset_name = "allow_comment_subscriptions" )' );
-		$blogs_settings_SQL->WHERE_and( 'cset_value = 0' );
-		$blogs_disabled_subscriptions_IDs = $DB->get_col( $blogs_settings_SQL->get() );
-		if( count( $blogs_disabled_subscriptions_IDs ) )
-		{	// Exclude the blogs which don't allow the subscriptions
-			$BlogCache_SQL->WHERE_and( 'blog_ID NOT IN ('.$DB->quote( $blogs_disabled_subscriptions_IDs ).')' );
-		}
-	}
-	if( $Settings->get( 'subscribe_new_blogs' ) == 'public' )
-	{	// If a subscribing to new blogs available only for the public blogs
-		$BlogCache_SQL->WHERE_and( '( blog_in_bloglist IN ( "public", "logged" ) ) OR
-			( blog_in_bloglist = "member" AND (
-				( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND bloguser_user_ID = '.$edited_User->ID.' ) OR
-				( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND bloggroup_group_ID = '.$edited_User->grp_ID.' )
-			) )' );
-	}
-	if( !empty( $subs_blog_IDs ) )
-	{	// Exclude the blogs from the list if user already is subscribed on them
-		$BlogCache_SQL->WHERE_and( 'blog_ID NOT IN ('.$DB->quote( $subs_blog_IDs ).')' );
-	}
-	$BlogCache->load_by_sql( $BlogCache_SQL );
 	if( empty( $BlogCache->cache ) )
 	{	// No blogs to subscribe
 		if( empty( $subs_blog_IDs ) )
