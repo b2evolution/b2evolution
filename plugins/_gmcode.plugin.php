@@ -41,7 +41,7 @@ class gmcode_plugin extends custom_tags_plugin
 	var $configurable_email_list = true;
 
 	var $default_search_list = '** #\*\*(.+?)\*\*#x
-\\\\\\\\ #\\\\\\\\(.+?)\\\\\\\\#x
+\\\\ #\\\\\\\\(.+?)\\\\\\\\#x
 // #(?<!:)\x2f\x2f(.+?)\x2f\x2f#x
 __ #__(.+?)__#x
 ## /\#\#(.+?)\#\#/x
@@ -180,7 +180,7 @@ __ #__(.+?)__#x
 		foreach( $search_list as $line )
 		{	// Init buttons from regexp lines
 			$line = explode( ' ', $line, 2 );
-			$button_name = $line[0];
+			$button_name = addslashes( $line[0] );
 			$button_exp = $line[1];
 			if( !empty( $button_name ) && !empty( $button_exp ) )
 			{
