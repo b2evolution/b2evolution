@@ -7832,9 +7832,6 @@ class Item extends ItemLight
 									break;
 							}
 
-							$thumbnail_width = isset( $thumbnail_sizes[$thumbnail_size] ) ? $thumbnail_sizes[$thumbnail_size][1] : 192;
-							$thumbnail_height = isset( $thumbnail_sizes[$thumbnail_size] ) ? $thumbnail_sizes[$thumbnail_size][2] : 192;
-
 							$thumbnail_classes[] = 'evo_thumbnail';
 							$thumbnail_classes[] = 'evo_thumbnail__'.$thumbnail_position;
 							if( isset( $extra_classes ) )
@@ -7842,9 +7839,7 @@ class Item extends ItemLight
 								$thumbnail_classes = array_merge( $thumbnail_classes, $extra_classes );
 							}
 
-							$link_tag = '<img src="'.$File->get_url().'"'.' width="'.$thumbnail_width.'" height="'.$thumbnail_height.'" '
-									.' class="'.implode(' ', $thumbnail_classes )
-									.'" />';
+							$link_tag = $File->get_thumb_imgtag( $thumbnail_size, implode( ' ', $thumbnail_classes ) );
 						}
 						else
 						{
