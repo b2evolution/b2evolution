@@ -335,8 +335,8 @@ class Group extends DataObject
 					$SectionCache = & get_SectionCache();
 					if( $Section = & $SectionCache->get_by_ID( $perm_target, false, false ) )
 					{
-						if( $Section->ID == $this->get_setting( 'perm_default_sec_ID' ) )
-						{	// If the requested section is default of this group:
+						if( $permlevel != 'edit' && $Section->ID == $this->get_setting( 'perm_default_sec_ID' ) )
+						{	// Allow to view or create a collection if the requested section is default of this group:
 							$perm = true;
 						}
 						if( ! $perm && $User && $Section->owner_user_ID == $User->ID )
