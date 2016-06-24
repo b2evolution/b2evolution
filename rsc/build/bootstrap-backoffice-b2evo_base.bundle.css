@@ -1929,23 +1929,24 @@ div.results .pagination {
   margin-bottom: 5px;
 }
 div.results tr.placeholder {
-  display: block;
-  background: red;
   position: relative;
-  margin: 0;
-  padding: 0;
-  border: none;
+  border-bottom: 2px solid #f00;
 }
 div.results tr.placeholder:before {
   content: "";
   position: absolute;
   width: 0;
   height: 0;
-  border: 5px solid transparent;
-  border-left-color: red;
+  border: 6px solid transparent;
+  border-left-color: #f00;
+  border-right: none;
   margin-top: -5px;
   left: 0;
-  border-right: none;
+}
+div.results tr.placeholder td {
+  border: none;
+  height: 0;
+  padding: 0;
 }
 div.filters {
   margin-bottom: 0;

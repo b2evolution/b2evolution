@@ -729,6 +729,19 @@ fieldset ul {
 			display: block;
 		}
 	}
+	.table_scroll {
+		// Use this position to fix red triangle when attachment is dragged by mouse:
+		position: relative;
+	}
+	table tbody {
+		.dragged {
+			opacity: 0.5;
+			position: absolute;
+		}
+		td {
+			cursor: move;
+		}
+	}
 }
 #filelist_tbody {
 	tr:first-child .action_icon_link_move_up,

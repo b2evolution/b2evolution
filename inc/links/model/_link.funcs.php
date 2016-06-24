@@ -483,7 +483,7 @@ jQuery( document ).ready( function()
 		containerSelector: 'table',
 		itemPath: '> tbody',
 		itemSelector: 'tr',
-		placeholder: '<tr class="placeholder"/>',
+		placeholder: jQuery.parseHTML( '<tr class="placeholder"><td colspan="5"></td></tr>' ),
 		onDrop: function( $item, container, _super )
 		{
 			jQuery( '#attachments_fieldset_table table tr' ).removeClass( 'odd even' );
@@ -510,8 +510,14 @@ jQuery( document ).ready( function()
 					'action': 'update_links_order',
 					'links': link_IDs,
 					'crumb_link': '<?php echo get_crumb( 'link' ); ?>',
+				},
+				success: function()
+				{
+					evoFadeSuccess( $item );
 				}
 			} );
+
+			$item.removeClass(container.group.options.draggedClass).removeAttr("style");
 		}
 	} );
 } );

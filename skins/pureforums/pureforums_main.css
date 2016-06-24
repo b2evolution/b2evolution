@@ -7,8 +7,7 @@ body {
 a {
   color: #306595;
   text-decoration: none;
-  -webkit-transition: color 150ms ease 0s;
-          transition: color 150ms ease 0s;
+  transition: color 150ms ease 0s;
 }
 
 a:hover {
@@ -197,9 +196,9 @@ form#user_checkchanges.bComment {
   /* autoprefixer: off */
   padding: 12px 20px;
   background-color: #ECEDF3;
-  background-image: -webkit-linear-gradient(#f1f2f6, #e7e9f0);
-  background-image: -moz-linear-gradient(#f1f2f6, #e7e9f0);
-  background-image: linear-gradient(#f1f2f6, #e7e9f0);
+  background-image: -webkit-linear-gradient(#F1F2F6, #E7E9F0);
+  background-image: -moz-linear-gradient(#F1F2F6, #E7E9F0);
+  background-image: linear-gradient(#F1F2F6, #E7E9F0);
   color: #535C66;
   font-size: 14px;
   font-weight: bold;
@@ -447,7 +446,6 @@ body.round_avatars .forums_table .ft_author_avatar img {
 
 .ft_search .search_field {
   border-radius: 3px;
-  -webkit-transition: box-shadow 150ms ease;
   transition: box-shadow 150ms ease;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
   padding: 6px 7px;
@@ -595,11 +593,11 @@ ul.legend span.note {
   display: inline-block;
   padding: 0 12px;
   background-color: #A3ACBE;
-  background-image: -webkit-linear-gradient(#b5bdcb, #929bb1);
-  background-image: -moz-linear-gradient(#b5bdcb, #929bb1);
-  background-image: linear-gradient(#b5bdcb, #929bb1);
+  background-image: -webkit-linear-gradient(#B5BDCB, #929BB1);
+  background-image: -moz-linear-gradient(#B5BDCB, #929BB1);
+  background-image: linear-gradient(#B5BDCB, #929BB1);
   border: 1px solid #000;
-  border-color: rgba(0, 0, 0, 0) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.3);
+  border-color: transparent rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.3);
   border-right: none;
   color: #FFF;
   font-size: 12px;
@@ -615,9 +613,9 @@ ul.legend span.note {
 .breadcrumbs a:last-child {
   /* autoprefixer: off */
   background-color: #848C9D;
-  background-image: -webkit-linear-gradient(#98a0af, #70788c);
-  background-image: -moz-linear-gradient(#98a0af, #70788c);
-  background-image: linear-gradient(#98a0af, #70788c);
+  background-image: -webkit-linear-gradient(#98A0AF, #70788C);
+  background-image: -moz-linear-gradient(#98A0AF, #70788C);
+  background-image: linear-gradient(#98A0AF, #70788C);
   border-bottom-right-radius: 3px;
   border-top-right-radius: 3px;
 }
@@ -631,9 +629,9 @@ ul.legend span.note {
   right: -8px;
   top: 50%;
   width: 20px;
-  background-image: -webkit-linear-gradient(45deg, #98a0af, #70788c);
-  background-image: -moz-linear-gradient(45deg, #98a0af, #70788c);
-  background-image: linear-gradient(45deg, #98a0af, #70788c);
+  background-image: -webkit-linear-gradient(45deg, #98A0AF, #70788C);
+  background-image: -moz-linear-gradient(45deg, #98A0AF, #70788C);
+  background-image: linear-gradient(45deg, #98A0AF, #70788C);
   -webkit-transform: rotate(135deg) skew(-10deg, -10deg);
   -moz-transform: rotate(135deg) skew(-10deg, -10deg);
   -ms-transform: rotate(135deg) skew(-10deg, -10deg);
@@ -744,9 +742,9 @@ div.results div.filters {
 
 #edit_group_contacts {
   /* autoprefixer: off */
-  background-image: -webkit-linear-gradient(#f1f2f6, #e7e9f0);
-  background-image: -moz-linear-gradient(#f1f2f6, #e7e9f0);
-  background-image: linear-gradient(#f1f2f6, #e7e9f0);
+  background-image: -webkit-linear-gradient(#F1F2F6, #E7E9F0);
+  background-image: -moz-linear-gradient(#F1F2F6, #E7E9F0);
+  background-image: linear-gradient(#F1F2F6, #E7E9F0);
   border: none;
   padding: 10px;
   box-sizing: border-box;
