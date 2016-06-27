@@ -44,7 +44,10 @@ $schema_queries['T_centralantispam__keyword'] = array(
 			cakw_status          ENUM('new', 'published', 'revoked') NOT NULL DEFAULT 'new',
 			cakw_statuschange_ts TIMESTAMP NULL,
 			cakw_lastreport_ts   TIMESTAMP NULL,
-			PRIMARY KEY (cakw_ID)
+			PRIMARY KEY (cakw_ID),
+			INDEX cakw_keyword (cakw_keyword),
+			INDEX cakw_statuschange_ts (cakw_statuschange_ts),
+			INDEX cakw_lastreport_ts (cakw_lastreport_ts)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" );
 
 
