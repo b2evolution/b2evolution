@@ -29,7 +29,7 @@ class calendar_plugin extends Plugin
 	var $name;
 	var $code = 'evo_Calr';
 	var $priority = 20;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'navigation';
@@ -155,6 +155,26 @@ class calendar_plugin extends Plugin
 			),
 		);
 		return $r;
+	}
+
+
+	/**
+	 * Get keys for block/widget caching
+	 *
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @param integer Widget ID
+	 * @return array of keys this widget depends on
+	 */
+	function get_widget_cache_keys( $widget_ID = 0 )
+	{
+		global $Blog;
+
+		return array(
+				'wi_ID'        => $widget_ID, // Have the widget settings changed ?
+				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
+				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
+			);
 	}
 
 
@@ -287,7 +307,7 @@ class calendar_plugin extends Plugin
 		// Set filter by collection:
 		$blog_ID = empty( $params['blog_ID'] ) ? NULL : $params['blog_ID'];
 
-		
+
 		if( empty( $params['cat_IDs'] ) )
 		{	// Use default categories filter:
 			$filter_cat_array = ( $Calendar->link_type == 'context' ) ? $cat_array : array();
@@ -460,7 +480,7 @@ class Calendar
 	var $context_isolation;
 
 	var $params = array( );
-	
+
 	/**
 	 * Prefix of the ItemList object
 	 * @var string

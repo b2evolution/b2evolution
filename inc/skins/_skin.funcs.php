@@ -168,6 +168,25 @@ function skin_init( $disp )
 				header_redirect( $Item->url, true, true );
 			}
 
+			// Check if the post has 'deprecated' status:
+			if( isset( $Item->status ) && $Item->status == 'deprecated' )
+			{ // If the post is deprecated
+				global $disp;
+				$disp = '404';
+				$disp_detail = '404-deprecated-post' ;
+				break;
+			}
+
+			// Check if the post has allowed front office statuses
+			$allowed_statuses = get_inskin_statuses( $Blog->ID, 'post' );
+			if( ! $preview && ! in_array( $Item->status, $allowed_statuses ) )
+			{
+				global $disp;
+				$disp = '404';
+				$disp_detail = '404-disallowed-post-status';
+				break;
+			}
+
 			// Check if we want to redirect to a canonical URL for the post
 			// Please document encountered problems.
 			if( ! $preview
@@ -1079,7 +1098,7 @@ var downloadInterval = setInterval( function()
 			break;
 
 		case 'login':
-			global $Plugins, $transmit_hashed_password;
+			global $Plugins;
 
 			if( is_logged_in() )
 			{ // User is already logged in
@@ -1460,6 +1479,12 @@ var downloadInterval = setInterval( function()
 				global $disp;
 				$disp = '404';
 			}
+			elseif( $Session->get( 'account_close_reason' ) )
+			{
+				global $account_close_reason;
+				$account_close_reason = $Session->get( 'account_close_reason' );
+				$Session->delete( 'account_close_reason' );
+			}
 			elseif( $Session->get( 'account_closing_success' ) )
 			{ // User has closed the account
 				global $account_closing_success;
@@ -1647,22 +1672,6 @@ function skin_include( $template_name, $params = array() )
 	$timer_name = 'skin_include('.$template_name.')';
 	$Timer->resume( $timer_name );
 
-	if( ! empty( $disp ) && ( $disp == 'single' || $disp == 'page' ) &&
-	    $template_name == '$disp$' &&
-	    ! empty( $Item ) && ( $ItemType = & $Item->get_ItemType() ) )
-	{ // Get template name for the current Item if it is defined by Item Type
-		$item_type_template_name = $ItemType->get( 'template_name' );
-		if( ! empty( $item_type_template_name ) )
-		{ // The item type has a specific template for this display:
-			$item_type_template_name = '_'.$item_type_template_name.'.disp.php';
-			if( file_exists( $ads_current_skin_path.$item_type_template_name ) ||
-			    skin_fallback_path( $item_type_template_name ) )
-			{ // Use template file name of the Item Type only if it exists
-				$template_name = $item_type_template_name;
-			}
-		}
-	}
-
 	if( $template_name == '$disp$' )
 	{ // This is a special case.
 		// We are going to include a template based on $disp:
@@ -1747,6 +1756,21 @@ function skin_include( $template_name, $params = array() )
 			return;
 		}
 
+		if( $template_name[0] != '#' && // if template is not handled by plugins
+		    ( $disp == 'single' || $disp == 'page' ) &&
+		    ! empty( $Item ) && ( $ItemType = & $Item->get_ItemType() ) )
+		{	// Get template name for the current Item if it is defined by Item Type:
+			$item_type_template_name = $ItemType->get( 'template_name' );
+			if( ! empty( $item_type_template_name ) )
+			{	// The item type has a specific template for this display:
+				$item_type_template_name = '_'.$item_type_template_name.'.disp.php';
+				if( file_exists( $ads_current_skin_path.$item_type_template_name ) ||
+						skin_fallback_path( $item_type_template_name ) )
+				{	// Use template file name of the Item Type only if it exists:
+					$template_name = $item_type_template_name;
+				}
+			}
+		}
 	}
 
 
@@ -2144,32 +2168,35 @@ function skin_opengraph_tags()
 		}
 
 		$LinkOwner = new LinkItem( $Item );
-		if( ! $LinkList = $LinkOwner->get_attachment_LinkList( 1000 ) )
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000 ) )
 		{ // Item has no linked files
-			return;
-		}
+			while( $Link = & $LinkList->get_next() )
+			{
+				if( ! ( $File = & $Link->get_File() ) )
+				{ // No File object
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
+					continue;
+				}
 
-		while( $Link = & $LinkList->get_next() )
-		{
-			if( ! ( $File = & $Link->get_File() ) )
-			{ // No File object
-				global $Debuglog;
-				$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
-				continue;
-			}
+				if( ! $File->exists() )
+				{ // File doesn't exist
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+					continue;
+				}
 
-			if( ! $File->exists() )
-			{ // File doesn't exist
-				global $Debuglog;
-				$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
-				continue;
-			}
-
-			if( $File->is_image() )
-			{ // Use only image files for og:image tag
-				$og_images[] = $File->get_url();
+				if( $File->is_image() )
+				{ // Use only image files for og:image tag
+					$og_images[] = $File->get_url();
+				}
 			}
 		}
+
+		echo '<meta property="og:title" content="'.format_to_output( $Item->get( 'title' ), 'htmlattr' )."\" />\n";
+		echo '<meta property="og:url" content="'.format_to_output( $Item->get_url( 'public_view' ), 'htmlattr' )."\" />\n";
+		echo '<meta property="og:description" content="'.format_to_output( $Item->get_excerpt2(), 'htmlattr' )."\" />\n";
+		echo '<meta property="og:site_name" content="'.format_to_output( $Item->get_Blog()->get( 'name' ), 'htmlattr' )."\" />\n";
 	}
 
 	if( ! empty( $og_images ) )
@@ -2180,6 +2207,64 @@ function skin_opengraph_tags()
 		{ // Open Graph image tag
 			echo '<meta property="og:image" content="'.format_to_output( $og_image, 'htmlattr' )."\" />\n";
 		}
+	}
+}
+
+
+function skin_twitter_tags()
+{
+	global $Blog, $disp, $MainList;
+
+	if( empty( $Blog ) || ! $Blog->get_setting( 'tags_twitter_card' ) )
+	{ // Twitter summary card tags are not allowed
+		return;
+	}
+
+	// Get info for og:image tag
+	$twitter_image = '';
+	if( in_array( $disp, array( 'single', 'page' ) ) )
+	{ // Use only on 'single' and 'page' disp
+		$Item = & $MainList->get_by_idx( 0 );
+		if( is_null( $Item ) )
+		{ // This is not an object (happens on an invalid request):
+			return;
+		}
+
+		$LinkOwner = new LinkItem( $Item );
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser', 'image', array( 'sql_order_by' => 'link_position ASC' ) ) )
+		{ // Item has no linked files
+			while( $Link = & $LinkList->get_next() )
+			{
+				if( ! ( $File = & $Link->get_File() ) )
+				{ // No File object
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
+					continue;
+				}
+
+				if( ! $File->exists() )
+				{ // File doesn't exist
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+					continue;
+				}
+
+				if( $File->is_image() )
+				{ // Use only image files for og:image tag
+					$twitter_image = $File->get_url();
+					break;
+				}
+			}
+		}
+
+		echo '<meta property="twitter:card" content="summary" />'."\n";
+		echo '<meta property="twitter:title" content="'.format_to_output( $Item->get( 'title' ), 'htmlattr' )."\" />\n";
+		echo '<meta property="twitter:description" content="'.format_to_output( $Item->get_excerpt2(), 'htmlattr' )."\" />\n";
+	}
+
+	if( ! empty( $twitter_image ) )
+	{ // Display meta tags for image:
+		echo '<meta property="twitter:image" content="'.format_to_output( $twitter_image, 'htmlattr' )."\" />\n";
 	}
 }
 
@@ -2446,13 +2531,11 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 			echo '<span>'.$edited_Skin->name.'</span>';
 		echo '</div>';
 
-		if( isset( $edited_Skin->version ) )
-		{ // Skin version
-			echo '<div class="skin_setting_row">';
-				echo '<label>'.T_('Skin version').':</label>';
-				echo '<span>'.$edited_Skin->version.'</span>';
-			echo '</div>';
-		}
+		// Skin version
+		echo '<div class="skin_setting_row">';
+			echo '<label>'.T_('Skin version').':</label>';
+			echo '<span>'.( isset( $edited_Skin->version ) ? $edited_Skin->version : 'unknown' ).'</span>';
+		echo '</div>';
 
 		// Skin type
 		echo '<div class="skin_setting_row">';
@@ -2595,11 +2678,11 @@ function skin_body_attrs( $params = array() )
 	// WARNING: Caching! We're not supposed to have Session dependent stuff in here. This is for debugging only!
 	if ( ! empty($Blog) )
 	{
-		if( $Session->get( 'display_includes_'.$Blog->ID ) ) 
+		if( $Session->get( 'display_includes_'.$Blog->ID ) )
 		{
 			$classes[] = 'dev_show_includes';
 		}
-		if( $Session->get( 'display_containers_'.$Blog->ID ) ) 
+		if( $Session->get( 'display_containers_'.$Blog->ID ) )
 		{
 			$classes[] = 'dev_show_containers';
 		}
@@ -2611,4 +2694,17 @@ function skin_body_attrs( $params = array() )
 	}
 }
 
+
+function get_skin_version( $skin_ID )
+{
+	$SkinCache = & get_SkinCache();
+	$Skin = $SkinCache->get_by_ID( $skin_ID );
+
+	if( isset( $Skin->version ) )
+	{
+		return $Skin->version;
+	}
+
+	return 'unknown';
+}
 ?>

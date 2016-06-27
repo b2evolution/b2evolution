@@ -108,7 +108,7 @@ button.action_icon {
   color: #ff6666;
 }
 .status_color_meta {
-  color: #5133ab;
+  color: #5bc0de;
 }
 .btn[class*=btn-status-] {
   border: 1px solid #ccc;
@@ -628,18 +628,18 @@ div.filters .filter_item div {
   margin: 0;
 }
 .evo_comment__meta {
-  border: 2px solid #5133ab;
+  border: 2px solid #5bc0de;
 }
 .evo_comment__meta:last-child {
   margin-bottom: 0;
 }
 .evo_comment__meta .panel-heading {
-  border-bottom: 1px solid #5133ab;
-  background-color: #f7f4ff;
+  border-bottom: 1px solid #5bc0de;
+  background-color: #d9edf7;
 }
 .evo_comment__meta .panel-footer {
-  border-top: 1px solid #5133ab;
-  background-color: #f7f4ff;
+  border-top: 1px solid #5bc0de;
+  background-color: #d9edf7;
 }
 
 /*
@@ -1146,7 +1146,6 @@ a[rel~=nofollow]:not([class~=btn]):hover {
   border-radius: 2px;
 }
 img.loadimg {
-  display: inline-block;
   min-width: 64px;
   min-height: 64px;
   background: url(../img/ajax-loader/fff.gif) no-repeat center;
@@ -1156,6 +1155,20 @@ figure {
 }
 .evo_image_block {
   text-align: center;
+}
+.evo_image_block .img-responsive {
+  display: inline-block;
+}
+.evo_thumbnail {
+  max-width: 100%;
+}
+.evo_thumbnail__left {
+  float: left;
+  margin: 0 4px 4px 0;
+}
+.evo_thumbnail__right {
+  float: right;
+  margin: 0 0 4px 4px;
 }
 .replied_comment .evo_image_block img {
   max-width: 100%;
@@ -1355,6 +1368,9 @@ form div.avatartag a {
 .jcrop-keymgr {
   visibility: hidden;
 }
+.evo_label_inline {
+  margin-left: 2ex;
+}
 div.right_icons,
 div.fieldset_icons {
   text-align: right;
@@ -1507,6 +1523,75 @@ table.widget_grid div {
 .ufld_icon_links a {
   text-align: center;
 }
+li[class^="listnav_distance_"],
+li[class*=" listnav_distance_"] {
+  display: none;
+}
+@media only screen and (min-width: 320px) {
+  li[class^="active_distance_"],
+  li[class*=" active_distance_"] {
+    display: none;
+  }
+  li.listnav_prev,
+  li.listnav_next {
+    display: none;
+  }
+  li.listnav_prev_list,
+  li.listnav_next_list {
+    display: none;
+  }
+  li.listnav_first > a {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  li.listnav_last > a {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+  li[class="active_distance_1"] {
+    display: inline;
+  }
+  li[class="listnav_distance_1"] {
+    display: inline;
+  }
+}
+@media only screen and (min-width: 480px) {
+  li[class="active_distance_2"] {
+    display: inline;
+  }
+  li[class="listnav_distance_1"] {
+    display: none;
+  }
+  li[class="listnav_distance_2"] {
+    display: inline;
+  }
+}
+@media only screen and (min-width: 768px) {
+  li[class^="active_distance_"],
+  li[class*=" active_distance_"] {
+    display: inline;
+  }
+  li[class^="listnav_distance_"],
+  li[class*=" listnav_distance_"] {
+    display: none;
+  }
+  li.listnav_prev_list,
+  li.listnav_next_list {
+    display: inline;
+  }
+}
+@media only screen and (min-width: 992px) {
+  li.listnav_prev,
+  li.listnav_next {
+    display: inline;
+  }
+  li.listnav_first > a {
+    border-radius: 0;
+  }
+  li.listnav_last > a {
+    border-radius: 0;
+  }
+}
 
 /**
  * These are the generic styles that are common to "all" skins.
@@ -1591,38 +1676,12 @@ div.average_rating .star_rating {
   float: left;
   padding-right: 10px;
 }
-li[class^="listnav_distance_"],
-li[class*=" listnav_distance_"] {
-  display: none;
-}
-@media only screen and (max-width: 360px) {
-  li[class^="active_distance_"],
-  li[class*=" active_distance_"] {
-    display: none;
-  }
-  li[class~="active_distance_1"] {
-    display: inline;
-  }
-  li[class^="listnav_distance_"],
-  li[class*=" listnav_distance_"] {
-    display: inline;
-  }
-  li.listnav_prev_list,
-  li.listnav_next_list {
-    display: none;
-  }
-  li.listnav_prev,
-  li.listnav_next {
-    display: none;
-  }
-  li.listnav_first > a {
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
-  }
-  li.listnav_last > a {
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-  }
+.videojs_block .vjs-default-skin .vjs-big-play-button {
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
 }
 main .well {
   padding: 15px 15px 25px 15px;
@@ -2117,7 +2176,7 @@ div.item_location {
 .note.status_meta span,
 .evo_status__meta {
   color: #fff !important;
-  background-color: #5133ab !important;
+  background-color: #5bc0de !important;
 }
 .evo_content_block span[class*=status_] span {
   display: block;
@@ -2373,6 +2432,19 @@ input.btn-lg {
   padding: 8px;
   vertical-align: top;
 }
+.evo_content_block table.evo_poll__table {
+  margin: 1em 0;
+}
+.evo_content_block table.evo_poll__table th {
+  border: 0;
+  padding: 2px 10px 2px 0;
+  background-color: #eee;
+}
+.evo_content_block table.evo_poll__table td {
+  border: 0;
+  padding: 2px 10px 2px 0;
+  vertical-align: top;
+}
 .evo_form__comment .panel {
   margin: 0;
   border: none;
@@ -2501,6 +2573,9 @@ input.btn-lg {
 }
 .evo_poll__table .evo_poll__title {
   white-space: nowrap;
+}
+.evo_poll__table .evo_poll_percentage {
+  max-width: 50px;
 }
 .evo_container__sidebar .evo_poll__title {
   white-space: normal;
@@ -2640,6 +2715,10 @@ a.btn.action_icon.hoverlink {
 }
 .form-horizontal .info_full .controls-info {
   margin: 0 5px;
+}
+.form-horizontal .info_full_height .form-control-static {
+  padding-top: 0;
+  padding-bottom: 0;
 }
 .form-horizontal .controls {
   padding-left: 0;
@@ -2906,6 +2985,26 @@ div.results .pagination {
   margin-top: 5px;
   margin-bottom: 5px;
 }
+div.results tr.placeholder {
+  position: relative;
+  border-bottom: 2px solid #f00;
+}
+div.results tr.placeholder:before {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-left-color: #f00;
+  border-right: none;
+  margin-top: -5px;
+  left: 0;
+}
+div.results tr.placeholder td {
+  border: none;
+  height: 0;
+  padding: 0;
+}
 div.filters {
   margin-bottom: 0;
   background: none;
@@ -3165,7 +3264,7 @@ div.message_toolbars {
   color: #fff !important;
 }
 .badge-meta {
-  background-color: #5133ab !important;
+  background-color: #5bc0de !important;
   color: #fff !important;
 }
 .dropdown-menu > li > a .tooltip {

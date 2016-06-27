@@ -17,6 +17,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class _rss2_Skin extends Skin
 {
+	/**
+	 * Skin version
+	 * @var string
+	 */
+	var $version = '6.7.0';
+
   /**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.

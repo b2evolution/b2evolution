@@ -26,7 +26,7 @@ class adsense_plugin extends Plugin
 	var $help_url = 'http://b2evolution.net/blog-ads/adsense-plugin.php';
 	var $short_desc;
 	var $long_desc;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $number_of_installs = 1;
 
 	/**
@@ -248,7 +248,7 @@ class adsense_plugin extends Plugin
 		{	// Plugin is not enabled for current case, so don't display a toolbar:
 			return false;
 		}
-	
+
 		return $this->DisplayCodeToolbar();
 	}
 

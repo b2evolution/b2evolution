@@ -48,6 +48,12 @@ else
 }
 
 $Results->cols[] = array(
+						'th' => T_('Version'),
+						'td_class' => 'center',
+						'td' => '%get_skin_version( #skin_ID# )%'
+					);
+
+$Results->cols[] = array(
 						'th' => T_('Skin type'),
 						'order' => 'skin_type',
 						'td_class' => 'center',

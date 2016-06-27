@@ -34,7 +34,7 @@ class test_plugin extends Plugin
 	var $name = 'Test';
 	var $code = 'evo_TEST';
 	var $priority = 50;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -188,7 +188,7 @@ class test_plugin extends Plugin
 	 * @see Plugin::PluginUserSettingsValidateSet()
 	 * @return array
 	 */
-	function GetDefaultUserSettings()
+	function GetDefaultUserSettings( & $params )
 	{
 		return array(
 				'echo_random' => array(
@@ -288,7 +288,7 @@ class test_plugin extends Plugin
 	 *
 	 * @see Plugin::PluginUserSettingsUpdateAction()
 	 */
-	function PluginUserSettingsUpdateAction()
+	function PluginUserSettingsUpdateAction( & $params )
 	{
 		if( $this->UserSettings->get('echo_random') )
 		{
@@ -356,7 +356,7 @@ class test_plugin extends Plugin
 	/**
 	 * Event handler: Called when displaying editor buttons (in back-office).
 	 *
-	 * This method, if implemented, should output the buttons (probably as html INPUT elements) 
+	 * This method, if implemented, should output the buttons (probably as html INPUT elements)
 	 * and return true, if button(s) have been displayed.
 	 *
 	 * You should provide an unique html ID with each button.
@@ -510,7 +510,7 @@ class test_plugin extends Plugin
 	 *
 	 * @see Plugin::AdminToolAction()
 	 */
-	function AdminToolAction( $params )
+	function AdminToolAction()
 	{
 		global $Messages;
 
@@ -632,7 +632,7 @@ class test_plugin extends Plugin
 	 *
 	 * @see Plugin::RenderItemAsText()
 	 */
-	function RenderItemAsText( & $params )
+	function RenderItemAsText()
 	{
 		// Do nothing.
 	}
@@ -744,7 +744,7 @@ class test_plugin extends Plugin
 	 * Event handler: Called when a user tries to login.
 	 * @see Plugin::LoginAttempt()
 	 */
-	function LoginAttempt()
+	function LoginAttempt( & $params )
 	{
 		$this->msg( 'This is the TEST plugin responding to the LoginAttempt event.', 'note' );
 	}
@@ -768,7 +768,7 @@ class test_plugin extends Plugin
 	 *
 	 * @see Plugin::AlternateAuthentication()
 	 */
-	function AlternateAuthentication()
+	function AlternateAuthentication( & $params )
 	{
 		if( 0 ) // you should only enable it for test purposes, because it automagically logs every user in as "demouser"!
 		{

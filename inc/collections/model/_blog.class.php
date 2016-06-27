@@ -122,14 +122,9 @@ class Blog extends DataObject
 	var $type;
 
 	/**
-	 * @var boolean TRUE if blog is favorite
+	 * @var array Data of moderators which must be notified about new/edited comments
 	 */
-	var $favorite = 1;
-
-	/**
-	 * @var array IDs of moderators which must be notified about new comments
-	 */
-	var $comment_moderator_user_IDs;
+	var $comment_moderator_user_data;
 
 
 	/**
@@ -185,7 +180,6 @@ class Blog extends DataObject
 			$this->media_url = $db_row->blog_media_url;
 			$this->type = isset( $db_row->blog_type ) ? $db_row->blog_type : 'std';
 			$this->order = isset( $db_row->blog_order ) ? $db_row->blog_order : 0;
-			$this->favorite = isset( $db_row->blog_favorite ) ? $db_row->blog_favorite : 0;
 		}
 
 		$Timer->pause( 'Blog constructor' );
@@ -200,6 +194,7 @@ class Blog extends DataObject
 	static function get_delete_cascades()
 	{
 		return array(
+				array( 'table'=>'T_coll_user_favs', 'fk'=>'cufv_blog_ID', 'msg'=>T_('%d user favorites') ),
 				array( 'table'=>'T_coll_settings', 'fk'=>'cset_coll_ID', 'msg'=>T_('%d blog settings') ),
 				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user permission definitions') ),
 				array( 'table'=>'T_coll_group_perms', 'fk'=>'bloggroup_blog_ID', 'msg'=>T_('%d group permission definitions') ),
@@ -266,17 +261,13 @@ class Blog extends DataObject
 	 */
 	function init_by_kind( $kind, $name = NULL, $shortname = NULL, $urlname = NULL )
 	{
-		// Allow email subscriptions by default:
-		$this->set_setting( 'allow_subscriptions', '1' );
-		$this->set_setting( 'allow_item_subscriptions', '1' );
-
 		switch( $kind )
 		{
 			case 'main':
 				$this->set( 'type', 'main' );
 				$this->set( 'name', empty( $name ) ? T_('Homepage Title') : $name );
 				$this->set( 'shortname', empty( $shortname ) ? T_('Home') : $shortname );
-				$this->set( 'urlname', empty( $urlname ) ? 'main' : $urlname );
+				$this->set( 'urlname', empty( $urlname ) ? 'home' : $urlname );
 				$this->set_setting( 'front_disp', 'front' );
 				$this->set_setting( 'aggregate_coll_IDs', '*' );
 				$this->set_setting( 'in_skin_login', '1' );
@@ -284,9 +275,9 @@ class Blog extends DataObject
 
 			case 'photo':
 				$this->set( 'type', 'photo' );
-				$this->set( 'name', empty($name) ? T_('My photoblog') : $name );
-				$this->set( 'shortname', empty($shortname) ? T_('Photoblog') : $shortname );
-				$this->set( 'urlname', empty($urlname) ? 'photo' : $urlname );
+				$this->set( 'name', empty($name) ? T_('Photos') : $name );
+				$this->set( 'shortname', empty($shortname) ? T_('Photos') : $shortname );
+				$this->set( 'urlname', empty($urlname) ? 'photos' : $urlname );
 				$this->set_setting( 'posts_per_page', 12 );
 				$this->set_setting( 'archive_mode', 'postbypost' );
 				$this->set_setting( 'front_disp', 'posts' );
@@ -304,17 +295,17 @@ class Blog extends DataObject
 
 			case 'group':
 				$this->set( 'type', 'group' );
-				$this->set( 'name', empty($name) ? T_('Our blog') : $name );
-				$this->set( 'shortname', empty($shortname) ? T_('Group') : $shortname );
-				$this->set( 'urlname', empty($urlname) ? 'group' : $urlname );
+				$this->set( 'name', empty($name) ? T_('Tracker Title') : $name );
+				$this->set( 'shortname', empty($shortname) ? T_('Tracker') : $shortname );
+				$this->set( 'urlname', empty($urlname) ? 'tracker' : $urlname );
 				$this->set_setting( 'use_workflow', 1 );
 				break;
 
 			case 'forum':
 				$this->set( 'type', 'forum' );
-				$this->set( 'name', empty($name) ? T_('My forum') : $name );
-				$this->set( 'shortname', empty($shortname) ? T_('Forum') : $shortname );
-				$this->set( 'urlname', empty($urlname) ? 'forum' : $urlname );
+				$this->set( 'name', empty($name) ? T_('Forums Title') : $name );
+				$this->set( 'shortname', empty($shortname) ? T_('Forums') : $shortname );
+				$this->set( 'urlname', empty($urlname) ? 'forums' : $urlname );
 				$this->set( 'advanced_perms', 1 );
 				$this->set_setting( 'post_navigation', 'same_category' );
 				$this->set_setting( 'allow_comments', 'registered' );
@@ -342,7 +333,7 @@ class Blog extends DataObject
 
 			case 'manual':
 				$this->set( 'type', 'manual' );
-				$this->set( 'name', empty($name) ? T_('Manual') : $name );
+				$this->set( 'name', empty($name) ? T_('Manual Title') : $name );
 				$this->set( 'shortname', empty($shortname) ? T_('Manual') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'manual' : $urlname );
 				$this->set_setting( 'post_navigation', 'same_category' );
@@ -366,7 +357,7 @@ class Blog extends DataObject
 			case 'std':
 			default:
 				$this->set( 'type', 'std' );
-				$this->set( 'name', empty($name) ? T_('My weblog') : $name );
+				$this->set( 'name', empty($name) ? T_('Public Blog') : $name );
 				$this->set( 'shortname', empty($shortname) ? T_('Blog') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'blog' : $urlname );
 				break;
@@ -418,8 +409,97 @@ class Blog extends DataObject
 			}
 
 			// Collection permissions:
-			$this->set( 'advanced_perms', param( 'advanced_perms', 'integer', 0 ) );
-			$this->set_setting( 'allow_access', param( 'blog_allow_access', 'string', '' ) );
+			$prev_advanced_perms = $this->get( 'advanced_perms' );
+			$new_advanced_perms = param( 'advanced_perms', 'integer', 0 );
+			$prev_allow_access = $this->get_setting( 'allow_access' );
+			$new_allow_access = param( 'blog_allow_access', 'string', '' );
+
+			if( get_param( 'action' ) != 'update_confirm' && $this->ID > 0 &&
+			    ( $prev_allow_access != $new_allow_access || $prev_advanced_perms != $new_advanced_perms ) )
+			{	// One of these settings is changing, try to check if max allowed status will be changed too:
+				$prev_max_allowed_status = $this->get_max_allowed_status();
+				$prev_access_title = $this->get_access_title();
+				$this->set( 'advanced_perms', $new_advanced_perms );
+				$this->set_setting( 'allow_access', $new_allow_access );
+				$new_max_allowed_status = $this->get_max_allowed_status();
+				$new_access_title = $this->get_access_title();
+
+				$status_orders = get_visibility_statuses( 'ordered-index' );
+				if( $status_orders[ $new_max_allowed_status ] < $status_orders[ $prev_max_allowed_status ] )
+				{	// If max allowed status will be reduced after collection updating:
+					$count_reduced_status_data = $this->get_count_reduced_status_data( $new_max_allowed_status );
+					if( $count_reduced_status_data !== false )
+					{	// If some posts or comment will be updated:
+						$this->confirmation = array();
+						$this->confirmation['title'] = sprintf( T_('You changed the access setting of this collection from "%s" to "%s". This will also:'), $prev_access_title, $new_access_title );
+						$status_titles = get_visibility_statuses();
+						foreach( $count_reduced_status_data['posts'] as $status_key => $count )
+						{
+							$this->confirmation['messages'][] = sprintf( T_('change %d posts from "%s" to "%s"'), intval( $count ), $status_titles[ $status_key ], $status_titles[ $new_max_allowed_status ] );
+						}
+						foreach( $count_reduced_status_data['comments'] as $status_key => $count )
+						{
+							$this->confirmation['messages'][] = sprintf( T_('change %d comments from "%s" to "%s"'), intval( $count ), $status_titles[ $status_key ], $status_titles[ $new_max_allowed_status ] );
+						}
+					}
+				}
+			}
+
+			$this->set( 'advanced_perms', $new_advanced_perms );
+			$this->set_setting( 'allow_access', $new_allow_access );
+
+			if( $prev_allow_access != $this->get_setting( 'allow_access' ) )
+			{	// If setting "Allow access to" is changed to:
+				switch( $this->get_setting( 'allow_access' ) )
+				{	// Automatically enable/disable moderation statuses:
+					case 'public':
+						// Enable "Community" and "Members":
+						$enable_moderation_statuses = array( 'community', 'protected' );
+						$enable_comment_moderation_statuses = array( 'community', 'protected', 'review', 'draft' );
+						$disable_comment_moderation_statuses = array( 'private' );
+						break;
+					case 'users':
+						// Disable "Community" and Enable "Members":
+						$disable_moderation_statuses = array( 'community' );
+						$enable_moderation_statuses = array( 'protected' );
+						$enable_comment_moderation_statuses = array( 'protected', 'review', 'draft' );
+						$disable_comment_moderation_statuses = array( 'community', 'private' );
+						break;
+					case 'members':
+						// Disable "Community" and "Members":
+						$disable_moderation_statuses = array( 'community', 'protected' );
+						$enable_comment_moderation_statuses = array( 'review', 'draft' );
+						$disable_comment_moderation_statuses = array( 'community', 'protected', 'private' );
+						break;
+				}
+				$post_moderation_statuses = $this->get_setting( 'post_moderation_statuses' );
+				$post_moderation_statuses = empty( $post_moderation_statuses ) ? array() : explode( ',', $post_moderation_statuses );
+				$comment_moderation_statuses = $this->get_setting( 'moderation_statuses' );
+				$comment_moderation_statuses = empty( $comment_moderation_statuses ) ? array() : explode( ',', $comment_moderation_statuses );
+				if( ! empty( $disable_moderation_statuses ) )
+				{	// Disable moderation statuses:
+					$post_moderation_statuses = array_diff( $post_moderation_statuses, $disable_moderation_statuses );
+					$comment_moderation_statuses = array_diff( $comment_moderation_statuses, $disable_moderation_statuses );
+				}
+				if( ! empty( $enable_moderation_statuses ) )
+				{	// Enable moderation statuses:
+					$post_moderation_statuses = array_unique( array_merge( $enable_moderation_statuses, $post_moderation_statuses ) );
+					$comment_moderation_statuses = array_unique( array_merge( $enable_moderation_statuses, $comment_moderation_statuses ) );
+				}
+
+				if( ! empty( $disable_comment_moderation_statuses ) )
+				{
+					$comment_moderation_statuses = array_diff( $comment_moderation_statuses, $disable_comment_moderation_statuses );
+				}
+				if( ! empty( $enable_comment_moderation_statuses ) )
+				{
+					$comment_moderation_statuses = array_unique( array_merge( $enable_comment_moderation_statuses, $comment_moderation_statuses ) );
+				}
+
+				$this->set_setting( 'post_moderation_statuses', implode( ',', $post_moderation_statuses ) );
+				// Force enabled statuses regardless of previous settings
+				$this->set_setting( 'moderation_statuses', implode( ',', $enable_comment_moderation_statuses ) );
+			}
 			if( $this->get_setting( 'allow_access' ) == 'users' || $this->get_setting( 'allow_access' ) == 'members' )
 			{ // Disable site maps, feeds and ping plugins when access is restricted on this blog
 				$this->set_setting( 'enable_sitemaps', 0 );
@@ -430,13 +510,16 @@ class Blog extends DataObject
 			// Lists of collections:
 			$this->set( 'order', param( 'blog_order', 'integer' ) );
 			$this->set( 'in_bloglist', param( 'blog_in_bloglist', 'string', 'public' ) );
-			$this->set( 'favorite',  param( 'favorite', 'integer', 0 ) );
 		}
 
 		if( param( 'archive_links', 'string', NULL ) !== NULL )
 		{ // Archive link type:
 			$this->set_setting( 'archive_links', get_param( 'archive_links' ) );
-			$this->set_setting( 'archive_posts_per_page', param( 'archive_posts_per_page', 'integer', NULL ), true );
+		}
+
+		if( param( 'archive_posts_per_page', 'integer', NULL ) !== NULL )
+		{	// Archive posts per page:
+			$this->set_setting( 'archive_posts_per_page', get_param( 'archive_posts_per_page' ) );
 		}
 
 		if( param( 'chapter_links', 'string', NULL ) !== NULL )
@@ -658,7 +741,7 @@ class Blog extends DataObject
 		}
 
 		if( in_array( 'features', $groups ) )
-		{ // we want to load the workflow checkboxes:
+		{ // we want to load the posts related features:
 			$this->set_setting( 'enable_goto_blog', param( 'enable_goto_blog', 'string', NULL ) );
 
 			$this->set_setting( 'editing_goto_blog', param( 'editing_goto_blog', 'string', NULL ) );
@@ -666,6 +749,16 @@ class Blog extends DataObject
 			$this->set_setting( 'default_post_status', param( 'default_post_status', 'string', NULL ) );
 
 			$this->set_setting( 'post_categories', param( 'post_categories', 'string', NULL ) );
+
+			if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
+			{	// We have permission to edit advanced admin settings:
+				$this->set_setting( 'in_skin_editing', param( 'in_skin_editing', 'integer', 0 ) );
+				if( $this->get_setting( 'in_skin_editing' ) )
+				{
+					$this->set_setting( 'in_skin_editing_renderers', param( 'in_skin_editing_renderers', 'integer', 0 ) );
+					$this->set_setting( 'in_skin_editing_category', param( 'in_skin_editing_category', 'integer', 0 ) );
+				}
+			}
 
 			$this->set_setting( 'post_navigation', param( 'post_navigation', 'string', NULL ) );
 
@@ -677,6 +770,9 @@ class Blog extends DataObject
 
 			$this->set_setting( 'orderby', param( 'orderby', 'string', true ) );
 			$this->set_setting( 'orderdir', param( 'orderdir', 'string', true ) );
+
+			$disp_featured_above_list = param( 'disp_featured_above_list', 'integer', 0 );
+			$this->set_setting( 'disp_featured_above_list', $disp_featured_above_list );
 
 			// Front office statuses
 			$this->load_inskin_statuses( 'post' );
@@ -701,6 +797,10 @@ class Blog extends DataObject
 				}
 			}
 			$this->set_setting( 'post_moderation_statuses', implode( ',', $post_moderation_statuses ) );
+
+			// Subscriptions:
+			$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
+			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 		}
 
 		if( in_array( 'comments', $groups ) )
@@ -718,6 +818,7 @@ class Blog extends DataObject
 			$this->set_setting( 'moderation_statuses', implode( ',', $blog_moderation_statuses ) );
 
 			$this->set_setting( 'comment_quick_moderation',  param( 'comment_quick_moderation', 'string', 'expire' ) );
+			$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'comments_detect_email', param( 'comments_detect_email', 'integer', 0 ) );
 			$this->set_setting( 'comments_register', param( 'comments_register', 'integer', 0 ) );
@@ -773,6 +874,7 @@ class Blog extends DataObject
 
 			// Subscriptions:
 			$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
+			$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 
 			// Sitemaps:
@@ -853,6 +955,7 @@ class Blog extends DataObject
 			$this->set_setting( 'categories_meta_description', param( 'categories_meta_description', 'integer', 0 ) );
 			$this->set_setting( 'tags_meta_keywords', param( 'tags_meta_keywords', 'integer', 0 ) );
 			$this->set_setting( 'tags_open_graph', param( 'tags_open_graph', 'integer', 0 ) );
+			$this->set_setting( 'tags_twitter_card', param( 'tags_twitter_card', 'integer', 0 ) );
 			$this->set_setting( 'download_noindex', param( 'download_noindex', 'integer', 0 ) );
 			$this->set_setting( 'download_nofollowto', param( 'download_nofollowto', 'integer', 0 ) );
 		}
@@ -1115,7 +1218,7 @@ class Blog extends DataObject
 
 		}
 
-		return ! param_errors_detected();
+		return ! param_errors_detected() && empty( $this->confirmation );
 	}
 
 
@@ -1179,6 +1282,58 @@ class Blog extends DataObject
 
 
 	/**
+	 * Set favorite status of current_user
+	 *
+	 * @param integer User ID, leave empty for current user
+	 * @param integer Setting, leave empty to get favorite status
+	 * @return mixed Current favorite status or if set, True if the setting was changed  else false, NULL if unable to process
+	 */
+	function favorite( $user_ID = NULL, $setting = NULL )
+	{
+		global $DB, $current_User;
+
+		if( is_null( $user_ID ) && $current_User )
+		{
+			if( $current_User )
+			{
+				$user_ID = $current_User->ID;
+			}
+			else
+			{
+				return NULL;
+			}
+		}
+
+		if( $this->ID && $user_ID )
+		{
+			if( is_null( $setting ) )
+			{ // just return current favorite status
+				$fav_SQL = new SQL();
+				$fav_SQL->SELECT( 'COUNT(*)' );
+				$fav_SQL->FROM( 'T_coll_user_favs' );
+				$fav_SQL->WHERE( 'cufv_blog_ID = '.$DB->quote( $this->ID ) );
+				$fav_SQL->WHERE_and( 'cufv_user_ID = '.$DB->quote( $user_ID ) );
+
+				return $DB->get_var( $fav_SQL->get() );
+			}
+
+			if( $setting == 1 )
+			{
+				return $DB->query( 'REPLACE INTO T_coll_user_favs ( cufv_user_ID, cufv_blog_ID ) VALUES ( '.$user_ID.', '.$this->ID.' )' );
+			}
+			else
+			{
+				return $DB->query( 'DELETE FROM T_coll_user_favs WHERE cufv_user_ID = '.$user_ID.' AND cufv_blog_ID = '.$this->ID );
+			}
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+
+
+	/**
 	 * Set param value
 	 *
 	 * @param string Parameter name
@@ -1212,7 +1367,7 @@ class Blog extends DataObject
 	{
 		global $baseurl, $basedomain, $Settings;
 
-		switch( $this->access_type )
+		switch( $this->get( 'access_type' ) )
 		{
 			case 'baseurl':
 			case 'default':
@@ -1221,7 +1376,7 @@ class Blog extends DataObject
 					|| preg_match( '#^https?://#', $this->siteurl ) )
 				{ // Safety check! We only do that kind of linking if this is really the default blog...
 					// or if we call by absolute URL
-					if( $this->access_type == 'default' )
+					if( $this->get( 'access_type' ) == 'default' )
 					{
 						return $baseurl.$this->siteurl.'index.php';
 					}
@@ -1254,7 +1409,7 @@ class Blog extends DataObject
 				return $this->siteurl;
 
 			default:
-				debug_die( 'Unhandled Blog access type ['.$this->access_type.']' );
+				debug_die( 'Unhandled Blog access type ['.$this->get( 'access_type' ).']' );
 		}
 	}
 
@@ -1267,7 +1422,7 @@ class Blog extends DataObject
 	{
 		global $baseurl, $basedomain;
 
-		switch( $this->access_type )
+		switch( $this->get( 'access_type' ) )
 		{
 			case 'baseurl':
 				return $baseurl.$this->siteurl;
@@ -1296,7 +1451,7 @@ class Blog extends DataObject
 				break;
 
 			default:
-				debug_die( 'Unhandled Blog access type ['.$this->access_type.']' );
+				debug_die( 'Unhandled Blog access type ['.$this->get( 'access_type' ).']' );
 		}
 
 		if( substr( $url, -1 ) != '/' )
@@ -1679,7 +1834,7 @@ class Blog extends DataObject
 
 		if( ! is_logged_in() )
 		{	// User must be logged in:
-			return NULL;
+			return $this->get_max_allowed_status( $status );
 		}
 
 		if( empty( $status ) )
@@ -1994,6 +2149,14 @@ class Blog extends DataObject
 
 		switch( $parname )
 		{
+			case 'access_type':
+				$access_type_value = parent::get( $parname );
+				if( $access_type_value == 'subdom' && is_ip_url_domain( $baseurl ) )
+				{	// Don't allow subdomain for IP address:
+					$access_type_value = 'index.php';
+				}
+				return $access_type_value;
+
 			case 'blogurl':		// Deprecated
 			case 'link':  		// Deprecated
 			case 'url':
@@ -2183,7 +2346,6 @@ class Blog extends DataObject
 				{
 					return '';
 				}
-
 
 			default:
 				// All other params:
@@ -2472,6 +2634,22 @@ class Blog extends DataObject
 			// Enable default item types for the inserted collection:
 			$this->enable_default_item_types();
 
+			// Owner automatically favorite the collection
+			$this->favorite( $this->owner_user_ID, 1 );
+
+			// All users automatically favorite the new blog if collection count < 5 and user count <= 10
+			load_funcs( 'tools/model/_system.funcs.php' );
+			$blog_count = count( system_get_blog_IDs( false ) );
+			$user_IDs = system_get_user_IDs();
+			$user_count = count( $user_IDs );
+			if( $blog_count < 5 && $user_count <= 10 )
+			{
+				foreach( $user_IDs as $id )
+				{
+					$this->favorite( $id, 1 );
+				}
+			}
+
 			$Plugins->trigger_event( 'AfterCollectionInsert', $params = array( 'Blog' => & $this ) );
 
 			$DB->commit();
@@ -2509,7 +2687,7 @@ class Blog extends DataObject
 						WHERE blog_ID = '.$this->ID );
 			$Messages->add( sprintf(T_('The new blog has been associated with the stub file &laquo;%s&raquo;.'), $stub_filename ), 'success' );
 		}
-		elseif( $this->access_type == 'relative' )
+		elseif( $this->get( 'access_type' ) == 'relative' )
 		{ // Show error message only if stub file should exists!
 			$Messages->add( sprintf(T_('No stub file named &laquo;%s&raquo; was found. You must create it for the blog to function properly with the current settings.'), $stub_filename ), 'error' );
 		}
@@ -2806,7 +2984,7 @@ class Blog extends DataObject
 				'perm_delcmts'         => 0,
 				'perm_recycle_owncmts' => 0,
 				'perm_vote_spam_cmts'  => 1,
-				'perm_cmtstatuses'     => '',
+				'perm_cmtstatuses'     => $this->get_setting( 'new_feedback_status' ),
 				'perm_edit_cmt'        => 'no',
 				'perm_meta_comment'    => 1,
 				'perm_cats'            => 0,
@@ -2897,7 +3075,7 @@ class Blog extends DataObject
 				'perm_delcmts'         => 0,
 				'perm_recycle_owncmts' => 0,
 				'perm_vote_spam_cmts'  => 0,
-				'perm_cmtstatuses'     => '',
+				'perm_cmtstatuses'     => $this->get_setting( 'new_feedback_status' ),
 				'perm_edit_cmt'        => 'no',
 				'perm_meta_comment'    => 0,
 				'perm_cats'            => 0,
@@ -2962,6 +3140,12 @@ class Blog extends DataObject
 
 		$DB->begin();
 
+		// Favorite blog by new owner
+		if( isset( $this->dbchanges['blog_owner_user_ID'] ) )
+		{
+			$this->favorite( $this->owner_user_ID, 1 );
+		}
+
 		parent::dbupdate();
 
 		// if this blog settings was modified we need to invalidate this blog's page caches
@@ -2976,6 +3160,11 @@ class Blog extends DataObject
 		}
 
 		$Plugins->trigger_event( 'AfterCollectionUpdate', $params = array( 'Blog' => & $this ) );
+
+		if( get_param( 'action' ) == 'update_confirm' )
+		{	// Reduce statuses of posts and comments by max allowed status of this collection ONLY if this has been confirmed:
+			$this->update_reduced_status_data();
+		}
 
 		$DB->commit();
 
@@ -4080,30 +4269,230 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get IDs of moderators which must be notified about new comment
+	 * Get data of moderators which must be notified about new/edited comment
 	 *
-	 * @return array
+	 * @return array Array where each row is array with keys: user_email, user_ID, notify_comment_moderation, notify_edit_cmt_moderation
 	 */
-	function get_comment_moderator_user_IDs()
+	function get_comment_moderator_user_data()
 	{
-		if( ! isset( $this->comment_moderator_user_IDs ) )
+		if( ! isset( $this->comment_moderator_user_data ) )
 		{	// Get it from DB only first time and then cache in array:
 			global $DB;
 
-			$SQL = new SQL( 'Get list of moderators to notify for comment for collection #'.$this->ID );
-			$SQL->SELECT( 'DISTINCT user_email, user_ID, uset_value as notify_moderation' );
+			$SQL = new SQL( 'Get list of moderators to notify about new/edited comment of collection #'.$this->ID );
+			$SQL->SELECT( 'DISTINCT user_email, user_ID, s1.uset_value as notify_comment_moderation, s2.uset_value as notify_edit_cmt_moderation' );
 			$SQL->FROM( 'T_users' );
-			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "notify_comment_moderation"' );
+			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings AS s1 ON s1.uset_user_ID = user_ID AND s1.uset_name = "notify_comment_moderation"' );
+			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings AS s2 ON s2.uset_user_ID = user_ID AND s2.uset_name = "notify_edit_cmt_moderation"' );
 			$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
 			$SQL->WHERE( 'LENGTH( TRIM( user_email ) ) > 0' );
 			$SQL->WHERE_and( '( grp_perm_blogs = "editall" )
 				OR ( user_ID IN ( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = '.$this->ID.' AND bloguser_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )
 				OR ( grp_ID IN ( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = '.$this->ID.' AND bloggroup_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )' );
 
-			$this->comment_moderator_user_IDs = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+			$this->comment_moderator_user_data = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
 		}
 
-		return $this->comment_moderator_user_IDs;
+		return $this->comment_moderator_user_data;
+	}
+
+
+	/**
+	 * Get collection type title depending on access settings:
+	 *
+	 * @return string
+	 */
+	function get_access_title()
+	{
+		switch( $this->get_setting( 'allow_access' ) )
+		{
+			case 'members':
+				if( $this->get( 'advanced_perms' ) )
+				{
+					return T_('Members only');
+				}
+				else
+				{
+					return T_('Private');
+				}
+
+			case 'users':
+				return T_('Community only');
+
+			default: // 'public'
+				return T_('Public');
+		}
+	}
+
+
+	/**
+	 * Get max allowed post/comment status on this collection depending on access settings
+	 *
+	 * @param string|NULL Status to check and reduce by max allowed, NULL - to use max allowed status of this collection
+	 * @return string
+	 */
+	function get_max_allowed_status( $check_status = NULL )
+	{
+		switch( $this->get_setting( 'allow_access' ) )
+		{
+			case 'members':
+				if( $this->get( 'advanced_perms' ) )
+				{
+					$max_allowed_status = 'protected';
+				}
+				else
+				{
+					$max_allowed_status = 'private';
+				}
+				break;
+
+			case 'users':
+				$max_allowed_status = 'community';
+				break;
+
+			default: // 'public'
+				$max_allowed_status = 'published';
+				break;
+		}
+
+		if( $check_status === NULL )
+		{	// Don't check the requested status:
+			return $max_allowed_status;
+		}
+
+		// Check if the requested status can be used on this collection:
+		$status_orders = get_visibility_statuses( 'ordered-index' );
+		$max_allowed_status_order = $status_orders[ $max_allowed_status ];
+		$check_status_order = $status_orders[ $check_status ];
+
+		if( $max_allowed_status_order >= $check_status_order )
+		{	// The requested status can be used on this collection:
+			return $check_status;
+		}
+		else
+		{	// Reduce the requested status by max allowed:
+			return $max_allowed_status;
+		}
+	}
+
+
+	/**
+	 * Get what statuses should be reduced by max allowed:
+	 *
+	 * @param string Max allowed status, NULL to get current
+	 * @return array Statuses
+	 */
+	function get_reduced_statuses( $max_allowed_status = NULL )
+	{
+		if( $max_allowed_status === NULL )
+		{	// Get current max allowed status for posts and comments o this collection:
+			$max_allowed_status = $this->get_max_allowed_status();
+		}
+
+		$status_orders = get_visibility_statuses( 'ordered-index' );
+		$max_allowed_status_order = $status_orders[ $max_allowed_status ];
+
+		// Find what statuses should be reduced by max allowed:
+		$reduced_statuses = array();
+		foreach( $status_orders as $status_key => $status_order )
+		{
+			if( $max_allowed_status_order < $status_order )
+			{	// This status must be updated because the level is more than max allowed:
+				$reduced_statuses[] = $status_key;
+			}
+		}
+
+		return $reduced_statuses;
+	}
+
+
+	/**
+	 * Get a count how much statuses of posts and comments will be reduced after new max allowed status of this collection
+	 *
+	 * @return array|boolean Array with keys 'posts' and 'comments' where each is array with key as status and value as a count | FALSE if nothing to update
+	 */
+	function get_count_reduced_status_data( $new_max_allowed_status )
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{	// Collection must be created before:
+			return false;
+		}
+
+		// Get statuses that should be reduced by max allowed:
+		$reduced_statuses = $this->get_reduced_statuses( $new_max_allowed_status );
+
+		if( empty( $reduced_statuses ) )
+		{	// No status to update:
+			return false;
+		}
+
+		$posts_SQL = new SQL( 'Get how much posts will be updated after new max allowed status of the collection #'.$this->ID );
+		$posts_SQL->SELECT( 'post_status, COUNT( post_ID )' );
+		$posts_SQL->FROM( 'T_items__item' );
+		$posts_SQL->FROM_add( 'INNER JOIN T_categories ON cat_ID = post_main_cat_ID' );
+		$posts_SQL->WHERE( 'cat_blog_ID = '.$this->ID );
+		$posts_SQL->WHERE_and( 'post_status IN ( '.$DB->quote( $reduced_statuses ).' )' );
+		$posts_SQL->GROUP_BY( 'post_status' );
+		$posts = $DB->get_assoc( $posts_SQL->get(), $posts_SQL->title );
+
+		$comments_SQL = new SQL( 'Get how much comments will be updated after new max allowed status of the collection #'.$this->ID );
+		$comments_SQL->SELECT( 'comment_status, COUNT( comment_ID )' );
+		$comments_SQL->FROM( 'T_comments' );
+		$comments_SQL->FROM_add( 'INNER JOIN T_items__item ON comment_item_ID = post_ID' );
+		$comments_SQL->FROM_add( 'INNER JOIN T_categories ON cat_ID = post_main_cat_ID' );
+		$comments_SQL->WHERE( 'cat_blog_ID = '.$this->ID );
+		$comments_SQL->WHERE_and( 'comment_status IN ( '.$DB->quote( $reduced_statuses ).' )' );
+		$comments_SQL->GROUP_BY( 'comment_status' );
+		$comments = $DB->get_assoc( $comments_SQL->get(), $comments_SQL->title );
+
+		if( empty( $posts ) && empty( $comments ) )
+		{	// All posts and comments have a correct status:
+			return false;
+		}
+
+		return array(
+				'posts'    => $posts,
+				'comments' => $comments,
+			);
+	}
+
+
+	/**
+	 * Reduce statuses of posts and comments by max allowed status of this collection
+	 */
+	function update_reduced_status_data()
+	{
+		global $DB;
+
+		// Get statuses that should be reduced by max allowed:
+		$reduced_statuses = $this->get_reduced_statuses();
+
+		if( empty( $reduced_statuses ) )
+		{	// Nothing to update:
+			return;
+		}
+
+		// Get max allowed status:
+		$max_allowed_status = $this->get_max_allowed_status();
+
+		// Update posts:
+		$DB->query( 'UPDATE T_items__item
+			INNER JOIN T_categories ON cat_ID = post_main_cat_ID
+			  SET post_status = '.$DB->quote( $max_allowed_status ).'
+			WHERE cat_blog_ID = '.$this->ID.'
+				AND post_status IN ( '.$DB->quote( $reduced_statuses ).' )',
+			'Reduce posts statuses by max allowed status of the collection #'.$this->ID );
+
+		// Update comments:
+		$DB->query( 'UPDATE T_comments
+			INNER JOIN T_items__item ON comment_item_ID = post_ID
+			INNER JOIN T_categories ON cat_ID = post_main_cat_ID
+			  SET comment_status = '.$DB->quote( $max_allowed_status ).'
+			WHERE cat_blog_ID = '.$this->ID.'
+				AND comment_status IN ( '.$DB->quote( $reduced_statuses ).' )',
+			'Reduce comments statuses by max allowed status of the collection #'.$this->ID );
 	}
 }
 

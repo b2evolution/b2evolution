@@ -183,6 +183,12 @@ class Item extends ItemLight
 	 * @var integer
 	 */
 	var $notifications_ctsk_ID;
+	/**
+	 * What have been notified?
+	 * Possible values, separated by comma: 'moderators_notified,members_notified,community_notified,pings_sent'
+	 * @var string
+	 */
+	var $notifications_flags;
 
 	/**
 	 * array of IDs or NULL if we don't know...
@@ -344,6 +350,7 @@ class Item extends ItemLight
 			$this->wordcount = $db_row->post_wordcount;
 			$this->notifications_status = $db_row->post_notifications_status;
 			$this->notifications_ctsk_ID = $db_row->post_notifications_ctsk_ID;
+			$this->notifications_flags = $db_row->post_notifications_flags;
 			$this->comment_status = $db_row->post_comment_status;			// Comments status
 			$this->order = $db_row->post_order;
 			$this->featured = $db_row->post_featured;
@@ -686,11 +693,6 @@ class Item extends ItemLight
 			}
 		}
 
-		// DEADLINE:
-		if( param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL ) {
-			$this->set_from_Request( 'datedeadline', 'item_deadline', true );
-		}
-
 		// SLUG:
 		if( param( 'post_urltitle', 'string', NULL ) !== NULL ) {
 			$this->set_from_Request( 'urltitle' );
@@ -746,17 +748,26 @@ class Item extends ItemLight
 		}
 
 		// WORKFLOW stuff:
-		param( 'item_st_ID', 'integer', NULL );
-		$this->set_from_Request( 'pst_ID', 'item_st_ID', true );
+		$item_Blog = $this->get_Blog();
+		if( $item_Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $item_Blog->ID ) )
+		{	// Update workflow properties only when it is enabled by collection setting and allowed for current user:
+			param( 'item_st_ID', 'integer', NULL );
+			$this->set_from_Request( 'pst_ID', 'item_st_ID', true );
 
-		$item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', NULL );
-		$item_assigned_user_login = param( 'item_assigned_user_login', 'string', NULL );
-		$this->assign_to( $item_assigned_user_ID, $item_assigned_user_login );
+			$item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', NULL );
+			$item_assigned_user_login = param( 'item_assigned_user_login', 'string', NULL );
+			$this->assign_to( $item_assigned_user_ID, $item_assigned_user_login );
 
-		$item_priority = param( 'item_priority', 'integer', NULL );
-		if( $item_priority !== NULL )
-		{ // Set task priority only if it is gone from form
-			$this->set_from_Request( 'priority', 'item_priority', true );
+			$item_priority = param( 'item_priority', 'integer', NULL );
+			if( $item_priority !== NULL )
+			{ // Set task priority only if it is gone from form
+				$this->set_from_Request( 'priority', 'item_priority', true );
+			}
+
+			// DEADLINE:
+			if( param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL ) {
+				$this->set_from_Request( 'datedeadline', 'item_deadline', true );
+			}
 		}
 
 		// FEATURED checkbox:
@@ -809,7 +820,20 @@ class Item extends ItemLight
 			$param_name = 'item_'.$custom_field['type'].'_'.$custom_field['ID'];
 			if( isset_param( $param_name ) )
 			{ // param is set
-				$param_type = ( $custom_field['type'] == 'varchar' ) ? 'string' : $custom_field['type'];
+				switch( $custom_field['type'] )
+				{
+					case 'double':
+						$param_type = 'double';
+						break;
+					case 'html':
+					case 'text': // Keep html tags for text fields, they will be escaped at display
+						$param_type = 'html';
+						break;
+					case 'varchar':
+					default:
+						$param_type = 'string';
+						break;
+				}
 				param( $param_name, $param_type, NULL ); // get par value
 				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
 				$this->set_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'], get_param( $param_name ), $custom_field_make_null );
@@ -842,15 +866,22 @@ class Item extends ItemLight
 		modules_call_method( 'update_item_settings', array( 'edited_Item' => $this ) );
 
 		// RENDERERS:
-		if( param( 'renderers_displayed', 'integer', 0 ) )
-		{ // use "renderers" value only if it has been displayed (may be empty)
-			global $Plugins;
-			$renderers = $Plugins->validate_renderer_list( param( 'renderers', 'array:string', array() ), array( 'Item' => & $this ) );
-			$this->set( 'renderers', $renderers );
+		if( is_admin_page() || $item_Blog->get_setting( 'in_skin_editing_renderers' ) )
+		{	// If text renderers are allowed to update from front-office:
+			if( param( 'renderers_displayed', 'integer', 0 ) )
+			{	// Use "renderers" value only if it has been displayed (may be empty):
+				global $Plugins;
+				$renderers = $Plugins->validate_renderer_list( param( 'renderers', 'array:string', array() ), array( 'Item' => & $this ) );
+				$this->set( 'renderers', $renderers );
+			}
+			else
+			{
+				$renderers = $this->get_renderers_validated();
+			}
 		}
 		else
-		{
-			$renderers = $this->get_renderers_validated();
+		{	// Don't allow to update the text renderers:
+			$renderers = $this->get_renderers();
 		}
 
 		// CONTENT + TITLE:
@@ -1011,6 +1042,26 @@ class Item extends ItemLight
 					'link_text' => 'name',
 				) );
 			echo $after;
+		}
+	}
+
+
+	/**
+	 * Template function: display assignee of item with configurable params
+	 *
+	 * @params array
+	 */
+	function assigned_to2( $params = array() )
+	{
+		if( $this->get_assigned_User() )
+		{
+			$params = array_merge( array(
+				  'before' => '',
+					'after' => '',
+					'format' => 'htmlbody',
+					'link_text' => 'only_avatar',
+				), $params );
+			echo $params['before'].$this->assigned_User->get_identity_link( $params ).$params['after'];
 		}
 	}
 
@@ -1901,9 +1952,17 @@ class Item extends ItemLight
 		$content_parts = $this->get_content_parts( $params );
 		$output = array_shift( $content_parts );
 
-		// Render Inline Images  [image:123:caption] or [file:123:caption] :
+		// Set this flag to check inline tags outside of codeblocks:
 		$params['check_code_block'] = true;
+
+		// Render Inline Images  [image:123:caption] or [file:123:caption] :
 		$output = $this->render_inline_files( $output, $params );
+
+		// Render Custom Fields [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field]:
+		$output = $this->render_custom_fields( $output, $params );
+
+		// Render Parent Data [parent], [parent:fields] and etc.:
+		$output = $this->render_parent_data( $output, $params );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -2093,7 +2152,12 @@ class Item extends ItemLight
 	{
 		if( $this->load_custom_field_value( $field_index ) )
 		{
-			return $this->custom_fields[$field_index]['value'];
+			$custom_field_value = utf8_trim( $this->custom_fields[ $field_index ]['value'] );
+			if( $this->custom_fields[ $field_index ]['type'] == 'text' )
+			{	// Escape html tags and convert new lines to html <br> for text fields:
+				$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
+			}
+			return $custom_field_value;
 		}
 		return false;
 	}
@@ -2160,11 +2224,24 @@ class Item extends ItemLight
 	 */
 	function custom_fields( $params = array() )
 	{
+		echo $this->get_custom_fields( $params );
+	}
+
+
+	/**
+	 * Get all custom fields of current Item
+	 *
+	 * @param array Params
+	 * @return string
+	 */
+	function get_custom_fields( $params = array() )
+	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'before'       => '<table class="item_custom_fields">',
 				'field_format' => '<tr><th>$title$:</th><td>$value$</td></tr>', // $title$ $value$
 				'after'        => '</table>',
+				'fields'       => '', // Empty string to display ALL fields, OR fields names separated by comma to display only requested fields in order what you want
 			), $params );
 
 		if( empty( $this->custom_fields ) )
@@ -2172,22 +2249,46 @@ class Item extends ItemLight
 			$this->custom_fields = $this->get_type_custom_fields();
 		}
 
-		if( count( $this->custom_fields ) == 0 )
-		{	// No custom fields
-			return;
+		$fields_exist = false;
+
+		if( empty( $params['fields'] ) )
+		{	// Display all fields:
+			$display_fields = array_keys( $this->custom_fields );
+		}
+		else
+		{	// Display only the requested fields:
+			$display_fields = explode( ',', $params['fields'] );
+			$fields_exist = true;
 		}
 
-		$fields_exist = false;
+		if( ! $fields_exist && count( $this->custom_fields ) == 0 )
+		{	// No custom fields:
+			return '';
+		}
 
 		$html = $params['before'];
 
 		$mask = array( '$title$', '$value$' );
-		foreach( $this->custom_fields as $field )
+		foreach( $display_fields as $field_name )
 		{
-			$custom_field_value = $this->get_setting( 'custom_'.$field['type'].'_'.$field['ID'] );
-			if( !empty( $custom_field_value ) ||
+			$field_name = trim( $field_name );
+			if( ! isset( $this->custom_fields[ $field_name ] ) )
+			{	// Wrong field:
+				$values = array( $field_name, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), $field_name ).'</span>' );
+				$html .= str_replace( $mask, $values, $params['field_format'] );
+				$fields_exist = true;
+				continue;
+			}
+
+			$field = $this->custom_fields[ $field_name ];
+			$custom_field_value = utf8_trim( $this->get_setting( 'custom_'.$field['type'].'_'.$field['ID'] ) );
+			if( ! empty( $custom_field_value ) ||
 			    ( $field['type'] == 'double' && $custom_field_value == '0' ) )
-			{ // Display only the filled field AND also numeric field with '0' value
+			{	// Display only the filled field AND also numeric field with '0' value:
+				if( $field['type'] == 'text' )
+				{	// Escape html tags and convert new lines to html <br> for text fields:
+					$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
+				}
 				$values = array( $field['label'], $custom_field_value );
 				$html .= str_replace( $mask, $values, $params['field_format'] );
 				$fields_exist = true;
@@ -2198,8 +2299,154 @@ class Item extends ItemLight
 
 		if( $fields_exist )
 		{	// Print out if at least one field is filled for this item
-			echo $html;
+			return $html;
 		}
+		else
+		{
+			return '';
+		}
+	}
+
+
+	/**
+	 * Convert inline custom field tags like [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field] into HTML tags
+	 *
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_custom_fields( $content, $params = array() )
+	{
+		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call $this->render_custom_fields() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_custom_fields' ), array( $params ) );
+			return $content;
+		}
+
+		// Find all matches with tags of custom fields:
+		preg_match_all( '/\[(fields?):?([^\]]*)?\]/i', $content, $tags );
+
+		foreach( $tags[0] as $t => $source_tag )
+		{
+			switch( $tags[1][ $t ] )
+			{
+				case 'fields':
+					// Render several fields as HTML table:
+					$custom_fields_params = array( 'fields' => trim( $tags[2][ $t ] ) );
+						$field_value = $this->get_custom_fields( $custom_fields_params );
+						if( empty( $field_value ) )
+						{	// Fields don't exist:
+							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The item has no custom fields').'</span>', $content );
+						}
+						else
+						{	// Display fields:
+							$content = str_replace( $source_tag, $field_value, $content );
+						}
+					break;
+
+				case 'field':
+					// Render single field as text:
+					$field_index = trim( $tags[2][ $t ] );
+					$field_value = $this->get_custom_field_value( $field_index );
+					if( $field_value === false )
+					{	// Wrong field request, display error:
+						$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), $field_index ).'</span>', $content );
+					}
+					else
+					{	// Display field value:
+						$content = str_replace( $source_tag, $field_value, $content );
+					}
+					break;
+			}
+		}
+
+		return $content;
+	}
+
+
+	/**
+	 * Convert inline parent tags into HTML tags like:
+	 *    [parent]
+	 *    [parent:titlelink]
+	 *    [parent:url]
+	 *    [parent:fields:second_numeric_field,first_string_field]
+	 *    [parent:field:first_string_field]
+	 *
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_parent_data( $content, $params = array() )
+	{
+		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call $this->render_custom_fields() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_parent_data' ), array( $params ) );
+			return $content;
+		}
+
+		// Find all matches with tags of parent data:
+		preg_match_all( '/\[parent:([a-z]+):?([^\]]*)?\]/i', $content, $tags );
+
+		if( count( $tags[0] ) > 0 )
+		{	// If at least one parent tag is found in content:
+			if( ! ( $parent_Item = & $this->get_parent_Item() ) )
+			{	// If parent doesn't exist:
+				$content = str_replace( $tags[0], '<span class="text-danger">'.T_('This item has no parent.').'</span>', $content );
+				return $content;
+			}
+
+			foreach( $tags[0] as $t => $source_tag )
+			{
+				switch( $tags[1][ $t ] )
+				{
+					case 'fields':
+						// Render several parent custom fields as HTML table:
+						$custom_fields_params = array( 'fields' => trim( $tags[2][ $t ] ) );
+						$field_value = $parent_Item->get_custom_fields( $custom_fields_params );
+						if( empty( $field_value ) )
+						{	// Fields don't exist:
+							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The parent item has no custom fields').'</span>', $content );
+						}
+						else
+						{	// Display fields:
+							$content = str_replace( $source_tag, $field_value, $content );
+						}
+						break;
+
+					case 'field':
+						// Render single parent custom field as text:
+						$field_index = trim( $tags[2][ $t ] );
+						$field_value = $parent_Item->get_custom_field_value( $field_index );
+						if( $field_value === false )
+						{	// Wrong field request, display error:
+							$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), $field_index ).'</span>', $content );
+						}
+						else
+						{	// Display field value:
+							$content = str_replace( $source_tag, $field_value, $content );
+						}
+						break;
+
+					case 'titlelink':
+						// Render parent title with link:
+						$content = str_replace( $source_tag, $parent_Item->get_title(), $content );
+						break;
+
+					case 'url':
+						// Render parent URL:
+						$content = str_replace( $source_tag, $parent_Item->get_permanent_url(), $content );
+						break;
+				}
+			}
+		}
+
+		return $content;
 	}
 
 
@@ -2978,13 +3225,19 @@ class Item extends ItemLight
 				'limit_attach' =>        1000, // Max # of files displayed
 				'limit' =>               1000,
 				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
-				'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore',
+				'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore,attachment',
 				'data'                       => '',
-				'attach_format'              => '$icon_link$ $file_link$ $file_size$', // $icon_link$ $icon$ $file_link$ $file_size$
-				'file_link_format'           => '$file_name$', // $icon$ $file_name$ $file_size$
+				'attach_format'              => '$icon_link$ $file_link$ $file_size$ $file_desc$', // $icon_link$ $icon$ $file_link$ $file_size$ $file_desc$
+				'file_link_format'           => '$file_name$', // $icon$ $file_name$ $file_size$ $file_desc$
 				'file_link_class'            => '',
+				'file_link_text'             => 'filename', // 'filename' - Always display Filename, 'title' - Display Title if available
 				'download_link_icon'         => 'download',
 				'download_link_title'        => T_('Download file'),
+				'display_download_icon'      => true,
+				'display_file_size'          => true,
+				'display_file_desc'          => false,
+				'before_file_desc'           => '<span class="evo_file_description">',
+				'after_file_desc'            => '</span>',
 			), $params );
 
 		// Get list of attached files
@@ -3029,13 +3282,13 @@ class Item extends ItemLight
 				$params[ $param_key ] = & $params[ $param_key ];
 			}
 
-			if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $params ) ) != 0 )
+			if( $Link->get( 'position' ) != 'attachment' && count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $params ) ) != 0 )
 			{
 				continue;
 			}
 
-			if( $File->is_image() )
-			{ // Skip images because these are displayed inline already
+			if( $File->is_image() && $Link->get( 'position' ) != 'attachment' )
+			{ // Skip images (except those in the attachment position) because these are displayed inline already
 				// fp> TODO: have a setting for each linked file to decide whether it should be displayed inline or as an attachment
 				continue;
 			}
@@ -3044,48 +3297,57 @@ class Item extends ItemLight
 				continue;
 			}
 
-			if( $File->is_audio() )
-			{ // Player for audio file:
-				$r_file[$i]  = '<div class="podplayer">';
-				$r_file[$i] .= $this->get_player( $File->get_url() );
-				$r_file[$i] .= '</div>';
-				$i++;
-				$params = $temp_params;
-				continue;
-			}
-
 			// A link to download a file:
 
-			// Just icon with download icon
-			$icon = ( $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$icon$' ) !== false ) ?
+			// Just icon with download icon:
+			$icon = ( $params['display_download_icon'] && $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$icon$' ) !== false ) ?
 					get_icon( $params['download_link_icon'], 'imgtag', array( 'title' => $params['download_link_title'] ) ) : '';
 
-			// A link with icon to download
-			$icon_link = ( $File->exists() && strpos( $params['attach_format'], '$icon_link$' ) !== false ) ?
+			// A link with icon to download:
+			$icon_link = ( $params['display_download_icon'] && $File->exists() && strpos( $params['attach_format'], '$icon_link$' ) !== false ) ?
 					action_icon( $params['download_link_title'], $params['download_link_icon'], $Link->get_download_url(), '', 5 ) : '';
 
-			// File size info
-			$file_size = ( $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$file_size$' ) !== false ) ?
+			// File size info:
+			$file_size = ( $params['display_file_size'] && $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$file_size$' ) !== false ) ?
 					$params['before_attach_size'].bytesreadable( $File->get_size(), false, false ).$params['after_attach_size'] : '';
 
-			// A link with file name to download
+			// File description:
+			$file_desc = '';
+			if( $params['display_file_desc'] && $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$file_desc$' ) !== false )
+			{	// If description should be displayed:
+				$file_desc = nl2br( trim( $File->get( 'desc' ) ) );
+				if( $file_desc !== '' )
+				{	// If file has a filled description:
+					$params['before_file_desc'].$file_desc.$params['after_file_desc'];
+				}
+			}
+
+			// A link with file name or file title to download:
 			$file_link_format = str_replace( array( '$icon$', '$file_name$', '$file_size$' ),
 				array( $icon, '$text$', $file_size ),
 				$params['file_link_format'] );
-			if( $File->exists() )
-			{ // Get file link to download if file exists
-				$file_link = ( strpos( $params['attach_format'], '$file_link$' ) !== false ) ?
-						$File->get_view_link( $File->get_name(), NULL, NULL, $file_link_format, $params['file_link_class'], $Link->get_download_url() ) : '';
+			if( $params['file_link_text'] == 'filename' || trim( $File->get( 'title' ) ) === '' )
+			{	// Use file name for link text:
+				$file_link_text = $File->get_name();
 			}
 			else
-			{ // File doesn't exist, We cannot display a link, Display only file name and warning
+			{	// Use file title only if it filled:
+				$file_link_text = $File->get( 'title' );
+			}
+			if( $File->exists() )
+			{	// Get file link to download if file exists:
 				$file_link = ( strpos( $params['attach_format'], '$file_link$' ) !== false ) ?
-						$File->get_name().' - <span class="red nowrap">'.get_icon( 'warning_yellow' ).' '.T_('Missing attachment!').'</span>' : '';
+						$File->get_view_link( $file_link_text, NULL, NULL, $file_link_format, $params['file_link_class'], $Link->get_download_url() ) : '';
+			}
+			else
+			{	// File doesn't exist, We cannot display a link, Display only file name and warning:
+				$file_link = ( strpos( $params['attach_format'], '$file_link$' ) !== false ) ?
+						$file_link_text.' - <span class="red nowrap">'.get_icon( 'warning_yellow' ).' '.T_('Missing attachment!').'</span>' : '';
 			}
 
 			$r_file[$i] = $params['before_attach'];
-			$r_file[$i] .= str_replace( array( '$icon$', '$icon_link$', '$file_link$', '$file_size$' ),
-				array( $icon, $icon_link, $file_link, $file_size ),
+			$r_file[$i] .= str_replace( array( '$icon$', '$icon_link$', '$file_link$', '$file_size$', '$file_desc$' ),
+				array( $icon, $icon_link, $file_link, $file_size, $file_desc ),
 				$params['attach_format'] );
 			$r_file[$i] .= $params['after_attach'];
 
@@ -3166,7 +3428,8 @@ class Item extends ItemLight
 		if( ! isset( $this->placeholder_FileList ) )
 		{ // Get list of attached fallback files
 			$LinkOwner = new LinkItem( $this );
-			if( ! $this->placeholder_FileList = & $LinkOwner->get_attachment_FileList( 1000 ) )
+			$attachment_FileList = $LinkOwner->get_attachment_FileList( 1000 );
+			if( ! $this->placeholder_FileList = & $attachment_FileList )
 			{ // No attached files
 				return $r;
 			}
@@ -4773,17 +5036,34 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get HTML code to display a flash audio player for playback of a
-	 * given URL.
+	 * Get HTML code to display video/audio player for playback of a given URL
 	 *
-	 * @param string The URL of a MP3 audio file.
-	 * @return string The HTML code.
+	 * @param string The URL of video/audio file
+	 * @return string The HTML code
 	 */
 	function get_player( $url )
 	{
-		global $rsc_url;
+		global $Plugins;
 
-		return '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0" width="200" height="20" id="dewplayer" align="middle"><param name="wmode" value="transparent"><param name="allowScriptAccess" value="sameDomain" /><param name="movie" value="'.$rsc_url.'swf/dewplayer.swf?mp3='.$url.'&amp;showtime=1" /><param name="quality" value="high" /><param name="bgcolor" value="" /><embed src="'.$rsc_url.'swf/dewplayer.swf?mp3='.$url.'&amp;showtime=1" quality="high" bgcolor="" width="200" height="20" name="dewplayer" wmode="transparent" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"></embed></object>';
+		$params = array(
+				'url'  => $url,
+				'data' => '',
+			);
+
+		$temp_params = $params;
+		foreach( $params as $param_key => $param_value )
+		{ // Pass all params by reference, in order to give possibility to modify them by plugin
+			// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
+			$params[ $param_key ] = & $params[ $param_key ];
+		}
+
+		if( count( $Plugins->trigger_event_first_true( 'RenderURL', $params ) ) != 0 )
+		{	// Display a rendered url, for example as video/audio player:
+			return $params['data'];
+		}
+
+		// Display URL as simple link:
+		return '<a href="'.$url.'">'.$url.'</a>';
 	}
 
 
@@ -5009,6 +5289,16 @@ class Item extends ItemLight
 				}
 				break;
 
+			case 'notifications_flags':
+				$notifications_flags = $this->get( 'notifications_flags' );
+				if( ! is_array( $parvalue ) )
+				{	// Convert string to array:
+					$parvalue = array( $parvalue );
+				}
+				$notifications_flags = array_merge( $notifications_flags, $parvalue );
+				$notifications_flags = array_unique( $notifications_flags );
+				return $this->set_param( 'notifications_flags', 'string', implode( ',', $notifications_flags ), $make_null );
+
 			default:
 				return parent::set( $parname, $parvalue, $make_null );
 		}
@@ -5171,6 +5461,9 @@ class Item extends ItemLight
 		global $DB, $current_User, $Plugins;
 
 		$DB->begin( 'SERIALIZABLE' );
+
+		// Restrict item status to max allowed by item collection:
+		$this->restrict_status_by_collection( true );
 
 		if( $this->status != 'draft' )
 		{	// The post is getting published in some form, set the publish date so it doesn't get auto updated in the future:
@@ -5363,6 +5656,9 @@ class Item extends ItemLight
 		global $DB, $Plugins;
 
 		$DB->begin( 'SERIALIZABLE' );
+
+		// Restrict item status to max allowed by item collection:
+		$this->restrict_status_by_collection( true );
 
 		if( $this->status != 'draft' )
 		{	// The post is getting published in some form, set the publish date so it doesn't get auto updated in the future:
@@ -5631,7 +5927,7 @@ class Item extends ItemLight
 	 */
 	function update_excerpt( $maxlen = 254, $tail = '&hellip;' )
 	{
-		if( empty($this->excerpt) || $this->excerpt_autogenerated )
+		if( empty($this->excerpt) || ( $this->excerpt_autogenerated && isset( $this->dbchanges['post_content'] ) ) )
 		{	// We want to regenerate the excerpt from the content:
 			$excerpt = $this->get_autogenerated_excerpt( $maxlen, $tail );
 
@@ -5663,7 +5959,7 @@ class Item extends ItemLight
 		$content = array_shift( $content_parts );
 
 		// Remove inline images from excerpt // [image:123:caption:.class] [file:123:caption:.class] [inline:123:.class]
-		$content = preg_replace( '/\[(image|file|inline):\d+:?[^\]]*\]/i', '', $content );
+		$content = preg_replace( '/\[(image|file|inline|video|audio|thumbnail):\d+:?[^\]]*\]/i', '', $content );
 
 		return excerpt( $content, $maxlen, $tail );
 	}
@@ -5837,15 +6133,23 @@ class Item extends ItemLight
 
 
 	/**
-	 * Execute or schedule post(=after) processing tasks
+	 * Execute or schedule various notifications:
+	 * - notifications for moderators
+	 * - notifications for subscribers
+	 * - pings
 	 *
-	 * Includes notifications & pings
-	 *
-	 * @param boolean Give more info messages (we want to avoid that when we save & continue editing)
-	 * @param boolean Repeat notifications and pings to already finished
+	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by current logged in User
+	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
+	 * @param boolean|string Force sending notifications for members:
+	 *                       false   - Auto mode depending on current item statuses
+	 *                       'skip'  - Skip notifications
+	 *                       'force' - Force notifications
+	 *                       'mark'  - Change DB flag to "notified/sent" but do NOT actually send notifications
+	 * @param boolean|string Force sending notifications for community (use same values of second param)
+	 * @param boolean|string Force sending outbound pings (use same values of second param)
 	 * @return boolean TRUE on success
 	 */
-	function handle_post_processing( $verbose = true, $repeat_finished = false )
+	function handle_notifications( $executed_by_userid = NULL, $is_new_item = false, $force_members = false, $force_community = false, $force_pings = false )
 	{
 		global $Settings, $Messages, $localtimenow;
 
@@ -5853,79 +6157,124 @@ class Item extends ItemLight
 		$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
 		if( $notifications_mode == 'off' )
-		{	// Don't send notifications and pings:
+		{	// Don't send any notifications nor pings:
 			return false;
 		}
 
-		if( $repeat_finished && $this->get( 'notifications_status' ) == 'finished' )
-		{	// If users were already notified about this item
-			// but we need it again, for example when item status was changed to published:
-			//  1. Then we should send it again because simple users(not moderators)
-			//     receive this only when item is published.
-			//  2. Also moderators must receive a notification when this item
-			//     has been published by some other moderator.
-
-			// So allow to send email notifications again below depending on the mode...
+		if( $executed_by_userid === NULL && is_logged_in() )
+		{	// Use current user by default:
+			global $current_User;
+			$executed_by_userid = $current_User->ID;
 		}
-		elseif( $this->get( 'notifications_status' ) != 'noreq' )
-		{	// Pings have been done before, Skip notifications and pings:
-			if( $verbose )
-			{
-				$Messages->add( T_('Post had already pinged: skipping notifications...'), 'note' );
-			}
+
+		// FIRST: Moderators need to be notified immediately, even if the post is a draft/review and/or has an issue_date in the future.
+		// fp> NOTE: for simplicity, for now, we will NOT make a scheduled job for this (but we will probably do so in the future)
+		// Send email notifications to users who can moderate this item:
+		$already_notified_user_IDs = $this->send_moderation_emails( $executed_by_userid, $is_new_item );
+
+		// SECOND: Subscribers may be notified asynchornously... and that is a even a requirement if the post has an issue_date in the future.
+
+		$notified_flags = array();
+		if( $force_members == 'mark' )
+		{	// Only change DB flag to "members_notified" but do NOT actually send notifications:
+			$force_members = false;
+			$notified_flags[] = 'members_notified';
+			$Messages->add( T_('Marking email notifications for members as sent.'), 'note' );
+		}
+		if( $force_community == 'mark' )
+		{	// Only change DB flag to "community_notified" but do NOT actually send notifications:
+			$force_community = false;
+			$notified_flags[] = 'community_notified';
+			$Messages->add( T_('Marking email notifications for community as sent.'), 'note' );
+		}
+		if( $force_pings == 'mark' )
+		{	// Only change DB flag to "pings_sent" but do NOT actually send pings:
+			$force_pings = false;
+			$notified_flags[] = 'pings_sent';
+			$Messages->add( T_('Marking pings as sent.'), 'note' );
+		}
+		if( ! empty( $notified_flags ) )
+		{	// Save the marked processing status to DB:
+			$this->set( 'notifications_flags', $notified_flags );
+			$this->dbupdate( false, false, false );
+		}
+
+		// Instead of the above we now check the flags:
+		if( ( $force_members != 'force' && $force_community != 'force' && $force_pings != 'force' ) &&
+		    $this->check_notifications_flags( array( 'members_notified', 'community_notified', 'pings_sent' ) ) )
+		{	// All possible notifications have already been sent and no forcing for any notification:
+			$Messages->add( T_('All possible notifications have already been sent: skipping notifications...'), 'note' );
 			return false;
 		}
+
+		// IMMEDIATE vs ASYNCHRONOUS sending:
 
 		if( $notifications_mode == 'immediate' && strtotime( $this->issue_date ) <= $localtimenow )
-		{	// We want to do the post processing immediately:
+		{	// We want to send the notifications immediately (can only be done if post does not have an issue_date in the future):
 
-			// Send outbound pings:
-			$this->send_outbound_pings( $verbose );
+			// Send outbound pings: (will only do something if visibility is 'public')
+			$this->send_outbound_pings( $force_pings );
 
-			// Send email notifications to users who can moderate this item:
-			$already_notified_user_IDs = $this->send_moderation_emails();
+			// Send email notifications to users who want to receive them for the collection of this item: (will be different recipients depending on visibility)
+			$notified_flags = $this->send_email_notifications( $executed_by_userid, $is_new_item, $already_notified_user_IDs, $force_members, $force_community );
 
-			// Send email notifications to users who want receive it on collection of this item:
-			$this->send_email_notifications( $already_notified_user_IDs );
+			// Record that we have just notified the members and/or community:
+			$this->set( 'notifications_flags', $notified_flags );
 
 			// Record that processing has been done:
 			$this->set( 'notifications_status', 'finished' );
 		}
-		else
-		{	// We want asynchronous post processing. This applies to posts with date in future too.
+		elseif( $this->get( 'notifications_status' ) != 'todo' && $this->get( 'notifications_status' ) != 'started' )
+		{	// We want asynchronous post processing. (This automatically applies to posts with issue_date in the future):
 
-			if( $notifications_mode == 'immediate' && strtotime( $this->issue_date ) > $localtimenow )
-			{	// Display this warning, because when the cron job will be executed any notification will NOT be sent:
+			if( $notifications_mode == 'immediate' )
+			{	// We ended up here because the issue_date is in the future BUT notifications are not sent to asynchronoys...
+				// This means we will schedule a job but it will never get executed until the admin turns on async notifications:
 				$Messages->add( sprintf( T_('You just published a post in the future. You must set your notifications to <a %s>Asynchronous</a> so that b2evolution can send out notification when this post goes live.'),
 					'href="http://b2evolution.net/man/after-each-post-settings" target="_blank"' ), 'warning' );
 			}
 
-			// CREATE OBJECT:
+			// CREATE CRON JOB OBJECT:
+
+			// Note: in case of successive edits of a post we may create many cron jobs for it.
+			// It will be the responsibility of the cron jobs to detect if another one is already running and not execute twice or more times concurrently.
+
 			load_class( '/cron/model/_cronjob.class.php', 'Cronjob' );
-			$edited_Cronjob = new Cronjob();
+			$item_Cronjob = new Cronjob();
 
 			// start datetime. We do not want to ping before the post is effectively published:
-			$edited_Cronjob->set( 'start_datetime', $this->issue_date );
+			$item_Cronjob->set( 'start_datetime', $this->issue_date );
 
 			// no repeat.
 
 			// key:
-			$edited_Cronjob->set( 'key', 'send-post-notifications' );
+			$item_Cronjob->set( 'key', 'send-post-notifications' );
 
 			// params: specify which post this job is supposed to send notifications for:
-			$edited_Cronjob->set( 'params', array( 'item_ID' => $this->ID ) );
+			$item_Cronjob->set( 'params', array(
+					'item_ID'                   => $this->ID,
+					'executed_by_userid'        => $executed_by_userid,
+					'is_new_item'               => $is_new_item,
+					'already_notified_user_IDs' => $already_notified_user_IDs,
+					'force_members'             => $force_members,
+					'force_community'           => $force_community,
+					'force_pings'               => $force_pings,
+				) );
 
 			// Save cronjob to DB:
-			$edited_Cronjob->dbinsert();
+			if( $item_Cronjob->dbinsert() )
+			{
+				$Messages->add( T_('Scheduling email notifications for subscribers.'), 'note' );
 
-			// Memorize the cron job ID which is going to handle this post:
-			$this->set( 'notifications_ctsk_ID', $edited_Cronjob->ID );
+				// Memorize the cron job ID which is going to handle this post:
+				$this->set( 'notifications_ctsk_ID', $item_Cronjob->ID );
 
-			// Record that processing has been scheduled:
-			$this->set( 'notifications_status', 'todo' );
+				// Record that processing has been scheduled:
+				$this->set( 'notifications_status', 'todo' );
+			}
 		}
 
-		// Save the new processing status to DB, but do not update last edited by user, slug or post excerpt
+		// Save the new processing status to DB, but do not update last edited by user, slug or post excerpt:
 		$this->dbupdate( false, false, false );
 
 		return true;
@@ -5933,19 +6282,29 @@ class Item extends ItemLight
 
 
 	/**
-	 * Send post may need moderation notifications for those users who have rights to moderate this post, and would like to receive notifications
+	 * Send "post may need moderation" notifications for those users who have permission to moderate this post and would like to receive these notifications.
 	 *
+	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by current logged in User
+	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
 	 * @return array the notified user ids
 	 */
-	function send_moderation_emails()
+	function send_moderation_emails( $executed_by_userid = NULL, $is_new_item = false )
 	{
-		global $Settings, $UserSettings, $DB;
+		global $Settings, $UserSettings, $DB, $Messages;
+
+		if( $executed_by_userid === NULL && is_logged_in() )
+		{	// Use current user by default:
+			global $current_User;
+			$executed_by_userid = $current_User->ID;
+		}
 
 		// Select all users who are post moderators in this Item's blog
 		$blog_ID = $this->load_Blog();
 
+		$notify_moderation_setting_name = ( $is_new_item ? 'notify_post_moderation' : 'notify_edit_pst_moderation' );
+
 		$notify_condition = 'uset_value IS NOT NULL AND uset_value <> "0"';
-		if( $Settings->get( 'def_notify_post_moderation' ) )
+		if( $Settings->get( 'def_'.$notify_moderation_setting_name ) )
 		{
 			$notify_condition = '( uset_value IS NULL OR ( '.$notify_condition.' ) )';
 		}
@@ -5957,12 +6316,16 @@ class Item extends ItemLight
 		$SQL->FROM_add( 'LEFT JOIN T_blogs ON ( blog_ID = '.$this->blog_ID.' )' );
 		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0 AND user_ID = bloguser_user_ID AND bloguser_blog_ID = '.$this->blog_ID.' )' );
 		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0 AND user_grp_ID = bloggroup_group_ID AND bloggroup_blog_ID = '.$this->blog_ID.' )' );
-		$SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "notify_post_moderation"' );
+		$SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "'.$notify_moderation_setting_name.'"' );
 		$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
 		$SQL->WHERE( $notify_condition );
 		$SQL->WHERE_and( '( bloguser_perm_edit IS NOT NULL AND bloguser_perm_edit <> "no" AND bloguser_perm_edit <> "own" )
 				OR ( bloggroup_perm_edit IS NOT NULL AND bloggroup_perm_edit <> "no" AND bloggroup_perm_edit <> "own" )
 				OR ( grp_perm_blogs = "editall" ) OR ( user_ID = blog_owner_user_ID )' );
+		if( $executed_by_userid !== NULL )
+		{	// Don't notify the user who just created/updated this post:
+			$SQL->WHERE_and( 'user_ID != '.$DB->quote( $executed_by_userid ) );
+		}
 
 		$post_moderators = $DB->get_assoc( $SQL->get() );
 
@@ -5977,8 +6340,8 @@ class Item extends ItemLight
 			return NULL;
 		}
 
-		// Collect all notified User ID in this array
-		$notfied_Users = array();
+		// Collect all notified User IDs in this array:
+		$notified_user_IDs = array();
 
 		$post_creator_level = $post_creator_User->level;
 		$UserCache = & get_UserCache();
@@ -6005,19 +6368,40 @@ class Item extends ItemLight
 				'Item'           => $this,
 				'recipient_User' => $moderator_User,
 				'notify_type'    => 'moderator',
+				'is_new_item'    => $is_new_item,
 			);
 
 			locale_temp_switch( $moderator_User->locale );
-			$subject = T_('New post may need moderation:').' '.sprintf( T_('%s created a new post on "%s"'), $post_creator_User->login, $this->Blog->get('shortname') );
-			// Send the email
-			send_mail_to_User( $moderator_ID, $subject, 'post_new', $email_template_params, false, array( 'Reply-To' => $post_creator_User->email ) );
-			locale_restore_previous();
 
-			// A send notification email request to the user with $moderator_ID ID was processed
-			$notfied_Users[] = $moderator_ID;
+			if( $this->status == 'draft' || $this->status == 'review' )
+			{
+				/* TRANS: Subject of the mail to send on new posts to moderators. First %s is blog name, the second %s is the item's title. */
+				$subject = T_('[%s] New post awaiting moderation: "%s"');
+			}
+			else
+			{
+				/* TRANS: Subject of the mail to send on new posts to moderators. First %s is blog name, the second %s is the item's title. */
+				$subject = T_('[%s] New post may need moderation: "%s"');
+			}
+			$subject = sprintf( $subject, $this->Blog->get('shortname'), $this->get('title') );
+
+			// Send the email:
+			if( send_mail_to_User( $moderator_ID, $subject, 'post_new', $email_template_params, false, array( 'Reply-To' => $post_creator_User->email ) ) )
+			{	// A send notification email request to the user with $moderator_ID ID was processed:
+				$notified_user_IDs[] = $moderator_ID;
+			}
+
+			locale_restore_previous();
 		}
 
-		return $notfied_Users;
+		// Record that we have notified the moderators (for info only):
+		$this->set( 'notifications_flags', 'moderators_notified' );
+		// Save the new processing status to DB, but do not update last edited by user, slug or post excerpt:
+		$this->dbupdate( false, false, false );
+
+		$Messages->add( sprintf( T_('Sending %d email notifications to moderators.'), count( $notified_user_IDs ) ), 'note' );
+
+		return $notified_user_IDs;
 	}
 
 
@@ -6026,51 +6410,217 @@ class Item extends ItemLight
 	 *
 	 * @todo fp>> shall we notify suscribers of blog were this is in extra-cat? blueyed>> IMHO yes.
 	 *
+	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by current logged in User
+	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
 	 * @param array Already notified user ids, or NULL if it is not the case
+	 * @param boolean|string Force sending notifications for members:
+	 *                       false - Auto mode depending on current item statuses
+	 *                       'skip' - Skip notifications
+	 *                       'force' - Force notifications
+	 * @param boolean|string Force sending notifications for community (use same values of third param)
+	 * @return array Notified flags: 'members_notified', 'community_notified'
 	 */
-	function send_email_notifications( $already_notified_user_IDs = NULL )
+	function send_email_notifications( $executed_by_userid = NULL, $is_new_item = false, $already_notified_user_IDs = NULL, $force_members = false, $force_community = false )
 	{
-		global $DB, $debug;
+		global $DB, $debug, $Messages;
 
-		if( $this->get( 'status' ) != 'published' )
-		{	// Don't send notifications about not published items:
-			return;
-		}
-
-		if( in_array( $this->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'special' ) ) )
-		{	// Don't send pings of items with these item types:
-			return;
+		if( $executed_by_userid === NULL && is_logged_in() )
+		{	// Use current user by default:
+			global $current_User;
+			$executed_by_userid = $current_User->ID;
 		}
 
 		$edited_Blog = & $this->get_Blog();
 
 		if( ! $edited_Blog->get_setting( 'allow_subscriptions' ) )
 		{	// Subscriptions not enabled!
-			return;
+			$Messages->add( T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.'), 'note' );
+			return array();
 		}
 
-		// Create condition to not select already notified moderator users:
-		$except_users_condition = empty( $already_notified_user_IDs ) ? '' : ' AND sub_user_ID NOT IN ( '.implode( ',', $already_notified_user_IDs ).' )';
+		if( ! $this->notifications_allowed() )
+		{	// Don't send notifications about some post/usages like "special":
+			// Note: this is a safety but this case should never happen, so don't make translators work on this:
+			$Messages->add( 'This post type/usage cannot support notifications: skipping notifications...', 'note' );
+			return array();
+		}
+
+		if( ! in_array( $this->get( 'status' ), array( 'protected', 'community', 'published' ) ) )
+		{	// Don't send notifications about items with not allowed status:
+			$status_titles = get_visibility_statuses( '', array() );
+			$status_title = isset( $status_titles[ $this->get( 'status' ) ] ) ? $status_titles[ $this->get( 'status' ) ] : $this->get( 'status' );
+			$Messages->add( sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title ), 'note' );
+			return array();
+		}
+
+		if( $force_members == 'skip' && $force_community == 'skip' )
+		{	// Skip subscriber notifications because of it is forced by param:
+			$Messages->add( T_('Skipping email notifications to subscribers.'), 'note' );
+			return array();
+		}
+
+		if( $force_members == 'force' && $force_community == 'force' )
+		{	// Force to members and community:
+			$Messages->add( T_('Force sending email notifications to subscribers...'), 'note' );
+		}
+		elseif( $force_members == 'force' )
+		{	// Force to members only:
+			$Messages->add( T_('Force sending email notifications to subscribed members...'), 'note' );
+		}
+		elseif( $force_community == 'force' )
+		{	// Force to community only:
+			$Messages->add( T_('Force sending email notifications to other subscribers...'), 'note' );
+		}
+		else
+		{	// Check if email notifications can be sent for this item currently:
+
+			// Some post usages should not trigger notifications to subscribers (moderators are notified earlier in the process, so they will be notified)
+			// fp> I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
+			if( $this->get_type_setting( 'usage' ) != 'post' )
+			{	// Don't send outbound pings for items that are not regular posts:
+				$Messages->add( T_('This post type/usage doesn\'t need notifications by default: skipping notifications...'), 'note' );
+				return array();
+			}
+		}
+
+		$notify_members = false;
+		$notify_community = false;
+
+		if( $this->get( 'status' ) == 'protected' )
+		{	// If the post is visible for members only...
+			if( $force_members == 'force' || ( ! $this->check_notifications_flags( 'members_notified' ) && $this->get_type_setting( 'usage' ) == 'post' ) )
+			{	// Members have not been notified yet OR Force sending, do so:
+				$notify_members = true;
+			}
+		}
+		elseif( $this->get( 'status' ) == 'community' || $this->get( 'status' ) == 'published' )
+		{	// If the post is visible to the community or is public...
+			if( $force_members == 'force' || ( ! $this->check_notifications_flags( 'members_notified' ) && $this->get_type_setting( 'usage' ) == 'post' ) )
+			{	// Members have not been notified yet OR Force sending, do so:
+				$notify_members = true;
+			}
+			if( $force_community == 'force' || ( ! $this->check_notifications_flags( 'community_notified' ) && $this->get_type_setting( 'usage' ) == 'post' ) )
+			{	// Community have not been notified yet OR Force sending, do so:
+				$notify_community = true;
+			}
+		}
+
+		if( ! $notify_members && ! $notify_community )
+		{	// Everyone has already been notified, nothing to do:
+			$Messages->add( T_('Skipping email notifications to subscribers because they were already notified.'), 'note' );
+			return array();
+		}
+
+		if( $notify_members && $force_members == 'skip' )
+		{	// Skip email notifications to members because it is forced by param:
+			$Messages->add( T_('Skipping email notifications to subscribed members.'), 'note' );
+			$notify_members = false;
+		}
+		if( $notify_community && $force_community == 'skip' )
+		{	// Skip email notifications to community because it is forced by param:
+			$Messages->add( T_('Skipping email notifications to other subscribers.'), 'note' );
+			$notify_community = false;
+		}
+
+		// Set flags what really users will be notified below:
+		$notified_flags = array();
+		if( $notify_members )
+		{	// If members should be notified:
+			$notified_flags[] = 'members_notified';
+		}
+		if( $notify_community )
+		{	// If community should be notified:
+			$notified_flags[] = 'community_notified';
+		}
+
+		if( ! $notify_members && ! $notify_community )
+		{	// All notifications are skipped by requested params:
+			return $notified_flags;
+		}
 
 		// Get list of users who want to be notified:
 		// TODO: also use extra cats/blogs??
-		$sql = 'SELECT DISTINCT sub_user_ID
-							FROM T_subscriptions
-						WHERE sub_coll_ID = '.$this->get_blog_ID().'
-							AND sub_items <> 0'.$except_users_condition;
-		$notify_users = $DB->get_col( $sql, 0, 'Get list of users who want to be notified about new items on colection #'.$this->get_blog_ID() );
-
-		if( empty( $notify_users ) )
-		{	// No-one to notify:
-			return;
+		$SQL = new SQL( 'Get list of users who want to be notified about new items on colection #'.$this->get_blog_ID() );
+		$SQL->SELECT( 'DISTINCT sub_user_ID' );
+		$SQL->FROM( 'T_subscriptions' );
+		$SQL->WHERE( 'sub_coll_ID = '.$this->get_blog_ID() );
+		$SQL->WHERE_and( 'sub_items <> 0' );
+		if( ! empty( $already_notified_user_IDs ) )
+		{	// Create condition to not select already notified moderator users:
+			$SQL->WHERE_and( 'sub_user_ID NOT IN ( '.implode( ',', $already_notified_user_IDs ).' )' );
 		}
+		if( $executed_by_userid !== NULL )
+		{	// Don't notify the user who just created/updated this post:
+			$SQL->WHERE_and( 'sub_user_ID != '.$DB->quote( $executed_by_userid ) );
+		}
+		$notify_users = $DB->get_col( $SQL->get(), 0, $SQL->title );
 
 		// Load all users who will be notified:
 		$UserCache = & get_UserCache();
 		$UserCache->load_list( $notify_users );
 
+		$members_count = 0;
+		$community_count = 0;
+		foreach( $notify_users as $u => $user_ID )
+		{	// Check each subscribed user if we can send notification to him depending on current request and item settings:
+			if( ! ( $notify_User = & $UserCache->get_by_ID( $user_ID, false, false ) ) )
+			{	// Wrong user, Skip it:
+				unset( $notify_users[ $u ] );
+				continue;
+			}
+			// Check if the user is member of the collection:
+			$is_member = $notify_User->check_perm( 'blog_ismember', 'view', false, $this->get_blog_ID() );
+			if( $notify_members && $notify_community )
+			{	// We can notify all subscribed users:
+				if( $is_member )
+				{	// Count subscribed member:
+					$members_count++;
+				}
+				else
+				{	// Count other subscriber:
+					$community_count++;
+				}
+			}
+			elseif( $notify_members )
+			{	// We should notify only members:
+				if( $is_member )
+				{	// Count subscribed member:
+					$members_count++;
+				}
+				else
+				{	// Skip not member:
+					unset( $notify_users[ $u ] );
+				}
+			}
+			else
+			{	// We should notify only community users:
+				if( ! $is_member )
+				{	// Count subscribed community user:
+					$community_count++;
+				}
+				else
+				{	// Skip member:
+					unset( $notify_users[ $u ] );
+				}
+			}
+		}
+
+		if( $notify_members )
+		{	// Display a message to know how much members are notified:
+			$Messages->add( sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count ), 'note' );
+		}
+		if( $notify_community )
+		{	// Display a message to know how much community users are notified:
+			$Messages->add( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), 'note' );
+		}
+
+		if( empty( $notify_users ) )
+		{	// No-one to notify:
+			return $notified_flags;
+		}
+
 		/*
-		 * We have a list of user IDs to notify:
+		 * We have a list of User IDs to notify:
 		 */
 		$this->get_creator_User();
 
@@ -6081,7 +6631,7 @@ class Item extends ItemLight
 		$cache_by_locale = array();
 		foreach( $notify_users as $user_ID )
 		{
-			$notify_User = $UserCache->get_by_ID( $user_ID, false, false );
+			$notify_User = & $UserCache->get_by_ID( $user_ID, false, false );
 			if( empty( $notify_User ) )
 			{	// skip invalid users:
 				continue;
@@ -6100,9 +6650,8 @@ class Item extends ItemLight
 			{	// No message for this locale generated yet:
 				locale_temp_switch( $notify_locale );
 
-				$cache_by_locale[$notify_locale]['subject']['short'] = sprintf( T_('%s created a new post in blog "%s"'), $this->creator_User->get( 'login' ), $edited_Blog->get('shortname') );
-
-				$cache_by_locale[$notify_locale]['subject']['full'] = sprintf( T_('[%s] New post: "%s"'), $edited_Blog->get('shortname'), $this->get('title') );
+				/* TRANS: Subject of the mail to send on new posts to subscribed users. First %s is blog name, the second %s is the item's title. */
+				$cache_by_locale[$notify_locale]['subject'] = sprintf( T_('[%s] New post: "%s"'), $edited_Blog->get('shortname'), $this->get('title') );
 
 				locale_restore_previous();
 			}
@@ -6113,6 +6662,7 @@ class Item extends ItemLight
 					'Item'           => $this,
 					'recipient_User' => $notify_User,
 					'notify_type'    => 'subscription',
+					'is_new_item'    => $is_new_item,
 				);
 
 			if( $debug >= 2 )
@@ -6121,42 +6671,69 @@ class Item extends ItemLight
 				echo "<p>Sending notification to $notify_email:<pre>$message_content</pre>";
 			}
 
-			$subject_type = $notify_full ? 'full' : 'short';
-			send_mail_to_User( $user_ID, $cache_by_locale[$notify_locale]['subject'][$subject_type], 'post_new', $email_template_params );
+			send_mail_to_User( $user_ID, $cache_by_locale[$notify_locale]['subject'], 'post_new', $email_template_params );
 
 			blocked_emails_memorize( $notify_User->email );
 		}
 
 		blocked_emails_display();
+
+		return $notified_flags;
 	}
 
 
 	/**
 	 * Send outbound pings for a post
 	 *
-	 * @param boolean give more info messages (we want to avoid that when we save & continue editing)
+	 * @param boolean|string Force sending outbound pings:
+	 *                       false - Auto mode depending on current item statuses
+	 *                       'skip' - Skip notifications
+	 *                       'force' - Force notifications
 	 * @return boolean TRUE on success
 	 */
-	function send_outbound_pings( $verbose = true )
+	function send_outbound_pings( $force_pings = false )
 	{
 		global $Plugins, $baseurl, $Messages, $evonetsrv_host, $test_pings_for_real;
 
-		if( $this->get( 'status' ) != 'published' )
-		{	// Don't send outbound pings about not published items:
-			if( $verbose )
-			{
-				$Messages->add( T_('Post not publicly published: skipping notifications...'), 'note' );
-			}
+		if( ! $this->notifications_allowed() )
+		{	// Don't send pings about some post/usages like "special":
+			// Note: this is a safety but this case should never happen, so don't make translators work on this:
+			$Messages->add( 'This post type/usage cannot support pings: skipping pings...', 'note' );
 			return false;
 		}
 
-		if( in_array( $this->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'special' ) ) )
-		{	// Don't send outbound pings of items with these item types:
-			if( $verbose )
-			{
-				$Messages->add( T_('This post type doesn\'t need notifications...'), 'note' );
-			}
+		if( $this->get( 'status' ) != 'published' )
+		{	// Don't send pings if item is not 'public':
+			$Messages->add( T_('Skipping outbound pings because item is not published yet.'), 'note' );
 			return false;
+		}
+
+		if( $force_pings == 'skip' )
+		{	// Skip pings because it is forced by param:
+			$Messages->add( T_('Skipping outbound pings.'), 'note' );
+			return false;
+		}
+
+		if( $force_pings == 'force' )
+		{	// Force pings:
+			$Messages->add( T_('Force sending outbound pings...'), 'note' );
+		}
+		else
+		{	// Check if pings can be sent for this item currently:
+
+			if( $this->check_notifications_flags( 'pings_sent' ) )
+			{	// Don't send pings if they have already been sent:
+				$Messages->add( T_('Skipping outbound pings because they were already sent.'), 'note' );
+				return false;
+			}
+
+			// Some post usages should not trigger notifications to subscribers (moderators are notified earlier in the process, so they will be notified)
+			// fp> I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
+			if( $this->get_type_setting( 'usage' ) != 'post' )
+			{	// Don't send outbound pings for items that are not regular posts:
+				$Messages->add( T_('This post type/usage doesn\'t need pings by default: skipping pings...'), 'note' );
+				return false;
+			}
 		}
 
 		load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
@@ -6172,44 +6749,50 @@ class Item extends ItemLight
 				|| preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) ) /* domain ending in ".local" */
 			&& $evonetsrv_host != 'localhost'	// OK if we are pinging locally anyway ;)
 			&& empty($test_pings_for_real) )
-		{
-			if( $verbose )
-			{
-				$Messages->add( T_('Skipping pings (Running on localhost).'), 'note' );
-			}
+		{	// Don't send pings from localhost:
+			$Messages->add( T_('Skipping pings (Running on localhost).'), 'note' );
 			return false;
 		}
-		else foreach( $ping_plugins as $plugin_code )
-		{
-			$Plugin = & $Plugins->get_by_code($plugin_code);
+		else
+		{	// Send pings:
+			$Messages->add( T_('Trying to find plugins for sending outbound pings...'), 'note' );
 
-			if( $Plugin )
+			foreach( $ping_plugins as $plugin_code )
 			{
-				$ping_messages = array();
-				$ping_messages[] = sprintf( T_('Pinging %s...'), $Plugin->ping_service_name );
-				$params = array( 'Item' => & $this, 'xmlrpcresp' => NULL, 'display' => false );
+				$Plugin = & $Plugins->get_by_code($plugin_code);
 
-				$r = $r && ( $Plugin->ItemSendPing( $params ) );
-
-				if( ! empty( $params['xmlrpcresp'] ) )
+				if( $Plugin )
 				{
-					if( is_a( $params['xmlrpcresp'], 'xmlrpcresp' ) )
-					{
-						// dh> TODO: let xmlrpc_displayresult() handle $Messages (e.g. "error", but should be connected/after the "Pinging %s..." from above)
-						ob_start();
-						xmlrpc_displayresult( $params['xmlrpcresp'], true );
-						$ping_messages[] = ob_get_contents();
-						ob_end_clean();
-					}
-					else
-					{
-						$ping_messages[] = $params['xmlrpcresp'];
-					}
-				}
+					$ping_messages = array();
+					$ping_messages[] = sprintf( T_('Pinging %s...'), $Plugin->ping_service_name );
+					$params = array( 'Item' => & $this, 'xmlrpcresp' => NULL, 'display' => false );
 
-				$Messages->add( implode( '<br />', $ping_messages ), 'note' );
+					$r = $r && ( $Plugin->ItemSendPing( $params ) );
+
+					if( ! empty( $params['xmlrpcresp'] ) )
+					{
+						if( $params['xmlrpcresp'] instanceof xmlrpcresp )
+						{
+							// dh> TODO: let xmlrpc_displayresult() handle $Messages (e.g. "error", but should be connected/after the "Pinging %s..." from above)
+							ob_start();
+							xmlrpc_displayresult( $params['xmlrpcresp'], true );
+							$ping_messages[] = ob_get_contents();
+							ob_end_clean();
+						}
+						else
+						{
+							$ping_messages[] = $params['xmlrpcresp'];
+						}
+					}
+
+					$Messages->add( implode( '<br />', $ping_messages ), 'note' );
+				}
 			}
 		}
+
+		// Record that we have just pinged:
+		$this->set( 'notifications_flags', 'pings_sent' );
+
 		return $r;
 	}
 
@@ -6294,11 +6877,15 @@ class Item extends ItemLight
 				return $this->priorities[ $this->priority ];
 
 			case 'pingsdone':
-				// Deprecated by fp 2006-08-21
-				return ($this->post_notifications_status == 'finished');
+				// Have pings been sent? (should only happen once the post has visibility 'public')
+				// return ($this->post_notifications_status == 'finished'); // Deprecated by fp 2006-08-21 -- TODO: this should now become an alias of "pings_sent"
+				return $this->check_notifications_flags( 'pings_sent' );
 
 			case 'excerpt':
-				return $this->get_excerpt2();
+				return $this->get_excerpt2( array( 'update_db' => false )  );
+
+			case 'notifications_flags':
+				return empty( $this->notifications_flags ) ? array() : explode( ',', $this->notifications_flags );
 		}
 
 		return parent::get( $parname );
@@ -6614,32 +7201,37 @@ class Item extends ItemLight
 	/**
 	 * Get the latest Comment on this Item
 	 *
-	 * @param string the status of the latest comment
 	 * @return Comment
 	 */
-	function & get_latest_Comment( $status = NULL )
+	function & get_latest_Comment()
 	{
 		global $DB;
 
-		if( is_null($this->latest_Comment) )
+		if( $this->latest_Comment === NULL )
 		{
-			$SQL = new SQL( 'Get the latest Comment on the Item' );
+			if( empty( $this->ID ) )
+			{	// New item has no comments:
+				$this->latest_Comment = false;
+				return $this->latest_Comment;
+			}
+
+			$SQL = new SQL( 'Get the latest Comment on the Item #'.$this->ID );
 			$SQL->SELECT( 'comment_ID' );
 			$SQL->FROM( 'T_comments' );
 			$SQL->WHERE( 'comment_item_ID = '.$DB->quote( $this->ID ) );
 			$SQL->WHERE_and( 'comment_type != "meta"' );
+			$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $this->get_blog_ID(), 'comment' ), 'comment_', $this->get_blog_ID(), 'blog_comment!', true ) );
 			$SQL->ORDER_BY( 'comment_date DESC' );
 			$SQL->LIMIT( '1' );
 
-			if( $status != NULL )
-			{
-				$SQL->WHERE_and( 'comment_status = '.$DB->quote( $status ) );
-			}
-
-			if( $comment_ID = $DB->get_var( $SQL->get() ) )
-			{
+			if( $comment_ID = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) )
+			{	// Load the latest Comment in cache:
 				$CommentCache = & get_CommentCache();
 				$this->latest_Comment = & $CommentCache->get_by_ID( $comment_ID );
+			}
+			else
+			{	// Set FALSE to don't call SQL query twice when the item has no comments yet:
+				$this->latest_Comment = false;
 			}
 		}
 
@@ -7054,10 +7646,10 @@ class Item extends ItemLight
 		global $Plugins;
 
 		// Find all matches with inline tags
-		preg_match_all( '/\[(image|file|inline):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
+		preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
 
 		if( !empty( $inlines[0] ) )
-		{ // There are inline tags in the content
+		{ // There are inline tags in the content...
 
 			if( !isset( $LinkList ) )
 			{ // Get list of attached Links only first time
@@ -7066,32 +7658,34 @@ class Item extends ItemLight
 			}
 
 			if( empty( $LinkList ) )
-			{ // This Item has not the inline attached files, Exit here
+			{ // This Item has no attached files for 'inline' position, Exit here
 				return $content;
 			}
 
 			foreach( $inlines[0] as $i => $current_link_tag )
 			{
-				$inline_type = $inlines[1][$i]; // image|file|inline
+				$inline_type = $inlines[1][$i]; // image|file|inline|video|audio|thumbnail
 				$current_link_ID = (int)$inlines[2][$i];
+
 				if( empty( $current_link_ID ) )
 				{ // Invalid link ID, Go to next match
 					continue;
 				}
+
 				if( ! ( $Link = & $LinkList->get_by_field( 'link_ID', $current_link_ID ) ) )
-				{ // Link is not found by ID
+				{ // Link ID is not part of the linked files for position "inline"
 					continue;
 				}
 
 				if( ! ( $File = & $Link->get_File() ) )
-				{ // No File object
+				{ // No File object:
 					global $Debuglog;
 					$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
 					continue;
 				}
 
 				if( ! $File->exists() )
-				{ // File doesn't exist
+				{ // File doesn't exist:
 					global $Debuglog;
 					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
 					continue;
@@ -7101,102 +7695,261 @@ class Item extends ItemLight
 				$params['Link'] = $Link;
 				$params['Item'] = $this;
 
-				$current_image_params = $params;
-				$current_file_params = array();
-				if( ! empty( $inlines[3][$i] ) )
+				switch( $inline_type )
 				{
-					// Get the inline params: caption and class
-					$inline_params = explode( ':.', $inlines[4][$i] );
+					case 'image':
+					case 'inline': // valid file type: image
+						if( $File->is_image() )
+						{
+							$current_image_params = $params;
+							$current_file_params = array();
 
-					if( ! empty( $inline_params[0] ) )
-					{ // Image caption is set, so overwrite the image link title
-						if( $inline_params[0] == '-' )
-						{ // Image caption display is disabled
-							$current_image_params['image_link_title'] = '';
-							$current_image_params['hide_image_link_title'] = true;
+							if( ! empty( $inlines[3][$i] ) ) // check if second colon is present
+							{
+								// Get the inline params: caption and class
+								$inline_params = explode( ':.', $inlines[4][$i] );
+
+								if( ! empty( $inline_params[0] ) )
+								{ // Caption is set, so overwrite the image link title
+									if( $inline_params[0] == '-' )
+									{ // Caption display is disabled
+										$current_image_params['image_link_title'] = '';
+										$current_image_params['hide_image_link_title'] = true;
+									}
+									else
+									{ // New image caption was set
+										$current_image_params['image_link_title'] = strip_tags( $inline_params[0] );
+									}
+
+									$current_image_params['image_desc'] = $current_image_params['image_link_title'];
+									$current_file_params['title'] = $inline_params[0];
+								}
+
+								$class_index = ( $inline_type == 'inline' ) ? 0 : 1; // [inline] tag doesn't have a caption, so 0 index is for class param
+								if( ! empty( $inline_params[ $class_index ] ) )
+								{ // A class name is set for the inline tags
+									$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $class_index ] ) ) );
+									if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
+									{ // Overwrite 'before_image' setting to add an extra class name
+										$current_image_params['before_image'] = '<div class="image_block '.$image_extraclass.'">';
+										// 'after_image' setting must be also defined, becuase it may be different than the default '</div>'
+										$current_image_params['after_image'] = '</div>';
+
+										// Set class for file inline tags
+										$current_file_params['class'] = $image_extraclass;
+									}
+								}
+							}
+
+							if( ! $current_image_params['get_rendered_attachments'] )
+							{ // Save $r to temp var in order to don't get the rendered data from plugins
+								$temp_r = $r;
+							}
+
+							$temp_params = $current_image_params;
+							foreach( $current_image_params as $param_key => $param_value )
+							{ 	// Pass all params by reference, in order to give possibility to modify them by plugin
+								// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
+								$current_image_params[ $param_key ] = & $current_image_params[ $param_key ];
+							}
+
+							// We need to assign the result of trigger_event_first_true to a variable before counting
+							// or else modifications to the params are not applied in PHP7
+							$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_image_params );
+							if( count( $r_params ) != 0 )
+							{	// Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r
+								if( ! $r_params['get_rendered_attachments'] )
+								{ // Restore $r value and mark this item has the rendered attachments
+									$r = $temp_r;
+									$plugin_render_attachments = true;
+								}
+								continue;
+							}
+
+							if( $inline_type == 'image' )
+							{ // Generate the IMG tag with all the alt, title and desc if available
+								$link_tag = $this->get_attached_image_tag( $Link, $current_image_params );
+							}
+							elseif( $inline_type == 'inline' )
+							{ // Generate simple IMG tag with original image size
+								$link_tag = '<img src="'.$File->get_url().'"'
+									.( empty( $current_file_params['class'] ) ? '' : ' class="'.$current_file_params['class'].'"' )
+									.' />';
+							}
 						}
 						else
-						{ // New image caption was set
-							$current_image_params['image_link_title'] = strip_tags( $inline_params[0] );
+						{ // not an image file, do not process
+							$link_tag = $current_link_tag;
 						}
+						break;
 
-						$current_image_params['image_desc'] = $current_image_params['image_link_title'];
-						$current_file_params['title'] = $inline_params[0];
-					}
+					case 'thumbnail':
+						if( $File->is_image() )
+						{
+							global $thumbnail_sizes;
 
-					$class_index = ( $inline_type == 'inline' ) ? 0 : 1; // [inline] tag doesn't have a caption, so 0 index is for class param
-					if( ! empty( $inline_params[ $class_index ] ) )
-					{ // A class name is set for the inline tags
-						$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $class_index ] ) ) );
-						if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
-						{ // Overwrite 'before_image' setting to add an extra class name
-							$current_image_params['before_image'] = '<div class="image_block '.$image_extraclass.'">';
-							// 'after_image' setting must be also defined, becuase it may be different than the default '</div>'
-							$current_image_params['after_image'] = '</div>';
+							$thumbnail_size = 'medium';
+							$thumbnail_position = 'left';
 
-							// Set class for file inline tags
-							$current_file_params['class'] = $image_extraclass;
+							$thumbnail_classes = array();
+
+							if( ! empty( $inlines[3][$i] ) ) // check if second colon is present
+							{
+								// Get the inline params: caption and class
+								$inline_params = explode( ':', $inlines[4][$i] );
+
+								$valid_thumbnail_sizes = array( 'small', 'medium', 'large' );
+								if( ! empty( $inline_params[0] ) && in_array( $inline_params[0], $valid_thumbnail_sizes ) )
+								{
+									$thumbnail_size = $inline_params[0];
+								}
+
+								$valid_thumbnail_positions = array( 'left', 'right' );
+								if( ! empty( $inline_params[1] ) && in_array( $inline_params[1], $valid_thumbnail_positions ) )
+								{
+									$thumbnail_position = $inline_params[1];
+								}
+
+								if( ! empty( $inline_params[2] ) )
+								{
+									$extra_classes = explode( '.', ltrim( $inline_params[2], '.' ) );
+								}
+							}
+
+							switch( $thumbnail_size )
+							{
+								case 'small':
+									$thumbnail_size = 'fit-128x128';
+									break;
+
+								case 'large':
+									$thumbnail_size = 'fit-320x320';
+									break;
+
+								case 'medium':
+								default:
+									$thumbnail_size = 'fit-192x192';
+									break;
+							}
+
+							$thumbnail_classes[] = 'evo_thumbnail';
+							$thumbnail_classes[] = 'evo_thumbnail__'.$thumbnail_position;
+							if( isset( $extra_classes ) )
+							{
+								$thumbnail_classes = array_merge( $thumbnail_classes, $extra_classes );
+							}
+
+							$link_tag = $File->get_thumb_imgtag( $thumbnail_size, implode( ' ', $thumbnail_classes ) );
 						}
-					}
-				}
+						else
+						{
+							$link_tag = $current_link_tag;
+						}
+						break;
 
-				if( ! $current_image_params['get_rendered_attachments'] )
-				{ // Save $r to temp var in order to don't get the rendered data from plugins
-					$temp_r = $r;
-				}
+					case 'file': // valid file types: image, video, audio, other
+						$valid_file_types = array( 'image', 'video', 'audio', 'other' );
+						if( in_array( $File->get_file_type(), $valid_file_types ) )
+						{
+							if( ! empty( $inlines[3][$i] ) ) // check if second colon is present
+							{
+								// Get the file caption
+								$caption = $inlines[4][$i];
 
-				$temp_params = $current_image_params;
-				foreach( $current_image_params as $param_key => $param_value )
-				{ // Pass all params by reference, in order to give possibility to modify them by plugin
-					// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
-					$current_image_params[ $param_key ] = & $current_image_params[ $param_key ];
-				}
+								if( ! empty( $caption ) )
+								{ // Caption is set
+									$current_file_params['title'] = strip_tags( $caption );
+								}
+							}
 
-				if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_image_params ) ) != 0 )
-				{ // Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r
-					if( ! $current_image_params['get_rendered_attachments'] )
-					{ // Restore $r value and mark this item has the rendered attachments
-						$r = $temp_r;
-						$plugin_render_attachments = true;
-					}
-					continue;
-				}
+							if( empty( $current_file_params['title'] ) )
+							{ // Use real file name as title when it is not defined for inline tag
+								$file_title = $File->get( 'title' );
+								$current_file_params['title'] = ' '.( empty( $file_title ) ? $File->get_name() : $file_title );
+							}
+							elseif( $current_file_params['title'] == '-' )
+							{ // Don't display a title in this case, Only file icon will be displayed
+								$current_file_params['title'] = '';
+							}
+							else
+							{ // Add a space between file icon and title
+								$current_file_params['title'] = ' '.$current_file_params['title'];
+							}
+							$link_tag = '<a href="'.$File->get_url().'"'
+								.( empty( $current_file_params['class'] ) ? '' : ' class="'.$current_file_params['class'].'"' )
+								.'>'.$File->get_icon( $current_file_params ).$current_file_params['title'].'</a>';
+						}
+						else
+						{ // not a valid file type, do not process
+							$link_tag = $current_link_tag;
+						}
+						break;
 
-				if( $inline_type == 'image' && $File->is_image() )
-				{ // Generate the IMG tag with all the alt, title and desc if available
-					$link_tag = $this->get_attached_image_tag( $Link, $current_image_params );
-				}
-				elseif( $inline_type == 'inline' )
-				{ // Generate simple IMG tag with original image size
-					if( $File->is_image() )
-					{ // Only when file is really image file
-						$link_tag = '<img src="'.$File->get_url().'"'
-							.( empty( $current_file_params['class'] ) ? '' : ' class="'.$current_file_params['class'].'"' )
-							.' />';
-					}
-					else
-					{ // Display original inline tag when file is not image
+					case 'video':	// valid file type: video
+						if( $File->is_video() )
+						{
+							$current_video_params = $params;
+							// Create an empty dummy element where the plugin is expected to append the rendered video
+							$current_video_params['data'] = '';
+
+							foreach( $current_video_params as $param_key => $param_value )
+							{ // Pass all params by reference, in order to give possibility to modify them by plugin
+								// So plugins can add some data before/after tags (E.g. used by infodots plugin)
+								$current_video_params[ $param_key ] = & $current_video_params[ $param_key ];
+							}
+
+							// We need to assign the result of trigger_event_first_true to a variable before counting
+							// or else modifications to the params are not applied in PHP7
+							$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_video_params );
+							if( count( $r_params ) != 0 )
+							{
+								$link_tag = $r_params['data'];
+							}
+							else
+							{ // no plugin available or was able to render the tag
+								$link_tag = $current_link_tag;
+							}
+						}
+						else
+						{ // not a video file, do not process
+							$link_tag = $current_link_tag;
+						}
+						break;
+
+					case 'audio': // valid file type: audio
+						if( $File->is_audio() )
+						{
+							$current_audio_params = $params;
+							// Create an empty dummy element where the plugin is expected to append the rendered video
+							$current_audio_params['data'] = '';
+
+							foreach( $current_audio_params as $param_key => $param_value )
+							{ // Pass all params by reference, in order to give possibility to modify them by plugin
+								// So plugins can add some data before/after tags (E.g. used by infodots plugin)
+								$current_audio_params[ $param_key ] = & $current_audio_params[ $param_key ];
+							}
+
+							// We need to assign the result of trigger_event_first_true to a variable before counting
+							// or else modifications to the params are not applied in PHP7
+							$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_audio_params );
+							if( count( $r_params ) != 0 )
+							{
+								$link_tag = $r_params['data'];
+							}
+							else
+							{ // no plugin available or was able to render the tag
+								$link_tag = $current_link_tag;
+							}
+						}
+						else
+						{ // not a video file, do not process
+							$link_tag = $current_link_tag;
+						}
+						break;
+
+					default:
+						// do nothing
 						$link_tag = $current_link_tag;
-					}
-				}
-				else
-				{ // Display icon+caption if file is not an image
-					if( empty( $current_file_params['title'] ) )
-					{ // Use real file name as title when it is not defined for inline tag
-						$file_title = $File->get( 'title' );
-						$current_file_params['title'] = ' '.( empty( $file_title ) ? $File->get_name() : $file_title );
-					}
-					elseif( $current_file_params['title'] == '-' )
-					{ // Don't display a title in this case, Only file icon will be displayed
-						$current_file_params['title'] = '';
-					}
-					else
-					{ // Add a space between file icon and title
-						$current_file_params['title'] = ' '.$current_file_params['title'];
-					}
-					$link_tag = '<a href="'.$File->get_url().'"'
-						.( empty( $current_file_params['class'] ) ? '' : ' class="'.$current_file_params['class'].'"' )
-						.'>'.$File->get_icon( $current_file_params ).$current_file_params['title'].'</a>';
 				}
 
 				// Replace inline image tag with HTML img tag
@@ -7614,7 +8367,7 @@ class Item extends ItemLight
 	/**
 	 * Get custom fields of post type
 	 *
-	 * @param string Type of custom field: 'all', 'varchar', 'double'
+	 * @param string Type(s) of custom field: 'all', 'varchar', 'double', 'text', 'html'. Use comma separator to get several types
 	 * @return array
 	 */
 	function get_type_custom_fields( $type = 'all' )
@@ -7839,9 +8592,9 @@ class Item extends ItemLight
 		{	// If current item status cannot be used for item collection
 			global $Messages;
 
+			$visibility_statuses = get_visibility_statuses();
 			if( $item_Blog->get_setting( 'allow_access' ) == 'members' )
 			{	// The collection is restricted for members or only for owner
-				$visibility_statuses = get_visibility_statuses();
 				if( ! $item_Blog->get( 'advanced_perms' ) )
 				{	// If advanced permissions are NOT enabled then only owner has an access for the collection
 					$Messages->add( sprintf( T_('Since this collection is "Private", the visibility of this post will be restricted to "%s".'), $visibility_statuses[ $this->status ] ), 'warning' );
@@ -7851,7 +8604,40 @@ class Item extends ItemLight
 					$Messages->add( sprintf( T_('Since this collection is "Members only", the visibility of this post will be restricted to "%s".'), $visibility_statuses[ $this->status ] ), 'warning' );
 				}
 			}
+			elseif( $item_Blog->get_setting( 'allow_access' ) == 'users' )
+			{	// The collection is restricted for logged-in users only:
+				$Messages->add( sprintf( T_('Since this collection is "Community only", the visibility of this post will be restricted to "%s".'), $visibility_statuses[ $this->status ] ), 'warning' );
+			}
 		}
+	}
+
+
+	/**
+	 * Check what were already notified on this item
+	 *
+	 * @param array|string Flags, possible values: 'moderators_notified', 'members_notified', 'community_notified', 'pings_sent'
+	 */
+	function check_notifications_flags( $flags )
+	{
+		if( ! is_array( $flags ) )
+		{	// Convert string to array:
+			$flags = array( $flags );
+		}
+
+		// TRUE if all requested flags are in current item notifications flags:
+		return ( count( array_diff( $flags, $this->get( 'notifications_flags' ) ) ) == 0 );
+	}
+
+
+	/**
+	 * Check if notifications are allowed for this Item
+	 * (some item types have no permanent URL and thus cannot be sent out with a permalink)
+	 *
+	 * @return boolean TRUE if allowed
+	 */
+	function notifications_allowed()
+	{
+		return ( $this->get_type_setting( 'usage' ) != 'special' );
 	}
 }
 ?>

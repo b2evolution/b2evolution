@@ -117,6 +117,11 @@ $Form->begin_form();
 			echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'type', /* TRANS: file type */ T_('Type') ).'</th>';
 		}
 
+		if( $UserSettings->get('fm_showcreator') )
+		{ // Show file creator
+			echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'creator_user_ID', /* TRANS: added by */ T_('Added by') ).'</th>';
+		}
+
 		if( $UserSettings->get('fm_showdownload') )
 		{  // Show download count column
 			echo '<th class="nowrap">'.$fm_Filelist->get_sort_link( 'download_count', /* TRANS: download count */ T_('Downloads') ).'</th>';
@@ -294,6 +299,9 @@ $Form->begin_form();
 					{	// We want the action to happen in the post attachments iframe:
 						$link_attribs['target'] = $iframe_name;
 						$link_attribs['class'] = 'action_icon link_file btn btn-primary btn-xs';
+						$link_attribs['onclick'] = 'return evo_link_attach( \''.$LinkOwner->type.'\', '.$LinkOwner->get_ID()
+								.', \''.FileRoot::gen_ID( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID() )
+								.'\', \''.$lFile->get_rdfp_rel_path().'\' )';
 						$link_action = 'link_inpost';
 					}
 					echo action_icon( T_('Link this file!'), 'link',
@@ -366,6 +374,20 @@ $Form->begin_form();
 		if( $UserSettings->get('fm_showtypes') )
 		{ // Show file types
 			echo '<td class="type">'.$lFile->get_type().'</td>';
+		}
+
+		/*******************  Added by  *******************/
+
+		if( $UserSettings->get('fm_showcreator') )
+		{
+			if( $creator = $lFile->get_creator() )
+			{
+				echo '<td class="center">'.$creator->get( 'login' ).'</td>';
+			}
+			else
+			{
+				echo '<td class="center">unknown</td>';
+			}
 		}
 
 		/****************  Download Count  ****************/
@@ -471,11 +493,13 @@ $Form->begin_form();
 	 */
 	$filetable_cols = 5
 		+ (int)$fm_flatmode
+		+ (int)$UserSettings->get('fm_showcreator')
 		+ (int)$UserSettings->get('fm_showtypes')
 		+ (int)($UserSettings->get('fm_showdate') != 'no')
 		+ (int)$UserSettings->get('fm_showfsperms')
 		+ (int)$UserSettings->get('fm_showfsowner')
 		+ (int)$UserSettings->get('fm_showfsgroup')
+		+ (int)$UserSettings->get('fm_showdownloads')
 		+ (int)$UserSettings->get('fm_imglistpreview');
 
 
@@ -545,6 +569,14 @@ $Form->begin_form();
 			{
 				$template_filerow .= '<td class="type">&nbsp;</td>';
 			}
+			if( $UserSettings->get( 'fm_showcreator' ) )
+			{
+				$template_filerow .= '<td class="center">&nbsp;</td>';
+			}
+			if( $UserSettings->get( 'fm_showdownload' ) )
+			{
+				$template_filerow .= '<td class="center">&nbsp;</td>';
+			}
 			$template_filerow .= '<td class="size"><span class="qq-upload-size">&nbsp;</span><span class="qq-upload-spinner">&nbsp;</span></td>';
 			if( $UserSettings->get('fm_showdate') != 'no' )
 			{
@@ -574,6 +606,7 @@ $Form->begin_form();
 			display_dragdrop_upload_button( array(
 					'fileroot_ID'         => $fm_FileRoot->ID,
 					'path'                => $path,
+					'listElement'         => 'jQuery( "#filelist_tbody" ).get(0)',
 					'list_style'          => 'table',
 					'template_filerow'    => $template_filerow,
 					'display_support_msg' => false,

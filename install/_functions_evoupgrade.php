@@ -2092,7 +2092,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		 */
 		function insert_basic_widgets_9408( $blog_id, $initial_install = false, $kind = '' )
 		{
-			global $DB, $test_install_all_features, $basic_widgets_insert_sql_rows;
+			global $DB, $install_test_features, $basic_widgets_insert_sql_rows;
 
 			// Initialize this array first time and clear after previous call of this function
 			$basic_widgets_insert_sql_rows = array();
@@ -2180,7 +2180,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			{ // About Author
 				add_basic_widget_9408( $blog_id, 'Item Single', 'item_about_author', 'core', 25 );
 			}
-			if( ( $blog_id == $blog_a_ID || ( ! empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && $test_install_all_features )
+			if( ( $blog_id == $blog_a_ID || ( ! empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && ! empty( $install_test_features ) )
 			{ // Google Maps
 				add_basic_widget_9408( $blog_id, 'Item Single', 'evo_Gmaps', 'plugin', 30 );
 			}
@@ -2203,7 +2203,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			}
 			else
 			{
-				if( $test_install_all_features )
+				if( ! empty( $install_test_features ) )
 				{
 					if( $kind != 'forum' && $kind != 'manual' )
 					{ // Current filters widget
@@ -4050,6 +4050,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$DB->query( 'ALTER TABLE T_basedomains ADD UNIQUE dom_type_name ( dom_type, dom_name )' );
 		task_end();
 
+		task_begin( 'Upgrading base domains table...' );
+		$DB->query( "ALTER TABLE T_basedomains
+			MODIFY dom_name VARCHAR(250) COLLATE utf8_bin NOT NULL DEFAULT ''" );
+		task_end();
+
 		/*** Update user_email_dom_ID for all already existing users ***/
 		task_begin( 'Upgrading users email domains...' );
 		$DB->begin();
@@ -4067,13 +4072,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$edoms_SQL->FROM( 'T_basedomains' );
 			$edoms_SQL->WHERE( 'dom_type = \'email\'' );
 			$email_domains = $DB->get_assoc( $edoms_SQL->get() );
-			// pre_dump( $email_domains );
 
 			foreach( $users_emails as $user_ID => $user_email )
 			{
 				if( preg_match( '#@(.+)#i', strtolower($user_email), $ematch ) )
 				{	// Get email domain from user's email address
-					$email_domain = $ematch[1];
+					$email_domain = trim( $ematch[1] );
 					$dom_ID = array_search( $email_domain, $email_domains );
 
 					if( ! $dom_ID )
@@ -7359,9 +7363,246 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 11735, 'Upgrade table files...' ) )
-	{
+	{	// part of 6.7.0
 		$DB->query( 'ALTER TABLE T_files
 			MODIFY file_type ENUM( "image", "audio", "video", "other" ) COLLATE ascii_general_ci NULL DEFAULT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11740, 'Update table user settings for new post/comment moderation settings...' ) )
+	{	// part of 6.7.0
+		$DB->query( 'INSERT INTO T_users__usersettings ( uset_user_ID, uset_name, uset_value )
+			SELECT uset_user_ID, IF( uset_name = "notify_comment_moderation", "notify_edit_cmt_moderation", "notify_edit_pst_moderation" ), uset_value
+			  FROM T_users__usersettings
+			 WHERE uset_name IN ( "notify_comment_moderation", "notify_post_moderation" )' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11745, 'Upgrading items table...' ) )
+	{	// part of 6.7.1
+		db_add_col( 'T_items__item', 'post_notifications_flags', "SET('moderators_notified','members_notified','community_notified','pings_sent') NOT NULL DEFAULT '' AFTER post_notifications_ctsk_ID" );
+		$DB->query( 'UPDATE T_items__item
+			  SET post_notifications_flags = "moderators_notified,members_notified,community_notified,pings_sent"
+			WHERE post_notifications_status = "finished"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11750, 'Upgrading comments table...' ) )
+	{	// part of 6.7.1
+		db_add_col( 'T_comments', 'comment_notif_flags', "SET('moderators_notified','members_notified','community_notified') NOT NULL DEFAULT ''" );
+		$DB->query( 'UPDATE T_comments
+			  SET comment_notif_flags = "moderators_notified,members_notified,community_notified"
+			WHERE comment_notif_status = "finished"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11755, 'Creating collection user favorites table...' ) )
+	{ // part of 6.7.1-beta
+		db_create_table( 'T_coll_user_favs', '
+				cufv_user_ID INT(10) UNSIGNED NOT NULL,
+				cufv_blog_ID INT(11) UNSIGNED NOT NULL,
+				PRIMARY KEY cufv_pk ( cufv_user_ID, cufv_blog_ID )' );
+
+		// If system user count is less than or equal to 10, Add favorites based on previous blog_favorite settings
+		load_funcs( 'tools/model/_system.funcs.php' );
+		$user_IDs = system_get_user_IDs();
+		$user_count = count( $user_IDs );
+
+		$SQL = new SQL();
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_blogs' );
+		$SQL->ORDER_BY( 'blog_ID' );
+		$blogs = $DB->get_results( $SQL->get() );
+
+		$SQL = 'INSERT INTO T_coll_user_favs ( cufv_blog_ID, cufv_user_ID ) VALUES ';
+		$values = array();
+
+		// Collection owners will automatically favorite their collection
+		foreach( $blogs as $blog )
+		{
+			$values[] = '( '.$blog->blog_ID.', '.$blog->blog_owner_user_ID.' )';
+		}
+
+		if( $user_count <= 10 )
+		{
+			foreach( $blogs as $blog )
+			{
+				if( $blog->blog_favorite )
+				{ // currently has favorite status
+					foreach( $user_IDs as $user_ID )
+					{
+						$values[] = '( '.$blog->blog_ID.', '.$user_ID.' )';
+					}
+				}
+			}
+		}
+
+		$values = array_unique( $values );
+		if( $values )
+		{
+			$SQL .= implode( ', ', $values );
+			$DB->query( $SQL );
+		}
+
+		// Drop blog_favorite column
+		db_drop_col( 'T_blogs', 'blog_favorite' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11760, 'Upgrading email campaigns table...' ) )
+	{	// part of 6.7.1-beta
+		db_add_col( 'T_email__campaign', 'ecmp_send_ctsk_ID', 'INT(10) UNSIGNED NULL DEFAULT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11765, 'Upgrading files table...' ) )
+	{ // part of 6.7.1-beta
+		db_add_col( 'T_files', 'file_creator_user_ID', 'int(10) unsigned NULL default NULL AFTER file_ID' );
+
+		// Update file_creator_user_ID with the owner of the first link to a comment/post/message
+		$SQL = 'UPDATE T_files AS t1,
+				(
+					SELECT a.link_file_ID, a.link_creator_user_ID
+					FROM T_links AS a
+					INNER JOIN
+					(
+						SELECT link_file_ID, MIN( link_ID ) AS min_ID
+						FROM T_links
+						GROUP BY link_file_ID
+					) AS b
+						ON a.link_file_ID = b.link_file_ID AND a.link_ID = b.min_ID
+				) AS t2
+				SET
+					t1.file_creator_user_ID = t2.link_creator_user_ID
+				WHERE
+					t1.file_ID = t2.link_file_ID';
+		$DB->query( $SQL );
+
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11770, 'Upgrading files table...' ) )
+	{ // part of 6.7.3-beta
+		db_add_index( 'T_files', 'file_creator_user_id', 'file_creator_user_id' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11775, 'Add new types "Text" and "HTML" for custom fields of item types...' ) )
+	{	// part of 6.7.3-stable
+		$DB->query( 'ALTER TABLE T_items__item_settings
+			MODIFY COLUMN iset_value varchar( 10000 ) NULL' );
+		$DB->query( 'ALTER TABLE T_items__type_custom_field
+			MODIFY COLUMN itcf_type ENUM( "double", "varchar", "text", "html" ) COLLATE ascii_general_ci NOT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11780, 'Update widget container "Item Single"...' ) )
+	{	// part of 6.7.3-stable
+		$DB->begin();
+		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
+		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_code, wi_order' );
+		$SQL->FROM( 'T_widget' );
+		$SQL->WHERE( 'wi_sco_name = "Item Single"' );
+		$SQL->ORDER_BY( 'wi_coll_ID, wi_order' );
+		$coll_item_single_widgets = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+		$coll_widgets = array();
+		foreach( $coll_item_single_widgets as $coll_item_single_widget )
+		{
+			if( ! isset( $coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] ) )
+			{	// If the "Item Single" has no widget "Item Content":
+				$coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] = 1;
+			}
+			if( $coll_item_single_widget['wi_code'] == 'item_content' )
+			{	// If the "Item Single" contains widget "Item Content" then keep an order of this widget:
+				$coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] = $coll_item_single_widget['wi_order'] + 1;
+			}
+		}
+		$item_attachments_widget_rows = array();
+		foreach( $coll_widgets as $coll_ID => $widget_order )
+		{	// Insert new widget "Item Attachments" to each colleaction that has a container "Item Single":
+			$item_attachments_widget_rows[] = '( '.$coll_ID.', "Item Single", '.$widget_order.', "item_attachments" )';
+			// Check and update not unique widget orders:
+			$not_unique_widget_ID = $DB->get_var( 'SELECT wi_ID
+				 FROM T_widget
+				WHERE wi_coll_ID = '.$coll_ID.'
+					AND wi_sco_name = "Item Single"
+					AND wi_order = '.$widget_order );
+			if( $not_unique_widget_ID > 0 )
+			{	// The collection has not unique widget order:
+				$update_order_widgets = array();
+				foreach( $coll_item_single_widgets as $coll_item_single_widget )
+				{
+					if( $coll_item_single_widget['wi_coll_ID'] == $coll_ID && $coll_item_single_widget['wi_order'] >= $widget_order )
+					{	// Increase a widget order to avoid mysql errors of duplicate entry:
+						$update_order_widgets[] = $coll_item_single_widget['wi_ID'];
+					}
+				}
+				for( $w = count( $update_order_widgets ) - 1; $w >= 0 ; $w-- )
+				{	// Update not unique widget orders:
+					$DB->query( 'UPDATE T_widget
+							SET   wi_order = wi_order + 1
+							WHERE wi_ID = '.$update_order_widgets[ $w ] );
+				}
+			}
+		}
+		if( count( $item_attachments_widget_rows ) )
+		{	// Insert new widgets "Item Attachments" into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
+			  VALUES '.implode( ', ', $item_attachments_widget_rows ) );
+		}
+		$DB->commit();
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11785, 'Create new widget container "404 Page"...' ) )
+	{	// part of 6.7.3-stable
+		$coll_IDs = $DB->get_col( 'SELECT blog_ID FROM T_blogs' );
+		if( $coll_IDs )
+		{
+			$page_404_widget_rows = array();
+			foreach( $coll_IDs as $coll_ID )
+			{
+				$page_404_widget_rows[] = '( '.$coll_ID.', "404 Page", 10, "page_404_not_found" )';
+				$page_404_widget_rows[] = '( '.$coll_ID.', "404 Page", 20, "coll_search_form" )';
+				$page_404_widget_rows[] = '( '.$coll_ID.', "404 Page", 30, "coll_tag_cloud" )';
+			}
+			// Insert new widgets for container "404 Page" into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
+			  VALUES '.implode( ', ', $page_404_widget_rows ) );
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11790, 'Rename table "T_antispam" to "T_antispam__keyword"...' ) )
+	{	// part of 6.7.4-stable
+		$DB->query( 'RENAME TABLE '.$tableprefix.'antispam TO T_antispam__keyword' );
+		$DB->query( "ALTER TABLE T_antispam__keyword
+			CHANGE aspm_ID     askw_ID     bigint(11) NOT NULL auto_increment,
+			CHANGE aspm_string askw_string varchar(80) NOT NULL,
+			CHANGE aspm_source askw_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported',
+			DROP INDEX aspm_string,
+			ADD UNIQUE askw_string ( askw_string )" );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11795, 'Upgrading posts and comments statuses depeding on max allowed status by their collections...' ) )
+	{	// part of 6.7.4-stable
+		$BlogCache = & get_BlogCache();
+		$BlogCache->load_all( 'ID', 'ASC' );
+		foreach( $BlogCache->cache as $Blog )
+		{
+			$Blog->update_reduced_status_data();
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11800, 'Upgrading subscription settings of collections...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'REPLACE INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
+				SELECT cset_coll_ID, "allow_comment_subscriptions", 1
+				  FROM T_coll_settings
+				 WHERE cset_name = "allow_subscriptions"
+				   AND cset_value = 1' );
 		upg_task_end();
 	}
 

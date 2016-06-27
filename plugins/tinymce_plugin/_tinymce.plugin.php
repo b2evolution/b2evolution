@@ -36,7 +36,7 @@ class tinymce_plugin extends Plugin
 	var $code = 'evo_TinyMCE';
 	var $name = 'TinyMCE';
 	var $priority = 10;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -44,6 +44,20 @@ class tinymce_plugin extends Plugin
 	function PluginInit( & $params )
 	{
 		$this->short_desc = $this->T_('Javascript WYSIWYG editor');
+	}
+
+
+	/**
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_coll_setting_definitions( & $params )
+	{
+		$default_params = array_merge( $params, array( 'default_comment_using' => 'disabled' ) );
+
+		return parent::get_coll_setting_definitions( $default_params );
 	}
 
 
@@ -239,7 +253,7 @@ class tinymce_plugin extends Plugin
 	 *
 	 * Event handler: Called when displaying editor buttons (in back-office).
 	 *
-	 * This method, if implemented, should output the buttons (probably as html INPUT elements) 
+	 * This method, if implemented, should output the buttons (probably as html INPUT elements)
 	 * and return true, if button(s) have been displayed.
 	 *
 	 * You should provide an unique html ID with each button.
@@ -268,6 +282,13 @@ class tinymce_plugin extends Plugin
 
 				if( ! empty( $edited_Item ) && ! $edited_Item->get_type_setting( 'allow_html' ) )
 				{	// Only when HTML is allowed in post:
+					return false;
+				}
+
+				$item_Blog = & $edited_Item->get_Blog();
+
+				if( ! $this->get_coll_setting( 'coll_use_for_posts', $item_Blog ) )
+				{	// This plugin is disabled to use for posts:
 					return false;
 				}
 
@@ -761,13 +782,13 @@ class tinymce_plugin extends Plugin
 		}
 
 		// Load the content css files from 3rd party code, e.g. other plugins:
-		global $tinymce_content_css;
+		global $tinymce_content_css, $app_version_long;
 		if( is_array( $tinymce_content_css ) && count( $tinymce_content_css ) )
 		{
 			$content_css .= ','.implode( ',', $tinymce_content_css );
 		}
 
-		$init_options[] = 'content_css : "'.$this->get_plugin_url().'editor.css?v='.( $debug ? $localtimenow : $this->version )
+		$init_options[] = 'content_css : "'.$this->get_plugin_url().'editor.css?v='.( $debug ? $localtimenow : $this->version.'+'.$app_version_long )
 									.$content_css.'"';
 
 		// Generated HTML code options:
@@ -777,7 +798,7 @@ class tinymce_plugin extends Plugin
 
 		// Autocomplete options
 		$init_options[] = 'autocomplete_options: autocomplete_static_options'; // Must be initialize before as string with usernames that are separated by comma
-		$init_options[] = 'autocomplete_options_url: htsrv_url + "anon_async.php?action=autocomplete_usernames"';
+		$init_options[] = 'autocomplete_options_url: restapi_url + "users/autocomplete"';
 
 		// remove_linebreaks : false,
 		// not documented:	auto_cleanup_word : true,
@@ -996,7 +1017,7 @@ class tinymce_plugin extends Plugin
 
 		if( $disp == 'edit' )
 		{
-			require_css( $this->get_plugin_url( true ).'toolbar.css', 'blog' );
+			$this->require_css( 'toolbar.css' );
 		}
 	}
 
@@ -1013,7 +1034,7 @@ class tinymce_plugin extends Plugin
 
 		if( $ctrl == 'items' || $ctrl == 'campaigns' )
 		{
-			require_css( $this->get_plugin_url( true ).'toolbar.css', 'blog' );
+			$this->require_css( 'toolbar.css' );
 		}
 	}
 }

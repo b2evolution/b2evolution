@@ -52,7 +52,7 @@ class ResultSel extends Results
 	 * @param string default ordering of columns (special syntax) if not URL specified
 	 * @param integer number of lines displayed on one screen
 	 */
-	function ResultSel( $field_ID, $table_selections, $field_sel_ID, $field_sel_name,
+	function __construct( $field_ID, $table_selections, $field_sel_ID, $field_sel_name,
 											$table_objsel, $field_selected, $field_selection, $current_selection_ID,
 											$sql, $count_sql = NULL, $param_prefix = '', $default_order = '', $limit = 20 )
 	{

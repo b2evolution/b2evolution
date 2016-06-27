@@ -96,7 +96,7 @@ function toggle_clickopen( id, hide, displayVisible )
  * Used only on BACK-office in the following files:
  *  - _misc_js.funcs.php
  *  - blog_widgets.js
- *  - links.js
+ *  - src/evo_links.js
  *
  * @param jQuery selector
  */
@@ -111,7 +111,7 @@ function evoFadeSuccess( selector )
  *
  * Used only in BACK-office in the following files:
  *  - _misc_js.funcs.php
- *  - links.js
+ *  - src/evo_links.js
  *
  * @param jQuery selector
  */
@@ -143,7 +143,7 @@ function evoFadeHighlight( selector )
  * Used only on BACK-office in the following files:
  *  - _misc_js.funcs.php
  *  - blog_widgets.js
- *  - links.js
+ *  - src/evo_links.js
  *  - _file_list.inc.php
  *
  * @param string|jQuery

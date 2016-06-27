@@ -33,6 +33,12 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 class File extends DataObject
 {
 	/**
+	 * ID of user that created/uploaded the file
+	 * @var integer
+	 */
+	var $creator_user_ID;
+
+	/**
 	 * File type: 'image', 'audio', 'other', NULL
 	 * @var string
 	 */
@@ -324,6 +330,7 @@ class File extends DataObject
 				$Debuglog->add( "Loaded metadata for {$this->_FileRoot->ID}:{$this->_rdfp_rel_path}", 'files' );
 				$this->meta  = 'loaded';
 				$this->ID    = $row->file_ID;
+				$this->creator_user_ID = $row->file_creator_user_ID;
 				$this->type  = $row->file_type;
 				$this->title = $row->file_title;
 				$this->alt   = $row->file_alt;
@@ -464,6 +471,43 @@ class File extends DataObject
 	function is_dir()
 	{
 		return $this->_is_dir;
+	}
+
+	/**
+	 * Is the File a directory or file?
+	 *
+	 * @param string String to return if the File is a directory
+	 * @param string String to return if the File is a file
+	 * @return string specified directory string if the object is a directory, specified file string if not
+	 */
+	function dir_or_file( $dir_string = NULL, $file_string = NULL)
+	{
+		if( is_null( $dir_string ) )
+		{
+			$dir_string = T_('directory');
+		}
+
+		if( is_null( $file_string ) )
+		{
+			$file_string = T_('file');
+		}
+
+		return $this->is_dir() ? $dir_string : $file_string;
+	}
+
+	/**
+	 * Get file type
+	 *
+	 * @return string file type
+	 */
+	function get_file_type()
+	{
+		if( empty( $this->type ) )
+		{ // Detect and set file type
+			$this->set_file_type();
+		}
+
+		return $this->type;
 	}
 
 
@@ -607,6 +651,27 @@ class File extends DataObject
 	function get_name()
 	{
 		return $this->_name;
+	}
+
+
+	/**
+	 * Get file creator
+	 *
+	 * @return object User
+	 */
+	function get_creator()
+	{
+		if( $this->creator_user_ID )
+		{
+			$UserCache = & get_UserCache();
+			$creator = $UserCache->get_by_ID( $this->creator_user_ID );
+
+			return $creator;
+		}
+		else
+		{
+			return NULL;
+		}
 	}
 
 
@@ -1799,12 +1864,12 @@ class File extends DataObject
 			// update current entry
 			$this->_perms = fileperms( $this->_adfp_full_path );
 
-			syslog_insert( sprintf( 'The permissions of file %s were changed to %s', '[['.$this->get_name().']]', $chmod ), 'info', 'file', $this->ID );
+			syslog_insert( sprintf( 'The permissions of file %s were changed to %s', '[['.$this->get_full_path().']]', $chmod ), 'info', 'file', $this->ID );
 			return $this->_perms;
 		}
 		else
 		{
-			syslog_insert( sprintf( 'The permissions of file %s could not be changed to %s', '[['.$this->get_name().']]', $chmod ), 'info', 'file', $this->ID );
+			syslog_insert( sprintf( 'The permissions of file %s could not be changed to %s', '[['.$this->get_full_path().']]', $chmod ), 'info', 'file', $this->ID );
 			return false;
 		}
 	}
@@ -1817,7 +1882,7 @@ class File extends DataObject
 	 */
 	function dbinsert( )
 	{
-		global $Debuglog;
+		global $Debuglog, $current_User;
 
 		if( $this->meta == 'unknown' )
 		{
@@ -1832,6 +1897,7 @@ class File extends DataObject
 		$Debuglog->add( 'Inserting meta data for new file into db', 'files' );
 
 		// Let's make sure the bare minimum gets saved to DB:
+		$this->set_param( 'creator_user_ID', 'integer', $current_User->ID );
 		$this->set_param( 'root_type', 'string', $this->_FileRoot->type );
 		$this->set_param( 'root_ID', 'number', $this->_FileRoot->in_type_ID );
 		$this->set_param( 'path', 'string', $this->_rdfp_rel_path );
@@ -1964,7 +2030,7 @@ class File extends DataObject
 
 		if( is_null( $text ) )
 		{ // Use file root+relpath+name by default
-			$text = $this->get_root_and_rel_path();
+			$text = ( $this->is_dir() ? $this->get_root_and_rel_path() : $this->get_root_and_rel_path() );
 		}
 
 		if( is_null( $title ) )
@@ -1980,7 +2046,7 @@ class File extends DataObject
 
 		if( is_null( $url ) )
 		{ // Get the URL for viewing the file/dir:
-			$url = $this->get_view_url( false );
+			$url = ( $this->is_dir() ? $this->get_linkedit_url() : $this->get_view_url( false ) );
 			$ignore_popup = false;
 		}
 		else
@@ -2003,7 +2069,7 @@ class File extends DataObject
 		$rel_attr = ( ! empty( $Blog ) && $Blog->get_setting( 'download_nofollowto' ) ) ? ' rel="nofollow"' : '';
 
 		$Filetype = & $this->get_Filetype();
-		if( $ignore_popup || ( $Filetype && in_array( $Filetype->viewtype, array( 'external', 'download' ) ) ) )
+		if( $this->is_dir() || $ignore_popup || ( $Filetype && in_array( $Filetype->viewtype, array( 'external', 'download' ) ) ) )
 		{ // Link to open in the curent window
 			return '<a href="'.$url.'" title="'.$title.'"'.$class_attr.$rel_attr.'>'.$text.'</a>';
 		}

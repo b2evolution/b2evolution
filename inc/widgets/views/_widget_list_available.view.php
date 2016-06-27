@@ -80,6 +80,7 @@ $core_componentwidget_defs = array(
 			'coll_current_filters',
 		),
 	'content' => array(
+			'coll_featured_posts',    // Simplified UIL: Featured Posts
 			'coll_post_list',         // Simple Post list
 			'coll_page_list',         // Simple Page list
 			'coll_related_post_list', // Simple Related Posts list
@@ -90,6 +91,7 @@ $core_componentwidget_defs = array(
 		),
 	'infoitem' => array(
 			'item_content',
+			'item_attachments',
 			'item_small_print',
 			'item_tags',
 			'item_about_author',
@@ -118,7 +120,8 @@ $core_componentwidget_defs = array(
 			'org_members',
 			'online_users',
 			'mobile_skin_switcher',
-			'poll'
+			'poll',
+			'page_404_not_found',
 		),
 );
 

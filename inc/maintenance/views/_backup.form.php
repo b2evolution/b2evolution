@@ -71,17 +71,26 @@ foreach( $backup_exclude_folders as $name => $settings )
 		array_pop( $settings['path'] );
 		$exclude_folder_names = '<code>'.implode( '</code>, <code>', $settings['path'] ).'</code>';
 		$exclude_folder_names .= ' '.T_('or').' <code>'.$exclude_folder_name_last.'</code>';
+		$exclude_folder_note = T_('Exclude all %s folders');
+	}
+	elseif( count( $settings['path'] ) == 2 )
+	{
+		$exclude_folder_names = '<code>'.implode( '</code> '.T_('or').' <code>', $settings['path'] ).'</code>';
+		$exclude_folder_note = T_('Exclude all %s folders');
 	}
 	else
 	{
-		$exclude_folder_names = '<code>'.implode( '</code> '.T_('or').' <code>', $settings['path'] ).'</code>';
+		$exclude_folder_names = '<code>'.$settings['path'][0].'</code>';
+		$exclude_folder_note = T_('Exclude the %s folder');
 	}
-	$backup_exclude_checkboxes[] = array( 'exclude_bk_'.$name, $current_Backup->exclude_folders[ $name ], sprintf( T_('Exclude all %s folders'), $exclude_folder_names ), $settings['excluded'] );
+	$backup_exclude_checkboxes[] = array( 'exclude_bk_'.$name, $current_Backup->exclude_folders[ $name ], sprintf( $exclude_folder_note, $exclude_folder_names ), $settings['excluded'] );
 }
 if( count( $backup_exclude_checkboxes ) )
 {
 	$Form->checklist( $backup_exclude_checkboxes, 'exclude_bk', T_('Exclude folders') );
 }
+
+$Form->checkbox( 'ignore_bk_config', $current_Backup->ignore_config, 'backup_ignore.conf', sprintf( T_('Ignore files and folders listed in %s'), '<code>conf/backup_ignore.conf</code>' ) );
 
 $Form->end_fieldset();
 

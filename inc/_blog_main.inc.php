@@ -367,11 +367,6 @@ if( !empty($p) || !empty($title) )
 		// Search item by title:
 		$Item = & $ItemCache->get_by_urltitle( $title, false, false );
 
-		if( isset( $Item->status ) && $Item->status == 'deprecated' )
-		{ // If the post is deprecated
-			$disp = '404';
-		}
-
 		if( ( !empty( $Item ) ) && ( $Item !== false ) && (! $Item->is_part_of_blog( $blog ) ) )
 		{ // We have found an Item object, but it doesn't belong to the current blog!
 			// Check if we want to redirect moved posts:
@@ -532,7 +527,7 @@ elseif( $disp == '-' && !empty($Item) )
 	if( preg_match( '|[&?](download=\d+)|', $ReqURI ) )
 	{
 		$disp = 'download';
-		
+
 		// erhsatingin> Is this the right place to increment the download count?
 		$link_ID = param( 'download', 'integer', false);
 		$LinkCache = & get_LinkCache();
@@ -621,7 +616,7 @@ elseif( ( ( $disp == 'page' ) || ( $disp == 'single' ) ) && empty( $Item ) )
 if( $disp == 'terms' )
 {	// Display a page of terms & conditions:
 	$terms_item_ID = intval( $Settings->get( 'site_terms' ) );
-	if( $terms_item_ID  > 0 )
+	if( $Settings->get( 'site_terms_enabled' ) && $terms_item_ID  > 0 )
 	{	// Only if item ID is defined for terms page:
 		set_param( 'p', $terms_item_ID );
 		$c = 0; // Don't display comments
@@ -642,6 +637,7 @@ if( $disp == 'terms' )
 // Check if terms & conditions should be accepted by current user:
 if( is_logged_in() && // Only for logged in users
     ! in_array( $disp, array( 'terms', 'help', 'msgform', 'activateinfo' ) ) && // Allow these pages
+    $Settings->get( 'site_terms_enabled' ) && // Terms must be enabled
     ! $UserSettings->get( 'terms_accepted', $current_User->ID ) ) // If it was not accepted yet
 {	// Current user didn't accept the terms yet:
 

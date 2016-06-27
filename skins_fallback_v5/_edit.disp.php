@@ -121,7 +121,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'metadesc', $edited_Item->get_setting( 'metadesc' ) );
 		$Form->hidden( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ) );
 
-		if( $Blog->get_setting( 'use_workflow' ) )
+		if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 		{	// We want to use workflow properties for this blog:
 			$Form->hidden( 'item_priority', $edited_Item->priority );
 			$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
@@ -158,21 +158,33 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'suggest_item_tags', $UserSettings->get( 'suggest_item_tags' ) );
 	}
 
-	$disp_edit_categories = true;
+	if( $Blog->get_setting( 'in_skin_editing_category' ) )
+	{	// If categories are allowed to update from front-office:
+		$disp_edit_categories = true;
+	}
+	else
+	{	// Don't allow to update the categories:
+		$disp_edit_categories = false;
+		if( $edited_Item->ID == 0 )
+		{	// Force to store category Id in hidden field only for new creating items:
+			$params['disp_edit_categories'] = false;
+		}
+	}
+
 	if( ! $params['disp_edit_categories'] )
-	{	// When categories are hidden, we store a cat_ID in the hidden input
+	{	// When categories are hidden, we store a cat_ID in the hidden input:
 		if( $edited_Item->ID > 0 )
-		{	// Get cat_ID from existing Item
+		{	// Get cat_ID from existing Item:
 			$main_Chapter = $edited_Item->get_main_Chapter();
 			$cat = $main_Chapter->ID;
 		}
 		else
-		{	// Forums skin get cat_ID from $_GET
+		{	// Forums skin get cat_ID from $_GET:
 			$cat = param( 'cat', 'integer', 0 );
 		}
 
 		if( $cat > 0 )
-		{	// Store a cat_ID
+		{	// Store a cat_ID:
 			$Form->hidden( 'post_category', $cat );
 			$Form->hidden( 'cat', $cat );
 			$disp_edit_categories = false;
@@ -231,7 +243,12 @@ $Form->begin_form( 'inskin', '', $form_params );
 		<?php
 		echo '<div class="edit_plugin_actions">';
 		// CALL PLUGINS NOW:
-		$Plugins->trigger_event( 'DisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'inskin' ) );
+		$Plugins->trigger_event( 'DisplayEditorButton', array(
+				'target_type'   => 'Item',
+				'target_object' => $edited_Item,
+				'content_id'    => 'itemform_post_content',
+				'edit_layout'   => 'inskin'
+			) );
 		echo '</div>';
 	}
 	else
@@ -270,7 +287,14 @@ $Form->begin_form( 'inskin', '', $form_params );
 	}
 
 	// ################### TEXT RENDERERS ###################
-	$item_renderer_checkboxes = $edited_Item->get_renderer_checkboxes();
+	if( $Blog->get_setting( 'in_skin_editing_renderers' ) )
+	{	// If text renderers are allowed to update from front-office:
+		$item_renderer_checkboxes = $edited_Item->get_renderer_checkboxes();
+	}
+	else
+	{	// Don't allow to update the text renderers:
+		$item_renderer_checkboxes = false;
+	}
 	if( !empty( $item_renderer_checkboxes ) )
 	{
 		$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers' ) );

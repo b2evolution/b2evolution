@@ -248,7 +248,7 @@ function syslog_object_link( $object_type, $object_ID )
 			$FileCache = & get_FileCache();
 			if( ( $File = & $FileCache->get_by_ID( $object_ID, false, false ) ) !== false )
 			{ // File exists
-				$link = $File->is_dir() ? '' : $File->get_view_link();
+				$link = $File->get_view_link();
 				$link .= ' '.$File->get_target_icon();
 			}
 			else

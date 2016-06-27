@@ -159,7 +159,7 @@ $fm_FileRoot = NULL;
 
 $FileRootCache = & get_FileRootCache();
 
-$available_Roots = FileRootCache::get_available_FileRoots( get_param( 'root' ) );
+$available_Roots = FileRootCache::get_available_FileRoots( get_param( 'root' ), 'favorite' );
 
 if( ! empty( $root ) )
 { // We have requested a root folder by string:
@@ -509,6 +509,7 @@ switch( $action )
 		$UserSettings->set( 'fm_showfsperms',      param( 'option_showfsperms',      'integer', 0 ) );
 		$UserSettings->set( 'fm_showfsowner',      param( 'option_showfsowner',      'integer', 0 ) );
 		$UserSettings->set( 'fm_showfsgroup',      param( 'option_showfsgroup',      'integer', 0 ) );
+		$UserSettings->set( 'fm_showcreator',      param( 'option_showcreator',      'integer', 0 ) );
 		$UserSettings->set( 'fm_showdownload',     param( 'option_showdownload',     'integer', 0 ) );
 
 		$UserSettings->set( 'fm_showhidden',       param( 'option_showhidden',       'integer', 0 ) );
@@ -1497,9 +1498,6 @@ switch( $fm_mode )
 	case 'link_object':
 		// We want to link file(s) to an object or view linked files to an object:
 		// TODO: maybe this should not be a mode and maybe we should handle linking as soon as we have an $edited_Item ...
-
-		// Add JavaScript to handle links modifications.
-		require_js( 'links.js' );
 
 		if( !isset( $LinkOwner ) )
 		{ // No Object to link to...

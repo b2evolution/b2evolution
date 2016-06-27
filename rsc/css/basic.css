@@ -510,7 +510,6 @@ img.flagtop {
   border: 1px solid #000;
 }
 img.loadimg {
-  display: inline-block;
   min-width: 64px;
   min-height: 64px;
   background: url(../img/ajax-loader/fff.gif) no-repeat center;
@@ -776,6 +775,9 @@ input[type=checkbox] {
 }
 fieldset div.notes {
   margin: 0 0 1ex 3ex;
+}
+.evo_label_inline {
+  margin-left: 2ex;
 }
 div.right_icons,
 div.fieldset_icons {

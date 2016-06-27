@@ -65,7 +65,7 @@ switch( $action )
 		break;
 }
 
-if( $action == 'edit_links' )
+if( $action == 'edit_links' || $action == 'sort_links' )
 { // set LinkOwner from params
 	$link_type = param( 'link_type', 'string', 'item', true );
 	$object_ID = param( 'link_object_ID', 'integer', 0, true );
@@ -90,9 +90,6 @@ switch( $action )
 
 		// Check permission:
 		$LinkOwner->check_perm( 'edit', true );
-
-		// Add JavaScript to handle links modifications.
-		require_js( 'links.js' );
 		break;
 
 	case 'unlink': // Unlink a file from object:
@@ -197,6 +194,62 @@ switch( $action )
 		}
 
 		header_redirect( $redirect_to );
+		break;
+
+	case 'sort_links':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( "link" );
+
+		// Check permission:
+		$LinkOwner->check_perm( 'edit', true );
+
+		$ownerLinks = $LinkOwner->get_Links();
+		usort( $ownerLinks, 'sort_links_by_filename' );
+
+		$max_order = 0;
+		$link_orders = array();
+		$link_count = count( $ownerLinks );
+		foreach( $ownerLinks as $link )
+		{
+			if( $link->order > $max_order )
+			{
+				$max_order = $link->order;
+			}
+			$link_orders[] = $link->order;
+		}
+
+		for( $i = 1; $i <= $link_count; $i++ )
+		{
+				$ownerLinks[$i - 1]->set( 'order', $i + $max_order );
+				$ownerLinks[$i - 1]->dbupdate();
+		}
+
+		for( $i = 1; $i <= $link_count; $i++ )
+		{
+			if( $ownerLinks[$i -1]->get( 'order' ) != $i )
+			{
+				$ownerLinks[$i - 1]->set( 'order', $i );
+				$ownerLinks[$i - 1]->dbupdate();
+			}
+		}
+
+		$Messages->add( T_('The attachments have been sorted by file name.'), 'success' );
+
+		// Need to specify where to redirect, otherwise referrer will be used:
+		switch( $LinkOwner->type )
+		{
+			case 'item':
+				$redirect_url = $admin_url.'?ctrl=items&action=edit&p='.$LinkOwner->get_ID();
+				break;
+			case 'comment':
+				$redirect_url = $admin_url.'?ctrl=comments&action=edit&comment_ID='.$LinkOwner->get_ID();
+				break;
+			default:
+				param( 'iframe_name', 'string', '', true );
+				$redirect_url = $admin_url.'?ctrl=links&action=edit_links&link_type='.$LinkOwner->type.'&mode=iframe&iframe_name='.$iframe_name.'&link_object_ID='.$LinkOwner->get_ID();
+				break;
+		}
+		header_redirect( $redirect_url );
 		break;
 
 

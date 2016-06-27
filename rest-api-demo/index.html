@@ -107,9 +107,9 @@ jQuery( document ).ready( function()
 	rest_api_request( 'collections', '#api_collections_list', function( data )
 	{	// Display the collections list in first column on success request:
 		var r = '<ul>';
-		for( var c in data )
+		for( var c in data.colls )
 		{
-			var coll = data[c];
+			var coll = data.colls[c];
 			r += '<li><a href="#" data-urlname="' + coll.urlname + '">' + coll.name + '</a></li>';
 		}
 		r += '</ul>';

@@ -325,7 +325,8 @@ class ItemType extends DataObject
 		// Empty and Initialize the custom fields from POST data
 		$this->custom_fields = array();
 
-		foreach( array( 'double', 'varchar' ) as $type )
+		$types = array( 'double', 'varchar', 'text', 'html' );
+		foreach( $types as $type )
 		{
 			$empty_title_error = false; // use this to display empty title fields error message only ones
 			$custom_field_count = param( 'count_custom_'.$type, 'integer', 0 ); // all custom fields count ( contains even deleted fields )
@@ -562,7 +563,7 @@ class ItemType extends DataObject
 	/**
 	 * Get the custom feilds
 	 *
-	 * @param string Type of custom field: 'all', 'varchar', 'double'
+	 * @param string Type of custom field: 'all', 'varchar', 'double', 'text', 'html'. Use comma separator to get several types
 	 * @param string Field name that is used as key of array: 'ID', 'ityp_ID', 'label', 'name', 'type', 'order'
 	 * @return array Custom fields
 	 */
@@ -589,7 +590,7 @@ class ItemType extends DataObject
 		$custom_fields = array();
 		foreach( $this->custom_fields as $custom_field )
 		{
-			if( $type == 'all' || $type == $custom_field['type'] )
+			if( $type == 'all' || strpos( $type, $custom_field['type'] ) !== false )
 			{
 				switch( $array_key )
 				{

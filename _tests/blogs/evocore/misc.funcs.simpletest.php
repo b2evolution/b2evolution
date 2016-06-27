@@ -454,6 +454,38 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( strmaxwords('  <img />foo  bar  ', 2), '  <img />foo  bar  ' );
 		$this->assertEqual( strmaxwords('  <img />foo  bar  ', 1), '  <img />foo  &hellip;' );
 	}
+
+
+	/**
+	 * Test {@link evo_version_compare()}
+	 */
+	function test_evo_version_compare()
+	{
+		$versions = array(
+			array( '4.1.6-2012-11-23',         '4.1.7-2013-04-27',         '<' ),
+			array( '4.1.7-2013-04-27',         '5.0.0-alpha-4-2012-11-29', '<' ),
+			array( '5.0.0-alpha-4-2012-11-29', '5.0.1-alpha-2013-02-21',   '<' ),
+			array( '5.0.1-alpha-2013-02-21',   '5.0.2-alpha-5-2013-03-15', '<' ),
+			array( '5.0.2-alpha-5-2013-03-15', '5.0.3-beta-5-2013-04-28',  '<' ),
+			array( '5.0.3-beta-5-2013-04-28',  '5.0.4-stable-2013-06-28',  '<' ),
+			array( '5.0.4-stable-2013-06-28',  '5.0.5-stable-2013-08-02',  '<' ),
+			array( '5.0.5-stable-2013-08-02',  '5.0.6-stable-2013-09-25',  '<' ),
+			array( '5.0.6-stable-2013-09-25',  '5.1.0-alpha-2014-03-26',   '<' ),
+			array( '5.1.0-alpha-2014-03-26',   '5.1.0-beta-2014-06-11',    '<' ),
+			array( '5.1.0-beta-2014-06-11',    '5.1.0-stable',             '<' ),
+			array( '5.1.0-stable',             '5.1.0-stable-2014-09-10',  '<' ),
+			array( '5.1.0-stable-2014-09-10',  '5.1.0-stable-2014-09-11',  '<' ),
+			array( '5.1.0',                    '5.1.0-beta-2014-06-11',    '>' ),
+			array( '5.1.0',                    '5.1.0-stable',             '=' ),
+			array( '5.1.0-beta',               '5.1.0-stable',             '<' ),
+		);
+
+		foreach( $versions as $func_params )
+		{
+			$this->assertTrue( call_user_func_array( 'evo_version_compare', $func_params ),
+				'FALSE === ( "'.$func_params[0].'" '.$func_params[2].' "'.$func_params[1].'" )' );
+		}
+	}
 }
 
 

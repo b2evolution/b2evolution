@@ -154,7 +154,8 @@ function display_base_config_recap()
  */
 function install_newdb()
 {
-	global $new_db_version, $admin_url, $baseurl, $install_login, $random_password, $create_sample_contents;
+	global $new_db_version, $admin_url, $baseurl, $install_login, $random_password;
+	global $create_sample_contents, $create_sample_organization, $create_demo_users;
 
 	/*
 	 * -----------------------------------------------------------------------------------
@@ -190,13 +191,51 @@ function install_newdb()
 	// Update the progress bar status
 	update_install_progress_bar();
 
+	// Create default data
 	echo get_install_format_text( '<h2>'.T_('Creating minimum default data...').'</h2>', 'h2' );
 	evo_flush();
 	create_default_data();
 
+
+	if( $create_sample_organization || $create_demo_users )
+	{
+		echo get_install_format_text( '<h2>'.T_('Creating sample organization and users...').'</h2>', 'h2' );
+		evo_flush();
+
+		// Create sample organization if selected
+		if( $create_sample_organization )
+		{
+			create_sample_organization();
+		}
+
+		// Create demo users if selected
+		if( $create_demo_users )
+		{
+			global $Settings;
+
+			// We're gonna need some environment in order to create the demo contents...
+			load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
+			load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
+			/**
+			* @var GeneralSettings
+			*/
+			$Settings = new GeneralSettings();
+
+			/**
+			* @var UserCache
+			*/
+			$UserCache = & get_UserCache();
+			// Create $current_User object.
+			// (Assigning by reference does not work with "global" keyword (PHP 5.2.8))
+			$GLOBALS['current_User'] = & $UserCache->get_by_ID( 1 );
+
+			create_demo_users();
+		}
+	}
+
 	if( $create_sample_contents )
 	{
-		global $Settings, $test_install_all_features;
+		global $Settings, $install_test_features;
 
 		echo get_install_format_text( '<h2>'.T_('Installing sample contents...').'</h2>', 'h2' );
 		evo_flush();
@@ -423,7 +462,8 @@ function create_default_settings( $override = array() )
 {
 	global $DB, $new_db_version, $default_locale;
 	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $spam_Group;
-	global $test_install_all_features, $create_sample_contents, $install_site_color, $local_installation;
+	global $install_test_features, $create_sample_contents, $install_site_color, $local_installation;
+	global $create_sample_organization, $create_demo_users;
 
 	$defaults = array(
 		'db_version' => $new_db_version,
@@ -434,15 +474,18 @@ function create_default_settings( $override = array() )
 		'registration_is_public' => 1,
 		'quick_registration' => 1,
 	);
-	if( $test_install_all_features )
+	if( $install_test_features )
 	{
 		$defaults['gender_colored'] = 1;
+		echo_install_log( 'TEST FEATURE: Enabling colored gender usernames by default' );
 		$defaults['registration_require_country'] = 1;
 		$defaults['registration_require_gender'] = 'required';
+		echo_install_log( 'TEST FEATURE: Making country and gender required on registration' );
 		$defaults['location_country'] = 'required';
 		$defaults['location_region'] = 'required';
 		$defaults['location_subregion'] = 'required';
 		$defaults['location_city'] = 'required';
+		echo_install_log( 'TEST FEATURE: Making country, region, sub-region and city required by default' );
 	}
 	if( !empty( $install_site_color ) )
 	{ // Set default site color
@@ -564,7 +607,7 @@ function install_basic_plugins( $old_db_version = 0 )
 	/**
 	 * @var Plugins_admin
 	 */
-	global $Plugins_admin, $test_install_all_features;
+	global $Plugins_admin, $install_test_features;
 
 	$Plugins_admin = & get_Plugins_admin();
 
@@ -589,8 +632,9 @@ function install_basic_plugins( $old_db_version = 0 )
 
 	if( $old_db_version < 9290 )
 	{
-		if( $test_install_all_features )
+		if( $install_test_features )
 		{
+			echo_install_log( 'TEST FEATURE: Installing plugin "Smilies"' );
 			install_plugin( 'smilies_plugin' );
 		}
 		install_plugin( 'videoplug_plugin' );
@@ -616,15 +660,16 @@ function install_basic_plugins( $old_db_version = 0 )
 	{ // Upgrade to 5.0.0
 		install_plugin( 'flowplayer_plugin' );
 
-		if( $test_install_all_features )
+		if( $install_test_features )
 		{
+			echo_install_log( 'TEST FEATURE: Installing plugin "Google Maps"' );
 			install_plugin( 'google_maps_plugin' );
 		}
 	}
 
 	if( $old_db_version < 11000 )
 	{ // Upgrade to 5.0.0-alpha-4
-		if( $test_install_all_features )
+		if( $install_test_features )
 		{
 			$captcha_qstn_plugin_settings = array(
 					'questions' => T_('What is the color of the sky? blue|grey|gray|dark')."\r\n".
@@ -632,6 +677,7 @@ function install_basic_plugins( $old_db_version = 0 )
 												 T_('What color is a carrot? orange|yellow')."\r\n".
 												 T_('What color is a tomato? red')
 				);
+			echo_install_log( 'TEST FEATURE: Creating sample questions for plugin "Captcha questions"' );
 		}
 		else
 		{
@@ -648,21 +694,45 @@ function install_basic_plugins( $old_db_version = 0 )
 		// files
 		install_plugin( 'html5_mediaelementjs_plugin' );
 		install_plugin( 'html5_videojs_plugin' );
-		install_plugin( 'watermark_plugin', $test_install_all_features );
+		install_plugin( 'watermark_plugin', $install_test_features );
+		if( $install_test_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "Watermark"' );
+		}
 		// ping
 		install_plugin( 'generic_ping_plugin' );
 		// rendering
 		install_plugin( 'escapecode_plugin' );
-		install_plugin( 'bbcode_plugin', $test_install_all_features );
-		install_plugin( 'star_plugin', $test_install_all_features );
-		install_plugin( 'prism_plugin', $test_install_all_features );
-		install_plugin( 'code_highlight_plugin', $test_install_all_features );
+		install_plugin( 'bbcode_plugin', $install_test_features );
+		if( $install_test_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "BB code"' );
+		}
+		install_plugin( 'star_plugin', $install_test_features );
+		if( $install_test_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "Star renderer"' );
+		}
+		install_plugin( 'prism_plugin', $install_test_features );
+		if( $install_test_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "Prism"' );
+		}
+		install_plugin( 'code_highlight_plugin', $install_test_features );
+		if( $install_test_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "Code highlight"' );
+		}
 		install_plugin( 'gmcode_plugin' );
 		install_plugin( 'wacko_plugin' );
 		install_plugin( 'shortlinks_plugin' );
 		install_plugin( 'wikitables_plugin' );
 		install_plugin( 'markdown_plugin' );
-		install_plugin( 'infodots_plugin', $test_install_all_features );
+		install_plugin( 'infodots_plugin', $install_test_features );
+		if( $install_test_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "Info dots renderer"' );
+		}
 		install_plugin( 'widescroll_plugin' );
 		// widget
 		install_plugin( 'facebook_plugin' );
@@ -678,8 +748,17 @@ function install_basic_plugins( $old_db_version = 0 )
 
 	if( $old_db_version < 11490 )
 	{ // Upgrade to 6.7.1-stable
-		install_plugin( 'adjust_headings_plugin', $test_install_all_features );
+		install_plugin( 'adjust_headings_plugin', $install_test_features );
+		if( $install_test_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "Adjust headings"' );
+		}
 		install_plugin( 'cookie_consent_plugin', false );
+	}
+
+	if( $old_db_version < 11730 )
+	{
+		install_plugin( 'custom_tags_plugin', true );
 	}
 }
 
@@ -701,7 +780,7 @@ function install_plugin( $plugin, $activate = true, $settings = array() )
 
 	task_begin( 'Installing plugin: '.$plugin.'... ' );
 	$edit_Plugin = & $Plugins_admin->install( $plugin, 'broken' ); // "broken" by default, gets adjusted later
-	if( ! is_a( $edit_Plugin, 'Plugin' ) )
+	if( ! ( $edit_Plugin instanceof Plugin ) )
 	{ // Broken plugin
 		echo get_install_format_text( '<span class="text-danger"><evo:error>'.$edit_Plugin.'</evo:error></span><br />'."\n", 'br' );
 		return false;
@@ -1105,9 +1184,7 @@ function do_install_htaccess( $upgrade = false, $force_htaccess = false )
 function get_antispam_query()
 {
 	//used base64_encode() for getting this code
-	$r = base64_decode('SU5TRVJUIElOVE8gVF9hbnRpc3BhbShhc3BtX3N0cmluZykgVkFMVUVTICgnb25saW5lLWNhc2lubycpLCAoJ3BlbmlzLWVubGFyZ2VtZW50JyksICgnb3JkZXItdmlhZ3JhJyksICgnb3JkZXItcGhlbnRlcm1pbmUnKSwgKCdvcmRlci14ZW5pY2FsJyksICgnb3JkZXItcHJvcGhlY2lhJyksICgnc2V4eS1saW5nZXJpZScpLCAoJy1wb3JuLScpLCAoJy1hZHVsdC0nKSwgKCctdGl0cy0nKSwgKCdidXktcGhlbnRlcm1pbmUnKSwgKCdvcmRlci1jaGVhcC1waWxscycpLCAoJ2J1eS14ZW5hZHJpbmUnKSwgKCdwYXJpcy1oaWx0b24nKSwgKCdwYXJpc2hpbHRvbicpLCAoJ2NhbWdpcmxzJyksICgnYWR1bHQtbW9kZWxzJyk=');
-	// pre_dump($r);
-	return $r;
+	return base64_decode('SU5TRVJUIElOVE8gVF9hbnRpc3BhbV9fa2V5d29yZCAoIGFza3dfc3RyaW5nICkgVkFMVUVTICgnb25saW5lLWNhc2lubycpLCAoJ3BlbmlzLWVubGFyZ2VtZW50JyksICgnb3JkZXItdmlhZ3JhJyksICgnb3JkZXItcGhlbnRlcm1pbmUnKSwgKCdvcmRlci14ZW5pY2FsJyksICgnb3JkZXItcHJvcGhlY2lhJyksICgnc2V4eS1saW5nZXJpZScpLCAoJy1wb3JuLScpLCAoJy1hZHVsdC0nKSwgKCctdGl0cy0nKSwgKCdidXktcGhlbnRlcm1pbmUnKSwgKCdvcmRlci1jaGVhcC1waWxscycpLCAoJ2J1eS14ZW5hZHJpbmUnKSwgKCdwYXJpcy1oaWx0b24nKSwgKCdwYXJpc2hpbHRvbicpLCAoJ2NhbWdpcmxzJyksICgnYWR1bHQtbW9kZWxzJyk=');
 }
 
 /**
@@ -1244,12 +1321,13 @@ function update_install_progress_bar()
  */
 function get_install_steps_count()
 {
-	global $config_test_install_all_features, $allow_evodb_reset;
+	global $allow_install_test_features, $allow_evodb_reset;
+	global $create_sample_organization;
 
 	$steps = 0;
 
 	// After Deleting b2evolution tables:
-	if( $allow_evodb_reset >= 2 || ($config_test_install_all_features && $allow_evodb_reset >= 1) )
+	if( $allow_evodb_reset >= 2 || ( $allow_install_test_features && $allow_evodb_reset >= 1 ) )
 	{ // Allow to quick delete before new installation only when these two settings are enabled in config files
 		$delete_contents = param( 'delete_contents', 'integer', 0 );
 
@@ -1271,6 +1349,12 @@ function get_install_steps_count()
 	// Before install default skins:
 	$steps++;
 
+	// Creating sample organization:
+	if( $create_sample_organization )
+	{
+		$steps++;
+	}
+
 	// Installing sample contents:
 	$create_sample_contents = param( 'create_sample_contents', 'string', '' );
 
@@ -1287,6 +1371,7 @@ function get_install_steps_count()
 			$install_collection_photos = 1;
 			$install_collection_forums = 1;
 			$install_collection_manual = 1;
+			$install_collection_tracker = 1;
 		}
 		else
 		{ // Array contains which collections should be installed
@@ -1297,6 +1382,7 @@ function get_install_steps_count()
 			$install_collection_photos = in_array( 'photos', $collections );
 			$install_collection_forums = in_array( 'forums', $collections );
 			$install_collection_manual = in_array( 'manual', $collections );
+			$install_collection_tracker = in_array( 'group', $collections );
 		}
 
 		if( $install_collection_home )
@@ -1321,6 +1407,11 @@ function get_install_steps_count()
 		}
 		if( $install_collection_manual )
 		{ // After installing of the blog "Manual"
+			$steps++;
+		}
+
+		if( $install_collection_tracker )
+		{ // After installing of the blog "Tracker"
 			$steps++;
 		}
 	}
@@ -1352,17 +1443,20 @@ function get_upgrade_steps_count()
 	// Calculate the upgrade blocks:
 	$old_db_version = get_db_version();
 	if( $new_db_version > $old_db_version )
-	{ // Only when DB must be updated
+	{	// Only when DB must be updated really:
 		$upgrade_file_name = dirname( __FILE__ ).'/_functions_evoupgrade.php';
 		if( @file_exists( $upgrade_file_name ) )
-		{ // If file exists we can parse to know how much the upgrade blocks will be executed
+		{	// If file exists we can parse to know how much the upgrade blocks will be executed:
 			$upgrade_file_content = file_get_contents( $upgrade_file_name );
-			if( preg_match_all( '#if\(\s*\$old_db_version\s*<\s*(\d+)\s*\)#i', $upgrade_file_content, $version_matches ) )
+			// Find DB versions in the upgrade blocks like:
+			//      if( $old_db_version < 11430 )
+			//      if( upg_task_start( 11440, 'Upgrading base domains table...' ) )
+			if( preg_match_all( '#if\(\s*(\$old_db_version\s*<|upg_task_start\()\s*(\d+)#i', $upgrade_file_content, $version_matches ) )
 			{
-				foreach( $version_matches[1] as $version )
+				foreach( $version_matches[2] as $version )
 				{
 					if( $old_db_version < $version && $new_db_version != $old_db_version )
-					{ // Only these blocks will be executed
+					{	// Only these new blocks will be executed:
 						$steps++;
 					}
 				}
@@ -1857,5 +1951,17 @@ function update_basic_config_file( $params = array() )
 	}
 
 	return true;
+}
+
+
+/**
+ * Print out log text on screen
+ *
+ * @param string Log text
+ * @param string Log type: 'warning', 'note', 'success', 'danger'
+ */
+function echo_install_log( $text, $type = 'warning' )
+{
+	echo '<p class="alert alert-'.$type.'">'.$text.'</p>';
 }
 ?>

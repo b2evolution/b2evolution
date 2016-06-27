@@ -23,7 +23,7 @@ class flowplayer_plugin extends Plugin
 	var $code = 'b2evFlwP';
 	var $name = 'Flowplayer';
 	var $priority = 80;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $group = 'files';
 	var $number_of_installs = 1;
 	var $allow_ext = array( 'flv', 'swf', 'mp4', 'ogv', 'webm', 'm3u8' );
@@ -91,6 +91,18 @@ class flowplayer_plugin extends Plugin
 	{
 		return array_merge( parent::get_coll_setting_definitions( $params ),
 			array(
+				'use_for_posts' => array(
+					'label' => T_('Use for'),
+					'note' => T_('videos attached to posts'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
+					),
+				'use_for_comments' => array(
+					'label' => '',
+					'note' => T_('videos attached to comments'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
+					),
 				'skin' => array(
 					'label' => T_('Skin'),
 					'type' => 'select',
@@ -109,7 +121,8 @@ class flowplayer_plugin extends Plugin
 					'valid_range' => array( 'min' => 1 ),
 					),
 				'allow_download' => array(
-					'label' => T_('Allow downloading of the video file'),
+					'label' => T_('Display Download Link'),
+					'note' => T_('Check to display a "Download this video" link under the video.'),
 					'type' => 'checkbox',
 					'defaultvalue' => 0,
 					),
@@ -154,6 +167,12 @@ class flowplayer_plugin extends Plugin
 
 		$Item = & $params['Item'];
 		$item_Blog = $Item->get_Blog();
+
+		if( ( ! $in_comments && ! $this->get_coll_setting( 'use_for_posts', $item_Blog ) ) ||
+		    ( $in_comments && ! $this->get_coll_setting( 'use_for_comments', $item_Blog ) ) )
+		{ // Plugin is disabled for post/comment videos on this Blog
+			return false;
+		}
 
 		$width = intval( $this->get_coll_setting( 'width', $item_Blog ) );
 		if( empty( $width ) )
@@ -296,7 +315,7 @@ class flowplayer_plugin extends Plugin
 		$skins_path = dirname( $this->classfile_path ).'/skin';
 		if( file_exists( $skins_path.'/'.$skin.'.css' ) )
 		{ // Require css file only if it exists
-			require_css( $this->get_plugin_url().'skin/'.$skin.'.css', 'relative' );
+			$this->require_css( 'skin/'.$skin.'.css' );
 		}
 	}
 

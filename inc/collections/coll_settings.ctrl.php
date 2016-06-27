@@ -102,6 +102,7 @@ else
 switch( $action )
 {
 	case 'update':
+	case 'update_confirm':
 		// Update DB:
 
 		// Check that this action request is not a CSRF hacked request:
@@ -117,6 +118,26 @@ switch( $action )
 			case 'urls':
 				if( $edited_Blog->load_from_Request( array() ) )
 				{ // Commit update to the DB:
+					global $Settings;
+
+					param( 'set_as_info_blog', 'boolean' );
+					param( 'set_as_login_blog', 'boolean' );
+					param( 'set_as_msg_blog', 'boolean' );
+
+					if( $set_as_info_blog && ! $Settings->get( 'info_blog_ID' ) )
+					{
+						$Settings->set( 'info_blog_ID', $edited_Blog->ID );
+					}
+					if( $set_as_login_blog && ! $Settings->get( 'login_blog_ID' ) )
+					{
+						$Settings->set( 'login_blog_ID', $edited_Blog->ID );
+					}
+					if( $set_as_msg_blog && ! $Settings->get( 'mgs_blog_ID' ) )
+					{
+						$Settings->set( 'msg_blog_ID', $edited_Blog->ID );
+					}
+					$Settings->dbupdate();
+
 					$edited_Blog->dbupdate();
 					$Messages->add( T_('The blog settings have been updated'), 'success' );
 					// Redirect so that a reload doesn't write to the DB twice:
@@ -187,13 +208,24 @@ switch( $action )
 				}
 				break;
 
-			case 'renderers':
+			case 'plugins':
+				$plugin_group = param( 'plugin_group', 'string', NULL );
+				if( isset( $plugin_group ) )
+				{
+					$update_redirect_url .= '&plugin_group='.$plugin_group;
+				}
+
 				// Update Plugin params/Settings
 				load_funcs('plugins/_plugin.funcs.php');
 
 				$Plugins->restart();
 				while( $loop_Plugin = & $Plugins->get_next() )
 				{
+					if( $loop_Plugin->group != $plugin_group )
+					{
+						continue;
+					}
+
 					$tmp_params = array( 'for_editing' => true );
 					$pluginsettings = $loop_Plugin->get_coll_setting_definitions( $tmp_params );
 					if( empty($pluginsettings) )
@@ -324,7 +356,7 @@ switch( $action )
 		{
 			case 'fav':
 				// Favorite Blog
-				$edited_Blog->set( 'favorite', $setting_value );
+				$edited_Blog->favorite( $current_User->ID, $setting_value );
 				$result_message = T_('The collection setting has been updated.');
 				break;
 
@@ -454,12 +486,6 @@ if( $action == 'dashboard' )
 					'comments' => 10,
 				) );
 
-			// Run SQL query to get results depending on current filters:
-			$CommentList->query();
-
-			// Load data of comments from the current page at once to cache variables:
-			$CommentList->load_list_data();
-
 			// Set param prefix for URLs
 			$param_prefix = 'cmnt_fullview_';
 			if( !empty( $CommentList->param_prefix ) )
@@ -469,10 +495,14 @@ if( $action == 'dashboard' )
 
 			// Get ready for display (runs the query):
 			$CommentList->display_init();
+
+			// Load data of comments from the current page at once to cache variables:
+			$CommentList->load_list_data();
 		}
 
 		// Check if we have comments and posts to moderate
 		$have_comments_to_moderate = $user_perm_moderate_cmt && $CommentList->result_num_rows;
+
 		$Timer->pause( 'Panel: Comments Awaiting Moderation' );
 
 		// Posts for Moderation
@@ -488,6 +518,7 @@ if( $action == 'dashboard' )
 		}
 		$posts_awaiting_moderation_content = ob_get_contents();
 		ob_clean();
+
 		$Timer->pause( 'Panel: Posts Awaiting Moderation' );
 
 		// Check if we have posts that $blog_moderation
@@ -499,7 +530,8 @@ if( $action == 'dashboard' )
 		echo '<div class="first_payload_block">'."\n";
 
 		$AdminUI->disp_payload_begin();
-		echo '<h2 class="page-title">'.$Blog->dget( 'name' ).'</h2>';
+		echo '<h2 class="page-title">'.get_coll_fav_icon( $Blog->ID, array( 'class' => 'coll-fav' ) ).'&nbsp;'.$Blog->dget( 'name' ).'</h2>';
+		load_funcs( 'collections/model/_blog_js.funcs.php' );
 		echo '<div class="row browse">';
 
 		// Block Group 1
@@ -552,6 +584,7 @@ if( $action == 'dashboard' )
 			echo '</div>';
 		}
 		echo '</div><!-- End of Block Group 1 -->';
+
 		$Timer->stop( 'Panel: Collection Metrics' );
 		evo_flush();
 
@@ -583,7 +616,7 @@ if( $action == 'dashboard' )
 				echo '<div id="comments_block" class="dashboard_comments_block">';
 
 				$block_item_Widget->disp_template_replaced( 'block_start' );
-				echo '<div id="comments_container">';
+				echo '<div id="comments_container" class="evo_comments_container">';
 
 				// GET COMMENTS AWAITING MODERATION (the code generation is shared with the AJAX callback):
 				$Timer->start( 'show_comments_awaiting_moderation' );
@@ -614,6 +647,7 @@ if( $action == 'dashboard' )
 			echo '<div style="min-height: 100px;" class="hidden-xs hidden-sm hidden-md"></div>';
 			echo '</div><!-- End of Block Group 2 -->';
 		}
+
 		evo_flush();
 
 		// Block Group 3
@@ -641,12 +675,6 @@ if( $action == 'dashboard' )
 					'comments' => 5,
 				) );
 
-			// Run SQL query to get results depending on current filters:
-			$CommentList->query();
-
-			// Load data of comments from the current page at once to cache variables:
-			$CommentList->load_list_data();
-
 			// Set param prefix for URLs:
 			$param_prefix = 'cmnt_meta_';
 			if( !empty( $CommentList->param_prefix ) )
@@ -656,6 +684,9 @@ if( $action == 'dashboard' )
 
 			// Get ready for display (runs the query):
 			$CommentList->display_init();
+
+			// Load data of comments from the current page at once to cache variables:
+			$CommentList->load_list_data();
 
 			if( $CommentList->result_num_rows )
 			{	// We have the meta comments
@@ -680,7 +711,7 @@ if( $action == 'dashboard' )
 
 				$block_item_Widget->disp_template_replaced( 'block_start' );
 
-				echo '<div id="comments_container">';
+				echo '<div id="comments_container" class="evo_comments_container">';
 				// GET LATEST META COMMENTS:
 				show_comments_awaiting_moderation( $Blog->ID, $CommentList );
 				echo '</div>';
@@ -693,6 +724,7 @@ if( $action == 'dashboard' )
 		}
 
 		$Timer->start( 'Panel: Recently Edited Post' );
+
 		// Recently Edited Posts Block
 		// Create empty List:
 		$ItemList = new ItemList2( $Blog, NULL, NULL );
@@ -996,7 +1028,7 @@ else
 			$AdminUI->set_page_manual_link( 'seo-settings' );
 			break;
 
-		case 'renderers':
+		case 'plugins':
 			$AdminUI->set_path( 'collections', 'settings', $tab );
 			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 			$AdminUI->breadcrumbpath_add( T_('Plugins'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
@@ -1016,6 +1048,8 @@ else
 			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 			$AdminUI->breadcrumbpath_add( T_('User permissions'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			$AdminUI->set_page_manual_link( 'advanced-user-permissions' );
+			// Load JavaScript to toggle checkboxes:
+			require_js( 'collectionperms.js', 'rsc_url' );
 			break;
 
 		case 'permgroup':
@@ -1024,6 +1058,8 @@ else
 			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 			$AdminUI->breadcrumbpath_add( T_('Group permissions'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			$AdminUI->set_page_manual_link( 'advanced-group-permissions' );
+			// Load JavaScript to toggle checkboxes:
+			require_js( 'collectionperms.js', 'rsc_url' );
 			break;
 	}
 
@@ -1097,7 +1133,7 @@ else
 				case 'seo':
 					$AdminUI->disp_view( 'collections/views/_coll_seo.form.php' );
 					break;
-				case 'renderers':
+				case 'plugins':
 					$AdminUI->disp_view( 'collections/views/_coll_plugin_settings.form.php' );
 					break;
 				case 'advanced':
