@@ -95,18 +95,27 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'cakeywordsimport' );
 
+		$import_keywords = param( 'import_keywords', 'array:string' );
+
+		if( empty( $import_keywords ) )
+		{	// No selected keywords to import:
+			$Messages->add( $central_antispam_Module->T_('Please select what keywords should be imported.'), 'error' );
+			$action = 'import';
+			break;
+		}
+
 		$DB->begin();
 
 		$keywords_SQL = new SQL( 'Get keywords that will be imported as local reports' );
-		$keywords_SQL->SELECT( 'askw_string' );
+		$keywords_SQL->SELECT( 'askw_string, askw_source' );
 		$keywords_SQL->FROM( 'T_antispam__keyword' );
 		$keywords_SQL->WHERE( 'askw_string NOT IN ( SELECT cakw_keyword FROM T_centralantispam__keyword )' );
-		$keywords = $DB->get_col( $keywords_SQL->get(), 0, $keywords_SQL->title );
+		$keywords_SQL->WHERE_and( 'askw_source IN( '.$DB->quote( $import_keywords ).' )' );
+		$keywords = $DB->get_results( $keywords_SQL->get(), ARRAY_A, $keywords_SQL->title );
 
 		$keywords_imported_count = 0;
 		if( count( $keywords ) )
 		{	// If there are new keywords to import:
-			$time_difference = $Settings->get( 'time_difference' );
 
 			// Check if the Reporter/Source already exists in DB
 			$source_SQL = new SQL( 'Get source of current baseurl for central antispam' );
@@ -131,19 +140,29 @@ switch( $action )
 			}
 
 			$keywords_reports = array();
+			$keyword_report_dates = array(
+					'central'  => strtotime( '2014-01-01 00:00:00' ),
+					'reported' => strtotime( '2015-01-01 00:00:00' ),
+					'local'    => strtotime( '2016-01-01 00:00:00' ),
+				);
 			foreach( $keywords as $keyword )
 			{
-				$keyword_timestamp = date( 'Y-m-d H:i:s', ( time() + $time_difference ) );
+				$keyword_timestamp = date( 'Y-m-d H:i:s', $keyword_report_dates[ $keyword['askw_source'] ] );
+				if( $keyword['askw_source'] == 'central' && $keyword_timestamp > '2014-02-24 21:10:18' )
+				{	// Limit central keywords by this max date:
+					$keyword_timestamp = '2014-02-24 21:10:18';
+				}
 				// Insert new keyword:
 				$query_result = $DB->query( 'INSERT INTO T_centralantispam__keyword
 						( cakw_keyword, cakw_status, cakw_statuschange_ts, cakw_lastreport_ts ) VALUES
-						( '.$DB->quote( $keyword ).', "published", '.$DB->quote( $keyword_timestamp ).', '.$DB->quote( $keyword_timestamp ).' )' );
+						( '.$DB->quote( $keyword['askw_string'] ).', "published", '.$DB->quote( $keyword_timestamp ).', '.$DB->quote( $keyword_timestamp ).' )' );
 				if( $query_result )
 				{	// If new keyword has been inserted:
 					$keywords_imported_count++;
 					$keyword_ID = $DB->insert_id;
 					$keywords_reports[] = '( '.$DB->insert_id.', '.$source_ID.', '.$DB->quote( $keyword_timestamp ).' )';
 				}
+				$keyword_report_dates[ $keyword['askw_source'] ]++;
 			}
 
 			if( $keywords_imported_count )

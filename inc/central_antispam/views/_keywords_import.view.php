@@ -21,10 +21,17 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $central_antispam_Module, $DB;
 
 $keywords_SQL = new SQL( 'Get a count of keywords that can be imported as local reports' );
-$keywords_SQL->SELECT( 'SQL_NO_CACHE COUNT( askw_ID )' );
+$keywords_SQL->SELECT( 'askw_source, COUNT( askw_ID )' );
+$keywords_SQL->SELECT_add( ', CASE
+		WHEN askw_source = "central"  THEN 1
+		WHEN askw_source = "reported" THEN 2
+		WHEN askw_source = "local"    THEN 3
+	END AS source_order' );
 $keywords_SQL->FROM( 'T_antispam__keyword' );
 $keywords_SQL->WHERE( 'askw_string NOT IN ( SELECT cakw_keyword FROM T_centralantispam__keyword )' );
-$keywords_count = intval( $DB->get_var( $keywords_SQL->get(), 0, NULL, $keywords_SQL->title ) );
+$keywords_SQL->ORDER_BY( 'source_order' );
+$keywords_SQL->GROUP_BY( 'askw_source' );
+$keywords = $DB->get_assoc( $keywords_SQL->get(), $keywords_SQL->title );
 
 $Form = new Form();
 
@@ -36,16 +43,32 @@ $Form->hidden( 'confirm', 1 );
 
 $Form->begin_fieldset( $central_antispam_Module->T_('Import keywords') );
 
-echo '<p>';
-if( $keywords_count > 0 )
-{
-	printf( $central_antispam_Module->T_('%d new keywords will be imported as local reports'), $keywords_count );
+if( count( $keywords ) > 0 )
+{	// Suggest to import keywords only if at least one is found:
+	$keywords_options = array();
+	foreach( $keywords as $keywords_status => $keywords_count )
+	{
+		switch( $keywords_status )
+		{
+			case 'central':
+				$keywords_date_start = '[2014-01-01] [00:00:00]';
+				break;
+			case 'reported':
+				$keywords_date_start = '[2015-01-01] [00:00:00]';
+				break;
+			case 'local':
+			default:
+				$keywords_date_start = '[2016-01-01] [00:00:00]';
+				break;
+		}
+		$keywords_options[] = array( 'import_keywords[]', $keywords_status, sprintf( T_('Import %s keywords with status "%s" and set report dates starting at %s with 1 second increments'), $keywords_count, $keywords_status, $keywords_date_start ), 1 );
+	}
+	$Form->checklist( $keywords_options, '', '', false, false, array( 'wide' => true ) );
 }
 else
 {
-	echo $central_antispam_Module->T_('No new keywords to import');
+	echo '<p>'.$central_antispam_Module->T_('No new keywords to import').'</p>';
 }
-echo '</p>';
 
 $Form->end_fieldset();
 
