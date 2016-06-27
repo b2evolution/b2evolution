@@ -23,7 +23,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $central_antispam_Module, $UserSettings, $admin_url;
+global $central_antispam_Module, $UserSettings, $admin_url, $current_User;
 
 // Create result set:
 
@@ -61,7 +61,11 @@ $Results->cols[] = array(
 		'th' => $central_antispam_Module->T_('Status'),
 		'order' => 'cakw_status',
 		'th_class' => 'shrinkwrap',
-		'td' => '%ca_get_keyword_status_title( #cakw_status# )%',
+		'td_class' => 'cakeyword_status_edit',
+		'td' =>  /* Check permission: */$current_User->check_perm( 'spamblacklist', 'edit' ) ?
+			/* Current user can edit keyword */'<a href="#" rel="$cakw_status$" style="color:#FFF">%ca_get_keyword_status_title( #cakw_status# )%</a>' :
+			/* No edit, only view the status */'%ca_get_keyword_status_title( #cakw_status# )%',
+		'extra' => array ( 'style' => 'background-color: %ca_get_keyword_status_color( "#cakw_status#" )%;color:#FFF', 'format_to_output' => false ),
 	);
 
 $Results->cols[] = array(
@@ -106,4 +110,17 @@ $Results->cols[] = array(
 
 // Display results:
 $Results->display();
+
+if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+{ // Check permission to edit central antispam keyword:
+	// Print JS to edit status of central antispam keyword:
+	echo_editable_column_js( array(
+		'column_selector' => '.cakeyword_status_edit',
+		'ajax_url'        => get_secure_htsrv_url().'async.php?action=cakeyword_status_edit&'.url_crumb( 'cakeyword' ),
+		'options'         => ca_get_keyword_statuses(),
+		'new_field_name'  => 'new_status',
+		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',
+		'ID_name'         => 'cakw_ID',
+		'colored_cells'   => true ) );
+}
 ?>

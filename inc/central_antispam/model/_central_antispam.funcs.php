@@ -72,4 +72,38 @@ function ca_get_source_status_title( $value )
 
 	return isset( $statuses[ $value ] ) ? $statuses[ $value ] : $value;
 }
+
+
+/**
+ * Get status colors of central antispam keyword
+ *
+ * @return array Color values
+ */
+function ca_get_keyword_status_colors()
+{
+	return array(
+			'new'       => '5bc0de',
+			'published' => 'f0ad4e',
+			'revoked'   => '333333',
+		);
+}
+
+
+/**
+ * Get status color of central antispam keyword by status value
+ *
+ * @param string Status value
+ * @return string Color value
+ */
+function ca_get_keyword_status_color( $status )
+{
+	if( $status == 'NULL' )
+	{
+		$status = '';
+	}
+
+	$ca_keyword_status_colors = ca_get_keyword_status_colors();
+
+	return isset( $ca_keyword_status_colors[ $status ] ) ? '#'.$ca_keyword_status_colors[ $status ] : 'none';
+}
 ?>

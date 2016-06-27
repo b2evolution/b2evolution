@@ -193,6 +193,10 @@ switch( $tab )
 		{
 			$AdminUI->breadcrumbpath_add( $central_antispam_Module->T_('Import'), $admin_url.'?ctrl=central_antispam&amp;action='.$action );
 		}
+		if( empty( $action ) )
+		{	// Load JS to edit keyword status from list:
+			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+		}
 		break;
 
 	case 'reporters':

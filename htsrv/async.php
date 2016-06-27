@@ -507,6 +507,27 @@ switch( $action )
 		echo '<a href="#" rel="'.$new_status.'" color="'.aipr_status_color( $new_status ).'">'.aipr_status_title( $new_status ).'</a>';
 		break;
 
+	case 'cakeyword_status_edit':
+		// Update status of central antispam keyword from list screen by clicking on the status column:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'cakeyword' );
+
+		// Check permission:
+		$current_User->check_perm( 'spamblacklist', 'edit', true );
+
+		load_funcs( 'central_antispam/model/_central_antispam.funcs.php' );
+
+		$new_status = param( 'new_status', 'string' );
+		$cakw_ID = param( 'cakw_ID', 'integer', true );
+
+		$DB->query( 'UPDATE T_centralantispam__keyword
+			  SET cakw_status = '.( empty( $new_status ) ? 'NULL' : $DB->quote( $new_status ) ).',
+			      cakw_statuschange_ts = '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).'
+			WHERE cakw_ID =' . $DB->quote( $cakw_ID ) );
+		echo '<a href="#" rel="'.$new_status.'" style="color:#FFF" color="'.ca_get_keyword_status_color( $new_status ).'">'.ca_get_keyword_status_title( $new_status ).'</a>';
+		break;
+
 	case 'emadr_status_edit':
 		// Update status of email address
 
