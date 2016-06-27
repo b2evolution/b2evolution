@@ -78,14 +78,15 @@ $Form->begin_fieldset( T_('SMTP Server connection settings').get_manual_link('sm
 
 	$Form->text_input( 'smtp_server_host', $Settings->get('smtp_server_host'), 25, T_('SMTP Server'), T_('Hostname or IP address of your SMTP server.'), array( 'maxlength' => 255 ) );
 
-	$Form->radio( 'smtp_server_security', $Settings->get('smtp_server_security'), array(
+	$smtp_server_security = $Settings->get( 'smtp_server_security' );
+	$Form->radio( 'smtp_server_security', $smtp_server_security, array(
 				array( 'none', T_('None'), ),
 				array( 'ssl', T_('SSL'), ),
 				array( 'tls', T_('TLS'), ),
 			), T_('Encryption Method') );
 
 	$smtp_server_novalidatecert_params = array( 'lines' => true );
-	if( $Settings->get( 'smtp_server_security' ) == 'none' || empty( $Settings->get( 'smtp_server_security' ) ) )
+	if( empty( $smtp_server_security ) || $smtp_server_security == 'none' )
 	{
 		$smtp_server_novalidatecert_params['disabled'] = 'disabled';
 	}
