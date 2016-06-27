@@ -512,10 +512,13 @@
 			}
 			if (!options.innerHeight && !options.height) {
 				var $child = $loaded.wrapInner("<div style='overflow:auto'></div>").children(); // temporary wrapper to get an accurate estimate of just how high the total content should be.
-				settings.h = $child.height();
+				settings.h = $child.outerHeight();
 				$child.replaceWith($child.children()); // ditch the temporary wrapper div used in height calculation
 			}
 			$loaded.css({height: settings.h});
+
+			prevSettings.pw = settings.w;
+			prevSettings.ph = settings.h;
 
 			publicMethod.position(settings.transition === "none" ? 0 : settings.speed);
 		}
@@ -537,7 +540,6 @@
 			settings.w = settings.mw && settings.mw < settings.w ? settings.mw : settings.w;
 			settings.w = settings.minWidth && settings.minWidth > settings.w ? settings.minWidth : settings.w;
 			prevSettings.pw = ( prevSettings.pw == undefined || settings.w > prevSettings.pw ) ? settings.w : prevSettings.pw;
-			//return settings.w;
 			return prevSettings.pw;
 		}
 		function getHeight() {
@@ -545,7 +547,6 @@
 			settings.h = settings.mh && settings.mh < settings.h ? settings.mh : settings.h;
 			settings.h = settings.minHeight && settings.minHeight > settings.h ? settings.minHeight : settings.h;
 			prevSettings.ph = (  prevSettings.ph == undefined || settings.h > prevSettings.ph )? settings.h : prevSettings.ph;
-			//return settings.h;
 			return prevSettings.ph;
 		}
 
@@ -562,7 +563,6 @@
 
 		$(photo).css({'float': 'none'});
 		$(photo).css({ 'position': 'absolute', 'top': $loaded.height()/2 + 'px', 'left': '50%', 'transform': 'translate(-50%, -50%)' });
-
 
 		callback = function () {
 			var prev, prevSrc, next, nextSrc, total = $related.length, iframe, complete;
@@ -841,6 +841,10 @@
 						}
 						else
 						{ // Zoom in a photo to real size
+							publicMethod.resize({
+								width: settings.mw,
+								height: settings.mh + parseInt( $loaded.css( 'margin-bottom' ) )
+							});
 							var this_offset = jQuery( this ).offset();
 							var pageX = typeof( event.pageX ) != 'undefined' ? event.pageX : touch_event.originalEvent.touches[0].pageX;
 							var pageY = typeof( event.pageY ) != 'undefined' ? event.pageY : touch_event.originalEvent.touches[0].pageY;
