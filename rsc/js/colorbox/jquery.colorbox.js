@@ -97,6 +97,7 @@
 
 	// Variables for cached values or use across multiple functions
 	settings,
+	prevSettings,
 	interfaceHeight,
 	interfaceWidth,
 	loadedHeight,
@@ -213,7 +214,7 @@
 		if (!closing) {
 
 			element = target;
-
+			prevSettings = {};
 			makeSettings();
 
 			$related = $(element);
@@ -411,6 +412,9 @@
 	};
 
 	publicMethod.position = function (speed, loadedCallback) {
+		var w = ( prevSettings.pw == undefined || settings.w > prevSettings.pw ) ? settings.w : prevSettings.pw;
+		var h = ( prevSettings.ph == undefined || settings.h > prevSettings.ph ) ? settings.h : prevSettings.ph;
+
 		var top = 0, left = 0;
 
 		$window.unbind('resize.' + prefix);
@@ -428,25 +432,25 @@
 
 		// keeps the top and left positions within the browser's viewport.
 		if (settings.right !== false) {
-			left += Math.max($window.width() - settings.w - loadedWidth - interfaceWidth - setSize(settings.right, 'x'), 0);
+			left += Math.max($window.width() - w - loadedWidth - interfaceWidth - setSize(settings.right, 'x'), 0);
 		} else if (settings.left !== false) {
 			left += setSize(settings.left, 'x');
 		} else {
-			left += Math.round(Math.max($window.width() - settings.w - loadedWidth - interfaceWidth, 0) / 2);
+			left += Math.round(Math.max($window.width() - w - loadedWidth - interfaceWidth, 0) / 2);
 		}
 
 		if (settings.bottom !== false) {
-			top += Math.max(document.documentElement.clientHeight - settings.h - loadedHeight - interfaceHeight - setSize(settings.bottom, 'y'), 0);
+			top += Math.max(document.documentElement.clientHeight - h - loadedHeight - interfaceHeight - setSize(settings.bottom, 'y'), 0);
 		} else if (settings.top !== false) {
 			top += setSize(settings.top, 'y');
 		} else {
-			top += Math.round(Math.max(document.documentElement.clientHeight - settings.h - loadedHeight - interfaceHeight, 0) / 2);
+			top += Math.round(Math.max(document.documentElement.clientHeight - h - loadedHeight - interfaceHeight, 0) / 2);
 		}
 
 		$box.show();
 
 		// setting the speed to 0 to reduce the delay between same-sized content.
-		speed = ($box.width() === settings.w + loadedWidth && $box.height() === settings.h + loadedHeight) ? 0 : speed || 0;
+		speed = ($box.width() === w + loadedWidth && $box.height() === h + loadedHeight) ? 0 : speed || 0;
 
 		// this gives the wrapper plenty of breathing room so it's floated contents can move around smoothly,
 		// but it has to be shrank down around the size of div#colorbox when it's done.  If not,
@@ -459,7 +463,7 @@
 			$loadingOverlay[0].style.height = $loadingOverlay[1].style.height = $content[0].style.height = that.style.height;
 		}
 
-		$box.dequeue().animate({width: settings.w + loadedWidth, height: settings.h + loadedHeight, top: top, left: left}, {
+		$box.dequeue().animate({width: w + loadedWidth, height: h + loadedHeight, top: top, left: left}, {
 			duration: speed,
 			complete: function () {
 				modalDimensions(this);
@@ -467,8 +471,8 @@
 				active = false;
 
 				// shrink the wrapper down to exactly the size of colorbox to avoid a bug in IE's iframe implementation.
-				$wrap[0].style.width = (settings.w + loadedWidth + interfaceWidth) + "px";
-				$wrap[0].style.height = (settings.h + loadedHeight + interfaceHeight) + "px";
+				$wrap[0].style.width = (w + loadedWidth + interfaceWidth) + "px";
+				$wrap[0].style.height = (h + loadedHeight + interfaceHeight) + "px";
 
 				if (loadedCallback) {
 					loadedCallback();
@@ -532,13 +536,17 @@
 			settings.w = settings.w || $loaded.width();
 			settings.w = settings.mw && settings.mw < settings.w ? settings.mw : settings.w;
 			settings.w = settings.minWidth && settings.minWidth > settings.w ? settings.minWidth : settings.w;
-			return settings.w;
+			prevSettings.pw = ( prevSettings.pw == undefined || settings.w > prevSettings.pw ) ? settings.w : prevSettings.pw;
+			//return settings.w;
+			return prevSettings.pw;
 		}
 		function getHeight() {
 			settings.h = settings.h || $loaded.height();
 			settings.h = settings.mh && settings.mh < settings.h ? settings.mh : settings.h;
 			settings.h = settings.minHeight && settings.minHeight > settings.h ? settings.minHeight : settings.h;
-			return settings.h;
+			prevSettings.ph = (  prevSettings.ph == undefined || settings.h > prevSettings.ph )? settings.h : prevSettings.ph;
+			//return settings.h;
+			return prevSettings.ph;
 		}
 
 		$loaded.hide()
@@ -553,6 +561,8 @@
 		//$(photo).css({'float': 'none', marginLeft: 'auto', marginRight: 'auto'});
 
 		$(photo).css({'float': 'none'});
+		$(photo).css({ 'position': 'absolute', 'top': $loaded.height()/2 + 'px', 'left': '50%', 'transform': 'translate(-50%, -50%)' });
+
 
 		callback = function () {
 			var prev, prevSrc, next, nextSrc, total = $related.length, iframe, complete;
@@ -838,6 +848,7 @@
 							var pecentY = ( pageY - this_offset.top ) / jQuery( this ).height();
 
 							photo.className = photo.className + ' zoomout';
+							$(photo).css({ 'position': 'static', 'top': 0, 'left': 0, 'transform': 'none' });
 							photo_width = photo.width;
 							photo_height = photo.height;
 							photo.removeAttribute( 'width' );
