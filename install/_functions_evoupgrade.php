@@ -7487,7 +7487,28 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11775, 'Add new types "Text" and "HTML" for custom fields of item types...' ) )
+	if( upg_task_start( 11775, 'Upgrading posts and comments statuses depeding on max allowed status by their collections...' ) )
+	{	// part of 6.7.4-stable
+		$BlogCache = & get_BlogCache();
+		$BlogCache->load_all( 'ID', 'ASC' );
+		foreach( $BlogCache->cache as $Blog )
+		{
+			$Blog->update_reduced_status_data();
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11780, 'Upgrading subscription settings of collections...' ) )
+	{	// part of 6.7.4-stable
+		$DB->query( 'REPLACE INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
+				SELECT cset_coll_ID, "allow_comment_subscriptions", 1
+				  FROM T_coll_settings
+				 WHERE cset_name = "allow_subscriptions"
+				   AND cset_value = 1' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11785, 'Add new types "Text" and "HTML" for custom fields of item types...' ) )
 	{	// part of 6.7.3-stable
 		$DB->query( 'ALTER TABLE T_items__item_settings
 			MODIFY COLUMN iset_value varchar( 10000 ) NULL' );
@@ -7496,7 +7517,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11780, 'Update widget container "Item Single"...' ) )
+	if( upg_task_start( 11790, 'Update widget container "Item Single"...' ) )
 	{	// part of 6.7.3-stable
 		$DB->begin();
 		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
@@ -7554,7 +7575,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11785, 'Create new widget container "404 Page"...' ) )
+	if( upg_task_start( 11795, 'Create new widget container "404 Page"...' ) )
 	{	// part of 6.7.3-stable
 		$coll_IDs = $DB->get_col( 'SELECT blog_ID FROM T_blogs' );
 		if( $coll_IDs )
@@ -7573,7 +7594,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11790, 'Rename table "T_antispam" to "T_antispam__keyword"...' ) )
+	if( upg_task_start( 11800, 'Rename table "T_antispam" to "T_antispam__keyword"...' ) )
 	{	// part of 6.7.4-stable
 		$DB->query( 'RENAME TABLE '.$tableprefix.'antispam TO T_antispam__keyword' );
 		$DB->query( "ALTER TABLE T_antispam__keyword
@@ -7582,27 +7603,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			CHANGE aspm_source askw_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported',
 			DROP INDEX aspm_string,
 			ADD UNIQUE askw_string ( askw_string )" );
-		upg_task_end();
-	}
-
-	if( upg_task_start( 11795, 'Upgrading posts and comments statuses depeding on max allowed status by their collections...' ) )
-	{	// part of 6.7.4-stable
-		$BlogCache = & get_BlogCache();
-		$BlogCache->load_all( 'ID', 'ASC' );
-		foreach( $BlogCache->cache as $Blog )
-		{
-			$Blog->update_reduced_status_data();
-		}
-		upg_task_end();
-	}
-
-	if( upg_task_start( 11800, 'Upgrading subscription settings of collections...' ) )
-	{	// part of 6.8.0-alpha
-		$DB->query( 'REPLACE INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
-				SELECT cset_coll_ID, "allow_comment_subscriptions", 1
-				  FROM T_coll_settings
-				 WHERE cset_name = "allow_subscriptions"
-				   AND cset_value = 1' );
 		upg_task_end();
 	}
 
