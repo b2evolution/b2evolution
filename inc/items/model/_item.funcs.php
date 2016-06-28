@@ -53,7 +53,12 @@ function init_MainList( $items_nb_limit )
 					) );
 			}
 
-			// else: we are in posts mode
+			if( $disp == 'posts' && $Blog->get_setting( 'show_post_types' ) != '' )
+			{	// Exclude items with types which are hidden by collection setting "Show post types":
+				$MainList->set_default_filters( array(
+						'types' => '-'.$Blog->get_setting( 'show_post_types' )
+					) );
+			}
 
 			// pre_dump( $MainList->default_filters );
 			$MainList->load_from_Request( false );
