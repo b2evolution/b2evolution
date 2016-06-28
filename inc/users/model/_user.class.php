@@ -316,7 +316,7 @@ class User extends DataObject
 				array( 'table'=>'T_messaging__contact_groupusers', 'fk'=>'cgu_user_ID', 'msg'=>T_('%d contacts from contact groups') ),
 				array( 'table'=>'T_pluginusersettings', 'fk'=>'puset_user_ID', 'msg'=>T_('%d user settings on plugins') ),
 				array( 'table'=>'T_users__fields', 'fk'=>'uf_user_ID', 'msg'=>T_('%d user fields') ),
-				array( 'table'=>'T_users__postreadstatus', 'fk'=>'uprs_user_ID', 'msg'=>T_('%d recordings of a post having been read') ),
+				array( 'table'=>'T_items__user_data', 'fk'=>'itud_user_ID', 'msg'=>T_('%d recordings of user data for a specific post') ),
 				array( 'table'=>'T_links', 'fk'=>'link_usr_ID', 'msg'=>T_('%d links to this user'),
 						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
 				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition'=>'file_root_type = "user"', 'msg'=>T_('%d files from this user file root') ),
@@ -6613,6 +6613,49 @@ class User extends DataObject
 		{	// No terms for this site:
 			return false;
 		}
+	}
+
+
+	/**
+	 * Get a count of flagged items by this user in current collection
+	 *
+	 * @return integer
+	 */
+	function get_flagged_items_count()
+	{
+		global $Blog;
+
+		if( ! is_logged_in() )
+		{	// Only logged in users can have the flagged items:
+			return 0;
+		}
+
+		if( empty( $Blog ) )
+		{	// Collection must be defined:
+			return 0;
+		}
+
+		if( ! isset( $this->flagged_items_count ) )
+		{	// Get it from DB only first time and then cache in var:
+			global $current_User;
+
+			$flagged_ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
+
+			// Set additional debug info prefix for SQL queries in order to know what code executes it:
+			$flagged_ItemList2->query_title_prefix = 'Flagged Items';
+
+			// Filter only the flagged items:
+			$flagged_ItemList2->set_default_filters( array(
+					'flagged' => 1
+				) );
+
+			// Run query initialization to get total rows:
+			$flagged_ItemList2->query_init();
+
+			$this->flagged_items_count = $flagged_ItemList2->total_rows;
+		}
+
+		return $this->flagged_items_count;
 	}
 }
 

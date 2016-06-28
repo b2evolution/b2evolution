@@ -2274,6 +2274,10 @@ class Blog extends DataObject
 				$disp_param = 'contacts';
 				break;
 
+			case 'flaggedurl':
+				$disp_param = 'flagged';
+				break;
+
 			case 'helpurl':
 				if( $this->get_setting( 'help_link' ) == 'slug' )
 				{

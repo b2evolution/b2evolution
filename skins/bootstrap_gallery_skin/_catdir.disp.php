@@ -141,9 +141,13 @@ if( ! empty( $chapters ) )
 				{ // No images, but some attachments(e.g. videos) are rendered by plugins
 					$item_first_image = $Item->get_permanent_link( '<b>'.T_('Click to see contents').'</b>', '#', 'album_nopic' );
 				}
+				// Flag:
+				$item_flag = $Item->get_flag( array(
+						'only_flagged' => true
+					) );
 				// Display a title
 				echo $Item->get_title( array(
-					'before' => $item_first_image.'<br />',
+					'before' => $item_first_image.'<br />'.$item_flag,
 					) );
 				// Restore previous locale (Blog locale)
 				locale_restore_previous();

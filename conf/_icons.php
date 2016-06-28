@@ -1013,6 +1013,24 @@ function get_icon_info( $name )
 			'color' => '#7f7f7f'
 		);
 
+		case 'flag_on': return array(
+			'rollover' => true,
+			'alt'  => '',
+			'size' => array( 16, 16 ),
+			'xy' => array( 0, 208 ),
+			'glyph' => 'flag',
+			'fa' => 'flag fa-x--hover',
+			'color' => '#FAA72D'
+		);
+		case 'flag_off': return array(
+			'alt'  => '',
+			'size' => array( 16, 16 ),
+			'xy' => array( 16, 208 ),
+			'glyph' => 'flag',
+			'fa' => 'flag-o fa-x--hover',
+			'color' => '#7f7f7f'
+		);
+
 		case 'magnifier': return array(
 			'alt'  => T_('Log as a search instead'),
 			'size' => array( 14, 13 ),

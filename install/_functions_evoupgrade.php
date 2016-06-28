@@ -5553,7 +5553,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_end();
 
 		task_begin( 'Create table for User post read status... ' );
-		db_create_table( 'T_users__postreadstatus', '
+		db_create_table( $tableprefix.'users__postreadstatus', '
 			uprs_user_ID int(11) unsigned NOT NULL,
 			uprs_post_ID int(11) unsigned NOT NULL,
 			uprs_read_post_ts TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
@@ -7603,6 +7603,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			CHANGE aspm_source askw_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported',
 			DROP INDEX aspm_string,
 			ADD UNIQUE askw_string ( askw_string )" );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11805, 'Upgrade table user post data...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'RENAME TABLE '.$tableprefix.'users__postreadstatus TO T_items__user_data' );
+		$DB->query( "ALTER TABLE T_items__user_data
+			CHANGE uprs_user_ID         itud_user_ID          INT(11) UNSIGNED NOT NULL,
+			CHANGE uprs_post_ID         itud_item_ID          INT(11) UNSIGNED NOT NULL,
+			CHANGE uprs_read_post_ts    itud_read_item_ts     TIMESTAMP NULL DEFAULT NULL,
+			CHANGE uprs_read_comment_ts itud_read_comments_ts TIMESTAMP NULL DEFAULT NULL,
+			ADD                         itud_flagged_item     TINYINT(1) NOT NULL DEFAULT 0" );
 		upg_task_end();
 	}
 

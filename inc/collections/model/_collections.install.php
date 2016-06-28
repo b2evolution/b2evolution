@@ -374,6 +374,17 @@ $schema_queries = array_merge( $schema_queries, array(
 			PRIMARY KEY ( iset_item_ID, iset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
+	'T_items__user_data' => array(
+		'Creating table for user post data',
+		"CREATE TABLE T_items__user_data (
+			itud_user_ID          INT(11) UNSIGNED NOT NULL,
+			itud_item_ID          INT(11) UNSIGNED NOT NULL,
+			itud_read_item_ts     TIMESTAMP NULL DEFAULT NULL,
+			itud_read_comments_ts TIMESTAMP NULL DEFAULT NULL,
+			itud_flagged_item     TINYINT(1) NOT NULL DEFAULT 0,
+			PRIMARY KEY ( itud_user_ID, itud_item_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
 	'T_subscriptions' => array(
 		'Creating table for subscriptions',
 		"CREATE TABLE T_subscriptions (

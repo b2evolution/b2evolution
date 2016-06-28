@@ -112,6 +112,10 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 13, array( 'link_type' => 'recentposts', 'link_text' => T_('Latest pages') ) );
 			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 15, array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest comments') ) );
 		}
+		if( $kind == 'forum' || $kind == 'manual' )
+		{	// Add menu with flagged items:
+			add_basic_widget( $blog_id, 'Menu', 'flag_menu_link', 'core', 17, array( 'link_text' => ( $kind == 'forum' ) ? T_('Flagged topics') : T_('Flagged pages') ) );
+		}
 		if( $kind == 'photo' )
 		{ // Add menu with Photo index
 			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 18, array( 'link_type' => 'mediaidx', 'link_text' => T_('Index') ) );

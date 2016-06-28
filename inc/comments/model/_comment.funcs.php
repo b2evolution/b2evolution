@@ -936,7 +936,7 @@ function comment_mass_delete_process( $mass_type, $deletable_comments_query )
 		return;
 	}
 
-	global $DB, $cache_comments_has_replies, $user_post_read_statuses, $cache_postcats;
+	global $DB, $cache_comments_has_replies, $cache_items_user_data, $cache_postcats;
 
 	/**
 	 * Disable log queries because it increases the memory and stops the process with error "Allowed memory size of X bytes exhausted..."
@@ -982,7 +982,7 @@ function comment_mass_delete_process( $mass_type, $deletable_comments_query )
 			$ItemCache->clear();
 			$ChapterCache->clear();
 			$cache_comments_has_replies = array();
-			$user_post_read_statuses = array();
+			$cache_items_user_data = array();
 			$cache_postcats = array();
 
 			// Get new portion of deletable comments

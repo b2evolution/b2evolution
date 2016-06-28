@@ -39,25 +39,34 @@ function init_MainList( $items_nb_limit )
 
 		if( ! $preview )
 		{
-			if( $disp == 'page' )
-			{	// Get pages:
-				$MainList->set_default_filters( array(
-						'itemtype_usage' => 'page' // pages
-					) );
-			}
+			switch( $disp )
+			{
+				case 'page':
+					$MainList->set_default_filters( array(
+							'itemtype_usage' => 'page' // Only pages
+						) );
+					break;
 
-			if( $disp == 'terms' )
-			{	// Allow all post types:
-				$MainList->set_default_filters( array(
-						'itemtype_usage' => 'page,special'
-					) );
-			}
+				case 'terms':
+					$MainList->set_default_filters( array(
+							'itemtype_usage' => 'page,special' // Allow all post types
+						) );
+					break;
 
-			if( $disp == 'posts' && $Blog->get_setting( 'show_post_types' ) != '' )
-			{	// Exclude items with types which are hidden by collection setting "Show post types":
-				$MainList->set_default_filters( array(
-						'types' => '-'.$Blog->get_setting( 'show_post_types' )
-					) );
+				case 'posts':
+					if( $Blog->get_setting( 'show_post_types' ) != '' )
+					{	// Exclude items with types which are hidden by collection setting "Show post types":
+						$MainList->set_default_filters( array(
+								'types' => '-'.$Blog->get_setting( 'show_post_types' )
+							) );
+					}
+					break;
+
+				case 'flagged':
+					$MainList->set_default_filters( array(
+							'flagged' => 1
+						) );
+					break;
 			}
 
 			// pre_dump( $MainList->default_filters );
@@ -3936,44 +3945,54 @@ function item_inskin_display( $Item )
  */
 function load_user_data_for_items( $post_ids = NULL )
 {
-	global $DB, $current_User, $user_post_read_statuses;
+	global $DB, $current_User, $cache_items_user_data;
 
 	if( ! is_logged_in() )
 	{	// There are no logged in user:
 		return;
 	}
 
-	if( is_array( $user_post_read_statuses ) )
+	if( is_array( $cache_items_user_data ) )
 	{	// User read statuses were already set:
 		return;
 	}
 	else
 	{	// Init with an empty array:
-		$user_post_read_statuses = array();
+		$cache_items_user_data = array();
 	}
 
-	$post_condition = empty( $post_ids ) ? NULL : 'uprs_post_ID IN ( '.implode( ',', $post_ids ).' )';
+	$post_condition = empty( $post_ids ) ? NULL : 'itud_item_ID IN ( '.implode( ',', $post_ids ).' )';
 
 	// SELECT current User's post and comment read statuses for all post with the given ids:
-	$SQL = new SQL( 'Load all read post date statuses for user #'.$current_User->ID );
-	$SQL->SELECT( 'uprs_post_ID, uprs_read_post_ts' );
-	$SQL->FROM( 'T_users__postreadstatus' );
-	$SQL->WHERE( 'uprs_user_ID = '.$DB->quote( $current_User->ID ) );
+	$SQL = new SQL( 'Load all items data for user #'.$current_User->ID );
+	$SQL->SELECT( 'itud_item_ID AS item_ID, IFNULL( itud_read_item_ts, 0 ) AS item_date, IFNULL( itud_read_comments_ts, 0 )AS comments_date, itud_flagged_item AS item_flag' );
+	$SQL->FROM( 'T_items__user_data' );
+	$SQL->WHERE( 'itud_user_ID = '.$DB->quote( $current_User->ID ) );
 	$SQL->WHERE_and( $post_condition );
 	// Set those post read statuses which were opened before:
-	$user_post_read_statuses = $DB->get_assoc( $SQL->get(), $SQL->title );
+	$data_rows = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
 
 	if( empty( $post_ids ) )
 	{	// The load was not requested for specific posts, so we have loaded all information what we have, ther rest of the posts were not read by this user:
 		return;
 	}
 
-	// Set new posts read statuses:
+	// Prepare array to proper format:
+	foreach( $data_rows as $r => $row )
+	{
+		// Make item ID as key:
+		$row_item_ID = $row['item_ID'];
+		unset( $row['item_ID'] );
+
+		$cache_items_user_data[ $row_item_ID ] = $row;
+	}
+
+	// Set new item user data:
 	foreach( $post_ids as $post_ID )
 	{	// Make sure to set read statuses for each requested post ID:
-		if( ! isset( $user_post_read_statuses[ $post_ID ] ) )
-		{	// Set each read status to 0:
-			$user_post_read_statuses[ $post_ID ] = 0;
+		if( ! isset( $cache_items_user_data[ $post_ID ] ) )
+		{	// If no item user data yet, Set default empty data:
+			$cache_items_user_data[ $post_ID ] = NULL;
 		}
 	}
 }

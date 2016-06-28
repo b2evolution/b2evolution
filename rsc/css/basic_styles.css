@@ -220,6 +220,18 @@ a:hover .fa-x-rollover-orange {
 a:hover .fa-x-rollover-black {
   color: #000 !important;
 }
+a:hover .fa-flag.fa-x--hover {
+  color: #F00 !important;
+}
+a:hover .fa-flag.fa-x--hover:before {
+  content: "\f11d";
+}
+a:hover .fa-flag-o.fa-x--hover {
+  color: #F00 !important;
+}
+a:hover .fa-flag-o.fa-x--hover:before {
+  content: "\f024";
+}
 .fa-x-external-link--nudge:before {
   position: relative;
   top: 0.05em;

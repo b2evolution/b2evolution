@@ -99,6 +99,10 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 					'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
 				) );
 		}
+
+		// Flag:
+		$Item->flag();
+
 		// Permalink:
 		$Item->permanent_link( array(
 				'text' => '#icon#',

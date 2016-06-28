@@ -68,6 +68,7 @@ $core_componentwidget_defs = array(
 	'menu_item' => array(
 			'menu_link',
 			'msg_menu_link',
+			'flag_menu_link',
 			'profile_menu_link',
 		),
 	'navigation' => array(

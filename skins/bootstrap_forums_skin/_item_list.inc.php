@@ -104,6 +104,9 @@ $use_workflow = ( $disp == 'posts' ) &&
 							}
 						}
 
+						// Flag:
+						$Item->flag();
+
 						// Title:
 						$Item->title( array(
 								'link_class'      => 'topictitle ellipsis'.( $Item->get_read_status() != 'read' ? ' unread' : '' ),
