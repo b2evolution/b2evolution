@@ -1999,7 +1999,6 @@ div.results .pagination {
 }
 div.results tr.placeholder {
   position: relative;
-  border-bottom: 2px solid #f00;
 }
 div.results tr.placeholder:before {
   content: "";
@@ -2012,10 +2011,23 @@ div.results tr.placeholder:before {
   margin-top: -5px;
   left: 0;
 }
+div.results tr.placeholder:after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: #F00;
+  left: 0;
+  margin-top: 1px;
+}
 div.results tr.placeholder td {
   border: none;
   height: 0;
   padding: 0;
+}
+div.results tr.placeholder + tr:not( :nth-child(2)):not(.dragged) > td,
+div.results tr.dragged + tr:not( :nth-child(2)):not(.dragged) > td {
+  border-top: none;
 }
 div.filters {
   margin-bottom: 0;

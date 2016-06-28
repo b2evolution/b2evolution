@@ -696,7 +696,7 @@ fieldset ul {
   position: relative;
 }
 #attachments_fieldset_wrapper table tbody .dragged {
-  opacity: 0.5;
+  opacity: 0.8;
   position: absolute;
 }
 #attachments_fieldset_wrapper table tbody td {
@@ -855,7 +855,6 @@ h2.user_title {
   font-weight: normal;
   color: #999;
   margin: 40px 0 30px;
-  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;

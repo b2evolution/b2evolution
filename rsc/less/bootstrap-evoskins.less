@@ -375,7 +375,6 @@ div.results {
 	}
 	tr.placeholder {
 		position: relative;
-		border-bottom: 2px solid #f00;
 		&:before {
 			content: "";
 			position: absolute;
@@ -387,10 +386,24 @@ div.results {
 			margin-top: -5px;
 			left: 0;
 		}
+		&:after {
+			content: "";
+			position: absolute;
+			width: 100%;
+			height: 2px;
+			background: #F00;
+			left: 0;
+			margin-top: 1px;
+		}
 		td {
 			border: none;
 			height: 0;
 			padding: 0;
+		}
+	}
+	tr.placeholder, tr.dragged {
+		+ tr:not(:nth-child(2)):not(.dragged) > td {
+			border-top: none;
 		}
 	}
 }
