@@ -30,15 +30,15 @@ $Form->hidden_ctrl();
 $Form->hidden( 'tab', 'keywords' );
 $Form->hidden( 'cakw_ID', $edited_CaKeyword->ID );
 
-$Form->begin_fieldset( $central_antispam_Module->T_('Edit keyword') );
+$Form->begin_fieldset( T_('Edit keyword') );
 
-$Form->info( $central_antispam_Module->T_('Keyword'), $edited_CaKeyword->keyword );
+$Form->info( T_('Keyword'), $edited_CaKeyword->keyword );
 
-$Form->select_input_array( 'cakw_status', $edited_CaKeyword->status, ca_get_keyword_statuses(), $central_antispam_Module->T_('Status') );
+$Form->select_input_array( 'cakw_status', $edited_CaKeyword->status, ca_get_keyword_statuses(), T_('Status') );
 
 $Form->end_fieldset();
 
-$Form->end_form( array( array( 'submit', 'actionArray[keyword_save]', $central_antispam_Module->T_('Save changes!'), 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'actionArray[keyword_save]', T_('Save changes!'), 'SaveButton' ) ) );
 
 
 // Reports of the edited keyword:
@@ -55,16 +55,16 @@ $CountSQL->WHERE( 'carpt_cakw_ID = '.$DB->quote( $edited_CaKeyword->ID ) );
 
 $Results = new Results( $SQL->get(), 'carpt_', '-D', $UserSettings->get( 'results_per_page' ), $CountSQL->get() );
 
-$Results->title = $central_antispam_Module->T_('Reports');
+$Results->title = T_('Reports');
 
 $Results->cols[] = array(
-		'th' => $central_antispam_Module->T_('Url'),
+		'th' => T_('Url'),
 		'order' => 'casrc_baseurl',
 		'td' => '$casrc_baseurl$',
 	);
 
 $Results->cols[] = array(
-		'th' => $central_antispam_Module->T_('Date'),
+		'th' => T_('Date'),
 		'th_class' => 'shrinkwrap',
 		'order' => 'carpt_ts',
 		'td' => '%mysql2localedatetime_spans( #carpt_ts# )%',

@@ -41,7 +41,7 @@ $Form->add_crumb( 'cakeywordsimport' );
 $Form->hidden_ctrl();
 $Form->hidden( 'confirm', 1 );
 
-$Form->begin_fieldset( $central_antispam_Module->T_('Import keywords') );
+$Form->begin_fieldset( T_('Import keywords') );
 
 if( count( $keywords ) > 0 )
 {	// Suggest to import keywords only if at least one is found:
@@ -67,14 +67,14 @@ if( count( $keywords ) > 0 )
 }
 else
 {
-	echo '<p>'.$central_antispam_Module->T_('No new keywords to import').'</p>';
+	echo '<p>'.T_('No new keywords to import').'</p>';
 }
 
 $Form->end_fieldset();
 
 if( count( $keywords ) )
 {
-	$Form->end_form( array( array( 'submit', 'actionArray[import]', $central_antispam_Module->T_('Confirm Import'), 'SaveButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'actionArray[import]', T_('Confirm Import'), 'SaveButton' ) ) );
 }
 else
 {

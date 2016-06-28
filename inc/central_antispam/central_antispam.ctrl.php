@@ -30,7 +30,7 @@ switch( $tab )
 			{
 				unset( $edited_CaKeyword );
 				forget_param( 'cakw_ID' );
-				$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), $central_antispam_Module->T_('Keyword') ), 'error' );
+				$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Keyword') ), 'error' );
 				$action = 'nil';
 			}
 		}
@@ -44,7 +44,7 @@ switch( $tab )
 			{
 				unset( $edited_CaSource );
 				forget_param( 'casrc_ID' );
-				$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), $central_antispam_Module->T_('Reporter') ), 'error' );
+				$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Reporter') ), 'error' );
 				$action = 'nil';
 			}
 		}
@@ -64,7 +64,7 @@ switch( $action )
 		if( $edited_CaKeyword->load_from_Request() )
 		{	// We could load data from form without errors:
 			$edited_CaKeyword->dbupdate();
-			$Messages->add( $central_antispam_Module->T_('The keyword has been saved.'), 'success' );
+			$Messages->add( T_('The keyword has been saved.'), 'success' );
 			header_redirect( $admin_url.'?ctrl=central_antispam&tab=keywords', 303 );
 		}
 		$action = 'keyword_edit';
@@ -80,7 +80,7 @@ switch( $action )
 		if( $edited_CaSource->load_from_Request() )
 		{	// We could load data from form without errors:
 			$edited_CaSource->dbupdate();
-			$Messages->add( $central_antispam_Module->T_('The source has been saved.'), 'success' );
+			$Messages->add( T_('The source has been saved.'), 'success' );
 			header_redirect( $admin_url.'?ctrl=central_antispam&tab=sources', 303 );
 		}
 		$action = 'source_edit';
@@ -99,7 +99,7 @@ switch( $action )
 
 		if( empty( $import_keywords ) )
 		{	// No selected keywords to import:
-			$Messages->add( $central_antispam_Module->T_('Please select what keywords should be imported.'), 'error' );
+			$Messages->add( T_('Please select what keywords should be imported.'), 'error' );
 			$action = 'import';
 			break;
 		}
@@ -173,7 +173,7 @@ switch( $action )
 			}
 		}
 
-		$Messages->add( sprintf( $central_antispam_Module->T_('%d new keywords have been imported as local reports.'), $keywords_imported_count ), 'success' );
+		$Messages->add( sprintf( T_('%d new keywords have been imported as local reports.'), $keywords_imported_count ), 'success' );
 
 		$DB->commit();
 		$action = '';
@@ -184,14 +184,14 @@ switch( $action )
 $AdminUI->set_path( 'central_antispam', $tab );
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( $central_antispam_Module->T_('Central Antispam'), $admin_url.'?ctrl=central_antispam' );
+$AdminUI->breadcrumbpath_add( T_('Central Antispam'), $admin_url.'?ctrl=central_antispam' );
 switch( $tab )
 {
 	case 'keywords':
-		$AdminUI->breadcrumbpath_add( $central_antispam_Module->T_('Keywords'), $admin_url.'?ctrl=central_antispam&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( T_('Keywords'), $admin_url.'?ctrl=central_antispam&amp;tab='.$tab );
 		if( $action == 'import' )
 		{
-			$AdminUI->breadcrumbpath_add( $central_antispam_Module->T_('Import'), $admin_url.'?ctrl=central_antispam&amp;action='.$action );
+			$AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=central_antispam&amp;action='.$action );
 		}
 		if( empty( $action ) )
 		{	// Load JS to edit keyword status from list:
@@ -200,7 +200,7 @@ switch( $tab )
 		break;
 
 	case 'reporters':
-		$AdminUI->breadcrumbpath_add( $central_antispam_Module->T_('Reporters'), $admin_url.'?ctrl=central_antispam&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( T_('Reporters'), $admin_url.'?ctrl=central_antispam&amp;tab='.$tab );
 		break;
 }
 

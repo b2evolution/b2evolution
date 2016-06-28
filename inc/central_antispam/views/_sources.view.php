@@ -39,10 +39,10 @@ $CountSQL->FROM( 'T_centralantispam__source' );
 
 $Results = new Results( $SQL->get(), 'casrc_', '-A', $UserSettings->get( 'results_per_page' ), $CountSQL->get() );
 
-$Results->title = $central_antispam_Module->T_('Reporters');
+$Results->title = T_('Reporters');
 
 $Results->cols[] = array(
-		'th' => $central_antispam_Module->T_('ID'),
+		'th' => T_('ID'),
 		'order' => 'casrc_ID',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'right',
@@ -50,20 +50,20 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => $central_antispam_Module->T_('URL'),
+		'th' => T_('URL'),
 		'order' => 'casrc_baseurl',
 		'td' => '<a href="'.$admin_url.'?ctrl=central_antispam&amp;tab=sources&amp;action=source_edit&amp;casrc_ID=$casrc_ID$">$casrc_baseurl$</a>',
 	);
 
 $Results->cols[] = array(
-		'th' => $central_antispam_Module->T_('Status'),
+		'th' => T_('Status'),
 		'order' => 'casrc_status',
 		'th_class' => 'shrinkwrap',
 		'td' => '%ca_get_source_status_title( #casrc_status# )%',
 	);
 
 $Results->cols[] = array(
-		'th' => $central_antispam_Module->T_('Reports'),
+		'th' => T_('Reports'),
 		'order' => 'report_num',
 		'default_dir' => 'D',
 		'th_class' => 'shrinkwrap',
@@ -75,10 +75,10 @@ function ac_results_source_actions( $casrc_ID )
 {
 	global $central_antispam_Module, $admin_url;
 
-	return action_icon( $central_antispam_Module->T_('Edit this reporter...'), 'edit', $admin_url.'?ctrl=central_antispam&amp;tab=sources&amp;action=source_edit&amp;casrc_ID='.$casrc_ID );
+	return action_icon( T_('Edit this reporter...'), 'edit', $admin_url.'?ctrl=central_antispam&amp;tab=sources&amp;action=source_edit&amp;casrc_ID='.$casrc_ID );
 }
 $Results->cols[] = array(
-		'th' => $central_antispam_Module->T_('Actions'),
+		'th' => T_('Actions'),
 		'td_class' => 'shrinkwrap',
 		'td' => '%ac_results_source_actions( #casrc_ID# )%'
 	);

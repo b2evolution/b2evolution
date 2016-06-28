@@ -39,12 +39,12 @@ $CountSQL->FROM( 'T_centralantispam__keyword' );
 
 $Results = new Results( $SQL->get(), 'cakw_', '---D', $UserSettings->get( 'results_per_page' ), $CountSQL->get() );
 
-$Results->title = $central_antispam_Module->T_('Keywords');
+$Results->title = T_('Keywords');
 
-$Results->global_icon( $central_antispam_Module->T_('Import from local antispam list...'), 'new', regenerate_url( 'action', 'action=import' ), $central_antispam_Module->T_('Import from local antispam list...'), 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+$Results->global_icon( T_('Import from local antispam list...'), 'new', regenerate_url( 'action', 'action=import' ), T_('Import from local antispam list...'), 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 
 $Results->cols[] = array(
-		'th' => $central_antispam_Module->T_('ID'),
+		'th' => T_('ID'),
 		'order' => 'cakw_ID',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'right',
@@ -52,13 +52,13 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => $central_antispam_Module->T_('Keyword'),
+		'th' => T_('Keyword'),
 		'order' => 'cakw_keyword',
 		'td' => '<a href="'.$admin_url.'?ctrl=central_antispam&amp;action=keyword_edit&amp;cakw_ID=$cakw_ID$">$cakw_keyword$</a>',
 	);
 
 $Results->cols[] = array(
-		'th' => $central_antispam_Module->T_('Status'),
+		'th' => T_('Status'),
 		'order' => 'cakw_status',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'cakeyword_status_edit',
@@ -69,7 +69,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => $central_antispam_Module->T_('Last change'),
+		'th' => T_('Last change'),
 		'th_class' => 'shrinkwrap',
 		'order' => 'cakw_statuschange_ts',
 		'default_dir' => 'D',
@@ -78,7 +78,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => $central_antispam_Module->T_('Reports'),
+		'th' => T_('Reports'),
 		'order' => 'report_num',
 		'default_dir' => 'D',
 		'th_class' => 'shrinkwrap',
@@ -87,7 +87,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => $central_antispam_Module->T_('Last report'),
+		'th' => T_('Last report'),
 		'th_class' => 'shrinkwrap',
 		'order' => 'cakw_lastreport_ts',
 		'default_dir' => 'D',
@@ -99,10 +99,10 @@ function ac_results_keyword_actions( $cakw_ID )
 {
 	global $central_antispam_Module, $admin_url;
 
-	return action_icon( $central_antispam_Module->T_('Edit this keyword...'), 'edit', $admin_url.'?ctrl=central_antispam&amp;action=keyword_edit&amp;cakw_ID='.$cakw_ID );
+	return action_icon( T_('Edit this keyword...'), 'edit', $admin_url.'?ctrl=central_antispam&amp;action=keyword_edit&amp;cakw_ID='.$cakw_ID );
 }
 $Results->cols[] = array(
-		'th' => $central_antispam_Module->T_('Actions'),
+		'th' => T_('Actions'),
 		'td_class' => 'shrinkwrap',
 		'td' => '%ac_results_keyword_actions( #cakw_ID# )%'
 	);

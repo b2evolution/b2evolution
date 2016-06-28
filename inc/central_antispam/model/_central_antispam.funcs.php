@@ -22,9 +22,9 @@ function ca_get_keyword_statuses()
 	global $central_antispam_Module;
 
 	return array(
-			'new'       => $central_antispam_Module->T_('New'),
-			'published' => $central_antispam_Module->T_('Published'),
-			'revoked'   => $central_antispam_Module->T_('Revoked'),
+			'new'       => T_('New'),
+			'published' => T_('Published'),
+			'revoked'   => T_('Revoked'),
 		);
 }
 
@@ -52,11 +52,11 @@ function ca_get_source_statuses()
 	global $central_antispam_Module;
 
 	return array(
-			'trusted'   => $central_antispam_Module->T_('Trusted'),
-			'promising' => $central_antispam_Module->T_('Promising'),
-			'unknown'   => $central_antispam_Module->T_('Unknown'),
-			'suspect'   => $central_antispam_Module->T_('Suspect'),
-			'blocked'   => $central_antispam_Module->T_('Blocked'),
+			'trusted'   => T_('Trusted'),
+			'promising' => T_('Promising'),
+			'unknown'   => T_('Unknown'),
+			'suspect'   => T_('Suspect'),
+			'blocked'   => T_('Blocked'),
 		);
 }
 

@@ -99,33 +99,6 @@ class central_antispam_Module extends Module
 
 
 	/**
-	 * Translations
-	 *
-	 * @param mixed $string
-	 * @param mixed $req_locale
-	 * @return string
-	 */
-	function T_( $string, $req_locale = '' )
-	{
-		global $current_locale;
-
-		static $trans = array(
-			'' => '',
-		);
-
-		if( $current_locale == 'fr-FR' )
-		{
-			if( isset( $trans[ $string ] ) )
-			{
-				return $trans[ $string ];
-			}
-		}
-
-		return T_( $string );
-	}
-
-
-	/**
 	 * Builds the 2nd half of the menu. This is the one with the configuration features
 	 *
 	 * At some point this might be displayed differently than the 1st half.
@@ -137,15 +110,15 @@ class central_antispam_Module extends Module
 		// Display Central Antispam menu:
 		$AdminUI->add_menu_entries( NULL, array(
 			'central_antispam' => array(
-				'text' => $this->T_('Central Antispam'),
+				'text' => T_('Central Antispam'),
 				'href' => $admin_url.'?ctrl=central_antispam',
 				'entries' => array(
 					'keywords' => array(
-						'text' => $this->T_('Keywords'),
+						'text' => T_('Keywords'),
 						'href' => $admin_url.'?ctrl=central_antispam&amp;tab=keywords',
 					),
 					'sources' => array(
-						'text' => $this->T_('Reporters'),
+						'text' => T_('Reporters'),
 						'href' => $admin_url.'?ctrl=central_antispam&amp;tab=sources',
 					),
 				),
