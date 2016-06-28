@@ -105,7 +105,12 @@ class central_antispam_Module extends Module
 	 */
 	function build_menu_3()
 	{
-		global $AdminUI, $admin_url;
+		global $AdminUI, $admin_url, $current_User;
+
+		if( ! is_logged_in() || ! $current_User->check_perm( 'centralantispam', 'view' ) )
+		{	// Don't display menu if current user has no acces to central antispam:
+			return;
+		}
 
 		// Display Central Antispam menu:
 		$AdminUI->add_menu_entries( NULL, array(
@@ -123,6 +128,70 @@ class central_antispam_Module extends Module
 					),
 				),
 			) ) );
+	}
+
+
+	/**
+	 * Get default module permissions
+	 *
+	 * #param integer Group ID
+	 * @return array
+	 */
+	function get_default_group_permissions( $grp_ID )
+	{
+		switch( $grp_ID )
+		{
+			case 1: // Administrators group ID equals 1
+				$perm_centralantispam = 'allowed';
+				break;
+			default: // Other groups
+				$perm_centralantispam = 'none';
+				break;
+		}
+
+		// We can return as many default permissions as we want:
+		// e.g. array ( permission_name => permission_value, ... , ... )
+		return $permissions = array(
+				'perm_centralantispam' => $perm_centralantispam
+			);
+	}
+
+
+	/**
+	 * Get available group permissions
+	 *
+	 * @return array
+	 */
+	function get_available_group_permissions()
+	{
+		// 'label' is used in the group form as label for radio buttons group
+		// 'user_func' is used to check user permission. This function should be defined in module initializer.
+		// 'group_func' is used to check group permission. This function should be defined in module initializer.
+		// 'perm_block' group form block where this permissions will be displayed. Now available, the following blocks: additional, system
+		// 'options' is permission options
+		$permissions = array(
+			'perm_centralantispam' => array(
+				'label' => T_('Allow central antispam management'),
+				'user_func'  => 'check_centralantispam_user_perm',
+				'group_func' => 'check_centralantispam_group_perm',
+				'perm_block' => 'additional',
+				'perm_type' => 'checkbox',
+				'note' => '',
+				),
+		);
+		// We can return as many permissions as we want.
+		// In other words, one module can return many pluggable permissions.
+		return $permissions;
+	}
+
+
+	/**
+	 * Check permission for the group
+	 */
+	function check_centralantispam_group_perm( $permlevel, $permvalue, $permtarget )
+	{
+		// Only 'allowed' value means group has permission
+		return $permvalue == 'allowed';
 	}
 
 

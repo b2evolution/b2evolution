@@ -293,6 +293,7 @@ class Group extends DataObject
 	 *                - blogs
 	 *                - admin (levels "visible", "hidden")
 	 *                - messaging
+	 *                - centralantispam
 	 * @param string Requested permission level
 	 * @param mixed Permission target (blog ID, array of cat IDs...)
 	 * @return boolean True on success (permission is granted), false if permission is not granted
@@ -315,7 +316,7 @@ class Group extends DataObject
 			$permvalue = false; // This will result in $perm == false always. We go on for the $Debuglog..
 		}
 
-		$pluggable_perms = array( 'admin', 'shared_root', 'import_root', 'spamblacklist', 'slugs', 'templates', 'options', 'emails', 'files', 'users', 'orgs' );
+		$pluggable_perms = array( 'admin', 'shared_root', 'import_root', 'spamblacklist', 'slugs', 'templates', 'options', 'emails', 'files', 'users', 'orgs', 'centralantispam' );
 		if( in_array( $permname, $pluggable_perms ) )
 		{
 			$permname = 'perm_'.$permname;

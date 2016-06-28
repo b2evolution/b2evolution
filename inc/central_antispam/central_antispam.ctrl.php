@@ -17,6 +17,9 @@ load_funcs( 'central_antispam/model/_central_antispam.funcs.php' );
 load_class( 'central_antispam/model/_keyword.class.php', 'CaKeyword' );
 load_class( 'central_antispam/model/_source.class.php', 'CaSource' );
 
+// Check permission:
+$current_User->check_perm( 'centralantispam', 'view', true );
+
 param_action( '', true );
 param( 'tab', 'string', 'keywords', true );
 
@@ -60,6 +63,9 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'cakeyword' );
 
+		// Check permission:
+		$current_User->check_perm( 'centralantispam', 'edit', true );
+
 		// load data from request
 		if( $edited_CaKeyword->load_from_Request() )
 		{	// We could load data from form without errors:
@@ -75,6 +81,9 @@ switch( $action )
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'casource' );
+
+		// Check permission:
+		$current_User->check_perm( 'centralantispam', 'edit', true );
 
 		// Load data from request:
 		if( $edited_CaSource->load_from_Request() )
@@ -94,6 +103,9 @@ switch( $action )
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'cakeywordsimport' );
+
+		// Check permission:
+		$current_User->check_perm( 'centralantispam', 'edit', true );
 
 		$import_keywords = param( 'import_keywords', 'array:string' );
 
@@ -193,7 +205,7 @@ switch( $tab )
 		{
 			$AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=central_antispam&amp;action='.$action );
 		}
-		if( empty( $action ) )
+		if( empty( $action ) && $current_User->check_perm( 'centralantispam', 'edit' ) )
 		{	// Load JS to edit keyword status from list:
 			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 		}
