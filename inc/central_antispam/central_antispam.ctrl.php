@@ -116,6 +116,20 @@ switch( $action )
 			break;
 		}
 
+		// Get start dates for keywords:
+		$keyword_dates = array();
+		foreach( $import_keywords as $keyword_source )
+		{
+			param_date( 'date_start_'.$keyword_source, T_('Invalid date'), true );
+			param_time( 'time_start_'.$keyword_source );
+			$keyword_dates[ $keyword_source ] = strtotime( form_date( get_param( 'date_start_'.$keyword_source ), get_param( 'time_start_'.$keyword_source ) ) );
+		}
+
+		if( param_errors_detected() )
+		{	// Don't allow to import with wrong entered data:
+			break;
+		}
+
 		$DB->begin();
 
 		$keywords_SQL = new SQL( 'Get keywords that will be imported as local reports' );
@@ -125,7 +139,7 @@ switch( $action )
 		$keywords_SQL->WHERE_and( 'askw_source IN( '.$DB->quote( $import_keywords ).' )' );
 		$keywords = $DB->get_results( $keywords_SQL->get(), ARRAY_A, $keywords_SQL->title );
 
-		$keywords_imported_count = 0;
+		$keywords_imported_count = array();
 		if( count( $keywords ) )
 		{	// If there are new keywords to import:
 
@@ -152,14 +166,9 @@ switch( $action )
 			}
 
 			$keywords_reports = array();
-			$keyword_report_dates = array(
-					'central'  => strtotime( '2014-01-01 00:00:00' ),
-					'reported' => strtotime( '2015-01-01 00:00:00' ),
-					'local'    => strtotime( '2016-01-01 00:00:00' ),
-				);
 			foreach( $keywords as $keyword )
 			{
-				$keyword_timestamp = date( 'Y-m-d H:i:s', $keyword_report_dates[ $keyword['askw_source'] ] );
+				$keyword_timestamp = date( 'Y-m-d H:i:s', $keyword_dates[ $keyword['askw_source'] ] );
 				if( $keyword['askw_source'] == 'central' && $keyword_timestamp > '2014-02-24 21:10:18' )
 				{	// Limit central keywords by this max date:
 					$keyword_timestamp = '2014-02-24 21:10:18';
@@ -170,14 +179,19 @@ switch( $action )
 						( '.$DB->quote( $keyword['askw_string'] ).', "published", '.$DB->quote( $keyword_timestamp ).', '.$DB->quote( $keyword_timestamp ).' )' );
 				if( $query_result )
 				{	// If new keyword has been inserted:
-					$keywords_imported_count++;
+					if( ! isset( $keywords_imported_count[ $keyword['askw_source'] ] ) )
+					{
+						$keywords_imported_count[ $keyword['askw_source'] ] = 0;
+					}
+					$keywords_imported_count[ $keyword['askw_source'] ]++;
 					$keyword_ID = $DB->insert_id;
 					$keywords_reports[] = '( '.$DB->insert_id.', '.$source_ID.', '.$DB->quote( $keyword_timestamp ).' )';
 				}
-				$keyword_report_dates[ $keyword['askw_source'] ]++;
+				// Increase 1 second for next keyword:
+				$keyword_dates[ $keyword['askw_source'] ]++;
 			}
 
-			if( $keywords_imported_count )
+			if( count( $keywords_imported_count ) )
 			{	// Insert reports to know from what host new keyword was added:
 				$DB->query( 'INSERT INTO T_centralantispam__report
 					( carpt_cakw_ID, carpt_casrc_ID, carpt_ts ) VALUES '
@@ -185,7 +199,10 @@ switch( $action )
 			}
 		}
 
-		$Messages->add( sprintf( T_('%d new keywords have been imported as local reports.'), $keywords_imported_count ), 'success' );
+		foreach( $keywords_imported_count as $keywords_source => $keywords_count )
+		{
+			$Messages->add( sprintf( T_('%d new keywords have been imported as "%s" reports.'), $keywords_count, $keywords_source ), 'success' );
+		}
 
 		$DB->commit();
 		$action = '';
@@ -204,6 +221,8 @@ switch( $tab )
 		if( $action == 'import' )
 		{
 			$AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=central_antispam&amp;action='.$action );
+			// Initialize date picker:
+			init_datepicker_js();
 		}
 		if( empty( $action ) && $current_User->check_perm( 'centralantispam', 'edit' ) )
 		{	// Load JS to edit keyword status from list:
