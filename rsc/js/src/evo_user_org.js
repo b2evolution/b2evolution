@@ -38,3 +38,36 @@ function user_add_org( org_ID )
 
 	return false;
 }
+
+/**
+ * Open modal window to edit user in organization
+ *
+ * @param integer Organization ID
+ * @param integer user ID
+ */
+function user_edit( org_ID, user_ID )
+{
+	openModalWindow( '<span class="loader_img loader_user_deldata absolute_center" title="' + evo_js_lang_loading + '"></span>',
+			'450px', '', true,
+			evo_js_lang_edit_membership, evo_js_lang_edit, true );
+	jQuery.ajax(
+	{
+		type: 'POST',
+		url: evo_js_user_org_ajax_url,
+		data:
+		{
+			'ctrl': 'organizations',
+			'action': 'edit_user',
+			'org_ID': org_ID,
+			'user_ID': user_ID,
+			'display_mode': 'js',
+			'crumb_user': evo_js_crumb_organization,
+		},
+		success: function( result )
+		{
+			openModalWindow( result, '450px', '', true, evo_js_lang_edit_membership, evo_js_lang_edit );
+		}
+	});
+
+	return false;
+}

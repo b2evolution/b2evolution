@@ -45,7 +45,7 @@ class am_xml_highlighter
 	 * @param object $parent
 	 * @return object am_xml_highlighter
 	 */
-	function am_xml_highlighter( & $parent )
+	function __construct( & $parent )
 	{
 		$this->parent = & $parent;
 		return $this;

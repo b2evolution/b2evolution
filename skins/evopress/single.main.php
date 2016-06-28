@@ -131,7 +131,6 @@ while( $Item = & mainlist_get_item() )
 
 		<?php
 			// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-			// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 			// Display container contents:
 			skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 				'widget_context' => 'item',	// Signal that we are displaying within an Item
@@ -143,10 +142,10 @@ while( $Item = & mainlist_get_item() )
 				'block_title_start' => '<h3>',
 				'block_title_end' => '</h3>',
 				// Template params for "Small Print" widget
-				'widget_coll_small_print_before' => '<p class="postmetadata alt"><small>',
-				'widget_coll_small_print_after'  => '</small></p>',
+				'widget_item_small_print_before' => '<p class="postmetadata alt"><small>',
+				'widget_item_small_print_after'  => '</small></p>',
 				// Params for skin file "_item_content.inc.php"
-				'widget_coll_item_content_params' => array( 'image_size' => 'fit-400x320' ),
+				'widget_item_content_params' => array( 'image_size' => 'fit-400x320' ),
 			) );
 			// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 		?>
@@ -158,7 +157,7 @@ while( $Item = & mainlist_get_item() )
 		skin_include( '_item_feedback.inc.php', array(
 				'before_section_title' => '<h3>',
 				'after_section_title'  => '</h3>',
-				'author_link_text' => 'preferredname',
+				'author_link_text' => 'auto',
 			) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.

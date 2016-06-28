@@ -7,6 +7,7 @@
  */
 
 @import "inc/star_rating.inc.less";
+@import "inc/video-js-overrides.inc.less";
 
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
@@ -550,7 +551,7 @@ div.item_location {
 .note.status_meta span,			// This is deprecated
 .evo_status__meta {				// This is clean
 	color: #fff !important;
-	background-color: #5133ab !important;
+	background-color: #5bc0de !important;
 }
 
 .evo_content_block span[class*=status_] span {
@@ -807,6 +808,20 @@ input.btn-lg {
 	}
 }
 
+.evo_content_block table.evo_poll__table {
+	margin: 1em 0;
+	th {
+		border: 0;
+		padding: 2px 10px 2px 0;
+		background-color: #eee;
+	}
+	td {
+		border: 0;
+		padding: 2px 10px 2px 0;
+		vertical-align: top;
+	}
+}
+
 // Fix the form elements:
 .evo_form__comment {
 	.panel {
@@ -945,6 +960,9 @@ input.btn-lg {
 	}
 	.evo_poll__title {
 		white-space: nowrap;
+	}
+	.evo_poll_percentage {
+		max-width: 50px;
 	}
 }
 .evo_container__sidebar .evo_poll__title {

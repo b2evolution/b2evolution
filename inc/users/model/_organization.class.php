@@ -45,14 +45,20 @@ class Organization extends DataObject
 	var $accept = 'owner';
 
 	/**
+	 * Edit Role
+	 * @var string: 'owner and member', 'owner'
+	 */
+	var $perm_role = 'owner and member';
+
+	/**
 	 * Constructor
 	 *
 	 * @param object DB row
 	 */
-	function Organization( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_users__organization', 'org_', 'org_ID' );
+		parent::__construct( 'T_users__organization', 'org_', 'org_ID' );
 
 		if( $db_row != NULL )
 		{ // Loading an object from DB:
@@ -61,6 +67,7 @@ class Organization extends DataObject
 			$this->name          = $db_row->org_name;
 			$this->url           = $db_row->org_url;
 			$this->accept        = $db_row->org_accept;
+			$this->perm_role     = $db_row->org_perm_role;
 		}
 		else
 		{	// Set default organization data for new object:
@@ -134,6 +141,10 @@ class Organization extends DataObject
 		// Accept level:
 		param( 'org_accept', 'string' );
 		$this->set_from_Request( 'accept' );
+		
+		// Edit Role Permission:
+		param( 'org_perm_role', 'string' );
+		$this->set_from_Request( 'perm_role' );
 
 		return ! param_errors_detected();
 	}
@@ -155,7 +166,7 @@ class Organization extends DataObject
 	 *
 	 * return array User objects
 	 */
-	function get_users()
+	function get_users( $order_by = 'user_id', $accepted_only = false )
 	{
 		global $DB;
 
@@ -171,7 +182,31 @@ class Organization extends DataObject
 		$users_SQL->FROM( 'T_users__user_org' );
 		$users_SQL->FROM_add( 'INNER JOIN T_users ON uorg_user_ID = user_ID' );
 		$users_SQL->WHERE( 'uorg_org_ID = '.$DB->quote( $this->ID ) );
-		$users_SQL->ORDER_BY( 'user_level DESC, user_lastname ASC, user_firstname ASC' );
+		if( $accepted_only )
+		{
+			$users_SQL->WHERE_and( 'uorg_accepted = 1' );
+		}
+		
+		switch( $order_by )
+		{
+			case 'user_level':
+				$users_SQL->ORDER_BY( 'user_level DESC, user_ID ASC' );
+				break;
+			case 'org_role':
+				$users_SQL->ORDER_BY( 'uorg_role ASC, user_ID ASC' );
+				break;
+			case 'username':
+				$users_SQL->ORDER_BY( 'user_login ASC, user_ID ASC' );
+				break;
+			case 'lastname':
+				$users_SQL->ORDER_BY( 'user_lastname ASC, user_ID ASC' );
+				break;
+			case 'firstname':
+				$users_SQL->ORDER_BY( 'user_firstname ASC, user_ID ASC' );
+				break;
+			default:
+				$users_SQL->ORDER_BY( 'user_id ASC' );
+		}
 		$user_IDs = $DB->get_col( $users_SQL->get() );
 
 		$UserCache = & get_UserCache();

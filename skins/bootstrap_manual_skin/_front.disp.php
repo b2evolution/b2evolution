@@ -36,6 +36,17 @@ if( !empty( $Item ) )
 	echo '</div>'; // End of posts display
 }
 
+// ------------------------- "Front Page Main Area" CONTAINER EMBEDDED HERE --------------------------
+	// Display container and contents:
+	skin_container( NT_('Front Page Main Area'), array(
+	// The following params will be used as defaults for widgets included in this container:
+		'block_start'       => '<div class="evo_widget $wi_class$">',
+		'block_end'         => '</div>',
+		'block_title_start' => '<h2 class="page-header">',
+		'block_title_end'   => '</h2>',
+	) );
+// ----------------------------- END OF "Front Page Main Area" CONTAINER -----------------------------
+
 // --------------------------------- START OF CONTENT HIERARCHY --------------------------------
 echo '<h2 class="table_contents">'.T_('Table of contents').'</h2>';
 skin_widget( array(

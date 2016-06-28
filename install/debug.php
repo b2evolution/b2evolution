@@ -28,7 +28,7 @@ if( ! $config_is_done )
 	$rsc_url = '../rsc/';
 }
 
-require_once $inc_path.'_core/_class5.funcs.php';
+require_once $inc_path.'_core/_class_loader.funcs.php';
 require_once $inc_path.'_core/_misc.funcs.php';
 
 /**
@@ -352,7 +352,7 @@ $minimum_comment_interval = 1;<br />
 $debug = 1;<br />
 $debug_jslog = 1;<br />
 $allow_po_extraction = 1;<br />
-$test_install_all_features = true;<br />
+$allow_install_test_features = true;<br />
 $db_config[\'debug_dump_rows\'] = 20;<br />
 $db_config[\'debug_explain_joins\'] = false;<br />
 $display_errors_on_production = false;'

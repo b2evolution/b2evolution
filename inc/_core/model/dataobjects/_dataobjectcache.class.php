@@ -257,7 +257,7 @@ class DataObjectCache
 	{
 		global $DB, $Debuglog;
 
-		if( is_a($Debuglog, 'Log') )
+		if( $Debuglog instanceof Log )
 		{
 			$sql_where = trim($SQL->get_where(''));
 			if( empty($sql_where) )
@@ -903,11 +903,24 @@ class DataObjectCache
 	 *
 	 * Load the cache if necessary
 	 *
+	 * @param array IDs to ignore.
+	 * @return string
+	 */
+	function get_option_array( $ignore_IDs = array() )
+	{
+		return $this->get_option_array_worker( 'get_name', $ignore_IDs );
+	}
+
+	/**
+	 * Returns option array with cache contents
+	 *
+	 * Load the cache if necessary
+	 *
 	 * @param string Callback method name
 	 * @param array IDs to ignore.
 	 * @return string
 	 */
-	function get_option_array( $method = 'get_name', $ignore_IDs = array() )
+	function get_option_array_worker( $method = 'get_name', $ignore_IDs = array() )
 	{
 		if( ! $this->all_loaded && $this->load_all )
 		{ // We have not loaded all items so far, but we're allowed to.

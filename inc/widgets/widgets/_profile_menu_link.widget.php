@@ -27,10 +27,10 @@ class profile_menu_link_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function profile_menu_link_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'profile_menu_link' );
+		parent::__construct( $db_row, 'core', 'profile_menu_link' );
 	}
 
 

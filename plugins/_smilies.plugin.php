@@ -29,7 +29,7 @@ class smilies_plugin extends Plugin
 	 * fp> There is... I can't remember the exact problem thouh. Probably some interaction with the code highlight or the video plugins.
 	 */
 	var $priority = 25;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $group = 'rendering';
 	var $number_of_installs = 3; // QUESTION: dh> why 3?
 
@@ -66,11 +66,16 @@ Optionally, it will also display a toolbar for quick insertion of smilies into a
 
 
 	/**
-	* Defaults for user specific settings: "Display toolbar"
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
 	 *
-	 * @return array
+	 * @param array Associative array of parameters (since v1.9).
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
+	 * @return array see {@link Plugin::GetDefaultSettings()}.
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
+	 * and assign an array with the following keys to them (only 'label' is required):
 	 */
-	function GetDefaultSettings()
+	function GetDefaultSettings( & $params )
 	{
 		global $rsc_subdir;
 		return array(
@@ -138,15 +143,19 @@ XX(      graydead.gif
  :wave:  icon_wave.gif',
 				),
 			);
-}
+	}
 
 
 	/**
-	 * Allowing the user to override the display of the toolbar.
+	 * Define the PER-USER settings of the plugin here. These can then be edited by each user.
 	 *
-	 * @return array
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
-	function GetDefaultUserSettings()
+	function GetDefaultUserSettings( & $params )
 	{
 		return array(
 				'use_toolbar' => array(
@@ -181,6 +190,8 @@ XX(      graydead.gif
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
+		global $Blog;
+
 		$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $Blog );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never'
 		    && is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
@@ -415,7 +426,7 @@ XX(      graydead.gif
 	 */
 	function ReplaceInlinePlaceholderSafe( $text )
 	{
-		return callback_on_non_matching_blocks( $text, '~\[(image|file|inline):\d+:?[^\]]*\]~', array( & $this, 'preg_insert_smilies_callback' ) );
+		return callback_on_non_matching_blocks( $text, '~\[(image|file|inline|video|audio):\d+:?[^\]]*\]~', array( & $this, 'preg_insert_smilies_callback' ) );
 	}
 
 

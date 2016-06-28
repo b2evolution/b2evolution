@@ -23,7 +23,7 @@ class bookmarklet_plugin extends Plugin
 	var $name = 'Bookmarklet';
 	var $code = 'cafeBkmk';
 	var $priority = 94;
-	var $version = '1.9-dev';
+	var $version = '6.7.0';
 	var $author = 'Cafelog team';
 	var $number_of_installs = 1;
 
@@ -43,10 +43,9 @@ class bookmarklet_plugin extends Plugin
 	 *
 	 * @todo Do not create links/javascript code based on browser detection! But: test for functionality!
 	 *
-	 * @param array Associative array of parameters
 	 * @return boolean did we display a tool menu block?
 	 */
-	function AdminToolPayload( $params )
+	function AdminToolPayload()
 	{
 		global $Hit, $admin_url;
 

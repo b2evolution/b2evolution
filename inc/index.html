@@ -6,9 +6,10 @@
 <body>
 	<h2><a href="http://evocore.net/">evoCore</a> FrameWork</h2>
 	<h1><code>/inc</code> folder</h1>
-	<p>This folder holds the <strong>inc</strong>ludes needed by the main PHP entry points.</p>
-	<p>This folder also holds the <code>_main.inc.php</code> file which handle the main initializations for the application.</p>
-	<p>The includes are grouped into &quot;module&quot; folders that group files pertaining to a specific functionality set (e-g: file management).</p>
+	<p>This folder originally held the <strong>inc</strong>ludes needed by the main PHP entry points. For example, this folder holds the <code>_main.inc.php</code> file which handles the main initializations for the application.</p>
+	<p>In recent versions, this folder also holds a series of sub-folders. Each of these sub-folder is a &quot;module&quot; that groups files pertaining to a specific functionality set (e-g: file management).</p>
+	<p>Each module follows an MVC (Model - View - Controller) paradigm.</p>
+	<p><em>This folder (and its sub-folders) only needs to be accessed by PHP. It does not need to be accessed through the web directly.</em></p>
 	<h2>Controllers</h2>
 	<p>Each module may contain one or more controllers identified by their suffix of <code>.ctrl.php</code></p>
 	<p>Each controller is a PHP include file which implements the logic for manipulating a particular &quot;set&quot; of data. For example there could be a controller to handle general settings and another controller to handle local settings. Those two controllers may be found within the &quot;settings&quot; module.</p>
@@ -29,5 +30,7 @@
 		determine the exact rendering of the View (see the Admin skins <code>/skins_adm</code> folder).</p>
 	<p>It is also important to understand that a specific View can be called by different controllers. A contextual help block would be an example of that (provided the content is dynamic).</p>
 	<p>A single controller can also be calling several views in a row. (The controller can assemble multiple views).</p>
+
+	<p><a href="http://b2evolution.net/man/codebase-overview">A global overview of the codebase can be found here.</a></p>
 </body>
 </html>

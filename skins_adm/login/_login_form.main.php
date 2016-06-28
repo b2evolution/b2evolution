@@ -54,8 +54,7 @@ $wrap_width = '380px';
 
 require_js( 'functions.js' );
 
-$transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
-if( $transmit_hashed_password )
+if( transmit_hashed_password() )
 { // Include JS for client-side password hashing:
 	require_js( 'build/sha1_md5.bmin.js' );
 }
@@ -90,7 +89,7 @@ $params = array(
 	'login_action_value'       => $action,
 	'login_form_reqID'         => isset( $reqID ) ? $reqID : NULL,
 	'login_form_sessID'        => isset( $sessID ) ? $sessID : NULL,
-	'transmit_hashed_password' => $transmit_hashed_password,
+	'transmit_hashed_password' => transmit_hashed_password(),
 	'display_abort_link'       => true,
 	'abort_link_position'      => 'form_title',
 	'abort_link_text'          => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',

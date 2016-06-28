@@ -70,7 +70,7 @@ function textarea_replace_selection( myField, snippet, target_document )
  *  - By each plugin that works with textarea content of post or comment, to insert a code inside content by click event of toolbar button
  *  - upload.ctrl.php: ???
  *  - _file_list.inc.php: ???
- *  - links.js: to insert inline tag like this [image:123:caption text]
+ *  - src/evo_links.js: to insert inline tag like this [image:123:caption text]
  *
  * @var element
  * @var text
@@ -193,7 +193,7 @@ function textarea_wrap_selection( myField, before, after, replace, target_docume
  * Replace substring in textarea.
  *
  * Used on FRONT-office (EDITING) and BACK-office in the following files:
- *  - links.js: to remove inline tag like this [image:123:caption text]
+ *  - src/evo_links.js: to remove inline tag like this [image:123:caption text]
  *
  * @var element
  * @var text
@@ -351,12 +351,19 @@ function b2evo_Callbacks() {
 };
 
 b2evo_Callbacks.prototype = {
-	register_callback : function(event, f) {
+	register_callback : function(event, f, single_event) {
 		if( typeof this.eventHandlers[event] == "undefined" )
 		{
 			this.eventHandlers[event] = new Array();
 		}
-		this.eventHandlers[event][this.eventHandlers[event].length] = f;
+		if( typeof( single_event ) != 'undefined' && single_event )
+		{	// Use only single last registered event:
+			this.eventHandlers[event][0] = f;
+		}
+		else
+		{	// Keep all registered events:
+			this.eventHandlers[event][this.eventHandlers[event].length] = f;
+		}
 	},
 
 	/**

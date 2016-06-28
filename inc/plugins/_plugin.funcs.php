@@ -38,6 +38,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	global $htsrv_url;
 	static $has_array_type;
 
+	if( ! is_array( $parmeta ) )
+	{	// Must be array:
+		return;
+	}
+
 	if( ! empty($parmeta['no_edit']) )
 	{ // this setting is not editable
 		return;
@@ -190,22 +195,24 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			case 'UserSettings':
 				// NOTE: this assumes we come here only on recursion or with $use_value set..!
 				$set_value = $Obj->UserSettings->get( $parname, $set_target->ID );
-				$error_value = $Obj->PluginUserSettingsValidateSet( $tmp_params = array(
+				$tmp_params = array(
 					'name' => $parname,
 					'value' => & $set_value,
 					'meta' => $parmeta,
 					'User' => $set_target,
-					'action' => 'display' ) );
+					'action' => 'display' );
+				$error_value = $Obj->PluginUserSettingsValidateSet( $tmp_params );
 				break;
 
 			case 'Settings':
 				// NOTE: this assumes we come here only on recursion or with $use_value set..!
 				$set_value = $Obj->Settings->get( $parname );
-				$error_value = $Obj->PluginSettingsValidateSet( $tmp_params = array(
-					'name' => $parname,
-					'value' => & $set_value,
-					'meta' => $parmeta,
-					'action' => 'display' ) );
+				$tmp_params = array(
+					'name'   => $parname,
+					'value'  => & $set_value,
+					'meta'   => $parmeta,
+					'action' => 'display' );
+				$error_value = $Obj->PluginSettingsValidateSet( $tmp_params );
 				break;
 
 			default:
@@ -593,7 +600,8 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
 
 	// meta info for this setting:
 	$method = 'GetDefault'.$set_type; // GetDefaultSettings or GetDefaultUserSettings
-	$defaults = $Plugin->$method( $tmp_params = array('for_editing'=>true) );
+	$tmp_params = array( 'for_editing' => true );
+	$defaults = $Plugin->$method( $tmp_params );
 	if( ! isset($defaults[ $set_name ]) )
 	{
 		//debug_die( 'Invalid setting ('.$set_name.') - no meta data!' );
@@ -679,6 +687,11 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
  */
 function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type, $set_target = NULL, $set_value = NULL )
 {
+	if( ! is_array( $parmeta ) )
+	{	// Must be array:
+		return;
+	}
+
 	if( isset($parmeta['layout']) )
 	{ // a layout "setting"
 		return;
@@ -768,12 +781,13 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 
 		case 'UserSettings':
 			// Plugin User settings:
-			$error_value = $Obj->PluginUserSettingsValidateSet( $dummy = array(
+			$dummy = array(
 				'name' => $parname,
 				'value' => & $l_value,
 				'meta' => $parmeta,
 				'User' => $set_target,
-				'action' => 'set' ) );
+				'action' => 'set' );
+			$error_value = $Obj->PluginUserSettingsValidateSet( $dummy );
 			// Update the param value, because a plugin might have changed it (through reference):
 			$GLOBALS['edit_plugin_'.$Obj->ID.'_set_'.$parname] = $l_value;
 
@@ -789,11 +803,12 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 			// Plugin messages settings:
 		case 'EmailSettings':
 			// Plugin emails settings:
-			$error_value = $Obj->PluginSettingsValidateSet( $dummy = array(
-				'name' => $parname,
-				'value' => & $l_value,
-				'meta' => $parmeta,
-				'action' => 'set' ) );
+			$dummy = array(
+				'name'   => $parname,
+				'value'  => & $l_value,
+				'meta'   => $parmeta,
+				'action' => 'set' );
+			$error_value = $Obj->PluginSettingsValidateSet( $dummy );
 			// Update the param value, because a plugin might have changed it (through reference):
 			$GLOBALS['edit_plugin_'.$Obj->ID.'_set_'.$parname] = $l_value;
 
@@ -837,6 +852,11 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 function autoform_validate_param_value( $param_name, $value, $meta )
 {
 	global $Messages;
+
+	if( ! is_array( $meta ) )
+	{	// Must be array:
+		return;
+	}
 
 	if( is_array($value) && isset($meta['entries']) )
 	{
@@ -938,9 +958,27 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 					$check_options = array($check_options);
 				}
 
-				foreach($check_options as $v)
+				// Get all possible values for the select element:
+				$meta_options = array();
+				foreach( $meta['options'] as $meta_option_key => $meta_option_value )
 				{
-					if( ! in_array( $v, array_keys($meta['options']) ) )
+					if( is_array( $meta_option_value ) )
+					{	// It is a grouped options:
+						foreach( $meta_option_value as $meta_group_option_key => $meta_group_option_value )
+						{
+							$meta_options[] = $meta_group_option_key;
+						}
+					}
+					else
+					{	// Single option:
+						$meta_options[] = $meta_option_key;
+					}
+				}
+
+				// Check if the selected values can be used for the select element:
+				foreach( $check_options as $v )
+				{
+					if( ! in_array( $v, $meta_options ) )
 					{
 						param_error( $param_name, sprintf( T_('Invalid option &laquo;%s&raquo;.'), $v ) );
 						return false;

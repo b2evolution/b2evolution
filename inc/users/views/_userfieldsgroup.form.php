@@ -39,7 +39,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New user field group') : T_('User f
 
 	$Form->text_input( 'ufgp_name', $edited_UserfieldGroup->name, 50, T_('Name'), '', array( 'maxlength'=> 255, 'required'=>true ) );
 
-	$Form->text_input( 'ufgp_order', $edited_UserfieldGroup->order, 50, T_('Order number'), '', array( 'maxlength'=> 11, 'required'=>true ) );
+	$Form->text_input( 'ufgp_order', $edited_UserfieldGroup->order, 5, T_('Order number'), '', array( 'maxlength'=> 11, 'required'=>true ) );
 
 if( $creating )
 {

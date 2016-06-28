@@ -33,10 +33,10 @@ $Form->begin_form( 'fform' );
 	$User = NULL;
 	$Form->username( 'user_login', $User, T_('Username'), '', '', array( 'required' => true ) );
 
-	$Form->radio( 'accepted', 'yes',
+	$Form->radio( 'accepted', '1',
 				array(
-					array( 'yes', T_('Accepted') ),
-					array( 'no', T_('Not Accepted') ),
+					array( '1', T_('Accepted') ),
+					array( '0', T_('Not Accepted') ),
 			), T_('Membership'), true );
 
 	$Form->text_input( 'role', '', 32, T_('Role'), '', array( 'maxlength' => 255 ) );

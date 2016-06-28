@@ -30,6 +30,12 @@ class Skin extends DataObject
 	var $type;
 
 	/**
+	 * Skin version
+	 * @var string
+	 */
+	var $version = NULL;
+
+	/**
 	 * Do we want to use style.min.css instead of style.css ?
 	 */
 	var $use_min_css = false;  // true|false|'check' Set this to true for better optimization
@@ -55,10 +61,10 @@ class Skin extends DataObject
 	 *
 	 * @param table Database row
 	 */
-	function Skin( $db_row = NULL, $skin_folder = NULL )
+	function __construct( $db_row = NULL, $skin_folder = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_skins__skin', 'skin_', 'skin_ID' );
+		parent::__construct( 'T_skins__skin', 'skin_', 'skin_ID' );
 
 		if( is_null($db_row) )
 		{	// We are creating an object here:
@@ -126,7 +132,7 @@ class Skin extends DataObject
 
 
 	/**
-	 * Get default type for the skin.
+	 * Get default skin type for the skin.
 	 */
 	function get_default_type()
 	{
@@ -152,6 +158,58 @@ class Skin extends DataObject
 	function get_api_version()
 	{
 		return 5;
+	}
+
+
+	/**
+	 * Get supported collection kinds.
+	 *
+	 * This should be overloaded in skins.
+	 *
+	 * For each kind the answer could be:
+	 * - 'yes' : this skin does support that collection kind (the result will be was is expected)
+	 * - 'partial' : this skin is not a primary choice for this collection kind (but still produces an output that makes sense)
+	 * - 'maybe' : this skin has not been tested with this collection kind
+	 * - 'no' : this skin does not support that collection kind (the result would not be what is expected)
+	 * There may be more possible answers in the future...
+	 */
+	public function get_supported_coll_kinds()
+	{
+		$supported_kinds = array(
+				'main' => 'maybe',
+				'std' => 'maybe',		// Blog
+				'photo' => 'maybe',
+				'forum' => 'no',
+				'manual' => 'no',
+				'group' => 'maybe',  // Tracker
+				// Any kind that is not listed should be considered as "maybe" supported
+			);
+
+		return $supported_kinds;
+	}
+
+
+	final public function supports_coll_kind( $kind )
+	{
+		$supported_kinds = $this->get_supported_coll_kinds();
+
+		if( isset($supported_kinds[$kind]) )
+		{
+			return $supported_kinds[$kind];
+		}
+
+		// When the skin doesn't say... consider it a "maybe":
+		return 'maybe';
+	}
+
+	/*
+	 * What CSS framework does has this skin been designed with?
+	 *
+	 * This may impact default markup returned by Skin::get_template() for example
+	 */
+	function get_css_framework()
+	{
+		return '';	// Other possibilities: 'bootstrap', 'foundation'... (maybe 'bootstrap4' later...)
 	}
 
 
@@ -622,10 +680,10 @@ class Skin extends DataObject
 					break;
 
 				case 'select':
-					// Display a link to preview the skin
-					if( ! empty( $skin_url ) )
+					// Display a link to preview the skin:
+					if( ! empty( $disp_params['function_url'] ) )
 					{
-						echo '<a href="'.$skin_url.'" target="_blank" title="'.T_('Preview blog with this skin in a new window').'">';
+						echo '<a href="'.$disp_params['function_url'].'" target="_blank" title="'.T_('Preview blog with this skin in a new window').'">';
 						echo T_('Preview').'</a>';
 					}
 					break;
@@ -783,7 +841,7 @@ class Skin extends DataObject
 	/**
 	 * Get ready for displaying the skin.
 	 *
-	 * This method may register some CSS or JS. 
+	 * This method may register some CSS or JS.
 	 * The default implementation can register a few common things that you may request in the $features param.
 	 * This is where you'd specify you want to use BOOTSTRAP, etc.
 	 *
@@ -792,9 +850,12 @@ class Skin extends DataObject
 	 *
 	 * @param array of possible features you want to include. If empty, will default to {'b2evo_base', 'style', 'colorbox'} for backwards compatibility.
 	 */
-	function display_init( $features = array() )
+	function display_init( /*optional: $features = array() */ )
 	{
-		global $debug, $Messages, $disp;
+		global $debug, $Messages, $disp, $UserSettings;
+
+		// We get the optional arg this way for PHP7 comaptibility:
+		@list( $features ) = func_get_args();
 
 		if( empty($features) )
 		{	// Fall back to v5 default set of features:
@@ -813,7 +874,7 @@ class Skin extends DataObject
 			// Get next feature to include:
 			$feature = $features[$i];
 
-			switch( $feature ) 
+			switch( $feature )
 			{
 				case 'jquery':
 					// Include jQuery:
@@ -885,19 +946,19 @@ class Skin extends DataObject
 						require_css( 'b2evo_base.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
 					}
 					break;
-				
+
 				case 'style_css':
 					// Include the default skin style.css:
 					// You should make sure this is called ahead of any custom generated CSS.
-					if( $this->use_min_css == false 
-						|| $debug 
+					if( $this->use_min_css == false
+						|| $debug
 						|| ( $this->use_min_css == 'check' && !file_exists(dirname(__FILE__).'/style.min.css' ) ) )
 					{	// Use readable CSS:
-						require_css( 'style.css', 'relative' );	// Relative to <base> tag (current skin folder)
+						$this->require_css( 'style.css' );
 					}
 					else
 					{	// Use minified CSS:
-						require_css( 'style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
+						$this->require_css( 'style.min.css' );
 					}
 					break;
 
@@ -919,7 +980,7 @@ class Skin extends DataObject
 				case 'disp_page':
 					// Specific features for disp=page:
 
-					global $Blog;
+					global $Blog, $current_User;
 
 					// Used to init functions for AJAX forms to add a comment:
 					init_ajax_forms( 'blog' );
@@ -941,8 +1002,9 @@ class Skin extends DataObject
 						require_js( '#jqueryUI#', 'blog' );
 					}
 
-					if( is_logged_in() && $Blog->get_setting( 'use_workflow' ) )
-					{	// Initialize date picker to select a workflow deadline date:
+					if( is_logged_in() && $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
+					{	// Initialize JS to autcomplete user logins and date picker to edit workflow properties:
+						init_autocomplete_login_js( 'blog', $this->get_template( 'autocomplete_plugin' ) );
 						init_datepicker_js( 'blog' );
 					}
 					break;
@@ -1034,12 +1096,12 @@ class Skin extends DataObject
 					break;
 
 				case 'disp_login':
-					// Specific features for disp=threads:
+				case 'disp_access_requires_login':
+					// Specific features for disp=login and disp=access_requires_login:
 
 					global $Settings, $Plugins;
 
-					$transmit_hashed_password = (bool)$Settings->get( 'js_passwd_hashing' ) && !(bool)$Plugins->trigger_event_first_true( 'LoginAttemptNeedsRawPassword' );
-					if( $transmit_hashed_password )
+					if( transmit_hashed_password() )
 					{ // Include JS for client-side password hashing:
 						require_js( 'build/sha1_md5.bmin.js', 'blog' );
 					}
@@ -1055,6 +1117,12 @@ class Skin extends DataObject
 					require_js( '#jquery#', 'blog' );
 					require_js( '#jcrop#', 'blog' );
 					require_css( '#jcrop_css#', 'blog' );
+
+					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
+					if( $UserSettings->get( 'control_form_abortions' ) )
+					{	// Only if user wants this:
+						require_js( 'bozo_validator.js', 'blog' );
+					}
 					break;
 
 				case 'disp_avatar':
@@ -1064,13 +1132,36 @@ class Skin extends DataObject
 					require_js( '#jquery#', 'blog' );
 					require_js( '#jcrop#', 'blog' );
 					require_css( '#jcrop_css#', 'blog' );
+
+					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
+					if( $UserSettings->get( 'control_form_abortions' ) )
+					{	// Only if user wants this:
+						require_js( 'bozo_validator.js', 'blog' );
+					}
+					break;
+
+				case 'disp_pwdchange':
+					// Specific features for disp=pwdchange:
+				case 'disp_userprefs':
+					// Specific features for disp=userprefs:
+				case 'disp_subs':
+					// Specific features for disp=subs:
+
+					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
+					if( $UserSettings->get( 'control_form_abortions' ) )
+					{	// Only if user wants this:
+						require_js( 'bozo_validator.js', 'blog' );
+					}
 					break;
 
 				case 'disp_edit':
 					// Specific features for disp=edit:
 
 					// Require results.css to display attachments as a result table:
-					require_css( 'results.css' );
+					if( ! in_array( 'bootstrap', $features ) )
+					{	// Only for NON-bootstrap skins:
+						require_css( 'results.css', 'blog' ); // Results/tables styles
+					}
 
 					init_tokeninput_js( 'blog' );
 
@@ -1088,13 +1179,22 @@ class Skin extends DataObject
 
 					// Used to autocomplete usernames in textarea:
 					init_autocomplete_usernames_js( 'blog' );
+
+					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
+					if( $UserSettings->get( 'control_form_abortions' ) )
+					{	// Only if user wants this:
+						require_js( 'bozo_validator.js', 'blog' );
+					}
 					break;
 
 				case 'disp_edit_comment':
 					// Specific features for disp=edit_comment:
 
 					// Require results.css to display attachments as a result table:
-					require_css( 'results.css' );
+					if( ! in_array( 'bootstrap', $features ) )
+					{	// Only for NON-bootstrap skins:
+						require_css( 'results.css', 'blog' ); // Results/tables styles
+					}
 
 					// Used to set rating for a new comment:
 					init_ratings_js( 'blog' );
@@ -1115,7 +1215,10 @@ class Skin extends DataObject
 					// Specific features for disp=usercomments:
 
 					// Require results.css to display item/comment query results in a table
-					require_css( 'results.css' ); // Results/tables styles
+					if( ! in_array( 'bootstrap', $features ) )
+					{	// Only for NON-bootstrap skins:
+						require_css( 'results.css', 'blog' ); // Results/tables styles
+					}
 
 					// Require functions.js to show/hide a panel with filters
 					require_js( 'functions.js', 'blog' );
@@ -1197,6 +1300,349 @@ class Skin extends DataObject
 	 */
 	function get_template( $name )
 	{
+		switch( $this->get_css_framework() )
+		{
+			case 'bootstrap':
+				switch( $name )
+				{
+					case 'Results':
+						// Results list (Used to view the lists of the users, messages, contacts and etc.):
+						return array(
+							'page_url' => '', // All generated links will refer to the current page
+							'before' => '<div class="results panel panel-default">',
+							'content_start' => '<div id="$prefix$ajax_content">',
+							'header_start' => '',
+								'header_text' => '<div class="center"><ul class="pagination">'
+										.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
+									.'</ul></div>',
+								'header_text_single' => '',
+							'header_end' => '',
+							'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
+							'global_icons_class' => 'btn btn-default btn-sm',
+							'filters_start'        => '<div class="filters panel-body">',
+							'filters_end'          => '</div>',
+							'filter_button_class'  => 'btn-sm btn-info',
+							'filter_button_before' => '<div class="form-group pull-right">',
+							'filter_button_after'  => '</div>',
+							'messages_start' => '<div class="messages form-inline">',
+							'messages_end' => '</div>',
+							'messages_separator' => '<br />',
+							'list_start' => '<div class="table_scroll">'."\n"
+														 .'<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0">'."\n",
+								'head_start' => "<thead>\n",
+									'line_start_head' => '<tr>',  // TODO: fusionner avec colhead_start_first; mettre a jour admin_UI_general; utiliser colspan="$headspan$"
+									'colhead_start' => '<th $class_attrib$>',
+									'colhead_start_first' => '<th class="firstcol $class$">',
+									'colhead_start_last' => '<th class="lastcol $class$">',
+									'colhead_end' => "</th>\n",
+									'sort_asc_off' => get_icon( 'sort_asc_off' ),
+									'sort_asc_on' => get_icon( 'sort_asc_on' ),
+									'sort_desc_off' => get_icon( 'sort_desc_off' ),
+									'sort_desc_on' => get_icon( 'sort_desc_on' ),
+									'basic_sort_off' => '',
+									'basic_sort_asc' => get_icon( 'ascending' ),
+									'basic_sort_desc' => get_icon( 'descending' ),
+								'head_end' => "</thead>\n\n",
+								'tfoot_start' => "<tfoot>\n",
+								'tfoot_end' => "</tfoot>\n\n",
+								'body_start' => "<tbody>\n",
+									'line_start' => '<tr class="even">'."\n",
+									'line_start_odd' => '<tr class="odd">'."\n",
+									'line_start_last' => '<tr class="even lastline">'."\n",
+									'line_start_odd_last' => '<tr class="odd lastline">'."\n",
+										'col_start' => '<td $class_attrib$ $colspan_attrib$>',
+										'col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+										'col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
+										'col_end' => "</td>\n",
+									'line_end' => "</tr>\n\n",
+									'grp_line_start' => '<tr class="group">'."\n",
+									'grp_line_start_odd' => '<tr class="odd">'."\n",
+									'grp_line_start_last' => '<tr class="lastline">'."\n",
+									'grp_line_start_odd_last' => '<tr class="odd lastline">'."\n",
+												'grp_col_start' => '<td $class_attrib$ $colspan_attrib$>',
+												'grp_col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+												'grp_col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
+										'grp_col_end' => "</td>\n",
+									'grp_line_end' => "</tr>\n\n",
+								'body_end' => "</tbody>\n\n",
+								'total_line_start' => '<tr class="total">'."\n",
+									'total_col_start' => '<td $class_attrib$>',
+									'total_col_start_first' => '<td class="firstcol $class$">',
+									'total_col_start_last' => '<td class="lastcol $class$">',
+									'total_col_end' => "</td>\n",
+								'total_line_end' => "</tr>\n\n",
+							'list_end' => "</table></div>\n\n",
+							'footer_start' => '',
+							'footer_text' => '<div class="center"><ul class="pagination">'
+									.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
+								.'</ul></div><div class="center">$page_size$</div>'
+																/* T_('Page $scroll_list$ out of $total_pages$   $prev$ | $next$<br />'. */
+																/* '<strong>$total_pages$ Pages</strong> : $prev$ $list$ $next$' */
+																/* .' <br />$first$  $list_prev$  $list$  $list_next$  $last$ :: $prev$ | $next$') */,
+							'footer_text_single' => '<div class="center">$page_size$</div>',
+							'footer_text_no_limit' => '', // Text if theres no LIMIT and therefor only one page anyway
+								'page_current_template' => '<span>$page_num$</span>',
+								'page_item_before' => '<li>',
+								'page_item_after' => '</li>',
+								'page_item_current_before' => '<li class="active">',
+								'page_item_current_after'  => '</li>',
+								'prev_text' => T_('Previous'),
+								'next_text' => T_('Next'),
+								'no_prev_text' => '',
+								'no_next_text' => '',
+								'list_prev_text' => T_('...'),
+								'list_next_text' => T_('...'),
+								'list_span' => 11,
+								'scroll_list_range' => 5,
+							'footer_end' => "\n\n",
+							'no_results_start' => '<div class="panel-footer">'."\n",
+							'no_results_end'   => '$no_results$</div>'."\n\n",
+							'content_end' => '</div>',
+							'after' => '</div>',
+							'sort_type' => 'basic'
+						);
+
+					case 'blockspan_form':
+						// Form settings for filter area:
+						return array(
+							'layout'         => 'blockspan',
+							'formclass'      => 'form-inline',
+							'formstart'      => '',
+							'formend'        => '',
+							'title_fmt'      => '$title$'."\n",
+							'no_title_fmt'   => '',
+							'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
+																		.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
+							'fieldset_end'   => '</fieldset>'."\n",
+							'fieldstart'     => '<div class="form-group form-group-sm" $ID$>'."\n",
+							'fieldend'       => "</div>\n\n",
+							'labelclass'     => 'control-label',
+							'labelstart'     => '',
+							'labelend'       => "\n",
+							'labelempty'     => '<label></label>',
+							'inputstart'     => '',
+							'inputend'       => "\n",
+							'infostart'      => '<div class="form-control-static">',
+							'infoend'        => "</div>\n",
+							'buttonsstart'   => '<div class="form-group form-group-sm">',
+							'buttonsend'     => "</div>\n\n",
+							'customstart'    => '<div class="custom_content">',
+							'customend'      => "</div>\n",
+							'note_format'    => ' <span class="help-inline">%s</span>',
+							// Additional params depending on field type:
+							// - checkbox
+							'fieldstart_checkbox'    => '<div class="form-group form-group-sm checkbox" $ID$>'."\n",
+							'fieldend_checkbox'      => "</div>\n\n",
+							'inputclass_checkbox'    => '',
+							'inputstart_checkbox'    => '',
+							'inputend_checkbox'      => "\n",
+							'checkbox_newline_start' => '',
+							'checkbox_newline_end'   => "\n",
+							// - radio
+							'inputclass_radio'       => '',
+							'radio_label_format'     => '$radio_option_label$',
+							'radio_newline_start'    => '',
+							'radio_newline_end'      => "\n",
+							'radio_oneline_start'    => '',
+							'radio_oneline_end'      => "\n",
+						);
+
+					case 'compact_form':
+					case 'Form':
+						// Default Form settings (Used for any form on front-office):
+						return array(
+							'layout'         => 'fieldset',
+							'formclass'      => 'form-horizontal',
+							'formstart'      => '',
+							'formend'        => '',
+							'title_fmt'      => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
+							'no_title_fmt'   => '<span style="float:right">$global_icons$</span>'."\n",
+							'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
+																	.'<legend class="panel-heading" $title_attribs$>$fieldset_title$</legend><div class="panel-body $class$">'."\n",
+							'fieldset_end'   => '</div></div></fieldset></div>'."\n",
+							'fieldstart'     => '<div class="form-group" $ID$>'."\n",
+							'fieldend'       => "</div>\n\n",
+							'labelclass'     => 'control-label col-sm-3',
+							'labelstart'     => '',
+							'labelend'       => "\n",
+							'labelempty'     => '<label class="control-label col-sm-3"></label>',
+							'inputstart'     => '<div class="controls col-sm-9">',
+							'inputend'       => "</div>\n",
+							'infostart'      => '<div class="controls col-sm-9"><div class="form-control-static">',
+							'infoend'        => "</div></div>\n",
+							'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-3 col-sm-9">',
+							'buttonsend'     => "</div></div>\n\n",
+							'customstart'    => '<div class="custom_content">',
+							'customend'      => "</div>\n",
+							'note_format'    => ' <span class="help-inline">%s</span>',
+							// Additional params depending on field type:
+							// - checkbox
+							'inputclass_checkbox'    => '',
+							'inputstart_checkbox'    => '<div class="controls col-sm-9"><div class="checkbox"><label>',
+							'inputend_checkbox'      => "</label></div></div>\n",
+							'checkbox_newline_start' => '<div class="checkbox">',
+							'checkbox_newline_end'   => "</div>\n",
+							// - radio
+							'fieldstart_radio'       => '<div class="form-group radio-group" $ID$>'."\n",
+							'fieldend_radio'         => "</div>\n\n",
+							'inputclass_radio'       => '',
+							'radio_label_format'     => '$radio_option_label$',
+							'radio_newline_start'    => '<div class="radio"><label>',
+							'radio_newline_end'      => "</label></div>\n",
+							'radio_oneline_start'    => '<label class="radio-inline">',
+							'radio_oneline_end'      => "</label>\n",
+						);
+
+					case 'linespan_form':
+						// Linespan form:
+						return array(
+							'layout'         => 'linespan',
+							'formclass'      => 'form-horizontal',
+							'formstart'      => '',
+							'formend'        => '',
+							'title_fmt'      => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
+							'no_title_fmt'   => '<span style="float:right">$global_icons$</span>'."\n",
+							'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
+																	.'<legend class="panel-heading" $title_attribs$>$fieldset_title$</legend><div class="panel-body $class$">'."\n",
+							'fieldset_end'   => '</div></div></fieldset></div>'."\n",
+							'fieldstart'     => '<div class="form-group" $ID$>'."\n",
+							'fieldend'       => "</div>\n\n",
+							'labelclass'     => '',
+							'labelstart'     => '',
+							'labelend'       => "\n",
+							'labelempty'     => '',
+							'inputstart'     => '<div class="controls">',
+							'inputend'       => "</div>\n",
+							'infostart'      => '<div class="controls"><div class="form-control-static">',
+							'infoend'        => "</div></div>\n",
+							'buttonsstart'   => '<div class="form-group"><div class="control-buttons">',
+							'buttonsend'     => "</div></div>\n\n",
+							'customstart'    => '<div class="custom_content">',
+							'customend'      => "</div>\n",
+							'note_format'    => ' <span class="help-inline">%s</span>',
+							// Additional params depending on field type:
+							// - checkbox
+							'inputclass_checkbox'    => '',
+							'inputstart_checkbox'    => '<div class="controls"><div class="checkbox"><label>',
+							'inputend_checkbox'      => "</label></div></div>\n",
+							'checkbox_newline_start' => '<div class="checkbox">',
+							'checkbox_newline_end'   => "</div>\n",
+							'checkbox_basic_start'   => '<div class="checkbox"><label>',
+							'checkbox_basic_end'     => "</label></div>\n",
+							// - radio
+							'fieldstart_radio'       => '',
+							'fieldend_radio'         => '',
+							'inputstart_radio'       => '<div class="controls">',
+							'inputend_radio'         => "</div>\n",
+							'inputclass_radio'       => '',
+							'radio_label_format'     => '$radio_option_label$',
+							'radio_newline_start'    => '<div class="radio"><label>',
+							'radio_newline_end'      => "</label></div>\n",
+							'radio_oneline_start'    => '<label class="radio-inline">',
+							'radio_oneline_end'      => "</label>\n",
+						);
+
+					case 'fixed_form':
+						// Form with fixed label width (Used for form on disp=user):
+						return array(
+							'layout'         => 'fieldset',
+							'formclass'      => 'form-horizontal',
+							'formstart'      => '',
+							'formend'        => '',
+							'title_fmt'      => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
+							'no_title_fmt'   => '<span style="float:right">$global_icons$</span>'."\n",
+							'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
+																	.'<legend class="panel-heading" $title_attribs$>$fieldset_title$</legend><div class="panel-body $class$">'."\n",
+							'fieldset_end'   => '</div></div></fieldset></div>'."\n",
+							'fieldstart'     => '<div class="form-group fixedform-group" $ID$>'."\n",
+							'fieldend'       => "</div>\n\n",
+							'labelclass'     => 'control-label fixedform-label',
+							'labelstart'     => '',
+							'labelend'       => "\n",
+							'labelempty'     => '<label class="control-label fixedform-label"></label>',
+							'inputstart'     => '<div class="controls fixedform-controls">',
+							'inputend'       => "</div>\n",
+							'infostart'      => '<div class="controls fixedform-controls"><div class="form-control-static">',
+							'infoend'        => "</div></div>\n",
+							'buttonsstart'   => '<div class="form-group"><div class="control-buttons fixedform-controls">',
+							'buttonsend'     => "</div></div>\n\n",
+							'customstart'    => '<div class="custom_content">',
+							'customend'      => "</div>\n",
+							'note_format'    => ' <span class="help-inline">%s</span>',
+							// Additional params depending on field type:
+							// - checkbox
+							'inputclass_checkbox'    => '',
+							'inputstart_checkbox'    => '<div class="controls fixedform-controls"><div class="checkbox"><label>',
+							'inputend_checkbox'      => "</label></div></div>\n",
+							'checkbox_newline_start' => '<div class="checkbox">',
+							'checkbox_newline_end'   => "</div>\n",
+							// - radio
+							'fieldstart_radio'       => '<div class="form-group radio-group" $ID$>'."\n",
+							'fieldend_radio'         => "</div>\n\n",
+							'inputclass_radio'       => '',
+							'radio_label_format'     => '$radio_option_label$',
+							'radio_newline_start'    => '<div class="radio"><label>',
+							'radio_newline_end'      => "</label></div>\n",
+							'radio_oneline_start'    => '<label class="radio-inline">',
+							'radio_oneline_end'      => "</label>\n",
+						);
+
+					case 'user_navigation':
+						// The Prev/Next links of users (Used on disp=user to navigate between users):
+						return array(
+							'block_start'  => '<ul class="pager">',
+							'prev_start'   => '<li class="previous">',
+							'prev_end'     => '</li>',
+							'prev_no_user' => '',
+							'back_start'   => '<li>',
+							'back_end'     => '</li>',
+							'next_start'   => '<li class="next">',
+							'next_end'     => '</li>',
+							'next_no_user' => '',
+							'block_end'    => '</ul>',
+						);
+
+					case 'button_classes':
+						// Button classes (Used to initialize classes for action buttons like buttons to spam vote, or edit an intro post):
+						return array(
+							'button'       => 'btn btn-default btn-xs',
+							'button_red'   => 'btn-danger',
+							'button_green' => 'btn-success',
+							'text'         => 'btn btn-default btn-xs',
+							'group'        => 'btn-group',
+						);
+
+					case 'tooltip_plugin':
+						// Plugin name for tooltips: 'bubbletip' or 'popover'
+						// We should use 'popover' tooltip plugin for bootstrap skins
+						// This tooltips appear on mouse over user logins or on plugin help icons
+						return 'popover';
+
+					case 'autocomplete_plugin':
+						// Plugin name to autocomplete user logins: 'hintbox', 'typeahead'
+						return 'typeahead';
+
+					case 'plugin_template':
+						// Template for plugins:
+						return array(
+								// This template is used to build a plugin toolbar with action buttons above edit item/comment area:
+								'toolbar_before'       => '<div class="btn-toolbar $toolbar_class$" role="toolbar">',
+								'toolbar_after'        => '</div>',
+								'toolbar_title_before' => '<div class="btn-toolbar-title">',
+								'toolbar_title_after'  => '</div>',
+								'toolbar_group_before' => '<div class="btn-group btn-group-xs" role="group">',
+								'toolbar_group_after'  => '</div>',
+								'toolbar_button_class' => 'btn btn-default',
+							);
+
+					case 'modal_window_js_func':
+						// JavaScript function to initialize Modal windows, @see echo_user_ajaxwindow_js()
+						return 'echo_modalwindow_js_bootstrap';
+				}
+				break;
+		}
+
+		// Use default template:
 		switch( $name )
 		{
 			case 'Results':
@@ -1239,9 +1685,9 @@ class Skin extends DataObject
 							'line_start_odd' => '<tr class="odd">'."\n",
 							'line_start_last' => '<tr class="even lastline">'."\n",
 							'line_start_odd_last' => '<tr class="odd lastline">'."\n",
-								'col_start' => '<td $class_attrib$>',
-								'col_start_first' => '<td class="firstcol $class$">',
-								'col_start_last' => '<td class="lastcol $class$">',
+								'col_start' => '<td $class_attrib$ $colspan_attrib$>',
+								'col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+								'col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
 								'col_end' => "</td>\n",
 							'line_end' => "</tr>\n\n",
 							'grp_line_start' => '<tr class="group">'."\n",
@@ -1319,9 +1765,47 @@ class Skin extends DataObject
 					'note_format' => ' <span class="notes">%s</span>',
 					'formend' => '',
 				);
+
+			case 'cat_array_mode':
+				// What category level use to display the items on disp=posts:
+				//   - 'children' - Get items from current category and from all its sub-categories recirsively
+				//   - 'parent' - Get items ONLY from current category WITHOUT sub-categories
+				return 'children';
+
+			case 'autocomplete_plugin':
+				// Plugin name to autocomplete user logins: 'hintbox', 'typeahead'
+				return 'hintbox';
 		}
 
 		return array();
+	}
+
+
+	/**
+	 * Memorize that a specific css that file will be required by the current page.
+	 * @see require_css() for full documentation,
+	 * this function is used to add unique version number for each skin
+	 *
+	 * @param string Name of CSS file relative to <base> tag (current skin folder)
+	 */
+	function require_css( $css_file )
+	{
+		global $app_version_long;
+		require_css( $css_file, 'relative', NULL, NULL, $this->folder.'+'.$this->version.'+'.$app_version_long );
+	}
+
+
+	/**
+	 * Memorize that a specific javascript file will be required by the current page.
+	 * @see require_js() for full documentation,
+	 * this function is used to add unique version number for each skin
+	 *
+	 * @param string Name of JavaScript file relative to <base> tag (current skin folder)
+	 */
+	function require_js( $js_file )
+	{
+		global $app_version_long;
+		require_js( $js_file, 'relative', false, false, $this->folder.'+'.$this->version.'+'.$app_version_long );
 	}
 }
 

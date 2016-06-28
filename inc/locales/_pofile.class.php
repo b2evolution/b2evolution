@@ -22,7 +22,7 @@ class POFile
 {
 	var $msgids = array();
 
-	function POFile($filename=null)
+	function __construct($filename=null)
 	{
 		$this->filename = str_replace( '\\', '/', $filename );
 	}

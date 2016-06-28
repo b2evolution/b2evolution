@@ -18,6 +18,17 @@ load_class( 'users/model/_group.class.php', 'Group' );
 load_class( 'users/model/_user.class.php', 'User' );
 
 
+/*
+	* Reports new user created by inserting system log entry
+	*
+	* @param object newly create user
+	*/
+function report_user_create( $User )
+{
+	syslog_insert( sprintf( T_('User %s was created'), '[['.$User->login.']]' ), 'info', 'user', $User->ID );
+}
+
+
 /**
  * Log the user out
  */
@@ -1188,7 +1199,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 	{
 		if( ( $current_User->ID != $user_ID && ! $current_User->check_perm( 'users', 'view' ) ) ||
 		    ( ! $current_User->check_perm( 'admin', 'restricted' ) || ! $current_User->check_status( 'can_access_admin' ) ) )
-		{ // Use blog url when user has no access to backoffice 
+		{ // Use blog url when user has no access to backoffice
 			if( empty( $current_Blog ) )
 			{ // Check if system has at least one blog
 				$BlogCache = & get_BlogCache();
@@ -1206,7 +1217,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 			}
 
 			if( ! empty( $current_Blog ) )
-			{ // We should use blog url when at least one blog exist 
+			{ // We should use blog url when at least one blog exist
 				if( $is_admin_tab )
 				{ // Deny all admin tabs for such users
 					$user_tab = 'user';
@@ -1259,8 +1270,6 @@ function user_messaging_link( $before = '', $after = '', $link_text = '#', $link
  */
 function get_user_messaging_link( $before = '', $after = '', $link_text = '#', $link_title = '#', $show_badge = false )
 {
-	global $unread_messages_count;
-
 	$user_messaging_url = get_user_messaging_url();
 
 	if( !$user_messaging_url )
@@ -1279,9 +1288,13 @@ function get_user_messaging_link( $before = '', $after = '', $link_text = '#', $
 	}
 
 	$badge = '';
-	if( $show_badge && $unread_messages_count > 0 )
-	{
-		$badge = ' <span class="badge">'.$unread_messages_count.'</span>';
+	if( $show_badge )
+	{	// Show badge with count of uread messages:
+		$unread_messages_count = get_unread_messages_count();
+		if( $unread_messages_count > 0 )
+		{	// If at least one unread message:
+			$badge = ' <span class="badge">'.$unread_messages_count.'</span>';
+		}
 	}
 
 	$r = $before
@@ -1497,7 +1510,7 @@ function profile_check_params( $params, $User = NULL )
 		{
 			param_error( $params['gender'][1], T_('Please select gender.') );
 		}
-		elseif( ( $params['gender'][0] != 'M' ) && ( $params['gender'][0] != 'F' ) )
+		elseif( ( $params['gender'][0] != 'M' ) && ( $params['gender'][0] != 'F' ) && ( $params['gender'][0] != 'O' ) )
 		{
 			param_error( $params['gender'][1], 'Gender value is invalid' );
 		}
@@ -1969,56 +1982,6 @@ function get_status_permvalue( $status )
 
 
 /**
- * Load current_User post read statuses
- *
- * @param array Load only for posts with these ids
- */
-function load_user_read_statuses( $post_ids = NULL )
-{
-	global $DB, $current_User, $user_post_read_statuses;
-
-	if( !is_logged_in() )
-	{ // There are no logged in user
-		return;
-	}
-
-	if( !empty( $user_post_read_statuses ) )
-	{ // User read statuses were already set
-		return;
-	}
-	else
-	{ // Init with an empty array
-		$user_post_read_statuses = array();
-	}
-
-	$post_condition = empty( $post_ids ) ? NULL : 'uprs_post_ID IN ( '.implode( ',', $post_ids ).' )';
-
-	// SELECT current User's post and comment read statuses for all post with the given ids
-	$SQL = new SQL();
-	$SQL->SELECT( 'uprs_post_ID, uprs_read_post_ts' );
-	$SQL->FROM( 'T_users__postreadstatus' );
-	$SQL->WHERE( 'uprs_user_ID = '.$DB->quote( $current_User->ID ) );
-	$SQL->WHERE_and( $post_condition );
-	// Set those post read statuses which were opened before:
-	$user_post_read_statuses = $DB->get_assoc( $SQL->get() );
-
-	if( empty( $post_ids ) )
-	{ // The load was not requested for specific posts, so we have loaded all information what we have, ther rest of the posts were not read by this user
-		return;
-	}
-
-	// Set new posts read statuses
-	foreach( $post_ids as $post_ID )
-	{ // Make sure to set read statuses for each requested post ID
-		if( ! isset( $user_post_read_statuses[ $post_ID ] ) )
-		{ // Set each read status to 0
-			$user_post_read_statuses[ $post_ID ] = 0;
-		}
-	}
-}
-
-
-/**
  * Load blog advanced User/Group permission
  *
  * @param array the array what should be loaded with the permission values ( it should be the User or Group blog_post_statuses array )
@@ -2105,6 +2068,7 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 				'blog_recycle_owncmts'    => $row[$prefix.'_perm_recycle_owncmts'],
 				'blog_vote_spam_comments' => $row[$prefix.'_perm_vote_spam_cmts'],
 				'blog_edit_cmt'           => $row[$prefix.'_perm_edit_cmt'],
+				'blog_meta_comment'       => $row[$prefix.'_perm_meta_comment'],
 				'blog_cats'               => $row[$prefix.'_perm_cats'],
 				'blog_properties'         => $row[$prefix.'_perm_properties'],
 				'blog_admin'              => $row[$prefix.'_perm_admin'],
@@ -2133,6 +2097,7 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 						'blog_recycle_owncmts'    => 0,
 						'blog_vote_spam_comments' => 0,
 						'blog_cmt_statuses'       => 0,
+						'blog_meta_comment'       => 0,
 						'blog_cats'               => 0,
 						'blog_properties'         => 0,
 						'blog_admin'              => 0,
@@ -2237,6 +2202,10 @@ function check_blog_advanced_perm( & $blog_perms, $user_ID, $permname, $permleve
 			}
 
 			$perm = $perm_statuses_value & get_status_permvalue( $status );
+			break;
+
+		case 'meta_comment':
+			return $blog_perms['blog_meta_comment'];
 			break;
 
 		case 'files':
@@ -2499,6 +2468,23 @@ function get_user_isubscription( $user_ID, $item_ID )
 
 
 /**
+ * Get if user is subscribed to get emails, when a new post or comment is published on this collection.
+ *
+ * @param integer user ID
+ * @param integer blog ID
+ * @return object with properties sub_items and sub_comments. Each property value is true if user is subscribed and false otherwise
+ */
+function get_user_subscription( $user_ID, $blog )
+{
+	global $DB;
+	$result = $DB->get_row( 'SELECT sub_items, sub_comments
+								FROM T_subscriptions
+								WHERE sub_user_ID = '.$user_ID.' AND sub_coll_ID = '.$blog );
+	return $result;
+}
+
+
+/**
  * Set user item subscription
  *
  * @param integer user ID
@@ -2516,6 +2502,47 @@ function set_user_isubscription( $user_ID, $item_ID, $value )
 
 	return $DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
 								VALUES ( '.$item_ID.', '.$user_ID.', '.$value.' )' );
+}
+
+
+/**
+ * Set user collection subscription
+ *
+ * @param integer user ID
+ * @param integer blog ID
+ * @param integer value 0 for unsubscribe and 1 for subscribe to new posts
+ * @param integer value 0 for unsubscribe and 1 for subscribe to new comments
+ */
+function set_user_subscription( $user_ID, $blog, $items = NULL, $comments = NULL )
+{
+	global $DB;
+	$sub = get_user_subscription( $user_ID, $blog ); // Get default values
+
+	if( ( $items < 0 ) || ( $items > 1 ) || ( $comments < 0 ) || ( $comments > 1 ) )
+	{
+		return false;
+	}
+
+	if( ! is_null( $items ) )
+	{
+		$sub_items = $items;
+	}
+	else
+	{
+		$sub_items = $sub ? $sub->sub_items : 0;
+	}
+
+	if( ! is_null( $comments ) )
+	{
+		$sub_comments = $comments;
+	}
+	else
+	{
+		$sub_comments = $sub ? $sub->sub_comments : 0;
+	}
+
+	return $DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
+			VALUES ( '.$blog.', '.$user_ID.', '.$sub_items.', '.$sub_comments.' )' );
 }
 
 
@@ -3066,6 +3093,7 @@ function callback_filter_userlist( & $Form )
 
 	$Form->checkbox( 'gender_men', get_param('gender_men'), T_('Men') );
 	$Form->checkbox( 'gender_women', get_param('gender_women'), T_('Women') );
+	$Form->checkbox( 'gender_other', get_param('gender_other'), T_('Other') );
 
 	if( is_admin_page() )
 	{ // show this filters only on admin interface
@@ -3085,7 +3113,7 @@ function callback_filter_userlist( & $Form )
 		$group_options_array = array(
 				'-1' => T_('All (Ungrouped)'),
 				'0'  => T_('All (Grouped)'),
-			) + $GroupCache->get_option_array( 'get_name_without_level' );
+			) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
 		$Form->select_input_array( 'group', get_param('group'), $group_options_array,
 			// TRANS: Type: Primary Group, Secondary Group
 			sprintf( T_('%s Group'), get_admin_badge( 'group', '#', '#', '#', 'primary' ) ),
@@ -3097,7 +3125,7 @@ function callback_filter_userlist( & $Form )
 		$GroupCache->all_loaded = true;
 		$group_options_array = array(
 				'0'  => T_('All'),
-			) + $GroupCache->get_option_array( 'get_name_without_level' );
+			) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
 		$Form->select_input_array( 'group2', get_param('group2'), $group_options_array,
 			// TRANS: Type: Primary Group, Secondary Group
 			sprintf( T_('%s Group'), get_admin_badge( 'group', '#', '#', '#', 'secondary' ) ),
@@ -4426,6 +4454,33 @@ function echo_user_add_organization_js( $edited_Organization )
 	</script>';
 }
 
+/**
+ * Initialize JavaScript for AJAX loading of popup window to edit user in organization
+ *
+ * @param object Organization
+ */
+function echo_user_edit_membership_js( $edited_Organization )
+{
+	global $admin_url, $current_User;
+
+	if( ! $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
+	{	// User must has an edit perm to edit user in organization:
+		return;
+	}
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_deldata.js":
+	echo '<script type="text/javascript">
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_edit_membership = \''.TS_('Edit membership').get_manual_link( 'edit-user-membership' ).'\';
+		var evo_js_lang_edit = \''.TS_('Edit').'\';
+		var evo_js_user_org_ajax_url = \''.$admin_url.'\';
+		var evo_js_crumb_organization = \''.get_crumb( 'organization' ).'\';
+	</script>';
+}
+
 
 /**
  * Check invitation code and display error on incorrect code
@@ -4534,6 +4589,236 @@ function get_users_IDs_by_logins( $logins )
 	}
 
 	return implode( ',', $ids );
+}
+
+
+/**
+ * Check access to public list of the users
+ *
+ * @param string Mode: 'normal', 'api'
+ * @return boolean|string TRUE - if current user has an access,
+ *                        Error message - if not access(for 'api' mode) OR Redirect(for 'normal' mode)
+ */
+function check_access_users_list( $mode = 'normal' )
+{
+	global $current_User, $Settings, $Messages;
+
+	if( ! is_logged_in() && ! $Settings->get( 'allow_anonymous_user_list' ) )
+	{	// Redirect to the login page if not logged in and allow anonymous user setting is OFF:
+		$error_message = T_( 'You must log in to view the user directory.' );
+		if( $mode == 'api' )
+		{	// It is a request from REST API
+			return $error_message;
+		}
+		else
+		{	// Normal request
+			$Messages->add( $error_message );
+			header_redirect( get_login_url( 'cannot see user' ), 302 );
+		}
+		// will have exited
+	}
+
+	if( is_logged_in() && ( ! check_user_status( 'can_view_users' ) ) )
+	{	// Current user status doesn't permit to view users list
+		if( check_user_status( 'can_be_validated' ) )
+		{	// Current user is logged in but his/her account is not active yet
+			$error_message = T_( 'You must activate your account before you can view the user directory.' );
+			if( $mode == 'api' )
+			{	// It is a request from REST API
+				return $error_message;
+			}
+			else
+			{	// Normal request
+				// Redirect to the account activation page:
+				$Messages->add( $error_message.' <b>'.T_( 'See below:' ).'</b>' );
+				header_redirect( get_activate_info_url(), 302 );
+			}
+			// will have exited
+		}
+
+		// Set where to redirect:
+		$error_message = T_( 'Your account status currently does not permit to view the user directory.' );
+		if( $mode == 'api' )
+		{	// It is a request from REST API
+			return $error_message;
+		}
+		else
+		{	// Normal request
+			global $Blog, $baseurl;
+			$Messages->add( $error_message );
+			header_redirect( ( empty( $Blog ) ? $baseurl : $Blog->gen_blogurl() ), 302 );
+		}
+		// will have exited
+	}
+
+	if( has_cross_country_restriction( 'users', 'list' ) && empty( $current_User->ctry_ID ) )
+	{	// User may browse other users only from the same country
+		$error_message = T_('Please specify your country before attempting to contact other users.');
+		if( $mode == 'api' )
+		{	// It is a request from REST API
+			return $error_message;
+		}
+		else
+		{	// Normal request
+			$Messages->add( $error_message );
+			header_redirect( get_user_profile_url() );
+		}
+		// will have exited
+	}
+
+	// Current user has an access to public list of the users:
+	return true;
+}
+
+
+/**
+ * Check access to view a profile of the user
+ *
+ * @param integer User ID
+ * @param string Mode: 'normal', 'api'
+ * @return boolean|string TRUE - if current user has an access,
+ *                        Error message - if not access(for 'api' mode) OR Redirect(for 'normal' mode)
+ */
+function check_access_user_profile( $user_ID, $mode = 'normal' )
+{
+	global $Blog, $baseurl, $Settings, $current_User, $Settings, $Messages;
+
+	// Set where to redirect in case of error:
+	$error_redirect_to = ( empty( $Blog ) ? $baseurl : $Blog->gen_blogurl() );
+
+	if( ! is_logged_in() )
+	{	// Redirect to the login page if not logged in and allow anonymous user setting is OFF:
+		$user_available_by_group_level = true;
+		if( ! empty( $user_ID ) )
+		{
+			$UserCache = & get_UserCache();
+			if( $User = & $UserCache->get_by_ID( $user_ID, false ) )
+			{	// If user exists we can check if the anonymous users have an access to view the user by group level limitation
+				$User->get_Group();
+				$user_available_by_group_level = ( $User->Group->level >= $Settings->get( 'allow_anonymous_user_level_min' ) &&
+						$User->Group->level <= $Settings->get( 'allow_anonymous_user_level_max' ) );
+			}
+		}
+
+		if( ! $Settings->get( 'allow_anonymous_user_profiles' ) || ! $user_available_by_group_level || empty( $user_ID ) )
+		{	// If this user is not available for anonymous users
+			$error_message = T_('You must log in to view this user profile.');
+			if( $mode == 'api' )
+			{	// It is a request from REST API
+				return $error_message;
+			}
+			else
+			{	// Normal request
+				$Messages->add( $error_message );
+				header_redirect( get_login_url( 'cannot see user' ), 302 );
+			}
+			// will have exited
+		}
+	}
+
+	if( is_logged_in() && ! check_user_status( 'can_view_user', $user_ID ) )
+	{	// Current user is logged in, but his/her status doesn't permit to view user profile
+		if( check_user_status( 'can_be_validated' ) )
+		{ // Current user is logged in but his/her account is not active yet
+			$error_message = T_('You must activate your account before you can view this user profile.');
+			if( $mode == 'api' )
+			{	// It is a request from REST API
+				return $error_message;
+			}
+			else
+			{	// Normal request
+				// Redirect to the account activation page:
+				$Messages->add( $error_message.' <b>'.T_('See below:').'</b>' );
+				header_redirect( get_activate_info_url(), 302 );
+			}
+			// will have exited
+		}
+
+		$error_message = T_('Your account status currently does not permit to view this user profile.');
+		if( $mode == 'api' )
+		{	// It is a request from REST API
+			return $error_message;
+		}
+		else
+		{	// Normal request
+			// Redirect to the account activation page:
+			$Messages->add( $error_message );
+			header_redirect( $error_redirect_to, 302 );
+		}
+		// will have exited
+	}
+
+	if( ! empty( $user_ID ) )
+	{
+		$UserCache = & get_UserCache();
+		$User = & $UserCache->get_by_ID( $user_ID, false );
+
+		if( empty( $User ) )
+		{	// Wrong user request
+			$error_message = T_('The requested user does not exist!');
+			if( $mode == 'api' )
+			{	// It is a request from REST API
+				return $error_message;
+			}
+			else
+			{	// Normal request
+				$Messages->add( $error_message );
+				header_redirect( $error_redirect_to );
+			}
+			// will have exited
+		}
+
+		if( $User->check_status( 'is_closed' ) )
+		{	// The requested user is closed
+			$error_message = T_('The requested user account is closed!');
+			if( $mode == 'api' )
+			{	// It is a request from REST API
+				return $error_message;
+			}
+			else
+			{	// Normal request
+				$Messages->add( $error_message );
+				header_redirect( $error_redirect_to );
+			}
+			// will have exited
+		}
+
+		if( has_cross_country_restriction( 'any' ) )
+		{
+			if( empty( $current_User->ctry_ID  ) )
+			{	// Current User country is not set
+				$error_message = T_('Please specify your country before attempting to contact other users.');
+				if( $mode == 'api' )
+				{	// It is a request from REST API
+					return $error_message;
+				}
+				else
+				{	// Normal request
+					$Messages->add( $error_message );
+					header_redirect( get_user_profile_url() );
+				}
+				// will have exited
+			}
+
+			if( has_cross_country_restriction( 'users', 'profile' ) && ( $current_User->ctry_ID !== $User->ctry_ID ) )
+			{	// Current user country is different then edited user country and cross country user browsing is not enabled.
+				$error_message = T_('You don\'t have permission to view this user profile.');
+				if( $mode == 'api' )
+				{	// It is a request from REST API
+					return $error_message;
+				}
+				else
+				{	// Normal request
+					$Messages->add( $error_message );
+					header_redirect( url_add_param( $error_redirect_to, 'disp=403', '&' ) );
+				}
+				// will have exited
+			}
+		}
+	}
+
+	// Current user has an access to view of the requested user profile:
+	return true;
 }
 
 
@@ -4713,6 +4998,7 @@ function users_results_block( $params = array() )
 			'display_lastname'     => false,
 			'display_nickname'     => true,
 			'display_name'         => true,
+			'display_role'         => false,
 			'display_gender'       => true,
 			'display_country'      => true,
 			'display_region'       => false,
@@ -4734,6 +5020,7 @@ function users_results_block( $params = array() )
 			'display_level'        => true,
 			'display_status'       => true,
 			'display_actions'      => true,
+			'display_org_actions'  => false,
 			'display_newsletter'   => true,
 			'force_check_user'     => false,
 		), $params );
@@ -4768,6 +5055,7 @@ function users_results_block( $params = array() )
 			'join_region'         => $params['display_region'],
 			'join_subregion'      => $params['display_subregion'],
 			'join_country'        => $params['join_country'],
+			'join_colls'          => $params['display_blogs'],
 			'keywords_fields'     => $params['keywords_fields'],
 			'where_status_closed' => $params['where_status_closed'],
 			'where_org_ID'        => $params['org_ID'],
@@ -4797,6 +5085,7 @@ function users_results_block( $params = array() )
 				'all' => array( T_('All users'), url_add_param( $params['page_url'], 'filter=new' ) ),
 				'men' => array( T_('Men'), url_add_param( $params['page_url'], 'gender_men=1&amp;filter=new' ) ),
 				'women' => array( T_('Women'), url_add_param( $params['page_url'], 'gender_women=1&amp;filter=new' ) ),
+				'other' => array( T_('Other'), url_add_param( $params['page_url'], 'gender_other=1&amp;filter=new' ) ),
 			);
 
 		if( is_admin_page() )
@@ -4874,7 +5163,7 @@ function users_results_block( $params = array() )
  */
 function users_results( & $UserList, $params = array() )
 {
-	global $Settings, $current_User;
+	global $Settings, $current_User, $collections_Module;
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
@@ -4887,6 +5176,7 @@ function users_results( & $UserList, $params = array() )
 			'display_nickname'   => true,
 			'display_name'       => true,
 			'order_name'         => 'user_lastname, user_firstname',
+			'display_role'       => false,
 			'display_gender'     => true,
 			'display_country'    => true,
 			'display_country_type' => 'both', // 'both', 'flag', 'name'
@@ -4901,6 +5191,8 @@ function users_results( & $UserList, $params = array() )
 			'display_regcountry' => true,
 			'display_update'     => true,
 			'display_lastvisit'  => true,
+			'display_lastvisit_view' => 'exact_date',
+			'display_lastvisit_cheat' => 0,
 			'display_contact'    => true,
 			'display_reported'   => true,
 			'display_group'      => true,
@@ -4908,6 +5200,7 @@ function users_results( & $UserList, $params = array() )
 			'display_level'      => true,
 			'display_status'     => true,
 			'display_actions'    => true,
+			'display_org_actions'=> false,
 			'th_class_avatar'    => 'shrinkwrap small',
 			'td_class_avatar'    => 'shrinkwrap center small',
 			'avatar_size'        => 'crop-top-48x48',
@@ -5041,6 +5334,17 @@ function users_results( & $UserList, $params = array() )
 			$col['order'] = $params['order_name'];
 		}
 		$UserList->cols[] = $col;
+	}
+
+	if( $params['display_role'] )
+	{ // Display organizational role
+		$UserList->cols[] = array(
+			'th' => T_('Role'),
+			'th_class' => 'small',
+			'td_class' => 'small',
+			'order' => 'uorg_role',
+			'td' => '<a href="#" style="font-weight: 700;" onclick="return user_edit( '.intval( $params['org_ID'] ).', $user_ID$ )">$uorg_role$</a>',
+		);
 	}
 
 	if( $params['display_gender'] )
@@ -5188,7 +5492,7 @@ function users_results( & $UserList, $params = array() )
 				'td_class' => $params['td_class_lastvisit'],
 				'order' => 'user_lastseen_ts',
 				'default_dir' => 'D',
-				'td' => '%mysql2localedate( #user_lastseen_ts#, "M-d" )%',
+				'td' => '%get_lastseen_date( #user_lastseen_ts#, \''.$params['display_lastvisit_view'].'\', '.$params['display_lastvisit_cheat'].' )%',
 			);
 	}
 
@@ -5221,7 +5525,7 @@ function users_results( & $UserList, $params = array() )
 	if( $params['display_group'] && $UserList->filters['group'] == -1 )
 	{ // List is ungrouped, Display column with group name
 		$UserList->cols[] = array(
-				'th' => T_('Primary Group'),
+				'th' => T_('Primary<br />Group'),
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'shrinkwrap small',
 				'order' => 'grp_name',
@@ -5232,11 +5536,11 @@ function users_results( & $UserList, $params = array() )
 	if( $params['display_sec_groups'] )
 	{	// Display column with count of secondary groups:
 		$UserList->cols[] = array(
-				'th' => T_('Sec. Groups'),
+				'th' => T_('Sec.<br />Groups'),
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'shrinkwrap small',
 				'order' => 'grp_name',
-				'td' => '%conditional( #secondary_groups_count#, "<span class=\"label label-info\">#secondary_groups_count#</span>", "" )%',
+				'td' => '%user_td_sec_groups( #user_ID#, #secondary_groups_count# )%',
 			);
 	}
 
@@ -5297,6 +5601,16 @@ function users_results( & $UserList, $params = array() )
 					'th_class' => 'small',
 					'td_class' => 'shrinkwrap small',
 					'td' => '%user_td_actions( #user_ID# )%'
+				);
+		}
+
+		if( $params['display_org_actions'] )
+		{
+			$UserList->cols[] = array(
+					'th' => T_('Actions'),
+					'th_class' => 'small',
+					'td_class' => 'shrinkwrap small',
+					'td' => '%user_td_org_actions( '.intval( $params['org_ID'] ).', #user_ID# )%'
 				);
 		}
 	}
@@ -5364,7 +5678,39 @@ function user_td_grp_name( $user_ID, $group_name, $group_level )
 	}
 
 	// Group level:
-	$r .= '<br />'.T_('Level').': '.$group_level;
+	$r .= '<div class="note">'.T_('Level').': '.$group_level.'</div>';
+
+	return $r;
+}
+
+
+/**
+ * Get info about secondary groups for cell of users table
+ *
+ * @param integer User ID
+ * @param integer Secondary groups count
+ * @return string
+ */
+function user_td_sec_groups( $user_ID, $secondary_groups_count )
+{
+	global $current_User;
+
+	if( empty( $secondary_groups_count ) )
+	{	// No secondary groups:
+		return '';
+	}
+
+	$r = $secondary_groups_count;
+
+	if( is_logged_in() && $current_User->can_moderate_user( $user_ID ) )
+	{	// Make a link to update the groups if current user can moderate this user:
+		global $admin_url;
+		$r = '<a href="'.$admin_url.'?ctrl=user&amp;user_tab=admin&amp;user_ID='.$user_ID.'" class="label label-info">'.$r.'</a>';
+	}
+	else
+	{
+		$r = '<span class="label label-info">'.$r.'</span>';
+	}
 
 	return $r;
 }
@@ -5554,6 +5900,34 @@ function user_td_actions( $user_ID )
 			$r .= get_icon( 'delete', 'noimg' );
 		}
 	}
+
+	return $r;
+}
+
+/**
+ * Get user level as link to edit ot as simple text to view
+ *
+ * @param integer User_ID
+ * @param integer User Level
+ * @return string
+ */
+function user_td_org_actions( $org_ID, $user_ID )
+{
+	global $current_User;
+
+	$r = '';
+	if( $current_User->can_moderate_user( $user_ID ) )
+	{ // Current user can moderate this user
+		$link_params = array(
+				'onclick' => 'return user_edit( '.$org_ID.', '.$user_ID.' );'
+			);
+		$r .= action_icon( T_('Edit membership...'), 'edit', '#', NULL, NULL, NULL, $link_params );
+	}
+	else
+	{
+		$r .= get_icon( 'edit', 'noimg' );
+	}
+
 
 	return $r;
 }

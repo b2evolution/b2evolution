@@ -52,14 +52,14 @@ class ResultSel extends Results
 	 * @param string default ordering of columns (special syntax) if not URL specified
 	 * @param integer number of lines displayed on one screen
 	 */
-	function ResultSel( $field_ID, $table_selections, $field_sel_ID, $field_sel_name,
+	function __construct( $field_ID, $table_selections, $field_sel_ID, $field_sel_name,
 											$table_objsel, $field_selected, $field_selection, $current_selection_ID,
 											$sql, $count_sql = NULL, $param_prefix = '', $default_order = '', $limit = 20 )
 	{
 		global $current_User;
 
 		// Call parent:
-		parent::Results( $sql, $param_prefix, $default_order, $limit, $count_sql );
+		parent::__construct( $sql, $param_prefix, $default_order, $limit, $count_sql );
 
 		if( ! $current_User->check_perm( 'selections', 'view' ) )
 		{	// User is NOT allowed to view selections

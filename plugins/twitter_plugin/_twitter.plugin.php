@@ -47,7 +47,7 @@ class twitter_plugin extends Plugin
 	 */
 	var $code = 'evo_twitter';
 	var $priority = 50;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $author = 'b2evolution Group';
 
 	/*
@@ -143,9 +143,14 @@ class twitter_plugin extends Plugin
 		return $this->send_a_tweet( $content, $params['Item'], $params['xmlrpcresp'] );
 	}
 
+
 	/**
-	 * Allowing the user to specify their twitter account name and password.
+	 * Define the PER-USER settings of the plugin here. These can then be edited by each user.
 	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating
 	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
 	function GetDefaultUserSettings( & $params )
@@ -170,6 +175,47 @@ class twitter_plugin extends Plugin
 					'note' => T_('$title$, $excerpt$ and $url$ will be replaced appropriately.'),
 				),
 			);
+	}
+
+
+	/**
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinBeginHtmlHead( & $params )
+	{
+		global $Blog, $Item;
+
+		if( $Blog && $Blog->get_setting( 'tags_twitter_card' ) )
+		{
+			if( $Item )
+			{
+				$Item->get_creator_User();
+			}
+
+			$params = array_merge( array(
+					'blog_ID' => $Blog->ID,
+					'user_ID' => isset( $Item->creator_user_ID ) ? $Item->creator_user_ID : NULL
+				), $params );
+
+			$oauth_info = $this->get_oauth_info( $params );
+
+			if( ! empty( $oauth_info['token'] ) && isset( $oauth_info['contact'] ) )
+			{
+				echo '<meta property="twitter:creator" content="@'.$oauth_info['contact'].'" />'."\n";
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 

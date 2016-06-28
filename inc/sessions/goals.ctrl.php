@@ -106,7 +106,7 @@ switch( $action )
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_Goal = duplicate( $edited_Goal ); // PHP4/5 abstraction
+			$edited_Goal = clone $edited_Goal;
 			$edited_Goal->ID = 0;
 		}
 		break;
@@ -138,42 +138,27 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Insert in DB:
-			$DB->begin();
-			$q = $edited_Goal->dbexists();
-			if($q)
-			{	// We have a duplicate entry:
+			$edited_Goal->dbinsert();
+			$Messages->add( T_('New goal created.'), 'success' );
 
-				param_error( 'goal_key',
-					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
-						'href="?ctrl=goals&amp;action=edit&amp;blog='.$Blog->ID.'&amp;goal_ID='.$q.'"' ) );
-			}
-			else
+			// What next?
+			switch( $action )
 			{
-				$edited_Goal->dbinsert();
-				$Messages->add( T_('New goal created.'), 'success' );
-			}
-			$DB->commit();
-
-			if( empty($q) )
-			{	// What next?
-				switch( $action )
-				{
-					case 'create_copy':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=goals&action=new&blog='.$Blog->ID.'&goal_ID='.$edited_Goal->ID, 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create_new':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=goals&action=new&blog='.$Blog->ID, 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=goals&blog='.$Blog->ID, 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-				}
+				case 'create_copy':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=goals&action=new'.( isset( $Blog ) ? '&blog='.$Blog->ID : '' ).'&goal_ID='.$edited_Goal->ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create_new':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=goals&action=new'.( isset( $Blog ) ? '&blog='.$Blog->ID : '' ), 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=goals'.( isset( $Blog ) ? '&blog='.$Blog->ID : '' ), 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
 			}
 		}
 		break;
@@ -195,29 +180,13 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Update in DB:
-			$DB->begin();
-			$q = $edited_Goal->dbexists();
-			if($q)
-			{	// We have a duplicate entry:
+			$edited_Goal->dbupdate();
+			$Messages->add( T_('Goal updated.'), 'success' );
 
-				param_error( 'goal_key',
-					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
-						'href="?ctrl=goals&amp;action=edit&amp;blog='.$Blog->ID.'&amp;goal_ID='.$q.'"' ) );
-			}
-			else
-			{
-				$edited_Goal->dbupdate();
-				$Messages->add( T_('Goal updated.'), 'success' );
-			}
-			$DB->commit();
-
-			if( empty($q) )
-			{
-				$action = 'list';
-				// Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( '?ctrl=goals&blog='.$Blog->ID, 303 ); // Will EXIT
-				// We have EXITed already at this point!!
-			}
+			$action = 'list';
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=goals'.( isset( $Blog ) ? '&blog='.$Blog->ID : '' ), 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
 
 
@@ -269,7 +238,7 @@ switch( $action )
 		}
 		else
 		{ // Duplicate object in order no to mess with the cache:
-			$edited_GoalCategory = duplicate( $edited_GoalCategory ); // PHP4/5 abstraction
+			$edited_GoalCategory = clone $edited_GoalCategory;
 			$edited_GoalCategory->ID = 0;
 		}
 		break;

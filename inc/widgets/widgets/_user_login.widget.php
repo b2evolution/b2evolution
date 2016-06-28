@@ -28,10 +28,10 @@ class user_login_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function user_login_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'user_login' );
+		parent::__construct( $db_row, 'core', 'user_login' );
 	}
 
 
@@ -184,8 +184,7 @@ class user_login_Widget extends ComponentWidget
 		global $Settings, $Plugins;
 
 		//get required js files for _widget_login.form
-		$transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
-		if( $transmit_hashed_password )
+		if( transmit_hashed_password() )
 		{ // Include JS for client-side password hashing:
 			require_js( 'build/sha1_md5.bmin.js', 'blog' );
 		}

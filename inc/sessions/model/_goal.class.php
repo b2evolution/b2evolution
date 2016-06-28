@@ -38,10 +38,10 @@ class Goal extends DataObject
 	 *
 	 * @param object Database row
 	 */
-	function Goal( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_track__goal', 'goal_', 'goal_ID' );
+		parent::__construct( 'T_track__goal', 'goal_', 'goal_ID' );
 
 		if( $db_row )
 		{
@@ -188,6 +188,18 @@ class Goal extends DataObject
 		param( 'goal_notes', 'text' );
 		$this->set_from_Request( 'notes', 'goal_notes' );
 
+		if( ! param_errors_detected() )
+		{	// Check goal key for duplicating:
+			$existing_goal_ID = $this->dbexists( 'goal_key', $this->get( 'key' ) );
+			if( $existing_goal_ID )
+			{	// We have a duplicate goal:
+				global $Blog;
+				param_error( 'goal_key',
+					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
+						'href="?ctrl=goals&amp;action=edit'.( isset( $Blog ) ? '&amp;blog='.$Blog->ID : '' ).'&amp;goal_ID='.$existing_goal_ID.'"' ) );
+			}
+		}
+
 		return ! param_errors_detected();
 	}
 
@@ -224,17 +236,6 @@ class Goal extends DataObject
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
-	}
-
-
-	/**
-	 * Check existence of specified goal in goal_key unique field.
-	 *
-	 * @return int ID if goal exists otherwise NULL/false
-	 */
-	function dbexists()
-	{
-		return parent::dbexists('goal_key', $this->key);
 	}
 
 

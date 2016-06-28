@@ -3,7 +3,11 @@
  * It now also contains all sorts of base styles like the toolbar and debug for backward comaptibility with older skins... :/
  */
 
+// CSS to show containers, widgets and includes:
 @import "_dev-blocks.module.less";
+// Styles for results table on AJAX data loading:
+@import "_results_ajax_loading.module.less";
+
 @import "inc/toolbar.inc.less";
 @import "inc/tooltip.inc.less";
 @import "inc/user_colors.inc.less";
@@ -46,7 +50,6 @@ img.flagtop {
 	border:1px solid #000;
 }
 img.loadimg {
-	display: inline-block;
 	min-width: 64px;
 	min-height: 64px;
 	background: url(../img/ajax-loader/fff.gif) no-repeat center;
@@ -322,6 +325,9 @@ input[type=checkbox]
 }
 fieldset div.notes {
 	margin: 0 0 1ex 3ex;
+}
+.evo_label_inline {
+	margin-left: 2ex;
 }
 // Used for action icons
 div.right_icons,

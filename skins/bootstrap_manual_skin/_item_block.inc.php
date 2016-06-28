@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $Blog;
+global $Item, $Blog, $app_version;
 
 // Default params:
 $params = array_merge( array(
@@ -69,7 +69,7 @@ $params = array_merge( array(
 			'text'   => '#icon#',
 			'class'  => button_class(),
 		) );
-	if( $Item->is_intro() && $Item->ityp_ID > 1500 )
+	if( $Item->is_intro() )
 	{ // Link to edit category
 		$ItemChapter = & $Item->get_main_Chapter();
 		if( !empty( $ItemChapter ) )
@@ -107,7 +107,6 @@ $params = array_merge( array(
 		<div class="evo_container evo_container__item_single">
 		<?php
 		// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-		// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 		// Display container contents:
 		skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
@@ -119,15 +118,25 @@ $params = array_merge( array(
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
 			// Template params for "Item Tags" widget
-			'widget_coll_item_tags_before'    => '<div class="small text-muted">'.T_('Tags').': ',
-			'widget_coll_item_tags_after'     => '</div>',
-			'widget_coll_item_tags_separator' => ', ',
+			'widget_item_tags_before'    => '<div class="small text-muted">'.T_('Tags').': ',
+			'widget_item_tags_after'     => '</div>',
+			'widget_item_tags_separator' => ', ',
 			// Template params for "Small Print" widget
-			'widget_coll_small_print_before'         => '<p class="small text-muted">',
-			'widget_coll_small_print_after'          => '</p>',
-			'widget_coll_small_print_display_author' => false,
+			'widget_item_small_print_before'         => '<p class="small text-muted">',
+			'widget_item_small_print_after'          => '</p>',
+			'widget_item_small_print_display_author' => false,
 			// Params for skin file "_item_content.inc.php"
-			'widget_coll_item_content_params' => $params,
+			'widget_item_content_params' => $params,
+			// Template params for "Item Attachments" widget:
+			'widget_item_attachments_params' => array(
+					'limit_attach'       => 1000,
+					'before'             => '<div class="evo_post_attachments"><h3>'.T_('Attachments').':</h3><ul class="evo_files">',
+					'after'              => '</ul></div>',
+					'before_attach'      => '<li class="evo_file">',
+					'after_attach'       => '</li>',
+					'before_attach_size' => ' <span class="evo_file_size">(',
+					'after_attach_size'  => ')</span>',
+				),
 		) );
 		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 		?>
@@ -156,12 +165,12 @@ $params = array_merge( array(
 			$Item->author( array(
 					'before'    => T_('Created by '),
 					'after'     => ' &bull; ',
-					'link_text' => 'name',
+					'link_text' => 'auto',
 				) );
 			$Item->lastedit_user( array(
 					'before'    => T_('Last edit by '),
 					'after'     => T_(' on ').$Item->get_mod_date( 'F jS, Y' ),
-					'link_text' => 'name',
+					'link_text' => 'auto',
 				) );
 			'</p>';
 			echo $Item->get_history_link( array(
@@ -184,18 +193,24 @@ $params = array_merge( array(
 	?>
 
 	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
 		// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
 		skin_include( '_item_workflow.inc.php' );
 		// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
+	}
 	?>
 
 	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
 		// ------------------ META COMMENTS INCLUDED HERE ------------------
 		skin_include( '_item_meta_comments.inc.php', array(
 				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
 				'comment_end'           => '</article>',
 			) );
 		// ---------------------- END OF META COMMENTS ---------------------
+	}
 	?>
 
 	<?php

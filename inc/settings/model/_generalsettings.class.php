@@ -32,7 +32,7 @@ class GeneralSettings extends AbstractSettings
 	 * @var array
 	 */
 	var $_defaults = array(
-		'admin_skin' => 'chicago',
+		'admin_skin' => 'bootstrap',
 
 		'antispam_last_update' => '2000-01-01 00:00:00',
 		'antispam_threshold_publish' => '-90',
@@ -61,7 +61,9 @@ class GeneralSettings extends AbstractSettings
 		'notification_long_name' => '', // notification emails will use this as long site name
 		'notification_logo' => '', // notification emails will use this as url to site logo
 
+		'email_campaign_send_mode' => 'immediate', // Sending mode for campaign
 		'email_campaign_chunk_size' => 50, // Chunk size of emails to send a campaign at a time
+		'email_campaign_cron_repeat' => 300, // Delay between chunks on scheduled campaign job runs
 
 		'fm_enable_create_dir' => '1',
 		'fm_enable_create_file' => '1',
@@ -104,8 +106,10 @@ class GeneralSettings extends AbstractSettings
 		'def_notify_unread_messages' => '1',
 		'def_notify_published_comments' => '1',
 		'def_notify_comment_moderation' => '1',
+		'def_notify_edit_cmt_moderation' => '1',
 		'def_notify_meta_comments' => '1',
 		'def_notify_post_moderation' => '1',
+		'def_notify_edit_pst_moderation' => '1',
 		'def_newsletter_news' => '1',
 		'def_newsletter_ads' => '0',
 		'def_notification_email_limit' => '3',

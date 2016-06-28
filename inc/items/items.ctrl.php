@@ -43,6 +43,7 @@ global $Blog;
 global $dispatcher;
 
 $action = param_action( 'list' );
+$orig_action = $action; // Used to know what action is called really
 
 $AdminUI->set_path( 'collections', 'posts' );	// Sublevel may be attached below
 
@@ -479,8 +480,8 @@ switch( $action )
 		// but we need to make sure the requested/default one is ok:
 		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status );
 
-		// Check if new category was started to create. If yes then set up parameters for next page
-		check_categories_nosave ( $post_category, $post_extracats );
+		// Check if new category was started to create. If yes then set up parameters for next page:
+		check_categories_nosave( $post_category, $post_extracats, $edited_Item, ( $action == 'new_switchtab' ? 'frontoffice' : 'backoffice' ) );
 
 		$edited_Item->set ( 'main_cat_ID', $post_category );
 		if( $edited_Item->main_cat_ID && ( get_allow_cross_posting() < 2 ) && $edited_Item->get_blog_ID() != $blog )
@@ -494,32 +495,19 @@ switch( $action )
 		// Trackback addresses (never saved into item)
 		param( 'trackback_url', 'string', '' );
 
-		// Page title:
-		switch( param( 'item_typ_ID', 'integer', 1 ) )
-		{
-			case 1000:
-				$title = T_('New page');
-				break;
+		// Item type ID:
+		param( 'item_typ_ID', 'integer', 1 );
 
-			case 1600:
-				$title = T_('New intro');
-				break;
-
-			case 2000:
-				$title = T_('New podcast episode');
-				break;
-
-			case 3000:
-				$title = T_('New link');
-				break;
-
-			case 4000:
-				$title = T_('New advertisement');
-				break;
-
-			default:
-				$title = T_('New post');
-				break;
+		// Initialize a page title depending on item type:
+		if( empty( $item_typ_ID ) )
+		{	// No selected item type, use default:
+			$title = T_('New post');
+		}
+		else
+		{	// Get item type to set a pge title:
+			$ItemTypeCache = & get_ItemTypeCache();
+			$ItemType = & $ItemTypeCache->get_by_ID( $item_typ_ID );
+			$title = sprintf( T_('New %s'), $ItemType->get_name() );
 		}
 
 		$AdminUI->breadcrumbpath_add( $title, '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$item_typ_ID );
@@ -568,36 +556,13 @@ switch( $action )
 		$post_comment_status = $edited_Item->get( 'comment_status' );
 		$post_extracats = postcats_get_byID( $p );
 
-		// Check if new category was started to create. If yes then set up parameters for next page
-		check_categories_nosave ( $post_category, $post_extracats );
+		// Check if new category was started to create. If yes then set up parameters for next page:
+		check_categories_nosave( $post_category, $post_extracats, $edited_Item );
 
-		// Page title:
-		switch( $edited_Item->ityp_ID )
-		{
-			case 1000:
-				$title = T_('Duplicate page');
-				break;
-
-			case 1600:
-				$title = T_('Duplicate intro');
-				break;
-
-			case 2000:
-				$title = T_('Duplicate podcast episode');
-				break;
-
-			case 3000:
-				$title = T_('Duplicate link');
-				break;
-
-			case 4000:
-				$title = T_('Duplicate advertisement');
-				break;
-
-			default:
-				$title = T_('Duplicate post');
-				break;
-		}
+		// Initialize a page title depending on item type:
+		$ItemTypeCache = & get_ItemTypeCache();
+		$ItemType = & $ItemTypeCache->get_by_ID( $edited_Item->ityp_ID );
+		$title = sprintf( T_('Duplicate %s'), $ItemType->get_name() );
 
 		$AdminUI->breadcrumbpath_add( $title, '?ctrl=items&amp;action=copy&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
 
@@ -624,8 +589,8 @@ switch( $action )
 		// from tab to tab via javascript when the editor wants to switch views...
 		$edited_Item->load_from_Request( true ); // needs Blog set
 
-		// Check if new category was started to create. If yes then set up parameters for next page
-		check_categories_nosave( $post_category, $post_extracats );
+		// Check if new category was started to create. If yes then set up parameters for next page:
+		check_categories_nosave( $post_category, $post_extracats,$edited_Item, ( $action == 'edit_switchtab' ? 'frontoffice' : 'backoffice' ) );
 
 		$edited_Item->set( 'main_cat_ID', $post_category );
 		if( $edited_Item->main_cat_ID && ( get_allow_cross_posting() < 2 ) && $edited_Item->get_blog_ID() != $blog )
@@ -727,6 +692,9 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
+		// Restrict item status to max allowed by item collection:
+		$edited_Item->restrict_status_by_collection();
+
 		$post_comment_status = $edited_Item->get( 'comment_status' );
 		$post_extracats = postcats_get_byID( $p ); // NOTE: dh> using $edited_Item->get_Chapters here instead fails (empty list, since no postIDlist).
 
@@ -751,6 +719,11 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'item' );
 
+		// Get params to skip/force/mark notifications and pings:
+		param( 'item_members_notified', 'string', NULL );
+		param( 'item_community_notified', 'string', NULL );
+		param( 'item_pings_sent', 'string', NULL );
+
 		// We need early decoding of these in order to check permissions:
 		param( 'post_status', 'string', 'published' );
 
@@ -759,8 +732,11 @@ switch( $action )
 			$post_status = load_publish_status( true );
 		}
 
-		// Check if new category was started to create. If yes check if it is valid.
+		// Check if new category was started to create. If yes check if it is valid:
 		check_categories( $post_category, $post_extracats );
+
+		// Check if allowed to cross post.
+		check_cross_posting( $post_category, $post_extracats );
 
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post!'.$post_status, 'create', true, $post_extracats );
@@ -871,7 +847,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( true, $exit_after_save );
+		$edited_Item->handle_notifications( NULL, true, $item_members_notified, $item_community_notified, $item_pings_sent );
 
 		$Messages->add( T_('Post has been created.'), 'success' );
 
@@ -944,6 +920,11 @@ switch( $action )
 		// Update the folding positions for current user
 		save_fieldset_folding_values( $Blog->ID );
 
+		// Get params to skip/force/mark notifications and pings:
+		param( 'item_members_notified', 'string', NULL );
+		param( 'item_community_notified', 'string', NULL );
+		param( 'item_pings_sent', 'string', NULL );
+
 		// We need early decoding of these in order to check permissions:
 		param( 'post_status', 'string', 'published' );
 
@@ -952,16 +933,22 @@ switch( $action )
 			$post_status = load_publish_status();
 		}
 
-		// Check if new category was started to create.  If yes check if it is valid.
-		$isset_category = check_categories( $post_category, $post_extracats );
+		// Check if new category was started to create.  If yes check if it is valid:
+		$isset_category = check_categories( $post_category, $post_extracats, $edited_Item );
+
+		// Check if allowed to cross post.
+		if( ! check_cross_posting( $post_category, $post_extracats, $edited_Item->main_cat_ID ) )
+		{
+			break;
+		}
 
 		// Get requested Post Type:
 		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
 		// Check permission on post type: (also verifies that post type is enabled and NOT reserved)
 		check_perm_posttype( $item_typ_ID, $post_extracats );
 
-		// Is this post already published?
-		$was_published = $edited_Item->status == 'published';
+		// Is this post publishing right now?
+		$is_publishing = ( $edited_Item->get( 'status' ) != 'published' && $post_status == 'published' );
 
 		// UPDATE POST:
 		// Set the params we already got:
@@ -969,6 +956,33 @@ switch( $action )
 
 		if( $isset_category )
 		{ // we change the categories only if the check was succesful
+
+			// get current extra_cats that are in collections where current user is not a coll admin
+			$ChapterCache = & get_ChapterCache();
+
+			$prev_extra_cat_IDs = postcats_get_byID( $edited_Item->ID );
+			$off_limit_cats = array();
+			$r = array();
+
+			foreach( $prev_extra_cat_IDs as $cat )
+			{
+				$cat_blog = get_catblog( $cat );
+				if( ! $current_User->check_perm( 'blog_admin', '', false, $cat_blog ) )
+				{
+					$Chapter = $ChapterCache->get_by_ID( $cat );
+					$off_limit_cats[$cat] = $Chapter;
+					$r[] = '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->dget( 'name' ).'</a>';
+				}
+			}
+
+			if( $off_limit_cats )
+			{
+				$Messages->add( sprintf( T_('Please note: this item is also cross-posted to the following other categories/collections: %s'),
+						implode( ', ', $r ) ), 'note' );
+			}
+
+			$post_extracats = array_unique( array_merge( $post_extracats,array_keys( $off_limit_cats ) ) );
+
 			$edited_Item->set( 'main_cat_ID', $post_category );
 			$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 		}
@@ -1009,7 +1023,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( false, $exit_after_save );
+		$edited_Item->handle_notifications( NULL, false, $item_members_notified, $item_community_notified, $item_pings_sent );
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
@@ -1045,8 +1059,8 @@ switch( $action )
 		{	// Use the original $redirect_to if a post is updated from "manual" view tab:
 			$blog_redirect_setting = 'orig';
 		}
-		elseif( ! $was_published && $edited_Item->status == 'published' )
-		{ // The post's last status wasn't "published", but we're going to publish it now.
+		elseif( $is_publishing )
+		{	// The post's last status wasn't "published", but we're going to publish it now:
 			$edited_Item->load_Blog();
 			$blog_redirect_setting = $edited_Item->Blog->get_setting( 'enable_goto_blog' );
 		}
@@ -1134,7 +1148,7 @@ switch( $action )
 			}
 
 			// Set redirect back to items list with new item type tab
-			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type='.$edited_Item->get_type_setting( 'backoffice_tab' ).'&filter=restore';
+			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type='.$edited_Item->get_type_setting( 'usage' ).'&filter=restore';
 		}
 		else
 		{ // Set default redirect urls (It goes from the item edit form)
@@ -1188,8 +1202,12 @@ switch( $action )
 			// Update item to set new type right now
 			$edited_Item->dbupdate();
 
-			// Set redirect back to items list with new item type tab
-			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type='.$edited_Item->get_type_setting( 'backoffice_tab' ).'&filter=restore';
+			// Execute or schedule notifications & pings:
+			$edited_Item->handle_notifications();
+
+			// Set redirect back to items list with new item type tab:
+			$tab = get_tab_by_item_type_usage( $edited_Item->get_type_setting( 'usage' ) );
+			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type='.( $tab ? $tab[0] : 'post' ).'&filter=restore';
 
 			// Highlight the updated item in list
 			$Session->set( 'highlight_id', $edited_Item->ID );
@@ -1265,9 +1283,11 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		$post_status = ( $action == 'publish_now' ) ? 'published' : param( 'post_status', 'string', 'published' );
+
 		// Check permissions:
 		/* TODO: Check extra categories!!! */
 		$current_User->check_perm( 'item_post!'.$post_status, 'edit', true, $edited_Item );
+
 		$edited_Item->set( 'status', $post_status );
 
 		if( $action == 'publish_now' )
@@ -1281,8 +1301,13 @@ switch( $action )
 		// UPDATE POST IN DB:
 		$edited_Item->dbupdate();
 
+		// Get params to skip/force/mark notifications and pings:
+		param( 'item_members_notified', 'string', NULL );
+		param( 'item_community_notified', 'string', NULL );
+		param( 'item_pings_sent', 'string', NULL );
+
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( false );
+		$edited_Item->handle_notifications( NULL, false, $item_members_notified, $item_community_notified, $item_pings_sent );
 
 		// Set the success message corresponding for the new status
 		switch( $edited_Item->status )
@@ -1436,7 +1461,7 @@ switch( $action )
  */
 function init_list_mode()
 {
-	global $tab, $tab_type, $Blog, $UserSettings, $ItemList, $AdminUI;
+	global $tab, $tab_type, $Blog, $UserSettings, $ItemList, $AdminUI, $current_User;
 
 	// set default itemslist param prefix
 	$items_list_param_prefix = 'items_';
@@ -1455,7 +1480,7 @@ function init_list_mode()
 		$UserSettings->param_Request( 'tab_type', 'pref_browse_tab_type', 'string', NULL, true /* memorize */, true /* force */ );
 	}
 
-	if( $tab == 'tracker' && ! $Blog->get_setting( 'use_workflow' ) )
+	if( $tab == 'tracker' && ( ! $Blog->get_setting( 'use_workflow' ) || ! $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) ) )
 	{ // Display workflow view only if it is enabled
 		global $Messages;
 		$Messages->add( T_('Workflow feature has not been enabled for this collection.'), 'note' );
@@ -1493,7 +1518,7 @@ function init_list_mode()
 	{
 		case 'full':
 			$ItemList->set_default_filters( array(
-					'types' => NULL, // All types (suited for tab with full posts)
+					'itemtype_usage' => NULL // All types
 				) );
 			// $AdminUI->breadcrumbpath_add( T_('All items'), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;filter=restore' );
 
@@ -1507,7 +1532,7 @@ function init_list_mode()
 			if( $Blog->get( 'type' ) != 'manual' )
 			{	// Display this tab only for manual blogs
 				global $admin_url;
-				header_redirect( $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type=posts&filter=restore' );
+				header_redirect( $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type=post&filter=restore' );
 			}
 
 			global $ReqURI, $blog;
@@ -1522,7 +1547,7 @@ function init_list_mode()
 		case 'type':
 			// Filter a posts list by type
 			$ItemList->set_default_filters( array(
-					'types' => get_item_types_by_tab( $tab_type ),
+					'itemtype_usage' => implode( ',', get_item_type_usage_by_tab( $tab_type ) ),
 				) );
 			$AdminUI->breadcrumbpath_add( T_( $tab_type ), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab_type='.urlencode( $tab_type ).'&amp;filter=restore' );
 			break;
@@ -1535,7 +1560,7 @@ function init_list_mode()
 			$AdminUI->breadcrumbpath_add( T_( 'Workflow view' ), '?ctrl=items&amp;blog=$blog$&amp;tab=tracker&amp;filter=restore' );
 
 			$AdminUI->set_page_manual_link( 'workflow-features' );
-			
+
 			// JS to edit priority of items from list view
 			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 			break;
@@ -1721,12 +1746,19 @@ switch( $action )
 attach_browse_tabs();
 
 
-if( isset( $edited_Item ) && ( $ItemType = & $edited_Item->get_ItemType() ))
-{ // Set a tab type for edited item
+if( isset( $edited_Item ) && ( $ItemType = & $edited_Item->get_ItemType() ) )
+{	// Set a tab type for edited/viewed item:
 	$tab = 'type';
-	$tab_type = $ItemType->backoffice_tab;
+	if( $tab_type = get_tab_by_item_type_usage( $ItemType->usage ) )
+	{	// Only if tab exists for current item type usage:
+		$tab_type = $tab_type[0];
+	}
+	else
+	{
+		$tab_type = 'all';
+	}
 }
-//pre_dump( 1,1,1,1, )
+
 if( ! empty( $tab ) && $tab == 'type' )
 { // Set a path from dynamic tabs
 	$AdminUI->append_path_level( 'type_'.str_replace( ' ', '_', utf8_strtolower( $tab_type ) ) );
@@ -1768,8 +1800,16 @@ if( !empty( $Blog ) )
 */
 
 if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action, 'new' ) !== false )
-{ // Initialize js to autocomplete usernames in post/comment form
+{	// Initialize js to autocomplete usernames in post/comment form
 	init_autocomplete_usernames_js();
+	// Require colorbox js:
+	require_js_helper( 'colorbox' );
+	// Require File Uploader js and css:
+	require_js( 'multiupload/fileuploader.js' );
+	require_css( 'fileuploader.css' );
+	// Load JS files to make the links table sortable:
+	require_js( '#jquery#' );
+	require_js( 'jquery/jquery.sortable.min.js' );
 }
 
 if( in_array( $action, array( 'new', 'copy', 'create_edit', 'create_link', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish', 'extract_tags' ) ) )
@@ -1812,7 +1852,7 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'browse-edit-tab' );
 		break;
 }
-if( $tab == 'manual' )
+if( get_param( 'tab' ) == 'manual' )
 {
 	$AdminUI->set_page_manual_link( 'manual-pages-editor' );
 }

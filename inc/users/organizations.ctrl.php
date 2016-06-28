@@ -56,7 +56,7 @@ switch( $action )
 		}
 		else
 		{ // Duplicate object in order no to mess with the cache:
-			$edited_Organization = duplicate( $edited_Organization ); // PHP4/5 abstraction
+			$edited_Organization = clone $edited_Organization;
 			$edited_Organization->ID = 0;
 			$edited_Organization->set( 'owner_user_ID', $current_User->ID );
 		}
@@ -207,7 +207,7 @@ switch( $action )
 		break;
 
 	case 'link_user':
-		// Add user to organization:
+		// Add user to organization/ Edit membership:
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'organization' );
@@ -227,16 +227,24 @@ switch( $action )
 			}
 		}
 
-		$accepted = param( 'accepted', 'string', 'yes' );
+		$accepted = param( 'accepted', 'string', '1' );
 		$role = param( 'role', 'string', '' );
+		$edit_mode = param( 'edit_mode', 'boolean' );
 
 		if( ! param_errors_detected() )
 		{	// Link user only when request has no errors:
 			$result = $DB->query( 'REPLACE INTO T_users__user_org ( uorg_user_ID, uorg_org_ID, uorg_accepted, uorg_role )
-				VALUES ( '.$login_User->ID.', '.$edited_Organization->ID.', '.( $accepted == 'yes' ? '1' : '0' ).', '.$DB->quote( $role ).' ) ' );
+				VALUES ( '.$login_User->ID.', '.$edited_Organization->ID.', '.$accepted.', '.$DB->quote( $role ).' ) ' );
 			if( $result )
 			{	// Display a message after successful linking:
-				$Messages->add( T_('Member has been added to the organization.'), 'success' );
+				if( $edit_mode )
+				{
+					$Messages->add( T_('Membership information updated.'), 'success');
+				}
+				else
+				{
+					$Messages->add( T_('Member has been added to the organization.'), 'success' );
+				}
 			}
 		}
 
@@ -299,6 +307,7 @@ switch( $action )
 		$AdminUI->disp_view( 'users/views/_organization.form.php' );
 		// Init JS for form to add user to organization:
 		echo_user_add_organization_js( $edited_Organization );
+		echo_user_edit_membership_js( $edited_Organization );
 		break;
 
 	case 'add_user':
@@ -309,6 +318,16 @@ switch( $action )
 			$debug_jslog = false;
 		}
 		$AdminUI->disp_view( 'users/views/_organization_user.form.php' );
+		break;
+
+	case 'edit_user':
+		// Form to edit user in organization
+		if( $display_mode == 'js' )
+		{
+			$debug = false;
+			$debug_jslog = false;
+		}
+		$AdminUI->disp_view( 'users/views/_organization_user_edit.form.php' );
 		break;
 
 

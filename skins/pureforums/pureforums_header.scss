@@ -86,16 +86,17 @@
 			}
 		}
 		.search_submit {
-			background: transparent url("../../rsc/icons/icons_sprite.png") -16px -176px no-repeat;
+			background: transparent none repeat scroll 0 0;
 			border: medium none;
-			width: 16px;
-			height: 16px;
-			margin: 9px;
+			border-radius: 5px;
+			cursor: pointer;
+			font-family: FontAwesome;
+			height: 34px;
+			margin: 0;
 			overflow: hidden;
 			position: absolute;
-			right: 15px;
-			text-indent: -10000px;
-			cursor: pointer;
+			right: 13px;
+			width: 25px;
 		}
 	}
 }

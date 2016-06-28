@@ -66,7 +66,7 @@ class code_highlight_plugin extends Plugin
 	var $name = 'Code highlight';
 	var $code = 'evo_code';
 	var $priority = 27;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $author = 'Astonish Me';
 	var $group = 'rendering';
 	var $help_topic = 'code-highlight-plugin';
@@ -114,15 +114,14 @@ class code_highlight_plugin extends Plugin
 
 
 	/**
-	 * Get the settings that the plugin can use.
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
 	 *
-	 * Those settings are transfered into a Settings member object of the plugin
-	 * and can be edited in the backoffice (Settings / Plugins).
-	 *
-	 * @see Plugin::GetDefaultSettings()
-	 * @see PluginSettings
-	 * @see Plugin::PluginSettingsValidateSet()
-	 * @return array
+	 * @param array Associative array of parameters (since v1.9).
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
+	 * @return array see {@link Plugin::GetDefaultSettings()}.
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
+	 * and assign an array with the following keys to them (only 'label' is required):
 	 */
 	function GetDefaultSettings( & $params )
 	{
@@ -145,15 +144,15 @@ class code_highlight_plugin extends Plugin
 
 
 	/**
-	 * Allowing the user to override the display of the toolbar.
+	 * Define the PER-USER settings of the plugin here. These can then be edited by each user.
 	 *
 	 * @see Plugin::GetDefaultSettings()
-	 * @see PluginSettings
-	 * @see Plugin::PluginSettingsValidateSet()
-	 *
-	 * @return array
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
-	function GetDefaultUserSettings()
+	function GetDefaultUserSettings( & $params )
 	{
 		return array(
 				'display_toolbar' => array(
@@ -467,7 +466,7 @@ class code_highlight_plugin extends Plugin
 	}
 
 
-	function BeforeCommentFormInsert( $params )
+	function BeforeCommentFormInsert( & $params )
 	{
 		$Comment = & $params['Comment'];
 		$comment_Item = & $Comment->get_Item();
@@ -611,33 +610,36 @@ class code_highlight_plugin extends Plugin
 
 
 	/**
-	 * Spits out the styles used
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
 	 *
-	 * @see Plugin::SkinBeginHtmlHead()
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
 	 */
-	function SkinBeginHtmlHead()
+	function SkinBeginHtmlHead( & $params )
 	{
 		global $Blog;
 
 		if( ! isset( $Blog ) || (
-		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' && 
+		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
 		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
 		{ // Don't load css/js files when plugin is not enabled
 			return;
 		}
 
-		require_css( $this->get_plugin_url().'amcode.css', true );
+		$this->require_css( 'amcode.css' );
 	}
 
 
 	/**
-	 * Spits out the styles used
+	 * Event handler: Called when ending the admin html head section.
 	 *
-	 * @see Plugin::AdminEndHtmlHead()
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
 	 */
-	function AdminEndHtmlHead()
+	function AdminEndHtmlHead( & $params )
 	{
-		$this->SkinBeginHtmlHead();
+		$this->SkinBeginHtmlHead( $params );
 	}
 
 

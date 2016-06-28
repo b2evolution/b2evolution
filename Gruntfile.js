@@ -1,22 +1,6 @@
-// In order to use Grunt:
-// - first install NodeJS on your system (http://nodejs.org), which includes the npm tool.
-// - then install the Grunt CLI on your system: (sudo) npm install -g grunt-cli
-// - then switch to the b2evolution folder (where this file resides) and install (locally in this dir) 
-//   everything that is needed: just type "npm install" - this will use the package.json file to know what to install.
-//   each of the required packages with "npm install xxx" for each of the Dependencies listed in package.json
-// - then, in order to be able to invoke 'grunt' on your system, type "sudo npm install -g grunt-cli". This will make
-//   grunt available from the Command Line Interface.
-// - ONCE IN A WHILE: run "npm update" to update all youe packages
-// In order to use Sass:
-// - Make sur Ruby is installed on your system (should be preinstalled on MacOSX. On windows: http://rubyinstaller.org)
-// - Type: "sudo gem install sass"
-// Once this is done, you can:
-// - type 'grunt' (in this dir) and run the default tasks
-// - type 'grunt xxx' where xxx is a specific task name
-// - type 'grunt watch' and grunt will start listening for file edits and run automatically 
-// Note for devs: when adding new plugins, use for example "npm install grunt-contrib-less --save-dev" 
-// to update the package.json file with the new plugin reference.
-
+// ---------------------------------------------------------------
+// To get started with Grunt: see http://b2evolution.net/man/grunt
+// ---------------------------------------------------------------
 module.exports = function(grunt) {
 
 	// Project configuration:
@@ -256,41 +240,77 @@ module.exports = function(grunt) {
 			// JS files that are used on front-office standard skins:
 			evo_frontoffice: {
 				options: {
-					banner: '/* This includes 4 files: src/evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js */\n'
+					banner: '/* This includes 6 files: src/evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/src/evo_modal_window.js', 'rsc/js/src/evo_user_crop.js', 'rsc/js/src/evo_user_report.js', 'rsc/js/src/evo_user_contact_groups.js'],
+				src: ['rsc/js/src/evo_modal_window.js',
+							'rsc/js/src/evo_images.js',
+							'rsc/js/src/evo_user_crop.js',
+							'rsc/js/src/evo_user_report.js',
+							'rsc/js/src/evo_user_contact_groups.js',
+							'rsc/js/src/evo_rest_api.js'],
 				dest: 'rsc/js/build/evo_frontoffice.bmin.js'
 			},
 			// JS files that are used on front-office bootstrap skins:
 			evo_frontoffice_bootstrap: {
 				options: {
-					banner: '/* This includes 4 files: src/bootstrap-evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js */\n'
+					banner: '/* This includes 6 files: src/bootstrap-evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/src/bootstrap-evo_modal_window.js', 'rsc/js/src/evo_user_crop.js', 'rsc/js/src/evo_user_report.js', 'rsc/js/src/evo_user_contact_groups.js'],
+				src: ['rsc/js/src/bootstrap-evo_modal_window.js',
+							'rsc/js/src/evo_images.js',
+							'rsc/js/src/evo_user_crop.js',
+							'rsc/js/src/evo_user_report.js',
+							'rsc/js/src/evo_user_contact_groups.js',
+							'rsc/js/src/evo_rest_api.js'],
 				dest: 'rsc/js/build/bootstrap-evo_frontoffice.bmin.js'
 			},
 			// JS files that are used on back-office standard skins:
 			evo_backoffice: {
 				options: {
-					banner: '/* This includes 11 files: functions.js, ajax.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, src/evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js, src/evo_user_org.js */\n'
+					banner: '/* This includes 14 files: functions.js, ajax.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, '+
+						'src/evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js, '+
+						'src/evo_user_org.js, src/evo_rest_api.js, src/evo_links.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/functions.js', 'rsc/js/ajax.js',
-							'rsc/js/form_extensions.js', 'rsc/js/extracats.js', 'rsc/js/dynamic_select.js', 'rsc/js/backoffice.js',
-							'rsc/js/src/evo_modal_window.js', 'rsc/js/src/evo_user_crop.js', 'rsc/js/src/evo_user_report.js', 'rsc/js/src/evo_user_deldata.js', 'rsc/js/src/evo_user_org.js'],
+				src: ['rsc/js/functions.js',
+							'rsc/js/ajax.js',
+							'rsc/js/form_extensions.js',
+							'rsc/js/extracats.js',
+							'rsc/js/dynamic_select.js',
+							'rsc/js/backoffice.js',
+							'rsc/js/src/evo_modal_window.js',
+							'rsc/js/src/evo_images.js',
+							'rsc/js/src/evo_user_crop.js',
+							'rsc/js/src/evo_user_report.js',
+							'rsc/js/src/evo_user_deldata.js',
+							'rsc/js/src/evo_user_org.js',
+							'rsc/js/src/evo_rest_api.js',
+							'rsc/js/src/evo_links.js'],
 				dest: 'rsc/js/build/evo_backoffice.bmin.js'
 			},
 			// JS files that are used on back-office bootstrap skins:
 			evo_backoffice_bootstrap: {
 				options: {
-					banner: '/* This includes 11 files: functions.js, ajax.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, src/bootstrap-evo_modal_window.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js, src/evo_user_org.js */\n'
+					banner: '/* This includes 14 files: functions.js, ajax.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, '+
+						'src/bootstrap-evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js, '+
+						'src/evo_user_org.js, src/evo_rest_api.js, src/evo_links.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/functions.js', 'rsc/js/ajax.js',
-							'rsc/js/form_extensions.js', 'rsc/js/extracats.js', 'rsc/js/dynamic_select.js', 'rsc/js/backoffice.js',
-							'rsc/js/src/bootstrap-evo_modal_window.js', 'rsc/js/src/evo_user_crop.js', 'rsc/js/src/evo_user_report.js', 'rsc/js/src/evo_user_deldata.js', 'rsc/js/src/evo_user_org.js'],
+				src: ['rsc/js/functions.js',
+							'rsc/js/ajax.js',
+							'rsc/js/form_extensions.js',
+							'rsc/js/extracats.js',
+							'rsc/js/dynamic_select.js',
+							'rsc/js/backoffice.js',
+							'rsc/js/src/bootstrap-evo_modal_window.js',
+							'rsc/js/src/evo_images.js',
+							'rsc/js/src/evo_user_crop.js',
+							'rsc/js/src/evo_user_report.js',
+							'rsc/js/src/evo_user_deldata.js',
+							'rsc/js/src/evo_user_org.js',
+							'rsc/js/src/evo_rest_api.js',
+							'rsc/js/src/evo_links.js'],
 				dest: 'rsc/js/build/bootstrap-evo_backoffice.bmin.js'
 			},
 		},

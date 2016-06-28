@@ -144,7 +144,7 @@ class Form extends Widget
 	 * @param string the form layout : 'fieldset', 'table' or '' (NULL means: if there is an {@link $AdminUI} object get it from there, otherwise use 'fieldset')
 	 * @param string Form encoding ("application/x-www-form-urlencoded" (default), "multipart/form-data" (uploads))
 	 */
-	function Form( $form_action = NULL, $form_name = '', $form_method = 'post', $layout = NULL, $enctype = '', $form_type = 'form' )
+	function __construct( $form_action = NULL, $form_name = '', $form_method = 'post', $layout = NULL, $enctype = '', $form_type = 'form' )
 	{
 		global $pagenow;
 
@@ -459,54 +459,6 @@ class Form extends Widget
 					$this->inputstart     = '<div class="input">';
 					$this->infostart      = '<div class="info">';
 					$this->inputend       = "</div>\n";
-					$this->fieldend       = "</fieldset>\n\n";
-					$this->buttonsstart   = '<fieldset><div class="label"></div><div class="input">'; // DIV.label for IE6
-					$this->buttonsend     = "</div></fieldset>\n\n";
-					$this->customstart    = '<div class="custom_content">';
-					$this->customend      = "</div>\n";
-					$this->note_format    = ' <span class="notes">%s</span>';
-					$this->formend        = '</div>';
-					// Additional params depending on field type:
-					// - checkbox
-					$this->fieldstart_checkbox    = $this->fieldstart;
-					$this->fieldend_checkbox      = $this->fieldend;
-					$this->inputclass_checkbox    = 'checkbox';
-					$this->inputstart_checkbox    = $this->inputstart;
-					$this->inputend_checkbox      = $this->inputend;
-					$this->checkbox_newline_start = '';
-					$this->checkbox_newline_end   = "<br />\n";
-					$this->checkbox_basic_start   = '<label>';
-					$this->checkbox_basic_end     = '</label>';
-					// - radio
-					$this->fieldstart_radio       = $this->fieldstart;
-					$this->fieldend_radio         = $this->fieldend;
-					$this->inputclass_radio       = 'radio';
-					$this->inputstart_radio       = $this->inputstart;
-					$this->inputend_radio         = $this->inputend;
-					$this->radio_label_format     = '<label class="radiooption" for="$radio_option_ID$">$radio_option_label$</label>';
-					$this->radio_newline_start    = "<div>\n";
-					$this->radio_newline_end      = "</div>\n";
-					$this->radio_oneline_start    = '';
-					$this->radio_oneline_end      = '';
-					break;
-
-				case 'chicago':		// Temporary dirty hack
-					$this->formclass      = '';
-					$this->formstart      = '<div>';// required before (no_)title_fmt for validation
-					$this->title_fmt      = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
-					$this->no_title_fmt   = '<span style="float:right">$global_icons$</span>'."\n";
-					$this->no_title_no_icons_fmt = "\n";
-					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
-																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
-					$this->fieldset_end   = '</fieldset>'."\n";
-					$this->fieldstart     = '<fieldset$ID$>'."\n";
-					$this->labelstart     = '<div class="label">';
-					$this->labelend       = "</div>\n";
-					$this->labelempty     = '<div class="label"></div>'; // so that IE6 aligns DIV.input correcctly
-					$this->inputstart     = '<div class="input">';
-					$this->inputend       = "</div>\n";
-					$this->infostart      = '<div class="info">';
-					$this->infoend        = "</div>\n";
 					$this->fieldend       = "</fieldset>\n\n";
 					$this->buttonsstart   = '<fieldset><div class="label"></div><div class="input">'; // DIV.label for IE6
 					$this->buttonsend     = "</div></fieldset>\n\n";
@@ -1206,7 +1158,8 @@ class Form extends Widget
 	function username( $field_name, &$User, $field_label, $field_note = '', $field_class = '', $field_params = array() )
 	{
 		$field_params = array_merge( array(
-				'note' => $field_note
+				'note' => $field_note,
+				'size' => 20,
 			), $field_params );
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
@@ -1215,7 +1168,7 @@ class Form extends Widget
 
 		$user_login = empty( $User ) ? '' : $User->login;
 
-		$r .= '<input type="text" class="form_text_input form-control autocomplete_login '.$field_class.'" value="'.$user_login.'" name="'.$field_name.'" id="'.$field_name.'" />';
+		$r .= '<input type="text" class="form_text_input form-control autocomplete_login '.$field_class.'" value="'.$user_login.'" name="'.$field_name.'" id="'.$field_name.'" size="'.$field_params['size'].'" />';
 
 		$r .= $this->end_field();
 
@@ -1596,7 +1549,7 @@ class Form extends Widget
 				    ( $p > 0 && $duration > $periods[ $p - 1 ]['seconds'] && $duration <= $period['seconds'] ) )
 				{
 					$period = $periods[ $p > 0 ? $p - 1 : 0 ];
-					$duration_value = ceil( $duration / $period['size'] );
+					$duration_value = floor( $duration / $period['size'] );
 					foreach( $periods_values as $v => $value )
 					{
 						if( $duration_value <= $value )
@@ -2550,6 +2503,12 @@ class Form extends Widget
 
 		foreach( $field_options as $l_key => $l_option )
 		{
+			if( is_array( $l_option ) )
+			{	// If option is array then it is a group of the options:
+				$r .= Form::get_select_group_options_string( array( $l_key => $l_option ), $field_value, $force_keys_as_values, $color_array );
+				continue;
+			}
+
 			// Get the value attribute from key if is_string():
 			$l_value = ($force_keys_as_values || is_string($l_key)) ? $l_key : $l_option;
 
@@ -2571,6 +2530,30 @@ class Form extends Widget
 
 			$r .= '>'.format_to_output($l_option).'</option>';
 		}
+		return $r;
+	}
+
+
+	/**
+	 * Get the grouped OPTION list as string for use in a SELECT.
+	 *
+	 * @param array Groups ( title => array( Options (key => value) )
+	 * @param string Selected value (if any)
+	 * @param boolean Force keys from $options as values? (Default: false, only array keys,
+	 *                which are strings will be used).
+	 * @return string
+	 */
+	static function get_select_group_options_string( $group_options, $field_value = NULL, $force_keys_as_values = false, $color_array = false )
+	{
+		$r = '';
+
+		foreach( $group_options as $group_title => $group_options )
+		{
+			$r .= '<optgroup label="'.format_to_output( $group_title, 'htmlattr' ).'">';
+			$r .= Form::get_select_options_string( $group_options, $field_value, $force_keys_as_values, $color_array );
+			$r .= '</optgroup>';
+		}
+
 		return $r;
 	}
 

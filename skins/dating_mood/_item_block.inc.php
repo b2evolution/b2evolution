@@ -50,10 +50,10 @@ $params = array_merge( array(
 				'text' => '#icon#',
 			) );
 		$Item->author( array(
-				'before'       => ' '.T_('by').' <strong>',
+				'before'       => /* TRANS: author name */ ' '.T_('by').' <strong>',
 				'after'        => '</strong>',
-				'link_to'		   => 'userpage',
-				'link_text'    => 'preferredname',
+				'link_to'      => 'userpage',
+				'link_text'    => 'auto',
 			) );
 		$Item->msgform_link( array(
 				'before'    => ' ',
@@ -80,7 +80,6 @@ $params = array_merge( array(
 	if( $disp == 'single' )
 	{
 		// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-		// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 		// Display container contents:
 		skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 			// The following (optional) params will be used as defaults for widgets included in this container:
@@ -91,10 +90,10 @@ $params = array_merge( array(
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
 			// Template params for "Item Tags" widget
-			'widget_coll_item_tags_before'    => '<div class="bSmallPrint">'.T_('Tags').': ',
-			'widget_coll_item_tags_after'     => '</div>',
+			'widget_item_tags_before'    => '<div class="bSmallPrint">'.T_('Tags').': ',
+			'widget_item_tags_after'     => '</div>',
 			// Params for skin file "_item_content.inc.php"
-			'widget_coll_item_content_params' => array( 'image_size' => 'fit-400x320' ),
+			'widget_item_content_params' => array( 'image_size' => 'fit-400x320' ),
 		) );
 		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 	}
@@ -161,7 +160,7 @@ $params = array_merge( array(
 				'before_section_title' => '<h4>',
 				'after_section_title'  => '</h4>',
 				'link_to' => 'userpage>userurl',
-				'author_link_text' => 'preferredname',
+				'author_link_text' => 'auto',
 			) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.

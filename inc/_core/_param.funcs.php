@@ -768,7 +768,7 @@ function param_check_valid_login( $var )
 		}
 		else
 		{
-			$msg = sprintf( T_('Logins cannot contain whitespace and the following characters: %s'), '\', ", >, <, @' );
+			$msg = sprintf( T_('Logins cannot contain whitespace and the following characters: %s'), '\', ", >, <, @, &' );
 		}
 		param_error( $var, $msg );
 		return false;
@@ -875,7 +875,7 @@ function param_check_filename( $var, $err_msg )
 	if( $error_filename = validate_filename( $GLOBALS[$var] ) )
 	{
 		param_error( $var, $error_filename );
-		syslog_insert( sprintf( 'File %s is invalid or has an unrecognized extension', '<b>'.$GLOBALS[$var].'</b>' ), 'warning', 'file' );
+		syslog_insert( sprintf( 'File %s is invalid or has an unrecognized extension', '[['.$GLOBALS[$var].']]' ), 'warning', 'file' );
 		return false;
 	}
 	return true;
@@ -1430,26 +1430,26 @@ function param_check_passwords( $var1, $var2, $required = false, $min_length = 6
 
 	if( ! strlen( $pass1 ) )
 	{
-		param_error( $var1, $params['msg_pass_new'] );
-		param_error( $var2, $params['msg_pass_twice'] );
+		param_error( $var1, '<span class="pass_check_new">'.$params['msg_pass_new'].'</span>' );
+		param_error( $var2, '<span class="pass_check_twice">'.$params['msg_pass_twice'].'</span>' );
 		return false;
 	}
 	if( ! strlen( $pass2 ) )
 	{
-		param_error( $var2, $params['msg_pass_twice'] );
+		param_error( $var2, '<span class="pass_check_twice">'.$params['msg_pass_twice'].'</span>' );
 		return false;
 	}
 
 	// checking the password has been typed twice the same:
 	if( $pass1 != $pass2 )
 	{
-		param_error_multiple( array( $var1, $var2 ), $params['msg_pass_diff'] );
+		param_error_multiple( array( $var1, $var2 ), '<span class="pass_check_diff">'.$params['msg_pass_diff'].'</span>' );
 		return false;
 	}
 
 	if( utf8_strlen( $pass1 ) < $min_length )
 	{ // Checking min length
-		param_error_multiple( array( $var1, $var2 ), sprintf( $params['msg_pass_min'], $min_length ) );
+		param_error_multiple( array( $var1, $var2 ), '<span class="pass_check_min">'.sprintf( $params['msg_pass_min'], $min_length ).'</span>' );
 		return false;
 	}
 
@@ -2147,7 +2147,7 @@ function param_check_gender( $var, $required = false )
 	}
 
 	$gender_value = $GLOBALS[$var];
-	if( ( $gender_value != 'M' ) && ( $gender_value != 'F' ) )
+	if( ( $gender_value != 'M' ) && ( $gender_value != 'F' ) && ( $gender_value != 'O' ) )
 	{
 		param_error( $var, 'Gender value is invalid' );
 		return false;
@@ -2283,13 +2283,26 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 			break;
 
 		case 'head_extension':
-			$xhtmlvalidation  = true;
-			// We disable everything else, because the XMHTML validator will set explicit rules for the 'head_extension' context
-			$allow_css_tweaks = false;
-			$allow_javascript = false;
-			$allow_iframes    = false;
-			$allow_objects    = false;
-			$bypass_antispam  = false;
+		case 'body_extension':
+		case 'footer_extension':
+			$Group = $User->get_Group();
+			$xhtmlvalidation = $Group->perm_xhtmlvalidation == 'always';
+			if( $xhtmlvalidation )
+			{ // We disable everything else, because the XMHTML validator will set explicit rules for the 'head_extension' context
+				$allow_css_tweaks = false;
+				$allow_javascript = false;
+				$allow_iframes    = false;
+				$allow_objects    = false;
+				$bypass_antispam  = false;
+			}
+			else
+			{ // Use basic checking
+				$allow_css_tweaks = $Group->perm_xhtml_css_tweaks;
+				$allow_javascript = $Group->perm_xhtml_javascript;
+				$allow_iframes    = $Group->perm_xhtml_iframes;
+				$allow_objects    = $Group->perm_xhtml_objects;
+				$bypass_antispam  = $Group->perm_bypass_antispam;
+			}
 			// Do not add error messages in this context
 			$verbose = false;
 			break;
@@ -2305,6 +2318,27 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 
 	// ANTISPAM check:
 	$error = ( ( ! $bypass_antispam ) && ( $block = antispam_check($content) ) );
+
+	// Log incident in system log
+	if( $error )
+	{
+		switch( $context )
+		{
+			case 'commenting':
+				$object_type = 'comment';
+				break;
+
+			case 'posting':
+			case 'xmlrpc_posting':
+				$object_type = 'item';
+				break;
+
+			default:
+				$object_type = NULL;
+		}
+		syslog_insert( sprintf( T_('Antispam: Illegal content found. Content contains blacklisted word "%s".'), $block ), 'error', $object_type );
+	}
+
 	if( $error && $verbose )
 	{ // Add error message
 		if( $context == 'xmlrpc_posting' )

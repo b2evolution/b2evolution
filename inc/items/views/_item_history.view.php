@@ -133,7 +133,7 @@ $Results->cols[] = array(
 						'default_dir' => 'D',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap',
-						'td' => '%mysql2localedatetime_spans( #iver_edit_datetime#, "M-d" )%',
+						'td' => '%mysql2localedatetime_spans( #iver_edit_datetime#, "Y-m-d", "H:i:s" )%',
 					);
 
 /**

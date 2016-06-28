@@ -17,7 +17,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Settings, $current_User, $display_mode;
+global $Settings, $current_User, $display_mode, $antispamsrv_host, $antispamsrv_tos_url;
 global $keyword;
 
 global $row_stats;	// for hit functions
@@ -28,6 +28,8 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Add a banned keywor
 	$Form->add_crumb('antispam');
 	$Form->hidden_ctrl();
 	$Form->hidden( 'action', 'ban' );
+	$Form->hidden( 'display_mode', $display_mode );
+	$Form->hidden( 'mode', get_param( 'mode' ) );
 
 	$button = array( 'submit', 'submit', T_('Check & ban...'), 'SaveButton' );
 	if( $display_mode == 'js' )
@@ -50,7 +52,7 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Add a banned keywor
 	{
 		$Form->buttons( array( $button ) );
 	}
-$Form->end_form( );
+$Form->end_form();
 
 
 $Form = new Form( NULL, 'antispam_ban', 'post', 'compact' );
@@ -69,6 +71,8 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 	$Form->hidden_ctrl();
 	$Form->hiddens_by_key( get_memorized() );
 	$Form->hidden( 'confirm', 'confirm' );
+	$Form->hidden( 'display_mode', $display_mode );
+	$Form->hidden( 'mode', get_param( 'mode' ) );
 
 	// Check for junk:
 
@@ -264,9 +268,9 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 			<p>
 			<input type="checkbox" name="report" id="report_cb" value="1" checked="checked" />
 			<label for="report_cb">
-				<?php printf ( T_('<strong>Report</strong> the keyword [%s] as abuse to b2evolution.net.'), htmlspecialchars($keyword) ) ?>
+				<?php printf ( T_('<strong>Report</strong> the keyword [%s] as abuse to Central Antispam Server (%s).'), htmlspecialchars( $keyword ), $antispamsrv_host ) ?>
 			</label>
-			[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
+			[<a href="<?php echo $antispamsrv_tos_url; ?>"><?php echo T_('Terms of service') ?></a>]
 			</p>
 			<?php
 		}

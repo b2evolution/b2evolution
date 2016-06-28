@@ -23,7 +23,7 @@ class cookie_consent_plugin extends Plugin
 	var $priority = 1;
 	var $short_desc;
 	var $long_desc;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $number_of_installs = 1;
 
 
@@ -38,11 +38,16 @@ class cookie_consent_plugin extends Plugin
 
 
 	/**
-	 * Get default settings
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
 	 *
-	 * @return array
+	 * @param array Associative array of parameters (since v1.9).
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
+	 * @return array see {@link Plugin::GetDefaultSettings()}.
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
+	 * and assign an array with the following keys to them (only 'label' is required):
 	 */
-	function GetDefaultSettings()
+	function GetDefaultSettings( & $params )
 	{
 		return array(
 				'title' => array(
@@ -130,7 +135,7 @@ class cookie_consent_plugin extends Plugin
 		}
 
 		// Initialize html block:
-		require_css( $this->get_plugin_url().'style.css', true, NULL, NULL, '#', true );
+		$this->require_css( 'style.css', true );
 		require_js( 'jquery/jquery.cookie.min.js', 'rsc_url', false, true );
 
 		$html_block = '<div id="eu_cookie_consent"'.( is_logged_in() ? ' class="eu_cookie_consent__loggedin"' : '' ).'>'

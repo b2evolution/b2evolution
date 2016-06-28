@@ -21,7 +21,7 @@ class prism_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $number_of_installs = 1;
 
 
@@ -188,7 +188,14 @@ class prism_plugin extends Plugin
 			$code_class .= ' language-'.$lang;
 		}
 
-		$r = '<code'.( empty( $code_class ) ? '' : ' class="'.trim( $code_class ).'"' ).'>'.$block[3].'</code>';
+		$content = $block[3];
+
+		if( $type == 'codeblock' )
+		{	// Remove first empty line from codeblock content:
+			$content = preg_replace( '/^\r?\n/', '', $content );
+		}
+
+		$r = '<code'.( empty( $code_class ) ? '' : ' class="'.trim( $code_class ).'"' ).'>'.$content.'</code>';
 
 		if( $type == 'codeblock' )
 		{ // Set special template and attributes only for codeblock
@@ -228,6 +235,8 @@ class prism_plugin extends Plugin
 	 */
 	function unfilter_code_callback( $block )
 	{
+		$content = $block[6];
+
 		if( empty( $block[1] ) )
 		{ // [codespan]
 			$code_tag = 'codespan';
@@ -240,6 +249,9 @@ class prism_plugin extends Plugin
 			// Detect number of start line:
 			preg_match( '/.*data-start="(-?[0-9]+)".*/i', html_entity_decode( $block[1] ), $line );
 			$line = ' line="'.( isset( $line[1] ) ? intval( $line[1] ) : '1' ).'"';
+
+			// Revert back first empty line:
+			$content = "\r\n".$content;
 		}
 
 		$lang = trim( strtolower( $block[5] ) );
@@ -259,7 +271,7 @@ class prism_plugin extends Plugin
 
 		// Build codeblock:
 		$r = '['.$code_tag.$lang.$line.']';
-		$r .= $block[6];
+		$r .= $content;
 		$r .= '[/'.$code_tag.']';
 
 		return $r;
@@ -267,35 +279,42 @@ class prism_plugin extends Plugin
 
 
 	/**
-	 * @see Plugin::SkinBeginHtmlHead()
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
 	 */
-	function SkinBeginHtmlHead()
+	function SkinBeginHtmlHead( & $params )
 	{
 		global $Blog;
 
 		if( ! isset( $Blog ) || (
-		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' && 
+		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
 		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
 		{ // Don't load css/js files when plugin is not enabled
 			return;
 		}
 
-		require_js( $this->get_plugin_url().'/js/prism.min.js', true );
-		require_css( $this->get_plugin_url().'/css/prism.min.css', true );
+		$this->require_js( 'js/prism.min.js' );
+		$this->require_css( 'css/prism.min.css' );
 	}
 
 
 	/**
-	 * @see Plugin::AdminEndHtmlHead()
+	 * Event handler: Called when ending the admin html head section.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
 	 */
-	function AdminEndHtmlHead()
+	function AdminEndHtmlHead( & $params )
 	{
 		global $ctrl;
 
 		if( $ctrl == 'campaigns' && get_param( 'tab' ) == 'send' && $this->get_email_setting( 'email_apply_rendering' ) )
 		{	// Load this only on form to preview email campaign:
-			require_js( $this->get_plugin_url().'/js/prism.min.js', 'relative' );
-			require_css( $this->get_plugin_url().'/css/prism.min.css', 'relative' );
+			$this->require_js( 'js/prism.min.js' );
+			$this->require_css( 'css/prism.min.css' );
 		}
 	}
 

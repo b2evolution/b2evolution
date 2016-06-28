@@ -27,6 +27,11 @@ global $plugins_subdir, $media_subdir, $backup_subdir, $upgrade_subdir;
 global $backup_paths;
 
 /**
+ * @var array backup exclude paths
+ */
+global $backup_exclude_folders;
+
+/**
  * @var array backup tables
  */
 global $backup_tables;
@@ -77,6 +82,27 @@ $backup_paths = array(
 		'path'     => $upgrade_subdir,
 		'included' => false ) );
 
+
+/**
+ * Exclude the backup folder/files default settings
+ * - 'path' Folders name
+ * - 'excluded' true if folder must be excluded from backup by default
+ * @var array
+ */
+$backup_exclude_folders = array(
+	'_cache' => array(
+		'path' => array( '_cache' ),
+		'excluded' => true ),
+
+	'cache' => array(
+		'path'     => array( '_evocache', '.evocache' ),
+		'excluded' => true ),
+
+	'version_control' => array(
+		'path'     => array( '.svn', '.git', '.cvs' ),
+		'excluded' => true ),
+	);
+
 /**
  * Backup database tables default settings
  * - 'label' checkbox label
@@ -117,6 +143,18 @@ class Backup
 	var $backup_paths;
 
 	/**
+	 * All of the excluded folders and their 'included' values defined in backup configuration file
+	 * @var array
+	 */
+	var $exclude_folders;
+
+	/**
+	 * Ignore files and folders listed in "conf/backup_ignore.conf"
+	 * @var boolean
+	 */
+	var $ignore_config = true;
+
+	/**
 	 * All of the tables and their 'included' values defined in backup configuration file
 	 * @var array
 	 */
@@ -132,9 +170,9 @@ class Backup
 	/**
 	 * Constructor
 	 */
-	function Backup()
+	function __construct()
 	{
-		global $backup_paths, $backup_tables;
+		global $backup_paths, $backup_exclude_folders, $backup_tables;
 
 		// Set default settings defined in backup configuration file
 
@@ -143,6 +181,13 @@ class Backup
 		foreach( $backup_paths as $name => $settings )
 		{
 			$this->backup_paths[$name] = $settings['included'];
+		}
+
+		// Set backup exclude folders default settings
+		$this->exclude_folders = array();
+		foreach( $backup_exclude_folders as $name => $settings )
+		{
+			$this->exclude_folders[$name] = $settings['excluded'];
 		}
 
 		// Set backup tables default settings
@@ -163,7 +208,7 @@ class Backup
 	 */
 	function load_from_Request( $memorize_params = false )
 	{
-		global $backup_paths, $backup_tables, $Messages;
+		global $backup_paths, $backup_exclude_folders, $backup_tables, $Messages;
 
 		// Load folders/files settings from request
 		foreach( $backup_paths as $name => $settings )
@@ -173,6 +218,14 @@ class Backup
 				$this->backup_paths[$name] = param( 'bk_'.$name, 'boolean', 0, $memorize_params );
 			}
 		}
+
+		// Load the excluded folders settings from request:
+		foreach( $backup_exclude_folders as $name => $settings )
+		{
+			$this->exclude_folders[$name] = param( 'exclude_bk_'.$name, 'boolean', 0, $memorize_params );
+		}
+
+		$this->ignore_config = param( 'ignore_bk_config', 'boolean', 0, $memorize_params );
 
 		// Load tables settings from request
 		foreach( $backup_tables as $name => $settings )
@@ -212,7 +265,7 @@ class Backup
 		// Backup directories and files
 		if( $success && $this->has_included( $this->backup_paths ) )
 		{
-			$backup_files_path = $this->pack_backup_files ? $cbackup_path : $cbackup_path.'files/';
+			$backup_files_path = $this->pack_backup_files ? $cbackup_path : $cbackup_path.'www/';
 
 			// Prepare files backup directory
 			if( $success = prepare_maintenance_dir( $backup_files_path, false ) )
@@ -224,12 +277,10 @@ class Backup
 		// Backup database
 		if( $success && $this->has_included( $this->backup_tables ) )
 		{
-			$backup_tables_path = $this->pack_backup_files ? $cbackup_path : $cbackup_path.'db/';
-
 			// Prepare database backup directory
-			if( $success = prepare_maintenance_dir( $backup_tables_path, false ) )
+			if( $success = prepare_maintenance_dir( $cbackup_path, false ) )
 			{	// We can backup database
-				$success = $this->backup_database( $backup_tables_path );
+				$success = $this->backup_database( $cbackup_path );
 			}
 		}
 
@@ -252,7 +303,7 @@ class Backup
 	 */
 	function backup_files( $backup_dirpath )
 	{
-		global $basepath, $backup_paths, $inc_path;
+		global $basepath, $backup_paths, $backup_exclude_folders, $backup_current_exclude_folders, $inc_path;
 
 		echo '<h4>'.T_('Creating folders/files backup...').'</h4>';
 		evo_flush();
@@ -291,12 +342,48 @@ class Backup
 			}
 		}
 
+		$backup_current_exclude_folders = array();
+		foreach( $this->exclude_folders as $name => $excluded )
+		{
+			if( $excluded )
+			{
+				foreach( $this->path_to_array( $backup_exclude_folders[$name]['path'] ) as $name )
+				{
+					// Exclude root folder with name:
+					$excluded_files[] = $name.'/';
+					// Exclude all subfolders with name:
+					$backup_current_exclude_folders[] = $name;
+				}
+			}
+		}
+
+		if( $this->ignore_config )
+		{	// Ignore files and folders listed in "conf/backup_ignore.conf":
+			global $conf_path;
+			$backup_ignore_file = $conf_path.'backup_ignore.conf';
+			if( file_exists( $backup_ignore_file ) && is_readable( $backup_ignore_file ) )
+			{
+				$backup_ignore_file_lines = preg_split( '/\r\n|\n|\r/', file_get_contents( $backup_ignore_file ) );
+				foreach( $backup_ignore_file_lines as $backup_ignore_file_line )
+				{
+					// Ignore root folder and file with name:
+					$excluded_files[] = trim( $backup_ignore_file_line ).'/';
+					$excluded_files[] = trim( $backup_ignore_file_line );
+				}
+			}
+			else
+			{
+				echo '<p style="color:red">'.sprintf( T_('Config file %s cannot be read.'), '<b>'.$backup_ignore_file.'</b>' ).'</p>';
+				evo_flush();
+			}
+		}
+
 		// Remove excluded list from included list
 		$included_files = array_diff( $included_files, $excluded_files );
 
 		if( $this->pack_backup_files )
 		{ // Create ZIPped backup
-			$zip_filepath = $backup_dirpath.'files.zip';
+			$zip_filepath = $backup_dirpath.'www.zip';
 
 			// Pack using 'zlib' extension and PclZip wrapper
 
@@ -317,10 +404,16 @@ class Backup
 				echo sprintf( T_('Backing up &laquo;<strong>%s</strong>&raquo; ...'), $basepath.$included_file );
 				evo_flush();
 
-				$file_list = $PclZip->add( no_trailing_slash( $basepath.$included_file ), PCLZIP_OPT_REMOVE_PATH, no_trailing_slash( $basepath ) );
+				$file_list = $PclZip->add( no_trailing_slash( $basepath.$included_file ),
+					PCLZIP_OPT_ADD_PATH, 'www',
+					PCLZIP_OPT_REMOVE_PATH, no_trailing_slash( $basepath ),
+					PCLZIP_CB_PRE_ADD, 'callback_backup_files' );
 				if( $file_list == 0 )
 				{
-					echo '<p style="color:red">'.sprintf( T_('Unable to create &laquo;%s&raquo;'), $zip_filepath ).'</p>';
+					echo '<p style="color:red">'
+							.sprintf( T_('Error: %s'), $PclZip->errorInfo( true ) ).'<br />'
+							.sprintf( T_('Unable to create &laquo;%s&raquo;'), $zip_filepath )
+						.'</p>';
 					evo_flush();
 
 					return false;
@@ -337,7 +430,8 @@ class Backup
 			foreach( $included_files as $included_file )
 			{
 				$this->recurse_copy( no_trailing_slash( $basepath.$included_file ),
-										no_trailing_slash( $backup_dirpath.$included_file ) );
+					no_trailing_slash( $backup_dirpath.$included_file ),
+					true, $backup_current_exclude_folders );
 			}
 		}
 
@@ -527,7 +621,10 @@ class Backup
 			$file_list = $PclZip->add( $backup_dirpath.$backup_sql_filename, PCLZIP_OPT_REMOVE_PATH, no_trailing_slash( $backup_dirpath ) );
 			if( $file_list == 0 )
 			{
-				echo '<p style="color:red">'.sprintf( T_('Unable to create &laquo;%s&raquo;'), $zip_filepath ).'</p>';
+				echo '<p style="color:red">'
+						.sprintf( T_('Error: %s'), $PclZip->errorInfo( true ) ).'<br />'
+						.sprintf( T_('Unable to create &laquo;%s&raquo;'), $zip_filepath )
+					.'</p>';
 				evo_flush();
 
 				return false;
@@ -545,9 +642,10 @@ class Backup
 	 *
 	 * @param string source directory
 	 * @param string destination directory
+	 * @param boolean TRUE to display of what backup is doing
 	 * @param array excluded directories
 	 */
-	function recurse_copy( $src, $dest, $root = true )
+	function recurse_copy( $src, $dest, $root = true, $exclude_folders = array() )
 	{
 		if( is_dir( $src ) )
 		{
@@ -571,6 +669,11 @@ class Backup
 					continue;
 				}
 
+				if( in_array( $file, $exclude_folders ) )
+				{	// Skip the excluded files/folders:
+					continue;
+				}
+
 				$srcfile = $src.'/'.$file;
 				if( is_dir( $srcfile ) )
 				{
@@ -579,7 +682,7 @@ class Backup
 						echo sprintf( T_('Backing up &laquo;<strong>%s</strong>&raquo; ...'), $srcfile ).'<br/>';
 						evo_flush();
 					}
-					$this->recurse_copy( $srcfile, $dest . '/' . $file, false );
+					$this->recurse_copy( $srcfile, $dest . '/' . $file, false, $exclude_folders );
 				}
 				else
 				{ // Copy file

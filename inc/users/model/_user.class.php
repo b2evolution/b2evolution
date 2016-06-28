@@ -151,16 +151,23 @@ class User extends DataObject
 	var $significant_changed_values = array();
 
 	/**
+	 * TRUE if user is owner of at least one collection
+	 * @access protected
+	 * @var boolean
+	 */
+	var $is_collection_owner;
+
+	/**
 	 * Constructor
 	 *
 	 * @param object DB row
 	 */
-	function User( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		global $default_locale, $Settings, $localtimenow;
 
 		// Call parent constructor:
-		parent::DataObject( 'T_users', 'user_', 'user_ID' );
+		parent::__construct( 'T_users', 'user_', 'user_ID' );
 
 		if( $db_row == NULL )
 		{ // Setting those object properties, which are not "NULL" in DB (MySQL strict mode):
@@ -313,6 +320,7 @@ class User extends DataObject
 				array( 'table'=>'T_links', 'fk'=>'link_usr_ID', 'msg'=>T_('%d links to this user'),
 						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
 				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition'=>'file_root_type = "user"', 'msg'=>T_('%d files from this user file root') ),
+				array( 'table' => 'T_files', 'fk'=>'file_creator_user_ID', 'and_condition'=>'file_root_type != "user"', 'msg'=>T_('%d files will lose their creator ID.') ),
 				array( 'table'=>'T_email__campaign_send', 'fk'=>'csnd_user_ID', 'msg'=>T_('%d newsletter emails for this user') ),
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_target_user_ID', 'msg'=>T_('%d reports about this user') ),
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_reporter_ID', 'msg'=>T_('%d reports created by this user') ),
@@ -397,8 +405,14 @@ class User extends DataObject
 	{
 		global $DB, $Settings, $UserSettings, $GroupCache, $Messages, $action;
 		global $current_User, $Session, $localtimenow;
+		global $is_api_request;
 
+		// TRUE when we create new user:
 		$is_new_user = ( $this->ID == 0 );
+
+		// TRUE if we should request a second password to confirm:
+		// (Don't request it when we create new user from REST API)
+		$request_password_confirmation = ! ( $is_api_request && $is_new_user );
 
 		// ---- Login checking / START ----
 		$edited_user_login = param( 'edited_user_login', 'string' );
@@ -539,10 +553,12 @@ class User extends DataObject
 				{ // User can edit Domains
 					$DomainCache = & get_DomainCache();
 
+					load_funcs('sessions/model/_hitlog.funcs.php');
+
 					// Update status of Domain in DB
 					$edited_domain_status = param( 'edited_domain_status', 'string' );
 					$user_domain = $UserSettings->get( 'user_domain', $this->ID );
-					$Domain = & $DomainCache->get_by_name( $user_domain, false, false );
+					$Domain = & get_Domain_by_subdomain( $user_domain );
 					if( ! $Domain && $edited_domain_status != 'unknown' && ! empty( $user_domain ) )
 					{ // Domain doesn't exist in DB, Create new record
 						$Domain = new Domain();
@@ -555,7 +571,6 @@ class User extends DataObject
 					}
 
 					// Update status of Initial referer in DB
-					load_funcs('sessions/model/_hitlog.funcs.php');
 					$edited_initial_referer_status = param( 'edited_initial_referer_status', 'string' );
 					$initial_referer = $UserSettings->get( 'initial_referer', $this->ID );
 					$initial_referer_domain = url_part( $initial_referer, 'host' );
@@ -962,20 +977,31 @@ class User extends DataObject
 			global $edited_user_pass1, $edited_user_pass2;
 
 			$edited_user_pass1 = param( 'edited_user_pass1', 'string', true );
-			$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
-
-			// Remove the invalid chars from password vars
+			// Remove the invalid chars from password var:
 			$edited_user_pass1 = preg_replace( '/[<>&]/', '', $edited_user_pass1 );
-			$edited_user_pass2 = preg_replace( '/[<>&]/', '', $edited_user_pass2 );
+
+			if( $request_password_confirmation )
+			{	// Request a password confirmation:
+				$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
+				// Remove the invalid chars from password var:
+				$edited_user_pass2 = preg_replace( '/[<>&]/', '', $edited_user_pass2 );
+			}
 
 			if( $is_new_user || ( !empty( $reqID ) && $reqID == $Session->get( 'core.changepwd.request_id' ) ) )
 			{ // current password is not required:
 				//   - new user creating process
 				//   - password change requested by email
 
-				if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') ) )
-				{ // We can set password
-					$this->set_password( $edited_user_pass2 );
+				if( $request_password_confirmation )
+				{	// Request a password confirmation:
+					if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') ) )
+					{ // We can set password
+						$this->set_password( $edited_user_pass2 );
+					}
+				}
+				else
+				{	// Don't request a password confirmation and use only first entered password (Used on REST API):
+					$this->set_password( $edited_user_pass1 );
 				}
 			}
 			else
@@ -1027,6 +1053,12 @@ class User extends DataObject
 					}
 				}
 
+			}
+
+			if( $_POST['edited_user_pass1'] != trim( $_POST['edited_user_pass1'] ) ||
+			    $_POST['edited_user_pass2'] != trim( $_POST['edited_user_pass2'] ) )
+			{ // If new password was entered with spaces then inform user about this
+				$Messages->add( T_('The leading and traling spaces have been trimmed from the new password.'), 'warning' );
 			}
 		}
 
@@ -1124,8 +1156,9 @@ class User extends DataObject
 				}
 				$is_comment_moderator = $this->check_role( 'comment_moderator' );
 				if( $is_comment_moderator || $this->check_role( 'comment_editor' ) )
-				{ // update 'notify_comment_moderation' only if user is comment moderator/editor at least in one blog
+				{	// update 'notify_comment_moderation' and 'notify_edit_cmt_moderation' only if user is comment moderator/editor at least in one collection:
 					$UserSettings->set( 'notify_comment_moderation', param( 'edited_user_notify_cmt_moderation', 'integer', 0 ), $this->ID );
+					$UserSettings->set( 'notify_edit_cmt_moderation', param( 'edited_user_notify_edit_cmt_moderation', 'integer', 0 ), $this->ID );
 				}
 				if( $this->check_perm( 'admin', 'restricted', false ) )
 				{ // update 'notify_meta_comments' only if edited user has a permission to back-office
@@ -1136,8 +1169,9 @@ class User extends DataObject
 					$UserSettings->set( 'send_cmt_moderation_reminder', param( 'edited_user_send_cmt_moderation_reminder', 'integer', 0 ), $this->ID );
 				}
 				if( $this->check_role( 'post_moderator' ) )
-				{ // update 'notify_post_moderation' and 'send_cmt_moderation_reminder' only if user is post moderator at least in one blog
+				{	// update 'notify_post_moderation', 'notify_edit_pst_moderation' and 'send_cmt_moderation_reminder' only if user is post moderator at least in one collection:
 					$UserSettings->set( 'notify_post_moderation', param( 'edited_user_notify_post_moderation', 'integer', 0 ), $this->ID );
+					$UserSettings->set( 'notify_edit_pst_moderation', param( 'edited_user_notify_edit_pst_moderation', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'send_pst_moderation_reminder', param( 'edited_user_send_pst_moderation_reminder', 'integer', 0 ), $this->ID );
 				}
 				if( $this->grp_ID == 1 )
@@ -1239,7 +1273,10 @@ class User extends DataObject
 
 		if( $is_advanced_form )
 		{
+			/*
+			 * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
 			$UserSettings->set( 'admin_skin', param( 'edited_user_admin_skin', 'string' ), $this->ID );
+			 */
 
 			// Action icon params:
 			param_integer_range( 'edited_user_action_icon_threshold', 1, 5, T_('The threshold must be between 1 and 5.') );
@@ -1491,6 +1528,7 @@ class User extends DataObject
 				'thumb_class'    => 'avatar_before_login',
 				'thumb_zoomable' => false,
 				'login_mask'     => '', // example: 'text $login$ text'
+				'login_class'    => 'identity_link_username',  // No used if login_mask is used
 				'display_bubbletip' => true,
 				'nowrap'         => true,
 				'user_tab'       => 'profile',
@@ -1544,6 +1582,9 @@ class User extends DataObject
 				case 'preferredname':
 					$link_login = $this->get_preferred_name();
 					break;
+				case 'auto':
+					$link_login = $this->get_username();
+					break;
 				// default: 'avatar_name' | 'avatar' | 'name'
 			}
 			$link_login = trim( $link_login );
@@ -1553,9 +1594,13 @@ class User extends DataObject
 			}
 			// Add class "login" to detect logins by js plugins
 			$class .= ( $link_login == $this->login ? ' login' : '' );
-			if( $params['login_mask'] != '' )
+			if( !empty($params['login_mask']) )
 			{ // Apply login mask
 				$link_login = str_replace( '$login$', $link_login, $params['login_mask'] );
+			}
+			elseif( !empty($params['login_class']) )
+			{
+				$link_login = '<span class="'.$params['login_class'].'">'.$link_login.'</span>';
 			}
 		}
 
@@ -1593,8 +1638,8 @@ class User extends DataObject
 
 		if( is_null($this->$Object) && !empty($this->$ID ) )
 		{
-			$Cache = & call_user_func( 'get_'.$Object.'Cache' );
-			$this->$Object = $Cache->get_by_ID( $this->$ID, false );
+			$Cache = call_user_func( 'get_'.$Object.'Cache' );
+			$this->$Object = & $Cache->get_by_ID( $this->$ID, false );
 		}
 
 		return $this->$Object;
@@ -1680,7 +1725,7 @@ class User extends DataObject
 	{
 		if( empty( $this->city_ID ) )
 		{
-			return;
+			return '';
 		}
 
 		load_class( 'regional/model/_city.class.php', 'City' );
@@ -1791,16 +1836,46 @@ class User extends DataObject
 
 		if( is_null( $this->_num_files ) )
 		{
-			$links_SQL = new SQL();
-			$links_SQL->SELECT( 'file_type, COUNT( file_ID ) AS cnt' );
-			$links_SQL->FROM( 'T_links' );
-			$links_SQL->FROM_add( 'INNER JOIN T_files ON file_ID = link_file_ID' );
-			$links_SQL->WHERE( 'link_creator_user_ID = '.$this->ID );
-			$links_SQL->GROUP_BY( 'file_type' );
-			$this->_num_files = $DB->get_assoc( $links_SQL->get() );
+			$files_SQL = new SQL();
+			$files_SQL->SELECT( 'file_type, COUNT( file_ID ) AS cnt' );
+			$files_SQL->FROM( 'T_files' );
+			$files_SQL->WHERE( 'file_creator_user_ID = '.$this->ID );
+			$files_SQL->GROUP_BY( 'file_type' );
+			$this->_num_files = $DB->get_assoc( $files_SQL->get() );
 		}
 
 		return ! empty( $this->_num_files[ $type ] ) ? $this->_num_files[ $type ] : 0;
+	}
+
+
+	/*
+	 * Get the total size of files uploaded by the user
+	 *
+	 * @return integer total size in bytes
+	 */
+	function get_total_upload( $type = NULL )
+	{
+		global $DB;
+
+		$files_SQL = new SQL();
+		$files_SQL->SELECT( 'file_ID' );
+		$files_SQL->FROM( 'T_files' );
+		$files_SQL->WHERE( 'file_creator_user_ID = '.$this->ID );
+		if( ! is_null( $type ) )
+		{
+			$files_SQL->WHERE_and( 'file_type = '.$DB->quote( $type ) );
+		}
+		$files = $DB->get_col( $files_SQL->get() );
+
+		$FileCache = & get_FileCache();
+		$total_upload_size = 0;
+		foreach( $files as $file_ID )
+		{
+			$user_File = $FileCache->get_by_ID( $file_ID );
+			$total_upload_size += $user_File->get_size();
+		}
+
+		return $total_upload_size;
 	}
 
 
@@ -2314,11 +2389,12 @@ class User extends DataObject
 			$perm_target_ID = $perm_target;
 		}
 
-		if( isset($perm_target_ID)	// if it makes sense to check the cache
-			&& isset($this->cache_perms[$permname][$permlevel][$perm_target_ID]) )
-		{ // Permission in available in Cache:
-			$Debuglog->add( "Got perm [$permname][$permlevel][$perm_target_ID] from cache", 'perms' );
-			return $this->cache_perms[$permname][$permlevel][$perm_target_ID];
+		$cache_permname = $permname; // save original name because $permname can be changed below
+		$cache_target_ID = isset( $perm_target_ID ) ? $perm_target_ID : 'null';
+		if( isset( $this->cache_perms[$cache_permname][$permlevel][$cache_target_ID] ) )
+		{	// Permission is available in Cache:
+			$Debuglog->add( "Got perm [$cache_permname][$permlevel][$cache_target_ID] from cache", 'perms' );
+			return $this->cache_perms[$cache_permname][$permlevel][$cache_target_ID];
 		}
 
 
@@ -2436,7 +2512,8 @@ class User extends DataObject
 			case 'blog_item_type_restricted':
 			case 'blog_item_type_admin':
 			case 'blog_edit_ts':
-				// The owner of a collection has automatic permission to so many things: 
+			case 'blog_media_browse':
+				// The owner of a collection has automatic permission to so many things:
 				if( $this->check_perm_blogowner( $perm_target_ID ) )
 				{	// Owner can do *almost* anything:
 					$perm = true;
@@ -2617,10 +2694,15 @@ class User extends DataObject
 					case 'view':
 					case 'add':
 						// Check perms to View/Add meta comments:
+						$blog_ID = $Item->get_blog_ID();
 						$perm = // If User can edit or delete this Item
 								$this->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item )
 								// OR If User can delete any Item of the Blog
-								|| $this->check_perm( 'blog_del_post', '', false, $Item->get_blog_ID() );
+								|| $this->check_perm( 'blog_del_post', '', false, $blog_ID )
+								// OR If User is explicitly allowed in the user permissions
+								|| $this->check_perm_blogusers( 'meta_comment', '', $blog_ID )
+								// OR If User belongs to a group explicitly allowed in the group permissions
+								|| $this->Group->check_perm_bloggroups( 'meta_comment', $permlevel, $blog_ID, $Item, $this );
 						break;
 
 					case 'edit':
@@ -2646,6 +2728,15 @@ class User extends DataObject
 						if( $this->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) &&
 						    $Comment->author_user_ID == $this->ID )
 						{ // If it is own meta comment of the User
+							$perm = true;
+							break;
+						}
+
+						// Check perms to Delete meta based on user/group settings
+						if( $Comment->author_user_ID == $this->ID &&
+								( $this->check_perm_blogusers( 'meta_comment', 'any', $Item->get_blog_ID() )
+								|| $this->Group->check_perm_bloggroups( 'meta_comment', $permlevel, $Item->get_blog_ID(), $Item, $this) ) )
+						{
 							$perm = true;
 							break;
 						}
@@ -2885,11 +2976,8 @@ class User extends DataObject
 			debug_die( sprintf( /* %s is the application name, usually "b2evolution" */ T_('Group/user permission denied by %s!'), $app_name )." ($permname:$permlevel:".( is_object( $perm_target ) ? get_class( $perm_target ).'('.$perm_target_ID.')' : ( is_array( $perm_target ) ? implode( ', ', $perm_target ) : $perm_target ) ).")" );
 		}
 
-		if( isset($perm_target_ID) )
-		{
-			// echo "cache_perms[$permname][$permlevel][$perm_target] = $perm;";
-			$this->cache_perms[$permname][$permlevel][$perm_target_ID] = $perm;
-		}
+		// Cache result:
+		$this->cache_perms[$cache_permname][$permlevel][$cache_target_ID] = $perm;
 
 		return $perm;
 	}
@@ -3193,32 +3281,39 @@ class User extends DataObject
 
 
 	/**
+	 * Check if user is owner of at least one collection
+	 *
+	 * @return boolean
+	 */
+	function is_collection_owner()
+	{
+		if( is_null( $this->is_collection_owner ) )
+		{	// Get a result from DB first time and put in cache var:
+			global $DB;
+
+			$check_owner_SQL = new SQL( 'Check if user #'.$this->ID.' is owner of at least one collection' );
+			$check_owner_SQL->SELECT( 'blog_ID' );
+			$check_owner_SQL->FROM( 'T_blogs' );
+			$check_owner_SQL->WHERE( 'blog_owner_user_ID = '.$DB->quote( $this->ID ) );
+			$check_owner_SQL->LIMIT( '1' );
+
+			$this->is_collection_owner = ($DB->get_var( $check_owner_SQL->get(), 0, NULL, $check_owner_SQL->title ) ? true : false);
+		}
+
+		return $this->is_collection_owner;
+	}
+
+
+	/**
 	 * Get messaging possibilities between current user and $this user
 	 *
 	 * @param object Current User (the one trying to send the PM)
-	 * @param string Type of contact method to check first: 'PM' > 'email'  
+	 * @param string Type of contact method to check first: 'PM' > 'email'
 	 * @return NULL|string allowed messaging possibility: PM > email > login > NULL
 	 */
 	function get_msgform_possibility( $current_User = NULL, $check_level = 'PM' )
 	{
-		global $DB;
-
-		$check_owner_SQL = new SQL();
-		$check_owner_SQL->SELECT( 'blog_ID' );
-		$check_owner_SQL->FROM( 'T_blogs' );
-		$check_owner_SQL->WHERE( 'blog_owner_user_ID = '.$DB->quote( $this->ID ) );
-		$check_owner_SQL->LIMIT( '1' );
-
-		if( $DB->get_var( $check_owner_SQL->get() ) )
-		{ // Always allow to contact this user because he is owner of at least one collection:
-			$is_collection_owner = true;
-		}
-		else
-		{
-			$is_collection_owner = false;
-		}
-
-		if( ! $is_collection_owner && ! $this->check_status( 'can_receive_any_message' ) )
+		if( ! $this->is_collection_owner() && ! $this->check_status( 'can_receive_any_message' ) )
 		{ // In case of a closed account:
 			return NULL;
 		}
@@ -3230,7 +3325,7 @@ class User extends DataObject
 				global $current_User;
 			}
 
-			if( ! $is_collection_owner && has_cross_country_restriction( 'contact' ) && ( empty( $current_User->ctry_ID ) || ( $current_User->ctry_ID !== $this->ctry_ID ) ) )
+			if( ! $this->is_collection_owner() && has_cross_country_restriction( 'contact' ) && ( empty( $current_User->ctry_ID ) || ( $current_User->ctry_ID !== $this->ctry_ID ) ) )
 			{ // Contat to this user is not enabled
 				return NULL;
 			}
@@ -3245,14 +3340,14 @@ class User extends DataObject
 				}
 			}
 
-			if( $is_collection_owner || $this->accepts_email() )
+			if( $this->is_collection_owner() || $this->accepts_email() )
 			{ // This User allows email => send email OR Force to allow to contact with this user because he is owner of the selected collection:
 				return 'email';
 			}
 		}
 		else
 		{ // current User is not logged in
-			if( $is_collection_owner || $this->accepts_email() )
+			if( $this->is_collection_owner() || $this->accepts_email() )
 			{ // This User allows email => send email OR Force to allow to contact with this user because he is owner of the selected collection:
 				return 'email';
 			}
@@ -3351,6 +3446,10 @@ class User extends DataObject
 							) );
 
 				$new_Blog->create();
+
+				// Don't show a sample collection on top menu in back-office:
+				// TODO: In another branch Erwin has implemented a rule similar to "only enable first 10 collections". This will be merged here at some point.
+				$new_Blog->favorite( NULL, 0 );
 			}
 
 			// Save IP Range and user counter
@@ -3497,7 +3596,7 @@ class User extends DataObject
 	 *
 	 * @param Log Log object where output gets added (by reference).
 	 */
-	function dbdelete( & $Log )
+	function dbdelete( & $Log = array() )
 	{
 		global $DB, $Plugins;
 
@@ -3520,9 +3619,20 @@ class User extends DataObject
 															comment_author_email = '.$DB->quote( $this->get('email') ).',
 															comment_author_url = '.$DB->quote( $this->get('url') ).'
 													WHERE comment_author_user_ID = '.$this->ID );
-			if( is_a( $Log, 'log' ) )
+			if( $Log instanceof log )
 			{
 				$Log->add( 'Transforming user\'s comments to unregistered comments... '.sprintf( '(%d rows)', $ret ), 'note' );
+			}
+		}
+
+		if( $deltype != 'spammer' )
+		{
+			$ret = $DB->query( 'UPDATE T_files
+			                    SET file_creator_user_ID = NULL
+								WHERE file_creator_user_ID = '.$this->ID. ' AND file_root_type != "user"' );
+			if( $Log instanceof log )
+			{
+				$Log->add( 'Setting user\'s uploaded files creator ID to NULL...'.sprintf( '(%d rows)', $ret ), 'note' );
 			}
 		}
 
@@ -3557,7 +3667,7 @@ class User extends DataObject
 
 		$DB->commit();
 
-		if( is_a( $Log, 'log' ) )
+		if( $Log instanceof log )
 		{
 			$Log->add( 'Deleted User.', 'note' );
 		}
@@ -3868,6 +3978,9 @@ class User extends DataObject
 
 			case 'F':
 				return T_('A woman');
+
+			case 'O':
+				return T_('Other');
 		}
 
 		return NULL;
@@ -3898,6 +4011,9 @@ class User extends DataObject
 				break;
 			case 'F':
 				$gender_class .= ' woman';
+				break;
+			case 'O':
+				$gender_class .= ' other';
 				break;
 			default:
 				$gender_class .= ' nogender';
@@ -4539,6 +4655,7 @@ class User extends DataObject
 			if( $is_new_user )
 			{
 				$Messages->add( T_('New user has been created.'), 'success' );
+				report_user_create( $this );
 			}
 			elseif( $is_password_form )
 			{
@@ -4562,6 +4679,7 @@ class User extends DataObject
 				if( $update_success )
 				{
 					$Messages->add( T_('Profile has been updated.'), 'success' );
+					syslog_insert( sprintf( 'User %s was renamed to %s', '[['.$user_old_login.']]', '[['.$this->login.']]' ), 'info', 'user', $this->ID );
 				}
 			}
 
@@ -4586,11 +4704,16 @@ class User extends DataObject
 				$this->send_account_changed_notification();
 			}
 		}
-		else
-		{
+		elseif( $is_new_user )
+		{	// Some error on inserting new user in DB:
 			$DB->rollback();
 			$update_success = false;
 			$Messages->add( 'New user creation error', 'error' );
+		}
+		else
+		{	// Nothing to update:
+			$DB->commit();
+			$update_success = true;
 		}
 
 		// Update user status settings
@@ -5256,30 +5379,6 @@ class User extends DataObject
 		return NULL;
 	}
 
-	/**
-	 * Get session param from the user first session, hit
-	 * @param integer Session Id
-	 * @return object of params
-	 */
-	function get_first_session_hit_params( $sess_id )
-	{
-		global $DB;
-
-		$query = 'SELECT *
-					FROM T_hitlog
-					WHERE hit_sess_ID = '.$DB->quote( $sess_id ).'
-					ORDER BY hit_ID ASC
-					LIMIT 1';
-
-		$result = $DB->get_row( $query );
-
-		if( !empty( $result ) )
-		{
-			return $result;
-		}
-
-		return NULL;
-	}
 
 	/**
 	 * Send a welcome private message
@@ -5835,9 +5934,10 @@ class User extends DataObject
 		$params = array_merge( array(
 				'view_type'           => 'simple', // 'simple', 'extended'
 				'file_type'           => 'image', // 'image', 'audio', 'other'
-				'text_image_simple'   => T_( '%s has posted %s photos. %s of these photos have been liked by %s different users.' ),
-				'text_image_extended' => T_( '%s has posted %s photos.<br />%s voted up (liked) by %s different users.<br />%s voted down by %s different users.<br />%s considered INAPPROPRIATE by %s different users.<br />%s considered SPAM by %s different users.' ),
+				'text_image_simple'   => T_( '%s has uploaded %s photos. %s of these photos have been liked by %s different users.' ),
+				'text_image_extended' => T_( '%s has uploaded %s photos.<br />%s voted up (liked) by %s different users.<br />%s voted down by %s different users.<br />%s considered INAPPROPRIATE by %s different users.<br />%s considered SPAM by %s different users.' ),
 				'text_audio'          => T_( '%s has uploaded %s audio files.' ),
+				'text_video'          => T_( '%s has uploaded %s video files.' ),
 				'text_other'          => T_( '%s has uploaded %s other files.' ),
 			), $params );
 
@@ -5932,10 +6032,40 @@ class User extends DataObject
 				// Number of audio files
 				return sprintf( $params['text_audio'], $this->login, '<b>'.$this->get_num_files( 'audio' ).'</b>' );
 
+			case 'video':
+				// Number of video files
+				return sprintf( $params['text_video'], $this->login, '<b>'.$this->get_num_files( 'video' ).'</b>' );
+
 			case 'other':
 				// Number of other files
 				return sprintf( $params['text_other'], $this->login, '<b>'.$this->get_num_files( 'other' ).'</b>' );
 		}
+	}
+
+
+	/**
+	 * Get total size of uploaded files
+	 *
+	 * @param array Params
+	 * @return string Result
+	 */
+	function get_reputation_total_upload( $params = array() )
+	{
+		$params = array_merge( array(
+				'text' => T_('%s has uploaded a total of %s')
+			), $params );
+
+		$total_upload = $this->get_total_upload();
+		if( empty( $total_upload ) )
+		{
+			$total_upload = T_('0 bytes');
+		}
+		else
+		{
+			$total_upload = bytesreadable( $total_upload );
+		}
+
+		return sprintf( $params['text'], $this->login, '<b>'.$total_upload.'</b>' );
 	}
 
 
@@ -6078,7 +6208,7 @@ class User extends DataObject
 			$field_was_changed = ( isset( $this->significant_changed_values[ $user_field_name ] ) && ( ! empty( $this->significant_changed_values[ $user_field_name ] ) ) );
 			if( isset( $user_field_data['className'] ) )
 			{ // The field value is an object ID, get the object name
-				$Cache = & call_user_func( 'get_'.$user_field_data['className'].'Cache' );
+				$Cache = call_user_func( 'get_'.$user_field_data['className'].'Cache' );
 				$Object = & $Cache->get_by_ID( $this->get( $user_field_name ), false, false );
 				$user_field_data['new'] = empty( $Object ) ? NULL : $Object->get_name();
 				if( $field_was_changed )
@@ -6207,7 +6337,7 @@ class User extends DataObject
 
 			if( isset( $insert_orgs[ $organization_ID ] ) )
 			{	// Don't join this user to same organization twice:
-				$Messages->add( sprintf( T_('User cannot be joined to the same organization &laquo;%s&raquo; twice.'), $user_Organization->get_name() ), 'error' );
+				$Messages->add( sprintf( T_('You are already a member of "%s".'), $user_Organization->get_name() ), 'error' );
 			}
 			elseif( in_array( $organization_ID, $curr_org_IDs ) )
 			{ // User is already in this organization
@@ -6460,6 +6590,11 @@ class User extends DataObject
 	function must_accept_terms()
 	{
 		global $UserSettings, $Settings;
+
+		if( ! $Settings->get( 'site_terms_enabled' ) )
+		{	// The terms are not enabled:
+			return false;
+		}
 
 		if( $UserSettings->get( 'terms_accepted', $this->ID ) )
 		{	// This user already accepted the terms:

@@ -202,10 +202,10 @@ if( ! empty( $cookie_skin_width_value ) )
 	$cookie_skin_width_value_fixed = $cookie_skin_width_value != '1140px' ? '100%' : $cookie_skin_width_value;
 }
 
-$switcher_layout_top = is_logged_in() ? 29 : 3;
-$switcher_layout_top += $Settings->get( 'site_skins_enabled' ) ? 103 : 3; // 153 -> 106
+$switcher_layout_top = is_logged_in() ? 26 : 3;
+$switcher_layout_top += $Settings->get( 'site_skins_enabled' ) ? 90 : 3; // 153 -> 106
 
-$switcher_top = is_logged_in() ? 29 : 0;
+$switcher_top = is_logged_in() ? 26 : 0;
 $switcher_top += $Settings->get( 'site_skins_enabled' ) ? 54 : 0;
 
 $switcher_class = !$Settings->get( 'site_skins_enabled' ) ? ' fixed' : '';
@@ -224,7 +224,7 @@ foreach( $width_switchers as $ws_size => $ws_icon )
 		$ws_class .= ' roundbutton_selected';
 	}
 	echo '<a href="#" onclick="switch_width( this, \''.$ws_size.'\', \''.$cookie_skin_width_name.'\', \''.$cookie_path.'\' ); return false;" class="'.$ws_class.'">';
-	echo get_icon( $ws_icon );
+	echo '<span class="ficon '.$ws_icon.'"></span>';
 	echo '</a>';
 	$ws++;
 }

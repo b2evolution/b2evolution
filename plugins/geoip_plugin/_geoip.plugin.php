@@ -35,7 +35,7 @@ class geoip_plugin extends Plugin
 	var $name = 'GeoIP';
 	var $code = 'evo_GeoIP';
 	var $priority = 45;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $author = 'The b2evo Group';
 	var $group = 'antispam';
 
@@ -80,15 +80,14 @@ class geoip_plugin extends Plugin
 
 
 	/**
-	 * Get the settings that the plugin can use.
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
 	 *
-	 * Those settings are transfered into a Settings member object of the plugin
-	 * and can be edited in the backoffice (Settings / Plugins).
-	 *
-	 * @see Plugin::GetDefaultSettings()
-	 * @see PluginSettings
-	 * @see Plugin::PluginSettingsValidateSet()
-	 * @return array
+	 * @param array Associative array of parameters (since v1.9).
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
+	 * @return array see {@link Plugin::GetDefaultSettings()}.
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
+	 * and assign an array with the following keys to them (only 'label' is required):
 	 */
 	function GetDefaultSettings( & $params )
 	{
@@ -100,9 +99,9 @@ class geoip_plugin extends Plugin
 		}
 		else
 		{
-			$datfile_info = '<span class="error">'.T_('Not found').'</span>';
+			$datfile_info = '<span class="error text-danger">'.T_('Not found').'</span>';
 		}
-		$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip">'.T_('Download update now!').'</a>';
+		$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip" class="btn btn-xs btn-warning">'.T_('Download update now!').'</a>';
 
 		return array(
 			'datfile' => array(
@@ -187,12 +186,12 @@ class geoip_plugin extends Plugin
 		$user_update_sql = '';
 		if( $this->Settings->get( 'force_account_creation' ) )
 		{	// Force country to the country detected by GeoIP
-			$user_update_sql = ', user_ctry_ID = '.$DB->quote( $Country->ID );
+			$User->set( 'ctry_ID', $Country->ID );
 		}
-		$DB->query( 'UPDATE T_users
-				  SET user_reg_ctry_ID = '.$DB->quote( $Country->ID ).
-				  $user_update_sql.'
-				WHERE user_ID = '.$DB->quote( $User->ID ) );
+
+		// Update user registration country
+		$User->set( 'reg_ctry_ID', $Country->ID );
+		$User->dbupdate();
 
 		// Move user to suspect group by Country ID
 		antispam_suspect_user_by_country( $Country->ID, $User->ID );
@@ -527,7 +526,7 @@ jQuery( document ).ready( function()
 	 *
 	 * @see Plugin::AdminToolPayload()
 	 */
-	function AdminToolPayload( $params )
+	function AdminToolPayload()
 	{
 		$action = param_action();
 
@@ -560,7 +559,17 @@ jQuery( document ).ready( function()
 				$this->print_tool_log( ' OK.<br />' );
 
 				$plugin_dir = dirname( __FILE__ );
-				if( ! is_writable( $plugin_dir ) )
+				$geoip_dat_file = $plugin_dir.'/'.$this->geoip_file_name;
+				// Check if GeoIP.dat file already exists
+				if( file_exists( $geoip_dat_file ) )
+				{
+					if( ! is_writable( $geoip_dat_file ) )
+					{
+						$this->print_tool_log( sprintf( T_('File %s must be writable to update it. Please fix the write permissions and try again.'), '<b>'.$geoip_dat_file.'</b>' ), 'error' );
+						break;
+					}
+				}
+				elseif( ! is_writable( $plugin_dir ) )
 				{ // Check the write rights
 					$this->print_tool_log( sprintf( T_('Plugin folder %s must be writable to receive GeoIP.dat. Please fix the write permissions and try again.'), '<b>'.$plugin_dir.'</b>' ), 'error' );
 					break;
@@ -568,7 +577,7 @@ jQuery( document ).ready( function()
 
 				$gzip_file_name = explode( '/', $this->geoip_download_url );
 				$gzip_file_name = $gzip_file_name[ count( $gzip_file_name ) - 1 ];
-				$gzip_file_path = $plugin_dir.'/'.$gzip_file_name;
+				$gzip_file_path = sys_get_temp_dir().'/'.$gzip_file_name;
 
 				if( ! save_to_file( $gzip_contents, $gzip_file_path, 'w' ) )
 				{ // Impossible to save file...
@@ -678,9 +687,24 @@ jQuery( document ).ready( function()
 				echo '<p>'.T_('This tool finds all users that do not have a registration country yet and then assigns them a registration country based on their registration IP.').
 						   get_manual_link('geoip-plugin').'</p>';
 
+				echo '<p>';
 				$Form->button( array(
 						'value' => T_('Find Registration Country for all Users NOW!')
 					) );
+				echo '</p>';
+
+				global $admin_url;
+				if( file_exists( $this->geoip_file_path ) )
+				{
+					$datfile_info = sprintf( T_('Last updated on %s'), date( locale_datefmt().' '.locale_timefmt(), filemtime( $this->geoip_file_path ) ) );
+				}
+				else
+				{
+					$datfile_info = '<span class="error text-danger">'.T_('Not found').'</span>';
+				}
+				$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip" class="btn btn-warning">'.T_('Download update now!').'</a>';
+				echo '<p><b>GeoIP.dat:</b> '.$datfile_info.'</p>';
+
 
 				if( !empty( $this->text_from_AdminTabAction ) )
 				{	// Display a report of executed action
@@ -874,7 +898,7 @@ function geoip_get_country_by_IP( $IP )
 			$IP = int2ip( $IP );
 		}
 
-		if( $Country = & $geoip_Plugin->get_country_by_IP( $IP ) )
+		if( $Country = $geoip_Plugin->get_country_by_IP( $IP ) )
 		{ // Get country flag + name
 			load_funcs( 'regional/model/_regional.funcs.php' );
 			$country = country_flag( $Country->get( 'code' ), $Country->get_name(), 'w16px', 'flag', '', false ).

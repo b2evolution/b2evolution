@@ -148,11 +148,37 @@ switch( $action )
 
 			$Ajaxlog->add( 'User: #'.$user_ID.' '.$User->login );
 
+			if( is_logged_in() &&
+			    $current_User->can_moderate_user( $User->ID ) &&
+			    $current_User->check_status( 'can_access_admin' ) &&
+			    $current_User->check_perm( 'admin', 'restricted' ) )
+			{	// Display the moderation buttons only if current user has a permission:
+				$moderation_buttons = '<p class="bubbletip_user__buttons">';
+				if( ! is_admin_page() )
+				{
+					$moderation_buttons .= '<a href="'.url_add_param( $admin_url, 'ctrl=user&amp;user_ID='.$User->ID ).'" class="btn btn-sm btn-block btn-primary">'
+							.T_('Edit in Back-Office').'</a>';
+				}
+				if( $current_User->ID != $User->ID && $current_User->check_perm( 'users', 'edit' ) )
+				{	// Display a button to delete a spammer only for other users and if current user can edit them:
+					$moderation_buttons .= '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) )
+								.'" class="btn btn-sm btn-block btn-danger">'
+							.T_('Delete Spammer')
+						.'</a>';
+				}
+				$moderation_buttons .= '</p>';
+			}
+			else
+			{	// No permission to moderate users:
+				$moderation_buttons = '';
+			}
+
 			echo '<div class="bubbletip_user">';
 
 			if( $User->check_status( 'is_closed' ) )
 			{ // display only info about closed accounts
 				echo T_( 'This account has been closed.' );
+				echo $moderation_buttons;
 				echo '</div>'; /* end of: <div class="bubbletip_user"> */
 				break;
 			}
@@ -184,6 +210,7 @@ switch( $action )
 
 			if( ! ( $Settings->get( 'allow_anonymous_user_profiles' ) || ( is_logged_in() && $current_User->check_perm( 'user', 'view', false, $User ) ) ) )
 			{ // User is not logged in and anonymous users may NOT view user profiles, or if current User has no permission to view additional information about the User
+				echo $moderation_buttons;
 				echo '</div>'; /* end of: <div class="bubbletip_user"> */
 				break;
 			}
@@ -262,6 +289,7 @@ switch( $action )
 				echo '</ul>';
 			}
 
+			echo $moderation_buttons;
 			echo '</div>'; /* end of: <div class="bubbletip_user"> */
 		}
 		else if( $comment_ID > 0 )
@@ -347,7 +375,10 @@ switch( $action )
 
 			$edited_Comment->set_vote( 'spam', param( 'vote', 'string' ) );
 			$edited_Comment->dbupdate();
-			$edited_Comment->vote_spam( '', '', '&amp;', true, true, array( 'display' => true ) );
+			$edited_Comment->vote_spam( '', '', '&amp;', true, true, array(
+					'display'            => true,
+					'button_group_class' => button_class( 'group' ).( is_admin_page() ? ' btn-group-sm' : '' ),
+				) );
 		}
 
 		break;
@@ -866,46 +897,6 @@ switch( $action )
 		call_user_func( $callback_function, $params );
 		break;
 
-	case 'get_recipients':
-		// Get list of users by search word
-		// Used for jQuery Tokeninput plugin ( when creating new messaging Thread )
-
-		if( !is_logged_in() || !$current_User->check_perm( 'perm_messaging', 'reply' ) )
-		{	// Check permission: User is not allowed to view threads
-			exit(0);
-		}
-
-		if( check_create_thread_limit() )
-		{	// user has already reached his limit, don't allow to get a users list
-			exit(0);
-		}
-
-		param( 'term', 'string' );
-
-		// Clear users cache and load only possible recipients who need right now, but keep shadow
-		$where_condition = '( user_login LIKE '.$DB->quote( '%'.$term.'%' ).' ) AND ( user_ID != '.$DB->quote( $current_User->ID ).' )';
-		$UserCache = & get_UserCache();
-		$UserCache->clear( true );
-		$UserCache->load_where( $where_condition );
-
-		$result_users = array();
-		while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
-		{ // Iterate through UserCache
-			if( !$iterator_User->check_status( 'can_receive_pm' ) )
-			{ // this user is probably closed so don't show it
-				continue;
-			}
-			$result_users[] = array(
-				'id'       => $iterator_User->ID,
-				'title'    => $iterator_User->get( 'login' ),
-				'fullname' => $iterator_User->get( 'fullname' ),
-				'picture'  => $iterator_User->get_avatar_imgtag( 'crop-top-32x32' )
-			);
-		}
-
-		echo evo_json_encode( $result_users );
-		exit(0);
-
 	case 'set_comment_status':
 		// Used for quick moderation of comments in dashboard, item list full view, comment list and front-office screens
 
@@ -941,10 +932,7 @@ switch( $action )
 				$result_success = $edited_Comment->dbupdate();
 				if( $result_success !== false )
 				{
-					if( $status == 'published' )
-					{
-						$edited_Comment->handle_notifications( false, $current_User->ID );
-					}
+					$edited_Comment->handle_notifications();
 				}
 			}
 		}
@@ -1111,39 +1099,6 @@ switch( $action )
 
 		break;
 
-	case 'autocomplete_usernames':
-		// Get usernames by first chars for autocomplete jQuery plugin & TinyMCE autocomplete plugin
-
-		$q = param( 'q', 'string', '' );
-
-		if( ! is_valid_login( $q ) || evo_strlen( $q ) < 4 )
-		{ // Restrict a wrong request
-			debug_die( 'Wrong request' );
-		}
-		// Add backslash for special char of sql operator LIKE
-		$q = str_replace( '_', '\_', $q );
-
-		if( utf8_strlen( $q ) == 0 )
-		{ // Don't search logins with empty request
-			$usernames = array();
-		}
-		else
-		{
-			$SQL = new SQL();
-			$SQL->SELECT( 'user_login' );
-			$SQL->FROM( 'T_users' );
-			$SQL->WHERE( 'user_login LIKE '.$DB->quote( $q.'%' ) );
-			$SQL->WHERE_and( 'user_status = "activated" OR user_status = "autoactivated"' );
-			$SQL->ORDER_BY( 'user_login' );
-			$usernames = $DB->get_col( $SQL->get() );
-		}
-
-		echo evo_json_encode( $usernames );
-
-		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
-
-		break;
-
 	case 'get_user_salt':
 		// Get the salt of the user from the given login info
 		// Note: If there are more users with the received login then give at most 3 salt values for the 3 most recently active users
@@ -1193,58 +1148,6 @@ switch( $action )
 
 		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
 		break;
-
-	case 'get_tags':
-		// Get list of item tags, where $term is part of the tag name (sorted)
-		// To be used for Tag autocompletion
-
-		// Crumb check and permission check are not required because this won't modify anything and it returns public info
-
-		$term = param( 'term', 'string' );
-
-		if( substr( $term, 0, 1 ) == '-' )
-		{ // Prevent chars '-' in first position
-			$term = preg_replace( '/^-+/', '', $term );
-		}
-
-		// Deny to use a comma in tag names:
-		$term = str_replace( ',', ' ', $term );
-
-		$term_is_new_tag = true;
-
-		if( ! empty( $term ) )
-		{ // Find tags in DB only when term is not empty
-			$tags = $DB->get_results( '
-				SELECT tag_name AS id, tag_name AS title
-				  FROM T_items__tag
-				 WHERE tag_name LIKE '.$DB->quote('%'.$term.'%').' COLLATE utf8_general_ci
-				 ORDER BY tag_name', ARRAY_A );
-			/* Yura: Here I added "COLLATE utf8_general_ci" because:
-			 * It allows to match "testA" with "testa", and otherwise "testa" with "testA".
-			 * It also allows to find "ee" when we type in "éè" and otherwise.
-			 */
-
-			// Check if current term is not an existing tag
-			foreach( $tags as $tag )
-			{
-				/* Yura: I have added "utf8_strtolower()" below in condition in order to:
-				 * When we enter new tag 'testA' and the tag 'testa' already exists
-				 * then we suggest only 'testa' instead of 'testA'.
-				 */
-				if( utf8_strtolower( $tag['title'] ) == utf8_strtolower( $term ) )
-				{ // Current term is an existing tag
-					$term_is_new_tag = false;
-				}
-			}
-		}
-
-		if( $term_is_new_tag && ! empty( $term ) )
-		{ // Add current term in the beginning of the tags list
-			array_unshift( $tags, array( 'id' => $term, 'title' => $term ) );
-		}
-
-		echo evo_json_encode( $tags );
-		exit(0);
 
 	case 'crop':
 		// Get form to crop profile picture
@@ -1373,6 +1276,7 @@ if( $current_debug || $current_debug_jslog )
 						), 'ul', 'jslog' );
 }
 
+// Add ajax response end comment:
 echo '<!-- Ajax response end -->';
 
 exit(0);

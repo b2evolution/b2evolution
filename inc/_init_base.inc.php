@@ -92,7 +92,7 @@ if( isset( $error_message ) )
 /**
  * Class loader.
  */
-require_once $inc_path.'_core/_class5.funcs.php';
+require_once $inc_path.'_core/_class_loader.funcs.php';
 
 
 /**
@@ -242,12 +242,6 @@ load_class( '_core/model/_module.class.php', 'Module' );
 foreach( $modules as $module )
 {
 	require_once $inc_path.$module.'/_'.$module.'.init.php';
-}
-
-if( ! defined( 'ENT_HTML5' ) )
-{	// Define flag for function htmlspecialchars():
-	// It is available by default since php 5.4.0
-	define( 'ENT_HTML5', 48 );
 }
 
 $Timer->pause( '_init_base' );

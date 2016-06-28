@@ -37,9 +37,9 @@ while( mainlist_get_item() )
 { // For each blog post, do everything below up to the closing curly brace "}"
 
 	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-	skin_include( '_item_block.inc.php', array(
+	skin_include( '_item_block.inc.php', array_merge( array(
 			'content_mode' => 'auto', // 'auto' will auto select depending on $disp-detail
-		) );
+		), $params ) );
 	// ----------------------------END ITEM BLOCK  ----------------------------
 
 } // ---------------------------------- END OF POSTS ------------------------------------

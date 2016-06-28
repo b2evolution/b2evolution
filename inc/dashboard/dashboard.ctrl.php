@@ -72,6 +72,7 @@ $AdminUI->disp_body_top();
 $AdminUI->disp_payload_begin();
 // Display blog list VIEW:
 $AdminUI->disp_view( 'collections/views/_coll_list.view.php' );
+load_funcs( 'collections/model/_blog_js.funcs.php' );
 $AdminUI->disp_payload_end();
 
 
@@ -113,14 +114,14 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 			'type'  => 'number',
 		);
 	$post_all_counter = get_table_count( 'T_items__item' );
-	
+
 	// Posts
 	$chart_data[] = array(
 			'title' => T_('Posts'),
 			'value' => $post_all_counter,
 			'type'  => 'number',
 		);
-	
+
 	// Slugs
 	$chart_data[] = array(
 			'title' => T_('Slugs'),
@@ -166,7 +167,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 	//---- END OF - System stats ----//
 
-	 
+
 	$block_item_Widget = new Widget( 'block_item' );
 
 	$block_item_Widget->title = T_('Updates from b2evolution.net');

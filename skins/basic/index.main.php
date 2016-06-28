@@ -183,7 +183,6 @@ siteskin_include( '_site_body_header.inc.php' );
 				if( $disp == 'single' )
 				{
 					// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-					// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 					// Display container contents:
 					skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 						// The following (optional) params will be used as defaults for widgets included in this container:
@@ -194,7 +193,7 @@ siteskin_include( '_site_body_header.inc.php' );
 						'block_title_start' => '<h3>',
 						'block_title_end' => '</h3>',
 						// Params for skin file "_item_content.inc.php"
-						'widget_coll_item_content_params' => array( 'image_size' => 'fit-400x320' ),
+						'widget_item_content_params' => array( 'image_size' => 'fit-400x320' ),
 					) );
 					// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 				}
@@ -262,7 +261,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				'disp_posts'  => '',		// We already handled this case above
 				'disp_single' => '',		// We already handled this case above
 				'disp_page'   => '',		// We already handled this case above
-				'author_link_text' => 'preferredname',
+				'author_link_text' => 'auto',
 			) );
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.

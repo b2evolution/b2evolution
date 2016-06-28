@@ -47,10 +47,23 @@ switch( $action )
 {
 	case 'new':
 		// New collection: Select blog type
+	case 'copy':
+		// Copy collection:
 		// Check permissions:
 		if( ! $current_User->check_perm( 'blogs', 'create' ) )
 		{
 			$Messages->add( T_('You don\'t have permission to create a collection.'), 'error' );
+			$redirect_to = param( 'redirect_to', 'url', $admin_url );
+			header_redirect( $redirect_to );
+		}
+
+		$user_Group = $current_User->get_Group();
+		$max_allowed_blogs = $user_Group->get_GroupSettings()->get( 'perm_max_createblog_num', $user_Group->ID );
+		$user_blog_count = $current_User->get_num_blogs();
+
+		if( $max_allowed_blogs != '' && $max_allowed_blogs <= $user_blog_count )
+		{
+			$Messages->add( sprintf( T_('You already own %d collection/s. You are not currently allowed to create any more.'), $user_blog_count ) );
 			$redirect_to = param( 'redirect_to', 'url', $admin_url );
 			header_redirect( $redirect_to );
 		}
@@ -116,11 +129,78 @@ switch( $action )
 			// create the new blog
 			$edited_Blog->create( $kind );
 
+			global $Settings;
+
+			param( 'set_as_info_blog', 'boolean' );
+			param( 'set_as_login_blog', 'boolean' );
+			param( 'set_as_msg_blog', 'boolean' );
+
+			if( $set_as_info_blog && ! $Settings->get( 'info_blog_ID' ) )
+			{
+				$Settings->set( 'info_blog_ID', $edited_Blog->ID );
+			}
+			if( $set_as_login_blog && ! $Settings->get( 'login_blog_ID' ) )
+			{
+				$Settings->set( 'login_blog_ID', $edited_Blog->ID );
+			}
+			if( $set_as_msg_blog && ! $Settings->get( 'mgs_blog_ID' ) )
+			{
+				$Settings->set( 'msg_blog_ID', $edited_Blog->ID );
+			}
+			$Settings->dbupdate();
+
+			// create demo contents for the new blog
+			param( 'create_demo_contents', 'boolean' );
+			param( 'blog_locale', 'string' );
+			if( $create_demo_contents )
+			{
+				global $user_org_IDs;
+
+				load_funcs( 'collections/_demo_content.funcs.php' );
+				param( 'create_demo_org', 'boolean', false );
+				param( 'create_demo_users', 'boolean', false );
+				$user_org_IDs = NULL;
+
+				if( $create_demo_org && $current_User->check_perm( 'orgs', 'create', true ) )
+				{ // Create the demo organization
+					$user_org_IDs = array( create_demo_organization( $edited_Blog->owner_user_ID )->ID );
+				}
+				if( $create_demo_users )
+				{ // Create demo users
+					get_demo_users( true, NULL, $user_org_IDs );
+				}
+
+				// Switch locale to translate content
+				locale_temp_switch( $blog_locale );
+				create_sample_content( $kind, $edited_Blog->ID, $edited_Blog->owner_user_ID, $create_demo_users );
+				locale_restore_previous();
+			}
+
 			// We want to highlight the edited object on next list display:
 			// $Session->set( 'fadeout_array', array( 'blog_ID' => array($edited_Blog->ID) ) );
 
+			header_redirect( $edited_Blog->gen_blogurl() );// will save $Messages into Session
+		}
+		break;
+
+	case 'duplicate':
+		// Duplicate collection:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'collection' );
+
+		// Check permissions:
+		$current_User->check_perm( 'blogs', 'create', true );
+
+		if( $edited_Blog->duplicate() )
+		{	// The collection has been duplicated successfully:
+			$Messages->add( T_('The collection has been duplicated.'), 'success' );
+
 			header_redirect( $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
 		}
+
+		//
+		$action = 'copy';
 		break;
 
 
@@ -271,11 +351,6 @@ switch( $action )
 		param_check_url( 'notification_logo', 'http-https' );
 		$Settings->set( 'notification_logo', get_param( 'notification_logo' ) );
 
-		// Large site logo url
-		param( 'notification_logo_large', 'string', '' );
-		param_check_url( 'notification_logo_large', 'http-https' );
-		$Settings->set( 'notification_logo_large', get_param( 'notification_logo_large' ) );
-
 		// Site footer text
 		$Settings->set( 'site_footer_text', param( 'site_footer_text', 'string', '' ) );
 
@@ -289,6 +364,7 @@ switch( $action )
 		}
 
 		// Terms & Conditions:
+		$Settings->set( 'site_terms_enabled', param( 'site_terms_enabled', 'integer', 0 ) );
 		$Settings->set( 'site_terms', param( 'site_terms', 'integer', '' ) );
 
 		// Default blog
@@ -446,6 +522,17 @@ switch( $action )
 		$AdminUI->disp_payload_begin();
 
 		$next_action = 'create';
+
+		$AdminUI->disp_view( 'collections/views/_coll_general.form.php' );
+
+		$AdminUI->disp_payload_end();
+		break;
+
+
+	case 'copy':
+		$AdminUI->disp_payload_begin();
+
+		$next_action = 'duplicate';
 
 		$AdminUI->disp_view( 'collections/views/_coll_general.form.php' );
 

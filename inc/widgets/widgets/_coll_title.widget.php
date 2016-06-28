@@ -27,10 +27,10 @@ class coll_title_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function coll_title_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'coll_title' );
+		parent::__construct( $db_row, 'core', 'coll_title' );
 	}
 
 

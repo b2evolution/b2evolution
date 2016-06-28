@@ -22,7 +22,7 @@ class shortlinks_plugin extends Plugin
 	var $code = 'b2evWiLi';
 	var $name = 'Short Links';
 	var $priority = 35;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -182,7 +182,8 @@ class shortlinks_plugin extends Plugin
 	 */
 	function render_content( & $content )
 	{
-		global $ItemCache, $admin_url, $blog, $evo_charset;
+
+		global $ItemCache, $admin_url, $blog, $evo_charset, $post_ID;
 
 		$regexp_modifier = '';
 		if( $evo_charset == 'utf-8' )
@@ -333,6 +334,13 @@ class shortlinks_plugin extends Plugin
 				// Parse wiki word to find additional param for atrr "id"
 				$url_params = '';
 				preg_match( '/^([^#]+)(#(.+))?$/i', $WikiWord, $WikiWord_match );
+				if( empty( $WikiWord_match ) )
+				{
+					preg_match( '/#(?<=#).*/', $WikiWord, $WikiWord_match );
+					$WikiWord_match[1] = isset( $WikiWord_match[0] ) ? $WikiWord_match[0] : null;
+					$anchor = $WikiWord_match[1];
+				}
+
 				if( isset( $WikiWord_match[3] ) )
 				{ // wiki word has attr "id"
 					$url_params .= '#'.$WikiWord_match[3];
@@ -378,7 +386,12 @@ class shortlinks_plugin extends Plugin
 				$permalink = '';
 				$link_text = preg_replace( array( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '*([^0-9])([0-9])*'.$regexp_modifier ), '$1 $2', $WikiWord );
 				$link_text = ucwords( str_replace( '-', ' ', $link_text ) );
-				if( ($Chapter = & $ChapterCache->get_by_urlname( $wiki_word, false )) !== false )
+				if( is_numeric( $wiki_word ) && ( $Item = & $ItemCache->get_by_ID( $wiki_word, false )) !== false )
+				{ // Item is found
+					$permalink = $Item->get_permanent_url();
+					$existing_link_text = $Item->get( 'title' );
+				}
+				elseif( ($Chapter = & $ChapterCache->get_by_urlname( $wiki_word, false )) !== false )
 				{ // Chapter is found
 					$permalink = $Chapter->get_permanent_url();
 					$existing_link_text = $Chapter->get( 'name' );
@@ -387,6 +400,13 @@ class shortlinks_plugin extends Plugin
 				{ // Item is found
 					$permalink = $Item->get_permanent_url();
 					$existing_link_text = $Item->get( 'title' );
+				}
+				elseif( isset( $anchor ) && ( $Item = & $ItemCache->get_by_ID( $ItemCache->ID_array[0], false )) !== false )
+				{ // Item is found
+					$permalink = $Item->get_permanent_url();
+					$permalink = $url_params == '' ? $permalink.$anchor : $url_params;
+					$existing_link_text = $Item->get( 'title' );
+					unset($anchor);
 				}
 
 				if( !empty( $permalink ) )
@@ -405,7 +425,7 @@ class shortlinks_plugin extends Plugin
 				}
 				else
 				{ // Chapter and Item are not found
-					$create_link = isset($blog) ? ('<a href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
+					$create_link = isset( $blog ) && !is_numeric( $wiki_word ) ? ('<a href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1%20$2', $WikiWord ).'&amp;post_urltitle='.$wiki_word.'" title="Create...">?</a>') : '';
 
 					// [[WikiWord text]]
 					$replace_links[] = '<span class="NonExistentWikiWord">$1'.$create_link.'</span>';
@@ -561,7 +581,7 @@ class shortlinks_plugin extends Plugin
 		require_js( 'functions.js', 'blog', true, true );
 
 		// Load css for modal window:
-		require_css( $this->get_plugin_url().'/shortlinks.css', 'relative', NULL, NULL, '#', true );
+		$this->require_css( 'shortlinks.css', true );
 
 		// Initialize JavaScript to build and open window:
 		echo_modalwindow_js();
@@ -648,17 +668,17 @@ class shortlinks_plugin extends Plugin
 		/**
 		 * Execute REST API request
 		 *
-		 * @param string URL
+		 * @param string REST API path
 		 * @param string Object selector
 		 * @param function Function on success request
 		 */
-		function shortlinks_api_request( url, obj_selector, func )
+		function shortlinks_api_request( api_path, obj_selector, func )
 		{
 			shortlinks_start_loading( obj_selector );
 
 			jQuery.ajax(
 			{
-				url: '<?php echo $baseurl; ?>api/v1/' + url
+				url: restapi_url + api_path
 			} )
 			.then( func, function( jqXHR )
 			{	// Error request, Display the error data:
@@ -806,9 +826,9 @@ class shortlinks_plugin extends Plugin
 				var r = '<div id="shortlinks_colls_list">'
 					+ '<h2><?php echo TS_('Collections'); ?></h2>'
 					+ '<select class="form-control">';
-				for( var c in data )
+				for( var c in data.colls )
 				{
-					var coll = data[c];
+					var coll = data.colls[c];
 					r += '<option value="' + coll.urlname + '"'
 						+ ( current_coll_urlname == coll.urlname ? ' selected="selected"' : '' )+ '>'
 						+ coll.name + '</option>';
@@ -870,7 +890,7 @@ class shortlinks_plugin extends Plugin
 
 			var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&paged=' + page;
 
-			shortlinks_api_request( 'collections/' + coll_urlname + '/items?orderby=datemodified&order=DESC' + page_param, '#shortlinks_posts_list', function( data )
+			shortlinks_api_request( 'collections/' + coll_urlname + '/items&orderby=datemodified&order=DESC' + page_param, '#shortlinks_posts_list', function( data )
 			{	// Display the posts on success request:
 				var r = '<ul>';
 				for( var p in data.items )
@@ -895,7 +915,7 @@ class shortlinks_plugin extends Plugin
 		{
 			var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&page=' + page;
 
-			shortlinks_api_request( 'collections/' + coll_urlname + '/search/' + search_keyword + '?kind=item' + page_param, '#shortlinks_posts_list', function( data )
+			shortlinks_api_request( 'collections/' + coll_urlname + '/search/' + search_keyword + '&kind=item' + page_param, '#shortlinks_posts_list', function( data )
 			{	// Display the post data in third column on success request:
 				if( typeof( data.code ) != 'undefined' )
 				{	// Error code was responsed:

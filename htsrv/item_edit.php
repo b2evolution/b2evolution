@@ -103,8 +103,8 @@ switch( $action )
 		// but we need to make sure the requested/default one is ok:
 		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status );
 
-		// Check if new category was started to create. If yes then set up parameters for next page
-		check_categories_nosave( $post_category, $post_extracats );
+		// Check if new category was started to create. If yes then set up parameters for next page:
+		check_categories_nosave( $post_category, $post_extracats, $edited_Item, 'backoffice' );
 
 		$edited_Item->set( 'main_cat_ID', $post_category );
 		if( $edited_Item->main_cat_ID && ( get_allow_cross_posting() < 2 ) && $edited_Item->get_blog_ID() != $blog )
@@ -138,8 +138,8 @@ switch( $action )
 		// from tab to tab via javascript when the editor wants to switch views...
 		$edited_Item->load_from_Request ( true ); // needs Blog set
 
-		// Check if new category was started to create. If yes then set up parameters for next page
-		check_categories_nosave ( $post_category, $post_extracats );
+		// Check if new category was started to create. If yes then set up parameters for next page:
+		check_categories_nosave( $post_category, $post_extracats, $edited_Item, 'backoffice' );
 
 		$edited_Item->set ( 'main_cat_ID', $post_category );
 		if( $edited_Item->main_cat_ID && ( get_allow_cross_posting() < 2 ) && $edited_Item->get_blog_ID() != $blog )
@@ -160,8 +160,8 @@ switch( $action )
 	case 'create': // Create a new post
 		$exit_after_save = ( $action != 'create_edit' );
 
-		// Check if new category was started to create. If yes check if it is valid.
-		check_categories( $post_category, $post_extracats );
+		// Check if new category was started to create. If yes check if it is valid:
+		check_categories( $post_category, $post_extracats, NULL, 'frontoffice' );
 
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post!'.$post_status, 'create', true, $post_extracats );
@@ -234,7 +234,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( true, $exit_after_save );
+		$edited_Item->handle_notifications( NULL, true );
 
 		$Messages->add( T_('Post has been created.'), 'success' );
 
@@ -256,8 +256,8 @@ switch( $action )
 		// Check edit permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
-		// Check if new category was started to create.  If yes check if it is valid.
-		$isset_category = check_categories( $post_category, $post_extracats );
+		// Check if new category was started to create.  If yes check if it is valid:
+		$isset_category = check_categories( $post_category, $post_extracats, $edited_Item, 'frontoffice' );
 
 		// Get requested Post Type:
 		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
@@ -306,7 +306,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( false, $exit_after_save );
+		$edited_Item->handle_notifications();
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
@@ -325,7 +325,7 @@ switch( $action )
 		}
 		else
 		{ // User can see this post in the Front-office
-			if( $edited_Item->ityp_ID == 1520 )
+			if( $edited_Item->get_type_setting( 'usage' ) == 'intro-cat' )
 			{ // If post is category intro we should redirect to page of that category
 				$main_Chapter = & $edited_Item->get_main_Chapter();
 				$redirect_to = $main_Chapter->get_permanent_url();
@@ -342,7 +342,10 @@ switch( $action )
 		break;
 
 	case 'update_workflow':
-		// Update workflow properties from disp=single
+		// Update workflow properties from disp=single:
+
+		$current_User->check_perm( 'blog_can_be_assignee', 'edit', true, $Blog->ID );
+
 		if( $Blog->get_setting( 'use_workflow' ) )
 		{ // Only if the workflow is enabled on collection
 			param( 'item_st_ID', 'integer', NULL );
@@ -364,8 +367,6 @@ switch( $action )
 				$Messages->add( T_('The workflow properties have been updated.'), 'success' );
 			}
 		}
-
-		$redirect_to = $edited_Item->get_permanent_url();
 
 		// REDIRECT / EXIT
 		header_redirect( $redirect_to );

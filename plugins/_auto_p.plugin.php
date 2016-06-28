@@ -22,7 +22,7 @@ class auto_p_plugin extends Plugin
 	var $code = 'b2WPAutP';
 	var $name = 'Auto P';
 	var $priority = 80;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -58,9 +58,16 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 
 
 	/**
-	 * @return array
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
+	 *
+	 * @param array Associative array of parameters (since v1.9).
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
+	 * @return array see {@link Plugin::GetDefaultSettings()}.
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
+	 * and assign an array with the following keys to them (only 'label' is required):
 	 */
-	function GetDefaultSettings()
+	function GetDefaultSettings( & $params )
 	{
 		return array(
 				'br' => array(

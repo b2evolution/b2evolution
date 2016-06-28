@@ -440,9 +440,6 @@ function get_request_title( $params = array() )
 			'subs_text'           => T_('Notifications'),
 			'comments_text'       => T_('Latest Comments'),
 			'feedback-popup_text' => T_('Feedback'),
-			'edit_text_create'    => T_('New post'),
-			'edit_text_update'    => T_('Editing post'),
-			'edit_text_copy'      => T_('Duplicating post'),
 			'edit_comment_text'   => T_('Editing comment'),
 			'front_text'          => '',		// We don't want to display a special title on the front page
 			'posts_text'          => '#',		// Automatic - display filters
@@ -634,7 +631,7 @@ function get_request_title( $params = array() )
 				$after = $params['title_'.$disp.'_after'];
 			}
 			break;
-	
+
 		case 'download':
 			// We are displaying a download page:
 			global $download_Link;
@@ -670,21 +667,24 @@ function get_request_title( $params = array() )
 			break;
 
 		case 'edit':
+			global $edited_Item;
+			$type_name = $edited_Item->get_ItemType()->get_name();
+
 			$action = param_action(); // Edit post by switching into 'In skin' mode from Back-office
 			$p = param( 'p', 'integer', 0 ); // Edit post from Front-office
 			$post_ID = param ( 'post_ID', 'integer', 0 ); // Update the edited post( If user is redirected to edit form again with some error messages )
 			$cp = param( 'cp', 'integer', 0 ); // Copy post from Front-office
 			if( $action == 'edit_switchtab' || $p > 0 || $post_ID > 0 )
 			{	// Edit post
-				$title = $params['edit_text_update'];
+				$title = sprintf( T_('Edit %s'), $type_name );
 			}
 			else if( $cp > 0 )
 			{	// Copy post
-				$title = $params['edit_text_copy'];
+				$title = sprintf( T_('Duplicate %s'), $type_name );
 			}
 			else
 			{	// Create post
-				$title = $params['edit_text_create'];
+				$title = sprintf( T_('New %s'), $type_name );
 			}
 			if( $params['display_edit_links'] && $params['auto_pilot'] != 'seo_title' )
 			{ // Add advanced edit and close icon
@@ -970,8 +970,14 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 	{ // Be sure to get a fresh copy of this CSS file after application upgrades:
 		if( $version == '#' )
 		{
-			global $app_version_long;
+			global $app_version_long, $Skin;
+
 			$version = $app_version_long;
+
+			if( ( $relative_to == 'relative' || $relative_to === true ) && ! is_admin_page() && isset( $Skin ) )
+			{	// Prepand skin version to clear file from browser cache after skin switching:
+				$version = $Skin->folder.'+'.$Skin->version.'+'.$version;
+			}
 		}
 		$lib_url = url_add_param( $lib_url, 'v='.$version );
 	}
@@ -996,14 +1002,20 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
  * @param boolean|string Is the file's path relative to the base path/url?
  * @param boolean TRUE to add attribute "async" to load javascript asynchronously
  * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+ * @param string version number to append at the end of requested url to avoid getting an old version from the cache
  */
-function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output = false )
+function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output = false, $version = '#' )
 {
 	global $required_js; // Use this var as global and NOT static, because it is used in other functions(e.g. display_ajax_form())
 	global $dequeued_headlines;
 
 	if( isset( $dequeued_headlines[ $js_file ] ) )
 	{ // Don't require this file if it was dequeued before this request
+		return;
+	}
+
+	if( is_admin_page() && in_array( $js_file, array( 'functions.js', 'ajax.js', 'form_extensions.js', 'extracats.js', 'dynamic_select.js', 'backoffice.js' ) ) )
+	{	// Don't require this file on back-office because it is auto loaded by bundled file evo_backoffice.bmin.js:
 		return;
 	}
 
@@ -1014,11 +1026,11 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
 
 	if( in_array( $js_file, array( '#jqueryUI#', 'communication.js', 'functions.js' ) ) )
 	{ // Dependency : ensure jQuery is loaded
-		require_js( '#jquery#', $relative_to, $async, $output );
+		require_js( '#jquery#', $relative_to, $async, $output, $version );
 	}
 
 	// Get library url of JS file by alias name
-	$js_url = get_require_url( $js_file, $relative_to, 'js' );
+	$js_url = get_require_url( $js_file, $relative_to, 'js', $version );
 
 	// Add to headlines, if not done already:
 	if( empty( $required_js ) || ! in_array( strtolower( $js_url ), $required_js ) )
@@ -1592,7 +1604,7 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
  */
 function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintbox' )
 {
-	global $blog;
+	global $Blog;
 
 	require_js( '#jquery#', $relative_to ); // dependency
 
@@ -1600,6 +1612,7 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 	{
 		case 'typeahead':
 			// Use typeahead library of bootstrap
+			require_js( '#bootstrap_typeahead#', $relative_to );
 			add_js_headline( 'jQuery( document ).ready( function()
 			{
 				jQuery( "input.autocomplete_login" ).on( "added",function()
@@ -1610,6 +1623,15 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 						{	// Skip this field because typeahead is initialized before:
 							return;
 						}
+						var ajax_url = "";
+						if( jQuery( this ).hasClass( "only_assignees" ) )
+						{
+							ajax_url = restapi_url + "'.( isset( $Blog ) ? 'collections/'.$Blog->get( 'urlname' ).'/assignees' : 'users/logins' ).'";
+						}
+						else
+						{
+							ajax_url = restapi_url + "users/logins";
+						}
 						jQuery( this ).typeahead( null,
 						{
 							displayKey: "login",
@@ -1617,16 +1639,16 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 							{
 								jQuery.ajax(
 								{
-									url: "'.get_secure_htsrv_url().'async.php?action=get_login_list",
-									type: "post",
-									data: { q: query, data_type: "json" },
+									type: "GET",
 									dataType: "JSON",
-									success: function( logins )
+									url: ajax_url,
+									data: { q: query },
+									success: function( data )
 									{
 										var json = new Array();
-										for( var l in logins )
+										for( var l in data.list )
 										{
-											json.push( { login: logins[ l ] } );
+											json.push( { login: data.list[ l ] } );
 										}
 										cb( json );
 									}
@@ -1655,16 +1677,21 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 			require_js( 'jquery/jquery.hintbox.min.js', $relative_to );
 			add_js_headline( 'jQuery( document ).on( "focus", "input.autocomplete_login", function()
 			{
-				var ajax_params = "";
+				var ajax_url = "";
 				if( jQuery( this ).hasClass( "only_assignees" ) )
 				{
-					ajax_params = "&user_type=assignees&blog='.$blog.'";
+					ajax_url = restapi_url + "'.( isset( $Blog ) ? 'collections/'.$Blog->get( 'urlname' ).'/assignees' : 'users/logins' ).'";
+				}
+				else
+				{
+					ajax_url = restapi_url + "users/logins";
 				}
 				jQuery( this ).hintbox(
 				{
-					url: "'.get_secure_htsrv_url().'async.php?action=get_login_list" + ajax_params,
+					url: ajax_url,
 					matchHint: true,
-					autoDimentions: true
+					autoDimentions: true,
+					json: true,
 				} );
 				'
 				// Don't submit a form by Enter when user is editing the owner fields
@@ -1959,7 +1986,7 @@ function credits( $params = array() )
 
 	display_list( $cred_links, $params['list_start'], $params['list_end'], $params['separator'], $params['item_start'], $params['item_end'], NULL, $max_credits );
 
-	return $max_credits;	
+	return $max_credits;
 }
 
 

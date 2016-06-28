@@ -683,18 +683,18 @@ function check_rename( & $newname, $is_dir, $dir_path, $allow_locked_filetypes )
 	{
 		if( $error_dirname = validate_dirname( $newname ) )
 		{ // invalid directory name
-			syslog_insert( sprintf( 'Invalid name is detected for folder %s', '<b>'.$newname.'</b>' ), 'warning', 'file' );
+			syslog_insert( sprintf( 'Invalid name is detected for folder %s', '[['.$newname.']]' ), 'warning', 'file' );
 			return $error_dirname;
 		}
 		if( $dirpath_max_length < ( strlen( $dir_path ) + strlen( $newname ) ) )
 		{ // The new path length would be too long
-			syslog_insert( sprintf( 'The renamed file %s is too long for the folder', '<b>'.$newname.'</b>' ), 'warning', 'file' );
+			syslog_insert( sprintf( 'The renamed file %s is too long for the folder', '[['.$newname.']]' ), 'warning', 'file' );
 			return T_('The new name is too long for this folder.');
 		}
 	}
 	elseif( $error_filename = validate_filename( $newname, $allow_locked_filetypes ) )
 	{ // Not a file name or not an allowed extension
-		syslog_insert( sprintf( 'The renamed file %s has an unrecognized extension', '<b>'.$newname.'</b>' ), 'warning', 'file' );
+		syslog_insert( sprintf( 'The renamed file %s has an unrecognized extension', '[['.$newname.']]' ), 'warning', 'file' );
 		return $error_filename;
 	}
 
@@ -1481,7 +1481,7 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 		if( $error_filename = process_filename( $newName, !$warn_invalid_filenames, true, $fm_FileRoot, $path ) )
 		{ // Not a valid file name or not an allowed extension:
 			$failedFiles[$lKey] = $error_filename;
-			syslog_insert( sprintf( 'The uploaded file %s has an unrecognized extension', '<b>'.$newName.'</b>' ), 'warning', 'file' );
+			syslog_insert( sprintf( 'The uploaded file %s has an unrecognized extension', '[['.$newName.']]' ), 'warning', 'file' );
 			// Abort upload for this file:
 			continue;
 		}
@@ -1505,7 +1505,8 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 			if( $correct_Filetype && $correct_Filetype->is_allowed() )
 			{ // A FileType with the given mime type exists in database and it is an allowed file type for current User
 				// The "correct" extension is a plausible one, proceed...
-				$correct_extension = array_shift($correct_Filetype->get_extensions());
+				$correct_extension = $correct_Filetype->get_extensions();
+				$correct_extension = array_shift( $correct_extension );
 				$path_info = pathinfo($newName);
 				$current_extension = $path_info['extension'];
 
@@ -1550,7 +1551,7 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 		}
 		elseif( ! move_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey], $newFile->get_full_path() ) )
 		{
-			syslog_insert( sprintf( 'File %s could not be uploaded', '<b>'.$newFile->get_name().'</b>' ), 'warning', 'file', $newFile->ID );
+			syslog_insert( sprintf( 'File %s could not be uploaded', '[['.$newFile->get_name().']]' ), 'warning', 'file', $newFile->ID );
 			$failedFiles[$lKey] = T_('An unknown error occurred when moving the uploaded file on the server.');
 			// Abort upload for this file:
 			continue;
@@ -1600,7 +1601,7 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 
 		// Store File object into DB:
 		$newFile->dbsave();
-		syslog_insert( sprintf( 'File %s was uploaded', '<b>'.$newFile->get_name().'</b>' ), 'info', 'file', $newFile->ID );
+		report_user_upload( $newFile );
 		$uploadedFiles[] = $newFile;
 	}
 
@@ -1699,6 +1700,21 @@ function prepare_uploaded_image( $File, $mimetype )
 	{	// Save resized image ( and also rotated image if this operation was done )
 		save_image( $resized_imh, $File->get_full_path(), $mimetype, $thumb_quality );
 	}
+}
+
+
+/**
+ * Reports user file upload by inserting system log entry
+ *
+ * @param object File uploaded by user
+ */
+function report_user_upload( $File )
+{
+	global $current_User;
+	load_funcs( 'files/model/_file.funcs.php' );
+
+	syslog_insert( sprintf( T_('User %s has uploaded the file %s -- Size: %s'),
+			$current_User->login, '[['.$File->get_full_path().']]', bytesreadable( $File->get_size(), false ) ), 'info', 'file', $File->ID );
 }
 
 
@@ -1832,7 +1848,7 @@ function check_file_exists( $fm_FileRoot, $path, $newName, $image_info = NULL )
 			$newName = fix_filename_length( $newName, strrpos( $newName, '-' ) );
 			if( $error_filename = process_filename( $newName, true ) )
 			{ // The file name is still not valid
-				syslog_insert( sprintf( 'Invalid file name %s has found during file exists check', '<b>'.$newName.'</b>' ), 'warning', 'file' );
+				syslog_insert( sprintf( 'Invalid file name %s has found during file exists check', '[['.$newName.']]' ), 'warning', 'file' );
 				debug_die( 'Invalid file name has found during file exists check: '.$error_filename );
 			}
 		}
@@ -2006,7 +2022,7 @@ function copy_file( $file_path, $root_ID, $path, $check_perms = true )
 	// validate file name
 	if( $error_filename = process_filename( $newName, true ) )
 	{	// Not a valid file name or not an allowed extension:
-		syslog_insert( sprintf( 'File %s is not valid or not an allowed extension', '<b>'.$newName.'</b>' ), 'warning', 'file' );
+		syslog_insert( sprintf( 'File %s is not valid or not an allowed extension', '[['.$newName.']]' ), 'warning', 'file' );
 		// Abort import for this file:
 		return NULL;
 	}
@@ -2126,7 +2142,7 @@ function create_profile_picture_links()
 					$fileName = $lFile->get_name();
 					if( process_filename( $fileName ) )
 					{ // The file has invalid file name, don't create in the database
-						syslog_insert( sprintf( 'Invalid file name %s has been found in a user folder', '<b>'.$fileName.'</b>' ), 'info', 'user', $iterator_User->ID );
+						syslog_insert( sprintf( 'Invalid file name %s has been found in a user folder', '[['.$fileName.']]' ), 'info', 'user', $iterator_User->ID );
 						// TODO: asimo> we should collect each invalid file name here, and send an email to the admin
 						continue;
 					}
@@ -2207,6 +2223,7 @@ function display_dragdrop_upload_button( $params = array() )
 			'after'            => '',
 			'fileroot_ID'      => 0, // Root type and ID, e.g. collection_1
 			'path'             => '', // Subpath for the file/folder
+			'listElement'      => 'null',
 			'list_style'       => 'list',  // 'list' or 'table'
 			'template_button'  => '<div class="qq-uploader">'
 					.'<div class="qq-upload-drop-area"><span>'.TS_('Drop files here to upload').'</span></div>'
@@ -2291,6 +2308,7 @@ function display_dragdrop_upload_button( $params = array() )
 			uploader = new qq.FileUploader(
 			{
 				element: document.getElementById( 'file-uploader' ),
+				listElement: <?php echo $params['listElement']; ?>,
 				list_style: '<?php echo $params['list_style']; ?>',
 				additional_dropzone: '<?php echo $params['additional_dropzone']; ?>',
 				action: url,
@@ -2473,8 +2491,8 @@ function display_dragdrop_upload_button( $params = array() )
 		?>
 		function update_iframe_height()
 		{
-			var wrapper_height = jQuery( 'body' ).height();
-			jQuery( 'div#attachmentframe_wrapper', window.parent.document ).css( { 'height': wrapper_height, 'max-height': wrapper_height } );
+			var table_height = jQuery( '#attachments_fieldset_table' ).height();
+			jQuery( '#attachments_fieldset_wrapper' ).css( { 'height': table_height, 'max-height': table_height } );
 		}
 		<?php } ?>
 

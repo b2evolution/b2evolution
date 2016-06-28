@@ -8,7 +8,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $AdminUI;
 
 param( 'user_tab', 'string', '', true );
-if( empty($user_tab) )
+if( empty( $user_tab ) )
 {
 	$user_tab = 'profile';
 }
@@ -49,14 +49,14 @@ if( $user_profile_only )
 
 $UserCache = & get_UserCache();
 
-if( ! is_null($user_ID) )
+if( ! is_null( $user_ID ) )
 { // User selected
 	if( $action == 'update' && $user_ID == 0 )
 	{ // we create a new user
 		$edited_User = new User();
 		$edited_User->set_datecreated( $localtimenow );
 	}
-	elseif( ($edited_User = & $UserCache->get_by_ID( $user_ID, false )) === false )
+	elseif( ( $edited_User = & $UserCache->get_by_ID( $user_ID, false ) ) === false )
 	{	// We could not find the User to edit:
 		unset( $edited_User );
 		forget_param( 'user_ID' );
@@ -356,6 +356,8 @@ if( !$Messages->has_errors() )
 
 			if( param( 'advanced_form', 'boolean', false ) )
 			{
+				/*
+				 * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
 				$current_admin_skin = param( 'current_admin_skin', 'string' );
 				if( ( $current_admin_skin == $UserSettings->get( 'admin_skin', $current_User->ID ) ) &&
 					( $current_admin_skin == $UserSettings->get( 'admin_skin', $edited_User->ID ) ) )
@@ -363,6 +365,7 @@ if( !$Messages->has_errors() )
 					// edited user admin skin is the same as current user admin skin
 					$AdminUI->set_skin_settings( $edited_User->ID );
 				}
+				 */
 
 				if( $UserSettings->dbupdate() )
 				{
@@ -376,7 +379,8 @@ if( !$Messages->has_errors() )
 				$Plugins->restart();
 				while( $loop_Plugin = & $Plugins->get_next() )
 				{
-					$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) );
+					$tmp_params = array( 'for_editing' => true );
+					$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params );
 					if( empty($pluginusersettings) )
 					{
 						continue;
@@ -389,8 +393,8 @@ if( !$Messages->has_errors() )
 					}
 
 					// Let the plugin handle custom fields:
-					$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array(
-						'User' => & $edited_User, 'action' => 'save' ) );
+					$tmp_params = array( 'User' => & $edited_User, 'action' => 'save' );
+					$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params );
 
 					if( $ok_to_update === false )
 					{
@@ -466,7 +470,8 @@ if( !$Messages->has_errors() )
 			$Plugins->restart();
 			while( $loop_Plugin = & $Plugins->get_next() )
 			{
-				$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) );
+				$tmp_params = array( 'for_editing' => true );
+				$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params );
 
 				if( empty($pluginusersettings) )
 				{
@@ -484,8 +489,8 @@ if( !$Messages->has_errors() )
 				}
 
 				// Let the plugin handle custom fields:
-				$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array(
-					'User' => & $edited_User, 'action' => 'reset' ) );
+				$tmp_params = array( 'User' => & $edited_User, 'action' => 'reset' );
+				$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params );
 
 				if( $ok_to_update === false )
 				{
@@ -1019,6 +1024,9 @@ switch( $action )
 				}
 				$image_width = param( 'image_width', 'integer' );
 				$image_height = param( 'image_height', 'integer' );
+				$aspect_ratio = param( 'aspect_ratio', 'double' );
+				$content_width = param( 'content_width', 'integer' );
+				$content_height = param( 'content_height', 'integer' );
 				$AdminUI->disp_view( 'users/views/_user_crop.form.php' );
 				if( $display_mode != 'js')
 				{

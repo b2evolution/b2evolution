@@ -90,17 +90,16 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedback-options') );
 
-	$advanced_perms_warning = $edited_Blog->get_advanced_perms_warning();
 	$Form->radio( 'allow_comments', $edited_Blog->get_setting( 'allow_comments' ),
 						array(  array( 'any', T_('Any user'), T_('Including anonymous users'),
-										$advanced_perms_warning, 'onclick="show_hide_feedback_details(this);"'),
+										'', 'onclick="show_hide_feedback_details(this);"'),
 								array( 'registered', T_('Registered users only'),  '',
 										'', 'onclick="show_hide_feedback_details(this);"'),
 								array( 'member', T_('Members only'),  T_( 'Users have to be members of this blog' ),
 										'', 'onclick="show_hide_feedback_details(this);"'),
 								array( 'never', T_('Not allowed'), '',
 										'', 'onclick="show_hide_feedback_details(this);"'),
-					), T_('Comment posting by'), true );
+					), T_('Comment posting by'), true, $edited_Blog->get_advanced_perms_warning() );
 
 	echo '<div class="feedback_details_container">';
 
@@ -203,7 +202,7 @@ $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moder
 	}
 	// put this on feedback details container, this way it won't be displayed if comment posting is not allowed
 	echo '<div class="feedback_details_container">';
-	
+
 	if( $is_bootstrap_skin )
 	{	// Use dropdown for bootstrap skin:
 		$new_status_field = get_status_dropdown_button( array(
@@ -274,7 +273,8 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Subscriptions') . get_manual_link('comment-subscriptions') );
-	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), T_('Email subscriptions'), T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
+	$Form->checkbox( 'allow_comment_subscriptions', $edited_Blog->get_setting( 'allow_comment_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new comment.') );
+	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
 $Form->end_fieldset();
 
 

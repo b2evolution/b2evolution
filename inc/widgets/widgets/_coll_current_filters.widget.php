@@ -28,10 +28,10 @@ class coll_current_filters_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function coll_current_filters_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'coll_current_filters' );
+		parent::__construct( $db_row, 'core', 'coll_current_filters' );
 	}
 
 

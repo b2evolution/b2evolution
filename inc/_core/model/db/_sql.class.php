@@ -367,12 +367,12 @@ class SQL
 	}
 
 	/**
-	 * create the filter whith the search field array
+	 * Create the filter whith the search field array
 	 *
 	 * @param string keywords separated by space
 	 * @param string operator( AND , OR , PHRASE ) for the filter
 	 */
-	function WHERE_keywords( $search, $search_kw_combine )
+	function WHERE_kw_search( $search, $search_kw_combine = 'AND' )
 	{
 		global $DB;
 

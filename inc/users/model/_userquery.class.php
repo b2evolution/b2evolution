@@ -37,7 +37,7 @@ class UserQuery extends SQL
 	 * @param string Name of the ID field (including prefix)
 	 * @param array Query params
 	 */
-	function UserQuery( $dbtablename = 'T_users', $dbprefix = 'user_', $dbIDname = 'user_ID', $params = array() )
+	function __construct( $dbtablename = 'T_users', $dbprefix = 'user_', $dbIDname = 'user_ID', $params = array() )
 	{
 		global $collections_Module;
 
@@ -54,6 +54,7 @@ class UserQuery extends SQL
 				'join_region'    => false,
 				'join_subregion' => false,
 				'join_city'      => true,
+				'join_colls'     => true,
 				'grouped'        => false,
 			), $params );
 
@@ -105,14 +106,17 @@ class UserQuery extends SQL
 			$this->FROM_add( 'LEFT JOIN T_regional__city ON user_city_ID = city_ID ' );
 		}
 
-		if( isset( $collections_Module ) )
-		{ // We are handling blogs:
-			$this->SELECT_add( ', COUNT( DISTINCT blog_ID ) AS nb_blogs' );
-			$this->FROM_add( 'LEFT JOIN T_blogs on user_ID = blog_owner_user_ID ' );
-		}
-		else
-		{
-			$this->SELECT_add( ', 0 AS nb_blogs' );
+		if( $params['join_colls'] )
+		{	// Join a count of collections:
+			if( isset( $collections_Module ) )
+			{	// We are handling blogs:
+				$this->SELECT_add( ', COUNT( DISTINCT blog_ID ) AS nb_blogs' );
+				$this->FROM_add( 'LEFT JOIN T_blogs on user_ID = blog_owner_user_ID ' );
+			}
+			else
+			{
+				$this->SELECT_add( ', 0 AS nb_blogs' );
+			}
 		}
 
 		$this->WHERE( 'user_ID IS NOT NULL' );
@@ -126,6 +130,24 @@ class UserQuery extends SQL
 			$this->GROUP_BY( 'user_ID' );
 			$this->ORDER_BY( '*, user_profileupdate_date DESC, user_lastseen_ts DESC, user_ID ASC' );
 		}
+	}
+
+
+	/**
+	 * Restrict by user IDs
+	 *
+	 * @param array User IDs
+	 */
+	function where_user_IDs( $user_IDs )
+	{
+		global $DB;
+
+		if( empty( $user_IDs ) )
+		{	// Don't restrict:
+			return;
+		}
+
+		$this->WHERE_and( 'user_ID IN ( '.$DB->quote( $user_IDs ).' ) ');
 	}
 
 
@@ -181,7 +203,7 @@ class UserQuery extends SQL
 	 *
 	 * @param string Keyword search string
 	 */
-	function where_keywords( $keywords )
+	function where_keywords( $keywords, $search_kw_combine = 'AND' )
 	{
 		global $DB;
 
@@ -201,7 +223,7 @@ class UserQuery extends SQL
 
 		if( count( $search ) > 0 )
 		{
-			$this->WHERE_and( implode( ' AND ', $search ) );
+			$this->WHERE_and( implode( ' '.$search_kw_combine.' ', $search ) );
 		}
 	}
 
@@ -209,7 +231,7 @@ class UserQuery extends SQL
 	/**
 	 * Restrict with gender
 	 *
-	 * @param string Gender ( M, F, MF )
+	 * @param string Gender ( M, F, O, MF, MO, FO, MFO )
 	 */
 	function where_gender( $gender )
 	{
@@ -220,13 +242,13 @@ class UserQuery extends SQL
 			return;
 		}
 
-		if( $gender == 'MF' )
-		{	// Get men AND women
-			$this->WHERE_and( 'user_gender IN ( "M", "F" )' );
-		}
-		else
-		{	// Get men OR women
-			$this->WHERE_and( 'user_gender = '.$DB->quote( $gender ) );
+		switch( $gender )
+		{
+			case 'MF': $this->WHERE_and( 'user_gender IN ( "M", "F" )' ); break;
+			case 'MO': $this->WHERE_and( 'user_gender IN ( "M", "O" )' ); break;
+			case 'FO': $this->WHERE_and( 'user_gender IN ( "F", "O" )' ); break;
+			case 'MFO': $this->WHERE_and( 'user_gender IN ( "M", "F", "O" )' ); break;
+			default: $this->WHERE_and( 'user_gender = '.$DB->quote( $gender ) ); break;
 		}
 	}
 
@@ -482,7 +504,7 @@ class UserQuery extends SQL
 		}
 
 		// Join Organization table
-		$this->SELECT_add( ', uorg_org_ID, uorg_accepted' );
+		$this->SELECT_add( ', uorg_org_ID, uorg_accepted, uorg_role' );
 		$this->FROM_add( 'INNER JOIN T_users__user_org ON uorg_user_ID = user_ID AND uorg_org_ID = '.$DB->quote( $org_ID ) );
 	}
 

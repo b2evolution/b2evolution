@@ -55,13 +55,13 @@ $params = array_merge( array(
 		'comment_text_after'    => '</div>',
 		'comment_info_before'   => '<footer class="evo_comment_footer clear text-muted"><small>',
 		'comment_info_after'    => '</small></footer></div>',
-		'preview_start'         => '<div class="evo_comment evo_comment__preview panel panel-warning" id="comment_preview">',
-		'preview_end'           => '</div>',
-		'comment_error_start'   => '<div class="evo_comment evo_comment__error panel panel-default" id="comment_error">',
-		'comment_error_end'     => '</div>',
+		'preview_start'         => '<article class="evo_comment evo_comment__preview panel panel-warning" id="comment_preview">',
+		'preview_end'           => '</article>',
+		'comment_error_start'   => '<article class="evo_comment evo_comment__error panel panel-default" id="comment_error">',
+		'comment_error_end'     => '</article>',
 		'comment_template'      => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
 		'comment_image_size'    => 'fit-1280x720',
-		'author_link_text'      => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+		'author_link_text'      => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 		'link_to'               => 'userurl>userpage',		    // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		// Comment notification functions:
 		'disp_notification'     => true,
@@ -242,7 +242,7 @@ if( $Item->can_see_comments( true ) )
 		// // Display the meta comments info ?
 		if( $params['disp_meta_comment_info'] 	// If we want it
 			&& ! $params['disp_meta_comments'] 	// If we're not displaying the full list of meta comments anyways
-			&& is_logged_in() 						// If we're lgged in
+			&& is_logged_in() 						// If we're logged in
 			&& $current_User->check_perm( 'meta_comment', 'view', false, $Item ) ) // If we have permission to edit this post
 		{	// Display the meta comments info:
 			global $admin_url;
@@ -473,7 +473,7 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 		$not_subscribed = true;
 		$creator_User = $Item->get_creator_User();
 
-		if( $Blog->get_setting( 'allow_subscriptions' ) )
+		if( $Blog->get_setting( 'allow_comment_subscriptions' ) )
 		{
 			$sql = 'SELECT count( sub_user_ID ) FROM T_subscriptions
 						WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0';

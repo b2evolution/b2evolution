@@ -1,10 +1,9 @@
 <?php
 /**
- * This is the main public interface file!
+ * This is the main front-office interface file! This will we displayed if you haven't configured
+ * a default collection to display.
  *
- * This file is NOT mandatory. You can delete it if you want.
- * You can also replace the contents of this file with contents similar to the contents
- * of a_stub.php, a_noskin.php, multiblogs.php, etc.
+ * This file is NOT mandatory. You can delete it if you have configured a default collection.
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}

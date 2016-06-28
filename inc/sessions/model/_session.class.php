@@ -165,7 +165,7 @@ class Session
 					{ // Some session data has been previsouly stored:
 
 						// Unserialize session data (using an own callback that should provide class definitions):
-						$old_callback = ini_set( 'unserialize_callback_func', 'session_unserialize_callback' );
+						$old_callback = @ini_set( 'unserialize_callback_func', 'session_unserialize_callback' );
 						if( $old_callback === false || is_null($old_callback) /* disabled, reported with PHP 5.2.5 */ )
 						{	// NULL if ini_set has been disabled for security reasons
 							// Brutally load all classes that we might need:
@@ -178,7 +178,7 @@ class Session
 
 						if( $old_callback !== false )
 						{	// Restore the old callback if we changed it:
-							ini_set( 'unserialize_callback_func', $old_callback );
+							@ini_set( 'unserialize_callback_func', $old_callback );
 						}
 
 						if( ! is_array($this->_data) )
@@ -193,7 +193,7 @@ class Session
 							$Debuglog->add( 'Session: Session data loaded.', 'request' );
 
 							// Load a Messages object from session data, if available:
-							if( ($sess_Messages = $this->get('Messages')) && is_a( $sess_Messages, 'Messages' ) )
+							if( ($sess_Messages = $this->get('Messages')) && $sess_Messages instanceof Messages )
 							{
 								// dh> TODO: "old" messages should rather get prepended to any existing ones from the current request, rather than appended
 								$Messages->add_messages( $sess_Messages );
@@ -720,6 +720,31 @@ class Session
 		global $pc_user_devices;
 
 		return array_key_exists( $this->sess_device, $pc_user_devices );
+	}
+
+
+	/**
+	 * Get first hit params of this session
+	 *
+	 * @return object Params, array, keys are names of T_hitlog fields: hit_ID, hit_sess_ID, hit_uri, hit_referer, hit_referer_dom_ID and etc.
+	 */
+	function get_first_hit_params()
+	{
+		if( ! isset( $this->first_hit_params ) )
+		{	// Get the params from DB only first time and then cache them:
+			global $DB;
+
+			$SQL = new SQL( 'Get first hit params of the session #'.$this->ID );
+			$SQL->SELECT( '*' );
+			$SQL->FROM( 'T_hitlog' );
+			$SQL->WHERE( 'hit_sess_ID = '.$DB->quote( $this->ID ) );
+			$SQL->ORDER_BY( 'hit_ID ASC' );
+			$SQL->LIMIT( '1' );
+
+			$this->first_hit_params = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title );
+		}
+
+		return $this->first_hit_params;
 	}
 }
 

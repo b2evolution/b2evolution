@@ -22,7 +22,7 @@ class widescroll_plugin extends Plugin
 	var $code = 'evo_widescroll';
 	var $name = 'Wide scroll';
 	var $priority = 100;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $group = 'rendering';
 	var $number_of_installs = 1;
 
@@ -59,7 +59,8 @@ class widescroll_plugin extends Plugin
 			}
 		}
 
-		return parent::get_coll_setting_definitions( array_merge( $params, $default_params ) );
+		$tmp_params = array_merge( $params, $default_params );
+		return parent::get_coll_setting_definitions( $tmp_params );
 	}
 
 
@@ -176,12 +177,12 @@ class widescroll_plugin extends Plugin
 		}
 
 		// Append css styles for tinymce editor area
-		global $tinymce_content_css;
+		global $tinymce_content_css, $app_version_long;
 		if( empty( $tinymce_content_css ) )
 		{ // Initialize first time
 			$tinymce_content_css = array();
 		}
-		$tinymce_content_css[] = get_require_url( $this->get_plugin_url().'tinymce_editor.css', true, 'css' );
+		$tinymce_content_css[] = get_require_url( $this->get_plugin_url().'tinymce_editor.css', true, 'css', $this->version.'+'.$app_version_long );
 
 		// Print toolbar on screen
 		return $this->DisplayCodeToolbar();
@@ -277,39 +278,44 @@ class widescroll_plugin extends Plugin
 
 
 	/**
-	 * Spits out the styles used
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
 	 *
-	 * @see Plugin::SkinBeginHtmlHead()
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
 	 */
-	function SkinBeginHtmlHead()
+	function SkinBeginHtmlHead( & $params )
 	{
 		global $Blog;
 
 		if( ! isset( $Blog ) || (
-		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' && 
+		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
 		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
 		{ // Don't load css/js files when plugin is not enabled
 			return;
 		}
 
 		require_js( '#jquery#', 'blog' );
-		require_js( $this->get_plugin_url().'jquery.scrollwide.min.js', true );
-		require_css( $this->get_plugin_url().'jquery.scrollwide.css', true );
+		$this->require_js( 'jquery.scrollwide.min.js' );
+		$this->require_css( 'jquery.scrollwide.css' );
 	}
 
 
 	/**
-	 * @see Plugin::AdminEndHtmlHead()
+	 * Event handler: Called when ending the admin html head section.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
 	 */
-	function AdminEndHtmlHead()
+	function AdminEndHtmlHead( & $params )
 	{
 		global $ctrl;
 
 		if( $ctrl == 'campaigns' && get_param( 'tab' ) == 'send' && $this->get_email_setting( 'email_apply_rendering' ) )
 		{	// Load this only on form to preview email campaign:
 			require_js( '#jquery#', 'blog' );
-			require_js( $this->get_plugin_url().'jquery.scrollwide.min.js', 'relative' );
-			require_css( $this->get_plugin_url().'jquery.scrollwide.css', 'relative' );
+			$this->require_js( 'jquery.scrollwide.min.js' );
+			$this->require_css( 'jquery.scrollwide.css' );
 		}
 	}
 

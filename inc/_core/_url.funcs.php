@@ -167,6 +167,9 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 	{ // Search for blocked keywords:
 		if( $block = antispam_check($url) )
 		{
+			// Log into system log
+			syslog_insert( sprintf( T_('Antispam: URL "%s" not allowed. The URL contains blacklisted word "%s".'), htmlspecialchars($url), $block ), 'error' );
+
 			return $verbose
 				? sprintf( T_('URL "%s" not allowed: blacklisted word "%s".'), htmlspecialchars($url), $block )
 				: T_('URL not allowed');
@@ -311,7 +314,7 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, $timeout );
 		curl_setopt( $ch, CURLOPT_TIMEOUT, $timeout );
-		
+
 		// Set proxy:
 		if( !empty($outgoing_proxy_hostname) )
 		{

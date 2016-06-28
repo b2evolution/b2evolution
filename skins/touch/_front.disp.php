@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 $params = array_merge( array(
-		'author_link_text' => 'name'
+		'author_link_text' => 'auto'
 	), $params );
 
 // ------------------ "Front Page Main Area" CONTAINER EMBEDDED HERE -------------------

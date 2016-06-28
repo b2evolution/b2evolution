@@ -40,7 +40,7 @@ class SkinCache extends DataObjectCache
 	/**
 	 * Constructor
 	 */
-	function SkinCache()
+	function __construct()
 	{
 		parent::__construct( 'Skin', false, 'T_skins__skin', 'skin_', 'skin_ID', 'skin_name', NULL,
 			/* TRANS: "None" select option */ NT_('No skin') );

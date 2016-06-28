@@ -51,10 +51,10 @@ class EmailAddress extends DataObject
 	 *
 	 * @param object table Database row
 	 */
-	function EmailAddress( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_email__address', 'emadr_', 'emadr_ID' );
+		parent::__construct( 'T_email__address', 'emadr_', 'emadr_ID' );
 
 		if( $db_row != NULL )
 		{
@@ -98,12 +98,12 @@ class EmailAddress extends DataObject
 		global $emadr_address;
 		param_string_not_empty( 'emadr_address', T_('Please enter email address.') );
 		$emadr_address = utf8_strtolower( get_param( 'emadr_address' ) );
-		param_check_email( 'emadr_address', true );
-		if( $existing_emadr_ID = $this->dbexists( 'emadr_address', get_param( 'emadr_address' ) ) )
+		$is_email_correct = param_check_email( 'emadr_address', true );
+		if( $is_email_correct && $existing_emadr_ID = $this->dbexists( 'emadr_address', get_param( 'emadr_address' ) ) )
 		{	// Check if a email address already exists with the same address
 			global $admin_url;
 			param_error( 'emadr_address', sprintf( T_('This email address already exists. Do you want to <a %s>edit the existing email address</a>?'),
-				'href="'.$admin_url.'?ctrl=email&amp;tab=blocked&amp;emadr_ID='.$existing_emadr_ID.'"' ) );
+				'href="'.$admin_url.'?ctrl=email&amp;emadr_ID='.$existing_emadr_ID.'"' ) );
 		}
 		$this->set_from_Request( 'address' );
 

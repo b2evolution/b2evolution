@@ -271,6 +271,7 @@ if( $action != 'view' )
 	$Form->radio( 'edited_user_gender', $edited_User->get('gender'), array(
 			array( 'M', T_('A man') ),
 			array( 'F', T_('A woman') ),
+			array( 'O', T_('Other') ),
 		), T_('I am'), false, '', $Settings->get( 'registration_require_gender' ) == 'required' );
 
 	$button_refresh_regional = '<button id="%s" type="submit" name="actionArray[refresh_regional]" class="action_icon refresh_button">'.get_icon( 'refresh' ).'</button>';
@@ -408,10 +409,24 @@ if( $action != 'view' )
 					) );
 			}
 			else
-			{ // Allow to update the oraganization fields
+			{ // Allow to update the organization fields
+				$perm_edit_org_role = false;
+				if( ! empty( $org_ID ) )
+				{
+					$perm_edit_org_role = ( $user_Organization->owner_user_ID == $current_User->ID ) || ( $user_Organization->perm_role == 'owner and member' && $org_data['accepted'] );
+				}
+
 				$Form->output = false;
 				$Form->switch_layout( 'none' );
-				$org_role_input = ' &nbsp; <strong>'.T_('Role').':</strong> '.$Form->text_input( 'org_roles[]', $org_data['role'], 20, '', '', array( 'maxlength' => 255 ) ).' &nbsp; ';
+				if( $perm_edit_org_role )
+				{
+					$org_role_input = ' &nbsp; <strong>'.T_('Role').':</strong> '.
+							$Form->text_input( 'org_roles[]', $org_data['role'], 20, '', '', array( 'maxlength' => 255 ) ).' &nbsp; ';
+				}
+				else
+				{
+					$org_role_input = ( empty( $org_data['role'] ) ? '' : ' &nbsp; <strong>'.T_('Role').':</strong> '.$org_data['role'] ).' &nbsp; ';
+				}
 				$Form->switch_layout( NULL );
 				$Form->output = true;
 

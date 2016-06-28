@@ -11,9 +11,7 @@
 /**
  * Redundantly and rotationally uses several Transports when sending.
  *
- * @package    Swift
- * @subpackage Transport
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_Transport_LoadBalancedTransport implements Swift_Transport
 {
@@ -32,11 +30,11 @@ class Swift_Transport_LoadBalancedTransport implements Swift_Transport
     protected $_transports = array();
 
     /**
-     * Creates a new LoadBalancedTransport.
+     * The Transport used in the last successful send operation.
+     *
+     * @var Swift_Transport
      */
-    public function __construct()
-    {
-    }
+    protected $_lastUsedTransport = null;
 
     /**
      * Set $transports to delegate to.
@@ -60,9 +58,19 @@ class Swift_Transport_LoadBalancedTransport implements Swift_Transport
     }
 
     /**
+     * Get the Transport used in the last successful send operation.
+     *
+     * @return Swift_Transport
+     */
+    public function getLastUsedTransport()
+    {
+        return $this->_lastUsedTransport;
+    }
+
+    /**
      * Test if this Transport mechanism has started.
      *
-     * @return boolean
+     * @return bool
      */
     public function isStarted()
     {
@@ -102,15 +110,16 @@ class Swift_Transport_LoadBalancedTransport implements Swift_Transport
     {
         $maxTransports = count($this->_transports);
         $sent = 0;
+        $this->_lastUsedTransport = null;
 
         for ($i = 0; $i < $maxTransports
-            && $transport = $this->_getNextTransport(); ++$i)
-        {
+            && $transport = $this->_getNextTransport(); ++$i) {
             try {
                 if (!$transport->isStarted()) {
                     $transport->start();
                 }
                 if ($sent = $transport->send($message, $failedRecipients)) {
+                    $this->_lastUsedTransport = $transport;
                     break;
                 }
             } catch (Swift_TransportException $e) {
@@ -138,8 +147,6 @@ class Swift_Transport_LoadBalancedTransport implements Swift_Transport
             $transport->registerPlugin($plugin);
         }
     }
-
-    // -- Protected methods
 
     /**
      * Rotates the transport list around and returns the first instance.

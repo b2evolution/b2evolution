@@ -70,7 +70,7 @@ else
 		header_redirect( $admin_url.'?ctrl=dashboard' );
 		// EXITED:
 	}
-	
+
 	memorize_param( 'blog', 'integer', -1 );	// Needed when generating static page for example
 
 	param( 'skinpage', 'string', '' );
@@ -102,6 +102,7 @@ else
 switch( $action )
 {
 	case 'update':
+	case 'update_confirm':
 		// Update DB:
 
 		// Check that this action request is not a CSRF hacked request:
@@ -117,6 +118,26 @@ switch( $action )
 			case 'urls':
 				if( $edited_Blog->load_from_Request( array() ) )
 				{ // Commit update to the DB:
+					global $Settings;
+
+					param( 'set_as_info_blog', 'boolean' );
+					param( 'set_as_login_blog', 'boolean' );
+					param( 'set_as_msg_blog', 'boolean' );
+
+					if( $set_as_info_blog && ! $Settings->get( 'info_blog_ID' ) )
+					{
+						$Settings->set( 'info_blog_ID', $edited_Blog->ID );
+					}
+					if( $set_as_login_blog && ! $Settings->get( 'login_blog_ID' ) )
+					{
+						$Settings->set( 'login_blog_ID', $edited_Blog->ID );
+					}
+					if( $set_as_msg_blog && ! $Settings->get( 'mgs_blog_ID' ) )
+					{
+						$Settings->set( 'msg_blog_ID', $edited_Blog->ID );
+					}
+					$Settings->dbupdate();
+
 					$edited_Blog->dbupdate();
 					$Messages->add( T_('The blog settings have been updated'), 'success' );
 					// Redirect so that a reload doesn't write to the DB twice:
@@ -187,14 +208,26 @@ switch( $action )
 				}
 				break;
 
-			case 'renderers':
+			case 'plugins':
+				$plugin_group = param( 'plugin_group', 'string', NULL );
+				if( isset( $plugin_group ) )
+				{
+					$update_redirect_url .= '&plugin_group='.$plugin_group;
+				}
+
 				// Update Plugin params/Settings
 				load_funcs('plugins/_plugin.funcs.php');
 
 				$Plugins->restart();
 				while( $loop_Plugin = & $Plugins->get_next() )
 				{
-					$pluginsettings = $loop_Plugin->get_coll_setting_definitions( $tmp_params = array('for_editing'=>true) );
+					if( $loop_Plugin->group != $plugin_group )
+					{
+						continue;
+					}
+
+					$tmp_params = array( 'for_editing' => true );
+					$pluginsettings = $loop_Plugin->get_coll_setting_definitions( $tmp_params );
 					if( empty($pluginsettings) )
 					{
 						continue;
@@ -207,7 +240,8 @@ switch( $action )
 					}
 
 					// Let plugins process settings
-					$Plugins->call_method( $loop_Plugin->ID, 'PluginCollSettingsUpdateAction', $tmp_params = array() );
+					$tmp_params = array();
+					$Plugins->call_method( $loop_Plugin->ID, 'PluginCollSettingsUpdateAction', $tmp_params );
 				}
 
 				if(	! param_errors_detected() )
@@ -322,7 +356,7 @@ switch( $action )
 		{
 			case 'fav':
 				// Favorite Blog
-				$edited_Blog->set( 'favorite', $setting_value );
+				$edited_Blog->favorite( $current_User->ID, $setting_value );
 				$result_message = T_('The collection setting has been updated.');
 				break;
 
@@ -366,7 +400,7 @@ if( $action == 'dashboard' )
 {
 	// load dashboard functions
 	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
-	
+
 	if( ! $current_User->check_perm( 'blog_ismember', 'view', false, $blog ) )
 	{ // We don't have permission for the requested blog (may happen if we come to admin from a link on a different blog)
 		set_working_blog( 0 );
@@ -414,12 +448,16 @@ if( $action == 'dashboard' )
 	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
 	$AdminUI->disp_body_top();
 
+	// Flush to immediately display the above
+	evo_flush();
+
 	if ( $blog )
 	{
+		$Timer->start( 'Panel: Comments Awaiting Moderation' );
 		load_class( 'items/model/_itemlist.class.php', 'ItemList' );
 		$block_item_Widget = new Widget( 'dash_item' );
 		$nb_blocks_displayed = 0;
-		
+
 		$blog_moderation_statuses = explode( ',', $Blog->get_setting( 'moderation_statuses' ) );
 		$highest_publish_status = get_highest_publish_status( 'comment', $Blog->ID, false );
 		$user_modeartion_statuses = array();
@@ -445,7 +483,7 @@ if( $action == 'dashboard' )
 					'user_perm' => 'moderate',
 					'post_statuses' => array( 'published', 'community', 'protected' ),
 					'order' => 'DESC',
-					'comments' => 30,
+					'comments' => 10,
 				) );
 
 			// Set param prefix for URLs
@@ -457,16 +495,22 @@ if( $action == 'dashboard' )
 
 			// Get ready for display (runs the query):
 			$CommentList->display_init();
+
+			// Load data of comments from the current page at once to cache variables:
+			$CommentList->load_list_data();
 		}
-		
+
 		// Check if we have comments and posts to moderate
 		$have_comments_to_moderate = $user_perm_moderate_cmt && $CommentList->result_num_rows;
-		
+
+		$Timer->pause( 'Panel: Comments Awaiting Moderation' );
+
 		// Posts for Moderation
+		$Timer->start( 'Panel: Posts Awaiting Moderation' );
 		$post_moderation_statuses = explode( ',', $Blog->get_setting( 'post_moderation_statuses' ) );
 		ob_start();
 		foreach( $post_moderation_statuses as $status )
-		{ // go through all statuses		
+		{ // go through all statuses
 			if( display_posts_awaiting_moderation( $status, $block_item_Widget ) )
 			{ // a block was displayed for this status
 				$nb_blocks_displayed++;
@@ -474,28 +518,32 @@ if( $action == 'dashboard' )
 		}
 		$posts_awaiting_moderation_content = ob_get_contents();
 		ob_clean();
-		
+
+		$Timer->pause( 'Panel: Posts Awaiting Moderation' );
+
 		// Check if we have posts that $blog_moderation
 		$have_posts_to_moderate = ! empty( $posts_awaiting_moderation_content );
-		
-		
+
+
 		// Begin payload block:
 		// This div is to know where to display the message after overlay close:
 		echo '<div class="first_payload_block">'."\n";
 
 		$AdminUI->disp_payload_begin();
-		echo '<h2 class="page-title">'.$Blog->dget( 'name' ).'</h2>';
+		echo '<h2 class="page-title">'.get_coll_fav_icon( $Blog->ID, array( 'class' => 'coll-fav' ) ).'&nbsp;'.$Blog->dget( 'name' ).'</h2>';
+		load_funcs( 'collections/model/_blog_js.funcs.php' );
 		echo '<div class="row browse">';
-		
+
 		// Block Group 1
+		$Timer->start( 'Panel: Collection Metrics' );
 		echo '<!-- Start of Block Group 1 -->';
 		echo '<div class="col-xs-12 col-sm-12 col-md-3 col-md-push-0 col-lg-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '6' : '3' ).' col-lg-push-0 floatright">';
-		
+
 		$side_item_Widget = new Widget( 'side_item' );
 
 		$perm_options_edit = $current_User->check_perm( 'options', 'edit' );
 		$perm_blog_properties = $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID );
-		
+
 		// Collection Analytics Block
 		if( $perm_options_edit )
 		{ // We have some serious admin privilege:
@@ -508,7 +556,7 @@ if( $action == 'dashboard' )
 			$posts_sql_where = 'cat_blog_ID = '.$DB->quote( $blog );
 			$chart_data[] = array(
 					'title' => T_('Posts'),
-					'value' => $post_all_counter = get_table_count( 'T_items__item', $posts_sql_where, $posts_sql_from ),
+					'value' => get_table_count( 'T_items__item', $posts_sql_where, $posts_sql_from, 'Get a count of Items metric for collection #'.$blog ),
 					'type'  => 'number',
 				);
 			// Slugs
@@ -516,7 +564,7 @@ if( $action == 'dashboard' )
 			$slugs_sql_where = 'slug_type = "item" AND '.$posts_sql_where;
 			$chart_data[] = array(
 					'title' => T_('Slugs'),
-					'value' => get_table_count( 'T_slug', $slugs_sql_where, $slugs_sql_from ),
+					'value' => get_table_count( 'T_slug', $slugs_sql_where, $slugs_sql_from, 'Get a count of Slugs metric for collection #'.$blog ),
 					'type'  => 'number',
 				);
 			// Comments
@@ -524,7 +572,7 @@ if( $action == 'dashboard' )
 			$comments_sql_where = $posts_sql_where;
 			$chart_data[] = array(
 					'title' => T_('Comments'),
-					'value' => get_table_count( 'T_comments', $comments_sql_where, $comments_sql_from ),
+					'value' => get_table_count( 'T_comments', $comments_sql_where, $comments_sql_from, 'Get a count of Comments metric for collection #'.$blog ),
 					'type'  => 'number',
 				);
 
@@ -536,21 +584,27 @@ if( $action == 'dashboard' )
 			echo '</div>';
 		}
 		echo '</div><!-- End of Block Group 1 -->';
-		
+
+		$Timer->stop( 'Panel: Collection Metrics' );
+		evo_flush();
+
 		// Block Group 2
 		if( $have_comments_to_moderate || $have_posts_to_moderate )
 		{
 			echo '<!-- Start of Block Group 2 -->';
 			echo '<div class="col-xs-12 col-sm-12 col-md-9 col-md-pull-0 col-lg-6 col-lg-pull-0 floatleft">';
-			
+
 			// Comments Awaiting Moderation Block
 			if( $have_comments_to_moderate )
 			{
+				load_funcs( 'comments/model/_comment_js.funcs.php' );
+
+				$Timer->resume( 'Panel: Comments Awaiting Moderation' );
 				echo '<!-- Start of Comments Awaiting Moderation Block -->';
 				$opentrash_link = get_opentrash_link( true, false, array(
 						'class' => 'btn btn-default'
 					) );
-				$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', $admin_url.'?blog='.$blog, ' '.T_('Refresh'), 3, 4, array( 'onclick' => 'startRefreshComments( \''.request_from().'\' ); return false;', 'class' => 'btn btn-default' ) ).'</span> ';
+				$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', $admin_url.'?blog='.$blog, ' '.T_('Refresh'), 3, 4, array( 'onclick' => 'startRefreshComments( \'dashboard\' ); return false;', 'class' => 'btn btn-default' ) ).'</span> ';
 
 				$show_statuses_param = $param_prefix.'show_statuses[]='.implode( '&amp;'.$param_prefix.'show_statuses[]=', $user_modeartion_statuses );
 				$block_item_Widget->title = $refresh_link.$opentrash_link.T_('Comments awaiting moderation').
@@ -562,30 +616,40 @@ if( $action == 'dashboard' )
 				echo '<div id="comments_block" class="dashboard_comments_block">';
 
 				$block_item_Widget->disp_template_replaced( 'block_start' );
-				echo '<div id="comments_container">';
+				echo '<div id="comments_container" class="evo_comments_container">';
+
 				// GET COMMENTS AWAITING MODERATION (the code generation is shared with the AJAX callback):
+				$Timer->start( 'show_comments_awaiting_moderation' );
+				// erhsatingin > this takes up most of the rendering time!
 				show_comments_awaiting_moderation( $Blog->ID, $CommentList );
+				$Timer->stop( 'show_comments_awaiting_moderation' );
+
 				echo '</div>';
 				$block_item_Widget->disp_template_raw( 'block_end' );
 				echo '</div></div>';
 				echo '<!-- End of Comments Awaiting Moderation Block -->';
+				$Timer->stop( 'Panel: Comments Awaiting Moderation' );
 			}
-				
+
 			// Posts Awaiting Moderation Block
 			if( !empty( $have_posts_to_moderate ) )
 			{
+				$Timer->resume( 'Panel: Posts Awaiting Moderation' );
 				echo '<!-- Start of Posts Awaiting Moderation Block -->';
 				echo '<div class="items_container evo_content_block">';
 				echo $posts_awaiting_moderation_content;
 				echo '</div>';
 				echo '<!-- End of Posts Awaiting Moderation Block -->';
+				$Timer->stop( 'Panel: Posts Awaiting Moderation' );
 			}
-			
+
 			// The following div is required to ensure that Block Group 3 will align properly on large screen media
 			echo '<div style="min-height: 100px;" class="hidden-xs hidden-sm hidden-md"></div>';
 			echo '</div><!-- End of Block Group 2 -->';
 		}
-		
+
+		evo_flush();
+
 		// Block Group 3
 		echo '<!-- Start of Block Group 3 -->';
 		if( $have_comments_to_moderate || $have_posts_to_moderate )
@@ -596,11 +660,12 @@ if( $action == 'dashboard' )
 		{
 			echo '<div class="col-xs-12 col-sm-12 col-md-9 col-md-pull-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '2' : '0' ).' col-lg-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '6' : '9' ).' col-lg-pull-0 coll-dashboard-block-3">';
 		}
-		
+
 		if( $current_User->check_perm( 'meta_comment', 'blog', false, $Blog ) )
 		{
-		
+
 			// Latest Meta Comments Block
+			$Timer->start( 'Panel: Latest Meta Comments' );
 			$CommentList = new CommentList2( $Blog );
 
 			// Filter list:
@@ -620,13 +685,16 @@ if( $action == 'dashboard' )
 			// Get ready for display (runs the query):
 			$CommentList->display_init();
 
+			// Load data of comments from the current page at once to cache variables:
+			$CommentList->load_list_data();
+
 			if( $CommentList->result_num_rows )
 			{	// We have the meta comments
 
 				load_funcs( 'comments/model/_comment_js.funcs.php' );
 
 				$nb_blocks_displayed++;
-				
+
 				echo '<!-- Start of Latest Meta Comments Block -->';
 				$opentrash_link = get_opentrash_link( true, false, array(
 						'class' => 'btn btn-default'
@@ -643,19 +711,20 @@ if( $action == 'dashboard' )
 
 				$block_item_Widget->disp_template_replaced( 'block_start' );
 
-				echo '<div id="comments_container">';
+				echo '<div id="comments_container" class="evo_comments_container">';
 				// GET LATEST META COMMENTS:
 				show_comments_awaiting_moderation( $Blog->ID, $CommentList );
 				echo '</div>';
 				$block_item_Widget->disp_template_raw( 'block_end' );
-			
+
 				echo '</div>';
 				echo '<!-- End of Latest Meta Comments Block-->';
 			}
+			$Timer->start( 'Panel: Latest Meta Comments' );
 		}
-		
-			
-			
+
+		$Timer->start( 'Panel: Recently Edited Post' );
+
 		// Recently Edited Posts Block
 		// Create empty List:
 		$ItemList = new ItemList2( $Blog, NULL, NULL );
@@ -675,6 +744,7 @@ if( $action == 'dashboard' )
 		{	// We have recent edits
 
 			$nb_blocks_displayed++;
+
 			echo '<!-- Start of Recently Edited Post Block-->';
 			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 			{	// We have permission to add a post with at least one status:
@@ -758,9 +828,10 @@ if( $action == 'dashboard' )
 
 			echo '</div></div>';
 			echo '<!-- End of Recently Edited Post Block -->';
+			$Timer->stop( 'Panel: Recently Edited Post' );
 
 			$block_item_Widget->disp_template_raw( 'block_end' );
-		}	
+		}
 
 		// Getting Started Block
 		if( $nb_blocks_displayed == 0 )
@@ -779,11 +850,12 @@ if( $action == 'dashboard' )
 
 			$block_item_Widget->disp_template_raw( 'block_end' );
 		}
-		
+
 		// End payload block:
 		$AdminUI->disp_payload_end();
 		echo '</div>'."\n";
 		echo '<!-- End of Block Group 3 --></div>';
+		evo_flush();
 	}
 	else
 	{ // We're on the GLOBAL tab...
@@ -797,7 +869,7 @@ if( $action == 'dashboard' )
 		* DashboardGlobalMain to be added here (anyone?)
 		*/
 	}
-	
+
 	if( ! empty( $chart_data ) )
 	{ // JavaScript to initialize charts
 	?>
@@ -956,7 +1028,7 @@ else
 			$AdminUI->set_page_manual_link( 'seo-settings' );
 			break;
 
-		case 'renderers':
+		case 'plugins':
 			$AdminUI->set_path( 'collections', 'settings', $tab );
 			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 			$AdminUI->breadcrumbpath_add( T_('Plugins'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
@@ -976,6 +1048,8 @@ else
 			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 			$AdminUI->breadcrumbpath_add( T_('User permissions'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			$AdminUI->set_page_manual_link( 'advanced-user-permissions' );
+			// Load JavaScript to toggle checkboxes:
+			require_js( 'collectionperms.js', 'rsc_url' );
 			break;
 
 		case 'permgroup':
@@ -984,6 +1058,8 @@ else
 			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 			$AdminUI->breadcrumbpath_add( T_('Group permissions'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			$AdminUI->set_page_manual_link( 'advanced-group-permissions' );
+			// Load JavaScript to toggle checkboxes:
+			require_js( 'collectionperms.js', 'rsc_url' );
 			break;
 	}
 
@@ -1057,7 +1133,7 @@ else
 				case 'seo':
 					$AdminUI->disp_view( 'collections/views/_coll_seo.form.php' );
 					break;
-				case 'renderers':
+				case 'plugins':
 					$AdminUI->disp_view( 'collections/views/_coll_plugin_settings.form.php' );
 					break;
 				case 'advanced':
