@@ -161,7 +161,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 		{
 			$output .= '<a href="'.regenerate_url( 'action,keyword', 'action=report&amp;keyword='
 				.rawurlencode( $row->askw_string ) ).'&amp;'.url_crumb( 'antispam' ).'" title="'.
-				T_('Report abuse to centralized ban blacklist!').'" class="btn btn-default btn-xs">'.
+				T_('Report abuse to centralized ban blacklist!').'" class="btn btn-warning btn-xs">'.
 				T_('Report').'</a> ';
 		}
 
@@ -171,7 +171,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			T_('Re-check').'</a>';
 
 		$output .= ' <a href="'.$admin_url.'?ctrl=antispam&amp;action=remove&amp;hit_ID='.$row->askw_ID.'&amp;'.url_crumb( 'antispam' )
-			.'" title="'.T_('Allow keyword back (Remove it from the blacklist)').'" class="btn btn-default btn-xs">'.
+			.'" title="'.T_('Allow keyword back (Remove it from the blacklist)').'" class="btn btn-danger btn-xs">'.
 			T_('Remove from blacklist').'</a>';
 
 		return $output;

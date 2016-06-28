@@ -72,7 +72,7 @@ else
 
 $Form->end_fieldset();
 
-if( $keywords_count > 0 )
+if( count( $keywords ) )
 {
 	$Form->end_form( array( array( 'submit', 'actionArray[import]', $central_antispam_Module->T_('Confirm Import'), 'SaveButton' ) ) );
 }
