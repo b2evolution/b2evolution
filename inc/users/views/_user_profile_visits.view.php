@@ -69,7 +69,7 @@ if( ! isset( $params ) )
 }
 
 $params = array_merge( array(
-		'page_url'             => get_dispctrl_url( 'visits', 'user_tab=visits&amp;user_ID='.$edited_User->ID ),
+		'page_url'             => get_dispctrl_url( 'user', 'user_tab=visits&amp;user_ID='.$edited_User->ID ),
 		'filterset_name'       => '',
 		'results_param_prefix' => 'upv_',
 		'results_no_text'      => T_('No-one visited your profile yet. Please check back later.'),
