@@ -1790,6 +1790,12 @@ function create_demo_contents()
 			true,
 			'public',
 			$jay_moderator_ID );
+
+		$BlogCache = & get_BlogCache();
+		if( $a_Blog = $BlogCache->get_by_ID( $blog_a_ID, false, false ) )
+		{
+			$a_Blog->set_setting( 'front_disp', 'front' );
+		}
 	}
 
 	if( $install_collection_blogb )
