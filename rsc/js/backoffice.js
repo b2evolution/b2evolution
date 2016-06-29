@@ -216,8 +216,8 @@ function set_new_form_action( form, newaction )
  */
 function b2edit_open_preview( form, newaction )
 {
-	if( form.target == 'b2evo_preview' )
-	{ // A double-click on the Preview button
+	if( form.target == 'iframe_item_preview' )
+	{	// To avoid a double-click on the Preview button:
 		return false;
 	}
 
@@ -228,13 +228,15 @@ function b2edit_open_preview( form, newaction )
 		return false;
 	}
 
-	form.target = 'b2evo_preview';
-	preview_window = window.open( '', 'b2evo_preview' );
-	preview_window.focus();
-	// submit after target window is created.
+	// Submit a form in special iframe for preview:
+	form.target = 'iframe_item_preview';
 	form.submit();
 	form.attributes.getNamedItem('action').value = saved_action;
 	form.target = '_self';
+
+	// Unfold panel with preview iframe:
+	jQuery( '#fieldset_wrapper_itemform_preview.folded' ).removeClass( 'folded' );
+
 	return false;
 }
 

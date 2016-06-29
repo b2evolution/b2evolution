@@ -102,7 +102,7 @@ $Form->begin_form( '', '', $params );
 ?>
 <div class="row">
 
-<div class="left_col col-lg-9 col-md-8">
+<div class="left_col col-lg-6">
 
 	<?php
 	// ############################ INSTRUCTIONS ##############################
@@ -525,118 +525,21 @@ $Form->begin_form( '', '', $params );
 	// ####################### PLUGIN FIELDSETS #########################
 
 	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'expert' ) );
-
-	if( $current_User->check_perm( 'meta_comment', 'view', false, $edited_Item ) )
-	{
-		// ####################### META COMMENTS #########################
-		$currentpage = param( 'currentpage', 'integer', 1 );
-		$total_comments_number = generic_ctp_number( $edited_Item->ID, 'metas', 'total' );
-		param( 'comments_number', 'integer', $total_comments_number );
-		param( 'comment_type', 'string', 'meta' );
-
-		$Form->begin_fieldset( T_('Meta comments').get_manual_link( 'meta-comments-panel' )
-						.( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ),
-					array( 'id' => 'itemform_meta_cmnt', 'fold' => true, 'deny_fold' => ( $total_comments_number > 0 ) ) );
-
-		global $CommentList, $UserSettings;
-		$CommentList = new CommentList2( $Blog );
-
-		// Filter list:
-		$CommentList->set_filters( array(
-			'types' => array( 'meta' ),
-			'statuses' => get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) ),
-			'order' => 'DESC',
-			'post_ID' => $edited_Item->ID,
-			'comments' => $UserSettings->get( 'results_per_page' ),
-			'page' => $currentpage,
-			'expiry_statuses' => array( 'active' ),
-		) );
-		$CommentList->query();
-
-		// comments_container value shows, current Item ID
-		echo '<div class="evo_content_block">';
-		echo '<div id="comments_container" value="'.$edited_Item->ID.'" class="evo_comments_container">';
-		// display comments
-		$CommentList->display_if_empty( array(
-				'before'    => '<div class="evo_comment"><p>',
-				'after'     => '</p></div>',
-				'msg_empty' => T_('No feedback for this post yet...'),
-			) );
-		require $inc_path.'comments/views/_comment_list.inc.php';
-		echo '</div>'; // comments_container div
-		echo '</div>';
-
-		if( $current_User->check_perm( 'meta_comment', 'add', false, $edited_Item ) )
-		{ // Display a link to add new meta comment if current user has a permission
-			echo action_icon( T_('Add meta comment').'...', 'new', $admin_url.'?ctrl=items&amp;p='.$edited_Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments', T_('Add meta comment').' &raquo;', 3, 4 );
-		}
-
-		// Load JS functions to work with meta comments:
-		load_funcs( 'comments/model/_comment_js.funcs.php' );
-
-		$Form->end_fieldset();
-	}
 	?>
 
-</div>
+	<div class="row">
 
-<div class="right_col col-lg-3 col-md-4">
-
-	<?php
+		<div class="col-md-6">
+<?php
 	// ################### MODULES SPECIFIC ITEM SETTINGS ###################
 
 	modules_call_method( 'display_item_settings', array( 'Form' => & $Form, 'Blog' => & $Blog, 'edited_Item' => & $edited_Item, 'edit_layout' => 'expert', 'fold' => true ) );
 
-	// ############################ WORKFLOW #############################
-
-	if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
-	{	// We want to use workflow properties for this blog:
-		$Form->begin_fieldset( T_('Workflow properties').get_manual_link( 'post-edit-workflow-panel' ), array( 'id' => 'itemform_workflow_props', 'fold' => true ) );
-
-			echo '<div id="itemform_edit_workflow" class="edit_fieldgroup">';
-			$Form->switch_layout( 'linespan' );
-
-			$Form->select_input_array( 'item_priority', $edited_Item->priority, item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
-
-			echo ' '; // allow wrapping!
-
-			// Load current blog members into cache:
-			$UserCache = & get_UserCache();
-			// Load only first 21 users to know when we should display an input box instead of full users list
-			$UserCache->load_blogmembers( $Blog->ID, 21, false );
-
-			if( count( $UserCache->cache ) > 20 )
-			{
-				$assigned_User = & $UserCache->get_by_ID( $edited_Item->get( 'assigned_user_ID' ), false, false );
-				$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees', array( 'size' => 10 ) );
-			}
-			else
-			{
-				$Form->select_object( 'item_assigned_user_ID', NULL, $edited_Item, T_('Assigned to'),
-														'', true, '', 'get_assigned_user_options' );
-			}
-
-			echo ' '; // allow wrapping!
-
-			$ItemStatusCache = & get_ItemStatusCache();
-			$ItemStatusCache->load_all();
-			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true ), T_('Task status') );
-
-			echo ' '; // allow wrapping!
-
-			$Form->date( 'item_deadline', $edited_Item->get('datedeadline'), T_('Deadline') );
-
-			$Form->switch_layout( NULL );
-			echo '</div>';
-
-		$Form->end_fieldset();
-	}
-	// ################### CATEGORIES ###################
-
-	cat_select( $Form, true, true, array( 'fold' => true ) );
 
 	// ################### LOCATIONS ###################
+
 	echo_item_location_form( $Form, $edited_Item, array( 'fold' => true ) );
+
 
 	// ################### PROPERTIES ###################
 
@@ -690,18 +593,6 @@ $Form->begin_form( '', '', $params );
 	echo '</table>';
 
 	$Form->switch_layout( NULL );
-
-	$Form->end_fieldset();
-
-
-	// ################### TEXT RENDERERS ###################
-
-	$Form->begin_fieldset( T_('Text Renderers').get_manual_link( 'post-renderers-panel' )
-					.action_icon( T_('Plugins'), 'edit', $admin_url.'?ctrl=coll_settings&amp;tab=renderers&amp;blog='.$Blog->ID, T_('Plugins'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
-				array( 'id' => 'itemform_renderers', 'fold' => true ) );
-
-	// fp> TODO: there should be no param call here (shld be in controller)
-	$edited_Item->renderer_checkboxes( param('renderers', 'array:string', NULL) );
 
 	$Form->end_fieldset();
 
@@ -853,6 +744,72 @@ $Form->begin_form( '', '', $params );
 		}
 
 	$Form->end_fieldset();
+?>
+		</div><?php /* END OF <div class="col-md-6">*/ ?>
+
+		<div class="col-md-6">
+<?php
+	// ############################ WORKFLOW #############################
+
+	if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
+	{	// We want to use workflow properties for this blog:
+		$Form->begin_fieldset( T_('Workflow properties').get_manual_link( 'post-edit-workflow-panel' ), array( 'id' => 'itemform_workflow_props', 'fold' => true ) );
+
+			echo '<div id="itemform_edit_workflow" class="edit_fieldgroup">';
+			$Form->switch_layout( 'linespan' );
+
+			$Form->select_input_array( 'item_priority', $edited_Item->priority, item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
+
+			echo ' '; // allow wrapping!
+
+			// Load current blog members into cache:
+			$UserCache = & get_UserCache();
+			// Load only first 21 users to know when we should display an input box instead of full users list
+			$UserCache->load_blogmembers( $Blog->ID, 21, false );
+
+			if( count( $UserCache->cache ) > 20 )
+			{
+				$assigned_User = & $UserCache->get_by_ID( $edited_Item->get( 'assigned_user_ID' ), false, false );
+				$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees', array( 'size' => 10 ) );
+			}
+			else
+			{
+				$Form->select_object( 'item_assigned_user_ID', NULL, $edited_Item, T_('Assigned to'),
+														'', true, '', 'get_assigned_user_options' );
+			}
+
+			echo ' '; // allow wrapping!
+
+			$ItemStatusCache = & get_ItemStatusCache();
+			$ItemStatusCache->load_all();
+			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true ), T_('Task status') );
+
+			echo ' '; // allow wrapping!
+
+			$Form->date( 'item_deadline', $edited_Item->get('datedeadline'), T_('Deadline') );
+
+			$Form->switch_layout( NULL );
+			echo '</div>';
+
+		$Form->end_fieldset();
+	}
+
+
+	// ################### CATEGORIES ###################
+
+	cat_select( $Form, true, true, array( 'fold' => true ) );
+
+
+	// ################### TEXT RENDERERS ###################
+
+	$Form->begin_fieldset( T_('Text Renderers').get_manual_link( 'post-renderers-panel' )
+					.action_icon( T_('Plugins'), 'edit', $admin_url.'?ctrl=coll_settings&amp;tab=renderers&amp;blog='.$Blog->ID, T_('Plugins'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
+				array( 'id' => 'itemform_renderers', 'fold' => true ) );
+
+	// fp> TODO: there should be no param call here (shld be in controller)
+	$edited_Item->renderer_checkboxes( param('renderers', 'array:string', NULL) );
+
+	$Form->end_fieldset();
 
 
 	// ################### QUICK SETTINGS ###################
@@ -887,10 +844,83 @@ $Form->begin_form( '', '', $params );
 	echo '<p>';
 	echo action_icon( '', 'refresh', $quick_setting_url.'reset_quick_settings', T_('Reset defaults for this screen.'), 3, 4 );
 	echo '</p>';
+?>
 
+		</div><?php /* END OF <div class="col-md-6">*/ ?>
+
+	</div>
+
+</div><?php /* END OF <div class="left_col col-lg-6">*/ ?>
+
+<div class="right_col col-lg-6">
+
+	<?php
+
+	// ####################### PREVIEW #########################
+
+	$Form->begin_fieldset( T_('Preview').get_manual_link( 'preview-panel' ), array( 'id' => 'itemform_preview', 'fold' => true ) );
+
+	echo '<iframe id="iframe_item_preview"'
+		.( $edited_Item->ID > 0 ? ' src="'.$edited_Item->get_permanent_url().'"' : '' )
+		.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"></iframe>';
+
+
+	$Form->end_fieldset();
+
+	// ####################### META COMMENTS #########################
+
+	if( $current_User->check_perm( 'meta_comment', 'view', false, $edited_Item ) )
+	{
+		$currentpage = param( 'currentpage', 'integer', 1 );
+		$total_comments_number = generic_ctp_number( $edited_Item->ID, 'metas', 'total' );
+		param( 'comments_number', 'integer', $total_comments_number );
+		param( 'comment_type', 'string', 'meta' );
+
+		$Form->begin_fieldset( T_('Meta comments').get_manual_link( 'meta-comments-panel' )
+						.( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ),
+					array( 'id' => 'itemform_meta_cmnt', 'fold' => true, 'deny_fold' => ( $total_comments_number > 0 ) ) );
+
+		global $CommentList, $UserSettings;
+		$CommentList = new CommentList2( $Blog );
+
+		// Filter list:
+		$CommentList->set_filters( array(
+			'types' => array( 'meta' ),
+			'statuses' => get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) ),
+			'order' => 'DESC',
+			'post_ID' => $edited_Item->ID,
+			'comments' => $UserSettings->get( 'results_per_page' ),
+			'page' => $currentpage,
+			'expiry_statuses' => array( 'active' ),
+		) );
+		$CommentList->query();
+
+		// comments_container value shows, current Item ID
+		echo '<div class="evo_content_block">';
+		echo '<div id="comments_container" value="'.$edited_Item->ID.'" class="evo_comments_container">';
+		// display comments
+		$CommentList->display_if_empty( array(
+				'before'    => '<div class="evo_comment"><p>',
+				'after'     => '</p></div>',
+				'msg_empty' => T_('No feedback for this post yet...'),
+			) );
+		require $inc_path.'comments/views/_comment_list.inc.php';
+		echo '</div>'; // comments_container div
+		echo '</div>';
+
+		if( $current_User->check_perm( 'meta_comment', 'add', false, $edited_Item ) )
+		{ // Display a link to add new meta comment if current user has a permission
+			echo action_icon( T_('Add meta comment').'...', 'new', $admin_url.'?ctrl=items&amp;p='.$edited_Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments', T_('Add meta comment').' &raquo;', 3, 4 );
+		}
+
+		// Load JS functions to work with meta comments:
+		load_funcs( 'comments/model/_comment_js.funcs.php' );
+
+		$Form->end_fieldset();
+	}
 	?>
 
-</div>
+</div><?php /* END OF <div class="right_col col-lg-6">*/ ?>
 
 <div class="clearfix"></div>
 
