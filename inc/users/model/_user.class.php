@@ -1211,6 +1211,7 @@ class User extends DataObject
 
 				// Work the blogs:
 				$subscription_values = array();
+				$opt_out_values = array();
 				$unsubscribed = array();
 				$subs_blog_IDs = explode( ',', $subs_blog_IDs );
 				foreach( $subs_blog_IDs as $loop_blog_ID )
@@ -1228,7 +1229,22 @@ class User extends DataObject
 					}
 					else
 					{	// No subscription here:
-						$unsubscribed[] = $loop_blog_ID;
+
+						// Check if opt-out and user is a member
+						$BlogCache = & get_BlogCache();
+						$Blog = & $BlogCache->get_by_ID( $loop_blog_ID );
+
+						$opt_out_collection = true;
+						$is_member = true;
+
+						if( $Blog->get_setting( 'opt_out_subscription' ) && $this->check_perm( 'blog_ismember', 'view', true, $loop_blog_ID ) )
+						{
+							$opt_out_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_comments )";
+						}
+						else
+						{
+							$unsubscribed[] = $loop_blog_ID;
+						}
 					}
 				}
 
@@ -1237,6 +1253,12 @@ class User extends DataObject
 				{	// We need to record values:
 					$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
 												VALUES '.implode( ', ', $subscription_values ) );
+				}
+
+				if( count( $opt_out_values ) )
+				{
+					$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
+												VALUES '.implode( ', ', $opt_out_values ) );
 				}
 
 				if( count( $unsubscribed ) )

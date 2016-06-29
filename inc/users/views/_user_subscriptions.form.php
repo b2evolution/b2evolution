@@ -275,9 +275,26 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Blog subscriptions'), array( 'id' => 'subs' ) );
 
 		// Get those blogs for which we have already subscriptions (for this user)
+		/*
 		$sql = 'SELECT blog_ID, blog_shortname, sub_items, sub_comments
 		          FROM T_blogs INNER JOIN T_subscriptions ON ( blog_ID = sub_coll_ID AND sub_user_ID = '.$edited_User->ID.' )
 		                       INNER JOIN T_coll_settings ON ( blog_ID = cset_coll_ID AND cset_name = "allow_subscriptions" AND cset_value = "1" )';
+		*/
+
+		$sql = 'SELECT DISTINCT blog_ID, blog_shortname,
+							IF( sub_items IS NULL, 1, sub_items ) AS sub_items,
+							IF( sub_comments IS NULL, 1, sub_comments ) AS sub_comments
+						FROM T_blogs
+						INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = blog_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = "1" )
+						LEFT JOIN T_coll_settings AS opt ON ( opt.cset_coll_ID = blog_ID AND opt.cset_name = "opt_out_subscription" )
+						LEFT JOIN T_subscriptions ON ( sub_coll_ID = blog_ID AND sub_user_ID = '.$edited_User->ID.' )
+						LEFT JOIN T_coll_group_perms ON (bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND opt.cset_value = "1" )
+						LEFT JOIN T_coll_user_perms ON (bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND opt.cset_value = "1" )
+						LEFT JOIN T_users ON (user_grp_ID = bloggroup_group_ID AND user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
+						LEFT JOIN T_users__secondary_user_groups ON (sug_grp_ID = bloggroup_group_ID AND sug_user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
+						WHERE sug_user_ID = '.$edited_User->ID.' OR bloguser_user_ID = '.$edited_User->ID.' OR user_ID = '.$edited_User->ID.'
+							AND ( sub_items != 0 OR sub_comments != 0 OR sub_coll_ID IS NULL )';
+
 		$blog_subs = $DB->get_results( $sql );
 
 		$encountered_current_blog = false;
