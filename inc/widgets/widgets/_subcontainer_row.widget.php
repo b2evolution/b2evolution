@@ -111,6 +111,7 @@ class subcontainer_row_Widget extends ComponentWidget
 			$widget_params['column'.$i.'_class'] = array(
 				'label' => sprintf( T_('Column %d Classes'), $i ),
 				'note' => T_('The style classes for container above.'),
+				'size' => 60,
 				'defaultvalue' => 'col-lg-4 col-md-6 col-sm-6 col-xs-12'
 			);
 		}

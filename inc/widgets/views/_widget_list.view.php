@@ -17,8 +17,6 @@ global $Blog, $Skin, $admin_url;
 
 global $container_Widget_array;
 
-global $blog_container_list, $skins_container_list, $embedded_containers;
-
 if( $current_User->check_perm( 'options', 'edit', false ) )
 {
 	echo '<div class="pull-right" style="margin-bottom:10px">';
@@ -266,6 +264,85 @@ function display_container( $WidgetContainer, $legend_suffix = '' )
 	$Table->display_list_end();
 }
 
+
+/**
+ * Display containers
+ *
+ * @param boolean TRUE to display main containers, FALSE - sub containers
+ */
+function display_containers( $main = true )
+{
+	global $Blog, $blog_container_list, $skins_container_list, $embedded_containers;
+
+	// Display containers for current skin:
+	$displayed_containers = array();
+	$embedded_containers = array();
+	$WidgetContainerCache = & get_WidgetContainerCache();
+	foreach( $skins_container_list as $container_code => $container_data )
+	{
+		$WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $container_code );
+		if( ! $WidgetContainer )
+		{
+			$WidgetContainer = new WidgetContainer();
+			$WidgetContainer->set( 'code', $container_code );
+			$WidgetContainer->set( 'name', $container_data[0] );
+			$WidgetContainer->set( 'coll_ID', $Blog->ID );
+		}
+		if( ( $main && ! $WidgetContainer->get( 'main' ) ) ||
+		    ( ! $main && $WidgetContainer->get( 'main' ) ) )
+		{	// Skip this container because another type is requested:
+			continue;
+		}
+
+		display_container( $WidgetContainer );
+		if( $WidgetContainer->ID > 0 )
+		{ // Container exists in the database
+			$displayed_containers[$container_code] = $WidgetContainer->ID;
+		}
+	}
+
+	// Display embedded containers
+	reset( $embedded_containers );
+	while( count( $embedded_containers ) > 0 )
+	{
+		// Get the first item key, and remove the first item from the array
+		$container_code = key( $embedded_containers );
+		array_shift( $embedded_containers );
+		if( isset( $displayed_containers[$container_code] ) )
+		{ // This container was already displayed
+			continue;
+		}
+
+		if( $WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $container_code ) )
+		{ // Confirmed that it is part of the blog's containers in the database
+			if( ( $main && ! $WidgetContainer->get( 'main' ) ) ||
+			    ( ! $main && $WidgetContainer->get( 'main' ) ) )
+			{	// Skip this container because another type is requested:
+				continue;
+			}
+			display_container( $WidgetContainer );
+			$displayed_containers[$container_code] = $WidgetContainer->ID;
+		}
+	}
+
+	// Display other blog containers which are not in the current skin
+	foreach( $blog_container_list as $container_ID )
+	{
+		if( in_array( $container_ID, $displayed_containers ) )
+		{
+			continue;
+		}
+
+		$WidgetContainer = & $WidgetContainerCache->get_by_ID( $container_ID );
+		if( ( $main && ! $WidgetContainer->get( 'main' ) ) ||
+		    ( ! $main && $WidgetContainer->get( 'main' ) ) )
+		{	// Skip this container because another type is requested:
+			continue;
+		}
+		display_container( $WidgetContainer, ' '.T_('[NOT USED IN CURRENT SKINS!]') );
+	}
+}
+
 $Form = new Form( $admin_url.'?ctrl=widgets&blog='.$Blog->ID );
 
 $Form->add_crumb( 'widget' );
@@ -275,59 +352,17 @@ $Form->begin_form();
 // fp> what browser do we need a fielset for?
 echo '<fieldset id="current_widgets">'."\n"; // fieldsets are cool at remembering their width ;)
 
-// Display containers for current skin:
-$displayed_containers = array();
-$embedded_containers = array();
-$WidgetContainerCache = & get_WidgetContainerCache();
-foreach( $skins_container_list as $container_code => $container_data )
-{
-	$WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $container_code );
-	if( ! $WidgetContainer )
-	{
-		$WidgetContainer = new WidgetContainer();
-		$WidgetContainer->set( 'code', $container_code );
-		$WidgetContainer->set( 'name', $container_data[0] );
-		$WidgetContainer->set( 'coll_ID', $Blog->ID );
-	}
+echo '<div class="row">';
 
-	display_container( $WidgetContainer );
-	if( $WidgetContainer->ID > 0 )
-	{ // Container exists in the database
-		$displayed_containers[$container_code] = $WidgetContainer->ID;
-	}
-}
+echo '<div class="col-md-6 col-sm-12">';
+display_containers( true );
+echo '</div>';
 
-// Display embedded containers
-reset( $embedded_containers );
-while( count( $embedded_containers ) > 0 )
-{
-	// Get the first item key, and remove the first item from the array
-	$container_code = key( $embedded_containers );
-	array_shift( $embedded_containers );
-	if( isset( $displayed_containers[$container_code] ) )
-	{ // This container was already displayed
-		continue;
-	}
+echo '<div class="col-md-6 col-sm-12">';
+display_containers( false );
+echo '</div>';
 
-	$WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $container_code );
-	if( $WidgetContainer )
-	{ // Confirmed that it is part of the blog's containers in the database
-		display_container( $WidgetContainer );
-		$displayed_containers[$container_code] = $WidgetContainer->ID;
-	}
-}
-
-// Display other blog containers which are not in the current skin
-foreach( $blog_container_list as $container_ID )
-{
-	if( in_array( $container_ID, $displayed_containers ) )
-	{
-		continue;
-	}
-
-	$WidgetContainer = & $WidgetContainerCache->get_by_ID( $container_ID );
-	display_container( $WidgetContainer, ' '.T_('[NOT USED IN CURRENT SKINS!]') );
-}
+echo '</div>';
 
 echo '</fieldset>'."\n";
 

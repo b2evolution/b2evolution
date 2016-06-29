@@ -86,11 +86,15 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	// Get all containers declared in the given blog's skins
 	$blog_containers = get_skin_containers( $skin_ids );
 
+	// Additional sub containers:
+	$blog_containers['front_page_column_a'] = array( 'Front Page Column A', 1, 0 );
+	$blog_containers['front_page_column_b'] = array( 'Front Page Column B', 1, 0 );
+
 	// Create rows to insert for all collection containers:
 	$widget_containers_sql_rows = array();
 	foreach( $blog_containers as $wico_code => $wico_data )
 	{
-		$widget_containers_sql_rows[] = '( "'.$wico_code.'", "'.$wico_data[0].'", '.$blog_id.', '.$wico_data[1].', 1 )';
+		$widget_containers_sql_rows[] = '( "'.$wico_code.'", "'.$wico_data[0].'", '.$blog_id.', '.$wico_data[1].', '.( isset( $wico_data[2] ) ? intval( $wico_data[2] ) : '1' ).' )';
 	}
 
 	// Insert widget containers records by one SQL query
@@ -345,14 +349,34 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 				);
 		}
 		add_basic_widget( $wico_id, 'coll_featured_posts', 'core', 20, $post_list_params );
-		add_basic_widget( $wico_id, 'coll_post_list', 'core', 25, array( 'title' => T_('More Posts'), 'featured' => 'other' ) );
-		if( $kind != 'main' )
-		{ // Don't install the "Recent Commnets" widget for Main blogs
-			add_basic_widget( $wico_id, 'coll_comment_list', 'core', 30 );
-		}
+		add_basic_widget( $wico_id, 'subcontainer_row', 'core', 30, array(
+				'column1_container' => 'front_page_column_a',
+				'column1_class'     => ( $kind == 'main' ? 'col-xs-12' : 'col-sm-6 col-xs-12' ),
+				'column2_container' => 'front_page_column_b',
+				'column2_class'     => 'col-sm-6 col-xs-12',
+			) );
 		if( $blog_id == $blog_b_ID )
 		{	// Install widget "Poll" only for Blog B on install:
 			add_basic_widget( $wico_id, 'poll', 'core', 40, array( 'poll_ID' => 1 ) );
+		}
+	}
+
+
+	/* Front Page Column A */
+	if( array_key_exists( 'front_page_column_a', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['front_page_column_a']['wico_ID'];
+		add_basic_widget( $wico_id, 'coll_post_list', 'core', 10, array( 'title' => T_('More Posts'), 'featured' => 'other' ) );
+	}
+
+
+	/* Front Page Column B */
+	if( array_key_exists( 'front_page_column_b', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['front_page_column_b']['wico_ID'];
+		if( $kind != 'main' )
+		{	// Don't install the "Recent Commnets" widget for Main collections:
+			add_basic_widget( $wico_id, 'coll_comment_list', 'core', 10 );
 		}
 	}
 
