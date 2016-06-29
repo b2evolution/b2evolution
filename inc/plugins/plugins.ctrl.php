@@ -297,7 +297,7 @@ switch( $action )
 		{ // second step:
 			$edit_Plugin = & $admin_Plugins->get_by_ID( $plugin_ID );
 
-			if( ! is_a($edit_Plugin, 'Plugin') )
+			if( ! ( $edit_Plugin instanceof Plugin ) )
 			{
 				$Messages->add( sprintf( T_( 'The plugin with ID %d could not be instantiated.' ), $plugin_ID ), 'error' );
 				$action = 'list';
@@ -325,7 +325,8 @@ switch( $action )
 		$Messages->add( $msg, 'success' );
 
 		// Install completed:
-		$r = $admin_Plugins->call_method( $edit_Plugin->ID, 'AfterInstall', $params = array() );
+		$params = array();
+		$r = $admin_Plugins->call_method( $edit_Plugin->ID, 'AfterInstall', $params );
 
 		// invalidate all PageCaches
 		invalidate_pagecaches();
@@ -395,7 +396,8 @@ switch( $action )
 		}
 
 		// Ask plugin:
-		$uninstall_ok = $admin_Plugins->call_method( $edit_Plugin->ID, 'BeforeUninstall', $params = array( 'unattended' => false ) );
+		$params = array( 'unattended' => false );
+		$uninstall_ok = $admin_Plugins->call_method( $edit_Plugin->ID, 'BeforeUninstall', $params );
 
 		if( $uninstall_ok === false )
 		{ // Plugin said "NO":
@@ -969,7 +971,8 @@ switch( $action )
 
 			if( $uninstall_ok === NULL )
 			{ // Plugin requested this:
-				$admin_Plugins->call_method( $edit_Plugin->ID, 'BeforeUninstallPayload', $params = array( 'Form' => & $Form ) );
+				$params = array( 'Form' => & $Form );
+				$admin_Plugins->call_method( $edit_Plugin->ID, 'BeforeUninstallPayload', $params );
 			}
 
 			echo '<p>'.T_('THIS CANNOT BE UNDONE!').'</p>';

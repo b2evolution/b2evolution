@@ -94,6 +94,8 @@ class item_small_print_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		load_funcs( 'files/model/_image.funcs.php' );
+
 		$r = array_merge( array(
 				'title' => array(
 					'label' => T_( 'Title' ),
@@ -110,6 +112,13 @@ class item_small_print_Widget extends ComponentWidget
 							'revision' => T_('Revisions'),
 						),
 					'defaultvalue' => 'standard',
+				),
+				'avatar_size' => array(
+					'label' => T_('Avatar Size'),
+					'note' => '',
+					'type' => 'select',
+					'options' => get_available_thumb_sizes(),
+					'defaultvalue' => 'crop-top-32x32',
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -140,11 +149,12 @@ class item_small_print_Widget extends ComponentWidget
 		$this->convert_legacy_param( 'widget_coll_small_print_display_author', 'widget_item_small_print_display_author' );
 
 		$this->disp_params = array_merge( array(
-				'widget_item_small_print_before' => '',
-				'widget_item_small_print_after'  => '',
+				'widget_item_small_print_before'    => '',
+				'widget_item_small_print_after'     => '',
+				'widget_item_small_print_separator' => ' &bull; ',
 			), $this->disp_params );
 
-		echo $this->disp_params['block_start'];
+		echo add_tag_class( $this->disp_params['block_start'], 'clearfix' );
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 		echo $this->disp_params['widget_item_small_print_before'];
@@ -159,30 +169,32 @@ class item_small_print_Widget extends ComponentWidget
 			$Item->author( array(
 					'link_text'   => 'only_avatar',
 					'link_rel'    => 'nofollow',
-					'thumb_size'  => 'crop-top-32x32',
+					'thumb_size'  => $this->disp_params['avatar_size'],
 					'thumb_class' => 'leftmargin',
 				) );
+
+			$Item->flag();
 
 			if( isset( $Skin ) && $Skin->get_setting( 'display_post_date' ) )
 			{ // We want to display the post date:
 				$Item->issue_time( array(
-						'before'      => /* TRANS: date */ T_('This entry was posted on '),
+						'before'      => /* TRANS: date */ T_('This entry was posted on').' ',
 						'time_format' => 'F jS, Y',
 					) );
 				$Item->issue_time( array(
-						'before'      => /* TRANS: time */ T_('at '),
+						'before'      => /* TRANS: time */ T_('at').' ',
 						'time_format' => '#short_time',
 					) );
 				$Item->author( array(
-						'before'    => T_('by '),
-						'link_text' => 'preferredname',
+						'before'    => /* TRANS: author name */ T_('by').' ',
+						'link_text' => 'auto',
 					) );
 			}
 			else
 			{
 				$Item->author( array(
-						'before'    => T_('This entry was posted by '),
-						'link_text' => 'preferredname',
+						'before'    => T_('This entry was posted by').' ',
+						'link_text' => 'auto',
 					) );
 			}
 
@@ -209,20 +221,22 @@ class item_small_print_Widget extends ComponentWidget
 		}
 		else
 		{ // Revisions
+			$Item->flag();
+
 			$Item->author( array(
-					'before'    => T_('Created by '),
-					'after'     => ' &bull; ',
-					'link_text' => 'name',
+					'before'    => T_('Created by').' ',
+					'after'     => $this->disp_params['widget_item_small_print_separator'],
+					'link_text' => 'auto',
 				) );
 
 			$Item->lastedit_user( array(
-					'before'    => T_('Last edit by '),
-					'after'     => T_(' on ').$Item->get_mod_date( 'F jS, Y' ),
-					'link_text' => 'name',
+					'before'    => T_('Last edit by').' ',
+					'after'     => /* TRANS: "on" is followed by a date here */ ' '.T_('on').' '.$Item->get_mod_date( 'F jS, Y' ),
+					'link_text' => 'auto',
 				) );
 
 			echo $Item->get_history_link( array(
-					'before'    => ' &bull; ',
+					'before'    => $this->disp_params['widget_item_small_print_separator'],
 					'link_text' => T_('View history')
 				) );
 		}
@@ -242,13 +256,14 @@ class item_small_print_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog, $current_User;
+		global $Blog, $current_User, $Item;
 
 		return array(
 				'wi_ID'        => $this->ID, // Have the widget settings changed ?
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'user_ID'      => ( is_logged_in() ? $current_User->ID : 0 ), // Has the current User changed?
 				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
+				'item_ID'      => $Item->ID, // Has the Item page changed?
 			);
 	}
 }

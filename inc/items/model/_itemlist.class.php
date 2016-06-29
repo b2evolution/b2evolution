@@ -193,6 +193,7 @@ class ItemList2 extends ItemListLight
 			'' AS post_flags,
 			'noreq' AS post_notifications_status,
 			NULL AS post_notifications_ctsk_ID,
+			'' AS post_notifications_flags,
 			".bpost_count_words( $content )." AS post_wordcount,
 			".$DB->quote($post_comment_status)." AS post_comment_status,
 			'".$DB->escape( implode( '.', $renderers ) )."' AS post_renderers,
@@ -208,7 +209,8 @@ class ItemList2 extends ItemListLight
 		$this->total_pages = 1;
 		$this->page = 1;
 
-		$this->run_query( false, false, false, 'PREVIEW QUERY' );
+		// Skip the function of this class and call it of the parent because we have already initialized SQL query above in this function:
+		DataObjectList2::run_query( false, false, false, 'ItemList2::preview_from_request() PREVIEW QUERY' );
 
 		// Clear cache to view new updated data of the post:
 		$this->Cache->clear();
@@ -248,8 +250,23 @@ class ItemList2 extends ItemListLight
 
 	/**
 	 * Run Query: GET DATA ROWS *** HEAVY ***
+	 * 
+	 * We need this query() stub in order to call it from restart() and still
+	 * let derivative classes override it
+	 * 
+	 * @deprecated Use new function run_query()
 	 */
-	function query()
+	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
+	{
+		$this->run_query( $create_default_cols_if_needed, $append_limit, $append_order_by );
+	}
+
+
+	/**
+	 * Run Query: GET DATA ROWS *** HEAVY ***
+	 */
+	function run_query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true,
+											$query_title = 'Results::run_query()' )
 	{
 		global $DB;
 
@@ -316,10 +333,8 @@ class ItemList2 extends ItemListLight
 
 		//echo DB::format_query( $this->sql );
 
-		$this->run_query( false, false, false, 'ItemList2::Query() Step 2' );
-
-		// Load the post read statuses if it is allowed by current collection:
-		$this->load_user_data_for_items();
+		// Skip the function of first parent and call it of main parent because we have already initialized SQL query above in this function:
+		DataObjectList2::run_query( false, false, false, 'ItemList2::Query() Step 2' );
 	}
 
 
@@ -698,6 +713,7 @@ class ItemList2 extends ItemListLight
 		$next_Query->where_visibility( $this->filters['visibility_array'] );
 		$next_Query->where_featured( $featured );
 		$next_Query->where_tags( $this->filters['tags'] );
+		$next_Query->where_flagged( $this->filters['flagged'] );
 
 		/*
 		 * ORDER BY stuff:
@@ -862,6 +878,58 @@ class ItemList2 extends ItemListLight
 
 		return $this->prevnext_Item[$direction][$post_navigation];
 
+	}
+
+
+	/**
+	 * Load data of Items from the current page at once to cache variables.
+	 * For each loading we use only single query to optimize performance.
+	 * By default it loads all Items of current list page into global $ItemCache,
+	 * Other data are loaded depending on $params, see below:
+	 *
+	 * @param array Params:
+	 *        - 'load_user_data' - use TRUE to load all data from table T_users__postreadstatus(dates of last read
+	 *                             post and comments) of the current logged in User for all Items of current list page.
+	 *                             (ONLY when a tracking unread content is enabled for the collection)
+	 *        - 'load_postcats'  - use TRUE to load all category associations for all Items of current list page.
+	 */
+	function load_list_data( $params = array() )
+	{
+		$params = array_merge( array(
+				'load_user_data' => true,
+				'load_postcats'  => true,
+			), $params );
+
+		$page_post_ids = $this->get_page_ID_array();
+		if( empty( $page_post_ids ) )
+		{	// There are no items on this list:
+			return;
+		}
+
+		// Load all items of the current page in single query:
+		$ItemCache = & get_ItemCache();
+		$ItemCache->load_list( $page_post_ids );
+
+		if( $params['load_user_data'] )
+		{	// Load the user data for items:
+			$this->load_user_data_for_items();
+		}
+
+		if( $params['load_postcats'] )
+		{	// Load category associations for the items of current page:
+			postcats_get_by_IDs( $page_post_ids );
+		}
+	}
+
+
+	/**
+	 * Load user data (posts/comments read statuses) for current User for each post of the current ItemList page
+	 *
+	 * @deprecated Use new function load_user_data_for_items() instead
+	 */
+	function load_content_read_statuses()
+	{
+		$this->load_user_data_for_items();
 	}
 
 

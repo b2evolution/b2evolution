@@ -257,7 +257,7 @@ class DataObjectCache
 	{
 		global $DB, $Debuglog;
 
-		if( is_a($Debuglog, 'Log') )
+		if( $Debuglog instanceof Log )
 		{
 			$sql_where = trim($SQL->get_where(''));
 			if( empty($sql_where) )

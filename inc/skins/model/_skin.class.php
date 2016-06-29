@@ -30,6 +30,12 @@ class Skin extends DataObject
 	var $type;
 
 	/**
+	 * Skin version
+	 * @var string
+	 */
+	var $version = NULL;
+
+	/**
 	 * Do we want to use style.min.css instead of style.css ?
 	 */
 	var $use_min_css = false;  // true|false|'check' Set this to true for better optimization
@@ -126,7 +132,7 @@ class Skin extends DataObject
 
 
 	/**
-	 * Get default type for the skin.
+	 * Get default skin type for the skin.
 	 */
 	function get_default_type()
 	{
@@ -156,6 +162,47 @@ class Skin extends DataObject
 
 
 	/**
+	 * Get supported collection kinds.
+	 *
+	 * This should be overloaded in skins.
+	 *
+	 * For each kind the answer could be:
+	 * - 'yes' : this skin does support that collection kind (the result will be was is expected)
+	 * - 'partial' : this skin is not a primary choice for this collection kind (but still produces an output that makes sense)
+	 * - 'maybe' : this skin has not been tested with this collection kind
+	 * - 'no' : this skin does not support that collection kind (the result would not be what is expected)
+	 * There may be more possible answers in the future...
+	 */
+	public function get_supported_coll_kinds()
+	{
+		$supported_kinds = array(
+				'main' => 'maybe',
+				'std' => 'maybe',		// Blog
+				'photo' => 'maybe',
+				'forum' => 'no',
+				'manual' => 'no',
+				'group' => 'maybe',  // Tracker
+				// Any kind that is not listed should be considered as "maybe" supported
+			);
+
+		return $supported_kinds;
+	}
+
+
+	final public function supports_coll_kind( $kind )
+	{
+		$supported_kinds = $this->get_supported_coll_kinds();
+
+		if( isset($supported_kinds[$kind]) )
+		{
+			return $supported_kinds[$kind];
+		}
+
+		// When the skin doesn't say... consider it a "maybe":
+		return 'maybe';
+	}
+
+	/*
 	 * What CSS framework does has this skin been designed with?
 	 *
 	 * This may impact default markup returned by Skin::get_template() for example
@@ -164,7 +211,6 @@ class Skin extends DataObject
 	{
 		return '';	// Other possibilities: 'bootstrap', 'foundation'... (maybe 'bootstrap4' later...)
 	}
-
 
 
 	/**
@@ -795,7 +841,7 @@ class Skin extends DataObject
 	/**
 	 * Get ready for displaying the skin.
 	 *
-	 * This method may register some CSS or JS. 
+	 * This method may register some CSS or JS.
 	 * The default implementation can register a few common things that you may request in the $features param.
 	 * This is where you'd specify you want to use BOOTSTRAP, etc.
 	 *
@@ -809,7 +855,7 @@ class Skin extends DataObject
 		global $debug, $Messages, $disp, $UserSettings;
 
 		// We get the optional arg this way for PHP7 comaptibility:
-		list( $features ) = func_get_args();
+		@list( $features ) = func_get_args();
 
 		if( empty($features) )
 		{	// Fall back to v5 default set of features:
@@ -828,7 +874,7 @@ class Skin extends DataObject
 			// Get next feature to include:
 			$feature = $features[$i];
 
-			switch( $feature ) 
+			switch( $feature )
 			{
 				case 'jquery':
 					// Include jQuery:
@@ -900,19 +946,19 @@ class Skin extends DataObject
 						require_css( 'b2evo_base.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
 					}
 					break;
-				
+
 				case 'style_css':
 					// Include the default skin style.css:
 					// You should make sure this is called ahead of any custom generated CSS.
-					if( $this->use_min_css == false 
-						|| $debug 
+					if( $this->use_min_css == false
+						|| $debug
 						|| ( $this->use_min_css == 'check' && !file_exists(dirname(__FILE__).'/style.min.css' ) ) )
 					{	// Use readable CSS:
-						require_css( 'style.css', 'relative' );	// Relative to <base> tag (current skin folder)
+						$this->require_css( 'style.css' );
 					}
 					else
 					{	// Use minified CSS:
-						require_css( 'style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
+						$this->require_css( 'style.min.css' );
 					}
 					break;
 
@@ -934,7 +980,7 @@ class Skin extends DataObject
 				case 'disp_page':
 					// Specific features for disp=page:
 
-					global $Blog;
+					global $Blog, $current_User;
 
 					// Used to init functions for AJAX forms to add a comment:
 					init_ajax_forms( 'blog' );
@@ -956,8 +1002,9 @@ class Skin extends DataObject
 						require_js( '#jqueryUI#', 'blog' );
 					}
 
-					if( is_logged_in() && $Blog->get_setting( 'use_workflow' ) )
-					{	// Initialize date picker to select a workflow deadline date:
+					if( is_logged_in() && $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
+					{	// Initialize JS to autcomplete user logins and date picker to edit workflow properties:
+						init_autocomplete_login_js( 'blog', $this->get_template( 'autocomplete_plugin' ) );
 						init_datepicker_js( 'blog' );
 					}
 					break;
@@ -1049,12 +1096,12 @@ class Skin extends DataObject
 					break;
 
 				case 'disp_login':
-					// Specific features for disp=threads:
+				case 'disp_access_requires_login':
+					// Specific features for disp=login and disp=access_requires_login:
 
 					global $Settings, $Plugins;
 
-					$transmit_hashed_password = (bool)$Settings->get( 'js_passwd_hashing' ) && !(bool)$Plugins->trigger_event_first_true( 'LoginAttemptNeedsRawPassword' );
-					if( $transmit_hashed_password )
+					if( can_use_hashed_password() )
 					{ // Include JS for client-side password hashing:
 						require_js( 'build/sha1_md5.bmin.js', 'blog' );
 					}
@@ -1303,9 +1350,9 @@ class Skin extends DataObject
 									'line_start_odd' => '<tr class="odd">'."\n",
 									'line_start_last' => '<tr class="even lastline">'."\n",
 									'line_start_odd_last' => '<tr class="odd lastline">'."\n",
-										'col_start' => '<td $class_attrib$>',
-										'col_start_first' => '<td class="firstcol $class$">',
-										'col_start_last' => '<td class="lastcol $class$">',
+										'col_start' => '<td $class_attrib$ $colspan_attrib$>',
+										'col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+										'col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
 										'col_end' => "</td>\n",
 									'line_end' => "</tr>\n\n",
 									'grp_line_start' => '<tr class="group">'."\n",
@@ -1571,6 +1618,10 @@ class Skin extends DataObject
 						// This tooltips appear on mouse over user logins or on plugin help icons
 						return 'popover';
 
+					case 'autocomplete_plugin':
+						// Plugin name to autocomplete user logins: 'hintbox', 'typeahead'
+						return 'typeahead';
+
 					case 'plugin_template':
 						// Template for plugins:
 						return array(
@@ -1634,9 +1685,9 @@ class Skin extends DataObject
 							'line_start_odd' => '<tr class="odd">'."\n",
 							'line_start_last' => '<tr class="even lastline">'."\n",
 							'line_start_odd_last' => '<tr class="odd lastline">'."\n",
-								'col_start' => '<td $class_attrib$>',
-								'col_start_first' => '<td class="firstcol $class$">',
-								'col_start_last' => '<td class="lastcol $class$">',
+								'col_start' => '<td $class_attrib$ $colspan_attrib$>',
+								'col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+								'col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
 								'col_end' => "</td>\n",
 							'line_end' => "</tr>\n\n",
 							'grp_line_start' => '<tr class="group">'."\n",
@@ -1714,9 +1765,47 @@ class Skin extends DataObject
 					'note_format' => ' <span class="notes">%s</span>',
 					'formend' => '',
 				);
+
+			case 'cat_array_mode':
+				// What category level use to display the items on disp=posts:
+				//   - 'children' - Get items from current category and from all its sub-categories recirsively
+				//   - 'parent' - Get items ONLY from current category WITHOUT sub-categories
+				return 'children';
+
+			case 'autocomplete_plugin':
+				// Plugin name to autocomplete user logins: 'hintbox', 'typeahead'
+				return 'hintbox';
 		}
 
 		return array();
+	}
+
+
+	/**
+	 * Memorize that a specific css that file will be required by the current page.
+	 * @see require_css() for full documentation,
+	 * this function is used to add unique version number for each skin
+	 *
+	 * @param string Name of CSS file relative to <base> tag (current skin folder)
+	 */
+	function require_css( $css_file )
+	{
+		global $app_version_long;
+		require_css( $css_file, 'relative', NULL, NULL, $this->folder.'+'.$this->version.'+'.$app_version_long );
+	}
+
+
+	/**
+	 * Memorize that a specific javascript file will be required by the current page.
+	 * @see require_js() for full documentation,
+	 * this function is used to add unique version number for each skin
+	 *
+	 * @param string Name of JavaScript file relative to <base> tag (current skin folder)
+	 */
+	function require_js( $js_file )
+	{
+		global $app_version_long;
+		require_js( $js_file, 'relative', false, false, $this->folder.'+'.$this->version.'+'.$app_version_long );
 	}
 }
 

@@ -66,8 +66,8 @@ else
 
 	if( $recipient_User )
 	{ // recipient User found
-		$recipient_name = $recipient_User->get('preferredname');
-		$recipient_address = $recipient_User->get('email');
+		$recipient_name = $recipient_User->get_username();
+		$recipient_address = $recipient_User->get( 'email' );
 	}
 }
 
@@ -105,7 +105,7 @@ else
 {
 	if( ! empty( $recipient_User ) )
 	{ // Get identity link for existed users
-		$recipient_link = $recipient_User->get_identity_link( array( 'link_text' => 'nickname' ) );
+		$recipient_link = $recipient_User->get_identity_link( array( 'link_text' => 'auto' ) );
 	}
 	else
 	{ // Get login name for anonymous user

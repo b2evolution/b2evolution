@@ -1208,7 +1208,7 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 		// Moderators will get emails about every new comment
 		// Subscribed user will only get emails about new published comments
 		$executed_by_userid = empty( $User ) ? NULL : $User->ID;
-		$Comment->handle_notifications( true, $executed_by_userid );
+		$Comment->handle_notifications( $executed_by_userid, true );
 	}
 	else
 	{
@@ -1285,7 +1285,7 @@ function xmlrpcs_edit_comment( $params = array(), & $edited_Comment )
 
 	// Execute or schedule notifications & pings:
 	logIO( 'Handling notifications...' );
-	$edited_Comment->handle_notifications( false, $current_User->ID );
+	$edited_Comment->handle_notifications();
 
 	logIO( 'OK.' );
 	return new xmlrpcresp( new xmlrpcval( true, 'boolean' ) );
@@ -1460,7 +1460,7 @@ function xmlrpcs_new_item( $params, & $Blog = NULL )
 
 	// Execute or schedule notifications & pings:
 	logIO( 'Handling notifications...' );
-	$edited_Item->handle_post_processing( true );
+	$edited_Item->handle_notifications( NULL, true );
 
  	logIO( 'OK.' );
 	return new xmlrpcresp(new xmlrpcval($edited_Item->ID));
@@ -1657,7 +1657,7 @@ function xmlrpcs_edit_item( & $edited_Item, $params )
 
 	// Execute or schedule notifications & pings:
 	logIO( 'Handling notifications...' );
-	$edited_Item->handle_post_processing( false );
+	$edited_Item->handle_notifications();
 
 	logIO( 'OK.' );
 	return new xmlrpcresp( new xmlrpcval( 1, 'boolean' ) );
@@ -1921,9 +1921,6 @@ function xmlrpc_get_comments( $params, & $Blog )
 
 	// Filter list:
 	$CommentList->set_filters( $filters, false );
-
-	// Run SQL query to get results depending on current filters:
-	$CommentList->query();
 
 	// Get ready for display (runs the query):
 	$CommentList->display_init();

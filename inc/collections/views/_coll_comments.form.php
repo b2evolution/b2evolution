@@ -202,7 +202,7 @@ $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moder
 	}
 	// put this on feedback details container, this way it won't be displayed if comment posting is not allowed
 	echo '<div class="feedback_details_container">';
-	
+
 	if( $is_bootstrap_skin )
 	{	// Use dropdown for bootstrap skin:
 		$new_status_field = get_status_dropdown_button( array(
@@ -273,7 +273,8 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Subscriptions') . get_manual_link('comment-subscriptions') );
-	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), T_('Email subscriptions'), T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
+	$Form->checkbox( 'allow_comment_subscriptions', $edited_Blog->get_setting( 'allow_comment_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new comment.') );
+	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
 $Form->end_fieldset();
 
 

@@ -81,7 +81,7 @@ class BlogCache extends DataObjectCache
 	 */
 	function & get_by_url( $req_url, $halt_on_error = true )
 	{
-		global $DB, $Debuglog, $baseurl, $basedomain;
+		global $DB, $Debuglog, $baseurl, $basedomain, $basehost;
 
 		foreach( array_keys($this->cache_siteurl_abs) as $siteurl_abs )
 		{
@@ -102,7 +102,8 @@ class BlogCache extends DataObjectCache
 			         AND ( '.$DB->quote('http'.$req_url_wo_proto).' LIKE CONCAT( blog_siteurl, "%" )
 		                 OR '.$DB->quote('https'.$req_url_wo_proto).' LIKE CONCAT( blog_siteurl, "%" ) ) )
 			    OR ( blog_access_type = "subdom"
-			         AND '.$DB->quote($req_url_wo_proto).' LIKE CONCAT( "://", blog_urlname, ".'.$basedomain.'/%" ) )';
+			         AND ( '.$DB->quote($req_url_wo_proto).' LIKE CONCAT( "://", blog_urlname, ".'.$basedomain.'/%" )
+			               OR '.$DB->quote($req_url_wo_proto).' LIKE CONCAT( "://", blog_urlname, ".'.$basehost.'/%" ) ) )';
 
 		// Match stubs like "http://base/url/STUB?param=1" on $baseurl
 		/*
@@ -201,41 +202,17 @@ class BlogCache extends DataObjectCache
 	/**
 	 * Load a list of public blogs into the cache
 	 *
-	 * @param string
+	 * @param string Order By
+	 * @param string Order Direction
 	 * @return array of IDs
 	 */
 	function load_public( $order_by = '', $order_dir = '' )
 	{
-		global $DB, $Settings, $Debuglog;
+		global $DB, $Debuglog;
 
 		$Debuglog->add( "Loading <strong>$this->objtype(public)</strong> into cache", 'dataobjects' );
 
-		if( $order_by == '' )
-		{	// Use default value from settings
-			$order_by = $Settings->get('blogs_order_by');
-		}
-
-		if( $order_dir == '' )
-		{	// Use default value from settings
-			$order_dir = $Settings->get('blogs_order_dir');
-		}
-
-		$SQL = new SQL();
-		$SQL->SELECT( '*' );
-		$SQL->FROM( $this->dbtablename );
-		$sql_where = 'blog_in_bloglist = "public"';
-		if( is_logged_in() )
-		{ // Allow the blogs that available for logged in users
-			$sql_where .= ' OR blog_in_bloglist = "logged"';
-			// Allow the blogs that available for members
-			global $current_User;
-			$sql_where .= ' OR ( blog_in_bloglist = "member" AND (
-					( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND bloguser_user_ID = '.$current_User->ID.' ) OR
-					( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND bloggroup_group_ID = '.$current_User->grp_ID.' )
-				) )';
-		}
-		$SQL->WHERE( '( '.$sql_where.' )' );
-		$SQL->ORDER_BY( gen_order_clause( $order_by, $order_dir, 'blog_', 'blog_ID' ) );
+		$SQL = $this->get_public_colls_SQL( $order_by, $order_dir );
 
 		foreach( $DB->get_results( $SQL->get(), OBJECT, 'Load public blog list' ) as $row )
 		{	// Instantiate a custom object
@@ -243,6 +220,49 @@ class BlogCache extends DataObjectCache
 		}
 
 		return $DB->get_col( NULL, 0 );
+	}
+
+
+	/**
+	 * Get SQL to load a list of public collections
+	 *
+	 * @param string Order By
+	 * @param string Order Direction
+	 * @return object SQL
+	 */
+	function get_public_colls_SQL( $order_by = '', $order_dir = '' )
+	{
+		global $Settings;
+
+		if( $order_by == '' )
+		{	// Use default value from settings:
+			$order_by = $Settings->get( 'blogs_order_by' );
+		}
+
+		if( $order_dir == '' )
+		{	// Use default value from settings:
+			$order_dir = $Settings->get( 'blogs_order_dir' );
+		}
+
+		$SQL = new SQL();
+		$SQL->SELECT( '*' );
+		$SQL->FROM( $this->dbtablename );
+		$sql_where = 'blog_in_bloglist = "public"';
+		if( is_logged_in() )
+		{	// Allow the collections that available for logged in users:
+			$sql_where .= ' OR blog_in_bloglist = "logged"';
+			// Allow the collections that available for members:
+			global $current_User;
+			$sql_where .= ' OR ( blog_in_bloglist = "member" AND (
+					( SELECT grp_ID FROM T_groups WHERE grp_ID = '.$current_User->grp_ID.' AND grp_perm_blogs IN ( "viewall", "editall" ) ) OR
+					( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND bloguser_user_ID = '.$current_User->ID.' ) OR
+					( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND bloggroup_group_ID = '.$current_User->grp_ID.' )
+				) )';
+		}
+		$SQL->WHERE( '( '.$sql_where.' )' );
+		$SQL->ORDER_BY( gen_order_clause( $order_by, $order_dir, 'blog_', 'blog_ID' ) );
+
+		return $SQL;
 	}
 
 
@@ -287,12 +307,16 @@ class BlogCache extends DataObjectCache
 	/**
 	 * Load blogs a user has permissions for.
 	 *
-	 * @param string permission: 'member' (default), 'browse' (files)
-	 * @param string
-	 * @param integer user ID
+	 * @param string Permission name: 'member' (default), 'browse' (files)
+	 * @param string Permission level: 'view', 'edit'
+	 * @param integer User ID
+	 * @param string Order by
+	 * @param string Order direction
+	 * @param integer Limit
+	 * @param string Filter: 'favorite' - to get only favorite collections for current user
 	 * @return array The blog IDs
 	 */
-	function load_user_blogs( $permname = 'blog_ismember', $permlevel = 'view', $user_ID = NULL, $order_by = '', $order_dir = '', $limit = NULL )
+	function load_user_blogs( $permname = 'blog_ismember', $permlevel = 'view', $user_ID = NULL, $order_by = '', $order_dir = '', $limit = NULL, $filter = NULL )
 	{
 		global $DB, $Settings, $Debuglog;
 
@@ -321,24 +345,48 @@ class BlogCache extends DataObjectCache
 		}
 		$for_User->get_Group();// ensure Group is set
 
+		if( $filter == 'favorite' )
+		{	// Get only favorite collections of the user:
+			$sql_filter = 'INNER JOIN T_coll_user_favs
+				 ON cufv_blog_ID = blog_ID
+				AND cufv_user_ID = '.$DB->quote( $user_ID );
+		}
+
 		$Group = $for_User->Group;
 		// First check if we have a global access perm:
- 		if( $Group->check_perm( 'blogs', $permlevel ) )
+		if( $Group->check_perm( 'blogs', $permlevel ) ||
+		    ( $permname == 'blog_media_browse' && $Group->check_perm( 'files', 'edit' ) ) )
 		{ // If group grants a global permission:
-			$this->load_all( $order_by, $order_dir );
+			$this->clear();
+			if( isset( $sql_filter ) )
+			{	// Filter collections:
+				$blog_SQL = $this->get_SQL_object();
+				$blog_SQL->FROM_add( $sql_filter );
+				$this->load_by_sql( $blog_SQL );
+			}
+			else
+			{	// Get all collections:
+				$this->load_all( $order_by, $order_dir );
+			}
 			return $this->get_ID_array();
 		}
 
 		// Note: We only JOIN in the advanced perms if any given blog has them enabled,
 		// otherwise they are ignored!
-		$sql = "SELECT DISTINCT T_blogs.*
+		$sql = 'SELECT DISTINCT T_blogs.*
 		          FROM T_blogs LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0
 		          																				AND blog_ID = bloguser_blog_ID
-		          																				AND bloguser_user_ID = {$user_ID} )
+		          																				AND bloguser_user_ID = '.$user_ID.' )
 		          		 LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0
 		          																	AND blog_ID = bloggroup_blog_ID
-		          																	AND bloggroup_group_ID = {$Group->ID} )
-		         WHERE ";
+		          																	AND bloggroup_group_ID = '.$Group->ID.' )';
+
+		if( isset( $sql_filter ) )
+		{	// Filter collections:
+			$sql .= $sql_filter;
+		}
+
+		$sql .= ' WHERE ';
 
 		if( $permname != 'blog_admin' )
 		{	// Only the admin perm is not convered by being the owner of the blog:
@@ -392,6 +440,98 @@ class BlogCache extends DataObjectCache
 		}
 
 		return $DB->get_col( NULL, 0 );
+	}
+
+
+	/**
+	 * Load into the cache a list of collections which have the enabled settings to subscribe on new posts or comments
+	 *
+	 * @param object User, Restrict public collections which available only for the User
+	 * @param array IDs of collections which should be exluded from list
+	 * @param string Order By
+	 * @param string Order Direction
+	 * @return array of IDs
+	 */
+	function load_subscription_colls( $User, $exclude_coll_IDs = NULL, $order_by = '', $order_dir = '' )
+	{
+		global $DB, $Settings, $Debuglog;
+
+		$Debuglog->add( 'Loading <strong>'.$this->objtype.'(subscription collections)</strong> into cache', 'dataobjects' );
+
+		if( $order_by == '' )
+		{	// Use default value from settings:
+			$order_by = $Settings->get( 'blogs_order_by' );
+		}
+
+		if( $order_dir == '' )
+		{	// Use default value from settings:
+			$order_dir = $Settings->get( 'blogs_order_dir' );
+		}
+
+		load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
+		$CollectionSettings = new CollectionSettings();
+
+		$blog_cache_SQL = $this->get_SQL_object();
+
+		$blog_cache_SQL->title = 'Get the '.$this->objtype.'(subscription collections) rows to load the objects into the cache by '.get_class().'->'.__FUNCTION__.'()';
+
+		// Initialize subquery to get all collections which allow subscription for new ITEMS/POSTS:
+		if( $CollectionSettings->get_default( 'allow_subscriptions' ) == 0 )
+		{	// If default setting disables to subscribe for new ITEMS/POSTS, we should get only the collections which allow the subsriptions:
+			$sql_operator = 'IN';
+			$sql_value = '1';
+		}
+		else
+		{	// If default setting enables to subscribe for new ITEMS/POSTS, we should exclude the collections which don't allow the subsriptions:
+			$sql_operator = 'NOT IN';
+			$sql_value = '0';
+		}
+		$allow_item_subscriptions_sql = 'blog_ID '.$sql_operator.' (
+					SELECT cset_coll_ID
+					  FROM T_coll_settings
+					 WHERE cset_name = "allow_subscriptions"
+					   AND cset_value = '.$sql_value.'
+				)';
+		// Initialize subquery to get all collections which allow subscription for new COMMENTS:
+		if( $CollectionSettings->get_default( 'allow_comment_subscriptions' ) == 0 )
+		{	// If default setting disables to subscribe for new COMMENTS, we should get only the collections which allow the subsriptions:
+			$sql_operator = 'IN';
+			$sql_value = '1';
+		}
+		else
+		{	// If default setting enables to subscribe for new COMMENTS, we should exclude the collections which don't allow the subsriptions:
+			$sql_operator = 'NOT IN';
+			$sql_value = '0';
+		}
+		$allow_comment_subscriptions_sql = 'blog_ID '.$sql_operator.' (
+				SELECT cset_coll_ID
+				  FROM T_coll_settings
+				 WHERE cset_name = "allow_comment_subscriptions"
+				   AND cset_value = '.$sql_value.'
+			)';
+
+		// Get collections which which allow subscription for new items/posts OR comments:
+		$blog_cache_SQL->WHERE_and( $allow_item_subscriptions_sql.' OR '.$allow_comment_subscriptions_sql );
+
+		if( $Settings->get( 'subscribe_new_blogs' ) == 'public' )
+		{	// If a subscribing is available only for the public collections:
+			$blog_cache_SQL->WHERE_and( '( blog_in_bloglist IN ( "public", "logged" ) ) OR
+				( blog_in_bloglist = "member" AND (
+					( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND bloguser_user_ID = '.$User->ID.' ) OR
+					( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND bloggroup_group_ID = '.$User->grp_ID.' )
+				) )' );
+		}
+
+		if( ! empty( $exclude_coll_IDs ) )
+		{	// Exclude the collections from the list (for example, if user already is subscribed on them):
+			$blog_cache_SQL->WHERE_and( 'blog_ID NOT IN ( '.$DB->quote( $exclude_coll_IDs ).' )' );
+		}
+
+		$blog_cache_SQL->ORDER_BY( gen_order_clause( $order_by, $order_dir, $this->dbprefix, $this->dbIDname ) );
+
+		$this->load_by_sql( $blog_cache_SQL );
+
+		return array_keys( $this->cache );
 	}
 
 

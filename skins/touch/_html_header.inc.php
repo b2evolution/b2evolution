@@ -18,8 +18,6 @@ $params = array_merge( array(
 	'auto_pilot' => 'seo_title',
 ), $params );
 
-require_css( 'style.css', 'relative' );
-
 init_bubbletip_js( 'blog' ); // Add jQuery bubbletip plugin
 init_results_js( 'blog' ); // Add functions to work with Results tables
 require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
@@ -38,17 +36,20 @@ require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 	<?php skin_description_tag(); ?>
 	<?php skin_keywords_tag(); ?>
 	<?php skin_opengraph_tags(); ?>
+	<?php skin_twitter_tags(); ?>
 	<?php robots_tag(); ?>
 	<?php
-	global $htsrv_url;
+	global $htsrv_url, $restapi_url;
 	$js_blog_id = "";
 	if( ! empty( $Blog ) )
 	{ // Set global js var "blog_id"
 		$js_blog_id = "\r\n		var blog_id = '".$Blog->ID."';";
 	}
 
-	add_js_headline( "// Paths used by JS functions:
-		var htsrv_url = '".get_samedomain_htsrv_url()."';"
+	add_js_headline( "// Paths and vars are used by JS functions:
+		var htsrv_url = '".get_samedomain_htsrv_url()."';
+		var restapi_url = '$restapi_url';
+		var b2evo_icons_type = '".get_param( 'b2evo_icons_type' )."';"
 		.$js_blog_id );
 	?>
 	<meta name="generator" content="b2evolution <?php app_version(); ?>" /> <!-- Please leave this for stats -->

@@ -45,7 +45,7 @@ $params = array_merge( array(
 		'comment_error_start'  => '<div class="bComment" id="comment_error">',
 		'comment_error_end'    => '</div>',
 		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
-		'author_link_text'     => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+		'author_link_text'     => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 		'link_to'              => 'userurl>userpage',		    // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'form_title_start'     => '<h3 id="respond">',
 		'form_title_end'       => '</h3>',
@@ -179,9 +179,6 @@ if( $Item->can_see_comments( true ) )
 
 		$CommentList->load_from_Request();
 
-		// Run SQL query to get results depending on current filters:
-		$CommentList->query();
-
 		// Get ready for display (runs the query):
 		$CommentList->display_init();
 
@@ -311,7 +308,7 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 	$not_subscribed = true;
 	$creator_User = $Item->get_creator_User();
 
-	if( $Blog->get_setting( 'allow_subscriptions' ) )
+	if( $Blog->get_setting( 'allow_comment_subscriptions' ) )
 	{
 		$sql = 'SELECT count( sub_user_ID ) FROM T_subscriptions
 					WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0';

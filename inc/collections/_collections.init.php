@@ -39,6 +39,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_categories'               => $tableprefix.'categories',
 		'T_coll_group_perms'         => $tableprefix.'bloggroups',
 		'T_coll_user_perms'          => $tableprefix.'blogusers',
+		'T_coll_user_favs'           => $tableprefix.'coll_favs',
 		'T_coll_settings'            => $tableprefix.'coll_settings',
 		'T_comments'                 => $tableprefix.'comments',
 		'T_comments__votes'          => $tableprefix.'comments__votes',
@@ -48,11 +49,12 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_items__itemtag'           => $tableprefix.'items__itemtag',
 		'T_items__prerendering'      => $tableprefix.'items__prerendering',
 		'T_items__status'            => $tableprefix.'items__status',
+		'T_items__subscriptions'     => $tableprefix.'items__subscriptions',
 		'T_items__tag'               => $tableprefix.'items__tag',
 		'T_items__type'              => $tableprefix.'items__type',
 		'T_items__type_custom_field' => $tableprefix.'items__type_custom_field',
 		'T_items__type_coll'         => $tableprefix.'items__type_coll',
-		'T_items__subscriptions'     => $tableprefix.'items__subscriptions',
+		'T_items__user_data'         => $tableprefix.'items__user_data',
 		'T_items__version'           => $tableprefix.'items__version',
 		'T_links'                    => $tableprefix.'links',
 		'T_links__vote'              => $tableprefix.'links__vote',
@@ -830,9 +832,9 @@ class collections_Module extends Module
 							'seo' => array(
 								'text' => T_('SEO'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=seo&amp;blog='.$blog, ),
-							'renderers' => array(
-								'text' => T_('Renderers'),
-								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=renderers&amp;blog='.$blog, ),
+							'plugins' => array(
+								'text' => T_('Plugins'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugins&amp;blog='.$blog, ),
 						),
 					),
 				) );
@@ -966,13 +968,19 @@ class collections_Module extends Module
 				'name'   => T_('Send notifications about new comment on &laquo;%s&raquo;'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_comment_notifications.job.php',
-				'params' => NULL, // 'comment_ID', 'except_moderators'
+				'params' => NULL, // 'comment_ID', 'executed_by_userid', 'is_new_comment', 'already_notified_user_IDs', 'force_members', 'force_community'
 			),
 			'send-post-notifications' => array( // not user schedulable
 				'name'   => T_('Send notifications for &laquo;%s&raquo;'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_post_notifications.job.php',
-				'params' => NULL, // 'item_ID'
+				'params' => NULL, // 'item_ID', 'executed_by_userid', 'is_new_item', 'already_notified_user_IDs', 'force_members', 'force_community', 'force_pings'
+			),
+			'send-email-campaign' => array( // not user schedulable
+				'name'   => T_('Send a chunk of %s emails for the campaign "%s"'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_email_campaign.job.php',
+				'params' => NULL, // 'ecmp_ID'
 			),
 			'send-unmoderated-comments-reminders' => array(
 				'name'   => T_('Send reminders about comments awaiting moderation'),
@@ -1036,6 +1044,14 @@ class collections_Module extends Module
 				// Check permission:
 				$LinkOwner->check_perm( 'edit', true );
 
+				if( $current_User->check_perm( 'files', 'edit' ) )
+				{	// If current User has permission to edit/delete files:
+					// Get number of objects where this file is attached to:
+					// TODO: attila>this must be handled with a different function
+					$file_links = get_file_links( $linked_File->ID, array( 'separator' => '<br />' ) );
+					$links_count = ( strlen( $file_links ) > 0 ) ? substr_count( $file_links, '<br />' ) + 1 : 0;
+				}
+
 				$confirmed = param( 'confirmed', 'integer', 0 );
 				if( $confirmed )
 				{ // Unlink File from Item:
@@ -1050,10 +1066,7 @@ class collections_Module extends Module
 					if( $current_User->check_perm( 'files', 'edit' ) )
 					{ // current User has permission to edit/delete files
 						$file_name = $linked_File->get_name();
-						// Get number of objects where this file is attahced to
-						// TODO: attila>this must be handled with a different function
-						$file_links = get_file_links( $linked_File->ID, array( 'separator' => '<br />' ) );
-						$links_count = ( strlen( $file_links ) > 0 ) ? substr_count( $file_links, '<br />' ) + 1 : 0;
+						$links_count--;
 						if( $links_count > 0 )
 						{ // File is linked to other objects
 							$Messages->add( sprintf( T_('File %s is still linked to %d other objects'), $file_name, $links_count ), 'note' );
@@ -1076,7 +1089,14 @@ class collections_Module extends Module
 					$delete_url = $samedomain_htsrv_url.'action.php?mname=collections&action=unlink&link_ID='.$edited_Link->ID.'&confirmed=1&crumb_collections_unlink='.get_crumb( 'collections_unlink' );
 					$ok_button = '<a href="'.$delete_url.'" class="btn btn-danger">'.T_('I am sure!').'</a>';
 					$cancel_button = '<a href="'.$redirect_to.'" class="btn btn-default">'.T_('CANCEL').'</a>';
-					$msg = sprintf( T_( 'You are about to unlink and delete the attached file from %s path.' ), $linked_File->get_root_and_rel_path() );
+					if( isset( $links_count ) && $links_count == 1 )
+					{	// If the file will be deleted after confirmation:
+						$msg = sprintf( T_( 'You are about to unlink and delete the attached file from %s path.' ), $linked_File->get_root_and_rel_path() );
+					}
+					else
+					{	// If the file will be only unlinked after confirmation because it is also attached to other objects:
+						$msg = sprintf( T_( 'You are about to unlink the attached file %s.' ), $linked_File->get_root_and_rel_path() );
+					}
 					$msg .= '<br />'.T_( 'This CANNOT be undone!').'<br />'.T_( 'Are you sure?' ).'<br /><br />'.$ok_button."\t".$cancel_button;
 					$Messages->add( $msg, 'error' );
 				}

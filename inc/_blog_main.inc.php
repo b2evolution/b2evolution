@@ -367,11 +367,6 @@ if( !empty($p) || !empty($title) )
 		// Search item by title:
 		$Item = & $ItemCache->get_by_urltitle( $title, false, false );
 
-		if( isset( $Item->status ) && $Item->status == 'deprecated' )
-		{ // If the post is deprecated
-			$disp = '404';
-		}
-
 		if( ( !empty( $Item ) ) && ( $Item !== false ) && (! $Item->is_part_of_blog( $blog ) ) )
 		{ // We have found an Item object, but it doesn't belong to the current blog!
 			// Check if we want to redirect moved posts:
@@ -631,24 +626,29 @@ if( ( $disp == 'user' ) && isset( $user_ID ) && isset( $current_User ) && ( $use
 
 if( $disp == 'terms' )
 {	// Display a page of terms & conditions:
-	set_param( 'p', intval( $Settings->get( 'site_terms' ) ) );
-	$c = 0; // Don't display comments
+	$terms_item_ID = intval( $Settings->get( 'site_terms' ) );
+	if( $Settings->get( 'site_terms_enabled' ) && $terms_item_ID  > 0 )
+	{	// Only if item ID is defined for terms page:
+		set_param( 'p', $terms_item_ID );
+		$c = 0; // Don't display comments
 
-	$ItemCache = & get_ItemCache();
-	$Item = & $ItemCache->get_by_ID( $p, false );
+		$ItemCache = & get_ItemCache();
+		$Item = & $ItemCache->get_by_ID( $p, false );
 
-	if( is_logged_in() && $UserSettings->get( 'terms_accepted', $current_User->ID ) )
-	{	// Display the message if current user already accepted the terms:
-		$Messages->add( T_('You already accepted these terms.'), 'success' );
+		if( is_logged_in() && $UserSettings->get( 'terms_accepted', $current_User->ID ) )
+		{	// Display the message if current user already accepted the terms:
+			$Messages->add( T_('You already accepted these terms.'), 'success' );
+		}
+
+		// Don't redirect to permanent url of the page:
+		$redir = 'no';
 	}
-
-	// Don't redirect to permanent url of the page:
-	$redir = 'no';
 }
 
 // Check if terms & conditions should be accepted by current user:
 if( is_logged_in() && // Only for logged in users
     ! in_array( $disp, array( 'terms', 'help', 'msgform', 'activateinfo' ) ) && // Allow these pages
+    $Settings->get( 'site_terms_enabled' ) && // Terms must be enabled
     ! $UserSettings->get( 'terms_accepted', $current_User->ID ) ) // If it was not accepted yet
 {	// Current user didn't accept the terms yet:
 

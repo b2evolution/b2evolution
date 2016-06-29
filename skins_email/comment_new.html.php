@@ -26,6 +26,7 @@ $params = array_merge( array(
 		'author_name'    => '',
 		'notify_type'    => '',
 		'recipient_User' => NULL,
+		'is_new_comment' => true,
 	), $params );
 
 
@@ -143,9 +144,19 @@ switch( $params['notify_type'] )
 {
 	case 'moderator':
 		// moderation email
+		if( $params['is_new_comment'] )
+		{	// about new comment:
+			$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating new comments, click here' );
+			$unsubscribe_type = 'comment_moderator';
+		}
+		else
+		{	// about updated comment:
+			$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating updated comments, click here' );
+			$unsubscribe_type = 'comment_moderator_edit';
+		}
 		$params['unsubscribe_text'] = T_( 'You are a moderator of this blog and you are receiving notifications when a comment may need moderation.' ).'<br />'
-			.T_( 'If you don\'t want to receive any more notifications about comment moderation, click here' ).': '
-			.get_link_tag( $htsrv_url.'quick_unsubscribe.php?type=comment_moderator&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
+			.$unsubscribe_text.': '
+			.get_link_tag( $htsrv_url.'quick_unsubscribe.php?type='.$unsubscribe_type.'&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
 		break;
 
 	case 'blog_subscription':

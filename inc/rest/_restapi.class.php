@@ -226,6 +226,35 @@ class RestApi
 
 
 	/**
+	 * Halt execution with text from $Messages
+	 *
+	 * @param integer Status code: 'wrong_route', 'unknown_module'
+	 * @param integer Status number: 404, 403
+	 * @param string Message types, separated by comma: 'success', 'warning', 'error', 'note'
+	 */
+	private function halt_with_Messages( $status_code = 'no_access', $status_number = 403, $message_types = 'error,warning' )
+	{
+		global $Messages;
+
+		$message_types = explode( ',', $message_types );
+
+		$halt_messages = array();
+		foreach( $Messages->messages_text as $m => $message_text )
+		{
+			if( in_array( $Messages->messages_type[ $m ], $message_types ) )
+			{	// Get this message for halt because of message type:
+				$halt_messages[] = $message_text;
+			}
+		}
+
+		$halt_messages = empty( $halt_messages ) ? $status_code : implode( ' ', $halt_messages );
+
+		// Halt execution:
+		$this->halt( $halt_messages, $status_code, $status_number );
+	}
+
+
+	/**
 	 * Add new element in response array
 	 *
 	 * @param string Key or Value ( if second param is NULL )
@@ -330,6 +359,17 @@ class RestApi
 			}
 		}
 
+		// Try to get an object ID and action for example request "<baseurl>/api/v1/collections/<collname>/items/<id>/action":
+		$object_ID = empty( $this->args[3] ) ? NULL : intval( $this->args[3] );
+		$object_action = empty( $this->args[4] ) ? NULL : $this->args[4];
+		$coll_controller_params = array();
+
+		if( $object_ID && $object_action )
+		{	// Set controller name for single object and action:
+			$coll_controller = $coll_controller.'_'.$object_action;
+			$coll_controller_params[] = $object_ID;
+		}
+
 		if( ! method_exists( $this, 'controller_coll_'.$coll_controller ) )
 		{	// Unknown controller:
 			$this->halt( 'Unknown collection controller "'.$coll_controller.'"', 'unknown_controller' );
@@ -337,29 +377,153 @@ class RestApi
 		}
 
 		// Call collection controller to prepare current request:
-		$this->{'controller_coll_'.$coll_controller}();
+		call_user_func_array( array( $this, 'controller_coll_'.$coll_controller ), $coll_controller_params );
 	}
 
 
 	/**
-	 * Call collection controller to list the public collections
+	 * Call collection controller to list the collections
 	 */
 	private function controller_coll_list()
 	{
-		// Load only public collections for current user:
-		$BlogCache = & get_BlogCache();
-		$BlogCache->clear();
-		$BlogCache->load_public();
+		global $DB, $Settings, $current_User;
 
-		if( empty( $BlogCache->cache ) )
-		{	// No collections found:
-			$this->halt( 'No collections found', 'no_collections', 404 );
-			// Exit here.
+		$api_page = param( 'page', 'integer', 1 );
+		$api_per_page = param( 'per_page', 'integer', 10 );
+		$api_q = param( 'q', 'string', '' );
+		$api_fields = param( 'fields', 'string', 'shortname' ); // 'id', 'shortname'
+		$api_restrict = param( 'restrict', 'string', '' ); // 'available_fileroots' - Load only collections with available file roots for current user
+		$api_filter = param( 'filter', 'string', 'public' ); // 'public' - Load only collections which can be viewed for current user
+
+		if( $api_filter == 'public' )
+		{	// SQL to get ONLY public collections:
+			$BlogCache = & get_BlogCache();
+			$SQL = $BlogCache->get_public_colls_SQL();
+			$count_SQL = $BlogCache->get_public_colls_SQL();
+			$count_SQL->SELECT( 'COUNT( blog_ID )' );
+		}
+		else
+		{	// SQL to get ALL collections:
+			$sql_order_by = gen_order_clause( $Settings->get( 'blogs_order_by' ), $Settings->get( 'blogs_order_dir' ), 'blog_', 'blog_ID' );
+			$SQL = new SQL();
+			$SQL->SELECT( '*' );
+			$SQL->FROM( 'T_blogs' );
+			$SQL->ORDER_BY( $sql_order_by );
+			$count_SQL = new SQL();
+			$count_SQL->SELECT( 'COUNT( blog_ID )' );
+			$count_SQL->FROM( 'T_blogs' );
+			$count_SQL->ORDER_BY( $sql_order_by );
 		}
 
+		if( ! empty( $api_q ) )
+		{	// Search collections by keyword:
+			$search_sql_where = array();
+			$search_fields = empty( $api_fields ) ? array( 'shortname' ) : explode( ',', $api_fields );
+			foreach( $search_fields as $search_field )
+			{
+				switch( strtolower( $search_field ) )
+				{
+					case 'id':
+						$search_sql_where[] = 'blog_ID = '.$DB->quote( $api_q );
+						break;
+
+					case 'shortname':
+						$search_sql_where[] = 'blog_shortname LIKE '.$DB->quote( '%'.$api_q.'%' );
+						break;
+				}
+			}
+
+			$search_sql_where = implode( ' OR ', $search_sql_where );
+			$SQL->WHERE_and( $search_sql_where );
+			$count_SQL->WHERE_and( $search_sql_where );
+		}
+
+		$collections = array();
+		if( $api_restrict == 'available_fileroots' &&
+		    (
+		      ! is_logged_in() ||
+		      ! $current_User->check_perm( 'admin', 'restricted' ) ||
+		      ! $current_User->check_perm( 'files', 'view' )
+		    ) )
+		{	// Anonymous user has no access to file roots AND also if current use has no access to back-office or to file manager:
+			$result_count = 0;
+		}
+		else
+		{
+			if( $api_restrict == 'available_fileroots' )
+			{	// Restrict collections by available file roots for current user:
+
+				// SQL analog for $current_User->check_perm( 'blogs', 'view' ) || $current_User->check_perm( 'files', 'edit' ):
+				$current_User->get_Group();
+				$check_perm_blogs_view_files_edit_SQL = new SQL();
+				$check_perm_blogs_view_files_edit_SQL->SELECT( 'grp_ID' );
+				$check_perm_blogs_view_files_edit_SQL->FROM( 'T_groups' );
+				$check_perm_blogs_view_files_edit_SQL->FROM_add( 'LEFT JOIN T_groups__groupsettings ON grp_ID = gset_grp_ID AND gset_name = "perm_files"' );
+				$check_perm_blogs_view_files_edit_SQL->WHERE( 'grp_ID = '.$current_User->Group->ID );
+				$check_perm_blogs_view_files_edit_SQL->WHERE_and( 'grp_perm_blogs IN ( "viewall", "editall" ) OR gset_value IS NULL OR gset_value IN ( "all", "edit" )' );
+				$restrict_available_fileroots_sql = '( '.$check_perm_blogs_view_files_edit_SQL->get().' )';
+
+				// SQL analog for $current_User->check_perm( 'blog_media_browse', 'view', false, $Blog ):
+				$check_perm_blog_media_browse_user_SQL = new SQL();
+				$check_perm_blog_media_browse_user_SQL->SELECT( 'bloguser_blog_ID' );
+				$check_perm_blog_media_browse_user_SQL->FROM( 'T_coll_user_perms' );
+				$check_perm_blog_media_browse_user_SQL->WHERE( 'bloguser_user_ID = '.$current_User->ID );
+				$check_perm_blog_media_browse_user_SQL->WHERE_and( 'bloguser_perm_media_browse <> 0' );
+				$check_perm_blog_media_browse_group_SQL = new SQL();
+				$check_perm_blog_media_browse_group_SQL->SELECT( 'bloggroup_blog_ID' );
+				$check_perm_blog_media_browse_group_SQL->FROM( 'T_coll_group_perms' );
+				$check_perm_blog_media_browse_group_SQL->WHERE( 'bloggroup_group_ID = '.$current_User->Group->ID );
+				$check_perm_blog_media_browse_group_SQL->WHERE_and( 'bloggroup_perm_media_browse <> 0' );
+				$restrict_available_fileroots_sql .= ' OR blog_owner_user_ID = '.$current_User->ID
+					.' OR ( blog_advanced_perms <> 0 AND ( '
+					.'        blog_ID IN ( '.$check_perm_blog_media_browse_user_SQL->get().' ) OR '
+					.'        blog_ID IN ( '.$check_perm_blog_media_browse_group_SQL->get().' )'
+					.'      )'
+					.'    )';
+
+				$SQL->WHERE_and( $restrict_available_fileroots_sql );
+				$count_SQL->WHERE_and( $restrict_available_fileroots_sql );
+			}
+
+			$result_count = intval( $DB->get_var( $count_SQL->get(), 0, NULL, 'Get a count of collections for search request' ) );
+		}
+
+		// Prepare pagination:
+		if( $result_count > $api_per_page )
+		{	// We will have multiple search result pages:
+			if( $api_page < 1 )
+			{	// Limit by min page:
+				$api_page = 1;
+			}
+			$total_pages = ceil( $result_count / $api_per_page );
+			if( $api_page > $total_pages )
+			{	// Limit by max page:
+				$api_page = $total_pages;
+			}
+		}
+		else
+		{	// Only one page of results:
+			$current_page = 1;
+			$total_pages = 1;
+		}
+
+		$BlogCache = & get_BlogCache();
+		$BlogCache->clear();
+
+		if( $result_count > 0 )
+		{	// Select collections only from current page:
+			$SQL->LIMIT( ( ( $api_page - 1 ) * $api_per_page ).', '.$api_per_page );
+			$BlogCache->load_by_sql( $SQL );
+		}
+
+		$this->add_response( 'found', $result_count, 'integer' );
+		$this->add_response( 'page', $api_page, 'integer' );
+		$this->add_response( 'page_size', $api_per_page, 'integer' );
+		$this->add_response( 'pages_total', $total_pages, 'integer' );
+
 		foreach( $BlogCache->cache as $Blog )
-		{ // Add each collection row in the response array:
-			$this->add_response( array(
+		{	// Add each collection row in the response array:
+			$this->add_response( 'colls', array(
 					'id'        => intval( $Blog->ID ),
 					'urlname'   => $Blog->get( 'urlname' ),
 					'kind'      => $Blog->get( 'type' ),
@@ -367,7 +531,7 @@ class RestApi
 					'name'      => $Blog->get( 'name' ),
 					'tagline'   => $Blog->get( 'tagline' ),
 					'desc'      => $Blog->get( 'longdesc' ),
-				) );
+				), 'array' );
 		}
 	}
 
@@ -400,7 +564,7 @@ class RestApi
 
 		if( $ItemList2->filters['types'] == $ItemList2->default_filters['types'] )
 		{	// Allow all post types by default for this request:
-			$ItemList2->set_filters( array( 'types' => '' ), true, true );
+			$ItemList2->set_filters( array( 'itemtype_usage' => NULL ), true, true );
 		}
 
 		if( ! empty( $force_filters ) )
@@ -501,10 +665,8 @@ class RestApi
 	 */
 	private function controller_coll_posts()
 	{
-		global $posttypes_specialtypes;
-
 		$this->controller_coll_items( array(
-				'types' => '-'.implode( ',', $posttypes_specialtypes ), // Keep content post types, Exclude pages, intros, sidebar links and ads
+				'itemtype_usage' => NULL, // Keep content post types, Exclude pages, intros, sidebar links and ads
 			) );
 	}
 
@@ -533,13 +695,13 @@ class RestApi
 		$search_params = $Session->get( 'search_params' );
 		$search_result = $Session->get( 'search_result' );
 		$search_result_loaded = false;
-		if( empty( $search_params ) 
+		if( empty( $search_params )
 			|| ( $search_params['search_keywords'] != $search_keywords ) // We had saved search results but for a different search string
 			|| ( $search_params['search_blog'] != $Blog->ID ) // We had saved search results but for a different collection
 			|| ( $search_result === NULL ) )
 		{	// We need to perform a new search:
 			$search_params = array(
-				'search_keywords' => $search_keywords, 
+				'search_keywords' => $search_keywords,
 				'search_blog'     => $Blog->ID,
 			);
 
@@ -705,7 +867,7 @@ class RestApi
 					$result_data['permalink'] = url_add_param( $Blog->gen_blogurl(), 'tag='.$tag_name, '&' );
 					break;
 
-				default: 
+				default:
 					// Other type of result is not implemented
 
 					// TODO: maybe find collections (especially in case of aggregation)? users? files?
@@ -716,6 +878,180 @@ class RestApi
 			// Add data of the searched thing to response:
 			$this->add_response( 'results', $result_data, 'array' );
 		}
+	}
+
+
+	/**
+	 * Call collection controller to prepare request for possible assignees
+	 *
+	 * Request scheme: "<baseurl>/api/v1/collections/<collname>/assignees?q=<search login string>"
+	 *
+	 * @param integer Item ID
+	 */
+	private function controller_coll_assignees()
+	{
+		global $current_User, $Blog, $DB;
+
+		if( ! is_logged_in() || ! $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
+		{	// Check permission: Current user must has a permission to be assignee of the collection:
+			$this->halt( 'You are not allowed to view assigness of the collection "'.$Blog->get( 'name' ).'".', 'no_access', 403 );
+			// Exit here.
+		}
+
+		if( ! $Blog->get_setting( 'use_workflow' ) )
+		{	// If workflow is not enabled for the collection:
+			$this->halt( 'The collection "'.$Blog->get( 'name' ).'" is not used for workflow.', 'no_access', 403 );
+			// Exit here.
+		}
+
+		$api_q = trim( urldecode( param( 'q', 'string', '' ) ) );
+
+		/**
+		 * sam2kb> The code below decodes percent-encoded unicode string produced by Javascript "escape"
+		 * function in format %uxxxx where xxxx is a Unicode value represented as four hexadecimal digits.
+		 * Example string "MAMA" (cyrillic letters) encoded with "escape": %u041C%u0410%u041C%u0410
+		 * Same word encoded with "encodeURI": %D0%9C%D0%90%D0%9C%D0%90
+		 *
+		 * jQuery hintbox plugin uses "escape" function to encode URIs
+		 *
+		 * More info here: http://en.wikipedia.org/wiki/Percent-encoding#Non-standard_implementations
+		 */
+		if( preg_match( '~%u[0-9a-f]{3,4}~i', $api_q ) && version_compare(PHP_VERSION, '5', '>=') )
+		{	// Decode UTF-8 string (PHP 5 and up)
+			$api_q = preg_replace( '~%u([0-9a-f]{3,4})~i', '&#x\\1;', $api_q );
+			$api_q = html_entity_decode( $api_q, ENT_COMPAT, 'UTF-8' );
+		}
+
+		if( empty( $api_q ) )
+		{	// Don't allow empty request:
+			$this->halt( 'Please enter at least one char to find assignees', 'no_access', 403 );
+			// Exit here.
+		}
+
+		if( $Blog->get( 'advanced_perms' ) )
+		{	// Load group and user permissions ONLY if collection advanced permissions are enabled:
+
+			// Get users which can be assignees of the collection:
+			$user_perms_SQL = new SQL();
+			$user_perms_SQL->SELECT( 'user_login' );
+			$user_perms_SQL->FROM( 'T_users' );
+			$user_perms_SQL->FROM_add( 'INNER JOIN T_coll_user_perms ON user_ID = bloguser_user_ID' );
+			$user_perms_SQL->WHERE( 'bloguser_blog_ID = '.$DB->quote( $Blog->ID ) );
+			$user_perms_SQL->WHERE_and( 'bloguser_can_be_assignee <> 0' );
+			$users_sql[] = $user_perms_SQL->get();
+
+			// Get users which primary groups can be assignees of the collection:
+			$group_perms_SQL = new SQL();
+			$group_perms_SQL->SELECT( 'user_login' );
+			$group_perms_SQL->FROM( 'T_users' );
+			$group_perms_SQL->FROM_add( 'INNER JOIN T_coll_group_perms ON user_grp_ID = bloggroup_group_ID' );
+			$group_perms_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $Blog->ID ) );
+			$group_perms_SQL->WHERE_and( 'bloggroup_can_be_assignee <> 0' );
+			$users_sql[] = $group_perms_SQL->get();
+
+			// Get users which secondary groups can be assignees of the collection:
+			$secondary_group_perms_SQL = new SQL();
+			$secondary_group_perms_SQL->SELECT( 'user_login' );
+			$secondary_group_perms_SQL->FROM( 'T_users' );
+			$secondary_group_perms_SQL->FROM_add( 'INNER JOIN T_users__secondary_user_groups ON sug_user_ID = user_ID' );
+			$secondary_group_perms_SQL->FROM_add( 'INNER JOIN T_coll_group_perms ON sug_grp_ID = bloggroup_group_ID' );
+			$secondary_group_perms_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $Blog->ID ) );
+			$secondary_group_perms_SQL->WHERE_and( 'bloggroup_can_be_assignee <> 0' );
+			$users_sql[] = $secondary_group_perms_SQL->get();
+		}
+
+		// Get collection's owner because it can be assignee by default:
+		$owner_SQL = new SQL();
+		$owner_SQL->SELECT( 'user_login' );
+		$owner_SQL->FROM( 'T_users' );
+		$owner_SQL->FROM_add( 'INNER JOIN T_blogs ON blog_owner_user_ID = user_ID' );
+		$owner_SQL->WHERE( 'blog_ID = '.$DB->quote( $Blog->ID ) );
+		$users_sql[] = $owner_SQL->get();
+
+		// Get assignees which primary groups have a setting to EDIT ALL collections:
+		$group_setting_SQL = new SQL();
+		$group_setting_SQL->SELECT( 'user_login' );
+		$group_setting_SQL->FROM( 'T_users' );
+		$group_setting_SQL->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
+		$group_setting_SQL->WHERE( 'grp_perm_blogs = "editall"' );
+		$users_sql[] = $group_setting_SQL->get();
+
+		// Union sql queries to execute one query and save an order as one list:
+		$users_sql = 'SELECT user_login'
+			.' FROM ( ( '.implode( ' ) UNION ( ', $users_sql ).' ) ) AS uu'
+			.' WHERE uu.user_login LIKE "'.$DB->escape( $api_q ).'%"'
+			.' ORDER BY user_login'
+			.' LIMIT 10';
+
+		$user_logins = $DB->get_col( $users_sql );
+
+		// Send users logins array as response:
+		$this->add_response( 'list', $user_logins );
+	}
+
+
+	/**
+	 * Call collection controller to toggle favorite status
+	 *
+	 */
+	private function controller_coll_favorite()
+	{
+		global $current_User, $Blog;
+
+		if( ! is_logged_in() )
+		{	// Check permission: Current user must be logged in
+			$this->halt( 'You are not allowed to set the collection "'.$Blog->get( 'name' ).'" as a favorite.', 'no_access', 403 );
+			// Exit here.
+		}
+
+		$setting = ( $Blog->favorite( $current_User->ID ) == 1 ? 0 : 1 );
+		$r = $Blog->favorite( $current_User->ID, $setting );
+
+		if( is_null( $r ) )
+		{
+			$this->add_response( 'status', 'fail', 'string' );
+			$this->add_response( 'errorMsg', T_('Unable to set collection favorite status') );
+		}
+		else
+		{
+			$this->add_response( 'status', 'ok', 'string' );
+			$this->add_response( 'setting', $setting );
+		}
+	}
+
+
+	/**
+	 * Call item controller to flag by current user
+	 *
+	 * @param integer Item ID
+	 */
+	private function controller_coll_items_flag( $item_ID )
+	{
+		global $Blog;
+
+		$ItemCache = & get_ItemCache();
+		if( ( $Item = & $ItemCache->get_by_ID( $item_ID, false, false ) ) === false )
+		{	// Item is not detected in DB by requested ID:
+			$this->halt( 'No item found in DB by requested ID #'.$item_ID, 'unknown_item', 404 );
+			// Exit here.
+		}
+
+		if( $Item->get_blog_ID() != $Blog->ID )
+		{	// Item should be called for current collection:
+			$this->halt( 'You request item #'.$Item->ID.' from another collection "'.$Blog->get( 'urlname' ).'"', 'wrong_item_coll', 403 );
+			// Exit here.
+		}
+
+		if( ! $Item->can_flag() )
+		{	// Don't display the flag button if it is not allowed by some reason:
+			$this->halt( 'You cannot flag the item #'.$Item->ID, 'cannot_flag_item', 403 );
+		}
+
+		// Flag or unflag item for current user:
+		$Item->update_flag();
+
+		// Return current state of flag:
+		$this->add_response( 'flag', $Item->get_user_data( 'item_flag' ), 'integer' );
 	}
 
 
@@ -759,8 +1095,14 @@ class RestApi
 
 			case 'GET':
 			default:
-				// Set controller to view the requested user profile or ALL users:
-				$user_controller = ( $user_ID > 0 ) ? 'view' : 'list';
+				if( $user_ID > 0 )
+				{	// Set controller to view the requested user profile:
+					$user_controller = 'view';
+				}
+				else
+				{	// Set controller to view all users by default or call the requested controller:
+					$user_controller = empty( $this->args[1] ) ? 'list' : $this->args[1];
+				}
 				break;
 		}
 
@@ -782,21 +1124,54 @@ class RestApi
 	{
 		global $Settings;
 
-		if( ( $access_error_message = check_access_users_list( 'api' ) ) !== true )
-		{	// Current user has no access to public list of the users,
-			// Display error message:
-			$this->halt( $access_error_message, 'no_access', 403 );
-			// Exit here.
+		$api_restrict = param( 'restrict', 'string', '' );
+
+		if( $api_restrict == 'available_fileroots' )
+		{	// Check if current user has an access to file roots of other users:
+			global $current_User;
+			if( is_logged_in() )
+			{	// Check perms for logged in user:
+				if( ! ( $current_User->check_perm( 'users', 'moderate' ) && $current_User->check_perm( 'files', 'all' ) ) )
+				{	// Current user has an access only to file root of own account:
+					$user_filters = array( 'userids' => array( $current_User->ID ) );
+				}
+				// otherwise current user has an access to file roots of all users
+			}
+			else
+			{	// Anonymous user has no access to file roots:
+				$user_filters = array( 'userids' => array( -1 ) );
+			}
+		}
+		else
+		{	// Default restriction:
+			if( ( $access_error_message = check_access_users_list( 'api' ) ) !== true )
+			{	// Current user has no access to public list of the users,
+				// Display error message:
+				$this->halt( $access_error_message, 'no_access', 403 );
+				// Exit here.
+			}
 		}
 
 		// Get param to limit number users per page:
 		$api_per_page = param( 'per_page', 'integer', 10 );
+
+		// Alias for filter param 'keywords':
+		$api_q = param( 'q', 'string', NULL );
+		if( $api_q !== NULL )
+		{
+			set_param( 'keywords', $api_q );
+		}
 
 		// Create result set:
 		load_class( 'users/model/_userlist.class.php', 'UserList' );
 		$UserList = new UserList( 'api_', $api_per_page, '' );
 
 		$UserList->load_from_Request();
+
+		if( ! empty( $user_filters ) )
+		{	// Filter list:
+			$UserList->set_filters( $user_filters, true, true );
+		}
 
 		// Execute query:
 		$UserList->query();
@@ -1012,7 +1387,7 @@ class RestApi
 		global $current_User;
 
 		if( ! is_logged_in() || ! $current_User->check_perm( 'users', 'edit' ) )
-		{	// Current user has no permission to delate the requested user:
+		{	// Current user has no permission to delete the requested user:
 			$this->halt( T_('You have no permission to edit other users!'), 'no_access', 403 );
 			// Exit here.
 		}
@@ -1063,5 +1438,662 @@ class RestApi
 	}
 
 
+	/**
+	 * Call user controller to search recipients
+	 */
+	private function controller_user_recipients()
+	{
+		global $current_User, $DB;
+
+		if( ! is_logged_in() || ! $current_User->check_perm( 'perm_messaging', 'reply' ) )
+		{	// Check permission: User is not allowed to view threads
+			$this->halt( 'You are not allowed to view recipients.', 'no_access', 403 );
+			// Exit here.
+		}
+
+		if( check_create_thread_limit( true ) )
+		{	// User has already reached his limit, don't allow to get a users list:
+			$this->halt_with_Messages();
+		}
+
+		$api_q = param( 'q', 'string', '' );
+
+		// Search users:
+		$users = $this->func_user_search( $api_q, array(
+				'sql_where' => 'user_ID != '.$DB->quote( $current_User->ID ),
+				'sql_mask'  => '%$login$%',
+			) );
+
+		foreach( $users as $User )
+		{
+			if( ! $User->check_status( 'can_receive_pm' ) )
+			{	// This user is probably closed so don't show it:
+				continue;
+			}
+
+			$user_data = array(
+					'id'       => $User->ID,
+					'login'    => $User->get( 'login' ),
+					'fullname' => $User->get( 'fullname' ),
+					'avatar'   => $User->get_avatar_imgtag( 'crop-top-32x32' ),
+				);
+
+			// Add data of each user in separate array of response:
+			$this->add_response( 'users', $user_data, 'array' );
+		}
+	}
+
+
+	/**
+	 * Call user controller to search user for autocomplete JS plugin
+	 */
+	private function controller_user_autocomplete()
+	{
+		$api_q = param( 'q', 'string', '' );
+
+		if( ! is_valid_login( $api_q ) )
+		{	// Restrict a wrong request:
+			$this->halt( 'Wrong request', 'wrong_request', 403 );
+			// Exit here.
+		}
+
+		// Add backslash for special char of sql operator LIKE:
+		$api_q = str_replace( '_', '\_', $api_q );
+
+		// Search users:
+		$users = $this->func_user_search( $api_q );
+
+		foreach( $users as $User )
+		{
+			$user_data = array(
+					'login'    => $User->get( 'login' ),
+				);
+
+			// Add data of each user in separate array of response:
+			$this->add_response( 'users', $user_data, 'array' );
+		}
+	}
+
+
+	/**
+	 * Call user controller to search user for hintbox and typeahead JS plugins
+	 */
+	private function controller_user_logins()
+	{
+		global $current_User;
+
+		if( ! is_logged_in() || ! $current_User->check_perm( 'users', 'view' ) )
+		{	// Check permission: Current user must have at least view permission to see users login:
+			$this->halt( 'You are not allowed to view users.', 'no_access', 403 );
+			// Exit here.
+		}
+
+		$api_q = trim( urldecode( param( 'q', 'string', '' ) ) );
+
+		/**
+		 * sam2kb> The code below decodes percent-encoded unicode string produced by Javascript "escape"
+		 * function in format %uxxxx where xxxx is a Unicode value represented as four hexadecimal digits.
+		 * Example string "MAMA" (cyrillic letters) encoded with "escape": %u041C%u0410%u041C%u0410
+		 * Same word encoded with "encodeURI": %D0%9C%D0%90%D0%9C%D0%90
+		 *
+		 * jQuery hintbox plugin uses "escape" function to encode URIs
+		 *
+		 * More info here: http://en.wikipedia.org/wiki/Percent-encoding#Non-standard_implementations
+		 */
+		if( preg_match( '~%u[0-9a-f]{3,4}~i', $api_q ) && version_compare(PHP_VERSION, '5', '>=') )
+		{	// Decode UTF-8 string (PHP 5 and up)
+			$api_q = preg_replace( '~%u([0-9a-f]{3,4})~i', '&#x\\1;', $api_q );
+			$api_q = html_entity_decode( $api_q, ENT_COMPAT, 'UTF-8' );
+		}
+
+		if( empty( $api_q ) )
+		{	// Don't allow empty request:
+			$this->halt( 'Please enter at least one char to find assignees', 'no_access', 403 );
+			// Exit here.
+		}
+
+		// Search users:
+		$users = $this->func_user_search( $api_q, array(
+				'sql_limit' => 10,
+			) );
+
+		$user_logins = array();
+		foreach( $users as $User )
+		{
+			$user_logins[] = $User->get( 'login' );
+		}
+
+		// Send users logins array as response:
+		$this->add_response( 'list', $user_logins );
+	}
+
+
+	/**
+	 * Function to search users by login
+	 *
+	 * @param string Search string
+	 * @return array Users
+	 */
+	private function func_user_search( $search_string, $params = array() )
+	{
+		global $DB;
+
+		$params = array_merge( array(
+				'sql_where' => '( user_status = "activated" OR user_status = "autoactivated" )',
+				'sql_mask'  => '$login$%',
+				'sql_limit' => 0,
+			), $params );
+
+		// Get request params:
+		$api_page = param( 'page', 'integer', 1 );
+		$api_per_page = param( 'per_page', 'integer', $params['sql_limit'] );
+
+		// Initialize SQL to get users:
+		$users_SQL = new SQL();
+		$users_SQL->SELECT( '*' );
+		$users_SQL->FROM( 'T_users' );
+		if( ! empty( $search_string ) )
+		{	// Filter by login:
+			$users_SQL->WHERE( 'user_login LIKE '.$DB->quote( str_replace( '$login$', $search_string, $params['sql_mask'] ) ) );
+		}
+		if( ! empty( $params['sql_where'] ) )
+		{	// Additional restrict:
+			$users_SQL->WHERE_and( $params['sql_where'] );
+		}
+		$users_SQL->ORDER_BY( 'user_login' );
+
+		// Get a count of users:
+		$count_users = $DB->get_var( preg_replace( '/SELECT(.+)FROM/i', 'SELECT COUNT( user_ID ) FROM', $users_SQL->get() ) );
+
+		// Set page params:
+		$count_pages = empty( $api_per_page ) ? 1 : ceil( $count_users / $api_per_page );
+		if( empty( $api_page ) )
+		{	// Force wrong page number to first:
+			$api_page = 1;
+		}
+		if( $api_page > $count_pages )
+		{	// Don't allow page number more than total pages:
+			$api_page = $count_pages;
+		}
+		if( $api_per_page > 0 )
+		{	// Limit users by current page:
+			$users_SQL->LIMIT( ( ( $api_page - 1 ) * $api_per_page ).', '.$api_per_page );
+		}
+
+		// Load users in cache by SQL:
+		$UserCache = & get_UserCache();
+		$UserCache->clear();
+		$UserCache->load_by_sql( $users_SQL );
+
+		if( empty( $UserCache->cache ) )
+		{	// No users found:
+			$this->halt( 'No users found', 'no_users', 200 );
+			// Exit here.
+		}
+
+		$this->add_response( 'found', $count_users, 'integer' );
+		$this->add_response( 'page', $api_page, 'integer' );
+		$this->add_response( 'page_size', $api_per_page, 'integer' );
+		$this->add_response( 'pages_total', $count_pages, 'integer' );
+
+		return $UserCache->cache;
+	}
+
+
 	/**** MODULE USERS ---- END ****/
+
+
+	/**** MODULE TAGS ---- START ****/
+
+
+	/**
+	 * Call module to prepare request for tags
+	 */
+	private function module_tags()
+	{
+		global $DB;
+
+		$term = param( 's', 'string' );
+
+		if( substr( $term, 0, 1 ) == '-' )
+		{	// Prevent chars '-' in first position:
+			$term = preg_replace( '/^-+/', '', $term );
+		}
+
+		// Deny to use a comma in tag names:
+		$term = str_replace( ',', ' ', $term );
+
+		$term_is_new_tag = true;
+
+		$tags = array();
+
+		$tags_SQL = new SQL();
+		$tags_SQL->SELECT( 'tag_name AS id, tag_name AS name' );
+		$tags_SQL->FROM( 'T_items__tag' );
+		/* Yura: Here I added "COLLATE utf8_general_ci" because:
+		 * It allows to match "testA" with "testa", and otherwise "testa" with "testA".
+		 * It also allows to find "ee" when we type in "éè" and otherwise.
+		 */
+		$tags_SQL->WHERE( 'tag_name LIKE '.$DB->quote( '%'.$term.'%' ).' COLLATE utf8_general_ci' );
+		$tags_SQL->ORDER_BY( 'tag_name' );
+		$tags = $DB->get_results( $tags_SQL->get(), ARRAY_A );
+
+		// Check if current term is not an existing tag:
+		foreach( $tags as $tag )
+		{
+			/* Yura: I have added "utf8_strtolower()" below in condition in order to:
+			 * When we enter new tag 'testA' and the tag 'testa' already exists
+			 * then we suggest only 'testa' instead of 'testA'.
+			 */
+			if( utf8_strtolower( $tag['name'] ) == utf8_strtolower( $term ) )
+			{ // Current term is an existing tag
+				$term_is_new_tag = false;
+			}
+		}
+
+		if( $term_is_new_tag && ! empty( $term ) )
+		{	// Add current term in the beginning of the tags list:
+			array_unshift( $tags, array( 'id' => $term, 'name' => $term ) );
+		}
+
+		$this->add_response( 'tags', $tags );
+	}
+
+
+	/**** MODULE TAGS ---- END ****/
+
+	/**** MODULE POLLS ---- START ****/
+
+	private function module_polls()
+	{
+		global $DB, $current_User;
+
+		if( is_logged_in() && $current_User )
+		{
+			$polls = array();
+
+			$perm_poll_view = $current_User->check_perm( 'polls', 'view' );
+
+			$polls_SQL = new SQL();
+			$polls_SQL->SELECT( 'pqst_ID, pqst_owner_user_ID, pqst_question_text' );
+			$polls_SQL->FROM( 'T_polls__question' );
+			if( ! $perm_poll_view )
+			{
+				$polls_SQL->WHERE( 'pqst_owner_user_ID = '.$DB->quote( $current_User->ID ) );
+			}
+
+			$poll_count_SQL = new SQL();
+			$poll_count_SQL->SELECT( 'COUNT( pqst_ID )' );
+			$poll_count_SQL->FROM( 'T_polls__question' );
+			if( ! $perm_poll_view )
+			{
+				$poll_count_SQL->WHERE( 'pqst_owner_user_ID = '.$DB->quote( $current_User->ID ) );
+			}
+
+			$polls = $DB->get_results( $polls_SQL->get(), ARRAY_A );
+
+			$this->add_response( 'polls', $polls );
+		}
+		else
+		{
+			$this->halt( 'You are not allowed to view polls.', 'no_access', 403 );
+		}
+	}
+
+	/**** MODULE POLLS ---- END ****/
+
+
+	/**** MODULE LINKS ---- START ****/
+
+
+	/**
+	 * Call module to prepare request for links
+	 */
+	private function module_links()
+	{
+		if( ! empty( $this->args[2] ) )
+		{	// Get action from request string:
+			$link_action = $this->args[2];
+		}
+		else
+		{	// Get action from param:
+			$link_action = param( 'action', 'string', '' );
+		}
+
+		// Set link controller '' by default:
+		$link_controller = '';
+
+		$request_method = isset( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : 'GET';
+		switch( $request_method )
+		{
+			case 'DELETE':
+				// Set controller to unlink/delete the requested link:
+				$link_controller = 'delete';
+				break;
+
+			case 'GET':
+			case 'POST':
+				// Actions to update the links:
+				switch( $link_action )
+				{
+					case 'move_up':
+					case 'move_down':
+						$link_controller = 'change_order';
+						break;
+
+					case 'attach':
+						$link_controller = 'attach';
+						break;
+
+					case 'refresh':
+					case 'sort':
+						$link_controller = 'refresh';
+						break;
+				}
+				break;
+		}
+
+		if( ! method_exists( $this, 'controller_link_'.$link_controller ) )
+		{	// Unknown controller:
+			$this->halt( 'Unknown link controller "'.$link_controller.'"', 'unknown_controller' );
+			// Exit here.
+		}
+
+		// Call collection controller to prepare current request:
+		$this->{'controller_link_'.$link_controller}();
+	}
+
+
+	/**
+	 * Get Link object
+	 *
+	 * @return object Link
+	 */
+	private function & get_Link()
+	{
+		// Get link ID:
+		$link_ID = empty( $this->args[1] ) ? 0 : intval( $this->args[1] );
+
+		$LinkCache = & get_LinkCache();
+		$Link = & $LinkCache->get_by_ID( $link_ID, false, false );
+
+		return $Link;
+	}
+
+
+	/**
+	 * Check permission if current user can update the requested link
+	 */
+	private function link_check_perm()
+	{
+		if( ! ( $Link = & $this->get_Link() ) )
+		{	// Wrong link request:
+			$this->halt( 'Invalid link ID', 'link_invalid_id' );
+			// Exit here.
+		}
+
+		$LinkOwner = & $Link->get_LinkOwner();
+
+		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
+		{	// Current user has no permission to unlink the requested link:
+			$this->halt( 'You have no permission to edit the requested link!', 'no_access', 403 );
+			// Exit here.
+		}
+	}
+
+
+	/**
+	 * Call link controller to unlink the requested link or delete file completely
+	 */
+	private function controller_link_delete()
+	{
+		// Check permission if current user can update the requested link:
+		$this->link_check_perm();
+
+		// Action: 'unlink - just unlink file from the owner, 'delete' - unlink and delete the file from disk and DB completely
+		$action = param( 'action', 'string', '' );
+
+		$deleted_Link = & $this->get_Link();
+		$LinkOwner = & $deleted_Link->get_LinkOwner();
+
+		if( $link_File = & $deleted_Link->get_File() )
+		{
+			syslog_insert( sprintf( 'File %s was unlinked from %s with ID=%s', '[['.$link_File->get_name().']]', $LinkOwner->type, $LinkOwner->link_Object->ID ), 'info', 'file', $link_File->ID );
+		}
+
+		if( $action == 'delete' && $deleted_Link->can_be_file_deleted() )
+		{	// Get a linked file to delete it after unlinking if it is allowed for current user:
+			$linked_File = & $deleted_Link->get_File();
+		}
+
+		// Unlink File from Item/Comment:
+		$deleted_link_ID = $deleted_Link->ID;
+		$deleted_Link->dbdelete();
+
+		$LinkOwner->after_unlink_action( $deleted_link_ID );
+
+		if( $action == 'delete' && ! empty( $linked_File ) )
+		{	// Delete a linked file from disk and DB completely:
+			$linked_File->unlink();
+		}
+
+		// The requested link has been deleted successfully:
+		$this->halt( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'delete_success', 200 );
+		// Exit here.
+	}
+
+
+	/**
+	 * Call link controller to change order the requested link
+	 */
+	private function controller_link_change_order()
+	{
+		// Check permission if current user can update the requested link:
+		$this->link_check_perm();
+
+		// Get action from request string:
+		$link_action = $this->args[2];
+
+		$edited_Link = & $this->get_Link();
+		$LinkOwner = & $edited_Link->get_LinkOwner();
+
+		$ownerLinks = $LinkOwner->get_Links();
+
+		// TODO fp> when moving an "after_more" above a "teaser" img, it should change to "teaser" too.
+		// TODO fp> when moving a "teaser" below an "aftermore" img, it should change to "aftermore" too.
+
+		// Switch order with the next/prev one:
+		if( $link_action == 'move_up' )
+		{
+			$switchcond = 'return ($loop_Link->get("order") > $i
+				&& $loop_Link->get("order") < '.$edited_Link->get( 'order' ).');';
+			$i = -1;
+		}
+		else
+		{
+			$switchcond = 'return ($loop_Link->get("order") < $i
+				&& $loop_Link->get("order") > '.$edited_Link->get( 'order' ).');';
+			$i = PHP_INT_MAX;
+		}
+		foreach( $ownerLinks as $loop_Link )
+		{	// Find nearest order:
+			if( $loop_Link == $edited_Link )
+				continue;
+
+			if( eval( $switchcond ) )
+			{
+				$i = $loop_Link->get( 'order' );
+				$switch_Link = $loop_Link;
+			}
+		}
+		if( $i > -1 && $i < PHP_INT_MAX )
+		{	// Switch the links:
+			$switch_Link->set( 'order', $edited_Link->get( 'order' ) );
+
+			// HACK: go through order=0 to avoid duplicate key conflict:
+			$edited_Link->set( 'order', 0 );
+			$edited_Link->dbupdate();
+			$switch_Link->dbupdate();
+
+			$edited_Link->set( 'order', $i );
+			$edited_Link->dbupdate();
+
+			// Update last touched date of Owners
+			$LinkOwner->update_last_touched_date();
+
+			// The requested link order has been changed successfully:
+			$this->halt( ( $link_action == 'move_up' )
+				? T_('Link has been moved up.')
+				: T_('Link has been moved down.'),
+				'change_order_success', 200 );
+			// Exit here.
+		}
+		else
+		{	// The requested link order has been changed successfully:
+			$this->halt( T_('Link order has not been changed.'), 'change_order_success', 403 );
+			// Exit here.
+		}
+	}
+
+
+	/**
+	 * Call link controller to change order the requested link
+	 */
+	private function controller_link_attach()
+	{
+		global $LinkOwner, $current_File;
+
+		$link_type = param( 'type', 'string' );
+		$link_object_ID = param( 'object_ID', 'string' );
+		$root = param( 'root', 'string' );
+		$file_path = param( 'path', 'string' );
+
+		$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+
+		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
+		{	// Current user has no permission to unlink the requested link:
+			$this->halt( 'You have no permission to attach a file!', 'no_access', 403 );
+			// Exit here.
+		}
+
+		$FileCache = & get_FileCache();
+		list( $root_type, $root_in_type_ID ) = explode( '_', $root, 2 );
+		if( ! ( $current_File = $FileCache->get_by_root_and_path( $root_type, $root_in_type_ID, $file_path ) ) )
+		{	// No file:
+			$this->halt( T_('Nothing selected.'), 'wrong_file', 403 );
+			// Exit here.
+		}
+
+		// Link the file to Item/Comment:
+		$link_ID = $current_File->link_to_Object( $LinkOwner );
+
+		$LinkCache = & get_LinkCache();
+		if( $Link = & $LinkCache->get_by_ID( $link_ID, false, false ) )
+		{	// Add data of new link to response:
+
+			// Use the glyph or font-awesome icons if requested by skin
+			param( 'b2evo_icons_type', 'string', 'fontawesome-glyphicons' );
+
+			$mask_row = (object) array(
+					'link_ID'       => $Link->ID,
+					'file_ID'       => $current_File->ID,
+					'link_position' => $Link->get( 'position' ),
+				);
+			$this->add_response( 'link', array(
+					'ID'       => $Link->ID,
+					'url'      => $current_File->get_view_link(),
+					'preview'  => $Link->get_preview_thumb(),
+					'actions'  => link_actions( $Link->ID, 'last', $link_type ),
+					'position' => display_link_position( $mask_row ),
+				) );
+		}
+
+		// File has been attached successfully:
+		$this->halt( $LinkOwner->translate( 'Selected files have been linked to xxx.' ), 'attach_success', 200 );
+		// Exit here.
+	}
+
+
+	/**
+	 * Call link controller to refresh a list of the links
+	 */
+	private function controller_link_refresh()
+	{
+		global $LinkOwner, $current_File, $disable_evo_flush;
+
+		$link_type = param( 'type', 'string' );
+		$link_object_ID = param( 'object_ID', 'string' );
+
+		$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+
+		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
+		{	// Current user has no permission to unlink the requested link:
+			$this->halt( 'You have no permission to list of the links!', 'no_access', 403 );
+			// Exit here.
+		}
+
+		if( get_param( 'action' ) == 'sort' )
+		{	// Sort the links:
+			$ownerLinks = $LinkOwner->get_Links();
+			usort( $ownerLinks, 'sort_links_by_filename' );
+
+			$max_order = 0;
+			$link_orders = array();
+			$link_count = count( $ownerLinks );
+			foreach( $ownerLinks as $link )
+			{
+				if( $link->order > $max_order )
+				{
+					$max_order = $link->order;
+				}
+				$link_orders[] = $link->order;
+			}
+
+			for( $i = 1; $i <= $link_count; $i++ )
+			{
+					$ownerLinks[$i - 1]->set( 'order', $i + $max_order );
+					$ownerLinks[$i - 1]->dbupdate();
+			}
+
+			for( $i = 1; $i <= $link_count; $i++ )
+			{
+				if( $ownerLinks[$i -1]->get( 'order' ) != $i )
+				{
+					$ownerLinks[$i - 1]->set( 'order', $i );
+					$ownerLinks[$i - 1]->dbupdate();
+				}
+			}
+		}
+
+		// Initialize admin skin:
+		global $current_User, $UserSettings, $is_admin_page, $adminskins_path, $AdminUI;
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		$is_admin_page = true;
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+		$AdminUI = new AdminUI();
+
+		// Disable function evo_flush() to correct handle a content below:
+		$disable_evo_flush = true;
+
+		// Get the refreshed content:
+		ob_start();
+		$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+		$refreshed_content = ob_get_clean();
+
+		$this->add_response( 'html', $refreshed_content );
+
+		if( get_param( 'action' ) == 'sort' )
+		{	// The sort has been done successfully:
+			$this->halt( T_('The attachments have been sorted by file name.'), 'sort_success', 200 );
+			// Exit here.
+		}
+		else
+		{	// The refresh has been done successfully:
+			$this->halt( 'A list of the links has been refreshed.', 'refresh_success', 200 );
+			// Exit here.
+		}
+	}
+
+
+	/**** MODULE LINKS ---- END ****/
 }

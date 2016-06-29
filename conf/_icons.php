@@ -71,7 +71,7 @@ function get_icon_info( $name )
 			'size' => array( 16, 16 ),
 			'xy' => array( 112, 16 ),
 			'glyph' => 'circle-arrow-right',
-			'fa' => 'clipboard'
+			'fa' => 'arrow-right'
 		);
 		case 'file_delete': return array(   // delete a file/folder
 			'alt'  => T_('Del'),
@@ -1013,6 +1013,24 @@ function get_icon_info( $name )
 			'color' => '#7f7f7f'
 		);
 
+		case 'flag_on': return array(
+			'rollover' => true,
+			'alt'  => '',
+			'size' => array( 16, 16 ),
+			'xy' => array( 0, 208 ),
+			'glyph' => 'flag',
+			'fa' => 'flag fa-x--hover',
+			'color' => '#FAA72D'
+		);
+		case 'flag_off': return array(
+			'alt'  => '',
+			'size' => array( 16, 16 ),
+			'xy' => array( 16, 208 ),
+			'glyph' => 'flag',
+			'fa' => 'flag-o fa-x--hover',
+			'color' => '#7f7f7f'
+		);
+
 		case 'magnifier': return array(
 			'alt'  => T_('Log as a search instead'),
 			'size' => array( 14, 13 ),
@@ -1029,6 +1047,16 @@ function get_icon_info( $name )
 			'fa' => 'plus-circle',
 			'color' => '#0C0'
 		);
+
+		case 'add__yellow': return array(
+			'alt'  => T_('Add'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 32, 224 ),
+			'glyph' => 'plus-sign',
+			'fa' => 'plus-circle',
+			'color' => '#fc0'
+		);
+
 		case 'minus': return array(
 			'alt'  => T_('Remove'),
 			'size' => array( 16, 16 ),

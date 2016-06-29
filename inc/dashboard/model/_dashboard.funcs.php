@@ -268,11 +268,11 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 				'comments' => $limit,
 			) );
 
-		// Run SQL query to get results depending on current filters:
-		$CommentList->query();
-
 		// Get ready for display (runs the query):
 		$CommentList->display_init();
+
+		// Load data of comments from the current page at once to cache variables:
+		$CommentList->load_list_data();
 	}
 
 	$index = 0;
@@ -398,13 +398,19 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
  * @param string Table name
  * @param string SQL WHERE
  * @param string SQL FROM
+ * @param string SQL title for better debug
  * @return integer A count of the records
  */
-function get_table_count( $table_name, $sql_where = '', $sql_from = '' )
+function get_table_count( $table_name, $sql_where = '', $sql_from = '', $sql_title = '' )
 {
 	global $DB;
 
-	$SQL = new SQL();
+	if( empty( $sql_title ) )
+	{	// Set default SQL title:
+		$sql_title = 'Get a count of the records in the DB table '.$table_name;
+	}
+
+	$SQL = new SQL( $sql_title );
 	$SQL->SELECT( 'COUNT( * )' );
 	$SQL->FROM( $table_name );
 	if( !empty( $sql_from ) )
@@ -416,7 +422,7 @@ function get_table_count( $table_name, $sql_where = '', $sql_from = '' )
 		$SQL->WHERE( $sql_where );
 	}
 
-	return intval( $DB->get_var( $SQL->get() ) );
+	return intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
 }
 
 

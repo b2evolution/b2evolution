@@ -71,7 +71,6 @@ $schema_queries = array_merge( $schema_queries, array(
 			blog_media_url       VARCHAR( 255 ) NULL,
 			blog_type            ENUM( 'main', 'std', 'photo', 'group', 'forum', 'manual' ) COLLATE ascii_general_ci DEFAULT 'std' NOT NULL,
 			blog_order           int(11) NULL DEFAULT NULL,
-			blog_favorite        TINYINT(1) NOT NULL DEFAULT 1,
 			PRIMARY KEY blog_ID (blog_ID),
 			UNIQUE KEY blog_urlname (blog_urlname)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -151,6 +150,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_main_cat_ID            int(11) unsigned NOT NULL,
 			post_notifications_status   ENUM('noreq','todo','started','finished') COLLATE ascii_general_ci NOT NULL DEFAULT 'noreq',
 			post_notifications_ctsk_ID  INT(10) unsigned NULL DEFAULT NULL,
+			post_notifications_flags    SET('moderators_notified','members_notified','community_notified','pings_sent') NOT NULL DEFAULT '',
 			post_wordcount              int(11) default NULL,
 			post_comment_status         ENUM('disabled', 'open', 'closed') COLLATE ascii_general_ci NOT NULL DEFAULT 'open',
 			post_renderers              VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
@@ -214,6 +214,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_secret             CHAR(32) COLLATE ascii_general_ci NULL default NULL,
 			comment_notif_status       ENUM('noreq','todo','started','finished') COLLATE ascii_general_ci NOT NULL DEFAULT 'noreq' COMMENT 'Have notifications been sent for this comment? How far are we in the process?',
 			comment_notif_ctsk_ID      INT(10) unsigned NULL DEFAULT NULL COMMENT 'When notifications for this comment are sent through a scheduled job, what is the job ID?',
+			comment_notif_flags        SET('moderators_notified','members_notified','community_notified') NOT NULL DEFAULT '',
 			PRIMARY KEY comment_ID (comment_ID),
 			KEY comment_item_ID (comment_item_ID),
 			KEY comment_date (comment_date),
@@ -322,7 +323,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			itcf_ityp_ID INT(11) UNSIGNED NOT NULL,
 			itcf_label   VARCHAR(255) NOT NULL,
 			itcf_name    VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
-			itcf_type    ENUM( 'double', 'varchar' ) COLLATE ascii_general_ci NOT NULL,
+			itcf_type    ENUM( 'double', 'varchar', 'text', 'html' ) COLLATE ascii_general_ci NOT NULL,
 			itcf_order   INT NULL,
 			PRIMARY KEY ( itcf_ID ),
 			UNIQUE itcf_ityp_ID_name( itcf_ityp_ID, itcf_name )
@@ -369,8 +370,19 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_items__item_settings (
 			iset_item_ID  int(10) unsigned NOT NULL,
 			iset_name     varchar( 50 ) COLLATE ascii_general_ci NOT NULL,
-			iset_value    varchar( 2000 ) NULL,
+			iset_value    varchar( 10000 ) NULL,
 			PRIMARY KEY ( iset_item_ID, iset_name )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_items__user_data' => array(
+		'Creating table for user post data',
+		"CREATE TABLE T_items__user_data (
+			itud_user_ID          INT(11) UNSIGNED NOT NULL,
+			itud_item_ID          INT(11) UNSIGNED NOT NULL,
+			itud_read_item_ts     TIMESTAMP NULL DEFAULT NULL,
+			itud_read_comments_ts TIMESTAMP NULL DEFAULT NULL,
+			itud_flagged_item     TINYINT(1) NOT NULL DEFAULT 0,
+			PRIMARY KEY ( itud_user_ID, itud_item_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_subscriptions' => array(
@@ -437,6 +449,14 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloggroup_perm_media_browse    tinyint NOT NULL default 0,
 			bloggroup_perm_media_change    tinyint NOT NULL default 0,
 			PRIMARY KEY bloggroup_pk (bloggroup_blog_ID,bloggroup_group_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_coll_user_favs' => array(
+		'Creating table for user favorite collections',
+		"CREATE TABLE T_coll_user_favs (
+			cufv_user_ID    int(10) unsigned NOT NULL,
+			cufv_blog_ID    int(10) unsigned NOT NULL,
+			PRIMARY KEY cufv_pk (cufv_user_ID, cufv_blog_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_links' => array(

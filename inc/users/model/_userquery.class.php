@@ -134,6 +134,24 @@ class UserQuery extends SQL
 
 
 	/**
+	 * Restrict by user IDs
+	 *
+	 * @param array User IDs
+	 */
+	function where_user_IDs( $user_IDs )
+	{
+		global $DB;
+
+		if( empty( $user_IDs ) )
+		{	// Don't restrict:
+			return;
+		}
+
+		$this->WHERE_and( 'user_ID IN ( '.$DB->quote( $user_IDs ).' ) ');
+	}
+
+
+	/**
 	 * Restrict by members
 	 *
 	 * @param boolean TRUE to select only member of the current Blog

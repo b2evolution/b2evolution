@@ -56,9 +56,12 @@ switch( $action )
 
 		$reasons = trim( $Settings->get( 'account_close_reasons' ) );
 		param( 'account_close_type', 'string', '' );
+
 		if( ! empty( $reasons ) && empty( $account_close_type ) )
 		{ // Don't submit a form without a selected reason
 			$Messages->add( T_( 'Please quickly select a reason for closing your account.' ) );
+			// Set this session var only to repopulate other reason textarea input
+			$Session->set( 'account_close_reason', param( 'account_close_reason', 'text', '' ) );
 			// Redirect to show the errors:
 			header_redirect(); // Will EXIT
 			// We have EXITed already at this point!!

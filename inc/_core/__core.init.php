@@ -38,7 +38,7 @@ $required_mysql_version[ '_core' ] = '5.0.3';
  *  change {@link $tableprefix} in _basic_config.php)
  */
 $db_config['aliases'] = array(
-		'T_antispam'               => $tableprefix.'antispam',
+		'T_antispam__keyword'      => $tableprefix.'antispam__keyword',
 		'T_antispam__iprange'      => $tableprefix.'antispam__iprange',
 		'T_cron__log'              => $tableprefix.'cron__log',
 		'T_cron__task'             => $tableprefix.'cron__task',
@@ -65,7 +65,6 @@ $db_config['aliases'] = array(
 		'T_users__invitation_code' => $tableprefix.'users__invitation_code',
 		'T_users__reports'         => $tableprefix.'users__reports',
 		'T_users__usersettings'    => $tableprefix.'users__usersettings',
-		'T_users__postreadstatus'  => $tableprefix.'users__postreadstatus',
 		'T_users__organization'    => $tableprefix.'users__organization',
 		'T_users__user_org'        => $tableprefix.'users__user_org',
 		'T_users__secondary_user_groups' => $tableprefix.'users__secondary_user_groups',
@@ -433,8 +432,8 @@ function & get_EmailAddressCache()
 
 	if( ! isset( $EmailAddressCache ) )
 	{	// Cache doesn't exist yet:
-		load_class( 'tools/model/_emailaddress.class.php', 'EmailAddress' );
-		$EmailAddressCache = new DataObjectCache( 'EmailAddress', false, 'T_email__address', 'emadr_', 'emadr_ID', 'emadr_address' );
+		load_class( 'tools/model/_emailaddresscache.class.php', 'EmailAddressCache' );
+		$EmailAddressCache = new EmailAddressCache();
 	}
 
 	return $EmailAddressCache;
@@ -1130,7 +1129,7 @@ class _core_Module extends Module
 							);
 					}
 
-					if( $Blog->get_setting( 'use_workflow' ) )
+					if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 					{ // Workflow view
 						$entries['blog']['entries']['workflow'] = array(
 								'text' => T_('Workflow view').'&hellip;',
@@ -1250,8 +1249,8 @@ class _core_Module extends Module
 										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=seo'.$blog_param,
 									),
 									'renderers' => array(
-										'text' => T_('Renderers').'&hellip;',
-										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=renderers'.$blog_param,
+										'text' => T_('Plugins').'&hellip;',
+										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugins'.$blog_param,
 									),
 								)
 						);
@@ -1725,7 +1724,7 @@ class _core_Module extends Module
 								'text' => T_('Profiles'),
 								'href' => '?ctrl=usersettings' ),
 							'registration' => array(
-								'text' => T_('Registration'),
+								'text' => T_('Registration & Login'),
 								'href' => '?ctrl=registration' ),
 							'invitations' => array(
 								'text' => T_('Invitations'),

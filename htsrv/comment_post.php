@@ -283,9 +283,6 @@ if( param( 'renderers_displayed', 'integer', 0 ) )
 $def_status = $Comment->is_meta() ? 'published' : get_highest_publish_status( 'comment', $commented_Item->Blog->ID, false );
 $Comment->set( 'status', $def_status );
 
-// Restrict comment status by parent item:
-$Comment->restrict_status_by_item( true );
-
 if( $action != 'preview' )
 {
 	/*
@@ -611,8 +608,7 @@ if( $Comment->ID )
 	// asimo> this handle moderators and general users as well and use "outbound_notifications_mode" in case of general users
 	// Moderators will get emails about every new comment
 	// Subscribed user will only get emails about new published comments
-	$executed_by_userid = is_logged_in() ? $current_User->ID : NULL;
-	$Comment->handle_notifications( true, $executed_by_userid );
+	$Comment->handle_notifications( NULL, true );
 
 
 	// Add a message, according to the comment's status:

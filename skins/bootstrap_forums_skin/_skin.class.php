@@ -18,6 +18,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class bootstrap_forums_Skin extends Skin
 {
 	/**
+	 * Skin version
+	 * @var string
+	 */
+	var $version = '6.7.3';
+
+	/**
 	 * Do we want to use style.min.css instead of style.css ?
 	 */
 	var $use_min_css = true;  // true|false|'check' Set this to true for better optimization
@@ -54,6 +60,34 @@ class bootstrap_forums_Skin extends Skin
 
 
 	/**
+	 * Get supported collection kinds.
+	 *
+	 * This should be overloaded in skins.
+	 *
+	 * For each kind the answer could be:
+	 * - 'yes' : this skin does support that collection kind (the result will be was is expected)
+	 * - 'partial' : this skin is not a primary choice for this collection kind (but still produces an output that makes sense)
+	 * - 'maybe' : this skin has not been tested with this collection kind
+	 * - 'no' : this skin does not support that collection kind (the result would not be what is expected)
+	 * There may be more possible answers in the future...
+	 */
+	public function get_supported_coll_kinds()
+	{
+		$supported_kinds = array(
+				'main' => 'maybe',
+				'std' => 'no',		// Blog
+				'photo' => 'no',
+				'forum' => 'yes',
+				'manual' => 'no',
+				'group' => 'partial',  // Tracker
+				// Any kind that is not listed should be considered as "maybe" supported
+			);
+
+		return $supported_kinds;
+	}
+
+
+	/*
 	 * What CSS framework does has this skin been designed with?
 	 *
 	 * This may impact default markup returned by Skin::get_template() for example
@@ -80,7 +114,7 @@ class bootstrap_forums_Skin extends Skin
 					'layout_general' => array(
 						'label' => T_('General Layout'),
 						'note' => '',
-						'defaultvalue' => 'no_sidebar',
+						'defaultvalue' => 'right_sidebar',
 						'options' => array(
 								'no_sidebar'    => T_('No Sidebar'),
 								'left_sidebar'  => T_('Left Sidebar'),
@@ -114,12 +148,6 @@ class bootstrap_forums_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Forum Display Settings')
 				),
-					'display_post_date' => array(
-						'label' => T_('Post date'),
-						'note' => T_('Display the date of each post'),
-						'defaultvalue' => 1,
-						'type' => 'checkbox',
-					),
 					'banner_public' => array(
 						'label' => T_('Display "Public" banner'),
 						'note' => T_('Display banner for "Public" posts (posts & comments)'),
@@ -326,18 +354,18 @@ class bootstrap_forums_Skin extends Skin
 			// Initialize date picker for _item_expert.form.php
 			init_datepicker_js( 'blog' );
 		}
-		
+
 		// Add custom CSS:
 		$custom_css = '';
-		
-		
+
+
 		// If sidebar == true + col-lg
 		if( $layout = $this->get_setting( 'layout_general' ) != 'no_sidebar' )
 		{
 			$custom_css = "@media screen and (min-width: 1200px) {
-				.forums_list .ft_date { 
+				.forums_list .ft_date {
 					white-space: normal;
-					margin-top: 11px;
+					margin-top: 3px;
 				}
 				.disp_single .single_topic .evo_content_block .panel-body .evo_post__full, .disp_single .evo_comment .panel-body .evo_comment_text p, .disp_single .post_tags {
 					padding-left: 15px;
@@ -345,7 +373,7 @@ class bootstrap_forums_Skin extends Skin
 				\n
 			}";
 		}
-		
+
 		if( ! empty( $custom_css ) )
 		{ // Function for custom_css:
 		$custom_css = '<style type="text/css">
@@ -354,7 +382,7 @@ class bootstrap_forums_Skin extends Skin
 -->
 		</style>';
 		add_headline( $custom_css );
-		}			
+		}
 	}
 
 
@@ -585,15 +613,15 @@ class bootstrap_forums_Skin extends Skin
 			$unread_posts_SQL = new SQL();
 			$unread_posts_SQL->SELECT( 'COUNT( post_ID )' );
 			$unread_posts_SQL->FROM( 'T_items__item' );
-			$unread_posts_SQL->FROM_add( 'LEFT JOIN T_users__postreadstatus ON post_ID = uprs_post_ID AND uprs_user_ID = '.$DB->quote( $current_User->ID ) );
+			$unread_posts_SQL->FROM_add( 'LEFT JOIN T_items__user_data ON post_ID = itud_item_ID AND itud_user_ID = '.$DB->quote( $current_User->ID ) );
 			$unread_posts_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
 			$unread_posts_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
 			$unread_posts_SQL->WHERE( $ItemList2->ItemQuery->get_where( '' ) );
 			$unread_posts_SQL->WHERE_and( 'post_last_touched_ts > '.$DB->quote( date2mysql( $localtimenow - 30 * 86400 ) ) );
 			// In theory, it would be more safe to use this comparison:
-			// $unread_posts_SQL->WHERE_and( 'uprs_post_ID IS NULL OR uprs_read_post_ts <= post_last_touched_ts' );
+			// $unread_posts_SQL->WHERE_and( 'itud_item_ID IS NULL OR itud_read_item_ts <= post_last_touched_ts' );
 			// But until we have milli- or micro-second precision on timestamps, we decided it was a better trade-off to never see our own edits as unread. So we use:
-			$unread_posts_SQL->WHERE_and( 'uprs_post_ID IS NULL OR uprs_read_post_ts < post_last_touched_ts' );
+			$unread_posts_SQL->WHERE_and( 'itud_item_ID IS NULL OR itud_read_item_ts < post_last_touched_ts' );
 
 			// Execute a query with to know if current user has new data to view:
 			$unread_posts_count = $DB->get_var( $unread_posts_SQL->get(), 0, NULL, 'Get a count of the unread topics for current user' );
@@ -612,6 +640,26 @@ class bootstrap_forums_Skin extends Skin
 
 		// Print out the button:
 		echo '<a href="'.$Blog->get( 'recentpostsurl' ).'" class="btn '.$btn_class.' pull-right btn_recent_topics">'.$btn_title.'</a>';
+	}
+
+
+	/**
+	 * Those templates are used for example by the messaging screens.
+	 */
+	function get_template( $name )
+	{
+		switch( $name )
+		{
+			case 'cat_array_mode':
+				// What category level use to display the items on disp=posts:
+				//   - 'children' - Get items from current category and from all its sub-categories recirsively
+				//   - 'parent' - Get items ONLY from current category WITHOUT sub-categories
+				return 'parent';
+
+			default:
+				// Delegate to parent class:
+				return parent::get_template( $name );
+		}
 	}
 }
 

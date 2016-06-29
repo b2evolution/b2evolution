@@ -48,10 +48,7 @@ function tool_create_sample_collections( $num_collections, $perm_management, $al
 		// Set random of "Permission management" from the selected options:
 		$new_Blog->set( 'advanced_perms', $perm_management[ rand( 0, $perm_management_max_index ) ] == 'advanced' ? 1 : 0 );
 		// Set random of "Allow access to" from the selected options:
-		$new_Blog->set_setting( 'allow_access', $allow_access[ rand( 0, $allow_access_max_index ) ] );
-		// Don't show a sample collection on top menu in back-office:
-		// TODO: In another branch Erwin has implemented a rule similar to "only enable first 10 collections". This will be merged here at some point.
-		$new_Blog->set( 'favorite', 0 );
+		$new_Blog->set_setting( 'allow_access', $allow_access[ rand( 0, $allow_access_max_index ) ] );;
 
 		// Define collection settings by its kind:
 		$Plugins->trigger_event( 'InitCollectionKinds', array(
@@ -61,6 +58,10 @@ function tool_create_sample_collections( $num_collections, $perm_management, $al
 
 		// Do a creating new collection:
 		$new_Blog->create();
+
+		// Don't show a sample collection on top menu in back-office:
+		// TODO: In another branch Erwin has implemented a rule similar to "only enable first 10 collections". This will be merged here at some point.
+		$new_Blog->favorite( NULL, 0 );
 
 		// Clear the messages because we have at least 4 messages after each $new_Blog->create() which are the same:
 		$Messages->clear();
@@ -503,8 +504,7 @@ function tool_create_sample_messages( $num_loops, $num_messages, $num_words, $ma
 	if( count( $users ) < 2 )
 	{	// No users
 		$Messages->add( T_('At least two users must exist in DB to create the messages'), 'error' );
-		$action = 'show_create_messages';
-		break;
+		return;
 	}
 
 	$count_threads = 0;

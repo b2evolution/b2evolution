@@ -16,6 +16,13 @@
 	border-radius: @radius;
 }
 
+// Favorite star
+h2.page-title {
+	.fa.coll-fav {
+		font-size: 26px;
+	}
+}
+
 // Page content
 .page-content {
 	// Add space above page content when no navigation level2 and level3 before this
@@ -176,6 +183,9 @@ div.avatartag {
 	.PreviewButton, .pull-left {
 		margin-right: 10px;
 	}
+	.quick-publish {
+		margin-left: 5px;
+	}
 	.html_status {
 		margin-top: 14px;
 		display: inline-block;
@@ -222,40 +232,24 @@ div.delete_messages ul {
 /*
  * Browse pages of items and comments ( ?ctrl=items and ?ctrl=comments - full views )
  */
-div.bPost {
+.evo_post {
 	clear: both;
 	margin: 0 0 1ex;
 	padding: 0;
-	border: 1px solid #CCC;
-	.border-radius;
 	overflow: hidden; /* to normal view of border-radius */
+	.evo_post__tags {
+		border-top: 1px solid #ddd;
+	}
+	.panel-body h3 {
+		margin: 8px 0;
+	}
 }
-.bSmallHead {
-	background-color: #F5F5F5;
-	border-bottom: 1px solid #CCC;
-	color: #666666;
-	font-size: 85%;
-	margin: 0;
-	padding: 1ex;
+.evo_post, .evo_comment {
+	.panel-heading, .panel-body, .panel-footer {
+		padding: 1ex;
+	}
 }
-.bSmallHeadRight {
-	 float: right;
-	 text-align: right;
-	 padding-left: 1em; /* do not pad on text in .bSmallHead */
-}
-.bSmallPrint {
-	border-top: 1px solid #becdd6;
-	font-size: 85%;
-	padding: 1ex;
-	color: #929292;
-}
-.bContent {
-	padding: 1ex;
-}
-.bCommentContent, .bFeedback {
-	margin: 1ex;
-}
-#comments_container {
+.evo_comments_container {
 	border: none;
 	.bCommentAvatar {
 		border: 0;
@@ -264,18 +258,19 @@ div.bPost {
 		margin: 4px 10px 10px 0;
 		float: left;
 	}
-}
-#comments_container.full_comment_list {
-	border: none;
-	div.bComment {
-		margin-left: 0;
-		margin-right: 0;
+	&.evo_comments_container__full_list {
+		border: none;
+		.evo_comment {
+			margin-left: 0;
+			margin-right: 0;
+		}
 	}
 }
-.bFeedback {
-	#comments_container {
+.evo_post__comments {
+	margin: 1ex;
+	.evo_comments_container {
 		border: none;
-		div.bComment {
+		.evo_comment {
 			margin-left: 0;
 			margin-right: 0;
 		}
@@ -291,20 +286,20 @@ div.bPost {
 		background: #F5F5F5;
 		border: none;
 	}
-	.form-horizontal {
+	.evo_form__comment.form-horizontal {
 		margin: 0;
 		padding: 1ex;
 		border: 1px solid #ddd;
 		.border-radius;
 		&.evo_form__comment_meta {
-			border: 2px solid #5133ab;
-			background-color: #f7f4ff;
+			border: 2px solid #5bc0de;
+			background-color: #d9edf7;
 		}
 		.form_info {
 			display: block;
 			text-align: center;
 			padding: 10px;
-			color: #5133ab;
+			color: #5bc0de;
 		}
 	}
 }
@@ -328,44 +323,42 @@ div.bPost {
 	}
 }
 
-#comments_container {
-	div.bComment {
+.evo_comments_container {
+	.evo_comment {
 		overflow: hidden;
 		padding: 0;
 		margin: 1ex;
-		border: 1px solid #ddd;
-		.border-radius;
 		> p {
 			margin: 0;
 		}
-		&.bCommentdraft {
+		&.evo_comment__status_draft {
 			border: 1px solid #fc3;
 			background-color: #ffb;
 		}
-		&.bCommentdeprecated {
+		&.evo_comment__status_deprecated {
 			border: 1px solid #000;
 			background-color: #eee;
 			color: #888;
 		}
-		&.bCommentmeta {
-			border: 2px solid #5133ab;
-			.bSmallHead, .CommentActionsArea {
-				background-color: #f7f4ff;
-				border-bottom: 1px solid #5133ab;
+		&.evo_comment__status_meta {
+			border: 2px solid #5bc0de;
+			.panel-heading, .panel-footer {
+				background-color: #d9edf7;
+				border-bottom: 1px solid #5bc0de;
 			}
-			.CommentActionsArea {
-				border-top: 1px solid #5133ab;
+			.panel-footer {
+				border-top: 1px solid #5bc0de;
 				border-bottom: none;
 			}
 		}
-		&.bCommenttrash {
+		&.evo_comment__status_trash {
 			border: 1px solid #f66;
 			background-color: #fcc;
-			.bSmallHead {
+			.panel-heading {
 				border-bottom: 1px solid #f66;
 				background-color: #faa;
 			}
-			.CommentActionsArea {
+			.panel-footer {
 				border-top: 1px solid #f66;
 				background-color: #faa;
 			}
@@ -375,24 +368,17 @@ div.bPost {
 		margin-bottom: 5px;
 	}
 }
-#fieldset_wrapper_itemform_meta_cmnt #comments_container {
+#fieldset_wrapper_itemform_meta_cmnt .evo_comments_container {
 	border: none;
 	margin: 0;
-	div.bComment {
+	.evo_comment {
 		margin: 0 0 1ex 0;
 		&:not([class*=meta]) {
 			border: none;
 		}
 	}
 }
-div.PostActionsArea, div.CommentActionsArea {
-	background-color: #F5F5F5;
-	border-top: 1px solid #CCC;
-	clear: both;
-	margin: 0;
-	padding: 1ex;
-}
-.bPostAttachments {
+.evo_post__attachments {
 	margin: 1ex;
 }
 .feedback-tabs {
@@ -425,52 +411,53 @@ div.PostActionsArea, div.CommentActionsArea {
 	top: -8px;
 }
 // The colored blocks for special post statuses
-div.bPostcommunity {
+.evo_post__status_community {
 	border: 1px solid #2E8BB9;
-	> div.bSmallHead {
+	> .panel-heading {
 		border-bottom: inherit;
 	}
-	> .PostActionsArea {
+	> .panel-footer {
 		border-top: inherit;
 	}
 }
-div.bPostprotected {
+.evo_post__status_protected {
 	border: 1px solid #fc9;
-	> div.bSmallHead {
+	> .panel-heading {
 		border-bottom: inherit;
 	}
-	> .PostActionsArea {
+	> .panel-footer {
 		border-top: inherit;
 	}
 }
-div.bPostreview {
+.evo_post__status_review {
 	border: 1px solid #CC0099;
-	> div.bSmallHead {
+	> .panel-heading {
 		border-bottom: inherit;
 	}
-	> .PostActionsArea {
+	> .panel-footer {
 		border-top: inherit;
 	}
 }
-div.bPostprivate {
+.evo_post__status_private {
 	border: 1px solid #f99;
-	> div.bSmallHead {
+	> .panel-heading {
 		border-bottom: inherit;
 	}
-	> .PostActionsArea {
+	> .panel-footer {
 		border-top: inherit;
 	}
 }
-div.bPostdraft, div.bCommentdraft {
+.evo_post__status_draft, .evo_comment__status_draft {
 	border: 1px solid #fc3;
-	> .bContent {
+	> .panel-body {
 		background-color: #ffb;
 	}
-	.bSmallHead {
+	.panel-heading {
 		border-bottom: 1px solid #fc3;
 		background-color: #ff9;
 	}
-	.CommentActionsArea, .PostActionsArea {
+	.panel-footer {
+		border-top: 1px solid #fc3;
 		background-color: #ff9;
 	}
 	span.bStatus {
@@ -482,30 +469,30 @@ div.bPostdraft, div.bCommentdraft {
 		background-color: #FFCC33;
 	}
 }
-div.bPostdeprecated, div.bCommentdeprecated {
+.evo_post__status_deprecated, .evo_comment__status_deprecated {
 	border: 1px solid #000;
-	> .bContent {
+	> .panel-body {
 		background-color: #eee;
 	}
-	> div.bSmallHead {
+	> .panel-heading {
 		border-bottom: inherit;
 		background-color: #ccc;
 	}
-	> .PostActionsArea, .CommentActionsArea {
+	> .panel-footer {
 		border-top: inherit;
 		background-color: #ccc;
 	}
 }
-div.bPostredirected {
+.evo_post__status_redirected {
 	border: 1px solid #639;
-	> .bContent {
+	> .panel-body {
 		background-color: #dcf;
 	}
-	> div.bSmallHead {
+	> .panel-heading {
 		border-bottom: inherit;
 		background-color: #c0b0e0;
 	}
-	> .PostActionsArea {
+	> .panel-footer {
 		border-top: inherit;
 		background-color: #c0b0e0;
 	}
@@ -565,12 +552,9 @@ fieldset ul {
 	margin: 0;
 	padding: 0;
 }
-.bContent h3 {
-	margin: 8px 0;
-}
 
 // Dashboard
-#comments_container, .items_container {
+.evo_comments_container, .items_container {
 	border: 1px solid #DDD;
 	.border-radius;
 	margin-bottom: 20px;
@@ -610,7 +594,7 @@ fieldset ul {
 			.border-radius(0);
 		}
 	}
-	#comments_container {
+	.evo_comments_container {
 		border: none;
 		margin: 0;
 	}
@@ -637,7 +621,7 @@ fieldset ul {
 }
 .dashboard_comments_block__meta {
 	.panel-body {
-		background-color: #f7f4ff;
+		background-color: #d9edf7;
 	}
 }
 // Charts on dashboard
@@ -672,7 +656,7 @@ fieldset ul {
 		display: block;
 	}
 }
-#itemform_adv_props {
+#itemform_adv_props, #itemform_custom_fields {
 	div.tile, div.controls {
 		width: 100%;
 	}
@@ -688,6 +672,8 @@ fieldset ul {
 		font-weight: normal;
 		display: block;
 	}
+}
+#itemform_adv_props {
 	ul.token-input-list-facebook {
 		width: 100%;
 		max-width: 100%;
@@ -720,14 +706,17 @@ fieldset ul {
 }
 
 // Attachments / links
-#attachmentframe_wrapper {
+#attachments_fieldset_wrapper {
 	width: 100%;
 	height: 160px;
 	position: relative;
-	overflow: hidden;
 	padding-bottom: 6px;
 	box-sizing: content-box;
- .ui-resizable-s {
+	#attachments_fieldset_block {
+		overflow: auto;
+		height: 100%;
+	}
+	.ui-resizable-s {
 		background: #c0c0c0;
 		height: 6px;
 		bottom: 0;
@@ -740,12 +729,18 @@ fieldset ul {
 			display: block;
 		}
 	}
-	#attachmentframe_disabler {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
+	.table_scroll {
+		// Use this position to fix red triangle when attachment is dragged by mouse:
+		position: relative;
+	}
+	table tbody {
+		.dragged {
+			opacity: 0.8;
+			position: absolute;
+		}
+		td {
+			cursor: move;
+		}
 	}
 }
 #filelist_tbody {
@@ -876,7 +871,6 @@ tr#fileuploader_form td {
 	background: #f5f5f5;
 }
 .file_browser {
-	overflow: hidden; // to fix overlapping of the corners on rounded borders
 	.panel-body {
 		padding: 0;
 		#fm_browser {
@@ -1032,7 +1026,7 @@ table.table {
 		color: darken( #848484, 5%);
 		text-align: center;
 		a {
-			color: darken( #848484, 5%); 
+			color: darken( #848484, 5%);
 		}
 		a.basic_current,
 		a:hover {
@@ -1112,7 +1106,7 @@ table.coll_kind {
 		padding: 10px 10px 10px 0;
 	}
 	td.coll_kind__desc {
-		padding-top: 18px;	
+		padding-top: 18px;
 	}
 	.btn {
 		width: 100%;
@@ -1204,9 +1198,19 @@ div.level2 {
 nav.level1 {
 	z-index: 1;
 }
-div.level3 nav .nav>li>a {
-	padding: 4px 10px;
-	font-size: 92%;
+div.level3 nav .nav > li {
+	> a {
+		padding: 4px 10px;
+		font-size: 92%;
+		background-color: #f6f6f6;
+	}
+	&.active a,
+	&.active a:hover,
+	&.active a:focus {
+		background-color: #337ab7;
+	}
+	margin-right: 3px;
+	margin-bottom: 3px;
 }
 .user_header_content {
 	div.level3 {
@@ -1215,6 +1219,10 @@ div.level3 nav .nav>li>a {
 	.user_title .login {
 		margin-left: 10px;
 	}
+}
+
+div.level3 nav .nav > li + li {
+	margin-left: 0px;
 }
 
 // Footer
@@ -1297,7 +1305,7 @@ div.level3 nav .nav>li>a {
 	.border-radius;
 	padding: 5px;
 	float: left;
-	margin: 15px;
+	margin: 5px;
 	.skinshot_placeholder {
 		width: 240px;
 		height: 180px;
@@ -1317,10 +1325,11 @@ div.level3 nav .nav>li>a {
 		margin: 0 1ex;
 	}
 }
-.skin_selector_block {
-	margin: -15px 0 0 -15px;
+.coll_settings_skinshot {
 	.skinshot {
-		margin: 15px 0 0 15px;
+		padding: 0;
+		float: none;
+		margin: -1ex -1ex 1ex -1ex;
 	}
 }
 .skinshot_new {
@@ -1543,22 +1552,82 @@ table.diff {
 	}
 }
 
-// Poll option percent:
-.evo_poll__percent_bar {
-	width: 100px;
-	margin-right: 2px;
-	vertical-align: middle;
-	display: inline-block;
-	> div {
-		background: #ffcc66;
-		height: 12px;
-		min-width: 1px;
+.evo_poll__table {
+	margin-bottom: 14px;
+	width: 100%;
+	td {
+		padding: 2px 10px 2px 0;
+		vertical-align: top;
+	}
+	tr td:last-child {
+		padding-right: 0;
+	}
+	input[type=radio], label {
+		margin: 0;
+	}
+	.evo_poll__percent_bar {
+		width: 100%;
+		min-width: 40px;
+		padding-right: 6px;
+		> div {
+			width: 100%;
+			vertical-align: middle;
+			display: inline-block;
+			> div {
+				background: #ffcc66;
+				height: 12px;
+				min-width: 1px;
+			}
+		}
+	}
+	.evo_poll__selector {
+		width: 5px;
+	}
+	.evo_poll__title {
+		white-space: nowrap;
+	}
+	.evo_poll_percentage {
+		max-width: 50px;
 	}
 }
 
-// Mark checkbox with red background color, e.g. on advanced collection permissions:
-.red-bordered-checkbox {
-	background-color: #F00;
-	padding: 1px;
-	padding-top: 0;
+// Status checkboxes, e.g. on advanced collection permissions:
+@import "../../../../rsc/less/inc/visibility_status_colors.inc.less";
+.evo_checkbox_status {
+	padding: 0 1px 1px 1px;
+	border-radius: 2px;
+}
+.evo_checkbox_status__default {
+	border: 1px solid #F00;
+	padding: 1px 1px 2px 1px;
+}
+.evo_checkbox_status__published {
+	background-color: @status_color_published;
+}
+.evo_checkbox_status__community {
+	background-color: @status_color_community;
+}
+.evo_checkbox_status__protected {
+	background-color: @status_color_protected;
+}
+.evo_checkbox_status__review {
+	background-color: @status_color_review;
+}
+.evo_checkbox_status__private {
+	background-color: @status_color_private;
+}
+.evo_checkbox_status__draft {
+	background-color: @status_color_draft;
+}
+.evo_checkbox_status__deprecated {
+	background-color: @status_color_deprecated;
+}
+.evo_checkbox_status__redirected {
+	background-color: @status_color_redirected;
+}
+.evo_checkbox_status__trash {
+	background-color: @status_color_trash;
+}
+.evo_checkbox_status__meta {
+	background-color: @status_color_meta;
 }

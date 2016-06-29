@@ -203,7 +203,7 @@ class FileRoot
 				return NT_('User roots');
 
 			case 'collection':
-				return NT_('Blog roots');
+				return NT_('Collection roots');
 
 			default:
 				return NT_('Special roots');

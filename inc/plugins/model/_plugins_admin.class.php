@@ -144,6 +144,7 @@ class Plugins_admin extends Plugins
 				'RenderCommentAttachment' => 'Renders comment attachment.',
 				'RenderMessageAsHtml' => 'Renders message content when generated as HTML.',
 				'RenderEmailAsHtml' => 'Renders email content when generated as HTML.',
+				'RenderURL' => 'Renders file by URL.',
 
 
 				// fp> rename to "DispRender"

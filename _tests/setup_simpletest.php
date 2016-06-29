@@ -3,7 +3,7 @@ if( ! defined('EVODIR') )
 {
 	require dirname(__FILE__).'/config.php';
 }
-require EVODIR.'blogs/inc/_main.inc.php';
+require EVODIR.'inc/_main.inc.php';
 load_funcs('_core/_param.funcs.php');
 
 param('action', 'string', '');

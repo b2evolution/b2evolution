@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $preview, $dummy_fields, $cat, $current_User;
+global $Item, $preview, $dummy_fields, $cat, $current_User, $app_version;
 
 /**
  * @var array Save all statuses that used on this page in order to show them in the footer legend
@@ -87,7 +87,7 @@ skin_widget( array(
 
 <div class="forums_list single_topic evo_content_block">
 	<?php /* This empty row is used to fix columns width, when table has css property "table-layout:fixed" */ ?>
-	
+
 	<div class="single_page_title">
 		<?php
 		// Page title
@@ -96,19 +96,26 @@ skin_widget( array(
 				'after'     => '</h2>',
 				'link_type' => 'permalink'
 			) );
-				// Author info:
-				echo '<div class="ft_author_info">'.T_('Thread started by');
-				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
-				echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
-				echo '<span class="text-muted"> &ndash; '
-						.T_('Last touched:').' '.mysql2date( 'D M j, Y H:i', $Item->get( 'last_touched_ts' ) )
-					.'</span>';
-				echo '</div>';
-				// Author info - shrinked:
-				echo '<div class="ft_author_info shrinked">'.T_('Started by');
-				$Item->author( array( 'link_text' => 'login', 'after' => '' ) );
-				echo ', '.mysql2date( 'm/j/y', $Item->datecreated );
-				echo '</div>';
+
+		// Flag:
+		$Item->flag( array(
+				'before' => '<span class="pull-left">',
+				'after'  => '</span>',
+			) );
+
+		// Author info:
+		echo '<div class="ft_author_info">'.T_('Thread started by');
+		$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
+		echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
+		echo '<span class="text-muted"> &ndash; '
+				.T_('Last touched:').' '.mysql2date( 'D M j, Y H:i', $Item->get( 'last_touched_ts' ) )
+			.'</span>';
+		echo '</div>';
+		// Author info - shrinked:
+		echo '<div class="ft_author_info shrinked">'.T_('Started by');
+		$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
+		echo ', '.mysql2date( 'm/j/y', $Item->datecreated );
+		echo '</div>';
 		?>
 	</div>
 
@@ -122,21 +129,19 @@ skin_widget( array(
 				<h4 class="evo_comment_title panel-title"><a href="<?php echo $Item->get_permanent_url(); ?>" class="permalink">#1</a>
 					<?php
 						$Item->author( array(
-							'link_text' => 'login',
+							'link_text' => 'auto',
 						) );
 					?>
 					<?php
-						if( $Skin->get_setting( 'display_post_date' ) )
-						{ // We want to display the post date:
-							$Item->issue_time( array(
-									'before'      => '',
-									'after'       => ' &nbsp; &nbsp; ',
-									'time_format' => 'M j, Y H:i',
-								) );
-						}
+						// We want to display the post date:
+						$Item->issue_time( array(
+								'before'      => '<span class="text-muted">',
+								'after'       => '</span> &nbsp; &nbsp; ',
+								'time_format' => 'M j, Y H:i',
+							) );
 					?>
 				</h4>
-			</div>	
+			</div>
 					<?php
 						if( $Skin->enabled_status_banner( $Item->status ) )
 						{ // Status banner
@@ -147,9 +152,9 @@ skin_widget( array(
 							$legend_statuses[] = $Item->status;
 							echo '</div>';
 						}
-					?>	
+					?>
 		</div>
-		
+
 		<div class="panel-body">
 			<div class="ft_avatar col-md-1 col-sm-2"><?php
 				$Item->author( array(
@@ -165,7 +170,6 @@ skin_widget( array(
 					<div class="evo_container evo_container__item_single">
 					<?php
 					// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-					// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 					// Display container contents:
 					skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
 						'widget_context' => 'item',	// Signal that we are displaying within an Item
@@ -178,6 +182,16 @@ skin_widget( array(
 						'block_title_end' => '</h3>',
 						// Params for skin file "_item_content.inc.php"
 						'widget_item_content_params' => $params,
+						// Template params for "Item Attachments" widget:
+						'widget_item_attachments_params' => array(
+								'limit_attach'       => 1000,
+								'before'             => '<div class="evo_post_attachments"><h3>'.T_('Attachments').':</h3><ul class="evo_files">',
+								'after'              => '</ul></div>',
+								'before_attach'      => '<li class="evo_file">',
+								'after_attach'       => '</li>',
+								'before_attach_size' => ' <span class="evo_file_size">(',
+								'after_attach_size'  => ')</span>',
+							),
 					) );
 					// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 					?>
@@ -204,7 +218,7 @@ skin_widget( array(
 				?>
 			</div>
 		</div><!-- ../panel-body -->
-		
+
 		<div class="panel-footer clearfix">
 		<a href="<?php echo $Item->get_permanent_url(); ?>#skin_wrapper" class="to_top"><?php echo T_('Back to top'); ?></a>
 		<?php
@@ -240,7 +254,7 @@ skin_widget( array(
 			echo '</span>';
 			echo '</div>';
 		?>
-		
+
 		</div><!-- ../panel-footer -->
 	</div><!-- ../panel panel-default -->
 	</section><!-- ../table evo_content_block -->
@@ -254,14 +268,14 @@ skin_widget( array(
 			'disp_section_title'    => false,
 			'disp_meta_comment_info' => false,
 
-			'comment_post_before'   => '<h4 class="evo_comment_post_title ellipsis">',
+			'comment_post_before'   => '<br /><h4 class="evo_comment_post_title ellipsis">',
 			'comment_post_after'    => '</h4>',
 
 			'comment_title_before'  => '<div class="panel-heading posts_panel_title_wrapper"><div class="cell1 ellipsis"><h4 class="evo_comment_title panel-title">',
 			'comment_status_before' => '</h4></div>',
 			'comment_title_after'   => '</div>',
 
-			'comment_avatar_before' => '<div class="panel-body"><span class="evo_comment_avatar col-md-1 col-sm-2">',
+			'comment_avatar_before' => '<span class="evo_comment_avatar col-md-1 col-sm-2">',
 			'comment_avatar_after'  => '</span>',
 			'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10">',
 			'comment_text_after'    => '</div>',
@@ -275,12 +289,17 @@ skin_widget( array(
 	?>
 
 	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
 		// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
 		skin_include( '_item_workflow.inc.php' );
 		// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
+	}
 	?>
 
 	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
 		// ------------------ META COMMENTS INCLUDED HERE ------------------
 		skin_include( '_item_meta_comments.inc.php', array(
 				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
@@ -296,6 +315,7 @@ skin_widget( array(
 				'comment_text_after'    => '</div>',
 			) );
 		// ---------------------- END OF META COMMENTS ---------------------
+	}
 	?>
 
 		</div><!-- .col -->

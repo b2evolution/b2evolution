@@ -79,9 +79,10 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( $check_permname, $check_permlevel, true, $edited_Comment );
 
-		// Restrict comment status by parent item:
-		$update_restricted_status = ( $action != 'edit' && $action != 'switch_view' );
-		$edited_Comment->restrict_status_by_item( $update_restricted_status );
+		if( $action == 'edit' || $action == 'switch_view' )
+		{	// Restrict comment status by parent item:
+			$edited_Comment->restrict_status_by_item();
+		}
 
 		$comment_title = '';
 		$comment_content = htmlspecialchars_decode( $edited_Comment->content );
@@ -404,10 +405,6 @@ switch( $action )
 			$edited_Comment->set( 'status', $comment_status );
 		}
 
-		// Restrict comment status by parent item:
-		$edited_Comment->restrict_status_by_item( true );
-		$comment_status = $edited_Comment->get( 'status' );
-
 		param( 'comment_nofollow', 'integer', 0 );
 		$edited_Comment->set_from_Request( 'nofollow' );
 
@@ -426,10 +423,12 @@ switch( $action )
 		{ // UPDATE DB:
 			$edited_Comment->dbupdate();	// Commit update to the DB
 
-			if( $edited_Comment->status == 'published' )
-			{ // comment status was set to published or it was already published, needs to handle notifications
-				$edited_Comment->handle_notifications( false, $current_User->ID );
-			}
+			// Get params to skip/force/mark email notifications:
+			param( 'comment_members_notified', 'string', NULL );
+			param( 'comment_community_notified', 'string', NULL );
+
+			// Execute or schedule email notifications:
+			$edited_Comment->handle_notifications( NULL, false, $comment_members_notified, $comment_community_notified );
 
 			$Messages->add( T_('Comment has been updated.'), 'success' );
 
@@ -458,8 +457,12 @@ switch( $action )
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
-		// comment status was set to published, needs to handle notifications
-		$edited_Comment->handle_notifications( false, $current_User->ID );
+		// Get params to skip/force/mark email notifications:
+		param( 'comment_members_notified', 'string', NULL );
+		param( 'comment_community_notified', 'string', NULL );
+
+		// Execute or schedule email notifications:
+		$edited_Comment->handle_notifications( NULL, false, $comment_members_notified, $comment_community_notified );
 
 		// Set the success message corresponding for the new status
 		switch( $edited_Comment->status )
@@ -756,11 +759,19 @@ if( $tab3 == 'fullview' || $tab3 == 'meta' )
 	require_js( '#jqueryUI#' );
 }
 
-if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit', 'elevate' ) ) )
+if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit', 'elevate', 'switch_view' ) ) )
 { // Initialize date picker for _comment.form.php
 	init_datepicker_js();
 	// Init JS to autocomplete the user logins:
 	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+	// Require colorbox js:
+	require_js_helper( 'colorbox' );
+	// Require File Uploader js and css:
+	require_js( 'multiupload/fileuploader.js' );
+	require_css( 'fileuploader.css' );
+	// Load JS files to make the links table sortable:
+	require_js( '#jquery#' );
+	require_js( 'jquery/jquery.sortable.min.js' );
 }
 
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation

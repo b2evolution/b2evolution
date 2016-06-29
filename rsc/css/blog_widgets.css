@@ -71,12 +71,31 @@ color:#444;
 background:#ee8;
 }
 */
-.widget_container li.droppable-hover {
-	border-bottom: 2px solid #f00;
-	padding-bottom: 1px;
-}
+.widget_container li.droppable-hover,
 #current_widgets div.ui-droppable.droppable-hover {
-	border-bottom: 2px solid #f00;
+	position: relative;
+}
+.widget_container li.droppable-hover:before,
+div.ui-droppable.droppable-hover:before {
+	content: "";
+	position: absolute;
+	width: 0;
+	height: 0;
+	border: 6px solid transparent;
+	border-left-color: #f00;
+	border-right: none;
+	left: 0;
+	bottom: -7px;
+}
+.widget_container li.droppable-hover:after,
+div.ui-droppable.droppable-hover:after {
+	content: "";
+	position: absolute;
+	width: 100%;
+	height: 2px;
+	background: #F00;
+	left: 0;
+	bottom: -2px;
 }
 
 .add_widget{

@@ -21,7 +21,7 @@ class infodots_plugin extends Plugin
 	var $code = 'b2evoDot';
 	var $name = 'Info dots renderer';
 	var $priority = 95;
-	var $version = '5.0.0';
+	var $version = '6.7.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -100,13 +100,13 @@ class infodots_plugin extends Plugin
 		global $Blog;
 
 		if( ! isset( $Blog ) || (
-		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' && 
+		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
 		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
 		{ // Don't load css/js files when plugin is not enabled
 			return;
 		}
 
-		require_css( $this->get_plugin_url( true ).'infodots.css', $relative_to );
+		$this->require_css( 'infodots.css' );
 
 		// Bubbletip
 		require_js( '#jquery#', $relative_to );
@@ -153,7 +153,7 @@ class infodots_plugin extends Plugin
 	} );
 } );' );
 	}
-	
+
 
 	/**
 	 * Event handler: Called at the beginning of the skin's HTML HEAD section.

@@ -103,7 +103,8 @@ class UserCache extends DataObjectCache
 					  FROM T_users
 					 WHERE user_login = '".$DB->escape($login)."'", 0, 0, 'Get User login' ) )
 			{
-				$this->add( new User( $row ) );
+				$new_user = new User( $row );
+				$this->add( $new_user );
 			}
 			else
 			{
@@ -288,8 +289,6 @@ class UserCache extends DataObjectCache
 		{ // Load members of the blog
 			$cache_name = 'blogmembers';
 			$db_field = 'ismember';
-			// The collection's owner is member by default, Load it together with other members:
-			$owner_User = & $Blog->get_owner_User();
 		}
 
 		if( isset( $this->alreadyCached[ $cache_name ] ) && isset( $this->alreadyCached[ $cache_name ][ $blog_ID ] ) )
@@ -308,7 +307,8 @@ class UserCache extends DataObjectCache
 
 		$Debuglog->add( "Loading <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache[$cache_name]", 'dataobjects' );
 
-		if( isset( $owner_User ) )
+		// The collection's owner is member and can be assignee by default, Load it together with other members/assignees:
+		if( $owner_User = & $Blog->get_owner_User() )
 		{	// Add collection owner to the cache:
 			$this->add( $owner_User );
 		}
@@ -317,7 +317,7 @@ class UserCache extends DataObjectCache
 		if( $Blog->get( 'advanced_perms' ) )
 		{	// Load group and user permissions ONLY if collection advanced permissions are enabled:
 
-			// Get users which are members of the blog:
+			// Get users which are members or can be assignees of the collection:
 			$user_perms_SQL = new SQL();
 			$user_perms_SQL->SELECT( 'T_users.*' );
 			$user_perms_SQL->FROM( 'T_users' );
@@ -326,7 +326,7 @@ class UserCache extends DataObjectCache
 			$user_perms_SQL->WHERE_and( 'bloguser_'.$db_field.' <> 0' );
 			$users_sql[] = $user_perms_SQL->get();
 
-			// Get users which groups are members of the blog:
+			// Get users which primary groups are members or can be assignees of the collection:
 			$group_perms_SQL = new SQL();
 			$group_perms_SQL->SELECT( 'T_users.*' );
 			$group_perms_SQL->FROM( 'T_users' );
@@ -334,17 +334,32 @@ class UserCache extends DataObjectCache
 			$group_perms_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $blog_ID ) );
 			$group_perms_SQL->WHERE_and( 'bloggroup_'.$db_field.' <> 0' );
 			$users_sql[] = $group_perms_SQL->get();
+
+			// Get users which secondary groups are members or can be assignees of the collection:
+			$secondary_group_perms_SQL = new SQL();
+			$secondary_group_perms_SQL->SELECT( 'T_users.*' );
+			$secondary_group_perms_SQL->FROM( 'T_users' );
+			$secondary_group_perms_SQL->FROM_add( 'INNER JOIN T_users__secondary_user_groups ON sug_user_ID = user_ID' );
+			$secondary_group_perms_SQL->FROM_add( 'INNER JOIN T_coll_group_perms ON sug_grp_ID = bloggroup_group_ID' );
+			$secondary_group_perms_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $blog_ID ) );
+			$secondary_group_perms_SQL->WHERE_and( 'bloggroup_'.$db_field.' <> 0' );
+			$users_sql[] = $secondary_group_perms_SQL->get();
 		}
 
+		// Get members or assignees which primary groups have a setting to VIEW/EDIT ALL collections:
+		$group_setting_SQL = new SQL();
+		$group_setting_SQL->SELECT( 'T_users.*' );
+		$group_setting_SQL->FROM( 'T_users' );
+		$group_setting_SQL->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
 		if( $load_members )
-		{	// Get users which groups have a setting to view ALL collections:
-			$group_setting_SQL = new SQL();
-			$group_setting_SQL->SELECT( 'T_users.*' );
-			$group_setting_SQL->FROM( 'T_users' );
-			$group_setting_SQL->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
+		{	// Get members which primary groups have a setting to VIEW/EDIT ALL collections:
 			$group_setting_SQL->WHERE( 'grp_perm_blogs = "viewall" OR grp_perm_blogs = "editall"' );
-			$users_sql[] = $group_setting_SQL->get();
 		}
+		else
+		{	// Get assignees which primary groups have a setting to EDIT ALL collections:
+			$group_setting_SQL->WHERE( 'grp_perm_blogs = "editall"' );
+		}
+		$users_sql[] = $group_setting_SQL->get();
 
 		// Union sql queries to execute one query and save an order as one list:
 		$users_sql = '( '.implode( ' ) UNION ( ', $users_sql ).' )';

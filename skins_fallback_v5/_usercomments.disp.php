@@ -23,7 +23,7 @@ $params = array_merge( array(
 	), $params );
 
 
-$user_CommentList->title = sprintf( $params['user_commentlist_title'], $viewed_User->get_identity_link( array( 'link_text' => 'name' ) ) );
+$user_CommentList->title = sprintf( $params['user_commentlist_title'], $viewed_User->get_identity_link( array( 'link_text' => 'auto' ) ) );
 $user_CommentList->no_results_text = $params['user_commentlist_no_results'];
 
 // Initialize Results object

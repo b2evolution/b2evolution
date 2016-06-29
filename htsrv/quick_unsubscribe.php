@@ -84,8 +84,14 @@ $edited_User = $UserCache->get_by_ID( $user_ID, false, false );
 
 			case 'comment_moderator':
 			case 'moderator': // Note: This was not chaned to 'comment_moderator' to make sure old emails unsubscribe link are also work
-				// unsubscribe from new comment may need moderation notifications
+				// unsubscribe from new comment may need moderation notifications:
 				$UserSettings->set( 'notify_comment_moderation', '0', $edited_User->ID );
+				$UserSettings->dbupdate();
+				break;
+
+			case 'comment_moderator_edit':
+				// unsubscribe from updated comment may need moderation notifications:
+				$UserSettings->set( 'notify_edit_cmt_moderation', '0', $edited_User->ID );
 				$UserSettings->dbupdate();
 				break;
 
@@ -96,8 +102,14 @@ $edited_User = $UserCache->get_by_ID( $user_ID, false, false );
 				break;
 
 			case 'post_moderator':
-				// unsubscribe from post moderation notifications
+				// unsubscribe from new post moderation notifications:
 				$UserSettings->set( 'notify_post_moderation', '0', $edited_User->ID );
+				$UserSettings->dbupdate();
+				break;
+
+			case 'post_moderator_edit':
+				// unsubscribe from updated post moderation notifications:
+				$UserSettings->set( 'notify_edit_pst_moderation', '0', $edited_User->ID );
 				$UserSettings->dbupdate();
 				break;
 
