@@ -209,30 +209,56 @@ function set_new_form_action( form, newaction )
 
 
 /**
- * Open the item in a preview window (a new window with target 'b2evo_preview'), by changing
+ * Update iframe to preview the item, by changing
  * the form's action attribute and target temporarily.
  *
  * fp> This is gonna die...
  */
-function b2edit_open_preview( form, newaction )
+function b2edit_update_item_preview( obj, form_action, submit_action )
 {
-	if( form.target == 'iframe_item_preview' )
-	{	// To avoid a double-click on the Preview button:
+	var form = jQuery( obj ).closest( 'form' );
+
+	if( form.attr( 'target' ) == 'iframe_item_preview' )
+	{	// To avoid a double-click on the Preview/Save button:
 		return false;
 	}
 
-	var saved_action = form.attributes.getNamedItem('action').value;
-	if( ! set_new_form_action(form, newaction) )
-	{
-		alert( "Preview not supported. Sorry. (Could not set form.action for preview)" );
-		return false;
+	if( typeof( form_action ) != 'undefined' && form_action !== false )
+	{	// Change form action url to new:
+		var saved_form_action = form.attr( 'action' );
+		if( ! set_new_form_action( form.get( 0 ), form_action ) )
+		{
+			alert( "Preview not supported. Sorry. (Could not set form.action for preview)" );
+			return false;
+		}
+	}
+
+	if( typeof( submit_action ) != 'undefined' )
+	{	// Save form action field value to new:
+		var saved_submit_action = form.find( 'input[name=action]' ).val();
+		if( form.find( 'input[name=action]' ).length == 0 )
+		{
+			form.append( '<input type="hidden" name="action" value="' + submit_action + '" />' );
+		}
+		else
+		{
+			form.find( 'input[name=action]' ).val( submit_action );
+		}
 	}
 
 	// Submit a form in special iframe for preview:
-	form.target = 'iframe_item_preview';
+	form.attr( 'target', 'iframe_item_preview' );
 	form.submit();
-	form.attributes.getNamedItem('action').value = saved_action;
-	form.target = '_self';
+
+	if( typeof( form_action ) != 'undefined' && form_action !== false )
+	{	// Revert form action url to original value:
+		form.attr( 'action', saved_form_action );
+	}
+	form.attr( 'target', '_self' );
+	if( typeof( submit_action ) != 'undefined' )
+	{	// Revert form action field value to original value:
+		form.find( 'input[name=action]' ).val( saved_submit_action );
+	}
 
 	// Unfold panel with preview iframe:
 	jQuery( '#fieldset_wrapper_itemform_preview.folded' ).removeClass( 'folded' );

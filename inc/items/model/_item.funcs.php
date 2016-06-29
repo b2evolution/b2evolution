@@ -1852,7 +1852,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	if( ! $inskin || $display_preview )
 	{
 		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
-		$Form->button( array( 'button', '', T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
+		$Form->button( array( 'button', '', T_('Preview'), 'PreviewButton', 'b2edit_update_item_preview( this, \''.$url.'\' );' ) );
 	}
 
 	// ---------- VISIBILITY ----------
@@ -1904,7 +1904,8 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	$next_action = ($creating ? 'create' : 'update');
 	if( ! $inskin && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 	{ // Show Save & Edit only on admin mode
-		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton btn-status-'.$edited_Item->status ) );
+		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'),
+			'SaveEditButton btn-status-'.$edited_Item->status, 'return b2edit_update_item_preview( this, false, "'.$next_action.'_preview" );' ) );
 	}
 
 	if( $inskin )
