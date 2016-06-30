@@ -18,7 +18,7 @@ global $Blog;
 
 // Create query
 $SQL = new SQL();
-$SQL->SELECT( 't.*, IF( tb.itc_ityp_ID > 0, 1, 0 ) AS type_enabled' );
+$SQL->SELECT( 't.*, IF( tb.itc_ityp_ID > 0, 1, 0 ) AS type_enabled, IF( ityp_ID = '.$Blog->get_setting( 'default_post_type' ).', 1, 0 ) AS type_default' );
 $SQL->FROM( 'T_items__type AS t' );
 $SQL->FROM_add( 'LEFT JOIN T_items__type_coll AS tb ON itc_ityp_ID = ityp_ID AND itc_coll_ID = '.$Blog->ID );
 
@@ -117,7 +117,8 @@ function ityp_row_enabled( $enabled, $item_type_ID )
 }
 $Results->cols[] = array(
 		'th' => sprintf( T_('Enabled in<br />%s'), $Blog->get( 'shortname' ) ),
-		'order' => 'ityp_perm_level',
+		'order' => 'type_enabled',
+		'default_dir' => 'D',
 		'td' => '%ityp_row_enabled( #type_enabled#, #ityp_ID# )%',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'center',
@@ -156,7 +157,8 @@ function ityp_row_default( $item_type_ID )
 }
 $Results->cols[] = array(
 		'th' => sprintf( T_('Default for<br />%s'), $Blog->get( 'shortname' ) ),
-		'order' => 'ityp_perm_level',
+		'order' => 'type_default',
+		'default_dir' => 'D',
 		'td' => '%ityp_row_default( #ityp_ID# )%',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'center',
