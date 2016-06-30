@@ -7628,6 +7628,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11815, 'Upgrade base domains table...') )
+	{ // part of 6.8.0-alpha
+		db_add_col( 'T_basedomains', 'dom_comment', 'VARCHAR(255) DEFAULT NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

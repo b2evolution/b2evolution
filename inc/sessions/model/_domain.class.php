@@ -31,6 +31,8 @@ class Domain extends DataObject
 
 	var $type;
 
+	var $comment;
+
 	/**
 	 * Constructor
 	 *
@@ -47,6 +49,7 @@ class Domain extends DataObject
 			$this->name = $db_row->dom_name;
 			$this->status = $db_row->dom_status;
 			$this->type = $db_row->dom_type;
+			$this->comment = $db_row->dom_comment;
 		}
 	}
 
@@ -67,6 +70,9 @@ class Domain extends DataObject
 
 		$dom_type = param( 'dom_type', 'string', true );
 		$this->set( 'type', $dom_type, true );
+
+		$dom_comment = param( 'dom_comment', 'string', true );
+		$this->set( 'comment', $dom_comment, true );
 
 		if( ! param_errors_detected() )
 		{ // Check domains with the same name and type
