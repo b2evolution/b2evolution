@@ -327,7 +327,11 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 
 	/* Front Page Secondary Area */
-	add_basic_widget( $blog_id, 'Front Page Secondary Area', 'org_members', 'core', 10 );
+	if( $kind == 'main' )
+	{	// Install the "Organization Members" widget only for Main collections:
+		add_basic_widget( $blog_id, 'Front Page Secondary Area', 'org_members', 'core', 10 );
+	}
+	add_basic_widget( $blog_id, 'Front Page Secondary Area', 'coll_flagged_list', 'core', 20 );
 
 
 	/* 404 Page */

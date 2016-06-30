@@ -124,6 +124,12 @@ class coll_item_list_Widget extends ComponentWidget
 						),
 					'defaultvalue' => 'all',
 				),
+				'flagged' => array(
+					'label' => T_('Flagged'),
+					'note' => T_('Do you want to restrict only to flagged contents?'),
+					'type' => 'checkbox',
+					'defaultvalue' => 0,
+				),
 				'follow_mainlist' => array(
 					'label' => T_('Follow Main List'),
 					'note' => T_('Do you want to restrict to contents related to what is displayed in the main area?'),
@@ -426,6 +432,11 @@ class coll_item_list_Widget extends ComponentWidget
 		elseif( $this->disp_params['featured'] == 'other' )
 		{	// Restrict to NOT featured Items:
 			$filters['featured'] = false;
+		}
+
+		if( $this->disp_params['flagged'] == 1 )
+		{	// Restrict to flagged Items:
+			$filters['flagged'] = true;
 		}
 
 
