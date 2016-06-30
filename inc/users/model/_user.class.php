@@ -6421,7 +6421,21 @@ class User extends DataObject
 			{
 				if( strtotime( $membership_expire_date ) < $localtimenow )
 				{	// The membership is expired for this user:
-					$Debuglog->add( sprintf( 'Secondary Group "%s" membership has expired for user "%s".', $user_secondary_Group->get_name(), $this->get( 'login' ) ), '_init_login' );
+					global $Debuglog, $DB;
+
+					$log_message = sprintf( 'Secondary Group "%s" membership has expired for user "%s".', $user_secondary_Group->get_name(), $this->get( 'login' ) );
+					$Debuglog->add( $log_message, '_init_login' );
+					syslog_insert( $log_message, 'warning', 'user', $this->ID );
+
+					// Remove membership of this user from DB:
+					$DB->query( 'DELETE FROM T_users__secondary_user_groups
+						WHERE sug_user_ID = '.$this->ID.'
+						  AND sug_grp_ID = '.$user_secondary_Group->ID );
+
+					if( isset( $this->secondary_groups[ $user_secondary_Group->ID ] ) )
+					{	// Remove membership of this user from cache:
+						unset( $this->secondary_groups[ $user_secondary_Group->ID ] );
+					}
 				}
 			}
 		}
@@ -6449,7 +6463,8 @@ class User extends DataObject
 			// Load all secondary group objects of this user in cache:
 			$GroupCache = & get_GroupCache();
 			$GroupCache->clear();
-			$this->secondary_groups = $GroupCache->load_by_sql( $secondary_groups_SQL );
+			$GroupCache->load_by_sql( $secondary_groups_SQL );
+			$this->secondary_groups = $GroupCache->cache;
 		}
 
 		return $this->secondary_groups;
