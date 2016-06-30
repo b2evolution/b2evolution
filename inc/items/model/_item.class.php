@@ -6533,6 +6533,65 @@ class Item extends ItemLight
 
 		// Get list of users who want to be notified:
 		// TODO: also use extra cats/blogs??
+		$sql = 'SELECT user_ID
+				FROM (
+					SELECT DISTINCT sub_user_ID AS user_ID
+					FROM T_subscriptions
+					WHERE sub_coll_ID = '.$this->get_blog_ID().'
+					AND sub_items <> 0
+
+					UNION
+
+					SELECT user_ID
+					FROM T_coll_settings
+					LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = cset_coll_ID AND bloggroup_ismember = 1 )
+					LEFT JOIN T_users ON ( user_grp_ID = bloggroup_group_ID )
+					LEFT JOIN T_subscriptions ON ( sub_coll_ID = cset_coll_ID AND sub_user_ID = user_ID )
+					WHERE cset_coll_ID = '.$this->get_blog_ID().'
+						AND cset_name = "opt_out_subscription"
+						AND cset_value = 1
+						AND NOT user_ID IS NULL
+						AND ( ( sub_items IS NULL OR sub_items = 1 ) OR ( sub_comments IS NULL OR sub_comments = 1 ) )
+
+					UNION
+
+					SELECT sug_user_ID
+					FROM T_coll_settings
+					LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = cset_coll_ID AND bloggroup_ismember = 1 )
+					LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
+					LEFT JOIN T_subscriptions ON ( sub_coll_ID = cset_coll_ID AND sub_user_ID = sug_user_ID )
+					WHERE cset_coll_ID = '.$this->get_blog_ID().'
+						AND cset_name = "opt_out_subscription"
+						AND cset_value = 1
+						AND NOT sug_user_ID IS NULL
+						AND ( ( sub_items IS NULL OR sub_items = 1 ) OR ( sub_comments IS NULL OR sub_comments = 1 ) )
+
+					UNION
+
+					SELECT bloguser_user_ID
+					FROM T_coll_settings
+					LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = cset_coll_ID AND bloguser_ismember = 1 )
+					LEFT JOIN T_subscriptions ON ( sub_coll_ID = cset_coll_ID AND sub_user_ID = bloguser_user_ID )
+					WHERE cset_coll_ID = '.$this->get_blog_ID().'
+						AND cset_name = "opt_out_subscription"
+						AND cset_value = 1
+						AND NOT bloguser_user_ID IS NULL
+						AND ( ( sub_items IS NULL OR sub_items = 1 ) OR ( sub_comments IS NULL OR sub_comments = 1 ) )
+				) AS users
+				WHERE NOT user_ID IS NULL';
+
+		if( ! empty( $already_notified_user_IDs ) )
+		{
+			$sql .= ' AND user_ID NOT IN ( '.implode( ',', $already_notified_user_IDs ).' )';
+		}
+		if( $executed_by_userid !== NULL )
+		{
+			$sql .= ' AND user_ID != '.$DB->quote( $executed_by_userid );
+		}
+
+		$notify_users = $DB->get_col( $sql, 0, 'Get users to be notified' );
+
+		/*
 		$SQL = new SQL( 'Get list of users who want to be notified about new items on colection #'.$this->get_blog_ID() );
 		$SQL->SELECT( 'DISTINCT sub_user_ID' );
 		$SQL->FROM( 'T_subscriptions' );
@@ -6546,7 +6605,9 @@ class Item extends ItemLight
 		{	// Don't notify the user who just created/updated this post:
 			$SQL->WHERE_and( 'sub_user_ID != '.$DB->quote( $executed_by_userid ) );
 		}
+
 		$notify_users = $DB->get_col( $SQL->get(), 0, $SQL->title );
+		*/
 
 		// Load all users who will be notified:
 		$UserCache = & get_UserCache();

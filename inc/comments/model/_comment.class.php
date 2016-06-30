@@ -3714,6 +3714,52 @@ class Comment extends DataObject
 			// Get list of users who want to be notified about the this post comments:
 			if( $comment_item_Blog->get_setting( 'allow_item_subscriptions' ) )
 			{	// If item subscriptions is allowed:
+				$sql = 'SELECT user_ID
+						FROM (
+							SELECT DISTINCT isub_user_ID AS user_ID
+							FROM T_items__subscriptions
+							WHERE isub_item_ID = '.$comment_Item->ID.'
+							AND isub_comments <> 0
+
+							UNION
+
+							SELECT user_ID
+							FROM T_coll_settings
+							LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = cset_coll_ID AND bloggroup_ismember = 1 )
+							LEFT JOIN T_users ON ( user_grp_ID = bloggroup_group_ID )
+							LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$comment_Item->ID.' AND isub_user_ID = user_ID )
+							WHERE cset_coll_ID = '.$comment_item_Blog->ID.'
+								AND cset_name = "opt_out_item_subscription"
+								AND cset_value = 1
+								AND NOT user_ID IS NULL
+								AND ( isub_comments IS NULL OR isub_comments = 1 )
+
+							UNION
+
+							SELECT sug_user_ID
+							FROM T_coll_settings
+							LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = cset_coll_ID AND bloggroup_ismember = 1 )
+							LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
+							LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$comment_Item->ID.' AND isub_user_ID = sug_user_ID )
+							WHERE cset_coll_ID = '.$comment_item_Blog->ID.'
+								AND cset_name = "opt_out_item_subscription"
+								AND cset_value = 1
+								AND NOT sug_user_ID IS NULL
+								AND ( isub_comments IS NULL OR isub_comments = 1 )
+
+							UNION
+
+							SELECT bloguser_user_ID
+							FROM T_coll_settings
+							LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = cset_coll_ID AND bloguser_ismember = 1 )
+							LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$comment_Item->ID.' AND isub_user_ID = bloguser_user_ID )
+							WHERE cset_coll_ID = '.$comment_item_Blog->ID.'
+								AND cset_name = "opt_out_item_subscription"
+								AND cset_value = 1
+								AND NOT bloguser_user_ID IS NULL
+								AND ( isub_comments IS NULL OR isub_comments = 1 )
+						) AS users'.$except_condition;
+
 				$sql = 'SELECT DISTINCT user_ID
 									FROM T_items__subscriptions INNER JOIN T_users ON isub_user_ID = user_ID
 								 WHERE isub_item_ID = '.$comment_Item->ID.'

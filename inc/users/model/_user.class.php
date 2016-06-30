@@ -1210,6 +1210,7 @@ class User extends DataObject
 				$subs_item_IDs = param( 'subs_item_IDs', 'string', true );
 
 				// Work the blogs:
+				$BlogCache = & get_BlogCache();
 				$subscription_values = array();
 				$opt_out_values = array();
 				$unsubscribed = array();
@@ -1231,11 +1232,7 @@ class User extends DataObject
 					{	// No subscription here:
 
 						// Check if opt-out and user is a member
-						$BlogCache = & get_BlogCache();
 						$Blog = & $BlogCache->get_by_ID( $loop_blog_ID );
-
-						$opt_out_collection = true;
-						$is_member = true;
 
 						if( $Blog->get_setting( 'opt_out_subscription' ) && $this->check_perm( 'blog_ismember', 'view', true, $loop_blog_ID ) )
 						{
@@ -1271,15 +1268,37 @@ class User extends DataObject
 				// Individual post subscriptions
 				if( !empty( $subs_item_IDs ) )
 				{ // user was subscribed to at least one post update notification
+					$ItemCache = & get_ItemCache();
 					$subs_item_IDs = explode( ',', $subs_item_IDs );
+					$opt_out_values = array();
 					$unsubscribed = array();
 					foreach( $subs_item_IDs as $loop_item_ID )
 					{
+						$isub_comments = param( 'items_subs_'.$loop_item_ID, 'integer', 0 );
+
 						if( !param( 'item_sub_'.$loop_item_ID, 'integer', 0 ) )
 						{ // user wants to unsubscribe from this post notifications
-							$unsubscribed[] = $loop_item_ID;
+							$Item = $ItemCache->get_by_ID( $loop_item_ID );
+							$blog_ID = $Item->get_blog_ID();
+							$Blog = $BlogCache->get_by_ID( $blog_ID );
+
+							if( $Blog->get_setting( 'opt_out_subscription' ) && $this->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
+							{
+								$opt_out_values[] = "( $loop_item_ID, $this->ID, $isub_comments )";
+							}
+							else
+							{
+								$unsubscribed[] = $loop_item_ID;
+							}
+
 						}
 					}
+					if( !empty( $opt_out_values ) )
+					{
+						$DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
+												VALUES '.implode( ', ', $opt_out_values ) );
+					}
+
 					if( !empty( $unsubscribed ) )
 					{ // unsubscribe list is not empty, delete not wanted subscriptions
 						$DB->query( 'DELETE FROM T_items__subscriptions
