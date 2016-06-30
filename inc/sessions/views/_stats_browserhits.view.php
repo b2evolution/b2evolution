@@ -17,6 +17,9 @@ global $blog, $admin_url, $AdminUI, $referer_type_color, $hit_type_color, $Hit;
 
 echo '<h2 class="page-title">'.T_('Hits from web browsers - Summary').get_manual_link('browser_hits_summary').'</h2>';
 
+// Display buttons to toggle between type of hits summary data(Live or Aggregate):
+display_hits_summary_toggler();
+
 // fplanque>> I don't get it, it seems that GROUP BY on the referer type ENUM fails pathetically!!
 // Bug report: http://lists.mysql.com/bugs/36
 // Solution : CAST to string
@@ -28,21 +31,36 @@ echo '<h2 class="page-title">'.T_('Hits from web browsers - Summary').get_manual
 // http://dev.mysql.com/doc/refman/4.1/en/cast-functions.html
 // TODO: I've also limited this to agent_type "browser" here, according to the change for "referers" (Rev 1.6)
 //       -> an RSS service that sends a referer is not a real referer (though it should be listed in the robots list)! (blueyed)
-$sql = '
-	SELECT SQL_NO_CACHE COUNT(*) AS hits, CONCAT(hit_referer_type) AS referer_type, hit_type, hit_sess_ID,
-			   EXTRACT(YEAR FROM hit_datetime) AS year,
-			   EXTRACT(MONTH FROM hit_datetime) AS month,
-			   EXTRACT(DAY FROM hit_datetime) AS day
-		FROM T_hitlog
-	 WHERE hit_agent_type = "browser"';
-
-if( $blog > 0 )
-{
-	$sql .= ' AND hit_coll_ID = '.$blog;
+$SQL = new SQL( 'Get hits summary from web browsers' );
+if( get_hits_summary_mode() == 'live' )
+{	// Get the live data:
+	$SQL->SELECT( 'SQL_NO_CACHE COUNT( * ) AS hits, hit_referer_type AS referer_type, hit_type,
+		EXTRACT( YEAR FROM hit_datetime ) AS year,
+		EXTRACT( MONTH FROM hit_datetime ) AS month,
+		EXTRACT( DAY FROM hit_datetime ) AS day' );
+	$SQL->FROM( 'T_hitlog' );
+	$SQL->WHERE( 'hit_agent_type = "browser"' );
+	if( $blog > 0 )
+	{	// Filter by collection:
+		$SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
+	}
 }
-$sql .= ' GROUP BY year, month, day, referer_type, hit_type, hit_sess_ID
-					ORDER BY year DESC, month DESC, day DESC, referer_type, hit_type';
-$res_hits = $DB->get_results( $sql, ARRAY_A, 'Get hit summary' );
+else
+{	// Get the aggregated data:
+	$SQL->SELECT( 'SUM( hagg_count ) AS hits, hagg_referer_type AS referer_type, hagg_type AS hit_type,
+		EXTRACT( YEAR FROM hagg_date ) AS year,
+		EXTRACT( MONTH FROM hagg_date ) AS month,
+		EXTRACT( DAY FROM hagg_date ) AS day' );
+	$SQL->FROM( 'T_hits__aggregate' );
+	$SQL->WHERE( 'hagg_agent_type = "browser"' );
+	if( $blog > 0 )
+	{	// Filter by collection:
+		$SQL->WHERE_and( 'hagg_coll_ID = '.$DB->quote( $blog ) );
+	}
+}
+$SQL->GROUP_BY( 'year, month, day, referer_type, hit_type' );
+$SQL->ORDER_BY( 'year DESC, month DESC, day DESC, referer_type, hit_type' );
+$res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
 
 /*
  * Chart

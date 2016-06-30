@@ -19,18 +19,39 @@ echo '<h2 class="page-title">'.T_('Hits from RSS/Atom feed readers - Summary').g
 
 echo '<p class="notes">'.T_('Any user agent accessing the XML feeds will be flagged as an XML reader.').'</p>';
 
-$sql = "
-	SELECT SQL_NO_CACHE COUNT(*) AS hits, EXTRACT(YEAR FROM hit_datetime) AS year,
-			   EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day
-		FROM T_hitlog
-	 WHERE hit_type = 'rss'";
-if( $blog > 0 )
-{
-	$sql .= ' AND hit_coll_ID = '.$blog;
+// Display buttons to toggle between type of hits summary data(Live or Aggregate):
+display_hits_summary_toggler();
+
+$SQL = new SQL( 'Get RSS/Atom feed readers hits summary' );
+if( get_hits_summary_mode() == 'live' )
+{	// Get the live data:
+	$SQL->SELECT( 'SQL_NO_CACHE COUNT( * ) AS hits,
+		EXTRACT( YEAR FROM hit_datetime ) AS year,
+		EXTRACT( MONTH FROM hit_datetime ) AS month,
+		EXTRACT( DAY FROM hit_datetime ) AS day' );
+	$SQL->FROM( 'T_hitlog' );
+	$SQL->WHERE( 'hit_type = "rss"' );
+	if( $blog > 0 )
+	{	// Filter by collection:
+		$SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
+	}
 }
-$sql .= ' GROUP BY year, month, day
-					ORDER BY year DESC, month DESC, day DESC';
-$res_hits = $DB->get_results( $sql, ARRAY_A, 'Get rss summary' );
+else
+{	// Get the aggregated data:
+	$SQL->SELECT( 'SUM( hagg_count ) AS hits,
+		EXTRACT( YEAR FROM hagg_date ) AS year,
+		EXTRACT( MONTH FROM hagg_date ) AS month,
+		EXTRACT( DAY FROM hagg_date ) AS day' );
+	$SQL->FROM( 'T_hits__aggregate' );
+	$SQL->WHERE( 'hagg_type = "rss"' );
+	if( $blog > 0 )
+	{	// Filter by collection:
+		$SQL->WHERE_and( 'hagg_coll_ID = '.$DB->quote( $blog ) );
+	}
+}
+$SQL->GROUP_BY( 'year, month, day' );
+$SQL->ORDER_BY( 'year DESC, month DESC, day DESC' );
+$res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
 
 
 /*

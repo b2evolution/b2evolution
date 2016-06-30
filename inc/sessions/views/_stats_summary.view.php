@@ -17,22 +17,42 @@ global $blog, $admin_url, $AdminUI, $agent_type_color, $hit_type_color, $Hit;
 
 echo '<h2 class="page-title">'.T_('Global hits - Summary').get_manual_link('global_hits_summary').'</h2>';
 
+// Display buttons to toggle between type of hits summary data(Live or Aggregate):
+display_hits_summary_toggler();
+
 // fplanque>> I don't get it, it seems that GROUP BY on the referer type ENUM fails pathetically!!
 // Bug report: http://lists.mysql.com/bugs/36
 // Solution : CAST to string
 // TODO: I've also limited this to hit_agent_type "browser" here, according to the change for "referers" (Rev 1.6)
 //       -> an RSS service that sends a referer is not a real referer (though it should be listed in the robots list)! (blueyed)
-$sql = '
-	SELECT SQL_NO_CACHE COUNT(*) AS hits, hit_agent_type, hit_type, EXTRACT(YEAR FROM hit_datetime) AS year,
-			   EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day
-		FROM T_hitlog';
-if( $blog > 0 )
-{
-	$sql .= ' WHERE hit_coll_ID = '.$blog;
+$SQL = new SQL( 'Get global hits summary ('.( get_hits_summary_mode() == 'live' ? 'Live data' : 'Aggregate data' ).')' );
+if( get_hits_summary_mode() == 'live' )
+{	// Get the live data:
+	$SQL->SELECT( 'SQL_NO_CACHE COUNT( * ) AS hits, hit_agent_type, hit_type,
+		EXTRACT( YEAR FROM hit_datetime ) AS year,
+		EXTRACT( MONTH FROM hit_datetime ) AS month,
+		EXTRACT( DAY FROM hit_datetime ) AS day' );
+	$SQL->FROM( 'T_hitlog' );
+	if( $blog > 0 )
+	{	// Filter by collection:
+		$SQL->WHERE( 'hit_coll_ID = '.$DB->quote( $blog ) );
+	}
 }
-$sql .= ' GROUP BY year, month, day, hit_agent_type, hit_type
-					ORDER BY year DESC, month DESC, day DESC, hit_agent_type, hit_type';
-$res_hits = $DB->get_results( $sql, ARRAY_A, 'Get hit summary' );
+else
+{	// Get the aggregated data:
+	$SQL->SELECT( 'SUM( hagg_count ) AS hits, hagg_agent_type AS hit_agent_type, hagg_type AS hit_type,
+		EXTRACT( YEAR FROM hagg_date ) AS year,
+		EXTRACT( MONTH FROM hagg_date ) AS month,
+		EXTRACT( DAY FROM hagg_date ) AS day' );
+	$SQL->FROM( 'T_hits__aggregate' );
+	if( $blog > 0 )
+	{	// Filter by collection:
+		$SQL->WHERE( 'hagg_coll_ID = '.$DB->quote( $blog ) );
+	}
+}
+$SQL->GROUP_BY( 'year, month, day, hit_agent_type, hit_type' );
+$SQL->ORDER_BY( 'year DESC, month DESC, day DESC, hit_agent_type, hit_type' );
+$res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
 
 
 /*
