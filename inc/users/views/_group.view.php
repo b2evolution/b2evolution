@@ -116,6 +116,7 @@ function grp_row_users_count( $group_ID, $primary_users_count, $secondary_users_
 $Results->cols[] = array(
 		'th' => T_('User count'),
 		'order' => 'primary_users_count, secondary_users_count',
+		'default_dir' => 'D',
 		'td' => '%grp_row_users_count( #grp_ID#, #primary_users_count#, #secondary_users_count# )%',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
