@@ -7604,7 +7604,7 @@ function check_user_email_delivery_issue()
 		return true;
 	}
 
-	if( $user_EmailAddress->get( 'status' ) == 'unknown' )
+	if( $user_EmailAddress->get( 'status' ) != 'suspicious3' && $user_EmailAddress->get( 'status' ) != 'prmerror' )
 	{	// User's email has no restricted status:
 		return true;
 	}
@@ -7630,7 +7630,7 @@ function check_user_email_delivery_issue()
 
 	if( ! is_same_url( $ReqURL, str_replace( '&amp;', '&', $subs_url ) ) )
 	{	// Display a warning only on not same page where we send user to solve the issue:
-		$Messages->add( sprintf( T_('It seems you don\'t get our emails, <a %s>click here to resolve</a>'), 'href="'.$subs_url.'"' ), 'warning' );
+		$Messages->add( sprintf( T_('It seems you are not receiving or notification emails. <a %s>Click here to resolve</a>.'), 'href="'.$subs_url.'"' ), 'warning' );
 	}
 
 	return false;

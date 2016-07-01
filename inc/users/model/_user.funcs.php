@@ -4110,7 +4110,12 @@ function find_users_with_same_email( $user_ID, $user_email, $message )
  */
 function display_user_email_status_message( $user_ID = 0 )
 {
-	global $Messages, $current_User, $Blog, $disp;
+	global $Messages, $current_User, $Blog, $disp, $user_email_status_message_displayed;
+
+	if( ! empty( $user_email_status_message_displayed ) )
+	{	// Don't display the message twice:
+		return;
+	}
 
 	if( ! is_logged_in() || ( $user_ID != 0 && $user_ID != $current_User->ID ) )
 	{ // User must be logged in AND only for current User
@@ -4187,6 +4192,8 @@ function display_user_email_status_message( $user_ID = 0 )
 				), 'note' );
 			break;
 	}
+
+	$user_email_status_message_displayed = true;
 }
 
 
@@ -4660,7 +4667,7 @@ function check_access_users_list( $mode = 'normal' )
  */
 function check_access_user_profile( $user_ID, $mode = 'normal' )
 {
-	global $Blog, $baseurl, $Settings, $current_User, $Settings;
+	global $Blog, $baseurl, $Settings, $current_User, $Settings, $Messages;
 
 	// Set where to redirect in case of error:
 	$error_redirect_to = ( empty( $Blog ) ? $baseurl : $Blog->gen_blogurl() );

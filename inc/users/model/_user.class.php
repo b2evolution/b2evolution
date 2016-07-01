@@ -2207,41 +2207,54 @@ class User extends DataObject
 	 * @param boolean Set TRUE if changing of account status is required
 	 * @return boolean true, if set; false if not changed
 	 */
-	function set_email( $email, $change_status = true )
+	function set_email( $email, $change_user_status = true )
 	{
 		global $Settings;
 
 		$r = parent::set_param( 'email', 'string', utf8_strtolower( $email ) );
 
-		if( $change_status )
-		{ // Change user status to 'emailchanged' (if email has changed and Settings are available, which they are not during install):
-			if( $r && ( $this->ID != 0 ) && isset($Settings) && $Settings->get('newusers_revalidate_emailchg') && ( $this->check_status( 'is_validated' ) ) )
-			{ // Deactivate the account, because the changed email has not been verified yet, but the user account is active:
+		if( $r && $this->ID != 0 )
+		{	// If user email has been changed to new value:
+
+			// Change user status to 'emailchanged' (if email has changed and Settings are available, which they are not during install):
+			if( $change_user_status && isset($Settings) && $Settings->get('newusers_revalidate_emailchg') && ( $this->check_status( 'is_validated' ) ) )
+			{	// Deactivate the account, because the changed email has not been verified yet, but the user account is active:
 				$this->set( 'status', 'emailchanged' );
+			}
+
+			// Change email status to "Redemption":
+			$EmailAddressCache = & get_EmailAddressCache();
+			if( $EmailAddress = & $EmailAddressCache->get_by_name( $this->get( 'email' ), false, false ) )
+			{	// If email address exists in DB:
+				if( ! in_array( $EmailAddress->get( 'status' ), array( 'unknown', 'redemption', 'suspicious3', 'prmerror', 'spammer' ) ) )
+				{	// If email address status is not from list above:
+					$EmailAddress->set( 'status', 'redemption' );
+					$EmailAddress->dbupdate();
+				}
 			}
 		}
 
 		if( preg_match( '#@(.+)#i', $email, $ematch ) )
-		{	// Set email domain ID
+		{	// Set email domain ID:
 			global $DB;
 
 			$email_domain = $ematch[1];
 
-			$SQL = new SQL();
+			$SQL = new SQL( 'Get domain by email address of the updated user #'.$this->ID );
 			$SQL->SELECT( 'dom_ID' );
 			$SQL->FROM( 'T_basedomains' );
 			$SQL->WHERE( 'dom_type = \'email\'' );
 			$SQL->WHERE_and( 'dom_name = '.$DB->quote( $email_domain ) );
 
-			$dom_ID = $DB->get_var( $SQL->get() );
+			$dom_ID = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
 			if( !$dom_ID )
-			{	// The email domains doesn't exist yet, Insert new record
+			{	// The email domains doesn't exist yet, Insert new record:
 				$DB->query( 'INSERT INTO T_basedomains ( dom_type, dom_name )
 					VALUES ( \'email\', '.$DB->quote( $email_domain ).' )' );
 				$dom_ID = $DB->insert_id;
 			}
 
-			$this->set( 'email_dom_ID', (int) $dom_ID );
+			$this->set( 'email_dom_ID', intval( $dom_ID ) );
 		}
 
 		return $r;
