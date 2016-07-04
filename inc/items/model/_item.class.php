@@ -7839,7 +7839,18 @@ class Item extends ItemLight
 								$thumbnail_classes = array_merge( $thumbnail_classes, $extra_classes );
 							}
 
-							$link_tag = $File->get_thumb_imgtag( $thumbnail_size, implode( ' ', $thumbnail_classes ) );
+							$current_image_params = array(
+								'before_image'        => '',
+								'before_image_legend' => '', // can be NULL
+								'after_image_legend'  => '',
+								'after_image'         => '',
+								'image_size'          => $thumbnail_size,
+								'image_link_to'       => 'original',
+								'image_link_title'    => '',	// can be text or #title# or #desc#
+								'image_class'         => implode( ' ', $thumbnail_classes ),
+							);
+
+							$link_tag = $this->get_attached_image_tag( $Link, $current_image_params );
 						}
 						else
 						{
