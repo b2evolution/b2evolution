@@ -6416,7 +6416,7 @@ class User extends DataObject
 
 		foreach( $user_secondary_groups as $user_secondary_Group )
 		{
-			$membership_expire_date = $user_secondary_Group->get_expire_date( $this );
+			$membership_expire_date = $user_secondary_Group->get_expire_date( $this, 'Y-m-d H:i:s' );
 			if( ! empty( $membership_expire_date ) )
 			{
 				if( strtotime( $membership_expire_date ) < $localtimenow )

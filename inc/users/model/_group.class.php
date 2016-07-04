@@ -639,7 +639,7 @@ class Group extends DataObject
 		// Get a value from cache:
 		if( array_key_exists( $User->ID, $this->expire_dates ) )
 		{	// User has a membership with this secondary group
-			return empty( $this->expire_dates[ $User->ID ] ) ? NULL : mysql2date( $date_format, $this->expire_dates[ $User->ID ].' 00:00:00' );
+			return empty( $this->expire_dates[ $User->ID ] ) ? NULL : mysql2date( $date_format, $this->expire_dates[ $User->ID ].' 23:59:59' );
 		}
 		else
 		{	// User has no membership:
