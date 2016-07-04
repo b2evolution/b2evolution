@@ -22,7 +22,10 @@ echo '<p class="notes">'.T_('Any user agent accessing the XML feeds will be flag
 // Display buttons to toggle between type of hits summary data(Live or Aggregate):
 display_hits_summary_toggler();
 
-$SQL = new SQL( 'Get RSS/Atom feed readers hits summary' );
+// Check if it is a mode to display a live data:
+$is_live_mode = ( get_hits_summary_mode() == 'live' );
+
+$SQL = new SQL( 'Get RSS/Atom feed readers hits summary ('.( $is_live_mode ? 'Live data' : 'Aggregate data' ).')' );
 if( get_hits_summary_mode() == 'live' )
 {	// Get the live data:
 	$SQL->SELECT( 'SQL_NO_CACHE COUNT( * ) AS hits,
@@ -66,12 +69,14 @@ if( count($res_hits) )
 
 	$chart['dates'] = array();
 
-	// Initialize the data to open an url by click on bar item
-	$chart['link_data'] = array();
-	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&hit_type=$param1$';
-	$chart['link_data']['params'] = array(
-			array( 'rss' )
-		);
+	if( $is_live_mode )
+	{	// Initialize the data to open an url by click on bar item
+		$chart['link_data'] = array();
+		$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&hit_type=$param1$';
+		$chart['link_data']['params'] = array(
+				array( 'rss' )
+			);
+	}
 
 	$count = 0;
 	foreach( $res_hits as $row_stats )
@@ -121,14 +126,14 @@ if( count($res_hits) )
 		<tr class="<?php echo ( $r % 2 == 1 ) ? 'odd' : 'even'; ?>">
 			<td class="firstcol shrinkwrap" style="text-align:right"><?php
 				echo date( 'D '.locale_datefmt(), $this_date );
-				if( $current_User->check_perm( 'stats', 'edit' ) )
-				{
+				if( $is_live_mode && $current_User->check_perm( 'stats', 'edit' ) )
+				{	// Display a link to prune hits only for live data and if current user has a permission:
 					echo action_icon( T_('Prune hits for this date!'), 'delete', $admin_url.'?ctrl=stats&amp;action=prune&amp;date='.$this_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb( 'stats' ) );
 				}
 			?></td>
-			<td class="lastcol right"><a href="<?php echo $admin_url.'?ctrl=stats&amp;tab=hits&amp;'
+			<td class="lastcol right"><?php echo $is_live_mode ? '<a href="'.$admin_url.'?ctrl=stats&amp;tab=hits&amp;'
 				.'datestartinput='.urlencode( date( locale_datefmt() , $this_date ) ).'&amp;'
-				.'datestopinput='.urlencode( date( locale_datefmt(), $this_date ) ).'&amp;blog='.$blog.'&amp;hit_type=rss'; ?>"><?php echo $row_stats['hits']; ?></a></td>
+				.'datestopinput='.urlencode( date( locale_datefmt(), $this_date ) ).'&amp;blog='.$blog.'&amp;hit_type=rss">'.$row_stats['hits'].'</a>' : $row_stats['hits']; ?></td>
 		</tr>
 		<?php
 		// Increment total hits counter:
@@ -139,7 +144,7 @@ if( count($res_hits) )
 	?>
 		<tr class="total">
 			<td class="firstcol"><?php echo T_('Total') ?></td>
-			<td class="lastcol right"><a href="<?php echo $admin_url.'?ctrl=stats&amp;tab=hits&amp;blog='.$blog.'&amp;hit_type=rss'; ?>"><?php echo $hits_total; ?></a></td>
+			<td class="lastcol right"><?php echo $is_live_mode ? '<a href="'.$admin_url.'?ctrl=stats&amp;tab=hits&amp;blog='.$blog.'&amp;hit_type=rss">'.$hits_total.'</a>' : $hits_total; ?></td>
 		</tr>
 	</table>
 	<?php

@@ -20,6 +20,9 @@ echo '<h2 class="page-title">'.T_('Hits from web browsers - Summary').get_manual
 // Display buttons to toggle between type of hits summary data(Live or Aggregate):
 display_hits_summary_toggler();
 
+// Check if it is a mode to display a live data:
+$is_live_mode = ( get_hits_summary_mode() == 'live' );
+
 // fplanque>> I don't get it, it seems that GROUP BY on the referer type ENUM fails pathetically!!
 // Bug report: http://lists.mysql.com/bugs/36
 // Solution : CAST to string
@@ -31,8 +34,8 @@ display_hits_summary_toggler();
 // http://dev.mysql.com/doc/refman/4.1/en/cast-functions.html
 // TODO: I've also limited this to agent_type "browser" here, according to the change for "referers" (Rev 1.6)
 //       -> an RSS service that sends a referer is not a real referer (though it should be listed in the robots list)! (blueyed)
-$SQL = new SQL( 'Get hits summary from web browsers' );
-if( get_hits_summary_mode() == 'live' )
+$SQL = new SQL( 'Get hits summary from web browsers ('.( $is_live_mode ? 'Live data' : 'Aggregate data' ).')' );
+if( $is_live_mode )
 {	// Get the live data:
 	$SQL->SELECT( 'SQL_NO_CACHE COUNT( * ) AS hits, hit_referer_type AS referer_type, hit_type,
 		GROUP_CONCAT( DISTINCT hit_sess_ID SEPARATOR "," ) AS sessions,
@@ -99,19 +102,21 @@ if( count($res_hits) )
 	// Draw last data as line
 	$chart['draw_last_line'] = true;
 
-	// Initialize the data to open an url by click on bar item
-	$chart['link_data'] = array();
-	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&agent_type=browser&referer_type=$param1$&hit_type=$param2$';
-	$chart['link_data']['params'] = array(
-			array( 'search',  '' ),
-			array( 'referer', '' ),
-			array( 'direct',  '' ),
-			array( 'self',    '' ),
-			array( '',        'ajax' ),
-			array( 'special', '' ),
-			array( 'spam',    '' ),
-			array( '',        'admin' )
-		);
+	if( $is_live_mode )
+	{	// Initialize the data to open an url by click on bar item:
+		$chart['link_data'] = array();
+		$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&agent_type=browser&referer_type=$param1$&hit_type=$param2$';
+		$chart['link_data']['params'] = array(
+				array( 'search',  '' ),
+				array( 'referer', '' ),
+				array( 'direct',  '' ),
+				array( 'self',    '' ),
+				array( '',        'ajax' ),
+				array( 'special', '' ),
+				array( 'spam',    '' ),
+				array( '',        'admin' )
+			);
+	}
 
 	$count = 0;
 	$sessions = array();
@@ -254,21 +259,21 @@ if( count($res_hits) )
 				<tr class="<?php echo ( $count%2 == 1 ) ? 'odd' : 'even'; ?>">
 					<td class="firstcol right"><?php
 						echo date( 'D '.locale_datefmt(), $last_date );
-						if( $current_User->check_perm( 'stats', 'edit' ) )
-						{
+						if( $is_live_mode && $current_User->check_perm( 'stats', 'edit' ) )
+						{	// Display a link to prune hits only for live data and if current user has a permission:
 							echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb('stats') ) );
 						}
 					?></td>
-				<td class="right"><?php echo count( $sessions[ $last_date ] ); ?></td>
-				<td class="right"><a href="<?php echo $link_text.'&referer_type=search'?>"><?php echo $hits['search'] ?></a></td>
-				<td class="right"><a href="<?php echo $link_text.'&referer_type=referer'?>"><?php echo $hits['referer'] ?></a></td>
-				<td class="right"><a href="<?php echo $link_text.'&referer_type=direct'?>"><?php echo $hits['direct'] ?></a></td>
-				<td class="right"><a href="<?php echo $link_text.'&referer_type=self'?>"><?php echo $hits['self'] ?></a></td>
-				<td class="right"><a href="<?php echo $link_text.'&hit_type=ajax'?>"><?php echo $hits['ajax'] ?></a></td>
-				<td class="right"><a href="<?php echo $link_text.'&referer_type=special'?>"><?php echo $hits['special'] ?></a></td>
-				<td class="right"><a href="<?php echo $link_text.'&referer_type=spam'?>"><?php echo $hits['spam'] ?></a></td>
-				<td class="right"><a href="<?php echo $link_text.'&hit_type=admin'?>"><?php echo $hits['admin'] ?></a></td>
-				<td class="lastcol right"><a href="<?php echo $link_text_total_day ?>"><?php echo array_sum( $hits ) ?></a></td>
+					<td class="right"><?php echo count( $sessions[ $last_date ] ); ?></td>
+					<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=search">'.$hits['search'].'</a>' : $hits['search']; ?></td>
+					<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=referer">'.$hits['referer'].'</a>' : $hits['referer']; ?></td>
+					<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=direct">'.$hits['direct'].'</a>' : $hits['direct']; ?></td>
+					<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=self">'.$hits['self'].'</a>' : $hits['self']; ?></td>
+					<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=ajax">'.$hits['ajax'].'</a>' : $hits['ajax']; ?></td>
+					<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=special">'.$hits['special'].'</a>' : $hits['special']; ?></td>
+					<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=spam">'.$hits['spam'].'</a>' : $hits['spam']; ?></td>
+					<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=admin">'.$hits['admin'].'</a>' : $hits['admin']; ?></td>
+					<td class="lastcol right"><?php echo $is_live_mode ? '<a href="'.$link_text_total_day.'">'.array_sum( $hits ).'</a>' : array_sum( $hits ); ?></td>
 				</tr>
 				<?php
 					$hits = array(
@@ -317,21 +322,21 @@ if( count($res_hits) )
 				<tr class="<?php echo ( $count%2 == 1 ) ? 'odd' : 'even'; ?>">
 				<td class="firstcol right"><?php
 					echo date( 'D '.locale_datefmt(), $this_date );
-					if( $current_User->check_perm( 'stats', 'edit' ) )
-					{
+					if( $is_live_mode && $current_User->check_perm( 'stats', 'edit' ) )
+					{	// Display a link to prune hits only for live data and if current user has a permission:
 						echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb('stats') ) );
 					}
 				?></td>
 				<td class="right"><?php echo count( $sessions[ $last_date ] ); ?></td>
-				<td class="right"><a href="<?php echo $link_text.'&referer_type=search'?>"><?php echo $hits['search'] ?></a></td>
-				<td class="right"><a href="<?php echo $link_text.'&referer_type=referer'?>"><?php echo $hits['referer'] ?></a></td>
-				<td class="right"><a href="<?php echo $link_text.'&referer_type=direct'?>"><?php echo $hits['direct'] ?></a></td>
-				<td class="right"><a href="<?php echo $link_text.'&referer_type=self'?>"><?php echo $hits['self'] ?></a></td>
-				<td class="right"><a href="<?php echo $link_text.'&hit_type=ajax'?>"><?php echo $hits['ajax'] ?></a></td>
-				<td class="right"><a href="<?php echo $link_text.'&referer_type=special'?>"><?php echo $hits['special'] ?></a></td>
-				<td class="right"><a href="<?php echo $link_text.'&referer_type=spam'?>"><?php echo $hits['spam'] ?></a></td>
-				<td class="right"><a href="<?php echo $link_text.'&hit_type=admin'?>"><?php echo $hits['admin'] ?></a></td>
-				<td class="lastcol right"><a href="<?php echo $link_text_total_day ?>"><?php echo array_sum( $hits ) ?></a></td>
+				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=search">'.$hits['search'].'</a>' : $hits['search']; ?></td>
+				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=referer">'.$hits['referer'].'</a>' : $hits['referer']; ?></td>
+				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=direct">'.$hits['direct'].'</a>' : $hits['direct']; ?></td>
+				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=self">'.$hits['self'].'</a>' : $hits['self']; ?></td>
+				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=ajax">'.$hits['ajax'].'</a>' : $hits['ajax']; ?></td>
+				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=special">'.$hits['special'].'</a>' : $hits['special']; ?></td>
+				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=spam">'.$hits['spam'].'</a>' : $hits['spam']; ?></td>
+				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=admin">'.$hits['admin'].'</a>' : $hits['admin']; ?></td>
+				<td class="lastcol right"><?php echo $is_live_mode ? '<a href="'.$link_text_total_day.'">'.array_sum( $hits ).'</a>' : array_sum( $hits ); ?></td>
 			</tr>
 			<?php
 		}
@@ -355,17 +360,17 @@ if( count($res_hits) )
 		?>
 
 		<tr class="total">
-		<td class="firstcol"><?php echo T_('Total') ?></td>
-		<td class="right"><?php echo count( $total_sessions ); ?></td>
-		<td class="right"><a href="<?php echo $link_text_total.'&referer_type=search'?>"><?php echo $hits_total['search'] ?></a></td>
-		<td class="right"><a href="<?php echo $link_text_total.'&referer_type=referer'?>"><?php echo $hits_total['referer'] ?></a></td>
-		<td class="right"><a href="<?php echo $link_text_total.'&referer_type=direct'?>"><?php echo $hits_total['direct'] ?></a></td>
-		<td class="right"><a href="<?php echo $link_text_total.'&referer_type=self'?>"><?php echo $hits_total['self'] ?></a></td>
-		<td class="right"><a href="<?php echo $link_text_total.'&hit_type=ajax'?>"><?php echo $hits_total['ajax'] ?></a></td>
-		<td class="right"><a href="<?php echo $link_text_total.'&referer_type=special'?>"><?php echo $hits_total['special'] ?></a></td>
-		<td class="right"><a href="<?php echo $link_text_total.'&referer_type=spam'?>"><?php echo $hits_total['spam'] ?></a></td>
-		<td class="right"><a href="<?php echo $link_text_total.'&hit_type=admin'?>"><?php echo $hits_total['admin'] ?></a></td>
-		<td class="lastcol right"><a href="<?php echo $link_text_total?>"><?php echo array_sum( $hits_total ) ?></a></td>
+			<td class="firstcol"><?php echo T_('Total') ?></td>
+			<td class="right"><?php echo count( $total_sessions ); ?></td>
+			<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&referer_type=search">'.$hits_total['search'].'</a>' : $hits_total['search']; ?></td>
+			<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&referer_type=referer">'.$hits_total['referer'].'</a>' : $hits_total['referer']; ?></td>
+			<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&referer_type=direct">'.$hits_total['direct'].'</a>' : $hits_total['direct']; ?></td>
+			<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&referer_type=self">'.$hits_total['self'].'</a>' : $hits_total['self']; ?></td>
+			<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&hit_type=ajax">'.$hits_total['ajax'].'</a>' : $hits_total['ajax']; ?></td>
+			<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&referer_type=special">'.$hits_total['special'].'</a>' : $hits_total['special']; ?></td>
+			<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&referer_type=spam">'.$hits_total['spam'].'</a>' : $hits_total['spam']; ?></td>
+			<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&hit_type=admin">'.$hits_total['admin'].'</a>' : $hits_total['admin']; ?></td>
+			<td class="lastcol right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'">'.array_sum( $hits_total ).'</a>' : array_sum( $hits_total ); ?></td>
 		</tr>
 
 	</table>
