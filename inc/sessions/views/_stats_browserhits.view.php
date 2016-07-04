@@ -35,6 +35,7 @@ $SQL = new SQL( 'Get hits summary from web browsers' );
 if( get_hits_summary_mode() == 'live' )
 {	// Get the live data:
 	$SQL->SELECT( 'SQL_NO_CACHE COUNT( * ) AS hits, hit_referer_type AS referer_type, hit_type,
+		GROUP_CONCAT( DISTINCT hit_sess_ID SEPARATOR "," ) AS sessions,
 		EXTRACT( YEAR FROM hit_datetime ) AS year,
 		EXTRACT( MONTH FROM hit_datetime ) AS month,
 		EXTRACT( DAY FROM hit_datetime ) AS day' );
@@ -48,6 +49,7 @@ if( get_hits_summary_mode() == 'live' )
 else
 {	// Get the aggregated data:
 	$SQL->SELECT( 'SUM( hagg_count ) AS hits, hagg_referer_type AS referer_type, hagg_type AS hit_type,
+		"" AS sessions,
 		EXTRACT( YEAR FROM hagg_date ) AS year,
 		EXTRACT( MONTH FROM hagg_date ) AS month,
 		EXTRACT( DAY FROM hagg_date ) AS day' );
@@ -112,6 +114,7 @@ if( count($res_hits) )
 		);
 
 	$count = 0;
+	$sessions = array();
 	foreach( $res_hits as $row_stats )
 	{
 		$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
@@ -152,8 +155,22 @@ if( count($res_hits) )
 			}
 		}
 
+		if( ! isset( $sessions[ $this_date ] ) )
+		{	// Initialize array to count sessions for each date:
+			$sessions[ $this_date ] = array();
+		}
+		$row_sessions = explode( ',', $row_stats['sessions'] );
+		foreach( $row_sessions as $row_session )
+		{
+			if( ! in_array( $row_session, $sessions[ $this_date ] ) )
+			{	// Count only unique session IDs:
+				$sessions[ $this_date ][] = $row_session;
+			}
+		}
+
+		// Store a count of sessions:
 		$col = $col_mapping['session'];
-		$chart['chart_data'][ $col ][0]++;
+		$chart['chart_data'][ $col ][0] = count( $sessions[ $this_date ] );
 	}
 
 	array_unshift( $chart[ 'chart_data' ][ 0 ], '' );
@@ -191,7 +208,6 @@ if( count($res_hits) )
 	 * Table:
 	 */
 	$hits = array(
-		'session' => 0,
 		'direct' => 0,
 		'referer' => 0,
 		'search' => 0,
@@ -243,7 +259,7 @@ if( count($res_hits) )
 							echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb('stats') ) );
 						}
 					?></td>
-				<td class="right"><?php echo $hits['session'] ?></td>
+				<td class="right"><?php echo count( $sessions[ $last_date ] ); ?></td>
 				<td class="right"><a href="<?php echo $link_text.'&referer_type=search'?>"><?php echo $hits['search'] ?></a></td>
 				<td class="right"><a href="<?php echo $link_text.'&referer_type=referer'?>"><?php echo $hits['referer'] ?></a></td>
 				<td class="right"><a href="<?php echo $link_text.'&referer_type=direct'?>"><?php echo $hits['direct'] ?></a></td>
@@ -252,11 +268,10 @@ if( count($res_hits) )
 				<td class="right"><a href="<?php echo $link_text.'&referer_type=special'?>"><?php echo $hits['special'] ?></a></td>
 				<td class="right"><a href="<?php echo $link_text.'&referer_type=spam'?>"><?php echo $hits['spam'] ?></a></td>
 				<td class="right"><a href="<?php echo $link_text.'&hit_type=admin'?>"><?php echo $hits['admin'] ?></a></td>
-				<td class="lastcol right"><a href="<?php echo $link_text_total_day ?>"><?php echo array_sum( $hits ) - $hits['session'] ?></a></td>
+				<td class="lastcol right"><a href="<?php echo $link_text_total_day ?>"><?php echo array_sum( $hits ) ?></a></td>
 				</tr>
 				<?php
 					$hits = array(
-						'session' => 0,
 						'direct' => 0,
 						'referer' => 0,
 						'search' => 0,
@@ -290,10 +305,6 @@ if( count($res_hits) )
 					$hits_total[$row_stats['referer_type']] += $row_stats['hits'];
 				}
 			}
-
-			$hits['session']++;
-			$hits_total['session']++;
-
 		}
 
 		if( $last_date != 0 )
@@ -311,7 +322,7 @@ if( count($res_hits) )
 						echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb('stats') ) );
 					}
 				?></td>
-				<td class="right"><?php echo $hits['session'] ?></td>
+				<td class="right"><?php echo count( $sessions[ $last_date ] ); ?></td>
 				<td class="right"><a href="<?php echo $link_text.'&referer_type=search'?>"><?php echo $hits['search'] ?></a></td>
 				<td class="right"><a href="<?php echo $link_text.'&referer_type=referer'?>"><?php echo $hits['referer'] ?></a></td>
 				<td class="right"><a href="<?php echo $link_text.'&referer_type=direct'?>"><?php echo $hits['direct'] ?></a></td>
@@ -320,7 +331,7 @@ if( count($res_hits) )
 				<td class="right"><a href="<?php echo $link_text.'&referer_type=special'?>"><?php echo $hits['special'] ?></a></td>
 				<td class="right"><a href="<?php echo $link_text.'&referer_type=spam'?>"><?php echo $hits['spam'] ?></a></td>
 				<td class="right"><a href="<?php echo $link_text.'&hit_type=admin'?>"><?php echo $hits['admin'] ?></a></td>
-				<td class="lastcol right"><a href="<?php echo $link_text_total_day ?>"><?php echo array_sum( $hits ) - $hits['session'] ?></a></td>
+				<td class="lastcol right"><a href="<?php echo $link_text_total_day ?>"><?php echo array_sum( $hits ) ?></a></td>
 			</tr>
 			<?php
 		}
@@ -328,11 +339,24 @@ if( count($res_hits) )
 		// Total numbers:
 
 		$link_text_total = $admin_url.'?ctrl=stats&tab=hits&blog='.$blog.'&agent_type=browser';
+
+		// Count total unique sessions for all dates:
+		$total_sessions = array();
+		foreach( $sessions as $date_sessions )
+		{
+			foreach( $date_sessions as $session_ID )
+			{
+				if( ! in_array( $session_ID, $total_sessions ) )
+				{	// Count only unique session IDs:
+					$total_sessions[] = $session_ID;
+				}
+			}
+		}
 		?>
 
 		<tr class="total">
 		<td class="firstcol"><?php echo T_('Total') ?></td>
-		<td class="right"><?php echo $hits_total['session'] ?></td>
+		<td class="right"><?php echo count( $total_sessions ); ?></td>
 		<td class="right"><a href="<?php echo $link_text_total.'&referer_type=search'?>"><?php echo $hits_total['search'] ?></a></td>
 		<td class="right"><a href="<?php echo $link_text_total.'&referer_type=referer'?>"><?php echo $hits_total['referer'] ?></a></td>
 		<td class="right"><a href="<?php echo $link_text_total.'&referer_type=direct'?>"><?php echo $hits_total['direct'] ?></a></td>
@@ -341,7 +365,7 @@ if( count($res_hits) )
 		<td class="right"><a href="<?php echo $link_text_total.'&referer_type=special'?>"><?php echo $hits_total['special'] ?></a></td>
 		<td class="right"><a href="<?php echo $link_text_total.'&referer_type=spam'?>"><?php echo $hits_total['spam'] ?></a></td>
 		<td class="right"><a href="<?php echo $link_text_total.'&hit_type=admin'?>"><?php echo $hits_total['admin'] ?></a></td>
-		<td class="lastcol right"><a href="<?php echo $link_text_total?>"><?php echo array_sum( $hits_total ) - $hits_total['session']?></a></td>
+		<td class="lastcol right"><a href="<?php echo $link_text_total?>"><?php echo array_sum( $hits_total ) ?></a></td>
 		</tr>
 
 	</table>
