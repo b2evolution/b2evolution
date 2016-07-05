@@ -226,17 +226,11 @@ function votingAdjust()
 	var w = $wrap.parent().width();
 
 	// reset
-	voting_separator.show(); // show separator so it will be included in the calculation
-	voting_wrapper.css({ textAlign: 'left' });
-	voting_buttons.css({ display: 'inline-block', 'margin': '3px 0 0' });
-	voting_title.css({ textAlign: 'right' });
+	voting_wrapper.removeClass( 'compact' );
 
 	if( w <= ( voting_title.width() + voting_buttons.width() + voting_others.width() ) )
 	{ // voting button, title and others will not fit in 1 line
-		voting_separator.hide();
-		voting_wrapper.css({ textAlign: 'center' });
-		voting_buttons.css({ display: 'block', 'margin': '3px auto 0' });
-		voting_title.css({ textAlign: 'center' });
+		voting_wrapper.addClass( 'compact' );
 	}
 
 }

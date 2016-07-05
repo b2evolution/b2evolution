@@ -912,7 +912,6 @@
 
 	publicMethod.resizeVoting = function() {
 
-		var prevWidth = $prev.width();
 		var voting_wrapper = $('#colorbox div.voting_wrapper');
 		var voting_title = $('#colorbox div.vote_title');
 		var voting_buttons = $('#colorbox div.voting_wrapper > div.btn-group');
@@ -930,17 +929,11 @@
 		}
 
 		// reset
-		voting_separator.show();
-		voting_wrapper.css({ textAlign: 'left' });
-		voting_buttons.css({ display: 'inline-block', 'margin': '3px 0 0' });
-		voting_title.css({ textAlign: 'right' });
+		voting_wrapper.removeClass( 'compact' );
 
 		if( w <= ( voting_title.width() + voting_buttons.width() + voting_others.width() ) )
 		{ // voting button, title and others will not fit in 1 line
-			voting_separator.hide();
-			voting_wrapper.css({ textAlign: 'center' });
-			voting_buttons.css({ display: 'block', 'margin': '3px auto 0' });
-			voting_title.css({ textAlign: 'center' });
+			voting_wrapper.addClass( 'compact' );
 		}
 
 	};

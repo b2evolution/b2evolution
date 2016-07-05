@@ -228,11 +228,15 @@
 		height: 16px;
 	}
 	.voting_wrapper {
+		text-align: left;
+		.separator {
+			display: inline-block;
+		}
 		div.btn-group {
 			display: inline-block;
 			min-width: 50px;
 			text-align: center;
-			margin-top: 3px;
+			margin: 3px 0 0;
 			white-space: nowrap;
 		}
 		div.vote_title {
@@ -248,6 +252,19 @@
 			white-space: nowrap;
 			margin-top: 3px;
 			min-width: 150px;
+		}
+		&.compact {
+			text-align: center;
+			.separator {
+				display: none;
+			}
+			.btn-group {
+				display: block;
+				margin: 3px auto 0;
+			}
+			div.vote_title {
+				text-align: center;
+			}
 		}
 	}
 	div.vote_title {

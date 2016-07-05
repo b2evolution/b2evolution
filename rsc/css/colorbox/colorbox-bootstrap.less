@@ -236,6 +236,10 @@
 		height: 16px;
 	}
 	.voting_wrapper {
+		text-align: left;
+		.separator {
+			display: inline-block;
+		}
 		a:first-child span {
 			border-top-left-radius: 4px;
 			border-bottom-left-radius: 4px;
@@ -248,7 +252,7 @@
 			display: inline-block;
 			width: 160px;
 			text-align: center;
-			margin-top: 3px;
+			margin: 3px 0 0;
 			white-space: nowrap;
 			.voting_btn {
 				border: 1px solid #adadad;
@@ -277,6 +281,19 @@
 			min-width: 200px;
 			span.separator {
 				display: none;
+			}
+		}
+		&.compact {
+			text-align: center;
+			.separator {
+				display: none;
+			}
+			.btn-group {
+				display: block;
+				margin: 3px auto 0;
+			}
+			div.vote_title {
+				text-align: center;
 			}
 		}
 	}

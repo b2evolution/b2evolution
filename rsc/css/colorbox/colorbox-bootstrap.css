@@ -278,6 +278,12 @@
   width: 100%;
   height: 16px;
 }
+#cboxVoting .voting_wrapper {
+  text-align: left;
+}
+#cboxVoting .voting_wrapper .separator {
+  display: inline-block;
+}
 #cboxVoting .voting_wrapper a:first-child span {
   border-top-left-radius: 4px;
   border-bottom-left-radius: 4px;
@@ -290,7 +296,7 @@
   display: inline-block;
   width: 160px;
   text-align: center;
-  margin-top: 3px;
+  margin: 3px 0 0;
   white-space: nowrap;
 }
 #cboxVoting .voting_wrapper div.btn-group .voting_btn {
@@ -321,6 +327,19 @@
 }
 #cboxVoting .voting_wrapper div.vote_others span.separator {
   display: none;
+}
+#cboxVoting .voting_wrapper.compact {
+  text-align: center;
+}
+#cboxVoting .voting_wrapper.compact .separator {
+  display: none;
+}
+#cboxVoting .voting_wrapper.compact .btn-group {
+  display: block;
+  margin: 3px auto 0;
+}
+#cboxVoting .voting_wrapper.compact div.vote_title {
+  text-align: center;
 }
 #cboxVoting #votingLike,
 #cboxVoting #votingNoopinion,
