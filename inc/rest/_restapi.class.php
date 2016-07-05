@@ -362,12 +362,17 @@ class RestApi
 		// Try to get an object ID and action for example request "<baseurl>/api/v1/collections/<collname>/items/<id>/action":
 		$object_ID = empty( $this->args[3] ) ? NULL : intval( $this->args[3] );
 		$object_action = empty( $this->args[4] ) ? NULL : $this->args[4];
+		$null_object_action = empty( $this->args[3] ) ? NULL : $this->args[3];
 		$coll_controller_params = array();
 
 		if( $object_ID && $object_action )
 		{	// Set controller name for single object and action:
 			$coll_controller = $coll_controller.'_'.$object_action;
 			$coll_controller_params[] = $object_ID;
+		}
+		elseif( empty( $object_ID ) && $null_object_action )
+		{	// Set controller name for action without object ID(e.g. new creating object):
+			$coll_controller = $coll_controller.'_'.$null_object_action;
 		}
 
 		if( ! method_exists( $this, 'controller_coll_'.$coll_controller ) )
@@ -1052,6 +1057,266 @@ class RestApi
 
 		// Return current state of flag:
 		$this->add_response( 'flag', $Item->get_user_data( 'item_flag' ), 'integer' );
+	}
+
+
+	/**
+	 * Call item controller to create by current user
+	 *
+	 * @param integer Item ID
+	 */
+	private function controller_coll_items_create()
+	{
+		global $Blog, $current_User, $Messages, $Plugins;
+
+		if( ! is_logged_in() )
+		{	// Current user must be logged in to edit the requested Item:
+			$this->halt( 'You must be logged in to edit the Item!', 'no_access', 403 );
+			// Exit here.
+		}
+
+		// Get params to skip/force/mark notifications and pings:
+		$item_members_notified = param( 'item_members_notified', 'string', NULL );
+		$item_community_notified = param( 'item_community_notified', 'string', NULL );
+		$item_pings_sent = param( 'item_pings_sent', 'string', NULL );
+
+		// We need early decoding of these in order to check permissions:
+		$post_status = param( 'post_status', 'string', 'published' );
+
+		// Check if new category was started to create. If yes check if it is valid:
+		check_categories( $post_category, $post_extracats );
+
+		// Check if allowed to cross post.
+		check_cross_posting( $post_category, $post_extracats );
+
+		// Check permission on statuses:
+		$current_User->check_perm( 'cats_post!'.$post_status, 'create', true, $post_extracats );
+
+		// Get requested Post Type:
+		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
+		// Check permission on post type: (also verifies that post type is enabled and NOT reserved)
+		check_perm_posttype( $item_typ_ID, $post_extracats );
+
+		// Update the folding positions for current user
+		save_fieldset_folding_values( $Blog->ID );
+
+		// CREATE NEW POST:
+		load_class( 'items/model/_item.class.php', 'Item' );
+		$edited_Item = new Item();
+
+		// Set the params we already got:
+		$edited_Item->set( 'status', $post_status );
+		$edited_Item->set( 'main_cat_ID', $post_category );
+		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
+
+		// Set object params:
+		$edited_Item->load_from_Request( /* editing? */ true, /* creating? */ true );
+
+		$Plugins->trigger_event ( 'AdminBeforeItemEditCreate', array ( 'Item' => & $edited_Item ) );
+
+		if( param_errors_detected() )
+		{	// If errors have been detected:
+			global $param_input_err_messages;
+			foreach( $param_input_err_messages as $param_input_name => $param_input_err_message )
+			{	// Send errors of input fields:
+				$this->add_response( 'field_errors', array( $param_input_name, $param_input_err_message ), 'array' );
+			}
+			foreach( $Messages->messages_text as $m => $messages_text )
+			{	// Send all messages:
+				$this->add_response( 'messages', array( $Messages->messages_type[ $m ], $messages_text ), 'array' );
+			}
+			$this->halt( T_('The post couldn\'t be created.'), 'update_error', 403 );
+			return;
+		}
+
+		$result = $edited_Item->dbinsert();
+
+		if( $result )
+		{	// Post post-publishing operations:
+			param( 'trackback_url', 'string' );
+			if( !empty( $trackback_url ) )
+			{
+				if( $edited_Item->status != 'published' )
+				{
+					$Messages->add( T_('Post not publicly published: skipping trackback...'), 'note' );
+				}
+				else
+				{ // trackback now:
+					load_funcs('comments/_trackback.funcs.php');
+					trackbacks( $trackback_url, $edited_Item );
+				}
+			}
+
+			// Execute or schedule notifications & pings:
+			$edited_Item->handle_notifications( NULL, true, $item_members_notified, $item_community_notified, $item_pings_sent );
+		}
+
+		foreach( $Messages->messages_text as $m => $messages_text )
+		{	// Add all messages to response:
+			$this->add_response( 'messages', array( $Messages->messages_type[ $m ], $messages_text ), 'array' );
+		}
+
+		if( $result )
+		{	// Success creating:
+			$this->add_response( 'item_url', $edited_Item->get_permanent_url() );
+			$this->halt( T_('Post has been created.'), 'create_success', 200 );
+		}
+		else
+		{	// Failed creating:
+			$this->halt( T_('The post couldn\'t be created.'), 'create_error', 403 );
+		}
+	}
+
+
+	/**
+	 * Call item controller to update by current user
+	 *
+	 * @param integer Item ID
+	 */
+	private function controller_coll_items_update( $item_ID )
+	{
+		global $Blog, $current_User, $Messages, $Plugins;
+
+		if( ! is_logged_in() )
+		{	// Current user must be logged in to edit the requested Item:
+			$this->halt( 'You must be logged in to edit the Item!', 'no_access', 403 );
+			// Exit here.
+		}
+
+		$ItemCache = & get_ItemCache();
+		if( ( $edited_Item = & $ItemCache->get_by_ID( $item_ID, false, false ) ) === false )
+		{	// Item is not detected in DB by requested ID:
+			$this->halt( 'No item found in DB by requested ID #'.$item_ID, 'unknown_item', 404 );
+			// Exit here.
+		}
+
+		if( $edited_Item->get_blog_ID() != $Blog->ID )
+		{	// Item should be called for current collection:
+			$this->halt( 'You request item #'.$edited_Item->ID.' from another collection "'.$Blog->get( 'urlname' ).'"', 'wrong_item_coll', 403 );
+			// Exit here.
+		}
+
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+		// Update the folding positions for current user
+		save_fieldset_folding_values( $Blog->ID );
+
+		// Get params to skip/force/mark notifications and pings:
+		$item_members_notified = param( 'item_members_notified', 'string', NULL );
+		$item_community_notified = param( 'item_community_notified', 'string', NULL );
+		$item_pings_sent = param( 'item_pings_sent', 'string', NULL );
+
+		// We need early decoding of these in order to check permissions:
+		$post_status = param( 'post_status', 'string', 'published' );
+
+		// Check if new category was started to create.  If yes check if it is valid:
+		$isset_category = check_categories( $post_category, $post_extracats, $edited_Item );
+
+		// Check if allowed to cross post.
+		if( ! check_cross_posting( $post_category, $post_extracats, $edited_Item->main_cat_ID ) )
+		{
+			return;
+		}
+
+		// Get requested Post Type:
+		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
+		// Check permission on post type: (also verifies that post type is enabled and NOT reserved)
+		check_perm_posttype( $item_typ_ID, $post_extracats );
+
+		// UPDATE POST:
+		// Set the params we already got:
+		$edited_Item->set( 'status', $post_status );
+
+		if( $isset_category )
+		{ // we change the categories only if the check was succesful
+
+			// get current extra_cats that are in collections where current user is not a coll admin
+			$ChapterCache = & get_ChapterCache();
+
+			$prev_extra_cat_IDs = postcats_get_byID( $edited_Item->ID );
+			$off_limit_cats = array();
+			$r = array();
+
+			foreach( $prev_extra_cat_IDs as $cat )
+			{
+				$cat_blog = get_catblog( $cat );
+				if( ! $current_User->check_perm( 'blog_admin', '', false, $cat_blog ) )
+				{
+					$Chapter = $ChapterCache->get_by_ID( $cat );
+					$off_limit_cats[$cat] = $Chapter;
+					$r[] = '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->dget( 'name' ).'</a>';
+				}
+			}
+
+			if( $off_limit_cats )
+			{
+				$Messages->add( sprintf( T_('Please note: this item is also cross-posted to the following other categories/collections: %s'),
+						implode( ', ', $r ) ), 'note' );
+			}
+
+			$post_extracats = array_unique( array_merge( $post_extracats,array_keys( $off_limit_cats ) ) );
+
+			$edited_Item->set( 'main_cat_ID', $post_category );
+			$edited_Item->set( 'extra_cat_IDs', $post_extracats );
+		}
+
+		// Set Item params and settings:
+		$edited_Item->load_from_Request( false );
+
+		$Plugins->trigger_event( 'AdminBeforeItemEditUpdate', array( 'Item' => & $edited_Item ) );
+
+		if( param_errors_detected() )
+		{	// If errors have been detected:
+			global $param_input_err_messages;
+			foreach( $param_input_err_messages as $param_input_name => $param_input_err_message )
+			{	// Send errors of input fields:
+				$this->add_response( 'field_errors', array( $param_input_name, $param_input_err_message ), 'array' );
+			}
+			foreach( $Messages->messages_text as $m => $messages_text )
+			{	// Send all messages:
+				$this->add_response( 'messages', array( $Messages->messages_type[ $m ], $messages_text ), 'array' );
+			}
+			$this->halt( T_('The post couldn\'t be updated.'), 'update_error', 403 );
+			return;
+		}
+
+		// Try to update the edited Item:
+		$result = $edited_Item->dbupdate();
+
+		if( $result )
+		{	// Post post-publishing operations:
+			$trackback_url = param( 'trackback_url', 'string' );
+			if( ! empty( $trackback_url ) )
+			{
+				if( $edited_Item->status != 'published' )
+				{
+					$Messages->add( T_('Post not publicly published: skipping trackback...'), 'note' );
+				}
+				else
+				{ // trackback now:
+					load_funcs( 'comments/_trackback.funcs.php' );
+					trackbacks( $trackback_url, $edited_Item );
+				}
+			}
+
+			// Execute or schedule notifications & pings:
+			$edited_Item->handle_notifications( NULL, false, $item_members_notified, $item_community_notified, $item_pings_sent );
+		}
+
+		foreach( $Messages->messages_text as $m => $messages_text )
+		{	// Add all messages to response:
+			$this->add_response( 'messages', array( $Messages->messages_type[ $m ], $messages_text ), 'array' );
+		}
+
+		if( $result )
+		{	// Success updating:
+			$this->add_response( 'item_url', $edited_Item->get_permanent_url() );
+			$this->halt( T_('Post has been updated.'), 'update_success', 200 );
+		}
+		else
+		{	// Failed updating:
+			$this->halt( T_('The post couldn\'t be updated.'), 'update_error', 403 );
+		}
 	}
 
 

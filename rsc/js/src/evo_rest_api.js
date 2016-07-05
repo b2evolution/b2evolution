@@ -11,7 +11,7 @@
  * @param function Function on success request
  * @param string Type method: 'GET', 'POST', 'DELETE', etc.
  */
-function evo_rest_api_request( url, params_func, func_method, method )
+function evo_rest_api_request( url, params_func, func_method, method, func_fail )
 {
 	var params = params_func;
 	var func = func_method;
@@ -35,10 +35,16 @@ function evo_rest_api_request( url, params_func, func_method, method )
 		data: params
 	} )
 	.then( function( data, textStatus, jqXHR )
-	{
+	{	// Success:
 		if( typeof( jqXHR.responseJSON ) == 'object' )
 		{	// Call function only when we get correct JSON response:
 			eval( func )( data, textStatus, jqXHR );
+		}
+	}, function( jqXHR )
+	{	// Fail:
+		if( typeof( func_fail ) == 'function' && typeof( jqXHR.responseJSON ) == 'object' )
+		{	// Call function only when we get correct JSON response:
+			eval( func_fail )( jqXHR.responseJSON, jqXHR );
 		}
 	} );
 }

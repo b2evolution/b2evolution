@@ -268,6 +268,118 @@ function b2edit_update_item_preview( obj, form_action, submit_action )
 
 
 /**
+ * Save item/post form by REST API
+ *
+ * @param object Event object
+ * @param integer Item ID
+ */
+function b2edit_save_item( obj, item_ID, coll_urlname )
+{
+	var form = jQuery( obj ).closest( 'form' );
+
+	// Get all form params for REST API call below:
+	var params = {};
+	form.find( 'input, select, textarea' ).each( function()
+	{
+		var field_name = jQuery( this ).attr( 'name' );
+		var field_value = jQuery( this ).val();
+		var field_type = jQuery( this ).attr( 'type' );
+		if( typeof( field_name ) != 'undefined' && field_name != '' && field_value != ''
+		    && ( ( field_type != 'checkbox' && field_type != 'radio' ) || jQuery( this ).is( ':checked' ) ) )
+		{	// Get only really selected params:
+			if( typeof( params[ field_name ] ) != 'undefined' && field_name.indexOf( '[' ) != -1 )
+			{	// Array param:
+				if( typeof( params[ field_name ] ) != 'object' )
+				{
+					var first_param_value = params[ field_name ];
+					params[ field_name ] = [];
+					params[ field_name ].push( first_param_value );
+				}
+				params[ field_name ].push( field_value );
+			}
+			else
+			{	// Scalar param:
+				params[ field_name ] = field_value;
+			}
+		}
+	} );
+
+	// Call REST API request to save Item:
+	evo_rest_api_request( 'collections/' + coll_urlname + '/items/' + ( item_ID ? item_ID + '/update' : 'create' ), params,
+	function( data )
+	{	// Success updating:
+		b2edit_save_item_print_messages( data, 'success' );
+		// Reload preview iframe:
+		jQuery( 'iframe#iframe_item_preview' ).attr( 'src', data.item_url );
+		// Unfold panel with preview iframe:
+		jQuery( '#fieldset_wrapper_itemform_preview.folded' ).removeClass( 'folded' );
+	}, 'GET',
+	function( data )
+	{	// Failed updating:
+		b2edit_save_item_print_messages( data, 'error' );
+	} );
+
+	function b2edit_save_item_print_messages( data, msg_type )
+	{
+		if( jQuery( '.action_messages' ).length == 0 )
+		{	// Create block for messages:
+			jQuery( '.page-content' ).before( '<div class="action_messages container-fluid"><ul></ul></div>' );
+		}
+		// Clear previous messages:
+		var messages_list = jQuery( '.action_messages ul' );
+		messages_list.html( '' );
+
+		var msg_template = '<li><div class="alert alert-dismissible $message_class$ fade in"><button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>$message$</div></li>';
+
+		// Print additional messages:
+		if( typeof( data.messages ) == 'object' )
+		{
+			for( var i = 0; i < data.messages.length; i++ )
+			{
+				messages_list.append( msg_template
+					.replace( '$message_class$', b2edit_save_item_get_message_class( data.messages[i][0] ) )
+					.replace( '$message$', data.messages[i][1] ) );
+			}
+		}
+
+		if( typeof( data.error_info ) != 'undefined' )
+		{	// Print main message:
+			messages_list.append( msg_template
+				.replace( '$message_class$', b2edit_save_item_get_message_class( 'error' ) )
+				.replace( '$message$', data.error_info ) );
+		}
+
+		if( typeof( data.message ) != 'undefined' )
+		{	// Print main message:
+			messages_list.append( msg_template
+				.replace( '$message_class$', b2edit_save_item_get_message_class( msg_type ) )
+				.replace( '$message$', data.message ) );
+		}
+	}
+
+	function b2edit_save_item_get_message_class( msg_type )
+	{
+		var msg_class = 'alert-info';
+		switch( msg_type )
+		{
+			case 'error':
+				msg_class = 'alert-danger';
+				break;
+			case 'success':
+				msg_class = 'alert-success';
+				break;
+			case 'warning':
+				msg_class = 'alert-warning';
+				break;
+		}
+		return msg_class;
+	}
+
+	return false;
+}
+
+
+/**
  * Submits the form after setting its action attribute to "newaction" and the blog value to "blog" (if given).
  *
  * This is used to switch to another blog or tab, but "keep" the input in the form.
