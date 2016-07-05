@@ -225,17 +225,6 @@ function votingAdjust()
 
 	var w = $wrap.parent().width();
 
-	if( w <= 480 )
-	{
-		$voting.css({ paddingLeft: ( prevWidth * 2 ) + 'px' });
-		voting_wrapper.css({ left: ( prevWidth * 2 ) + 'px' });
-	}
-	else
-	{
-		$voting.css({ paddingLeft: ( prevWidth * 4 ) + 'px' });
-		voting_wrapper.css({ left: ( prevWidth * 4 ) + 'px' });
-	}
-
 	// reset
 	voting_separator.show(); // show separator so it will be included in the calculation
 	voting_wrapper.css({ textAlign: 'left' });

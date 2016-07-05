@@ -30,6 +30,8 @@
 #cboxLoadedContent {
 	overflow: auto;
 	box-sizing: border-box;
+	display: flex;
+	align-items: center;
 }
 #cboxTitle {
 	margin: 0;
@@ -99,7 +101,7 @@
 }
 #cboxTitle {
 	position: absolute;
-	bottom: 4px;
+	bottom: 76px;
 	left: 0;
 	text-align: center;
 	width: 100%;
@@ -114,13 +116,16 @@
 	bottom: 0;
 	width: 100%;
 	min-height: 76px;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: space-between;
+	align-items: center;
 }
 #cboxCurrent {
-	position: absolute;
+	width: 80px;
 	color: #949494;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%,-50%);
+	text-align: center;
 }
 #cboxSlideshow {
 	position: absolute;
@@ -130,23 +135,21 @@
 	line-height: 17px;
 }
 #cboxNavigation {
-	position: absolute;
-	left: 0;
-	bottom: 0;
-	top: 0;
-	width: 128px;
+	flex-basis: auto;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: space-between;
+	align-items: center;
+	min-width: 80px;
 }
 
-#cboxPrevious, #cboxNext, #cboxClose {
-	position: absolute;
-	//bottom: 0;
+#cboxPrevious, #cboxNext {
 	width: 40px;
 	height: 40px;
 	color: #999;
 	font: normal normal normal 40px/1 FontAwesome;
 	visibility: hidden;
-	top: 50%;
-	transform: translateY(-50%);
 	&:before {
 		visibility: visible;
 	}
@@ -155,22 +158,26 @@
 	}
 }
 #cboxPrevious {
-	left: 0;
+	//left: 0;
 	&:before {
 		content: "\f190";
 	}
 }
 #cboxNext {
-	right: 0;
+	//right: 0;
 	&:before {
 		content: "\f18e";
 	}
 }
 #cboxClose {
-	position: absolute;
-	right: 0;
-	bottom: 0;
+	width: 40px;
+	height: 40px;
+	color: #999;
+	font: normal normal normal 40px/1 FontAwesome;
+	visibility: hidden;
+	flex-basis: auto;
 	&:before {
+		visibility: visible;
 		content: "\f05c";
 	}
 }
@@ -181,19 +188,10 @@
 	background: url(../img/ajax-loader/fff.gif) no-repeat center center;
 }
 #cboxVoting {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	height: 100%;
-	padding-left: 160px;
-	padding-right: 40px;
 	white-space: normal;
 	-khtml-border-radius: 6px;
 	border-radius: 6px;
 	a {
-		//margin: 0 10px 0 0;
 		margin: 0;
 		vertical-align: middle;
 		display: inline-block;
@@ -203,7 +201,6 @@
 		}
 	}
 	span {
-		//margin: 0 10px 0 0;
 		display: inline-block;
 		&.icon {
 			vertical-align: middle;
@@ -239,12 +236,6 @@
 		height: 16px;
 	}
 	.voting_wrapper {
-		position: absolute;
-		//text-align: center;
-		top: 50%;
-		transform: translateY(-50%);
-		left: 160px;
-		right: 40px;
 		a:first-child span {
 			border-top-left-radius: 4px;
 			border-bottom-left-radius: 4px;

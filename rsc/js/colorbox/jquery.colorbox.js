@@ -324,12 +324,12 @@
 			$loadingOverlay = $div("LoadingOverlay").add($div("LoadingGraphic")),
 			$title = $div("Title"),
 			$infoBar = $div("InfoBar").append(
-				$voting = $div("Voting"),
 				$nav = $div("Navigation").append(
 					$prev = $div("Previous"),
 					$current = $div("Current"),
 					$next = $div("Next")
 				),
+				$voting = $div("Voting"),
 				$slideshow = $div("Slideshow").bind(event_open, slideshow),
 				$close = $div("Close"),
 				$open = $div("Open")
@@ -562,7 +562,6 @@
 		//$(photo).css({'float': 'none', marginLeft: 'auto', marginRight: 'auto'});
 
 		$(photo).css({'float': 'none'});
-		$(photo).css({ 'position': 'absolute', 'top': $loaded.height()/2 + 'px', 'left': '50%', 'transform': 'translate(-50%, -50%)' });
 
 		callback = function () {
 			var prev, prevSrc, next, nextSrc, total = $related.length, iframe, complete;
@@ -688,29 +687,6 @@
 
 		trigger(event_load, settings.onLoad);
 
-		if( ( previous_title == '' && settings.title != '' ) ||
-		    ( previous_title != '' && settings.title == '' ) )
-		{	// Fix positions of the title
-			var title_height = 0;
-			if( settings.title !== "" )
-			{	// Title is enabled
-				var voting_height = 0;
-				if( settings.displayVoting && settings.votingUrl != '' )
-				{	// If voting panel is enabled
-					voting_height = $voting.outerHeight()
-					$voting.css( 'bottom', '9px' );
-				}
-				$title.css( 'margin-bottom', voting_height + $close.outerHeight() - 3 );
-				title_height = 15;
-			}
-			else
-			{	// No title
-				title_height = -15;
-				$voting.css( 'bottom', '25px' );
-			}
-			$loaded.css( 'margin-bottom', parseInt( $loaded.css( 'margin-bottom' ) ) + title_height );
-			//loadedHeight += title_height;
-		}
 		previous_title = settings.title;
 
 		if( settings.displayVoting && settings.votingUrl != '' && element.id != '' )
@@ -947,16 +923,10 @@
 		if( w <= 480 )
 		{
 			$current.hide();
-			$nav.css({ width: ( prevWidth * 2 ) + 'px'  });
-			$voting.css({ paddingLeft: ( prevWidth * 2 ) + 'px' });
-			voting_wrapper.css({ left: ( $prev.width() * 2 ) + 'px' });
 		}
 		else
 		{
 			$current.show();
-			$nav.css({ width: ( prevWidth * 4 ) + 'px' })
-			$voting.css({ paddingLeft: ( prevWidth * 4 ) + 'px' });
-			voting_wrapper.css({ left: ( $prev.width() * 4 ) + 'px' });
 		}
 
 		// reset

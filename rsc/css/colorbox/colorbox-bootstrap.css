@@ -32,6 +32,14 @@
 #cboxLoadedContent {
   overflow: auto;
   box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 #cboxTitle {
   margin: 0;
@@ -105,7 +113,7 @@
 }
 #cboxTitle {
   position: absolute;
-  bottom: 4px;
+  bottom: 76px;
   left: 0;
   text-align: center;
   width: 100%;
@@ -120,15 +128,31 @@
   bottom: 0;
   width: 100%;
   min-height: 76px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-flex-wrap: nowrap;
+      -ms-flex-wrap: nowrap;
+          flex-wrap: nowrap;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 #cboxCurrent {
-  position: absolute;
+  width: 80px;
   color: #949494;
-  top: 50%;
-  left: 50%;
-  -webkit-transform: translate(-50%, -50%);
-      -ms-transform: translate(-50%, -50%);
-          transform: translate(-50%, -50%);
+  text-align: center;
 }
 #cboxSlideshow {
   position: absolute;
@@ -138,54 +162,65 @@
   line-height: 17px;
 }
 #cboxNavigation {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  top: 0;
-  width: 128px;
+  -webkit-flex-basis: auto;
+      -ms-flex-preferred-size: auto;
+          flex-basis: auto;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-flex-wrap: nowrap;
+      -ms-flex-wrap: nowrap;
+          flex-wrap: nowrap;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  min-width: 80px;
 }
 #cboxPrevious,
-#cboxNext,
-#cboxClose {
-  position: absolute;
+#cboxNext {
   width: 40px;
   height: 40px;
   color: #999;
   font: normal normal normal 40px/1 FontAwesome;
   visibility: hidden;
-  top: 50%;
-  -webkit-transform: translateY(-50%);
-      -ms-transform: translateY(-50%);
-          transform: translateY(-50%);
 }
 #cboxPrevious:before,
-#cboxNext:before,
-#cboxClose:before {
+#cboxNext:before {
   visibility: visible;
 }
 #cboxPrevious.hover,
-#cboxNext.hover,
-#cboxClose.hover {
+#cboxNext.hover {
   color: #000;
-}
-#cboxPrevious {
-  left: 0;
 }
 #cboxPrevious:before {
   content: "\f190";
-}
-#cboxNext {
-  right: 0;
 }
 #cboxNext:before {
   content: "\f18e";
 }
 #cboxClose {
-  position: absolute;
-  right: 0;
-  bottom: 0;
+  width: 40px;
+  height: 40px;
+  color: #999;
+  font: normal normal normal 40px/1 FontAwesome;
+  visibility: hidden;
+  -webkit-flex-basis: auto;
+      -ms-flex-preferred-size: auto;
+          flex-basis: auto;
 }
 #cboxClose:before {
+  visibility: visible;
   content: "\f05c";
 }
 #cboxLoadingOverlay {
@@ -195,14 +230,6 @@
   background: url(../img/ajax-loader/fff.gif) no-repeat center center;
 }
 #cboxVoting {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 100%;
-  padding-left: 160px;
-  padding-right: 40px;
   white-space: normal;
   -khtml-border-radius: 6px;
   border-radius: 6px;
@@ -250,15 +277,6 @@
   background: url(../img/ajax-loader.gif) no-repeat center;
   width: 100%;
   height: 16px;
-}
-#cboxVoting .voting_wrapper {
-  position: absolute;
-  top: 50%;
-  -webkit-transform: translateY(-50%);
-      -ms-transform: translateY(-50%);
-          transform: translateY(-50%);
-  left: 160px;
-  right: 40px;
 }
 #cboxVoting .voting_wrapper a:first-child span {
   border-top-left-radius: 4px;
