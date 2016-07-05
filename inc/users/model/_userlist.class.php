@@ -550,10 +550,10 @@ class UserList extends DataObjectList2
 
 	/**
 	 * Run Query: GET DATA ROWS *** HEAVY ***
-	 * 
+	 *
 	 * We need this query() stub in order to call it from restart() and still
 	 * let derivative classes override it
-	 * 
+	 *
 	 * @deprecated Use new function run_query()
 	 */
 	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
@@ -587,6 +587,7 @@ class UserList extends DataObjectList2
 		// *** STEP 1 ***
 		$user_IDs = isset( $this->filters['users'] ) ? $this->filters['users'] : array();
 		if( $this->refresh_query || // Some filters are changed
+			$this->page == 1 || // Always run query on the first page
 		    $localtimenow - $Session->get( $this->filterset_name.'_refresh_time' ) > 7200 ) // Time has passed ( 2 hours )
 		{	// We should create new list of user IDs
 			global $Timer;
