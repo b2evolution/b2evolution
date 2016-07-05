@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $AdminUI, $agent_type_color, $hit_type_color, $Hit;
+global $blog, $admin_url, $AdminUI, $agent_type_color, $hit_type_color, $Hit, $Settings, $localtimenow;
 
 echo '<h2 class="page-title">'.T_('Global hits - Summary').get_manual_link('global_hits_summary').'</h2>';
 
@@ -92,21 +92,19 @@ if( count($res_hits) )
 
 	$chart['dates'] = array();
 
-	if( $is_live_mode )
-	{	// Initialize the data to open an url by click on bar item:
-		$chart['link_data'] = array();
-		$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&hit_type=$param1$&agent_type=$param2$';
-		$chart['link_data']['params'] = array(
-				array( 'rss',      '' ),
-				array( 'standard', 'robot' ),
-				array( 'standard', 'browser' ),
-				array( 'ajax',     '' ),
-				array( 'service',  '' ),
-				array( 'admin',    '' ),
-				array( 'api',      '' ),
-				array( '',         'unknown' )
-			);
-	}
+	// Initialize the data to open an url by click on bar item:
+	$chart['link_data'] = array();
+	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&hit_type=$param1$&agent_type=$param2$';
+	$chart['link_data']['params'] = array(
+			array( 'rss',      '' ),
+			array( 'standard', 'robot' ),
+			array( 'standard', 'browser' ),
+			array( 'ajax',     '' ),
+			array( 'service',  '' ),
+			array( 'admin',    '' ),
+			array( 'api',      '' ),
+			array( '',         'unknown' )
+		);
 
 	$count = 0;
 	foreach( $res_hits as $row_stats )
@@ -233,7 +231,15 @@ if( count($res_hits) )
 
 
 		if( $last_date != $this_date )
-		{ // We just hit a new day, let's display the previous one:
+		{	// We just hit a new day, let's display the previous one:
+
+			// Check if current data are live and not aggregated:
+			$is_live_data = true;
+			if( ! $is_live_mode )
+			{	// Check only for "Aggregate data":
+				$time_prune_before = mktime( 0, 0, 0 ) - ( $Settings->get( 'auto_prune_stats' ) * 86400 );
+				$is_live_data = $last_date >= $time_prune_before;
+			}
 			?>
 			<tr class="<?php echo ( $count%2 == 1 ) ? 'odd' : 'even'; ?>">
 				<td class="firstcol right"><?php
@@ -243,15 +249,15 @@ if( count($res_hits) )
 						echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb('stats') ) );
 					}
 				?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=rss">'.$hits['rss'].'</a>' : $hits['rss']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=standard&agent_type=robot">'.$hits['standard_robot'].'</a>' : $hits['standard_robot']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=standard&agent_type=browser">'.$hits['standard_browser'].'</a>' : $hits['standard_browser']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=ajax">'.$hits['ajax'].'</a>' : $hits['ajax']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=service">'.$hits['service'].'</a>' : $hits['service']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=admin">'.$hits['admin'].'</a>' : $hits['admin']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=api">'.$hits['api'].'</a>' : $hits['api']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&agent_type=unknown">'.$hits['unknown'].'</a>' : $hits['unknown']; ?></td>
-				<td class="lastcol right"><?php echo $is_live_mode ? '<a href="'.$link_text_total_day.'">'.array_sum( $hits ).'</a>' : array_sum( $hits ); ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&hit_type=rss">'.$hits['rss'].'</a>' : $hits['rss']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&hit_type=standard&agent_type=robot">'.$hits['standard_robot'].'</a>' : $hits['standard_robot']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&hit_type=standard&agent_type=browser">'.$hits['standard_browser'].'</a>' : $hits['standard_browser']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&hit_type=ajax">'.$hits['ajax'].'</a>' : $hits['ajax']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&hit_type=service">'.$hits['service'].'</a>' : $hits['service']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&hit_type=admin">'.$hits['admin'].'</a>' : $hits['admin']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&hit_type=api">'.$hits['api'].'</a>' : $hits['api']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&agent_type=unknown">'.$hits['unknown'].'</a>' : $hits['unknown']; ?></td>
+				<td class="lastcol right"><?php echo $is_live_data ? '<a href="'.$link_text_total_day.'">'.array_sum( $hits ).'</a>' : array_sum( $hits ); ?></td>
 			</tr>
 			<?php
 				$hits = array(
@@ -294,6 +300,14 @@ if( count($res_hits) )
 
 		$link_text = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).'&blog='.$blog;
 		$link_text_total_day = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).'&blog='.$blog;
+
+		// Check if current data are live and not aggregated:
+		$is_live_data = true;
+		if( ! $is_live_mode )
+		{	// Check only for "Aggregate data":
+			$time_prune_before = mktime( 0, 0, 0 ) - ( $Settings->get( 'auto_prune_stats' ) * 86400 );
+			$is_live_data = $last_date >= $time_prune_before;
+		}
 		?>
 			<tr class="<?php echo ( $count%2 == 1 ) ? 'odd' : 'even'; ?>">
 				<td class="firstcol right"><?php
@@ -303,15 +317,15 @@ if( count($res_hits) )
 					echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb('stats') ) );
 				}
 				?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=rss">'.$hits['rss'].'</a>' : $hits['rss']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=standard&agent_type=robot">'.$hits['standard_robot'].'</a>' : $hits['standard_robot']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=standard&agent_type=browser">'.$hits['standard_browser'].'</a>' : $hits['standard_browser']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=ajax">'.$hits['ajax'].'</a>' : $hits['ajax']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=service">'.$hits['service'].'</a>' : $hits['service']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=admin">'.$hits['admin'].'</a>' : $hits['admin']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=api">'.$hits['api'].'</a>' : $hits['api']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&agent_type=unknown">'.$hits['unknown'].'</a>' : $hits['unknown']; ?></td>
-				<td class="lastcol right"><?php echo $is_live_mode ? '<a href="'.$link_text_total_day.'">'.array_sum( $hits ).'</a>' : array_sum( $hits ); ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&hit_type=rss">'.$hits['rss'].'</a>' : $hits['rss']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&hit_type=standard&agent_type=robot">'.$hits['standard_robot'].'</a>' : $hits['standard_robot']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&hit_type=standard&agent_type=browser">'.$hits['standard_browser'].'</a>' : $hits['standard_browser']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&hit_type=ajax">'.$hits['ajax'].'</a>' : $hits['ajax']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&hit_type=service">'.$hits['service'].'</a>' : $hits['service']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&hit_type=admin">'.$hits['admin'].'</a>' : $hits['admin']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&hit_type=api">'.$hits['api'].'</a>' : $hits['api']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&agent_type=unknown">'.$hits['unknown'].'</a>' : $hits['unknown']; ?></td>
+				<td class="lastcol right"><?php echo $is_live_data ? '<a href="'.$link_text_total_day.'">'.array_sum( $hits ).'</a>' : array_sum( $hits ); ?></td>
 			</tr>
 		<?php
 	}
@@ -322,15 +336,15 @@ if( count($res_hits) )
 
 	<tr class="total">
 		<td class="firstcol"><?php echo T_('Total') ?></td>
-		<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&hit_type=rss">'.$hits_total['rss'].'</a>' : $hits_total['rss']; ?></td>
-		<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&hit_type=standard&agent_type=robot">'.$hits_total['standard_robot'].'</a>' : $hits_total['standard_robot']; ?></td>
-		<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&hit_type=standard&agent_type=browser">'.$hits_total['standard_browser'].'</a>' : $hits_total['standard_browser']; ?></td>
-		<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&hit_type=ajax">'.$hits_total['ajax'].'</a>' : $hits_total['ajax']; ?></td>
-		<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&hit_type=service">'.$hits_total['service'].'</a>' : $hits_total['service']; ?></td>
-		<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&hit_type=admin">'.$hits_total['admin'].'</a>' : $hits_total['admin']; ?></td>
-		<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&hit_type=api">'.$hits_total['api'].'</a>' : $hits_total['api']; ?></td>
-		<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&agent_type=unknown">'.$hits_total['unknown'].'</a>' : $hits_total['unknown']; ?></td>
-		<td class="lastcol right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'">'.array_sum( $hits_total ).'</a>' : array_sum( $hits_total ); ?></td>
+		<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'&hit_type=rss">'.$hits_total['rss'].'</a>' : $hits_total['rss']; ?></td>
+		<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'&hit_type=standard&agent_type=robot">'.$hits_total['standard_robot'].'</a>' : $hits_total['standard_robot']; ?></td>
+		<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'&hit_type=standard&agent_type=browser">'.$hits_total['standard_browser'].'</a>' : $hits_total['standard_browser']; ?></td>
+		<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'&hit_type=ajax">'.$hits_total['ajax'].'</a>' : $hits_total['ajax']; ?></td>
+		<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'&hit_type=service">'.$hits_total['service'].'</a>' : $hits_total['service']; ?></td>
+		<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'&hit_type=admin">'.$hits_total['admin'].'</a>' : $hits_total['admin']; ?></td>
+		<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'&hit_type=api">'.$hits_total['api'].'</a>' : $hits_total['api']; ?></td>
+		<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'&agent_type=unknown">'.$hits_total['unknown'].'</a>' : $hits_total['unknown']; ?></td>
+		<td class="lastcol right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'">'.array_sum( $hits_total ).'</a>' : array_sum( $hits_total ); ?></td>
 	</tr>
 
 	</table>

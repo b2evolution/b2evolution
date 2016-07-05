@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $AdminUI, $referer_type_color, $hit_type_color, $Hit;
+global $blog, $admin_url, $AdminUI, $referer_type_color, $hit_type_color, $Hit, $Settings, $localtimenow;
 
 echo '<h2 class="page-title">'.T_('Hits from web browsers - Summary').get_manual_link('browser_hits_summary').'</h2>';
 
@@ -102,21 +102,19 @@ if( count($res_hits) )
 	// Draw last data as line
 	$chart['draw_last_line'] = true;
 
-	if( $is_live_mode )
-	{	// Initialize the data to open an url by click on bar item:
-		$chart['link_data'] = array();
-		$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&agent_type=browser&referer_type=$param1$&hit_type=$param2$';
-		$chart['link_data']['params'] = array(
-				array( 'search',  '' ),
-				array( 'referer', '' ),
-				array( 'direct',  '' ),
-				array( 'self',    '' ),
-				array( '',        'ajax' ),
-				array( 'special', '' ),
-				array( 'spam',    '' ),
-				array( '',        'admin' )
-			);
-	}
+	// Initialize the data to open an url by click on bar item:
+	$chart['link_data'] = array();
+	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&agent_type=browser&referer_type=$param1$&hit_type=$param2$';
+	$chart['link_data']['params'] = array(
+			array( 'search',  '' ),
+			array( 'referer', '' ),
+			array( 'direct',  '' ),
+			array( 'self',    '' ),
+			array( '',        'ajax' ),
+			array( 'special', '' ),
+			array( 'spam',    '' ),
+			array( '',        'admin' )
+		);
 
 	$count = 0;
 	$sessions = array();
@@ -254,7 +252,15 @@ if( count($res_hits) )
 			$link_text_total_day = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).'&blog='.$blog.'&agent_type=browser';
 
 			if( $last_date != $this_date )
-			{ // We just hit a new day, let's display the previous one:
+			{	// We just hit a new day, let's display the previous one:
+
+				// Check if current data are live and not aggregated:
+				$is_live_data = true;
+				if( ! $is_live_mode )
+				{	// Check only for "Aggregate data":
+					$time_prune_before = mktime( 0, 0, 0 ) - ( $Settings->get( 'auto_prune_stats' ) * 86400 );
+					$is_live_data = $last_date >= $time_prune_before;
+				}
 				?>
 				<tr class="<?php echo ( $count%2 == 1 ) ? 'odd' : 'even'; ?>">
 					<td class="firstcol right"><?php
@@ -265,15 +271,15 @@ if( count($res_hits) )
 						}
 					?></td>
 					<td class="right"><?php echo count( $sessions[ $last_date ] ); ?></td>
-					<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=search">'.$hits['search'].'</a>' : $hits['search']; ?></td>
-					<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=referer">'.$hits['referer'].'</a>' : $hits['referer']; ?></td>
-					<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=direct">'.$hits['direct'].'</a>' : $hits['direct']; ?></td>
-					<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=self">'.$hits['self'].'</a>' : $hits['self']; ?></td>
-					<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=ajax">'.$hits['ajax'].'</a>' : $hits['ajax']; ?></td>
-					<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=special">'.$hits['special'].'</a>' : $hits['special']; ?></td>
-					<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=spam">'.$hits['spam'].'</a>' : $hits['spam']; ?></td>
-					<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=admin">'.$hits['admin'].'</a>' : $hits['admin']; ?></td>
-					<td class="lastcol right"><?php echo $is_live_mode ? '<a href="'.$link_text_total_day.'">'.array_sum( $hits ).'</a>' : array_sum( $hits ); ?></td>
+					<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&referer_type=search">'.$hits['search'].'</a>' : $hits['search']; ?></td>
+					<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&referer_type=referer">'.$hits['referer'].'</a>' : $hits['referer']; ?></td>
+					<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&referer_type=direct">'.$hits['direct'].'</a>' : $hits['direct']; ?></td>
+					<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&referer_type=self">'.$hits['self'].'</a>' : $hits['self']; ?></td>
+					<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&hit_type=ajax">'.$hits['ajax'].'</a>' : $hits['ajax']; ?></td>
+					<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&referer_type=special">'.$hits['special'].'</a>' : $hits['special']; ?></td>
+					<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&referer_type=spam">'.$hits['spam'].'</a>' : $hits['spam']; ?></td>
+					<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&hit_type=admin">'.$hits['admin'].'</a>' : $hits['admin']; ?></td>
+					<td class="lastcol right"><?php echo $is_live_data ? '<a href="'.$link_text_total_day.'">'.array_sum( $hits ).'</a>' : array_sum( $hits ); ?></td>
 				</tr>
 				<?php
 					$hits = array(
@@ -318,6 +324,14 @@ if( count($res_hits) )
 
 			$link_text = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).'&blog='.$blog.'&agent_type=browser';
 			$link_text_total_day = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).'&blog='.$blog.'&agent_type=browser';
+
+			// Check if current data are live and not aggregated:
+			$is_live_data = true;
+			if( ! $is_live_mode )
+			{	// Check only for "Aggregate data":
+				$time_prune_before = mktime( 0, 0, 0 ) - ( $Settings->get( 'auto_prune_stats' ) * 86400 );
+				$is_live_data = $last_date >= $time_prune_before;
+			}
 			?>
 				<tr class="<?php echo ( $count%2 == 1 ) ? 'odd' : 'even'; ?>">
 				<td class="firstcol right"><?php
@@ -328,15 +342,15 @@ if( count($res_hits) )
 					}
 				?></td>
 				<td class="right"><?php echo count( $sessions[ $last_date ] ); ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=search">'.$hits['search'].'</a>' : $hits['search']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=referer">'.$hits['referer'].'</a>' : $hits['referer']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=direct">'.$hits['direct'].'</a>' : $hits['direct']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=self">'.$hits['self'].'</a>' : $hits['self']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=ajax">'.$hits['ajax'].'</a>' : $hits['ajax']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=special">'.$hits['special'].'</a>' : $hits['special']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&referer_type=spam">'.$hits['spam'].'</a>' : $hits['spam']; ?></td>
-				<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text.'&hit_type=admin">'.$hits['admin'].'</a>' : $hits['admin']; ?></td>
-				<td class="lastcol right"><?php echo $is_live_mode ? '<a href="'.$link_text_total_day.'">'.array_sum( $hits ).'</a>' : array_sum( $hits ); ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&referer_type=search">'.$hits['search'].'</a>' : $hits['search']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&referer_type=referer">'.$hits['referer'].'</a>' : $hits['referer']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&referer_type=direct">'.$hits['direct'].'</a>' : $hits['direct']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&referer_type=self">'.$hits['self'].'</a>' : $hits['self']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&hit_type=ajax">'.$hits['ajax'].'</a>' : $hits['ajax']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&referer_type=special">'.$hits['special'].'</a>' : $hits['special']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&referer_type=spam">'.$hits['spam'].'</a>' : $hits['spam']; ?></td>
+				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&hit_type=admin">'.$hits['admin'].'</a>' : $hits['admin']; ?></td>
+				<td class="lastcol right"><?php echo $is_live_data ? '<a href="'.$link_text_total_day.'">'.array_sum( $hits ).'</a>' : array_sum( $hits ); ?></td>
 			</tr>
 			<?php
 		}
@@ -362,15 +376,15 @@ if( count($res_hits) )
 		<tr class="total">
 			<td class="firstcol"><?php echo T_('Total') ?></td>
 			<td class="right"><?php echo count( $total_sessions ); ?></td>
-			<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&referer_type=search">'.$hits_total['search'].'</a>' : $hits_total['search']; ?></td>
-			<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&referer_type=referer">'.$hits_total['referer'].'</a>' : $hits_total['referer']; ?></td>
-			<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&referer_type=direct">'.$hits_total['direct'].'</a>' : $hits_total['direct']; ?></td>
-			<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&referer_type=self">'.$hits_total['self'].'</a>' : $hits_total['self']; ?></td>
-			<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&hit_type=ajax">'.$hits_total['ajax'].'</a>' : $hits_total['ajax']; ?></td>
-			<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&referer_type=special">'.$hits_total['special'].'</a>' : $hits_total['special']; ?></td>
-			<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&referer_type=spam">'.$hits_total['spam'].'</a>' : $hits_total['spam']; ?></td>
-			<td class="right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'&hit_type=admin">'.$hits_total['admin'].'</a>' : $hits_total['admin']; ?></td>
-			<td class="lastcol right"><?php echo $is_live_mode ? '<a href="'.$link_text_total.'">'.array_sum( $hits_total ).'</a>' : array_sum( $hits_total ); ?></td>
+			<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'&referer_type=search">'.$hits_total['search'].'</a>' : $hits_total['search']; ?></td>
+			<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'&referer_type=referer">'.$hits_total['referer'].'</a>' : $hits_total['referer']; ?></td>
+			<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'&referer_type=direct">'.$hits_total['direct'].'</a>' : $hits_total['direct']; ?></td>
+			<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'&referer_type=self">'.$hits_total['self'].'</a>' : $hits_total['self']; ?></td>
+			<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'&hit_type=ajax">'.$hits_total['ajax'].'</a>' : $hits_total['ajax']; ?></td>
+			<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'&referer_type=special">'.$hits_total['special'].'</a>' : $hits_total['special']; ?></td>
+			<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'&referer_type=spam">'.$hits_total['spam'].'</a>' : $hits_total['spam']; ?></td>
+			<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'&hit_type=admin">'.$hits_total['admin'].'</a>' : $hits_total['admin']; ?></td>
+			<td class="lastcol right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'">'.array_sum( $hits_total ).'</a>' : array_sum( $hits_total ); ?></td>
 		</tr>
 
 	</table>

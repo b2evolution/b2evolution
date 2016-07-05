@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $rsc_url, $AdminUI, $agent_type_color;
+global $blog, $admin_url, $rsc_url, $AdminUI, $agent_type_color, $Settings, $localtimenow;
 
 echo '<h2 class="page-title">'.T_('Hits from RSS/Atom feed readers - Summary').get_manual_link( 'feed-hits-summary' ).'</h2>';
 
@@ -69,14 +69,12 @@ if( count($res_hits) )
 
 	$chart['dates'] = array();
 
-	if( $is_live_mode )
-	{	// Initialize the data to open an url by click on bar item
-		$chart['link_data'] = array();
-		$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&hit_type=$param1$';
-		$chart['link_data']['params'] = array(
-				array( 'rss' )
-			);
-	}
+	// Initialize the data to open an url by click on bar item
+	$chart['link_data'] = array();
+	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&hit_type=$param1$';
+	$chart['link_data']['params'] = array(
+			array( 'rss' )
+		);
 
 	$count = 0;
 	foreach( $res_hits as $row_stats )
@@ -122,6 +120,14 @@ if( count($res_hits) )
 	foreach( $res_hits as $r => $row_stats )
 	{
 		$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
+
+		// Check if current data are live and not aggregated:
+		$is_live_data = true;
+		if( ! $is_live_mode )
+		{	// Check only for "Aggregate data":
+			$time_prune_before = mktime( 0, 0, 0 ) - ( $Settings->get( 'auto_prune_stats' ) * 86400 );
+			$is_live_data = $this_date >= $time_prune_before;
+		}
 		?>
 		<tr class="<?php echo ( $r % 2 == 1 ) ? 'odd' : 'even'; ?>">
 			<td class="firstcol shrinkwrap" style="text-align:right"><?php
@@ -131,7 +137,7 @@ if( count($res_hits) )
 					echo action_icon( T_('Prune hits for this date!'), 'delete', $admin_url.'?ctrl=stats&amp;action=prune&amp;date='.$this_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb( 'stats' ) );
 				}
 			?></td>
-			<td class="lastcol right"><?php echo $is_live_mode ? '<a href="'.$admin_url.'?ctrl=stats&amp;tab=hits&amp;'
+			<td class="lastcol right"><?php echo $is_live_data ? '<a href="'.$admin_url.'?ctrl=stats&amp;tab=hits&amp;'
 				.'datestartinput='.urlencode( date( locale_datefmt() , $this_date ) ).'&amp;'
 				.'datestopinput='.urlencode( date( locale_datefmt(), $this_date ) ).'&amp;blog='.$blog.'&amp;hit_type=rss">'.$row_stats['hits'].'</a>' : $row_stats['hits']; ?></td>
 		</tr>
@@ -144,7 +150,7 @@ if( count($res_hits) )
 	?>
 		<tr class="total">
 			<td class="firstcol"><?php echo T_('Total') ?></td>
-			<td class="lastcol right"><?php echo $is_live_mode ? '<a href="'.$admin_url.'?ctrl=stats&amp;tab=hits&amp;blog='.$blog.'&amp;hit_type=rss">'.$hits_total.'</a>' : $hits_total; ?></td>
+			<td class="lastcol right"><?php echo $is_live_data ? '<a href="'.$admin_url.'?ctrl=stats&amp;tab=hits&amp;blog='.$blog.'&amp;hit_type=rss">'.$hits_total.'</a>' : $hits_total; ?></td>
 		</tr>
 	</table>
 	<?php
