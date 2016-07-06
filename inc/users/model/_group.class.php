@@ -221,7 +221,7 @@ class Group extends DataObject
 		foreach( $GroupSettings->permission_values as $name => $value )
 		{
 			// We need to handle checkboxes and radioboxes separately , because when a checkbox isn't checked the checkbox variable is not sent
-			if( $name == 'perm_createblog' || $name == 'perm_getblog' || $name == 'perm_templates'
+			if( $name == 'perm_createblog' || $name == 'perm_getblog' || $name == 'perm_templates' || $name == 'perm_centralantispam'
 				|| $name == 'cross_country_allow_profiles' || $name == 'cross_country_allow_contact' )
 			{ // These permissions are represented by checkboxes, all other pluggable group permissions are represented by radiobox.
 				$value = param( 'edited_grp_'.$name, 'string', 'denied' );
