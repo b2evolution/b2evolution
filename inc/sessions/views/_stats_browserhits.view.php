@@ -35,6 +35,7 @@ $is_live_mode = ( get_hits_summary_mode() == 'live' );
 // TODO: I've also limited this to agent_type "browser" here, according to the change for "referers" (Rev 1.6)
 //       -> an RSS service that sends a referer is not a real referer (though it should be listed in the robots list)! (blueyed)
 $SQL = new SQL( 'Get hits summary from web browsers ('.( $is_live_mode ? 'Live data' : 'Aggregate data' ).')' );
+$sessions_SQL = new SQL( 'Get sessions summary from web browsers ('.( $is_live_mode ? 'Live data' : 'Aggregate data' ).')' );
 if( $is_live_mode )
 {	// Get the live data:
 	$SQL->SELECT( 'SQL_NO_CACHE COUNT( * ) AS hits, hit_referer_type AS referer_type, hit_type,
@@ -44,9 +45,15 @@ if( $is_live_mode )
 		EXTRACT( DAY FROM hit_datetime ) AS day' );
 	$SQL->FROM( 'T_hitlog' );
 	$SQL->WHERE( 'hit_agent_type = "browser"' );
+
+	$sessions_SQL->SELECT( 'SQL_NO_CACHE DATE( hit_datetime ) AS hit_date, COUNT( DISTINCT hit_sess_ID )' );
+	$sessions_SQL->FROM( 'T_hitlog' );
+	$sessions_SQL->WHERE( 'hit_agent_type = "browser"' );
+
 	if( $blog > 0 )
 	{	// Filter by collection:
 		$SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
+		$sessions_SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
 	}
 }
 else
@@ -58,14 +65,23 @@ else
 		EXTRACT( DAY FROM hagg_date ) AS day' );
 	$SQL->FROM( 'T_hits__aggregate' );
 	$SQL->WHERE( 'hagg_agent_type = "browser"' );
+
+	$sessions_SQL->SELECT( 'hags_date AS hit_date, SUM( hags_count_browser )' );
+	$sessions_SQL->FROM( 'T_hits__aggregate_sessions' );
+
 	if( $blog > 0 )
 	{	// Filter by collection:
 		$SQL->WHERE_and( 'hagg_coll_ID = '.$DB->quote( $blog ) );
+		$sessions_SQL->WHERE( 'hags_coll_ID = '.$DB->quote( $blog ) );
 	}
 }
 $SQL->GROUP_BY( 'year, month, day, referer_type, hit_type' );
 $SQL->ORDER_BY( 'year DESC, month DESC, day DESC, referer_type, hit_type' );
+$sessions_SQL->GROUP_BY( 'hit_date' );
+$sessions_SQL->ORDER_BY( 'hit_date DESC' );
+
 $res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+$sessions = $DB->get_assoc( $sessions_SQL->get(), $SQL->title );
 
 /*
  * Chart
@@ -117,7 +133,6 @@ if( count($res_hits) )
 		);
 
 	$count = 0;
-	$sessions = array();
 	foreach( $res_hits as $row_stats )
 	{
 		$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
@@ -158,22 +173,9 @@ if( count($res_hits) )
 			}
 		}
 
-		if( ! isset( $sessions[ $this_date ] ) )
-		{	// Initialize array to count sessions for each date:
-			$sessions[ $this_date ] = array();
-		}
-		$row_sessions = explode( ',', $row_stats['sessions'] );
-		foreach( $row_sessions as $row_session )
-		{
-			if( ! in_array( $row_session, $sessions[ $this_date ] ) )
-			{	// Count only unique session IDs:
-				$sessions[ $this_date ][] = $row_session;
-			}
-		}
-
 		// Store a count of sessions:
 		$col = $col_mapping['session'];
-		$chart['chart_data'][ $col ][0] = count( $sessions[ $this_date ] );
+		$chart['chart_data'][ $col ][0] = ( isset( $sessions[ date( 'Y-m-d', $this_date ) ] ) ? $sessions[ date( 'Y-m-d', $this_date ) ] : 0 );
 	}
 
 	array_unshift( $chart[ 'chart_data' ][ 0 ], '' );
@@ -270,7 +272,7 @@ if( count($res_hits) )
 							echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb('stats') ) );
 						}
 					?></td>
-					<td class="right"><?php echo count( $sessions[ $last_date ] ); ?></td>
+					<td class="right"><?php echo isset( $sessions[ date( 'Y-m-d', $last_date ) ] ) ? $sessions[ date( 'Y-m-d', $last_date ) ] : 0; ?></td>
 					<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&referer_type=search">'.$hits['search'].'</a>' : $hits['search']; ?></td>
 					<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&referer_type=referer">'.$hits['referer'].'</a>' : $hits['referer']; ?></td>
 					<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&referer_type=direct">'.$hits['direct'].'</a>' : $hits['direct']; ?></td>
@@ -341,7 +343,7 @@ if( count($res_hits) )
 						echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb('stats') ) );
 					}
 				?></td>
-				<td class="right"><?php echo count( $sessions[ $last_date ] ); ?></td>
+				<td class="right"><?php echo isset( $sessions[ date( 'Y-m-d', $last_date ) ] ) ? $sessions[ date( 'Y-m-d', $last_date ) ] : 0; ?></td>
 				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&referer_type=search">'.$hits['search'].'</a>' : $hits['search']; ?></td>
 				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&referer_type=referer">'.$hits['referer'].'</a>' : $hits['referer']; ?></td>
 				<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text.'&referer_type=direct">'.$hits['direct'].'</a>' : $hits['direct']; ?></td>
@@ -358,24 +360,11 @@ if( count($res_hits) )
 		// Total numbers:
 
 		$link_text_total = $admin_url.'?ctrl=stats&tab=hits&blog='.$blog.'&agent_type=browser';
-
-		// Count total unique sessions for all dates:
-		$total_sessions = array();
-		foreach( $sessions as $date_sessions )
-		{
-			foreach( $date_sessions as $session_ID )
-			{
-				if( ! in_array( $session_ID, $total_sessions ) )
-				{	// Count only unique session IDs:
-					$total_sessions[] = $session_ID;
-				}
-			}
-		}
 		?>
 
 		<tr class="total">
 			<td class="firstcol"><?php echo T_('Total') ?></td>
-			<td class="right"><?php echo count( $total_sessions ); ?></td>
+			<td class="right"><?php echo array_sum( $sessions ); ?></td>
 			<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'&referer_type=search">'.$hits_total['search'].'</a>' : $hits_total['search']; ?></td>
 			<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'&referer_type=referer">'.$hits_total['referer'].'</a>' : $hits_total['referer']; ?></td>
 			<td class="right"><?php echo $is_live_data ? '<a href="'.$link_text_total.'&referer_type=direct">'.$hits_total['direct'].'</a>' : $hits_total['direct']; ?></td>

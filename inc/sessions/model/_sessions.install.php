@@ -124,6 +124,18 @@ $schema_queries['T_hits__aggregate'] = array(
 			UNIQUE            hagg_date_coll_ID_types (hagg_date, hagg_coll_ID, hagg_type, hagg_referer_type, hagg_agent_type)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
 
+$schema_queries['T_hits__aggregate_sessions'] = array(
+		'Creating table for aggregations of hit sessions',
+		"CREATE TABLE T_hits__aggregate_sessions (
+			hags_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			hags_date          DATE NOT NULL DEFAULT '2000-01-01',
+			hags_coll_ID       INT(11) UNSIGNED NULL DEFAULT NULL,
+			hags_count_browser INT(11) UNSIGNED NOT NULL DEFAULT 0,
+			hags_count_api     INT(11) UNSIGNED NOT NULL DEFAULT 0,
+			PRIMARY KEY        (hags_ID),
+			UNIQUE             hags_date_coll_ID (hags_date, hags_coll_ID)
+		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
+
 $schema_queries['T_track__goal'] = array(
 		'Creating goals table',
 		"CREATE TABLE T_track__goal(

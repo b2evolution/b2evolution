@@ -115,13 +115,31 @@ class Hitlist
 
 		$time_prune_before = ( $localtimenow - ( $Settings->get( 'auto_prune_stats' ) * 86400 ) ); // 1 day = 86400 seconds
 
-		// Aggregate the hits before they will be deleted below:
+		// Aggregate the hits and sessions before they will be deleted below:
+		// NOTE: Do NOT aggregate current day because it is not ended yet
 		$hitlist_Timer->start( 'aggregate' );
 		$DB->query( 'REPLACE INTO T_hits__aggregate ( hagg_date, hagg_coll_ID, hagg_type, hagg_referer_type, hagg_agent_type, hagg_count )
 			SELECT DATE( hit_datetime ) AS hit_date, IFNULL( hit_coll_ID, 0 ), hit_type, hit_referer_type, hit_agent_type, COUNT( hit_ID )
 			  FROM T_hitlog
+			 WHERE hit_datetime < '.$DB->quote( date( 'Y-m-d H:i:s', mktime( 0, 0, 0 ) ) ).'
 			 GROUP BY hit_date, hit_coll_ID, hit_type, hit_referer_type, hit_agent_type', 'Aggregate hit log' );
 		$hitlist_Timer->stop( 'aggregate' );
+		// Aggregate the counts of unique sessions:
+		$hitlist_Timer->start( 'aggregate_sessions' );
+		$DB->query( 'REPLACE INTO T_hits__aggregate_sessions ( hags_date, hags_coll_ID, hags_count_browser, hags_count_api )
+			SELECT DATE( hit_datetime ) AS hit_date, IFNULL( hit_coll_ID, 0 ), COUNT( DISTINCT hit_sess_ID ), 0
+			  FROM T_hitlog
+			 WHERE hit_datetime < '.$DB->quote( date( 'Y-m-d H:i:s', mktime( 0, 0, 0 ) ) ).'
+			   AND hit_agent_type = "browser"
+			 GROUP BY hit_date, hit_coll_ID', 'Aggregate sessions from hit log (hit_agent_type = "browser")' );
+		$DB->query( 'INSERT INTO T_hits__aggregate_sessions ( hags_date, hags_coll_ID, hags_count_api )
+			SELECT DATE( hit_datetime ) AS hit_date, IFNULL( hit_coll_ID, 0 ), COUNT( DISTINCT hit_sess_ID )
+			  FROM T_hitlog
+			 WHERE hit_datetime < '.$DB->quote( date( 'Y-m-d H:i:s', mktime( 0, 0, 0 ) ) ).'
+			   AND hit_type = "api"
+			 GROUP BY hit_date, hit_coll_ID
+			ON DUPLICATE KEY UPDATE hags_count_api = VALUES( hags_count_api )', 'Aggregate sessions from hit log (hit_type = "api")' );
+		$hitlist_Timer->stop( 'aggregate_sessions' );
 
 		// PRUNE HITLOG:
 		$hitlist_Timer->start( 'hitlog' );
@@ -202,6 +220,7 @@ class Hitlist
 					."\n"
 					.'AGGREGATING:'."\n"
 					.sprintf( 'Aggregate the rows from T_hitlog to T_hits__aggregate, Execution time: %s seconds', $hitlist_Timer->get_duration( 'aggregate' ) )."\n"
+					.sprintf( 'Aggregate the rows from T_hitlog to T_hits__aggregate_sessions, Execution time: %s seconds', $hitlist_Timer->get_duration( 'aggregate_sessions' ) )."\n"
 					."\n"
 					.'PRUNING:'."\n"
 					.sprintf( '%s rows from T_hitlog, Execution time: %s seconds', $hitlog_rows_affected, $hitlist_Timer->get_duration( 'hitlog' ) )."\n"
