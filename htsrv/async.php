@@ -520,12 +520,13 @@ switch( $action )
 
 		$new_status = param( 'new_status', 'string' );
 		$cakw_ID = param( 'cakw_ID', 'integer', true );
+		$statuschange_ts = date( 'Y-m-d H:i:s', $localtimenow );
 
 		$DB->query( 'UPDATE T_centralantispam__keyword
 			  SET cakw_status = '.( empty( $new_status ) ? 'NULL' : $DB->quote( $new_status ) ).',
-			      cakw_statuschange_ts = '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).'
+			      cakw_statuschange_ts = '.$DB->quote( $statuschange_ts ).'
 			WHERE cakw_ID =' . $DB->quote( $cakw_ID ) );
-		echo '<a href="#" rel="'.$new_status.'" style="color:#FFF" color="'.ca_get_keyword_status_color( $new_status ).'">'.ca_get_keyword_status_title( $new_status ).'</a>';
+		echo '<a href="#" rel="'.$new_status.'" style="color:#FFF" color="'.ca_get_keyword_status_color( $new_status ).'" date="'.format_to_output( mysql2localedatetime_spans( $statuschange_ts ), 'htmlspecialchars' ).'">'.ca_get_keyword_status_title( $new_status ).'</a>';
 		break;
 
 	case 'emadr_status_edit':

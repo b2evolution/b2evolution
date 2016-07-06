@@ -25,6 +25,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $central_antispam_Module, $UserSettings, $admin_url, $current_User;
 
+$keywords = param( 'keywords', 'string', '', true );
+$status = param( 'status', 'string', '', true );
+
 // Create result set:
 
 $SQL = new SQL();
@@ -33,15 +36,48 @@ $SQL->FROM( 'T_centralantispam__keyword' );
 $SQL->FROM_add( 'LEFT JOIN T_centralantispam__report ON carpt_cakw_ID = cakw_ID' );
 $SQL->GROUP_BY( 'cakw_ID' );
 
-$CountSQL = new SQL();
-$CountSQL->SELECT( 'SQL_NO_CACHE COUNT( cakw_ID )' );
-$CountSQL->FROM( 'T_centralantispam__keyword' );
+$count_SQL = new SQL();
+$count_SQL->SELECT( 'SQL_NO_CACHE COUNT( cakw_ID )' );
+$count_SQL->FROM( 'T_centralantispam__keyword' );
 
-$Results = new Results( $SQL->get(), 'cakw_', '---D', $UserSettings->get( 'results_per_page' ), $CountSQL->get() );
+if( ! empty( $keywords ) )
+{	// Filter by keywords:
+	$SQL->add_search_field( 'cakw_keyword' );
+	$SQL->WHERE_kw_search( $keywords, 'AND' );
+	$count_SQL->add_search_field( 'cakw_keyword' );
+	$count_SQL->WHERE_kw_search( $keywords, 'AND' );
+}
+
+if( ! empty( $status ) )
+{	// Filter by status:
+	$SQL->WHERE_and( 'cakw_status = '.$DB->quote( $status ) );
+	$count_SQL->WHERE_and( 'cakw_status = '.$DB->quote( $status ) );
+}
+
+$Results = new Results( $SQL->get(), 'cakw_', '---D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
 $Results->title = T_('Keywords');
 
 $Results->global_icon( T_('Import from local antispam list...'), 'new', regenerate_url( 'action', 'action=import' ), T_('Import from local antispam list...'), 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+
+
+/**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function filter_central_antispam( & $Form )
+{
+	$Form->text( 'keywords', get_param( 'keywords' ), 20, T_('Keywords'), T_('Separate with space'), 50 );
+
+	$Form->select_input_array( 'status', get_param( 'status' ), array( '' => T_('All') ) + ca_get_keyword_statuses(), T_('Status') );
+}
+$Results->filter_area = array(
+	'callback' => 'filter_central_antispam',
+	'presets' => array(
+		'all' => array( T_('All keywords'), $admin_url.'?ctrl=central_antispam' ),
+		)
+	);
 
 $Results->cols[] = array(
 		'th' => T_('ID'),
@@ -121,6 +157,8 @@ if( $current_User->check_perm( 'centralantispam', 'edit' ) )
 		'new_field_name'  => 'new_status',
 		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',
 		'ID_name'         => 'cakw_ID',
-		'colored_cells'   => true ) );
+		'colored_cells'   => true,
+		'callback_code'   => 'jQuery( this ).next().html( jQuery( this ).find( "a" ).attr( "date" ) );'."\r\n"
+		                    .'evoFadeSuccess( jQuery( this ).next().get( 0 ) );' ) );
 }
 ?>

@@ -69,7 +69,7 @@ if( ! empty( $keywords ) )
 
 if( ! empty( $source ) )
 {	// Filter by source:
-	$SQL->WHERE( 'askw_source = '.$DB->quote( $source ) );
+	$SQL->WHERE_and( 'askw_source = '.$DB->quote( $source ) );
 }
 
 // Create result set:

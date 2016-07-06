@@ -7110,6 +7110,7 @@ function echo_editable_column_js( $params = array() )
 			'field_type'      => 'select', // Type of the editable field: 'select', 'text'
 			'field_class'     => '', // Class of the editable field
 			'null_text'       => '', // Null text of an input field, Use TS_() to translate it
+			'callback_code'   => '', // Additional JS code after main callback code
 		), $params );
 
 	// Set onblur action to 'submit' when type is 'text' in order to don't miss the selected user login from autocomplete list
@@ -7171,7 +7172,11 @@ jQuery( document ).ready( function()
 			{
 				evoFadeSuccess( this );
 			}
-			<?php } ?>
+			<?php
+			}
+			// Execute additional code:
+			echo $params['callback_code'];
+			?>
 		},
 		onsubmit: function( settings, original ) {},
 		submitdata : function( value, settings )
