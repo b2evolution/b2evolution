@@ -64,7 +64,7 @@ if( count( $keywords ) > 0 )
 		$Form->switch_layout( NULL );
 
 		$Form->begin_line( '', NULL, '', array( 'wide' => true ) );
-			$Form->checkbox_input( 'import_keywords[]', 1, '', array( 'value' => $keywords_status ) );
+			$Form->checkbox_input( 'import_keywords[]', ( $keywords_status != 'local' ), '', array( 'value' => $keywords_status ) );
 			printf( T_('Import %s keywords with status "%s" and set report dates starting at %s with 1 second increments'), $keywords_count, $keywords_status, $keywords_date_start );
 		$Form->end_line();
 	}
