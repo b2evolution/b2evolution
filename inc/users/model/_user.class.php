@@ -1214,33 +1214,37 @@ class User extends DataObject
 				$subscription_values = array();
 				$opt_out_values = array();
 				$unsubscribed = array();
-				$subs_blog_IDs = explode( ',', $subs_blog_IDs );
-				foreach( $subs_blog_IDs as $loop_blog_ID )
+				if( $subs_blog_IDs )
 				{
-					// Make sure no dirty hack is coming in here:
-					$loop_blog_ID = intval( $loop_blog_ID );
+					$subs_blog_IDs = explode( ',', $subs_blog_IDs );
 
-					// Get checkbox values:
-					$sub_items    = param( 'sub_items_'.$loop_blog_ID,    'integer', 0 );
-					$sub_comments = param( 'sub_comments_'.$loop_blog_ID, 'integer', 0 );
+					foreach( $subs_blog_IDs as $loop_blog_ID )
+					{
+						// Make sure no dirty hack is coming in here:
+						$loop_blog_ID = intval( $loop_blog_ID );
 
-					if( $sub_items || $sub_comments )
-					{	// We have a subscription for this blog
-						$subscription_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_comments )";
-					}
-					else
-					{	// No subscription here:
+						// Get checkbox values:
+						$sub_items    = param( 'sub_items_'.$loop_blog_ID,    'integer', 0 );
+						$sub_comments = param( 'sub_comments_'.$loop_blog_ID, 'integer', 0 );
 
-						// Check if opt-out and user is a member
-						$Blog = & $BlogCache->get_by_ID( $loop_blog_ID );
-
-						if( $Blog->get_setting( 'opt_out_subscription' ) && $this->check_perm( 'blog_ismember', 'view', true, $loop_blog_ID ) )
-						{
-							$opt_out_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_comments )";
+						if( $sub_items || $sub_comments )
+						{	// We have a subscription for this blog
+							$subscription_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_comments )";
 						}
 						else
-						{
-							$unsubscribed[] = $loop_blog_ID;
+						{	// No subscription here:
+
+							// Check if opt-out and user is a member
+							$Blog = & $BlogCache->get_by_ID( $loop_blog_ID );
+
+							if( $Blog->get_setting( 'opt_out_subscription' ) && $this->check_perm( 'blog_ismember', 'view', true, $loop_blog_ID ) )
+							{
+								$opt_out_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_comments )";
+							}
+							else
+							{
+								$unsubscribed[] = $loop_blog_ID;
+							}
 						}
 					}
 				}
@@ -1282,7 +1286,7 @@ class User extends DataObject
 							$blog_ID = $Item->get_blog_ID();
 							$Blog = $BlogCache->get_by_ID( $blog_ID );
 
-							if( $Blog->get_setting( 'opt_out_subscription' ) && $this->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
+							if( $Blog->get_setting( 'opt_out_item_subscription' ) && $this->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
 							{
 								$opt_out_values[] = "( $loop_item_ID, $this->ID, $isub_comments )";
 							}

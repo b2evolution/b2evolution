@@ -2460,9 +2460,57 @@ function get_user_sub_entries( $is_admin, $user_ID )
 function get_user_isubscription( $user_ID, $item_ID )
 {
 	global $DB;
+	$ItemCache = & get_ItemCache();
+	$Item = $ItemCache->get_by_ID( $item_ID );
+	$blog_ID = $Item->get_blog_ID();
+
 	$result = $DB->get_var( 'SELECT count( isub_user_ID )
-								FROM T_items__subscriptions
-								WHERE isub_user_ID = '.$user_ID.' AND isub_item_ID = '.$item_ID.' AND isub_comments <> 0' );
+								FROM (
+									SELECT DISTINCT isub_user_ID
+									FROM T_items__subscriptions
+									WHERE isub_user_ID = '.$user_ID.' AND isub_item_ID = '.$item_ID.' AND isub_comments <> 0
+
+									UNION
+
+									SELECT user_ID
+									FROM T_coll_settings AS opt
+									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = 1 )
+									LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+									LEFT JOIN T_users ON ( user_grp_ID = bloggroup_group_ID )
+									LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$item_ID.' AND isub_user_ID = user_ID )
+									WHERE opt.cset_coll_ID = '.$blog_ID.'
+										AND opt.cset_name = "opt_out_item_subscription"
+										AND opt.cset_value = 1
+										AND  user_ID = '.$user_ID.'
+										AND ( isub_comments IS NULL OR isub_comments = 1 )
+
+									UNION
+
+									SELECT sug_user_ID
+									FROM T_coll_settings AS opt
+									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = 1 )
+									LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+									LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
+									LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$item_ID.' AND isub_user_ID = sug_user_ID )
+									WHERE opt.cset_coll_ID = '.$blog_ID.'
+										AND opt.cset_name = "opt_out_item_subscription"
+										AND opt.cset_value = 1
+										AND sug_user_ID = '.$user_ID.'
+										AND ( isub_comments IS NULL OR isub_comments = 1 )
+
+									UNION
+
+									SELECT bloguser_user_ID
+									FROM T_coll_settings AS opt
+									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = 1 )
+									LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = opt.cset_coll_ID AND bloguser_ismember = 1 )
+									LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$item_ID.' AND isub_user_ID = bloguser_user_ID )
+									WHERE opt.cset_coll_ID = '.$blog_ID.'
+										AND opt.cset_name = "opt_out_item_subscription"
+										AND opt.cset_value = 1
+										AND bloguser_user_ID = '.$user_ID.'
+										AND ( isub_comments IS NULL OR isub_comments = 1 )
+								) AS users' );
 	return $result > 0;
 }
 

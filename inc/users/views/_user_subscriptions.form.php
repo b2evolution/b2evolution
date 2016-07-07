@@ -275,12 +275,6 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Blog subscriptions'), array( 'id' => 'subs' ) );
 
 		// Get those blogs for which we have already subscriptions (for this user)
-		/*
-		$sql = 'SELECT blog_ID, blog_shortname, sub_items, sub_comments
-		          FROM T_blogs INNER JOIN T_subscriptions ON ( blog_ID = sub_coll_ID AND sub_user_ID = '.$edited_User->ID.' )
-		                       INNER JOIN T_coll_settings ON ( blog_ID = cset_coll_ID AND cset_name = "allow_subscriptions" AND cset_value = "1" )';
-		*/
-
 		$sql = 'SELECT DISTINCT blog_ID, blog_shortname,
 							IF( sub_items IS NULL, 1, sub_items ) AS sub_items,
 							IF( sub_comments IS NULL, 1, sub_comments ) AS sub_comments
@@ -292,8 +286,9 @@ $Form->begin_fieldset( T_('Blog subscriptions'), array( 'id' => 'subs' ) );
 						LEFT JOIN T_coll_user_perms ON (bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND opt.cset_value = "1" )
 						LEFT JOIN T_users ON (user_grp_ID = bloggroup_group_ID AND user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
 						LEFT JOIN T_users__secondary_user_groups ON (sug_grp_ID = bloggroup_group_ID AND sug_user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
-						WHERE sug_user_ID = '.$edited_User->ID.' OR bloguser_user_ID = '.$edited_User->ID.' OR user_ID = '.$edited_User->ID.'
-							AND ( sub_items != 0 OR sub_comments != 0 OR sub_coll_ID IS NULL )';
+						WHERE ( sug_user_ID = '.$edited_User->ID.' OR bloguser_user_ID = '.$edited_User->ID.' OR user_ID = '.$edited_User->ID.' OR sub_user_ID = '.$edited_User->ID.' )
+							AND ( sub_items <> 0 OR sub_comments <> 0 OR sub_coll_ID IS NULL )
+							AND ( CASE opt.cset_value WHEN 1 THEN blog_advanced_perms = 1 ELSE TRUE END )';
 
 		$blog_subs = $DB->get_results( $sql );
 
@@ -403,15 +398,6 @@ else
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Individual post subscriptions') );
-	/*
-	$sql = 'SELECT DISTINCT post_ID, blog_ID, blog_shortname
-				FROM T_items__subscriptions
-					INNER JOIN T_items__item ON isub_item_ID = post_ID
-					INNER JOIN T_categories ON post_main_cat_ID = cat_ID
-					INNER JOIN T_blogs ON cat_blog_ID = blog_ID
-				WHERE isub_user_ID = '.$edited_User->ID.' AND isub_comments <> 0
-				ORDER BY blog_ID, post_ID ASC';
-	*/
 	$sql = 'SELECT DISTINCT post_ID, blog_ID, blog_shortname
 			FROM T_items__item
 			INNER JOIN T_categories ON cat_ID = post_main_cat_ID
@@ -423,7 +409,7 @@ $Form->begin_fieldset( T_('Individual post subscriptions') );
 			LEFT JOIN T_coll_user_perms ON (bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND opt.cset_value = "1" )
 			LEFT JOIN T_users ON (user_grp_ID = bloggroup_group_ID AND user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
 			LEFT JOIN T_users__secondary_user_groups ON (sug_grp_ID = bloggroup_group_ID AND sug_user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
-			WHERE sug_user_ID = '.$edited_User->ID.' OR bloguser_user_ID = '.$edited_User->ID.' OR user_ID = '.$edited_User->ID.'
+			WHERE ( sug_user_ID = '.$edited_User->ID.' OR bloguser_user_ID = '.$edited_User->ID.' OR user_ID = '.$edited_User->ID.' )
 				AND ( isub_comments <> 0 OR isub_item_ID IS NULL )';
 
 	$individual_posts_subs = $DB->get_results( $sql );

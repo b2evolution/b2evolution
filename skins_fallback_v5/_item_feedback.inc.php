@@ -389,8 +389,57 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 
 	if( $Blog->get_setting( 'allow_subscriptions' ) )
 	{
-		$sql = 'SELECT count( sub_user_ID ) FROM T_subscriptions
-					WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0';
+		$sql = 'SELECT count( sub_user_ID )
+							FROM (
+								SELECT DISTINCT sub_user_ID
+								FROM T_subscriptions
+								WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0
+
+								UNION
+
+								SELECT user_ID
+								FROM T_coll_settings AS opt
+								INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+								INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+								LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+								LEFT JOIN T_users ON ( user_grp_ID = bloggroup_group_ID )
+								LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = user_ID )
+								WHERE opt.cset_coll_ID = '.$Blog->ID.'
+									AND opt.cset_name = "opt_out_subscription"
+									AND opt.cset_value = 1
+									AND user_ID = '.$current_User->ID.'
+									AND ( sub_comments IS NULL OR sub_comments <> 0 )
+
+								UNION
+
+								SELECT sug_user_ID
+								FROM T_coll_settings AS opt
+								INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+								INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+								LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+								LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
+								LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = sug_user_ID )
+								WHERE opt.cset_coll_ID = '.$Blog->ID.'
+									AND opt.cset_name = "opt_out_subscription"
+									AND opt.cset_value = 1
+									AND sug_user_ID = '.$current_User->ID.'
+									AND ( sub_comments IS NULL OR sub_comments <> 0 )
+
+								UNION
+
+								SELECT bloguser_user_ID
+								FROM T_coll_settings AS opt
+								INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+								INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+								LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = opt.cset_coll_ID AND bloguser_ismember = 1 )
+								LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = bloguser_user_ID )
+								WHERE opt.cset_coll_ID = '.$Blog->ID.'
+									AND opt.cset_name = "opt_out_subscription"
+									AND opt.cset_value = 1
+									AND bloguser_user_ID = '.$current_User->ID.'
+									AND ( sub_comments IS NULL OR sub_comments <> 0 )
+							) AS users';
+
 		if( $DB->get_var( $sql ) > 0 )
 		{
 			echo '<p>'.T_( 'You are receiving notifications when anyone comments on any post.' );
