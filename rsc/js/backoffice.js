@@ -285,7 +285,7 @@ function b2edit_save_item( obj, coll_urlname )
 		var field_name = jQuery( this ).attr( 'name' );
 		var field_value = jQuery( this ).val();
 		var field_type = jQuery( this ).attr( 'type' );
-		if( typeof( field_name ) != 'undefined' && field_name != '' && field_value != ''
+		if( typeof( field_name ) != 'undefined' && field_name != ''
 		    && ( ( field_type != 'checkbox' && field_type != 'radio' ) || jQuery( this ).is( ':checked' ) ) )
 		{	// Get only really selected params:
 			if( typeof( params[ field_name ] ) != 'undefined' && field_name.indexOf( '[' ) != -1 )
@@ -337,6 +337,27 @@ function b2edit_save_item( obj, coll_urlname )
 	function( data )
 	{	// Failed updating:
 		b2edit_save_item_print_messages( data, 'error' );
+
+		jQuery( '.field_error' ).each( function()
+		{	// Clear all error fields from previous request:
+			jQuery( this ).removeClass( 'field_error' );
+			if( jQuery( this ).next().hasClass( 'help-inline' ) )
+			{
+				jQuery( this ).next().remove();
+			}
+		} );
+
+		if( typeof( data.field_errors ) == 'object' )
+		{	// Add error messages and red style for fields with entered error:
+			for( var i = 0; i < data.field_errors.length; i++ )
+			{
+				var field_name = data.field_errors[i][0];
+				var field_error = data.field_errors[i][1];
+				jQuery( '[name="' + field_name + '"]' )
+					.addClass( 'field_error' )
+					.after( '<span class="help-inline"><span class="field_error" rel="' + field_name + '">' + field_error + '</span></span>' );
+			}
+		}
 	} );
 
 	function b2edit_save_item_print_messages( data, msg_type )
