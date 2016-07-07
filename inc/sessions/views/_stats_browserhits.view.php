@@ -66,13 +66,17 @@ else
 	$SQL->FROM( 'T_hits__aggregate' );
 	$SQL->WHERE( 'hagg_agent_type = "browser"' );
 
-	$sessions_SQL->SELECT( 'hags_date AS hit_date, SUM( hags_count_browser )' );
+	$sessions_SQL->SELECT( 'hags_date AS hit_date, hags_count_browser' );
 	$sessions_SQL->FROM( 'T_hits__aggregate_sessions' );
 
 	if( $blog > 0 )
 	{	// Filter by collection:
 		$SQL->WHERE_and( 'hagg_coll_ID = '.$DB->quote( $blog ) );
 		$sessions_SQL->WHERE( 'hags_coll_ID = '.$DB->quote( $blog ) );
+	}
+	else
+	{	// Get ALL aggregated sessions:
+		$sessions_SQL->WHERE( 'hags_coll_ID = 0' );
 	}
 }
 $SQL->GROUP_BY( 'year, month, day, referer_type, hit_type' );
