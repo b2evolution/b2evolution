@@ -660,6 +660,12 @@ class Session
 
 		// ERROR MESSAGE, with form/button to bypass and enough warning hopefully.
 		// TODO: dh> please review carefully!
+		global $io_charset;
+		// erhsatingin > Most browsers will output this is in the <head> section. Either this or possibility of multiple <head> declarations.
+		// echo '<head>';
+		echo '<meta http-equiv="Content-Type" content="text/html; charset='.$io_charset.'" />';
+		// echo '</head>';
+
 		echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
 		echo '<h3 style="color:#f00;">'.T_('Incorrect crumb received!').' ['.$crumb_name.']</h3>';
 		echo '<p>'.T_('Your request was stopped for security reasons.').'</p>';
