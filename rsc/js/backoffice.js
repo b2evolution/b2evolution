@@ -328,6 +328,10 @@ function b2edit_save_item( obj, coll_urlname )
 			{
 				jQuery( this ).attr( 'href', jQuery( this ).attr( 'href' ).replace( 'disp=edit', 'disp=edit&p=' + data.item_ID ) );
 			} );
+			jQuery( 'a[href*="prev_action=new"]' ).each( function()
+			{
+				jQuery( this ).attr( 'href', jQuery( this ).attr( 'href' ).replace( 'prev_action=new', 'prev_action=edit&p=' + data.item_ID ) );
+			} );
 		}
 	}, 'GET',
 	function( data )
