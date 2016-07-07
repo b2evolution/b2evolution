@@ -1905,7 +1905,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	if( ! $inskin && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 	{ // Show Save & Edit only on admin mode
 		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'),
-			'SaveEditButton btn-status-'.$edited_Item->status, 'return b2edit_save_item( this, '.$edited_Item->ID.', "'.$Blog->get( 'urlname' ).'" );' ) );
+			'SaveEditButton btn-status-'.$edited_Item->status, 'return b2edit_save_item( this, "'.$Blog->get( 'urlname' ).'" );' ) );
 	}
 
 	if( $inskin )

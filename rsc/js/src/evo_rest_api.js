@@ -42,6 +42,8 @@ function evo_rest_api_request( url, params_func, func_method, method, func_fail 
 		}
 	}, function( jqXHR )
 	{	// Fail:
+		// Don't show window with debug log error:
+		b2evo_show_debug_ajax_error = false;
 		if( typeof( func_fail ) == 'function' && typeof( jqXHR.responseJSON ) == 'object' )
 		{	// Call function only when we get correct JSON response:
 			eval( func_fail )( jqXHR.responseJSON, jqXHR );

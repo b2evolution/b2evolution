@@ -273,9 +273,10 @@ function b2edit_update_item_preview( obj, form_action, submit_action )
  * @param object Event object
  * @param integer Item ID
  */
-function b2edit_save_item( obj, item_ID, coll_urlname )
+function b2edit_save_item( obj, coll_urlname )
 {
 	var form = jQuery( obj ).closest( 'form' );
+	var item_ID = form.find( 'input[name=post_ID]' ).val();
 
 	// Get all form params for REST API call below:
 	var params = {};
@@ -305,14 +306,29 @@ function b2edit_save_item( obj, item_ID, coll_urlname )
 	} );
 
 	// Call REST API request to save Item:
-	evo_rest_api_request( 'collections/' + coll_urlname + '/items/' + ( item_ID ? item_ID + '/update' : 'create' ), params,
+	evo_rest_api_request( 'collections/' + coll_urlname + '/items/' + ( item_ID > 0 ? item_ID + '/update' : 'create' ), params,
 	function( data )
 	{	// Success updating:
 		b2edit_save_item_print_messages( data, 'success' );
 		// Reload preview iframe:
-		jQuery( 'iframe#iframe_item_preview' ).attr( 'src', data.item_url );
-		// Unfold panel with preview iframe:
-		jQuery( '#fieldset_wrapper_itemform_preview.folded' ).removeClass( 'folded' );
+		b2edit_update_item_preview( obj, data.coll_url );
+		if( item_ID == 0 )
+		{	// If new item has been created we should switch form to "update" mode in order to don't create the item twice:
+			form.find( 'input[name=post_ID]' ).val( data.item_ID );
+			form.find( 'input[name^="actionArray[create"]' ).each( function()
+			{
+				jQuery( this ).attr( 'name', jQuery( this ).attr( 'name' ).replace( '[create', '[update' ) );
+			} );
+			jQuery( 'a[href$="action=new_type"]' ).each( function()
+			{
+				jQuery( this ).attr( 'href', jQuery( this ).attr( 'href' ).replace( 'action=new_type', 'action=edit_type&post_ID=' + data.item_ID ) );
+				jQuery( this ).attr( 'onclick', jQuery( this ).attr( 'onclick' ).replace( "'new_type'", "'edit_type'" ) );
+			} );
+			jQuery( 'a[href$="disp=edit"]' ).each( function()
+			{
+				jQuery( this ).attr( 'href', jQuery( this ).attr( 'href' ).replace( 'disp=edit', 'disp=edit&p=' + data.item_ID ) );
+			} );
+		}
 	}, 'GET',
 	function( data )
 	{	// Failed updating:

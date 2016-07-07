@@ -26,10 +26,6 @@ global $LinkOwner;
 
 global $AdminUI, $current_User;
 
-// Override $debug in order to keep the display of the iframe neat
-global $debug;
-$debug = 0;
-
 if( empty( $Blog ) )
 {
 	$Blog = & $LinkOwner->get_Blog();

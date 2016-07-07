@@ -78,7 +78,10 @@ jQuery( document ).ready( function()
 
 	jQuery( document ).ajaxError( function( event, request, settings, thrownError )
 	{ // AJAX request is failed, Add debug info into the list
-		jQuery( 'div#debug_ajax_info' ).show();
+		if( typeof( b2evo_show_debug_ajax_error ) == 'undefined' || b2evo_show_debug_ajax_error )
+		{	// Make debug AJAX info window visible on error if it is not forbidden by some code:
+			jQuery( 'div#debug_ajax_info' ).show();
+		}
 
 		var log = '<h4 class="error">Request ERROR #' + debug_ajax_request_number + ':</h4>';
 		log += '<b>url</b>: ' + settings.url + '<br />';

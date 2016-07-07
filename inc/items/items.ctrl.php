@@ -103,7 +103,6 @@ switch( $action )
 		break;
 
 	case 'update_edit':
-	case 'update_preview':
 	case 'update':
 	case 'update_publish':
 	case 'update_status':
@@ -909,7 +908,6 @@ switch( $action )
 
 
 	case 'update_edit':
-	case 'update_preview':
 	case 'update':
 	case 'update_publish':
 	case 'extract_tags':
@@ -941,15 +939,7 @@ switch( $action )
 		// Check if allowed to cross post.
 		if( ! check_cross_posting( $post_category, $post_extracats, $edited_Item->main_cat_ID ) )
 		{
-			if( $action == 'update_preview' )
-			{	// Redirect to item page to preview:
-				header_redirect( $edited_Item->get_permanent_url(), 303 );
-				/* EXITED */
-			}
-			else
-			{
-				break;
-			}
+			break;
 		}
 
 		// Get requested Post Type:
@@ -1007,30 +997,14 @@ switch( $action )
 
 		if( $Messages->has_errors() )
 		{	// There have been some validation errors:
-			if( $action == 'update_preview' )
-			{	// Redirect to item page to preview:
-				header_redirect( $edited_Item->get_permanent_url(), 303 );
-				/* EXITED */
-			}
-			else
-			{
-				break;
-			}
+			break;
 		}
 
 		// UPDATE POST IN DB:
 		if( !$edited_Item->dbupdate() )
 		{ // Could not update successful
 			$Messages->add( T_('The post couldn\'t be updated.'), 'error' );
-			if( $action == 'update_preview' )
-			{	// Redirect to item page to preview:
-				header_redirect( $edited_Item->get_permanent_url(), 303 );
-				/* EXITED */
-			}
-			else
-			{
-				break;
-			}
+			break;
 		}
 
 		// post post-publishing operations:
@@ -1065,12 +1039,7 @@ switch( $action )
 		// Delete Item from Session
 		delete_session_Item( $edited_Item->ID );
 
-		if( $action == 'update_preview' )
-		{	// Redirect to item page to preview:
-			header_redirect( $edited_Item->get_permanent_url(), 303 );
-			/* EXITED */
-		}
-		elseif( ! $exit_after_save )
+		if( ! $exit_after_save )
 		{	// We want to continue editing...
 			break;
 		}
@@ -1701,7 +1670,7 @@ switch( $action )
 					) );
 
 				// Params we need for tab switching
-				$tab_switch_params = 'p='.$edited_Item->ID;
+				$tab_switch_params = '&amp;p='.$edited_Item->ID;
 			}
 			else
 			{
@@ -1710,7 +1679,7 @@ switch( $action )
 
 			if( $Blog->get_setting( 'in_skin_editing' ) && ( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) || get_param( 'p' ) > 0 ) )
 			{ // Show 'In skin' link if Blog setting 'In-skin editing' is ON and User has a permission to publish item in this blog
-				$mode_inskin_url = url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;'.$tab_switch_params );
+				$mode_inskin_url = url_add_param( $Blog->get( 'url' ), 'disp=edit'.$tab_switch_params );
 				$mode_inskin_action = get_samedomain_htsrv_url().'item_edit.php';
 				$AdminUI->global_icon( T_('In skin editing'), 'edit', $mode_inskin_url,
 						' '.T_('In skin editing'), 4, 3, array(

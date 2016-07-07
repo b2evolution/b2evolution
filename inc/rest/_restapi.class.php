@@ -1126,7 +1126,6 @@ class RestApi
 				$this->add_response( 'messages', array( $Messages->messages_type[ $m ], $messages_text ), 'array' );
 			}
 			$this->halt( T_('The post couldn\'t be created.'), 'update_error', 403 );
-			return;
 		}
 
 		$result = $edited_Item->dbinsert();
@@ -1158,7 +1157,8 @@ class RestApi
 
 		if( $result )
 		{	// Success creating:
-			$this->add_response( 'item_url', $edited_Item->get_permanent_url() );
+			$this->add_response( 'coll_url', url_same_protocol( $Blog->get( 'url' ) ) );
+			$this->add_response( 'item_ID', $edited_Item->ID );
 			$this->halt( T_('Post has been created.'), 'create_success', 200 );
 		}
 		else
@@ -1277,7 +1277,6 @@ class RestApi
 				$this->add_response( 'messages', array( $Messages->messages_type[ $m ], $messages_text ), 'array' );
 			}
 			$this->halt( T_('The post couldn\'t be updated.'), 'update_error', 403 );
-			return;
 		}
 
 		// Try to update the edited Item:
@@ -1310,7 +1309,7 @@ class RestApi
 
 		if( $result )
 		{	// Success updating:
-			$this->add_response( 'item_url', $edited_Item->get_permanent_url() );
+			$this->add_response( 'coll_url', url_same_protocol( $Blog->get( 'url' ) ) );
 			$this->halt( T_('Post has been updated.'), 'update_success', 200 );
 		}
 		else
