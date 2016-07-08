@@ -26,7 +26,7 @@ global $Settings;
 
 global $baseurl, $admin_url;
 
-global $smtp_test_output, $action;
+global $test_mail_output, $action;
 
 
 $Form = new Form( NULL, 'settings_checkchanges' );
@@ -46,14 +46,16 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 
 		$url = '?ctrl=email&amp;tab='.get_param( 'tab' ).'&amp;tab2='.get_param( 'tab2' ).'&amp;tab3='.get_param( 'tab3' ).'&amp;'.url_crumb('emailsettings').'&amp;action=';
 		$Form->info_field( T_('Perform tests'),
-					'<a href="'.$url.'test_smtp">['.T_('server connection').']</a>&nbsp;&nbsp;'.
-					'<a href="'.$url.'test_email">['.T_('send test email').']</a>&nbsp;&nbsp;' );
+					'<a href="'.$url.'test_smtp" class="btn btn-default">'.T_('SMTP server connection').'</a>&nbsp;&nbsp;'.
+					'<a href="'.$url.'test_email_smtp" class="btn btn-default">'.T_('Send test email via SMTP').'</a>&nbsp;&nbsp;'.
+					'<a href="'.$url.'test_email_php" class="btn btn-default">'.T_('Send test email via PHP').'</a>',
+					array( 'class' => 'info_full_height' ) );
 
-		if( !empty( $smtp_test_output ) )
+		if( !empty( $test_mail_output ) )
 		{
 			echo '<div style="margin-top:25px"></div>';
 			// Display scrollable div
-			echo '<div style="padding: 6px; margin:5px; border: 1px solid #CCC; overflow:scroll; height: 350px">'.$smtp_test_output.'</div>';
+			echo '<div style="padding: 6px; margin:5px; border: 1px solid #CCC; overflow:scroll; height: 350px">'.$test_mail_output.'</div>';
 		}
 
 	$Form->end_fieldset();

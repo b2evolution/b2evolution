@@ -759,23 +759,52 @@ function evo_mail( $to, $subject, $message, $headers = array(), $additional_para
 	switch( $Settings->get( 'email_service' ) )
 	{
 		case 'smtp':
-			// SMTP sending is preferred
+			// SMTP sending is preferred:
 			$result = evo_mail_smtp( $to, $subject, $message_data, $headers, $additional_parameters );
 			if( ! $result && $Settings->get( 'force_email_sending' ) )
-			{ // SMTP sending was failed, Try to send email by php "mail" function
-				$result = @mail( $to, $subject, $message, get_mail_headers( $headers ), $additional_parameters );
+			{	// SMTP sending was failed, Try to send email by php "mail" function:
+				$result = evo_mail_php( $to, $subject, $message, $headers, $additional_parameters );
 			}
 			break;
 
 		case 'mail':
 		default:
-			// PHP "mail" function is preferred
-			$result = @mail( $to, $subject, $message, get_mail_headers( $headers ), $additional_parameters );
+			// PHP "mail" function is preferred:
+			$result = evo_mail_php( $to, $subject, $message, $headers, $additional_parameters );
 			if( ! $result && $Settings->get( 'force_email_sending' ) )
-			{ // "mail" function was failed, Try to send email by SMTP Swift Mailer
+			{	// "mail" function was failed, Try to send email by SMTP Swift Mailer:
 				$result = evo_mail_smtp( $to, $subject, $message_data, $headers, $additional_parameters );
 			}
 			break;
+	}
+
+	return $result;
+}
+
+
+/**
+ * Send mail by PHP mail() function
+ *
+ * @param string Receiver, or receivers of the mail
+ * @param string Subject of the email
+ * @param string|array Message OR Array: 'charset', 'full', 'html', 'text'
+ * @param array Email headers
+ * @param string Additional flags as command line options
+ * @return boolean TRUE on success
+ */
+function evo_mail_php( $to, $subject, $message, $headers = array(), $additional_parameters = '' )
+{
+	global $php_mail_sending_log;
+
+	$result = @mail( $to, $subject, $message, get_mail_headers( $headers ), $additional_parameters );
+
+	if( ! $result )
+	{	// Store error log in global var:
+		$php_last_error = error_get_last();
+		if( isset( $php_last_error['message'] ) )
+		{
+			$php_mail_sending_log = $php_last_error['message'];
+		}
 	}
 
 	return $result;
@@ -931,7 +960,7 @@ function smtp_connection_test()
 {
 	global $smtp_connection_result;
 
-	$smtp_messages = array();
+	$test_mail_messages = array();
 	$smtp_connection_result = true;
 
 	// Check if Swift Mailer is enabled
@@ -939,15 +968,15 @@ function smtp_connection_test()
 	$message = T_('Check SMTP settings...').' ';
 	if( $check_smtp_result === true )
 	{	// Success:
-		$smtp_messages[] = '<b>'.$message.'</b><b class="green">OK</b>';
+		$test_mail_messages[] = '<b>'.$message.'</b><b class="green">OK</b>';
 		syslog_insert( $message.' OK', 'info', NULL );
 	}
 	else
 	{	// Error:
-		$smtp_messages[] = '<b>'.$message.'</b>'.$check_smtp_result.' <b class="red">'.T_('Failed').'</b>';
+		$test_mail_messages[] = '<b>'.$message.'</b>'.$check_smtp_result.' <b class="red">'.T_('Failed').'</b>';
 		syslog_insert( $message.$check_smtp_result.' '.T_('Failed'), 'warning', NULL );
 		$smtp_connection_result = false;
-		return $smtp_messages;// EXIT
+		return $test_mail_messages;// EXIT
 	}
 
 	// Create SMTP transport:
@@ -971,17 +1000,17 @@ function smtp_connection_test()
 
 	if( $connection_result === true )
 	{ // Success
-		$smtp_messages[] = $smtp_mail_sending_log_html.'<b class="green">OK</b>';
+		$test_mail_messages[] = $smtp_mail_sending_log_html.'<b class="green">OK</b>';
 		syslog_insert( $smtp_message.$smtp_mail_connection_log.' OK', 'info', NULL );
 	}
 	else
 	{ // Error
-		$smtp_messages[] = $smtp_mail_sending_log_html.'<b class="red">'.T_('Failed').'</b>';
+		$test_mail_messages[] = $smtp_mail_sending_log_html.'<b class="red">'.T_('Failed').'</b>';
 		syslog_insert( $smtp_message.$smtp_mail_connection_log.' '.T_('Failed'), 'warning', NULL );
 		$smtp_connection_result = false;
 	}
 
-	return $smtp_messages;
+	return $test_mail_messages;
 }
 
 
@@ -997,11 +1026,11 @@ function smtp_email_sending_test()
 	$smtp_connection_result = true;
 
 	// Firstly try to SMTP connect:
-	$smtp_messages = smtp_connection_test();
+	$test_mail_messages = smtp_connection_test();
 
 	if( ! $smtp_connection_result )
 	{	// Errors on SMTP connections:
-		return $smtp_messages;
+		return $test_mail_messages;
 		// Exit here.
 	}
 
@@ -1021,16 +1050,55 @@ function smtp_email_sending_test()
 
 	if( $sending_result === true )
 	{	// Success:
-		$smtp_messages[] = $smtp_mail_sending_log_html.'<b class="green">OK</b>';
+		$test_mail_messages[] = $smtp_mail_sending_log_html.'<b class="green">OK</b>';
 		syslog_insert( $smtp_message.$smtp_mail_sending_log.' OK', 'info', NULL );
 	}
 	else
 	{	// Error:
-		$smtp_messages[] = $smtp_mail_sending_log_html.'<b class="red">'.T_('Failed').'</b>';
+		$test_mail_messages[] = $smtp_mail_sending_log_html.'<b class="red">'.T_('Failed').'</b>';
 		syslog_insert( $smtp_message.$smtp_mail_sending_log.' '.T_('Failed'), 'warning', NULL );
 		$smtp_connection_result = false;
 	}
 
-	return $smtp_messages;
+	return $test_mail_messages;
+}
+
+
+/**
+ * Test email sending by PHP
+ *
+ * @return array Result messages
+ */
+function php_email_sending_test()
+{
+	global $Settings, $current_User, $php_mail_sending_log;
+
+	$mail_message = sprintf( T_( 'Send test email message to "%s"...' ), $current_User->get( 'email' ) ).' ';
+
+	// Force temporary to use ONLY PHP mail sending:
+	$Settings->set( 'email_service', 'mail' );
+	// DON'T force to send email by php "mail":
+	$Settings->set( 'force_email_sending', false );
+
+	// Send test email:
+	$sending_result = send_mail( $current_User->get( 'email' ), $current_User->get( 'login' ), 'Test PHP email sending', 'Hello, this is a test.' );
+
+	// Set SMTP log text to display on the testing page:
+	$php_mail_sending_log_html = '<b>'.$mail_message.'</b>'
+		.( empty( $php_mail_sending_log ) ? ' ' : nl2br( format_to_output( $php_mail_sending_log, 'htmlspecialchars' ) ).'<br />' );
+
+	if( $sending_result === true )
+	{	// Success:
+		$test_mail_messages[] = $php_mail_sending_log_html.'<b class="green">OK</b>';
+		syslog_insert( $mail_message.$php_mail_sending_log.' OK', 'info', NULL );
+	}
+	else
+	{	// Error:
+		$test_mail_messages[] = $php_mail_sending_log_html.'<b class="red">'.T_('Failed').'</b>';
+		syslog_insert( $mail_message.$php_mail_sending_log.' '.T_('Failed'), 'warning', NULL );
+		$smtp_connection_result = false;
+	}
+
+	return $test_mail_messages;
 }
 ?>
