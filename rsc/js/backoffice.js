@@ -524,3 +524,60 @@ function b2edit_confirm( msg, newaction, submit_action )
 
 	return b2edit_reload( document.getElementById( 'item_checkchanges' ), newaction, null, { action: submit_action }, false );
 }
+
+// Code to resize height of item preview frame:
+jQuery( document ).ready( function()
+{
+	function update_item_preview_frame_height()
+	{
+		var body_height = jQuery( '#iframe_item_preview' ).contents().find( 'body' ).height();
+		if( body_height == 0 )
+		{	// Some browsers cannot get iframe body height correctly, Use this default min value:
+			body_height = 200;
+		}
+
+		if( body_height > jQuery( '#iframe_item_preview_wrapper' ).height() )
+		{	// Expand the frame height if it is more than wrapper height (but max height is 320px):
+			jQuery( '#iframe_item_preview_wrapper' ).css( 'height', body_height < 600 ? body_height : 600 );
+		}
+		// Set max-height on each iframe reload in order to avoid a space after upload button:
+		jQuery( '#iframe_item_preview_wrapper' ).css( 'max-height', body_height );
+	}
+
+	var iframe_item_preview_is_loaded = false;
+	jQuery( '#iframe_item_preview' ).bind( 'load', function()
+	{	// Set proper height on frame loading:
+		if( ! iframe_item_preview_is_loaded )
+		{	// Only on first loading:
+			update_item_preview_frame_height();
+			iframe_item_preview_is_loaded = true;
+		}
+	} );
+
+	jQuery( '#icon_folding_itemform_preview, #title_folding_itemform_preview' ).click( function()
+	{	// Use this hack to fix frame height on show preview fieldset if it was hidden before:
+		update_item_preview_frame_height();
+	} );
+
+	jQuery( '#iframe_item_preview_wrapper' ).resizable(
+	{	// Make the frame wrapper resizable:
+		minHeight: 80,
+		handles: 's',
+		start: function( e, ui )
+		{	// Create a temp div to disable the mouse over events inside the frame:
+			ui.element.append( '<div id="iframe_item_preview_disabler"></div>' );
+		},
+		stop: function( e, ui )
+		{	// Remove the temp div element:
+			ui.element.find( '#iframe_item_preview_disabler' ).remove();
+		},
+		resize: function( e, ui )
+		{	// Limit max height:
+			jQuery( '#iframe_item_preview_wrapper' ).resizable( 'option', 'maxHeight', jQuery( '#iframe_item_preview' ).contents().find( 'body' ).height() );
+		}
+	} );
+	jQuery( document ).on( 'click', '#iframe_item_preview_wrapper .ui-resizable-handle', function()
+	{	// Increase height on click:
+		jQuery( '#iframe_item_preview_wrapper' ).css( 'height', jQuery( '#iframe_item_preview_wrapper' ).height() + 80 );
+	} );
+} );

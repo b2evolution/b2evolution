@@ -670,7 +670,6 @@ fieldset ul {
 }
 #itemform_preview .panel-body {
   padding: 0;
-  height: 600px;
 }
 #attachments_fieldset_wrapper {
   width: 100%;
@@ -709,6 +708,34 @@ fieldset ul {
 #filelist_tbody tr:first-child .action_icon_link_move_up,
 #filelist_tbody tr:last-child .action_icon_link_move_down {
   visibility: hidden;
+}
+#iframe_item_preview_wrapper {
+  width: 100%;
+  height: 160px;
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 6px;
+  box-sizing: content-box;
+}
+#iframe_item_preview_wrapper .ui-resizable-s {
+  background: #c0c0c0;
+  height: 6px;
+  bottom: 0;
+}
+#iframe_item_preview_wrapper .ui-resizable-s:after {
+  content: "...";
+  font-size: 10px;
+  top: -7px;
+  position: relative;
+  text-align: center;
+  display: block;
+}
+#iframe_item_preview_wrapper #iframe_item_preview_disabler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 table.filelist {
   margin: 0;
