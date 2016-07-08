@@ -3761,7 +3761,8 @@ class Comment extends DataObject
 								AND opt.cset_value = 1
 								AND NOT bloguser_user_ID IS NULL
 								AND ( isub_comments IS NULL OR isub_comments = 1 )
-						) AS users'.$except_condition;
+						) AS users
+						WHERE user_ID IS NOT NULL'.$except_condition;
 
 				/*
 				$sql = 'SELECT DISTINCT user_ID

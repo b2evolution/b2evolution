@@ -1237,7 +1237,10 @@ class User extends DataObject
 							// Check if opt-out and user is a member
 							$Blog = & $BlogCache->get_by_ID( $loop_blog_ID );
 
-							if( $Blog->get_setting( 'opt_out_subscription' ) && $this->check_perm( 'blog_ismember', 'view', true, $loop_blog_ID ) )
+							if( $Blog->get( 'advanced_perms' )
+									&& $Blog->get_setting( 'allow_subscriptions' )
+									&& $Blog->get_setting( 'opt_out_subscription' )
+									&& $this->check_perm( 'blog_ismember', 'view', true, $loop_blog_ID ) )
 							{
 								$opt_out_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_comments )";
 							}
@@ -1286,7 +1289,10 @@ class User extends DataObject
 							$blog_ID = $Item->get_blog_ID();
 							$Blog = $BlogCache->get_by_ID( $blog_ID );
 
-							if( $Blog->get_setting( 'opt_out_item_subscription' ) && $this->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
+							if( $Blog->get( 'advanced_perms' )
+									&& $Blog->get_setting( 'allow_item_subscriptions' )
+									&& $Blog->get_setting( 'opt_out_item_subscription' )
+									&& $this->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
 							{
 								$opt_out_values[] = "( $loop_item_ID, $this->ID, $isub_comments )";
 							}
