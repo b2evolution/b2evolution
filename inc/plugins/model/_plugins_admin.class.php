@@ -418,7 +418,7 @@ class Plugins_admin extends Plugins
 					'always' => 'always',
 					'opt-out' => 'opt-out',
 					'opt-in' => 'opt-in',
-					'lazy' => 'automatic', // The plugin will automatically deside to use rendering or not
+					'lazy' => 'automatic', // The plugin will automatically decide to use rendering or not
 					'never' => 'never',
 				);
 		}
