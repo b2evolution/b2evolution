@@ -168,6 +168,14 @@ $Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_li
 										'onclick="update_urlpreview( \'http://\'+document.getElementById( \'blog_urlname\' ).value+\'.'.preg_replace( '#(https?://)#i', '', $baseurl ).'\' )"'
 			);
 		}
+		else
+		{
+			$access_type_options[] = array( 'subdom', T_('Subdomain').':',
+										sprintf( T_('(Not possible for %s)'), $baseurl ),
+										'',
+										'disabled="disabled"'
+			);
+		}
 		$access_type_options[] = array( 'absolute', T_('Absolute URL').':',
 										'',
 										'<input type="text" id="blog_siteurl_absolute" class="form_text_input form-control" name="blog_siteurl_absolute" size="50" maxlength="120" value="'
