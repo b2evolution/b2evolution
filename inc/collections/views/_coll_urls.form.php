@@ -171,7 +171,7 @@ $Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_li
 		else
 		{
 			$access_type_options[] = array( 'subdom', T_('Subdomain').':',
-										sprintf( T_('(Not possible for %s)'), $baseurl ),
+										sprintf( T_('(Not possible for %s)'), $basedomain ),
 										'',
 										'disabled="disabled"'
 			);
