@@ -216,7 +216,14 @@ else
  *
  * @global string
  */
-$basedomain = preg_replace( '/^( .* \. )? (.+? \. .+? )$/xi', '$2', $basehost );
+if( filter_var( $basehost, FILTER_VALIDATE_IP ) )
+{ // host is an IP address
+	$basedomain = $basehost;
+}
+else
+{
+	$basedomain = preg_replace( '/^( .* \. )? (.+? \. .+? )$/xi', '$2', $basehost );
+}
 
 
 /**
@@ -844,7 +851,7 @@ $email_send_simulate_only = false;
 
 
 /**
- * Would you like to use CDNs as definied in the array $library_cdn_urls below 
+ * Would you like to use CDNs as definied in the array $library_cdn_urls below
  * or do you prefer to load all files from the local source as defined in the array $library_local_urls below?
  *
  * @global boolean $use_cdns
