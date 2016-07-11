@@ -332,8 +332,10 @@ class adsense_plugin extends Plugin
 	 */
 	function DisplayCodeToolbar()
 	{
+		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
+
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', true, true );
+		require_js( 'functions.js', $relative_to, true, true );
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_title_before' ).'AdSense: '.$this->get_template( 'toolbar_title_after' );

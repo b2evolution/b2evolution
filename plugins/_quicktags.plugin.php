@@ -114,8 +114,10 @@ class quicktags_plugin extends Plugin
 
 		$simple = ( isset( $params['edit_layout'] ) && $params['edit_layout'] == 'inskin' );
 
+		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
+
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', true, true );
+		require_js( 'functions.js', $relative_to, true, true );
 
 		?><script type="text/javascript">
 		//<![CDATA[
