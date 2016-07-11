@@ -760,7 +760,7 @@ function evo_mail( $to, $subject, $message, $headers = array(), $additional_para
 	{
 		case 'smtp':
 			// SMTP sending is preferred:
-			$result = evo_mail_smtp( $to, $subject, $message_data, $headers, $additional_parameters );
+			$result = evo_mail_smtp( $to, $subject, $message_data, $headers );
 			if( ! $result && $Settings->get( 'force_email_sending' ) )
 			{	// SMTP sending was failed, Try to send email by php "mail" function:
 				$result = evo_mail_php( $to, $subject, $message, $headers, $additional_parameters );
@@ -773,7 +773,7 @@ function evo_mail( $to, $subject, $message, $headers = array(), $additional_para
 			$result = evo_mail_php( $to, $subject, $message, $headers, $additional_parameters );
 			if( ! $result && $Settings->get( 'force_email_sending' ) )
 			{	// "mail" function was failed, Try to send email by SMTP Swift Mailer:
-				$result = evo_mail_smtp( $to, $subject, $message_data, $headers, $additional_parameters );
+				$result = evo_mail_smtp( $to, $subject, $message_data, $headers );
 			}
 			break;
 	}
@@ -796,14 +796,29 @@ function evo_mail_php( $to, $subject, $message, $headers = array(), $additional_
 {
 	global $php_mail_sending_log;
 
-	$result = @mail( $to, $subject, $message, get_mail_headers( $headers ), $additional_parameters );
+	$php_mail_sending_log = '';
+
+	$headers_string = get_mail_headers( $headers );
+
+	if( ! empty( $headers_string ) )
+	{	// Write headers to log:
+		$php_mail_sending_log .= PHP_EOL.'Headers:'.PHP_EOL.$headers_string;
+	}
+
+	if( ! empty( $additional_parameters ) )
+	{	// Write additional params to log:
+		$php_mail_sending_log .= PHP_EOL.'Additional parameters: '.$additional_parameters.PHP_EOL;
+	}
+
+	// Send email by PHP:
+	$result = @mail( $to, $subject, $message, $headers_string, $additional_parameters );
 
 	if( ! $result )
 	{	// Store error log in global var:
 		$php_last_error = error_get_last();
 		if( isset( $php_last_error['message'] ) )
 		{
-			$php_mail_sending_log = $php_last_error['message'];
+			$php_mail_sending_log .= $php_last_error['message'];
 		}
 	}
 
@@ -818,10 +833,9 @@ function evo_mail_php( $to, $subject, $message, $headers = array(), $additional_
  * @param string Subject of the email
  * @param string|array Message OR Array: 'charset', 'full', 'html', 'text'
  * @param array Email headers
- * @param string Additional flags as command line options
  * @return boolean TRUE on success
  */
-function evo_mail_smtp( $to, $subject, $message, $headers = array(), $additional_parameters = '' )
+function evo_mail_smtp( $to, $subject, $message, $headers = array() )
 {
 	global $smtp_mail_sending_log;
 
@@ -915,6 +929,13 @@ function evo_mail_smtp( $to, $subject, $message, $headers = array(), $additional
 		{
 			$smtp_mail_sending_log = '';
 		}
+
+		if( ! empty( $headers ) )
+		{	// Write headers to log:
+			$headers_string = get_mail_headers( $headers );
+			$smtp_mail_sending_log .= PHP_EOL.'Headers:'.PHP_EOL.$headers_string;
+		}
+
 		$recipients = array();
 		foreach( $Swift_Message->getTo() as $recipient_address => $recipient_name )
 		{
@@ -1032,11 +1053,13 @@ function smtp_email_sending_test()
 		// Exit here.
 	}
 
-	$smtp_message = sprintf( T_( 'Send test email message to "%s"...' ), $current_User->get( 'email' ) ).' ';
+	$smtp_message = sprintf( T_( 'Attempting to send a text message to "%s" external SMTP server...' ), $current_User->get( 'email' ) ).' ';
 
 	// Force temporary to use ONLY SMTP sending:
+	$email_service = $Settings->get( 'email_service' );
 	$Settings->set( 'email_service', 'smtp' );
 	// DON'T force to send email by php "mail":
+	$force_email_sending = $Settings->get( 'force_email_sending' );
 	$Settings->set( 'force_email_sending', false );
 
 	// Send test email:
@@ -1058,6 +1081,10 @@ function smtp_email_sending_test()
 		$smtp_connection_result = false;
 	}
 
+	// Revert temporary changed settings:
+	$Settings->set( 'email_service', $email_service );
+	$Settings->set( 'force_email_sending', $force_email_sending );
+
 	return $test_mail_messages;
 }
 
@@ -1071,11 +1098,13 @@ function php_email_sending_test()
 {
 	global $Settings, $current_User, $php_mail_sending_log;
 
-	$mail_message = sprintf( T_( 'Send test email message to "%s"...' ), $current_User->get( 'email' ) ).' ';
+	$mail_message = sprintf( T_( 'Attempting to send a text message to "%s" via PHP...' ), $current_User->get( 'email' ) ).' ';
 
 	// Force temporary to use ONLY PHP mail sending:
+	$email_service = $Settings->get( 'email_service' );
 	$Settings->set( 'email_service', 'mail' );
-	// DON'T force to send email by php "mail":
+	// DON'T force to send email by SMTP:
+	$force_email_sending = $Settings->get( 'force_email_sending' );
 	$Settings->set( 'force_email_sending', false );
 
 	// Send test email:
@@ -1096,6 +1125,10 @@ function php_email_sending_test()
 		syslog_insert( $mail_message.$php_mail_sending_log.' '.T_('Failed'), 'warning', NULL );
 		$smtp_connection_result = false;
 	}
+
+	// Revert temporary changed settings:
+	$Settings->set( 'email_service', $email_service );
+	$Settings->set( 'force_email_sending', $force_email_sending );
 
 	return $test_mail_messages;
 }
