@@ -843,7 +843,7 @@ class Skin extends DataObject
 
 				case 'font_awesome':
 					// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
-					init_fontawesome_icons( 'fontawesome-glyphicons' );
+					init_fontawesome_icons( 'fontawesome-glyphicons', 'blog' );
 					break;
 
 				case 'bootstrap':
