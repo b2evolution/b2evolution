@@ -577,8 +577,10 @@ class shortlinks_plugin extends Plugin
 			return false;
 		}
 
+		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
+
 		// Load js to work with textarea:
-		require_js( 'functions.js', 'blog', true, true );
+		require_js( 'functions.js', $relative_to, true, true );
 
 		// Load css for modal window:
 		$this->require_css( 'shortlinks.css', true );

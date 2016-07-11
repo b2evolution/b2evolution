@@ -3249,8 +3249,9 @@ function get_prevent_key_enter_js( $jquery_selection )
  * @param string Icons type:
  *               - 'fontawesome' - Use only font-awesome icons
  *               - 'fontawesome-glyphicons' - Use font-awesome icons as a priority over the glyphicons
+ * @param boolean|string 'relative' or true (relative to <base>) or 'rsc_url' (relative to $rsc_url) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
  */
-function init_fontawesome_icons( $icons_type = 'fontawesome' )
+function init_fontawesome_icons( $icons_type = 'fontawesome', $relative_to = 'rsc_url' )
 {
 	global $b2evo_icons_type;
 
@@ -3258,7 +3259,7 @@ function init_fontawesome_icons( $icons_type = 'fontawesome' )
 	$b2evo_icons_type = $icons_type;
 
 	// Load main CSS file of font-awesome icons
-	require_css( '#fontawesome#', 'rsc_url' );
+	require_css( '#fontawesome#', $relative_to );
 }
 
 ?>
