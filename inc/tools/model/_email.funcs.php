@@ -825,8 +825,6 @@ function evo_mail_smtp( $to, $subject, $message, $headers = array(), $additional
 {
 	global $smtp_mail_sending_log;
 
-	$headers_string = get_mail_headers( $headers );
-
 	// Check if we can use SMTP Swift Mailer
 	if( check_smtp_mailer() === true && ( $Swift_Mailer = & get_Swift_Mailer() ) )
 	{ // Use Swift Mailer to send emails using SMTP
@@ -906,7 +904,7 @@ function evo_mail_smtp( $to, $subject, $message, $headers = array(), $additional
 		}
 		if( ! empty( $headers['Date'] ) )
 		{ // Date:
-			$Swift_Message->setDate( $headers['Date'] );
+			$Swift_Message->setDate( is_string( $headers['Date'] ) ? strtotime( $headers['Date'] ) : $headers['Date'] );
 		}
 
 		// Send the message by SMTP transport:
