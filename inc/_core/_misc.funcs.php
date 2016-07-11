@@ -2950,10 +2950,12 @@ function debug_info( $force = false, $force_clean = false )
 	{	// Display debug jslog once
 		global $rsc_url, $app_version_long;
 
-		require_js( '#jqueryUI#', 'rsc_url', false, true );
-		require_css( '#jqueryUI_css#', 'rsc_url', NULL, NULL, '#', true );
-		require_js( 'debug_jslog.js', 'rsc_url', false, true );
-		require_js( 'jquery/jquery.cookie.min.js', 'rsc_url', false, true );
+		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
+
+		require_js( '#jqueryUI#', $relative_to, false, true );
+		require_css( '#jqueryUI_css#', $relative_to, NULL, NULL, '#', true );
+		require_js( 'debug_jslog.js', $relative_to, false, true );
+		require_js( 'jquery/jquery.cookie.min.js', $relative_to, false, true );
 
 		$jslog_style_cookies = param_cookie( 'jslog_style', 'string' );
 		$jslog_styles = array();
@@ -3188,7 +3190,8 @@ function debug_info( $force = false, $force_clean = false )
 			echo "\n</tbody></table>";
 
 			// add jquery.tablesorter to the "Debug info" table.
-			require_js( 'jquery/jquery.tablesorter.min.js', 'rsc_url', true, true );
+			$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
+			require_js( 'jquery/jquery.tablesorter.min.js', $relative_to, true, true );
 			echo '
 			<script type="text/javascript">
 			(function($){
