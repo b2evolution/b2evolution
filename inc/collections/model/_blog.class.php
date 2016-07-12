@@ -1602,7 +1602,29 @@ class Blog extends DataObject
 			return $this->get_setting( 'plugins_assets_absolute_url' );
 		}
 		else// == 'basic'
-		{	// Basic URL from config:
+		{	// Basic Config URL from config:
+			global $plugins_url;
+			return $plugins_url;
+		}
+	}
+
+// fp>quick rewrite to replace above function:
+	function get_local_plugins_url2( $url_type = NULL )
+	{
+		$url_type = is_null( $url_type ) ? $this->get_setting( 'plugins_assets_url_type' ) : $url_type;
+
+		if( $url_type == 'relative' )
+		{	// Relative URL:
+			global $plugins_subdir;
+// fp> here is the change (not tested):
+			return '/'.$plugins_subdir;
+		}
+		elseif( $url_type == 'absolute' )
+		{	// Absolute URL:
+			return $this->get_setting( 'plugins_assets_absolute_url' );
+		}
+		else// == 'basic'
+		{	// Basic Config URL from config:
 			global $plugins_url;
 			return $plugins_url;
 		}
