@@ -64,6 +64,7 @@ $core_componentwidget_defs = array(
 			'coll_avatar',
 			'free_html',
 			'user_links',
+			'social_links'
 		),
 	'menu_item' => array(
 			'menu_link',
