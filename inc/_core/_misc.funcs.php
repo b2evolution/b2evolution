@@ -3603,7 +3603,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	// Stop a request from the blocked IP addresses or Domains
 	antispam_block_request();
 
-	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode, $sendmail_additional_params;
+	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode;
 
 	$message_data = $message;
 	if( is_array( $message_data ) && isset( $message_data['full'] ) )
@@ -3707,12 +3707,24 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	$headerstring = get_mail_headers( $headers, $NL );
 
 	// Set an additional parameter for the return path:
-	if( ! empty( $sendmail_additional_params ) )
+	switch( $Settings->get( 'sendmail_params' ) )
+	{
+		case 'return':
+			$sendmail_params = '-r $return-address$';
+			break;
+		case 'from':
+			$sendmail_params = '-f $return-address$';
+			break;
+		case 'custom':
+			$sendmail_params = $Settings->get( 'sendmail_params_custom' );
+			break;
+	}
+	if( ! empty( $sendmail_params ) )
 	{
 		$additional_parameters = str_replace(
 			array( '$from-address$', '$return-address$' ),
-			array( $from, ( empty( $return_path ) ? $from : $return_path ) ),
-			$sendmail_additional_params );
+			array( $message_data['from_email'], ( empty( $return_path ) ? $message_data['from_email'] : $return_path ) ),
+			$sendmail_params );
 	}
 	else
 	{

@@ -190,6 +190,10 @@ switch( $action )
 				// Force email sending
 				$Settings->set( 'force_email_sending', param( 'force_email_sending', 'integer', 0 ) );
 
+				// Sendmail additional params:
+				$Settings->set( 'sendmail_params', param( 'sendmail_params', 'string', 'return' ) );
+				$Settings->set( 'sendmail_params_custom', param( 'sendmail_params_custom', 'string' ) );
+
 				$old_smtp_enabled = $Settings->get( 'smtp_enabled' );
 
 				// Enabled
