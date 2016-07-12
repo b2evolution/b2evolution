@@ -179,6 +179,8 @@ class CollectionSettings extends AbstractSettings
 			'media_assets_absolute_url' => '', // Absolute URL for setting 'media_assets_url_type' with selected option 'absolute'
 			'skins_assets_url_type' => 'relative', // Load generic /skins/ assets from: 'basic', 'relative', 'absolute'
 			'skins_assets_absolute_url' => '', // Absolute URL for setting 'skins_assets_url_type' with selected option 'absolute'
+			'plugins_assets_url_type' => 'relative', // Load generic /plugins/ assets from: 'basic', 'relative', 'absolute'
+			'plugins_assets_absolute_url' => '', // Absolute URL for setting 'plugins_assets_url_type' with selected option 'absolute'
 			'locale_source' => 'blog', // Source of the locale for navigation/widget: 'blog', 'user'
 			'post_locale_source' => 'post', // Source of the locale for post content: 'post', 'blog'
 			'new_item_locale_source' => 'select_coll', // Source of the locale for new items: 'use_coll', 'select_coll', 'select_user'

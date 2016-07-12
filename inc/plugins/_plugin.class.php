@@ -255,11 +255,11 @@ class Plugin
 
 	/**
 	 * Plugin URL
-	 * This gets lazy-filled with both 'abs' and 'rel' URLs by {@link get_plugin_url()}.
+	 * This gets lazy-filled with URL by {@link get_plugin_url()}.
 	 *
-	 * @var array
+	 * @var string
 	 */
-	private $_plugin_url = array();
+	private $_plugin_url;
 
 	/**
 	 * Plugin template
@@ -3067,31 +3067,30 @@ class Plugin
 	 * Get the absolute URL to the plugin's directory (where the plugins classfile is).
 	 * Trailing slash included.
 	 *
-	 * @param string Get absolute URL? (or make it relative to $ReqHost)
+	 * @param string This param is DEPRECATED: Get absolute URL? (or make it relative to $ReqHost)
 	 * @return string
 	 */
 	function get_plugin_url( $abs = false )
 	{
-		global $ReqHost, $plugins_url, $plugins_path;
+		if( empty( $this->_plugin_url ) )
+		{	// Initialize plugin URL only first time request:
+			global $Blog, $plugins_url, $plugins_path;
 
-		$key = $abs ? 'abs' : 'rel';
+			// Get sub-path below $plugins_path, if any:
+			$sub_path = preg_replace( ':^'.preg_quote( $plugins_path, ':' ).':', '', dirname( $this->classfile_path ).'/' );
 
-		if( empty($this->_plugin_url) )
-		{
-			// Get sub-path below $plugins_path, if any
-			$sub_path = preg_replace( ':^'.preg_quote($plugins_path, ':').':', '', dirname($this->classfile_path).'/' );
-
-			$r = $plugins_url.$sub_path;
-
-			// Use the same protocol as with current host (so includes from within https do not fail when on http)
-			$r = url_same_protocol($r);
-
-			$this->_plugin_url = array(
-					'abs' => $r, // absolute
-					'rel' => url_rel_to_same_host($r, $ReqHost), // relative to current host
-				);
+			if( is_admin_page() || empty( $Blog ) )
+			{	// Get absolute plugin URL:
+				// Use the same protocol as with current host (so includes from within https do not fail when on http):
+				$this->_plugin_url = url_same_protocol( $plugins_url.$sub_path );
+			}
+			else
+			{	// Get plugin URL depending on collection setting:
+				$this->_plugin_url = $Blog->get_local_plugins_url().$sub_path;
+			}
 		}
-		return $this->_plugin_url[$key];
+
+		return $this->_plugin_url;
 	}
 
 

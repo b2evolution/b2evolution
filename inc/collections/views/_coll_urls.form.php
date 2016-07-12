@@ -207,6 +207,7 @@ function update_urlpreview( baseurl, url_path )
 	jQuery( '#rsc_assets_url_type_relative' ).html( baseurl + 'rsc/' );
 	jQuery( '#media_assets_url_type_relative' ).html( baseurl + 'media/' );
 	jQuery( '#skins_assets_url_type_relative' ).html( baseurl + 'skins/' );
+	jQuery( '#plugins_assets_url_type_relative' ).html( baseurl + 'plugins/' );
 }
 
 // Update blog url name in several places on the page
@@ -243,7 +244,7 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{ // Permission to edit advanced admin settings
-		global $rsc_url, $media_url, $skins_url;
+		global $rsc_url, $media_url, $skins_url, $plugins_url;
 
 		$option_labels = array(
 			'relative' => T_('%s folder relative to current collection'),
@@ -289,6 +290,14 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 				'folder'       => '/skins/',
 				'local_url'    => $edited_Blog->get_local_skins_url( 'relative' )
 			);
+		// plugins url:
+		$assets_url_data['plugins_assets_url_type'] = array(
+				'label'        => sprintf( T_('Load %s assets from'), '<code>/plugins/</code>' ),
+				'url'          => $plugins_url,
+				'absolute_url' => 'plugins_assets_absolute_url',
+				'folder'       => '/plugins/',
+				'local_url'    => $edited_Blog->get_local_plugins_url( 'relative' )
+			);
 
 		foreach( $assets_url_data as $asset_url_type => $asset_url_data )
 		{
@@ -304,7 +313,8 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 				    $edited_Blog->get_setting( $asset_url_type ) == 'basic' )
 				{
 					$basic_asset_url_note .= ' <span class="red">'
-							.sprintf( T_('ATTENTION: Using a different domain for your collection and your %s folder may cause problems (e-g: impossible to load fonts)'), '<code>'.$asset_url_data['folder'].'</code>' )
+							.sprintf( T_('ATTENTION: Using a different domain for your collection and your %s folder may cause problems'), '<code>'.$asset_url_data['folder'].'</code>' )
+							.' ('.( $asset_url_type == 'plugins_assets_url_type' ? T_('e-g: Ajax requests') : T_('e-g: impossible to load fonts') ).')'
 						.'</span>';
 				}
 
