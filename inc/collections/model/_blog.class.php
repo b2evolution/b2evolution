@@ -1105,6 +1105,14 @@ class Blog extends DataObject
 							.'. '.T_('You must provide an absolute URL (starting with <code>http://</code>, <code>https://</code> or <code>//</code>) and it must ending with \'/\' sign!'), 'error' );
 					}
 				}
+
+				if( $this->get( 'access_type' ) == 'absolute' &&
+				    ( $this->get_setting( 'rsc_assets_url_type' ) == 'basic' ||
+				      $this->get_setting( 'media_assets_url_type' ) == 'basic' ||
+				      $this->get_setting( 'skins_assets_url_type' ) == 'basic' ) )
+				{	// Display warning for such settings combination:
+					$Messages->add( T_('WARNING: you will be loading your assets from a different domain. This may cause problems if you don\'t know exactly what you are doing. Please check the Assets URLs panel below.'), 'warning' );
+				}
 			}
 
 
