@@ -793,6 +793,7 @@ class tinymce_plugin extends Plugin
 		// Generated HTML code options:
 		// do not make the path relative to "document_base_url":
 		$init_options[] = 'relative_urls : false';
+		$init_options[] = 'convert_urls : false';
 		$init_options[] = 'entity_encoding : "raw"';
 
 		// Autocomplete options
