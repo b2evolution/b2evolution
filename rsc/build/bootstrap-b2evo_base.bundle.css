@@ -660,7 +660,6 @@ div.filters .filter_item div {
  */
 div#evo_toolbar {
   background-color: #d2d2d2;
-  color: ButtonText;
   border-bottom: 1px solid #aeaeae;
   text-align: left;
   margin: 0;
@@ -3968,13 +3967,6 @@ div.message_toolbars {
 }
 .mce-container label.mce-label {
   max-width: none;
-}
-.evo_content_block {
-  /*
-	a.user img { // bubbletip
-		.border-radius(0);
-	}
-	*/
 }
 .evo_content_block img {
   -webkit-border-radius: 4px;

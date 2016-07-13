@@ -7630,6 +7630,9 @@ class Item extends ItemLight
 
 		// No code/pre blocks, replace on the whole thing
 
+		// Remove block level short tags inside <p> blocks and move them before the paragraph
+		$content = move_short_tags( $content );
+
 		$params = array_merge( array(
 				'before'                   => '<div>',
 				'before_image'             => '<div class="image_block">',
