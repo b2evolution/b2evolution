@@ -1107,7 +1107,7 @@ function move_short_tags( $content, $pattern = NULL, $callback = NULL )
 
 	if( is_null( $pattern ) )
 	{
-		$pattern = '/(<p[\s*|>]((?!<\/p>).)*?)(?=\[(image|video))(\[(image|video):(\d+)(:?)([^\]]*)\])/i';
+		$pattern = '/(<p[\s*|>]((?!<\/p>).)*?)(?=\[(image|video|audio))(\[(image|video|audio):(\d+)(:?)([^\]]*)\])/i';
 	}
 
 	preg_match_all( $pattern, $content, $matches );
