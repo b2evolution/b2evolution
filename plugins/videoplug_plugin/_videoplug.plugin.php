@@ -73,6 +73,9 @@ class videoplug_plugin extends Plugin
 				'<div class="videoblock">The iFilm video service is not available anymore.</div>',
 			);
 
+		// Move short tag outside of paragraph
+		$content = move_short_tags( $content, '/(<p[\s*|>]((?!<\/p>).)*?)(?=\[(video))(\[(video):(youtube|dailymotion|vimeo)(:?)([^\]]*)\])/i' );
+
 		$content = replace_content_outcode( $search_list, $replace_list, $content );
 
 		return true;
