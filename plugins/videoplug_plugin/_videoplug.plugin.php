@@ -215,10 +215,8 @@ class videoplug_plugin extends Plugin
 
 		echo $this->get_template( 'toolbar_after' );
 
-		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
-
 		// Load js to work with textarea
-		require_js( 'functions.js', $relative_to, true, true );
+		require_js( 'functions.js', 'blog', true, true );
 
 		?><script type="text/javascript">
 			//<![CDATA[

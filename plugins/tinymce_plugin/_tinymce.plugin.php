@@ -418,9 +418,8 @@ class tinymce_plugin extends Plugin
 			// Load TinyMCE Javascript source file:
 			// This cannot be done through AJAX, since there appear to be scope problems on init then (TinyMCE problem?! - "u not defined").
 			// Anyway, not using AJAX to fetch the file makes it more cachable anyway.
-			$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
-			require_js( '#tinymce#', $relative_to, false, true );
-			require_js( '#tinymce_jquery#', $relative_to, false, true );
+			require_js( '#tinymce#', 'blog', false, true );
+			require_js( '#tinymce_jquery#', 'blog', false, true );
 			?>
 
 			<script type="text/javascript">
@@ -729,7 +728,7 @@ class tinymce_plugin extends Plugin
 		$init_options = array();
 		if( $this->Settings->get( 'use_gzip_compressor' ) )
 		{	// Load script to use gzip compressor:
-			$init_options[] = 'script_url: "'.get_require_url( 'tiny_mce/tinymce.gzip.php', ( is_admin_page() ? 'rsc_url' : 'blog' ), 'js' ).'"';
+			$init_options[] = 'script_url: "'.get_require_url( 'tiny_mce/tinymce.gzip.php', 'blog', 'js' ).'"';
 		}
 		// TinyMCE Theme+Skin+Variant to use:
 		$init_options[] = 'theme : "modern"';
@@ -794,6 +793,7 @@ class tinymce_plugin extends Plugin
 		// Generated HTML code options:
 		// do not make the path relative to "document_base_url":
 		$init_options[] = 'relative_urls : false';
+		$init_options[] = 'convert_urls : false';
 		$init_options[] = 'entity_encoding : "raw"';
 
 		// Autocomplete options

@@ -832,16 +832,6 @@ $allow_redirects_to_different_domain = 'all_collections_and_redirected_posts';
 
 
 /**
- * Additional params you may want to pass to sendmail when sending emails
- * For setting the return-path, some Linux servers will require -r, others will require -f.
- * Allowed placeholders: $from-address$ , $return-address$
- *
- * @global string $sendmail_additional_params
- */
-$sendmail_additional_params = '-r $return-address$';
-
-
-/**
  * Turn this on to simulate email sends instead of really sending them through SMTP.
  * This is useful if you are debugging a production database on a development machine.
  * It will prevent from sending test notifications to real user accounts.

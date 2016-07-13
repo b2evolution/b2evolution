@@ -50,11 +50,9 @@ class html5_mediaelementjs_plugin extends Plugin
 	{
 		global $Blog;
 
-		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
-
-		require_css( '#mediaelement_css#', $relative_to );
-		require_js( '#jquery#', $relative_to );
-		require_js( '#mediaelement#', $relative_to );
+		require_css( '#mediaelement_css#', 'blog' );
+		require_js( '#jquery#', 'blog' );
+		require_js( '#mediaelement#', 'blog' );
 		$this->require_skin();
 
 		// Set a video/audio size in css style, because option setting cannot sets correct size

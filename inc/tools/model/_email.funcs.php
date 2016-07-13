@@ -1053,7 +1053,7 @@ function smtp_email_sending_test()
 		// Exit here.
 	}
 
-	$smtp_message = sprintf( T_( 'Attempting to send a text message to "%s" external SMTP server...' ), $current_User->get( 'email' ) ).' ';
+	$smtp_message = sprintf( T_( 'Attempting to send a text message to "%s" via external SMTP server...' ), $current_User->get( 'email' ) ).' ';
 
 	// Force temporary to use ONLY SMTP sending:
 	$email_service = $Settings->get( 'email_service' );

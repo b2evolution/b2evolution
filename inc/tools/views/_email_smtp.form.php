@@ -65,10 +65,24 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 $Form->begin_fieldset( T_( 'Email service settings' ).get_manual_link( 'email-service-settings' ) );
 
 $Form->radio( 'email_service', $Settings->get( 'email_service' ), array(
-			array( 'mail', T_('Regular PHP "mail" function'), ),
+			array( 'mail', T_('Regular PHP <code>mail()</code> function'), ),
 			array( 'smtp', T_('External SMTP Server defined below'), ),
 		), T_('Primary email service'), true );
 $Form->checkbox( 'force_email_sending', $Settings->get( 'force_email_sending' ), T_('Force email sending'), T_('If the primary email service is not available, the secondary option will be used.') );
+
+$Form->end_fieldset();
+
+
+$Form->begin_fieldset( T_( 'PHP <code>mail()</code> function settings' ).get_manual_link( 'php-mail-function-settings' ) );
+
+$Form->radio( 'sendmail_params', $Settings->get( 'sendmail_params' ), array(
+			array( 'return', '<code>-r $return-address$</code>', ),
+			array( 'from', '<code>-f $return-address$</code>', ),
+			array( 'custom', T_('Custom').':', '',
+				'<input type="text" class="form_text_input form-control" name="sendmail_params_custom"
+					size="150" value="'.format_to_output( $Settings->get( 'sendmail_params_custom' ), 'formvalue' ).'" />
+					<span class="notes">'.sprintf( T_('Allowed placeholders: %s'), '<code>$from-address$</code>, <code>$return-address$</code>' ).'</span>' ),
+		), T_('Sendmail additional params'), true );
 
 $Form->end_fieldset();
 

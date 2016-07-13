@@ -92,10 +92,8 @@ class infodots_plugin extends Plugin
 
 	/**
 	 * Include JS/CSS files in HTML head
-	 *
-	 * @param boolean|string Is the file's path relative to the base path/url?
 	 */
-	function init_html_head( $relative_to )
+	function init_html_head()
 	{
 		global $Blog;
 
@@ -109,9 +107,9 @@ class infodots_plugin extends Plugin
 		$this->require_css( 'infodots.css' );
 
 		// Bubbletip
-		require_js( '#jquery#', $relative_to );
-		require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-		require_css( 'jquery/jquery.bubbletip.css', $relative_to );
+		require_js( '#jquery#', 'blog' );
+		require_js( 'jquery/jquery.bubbletip.min.js', 'blog' );
+		require_css( 'jquery/jquery.bubbletip.css', 'blog' );
 
 		add_js_headline( 'jQuery( document ).ready( function()
 {
@@ -164,7 +162,7 @@ class infodots_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		$this->init_html_head( 'blog' );
+		$this->init_html_head();
 	}
 
 
@@ -176,7 +174,7 @@ class infodots_plugin extends Plugin
 	 */
 	function AdminEndHtmlHead( & $params )
 	{
-		$this->init_html_head( 'rsc_url' );
+		$this->init_html_head();
 	}
 
 

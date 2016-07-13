@@ -1104,9 +1104,10 @@ class Blog extends DataObject
 
 				// Check all assets types url settings:
 				$assets_url_data = array(
-					'rsc_assets_url_type'   => array( 'url' => 'rsc_assets_absolute_url', 'folder' => '/rsc/' ),
-					'media_assets_url_type' => array( 'url' => 'media_assets_absolute_url', 'folder' => '/media/' ),
-					'skins_assets_url_type' => array( 'url' => 'skins_assets_absolute_url', 'folder' => '/skins/' ),
+					'rsc_assets_url_type'     => array( 'url' => 'rsc_assets_absolute_url',     'folder' => '/rsc/' ),
+					'media_assets_url_type'   => array( 'url' => 'media_assets_absolute_url',   'folder' => '/media/' ),
+					'skins_assets_url_type'   => array( 'url' => 'skins_assets_absolute_url',   'folder' => '/skins/' ),
+					'plugins_assets_url_type' => array( 'url' => 'plugins_assets_absolute_url', 'folder' => '/plugins/' ),
 				);
 
 				foreach( $assets_url_data as $asset_url_type => $asset_url_data )
@@ -1132,6 +1133,15 @@ class Blog extends DataObject
 						$Messages->add( sprintf( T_('Absolute URL for %s'), $asset_url_data['folder'] ).': '.sprintf( T_('%s is an invalid absolute URL'), '&laquo;'.htmlspecialchars( $assets_absolute_url_value ).'&raquo;' )
 							.'. '.T_('You must provide an absolute URL (starting with <code>http://</code>, <code>https://</code> or <code>//</code>) and it must ending with \'/\' sign!'), 'error' );
 					}
+				}
+
+				if( $this->get( 'access_type' ) == 'absolute' &&
+				    ( $this->get_setting( 'rsc_assets_url_type' ) == 'basic' ||
+				      $this->get_setting( 'media_assets_url_type' ) == 'basic' ||
+				      $this->get_setting( 'skins_assets_url_type' ) == 'basic' ||
+				      $this->get_setting( 'plugins_assets_url_type' ) == 'basic' ) )
+				{	// Display warning for such settings combination:
+					$Messages->add( T_('WARNING: you will be loading your assets from a different domain. This may cause problems if you don\'t know exactly what you are doing. Please check the Assets URLs panel below.'), 'warning' );
 				}
 			}
 
@@ -1509,6 +1519,17 @@ class Blog extends DataObject
 
 
 	/**
+	 * Get the URL to the basepath of this collection relative to domain
+	 *
+	 * @return string
+	 */
+	function get_basepath_relative_url()
+	{
+		return str_replace( $this->get_baseurl_root(), '', $this->get_basepath_url() );
+	}
+
+
+	/**
 	 * Get the URL of the htsrv folder, on the current blog's domain (which is NOT always the same as the $baseurl domain!).
 	 */
 	function get_local_htsrv_url()
@@ -1532,7 +1553,7 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{ // Relative URL
 			global $media_subdir;
-			return $this->get_basepath_url().$media_subdir;
+			return $this->get_basepath_relative_url().$media_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL
@@ -1559,7 +1580,7 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{ // Relative URL
 			global $rsc_subdir;
-			return $this->get_basepath_url().$rsc_subdir;
+			return $this->get_basepath_relative_url().$rsc_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL
@@ -1586,7 +1607,7 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{ // Relative URL
 			global $skins_subdir;
-			return $this->get_basepath_url().$skins_subdir;
+			return $this->get_basepath_relative_url().$skins_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL
@@ -1596,6 +1617,33 @@ class Blog extends DataObject
 		{ // Basic URL from config
 			global $skins_url;
 			return $skins_url;
+		}
+	}
+
+
+	/**
+	 * Get the URL of the plugins folder, on the current collection's domain (which is NOT always the same as the $baseurl domain!).
+	 *
+	 * @param string NULL to use current plugins_assets_url_type setting. Use 'basic', 'relative' or 'absolute' to force.
+	 * @return string URL to /plugins/ folder
+	 */
+	function get_local_plugins_url( $url_type = NULL )
+	{
+		$url_type = is_null( $url_type ) ? $this->get_setting( 'plugins_assets_url_type' ) : $url_type;
+
+		if( $url_type == 'relative' )
+		{	// Relative URL:
+			global $plugins_subdir;
+			return $this->get_basepath_relative_url().$plugins_subdir;
+		}
+		elseif( $url_type == 'absolute' )
+		{	// Absolute URL:
+			return $this->get_setting( 'plugins_assets_absolute_url' );
+		}
+		else// == 'basic'
+		{	// Basic Config URL from config:
+			global $plugins_url;
+			return $plugins_url;
 		}
 	}
 

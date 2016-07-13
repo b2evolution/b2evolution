@@ -929,6 +929,11 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 	global $library_local_urls, $library_cdn_urls, $use_cdns, $debug, $rsc_url;
 	global $Blog, $baseurl, $assets_baseurl, $ReqURL;
 
+	if( $relative_to == 'blog' && ( is_admin_page() || empty( $Blog ) ) )
+	{	// Make sure we never use resource url relative to any blog url in case of an admin page ( important in case of multi-domain installations ):
+		$relative_to = 'rsc_url';
+	}
+
 	// Check if we have a public CDN we want to use for this library file:
 	if( $use_cdns && ! empty( $library_cdn_urls[ $lib_file ] ) )
 	{ // Rewrite local urls with public CDN urls if they are defined in _advanced.php
@@ -1029,11 +1034,6 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
 	if( is_admin_page() && in_array( $js_file, array( 'functions.js', 'ajax.js', 'form_extensions.js', 'extracats.js', 'dynamic_select.js', 'backoffice.js' ) ) )
 	{	// Don't require this file on back-office because it is auto loaded by bundled file evo_backoffice.bmin.js:
 		return;
-	}
-
-	if( is_admin_page() && ( $relative_to == 'blog' ) )
-	{ // Make sure we never use resource url relative to any blog url in case of an admin page ( important in case of multi-domain installations )
-		$relative_to = 'rsc_url';
 	}
 
 	if( in_array( $js_file, array( '#jqueryUI#', 'communication.js', 'functions.js' ) ) )
