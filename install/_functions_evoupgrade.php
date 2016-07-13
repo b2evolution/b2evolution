@@ -7634,6 +7634,28 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11820, 'Create table for items votes...' ) )
+	{	// 6.8.0-alpha
+		db_create_table( 'T_items__votes', '
+			itvt_item_ID INT UNSIGNED NOT NULL,
+			itvt_user_ID INT UNSIGNED NOT NULL,
+			itvt_updown  TINYINT(1) NULL DEFAULT NULL,
+			itvt_report  ENUM( "clean", "rated", "adult", "inappropriate", "spam" ) COLLATE ascii_general_ci NULL DEFAULT NULL,
+			itvt_ts      TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00",
+			PRIMARY KEY (itvt_item_ID, itvt_user_ID),
+			KEY itvt_item_ID (itvt_item_ID),
+			KEY itvt_user_ID (itvt_user_ID)' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11825, 'Upgrade table posts for voting...' ) )
+	{	// 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_items__item
+			ADD post_addvotes   INT NOT NULL DEFAULT 0,
+			ADD post_countvotes INT UNSIGNED NOT NULL DEFAULT 0' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

@@ -282,26 +282,12 @@ echo $params['comment_body_after'];
 	$Comment->reply_link( ' ', ' ', '#', '#', 'pull-left' ); /* Link for replying to the Comment */
 
 	if( $params['display_vote_helpful'] )
-	{ // Display a voting tool
-		$Comment->vote_helpful( '', '', '&amp;', true, true, array(
-				'helpful_text'    => T_('Is this reply helpful?'),
-				'title_yes'       => T_('Mark this reply as helpful!'),
-				'title_yes_voted' => T_('You think this reply is helpful'),
-				'title_no'        => T_('Mark this reply as not helpful!'),
-				'title_no_voted'  => T_('You think this reply is not helpful'),
-				'class'           => 'vote_helpful'
-			) );
+	{	// Display a voting panel for comment:
+		$Skin->display_comment_voting_panel( $Comment );
 	}
 
 	// Display Spam Voting system
-	$Comment->vote_spam( '', '', '&amp;', true, true, array(
-			'title_spam'          => T_('Mark this reply as spam!'),
-			'title_spam_voted'    => T_('You think this reply is spam'),
-			'title_notsure'       => T_('Mark this reply as not sure!'),
-			'title_notsure_voted' => T_('You are not sure in this reply'),
-			'title_ok'            => T_('Mark this reply as OK!'),
-			'title_ok_voted'      => T_('You think this reply is OK'),
-		) );
+	$Comment->vote_spam( '', '', '&amp;', true, true );
 
 	echo '<div class="pull-right">';
 		$comment_redirect_url = rawurlencode( $Comment->get_permanent_url() );

@@ -161,6 +161,8 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_rgn_ID                 INT(10) UNSIGNED NULL,
 			post_subrg_ID               INT(10) UNSIGNED NULL,
 			post_city_ID                INT(10) UNSIGNED NULL,
+			post_addvotes               INT NOT NULL DEFAULT 0,
+			post_countvotes             INT UNSIGNED NOT NULL DEFAULT 0,
 			PRIMARY KEY post_ID( post_ID ),
 			UNIQUE post_urltitle( post_urltitle ),
 			INDEX post_datestart( post_datestart ),
@@ -383,6 +385,19 @@ $schema_queries = array_merge( $schema_queries, array(
 			itud_read_comments_ts TIMESTAMP NULL DEFAULT NULL,
 			itud_flagged_item     TINYINT(1) NOT NULL DEFAULT 0,
 			PRIMARY KEY ( itud_user_ID, itud_item_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_items__votes' => array(
+		'Creating table for Items Votes',
+		"CREATE TABLE T_items__votes (
+			itvt_item_ID INT UNSIGNED NOT NULL,
+			itvt_user_ID INT UNSIGNED NOT NULL,
+			itvt_updown  TINYINT(1) NULL DEFAULT NULL,
+			itvt_report  ENUM( 'clean', 'rated', 'adult', 'inappropriate', 'spam' ) COLLATE ascii_general_ci NULL DEFAULT NULL,
+			itvt_ts      TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			PRIMARY KEY (itvt_item_ID, itvt_user_ID),
+			KEY itvt_item_ID (itvt_item_ID),
+			KEY itvt_user_ID (itvt_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_subscriptions' => array(

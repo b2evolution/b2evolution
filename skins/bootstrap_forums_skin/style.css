@@ -551,6 +551,7 @@ body.round_avatars .single_topic .evo_content_block .ft_avatar a > img {
 }
 .vote_spam {
   float: left;
+  height: 22px;
   line-height: 22px;
 }
 .vote_spam .action_icon {
@@ -559,11 +560,22 @@ body.round_avatars .single_topic .evo_content_block .ft_avatar a > img {
 a.btn + .vote_spam {
   margin-left: 5px;
 }
-.vote_helpful {
+.evo_voting_panel {
   float: left;
-  display: block;
   margin-right: 10px;
+  height: 22px;
   line-height: 22px;
+}
+.evo_voting_panel span.fa {
+  line-height: 20px;
+}
+.comment_reply {
+  height: 22px;
+  line-height: 22px;
+  margin-right: 10px;
+}
+.quote_button {
+  margin-right: 10px;
 }
 label.control-label[for=post_title] {
   width: auto;
@@ -910,7 +922,7 @@ aside .widget_core_coll_search_form div.compact_search_form input.search_field {
 }
 a.to_top {
   font-size: 14px !important;
-  margin-right: 5px;
+  margin-right: 10px;
   float: left;
 }
 .evo_post_title {

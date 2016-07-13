@@ -988,6 +988,9 @@ class Skin extends DataObject
 					// Used to set rating for a new comment:
 					init_ratings_js( 'blog' );
 
+					// Used to vote on an item:
+					init_voting_item_js( 'blog' );
+
 					// Used to vote on the comments:
 					init_voting_comment_js( 'blog' );
 

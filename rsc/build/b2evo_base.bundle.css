@@ -221,6 +221,9 @@ a:hover .fa-x-rollover-orange {
 a:hover .fa-x-rollover-black {
   color: #000 !important;
 }
+a:hover .fa-x-rollover-grey {
+  color: #7f7f7f !important;
+}
 a:hover .fa-flag.fa-x--hover {
   color: #F00 !important;
 }

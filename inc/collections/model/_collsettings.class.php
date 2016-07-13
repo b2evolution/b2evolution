@@ -61,6 +61,11 @@ class CollectionSettings extends AbstractSettings
 			'tags_twitter_card' => 1,
 			// 'post_moderation_statuses' => NULL,			// Possible values are a list of statuses from: 'community', 'protected', 'review', 'draft', but we don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 
+		// Item voting settings:
+			'voting_positive' => 1, // Allow Positive vote
+			'voting_neutral'  => 0, // Allow Neutral vote
+			'voting_negative' => 0, // Allow Negative vote
+
 		// Comment settings:
 			'new_feedback_status' => 'review',			// Default status for new anonymous comments: 'published', 'community', 'protected', 'private', 'review', 'draft' or 'deprecated'. We don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 			// 'moderation_statuses' => NULL,			// Possible values are a list of statuses from: 'community', 'protected', 'review', 'draft', but we don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )

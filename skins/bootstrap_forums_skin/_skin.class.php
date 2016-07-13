@@ -661,6 +661,43 @@ class bootstrap_forums_Skin extends Skin
 				return parent::get_template( $name );
 		}
 	}
+
+
+	/**
+	 * Display a panel with voting buttons for item
+	 *
+	 * @param object Item
+	 * @param array Params
+	 */
+	function display_item_voting_panel( $Item, $params = array() )
+	{
+		skin_widget( array_merge( array(
+				// CODE for the widget:
+				'widget'      => 'item_vote',
+				// Optional display params
+				'Item'        => $Item,
+				'block_start' => '',
+				'block_end'   => '',
+				'skin_ID'     => $this->ID,
+			), $params ) );
+	}
+
+
+	/**
+	 * Display a panel with voting buttons for item
+	 *
+	 * @param object Comment
+	 * @param array Params
+	 */
+	function display_comment_voting_panel( $Comment, $params = array() )
+	{
+		$Comment->vote_helpful( '', '', '&amp;', true, true, array_merge( array(
+				'before_title'          => '',
+				'helpful_text'          => T_('Is this reply helpful?'),
+				'class'                 => 'vote_helpful',
+				'skin_ID'               => $this->ID,
+			), $params ) );
+	}
 }
 
 ?>

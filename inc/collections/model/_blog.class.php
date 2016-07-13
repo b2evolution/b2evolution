@@ -807,6 +807,11 @@ class Blog extends DataObject
 			// Subscriptions:
 			$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+
+			// Voting options:
+			$this->set_setting( 'voting_positive', param( 'voting_positive', 'integer', 0 ) );
+			$this->set_setting( 'voting_neutral', param( 'voting_neutral', 'integer', 0 ) );
+			$this->set_setting( 'voting_negative', param( 'voting_negative', 'integer', 0 ) );
 		}
 
 		if( in_array( 'comments', $groups ) )

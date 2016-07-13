@@ -1554,7 +1554,9 @@ function init_results_js( $relative_to = 'rsc_url' )
 
 
 /**
- * Registers headlines for initialization of functions to work with Results tables
+ * Registers headlines for initialization of functions to work a voting panel for comments
+ *
+ * @param boolean|string Is the file's path relative to the base path/url?
  */
 function init_voting_comment_js( $relative_to = 'rsc_url' )
 {
@@ -1574,6 +1576,35 @@ function init_voting_comment_js( $relative_to = 'rsc_url' )
 		jQuery( "span[id^=vote_helpful_]" ).each( function()
 		{
 			init_voting_bar( jQuery( this ), comment_voting_url, jQuery( this ).find( "#votingID" ).val(), false );
+		} );
+	} );
+	' );
+}
+
+
+/**
+ * Registers headlines for initialization of functions to work a voting panel for items
+ *
+ * @param boolean|string Is the file's path relative to the base path/url?
+ */
+function init_voting_item_js( $relative_to = 'rsc_url' )
+{
+	global $Blog, $b2evo_icons_type;
+
+	if( empty( $Blog ) || ! is_logged_in( false ) || ! $Blog->get_setting( 'voting_positive' ) )
+	{	// If User is not logged OR Users cannot vote:
+		return false;
+	}
+
+	require_js( '#jquery#', $relative_to );
+	require_js( 'voting.js', $relative_to );
+	add_js_headline( '
+	jQuery( document ).ready( function()
+	{
+		var item_voting_url = "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=item&b2evo_icons_type='.$b2evo_icons_type.'";
+		jQuery( "span[id^=vote_item_]" ).each( function()
+		{
+			init_voting_bar( jQuery( this ), item_voting_url, jQuery( this ).find( "#votingID" ).val(), false );
 		} );
 	} );
 	' );

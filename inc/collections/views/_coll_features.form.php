@@ -137,7 +137,21 @@ $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_setting
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Post moderation') . get_manual_link('post-moderation') );
+
+$Form->begin_fieldset( T_('Voting options').get_manual_link( 'item-voting-options' ), array( 'id' => 'voting_options' ) );
+
+	$voting_disabled = ! $edited_Blog->get_setting( 'voting_positive' );
+
+	$Form->checkbox( 'voting_positive', $edited_Blog->get_setting( 'voting_positive' ), T_('Allow Positive vote'), get_icon( 'thumb_up', 'imgtag', array( 'title' => T_('Allow Positive vote') ) ) );
+
+	$Form->checkbox( 'voting_neutral', $edited_Blog->get_setting( 'voting_neutral' ), T_('Allow Neutral vote'), get_icon( 'ban', 'imgtag', array( 'title' => T_('Allow Neutral vote') ) ), '', 1, $voting_disabled );
+
+	$Form->checkbox( 'voting_negative', $edited_Blog->get_setting( 'voting_negative' ), T_('Allow Negative vote'), get_icon( 'thumb_down', 'imgtag', array( 'title' => T_('Allow Negative vote') ) ), '', 1, $voting_disabled );
+
+$Form->end_fieldset();
+
+
+$Form->begin_fieldset( T_('Post moderation').get_manual_link( 'post-moderation' ) );
 
 	// Get max allowed visibility status:
 	$max_allowed_status = get_highest_publish_status( 'comment', $edited_Blog->ID, false );
@@ -252,6 +266,18 @@ jQuery( 'input[name=in_skin_editing]' ).click( function()
 	{
 		jQuery( 'input[name=in_skin_editing_renderers]' ).attr( 'disabled', 'disabled' );
 		jQuery( 'input[name=in_skin_editing_category]' ).attr( 'disabled', 'disabled' );
+	}
+} );
+
+jQuery( '#voting_positive' ).click( function()
+{
+	if( jQuery( this ).is( ':checked' ) )
+	{
+		jQuery( '#voting_neutral, #voting_negative' ).removeAttr( 'disabled' );
+	}
+	else
+	{
+		jQuery( '#voting_neutral, #voting_negative' ).attr( 'disabled', 'disabled' ).removeAttr( 'checked' );
 	}
 } );
 </script>

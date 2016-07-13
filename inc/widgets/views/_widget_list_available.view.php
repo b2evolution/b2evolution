@@ -99,6 +99,7 @@ $core_componentwidget_defs = array(
 			'item_tags',
 			'item_about_author',
 			'item_seen_by',
+			'item_vote',
 		),
 	'collection' => array(
 			'coll_logo',

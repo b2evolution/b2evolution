@@ -693,25 +693,33 @@ function link_vote( $link_ID, $user_ID, $vote_action, $checked = 1 )
 
 	$DB->begin();
 
-	$SQL = new SQL();
-	$SQL->SELECT( 'lvot_link_ID' );
+	$SQL = new SQL( 'Check if current user already voted on link #'.$link_ID );
+	$SQL->SELECT( 'lvot_link_ID, '.$field_name.' AS value' );
 	$SQL->FROM( 'T_links__vote' );
 	$SQL->WHERE( 'lvot_link_ID = '.$DB->quote( $link_ID ) );
 	$SQL->WHERE_and( 'lvot_user_ID = '.$DB->quote( $user_ID ) );
-	$vote = $DB->get_row( $SQL->get() );
+	$existing_vote = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title );
 
-	// Save a voting results in DB
-	if( empty( $vote ) )
-	{ // User replace into to avoid duplicate key conflict in case when user clicks two times fast one after the other
-		$result = $DB->query( 'REPLACE INTO T_links__vote ( lvot_link_ID, lvot_user_ID, '.$field_name.' )
-						VALUES ( '.$DB->quote( $link_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $field_value ).' )' );
+	// Save a voting results in DB:
+	if( empty( $existing_vote ) )
+	{	// Add a new vote for first time:
+		// Use a replace into to avoid duplicate key conflict in case when user clicks two times fast one after the other:
+		$result = $DB->query( 'REPLACE INTO T_links__vote
+			       ( lvot_link_ID, lvot_user_ID, '.$field_name.' )
+			VALUES ( '.$DB->quote( $link_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $field_value ).' )',
+			'Add new vote on link #'.$link_ID );
 	}
 	else
-	{ // Update existing record, because user already has a vote for this file
+	{ // Update existing record, because user already has a vote for this file:
+		if( $existing_vote->value == $field_value )
+		{	// Undo previous vote:
+			$field_value = NULL;
+		}
 		$result = $DB->query( 'UPDATE T_links__vote
-					SET '.$field_name.' = '.$DB->quote( $field_value ).'
-					WHERE lvot_link_ID = '.$DB->quote( $link_ID ).'
-						AND lvot_user_ID = '.$DB->quote( $user_ID ) );
+			  SET '.$field_name.' = '.$DB->quote( $field_value ).'
+			WHERE lvot_link_ID = '.$DB->quote( $link_ID ).'
+			  AND lvot_user_ID = '.$DB->quote( $user_ID ),
+			'Update a vote on link #'.$link_ID );
 	}
 
 	if( $result )
