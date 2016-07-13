@@ -204,6 +204,7 @@ function update_urlpreview( baseurl, url_path )
 	jQuery( '#urlpreview' ).html( baseurl + url_path );
 
 	baseurl = baseurl.replace( /^(.+\/)([^\/]+\.[^\/]+)?$/, '$1' );
+	baseurl = baseurl.replace( /^(https?:\/\/(.+?)(:.+?)?)\//, '/' );
 	jQuery( '#rsc_assets_url_type_relative' ).html( baseurl + 'rsc/' );
 	jQuery( '#media_assets_url_type_relative' ).html( baseurl + 'media/' );
 	jQuery( '#skins_assets_url_type_relative' ).html( baseurl + 'skins/' );

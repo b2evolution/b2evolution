@@ -1491,6 +1491,17 @@ class Blog extends DataObject
 
 
 	/**
+	 * Get the URL to the basepath of this collection relative to domain
+	 *
+	 * @return string
+	 */
+	function get_basepath_relative_url()
+	{
+		return str_replace( $this->get_baseurl_root(), '', $this->get_basepath_url() );
+	}
+
+
+	/**
 	 * Get the URL of the htsrv folder, on the current blog's domain (which is NOT always the same as the $baseurl domain!).
 	 */
 	function get_local_htsrv_url()
@@ -1514,7 +1525,7 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{ // Relative URL
 			global $media_subdir;
-			return $this->get_basepath_url().$media_subdir;
+			return $this->get_basepath_relative_url().$media_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL
@@ -1541,7 +1552,7 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{ // Relative URL
 			global $rsc_subdir;
-			return $this->get_basepath_url().$rsc_subdir;
+			return $this->get_basepath_relative_url().$rsc_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL
@@ -1568,7 +1579,7 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{ // Relative URL
 			global $skins_subdir;
-			return $this->get_basepath_url().$skins_subdir;
+			return $this->get_basepath_relative_url().$skins_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL
@@ -1595,29 +1606,7 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{	// Relative URL:
 			global $plugins_subdir;
-			return $this->get_basepath_url().$plugins_subdir;
-		}
-		elseif( $url_type == 'absolute' )
-		{	// Absolute URL:
-			return $this->get_setting( 'plugins_assets_absolute_url' );
-		}
-		else// == 'basic'
-		{	// Basic Config URL from config:
-			global $plugins_url;
-			return $plugins_url;
-		}
-	}
-
-// fp>quick rewrite to replace above function:
-	function get_local_plugins_url2( $url_type = NULL )
-	{
-		$url_type = is_null( $url_type ) ? $this->get_setting( 'plugins_assets_url_type' ) : $url_type;
-
-		if( $url_type == 'relative' )
-		{	// Relative URL:
-			global $plugins_subdir;
-// fp> here is the change (not tested):
-			return '/'.$plugins_subdir;
+			return $this->get_basepath_relative_url().$plugins_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{	// Absolute URL:

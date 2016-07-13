@@ -255,11 +255,11 @@ class Plugin
 
 	/**
 	 * Plugin URL
-	 * This gets lazy-filled with both 'abs' and 'rel' URLs by {@link get_plugin_url()}.
+	 * This gets lazy-filled URL by {@link get_plugin_url()}.
 	 *
-	 * @var array
+	 * @var string
 	 */
-	private $_plugin_url = array();
+	private $_plugin_url;
 
 	/**
 	 * Plugin template
@@ -3070,41 +3070,7 @@ class Plugin
 	 * @param string Get absolute URL? (or make it relative to $ReqHost)
 	 * @return string
 	 */
-	function get_plugin_url( $abs = false )
-	{
-		global $ReqHost, $plugins_url, $plugins_path, $Blog;
-
-		$key = $abs ? 'abs' : 'rel';
-
-		if( empty( $this->_plugin_url ) )
-		{	// Initialize plugin URL only first time request:
-
-			// Get sub-path below $plugins_path, if any:
-			$sub_path = preg_replace( ':^'.preg_quote( $plugins_path, ':' ).':', '', dirname( $this->classfile_path ).'/' );
-
-			if( is_admin_page() || empty( $Blog ) )
-			{	// Get plugin url for nack-office and when collection is not viewed now:
-				$r = $plugins_url.$sub_path;
-			}
-			else
-			{	// Get plugin url depending on collection setting:
-				$r = $Blog->get_local_plugins_url().$sub_path;
-			}
-
-			// Use the same protocol as with current host (so includes from within https do not fail when on http):
-			$r = url_same_protocol( $r );
-
-			$this->_plugin_url = array(
-					'abs' => $r, // absolute
-					'rel' => url_rel_to_same_host( $r, $ReqHost ), // relative to current host
-				);
-		}
-
-		return $this->_plugin_url[$key];
-	}
-
-//fp> quick rewrite to replace above function:
-	function get_plugin_url2( $dummy = false )
+	function get_plugin_url( $dummy = false )
 	{
 		global $ReqHost, $plugins_url, $plugins_path, $Blog;
 
@@ -3124,7 +3090,6 @@ class Plugin
 			}
 
 			// Use the same protocol as with current host (so includes from within https do not fail when on http):
-// fp> make sure this does not break relative usrl like '/plugins/...':
 			$r = url_same_protocol( $r );
 
 			$this->_plugin_url = $r;
