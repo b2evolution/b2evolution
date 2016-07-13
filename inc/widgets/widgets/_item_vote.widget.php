@@ -109,7 +109,7 @@ class item_vote_Widget extends ComponentWidget
 				'display_summary_author' => array(
 					'label' => T_('Always show summary to author'),
 					'size' => 40,
-					'note' => T_('Author will always see a summary.'),
+					'note' => T_('Author will always see a summary (since he can\'t vote).'),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
 				),
