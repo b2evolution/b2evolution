@@ -7635,7 +7635,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 11820, 'Create table for items votes...' ) )
-	{	// 6.8.0-alpha
+	{	// part of 6.8.0-alpha
 		db_create_table( 'T_items__votes', '
 			itvt_item_ID INT UNSIGNED NOT NULL,
 			itvt_user_ID INT UNSIGNED NOT NULL,
@@ -7649,7 +7649,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 11825, 'Upgrade table posts for voting...' ) )
-	{	// 6.8.0-alpha
+	{	// part of 6.8.0-alpha
 		$DB->query( 'ALTER TABLE T_items__item
 			ADD post_addvotes   INT NOT NULL DEFAULT 0,
 			ADD post_countvotes INT UNSIGNED NOT NULL DEFAULT 0' );
