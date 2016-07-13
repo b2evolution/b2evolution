@@ -1064,6 +1064,43 @@ function split_outcode( $separators, $content, $capture_separator = false )
 
 
 /**
+ * Remove [image:] and [video:] short tags that are inside <p> blocks and move them before the paragraph
+ *
+ * @param string Source content
+ * @param string Search pattern
+ * @param function Optional callback function that accepts $content and $matches arguments
+ * @return string Content
+ */
+function move_short_tags( $content, $pattern = NULL, $callback = NULL )
+{	// Move [image:] tags [video:] out of <p> blocks
+
+	if( is_null( $pattern ) )
+	{
+		$pattern = '/(<p[\s*|>]((?!<\/p>).)*?)(?=\[(image|video))(\[(image|video):(\d+)(:?)([^\]]*)\])/i';
+	}
+
+	preg_match_all( $pattern, $content, $matches );
+
+	if( $callback )
+	{
+		$content = call_user_func( $callback, $content, $matches );
+	}
+	else
+	{
+		if( ! empty( $matches[0] ) )
+		{ // there are short tags to relocate
+			foreach( $matches[0] as $i => $current_match )
+			{
+				$content = str_replace( $current_match, $matches[4][$i].$matches[1][$i], $content );
+			}
+		}
+	}
+
+	return $content;
+}
+
+
+/**
  * Make links clickable in a given text.
  *
  * It replaces only text which is not between <a> tags already.
