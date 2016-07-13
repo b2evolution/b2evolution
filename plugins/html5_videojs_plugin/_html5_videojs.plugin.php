@@ -50,10 +50,8 @@ class html5_videojs_plugin extends Plugin
 	{
 		global $Blog;
 
-		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
-
-		require_css( '#videojs_css#', $relative_to );
-		require_js( '#videojs#', $relative_to );
+		require_css( '#videojs_css#', 'blog' );
+		require_js( '#videojs#', 'blog' );
 		$this->require_skin();
 
 		// Set a video size in css style, because option setting is ignored by some reason

@@ -134,11 +134,9 @@ class cookie_consent_plugin extends Plugin
 			$accept_button = TS_('Accept');
 		}
 
-		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
-
 		// Initialize html block:
 		$this->require_css( 'style.css', true );
-		require_js( 'jquery/jquery.cookie.min.js', $relative_to, false, true );
+		require_js( 'jquery/jquery.cookie.min.js', 'blog', false, true );
 
 		$html_block = '<div id="eu_cookie_consent"'.( is_logged_in() ? ' class="eu_cookie_consent__loggedin"' : '' ).'>'
 				.'<div>'

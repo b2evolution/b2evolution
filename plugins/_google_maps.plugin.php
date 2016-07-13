@@ -210,9 +210,7 @@ class google_maps_plugin extends Plugin
 
 		$params['Form']->switch_layout( 'linespan' );
 
-		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
-
-		require_js( '#jqueryUI#', $relative_to );
+		require_js( '#jqueryUI#', 'blog' );
 
 		$lat = $Item->get_setting('latitude');
 		$lng = $Item->get_setting('longitude');
@@ -856,9 +854,7 @@ function locate()
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
-
-		require_js( '#jquery#', $relative_to );
+		require_js( '#jquery#', 'blog' );
 	}
 
 

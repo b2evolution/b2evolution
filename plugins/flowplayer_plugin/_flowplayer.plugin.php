@@ -49,8 +49,7 @@ class flowplayer_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
-		require_js( '#flowplayer#', $relative_to );
+		require_js( '#flowplayer#', 'blog' );
 		add_js_headline( 'flowplayer.conf = { flashfit: true, embed: false }' );
 		$this->require_skin();
 		add_css_headline( '.flowplayer_block {

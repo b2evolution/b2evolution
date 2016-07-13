@@ -76,10 +76,8 @@ class widescroll_plugin extends Plugin
 			return false;
 		}
 
-		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
-
 		// Load js to work with textarea
-		require_js( 'functions.js', $relative_to, true, true );
+		require_js( 'functions.js', 'blog', true, true );
 
 		?><script type="text/javascript">
 		//<![CDATA[
@@ -297,9 +295,7 @@ class widescroll_plugin extends Plugin
 			return;
 		}
 
-		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
-
-		require_js( '#jquery#', $relative_to );
+		require_js( '#jquery#', 'blog' );
 		$this->require_js( 'jquery.scrollwide.min.js' );
 		$this->require_css( 'jquery.scrollwide.css' );
 	}
@@ -317,7 +313,7 @@ class widescroll_plugin extends Plugin
 
 		if( $ctrl == 'campaigns' && get_param( 'tab' ) == 'send' && $this->get_email_setting( 'email_apply_rendering' ) )
 		{	// Load this only on form to preview email campaign:
-			require_js( '#jquery#', 'rsc_url' );
+			require_js( '#jquery#', 'blog' );
 			$this->require_js( 'jquery.scrollwide.min.js' );
 			$this->require_css( 'jquery.scrollwide.css' );
 		}
