@@ -74,7 +74,7 @@ class videoplug_plugin extends Plugin
 			);
 
 		// Move short tag outside of paragraph
-		$content = move_short_tags( $content, '/(<p[\s*|>](((?!<\/p>).)*)?)(?=\[(video))(\[(video):(youtube|dailymotion|vimeo)(:?)([^\]]*)\])(.*(?=<\/p>))/i' );
+		$content = move_short_tags( $content, '/\[video:(youtube|dailymotion|vimeo):?[^\[\]]*\]/i' );
 
 		$content = replace_content_outcode( $search_list, $replace_list, $content );
 
