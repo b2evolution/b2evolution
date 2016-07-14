@@ -1107,7 +1107,7 @@ function move_short_tags( $content, $pattern = NULL, $callback = NULL )
 
 	if( is_null( $pattern ) )
 	{
-		$pattern = '/(<p[\s*|>]((?!<\/p>).)*?)(?=\[(image|video|audio))(\[(image|video|audio):(\d+)(:?)([^\]]*)\])/i';
+		$pattern = '/(<p[\s*|>](((?!<\/p>).)*)?)(?=\[(image|video|audio))(\[(image|video|audio):(\d+)(:?)([^\]]*)\])(.*<\/p>)/i';
 	}
 
 	preg_match_all( $pattern, $content, $matches );
@@ -1122,7 +1122,13 @@ function move_short_tags( $content, $pattern = NULL, $callback = NULL )
 		{ // there are short tags to relocate
 			foreach( $matches[0] as $i => $current_match )
 			{
-				$content = str_replace( $current_match, $matches[4][$i].$matches[1][$i], $content );
+				$new_paragraph = $matches[1][$i].$matches[10][$i];
+				if( preg_match( '/<p\s*.*>\s*<\/p>/i', $new_paragraph ) === 1 )
+				{ // remove paragraph the if moving out the short tag will result to an empty paragraph
+					$new_paragraph = '';
+				}
+
+				$content = str_replace( $current_match, $matches[5][$i].$new_paragraph, $content );
 			}
 		}
 	}
