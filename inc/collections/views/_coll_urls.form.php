@@ -319,8 +319,18 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 						.'</span>';
 				}
 
+				$relative_asset_url_note = '<span id="'.$asset_url_type.'_relative">'.$asset_url_data['local_url'].'</span>';
+				if( $asset_url_type != 'skins_assets_url_type' &&
+				    $edited_Blog->get_setting( 'skins_assets_url_type' ) != 'relative' &&
+				    $edited_Blog->get_setting( $asset_url_type ) == 'relative' )
+				{
+					$relative_asset_url_note .= ' <span class="red">'
+							.sprintf( T_('ATTENTION: using a relative %s folder with a non-relative %s folder will probably lead to undesired results (because of the skin\'s &lt;baseurl&gt;).'), '<code>'.$asset_url_data['folder'].'</code>', '<code>/skins/</code>' )
+						.'</span>';
+				}
+
 				$Form->radio( $asset_url_type, $edited_Blog->get_setting( $asset_url_type ), array(
-					array( 'relative', sprintf( $option_labels['relative'], '<code>'.$asset_url_data['folder'].'</code>' ), '<span id="'.$asset_url_type.'_relative">'.$asset_url_data['local_url'].'</span>' ),
+					array( 'relative', sprintf( $option_labels['relative'], '<code>'.$asset_url_data['folder'].'</code>' ), $relative_asset_url_note ),
 					array( 'basic', $option_labels['basic'], $basic_asset_url_note ),
 					array( 'absolute', $option_labels['absolute'], '',
 						'<input type="text" id="'.$asset_url_data['absolute_url'].'" class="form_text_input form-control" name="'.$asset_url_data['absolute_url'].'"
