@@ -1123,15 +1123,22 @@ function move_short_tags( $content, $pattern = NULL, $callback = NULL )
 		{
 			// get short tags in each paragraph
 			preg_match_all( $pattern, $current_paragraph, $matches );
-			//var_dump( $current_paragraph );
-			$new_paragraph = str_replace( $matches[0], '', $current_paragraph );
+			$new_paragraph = $current_paragraph;
 
-			if( preg_match( '/<p[\s*|>]\s*<\/p>/i', $new_paragraph ) === 1 )
-			{ // remove paragraph the if moving out the short tag will result to an empty paragraph
-				$new_paragraph = '';
+			if( $matches[0] )
+			{
+				$new_paragraph = str_replace( $matches[0], '', $current_paragraph );
+
+				// convert &nbsp; to space
+				$x = str_replace( "\xC2\xA0", ' ', $new_paragraph );
+
+				if( preg_match( '/<p[\s*|>]\s*<\/p>/i', $x ) === 1 )
+				{ // remove paragraph the if moving out the short tag will result to an empty paragraph
+					$new_paragraph = '';
+				}
+
+				$new_paragraph = implode( '', $matches[0] ).$new_paragraph;
 			}
-
-			$new_paragraph = implode( '', $matches[0] ).$new_paragraph;
 		}
 		$content = str_replace( $current_paragraph, $new_paragraph, $content );
 	}
