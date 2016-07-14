@@ -1148,6 +1148,25 @@ class Blog extends DataObject
 				{	// Display warning for such settings combination:
 					$Messages->add( T_('WARNING: you will be loading your assets from a different domain. This may cause problems if you don\'t know exactly what you are doing. Please check the Assets URLs panel below.'), 'warning' );
 				}
+
+				if( $this->get_setting( 'skins_assets_url_type' ) != 'relative' )
+				{	// Display warning if skins path is used as NOT relative url:
+					if( $this->get_setting( 'rsc_assets_url_type' ) == 'relative' )
+					{	// If rsc path is relative url:
+						$Messages->add( sprintf( T_('WARNING: your %s and %s assets URL seem to be configured in a potentially undesirable way. Please check your Assets URLs below.'),
+							'<code>/rsc/</code>', '<code>/skins/</code>' ), 'warning' );
+					}
+					if( $this->get_setting( 'media_assets_url_type' ) == 'relative' )
+					{	// If media path is relative url:
+						$Messages->add( sprintf( T_('WARNING: your %s and %s assets URL seem to be configured in a potentially undesirable way. Please check your Assets URLs below.'),
+							'<code>/media/</code>', '<code>/skins/</code>' ), 'warning' );
+					}
+					if( $this->get_setting( 'plugins_assets_url_type' ) == 'relative' )
+					{	// If plugins path is relative url:
+						$Messages->add( sprintf( T_('WARNING: your %s and %s assets URL seem to be configured in a potentially undesirable way. Please check your Assets URLs below.'),
+							'<code>/plugins/</code>', '<code>/skins/</code>' ), 'warning' );
+					}
+				}
 			}
 
 
@@ -1530,7 +1549,15 @@ class Blog extends DataObject
 	 */
 	function get_basepath_relative_url()
 	{
-		return str_replace( $this->get_baseurl_root(), '', $this->get_basepath_url() );
+		if( $this->get( 'access_type' ) == 'absolute' )
+		{	// If collection URL is absolute we should extract sub path from the URL because it can be different than site url:
+			return str_replace( $this->get_baseurl_root(), '', $this->get_basepath_url() );
+		}
+		else
+		{	// Otherwise we can use sub path of site url:
+			global $basesubpath;
+			return $basesubpath;
+		}
 	}
 
 
