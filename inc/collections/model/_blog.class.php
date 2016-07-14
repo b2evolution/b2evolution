@@ -1497,7 +1497,15 @@ class Blog extends DataObject
 	 */
 	function get_basepath_relative_url()
 	{
-		return str_replace( $this->get_baseurl_root(), '', $this->get_basepath_url() );
+		if( $this->get( 'access_type' ) == 'absolute' )
+		{	// If collection URL is absolute we should extract sub path from the URL because it can be different than site url:
+			return str_replace( $this->get_baseurl_root(), '', $this->get_basepath_url() );
+		}
+		else
+		{	// Otherwise we can use sub path of site url:
+			global $basesubpath;
+			return $basesubpath;
+		}
 	}
 
 
