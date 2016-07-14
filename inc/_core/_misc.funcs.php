@@ -1068,38 +1068,48 @@ function split_outcode( $separators, $content, $capture_separator = false )
  *
  * @param string Source content
  * @param string Search pattern
- * @param function Optional callback function that accepts $content and $matches arguments
+ * @param function Optional callback function that accepts search pattern and current paragraph as arguments and returns the new_paragraph
  * @return string Content
  */
 function move_short_tags( $content, $pattern = NULL, $callback = NULL )
-{	// Move [image:] tags [video:] out of <p> blocks
+{	// Move [image:] and [video:] tags out of <p> blocks
+
+	// Get individual paragraphs
+	preg_match_all( '/<p[\s*|>].*?<\/p>/i', $content, $paragraphs );
 
 	if( is_null( $pattern ) )
 	{
-		$pattern = '/(<p[\s*|>](((?!<\/p>).)*)?)(?=\[(image|video))(\[(image|video):(\d+)(:?)([^\]]*)\])(.*<\/p>)/i';
+		$pattern = '/\[(image|video):\d+:?[^\[\]]*\]/i';
 	}
 
-	preg_match_all( $pattern, $content, $matches );
+	foreach( $paragraphs[0] as $i => $current_paragraph )
+	{
+		if( $callback )
+		{
+			$new_paragraph = call_user_func( $callback, $pattern, $current_paragraph );
+		}
+		else
+		{
+			// get short tags in each paragraph
+			preg_match_all( $pattern, $current_paragraph, $matches );
+			$new_paragraph = $current_paragraph;
 
-	if( $callback )
-	{
-		$content = call_user_func( $callback, $content, $matches );
-	}
-	else
-	{
-		if( ! empty( $matches[0] ) )
-		{ // there are short tags to relocate
-			foreach( $matches[0] as $i => $current_match )
+			if( $matches[0] )
 			{
-				$new_paragraph = $matches[1][$i].$matches[10][$i];
-				if( preg_match( '/<p\s*.*>\s*<\/p>/i', $new_paragraph ) === 1 )
+				$new_paragraph = str_replace( $matches[0], '', $current_paragraph );
+
+				// convert &nbsp; to space
+				$x = str_replace( "\xC2\xA0", ' ', $new_paragraph );
+
+				if( preg_match( '/<p[\s*|>]\s*<\/p>/i', $x ) === 1 )
 				{ // remove paragraph the if moving out the short tag will result to an empty paragraph
 					$new_paragraph = '';
 				}
 
-				$content = str_replace( $current_match, $matches[5][$i].$new_paragraph, $content );
+				$new_paragraph = implode( '', $matches[0] ).$new_paragraph;
 			}
 		}
+		$content = str_replace( $current_paragraph, $new_paragraph, $content );
 	}
 
 	return $content;
