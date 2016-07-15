@@ -6266,7 +6266,7 @@ function get_ReqURI()
  */
 function get_samedomain_htsrv_url( $secure = false )
 {
-	global $ReqHost, $ReqPath, $htsrv_url, $htsrv_url_sensitive, $Blog;
+	global $htsrv_url, $htsrv_url_sensitive, $htsrv_subdir, $Blog;
 
 	if( $secure )
 	{
@@ -6277,21 +6277,37 @@ function get_samedomain_htsrv_url( $secure = false )
 		$req_htsrv_url = $htsrv_url;
 	}
 
-	if( strpos( $ReqHost.$ReqPath, $req_htsrv_url ) !== false )
+	if( is_admin_page() || empty( $Blog ) )
+	{	// Get current host and path for back-office or when no collection page:
+		global $ReqHost, $ReqPath;
+		$current_path = $ReqPath;
+		$current_host = $ReqHost;
+	}
+	else
+	{	// Get host and path depending on current collection settings:
+		$current_path = $Blog->get_basepath();
+		$current_host = $Blog->get_baseurl_root().$current_path;
+	}
+
+	if( strpos( $current_host.$current_path, $req_htsrv_url ) !== false )
 	{
 		return $req_htsrv_url;
 	}
 
-	$req_url_parts = @parse_url( $ReqHost );
+	$req_url_parts = @parse_url( $current_host );
 	$hsrv_url_parts = @parse_url( $req_htsrv_url );
 	if( ( !isset( $req_url_parts['host'] ) ) || ( !isset( $hsrv_url_parts['host'] ) ) )
 	{
 		debug_die( 'Invalid hosts!' );
 	}
-	$req_domain = $req_url_parts['host'];
-	$htsrv_domain = $hsrv_url_parts['host'];
+	$req_domain = $req_url_parts['host']
+		.( empty( $req_url_parts['port'] ) ? '' : ':'.$req_url_parts['port'] )
+		.( empty( $req_url_parts['path'] ) ? '' : $req_url_parts['path'] );
+	$htsrv_domain = $hsrv_url_parts['host']
+		.( empty( $hsrv_url_parts['port'] ) ? '' : ':'.$hsrv_url_parts['port'] )
+		.( empty( $hsrv_url_parts['path'] ) ? '' : $hsrv_url_parts['path'] );
 
-	$samedomain_htsrv_url = substr_replace( $req_htsrv_url, $req_domain, strpos( $req_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) );
+	$samedomain_htsrv_url = substr_replace( $req_htsrv_url, $req_domain, strpos( $req_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) - strlen( $htsrv_subdir ) );
 
 	// fp> The following check would apply well if we always had 301 redirects.
 	// But it's possible to turn them off in SEO settings for some page and not others (we don't know which here)
