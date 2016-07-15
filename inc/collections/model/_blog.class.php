@@ -1566,8 +1566,8 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{	// Relative URL:
 			global $media_subdir, $Skin;
-			if( isset( $Skin ) && $Skin->get( 'type' ) == 'feed' )
-			{	// Force to absolute collection URL on feed skins:
+			if( is_admin_page() || ( isset( $Skin ) && $Skin->get( 'type' ) == 'feed' ) )
+			{	// Force to absolute collection URL on back-office and feed skins:
 				return $this->get_basepath_url().$media_subdir;
 			}
 			else
