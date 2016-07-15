@@ -1564,9 +1564,16 @@ class Blog extends DataObject
 		$url_type = is_null( $url_type ) ? $this->get_setting( 'media_assets_url_type' ) : $url_type;
 
 		if( $url_type == 'relative' )
-		{ // Relative URL
-			global $media_subdir;
-			return $this->get_basepath().$media_subdir;
+		{	// Relative URL:
+			global $media_subdir, $Skin;
+			if( isset( $Skin ) && $Skin->get( 'type' ) == 'feed' )
+			{	// Force to absolute collection URL on feed skins:
+				return $this->get_basepath_url().$media_subdir;
+			}
+			else
+			{	// Use relative URL for other skins:
+				return $this->get_basepath().$media_subdir;
+			}
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL
