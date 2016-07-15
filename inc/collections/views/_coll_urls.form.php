@@ -249,14 +249,6 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 
 		$absolute_url_note = T_('Enter path to %s folder ending with / -- This may be located in a CDN zone');
 		$assets_url_data = array();
-		// rsc url:
-		$assets_url_data['rsc_assets_url_type'] = array(
-				'label'        => sprintf( T_('Load generic %s assets from'), '<code>/rsc/</code>' ),
-				'url'          => $rsc_url,
-				'absolute_url' => 'rsc_assets_absolute_url',
-				'folder'       => '/rsc/',
-				'local_url'    => $edited_Blog->get_local_rsc_url( 'relative' )
-			);
 		// skins url:
 		$assets_url_data['skins_assets_url_type'] = array(
 				'label'        => sprintf( T_('Load %s assets from'), '<code>/skins/</code>' ),
@@ -264,6 +256,14 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 				'absolute_url' => 'skins_assets_absolute_url',
 				'folder'       => '/skins/',
 				'local_url'    => $edited_Blog->get_local_skins_url( 'relative' )
+			);
+		// rsc url:
+		$assets_url_data['rsc_assets_url_type'] = array(
+				'label'        => sprintf( T_('Load generic %s assets from'), '<code>/rsc/</code>' ),
+				'url'          => $rsc_url,
+				'absolute_url' => 'rsc_assets_absolute_url',
+				'folder'       => '/rsc/',
+				'local_url'    => $edited_Blog->get_local_rsc_url( 'relative' )
 			);
 		// plugins url:
 		$assets_url_data['plugins_assets_url_type'] = array(

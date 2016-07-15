@@ -87,6 +87,16 @@ class Blog extends DataObject
 
 
 	/**
+	 * The basepath of that collection.
+	 *
+	 * Lazy filled by get_basepath()
+	 *
+	 * @var string
+	 */
+	var $basepath;
+
+
+	/**
 	 * The URL to the basepath of that blog.
 	 * This is supposed to be the same as $baseurl but localized to the domain of the blog/
 	 *
@@ -1526,15 +1536,14 @@ class Blog extends DataObject
 	{
 		if( empty( $this->basepath_url ) )
 		{
-			if( $this->access_type == 'absolute' )
-			{ // Use whole url when it is absolute
-				// Remove text like 'index.php' at the end
+			if( $this->get( 'access_type' ) == 'absolute' )
+			{	// Use whole url when it is absolute:
+				// Remove text like 'index.php' at the end:
 				$this->basepath_url = preg_replace( '/^(.+\/)([^\/]+\.[^\/]+)?$/', '$1', $this->get( 'siteurl' ) );
 			}
 			else
-			{ // Build url from base and sub path
-				global $basesubpath;
-				$this->basepath_url = $this->get_baseurl_root().$basesubpath;
+			{	// Build url from base and sub path:
+				$this->basepath_url = $this->get_baseurl_root().$this->get_basepath();
 			}
 		}
 
@@ -1543,21 +1552,26 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get the URL to the basepath of this collection relative to domain
+	 * Get the basepath of this collection relative to domain
 	 *
 	 * @return string
 	 */
-	function get_basepath_relative_url()
+	function get_basepath()
 	{
-		if( $this->get( 'access_type' ) == 'absolute' )
-		{	// If collection URL is absolute we should extract sub path from the URL because it can be different than site url:
-			return str_replace( $this->get_baseurl_root(), '', $this->get_basepath_url() );
+		if( empty( $this->basepath ) )
+		{	// Initialize base path only first time:
+			if( $this->get( 'access_type' ) == 'absolute' )
+			{	// If collection URL is absolute we should extract sub path from the URL because it can be different than site url:
+				$this->basepath = str_replace( $this->get_baseurl_root(), '', $this->get_basepath_url() );
+			}
+			else
+			{	// Otherwise we can use sub path of site url:
+				global $basesubpath;
+				$this->basepath = $basesubpath;
+			}
 		}
-		else
-		{	// Otherwise we can use sub path of site url:
-			global $basesubpath;
-			return $basesubpath;
-		}
+
+		return $this->basepath;
 	}
 
 
@@ -1583,9 +1597,16 @@ class Blog extends DataObject
 		$url_type = is_null( $url_type ) ? $this->get_setting( 'media_assets_url_type' ) : $url_type;
 
 		if( $url_type == 'relative' )
-		{ // Relative URL
-			global $media_subdir;
-			return $this->get_basepath_relative_url().$media_subdir;
+		{	// Relative URL:
+			global $media_subdir, $Skin;
+			if( is_admin_page() || ( isset( $Skin ) && $Skin->get( 'type' ) == 'feed' ) )
+			{	// Force to absolute collection URL on back-office and feed skins:
+				return $this->get_basepath_url().$media_subdir;
+			}
+			else
+			{	// Use relative URL for other skins:
+				return $this->get_basepath().$media_subdir;
+			}
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL
@@ -1612,7 +1633,7 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{ // Relative URL
 			global $rsc_subdir;
-			return $this->get_basepath_relative_url().$rsc_subdir;
+			return $this->get_basepath().$rsc_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL
@@ -1639,7 +1660,7 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{ // Relative URL
 			global $skins_subdir;
-			return $this->get_basepath_relative_url().$skins_subdir;
+			return $this->get_basepath().$skins_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL
@@ -1666,7 +1687,7 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{	// Relative URL:
 			global $plugins_subdir;
-			return $this->get_basepath_relative_url().$plugins_subdir;
+			return $this->get_basepath().$plugins_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{	// Absolute URL:
