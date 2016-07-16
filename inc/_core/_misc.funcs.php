@@ -6342,7 +6342,7 @@ function get_samedomain_htsrv_url( $secure = false )
 		.( empty( $hsrv_url_parts['port'] ) ? '' : ':'.$hsrv_url_parts['port'] )
 		.( empty( $hsrv_url_parts['path'] ) ? '' : $hsrv_url_parts['path'] );
 
-	$samedomain_htsrv_url = substr_replace( $req_htsrv_url, $req_domain, strpos( $req_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) - strlen( $htsrv_subdir ) );
+	$samedomain_htsrv_url = substr_replace( $req_htsrv_url, $req_domain, strpos( $req_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) - strlen( $htsrv_subdir ) - 1 );
 
 	// fp> The following check would apply well if we always had 301 redirects.
 	// But it's possible to turn them off in SEO settings for some page and not others (we don't know which here)
