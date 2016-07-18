@@ -6266,7 +6266,7 @@ function get_ReqURI()
  */
 function get_samedomain_htsrv_url( $secure = false )
 {
-	global $htsrv_url, $htsrv_url_sensitive, $htsrv_subdir, $Blog;
+	global $ReqHost, $ReqPath, $htsrv_url, $htsrv_url_sensitive, $htsrv_subdir, $Blog;
 
 	if( $secure )
 	{
@@ -6277,21 +6277,24 @@ function get_samedomain_htsrv_url( $secure = false )
 		$req_htsrv_url = $htsrv_url;
 	}
 
+	// Cut htsrv folder from end of the URL:
+	$req_htsrv_url = substr( $req_htsrv_url, 0, strlen( $req_htsrv_url ) - strlen( $htsrv_subdir ) );
+
 	if( is_admin_page() || empty( $Blog ) )
 	{	// Get current host and path for back-office or when no collection page:
 		global $ReqHost, $ReqPath;
-		$current_path = $ReqPath;
+		$current_path = $ReqHost.$ReqPath;
 		$current_host = $ReqHost;
 	}
 	else
 	{	// Get host and path depending on current collection settings:
-		$current_path = $Blog->get_basepath();
-		$current_host = $Blog->get_baseurl_root().$current_path;
+		$current_path = $Blog->get_basepath_url();
+		$current_host = $Blog->get_basepath_url();
 	}
 
-	if( strpos( $current_host.$current_path, $req_htsrv_url ) !== false )
-	{
-		return $req_htsrv_url;
+	if( strpos( $current_path, $req_htsrv_url ) !== false )
+	{	// If current request path contains the required htsrv URL:
+		return $req_htsrv_url.$htsrv_subdir;
 	}
 
 	$req_url_parts = @parse_url( $current_host );
@@ -6300,14 +6303,27 @@ function get_samedomain_htsrv_url( $secure = false )
 	{
 		debug_die( 'Invalid hosts!' );
 	}
-	$req_domain = $req_url_parts['host']
-		.( empty( $req_url_parts['port'] ) ? '' : ':'.$req_url_parts['port'] )
-		.( empty( $req_url_parts['path'] ) ? '' : $req_url_parts['path'] );
-	$htsrv_domain = $hsrv_url_parts['host']
-		.( empty( $hsrv_url_parts['port'] ) ? '' : ':'.$hsrv_url_parts['port'] )
-		.( empty( $hsrv_url_parts['path'] ) ? '' : $hsrv_url_parts['path'] );
 
-	$samedomain_htsrv_url = substr_replace( $req_htsrv_url, $req_domain, strpos( $req_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) - strlen( $htsrv_subdir ) - 1 );
+	if( is_admin_page() || empty( $Blog ) )
+	{	// If no collection then replace only domain:
+		$req_domain = $req_url_parts['host'];
+		$htsrv_domain = $hsrv_url_parts['host'];
+	}
+	else
+	{	// If request is from collection then replace domain + path:
+		$req_domain = $req_url_parts['host']
+			.( empty( $req_url_parts['port'] ) ? '' : ':'.$req_url_parts['port'] )
+			.( empty( $req_url_parts['path'] ) ? '' : $req_url_parts['path'] );
+		$htsrv_domain = $hsrv_url_parts['host']
+			.( empty( $hsrv_url_parts['port'] ) ? '' : ':'.$hsrv_url_parts['port'] )
+			.( empty( $hsrv_url_parts['path'] ) ? '' : $hsrv_url_parts['path'] );
+	}
+
+	// Replace domain + path of htsrv URL with current request:
+	$samedomain_htsrv_url = substr_replace( $req_htsrv_url, $req_domain, strpos( $req_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) );
+
+	// Revert htsrv folder to end of the URL which has been cut above:
+	$samedomain_htsrv_url .= $htsrv_subdir;
 
 	// fp> The following check would apply well if we always had 301 redirects.
 	// But it's possible to turn them off in SEO settings for some page and not others (we don't know which here)

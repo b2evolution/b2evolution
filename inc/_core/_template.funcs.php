@@ -2171,7 +2171,7 @@ function is_recursive( /*array*/ & $array, /*array*/ & $alreadySeen = array() )
  */
 function display_ajax_form( $params )
 {
-	global $rsc_url, $samedomain_htsrv_url, $ajax_form_number, $required_js;
+	global $rsc_url, $ajax_form_number, $required_js;
 
 	if( is_recursive( $params ) )
 	{ // The params array contains recursion, don't try to encode, display error message instead
@@ -2207,7 +2207,7 @@ function display_ajax_form( $params )
 		function get_form_<?php echo $ajax_form_number; ?>()
 		{
 			jQuery.ajax({
-				url: '<?php echo $samedomain_htsrv_url; ?>anon_async.php',
+				url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
 				type: 'POST',
 				data: <?php echo $json_params; ?>,
 				success: function(result)
