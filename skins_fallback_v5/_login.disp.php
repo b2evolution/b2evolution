@@ -27,7 +27,7 @@ $return_to = param( 'return_to', 'url', '' );
 $source = param( 'source', 'string', 'inskin login form' );
 $login_required = ( $action == 'req_login' );
 
-global $admin_url, $ReqHost, $secure_htsrv_url;
+global $admin_url, $ReqHost;
 
 if( !isset( $redirect_to ) )
 {
@@ -107,7 +107,7 @@ display_login_form( $login_form_params );
 
 if( $params['login_form_footer'] )
 { // Display login form footer
-	echo '<div class="notes standard_login_link"><a href="'.$secure_htsrv_url.'login.php?source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'&amp;return_to='.rawurlencode( $return_to ).'">'.T_( 'Use standard login form instead').' &raquo;</a></div>';
+	echo '<div class="notes standard_login_link"><a href="'.get_htsrv_url( true ).'login.php?source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'&amp;return_to='.rawurlencode( $return_to ).'">'.T_( 'Use standard login form instead').' &raquo;</a></div>';
 
 	echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
 

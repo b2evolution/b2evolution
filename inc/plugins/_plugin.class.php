@@ -3152,10 +3152,9 @@ class Plugin
 	 */
 	function get_htsrv_url( $method, $params = array(), $glue = '&amp;', $abs = false )
 	{
-		global $htsrv_url, $htsrv_url_sensitive;
-		global $ReqHost, $Blog;
+		global $ReqHost;
 
-		$base = substr($ReqHost, 0, 6) == 'https:' ? $htsrv_url_sensitive : $htsrv_url;
+		$base = substr( $ReqHost, 0, 6 ) == 'https:' ? get_htsrv_url( true ) : get_htsrv_url();
 
 		if( ! $abs && strpos( $base, $ReqHost ) === 0 )
 		{ // cut off $ReqHost if the resulting URL starts with it:

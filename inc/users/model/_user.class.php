@@ -3689,7 +3689,7 @@ class User extends DataObject
 	 */
 	function send_validate_email( $redirect_to_after, $blog = NULL, $email_changed = false )
 	{
-		global $app_name, $Session, $secure_htsrv_url, $baseurl, $servertimenow;
+		global $app_name, $Session, $baseurl, $servertimenow;
 		global $Settings, $UserSettings;
 
 		// Display messages depending on user email status
@@ -4984,9 +4984,9 @@ class User extends DataObject
 		else
 		{ // Front-office
 			global $Blog;
-			$url_rotate_90_left = get_secure_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_90_left&file_ID='.$file_ID.'&'.url_crumb( 'user' );
-			$url_rotate_180 = get_secure_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_180&file_ID='.$file_ID.'&'.url_crumb( 'user' );
-			$url_rotate_90_right = get_secure_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_90_right&file_ID='.$file_ID.'&'.url_crumb( 'user' );
+			$url_rotate_90_left = get_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_90_left&file_ID='.$file_ID.'&'.url_crumb( 'user' );
+			$url_rotate_180 = get_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_180&file_ID='.$file_ID.'&'.url_crumb( 'user' );
+			$url_rotate_90_right = get_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_90_right&file_ID='.$file_ID.'&'.url_crumb( 'user' );
 		}
 
 		$html = $params['before'];

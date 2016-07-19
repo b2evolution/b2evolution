@@ -88,7 +88,7 @@ user_report_form( array(
 		'Form'       => $Form,
 		'user_ID'    => $edited_User->ID,
 		'crumb_name' => 'user',
-		'cancel_url' => get_secure_htsrv_url().'profile_update.php?'
+		'cancel_url' => get_htsrv_url().'profile_update.php?'
 										.( is_admin_page() ? 'is_backoffice=1&amp;' : '' )
 										.'action=remove_report&amp;'
 										.'user_ID='.$edited_User->ID.'&amp;'

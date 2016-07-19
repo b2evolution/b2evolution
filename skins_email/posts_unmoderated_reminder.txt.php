@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.txt.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url, $baseurl, $htsrv_url, $post_moderation_reminder_threshold;
+global $admin_url, $baseurl, $post_moderation_reminder_threshold;
 
 $BlogCache = & get_BlogCache();
 
@@ -36,7 +36,7 @@ foreach( $params['blogs'] as $blog_ID )
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'You are a moderator in this blog, and you are receiving notifications when the posts may need moderation.' )."\n".
 		T_( 'If you don\'t want to receive any more notifications about post moderation, click here' ).': '.
-		$htsrv_url.'quick_unsubscribe.php?type=pst_moderation_reminder&user_ID=$user_ID$&key=$unsubscribe_key$';
+		get_htsrv_url().'quick_unsubscribe.php?type=pst_moderation_reminder&user_ID=$user_ID$&key=$unsubscribe_key$';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.txt.php', $params );

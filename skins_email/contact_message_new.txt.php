@@ -14,7 +14,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.txt.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $htsrv_url, $samedomain_htsrv_url;
 
 // Default params:
 $params = array_merge( array(
@@ -85,12 +84,12 @@ if( ! empty( $recipient_User ) )
 	}
 	// Add quick unsubcribe link so users can deny receiving emails through b2evo message form in any circumstances
 	$params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more emails through a message form, click here:' ).' '.
-		$htsrv_url.'quick_unsubscribe.php?type=msgform&user_ID=$user_ID$&key=$unsubscribe_key$';
+		get_htsrv_url().'quick_unsubscribe.php?type=msgform&user_ID=$user_ID$&key=$unsubscribe_key$';
 }
 elseif( !empty( $params['Comment'] ) )
 { // Visitor:
 	$params['unsubscribe_text'] = T_("Click on the following link to not receive e-mails on your comments\nfor this e-mail address anymore:").' '.
-		$samedomain_htsrv_url.'anon_unsubscribe.php?type=comment&c='.$params['Comment']->ID.'&anon_email='.rawurlencode( $params['Comment']->author_email );
+		get_htsrv_url().'anon_unsubscribe.php?type=comment&c='.$params['Comment']->ID.'&anon_email='.rawurlencode( $params['Comment']->author_email );
 }
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------

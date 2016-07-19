@@ -47,7 +47,7 @@ $params = array_merge( array(
 			'item_selected_end'   => '</div>',
 			'block_end'           => '</div><div class="clear"></div>',
 		),
-	'form_action' => get_secure_htsrv_url().'profile_update.php',
+	'form_action' => get_htsrv_url( true ).'profile_update.php',
 	'form_class_user_avatar'   => 'evo_form',
 	'form_class_user_identity' => 'evo_form',
 	'form_class_user_pass'     => 'evo_form',

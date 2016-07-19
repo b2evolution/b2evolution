@@ -32,7 +32,7 @@ else
 }
 
 
-$submit_url = get_secure_htsrv_url().'message_send.php';
+$submit_url = get_htsrv_url().'message_send.php';
 
 if( ( $unsaved_message_params = get_message_params_from_session() ) == NULL )
 { // set message default to empty string
@@ -62,7 +62,7 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 	$Form->hidden( 'recipient_id', $recipient_id );
 	$Form->hidden( 'post_id', $post_id );
 	$Form->hidden( 'comment_id', $comment_id );
-	$Form->hidden( 'redirect_to', url_rel_to_same_host( $redirect_to, get_secure_htsrv_url() ) );
+	$Form->hidden( 'redirect_to', url_rel_to_same_host( $redirect_to, get_htsrv_url() ) );
 
 	$Form->info( T_('To'), $recipient_link );
 

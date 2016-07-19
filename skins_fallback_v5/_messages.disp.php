@@ -98,7 +98,7 @@ if( !isset( $params ) )
 }
 $params = array_merge( array(
 	'form_class_msg' => 'bComment',
-	'form_action' => $samedomain_htsrv_url.'action.php?mname=messaging',
+	'form_action' => get_htsrv_url().'action.php?mname=messaging',
 	'form_name' => '',
 	'form_layout' => NULL,
 	'cols' => 35,

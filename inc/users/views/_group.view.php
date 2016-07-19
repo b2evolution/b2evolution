@@ -189,7 +189,7 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 	// Print JS to edit a group level
 	echo_editable_column_js( array(
 		'column_selector' => '.group_level_edit',
-		'ajax_url'        => get_secure_htsrv_url().'async.php?action=group_level_edit&'.url_crumb( 'grouplevel' ),
+		'ajax_url'        => get_htsrv_url().'async.php?action=group_level_edit&'.url_crumb( 'grouplevel' ),
 		'options'         => $group_levels,
 		'new_field_name'  => 'new_group_level',
 		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',

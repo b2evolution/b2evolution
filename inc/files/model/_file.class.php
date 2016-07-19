@@ -747,7 +747,7 @@ class File extends DataObject
 	 */
 	function get_url()
 	{
-		global $public_access_to_media, $htsrv_url;
+		global $public_access_to_media;
 
 		if( $this->is_dir() )
 		{ // Directory
@@ -1969,7 +1969,7 @@ class File extends DataObject
 	 */
 	function get_view_url( $always_open_dirs_in_fm = true )
 	{
-		global $htsrv_url, $public_access_to_media;
+		global $public_access_to_media;
 
 		// Get root code
 		$root_ID = $this->_FileRoot->ID;
@@ -1996,10 +1996,10 @@ class File extends DataObject
 			switch( $Filetype->viewtype )
 			{
 				case 'image':
-					return  $htsrv_url.'viewfile.php?root='.$root_ID.'&amp;path='.$this->_rdfp_rel_path.'&amp;viewtype=image';
+					return  get_htsrv_url().'viewfile.php?root='.$root_ID.'&amp;path='.$this->_rdfp_rel_path.'&amp;viewtype=image';
 
 				case 'text':
-					return $htsrv_url.'viewfile.php?root='.$root_ID.'&amp;path='.$this->_rdfp_rel_path.'&amp;viewtype=text';
+					return get_htsrv_url().'viewfile.php?root='.$root_ID.'&amp;path='.$this->_rdfp_rel_path.'&amp;viewtype=text';
 
 				case 'download':	 // will NOT open a popup and will insert a Content-disposition: attachment; header
 					return $this->get_getfile_url();
@@ -2187,7 +2187,7 @@ class File extends DataObject
 	 */
 	function get_thumb_url( $size_name = 'fit-80x80', $glue = '&amp;', $size_x = 1 )
 	{
-		global $public_access_to_media, $htsrv_url;
+		global $public_access_to_media;
 
 		if( ! $this->is_image() )
 		{ // Not an image
@@ -2226,8 +2226,7 @@ class File extends DataObject
 	 */
 	function get_getfile_url( $glue = '&amp;' )
 	{
-		global $htsrv_url;
-		return $htsrv_url.'getfile.php/'
+		return get_htsrv_url().'getfile.php/'
 			// This is for clean 'save as':
 			.rawurlencode( $this->_name )
 			// This is for locating the file:

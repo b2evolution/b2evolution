@@ -1171,7 +1171,7 @@ switch( $action )
 		$Skin = & $SkinCache->get_by_ID( $skin_ID );
 
 		$display_mode = 'js';
-		$form_action = get_secure_htsrv_url().'profile_update.php';
+		$form_action = get_htsrv_url().'profile_update.php';
 
 		$window_width = param( 'window_width', 'integer' );
 		$window_height = param( 'window_height', 'integer' );
@@ -1213,7 +1213,7 @@ switch( $action )
 		}
 
 		$display_mode = 'js';
-		$form_action = get_secure_htsrv_url().'profile_update.php';
+		$form_action = get_htsrv_url().'profile_update.php';
 
 		require $inc_path.'users/views/_user_report.form.php';
 		break;
@@ -1254,7 +1254,7 @@ switch( $action )
 		}
 
 		$display_mode = 'js';
-		$form_action = get_secure_htsrv_url().'profile_update.php';
+		$form_action = get_htsrv_url().'profile_update.php';
 
 		require $inc_path.'users/views/_user_groups.form.php';
 		break;

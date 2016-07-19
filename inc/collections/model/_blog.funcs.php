@@ -702,7 +702,7 @@ function init_blog_widgets( $blog_id )
  */
 function check_allow_disp( $disp )
 {
-	global $Blog, $Messages, $Settings, $current_User, $secure_htsrv_url;
+	global $Blog, $Messages, $Settings, $current_User;
 
 	if( !check_user_status( 'can_be_validated' ) )
 	{ // we don't have the case when user is logged in and the account is not active

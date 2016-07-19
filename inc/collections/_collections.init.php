@@ -1003,7 +1003,7 @@ class collections_Module extends Module
 	function handle_htsrv_action()
 	{
 		global $demo_mode, $current_User, $DB, $Session, $Messages;
-		global $UserSettings, $samedomain_htsrv_url;
+		global $UserSettings;
 
 		if( !is_logged_in() )
 		{ // user must be logged in
@@ -1085,7 +1085,7 @@ class collections_Module extends Module
 				}
 				else
 				{ // Display confirm unlink/delete message
-					$delete_url = $samedomain_htsrv_url.'action.php?mname=collections&action=unlink&link_ID='.$edited_Link->ID.'&confirmed=1&crumb_collections_unlink='.get_crumb( 'collections_unlink' );
+					$delete_url = get_htsrv_url().'action.php?mname=collections&action=unlink&link_ID='.$edited_Link->ID.'&confirmed=1&crumb_collections_unlink='.get_crumb( 'collections_unlink' );
 					$ok_button = '<a href="'.$delete_url.'" class="btn btn-danger">'.T_('I am sure!').'</a>';
 					$cancel_button = '<a href="'.$redirect_to.'" class="btn btn-default">'.T_('CANCEL').'</a>';
 					if( isset( $links_count ) && $links_count == 1 )

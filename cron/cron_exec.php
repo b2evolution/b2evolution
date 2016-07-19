@@ -48,7 +48,7 @@ if( $is_cli )
 			global $baseurl;
 			$ReqHost = $baseurl;
 		}
-		$secure_htsrv_url = get_secure_htsrv_url();
+		$secure_htsrv_url = get_htsrv_url( true );
 	}
 
 	// Load required functions ( we need to load here, because in CLI mode it is not loaded )

@@ -275,7 +275,7 @@ class Link extends DataObject
 					}
 					else
 					{ // For other files use url through special file that forces a download action
-						return get_samedomain_htsrv_url().'download.php?link_ID='.$this->ID;
+						return get_htsrv_url().'download.php?link_ID='.$this->ID;
 					}
 
 				case 'page':

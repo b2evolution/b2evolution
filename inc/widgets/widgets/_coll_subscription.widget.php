@@ -133,7 +133,7 @@ class coll_subscription_Widget extends ComponentWidget
 
 		if( $current_User && ( $allow_subscriptions || $allow_comment_subscriptions ) )
 		{
-			$samedomain_htsrv_url = get_samedomain_htsrv_url();
+			$current_htsrv_url = get_htsrv_url();
 			$subscriptions = get_user_subscription( $current_User->ID, $Blog->ID );
 			if( $subscriptions )
 			{
@@ -165,7 +165,7 @@ class coll_subscription_Widget extends ComponentWidget
 						$button_label = T_('Subscribe');
 					}
 
-					$Form = new Form( $samedomain_htsrv_url.'action.php', 'collection_subscription' );
+					$Form = new Form( $current_htsrv_url.'action.php', 'collection_subscription' );
 					$Form->begin_form( 'fform' );
 					$Form->hidden( 'action', 'subs_update' );
 					$Form->hidden( 'subscribe_blog', $Blog->ID );
@@ -215,12 +215,12 @@ class coll_subscription_Widget extends ComponentWidget
 						if( $items_subscribed )
 						{
 							echo '<p>You are subscribed to get automatic email notifications whenever there is a new <strong>post</strong>
-									in this collection. <a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=subs_update&subscribe_blog='.$Blog->ID.
+									in this collection. <a href="'.$current_htsrv_url.'action.php?mname=collections&action=subs_update&subscribe_blog='.$Blog->ID.
 									'&sub_items=0&'.url_crumb( 'collections_subs_update' ).'">Unsubscribe</a>.</p>';
 						}
 						else
 						{
-							echo '<p><a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=subs_update&subscribe_blog='.$Blog->ID.
+							echo '<p><a href="'.$current_htsrv_url.'action.php?mname=collections&action=subs_update&subscribe_blog='.$Blog->ID.
 									'&sub_items=1&'.url_crumb( 'collections_subs_update' ).'">Click here</a> to get automatic email notifications whenever there is a new <strong>post</strong>
 									in this collection.</p>';
 						}
@@ -230,12 +230,12 @@ class coll_subscription_Widget extends ComponentWidget
 						if( $comments_subscribed )
 						{
 							echo '<p>You are '.( $items_subscribed ? '<strong>also</strong>' : '' ).' subscribed to get automatic email notifications whenever there is a new
-									<strong>comment</strong> in this collection. <a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=subs_update&subscribe_blog='.$Blog->ID.
+									<strong>comment</strong> in this collection. <a href="'.$current_htsrv_url.'action.php?mname=collections&action=subs_update&subscribe_blog='.$Blog->ID.
 									'&sub_comments=0&'.url_crumb( 'collections_subs_update' ).'">Unsubscribe</a>.</p>';
 						}
 						else
 						{
-							echo '<p><a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=subs_update&subscribe_blog='.$Blog->ID.
+							echo '<p><a href="'.$current_htsrv_url.'action.php?mname=collections&action=subs_update&subscribe_blog='.$Blog->ID.
 									'&sub_comments=1&'.url_crumb( 'collections_subs_update' ).'">Click here</a> to '.( $items_subscribed ? '<strong>also</strong>' : '' ).
 									' get automatic email notifications whenever there is a new <strong>comment</strong> in this collection.</p>';
 						}

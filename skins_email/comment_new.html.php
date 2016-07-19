@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.html.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $htsrv_url, $admin_url, $Blog;
+global $admin_url, $Blog;
 
 // Default params:
 $params = array_merge( array(
@@ -130,7 +130,7 @@ if( $params['notify_type'] == 'moderator' )
 { // moderation email
 	if( ( $Blog->get_setting( 'comment_quick_moderation' ) != 'never' ) && ( !empty( $Comment->secret ) ) )
 	{ // quick moderation is permitted, and comment secret was set
-		echo get_link_tag( '$secret_content_start$'.$htsrv_url.'comment_review.php?cmt_ID='.$Comment->ID.'&secret='.$Comment->secret.'$secret_content_end$', T_('Quick moderation'), 'div.buttons a+a.button_yellow' )."\n";
+		echo get_link_tag( '$secret_content_start$'.get_htsrv_url().'comment_review.php?cmt_ID='.$Comment->ID.'&secret='.$Comment->secret.'$secret_content_end$', T_('Quick moderation'), 'div.buttons a+a.button_yellow' )."\n";
 	}
 	echo get_link_tag( $admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID, T_('Edit comment'), 'div.buttons a+a.button_gray' )."\n";
 }
@@ -156,14 +156,14 @@ switch( $params['notify_type'] )
 		}
 		$params['unsubscribe_text'] = T_( 'You are a moderator of this blog and you are receiving notifications when a comment may need moderation.' ).'<br />'
 			.$unsubscribe_text.': '
-			.get_link_tag( $htsrv_url.'quick_unsubscribe.php?type='.$unsubscribe_type.'&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
+			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type='.$unsubscribe_type.'&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
 		break;
 
 	case 'blog_subscription':
 		// blog subscription
 		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on any post.' ).'<br />'
 			.T_( 'If you don\'t want to receive any more notifications on this blog, click here' ).': '
-			.get_link_tag( $htsrv_url.'quick_unsubscribe.php?type=coll_comment&coll_ID='.$Blog->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
+			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=coll_comment&coll_ID='.$Blog->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
 		// subscribers are not allowed to see comment author email
 		break;
 
@@ -171,7 +171,7 @@ switch( $params['notify_type'] )
 		// item subscription
 		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on this post.' ).'<br />'
 			.T_( 'If you don\'t want to receive any more notifications on this post, click here' ).': '
-			.get_link_tag( $htsrv_url.'quick_unsubscribe.php?type=post&post_ID='.$Item->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
+			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=post&post_ID='.$Item->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
 		// subscribers are not allowed to see comment author email
 		break;
 
@@ -179,14 +179,14 @@ switch( $params['notify_type'] )
 		// user is the creator of the post
 		$params['unsubscribe_text'] = T_( 'This is your post. You are receiving notifications when anyone comments on your posts.' ).'<br />'
 			.T_( 'If you don\'t want to receive any more notifications on your posts, click here' ).':'
-			.get_link_tag( $htsrv_url.'quick_unsubscribe.php?type=creator&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
+			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=creator&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
 		break;
 
 	case 'meta_comment':
 		// meta comment subscription
 		$params['unsubscribe_text'] = T_( 'You are receiving notifications when meta comment is added on this post.' ).'<br />'
 			.T_( 'If you don\'t want to receive any more notifications about meta comments, click here' ).': '
-			.get_link_tag( $htsrv_url.'quick_unsubscribe.php?type=meta_comment&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
+			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=meta_comment&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
 		break;
 }
 

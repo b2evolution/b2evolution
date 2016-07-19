@@ -106,6 +106,16 @@ class Blog extends DataObject
 	 */
 	var $basepath_url;
 
+
+	/**
+	 * The htsrv URLs to the basepath of that collection.
+	 *
+	 * Lazy filled by get_htsrv_url()
+	 *
+	 * @var array: 0 - normal URL, 1 - secure URL
+	 */
+	var $htsrv_urls;
+
 	/**
 	 * Additional settings for the collection.  lazy filled.
  	 *
@@ -1550,6 +1560,69 @@ class Blog extends DataObject
 		global $htsrv_subdir;
 
 		return $this->get_basepath_url().$htsrv_subdir;
+	}
+
+
+	/**
+	 * Get URL to htsrv folder
+	 *
+	 * Note: For back-office or no collection page _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
+	 *
+	 * @param boolean TRUE to use https URL
+	 * @return string URL to htsrv folder
+	 */
+	function get_htsrv_url( $force_https = false )
+	{
+		$force_https = intval( $force_https );
+
+		if( ! isset( $this->htsrv_urls[ $force_https ] ) )
+		{	// Initialize collection htsrv URL only first time and store in cache:
+			global $htsrv_url, $htsrv_url_sensitive, $htsrv_subdir;
+
+			if( ! is_array( $this->htsrv_urls ) )
+			{
+				$this->htsrv_urls = array();
+			}
+
+			if( $force_https )
+			{	// If secure htsrv URL is required:
+				$required_htsrv_url = $htsrv_url_sensitive;
+			}
+			else
+			{	// If normal htsrv URL is required:
+				$required_htsrv_url = $htsrv_url;
+			}
+
+			// Cut htsrv folder from end of the URL:
+			$required_htsrv_url = substr( $required_htsrv_url, 0, strlen( $required_htsrv_url ) - strlen( $htsrv_subdir ) );
+
+			if( strpos( $this->get_basepath_url(), $required_htsrv_url ) !== false )
+			{	// If current request path contains the required htsrv URL:
+				return $required_htsrv_url.$htsrv_subdir;
+			}
+
+			$coll_url_parts = @parse_url( $this->get_basepath_url() );
+			$htsrv_url_parts = @parse_url( $required_htsrv_url );
+			if( ! isset( $coll_url_parts['host'] ) || ! isset( $htsrv_url_parts['host'] ) )
+			{
+				debug_die( 'Invalid hosts!' );
+			}
+
+			$coll_domain = $coll_url_parts['host']
+				.( empty( $coll_url_parts['port'] ) ? '' : ':'.$coll_url_parts['port'] )
+				.( empty( $coll_url_parts['path'] ) ? '' : $coll_url_parts['path'] );
+			$htsrv_domain = $htsrv_url_parts['host']
+				.( empty( $htsrv_url_parts['port'] ) ? '' : ':'.$htsrv_url_parts['port'] )
+				.( empty( $htsrv_url_parts['path'] ) ? '' : $htsrv_url_parts['path'] );
+
+			// Replace domain + path of htsrv URL with current request:
+			$this->htsrv_urls[ $force_https ] = substr_replace( $required_htsrv_url, $coll_domain, strpos( $required_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) );
+
+			// Revert htsrv folder to end of the URL which has been cut above:
+			$this->htsrv_urls[ $force_https ] .= $htsrv_subdir;
+		}
+
+		return $this->htsrv_urls[ $force_https ];
 	}
 
 

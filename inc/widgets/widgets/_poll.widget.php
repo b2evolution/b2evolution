@@ -123,7 +123,7 @@ class poll_Widget extends ComponentWidget
 			{	// Display a form only if at least one poll option exists:
 				if( is_logged_in() )
 				{	// Set form action to vote if current user is logged in:
-					$form_action = get_samedomain_htsrv_url().'action.php?mname=polls';
+					$form_action = get_htsrv_url().'action.php?mname=polls';
 				}
 				else
 				{	// Set form action to log in:

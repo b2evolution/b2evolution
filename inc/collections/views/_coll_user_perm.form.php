@@ -23,7 +23,7 @@ global $current_User;
 
 global $debug;
 global $UserSettings;
-global $rsc_url, $htsrv_url, $admin_url;
+global $rsc_url, $admin_url;
 
 global $Blog, $permission_to_change_admin;
 
@@ -31,7 +31,7 @@ $permission_to_change_admin = $current_User->check_perm( 'blog_admin', 'edit', f
 
 // Javascript:
 echo '
-<script type="text/javascript">var htsrv_url = "'.$htsrv_url.'";</script>';
+<script type="text/javascript">var htsrv_url = "'.get_htsrv_url().'";</script>';
 require_js( 'collectionperms.js', 'rsc_url', false, true );
 
 $Form = new Form( NULL, 'blogperm_checkchanges', 'post' );

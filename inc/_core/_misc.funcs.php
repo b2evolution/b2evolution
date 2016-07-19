@@ -6260,9 +6260,35 @@ function get_ReqURI()
 
 
 /**
+ * Get URL to htsrv folder depending on current collection base url from front-office or site base url from back-office
+ *
+ * Note: For back-office or no collection page _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
+ *
+ * @param boolean TRUE to use https URL
+ * @return string URL to htsrv folder
+ */
+function get_htsrv_url( $force_https = false )
+{
+	global $Blog;
+
+	if( is_admin_page() || empty( $Blog ) )
+	{	// For back-office or when no collection page:
+		return get_samedomain_htsrv_url( $force_https );
+	}
+	else
+	{	// For current collection:
+		return $Blog->get_htsrv_url( $force_https );
+	}
+}
+
+
+/**
  * Get htsrv url on the same domain as the http request came from
  *
  * Note: _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
+ *
+ * @param boolean TRUE to use https URL
+ * @return string URL to htsrv folder
  */
 function get_samedomain_htsrv_url( $secure = false )
 {
@@ -6280,44 +6306,20 @@ function get_samedomain_htsrv_url( $secure = false )
 	// Cut htsrv folder from end of the URL:
 	$req_htsrv_url = substr( $req_htsrv_url, 0, strlen( $req_htsrv_url ) - strlen( $htsrv_subdir ) );
 
-	if( is_admin_page() || empty( $Blog ) )
-	{	// Get current host and path for back-office or when no collection page:
-		global $ReqHost, $ReqPath;
-		$current_path = $ReqHost.$ReqPath;
-		$current_host = $ReqHost;
-	}
-	else
-	{	// Get host and path depending on current collection settings:
-		$current_path = $Blog->get_basepath_url();
-		$current_host = $Blog->get_basepath_url();
-	}
-
-	if( strpos( $current_path, $req_htsrv_url ) !== false )
+	if( strpos( $ReqHost.$ReqPath, $req_htsrv_url ) !== false )
 	{	// If current request path contains the required htsrv URL:
 		return $req_htsrv_url.$htsrv_subdir;
 	}
 
-	$req_url_parts = @parse_url( $current_host );
+	$req_url_parts = @parse_url( $ReqHost );
 	$hsrv_url_parts = @parse_url( $req_htsrv_url );
 	if( ( !isset( $req_url_parts['host'] ) ) || ( !isset( $hsrv_url_parts['host'] ) ) )
 	{
 		debug_die( 'Invalid hosts!' );
 	}
 
-	if( is_admin_page() || empty( $Blog ) )
-	{	// If no collection then replace only domain:
-		$req_domain = $req_url_parts['host'];
-		$htsrv_domain = $hsrv_url_parts['host'];
-	}
-	else
-	{	// If request is from collection then replace domain + path:
-		$req_domain = $req_url_parts['host']
-			.( empty( $req_url_parts['port'] ) ? '' : ':'.$req_url_parts['port'] )
-			.( empty( $req_url_parts['path'] ) ? '' : $req_url_parts['path'] );
-		$htsrv_domain = $hsrv_url_parts['host']
-			.( empty( $hsrv_url_parts['port'] ) ? '' : ':'.$hsrv_url_parts['port'] )
-			.( empty( $hsrv_url_parts['path'] ) ? '' : $hsrv_url_parts['path'] );
-	}
+	$req_domain = $req_url_parts['host'];
+	$htsrv_domain = $hsrv_url_parts['host'];
 
 	// Replace domain + path of htsrv URL with current request:
 	$samedomain_htsrv_url = substr_replace( $req_htsrv_url, $req_domain, strpos( $req_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) );

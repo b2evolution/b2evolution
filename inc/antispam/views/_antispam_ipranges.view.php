@@ -164,7 +164,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 	// Print JS to edit status of IP range
 	echo_editable_column_js( array(
 		'column_selector' => '.iprange_status_edit',
-		'ajax_url'        => get_secure_htsrv_url().'async.php?action=iprange_status_edit&'.url_crumb( 'iprange' ),
+		'ajax_url'        => get_htsrv_url().'async.php?action=iprange_status_edit&'.url_crumb( 'iprange' ),
 		'options'         => aipr_status_titles(),
 		'new_field_name'  => 'new_status',
 		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',
