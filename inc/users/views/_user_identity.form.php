@@ -187,8 +187,8 @@ if( $action != 'view' )
 		}
 		else
 		{
-			$remove_picture_url = get_secure_htsrv_url().'profile_update.php?user_tab=avatar&amp;blog='.$Blog->ID.'&amp;action=remove_avatar&amp;'.url_crumb( 'user' );
-			$delete_picture_url = get_secure_htsrv_url().'profile_update.php?user_tab=avatar&amp;blog='.$Blog->ID.'&amp;action=delete_avatar&amp;file_ID='.$edited_User->avatar_file_ID.'&amp;'.url_crumb( 'user' );
+			$remove_picture_url = get_htsrv_url().'profile_update.php?user_tab=avatar&amp;blog='.$Blog->ID.'&amp;action=remove_avatar&amp;'.url_crumb( 'user' );
+			$delete_picture_url = get_htsrv_url().'profile_update.php?user_tab=avatar&amp;blog='.$Blog->ID.'&amp;action=delete_avatar&amp;file_ID='.$edited_User->avatar_file_ID.'&amp;'.url_crumb( 'user' );
 		}
 
 		if( $edited_User->has_avatar() || count( $user_avatars ) )
@@ -668,7 +668,7 @@ $Form->end_form();
 
 		jQuery.ajax({
 		type: 'POST',
-		url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+		url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 		data: 'action=get_user_new_field&user_id=<?php echo $edited_User->ID; ?>&field_id=' + field_id + params,
 		success: function(result)
 			{
@@ -760,7 +760,7 @@ $Form->end_form();
 
 		jQuery.ajax({
 		type: 'POST',
-		url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+		url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 		data: 'action=get_user_new_field&user_id=<?php echo $edited_User->ID; ?>&field_id=' + field_id + params,
 		success: function( result )
 			{
@@ -831,7 +831,7 @@ $Form->end_form();
 		jQuery.ajax(
 		{
 			type: 'POST',
-			url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+			url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 			data: 'action=get_user_new_org' + params,
 			success: function( result )
 			{
@@ -891,7 +891,7 @@ function bind_autocomplete( field_objs )
 	{	// If selected elements are exists
 		field_objs.autocomplete( {
 			source: function(request, response) {
-				jQuery.getJSON( '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php?action=get_user_field_autocomplete', {
+				jQuery.getJSON( '<?php echo get_htsrv_url(); ?>anon_async.php?action=get_user_field_autocomplete', {
 					term: request.term, attr_id: this.element[0].getAttribute( 'id' )
 				}, response);
 			},

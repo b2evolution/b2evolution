@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $secure_htsrv_url, $Blog, $account_closing_success, $account_close_reason;
+global $Blog, $account_closing_success, $account_close_reason;
 
 if( ! empty( $account_closing_success ) )
 { // Display a bye message after user closed an account
@@ -23,7 +23,7 @@ if( ! empty( $account_closing_success ) )
 else
 { // Display a form to close an account
 
-	$Form = new Form( $secure_htsrv_url.'login.php' );
+	$Form = new Form( get_htsrv_url( true ).'login.php' );
 
 	$Form->begin_form( 'inskin' );
 

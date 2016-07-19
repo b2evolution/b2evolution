@@ -152,7 +152,7 @@ if( $current_User->check_perm( 'centralantispam', 'edit' ) )
 	// Print JS to edit status of central antispam keyword:
 	echo_editable_column_js( array(
 		'column_selector' => '.cakeyword_status_edit',
-		'ajax_url'        => get_secure_htsrv_url().'async.php?action=cakeyword_status_edit&'.url_crumb( 'cakeyword' ),
+		'ajax_url'        => get_htsrv_url().'async.php?action=cakeyword_status_edit&'.url_crumb( 'cakeyword' ),
 		'options'         => ca_get_keyword_statuses(),
 		'new_field_name'  => 'new_status',
 		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',

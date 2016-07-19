@@ -220,7 +220,7 @@ echo '<div class="profile_column_left">';
 		}
 
 		$buttons['group'] = array();
-		$contact_block_url = get_samedomain_htsrv_url().'action.php?mname=messaging&amp;disp=contacts&amp;user_ID='.$user_ID.'&amp;redirect_to='.rawurlencode( regenerate_url() ).'&amp;'.url_crumb( 'messaging_contacts' );
+		$contact_block_url = get_htsrv_url().'action.php?mname=messaging&amp;disp=contacts&amp;user_ID='.$user_ID.'&amp;redirect_to='.rawurlencode( regenerate_url() ).'&amp;'.url_crumb( 'messaging_contacts' );
 		if( $is_contact === NULL || $is_contact === true )
 		{ // Display a button to block user
 			$buttons['group'][] = '<a href="'.$contact_block_url.'&action=block">'

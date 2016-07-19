@@ -1224,7 +1224,7 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				// Colorbox params to display a voting panel:
 				$colorbox_voting_params = '{'.$colorbox_strings_params.'
 					displayVoting: true,
-					votingUrl: "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=link&b2evo_icons_type='.$b2evo_icons_type.$blog_param.'",
+					votingUrl: "'.get_htsrv_url().'anon_async.php?action=voting&vote_type=link&b2evo_icons_type='.$b2evo_icons_type.$blog_param.'",
 					minWidth: 305}';
 				// Colorbox params without voting panel:
 				$colorbox_no_voting_params = '{'.$colorbox_strings_params.'
@@ -1572,7 +1572,7 @@ function init_voting_comment_js( $relative_to = 'rsc_url' )
 	add_js_headline( '
 	jQuery( document ).ready( function()
 	{
-		var comment_voting_url = "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=comment&b2evo_icons_type='.$b2evo_icons_type.'";
+		var comment_voting_url = "'.get_htsrv_url().'anon_async.php?action=voting&vote_type=comment&b2evo_icons_type='.$b2evo_icons_type.'";
 		jQuery( "span[id^=vote_helpful_]" ).each( function()
 		{
 			init_voting_bar( jQuery( this ), comment_voting_url, jQuery( this ).find( "#votingID" ).val(), false );
@@ -1601,7 +1601,7 @@ function init_voting_item_js( $relative_to = 'rsc_url' )
 	add_js_headline( '
 	jQuery( document ).ready( function()
 	{
-		var item_voting_url = "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=item&b2evo_icons_type='.$b2evo_icons_type.'";
+		var item_voting_url = "'.get_htsrv_url().'anon_async.php?action=voting&vote_type=item&b2evo_icons_type='.$b2evo_icons_type.'";
 		jQuery( "span[id^=vote_item_]" ).each( function()
 		{
 			init_voting_bar( jQuery( this ), item_voting_url, jQuery( this ).find( "#votingID" ).val(), false );
@@ -2250,7 +2250,7 @@ function display_ajax_form( $params )
 		function get_form_<?php echo $ajax_form_number; ?>()
 		{
 			jQuery.ajax({
-				url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+				url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 				type: 'POST',
 				data: <?php echo $json_params; ?>,
 				success: function(result)
@@ -2304,7 +2304,7 @@ function display_ajax_form( $params )
 function display_login_form( $params )
 {
 	global $Settings, $Plugins, $Session, $Blog, $blog, $dummy_fields;
-	global $secure_htsrv_url, $admin_url, $baseurl, $ReqHost, $redirect_to;
+	global $admin_url, $baseurl, $ReqHost, $redirect_to;
 
 	$params = array_merge( array(
 			'form_before' => '',
@@ -2553,7 +2553,7 @@ function display_login_js_handler( $params )
 
 		jQuery.ajax({
 			type: 'POST',
-			url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+			url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 			data: {
 				'<?php echo $dummy_fields[ 'login' ]; ?>': username,
 				'action': 'get_user_salt',
@@ -2624,12 +2624,12 @@ function display_login_js_handler( $params )
  */
 function display_lostpassword_form( $login, $hidden_params, $params = array() )
 {
-	global $secure_htsrv_url, $dummy_fields, $redirect_to, $Session;
+	global $dummy_fields, $redirect_to, $Session;
 
 	$params = array_merge( array(
 			'form_before'     => '',
 			'form_after'      => '',
-			'form_action'     => $secure_htsrv_url.'login.php',
+			'form_action'     => get_htsrv_url( true ).'login.php',
 			'form_name'       => 'lostpass_form',
 			'form_class'      => 'fform',
 			'form_template'   => NULL,
@@ -2728,7 +2728,7 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 function display_activateinfo( $params )
 {
 	global $current_User, $Settings, $UserSettings, $Plugins;
-	global $secure_htsrv_url, $rsc_path, $rsc_url, $dummy_fields;
+	global $rsc_path, $rsc_url, $dummy_fields;
 
 	if( !is_logged_in() )
 	{ // if this happens, it means the code is not correct somewhere before this
@@ -2739,7 +2739,7 @@ function display_activateinfo( $params )
 			'use_form_wrapper' => true,
 			'form_before'      => '',
 			'form_after'       => '',
-			'form_action'      => $secure_htsrv_url.'login.php',
+			'form_action'      => get_htsrv_url( true ).'login.php',
 			'form_name'        => 'form_validatemail',
 			'form_class'       => 'fform',
 			'form_layout'      => 'fieldset',
@@ -2868,7 +2868,7 @@ function display_activateinfo( $params )
 
 		echo $params['use_form_wrapper'] ? $params['form_before'] : '';
 
-		$Form = new Form( $secure_htsrv_url.'login.php', 'form_validatemail', 'post', 'fieldset' );
+		$Form = new Form( get_htsrv_url( true ).'login.php', 'form_validatemail', 'post', 'fieldset' );
 
 		if( ! empty( $params['form_template'] ) )
 		{ // Switch layout to template from array
@@ -2879,7 +2879,7 @@ function display_activateinfo( $params )
 
 		$Form->add_crumb( 'validateform' );
 		$Form->hidden( 'action', 'validatemail' );
-		$Form->hidden( 'redirect_to', url_rel_to_same_host( $redirect_to, $secure_htsrv_url ) );
+		$Form->hidden( 'redirect_to', url_rel_to_same_host( $redirect_to, get_htsrv_url( true ) ) );
 		$Form->hidden( 'reqID', 1 );
 		$Form->hidden( 'sessID', $Session->ID );
 
@@ -3076,7 +3076,7 @@ function display_login_validator( $params = array() )
 			jQuery( "#login_status" ).html( login_icon_load );
 			jQuery.ajax( {
 				type: "POST",
-				url: "'.get_samedomain_htsrv_url().'anon_async.php",
+				url: "'.get_htsrv_url().'anon_async.php",
 				data: "action=validate_login&login=" + jQuery( this ).val(),
 				success: function( result )
 				{

@@ -2256,7 +2256,7 @@ function col_thread_read_by( $thread_ID )
  */
 function col_thread_delete_action( $thread_ID )
 {
-	global $Blog, $samedomain_htsrv_url, $admin_url;
+	global $Blog, $admin_url;
 
 	if( is_admin_page() )
 	{
@@ -2266,7 +2266,7 @@ function col_thread_delete_action( $thread_ID )
 	else
 	{
 		$redirect_to = get_dispctrl_url( 'threads' );
-		return action_icon( T_( 'Delete'), 'delete', $samedomain_htsrv_url.'action.php?mname=messaging&thrd_ID='.$thread_ID.'&action=delete&redirect_to='.$redirect_to.'&'.url_crumb( 'messaging_threads' ) );
+		return action_icon( T_( 'Delete'), 'delete', get_htsrv_url().'action.php?mname=messaging&thrd_ID='.$thread_ID.'&action=delete&redirect_to='.$redirect_to.'&'.url_crumb( 'messaging_threads' ) );
 	}
 }
 
@@ -2417,7 +2417,7 @@ function col_msg_read_by( $message_ID )
  */
 function col_msg_actions( $thrd_ID, $msg_ID )
 {
-	global $Blog, $samedomain_htsrv_url, $perm_abuse_management;
+	global $Blog, $perm_abuse_management;
 
 	if( $msg_ID < 1 )
 	{ // Don't display actions in preview mode
@@ -2435,7 +2435,7 @@ function col_msg_actions( $thrd_ID, $msg_ID )
 	else
 	{
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=messages&thrd_ID='.$thrd_ID );
-		$action_url = $samedomain_htsrv_url.'action.php?mname=messaging&disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete&blog='.$Blog->ID;
+		$action_url = get_htsrv_url().'action.php?mname=messaging&disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete&blog='.$Blog->ID;
 		$action_url = url_add_param( $action_url, 'redirect_to='.rawurlencode( $redirect_to ), '&' );
 		return action_icon( T_( 'Delete'), 'delete', $action_url.'&'.url_crumb( 'messaging_messages' ) );
 	}

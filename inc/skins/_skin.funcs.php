@@ -1676,8 +1676,7 @@ function skin_include( $template_name, $params = array() )
 	global $Blog, $MainList, $Item;
 	global $Plugins, $Skin;
 	global $current_User, $Hit, $Session, $Settings;
-	global $skin_url, $htsrv_url, $htsrv_url_sensitive;
-	global $samedomain_htsrv_url, $secure_htsrv_url;
+	global $skin_url;
 	global $credit_links, $skin_links, $francois_links, $fplanque_links, $skinfaktory_links;
 	/**
 	* @var Log
@@ -1957,8 +1956,7 @@ function siteskin_include( $template_name, $params = array(), $force = false )
 
 	// Globals that may be needed by the template:
 	global $current_User, $Hit, $Session, $Settings;
-	global $skin_url, $htsrv_url, $htsrv_url_sensitive;
-	global $samedomain_htsrv_url, $secure_htsrv_url;
+	global $skin_url;
 	global $credit_links, $skin_links, $francois_links, $fplanque_links, $skinfaktory_links;
 	/**
 	* @var Log

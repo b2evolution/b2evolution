@@ -74,7 +74,7 @@ function delete_comment_url( comment_id )
 
 	jQuery.ajax({
 		type: 'POST',
-		url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+		url: '<?php echo get_htsrv_url(); ?>async.php',
 		data:
 		{ 'blogid': '<?php echo $Blog->ID; ?>',
 			'commentid': comment_id,
@@ -114,7 +114,7 @@ function setCommentStatus( id, status, request_from, redirect_to )
 
 	jQuery.ajax({
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 	data:
 		{ 'blogid': '<?php echo $Blog->ID; ?>',
 			'commentid': id,
@@ -197,7 +197,7 @@ function setCommentVote( id, type, vote )
 
 	jQuery.ajax({
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 	data:
 		{ 'blog': '<?php echo $Blog->ID; ?>',
 			'commentid': id,
@@ -247,7 +247,7 @@ function edit_comment( action, comment_ID )
 	jQuery.ajax(
 	{
 		type: 'POST',
-		url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+		url: '<?php echo get_htsrv_url(); ?>async.php',
 		data:
 		{
 			'commentid': comment_ID,
@@ -302,7 +302,7 @@ function deleteComment( commentId, request_from, comment_type )
 		{ // Load and display a link to recycle bin
 			jQuery.ajax({
 			type: 'POST',
-			url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+			url: '<?php echo get_htsrv_url(); ?>async.php',
 			data:
 				{ 'action': 'get_opentrash_link',
 					'blog': '<?php echo $Blog->ID; ?>',
@@ -318,7 +318,7 @@ function deleteComment( commentId, request_from, comment_type )
 
 	jQuery.ajax({
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+	url: '<?php echo get_htsrv_url(); ?>async.php',
 	data:
 		{ 'blogid': '<?php echo $Blog->ID; ?>',
 			'commentid': commentId,
@@ -471,7 +471,7 @@ function refreshComments( request_from )
 
 	jQuery.ajax({
 		type: 'POST',
-		url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+		url: '<?php echo get_htsrv_url(); ?>async.php',
 		data:
 			{ 'blogid': '<?php echo $Blog->ID; ?>',
 				'action': 'refresh_comments',
@@ -589,7 +589,7 @@ function refresh_item_comments( item_id, currentpage, comment_type )
 
 	jQuery.ajax({
 		type: 'POST',
-		url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+		url: '<?php echo get_htsrv_url(); ?>async.php',
 		data:
 			{ 'blogid': '<?php echo $Blog->ID; ?>',
 				'action': 'refresh_comments',

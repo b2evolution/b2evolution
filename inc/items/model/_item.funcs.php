@@ -227,7 +227,7 @@ function init_inskin_editing()
 			'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'\' );',
 		);
 
-	$form_action = get_samedomain_htsrv_url().'item_edit.php';
+	$form_action = get_htsrv_url().'item_edit.php';
 }
 
 /**
@@ -2557,7 +2557,7 @@ function echo_onchange_goal_cat()
 			jQuery.ajax(
 			{
 				type: 'POST',
-				url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+				url: '<?php echo get_htsrv_url(); ?>async.php',
 				data: 'action=get_goals&cat_id=' + cat_ID + '&blogid=<?php echo $blog; ?>&crumb_itemgoal=<?php echo get_crumb( 'itemgoal' ); ?>',
 				success: function( result )
 				{

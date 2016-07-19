@@ -5042,12 +5042,10 @@ class Item extends ItemLight
 	 */
 	function get_trackback_url()
 	{
-		global $htsrv_url, $Settings;
-
 		// fp> TODO: get a clean (per blog) setting for this
-		//	return $htsrv_url.'trackback.php/'.$this->ID;
+		//	return get_htsrv_url().'trackback.php/'.$this->ID;
 
-		return $htsrv_url.'trackback.php?tb_id='.$this->ID;
+		return get_htsrv_url().'trackback.php?tb_id='.$this->ID;
 	}
 
 

@@ -178,7 +178,7 @@ function contact_block( $block, $user_ID, $user_status )
 	$action_url = regenerate_url();
 	if( !is_admin_page() )
 	{ // in front office the action will be processed by messaging module handle_htsrv_action() through action.php
-		$action_url = get_samedomain_htsrv_url().'action.php?mname=messaging&disp=contacts&redirect_to='.rawurlencode( $action_url );
+		$action_url = get_htsrv_url().'action.php?mname=messaging&disp=contacts&redirect_to='.rawurlencode( $action_url );
 	}
 
 	if( $block == 0 )

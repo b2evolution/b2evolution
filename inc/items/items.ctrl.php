@@ -1680,7 +1680,7 @@ switch( $action )
 			if( $Blog->get_setting( 'in_skin_editing' ) && ( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) || get_param( 'p' ) > 0 ) )
 			{ // Show 'In skin' link if Blog setting 'In-skin editing' is ON and User has a permission to publish item in this blog
 				$mode_inskin_url = url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;'.$tab_switch_params );
-				$mode_inskin_action = get_samedomain_htsrv_url().'item_edit.php';
+				$mode_inskin_action = get_htsrv_url().'item_edit.php';
 				$AdminUI->global_icon( T_('In skin editing'), 'edit', $mode_inskin_url,
 						' '.T_('In skin editing'), 4, 3, array(
 						'style' => 'margin-right: 3ex',

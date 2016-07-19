@@ -35,7 +35,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $set_target = NULL, $use_value = NULL )
 {
 	global $debug;
-	global $htsrv_url;
 	static $has_array_type;
 
 	if( ! is_array( $parmeta ) )
@@ -411,7 +410,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 					// Replace the 'add new' action icon div with a new set of setting and a new 'add new' action icon div
 					array('onclick'=>"
 						var oThis = this;
-						jQuery.get('{$htsrv_url}async.php', {
+						jQuery.get('".get_htsrv_url()."async.php', {
 								action: 'add_plugin_sett_set',
 								plugin_ID: '{$Obj->ID}',
 								set_type: '$set_type',

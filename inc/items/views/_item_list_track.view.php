@@ -161,7 +161,7 @@ $ItemList->display( NULL, $result_fadeout );
 // Print JS to edit a task priority
 echo_editable_column_js( array(
 	'column_selector' => '.task_priority_edit',
-	'ajax_url'        => get_secure_htsrv_url().'async.php?action=item_task_edit&field=priority&'.url_crumb( 'itemtask' ),
+	'ajax_url'        => get_htsrv_url().'async.php?action=item_task_edit&field=priority&'.url_crumb( 'itemtask' ),
 	'options'         => item_priority_titles(),
 	'new_field_name'  => 'new_priority',
 	'ID_value'        => 'jQuery( this ).attr( "rel" )',
@@ -186,7 +186,7 @@ if( $field_type == 'select' )
 }
 echo_editable_column_js( array(
 	'column_selector' => '.task_assigned_edit',
-	'ajax_url'        => get_secure_htsrv_url().'async.php?action=item_task_edit&field=assigned&'.url_crumb( 'itemtask' ),
+	'ajax_url'        => get_htsrv_url().'async.php?action=item_task_edit&field=assigned&'.url_crumb( 'itemtask' ),
 	'options'         => $task_assignees,
 	'new_field_name'  => $field_type == 'select' ? 'new_assigned_ID' : 'new_assigned_login',
 	'ID_value'        => 'jQuery( this ).attr( "rel" )',
@@ -206,7 +206,7 @@ foreach( $ItemStatusCache->cache as $ItemStatus )
 }
 echo_editable_column_js( array(
 	'column_selector' => '.task_status_edit',
-	'ajax_url'        => get_secure_htsrv_url().'async.php?action=item_task_edit&field=status&'.url_crumb( 'itemtask' ),
+	'ajax_url'        => get_htsrv_url().'async.php?action=item_task_edit&field=status&'.url_crumb( 'itemtask' ),
 	'options'         => $task_statuses,
 	'new_field_name'  => 'new_status',
 	'ID_value'        => 'jQuery( this ).attr( "rel" )',

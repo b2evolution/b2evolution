@@ -6,7 +6,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $DB, $UserSettings, $Settings;
 
-global $servertimenow, $htsrv_url, $unread_message_reminder_delay, $unread_messsage_reminder_threshold;
+global $servertimenow, $unread_message_reminder_delay, $unread_messsage_reminder_threshold;
 
 // New unread messages reminder may be sent to a user if it has at least one unread message which is older then the given threshold date
 $threshold_date = date2mysql( $servertimenow - $unread_messsage_reminder_threshold );

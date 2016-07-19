@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.txt.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url, $htsrv_url, $current_User;
+global $admin_url, $current_User;
 
 // Default params:
 $params = array_merge( array(
@@ -70,7 +70,7 @@ echo T_('Edit user').': '.$admin_url.'?ctrl=user&user_tab=profile&user_ID='.$par
 
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notifications about user changes, click here:' ).' '.
-		$htsrv_url.'quick_unsubscribe.php?type=account_changed&user_ID=$user_ID$&key=$unsubscribe_key$';
+		get_htsrv_url().'quick_unsubscribe.php?type=account_changed&user_ID=$user_ID$&key=$unsubscribe_key$';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.txt.php', $params );

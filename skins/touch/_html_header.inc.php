@@ -39,7 +39,7 @@ require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 	<?php skin_twitter_tags(); ?>
 	<?php robots_tag(); ?>
 	<?php
-	global $htsrv_url, $restapi_url;
+	global $restapi_url;
 	$js_blog_id = "";
 	if( ! empty( $Blog ) )
 	{ // Set global js var "blog_id"
@@ -47,7 +47,7 @@ require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 	}
 
 	add_js_headline( "// Paths and vars are used by JS functions:
-		var htsrv_url = '".get_samedomain_htsrv_url()."';
+		var htsrv_url = '".get_htsrv_url()."';
 		var restapi_url = '$restapi_url';
 		var b2evo_icons_type = '".get_param( 'b2evo_icons_type' )."';"
 		.$js_blog_id );

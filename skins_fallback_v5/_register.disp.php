@@ -99,12 +99,9 @@ if( $register_user = $Session->get('core.register_user') )
 	$Session->delete( 'core.register_user' );
 }
 
-// set secure htsrv url with the same domain as the request has
-$secure_htsrv_url = get_secure_htsrv_url();
-
 echo str_replace( '$form_title$', $params['register_form_title'], $params['skin_form_before'] );
 
-$Form = new Form( $secure_htsrv_url.'register.php', 'register_form', 'post' );
+$Form = new Form( get_htsrv_url( true ).'register.php', 'register_form', 'post' );
 
 if( ! is_null( $params['register_form_params'] ) )
 { // Use another template param from skin
@@ -241,7 +238,7 @@ echo '</div>';
 
 if( $params['register_form_footer'] )
 { // Display register form footer
-	echo '<div class="notes standard_login_link"><a href="'.$secure_htsrv_url.'register.php?source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'&amp;return_to='.rawurlencode( $return_to ).'">'.T_( 'Use standard registration form instead').' &raquo;</a></div>';
+	echo '<div class="notes standard_login_link"><a href="'.get_htsrv_url( true ).'register.php?source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'&amp;return_to='.rawurlencode( $return_to ).'">'.T_( 'Use standard registration form instead').' &raquo;</a></div>';
 
 	echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
 }
