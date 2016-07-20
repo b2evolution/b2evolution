@@ -1550,6 +1550,9 @@ var downloadInterval = setInterval( function()
 	$Skin->display_init();
 	$Timer->pause( 'Skin:display_init' );
 
+	// Send the predefined cookies:
+	evo_sendcookies();
+
 	// Send default headers:
 	// See comments inside of this function:
 	headers_content_mightcache( 'text/html' );		// In most situations, you do NOT want to cache dynamic content!
@@ -1570,6 +1573,9 @@ function siteskin_init()
 		// Include the additional required files
 		siteskin_include( '_skin_init.inc.php' );
 	}
+
+	// Send the predefined cookies:
+	evo_sendcookies();
 }
 
 

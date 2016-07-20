@@ -54,7 +54,7 @@ function headers_content_mightcache( $type = 'text/html', $max_age = '#', $chars
 	global $Messages, $is_admin_page;
 	global $PageCache, $Debuglog;
 
-	// Send headers to set cookies:
+	// Send the predefined cookies:
 	evo_sendcookies();
 
 	header_content_type( $type, $charset );

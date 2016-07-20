@@ -505,6 +505,9 @@ class AdminUI_general extends Menu
 
 		global $adminskins_path;
 
+		// Send the predefined cookies:
+		evo_sendcookies();
+
 		if( isset( $this->skin_name ) && file_exists( $adminskins_path.$this->skin_name.'/_html_header.inc.php' ) )
 		{ // Get header of the skin
 			require $adminskins_path.$this->skin_name.'/_html_header.inc.php';
