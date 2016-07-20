@@ -1575,17 +1575,6 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get the URL of the htsrv folder, on the current blog's domain (which is NOT always the same as the $baseurl domain!).
-	 */
-	function get_local_htsrv_url()
-	{
-		global $htsrv_subdir;
-
-		return $this->get_basepath_url().$htsrv_subdir;
-	}
-
-
-	/**
 	 * Get URL to htsrv folder
 	 *
 	 * Note: For back-office or no collection page _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized

@@ -6331,9 +6331,9 @@ function get_samedomain_htsrv_url( $secure = false )
 	// But it's possible to turn them off in SEO settings for some page and not others (we don't know which here)
   // And some kinds of pages do not have 301 redirections implemented yet, e-g: disp=users
   /*
-	if( ( !is_admin_page() ) && ( !empty( $Blog ) ) && ( $samedomain_htsrv_url != $Blog->get_local_htsrv_url() ) )
+	if( ( !is_admin_page() ) && ( !empty( $Blog ) ) && ( $samedomain_htsrv_url != $Blog->get_htsrv_url( $secure ) ) )
 	{
-		debug_die( 'The blog is configured to have /htsrv/ at:<br> '.$Blog->get_local_htsrv_url().'<br>but in order to stay on the current domain, we would need to use:<br>'.$samedomain_htsrv_url.'<br>Maybe we have a missing redirection to the proper blog url?' );
+		debug_die( 'The blog is configured to have /htsrv/ at:<br> '.$Blog->get_htsrv_url( $secure ).'<br>but in order to stay on the current domain, we would need to use:<br>'.$samedomain_htsrv_url.'<br>Maybe we have a missing redirection to the proper blog url?' );
 	}
 	*/
 
