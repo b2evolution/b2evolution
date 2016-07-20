@@ -1810,6 +1810,8 @@ if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action,
 	// Load JS files to make the links table sortable:
 	require_js( '#jquery#' );
 	require_js( 'jquery/jquery.sortable.min.js' );
+	// Load JS to save panel params in cookie:
+	require_js( 'jquery/jquery.cookie.min.js' );
 }
 
 if( in_array( $action, array( 'new', 'copy', 'create_edit', 'create_link', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish', 'extract_tags' ) ) )

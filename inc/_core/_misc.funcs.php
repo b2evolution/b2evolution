@@ -7859,4 +7859,45 @@ function can_use_hashed_password()
 
 	return $transmit_hashed_password;
 }
+
+
+/**
+ * Get param value of panel from cookie
+ * Used for panels of edit forms of post and comments
+ *
+ * @param string Panel name
+ * @param string Param name: 'visibility', 'height'
+ * @return string|NULL
+ */
+function get_panel_cookie_param( $panel_name, $param_name = 'visibility' )
+{
+	if( ! isset( $_COOKIE['editscrnpanels_'] ) )
+	{	// Param is not defined yet:
+		return NULL;
+	}
+
+	$panels = explode( ';', $_COOKIE['editscrnpanels_'] );
+
+	foreach( $panels as $panel )
+	{
+		if( preg_match( '/^([a-z0-9\-_]+)\(([^\)]+)\)$/i', $panel, $match ) )
+		{
+			if( $panel_name != $match[1] )
+			{	// Skip a not requested panel:
+				continue;
+			}
+			$params = explode( ',', $match[2] );
+			switch( $param_name )
+			{
+				case 'visibility':
+					return $params[0];
+				case 'height':
+					return isset( $params[1] ) ? $params[1] : NULL;
+			}
+		}
+	}
+
+	// Param is not defined yet:
+	return NULL;
+}
 ?>

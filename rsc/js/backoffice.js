@@ -533,10 +533,10 @@ jQuery( document ).ready( function()
 		var body_height = jQuery( '#iframe_item_preview' ).contents().find( 'body' ).height();
 		if( body_height == 0 )
 		{	// Some browsers cannot get iframe body height correctly, Use this default min value:
-			body_height = 200;
+			body_height = 600;
 		}
 
-		if( body_height > jQuery( '#iframe_item_preview_wrapper' ).height() )
+		if( jQuery( '#iframe_item_preview_wrapper' ).prop( 'style' ).height == '' && body_height > jQuery( '#iframe_item_preview_wrapper' ).height() )
 		{	// Expand the frame height if it is more than wrapper height (but max height is 320px):
 			jQuery( '#iframe_item_preview_wrapper' ).css( 'height', body_height < 600 ? body_height : 600 );
 		}
@@ -570,6 +570,7 @@ jQuery( document ).ready( function()
 		stop: function( e, ui )
 		{	// Remove the temp div element:
 			ui.element.find( '#iframe_item_preview_disabler' ).remove();
+			b2edit_update_panel_cookie_param( 'itemform_preview', 'open', jQuery( this ).height() );
 		},
 		resize: function( e, ui )
 		{	// Limit max height:
@@ -581,3 +582,57 @@ jQuery( document ).ready( function()
 		jQuery( '#iframe_item_preview_wrapper' ).css( 'height', jQuery( '#iframe_item_preview_wrapper' ).height() + 80 );
 	} );
 } );
+
+
+/**
+ * Update params of panel in cookie
+ * Used on forms to edit posts and comments
+ *
+ * @param string Panel name
+ * @param string Visibility: 'open', 'closed'
+ * @param string Height
+ */
+function b2edit_update_panel_cookie_param( panel_name, visibility, height )
+{
+	var current_params = jQuery.cookie( 'editscrnpanels_' );
+	current_params = current_params ? current_params.split( ';' ) : [];
+	var new_params = [];
+	var settings_updated = false;
+
+	for( var i = 0, len = current_params.length; i < len; i++ )
+	{
+		var match = current_params[ i ].match( /^([a-z0-9\-_]+)\(([^\)]+)\)$/i );
+		if( match )
+		{
+			if( panel_name == match[1] )
+			{	// Update settings of the requested panel:
+				var height_param = '';
+				if( typeof( height ) != 'undefined' )
+				{	// Update height:
+					height_param = ',' + height;
+				}
+				else
+				{
+					var params = match[2].split( ',' );
+					if( typeof( params[1] ) != 'undefined' )
+					{	// Save previous height value:
+						height_param = ',' + params[1];
+					}
+				}
+				new_params.push( match[1] + '(' + visibility + height_param + ')' );
+				settings_updated = true;
+			}
+			else
+			{	// Keep settings of other panels:
+				new_params.push( match[0] );
+			}
+		}
+	}
+
+	if( ! settings_updated )
+	{	// Add new param:
+		new_params.push( panel_name + '(' + visibility + ',' + height + ')' );
+	}
+
+	jQuery.cookie( 'editscrnpanels_', new_params.join( ';' ), { path: '/' } );
+}
