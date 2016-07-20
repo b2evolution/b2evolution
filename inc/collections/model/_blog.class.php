@@ -97,7 +97,7 @@ class Blog extends DataObject
 
 
 	/**
-	 * The URL to the basepath of that blog.
+	 * The URL to the basepath of that collection.
 	 * This is supposed to be the same as $baseurl but localized to the domain of the blog/
 	 *
 	 * Lazy filled by get_basepath_url()
@@ -105,6 +105,16 @@ class Blog extends DataObject
 	 * @var string
 	 */
 	var $basepath_url;
+
+
+	/**
+	 * The domain of that collection.
+	 *
+	 * Lazy filled by get_baseurl_root()
+	 *
+	 * @var string
+	 */
+	var $baseurl_root;
 
 
 	/**
@@ -1492,22 +1502,34 @@ class Blog extends DataObject
 
 
 	/**
-	 * This is the domain of the blog.
+	 * This is the domain of the collection.
 	 * This returns NO trailing slash.
+	 *
+	 * @return string
 	 */
 	function get_baseurl_root()
 	{
-		if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $this->gen_baseurl(), $matches ) )
-		{
-			return $matches[1];
+		if( empty( $this->baseurl_root ) )
+		{	// Initialize collection domain only first time:
+			if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $this->gen_baseurl(), $matches ) )
+			{
+				$this->baseurl_root = $matches[1];
+			}
+			else
+			{
+				debug_die( 'Blog::get(baseurl)/baseurlroot - assertion failed [baseurl: '.$this->gen_baseurl().'].' );
+			}
 		}
-		debug_die( 'Blog::get(baseurl)/baseurlroot - assertion failed [baseurl: '.$this->gen_baseurl().'].' );
+
+		return $this->baseurl_root;
 	}
 
 
 	/**
-	 * Get the URL to the basepath of that blog.
+	 * Get the URL to the basepath of that collection.
 	 * This is supposed to be the same as $baseurl but localized to the domain of the blog/
+	 *
+	 * @return string
 	 */
 	function get_basepath_url()
 	{
@@ -1646,7 +1668,7 @@ class Blog extends DataObject
 			}
 			elseif( isset( $Skin ) && $Skin->get( 'type' ) == 'feed' )
 			{	// Force to absolute collection URL on feed skins:
-				return $this->get_basepath_url().$media_subdir;
+				return $this->get_baseurl_root().$this->get_basepath().$media_subdir;
 			}
 			else
 			{	// Use relative URL for other skins:
