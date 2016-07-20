@@ -485,7 +485,8 @@ $xmlsrv_url = $baseurl.$xmlsrv_subdir;   // You should not need to change this
  * URL of the REST API.
  * @global string $restapi_url
  */
-$restapi_url = $htsrv_url.'rest.php?api_version=1&api_request='; // You should not need to change this
+$restapi_script = 'rest.php?api_version=1&api_request='; // You should not need to change this
+$restapi_url = $htsrv_url.$restapi_script; // You should not need to change this
 
 /**
  * Location of the RSC folder.

@@ -6269,6 +6269,21 @@ function get_ReqURI()
 
 
 /**
+ * Get URL to REST API script depending on current collection base url from front-office or site base url from back-office
+ *
+ * Note: For back-office or no collection page _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
+ *
+ * @return string URL to htsrv folder
+ */
+function get_restapi_url()
+{
+	global $restapi_script;
+
+	return get_htsrv_url().$restapi_script;
+}
+
+
+/**
  * Get URL to htsrv folder depending on current collection base url from front-office or site base url from back-office
  *
  * Note: For back-office or no collection page _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
