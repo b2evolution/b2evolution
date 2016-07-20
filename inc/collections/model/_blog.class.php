@@ -118,6 +118,16 @@ class Blog extends DataObject
 
 
 	/**
+	 * The domain for cookie of that collection.
+	 *
+	 * Lazy filled by get_cookie_domain()
+	 *
+	 * @var string
+	 */
+	var $cookie_domain;
+
+
+	/**
 	 * The htsrv URLs to the basepath of that collection.
 	 *
 	 * Lazy filled by get_htsrv_url()
@@ -1571,6 +1581,44 @@ class Blog extends DataObject
 		}
 
 		return $this->basepath;
+	}
+
+
+	/**
+	 * Get cookie domain of this collection
+	 *
+	 * @return string
+	 */
+	function get_cookie_domain()
+	{
+		if( empty( $this->cookie_domain ) )
+		{	// Initialize only first time:
+			if( $this->get( 'access_type' ) == 'absolute' )
+			{	// If collection URL is absolute we should extract cookie domain from the URL because it can be different than site url:
+				preg_match( '#^https?://(.+?)(:(.+?))?$#', $this->get_baseurl_root(), $matches );
+				$coll_host = $matches[1];
+
+				if( strpos( $coll_host, '.' ) === false )
+				{	// localhost or windows machine name:
+					$this->cookie_domain = '';
+				}
+				elseif( preg_match( '~^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$~i', $coll_host ) )
+				{	// The basehost is an IP address, use the basehost as it is:
+					$this->cookie_domain = $coll_host;
+				}
+				else
+				{	// Keep the part of the basehost after the www. :
+					$this->cookie_domain = preg_replace( '/^(www\. )? (.+)$/xi', '.$2', $coll_host );
+				}
+			}
+			else
+			{	// Otherwise we can use sub path of site url:
+				global $cookie_domain;
+				$this->cookie_domain = $cookie_domain;
+			}
+		}
+
+		return $this->cookie_domain;
 	}
 
 

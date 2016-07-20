@@ -570,23 +570,23 @@ if( !is_logged_in() )
 			$url = ' '; // this to make sure a cookie is set for 'no url'
 
 		// fplanque: made cookies available for whole site
-		evo_setcookie( $cookie_name, $author, $cookie_expires, $cookie_path, $cookie_domain, false, true );
-		evo_setcookie( $cookie_email, $email, $cookie_expires, $cookie_path, $cookie_domain, false, true );
-		evo_setcookie( $cookie_url, $url, $cookie_expires, $cookie_path, $cookie_domain, false, true );
+		evo_setcookie( $cookie_name, $author, $cookie_expires, '', '', false, true );
+		evo_setcookie( $cookie_email, $email, $cookie_expires, '', '', false, true );
+		evo_setcookie( $cookie_url, $url, $cookie_expires, '', '', false, true );
 	}
 	else
 	{	// Erase cookies:
 		if( !empty($_COOKIE[$cookie_name]) )
 		{
-			evo_setcookie( $cookie_name, '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
+			evo_setcookie( $cookie_name, '', $cookie_expired, '', '', false, true );
 		}
 		if( !empty($_COOKIE[$cookie_email]) )
 		{
-			evo_setcookie( $cookie_email, '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
+			evo_setcookie( $cookie_email, '', $cookie_expired, '', '', false, true );
 		}
 		if( !empty($_COOKIE[$cookie_url]) )
 		{
-			evo_setcookie( $cookie_url, '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
+			evo_setcookie( $cookie_url, '', $cookie_expired, '', '', false, true );
 		}
 	}
 }
