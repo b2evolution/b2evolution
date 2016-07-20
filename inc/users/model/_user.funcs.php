@@ -515,7 +515,7 @@ function use_in_skin_login()
 		$Blog = $BlogCache->get_by_ID( $blog, false, false );
 	}
 
-	if( get_setting_Blog( 'login_blog_ID' ) )
+	if( get_setting_Blog( 'login_blog_ID', $Blog ) )
 	{ // If special blog is defined for all login actions
 		return true;
 	}

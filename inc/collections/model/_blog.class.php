@@ -990,7 +990,7 @@ class Blog extends DataObject
 
 			if( in_array( 'login', $groups ) )
 			{ // we want to load the login params:
-				if( ! get_setting_Blog( 'login_blog_ID' ) )
+				if( ! get_setting_Blog( 'login_blog_ID', $this ) )
 				{ // Update this only when no blog is defined for login/registration
 					$this->set_setting( 'in_skin_login', param( 'in_skin_login', 'integer', 0 ) );
 				}
@@ -2410,7 +2410,7 @@ class Blog extends DataObject
 			case 'activateinfourl':
 			case 'access_requires_loginurl':
 				$url_disp = str_replace( 'url', '', $parname );
-				if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) )
+				if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $this ) )
 				{ // Use special blog for login/register actions if it is defined in general settings
 					return url_add_param( $login_Blog->gen_blogurl(), 'disp='.$url_disp, $params['glue'] );
 				}

@@ -121,7 +121,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	$Form->end_fieldset();
 
 	$Form->begin_fieldset( T_('In-skin Actions').get_admin_badge().get_manual_link('in_skin_action_settings') );
-		if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) )
+		if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $edited_Blog ) )
 		{ // The login blog is defined in general settings
 			$Form->info( T_( 'In-skin login' ), sprintf( T_('All login/registration functions are delegated to the collection: %s'), '<a href="'.$admin_url.'?ctrl=collections&tab=site_settings">'.$login_Blog->get( 'shortname' ).'</a>' ) );
 		}
