@@ -456,6 +456,22 @@ class bootstrap_main_Skin extends Skin
 				add_headline( $custom_css );
 			}
 		}
+
+		if( $disp == 'front' )
+		{ // Initialize script to scroll down to widget container with users team:
+			add_js_headline( '
+jQuery( document ).ready( function()
+{
+	jQuery( "#slide_button" ).click( function()
+	{
+		jQuery( "html, body, #skin_wrapper" ).animate(
+		{
+			scrollTop: jQuery( ".evo_container__front_page_secondary" ).offset().top
+		}, 1500 );
+	} );
+} );' );
+		}
+
 	}
 
 
