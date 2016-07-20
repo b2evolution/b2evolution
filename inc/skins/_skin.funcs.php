@@ -1573,9 +1573,6 @@ function siteskin_init()
 		// Include the additional required files
 		siteskin_include( '_skin_init.inc.php' );
 	}
-
-	// Send the predefined cookies:
-	evo_sendcookies();
 }
 
 

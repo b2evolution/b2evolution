@@ -297,6 +297,9 @@ class RestApi
 	 */
 	private function display_response()
 	{
+		// Send the predefined cookies:
+		evo_sendcookies();
+
 		// Set JSON content type:
 		headers_content_mightcache( 'application/json' );
 

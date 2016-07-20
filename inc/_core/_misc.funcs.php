@@ -2740,6 +2740,9 @@ function debug_die( $additional_info = '', $params = array() )
 		$additional_info = $params['debug_info'];
 	}
 
+	// Send the predefined cookies:
+	evo_sendcookies();
+
 	if( $is_api_request )
 	{	// REST API or XMLRPC request:
 
@@ -2891,6 +2894,9 @@ function debug_die( $additional_info = '', $params = array() )
 function bad_request_die( $additional_info = '' )
 {
 	global $debug, $baseurl, $is_api_request;
+
+	// Send the predefined cookies:
+	evo_sendcookies();
 
 	if( $is_api_request )
 	{	// REST API or XMLRPC request:
@@ -5729,6 +5735,9 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 		}
 	}
 
+	// Send the predefined cookies:
+	evo_sendcookies();
+
 	if( $send_as_html )
 	{	// we want to send as a html document
 		if( ! headers_sent() )
@@ -7208,6 +7217,11 @@ function evo_setcookie( $name, $value = '', $expire = 0, $dummy = '', $dummy2 = 
 function evo_sendcookies()
 {
 	global $evo_cookies;
+
+	if( headers_sent() )
+	{	// Exit to avoid errors because headers already were sent:
+		return;
+	}
 
 	if( empty( $evo_cookies ) )
 	{	// No cookies:

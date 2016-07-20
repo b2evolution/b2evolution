@@ -54,9 +54,6 @@ function headers_content_mightcache( $type = 'text/html', $max_age = '#', $chars
 	global $Messages, $is_admin_page;
 	global $PageCache, $Debuglog;
 
-	// Send the predefined cookies:
-	evo_sendcookies();
-
 	header_content_type( $type, $charset );
 
 	if( empty($max_age) || $is_admin_page || is_logged_in() || $Messages->count() )

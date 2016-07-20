@@ -22,6 +22,9 @@ global $io_charset, $rsc_url, $UserSettings, $Debuglog, $Plugins;
 global $month, $month_abbrev, $weekday, $weekday_abbrev; /* for localized calendar */
 global $debug, $Hit;
 
+// Send the predefined cookies:
+evo_sendcookies();
+
 headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache the admin pages!
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
