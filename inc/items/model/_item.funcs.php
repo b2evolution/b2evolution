@@ -2101,7 +2101,6 @@ function echo_status_dropdown_button_js( $type = 'post' )
  */
 function echo_autocomplete_tags()
 {
-	global $restapi_url;
 ?>
 	<script type="text/javascript">
 	function init_autocomplete_tags( selector )
@@ -2117,7 +2116,7 @@ function echo_autocomplete_tags()
 			}
 		}
 
-		jQuery( selector ).tokenInput( '<?php echo $restapi_url.'tags' ?>',
+		jQuery( selector ).tokenInput( '<?php echo get_restapi_url().'tags' ?>',
 		{
 			theme: 'facebook',
 			queryParam: 's',

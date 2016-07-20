@@ -97,7 +97,7 @@ class Blog extends DataObject
 
 
 	/**
-	 * The URL to the basepath of that blog.
+	 * The URL to the basepath of that collection.
 	 * This is supposed to be the same as $baseurl but localized to the domain of the blog/
 	 *
 	 * Lazy filled by get_basepath_url()
@@ -105,6 +105,26 @@ class Blog extends DataObject
 	 * @var string
 	 */
 	var $basepath_url;
+
+
+	/**
+	 * The domain of that collection.
+	 *
+	 * Lazy filled by get_baseurl_root()
+	 *
+	 * @var string
+	 */
+	var $baseurl_root;
+
+
+	/**
+	 * The domain for cookie of that collection.
+	 *
+	 * Lazy filled by get_cookie_domain()
+	 *
+	 * @var string
+	 */
+	var $cookie_domain;
 
 
 	/**
@@ -1013,7 +1033,7 @@ class Blog extends DataObject
 
 			if( in_array( 'login', $groups ) )
 			{ // we want to load the login params:
-				if( ! get_setting_Blog( 'login_blog_ID' ) )
+				if( ! get_setting_Blog( 'login_blog_ID', $this ) )
 				{ // Update this only when no blog is defined for login/registration
 					$this->set_setting( 'in_skin_login', param( 'in_skin_login', 'integer', 0 ) );
 				}
@@ -1525,22 +1545,34 @@ class Blog extends DataObject
 
 
 	/**
-	 * This is the domain of the blog.
+	 * This is the domain of the collection.
 	 * This returns NO trailing slash.
+	 *
+	 * @return string
 	 */
 	function get_baseurl_root()
 	{
-		if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $this->gen_baseurl(), $matches ) )
-		{
-			return $matches[1];
+		if( empty( $this->baseurl_root ) )
+		{	// Initialize collection domain only first time:
+			if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $this->gen_baseurl(), $matches ) )
+			{
+				$this->baseurl_root = $matches[1];
+			}
+			else
+			{
+				debug_die( 'Blog::get(baseurl)/baseurlroot - assertion failed [baseurl: '.$this->gen_baseurl().'].' );
+			}
 		}
-		debug_die( 'Blog::get(baseurl)/baseurlroot - assertion failed [baseurl: '.$this->gen_baseurl().'].' );
+
+		return $this->baseurl_root;
 	}
 
 
 	/**
-	 * Get the URL to the basepath of that blog.
+	 * Get the URL to the basepath of that collection.
 	 * This is supposed to be the same as $baseurl but localized to the domain of the blog/
+	 *
+	 * @return string
 	 */
 	function get_basepath_url()
 	{
@@ -1586,13 +1618,40 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get the URL of the htsrv folder, on the current blog's domain (which is NOT always the same as the $baseurl domain!).
+	 * Get cookie domain of this collection
+	 *
+	 * @return string
 	 */
-	function get_local_htsrv_url()
+	function get_cookie_domain()
 	{
-		global $htsrv_subdir;
+		if( empty( $this->cookie_domain ) )
+		{	// Initialize only first time:
+			if( $this->get( 'access_type' ) == 'absolute' )
+			{	// If collection URL is absolute we should extract cookie domain from the URL because it can be different than site url:
+				preg_match( '#^https?://(.+?)(:(.+?))?$#', $this->get_baseurl_root(), $matches );
+				$coll_host = $matches[1];
 
-		return $this->get_basepath_url().$htsrv_subdir;
+				if( strpos( $coll_host, '.' ) === false )
+				{	// localhost or windows machine name:
+					$this->cookie_domain = '';
+				}
+				elseif( preg_match( '~^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$~i', $coll_host ) )
+				{	// The basehost is an IP address, use the basehost as it is:
+					$this->cookie_domain = $coll_host;
+				}
+				else
+				{	// Keep the part of the basehost after the www. :
+					$this->cookie_domain = preg_replace( '/^(www\. )? (.+)$/xi', '.$2', $coll_host );
+				}
+			}
+			else
+			{	// Otherwise we can use sub path of site url:
+				global $cookie_domain;
+				$this->cookie_domain = $cookie_domain;
+			}
+		}
+
+		return $this->cookie_domain;
 	}
 
 
@@ -1679,7 +1738,7 @@ class Blog extends DataObject
 			}
 			elseif( isset( $Skin ) && $Skin->get( 'type' ) == 'feed' )
 			{	// Force to absolute collection URL on feed skins:
-				return $this->get_basepath_url().$media_subdir;
+				return $this->get_baseurl_root().$this->get_basepath().$media_subdir;
 			}
 			else
 			{	// Use relative URL for other skins:
@@ -2432,7 +2491,7 @@ class Blog extends DataObject
 			case 'activateinfourl':
 			case 'access_requires_loginurl':
 				$url_disp = str_replace( 'url', '', $parname );
-				if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) )
+				if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $this ) )
 				{ // Use special blog for login/register actions if it is defined in general settings
 					return url_add_param( $login_Blog->gen_blogurl(), 'disp='.$url_disp, $params['glue'] );
 				}

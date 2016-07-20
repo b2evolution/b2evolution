@@ -1129,7 +1129,7 @@ var downloadInterval = setInterval( function()
 				// will have exited
 			}
 
-			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'loginurl', array( 'glue' => '&' ) ) );
 			}
@@ -1145,7 +1145,7 @@ var downloadInterval = setInterval( function()
 				header_redirect( $Blog->gen_blogurl(), false );
 			}
 
-			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'registerurl', array( 'glue' => '&' ) ) );
 			}
@@ -1165,7 +1165,7 @@ var downloadInterval = setInterval( function()
 				header_redirect( $Blog->gen_blogurl(), false );
 			}
 
-			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'lostpasswordurl', array( 'glue' => '&' ) ) );
 			}
@@ -1216,7 +1216,7 @@ var downloadInterval = setInterval( function()
 				// will have exited
 			}
 
-			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'activateinfourl', array( 'glue' => '&' ) ) );
 			}
@@ -1565,6 +1565,9 @@ var downloadInterval = setInterval( function()
 	$Timer->start( 'Skin:display_init' );
 	$Skin->display_init();
 	$Timer->pause( 'Skin:display_init' );
+
+	// Send the predefined cookies:
+	evo_sendcookies();
 
 	// Send default headers:
 	// See comments inside of this function:
