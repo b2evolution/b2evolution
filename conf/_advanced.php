@@ -328,13 +328,6 @@ elseif( preg_match( '~^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$~i', $basehost ) )
 else
 {	// Keep the part of the basehost after the www. :
 	$cookie_domain = preg_replace( '/^(www\. )? (.+)$/xi', '.$2', $basehost );
-
-	// When hosting multiple domains (not just subdomains) on a single instance of b2evo,
-	// you may want to try this:
-	// $cookie_domain = '.'.$_SERVER['HTTP_HOST'];
-	// or this: -- Have a cookie domain of 2 levels only, base on current basehost.
-	// $cookie_domain = preg_replace( '/^( .* \. )? (.+? \. .+? )$/xi', '.$2', $basehost );
-	// fp> pb with domains like .co.uk !?
 }
 
 /**
