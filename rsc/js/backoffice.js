@@ -536,8 +536,9 @@ jQuery( document ).ready( function()
 			body_height = 600;
 		}
 
-		if( jQuery( '#iframe_item_preview_wrapper' ).prop( 'style' ).height == '' && body_height > jQuery( '#iframe_item_preview_wrapper' ).height() )
-		{	// Expand the frame height if it is more than wrapper height (but max height is 320px):
+		if( jQuery( '#iframe_item_preview_wrapper' ).prop( 'style' ).height == '' &&
+		    body_height > jQuery( '#iframe_item_preview_wrapper' ).height() )
+		{	// Expand the frame height if it is more than wrapper height:
 			jQuery( '#iframe_item_preview_wrapper' ).css( 'height', body_height < 600 ? body_height : 600 );
 		}
 		// Set max-height on each iframe reload in order to avoid a space after upload button:
@@ -570,6 +571,7 @@ jQuery( document ).ready( function()
 		stop: function( e, ui )
 		{	// Remove the temp div element:
 			ui.element.find( '#iframe_item_preview_disabler' ).remove();
+			// Save height in cookie:
 			b2edit_update_panel_cookie_param( 'itemform_preview', 'open', jQuery( this ).height() );
 		},
 		resize: function( e, ui )

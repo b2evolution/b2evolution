@@ -155,13 +155,15 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 	// Get a count of links in order to deny folding when there is at least one link
 	$links_count = count( $LinkOwner->get_Links() );
 
+	$fieldset_id = ( $LinkOwner->type == 'comment' ) ? 'cmntform_links' : 'itemform_links';
 	$Form->begin_fieldset( $fieldset_title, array(
-			'id' => $LinkOwner->type == 'comment' ? 'cmntform_links' : 'itemform_links',
+			'id' => $fieldset_id,
 			'fold' => $fold,
 			'deny_fold' => ( $links_count > 0 )
 		) );
 
-	echo '<div id="attachments_fieldset_wrapper">';
+	$links_wrapper_height = get_panel_cookie_param( $fieldset_id, 'height' );
+	echo '<div id="attachments_fieldset_wrapper"'.( empty( $links_wrapper_height ) ? '' : ' style="height:'.$links_wrapper_height.'px"' ).'>';
 		echo '<div id="attachments_fieldset_block">';
 			echo '<div id="attachments_fieldset_table">';
 				$AdminUI->disp_view( 'links/views/_link_list.view.php' );

@@ -783,6 +783,8 @@ if( in_array( $action, array( 'edit', 'elevate', 'update_publish', 'update', 'up
 { // Page with comment edit form
 	// Initialize js to autocomplete usernames in comment form
 	init_autocomplete_usernames_js();
+	// Load JS to save panel params in cookie:
+	require_js( 'jquery/jquery.cookie.min.js' );
 }
 
 // Set an url for manual page:

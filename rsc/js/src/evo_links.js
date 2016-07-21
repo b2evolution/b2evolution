@@ -16,14 +16,22 @@
 // Initialize attachments block:
 jQuery( document ).ready( function()
 {
-	var height = jQuery( '#attachments_fieldset_table' ).height();
-	height = ( height > 320 ) ? 320 : ( height < 97 ? 97 : height );
-	jQuery( '#attachments_fieldset_wrapper' ).height( height );
+	var table_height = jQuery( '#attachments_fieldset_table' ).height();
+	if( jQuery( '#attachments_fieldset_wrapper' ).prop( 'style' ).height == '' ||
+	    jQuery( '#attachments_fieldset_wrapper' ).height() > table_height )
+	{	// Set default height:
+		table_height = ( table_height > 320 ) ? 320 : ( table_height < 97 ? 97 : table_height );
+		jQuery( '#attachments_fieldset_wrapper' ).height( table_height );
+	}
 
 	jQuery( '#attachments_fieldset_wrapper' ).resizable(
 	{	// Make the attachments fieldset wrapper resizable:
 		minHeight: 80,
 		handles: 's',
+		stop: function( e, ui )
+		{	// Save height in cookie:
+			b2edit_update_panel_cookie_param( jQuery( this ).closest( 'fieldset.fieldset' ).attr( 'id' ), 'open', jQuery( this ).height() );
+		},
 		resize: function( e, ui )
 		{	// Limit max height by table of attachments:
 			jQuery( '#attachments_fieldset_wrapper' ).resizable( 'option', 'maxHeight', jQuery( '#attachments_fieldset_table' ).height() );

@@ -861,7 +861,7 @@ $Form->begin_form( '', '', $params );
 	$Form->begin_fieldset( T_('Preview').get_manual_link( 'preview-panel' ), array( 'id' => 'itemform_preview', 'fold' => true ) );
 
 	$itemform_preview_height = get_panel_cookie_param( 'itemform_preview', 'height' );
-	echo '<div id="iframe_item_preview_wrapper" '.( empty( $itemform_preview_height ) ? '' : ' style="height:'.$itemform_preview_height.'px"' ).'>';
+	echo '<div id="iframe_item_preview_wrapper"'.( empty( $itemform_preview_height ) ? '' : ' style="height:'.$itemform_preview_height.'px"' ).'>';
 	echo '<iframe id="iframe_item_preview"'
 		.( $edited_Item->ID > 0 ? ' src="'.$edited_Item->get_permanent_url().'"' : '' )
 		.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"></iframe>';
