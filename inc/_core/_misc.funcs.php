@@ -8089,4 +8089,354 @@ function can_use_hashed_password()
 
 	return $transmit_hashed_password;
 }
+
+
+/**
+	 * Convert inline tags like [image:|file:|inline:|video:|audio:|thumbnail:] into HTML tags
+	 *
+	 * @param object Item source Item
+	 * @param array Inline tags
+	 * @param array Params
+	 * @return array Associative array of rendered HTML tags with inline tags as key
+	 */
+function render_inline_tags( $Item, $input, $params = array() )
+{
+	global $Plugins;
+	$inlines = array();
+
+	$params = array_merge( array(
+				'before'                   => '<div>',
+				'before_image'             => '<div class="image_block">',
+				'before_image_legend'      => '<div class="image_legend">',
+				'after_image_legend'       => '</div>',
+				'after_image'              => '</div>',
+				'after'                    => '</div>',
+				'image_size'               => 'fit-400x320',
+				'image_link_to'            => 'original', // Can be 'orginal' (image) or 'single' (this post)
+				'limit'                    => 1000, // Max # of images displayed
+				'get_rendered_attachments' => true,
+			), $params );
+
+	if( !isset( $LinkList ) )
+	{ // Get list of attached Links only first time
+		$LinkOwner = new LinkItem( $Item );
+		$LinkList = $LinkOwner->get_attachment_LinkList( $params['limit'], 'inline' );
+	}
+
+	if( empty( $LinkList ) )
+	{ // This Item has no attached files for 'inline' position, Exit here
+		return false;
+	}
+
+	foreach( $input as $current_inline )
+	{
+		preg_match("/\[(image|file|inline|video|audio|thumbnail):(\d+)(:?)([^\]]*)\]/i", $current_inline, $inline);
+
+		if( empty( $inline ) )
+		{
+			$inlines[$current_inline] = $current_inline;
+		}
+
+		$inline_type = $inline[1]; // image|file|inline|video|audio|thumbnail
+		$current_link_ID = (int) $inline[2];
+
+		if( empty( $current_link_ID ) )
+		{ // Invalid link ID, Go to next match
+			$inlines[$current_inline] = $current_inline;
+		}
+
+		if( ! ( $Link = & $LinkList->get_by_field( 'link_ID', $current_link_ID ) ) )
+		{ // Link ID is not part of the linked files for position "inline"
+			$inlines[$current_inline] = $current_inline;
+		}
+
+		if( ! ( $File = & $Link->get_File() ) )
+		{ // No File object:
+			global $Debuglog;
+			$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
+			$inlines[$current_inline] = $current_inline;
+		}
+
+		if( ! $File->exists() )
+		{ // File doesn't exist:
+			global $Debuglog;
+			$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+			$inlines[$current_inline] = $current_inline;
+		}
+
+		$params['File'] = $File;
+		$params['Link'] = $Link;
+		$params['Item'] = $Item;
+
+		switch( $inline_type )
+		{
+			case 'image':
+			case 'inline': // valid file type: image
+				if( $File->is_image() )
+				{
+					$current_image_params = $params;
+					$current_file_params = array();
+
+					if( ! empty( $inline[3] ) ) // check if second colon is present
+					{
+						// Get the inline params: caption and class
+						$inline_params = explode( ':.', $inline[4] );
+
+						if( ! empty( $inline_params[0] ) )
+						{ // Caption is set, so overwrite the image link title
+							if( $inline_params[0] == '-' )
+							{ // Caption display is disabled
+								$current_image_params['image_link_title'] = '';
+								$current_image_params['hide_image_link_title'] = true;
+							}
+							else
+							{ // New image caption was set
+								$current_image_params['image_link_title'] = strip_tags( $inline_params[0] );
+							}
+
+							$current_image_params['image_desc'] = $current_image_params['image_link_title'];
+							$current_file_params['title'] = $inline_params[0];
+						}
+
+						$class_index = ( $inline_type == 'inline' ) ? 0 : 1; // [inline] tag doesn't have a caption, so 0 index is for class param
+						if( ! empty( $inline_params[ $class_index ] ) )
+						{ // A class name is set for the inline tags
+							$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $class_index ] ) ) );
+							if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
+							{ // Overwrite 'before_image' setting to add an extra class name
+								$current_image_params['before_image'] = '<div class="image_block '.$image_extraclass.'">';
+								// 'after_image' setting must be also defined, becuase it may be different than the default '</div>'
+								$current_image_params['after_image'] = '</div>';
+
+								// Set class for file inline tags
+								$current_file_params['class'] = $image_extraclass;
+							}
+						}
+					}
+
+					if( ! $current_image_params['get_rendered_attachments'] )
+					{ // Save $r to temp var in order to don't get the rendered data from plugins
+						$temp_r = $r;
+					}
+
+					$temp_params = $current_image_params;
+					foreach( $current_image_params as $param_key => $param_value )
+					{ 	// Pass all params by reference, in order to give possibility to modify them by plugin
+						// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
+						$current_image_params[ $param_key ] = & $current_image_params[ $param_key ];
+					}
+
+					// We need to assign the result of trigger_event_first_true to a variable before counting
+					// or else modifications to the params are not applied in PHP7
+					$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_image_params );
+					if( count( $r_params ) != 0 )
+					{	// Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r
+						if( ! $r_params['get_rendered_attachments'] )
+						{ // Restore $r value and mark this item has the rendered attachments
+							$r = $temp_r;
+							$plugin_render_attachments = true;
+						}
+					}
+
+					if( $inline_type == 'image' )
+					{ // Generate the IMG tag with all the alt, title and desc if available
+						$inlines[$current_inline] = $Item->get_attached_image_tag( $Link, $current_image_params );
+					}
+					elseif( $inline_type == 'inline' )
+					{ // Generate simple IMG tag with original image size
+						$inlines[$current_inline] = '<img src="'.$File->get_url().'"'
+							.( empty( $current_file_params['class'] ) ? '' : ' class="'.$current_file_params['class'].'"' )
+							.' />';
+					}
+				}
+				else
+				{ // not an image file, do not process
+					$inlines[$current_inline] = $current_inline;
+				}
+				break;
+
+			case 'thumbnail':
+				if( $File->is_image() )
+				{
+					global $thumbnail_sizes;
+
+					$thumbnail_size = 'medium';
+					$thumbnail_position = 'left';
+
+					$thumbnail_classes = array();
+
+					if( ! empty( $inline[3] ) ) // check if second colon is present
+					{
+						// Get the inline params: caption and class
+						$inline_params = explode( ':', $inline[4] );
+
+						$valid_thumbnail_sizes = array( 'small', 'medium', 'large' );
+						if( ! empty( $inline_params[0] ) && in_array( $inline_params[0], $valid_thumbnail_sizes ) )
+						{
+							$thumbnail_size = $inline_params[0];
+						}
+
+						$valid_thumbnail_positions = array( 'left', 'right' );
+						if( ! empty( $inline_params[1] ) && in_array( $inline_params[1], $valid_thumbnail_positions ) )
+						{
+							$thumbnail_position = $inline_params[1];
+						}
+
+						if( ! empty( $inline_params[2] ) )
+						{
+							$extra_classes = explode( '.', ltrim( $inline_params[2], '.' ) );
+						}
+					}
+
+					switch( $thumbnail_size )
+					{
+						case 'small':
+							$thumbnail_size = 'fit-128x128';
+							break;
+
+						case 'large':
+							$thumbnail_size = 'fit-320x320';
+							break;
+
+						case 'medium':
+						default:
+							$thumbnail_size = 'fit-192x192';
+							break;
+					}
+
+					$thumbnail_classes[] = 'evo_thumbnail';
+					$thumbnail_classes[] = 'evo_thumbnail__'.$thumbnail_position;
+					if( isset( $extra_classes ) )
+					{
+						$thumbnail_classes = array_merge( $thumbnail_classes, $extra_classes );
+					}
+
+					$current_image_params = array(
+						'before_image'        => '',
+						'before_image_legend' => '', // can be NULL
+						'after_image_legend'  => '',
+						'after_image'         => '',
+						'image_size'          => $thumbnail_size,
+						'image_link_to'       => 'original',
+						'image_link_title'    => '',	// can be text or #title# or #desc#
+						'image_class'         => implode( ' ', $thumbnail_classes ),
+					);
+
+					$inlines[$current_inline] = $Item->get_attached_image_tag( $Link, $current_image_params );
+				}
+				else
+				{
+					return false;
+				}
+				break;
+
+			case 'file': // valid file types: image, video, audio, other
+				$valid_file_types = array( 'image', 'video', 'audio', 'other' );
+				if( in_array( $File->get_file_type(), $valid_file_types ) )
+				{
+					if( ! empty( $inline[3] ) ) // check if second colon is present
+					{
+						// Get the file caption
+						$caption = $inline[4];
+
+						if( ! empty( $caption ) )
+						{ // Caption is set
+							$current_file_params['title'] = strip_tags( $caption );
+						}
+					}
+
+					if( empty( $current_file_params['title'] ) )
+					{ // Use real file name as title when it is not defined for inline tag
+						$file_title = $File->get( 'title' );
+						$current_file_params['title'] = ' '.( empty( $file_title ) ? $File->get_name() : $file_title );
+					}
+					elseif( $current_file_params['title'] == '-' )
+					{ // Don't display a title in this case, Only file icon will be displayed
+						$current_file_params['title'] = '';
+					}
+					else
+					{ // Add a space between file icon and title
+						$current_file_params['title'] = ' '.$current_file_params['title'];
+					}
+
+					$inlines[$current_inline] = '<a href="'.$File->get_url().'"'
+						.( empty( $current_file_params['class'] ) ? '' : ' class="'.$current_file_params['class'].'"' )
+						.'>'.$File->get_icon( $current_file_params ).$current_file_params['title'].'</a>';
+				}
+				else
+				{ // not a valid file type, do not process
+					$inlines[$current_inline] = $current_inline;
+				}
+				break;
+
+			case 'video':	// valid file type: video
+				if( $File->is_video() )
+				{
+					$current_video_params = $params;
+					// Create an empty dummy element where the plugin is expected to append the rendered video
+					$current_video_params['data'] = '';
+
+					foreach( $current_video_params as $param_key => $param_value )
+					{ // Pass all params by reference, in order to give possibility to modify them by plugin
+						// So plugins can add some data before/after tags (E.g. used by infodots plugin)
+						$current_video_params[ $param_key ] = & $current_video_params[ $param_key ];
+					}
+
+					// We need to assign the result of trigger_event_first_true to a variable before counting
+					// or else modifications to the params are not applied in PHP7
+					$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_video_params );
+					if( count( $r_params ) != 0 )
+					{
+						$inlines[$current_inline] = $r_params['data'];
+					}
+					else
+					{ // no plugin available or was able to render the tag
+						$inlines[$current_inline] = $current_inline;
+					}
+				}
+				else
+				{ // not a video file, do not process
+					$inlines[$current_inline] = $current_inline;
+				}
+				break;
+
+			case 'audio': // valid file type: audio
+				if( $File->is_audio() )
+				{
+					$current_audio_params = $params;
+					// Create an empty dummy element where the plugin is expected to append the rendered video
+					$current_audio_params['data'] = '';
+
+					foreach( $current_audio_params as $param_key => $param_value )
+					{ // Pass all params by reference, in order to give possibility to modify them by plugin
+						// So plugins can add some data before/after tags (E.g. used by infodots plugin)
+						$current_audio_params[ $param_key ] = & $current_audio_params[ $param_key ];
+					}
+
+					// We need to assign the result of trigger_event_first_true to a variable before counting
+					// or else modifications to the params are not applied in PHP7
+					$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_audio_params );
+
+					if( count( $r_params ) != 0 )
+					{
+						$inlines[$current_inline] =  $r_params['data'];
+					}
+					else
+					{ // no plugin available or was able to render the tag
+						$inlines[$current_inline] = $current_inline;
+					}
+				}
+				else
+				{ // not a video file, do not process
+					$inlines[$current_inline] = $current_inline;
+				}
+				break;
+
+			default:
+				$inlines[$current_inline] = $current_inline;
+		}
+	}
+
+	return $inlines;
+}
 ?>
