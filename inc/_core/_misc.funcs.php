@@ -7333,6 +7333,43 @@ function evo_error_handler()
 
 
 /**
+ * Get fieldset fold status from cookies or user settings
+ *
+ * @return integer 1 - closed, 0 - opened
+ */
+function get_fieldset_folding_status( $fieldset_id )
+{
+	$folding_status = get_panel_cookie_param( $fieldset_id, 'visibility' );
+
+	if( ! empty( $folding_status ) )
+	{	// Try to get a folding status from cookies firstly:
+		if( $folding_status == 'open' )
+		{	// Fieldset is opened:
+			$value = 0;
+		}
+		else // 'closed'
+		{	// Fieldset is closed:
+			$value = 1;
+		}
+	}
+	else
+	{	// Otherwise get it from user settings:
+		global $UserSettings, $Blog;
+		if( empty( $Blog ) )
+		{	// Get user setting value:
+			$value = intval( $UserSettings->get( 'fold_'.$fieldset_id ) );
+		}
+		else
+		{	// Get user-collection setting:
+			$value = intval( $UserSettings->get_collection_setting( 'fold_'.$fieldset_id, $Blog->ID ) );
+		}
+	}
+
+	return $value;
+}
+
+
+/**
  * Get icon to collapse/expand fieldset
  *
  * @param string ID of fieldset
@@ -7353,20 +7390,12 @@ function get_fieldset_folding_icon( $id, $params = array() )
 		), $params );
 
 	if( $params['deny_fold'] )
-	{ // Deny folding for this case
+	{	// Deny folding for this case:
 		$value = 0;
 	}
 	else
-	{ // Get the fold value from user settings
-		global $UserSettings, $Blog;
-		if( empty( $Blog ) )
-		{ // Get user setting value
-			$value = intval( $UserSettings->get( 'fold_'.$id ) );
-		}
-		else
-		{ // Get user-collection setting
-			$value = intval( $UserSettings->get_collection_setting( 'fold_'.$id, $Blog->ID ) );
-		}
+	{	// Get the fold value from cookies or user settings:
+		$value = get_fieldset_folding_status( $id );
 	}
 
 	// Icon
@@ -7418,15 +7447,25 @@ jQuery( 'span[id^=icon_folding_], span[id^=title_folding_]' ).click( function()
 		return false;
 	}
 
+	var fieldset_name = value_obj.attr( 'name' ).match( /\[([^\]]+)\]$/i );
+
 	if( value_obj.val() == '1' )
 	{ // Collapse
 		wrapper_obj.removeClass( 'folded' );
 		value_obj.val( '0' );
+		if( fieldset_name )
+		{	// Save the folding status in cookie:
+			b2edit_update_panel_cookie_param( fieldset_name[1], 'open' );
+		}
 	}
 	else
 	{ // Expand
 		wrapper_obj.addClass( 'folded' );
 		value_obj.val( '1' );
+		if( fieldset_name )
+		{	// Save the folding status in cookie:
+			b2edit_update_panel_cookie_param( fieldset_name[1], 'closed' );
+		}
 	}
 
 	// Change icon image

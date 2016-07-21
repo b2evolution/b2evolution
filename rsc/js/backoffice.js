@@ -633,7 +633,7 @@ function b2edit_update_panel_cookie_param( panel_name, visibility, height )
 
 	if( ! settings_updated )
 	{	// Add new param:
-		new_params.push( panel_name + '(' + visibility + ',' + height + ')' );
+		new_params.push( panel_name + '(' + visibility + ( typeof( height ) != 'undefined' ? ',' + height : '' ) + ')' );
 	}
 
 	jQuery.cookie( 'editscrnpanels_', new_params.join( ';' ), { path: '/' } );
