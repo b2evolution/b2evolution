@@ -596,7 +596,8 @@ jQuery( document ).ready( function()
  */
 function b2edit_update_panel_cookie_param( panel_name, visibility, height )
 {
-	var current_params = jQuery.cookie( 'editscrnpanels_' );
+	var cookie_name = 'editscrnpanels' + ( typeof( cookie_suffix ) == 'undefined' ? '_b2evo' : cookie_suffix );
+	var current_params = jQuery.cookie( cookie_name );
 	current_params = current_params ? current_params.split( ';' ) : [];
 	var new_params = [];
 	var settings_updated = false;
@@ -636,5 +637,5 @@ function b2edit_update_panel_cookie_param( panel_name, visibility, height )
 		new_params.push( panel_name + '(' + visibility + ( typeof( height ) != 'undefined' ? ',' + height : '' ) + ')' );
 	}
 
-	jQuery.cookie( 'editscrnpanels_', new_params.join( ';' ), { path: '/' } );
+	jQuery.cookie( cookie_name, new_params.join( ';' ), { path: '/' } );
 }

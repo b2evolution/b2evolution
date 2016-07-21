@@ -7910,12 +7910,16 @@ function can_use_hashed_password()
  */
 function get_panel_cookie_param( $panel_name, $param_name = 'visibility' )
 {
-	if( ! isset( $_COOKIE['editscrnpanels_'] ) )
+	global $instance_name, $cookie_domain;
+
+	$cookie_name = 'editscrnpanels_'.str_replace( '.', '_', $instance_name.'_'.$cookie_domain );
+
+	if( ! isset( $_COOKIE[ $cookie_name ] ) )
 	{	// Param is not defined yet:
 		return NULL;
 	}
 
-	$panels = explode( ';', $_COOKIE['editscrnpanels_'] );
+	$panels = explode( ';', $_COOKIE[ $cookie_name ] );
 
 	foreach( $panels as $panel )
 	{

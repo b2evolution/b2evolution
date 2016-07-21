@@ -36,7 +36,7 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 	$robots_follow = false;
 	robots_tag();
 
-	global $rsc_path, $rsc_url, $htsrv_url, $restapi_url;
+	global $rsc_path, $rsc_url, $htsrv_url, $restapi_url, $instance_name, $cookie_domain;
 
 	// var htsrv_url is used for AJAX callbacks
 	add_js_headline( "// Paths and vars are used by JS functions:
@@ -44,7 +44,8 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 		var restapi_url = '$restapi_url';
 		var b2evo_icons_type = '".get_param( 'b2evo_icons_type' )."';
 		var blog_id = '".param( 'blog', 'integer' )."';
-		var is_backoffice = true;" );
+		var is_backoffice = true;
+		var cookie_suffix = '_".str_replace( '.', '_', $instance_name.'_'.$cookie_domain )."';" );
 
 	init_bubbletip_js(); // Add jQuery bubbletip plugin
 	init_results_js(); // Add functions to work with Results tables
