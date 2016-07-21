@@ -7910,9 +7910,11 @@ function can_use_hashed_password()
  */
 function get_panel_cookie_param( $panel_name, $param_name = 'visibility' )
 {
-	global $instance_name, $cookie_domain;
+	global $instance_name, $cookie_domain, $Blog;
 
-	$cookie_name = 'editscrnpanels_'.str_replace( '.', '_', $instance_name.'_'.$cookie_domain );
+	$cookie_name = 'editscrnpanels'
+		.( isset( $Blog ) ? '_'.$Blog->ID : '' )
+		.'_'.str_replace( '.', '_', $instance_name.'_'.$cookie_domain );
 
 	if( ! isset( $_COOKIE[ $cookie_name ] ) )
 	{	// Param is not defined yet:
