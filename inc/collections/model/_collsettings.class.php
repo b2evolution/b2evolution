@@ -184,6 +184,9 @@ class CollectionSettings extends AbstractSettings
 			'locale_source' => 'blog', // Source of the locale for navigation/widget: 'blog', 'user'
 			'post_locale_source' => 'post', // Source of the locale for post content: 'post', 'blog'
 			'new_item_locale_source' => 'select_coll', // Source of the locale for new items: 'use_coll', 'select_coll', 'select_user'
+			// Cookie settings:
+			'cookie_domain_type' => 'auto', // Cookie domain type: 'auto', 'custom'
+			'cookie_path_type' => 'auto', // Cookie path type: 'auto', 'custom'
 
 		// User directory:
 			'userdir_picture' => 1,

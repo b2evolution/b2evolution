@@ -128,6 +128,16 @@ class Blog extends DataObject
 
 
 	/**
+	 * The path for cookie of that collection.
+	 *
+	 * Lazy filled by get_cookie_path()
+	 *
+	 * @var string
+	 */
+	var $cookie_path;
+
+
+	/**
 	 * The htsrv URLs to the basepath of that collection.
 	 *
 	 * Lazy filled by get_htsrv_url()
@@ -1110,6 +1120,39 @@ class Blog extends DataObject
 				}
 			}
 
+			if( ( param( 'cookie_domain_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
+			{	// Cookies:
+				$this->set_setting( 'cookie_domain_type', get_param( 'cookie_domain_type' ) );
+				if( get_param( 'cookie_domain_type' ) == 'custom' )
+				{	// Update custom cookie domain:
+					$cookie_domain_custom = param( 'cookie_domain_custom', 'string', NULL );
+					preg_match( '#^https?://(.+?)(:(.+?))?$#', $this->get_baseurl_root(), $coll_host );
+					if( empty( $coll_host[1] ) || ! preg_match( '#(^|\.)'.preg_quote( preg_replace( '#^\.#i', '', $cookie_domain_custom ) ).'$#i', $coll_host[1] ) )
+					{	// Wrong cookie domain:
+						$Messages->add( T_('Impossible to save wrong setting for custom cookie domain.'), 'error' );
+					}
+					$this->set_setting( 'cookie_domain_custom', $cookie_domain_custom );
+				}
+				else
+				{	// Reset custom cookie domain:
+					$this->set_setting( 'cookie_domain_custom', '' );
+				}
+
+				$this->set_setting( 'cookie_path_type', param( 'cookie_path_type', 'string', NULL ) );
+				if( get_param( 'cookie_path_type' ) == 'custom' )
+				{	// Update custom cookie path:
+					$cookie_path_custom = param( 'cookie_path_custom', 'string', NULL );
+					if( ! preg_match( '#^'.preg_quote( preg_replace( '#/$#i', '', $cookie_path_custom ) ).'(/|$)#i', $this->get_basepath() ) )
+					{	// Wrong cookie path:
+						$Messages->add( T_('Impossible to save wrong setting for custom cookie path.'), 'error' );
+					}
+					$this->set_setting( 'cookie_path_custom', $cookie_path_custom );
+				}
+				else
+				{	// Reset custom cookie path:
+					$this->set_setting( 'cookie_path_custom', '' );
+				}
+			}
 
 			if( ( param( 'rsc_assets_url_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
 			{ // Assets URLs / CDN:
@@ -1587,38 +1630,78 @@ class Blog extends DataObject
 	/**
 	 * Get cookie domain of this collection
 	 *
+	 * @param boolean|string FALSE - use dependon of setting,
+	 *                       'auto' - force to use automatic cookie domain,
+	 *                       'custom' - force to use custom cookie domain
 	 * @return string
 	 */
-	function get_cookie_domain()
+	function get_cookie_domain( $force_type = false )
 	{
 		if( empty( $this->cookie_domain ) )
 		{	// Initialize only first time:
-			if( $this->get( 'access_type' ) == 'absolute' )
-			{	// If collection URL is absolute we should extract cookie domain from the URL because it can be different than site url:
-				preg_match( '#^https?://(.+?)(:(.+?))?$#', $this->get_baseurl_root(), $matches );
-				$coll_host = $matches[1];
+			$cookie_domain_type = ( $force_type === false ) ? $this->get_setting( 'cookie_domain_type' ) : $force_type;
 
-				if( strpos( $coll_host, '.' ) === false )
-				{	// localhost or windows machine name:
-					$this->cookie_domain = '';
-				}
-				elseif( preg_match( '~^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$~i', $coll_host ) )
-				{	// The basehost is an IP address, use the basehost as it is:
-					$this->cookie_domain = $coll_host;
-				}
-				else
-				{	// Keep the part of the basehost after the www. :
-					$this->cookie_domain = preg_replace( '/^(www\. )? (.+)$/xi', '.$2', $coll_host );
-				}
+			if( $cookie_domain_type == 'custom' )
+			{	// Custom cookie domain:
+				return $this->get_setting( 'cookie_domain_custom' );
 			}
 			else
-			{	// Otherwise we can use sub path of site url:
-				global $cookie_domain;
-				$this->cookie_domain = $cookie_domain;
+			{	// Automatic cookie domain:
+				if( $this->get( 'access_type' ) == 'absolute' )
+				{	// If collection URL is absolute we should extract cookie domain from the URL because it can be different than site url:
+					preg_match( '#^https?://(.+?)(:(.+?))?$#', $this->get_baseurl_root(), $matches );
+					$coll_host = $matches[1];
+
+					if( strpos( $coll_host, '.' ) === false )
+					{	// localhost or windows machine name:
+						$this->cookie_domain = $coll_host;
+					}
+					elseif( preg_match( '~^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$~i', $coll_host ) )
+					{	// The basehost is an IP address, use the basehost as it is:
+						$this->cookie_domain = $coll_host;
+					}
+					else
+					{	// Keep the part of the basehost after the www. :
+						$this->cookie_domain = preg_replace( '/^(www\. )? (.+)$/xi', '.$2', $coll_host );
+					}
+				}
+				else
+				{	// Otherwise we can use sub path of site url:
+					global $cookie_domain;
+					$this->cookie_domain = $cookie_domain;
+				}
 			}
 		}
 
 		return $this->cookie_domain;
+	}
+
+
+	/**
+	 * Get cookie path of this collection
+	 *
+	 * @param boolean|string FALSE - use dependon of setting,
+	 *                       'auto' - force to use automatic cookie path,
+	 *                       'custom' - force to use custom cookie path
+	 * @return string
+	 */
+	function get_cookie_path( $force_type = false )
+	{
+		if( empty( $this->cookie_path ) )
+		{	// Initialize only first time:
+			$cookie_domain_type = ( $force_type === false ) ? $this->get_setting( 'cookie_path_type' ) : $force_type;
+
+			if( $cookie_domain_type == 'custom' )
+			{	// Custom cookie path:
+				return $this->get_setting( 'cookie_path_custom' );
+			}
+			else
+			{	// Automatic cookie path:
+				$this->cookie_path = $this->get_basepath();
+			}
+		}
+
+		return $this->cookie_path;
 	}
 
 

@@ -7193,7 +7193,7 @@ function get_cookie_path()
 	}
 	else
 	{	// Use base path of current collection url:
-		return $Blog->get_basepath();
+		return $Blog->get_cookie_path();
 	}
 }
 

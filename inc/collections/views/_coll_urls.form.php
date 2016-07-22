@@ -241,6 +241,31 @@ jQuery( '[id$=_assets_absolute_url]' ).focus( function()
 $Form->end_fieldset();
 
 
+$Form->begin_fieldset( T_('Cookies').get_admin_badge().get_manual_link( 'collection-cookies' ) );
+
+	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+	{	// If current user has a permission to edit collection advanced admin settings:
+		$Form->radio( 'cookie_domain_type', $edited_Blog->get_setting( 'cookie_domain_type' ), array(
+				array( 'auto', T_('Automatic'), $edited_Blog->get_cookie_domain( 'auto' ) ),
+				array( 'custom', T_('Custom').':', '', '<input type="text" class="form_text_input form-control" name="cookie_domain_custom" size="50" maxlength="120" value="'
+					.format_to_output( $edited_Blog->get_setting( 'cookie_domain_custom' ), 'formvalue' ).'" />' ),
+			), T_('Cookie domain'), true );
+
+		$Form->radio( 'cookie_path_type', $edited_Blog->get_setting( 'cookie_path_type' ), array(
+				array( 'auto', T_('Automatic'), $edited_Blog->get_cookie_path( 'auto' ) ),
+				array( 'custom', T_('Custom').':', '', '<input type="text" class="form_text_input form-control" name="cookie_path_custom" size="50" maxlength="120" value="'
+					.format_to_output( $edited_Blog->get_setting( 'cookie_path_custom' ), 'formvalue' ).'" />' ),
+			), T_('Cookie path'), true );
+	}
+	else
+	{	// Display only info about colleciton cookie domain and path if user has no permission to edit:
+		$Form->info( T_('Cookie domain'), $edited_Blog->get_cookie_domain() );
+		$Form->info( T_('Cookie path'), $edited_Blog->get_cookie_path() );
+	}
+
+$Form->end_fieldset();
+
+
 $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_manual_link( 'assets-url-cdn-settings' ) );
 
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
