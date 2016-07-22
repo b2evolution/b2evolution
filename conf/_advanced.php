@@ -173,7 +173,7 @@ $minimum_comment_interval = 30;
 /**
  * Check antispam blacklist for private messages.
  *
- * Do you want to check the antispam blocklist when a message form is submitted?
+ * Do you want to check the antispam blacklist when a message form is submitted?
  *
  * @global boolean $antispam_on_message_form
  */
@@ -184,15 +184,15 @@ $antispam_on_message_form = 1;
  * By default images get copied into b2evo cache without resampling if they are smaller
  * than requested thumbnails.
  *
- * Althought, if you want to use the BeforeThumbCreate event (Watermark plugin),
- * this should be set to 'true' in order to process smaller images.
+ * If you want to use the BeforeThumbCreate event (Watermark plugin), this should be set to 'true' 
+ * to make sure that smaller images are also processed.
  *
  * @global boolean Default: false
  */
 $resample_all_images = false;
 
 
-// Get hostname out of baseurl
+// Decompose the baseurl
 // YOU SHOULD NOT EDIT THIS unless you know what you're doing
 if( preg_match( '#^(https?://(.+?)(:(.+?))?)(/.*)$#', $baseurl, $matches ) )
 {
@@ -217,7 +217,7 @@ else
  * By default we try to extract it automagically from $basehost (itself extracted from $baseurl)
  * But you may need to adjust this manually.
  *
- * @todo does anyone have a clean way of handling stuff like .co.uk ?
+ * @todo does anyone have a clean way of handling stuff like .co.uk ? // see also: function get_base_domain( $url )
  *
  * @global string
  */
@@ -234,12 +234,9 @@ else
 /**
  * Short name of this system (will be used for cookies and notification emails).
  *
- * Change this only if you install mutliple b2evolutions on the same website.
+ * Change this only if you install mutliple b2evolution instances on the same server or same domain.
  *
- * WARNING: don't play with this or you'll have tons of cookies sent away and your
- * readers surely will complain about it!
- *
- * You can change the notification email address alone a few lines below.
+ * WARNING: don't play with this or you'll have tons of cookies sent away and your users will have issues!
  *
  * @global string Default: 'b2evo'
  */
@@ -259,7 +256,7 @@ $db_config['show_errors'] = true;
 /**
  * Halt on MySQL errors? (default: true)
  *
- * Setting this to false is not recommended,
+ * Setting this to false is NOT recommended,
  */
 $db_config['halt_on_error'] = true;
 
@@ -275,13 +272,13 @@ $db_config['table_options'] = ''; 	// Low ranking MySQL hosting compatibility De
 /**
  * Use transactions in DB?
  *
- * You need to use InnoDB in order to enable this.
+ * b2evolution REQUIRES transactions to function properly. This also means InnoDB is required.
  */
 $db_config['use_transactions'] = true;
 
 
 /**
- * Display elements that are different on each request (Page processing time, ..)
+ * When debugging obhandler functions, we may need to stop polluting the output with debug info.
  *
  * Set this to true to prevent displaying minor changing elements (like time) in order not to have artificial content changes
  *
@@ -293,7 +290,7 @@ $obhandler_debug = false;
 // ** Cookies **
 
 /**
- * This is the path that will be associated to cookies.
+ * This is the path that will be associated with cookies.
  *
  * That means cookies set by this b2evo install won't be seen outside of this path on the domain below.
  *
