@@ -1353,6 +1353,32 @@ switch( $action )
 		require $inc_path.'users/views/_user_groups.form.php';
 		break;
 
+	case 'render_inlines':
+		if( $item_ID)
+		{
+			$ItemCache = & get_ItemCache();
+			$Item = $ItemCache->get_by_ID( $item_ID );
+			$tags = param( 'tags', 'array:string', array() );
+
+			// Default params from skins/skins_fallback_v6/_item_content.inc.php
+			$params = array(
+				'before_image'             => '<figure class="evo_image_block">',
+				'before_image_legend'      => '<figcaption class="evo_image_legend">',
+				'after_image_legend'       => '</figcaption>',
+				'after_image'              => '</figure>',
+				'after_images'             => '</div>',
+				'image_class'              => 'img-responsive',
+				'image_size'               => 'fit-1280x720',
+				'image_limit'              =>  1000,
+				'image_link_to'            => 'original', // Can be 'original', 'single' or empty
+			);
+
+			$rendered_tags = render_inline_tags( $Item, $tags, $params );
+			echo json_encode( $rendered_tags );
+		}
+		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
+		break;
+
 	default:
 		$Ajaxlog->add( T_('Incorrect action!'), 'error' );
 		break;

@@ -40,6 +40,9 @@ class tinymce_plugin extends Plugin
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
+	var $collection = NULL;
+	var $post_ID = NULL;
+
 
 	function PluginInit( & $params )
 	{
@@ -278,7 +281,9 @@ class tinymce_plugin extends Plugin
 				// Initialize settings for item:
 				global $Blog;
 
+				$this->collection = $Blog->get( 'urlname' );
 				$edited_Item = & $params['target_object'];
+				$this->post_ID = $edited_Item->ID;
 
 				if( ! empty( $edited_Item ) && ! $edited_Item->get_type_setting( 'allow_html' ) )
 				{	// Only when HTML is allowed in post:
@@ -578,7 +583,22 @@ class tinymce_plugin extends Plugin
 		global $UserSettings;
 		global $ReqHost;
 
-		$tmce_plugins_array = array( 'image', 'importcss', 'link', 'pagebreak', 'morebreak', 'textcolor', 'media', 'nonbreaking', 'charmap', 'fullscreen', 'table', 'searchreplace', 'autocomplete' );
+		$tmce_plugins_array = array(
+			'image',
+			'importcss',
+			'link',
+			'pagebreak',
+			'morebreak',
+			'textcolor',
+			'media',
+			'nonbreaking',
+			'charmap',
+			'fullscreen',
+			'table',
+			'searchreplace',
+			'autocomplete',
+			'b2evo_shorttags',
+			'b2evo_attachments' );
 
 		if( function_exists( 'enchant_broker_init' ) )
 		{ // Requires Enchant spelling library
@@ -690,6 +710,7 @@ class tinymce_plugin extends Plugin
 			}
 
 			$tmce_theme_advanced_buttons3_array[] = 'code';
+			$tmce_theme_advanced_buttons3_array[] = 'b2evo_image';
 
 			/* ----------- button row 4 ------------ */
 
@@ -731,6 +752,9 @@ class tinymce_plugin extends Plugin
 			$init_options[] = 'script_url: "'.get_require_url( 'tiny_mce/tinymce.gzip.php', 'blog', 'js' ).'"';
 		}
 		// TinyMCE Theme+Skin+Variant to use:
+		$init_options[] = 'collection: "'.$this->collection.'"';
+		$init_options[] = 'postID: '.$this->post_ID;
+		$init_options[] = 'async_url: "'.get_htsrv_url().'anon_async.php"';
 		$init_options[] = 'theme : "modern"';
 		$init_options[] = 'menubar : false';
 		// comma separated list of plugins: -- http://wiki.moxiecode.com/index.php/TinyMCE:Plugins
@@ -761,6 +785,9 @@ class tinymce_plugin extends Plugin
 		// note: $version may not be needed below because of automatic suffix? not sure..
 		// TODO: we don't want all of basic.css here
 
+		// Adding custom elements to wrap our short tags
+		$init_options[] = 'custom_elements : "b2evo"';
+
 		$content_css = '';
 		if( ! empty( $Blog ) )
 		{	// Load the appropriate ITEM/POST styles depending on the blog's skin:
@@ -776,6 +803,7 @@ class tinymce_plugin extends Plugin
 				$item_css_url = $skins_url.$Skin->folder.'/item.css';
 				// else: $item_css_url = $rsc_url.'css/item_base.css';
 				$content_css .= ','.$item_css_url;		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
+				//$content_css .= ',http://b2evolution.lan/rsc/build/bootstrap-b2evo_base.bundle.css?v=6.8.0-alpha-2016-07-13';
 			}
 			// else item_default.css -- is it still possible to have no skin ?
 		}
