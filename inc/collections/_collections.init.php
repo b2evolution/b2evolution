@@ -20,7 +20,7 @@ $default_ctrl = 'dashboard';
 /**
  * Minimum PHP version required for collections module to function properly
  */
-$required_php_version[ 'collections' ] = '5.0';
+$required_php_version[ 'collections' ] = '5.2';
 
 /**
  * Minimum MYSQL version required for collections module to function properly
