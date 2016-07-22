@@ -9,6 +9,7 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+
 /**
  * Display debugging informations?
  *
@@ -34,8 +35,8 @@ $debug_jslog = 'pwd';
  */
 $debug_pwd = '';
 
-// Most of the time you'll want to see all errors, including notices:
-// b2evo should run without any notices! (plugins too!)
+// Most of the time you'll want to see all errors, including notices, to alert you on potential issues:
+// b2evo should run without any notices! (same for plugins!)
 error_reporting( E_ALL | E_STRICT );
 /**
  * Do we want to display errors, even when not in debug mode?
@@ -57,7 +58,7 @@ $dev_menu = 0;
 
 
 // If you get blank pages or missing thumbnail images, PHP may be crashing because it doesn't have enough memory.
-// The default is 8 MB (in PHP < 5.2) and 128 MB (in PHP > 5.2)
+// The default is 128 MB (in PHP > 5.2)
 // Try uncommmenting the following line:
 // @ini_set( 'memory_limit', '128M' );
 
@@ -77,17 +78,20 @@ $log_app_errors = 1;
 
 
 /**
- * Allows to force a timezone if PHP>=5.1
+ * Allows to force the timezone used by PHP (in case it's not properly configured in php.ini)
  * See: http://b2evolution.net/man/date_default_timezone-forcing-a-timezone
  */
 $date_default_timezone = '';
 
+
 /**
- * Thumbnail size definitions.
+ * Thumbnail/Image sizes
  *
- * NOTE: this gets used for general resizing, too. E.g. in the coll_avatar_Widget.
+ * This is used for resizing images to various sizes
  *
- * type, width, height, quality, percent of blur effect
+ * For each size: name => array( type, width, height, quality, percent of blur effect )
+ *
+ * @global array
  */
 $thumbnail_sizes = array(
 			'fit-1280x720' => array( 'fit', 1280, 720, 85 ),
@@ -130,6 +134,7 @@ $thumbnail_sizes = array(
  *  - Do not allow update of files in the file manager
  *  - Do not allow changes to the 'demouser' and 'admin' account/group
  *  - Blog media directories can only be configured to be inside of {@link $media_path}
+ *
  * @global boolean Default: false
  */
 $demo_mode = false;
