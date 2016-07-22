@@ -169,7 +169,7 @@ else
 	@ini_set( 'display_errors', 'Off' );
 }
 
-// Check compatibility. Server PHP version can't be lower then the application required PHP version.
+// Check compatibility. Server PHP version can't be lower than the application's required PHP version.
 $php_version = phpversion();
 if( version_compare( $php_version, $required_php_version[ 'application' ], '<' ) )
 {
@@ -181,8 +181,8 @@ if( version_compare( $php_version, $required_php_version[ 'application' ], '<' )
 
 // Check timezone setting:
 $date_timezone = ini_get( "date.timezone" );
-if( version_compare( $php_version, '5.1', '>=' ) && ( !empty( $date_default_timezone ) || empty( $date_timezone ) ) )
-{ // Set default timezone in php versions >= 5.1 but only if $date_default_timezone is set or php.ini 'date.timezone' setting was not set
+if( ( !empty( $date_default_timezone ) || empty( $date_timezone ) ) )
+{ // Set default timezone if $date_default_timezone is set or php.ini 'date.timezone' setting was not set
 	date_default_timezone_set( empty( $date_default_timezone ) ? 'Europe/Paris' : $date_default_timezone );
 }
 
