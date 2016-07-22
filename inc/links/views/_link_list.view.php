@@ -134,6 +134,9 @@ else
 	$table_headers = '';
 }
 
+// Load FileRoot class to get fileroot ID of collection below:
+load_class( '/files/model/_fileroot.class.php', 'FileRoot' );
+
 // Display a button to quick upload the files by drag&drop method
 display_dragdrop_upload_button( array(
 		'before' => '<div id="fileuploader_form">',
