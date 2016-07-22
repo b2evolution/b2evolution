@@ -92,25 +92,11 @@ if( $debug == 'pwd' )
 			if( $_GET['debug'] == $debug_pwd )
 			{	// Password matches
 				$debug = 1;
-				if( version_compare( phpversion(), '5.2', '>=' ) )
-				{ // Use HTTP-only setting since PHP 5.2.0
-					setcookie( 'debug', $debug_pwd, 0, $cookie_path, $cookie_domain, false, true );
-				}
-				else
-				{ // PHP < 5.2 doesn't support HTTP-only
-					setcookie( 'debug', $debug_pwd, 0, $cookie_path, $cookie_domain );
-				}
+				setcookie( 'debug', $debug_pwd, 0, $cookie_path, $cookie_domain, false, true );
 			}
 			else
 			{	// Password doesn't match: turn off debug mode:
-				if( version_compare( phpversion(), '5.2', '>=' ) )
-				{ // Use HTTP-only setting since PHP 5.2.0
-					setcookie( 'debug', '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
-				}
-				else
-				{ // PHP < 5.2 doesn't support HTTP-only
-					setcookie( 'debug', '', $cookie_expired, $cookie_path, $cookie_domain );
-				}
+				setcookie( 'debug', '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
 			}
 		}
 		elseif( !empty( $_COOKIE['debug'] ) && $_COOKIE['debug'] == $debug_pwd )

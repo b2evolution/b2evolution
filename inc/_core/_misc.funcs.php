@@ -7190,7 +7190,7 @@ function get_cookie_path()
 		return $cookie_path;
 	}
 	else
-	{	// Use cookie domain of current collection url:
+	{	// Use base path of current collection url:
 		return $Blog->get_basepath();
 	}
 }
