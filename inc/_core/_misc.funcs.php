@@ -7153,39 +7153,41 @@ function apm_log_custom_param( $name, $value )
 
 
 /**
- * Get cookie domain
+ * Get cookie domain depending on current page:
+ *     - For back-office the config var $cookie_domain is used
+ *     - For front-office it is dynamically generated from collection url
  *
- * @return string
+ * @return string Cookie domain
  */
 function get_cookie_domain()
 {
 	global $Blog;
 
 	if( is_admin_page() || empty( $Blog ) )
-	{	// Use cookie domain of base url:
-		//pre_dump( 'get_cookie_domain = SITE' );
+	{	// Use cookie domain of base url from config:
 		global $cookie_domain;
 		return $cookie_domain;
 	}
 	else
 	{	// Use cookie domain of current collection url:
-		//pre_dump( 'get_cookie_domain = COLLECTION' );
 		return $Blog->get_cookie_domain();
 	}
 }
 
 
 /**
- * Get cookie path
+ * Get cookie path depending on current page:
+ *     - For back-office the config var $cookie_path is used
+ *     - For front-office it is dynamically generated from collection url
  *
- * @return string
+ * @return string Cookie path
  */
 function get_cookie_path()
 {
 	global $Blog;
 
 	if( is_admin_page() || empty( $Blog ) )
-	{	// Use cookie domain of base url:
+	{	// Use cookie path of base url from config:
 		global $cookie_path;
 		return $cookie_path;
 	}
