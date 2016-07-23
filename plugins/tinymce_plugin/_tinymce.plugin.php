@@ -791,14 +791,14 @@ class tinymce_plugin extends Plugin
 									.$content_css.'"';
 
 		// Generated HTML code options:
-		// do not make the path relative to "document_base_url":
+		// Do not make the path relative to "document_base_url":
 		$init_options[] = 'relative_urls : false';
-		// do not convert absolute urls to relative if url domain is the same as current page,
-		// (we should keep urls what were entered manually, because urls can be broken if collection has different domain than back-office):
+		// Do not convert absolute urls to relative if url domain is the same as current page,
+		// (we should keep urls as they were entered manually, because urls can be broken if collection has different domain than back-office; also an issue with RSS feeds):
 		$init_options[] = 'convert_urls : false';
 		$init_options[] = 'entity_encoding : "raw"';
 
-		// Autocomplete options
+		// Autocomplete options:
 		$init_options[] = 'autocomplete_options: autocomplete_static_options'; // Must be initialize before as string with usernames that are separated by comma
 		$init_options[] = 'autocomplete_options_url: restapi_url + "users/autocomplete"';
 
