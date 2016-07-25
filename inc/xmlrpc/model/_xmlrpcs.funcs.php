@@ -1005,7 +1005,7 @@ function xmlrpcs_resperror( $errcode = NULL, $errmsg = NULL )
  */
 function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 {
-	global $DB, $Plugins, $Messages, $Hit, $localtimenow, $require_name_email;
+	global $DB, $Plugins, $Messages, $Hit, $localtimenow;
 
 	$params = array_merge( array(
 			'password'			=> '',
@@ -1044,17 +1044,14 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 			$url = NULL;
 		}
 
-		// we need some id info from the anonymous user:
-		if( $require_name_email )
-		{ // We want Name and EMail with comments
-			if( empty($author) )
-			{
-				return xmlrpcs_resperror( 5, T_('Please fill in your name.') );
-			}
-			if( empty($email) )
-			{
-				return xmlrpcs_resperror( 5, T_('Please fill in your email.') );
-			}
+		// We need some id info from the anonymous user:
+		if( $commented_Item->Blog->get_setting( 'require_anon_name' ) && empty( $author ) )
+		{	// Author name is required for anonymous users:
+			return xmlrpcs_resperror( 5, T_('Please fill in your name.') );
+		}
+		if( $commented_Item->Blog->get_setting( 'require_anon_email' ) && empty( $email ) )
+		{	// Author email address is required for anonymous users:
+			return xmlrpcs_resperror( 5, T_('Please fill in your email.') );
 		}
 
 		if( !empty($author) && ( $block = antispam_check( $author ) ) )

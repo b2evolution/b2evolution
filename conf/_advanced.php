@@ -157,14 +157,6 @@ $home_url = $baseurl;
 
 
 /**
- * Comments: Set this to 1 to require e-mail and name, or 0 to allow comments
- * without e-mail/name.
- * @global boolean $require_name_email
- */
-$require_name_email = 1;
-
-
-/**
  * Check antispam blacklist for private messages.
  *
  * Do you want to check the antispam blacklist when a message form is submitted?

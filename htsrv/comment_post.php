@@ -172,17 +172,14 @@ else
 	// NO permission to edit!
 	$perm_comment_edit = false;
 
-	// we need some id info from the anonymous user:
-	if ( $require_name_email )
-	{ // We want Name and EMail with comments
-		if( empty( $author ) )
-		{
-			$Messages->add( T_('Please fill in your name.'), 'error' );
-		}
-		if( empty( $email ) )
-		{
-			$Messages->add( T_('Please fill in your email.'), 'error' );
-		}
+	// We need some id info from the anonymous user:
+	if( $commented_Item->Blog->get_setting( 'require_anon_name' ) && empty( $author ) )
+	{	// Author name is required for anonymous users:
+		$Messages->add( T_('Please fill in your name.'), 'error' );
+	}
+	if( $commented_Item->Blog->get_setting( 'require_anon_email' ) && empty( $email ) )
+	{	// Author email address is required for anonymous users:
+		$Messages->add( T_('Please fill in your email.'), 'error' );
 	}
 
 	if( !empty( $author ) && ( $block = antispam_check( $author ) ) )
