@@ -1005,7 +1005,7 @@ function xmlrpcs_resperror( $errcode = NULL, $errmsg = NULL )
  */
 function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 {
-	global $DB, $Plugins, $Messages, $Hit, $localtimenow, $require_name_email, $minimum_comment_interval;
+	global $DB, $Plugins, $Messages, $Hit, $localtimenow, $require_name_email;
 
 	$params = array_merge( array(
 			'password'			=> '',
@@ -1113,34 +1113,7 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 		return xmlrpcs_resperror( 5, T_('Please do not send empty comments.') );
 	}
 
-	$now = date2mysql($localtimenow);
-
-	/*
-	 * Flood-protection
-	 * NOTE: devs can override the flood protection delay in /conf/_overrides_TEST.php
-	 * TODO: Put time check into query?
-	 * TODO: move that as far !!UP!! as possible! We want to waste minimum resources on Floods
-	 * TODO: have several thresholds. For example:
-	 * 1 comment max every 30 sec + 5 comments max every 10 minutes + 15 comments max every 24 hours
-	 * TODO: factorize with trackback
-	 */
-	$query = 'SELECT MAX(comment_date)
-				FROM T_comments
-				WHERE comment_author_IP = '.$DB->quote( $Hit->IP ).'
-				OR comment_author_email = '.$DB->quote( $email );
-	$ok = 1;
-	if( $then = $DB->get_var( $query ) )
-	{
-		$time_lastcomment = mysql2date("U",$then);
-		$time_newcomment = mysql2date("U",$now);
-		if( ($time_newcomment - $time_lastcomment) < $minimum_comment_interval )
-			$ok = 0;
-	}
-	if( !$ok )
-	{
-		return xmlrpcs_resperror( 5, sprintf( T_('You can only post a new comment every %d seconds.'), $minimum_comment_interval ) );
-	}
-	/* end flood-protection */
+	$now = date2mysql( $localtimenow );
 
 	/**
 	 * Create comment object. Gets validated, before recording it into DB:

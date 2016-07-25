@@ -163,12 +163,6 @@ $home_url = $baseurl;
  */
 $require_name_email = 1;
 
-/**
- * Minimum interval (in seconds) between consecutive comments from same IP.
- * @global int $minimum_comment_interval
- */
-$minimum_comment_interval = 30;
-
 
 /**
  * Check antispam blacklist for private messages.

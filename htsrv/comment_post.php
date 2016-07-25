@@ -283,36 +283,6 @@ if( param( 'renderers_displayed', 'integer', 0 ) )
 $def_status = $Comment->is_meta() ? 'published' : get_highest_publish_status( 'comment', $commented_Item->Blog->ID, false );
 $Comment->set( 'status', $def_status );
 
-if( $action != 'preview' )
-{
-	/*
-	 * Flood-protection
-	 * NOTE: devs can override the flood protection delay in /conf/_overrides_TEST.php
-	 * TODO: Put time check into query?
-	 * TODO: move that as far !!UP!! as possible! We want to waste minimum resources on Floods
-	 * TODO: have several thresholds. For example:
-	 * 1 comment max every 30 sec + 5 comments max every 10 minutes + 15 comments max every 24 hours
-	 * TODO: factorize with trackback
-	 */
-	$query = 'SELECT MAX(comment_date)
-							FROM T_comments
-						 WHERE comment_author_IP = '.$DB->quote($Hit->IP).'
-								OR comment_author_email = '.$DB->quote( $Comment->get_author_email() );
-	$ok = 1;
-	if( $then = $DB->get_var( $query ) )
-	{
-		$time_lastcomment = mysql2date("U",$then);
-		$time_newcomment = mysql2date("U",$now);
-		if( ($time_newcomment - $time_lastcomment) < $minimum_comment_interval )
-			$ok = 0;
-	}
-	if( !$ok )
-	{
-		$Messages->add( sprintf( T_('You can only post a new comment every %d seconds.'), $minimum_comment_interval ), 'error' );
-	}
-	/* end flood-protection */
-}
-
 // get already attached file ids
 param( 'preview_attachments', 'string', '' );
 // finally checked attachments
@@ -336,7 +306,7 @@ if( !empty( $preview_attachments ) )
 	}
 }
 
-if( $commented_Item->can_attach() && ( ( $action == 'preview' ) || $ok ) &&
+if( $commented_Item->can_attach() && ( $action == 'preview' ) &&
     !empty( $_FILES['uploadfile'] ) && !empty( $_FILES['uploadfile']['size'] ) && !empty( $_FILES['uploadfile']['size'][0] ) )
 { // attaching files is permitted
 	$FileRootCache = & get_FileRootCache();
