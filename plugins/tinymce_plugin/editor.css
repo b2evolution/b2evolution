@@ -1,7 +1,10 @@
 /* Styles for TinyMCE's iframe/editable area */
 
 body.mce-content-body {
-	font: 13px/19px Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
+	font: 1em Merriweather, Georgia, serif;
+	font-weight: normal;
+	line-height: 28px;
+	-webkit-font-smoothing: antialiased;
 	padding: 0.6em;
 	margin: 0;
 }

@@ -751,10 +751,15 @@ class tinymce_plugin extends Plugin
 		{	// Load script to use gzip compressor:
 			$init_options[] = 'script_url: "'.get_require_url( 'tiny_mce/tinymce.gzip.php', 'blog', 'js' ).'"';
 		}
-		// TinyMCE Theme+Skin+Variant to use:
+
+		// B2evo plugin options
 		$init_options[] = 'collection: "'.$this->collection.'"';
 		$init_options[] = 'postID: '.$this->post_ID;
 		$init_options[] = 'async_url: "'.get_htsrv_url().'anon_async.php"';
+
+		$init_options[] = 'fontsize_formats: "8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt"';
+
+		// TinyMCE Theme+Skin+Variant to use:
 		$init_options[] = 'theme : "modern"';
 		$init_options[] = 'menubar : false';
 		// comma separated list of plugins: -- http://wiki.moxiecode.com/index.php/TinyMCE:Plugins
