@@ -3039,7 +3039,7 @@ class User extends DataObject
 
 		// Group may grant VIEW access, FULL access:
 		$this->get_Group();
-		$group_permlevel = ( $permlevel == 'view' && $permlevel == 'any' ) ? 'viewall' : 'editall';
+		$group_permlevel = ( $permlevel == 'view' || $permlevel == 'any' ) ? 'viewall' : 'editall';
 		if( $this->Group->check_perm( 'blogs', $group_permlevel ) )
 		{ // If group grants a global permission:
 			return true;
