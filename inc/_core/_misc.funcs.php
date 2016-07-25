@@ -5601,7 +5601,7 @@ function hash_link_params( $link_array, $force_hash = NULL )
 	{
 		$key = $ReqHost.$ReqPath;
 
-		global $Blog;
+		global $Collection, $Blog;
 		if( !empty($Blog) && strpos( $Blog->get_setting('single_links'), 'param_' ) === 0 )
 		{	// We are on a blog that doesn't even have clean URLs for posts
 			$key .= $ReqURI;
@@ -6328,7 +6328,7 @@ function get_restapi_url()
  */
 function get_htsrv_url( $force_https = false )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( is_admin_page() || empty( $Blog ) )
 	{	// For back-office or when no collection page:
@@ -6351,7 +6351,7 @@ function get_htsrv_url( $force_https = false )
  */
 function get_samedomain_htsrv_url( $secure = false )
 {
-	global $ReqHost, $ReqPath, $htsrv_url, $htsrv_url_sensitive, $htsrv_subdir, $Blog;
+	global $ReqHost, $ReqPath, $htsrv_url, $htsrv_url_sensitive, $htsrv_subdir, $Collection, $Blog;
 
 	if( $secure )
 	{
@@ -7201,7 +7201,7 @@ function apm_log_custom_param( $name, $value )
  */
 function get_cookie_domain()
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( is_admin_page() || empty( $Blog ) )
 	{	// Use cookie domain of base url from config:
@@ -7224,7 +7224,7 @@ function get_cookie_domain()
  */
 function get_cookie_path()
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( is_admin_page() || empty( $Blog ) )
 	{	// Use cookie path of base url from config:
@@ -7487,7 +7487,7 @@ function button_class( $type = 'button', $jQuery_selector = false )
  */
 function echo_modalwindow_js()
 {
-	global $AdminUI, $Blog, $modal_window_js_initialized;
+	global $AdminUI, $Collection, $Blog, $modal_window_js_initialized;
 
 	if( ! empty( $modal_window_js_initialized ) )
 	{ // Don't print out these functions twice
@@ -7580,7 +7580,7 @@ function get_fieldset_folding_icon( $id, $params = array() )
 	}
 	else
 	{ // Get the fold value from user settings
-		global $UserSettings, $Blog;
+		global $UserSettings, $Collection, $Blog;
 		if( empty( $Blog ) )
 		{ // Get user setting value
 			$value = intval( $UserSettings->get( 'fold_'.$id ) );

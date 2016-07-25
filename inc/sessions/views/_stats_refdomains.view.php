@@ -47,7 +47,7 @@ if( empty( $blog ) )
 }
 else
 { // Page title for selected blog domains
-	global $Blog;
+	global $Collection, $Blog;
 	$page_title = sprintf( T_('Referring domains for collection %s'), $Blog->get( 'shortname' ) );
 }
 

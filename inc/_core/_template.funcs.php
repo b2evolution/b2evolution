@@ -112,7 +112,7 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	 * @var Hit
 	 */
 	global $Hit;
-	global $baseurl, $Blog, $htsrv_url_sensitive, $ReqHost, $ReqURL, $dispatcher;
+	global $baseurl, $Collection, $Blog, $htsrv_url_sensitive, $ReqHost, $ReqURL, $dispatcher;
 	global $Session, $Debuglog, $Messages;
 	global $http_response_code, $allow_redirects_to_different_domain;
 
@@ -394,7 +394,7 @@ function header_etag( $etag )
  */
 function get_request_title( $params = array() )
 {
-	global $MainList, $preview, $disp, $action, $current_User, $Blog, $admin_url;
+	global $MainList, $preview, $disp, $action, $current_User, $Collection, $Blog, $admin_url;
 
 	$r = array();
 
@@ -902,7 +902,7 @@ function robots_tag()
  */
 function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_text = 'Home' )
 {
-	global $Blog, $baseurl;
+	global $Collection, $Blog, $baseurl;
 
 	if( !empty( $Blog ) )
 	{
@@ -927,7 +927,7 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
 function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js', $version = '#' )
 {
 	global $library_local_urls, $library_cdn_urls, $use_cdns, $debug, $rsc_url;
-	global $Blog, $baseurl, $assets_baseurl, $ReqURL;
+	global $Collection, $Blog, $baseurl, $assets_baseurl, $ReqURL;
 
 	if( $relative_to == 'blog' && ( is_admin_page() || empty( $Blog ) ) )
 	{	// Make sure we never use resource url relative to any blog url in case of an admin page ( important in case of multi-domain installations ):
@@ -1383,7 +1383,7 @@ function add_js_for_toolbar( $relative_to = 'rsc_url' )
  */
 function init_ajax_forms( $relative_to = 'blog' )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( !empty($Blog) && $Blog->get_setting('ajax_form_enabled') )
 	{
@@ -1560,7 +1560,7 @@ function init_results_js( $relative_to = 'rsc_url' )
  */
 function init_voting_comment_js( $relative_to = 'rsc_url' )
 {
-	global $Blog, $b2evo_icons_type;
+	global $Collection, $Blog, $b2evo_icons_type;
 
 	if( empty( $Blog ) || ! is_logged_in( false ) || ! $Blog->get_setting('allow_rating_comment_helpfulness') )
 	{	// If User is not logged OR Users cannot vote
@@ -1589,7 +1589,7 @@ function init_voting_comment_js( $relative_to = 'rsc_url' )
  */
 function init_voting_item_js( $relative_to = 'rsc_url' )
 {
-	global $Blog, $b2evo_icons_type;
+	global $Collection, $Blog, $b2evo_icons_type;
 
 	if( empty( $Blog ) || ! is_logged_in( false ) || ! $Blog->get_setting( 'voting_positive' ) )
 	{	// If User is not logged OR Users cannot vote:
@@ -1647,7 +1647,7 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
  */
 function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintbox' )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	require_js( '#jquery#', $relative_to ); // dependency
 
@@ -2006,7 +2006,7 @@ function credits( $params = array() )
 	 * @var AbstractSettings
 	 */
 	global $global_Cache;
-	global $Blog;
+	global $Collection, $Blog;
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
@@ -2114,7 +2114,7 @@ function powered_by( $params = array() )
  */
 function bloginfo( $what )
 {
-	global $Blog;
+	global $Collection, $Blog;
 	$Blog->disp( $what );
 }
 
@@ -2303,7 +2303,7 @@ function display_ajax_form( $params )
  */
 function display_login_form( $params )
 {
-	global $Settings, $Plugins, $Session, $Blog, $blog, $dummy_fields;
+	global $Settings, $Plugins, $Session, $Collection, $Blog, $blog, $dummy_fields;
 	global $admin_url, $baseurl, $ReqHost, $redirect_to;
 
 	$params = array_merge( array(
@@ -2354,7 +2354,7 @@ function display_login_form( $params )
 				if( empty( $Blog ) )
 				{
 					$BlogCache = & get_BlogCache();
-					$Blog = $BlogCache->get_by_ID( $blog, false );
+					$Collection = $Blog = $BlogCache->get_by_ID( $blog, false );
 				}
 				// set abort url to Blog url
 				$abort_url = $Blog->gen_blogurl();
@@ -2907,7 +2907,7 @@ function display_activateinfo( $params )
  */
 function display_password_indicator( $params = array() )
 {
-	global $Blog, $rsc_url, $disp, $dummy_fields;
+	global $Collection, $Blog, $rsc_url, $disp, $dummy_fields;
 
 	$params = array_merge( array(
 			'pass1-id'    => $dummy_fields[ 'pass1' ],
@@ -3232,7 +3232,7 @@ function init_autocomplete_usernames_js( $relative_to = 'rsc_url' )
 {
 	if( is_admin_page() )
 	{ // Check to enable it in back-office
-		global $Blog;
+		global $Collection, $Blog;
 		if( empty( $Blog ) || ! $Blog->get_setting( 'autocomplete_usernames' ) )
 		{ // Blog setting doesn't allow to autocomplete usernames
 			return;

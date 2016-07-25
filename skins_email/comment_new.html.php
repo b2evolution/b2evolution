@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.html.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url, $Blog;
+global $admin_url, $Collection, $Blog;
 
 // Default params:
 $params = array_merge( array(
@@ -31,7 +31,7 @@ $params = array_merge( array(
 
 
 $Comment = $params['Comment'];
-$Blog = $params['Blog'];
+$Collection = $Blog = $params['Blog'];
 $Item = $params['Item'];
 $recipient_User = & $params['recipient_User'];
 

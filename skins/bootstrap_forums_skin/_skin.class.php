@@ -408,7 +408,7 @@ class bootstrap_forums_Skin extends Skin
 	 */
 	function get_post_button( $chapter_ID, $Item = NULL, $params = array() )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$params = array_merge( array(
 				'group_class'  => '',
@@ -491,7 +491,7 @@ class bootstrap_forums_Skin extends Skin
 	 */
 	function is_visible_container( $container_key )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $Blog->has_access() )
 		{	// If current user has an access to this collection then don't restrict containers:
@@ -591,7 +591,7 @@ class bootstrap_forums_Skin extends Skin
 	 */
 	function display_button_recent_topics()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( ! is_logged_in() || ! $Blog->get_setting( 'track_unread_content' ) )
 		{	// For not logged in users AND if the tracking of unread content is turned off for the collection

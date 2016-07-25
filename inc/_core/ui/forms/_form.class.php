@@ -858,7 +858,7 @@ class Form extends Widget
 			$folding_icon = get_fieldset_folding_icon( $field_params['id'], $field_params );
 			if( ! $field_params['deny_fold'] && is_logged_in() )
 			{ // Only loggedin users can fold fieldset
-				global $UserSettings, $Blog;
+				global $UserSettings, $Collection, $Blog;
 				if( empty( $Blog ) )
 				{ // Get user setting value
 					$value = intval( $UserSettings->get( 'fold_'.$field_params['id'] ) );

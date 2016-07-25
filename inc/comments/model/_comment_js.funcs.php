@@ -2,7 +2,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $current_User, $Session, $admin_url, $status_list, $CommentList, $b2evo_icons_type;
+global $Collection, $Blog, $current_User, $Session, $admin_url, $status_list, $CommentList, $b2evo_icons_type;
 
 // Require this file because function evoAlert() is used here
 require_js( 'functions.js', 'blog', false, true );

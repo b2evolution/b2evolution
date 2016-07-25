@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $Blog, $app_version;
+global $Item, $Collection, $Blog, $app_version;
 
 // Default params:
 $params = array_merge( array(

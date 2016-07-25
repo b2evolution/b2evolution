@@ -77,7 +77,7 @@ if( is_admin_page() )
 }
 else
 {
-	global $Blog;
+	global $Collection, $Blog;
 	$form_title = '';
 	$form_class = 'bComment';
 	$ctrl_param = url_add_param( $Blog->gen_blogurl(), 'disp='.$disp );

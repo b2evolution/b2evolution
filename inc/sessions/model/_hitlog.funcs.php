@@ -433,7 +433,7 @@ function stats_blog_name()
 	global $row_stats;
 
 	$BlogCache = & get_BlogCache();
-	$Blog = & $BlogCache->get_by_ID($row_stats['hit_coll_ID']);
+	$Collection = $Blog = & $BlogCache->get_by_ID($row_stats['hit_coll_ID']);
 
 	$Blog->disp('name');
 }

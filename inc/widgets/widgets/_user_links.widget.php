@@ -118,7 +118,7 @@ class user_links_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $DB, $Item, $Blog;
+		global $DB, $Item, $Collection, $Blog;
 
 		$this->init_display( $params );
 
@@ -188,7 +188,7 @@ class user_links_Widget extends ComponentWidget
 	 */
 	function & get_widget_User()
 	{
-		global $Item, $Blog;
+		global $Item, $Collection, $Blog;
 
 		$widget_User = NULL;
 
@@ -217,7 +217,7 @@ class user_links_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$cache_keys = array(
 				'wi_ID'       => $this->ID, // Have the widget settings changed ?

@@ -1025,7 +1025,7 @@ switch( $action )
 		{
 			set_working_blog( $fm_Filelist->get_root_ID() );
       // Load the blog we're in:
-			$Blog = & $BlogCache->get_by_ID( $blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 		}
 		// ---
 

@@ -49,7 +49,7 @@ $BlogCache = & get_BlogCache();
 /**
  * @var Blog
  */
-$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 if( empty( $Blog ) )
 {
 	require $siteskins_path.'_404_blog_not_found.main.php'; // error & exit
@@ -109,7 +109,7 @@ if( init_charsets( $current_charset ) )
 	// Reload Blog(s) (for encoding of name, tagline etc):
 	$BlogCache->clear();
 
-	$Blog = & $BlogCache->get_by_ID( $blog );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 	if( is_logged_in() )
 	{ // We also need to reload the current User with the new final charset
 		$UserCache = & get_UserCache();

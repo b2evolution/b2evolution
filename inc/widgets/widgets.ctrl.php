@@ -37,7 +37,7 @@ if( $selected = autoselect_blog( 'blog_properties', 'edit' ) ) // Includes perm 
 		/**
 		 * @var Blog
 		 */
-		$Blog = & $BlogCache->get_by_ID( $blog );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 	}
 
 	/**
@@ -121,7 +121,7 @@ switch( $action )
 		/**
 		* @var Blog
 		*/
-		$Blog = & $BlogCache->get_by_ID( $blog );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
 		break;
 

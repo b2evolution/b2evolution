@@ -130,7 +130,7 @@ class sessions_Module extends Module
 		global $topleft_Menu;
 		global $current_User;
 		global $admin_url;
-		global $Blog, $activate_collection_toolbar;
+		global $Collection, $Blog, $activate_collection_toolbar;
 
 		if( !$current_User->check_perm( 'admin', 'normal' ) )
 		{
@@ -236,7 +236,7 @@ class sessions_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		/**
 		 * @var AdminUI_general
 		 */

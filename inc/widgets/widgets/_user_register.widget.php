@@ -160,7 +160,7 @@ class user_register_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog, $Settings, $Session, $redirect_to, $dummy_fields;
+		global $Collection, $Blog, $Settings, $Session, $redirect_to, $dummy_fields;
 
 		if( is_logged_in() )
 		{	// No display when user is already registered

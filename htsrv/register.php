@@ -64,7 +64,7 @@ param( 'source', 'string', '' );
 param( 'redirect_to', 'url', '' ); // do not default to $admin_url; "empty" gets handled better in the end (uses $blogurl, if no admin perms).
 param( 'inskin', 'boolean', false, true );
 
-global $Blog;
+global $Collection, $Blog;
 if( $inskin && empty( $Blog ) )
 {
 	param( 'blog', 'integer', 0 );
@@ -72,7 +72,7 @@ if( $inskin && empty( $Blog ) )
 	if( isset( $blog) && $blog > 0 )
 	{
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog, false, false );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog, false, false );
 	}
 }
 

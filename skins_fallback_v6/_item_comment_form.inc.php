@@ -17,7 +17,7 @@ global $comment_allowed_tags;
 global $comment_cookies, $comment_allow_msgform;
 global $checked_attachments; // Set this var as global to use it in the method $Item->can_attach()
 global $PageCache, $Session;
-global $Blog, $dummy_fields;
+global $Collection, $Blog, $dummy_fields;
 
 // Default params:
 $params = array_merge( array(

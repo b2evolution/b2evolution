@@ -1491,7 +1491,7 @@ class Plugins_admin extends Plugins
 		if( !isset( $params['object_Blog'] ) &&
 		    ( !isset( $params['object_type'] ) || ( isset( $params['object_type'] ) && $params['object_type'] != 'Message' ) ) )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{
 				return false;

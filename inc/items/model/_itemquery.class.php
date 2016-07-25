@@ -309,7 +309,7 @@ class ItemQuery extends SQL
 		{ // Blog IDs are not defined, Use them depending on current collection setting
 			// NOTE! collection can be 0, for example, on disp=usercomments|useritems where we display data from all collections
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $this->blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $this->blog );
 			$aggregate_coll_IDs = $Blog->get_setting( 'aggregate_coll_IDs' );
 		}
 

@@ -112,7 +112,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 	}
 
 	// Editing link owner
-	$Blog = & $LinkOwner->get_Blog();
+	$Collection = $Blog = & $LinkOwner->get_Blog();
 
 	$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' );
 
@@ -573,7 +573,7 @@ function get_file_links( $file_ID, $params = array() )
 			{ // File is linked to a post
 				if( $Item = & $ItemCache->get_by_ID( $link->link_itm_ID, false ) )
 				{
-					$Blog = $Item->get_Blog();
+					$Collection = $Blog = $Item->get_Blog();
 					if( $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $Item ) )
 					{ // Current user can edit the linked post
 						$r .= $params['post_prefix'].'<a href="'.url_add_param( $admin_url, 'ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$link->link_itm_ID ).'">'.$Item->get( 'title' ).'</a>';

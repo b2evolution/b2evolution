@@ -957,7 +957,7 @@ class test_plugin extends Plugin
 	 */
 	function InitMainList( & $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 		global $preview, $disp;
 		global $postIDlist, $postIDarray, $cat_array;
 

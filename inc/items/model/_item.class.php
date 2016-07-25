@@ -307,7 +307,7 @@ class Item extends ItemLight
 
 		if( is_null($db_row) )
 		{ // New item:
-			global $Blog;
+			global $Collection, $Blog;
 
 			if( isset($current_User) )
 			{ // use current user as default, if available (which won't be the case during install)
@@ -2708,7 +2708,7 @@ class Item extends ItemLight
 
 		if( $params['form_url'] == '#current_blog#' )
 		{	// Get
-			global $Blog;
+			global $Collection, $Blog;
 			$params['form_url'] = $Blog->get('msgformurl');
 		}
 
@@ -5410,7 +5410,7 @@ class Item extends ItemLight
 		{	// Try to set default post type ID from blog setting:
 			$ChapterCache = & get_ChapterCache();
 			if( $Chapter = & $ChapterCache->get_by_ID( $main_cat_ID, false, false ) &&
-			    $Blog = & $Chapter->get_Blog() )
+			    $Collection = $Blog = & $Chapter->get_Blog() )
 			{	// Use default post type what used for the blog:
 				$item_typ_ID = $Blog->get_setting( 'default_post_type' );
 			}
@@ -5806,7 +5806,7 @@ class Item extends ItemLight
 		if( $db_changed )
 		{ // There were db modificaitons, needs cache invalidation
 			// Load the blog we're in:
-			$Blog = & $this->get_Blog();
+			$Collection = $Blog = & $this->get_Blog();
 
 			// BLOCK CACHE INVALIDATION:
 			BlockCache::invalidate_key( 'cont_coll_ID', $Blog->ID ); // Content has changed
@@ -5892,7 +5892,7 @@ class Item extends ItemLight
 		$old_ID = $this->ID;
 
 		// Load the blog
-		$Blog = & $this->get_Blog();
+		$Collection = $Blog = & $this->get_Blog();
 
 		$DB->begin();
 
@@ -7093,7 +7093,7 @@ class Item extends ItemLight
 		{
 			return '';
 		}
-		$Blog = & $this->get_Blog();
+		$Collection = $Blog = & $this->get_Blog();
 		return url_add_tail( $Blog->get( 'url'), '/'.$tinyslug );
 	}
 

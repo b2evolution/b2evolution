@@ -38,7 +38,7 @@ global $current_User;
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 
 global $dispatcher;
 
@@ -92,7 +92,7 @@ switch( $action )
 		}
 
 		// Load the blog we're in:
-		$Blog = & $edited_Item->get_Blog();
+		$Collection = $Blog = & $edited_Item->get_Blog();
 		set_working_blog( $Blog->ID );
 
 		// Where are we going to redirect to?
@@ -140,7 +140,7 @@ switch( $action )
 		}
 
 		// Load the blog we're in:
-		$Blog = & $edited_Item->get_Blog();
+		$Collection = $Blog = & $edited_Item->get_Blog();
 		set_working_blog( $Blog->ID );
 
 		// Where are we going to redirect to?
@@ -192,7 +192,7 @@ switch( $action )
 			if( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
 			{	// Selected a new blog:
 				$BlogCache = & get_BlogCache();
-				$Blog = & $BlogCache->get_by_ID( $blog );
+				$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 			}
 
 			// Where are we going to redirect to?
@@ -238,7 +238,7 @@ switch( $action )
 		{
 			set_working_blog( $fm_FileRoot->in_type_ID );
 			// Load the blog we're in:
-			$Blog = & $BlogCache->get_by_ID( $blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 		}
 		// ---
 
@@ -1461,7 +1461,7 @@ switch( $action )
  */
 function init_list_mode()
 {
-	global $tab, $tab_type, $Blog, $UserSettings, $ItemList, $AdminUI, $current_User;
+	global $tab, $tab_type, $Collection, $Blog, $UserSettings, $ItemList, $AdminUI, $current_User;
 
 	// set default itemslist param prefix
 	$items_list_param_prefix = 'items_';

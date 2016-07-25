@@ -23,7 +23,7 @@ global $creating_success;
 
 global $DB, $action, $Plugins;
 
-global $Blog;
+global $Collection, $Blog;
 
 $creating = is_create_action( $action );
 

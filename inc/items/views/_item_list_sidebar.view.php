@@ -21,7 +21,7 @@ global $AdminUI;
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var Plugins
  */

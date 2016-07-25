@@ -218,7 +218,7 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 			$blog_ID = $blog;
 		}
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog_ID );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 		if( ! empty( $redirect_url ) )
 		{
 			$redirect_url = url_rel_to_same_host( $redirect_url, $Blog->get( $blog_page, array( 'glue' => '&' ) ) );
@@ -258,7 +258,7 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
  */
 function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;', $return_to = NULL )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( empty( $redirect_to ) && $redirect_to !== false )
 	{ // Redirect back to current URL
@@ -303,7 +303,7 @@ function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;', $return_to 
  */
 function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( empty( $redirect_to ) )
 	{ // Redirect back to current URL
@@ -332,12 +332,12 @@ function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
  */
 function get_notifications_url( $glue = '&amp;', $user_ID = NULL )
 {
-	global $blog, $Blog, $admin_url;
+	global $blog, $Collection, $Blog, $admin_url;
 
 	if( ! empty( $blog ) && empty( $Blog ) )
-	{ // Try to initialize global $Blog object
+	{ // Try to initialize global $Collection, $Blog object
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog, false, false );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog, false, false );
 	}
 
 	$use_admin_page_url = false;
@@ -497,7 +497,7 @@ function send_admin_notification( $subject, $template_name, $template_params )
  */
 function use_in_skin_login()
 {
-	global $Blog, $blog;
+	global $Collection, $Blog, $blog;
 
 	if( is_admin_page() )
 	{ // Back-office page
@@ -510,9 +510,9 @@ function use_in_skin_login()
 	}
 
 	if( empty( $Blog ) )
-	{ // Try to initialize global $Blog object
+	{ // Try to initialize global $Collection, $Blog object
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog, false, false );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog, false, false );
 	}
 
 	if( get_setting_Blog( 'login_blog_ID', $Blog ) )
@@ -547,7 +547,7 @@ function show_toolbar()
  */
 function check_setting( $setting_name )
 {
-	global $Settings, $Blog;
+	global $Settings, $Collection, $Blog;
 
 	if( is_admin_page() || empty( $Blog ) )
 	{ // Check setting in the Back office or when Blog is not defined
@@ -676,7 +676,7 @@ function get_user_register_url( $redirect_to = NULL, $default_source_string = ''
 		}
 
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog_ID );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 
 		$register_url = $Blog->get( 'registerurl', array( 'glue' => $glue ) );
 	}
@@ -784,7 +784,7 @@ function get_user_logout_url( $blog_ID = NULL )
 		}
 		if( empty( $current_Blog ) )
 		{ // Use current blog
-			global $Blog;
+			global $Collection, $Blog;
 			$current_Blog = & $Blog;
 		}
 
@@ -1179,7 +1179,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 	}
 	if( empty( $current_Blog ) )
 	{ // Use current blog
-		global $Blog;
+		global $Collection, $Blog;
 		$current_Blog = & $Blog;
 	}
 
@@ -1311,7 +1311,7 @@ function get_user_messaging_link( $before = '', $after = '', $link_text = '#', $
  */
 function get_user_messaging_url()
 {
-	global $current_User, $Blog;
+	global $current_User, $Collection, $Blog;
 
 	if( !is_logged_in() )
 	{
@@ -1375,7 +1375,7 @@ function get_user_contacts_link( $before = '', $after = '', $link_text = '#', $l
  */
 function get_user_contacts_url()
 {
-	global $current_User, $Blog;
+	global $current_User, $Collection, $Blog;
 
 	if( !is_logged_in() )
 	{
@@ -1996,7 +1996,7 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 	/**
 	 * @var Blog
 	 */
-	$Blog = & $BlogCache->get_by_ID( $perm_target_blog );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $perm_target_blog );
 	if( ! $Blog->advanced_perms )
 	{ // We do not abide to advanced perms
 		return false;
@@ -3094,7 +3094,7 @@ function userfield_prepare( & $userfield )
  */
 function callback_filter_userlist( & $Form )
 {
-	global $Settings, $current_User, $Blog, $edited_Organization;
+	global $Settings, $current_User, $Collection, $Blog, $edited_Organization;
 
 	$Form->hidden( 'filter', 'new' );
 
@@ -4139,7 +4139,7 @@ function find_users_with_same_email( $user_ID, $user_email, $message )
  */
 function display_user_email_status_message( $user_ID = 0 )
 {
-	global $Messages, $current_User, $Blog, $disp;
+	global $Messages, $current_User, $Collection, $Blog, $disp;
 
 	if( ! is_logged_in() || ( $user_ID != 0 && $user_ID != $current_User->ID ) )
 	{ // User must be logged in AND only for current User
@@ -4652,7 +4652,7 @@ function check_access_users_list( $mode = 'normal' )
 		}
 		else
 		{	// Normal request
-			global $Blog, $baseurl;
+			global $Collection, $Blog, $baseurl;
 			$Messages->add( $error_message );
 			header_redirect( ( empty( $Blog ) ? $baseurl : $Blog->gen_blogurl() ), 302 );
 		}
@@ -4689,7 +4689,7 @@ function check_access_users_list( $mode = 'normal' )
  */
 function check_access_user_profile( $user_ID, $mode = 'normal' )
 {
-	global $Blog, $baseurl, $Settings, $current_User, $Settings, $Messages;
+	global $Collection, $Blog, $baseurl, $Settings, $current_User, $Settings, $Messages;
 
 	// Set where to redirect in case of error:
 	$error_redirect_to = ( empty( $Blog ) ? $baseurl : $Blog->gen_blogurl() );

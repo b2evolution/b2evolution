@@ -70,7 +70,7 @@ class coll_member_count_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( empty( $Blog ) || $Blog->get_setting( 'allow_access' ) != 'members' )
 		{ // Use this widget only when blog is allowed only for members
@@ -101,7 +101,7 @@ class coll_member_count_Widget extends ComponentWidget
 	 */
 	function get_members_count()
 	{
-		global $Blog, $DB;
+		global $Collection, $Blog, $DB;
 
 		// Get blog owner
 		$blogowner_SQL = new SQL();

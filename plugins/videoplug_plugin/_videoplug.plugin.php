@@ -106,12 +106,12 @@ class videoplug_plugin extends Plugin
 		if( !empty( $params['Item'] ) )
 		{	// Item is set, get Blog from post:
 			$edited_Item = & $params['Item'];
-			$Blog = & $edited_Item->get_Blog();
+			$Collection = $Blog = & $edited_Item->get_Blog();
 		}
 
 		if( empty( $Blog ) )
 		{	// Item is not set, try global Blog:
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available:
 				return false;
@@ -177,13 +177,13 @@ class videoplug_plugin extends Plugin
 		{	// Get a post of the comment:
 			if( $comment_Item = & $Comment->get_Item() )
 			{
-				$Blog = & $comment_Item->get_Blog();
+				$Collection = $Blog = & $comment_Item->get_Blog();
 			}
 		}
 
 		if( empty( $Blog ) )
 		{	// Item is not set, try global Blog
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available
 				return false;

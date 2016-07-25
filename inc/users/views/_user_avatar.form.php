@@ -67,7 +67,7 @@ if( $is_admin )
 }
 else
 {
-	global $Blog;
+	global $Collection, $Blog;
 	$form_title = '';
 	$form_class = $params['form_class_user_avatar'];
 	$ctrl_param = url_add_param( $Blog->gen_blogurl(), 'disp='.$disp );

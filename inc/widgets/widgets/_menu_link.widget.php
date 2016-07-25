@@ -215,7 +215,7 @@ class menu_link_Widget extends ComponentWidget
 		/**
 		* @var Blog
 		*/
-		global $Blog;
+		global $Collection, $Blog;
 		global $disp;
 
 		$this->init_display( $params );
@@ -590,7 +590,7 @@ class menu_link_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog, $current_User;
+		global $Collection, $Blog, $current_User;
 
 		$keys = array(
 				'wi_ID'   => $this->ID,					// Have the widget settings changed ?

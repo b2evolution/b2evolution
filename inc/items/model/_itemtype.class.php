@@ -418,7 +418,7 @@ class ItemType extends DataObject
 
 		if( parent::dbinsert() )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 
 			// Update/Insert/Delete custom fields:
 			$this->dbsave_custom_fields();

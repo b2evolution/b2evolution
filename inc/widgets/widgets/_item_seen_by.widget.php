@@ -117,7 +117,7 @@ class item_seen_by_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog, $Item, $current_User, $DB;
+		global $Collection, $Blog, $Item, $current_User, $DB;
 
 		if( empty( $Blog ) || ! $Blog->get_setting( 'track_unread_content' ) )
 		{	// Don't display this widget if current collection doesn't track the unread content:

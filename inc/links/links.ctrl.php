@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $AdminUI;
 
-global $Blog, $Session;
+global $Collection, $Blog, $Session;
 
 /*
  * Initialize everything
@@ -45,7 +45,7 @@ switch( $action )
 			$LinkOwner = & $edited_Link->get_LinkOwner();
 
 			// Load the blog we're in:
-			$Blog = & $LinkOwner->get_Blog();
+			$Collection = $Blog = & $LinkOwner->get_Blog();
 			set_working_blog( $Blog->ID );
 		}
 		else
@@ -72,7 +72,7 @@ if( $action == 'edit_links' || $action == 'sort_links' )
 	$LinkOwner = get_link_owner( $link_type, $object_ID );
 	if( empty( $Blog ) )
 	{ // Load the blog we're in:
-		$Blog = & $LinkOwner->get_Blog();
+		$Collection = $Blog = & $LinkOwner->get_Blog();
 		set_working_blog( $Blog->ID );
 	}
 }

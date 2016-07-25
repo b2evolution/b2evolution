@@ -270,7 +270,7 @@ class Skin extends DataObject
 		 * Blog currently displayed
 		 * @var Blog
 		 */
-		global $Blog;
+		global $Collection, $Blog;
 		global $admin_url, $rsc_url;
 		global $Timer, $Session;
 
@@ -727,7 +727,7 @@ class Skin extends DataObject
 		/**
 		 * @var Blog
 		 */
-		global $Blog;
+		global $Collection, $Blog;
 
 		// Name of the setting in the blog settings:
 		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
@@ -815,7 +815,7 @@ class Skin extends DataObject
 		/**
 		 * @var Blog
 		 */
-		global $Blog;
+		global $Collection, $Blog;
 
 		// Name of the setting in the blog settings:
 		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
@@ -832,7 +832,7 @@ class Skin extends DataObject
 		/**
 		 * @var Blog
 		 */
-		global $Blog;
+		global $Collection, $Blog;
 
 		$Blog->dbupdate();
 	}
@@ -980,7 +980,7 @@ class Skin extends DataObject
 				case 'disp_page':
 					// Specific features for disp=page:
 
-					global $Blog, $current_User;
+					global $Collection, $Blog, $current_User;
 
 					// Used to init functions for AJAX forms to add a comment:
 					init_ajax_forms( 'blog' );

@@ -569,7 +569,7 @@ class ComponentWidget extends DataObject
 	 */
 	function display( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 		global $Plugins;
 		global $rsc_url;
 
@@ -602,7 +602,7 @@ class ComponentWidget extends DataObject
 	 */
 	function display_with_cache( $params, $keys = array() )
 	{
-		global $Blog, $Timer, $debug, $admin_url, $Session;
+		global $Collection, $Blog, $Timer, $debug, $admin_url, $Session;
 
 		$this->init_display( $params );
 
@@ -693,7 +693,7 @@ class ComponentWidget extends DataObject
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $this->type == 'plugin' && $this->get_Plugin() )
 		{	// Get widget cache keys from plugin:
@@ -784,7 +784,7 @@ class ComponentWidget extends DataObject
 		/**
 		 * @var Blog
 		 */
-		global $Blog, $baseurl;
+		global $Collection, $Blog, $baseurl;
 
 		echo $this->disp_params['block_start'];
 

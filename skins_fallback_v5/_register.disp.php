@@ -16,7 +16,7 @@ load_class( 'regional/model/_country.class.php', 'Country' );
 
 global $Settings, $Plugins;
 
-global $Blog, $rsc_path, $rsc_url, $dummy_fields;
+global $Collection, $Blog, $rsc_path, $rsc_url, $dummy_fields;
 
 global $display_invitation;
 

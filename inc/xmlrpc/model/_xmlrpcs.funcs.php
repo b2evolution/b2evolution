@@ -98,7 +98,7 @@ function _wp_mw_newmediaobject($m)
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -607,7 +607,7 @@ function _b2_or_mt_get_categories( $type, $m )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -661,7 +661,7 @@ function _wp_mw_getcategories( $m, $params = array() )
 	/**
 	 * @var Blog
 	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	if( ! ( $Collection = $Blog = & xmlrpcs_get_Blog( $m, 0 ) ) )
 	{	// Not found the selected blog, return (last) error:
 		return xmlrpcs_resperror();
 	}
@@ -802,7 +802,7 @@ function & xmlrpcs_get_Blog( $m, $id_param )
 	/**
 	 * @var Blog
 	 */
-	$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 
 	if( empty( $Blog ) )
 	{	// Blog not found
@@ -1304,7 +1304,7 @@ function xmlrpcs_new_item( $params, & $Blog = NULL )
 		}
 
 		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $main_Chapter->blog_ID, false, false );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $main_Chapter->blog_ID, false, false );
 
 		logIO( 'Requested Blog: '.$Blog->ID.' - '.$Blog->name );
 	}
@@ -1470,7 +1470,7 @@ function xmlrpcs_edit_item( & $edited_Item, $params )
 			'locale'			=> '',
 		), $params );
 
-	$Blog = & $edited_Item->get_Blog();
+	$Collection = $Blog = & $edited_Item->get_Blog();
 	logIO( 'Requested Blog: '.$Blog->ID.' - '.$Blog->name );
 
 	if( empty($Blog) )

@@ -277,7 +277,7 @@ function get_allowed_statuses( $blog )
  */
 function echo_comment_buttons( $Form, $edited_Comment )
 {
-	global $Blog, $AdminUI;
+	global $Collection, $Blog, $AdminUI;
 
 	if( $edited_Comment->is_meta() )
 	{ // Meta comments don't have a status, Display only one button to update
@@ -355,7 +355,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
  */
 function echo_comment_status_buttons( $Form, $edited_Comment )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	$comment_Item = & $edited_Comment->get_Item();
 	// Comment status cannot be more than post status, restrict it:
@@ -798,7 +798,7 @@ function display_comment_replies( $comment_ID, $params = array(), $level = 1 )
  */
 function echo_comment_reply_js( $Item )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( !isset( $Blog ) )
 	{
@@ -862,7 +862,7 @@ function echo_comment_moderate_js()
 		return false;
 	}
 
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( empty( $Blog ) )
 	{

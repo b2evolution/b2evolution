@@ -54,7 +54,7 @@ else
 			/**
 			* @var Blog
 			*/
-			$Blog = & $BlogCache->get_by_ID( $blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 		}
 
 		/**
@@ -404,7 +404,7 @@ if( $action == 'dashboard' )
 	if( ! $current_User->check_perm( 'blog_ismember', 'view', false, $blog ) )
 	{ // We don't have permission for the requested blog (may happen if we come to admin from a link on a different blog)
 		set_working_blog( 0 );
-		unset( $Blog );
+		unset( $Blog, $Collection );
 	}
 
 	$AdminUI->set_path( 'collections', 'dashboard' );

@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 
 /**
  * Needed by functions
@@ -32,7 +32,7 @@ $debug = 0;
 
 if( empty( $Blog ) )
 {
-	$Blog = & $LinkOwner->get_Blog();
+	$Collection = $Blog = & $LinkOwner->get_Blog();
 }
 
 // Name of the iframe we want some actions to come back to:

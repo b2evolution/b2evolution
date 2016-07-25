@@ -24,7 +24,7 @@ global $edited_Item;
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var Plugins
  */

@@ -586,7 +586,7 @@ class collections_Module extends Module
 		global $topleft_Menu, $topright_Menu;
 		global $current_User;
 		global $home_url, $admin_url, $debug, $seo_page_type, $robots_index;
-		global $Blog, $blog;
+		global $Collection, $Blog, $blog;
 
 		global $Settings;
 
@@ -637,7 +637,7 @@ class collections_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		global $Settings;
 		/**
 		 * @var AdminUI_general
@@ -721,7 +721,7 @@ class collections_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		/**
 		 * @var AdminUI_general
 		 */
@@ -910,7 +910,7 @@ class collections_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		/**
 		 * @var AdminUI_general
 		 */
@@ -1039,7 +1039,7 @@ class collections_Module extends Module
 				$linked_File = & $edited_Link->get_File();
 
 				// Load the blog we're in:
-				$Blog = & $LinkOwner->get_Blog();
+				$Collection = $Blog = & $LinkOwner->get_Blog();
 				set_working_blog( $Blog->ID );
 
 				// Check permission:

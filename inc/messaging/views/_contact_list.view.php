@@ -226,7 +226,7 @@ if( $Settings->get('allow_avatars') )
 	 */
 	function user_avatar( $user_ID )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$UserCache = & get_UserCache();
 		$User = & $UserCache->get_by_ID( $user_ID, false, false );

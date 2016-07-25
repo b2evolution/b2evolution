@@ -459,7 +459,7 @@ if( ! empty( $login_error ) || ( $login_required && ! is_logged_in() ) )
 		if( empty( $Blog ) && init_requested_blog() )
 		{ // $blog is set, init $Blog also
 			$BlogCache = & get_BlogCache();
-			$Blog = $BlogCache->get_by_ID( $blog, false, false );
+			$Collection = $Blog = $BlogCache->get_by_ID( $blog, false, false );
 		}
 
 		$blog_skin_ID = NULL;

@@ -14,7 +14,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $Blog;
+global $Collection, $Blog;
 
 // Create query
 $SQL = new SQL();
@@ -85,7 +85,7 @@ $Results->cols[] = array(
 
 function ityp_row_enabled( $enabled, $item_type_ID )
 {
-	global $current_User, $admin_url, $Blog;
+	global $current_User, $admin_url, $Collection, $Blog;
 
 	$perm_edit = $current_User->check_perm( 'options', 'edit', false );
 
@@ -126,7 +126,7 @@ $Results->cols[] = array(
 
 function ityp_row_default( $item_type_ID )
 {
-	global $current_User, $admin_url, $Blog;
+	global $current_User, $admin_url, $Collection, $Blog;
 
 	if( $Blog->get_setting( 'default_post_type' ) == $item_type_ID )
 	{ // The item type is default for current collection:

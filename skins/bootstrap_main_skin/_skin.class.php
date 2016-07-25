@@ -483,7 +483,7 @@ jQuery( document ).ready( function()
 	 */
 	function is_visible_container( $container_key )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $Blog->has_access() )
 		{	// If current user has an access to this collection then don't restrict containers:

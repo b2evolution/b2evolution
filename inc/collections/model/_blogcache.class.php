@@ -123,7 +123,7 @@ class BlogCache extends DataObjectCache
 			return $r; // we return by reference!
 		}
 
-		$Blog = new Blog( $row );
+		$Collection = $Blog = new Blog( $row );
 		$this->add( $Blog );
 
 		return $Blog;
@@ -163,7 +163,7 @@ class BlogCache extends DataObjectCache
 			return $r;
 		}
 
-		$Blog = new Blog( $row );
+		$Collection = $Blog = new Blog( $row );
 		$this->add( $Blog );
 
 		return $Blog;

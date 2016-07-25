@@ -75,7 +75,7 @@ class FileRoot
 		global $current_User;
 		global $Messages;
 		global $Settings, $Debuglog;
-		global $Blog;
+		global $Collection, $Blog;
 
 		// Store type:
 		$this->type = $root_type;
@@ -99,7 +99,7 @@ class FileRoot
 
 			case 'collection':
 				$BlogCache = & get_BlogCache();
-				if( ! $Blog = & $BlogCache->get_by_ID( $root_in_type_ID, false, false ) )
+				if( ! ( $Collection = $Blog = & $BlogCache->get_by_ID( $root_in_type_ID, false, false ) ) )
 				{	// Blog not found
 					return false;
 				}

@@ -24,7 +24,7 @@ $Form->begin_form( 'fform', T_('WordPress XML Importer') );
 $Form->begin_fieldset( T_('Report of the import') );
 
 	$BlogCache = & get_BlogCache();
-	$Blog = & $BlogCache->get_by_ID( $wp_blog_ID );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $wp_blog_ID );
 	$Form->info( T_('Collection'), $Blog->get_name() );
 
 	// Import the data and display a report on the screen

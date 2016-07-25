@@ -18,7 +18,7 @@ if( empty( $Blog ) )
 	if( isset( $blog) && $blog > 0 )
 	{
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog, false, false );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog, false, false );
 	}
 }
 
@@ -72,7 +72,7 @@ switch( $action )
 		$edited_Item = & $ItemCache->get_by_ID ( $post_ID );
 
 		// Load the blog we're in:
-		$Blog = & $edited_Item->get_Blog();
+		$Collection = $Blog = & $edited_Item->get_Blog();
 		set_working_blog( $Blog->ID );
 
 		// Where are we going to redirect to?

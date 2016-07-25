@@ -30,7 +30,7 @@ $params = array_merge( array(
 
 
 $Comment = $params['Comment'];
-$Blog = $params['Blog'];
+$Collection = $Blog = $params['Blog'];
 $Item = $params['Item'];
 
 if( $params['notify_type'] == 'meta_comment' )

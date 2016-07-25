@@ -94,11 +94,11 @@ elseif( $antispam_on_message_form && ( $block = antispam_check( $message ) ) )
 $BlogCache = & get_BlogCache();
 if( !empty( $comment_id ) || !empty( $post_id ) )
 {
-	$Blog = & $BlogCache->get_by_ID( $blog );	// Required
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog );	// Required
 }
 else
 {
-	$Blog = & $BlogCache->get_by_ID( $blog, true, false );	// Optional
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog, true, false );	// Optional
 }
 
 $allow_msgform = '';

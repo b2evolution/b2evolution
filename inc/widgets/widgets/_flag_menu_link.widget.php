@@ -157,7 +157,7 @@ class flag_menu_link_Widget extends ComponentWidget
 
 		if( empty( $current_Blog ) )
 		{	// Blog is not defined in setting or it doesn't exist in DB:
-			global $Blog;
+			global $Collection, $Blog;
 			// Use current blog:
 			$current_Blog = & $Blog;
 		}
