@@ -64,10 +64,10 @@ class basic_antispam_plugin extends Plugin
 				'min_comment_interval' => array(
 					'type' => 'integer',
 					'label' => T_('Minimum comment interval'),
-					'note' => T_('Minimum interval (in seconds) between consecutive comments from same IP or email address.'),
+					'note' => T_('Minimum interval (in seconds) between consecutive comments from same IP or email address. 0 to disable it.'),
 					'defaultvalue' => '30',
 					'size' => 3,
-					'valid_range' => array( 'min' => 1 ),
+					'valid_range' => array( 'min' => 0 ),
 				),
 				'check_dupes' => array(
 					'type' => 'checkbox',
