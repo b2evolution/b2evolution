@@ -133,6 +133,16 @@ class msg_menu_link_Widget extends ComponentWidget
 					'size' => 5,
 					'defaultvalue' => '',
 				),
+				'visibility' => array(
+					'label' => T_( 'Visibility' ),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'always', T_( 'Always show') ),
+							array( 'access', T_( 'Only show if access is allowed' ) ) ),
+					'defaultvalue' => 'always',
+					'field_lines' => true,
+				),
 				'show_to' => array(
 					'label' => T_( 'Show to' ),
 					'note' => '',
@@ -216,6 +226,11 @@ class msg_menu_link_Widget extends ComponentWidget
 
 		if( empty( $current_Blog ) )
 		{ // Don't use this widget without current collection:
+			return false;
+		}
+
+		if( $this->disp_params['visibility'] == 'access' && ! $current_Blog->has_access() )
+		{	// Don't use this widget because current user has no access to the collection:
 			return false;
 		}
 

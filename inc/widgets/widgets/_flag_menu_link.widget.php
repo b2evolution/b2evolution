@@ -97,6 +97,16 @@ class flag_menu_link_Widget extends ComponentWidget
 					'size' => 5,
 					'defaultvalue' => '',
 				),
+				'visibility' => array(
+					'label' => T_( 'Visibility' ),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'always', T_( 'Always show') ),
+							array( 'access', T_( 'Only show if access is allowed' ) ) ),
+					'defaultvalue' => 'always',
+					'field_lines' => true,
+				),
 				'show_badge' => array(
 					'label' => T_( 'Show Badge' ),
 					'note' => T_('Show a badge with the count of flagged items.'),
@@ -146,6 +156,11 @@ class flag_menu_link_Widget extends ComponentWidget
 		global $current_User;
 		global $disp;
 
+		if( ! is_logged_in() )
+		{	// Only logged in user can flag items:
+			return false;
+		}
+
 		$this->init_display( $params );
 
 		$blog_ID = intval( $this->disp_params['blog_ID'] );
@@ -167,8 +182,8 @@ class flag_menu_link_Widget extends ComponentWidget
 			return false;
 		}
 
-		if( ! is_logged_in() )
-		{	// Only logged in user can flag items:
+		if( $this->disp_params['visibility'] == 'access' && ! $current_Blog->has_access() )
+		{	// Don't use this widget because current user has no access to the collection:
 			return false;
 		}
 

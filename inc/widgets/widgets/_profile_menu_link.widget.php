@@ -98,6 +98,16 @@ class profile_menu_link_Widget extends ComponentWidget
 					'size' => 5,
 					'defaultvalue' => '',
 				),
+				'visibility' => array(
+					'label' => T_( 'Visibility' ),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'always', T_( 'Always show') ),
+							array( 'access', T_( 'Only show if access is allowed' ) ) ),
+					'defaultvalue' => 'always',
+					'field_lines' => true,
+				),
 			), parent::get_param_definitions( $params ) );
 
 		if( isset( $r['allow_blockcache'] ) )
@@ -140,6 +150,11 @@ class profile_menu_link_Widget extends ComponentWidget
 		}
 
 		$this->init_display( $params );
+
+		if( $this->disp_params['visibility'] == 'access' && ! $current_Blog->has_access() )
+		{	// Don't use this widget because current user has no access to the collection:
+			return false;
+		}
 
 		// Default link class
 		$link_class = $this->disp_params['link_default_class'];
