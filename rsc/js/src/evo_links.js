@@ -150,6 +150,10 @@ function evo_link_delete( event_object, type, link_ID, action )
 				var regexp = new RegExp( '\\\[(image|file|inline|video|audio):' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
 				textarea_str_replace( b2evoCanvas, regexp, '', window.document );
 			}
+
+			// Fire file attached event for editor plugin
+			var event = new Event( 'b2evoAttachmentsChanged' );
+			document.dispatchEvent( event );
 		}
 
 		// Remove attachment row from table:

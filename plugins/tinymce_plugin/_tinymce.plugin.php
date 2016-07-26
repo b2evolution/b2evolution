@@ -353,12 +353,13 @@ class tinymce_plugin extends Plugin
 				{
 					tinymce_plugin_init_done = true;
 					// call this method on init again, with "null" id, so that mceAddControl gets called.
-					tinymce_plugin_init_tinymce( function() {tinymce_plugin_toggleEditor(null)} );
+					tinymce_plugin_init_tinymce( function() { tinymce_plugin_toggleEditor(null) } );
 					return;
 				}
 
 				if( ! tinymce.get( id ) )
 				{ // Turn on WYSIWYG editor
+					tinymce.init( tmce_init );
 					tinymce.execCommand( 'mceAddEditor', false, id );
 					jQuery.get( '<?php echo $this->get_htsrv_url( 'save_editor_state', array_merge( $state_params, array( 'on' => 1 ) ), '&' ); ?>' );
 					jQuery( '#tinymce_plugin_toggle_button_wysiwyg' ).addClass( 'active' );
@@ -378,6 +379,7 @@ class tinymce_plugin extends Plugin
 				}
 				else
 				{ // Hide the editor, Display only source HTML
+					tinymce.activeEditor.save();
 					tinymce.execCommand( 'mceRemoveEditor', false, id );
 					jQuery.get( '<?php echo $this->get_htsrv_url( 'save_editor_state', array_merge( $state_params, array( 'on' => 0 ) ), '&' ); ?>' );
 					jQuery( '#tinymce_plugin_toggle_button_html' ).addClass( 'active' );
@@ -808,7 +810,9 @@ class tinymce_plugin extends Plugin
 				$item_css_url = $skins_url.$Skin->folder.'/item.css';
 				// else: $item_css_url = $rsc_url.'css/item_base.css';
 				$content_css .= ','.$item_css_url;		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
-				//$content_css .= ',http://b2evolution.lan/rsc/build/bootstrap-b2evo_base.bundle.css?v=6.8.0-alpha-2016-07-13';
+
+				// Load b2evo base css
+				$content_css .= ',http://b2evolution.lan/rsc/build/bootstrap-b2evo_base.bundle.css?v=6.8.0-alpha-2016-07-13';
 			}
 			// else item_default.css -- is it still possible to have no skin ?
 		}

@@ -2472,6 +2472,10 @@ function display_dragdrop_upload_button( $params = array() )
 					update_iframe_height();
 					jQuery( 'img' ).on( 'load', function() { update_iframe_height(); } );
 					<?php } ?>
+
+					// Fire file attached event for editor plugin
+					var event = new Event( 'b2evoAttachmentsChanged' );
+					document.dispatchEvent( event );
 				},
 				template: '<?php echo str_replace( '#button_text#', "' + button_text + '", $params['template_button'] ); ?>',
 				fileTemplate: '<?php echo $params['template_filerow']; ?>',
