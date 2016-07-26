@@ -647,7 +647,7 @@ var downloadInterval = setInterval( function()
 					// Set global variable to auto define the FB autocomplete plugin field
 					$recipients_selected = array( array(
 							'id'    => $recipient_User->ID,
-							'title' => $recipient_User->login,
+							'login' => $recipient_User->login,
 						) );
 
 					init_tokeninput_js( 'blog' );
