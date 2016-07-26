@@ -7656,6 +7656,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11830, 'Update table post types...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'UPDATE T_items__type
+			  SET ityp_allow_disabling_comments = 1
+			WHERE ityp_usage LIKE "intro%"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

@@ -274,6 +274,7 @@ function create_default_data()
 			'allow_breaks'   => 0,
 			'allow_featured' => 0,
 			'perm_level'     => 'restricted',
+			'allow_disabling_comments' => 1,
 		);
 	$post_types[] = array(
 			'name'           => 'Intro-Main',
@@ -282,6 +283,7 @@ function create_default_data()
 			'allow_breaks'   => 0,
 			'allow_featured' => 0,
 			'perm_level'     => 'restricted',
+			'allow_disabling_comments' => 1,
 		);
 	$post_types[] = array(
 			'name'           => 'Intro-Cat',
@@ -290,6 +292,7 @@ function create_default_data()
 			'allow_breaks'   => 0,
 			'allow_featured' => 0,
 			'perm_level'     => 'restricted',
+			'allow_disabling_comments' => 1,
 		);
 	$post_types[] = array(
 			'name'           => 'Intro-Tag',
@@ -298,6 +301,7 @@ function create_default_data()
 			'allow_breaks'   => 0,
 			'allow_featured' => 0,
 			'perm_level'     => 'restricted',
+			'allow_disabling_comments' => 1,
 		);
 	$post_types[] = array(
 			'name'           => 'Intro-Sub',
@@ -306,6 +310,7 @@ function create_default_data()
 			'allow_breaks'   => 0,
 			'allow_featured' => 0,
 			'perm_level'     => 'restricted',
+			'allow_disabling_comments' => 1,
 		);
 	$post_types[] = array(
 			'name'           => 'Intro-All',
@@ -314,6 +319,7 @@ function create_default_data()
 			'allow_breaks'   => 0,
 			'allow_featured' => 0,
 			'perm_level'     => 'restricted',
+			'allow_disabling_comments' => 1,
 		);
 	$post_types[] = array(
 			'name'           => 'Sidebar link',
@@ -350,27 +356,28 @@ function create_default_data()
 		);
 	// Default settings:
 	$post_type_default_settings = array(
-			'name'                   => '',
-			'description'            => NULL,
-			'usage'                  => 'post',
-			'template_name'          => 'single',
-			'perm_level'             => 'standard',
-			'allow_html'             => 1,
-			'allow_breaks'           => 1,
-			'allow_featured'         => 1,
-			'use_text'               => 'optional',
-			'use_tags'               => 'optional',
-			'use_excerpt'            => 'optional',
-			'use_url'                => 'optional',
-			'podcast'                => 0,
-			'use_parent'             => 'never',
-			'use_title_tag'          => 'optional',
-			'use_meta_desc'          => 'optional',
-			'use_meta_keywds'        => 'optional',
-			'use_comments'           => 1,
-			'allow_closing_comments' => 1,
-			'use_comment_expiration' => 'optional',
-			'use_custom_fields'      => 1,
+			'name'                     => '',
+			'description'              => NULL,
+			'usage'                    => 'post',
+			'template_name'            => 'single',
+			'perm_level'               => 'standard',
+			'allow_html'               => 1,
+			'allow_breaks'             => 1,
+			'allow_featured'           => 1,
+			'use_text'                 => 'optional',
+			'use_tags'                 => 'optional',
+			'use_excerpt'              => 'optional',
+			'use_url'                  => 'optional',
+			'podcast'                  => 0,
+			'use_parent'               => 'never',
+			'use_title_tag'            => 'optional',
+			'use_meta_desc'            => 'optional',
+			'use_meta_keywds'          => 'optional',
+			'use_comments'             => 1,
+			'allow_closing_comments'   => 1,
+			'allow_disabling_comments' => 0,
+			'use_comment_expiration'   => 'optional',
+			'use_custom_fields'        => 1,
 		);
 	$post_types_sql = 'INSERT INTO T_items__type ( ityp_'.implode( ', ityp_', array_keys( $post_type_default_settings ) ).' ) VALUES ';
 	foreach( $post_types as $p => $post_type )
