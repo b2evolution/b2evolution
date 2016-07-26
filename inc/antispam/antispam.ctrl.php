@@ -234,6 +234,9 @@ switch( $action )
 		param_integer_range( 'antispam_threshold_delete', -100, 100, T_('The threshold must be between -100 and 100.') );
 		$Settings->set( 'antispam_threshold_delete', $antispam_threshold_delete );
 
+		param( 'antispam_block_contact_form', 'integer', 0 );
+		$Settings->set( 'antispam_block_contact_form', $antispam_block_contact_form );
+
 		param( 'antispam_block_spam_referers', 'integer', 0 );
 		$Settings->set( 'antispam_block_spam_referers', $antispam_block_spam_referers );
 

@@ -157,16 +157,6 @@ $home_url = $baseurl;
 
 
 /**
- * Check antispam blacklist for private messages.
- *
- * Do you want to check the antispam blacklist when a message form is submitted?
- *
- * @global boolean $antispam_on_message_form
- */
-$antispam_on_message_form = 1;
-
-
-/**
  * By default images get copied into b2evo cache without resampling if they are smaller
  * than requested thumbnails.
  *
