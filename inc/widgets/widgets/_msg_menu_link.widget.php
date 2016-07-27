@@ -138,8 +138,8 @@ class msg_menu_link_Widget extends ComponentWidget
 					'note' => '',
 					'type' => 'radio',
 					'options' => array(
-							array( 'always', T_( 'Always show') ),
-							array( 'access', T_( 'Only show if access is allowed' ) ) ),
+							array( 'always', T_( 'Always show (cacheable)') ),
+							array( 'access', T_( 'Only show if access is allowed (not cacheable)' ) ) ),
 					'defaultvalue' => 'always',
 					'field_lines' => true,
 				),
