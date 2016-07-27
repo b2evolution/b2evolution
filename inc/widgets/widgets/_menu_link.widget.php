@@ -131,7 +131,12 @@ class menu_link_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $menu_link_widget_link_types;
+		global $menu_link_widget_link_types, $admin_url;
+
+		// Check if field "Collection ID" is disabled because of link type and site uses only one fixed collection for profile pages:
+		$coll_id_is_disabled = ( empty( $params['infinite_loop'] )
+			&& in_array( $this->get_param( 'link_type', true ), array( 'ownercontact', 'owneruserinfo', 'myprofile', 'profile', 'avatar' ) )
+			&& $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) );
 
 		$r = array_merge( array(
 				'link_type' => array(
@@ -150,11 +155,15 @@ class menu_link_Widget extends ComponentWidget
 				),
 				'blog_ID' => array(
 					'label' => T_('Collection ID'),
-					'note' => T_( 'Leave empty for current collection.' ),
+					'note' => T_( 'Leave empty for current collection.' )
+						.( $coll_id_is_disabled ? ' <span class="red">'.sprintf( T_('The site is <a %s>configured</a> to always use collection %s for profiles/messaging functions.'),
+								'href="'.$admin_url.'?ctrl=collections&amp;tab=site_settings"',
+								'<b>'.$msg_Blog->get( 'name' ).'</b>' ).'</span>' : '' ),
 					'type' => 'integer',
 					'allow_empty' => true,
 					'size' => 5,
 					'defaultvalue' => '',
+					'disabled' => $coll_id_is_disabled ? 'disabled' : false,
 				),
 				// fp> TODO: ideally we would have a link icon to go click on the destination...
 				'item_ID' => array(

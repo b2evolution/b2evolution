@@ -95,7 +95,10 @@ class msg_menu_link_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $msg_menu_link_widget_link_types;
+		global $msg_menu_link_widget_link_types, $admin_url;
+
+		// Try to get collection that is used for messages on this site:
+		$msg_Blog = & get_setting_Blog( 'msg_blog_ID' );
 
 		$r = array_merge( array(
 				'link_type' => array(
@@ -127,11 +130,15 @@ class msg_menu_link_Widget extends ComponentWidget
 				),
 				'blog_ID' => array(
 					'label' => T_('Collection ID'),
-					'note' => T_('Leave empty for current collection.'),
+					'note' => T_('Leave empty for current collection.')
+						.( $msg_Blog ? ' <span class="red">'.sprintf( T_('The site is <a %s>configured</a> to always use collection %s for profiles/messaging functions.'),
+								'href="'.$admin_url.'?ctrl=collections&amp;tab=site_settings"',
+								'<b>'.$msg_Blog->get( 'name' ).'</b>' ).'</span>' : '' ),
 					'type' => 'integer',
 					'allow_empty' => true,
 					'size' => 5,
 					'defaultvalue' => '',
+					'disabled' => $msg_Blog ? 'disabled' : false,
 				),
 				'show_to' => array(
 					'label' => T_( 'Show to' ),
