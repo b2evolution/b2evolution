@@ -264,8 +264,8 @@ function validateCommentForm(form)
 
 	// Display a message before comment form:
 	$Item->display_comment_form_msg( array(
-			'before' => '<tr><td colspan="2"><div class="warning">',
-			'after'  => '</div></td></tr>',
+			'before' => '<tr><td colspan="2"><div class="warning"><div class="action_messages">',
+			'after'  => '</div></div></td></tr>',
 		) );
 
 	// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.
