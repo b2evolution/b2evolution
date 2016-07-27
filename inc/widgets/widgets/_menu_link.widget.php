@@ -241,6 +241,9 @@ class menu_link_Widget extends ComponentWidget
 			return false;
 		}
 
+		// Allow to higlight current menu item only when it is enabled by widget setting and it is linked to current collection:
+		$highlight_current = ( $this->disp_params['highlight_current'] == 'yes' && $current_Blog->ID == $Blog->ID );
+
 		switch( $this->disp_params['link_type'] )
 		{
 			case 'recentposts':
@@ -263,74 +266,57 @@ class menu_link_Widget extends ComponentWidget
 				}
 
 				$text = T_('Recently');
-				if( $disp == 'posts' && $this->disp_params['highlight_current'] == 'yes' )
-				{	// Let's display the link as selected
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				// Check if current menu item must be highlighted:
+				$highlight_current = ( $highlight_current && $disp == 'posts' );
 				break;
 
 			case 'search':
 				$url = $current_Blog->get( 'searchurl' );
 				$text = T_('Search');
-				// Is this the current display?
-				if( $disp == 'search' && $this->disp_params['highlight_current'] == 'yes' )
-				{	// Let's display the link as selected
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				// Check if current menu item must be highlighted:
+				$highlight_current = ( $highlight_current && $disp == 'search' );
 				break;
 
 			case 'arcdir':
 				$url = $current_Blog->get( 'arcdirurl' );
 				$text = T_('Archives');
-				if( $disp == 'arcdir' && $this->disp_params['highlight_current'] == 'yes' )
-				{	// Let's display the link as selected
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				// Check if current menu item must be highlighted:
+				$highlight_current = ( $highlight_current && $disp == 'arcdir' );
 				break;
 
 			case 'catdir':
 				$url = $current_Blog->get( 'catdirurl' );
 				$text = T_('Categories');
-				if( $disp == 'catdir' && $this->disp_params['highlight_current'] == 'yes' )
-				{	// Let's display the link as selected
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				// Check if current menu item must be highlighted:
+				$highlight_current = ( $highlight_current && $disp == 'catdir' );
 				break;
 
 			case 'tags':
 				$url = $current_Blog->get( 'tagsurl' );
 				$text = T_('Tags');
-				if( $disp == 'tags' && $this->disp_params['highlight_current'] == 'yes' )
-				{	// Let's display the link as selected:
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				// Check if current menu item must be highlighted:
+				$highlight_current = ( $highlight_current && $disp == 'tags' );
 				break;
 
 			case 'postidx':
 				$url = $current_Blog->get( 'postidxurl' );
 				$text = T_('Post index');
-				if( $disp == 'postidx' && $this->disp_params['highlight_current'] == 'yes' )
-				{	// Let's display the link as selected
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				// Check if current menu item must be highlighted:
+				$highlight_current = ( $highlight_current && $disp == 'postidx' );
 				break;
 
 			case 'mediaidx':
 				$url = $current_Blog->get( 'mediaidxurl' );
 				$text = T_('Photo index');
-				if( $disp == 'mediaidx' && $this->disp_params['highlight_current'] == 'yes' )
-				{	// Let's display the link as selected
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				// Check if current menu item must be highlighted:
+				$highlight_current = ( $highlight_current && $disp == 'mediaidx' );
 				break;
 
 			case 'sitemap':
 				$url = $current_Blog->get( 'sitemapurl' );
 				$text = T_('Site map');
-				if( $disp == 'sitemap' && $this->disp_params['highlight_current'] == 'yes' )
-				{	// Let's display the link as selected
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				// Check if current menu item must be highlighted:
+				$highlight_current = ( $highlight_current && $disp == 'sitemap' );
 				break;
 
 			case 'latestcomments':
@@ -340,22 +326,16 @@ class menu_link_Widget extends ComponentWidget
 				}
 				$url = $current_Blog->get( 'lastcommentsurl' );
 				$text = T_('Latest comments');
-				if( $disp == 'comments' && $this->disp_params['highlight_current'] == 'yes' )
-				{	// Let's display the link as selected
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				// Check if current menu item must be highlighted:
+				$highlight_current = ( $highlight_current && $disp == 'comments' );
 				break;
 
 			case 'owneruserinfo':
+				global $User;
 				$url = url_add_param( $current_Blog->get( 'userurl' ), 'user_ID='.$current_Blog->owner_user_ID );
 				$text = T_('Owner details');
-				// Is this the current display?
-				global $User;
-				if( $disp == 'user' && $this->disp_params['highlight_current'] == 'yes' &&
-				    ! empty( $User ) && $User->ID == $current_Blog->owner_user_ID )
-				{	// Let's display the link as selected
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				// Check if current menu item must be highlighted:
+				$highlight_current = ( $highlight_current && $disp == 'user' && ! empty( $User ) && $User->ID == $current_Blog->owner_user_ID );
 				break;
 
 			case 'ownercontact':
@@ -364,14 +344,10 @@ class menu_link_Widget extends ComponentWidget
 					return;
 				}
 				$text = T_('Contact');
-				// Is this the current display?
-				if( ( $disp == 'msgform' || ( isset( $_GET['disp'] ) && $_GET['disp'] == 'msgform' ) ) &&
-				    $this->disp_params['highlight_current'] == 'yes' )
-				{ // Let's display the link as selected
-					// fp> I think it's interesting to select this link , even if the recipient ID is different from the owner
-					// odds are there is no other link to highlight in this case
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				// Check if current menu item must be highlighted:
+				// fp> I think it's interesting to select this link , even if the recipient ID is different from the owner
+				// odds are there is no other link to highlight in this case
+				$highlight_current = ( $highlight_current && ( $disp == 'msgform' || ( isset( $_GET['disp'] ) && $_GET['disp'] == 'msgform' ) ) );
 				break;
 
 			case 'login':
@@ -388,11 +364,8 @@ class menu_link_Widget extends ComponentWidget
 					$this->BlockCache->abort_collect();
 				}
 				$text = T_('Log in');
-				// Is this the current display?
-				if( $disp == 'login' && $this->disp_params['highlight_current'] == 'yes' )
-				{ // Let's display the link as selected
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				// Check if current menu item must be highlighted:
+				$highlight_current = ( $highlight_current && $disp == 'login' );
 				break;
 
 			case 'logout':
@@ -402,6 +375,8 @@ class menu_link_Widget extends ComponentWidget
 				}
 				$url = get_user_logout_url( $current_Blog->ID );
 				$text = T_('Log out');
+				// This is never highlighted:
+				$highlight_current = false;
 				break;
 
 			case 'register':
@@ -417,52 +392,41 @@ class menu_link_Widget extends ComponentWidget
 					$this->BlockCache->abort_collect();
 				}
 				$text = T_('Register');
-				// Is this the current display?
-				if( $disp == 'register' && $this->disp_params['highlight_current'] == 'yes' )
-				{	// Let's display the link as selected
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				// Check if current menu item must be highlighted:
+				$highlight_current = ( $highlight_current && $disp == 'register' );
 				break;
 
 			case 'profile':
 				if( ! is_logged_in() ) return false;
 				$url = get_user_profile_url( $current_Blog->ID );
 				$text = T_('Edit profile');
-				// Is this the current display?  (Edit my Profile)
-				if( in_array( $disp, array( 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs' ) ) &&
-				    $this->disp_params['highlight_current'] == 'yes' )
-				{	// Let's display the link as selected
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				// Check if current menu item must be highlighted:
+				$highlight_current = ( $highlight_current && in_array( $disp, array( 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs' ) ) );
 				break;
 
 			case 'avatar':
 				if( ! is_logged_in() ) return false;
 				$url = get_user_avatar_url( $current_Blog->ID );
 				$text = T_('Profile picture');
-				// Note: we never highlight this, it will always highlight 'profile' instead
+				// Note: we never highlight this, it will always highlight 'profile' instead:
+				$highlight_current = false;
 				break;
 
 			case 'users':
-				global $Settings;
+				global $Settings, $user_ID;
 				if( ! is_logged_in() && ! $Settings->get( 'allow_anonymous_user_list' ) )
 				{	// Don't allow anonymous users to see users list
 					return false;
 				}
 				$url = $current_Blog->get( 'usersurl' );
 				$text = T_('User directory');
-				// Is this the current display?
+				// Check if current menu item must be highlighted:
 				// Note: If $user_ID is not set, it means we are viewing "My Profile" instead
-				global $user_ID;
-				if( ( $disp == 'users' || ( $disp == 'user' && ! empty( $user_ID ) ) ) &&
-				    $this->disp_params['highlight_current'] == 'yes' )
-				{	// Let's display the link as selected
-					// Note: we also highlight this for any user profile that is displayed
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				$highlight_current = ( $highlight_current && ( $disp == 'users' || ( $disp == 'user' && ! empty( $user_ID ) ) ) );
 				break;
 
 			case 'item':
+				global $Item;
 				$ItemCache = & get_ItemCache();
 				/**
 				* @var Item
@@ -475,13 +439,8 @@ class menu_link_Widget extends ComponentWidget
 				}
 				$url = $disp_Item->get_permanent_url();
 				$text = $disp_Item->title;
-				// Is this the current item?
-				global $Item;
-				if( $this->disp_params['highlight_current'] == 'yes' && ! empty( $Item ) && $disp_Item->ID == $Item->ID )
-				{ // The current page is currently displaying the Item this link is pointing to
-					// Let's display it as selected
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				// Check if current menu item must be highlighted:
+				$highlight_current = ( $highlight_current && ! empty( $Item ) && $disp_Item->ID == $Item->ID );
 				break;
 
 			case 'url':
@@ -492,6 +451,7 @@ class menu_link_Widget extends ComponentWidget
 				$url = $this->disp_params['link_href'];
 				$text = '[URL]';	// should normally be overriden below...
 				// Note: we never highlight this link
+				$highlight_current = false;
 				break;
 
 			case 'postnew':
@@ -501,28 +461,22 @@ class menu_link_Widget extends ComponentWidget
 				}
 				$url = url_add_param( $current_Blog->get( 'url' ), 'disp=edit' );
 				$text = T_('Write a new post');
-				// Is this the current display?
-				if( $disp == 'edit' && $this->disp_params['highlight_current'] == 'yes' )
-				{	// Let's display the link as selected
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				// Check if current menu item must be highlighted:
+				$highlight_current = ( $highlight_current && $disp == 'edit' );
 				break;
 
 			case 'myprofile':
+				global $user_ID;
 				if( ! is_logged_in() )
 				{	// Don't show this link for not logged in users
 					return false;
 				}
 				$url = $current_Blog->get( 'userurl' );
 				$text = T_('My profile');
-				// Is this the current display?  (Edit my Profile)
-				global $user_ID, $current_User;
+				// Check if current menu item must be highlighted:
 				// If $user_ID is not set, it means we will fall back to the current user, so it's ok
 				// If $user_ID is set, it means we are browsing the directory instead
-				if( $disp == 'user' && empty( $user_ID ) && $this->disp_params['highlight_current'] == 'yes' )
-				{	// Let's display the link as selected
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				$highlight_current = ( $highlight_current && $disp == 'user' && empty( $user_ID ) );
 				break;
 
 			case 'admin':
@@ -534,17 +488,17 @@ class menu_link_Widget extends ComponentWidget
 				global $admin_url;
 				$url = $admin_url;
 				$text = T_('Admin').' &raquo;';
+				// This is never highlighted:
+				$highlight_current = false;
 				break;
 
 			case 'home':
 			default:
+				global $is_front;
 				$url = $current_Blog->get( 'url' );
 				$text = T_('Front Page');
-				global $is_front;
-				if( ( $disp == 'front' || ! empty( $is_front ) ) && $this->disp_params['highlight_current'] == 'yes' )
-				{ // Let's display the link as selected on front page
-					$link_class = $this->disp_params['link_selected_class'];
-				}
+				// Check if current menu item must be highlighted:
+				$highlight_current = ( $highlight_current && ( $disp == 'front' || ! empty( $is_front ) ) );
 		}
 
 		// Override default link text?
@@ -557,21 +511,22 @@ class menu_link_Widget extends ComponentWidget
 		echo $this->disp_params['block_body_start'];
 		echo $this->disp_params['list_start'];
 
-		if( $link_class == $this->disp_params['link_selected_class'] )
-		{
+		if( $highlight_current )
+		{	// Use template and class to highlight current menu item:
+			$link_class = $this->disp_params['link_selected_class'];
 			echo $this->disp_params['item_selected_start'];
 		}
 		else
-		{
+		{	// Use normal template:
 			echo $this->disp_params['item_start'];
 		}
 		echo '<a href="'.$url.'" class="'.$link_class.'">'.$text.'</a>';
-		if( $link_class == $this->disp_params['link_selected_class'] )
-		{
+		if( $highlight_current )
+		{	// Use template to highlight current menu item:
 			echo $this->disp_params['item_selected_end'];
 		}
 		else
-		{
+		{	// Use normal template:
 			echo $this->disp_params['item_end'];
 		}
 
