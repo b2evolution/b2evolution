@@ -732,6 +732,14 @@ $Form->begin_form( '', '', $params );
 		<?php
 		}
 
+		if( $edited_Item->get_type_setting( 'allow_comment_form_msg' ) )
+		{	// If custom message is allowed before comment form:
+			$Form->switch_layout( 'none' );
+			$Form->textarea_input( 'comment_form_msg', $edited_Item->get_setting( 'comment_form_msg' ), 3, T_('Message before comment form') );
+			echo '<br />';
+			$Form->switch_layout( NULL );
+		}
+
 		if( $edited_Item->get_type_setting( 'use_comment_expiration' ) != 'never' )
 		{ // Display comment expiration
 			$Form->switch_layout( 'table' );

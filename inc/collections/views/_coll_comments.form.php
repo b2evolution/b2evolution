@@ -103,6 +103,8 @@ $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedbac
 
 	echo '<div class="feedback_details_container">';
 
+	$Form->textarea_input( 'comment_form_msg', $edited_Blog->get_setting( 'comment_form_msg' ), 3, T_('Message before comment form') );
+
 	$Form->checklist( array(
 			array( 'require_anon_name', 1, T_('Require a name'), $edited_Blog->get_setting( 'require_anon_name' ) ),
 			array( 'require_anon_email', 1, T_('Require an email'), $edited_Blog->get_setting( 'require_anon_email' ) ),

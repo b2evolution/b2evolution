@@ -250,6 +250,9 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	echo $params['form_title_text'];
 	echo $params['form_title_end'];
 
+	// Display a message before comment form:
+	$Item->display_comment_form_msg();
+
 /*
 	echo '<script type="text/javascript">
 /* <![CDATA[ *

@@ -7664,6 +7664,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11835, 'Upgrade table post types...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_items__type
+			ADD ityp_comment_form_msg       TEXT NULL DEFAULT NULL AFTER ityp_use_comments,
+			ADD ityp_allow_comment_form_msg TINYINT DEFAULT 0      AFTER ityp_comment_form_msg' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

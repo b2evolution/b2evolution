@@ -951,6 +951,7 @@ class Blog extends DataObject
 			{ // Only admin can set this setting to 'Public'
 				$this->set_setting( 'new_feedback_status', $new_feedback_status );
 			}
+			$this->set_setting( 'comment_form_msg', param( 'comment_form_msg', 'text' ) );
 			$this->set_setting( 'require_anon_name', param( 'require_anon_name', 'string', '0' ) );
 			$this->set_setting( 'require_anon_email', param( 'require_anon_email', 'string', '0' ) );
 			$this->set_setting( 'allow_anon_url', param( 'allow_anon_url', 'string', '0' ) );

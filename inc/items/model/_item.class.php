@@ -866,6 +866,13 @@ class Item extends ItemLight
 			}
 		}
 
+		// MESSAGE BEFORE COMMENT FORM:
+		if( $this->get_type_setting( 'allow_comment_form_msg' ) )
+		{	// Save a mesage before comment form only if it is allowed by item type:
+			$comment_form_msg = param( 'comment_form_msg', 'text', NULL );
+			$this->set_setting( 'comment_form_msg', $comment_form_msg, true );
+		}
+
 		// EXPIRY DELAY:
 		$expiry_delay = param_duration( 'expiry_delay' );
 		if( empty( $expiry_delay ) )
@@ -9170,6 +9177,66 @@ class Item extends ItemLight
 		}
 
 		return $summary.$params['after_result'].' ';
+	}
+
+
+	/**
+	 * Get a message to display before comment form
+	 *
+	 * @return string
+	 */
+	function get_comment_form_msg()
+	{
+		if( $this->get_type_setting( 'allow_comment_form_msg' ) )
+		{	// If custom message is allowed by Item Type:
+			$item_msg = trim( $this->get_setting( 'comment_form_msg' ) );
+			if( ! empty( $item_msg ) )
+			{	// Use custom message of this item:
+				return $item_msg;
+			}
+		}
+
+		// Try to use a message from Collection setting:
+		$item_Blog = & $this->get_Blog();
+		$collection_msg = trim( $item_Blog->get_setting( 'comment_form_msg' ) );
+		if( ! empty( $collection_msg ) )
+		{	// Use a message of the item type:
+			return $collection_msg;
+		}
+
+		// Try to use a message from Item Type setting:
+		$item_type_msg = trim( $this->get_type_setting( 'comment_form_msg' ) );
+		if( ! empty( $item_type_msg ) )
+		{	// Use a message of the item type:
+			return $item_type_msg;
+		}
+	}
+
+
+	/**
+	 * Display a message before comment form
+	 *
+	 * @param array Params
+	 */
+	function display_comment_form_msg( $params = array() )
+	{
+		$params = array_merge( array(
+				'before' => '<div class="alert alert-warning">',
+				'after'  => '</div>',
+			), $params );
+
+		// Get a message:
+		$comment_form_msg = $this->get_comment_form_msg();
+
+		if( empty( $comment_form_msg ) )
+		{	// No message to display before comment form, Exit here:
+			return;
+		}
+
+		// Display a message:
+		echo $params['before'];
+		echo nl2br( $comment_form_msg );
+		echo $params['after'];
 	}
 }
 ?>
