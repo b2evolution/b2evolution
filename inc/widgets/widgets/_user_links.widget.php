@@ -193,15 +193,18 @@ class user_links_Widget extends ComponentWidget
 		$widget_User = NULL;
 
 		if( empty( $this->disp_params['login'] ) )
-		{ // No defined user in widget settings
-			// Note: There is no 'in-item' context in i7
-			if( ! empty( $Blog ) )
-			{ // Use an owner of the current $Blog
+		{	// No defined user in widget settings:
+			if( $this->disp_params['widget_context'] == 'item' && ! empty( $Item ) )
+			{	// Use an author of the current $Item (Only if we are in the context of displaying an Item, not if $Item is set from before):
+				$widget_User = & $Item->get_creator_User();
+			}
+			elseif( ! empty( $Blog ) )
+			{	// Use an owner of the current $Blog:
 				$widget_User = & $Blog->get_owner_User();
 			}
 		}
 		else
-		{ // Try to get user by login from DB
+		{	// Try to get user by login from DB:
 			$UserCache = & get_UserCache();
 			$widget_User = & $UserCache->get_by_login( $this->disp_params['login'] );
 		}

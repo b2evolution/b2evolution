@@ -454,6 +454,7 @@ class ComponentWidget extends DataObject
 		// Merge basic defaults < widget defaults < container params < DB params
 		// note: when called with skin_widget it falls back to basic defaults < widget defaults < calltime params < array()
 		$params = array_merge( array(
+					'widget_context' => 'general',		// general | item
 					'block_start' => '<div class="evo_widget widget $wi_class$">',
 					'block_end' => '</div>',
 					'block_display_title' => true,
