@@ -86,6 +86,11 @@ class ComponentWidget extends DataObject
 	var $Blog = NULL;
 
 	/**
+	* @var target User that should be used depending on context
+	*/
+	var $target_User = NULL;
+
+	/**
 	 * Constructor
 	 *
 	 * @param object data row from db
@@ -505,7 +510,7 @@ class ComponentWidget extends DataObject
 		// Merge basic defaults < widget defaults < container params < DB params
 		// note: when called with skin_widget it falls back to basic defaults < widget defaults < calltime params < array()
 		$params = array_merge( array(
-					'widget_context' => 'general',		// general | item
+					'widget_context' => 'general',		// general | item | user
 					'block_start' => '<div class="evo_widget widget $wi_class$">',
 					'block_end' => '</div>',
 					'block_display_title' => true,
@@ -1171,6 +1176,46 @@ class ComponentWidget extends DataObject
 					return $this->disp_params[$disp_param_prefix.'item_end'];
 				}
 		}
+	}
+
+
+	/**
+	 * Get User that should be used for this widget currently depending on context
+	 *
+	 * @return object User
+	 */
+	function & get_target_User()
+	{
+		if( $this->target_User === NULL )
+		{	// Initialize target User only first time:
+			global $Item, $Blog;
+
+			if( $this->disp_params['widget_context'] == 'user' )
+			{	// Use an user of current page disp=user (Only if we are in the context of displaying an User, not if $User is set from before):
+				$user_ID = get_param( 'user_ID' );
+				if( empty( $user_ID ) && is_logged_in() )
+				{	// Use current logged in User:
+					$user_ID = $current_User->ID;
+				}
+				if( ! empty( $user_ID ) )
+				{	// Try to get User by ID:
+					$UserCache = & get_UserCache();
+					$this->target_User = & $UserCache->get_by_ID( $user_ID, false, false );
+				}
+			}
+
+			if( empty( $this->target_User ) && $this->disp_params['widget_context'] == 'item' && ! empty( $Item ) )
+			{	// Use an author of the current $Item (Only if we are in the context of displaying an Item, not if $Item is set from before):
+				$this->target_User = & $Item->get_creator_User();
+			}
+
+			if( empty( $this->target_User ) && ! empty( $Blog ) )
+			{	// Use an owner of the current $Blog:
+				$this->target_User = & $Blog->get_owner_User();
+			}
+		}
+
+		return $this->target_User;
 	}
 }
 ?>

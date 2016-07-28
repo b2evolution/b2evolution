@@ -137,16 +137,16 @@ class user_links_Widget extends ComponentWidget
 
 		$r = '';
 
-		$widget_User = & $this->get_widget_User();
-		if( empty( $widget_User ) )
+		$target_User = & $this->get_target_User();
+		if( empty( $target_User ) )
 		{ // No user detected
 			$r .= '<p class="red">'.sprintf( T_('User %s not found.'), '<b>'.format_to_output( $this->disp_params['login'], 'text' ).'</b>' ).'</p>';
 		}
 
-		if( ! empty( $widget_User ) )
+		if( ! empty( $target_User ) )
 		{ // If we really have found user
 			// Get all user extra field values with type "url"
-			$url_fields = $widget_User->userfields_by_type( 'url' );
+			$url_fields = $target_User->userfields_by_type( 'url' );
 			if( count( $url_fields ) )
 			{
 				$r .= '<div class="ufld_icon_links">';
@@ -186,30 +186,22 @@ class user_links_Widget extends ComponentWidget
 	 *
 	 * @return object User
 	 */
-	function & get_widget_User()
+	function & get_target_User()
 	{
-		global $Item, $Blog;
-
-		$widget_User = NULL;
-
-		if( empty( $this->disp_params['login'] ) )
-		{	// No defined user in widget settings:
-			if( $this->disp_params['widget_context'] == 'item' && ! empty( $Item ) )
-			{	// Use an author of the current $Item (Only if we are in the context of displaying an Item, not if $Item is set from before):
-				$widget_User = & $Item->get_creator_User();
+		if( $this->target_User === NULL )
+		{	// Initialize target User only first time:
+			if( empty( $this->disp_params['login'] ) )
+			{	// No defined user in widget settings:
+				$this->target_User = & parent::get_target_User();
 			}
-			elseif( ! empty( $Blog ) )
-			{	// Use an owner of the current $Blog:
-				$widget_User = & $Blog->get_owner_User();
+			else
+			{	// Try to get user by login from DB:
+				$UserCache = & get_UserCache();
+				$this->target_User = & $UserCache->get_by_login( $this->disp_params['login'] );
 			}
 		}
-		else
-		{	// Try to get user by login from DB:
-			$UserCache = & get_UserCache();
-			$widget_User = & $UserCache->get_by_login( $this->disp_params['login'] );
-		}
 
-		return $widget_User;
+		return $this->target_User;
 	}
 
 
@@ -227,9 +219,9 @@ class user_links_Widget extends ComponentWidget
 				'set_coll_ID' => $Blog->ID, // Have the settings of the blog changed ? (ex: new owner, new skin)
 			);
 
-		if( $widget_User = & $this->get_widget_User() )
+		if( $target_User = & $this->get_target_User() )
 		{
-			$cache_keys['user_ID'] = $widget_User->ID; // Has the owner User changed? (name, avatar, etc..)
+			$cache_keys['user_ID'] = $target_User->ID; // Has the owner User changed? (name, avatar, etc..)
 		}
 
 		return $cache_keys;
