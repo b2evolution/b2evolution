@@ -90,6 +90,8 @@ class bootstrap_main_Skin extends Skin
 				'item_single'               => array( NT_('Item Single'), 50 ),
 				'contact_page_main_area'    => array( NT_('Contact Page Main Area'), 60 ),
 				'footer'                    => array( NT_('Footer'), 100 ),
+				'user_profile_left'         => array( NT_('User Profile - Left'), 110 ),
+				'user_profile_right'        => array( NT_('User Profile - Right'), 120 ),
 			);
 	}
 

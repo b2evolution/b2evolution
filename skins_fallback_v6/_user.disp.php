@@ -34,11 +34,6 @@ $is_logged_in = is_logged_in();
 
 // Default params:
 $params = array_merge( array(
-		'profile_avatar_before'            => '',
-		'profile_avatar_after'             => '',
-		'avatar_image_size'                => 'crop-top-320x320',
-		'avatar_image_size_if_anonymous'   => 'crop-top-320x320-blur-8',
-		'avatar_overlay_text_if_anonymous' => '#default#',
 		'edit_my_profile_link_text'        => T_('Edit my profile'),
 		'edit_user_admin_link_text'        => T_('Edit in Back-Office'),
 		'skin_form_params'                 => array(),
@@ -75,36 +70,19 @@ $profileForm->begin_form( 'evo_form evo_form_user' );
 // ---- START OF LEFT COLUMN ---- //
 echo '<div class="profile_column_left">';
 
-	// Main profile picture:
-	$avatar_overlay_text = '';
-	if( $is_logged_in )
-	{ // Avatar size for logged in user
-		$avatar_image_size = $params['avatar_image_size'];
-	}
-	else
-	{ // Avatar settings for anonymous user
-		$avatar_image_size = $params['avatar_image_size_if_anonymous'];
-		if( $params['avatar_overlay_text_if_anonymous'] != '#default#' )
-		{ // Get overlay text from params
-			$avatar_overlay_text = $params['avatar_overlay_text_if_anonymous'];
-		}
-		else
-		{ // Get default overlay text from Back-office settings
-			$avatar_overlay_text = $Settings->get('bubbletip_overlay');
-		}
-	}
-
-	$avatar_imgtag = $User->get_avatar_imgtag( $avatar_image_size, 'main_profile_picture', '', true, $avatar_overlay_text, 'user', '300x300' );
-
-	if( $is_logged_in )
-	{
-		if( $User->ID == $current_User->ID && ! $User->has_avatar() )
-		{ // If user hasn't an avatar, add a link to go for uploading of avatar
-			$avatar_imgtag = '<a href="'.get_user_avatar_url().'">'.$avatar_imgtag.'</a>';
-		}
-	}
-
-	echo $params['profile_avatar_before'].$avatar_imgtag.$params['profile_avatar_after'];
+	// ------------------------- "User Profile - Left" CONTAINER EMBEDDED HERE --------------------------
+	// Display container contents:
+	skin_container( /* TRANS: Widget container name */ NT_('User Profile - Left'), array(
+		'widget_context' => 'user',	// Signal that we are displaying within an User
+		// The following (optional) params will be used as defaults for widgets included in this container:
+		// This will enclose each widget in a block:
+		'block_start' => '<div class="$wi_class$">',
+		'block_end' => '</div>',
+		// This will enclose the title of each widget:
+		'block_title_start' => '<h3>',
+		'block_title_end' => '</h3>',
+	) );
+	// ----------------------------- END OF "User Profile - Left" CONTAINER -----------------------------
 
 	// First Last Names:
 	$first_last_name = '';
@@ -324,6 +302,20 @@ echo '</div>';
 
 // ---- START OF RIGHT COLUMN ---- //
 echo '<div class="profile_column_right">';
+
+	// ------------------------- "User Profile - Right" CONTAINER EMBEDDED HERE --------------------------
+	// Display container contents:
+	skin_container( /* TRANS: Widget container name */ NT_('User Profile - Right'), array(
+		'widget_context' => 'user',	// Signal that we are displaying within an User
+		// The following (optional) params will be used as defaults for widgets included in this container:
+		// This will enclose each widget in a block:
+		'block_start' => '<div class="$wi_class$">',
+		'block_end' => '</div>',
+		// This will enclose the title of each widget:
+		'block_title_start' => '<h3>',
+		'block_title_end' => '</h3>',
+	) );
+	// ----------------------------- END OF "User Profile - Right" CONTAINER -----------------------------
 
 	if( $is_logged_in && $current_User->check_status( 'can_view_user', $user_ID ) )
 	{ // Display other pictures, but only for logged in and activated users:

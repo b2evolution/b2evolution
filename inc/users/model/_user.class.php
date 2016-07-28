@@ -1373,11 +1373,14 @@ class User extends DataObject
 				'link_class'   => '',
 				'thumb_size'   => 'crop-top-32x32',
 				'thumb_class'  => '',
+				'thumb_zoom'   => false,
+				'thumb_overlay'=> '',
+				'tag_size'     => NULL,
 			), $params );
 
 		if( $params['link_text'] == 'avatar' )
 		{
-			$r = $this->get_avatar_imgtag( $params['thumb_size'], $params['thumb_class'] );
+			$r = $this->get_avatar_imgtag( $params['thumb_size'], $params['thumb_class'], '', $params['thumb_zoom'], $params['thumb_overlay'], '', $params['tag_size'] );
 		}
 		else
 		{

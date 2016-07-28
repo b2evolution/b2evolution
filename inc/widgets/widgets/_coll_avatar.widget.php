@@ -51,7 +51,7 @@ class coll_avatar_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Profile picture (Avatar)');
+		return T_('User Profile Picture(s)');
 	}
 
 
@@ -60,7 +60,7 @@ class coll_avatar_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display the profile picture of the blog owner.');
+		return T_('Display the profile picture of the viewed user, item creator or collection owner.');
 	}
 
 
@@ -83,6 +83,38 @@ class coll_avatar_Widget extends ComponentWidget
 					'note' => sprintf( /* TRANS: %s is a config variable name */ T_('List of available image sizes is defined in %s.'), '$thumbnail_sizes' ),
 					'defaultvalue' => 'fit-160x160',
 				),
+			'thumb_class' => array(
+					'type' => 'text',
+					'label' => T_('Image class'),
+					'note' => '',
+					'defaultvalue' => '',
+					'size' => 60,
+				),
+			'force_size' => array(
+					'type' => 'text',
+					'label' => T_('Force size'),
+					'note' => T_('Force image sizes by html attributes. Use "160" to set "width=160 height=160" or "160x320" to set "width=160 height=320".'),
+					'defaultvalue' => '',
+				),
+			'anon_thumb_size' => array(
+					'type' => 'select',
+					'label' => T_('Image size for anonymous users'),
+					'options' => get_available_thumb_sizes(),
+					'note' => sprintf( /* TRANS: %s is a config variable name */ T_('List of available image sizes is defined in %s.'), '$thumbnail_sizes' ),
+					'defaultvalue' => 'fit-160x160',
+				),
+			'anon_overlay_show' => array(
+					'type' => 'checkbox',
+					'label' => T_('Show overlay text for anonymous users'),
+					'note' => T_('Check to show overlay text from field below for anonymous users.'),
+					'defaultvalue' => 0,
+				),
+			'anon_overlay_text' => array(
+					'type' => 'textarea',
+					'label' => T_('Overlay text for anonymous users'),
+					'note' => T_('Text to use as image overlay for anomymous users (leave empty for default).'),
+					'defaultvalue' => '',
+				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -96,12 +128,11 @@ class coll_avatar_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $cat_modifier;
-		global $Blog;
+		global $disp, $current_User;
 
 		$this->init_display( $params );
 
-		$owner_User = & $Blog->get_owner_User();
+		$target_User = & $this->get_target_User();
 
 		// START DISPLAY:
 		echo $this->disp_params['block_start'];
@@ -111,11 +142,40 @@ class coll_avatar_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		echo $owner_User->get_link( array(
-				'link_to'		   => 'userpage',  // TODO: make configurable $this->disp_params['link_to']
-				'link_text'    => 'avatar',
-				'thumb_size'	 => $this->disp_params['thumb_size'],
+		// Check if the target user is viewed currently:
+		$current_user_is_viewed = ( $disp == 'user' && $this->disp_params['widget_context'] == 'user' );
+
+		// Set overlay text:
+		$thumb_overlay_text = '';
+		if( ! is_logged_in() && $this->disp_params['anon_overlay_show'] )
+		{	// If it is enabled by widget setting:
+			if( trim( $this->disp_params['anon_overlay_text'] ) != '' )
+			{	// Get overlay text from params:
+				$thumb_overlay_text = nl2br( $this->disp_params['anon_overlay_text'] );
+			}
+			else
+			{	// Get default overlay text from general settings:
+				global $Settings;
+				$thumb_overlay_text = $Settings->get( 'bubbletip_overlay' );
+			}
+		}
+
+		$profile_image_tag = $target_User->get_link( array(
+				'link_to'       => $current_user_is_viewed ? 'none' : 'userpage',  // TODO: make configurable $this->disp_params['link_to']
+				'link_text'     => 'avatar',
+				'thumb_size'    => is_logged_in() ? $this->disp_params['thumb_size'] : $this->disp_params['anon_thumb_size'],
+				'thumb_class'   => $this->disp_params['thumb_class'],
+				'thumb_zoom'    => $current_user_is_viewed,
+				'thumb_overlay' => $thumb_overlay_text,
+				'tag_size'      => $this->disp_params['force_size'],
 			) );
+
+		if( is_logged_in() && $target_User->ID == $current_User->ID && ! $target_User->has_avatar() )
+		{	// If user hasn't an avatar, add a link to go for uploading of avatar:
+			$profile_image_tag = '<a href="'.get_user_avatar_url().'">'.$profile_image_tag.'</a>';
+		}
+
+		echo $profile_image_tag;
 
 		echo $this->disp_params['block_body_end'];
 

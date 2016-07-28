@@ -423,6 +423,21 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	}
 
 
+	/* User Profile - Left */
+	if( array_key_exists( 'user_profile_left', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['user_profile_left']['wico_ID'];
+		// User Profile Picture(s):
+		add_basic_widget( $wico_id, 'coll_avatar', 'core', 10, array(
+				'thumb_size'        => 'crop-top-320x320',
+				'thumb_class'       => 'main_profile_picture',
+				'force_size'        => '300x300',
+				'anon_thumb_size'   => 'crop-top-320x320-blur-8',
+				'anon_overlay_show' => '1',
+			) );
+	}
+
+
 	// Check if there are widgets to create
 	if( ! empty( $basic_widgets_insert_sql_rows ) )
 	{ // Insert the widget records by single SQL query
