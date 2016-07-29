@@ -2344,10 +2344,11 @@ input.btn-lg {
   -o-border-radius: 4px;
   border-radius: 4px;
 }
-.other_profile_pictures {
+div.other_profile_pictures {
+  text-align: left;
   margin-bottom: 10px;
 }
-.other_profile_pictures img {
+div.other_profile_pictures img {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   -ms-border-radius: 4px;

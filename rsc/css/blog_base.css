@@ -904,10 +904,11 @@ input.btn-lg {
 .main_profile_picture {
   border-radius: 4px;
 }
-.other_profile_pictures {
+div.other_profile_pictures {
+  text-align: left;
   margin-bottom: 10px;
 }
-.other_profile_pictures img {
+div.other_profile_pictures img {
   border-radius: 4px;
 }
 .profile_column_left {

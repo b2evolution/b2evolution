@@ -104,28 +104,6 @@ echo '<div class="profile_column_right">';
 	) );
 	// ----------------------------- END OF "User Profile - Right" CONTAINER -----------------------------
 
-	if( $is_logged_in && $current_User->check_status( 'can_view_user', $user_ID ) )
-	{ // Display other pictures, but only for logged in and activated users:
-		$user_avatars = $User->get_avatar_Links();
-		if( count( $user_avatars ) > 0 )
-		{
-			echo '<div class="other_profile_pictures">';
-			foreach( $user_avatars as $uLink )
-			{
-				echo $uLink->get_tag( array(
-					'before_image'        => '<div class="avatartag">',
-					'before_image_legend' => NULL,
-					'after_image_legend'  => NULL,
-					'image_size'          => 'crop-top-80x80',
-					'image_link_to'       => 'original',
-					'image_link_title'    => $User->login,
-					'image_link_rel'      => 'lightbox[user]'
-				) );
-			}
-			echo '</div>';
-		}
-	}
-
 	// Load the user fields:
 	$User->userfields_load();
 

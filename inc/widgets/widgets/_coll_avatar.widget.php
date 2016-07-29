@@ -76,6 +76,18 @@ class coll_avatar_Widget extends ComponentWidget
 		load_funcs( 'files/model/_image.funcs.php' );
 
 		$r = array_merge( array(
+			'display_main' => array(
+					'type' => 'checkbox',
+					'label' => T_('Display main picture'),
+					'note' => '',
+					'defaultvalue' => 1,
+				),
+			'display_other' => array(
+					'type' => 'checkbox',
+					'label' => T_('Display additional pictures'),
+					'note' => '',
+					'defaultvalue' => 0,
+				),
 			'thumb_size' => array(
 					'type' => 'select',
 					'label' => T_('Image size'),
@@ -95,6 +107,20 @@ class coll_avatar_Widget extends ComponentWidget
 					'label' => T_('Force size'),
 					'note' => T_('Force image sizes by html attributes. Use "160" to set "width=160 height=160" or "160x320" to set "width=160 height=320".'),
 					'defaultvalue' => '',
+				),
+			'before_image' => array(
+					'type'         => 'html_input',
+					'label'        => T_('Before picture'),
+					'note'         => T_('HTML text to display before each profile picture.'),
+					'defaultvalue' => '',
+					'size'         => 60,
+				),
+			'after_image' => array(
+					'type'         => 'html_input',
+					'label'        => T_('After picture'),
+					'note'         => T_('HTML text to display after each profile picture.'),
+					'defaultvalue' => '',
+					'size'         => 60,
 				),
 			'anon_thumb_size' => array(
 					'type' => 'select',
@@ -142,40 +168,68 @@ class coll_avatar_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		// Check if the target user is viewed currently:
-		$current_user_is_viewed = ( $disp == 'user' && $this->disp_params['widget_context'] == 'user' );
+		if( $this->get_param( 'display_main' ) )
+		{	// Display main profile pictures:
 
-		// Set overlay text:
-		$thumb_overlay_text = '';
-		if( ! is_logged_in() && $this->disp_params['anon_overlay_show'] )
-		{	// If it is enabled by widget setting:
-			if( trim( $this->disp_params['anon_overlay_text'] ) != '' )
-			{	// Get overlay text from params:
-				$thumb_overlay_text = nl2br( $this->disp_params['anon_overlay_text'] );
+			// Check if the target user is viewed currently:
+			$current_user_is_viewed = ( $disp == 'user' && $this->disp_params[ 'widget_context' ] == 'user' );
+
+			// Set overlay text:
+			$thumb_overlay_text = '';
+			if( ! is_logged_in() && $this->get_param( 'anon_overlay_show' ) )
+			{	// If it is enabled by widget setting:
+				if( trim( $this->get_param( 'anon_overlay_text' ) ) != '' )
+				{	// Get overlay text from params:
+					$thumb_overlay_text = nl2br( $this->get_param( 'anon_overlay_text' ) );
+				}
+				else
+				{	// Get default overlay text from general settings:
+					global $Settings;
+					$thumb_overlay_text = $Settings->get( 'bubbletip_overlay' );
+				}
 			}
-			else
-			{	// Get default overlay text from general settings:
-				global $Settings;
-				$thumb_overlay_text = $Settings->get( 'bubbletip_overlay' );
+
+			$profile_image_tag = $target_User->get_link( array(
+					'link_to'       => $current_user_is_viewed ? 'none' : 'userpage',  // TODO: make configurable $this->disp_params['link_to']
+					'link_text'     => 'avatar',
+					'thumb_size'    => is_logged_in() ? $this->disp_params['thumb_size'] : $this->get_param( 'anon_thumb_size' ),
+					'thumb_class'   => $this->get_param( 'thumb_class' ),
+					'thumb_zoom'    => $current_user_is_viewed,
+					'thumb_overlay' => $thumb_overlay_text,
+					'tag_size'      => $this->get_param( 'force_size' ),
+				) );
+
+			if( is_logged_in() && $target_User->ID == $current_User->ID && ! $target_User->has_avatar() )
+			{	// If user hasn't an avatar, add a link to go for uploading of avatar:
+				$profile_image_tag = '<a href="'.get_user_avatar_url().'">'.$profile_image_tag.'</a>';
 			}
+
+			echo $profile_image_tag;
 		}
 
-		$profile_image_tag = $target_User->get_link( array(
-				'link_to'       => $current_user_is_viewed ? 'none' : 'userpage',  // TODO: make configurable $this->disp_params['link_to']
-				'link_text'     => 'avatar',
-				'thumb_size'    => is_logged_in() ? $this->disp_params['thumb_size'] : $this->disp_params['anon_thumb_size'],
-				'thumb_class'   => $this->disp_params['thumb_class'],
-				'thumb_zoom'    => $current_user_is_viewed,
-				'thumb_overlay' => $thumb_overlay_text,
-				'tag_size'      => $this->disp_params['force_size'],
-			) );
-
-		if( is_logged_in() && $target_User->ID == $current_User->ID && ! $target_User->has_avatar() )
-		{	// If user hasn't an avatar, add a link to go for uploading of avatar:
-			$profile_image_tag = '<a href="'.get_user_avatar_url().'">'.$profile_image_tag.'</a>';
+		if( $this->get_param( 'display_other' ) )
+		{	// Display additional pictures:
+			if( is_logged_in() && $current_User->check_status( 'can_view_user', $target_User->ID ) )
+			{	// Only for logged in and activated users
+				$user_pictures = $target_User->get_avatar_Links();
+				if( count( $user_pictures ) > 0 )
+				{
+					foreach( $user_pictures as $user_Link )
+					{
+						echo $user_Link->get_tag( array(
+							'before_image'        => $this->get_param( 'before_image' ),
+							'before_image_legend' => NULL,
+							'after_image_legend'  => NULL,
+							'after_image'         => $this->get_param( 'after_image' ),
+							'image_size'          => $this->disp_params['thumb_size'],
+							'image_link_to'       => 'original',
+							'image_link_title'    => $target_User->login,
+							'image_link_rel'      => 'lightbox[user]'
+						) );
+					}
+				}
+			}
 		}
-
-		echo $profile_image_tag;
 
 		echo $this->disp_params['block_body_end'];
 
