@@ -81,6 +81,12 @@ class user_info_Widget extends ComponentWidget
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
+				'title' => array(
+					'label' => T_('Block title'),
+					'note' => T_( 'Title to display in your skin.' ),
+					'size' => 40,
+					'defaultvalue' => '',
+				),
 				'info' => array(
 					'type'    => 'select',
 					'label'   => T_('What info to display'),
@@ -91,6 +97,7 @@ class user_info_Widget extends ComponentWidget
 							'login'      => T_('Login'),
 							'gender_age' => T_('Gender & Age group'),
 							'location'   => T_('Location'),
+							'orgs'       => T_('Organizations'),
 							/*'posts'      => T_('Number of posts'),
 							'comments'   => T_('Comments'),
 							'photos'     => T_('Photos'),
@@ -206,6 +213,27 @@ class user_info_Widget extends ComponentWidget
 					$r = '<span class="nowrap">'.implode( '</span>, <span class="nowrap">', $location ).'</span>';
 				}
 				break;
+
+			case 'orgs':
+				// Organizations:
+				$user_organizations = $target_User->get_organizations();
+				if( count( $user_organizations ) > 0 )
+				{	// No organizations to display:
+					$org_names = array();
+					foreach( $user_organizations as $org )
+					{
+						if( empty( $org->url ) )
+						{	// Display just a text:
+							$org_names[] = $org->name;
+						}
+						else
+						{	// Make a link for organization:
+							$org_names[] = '<a href="'.$org->url.'" rel="nofollow" target="_blank">'.$org->name.'</a>';
+						}
+					}
+					$r = implode( ' &middot; ', $org_names );
+				}
+				break;
 		}
 
 		$r = utf8_trim( $r );
@@ -216,6 +244,8 @@ class user_info_Widget extends ComponentWidget
 		}
 
 		echo $this->disp_params['block_start'];
+
+		$this->disp_title();
 
 		echo $this->disp_params['block_body_start'];
 

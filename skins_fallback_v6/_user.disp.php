@@ -79,34 +79,10 @@ echo '<div class="profile_column_left">';
 		'block_start' => '<div class="$wi_class$">',
 		'block_end' => '</div>',
 		// This will enclose the title of each widget:
-		'block_title_start' => '<h3>',
-		'block_title_end' => '</h3>',
+		'block_title_start' => '<p><b>',
+		'block_title_end' => '</b></p>',
 	) );
 	// ----------------------------- END OF "User Profile - Left" CONTAINER -----------------------------
-
-	// Organizations:
-	$user_organizations = $User->get_organizations();
-	$count_organizations = count( $user_organizations );
-	if( $count_organizations > 0 )
-	{
-		$org_names = array();
-		foreach( $user_organizations as $org )
-		{
-			if( empty( $org->url ) )
-			{ // Display just a text
-				$org_names[] = $org->name;
-			}
-			else
-			{ // Make a link for organization
-				$org_names[] = '<a href="'.$org->url.'" rel="nofollow" target="_blank">'.$org->name.'</a>';
-			}
-		}
-		echo '<hr class="profile_separator" />'."\n";
-		echo '<p><b>'.T_('Organizations').':</b></p>';
-		echo '<p>'.implode( ' &middot; ', $org_names ).'</p>';
-	}
-
-	echo '</p>';
 
 echo '</div>';
 // ---- END OF LEFT COLUMN ---- //

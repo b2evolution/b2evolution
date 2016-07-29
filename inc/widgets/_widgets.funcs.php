@@ -511,6 +511,15 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 				'after_button'     => '</p>',
 				'widget_css_class' => 'profile_buttons',
 			) );
+		// Free HTML / Separator:
+		add_basic_widget( $wico_id, 'free_html', 'core', 160, array( 'content' => '<hr class="profile_separator" />' ) );
+		// User info / Organizations:
+		add_basic_widget( $wico_id, 'user_info', 'core', 170, array(
+				'info'        => 'orgs',
+				'title'       => T_('Organizations').':',
+				'before_info' => '<p>',
+				'after_info'  => '</p>',
+			) );
 	}
 
 
