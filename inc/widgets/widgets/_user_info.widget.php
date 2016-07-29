@@ -80,8 +80,6 @@ class user_info_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		load_funcs( 'files/model/_image.funcs.php' );
-
 		$r = array_merge( array(
 				'info' => array(
 					'type'    => 'select',
@@ -104,15 +102,15 @@ class user_info_Widget extends ComponentWidget
 				),
 				'before_info' => array(
 					'type'         => 'html_input',
-					'label'        => T_('Before'),
-					'note'         => T_('Text to display before info value.'),
+					'label'        => T_('Before info'),
+					'note'         => T_('HTML text to display before info value.'),
 					'defaultvalue' => '',
 					'size'         => 60,
 				),
 				'after_info' => array(
 					'type'         => 'html_input',
-					'label'        => T_('After'),
-					'note'         => T_('Text to display after info value.'),
+					'label'        => T_('After info'),
+					'note'         => T_('HTML text to display after info value.'),
 					'defaultvalue' => '',
 					'size'         => 60,
 				),

@@ -469,6 +469,48 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 			) );
 		// Free HTML / Separator:
 		add_basic_widget( $wico_id, 'free_html', 'core', 90, array( 'content' => '<hr class="profile_separator" />' ) );
+		// User action / Edit my profile:
+		add_basic_widget( $wico_id, 'user_action', 'core', 100, array(
+				'button'           => 'edit_profile',
+				'before_button'    => '<p>',
+				'after_button'     => '</p>',
+				'widget_css_class' => 'profile_buttons',
+			) );
+		// User action / Edit my profile:
+		add_basic_widget( $wico_id, 'user_action', 'core', 110, array(
+				'button'           => 'send_message',
+				'before_button'    => '<p>',
+				'after_button'     => '</p>',
+				'widget_css_class' => 'profile_buttons',
+			) );
+		// User action / Edit my profile:
+		add_basic_widget( $wico_id, 'user_action', 'core', 120, array(
+				'button'           => 'add_contact',
+				'before_button'    => '<p>',
+				'after_button'     => '</p>',
+				'widget_css_class' => 'profile_buttons',
+			) );
+		// User action / Block Contact & Report User:
+		add_basic_widget( $wico_id, 'user_action', 'core', 130, array(
+				'button'           => 'block_report',
+				'before_button'    => '<p class="btn-group">',
+				'after_button'     => '</p>',
+				'widget_css_class' => 'profile_buttons',
+			) );
+		// User action / Edit in Back-Office:
+		add_basic_widget( $wico_id, 'user_action', 'core', 140, array(
+				'button'           => 'edit_backoffice',
+				'before_button'    => '<p>',
+				'after_button'     => '</p>',
+				'widget_css_class' => 'profile_buttons',
+			) );
+		// User action / Delete & Delete Spammer:
+		add_basic_widget( $wico_id, 'user_action', 'core', 150, array(
+				'button'           => 'delete',
+				'before_button'    => '<p class="btn-group">',
+				'after_button'     => '</p>',
+				'widget_css_class' => 'profile_buttons',
+			) );
 	}
 
 
