@@ -59,7 +59,9 @@ class user_action_Widget extends ComponentWidget
 	 */
 	function get_short_desc()
 	{
-		return format_to_output( $this->get_name() );
+		$button_options = $this->get_param_definitions( array() );
+		$button_options = $button_options['button']['options'];
+		return format_to_output( isset( $button_options[ $this->disp_params['button'] ] ) ? $button_options[ $this->disp_params['button'] ] : $this->get_name() );
 	}
 
 

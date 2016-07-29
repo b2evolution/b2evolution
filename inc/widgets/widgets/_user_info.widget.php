@@ -59,7 +59,9 @@ class user_info_Widget extends ComponentWidget
 	 */
 	function get_short_desc()
 	{
-		return format_to_output( $this->get_name() );
+		$info_options = $this->get_param_definitions( array() );
+		$info_options = $info_options['info']['options'];
+		return format_to_output( isset( $info_options[ $this->disp_params['info'] ] ) ? $info_options[ $this->disp_params['info'] ] : $this->get_name() );
 	}
 
 
