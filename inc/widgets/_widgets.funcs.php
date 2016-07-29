@@ -435,6 +435,40 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 				'anon_thumb_size'   => 'crop-top-320x320-blur-8',
 				'anon_overlay_show' => '1',
 			) );
+		// User info / Name:
+		add_basic_widget( $wico_id, 'user_info', 'core', 20, array(
+				'info'        => 'name',
+				'before_info' => '<h1>',
+				'after_info'  => '</h1>',
+			) );
+		// User info / Nickname:
+		add_basic_widget( $wico_id, 'user_info', 'core', 30, array(
+				'info'        => 'nickname',
+				'before_info' => '<h2>',
+				'after_info'  => '</h2>',
+			) );
+		// User info / Login:
+		add_basic_widget( $wico_id, 'user_info', 'core', 40, array(
+				'info'        => 'login',
+				'before_info' => '<h2 class="text-muted">',
+				'after_info'  => '</h2>',
+			) );
+		// Free HTML / Separator:
+		add_basic_widget( $wico_id, 'free_html', 'core', 60, array( 'content' => '<hr class="profile_separator" />' ) );
+		// User info / :
+		add_basic_widget( $wico_id, 'user_info', 'core', 70, array(
+				'info'        => 'gender_age',
+				'before_info' => '<p>',
+				'after_info'  => '</p>',
+			) );
+		// User info / Location:
+		add_basic_widget( $wico_id, 'user_info', 'core', 80, array(
+				'info'        => 'location',
+				'before_info' => '<p>',
+				'after_info'  => '</p>',
+			) );
+		// Free HTML / Separator:
+		add_basic_widget( $wico_id, 'free_html', 'core', 90, array( 'content' => '<hr class="profile_separator" />' ) );
 	}
 
 

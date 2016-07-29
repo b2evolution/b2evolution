@@ -194,13 +194,17 @@ class coll_avatar_Widget extends ComponentWidget
 	{
 		global $Blog;
 
-		$owner_User = & $Blog->get_owner_User();
-
-		return array(
+		$cache_keys = array(
 				'wi_ID'   => $this->ID,					// Have the widget settings changed ?
 				'set_coll_ID' => $Blog->ID,			// Have the settings of the blog changed ? (ex: new owner, new skin)
-				'user_ID' => $owner_User->ID, 	// Has the owner User changed? (name, avatar, etc..)
 			);
+
+		if( $target_User = & $this->get_target_User() )
+		{
+			$cache_keys['user_ID'] = $target_User->ID; // Has the target User changed? (name, avatar, etc..)
+		}
+
+		return $cache_keys;
 	}
 }
 

@@ -84,72 +84,6 @@ echo '<div class="profile_column_left">';
 	) );
 	// ----------------------------- END OF "User Profile - Left" CONTAINER -----------------------------
 
-	// First Last Names:
-	$first_last_name = '';
-	if( $Settings->get( 'firstname_editing' ) != 'hidden' && $User->get( 'firstname' ) != '' )
-	{
-		$first_last_name .= $User->get( 'firstname' );
-	}
-	if( $Settings->get( 'lastname_editing' ) != 'hidden' && $User->get( 'lastname' ) != '' )
-	{
-		$first_last_name .= ' '.$User->get( 'lastname' );
-	}
-	$first_last_name = utf8_trim( $first_last_name );
-	if( ! empty( $first_last_name ) )
-	{ // Display first last name of it is not empty
-		echo '<h1>'.$first_last_name.'</h1>';
-	}
-
-	// Nickname:
-	if( $Settings->get( 'nickname_editing' ) != 'hidden' && $User->get( 'nickname' ) != '' )
-	{
-		echo '<h2>'.$User->get( 'nickname' ).'</h2>';
-	}
-
-	// Login:
-	echo '<h2 class="text-muted">'.$User->get( 'login' ).'</h2>';
-
-	echo '<hr class="profile_separator" />'."\n";
-
-	// Gender & age group:
-	$gender_age_group = $User->get_gender();
-	if( ! empty( $User->age_min ) || ! empty( $User->age_max ) )
-	{
-		if( ! empty( $gender_age_group ) )
-		{
-			$gender_age_group .= ' &bull; ';
-		}
-		$gender_age_group .= sprintf( T_('%s years old'), $User->get( 'age_min' ).'-'.$User->get( 'age_max' ) );
-	}
-	echo '<p>'.$gender_age_group.'</p>';
-
-	// Location:
-	$location = array();
-	if( ! empty( $User->city_ID ) && user_city_visible() )
-	{ // Display city
-		load_class( 'regional/model/_city.class.php', 'City' );
-		$location[] = $User->get_city_name();
-	}
-	if( ! empty( $User->subrg_ID ) && user_subregion_visible() )
-	{ // Display sub-region
-		load_class( 'regional/model/_subregion.class.php', 'Subregion' );
-		$location[] = $User->get_subregion_name();
-	}
-	if( ! empty( $User->rgn_ID ) && user_region_visible() )
-	{ // Display region
-		load_class( 'regional/model/_region.class.php', 'Region' );
-		$location[] = $User->get_region_name();
-	}
-	if( ! empty( $User->ctry_ID ) && user_country_visible() )
-	{ // Display country
-		load_class( 'regional/model/_country.class.php', 'Country' );
-		$location[] = $User->get_country_name();
-	}
-	if( ! empty( $location ) )
-	{ // Display location only if at least one selected
-		echo '<p><span class="nowrap">'.implode( '</span>, <span class="nowrap">', $location ).'</span></p>';
-	}
-
 	// Buttons:
 	$buttons = array();
 
@@ -257,7 +191,6 @@ echo '<div class="profile_column_left">';
 
 	if( count( $buttons ) )
 	{ // Dispaly all available buttons
-		echo '<hr class="profile_separator" />'."\n";
 		echo '<div class="profile_buttons">';
 		foreach( $buttons as $button )
 		{

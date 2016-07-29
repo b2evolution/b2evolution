@@ -221,7 +221,7 @@ class user_links_Widget extends ComponentWidget
 
 		if( $target_User = & $this->get_target_User() )
 		{
-			$cache_keys['user_ID'] = $target_User->ID; // Has the owner User changed? (name, avatar, etc..)
+			$cache_keys['user_ID'] = $target_User->ID; // Has the target User changed? (name, avatar, etc..)
 		}
 
 		return $cache_keys;

@@ -114,6 +114,7 @@ $core_componentwidget_defs = array(
 			'user_login',
 			'user_register',
 			'user_tools',
+			'user_info',
 		),
 	'other' => array(
 			'subcontainer',

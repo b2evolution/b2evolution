@@ -1195,6 +1195,7 @@ class ComponentWidget extends DataObject
 				$user_ID = get_param( 'user_ID' );
 				if( empty( $user_ID ) && is_logged_in() )
 				{	// Use current logged in User:
+					global $current_User;
 					$user_ID = $current_User->ID;
 				}
 				if( ! empty( $user_ID ) )
