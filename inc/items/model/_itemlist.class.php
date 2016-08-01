@@ -201,7 +201,9 @@ class ItemList2 extends ItemListLight
 			".$DB->quote($item_typ_ID)." AS post_ityp_ID,
 			".$DB->quote($item_st_ID)." AS post_pst_ID,
 			".$DB->quote($item_deadline)." AS post_datedeadline,
-			".$DB->quote($item_priority)." AS post_priority,";
+			".$DB->quote($item_priority)." AS post_priority,
+			0 AS post_addvotes,
+			0 AS post_countvotes,";
 
 		$this->sql .= $DB->quote(param( 'item_order', 'double', NULL )).' AS post_order'.",\n"
 								.$DB->quote(param( 'item_featured', 'integer', NULL )).' AS post_featured'."\n";
