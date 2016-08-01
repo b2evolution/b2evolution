@@ -5007,7 +5007,7 @@ function get_base_domain( $url )
 	$base_domain = convert_charset(idna_decode($match[0]), $evo_charset, 'UTF-8');
 
 	// Remove any www. prefix:
-	$base_domain = preg_replace( '~^www\.~i', '', $base_domain );
+	$base_domain = preg_replace( '~^www[0-9]*\.~i', '', $base_domain );
 
 	//echo '<br>'.$base_domain.'</p>';
 
