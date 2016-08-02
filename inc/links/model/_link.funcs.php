@@ -18,6 +18,7 @@ load_class( 'links/model/_linkowner.class.php', 'LinkOwner' );
 load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
 load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
 load_class( 'links/model/_linkuser.class.php', 'LinkUser' );
+load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
 
 /**
  * Get a link owner object from link_type and object ID
@@ -30,24 +31,31 @@ function & get_link_owner( $link_type, $object_ID )
 	switch( $link_type )
 	{
 		case 'item':
-			// create LinkItem object
+			// Create LinkItem object:
 			$ItemCache = & get_ItemCache();
 			$Item = $ItemCache->get_by_ID( $object_ID, false );
 			$LinkOwner = new LinkItem( $Item );
 			break;
 
 		case 'comment':
-			// create LinkComment object
+			// Create LinkComment object:
 			$CommentCache = & get_CommentCache();
 			$Comment = $CommentCache->get_by_ID( $object_ID, false );
 			$LinkOwner = new LinkComment( $Comment );
 			break;
 
 		case 'user':
-			// create LinkUser object
+			// Create LinkUser object:
 			$UserCache = & get_UserCache();
 			$User = $UserCache->get_by_ID( $object_ID, false );
 			$LinkOwner = new LinkUser( $User );
+			break;
+
+		case 'emailcampaign':
+			// Create LinkEmailCampaign object:
+			$EmailCampaignCache = & get_EmailCampaignCache();
+			$EmailCampaign = $EmailCampaignCache->get_by_ID( $object_ID, false );
+			$LinkOwner = new LinkEmailCampaign( $EmailCampaign );
 			break;
 
 		default:
@@ -81,14 +89,27 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 	}
 
 	// Set title for modal window:
-	$window_title = TS_('Attach files');
-	if( $LinkOwner->type == 'item' )
-	{ // Item
-		$window_title = format_to_js( sprintf( T_('Attach files to "%s"'), $LinkOwner->Item->get( 'title' ) ) );
-	}
-	elseif( $LinkOwner->type == 'comment' )
-	{ // Comment
-		$window_title = format_to_js( sprintf( T_('Attach files to comment #%s'), $LinkOwner->Comment->ID ) );
+	switch( $LinkOwner->type )
+	{
+		case 'item':
+			$window_title = format_to_js( sprintf( T_('Attach files to "%s"'), $LinkOwner->Item->get( 'title' ) ) );
+			$form_id = 'itemform_links';
+			break;
+
+		case 'comment':
+			$window_title = format_to_js( sprintf( T_('Attach files to comment #%s'), $LinkOwner->Comment->ID ) );
+			$form_id = 'cmntform_links';
+			break;
+
+		case 'emailcampaign':
+			$window_title = format_to_js( sprintf( T_('Attach files to email campaign "%s"'), $LinkOwner->EmailCampaign->get( 'name' ) ) );
+			$form_id = 'ecmpform_links';
+			break;
+
+		default:
+			$window_title = TS_('Attach files');
+			$form_id = 'atchform_links';
+			break;
 	}
 
 	$fieldset_title = T_( 'Images &amp; Attachments' );
@@ -111,12 +132,9 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 		return;
 	}
 
-	// Editing link owner
-	$Collection = $Blog = & $LinkOwner->get_Blog();
-
 	$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' );
 
-	if( $current_User->check_perm( 'files', 'view', false, $Blog->ID )
+	if( $current_User->check_perm( 'files', 'view' )
 		&& $LinkOwner->check_perm( 'edit', false ) )
 	{ // Check that we have permission to edit owner:
 		$attach_files_url = $admin_url.'?ctrl=files&amp;fm_mode=link_object&amp;link_type=item&amp;link_object_ID='.$LinkOwner->get_ID();
@@ -156,7 +174,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 	$links_count = count( $LinkOwner->get_Links() );
 
 	$Form->begin_fieldset( $fieldset_title, array(
-			'id' => $LinkOwner->type == 'comment' ? 'cmntform_links' : 'itemform_links',
+			'id' => $form_id,
 			'fold' => $fold,
 			'deny_fold' => ( $links_count > 0 )
 		) );
@@ -394,7 +412,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 		}
 	}
 
-	if( $link_type == 'item' && $current_File )
+	if( ( $link_type == 'item' || $link_type == 'emailcampaign' ) && $current_File )
 	{ // Display icon to insert image|video|audio into post inline
 		$type = $current_File->get_file_type();
 
@@ -540,6 +558,7 @@ function get_file_links( $file_ID, $params = array() )
 			'post_prefix'     => T_('Post').' - ',
 			'comment_prefix'  => T_('Comment on').' - ',
 			'user_prefix'     => T_('Profile picture').' - ',
+			'emailcampaign_prefix' => T_('Email campaign').' - ',
 			'current_link_ID' => 0,
 			'current_before'  => '<b>',
 			'current_after'   => '</b>',
@@ -550,7 +569,7 @@ function get_file_links( $file_ID, $params = array() )
 
 	// Get all links with posts and comments
 	$links_SQL = new SQL();
-	$links_SQL->SELECT( 'link_ID, link_itm_ID, link_cmt_ID, link_usr_ID' );
+	$links_SQL->SELECT( 'link_ID, link_itm_ID, link_cmt_ID, link_usr_ID, link_ecmp_ID' );
 	$links_SQL->FROM( 'T_links' );
 	$links_SQL->WHERE( 'link_file_ID = '.$DB->quote( $file_ID ) );
 	$links = $DB->get_results( $links_SQL->get() );
@@ -560,6 +579,7 @@ function get_file_links( $file_ID, $params = array() )
 		$ItemCache = & get_ItemCache();
 		$CommentCache = & get_CommentCache();
 		$UserCache = & get_UserCache();
+		$EmailCampaignCache = & get_EmailCampaignCache();
 		$LinkCache = & get_LinkCache();
 		foreach( $links as $link )
 		{
@@ -616,6 +636,21 @@ function get_file_links( $file_ID, $params = array() )
 					$link_object_ID = $link->link_usr_ID;
 				}
 			}
+			elseif( ! empty( $link->link_ecmp_ID ) )
+			{	// File is linked to email campaign:
+				if( $EmailCampaign = & $EmailCampaignCache->get_by_ID( $link->link_ecmp_ID, false ) )
+				{
+					if( ! $current_User->check_perm( 'emails', 'view' ) )
+					{	// Build a link to display an email campaign in edit back-office form:
+						$r .= $params['emailcampaign_prefix'].'<a href="?ctrl=campaigns&action=edit&tab=info&ecmp_ID='.$EmailCampaign->ID.'">'.$EmailCampaign->get( 'name' ).'</a>';
+					}
+					else
+					{	// No permission to view email campaign in edit back-office form:
+						$r .= $params['emailcampaign_prefix'].$EmailCampaign->get( 'name' );
+					}
+					$link_object_ID = $link->link_ecmp_ID;
+				}
+			}
 
 			if( ! empty( $link_object_ID ) )
 			{ // Action icon to unlink file from object
@@ -623,7 +658,7 @@ function get_file_links( $file_ID, $params = array() )
 				    ( $LinkOwner = & $edited_Link->get_LinkOwner() ) !== false && $LinkOwner->check_perm( 'edit', false ) )
 				{ // Allow to unlink only if current user has an permission
 					$r .= ' '.action_icon( T_('Delete this link!'), 'unlink',
-						$admin_url.'?ctrl=links&amp;link_ID='.$link->link_ID.'&amp;link_type=item&amp;link_object_ID='.$link->link_usr_ID.'&amp;action=unlink&amp;redirect_to='.rawurlencode( regenerate_url( 'blog', '', '', '&' ) ).'&amp;'.url_crumb( 'link' ),
+						$admin_url.'?ctrl=links&amp;link_ID='.$link->link_ID.'&amp;link_type=item&amp;link_object_ID='.$link_object_ID.'&amp;action=unlink&amp;redirect_to='.rawurlencode( regenerate_url( 'blog', '', '', '&' ) ).'&amp;'.url_crumb( 'link' ),
 						NULL, NULL, NULL,
 						array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to unlink this file?').'\');' ) );
 				}

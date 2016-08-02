@@ -244,6 +244,9 @@ switch( $action )
 			case 'comment':
 				$redirect_url = $admin_url.'?ctrl=comments&action=edit&comment_ID='.$LinkOwner->get_ID();
 				break;
+			case 'emailcampaign':
+				$redirect_url = $admin_url.'?ctrl=campaigns&action=edit&tab=compose&ecmp_ID='.$LinkOwner->get_ID();
+				break;
 			default:
 				param( 'iframe_name', 'string', '', true );
 				$redirect_url = $admin_url.'?ctrl=links&action=edit_links&link_type='.$LinkOwner->type.'&mode=iframe&iframe_name='.$iframe_name.'&link_object_ID='.$LinkOwner->get_ID();

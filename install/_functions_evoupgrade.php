@@ -7672,6 +7672,19 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11840, 'Upgrade links table...' ) )
+	{	// part of 6.8.0-alpha
+		db_add_col( 'T_links', 'link_ecmp_ID', 'int(11) unsigned  NULL COMMENT \'Used for linking files to email campaign\' AFTER link_usr_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11845, 'Upgrade files table...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_files
+			MODIFY file_root_type ENUM("absolute","user","collection","shared","skins","import","emailcampaign") COLLATE ascii_general_ci NOT NULL DEFAULT "absolute"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

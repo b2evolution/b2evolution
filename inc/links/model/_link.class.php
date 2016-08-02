@@ -55,16 +55,24 @@ class Link extends DataObject
 
 			// source of link:
 			if( $db_row->link_itm_ID != NULL )
-			{ // Item
+			{	// Item:
 				$this->LinkOwner = & get_link_owner( 'item', $db_row->link_itm_ID );
 			}
 			elseif( $db_row->link_cmt_ID != NULL )
-			{ // Comment
+			{	// Comment:
 				$this->LinkOwner = & get_link_owner( 'comment', $db_row->link_cmt_ID );
 			}
-			else
-			{ // User
+			elseif( $db_row->link_usr_ID != NULL )
+			{	// User:
 				$this->LinkOwner = & get_link_owner( 'user', $db_row->link_usr_ID );
+			}
+			elseif( $db_row->link_ecmp_ID != NULL )
+			{	// Email Campaign:
+				$this->LinkOwner = & get_link_owner( 'emailcampaign', $db_row->link_ecmp_ID );
+			}
+			else
+			{
+				debug_die( 'Wrong link object' );
 			}
 
 			$this->file_ID = $db_row->link_file_ID;

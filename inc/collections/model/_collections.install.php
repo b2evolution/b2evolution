@@ -487,6 +487,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			link_itm_ID           int(11) unsigned  NULL,
 			link_cmt_ID           int(11) unsigned  NULL COMMENT 'Used for linking files to comments (comment attachments)',
 			link_usr_ID           int(11) unsigned  NULL COMMENT 'Used for linking files to users (user profile picture)',
+			link_ecmp_ID          int(11) unsigned  NULL COMMENT 'Used for linking files to email campaign',
 			link_file_ID          int(11) unsigned  NULL,
 			link_ltype_ID         int(11) unsigned  NOT NULL default 1,
 			link_position         varchar(10) COLLATE ascii_general_ci NOT NULL,

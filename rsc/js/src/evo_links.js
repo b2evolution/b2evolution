@@ -97,8 +97,7 @@ function evo_link_change_position( selectInput, url, crumb )
  */
 function evo_link_insert_inline( type, link_ID, caption )
 {
-	var b2evoCanvas = window.document.getElementById('itemform_post_content');
-	if( b2evoCanvas != null )
+	if( typeof( b2evoCanvas ) != 'undefined' )
 	{ // Canvas exists
 		var insert_tag = '[' + type + ':' + link_ID;
 

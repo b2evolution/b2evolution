@@ -2296,8 +2296,7 @@ function display_dragdrop_upload_button( $params = array() )
 		{ // Add params to link a file right after uploading
 			global $b2evo_icons_type;
 			$link_owner_type = $params['LinkOwner']->type;
-			$link_owner_ID = ( $link_owner_type == 'item' ? $params['LinkOwner']->Item->ID : $params['LinkOwner']->Comment->ID );
-			echo 'url += "&link_owner='.$link_owner_type.'_'.$link_owner_ID.'&b2evo_icons_type='.$b2evo_icons_type.'"';
+			echo 'url += "&link_owner='.$link_owner_type.'_'.$params['LinkOwner']->get_ID().'&b2evo_icons_type='.$b2evo_icons_type.'"';
 		}
 		?>
 
@@ -2449,7 +2448,10 @@ function display_dragdrop_upload_button( $params = array() )
 							this_row.find( '.qq-upload-link-id' ).html( responseJSON.success.link_ID );
 							this_row.find( '.qq-upload-image' ).html( responseJSON.success.link_preview );
 							this_row.find( '.qq-upload-link-actions' ).prepend( responseJSON.success.link_actions );
-							this_row.find( '.qq-upload-link-position' ).html( responseJSON.success.link_position );
+							if( typeof( responseJSON.success.link_position ) != 'undefined' )
+							{
+								this_row.find( '.qq-upload-link-position' ).html( responseJSON.success.link_position );
+							}
 							init_colorbox( this_row.find( '.qq-upload-image a[rel^="lightbox"]' ) );
 						}
 					}
