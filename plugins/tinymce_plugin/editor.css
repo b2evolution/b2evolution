@@ -1,12 +1,18 @@
 /* Styles for TinyMCE's iframe/editable area */
 
 body.mce-content-body {
-	font: 1em Merriweather, Georgia, serif;
-	font-weight: normal;
-	line-height: 28px;
-	-webkit-font-smoothing: antialiased;
+	/*
+	font-family: Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
+	font-size: 16px;
+	line-height: 1.5;
+	color: #333;
+	-webkit-font-smoothing: antialiased !important;
 	padding: 0.6em;
 	margin: 0;
+	*/
+	font-size: 16px;
+	line-height: 1.75;
+	-webkit-font-smoothing: antialiased !important;
 }
 
 h1,h2,h3,h4,h5,h6 {

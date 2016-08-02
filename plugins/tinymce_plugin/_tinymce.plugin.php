@@ -584,6 +584,7 @@ class tinymce_plugin extends Plugin
 		global $localtimenow, $debug, $rsc_url, $rsc_path, $skins_url;
 		global $UserSettings;
 		global $ReqHost;
+		global $baseurl;
 
 		$tmce_plugins_array = array(
 			'image',
@@ -757,6 +758,7 @@ class tinymce_plugin extends Plugin
 		// B2evo plugin options
 		$init_options[] = 'collection: "'.$this->collection.'"';
 		$init_options[] = 'postID: '.$this->post_ID;
+		$init_options[] = 'rest_url: "'.get_htsrv_url().'rest.php"';
 		$init_options[] = 'async_url: "'.get_htsrv_url().'anon_async.php"';
 
 		$init_options[] = 'fontsize_formats: "8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt"';
@@ -809,10 +811,13 @@ class tinymce_plugin extends Plugin
 				$Skin = $SkinCache->get_by_ID( $blog_skin_ID );
 				$item_css_url = $skins_url.$Skin->folder.'/item.css';
 				// else: $item_css_url = $rsc_url.'css/item_base.css';
-				$content_css .= ','.$item_css_url;		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
+				if( file_exists( $item_css_url ) )
+				{
+					$content_css .= ','.$item_css_url;		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
+				}
 
 				// Load b2evo base css
-				$content_css .= ',http://b2evolution.lan/rsc/build/bootstrap-b2evo_base.bundle.css?v=6.8.0-alpha-2016-07-13';
+				$content_css .= ','.$baseurl.'rsc/build/bootstrap-b2evo_base.bundle.css';
 			}
 			// else item_default.css -- is it still possible to have no skin ?
 		}

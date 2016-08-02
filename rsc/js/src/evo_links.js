@@ -83,6 +83,10 @@ function evo_link_change_position( selectInput, url, crumb )
 			evoFadeFailure( jQuery(oThis).closest('tr') );
 			jQuery(oThis.form).closest('td').addClass('error');
 		}
+
+		// Fire file attached event for editor plugin
+		var event = new Event( 'b2evoAttachmentsChanged' );
+		document.dispatchEvent( event );
 	} );
 	return false;
 }
