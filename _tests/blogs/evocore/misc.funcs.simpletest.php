@@ -263,12 +263,18 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( get_base_domain('http://hostname'), 'hostname' );
 		$this->assertEqual( get_base_domain('www.example.com'), 'example.com' );
 		$this->assertEqual( get_base_domain('www2.example.com'), 'example.com' );  // We no longer treat www2.ex.com equal to ex.com
-		$this->assertEqual( get_base_domain('subdom.example.com'), 'subdom.example.com' );
-		$this->assertEqual( get_base_domain('https://www.hello.example.com/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
-		$this->assertEqual( get_base_domain('https://www.sub1.hello.example.com/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
-		$this->assertEqual( get_base_domain('https://sub1.hello.example.com/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
-		$this->assertEqual( get_base_domain('https://hello.example.com/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
-		$this->assertEqual( get_base_domain('https://hello.example.com:8080/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
+		$this->assertEqual( get_base_domain('subdom.example.com'), 'example.com' );
+		$this->assertEqual( get_base_domain('sub2.subdom.example.net'), 'example.net' );
+		$this->assertEqual( get_base_domain('sub3.sub2.subdom.example.org'), 'example.org' );
+		$this->assertEqual( get_base_domain('https://www.hello.example.com/path/1/2/3/page.html?param=hello#location'), 'example.com' );
+		$this->assertEqual( get_base_domain('https://www.sub1.hello.example.com/path/1/2/3/page.html?param=hello#location'), 'example.com' );
+		$this->assertEqual( get_base_domain('https://sub1.hello.example.com/path/1/2/3/page.html?param=hello#location'), 'example.com' );
+		$this->assertEqual( get_base_domain('https://hello.example.com/path/1/2/3/page.html?param=hello#location'), 'example.com' );
+		$this->assertEqual( get_base_domain('https://hello.example.com:8080/path/1/2/3/page.html?param=hello#location'), 'example.com' );
+		$this->assertEqual( get_base_domain('https://hello.example.net:8080/path/1/2/3/page.html?param=hello#location'), 'example.net' );
+		$this->assertEqual( get_base_domain('https://hello.example.org:8080/path/1/2/3/page.html?param=hello#location'), 'example.org' );
+		$this->assertEqual( get_base_domain('https://lessons.teachers.city.edu:443/index.php#lesson45'), 'city.edu' );
+		$this->assertEqual( get_base_domain('ftp://projects.roads.gov/region.php#plan'), 'roads.gov' );
 		$this->assertEqual( get_base_domain('http://domain.gouv.fr:8080/index.php#anchor'), 'domain.gouv.fr' );
 		$this->assertEqual( get_base_domain('http://www14.domain.gouv.fr:8080/index.php#anchor'), 'domain.gouv.fr' );
 		$this->assertEqual( get_base_domain('https://sub.domain.gouv.fr:8080/page.html'), 'domain.gouv.fr' );
