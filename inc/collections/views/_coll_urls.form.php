@@ -61,7 +61,7 @@ $Form->hidden( 'tab', $tab );
 $Form->hidden( 'blog', $blog );
 
 
-global $baseurl, $basedomain;
+global $baseurl, $basehost;
 
 // determine siteurl type (if not set from update-action)
 if( preg_match('#https?://#', $edited_Blog->get( 'siteurl' ) ) )
@@ -162,7 +162,7 @@ $Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_li
 		);
 		if( ! is_ip_url_domain( $baseurl ) )
 		{	// Don't allow subdomain for IP address:
-			$access_type_options[] = array( 'subdom', T_('Subdomain of basedomain'),
+			$access_type_options[] = array( 'subdom', T_('Subdomain of basehost'),
 										preg_replace( '#(https?://)#i', '$1<span class="blog_url_text">'.$edited_Blog->urlname.'</span>.', $baseurl ),
 										'',
 										'onclick="update_urlpreview( \'http://\'+document.getElementById( \'blog_urlname\' ).value+\'.'.preg_replace( '#(https?://)#i', '', $baseurl ).'\' )"'
@@ -171,7 +171,7 @@ $Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_li
 		else
 		{
 			$access_type_options[] = array( 'subdom', T_('Subdomain').':',
-										sprintf( T_('(Not possible for %s)'), $basedomain ),
+										sprintf( T_('(Not possible for %s)'), $basehost ),
 										'',
 										'disabled="disabled"'
 			);
