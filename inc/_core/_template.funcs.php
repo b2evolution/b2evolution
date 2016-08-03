@@ -185,18 +185,20 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 
 
 	$allow_collection_redirect = false;
-	if( $external_redirect && $allow_redirects_to_different_domain == 'all_collections_and_redirected_posts' && ! $redirected_post )
+	if( $external_redirect 
+		&& $allow_redirects_to_different_domain == 'all_collections_and_redirected_posts' 
+		&& ! $redirected_post )
 	{ // If a redirect is external and we allow to redirect to all collection domains:
 		global $basehost;
 
 		$redirect_to_domain = preg_replace( '~https?://([^/]+)/?.*~i', '$1', $redirect_to );
 
 		if( preg_match( '~\.'.preg_quote( $basehost ).'(:\d+)?$~', $redirect_to_domain ) )
-		{ // Current redirect goes to subdomain, Allow this:
+		{ // Current redirect goes to a subdomain of basehost, Allow this:
 			$allow_collection_redirect = true;
 		}
 		else
-		{ // Check if current redirect domain is used as absolute url at least for one collection in system:
+		{ // Check if current redirect domain is used as absolute URL for at least 1 collection on the system:
 			global $DB;
 
 			$abs_url_coll_SQL = new SQL();
@@ -208,7 +210,7 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 
 			$abs_url_coll_ID = $DB->get_var( $abs_url_coll_SQL->get() );
 			if( ! empty( $abs_url_coll_ID ) )
-			{ // We found current redirect goes to a collection domain, so it is not external
+			{ // We found current redirect goes to a collection domain, Allow this:
 				$allow_collection_redirect = true;
 			}
 		}
