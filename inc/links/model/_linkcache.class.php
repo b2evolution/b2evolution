@@ -90,7 +90,7 @@ class LinkCache extends DataObjectCache
 	 * @param string Type of cached object ( '' - empty value to cache depend on link owner type, 'file' - to cache file )
 	 * @return boolean TRUE on success
 	 */
-	function add( & $Obj, $cache_type = '' )
+	function add( $Obj, $cache_type = '' )
 	{
 		if( ( !isset($Obj->ID) ) || ( $Obj->ID == 0 ) )
 		{ // The object is not cachable, becuase it has no valid ID
@@ -98,10 +98,10 @@ class LinkCache extends DataObjectCache
 		}
 
 		// If the object wasn't already cached and is valid:
-		$this->cache[$Obj->ID] = & $Obj;
+		$this->cache[$Obj->ID] = $Obj;
 		if( $cache_type == 'file' )
 		{ // Cache by File ID
-			$this->cache_file[$Obj->file_ID][$Obj->ID] = & $Obj;
+			$this->cache_file[$Obj->file_ID][$Obj->ID] = $Obj;
 			return true;
 		}
 
@@ -116,15 +116,15 @@ class LinkCache extends DataObjectCache
 		switch( $LinkOwner->type )
 		{
 			case 'item': // cache indexed by Item ID
-				$this->cache_item[$link_object_ID][$Obj->ID] = & $Obj;
+				$this->cache_item[$link_object_ID][$Obj->ID] = $Obj;
 				break;
 
 			case 'comment': // cache indexed by Comment ID
-				$this->cache_comment[$link_object_ID][$Obj->ID] = & $Obj;
+				$this->cache_comment[$link_object_ID][$Obj->ID] = $Obj;
 				break;
 
 			case 'user': // cache indexed by User ID
-				$this->cache_user[$link_object_ID][$Obj->ID] = & $Obj;
+				$this->cache_user[$link_object_ID][$Obj->ID] = $Obj;
 				break;
 
 			default:

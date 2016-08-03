@@ -343,8 +343,11 @@ class DataObjectCache
 
 	/**
 	 * Add a dataobject to the cache
+	 *
+	 * @param object Object to add in cache
+	 * @return boolean TRUE on adding, FALSE on wrong object or if it is already in cache
 	 */
-	function add( & $Obj )
+	function add( $Obj )
 	{
 		global $Debuglog;
 
@@ -364,9 +367,9 @@ class DataObjectCache
 
 		// If the object is valid and not already cached:
 		// Add object to cache:
-		$this->cache[$Obj->ID] = & $Obj;
+		$this->cache[$Obj->ID] = $Obj;
 		// Add a reference in the object list:
-		$this->DataObject_array[] = & $Obj;
+		$this->DataObject_array[] = $Obj;
 		// Add the ID to the list of IDs
 		$this->ID_array[] = $Obj->ID;
 

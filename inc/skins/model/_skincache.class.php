@@ -50,12 +50,12 @@ class SkinCache extends DataObjectCache
 	/**
 	 * Add object to cache, handling our own indices.
 	 *
-	 * @param Skin
+	 * @param object Skin object
 	 * @return boolean True on add, false if already existing.
 	 */
-	function add( & $Skin )
+	function add( $Skin )
 	{
-		$this->cache_by_folder[ $Skin->folder ] = & $Skin;
+		$this->cache_by_folder[ $Skin->folder ] = $Skin;
 
 		return parent::add( $Skin );
 	}

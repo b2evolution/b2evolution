@@ -50,10 +50,10 @@ class BlogCache extends DataObjectCache
 	/**
 	 * Add object to cache, handling our own indices.
 	 *
-	 * @param Blog
+	 * @param object Collection object
 	 * @return boolean True on add, false if already existing.
 	 */
-	function add( & $Blog )
+	function add( $Blog )
 	{
 		if( ! empty($Blog->siteurl) && preg_match( '~^https?://~', $Blog->siteurl ) )
 		{ // absolute siteurl
