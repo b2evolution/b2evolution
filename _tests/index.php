@@ -123,6 +123,6 @@ switch( $action )
 		break;
 }
 
-$test->run( new EvoHtmlReporter(), new EvoTextReporter() );
+$test->run2( new EvoHtmlReporter(), new EvoTextReporter() );
 
 ?>
