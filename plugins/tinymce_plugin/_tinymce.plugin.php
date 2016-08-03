@@ -95,12 +95,15 @@ class tinymce_plugin extends Plugin
 				'layout' => 'begin_fieldset'
 			),
 			*/
+
+			/* Disabled to allow browser spellchecker
 			'tmce_options_contextmenu' => array( // fp> keep for now
 				'label' => $this->T_('Context menu'),
 				'type' => 'checkbox',
 				'defaultvalue' => 1,
 				'note' => $this->T_('Enable this to use an extra context menu in the editor')
 			),
+			*/
 			'tmce_options_paste' => array( // fp> keep for now
 				'label' => $this->T_('Advanced paste support'),
 				'type' => 'checkbox',
@@ -618,10 +621,12 @@ class tinymce_plugin extends Plugin
 			$tmce_plugins_array[] = 'autosave';
 		}
 
+		/* Disabled to allow browser spellchecker
 		if( $this->UserSettings->get('tmce_options_contextmenu') == 1 )
 		{
 			$tmce_plugins_array[] = 'contextmenu';
 		}
+		*/
 
 		if( $edit_layout == 'inskin' )
 		{ // In-skin editing mode
@@ -779,7 +784,10 @@ class tinymce_plugin extends Plugin
 		$init_options[] = 'toolbar3: "'.$tmce_theme_advanced_buttons3.'"';
 		$init_options[] = 'toolbar4: "'.$tmce_theme_advanced_buttons4.'"';
 		// Context menu:
-		$init_options[] = 'contextmenu: "cut copy paste | link image | inserttable"';
+		// Disabled to allow browser spell checker
+		//$init_options[] = 'contextmenu: "cut copy paste | link image | inserttable"';
+		$init_options[] = 'browser_spellcheck: true';
+
 		// UI options:
 		$init_options[] = 'block_formats : "Paragraph=p;Preformatted=pre;Block Quote=blockquote;Heading 2=h2;Heading 3=h3;Heading 4=h4;Heading 5=h5;Heading 6=h6;Address=address;Definition Term=dt;Definition Description=dd;DIV=div"';
 		$init_options[] = 'resize : true';
