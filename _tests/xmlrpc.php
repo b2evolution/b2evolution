@@ -19,7 +19,7 @@ define( 'EVO_MAIN_INIT', true );
 /**
  * class loader
  */
-require_once $inc_path.'_core/_class5.funcs.php';
+require_once $inc_path.'_core/_class_loader.funcs.php';
 require_once $inc_path.'_core/_misc.funcs.php';
 
 load_funcs('xmlrpc/model/_xmlrpc.funcs.php');

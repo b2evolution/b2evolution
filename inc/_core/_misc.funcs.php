@@ -5012,37 +5012,45 @@ function get_base_domain( $url )
 {
 	global $evo_charset;
 
-	//echo '<p>'.$url;
-	// Chop away the http part and the path:
+	// Chop away the protocol part(http,htpps,ftp) and the path:
 	$domain = preg_replace( '~^([a-z]+://)?([^:/#]+)(.*)$~i', '\\2', $url );
 
-	if( empty($domain) || preg_match( '~^(\d+\.)+\d+$~', $domain ) )
-	{	// Empty or All numeric = IP address, don't try to cut it any further
+	if( empty( $domain ) || preg_match( '~^(\d+\.)+\d+$~', $domain ) )
+	{	// Empty or All numeric = IP address, don't try to cut it any further:
 		return $domain;
 	}
 
-	//echo '<br>'.$domain;
-
-	// Get the base domain up to 3 levels (x.y.tld):
+	// Get the base domain up to 2 or 3 levels (x.y.tld):
 	// NOTE: "_" is not really valid, but for Windows it is..
 	// NOTE: \w includes "_"
 
-	// convert URL to IDN:
-	$domain = idna_encode($domain);
+	// Convert URL to IDN:
+	$domain = idna_encode( $domain );
 
-	$domain_pattern = '~ ( \w (\w|-|_)* \. ){0,2}   \w (\w|-|_)* $~ix';
-	if( ! preg_match( $domain_pattern, $domain, $match ) )
-	{
+	if( preg_match( '~\.(com|net|org|int|edu|gov|mil|arpa)$~i', $domain ) )
+	{	// Use max 2 level domain for very well known TLDs:
+		// (for example: "sub3.sub2.sub1.domain.com" will be "domain.com")
+		$max_level = 2;
+	}
+	else
+	{	// Use max 3 level domain for all others:
+		// (for example: "sub3.sub2.sub1.domain.fr" will be "sub1.domain.fr")
+		$max_level = 3;
+	}
+
+	// Limit domain by 2 or 3 level depending on TLD:
+	if( ! preg_match( '~ ( \w (\w|-|_)* \. ){0,'.( $max_level - 1 ).'}   \w (\w|-|_)* $~ix', $domain, $match ) )
+	{	// Return an empty if domain doesn't match to proper format:
 		return '';
 	}
-	$base_domain = convert_charset(idna_decode($match[0]), $evo_charset, 'UTF-8');
 
-	// Remove any www. prefix:
-	$base_domain = preg_replace( '~^www\.~i', '', $base_domain );
+	// Convert all symbols of domain name to UTF-8:
+	$domain = convert_charset( idna_decode( $match[0] ), $evo_charset, 'UTF-8' );
 
-	//echo '<br>'.$base_domain.'</p>';
+	// Remove any prefix like "www.", "www2.", "www9999." and etc.:
+	$domain = preg_replace( '~^www[0-9]*\.~i', '', $domain );
 
-	return $base_domain;
+	return $domain;
 }
 
 
