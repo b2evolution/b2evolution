@@ -1455,7 +1455,7 @@ class Blog extends DataObject
 	 */
 	function gen_blogurl( $type = 'default' )
 	{
-		global $baseurl, $basedomain, $Settings;
+		global $baseurl, $Settings;
 
 		switch( $this->get( 'access_type' ) )
 		{
@@ -1510,7 +1510,7 @@ class Blog extends DataObject
 	 */
 	function gen_baseurl()
 	{
-		global $baseurl, $basedomain;
+		global $baseurl;
 
 		switch( $this->get( 'access_type' ) )
 		{

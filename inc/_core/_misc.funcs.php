@@ -4996,7 +4996,7 @@ function get_base_domain( $url )
 	// Convert URL to IDN:
 	$domain = idna_encode( $domain );
 
-	if( preg_match( '~\.(com|net|org|int|edu|gov|mil|arpa)$~i', $domain ) )
+	if( preg_match( '~\.(com|net|org|int|edu|gov|mil)$~i', $domain ) )
 	{	// Use max 2 level domain for very well known TLDs:
 		// (for example: "sub3.sub2.sub1.domain.com" will be "domain.com")
 		$max_level = 2;
