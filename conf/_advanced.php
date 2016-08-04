@@ -212,26 +212,6 @@ else
 
 
 /**
- * Base domain of b2evolution.
- *
- * By default we try to extract it automagically from $basehost (itself extracted from $baseurl)
- * But you may need to adjust this manually.
- *
- * @todo does anyone have a clean way of handling stuff like .co.uk ? // see also: function get_base_domain( $url )
- *
- * @global string
- */
-if( filter_var( $basehost, FILTER_VALIDATE_IP ) )
-{ // host is an IP address
-	$basedomain = $basehost;
-}
-else
-{
-	$basedomain = preg_replace( '/^( .* \. )? (.+? \. .+? )$/xi', '$2', $basehost );
-}
-
-
-/**
  * Short name of this system (will be used for cookies and notification emails).
  *
  * Change this only if you install mutliple b2evolution instances on the same server or same domain.
@@ -834,7 +814,7 @@ $failed_logins_lockout = 600; // 10 minutes
  *
  * Possible values:
  *  - 'always' : Always allow redirects to a different domain
- *  - 'all_collections_and_redirected_posts' ( Default ): Allow redirects to all collection domains, ALL SUB-DOMAINS of $basedomain or redirects of posts with redirected status
+ *  - 'all_collections_and_redirected_posts' ( Default ): Allow redirects to all collection domains, ALL SUB-DOMAINS of $basehost or redirects of posts with redirected status
  *  - 'only_redirected_posts' : Allow redirects to a different domain only in case of posts with redirected status
  *  - 'never' : Force redirects to the same domain in all of the cases, and never allow redirect to a different domain
  */
