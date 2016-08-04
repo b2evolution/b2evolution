@@ -507,7 +507,7 @@ function dbm_delete_orphan_files()
 	if( $count_files_invalid )
 	{ // There are invalid files in the database
 		// Display warning to show that the 'Remove orphan file roots' tool should be also called
-		$remove_orphan_file_roots = 'href="'.$admin_url.'ctrl=tools&amp;action=delete_orphan_file_roots&amp;'.url_crumb('tools').'"';
+		$remove_orphan_file_roots = 'href="'.$admin_url.'?ctrl=tools&amp;action=delete_orphan_file_roots&amp;'.url_crumb('tools').'"';
 		$invalid_files_note = ( $count_files_invalid == 1 ) ? T_('An invalid File object was found in the database.') : sprintf( T_('%d invalid File objects were found in the database.'), $count_files_invalid );
 		echo '<p class="warning">'.$invalid_files_note."<br/>"
 			.sprintf( T_('It is strongly recommended to also execute the &lt;<a %s>Remove orphan file roots</a>&gt; tool to remove invalid files from the database and from the disk as well!'), $remove_orphan_file_roots )
