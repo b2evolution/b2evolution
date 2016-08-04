@@ -804,8 +804,8 @@ class tinymce_plugin extends Plugin
 		// note: $version may not be needed below because of automatic suffix? not sure..
 		// TODO: we don't want all of basic.css here
 
-		// Adding custom elements to wrap our short tags
-		$init_options[] = 'custom_elements : "b2evo"';
+		// Prevent object resizing in editor
+		$init_options[] = 'object_resizing : false';
 
 		$content_css = '';
 		if( ! empty( $Blog ) )
