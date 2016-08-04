@@ -1971,8 +1971,8 @@ class Item extends ItemLight
 		// Set this flag to check inline tags outside of codeblocks:
 		$params['check_code_block'] = true;
 
-		// Render Inline Images  [image:123:caption] or [file:123:caption] :
-		$output = $this->render_inline_files( $output, $params );
+		// Render inline file tags like [image:123:caption] or [file:123:caption] :
+		$output = render_inline_files( $output, $this, $params );
 
 		// Render Custom Fields [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field]:
 		$output = $this->render_custom_fields( $output, $params );
@@ -2101,9 +2101,9 @@ class Item extends ItemLight
 		array_shift($content_parts);
 		$output = implode('', $content_parts);
 
-		// Render Inline Images  [image:123:caption] or [file:123:caption] :
+		// Render inline file tags like [image:123:caption] or [file:123:caption] :
 		$params['check_code_block'] = true;
-		$output = $this->render_inline_files( $output, $params );
+		$output = render_inline_files( $output, $this, $params );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -7621,46 +7621,6 @@ class Item extends ItemLight
 		}
 
 		return $this->is_locked;
-	}
-
-
-	/**
-	 * Convert inline file tags like [image|file:123:link title:.css_class_name] or [inline:123:.css_class_name] into HTML img tags
-	 *
-	 * @param string Source content
-	 * @param array Params
-	 * @return string Content
-	 */
-	function render_inline_files( $content, $params = array() )
-	{
-		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
-		{ // Call $this->render_inline_files() on everything outside code/pre:
-			$params['check_code_block'] = false;
-			$content = callback_on_non_matching_blocks( $content,
-				'~<(code|pre)[^>]*>.*?</\1>~is',
-				array( $this, 'render_inline_files' ), array( $params ) );
-			return $content;
-		}
-
-		// No code/pre blocks, replace on the whole thing
-
-		// Remove block level short tags inside <p> blocks and move them before the paragraph
-		$content = move_short_tags( $content );
-
-		// Find all matches with inline tags
-		preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
-
-		if( !empty( $inlines[0] ) )
-		{ // There are inline tags in the content...
-
-			$rendered_tags = render_inline_tags( $this, $inlines[0], $params );
-			foreach( $rendered_tags as $current_link_tag => $rendered_link_tag )
-			{
-				$content = str_replace( $current_link_tag, $rendered_link_tag, $content );
-			}
-		}
-
-		return $content;
 	}
 
 

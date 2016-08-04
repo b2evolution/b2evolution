@@ -1395,6 +1395,23 @@ class Plugin
 
 
 	/**
+	 * Event handler: Called when rendering attachments of item contents.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'Item': the {@link Item} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function RenderItemAttachment( & $params )
+	{
+		return false; // Do nothing by default.
+	}
+
+
+	/**
 	 * Event handler: Called when rendering item/post contents as XML.
 	 *
 	 * Should this plugin apply to XML?
@@ -2186,13 +2203,31 @@ class Plugin
 	 * @param array Associative array of parameters
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
-	 *   - 'EmailCampaign': the {@link Item} object which gets rendered.
+	 *   - 'EmailCampaign': the {@link EmailCampaign} object which gets rendered.
 	 * @return boolean Have we changed something?
 	 */
 	function RenderEmailAsHtml( & $params )
 	{
 		// Use this render by default temporarily
 		return $this->RenderItemAsHtml( $params );
+	}
+
+
+	/**
+	 * Event handler: Called when rendering attachments of email campaign contents.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'EmailCampaign': the {@link EmailCampaign} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function RenderEmailAttachment( & $params )
+	{
+		// Use this render by default temporarily
+		return $this->RenderItemAttachment( $params );
 	}
 
 	// }}}
