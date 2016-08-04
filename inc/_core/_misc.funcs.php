@@ -8099,7 +8099,7 @@ function can_use_hashed_password()
 	 * @param array Params
 	 * @return array Associative array of rendered HTML tags with inline tags as key
 	 */
-function render_inline_tags( $Item, $input, $params = array() )
+function render_inline_tags( $Item, $tags, $params = array() )
 {
 	global $Plugins;
 	$inlines = array();
@@ -8128,13 +8128,14 @@ function render_inline_tags( $Item, $input, $params = array() )
 		return false;
 	}
 
-	foreach( $input as $current_inline )
+	foreach( $tags as $current_inline )
 	{
 		preg_match("/\[(image|file|inline|video|audio|thumbnail):(\d+)(:?)([^\]]*)\]/i", $current_inline, $inline);
 
 		if( empty( $inline ) )
 		{
 			$inlines[$current_inline] = $current_inline;
+			continue;
 		}
 
 		$inline_type = $inline[1]; // image|file|inline|video|audio|thumbnail
@@ -8143,11 +8144,13 @@ function render_inline_tags( $Item, $input, $params = array() )
 		if( empty( $current_link_ID ) )
 		{ // Invalid link ID, Go to next match
 			$inlines[$current_inline] = $current_inline;
+			continue;
 		}
 
 		if( ! ( $Link = & $LinkList->get_by_field( 'link_ID', $current_link_ID ) ) )
 		{ // Link ID is not part of the linked files for position "inline"
 			$inlines[$current_inline] = $current_inline;
+			continue;
 		}
 
 		if( ! ( $File = & $Link->get_File() ) )
@@ -8155,6 +8158,7 @@ function render_inline_tags( $Item, $input, $params = array() )
 			global $Debuglog;
 			$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
 			$inlines[$current_inline] = $current_inline;
+			continue;
 		}
 
 		if( ! $File->exists() )
@@ -8162,6 +8166,7 @@ function render_inline_tags( $Item, $input, $params = array() )
 			global $Debuglog;
 			$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
 			$inlines[$current_inline] = $current_inline;
+			continue;
 		}
 
 		$params['File'] = $File;
@@ -8326,7 +8331,7 @@ function render_inline_tags( $Item, $input, $params = array() )
 				}
 				else
 				{
-					return false;
+					continue;
 				}
 				break;
 
