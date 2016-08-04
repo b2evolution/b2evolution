@@ -8092,14 +8092,55 @@ function can_use_hashed_password()
 
 
 /**
-	 * Convert inline tags like [image:|file:|inline:|video:|audio:|thumbnail:] into HTML tags
-	 *
-	 * @param object Item source Item
-	 * @param array Inline tags
-	 * @param array Params
-	 * @return array Associative array of rendered HTML tags with inline tags as key
-	 */
-function render_inline_tags( $Item, $tags, $params = array() )
+ * Convert inline file tags like [image|file:123:link title:.css_class_name] or [inline:123:.css_class_name] into HTML tags
+ *
+ * @param string Source content
+ * @param object Source object
+ * @param array Params
+ * @return string Content
+ */
+function render_inline_files( $content, $Object, $params = array() )
+{
+	if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+	{	// Call render_inline_files() on everything outside code/pre:
+		$params['check_code_block'] = false;
+		$content = callback_on_non_matching_blocks( $content,
+			'~<(code|pre)[^>]*>.*?</\1>~is',
+			'render_inline_files', array( $Object, $params ) );
+		return $content;
+	}
+
+	// No code/pre blocks, replace on the whole thing
+
+	// Remove block level short tags inside <p> blocks and move them before the paragraph
+	$content = move_short_tags( $content );
+
+	// Find all matches with inline tags
+	preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
+
+	if( !empty( $inlines[0] ) )
+	{	// There are inline tags in the content...
+
+		$rendered_tags = render_inline_tags( $Object, $inlines[0], $params );
+		foreach( $rendered_tags as $current_link_tag => $rendered_link_tag )
+		{
+			$content = str_replace( $current_link_tag, $rendered_link_tag, $content );
+		}
+	}
+
+	return $content;
+}
+
+
+/**
+ * Convert inline tags like [image:|file:|inline:|video:|audio:|thumbnail:] into HTML tags
+ *
+ * @param object Source object: Item, EmailCampaign
+ * @param array Inline tags
+ * @param array Params
+ * @return array Associative array of rendered HTML tags with inline tags as key
+ */
+function render_inline_tags( $Object, $tags, $params = array() )
 {
 	global $Plugins;
 	$inlines = array();
@@ -8117,9 +8158,26 @@ function render_inline_tags( $Item, $tags, $params = array() )
 				'get_rendered_attachments' => true,
 			), $params );
 
+	$object_class = get_class( $Object );
+
 	if( !isset( $LinkList ) )
-	{ // Get list of attached Links only first time
-		$LinkOwner = new LinkItem( $Item );
+	{	// Get list of attached Links only first time:
+		switch( $object_class )
+		{
+			case 'Item':
+				$LinkOwner = new LinkItem( $Object );
+				$plugin_event_name = 'RenderItemAttachment';
+				break;
+
+			case 'EmailCampaign':
+				$LinkOwner = new LinkEmailCampaign( $Object );
+				$plugin_event_name = 'RenderEmailAttachment';
+				break;
+
+			default:
+				// Wrong source object type:
+				return false;
+		}
 		$LinkList = $LinkOwner->get_attachment_LinkList( $params['limit'], 'inline' );
 	}
 
@@ -8156,7 +8214,7 @@ function render_inline_tags( $Item, $tags, $params = array() )
 		if( ! ( $File = & $Link->get_File() ) )
 		{ // No File object:
 			global $Debuglog;
-			$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
+			$Debuglog->add( sprintf( 'Link ID#%d of '.$object_class.' #%d does not have a file object!', $Link->ID, $Object->ID ), array( 'error', 'files' ) );
 			$inlines[$current_inline] = $current_inline;
 			continue;
 		}
@@ -8164,14 +8222,14 @@ function render_inline_tags( $Item, $tags, $params = array() )
 		if( ! $File->exists() )
 		{ // File doesn't exist:
 			global $Debuglog;
-			$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+			$Debuglog->add( sprintf( 'File linked to '.$object_class.' #%d does not exist (%s)!', $Object->ID, $File->get_full_path() ), array( 'error', 'files' ) );
 			$inlines[$current_inline] = $current_inline;
 			continue;
 		}
 
 		$params['File'] = $File;
 		$params['Link'] = $Link;
-		$params['Item'] = $Item;
+		$params[ $object_class ] = $Object;
 
 		switch( $inline_type )
 		{
@@ -8233,7 +8291,7 @@ function render_inline_tags( $Item, $tags, $params = array() )
 
 					// We need to assign the result of trigger_event_first_true to a variable before counting
 					// or else modifications to the params are not applied in PHP7
-					$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_image_params );
+					$r_params = $Plugins->trigger_event_first_true( $plugin_event_name, $current_image_params );
 					if( count( $r_params ) != 0 )
 					{	// Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r
 						if( ! $r_params['get_rendered_attachments'] )
@@ -8244,8 +8302,17 @@ function render_inline_tags( $Item, $tags, $params = array() )
 					}
 
 					if( $inline_type == 'image' )
-					{ // Generate the IMG tag with all the alt, title and desc if available
-						$inlines[$current_inline] = $Item->get_attached_image_tag( $Link, $current_image_params );
+					{	// Generate the IMG tag with all the alt, title and desc if available:
+						if( $object_class == 'Item' )
+						{	// Get the IMG tag with link to original image or to Item page:
+							$inlines[ $current_inline ] = $Object->get_attached_image_tag( $Link, $current_image_params );
+						}
+						else
+						{	// Get the IMG tag without link:
+							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
+									'image_link_to' => false
+								) ) );
+						}
 					}
 					elseif( $inline_type == 'inline' )
 					{ // Generate simple IMG tag with original image size
@@ -8327,7 +8394,16 @@ function render_inline_tags( $Item, $tags, $params = array() )
 						'image_class'         => implode( ' ', $thumbnail_classes ),
 					);
 
-					$inlines[$current_inline] = $Item->get_attached_image_tag( $Link, $current_image_params );
+					if( $object_class == 'Item' )
+					{	// Get the IMG tag with link to original image or to Item page:
+						$inlines[ $current_inline ] = $Object->get_attached_image_tag( $Link, $current_image_params );
+					}
+					else
+					{	// Get the IMG tag without link:
+						$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
+								'image_link_to' => false
+							) ) );
+					}
 				}
 				else
 				{
@@ -8389,7 +8465,7 @@ function render_inline_tags( $Item, $tags, $params = array() )
 
 					// We need to assign the result of trigger_event_first_true to a variable before counting
 					// or else modifications to the params are not applied in PHP7
-					$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_video_params );
+					$r_params = $Plugins->trigger_event_first_true( $plugin_event_name, $current_video_params );
 					if( count( $r_params ) != 0 )
 					{
 						$inlines[$current_inline] = $r_params['data'];
@@ -8420,7 +8496,7 @@ function render_inline_tags( $Item, $tags, $params = array() )
 
 					// We need to assign the result of trigger_event_first_true to a variable before counting
 					// or else modifications to the params are not applied in PHP7
-					$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_audio_params );
+					$r_params = $Plugins->trigger_event_first_true( $plugin_event_name, $current_audio_params );
 
 					if( count( $r_params ) != 0 )
 					{
