@@ -18,9 +18,9 @@ param('action', 'string', '');
 <body>
 	<h1>Setup simpletest for b2evolution</h1>
 	<p>This will setup the simpletest framework for b2evolution, by unzipping the simpletest snapshot
-	<small>(<a href="http://evocms.cvs.sourceforge.net/viewvc/*checkout*/evocms/b2evolution/tests/simpletest.tar.bz2?revision=1.1">link to the CVS HEAD (most current) version</a>)</small> shipped with b2evolution.</p>
+	<small>(<a href="https://github.com/simpletest/simpletest/releases/latest">link to the GITHUB (most current) version</a>)</small> shipped with b2evolution.</p>
 
-	<p><small>This snapshot is provided for your convenience and gets packaged from <a href="http://github.com/blueyed/simpletest">http://github.com/blueyed/simpletest</a> (basically upstream trunk with useful/required patches)</small></p>
+	<p><small>This snapshot is provided for your convenience and gets packaged from <a href="https://github.com/simpletest/simpletest">https://github.com/simpletest/simpletest</a> (basically upstream trunk with useful/required patches)</small></p>
 
 <?php
 if( $action == 'unzip_simpletest' )
@@ -28,7 +28,7 @@ if( $action == 'unzip_simpletest' )
 	echo '<h1>Unzipping...</h1>';
 
 	$target_dir = dirname(__FILE__);
-	$source_file = 'simpletest.tar.bz2';
+	$source_file = 'simpletest.tar.gz';
 
 	# Test if "tar" exists
 	exec( 'tar --version', $output, $return );
@@ -39,6 +39,8 @@ if( $action == 'unzip_simpletest' )
 	else
 	{
 		$commands[] = 'tar xjv -f '.escapeshellarg($source_file).' 2>&1';
+		$commands[] = 'mv simpletest-1.1.7/* simpletest';
+		$commands[] = 'rm -R simpletest-1.1.7';
 	}
 	
 	if( empty($commands) && @file_exists( 'C:\Program Files\7-Zip\7z.exe' ) )
