@@ -6102,9 +6102,9 @@ function get_active_opcode_cache()
 		return 'OPCache';
 	}
 
-	if( function_exists( 'apcu_cache_info' ) && ini_get( 'apc.enabled' ) )
+	if( function_exists( 'apc_cache_info' ) && ini_get( 'apc.enabled' ) )
 	{
-		return 'APCu';
+		return 'APC';
 	}
 
 	return 'none';
@@ -6118,14 +6118,14 @@ function get_active_opcode_cache()
  */
 function get_active_user_cache()
 {
-	if( function_exists( 'apc_cache_info' ) && ini_get( 'apc.enabled' ) )
-	{
-		return 'APC';
-	}
-
 	if( function_exists( 'apcu_cache_info' ) && ini_get( 'apc.enabled' ) )
 	{
 		return 'APCu';
+	}
+
+	if( function_exists( 'apc_cache_info' ) && ini_get( 'apc.enabled' ) )
+	{
+		return 'APC';
 	}
 
 	// xcache: xcache.var_size must be > 0. xcache_set is not necessary (might have been disabled).
