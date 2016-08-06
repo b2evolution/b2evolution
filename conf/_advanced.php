@@ -194,15 +194,20 @@ $resample_all_images = false;
 
 // Decompose the baseurl
 // YOU SHOULD NOT EDIT THIS unless you know what you're doing
-if( preg_match( '#^(https?://(.+?)(:(.+?))?)(/.*)$#', $baseurl, $matches ) )
+if( preg_match( '#^((https?)://(www\.)?(.+?)(:(.+?))?)(/.*)$#', $baseurl, $matches ) )
 {
 	$baseurlroot = $matches[1]; // no ending slash!
 	// echo "baseurlroot=$baseurlroot <br />";
-	$basehost = $matches[2];
+
+	$baseprotocol = $matches[2];
+
+	$basehost = $matches[4]; // Will NEVER include "www." at the beginning.
 	// echo "basehost=$basehost <br />";
-	$baseport =  $matches[4];
+
+	$baseport =  $matches[6];
 	// echo "baseport=$baseport <br />";
-	$basesubpath =  $matches[5];
+
+	$basesubpath =  $matches[7];
 	// echo "basesubpath=$basesubpath <br />";
 }
 else
@@ -298,17 +303,26 @@ $cookie_path = preg_replace( '#https?://[^/]+#', '', $baseurl );
  * @global string
  */
 if( strpos($basehost, '.') === false )
-{	// localhost or windows machine name:
+{	// "localhost" or windows machine name:
 	$cookie_domain = '';
 }
+else
+{
+	$cookie_domain = $basehost;
+}
+
+/* The following is no longer needed because we already strip away "www." from $basehost, so now in all cases the cookie domain should just be the base domain
+
 elseif( preg_match( '~^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$~i', $basehost ) )
 {	// The basehost is an IP address, use the basehost as it is:
 	$cookie_domain = $basehost;
 }
 else
-{	// Keep the part of the basehost after the www. :
-	$cookie_domain = preg_replace( '/^(www\. )? (.+)$/xi', '.$2', $basehost );
+{	
+	// Keep the part of the basehost after the www. :
+	//	$cookie_domain = preg_replace( '/^(www\. )? (.+)$/xi', '.$2', $basehost );
 }
+*/
 
 /**
  * Name used for session cookies.

@@ -1564,23 +1564,11 @@ function check_local_installation()
 	global $basehost;
 
 	return php_sapi_name() != 'cli' && // NOT php CLI mode
-		( $basehost == 'localhost' ||
-			( isset( $_SERVER['SERVER_ADDR'] ) && (
-				$_SERVER['SERVER_ADDR'] == '127.0.0.1' ||
-				$_SERVER['SERVER_ADDR'] == '::1' ) // IPv6 address of 127.0.0.1
-			) ||
-			( isset( $_SERVER['REMOTE_ADDR'] ) && (
-				$_SERVER['REMOTE_ADDR'] == '127.0.0.1' ||
-				$_SERVER['REMOTE_ADDR'] == '::1' )
-			) ||
-			( isset( $_SERVER['HTTP_HOST'] ) && (
-				$_SERVER['HTTP_HOST'] == '127.0.0.1' ||
-				$_SERVER['HTTP_HOST'] == '::1' )
-			) ||
-			( isset( $_SERVER['SERVER_NAME'] ) && (
-				$_SERVER['SERVER_NAME'] == '127.0.0.1' ||
-				$_SERVER['SERVER_NAME'] == '::1' )
-			)
+		( $basehost == 'localhost' 
+			|| ( isset( $_SERVER['SERVER_ADDR'] ) && ( $_SERVER['SERVER_ADDR'] == '127.0.0.1' || $_SERVER['SERVER_ADDR'] == '::1' ) ) // IPv6 address of 127.0.0.1
+			|| ( isset( $_SERVER['REMOTE_ADDR'] ) && ( $_SERVER['REMOTE_ADDR'] == '127.0.0.1' || $_SERVER['REMOTE_ADDR'] == '::1' ) ) 
+			|| ( isset( $_SERVER['HTTP_HOST'] ) && ( $_SERVER['HTTP_HOST'] == '127.0.0.1' || $_SERVER['HTTP_HOST'] == '::1' ) ) 
+			|| ( isset( $_SERVER['SERVER_NAME'] ) && ( $_SERVER['SERVER_NAME'] == '127.0.0.1' || $_SERVER['SERVER_NAME'] == '::1' ) )
 		);
 }
 
