@@ -9,6 +9,9 @@
   float: left;
   margin: 0 10px 5px 0;
 }
+.widget_core_item_about_author .evo_avatar img {
+  border-radius: 50%;
+}
 div.widget_core_coll_item_list.evo_layout_rwd .widget_rwd_content,
 div.widget_core_coll_featured_posts.evo_layout_rwd .widget_rwd_content,
 div.widget_core_coll_post_list.evo_layout_rwd .widget_rwd_content,
@@ -432,7 +435,7 @@ div.widget_core_coll_related_post_list.evo_withexcerpt.evo_noteaser div.item_exc
   user-select: none;
   background-image: none;
   border: 1px solid transparent;
-  color: #333333;
+  color: #333;
   border-radius: 4px;
   border: 1px solid #ccc;
 }
@@ -555,7 +558,7 @@ div.widget_core_user_avatars.evo_layout_rwd img {
 }
 .widget_core_org_members {
   margin: 5em 0 30px;
-  color: #333333;
+  color: #333;
 }
 .widget_core_org_members div.widget_rwd_content {
   text-align: center;
@@ -576,7 +579,7 @@ div.widget_core_user_avatars.evo_layout_rwd img {
   font-size: 18px;
 }
 .widget_core_org_members a.user_link {
-  color: #000000;
+  color: #000;
 }
 .widget_core_org_members a.user_link:hover {
   color: #23527c;
@@ -611,6 +614,13 @@ div.widget_core_user_avatars.evo_layout_rwd img {
     font-size: 20px;
     line-height: 45px;
   }
+}
+.videojs_block .vjs-default-skin .vjs-big-play-button {
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
 }
 .ratings_table {
   margin: 0 10px 10px 0;
@@ -687,13 +697,6 @@ div.average_rating .star_rating {
 .rating_recap div {
   float: left;
   padding-right: 10px;
-}
-.videojs_block .vjs-default-skin .vjs-big-play-button {
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
 }
 *[class^="listnav_distance_"],
 *[class*=" listnav_distance_"] {

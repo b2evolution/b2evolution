@@ -81,31 +81,31 @@ button.action_icon {
   cursor: pointer;
 }
 .status_color_draft {
-  color: #ffff99;
+  color: #ff9;
 }
 .status_color_review {
-  color: #cc0099;
+  color: #CC0099;
 }
 .status_color_community {
-  color: #2e8bb9;
+  color: #2E8BB9;
 }
 .status_color_protected {
-  color: #ff9c2a;
+  color: #FF9C2A;
 }
 .status_color_private {
-  color: #dc143c;
+  color: #DC143C;
 }
 .status_color_published {
-  color: #99ee44;
+  color: #99EE44;
 }
 .status_color_deprecated {
-  color: #000000;
+  color: #000;
 }
 .status_color_redirected {
   color: #663399;
 }
 .status_color_trash {
-  color: #ff6666;
+  color: #f66;
 }
 .status_color_meta {
   color: #5bc0de;
@@ -115,7 +115,7 @@ button.action_icon {
 }
 .btn-status-draft {
   color: #000;
-  background-color: #ffff99;
+  background-color: #ff9;
   border-color: #dfdfdf;
 }
 .btn-status-draft:hover {
@@ -124,7 +124,7 @@ button.action_icon {
 }
 .btn-status-review {
   color: #fff;
-  background-color: #cc0099;
+  background-color: #CC0099;
 }
 .btn-status-review:hover {
   color: #fff;
@@ -132,7 +132,7 @@ button.action_icon {
 }
 .btn-status-community {
   color: #fff;
-  background-color: #2e8bb9;
+  background-color: #2E8BB9;
 }
 .btn-status-community:hover {
   color: #fff;
@@ -140,7 +140,7 @@ button.action_icon {
 }
 .btn-status-protected {
   color: #fff;
-  background-color: #ff9c2a;
+  background-color: #FF9C2A;
 }
 .btn-status-protected:hover {
   color: #fff;
@@ -148,7 +148,7 @@ button.action_icon {
 }
 .btn-status-private {
   color: #fff;
-  background-color: #dc143c;
+  background-color: #DC143C;
 }
 .btn-status-private:hover {
   color: #fff;
@@ -156,7 +156,7 @@ button.action_icon {
 }
 .btn-status-published {
   color: #000;
-  background-color: #99ee44;
+  background-color: #99EE44;
 }
 .btn-status-published .glyphicon {
   color: inherit !important;
@@ -167,11 +167,11 @@ button.action_icon {
 }
 .btn-status-deprecated {
   color: #fff;
-  background-color: #000000;
+  background-color: #000;
 }
 .btn-status-deprecated:hover {
   color: #fff;
-  background-color: #333333;
+  background-color: #333;
 }
 .btn-status-redirected {
   color: #fff;
@@ -183,11 +183,11 @@ button.action_icon {
 }
 .btn-status-trash {
   color: #fff;
-  background-color: #ff6666;
+  background-color: #f66;
 }
 .btn-status-trash:hover {
   color: #fff;
-  background-color: #ff4444;
+  background-color: #f44;
 }
 span.fa {
   line-height: inherit;
@@ -544,7 +544,7 @@ code {
   color: #f60;
 }
 .green {
-  color: #00cc00;
+  color: #0c0;
 }
 .black {
   color: #000;
@@ -804,7 +804,7 @@ div#evo_toolbar .actions_right {
 }
 .evobar-menu a.disabled,
 .evobar-menu a.disabled:hover {
-  color: #999999;
+  color: #999;
 }
 .evobar-menu [class^=evobar-icon-] {
   margin-left: 6px;
@@ -863,7 +863,7 @@ div#evo_toolbar .actions_right {
   left: 0;
   width: 100%;
   text-align: center;
-  text-shadow: -1px -1px #000000, -2px 0 #000000, -1px 1px #000000, 0 2px #000000, 1px 1px #000000, 2px 0 #000000, 1px -1px #000000, 0 -2px #000000;
+  text-shadow: -1px -1px #000, -2px 0 #000, -1px 1px #000, 0 2px #000, 1px 1px #000, 2px 0 #000, 1px -1px #000, 0 -2px #000;
   color: #FFF;
   font-weight: bold;
 }
@@ -1622,6 +1622,9 @@ li[class*=" listnav_distance_"] {
   float: left;
   margin: 0 10px 5px 0;
 }
+.widget_core_item_about_author .evo_avatar img {
+  border-radius: 50%;
+}
 div.widget_core_coll_item_list.evo_layout_rwd .widget_rwd_content,
 div.widget_core_coll_featured_posts.evo_layout_rwd .widget_rwd_content,
 div.widget_core_coll_post_list.evo_layout_rwd .widget_rwd_content,
@@ -2049,7 +2052,7 @@ div.widget_core_coll_related_post_list.evo_withexcerpt.evo_noteaser div.item_exc
   user-select: none;
   background-image: none;
   border: 1px solid transparent;
-  color: #333333;
+  color: #333;
   border-radius: 4px;
   border: 1px solid #ccc;
 }
@@ -2172,7 +2175,7 @@ div.widget_core_user_avatars.evo_layout_rwd img {
 }
 .widget_core_org_members {
   margin: 5em 0 30px;
-  color: #333333;
+  color: #333;
 }
 .widget_core_org_members div.widget_rwd_content {
   text-align: center;
@@ -2193,7 +2196,7 @@ div.widget_core_user_avatars.evo_layout_rwd img {
   font-size: 18px;
 }
 .widget_core_org_members a.user_link {
-  color: #000000;
+  color: #000;
 }
 .widget_core_org_members a.user_link:hover {
   color: #23527c;
@@ -2228,6 +2231,13 @@ div.widget_core_user_avatars.evo_layout_rwd img {
     font-size: 20px;
     line-height: 45px;
   }
+}
+.videojs_block .vjs-default-skin .vjs-big-play-button {
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
 }
 .ratings_table {
   margin: 0 10px 10px 0;
@@ -2304,13 +2314,6 @@ div.average_rating .star_rating {
 .rating_recap div {
   float: left;
   padding-right: 10px;
-}
-.videojs_block .vjs-default-skin .vjs-big-play-button {
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
 }
 main .well {
   padding: 15px 15px 25px 15px;
@@ -3645,8 +3648,8 @@ div.results tr.placeholder td {
   height: 0;
   padding: 0;
 }
-div.results tr.placeholder + tr:not( :nth-child(2)):not(.dragged) > td,
-div.results tr.dragged + tr:not( :nth-child(2)):not(.dragged) > td {
+div.results tr.placeholder + tr:not(:nth-child(2)):not(.dragged) > td,
+div.results tr.dragged + tr:not(:nth-child(2)):not(.dragged) > td {
   border-top: none;
 }
 div.filters {
