@@ -6776,43 +6776,10 @@ function int2ip( $int )
  */
 function is_valid_ip_format( $ip )
 {
-	if( function_exists( 'filter_var' ) )
-	{ // filter_var() function exists we have PHP version >= 5.2.0
-		return filter_var( $ip, FILTER_VALIDATE_IP ) !== false;
-	}
-
-	// PHP version is < 5.2.0
-	if( $ip == '::1' )
-	{	// Reserved IP for localhost
-		$ip = '127.0.0.1';
-	}
-
-	if( strpos( $ip, '.' ) !== false )
-	{ // we have IPv4
-		if( strpos( $ip, ':' !== false ) )
-		{ // It is combined with IPv6, remove the IPv6 prefix
-			$ip = substr( $ip, strrpos( $ip, ':' ) );
-		}
-		if( substr_count( $ip, '.' ) != 3 )
-		{ // Don't vaildate formats like 'zz.yyyyy' which would be allowed by ip2long() function
-			return false;
-		}
-		$result = ip2long( $ip );
-		return ( ( $result !== false ) && ( $result !== -1 ) );
-	}
-
-	// Check if it is a valid IPv6 string
-	if( preg_match( "/^[0-9a-f]{1,4}:([0-9a-f]{0,4}:){1,6}[0-9a-f]{1,4}$/", $ip ) )
-	{ // $ip has the correct format
-		if( ( substr_count( $ip, '::' ) > 1 ) || ( strpos( $ip, ':::' ) !== false ) )
-		{ // Not valid IPv6 format because contains a ':::' char sequence or more than one '::'
-			return false;
-		}
-		return true;
-	}
-
-	return false;
+	return filter_var( $ip, FILTER_VALIDATE_IP ) !== false;
 }
+
+
 
 
 /**

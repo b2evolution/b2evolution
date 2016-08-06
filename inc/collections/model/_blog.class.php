@@ -1491,7 +1491,7 @@ class Blog extends DataObject
 	 */
 	function gen_blogurl( $type = 'default' )
 	{
-		global $baseurl, $Settings;
+		global $baseprotocol, $basehost, $baseurl, $Settings;
 
 		switch( $this->get( 'access_type' ) )
 		{
@@ -1529,7 +1529,7 @@ class Blog extends DataObject
 				return $baseurl.$this->siteurl;
 
 			case 'subdom':
-				return preg_replace( '#(https?://)#i', '$1'.$this->urlname.'.', $baseurl );
+				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.'/';
 
 			case 'absolute':
 				return $this->siteurl;
@@ -1546,7 +1546,7 @@ class Blog extends DataObject
 	 */
 	function gen_baseurl()
 	{
-		global $baseurl;
+		global $baseprotocol, $basehost, $baseurl;
 
 		switch( $this->get( 'access_type' ) )
 		{
@@ -1570,7 +1570,7 @@ class Blog extends DataObject
 				break;
 
 			case 'subdom':
-				return preg_replace( '#(https?://)#i', '$1'.$this->urlname.'.', $baseurl );
+				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.'/';
 
 			case 'absolute':
 				$url = $this->siteurl;
@@ -2465,7 +2465,7 @@ class Blog extends DataObject
 	 */
 	function get( $parname, $params = array() )
 	{
-		global $xmlsrv_url, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog;
+		global $xmlsrv_url, $basehost, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog;
 
 		if( gettype( $params ) != 'array' )
 		{
@@ -2481,7 +2481,7 @@ class Blog extends DataObject
 		{
 			case 'access_type':
 				$access_type_value = parent::get( $parname );
-				if( $access_type_value == 'subdom' && is_ip_url_domain( $baseurl ) )
+				if( $access_type_value == 'subdom' && is_valid_ip_format( $basehost ) )
 				{	// Don't allow subdomain for IP address:
 					$access_type_value = 'index.php';
 				}

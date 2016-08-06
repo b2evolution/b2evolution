@@ -363,8 +363,8 @@ C message size exceeds',
 		}
 
 		// set those defaults which needs some global variables
-		$this->_defaults['notification_sender_email'] = $instance_name.'-noreply@'.preg_replace( '/^www\./i', '', $basehost );
-		$this->_defaults['notification_return_path'] = $instance_name.'-return@'.preg_replace( '/^www\./i', '', $basehost );
+		$this->_defaults['notification_sender_email'] = $instance_name.'-noreply@'.$basehost;
+		$this->_defaults['notification_return_path'] = $instance_name.'-return@'.$basehost;
 	}
 
 

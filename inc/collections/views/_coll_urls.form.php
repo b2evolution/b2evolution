@@ -61,7 +61,7 @@ $Form->hidden( 'tab', $tab );
 $Form->hidden( 'blog', $blog );
 
 
-global $baseurl, $basehost;
+global $baseurl, $baseprotocol, $basehost;
 
 // determine siteurl type (if not set from update-action)
 if( preg_match('#https?://#', $edited_Blog->get( 'siteurl' ) ) )
@@ -160,16 +160,16 @@ $Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_li
 										'onclick="document.getElementById( \'blog_siteurl_relative\' ).focus();"'
 			)
 		);
-		if( ! is_ip_url_domain( $baseurl ) )
-		{	// Don't allow subdomain for IP address:
+		if( ! is_valid_ip_format( $basehost ) )
+		{// Not an IP address, we can use subdomains:
 			$access_type_options[] = array( 'subdom', T_('Subdomain of basehost'),
-										preg_replace( '#(https?://)#i', '$1<span class="blog_url_text">'.$edited_Blog->urlname.'</span>.', $baseurl ),
+										$baseprotocol.'://<span class="blog_url_text">'.$edited_Blog->urlname.'</span>.'.$basehost.'/',
 										'',
-										'onclick="update_urlpreview( \'http://\'+document.getElementById( \'blog_urlname\' ).value+\'.'.preg_replace( '#(https?://)#i', '', $baseurl ).'\' )"'
+										'onclick="update_urlpreview( \''.$baseprotocol.'://\'+document.getElementById( \'blog_urlname\' ).value+\'.'.$basehost.'/\' )"'
 			);
 		}
 		else
-		{
+		{ // Don't allow subdomain for IP address:
 			$access_type_options[] = array( 'subdom', T_('Subdomain').':',
 										sprintf( T_('(Not possible for %s)'), $basehost ),
 										'',
@@ -211,7 +211,7 @@ function update_urlpreview( baseurl, url_path )
 	jQuery( '#plugins_assets_url_type_relative' ).html( baseurl + 'plugins/' );
 }
 
-// Update blog url name in several places on the page
+// Update blog url name in several places on the page:
 jQuery( '#blog_urlname' ).bind( 'keyup blur', function()
 {
 	jQuery( '.blog_url_text' ).html( jQuery( this ).val() );
@@ -241,7 +241,7 @@ jQuery( '[id$=_assets_absolute_url]' ).focus( function()
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Cookies').get_admin_badge().get_manual_link( 'collection-cookies' ) );
+$Form->begin_fieldset( T_('Cookie Settings').get_admin_badge().get_manual_link( 'collection-cookie-settings' ) );
 
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{	// If current user has a permission to edit collection advanced admin settings:
