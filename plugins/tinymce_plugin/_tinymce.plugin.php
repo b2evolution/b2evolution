@@ -807,6 +807,8 @@ class tinymce_plugin extends Plugin
 		// Prevent object resizing in editor
 		$init_options[] = 'object_resizing : false';
 
+		$init_options[] = 'extended_valid_elements : "figure[class],figcaption[class]"';
+
 		$content_css = '';
 		if( ! empty( $Blog ) )
 		{	// Load the appropriate ITEM/POST styles depending on the blog's skin:
@@ -827,7 +829,7 @@ class tinymce_plugin extends Plugin
 				}
 
 				// Load b2evo base css
-				$content_css .= ','.$baseurl.'rsc/build/bootstrap-b2evo_base.bundle.css';
+				$content_css .= ','.$baseurl.'rsc/build/bootstrap-b2evo_base.bmin.css';
 			}
 			// else item_default.css -- is it still possible to have no skin ?
 		}
