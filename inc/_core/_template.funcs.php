@@ -89,22 +89,20 @@ function headers_content_mightcache( $type = 'text/html', $max_age = '#', $chars
 
 
 /**
- * Sends HTTP header to redirect to the previous location (which
- * can be given as function parameter, GET parameter (redirect_to),
+ * Sends HTTP header to redirect to the previous location (which can be given as function parameter, GET parameter (redirect_to),
  * is taken from {@link Hit::$referer} or {@link $baseurl}).
  *
- * {@link $Debuglog} and {@link $Messages} get stored in {@link $Session}, so they
- * are available after the redirect.
- *
- * NOTE: This function {@link exit() exits} the php script execution.
+ * {@link $Debuglog} and {@link $Messages} get stored in {@link $Session}, so they are available after the redirect.
  *
  * @todo fp> do NOT allow $redirect_to = NULL. This leads to spaghetti code and unpredictable behavior.
  *
+ * @return boolean false IF blocked AND $return_to_caller_if_forbidden BUT most of the time, this function {@link exit() exits} the php script execution.
  * @param string Destination URL to redirect to
  * @param boolean|integer is this a permanent redirect? if true, send a 301; otherwise a 303 OR response code 301,302,303
  * @param boolean is this a redirected post display? This param may be true only if we should redirect to a post url where the post status is 'redirected'!
+ * @param boolean do we want to return to the caller if the redirect is forbidden? (useful when trying to redirect after post edit)
  */
-function header_redirect( $redirect_to = NULL, $status = false, $redirected_post = false )
+function header_redirect( $redirect_to = NULL, $status = false, $redirected_post = false, $return_to_caller_if_forbidden = false )
 {
 	/**
 	 * put your comment there...
@@ -185,6 +183,7 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 
 
 	$allow_collection_redirect = false;
+
 	if( $external_redirect 
 		&& $allow_redirects_to_different_domain == 'all_collections_and_redirected_posts' 
 		&& ! $redirected_post )
@@ -224,6 +223,10 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	{ // Force header redirects into the same domain. Do not allow external URLs.
 		$Messages->add( T_('A redirection to an external URL was blocked for security reasons.'), 'error' );
 		syslog_insert( 'A redirection to an external URL '.$redirect_to.' was blocked for security reasons.', 'error', NULL );
+		if( $return_to_caller_if_forbidden )
+		{	// Return to caller meaning we did not redirect:
+			return false;
+		}
 		$redirect_to = $baseurl;
 	}
 
