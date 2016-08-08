@@ -7174,18 +7174,6 @@ function get_cookie_path()
 
 
 /**
- * Get name of session cookie
- *
- * @return string Session cookie name
- */
-function get_session_cookie_name()
-{
-	global $instance_name;
-	return str_replace( '.', '_', 'session_'.$instance_name.'_'.get_cookie_domain() );
-}
-
-
-/**
  * Set a cookie to send it by evo_sendcookies()
  *
  * @param string The name of the cookie
