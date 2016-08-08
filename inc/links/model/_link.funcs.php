@@ -438,11 +438,14 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 				'style'   => 'cursor:default;'
 			) );
 
-		$r .= ' '.get_icon( 'add__yellow', 'imgtag', array(
-				'title'   => T_('Insert thumbnail into the post'),
-				'onclick' => 'evo_link_insert_inline( \'thumbnail\', '.$link_ID.', \'medium:left\' )',
-				'style'   => 'cursor:default;'
-			) );
+		if( $type == 'image' )
+		{
+			$r .= ' '.get_icon( 'add__yellow', 'imgtag', array(
+					'title'   => T_('Insert thumbnail into the post'),
+					'onclick' => 'evo_link_insert_inline( \'thumbnail\', '.$link_ID.', \'medium:left\' )',
+					'style'   => 'cursor:default;'
+				) );
+		}
 	}
 
 	return $r;
