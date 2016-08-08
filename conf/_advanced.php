@@ -327,7 +327,7 @@ else
 /**
  * Name used for session cookies.
  */
-$cookie_session = str_replace( '.', '_', 'session_'.$instance_name.'_'.$cookie_domain );
+$cookie_session = 'session_'.$instance_name;
 
 /**
  * Names used for other cookies.
