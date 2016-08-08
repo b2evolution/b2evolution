@@ -325,11 +325,6 @@ else
 */
 
 /**
- * Name used for session cookies.
- */
-$cookie_session = str_replace( '.', '_', 'session_'.$instance_name.'_'.$cookie_domain );
-
-/**
  * Names used for other cookies.
  *
  * The following remember the comment meta data for non registered users:

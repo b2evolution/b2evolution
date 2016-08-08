@@ -99,12 +99,12 @@ class Session
 	{
 		global $DB, $Debuglog, $current_User, $localtimenow, $Messages, $Settings, $UserSettings;
 		global $Hit;
-		global $cookie_session, $cookie_expires;
+		global $cookie_expires;
 
 		$Debuglog->add( 'Session: cookie_domain='.get_cookie_domain(), 'request' );
 		$Debuglog->add( 'Session: cookie_path='.get_cookie_path(), 'request' );
 
-		$session_cookie = param_cookie( $cookie_session, 'string', '' );
+		$session_cookie = param_cookie( get_session_cookie_name(), 'string', '' );
 		if( empty( $session_cookie ) )
 		{
 			$Debuglog->add( 'Session: No session cookie received.', 'request' );
@@ -248,7 +248,7 @@ class Session
 			$this->ID = $DB->insert_id;
 
 			// Set a cookie valid for ~ 10 years:
-			evo_setcookie( $cookie_session, $this->ID.'_'.$this->key, time()+315360000, '', '', false, true );
+			evo_setcookie( get_session_cookie_name(), $this->ID.'_'.$this->key, time()+315360000, '', '', false, true );
 
 			$Debuglog->add( 'Session: ID (generated): '.$this->ID, 'request' );
 			$Debuglog->add( 'Session: Cookie sent.', 'request' );
@@ -374,7 +374,7 @@ class Session
 	 */
 	function logout()
 	{
-		global $Debuglog, $cookie_session;
+		global $Debuglog;
 
 		// Invalidate the session key (no one will be able to use this session again)
 		$this->key = NULL;
@@ -385,7 +385,7 @@ class Session
 		$this->user_ID = NULL; // Unset user_ID after invalidating/saving the session above, to keep the user info attached to the old session.
 
 		// clean up the session cookie:
-		evo_setcookie( $cookie_session, '', 200000000, '', '', false, true );
+		evo_setcookie( get_session_cookie_name(), '', 200000000, '', '', false, true );
 	}
 
 
