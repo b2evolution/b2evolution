@@ -7508,6 +7508,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11785, 'Upgrading email log table...' ) )
+	{	// part of 6.7.5-stable
+		$DB->query( 'ALTER TABLE T_email__log
+			MODIFY emlog_message MEDIUMTEXT DEFAULT NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
