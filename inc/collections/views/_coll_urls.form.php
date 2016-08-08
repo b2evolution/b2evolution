@@ -245,16 +245,21 @@ $Form->begin_fieldset( T_('Cookie Settings').get_admin_badge().get_manual_link( 
 
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{	// If current user has a permission to edit collection advanced admin settings:
+		$Form->switch_layout( 'none' );
+		$Form->output = false;
+		$cookie_domain_custom_field = $Form->text( 'cookie_domain_custom', $edited_Blog->get_setting( 'cookie_domain_custom' ), 50, '', '', 120 );
+		$cookie_path_custom_field = $Form->text( 'cookie_path_custom', $edited_Blog->get_setting( 'cookie_path_custom' ), 50, '', '', 120 );
+		$Form->output = true;
+		$Form->switch_layout( NULL );
+
 		$Form->radio( 'cookie_domain_type', $edited_Blog->get_setting( 'cookie_domain_type' ), array(
 				array( 'auto', T_('Automatic'), $edited_Blog->get_cookie_domain( 'auto' ) ),
-				array( 'custom', T_('Custom').':', '', '<input type="text" class="form_text_input form-control" name="cookie_domain_custom" size="50" maxlength="120" value="'
-					.format_to_output( $edited_Blog->get_setting( 'cookie_domain_custom' ), 'formvalue' ).'" />' ),
+				array( 'custom', T_('Custom').':', '', $cookie_domain_custom_field ),
 			), T_('Cookie domain'), true );
 
 		$Form->radio( 'cookie_path_type', $edited_Blog->get_setting( 'cookie_path_type' ), array(
 				array( 'auto', T_('Automatic'), $edited_Blog->get_cookie_path( 'auto' ) ),
-				array( 'custom', T_('Custom').':', '', '<input type="text" class="form_text_input form-control" name="cookie_path_custom" size="50" maxlength="120" value="'
-					.format_to_output( $edited_Blog->get_setting( 'cookie_path_custom' ), 'formvalue' ).'" />' ),
+				array( 'custom', T_('Custom').':', '', $cookie_path_custom_field ),
 			), T_('Cookie path'), true );
 	}
 	else

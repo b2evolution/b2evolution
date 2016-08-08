@@ -1129,7 +1129,7 @@ class Blog extends DataObject
 					preg_match( '#^https?://(.+?)(:(.+?))?$#', $this->get_baseurl_root(), $coll_host );
 					if( empty( $coll_host[1] ) || ! preg_match( '#(^|\.)'.preg_quote( preg_replace( '#^\.#i', '', $cookie_domain_custom ) ).'$#i', $coll_host[1] ) )
 					{	// Wrong cookie domain:
-						$Messages->add( T_('Impossible to save wrong setting for custom cookie domain.'), 'error' );
+						param_error( 'cookie_domain_custom', T_('The custom cookie domain must be a parent of the collection domain.') );
 					}
 					$this->set_setting( 'cookie_domain_custom', $cookie_domain_custom );
 				}
@@ -1144,7 +1144,7 @@ class Blog extends DataObject
 					$cookie_path_custom = param( 'cookie_path_custom', 'string', NULL );
 					if( ! preg_match( '#^'.preg_quote( preg_replace( '#/$#i', '', $cookie_path_custom ) ).'(/|$)#i', $this->get_basepath() ) )
 					{	// Wrong cookie path:
-						$Messages->add( T_('Impossible to save wrong setting for custom cookie path.'), 'error' );
+						param_error( 'cookie_path_custom', T_('The custom cookie path must be a parent of the collection path.') );
 					}
 					$this->set_setting( 'cookie_path_custom', $cookie_path_custom );
 				}
