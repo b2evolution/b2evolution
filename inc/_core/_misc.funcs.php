@@ -7782,7 +7782,7 @@ function get_install_format_text( $text, $format = 'string' )
  *
  * @return boolean TRUE - hashed password will be transmitted, FALSE - raw password will be transmitted
  */
-function transmit_hashed_password()
+function can_use_hashed_password()
 {
 	global $transmit_hashed_password;
 
