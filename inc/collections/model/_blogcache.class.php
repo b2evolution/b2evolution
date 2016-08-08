@@ -102,7 +102,7 @@ class BlogCache extends DataObjectCache
 			         AND ( '.$DB->quote( 'http'.$req_url_wo_proto ).' LIKE CONCAT( blog_siteurl, "%" )
 		                 OR '.$DB->quote( 'https'.$req_url_wo_proto ).' LIKE CONCAT( blog_siteurl, "%" ) ) )
 			    OR ( blog_access_type = "subdom"
-			         AND '.$DB->quote( $req_url_wo_proto ).' LIKE CONCAT( "://", blog_urlname, ".'.$basehost.( empty( $baseport ) ? '' : ':'.$baseport ).'/%" ) )';
+			         AND '.$DB->quote( $req_url_wo_proto ).' LIKE CONCAT( "://", blog_urlname, ".'.$basehost.$baseport.'/%" ) )';
 
 		// Match stubs like "http://base/url/STUB?param=1" on $baseurl
 		/*

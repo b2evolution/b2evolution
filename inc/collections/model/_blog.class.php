@@ -1493,7 +1493,7 @@ class Blog extends DataObject
 				return $baseurl.$this->siteurl;
 
 			case 'subdom':
-				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.( empty( $baseport ) ? '' : ':'.$baseport ).'/';
+				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.$baseport.'/';
 
 			case 'absolute':
 				return $this->siteurl;
@@ -1534,7 +1534,7 @@ class Blog extends DataObject
 				break;
 
 			case 'subdom':
-				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.( empty( $baseport ) ? '' : ':'.$baseport ).'/';
+				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.$baseport.'/';
 
 			case 'absolute':
 				$url = $this->siteurl;
