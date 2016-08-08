@@ -1455,7 +1455,7 @@ class Blog extends DataObject
 	 */
 	function gen_blogurl( $type = 'default' )
 	{
-		global $baseprotocol, $basehost, $baseurl, $Settings;
+		global $baseprotocol, $basehost, $baseport, $baseurl, $Settings;
 
 		switch( $this->get( 'access_type' ) )
 		{
@@ -1493,7 +1493,7 @@ class Blog extends DataObject
 				return $baseurl.$this->siteurl;
 
 			case 'subdom':
-				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.'/';
+				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.( empty( $baseport ) ? '' : ':'.$baseport ).'/';
 
 			case 'absolute':
 				return $this->siteurl;
@@ -1510,7 +1510,7 @@ class Blog extends DataObject
 	 */
 	function gen_baseurl()
 	{
-		global $baseprotocol, $basehost, $baseurl;
+		global $baseprotocol, $basehost, $baseport, $baseurl;
 
 		switch( $this->get( 'access_type' ) )
 		{
@@ -1534,7 +1534,7 @@ class Blog extends DataObject
 				break;
 
 			case 'subdom':
-				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.'/';
+				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.( empty( $baseport ) ? '' : ':'.$baseport ).'/';
 
 			case 'absolute':
 				$url = $this->siteurl;

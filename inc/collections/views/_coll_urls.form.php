@@ -61,7 +61,7 @@ $Form->hidden( 'tab', $tab );
 $Form->hidden( 'blog', $blog );
 
 
-global $baseurl, $baseprotocol, $basehost;
+global $baseurl, $baseprotocol, $basehost, $baseport;
 
 // determine siteurl type (if not set from update-action)
 if( preg_match('#https?://#', $edited_Blog->get( 'siteurl' ) ) )
@@ -163,9 +163,9 @@ $Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_li
 		if( ! is_valid_ip_format( $basehost ) )
 		{// Not an IP address, we can use subdomains:
 			$access_type_options[] = array( 'subdom', T_('Subdomain of basehost'),
-										$baseprotocol.'://<span class="blog_url_text">'.$edited_Blog->urlname.'</span>.'.$basehost.'/',
+										$baseprotocol.'://<span class="blog_url_text">'.$edited_Blog->urlname.'</span>.'.$basehost.( empty( $baseport ) ? '' : ':'.$baseport ).'/',
 										'',
-										'onclick="update_urlpreview( \''.$baseprotocol.'://\'+document.getElementById( \'blog_urlname\' ).value+\'.'.$basehost.'/\' )"'
+										'onclick="update_urlpreview( \''.$baseprotocol.'://\'+document.getElementById( \'blog_urlname\' ).value+\'.'.$basehost.( empty( $baseport ) ? '' : ':'.$baseport ).'/\' )"'
 			);
 		}
 		else
