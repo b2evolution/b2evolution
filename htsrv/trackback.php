@@ -90,7 +90,7 @@ if( !( $commented_Item = & $ItemCache->get_by_ID( $tb_id, false ) ) )
 	trackback_response( 1, 'Sorry, the requested post doesn\'t exist.' ); // exits
 }
 
-if( !( $Blog = & $commented_Item->get_Blog() ) )
+if( !( $Collection = $Blog = & $commented_Item->get_Blog() ) )
 {
 	trackback_response( 1, 'Sorry, could not get the post\'s weblog.' ); // exits
 }

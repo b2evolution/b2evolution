@@ -231,7 +231,7 @@ class pureforums_Skin extends Skin
 				'separator' => '',
 			), $params );
 
-		global $Blog;
+		global $Collection, $Blog;
 
 		$ChapterCache = & get_ChapterCache();
 
@@ -277,7 +277,7 @@ class pureforums_Skin extends Skin
 	 */
 	function get_post_button( $chapter_ID, $Item = NULL )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$post_button = '';
 

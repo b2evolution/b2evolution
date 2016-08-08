@@ -50,10 +50,10 @@ class BlogCache extends DataObjectCache
 	/**
 	 * Add object to cache, handling our own indices.
 	 *
-	 * @param Blog
+	 * @param object Collection object
 	 * @return boolean True on add, false if already existing.
 	 */
-	function add( & $Blog )
+	function add( $Blog )
 	{
 		if( ! empty($Blog->siteurl) && preg_match( '~^https?://~', $Blog->siteurl ) )
 		{ // absolute siteurl
@@ -81,7 +81,7 @@ class BlogCache extends DataObjectCache
 	 */
 	function & get_by_url( $req_url, $halt_on_error = true )
 	{
-		global $DB, $Debuglog, $baseurl, $basedomain, $basehost;
+		global $DB, $Debuglog, $baseurl, $basehost, $baseport;
 
 		foreach( array_keys($this->cache_siteurl_abs) as $siteurl_abs )
 		{
@@ -99,11 +99,10 @@ class BlogCache extends DataObjectCache
 		$sql = 'SELECT *
 			  FROM T_blogs
 			 WHERE ( blog_access_type = "absolute"
-			         AND ( '.$DB->quote('http'.$req_url_wo_proto).' LIKE CONCAT( blog_siteurl, "%" )
-		                 OR '.$DB->quote('https'.$req_url_wo_proto).' LIKE CONCAT( blog_siteurl, "%" ) ) )
+			         AND ( '.$DB->quote( 'http'.$req_url_wo_proto ).' LIKE CONCAT( blog_siteurl, "%" )
+		                 OR '.$DB->quote( 'https'.$req_url_wo_proto ).' LIKE CONCAT( blog_siteurl, "%" ) ) )
 			    OR ( blog_access_type = "subdom"
-			         AND ( '.$DB->quote($req_url_wo_proto).' LIKE CONCAT( "://", blog_urlname, ".'.$basedomain.'/%" )
-			               OR '.$DB->quote($req_url_wo_proto).' LIKE CONCAT( "://", blog_urlname, ".'.$basehost.'/%" ) ) )';
+			         AND '.$DB->quote( $req_url_wo_proto ).' LIKE CONCAT( "://", blog_urlname, ".'.$basehost.( empty( $baseport ) ? '' : ':'.$baseport ).'/%" ) )';
 
 		// Match stubs like "http://base/url/STUB?param=1" on $baseurl
 		/*
@@ -123,7 +122,7 @@ class BlogCache extends DataObjectCache
 			return $r; // we return by reference!
 		}
 
-		$Blog = new Blog( $row );
+		$Collection = $Blog = new Blog( $row );
 		$this->add( $Blog );
 
 		return $Blog;
@@ -163,7 +162,7 @@ class BlogCache extends DataObjectCache
 			return $r;
 		}
 
-		$Blog = new Blog( $row );
+		$Collection = $Blog = new Blog( $row );
 		$this->add( $Blog );
 
 		return $Blog;

@@ -56,7 +56,7 @@ switch( $action )
 		$ItemCache = & get_ItemCache();
 		$Item = $ItemCache->get_by_ID( $item_ID );
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog_ID );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 
 		locale_activate( $Blog->get('locale') );
 
@@ -84,7 +84,7 @@ switch( $action )
 		$post_id = NULL;
 		$comment_id = param( 'comment_id', 'integer', 0 );
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog_ID );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 
 		locale_activate( $Blog->get('locale') );
 
@@ -138,7 +138,7 @@ switch( $action )
 		if( $blog_ID > 0 )
 		{	// Get Blog if ID is set
 			$BlogCache = & get_BlogCache();
-			$Blog = $BlogCache->get_by_ID( $blog_ID );
+			$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 		}
 
 		if( $user_ID > 0 )
@@ -349,7 +349,7 @@ switch( $action )
 		else
 		{
 			$BlogCache = &get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
 			$skin_ID = $Blog->get_skin_ID();
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $skin_ID );
@@ -457,7 +457,7 @@ switch( $action )
 					if( ! empty( $blog_ID ) )
 					{ // If blog is defined we should check if we can display info about number of votes
 						$BlogCache = & get_BlogCache();
-						if( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) &&
+						if( ( $Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) ) &&
 						    $blog_skin_ID = $Blog->get_skin_ID() )
 						{
 							$LinkOwner = & $Link->get_LinkOwner();
@@ -749,7 +749,7 @@ switch( $action )
 		else
 		{
 			$BlogCache = &get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
 			$skin_ID = $Blog->get_skin_ID();
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $skin_ID );
@@ -957,7 +957,7 @@ switch( $action )
 		else
 		{
 			$BlogCache = &get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
 			$skin_ID = $Blog->get_skin_ID();
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $skin_ID );
@@ -1259,7 +1259,7 @@ switch( $action )
 		}
 
 		$BlogCache = &get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
 		$skin_ID = $Blog->get_skin_ID();
 		$SkinCache = & get_SkinCache();
 		$Skin = & $SkinCache->get_by_ID( $skin_ID );
@@ -1300,7 +1300,7 @@ switch( $action )
 		else
 		{ // Load Blog skin
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
 			$skin_ID = $Blog->get_skin_ID();
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $skin_ID );
@@ -1341,7 +1341,7 @@ switch( $action )
 		else
 		{ // Load Blog skin
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
 			$skin_ID = $Blog->get_skin_ID();
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $skin_ID );

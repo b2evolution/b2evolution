@@ -48,7 +48,7 @@ class html5_videojs_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		require_css( '#videojs_css#', 'blog' );
 		require_js( '#videojs#', 'blog' );
@@ -279,7 +279,7 @@ class html5_videojs_plugin extends Plugin
 	 */
 	function require_skin()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$skin = $this->get_coll_setting( 'skin', $Blog );
 		if( !empty( $skin ) && $skin != 'vjs-default-skin' )

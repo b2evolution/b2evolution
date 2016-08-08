@@ -28,7 +28,7 @@ $params = array_merge( array(
 
 $recipient_User = $params['recipient_User'];
 $Item = $params['Item'];
-$Blog = & $Item->get_Blog();
+$Collection = $Blog = & $Item->get_Blog();
 
 if( $params['notify_full'] )
 {	/* Full notification */

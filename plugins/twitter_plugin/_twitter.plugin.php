@@ -187,7 +187,7 @@ class twitter_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		global $Blog, $Item;
+		global $Collection, $Blog, $Item;
 
 		if( $Blog && $Blog->get_setting( 'tags_twitter_card' ) )
 		{
@@ -260,7 +260,7 @@ class twitter_plugin extends Plugin
 	 */
 	function get_twitter_link( $target_type, $target_id )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		require_once 'twitteroauth/twitteroauth.php';
 
@@ -451,7 +451,7 @@ class twitter_plugin extends Plugin
 			$this->set_coll_setting( 'twitter_contact', $contact, $target_id );
 			// save Collection settings
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $target_id, false, false );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $target_id, false, false );
 			$Blog->dbupdate();
 		}
 		else if( $target_type == 'user' )
@@ -495,7 +495,7 @@ class twitter_plugin extends Plugin
 			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=renderers&blog='.$target_id );
 
 			$BlogCache = & get_BlogCache();
-			$Blog = $BlogCache->get_by_ID( $target_id );
+			$Collection = $Blog = $BlogCache->get_by_ID( $target_id );
 
 			$this->delete_coll_setting( 'twitter_token', $target_id );
 			$this->delete_coll_setting( 'twitter_secret', $target_id );
@@ -561,7 +561,7 @@ class twitter_plugin extends Plugin
 		if( ! empty($blog_ID) )
 		{	// CollSettings
 			$BlogCache = & get_Cache('BlogCache');
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 			if( !empty( $Blog ) )
 			{
 				$r['token'] = $this->get_coll_setting( 'twitter_token', $Blog );

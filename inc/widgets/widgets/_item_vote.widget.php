@@ -126,7 +126,7 @@ class item_vote_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog, $current_User, $DB;
+		global $Collection, $Blog, $current_User, $DB;
 
 		$this->init_display( $params );
 
@@ -184,7 +184,7 @@ class item_vote_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog, $current_User;
+		global $Collection, $Blog, $current_User;
 
 		return array(
 				'wi_ID'        => $this->ID, // Have the widget settings changed ?

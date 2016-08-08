@@ -456,6 +456,22 @@ class bootstrap_main_Skin extends Skin
 				add_headline( $custom_css );
 			}
 		}
+
+		if( $disp == 'front' )
+		{ // Initialize script to scroll down to widget container with users team:
+			add_js_headline( '
+jQuery( document ).ready( function()
+{
+	jQuery( "#slide_button" ).click( function()
+	{
+		jQuery( "html, body, #skin_wrapper" ).animate(
+		{
+			scrollTop: jQuery( ".evo_container__front_page_secondary" ).offset().top
+		}, 1500 );
+	} );
+} );' );
+		}
+
 	}
 
 
@@ -467,7 +483,7 @@ class bootstrap_main_Skin extends Skin
 	 */
 	function is_visible_container( $container_key )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $Blog->has_access() )
 		{	// If current user has an access to this collection then don't restrict containers:

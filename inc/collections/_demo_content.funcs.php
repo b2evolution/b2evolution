@@ -131,7 +131,7 @@ function create_blog(
 {
 	global $default_locale, $install_test_features, $local_installation, $Plugins;
 
-	$Blog = new Blog( NULL );
+	$Collection = $Blog = new Blog( NULL );
 
 	$Blog->init_by_kind( $kind, $blog_name, $blog_shortname, $blog_urlname );
 

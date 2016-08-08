@@ -151,14 +151,14 @@ class widescroll_plugin extends Plugin
 		if( ! empty( $params['Item'] ) )
 		{ // Item is set, get Blog from post
 			$edited_Item = & $params['Item'];
-			$Blog = & $edited_Item->get_Blog();
+			$Collection = $Blog = & $edited_Item->get_Blog();
 			// We editing an Item, Check if HTML is allowed for the post type:
 			$allow_HTML = $edited_Item->get_type_setting( 'allow_html' );
 		}
 
 		if( empty( $Blog ) )
 		{ // Item is not set, try global Blog
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{ // We can't get a Blog, this way "apply_rendering" plugin collection setting is not available
 				return false;
@@ -203,13 +203,13 @@ class widescroll_plugin extends Plugin
 			if( !empty( $Comment->item_ID ) )
 			{
 				$comment_Item = & $Comment->get_Item();
-				$Blog = & $comment_Item->get_Blog();
+				$Collection = $Blog = & $comment_Item->get_Blog();
 			}
 		}
 
 		if( empty( $Blog ) )
 		{ // Comment is not set, try global Blog
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{ // We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available
 				return false;
@@ -286,7 +286,7 @@ class widescroll_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( ! isset( $Blog ) || (
 		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&

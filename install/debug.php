@@ -348,7 +348,6 @@ switch( $action )
 		$Form->textarea_input( 'content', $file_overrides_content, 20, T_('Config'), array(
 						'cols' => 50,
 						'note' => 'A few possible settings:<br /><br />
-$minimum_comment_interval = 1;<br />
 $debug = 1;<br />
 $debug_jslog = 1;<br />
 $allow_po_extraction = 1;<br />

@@ -297,6 +297,9 @@ class RestApi
 	 */
 	private function display_response()
 	{
+		// Send the predefined cookies:
+		evo_sendcookies();
+
 		// Set JSON content type:
 		headers_content_mightcache( 'application/json' );
 
@@ -313,7 +316,7 @@ class RestApi
 	 */
 	private function module_collections()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		// Collection controller ('list' by default):
 		$coll_controller = isset( $this->args[2] ) ? $this->args[2] : 'list';
@@ -331,7 +334,7 @@ class RestApi
 			$coll_urlname = $this->args[1];
 
 			$BlogCache = & get_BlogCache();
-			if( ( $Blog = $BlogCache->get_by_urlname( $coll_urlname, false ) ) === false )
+			if( ( $Collection = $Blog = $BlogCache->get_by_urlname( $coll_urlname, false ) ) === false )
 			{	// Collection is not detected in DB by requested url name:
 				$this->halt( 'No collection found in DB by requested url name "'.$coll_urlname.'"', 'unknown_collection', 404 );
 				// Exit here.
@@ -543,7 +546,7 @@ class RestApi
 	 */
 	private function controller_coll_items( $force_filters = array() )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		// Get param to limit number posts per page:
 		$api_per_page = param( 'per_page', 'integer', 10 );
@@ -676,7 +679,7 @@ class RestApi
 	 */
 	private function controller_coll_search()
 	{
-		global $Blog, $Session;
+		global $Collection, $Blog, $Session;
 
 		// Get additional params:
 		$api_page = param( 'page', 'integer', 1 );
@@ -890,7 +893,7 @@ class RestApi
 	 */
 	private function controller_coll_assignees()
 	{
-		global $current_User, $Blog, $DB;
+		global $current_User, $Collection, $Blog, $DB;
 
 		if( ! is_logged_in() || ! $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 		{	// Check permission: Current user must has a permission to be assignee of the collection:
@@ -996,7 +999,7 @@ class RestApi
 	 */
 	private function controller_coll_favorite()
 	{
-		global $current_User, $Blog;
+		global $current_User, $Collection, $Blog;
 
 		if( ! is_logged_in() )
 		{	// Check permission: Current user must be logged in
@@ -1027,7 +1030,7 @@ class RestApi
 	 */
 	private function controller_coll_items_flag( $item_ID )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$ItemCache = & get_ItemCache();
 		if( ( $Item = & $ItemCache->get_by_ID( $item_ID, false, false ) ) === false )

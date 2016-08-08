@@ -811,7 +811,7 @@ class Hit
 	 */
 	function record_the_hit( $delayed = false )
 	{
-		global $DB, $Session, $ReqURI, $Blog, $blog, $localtimenow, $Debuglog, $disp, $ctrl, $http_response_code;
+		global $DB, $Session, $ReqURI, $Collection, $Blog, $blog, $localtimenow, $Debuglog, $disp, $ctrl, $http_response_code;
 
 		// To log current display and controller the global variables $disp and $ctrl are used. They can be setup while calling of some controller
 		// or while forming a page. In case if these variables aren't setup, NULL is recorded to the DB.

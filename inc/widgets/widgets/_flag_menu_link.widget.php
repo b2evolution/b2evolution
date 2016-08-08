@@ -97,6 +97,16 @@ class flag_menu_link_Widget extends ComponentWidget
 					'size' => 5,
 					'defaultvalue' => '',
 				),
+				'visibility' => array(
+					'label' => T_( 'Visibility' ),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'always', T_( 'Always show (cacheable)') ),
+							array( 'access', T_( 'Only show if access is allowed (not cacheable)' ) ) ),
+					'defaultvalue' => 'always',
+					'field_lines' => true,
+				),
 				'show_badge' => array(
 					'label' => T_( 'Show Badge' ),
 					'note' => T_('Show a badge with the count of flagged items.'),
@@ -143,8 +153,12 @@ class flag_menu_link_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $current_User;
-		global $disp;
+		global $current_User, $disp, $Blog;
+
+		if( ! is_logged_in() )
+		{	// Only logged in user can flag items:
+			return false;
+		}
 
 		$this->init_display( $params );
 
@@ -157,7 +171,7 @@ class flag_menu_link_Widget extends ComponentWidget
 
 		if( empty( $current_Blog ) )
 		{	// Blog is not defined in setting or it doesn't exist in DB:
-			global $Blog;
+			global $Collection, $Blog;
 			// Use current blog:
 			$current_Blog = & $Blog;
 		}
@@ -167,8 +181,8 @@ class flag_menu_link_Widget extends ComponentWidget
 			return false;
 		}
 
-		if( ! is_logged_in() )
-		{	// Only logged in user can flag items:
+		if( $this->disp_params['visibility'] == 'access' && ! $current_Blog->has_access() )
+		{	// Don't use this widget because current user has no access to the collection:
 			return false;
 		}
 
@@ -180,15 +194,8 @@ class flag_menu_link_Widget extends ComponentWidget
 		$url = $current_Blog->get( 'flaggedurl' );
 		$text = empty( $this->disp_params['link_text'] ) ? T_('Flagged Items') : $this->disp_params['link_text'];
 
-		if( $disp == 'flagged' )
-		{	// Display this item menu as selected if current page is displaying the flagged items:
-			$link_class = $this->disp_params['link_selected_class'];
-		}
-		else
-		{
-			$link_class = $this->disp_params['link_default_class'];
-		}
-
+		// Higlight current menu item only when it is linked to current collection and flagged items page is displaying currently:
+		$highlight_current = ( $current_Blog->ID == $Blog->ID && $disp == 'flagged' );
 
 		$badge = '';
 		if( $this->disp_params['show_badge'] )
@@ -204,21 +211,23 @@ class flag_menu_link_Widget extends ComponentWidget
 		echo $this->disp_params['block_body_start'];
 		echo $this->disp_params['list_start'];
 
-		if( $link_class == $this->disp_params['link_selected_class'] )
-		{
+		if( $highlight_current )
+		{	// Use template and class to highlight current menu item:
+			$link_class = $this->disp_params['link_selected_class'];
 			echo $this->disp_params['item_selected_start'];
 		}
 		else
-		{
+		{	// Use normal template and class:
+			$link_class = $this->disp_params['link_default_class'];
 			echo $this->disp_params['item_start'];
 		}
 		echo '<a href="'.$url.'" class="'.$link_class.'">'.$text.$badge.'</a>';
-		if( $link_class == $this->disp_params['link_selected_class'] )
-		{
+		if( $highlight_current )
+		{	// Use template to highlight current menu item:
 			echo $this->disp_params['item_selected_end'];
 		}
 		else
-		{
+		{	// Use normal template:
 			echo $this->disp_params['item_end'];
 		}
 

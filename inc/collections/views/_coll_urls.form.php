@@ -61,7 +61,7 @@ $Form->hidden( 'tab', $tab );
 $Form->hidden( 'blog', $blog );
 
 
-global $baseurl, $basedomain;
+global $baseurl, $baseprotocol, $basehost;
 
 // determine siteurl type (if not set from update-action)
 if( preg_match('#https?://#', $edited_Blog->get( 'siteurl' ) ) )
@@ -160,18 +160,18 @@ $Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_li
 										'onclick="document.getElementById( \'blog_siteurl_relative\' ).focus();"'
 			)
 		);
-		if( ! is_ip_url_domain( $baseurl ) )
-		{	// Don't allow subdomain for IP address:
-			$access_type_options[] = array( 'subdom', T_('Subdomain of basedomain'),
-										preg_replace( '#(https?://)#i', '$1<span class="blog_url_text">'.$edited_Blog->urlname.'</span>.', $baseurl ),
+		if( ! is_valid_ip_format( $basehost ) )
+		{// Not an IP address, we can use subdomains:
+			$access_type_options[] = array( 'subdom', T_('Subdomain of basehost'),
+										$baseprotocol.'://<span class="blog_url_text">'.$edited_Blog->urlname.'</span>.'.$basehost.'/',
 										'',
-										'onclick="update_urlpreview( \'http://\'+document.getElementById( \'blog_urlname\' ).value+\'.'.preg_replace( '#(https?://)#i', '', $baseurl ).'\' )"'
+										'onclick="update_urlpreview( \''.$baseprotocol.'://\'+document.getElementById( \'blog_urlname\' ).value+\'.'.$basehost.'/\' )"'
 			);
 		}
 		else
-		{
+		{ // Don't allow subdomain for IP address:
 			$access_type_options[] = array( 'subdom', T_('Subdomain').':',
-										sprintf( T_('(Not possible for %s)'), $basedomain ),
+										sprintf( T_('(Not possible for %s)'), $basehost ),
 										'',
 										'disabled="disabled"'
 			);
@@ -211,7 +211,7 @@ function update_urlpreview( baseurl, url_path )
 	jQuery( '#plugins_assets_url_type_relative' ).html( baseurl + 'plugins/' );
 }
 
-// Update blog url name in several places on the page
+// Update blog url name in several places on the page:
 jQuery( '#blog_urlname' ).bind( 'keyup blur', function()
 {
 	jQuery( '.blog_url_text' ).html( jQuery( this ).val() );
@@ -237,6 +237,31 @@ jQuery( '[id$=_assets_absolute_url]' ).focus( function()
 	// URL Preview (always displayed)
 	$blogurl = $edited_Blog->gen_blogurl();
 	$Form->info( T_('URL preview'), '<span id="urlpreview">'.$blogurl.'</span>' );
+
+$Form->end_fieldset();
+
+
+$Form->begin_fieldset( T_('Cookie Settings').get_admin_badge().get_manual_link( 'collection-cookie-settings' ) );
+
+	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+	{	// If current user has a permission to edit collection advanced admin settings:
+		$Form->radio( 'cookie_domain_type', $edited_Blog->get_setting( 'cookie_domain_type' ), array(
+				array( 'auto', T_('Automatic'), $edited_Blog->get_cookie_domain( 'auto' ) ),
+				array( 'custom', T_('Custom').':', '', '<input type="text" class="form_text_input form-control" name="cookie_domain_custom" size="50" maxlength="120" value="'
+					.format_to_output( $edited_Blog->get_setting( 'cookie_domain_custom' ), 'formvalue' ).'" />' ),
+			), T_('Cookie domain'), true );
+
+		$Form->radio( 'cookie_path_type', $edited_Blog->get_setting( 'cookie_path_type' ), array(
+				array( 'auto', T_('Automatic'), $edited_Blog->get_cookie_path( 'auto' ) ),
+				array( 'custom', T_('Custom').':', '', '<input type="text" class="form_text_input form-control" name="cookie_path_custom" size="50" maxlength="120" value="'
+					.format_to_output( $edited_Blog->get_setting( 'cookie_path_custom' ), 'formvalue' ).'" />' ),
+			), T_('Cookie path'), true );
+	}
+	else
+	{	// Display only info about colleciton cookie domain and path if user has no permission to edit:
+		$Form->info( T_('Cookie domain'), $edited_Blog->get_cookie_domain() );
+		$Form->info( T_('Cookie path'), $edited_Blog->get_cookie_path() );
+	}
 
 $Form->end_fieldset();
 

@@ -158,7 +158,7 @@ class UserQuery extends SQL
 	 */
 	function where_members( $members )
 	{
-		global $DB, $Blog;
+		global $DB, $Collection, $Blog;
 
 		if( empty( $members ) || is_admin_page() || empty( $Blog ) || $Blog->get_setting( 'allow_access' ) != 'members' )
 		{ // Don't restrict

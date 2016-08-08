@@ -285,7 +285,7 @@ switch( $action )
 		if( !empty( $blog ) )
 		{ // blog is set, redirect to in-skin change password form
 			$BlogCache = & get_BlogCache();
-			$Blog = $BlogCache->get_by_ID( $blog );
+			$Collection = $Blog = $BlogCache->get_by_ID( $blog );
 			if( $Blog )
 			{
 				$changepwd_url = $Blog->get( 'userurl', array( 'url_suffix' => 'disp=pwdchange&reqID='.$reqID, 'glue' => '&' ) );
@@ -603,7 +603,7 @@ $Debuglog->add( 'return_to: '.$return_to );
 if( $inskin && use_in_skin_login() )
 { // in-skin display:
 	$BlogCache = & get_BlogCache();
-	$Blog = $BlogCache->get_by_ID( $blog, false, false );
+	$Collection = $Blog = $BlogCache->get_by_ID( $blog, false, false );
 	if( ! empty( $Blog ) )
 	{
 		if( !empty( $login_error ) )

@@ -97,7 +97,7 @@ class Blog extends DataObject
 
 
 	/**
-	 * The URL to the basepath of that blog.
+	 * The URL to the basepath of that collection.
 	 * This is supposed to be the same as $baseurl but localized to the domain of the blog/
 	 *
 	 * Lazy filled by get_basepath_url()
@@ -105,6 +105,36 @@ class Blog extends DataObject
 	 * @var string
 	 */
 	var $basepath_url;
+
+
+	/**
+	 * The domain of that collection.
+	 *
+	 * Lazy filled by get_baseurl_root()
+	 *
+	 * @var string
+	 */
+	var $baseurl_root;
+
+
+	/**
+	 * The domain for cookie of that collection.
+	 *
+	 * Lazy filled by get_cookie_domain()
+	 *
+	 * @var string
+	 */
+	var $cookie_domain;
+
+
+	/**
+	 * The path for cookie of that collection.
+	 *
+	 * Lazy filled by get_cookie_path()
+	 *
+	 * @var string
+	 */
+	var $cookie_path;
 
 
 	/**
@@ -921,6 +951,9 @@ class Blog extends DataObject
 			{ // Only admin can set this setting to 'Public'
 				$this->set_setting( 'new_feedback_status', $new_feedback_status );
 			}
+			$this->set_setting( 'comment_form_msg', param( 'comment_form_msg', 'text' ) );
+			$this->set_setting( 'require_anon_name', param( 'require_anon_name', 'string', '0' ) );
+			$this->set_setting( 'require_anon_email', param( 'require_anon_email', 'string', '0' ) );
 			$this->set_setting( 'allow_anon_url', param( 'allow_anon_url', 'string', '0' ) );
 			$this->set_setting( 'allow_html_comment', param( 'allow_html_comment', 'string', '0' ) );
 			$this->set_setting( 'allow_attachments', param( 'allow_attachments', 'string', 'registered' ) );
@@ -1013,7 +1046,7 @@ class Blog extends DataObject
 
 			if( in_array( 'login', $groups ) )
 			{ // we want to load the login params:
-				if( ! get_setting_Blog( 'login_blog_ID' ) )
+				if( ! get_setting_Blog( 'login_blog_ID', $this ) )
 				{ // Update this only when no blog is defined for login/registration
 					$this->set_setting( 'in_skin_login', param( 'in_skin_login', 'integer', 0 ) );
 				}
@@ -1123,6 +1156,39 @@ class Blog extends DataObject
 				}
 			}
 
+			if( ( param( 'cookie_domain_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
+			{	// Cookies:
+				$this->set_setting( 'cookie_domain_type', get_param( 'cookie_domain_type' ) );
+				if( get_param( 'cookie_domain_type' ) == 'custom' )
+				{	// Update custom cookie domain:
+					$cookie_domain_custom = param( 'cookie_domain_custom', 'string', NULL );
+					preg_match( '#^https?://(.+?)(:(.+?))?$#', $this->get_baseurl_root(), $coll_host );
+					if( empty( $coll_host[1] ) || ! preg_match( '#(^|\.)'.preg_quote( preg_replace( '#^\.#i', '', $cookie_domain_custom ) ).'$#i', $coll_host[1] ) )
+					{	// Wrong cookie domain:
+						$Messages->add( T_('Impossible to save wrong setting for custom cookie domain.'), 'error' );
+					}
+					$this->set_setting( 'cookie_domain_custom', $cookie_domain_custom );
+				}
+				else
+				{	// Reset custom cookie domain:
+					$this->set_setting( 'cookie_domain_custom', '' );
+				}
+
+				$this->set_setting( 'cookie_path_type', param( 'cookie_path_type', 'string', NULL ) );
+				if( get_param( 'cookie_path_type' ) == 'custom' )
+				{	// Update custom cookie path:
+					$cookie_path_custom = param( 'cookie_path_custom', 'string', NULL );
+					if( ! preg_match( '#^'.preg_quote( preg_replace( '#/$#i', '', $cookie_path_custom ) ).'(/|$)#i', $this->get_basepath() ) )
+					{	// Wrong cookie path:
+						$Messages->add( T_('Impossible to save wrong setting for custom cookie path.'), 'error' );
+					}
+					$this->set_setting( 'cookie_path_custom', $cookie_path_custom );
+				}
+				else
+				{	// Reset custom cookie path:
+					$this->set_setting( 'cookie_path_custom', '' );
+				}
+			}
 
 			if( ( param( 'rsc_assets_url_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
 			{ // Assets URLs / CDN:
@@ -1425,7 +1491,7 @@ class Blog extends DataObject
 	 */
 	function gen_blogurl( $type = 'default' )
 	{
-		global $baseurl, $basedomain, $Settings;
+		global $baseprotocol, $basehost, $baseurl, $Settings;
 
 		switch( $this->get( 'access_type' ) )
 		{
@@ -1463,7 +1529,7 @@ class Blog extends DataObject
 				return $baseurl.$this->siteurl;
 
 			case 'subdom':
-				return preg_replace( '#(https?://)#i', '$1'.$this->urlname.'.', $baseurl );
+				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.'/';
 
 			case 'absolute':
 				return $this->siteurl;
@@ -1480,7 +1546,7 @@ class Blog extends DataObject
 	 */
 	function gen_baseurl()
 	{
-		global $baseurl, $basedomain;
+		global $baseprotocol, $basehost, $baseurl;
 
 		switch( $this->get( 'access_type' ) )
 		{
@@ -1504,7 +1570,7 @@ class Blog extends DataObject
 				break;
 
 			case 'subdom':
-				return preg_replace( '#(https?://)#i', '$1'.$this->urlname.'.', $baseurl );
+				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.'/';
 
 			case 'absolute':
 				$url = $this->siteurl;
@@ -1525,22 +1591,34 @@ class Blog extends DataObject
 
 
 	/**
-	 * This is the domain of the blog.
+	 * This is the domain of the collection.
 	 * This returns NO trailing slash.
+	 *
+	 * @return string
 	 */
 	function get_baseurl_root()
 	{
-		if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $this->gen_baseurl(), $matches ) )
-		{
-			return $matches[1];
+		if( empty( $this->baseurl_root ) )
+		{	// Initialize collection domain only first time:
+			if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $this->gen_baseurl(), $matches ) )
+			{
+				$this->baseurl_root = $matches[1];
+			}
+			else
+			{
+				debug_die( 'Blog::get(baseurl)/baseurlroot - assertion failed [baseurl: '.$this->gen_baseurl().'].' );
+			}
 		}
-		debug_die( 'Blog::get(baseurl)/baseurlroot - assertion failed [baseurl: '.$this->gen_baseurl().'].' );
+
+		return $this->baseurl_root;
 	}
 
 
 	/**
-	 * Get the URL to the basepath of that blog.
+	 * Get the URL to the basepath of that collection.
 	 * This is supposed to be the same as $baseurl but localized to the domain of the blog/
+	 *
+	 * @return string
 	 */
 	function get_basepath_url()
 	{
@@ -1586,13 +1664,80 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get the URL of the htsrv folder, on the current blog's domain (which is NOT always the same as the $baseurl domain!).
+	 * Get cookie domain of this collection
+	 *
+	 * @param boolean|string FALSE - use dependon of setting,
+	 *                       'auto' - force to use automatic cookie domain,
+	 *                       'custom' - force to use custom cookie domain
+	 * @return string
 	 */
-	function get_local_htsrv_url()
+	function get_cookie_domain( $force_type = false )
 	{
-		global $htsrv_subdir;
+		if( empty( $this->cookie_domain ) )
+		{	// Initialize only first time:
+			$cookie_domain_type = ( $force_type === false ) ? $this->get_setting( 'cookie_domain_type' ) : $force_type;
 
-		return $this->get_basepath_url().$htsrv_subdir;
+			if( $cookie_domain_type == 'custom' )
+			{	// Custom cookie domain:
+				return $this->get_setting( 'cookie_domain_custom' );
+			}
+			else
+			{	// Automatic cookie domain:
+				if( $this->get( 'access_type' ) == 'absolute' )
+				{	// If collection URL is absolute we should extract cookie domain from the URL because it can be different than site url:
+					preg_match( '#^https?://(.+?)(:(.+?))?$#', $this->get_baseurl_root(), $matches );
+					$coll_host = $matches[1];
+
+					if( strpos( $coll_host, '.' ) === false )
+					{	// localhost or windows machine name:
+						$this->cookie_domain = $coll_host;
+					}
+					elseif( preg_match( '~^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$~i', $coll_host ) )
+					{	// The basehost is an IP address, use the basehost as it is:
+						$this->cookie_domain = $coll_host;
+					}
+					else
+					{	// Keep the part of the basehost after the www. :
+						$this->cookie_domain = preg_replace( '/^(www\. )? (.+)$/xi', '.$2', $coll_host );
+					}
+				}
+				else
+				{	// Otherwise we can use sub path of site url:
+					global $cookie_domain;
+					$this->cookie_domain = $cookie_domain;
+				}
+			}
+		}
+
+		return $this->cookie_domain;
+	}
+
+
+	/**
+	 * Get cookie path of this collection
+	 *
+	 * @param boolean|string FALSE - use dependon of setting,
+	 *                       'auto' - force to use automatic cookie path,
+	 *                       'custom' - force to use custom cookie path
+	 * @return string
+	 */
+	function get_cookie_path( $force_type = false )
+	{
+		if( empty( $this->cookie_path ) )
+		{	// Initialize only first time:
+			$cookie_domain_type = ( $force_type === false ) ? $this->get_setting( 'cookie_path_type' ) : $force_type;
+
+			if( $cookie_domain_type == 'custom' )
+			{	// Custom cookie path:
+				return $this->get_setting( 'cookie_path_custom' );
+			}
+			else
+			{	// Automatic cookie path:
+				$this->cookie_path = $this->get_basepath();
+			}
+		}
+
+		return $this->cookie_path;
 	}
 
 
@@ -1679,7 +1824,7 @@ class Blog extends DataObject
 			}
 			elseif( isset( $Skin ) && $Skin->get( 'type' ) == 'feed' )
 			{	// Force to absolute collection URL on feed skins:
-				return $this->get_basepath_url().$media_subdir;
+				return $this->get_baseurl_root().$this->get_basepath().$media_subdir;
 			}
 			else
 			{	// Use relative URL for other skins:
@@ -2320,7 +2465,7 @@ class Blog extends DataObject
 	 */
 	function get( $parname, $params = array() )
 	{
-		global $xmlsrv_url, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog;
+		global $xmlsrv_url, $basehost, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog;
 
 		if( gettype( $params ) != 'array' )
 		{
@@ -2336,7 +2481,7 @@ class Blog extends DataObject
 		{
 			case 'access_type':
 				$access_type_value = parent::get( $parname );
-				if( $access_type_value == 'subdom' && is_ip_url_domain( $baseurl ) )
+				if( $access_type_value == 'subdom' && is_valid_ip_format( $basehost ) )
 				{	// Don't allow subdomain for IP address:
 					$access_type_value = 'index.php';
 				}
@@ -2432,7 +2577,7 @@ class Blog extends DataObject
 			case 'activateinfourl':
 			case 'access_requires_loginurl':
 				$url_disp = str_replace( 'url', '', $parname );
-				if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) )
+				if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $this ) )
 				{ // Use special blog for login/register actions if it is defined in general settings
 					return url_add_param( $login_Blog->gen_blogurl(), 'disp='.$url_disp, $params['glue'] );
 				}

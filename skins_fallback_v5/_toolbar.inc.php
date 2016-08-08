@@ -29,7 +29,7 @@ if( !$current_User->check_perm( 'admin', 'toolbar' ) )
 	return;
 }
 
-global $Blog;
+global $Collection, $Blog;
 
 global $Settings;
 

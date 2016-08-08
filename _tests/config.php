@@ -51,7 +51,7 @@ $evo_tests_tableprefix = 'evo_tests_';
 define( 'EVO_MAIN_INIT', 'SIMPLETEST' );
 require_once EVODIR.'conf/_config.php';
 
-require_once $inc_path.'_core/_class5.funcs.php';
+require_once $inc_path.'_core/_class_loader.funcs.php';
 require_once $inc_path.'_core/_misc.funcs.php';
 require_once $inc_path.'locales/_locale.funcs.php';
 

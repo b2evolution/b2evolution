@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Load classes
 load_class( 'users/model/_user.class.php', 'User' );
 
-global $Blog, $Skin, $Settings, $edited_User, $is_admin_page;
+global $Collection, $Blog, $Skin, $Settings, $edited_User, $is_admin_page;
 
 /**
  * @var user permission, if user is only allowed to edit his profile

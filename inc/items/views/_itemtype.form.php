@@ -110,6 +110,8 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Use of Comments').get_manual_link( 'item-type-comments' ), array( 'id' => 'itemtype_comments' ) );
 	$Form->checkbox( 'ityp_use_comments', $edited_Itemtype->use_comments, T_('Use comments'), T_('Also see collection\'s feedback options') );
+	$Form->textarea_input( 'ityp_comment_form_msg', $edited_Itemtype->comment_form_msg, 3, T_('Message before comment form') );
+	$Form->checkbox( 'ityp_allow_comment_form_msg', $edited_Itemtype->allow_comment_form_msg, T_('Allow custom message for each post'), T_('Check to allow a different custom message before comment form for each post.') );
 	$Form->checkbox( 'ityp_allow_closing_comments', $edited_Itemtype->allow_closing_comments, T_('Allow closing comments'), T_('Check to allow closing comments on individual items/posts.') );
 	$Form->checkbox( 'ityp_allow_disabling_comments', $edited_Itemtype->allow_disabling_comments, T_('Allow disabling comments'), T_('Check to allow disabling comments on individual items/posts.') );
 	$Form->radio( 'ityp_use_comment_expiration', $edited_Itemtype->use_comment_expiration, $options, T_('Use comment expiration') );

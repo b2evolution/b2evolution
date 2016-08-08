@@ -24,7 +24,7 @@ global $edited_Item;
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var Plugins
  */
@@ -730,6 +730,14 @@ $Form->begin_form( '', '', $params );
 			<label title="<?php echo T_('Visitors cannot see nor leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="disabled" class="checkbox" <?php if( $post_comment_status == 'disabled' ) echo 'checked="checked"'; ?> />
 			<?php echo T_('Disabled') ?></label><br />
 		<?php
+		}
+
+		if( $edited_Item->get_type_setting( 'allow_comment_form_msg' ) )
+		{	// If custom message is allowed before comment form:
+			$Form->switch_layout( 'none' );
+			$Form->textarea_input( 'comment_form_msg', $edited_Item->get_setting( 'comment_form_msg' ), 3, T_('Message before comment form') );
+			echo '<br />';
+			$Form->switch_layout( NULL );
 		}
 
 		if( $edited_Item->get_type_setting( 'use_comment_expiration' ) != 'never' )

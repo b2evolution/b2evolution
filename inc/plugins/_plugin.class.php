@@ -353,7 +353,7 @@ class Plugin
 		}
 		else
 		{ // Get plugin template from frontoffice skin
-			global $Blog;
+			global $Collection, $Blog;
 			if( ! empty( $Blog ) )
 			{
 				$skin_ID = $Blog->get_skin_ID();
@@ -3107,7 +3107,7 @@ class Plugin
 	 */
 	function get_plugin_url( $dummy = false )
 	{
-		global $ReqHost, $plugins_url, $plugins_path, $Blog;
+		global $ReqHost, $plugins_url, $plugins_path, $Collection, $Blog;
 
 		if( empty( $this->_plugin_url ) )
 		{	// Initialize plugin URL only first time request:
@@ -3749,12 +3749,12 @@ class Plugin
 
 		if( empty( $blog ) )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 		}
 		else
 		{
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 		}
 
 		// Name of the setting in the blog settings:
@@ -3777,12 +3777,12 @@ class Plugin
 
 		if( empty( $blog ) )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 		}
 		else
 		{
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 		}
 
 		// Name of the setting in the blog settings:

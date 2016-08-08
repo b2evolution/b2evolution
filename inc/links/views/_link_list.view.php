@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 
 /**
  * Needed by functions
@@ -32,7 +32,7 @@ $debug = 0;
 
 if( empty( $Blog ) )
 {
-	$Blog = & $LinkOwner->get_Blog();
+	$Collection = $Blog = & $LinkOwner->get_Blog();
 }
 
 // Name of the iframe we want some actions to come back to:
@@ -96,7 +96,7 @@ $Results->cols[] = array(
 						'td_class' => 'shrinkwrap link_id_cell',
 					);
 
-if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
+if( $current_User->check_perm( 'files', 'view' ) )
 {
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
@@ -105,11 +105,14 @@ if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
 						);
 }
 
-$Results->cols[] = array(
+if( $LinkOwner->type != 'emailcampaign' )
+{	// Don't display a position column for email campaign because it always has only one position 'inline':
+	$Results->cols[] = array(
 						'th' => T_('Position'),
 						'td_class' => 'shrinkwrap',
 						'td' => '%display_link_position( {row} )%',
 					);
+}
 
 // Add attr "id" to handle quick uploader
 $compact_results_params = $AdminUI->get_template( 'compact_results' );
@@ -134,12 +137,33 @@ else
 	$table_headers = '';
 }
 
+// Load FileRoot class to get fileroot ID of collection below:
+load_class( '/files/model/_fileroot.class.php', 'FileRoot' );
+
+switch( $LinkOwner->type )
+{
+	case 'item':
+		$upload_fileroot = FileRoot::gen_ID( 'collection', $Blog->ID );
+		$upload_path = '/quick-uploads/p'.$LinkOwner->link_Object->ID.'/';
+		break;
+
+	case 'comment':
+		$upload_fileroot = FileRoot::gen_ID( 'collection', $Blog->ID );
+		$upload_path = '/quick-uploads/c'.$LinkOwner->link_Object->ID.'/';
+		break;
+
+	case 'emailcampaign':
+		$upload_fileroot = FileRoot::gen_ID( 'emailcampaign', $LinkOwner->link_Object->ID );
+		$upload_path = '/'.$LinkOwner->link_Object->ID.'/';
+		break;
+}
+
 // Display a button to quick upload the files by drag&drop method
 display_dragdrop_upload_button( array(
 		'before' => '<div id="fileuploader_form">',
 		'after'  => '</div>',
-		'fileroot_ID'      => FileRoot::gen_ID( 'collection', $Blog->ID ),
-		'path'             => '/quick-uploads/'.( $LinkOwner->type == 'item' ? 'p' : 'c' ).$LinkOwner->link_Object->ID.'/',
+		'fileroot_ID'      => $upload_fileroot,
+		'path'             => $upload_path,
 		'listElement'      => 'jQuery( "#filelist_tbody" ).get(0)',
 		'list_style'       => 'table',
 		'template_filerow' => '<table><tr>'
@@ -154,7 +178,7 @@ display_dragdrop_upload_button( array(
 							.'<a class="qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'
 						.'</div>'
 					.'</td>'
-					.'<td class="qq-upload-link-position lastcol shrinkwrap"></td>'
+					.( $LinkOwner->type != 'emailcampaign' ? '<td class="qq-upload-link-position lastcol shrinkwrap"></td>' : '' )
 				.'</tr></table>',
 		'display_support_msg'    => false,
 		'additional_dropzone'    => '#filelist_tbody',

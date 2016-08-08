@@ -38,7 +38,7 @@ $block_item_Widget = new Widget( 'block_item' );
 if( get_param( 'tab' ) == 'current_skin' )
 {	// We are installing new skin for collection:
 	$BlogCache = & get_BlogCache();
-	$Blog = & $BlogCache->get_by_ID( $blog );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 	switch( $skin_type )
 	{
 		case 'normal':

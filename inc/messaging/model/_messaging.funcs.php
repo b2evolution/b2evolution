@@ -296,7 +296,7 @@ function leave_thread( $thread_ID, $user_ID, $close_thread = false )
  */
 function get_messaging_url( $disp = 'threads' )
 {
-	global $admin_url, $is_admin_page, $Blog;
+	global $admin_url, $is_admin_page, $Collection, $Blog;
 	if( $is_admin_page || empty( $Blog ) )
 	{
 		return $admin_url.'?ctrl='.$disp;
@@ -368,7 +368,7 @@ function get_messages_link_to( $thread_ID = NULL, $user_ID = NULL )
  */
 function get_messaging_sub_entries( $is_admin )
 {
-	global $Blog, $current_User;
+	global $Collection, $Blog, $current_User;
 
 	if( $is_admin )
 	{
@@ -1284,7 +1284,7 @@ function get_contacts_groups_options( $selected_group_ID = NULL, $value_null = t
  */
 function get_contacts_groups_list( $user_ID, $params = array() )
 {
-	global $DB, $current_User, $Blog;
+	global $DB, $current_User, $Collection, $Blog;
 
 	$params = array_merge( array(
 			'list_start'  => '<table cellspacing="0" class="user_contacts_groups">',
@@ -2104,7 +2104,7 @@ function threads_results( & $threads_Results, $params = array() )
  */
 function col_thread_recipients( $thread_ID, $abuse_management )
 {
-	global $DB, $Blog;
+	global $DB, $Collection, $Blog;
 
 	$SQL = new SQL();
 	$SQL->SELECT( 'user_login' );
@@ -2256,7 +2256,7 @@ function col_thread_read_by( $thread_ID )
  */
 function col_thread_delete_action( $thread_ID )
 {
-	global $Blog, $admin_url;
+	global $Collection, $Blog, $admin_url;
 
 	if( is_admin_page() )
 	{
@@ -2330,7 +2330,7 @@ function col_msg_format_text( $msg_ID, $msg_text )
  */
 function col_msg_read_by( $message_ID )
 {
-	global $read_status_list, $leave_status_list, $Blog, $current_User, $perm_abuse_management;
+	global $read_status_list, $leave_status_list, $Collection, $Blog, $current_User, $perm_abuse_management;
 
 	$UserCache = & get_UserCache();
 
@@ -2417,7 +2417,7 @@ function col_msg_read_by( $message_ID )
  */
 function col_msg_actions( $thrd_ID, $msg_ID )
 {
-	global $Blog, $perm_abuse_management;
+	global $Collection, $Blog, $perm_abuse_management;
 
 	if( $msg_ID < 1 )
 	{ // Don't display actions in preview mode

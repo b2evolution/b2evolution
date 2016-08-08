@@ -82,7 +82,7 @@ if( empty( $message ) )
 { // message should not be empty!
 	$Messages->add( T_('Please do not send empty messages.'), 'error' );
 }
-elseif( $antispam_on_message_form && ( $block = antispam_check( $message ) ) )
+elseif( $Settings->get( 'antispam_block_contact_form' ) && ( $block = antispam_check( $message ) ) )
 { // a blacklisted keyword has been found in the message:
 	// Log incident in system log
 	syslog_insert( sprintf( T_('Antispam: Supplied message is invalid / appears to be spam. Message contains blacklisted word "%s".'), $block ), 'error' );
@@ -94,11 +94,11 @@ elseif( $antispam_on_message_form && ( $block = antispam_check( $message ) ) )
 $BlogCache = & get_BlogCache();
 if( !empty( $comment_id ) || !empty( $post_id ) )
 {
-	$Blog = & $BlogCache->get_by_ID( $blog );	// Required
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog );	// Required
 }
 else
 {
-	$Blog = & $BlogCache->get_by_ID( $blog, true, false );	// Optional
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog, true, false );	// Optional
 }
 
 $allow_msgform = '';

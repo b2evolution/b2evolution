@@ -1042,12 +1042,12 @@ class Comment extends DataObject
 
 		global $Plugins;
 
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( empty( $Blog ) )
 		{ // Set Blog if it is still not defined
 			$comment_Item = $this->get_Item();
-			$Blog = $comment_Item->get_Blog();
+			$Collection = $Blog = $comment_Item->get_Blog();
 		}
 
 		if( $Blog->get_setting( 'allow_comments' ) != 'any' && $params['after_user'] == '#' && $params['after'] == '#' )

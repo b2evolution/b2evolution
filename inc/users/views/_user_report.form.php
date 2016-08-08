@@ -73,7 +73,7 @@ if( is_admin_page() )
 }
 else
 { // Params for frontoffice
-	global $Blog;
+	global $Collection, $Blog;
 	$Form->hidden( 'blog', $Blog->ID );
 }
 

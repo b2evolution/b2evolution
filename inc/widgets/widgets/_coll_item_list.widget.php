@@ -338,7 +338,7 @@ class coll_item_list_Widget extends ComponentWidget
 		 * @var ItemList2
 		 */
 		global $MainList;
-		global $BlogCache, $Blog;
+		global $BlogCache, $Collection, $Blog;
 		global $Item, $Settings;
 
 		$this->init_display( $params );
@@ -1017,7 +1017,7 @@ class coll_item_list_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$blog_ID = intval( $this->disp_params['blog_ID'] );
 

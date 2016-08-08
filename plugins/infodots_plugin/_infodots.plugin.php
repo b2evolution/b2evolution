@@ -95,7 +95,7 @@ class infodots_plugin extends Plugin
 	 */
 	function init_html_head()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( ! isset( $Blog ) || (
 		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
@@ -374,7 +374,7 @@ class infodots_plugin extends Plugin
 			return;
 		}
 
-		if( ( $LinkOwner = & $Link->get_LinkOwner() ) === false || ( $Blog = & $LinkOwner->get_Blog() ) === false )
+		if( ( $LinkOwner = & $Link->get_LinkOwner() ) === false || ( $Collection = $Blog = & $LinkOwner->get_Blog() ) === false )
 		{ // Couldn't get Blog object
 			return;
 		}

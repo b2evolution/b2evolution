@@ -149,7 +149,7 @@ class coll_search_form_Widget extends ComponentWidget
 		}
 		if( empty( $widget_Blog ) )
 		{ // Use current blog
-			global $Blog;
+			global $Collection, $Blog;
 			$widget_Blog = & $Blog;
 		}
 

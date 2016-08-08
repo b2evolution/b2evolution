@@ -48,7 +48,7 @@ class html5_mediaelementjs_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		require_css( '#mediaelement_css#', 'blog' );
 		require_js( '#jquery#', 'blog' );
@@ -318,7 +318,7 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 	 */
 	function RenderURL( & $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( empty( $params['url'] ) || ! $this->is_url_supported( $params['url'] ) )
 		{	// This file is not supported by plugin, Exit here:
@@ -332,7 +332,7 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 		}
 		else
 		{	// Use current collection:
-			global $Blog;
+			global $Collection, $Blog;
 			$player_Blog = $Blog;
 		}
 
@@ -446,7 +446,7 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 	 */
 	function get_skin_class()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$skin = $this->get_coll_setting( 'skin', $Blog );
 
@@ -463,7 +463,7 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 	 */
 	function require_skin()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$skin = $this->get_coll_setting( 'skin', $Blog );
 		if( !empty( $skin ) && $skin != 'default')

@@ -581,7 +581,7 @@ function perm_check_all( $row, $prefix )
  */
 function coll_perm_login( $user_ID, $user_login )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	$user_login = get_user_identity_link( $user_login, NULL, 'profile', 'avatar_login' );
 

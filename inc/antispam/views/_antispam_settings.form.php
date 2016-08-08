@@ -40,6 +40,8 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Misc').get_manual_link('antispam-settings-misc') );
+	$Form->checkbox( 'antispam_block_contact_form', $Settings->get( 'antispam_block_contact_form' ),
+		T_('Block spam on contact form'), T_('Check to use the antispam blacklist on contact form submissions') );
 	$Form->checkbox( 'antispam_block_spam_referers', $Settings->get('antispam_block_spam_referers'),
 		T_('Block spam referers'), T_('If a referrer has been detected as spam, should we block the request with a "403 Forbidden" page?') );
 	$Form->checkbox( 'antispam_report_to_central', $Settings->get('antispam_report_to_central'),

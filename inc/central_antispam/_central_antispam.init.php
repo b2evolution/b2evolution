@@ -9,12 +9,12 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for central antispam module to function properly
  */
-$required_php_version[ 'central_antispam' ] = '5.0';
+$required_php_version[ 'central_antispam' ] = '5.2';
 
 /**
  * Minimum MYSQL version required for central antispam module to function properly
  */
-$required_mysql_version[ 'central_antispam' ] = '4.1';
+$required_mysql_version[ 'central_antispam' ] = '5.0.3';
 
 /**
  * Aliases for table names:

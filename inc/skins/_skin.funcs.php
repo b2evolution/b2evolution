@@ -32,7 +32,7 @@ function skin_init( $disp )
 	/**
 	 * @var Blog
 	 */
-	global $Blog;
+	global $Collection, $Blog;
 
 	/**
 	 * @var Item
@@ -572,7 +572,7 @@ var downloadInterval = setInterval( function()
 			}
 			else
 			{ // Recipient was not defined, try set the blog owner as recipient
-				global $Blog;
+				global $Collection, $Blog;
 				if( empty( $Blog ) )
 				{ // Blog is not set, this is an invalid request
 					debug_die( 'Invalid send message request!');
@@ -647,7 +647,7 @@ var downloadInterval = setInterval( function()
 					// Set global variable to auto define the FB autocomplete plugin field
 					$recipients_selected = array( array(
 							'id'    => $recipient_User->ID,
-							'title' => $recipient_User->login,
+							'login' => $recipient_User->login,
 						) );
 
 					init_tokeninput_js( 'blog' );
@@ -1129,7 +1129,7 @@ var downloadInterval = setInterval( function()
 				// will have exited
 			}
 
-			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'loginurl', array( 'glue' => '&' ) ) );
 			}
@@ -1145,7 +1145,7 @@ var downloadInterval = setInterval( function()
 				header_redirect( $Blog->gen_blogurl(), false );
 			}
 
-			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'registerurl', array( 'glue' => '&' ) ) );
 			}
@@ -1165,7 +1165,7 @@ var downloadInterval = setInterval( function()
 				header_redirect( $Blog->gen_blogurl(), false );
 			}
 
-			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'lostpasswordurl', array( 'glue' => '&' ) ) );
 			}
@@ -1216,7 +1216,7 @@ var downloadInterval = setInterval( function()
 				// will have exited
 			}
 
-			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'activateinfourl', array( 'glue' => '&' ) ) );
 			}
@@ -1566,6 +1566,9 @@ var downloadInterval = setInterval( function()
 	$Skin->display_init();
 	$Timer->pause( 'Skin:display_init' );
 
+	// Send the predefined cookies:
+	evo_sendcookies();
+
 	// Send default headers:
 	// See comments inside of this function:
 	headers_content_mightcache( 'text/html' );		// In most situations, you do NOT want to cache dynamic content!
@@ -1673,7 +1676,7 @@ function skin_include( $template_name, $params = array() )
 	global $skins_path, $ads_current_skin_path, $disp;
 
 	// Globals that may be needed by the template:
-	global $Blog, $MainList, $Item;
+	global $Collection, $Blog, $MainList, $Item;
 	global $Plugins, $Skin;
 	global $current_User, $Hit, $Session, $Settings;
 	global $skin_url;
@@ -1942,7 +1945,7 @@ function skin_template_path( $template_name )
  */
 function siteskin_include( $template_name, $params = array(), $force = false )
 {
-	global $Settings, $siteskins_path, $Blog;
+	global $Settings, $siteskins_path, $Collection, $Blog;
 
 	if( !$Settings->get( 'site_skins_enabled' ) && !$force )
 	{ // Site skins are not enabled and we don't want to force either
@@ -2038,7 +2041,7 @@ function siteskin_include( $template_name, $params = array(), $force = false )
  */
 function skin_base_tag()
 {
-	global $skins_url, $skin, $Blog, $disp;
+	global $skins_url, $skin, $Collection, $Blog, $disp;
 
 	if( ! empty( $Blog ) )
 	{	// We are displaying a blog:
@@ -2074,7 +2077,7 @@ function skin_base_tag()
  */
 function skin_description_tag()
 {
-	global $Blog, $disp, $disp_detail, $MainList, $Chapter, $is_front;
+	global $Collection, $Blog, $disp, $disp_detail, $MainList, $Chapter, $is_front;
 
 	$r = '';
 
@@ -2123,7 +2126,7 @@ function skin_description_tag()
  */
 function skin_keywords_tag()
 {
-	global $Blog, $is_front, $disp, $MainList;
+	global $Collection, $Blog, $is_front, $disp, $MainList;
 
 	$r = '';
 
@@ -2166,7 +2169,7 @@ function skin_keywords_tag()
  */
 function skin_opengraph_tags()
 {
-	global $Blog, $disp, $MainList;
+	global $Collection, $Blog, $disp, $MainList;
 
 	if( empty( $Blog ) || ! $Blog->get_setting( 'tags_open_graph' ) )
 	{ // Open Graph tags are not allowed
@@ -2229,7 +2232,7 @@ function skin_opengraph_tags()
 
 function skin_twitter_tags()
 {
-	global $Blog, $disp, $MainList;
+	global $Collection, $Blog, $disp, $MainList;
 
 	if( empty( $Blog ) || ! $Blog->get_setting( 'tags_twitter_card' ) )
 	{ // Twitter summary card tags are not allowed
@@ -2290,7 +2293,7 @@ function skin_twitter_tags()
  */
 function skin_404_header()
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	// We have a 404 unresolved content error
 	// How do we want do deal with it?
@@ -2635,7 +2638,7 @@ function skin_body_attrs( $params = array() )
 			'class' => NULL
 		), $params );
 
-	global $PageCache, $Blog, $disp, $disp_detail, $Item, $current_User;
+	global $PageCache, $Collection, $Blog, $disp, $disp_detail, $Item, $current_User;
 
 	// WARNING: Caching! We're not supposed to have Session dependent stuff in here. This is for debugging only!
 	global $Session;

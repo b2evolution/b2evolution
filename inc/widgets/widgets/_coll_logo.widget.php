@@ -163,7 +163,7 @@ class coll_logo_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		switch( $this->disp_params['image_source'] )
 		{

@@ -17,7 +17,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $app_version, $disp, $Blog, $Skin, $Settings;
+global $app_version, $disp, $Collection, $Blog, $Skin, $Settings;
 
 if( evo_version_compare( $app_version, '4.0.0-dev' ) < 0 )
 { // Older 2.x skins work on newer 2.x b2evo versions, but newer 2.x skins may not work on older 2.x b2evo versions.
@@ -229,7 +229,7 @@ foreach( $width_switchers as $ws_size => $ws_icon )
 	{	// Mark this switcher as selected
 		$ws_class .= ' roundbutton_selected';
 	}
-	echo '<a href="#" onclick="switch_width( this, \''.$ws_size.'\', \''.$cookie_skin_width_name.'\', \''.$cookie_path.'\' ); return false;" class="'.$ws_class.'">';
+	echo '<a href="#" onclick="switch_width( this, \''.$ws_size.'\', \''.$cookie_skin_width_name.'\', \''.get_cookie_path().'\' ); return false;" class="'.$ws_class.'">';
 	echo '<span class="ficon '.$ws_icon.'"></span>';
 	echo '</a>';
 	$ws++;

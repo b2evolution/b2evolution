@@ -42,7 +42,7 @@ global $form_action;
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var DB
  */

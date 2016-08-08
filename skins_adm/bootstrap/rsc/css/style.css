@@ -658,11 +658,13 @@ fieldset ul {
   display: inline-block;
 }
 #itemform_links .panel,
-#cmntform_links .panel {
+#cmntform_links .panel,
+#ecmpform_links .panel {
   overflow: hidden;
 }
 #itemform_links .panel-body,
-#cmntform_links .panel-body {
+#cmntform_links .panel-body,
+#ecmpform_links .panel-body {
   padding: 0;
 }
 #itemform_goals td {

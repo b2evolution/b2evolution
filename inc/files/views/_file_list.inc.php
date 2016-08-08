@@ -50,7 +50,7 @@ global $LinkOwner;
 
 global $edited_User;
 
-global $Blog, $blog;
+global $Collection, $Blog, $blog;
 
 global $fm_mode, $fm_hide_dirtree, $create_name, $ads_list_path, $mode;
 

@@ -51,7 +51,7 @@ switch( $action )
 		$edited_Comment_Item = & $edited_Comment->get_Item();
 		set_working_blog( $edited_Comment_Item->get_blog_ID() );
 		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $blog );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Some users can delete & change a status of comments in their own posts, set corresponding permlevel
 		if( $edited_Comment->is_meta() )
@@ -107,7 +107,7 @@ switch( $action )
 		$edited_Comment = & Comment_get_by_ID( $comment_ID );
 
 		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $blog );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check permission:
 		$current_User->check_perm( 'blog_post!draft', 'edit', true, $blog );
@@ -142,7 +142,7 @@ switch( $action )
 		elseif( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
 		{ // Selected a new blog:
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 		}
 		break;
 
@@ -157,7 +157,7 @@ switch( $action )
 		$edited_Comment_Item = & $edited_Comment->get_Item();
 		set_working_blog( $edited_Comment_Item->get_blog_ID() );
 		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $blog );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check permission for spam voting
 		$current_User->check_perm( 'blog_vote_spam_comments', 'edit', true, $Blog->ID );

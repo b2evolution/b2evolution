@@ -770,13 +770,13 @@ class ItemLight extends DataObject
 			}
 			if( empty( $this->main_Chapter ) )
 			{	// If we still don't have a valid Chapter, display clean error and die().
-				global $admin_url, $Blog, $blog;
+				global $admin_url, $Collection, $Blog, $blog;
 				if( empty( $Blog ) )
 				{
 					if( !empty( $blog ) )
 					{
 						$BlogCache = & get_BlogCache();
-						$Blog = & $BlogCache->get_by_ID( $blog, false );
+						$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false );
 					}
 				}
 
@@ -979,7 +979,7 @@ class ItemLight extends DataObject
 	 */
 	function locale_temp_switch()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( ! empty( $Blog ) && $Blog->get_setting( 'post_locale_source' ) == 'blog' )
 		{ // Use locale what current blog is using now
@@ -1132,7 +1132,7 @@ class ItemLight extends DataObject
 	 */
 	function get_permanent_link( $text = '#', $title = '#', $class = '', $target_blog = '', $post_navigation = '', $nav_target = NULL )
 	{
-		global $current_User, $Blog;
+		global $current_User, $Collection, $Blog;
 
 		switch( $text )
 		{
@@ -1227,7 +1227,7 @@ class ItemLight extends DataObject
 	 */
 	function get_title( $params = array() )
 	{
-		global $ReqURL, $Blog, $MainList;
+		global $ReqURL, $Collection, $Blog, $MainList;
 
 		// Set default post navigation
 		$def_post_navigation = empty( $Blog ) ? 'same_blog' : $Blog->get_setting( 'post_navigation' );

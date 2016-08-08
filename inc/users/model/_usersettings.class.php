@@ -323,7 +323,7 @@ class UserSettings extends AbstractSettings
 	{
 		if( $coll_ID === NULL )
 		{ // Use current blog ID by default
-			global $Blog;
+			global $Collection, $Blog;
 
 			if( ! empty( $Blog ) )
 			{

@@ -114,7 +114,7 @@ class free_html_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$this->init_display( $params );
 

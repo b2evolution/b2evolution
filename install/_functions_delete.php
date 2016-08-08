@@ -63,7 +63,7 @@ function uninstall_b2evolution()
 		$BlogCache = & get_BlogCache( 'blog_ID' );
 		foreach( $blogs as $blog_ID )
 		{
-			$Blog = $BlogCache->get_by_ID( $blog_ID );
+			$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 
 			// Remove page cache of current blog
 			$PageCache = new PageCache( $Blog );

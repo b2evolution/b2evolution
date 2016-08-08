@@ -772,7 +772,7 @@ class UserList extends DataObjectList2
 		$user_key = array_search( $user_ID, $users_list );
 		if( is_int( $user_key ) )
 		{	// Selected user is located in this list
-			global $Blog;
+			global $Collection, $Blog;
 			++$user_key;
 			$page = ceil( $user_key / $this->limit );
 			$page_param = '';

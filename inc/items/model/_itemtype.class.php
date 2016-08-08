@@ -51,6 +51,8 @@ class ItemType extends DataObject
 	var $use_coordinates = 'never';
 	var $use_custom_fields = 1;
 	var $use_comments = 1;
+	var $comment_form_msg = '';
+	var $allow_comment_form_msg = 0;
 	var $allow_closing_comments = 1;
 	var $allow_disabling_comments = 0;
 	var $use_comment_expiration = 'optional';
@@ -118,6 +120,8 @@ class ItemType extends DataObject
 			$this->use_coordinates = $db_row->ityp_use_coordinates;
 			$this->use_custom_fields = $db_row->ityp_use_custom_fields;
 			$this->use_comments = $db_row->ityp_use_comments;
+			$this->comment_form_msg = $db_row->ityp_comment_form_msg;
+			$this->allow_comment_form_msg = $db_row->ityp_allow_comment_form_msg;
 			$this->allow_closing_comments = $db_row->ityp_allow_closing_comments;
 			$this->allow_disabling_comments = $db_row->ityp_allow_disabling_comments;
 			$this->use_comment_expiration = $db_row->ityp_use_comment_expiration;
@@ -287,6 +291,14 @@ class ItemType extends DataObject
 		param( 'ityp_use_comments', 'integer', 0 );
 		$this->set_from_Request( 'use_comments' );
 
+		// Message before comment form:
+		param( 'ityp_comment_form_msg', 'text' );
+		$this->set_from_Request( 'comment_form_msg', NULL, true );
+
+		// Allow custom message for each post
+		param( 'ityp_allow_comment_form_msg', 'integer', 0 );
+		$this->set_from_Request( 'allow_comment_form_msg' );
+
 		// Allow closing comments
 		param( 'ityp_allow_closing_comments', 'integer', 0 );
 		$this->set_from_Request( 'allow_closing_comments' );
@@ -418,7 +430,7 @@ class ItemType extends DataObject
 
 		if( parent::dbinsert() )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 
 			// Update/Insert/Delete custom fields:
 			$this->dbsave_custom_fields();

@@ -7656,6 +7656,35 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11830, 'Update table post types...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'UPDATE T_items__type
+			  SET ityp_allow_disabling_comments = 1
+			WHERE ityp_usage LIKE "intro%"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11835, 'Upgrade table post types...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_items__type
+			ADD ityp_comment_form_msg       TEXT NULL DEFAULT NULL AFTER ityp_use_comments,
+			ADD ityp_allow_comment_form_msg TINYINT DEFAULT 0      AFTER ityp_comment_form_msg' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11840, 'Upgrade links table...' ) )
+	{	// part of 6.8.0-alpha
+		db_add_col( 'T_links', 'link_ecmp_ID', 'int(11) unsigned  NULL COMMENT \'Used for linking files to email campaign\' AFTER link_usr_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11845, 'Upgrade files table...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_files
+			MODIFY file_root_type ENUM("absolute","user","collection","shared","skins","import","emailcampaign") COLLATE ascii_general_ci NOT NULL DEFAULT "absolute"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

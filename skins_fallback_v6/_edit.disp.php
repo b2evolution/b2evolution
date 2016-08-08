@@ -15,7 +15,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $Session, $inc_path;
+global $Collection, $Blog, $Session, $inc_path;
 global $action, $form_action;
 
 /**

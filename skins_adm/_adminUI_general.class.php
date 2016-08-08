@@ -186,7 +186,7 @@ class AdminUI_general extends Menu
 	*/
 	function breadcrumbpath_init( $add_blog = true, $additional_path = array() )
 	{
-		global $Blog, $Settings, $admin_url;
+		global $Collection, $Blog, $Settings, $admin_url;
 
 		// Path to site root
 		$site_style = $Settings->get( 'site_color' ) != '' ? 'style="color:'.$Settings->get( 'site_color' ).'"' : '';
@@ -223,7 +223,7 @@ class AdminUI_general extends Menu
 	*/
 	function breadcrumbpath_add( $text, $url, $help = NULL, $attrs = '' )
 	{
-		global $Blog, $current_User;
+		global $Collection, $Blog, $current_User;
 
 		$blog_ID = isset($Blog) ? $Blog->ID : 0;
 		$url = str_replace( '$blog$', $blog_ID, $url );

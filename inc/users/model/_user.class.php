@@ -2014,7 +2014,7 @@ class User extends DataObject
 	function get_media_url()
 	{
 		global $media_url, $Settings, $Debuglog;
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( ! $Settings->get( 'fm_enable_roots_user' ) )
 		{ // User directories are disabled:
@@ -2089,7 +2089,7 @@ class User extends DataObject
 
 		if( empty( $current_Blog ) )
 		{ // Use current blog
-			global $Blog;
+			global $Collection, $Blog;
 			$current_Blog = & $Blog;
 		}
 
@@ -2676,7 +2676,7 @@ class User extends DataObject
 				}
 				elseif( $permlevel == 'blog' )
 				{	// Set Blog from target object:
-					$Blog = & $perm_target;
+					$Collection = $Blog = & $perm_target;
 				}
 				else
 				{ // Invalid permission level
@@ -3001,7 +3001,7 @@ class User extends DataObject
 		/**
 		 * @var Blog
 		 */
-		$Blog = & $BlogCache->get_by_ID( $blog_ID );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID );
 
 		return ( $Blog->owner_user_ID == $this->ID );
 	}
@@ -3046,7 +3046,7 @@ class User extends DataObject
 
 		// Group may grant VIEW access, FULL access:
 		$this->get_Group();
-		$group_permlevel = ( $permlevel == 'view' && $permlevel == 'any' ) ? 'viewall' : 'editall';
+		$group_permlevel = ( $permlevel == 'view' || $permlevel == 'any' ) ? 'viewall' : 'editall';
 		if( $this->Group->check_perm( 'blogs', $group_permlevel ) )
 		{ // If group grants a global permission:
 			return true;
@@ -3102,7 +3102,7 @@ class User extends DataObject
 	 */
 	function check_status( $action, $target = NULL )
 	{
-		global $Settings, $Blog;
+		global $Settings, $Collection, $Blog;
 
 		switch( $action )
 		{
@@ -3850,7 +3850,7 @@ class User extends DataObject
 
 		if( is_null($form_url) )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 			$form_url = isset($Blog) ? $Blog->get('msgformurl') : '';
 		}
 
@@ -4236,7 +4236,7 @@ class User extends DataObject
 			}
 			else
 			{ // Anonymous user get an avatar picture with link to login page
-				global $Blog;
+				global $Collection, $Blog;
 				$redirect_to = '';
 				if( isset( $Blog ) )
 				{ // Redirect user after login
@@ -4741,7 +4741,7 @@ class User extends DataObject
 						if( ( !is_admin_page() ) && ( !empty( $blog ) ) )
 						{ // set where to redirect in front office, another way it would go to profile_update.php
 							$BlogCache = & get_BlogCache();
-							$Blog = $BlogCache->get_by_ID( $blog, false );
+							$Collection = $Blog = $BlogCache->get_by_ID( $blog, false );
 							$redirect_to = rawurlencode( $Blog->get( 'userprefsurl' ) );
 						}
 						$activate_info_link = 'href="'.get_activate_info_url( $redirect_to, '&amp;' ).'"';
@@ -4990,7 +4990,7 @@ class User extends DataObject
 		}
 		else
 		{ // Front-office
-			global $Blog;
+			global $Collection, $Blog;
 			$url_rotate_90_left = get_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_90_left&file_ID='.$file_ID.'&'.url_crumb( 'user' );
 			$url_rotate_180 = get_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_180&file_ID='.$file_ID.'&'.url_crumb( 'user' );
 			$url_rotate_90_right = get_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_90_right&file_ID='.$file_ID.'&'.url_crumb( 'user' );
@@ -5160,7 +5160,7 @@ class User extends DataObject
 		}
 		else
 		{ // Front-office
-			global $Blog;
+			global $Collection, $Blog;
 			$url_crop = url_add_param( $Blog->gen_blogurl(), 'disp=avatar&action=crop&file_ID='.$file_ID );
 		}
 
@@ -5784,7 +5784,7 @@ class User extends DataObject
 			}
 			else
 			{	// For front-office
-				global $Blog;
+				global $Collection, $Blog;
 				if( ! empty( $Blog ) )
 				{	// Only if blog is defined
 					$total_num_posts_url = url_add_param( $Blog->gen_blogurl(), 'disp=useritems&amp;user_ID='.$this->ID );
@@ -6624,7 +6624,7 @@ class User extends DataObject
 	 */
 	function get_flagged_items_count()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( ! is_logged_in() )
 		{	// Only logged in users can have the flagged items:

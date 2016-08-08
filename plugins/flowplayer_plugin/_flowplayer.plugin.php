@@ -293,7 +293,7 @@ class flowplayer_plugin extends Plugin
 	{
 		if( empty( $Blog ) )
 		{ // Get current Blog if it is not defined
-			global $Blog;
+			global $Collection, $Blog;
 		}
 
 		// Get a skin name from blog plugin setting

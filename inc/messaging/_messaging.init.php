@@ -17,7 +17,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for messaging module to function properly
  */
-$required_php_version[ 'messaging' ] = '5.0';
+$required_php_version[ 'messaging' ] = '5.2';
 
 /**
  * Minimum MYSQL version required for messaging module to function properly
@@ -437,7 +437,7 @@ class messaging_Module extends Module
 	 */
 	function handle_htsrv_action()
 	{
-		global $current_User, $Blog, $Session, $Messages;
+		global $current_User, $Collection, $Blog, $Session, $Messages;
 
 		// Init objects we want to work on.
 		$action = param_action( true, true );

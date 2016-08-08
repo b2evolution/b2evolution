@@ -155,7 +155,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'phpbb' );
 
 		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( phpbb_get_var( 'blog_ID' ) );
+		$Collection = $Blog = & $BlogCache->get_by_ID( phpbb_get_var( 'blog_ID' ) );
 
 		phpbb_clear_temporary_data();
 

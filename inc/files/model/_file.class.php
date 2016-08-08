@@ -2026,7 +2026,7 @@ class File extends DataObject
 	 */
 	function get_view_link( $text = NULL, $title = NULL, $no_access_text = NULL, $format = '$text$', $class = '', $url = NULL )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( is_null( $text ) )
 		{ // Use file root+relpath+name by default

@@ -17,7 +17,7 @@ global $comment_allowed_tags;
 global $comment_cookies, $comment_allow_msgform;
 global $checked_attachments; // Set this var as global to use it in the method $Item->can_attach()
 global $PageCache, $Session;
-global $Blog, $dummy_fields;
+global $Collection, $Blog, $dummy_fields;
 
 // Default params:
 $params = array_merge( array(
@@ -249,6 +249,9 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	echo $params['form_title_start'];
 	echo $params['form_title_text'];
 	echo $params['form_title_end'];
+
+	// Display a message before comment form:
+	$Item->display_comment_form_msg();
 
 /*
 	echo '<script type="text/javascript">

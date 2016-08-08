@@ -42,8 +42,8 @@ $commented_Item = & $ItemCache->get_by_ID( $comment_item_ID );
 // Make sure Blog is loaded
 $commented_Item->load_Blog();
 $blog = $commented_Item->Blog->ID;
-// Initialize global $Blog to avoid restriction of redirect to external URL, for example, when collection URL is subdomain:
-$Blog = $commented_Item->Blog;
+// Initialize global $Collection, $Blog to avoid restriction of redirect to external URL, for example, when collection URL is subdomain:
+$Collection = $Blog = $commented_Item->Blog;
 
 // Re-Init charset handling, in case current_charset has changed:
 locale_activate( $commented_Item->Blog->get('locale') );
@@ -172,17 +172,14 @@ else
 	// NO permission to edit!
 	$perm_comment_edit = false;
 
-	// we need some id info from the anonymous user:
-	if ( $require_name_email )
-	{ // We want Name and EMail with comments
-		if( empty( $author ) )
-		{
-			$Messages->add( T_('Please fill in your name.'), 'error' );
-		}
-		if( empty( $email ) )
-		{
-			$Messages->add( T_('Please fill in your email.'), 'error' );
-		}
+	// We need some id info from the anonymous user:
+	if( $commented_Item->Blog->get_setting( 'require_anon_name' ) && empty( $author ) )
+	{	// Author name is required for anonymous users:
+		$Messages->add( T_('Please fill in your name.'), 'error' );
+	}
+	if( $commented_Item->Blog->get_setting( 'require_anon_email' ) && empty( $email ) )
+	{	// Author email address is required for anonymous users:
+		$Messages->add( T_('Please fill in your email.'), 'error' );
 	}
 
 	if( !empty( $author ) && ( $block = antispam_check( $author ) ) )
@@ -283,36 +280,6 @@ if( param( 'renderers_displayed', 'integer', 0 ) )
 $def_status = $Comment->is_meta() ? 'published' : get_highest_publish_status( 'comment', $commented_Item->Blog->ID, false );
 $Comment->set( 'status', $def_status );
 
-if( $action != 'preview' )
-{
-	/*
-	 * Flood-protection
-	 * NOTE: devs can override the flood protection delay in /conf/_overrides_TEST.php
-	 * TODO: Put time check into query?
-	 * TODO: move that as far !!UP!! as possible! We want to waste minimum resources on Floods
-	 * TODO: have several thresholds. For example:
-	 * 1 comment max every 30 sec + 5 comments max every 10 minutes + 15 comments max every 24 hours
-	 * TODO: factorize with trackback
-	 */
-	$query = 'SELECT MAX(comment_date)
-							FROM T_comments
-						 WHERE comment_author_IP = '.$DB->quote($Hit->IP).'
-								OR comment_author_email = '.$DB->quote( $Comment->get_author_email() );
-	$ok = 1;
-	if( $then = $DB->get_var( $query ) )
-	{
-		$time_lastcomment = mysql2date("U",$then);
-		$time_newcomment = mysql2date("U",$now);
-		if( ($time_newcomment - $time_lastcomment) < $minimum_comment_interval )
-			$ok = 0;
-	}
-	if( !$ok )
-	{
-		$Messages->add( sprintf( T_('You can only post a new comment every %d seconds.'), $minimum_comment_interval ), 'error' );
-	}
-	/* end flood-protection */
-}
-
 // get already attached file ids
 param( 'preview_attachments', 'string', '' );
 // finally checked attachments
@@ -336,7 +303,7 @@ if( !empty( $preview_attachments ) )
 	}
 }
 
-if( $commented_Item->can_attach() && ( ( $action == 'preview' ) || $ok ) &&
+if( $commented_Item->can_attach() && ( $action == 'preview' ) &&
     !empty( $_FILES['uploadfile'] ) && !empty( $_FILES['uploadfile']['size'] ) && !empty( $_FILES['uploadfile']['size'][0] ) )
 { // attaching files is permitted
 	$FileRootCache = & get_FileRootCache();
@@ -570,23 +537,23 @@ if( !is_logged_in() )
 			$url = ' '; // this to make sure a cookie is set for 'no url'
 
 		// fplanque: made cookies available for whole site
-		evo_setcookie( $cookie_name, $author, $cookie_expires, $cookie_path, $cookie_domain, false, true );
-		evo_setcookie( $cookie_email, $email, $cookie_expires, $cookie_path, $cookie_domain, false, true );
-		evo_setcookie( $cookie_url, $url, $cookie_expires, $cookie_path, $cookie_domain, false, true );
+		evo_setcookie( $cookie_name, $author, $cookie_expires, '', '', false, true );
+		evo_setcookie( $cookie_email, $email, $cookie_expires, '', '', false, true );
+		evo_setcookie( $cookie_url, $url, $cookie_expires, '', '', false, true );
 	}
 	else
 	{	// Erase cookies:
 		if( !empty($_COOKIE[$cookie_name]) )
 		{
-			evo_setcookie( $cookie_name, '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
+			evo_setcookie( $cookie_name, '', $cookie_expired, '', '', false, true );
 		}
 		if( !empty($_COOKIE[$cookie_email]) )
 		{
-			evo_setcookie( $cookie_email, '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
+			evo_setcookie( $cookie_email, '', $cookie_expired, '', '', false, true );
 		}
 		if( !empty($_COOKIE[$cookie_url]) )
 		{
-			evo_setcookie( $cookie_url, '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
+			evo_setcookie( $cookie_url, '', $cookie_expired, '', '', false, true );
 		}
 	}
 }

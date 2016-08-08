@@ -182,7 +182,7 @@ switch( $action )
 				$blog_names = array();
 				foreach( $default_ids as $blog_ID => $item_type_ID )
 				{
-					if( $edited_Itemtype->ID == $item_type_ID && ( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) ) )
+					if( $edited_Itemtype->ID == $item_type_ID && ( $Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) ) )
 					{
 						$blog_names[] = '<a href="'.$admin_url.'?ctrl=coll_settings&tab=features&blog='.$Blog->ID.'#fieldset_wrapper_post_options"><b>'.$Blog->get('name').'</b></a>';
 					}

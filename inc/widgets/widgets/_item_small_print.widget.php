@@ -256,7 +256,7 @@ class item_small_print_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog, $current_User, $Item;
+		global $Collection, $Blog, $current_User, $Item;
 
 		return array(
 				'wi_ID'        => $this->ID, // Have the widget settings changed ?

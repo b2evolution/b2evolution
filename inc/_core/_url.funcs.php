@@ -710,7 +710,7 @@ function url_absolute( $url, $base = NULL )
 
 	if( empty($base) )
 	{	// Detect current page base
-		global $Blog, $ReqHost, $base_tag_set, $baseurl;
+		global $Collection, $Blog, $ReqHost, $base_tag_set, $baseurl;
 
 		if( $base_tag_set )
 		{	// <base> tag is set
@@ -884,7 +884,7 @@ function idna_decode( $url )
  */
 function get_dispctrl_url( $dispctrl, $params = '' )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( $params != '' )
 	{

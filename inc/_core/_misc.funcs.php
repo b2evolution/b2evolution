@@ -2771,6 +2771,9 @@ function debug_die( $additional_info = '', $params = array() )
 		$additional_info = $params['debug_info'];
 	}
 
+	// Send the predefined cookies:
+	evo_sendcookies();
+
 	if( $is_api_request )
 	{	// REST API or XMLRPC request:
 
@@ -2922,6 +2925,9 @@ function debug_die( $additional_info = '', $params = array() )
 function bad_request_die( $additional_info = '' )
 {
 	global $debug, $baseurl, $is_api_request;
+
+	// Send the predefined cookies:
+	evo_sendcookies();
 
 	if( $is_api_request )
 	{	// REST API or XMLRPC request:
@@ -5006,37 +5012,45 @@ function get_base_domain( $url )
 {
 	global $evo_charset;
 
-	//echo '<p>'.$url;
-	// Chop away the http part and the path:
+	// Chop away the protocol part(http,htpps,ftp) and the path:
 	$domain = preg_replace( '~^([a-z]+://)?([^:/#]+)(.*)$~i', '\\2', $url );
 
-	if( empty($domain) || preg_match( '~^(\d+\.)+\d+$~', $domain ) )
-	{	// Empty or All numeric = IP address, don't try to cut it any further
+	if( empty( $domain ) || preg_match( '~^(\d+\.)+\d+$~', $domain ) )
+	{	// Empty or All numeric = IP address, don't try to cut it any further:
 		return $domain;
 	}
 
-	//echo '<br>'.$domain;
-
-	// Get the base domain up to 3 levels (x.y.tld):
+	// Get the base domain up to 2 or 3 levels (x.y.tld):
 	// NOTE: "_" is not really valid, but for Windows it is..
 	// NOTE: \w includes "_"
 
-	// convert URL to IDN:
-	$domain = idna_encode($domain);
+	// Convert URL to IDN:
+	$domain = idna_encode( $domain );
 
-	$domain_pattern = '~ ( \w (\w|-|_)* \. ){0,2}   \w (\w|-|_)* $~ix';
-	if( ! preg_match( $domain_pattern, $domain, $match ) )
-	{
+	if( preg_match( '~\.(com|net|org|int|edu|gov|mil)$~i', $domain ) )
+	{	// Use max 2 level domain for very well known TLDs:
+		// (for example: "sub3.sub2.sub1.domain.com" will be "domain.com")
+		$max_level = 2;
+	}
+	else
+	{	// Use max 3 level domain for all others:
+		// (for example: "sub3.sub2.sub1.domain.fr" will be "sub1.domain.fr")
+		$max_level = 3;
+	}
+
+	// Limit domain by 2 or 3 level depending on TLD:
+	if( ! preg_match( '~ ( \w (\w|-|_)* \. ){0,'.( $max_level - 1 ).'}   \w (\w|-|_)* $~ix', $domain, $match ) )
+	{	// Return an empty if domain doesn't match to proper format:
 		return '';
 	}
-	$base_domain = convert_charset(idna_decode($match[0]), $evo_charset, 'UTF-8');
 
-	// Remove any www. prefix:
-	$base_domain = preg_replace( '~^www\.~i', '', $base_domain );
+	// Convert all symbols of domain name to UTF-8:
+	$domain = convert_charset( idna_decode( $match[0] ), $evo_charset, 'UTF-8' );
 
-	//echo '<br>'.$base_domain.'</p>';
+	// Remove any prefix like "www.", "www2.", "www9999." and etc.:
+	$domain = preg_replace( '~^www[0-9]*\.~i', '', $domain );
 
-	return $base_domain;
+	return $domain;
 }
 
 
@@ -5595,7 +5609,7 @@ function hash_link_params( $link_array, $force_hash = NULL )
 	{
 		$key = $ReqHost.$ReqPath;
 
-		global $Blog;
+		global $Collection, $Blog;
 		if( !empty($Blog) && strpos( $Blog->get_setting('single_links'), 'param_' ) === 0 )
 		{	// We are on a blog that doesn't even have clean URLs for posts
 			$key .= $ReqURI;
@@ -5763,6 +5777,9 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 			$output .= $target.$method.'('.implode( ',', $params ).');'."\n";
 		}
 	}
+
+	// Send the predefined cookies:
+	evo_sendcookies();
 
 	if( $send_as_html )
 	{	// we want to send as a html document
@@ -6120,9 +6137,9 @@ function get_active_opcode_cache()
 		return 'OPCache';
 	}
 
-	if( function_exists( 'apcu_cache_info' ) && ini_get( 'apc.enabled' ) )
+	if( function_exists( 'apc_cache_info' ) && ini_get( 'apc.enabled' ) )
 	{
-		return 'APCu';
+		return 'APC';
 	}
 
 	return 'none';
@@ -6136,14 +6153,14 @@ function get_active_opcode_cache()
  */
 function get_active_user_cache()
 {
-	if( function_exists( 'apc_cache_info' ) && ini_get( 'apc.enabled' ) )
-	{
-		return 'APC';
-	}
-
 	if( function_exists( 'apcu_cache_info' ) && ini_get( 'apc.enabled' ) )
 	{
 		return 'APCu';
+	}
+
+	if( function_exists( 'apc_cache_info' ) && ini_get( 'apc.enabled' ) )
+	{
+		return 'APC';
 	}
 
 	// xcache: xcache.var_size must be > 0. xcache_set is not necessary (might have been disabled).
@@ -6295,6 +6312,21 @@ function get_ReqURI()
 
 
 /**
+ * Get URL to REST API script depending on current collection base url from front-office or site base url from back-office
+ *
+ * Note: For back-office or no collection page _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
+ *
+ * @return string URL to htsrv folder
+ */
+function get_restapi_url()
+{
+	global $restapi_script;
+
+	return get_htsrv_url().$restapi_script;
+}
+
+
+/**
  * Get URL to htsrv folder depending on current collection base url from front-office or site base url from back-office
  *
  * Note: For back-office or no collection page _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
@@ -6304,7 +6336,7 @@ function get_ReqURI()
  */
 function get_htsrv_url( $force_https = false )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( is_admin_page() || empty( $Blog ) )
 	{	// For back-office or when no collection page:
@@ -6327,7 +6359,7 @@ function get_htsrv_url( $force_https = false )
  */
 function get_samedomain_htsrv_url( $secure = false )
 {
-	global $ReqHost, $ReqPath, $htsrv_url, $htsrv_url_sensitive, $htsrv_subdir, $Blog;
+	global $ReqHost, $ReqPath, $htsrv_url, $htsrv_url_sensitive, $htsrv_subdir, $Collection, $Blog;
 
 	if( $secure )
 	{
@@ -6366,9 +6398,9 @@ function get_samedomain_htsrv_url( $secure = false )
 	// But it's possible to turn them off in SEO settings for some page and not others (we don't know which here)
   // And some kinds of pages do not have 301 redirections implemented yet, e-g: disp=users
   /*
-	if( ( !is_admin_page() ) && ( !empty( $Blog ) ) && ( $samedomain_htsrv_url != $Blog->get_local_htsrv_url() ) )
+	if( ( !is_admin_page() ) && ( !empty( $Blog ) ) && ( $samedomain_htsrv_url != $Blog->get_htsrv_url( $secure ) ) )
 	{
-		debug_die( 'The blog is configured to have /htsrv/ at:<br> '.$Blog->get_local_htsrv_url().'<br>but in order to stay on the current domain, we would need to use:<br>'.$samedomain_htsrv_url.'<br>Maybe we have a missing redirection to the proper blog url?' );
+		debug_die( 'The blog is configured to have /htsrv/ at:<br> '.$Blog->get_htsrv_url( $secure ).'<br>but in order to stay on the current domain, we would need to use:<br>'.$samedomain_htsrv_url.'<br>Maybe we have a missing redirection to the proper blog url?' );
 	}
 	*/
 
@@ -6744,43 +6776,10 @@ function int2ip( $int )
  */
 function is_valid_ip_format( $ip )
 {
-	if( function_exists( 'filter_var' ) )
-	{ // filter_var() function exists we have PHP version >= 5.2.0
-		return filter_var( $ip, FILTER_VALIDATE_IP ) !== false;
-	}
-
-	// PHP version is < 5.2.0
-	if( $ip == '::1' )
-	{	// Reserved IP for localhost
-		$ip = '127.0.0.1';
-	}
-
-	if( strpos( $ip, '.' ) !== false )
-	{ // we have IPv4
-		if( strpos( $ip, ':' !== false ) )
-		{ // It is combined with IPv6, remove the IPv6 prefix
-			$ip = substr( $ip, strrpos( $ip, ':' ) );
-		}
-		if( substr_count( $ip, '.' ) != 3 )
-		{ // Don't vaildate formats like 'zz.yyyyy' which would be allowed by ip2long() function
-			return false;
-		}
-		$result = ip2long( $ip );
-		return ( ( $result !== false ) && ( $result !== -1 ) );
-	}
-
-	// Check if it is a valid IPv6 string
-	if( preg_match( "/^[0-9a-f]{1,4}:([0-9a-f]{0,4}:){1,6}[0-9a-f]{1,4}$/", $ip ) )
-	{ // $ip has the correct format
-		if( ( substr_count( $ip, '::' ) > 1 ) || ( strpos( $ip, ':::' ) !== false ) )
-		{ // Not valid IPv6 format because contains a ':::' char sequence or more than one '::'
-			return false;
-		}
-		return true;
-	}
-
-	return false;
+	return filter_var( $ip, FILTER_VALIDATE_IP ) !== false;
 }
+
+
 
 
 /**
@@ -7167,27 +7166,118 @@ function apm_log_custom_param( $name, $value )
 	}
 }
 
+
 /**
- * Send a cookie (@see setcookie() for more details)
+ * Get cookie domain depending on current page:
+ *     - For back-office the config var $cookie_domain is used
+ *     - For front-office it is dynamically generated from collection url
+ *
+ * @return string Cookie domain
+ */
+function get_cookie_domain()
+{
+	global $Collection, $Blog;
+
+	if( is_admin_page() || empty( $Blog ) )
+	{	// Use cookie domain of base url from config:
+		global $cookie_domain;
+		return $cookie_domain;
+	}
+	else
+	{	// Use cookie domain of current collection url:
+		return $Blog->get_cookie_domain();
+	}
+}
+
+
+/**
+ * Get cookie path depending on current page:
+ *     - For back-office the config var $cookie_path is used
+ *     - For front-office it is dynamically generated from collection url
+ *
+ * @return string Cookie path
+ */
+function get_cookie_path()
+{
+	global $Collection, $Blog;
+
+	if( is_admin_page() || empty( $Blog ) )
+	{	// Use cookie path of base url from config:
+		global $cookie_path;
+		return $cookie_path;
+	}
+	else
+	{	// Use base path of current collection url:
+		return $Blog->get_cookie_path();
+	}
+}
+
+
+/**
+ * Set a cookie to send it by evo_sendcookies()
  *
  * @param string The name of the cookie
  * @param string The value of the cookie
  * @param integer The time the cookie expires
- * @param string The path on the server in which the cookie will be available on
- * @param string The domain that the cookie is available
+ * @param string DEPRECATED: The path on the server in which the cookie will be available on
+ * @param string DEPRECATED: The domain that the cookie is available
  * @param boolean Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
  * @param boolean (Added in PHP 5.2.0) When TRUE the cookie will be made accessible only through the HTTP protocol
- * @return boolean TRUE if setcookie() successfully runs
  */
-function evo_setcookie( $name, $value = '', $expire = 0, $path = '', $domain = '', $secure = false, $httponly = false )
+function evo_setcookie( $name, $value = '', $expire = 0, $dummy = '', $dummy2 = '', $secure = false, $httponly = false )
 {
-	if( version_compare( phpversion(), '5.2', '>=' ) )
-	{ // Use HTTP-only setting since PHP 5.2.0
-		return setcookie( $name, $value, $expire, $path, $domain, $secure, $httponly );
+	global $evo_cookies;
+
+	if( ! is_array( $evo_cookies ) )
+	{	// Initialize array for cookies only first time:
+		$evo_cookies = array();
 	}
-	else
-	{ // PHP < 5.2 doesn't support HTTP-only
-		return setcookie( $name, $value, $expire, $path, $domain, $secure );
+
+	// Store cookie in global var:
+	$evo_cookies[ $name ] = array(
+			'value'    => $value,
+			'expire'   => $expire,
+			'secure'   => $secure,
+			'httponly' => $httponly,
+		);
+}
+
+
+/**
+ * Send the predefined cookies (@see setcookie() for more details)
+ */
+function evo_sendcookies()
+{
+	global $evo_cookies;
+
+	if( headers_sent() )
+	{	// Exit to avoid errors because headers already were sent:
+		return;
+	}
+
+	if( empty( $evo_cookies ) )
+	{	// No cookies:
+		return;
+	}
+
+	$php_version_52 = version_compare( phpversion(), '5.2', '>=' );
+
+	$current_cookie_domain = get_cookie_domain();
+	$current_cookie_path = get_cookie_path();
+
+	foreach( $evo_cookies as $evo_cookie_name => $evo_cookie )
+	{
+		if( $php_version_52 )
+		{	// Use HTTP-only setting since PHP 5.2.0:
+			setcookie( $evo_cookie_name, $evo_cookie['value'], $evo_cookie['expire'], $current_cookie_path, $current_cookie_domain, $evo_cookie['secure'], $evo_cookie['httponly'] );
+		}
+		else
+		{	// PHP < 5.2 doesn't support HTTP-only:
+			setcookie( $evo_cookie_name, $evo_cookie['value'], $evo_cookie['expire'], $current_cookie_path, $current_cookie_domain, $evo_cookie['secure'] );
+		}
+
+		// Unset to don't send cookie twice:
+		unset( $evo_cookies[ $evo_cookie_name ] );
 	}
 }
 
@@ -7372,7 +7462,7 @@ function button_class( $type = 'button', $jQuery_selector = false )
  */
 function echo_modalwindow_js()
 {
-	global $AdminUI, $Blog, $modal_window_js_initialized;
+	global $AdminUI, $Collection, $Blog, $modal_window_js_initialized;
 
 	if( ! empty( $modal_window_js_initialized ) )
 	{ // Don't print out these functions twice
@@ -7465,7 +7555,7 @@ function get_fieldset_folding_icon( $id, $params = array() )
 	}
 	else
 	{ // Get the fold value from user settings
-		global $UserSettings, $Blog;
+		global $UserSettings, $Collection, $Blog;
 		if( empty( $Blog ) )
 		{ // Get user setting value
 			$value = intval( $UserSettings->get( 'fold_'.$id ) );

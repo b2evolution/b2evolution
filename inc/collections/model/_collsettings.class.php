@@ -73,7 +73,9 @@ class CollectionSettings extends AbstractSettings
 			// 'post_inskin_statuses' => NULL,          // Same as in case of comments
 			'allow_comments' => 'any',
 			'allow_view_comments' => 'any',				// 'any', 'registered', 'member', 'moderator'
-			'allow_anon_url' => '0',
+			'require_anon_name' => 1,
+			'require_anon_email' => 1,
+			'allow_anon_url' => 0,
 			'allow_attachments' => 'registered',
 			'max_attachments' => '',
 			'display_rating_summary' => '1', // Display a summary of star ratings above the comments
@@ -192,6 +194,9 @@ class CollectionSettings extends AbstractSettings
 			'locale_source' => 'blog', // Source of the locale for navigation/widget: 'blog', 'user'
 			'post_locale_source' => 'post', // Source of the locale for post content: 'post', 'blog'
 			'new_item_locale_source' => 'select_coll', // Source of the locale for new items: 'use_coll', 'select_coll', 'select_user'
+			// Cookie settings:
+			'cookie_domain_type' => 'auto', // Cookie domain type: 'auto', 'custom'
+			'cookie_path_type' => 'auto', // Cookie path type: 'auto', 'custom'
 
 		// User directory:
 			'userdir_picture' => 1,

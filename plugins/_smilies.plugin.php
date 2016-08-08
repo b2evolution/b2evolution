@@ -190,7 +190,7 @@ XX(      graydead.gif
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $Blog );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never'
@@ -216,13 +216,13 @@ XX(      graydead.gif
 			if( !empty( $Comment->item_ID ) )
 			{
 				$comment_Item = & $Comment->get_Item();
-				$Blog = & $comment_Item->get_Blog();
+				$Collection = $Blog = & $comment_Item->get_Blog();
 			}
 		}
 
 		if( empty( $Blog ) )
 		{ // Comment is not set, try global Blog
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{ // We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available
 				return false;

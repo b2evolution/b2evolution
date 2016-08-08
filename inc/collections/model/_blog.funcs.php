@@ -304,14 +304,14 @@ function autoselect_blog( $permname, $permlevel = 'any' )
  */
 function valid_blog_requested()
 {
-	global $Blog, $Messages;
+	global $Collection, $Blog, $Messages;
 	if( empty( $Blog ) )
 	{ // The requested blog does not exist, Try to get other available blog for the current User
 		$blog_ID = get_working_blog();
 		if( $blog_ID )
 		{
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 		}
 	}
 
@@ -488,13 +488,13 @@ function set_cache_enabled( $cache_key, $new_status, $coll_ID = NULL, $save_sett
 
 	if( empty( $coll_ID ) )
 	{ // general cache
-		$Blog = NULL;
+		$Collection = $Blog = NULL;
 		$old_cache_status = $Settings->get( $cache_key );
 	}
 	else
 	{ // blog page cache
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $coll_ID );
+		$Collection = $Blog = $BlogCache->get_by_ID( $coll_ID );
 		$old_cache_status = $Blog->get_setting( $cache_key );
 	}
 
@@ -612,7 +612,7 @@ function init_requested_blog( $use_blog_param_first = true )
 		{	// There is an extension (like .php) in the collection name, ignore...
 			$Debuglog->add( 'Ignoring because it contains a dot.', 'detectblog' );
 		}
-		elseif( (($Blog = & $BlogCache->get_by_urlname( $matches[2], false )) !== false) ) /* SQL request '=' */
+		elseif( ( $Collection = $Blog = & $BlogCache->get_by_urlname( $matches[2], false ) ) !== false ) /* SQL request '=' */
 		{ // We found a matching blog:
 			$blog = $Blog->ID;
 			$Debuglog->add( 'Found matching blog: '.$blog, 'detectblog' );
@@ -635,7 +635,7 @@ function init_requested_blog( $use_blog_param_first = true )
 	}
 	$Debuglog->add( 'Looking up absolute url : '.$ReqAbsUrl, 'detectblog' );
 	// SQL request 'LIKE':
-	if( (($Blog = & $BlogCache->get_by_url( $ReqAbsUrl, false )) !== false) )
+	if( ( $Collection = $Blog = & $BlogCache->get_by_url( $ReqAbsUrl, false ) ) !== false )
 	{ // We found a matching blog:
 		$blog = $Blog->ID;
 		$Debuglog->add( 'Found matching blog: '.$blog, 'detectblog' );
@@ -656,7 +656,7 @@ function init_requested_blog( $use_blog_param_first = true )
 
 	// Still no blog requested, use default:
 	$blog = $Settings->get( 'default_blog_ID' );
-	$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 	if( $Blog !== false && $Blog !== NULL )
 	{ // We found a matching blog:
 		$Debuglog->add( 'Using default blog '.$blog, 'detectblog' );
@@ -684,7 +684,7 @@ function activate_blog_locale( $blog )
 	}
 
 	$BlogCache = & get_BlogCache();
-	$Blog = $BlogCache->get_by_ID( $blog, false, false );
+	$Collection = $Blog = $BlogCache->get_by_ID( $blog, false, false );
 	if( !empty( $Blog ) )
 	{ // Activate the blog locale
 		locale_activate( $Blog->get('locale') );
@@ -730,7 +730,7 @@ function init_blog_widgets( $blog_id )
  */
 function check_allow_disp( $disp )
 {
-	global $Blog, $Messages, $Settings, $current_User;
+	global $Collection, $Blog, $Messages, $Settings, $current_User;
 
 	if( !check_user_status( 'can_be_validated' ) )
 	{ // we don't have the case when user is logged in and the account is not active
@@ -943,7 +943,7 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	}
 	else
 	{ // Get list of relevant blogs
-		$Blog = & $BlogCache->get_by_ID( $blog_ids );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ids );
 		$where_cat_clause = trim( $Blog->get_sql_where_aggregate_coll_IDs( 'cat_blog_ID' ) );
 	}
 
@@ -1001,7 +1001,7 @@ function get_inskin_statuses( $blog_ID, $type )
 	}
 
 	$BlogCache = & get_BlogCache();
-	$Blog = $BlogCache->get_by_ID( $blog_ID );
+	$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 	$inskin_statuses = $Blog->get_setting( ( $type == 'comment' ) ? 'comment_inskin_statuses' : 'post_inskin_statuses' );
 	return explode( ',', $inskin_statuses );
 }
@@ -1341,11 +1341,12 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow
  * Get Blog object from general setting
  *
  * @param string Setting name: 'default_blog_ID', 'info_blog_ID', 'login_blog_ID', 'msg_blog_ID'
+ * @param object|NULL Current collection, Used for additional checking
  * @param boolean true if function $BlogCache->get_by_ID() should die on error
  * @param boolean true if function $BlogCache->get_by_ID() should die on empty/null
  * @return object|NULL|false
  */
-function & get_setting_Blog( $setting_name, $halt_on_error = false, $halt_on_empty = false )
+function & get_setting_Blog( $setting_name, $current_Blog = NULL, $halt_on_error = false, $halt_on_empty = false )
 {
 	global $Settings;
 
@@ -1353,6 +1354,11 @@ function & get_setting_Blog( $setting_name, $halt_on_error = false, $halt_on_emp
 
 	if( ! isset( $Settings ) )
 	{
+		return $setting_Blog;
+	}
+
+	if( $setting_name == 'login_blog_ID' && $current_Blog !== NULL && $current_Blog->get( 'access_type' ) == 'absolute' )
+	{	// Don't allow to use main login collection if current collection has an external domain:
 		return $setting_Blog;
 	}
 

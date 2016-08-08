@@ -21,7 +21,7 @@ global $Comment;
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var CommentList
  */
