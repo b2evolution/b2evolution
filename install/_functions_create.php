@@ -434,7 +434,7 @@ function create_default_data()
 			(10, 'pps', 'Slideshow', 'pps', 'file_pps', 'external', 'registered'),
 			(11, 'zip', 'ZIP archive', 'application/zip', 'file_zip', 'external', 'registered'),
 			(12, 'php php3 php4 php5 php6', 'PHP script', 'application/x-httpd-php', 'file_php', 'text', 'admin'),
-			(13, 'css', 'Style sheet', 'text/css', '', 'text', 'registered'),
+			(13, 'css', 'Style sheet', 'text/css', 'file_document', 'text', 'registered'),
 			(14, 'mp3', 'MPEG audio file', 'audio/mpeg', 'file_sound', 'browser', 'registered'),
 			(15, 'm4a', 'MPEG audio file', 'audio/x-m4a', 'file_sound', 'browser', 'registered'),
 			(16, 'mp4 f4v', 'MPEG video', 'video/mp4', 'file_video', 'browser', 'registered'),
@@ -445,7 +445,7 @@ function create_default_data()
 			(21, 'webm', 'WebM video file', 'video/webm', 'file_video', 'browser', 'registered'),
 			(22, 'ogv', 'Ogg video file', 'video/ogg', 'file_video', 'browser', 'registered'),
 			(23, 'm3u8', 'M3U8 video file', 'application/x-mpegurl', 'file_video', 'browser', 'registered'),
-			(24, 'xml', 'XML file', 'application/xml', 'file_document', 'browser', 'admin')
+			(24, 'xml', 'XML file', 'application/xml', 'file_www', 'browser', 'admin')
 		" );
 	task_end();
 

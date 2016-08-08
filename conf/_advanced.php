@@ -170,7 +170,7 @@ $resample_all_images = false;
 
 // Decompose the baseurl
 // YOU SHOULD NOT EDIT THIS unless you know what you're doing
-if( preg_match( '#^((https?)://(www\.)?(.+?)(:(.+?))?)(/.*)$#', $baseurl, $matches ) )
+if( preg_match( '#^((https?)://(www\.)?(.+?)(:.+?)?)(/.*)$#', $baseurl, $matches ) )
 {
 	$baseurlroot = $matches[1]; // no ending slash!
 	// echo "baseurlroot=$baseurlroot <br />";
@@ -180,10 +180,10 @@ if( preg_match( '#^((https?)://(www\.)?(.+?)(:(.+?))?)(/.*)$#', $baseurl, $match
 	$basehost = $matches[4]; // Will NEVER include "www." at the beginning.
 	// echo "basehost=$basehost <br />";
 
-	$baseport =  $matches[6];
+	$baseport =  $matches[5]; // Will start with ":" if a port is specified.
 	// echo "baseport=$baseport <br />";
 
-	$basesubpath =  $matches[7];
+	$basesubpath =  $matches[6];
 	// echo "basesubpath=$basesubpath <br />";
 }
 else
@@ -303,7 +303,7 @@ else
 /**
  * Name used for session cookies.
  */
-$cookie_session = str_replace( '.', '_', 'session_'.$instance_name.'_'.$cookie_domain );
+$cookie_session = 'session_'.$instance_name;
 
 /**
  * Names used for other cookies.

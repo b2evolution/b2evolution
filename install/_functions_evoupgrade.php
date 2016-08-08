@@ -7508,8 +7508,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11785, 'Add new types "Text" and "HTML" for custom fields of item types...' ) )
-	{	// part of 6.7.3-stable
+	if( upg_task_start( 11785, 'Upgrading email log table...' ) )
+	{	// part of 6.7.5-stable
+		$DB->query( 'ALTER TABLE T_email__log
+			MODIFY emlog_message MEDIUMTEXT DEFAULT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12000, 'Add new types "Text" and "HTML" for custom fields of item types...' ) )
+	{	// part of 6.7.5-stable
 		$DB->query( 'ALTER TABLE T_items__item_settings
 			MODIFY COLUMN iset_value varchar( 10000 ) NULL' );
 		$DB->query( 'ALTER TABLE T_items__type_custom_field
@@ -7517,8 +7524,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11790, 'Update widget container "Item Single"...' ) )
-	{	// part of 6.7.3-stable
+	if( upg_task_start( 12005, 'Update widget container "Item Single"...' ) )
+	{	// part of 6.7.5-stable
 		$DB->begin();
 		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
 		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_code, wi_order' );
@@ -7575,8 +7582,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11795, 'Create new widget container "404 Page"...' ) )
-	{	// part of 6.7.3-stable
+	if( upg_task_start( 12010, 'Create new widget container "404 Page"...' ) )
+	{	// part of 6.7.5-stable
 		$coll_IDs = $DB->get_col( 'SELECT blog_ID FROM T_blogs' );
 		if( $coll_IDs )
 		{
@@ -7594,8 +7601,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11800, 'Rename table "T_antispam" to "T_antispam__keyword"...' ) )
-	{	// part of 6.7.4-stable
+	if( upg_task_start( 12015, 'Rename table "T_antispam" to "T_antispam__keyword"...' ) )
+	{	// part of 6.7.5-stable
 		$DB->query( 'RENAME TABLE '.$tableprefix.'antispam TO T_antispam__keyword' );
 		$DB->query( "ALTER TABLE T_antispam__keyword
 			CHANGE aspm_ID     askw_ID     bigint(11) NOT NULL auto_increment,
@@ -7606,7 +7613,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11805, 'Upgrade table user post data...' ) )
+	if( upg_task_start( 12020, 'Upgrade table user post data...' ) )
 	{	// part of 6.8.0-alpha
 		$DB->query( 'RENAME TABLE '.$tableprefix.'users__postreadstatus TO T_items__user_data' );
 		$DB->query( "ALTER TABLE T_items__user_data
@@ -7618,7 +7625,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11810, 'Creating table for user profile visits...' ) )
+	if( upg_task_start( 12025, 'Creating table for user profile visits...' ) )
 	{	// part of 6.8.0-alpha
 		db_create_table( 'T_users__profile_visits', '
 				upv_visited_user_ID INT(11) UNSIGNED NOT NULL,
@@ -7628,13 +7635,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11815, 'Upgrade base domains table...') )
+	if( upg_task_start( 12030, 'Upgrade base domains table...') )
 	{ // part of 6.8.0-alpha
 		db_add_col( 'T_basedomains', 'dom_comment', 'VARCHAR(255) DEFAULT NULL' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11820, 'Create table for items votes...' ) )
+	if( upg_task_start( 12035, 'Create table for items votes...' ) )
 	{	// part of 6.8.0-alpha
 		db_create_table( 'T_items__votes', '
 			itvt_item_ID INT UNSIGNED NOT NULL,
@@ -7648,7 +7655,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11825, 'Upgrade table posts for voting...' ) )
+	if( upg_task_start( 12040, 'Upgrade table posts for voting...' ) )
 	{	// part of 6.8.0-alpha
 		$DB->query( 'ALTER TABLE T_items__item
 			ADD post_addvotes   INT NOT NULL DEFAULT 0,
@@ -7656,7 +7663,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11830, 'Update table post types...' ) )
+	if( upg_task_start( 12045, 'Update table post types...' ) )
 	{	// part of 6.8.0-alpha
 		$DB->query( 'UPDATE T_items__type
 			  SET ityp_allow_disabling_comments = 1
@@ -7664,7 +7671,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11835, 'Upgrade table post types...' ) )
+	if( upg_task_start( 12050, 'Upgrade table post types...' ) )
 	{	// part of 6.8.0-alpha
 		$DB->query( 'ALTER TABLE T_items__type
 			ADD ityp_comment_form_msg       TEXT NULL DEFAULT NULL AFTER ityp_use_comments,
@@ -7672,13 +7679,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11840, 'Upgrade links table...' ) )
+	if( upg_task_start( 12055, 'Upgrade links table...' ) )
 	{	// part of 6.8.0-alpha
 		db_add_col( 'T_links', 'link_ecmp_ID', 'int(11) unsigned  NULL COMMENT \'Used for linking files to email campaign\' AFTER link_usr_ID' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11845, 'Upgrade files table...' ) )
+	if( upg_task_start( 12060, 'Upgrade files table...' ) )
 	{	// part of 6.8.0-alpha
 		$DB->query( 'ALTER TABLE T_files
 			MODIFY file_root_type ENUM("absolute","user","collection","shared","skins","import","emailcampaign") COLLATE ascii_general_ci NOT NULL DEFAULT "absolute"' );
