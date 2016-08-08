@@ -37,7 +37,7 @@ switch( $target )
 		$test_user = 'admin';
 		$test_pass = $install_password;
 		pre_dump( $test_user, $test_pass );
-		$client = new xmlrpc_client( $basesubpath.$xmlsrv_subdir.'xmlrpc.php', $basehost, $baseport );
+		$client = new xmlrpc_client( $basesubpath.$xmlsrv_subdir.'xmlrpc.php', $basehost, substr( $baseport, 1 ) );
 		break;
 
 	default:
