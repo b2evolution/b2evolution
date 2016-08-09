@@ -736,17 +736,20 @@ label.control-label[for=post_title] {
 		margin-left: 10px;
 	}
 }
-@media screen and (min-width: 375px) and (max-width: 767px) {
-	.ft_workflow_info {
-		padding-left: 50px;
-	}
-}
+//@media screen and (min-width: 600px) and (max-width: 767px) {
+//	.ft_workflow_info {
+//		padding-left: 50px;
+//	}
+//}
 @media screen and (max-width: 767px) {
 	.ft_date {
 		display: none !important;
 	}
-	.ft_workflow_info {
+	.ft_workflow_status_and_author {
 		padding-right: 0;
+	}
+	.ft_workflow_last_comment {
+		padding-left: 5px;
 	}
 	.ft_assigned {
 		margin-top: 4px;
@@ -958,7 +961,7 @@ label.control-label[for=post_title] {
 	.posts_panel {
 		.ft_status_topic {
 			vertical-align: top;
-			margin-top: 8px;
+			// margin-top: 8px;
 		}
 		.ft_count {
 			margin-top: 0px;

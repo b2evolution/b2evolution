@@ -210,7 +210,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 		}
 		else
 		{ // 'status_and_author'
-			echo '<div class="ft_workflow_info col-lg-2 col-md-2 col-sm-3 col-sm-offset-0 col-xs-6">';
+			echo '<div class="ft_workflow_info ft_workflow_status_and_author col-lg-2 col-md-2 col-sm-3 col-sm-offset-0 col-xs-6">';
 			echo '<div class="ft_date_header">';	// fp> temp hack to get correct style
 
 			// Workflow status
@@ -249,7 +249,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 	echo '<!-- Last Comment Block -->';
 	if( $display_workflow )
 	{ // ==========================================================================================================================
-		echo '<div class="ft_workflow_info col-lg-2 col-md-2 col-sm-3 col-sm-offset-0 col-xs-6">';
+		echo '<div class="ft_workflow_info ft_workflow_last_comment col-lg-2 col-md-2 col-sm-3 col-sm-offset-0 col-xs-6">';
 		echo '<div class="ft_date_header">';
 		if( $comments_number == 0 && $Item->comment_status == 'disabled' )
 		{ // The comments are disabled:
