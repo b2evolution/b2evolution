@@ -842,6 +842,9 @@ ol.breadcrumb {
   max-width: 100%;
   display: inline-block;
 }
+.forums_list .ft_date_workflow {
+  margin-top: 2px;
+}
 .forums_list .ft_title > a.forumlink {
   font-size: 21px;
 }
