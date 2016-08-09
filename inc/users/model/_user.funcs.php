@@ -2947,7 +2947,8 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 			$Form->begin_fieldset( $userfield->ufgp_name.( is_admin_page() ? get_manual_link( 'user-profile-tab-userfields' ) : '' ) , array( 'id' => $userfield->ufgp_ID ) );
 		}
 
-		$uf_val = param( 'uf_'.$userfield->uf_ID, 'string', NULL );
+		$userfield_type = ( $userfield->ufdf_type == 'text' || $userfield->ufdf_type == 'url' ) ? $userfield->ufdf_type : 'string';
+		$uf_val = param( 'uf_'.$userfield->uf_ID, $userfield_type, NULL );
 
 		$uf_ID = $userfield->uf_ID;
 		if( $userfield->uf_ID == '0' )

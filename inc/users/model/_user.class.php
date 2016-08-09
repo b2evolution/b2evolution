@@ -759,7 +759,8 @@ class User extends DataObject
 					continue;
 				}
 
-				$field_type = ( $this->userfield_defs[$userfield->uf_ufdf_ID][0] == 'text' ) ? 'text' : 'string';
+				$field_type = $this->userfield_defs[$userfield->uf_ufdf_ID][0];
+				$field_type = ( $field_type == 'text' || $field_type == 'url' ) ? $field_type : 'string';
 				$uf_val = param( 'uf_'.$userfield->uf_ID, $field_type, '' );
 
 				if( $this->userfield_defs[$userfield->uf_ufdf_ID][0] == 'list' && $uf_val == '---' )
@@ -921,6 +922,12 @@ class User extends DataObject
 							{	// Insert a new field in DB if it is filled
 								if( $this->userfield_defs[$uf_new_id][0] == 'url' )
 								{	// Check url fields
+									// Decode url:
+									$uf_new_val = urldecode( $uf_new_val );
+									// strip out any html:
+									$uf_new_val = utf8_trim( utf8_strip_tags( $uf_new_val ) );
+									// Remove new line chars and double quote from url
+									$uf_new_val = preg_replace( '~\r|\n|"~', '', $uf_new_val );
 									param_check_url( 'uf_'.$uf_type.'['.$uf_new_id.'][]', 'commenting' );
 								}
 								if( $this->userfield_defs[$uf_new_id][4] == 'list' )
