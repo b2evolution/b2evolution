@@ -166,39 +166,83 @@ $use_workflow = ( $disp == 'posts' ) &&
 		$priority_color = item_priority_color( $Item->priority );
 		$url = $Item->get_permanent_url().'#workflow_panel';
 
-		if( $assigned_User )
+		// EXPERIMENTAL PARAM:
+		$worfklow_display_mode = 'status_and_author'; // Other mode = 'assignee_and_status' or 'status_and_author'
+
+		if( $worfklow_display_mode == 'assignee_and_status' )
 		{
-			echo '<div class="ft_assigned col-lg-2 col-md-2 col-sm-3 col-xs-4 col-sm-offset-0 col-xs-offset-2">';
-			echo '<div class="ft_assigned_header">';
-			echo '<a href="'.$url.'"  style="color: '.$priority_color.';">'.T_('Assigned to:').'</a>';
+			if( $assigned_User )
+			{
+				echo '<div class="ft_assigned col-lg-2 col-md-2 col-sm-3 col-xs-4 col-sm-offset-0 col-xs-offset-2">';
+				echo '<div class="ft_assigned_header">';
+				echo '<a href="'.$url.'"  style="color: '.$priority_color.';">'.T_('Assigned to:').'</a>';
+				echo '</div>';
+
+				// Assigned user avatar
+				$Item->assigned_to2( array(
+						'thumb_class' => 'ft_assigned_avatar',
+						'link_class' => 'ft_assigned_avatar',
+						'thumb_size'   => 'crop-top-32x32'
+					) );
+
+				echo '<div class="ft_assigned_info">';
+				// Assigned user login
+				$Item->assigned_to2( array(
+					  'after' => '<br />',
+						'link_text' => 'name'
+					) );
+			}
+			else
+			{
+				echo '<div class="ft_not_assigned col-lg-2 col-md-2 col-sm-3 col-xs-4 col-sm-offset-0 col-xs-offset-2">';
+				echo '<div class="ft_assigned_header">';
+				echo '<a href="'.$url.'" style="color: '.$priority_color.';">'.T_('Not assigned').'</a>';
+				echo '</div>';
+				echo '<div class="ft_assigned_info">';
+			}
+	
+			// Workflow status
+			echo '<span><a href="'.$url.'">'.item_td_task_cell( 'status', $Item, false ).'</a></span>';
 			echo '</div>';
 
-			// Assigned user avatar
-			$Item->assigned_to2( array(
-					'thumb_class' => 'ft_assigned_avatar',
-					'link_class' => 'ft_assigned_avatar',
-					'thumb_size'   => 'crop-top-32x32'
-				) );
-
-			echo '<div class="ft_assigned_info">';
-			// Assigned user login
-			$Item->assigned_to2( array(
-				  'after' => '<br />',
-					'link_text' => 'name'
-				) );
+			echo '</div>'; // /col
 		}
 		else
-		{
-			echo '<div class="ft_not_assigned col-lg-2 col-md-2 col-sm-3 col-xs-4 col-sm-offset-0 col-xs-offset-2">';
-			echo '<div class="ft_assigned_header">';
-			echo '<a href="'.$url.'" style="color: '.$priority_color.';">'.T_('Not assigned').'</a>';
-			echo '</div>';
-			echo '<div class="ft_assigned_info">';
-		}
+		{ // 'status_and_author'
+			echo '<div class="ft_date col-lg-2 col-md-2 col-sm-3 col-xs-4 col-sm-offset-0 col-xs-offset-2">';
+			echo '<div class="ft_date_header">';	// fp> temp hack to get correct style
 
-		// Workflow status
-		echo '<span><a href="'.$url.'">'.item_td_task_cell( 'status', $Item, false ).'</a></span>';
-		echo '</div></div>';
+			// Workflow status
+			echo '<b><a href="'.$url.'">'.item_td_task_cell( 'status', $Item, false ).'</a></b>';
+			echo '</div>';
+
+			// b2evonet:
+			$Item->author( array(
+						'before'      => '',
+						'after'       => '',
+						'before_user' => '',
+						'after_user'  => '',
+						'link_text'   => 'only_avatar',
+						'link_class'  => 'ft_author_avatar'
+					) );
+
+			echo '<div style="padding-left: 42px;">';
+
+			// Post author
+			echo $Item->author( array(
+					'before'      => '',
+					'before_user' => '',
+					'after'       => '<br />',
+					'after_user'  => '<br />',
+					'link_text'   => 'auto',
+				) );
+
+			echo $Item->get_mod_date( 'm/d/y' );
+
+			echo '</div>';
+
+			echo '</div>'; // /col
+		}
 	}	// ==========================================================================================================================
 
 	echo '<!-- Last Comment Block -->';

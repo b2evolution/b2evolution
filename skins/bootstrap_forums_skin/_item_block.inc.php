@@ -126,7 +126,7 @@ skin_widget( array(
 						) );
 					?>
 					<?php
-						// We want to display the post date:
+						// Display the post date:
 						$Item->issue_time( array(
 								'before'      => '<span class="text-muted">',
 								'after'       => '</span> &nbsp; &nbsp; ',

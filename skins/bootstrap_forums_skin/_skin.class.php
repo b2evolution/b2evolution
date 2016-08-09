@@ -263,7 +263,7 @@ class bootstrap_forums_Skin extends Skin
 							array( 'page_top', sprintf( T_('"%s" container'), NT_('Page Top') ),  1 ),
 							array( 'menu',     sprintf( T_('"%s" container'), NT_('Menu') ),      0 ),
 							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ) ),
-						),
+					),
 				'section_access_end' => array(
 					'layout' => 'end_fieldset',
 				),
