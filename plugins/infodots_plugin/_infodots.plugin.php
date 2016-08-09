@@ -47,9 +47,10 @@ class infodots_plugin extends Plugin
 		$this->long_desc = T_('This plugin allows to render info dots over images by using the syntax [infodot:1234:40:60:20ex]html text[enddot] for example');
 
 		// Pattern to search the stars
+// fp>yura: do we need this to be a variable? Does it ever change? Is it used by a function that is not in this plugin?
 		$this->search_text = '#((<br />|<p>)\r?\n?)?\[infodot:(\d+):(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)(:\d+[pxecm%]*)?\](.+?)\[enddot\](\r?\n?(<br />|</p>))?#is';
 
-// fp>yura: following comment is wrong. ALSO: do we need this to be a variable? Does it ever change?
+// fp>yura: following comment is wrong. ALSO: do we need this to be a variable? Does it ever change? Is it used by a function that is not in this plugin?
 		// Function to build template for stars
 		$this->replace_func = array( $this, 'load_infodot_from_source' );
 	}
