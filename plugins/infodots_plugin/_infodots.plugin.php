@@ -48,6 +48,8 @@ class infodots_plugin extends Plugin
 
 		// Pattern to search the stars
 		$this->search_text = '#((<br />|<p>)\r?\n?)?\[infodot:(\d+):(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)(:\d+[pxecm%]*)?\](.+?)\[enddot\](\r?\n?(<br />|</p>))?#is';
+
+// fp>yura: following comment is wrong. ALSO: do we need this to be a variable? Does it ever change?
 		// Function to build template for stars
 		$this->replace_func = array( $this, 'load_infodot_from_source' );
 	}
@@ -181,6 +183,12 @@ class infodots_plugin extends Plugin
 	/**
 	 * Perform rendering
 	 *
+	 * Renders code:
+	 * from [infodot:1234:40:60:20ex]html text[enddot]
+	 * to <div class="infodots_info" id="infodot_1234_1" xy="40:60" style="width:20ex:>html text</div>
+	 * 
+	 * This event also collects all dots in the array $this->dots.
+	 *
 	 * @see Plugin::RenderItemAsHtml()
 	 */
 	function RenderItemAsHtml( & $params )
@@ -191,6 +199,7 @@ class infodots_plugin extends Plugin
 		$this->dot_numbers = NULL;
 		$this->object_ID = 'itm_'.$Item->ID;
 		$content = replace_content_outcode( $this->search_text, $this->replace_func, $content, 'replace_content_callback' );
+// fp>yura: second param is documented as "Replace list". Why do we pass a function name?
 		$this->loaded_objects[ $this->object_ID ] = 1;
 
 		return true;
@@ -252,6 +261,7 @@ class infodots_plugin extends Plugin
 			$this->dot_numbers = NULL;
 			$this->object_ID = 'cmt_'.$Comment->ID;
 			$content = replace_content_outcode( $this->search_text, $this->replace_func, $content, 'replace_content_callback' );
+// fp>yura: second param is documented as "Replace list". Why do we pass a function name?
 			$this->loaded_objects[ $this->object_ID ] = 1;
 		}
 	}
@@ -389,8 +399,10 @@ class infodots_plugin extends Plugin
 		}
 
 		if( ! isset( $this->loaded_objects[ $this->object_ID ] ) )
-		{ // Load the info dots if they were not loaded before
-			replace_content_outcode( '#<div class="infodots_info" id="infodot_(\d+)_(\d+)" xy="(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)"[^>]*>(.+?)</div>#is', array( $this, 'load_infodot_from_rendered_content' ), $content, 'replace_content_callback' );
+		{ // Load the info dots if they were not loaded before:
+			replace_content_outcode( '#<div class="infodots_info" id="infodot_(\d+)_(\d+)" xy="(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)"[^>]*>(.+?)</div>#is', 
+				array( $this, 'load_infodot_from_rendered_content' ), $content, 'replace_content_callback' );
+// fp>yura: second param is documented as "Replace list". Why do we pass a function name?
 			$this->loaded_objects[ $this->object_ID ] = 1;
 		}
 
@@ -413,6 +425,13 @@ class infodots_plugin extends Plugin
 
 	/**
 	 * Event handler: Called when displaying item attachment.
+	 *
+	 * Renders the red dots before each image by getting them from array $this->dots if it was initialized during RenderItemAsHtml().
+	 *
+	 * If RenderItemAsHtml() was not called (which happens if content was already pre-rendered) then the array $this->dots is built by preg_match from prerendered content 
+	 * from hidden div <div class="infodots_info" id="infodot_1234_1" xy="40:60" style="width:20ex:>html text</div>
+	 *
+	 * The dots are rendered as <div class="infodots_image"> <div class="infodots_dot" rel="infodot_1234_1" style="left:40px;top:60px"></div> </div> before attached image.
 	 *
 	 * @param array Associative array of parameters. $params['File'] - attachment, $params['data'] - output
 	 * @param boolean TRUE - when render in comments
