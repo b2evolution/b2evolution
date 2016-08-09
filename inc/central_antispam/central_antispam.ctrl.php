@@ -137,10 +137,10 @@ switch( $action )
 		$keywords_SQL->FROM( 'T_antispam__keyword' );
 		$keywords_SQL->WHERE( 'askw_string NOT IN ( SELECT cakw_keyword FROM T_centralantispam__keyword )' );
 		$keywords_SQL->WHERE_and( 'askw_source IN( '.$DB->quote( $import_keywords ).' )' );
-		$keywords = $DB->get_results( $keywords_SQL->get(), ARRAY_A, $keywords_SQL->title );
+		$new_keywords = $DB->get_results( $keywords_SQL->get(), ARRAY_A, $keywords_SQL->title );
 
 		$keywords_imported_count = array();
-		if( count( $keywords ) )
+		if( count( $new_keywords ) )
 		{	// If there are new keywords to import:
 
 			// Check if the Reporter/Source already exists in DB
@@ -166,7 +166,7 @@ switch( $action )
 			}
 
 			$keywords_reports = array();
-			foreach( $keywords as $keyword )
+			foreach( $new_keywords as $keyword )
 			{
 				$keyword_timestamp = date( 'Y-m-d H:i:s', $keyword_dates[ $keyword['askw_source'] ] );
 				if( $keyword['askw_source'] == 'central' && $keyword_timestamp > '2014-02-24 21:10:18' )
