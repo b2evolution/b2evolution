@@ -331,26 +331,10 @@ $display_workflow = ( $disp == 'posts' ) &&
 	echo '</div>';
 	?>
 
+	<?php if (! $display_workflow ) { ?>
 	<!-- This is shrinked date that applies on lower screen res -->
-	<div class="ft_date_shrinked item_list<?php echo $use_workflow ? ' hidden-xs' : ' col-xs-6'; ?>">
+	<div class="ft_date_shrinked item_list col-xs-6">
 		<?php
-		if( $display_workflow )
-		{ // ==========================================================================================================================
-			echo '<div class="ft_date_header">';
-			if( $comments_number == 0 && $Item->comment_status == 'disabled' )
-			{ // The comments are disabled:
-				echo T_('n.a.');
-			}
-			else if( $latest_Comment = & $Item->get_latest_Comment() )
-			{	// At least one reply exists:
-				printf( T_('%s replies'), '<a href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest comment').'">'.$comments_number.'</a>' );
-			}
-			else
-			{	// No replies yet:
-				printf( T_('%s replies'), '0' );
-			}
-			echo '</div>';
-		} // ==========================================================================================================================
 		if( $latest_Comment = & $Item->get_latest_Comment() )
 		{ // Display info about last comment
 			$latest_Comment->author2( array(
@@ -377,4 +361,5 @@ $display_workflow = ( $disp == 'posts' ) &&
 		}
 		?>
 	</div>
+	<?php } ?>
 </article>
