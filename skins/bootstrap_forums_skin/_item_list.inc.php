@@ -167,7 +167,7 @@ $use_workflow = ( $disp == 'posts' ) &&
 		$url = $Item->get_permanent_url().'#workflow_panel';
 
 		// EXPERIMENTAL PARAM:
-		$worfklow_display_mode = 'status_and_author'; // Other mode = 'assignee_and_status' or 'status_and_author'
+		$worfklow_display_mode = $Skin->get_setting('workflow_display_mode'); // Other mode = 'assignee_and_status' or 'status_and_author'
 
 		if( $worfklow_display_mode == 'assignee_and_status' )
 		{
