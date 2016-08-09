@@ -460,6 +460,8 @@ class Plugin
 	 *     'select_blog': a drop down field, providing all existing blogs (Blog ID is the value or "" if "allow_none" is true) (WARNING: does not scale - not recommended)
 	 *     'select_group': a drop down field, providing all existing groups (Group ID is the value or "" if "allow_none" is true)
 	 *     'select_user': a drop down field, providing all existing groups (User ID is the value or "" if "allow_none" is true) (WARNING: does not scale - not recommended)
+	 *     'radio' : radio select (options on same line by default)
+	 *          'field_lines' : set to true to have options on separate line
 	 *     'array': a subset of settings. The value gets automagically (un)serialized through get() and set().
 	 *         The following keys apply to this type:
 	 *        'entries': an array with meta information about sub-settings

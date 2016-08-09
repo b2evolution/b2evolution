@@ -127,12 +127,13 @@ class bootstrap_forums_Skin extends Skin
 						'type' => 'checkbox',
 					),
 				   'workflow_display_mode' => array(
-					  'label'    => T_('Workflow display mode'),
+					  'label'    => T_('Workflow column'),
 					  'note'     => '',
 					  'type'     => 'radio',
+					  'field_lines' => true,
 					  'options'  => array(
-						 array( 'status_and_author', T_('Status and author') ),
-						 array( 'assignee_and_status', T_('Assignee and status') ),
+						 array( 'status_and_author', T_('Display Status & Item Author') ),
+						 array( 'assignee_and_status', T_('Display Assignee (with Priority color coding) & Status') ),
 					  ),
 					  'defaultvalue' => 'status_and_author',
 				   ),
