@@ -74,12 +74,12 @@ class Plugin
 	 * This can be used by other plugins when requiring your plugin
 	 * through {@link Plugin::GetDependencies()}.
 	 *
-	 * By increasing it you can request a call of {@link GetDbLayout()} upon instantiating.
+	 * By increasing it, you can request a call of {@link GetDbLayout()} upon instantiating.
 	 * If there are DB layout changes to be made, the plugin gets changed to status "needs_config".
 	 *
 	 * @var string
 	 */
-	var $version = '0';
+	var $version = '0.0.1';
 
 	/**
 	 * Plugin author.
