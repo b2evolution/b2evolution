@@ -209,7 +209,7 @@ $use_workflow = ( $disp == 'posts' ) &&
 		}
 		else
 		{ // 'status_and_author'
-			echo '<div class="ft_workflow_info col-lg-2 col-md-2 col-sm-3 col-xs-4 col-sm-offset-0 col-xs-offset-2">';
+			echo '<div class="ft_workflow_info col-lg-2 col-md-2 col-sm-3 col-sm-offset-0 col-xs-6">';
 			echo '<div class="ft_date_header">';	// fp> temp hack to get correct style
 
 			// Workflow status
@@ -248,7 +248,7 @@ $use_workflow = ( $disp == 'posts' ) &&
 	echo '<!-- Last Comment Block -->';
 	if( $use_workflow )
 	{ // ==========================================================================================================================
-		echo '<div class="ft_workflow_info col-lg-2 col-md-2 col-sm-3">';
+		echo '<div class="ft_workflow_info col-lg-2 col-md-2 col-sm-3 col-sm-offset-0 col-xs-6">';
 		echo '<div class="ft_date_header">';
 		if( $comments_number == 0 && $Item->comment_status == 'disabled' )
 		{ // The comments are disabled:
@@ -331,7 +331,7 @@ $use_workflow = ( $disp == 'posts' ) &&
 	?>
 
 	<!-- This is shrinked date that applies on lower screen res -->
-	<div class="ft_date_shrinked item_list<?php echo $use_workflow ? ' col-xs-5' : ' col-xs-6'; ?>">
+	<div class="ft_date_shrinked item_list<?php echo $use_workflow ? ' hidden-xs' : ' col-xs-6'; ?>">
 		<?php
 		if( $use_workflow )
 		{ // ==========================================================================================================================

@@ -736,15 +736,23 @@ label.control-label[for=post_title] {
 		margin-left: 10px;
 	}
 }
+@media screen and (min-width: 375px) and (max-width: 767px) {
+	.ft_workflow_info {
+		padding-left: 50px;
+	}
+}
 @media screen and (max-width: 767px) {
 	.ft_date {
 		display: none !important;
+	}
+	.ft_workflow_info {
+		padding-right: 0;
 	}
 	.ft_assigned {
 		margin-top: 4px;
 	}
 	.ft_date_shrinked {
-		display: inline-block !important;
+		display: inline-block;
 		text-align: center;
 		color: #8b96a1;
 		font-size: 90%;
