@@ -174,7 +174,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 		{
 			if( $assigned_User )
 			{
-				echo '<div class="ft_assigned col-lg-2 col-md-2 col-sm-3 col-xs-4 col-sm-offset-0 col-xs-offset-2">';
+				echo '<div class="ft_assigned col-lg-2 col-md-2 col-sm-3 col-sm-offset-0 col-xs-6">';
 				echo '<div class="ft_assigned_header">';
 				echo '<a href="'.$url.'"  style="color: '.$priority_color.';">'.T_('Assigned to:').'</a>';
 				echo '</div>';
@@ -195,7 +195,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 			}
 			else
 			{
-				echo '<div class="ft_not_assigned col-lg-2 col-md-2 col-sm-3 col-xs-4 col-sm-offset-0 col-xs-offset-2">';
+				echo '<div class="ft_not_assigned col-lg-2 col-md-2 col-sm-3 col-sm-offset-0 col-xs-6">';
 				echo '<div class="ft_assigned_header">';
 				echo '<a href="'.$url.'" style="color: '.$priority_color.';">'.T_('Not assigned').'</a>';
 				echo '</div>';

@@ -1360,11 +1360,9 @@ label.control-label[for=post_title] {
     margin-left: 0px;
   }
   .table-hover .group_row .ft_not_assigned {
-    padding-left: 0px;
-    margin-top: 4px;
+    margin-top: 13px;
   }
   .table-hover .group_row .ft_assigned {
-    padding-left: 0px;
     margin-top: 4px;
   }
   .table-hover .group_row .ft_date_shrinked {
