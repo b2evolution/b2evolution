@@ -742,13 +742,16 @@ ol.breadcrumb {
   display: inline-block;
   white-space: normal !important;
 }
-.forums_list .posts_panel .ft_date {
+.forums_list .posts_panel .ft_date,
+.forums_list .posts_panel .ft_workflow_info {
   text-align: left;
 }
-.forums_list .posts_panel .ft_date img {
+.forums_list .posts_panel .ft_date img,
+.forums_list .posts_panel .ft_workflow_info img {
   border-radius: 50%;
 }
-.forums_list .posts_panel .ft_date a.ft_author_avatar:hover {
+.forums_list .posts_panel .ft_date a.ft_author_avatar:hover,
+.forums_list .posts_panel .ft_workflow_info a.ft_author_avatar:hover {
   background-color: transparent !important;
 }
 .forums_list .posts_panel .ft_count {
@@ -825,24 +828,30 @@ ol.breadcrumb {
   line-height: 16px;
   margin-top: 13px;
 }
-.forums_list .ft_date {
+.forums_list .ft_date,
+.forums_list .ft_workflow_info {
   color: #8b96a1;
   font-size: 90%;
   line-height: 16px;
-  margin-top: 17px;
 }
-.forums_list .ft_date div.ft_date_header {
+.forums_list .ft_date div.ft_date_header,
+.forums_list .ft_workflow_info div.ft_date_header {
   margin-bottom: 5px;
 }
 .forums_list .ft_date span.user.anonymous,
-.forums_list .ft_date span.identity_link_username {
+.forums_list .ft_workflow_info span.user.anonymous,
+.forums_list .ft_date span.identity_link_username,
+.forums_list .ft_workflow_info span.identity_link_username {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
   display: inline-block;
 }
-.forums_list .ft_date_workflow {
+.forums_list .ft_date {
+  margin-top: 17px;
+}
+.forums_list .ft_workflow_info {
   margin-top: 2px;
 }
 .forums_list .ft_title > a.forumlink {

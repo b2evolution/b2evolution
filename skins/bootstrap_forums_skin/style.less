@@ -172,7 +172,7 @@ ol.breadcrumb {
 			white-space: normal !important;
 		}
 
-		.ft_date {
+		.ft_date, .ft_workflow_info {
 			text-align: left;
 			img {
 				border-radius: 50%;
@@ -260,11 +260,11 @@ ol.breadcrumb {
 		margin-top: 13px;
 	}
 
-	.ft_date {
+	.ft_date, .ft_workflow_info {
 		color: #8b96a1;
 		font-size: 90%;
 		line-height: 16px;
-		margin-top: 17px;
+		
 		div.ft_date_header {
 				margin-bottom: 5px;
 			}
@@ -276,8 +276,12 @@ ol.breadcrumb {
 			display: inline-block;
 		}
 	}
-	// When Enabled "Workflow" option, we use .ft_date_workflow instead of .ft_date
-	.ft_date_workflow {
+	// .ft_date margin is set separately because we handle the same CSS for both .ft_date and .ft_workflow_info, only margin is different
+	.ft_date {
+		margin-top: 17px;
+	}
+	// When Enabled "Workflow" option, we use .ft_workflow_info instead of .ft_date
+	.ft_workflow_info {
 		margin-top: 2px;
 	}
 	.ft_title >	a.forumlink {
