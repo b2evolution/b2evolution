@@ -112,16 +112,6 @@ class bootstrap_forums_Skin extends Skin
 						'type' => 'integer',
 						'allow_empty' => true,
 					),
-				   'workflow_display_mode' => array(
-					  'label'    => T_('Workflow display mode'),
-					  'note'     => '',
-					  'type'     => 'radio',
-					  'options'  => array(
-						 array( 'status_and_author', T_('Status and author') ),
-						 array( 'assignee_and_status', T_('Assignee and status') ),
-					  ),
-					  'defaultvalue' => 'status_and_author',
-				   ),
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -136,6 +126,16 @@ class bootstrap_forums_Skin extends Skin
 						'defaultvalue' => 1,
 						'type' => 'checkbox',
 					),
+				   'workflow_display_mode' => array(
+					  'label'    => T_('Workflow display mode'),
+					  'note'     => '',
+					  'type'     => 'radio',
+					  'options'  => array(
+						 array( 'status_and_author', T_('Status and author') ),
+						 array( 'assignee_and_status', T_('Assignee and status') ),
+					  ),
+					  'defaultvalue' => 'status_and_author',
+				   ),
 				'section_forum_end' => array(
 					'layout' => 'end_fieldset',
 				),
