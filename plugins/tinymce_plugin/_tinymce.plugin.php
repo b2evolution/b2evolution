@@ -103,6 +103,13 @@ class tinymce_plugin extends Plugin
 				'note' => $this->T_('Enable this to use an extra context menu in the editor.').' <span class="red">'.T_('Enabling this will prevent browser-side spelling correction.').'</span>'
 			),
 
+			'tmce_options_spellcheck' => array( // fp> keep for now
+				'label' => $this->T_('Browser spell checking'),
+				'type' => 'checkbox',
+				'defaultvalue' => 1,
+				'note' => $this->T_('Enable browser-based spell checking.')
+			),
+
 			'tmce_options_paste' => array( // fp> keep for now
 				'label' => $this->T_('Advanced paste support'),
 				'type' => 'checkbox',
@@ -208,6 +215,12 @@ class tinymce_plugin extends Plugin
 					'type' => 'checkbox',
 					'defaultvalue' => $this->Settings->get('tmce_options_contextmenu'),
 					'note' => $this->T_('Enable this to use an extra context menu in the editor.').' <span class="red">'.T_('Enabling this will prevent browser-side spelling correction.').'</span>'
+				);
+		$r['tmce_options_spellcheck'] = array(
+					'label' => $this->T_('Browser spell checking'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
+					'note' => $this->T_('Enable browser-based spell checking.')
 				);
 		$r['tmce_options_paste'] = array( // fp> keep for now
 					'label' => $this->T_('Advanced paste support'),
@@ -781,13 +794,18 @@ class tinymce_plugin extends Plugin
 		$init_options[] = 'toolbar3: "'.$tmce_theme_advanced_buttons3.'"';
 		$init_options[] = 'toolbar4: "'.$tmce_theme_advanced_buttons4.'"';
 		// Context menu:
-		if( $this->UserSettings->get('tmce_options_contextmenu') == 1 )
+		if( $this->Settings->get( 'tmce_options_contextmenu' ) == 1 )
 		{
 			$init_options[] = 'contextmenu: "cut copy paste | link image | inserttable"';
 		}
-		else
+
+		if( $this->Settings->get( 'tmce_options_spellcheck' ) == 1 )
 		{
 			$init_options[] = 'browser_spellcheck: true';
+		}
+		else
+		{
+			$init_options[] = 'browser_spellcheck: false';
 		}
 
 		// UI options:

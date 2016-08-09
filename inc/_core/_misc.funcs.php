@@ -8232,11 +8232,19 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						if( ! empty( $inline_params[ $class_index ] ) )
 						{ // A class name is set for the inline tags
 							$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $class_index ] ) ) );
+
 							if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
-							{ // Overwrite 'before_image' setting to add an extra class name
+							{
+								/*
+								// Overwrite 'before_image' setting to add an extra class name
 								$current_image_params['before_image'] = '<div class="image_block '.$image_extraclass.'">';
 								// 'after_image' setting must be also defined, becuase it may be different than the default '</div>'
 								$current_image_params['after_image'] = '</div>';
+								*/
+
+								// Instead of overwriting 'before_image' setting just add the extra class. The previous implementation
+								// puts a <figcaption> element within a <div> which is not acceptable.
+								$current_image_params['before_image'] = add_tag_class( $current_image_params['before_image'], $image_extraclass );
 
 								// Set class for file inline tags
 								$current_file_params['class'] = $image_extraclass;
