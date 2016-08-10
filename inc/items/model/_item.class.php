@@ -5065,7 +5065,7 @@ class Item extends ItemLight
 			case 'status':
 				// We need to set a reminder here to later check if the new status is allowed at dbinsert or dbupdate time ( $this->restrict_status( true ) )
 				// We cannot check immediately because we may be setting the status before having set a main cat_ID -> a collection ID to check the status possibilities
-				// Save previous status temporarily to make some changes on dbinsert(), dbupdate() & dbdelete()
+				// Save previous status as a reminder (it can be useful to compare later. The Comment class uses this).
 				$this->previous_status = $this->get( 'status' );
 
 // fp>yura: add a return or a break or somehting EXPLICIT HERE
