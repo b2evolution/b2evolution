@@ -7515,6 +7515,37 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11790, 'Fix number of favorite collections per each user...' ) )
+	{	// part of 6.7.5-stable
+		// Get users which have more than 20 favorite collections:
+		$more_fav_coll_users_SQL = new SQL();
+		$more_fav_coll_users_SQL->SELECT( 'cufv_user_ID' );
+		$more_fav_coll_users_SQL->FROM( 'T_coll_user_favs' );
+		$more_fav_coll_users_SQL->GROUP_BY( 'cufv_user_ID' );
+		$more_fav_coll_users_SQL->HAVING( 'COUNT( cufv_blog_ID ) > 20' );
+		$more_fav_coll_user_IDs = $DB->get_col( $more_fav_coll_users_SQL->get() );
+
+		foreach( $more_fav_coll_user_IDs as $more_fav_coll_user_ID )
+		{
+			// Get first 7 collections which should be kept as favorite after upgrade:
+			$first_colls_SQL = new SQL();
+			$first_colls_SQL->SELECT( 'cufv_blog_ID' );
+			$first_colls_SQL->FROM( 'T_coll_user_favs' );
+			$first_colls_SQL->WHERE( 'cufv_user_ID = '.$more_fav_coll_user_ID );
+			$first_colls_SQL->ORDER_BY( 'cufv_blog_ID' );
+			$first_colls_SQL->LIMIT( '7' );
+			$first_coll_IDs = $DB->get_col( $first_colls_SQL->get() );
+
+			if( count( $first_coll_IDs ) )
+			{	// Delete collections from favorite list:
+				$DB->query( 'DELETE FROM T_coll_user_favs
+					WHERE cufv_user_ID = '.$more_fav_coll_user_ID.'
+					  AND cufv_blog_ID NOT IN ( '.$DB->quote( $first_coll_IDs ).' )' );
+			}
+		}
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
