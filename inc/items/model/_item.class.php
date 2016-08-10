@@ -5056,6 +5056,13 @@ class Item extends ItemLight
 				$notifications_flags = array_unique( $notifications_flags );
 				return $this->set_param( 'notifications_flags', 'string', implode( ',', $notifications_flags ), $make_null );
 
+			case 'status':
+				$previous_status = $this->get( 'status' );
+				parent::set( 'status', $parvalue, $make_null );
+				// Restrict item status to max allowed by item collection:
+				$this->restrict_status_by_collection( true );
+				return ( $previous_status !== $this->get( 'status' ) );
+
 			default:
 				return parent::set( $parname, $parvalue, $make_null );
 		}
@@ -5218,9 +5225,6 @@ class Item extends ItemLight
 		global $DB, $current_User, $Plugins;
 
 		$DB->begin( 'SERIALIZABLE' );
-
-		// Restrict item status to max allowed by item collection:
-		$this->restrict_status_by_collection( true );
 
 		if( $this->status != 'draft' )
 		{	// The post is getting published in some form, set the publish date so it doesn't get auto updated in the future:
@@ -5413,9 +5417,6 @@ class Item extends ItemLight
 		global $DB, $Plugins;
 
 		$DB->begin( 'SERIALIZABLE' );
-
-		// Restrict item status to max allowed by item collection:
-		$this->restrict_status_by_collection( true );
 
 		if( $this->status != 'draft' )
 		{	// The post is getting published in some form, set the publish date so it doesn't get auto updated in the future:
@@ -8246,7 +8247,7 @@ class Item extends ItemLight
 
 		if( $update_status )
 		{	// Update status to new restricted value:
-			$this->set( 'status', $restricted_status );
+			parent::set( 'status', $restricted_status );
 		}
 		else
 		{	// Only change status to update it on the edit forms:

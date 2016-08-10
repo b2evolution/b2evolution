@@ -3048,7 +3048,6 @@ Hello
 			$Comment = new Comment();
 			$Comment->set( 'item_ID', $additional_comments_item_ID );
 			$Comment->set( 'status', $comment_status );
-			$Comment->restrict_status_by_item( true );
 			$comment_status = $Comment->get( 'status' );
 
 			for( $i_user_ID = 1; $i_user_ID <= 7; $i_user_ID++ )
@@ -3150,7 +3149,6 @@ function create_demo_comment( $item_ID, $status )
 	$Comment = new Comment();
 	$Comment->set( 'item_ID', $item_ID );
 	$Comment->set( 'status', $status );
-	$Comment->restrict_status_by_item( true );
 	$status = $Comment->get( 'status' );
 
 	// Set demo content depending on status
