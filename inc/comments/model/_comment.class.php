@@ -447,6 +447,7 @@ class Comment extends DataObject
 			case 'status':
 				// Save previous status temporarily to make some changes on dbinsert(), dbupdate() & dbdelete()
 				$this->previous_status = $this->get( 'status' );
+				return parent::set( 'status', $parvalue, $make_null );
 
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );

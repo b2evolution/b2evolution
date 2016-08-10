@@ -5067,8 +5067,7 @@ class Item extends ItemLight
 				// We cannot check immediately because we may be setting the status before having set a main cat_ID -> a collection ID to check the status possibilities
 				// Save previous status as a reminder (it can be useful to compare later. The Comment class uses this).
 				$this->previous_status = $this->get( 'status' );
-
-// fp>yura: add a return or a break or somehting EXPLICIT HERE
+				return parent::set( 'status', $parvalue, $make_null );
 
 			default:
 				return parent::set( $parname, $parvalue, $make_null );
