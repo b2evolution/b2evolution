@@ -5065,6 +5065,11 @@ class Item extends ItemLight
 			case 'status':
 				// Save previous status temporarily to make some changes on dbinsert(), dbupdate() & dbdelete()
 				$this->previous_status = $this->get( 'status' );
+// fp>yura : instead of previous, Why don't we call directly here:
+				// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:
+				$this->restrict_status( true );				//
+
+// fp>yura: add a return or a break or somehting EXPLICIT HERE
 
 			default:
 				return parent::set( $parname, $parvalue, $make_null );
