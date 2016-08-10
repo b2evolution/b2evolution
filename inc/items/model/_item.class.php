@@ -8257,7 +8257,7 @@ class Item extends ItemLight
 		// Store current status to display a warning:
 		$current_status = $this->get( 'status' );
 
-		// Restrict status to max allowed for item collection:
+		// Checks if the requested item status can be used by current user and if not, get max allowed item status of the collection
 		$restricted_status = $item_Blog->get_allowed_item_status( $current_status );
 
 		if( $update_status )
