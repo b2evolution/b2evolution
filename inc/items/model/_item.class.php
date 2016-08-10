@@ -126,6 +126,12 @@ class Item extends ItemLight
 	 */
 	var $status;
 	/**
+	 * Item previous visibility status. It will be set only if the item status was changed.
+	 * @var string
+	 */
+	var $previous_status;
+
+	/**
 	 * Locale code for the Item content.
 	 *
 	 * Examples: en-US, zh-CN-utf-8
@@ -5056,6 +5062,10 @@ class Item extends ItemLight
 				$notifications_flags = array_unique( $notifications_flags );
 				return $this->set_param( 'notifications_flags', 'string', implode( ',', $notifications_flags ), $make_null );
 
+			case 'status':
+				// Save previous status temporarily to make some changes on dbinsert(), dbupdate() & dbdelete()
+				$this->previous_status = $this->get( 'status' );
+
 			default:
 				return parent::set( $parname, $parvalue, $make_null );
 		}
@@ -5219,8 +5229,11 @@ class Item extends ItemLight
 
 		$DB->begin( 'SERIALIZABLE' );
 
-		// Restrict item status to max allowed by item collection:
-		$this->restrict_status_by_collection( true );
+		if( isset( $this->previous_status ) )
+		{	// Restrict item status to max allowed by item collection:
+			// (ONLY if current request is updating item status)
+			$this->restrict_status_by_collection( true );
+		}
 
 		if( $this->status != 'draft' )
 		{	// The post is getting published in some form, set the publish date so it doesn't get auto updated in the future:
@@ -5414,8 +5427,11 @@ class Item extends ItemLight
 
 		$DB->begin( 'SERIALIZABLE' );
 
-		// Restrict item status to max allowed by item collection:
-		$this->restrict_status_by_collection( true );
+		if( isset( $this->previous_status ) )
+		{	// Restrict item status to max allowed by item collection:
+			// (ONLY if current request is updating item status)
+			$this->restrict_status_by_collection( true );
+		}
 
 		if( $this->status != 'draft' )
 		{	// The post is getting published in some form, set the publish date so it doesn't get auto updated in the future:
