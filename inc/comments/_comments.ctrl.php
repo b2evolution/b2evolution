@@ -81,7 +81,7 @@ switch( $action )
 
 		if( $action == 'edit' || $action == 'switch_view' )
 		{	// Restrict comment status by parent item:
-			$edited_Comment->restrict_status_by_item();
+			$edited_Comment->restrict_status();
 		}
 
 		$comment_title = '';
