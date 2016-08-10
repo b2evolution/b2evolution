@@ -1779,7 +1779,7 @@ class Item extends ItemLight
 			if( empty($this->excerpt) )
 			{	// We want to generate an excerpt from the content:
 				if( $this->update_excerpt() && $params['update_db'] && $this->ID )
-				{	// We have updated... let's also update the DB:
+				{	// We have a new excerpt... and we also want to update the DB:
 					$this->dbupdate( false );		// Do not auto track modification date.
 				}
 			}
@@ -5701,12 +5701,10 @@ class Item extends ItemLight
 	 *
 	 * @todo have a maxlength param for excerpts in blog properties
 	 * @todo crop at word boundary, maybe even sentence boundary.
-	 *       This should get added to strmaxlen probably.
 	 *
 	 * @param int Maximum length
-	 * @param string Tail to use, when string gets cropped. Its length gets
-	 *               substracted from the total length (with HTML entities
-	 *               being decoded). Default is "&hellip;" (HTML entity)
+	 * @param string Tail to use, when string gets cropped. Its length gets substracted from the total length 
+	 *               (with HTML entities being decoded). Default is "&hellip;" (HTML entity)
 	 * @return boolean true if excerpt has been changed
 	 */
 	function update_excerpt( $maxlen = 254, $tail = '&hellip;' )
