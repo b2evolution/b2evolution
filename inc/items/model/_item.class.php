@@ -5230,9 +5230,9 @@ class Item extends ItemLight
 		$DB->begin( 'SERIALIZABLE' );
 
 		if( isset( $this->previous_status ) )
-		{	// Restrict item status to max allowed by item collection:
+		{	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:
 			// (ONLY if current request is updating item status)
-			$this->restrict_status_by_collection( true );
+			$this->restrict_status( true );
 		}
 
 		if( $this->status != 'draft' )
@@ -5428,9 +5428,9 @@ class Item extends ItemLight
 		$DB->begin( 'SERIALIZABLE' );
 
 		if( isset( $this->previous_status ) )
-		{	// Restrict item status to max allowed by item collection:
+		{	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:
 			// (ONLY if current request is updating item status)
-			$this->restrict_status_by_collection( true );
+			$this->restrict_status( true );
 		}
 
 		if( $this->status != 'draft' )
@@ -8246,11 +8246,11 @@ class Item extends ItemLight
 
 
 	/**
-	 * Restrict item status by item collection AND CURRENT USER write perm, which is WRONG
+	 * Restrict Item status by Collection access restriction AND by CURRENT USER write perm
 	 *
 	 * @param boolean TRUE to update status
 	 */
-	function restrict_status_by_collection( $update_status = false )
+	function restrict_status( $update_status = false )
 	{
 		$item_Blog = & $this->get_Blog();
 
