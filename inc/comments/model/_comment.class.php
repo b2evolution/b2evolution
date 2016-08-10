@@ -447,10 +447,6 @@ class Comment extends DataObject
 			case 'status':
 				// Save previous status temporarily to make some changes on dbinsert(), dbupdate() & dbdelete()
 				$this->previous_status = $this->get( 'status' );
-				$this->set_param( 'status', 'string', $parvalue, $make_null );
-				// Restrict comment status by parent item:
-				$this->restrict_status_by_item( true );
-				return ( $this->previous_status !== $this->get( 'status' ) );
 
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
@@ -4105,6 +4101,9 @@ class Comment extends DataObject
 	{
 		global $Plugins, $DB;
 
+		// Restrict comment status by parent item:
+		$this->restrict_status_by_item( true );
+
 		$dbchanges = $this->dbchanges;
 
 		if( count( $dbchanges ) )
@@ -4176,6 +4175,9 @@ class Comment extends DataObject
 		 */
 		global $Plugins;
 		global $Settings;
+
+		// Restrict comment status by parent item:
+		$this->restrict_status_by_item( true );
 
 		// Get karma percentage (interval -100 - 100)
 		$spam_karma = $Plugins->trigger_karma_collect( 'GetSpamKarmaForComment', array( 'Comment' => & $this ) );
@@ -4599,7 +4601,7 @@ class Comment extends DataObject
 
 		if( $update_status )
 		{	// Update status to new restricted value:
-			$this->set_param( 'status', 'string', $comment_allowed_status );
+			$this->set( 'status', $comment_allowed_status );
 		}
 		else
 		{	// Only change status to update it on the edit forms and Display a warning:
