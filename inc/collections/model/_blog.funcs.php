@@ -794,7 +794,7 @@ function get_highest_publish_status( $type, $blog, $with_label = true, $restrict
 	}
 
 	if( $restrict_max_allowed_status == 'redirected' && $type == 'comment' )
-	{	// Comment cannot has a status "redirected", force this to "deprecated":
+	{	// Comment cannot have a status "redirected", force this to "deprecated":
 		$restrict_max_allowed_status = 'deprecated';
 	}
 
