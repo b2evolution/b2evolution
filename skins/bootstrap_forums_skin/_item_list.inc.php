@@ -238,7 +238,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 					'link_text'   => 'auto',
 				) );
 
-			echo $Item->get_mod_date( 'm/d/y' );
+			$Item->issue_date( array( 'date_format' => 'm/d/y') );
 
 			echo '</div>';
 
