@@ -5063,11 +5063,10 @@ class Item extends ItemLight
 				return $this->set_param( 'notifications_flags', 'string', implode( ',', $notifications_flags ), $make_null );
 
 			case 'status':
+				// We need to set a reminder here to later check if the new status is allowed at dbinsert or dbupdate time ( $this->restrict_status( true ) )
+				// We cannot check immediately because we may be setting the status before having set a main cat_ID -> a collection ID to check the status possibilities
 				// Save previous status temporarily to make some changes on dbinsert(), dbupdate() & dbdelete()
 				$this->previous_status = $this->get( 'status' );
-// fp>yura : instead of previous, Why don't we call directly here:
-				// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:
-				$this->restrict_status( true );				//
 
 // fp>yura: add a return or a break or somehting EXPLICIT HERE
 
