@@ -793,6 +793,11 @@ function get_highest_publish_status( $type, $blog, $with_label = true, $restrict
 		debug_die( 'Invalid type parameter!' );
 	}
 
+	if( $restrict_max_allowed_status == 'redirected' && $type == 'comment' )
+	{	// Comment cannot has a status "redirected", force this to "deprecated":
+		$restrict_max_allowed_status = 'deprecated';
+	}
+
 	$BlogCache = & get_BlogCache();
 	$requested_Blog = $BlogCache->get_by_ID( $blog );
 	$default_status = ( $type == 'post' ) ? $requested_Blog->get_setting( 'default_post_status' ) : $requested_Blog->get_setting( 'new_feedback_status' );
@@ -841,16 +846,14 @@ function get_highest_publish_status( $type, $blog, $with_label = true, $restrict
 		return ( $with_label ? array( $curr_status, '' ) : $curr_status );
 	}
 
-	$status_order = get_visibility_statuses( 'ordered-array' );
-	$highest_index = count( $status_order ) - 1;
+	$indexed_statuses = array_reverse( get_visibility_statuses( 'ordered-index' ) );
 	$result = false;
 	// Set this flag to know if we should not allow $max_allowed_status and find next status with lower level:
 	$restricted_status_is_allowed = empty( $restrict_max_allowed_status );
 	// Set this flag to false in order to find first allowed status below:
 	$status_is_allowed = false;
-	for( $index = $highest_index; $index > 0; $index-- )
+	foreach( $indexed_statuses as $curr_status => $status_index )
 	{
-		$curr_status = $status_order[$index][0];
 		if( $curr_status == $restrict_max_allowed_status )
 		{	// Set this var to TRUE to make all next statuses below are allowed because it is a max allowed status:
 			$restricted_status_is_allowed = true;
@@ -861,30 +864,46 @@ function get_highest_publish_status( $type, $blog, $with_label = true, $restrict
 		}
 		if( $restricted_status_is_allowed && $status_is_allowed && $current_User->check_perm( 'blog_'.$type.'!'.$curr_status, 'create', false, $blog ) )
 		{	// The highest available publish status has been found:
-			$result = array( $curr_status, $status_order[$index][1] );
+			$result = $curr_status;
 			break;
 		}
 	}
 
-	if( !$result )
-	{ // There are no available public status
+	if( ! $result )
+	{	// There are no available public status:
 		if( $current_User->check_perm( 'blog_'.$type.'!private', 'create', false, $blog ) )
-		{ // Check private status
-			$result = array( 'private', T_('Make private!') );
+		{	// Check private status:
+			$result = 'private';
 		}
 		else
-		{ // None of the statuses were allowed avove the 'draft' status, so we return the lowest level status.
-			$result = array( 'draft', '' );
+		{	// None of the statuses were allowed above the 'draft' status, so we return the lowest level status:
+			$result = 'draft';
 		}
 	}
 
 	if( $with_label )
-	{
-		return $result;
+	{	// Get label for status updating action:
+		if( $result == 'private' )
+		{	// Set special label for private status because it is not defined in get_visibility_statuses( 'ordered-array' ):
+			$result_label = T_('Make private!');
+		}
+		else
+		{	// Get label by status key:
+			$ordered_statuses = get_visibility_statuses( 'ordered-array' );
+			foreach( $ordered_statuses as $index => $ordered_status )
+			{
+				if( $ordered_status[0] == $result )
+				{
+					$result_label = $ordered_status[1];
+					break;
+				}
+			}
+		}
+		return array( $result, empty( $result_label ) ? '' : $result_label );
 	}
 
-	// Return only the highest available visibility status without label
-	return $result[0];
+	// Return only the highest available visibility status without label:
+	return $result;
 }
 
 
@@ -1114,11 +1133,11 @@ function get_visibility_statuses( $format = '', $exclude = array('trash'), $chec
 
 		case 'ordered-index': // gives each status index in the statuses ordered array
 			$r = array(
-				'redirected' => 0,
 				'trash'      => 0,
-				'private'    => 0,
-				'draft'      => 0,
+				'redirected' => 0,
 				'deprecated' => 0,
+				'draft'      => 0,
+				'private'    => 0,
 				'review'     => 1,
 				'protected'  => 2,
 				'community'  => 3,
