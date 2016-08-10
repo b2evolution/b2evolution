@@ -3713,6 +3713,7 @@ class Form extends Widget
 		}
 		else
 		{
+			unset( $field_params['tag'] );
 			$r .= '<input'.get_field_attribs_as_string( $field_params, $format_to_output ).' />';
 		}
 
