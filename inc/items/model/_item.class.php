@@ -8246,7 +8246,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Restrict item status by item collection
+	 * Restrict item status by item collection AND CURRENT USER write perm, which is WRONG
 	 *
 	 * @param boolean TRUE to update status
 	 */
