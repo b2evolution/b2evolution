@@ -778,8 +778,12 @@ label.control-label[for=post_title] {
 			//padding-left: 5px;
 			div {
 				display: inline-block;
-				font-size: inherit;
 				line-height: 22px;
+				a {
+					// Using decimal size here because the other in-line div has 90% font-size of body (which is 14px)
+					// This div cannot have 90% because it already has declared 16px font-size and 90% of it doesn't have the same value
+					font-size: 12.6px;
+				}
 			}
 		}
 		.ft_assigned {
