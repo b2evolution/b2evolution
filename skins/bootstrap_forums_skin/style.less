@@ -779,9 +779,11 @@ label.control-label[for=post_title] {
 			div {
 				display: inline-block;
 				line-height: 22px;
+				// Using decimal size here because the other in-line div has 90% font-size of body (which is 14px)
+				// This div cannot have 90% because it already has declared 16px font-size and 90% of it doesn't have the same value
+				font-size: 12.6px;
 				a {
-					// Using decimal size here because the other in-line div has 90% font-size of body (which is 14px)
-					// This div cannot have 90% because it already has declared 16px font-size and 90% of it doesn't have the same value
+					// In case there is at least one recent comment, it is a link, so we need to override 16px font-size here as well
 					font-size: 12.6px;
 				}
 			}

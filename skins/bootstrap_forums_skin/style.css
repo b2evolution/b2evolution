@@ -1286,6 +1286,7 @@ label.control-label[for=post_title] {
   .posts_panel .ft_count div {
     display: inline-block;
     line-height: 22px;
+    font-size: 12.6px;
   }
   .posts_panel .ft_count div a {
     font-size: 12.6px;
