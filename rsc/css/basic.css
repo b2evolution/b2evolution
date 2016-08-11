@@ -228,7 +228,7 @@ div#evo_toolbar .actions_right {
 }
 .evobar-menu a.disabled,
 .evobar-menu a.disabled:hover {
-  color: #999999;
+  color: #999;
 }
 .evobar-menu [class^=evobar-icon-] {
   margin-left: 6px;
@@ -287,7 +287,7 @@ div#evo_toolbar .actions_right {
   left: 0;
   width: 100%;
   text-align: center;
-  text-shadow: -1px -1px #000000, -2px 0 #000000, -1px 1px #000000, 0 2px #000000, 1px 1px #000000, 2px 0 #000000, 1px -1px #000000, 0 -2px #000000;
+  text-shadow: -1px -1px #000, -2px 0 #000, -1px 1px #000, 0 2px #000, 1px 1px #000, 2px 0 #000, 1px -1px #000, 0 -2px #000;
   color: #FFF;
   font-weight: bold;
 }

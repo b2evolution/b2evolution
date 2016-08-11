@@ -421,7 +421,7 @@ div.widget_core_coll_related_post_list.evo_withexcerpt.evo_noteaser div.item_exc
   user-select: none;
   background-image: none;
   border: 1px solid transparent;
-  color: #333333;
+  color: #333;
   border-radius: 4px;
   border: 1px solid #ccc;
 }
@@ -546,9 +546,12 @@ div.widget_core_user_avatars.evo_layout_rwd img {
   float: left;
   margin: 0 10px 5px 0;
 }
+.widget_core_item_about_author .evo_avatar img {
+  border-radius: 50%;
+}
 .widget_core_org_members {
   margin: 5em 0 30px;
-  color: #333333;
+  color: #333;
 }
 .widget_core_org_members div.widget_rwd_content {
   text-align: center;
@@ -569,7 +572,7 @@ div.widget_core_user_avatars.evo_layout_rwd img {
   font-size: 18px;
 }
 .widget_core_org_members a.user_link {
-  color: #000000;
+  color: #000;
 }
 .widget_core_org_members a.user_link:hover {
   color: #23527c;

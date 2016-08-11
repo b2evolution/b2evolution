@@ -81,31 +81,31 @@ button.action_icon {
   cursor: pointer;
 }
 .status_color_draft {
-  color: #ffff99;
+  color: #ff9;
 }
 .status_color_review {
-  color: #cc0099;
+  color: #CC0099;
 }
 .status_color_community {
-  color: #2e8bb9;
+  color: #2E8BB9;
 }
 .status_color_protected {
-  color: #ff9c2a;
+  color: #FF9C2A;
 }
 .status_color_private {
-  color: #dc143c;
+  color: #DC143C;
 }
 .status_color_published {
-  color: #99ee44;
+  color: #99EE44;
 }
 .status_color_deprecated {
-  color: #000000;
+  color: #000;
 }
 .status_color_redirected {
   color: #663399;
 }
 .status_color_trash {
-  color: #ff6666;
+  color: #f66;
 }
 .status_color_meta {
   color: #5bc0de;
@@ -115,7 +115,7 @@ button.action_icon {
 }
 .btn-status-draft {
   color: #000;
-  background-color: #ffff99;
+  background-color: #ff9;
   border-color: #dfdfdf;
 }
 .btn-status-draft:hover {
@@ -124,7 +124,7 @@ button.action_icon {
 }
 .btn-status-review {
   color: #fff;
-  background-color: #cc0099;
+  background-color: #CC0099;
 }
 .btn-status-review:hover {
   color: #fff;
@@ -132,7 +132,7 @@ button.action_icon {
 }
 .btn-status-community {
   color: #fff;
-  background-color: #2e8bb9;
+  background-color: #2E8BB9;
 }
 .btn-status-community:hover {
   color: #fff;
@@ -140,7 +140,7 @@ button.action_icon {
 }
 .btn-status-protected {
   color: #fff;
-  background-color: #ff9c2a;
+  background-color: #FF9C2A;
 }
 .btn-status-protected:hover {
   color: #fff;
@@ -148,7 +148,7 @@ button.action_icon {
 }
 .btn-status-private {
   color: #fff;
-  background-color: #dc143c;
+  background-color: #DC143C;
 }
 .btn-status-private:hover {
   color: #fff;
@@ -156,7 +156,7 @@ button.action_icon {
 }
 .btn-status-published {
   color: #000;
-  background-color: #99ee44;
+  background-color: #99EE44;
 }
 .btn-status-published .glyphicon {
   color: inherit !important;
@@ -167,11 +167,11 @@ button.action_icon {
 }
 .btn-status-deprecated {
   color: #fff;
-  background-color: #000000;
+  background-color: #000;
 }
 .btn-status-deprecated:hover {
   color: #fff;
-  background-color: #333333;
+  background-color: #333;
 }
 .btn-status-redirected {
   color: #fff;
@@ -183,11 +183,11 @@ button.action_icon {
 }
 .btn-status-trash {
   color: #fff;
-  background-color: #ff6666;
+  background-color: #f66;
 }
 .btn-status-trash:hover {
   color: #fff;
-  background-color: #ff4444;
+  background-color: #f44;
 }
 span.fa {
   line-height: inherit;
@@ -430,7 +430,6 @@ samp {
 pre,
 code {
   -webkit-hyphens: none;
-  -moz-hyphens: none;
   -ms-hyphens: none;
   hyphens: none;
 }
@@ -524,7 +523,7 @@ code {
   color: #f60;
 }
 .green {
-  color: #00cc00;
+  color: #0c0;
 }
 .black {
   color: #000;
