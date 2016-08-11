@@ -1768,6 +1768,23 @@ class Item extends ItemLight
 
 
 	/**
+	 * Template tag: get excerpt 2 (Full version)
+	 * This full version may auto-generate an excerpt if it is found to be empty.
+	 *
+	 * @deprecated Use $this->get_excerpt() instead.
+	 *
+	 * @param array DEPRECATED: Associative list of params
+	 *   - allow_empty: force generation if excert is empty (Default: false)
+	 *   - update_db: update the DB if we generated an excerpt (Default: true)
+	 * @return string
+	 */
+	function get_excerpt2( $dummy = NULL )
+	{
+		return $this->get_excerpt();
+	}
+
+
+	/**
 	 * Make sure, the pages have been obtained (and split up_ from prerendered cache.
 	 *
 	 * @param string Format, used to retrieve the matching cache; see {@link format_to_output()}
