@@ -123,16 +123,20 @@ ol.breadcrumb {
   display: inline-block;
   white-space: normal !important;
 }
-.forums_list .posts_panel .ft_date {
+.forums_list .posts_panel .ft_date,
+.forums_list .posts_panel .ft_workflow_info {
   text-align: left;
 }
-.forums_list .posts_panel .ft_date img {
+.forums_list .posts_panel .ft_date img,
+.forums_list .posts_panel .ft_workflow_info img {
   border-radius: 50%;
 }
-.forums_list .posts_panel .ft_date a.ft_author_avatar:hover {
+.forums_list .posts_panel .ft_date a.ft_author_avatar:hover,
+.forums_list .posts_panel .ft_workflow_info a.ft_author_avatar:hover {
   background-color: transparent !important;
 }
-.forums_list .posts_panel .ft_date .last_mod_date {
+.forums_list .posts_panel .ft_date .last_mod_date,
+.forums_list .posts_panel .ft_workflow_info .last_mod_date {
   white-space: normal;
 }
 .forums_list .posts_panel .ft_count {
@@ -159,7 +163,7 @@ ol.breadcrumb {
   color: inherit;
 }
 .forums_list .ft_count {
-  margin-top: 12px;
+  margin-top: 5px;
   font-size: 90%;
 }
 .forums_list .ft_count a,
@@ -209,22 +213,31 @@ ol.breadcrumb {
   line-height: 16px;
   margin-top: 13px;
 }
-.forums_list .ft_date {
+.forums_list .ft_date,
+.forums_list .ft_workflow_info {
   color: #8b96a1;
   font-size: 90%;
   line-height: 16px;
-  margin-top: 3px;
 }
-.forums_list .ft_date div.ft_date_header {
+.forums_list .ft_date div.ft_date_header,
+.forums_list .ft_workflow_info div.ft_date_header {
   margin-bottom: 5px;
 }
 .forums_list .ft_date span.user.anonymous,
-.forums_list .ft_date span.identity_link_username {
+.forums_list .ft_workflow_info span.user.anonymous,
+.forums_list .ft_date span.identity_link_username,
+.forums_list .ft_workflow_info span.identity_link_username {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
   display: inline-block;
+}
+.forums_list .ft_date {
+  margin-top: 17px;
+}
+.forums_list .ft_workflow_info {
+  margin-top: 2px;
 }
 .forums_list .ft_title > a.forumlink {
   font-size: 21px;
@@ -655,6 +668,12 @@ aside .widget_core_coll_search_form div.compact_search_form input.search_field {
   .ft_date {
     display: none !important;
   }
+  .ft_workflow_status_and_author {
+    padding-right: 0;
+  }
+  .ft_workflow_last_comment {
+    padding-left: 5px;
+  }
   .ft_assigned {
     margin-top: 4px;
   }
@@ -753,11 +772,9 @@ aside .widget_core_coll_search_form div.compact_search_form input.search_field {
     margin-left: 0px;
   }
   .table-hover .group_row .ft_not_assigned {
-    padding-left: 0px;
-    margin-top: 4px;
+    margin-top: 13px;
   }
   .table-hover .group_row .ft_assigned {
-    padding-left: 0px;
     margin-top: 4px;
   }
   .table-hover .group_row .ft_date_shrinked {
@@ -839,7 +856,6 @@ aside .widget_core_coll_search_form div.compact_search_form input.search_field {
   /* Disp posts */
   .posts_panel .ft_status_topic {
     vertical-align: top;
-    margin-top: 8px;
   }
   .posts_panel .ft_count {
     margin-top: 0px;
