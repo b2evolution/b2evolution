@@ -1730,8 +1730,6 @@ class Item extends ItemLight
 	 *   - excerpt_after_more
 	 *   - excerpt_more_text
 	 *   - format
-	 *   - allow_empty: force generation if excert is empty (Default: false)
-	 *   - update_db: update the DB if we generated an excerpt (Default: true)
 	 */
 	function excerpt( $params = array() )
 	{
@@ -1743,16 +1741,14 @@ class Item extends ItemLight
 				'excerpt_after_more'  => '</span>',
 				'excerpt_more_text'   => T_('more').' &raquo;',
 				'format'              => 'htmlbody',
-				'allow_empty'         => false,
-				'update_db'           => true,
 			), $params );
 
-		$r = $this->get_excerpt2( $params );
+		$r = $this->get_excerpt( $params['format'] );
 
 		if( ! empty( $r ) )
 		{
 			echo $params['before'];
-			echo format_to_output( $r, $params['format'] );
+			echo $r;
 			if( !empty( $params['excerpt_more_text'] ) )
 			{
 				echo $params['excerpt_before_more'];
@@ -1761,41 +1757,6 @@ class Item extends ItemLight
 			}
 			echo $params['after'];
 		}
-	}
-
-
-	/**
-	 * Template tag: get excerpt 2 (Full version)
-	 * This full version may auto-generate an excerpt if it is found to be empty.
-	 *
-	 * @param array Associative list of params
-	 *   - allow_empty: force generation if excert is empty (Default: false)
-	 *   - update_db: update the DB if we generated an excerpt (Default: true)
-	 * @return string
-	 */
-	function get_excerpt2( $params = array() )
-	{
-		$params += array(
-			'allow_empty' => false,
-			'update_db' => true,
-			);
-
-// fp>yura: I think this is very uncool and unclean that we update the DB in a get_*() function.
-// Also, I think we don't need to try to update/regenerate an except once empty excerpts are correctly handled in this->set()
-// Therefore, I think we should deprecate these 2 params. And maybe we should bring back the original function get_excerpt() (depends on what it was exactly)
-		if( ! $params['allow_empty'] )
-		{	// Make sure the excerpt is not empty by updating it automatically if needed:
-			if( empty($this->excerpt) )
-			{	// We want to generate an excerpt from the content:
-				if( $this->update_excerpt() && $params['update_db'] && $this->ID )
-				{	// We have a new excerpt... and we also want to update the DB:
-					$this->dbupdate( false );		// Do not auto track modification date.
-				}
-			}
-		}
-
-		// Old DBs may have tags in excerpts, so we strip them:
-		return utf8_strip_tags( $this->excerpt );
 	}
 
 
@@ -6596,7 +6557,7 @@ class Item extends ItemLight
 				return $this->title;
 
 			case 'excerpt':
-				return $this->get_excerpt2();
+				return $this->get_excerpt();
 
 			case 'author':
 				return $this->get('t_author');
@@ -6665,7 +6626,7 @@ class Item extends ItemLight
 				return $this->check_notifications_flags( 'pings_sent' );
 
 			case 'excerpt':
-				return $this->get_excerpt2();
+				return $this->get_excerpt();
 
 			case 'notifications_flags':
 				return empty( $this->notifications_flags ) ? array() : explode( ',', $this->notifications_flags );

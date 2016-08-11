@@ -722,7 +722,7 @@ class coll_item_list_Widget extends ComponentWidget
 
 		if( $this->disp_params['disp_excerpt'] )
 		{ // Display excerpt
-			$excerpt = $disp_Item->dget( 'excerpt', 'htmlbody' );
+			$excerpt = $disp_Item->get_excerpt();
 
 			if( ! $this->disp_params['disp_teaser'] )
 			{ // only display if there is no teaser to display
