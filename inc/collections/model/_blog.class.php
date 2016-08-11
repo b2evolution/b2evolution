@@ -2151,7 +2151,7 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get allowed post status for current user in this blog
+	 * Checks if the requested item status can be used by current user and if not, get max allowed item status of the collection
 	 *
 	 * @todo make default a Blog param
 	 *

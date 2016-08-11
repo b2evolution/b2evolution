@@ -148,7 +148,7 @@ ol.breadcrumb {
 			white-space: normal !important;
 		}
 
-		.ft_date {
+		.ft_date, .ft_workflow_info {
 			text-align: left;
 			img {
 				border-radius: 50%;
@@ -188,7 +188,7 @@ ol.breadcrumb {
 		}
 	}
 	.ft_count {
-		margin-top: 12px;
+		margin-top: 5px;
 		font-size: 90%;
 		a, div {
 			font-size: 16px;
@@ -239,11 +239,11 @@ ol.breadcrumb {
 		margin-top: 13px;
 	}
 
-	.ft_date {
+	.ft_date, .ft_workflow_info {
 		color: #8b96a1;
 		font-size: 90%;
 		line-height: 16px;
-		margin-top: 3px;
+		
 		div.ft_date_header {
 				margin-bottom: 5px;
 			}
@@ -254,6 +254,14 @@ ol.breadcrumb {
 			max-width: 100%;
 			display: inline-block;
 		}
+	}
+	// .ft_date margin is set separately because we handle the same CSS for both .ft_date and .ft_workflow_info, only margin is different
+	.ft_date {
+		margin-top: 17px;
+	}
+	// When Enabled "Workflow" option, we use .ft_workflow_info instead of .ft_date
+	.ft_workflow_info {
+		margin-top: 2px;
 	}
 	.ft_title >	a.forumlink {
 		font-size: 21px;
@@ -728,9 +736,20 @@ aside .widget_core_coll_search_form {
 		margin-left: 10px;
 	}
 }
+//@media screen and (min-width: 600px) and (max-width: 767px) {
+//	.ft_workflow_info {
+//		padding-left: 50px;
+//	}
+//}
 @media screen and (max-width: 767px) {
 	.ft_date {
 		display: none !important;
+	}
+	.ft_workflow_status_and_author {
+		padding-right: 0;
+	}
+	.ft_workflow_last_comment {
+		padding-left: 5px;
 	}
 	.ft_assigned {
 		margin-top: 4px;
@@ -843,12 +862,12 @@ aside .widget_core_coll_search_form {
 			}
 		}
 		.ft_not_assigned {
-			padding-left: 0px;
-			margin-top: 4px;
+			//padding-left: 0px;
+			margin-top: 13px;
 		}
 
 		.ft_assigned {
-			padding-left: 0px;
+			//padding-left: 0px;
 			margin-top: 4px;
 		}
 		.ft_date_shrinked {
@@ -942,7 +961,7 @@ aside .widget_core_coll_search_form {
 	.posts_panel {
 		.ft_status_topic {
 			vertical-align: top;
-			margin-top: 8px;
+			// margin-top: 8px;
 		}
 		.ft_count {
 			margin-top: 0px;

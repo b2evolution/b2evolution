@@ -1384,7 +1384,7 @@ var downloadInterval = setInterval( function()
 			$display_params = array();
 
 			// Restrict comment status by parent item:
-			$edited_Comment->restrict_status_by_item();
+			$edited_Comment->restrict_status();
 			break;
 
 		case 'useritems':

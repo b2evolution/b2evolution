@@ -49,7 +49,7 @@ $params = array_merge( array(
 		'after_content_extension'  => '',
 
 		'before_images'            => '<div class="evo_post_images raised">',
-		'before_image'             => '<figure class="evo_image_block">',
+		'before_image'             => '<figure class="evo_image_block raised">',
 		'before_image_legend'      => '<figcaption class="evo_image_legend">',
 		'after_image_legend'       => '</figcaption>',
 		'after_image'              => '</figure>',

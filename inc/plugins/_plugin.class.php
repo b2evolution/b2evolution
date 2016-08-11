@@ -74,12 +74,12 @@ class Plugin
 	 * This can be used by other plugins when requiring your plugin
 	 * through {@link Plugin::GetDependencies()}.
 	 *
-	 * By increasing it you can request a call of {@link GetDbLayout()} upon instantiating.
+	 * By increasing it, you can request a call of {@link GetDbLayout()} upon instantiating.
 	 * If there are DB layout changes to be made, the plugin gets changed to status "needs_config".
 	 *
 	 * @var string
 	 */
-	var $version = '0';
+	var $version = '0.0.1';
 
 	/**
 	 * Plugin author.
@@ -460,6 +460,8 @@ class Plugin
 	 *     'select_blog': a drop down field, providing all existing blogs (Blog ID is the value or "" if "allow_none" is true) (WARNING: does not scale - not recommended)
 	 *     'select_group': a drop down field, providing all existing groups (Group ID is the value or "" if "allow_none" is true)
 	 *     'select_user': a drop down field, providing all existing groups (User ID is the value or "" if "allow_none" is true) (WARNING: does not scale - not recommended)
+	 *     'radio' : radio select (options on same line by default)
+	 *          'field_lines' : set to true to have options on separate line
 	 *     'array': a subset of settings. The value gets automagically (un)serialized through get() and set().
 	 *         The following keys apply to this type:
 	 *        'entries': an array with meta information about sub-settings
