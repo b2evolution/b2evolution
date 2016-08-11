@@ -1380,8 +1380,7 @@ label.control-label[for=post_title] {
   .table-hover .group_row .ft_date_shrinked {
     text-align: right;
     float: right;
-    margin-top: 6px;
-    margin-left: 5px;
+    margin-top: 8px;
   }
   .front_panel .ft_count {
     display: inline-block !important;
