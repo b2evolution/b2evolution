@@ -77,15 +77,8 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			) );
 	?>
 	
-	<?php 
-		if( ! $Item->is_intro() ) { // Display different layout for intro/featured and regular posts
-			echo '<section class="evo_post__full well">';
-			echo '<div class="evo_post__full_text">';
-		} else {
-			echo '<section class="evo_post__full">';
-			echo '<div class="evo_post__full_text">';
-		}
-	?>
+	<div class="evo_post_wrapper well">
+	
 	<header>
 	<?php
 		// ------- Title -------
@@ -176,6 +169,17 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	?>
 	
 	</header>
+	
+	<?php 
+		if( ! $Item->is_intro() ) { // Display different layout for intro/featured and regular posts
+			echo '<section class="evo_post__full">';
+			echo '<div class="evo_post__full_text clearfix">';
+		} else {
+			echo '<section class="evo_post__full">';
+			echo '<div class="evo_post__full_text clearfix">';
+		}
+	?>
+	
 	<?php
 	if( $disp == 'single' )
 	{
@@ -215,6 +219,8 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	// this will end a </section>
 	}
 	?>
+	
+	</div> <!-- ../content_end_full_text -->
 
 	<footer>
 		<?php
@@ -257,7 +263,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 		<?php } ?>
 	</footer>
 	
-	</div> <!-- ../content_end_full_text -->
+	</div><!-- ../evo_post_wrapper -->
 	</section>  <!-- ../content_end_full -->
 
 	<?php
