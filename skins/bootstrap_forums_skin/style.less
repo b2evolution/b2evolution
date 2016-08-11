@@ -558,6 +558,10 @@ ul.legend {
 // Single topic view
 .single_page_title {
 	margin-bottom: 20px;
+	// We want shrinked author info to display only on super small sizes (check under <375px media query below)
+	.ft_author_info.shrinked {
+		display: none;
+	}
 }
 .single_topic {
 	.ft_post_info {
@@ -940,6 +944,9 @@ label.control-label[for=post_title] {
 	.single_page_title {
 		.ft_author_info {
 			display: none;
+		}
+		.ft_author_info.shrinked {
+			display: block;
 		}
 	}
 	/* Disp front */
