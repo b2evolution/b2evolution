@@ -843,7 +843,7 @@ class Skin extends DataObject
 
 				case 'font_awesome':
 					// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
-					init_fontawesome_icons( 'fontawesome-glyphicons' );
+					init_fontawesome_icons( 'fontawesome-glyphicons', 'blog' );
 					break;
 
 				case 'bootstrap':
@@ -914,11 +914,11 @@ class Skin extends DataObject
 						|| $debug
 						|| ( $this->use_min_css == 'check' && !file_exists(dirname(__FILE__).'/style.min.css' ) ) )
 					{	// Use readable CSS:
-						require_css( 'style.css', 'relative' );	// Relative to <base> tag (current skin folder)
+						$this->require_css( 'style.css' );
 					}
 					else
 					{	// Use minified CSS:
-						require_css( 'style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
+						$this->require_css( 'style.min.css' );
 					}
 					break;
 
@@ -1056,12 +1056,12 @@ class Skin extends DataObject
 					break;
 
 				case 'disp_login':
-					// Specific features for disp=threads:
+				case 'disp_access_requires_login':
+					// Specific features for disp=login and disp=access_requires_login:
 
-					global $Settings, $Plugins, $transmit_hashed_password;
+					global $Settings, $Plugins;
 
-					$transmit_hashed_password = (bool)$Settings->get( 'js_passwd_hashing' ) && !(bool)$Plugins->trigger_event_first_true( 'LoginAttemptNeedsRawPassword' );
-					if( $transmit_hashed_password )
+					if( can_use_hashed_password() )
 					{ // Include JS for client-side password hashing:
 						require_js( 'build/sha1_md5.bmin.js', 'blog' );
 					}
@@ -1738,6 +1738,34 @@ class Skin extends DataObject
 		}
 
 		return array();
+	}
+
+
+	/**
+	 * Memorize that a specific css that file will be required by the current page.
+	 * @see require_css() for full documentation,
+	 * this function is used to add unique version number for each skin
+	 *
+	 * @param string Name of CSS file relative to <base> tag (current skin folder)
+	 */
+	function require_css( $css_file )
+	{
+		global $app_version_long;
+		require_css( $css_file, 'relative', NULL, NULL, $this->folder.'+'.$this->version.'+'.$app_version_long );
+	}
+
+
+	/**
+	 * Memorize that a specific javascript file will be required by the current page.
+	 * @see require_js() for full documentation,
+	 * this function is used to add unique version number for each skin
+	 *
+	 * @param string Name of JavaScript file relative to <base> tag (current skin folder)
+	 */
+	function require_js( $js_file )
+	{
+		global $app_version_long;
+		require_js( $js_file, 'relative', false, false, $this->folder.'+'.$this->version.'+'.$app_version_long );
 	}
 }
 

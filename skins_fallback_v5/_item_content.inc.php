@@ -267,9 +267,8 @@ switch( $content_mode )
 					'link_to'     => $params['more_link_to'],
 				) );
 
-			if( ! empty($params['image_size']) && $more && $Item->has_content_parts($params) /* only if not displayed all images already */ )
-			{
-				// Display images that are linked "after more" to this post:
+			if( ! empty( $params['image_size'] ) && ( $more || $params['force_more'] ) && $Item->has_content_parts( $params ) /* only if not displayed all images already */ )
+			{	// Display images that are linked "after more" to this post:
 				$Item->images( array(
 						'before'              => $params['before_images'],
 						'before_image'        => $params['before_image'],

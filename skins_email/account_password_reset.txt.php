@@ -19,7 +19,7 @@ emailskin_include( '_email_header.inc.txt.php', $params );
  */
 global $Session;
 
-global $secure_htsrv_url, $dummy_fields;
+global $dummy_fields;
 
 // Default params:
 $params = array_merge( array(
@@ -53,7 +53,7 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 	$message_content .= T_( 'Link to change your password:' )
 						."\n"
 						.'$secret_content_start$'
-						.$secure_htsrv_url.'login.php?action=changepwd'
+						.get_htsrv_url( true ).'login.php?action=changepwd'
 							.'&'.$dummy_fields[ 'login' ].'='.rawurlencode( $iterator_User->login )
 							.'&reqID='.$params['request_id']
 							.'&sessID='.$Session->ID  // used to detect cookie problems

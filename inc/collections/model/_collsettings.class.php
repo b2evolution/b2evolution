@@ -153,8 +153,9 @@ class CollectionSettings extends AbstractSettings
 			'in_skin_editing' => 0,
 			'default_cat_ID' => NULL,					// Default Cat for new posts
 			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet,evo_twitter', // ping plugin codes, separated by comma
-			'allow_subscriptions' => 0,      // Don't allow email subscriptions by default
-			'allow_item_subscriptions' => 0, // Don't allow email subscriptions for a specific post by default
+			'allow_subscriptions' => 1,         // Allow email subscriptions for new post by default
+			'allow_comment_subscriptions' => 1, // Allow email subscriptions for new comment by default
+			'allow_item_subscriptions' => 1,    // Allow email subscriptions for a specific post by default
 			'use_workflow' => 0,						// Don't use workflow by default
 			'aggregate_coll_IDs' => '',
 			'blog_footer_text' => 'This collection &copy;$year$ by $owner$',
@@ -171,9 +172,21 @@ class CollectionSettings extends AbstractSettings
 			'allow_html_comment' => 1, // Allow HTML in comments
 			'track_unread_content' => 0, // Should we track unread content on the specific blog. It can be modified on the Features/Other settings form.
 			'allow_access' => 'public', // Allow access to blog; Values: 'public' - Everyone (Public Blog), 'users' - Logged in users, 'members' - Members of the blog
+			// Assets URLs:
+			'rsc_assets_url_type' => 'relative', // Load generic /rsc/ assets from: 'basic', 'relative', 'absolute'
+			'rsc_assets_absolute_url' => '', // Absolute URL for setting 'rsc_assets_url_type' with selected option 'absolute'
+			'media_assets_url_type' => 'relative', // Load generic /media/ assets from: 'basic', 'relative', 'absolute'
+			'media_assets_absolute_url' => '', // Absolute URL for setting 'media_assets_url_type' with selected option 'absolute'
+			'skins_assets_url_type' => 'relative', // Load generic /skins/ assets from: 'basic', 'relative', 'absolute'
+			'skins_assets_absolute_url' => '', // Absolute URL for setting 'skins_assets_url_type' with selected option 'absolute'
+			'plugins_assets_url_type' => 'relative', // Load generic /plugins/ assets from: 'basic', 'relative', 'absolute'
+			'plugins_assets_absolute_url' => '', // Absolute URL for setting 'plugins_assets_url_type' with selected option 'absolute'
 			'locale_source' => 'blog', // Source of the locale for navigation/widget: 'blog', 'user'
 			'post_locale_source' => 'post', // Source of the locale for post content: 'post', 'blog'
 			'new_item_locale_source' => 'select_coll', // Source of the locale for new items: 'use_coll', 'select_coll', 'select_user'
+			// Cookie settings:
+			'cookie_domain_type' => 'auto', // Cookie domain type: 'auto', 'custom'
+			'cookie_path_type' => 'auto', // Cookie path type: 'auto', 'custom'
 
 		// User directory:
 			'userdir_picture' => 1,

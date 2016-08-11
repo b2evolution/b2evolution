@@ -297,6 +297,9 @@ class RestApi
 	 */
 	private function display_response()
 	{
+		// Send the predefined cookies:
+		evo_sendcookies();
+
 		// Set JSON content type:
 		headers_content_mightcache( 'application/json' );
 
@@ -811,7 +814,7 @@ class RestApi
 					}
 
 					$result_data['title'] = $Item->get_title( array( 'link_type' => 'none' ) );
-					$result_data['desc'] = $Item->get_excerpt2();
+					$result_data['desc'] = $Item->get_excerpt();
 					$result_data['permalink'] = $Item->get_permanent_url( '', '', '&' );
 					break;
 

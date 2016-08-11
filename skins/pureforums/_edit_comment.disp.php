@@ -17,7 +17,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $Blog, $edited_Comment, $comment_Item, $comment_content, $cat;
-global $display_params, $admin_url, $samedomain_htsrv_url, $dummy_fields;
+global $display_params, $admin_url, $dummy_fields;
 
 $form_action = url_add_param( $admin_url, 'ctrl=comments' );
 

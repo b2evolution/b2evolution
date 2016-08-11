@@ -66,7 +66,7 @@ class code_highlight_plugin extends Plugin
 	var $name = 'Code highlight';
 	var $code = 'evo_code';
 	var $priority = 27;
-	var $version = '6.7.0';
+	var $version = '6.7.5';
 	var $author = 'Astonish Me';
 	var $group = 'rendering';
 	var $help_topic = 'code-highlight-plugin';
@@ -627,7 +627,7 @@ class code_highlight_plugin extends Plugin
 			return;
 		}
 
-		require_css( $this->get_plugin_url().'amcode.css', true );
+		$this->require_css( 'amcode.css' );
 	}
 
 

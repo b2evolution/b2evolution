@@ -25,7 +25,7 @@ class videoplug_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '6.7.0';
+	var $version = '6.7.5';
 	var $number_of_installs = 1;
 
 
@@ -72,6 +72,9 @@ class videoplug_plugin extends Plugin
 				'<div class="videoblock">The Live Video service is not available anymore.</div>',
 				'<div class="videoblock">The iFilm video service is not available anymore.</div>',
 			);
+
+		// Move short tag outside of paragraph
+		$content = move_short_tags( $content, '/\[video:(youtube|dailymotion|vimeo):?[^\[\]]*\]/i' );
 
 		$content = replace_content_outcode( $search_list, $replace_list, $content );
 

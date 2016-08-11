@@ -23,7 +23,7 @@ global $Session;
  */
 global $Settings;
 
-global $secure_htsrv_url, $htsrv_url, $baseurl;
+global $baseurl;
 
 // Default params:
 $params = array_merge( array(
@@ -66,7 +66,7 @@ echo "\n\n";
 
 if( $Settings->get( 'validation_process' ) == 'easy' )
 { // ---- EASY activation ---- //
-	$activation_url = $htsrv_url.'login.php?action=activateaccount'
+	$activation_url = get_htsrv_url().'login.php?action=activateaccount'
 		.'&userID=$user_ID$'
 		.'&reminderKey='.$params['reminder_key'];
 
@@ -80,7 +80,7 @@ if( $Settings->get( 'validation_process' ) == 'easy' )
 }
 else
 { // ---- SECURE activation ---- //
-	$activation_url = $secure_htsrv_url.'login.php?action=validatemail'
+	$activation_url = get_htsrv_url( true ).'login.php?action=validatemail'
 		.$params['blog_param']
 		.'&reqID='.$params['request_id']
 		.'&sessID='.$Session->ID; // used to detect cookie problems
@@ -99,7 +99,7 @@ else
 
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'If you don\'t want to receive notifications to activate your account any more, click here:' ).' '.
-		$htsrv_url.'quick_unsubscribe.php?type=account_activation&user_ID=$user_ID$&key=$unsubscribe_key$';
+		get_htsrv_url().'quick_unsubscribe.php?type=account_activation&user_ID=$user_ID$&key=$unsubscribe_key$';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.txt.php', $params );

@@ -19,7 +19,7 @@ emailskin_include( '_email_header.inc.html.php', $params );
  */
 global $Session;
 
-global $secure_htsrv_url, $dummy_fields;
+global $dummy_fields;
 
 // Default params:
 $params = array_merge( array(
@@ -56,7 +56,7 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 		$message_content .= '<p'.emailskin_style( '.p' ).'>'.T_( 'Login:' ).' '.$iterator_User->get_colored_login( array( 'mask' => '$login$', 'protocol' => 'http:' ) )."</p>\n";
 	}
 
-	$url_change_password = $secure_htsrv_url.'login.php?action=changepwd'
+	$url_change_password = get_htsrv_url( true ).'login.php?action=changepwd'
 		.'&'.$dummy_fields[ 'login' ].'='.rawurlencode( $iterator_User->login )
 		.'&reqID='.$params['request_id']
 		.'&sessID='.$Session->ID  // used to detect cookie problems

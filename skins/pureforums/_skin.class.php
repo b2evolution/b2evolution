@@ -21,7 +21,7 @@ class pureforums_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.0';
+	var $version = '6.7.5';
 
   /**
 	 * Get default name for the skin.
@@ -165,11 +165,11 @@ class pureforums_Skin extends Skin
 				'disp_auto',      // Automatically include additional CSS and/or JS required by certain disps (replace with 'disp_off' to disable this)
 			) );
 
-		// require_css( 'pureforums_header.css', 'relative' );
-		// require_css( 'pureforums_main.css', 'relative' );
-		// require_css( 'pureforums_footer.css', 'relative' );
-		// require_css( 'pureforums.bundle.css', 'relative' ); // Concatenation of the above
-		require_css( 'pureforums.bmin.css', 'relative' ); // Concatenation + Minifaction of the above
+		// $this->require_css( 'pureforums_header.css' );
+		// $this->require_css( 'pureforums_main.css' );
+		// $this->require_css( 'pureforums_footer.css' );
+		// $this->require_css( 'pureforums.bundle.css' ); // Concatenation of the above
+		$this->require_css( 'pureforums.bmin.css' ); // Concatenation + Minifaction of the above
 
 		if( $this->get_setting( 'width_switcher' ) )
 		{ // Functions to switch between the width sizes

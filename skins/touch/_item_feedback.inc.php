@@ -300,7 +300,7 @@ else
 // ----------- Register for item's comment notification -----------
 if( is_logged_in() && $Item->can_comment( NULL ) )
 {
-	global $DB, $htsrv_url;
+	global $DB;
 	global $UserSettings;
 
 	echo '<div class="comment_notification">';
@@ -308,7 +308,7 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 	$not_subscribed = true;
 	$creator_User = $Item->get_creator_User();
 
-	if( $Blog->get_setting( 'allow_subscriptions' ) )
+	if( $Blog->get_setting( 'allow_comment_subscriptions' ) )
 	{
 		$sql = 'SELECT count( sub_user_ID ) FROM T_subscriptions
 					WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0';
@@ -331,11 +331,11 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 		if( get_user_isubscription( $current_User->ID, $Item->ID ) )
 		{
 			echo '<p>'.T_( 'You will be notified by email when someone comments here.' );
-			echo ' <a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></p>';
+			echo ' <a href="'.get_htsrv_url().'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></p>';
 		}
 		else
 		{
-			echo '<p><a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Notify me by email when someone comments here.' ).'</a></p>';
+			echo '<p><a href="'.get_htsrv_url().'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Notify me by email when someone comments here.' ).'</a></p>';
 		}
 	}
 

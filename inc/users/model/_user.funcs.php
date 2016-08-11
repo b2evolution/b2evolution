@@ -200,8 +200,6 @@ function get_user_colored_login_link( $login, $params = array() )
  */
 function get_login_url( $source, $redirect_to = NULL, $force_normal_login = false, $blog_ID = NULL, $blog_page = 'loginurl' )
 {
-	global $secure_htsrv_url;
-
 	// This URL is used to redirect after SUCCESS login action
 	$redirect_url = empty( $redirect_to ) ? regenerate_url( '', '', '', '&' ) : $redirect_to;
 
@@ -209,7 +207,7 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 	$return_url = param( 'return_to', 'url', '' );
 	if( empty( $return_url ) )
 	{
-		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), $secure_htsrv_url );
+		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), get_htsrv_url( true ) );
 	}
 
 	if( ! $force_normal_login && use_in_skin_login() )
@@ -235,13 +233,13 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 	{ // Use normal/standard login form (without blog skin)
 		if( ! empty( $redirect_url ) )
 		{
-			$redirect_url = url_rel_to_same_host( $redirect_url, $secure_htsrv_url );
+			$redirect_url = url_rel_to_same_host( $redirect_url, get_htsrv_url( true ) );
 		}
 		if( ! empty( $redirect_url ) )
 		{
-			$return_url = url_rel_to_same_host( $return_url, $secure_htsrv_url );
+			$return_url = url_rel_to_same_host( $return_url, get_htsrv_url( true ) );
 		}
-		$url = $secure_htsrv_url.'login.php';
+		$url = get_htsrv_url( true ).'login.php';
 	}
 
 	return url_add_param( $url, 'redirect_to='.rawurlencode( $redirect_url )
@@ -260,17 +258,17 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
  */
 function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;', $return_to = NULL )
 {
-	global $Blog, $secure_htsrv_url;
+	global $Blog;
 
 	if( empty( $redirect_to ) && $redirect_to !== false )
 	{ // Redirect back to current URL
-		$redirect_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), $secure_htsrv_url );
+		$redirect_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), get_htsrv_url( true ) );
 	}
 
 	// This URL is used to redirect after ABORT login action:
 	if( empty( $return_to ) && $return_to !== false  )
 	{
-		$return_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), $secure_htsrv_url );
+		$return_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), get_htsrv_url( true ) );
 	}
 
 	if( use_in_skin_login() )
@@ -279,7 +277,7 @@ function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;', $return_to 
 	}
 	else
 	{ // Use normal/standard lostpassword form (without blog skin)
-		$lostpassword_url = $secure_htsrv_url.'login.php?action=lostpassword';
+		$lostpassword_url = get_htsrv_url( true ).'login.php?action=lostpassword';
 	}
 
 	if( $redirect_to !== false )
@@ -305,11 +303,11 @@ function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;', $return_to 
  */
 function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
 {
-	global $Blog, $secure_htsrv_url;
+	global $Blog;
 
 	if( empty( $redirect_to ) )
 	{ // Redirect back to current URL
-		$redirect_to = rawurlencode( url_rel_to_same_host( regenerate_url( '', '', '', $glue ), $secure_htsrv_url ) );
+		$redirect_to = rawurlencode( url_rel_to_same_host( regenerate_url( '', '', '', $glue ), get_htsrv_url( true ) ) );
 	}
 
 	if( use_in_skin_login() )
@@ -318,7 +316,7 @@ function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
 	}
 	else
 	{ // Use normal/standard lostpassword form (without blog skin)
-		$activateinfo_url = $secure_htsrv_url.'login.php?action=req_validatemail';
+		$activateinfo_url = get_htsrv_url( true ).'login.php?action=req_validatemail';
 	}
 
 	return url_add_param( $activateinfo_url, 'redirect_to='.rawurlencode( $redirect_to ), $glue ) ;
@@ -517,7 +515,7 @@ function use_in_skin_login()
 		$Blog = $BlogCache->get_by_ID( $blog, false, false );
 	}
 
-	if( get_setting_Blog( 'login_blog_ID' ) )
+	if( get_setting_Blog( 'login_blog_ID', $Blog ) )
 	{ // If special blog is defined for all login actions
 		return true;
 	}
@@ -652,7 +650,7 @@ function get_user_register_link( $before = '', $after = '', $link_text = '', $li
  */
 function get_user_register_url( $redirect_to = NULL, $default_source_string = '', $disp_when_logged_in = false, $glue = '&amp;', $blog_ID = NULL )
 {
-	global $Settings, $edited_Blog, $secure_htsrv_url;
+	global $Settings, $edited_Blog;
 
 	if( is_logged_in() && ! $disp_when_logged_in )
 	{ // Do not display, when already logged in:
@@ -684,7 +682,7 @@ function get_user_register_url( $redirect_to = NULL, $default_source_string = ''
 	}
 	else
 	{ // Use normal/standard register form (without blog skin)
-		$register_url = $secure_htsrv_url.'register.php';
+		$register_url = get_htsrv_url( true ).'register.php';
 	}
 
 	// Source
@@ -705,14 +703,14 @@ function get_user_register_url( $redirect_to = NULL, $default_source_string = ''
 
 	if( ! empty( $redirect_to ) )
 	{
-		$register_url = url_add_param( $register_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, $secure_htsrv_url ) ), $glue );
+		$register_url = url_add_param( $register_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, get_htsrv_url( true ) ) ), $glue );
 	}
 
 	// This URL is used to redirect after ABORT login action
 	$return_url = param( 'return_to', 'url', '' );
 	if( empty( $return_url ) )
 	{
-		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), $secure_htsrv_url );
+		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), get_htsrv_url( true ) );
 	}
 
 	$register_url = url_add_param( $register_url, 'return_to='.rawurlencode( $return_url ), $glue );
@@ -769,14 +767,14 @@ function get_user_logout_link( $before = '', $after = '', $link_text = '', $link
  */
 function get_user_logout_url( $blog_ID = NULL )
 {
-	global $admin_url, $baseurl, $is_admin_page, $secure_htsrv_url;
+	global $admin_url, $baseurl, $is_admin_page;
 
 	if( ! is_logged_in() )
 	{
 		return false;
 	}
 
-	$redirect_to = url_rel_to_same_host( regenerate_url( 'disp,action','','','&' ), $secure_htsrv_url );
+	$redirect_to = url_rel_to_same_host( regenerate_url( 'disp,action','','','&' ), get_htsrv_url( true ) );
 	if( require_login( $redirect_to, true ) )
 	{ // if redirect_to page is a login page, or also require login ( e.g. admin.php )
 		if( ! empty( $blog_ID ) )
@@ -797,11 +795,11 @@ function get_user_logout_url( $blog_ID = NULL )
 		}
 		else
 		{ // Blog is empty, set abort url to baseurl
-			$redirect_to =  url_rel_to_same_host( $baseurl, $secure_htsrv_url );
+			$redirect_to =  url_rel_to_same_host( $baseurl, get_htsrv_url( true ) );
 		}
 	}
 
-	return $secure_htsrv_url.'login.php?action=logout&amp;redirect_to='.rawurlencode($redirect_to);
+	return get_htsrv_url( true ).'login.php?action=logout&amp;redirect_to='.rawurlencode($redirect_to);
 }
 
 
@@ -2660,7 +2658,7 @@ function update_user_email_counter( $limit_setting, $last_email_setting, $user_I
  */
 function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_changed = false )
 {
-	global $UserSettings, $servertimenow, $secure_htsrv_url;
+	global $UserSettings, $servertimenow;
 
 	$UserCache = & get_UserCache();
 
@@ -2949,7 +2947,8 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 			$Form->begin_fieldset( $userfield->ufgp_name.( is_admin_page() ? get_manual_link( 'user-profile-tab-userfields' ) : '' ) , array( 'id' => $userfield->ufgp_ID ) );
 		}
 
-		$uf_val = param( 'uf_'.$userfield->uf_ID, 'string', NULL );
+		$userfield_type = ( $userfield->ufdf_type == 'text' || $userfield->ufdf_type == 'url' ) ? $userfield->ufdf_type : 'string';
+		$uf_val = param( 'uf_'.$userfield->uf_ID, $userfield_type, NULL );
 
 		$uf_ID = $userfield->uf_ID;
 		if( $userfield->uf_ID == '0' )
@@ -3237,7 +3236,7 @@ jQuery( '#country' ).change( function()
 	var this_obj = jQuery( this );
 	jQuery.ajax( {
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 	data: 'action=get_regions_option_list&ctry_id=' + jQuery( this ).val(),
 	success: function( result )
 		{
@@ -3269,7 +3268,7 @@ function load_subregions( region_ID )
 {	// Load option list with sub-regions for seleted region
 	jQuery.ajax( {
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 	data: 'action=get_subregions_option_list&rgn_id=' + region_ID,
 	success: function( result )
 		{
@@ -3296,7 +3295,7 @@ function load_cities( country_ID, region_ID, subregion_ID )
 
 	jQuery.ajax( {
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 	data: 'action=get_cities_option_list&ctry_id=' + country_ID + '&rgn_id=' + region_ID + '&subrg_id=' + subregion_ID,
 	success: function( result )
 		{
@@ -4010,7 +4009,7 @@ function display_voting_form( $params = array() )
 
 	$blog_param = empty( $blog ) ? '' : '&blog='.$blog;
 	// Set this url for case when JavaScript is not enabled
-	$url = get_secure_htsrv_url().'anon_async.php?action=voting&vote_type='.$params['vote_type'].'&vote_ID='.$params['vote_ID'].$blog_param.'&'.url_crumb( 'voting' );
+	$url = get_htsrv_url().'anon_async.php?action=voting&vote_type='.$params['vote_type'].'&vote_ID='.$params['vote_ID'].$blog_param.'&'.url_crumb( 'voting' );
 	// Save action url here in order to have new crumb on every voting form loading
 	echo '<input type="hidden" id="voting_action" value="'.$url.'&b2evo_icons_type='.$b2evo_icons_type.'" />';
 	$redirect_to = regenerate_url();
@@ -4168,7 +4167,7 @@ function display_user_email_status_message( $user_ID = 0 )
 	else
 	{
 		$user_tab_param = empty( $disp ) ? 'profile' : $disp;
-		$url_change_status = get_secure_htsrv_url().'profile_update.php?action=redemption&amp;user_tab='.$user_tab_param.'&amp;blog='.$Blog->ID.'&amp;'.url_crumb( 'user' );
+		$url_change_status = get_htsrv_url().'profile_update.php?action=redemption&amp;user_tab='.$user_tab_param.'&amp;blog='.$Blog->ID.'&amp;'.url_crumb( 'user' );
 	}
 
 	// Display info about last error only when such data exists
@@ -4226,7 +4225,7 @@ function echo_user_report_window()
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_report_user = \''.TS_('Report User').'\';
 		var evo_js_lang_report_this_user_now = \''.TS_('Report this user now!').'\';
-		var evo_js_user_report_ajax_url = \''.get_secure_htsrv_url().'anon_async.php'.'\';
+		var evo_js_user_report_ajax_url = \''.get_htsrv_url().'anon_async.php'.'\';
 		var evo_js_is_backoffice = '.( is_admin_page() ? 'true' : 'false' ).';
 		var evo_js_blog = '.( isset( $blog ) ? $blog : 0 ).';
 		var evo_js_crumb_user = \''.get_crumb( 'user' ).'\';
@@ -4249,7 +4248,7 @@ function echo_user_contact_groups_window()
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_contact_groups = \''.TS_('Contact Groups').'\';
 		var evo_js_lang_save = \''.TS_('Save').'\';
-		var evo_js_user_contact_groups_ajax_url = \''.get_secure_htsrv_url().'anon_async.php'.'\';
+		var evo_js_user_contact_groups_ajax_url = \''.get_htsrv_url().'anon_async.php'.'\';
 		var evo_js_blog = '.( isset( $blog ) ? $blog : 0 ).';
 		var evo_js_crumb_user = \''.get_crumb( 'user' ).'\';
 	</script>';
@@ -4271,7 +4270,7 @@ function echo_user_crop_avatar_window()
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_crop_profile_pic = \''.TS_('Crop profile picture').'\';
 		var evo_js_lang_crop = \''.TS_('Crop').'\';
-		var evo_js_user_crop_ajax_url = \''.( is_admin_page() ? $admin_url : get_secure_htsrv_url().'anon_async.php' ).'\';
+		var evo_js_user_crop_ajax_url = \''.( is_admin_page() ? $admin_url : get_htsrv_url().'anon_async.php' ).'\';
 		var evo_js_is_backoffice = '.( is_admin_page() ? 'true' : 'false' ).';
 		var evo_js_blog = '.( isset( $blog ) ? $blog : 0 ).';
 		var evo_js_crumb_user = \''.get_crumb( 'user' ).'\';
@@ -4414,7 +4413,7 @@ jQuery( document ).on( 'click', 'span[rel^=org_status_]', function()
 	jQuery.ajax(
 	{
 		type: 'POST',
-		url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+		url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 		data: 'action=change_user_org_status&status=' + this_obj.attr( 'rel' ) + '&crumb_userorg=<?php echo get_crumb( 'userorg' ); ?>' + params,
 		success: function( result )
 		{
@@ -5430,6 +5429,7 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Collections'),
 				'order' => 'nb_blogs',
+				'default_dir' => 'D',
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'center small',
 				'td' => '~conditional( (#nb_blogs# > 0), \'<a href="admin.php?ctrl=user&amp;user_tab=activity&amp;user_ID=$user_ID$" title="'.format_to_output( T_('View personal blogs'), 'htmlattr' ).'">$nb_blogs$</a>\', \'&nbsp;\' )~',
@@ -5539,7 +5539,8 @@ function users_results( & $UserList, $params = array() )
 				'th' => T_('Sec.<br />Groups'),
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'shrinkwrap small',
-				'order' => 'grp_name',
+				'order' => 'secondary_groups_count',
+				'default_dir' => 'D',
 				'td' => '%user_td_sec_groups( #user_ID#, #secondary_groups_count# )%',
 			);
 	}

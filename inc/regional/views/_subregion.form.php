@@ -60,7 +60,7 @@ jQuery( '#subrg_ctry_ID' ).change( function ()
 {	// Load option list with regions for seleted country
 	jQuery.ajax( {
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 	data: 'action=get_regions_option_list&page=edit&ctry_id=' + jQuery( this ).val(),
 	success: function( result )
 		{

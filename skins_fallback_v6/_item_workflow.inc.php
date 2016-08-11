@@ -22,7 +22,7 @@ if( ( $disp == 'single' || $disp == 'page' ) &&
     $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) &&
     $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 { // Display workflow properties if current user can edit this post:
-	$Form = new Form( get_samedomain_htsrv_url().'item_edit.php' );
+	$Form = new Form( get_htsrv_url().'item_edit.php' );
 
 	$Form->add_crumb( 'item' );
 	$Form->hidden( 'blog', $Blog->ID );

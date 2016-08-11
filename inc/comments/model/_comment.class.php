@@ -445,8 +445,11 @@ class Comment extends DataObject
 				return $this->set_param( 'notif_flags', 'string', implode( ',', $notifications_flags ), $make_null );
 
 			case 'status':
+				// We need to set a reminder here to later check if the new status is allowed at dbinsert or dbupdate time ( $this->restrict_status( true ) )
+				// We cannot check immediately because we may be setting the status before having set a main cat_ID -> a collection ID to check the status possibilities
 				// Save previous status temporarily to make some changes on dbinsert(), dbupdate() & dbdelete()
 				$this->previous_status = $this->get( 'status' );
+				return parent::set( 'status', $parvalue, $make_null );
 
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
@@ -3732,7 +3735,7 @@ class Comment extends DataObject
 			}
 
 			// Get list of users who want to be notified about this blog comments:
-			if( $comment_item_Blog->get_setting( 'allow_subscriptions' ) )
+			if( $comment_item_Blog->get_setting( 'allow_comment_subscriptions' ) )
 			{	// If blog subscription is allowed:
 				$sql = 'SELECT DISTINCT user_ID
 								FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = user_ID
@@ -4101,6 +4104,12 @@ class Comment extends DataObject
 	{
 		global $Plugins, $DB;
 
+		if( isset( $this->previous_status ) )
+		{	// Restrict comment status by parent item:
+			// (ONLY if current request is updating comment status)
+			$this->restrict_status( true );
+		}
+
 		$dbchanges = $this->dbchanges;
 
 		if( count( $dbchanges ) )
@@ -4172,6 +4181,12 @@ class Comment extends DataObject
 		 */
 		global $Plugins;
 		global $Settings;
+
+		if( isset( $this->previous_status ) )
+		{	// Restrict comment status by parent item:
+			// (ONLY if current request is updating comment status)
+			$this->restrict_status( true );
+		}
 
 		// Get karma percentage (interval -100 - 100)
 		$spam_karma = $Plugins->trigger_karma_collect( 'GetSpamKarmaForComment', array( 'Comment' => & $this ) );
@@ -4564,11 +4579,11 @@ class Comment extends DataObject
 
 
 	/**
-	 * Restrict comment status by parent item
+	 * Restrict Comment status by parent Item status AND its Collection access restriction AND by CURRENT USER write perm
 	 *
 	 * @param boolean TRUE to update status
 	 */
-	function restrict_status_by_item( $update_status = false )
+	function restrict_status( $update_status = false )
 	{
 		global $current_User;
 

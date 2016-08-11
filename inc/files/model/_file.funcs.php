@@ -2214,7 +2214,7 @@ function create_htaccess_deny( $dir )
  */
 function display_dragdrop_upload_button( $params = array() )
 {
-	global $htsrv_url, $blog, $Settings, $current_User;
+	global $blog, $Settings, $current_User;
 
 	$params = array_merge( array(
 			'before'           => '',
@@ -2258,7 +2258,7 @@ function display_dragdrop_upload_button( $params = array() )
 	}
 
 	$root_and_path = $params['fileroot_ID'].'::'.$params['path'];
-	$quick_upload_url = $htsrv_url.'quick_upload.php?upload=true'.( empty( $blog ) ? '' : '&blog='.$blog );
+	$quick_upload_url = get_htsrv_url().'quick_upload.php?upload=true'.( empty( $blog ) ? '' : '&blog='.$blog );
 
 	echo $params['before'];
 
@@ -2520,7 +2520,7 @@ function display_dragdrop_upload_button( $params = array() )
 			jQuery.ajax(
 			{ // Replace old file name with new
 				type: 'POST',
-				url: '<?php echo get_secure_htsrv_url(); ?>async.php',
+				url: '<?php echo get_htsrv_url(); ?>async.php',
 				data:
 				{
 					action: 'conflict_files',

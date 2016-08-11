@@ -857,7 +857,7 @@ function search_result_block( $params = array() )
 
 				$display_params = array(
 					'title'   => $Item->get_title( array( 'link_type' => 'permalink' ) ).$params['title_suffix_post'],
-					'excerpt' => $Item->get_excerpt2(),
+					'excerpt' => $Item->get_excerpt(),
 					'chapter' => sprintf( T_('In %s'), $Item->get_chapter_links() ),
 				);
 

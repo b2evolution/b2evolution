@@ -40,7 +40,7 @@ $params = array_merge( array(
 		'excerpt_more_text'        => T_('more').' &raquo;',
 
 		// In case we display a full version of the post:
-		'content_start_full_text'  => '<div class="evo_post__full_text">',
+		'content_start_full_text'  => '<div class="evo_post__full_text clearfix">',
 		'content_end_full_text'    => '</div>',
 
 		'before_content_teaser'    => '',
@@ -310,9 +310,8 @@ switch( $content_mode )
 					'link_to'     => $params['more_link_to'],
 				) );
 
-			// Display images that are linked "after more" to this post:
-			if( ! empty($params['image_size']) && $more && $Item->has_content_parts($params) /* only if not displayed all images already */ )
-			{	
+			if( ! empty( $params['image_size'] ) && ( $more || $params['force_more'] ) && $Item->has_content_parts( $params ) /* only if not displayed all images already */ )
+			{	// Display images that are linked "after more" to this post:
 				$Item->images( array(
 						'before'              => $params['before_images'],
 						'before_image'        => $params['before_image'],

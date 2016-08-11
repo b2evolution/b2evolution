@@ -190,6 +190,10 @@ switch( $action )
 				// Force email sending
 				$Settings->set( 'force_email_sending', param( 'force_email_sending', 'integer', 0 ) );
 
+				// Sendmail additional params:
+				$Settings->set( 'sendmail_params', param( 'sendmail_params', 'string', 'return' ) );
+				$Settings->set( 'sendmail_params_custom', param( 'sendmail_params_custom', 'string' ) );
+
 				$old_smtp_enabled = $Settings->get( 'smtp_enabled' );
 
 				// Enabled
@@ -264,9 +268,9 @@ switch( $action )
 				{ // Check if connection is available
 					global $smtp_connection_result;
 					// Test SMTP connection
-					$smtp_messages = smtp_connection_test();
+					$test_mail_messages = smtp_connection_test();
 					// Init this var to display a result on the page
-					$smtp_test_output = is_array( $smtp_messages ) ? implode( "<br />\n", $smtp_messages ) : '';
+					$test_mail_output = is_array( $test_mail_messages ) ? implode( "<br />\n", $test_mail_messages ) : '';
 					if( $smtp_connection_result )
 					{ // Success
 						$Messages->add( T_('The connection with this SMTP server has been tested successfully.'), 'success' );
@@ -275,7 +279,7 @@ switch( $action )
 					{ // Error
 						$Messages->add( T_('The connection with this SMTP server has failed.'), 'error' );
 					}
-					// Don't redirect here in order to display a result($smtp_test_output) of SMTP connection above settings form
+					// Don't redirect here in order to display a result($test_mail_output) of SMTP connection above settings form
 				}
 				else
 				{ // Redirect so that a reload doesn't write to the DB twice:
@@ -365,14 +369,15 @@ switch( $action )
 		$current_User->check_perm( 'emails', 'edit', true );
 
 		// Test SMTP connection
-		$smtp_messages = smtp_connection_test();
+		$test_mail_messages = smtp_connection_test();
 
 		// Init this var to display a result on the page
-		$smtp_test_output = is_array( $smtp_messages ) ? implode( "<br />\n", $smtp_messages ) : '';
+		$test_mail_output = is_array( $test_mail_messages ) ? implode( "<br />\n", $test_mail_messages ) : '';
 		break;
 
-	case 'test_email':
-		// Test email sending by SMTP gateway:
+	case 'test_email_smtp':
+	case 'test_email_php':
+		// Test email sending by SMTP/PHP gateway:
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'emailsettings' );
@@ -381,10 +386,17 @@ switch( $action )
 		$current_User->check_perm( 'emails', 'edit', true );
 
 		// Test email sending:
-		$smtp_messages = smtp_email_sending_test();
+		if( $action == 'test_email_smtp' )
+		{	// SMTP gateway:
+			$test_mail_messages = smtp_email_sending_test();
+		}
+		else
+		{	// PHP mail():
+			$test_mail_messages = php_email_sending_test();
+		}
 
 		// Initialize this var to display a result on the page:
-		$smtp_test_output = is_array( $smtp_messages ) ? implode( "<br />\n", $smtp_messages ) : '';
+		$test_mail_output = is_array( $test_mail_messages ) ? implode( "<br />\n", $test_mail_messages ) : '';
 		break;
 
 	case 'blocked_new':

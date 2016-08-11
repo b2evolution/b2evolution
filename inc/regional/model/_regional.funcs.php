@@ -448,7 +448,7 @@ function load_regions( country_ID, region_ID )
 	jQuery( '#<?php echo $prefix; ?>_rgn_ID' ).next().find( 'button' ).hide().next().show();
 	jQuery.ajax( {
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 	data: 'action=get_regions_option_list&page=edit&mode=load_all&ctry_id=' + country_ID + '&rgn_id=' + region_ID,
 	success: function( result )
 		{
@@ -469,7 +469,7 @@ function load_subregions( country_ID, region_ID )
 	jQuery( '#<?php echo $prefix; ?>_subrg_ID' ).next().find( 'button' ).hide().next().show();
 	jQuery.ajax( {
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 	data: 'action=get_subregions_option_list&page=edit&mode=load_all&ctry_id=' + country_ID + '&rgn_id=' + region_ID,
 	success: function( result )
 		{
@@ -489,7 +489,7 @@ function load_cities( country_ID, region_ID, subregion_ID )
 	jQuery( '#<?php echo $prefix; ?>_city_ID' ).next().find( 'button' ).hide().next().show();
 	jQuery.ajax( {
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 	data: 'action=get_cities_option_list&page=edit&ctry_id=' + country_ID + '&rgn_id=' + region_ID + '&subrg_id=' + subregion_ID,
 	success: function( result )
 		{

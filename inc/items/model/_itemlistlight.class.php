@@ -625,6 +625,8 @@ class ItemListLight extends DataObjectList2
 			$available_fields[] = 'assigned_user_ID';
 			$available_fields[] = 'pst_ID';
 			$available_fields[] = 'datedeadline';
+			$available_fields[] = 'ityp_ID';
+			$available_fields[] = 'status';
 			$available_fields[] = 'T_categories.cat_name';
 			$available_fields[] = 'T_categories.cat_order';
 			$order_by = gen_order_clause( $this->filters['orderby'], $this->filters['order'], $this->Cache->dbprefix, $this->Cache->dbIDname, $available_fields );

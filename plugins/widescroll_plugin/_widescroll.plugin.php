@@ -22,7 +22,7 @@ class widescroll_plugin extends Plugin
 	var $code = 'evo_widescroll';
 	var $name = 'Wide scroll';
 	var $priority = 100;
-	var $version = '6.7.0';
+	var $version = '6.7.5';
 	var $group = 'rendering';
 	var $number_of_installs = 1;
 
@@ -177,12 +177,12 @@ class widescroll_plugin extends Plugin
 		}
 
 		// Append css styles for tinymce editor area
-		global $tinymce_content_css;
+		global $tinymce_content_css, $app_version_long;
 		if( empty( $tinymce_content_css ) )
 		{ // Initialize first time
 			$tinymce_content_css = array();
 		}
-		$tinymce_content_css[] = get_require_url( $this->get_plugin_url().'tinymce_editor.css', true, 'css' );
+		$tinymce_content_css[] = get_require_url( $this->get_plugin_url().'tinymce_editor.css', true, 'css', $this->version.'+'.$app_version_long );
 
 		// Print toolbar on screen
 		return $this->DisplayCodeToolbar();
@@ -296,8 +296,8 @@ class widescroll_plugin extends Plugin
 		}
 
 		require_js( '#jquery#', 'blog' );
-		require_js( $this->get_plugin_url().'jquery.scrollwide.min.js', true );
-		require_css( $this->get_plugin_url().'jquery.scrollwide.css', true );
+		$this->require_js( 'jquery.scrollwide.min.js' );
+		$this->require_css( 'jquery.scrollwide.css' );
 	}
 
 
@@ -314,8 +314,8 @@ class widescroll_plugin extends Plugin
 		if( $ctrl == 'campaigns' && get_param( 'tab' ) == 'send' && $this->get_email_setting( 'email_apply_rendering' ) )
 		{	// Load this only on form to preview email campaign:
 			require_js( '#jquery#', 'blog' );
-			require_js( $this->get_plugin_url().'jquery.scrollwide.min.js', 'relative' );
-			require_css( $this->get_plugin_url().'jquery.scrollwide.css', 'relative' );
+			$this->require_js( 'jquery.scrollwide.min.js' );
+			$this->require_css( 'jquery.scrollwide.css' );
 		}
 	}
 

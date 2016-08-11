@@ -1854,6 +1854,10 @@ class Form extends Widget
 		}
 		else
 		{ // Standard form
+			if( $form_params['action'] == '' )
+			{ // Remove action attribute instead of an empty one which is not HTML4/5 compliant
+				unset( $form_params['action'] );
+			}
 			$r = "\n\n<form".get_field_attribs_as_string( $form_params ).">\n";
 		}
 
@@ -3713,6 +3717,7 @@ class Form extends Widget
 		}
 		else
 		{
+			unset( $field_params['tag'] );
 			$r .= '<input'.get_field_attribs_as_string( $field_params, $format_to_output ).' />';
 		}
 

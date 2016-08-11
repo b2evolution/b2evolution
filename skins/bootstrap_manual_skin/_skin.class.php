@@ -21,7 +21,7 @@ class bootstrap_manual_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.0';
+	var $version = '6.7.5';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -263,7 +263,7 @@ class bootstrap_manual_Skin extends Skin
 
 		if( $this->is_left_navigation_visible() )
 		{ // Include JS code for left navigation panel only when it is displayed:
-			require_js( $this->get_url().'left_navigation.js' );
+			$this->require_js( 'left_navigation.js' );
 		}
 	}
 

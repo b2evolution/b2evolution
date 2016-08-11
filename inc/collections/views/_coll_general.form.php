@@ -56,6 +56,40 @@ else
 	$Form->hidden( 'blog', $blog );
 }
 
+if( ! empty( $edited_Blog->confirmation ) )
+{	// Display a confirmation message:
+	$form_fieldset_begin = $Form->fieldset_begin;
+	$Form->fieldset_begin = str_replace( 'panel-default', 'panel-danger', $Form->fieldset_begin );
+	$Form->begin_fieldset( T_('Confirmation') );
+
+		echo '<h3 class="evo_confirm_delete__title">'.$edited_Blog->confirmation['title'].'</h3>';
+
+		if( ! empty( $edited_Blog->confirmation['messages'] ) )
+		{
+			echo '<div class="log_container delete_messages"><ul>';
+			foreach( $edited_Blog->confirmation['messages'] as $confirmation_message )
+			{
+				echo '<li>'.$confirmation_message.'</li>';
+			}
+			echo '</ul></div>';
+		}
+
+		echo '<p class="warning text-danger">'.T_('Do you confirm?').'</p>';
+		echo '<p class="warning text-danger">'.T_('THIS CANNOT BE UNDONE!').'</p>';
+
+		// Fake button to submit form by key "Enter" without autoconfirm this:
+		$Form->button_input( array(
+				'name'  => 'submit',
+				'style' => 'position:absolute;left:-10000px'
+			) );
+		// Real button to confirm:
+		$Form->button( array( 'submit', 'actionArray[update_confirm]', T_('I am sure!'), 'DeleteButton btn-danger' ) );
+		$Form->button( array( 'button', '', T_('CANCEL'), 'CancelButton', 'location.href="'.$admin_url.'?ctrl=coll_settings&tab=general&blog='.$edited_Blog->ID.'"' ) );
+
+	$Form->end_fieldset();
+	$Form->fieldset_begin = $form_fieldset_begin;
+}
+
 
 $Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type-panel' ) );
 	$collection_kinds = get_collection_kinds();
@@ -179,7 +213,7 @@ $Form->begin_fieldset( T_('Collection permissions').get_manual_link( 'collection
 	$Form->radio( 'blog_allow_access', $edited_Blog->get_setting( 'allow_access' ),
 			array(
 				array( 'public', T_('Everyone (Public Blog)') ),
-				array( 'users', T_('Logged-in users only') ),
+				array( 'users', T_('Community only (Logged-in users only)') ),
 				array( 'members',
 									'<span id="allow_access_members_advanced_title"'.( $edited_Blog->get( 'advanced_perms' ) ? '' : ' style="display:none"' ).'>'.T_('Members only').'</span>'.
 									'<span id="allow_access_members_simple_title"'.( $edited_Blog->get( 'advanced_perms' ) ? ' style="display:none"' : '' ).'>'.T_('Only the owner').'</span>',

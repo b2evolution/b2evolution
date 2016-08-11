@@ -21,7 +21,7 @@ class bootstrap_forums_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.0';
+	var $version = '6.7.5';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -126,6 +126,17 @@ class bootstrap_forums_Skin extends Skin
 						'defaultvalue' => 1,
 						'type' => 'checkbox',
 					),
+				   'workflow_display_mode' => array(
+					  'label'    => T_('Workflow column'),
+					  'note'     => '',
+					  'type'     => 'radio',
+					  'field_lines' => true,
+					  'options'  => array(
+						 array( 'status_and_author', T_('Display Status & Item Author') ),
+						 array( 'assignee_and_status', T_('Display Assignee (with Priority color coding) & Status') ),
+					  ),
+					  'defaultvalue' => 'status_and_author',
+				   ),
 				'section_forum_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -263,7 +274,7 @@ class bootstrap_forums_Skin extends Skin
 							array( 'page_top', sprintf( T_('"%s" container'), NT_('Page Top') ),  1 ),
 							array( 'menu',     sprintf( T_('"%s" container'), NT_('Menu') ),      0 ),
 							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ) ),
-						),
+					),
 				'section_access_end' => array(
 					'layout' => 'end_fieldset',
 				),

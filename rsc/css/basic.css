@@ -97,7 +97,6 @@ div.dev-blocks--belowtoolbar {
 }
 div#evo_toolbar {
   background-color: #d2d2d2;
-  color: ButtonText;
   border-bottom: 1px solid #aeaeae;
   text-align: left;
   margin: 0;
@@ -147,7 +146,6 @@ div#evo_toolbar .actions_right {
   width: 25ex;
   border: 1px solid #aeaeae;
   box-shadow: 2px 2px 4px -1px rgba(0, 0, 0, 0.25);
-  -webkit-transition: opacity 0.2s ease-in-out;
   transition: opacity 0.2s ease-in-out;
 }
 .evobar-menu ul li {
@@ -211,7 +209,6 @@ div#evo_toolbar .actions_right {
   display: inline-block;
   position: relative;
   background-color: #d2d2d2;
-  -webkit-transition: background-color 0.15s ease-out;
   transition: background-color 0.15s ease-out;
   padding: 6px 1ex;
   text-decoration: none;
@@ -226,13 +223,12 @@ div#evo_toolbar .actions_right {
 }
 .evobar-menu a:hover {
   background-color: #bfbfbf;
-  -webkit-transition: none;
   transition: none;
   text-decoration: none;
 }
 .evobar-menu a.disabled,
 .evobar-menu a.disabled:hover {
-  color: #999999;
+  color: #999;
 }
 .evobar-menu [class^=evobar-icon-] {
   margin-left: 6px;
@@ -291,7 +287,7 @@ div#evo_toolbar .actions_right {
   left: 0;
   width: 100%;
   text-align: center;
-  text-shadow: -1px -1px #000000, -2px 0 #000000, -1px 1px #000000, 0 2px #000000, 1px 1px #000000, 2px 0 #000000, 1px -1px #000000, 0 -2px #000000;
+  text-shadow: -1px -1px #000, -2px 0 #000, -1px 1px #000, 0 2px #000, 1px 1px #000, 2px 0 #000, 1px -1px #000, 0 -2px #000;
   color: #FFF;
   font-weight: bold;
 }
@@ -1001,7 +997,6 @@ table.widget_grid .note {
 }
 .widget_flow_blocks,
 table.widget_grid {
-  display: -webkit-box;
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;

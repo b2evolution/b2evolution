@@ -53,7 +53,12 @@ function init_MainList( $items_nb_limit )
 					) );
 			}
 
-			// else: we are in posts mode
+			if( $disp == 'posts' && $Blog->get_setting( 'show_post_types' ) != '' )
+			{	// Exclude items with types which are hidden by collection setting "Show post types":
+				$MainList->set_default_filters( array(
+						'types' => '-'.$Blog->get_setting( 'show_post_types' )
+					) );
+			}
 
 			// pre_dump( $MainList->default_filters );
 			$MainList->load_from_Request( false );
@@ -183,9 +188,9 @@ function init_inskin_editing()
 
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit', '&' );
 	}
-
-	// Restrict item status to max allowed by item collection:
-	$edited_Item->restrict_status_by_collection();
+	
+	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:Restrict item status to max allowed by item collection:
+	$edited_Item->restrict_status();
 
 	// Used in the edit form:
 
@@ -213,7 +218,7 @@ function init_inskin_editing()
 			'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'\' );',
 		);
 
-	$form_action = get_samedomain_htsrv_url().'item_edit.php';
+	$form_action = get_htsrv_url().'item_edit.php';
 }
 
 /**
@@ -315,7 +320,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 		if( isset($Blog) )
 
 		if( $FeaturedList->result_num_rows == 0 && $restrict_disp != 'front'
-			&& isset($Blog) 
+			&& isset($Blog)
 			&& $Blog->get_setting('disp_featured_above_list') )
 		{ // No Intro page was found, try to find a featured post instead:
 
@@ -2087,7 +2092,6 @@ function echo_status_dropdown_button_js( $type = 'post' )
  */
 function echo_autocomplete_tags()
 {
-	global $restapi_url;
 ?>
 	<script type="text/javascript">
 	function init_autocomplete_tags( selector )
@@ -2103,7 +2107,7 @@ function echo_autocomplete_tags()
 			}
 		}
 
-		jQuery( selector ).tokenInput( '<?php echo $restapi_url.'tags' ?>',
+		jQuery( selector ).tokenInput( '<?php echo get_restapi_url().'tags' ?>',
 		{
 			theme: 'facebook',
 			queryParam: 's',
@@ -2522,7 +2526,7 @@ function echo_onchange_goal_cat()
 			jQuery.ajax(
 			{
 				type: 'POST',
-				url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+				url: '<?php echo get_htsrv_url(); ?>async.php',
 				data: 'action=get_goals&cat_id=' + cat_ID + '&blogid=<?php echo $blog; ?>&crumb_itemgoal=<?php echo get_crumb( 'itemgoal' ); ?>',
 				success: function( result )
 				{
@@ -4225,7 +4229,7 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 				if( $nb_comments_moderation > 0 )
 				{
 					$comments_icon_params['style'] = 'color:#cc0099';
-					$comments_icon_params['title'] = T_('There are come comments awaiting moderation.');
+					$comments_icon_params['title'] = T_('There are some comments awaiting moderation.');
 				}
 			}
 
@@ -4245,7 +4249,7 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 		{	// If at least one meta comment exists
 			$item_Blog = & $Item->get_Blog();
 			$col .= '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$item_Blog->ID.'&amp;p='.$Item->ID.'&amp;comment_type=meta#comments">'
-					.get_icon( 'comments', 'imgtag', array( 'style' => 'color:#F00', 'title' => T_('Meta comments') ) )
+					.get_icon( 'comments', 'imgtag', array( 'style' => 'color:#5bc0de', 'title' => T_('Meta comments') ) )
 				.'</a> ';
 		}
 	}

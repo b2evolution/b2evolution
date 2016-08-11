@@ -40,7 +40,7 @@ $params = array_merge( array(
 		'excerpt_more_text'        => T_('more').' &raquo;',
 
 		// In case we display a full version of the post:
-		'content_start_full_text'  => '<div class="evo_post__full_text">',
+		'content_start_full_text'  => '<div class="evo_post__full_text clearfix">',
 		'content_end_full_text'    => '</div>',
 
 		'before_content_teaser'    => '',
@@ -49,7 +49,7 @@ $params = array_merge( array(
 		'after_content_extension'  => '',
 
 		'before_images'            => '<div class="evo_post_images raised">',
-		'before_image'             => '<figure class="evo_image_block">',
+		'before_image'             => '<figure class="evo_image_block raised">',
 		'before_image_legend'      => '<figcaption class="evo_image_legend">',
 		'after_image_legend'       => '</figcaption>',
 		'after_image'              => '</figure>',
@@ -302,9 +302,8 @@ switch( $content_mode )
 					'link_to'     => $params['more_link_to'],
 				) );
 
-			// Display images that are linked "after more" to this post:
-			if( ! empty($params['image_size']) && $more && $Item->has_content_parts($params) /* only if not displayed all images already */ )
-			{	
+			if( ! empty( $params['image_size'] ) && ( $more || $params['force_more'] ) && $Item->has_content_parts( $params ) /* only if not displayed all images already */ )
+			{	// Display images that are linked "after more" to this post:
 				$Item->images( array(
 						'before'              => $params['before_images'],
 						'before_image'        => '<figure class="evo_image_block raised">',

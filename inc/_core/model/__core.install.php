@@ -443,7 +443,7 @@ $schema_queries = array(
 			emlog_result    ENUM( 'ok', 'error', 'blocked', 'simulated' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ok',
 			emlog_subject   VARCHAR(255) DEFAULT NULL,
 			emlog_headers   TEXT DEFAULT NULL,
-			emlog_message   TEXT DEFAULT NULL,
+			emlog_message   MEDIUMTEXT DEFAULT NULL,
 			PRIMARY KEY     (emlog_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 

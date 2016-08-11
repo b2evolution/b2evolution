@@ -53,6 +53,8 @@ class GeneralSettings extends AbstractSettings
 		'email_service' => 'mail', // Preferred email service: 'mail', 'smtp'
 		'force_email_sending' => '0', // Force email sending
 
+		'sendmail_params' => 'return', // Sendmail additional params: 'return', 'from', 'custom'
+
 		'outbound_notifications_mode' => 'immediate', // 'immediate' is the safest mode for average installs (may be "off", "immediate" or "cron")
 		'notification_sender_email' => '', // notification emails will be sent from this email. The real default value is set in the constructor.
 		'notification_return_path' => '', // erroneous emails will be sent to this email address. The real default value is set in the constructor.
@@ -360,8 +362,8 @@ C message size exceeds',
 		}
 
 		// set those defaults which needs some global variables
-		$this->_defaults['notification_sender_email'] = $instance_name.'-noreply@'.preg_replace( '/^www\./i', '', $basehost );
-		$this->_defaults['notification_return_path'] = $instance_name.'-return@'.preg_replace( '/^www\./i', '', $basehost );
+		$this->_defaults['notification_sender_email'] = $instance_name.'-noreply@'.$basehost;
+		$this->_defaults['notification_return_path'] = $instance_name.'-return@'.$basehost;
 	}
 
 

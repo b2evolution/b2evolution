@@ -20,7 +20,7 @@ $default_ctrl = 'dashboard';
 /**
  * Minimum PHP version required for collections module to function properly
  */
-$required_php_version[ 'collections' ] = '5.0';
+$required_php_version[ 'collections' ] = '5.2';
 
 /**
  * Minimum MYSQL version required for collections module to function properly
@@ -1003,7 +1003,7 @@ class collections_Module extends Module
 	function handle_htsrv_action()
 	{
 		global $demo_mode, $current_User, $DB, $Session, $Messages;
-		global $UserSettings, $samedomain_htsrv_url;
+		global $UserSettings;
 
 		if( !is_logged_in() )
 		{ // user must be logged in
@@ -1043,6 +1043,14 @@ class collections_Module extends Module
 				// Check permission:
 				$LinkOwner->check_perm( 'edit', true );
 
+				if( $current_User->check_perm( 'files', 'edit' ) )
+				{	// If current User has permission to edit/delete files:
+					// Get number of objects where this file is attached to:
+					// TODO: attila>this must be handled with a different function
+					$file_links = get_file_links( $linked_File->ID, array( 'separator' => '<br />' ) );
+					$links_count = ( strlen( $file_links ) > 0 ) ? substr_count( $file_links, '<br />' ) + 1 : 0;
+				}
+
 				$confirmed = param( 'confirmed', 'integer', 0 );
 				if( $confirmed )
 				{ // Unlink File from Item:
@@ -1057,10 +1065,7 @@ class collections_Module extends Module
 					if( $current_User->check_perm( 'files', 'edit' ) )
 					{ // current User has permission to edit/delete files
 						$file_name = $linked_File->get_name();
-						// Get number of objects where this file is attahced to
-						// TODO: attila>this must be handled with a different function
-						$file_links = get_file_links( $linked_File->ID, array( 'separator' => '<br />' ) );
-						$links_count = ( strlen( $file_links ) > 0 ) ? substr_count( $file_links, '<br />' ) + 1 : 0;
+						$links_count--;
 						if( $links_count > 0 )
 						{ // File is linked to other objects
 							$Messages->add( sprintf( T_('File %s is still linked to %d other objects'), $file_name, $links_count ), 'note' );
@@ -1080,10 +1085,17 @@ class collections_Module extends Module
 				}
 				else
 				{ // Display confirm unlink/delete message
-					$delete_url = $samedomain_htsrv_url.'action.php?mname=collections&action=unlink&link_ID='.$edited_Link->ID.'&confirmed=1&crumb_collections_unlink='.get_crumb( 'collections_unlink' );
+					$delete_url = get_htsrv_url().'action.php?mname=collections&action=unlink&link_ID='.$edited_Link->ID.'&confirmed=1&crumb_collections_unlink='.get_crumb( 'collections_unlink' );
 					$ok_button = '<a href="'.$delete_url.'" class="btn btn-danger">'.T_('I am sure!').'</a>';
 					$cancel_button = '<a href="'.$redirect_to.'" class="btn btn-default">'.T_('CANCEL').'</a>';
-					$msg = sprintf( T_( 'You are about to unlink and delete the attached file from %s path.' ), $linked_File->get_root_and_rel_path() );
+					if( isset( $links_count ) && $links_count == 1 )
+					{	// If the file will be deleted after confirmation:
+						$msg = sprintf( T_( 'You are about to unlink and delete the attached file from %s path.' ), $linked_File->get_root_and_rel_path() );
+					}
+					else
+					{	// If the file will be only unlinked after confirmation because it is also attached to other objects:
+						$msg = sprintf( T_( 'You are about to unlink the attached file %s.' ), $linked_File->get_root_and_rel_path() );
+					}
 					$msg .= '<br />'.T_( 'This CANNOT be undone!').'<br />'.T_( 'Are you sure?' ).'<br /><br />'.$ok_button."\t".$cancel_button;
 					$Messages->add( $msg, 'error' );
 				}

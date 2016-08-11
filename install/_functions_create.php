@@ -441,7 +441,7 @@ function create_default_data()
 			(10, 'pps', 'Slideshow', 'pps', 'file_pps', 'external', 'registered'),
 			(11, 'zip', 'ZIP archive', 'application/zip', 'file_zip', 'external', 'registered'),
 			(12, 'php php3 php4 php5 php6', 'PHP script', 'application/x-httpd-php', 'file_php', 'text', 'admin'),
-			(13, 'css', 'Style sheet', 'text/css', '', 'text', 'registered'),
+			(13, 'css', 'Style sheet', 'text/css', 'file_document', 'text', 'registered'),
 			(14, 'mp3', 'MPEG audio file', 'audio/mpeg', 'file_sound', 'browser', 'registered'),
 			(15, 'm4a', 'MPEG audio file', 'audio/x-m4a', 'file_sound', 'browser', 'registered'),
 			(16, 'mp4 f4v', 'MPEG video', 'video/mp4', 'file_video', 'browser', 'registered'),
@@ -451,7 +451,8 @@ function create_default_data()
 			(20, 'swf', 'Flash video file', 'application/x-shockwave-flash', 'file_video', 'browser', 'registered'),
 			(21, 'webm', 'WebM video file', 'video/webm', 'file_video', 'browser', 'registered'),
 			(22, 'ogv', 'Ogg video file', 'video/ogg', 'file_video', 'browser', 'registered'),
-			(23, 'm3u8', 'M3U8 video file', 'application/x-mpegurl', 'file_video', 'browser', 'registered')
+			(23, 'm3u8', 'M3U8 video file', 'application/x-mpegurl', 'file_video', 'browser', 'registered'),
+			(24, 'xml', 'XML file', 'application/xml', 'file_www', 'browser', 'admin')
 		" );
 	task_end();
 
@@ -3042,12 +3043,20 @@ Hello
 	{ // Create the additional comments when we install all features
 		foreach( $additional_comments_item_IDs as $additional_comments_item_ID )
 		{
+			// Restrict comment status by parent item:
+			$comment_status = 'published';
+			$Comment = new Comment();
+			$Comment->set( 'item_ID', $additional_comments_item_ID );
+			$Comment->set( 'status', $comment_status );
+			$Comment->restrict_status( true );
+			$comment_status = $Comment->get( 'status' );
+
 			for( $i_user_ID = 1; $i_user_ID <= 7; $i_user_ID++ )
 			{ // Insert the comments from each user
 				$now = date( 'Y-m-d H:i:s' );
-				$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_author_user_ID, comment_author_IP,
+				$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_status, comment_author_user_ID, comment_author_IP,
 						comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status, comment_notif_flags )
-					VALUES( '.$DB->quote( $additional_comments_item_ID ).', '.$DB->quote( $i_user_ID ).', "127.0.0.1", '
+					VALUES( '.$DB->quote( $additional_comments_item_ID ).', '.$DB->quote( $comment_status ).', '.$DB->quote( $i_user_ID ).', "127.0.0.1", '
 						.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( T_('Hi!
 
 This is a sample comment that has been approved by default!
@@ -3136,6 +3145,13 @@ function create_demo_comment( $item_ID, $status )
 		$author_email = 'missb2@example.com';
 		$author_email_url = 'http://example.com';
 	}
+
+	// Restrict comment status by parent item:
+	$Comment = new Comment();
+	$Comment->set( 'item_ID', $item_ID );
+	$Comment->set( 'status', $status );
+	$Comment->restrict_status( true );
+	$status = $Comment->get( 'status' );
 
 	// Set demo content depending on status
 	if( $status == 'published' )

@@ -23,7 +23,7 @@ $default_ctrl = 'settings';
  * Minimum PHP version required for _core module to function properly.
  * This value can't be higher then the application required php version.
  */
-$required_php_version[ '_core' ] = '5.0';
+$required_php_version[ '_core' ] = '5.2';
 
 /**
  * Minimum MYSQL version required for _core module to function properly.
@@ -1724,7 +1724,7 @@ class _core_Module extends Module
 								'text' => T_('Profiles'),
 								'href' => '?ctrl=usersettings' ),
 							'registration' => array(
-								'text' => T_('Registration'),
+								'text' => T_('Registration & Login'),
 								'href' => '?ctrl=registration' ),
 							'invitations' => array(
 								'text' => T_('Invitations'),

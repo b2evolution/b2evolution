@@ -17,7 +17,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for sessions module to function properly
  */
-$required_php_version[ 'sessions' ] = '5.0';
+$required_php_version[ 'sessions' ] = '5.2';
 
 /**
  * Minimum MYSQL version required for sessions module to function properly

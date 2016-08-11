@@ -638,7 +638,7 @@ var downloadInterval = setInterval( function()
 					// Set global variable to auto define the FB autocomplete plugin field
 					$recipients_selected = array( array(
 							'id'    => $recipient_User->ID,
-							'title' => $recipient_User->login,
+							'login' => $recipient_User->login,
 						) );
 
 					init_tokeninput_js( 'blog' );
@@ -1098,7 +1098,7 @@ var downloadInterval = setInterval( function()
 			break;
 
 		case 'login':
-			global $Plugins, $transmit_hashed_password;
+			global $Plugins;
 
 			if( is_logged_in() )
 			{ // User is already logged in
@@ -1120,7 +1120,7 @@ var downloadInterval = setInterval( function()
 				// will have exited
 			}
 
-			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'loginurl', array( 'glue' => '&' ) ) );
 			}
@@ -1136,7 +1136,7 @@ var downloadInterval = setInterval( function()
 				header_redirect( $Blog->gen_blogurl(), false );
 			}
 
-			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'registerurl', array( 'glue' => '&' ) ) );
 			}
@@ -1156,7 +1156,7 @@ var downloadInterval = setInterval( function()
 				header_redirect( $Blog->gen_blogurl(), false );
 			}
 
-			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'lostpasswordurl', array( 'glue' => '&' ) ) );
 			}
@@ -1207,7 +1207,7 @@ var downloadInterval = setInterval( function()
 				// will have exited
 			}
 
-			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'activateinfourl', array( 'glue' => '&' ) ) );
 			}
@@ -1374,7 +1374,7 @@ var downloadInterval = setInterval( function()
 			$display_params = array();
 
 			// Restrict comment status by parent item:
-			$edited_Comment->restrict_status_by_item();
+			$edited_Comment->restrict_status();
 			break;
 
 		case 'useritems':
@@ -1479,6 +1479,12 @@ var downloadInterval = setInterval( function()
 				global $disp;
 				$disp = '404';
 			}
+			elseif( $Session->get( 'account_close_reason' ) )
+			{
+				global $account_close_reason;
+				$account_close_reason = $Session->get( 'account_close_reason' );
+				$Session->delete( 'account_close_reason' );
+			}
 			elseif( $Session->get( 'account_closing_success' ) )
 			{ // User has closed the account
 				global $account_closing_success;
@@ -1543,6 +1549,9 @@ var downloadInterval = setInterval( function()
 	$Timer->start( 'Skin:display_init' );
 	$Skin->display_init();
 	$Timer->pause( 'Skin:display_init' );
+
+	// Send the predefined cookies:
+	evo_sendcookies();
 
 	// Send default headers:
 	// See comments inside of this function:
@@ -1654,8 +1663,7 @@ function skin_include( $template_name, $params = array() )
 	global $Blog, $MainList, $Item;
 	global $Plugins, $Skin;
 	global $current_User, $Hit, $Session, $Settings;
-	global $skin_url, $htsrv_url, $htsrv_url_sensitive;
-	global $samedomain_htsrv_url, $secure_htsrv_url;
+	global $skin_url;
 	global $credit_links, $skin_links, $francois_links, $fplanque_links, $skinfaktory_links;
 	/**
 	* @var Log
@@ -1933,8 +1941,7 @@ function siteskin_include( $template_name, $params = array(), $force = false )
 
 	// Globals that may be needed by the template:
 	global $current_User, $Hit, $Session, $Settings;
-	global $skin_url, $htsrv_url, $htsrv_url_sensitive;
-	global $samedomain_htsrv_url, $secure_htsrv_url;
+	global $skin_url;
 	global $credit_links, $skin_links, $francois_links, $fplanque_links, $skinfaktory_links;
 	/**
 	* @var Log

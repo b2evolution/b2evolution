@@ -7397,7 +7397,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 11755, 'Creating collection user favorites table...' ) )
-	{ // part of 6.7.1-beta
+	{	// part of 6.7.1-beta
 		db_create_table( 'T_coll_user_favs', '
 				cufv_user_ID INT(10) UNSIGNED NOT NULL,
 				cufv_blog_ID INT(11) UNSIGNED NOT NULL,
@@ -7406,45 +7406,57 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		// If system user count is less than or equal to 10, Add favorites based on previous blog_favorite settings
 		load_funcs( 'tools/model/_system.funcs.php' );
 		$user_IDs = system_get_user_IDs();
-		$user_count = count( $user_IDs );
 
-		$SQL = new SQL();
-		$SQL->SELECT( '*' );
-		$SQL->FROM( 'T_blogs' );
-		$SQL->ORDER_BY( 'blog_ID' );
-		$blogs = $DB->get_results( $SQL->get() );
+		$colls_SQL = new SQL( 'Get ALL collections' );
+		$colls_SQL->SELECT( 'blog_ID, blog_owner_user_ID, blog_favorite' );
+		$colls_SQL->FROM( 'T_blogs' );
+		$colls_SQL->ORDER_BY( 'blog_ID' );
+		$colls = $DB->get_results( $colls_SQL->get() );
 
-		$SQL = 'INSERT INTO T_coll_user_favs ( cufv_blog_ID, cufv_user_ID ) VALUES ';
-		$values = array();
-
-		// Collection owners will automatically favorite their collection
-		foreach( $blogs as $blog )
-		{
-			$values[] = '( '.$blog->blog_ID.', '.$blog->blog_owner_user_ID.' )';
+		$user_colls_count = array();
+		$insert_values = array();
+		foreach( $colls as $coll )
+		{	// Collection owners will automatically favorite their collections:
+			if( ! isset( $user_colls_count[ $coll->blog_owner_user_ID ] ) )
+			{	// Initialize a count of favorite collections for each user:
+				$user_colls_count[ $coll->blog_owner_user_ID ] = 1;
+			}
+			if( $user_colls_count[ $coll->blog_owner_user_ID ] <= 7 )
+			{	// Make favorite only first 7 collections for each user:
+				$insert_values[] = '( '.$coll->blog_ID.', '.$coll->blog_owner_user_ID.' )';
+				$user_colls_count[ $coll->blog_owner_user_ID ]++;
+			}
 		}
 
-		if( $user_count <= 10 )
-		{
-			foreach( $blogs as $blog )
+		if( count( $user_IDs ) <= 10 )
+		{	// Make collections favorite for other users only if system has <= 10 users:
+			foreach( $user_IDs as $user_ID )
 			{
-				if( $blog->blog_favorite )
-				{ // currently has favorite status
-					foreach( $user_IDs as $user_ID )
-					{
-						$values[] = '( '.$blog->blog_ID.', '.$user_ID.' )';
+				if( ! isset( $user_colls_count[ $user_ID ] ) )
+				{	// Initialize a count of favorite collections for each user:
+					$user_colls_count[ $user_ID ] = 1;
+				}
+				foreach( $colls as $coll )
+				{
+					if( $user_colls_count[ $user_ID ] > 7 )
+					{	// Make favorite only first 7 collections for each user:
+						break;
+					}
+					if( $coll->blog_favorite && $user_ID != $coll->blog_owner_user_ID )
+					{	// Skip collection owner, because it has this collection as favorite automatically above:
+						$insert_values[] = '( '.$coll->blog_ID.', '.$user_ID.' )';
+						$user_colls_count[ $user_ID ]++;
 					}
 				}
 			}
 		}
 
-		$values = array_unique( $values );
-		if( $values )
-		{
-			$SQL .= implode( ', ', $values );
-			$DB->query( $SQL );
+		if( count( $insert_values ) )
+		{	// Insert rows of favorite collections per users in DB:
+			$DB->query( 'INSERT INTO T_coll_user_favs ( cufv_blog_ID, cufv_user_ID ) VALUES '.implode( ', ', $insert_values ) );
 		}
 
-		// Drop blog_favorite column
+		// Drop blog_favorite column:
 		db_drop_col( 'T_blogs', 'blog_favorite' );
 		upg_task_end();
 	}
@@ -7484,6 +7496,72 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 11770, 'Upgrading files table...' ) )
 	{ // part of 6.7.3-beta
 		db_add_index( 'T_files', 'file_creator_user_id', 'file_creator_user_id' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11775, 'Upgrading posts and comments statuses depeding on max allowed status by their collections...' ) )
+	{	// part of 6.7.4-stable
+		$BlogCache = & get_BlogCache();
+		$BlogCache->load_all( 'ID', 'ASC' );
+		foreach( $BlogCache->cache as $Blog )
+		{
+			$Blog->update_reduced_status_data();
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11780, 'Upgrading subscription settings of collections...' ) )
+	{	// part of 6.7.4-stable
+		$DB->query( 'REPLACE INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
+				SELECT cset_coll_ID, "allow_comment_subscriptions", 1
+				  FROM T_coll_settings
+				 WHERE cset_name = "allow_subscriptions"
+				   AND cset_value = 1' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11785, 'Upgrading email log table...' ) )
+	{	// part of 6.7.5-stable
+		$DB->query( 'ALTER TABLE T_email__log
+			MODIFY emlog_message MEDIUMTEXT DEFAULT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11790, 'Fix number of favorite collections per each user...' ) )
+	{	// part of 6.7.5-stable
+		// Get users which have more than 20 favorite collections:
+		$more_fav_coll_users_SQL = new SQL();
+		$more_fav_coll_users_SQL->SELECT( 'cufv_user_ID' );
+		$more_fav_coll_users_SQL->FROM( 'T_coll_user_favs' );
+		$more_fav_coll_users_SQL->GROUP_BY( 'cufv_user_ID' );
+		$more_fav_coll_users_SQL->HAVING( 'COUNT( cufv_blog_ID ) > 20' );
+		$more_fav_coll_user_IDs = $DB->get_col( $more_fav_coll_users_SQL->get() );
+
+		foreach( $more_fav_coll_user_IDs as $more_fav_coll_user_ID )
+		{
+			// Get first 7 collections which should be kept as favorite after upgrade:
+			$first_colls_SQL = new SQL();
+			$first_colls_SQL->SELECT( 'cufv_blog_ID' );
+			$first_colls_SQL->FROM( 'T_coll_user_favs' );
+			$first_colls_SQL->WHERE( 'cufv_user_ID = '.$more_fav_coll_user_ID );
+			$first_colls_SQL->ORDER_BY( 'cufv_blog_ID' );
+			$first_colls_SQL->LIMIT( '7' );
+			$first_coll_IDs = $DB->get_col( $first_colls_SQL->get() );
+
+			if( count( $first_coll_IDs ) )
+			{	// Delete collections from favorite list:
+				$DB->query( 'DELETE FROM T_coll_user_favs
+					WHERE cufv_user_ID = '.$more_fav_coll_user_ID.'
+					  AND cufv_blog_ID NOT IN ( '.$DB->quote( $first_coll_IDs ).' )' );
+			}
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11795, 'Upgrading posts table...' ) )
+	{	// part of 6.7.5-stable
+		$DB->query( 'ALTER TABLE T_items__item
+			MODIFY post_excerpt_autogenerated  TINYINT(1) NOT NULL DEFAULT 1' );
 		upg_task_end();
 	}
 

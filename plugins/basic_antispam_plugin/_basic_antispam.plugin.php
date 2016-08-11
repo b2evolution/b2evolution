@@ -32,7 +32,7 @@ class basic_antispam_plugin extends Plugin
 	var $name = 'Basic Antispam';
 	var $code = 'b2evBAspm';
 	var $priority = 60;
-	var $version = '6.7.0';
+	var $version = '6.7.5';
 	var $author = 'The b2evo Group';
 	var $group = 'antispam';
 	var $number_of_installs = 1;

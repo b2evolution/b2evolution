@@ -42,6 +42,8 @@ global $Blog;
 
 global $dispatcher;
 
+global $basehost;
+
 $action = param_action( 'list' );
 $orig_action = $action; // Used to know what action is called really
 
@@ -692,8 +694,8 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
-		// Restrict item status to max allowed by item collection:
-		$edited_Item->restrict_status_by_collection();
+		// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:
+		$edited_Item->restrict_status();
 
 		$post_comment_status = $edited_Item->get( 'comment_status' );
 		$post_extracats = postcats_get_byID( $p ); // NOTE: dh> using $edited_Item->get_Chapters here instead fails (empty list, since no postIDlist).
@@ -757,9 +759,6 @@ switch( $action )
 		$edited_Item->set( 'status', $post_status );
 		$edited_Item->set( 'main_cat_ID', $post_category );
 		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
-
-		// Restrict item status to max allowed by item collection:
-		$edited_Item->restrict_status_by_collection( true );
 
 		// Set object params:
 		$edited_Item->load_from_Request( /* editing? */ ($action == 'create_edit' || $action == 'create_link'), /* creating? */ true );
@@ -870,9 +869,7 @@ switch( $action )
 		if( $edited_Item->status == 'published' &&
 		    ! strpos( $redirect_to, 'tab=tracker' ) &&
 		    ! strpos( $redirect_to, 'tab=manual' ) )
-		{	// fp> I noticed that after publishing a new post, I always want to see how the blog looks like
-			// If anyone doesn't want that, we can make this optional...
-			// sam2kb> Please make this optional, this is really annoying when you create more than one post or when you publish draft images created from FM.
+		{	// Where to go after publishing the post?
 			// yura> When a post is created from "workflow" or "manual" we should display a post list
 
 			// Where do we want to go after publishing?
@@ -892,23 +889,22 @@ switch( $action )
 			}
 		}
 
-		if( ( $redirect_to === NULL ) ||
-			( ( $allow_redirects_to_different_domain != 'always' ) && ( ! url_check_same_domain( $baseurl, $redirect_to ) ) ) )
-		{ // The redirect url was set to NULL ( $blog_redirect_setting == 'no' ) or the redirect_to url is outside of the base domain
-			if( $redirect_to !== NULL )
-			{ // Add messages which explain the different target of the redirect
-				$Messages->add( sprintf( 'We did not automatically redirect you to [%s] because it\'s on a different domain.', $redirect_to ) );
-			}
-			header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
+		if( $redirect_to !== NULL ) 
+		{	// The redirect url was NOT set to NULL ( $blog_redirect_setting == 'no' ) 
+	 
+			// TRY TO REDIRECT / EXIT
+			header_redirect( $redirect_to, 303, false, true /* RETURN if forbidden */ );
+
+			// If we have not Exited yet, it means the redirect was refused because it was on a different domain
 		}
 
-		// REDIRECT / EXIT
-		header_redirect( url_add_param( $redirect_to, 'highlight='.$edited_Item->ID, '&' ) );
-		// Switch to list mode:
-		// $action = 'list';
-		//init_list_mode();
-		break;
+		// Set highlight
+		$Session->set( 'highlight_id', $edited_Item->ID );
 
+		// REDIRECT / EXIT:
+		header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
+		/* EXITED */
+		break;
 
 	case 'update_edit':
 	case 'update':
@@ -956,9 +952,6 @@ switch( $action )
 		// UPDATE POST:
 		// Set the params we already got:
 		$edited_Item->set( 'status', $post_status );
-
-		// Restrict item status to max allowed by item collection:
-		$edited_Item->restrict_status_by_collection( true );
 
 		if( $isset_category )
 		{ // we change the categories only if the check was succesful
@@ -1050,10 +1043,7 @@ switch( $action )
 			break;
 		}
 
-		/* fp> I noticed that after publishing a new post, I always want
-		 *     to see how the blog looks like. If anyone doesn't want that,
-		 *     we can make this optional...
-		 */
+		// Where to go after publishing the post?
 		if( $edited_Item->status == 'redirected' ||
 		    strpos( $redirect_to, 'tab=tracker' ) )
 		{ // We should show the posts list if:
@@ -1095,20 +1085,20 @@ switch( $action )
 			$redirect_to = NULL;
 		}
 
-		if( ( $redirect_to === NULL ) ||
-			( ( $allow_redirects_to_different_domain != 'always' ) && ( ! url_check_same_domain( $baseurl, $redirect_to ) ) ) )
-		{ // The redirect url was set to NULL ( $blog_redirect_setting == 'no' ) or the redirect_to url is outside of the base domain
-			if( $redirect_to !== NULL )
-			{ // Add messages which explain the different target of the redirect
-				$Messages->add( sprintf( 'We did not automatically redirect you to [%s] because it\'s on a different domain.', $redirect_to ) );
-			}
-			// Set highlight
-			$Session->set( 'highlight_id', $edited_Item->ID );
-			header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
+		if( $redirect_to !== NULL ) 
+		{	// The redirect url was NOT set to NULL ( $blog_redirect_setting == 'no' ) 
+	 
+			// TRY TO REDIRECT / EXIT
+			header_redirect( $redirect_to, 303, false, true /* RETURN if forbidden */ );
+
+			// If we have not Exited yet, it means the redirect was refused because it was on a different domain
 		}
 
-		// REDIRECT / EXIT
-		header_redirect( $redirect_to, 303 );
+		// Set highlight
+		$Session->set( 'highlight_id', $edited_Item->ID );
+
+		// REDIRECT / EXIT:
+		header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
 		/* EXITED */
 		break;
 
@@ -1686,7 +1676,7 @@ switch( $action )
 			if( $Blog->get_setting( 'in_skin_editing' ) && ( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) || get_param( 'p' ) > 0 ) )
 			{ // Show 'In skin' link if Blog setting 'In-skin editing' is ON and User has a permission to publish item in this blog
 				$mode_inskin_url = url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;'.$tab_switch_params );
-				$mode_inskin_action = get_samedomain_htsrv_url().'item_edit.php';
+				$mode_inskin_action = get_htsrv_url().'item_edit.php';
 				$AdminUI->global_icon( T_('In skin editing'), 'edit', $mode_inskin_url,
 						' '.T_('In skin editing'), 4, 3, array(
 						'style' => 'margin-right: 3ex',

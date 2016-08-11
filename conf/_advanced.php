@@ -9,6 +9,7 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+
 /**
  * Display debugging informations?
  *
@@ -34,8 +35,8 @@ $debug_jslog = 'pwd';
  */
 $debug_pwd = '';
 
-// Most of the time you'll want to see all errors, including notices:
-// b2evo should run without any notices! (plugins too!)
+// Most of the time you'll want to see all errors, including notices, to alert you on potential issues:
+// b2evo should run without any notices! (same for plugins!)
 error_reporting( E_ALL | E_STRICT );
 /**
  * Do we want to display errors, even when not in debug mode?
@@ -57,7 +58,7 @@ $dev_menu = 0;
 
 
 // If you get blank pages or missing thumbnail images, PHP may be crashing because it doesn't have enough memory.
-// The default is 8 MB (in PHP < 5.2) and 128 MB (in PHP > 5.2)
+// The default is 128 MB (in PHP > 5.2)
 // Try uncommmenting the following line:
 // @ini_set( 'memory_limit', '128M' );
 
@@ -77,17 +78,20 @@ $log_app_errors = 1;
 
 
 /**
- * Allows to force a timezone if PHP>=5.1
+ * Allows to force the timezone used by PHP (in case it's not properly configured in php.ini)
  * See: http://b2evolution.net/man/date_default_timezone-forcing-a-timezone
  */
 $date_default_timezone = '';
 
+
 /**
- * Thumbnail size definitions.
+ * Thumbnail/Image sizes
  *
- * NOTE: this gets used for general resizing, too. E.g. in the coll_avatar_Widget.
+ * This is used for resizing images to various sizes
  *
- * type, width, height, quality, percent of blur effect
+ * For each size: name => array( type, width, height, quality, percent of blur effect )
+ *
+ * @global array
  */
 $thumbnail_sizes = array(
 			'fit-1280x720' => array( 'fit', 1280, 720, 85 ),
@@ -130,6 +134,7 @@ $thumbnail_sizes = array(
  *  - Do not allow update of files in the file manager
  *  - Do not allow changes to the 'demouser' and 'admin' account/group
  *  - Blog media directories can only be configured to be inside of {@link $media_path}
+ *
  * @global boolean Default: false
  */
 $demo_mode = false;
@@ -168,7 +173,7 @@ $minimum_comment_interval = 30;
 /**
  * Check antispam blacklist for private messages.
  *
- * Do you want to check the antispam blocklist when a message form is submitted?
+ * Do you want to check the antispam blacklist when a message form is submitted?
  *
  * @global boolean $antispam_on_message_form
  */
@@ -179,25 +184,30 @@ $antispam_on_message_form = 1;
  * By default images get copied into b2evo cache without resampling if they are smaller
  * than requested thumbnails.
  *
- * Althought, if you want to use the BeforeThumbCreate event (Watermark plugin),
- * this should be set to 'true' in order to process smaller images.
+ * If you want to use the BeforeThumbCreate event (Watermark plugin), this should be set to 'true' 
+ * to make sure that smaller images are also processed.
  *
  * @global boolean Default: false
  */
 $resample_all_images = false;
 
 
-// Get hostname out of baseurl
+// Decompose the baseurl
 // YOU SHOULD NOT EDIT THIS unless you know what you're doing
-if( preg_match( '#^(https?://(.+?)(:(.+?))?)(/.*)$#', $baseurl, $matches ) )
+if( preg_match( '#^((https?)://(www\.)?(.+?)(:.+?)?)(/.*)$#', $baseurl, $matches ) )
 {
 	$baseurlroot = $matches[1]; // no ending slash!
 	// echo "baseurlroot=$baseurlroot <br />";
-	$basehost = $matches[2];
+
+	$baseprotocol = $matches[2];
+
+	$basehost = $matches[4]; // Will NEVER include "www." at the beginning.
 	// echo "basehost=$basehost <br />";
-	$baseport =  $matches[4];
+
+	$baseport =  $matches[5]; // Will start with ":" if a port is specified.
 	// echo "baseport=$baseport <br />";
-	$basesubpath =  $matches[5];
+
+	$basesubpath =  $matches[6];
 	// echo "basesubpath=$basesubpath <br />";
 }
 else
@@ -207,27 +217,11 @@ else
 
 
 /**
- * Base domain of b2evolution.
- *
- * By default we try to extract it automagically from $basehost (itself extracted from $baseurl)
- * But you may need to adjust this manually.
- *
- * @todo does anyone have a clean way of handling stuff like .co.uk ?
- *
- * @global string
- */
-$basedomain = preg_replace( '/^( .* \. )? (.+? \. .+? )$/xi', '$2', $basehost );
-
-
-/**
  * Short name of this system (will be used for cookies and notification emails).
  *
- * Change this only if you install mutliple b2evolutions on the same website.
+ * Change this only if you install mutliple b2evolution instances on the same server or same domain.
  *
- * WARNING: don't play with this or you'll have tons of cookies sent away and your
- * readers surely will complain about it!
- *
- * You can change the notification email address alone a few lines below.
+ * WARNING: don't play with this or you'll have tons of cookies sent away and your users will have issues!
  *
  * @global string Default: 'b2evo'
  */
@@ -247,7 +241,7 @@ $db_config['show_errors'] = true;
 /**
  * Halt on MySQL errors? (default: true)
  *
- * Setting this to false is not recommended,
+ * Setting this to false is NOT recommended,
  */
 $db_config['halt_on_error'] = true;
 
@@ -263,13 +257,13 @@ $db_config['table_options'] = ''; 	// Low ranking MySQL hosting compatibility De
 /**
  * Use transactions in DB?
  *
- * You need to use InnoDB in order to enable this.
+ * b2evolution REQUIRES transactions to function properly. This also means InnoDB is required.
  */
 $db_config['use_transactions'] = true;
 
 
 /**
- * Display elements that are different on each request (Page processing time, ..)
+ * When debugging obhandler functions, we may need to stop polluting the output with debug info.
  *
  * Set this to true to prevent displaying minor changing elements (like time) in order not to have artificial content changes
  *
@@ -281,9 +275,11 @@ $obhandler_debug = false;
 // ** Cookies **
 
 /**
- * This is the path that will be associated to cookies.
+ * This is the path that will be associated with cookies.
  *
  * That means cookies set by this b2evo install won't be seen outside of this path on the domain below.
+ *
+ * This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function get_cookie_path()
  *
  * @global string Default: preg_replace( '#https?://[^/]+#', '', $baseurl )
  */
@@ -294,44 +290,44 @@ $cookie_path = preg_replace( '#https?://[^/]+#', '', $baseurl );
  *
  * That means cookies set by this b2evo install won't be seen outside of this domain.
  *
- * We'll take {@link $basehost} by default (the leading dot includes subdomains), but
- * when there's no dot in it, at least Firefox will not set the cookie. The best
- * example for having no dot in the host name is 'localhost', but it's the case for
- * host names in an intranet also.
+ * This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function get_cookie_domain()
+ *
+ * We'll take {@link $basehost} by default (the leading dot includes subdomains), but if there is no dot in it, at least (old?) Firefox will not set the cookie. 
+ * The most common example for having no dot in the host name is 'localhost', but it's the case for host names in an intranet also.
  *
  * Note: ".domain.com" cookies will be sent to sub.domain.com too.
  * But, see http://www.faqs.org/rfcs/rfc2965:
- *	"If multiple cookies satisfy the criteria above, they are ordered in
- *	the Cookie header such that those with more specific Path attributes
- *	precede those with less specific.  Ordering with respect to other
- *	attributes (e.g., Domain) is unspecified."
+ *	"If multiple cookies satisfy the criteria above, they are ordered in the Cookie header such that those with more specific Path attributes
+ *	precede those with less specific. Ordering with respect to other attributes (e.g., Domain) is unspecified."
  *
- * @global string Default: ( strpos($basehost, '.') ) ? '.'. $basehost : '';
+ * @global string
  */
 if( strpos($basehost, '.') === false )
-{	// localhost or windows machine name:
+{	// "localhost" or windows machine name:
 	$cookie_domain = '';
 }
+else
+{
+	$cookie_domain = $basehost;
+}
+
+/* The following is no longer needed because we already strip away "www." from $basehost, so now in all cases the cookie domain should just be the base domain
+
 elseif( preg_match( '~^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$~i', $basehost ) )
 {	// The basehost is an IP address, use the basehost as it is:
 	$cookie_domain = $basehost;
 }
 else
-{	// Keep the part of the basehost after the www. :
-	$cookie_domain = preg_replace( '/^(www\. )? (.+)$/xi', '.$2', $basehost );
-
-	// When hosting multiple domains (not just subdomains) on a single instance of b2evo,
-	// you may want to try this:
-	// $cookie_domain = '.'.$_SERVER['HTTP_HOST'];
-	// or this: -- Have a cookie domain of 2 levels only, base on current basehost.
-	// $cookie_domain = preg_replace( '/^( .* \. )? (.+? \. .+? )$/xi', '.$2', $basehost );
-	// fp> pb with domains like .co.uk !?
+{	
+	// Keep the part of the basehost after the www. :
+	//	$cookie_domain = preg_replace( '/^(www\. )? (.+)$/xi', '.$2', $basehost );
 }
+*/
 
 /**
  * Name used for session cookies.
  */
-$cookie_session = str_replace( '.', '_', 'session_'.$instance_name.'_'.$cookie_domain );
+$cookie_session = 'session_'.$instance_name;
 
 /**
  * Names used for other cookies.
@@ -373,6 +369,7 @@ $cookie_expired = time() - 86400;
  * @global int $crumb_expires
  */
 $crumb_expires = 7200;
+
 
 /**
  * Page cache expiration time
@@ -451,6 +448,8 @@ $misc_inc_path = $inc_path.'_misc/';	   	// You should not need to change this
  * Note: This folder NEEDS to by accessible through HTTP.
  *
  * @global string $htsrv_subdir
+ * @global string $htsrv_path
+ * @global string $htsrv_url This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function get_htsrv_url( false )
  */
 $htsrv_subdir = 'htsrv/';                // Subdirectory relative to base
 $htsrv_path = $basepath.$htsrv_subdir;   // You should not need to change this
@@ -463,7 +462,7 @@ $htsrv_url = $baseurl.$htsrv_subdir;     // You should not need to change this
  * SSL for login, registration and profile updates (where passwords are
  * involved), but not for the whole htsrv scripts.
  *
- * @global string
+ * @global string $htsrv_url_sensitive This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function get_htsrv_url( true )
  */
 $htsrv_url_sensitive = $htsrv_url;
 
@@ -476,9 +475,12 @@ $xmlsrv_url = $baseurl.$xmlsrv_subdir;   // You should not need to change this
 
 /**
  * URL of the REST API.
- * @global string $restapi_url
+ *
+ * @global string $restapi_script
+ * @global string $restapi_url This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function get_restapi_url()
  */
-$restapi_url = $htsrv_url.'rest.php?api_version=1&api_request='; // You should not need to change this
+$restapi_script = 'rest.php?api_version=1&api_request='; // You should not need to change this
+$restapi_url = $htsrv_url.$restapi_script; // You should not need to change this
 
 /**
  * Location of the RSC folder.
@@ -486,6 +488,9 @@ $restapi_url = $htsrv_url.'rest.php?api_version=1&api_request='; // You should n
  * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
  *
  * @global string $rsc_subdir
+ * @global string $rsc_path
+ * @global string $rsc_url This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function Blog->get_local_rsc_url()
+ * @global string $rsc_uri
  */
 $rsc_subdir = 'rsc/';                    // Subdirectory relative to base
 $rsc_path = $basepath.$rsc_subdir;       // You should not need to change this
@@ -498,6 +503,8 @@ $rsc_uri = $basesubpath.$rsc_subdir;
  * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
  *
  * @global string $skins_subdir
+ * @global string $skins_path
+ * @global string $skins_url This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function Blog->get_local_skins_url()
  */
 $skins_subdir = 'skins/';                // Subdirectory relative to base
 $skins_path = $basepath.$skins_subdir;   // You should not need to change this
@@ -560,6 +567,8 @@ $locales_path = $basepath.$locales_subdir;  // You should not need to change thi
  * Exact requirements depend on installed plugins.
  *
  * @global string $plugins_subdir
+ * @global string $plugins_path
+ * @global string $plugins_url This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function Blog->get_local_plugins_url()
  */
 $plugins_subdir = 'plugins/';            // Subdirectory relative to base
 $plugins_path = $basepath.$plugins_subdir;  // You should not need to change this
@@ -601,6 +610,8 @@ $cache_path = $basepath.$cache_subdir; // You should not need to change this
  * Exact requirements depend on $public_access_to_media .
  *
  * @global string $media_subdir
+ * @global string $media_path
+ * @global string $media_url This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function Blog->get_local_media_url()
  */
 $media_subdir = 'media/';                   // Subdirectory relative to base
 $media_path = $basepath.$media_subdir;      // You should not need to change this
@@ -817,21 +828,11 @@ $failed_logins_lockout = 600; // 10 minutes
  *
  * Possible values:
  *  - 'always' : Always allow redirects to a different domain
- *  - 'all_collections_and_redirected_posts' ( Default ): Allow redirects to all collection domains, ALL SUB-DOMAINS of $basedomain or redirects of posts with redirected status
+ *  - 'all_collections_and_redirected_posts' ( Default ): Allow redirects to all collection domains, ALL SUB-DOMAINS of $basehost or redirects of posts with redirected status
  *  - 'only_redirected_posts' : Allow redirects to a different domain only in case of posts with redirected status
  *  - 'never' : Force redirects to the same domain in all of the cases, and never allow redirect to a different domain
  */
 $allow_redirects_to_different_domain = 'all_collections_and_redirected_posts';
-
-
-/**
- * Additional params you may want to pass to sendmail when sending emails
- * For setting the return-path, some Linux servers will require -r, others will require -f.
- * Allowed placeholders: $from-address$ , $return-address$
- *
- * @global string $sendmail_additional_params
- */
-$sendmail_additional_params = '-r $return-address$';
 
 
 /**
@@ -844,7 +845,7 @@ $email_send_simulate_only = false;
 
 
 /**
- * Would you like to use CDNs as definied in the array $library_cdn_urls below 
+ * Would you like to use CDNs as definied in the array $library_cdn_urls below
  * or do you prefer to load all files from the local source as defined in the array $library_local_urls below?
  *
  * @global boolean $use_cdns

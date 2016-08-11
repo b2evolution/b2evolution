@@ -34,7 +34,7 @@ class google_maps_plugin extends Plugin
 	var $name = 'Google Maps';
 	var $code = 'evo_Gmaps';
 	var $priority = 50;
-	var $version = '6.7.0';
+	var $version = '6.7.5';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -210,7 +210,7 @@ class google_maps_plugin extends Plugin
 
 		$params['Form']->switch_layout( 'linespan' );
 
-		require_js( '#jqueryUI#' );
+		require_js( '#jqueryUI#', 'blog' );
 
 		$lat = $Item->get_setting('latitude');
 		$lng = $Item->get_setting('longitude');

@@ -62,7 +62,7 @@ jQuery( '#city_ctry_ID' ).change( function ()
 {	// Load option list with regions for seleted country
 	jQuery.ajax( {
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 	data: 'action=get_regions_option_list&page=edit&mode=load_subregions&ctry_id=' + jQuery( this ).val(),
 	success: function( result )
 		{
@@ -84,7 +84,7 @@ function load_subregions( region_ID )
 {	// Load option list with sub-regions for seleted region
 	jQuery.ajax( {
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 	data: 'action=get_subregions_option_list&page=edit&rgn_id=' + region_ID,
 	success: function( result )
 		{

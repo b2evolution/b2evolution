@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $secure_htsrv_url, $Blog, $account_closing_success;
+global $Blog, $account_closing_success, $account_close_reason;
 
 if( ! empty( $account_closing_success ) )
 { // Display a bye message after user closed an account
@@ -23,7 +23,7 @@ if( ! empty( $account_closing_success ) )
 else
 { // Display a form to close an account
 
-	$Form = new Form( $secure_htsrv_url.'login.php' );
+	$Form = new Form( get_htsrv_url( true ).'login.php' );
 
 	$Form->begin_form( 'inskin' );
 
@@ -48,21 +48,24 @@ else
 		$Form->radio_input( 'account_close_type', '', $reasons_options, '<b>'.T_('Reason').'</b>', array( 'lines' => true ) );
 	}
 
-	$Form->textarea_input( 'account_close_reason', '', 6, NULL, array( 'cols' => 40, 'maxlength' => 255 ) );
-	echo '<div id="character_counter" class="section_requires_javascript">';
-	echo '<div id="characters_left_block"></div>';
+	$Form->textarea_input( 'account_close_reason', $account_close_reason, 3, NULL, array( 'cols' => 40, 'maxlength' => 255 ) );
+	$Form->info_field( NULL, '%s characters left', array( 'class' => 'section_requires_javascript dimmed', 'name' => 'character_counter' ) );
 ?>
 	<script type="text/javascript">
 		<?php echo 'var counter_text = "'.T_( '%s characters left' ).'";';?>
-		jQuery("#characters_left_block").html( counter_text.replace( "%s", 255 ) );
-		jQuery("#account_close_reason").bind( "keyup", function(event)
+		var characterCounter = jQuery("#ffield_character_counter > div");
+		var otherReason = jQuery("#account_close_reason");
+		jQuery("#ffield_account_close_reason").css( { marginBottom: 0 } );
+		jQuery("div.form-group.radio-group").css( { marginBottom: 0 } );
+		characterCounter.html( counter_text.replace( "%s", 255 - otherReason[0].value.length ) );
+		otherReason.bind( "keyup", function(event)
 		{
 			var char_left = 255 - this.value.length;
 			if( char_left < 0 )
 			{
 				char_left = 0;
 			}
-			jQuery("#characters_left_block").html( counter_text.replace( "%s", char_left ) );
+			characterCounter.html( counter_text.replace( "%s", char_left ) );
 		} );
 	</script>
 	<noscript>

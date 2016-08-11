@@ -21,7 +21,7 @@ global $edited_Message;
 global $edited_Thread;
 global $creating_success;
 
-global $DB, $action, $Plugins, $restapi_url;
+global $DB, $action, $Plugins;
 
 global $Blog;
 
@@ -151,7 +151,7 @@ jQuery( document ).ready( function()
 } );
 
 jQuery( '#thrd_recipients' ).tokenInput(
-	'<?php echo $restapi_url; ?>users/recipients',
+	'<?php echo get_restapi_url(); ?>users/recipients',
 	{
 		theme: 'facebook',
 		queryParam: 'q',

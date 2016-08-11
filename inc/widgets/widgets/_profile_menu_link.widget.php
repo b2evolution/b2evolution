@@ -80,7 +80,12 @@ class profile_menu_link_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		global $admin_url;
+
 		load_funcs( 'files/model/_image.funcs.php' );
+
+		// Try to get collection that is used for messages on this site:
+		$msg_Blog = & get_setting_Blog( 'msg_blog_ID' );
 
 		$r = array_merge( array(
 				'profile_picture_size' => array(
@@ -92,11 +97,15 @@ class profile_menu_link_Widget extends ComponentWidget
 				),
 				'blog_ID' => array(
 					'label' => T_('Collection ID'),
-					'note' => T_('Leave empty for current collection.'),
+					'note' => T_('Leave empty for current collection.')
+						.( $msg_Blog ? ' <span class="red">'.sprintf( T_('The site is <a %s>configured</a> to always use collection %s for profiles/messaging functions.'),
+								'href="'.$admin_url.'?ctrl=collections&amp;tab=site_settings"',
+								'<b>'.$msg_Blog->get( 'name' ).'</b>' ).'</span>' : '' ),
 					'type' => 'integer',
 					'allow_empty' => true,
 					'size' => 5,
 					'defaultvalue' => '',
+					'disabled' => $msg_Blog ? 'disabled' : false,
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -132,7 +141,7 @@ class profile_menu_link_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $current_User, $disp;
+		global $current_User, $disp, $Blog;
 
 		if( ! is_logged_in() )
 		{ // Only logged in users can see this menu item
@@ -141,28 +150,43 @@ class profile_menu_link_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
+		$blog_ID = intval( $this->disp_params['blog_ID'] );
+		if( $blog_ID > 0 )
+		{	// Try to use collection from widget setting:
+			$BlogCache = & get_BlogCache();
+			$current_Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+		}
+
+		if( empty( $current_Blog ) )
+		{	// Use current collection if collection is not defined in setting or it doesn't exist in DB:
+			$current_Blog = $Blog;
+		}
+
+		if( empty( $current_Blog ) )
+		{	// Don't use this widget without current collection:
+			return false;
+		}
+
 		// Default link class
 		$link_class = $this->disp_params['link_default_class'];
 
 		// set allow blockcache to 0, this way make sure block cache is never allowed for menu items that can be selected
 		$this->disp_params[ 'allow_blockcache' ] = 0;
 
-		if( $disp == 'user' )
-		{ // The current page is currently displaying the user profile:
-			// Let's display it as selected
-			$link_class = $this->disp_params['link_selected_class'];
-		}
+		// Higlight current menu item only when it is linked to current collection and user profile page is displaying currently:
+		$highlight_current = ( $current_Blog->ID == $Blog->ID && $disp == 'user' );
 
 		echo $this->disp_params['block_start'];
 		echo $this->disp_params['block_body_start'];
 		echo $this->disp_params['list_start'];
 
-		if( $link_class == $this->disp_params['link_selected_class'] )
-		{
+		if( $highlight_current )
+		{	// Use template and class to highlight current menu item:
+			$link_class = $this->disp_params['link_selected_class'];
 			echo $this->disp_params['item_selected_start'];
 		}
 		else
-		{
+		{	// Use normal template:
 			echo $this->disp_params['item_start'];
 		}
 
@@ -171,15 +195,15 @@ class profile_menu_link_Widget extends ComponentWidget
 				'display_bubbletip' => false,
 				'thumb_size'        => $this->disp_params['profile_picture_size'],
 				'link_class'        => $link_class,
-				'blog_ID'           => intval( $this->disp_params['blog_ID'] ),
+				'blog_ID'           => $current_Blog->ID,
 			) );
 	
-		if( $link_class == $this->disp_params['link_selected_class'] )
-		{
+		if( $highlight_current )
+		{	// Use template to highlight current menu item:
 			echo $this->disp_params['item_selected_end'];
 		}
 		else
-		{
+		{	// Use normal template:
 			echo $this->disp_params['item_end'];
 		}
 

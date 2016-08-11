@@ -46,6 +46,19 @@ $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
 
 	$Form->checkbox( 'disp_featured_above_list', $edited_Blog->get_setting( 'disp_featured_above_list' ), T_('Featured post above list'), T_('Check to display a featured post above the list (as long as no Intro post is displayed.') );
 
+	$ItemTypeCache = & get_ItemTypeCache();
+	$enabled_item_types = $edited_Blog->get_enabled_item_types( 'post' );
+	$show_post_types_options = array();
+	$show_post_types_values = explode( ',', $edited_Blog->get_setting( 'show_post_types' ) );
+	foreach( $enabled_item_types as $enabled_item_type_ID )
+	{
+		if( ( $enabled_ItemType = & $ItemTypeCache->get_by_ID( $enabled_item_type_ID, false, false ) ) )
+		{
+			$show_post_types_options[] = array( 'show_post_types[]', $enabled_item_type_ID, $enabled_ItemType->get_name(), ! in_array( $enabled_item_type_ID, $show_post_types_values ) );
+		}
+	}
+	$Form->checklist( $show_post_types_options, '', T_('Show post types') );
+
 	$Form->output = false;
 	$Form->switch_layout( 'none' );
 	$timestamp_min_duration_input = $Form->duration_input( 'timestamp_min_duration', $edited_Blog->get_setting('timestamp_min_duration'), '' );
@@ -208,6 +221,11 @@ $Form->begin_fieldset( T_('RSS/Atom feeds').get_manual_link('item-feeds-features
 		$params['force_keys_as_values'] = true;
 		$Form->select_input_array( 'image_size', $edited_Blog->get_setting('image_size') , get_available_thumb_sizes(), T_('Image size'), '', $params );
 	}
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Subscriptions').get_manual_link( 'item-subscriptions' ) );
+	$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post.') );
+	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
 $Form->end_fieldset();
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );

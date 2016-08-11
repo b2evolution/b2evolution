@@ -27,6 +27,9 @@ $to_comment_edit = $admin_url.'?ctrl=comments&action=edit&comment_ID='.$cmt_ID;
 if( $action == 'exit' )
 {	// Display messages and exit
 
+	// Send the predefined cookies:
+	evo_sendcookies();
+
 	headers_content_mightcache( 'text/html', 0 );  // Do NOT cache!
 
 	require_css( 'basic.css', 'rsc_url' ); // Basic styles
@@ -157,6 +160,9 @@ switch( $action )
 }
 
 // No action => display the form
+
+// Send the predefined cookies:
+evo_sendcookies();
 
 headers_content_mightcache( 'text/html', 0 );  // Do NOT cache!
 

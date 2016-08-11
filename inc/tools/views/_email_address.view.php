@@ -227,7 +227,7 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 	// Print JS to edit an email status
 	echo_editable_column_js( array(
 		'column_selector' => '.emadr_status_edit',
-		'ajax_url'        => get_secure_htsrv_url().'async.php?action=emadr_status_edit&'.url_crumb( 'emadrstatus' ),
+		'ajax_url'        => get_htsrv_url().'async.php?action=emadr_status_edit&'.url_crumb( 'emadrstatus' ),
 		'options'         => emadr_get_status_titles(),
 		'new_field_name'  => 'new_status',
 		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',

@@ -1320,7 +1320,8 @@ class DB
 
 		if( $html )
 		{ // Javascript function to toggle DIVs (EXPLAIN, results, backtraces).
-			require_js( 'debug.js', 'rsc_url', false, true );
+			$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
+			require_js( 'debug.js', $relative_to, false, true );
 		}
 
 		foreach( $this->queries as $i => $query )

@@ -275,26 +275,39 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Blog subscriptions'), array( 'id' => 'subs' ) );
 
 		// Get those blogs for which we have already subscriptions (for this user)
-		$sql = 'SELECT blog_ID, blog_shortname, sub_items, sub_comments
-		          FROM T_blogs INNER JOIN T_subscriptions ON ( blog_ID = sub_coll_ID AND sub_user_ID = '.$edited_User->ID.' )
-		                       INNER JOIN T_coll_settings ON ( blog_ID = cset_coll_ID AND cset_name = "allow_subscriptions" AND cset_value = "1" )';
-		$blog_subs = $DB->get_results( $sql );
+		$blog_subs_SQL = new SQL( 'Get those blogs for which we have already subscriptions for this user #'.$edited_User->ID );
+		$blog_subs_SQL->SELECT( 'blog_ID, sub_items, sub_comments' );
+		$blog_subs_SQL->FROM( 'T_blogs' );
+		$blog_subs_SQL->FROM_add( 'INNER JOIN T_subscriptions ON blog_ID = sub_coll_ID AND sub_user_ID = '.$edited_User->ID );
+		$blog_subs_SQL->WHERE( 'sub_items = 1' );
+		$blog_subs_SQL->WHERE_or( 'sub_comments = 1' );
+		$blog_subs = $DB->get_results( $blog_subs_SQL->get(), OBJECT, $blog_subs_SQL->title );
 
-		$encountered_current_blog = false;
+		$BlogCache = & get_BlogCache();
 		$subs_blog_IDs = array();
 		foreach( $blog_subs AS $blog_sub )
 		{
-			if( isset( $Blog ) && $blog_sub->blog_ID == $Blog->ID )
-			{
-				$encountered_current_blog = true;
+			if( ! ( $sub_Blog = & $BlogCache->get_by_ID( $blog_sub->blog_ID, false, false ) ) )
+			{	// Skip wrong collection:
+				continue;
+			}
+			if( ! ( $sub_Blog->get_setting( 'allow_subscriptions' ) && $blog_sub->sub_items ) &&
+			    ! ( $sub_Blog->get_setting( 'allow_comment_subscriptions' ) && $blog_sub->sub_comments ) )
+			{	// Skip because the collection doesn't allow any subscription:
+				continue;
 			}
 
-			$subs_blog_IDs[] = $blog_sub->blog_ID;
-			$subscriptions = array(
-					array( 'sub_items_'.$blog_sub->blog_ID,    '1', T_('All posts'),    $blog_sub->sub_items ),
-					array( 'sub_comments_'.$blog_sub->blog_ID, '1', T_('All comments'), $blog_sub->sub_comments )
-				);
-			$Form->checklist( $subscriptions, 'subscriptions', format_to_output( $blog_sub->blog_shortname, 'htmlbody' ) );
+			$subs_blog_IDs[] = $sub_Blog->ID;
+			$subscriptions = array();
+			if( $sub_Blog->get_setting( 'allow_subscriptions' ) )
+			{	// If subscription is allowed for new posts:
+				$subscriptions[] = array( 'sub_items_'.$sub_Blog->ID, '1', T_('All posts'), $blog_sub->sub_items );
+			}
+			if( $sub_Blog->get_setting( 'allow_comment_subscriptions' ) )
+			{	// If subscription is allowed for new comments:
+				$subscriptions[] = array( 'sub_comments_'.$sub_Blog->ID, '1', T_('All comments'), $blog_sub->sub_comments );
+			}
+			$Form->checklist( $subscriptions, 'subscriptions', $sub_Blog->dget( 'shortname', 'htmlbody' ) );
 		}
 
 		$Form->hidden( 'subs_blog_IDs', implode( ',', $subs_blog_IDs ) );
@@ -306,44 +319,10 @@ if( $is_admin_page && $Settings->get( 'subscribe_new_blogs' ) == 'page' )
 else
 {	// To subscribe from current list of blogs
 
-	// Init $BlogCache object to display a select list to subscribe
+	// Load collections which have the enabled settings to subscribe on new posts or comments:
 	$BlogCache = new BlogCache();
-	$BlogCache_SQL = $BlogCache->get_SQL_object();
+	$BlogCache->load_subscription_colls( $edited_User, $subs_blog_IDs );
 
-	load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
-	$CollectionSettings = new CollectionSettings();
-	if( $CollectionSettings->get_default( 'allow_subscriptions' ) == 0 )
-	{	// If default setting disables to subscribe on blogs, we should get only the blogs which allow the subsriptions
-		$BlogCache_SQL->FROM_add( 'LEFT JOIN T_coll_settings ON cset_coll_ID = blog_ID' );
-		$BlogCache_SQL->WHERE_and( 'cset_name = \'allow_subscriptions\'' );
-		$BlogCache_SQL->WHERE_and( 'cset_value = 1' );
-	}
-	else// 'allow_subscriptions' == 1
-	{	// If default setting enables to subscribe on blogs, we should exclude the blogs which don't allow the subsriptions
-		$blogs_settings_SQL = new SQL( 'Get blogs which don\'t allow the subscriptions' );
-		$blogs_settings_SQL->SELECT( 'cset_coll_ID' );
-		$blogs_settings_SQL->FROM( 'T_coll_settings' );
-		$blogs_settings_SQL->WHERE( 'cset_name = \'allow_subscriptions\'' );
-		$blogs_settings_SQL->WHERE_and( 'cset_value = 0' );
-		$blogs_disabled_subscriptions_IDs = $DB->get_col( $blogs_settings_SQL->get() );
-		if( count( $blogs_disabled_subscriptions_IDs ) )
-		{	// Exclude the blogs which don't allow the subscriptions
-			$BlogCache_SQL->WHERE_and( 'blog_ID NOT IN ('.$DB->quote( $blogs_disabled_subscriptions_IDs ).')' );
-		}
-	}
-	if( $Settings->get( 'subscribe_new_blogs' ) == 'public' )
-	{	// If a subscribing to new blogs available only for the public blogs
-		$BlogCache_SQL->WHERE_and( '( blog_in_bloglist IN ( "public", "logged" ) ) OR
-			( blog_in_bloglist = "member" AND (
-				( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND bloguser_user_ID = '.$edited_User->ID.' ) OR
-				( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND bloggroup_group_ID = '.$edited_User->grp_ID.' )
-			) )' );
-	}
-	if( !empty( $subs_blog_IDs ) )
-	{	// Exclude the blogs from the list if user already is subscribed on them
-		$BlogCache_SQL->WHERE_and( 'blog_ID NOT IN ('.$DB->quote( $subs_blog_IDs ).')' );
-	}
-	$BlogCache->load_by_sql( $BlogCache_SQL );
 	if( empty( $BlogCache->cache ) )
 	{	// No blogs to subscribe
 		if( empty( $subs_blog_IDs ) )
@@ -359,7 +338,8 @@ else
 		$Form->switch_layout( 'none' );
 		$Form->output = false;
 
-		$subscribe_blogs_select = $Form->select_input_object( 'subscribe_blog', param( 'subscribe_blog' , '', isset( $Blog ) ? $Blog->ID : 0 ), $BlogCache, '', array( 'object_callback' => 'get_option_list_parent' ) ).'</span>';
+		$subscribe_blog_ID = param( 'subscribe_blog' , '', isset( $Blog ) ? $Blog->ID : 0 );
+		$subscribe_blogs_select = $Form->select_input_object( 'subscribe_blog', $subscribe_blog_ID, $BlogCache, '', array( 'object_callback' => 'get_option_list_parent' ) ).'</span>';
 		$subscribe_blogs_button = $Form->button( array(
 			'name'  => 'actionArray[subscribe]',
 			'value' => T_('Subscribe'),
@@ -370,9 +350,29 @@ else
 		$Form->switch_template_parts( $params['skin_form_params'] );
 		$Form->output = true;
 
+		// Get collection to set proper active checkboxes on page loading:
+		if( isset( $BlogCache->cache[ $subscribe_blog_ID ] ) )
+		{	// Get selected collection:
+			$selected_subscribe_Blog = $BlogCache->cache[ $subscribe_blog_ID ];
+		}
+		else
+		{	// Get first collection from list:
+			foreach( $BlogCache->cache as $selected_subscribe_Blog )
+			{
+				break;
+			}
+		}
+
+		foreach( $BlogCache->cache as $subscribe_Blog )
+		{	// These hidden fields are used only by JS to know what subscription settings are enabled for each collection:
+			$enabled_subs_settings = $subscribe_Blog->get_setting( 'allow_subscriptions' ) ? 'p' : '';
+			$enabled_subs_settings .= $subscribe_Blog->get_setting( 'allow_comment_subscriptions' ) ? 'c' : '';
+			$Form->hidden( 'coll_subs_settings_'.$subscribe_Blog->ID, $enabled_subs_settings );
+		}
+
 		$subscriptions = array(
-				array( 'sub_items_new',    '1', T_('All posts'),    0 ),
-				array( 'sub_comments_new', '1', T_('All comments'), 0 )
+				array( 'sub_items_new',    '1', T_('All posts'),    0, $selected_subscribe_Blog->get_setting( 'allow_subscriptions' ) ? 0 : 1 ),
+				array( 'sub_comments_new', '1', T_('All comments'), 0, $selected_subscribe_Blog->get_setting( 'allow_comment_subscriptions' ) ? 0 : 1 )
 			);
 		$label_suffix = $Form->label_suffix;
 		$Form->label_suffix = '';
@@ -451,3 +451,29 @@ if( $action != 'view' )
 $Form->end_form();
 
 ?>
+<script type="text/javascript">
+jQuery( document ).ready( function()
+{
+	jQuery( 'select#subscribe_blog' ).change( function()
+	{	// Enable/Disable collection additional subscription checkboxes depending on settings:
+		var coll_ID = jQuery( this ).val();
+		var coll_settings = jQuery( 'input[name=coll_subs_settings_' + coll_ID + ']' ).val();
+		if( coll_settings == 'pc' || coll_settings == 'p' )
+		{	// Enable if subscription is allowed for new posts:
+			jQuery( 'input[name=sub_items_new]' ).removeAttr( 'disabled' );
+		}
+		else
+		{	// Disable otherwise:
+			jQuery( 'input[name=sub_items_new]' ).attr( 'disabled', 'disabled' );
+		}
+		if( coll_settings == 'pc' || coll_settings == 'c' )
+		{ // Enable if subscription is allowed for new comments:
+			jQuery( 'input[name=sub_comments_new]' ).removeAttr( 'disabled' );
+		}
+		else
+		{	// Disable otherwise:
+			jQuery( 'input[name=sub_comments_new]' ).attr( 'disabled', 'disabled' );
+		}
+	} );
+} );
+</script>

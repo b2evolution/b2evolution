@@ -106,6 +106,9 @@ require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
 require_css( 'basic.css', 'rsc_url' ); // Basic styles
 require_css( 'viewfile.css', 'rsc_url' );
 
+// Send the predefined cookies:
+evo_sendcookies();
+
 headers_content_mightcache( 'text/html' );		// In most situations, you do NOT want to cache dynamic content!
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

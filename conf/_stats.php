@@ -28,17 +28,12 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  *
  * @todo move to admin interface (T_basedomains list editor), but use for upgrading
  * @todo handle multiple blog roots.
- * @todo If $basehost already begins with "www.", the pure domain will not
- *       be counted as a self referrer. Possible solution: Strip the "www."
- *       from $basehost - for "www.example.com" this would give "://example.com"
- *       and "://www.example.com", which would be correct (currently it
- *       gives "://www.example.com" and "://www.www.example.com").
  *
  * @global array
  */
 $self_referer_list = array(
 	'://'.$basehost,			// This line will match all pages from the host of your $baseurl
-	'://www.'.$basehost,	// This line will also match www.you_base_host in case you have no www. on your basehost
+	'://www.'.$basehost,		// This line will also match www.you_base_host because any "www." will have been stripped away from your basehost
 	'http://localhost',
 	'http://127.0.0.1',
 );

@@ -759,7 +759,8 @@ class User extends DataObject
 					continue;
 				}
 
-				$field_type = ( $this->userfield_defs[$userfield->uf_ufdf_ID][0] == 'text' ) ? 'text' : 'string';
+				$field_type = $this->userfield_defs[$userfield->uf_ufdf_ID][0];
+				$field_type = ( $field_type == 'text' || $field_type == 'url' ) ? $field_type : 'string';
 				$uf_val = param( 'uf_'.$userfield->uf_ID, $field_type, '' );
 
 				if( $this->userfield_defs[$userfield->uf_ufdf_ID][0] == 'list' && $uf_val == '---' )
@@ -921,6 +922,12 @@ class User extends DataObject
 							{	// Insert a new field in DB if it is filled
 								if( $this->userfield_defs[$uf_new_id][0] == 'url' )
 								{	// Check url fields
+									// Decode url:
+									$uf_new_val = urldecode( $uf_new_val );
+									// strip out any html:
+									$uf_new_val = utf8_trim( utf8_strip_tags( $uf_new_val ) );
+									// Remove new line chars and double quote from url
+									$uf_new_val = preg_replace( '~\r|\n|"~', '', $uf_new_val );
 									param_check_url( 'uf_'.$uf_type.'['.$uf_new_id.'][]', 'commenting' );
 								}
 								if( $this->userfield_defs[$uf_new_id][4] == 'list' )
@@ -3039,7 +3046,7 @@ class User extends DataObject
 
 		// Group may grant VIEW access, FULL access:
 		$this->get_Group();
-		$group_permlevel = ( $permlevel == 'view' && $permlevel == 'any' ) ? 'viewall' : 'editall';
+		$group_permlevel = ( $permlevel == 'view' || $permlevel == 'any' ) ? 'viewall' : 'editall';
 		if( $this->Group->check_perm( 'blogs', $group_permlevel ) )
 		{ // If group grants a global permission:
 			return true;
@@ -3689,7 +3696,7 @@ class User extends DataObject
 	 */
 	function send_validate_email( $redirect_to_after, $blog = NULL, $email_changed = false )
 	{
-		global $app_name, $Session, $secure_htsrv_url, $baseurl, $servertimenow;
+		global $app_name, $Session, $baseurl, $servertimenow;
 		global $Settings, $UserSettings;
 
 		// Display messages depending on user email status
@@ -4984,9 +4991,9 @@ class User extends DataObject
 		else
 		{ // Front-office
 			global $Blog;
-			$url_rotate_90_left = get_secure_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_90_left&file_ID='.$file_ID.'&'.url_crumb( 'user' );
-			$url_rotate_180 = get_secure_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_180&file_ID='.$file_ID.'&'.url_crumb( 'user' );
-			$url_rotate_90_right = get_secure_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_90_right&file_ID='.$file_ID.'&'.url_crumb( 'user' );
+			$url_rotate_90_left = get_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_90_left&file_ID='.$file_ID.'&'.url_crumb( 'user' );
+			$url_rotate_180 = get_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_180&file_ID='.$file_ID.'&'.url_crumb( 'user' );
+			$url_rotate_90_right = get_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_90_right&file_ID='.$file_ID.'&'.url_crumb( 'user' );
 		}
 
 		$html = $params['before'];

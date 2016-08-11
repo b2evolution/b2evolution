@@ -50,10 +50,10 @@ class BlogCache extends DataObjectCache
 	/**
 	 * Add object to cache, handling our own indices.
 	 *
-	 * @param Blog
+	 * @param object Collection object
 	 * @return boolean True on add, false if already existing.
 	 */
-	function add( & $Blog )
+	function add( $Blog )
 	{
 		if( ! empty($Blog->siteurl) && preg_match( '~^https?://~', $Blog->siteurl ) )
 		{ // absolute siteurl
@@ -81,7 +81,7 @@ class BlogCache extends DataObjectCache
 	 */
 	function & get_by_url( $req_url, $halt_on_error = true )
 	{
-		global $DB, $Debuglog, $baseurl, $basedomain, $basehost;
+		global $DB, $Debuglog, $baseurl, $basehost, $baseport;
 
 		foreach( array_keys($this->cache_siteurl_abs) as $siteurl_abs )
 		{
@@ -99,11 +99,10 @@ class BlogCache extends DataObjectCache
 		$sql = 'SELECT *
 			  FROM T_blogs
 			 WHERE ( blog_access_type = "absolute"
-			         AND ( '.$DB->quote('http'.$req_url_wo_proto).' LIKE CONCAT( blog_siteurl, "%" )
-		                 OR '.$DB->quote('https'.$req_url_wo_proto).' LIKE CONCAT( blog_siteurl, "%" ) ) )
+			         AND ( '.$DB->quote( 'http'.$req_url_wo_proto ).' LIKE CONCAT( blog_siteurl, "%" )
+		                 OR '.$DB->quote( 'https'.$req_url_wo_proto ).' LIKE CONCAT( blog_siteurl, "%" ) ) )
 			    OR ( blog_access_type = "subdom"
-			         AND ( '.$DB->quote($req_url_wo_proto).' LIKE CONCAT( "://", blog_urlname, ".'.$basedomain.'/%" )
-			               OR '.$DB->quote($req_url_wo_proto).' LIKE CONCAT( "://", blog_urlname, ".'.$basehost.'/%" ) ) )';
+			         AND '.$DB->quote( $req_url_wo_proto ).' LIKE CONCAT( "://", blog_urlname, ".'.$basehost.$baseport.'/%" ) )';
 
 		// Match stubs like "http://base/url/STUB?param=1" on $baseurl
 		/*
@@ -440,6 +439,98 @@ class BlogCache extends DataObjectCache
 		}
 
 		return $DB->get_col( NULL, 0 );
+	}
+
+
+	/**
+	 * Load into the cache a list of collections which have the enabled settings to subscribe on new posts or comments
+	 *
+	 * @param object User, Restrict public collections which available only for the User
+	 * @param array IDs of collections which should be exluded from list
+	 * @param string Order By
+	 * @param string Order Direction
+	 * @return array of IDs
+	 */
+	function load_subscription_colls( $User, $exclude_coll_IDs = NULL, $order_by = '', $order_dir = '' )
+	{
+		global $DB, $Settings, $Debuglog;
+
+		$Debuglog->add( 'Loading <strong>'.$this->objtype.'(subscription collections)</strong> into cache', 'dataobjects' );
+
+		if( $order_by == '' )
+		{	// Use default value from settings:
+			$order_by = $Settings->get( 'blogs_order_by' );
+		}
+
+		if( $order_dir == '' )
+		{	// Use default value from settings:
+			$order_dir = $Settings->get( 'blogs_order_dir' );
+		}
+
+		load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
+		$CollectionSettings = new CollectionSettings();
+
+		$blog_cache_SQL = $this->get_SQL_object();
+
+		$blog_cache_SQL->title = 'Get the '.$this->objtype.'(subscription collections) rows to load the objects into the cache by '.get_class().'->'.__FUNCTION__.'()';
+
+		// Initialize subquery to get all collections which allow subscription for new ITEMS/POSTS:
+		if( $CollectionSettings->get_default( 'allow_subscriptions' ) == 0 )
+		{	// If default setting disables to subscribe for new ITEMS/POSTS, we should get only the collections which allow the subsriptions:
+			$sql_operator = 'IN';
+			$sql_value = '1';
+		}
+		else
+		{	// If default setting enables to subscribe for new ITEMS/POSTS, we should exclude the collections which don't allow the subsriptions:
+			$sql_operator = 'NOT IN';
+			$sql_value = '0';
+		}
+		$allow_item_subscriptions_sql = 'blog_ID '.$sql_operator.' (
+					SELECT cset_coll_ID
+					  FROM T_coll_settings
+					 WHERE cset_name = "allow_subscriptions"
+					   AND cset_value = '.$sql_value.'
+				)';
+		// Initialize subquery to get all collections which allow subscription for new COMMENTS:
+		if( $CollectionSettings->get_default( 'allow_comment_subscriptions' ) == 0 )
+		{	// If default setting disables to subscribe for new COMMENTS, we should get only the collections which allow the subsriptions:
+			$sql_operator = 'IN';
+			$sql_value = '1';
+		}
+		else
+		{	// If default setting enables to subscribe for new COMMENTS, we should exclude the collections which don't allow the subsriptions:
+			$sql_operator = 'NOT IN';
+			$sql_value = '0';
+		}
+		$allow_comment_subscriptions_sql = 'blog_ID '.$sql_operator.' (
+				SELECT cset_coll_ID
+				  FROM T_coll_settings
+				 WHERE cset_name = "allow_comment_subscriptions"
+				   AND cset_value = '.$sql_value.'
+			)';
+
+		// Get collections which which allow subscription for new items/posts OR comments:
+		$blog_cache_SQL->WHERE_and( $allow_item_subscriptions_sql.' OR '.$allow_comment_subscriptions_sql );
+
+		if( $Settings->get( 'subscribe_new_blogs' ) == 'public' )
+		{	// If a subscribing is available only for the public collections:
+			$blog_cache_SQL->WHERE_and( '( blog_in_bloglist IN ( "public", "logged" ) ) OR
+				( blog_in_bloglist = "member" AND (
+					( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND bloguser_user_ID = '.$User->ID.' ) OR
+					( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND bloggroup_group_ID = '.$User->grp_ID.' )
+				) )' );
+		}
+
+		if( ! empty( $exclude_coll_IDs ) )
+		{	// Exclude the collections from the list (for example, if user already is subscribed on them):
+			$blog_cache_SQL->WHERE_and( 'blog_ID NOT IN ( '.$DB->quote( $exclude_coll_IDs ).' )' );
+		}
+
+		$blog_cache_SQL->ORDER_BY( gen_order_clause( $order_by, $order_dir, $this->dbprefix, $this->dbIDname ) );
+
+		$this->load_by_sql( $blog_cache_SQL );
+
+		return array_keys( $this->cache );
 	}
 
 

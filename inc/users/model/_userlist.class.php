@@ -598,6 +598,10 @@ class UserList extends DataObjectList2
 			{	// Filter is set to 'Reported users'
 				$step1_SQL->SELECT_add( ', COUNT( DISTINCT urep_reporter_ID ) AS user_rep' );
 			}
+			if( ! empty( $this->query_params['join_sec_groups'] ) )
+			{	// Initialize count of secondary groups (used on order by this field):
+				$step1_SQL->SELECT_add( ', COUNT( DISTINCT sug_count.sug_grp_ID ) AS secondary_groups_count' );
+			}
 			$step1_SQL->FROM( $this->UserQuery->get_from( '' ) );
 			$step1_SQL->WHERE( $this->UserQuery->get_where( '' ) );
 			$step1_SQL->GROUP_BY( $this->UserQuery->get_group_by( '' ) );

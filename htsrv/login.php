@@ -56,9 +56,12 @@ switch( $action )
 
 		$reasons = trim( $Settings->get( 'account_close_reasons' ) );
 		param( 'account_close_type', 'string', '' );
+
 		if( ! empty( $reasons ) && empty( $account_close_type ) )
 		{ // Don't submit a form without a selected reason
 			$Messages->add( T_( 'Please quickly select a reason for closing your account.' ) );
+			// Set this session var only to repopulate other reason textarea input
+			$Session->set( 'account_close_reason', param( 'account_close_reason', 'text', '' ) );
 			// Redirect to show the errors:
 			header_redirect(); // Will EXIT
 			// We have EXITed already at this point!!
@@ -571,7 +574,7 @@ switch( $action )
 
 if( strlen( $redirect_to ) )
 { // Make it relative to the form's target, in case it has been set absolute (and can be made relative).
-	$redirect_to = url_rel_to_same_host( $redirect_to, $secure_htsrv_url );
+	$redirect_to = url_rel_to_same_host( $redirect_to, get_htsrv_url( true ) );
 }
 if( preg_match( '#/login.php([&?].*)?$#', $redirect_to ) )
 { // avoid "endless loops"
@@ -583,7 +586,7 @@ $Debuglog->add( 'redirect_to: '.$redirect_to );
 
 if( strlen( $return_to ) )
 { // Make it relative to the form's target, in case it has been set absolute (and can be made relative).
-	$return_to = url_rel_to_same_host( $return_to, $secure_htsrv_url );
+	$return_to = url_rel_to_same_host( $return_to, get_htsrv_url( true ) );
 }
 if( preg_match( '#/login.php([&?].*)?$#', $return_to ) )
 { // avoid "endless loops"
@@ -647,7 +650,7 @@ switch( $action )
 	case 'lostpassword':
 		// Lost password:
 		$page_title = T_('Lost your password?');
-		$hidden_params = array( 'redirect_to' => url_rel_to_same_host( $redirect_to, $secure_htsrv_url ) );
+		$hidden_params = array( 'redirect_to' => url_rel_to_same_host( $redirect_to, get_htsrv_url( true ) ) );
 		$wrap_width = '480px';
 
 		// Use the links in the form title

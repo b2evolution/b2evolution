@@ -18,8 +18,6 @@ $params = array_merge( array(
 	'auto_pilot' => 'seo_title',
 ), $params );
 
-require_css( 'style.css', 'relative' );
-
 init_bubbletip_js( 'blog' ); // Add jQuery bubbletip plugin
 init_results_js( 'blog' ); // Add functions to work with Results tables
 require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
@@ -40,7 +38,6 @@ require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 	<?php skin_opengraph_tags(); ?>
 	<?php robots_tag(); ?>
 	<?php
-	global $htsrv_url, $restapi_url;
 	$js_blog_id = "";
 	if( ! empty( $Blog ) )
 	{ // Set global js var "blog_id"
@@ -48,8 +45,8 @@ require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 	}
 
 	add_js_headline( "// Paths used by JS functions:
-		var htsrv_url = '".get_samedomain_htsrv_url()."';
-		var restapi_url = '".$restapi_url."';"
+		var htsrv_url = '".get_htsrv_url()."';
+		var restapi_url = '".get_restapi_url()."';"
 		.$js_blog_id );
 	?>
 	<meta name="generator" content="b2evolution <?php app_version(); ?>" /> <!-- Please leave this for stats -->

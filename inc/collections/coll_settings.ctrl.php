@@ -102,6 +102,7 @@ else
 switch( $action )
 {
 	case 'update':
+	case 'update_confirm':
 		// Update DB:
 
 		// Check that this action request is not a CSRF hacked request:
@@ -792,7 +793,7 @@ if( $action == 'dashboard' )
 				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$item_title.'</a>';
 				echo '</h3>';
 
-				echo htmlspecialchars( $Item->get_content_excerpt( 150 ), NULL, $evo_charset );
+				echo $Item->get( 'excerpt' );
 
 				echo '</div>';
 

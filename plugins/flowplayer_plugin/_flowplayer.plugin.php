@@ -23,7 +23,7 @@ class flowplayer_plugin extends Plugin
 	var $code = 'b2evFlwP';
 	var $name = 'Flowplayer';
 	var $priority = 80;
-	var $version = '6.7.0';
+	var $version = '6.7.5';
 	var $group = 'files';
 	var $number_of_installs = 1;
 	var $allow_ext = array( 'flv', 'swf', 'mp4', 'ogv', 'webm', 'm3u8' );
@@ -49,8 +49,7 @@ class flowplayer_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
-		require_js( '#flowplayer#', $relative_to );
+		require_js( '#flowplayer#', 'blog' );
 		add_js_headline( 'flowplayer.conf = { flashfit: true, embed: false }' );
 		$this->require_skin();
 		add_css_headline( '.flowplayer_block {
@@ -296,7 +295,7 @@ class flowplayer_plugin extends Plugin
 		$skins_path = dirname( $this->classfile_path ).'/skin';
 		if( file_exists( $skins_path.'/'.$skin.'.css' ) )
 		{ // Require css file only if it exists
-			require_css( $this->get_plugin_url().'skin/'.$skin.'.css', 'relative' );
+			$this->require_css( 'skin/'.$skin.'.css' );
 		}
 	}
 

@@ -121,8 +121,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 
 	// $Debuglog->add( 'Login: salt: '.var_export($pwd_salt, true).', session salt: '.var_export($pwd_salt_sess, true), '_init_login' );
 
-	$transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
-	if( $transmit_hashed_password )
+	if( can_use_hashed_password() )
 	{
 		param( 'pwd_hashed', 'array:string', array() );
 	}
@@ -231,10 +230,10 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 			{	// Password NOT hashed by Javascript:
 				$pass_ok = ( $User->pass == md5( $User->salt.$pass, true ) );
 				$Debuglog->add( 'Login: Compared raw passwords. Result: '.(int)$pass_ok, '_init_login' );
-				if( $pass_ok )
+				if( $pass_ok && can_use_hashed_password() )
 				{	// Report about this unsecure login action:
-				//	syslog_insert( sprintf( 'User %s logged in without password hashing.', $User->login ), 'warning' );
-				//	$Messages->add( T_('WARNING: password hashing did not work. You just logged in insecurely. Please report this to your administrator.'), 'warning' );
+					syslog_insert( sprintf( 'User %s logged in without password hashing.', $User->login ), 'error', 'user', $User->ID, 'core', NULL, $User->ID );
+					$Messages->add( T_('WARNING: password hashing did not work. You just logged in insecurely. Please report this to your administrator.'), 'error' );
 				}
 			}
 		}

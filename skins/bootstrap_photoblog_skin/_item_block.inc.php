@@ -77,15 +77,8 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			) );
 	?>
 	
-	<?php 
-		if( ! $Item->is_intro() ) { // Display different layout for intro/featured and regular posts
-			echo '<section class="evo_post__full well">';
-			echo '<div class="evo_post__full_text">';
-		} else {
-			echo '<section class="evo_post__full">';
-			echo '<div class="evo_post__full_text">';
-		}
-	?>
+	<div class="evo_post_wrapper <?php if(!$Item->is_intro()){echo 'well';} ?>">
+	
 	<header>
 	<?php
 		// ------- Title -------
@@ -150,14 +143,14 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 
 			// Author
 			$Item->author( array(
-				'before'    => ' '.T_('by').' ',
+				'before'    => /* TRANS: author name */ ' '.T_('by').' ',
 				'after'     => ' ',
 				'link_text' => $params['author_link_text'],
 			) );
 
 			// Categories
 			$Item->categories( array(
-				'before'          => T_('in').' ',
+				'before'          => /* TRANS: category name(s) */ T_('in').' ',
 				'after'           => ' ',
 				'include_main'    => true,
 				'include_other'   => true,
@@ -176,6 +169,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	?>
 	
 	</header>
+	
 	<?php
 	if( $disp == 'single' )
 	{
@@ -198,6 +192,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			'widget_item_tags_after'     => '</div>',
 			// Params for skin file "_item_content.inc.php"
 			'widget_item_content_params' => $params,
+			
 		) );
 		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 		?>
@@ -215,11 +210,13 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	// this will end a </section>
 	}
 	?>
+	
+	</div> <!-- ../content_end_full_text -->
 
-	<footer>
 		<?php
 			if( ! $Item->is_intro() ) // Do NOT apply tags, comments and feedback on intro posts
 			{ // List all tags attached to this post:
+				echo '<footer>';
 				$Item->tags( array(
 						'before'    => '<nav class="small post_tags">',
 						'after'     => '</nav>',
@@ -254,10 +251,11 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 						) );
 		?>
 		</nav>
-		<?php } ?>
-	</footer>
+			<?php 
+				echo '</footer>';
+			} ?>
 	
-	</div> <!-- ../content_end_full_text -->
+	</div><!-- ../evo_post_wrapper -->
 	</section>  <!-- ../content_end_full -->
 
 	<?php

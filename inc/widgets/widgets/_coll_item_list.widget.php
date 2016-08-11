@@ -117,7 +117,7 @@ class coll_item_list_Widget extends ComponentWidget
 					'label' => T_('Featured'),
 					'note' => T_('Do you want to restrict to featured contents?'),
 					'type' => 'radio',
-					'options' => array( 
+					'options' => array(
 							array ('all', T_('All posts') ),
 							array ('featured', T_('Only featured') ),
 							array ('other', T_('Only NOT featured') ),
@@ -408,11 +408,11 @@ class coll_item_list_Widget extends ComponentWidget
 
 		if( $this->disp_params['featured'] == 'featured' )
 		{	// Restrict to featured Items:
-			$filters['featured'] = true; 
+			$filters['featured'] = true;
 		}
 		elseif( $this->disp_params['featured'] == 'other' )
 		{	// Restrict to NOT featured Items:
-			$filters['featured'] = false; 
+			$filters['featured'] = false;
 		}
 
 
@@ -722,7 +722,13 @@ class coll_item_list_Widget extends ComponentWidget
 
 		if( $this->disp_params['disp_excerpt'] )
 		{ // Display excerpt
-			$excerpt = $disp_Item->dget( 'excerpt', 'htmlbody' );
+			$excerpt = $disp_Item->get_excerpt();
+
+			if( ! $this->disp_params['disp_teaser'] )
+			{ // only display if there is no teaser to display
+				$excerpt .= ' <a href="'.$disp_Item->get_permanent_url().'">&hellip;</a>';
+			}
+
 			if( !empty($excerpt) )
 			{	// Note: Excerpts are plain text -- no html (at least for now)
 				echo $this->disp_params['item_excerpt_before'].$excerpt.$this->disp_params['item_excerpt_after'];

@@ -185,7 +185,7 @@ function link_attachment_window( iframe_name, link_owner_type, link_owner_ID, ro
 	jQuery.ajax(
 	{
 		type: 'POST',
-		url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+		url: '<?php echo get_htsrv_url(); ?>async.php',
 		data:
 		{
 			'action': 'link_attachment',
@@ -273,7 +273,7 @@ jQuery( document ).ready( function()
  */
 function display_attachments( & $LinkOwner, $params = array() )
 {
-	global $current_User, $samedomain_htsrv_url, $redirect_to;
+	global $current_User, $redirect_to;
 
 	$params = array_merge( array(
 			'block_start' => '<div class="attachment_list">',
@@ -315,8 +315,8 @@ function display_attachments( & $LinkOwner, $params = array() )
 		echo '</td><td class="lastcol shrinkwrap">';
 		if( $current_User->check_perm( 'files', 'edit' ) )
 		{ // display delete link action
-			$delete_url = $samedomain_htsrv_url.'action.php?mname=collections&amp;action=unlink&amp;link_ID='.$Link->ID.'&amp;crumb_collections_unlink='.get_crumb( 'collections_unlink' ).'&amp;redirect_to='.$redirect_to;
-			echo action_icon( T_( 'Delete' ), 'delete', $delete_url );
+			$delete_url = get_htsrv_url().'action.php?mname=collections&amp;action=unlink&amp;link_ID='.$Link->ID.'&amp;crumb_collections_unlink='.get_crumb( 'collections_unlink' ).'&amp;redirect_to='.$redirect_to;
+			echo action_icon( T_('Remove'), 'remove', $delete_url );
 		}
 		echo '</td></tr>';
 	}
@@ -492,7 +492,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
  */
 function display_link_position( & $row )
 {
-	global $LinkOwner, $htsrv_url;
+	global $LinkOwner;
 	// TODO: fp>dh: can you please implement cumbs in here? I don't clearly understand your code.
 	// TODO: dh> only handle images
 
@@ -526,11 +526,10 @@ function display_link_position( & $row )
  */
 function echo_link_position_js()
 {
-	global $htsrv_url;
 ?>
 <script type="text/javascript">
 jQuery( document ).on( 'change', 'select[id^=display_position_]', {
-		url:   '<?php echo $htsrv_url; ?>',
+		url:   '<?php echo get_htsrv_url(); ?>',
 		crumb: '<?php echo get_crumb( 'link' ); ?>'
 }, function( event )
 {
@@ -546,7 +545,6 @@ jQuery( document ).on( 'change', 'select[id^=display_position_]', {
  */
 function echo_link_sortable_js()
 {
-	global $htsrv_url;
 ?>
 <script type="text/javascript">
 jQuery( document ).ready( function()
@@ -576,7 +574,7 @@ jQuery( document ).ready( function()
 
 			jQuery.ajax(
 			{
-				url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+				url: '<?php echo get_htsrv_url(); ?>async.php',
 				type: 'POST',
 				data:
 				{

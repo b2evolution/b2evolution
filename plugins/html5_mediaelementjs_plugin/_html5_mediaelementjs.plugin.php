@@ -20,18 +20,18 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class html5_mediaelementjs_plugin extends Plugin
 {
 	var $code = 'b2evH5MP';
-	var $name = 'HTML 5 MediaElement.js Video Player';
+	var $name = 'HTML 5 MediaElement.js Video and Audio Player';
 	var $priority = 80;
-	var $version = '6.7.0';
+	var $version = '6.7.5';
 	var $group = 'files';
 	var $number_of_installs = 1;
-	var $allow_ext = array( 'flv', 'm4v', 'f4v', 'mp4', 'ogv', 'webm' );
+	var $allow_ext = array( 'flv', 'm4v', 'f4v', 'mp4', 'ogv', 'webm', 'mp3', 'm4a' );
 
 
 	function PluginInit( & $params )
 	{
 		$this->short_desc = sprintf( T_('Media player for the these file formats: %s. Note: iOS supports only: %s; Android supports only: %s.'),
-			implode( ', ', $this->allow_ext ), 'mp4', 'mp4, webm' );
+			implode( ', ', $this->allow_ext ), 'mp4, mp3, m4a', 'mp4, webm, mp3, m4a' );
 
 		$this->long_desc = $this->short_desc.' '
 			.sprintf( T_('This player can display a placeholder image of the same name as the video file with the following extensions: %s.'),
@@ -50,20 +50,21 @@ class html5_mediaelementjs_plugin extends Plugin
 	{
 		global $Blog;
 
-		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
-
-		require_css( '#mediaelement_css#', $relative_to );
+		require_css( '#mediaelement_css#', 'blog' );
 		require_js( '#jquery#', 'blog' );
-		require_js( '#mediaelement#', $relative_to );
+		require_js( '#mediaelement#', 'blog' );
 		$this->require_skin();
 
-		// Set a video size in css style, because option setting cannot sets correct size
+		// Set a video/audio size in css style, because option setting cannot sets correct size
 		$width = intval( $this->get_coll_setting( 'width', $Blog ) );
 		$width = empty( $width ) ? '100%' : $width.'px';
 		$height = intval( $this->get_coll_setting( 'height', $Blog ) );
-		add_css_headline( 'video.html5_mediaelementjs_video{ width: '.$width.' !important; height: '.$height.'px !important; display: block; margin: auto; }
+		add_css_headline( 'video.html5_mediaelementjs_player{ width: '.$width.' !important; height: '.$height.'px !important; display: block; margin: auto; }
+audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block; margin: auto; }
 .mediajs_block {
+	width: '.$width.' !important;
 	margin: 0 auto 1em;
+	text-align: center;
 }
 .mediajs_block .mediajs_text {
 	font-size: 84%;
@@ -76,19 +77,20 @@ class html5_mediaelementjs_plugin extends Plugin
 			( $width == "100%" ?
 			// Use 100% width
 			'' :
-			// Check to make video width <= window width
-			'var html5_mediaelementjs_video_width = parseInt( "'.$width.'" );
-			if( jQuery( window ).width() < html5_mediaelementjs_video_width )
+			// Check to make player width <= window width
+			'var html5_mediaelementjs_player_width = parseInt( "'.$width.'" );
+			if( jQuery( window ).width() < html5_mediaelementjs_player_width )
 			{
-				html5_mediaelementjs_video_width = jQuery( window ).width();
+				html5_mediaelementjs_player_width = jQuery( window ).width();
 			}'
 			).'
 			jQuery( document ).ready( function() {
-				jQuery( "video.html5_mediaelementjs_video" ).mediaelementplayer( {
-					defaultVideoWidth: '.( $width == "100%" ? '"100%"' : 'html5_mediaelementjs_video_width' ).',
+				jQuery( ".html5_mediaelementjs_player" ).mediaelementplayer( {
+					defaultVideoWidth: '.( $width == "100%" ? '"100%"' : 'html5_mediaelementjs_player_width' ).',
 					defaultVideoHeight: "'.$height.'",
-					videoWidth: '.( $width == "100%" ? '"100%"' : 'html5_mediaelementjs_video_width' ).',
+					videoWidth: '.( $width == "100%" ? '"100%"' : 'html5_mediaelementjs_player_width' ).',
 					videoHeight: "'.$height.'",
+					audioWidth: '.( $width == "100%" ? '"100%"' : 'html5_mediaelementjs_player_width' ).',
 				} );
 			} );' );
 		/**
@@ -168,7 +170,7 @@ class html5_mediaelementjs_plugin extends Plugin
 					'defaultvalue' => 'default',
 					),
 				'width' => array(
-					'label' => T_('Video width (px)'),
+					'label' => T_('Video/Audio width (px)'),
 					'defaultvalue' => 460,
 					'note' => T_('100% width if left empty or 0'),
 					),
@@ -180,13 +182,13 @@ class html5_mediaelementjs_plugin extends Plugin
 					'valid_range' => array( 'min' => 1 ),
 					),
 				'allow_download' => array(
-					'label' => T_('Allow downloading of the video file'),
+					'label' => T_('Display Download Link'),
 					'type' => 'checkbox',
 					'defaultvalue' => 0,
 					),
 				'disp_caption' => array(
 					'label' => T_('Display caption'),
-					'note' => T_('Check to display the video file caption under the video player.'),
+					'note' => T_('Check to display the file caption under the player.'),
 					'type' => 'checkbox',
 					'defaultvalue' => 0,
 					),
@@ -201,9 +203,28 @@ class html5_mediaelementjs_plugin extends Plugin
 	 * @param File
 	 * @return boolean true if extension of file supported by plugin
 	 */
-	function is_flp_video( $File )
+	function is_file_supported( $File )
 	{
 		return in_array( strtolower( $File->get_ext() ), $this->allow_ext );
+	}
+
+
+	/**
+	 * Check a file for correct extension
+	 *
+	 * @param File
+	 * @return boolean true if extension of file supported by plugin
+	 */
+	function is_url_supported( $url )
+	{
+		if( preg_match( '#\.([a-z0-9]+)(\?.+)?$#', $url, $match ) )
+		{
+			$url_extenssion = strtolower( $match[1] );
+
+			return in_array( $url_extenssion, $this->allow_ext );
+		}
+
+		return false;
 	}
 
 
@@ -218,8 +239,8 @@ class html5_mediaelementjs_plugin extends Plugin
 	{
 		$File = $params['File'];
 
-		if( ! $this->is_flp_video( $File ) )
-		{
+		if( ! $this->is_file_supported( $File ) )
+		{	// This file is not supported by plugin, Exit here:
 			return false;
 		}
 
@@ -228,43 +249,24 @@ class html5_mediaelementjs_plugin extends Plugin
 
 		if( $File->exists() )
 		{
-			/**
-			 * @var integer A number to assign each video player new id attribute
-			 */
-			global $html5_mediaelementjs_number;
-			$html5_mediaelementjs_number++;
-
-			if( $placeholder_File = & $Item->get_placeholder_File( $File ) )
-			{ // Display placeholder/poster when image file is linked to the Item with same name as current video File
-				$video_placeholder_attr = ' poster="'.$placeholder_File->get_url().'"';
+			if( ! $File->is_audio() && $placeholder_File = & $Item->get_placeholder_File( $File ) )
+			{	// Get placeholder/poster when image file is linked to the Item with same name as current video File:
+				$video_poster_url = $placeholder_File->get_url();
 			}
 			else
-			{ // No placeholder for current video File
-				$video_placeholder_attr = '';
+			{	// No poster file
+				$video_poster_url = '';
 			}
 
-			if( $in_comments )
-			{
-				$params['data'] .= '<div style="clear: both; height: 0px; font-size: 0px"></div>';
-			}
-
-			$params['data'] .= '<div class="mediajs_block">';
-
-			$params['data'] .= '<video class="html5_mediaelementjs_video '.$this->get_skin_class().'" id="html5_mediaelementjs_'.$html5_mediaelementjs_number.'"'.$video_placeholder_attr.'>'.
-				'<source src="'.$File->get_url().'" type="'.$this->get_video_mimetype( $File ).'" align="center" />'.
-			'</video>';
-
-			if( $File->get( 'desc' ) != '' && $this->get_coll_setting( 'disp_caption', $item_Blog ) )
-			{ // Display caption
-				$params['data'] .= '<div class="mediajs_text">'.$File->get( 'desc' ).'</div>';
-			}
-
-			if( $this->get_coll_setting( 'allow_download', $item_Blog ) )
-			{ // Allow to download the video files
-				$params['data'] .= '<div class="mediajs_text"><a href="'.$File->get_url().'">'.T_('Download this video').'</a></div>';
-			}
-
-			$params['data'] .= '</div>';
+			// Get video/audio player:
+			$params['data'] .= $this->get_player( array(
+					'before'           => $in_comments ? '<div style="clear: both; height: 0px; font-size: 0px"></div>' : '',
+					'Blog'             => $item_Blog,
+					'file_type'        => $File->is_audio() ? 'audio' : 'video',
+					'file_url'         => $File->get_url(),
+					'file_caption'     => ( $File->get( 'desc' ) != '' && $this->get_coll_setting( 'disp_caption', $item_Blog ) ) ? $File->get( 'desc' ) : '',
+					'video_poster_url' => $video_poster_url,
+				) );
 
 			return true;
 		}
@@ -286,6 +288,112 @@ class html5_mediaelementjs_plugin extends Plugin
 
 		return $this->RenderItemAttachment( $params, true );
 	}
+
+
+	/**
+	 * Event handler: Called when displaying item attachment.
+	 *
+	 * @param array Associative array of parameters. $params['File'] - attachment, $params['data'] - output
+	 * @param boolean TRUE - when render in comments
+	 * @return boolean true if plugin rendered this attachment
+	 */
+	function RenderURL( & $params )
+	{
+		global $Blog;
+
+		if( empty( $params['url'] ) || ! $this->is_url_supported( $params['url'] ) )
+		{	// This file is not supported by plugin, Exit here:
+			return false;
+		}
+
+		$player_Blog = NULL;
+		if( ! empty( $params['Item'] ) )
+		{	// Get collection of the Item;
+			$player_Blog = & $params['Item']->get_Blog();
+		}
+		else
+		{	// Use current collection:
+			global $Blog;
+			$player_Blog = $Blog;
+		}
+
+		// Get video/audio player:
+		$params['data'] .= $this->get_player( array(
+				'file_url'  => $params['url'],
+				'file_type' => 'audio',
+				'Blog'      => $player_Blog,
+			) );
+
+		return true;
+	}
+
+
+	/**
+	 * Get video/audio player
+	 *
+	 * @param array Params
+	 * @return string HTML text of player
+	 */
+	function get_player( $params = array() )
+	{
+		$params = array_merge( array(
+				'before'           => '',
+				'after'            => '',
+				'before_player'    => '<div class="mediajs_block">',
+				'after_player'     => '</div>',
+				'Blog'             => NULL,
+				'file_type'        => 'video', // 'audio' | 'video'
+				'file_url'         => '',
+				'file_caption'     => '',
+				'video_poster_url' => '',
+			), $params );
+
+		/**
+		 * @var integer A number to assign each video/ausio player new id attribute
+		 */
+		global $html5_mediaelementjs_number;
+		$html5_mediaelementjs_number++;
+
+		$r = $params['before'];
+
+		$r .= $params['before_player'];
+
+		if( $params['file_type'] == 'audio' )
+		{	// Audio file:
+			$r .= '<audio class="html5_mediaelementjs_player '.$this->get_skin_class().'" id="html5_mediaelementjs_'.$html5_mediaelementjs_number.'">'.
+				'<source src="'.$params['file_url'].'" type="'.$this->get_file_mimetype( $params['file_url'] ).'" align="center" />'.
+			'</audio>';
+		}
+		else
+		{	// Video file:
+
+			// Initialize placeholder/poster attribute:
+			$video_placeholder_attr = empty( $params['video_poster_url'] ) ? '' : ' poster="'.$params['video_poster_url'].'"';
+
+			$r .= '<video class="html5_mediaelementjs_player '.$this->get_skin_class().'" id="html5_mediaelementjs_'.$html5_mediaelementjs_number.'"'.$video_placeholder_attr.'>'.
+				'<source src="'.$params['file_url'].'" type="'.$this->get_file_mimetype( $params['file_url'] ).'" align="center" />'.
+			'</video>';
+		}
+
+		if( ! empty( $params['file_caption'] ) )
+		{	// Display caption:
+			$r .= '<div class="mediajs_text">'.$params['file_caption'].'</div>';
+		}
+
+		if( $params['Blog'] && $this->get_coll_setting( 'allow_download', $params['Blog'] ) )
+		{	// Allow to download the files:
+			$r .= '<div class="mediajs_text"><a href="'.$params['file_url'].'">'
+					.( $params['file_type'] == 'audio' ? T_('Download this audio') : T_('Download this video') )
+				.'</a></div>';
+		}
+
+		$r .= $params['after_player'];
+
+		$r .= $params['after'];
+
+		return $r;
+	}
+
 
 	/**
 	 * Get a list of the skins
@@ -344,20 +452,38 @@ class html5_mediaelementjs_plugin extends Plugin
 			$skins_path = dirname( $this->classfile_path ).'/skins';
 			if( file_exists( $skins_path.'/'.$skin.'/style.css' ) )
 			{	// Require css file only if it exists
-				require_css( $this->get_plugin_url().'skins/'.$skin.'/style.css', 'relative' );
+				$this->require_css( 'skins/'.$skin.'/style.css' );
 			}
 		}
 	}
 
 	/**
-	 * Get video mimetype
+	 * Get audio/video mimetype
 	 *
 	 * @param object File
-	 * @return string Mimetype
+	 * @return string Mime-type
 	 */
-	function get_video_mimetype( $File )
+	function get_file_mimetype( $file_url )
 	{
-		switch( $File->get_ext() )
+		if( preg_match( '#\.([a-z0-9]+)(\?.+)?$#', $file_url, $match ) )
+		{	// Get file extenssion from url string:
+			$file_extenssion = strtolower( $match[1] );
+		}
+
+		if( empty( $file_extenssion ) )
+		{	// Use this mime-type by default on unknown extenssion:
+			return 'video/mp4';
+		}
+
+		// Get mime-type from file type:
+		$FiletypeCache = & get_FiletypeCache();
+		if( $Filetype = & $FiletypeCache->get_by_extension( $file_extenssion, false ) )
+		{
+			return $Filetype->mimetype;
+		}
+
+		// Get mime-type by extenssion:
+		switch( $file_extenssion )
 		{
 			case 'flv':
 			case 'f4v':

@@ -62,7 +62,8 @@ elseif( $comments_number > 25 )
 	$legend_icons['topic_popular'] = 1;
 }
 $Item->load_Blog();
-$use_workflow = ( $disp == 'posts' ) &&
+// There is a very restrictive case in which we display workflow:
+$display_workflow = ( $disp == 'posts' ) &&
     ! empty( $Item ) &&
     is_logged_in() &&
     $Blog->get_setting( 'use_workflow' ) &&
@@ -140,7 +141,7 @@ $use_workflow = ( $disp == 'posts' ) &&
 
 	<!-- Replies Block -->
 	<?php
-	if( ! $use_workflow )
+	if( ! $display_workflow )
 	{ // --------------------------------------------------------------------------------------------------------------------------
 		echo '<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-5">';
 		if( $comments_number == 0 && $Item->comment_status == 'disabled' )
@@ -160,51 +161,95 @@ $use_workflow = ( $disp == 'posts' ) &&
 	} // --------------------------------------------------------------------------------------------------------------------------
 
 	echo '<!-- Assigned User Block -->';
-	if( $use_workflow )
+	if( $display_workflow )
 	{ // ==========================================================================================================================
 		$assigned_User = $Item->get_assigned_User();
 		$priority_color = item_priority_color( $Item->priority );
 		$url = $Item->get_permanent_url().'#workflow_panel';
 
-		if( $assigned_User )
+		// We offer 2 modes of displaying workflow.
+		$worfklow_display_mode = $Skin->get_setting('workflow_display_mode'); // Possible values = 'assignee_and_status' or 'status_and_author'
+
+		if( $worfklow_display_mode == 'assignee_and_status' )
 		{
-			echo '<div class="ft_assigned col-lg-2 col-md-2 col-sm-3 col-xs-4 col-sm-offset-0 col-xs-offset-2">';
-			echo '<div class="ft_assigned_header">';
-			echo '<a href="'.$url.'"  style="color: '.$priority_color.';">'.T_('Assigned to:').'</a>';
+			if( $assigned_User )
+			{
+				echo '<div class="ft_assigned col-lg-2 col-md-2 col-sm-3 col-sm-offset-0 col-xs-6">';
+				echo '<div class="ft_assigned_header">';
+				echo '<a href="'.$url.'"  style="color: '.$priority_color.';">'.T_('Assigned to:').'</a>';
+				echo '</div>';
+
+				// Assigned user avatar
+				$Item->assigned_to2( array(
+						'thumb_class' => 'ft_assigned_avatar',
+						'link_class' => 'ft_assigned_avatar',
+						'thumb_size'   => 'crop-top-32x32'
+					) );
+
+				echo '<div class="ft_assigned_info">';
+				// Assigned user login
+				$Item->assigned_to2( array(
+					  'after' => '<br />',
+						'link_text' => 'name'
+					) );
+			}
+			else
+			{
+				echo '<div class="ft_not_assigned col-lg-2 col-md-2 col-sm-3 col-sm-offset-0 col-xs-6">';
+				echo '<div class="ft_assigned_header">';
+				echo '<a href="'.$url.'" style="color: '.$priority_color.';">'.T_('Not assigned').'</a>';
+				echo '</div>';
+				echo '<div class="ft_assigned_info">';
+			}
+	
+			// Workflow status
+			echo '<span><a href="'.$url.'">'.item_td_task_cell( 'status', $Item, false ).'</a></span>';
 			echo '</div>';
 
-			// Assigned user avatar
-			$Item->assigned_to2( array(
-					'thumb_class' => 'ft_assigned_avatar',
-					'link_class' => 'ft_assigned_avatar',
-					'thumb_size'   => 'crop-top-32x32'
-				) );
-
-			echo '<div class="ft_assigned_info">';
-			// Assigned user login
-			$Item->assigned_to2( array(
-				  'after' => '<br />',
-					'link_text' => 'name'
-				) );
+			echo '</div>'; // /col
 		}
 		else
-		{
-			echo '<div class="ft_not_assigned col-lg-2 col-md-2 col-sm-3 col-xs-4 col-sm-offset-0 col-xs-offset-2">';
-			echo '<div class="ft_assigned_header">';
-			echo '<a href="'.$url.'" style="color: '.$priority_color.';">'.T_('Not assigned').'</a>';
-			echo '</div>';
-			echo '<div class="ft_assigned_info">';
-		}
+		{ // 'status_and_author'
+			echo '<div class="ft_workflow_info ft_workflow_status_and_author col-lg-2 col-md-2 col-sm-3 col-sm-offset-0 col-xs-6">';
+			echo '<div class="ft_date_header">';	// fp> temp hack to get correct style
 
-		// Workflow status
-		echo '<span><a href="'.$url.'">'.item_td_task_cell( 'status', $Item, false ).'</a></span>';
-		echo '</div></div>';
+			// Workflow status
+			echo '<b><a href="'.$url.'">'.item_td_task_cell( 'status', $Item, false ).'</a></b>';
+			echo '</div>';
+
+			// b2evonet:
+			$Item->author( array(
+						'before'      => '',
+						'after'       => '',
+						'before_user' => '',
+						'after_user'  => '',
+						'link_text'   => 'only_avatar',
+						'link_class'  => 'ft_author_avatar'
+					) );
+
+			echo '<div style="padding-left: 42px;">';
+
+			// Post author
+			echo $Item->author( array(
+					'before'      => '',
+					'before_user' => '',
+					'after'       => '<br />',
+					'after_user'  => '<br />',
+					'link_text'   => 'auto',
+				) );
+
+			$Item->issue_date( array( 'date_format' => 'm/d/y') );
+
+			echo '</div>';
+
+			echo '</div>'; // /col
+		}
 	}	// ==========================================================================================================================
 
 	echo '<!-- Last Comment Block -->';
-	if( $use_workflow )
+	if( $display_workflow )
 	{ // ==========================================================================================================================
-		echo '<div class="ft_date col-lg-2 col-md-2 col-sm-3">';
+		echo '<div class="ft_workflow_info ft_workflow_last_comment col-lg-2 col-md-2 col-sm-3 col-sm-offset-0 col-xs-6">';
 		echo '<div class="ft_date_header">';
 		if( $comments_number == 0 && $Item->comment_status == 'disabled' )
 		{ // The comments are disabled:
@@ -248,7 +293,7 @@ $use_workflow = ( $disp == 'posts' ) &&
 			) );
 
 		// Last comment date
-		$latest_Comment->date( $use_workflow ? 'm/d/y' : 'D M j, Y H:i' );
+		$latest_Comment->date( $display_workflow ? 'm/d/y' : 'D M j, Y H:i' );
 
 		echo ' <a href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest post')
 				.'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
@@ -277,7 +322,7 @@ $use_workflow = ( $disp == 'posts' ) &&
 			) );
 
 		// Last modification date
-		echo $use_workflow ? $Item->get_mod_date( 'm/d/y' ) : $Item->get_mod_date( 'D M j, Y H:i' );
+		echo $display_workflow ? $Item->get_mod_date( 'm/d/y' ) : $Item->get_mod_date( 'D M j, Y H:i' );
 
 		echo ' <a href="'.$Item->get_permanent_url().'" title="'.T_('View latest post')
 				.'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
@@ -286,32 +331,16 @@ $use_workflow = ( $disp == 'posts' ) &&
 	echo '</div>';
 	?>
 
+	<?php if (! $display_workflow ) { ?>
 	<!-- This is shrinked date that applies on lower screen res -->
-	<div class="ft_date_shrinked item_list<?php echo $use_workflow ? ' col-xs-5' : ' col-xs-6'; ?>">
+	<div class="ft_date_shrinked item_list col-xs-6">
 		<?php
-		if( $use_workflow )
-		{ // ==========================================================================================================================
-			echo '<div class="ft_date_header">';
-			if( $comments_number == 0 && $Item->comment_status == 'disabled' )
-			{ // The comments are disabled:
-				echo T_('n.a.');
-			}
-			else if( $latest_Comment = & $Item->get_latest_Comment() )
-			{	// At least one reply exists:
-				printf( T_('%s replies'), '<a href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest comment').'">'.$comments_number.'</a>' );
-			}
-			else
-			{	// No replies yet:
-				printf( T_('%s replies'), '0' );
-			}
-			echo '</div>';
-		} // ==========================================================================================================================
 		if( $latest_Comment = & $Item->get_latest_Comment() )
 		{ // Display info about last comment
 			$latest_Comment->author2( array(
 							'link_text' => 'auto',
-							'after' => '<br />',
-							'after_user' => '<br />'
+							'after' => ' ',
+							'after_user' => ' '
 				) );
 
 			$latest_Comment->date('m/j/y ');
@@ -322,8 +351,8 @@ $use_workflow = ( $disp == 'posts' ) &&
 		{ // No comments, Display info of post
 			echo $Item->author( array(
 					'link_text' => 'auto',
-					'after' => '<br />',
-					'after_user' => '<br />',
+					'after' => ' ',
+					'after_user' => ' ',
 				) );
 
 			echo $Item->get_mod_date( 'm/j/y' );
@@ -332,4 +361,5 @@ $use_workflow = ( $disp == 'posts' ) &&
 		}
 		?>
 	</div>
+	<?php } ?>
 </article>

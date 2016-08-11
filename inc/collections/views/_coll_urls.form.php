@@ -61,7 +61,7 @@ $Form->hidden( 'tab', $tab );
 $Form->hidden( 'blog', $blog );
 
 
-global $baseurl, $basedomain;
+global $baseurl, $baseprotocol, $basehost, $baseport;
 
 // determine siteurl type (if not set from update-action)
 if( preg_match('#https?://#', $edited_Blog->get( 'siteurl' ) ) )
@@ -160,12 +160,20 @@ $Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_li
 										'onclick="document.getElementById( \'blog_siteurl_relative\' ).focus();"'
 			)
 		);
-		if( ! is_ip_url_domain( $baseurl ) )
-		{	// Don't allow subdomain for IP address:
-			$access_type_options[] = array( 'subdom', T_('Subdomain of basedomain'),
-										preg_replace( '#(https?://)#i', '$1<span class="blog_url_text">'.$edited_Blog->urlname.'</span>.', $baseurl ),
+		if( ! is_valid_ip_format( $basehost ) )
+		{// Not an IP address, we can use subdomains:
+			$access_type_options[] = array( 'subdom', T_('Subdomain of basehost'),
+										$baseprotocol.'://<span class="blog_url_text">'.$edited_Blog->urlname.'</span>.'.$basehost.$baseport.'/',
 										'',
-										'onclick="update_urlpreview( \'http://\'+document.getElementById( \'blog_urlname\' ).value+\'.'.preg_replace( '#(https?://)#i', '', $baseurl ).'\' )"'
+										'onclick="update_urlpreview( \''.$baseprotocol.'://\'+document.getElementById( \'blog_urlname\' ).value+\'.'.$basehost.$baseport.'/\' )"'
+			);
+		}
+		else
+		{ // Don't allow subdomain for IP address:
+			$access_type_options[] = array( 'subdom', T_('Subdomain').':',
+										sprintf( T_('(Not possible for %s)'), $basehost ),
+										'',
+										'disabled="disabled"'
 			);
 		}
 		$access_type_options[] = array( 'absolute', T_('Absolute URL').':',
@@ -196,12 +204,14 @@ function update_urlpreview( baseurl, url_path )
 	jQuery( '#urlpreview' ).html( baseurl + url_path );
 
 	baseurl = baseurl.replace( /^(.+\/)([^\/]+\.[^\/]+)?$/, '$1' );
+	baseurl = baseurl.replace( /^(https?:\/\/(.+?)(:.+?)?)\//, '/' );
 	jQuery( '#rsc_assets_url_type_relative' ).html( baseurl + 'rsc/' );
 	jQuery( '#media_assets_url_type_relative' ).html( baseurl + 'media/' );
 	jQuery( '#skins_assets_url_type_relative' ).html( baseurl + 'skins/' );
+	jQuery( '#plugins_assets_url_type_relative' ).html( baseurl + 'plugins/' );
 }
 
-// Update blog url name in several places on the page
+// Update blog url name in several places on the page:
 jQuery( '#blog_urlname' ).bind( 'keyup blur', function()
 {
 	jQuery( '.blog_url_text' ).html( jQuery( this ).val() );
@@ -231,30 +241,71 @@ jQuery( '[id$=_assets_absolute_url]' ).focus( function()
 $Form->end_fieldset();
 
 
+$Form->begin_fieldset( T_('Cookie Settings').get_admin_badge().get_manual_link( 'collection-cookie-settings' ) );
+
+	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+	{	// If current user has a permission to edit collection advanced admin settings:
+		$Form->switch_layout( 'none' );
+		$Form->output = false;
+		$cookie_domain_custom_field = $Form->text( 'cookie_domain_custom', $edited_Blog->get_setting( 'cookie_domain_custom' ), 50, '', '', 120 );
+		$cookie_path_custom_field = $Form->text( 'cookie_path_custom', $edited_Blog->get_setting( 'cookie_path_custom' ), 50, '', '', 120 );
+		$Form->output = true;
+		$Form->switch_layout( NULL );
+
+		$Form->radio( 'cookie_domain_type', $edited_Blog->get_setting( 'cookie_domain_type' ), array(
+				array( 'auto', T_('Automatic'), $edited_Blog->get_cookie_domain( 'auto' ) ),
+				array( 'custom', T_('Custom').':', '', $cookie_domain_custom_field ),
+			), T_('Cookie domain'), true );
+
+		$Form->radio( 'cookie_path_type', $edited_Blog->get_setting( 'cookie_path_type' ), array(
+				array( 'auto', T_('Automatic'), $edited_Blog->get_cookie_path( 'auto' ) ),
+				array( 'custom', T_('Custom').':', '', $cookie_path_custom_field ),
+			), T_('Cookie path'), true );
+	}
+	else
+	{	// Display only info about colleciton cookie domain and path if user has no permission to edit:
+		$Form->info( T_('Cookie domain'), $edited_Blog->get_cookie_domain() );
+		$Form->info( T_('Cookie path'), $edited_Blog->get_cookie_path() );
+	}
+
+$Form->end_fieldset();
+
+
 $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_manual_link( 'assets-url-cdn-settings' ) );
 
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{ // Permission to edit advanced admin settings
-		global $rsc_url, $media_url, $skins_url;
+		global $rsc_url, $media_url, $skins_url, $plugins_url;
 
-		$option_labels = array(
-			'basic' => T_('URL configured in Basic Config'),
-			'relative' => T_('%s folder relative to current collection'),
-			'absolute' => T_('Absolute URL').':'
-		);
 		$absolute_url_note = T_('Enter path to %s folder ending with / -- This may be located in a CDN zone');
 		$assets_url_data = array();
+		// skins url:
+		$assets_url_data['skins_assets_url_type'] = array(
+				'label'        => sprintf( T_('Load %s assets from'), '<code>/skins/</code>' ),
+				'url'          => $skins_url,
+				'absolute_url' => 'skins_assets_absolute_url',
+				'folder'       => '/skins/',
+				'local_url'    => $edited_Blog->get_local_skins_url( 'relative' )
+			);
 		// rsc url:
 		$assets_url_data['rsc_assets_url_type'] = array(
-				'label'        => T_('Load generic /rsc/ assets from'),
+				'label'        => sprintf( T_('Load generic %s assets from'), '<code>/rsc/</code>' ),
 				'url'          => $rsc_url,
 				'absolute_url' => 'rsc_assets_absolute_url',
 				'folder'       => '/rsc/',
 				'local_url'    => $edited_Blog->get_local_rsc_url( 'relative' )
 			);
+		// plugins url:
+		$assets_url_data['plugins_assets_url_type'] = array(
+				'label'        => sprintf( T_('Load %s assets from'), '<code>/plugins/</code>' ),
+				'url'          => $plugins_url,
+				'absolute_url' => 'plugins_assets_absolute_url',
+				'folder'       => '/plugins/',
+				'local_url'    => $edited_Blog->get_local_plugins_url( 'relative' )
+			);
 		// media url:
 		$assets_url_data['media_assets_url_type'] = array(
-				'label'        => T_('Load /media/ assets from')
+				'label'        => sprintf( T_('Load %s assets from'), '<code>/media/</code>' )
 			);
 		if( $edited_Blog->get( 'media_location' ) == 'none' )
 		{ // if media location is disabled
@@ -273,14 +324,6 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 					'local_url'    => $edited_Blog->get_local_media_url( 'relative' )
 				);
 		}
-		// skins url:
-		$assets_url_data['skins_assets_url_type'] = array(
-				'label'        => T_('Load /skins/ assets from'),
-				'url'          => $skins_url,
-				'absolute_url' => 'skins_assets_absolute_url',
-				'folder'       => '/skins/',
-				'local_url'    => $edited_Blog->get_local_skins_url( 'relative' )
-			);
 
 		foreach( $assets_url_data as $asset_url_type => $asset_url_data )
 		{
@@ -290,23 +333,49 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 			}
 			else
 			{ // Display options full list
+				$basic_asset_url_note = $asset_url_data['url'];
+				if( $asset_url_type != 'media_assets_url_type' &&
+				    $edited_Blog->get( 'access_type' ) == 'absolute' &&
+				    $edited_Blog->get_setting( $asset_url_type ) == 'basic' )
+				{
+					$basic_asset_url_note .= ' <span class="red">'
+							.sprintf( T_('ATTENTION: Using a different domain for your collection and your %s folder may cause problems'), '<code>'.$asset_url_data['folder'].'</code>' )
+							.' ('.( $asset_url_type == 'plugins_assets_url_type' ? T_('e-g: Ajax requests') : T_('e-g: impossible to load fonts') ).')'
+						.'</span>';
+				}
+
+				$relative_asset_url_note = '<span id="'.$asset_url_type.'_relative">'.$asset_url_data['local_url'].'</span>';
+				if( $asset_url_type != 'skins_assets_url_type' &&
+				    $edited_Blog->get_setting( 'skins_assets_url_type' ) != 'relative' &&
+				    $edited_Blog->get_setting( $asset_url_type ) == 'relative' )
+				{
+					$relative_asset_url_note .= ' <span class="red">'
+							.sprintf( T_('ATTENTION: using a relative %s folder with a non-relative %s folder will probably lead to undesired results (because of the skin\'s &lt;baseurl&gt;).'), '<code>'.$asset_url_data['folder'].'</code>', '<code>/skins/</code>' )
+						.'</span>';
+				}
+
 				$Form->radio( $asset_url_type, $edited_Blog->get_setting( $asset_url_type ), array(
-					array( 'basic', $option_labels['basic'], $asset_url_data['url'] ),
-					array( 'relative', sprintf( $option_labels['relative'], $asset_url_data['folder'] ), '<span id="'.$asset_url_type.'_relative">'.$asset_url_data['local_url'].'</span>' ),
-					array( 'absolute', $option_labels['absolute'], '',
+					array( 'relative', (
+							$asset_url_type == 'skins_assets_url_type' ?
+							sprintf( T_('%s folder relative to current collection (recommended setting)'), '<code>'.$asset_url_data['folder'].'</code>' ) :
+							sprintf( T_('%s folder relative to %s domain (recommended setting)'), '<code>'.$asset_url_data['folder'].'</code>', '<code>/skins/</code>' )
+						), $relative_asset_url_note ),
+					array( 'basic', T_('URL configured in Basic Config'), $basic_asset_url_note ),
+					array( 'absolute', T_('Absolute URL').':', '',
 						'<input type="text" id="'.$asset_url_data['absolute_url'].'" class="form_text_input form-control" name="'.$asset_url_data['absolute_url'].'"
 						size="50" maxlength="120" onfocus="document.getElementsByName(\''.$asset_url_type.'\')[2].checked=true;" value="'.$edited_Blog->get_setting( $asset_url_data['absolute_url'] ).'" />
-						<span class="notes">'.sprintf( $absolute_url_note, $asset_url_data['folder'] ).'</span>'
+						<span class="notes">'.sprintf( $absolute_url_note, '<code>'.$asset_url_data['folder'].'</code>' ).'</span>'
 					)
 				), $asset_url_data['label'], true );
 			}
 		}
 	}
 	else
-	{ // Preview assets urls
-		$Form->info( T_('Load generic /rsc/ assets from'), $edited_Blog->get_local_rsc_url() );
-		$Form->info( T_('Load /media/ assets from'), $edited_Blog->get_local_media_url() );
-		$Form->info( T_('Load /skins/ assets from'), $edited_Blog->get_local_skins_url() );
+	{	// Preview assets urls:
+		$Form->info( sprintf( T_('Load generic %s assets from'), '<code>/rsc/</code>' ), $edited_Blog->get_local_rsc_url() );
+		$Form->info( sprintf( T_('Load %s assets from'), '<code>/skins/</code>' ), $edited_Blog->get_local_skins_url() );
+		$Form->info( sprintf( T_('Load %s assets from'), '<code>/plugins/</code>' ), $edited_Blog->get_local_plugins_url() );
+		$Form->info( sprintf( T_('Load %s assets from'), '<code>/media/</code>' ), $edited_Blog->get_local_media_url() );
 	}
 
 $Form->end_fieldset();

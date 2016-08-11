@@ -82,41 +82,41 @@ button.action_icon {
   cursor: pointer;
 }
 .status_color_draft {
-  color: #ffff99;
+  color: #ff9;
 }
 .status_color_review {
-  color: #cc0099;
+  color: #CC0099;
 }
 .status_color_community {
-  color: #2e8bb9;
+  color: #2E8BB9;
 }
 .status_color_protected {
-  color: #ff9c2a;
+  color: #FF9C2A;
 }
 .status_color_private {
-  color: #dc143c;
+  color: #DC143C;
 }
 .status_color_published {
-  color: #99ee44;
+  color: #99EE44;
 }
 .status_color_deprecated {
-  color: #000000;
+  color: #000;
 }
 .status_color_redirected {
   color: #663399;
 }
 .status_color_trash {
-  color: #ff6666;
+  color: #f66;
 }
 .status_color_meta {
-  color: #5133ab;
+  color: #5bc0de;
 }
 .btn[class*=btn-status-] {
   border: 1px solid #ccc;
 }
 .btn-status-draft {
   color: #000;
-  background-color: #ffff99;
+  background-color: #ff9;
   border-color: #dfdfdf;
 }
 .btn-status-draft:hover {
@@ -125,7 +125,7 @@ button.action_icon {
 }
 .btn-status-review {
   color: #fff;
-  background-color: #cc0099;
+  background-color: #CC0099;
 }
 .btn-status-review:hover {
   color: #fff;
@@ -133,7 +133,7 @@ button.action_icon {
 }
 .btn-status-community {
   color: #fff;
-  background-color: #2e8bb9;
+  background-color: #2E8BB9;
 }
 .btn-status-community:hover {
   color: #fff;
@@ -141,7 +141,7 @@ button.action_icon {
 }
 .btn-status-protected {
   color: #fff;
-  background-color: #ff9c2a;
+  background-color: #FF9C2A;
 }
 .btn-status-protected:hover {
   color: #fff;
@@ -149,7 +149,7 @@ button.action_icon {
 }
 .btn-status-private {
   color: #fff;
-  background-color: #dc143c;
+  background-color: #DC143C;
 }
 .btn-status-private:hover {
   color: #fff;
@@ -157,7 +157,7 @@ button.action_icon {
 }
 .btn-status-published {
   color: #000;
-  background-color: #99ee44;
+  background-color: #99EE44;
 }
 .btn-status-published .glyphicon {
   color: inherit !important;
@@ -168,11 +168,11 @@ button.action_icon {
 }
 .btn-status-deprecated {
   color: #fff;
-  background-color: #000000;
+  background-color: #000;
 }
 .btn-status-deprecated:hover {
   color: #fff;
-  background-color: #333333;
+  background-color: #333;
 }
 .btn-status-redirected {
   color: #fff;
@@ -184,11 +184,11 @@ button.action_icon {
 }
 .btn-status-trash {
   color: #fff;
-  background-color: #ff6666;
+  background-color: #f66;
 }
 .btn-status-trash:hover {
   color: #fff;
-  background-color: #ff4444;
+  background-color: #f44;
 }
 span.fa {
   line-height: inherit;
@@ -431,7 +431,6 @@ samp {
 pre,
 code {
   -webkit-hyphens: none;
-  -moz-hyphens: none;
   -ms-hyphens: none;
   hyphens: none;
 }
@@ -525,7 +524,7 @@ code {
   color: #f60;
 }
 .green {
-  color: #00cc00;
+  color: #0c0;
 }
 .black {
   color: #000;
@@ -623,7 +622,7 @@ a.roundbutton_text:hover {
   /* Opera 11.10+ */
   background: -o-linear-gradient(top, #a0a0a0, #d2d2d2);
   /* IE 8 */
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#a0a0a0', endColorstr='#d2d2d2');
+  -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#a0a0a0', endColorstr='#d2d2d2')";
 }
 a.roundbutton.roundbutton_selected,
 a.roundbutton_text.roundbutton_selected,
@@ -642,7 +641,7 @@ span.roundbutton {
   /* Opera 11.10+ */
   background: -o-linear-gradient(top, #6b6b6b, #989898);
   /* IE 8 */
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#6b6b6b', endColorstr='#989898');
+  -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#6b6b6b', endColorstr='#989898')";
 }
 a.roundbutton_green,
 span.roundbutton_green,
@@ -662,7 +661,7 @@ span.roundbutton_green:hover {
   /* Opera 11.10+ */
   background: -o-linear-gradient(top, #00b46e, #09f197);
   /* IE 8 */
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00b46e', endColorstr='#09f197');
+  -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#00b46e', endColorstr='#09f197')";
 }
 a.roundbutton_red,
 span.roundbutton_red,
@@ -682,7 +681,7 @@ span.roundbutton_red:hover {
   /* Opera 11.10+ */
   background: -o-linear-gradient(top, #e62020, #fa7171);
   /* IE 8 */
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#e62020', endColorstr='#fa7171');
+  -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#e62020', endColorstr='#fa7171')";
 }
 .roundbutton span,
 .roundbutton_text span {
@@ -791,10 +790,8 @@ span.roundbutton.rbtn_black:hover,
 .notes a.roundbutton {
   top: -2px;
 }
-@-moz-document url-prefix() {
-  .notes a.roundbutton {
-    top: 0;
-  }
+.notes a.roundbutton {
+  top: 0;
 }
 .btn {
   background-image: none;
@@ -818,7 +815,7 @@ span.roundbutton.rbtn_black:hover,
 }
 .btn-default:hover,
 .btn-default:focus {
-  color: 333;
+  color: #333;
   background-color: #e6e6e6;
   border-color: #adadad;
 }
@@ -1054,7 +1051,6 @@ div.dev-blocks--belowtoolbar {
 }
 div#evo_toolbar {
   background-color: #d2d2d2;
-  color: ButtonText;
   border-bottom: 1px solid #aeaeae;
   text-align: left;
   margin: 0;
@@ -1104,7 +1100,6 @@ div#evo_toolbar .actions_right {
   width: 25ex;
   border: 1px solid #aeaeae;
   box-shadow: 2px 2px 4px -1px rgba(0, 0, 0, 0.25);
-  -webkit-transition: opacity 0.2s ease-in-out;
   transition: opacity 0.2s ease-in-out;
 }
 .evobar-menu ul li {
@@ -1168,7 +1163,6 @@ div#evo_toolbar .actions_right {
   display: inline-block;
   position: relative;
   background-color: #d2d2d2;
-  -webkit-transition: background-color 0.15s ease-out;
   transition: background-color 0.15s ease-out;
   padding: 6px 1ex;
   text-decoration: none;
@@ -1183,13 +1177,12 @@ div#evo_toolbar .actions_right {
 }
 .evobar-menu a:hover {
   background-color: #bfbfbf;
-  -webkit-transition: none;
   transition: none;
   text-decoration: none;
 }
 .evobar-menu a.disabled,
 .evobar-menu a.disabled:hover {
-  color: #999999;
+  color: #999;
 }
 .evobar-menu [class^=evobar-icon-] {
   margin-left: 6px;
@@ -1248,7 +1241,7 @@ div#evo_toolbar .actions_right {
   left: 0;
   width: 100%;
   text-align: center;
-  text-shadow: -1px -1px #000000, -2px 0 #000000, -1px 1px #000000, 0 2px #000000, 1px 1px #000000, 2px 0 #000000, 1px -1px #000000, 0 -2px #000000;
+  text-shadow: -1px -1px #000, -2px 0 #000, -1px 1px #000, 0 2px #000, 1px 1px #000, 2px 0 #000, 1px -1px #000, 0 -2px #000;
   color: #FFF;
   font-weight: bold;
 }
@@ -1958,7 +1951,6 @@ table.widget_grid .note {
 }
 .widget_flow_blocks,
 table.widget_grid {
-  display: -webkit-box;
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;
@@ -2797,7 +2789,7 @@ div.item_location {
 }
 .note.status_meta span {
   color: #fff;
-  background-color: #5133ab;
+  background-color: #5bc0de;
 }
 #styled_content_block span[class*=status_] span,
 .evo_content_block span[class*=status_] span {
@@ -3157,7 +3149,7 @@ div.codeblock pre {
 p.codeblock_title,
 .bText p.codeblock_title {
   font-family: Verdana, sans-serif;
-  letter-spacing: 110%;
+  letter-spacing: 0.1em;
   line-height: 95%;
   font-weight: bold;
   font-size: 72%;

@@ -29,7 +29,7 @@ global $ItemList;
 global $Item;
 
 global $action, $dispatcher, $blog, $posts, $poststart, $postend, $ReqURI;
-global $edit_item_url, $delete_item_url, $htsrv_url, $p, $dummy_fields;
+global $edit_item_url, $delete_item_url, $p, $dummy_fields;
 global $comment_allowed_tags, $comment_type;
 global $Plugins, $DB, $UserSettings, $Session, $Messages;
 
@@ -571,7 +571,7 @@ while( $Item = & $ItemList->get_item() )
 				$comment_renderers = $Comment->get_renderers();
 			}
 
-			$Form = new Form( $htsrv_url.'comment_post.php', 'comment_checkchanges', 'post', NULL, 'multipart/form-data' );
+			$Form = new Form( get_htsrv_url().'comment_post.php', 'comment_checkchanges', 'post', NULL, 'multipart/form-data' );
 
 			$Form->begin_form( 'evo_form evo_form__comment '.( $comment_type == 'meta' ? ' evo_form__comment_meta' : '' ) );
 
@@ -684,7 +684,7 @@ while( $Item = & $ItemList->get_item() )
 			$not_subscribed = true;
 			$creator_User = $Item->get_creator_User();
 
-			if( $Blog->get_setting( 'allow_subscriptions' ) )
+			if( $Blog->get_setting( 'allow_comment_subscriptions' ) )
 			{
 				$sql = 'SELECT count( sub_user_ID ) FROM T_subscriptions
 							WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0';
@@ -704,15 +704,14 @@ while( $Item = & $ItemList->get_item() )
 			}
 			if( $not_subscribed && $Blog->get_setting( 'allow_item_subscriptions' ) )
 			{
-				global $samedomain_htsrv_url;
 				if( get_user_isubscription( $current_User->ID, $Item->ID ) )
 				{
 					echo '<p class="text-center">'.$notification_icon.' <span>'.T_( 'You will be notified by email when someone comments here.' );
-					echo ' <a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></span></p>';
+					echo ' <a href="'.get_htsrv_url().'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></span></p>';
 				}
 				else
 				{
-					echo '<p class="text-center"><a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'collections_isubs_update' ).'" class="btn btn-default">'.$notification_icon.' '.T_( 'Notify me by email when someone comments here.' ).'</a></p>';
+					echo '<p class="text-center"><a href="'.get_htsrv_url().'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'collections_isubs_update' ).'" class="btn btn-default">'.$notification_icon.' '.T_( 'Notify me by email when someone comments here.' ).'</a></p>';
 				}
 			}
 
@@ -727,7 +726,7 @@ while( $Item = & $ItemList->get_item() )
 					$current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) &&
 					$current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 			{	// Display workflow properties if current user can edit this post:
-				$Form = new Form( get_samedomain_htsrv_url().'item_edit.php' );
+				$Form = new Form( get_htsrv_url().'item_edit.php' );
 
 				$Form->add_crumb( 'item' );
 				$Form->hidden( 'blog', $Blog->ID );
