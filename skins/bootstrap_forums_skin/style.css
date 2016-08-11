@@ -1285,6 +1285,8 @@ label.control-label[for=post_title] {
   }
   .posts_panel .ft_count div {
     display: inline-block;
+    font-size: inherit;
+    line-height: 22px;
   }
   .posts_panel .ft_assigned {
     margin-top: 4px;
@@ -1295,6 +1297,10 @@ label.control-label[for=post_title] {
     padding-right: 15px;
     float: left;
     margin-top: 4px;
+    line-height: 22px;
+  }
+  .posts_panel .ft_date_shrinked span {
+    vertical-align: top;
   }
   .legend-item {
     margin-bottom: 5px;
