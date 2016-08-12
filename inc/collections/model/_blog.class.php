@@ -65,6 +65,7 @@ class Blog extends DataObject
 	var $locale;
 	var $order;
 	var $access_type;
+	var $http_protocol;
 
 	/*
 	 * ?> TODO: we should have an extra DB column that either defines type of blog_siteurl
@@ -215,6 +216,7 @@ class Blog extends DataObject
 			$this->longdesc = $db_row->blog_longdesc;
 			$this->locale = $db_row->blog_locale;
 			$this->access_type = $db_row->blog_access_type;
+			$this->http_protocol = $db_row->blog_http_protocol;
 			$this->siteurl = $db_row->blog_siteurl;
 			$this->urlname = $db_row->blog_urlname;
 			$this->links_blog_ID = $db_row->blog_links_blog_ID; // DEPRECATED
@@ -1154,6 +1156,11 @@ class Blog extends DataObject
 				{ // The received siteurl value was correct, may update the access_type value
 					$this->set( 'access_type', $access_type );
 				}
+			}
+
+			if( ( $http_protocol = param( 'blog_http_protocol', 'string', 'always_redirect' ) ) !== NULL )
+			{
+				$this->set( 'http_protocol', $http_protocol );
 			}
 
 			if( ( param( 'cookie_domain_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )

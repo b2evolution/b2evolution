@@ -7742,6 +7742,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12065, 'Upgrade blogs table...') )
+	{ // part of 6.8.0-alpha
+		db_add_col( 'T_blogs', 'blog_http_protocol', 'ENUM("always_redirect", "allow_both") DEFAULT "always_redirect" AFTER blog_access_type' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

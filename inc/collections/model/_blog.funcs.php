@@ -605,7 +605,14 @@ function init_requested_blog( $use_blog_param_first = true )
 
 	// No blog requested by URL param, let's try to match something in the URL:
 	$BlogCache = & get_BlogCache();
-	if( preg_match( '#^'.preg_quote($baseurl).'(index.php/)?([^/]+)#', $ReqHost.$ReqPath, $matches ) )
+
+	$re = "/^https?(.*)/i";
+	$str = preg_quote( $baseurl );
+	$subst = "https?$1";
+
+	$baseurl_regex = preg_replace($re, $subst, $str);
+
+	if( preg_match( '#^'.$baseurl_regex.'(index.php/)?([^/]+)#', $ReqHost.$ReqPath, $matches ) )
 	{ // We have an URL blog name:
 		$Debuglog->add( 'Found a potential URL collection name: '.$matches[2].' (in: '.$ReqHost.$ReqPath.')', 'detectblog' );
 		if( strpos( $matches[2], '.' ) !== false )
