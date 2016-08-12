@@ -27,7 +27,7 @@ $Form->begin_form( 'fform' );
 
 $Form->add_crumb( 'casource' );
 $Form->hidden_ctrl();
-$Form->hidden( 'tab', 'sources' );
+$Form->hidden( 'tab', 'reporters' );
 $Form->hidden( 'casrc_ID', $edited_CaSource->ID );
 
 $Form->begin_fieldset( T_('Edit reporter') );

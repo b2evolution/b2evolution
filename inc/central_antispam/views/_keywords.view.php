@@ -31,9 +31,16 @@ $status = param( 'status', 'string', '', true );
 // Create result set:
 
 $SQL = new SQL();
-$SQL->SELECT( 'cakw_ID, cakw_keyword, cakw_status, cakw_statuschange_ts, cakw_lastreport_ts, COUNT( carpt_cakw_ID ) as report_num' );
+$SQL->SELECT( 'cakw_ID, cakw_keyword, cakw_status, cakw_statuschange_ts, cakw_lastreport_ts' );
+$SQL->SELECT_add( ', COUNT( carpt_cakw_ID ) as report_num_total' );
+$SQL->SELECT_add( ', COUNT( s1.casrc_ID ) as report_num_trusted' );
+$SQL->SELECT_add( ', COUNT( s2.casrc_ID ) as report_num_promising' );
+$SQL->SELECT_add( ', COUNT( s3.casrc_ID ) as report_num_unknown' );
 $SQL->FROM( 'T_centralantispam__keyword' );
 $SQL->FROM_add( 'LEFT JOIN T_centralantispam__report ON carpt_cakw_ID = cakw_ID' );
+$SQL->FROM_add( 'LEFT JOIN T_centralantispam__source s1 ON carpt_casrc_ID = s1.casrc_ID AND s1.casrc_status = "trusted"' );
+$SQL->FROM_add( 'LEFT JOIN T_centralantispam__source s2 ON carpt_casrc_ID = s2.casrc_ID AND s2.casrc_status = "promising"' );
+$SQL->FROM_add( 'LEFT JOIN T_centralantispam__source s3 ON carpt_casrc_ID = s3.casrc_ID AND s3.casrc_status = "unknown"' );
 $SQL->GROUP_BY( 'cakw_ID' );
 
 $count_SQL = new SQL();
@@ -114,12 +121,43 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Reports'),
-		'order' => 'report_num',
+		'th_group' => T_('Reports'),
+		'th' => T_('Trusted'),
+		'order' => 'report_num_trusted',
 		'default_dir' => 'D',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'right',
-		'td' => '$report_num$',
+		'td' => '$report_num_trusted$',
+	);
+
+$Results->cols[] = array(
+		'th_group' => T_('Reports'),
+		'th' => T_('Promising'),
+		'order' => 'report_num_promising',
+		'default_dir' => 'D',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'right',
+		'td' => '$report_num_promising$',
+	);
+
+$Results->cols[] = array(
+		'th_group' => T_('Reports'),
+		'th' => T_('Unknown'),
+		'order' => 'report_num_unknown',
+		'default_dir' => 'D',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'right',
+		'td' => '$report_num_unknown$',
+	);
+
+$Results->cols[] = array(
+		'th_group' => T_('Reports'),
+		'th' => T_('Total'),
+		'order' => 'report_num_total',
+		'default_dir' => 'D',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'right',
+		'td' => '$report_num_total$',
 	);
 
 $Results->cols[] = array(
@@ -152,7 +190,7 @@ if( $current_User->check_perm( 'centralantispam', 'edit' ) )
 	// Print JS to edit status of central antispam keyword:
 	echo_editable_column_js( array(
 		'column_selector' => '.cakeyword_status_edit',
-		'ajax_url'        => get_htsrv_url().'async.php?action=cakeyword_status_edit&'.url_crumb( 'cakeyword' ),
+		'ajax_url'        => get_htsrv_url().'action.php?mname=central_antispam&action=cakeyword_status_edit&'.url_crumb( 'cakeyword' ),
 		'options'         => ca_get_keyword_statuses(),
 		'new_field_name'  => 'new_status',
 		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',

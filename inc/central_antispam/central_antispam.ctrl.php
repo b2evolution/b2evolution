@@ -39,7 +39,7 @@ switch( $tab )
 		}
 		break;
 
-	case 'sources':
+	case 'reporters':
 		if( param( 'casrc_ID', 'integer', '', true ) )
 		{	// Load source from cache:
 			$CaSourceCache = & get_CaSourceCache();
@@ -90,7 +90,7 @@ switch( $action )
 		{	// We could load data from form without errors:
 			$edited_CaSource->dbupdate();
 			$Messages->add( T_('The source has been saved.'), 'success' );
-			header_redirect( $admin_url.'?ctrl=central_antispam&tab=sources', 303 );
+			header_redirect( $admin_url.'?ctrl=central_antispam&tab=reporters', 303 );
 		}
 		$action = 'source_edit';
 		break;
@@ -226,12 +226,18 @@ switch( $tab )
 		}
 		if( empty( $action ) && $current_User->check_perm( 'centralantispam', 'edit' ) )
 		{	// Load JS to edit keyword status from list:
+			require_js( '#jquery#', 'rsc_url' );
 			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 		}
 		break;
 
 	case 'reporters':
 		$AdminUI->breadcrumbpath_add( T_('Reporters'), $admin_url.'?ctrl=central_antispam&amp;tab='.$tab );
+		if( empty( $action ) && $current_User->check_perm( 'centralantispam', 'edit' ) )
+		{	// Load JS to edit source status from list:
+			require_js( '#jquery#', 'rsc_url' );
+			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+		}
 		break;
 }
 
@@ -264,7 +270,7 @@ switch( $action )
 				$AdminUI->disp_view( 'central_antispam/views/_keywords.view.php' );
 				break;
 
-			case 'sources':
+			case 'reporters':
 				$AdminUI->disp_view( 'central_antispam/views/_sources.view.php' );
 				break;
 		}
