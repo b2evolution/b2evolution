@@ -500,6 +500,9 @@ ul.legend span.note {
 .single_page_title {
   margin-bottom: 20px;
 }
+.single_page_title .ft_author_info.shrinked {
+  display: none;
+}
 .single_topic {
   /* LATEST CHANGE
 	.evo_post__full {
@@ -694,6 +697,11 @@ aside .widget_core_coll_search_form div.compact_search_form input.search_field {
   }
   .posts_panel .ft_count div {
     display: inline-block;
+    line-height: 22px;
+    font-size: 12.6px;
+  }
+  .posts_panel .ft_count div a {
+    font-size: 12.6px;
   }
   .posts_panel .ft_assigned {
     margin-top: 4px;
@@ -704,6 +712,10 @@ aside .widget_core_coll_search_form div.compact_search_form input.search_field {
     padding-right: 15px;
     float: left;
     margin-top: 4px;
+    line-height: 22px;
+  }
+  .posts_panel .ft_date_shrinked span {
+    vertical-align: top;
   }
   .legend-item {
     margin-bottom: 5px;
@@ -780,8 +792,7 @@ aside .widget_core_coll_search_form div.compact_search_form input.search_field {
   .table-hover .group_row .ft_date_shrinked {
     text-align: right;
     float: right;
-    margin-top: 6px;
-    margin-left: 5px;
+    margin-top: 8px;
   }
   .front_panel .ft_count {
     display: inline-block !important;
@@ -839,6 +850,9 @@ aside .widget_core_coll_search_form div.compact_search_form input.search_field {
   }
   .single_page_title .ft_author_info {
     display: none;
+  }
+  .single_page_title .ft_author_info.shrinked {
+    display: block;
   }
   /* Disp front */
   .front_panel .table-hover .group_row .ft_count {

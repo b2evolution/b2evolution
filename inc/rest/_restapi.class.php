@@ -825,7 +825,7 @@ class RestApi
 					}
 
 					$result_data['title'] = $Item->get_title( array( 'link_type' => 'none' ) );
-					$result_data['desc'] = $Item->get_excerpt2();
+					$result_data['desc'] = $Item->get_excerpt();
 					$result_data['permalink'] = $Item->get_permanent_url( '', '', '&' );
 					break;
 

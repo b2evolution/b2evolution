@@ -346,8 +346,8 @@ $display_workflow = ( $disp == 'posts' ) &&
 		{ // Display info about last comment
 			$latest_Comment->author2( array(
 							'link_text' => 'auto',
-							'after' => '<br />',
-							'after_user' => '<br />'
+							'after' => ' ',
+							'after_user' => ' '
 				) );
 
 			$latest_Comment->date('m/j/y ');
@@ -358,8 +358,8 @@ $display_workflow = ( $disp == 'posts' ) &&
 		{ // No comments, Display info of post
 			echo $Item->author( array(
 					'link_text' => 'auto',
-					'after' => '<br />',
-					'after_user' => '<br />',
+					'after' => ' ',
+					'after_user' => ' ',
 				) );
 
 			echo $Item->get_mod_date( 'm/j/y' );

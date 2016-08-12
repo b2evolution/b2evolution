@@ -537,6 +537,10 @@ ul.legend {
 // Single topic view
 .single_page_title {
 	margin-bottom: 20px;
+	// We want shrinked author info to display only on super small sizes (check under <375px media query below)
+	.ft_author_info.shrinked {
+		display: none;
+	}
 }
 .single_topic {
 	.ft_post_info {
@@ -774,6 +778,14 @@ aside .widget_core_coll_search_form {
 			//padding-left: 5px;
 			div {
 				display: inline-block;
+				line-height: 22px;
+				// Using decimal size here because the other in-line div has 90% font-size of body (which is 14px)
+				// This div cannot have 90% because it already has declared 16px font-size and 90% of it doesn't have the same value
+				font-size: 12.6px;
+				a {
+					// In case there is at least one recent comment, it is a link, so we need to override 16px font-size here as well
+					font-size: 12.6px;
+				}
 			}
 		}
 		.ft_assigned {
@@ -785,6 +797,11 @@ aside .widget_core_coll_search_form {
 			padding-right: 15px;
 			float: left;
 			margin-top: 4px;
+			line-height: 22px;
+			
+			span {
+				vertical-align: top;
+			}
 		}
 	}
 	.legend-item {
@@ -873,8 +890,8 @@ aside .widget_core_coll_search_form {
 		.ft_date_shrinked {
 			text-align: right;
 			float: right;
-			margin-top: 6px;
-			margin-left: 5px;
+			margin-top: 8px;
+			// margin-left: 5px;
 		}
 	}
 	.front_panel {
@@ -940,6 +957,9 @@ aside .widget_core_coll_search_form {
 	.single_page_title {
 		.ft_author_info {
 			display: none;
+		}
+		.ft_author_info.shrinked {
+			display: block;
 		}
 	}
 	/* Disp front */
