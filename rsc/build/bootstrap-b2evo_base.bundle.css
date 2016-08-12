@@ -81,31 +81,31 @@ button.action_icon {
   cursor: pointer;
 }
 .status_color_draft {
-  color: #ff9;
+  color: #ffff99;
 }
 .status_color_review {
-  color: #CC0099;
+  color: #cc0099;
 }
 .status_color_community {
-  color: #2E8BB9;
+  color: #2e8bb9;
 }
 .status_color_protected {
-  color: #FF9C2A;
+  color: #ff9c2a;
 }
 .status_color_private {
-  color: #DC143C;
+  color: #dc143c;
 }
 .status_color_published {
-  color: #99EE44;
+  color: #99ee44;
 }
 .status_color_deprecated {
-  color: #000;
+  color: #000000;
 }
 .status_color_redirected {
   color: #663399;
 }
 .status_color_trash {
-  color: #f66;
+  color: #ff6666;
 }
 .status_color_meta {
   color: #5bc0de;
@@ -115,7 +115,7 @@ button.action_icon {
 }
 .btn-status-draft {
   color: #000;
-  background-color: #ff9;
+  background-color: #ffff99;
   border-color: #dfdfdf;
 }
 .btn-status-draft:hover {
@@ -124,7 +124,7 @@ button.action_icon {
 }
 .btn-status-review {
   color: #fff;
-  background-color: #CC0099;
+  background-color: #cc0099;
 }
 .btn-status-review:hover {
   color: #fff;
@@ -132,7 +132,7 @@ button.action_icon {
 }
 .btn-status-community {
   color: #fff;
-  background-color: #2E8BB9;
+  background-color: #2e8bb9;
 }
 .btn-status-community:hover {
   color: #fff;
@@ -140,7 +140,7 @@ button.action_icon {
 }
 .btn-status-protected {
   color: #fff;
-  background-color: #FF9C2A;
+  background-color: #ff9c2a;
 }
 .btn-status-protected:hover {
   color: #fff;
@@ -148,7 +148,7 @@ button.action_icon {
 }
 .btn-status-private {
   color: #fff;
-  background-color: #DC143C;
+  background-color: #dc143c;
 }
 .btn-status-private:hover {
   color: #fff;
@@ -156,7 +156,7 @@ button.action_icon {
 }
 .btn-status-published {
   color: #000;
-  background-color: #99EE44;
+  background-color: #99ee44;
 }
 .btn-status-published .glyphicon {
   color: inherit !important;
@@ -167,11 +167,11 @@ button.action_icon {
 }
 .btn-status-deprecated {
   color: #fff;
-  background-color: #000;
+  background-color: #000000;
 }
 .btn-status-deprecated:hover {
   color: #fff;
-  background-color: #333;
+  background-color: #333333;
 }
 .btn-status-redirected {
   color: #fff;
@@ -183,11 +183,11 @@ button.action_icon {
 }
 .btn-status-trash {
   color: #fff;
-  background-color: #f66;
+  background-color: #ff6666;
 }
 .btn-status-trash:hover {
   color: #fff;
-  background-color: #f44;
+  background-color: #ff4444;
 }
 span.fa {
   line-height: inherit;
@@ -529,7 +529,7 @@ code {
   color: #f60;
 }
 .green {
-  color: #0c0;
+  color: #00cc00;
 }
 .black {
   color: #000;
@@ -785,7 +785,7 @@ div#evo_toolbar .actions_right {
 }
 .evobar-menu a.disabled,
 .evobar-menu a.disabled:hover {
-  color: #999;
+  color: #999999;
 }
 .evobar-menu [class^=evobar-icon-] {
   margin-left: 6px;
@@ -844,7 +844,7 @@ div#evo_toolbar .actions_right {
   left: 0;
   width: 100%;
   text-align: center;
-  text-shadow: -1px -1px #000, -2px 0 #000, -1px 1px #000, 0 2px #000, 1px 1px #000, 2px 0 #000, 1px -1px #000, 0 -2px #000;
+  text-shadow: -1px -1px #000000, -2px 0 #000000, -1px 1px #000000, 0 2px #000000, 1px 1px #000000, 2px 0 #000000, 1px -1px #000000, 0 -2px #000000;
   color: #FFF;
   font-weight: bold;
 }

@@ -464,8 +464,8 @@ class menu_link_Widget extends ComponentWidget
 				break;
 
 			case 'postnew':
-				if( ! check_item_perm_create() )
-				{	// Don't allow users to create a new post
+				if( ! check_item_perm_create( $current_Blog ) )
+				{	// Don't allow users to create a new post:
 					return false;
 				}
 				$url = url_add_param( $current_Blog->get( 'url' ), 'disp=edit' );

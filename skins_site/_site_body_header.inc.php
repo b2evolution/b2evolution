@@ -17,8 +17,8 @@ global $baseurl, $Settings;
 <?php
 if( $Settings->get( 'notification_logo' ) != '' )
 {
-	$site_title = $Settings->get( 'notification_long_name' ) != '' ? ' title="'.$Settings->get( 'notification_long_name' ).'"' : '';
-	$site_name_text = '<img src="'.$Settings->get( 'notification_logo' ).'" alt="'.$Settings->get( 'notification_short_name' ).'"'.$site_title.' />';
+	$site_title = $Settings->get( 'notification_long_name' ) != '' ? ' title="'.$Settings->dget( 'notification_long_name', 'htmlattr' ).'"' : '';
+	$site_name_text = '<img src="'.$Settings->get( 'notification_logo' ).'" alt="'.$Settings->dget( 'notification_short_name', 'htmlattr' ).'"'.$site_title.' />';
 	$site_title_class = ' swhead_logo';
 }
 else

@@ -1446,31 +1446,31 @@ table.diff td.diff-title-addedline {
   max-width: 50px;
 }
 .status_color_draft {
-  color: #ff9;
+  color: #ffff99;
 }
 .status_color_review {
-  color: #CC0099;
+  color: #cc0099;
 }
 .status_color_community {
-  color: #2E8BB9;
+  color: #2e8bb9;
 }
 .status_color_protected {
-  color: #FF9C2A;
+  color: #ff9c2a;
 }
 .status_color_private {
-  color: #DC143C;
+  color: #dc143c;
 }
 .status_color_published {
-  color: #99EE44;
+  color: #99ee44;
 }
 .status_color_deprecated {
-  color: #000;
+  color: #000000;
 }
 .status_color_redirected {
   color: #663399;
 }
 .status_color_trash {
-  color: #f66;
+  color: #ff6666;
 }
 .status_color_meta {
   color: #5bc0de;
@@ -1480,7 +1480,7 @@ table.diff td.diff-title-addedline {
 }
 .btn-status-draft {
   color: #000;
-  background-color: #ff9;
+  background-color: #ffff99;
   border-color: #dfdfdf;
 }
 .btn-status-draft:hover {
@@ -1489,7 +1489,7 @@ table.diff td.diff-title-addedline {
 }
 .btn-status-review {
   color: #fff;
-  background-color: #CC0099;
+  background-color: #cc0099;
 }
 .btn-status-review:hover {
   color: #fff;
@@ -1497,7 +1497,7 @@ table.diff td.diff-title-addedline {
 }
 .btn-status-community {
   color: #fff;
-  background-color: #2E8BB9;
+  background-color: #2e8bb9;
 }
 .btn-status-community:hover {
   color: #fff;
@@ -1505,7 +1505,7 @@ table.diff td.diff-title-addedline {
 }
 .btn-status-protected {
   color: #fff;
-  background-color: #FF9C2A;
+  background-color: #ff9c2a;
 }
 .btn-status-protected:hover {
   color: #fff;
@@ -1513,7 +1513,7 @@ table.diff td.diff-title-addedline {
 }
 .btn-status-private {
   color: #fff;
-  background-color: #DC143C;
+  background-color: #dc143c;
 }
 .btn-status-private:hover {
   color: #fff;
@@ -1521,7 +1521,7 @@ table.diff td.diff-title-addedline {
 }
 .btn-status-published {
   color: #000;
-  background-color: #99EE44;
+  background-color: #99ee44;
 }
 .btn-status-published .glyphicon {
   color: inherit !important;
@@ -1532,11 +1532,11 @@ table.diff td.diff-title-addedline {
 }
 .btn-status-deprecated {
   color: #fff;
-  background-color: #000;
+  background-color: #000000;
 }
 .btn-status-deprecated:hover {
   color: #fff;
-  background-color: #333;
+  background-color: #333333;
 }
 .btn-status-redirected {
   color: #fff;
@@ -1548,11 +1548,11 @@ table.diff td.diff-title-addedline {
 }
 .btn-status-trash {
   color: #fff;
-  background-color: #f66;
+  background-color: #ff6666;
 }
 .btn-status-trash:hover {
   color: #fff;
-  background-color: #f44;
+  background-color: #ff4444;
 }
 .evo_checkbox_status {
   padding: 0 1px 1px 1px;
@@ -1563,31 +1563,31 @@ table.diff td.diff-title-addedline {
   padding: 1px 1px 2px 1px;
 }
 .evo_checkbox_status__published {
-  background-color: #99EE44;
+  background-color: #99ee44;
 }
 .evo_checkbox_status__community {
-  background-color: #2E8BB9;
+  background-color: #2e8bb9;
 }
 .evo_checkbox_status__protected {
-  background-color: #FF9C2A;
+  background-color: #ff9c2a;
 }
 .evo_checkbox_status__review {
-  background-color: #CC0099;
+  background-color: #cc0099;
 }
 .evo_checkbox_status__private {
-  background-color: #DC143C;
+  background-color: #dc143c;
 }
 .evo_checkbox_status__draft {
-  background-color: #ff9;
+  background-color: #ffff99;
 }
 .evo_checkbox_status__deprecated {
-  background-color: #000;
+  background-color: #000000;
 }
 .evo_checkbox_status__redirected {
   background-color: #663399;
 }
 .evo_checkbox_status__trash {
-  background-color: #f66;
+  background-color: #ff6666;
 }
 .evo_checkbox_status__meta {
   background-color: #5bc0de;

@@ -21,7 +21,7 @@ div.widget_core_user_avatars.evo_layout_rwd img {
 }
 .widget_core_org_members {
   margin: 5em 0 30px;
-  color: #333;
+  color: #333333;
 }
 .widget_core_org_members div.widget_rwd_content {
   text-align: center;
@@ -42,7 +42,7 @@ div.widget_core_user_avatars.evo_layout_rwd img {
   font-size: 18px;
 }
 .widget_core_org_members a.user_link {
-  color: #000;
+  color: #000000;
 }
 .widget_core_org_members a.user_link:hover {
   color: #23527c;

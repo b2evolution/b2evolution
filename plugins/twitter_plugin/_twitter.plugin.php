@@ -352,7 +352,7 @@ class twitter_plugin extends Plugin
 
 		if( $target_type == 'blog' )
 		{ // redirect to blog settings
-			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=renderers&blog='.$target_id );
+			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=plugins&blog='.$target_id );
 		}
 		else if ($target_type == 'user' )
 		{ // redirect to user advanced preferences form
@@ -451,7 +451,7 @@ class twitter_plugin extends Plugin
 
 		if( $target_type == 'blog' )
 		{ // Blog settings
-			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=renderers&blog='.$target_id );
+			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=plugins&blog='.$target_id );
 
 			$BlogCache = & get_BlogCache();
 			$Blog = $BlogCache->get_by_ID( $target_id );
