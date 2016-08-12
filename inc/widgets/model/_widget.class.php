@@ -319,9 +319,12 @@ class ComponentWidget extends DataObject
 
 		if( ! isset( $r['allow_blockcache'] ) )
 		{
+			$widget_Blog = & $this->get_Blog();
 			$r['allow_blockcache'] = array(
 					'label' => T_( 'Allow caching' ),
-					'note' => T_( 'Uncheck to prevent this widget from ever being cached in the block cache. (The whole page may still be cached.) This is only needed when a widget is poorly handling caching and cache keys.' ),
+					'note' => $widget_Blog->get_setting( 'cache_enabled_widgets' ) ?
+							T_('Uncheck to prevent this widget from ever being cached in the block cache. (The whole page may still be cached.) This is only needed when a widget is poorly handling caching and cache keys.') :
+							T_('Block caching is disabled for this collection.'),
 					'type' => 'checkbox',
 					'defaultvalue' => true,
 				);
