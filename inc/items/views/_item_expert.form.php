@@ -698,7 +698,7 @@ $Form->begin_form( '', '', $params );
 	// ################### TEXT RENDERERS ###################
 
 	$Form->begin_fieldset( T_('Text Renderers').get_manual_link( 'post-renderers-panel' )
-					.action_icon( T_('Plugins'), 'edit', $admin_url.'?ctrl=coll_settings&amp;tab=renderers&amp;blog='.$Blog->ID, T_('Plugins'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
+					.action_icon( T_('Plugins'), 'edit', $admin_url.'?ctrl=coll_settings&amp;tab=plugins&plugin_group=rendering&amp;blog='.$Blog->ID, T_('Plugins'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
 				array( 'id' => 'itemform_renderers', 'fold' => true ) );
 
 	// fp> TODO: there should be no param call here (shld be in controller)

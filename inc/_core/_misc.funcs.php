@@ -1352,11 +1352,11 @@ function make_clickable_callback( $text, $moredelim = '&amp;', $additional_attrs
 		/* Tblue> I removed the double quotes from the first RegExp because
 				  it made URLs in tag attributes clickable.
 				  See http://forums.b2evolution.net/viewtopic.php?p=92073 */
-		array( '#(^|[\s>\(]|\[url=)(https?|mailto)://([^<>{}\s]+[^.,:;!\?<>{}\s\]\)])#i',
-			'#(^|[\s>\(]|\[url=)aim:([^,<\s\]\)]+)#i',
+		array( '#(^|[\s>\(]|\[url=)(https?|mailto)://([^"<>{}\s]+[^".,:;!\?<>{}\s\]\)])#i',
+			'#(^|[\s>\(]|\[url=)aim:([^",<\s\]\)]+)#i',
 			'#(^|[\s>\(]|\[url=)icq:(\d+)#i',
-			'#(^|[\s>\(]|\[url=)www\.'.$pattern_domain.'([^<>{}\s]*[^.,:;!\?\s\]\)])#i',
-			'#(^|[\s>\(]|\[url=)([a-z0-9\-_.]+?)@'.$pattern_domain.'([^.,:;!\?<\s\]\)]+)#i', ),
+			'#(^|[\s>\(]|\[url=)www\.'.$pattern_domain.'([^"<>{}\s]*[^".,:;!\?\s\]\)])#i',
+			'#(^|[\s>\(]|\[url=)([a-z0-9\-_.]+?)@'.$pattern_domain.'([^".,:;!\?<\s\]\)]+)#i', ),
 		array( '$1<a href="$2://$3"'.$additional_attrs.'>$2://$3</a>',
 			'$1<a href="aim:goim?screenname=$2$3'.$moredelim.'message='.rawurlencode(T_('Hello')).'"'.$additional_attrs.'>$2$3</a>',
 			'$1<a href="http://wwp.icq.com/scripts/search.dll?to=$2"'.$additional_attrs.'>$2</a>',

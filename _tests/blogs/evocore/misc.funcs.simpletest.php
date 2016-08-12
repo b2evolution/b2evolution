@@ -54,6 +54,9 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 				'<img src="http://example.com/" />' => '<img src="http://example.com/" />',
 				'<img src=http://example.com/ />' => '<img src=http://example.com/ />',
 				'<div>http://example.com/</div>' => '<div><a href="http://example.com/">http://example.com/</a></div>',
+
+				// XSS sample:
+				'text http://test_url.test"onmouseover="alert(1)"onerror=1 "text' => 'text <a href="http://test_url.test">http://test_url.test</a>"onmouseover="alert(1)"onerror=1 "text',
 			) as $lText => $lExpected )
 		{
 			$this->assertEqual( make_clickable($lText), $lExpected );

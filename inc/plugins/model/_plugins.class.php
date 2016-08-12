@@ -2236,7 +2236,7 @@ class Plugins
 						default:
 							if( ! empty( $setting_Blog ) && $current_User->check_perm( 'blog_properties', 'edit', false, $setting_Blog->ID ) )
 							{ // Check if current user can edit the blog plugin settings
-								$settings_url = $admin_url.'?ctrl=coll_settings&amp;tab=renderers&amp;blog='.$setting_Blog->ID;
+								$settings_url = $admin_url.'?ctrl=coll_settings&amp;tab=plugins&amp;blog='.$setting_Blog->ID;
 							}
 							break;
 					}

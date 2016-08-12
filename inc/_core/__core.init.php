@@ -1248,7 +1248,7 @@ class _core_Module extends Module
 										'text' => T_('SEO').'&hellip;',
 										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=seo'.$blog_param,
 									),
-									'renderers' => array(
+									'plugins' => array(
 										'text' => T_('Plugins').'&hellip;',
 										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugins'.$blog_param,
 									),
@@ -1769,9 +1769,9 @@ class _core_Module extends Module
 							'text' => T_('Settings'),
 							'href' => '?ctrl=email&amp;tab=settings',
 							'entries' => array(
-								'renderers' => array(
-									'text' => T_('Renderers'),
-									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=renderers' ),
+								'plugins' => array(
+									'text' => T_('Plugins'),
+									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=plugins' ),
 								'envelope' => array(
 									'text' => T_('Envelope'),
 									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=envelope' ),
