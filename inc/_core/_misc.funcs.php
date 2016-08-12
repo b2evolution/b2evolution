@@ -893,7 +893,7 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
  * Replace content outside blocks <code></code>, <pre></pre> and markdown codeblocks
  *
  * @param array|string Search list
- * @param array|string Replace list
+ * @param array|string Replace list or Callback function
  * @param string Source content
  * @param string Callback function name
  * @param string Type of callback function: 'preg' -> preg_replace(), 'str' -> str_replace() (@see replace_content())

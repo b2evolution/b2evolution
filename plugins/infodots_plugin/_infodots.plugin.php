@@ -45,14 +45,6 @@ class infodots_plugin extends Plugin
 	{
 		$this->short_desc = T_('Info dots formatting e-g [infodot:1234:40:60:20ex]html text[enddot]');
 		$this->long_desc = T_('This plugin allows to render info dots over images by using the syntax [infodot:1234:40:60:20ex]html text[enddot] for example');
-
-		// Pattern to search the stars
-// fp>yura: do we need this to be a variable? Does it ever change? Is it used by a function that is not in this plugin?
-		$this->search_text = '#((<br />|<p>)\r?\n?)?\[infodot:(\d+):(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)(:\d+[pxecm%]*)?\](.+?)\[enddot\](\r?\n?(<br />|</p>))?#is';
-
-// fp>yura: following comment is wrong. ALSO: do we need this to be a variable? Does it ever change? Is it used by a function that is not in this plugin?
-		// Function to build template for stars
-		$this->replace_func = array( $this, 'load_infodot_from_source' );
 	}
 
 
@@ -197,10 +189,12 @@ class infodots_plugin extends Plugin
 		$content = & $params['data'];
 		$Item = $params['Item'];
 
+		// Pattern to search the infodots like [infodot:1234:40:60:20ex]html text[enddot]:
+		$infodot_pattern = '#((<br />|<p>)\r?\n?)?\[infodot:(\d+):(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)(:\d+[pxecm%]*)?\](.+?)\[enddot\](\r?\n?(<br />|</p>))?#is';
+
 		$this->dot_numbers = NULL;
 		$this->object_ID = 'itm_'.$Item->ID;
-		$content = replace_content_outcode( $this->search_text, $this->replace_func, $content, 'replace_content_callback' );
-// fp>yura: second param is documented as "Replace list". Why do we pass a function name?
+		$content = replace_content_outcode( $infodot_pattern, array( $this, 'load_infodot_from_source' ), $content, 'replace_content_callback' );
 		$this->loaded_objects[ $this->object_ID ] = 1;
 
 		return true;
@@ -247,8 +241,13 @@ class infodots_plugin extends Plugin
 
 
 	/**
-	 *
 	 * Render comments if required
+	 *
+	 * Renders code:
+	 * from [infodot:1234:40:60:20ex]html text[enddot]
+	 * to <div class="infodots_info" id="infodot_1234_1" xy="40:60" style="width:20ex:>html text</div>
+	 * 
+	 * This event also collects all dots in the array $this->dots.
 	 *
 	 * @see Plugin::FilterCommentContent()
 	 */
@@ -259,10 +258,13 @@ class infodots_plugin extends Plugin
 		if( in_array( $this->code, $Comment->get_renderers_validated() ) )
 		{ // apply_comment_rendering is set to render
 			$content = & $params['data'];
+
+			// Pattern to search the infodots like [infodot:1234:40:60:20ex]html text[enddot]:
+			$infodot_pattern = '#((<br />|<p>)\r?\n?)?\[infodot:(\d+):(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)(:\d+[pxecm%]*)?\](.+?)\[enddot\](\r?\n?(<br />|</p>))?#is';
+
 			$this->dot_numbers = NULL;
 			$this->object_ID = 'cmt_'.$Comment->ID;
-			$content = replace_content_outcode( $this->search_text, $this->replace_func, $content, 'replace_content_callback' );
-// fp>yura: second param is documented as "Replace list". Why do we pass a function name?
+			$content = replace_content_outcode( $infodot_pattern, array( $this, 'load_infodot_from_source' ), $content, 'replace_content_callback' );
 			$this->loaded_objects[ $this->object_ID ] = 1;
 		}
 	}
@@ -367,6 +369,11 @@ class infodots_plugin extends Plugin
 	/**
 	 * Render the dots before <img> tag
 	 *
+	 * Renders code:
+	 * from the before collected array $this->dots
+	 * OR from the prerendered content <div class="infodots_info" id="infodot_1234_1" xy="40:60">html text</div>
+	 * to <div class="infodots_dot" rel="infodot_1234_1" style="left:40px;top:60px"></div>
+	 *
 	 * @param array Associative array of parameters. $params['File'] - attachment, $params['data'] - output
 	 * @param string Content of the Item/Comment
 	 */
@@ -403,7 +410,6 @@ class infodots_plugin extends Plugin
 		{ // Load the info dots if they were not loaded before:
 			replace_content_outcode( '#<div class="infodots_info" id="infodot_(\d+)_(\d+)" xy="(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)"[^>]*>(.+?)</div>#is', 
 				array( $this, 'load_infodot_from_rendered_content' ), $content, 'replace_content_callback' );
-// fp>yura: second param is documented as "Replace list". Why do we pass a function name?
 			$this->loaded_objects[ $this->object_ID ] = 1;
 		}
 
