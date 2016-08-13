@@ -76,7 +76,8 @@ div.widget_core_coll_page_list.evo_1pic__special ul li,
 div.widget_core_coll_related_post_list.evo_1pic__special ul li {
   list-style: none;
   height: auto;
-  display: block;
+  display: inline-block;
+  width: 100%;
   clear: both;
   margin: 5px 0;
   padding: 0;
