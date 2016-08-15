@@ -55,7 +55,8 @@
 }
 
 .qq-upload-spinner {display:inline-block; background: url("../icons/loading.gif"); width:15px; height:15px; vertical-align:text-bottom;}
-.qq-upload-size,.qq-upload-cancel {font-size:11px;}
+.qq-upload-cancel {font-size:11px;}
+.qq-upload-size{ white-space: nowrap; }
 
 .qq-upload-failed-text {display:none;}
 .qq-upload-fail .qq-upload-failed-text {display:inline;}

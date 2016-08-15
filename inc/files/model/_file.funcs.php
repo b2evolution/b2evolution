@@ -2214,7 +2214,7 @@ function create_htaccess_deny( $dir )
  */
 function display_dragdrop_upload_button( $params = array() )
 {
-	global $blog, $Settings, $current_User;
+	global $blog, $Settings, $current_User, $b2evo_icons_type;
 
 	$params = array_merge( array(
 			'before'           => '',
@@ -2258,7 +2258,9 @@ function display_dragdrop_upload_button( $params = array() )
 	}
 
 	$root_and_path = $params['fileroot_ID'].'::'.$params['path'];
-	$quick_upload_url = get_htsrv_url().'quick_upload.php?upload=true'.( empty( $blog ) ? '' : '&blog='.$blog );
+	$quick_upload_url = get_htsrv_url().'quick_upload.php?upload=true'
+		.( empty( $blog ) ? '' : '&blog='.$blog )
+		.'&b2evo_icons_type='.$b2evo_icons_type;
 
 	echo $params['before'];
 
@@ -2293,10 +2295,9 @@ function display_dragdrop_upload_button( $params = array() )
 
 		<?php
 		if( $params['LinkOwner'] !== NULL )
-		{ // Add params to link a file right after uploading
-			global $b2evo_icons_type;
+		{	// Add params to link a file right after uploading:
 			$link_owner_type = $params['LinkOwner']->type;
-			echo 'url += "&link_owner='.$link_owner_type.'_'.$params['LinkOwner']->get_ID().'&b2evo_icons_type='.$b2evo_icons_type.'"';
+			echo 'url += "&link_owner='.$link_owner_type.'_'.$params['LinkOwner']->get_ID().'"';
 		}
 		?>
 
