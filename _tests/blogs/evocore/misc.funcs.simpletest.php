@@ -57,6 +57,15 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 
 				// XSS sample:
 				'text http://test_url.test"onmouseover="alert(1)"onerror=1 "text' => 'text <a href="http://test_url.test">http://test_url.test</a>"onmouseover="alert(1)"onerror=1 "text',
+
+				// Test stop symbols:
+				'Please check: http://example.com/index.php?issue=123&page=4; message #5' => 'Please check: <a href="http://example.com/index.php?issue=123&page=4">http://example.com/index.php?issue=123&page=4</a>; message #5',
+				'Info here: http://info.info!' => 'Info here: <a href="http://info.info">http://info.info</a>!',
+				'Did you read this instruction https://doc.com/ip/settings.html? page 3' => 'Did you read this instruction <a href="https://doc.com/ip/settings.html">https://doc.com/ip/settings.html</a>? page 3',
+				'Link http://test.net<p>Detailed info below:</p>' => 'Link <a href="http://test.net">http://test.net</a><p>Detailed info below:</p>',
+				'Go to http://doc.com/page/56>' => 'Go to <a href="http://doc.com/page/56">http://doc.com/page/56</a>>',
+				'Text http://example.com{sample}' => 'Text <a href="http://example.com">http://example.com</a>{sample}',
+				'Plugins{doc http://plugins.com/doc/page/4}' => 'Plugins{doc <a href="http://plugins.com/doc/page/4">http://plugins.com/doc/page/4</a>}',
 			) as $lText => $lExpected )
 		{
 			$this->assertEqual( make_clickable($lText), $lExpected );

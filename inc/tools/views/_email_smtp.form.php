@@ -80,7 +80,7 @@ $Form->radio( 'sendmail_params', $Settings->get( 'sendmail_params' ), array(
 			array( 'from', '<code>-f $return-address$</code>', ),
 			array( 'custom', T_('Custom').':', '',
 				'<input type="text" class="form_text_input form-control" name="sendmail_params_custom"
-					size="150" value="'.format_to_output( $Settings->get( 'sendmail_params_custom' ), 'formvalue' ).'" />
+					size="150" value="'.$Settings->dget( 'sendmail_params_custom', 'formvalue' ).'" />
 					<span class="notes">'.sprintf( T_('Allowed placeholders: %s'), '<code>$from-address$</code>, <code>$return-address$</code>' ).'</span>' ),
 		), T_('Sendmail additional params'), true );
 

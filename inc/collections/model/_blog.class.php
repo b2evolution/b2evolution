@@ -1815,28 +1815,30 @@ class Blog extends DataObject
 	 * Get the URL of the media folder, on the current blog's domain (which is NOT always the same as the $baseurl domain!).
 	 *
 	 * @param string NULL to use current media_assets_url_type setting.  Use 'basic', 'relative' or 'absolute' to force.
+	 * @param boolean TRUE - to don't force relative URL to absolute on back-office, mail template and feed skin
 	 * @return string URL to /media/ folder
 	 */
-	function get_local_media_url( $url_type = NULL )
+	function get_local_media_url( $url_type = NULL, $force_normal_using = false )
 	{
 		$url_type = is_null( $url_type ) ? $this->get_setting( 'media_assets_url_type' ) : $url_type;
 
 		if( $url_type == 'relative' )
 		{	// Relative URL:
 			global $media_subdir, $Skin;
-			if( is_admin_page() )
-			{	// Force to absolute base URL on back-office side:
-				global $media_url;
-				return $media_url;
+			if( ! $force_normal_using )
+			{	// Don't force URL value to normal using on front-office:
+				if( is_admin_page() || is_mail_template() )
+				{	// Force to absolute base URL on back-office side and email template:
+					global $media_url;
+					return $media_url;
+				}
+				elseif( isset( $Skin ) && $Skin->get( 'type' ) == 'feed' )
+				{	// Force to absolute collection URL on feed skins:
+					return $this->get_baseurl_root().$this->get_basepath().$media_subdir;
+				}
 			}
-			elseif( isset( $Skin ) && $Skin->get( 'type' ) == 'feed' )
-			{	// Force to absolute collection URL on feed skins:
-				return $this->get_baseurl_root().$this->get_basepath().$media_subdir;
-			}
-			else
-			{	// Use relative URL for other skins:
-				return $this->get_basepath().$media_subdir;
-			}
+			// Use relative URL for other skins:
+			return $this->get_basepath().$media_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL

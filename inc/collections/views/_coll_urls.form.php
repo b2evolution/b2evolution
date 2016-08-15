@@ -327,7 +327,7 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 					'url'          => $media_url,
 					'absolute_url' => 'media_assets_absolute_url',
 					'folder'       => '/media/',
-					'local_url'    => $edited_Blog->get_local_media_url( 'relative' )
+					'local_url'    => $edited_Blog->get_local_media_url( 'relative', true )
 				);
 		}
 

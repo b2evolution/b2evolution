@@ -4012,7 +4012,12 @@ function mail_autoinsert_user_data( $text, $User = NULL )
  */
 function mail_template( $template_name, $format = 'auto', $params = array(), $User = NULL )
 {
-	global $current_charset;
+	global $current_charset, $is_mail_template;
+
+	// Flag to currently mail template mode:
+	// @see is_mail_template()
+	// (For example, useful to force media URLs to absolute)
+	$is_mail_template = true;
 
 	if( !empty( $params['locale'] ) )
 	{ // Switch to locale for current email template
@@ -4113,6 +4118,9 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 	{ // Restore previous locale
 		locale_restore_previous();
 	}
+
+	// Disable mail template mode:
+	$is_mail_template = false;
 
 	if( isset( $template_contents ) )
 	{ // Return array for multipart content
@@ -5409,6 +5417,19 @@ function is_front_page()
 	global $is_front;
 
 	return isset( $is_front ) && $is_front === true;
+}
+
+
+/**
+ * Check it currently we are building email template
+ *
+ * @return boolean
+ */
+function is_mail_template()
+{
+	global $is_mail_template;
+
+	return isset( $is_mail_template ) && $is_mail_template === true;
 }
 
 
