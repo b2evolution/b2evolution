@@ -31,7 +31,7 @@ class LinkItem extends LinkOwner
 	function __construct( $Item )
 	{
 		// call parent contsructor
-		parent::__construct( $Item, 'item' );
+		parent::__construct( $Item, 'item', 'itm_ID' );
 		$this->Item = & $this->link_Object;
 
 		$this->_trans = array(
@@ -164,7 +164,7 @@ class LinkItem extends LinkOwner
 		}
 
 		$edited_Link = new Link();
-		$edited_Link->set( 'itm_ID', $this->Item->ID );
+		$edited_Link->set( $this->get_ID_field_name(), $this->get_ID() );
 		$edited_Link->set( 'file_ID', $file_ID );
 		$edited_Link->set( 'position', $position );
 		$edited_Link->set( 'order', $order );
@@ -177,7 +177,7 @@ class LinkItem extends LinkOwner
 			$File = $FileCache->get_by_ID( $file_ID, false, false );
 			$file_name = empty( $File ) ? '' : $File->get_name();
 			$file_dir = $File->dir_or_file();
-			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s',  ucfirst( $file_dir ), '[['.$file_name.']]', $this->type, $this->link_Object->ID ), 'info', 'file', $file_ID );
+			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s',  ucfirst( $file_dir ), '[['.$file_name.']]', $this->type, $this->get_ID() ), 'info', 'file', $file_ID );
 
 			if( $update_owner )
 			{ // Update last touched date of the Item
@@ -205,12 +205,6 @@ class LinkItem extends LinkOwner
 		}
 	}
 
-	/**
-	 * Get where condition for select query to get Item links
-	 */
-	function get_where_condition() {
-		return 'link_itm_ID = '.$this->Item->ID;
-	}
 
 	/**
 	 * Get Item parameter

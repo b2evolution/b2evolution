@@ -478,7 +478,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_links' => array(
-		'Creating table for Post Links',
+		'Creating table for Links',
 		"CREATE TABLE T_links (
 			link_ID               int(11) unsigned  not null AUTO_INCREMENT,
 			link_datecreated      datetime          not null DEFAULT '2000-01-01 00:00:00',
@@ -489,6 +489,8 @@ $schema_queries = array_merge( $schema_queries, array(
 			link_cmt_ID           int(11) unsigned  NULL COMMENT 'Used for linking files to comments (comment attachments)',
 			link_usr_ID           int(11) unsigned  NULL COMMENT 'Used for linking files to users (user profile picture)',
 			link_ecmp_ID          int(11) unsigned  NULL COMMENT 'Used for linking files to email campaign',
+			link_msg_ID           int(11) unsigned  NULL COMMENT 'Used for linking files to private message',
+			link_tmp_ID           int(11) unsigned  NULL COMMENT 'Used for linking files to new creating object',
 			link_file_ID          int(11) unsigned  NULL,
 			link_ltype_ID         int(11) unsigned  NOT NULL default 1,
 			link_position         varchar(10) COLLATE ascii_general_ci NOT NULL,
@@ -499,6 +501,14 @@ $schema_queries = array_merge( $schema_queries, array(
 			INDEX link_cmt_ID( link_cmt_ID ),
 			INDEX link_usr_ID( link_usr_ID ),
 			INDEX link_file_ID (link_file_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_temporary_ID' => array(
+		'Creating table for temporary ID',
+		"CREATE TABLE T_temporary_ID (
+			tmp_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			tmp_type VARCHAR(32) COLLATE ascii_general_ci NOT NULL,
+			PRIMARY KEY (tmp_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_links__vote' => array(

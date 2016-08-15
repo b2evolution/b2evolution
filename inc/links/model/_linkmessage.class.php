@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the LinkEmailCampaign class, which is a wrapper class for EmailCampaign class to handle linked files.
+ * This file implements the LinkMessage class, which is a wrapper class for Message class to handle linked files.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -14,41 +14,41 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * LinkEmailCampaign Class
+ * LinkMessage Class
  *
  * @package evocore
  */
-class LinkEmailCampaign extends LinkOwner
+class LinkMessage extends LinkOwner
 {
 	/**
-	 * @var EmailCampaign
+	 * @var Message
 	 */
-	var $EmailCampaign;
+	var $Message;
 
 	/**
 	 * Constructor
 	 */
-	function __construct( $EmailCampaign )
+	function __construct( $Message, $tmp_ID = NULL )
 	{
 		// call parent contsructor
-		parent::__construct( $EmailCampaign, 'emailcampaign', 'ecmp_ID' );
-		$this->EmailCampaign = & $this->link_Object;
+		parent::__construct( $Message, 'message', 'msg_ID', $tmp_ID );
+		$this->Message = & $this->link_Object;
 
 		$this->_trans = array(
-			'Link this image to your xxx' => NT_('Link this image to your email campaign.'),
-			'Link this file to your xxx' => NT_('Link this file to your email campaign.'),
-			'The file will be linked for download at the end of the xxx' => NT_('The file will be appended for linked at the end of the email campaign.'),
-			'Insert the following code snippet into your xxx' => NT_('Insert the following code snippet into your email campaign.'),
-			'View this xxx...' => NT_('View this email campaign...'),
-			'Edit this xxx...' => NT_('Edit this email campaign...'),
-			'Link files to current xxx' => NT_('Link files to current email campaign'),
-			'Selected files have been linked to xxx.' => NT_('Selected files have been linked to email campaign.'),
-			'Link has been deleted from $xxx$.' => NT_('Link has been deleted from email campaign.'),
+			'Link this image to your xxx' => NT_('Link this image to your message.'),
+			'Link this file to your xxx' => NT_('Link this file to your message.'),
+			'The file will be linked for download at the end of the xxx' => NT_('The file will be appended for linked at the end of the message.'),
+			'Insert the following code snippet into your xxx' => NT_('Insert the following code snippet into your message.'),
+			'View this xxx...' => NT_('View this message...'),
+			'Edit this xxx...' => NT_('Edit this message...'),
+			'Link files to current xxx' => NT_('Link files to current message'),
+			'Selected files have been linked to xxx.' => NT_('Selected files have been linked to message.'),
+			'Link has been deleted from $xxx$.' => NT_('Link has been deleted from message.'),
 		);
 	}
 
 	/**
-	 * Check current User Email Campaign permission
+	 * Check current User Message permission
 	 *
 	 * @param string permission level
 	 * @param boolean true to assert if user dosn't have the required permission
@@ -56,8 +56,9 @@ class LinkEmailCampaign extends LinkOwner
 	function check_perm( $permlevel, $assert = false )
 	{
 		global $current_User;
-		return $current_User->check_perm( 'emails', $permlevel, $assert );
+		return $current_User->check_perm( 'perm_messaging', 'reply', $assert );
 	}
+
 
 	/**
 	 * Get all positions ( key, display ) pairs where link can be displayed
@@ -67,8 +68,17 @@ class LinkEmailCampaign extends LinkOwner
 	 */
 	function get_positions( $file_ID = NULL )
 	{
-		return array( 'inline' => T_('Inline') );
+		$positions = array(
+				// TRANS: Noun - we're talking about a teaser image i-e: an image that appears before content
+				'teaser'     => T_('Teaser'),
+				// TRANS: noun - we're talking about an inline image i-e: an image that appears in the middle of some text
+				'inline'     => T_('Inline'),
+				'attachment' => T_('Attachment'),
+			);
+
+		return $positions;
 	}
+
 
 	/**
 	 * Get default position for a new link
@@ -82,19 +92,26 @@ class LinkEmailCampaign extends LinkOwner
 	}
 
 	/**
-	 * Load all links of owner Email Campaign if it was not loaded yet
+	 * Load all links of owner Message if it was not loaded yet
 	 */
 	function load_Links()
 	{
 		if( is_null( $this->Links ) )
 		{	// Links have not been loaded yet:
 			$LinkCache = & get_LinkCache();
-			$this->Links = $LinkCache->get_by_emailcampaign_ID( $this->EmailCampaign->ID );
+			if( $this->is_temp )
+			{
+				$this->Links = $LinkCache->get_by_temporary_ID( $this->get_ID() );
+			}
+			else
+			{
+				$this->Links = $LinkCache->get_by_message_ID( $this->get_ID() );
+			}
 		}
 	}
 
 	/**
-	 * Add new link to owner Email Campaign
+	 * Add new link to owner Message
 	 *
 	 * @param integer file ID
 	 * @param integer link position 'inline'
@@ -138,12 +155,12 @@ class LinkEmailCampaign extends LinkOwner
 	 */
 	function load_Blog()
 	{
-		// Email Campaign has no collection
+		// Message has no collection
 	}
 
 
 	/**
-	 * Get Email Campaign parameter
+	 * Get Message parameter
 	 *
 	 * @param string parameter name to get
 	 */
@@ -152,55 +169,32 @@ class LinkEmailCampaign extends LinkOwner
 		switch( $parname )
 		{
 			case 'name':
-				return 'emailcampaign';
+				return 'post';
 		}
 		return parent::get( $parname );
 	}
 
 
 	/**
-	 * Get Email Campaign edit url
+	 * Get Message edit url
 	 */
 	function get_edit_url()
 	{
-		global $admin_url;
-
-		return $admin_url.'?ctrl=campaigns&amp;action=edit&amp;tab=compose&amp;ecmp_ID='.$this->EmailCampaign->ID;
+		return $this->get_view_url();
 	}
 
 	/**
-	 * Get Email Campaign view url
+	 * Get Message view url
 	 */
 	function get_view_url()
 	{
-		global $admin_url;
-
-		return $admin_url.'?ctrl=campaigns&amp;action=edit&amp;tab=send&amp;ecmp_ID='.$this->EmailCampaign->ID;
-	}
-
-
-	/**
-	 * This function is called after when some file was unlinked from Email Campaign
-	 *
-	 * @param integer Link ID
-	 */
-	function after_unlink_action( $link_ID = 0 )
-	{
-		if( empty( $this->EmailCampaign ) )
-		{	// No existing Email Campaign, Exit here:
-			return;
+		$view_url = '';
+		if( ! empty( $this->Message ) && ( $this->Message instanceof Message ) && $Thread = & $this->Message->get_Thread() )
+		{
+			$view_url = $admin_url.'?ctrl=messages&amp;thrd_ID='.$Thread->ID;
 		}
 
-		if( ! empty( $link_ID ) )
-		{	// Find inline image placeholders if link ID is defined:
-			preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):'.$link_ID.':?[^\]]*\]/i', $this->EmailCampaign->email_text, $inline_images );
-			if( ! empty( $inline_images[0] ) )
-			{	// There are inline image placeholders in the post content:
-				$this->EmailCampaign->set( 'email_text', str_replace( $inline_images[0], '', $this->EmailCampaign->email_text ) );
-				$this->EmailCampaign->dbupdate();
-				return;
-			}
-		}
+		return $view_url;
 	}
 }
 

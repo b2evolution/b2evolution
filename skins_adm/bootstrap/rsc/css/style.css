@@ -659,13 +659,18 @@ fieldset ul {
 }
 #itemform_links .panel,
 #cmntform_links .panel,
-#ecmpform_links .panel {
+#ecmpform_links .panel,
+#msgform_links .panel {
   overflow: hidden;
 }
 #itemform_links .panel-body,
 #cmntform_links .panel-body,
-#ecmpform_links .panel-body {
+#ecmpform_links .panel-body,
+#msgform_links .panel-body {
   padding: 0;
+}
+#msgform_links {
+  margin-bottom: 20px;
 }
 #itemform_goals td {
   padding-bottom: 2px;

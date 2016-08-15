@@ -26,10 +26,6 @@ global $LinkOwner;
 
 global $AdminUI, $current_User;
 
-// Override $debug in order to keep the display of the iframe neat
-global $debug;
-$debug = 0;
-
 if( empty( $Blog ) )
 {
 	$Collection = $Blog = & $LinkOwner->get_Blog();
@@ -144,17 +140,22 @@ switch( $LinkOwner->type )
 {
 	case 'item':
 		$upload_fileroot = FileRoot::gen_ID( 'collection', $Blog->ID );
-		$upload_path = '/quick-uploads/p'.$LinkOwner->link_Object->ID.'/';
+		$upload_path = '/quick-uploads/p'.$LinkOwner->get_ID().'/';
 		break;
 
 	case 'comment':
 		$upload_fileroot = FileRoot::gen_ID( 'collection', $Blog->ID );
-		$upload_path = '/quick-uploads/c'.$LinkOwner->link_Object->ID.'/';
+		$upload_path = '/quick-uploads/c'.$LinkOwner->get_ID().'/';
 		break;
 
 	case 'emailcampaign':
-		$upload_fileroot = FileRoot::gen_ID( 'emailcampaign', $LinkOwner->link_Object->ID );
-		$upload_path = '/'.$LinkOwner->link_Object->ID.'/';
+		$upload_fileroot = FileRoot::gen_ID( 'emailcampaign', $LinkOwner->get_ID() );
+		$upload_path = '/'.$LinkOwner->get_ID().'/';
+		break;
+
+	case 'message':
+		$upload_fileroot = FileRoot::gen_ID( 'user', $current_User->ID );
+		$upload_path = '/private_message/'.( $LinkOwner->is_temp ? 'tmp' : 'pm' ).$LinkOwner->get_ID().'/';
 		break;
 }
 

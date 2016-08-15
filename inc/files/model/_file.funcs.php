@@ -2264,6 +2264,11 @@ function display_dragdrop_upload_button( $params = array() )
 
 	echo $params['before'];
 
+	if( $params['LinkOwner'] !== NULL && $params['LinkOwner']->is_temp )
+	{	// Use this field to know a form is submitted with temporary link owner(when object is creating and still doesn't exist in DB):
+		echo '<input type="hidden" name="temp_link_owner_ID" value="'.$params['LinkOwner']->get_ID().'" />';
+	}
+
 	?>
 	<div id="file-uploader" style="width:100%">
 		<noscript>

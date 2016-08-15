@@ -7748,6 +7748,23 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12070, 'Create table for temporary ID...' ) )
+	{	// part of 6.8.0-alpha
+		db_create_table( 'T_temporary_ID', '
+			tmp_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			tmp_type VARCHAR(32) COLLATE ascii_general_ci NOT NULL,
+			PRIMARY KEY (tmp_ID)' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12075, 'Upgrade links table...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_links
+			ADD link_msg_ID int(11) unsigned  NULL COMMENT \'Used for linking files to private message\' AFTER link_ecmp_ID,
+			ADD link_tmp_ID int(11) unsigned  NULL COMMENT \'Used for linking files to new creating object\' AFTER link_msg_ID' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

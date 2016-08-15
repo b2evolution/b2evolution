@@ -374,6 +374,11 @@ if( $upload )
 							$LinkOwner = new LinkEmailCampaign( $linked_EmailCampaign );
 						}
 						break;
+
+					case 'message':
+						// Get LinkOwner object of the Message:
+						$LinkOwner = new LinkMessage( NULL, $link_owner_ID );
+						break;
 				}
 			}
 

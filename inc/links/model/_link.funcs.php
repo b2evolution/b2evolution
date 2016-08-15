@@ -19,6 +19,8 @@ load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
 load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
 load_class( 'links/model/_linkuser.class.php', 'LinkUser' );
 load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
+load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
+load_class( 'links/model/_temporaryid.class.php', 'TemporaryID' );
 
 /**
  * Get a link owner object from link_type and object ID
@@ -56,6 +58,27 @@ function & get_link_owner( $link_type, $object_ID )
 			$EmailCampaignCache = & get_EmailCampaignCache();
 			$EmailCampaign = $EmailCampaignCache->get_by_ID( $object_ID, false );
 			$LinkOwner = new LinkEmailCampaign( $EmailCampaign );
+			break;
+
+		case 'message':
+			// Create LinkMessage object:
+			$MessageCache = & get_MessageCache();
+			$Message = $MessageCache->get_by_ID( $object_ID, false );
+			$LinkOwner = new LinkMessage( $Message );
+			break;
+
+		case 'temporary':
+			// Create Link temporary object:
+			$TemporaryIDCache = & get_TemporaryIDCache();
+			$TemporaryID = $TemporaryIDCache->get_by_ID( $object_ID, false );
+			switch( $TemporaryID->get( 'type' ) )
+			{
+				case 'message':
+					$LinkOwner = new LinkMessage( NULL, $object_ID );
+					break;
+			}
+			$LinkOwner->type = 'temporary';
+			$LinkOwner->is_temp = true;
 			break;
 
 		default:
@@ -104,6 +127,12 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 		case 'emailcampaign':
 			$window_title = format_to_js( sprintf( T_('Attach files to email campaign "%s"'), $LinkOwner->EmailCampaign->get( 'name' ) ) );
 			$form_id = 'ecmpform_links';
+			break;
+
+		case 'message':
+			//$Thread = & $LinkOwner->Message->get_Thread();
+			$window_title = '';// format_to_js( sprintf( T_('Attach files to message "%s"'), $Thread->get( 'title' ) ) );
+			$form_id = 'msgform_links';
 			break;
 
 		default:
@@ -159,9 +188,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 
 	$fieldset_title .= '<span class="floatright">&nbsp;'
 
-			.action_icon( T_('Refresh'), 'refresh', $admin_url.( $LinkOwner->type == 'item'
-					? '?ctrl=items&action=edit&p='.$LinkOwner->get_ID()
-					: '?ctrl=comments&action=edit&comment_ID='.$LinkOwner->get_ID() ),
+			.action_icon( T_('Refresh'), 'refresh', $LinkOwner->get_edit_url(),
 				T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\' )' ) )
 
 			.action_icon( T_('Sort'), 'ascending', $admin_url
@@ -412,7 +439,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 		}
 	}
 
-	if( ( $link_type == 'item' || $link_type == 'emailcampaign' ) && $current_File )
+	if( in_array( $link_type, array( 'item', 'emailcampaign', 'message' ) ) && $current_File )
 	{ // Display icon to insert image|video|audio into post inline
 		$type = $current_File->get_file_type();
 
@@ -572,7 +599,7 @@ function get_file_links( $file_ID, $params = array() )
 
 	// Get all links with posts and comments
 	$links_SQL = new SQL();
-	$links_SQL->SELECT( 'link_ID, link_itm_ID, link_cmt_ID, link_usr_ID, link_ecmp_ID' );
+	$links_SQL->SELECT( 'link_ID, link_itm_ID, link_cmt_ID, link_usr_ID, link_ecmp_ID, link_msg_ID' );
 	$links_SQL->FROM( 'T_links' );
 	$links_SQL->WHERE( 'link_file_ID = '.$DB->quote( $file_ID ) );
 	$links = $DB->get_results( $links_SQL->get() );
@@ -652,6 +679,22 @@ function get_file_links( $file_ID, $params = array() )
 						$r .= $params['emailcampaign_prefix'].$EmailCampaign->get( 'name' );
 					}
 					$link_object_ID = $link->link_ecmp_ID;
+				}
+			}
+			elseif( ! empty( $link->link_msg_ID ) )
+			{	// File is linked to message:
+				if( $Message = & $MessageCache->get_by_ID( $link->link_msg_ID, false ) )
+				{
+					$Thread = & $Message->get_Thread();
+					if( ! $current_User->check_perm( 'perm_messaging', 'reply' ) )
+					{	// Build a link to display a message in edit back-office form:
+						$r .= $params['message_prefix'].'<a href="?ctrl=messages&thrd_ID='.$Thread->ID.'">'.$Thread->get( 'title' ).' #'.$Message->ID.'</a>';
+					}
+					else
+					{	// No permission to view message in edit back-office form:
+						$r .= $params['message_prefix'].$Thread->get( 'title' ).' #'.$Message->ID;
+					}
+					$link_object_ID = $link->link_msg_ID;
 				}
 			}
 
