@@ -45,6 +45,10 @@ class infodots_plugin extends Plugin
 	{
 		$this->short_desc = T_('Info dots formatting e-g [infodot:1234:40:60:20ex]html text[enddot]');
 		$this->long_desc = T_('This plugin allows to render info dots over images by using the syntax [infodot:1234:40:60:20ex]html text[enddot] for example');
+
+		// Pattern to search the infodots like [infodot:1234:40:60:20ex]html text[enddot]:
+		// This is used twice: for Items AND for Comments
+		$this->infodot_pattern = '#((<br />|<p>)\r?\n?)?\[infodot:(\d+):(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)(:\d+[pxecm%]*)?\](.+?)\[enddot\](\r?\n?(<br />|</p>))?#is';
 	}
 
 
@@ -189,12 +193,9 @@ class infodots_plugin extends Plugin
 		$content = & $params['data'];
 		$Item = $params['Item'];
 
-		// Pattern to search the infodots like [infodot:1234:40:60:20ex]html text[enddot]:
-		$infodot_pattern = '#((<br />|<p>)\r?\n?)?\[infodot:(\d+):(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)(:\d+[pxecm%]*)?\](.+?)\[enddot\](\r?\n?(<br />|</p>))?#is';
-
 		$this->dot_numbers = NULL;
 		$this->object_ID = 'itm_'.$Item->ID;
-		$content = replace_content_outcode( $infodot_pattern, array( $this, 'load_infodot_from_source' ), $content, 'replace_content_callback' );
+		$content = replace_content_outcode( $this->infodot_pattern, array( $this, 'load_infodot_from_source' ), $content, 'replace_content_callback' );
 		$this->loaded_objects[ $this->object_ID ] = 1;
 
 		return true;
@@ -259,12 +260,9 @@ class infodots_plugin extends Plugin
 		{ // apply_comment_rendering is set to render
 			$content = & $params['data'];
 
-			// Pattern to search the infodots like [infodot:1234:40:60:20ex]html text[enddot]:
-			$infodot_pattern = '#((<br />|<p>)\r?\n?)?\[infodot:(\d+):(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)(:\d+[pxecm%]*)?\](.+?)\[enddot\](\r?\n?(<br />|</p>))?#is';
-
 			$this->dot_numbers = NULL;
 			$this->object_ID = 'cmt_'.$Comment->ID;
-			$content = replace_content_outcode( $infodot_pattern, array( $this, 'load_infodot_from_source' ), $content, 'replace_content_callback' );
+			$content = replace_content_outcode( $this->infodot_pattern, array( $this, 'load_infodot_from_source' ), $content, 'replace_content_callback' );
 			$this->loaded_objects[ $this->object_ID ] = 1;
 		}
 	}
