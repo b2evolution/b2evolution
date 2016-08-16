@@ -183,6 +183,9 @@ class infodots_plugin extends Plugin
 	 * Renders code:
 	 * from [infodot:1234:40:60:20ex]html text[enddot]
 	 * to <div class="infodots_info" id="infodot_1234_1" xy="40:60" style="width:20ex:>html text</div>
+	 * This html <div> is hidden by css .infodots_info { display: none; }. 
+	 * This plugin event is called only once to render content.
+	 * This only generates the content divs. The red dots themselves are added later to the evo_image_block divs, in the "RenderItemAttachment" event.
 	 * 
 	 * This event also collects all dots in the array $this->dots.
 	 *
@@ -247,6 +250,9 @@ class infodots_plugin extends Plugin
 	 * Renders code:
 	 * from [infodot:1234:40:60:20ex]html text[enddot]
 	 * to <div class="infodots_info" id="infodot_1234_1" xy="40:60" style="width:20ex:>html text</div>
+	 * This html <div> is hidden by css .infodots_info { display: none; }. 
+	 * This plugin event is called only once to render content.
+	 * This only generates the content divs. The red dots themselves are added later to the evo_image_block divs, in the "RenderCommentAttachment" event.
 	 * 
 	 * This event also collects all dots in the array $this->dots.
 	 *
@@ -431,8 +437,9 @@ class infodots_plugin extends Plugin
 	/**
 	 * Event handler: Called when displaying item attachment.
 	 *
-	 * Renders the red dots before each image by getting them from array $this->dots if it was initialized during RenderItemAsHtml().
+	 * THis will render the red dots in the same <div> as the image, which is important for using relative positioning based on the image coordinates.
 	 *
+	 * Renders the red dots before each image by getting them from array $this->dots if it was initialized during RenderItemAsHtml().
 	 * If RenderItemAsHtml() was not called (which happens if content was already pre-rendered) then the array $this->dots is built by preg_match from prerendered content 
 	 * from hidden div <div class="infodots_info" id="infodot_1234_1" xy="40:60" style="width:20ex:>html text</div>
 	 *
@@ -465,6 +472,8 @@ class infodots_plugin extends Plugin
 
 	/**
 	 * Event handler: Called when displaying comment attachment.
+	 *
+	 * See sister function RenderItemAttachment() above for more details.
 	 *
 	 * @param array Associative array of parameters. $params['File'] - attachment, $params['data'] - output
 	 * @return boolean true if plugin rendered this attachment
