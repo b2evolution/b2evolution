@@ -102,12 +102,6 @@ class user_profile_pics_Widget extends ComponentWidget
 					'defaultvalue' => '',
 					'size' => 60,
 				),
-			'force_size' => array(
-					'type' => 'text',
-					'label' => T_('Force size'),
-					'note' => T_('Force image sizes by html attributes. Use "160" to set "width=160 height=160" or "160x320" to set "width=160 height=320".'),
-					'defaultvalue' => '',
-				),
 			'before_image' => array(
 					'type'         => 'html_input',
 					'label'        => T_('Before picture'),
@@ -196,7 +190,6 @@ class user_profile_pics_Widget extends ComponentWidget
 					'thumb_class'   => $this->get_param( 'thumb_class' ),
 					'thumb_zoom'    => $current_user_is_viewed,
 					'thumb_overlay' => $thumb_overlay_text,
-					'tag_size'      => $this->get_param( 'force_size' ),
 				) );
 
 			if( is_logged_in() && $target_User->ID == $current_User->ID && ! $target_User->has_avatar() )

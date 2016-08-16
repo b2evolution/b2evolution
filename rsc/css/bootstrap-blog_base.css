@@ -394,6 +394,10 @@ div.container_menu_top input.search_field {
 .widget_core_user_login .user_level {
   color: #999;
 }
+.widget_core_user_profile_pics img {
+  max-width: 100%;
+  height: auto;
+}
 div.widget_core_coll_item_list.nobullets ul,
 div.widget_core_coll_item_list.nobullets ul li,
 li.widget_core_coll_item_list.nobullets ul,
