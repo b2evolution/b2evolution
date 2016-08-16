@@ -243,6 +243,12 @@ class EmailCampaign extends DataObject
 
 		$email_text = $this->get( 'email_text' );
 
+		// Render inline file tags like [image:123:caption] or [file:123:caption] :
+		$email_text = render_inline_files( $email_text, $this, array(
+				'check_code_block' => true,
+				'image_size'       => 'original',
+			) );
+
 		// This must get triggered before any internal validation and must pass all relevant params.
 		$Plugins->trigger_event( 'EmailFormSent', array(
 				'content'         => & $email_text,
@@ -259,6 +265,7 @@ class EmailCampaign extends DataObject
 
 		// Save plain-text message:
 		$email_plaintext = preg_replace( '#<a[^>]+href="([^"]+)"[^>]*>[^<]*</a>#i', ' [ $1 ] ', $this->get( 'email_html' ) );
+		$email_plaintext = preg_replace( '#<img[^>]+src="([^"]+)"[^>]*>#i', ' [ $1 ] ', $email_plaintext );
 		$email_plaintext = preg_replace( '#[\n\r]#i', ' ', $email_plaintext );
 		$email_plaintext = preg_replace( '#<(p|/h[1-6]|ul|ol)[^>]*>#i', "\n\n", $email_plaintext );
 		$email_plaintext = preg_replace( '#<(br|h[1-6]|/li|code|pre|div|/?blockquote)[^>]*>#i', "\n", $email_plaintext );

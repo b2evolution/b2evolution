@@ -55,13 +55,13 @@ class EvoGroupTest extends TestSuite
 	 * @param SimpleReporter Reporter for CLI mode
 	 * @access public
 	 */
-	function run( &$htmlReporter, &$cliReporter )
+	function run2( &$htmlReporter, &$cliReporter )
 	{
 		if( EvoTextReporter::inCli() )
 		{
-			exit( parent::run( $cliReporter ) ? 0 : 1 );
+			exit( $this->run( $cliReporter ) ? 0 : 1 );
 		}
-		parent::run( $htmlReporter );
+		$this->run( $htmlReporter );
 	}
 }
 

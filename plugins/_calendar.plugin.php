@@ -29,7 +29,7 @@ class calendar_plugin extends Plugin
 	var $name;
 	var $code = 'evo_Calr';
 	var $priority = 20;
-	var $version = '6.7.0';
+	var $version = '6.7.5';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'navigation';
@@ -168,7 +168,7 @@ class calendar_plugin extends Plugin
 	 */
 	function get_widget_cache_keys( $widget_ID = 0 )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		return array(
 				'wi_ID'        => $widget_ID, // Have the widget settings changed ?
@@ -222,7 +222,7 @@ class calendar_plugin extends Plugin
 		$itemlist_prefix = isset( $params['itemlist_prefix'] ) ? $params['itemlist_prefix'] : '';
 
 		global $month;
-		global $Blog, $cat_array, $cat_modifier;
+		global $Collection, $Blog, $cat_array, $cat_modifier;
 		global $show_statuses;
 		global $author, $assgn, $status, $types;
 		global ${$itemlist_prefix.'m'}, $w, $dstart;
@@ -557,7 +557,7 @@ class Calendar
 		$this->monthformat = 'F Y';
 		$this->linktomontharchive = true;  // month displayed as link to month' archive
 
-		$this->tablestart = '<table class="bCalendarTable" cellspacing="0" summary="Monthly calendar with links to each day\'s posts">'."\n";
+		$this->tablestart = '<table class="bCalendarTable" title="Monthly calendar with links to each day\'s posts">'."\n";
 		$this->tableend = '</table>';
 
 		$this->monthstart = '<caption>';
@@ -572,7 +572,7 @@ class Calendar
 
 		$this->headerrowstart = '<thead><tr class="bCalendarRow">' . "\n";
 		$this->headerrowend = "</tr></thead>\n";
-		$this->headercellstart = '<th class="bCalendarHeaderCell" abbr="[abbr]" scope="col" title="[abbr]">';	// please leave [abbr] there !
+		$this->headercellstart = '<th class="bCalendarHeaderCell" scope="col" title="[abbr]">';	// please leave [abbr] there !
 		$this->headercellend = "</th>\n";
 
 		$this->cellstart = '<td class="bCalendarCell">';
@@ -985,7 +985,7 @@ class Calendar
 		/**
 		 * @var Blog
 		 */
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $this->link_type == 'context' )
 		{	// We want to preserve context:

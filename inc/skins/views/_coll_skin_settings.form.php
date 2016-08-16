@@ -16,7 +16,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $Blog, $Settings, $current_User;
+global $Collection, $Blog, $Settings, $current_User;
 
 $Form = new Form( NULL, 'skin_settings_checkchanges' );
 

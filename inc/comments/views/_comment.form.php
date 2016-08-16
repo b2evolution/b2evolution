@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var Comment
  */
@@ -183,8 +183,9 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	if( isset($GLOBALS['files_Module']) )
 	{
 		load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
+		global $LinkOwner; // Initialize this object as global because this is used in many link functions
 		$LinkOwner = new LinkComment( $edited_Comment );
-		attachment_iframe( $Form, $LinkOwner, NULL, false, true );
+		display_attachments_fieldset( $Form, $LinkOwner, false, true );
 	}
 
 	// ####################### PLUGIN FIELDSETS #########################

@@ -18,7 +18,7 @@ global $comment_allowed_tags;
 global $comment_cookies, $comment_allow_msgform;
 global $checked_attachments; // Set this var as global to use it in the method $Item->can_attach()
 global $PageCache;
-global $Blog, $dummy_fields;
+global $Collection, $Blog, $dummy_fields;
 
 // Default params:
 $params = array_merge( array(
@@ -256,11 +256,17 @@ function validateCommentForm(form)
 /* ]]> *
 </script>';*/
 
-	$Form = new Form( $samedomain_htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post', NULL, 'multipart/form-data' );
+	$Form = new Form( get_htsrv_url().'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post', NULL, 'multipart/form-data' );
 
 	$Form->switch_template_parts( $params['form_params'] );
 
 	$Form->begin_form( '', '', array( 'target' => '_self'/*, 'onsubmit' => 'return validateCommentForm(this);'*/ ) );
+
+	// Display a message before comment form:
+	$Item->display_comment_form_msg( array(
+			'before' => '<tr><td colspan="2"><div class="warning"><div class="action_messages">',
+			'after'  => '</div></div></td></tr>',
+		) );
 
 	// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.
 	//           Actually, the best would be, if the $Form object could be changed by a plugin
@@ -279,7 +285,7 @@ function validateCommentForm(form)
 			// Make sure we get back to the right page (on the right domain)
 			// fp> TODO: check if we can use the permalink instead but we must check that application wide,
 			// that is to say: check with the comments in a pop-up etc...
-			// url_rel_to_same_host(regenerate_url( '', '', $Blog->get('blogurl'), '&' ), $htsrv_url)
+			// url_rel_to_same_host(regenerate_url( '', '', $Blog->get('blogurl'), '&' ), get_htsrv_url())
 			// fp> what we need is a regenerate_url that will work in permalinks
 			// fp> below is a simpler approach:
 			$Item->get_feedback_url( $disp == 'feedback-popup', '&' )

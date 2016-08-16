@@ -144,6 +144,7 @@ class Plugins_admin extends Plugins
 				'RenderCommentAttachment' => 'Renders comment attachment.',
 				'RenderMessageAsHtml' => 'Renders message content when generated as HTML.',
 				'RenderEmailAsHtml' => 'Renders email content when generated as HTML.',
+				'RenderEmailAttachment' => 'Renders email campaign attachment.',
 				'RenderURL' => 'Renders file by URL.',
 
 
@@ -418,7 +419,7 @@ class Plugins_admin extends Plugins
 					'always' => 'always',
 					'opt-out' => 'opt-out',
 					'opt-in' => 'opt-in',
-					'lazy' => 'automatic', // The plugin will automatically deside to use rendering or not
+					'lazy' => 'automatic', // The plugin will automatically decide to use rendering or not
 					'never' => 'never',
 				);
 		}
@@ -1491,7 +1492,7 @@ class Plugins_admin extends Plugins
 		if( !isset( $params['object_Blog'] ) &&
 		    ( !isset( $params['object_type'] ) || ( isset( $params['object_type'] ) && $params['object_type'] != 'Message' ) ) )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{
 				return false;

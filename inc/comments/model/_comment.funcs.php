@@ -277,7 +277,7 @@ function get_allowed_statuses( $blog )
  */
 function echo_comment_buttons( $Form, $edited_Comment )
 {
-	global $Blog, $AdminUI;
+	global $Collection, $Blog, $AdminUI;
 
 	if( $edited_Comment->is_meta() )
 	{ // Meta comments don't have a status, Display only one button to update
@@ -355,7 +355,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
  */
 function echo_comment_status_buttons( $Form, $edited_Comment )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	$comment_Item = & $edited_Comment->get_Item();
 	// Comment status cannot be more than post status, restrict it:
@@ -798,7 +798,7 @@ function display_comment_replies( $comment_ID, $params = array(), $level = 1 )
  */
 function echo_comment_reply_js( $Item )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( !isset( $Blog ) )
 	{
@@ -862,7 +862,7 @@ function echo_comment_moderate_js()
 		return false;
 	}
 
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( empty( $Blog ) )
 	{
@@ -936,7 +936,7 @@ function comment_mass_delete_process( $mass_type, $deletable_comments_query )
 		return;
 	}
 
-	global $DB, $cache_comments_has_replies, $user_post_read_statuses, $cache_postcats;
+	global $DB, $cache_comments_has_replies, $cache_items_user_data, $cache_postcats;
 
 	/**
 	 * Disable log queries because it increases the memory and stops the process with error "Allowed memory size of X bytes exhausted..."
@@ -982,7 +982,7 @@ function comment_mass_delete_process( $mass_type, $deletable_comments_query )
 			$ItemCache->clear();
 			$ChapterCache->clear();
 			$cache_comments_has_replies = array();
-			$user_post_read_statuses = array();
+			$cache_items_user_data = array();
 			$cache_postcats = array();
 
 			// Get new portion of deletable comments

@@ -445,8 +445,11 @@ class Comment extends DataObject
 				return $this->set_param( 'notif_flags', 'string', implode( ',', $notifications_flags ), $make_null );
 
 			case 'status':
+				// We need to set a reminder here to later check if the new status is allowed at dbinsert or dbupdate time ( $this->restrict_status( true ) )
+				// We cannot check immediately because we may be setting the status before having set a main cat_ID -> a collection ID to check the status possibilities
 				// Save previous status temporarily to make some changes on dbinsert(), dbupdate() & dbdelete()
 				$this->previous_status = $this->get( 'status' );
+				return parent::set( 'status', $parvalue, $make_null );
 
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
@@ -531,39 +534,53 @@ class Comment extends DataObject
 
 		$DB->begin();
 
-		$SQL = new SQL( 'Check if current user already voted on this comment' );
-		$SQL->SELECT( 'cmvt_cmt_ID' );
+		$SQL = new SQL( 'Check if current user already voted on comment #'.$this->ID );
+		$SQL->SELECT( 'cmvt_cmt_ID, cmvt_'.$vote_type.' AS value' );
 		$SQL->FROM( 'T_comments__votes' );
 		$SQL->WHERE( 'cmvt_cmt_ID = '.$DB->quote( $this->ID ) );
 		$SQL->WHERE_and( 'cmvt_user_ID = '.$DB->quote( $current_User->ID ) );
-		if( !$DB->get_row( $SQL->get() ) )
-		{ // Add a new vote for first time
+		$existing_vote = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title );
+
+		if( $existing_vote === NULL )
+		{	// Add a new vote for first time:
+			// Use a replace into to avoid duplicate key conflict in case when user clicks two times fast one after the other:
 			$DB->query( 'INSERT INTO T_comments__votes
-			                         ( cmvt_cmt_ID, cmvt_user_ID, cmvt_'.$vote_type.' )
-			                  VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $current_User->ID ).', '.$DB->quote( $vote ).' )' );
+				       ( cmvt_cmt_ID, cmvt_user_ID, cmvt_'.$vote_type.' )
+				VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $current_User->ID ).', '.$DB->quote( $vote ).' )',
+				'Add new vote on comment #'.$this->ID );
 		}
 		else
-		{ // Update a vote
+		{ // Update a vote:
+			if( $existing_vote->value == $vote )
+			{	// Undo previous vote:
+				$vote = NULL;
+			}
 			$DB->query( 'UPDATE T_comments__votes
-			                SET cmvt_'.$vote_type.' = '.$DB->quote( $vote ).'
-			              WHERE cmvt_cmt_ID = '.$DB->quote( $this->ID ).'
-			                AND cmvt_user_ID = '.$DB->quote( $current_User->ID ) );
+				  SET cmvt_'.$vote_type.' = '.$DB->quote( $vote ).'
+				WHERE cmvt_cmt_ID = '.$DB->quote( $this->ID ).'
+				  AND cmvt_user_ID = '.$DB->quote( $current_User->ID ),
+				'Update a vote on comment #'.$this->ID );
 		}
 
-		$vote_SQL = new SQL( 'Get voting results of this comment' );
-		$vote_SQL->SELECT( 'COUNT( cmvt_'.$vote_type.' ) AS c, SUM( cmvt_'.$vote_type.' ) AS s' );
+		$vote_SQL = new SQL( 'Get voting results of comment #'.$this->ID );
+		$vote_SQL->SELECT( 'COUNT( cmvt_'.$vote_type.' ) AS votes_count, SUM( cmvt_'.$vote_type.' ) AS votes_sum' );
 		$vote_SQL->FROM( 'T_comments__votes' );
 		$vote_SQL->WHERE( 'cmvt_cmt_ID = '.$DB->quote( $this->ID ) );
 		$vote_SQL->WHERE_and( 'cmvt_'.$vote_type.' IS NOT NULL' );
 		$vote = $DB->get_row( $vote_SQL->get() );
 
+		// These values must be number and not NULL:
+		$vote->votes_sum = intval( $vote->votes_sum );
+		$vote->votes_count = intval( $vote->votes_count );
+
 		// Update fields with vote counters for this comment
 		$DB->query( 'UPDATE T_comments
-		                SET comment_'.$vote_type.'_addvotes = '.$DB->quote( $vote->s ).',
-		                    comment_'.$vote_type.'_countvotes = '.$DB->quote( $vote->c ).'
-		              WHERE comment_ID = '.$DB->quote( $this->ID ) );
-		$this->{$vote_type.'_addvotes'} = $vote->s;
-		$this->{$vote_type.'_countvotes'} = $vote->c;
+			  SET comment_'.$vote_type.'_addvotes = '.$DB->quote( $vote->votes_sum ).',
+			      comment_'.$vote_type.'_countvotes = '.$DB->quote( $vote->votes_count ).'
+			WHERE comment_ID = '.$DB->quote( $this->ID ),
+			'Update fields with vote counters for comment #'.$this->ID );
+		$this->{$vote_type.'_addvotes'} = $vote->votes_sum;
+		$this->{$vote_type.'_countvotes'} = $vote->votes_count;
 
 		$DB->commit();
 
@@ -730,7 +747,7 @@ class Comment extends DataObject
 
 		if( $summary < -20 )
 		{	// Comment is OK
-			$summary = abs($summary).'% '.( $type == 'spam' ? T_('OK') : T_('not helpful') );
+			$summary = abs($summary).'% '.( $type == 'spam' ? T_('OK') : T_('Negative') );
 		}
 		else if( $summary >= -20 && $summary <= 20 )
 		{	// Comment is UNDECIDED
@@ -742,7 +759,7 @@ class Comment extends DataObject
 		}
 		else if( $summary > 20 )
 		{	// Comment is SPAM
-			$summary .= '% '.( $type == 'spam' ? T_('SPAM') : T_('helpful') );
+			$summary .= '% '.( $type == 'spam' ? T_('SPAM') : T_('Positive') );
 		}
 
 		if( !empty( $params['result_title'] ) )
@@ -1028,12 +1045,12 @@ class Comment extends DataObject
 
 		global $Plugins;
 
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( empty( $Blog ) )
 		{ // Set Blog if it is still not defined
 			$comment_Item = $this->get_Item();
-			$Blog = $comment_Item->get_Blog();
+			$Collection = $Blog = $comment_Item->get_Blog();
 		}
 
 		if( $Blog->get_setting( 'allow_comments' ) != 'any' && $params['after_user'] == '#' && $params['after'] == '#' )
@@ -1677,16 +1694,16 @@ class Comment extends DataObject
 	function get_vote_link( $vote_type, $vote_value, $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $params = array() )
 	{
 		$params = array_merge( array(
-				'title_spam'          => T_('Mark this comment as spam!'),
-				'title_spam_voted'    => T_('You think this comment is spam'),
-				'title_notsure'       => T_('Mark this comment as not sure!'),
-				'title_notsure_voted' => T_('You are not sure about this comment'),
-				'title_ok'            => T_('Mark this comment as OK!'),
-				'title_ok_voted'      => T_('You think this comment is OK'),
-				'title_yes'           => T_('Mark this comment as helpful!'),
-				'title_yes_voted'     => T_('You think this comment is helpful'),
-				'title_no'            => T_('Mark this comment as not helpful!'),
-				'title_no_voted'      => T_('You think this comment is not helpful'),
+				'title_spam'          => T_('Cast a spam vote!'),
+				'title_spam_voted'    => T_('You sent a spam vote.'),
+				'title_notsure'       => T_('Cast a "not sure" vote!'),
+				'title_notsure_voted' => T_('You sent a "not sure" vote.'),
+				'title_ok'            => T_('Cast an OK vote!'),
+				'title_ok_voted'      => T_('You sent an OK vote.'),
+				'title_yes'           => T_('Cast a helpful vote!'),
+				'title_yes_voted'     => T_('You sent helpful vote.'),
+				'title_no'            => T_('Cast a "not helpful" vote!'),
+				'title_no_voted'      => T_('You sent a "not helpful" vote.'),
 			), $params );
 
 		global $current_User, $admin_url;
@@ -1745,32 +1762,19 @@ class Comment extends DataObject
 		}
 		$class = str_replace( 'disabled', '', $class );
 
-		$r = '';
-		if( !$is_voted )
-		{ // If user didn't vote for this we should create a link for voting
-			$r .= '<a href="'.$admin_url.'?ctrl=comments'.$glue.'action='.$vote_type.$glue.'value='.$vote_value.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
-			if( $save_context )
-			{
-				$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
-			}
-			$r .= '"';
-
-			if( $ajax_button )
-			{
-				$r .= ' onclick="setCommentVote('.$this->ID.', \''.$vote_type.'\' , \''.$vote_value.'\' ); return false;"';
-			}
-
-			$r .= ' title="'.$title.'" class="'.$class.'">'.$text.'</a>';
-		}
-		else
+		$r = '<a href="'.$admin_url.'?ctrl=comments'.$glue.'action='.$vote_type.$glue.'value='.$vote_value.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
+		if( $save_context )
 		{
-			$r .= '<span';
-			if( !empty( $class ) )
-			{
-				$r .= ' class="'.$class.'"';
-			}
-			$r .= '>'.$text.'</span>';
+			$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
 		}
+		$r .= '"';
+
+		if( $ajax_button )
+		{
+			$r .= ' onclick="setCommentVote('.$this->ID.', \''.$vote_type.'\' , \''.$vote_value.'\' ); return false;"';
+		}
+
+		$r .= ' title="'.$title.'" class="'.$class.'">'.$text.'</a>';
 
 		return $r;
 	}
@@ -1817,12 +1821,12 @@ class Comment extends DataObject
 	{
 		$params = array_merge( array(
 				'display'             => false, // TRUE - to show this tool on loading(Used to make it visible only when JS is enalbed)
-				'title_spam'          => T_('Mark this comment as spam!'),
-				'title_spam_voted'    => T_('You think this comment is spam'),
-				'title_notsure'       => T_('Mark this comment as not sure!'),
-				'title_notsure_voted' => T_('You are not sure about this comment'),
-				'title_ok'            => T_('Mark this comment as OK!'),
-				'title_ok_voted'      => T_('You think this comment is OK'),
+				'title_spam'          => T_('Cast a spam vote!'),
+				'title_spam_voted'    => T_('You sent a spam vote.'),
+				'title_notsure'       => T_('Cast a "not sure" vote!'),
+				'title_notsure_voted' => T_('You sent a "not sure" vote.'),
+				'title_ok'            => T_('Cast an OK vote!'),
+				'title_ok_voted'      => T_('You sent an OK vote.'),
 				'title_empty'         => T_('No votes on spaminess yet.'),
 				'button_group_class'  => button_class( 'group' ),
 			), $params );
@@ -1895,15 +1899,18 @@ class Comment extends DataObject
 	function vote_helpful( $before = '', $after = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $params = array() )
 	{
 		$params = array_merge( array(
+				'before_title'          => ' &nbsp; ',
+				'skin_ID'               => 0,
 				'helpful_text'          => T_('Is this comment helpful?'),
-				'title_yes'             => T_('Mark this comment as helpful!'),
-				'title_yes_voted'       => T_('You think this comment is helpful'),
-				'title_noopinion'       => T_('Mark this comment as no opinion!'),
-				'title_noopinion_voted' => T_('You have no opinion about this comment'),
-				'title_no'              => T_('Mark this comment as not helpful!'),
-				'title_no_voted'        => T_('You think this comment is not helpful'),
-				'title_empty'           => T_('No votes on helpfulness yet.'),
+				'title_yes'             => T_('Cast a helpful vote!'),
+				'title_yes_voted'       => T_('You sent helpful vote.'),
+				'title_noopinion'       => T_('Cast a "no opinion" vote!'),
+				'title_noopinion_voted' => T_('You sent a "no opinion" vote.'),
+				'title_no'              => T_('Cast a "not helpful" vote!'),
+				'title_no_voted'        => T_('You sent a "not helpful" vote.'),
+				'title_empty'           => T_('No user votes yet.'),
 				'class'                 => '',
+				'display_wrapper'       => true, // Use FALSE when you update this from AJAX request
 			), $params );
 
 		if( $this->is_meta() )
@@ -1923,13 +1930,12 @@ class Comment extends DataObject
 
 		echo $before;
 
-		$class = '';
-		if( !empty( $params['class'] ) )
-		{
-			$class = ' class="'.$params['class'].'"';
+		if( $params['display_wrapper'] )
+		{	// Display wrapper:
+			echo '<span id="vote_helpful_'.$this->ID.'" class="evo_voting_panel '.( empty( $params['class'] ) ? '' : ' '.$params['class'] ).'">';
 		}
 
-		echo '<span id="vote_helpful_'.$this->ID.'"'.$class.'> &nbsp; ';
+		echo $params['before_title'];
 
 		if( $current_User->ID == $this->author_user_ID )
 		{ // Display only vote summary for users on their own comments
@@ -1954,6 +1960,7 @@ class Comment extends DataObject
 			display_voting_form( array(
 					'vote_type'             => 'comment',
 					'vote_ID'               => $this->ID,
+					'skin_ID'               => $params['skin_ID'],
 					'display_inappropriate' => false,
 					'display_spam'          => false,
 					'title_text'            => $title_text.' ',
@@ -1966,7 +1973,10 @@ class Comment extends DataObject
 				) );
 		}
 
-		echo '</span>';
+		if( $params['display_wrapper'] )
+		{	// Display end of wrapper:
+			echo '</span>';
+		}
 
 		echo $after;
 	}
@@ -3732,7 +3742,7 @@ class Comment extends DataObject
 			}
 
 			// Get list of users who want to be notified about this blog comments:
-			if( $comment_item_Blog->get_setting( 'allow_subscriptions' ) )
+			if( $comment_item_Blog->get_setting( 'allow_comment_subscriptions' ) )
 			{	// If blog subscription is allowed:
 				$sql = 'SELECT DISTINCT user_ID
 								FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = user_ID
@@ -4101,8 +4111,11 @@ class Comment extends DataObject
 	{
 		global $Plugins, $DB;
 
-		// Restrict comment status by parent item:
-		$this->restrict_status_by_item( true );
+		if( isset( $this->previous_status ) )
+		{	// Restrict comment status by parent item:
+			// (ONLY if current request is updating comment status)
+			$this->restrict_status( true );
+		}
 
 		$dbchanges = $this->dbchanges;
 
@@ -4176,8 +4189,11 @@ class Comment extends DataObject
 		global $Plugins;
 		global $Settings;
 
-		// Restrict comment status by parent item:
-		$this->restrict_status_by_item( true );
+		if( isset( $this->previous_status ) )
+		{	// Restrict comment status by parent item:
+			// (ONLY if current request is updating comment status)
+			$this->restrict_status( true );
+		}
 
 		// Get karma percentage (interval -100 - 100)
 		$spam_karma = $Plugins->trigger_karma_collect( 'GetSpamKarmaForComment', array( 'Comment' => & $this ) );
@@ -4570,11 +4586,11 @@ class Comment extends DataObject
 
 
 	/**
-	 * Restrict comment status by parent item
+	 * Restrict Comment status by parent Item status AND its Collection access restriction AND by CURRENT USER write perm
 	 *
 	 * @param boolean TRUE to update status
 	 */
-	function restrict_status_by_item( $update_status = false )
+	function restrict_status( $update_status = false )
 	{
 		global $current_User;
 

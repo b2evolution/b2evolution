@@ -36,7 +36,7 @@ class tinymce_plugin extends Plugin
 	var $code = 'evo_TinyMCE';
 	var $name = 'TinyMCE';
 	var $priority = 10;
-	var $version = '6.7.0';
+	var $version = '6.7.5';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -276,7 +276,7 @@ class tinymce_plugin extends Plugin
 		{
 			case 'Item':
 				// Initialize settings for item:
-				global $Blog;
+				global $Collection, $Blog;
 
 				$edited_Item = & $params['target_object'];
 
@@ -418,9 +418,8 @@ class tinymce_plugin extends Plugin
 			// Load TinyMCE Javascript source file:
 			// This cannot be done through AJAX, since there appear to be scope problems on init then (TinyMCE problem?! - "u not defined").
 			// Anyway, not using AJAX to fetch the file makes it more cachable anyway.
-			$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
-			require_js( '#tinymce#', $relative_to, false, true );
-			require_js( '#tinymce_jquery#', $relative_to, false, true );
+			require_js( '#tinymce#', 'blog', false, true );
+			require_js( '#tinymce_jquery#', 'blog', false, true );
 			?>
 
 			<script type="text/javascript">
@@ -573,7 +572,7 @@ class tinymce_plugin extends Plugin
 	 */
 	function get_tmce_init( $edit_layout, $content_id )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 		global $Plugins;
 		global $localtimenow, $debug, $rsc_url, $rsc_path, $skins_url;
 		global $UserSettings;
@@ -729,7 +728,7 @@ class tinymce_plugin extends Plugin
 		$init_options = array();
 		if( $this->Settings->get( 'use_gzip_compressor' ) )
 		{	// Load script to use gzip compressor:
-			$init_options[] = 'script_url: "'.get_require_url( 'tiny_mce/tinymce.gzip.php', ( is_admin_page() ? 'rsc_url' : 'blog' ), 'js' ).'"';
+			$init_options[] = 'script_url: "'.get_require_url( 'tiny_mce/tinymce.gzip.php', 'blog', 'js' ).'"';
 		}
 		// TinyMCE Theme+Skin+Variant to use:
 		$init_options[] = 'theme : "modern"';
@@ -792,11 +791,14 @@ class tinymce_plugin extends Plugin
 									.$content_css.'"';
 
 		// Generated HTML code options:
-		// do not make the path relative to "document_base_url":
+		// Do not make the path relative to "document_base_url":
 		$init_options[] = 'relative_urls : false';
+		// Do not convert absolute urls to relative if url domain is the same as current page,
+		// (we should keep urls as they were entered manually, because urls can be broken if collection has different domain than back-office; also an issue with RSS feeds):
+		$init_options[] = 'convert_urls : false';
 		$init_options[] = 'entity_encoding : "raw"';
 
-		// Autocomplete options
+		// Autocomplete options:
 		$init_options[] = 'autocomplete_options: autocomplete_static_options'; // Must be initialize before as string with usernames that are separated by comma
 		$init_options[] = 'autocomplete_options_url: restapi_url + "users/autocomplete"';
 
@@ -950,7 +952,7 @@ class tinymce_plugin extends Plugin
 	{
 		$blog = $params['blog'];
 		$BlogCache = get_BlogCache($blog);
-		$Blog = $BlogCache->get_by_ID($blog);
+		$Collection = $Blog = $BlogCache->get_by_ID($blog);
 		$path = array_shift($this->get_item_css_path_and_url($Blog));
 		$r = file_get_contents($path);
 		if( $r )

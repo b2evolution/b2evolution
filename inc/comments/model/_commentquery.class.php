@@ -571,7 +571,7 @@ class CommentQuery extends SQL
 		}
 
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog_ID );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 		if( $current_User->ID == $Blog->get( 'owner_user_ID' ) )
 		{ // User is the blog owner, so has permission on edit/moderate each comment
 			return;

@@ -212,6 +212,7 @@ function b2evopollabuse( $m )
 	$SQL->WHERE( 'cakw_status = "published"' );
 	$SQL->WHERE_And( 'cakw_statuschange_ts >= '.$DB->quote( date2mysql( $timestamp_min ) ) );
 	$SQL->ORDER_BY( 'cakw_statuschange_ts' );
+	$SQL->LIMIT( 1000 );
 	$keywords = $DB->get_results( $SQL->get() );
 
 	// Array of spam strings

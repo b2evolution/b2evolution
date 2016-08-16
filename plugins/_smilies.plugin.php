@@ -29,7 +29,7 @@ class smilies_plugin extends Plugin
 	 * fp> There is... I can't remember the exact problem thouh. Probably some interaction with the code highlight or the video plugins.
 	 */
 	var $priority = 25;
-	var $version = '6.7.0';
+	var $version = '6.7.5';
 	var $group = 'rendering';
 	var $number_of_installs = 3; // QUESTION: dh> why 3?
 
@@ -190,7 +190,7 @@ XX(      graydead.gif
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $Blog );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never'
@@ -216,13 +216,13 @@ XX(      graydead.gif
 			if( !empty( $Comment->item_ID ) )
 			{
 				$comment_Item = & $Comment->get_Item();
-				$Blog = & $comment_Item->get_Blog();
+				$Collection = $Blog = & $comment_Item->get_Blog();
 			}
 		}
 
 		if( empty( $Blog ) )
 		{ // Comment is not set, try global Blog
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{ // We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available
 				return false;
@@ -426,7 +426,7 @@ XX(      graydead.gif
 	 */
 	function ReplaceInlinePlaceholderSafe( $text )
 	{
-		return callback_on_non_matching_blocks( $text, '~\[(image|file|inline):\d+:?[^\]]*\]~', array( & $this, 'preg_insert_smilies_callback' ) );
+		return callback_on_non_matching_blocks( $text, '~\[(image|file|inline|video|audio):\d+:?[^\]]*\]~', array( & $this, 'preg_insert_smilies_callback' ) );
 	}
 
 

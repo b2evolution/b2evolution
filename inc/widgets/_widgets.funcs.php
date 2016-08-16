@@ -112,6 +112,10 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 13, array( 'link_type' => 'recentposts', 'link_text' => T_('Latest pages') ) );
 			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 15, array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest comments') ) );
 		}
+		if( $kind == 'forum' || $kind == 'manual' )
+		{	// Add menu with flagged items:
+			add_basic_widget( $blog_id, 'Menu', 'flag_menu_link', 'core', 17, array( 'link_text' => ( $kind == 'forum' ) ? T_('Flagged topics') : T_('Flagged pages') ) );
+		}
 		if( $kind == 'photo' )
 		{ // Add menu with Photo index
 			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 18, array( 'link_type' => 'mediaidx', 'link_text' => T_('Index') ) );
@@ -167,6 +171,10 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	add_basic_widget( $blog_id, 'Item Single', 'item_seen_by', 'core', 50, NULL,
 		// Disable this widget for "forum" collections by default:
 		$kind == 'forum' ? 0 : 1 );
+	if( $kind != 'forum' )
+	{	// Item voting panel:
+		add_basic_widget( $blog_id, 'Item Single', 'item_vote', 'core', 60 );
+	}
 
 
 	/* Sidebar Single */
@@ -177,7 +185,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 
 	/* Page Top */
-	add_basic_widget( $blog_id, 'Page Top', 'user_links', 'core', 10 );
+	add_basic_widget( $blog_id, 'Page Top', 'social_links', 'core', 10, 'a:19:{s:5:"title";s:0:"";s:5:"link1";s:2:"15";s:10:"link1_href";s:32:"https://twitter.com/b2evolution/";s:5:"link2";s:2:"16";s:10:"link2_href";s:36:"https://www.facebook.com/b2evolution";s:5:"link3";s:2:"17";s:10:"link3_href";s:42:"https://plus.google.com/+b2evolution/posts";s:5:"link4";s:2:"18";s:10:"link4_href";s:48:"https://www.linkedin.com/company/b2evolution-net";s:5:"link5";s:2:"19";s:10:"link5_href";s:42:"https://github.com/b2evolution/b2evolution";s:5:"link6";s:0:"";s:10:"link6_href";s:0:"";s:5:"link7";s:0:"";s:10:"link7_href";s:0:"";s:11:"icon_colors";a:1:{s:7:"hoverbg";s:1:"1";}s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;}' );
 
 
 	/* Sidebar */
@@ -323,7 +331,11 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 
 	/* Front Page Secondary Area */
-	add_basic_widget( $blog_id, 'Front Page Secondary Area', 'org_members', 'core', 10 );
+	if( $kind == 'main' )
+	{	// Install the "Organization Members" widget only for Main collections:
+		add_basic_widget( $blog_id, 'Front Page Secondary Area', 'org_members', 'core', 10 );
+	}
+	add_basic_widget( $blog_id, 'Front Page Secondary Area', 'coll_flagged_list', 'core', 20 );
 
 
 	/* 404 Page */

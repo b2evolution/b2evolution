@@ -531,7 +531,7 @@ $opcode_cache = get_active_opcode_cache();
 init_system_check( 'PHP opcode cache', $opcode_cache );
 if( $opcode_cache == 'none' )
 {
-	disp_system_check( 'warning', T_( 'Using an opcode cache allows all your PHP scripts to run faster by caching a "compiled" (opcode) version of the scripts instead of recompiling everything at every page load. Several opcode caches are available. We recommend APC.' ) );
+	disp_system_check( 'warning', T_( 'Using an opcode cache allows all your PHP scripts to run faster by caching a "compiled" (opcode) version of the scripts instead of recompiling everything at every page load. Several opcode caches are available. We recommend APC (which is included with PHP starting from PHP 7).' ) );
 }
 else
 {
@@ -543,7 +543,7 @@ $user_cache = get_active_user_cache();
 init_system_check( 'PHP user cache', $user_cache );
 if( $user_cache == 'none' )
 {
-	disp_system_check( 'warning', T_( 'Using an user cache allows all your PHP scripts to run faster by caching a "compiled" (user) version of the scripts instead of recompiling everything at every page load. Several user caches are available. We recommend APC.' ) );
+	disp_system_check( 'warning', T_( 'Using an user cache allows b2evolution to store some cached data (Block Cache) in memory instead of regenerated the blocks at each page load. Several user caches are available. We recommend APCu (which needs to be enabled separately from APC, starting from PHP 7).' ) );
 }
 else
 {

@@ -50,6 +50,7 @@ $Form->begin_fieldset( T_('Front page').get_manual_link('collection-front-page-s
 			array( 'sitemap',  T_('Site Map') ),
 			array( 'users',    T_('Users') ),
 			array( 'terms',    T_('Terms & Conditions') ),
+			array( 'flagged',  T_('Flagged Items') ),
 			array( 'single',   T_('First post') ),
 			array( 'page',     T_('A specific page') ),
 		);

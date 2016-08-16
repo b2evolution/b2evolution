@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher, $action, $current_User, $Blog, $perm_abuse_management, $Plugins, $edited_Message;
+global $dispatcher, $action, $current_User, $Collection, $Blog, $perm_abuse_management, $Plugins, $edited_Message;
 
 // in front office there is no function call, $edited_Thread is available
 if( !isset( $edited_Thread ) )
@@ -331,6 +331,16 @@ if( $is_recipient )
 			if( !empty( $message_renderer_checkboxes ) )
 			{
 				$Form->info( T_('Text Renderers'), $message_renderer_checkboxes );
+			}
+
+			// ####################### ATTACHMENTS/LINKS #########################
+			if( isset( $GLOBALS['files_Module'] )
+				&& $current_User->check_perm( 'files', 'view' ) )
+			{	// Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files:
+				load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
+				global $LinkOwner; // Initialize this object as global because this is used in many link functions
+				$LinkOwner = new LinkMessage( $edited_Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
+				display_attachments_fieldset( $Form, $LinkOwner );
 			}
 
 		$Form->end_form( array(

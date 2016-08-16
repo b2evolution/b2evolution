@@ -23,7 +23,7 @@ $default_ctrl = 'settings';
  * Minimum PHP version required for _core module to function properly.
  * This value can't be higher then the application required php version.
  */
-$required_php_version[ '_core' ] = '5.0';
+$required_php_version[ '_core' ] = '5.2';
 
 /**
  * Minimum MYSQL version required for _core module to function properly.
@@ -65,10 +65,10 @@ $db_config['aliases'] = array(
 		'T_users__invitation_code' => $tableprefix.'users__invitation_code',
 		'T_users__reports'         => $tableprefix.'users__reports',
 		'T_users__usersettings'    => $tableprefix.'users__usersettings',
-		'T_users__postreadstatus'  => $tableprefix.'users__postreadstatus',
 		'T_users__organization'    => $tableprefix.'users__organization',
 		'T_users__user_org'        => $tableprefix.'users__user_org',
 		'T_users__secondary_user_groups' => $tableprefix.'users__secondary_user_groups',
+		'T_users__profile_visits'  => $tableprefix.'users__profile_visits',
 		'T_slug'                   => $tableprefix.'slug',
 		'T_email__log'             => $tableprefix.'email__log',
 		'T_email__returns'         => $tableprefix.'email__returns',
@@ -1001,7 +1001,7 @@ class _core_Module extends Module
 		global $topleft_Menu, $topright_Menu;
 		global $current_User;
 		global $baseurl, $home_url, $admin_url, $debug, $debug_jslog, $dev_menu, $seo_page_type, $robots_index;
-		global $Blog, $blog, $activate_collection_toolbar;
+		global $Collection, $Blog, $blog, $activate_collection_toolbar;
 
 		global $Settings;
 
@@ -1248,9 +1248,9 @@ class _core_Module extends Module
 										'text' => T_('SEO').'&hellip;',
 										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=seo'.$blog_param,
 									),
-									'renderers' => array(
-										'text' => T_('Renderers').'&hellip;',
-										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=renderers'.$blog_param,
+									'plugins' => array(
+										'text' => T_('Plugins').'&hellip;',
+										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugins'.$blog_param,
 									),
 								)
 						);
@@ -1308,7 +1308,7 @@ class _core_Module extends Module
 					$dev_entries['coll'] = array(
 						'text' => 'Collection = '.$Blog->shortname,
 						'disabled' => true,
-					);					
+					);
 				}
 
 				global $disp, $is_front;
@@ -1317,7 +1317,7 @@ class _core_Module extends Module
 					$dev_entries['disp'] = array(
 						'text' => '$disp = '.$disp,
 						'disabled' => true,
-					);					
+					);
 				}
 
 				global $disp_detail;
@@ -1326,7 +1326,7 @@ class _core_Module extends Module
 					$dev_entries['disp_detail'] = array(
 						'text' => '$disp_detail = '.$disp_detail,
 						'disabled' => true,
-					);					
+					);
 				}
 
 				if( ! empty( $seo_page_type ) )
@@ -1334,7 +1334,7 @@ class _core_Module extends Module
 					$dev_entries['seo_page_type'] = array(
 						'text' => '> '.$seo_page_type,
 						'disabled' => true,
-					);					
+					);
 				}
 
 				global $is_front;
@@ -1343,7 +1343,7 @@ class _core_Module extends Module
 					$dev_entries['front'] = array(
 						'text' => 'This is the FRONT page',
 						'disabled' => true,
-					);					
+					);
 				}
 
 				if( $robots_index === false )
@@ -1608,7 +1608,7 @@ class _core_Module extends Module
 					'href' => $user_subs_url,
 				);
 		}
-	
+
 		$entries['userprefs'] = array(
 				'text'    => '<strong>'.$current_User->get_colored_login( array( 'login_text' => 'name' ) ).'</strong>',
 				'href'    => get_user_profile_url(),
@@ -1673,7 +1673,7 @@ class _core_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		/**
 		 * @var AdminUI_general
 		 */
@@ -1769,9 +1769,9 @@ class _core_Module extends Module
 							'text' => T_('Settings'),
 							'href' => '?ctrl=email&amp;tab=settings',
 							'entries' => array(
-								'renderers' => array(
-									'text' => T_('Renderers'),
-									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=renderers' ),
+								'plugins' => array(
+									'text' => T_('Plugins'),
+									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=plugins' ),
 								'envelope' => array(
 									'text' => T_('Envelope'),
 									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=envelope' ),

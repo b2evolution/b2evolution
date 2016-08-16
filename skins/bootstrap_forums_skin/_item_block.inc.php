@@ -96,19 +96,26 @@ skin_widget( array(
 				'after'     => '</h2>',
 				'link_type' => 'permalink'
 			) );
-				// Author info:
-				echo '<div class="ft_author_info">'.T_('Thread started by');
-				$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
-				echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
-				echo '<span class="text-muted"> &ndash; '
-						.T_('Last touched:').' '.mysql2date( 'D M j, Y H:i', $Item->get( 'last_touched_ts' ) )
-					.'</span>';
-				echo '</div>';
-				// Author info - shrinked:
-				echo '<div class="ft_author_info shrinked">'.T_('Started by');
-				$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
-				echo ', '.mysql2date( 'm/j/y', $Item->datecreated );
-				echo '</div>';
+
+		// Flag:
+		$Item->flag( array(
+				'before' => '<span class="pull-left">',
+				'after'  => '</span>',
+			) );
+
+		// Author info:
+		echo '<div class="ft_author_info">'.T_('Thread started by');
+		$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
+		echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
+		echo '<span class="text-muted"> &ndash; '
+				.T_('Last touched:').' '.mysql2date( 'D M j, Y H:i', $Item->get( 'last_touched_ts' ) )
+			.'</span>';
+		echo '</div>';
+		// Author info - shrinked:
+		echo '<div class="ft_author_info shrinked">'.T_('Started by');
+		$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
+		echo ', '.mysql2date( 'm/j/y', $Item->datecreated );
+		echo '</div>';
 		?>
 	</div>
 
@@ -126,7 +133,7 @@ skin_widget( array(
 						) );
 					?>
 					<?php
-						// We want to display the post date:
+						// Display the post date:
 						$Item->issue_time( array(
 								'before'      => '<span class="text-muted">',
 								'after'       => '</span> &nbsp; &nbsp; ',
@@ -212,7 +219,7 @@ skin_widget( array(
 			</div>
 		</div><!-- ../panel-body -->
 
-		<div class="panel-footer clearfix">
+		<div class="panel-footer clearfix small">
 		<a href="<?php echo $Item->get_permanent_url(); ?>#skin_wrapper" class="to_top"><?php echo T_('Back to top'); ?></a>
 		<?php
 			// Check if BBcode plugin is enabled for current blog
@@ -230,6 +237,10 @@ skin_widget( array(
 			{	// Display button to quote this post
 				echo '<a href="'.$Item->get_permanent_url().'?mode=quote&amp;qp='.$Item->ID.'#form_p'.$Item->ID.'" title="'.T_('Reply with quote').'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
 			}
+
+			// Display a panel with voting buttons for item:
+			$Skin->display_item_voting_panel( $Item );
+
 			echo '<div class="floatright">';
 			$Item->edit_link( array(
 					'before' => ' ',
@@ -302,7 +313,7 @@ skin_widget( array(
 				'comment_title_before'  => '<div class="panel-heading posts_panel_title_wrapper"><div class="cell1 ellipsis"><h4 class="evo_comment_title panel-title">',
 				'comment_status_before' => '</h4></div>',
 				'comment_title_after'   => '</div>',
-				'comment_avatar_before' => '<div class="panel-body"><span class="evo_comment_avatar col-md-1 col-sm-2">',
+				'comment_avatar_before' => '<span class="evo_comment_avatar col-md-1 col-sm-2">',
 				'comment_avatar_after'  => '</span>',
 				'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10">',
 				'comment_text_after'    => '</div>',

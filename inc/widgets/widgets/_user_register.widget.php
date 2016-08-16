@@ -160,7 +160,7 @@ class user_register_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog, $Settings, $Session, $redirect_to, $dummy_fields;
+		global $Collection, $Blog, $Settings, $Session, $redirect_to, $dummy_fields;
 
 		if( is_logged_in() )
 		{	// No display when user is already registered
@@ -209,7 +209,7 @@ class user_register_Widget extends ComponentWidget
 			echo '<p>'.$this->disp_params['intro'].'</p>';
 		}
 
-		$Form = new Form( get_secure_htsrv_url().'register.php', 'register_form', 'post' );
+		$Form = new Form( get_htsrv_url( true ).'register.php', 'register_form', 'post' );
 
 		$Form->begin_form();
 

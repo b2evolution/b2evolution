@@ -1303,7 +1303,7 @@ class Plugins
 		}
 		else
 		{ // use global Blog if it is set
-			global $Blog;
+			global $Collection, $Blog;
 			if( !empty( $Blog ) )
 			{
 				$setting_Blog = $Blog;
@@ -1927,7 +1927,7 @@ class Plugins
 		if( isset( $params['Item'] ) )
 		{ // Validate post renderers
 			$Item = & $params['Item'];
-			$Blog = & $Item->get_Blog();
+			$Collection = $Blog = & $Item->get_Blog();
 			$setting_name = 'coll_apply_rendering';
 			$setting_type = 'coll';
 		}
@@ -1935,25 +1935,25 @@ class Plugins
 		{ // Validate comment renderers
 			$Comment = & $params['Comment'];
 			$Item = & $Comment->get_Item();
-			$Blog = & $Item->get_Blog();
+			$Collection = $Blog = & $Item->get_Blog();
 			$setting_name = 'coll_apply_comment_rendering';
 			$setting_type = 'coll';
 		}
 		elseif( isset( $params['Message'] ) )
 		{ // Validate message renderers
-			$Blog = NULL;
+			$Collection = $Blog = NULL;
 			$setting_name = 'msg_apply_rendering';
 			$setting_type = 'msg';
 		}
 		elseif( isset( $params['EmailCampaign'] ) )
 		{	// Validate message renderers:
-			$Blog = NULL;
+			$Collection = $Blog = NULL;
 			$setting_name = 'email_apply_rendering';
 			$setting_type = 'email';
 		}
 		elseif( isset( $params['Blog'] ) && isset( $params['setting_name'] ) )
 		{ // Validate the given rendering option in the give Blog
-			$Blog = & $params['Blog'];
+			$Collection = $Blog = & $params['Blog'];
 			$setting_name = $params['setting_name'];
 			$setting_type = 'coll';
 			if( !in_array( $setting_name, array( 'coll_apply_rendering', 'coll_apply_comment_rendering' ) ) )
@@ -2236,7 +2236,7 @@ class Plugins
 						default:
 							if( ! empty( $setting_Blog ) && $current_User->check_perm( 'blog_properties', 'edit', false, $setting_Blog->ID ) )
 							{ // Check if current user can edit the blog plugin settings
-								$settings_url = $admin_url.'?ctrl=coll_settings&amp;tab=renderers&amp;blog='.$setting_Blog->ID;
+								$settings_url = $admin_url.'?ctrl=coll_settings&amp;tab=plugins&amp;blog='.$setting_Blog->ID;
 							}
 							break;
 					}

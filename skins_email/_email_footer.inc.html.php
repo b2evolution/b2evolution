@@ -10,7 +10,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $admin_url, $htsrv_url, $baseurl, $app_name, $Settings;
+global $admin_url, $baseurl, $app_name, $Settings;
 
 // Default params:
 $params = array_merge( array(

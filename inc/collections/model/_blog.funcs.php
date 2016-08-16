@@ -304,14 +304,14 @@ function autoselect_blog( $permname, $permlevel = 'any' )
  */
 function valid_blog_requested()
 {
-	global $Blog, $Messages;
+	global $Collection, $Blog, $Messages;
 	if( empty( $Blog ) )
 	{ // The requested blog does not exist, Try to get other available blog for the current User
 		$blog_ID = get_working_blog();
 		if( $blog_ID )
 		{
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 		}
 	}
 
@@ -488,13 +488,13 @@ function set_cache_enabled( $cache_key, $new_status, $coll_ID = NULL, $save_sett
 
 	if( empty( $coll_ID ) )
 	{ // general cache
-		$Blog = NULL;
+		$Collection = $Blog = NULL;
 		$old_cache_status = $Settings->get( $cache_key );
 	}
 	else
 	{ // blog page cache
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $coll_ID );
+		$Collection = $Blog = $BlogCache->get_by_ID( $coll_ID );
 		$old_cache_status = $Blog->get_setting( $cache_key );
 	}
 
@@ -605,14 +605,21 @@ function init_requested_blog( $use_blog_param_first = true )
 
 	// No blog requested by URL param, let's try to match something in the URL:
 	$BlogCache = & get_BlogCache();
-	if( preg_match( '#^'.preg_quote($baseurl).'(index.php/)?([^/]+)#', $ReqHost.$ReqPath, $matches ) )
+
+	$re = "/^https?(.*)/i";
+	$str = preg_quote( $baseurl );
+	$subst = "https?$1";
+
+	$baseurl_regex = preg_replace($re, $subst, $str);
+
+	if( preg_match( '#^'.$baseurl_regex.'(index.php/)?([^/]+)#', $ReqHost.$ReqPath, $matches ) )
 	{ // We have an URL blog name:
 		$Debuglog->add( 'Found a potential URL collection name: '.$matches[2].' (in: '.$ReqHost.$ReqPath.')', 'detectblog' );
 		if( strpos( $matches[2], '.' ) !== false )
 		{	// There is an extension (like .php) in the collection name, ignore...
 			$Debuglog->add( 'Ignoring because it contains a dot.', 'detectblog' );
 		}
-		elseif( (($Blog = & $BlogCache->get_by_urlname( $matches[2], false )) !== false) ) /* SQL request '=' */
+		elseif( ( $Collection = $Blog = & $BlogCache->get_by_urlname( $matches[2], false ) ) !== false ) /* SQL request '=' */
 		{ // We found a matching blog:
 			$blog = $Blog->ID;
 			$Debuglog->add( 'Found matching blog: '.$blog, 'detectblog' );
@@ -635,7 +642,7 @@ function init_requested_blog( $use_blog_param_first = true )
 	}
 	$Debuglog->add( 'Looking up absolute url : '.$ReqAbsUrl, 'detectblog' );
 	// SQL request 'LIKE':
-	if( (($Blog = & $BlogCache->get_by_url( $ReqAbsUrl, false )) !== false) )
+	if( ( $Collection = $Blog = & $BlogCache->get_by_url( $ReqAbsUrl, false ) ) !== false )
 	{ // We found a matching blog:
 		$blog = $Blog->ID;
 		$Debuglog->add( 'Found matching blog: '.$blog, 'detectblog' );
@@ -656,7 +663,7 @@ function init_requested_blog( $use_blog_param_first = true )
 
 	// Still no blog requested, use default:
 	$blog = $Settings->get( 'default_blog_ID' );
-	$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 	if( $Blog !== false && $Blog !== NULL )
 	{ // We found a matching blog:
 		$Debuglog->add( 'Using default blog '.$blog, 'detectblog' );
@@ -684,7 +691,7 @@ function activate_blog_locale( $blog )
 	}
 
 	$BlogCache = & get_BlogCache();
-	$Blog = $BlogCache->get_by_ID( $blog, false, false );
+	$Collection = $Blog = $BlogCache->get_by_ID( $blog, false, false );
 	if( !empty( $Blog ) )
 	{ // Activate the blog locale
 		locale_activate( $Blog->get('locale') );
@@ -730,7 +737,7 @@ function init_blog_widgets( $blog_id )
  */
 function check_allow_disp( $disp )
 {
-	global $Blog, $Messages, $Settings, $current_User, $secure_htsrv_url;
+	global $Collection, $Blog, $Messages, $Settings, $current_User;
 
 	if( !check_user_status( 'can_be_validated' ) )
 	{ // we don't have the case when user is logged in and the account is not active
@@ -821,6 +828,11 @@ function get_highest_publish_status( $type, $blog, $with_label = true, $restrict
 		debug_die( 'Invalid type parameter!' );
 	}
 
+	if( $restrict_max_allowed_status == 'redirected' && $type == 'comment' )
+	{	// Comment cannot have a status "redirected", force this to "deprecated":
+		$restrict_max_allowed_status = 'deprecated';
+	}
+
 	$BlogCache = & get_BlogCache();
 	$requested_Blog = $BlogCache->get_by_ID( $blog );
 	$default_status = ( $type == 'post' ) ? $requested_Blog->get_setting( 'default_post_status' ) : $requested_Blog->get_setting( 'new_feedback_status' );
@@ -869,16 +881,14 @@ function get_highest_publish_status( $type, $blog, $with_label = true, $restrict
 		return ( $with_label ? array( $curr_status, '' ) : $curr_status );
 	}
 
-	$status_order = get_visibility_statuses( 'ordered-array' );
-	$highest_index = count( $status_order ) - 1;
+	$indexed_statuses = array_reverse( get_visibility_statuses( 'ordered-index' ) );
 	$result = false;
 	// Set this flag to know if we should not allow $max_allowed_status and find next status with lower level:
 	$restricted_status_is_allowed = empty( $restrict_max_allowed_status );
 	// Set this flag to false in order to find first allowed status below:
 	$status_is_allowed = false;
-	for( $index = $highest_index; $index > 0; $index-- )
+	foreach( $indexed_statuses as $curr_status => $status_index )
 	{
-		$curr_status = $status_order[$index][0];
 		if( $curr_status == $restrict_max_allowed_status )
 		{	// Set this var to TRUE to make all next statuses below are allowed because it is a max allowed status:
 			$restricted_status_is_allowed = true;
@@ -889,30 +899,46 @@ function get_highest_publish_status( $type, $blog, $with_label = true, $restrict
 		}
 		if( $restricted_status_is_allowed && $status_is_allowed && $current_User->check_perm( 'blog_'.$type.'!'.$curr_status, 'create', false, $blog ) )
 		{	// The highest available publish status has been found:
-			$result = array( $curr_status, $status_order[$index][1] );
+			$result = $curr_status;
 			break;
 		}
 	}
 
-	if( !$result )
-	{ // There are no available public status
+	if( ! $result )
+	{	// There are no available public status:
 		if( $current_User->check_perm( 'blog_'.$type.'!private', 'create', false, $blog ) )
-		{ // Check private status
-			$result = array( 'private', T_('Make private!') );
+		{	// Check private status:
+			$result = 'private';
 		}
 		else
-		{ // None of the statuses were allowed avove the 'draft' status, so we return the lowest level status.
-			$result = array( 'draft', '' );
+		{	// None of the statuses were allowed above the 'draft' status, so we return the lowest level status:
+			$result = 'draft';
 		}
 	}
 
 	if( $with_label )
-	{
-		return $result;
+	{	// Get label for status updating action:
+		if( $result == 'private' )
+		{	// Set special label for private status because it is not defined in get_visibility_statuses( 'ordered-array' ):
+			$result_label = T_('Make private!');
+		}
+		else
+		{	// Get label by status key:
+			$ordered_statuses = get_visibility_statuses( 'ordered-array' );
+			foreach( $ordered_statuses as $index => $ordered_status )
+			{
+				if( $ordered_status[0] == $result )
+				{
+					$result_label = $ordered_status[1];
+					break;
+				}
+			}
+		}
+		return array( $result, empty( $result_label ) ? '' : $result_label );
 	}
 
-	// Return only the highest available visibility status without label
-	return $result[0];
+	// Return only the highest available visibility status without label:
+	return $result;
 }
 
 
@@ -943,7 +969,7 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	}
 	else
 	{ // Get list of relevant blogs
-		$Blog = & $BlogCache->get_by_ID( $blog_ids );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ids );
 		$where_cat_clause = trim( $Blog->get_sql_where_aggregate_coll_IDs( 'cat_blog_ID' ) );
 	}
 
@@ -1001,7 +1027,7 @@ function get_inskin_statuses( $blog_ID, $type )
 	}
 
 	$BlogCache = & get_BlogCache();
-	$Blog = $BlogCache->get_by_ID( $blog_ID );
+	$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 	$inskin_statuses = $Blog->get_setting( ( $type == 'comment' ) ? 'comment_inskin_statuses' : 'post_inskin_statuses' );
 	return explode( ',', $inskin_statuses );
 }
@@ -1142,11 +1168,11 @@ function get_visibility_statuses( $format = '', $exclude = array('trash'), $chec
 
 		case 'ordered-index': // gives each status index in the statuses ordered array
 			$r = array(
-				'redirected' => 0,
 				'trash'      => 0,
-				'private'    => 0,
-				'draft'      => 0,
+				'redirected' => 0,
 				'deprecated' => 0,
+				'draft'      => 0,
+				'private'    => 0,
 				'review'     => 1,
 				'protected'  => 2,
 				'community'  => 3,
@@ -1341,11 +1367,12 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow
  * Get Blog object from general setting
  *
  * @param string Setting name: 'default_blog_ID', 'info_blog_ID', 'login_blog_ID', 'msg_blog_ID'
+ * @param object|NULL Current collection, Used for additional checking
  * @param boolean true if function $BlogCache->get_by_ID() should die on error
  * @param boolean true if function $BlogCache->get_by_ID() should die on empty/null
  * @return object|NULL|false
  */
-function & get_setting_Blog( $setting_name, $halt_on_error = false, $halt_on_empty = false )
+function & get_setting_Blog( $setting_name, $current_Blog = NULL, $halt_on_error = false, $halt_on_empty = false )
 {
 	global $Settings;
 
@@ -1353,6 +1380,11 @@ function & get_setting_Blog( $setting_name, $halt_on_error = false, $halt_on_emp
 
 	if( ! isset( $Settings ) )
 	{
+		return $setting_Blog;
+	}
+
+	if( $setting_name == 'login_blog_ID' && $current_Blog !== NULL && $current_Blog->get( 'access_type' ) == 'absolute' )
+	{	// Don't allow to use main login collection if current collection has an external domain:
 		return $setting_Blog;
 	}
 

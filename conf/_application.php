@@ -21,7 +21,7 @@ $app_version = '6.8.0-alpha';
  * Release date (ISO)
  * @global string
  */
-$app_date = '2016-06-16';
+$app_date = '2016-08-15';
 
 /**
  * Long version string for checking differences
@@ -36,13 +36,13 @@ $app_version_long = $app_version.'-'.$app_date;
  *
  * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 11820;
+$new_db_version = 13020;
 
 /**
  * Minimum PHP version required for b2evolution to function properly. It will contain each module own minimum PHP version as well.
  * @global array
  */
-$required_php_version = array( 'application' => '5.0' );
+$required_php_version = array( 'application' => '5.2' );
 
 /**
  * Minimum MYSQL version required for b2evolution to function properly. It will contain each module own minimum MYSQL version as well.
@@ -84,6 +84,6 @@ $modules = array(
 		'sessions',
 		'messaging',
 		'maintenance',
-		'central_antispam',
+		// 'central_antispam',		// will also require $enable_blacklist_server_API = true;
 	);
 ?>

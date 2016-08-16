@@ -74,12 +74,12 @@ class Plugin
 	 * This can be used by other plugins when requiring your plugin
 	 * through {@link Plugin::GetDependencies()}.
 	 *
-	 * By increasing it you can request a call of {@link GetDbLayout()} upon instantiating.
+	 * By increasing it, you can request a call of {@link GetDbLayout()} upon instantiating.
 	 * If there are DB layout changes to be made, the plugin gets changed to status "needs_config".
 	 *
 	 * @var string
 	 */
-	var $version = '0';
+	var $version = '0.0.1';
 
 	/**
 	 * Plugin author.
@@ -255,11 +255,11 @@ class Plugin
 
 	/**
 	 * Plugin URL
-	 * This gets lazy-filled with both 'abs' and 'rel' URLs by {@link get_plugin_url()}.
+	 * This gets lazy-filled URL by {@link get_plugin_url()}.
 	 *
-	 * @var array
+	 * @var string
 	 */
-	private $_plugin_url = array();
+	private $_plugin_url;
 
 	/**
 	 * Plugin template
@@ -353,7 +353,7 @@ class Plugin
 		}
 		else
 		{ // Get plugin template from frontoffice skin
-			global $Blog;
+			global $Collection, $Blog;
 			if( ! empty( $Blog ) )
 			{
 				$skin_ID = $Blog->get_skin_ID();
@@ -460,6 +460,8 @@ class Plugin
 	 *     'select_blog': a drop down field, providing all existing blogs (Blog ID is the value or "" if "allow_none" is true) (WARNING: does not scale - not recommended)
 	 *     'select_group': a drop down field, providing all existing groups (Group ID is the value or "" if "allow_none" is true)
 	 *     'select_user': a drop down field, providing all existing groups (User ID is the value or "" if "allow_none" is true) (WARNING: does not scale - not recommended)
+	 *     'radio' : radio select (options on same line by default)
+	 *          'field_lines' : set to true to have options on separate line
 	 *     'array': a subset of settings. The value gets automagically (un)serialized through get() and set().
 	 *         The following keys apply to this type:
 	 *        'entries': an array with meta information about sub-settings
@@ -1395,6 +1397,23 @@ class Plugin
 
 
 	/**
+	 * Event handler: Called when rendering attachments of item contents.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'Item': the {@link Item} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function RenderItemAttachment( & $params )
+	{
+		return false; // Do nothing by default.
+	}
+
+
+	/**
 	 * Event handler: Called when rendering item/post contents as XML.
 	 *
 	 * Should this plugin apply to XML?
@@ -2186,13 +2205,31 @@ class Plugin
 	 * @param array Associative array of parameters
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
-	 *   - 'EmailCampaign': the {@link Item} object which gets rendered.
+	 *   - 'EmailCampaign': the {@link EmailCampaign} object which gets rendered.
 	 * @return boolean Have we changed something?
 	 */
 	function RenderEmailAsHtml( & $params )
 	{
 		// Use this render by default temporarily
 		return $this->RenderItemAsHtml( $params );
+	}
+
+
+	/**
+	 * Event handler: Called when rendering attachments of email campaign contents.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'EmailCampaign': the {@link EmailCampaign} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function RenderEmailAttachment( & $params )
+	{
+		// Use this render by default temporarily
+		return $this->RenderItemAttachment( $params );
 	}
 
 	// }}}
@@ -3070,28 +3107,32 @@ class Plugin
 	 * @param string Get absolute URL? (or make it relative to $ReqHost)
 	 * @return string
 	 */
-	function get_plugin_url( $abs = false )
+	function get_plugin_url( $dummy = false )
 	{
-		global $ReqHost, $plugins_url, $plugins_path;
+		global $ReqHost, $plugins_url, $plugins_path, $Collection, $Blog;
 
-		$key = $abs ? 'abs' : 'rel';
+		if( empty( $this->_plugin_url ) )
+		{	// Initialize plugin URL only first time request:
 
-		if( empty($this->_plugin_url) )
-		{
-			// Get sub-path below $plugins_path, if any
-			$sub_path = preg_replace( ':^'.preg_quote($plugins_path, ':').':', '', dirname($this->classfile_path).'/' );
+			// Get sub-path below $plugins_path, if any:
+			$sub_path = preg_replace( ':^'.preg_quote( $plugins_path, ':' ).':', '', dirname( $this->classfile_path ).'/' );
 
-			$r = $plugins_url.$sub_path;
+			if( is_admin_page() || empty( $Blog ) )
+			{	// Get plugin url for nack-office and when collection is not viewed now:
+				$r = $plugins_url.$sub_path;
+			}
+			else
+			{	// Get plugin url depending on collection setting:
+				$r = $Blog->get_local_plugins_url().$sub_path;
+			}
 
-			// Use the same protocol as with current host (so includes from within https do not fail when on http)
-			$r = url_same_protocol($r);
+			// Use the same protocol as with current host (so includes from within https do not fail when on http):
+			$r = url_same_protocol( $r );
 
-			$this->_plugin_url = array(
-					'abs' => $r, // absolute
-					'rel' => url_rel_to_same_host($r, $ReqHost), // relative to current host
-				);
+			$this->_plugin_url = $r;
 		}
-		return $this->_plugin_url[$key];
+
+		return $this->_plugin_url;
 	}
 
 
@@ -3148,10 +3189,9 @@ class Plugin
 	 */
 	function get_htsrv_url( $method, $params = array(), $glue = '&amp;', $abs = false )
 	{
-		global $htsrv_url, $htsrv_url_sensitive;
-		global $ReqHost, $Blog;
+		global $ReqHost;
 
-		$base = substr($ReqHost, 0, 6) == 'https:' ? $htsrv_url_sensitive : $htsrv_url;
+		$base = substr( $ReqHost, 0, 6 ) == 'https:' ? get_htsrv_url( true ) : get_htsrv_url();
 
 		if( ! $abs && strpos( $base, $ReqHost ) === 0 )
 		{ // cut off $ReqHost if the resulting URL starts with it:
@@ -3711,12 +3751,12 @@ class Plugin
 
 		if( empty( $blog ) )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 		}
 		else
 		{
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 		}
 
 		// Name of the setting in the blog settings:
@@ -3739,12 +3779,12 @@ class Plugin
 
 		if( empty( $blog ) )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 		}
 		else
 		{
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 		}
 
 		// Name of the setting in the blog settings:

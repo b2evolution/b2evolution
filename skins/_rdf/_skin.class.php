@@ -21,7 +21,7 @@ class _rdf_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.0';
+	var $version = '6.7.5';
 
   /**
 	 * Get default name for the skin.

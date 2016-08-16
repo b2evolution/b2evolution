@@ -34,7 +34,7 @@ class test_plugin extends Plugin
 	var $name = 'Test';
 	var $code = 'evo_TEST';
 	var $priority = 50;
-	var $version = '6.7.0';
+	var $version = '6.7.5';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -957,7 +957,7 @@ class test_plugin extends Plugin
 	 */
 	function InitMainList( & $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 		global $preview, $disp;
 		global $postIDlist, $postIDarray, $cat_array;
 

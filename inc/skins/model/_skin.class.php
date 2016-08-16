@@ -297,7 +297,7 @@ class Skin extends DataObject
 		 * Blog currently displayed
 		 * @var Blog
 		 */
-		global $Blog;
+		global $Collection, $Blog;
 		global $admin_url, $rsc_url;
 		global $Timer, $Session;
 
@@ -751,7 +751,7 @@ class Skin extends DataObject
 	 */
 	function get_setting( $parname )
 	{
-		global $Blog, $Settings;
+		global $Collection, $Blog, $Settings;
 
 		// Name of the setting in the settings:
 		$setting_name = 'skin'.$this->ID.'_'.$parname;
@@ -847,7 +847,7 @@ class Skin extends DataObject
 	 */
 	function set_setting( $parname, $parvalue )
 	{
-		global $Blog, $Settings;
+		global $Collection, $Blog, $Settings;
 
 		// Name of the setting in the settings:
 		$setting_name = 'skin'.$this->ID.'_'.$parname;
@@ -868,7 +868,7 @@ class Skin extends DataObject
 	 */
 	function dbupdate_settings()
 	{
-		global $Blog, $Settings;
+		global $Collection, $Blog, $Settings;
 
 		if( isset( $Blog ) )
 		{	// Update collection skin settings:
@@ -926,7 +926,7 @@ class Skin extends DataObject
 
 				case 'font_awesome':
 					// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
-					init_fontawesome_icons( 'fontawesome-glyphicons' );
+					init_fontawesome_icons( 'fontawesome-glyphicons', 'blog' );
 					break;
 
 				case 'bootstrap':
@@ -1023,13 +1023,16 @@ class Skin extends DataObject
 				case 'disp_page':
 					// Specific features for disp=page:
 
-					global $Blog, $current_User;
+					global $Collection, $Blog, $current_User;
 
 					// Used to init functions for AJAX forms to add a comment:
 					init_ajax_forms( 'blog' );
 
 					// Used to set rating for a new comment:
 					init_ratings_js( 'blog' );
+
+					// Used to vote on an item:
+					init_voting_item_js( 'blog' );
 
 					// Used to vote on the comments:
 					init_voting_comment_js( 'blog' );
@@ -1144,7 +1147,7 @@ class Skin extends DataObject
 
 					global $Settings, $Plugins;
 
-					if( transmit_hashed_password() )
+					if( can_use_hashed_password() )
 					{ // Include JS for client-side password hashing:
 						require_js( 'build/sha1_md5.bmin.js', 'blog' );
 					}

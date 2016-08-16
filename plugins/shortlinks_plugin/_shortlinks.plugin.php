@@ -22,7 +22,7 @@ class shortlinks_plugin extends Plugin
 	var $code = 'b2evWiLi';
 	var $name = 'Short Links';
 	var $priority = 35;
-	var $version = '6.7.0';
+	var $version = '6.7.5';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -468,12 +468,12 @@ class shortlinks_plugin extends Plugin
 		if( ! empty( $params['Item'] ) )
 		{	// Item is set, get Blog from post:
 			$edited_Item = & $params['Item'];
-			$Blog = & $edited_Item->get_Blog();
+			$Collection = $Blog = & $edited_Item->get_Blog();
 		}
 
 		if( empty( $Blog ) )
 		{	// Item is not set, try global Blog:
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available:
 				return false;
@@ -505,13 +505,13 @@ class shortlinks_plugin extends Plugin
 			if( ! empty( $Comment->item_ID ) )
 			{
 				$comment_Item = & $Comment->get_Item();
-				$Blog = & $comment_Item->get_Blog();
+				$Collection = $Blog = & $comment_Item->get_Blog();
 			}
 		}
 
 		if( empty( $Blog ) )
 		{	// Comment is not set, try global Blog:
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{	// We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available:
 				return false;

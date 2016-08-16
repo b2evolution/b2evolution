@@ -1025,7 +1025,7 @@ switch( $action )
 		{
 			set_working_blog( $fm_Filelist->get_root_ID() );
       // Load the blog we're in:
-			$Blog = & $BlogCache->get_by_ID( $blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 		}
 		// ---
 
@@ -1498,9 +1498,6 @@ switch( $fm_mode )
 	case 'link_object':
 		// We want to link file(s) to an object or view linked files to an object:
 		// TODO: maybe this should not be a mode and maybe we should handle linking as soon as we have an $edited_Item ...
-
-		// Add JavaScript to handle links modifications.
-		require_js( 'links.js' );
 
 		if( !isset( $LinkOwner ) )
 		{ // No Object to link to...

@@ -32,7 +32,7 @@ class facebook_plugin extends Plugin
 	var $name;
 	var $code = 'evo_facebook';
 	var $priority = 20;
-	var $version = '6.7.0';
+	var $version = '6.7.5';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'other';

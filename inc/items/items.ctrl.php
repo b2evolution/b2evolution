@@ -38,9 +38,11 @@ global $current_User;
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 
 global $dispatcher;
+
+global $basehost;
 
 $action = param_action( 'list' );
 $orig_action = $action; // Used to know what action is called really
@@ -92,7 +94,7 @@ switch( $action )
 		}
 
 		// Load the blog we're in:
-		$Blog = & $edited_Item->get_Blog();
+		$Collection = $Blog = & $edited_Item->get_Blog();
 		set_working_blog( $Blog->ID );
 
 		// Where are we going to redirect to?
@@ -140,7 +142,7 @@ switch( $action )
 		}
 
 		// Load the blog we're in:
-		$Blog = & $edited_Item->get_Blog();
+		$Collection = $Blog = & $edited_Item->get_Blog();
 		set_working_blog( $Blog->ID );
 
 		// Where are we going to redirect to?
@@ -192,7 +194,7 @@ switch( $action )
 			if( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
 			{	// Selected a new blog:
 				$BlogCache = & get_BlogCache();
-				$Blog = & $BlogCache->get_by_ID( $blog );
+				$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 			}
 
 			// Where are we going to redirect to?
@@ -238,7 +240,7 @@ switch( $action )
 		{
 			set_working_blog( $fm_FileRoot->in_type_ID );
 			// Load the blog we're in:
-			$Blog = & $BlogCache->get_by_ID( $blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 		}
 		// ---
 
@@ -692,8 +694,8 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
-		// Restrict item status to max allowed by item collection:
-		$edited_Item->restrict_status_by_collection();
+		// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:
+		$edited_Item->restrict_status();
 
 		$post_comment_status = $edited_Item->get( 'comment_status' );
 		$post_extracats = postcats_get_byID( $p ); // NOTE: dh> using $edited_Item->get_Chapters here instead fails (empty list, since no postIDlist).
@@ -867,9 +869,7 @@ switch( $action )
 		if( $edited_Item->status == 'published' &&
 		    ! strpos( $redirect_to, 'tab=tracker' ) &&
 		    ! strpos( $redirect_to, 'tab=manual' ) )
-		{	// fp> I noticed that after publishing a new post, I always want to see how the blog looks like
-			// If anyone doesn't want that, we can make this optional...
-			// sam2kb> Please make this optional, this is really annoying when you create more than one post or when you publish draft images created from FM.
+		{	// Where to go after publishing the post?
 			// yura> When a post is created from "workflow" or "manual" we should display a post list
 
 			// Where do we want to go after publishing?
@@ -889,23 +889,22 @@ switch( $action )
 			}
 		}
 
-		if( ( $redirect_to === NULL ) ||
-			( ( $allow_redirects_to_different_domain != 'always' ) && ( ! url_check_same_domain( $baseurl, $redirect_to ) ) ) )
-		{ // The redirect url was set to NULL ( $blog_redirect_setting == 'no' ) or the redirect_to url is outside of the base domain
-			if( $redirect_to !== NULL )
-			{ // Add messages which explain the different target of the redirect
-				$Messages->add( sprintf( 'We did not automatically redirect you to [%s] because it\'s on a different domain.', $redirect_to ) );
-			}
-			header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
+		if( $redirect_to !== NULL ) 
+		{	// The redirect url was NOT set to NULL ( $blog_redirect_setting == 'no' ) 
+	 
+			// TRY TO REDIRECT / EXIT
+			header_redirect( $redirect_to, 303, false, true /* RETURN if forbidden */ );
+
+			// If we have not Exited yet, it means the redirect was refused because it was on a different domain
 		}
 
-		// REDIRECT / EXIT
-		header_redirect( url_add_param( $redirect_to, 'highlight='.$edited_Item->ID, '&' ) );
-		// Switch to list mode:
-		// $action = 'list';
-		//init_list_mode();
-		break;
+		// Set highlight
+		$Session->set( 'highlight_id', $edited_Item->ID );
 
+		// REDIRECT / EXIT:
+		header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
+		/* EXITED */
+		break;
 
 	case 'update_edit':
 	case 'update':
@@ -1044,10 +1043,7 @@ switch( $action )
 			break;
 		}
 
-		/* fp> I noticed that after publishing a new post, I always want
-		 *     to see how the blog looks like. If anyone doesn't want that,
-		 *     we can make this optional...
-		 */
+		// Where to go after publishing the post?
 		if( $edited_Item->status == 'redirected' ||
 		    strpos( $redirect_to, 'tab=tracker' ) )
 		{ // We should show the posts list if:
@@ -1089,20 +1085,20 @@ switch( $action )
 			$redirect_to = NULL;
 		}
 
-		if( ( $redirect_to === NULL ) ||
-			( ( $allow_redirects_to_different_domain != 'always' ) && ( ! url_check_same_domain( $baseurl, $redirect_to ) ) ) )
-		{ // The redirect url was set to NULL ( $blog_redirect_setting == 'no' ) or the redirect_to url is outside of the base domain
-			if( $redirect_to !== NULL )
-			{ // Add messages which explain the different target of the redirect
-				$Messages->add( sprintf( 'We did not automatically redirect you to [%s] because it\'s on a different domain.', $redirect_to ) );
-			}
-			// Set highlight
-			$Session->set( 'highlight_id', $edited_Item->ID );
-			header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
+		if( $redirect_to !== NULL ) 
+		{	// The redirect url was NOT set to NULL ( $blog_redirect_setting == 'no' ) 
+	 
+			// TRY TO REDIRECT / EXIT
+			header_redirect( $redirect_to, 303, false, true /* RETURN if forbidden */ );
+
+			// If we have not Exited yet, it means the redirect was refused because it was on a different domain
 		}
 
-		// REDIRECT / EXIT
-		header_redirect( $redirect_to, 303 );
+		// Set highlight
+		$Session->set( 'highlight_id', $edited_Item->ID );
+
+		// REDIRECT / EXIT:
+		header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
 		/* EXITED */
 		break;
 
@@ -1461,7 +1457,7 @@ switch( $action )
  */
 function init_list_mode()
 {
-	global $tab, $tab_type, $Blog, $UserSettings, $ItemList, $AdminUI, $current_User;
+	global $tab, $tab_type, $Collection, $Blog, $UserSettings, $ItemList, $AdminUI, $current_User;
 
 	// set default itemslist param prefix
 	$items_list_param_prefix = 'items_';
@@ -1680,7 +1676,7 @@ switch( $action )
 			if( $Blog->get_setting( 'in_skin_editing' ) && ( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) || get_param( 'p' ) > 0 ) )
 			{ // Show 'In skin' link if Blog setting 'In-skin editing' is ON and User has a permission to publish item in this blog
 				$mode_inskin_url = url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;'.$tab_switch_params );
-				$mode_inskin_action = get_samedomain_htsrv_url().'item_edit.php';
+				$mode_inskin_action = get_htsrv_url().'item_edit.php';
 				$AdminUI->global_icon( T_('In skin editing'), 'edit', $mode_inskin_url,
 						' '.T_('In skin editing'), 4, 3, array(
 						'style' => 'margin-right: 3ex',
@@ -1800,8 +1796,16 @@ if( !empty( $Blog ) )
 */
 
 if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action, 'new' ) !== false )
-{ // Initialize js to autocomplete usernames in post/comment form
+{	// Initialize js to autocomplete usernames in post/comment form
 	init_autocomplete_usernames_js();
+	// Require colorbox js:
+	require_js_helper( 'colorbox' );
+	// Require File Uploader js and css:
+	require_js( 'multiupload/fileuploader.js' );
+	require_css( 'fileuploader.css' );
+	// Load JS files to make the links table sortable:
+	require_js( '#jquery#' );
+	require_js( 'jquery/jquery.sortable.min.js' );
 }
 
 if( in_array( $action, array( 'new', 'copy', 'create_edit', 'create_link', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish', 'extract_tags' ) ) )

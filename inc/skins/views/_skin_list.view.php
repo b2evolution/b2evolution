@@ -89,6 +89,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 						'th' => T_('Collections'),
 						'order' => 'nb_blogs',
+						'default_dir' => 'D',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'center',
 						'td' => '~conditional( (#nb_blogs# > 0), #nb_blogs#, \'&nbsp;\' )~',

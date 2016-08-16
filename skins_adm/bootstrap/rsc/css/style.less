@@ -292,14 +292,14 @@ div.delete_messages ul {
 		border: 1px solid #ddd;
 		.border-radius;
 		&.evo_form__comment_meta {
-			border: 2px solid #5133ab;
-			background-color: #f7f4ff;
+			border: 2px solid #5bc0de;
+			background-color: #d9edf7;
 		}
 		.form_info {
 			display: block;
 			text-align: center;
 			padding: 10px;
-			color: #5133ab;
+			color: #5bc0de;
 		}
 	}
 }
@@ -341,13 +341,13 @@ div.delete_messages ul {
 			color: #888;
 		}
 		&.evo_comment__status_meta {
-			border: 2px solid #5133ab;
+			border: 2px solid #5bc0de;
 			.panel-heading, .panel-footer {
-				background-color: #f7f4ff;
-				border-bottom: 1px solid #5133ab;
+				background-color: #d9edf7;
+				border-bottom: 1px solid #5bc0de;
 			}
 			.panel-footer {
-				border-top: 1px solid #5133ab;
+				border-top: 1px solid #5bc0de;
 				border-bottom: none;
 			}
 		}
@@ -621,7 +621,7 @@ fieldset ul {
 }
 .dashboard_comments_block__meta {
 	.panel-body {
-		background-color: #f7f4ff;
+		background-color: #d9edf7;
 	}
 }
 // Charts on dashboard
@@ -693,7 +693,7 @@ fieldset ul {
 		display: inline-block;
 	}
 }
-#itemform_links, #cmntform_links {
+#itemform_links, #cmntform_links, #ecmpform_links, #msgform_links {
 	.panel {
 		overflow: hidden;
 	}
@@ -701,19 +701,25 @@ fieldset ul {
 		padding: 0;
 	}
 }
+#msgform_links {
+	margin-bottom: 20px;
+}
 #itemform_goals td {
 	padding-bottom: 2px;
 }
 
 // Attachments / links
-#attachmentframe_wrapper {
+#attachments_fieldset_wrapper {
 	width: 100%;
 	height: 160px;
 	position: relative;
-	overflow: hidden;
 	padding-bottom: 6px;
 	box-sizing: content-box;
- .ui-resizable-s {
+	#attachments_fieldset_block {
+		overflow: auto;
+		height: 100%;
+	}
+	.ui-resizable-s {
 		background: #c0c0c0;
 		height: 6px;
 		bottom: 0;
@@ -726,12 +732,18 @@ fieldset ul {
 			display: block;
 		}
 	}
-	#attachmentframe_disabler {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
+	.table_scroll {
+		// Use this position to fix red triangle when attachment is dragged by mouse:
+		position: relative;
+	}
+	table tbody {
+		.dragged {
+			opacity: 0.8;
+			position: absolute;
+		}
+		td {
+			cursor: move;
+		}
 	}
 }
 #filelist_tbody {

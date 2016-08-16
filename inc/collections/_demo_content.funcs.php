@@ -132,7 +132,7 @@ function create_blog(
 {
 	global $default_locale, $install_test_features, $local_installation, $Plugins;
 
-	$Blog = new Blog( NULL );
+	$Collection = $Blog = new Blog( NULL );
 
 	$Blog->set( 'sec_ID', $section_ID );
 
@@ -685,7 +685,7 @@ function create_demo_comment( $item_ID, $comment_users , $status = NULL )
 	$Comment = new Comment();
 	$Comment->set( 'item_ID', $item_ID );
 	$Comment->set( 'status', $status );
-	$Comment->restrict_status_by_item( true );
+	$Comment->restrict_status( true );
 	$status = $Comment->get( 'status' );
 
 	// Set demo content depending on status
@@ -2123,7 +2123,7 @@ Hello
 			$Comment = new Comment();
 			$Comment->set( 'item_ID', $additional_comments_item_ID );
 			$Comment->set( 'status', $comment_status );
-			$Comment->restrict_status_by_item( true );
+			$Comment->restrict_status( true );
 			$comment_status = $Comment->get( 'status' );
 
 			foreach( $demo_users as $demo_user )

@@ -50,11 +50,11 @@ if( $demo_mode && ( $current_User->ID <= 3 ) )
 // Check that this action request is not a CSRF hacked request:
 $Session->assert_received_crumb( 'user' );
 
-$Blog = NULL;
+$Collection = $Blog = NULL;
 if( $blog > 0 )
 { // Get Blog
 	$BlogCache = & get_BlogCache();
-	$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 }
 
 switch( $action )

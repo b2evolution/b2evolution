@@ -159,16 +159,6 @@ $schema_queries = array(
 			PRIMARY KEY ( urep_target_user_ID, urep_reporter_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
-	'T_users__postreadstatus' => array(
-		'Creating table for User post read status',
-		"CREATE TABLE T_users__postreadstatus (
-			uprs_user_ID int(11) unsigned NOT NULL,
-			uprs_post_ID int(11) unsigned NOT NULL,
-			uprs_read_post_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-			uprs_read_comment_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-			PRIMARY KEY ( uprs_user_ID, uprs_post_ID )
-		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
-
 	'T_users__invitation_code' => array(
 		'Creating table for User invitation codes',
 		"CREATE TABLE T_users__invitation_code (
@@ -211,6 +201,15 @@ $schema_queries = array(
 			sug_user_ID INT(11) UNSIGNED NOT NULL,
 			sug_grp_ID  INT(11) UNSIGNED NOT NULL,
 			PRIMARY KEY ( sug_user_ID, sug_grp_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_users__profile_visits' => array(
+		'Crating table for profile visits',
+		"CREATE TABLE T_users__profile_visits (
+			upv_visited_user_ID INT(11) UNSIGNED NOT NULL,
+			upv_visitor_user_ID INT(11) UNSIGNED NOT NULL,
+			upv_last_visit_ts   TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			PRIMARY KEY ( upv_visited_user_ID, upv_visitor_user_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_i18n_original_string' => array(
@@ -443,7 +442,7 @@ $schema_queries = array(
 			emlog_result    ENUM( 'ok', 'error', 'blocked', 'simulated' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ok',
 			emlog_subject   VARCHAR(255) DEFAULT NULL,
 			emlog_headers   TEXT DEFAULT NULL,
-			emlog_message   TEXT DEFAULT NULL,
+			emlog_message   MEDIUMTEXT DEFAULT NULL,
 			PRIMARY KEY     (emlog_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 

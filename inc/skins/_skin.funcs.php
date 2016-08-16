@@ -32,7 +32,7 @@ function skin_init( $disp )
 	/**
 	 * @var Blog
 	 */
-	global $Blog;
+	global $Collection, $Blog;
 
 	/**
 	 * @var Item
@@ -92,7 +92,16 @@ function skin_init( $disp )
 		case 'terms':
 		case 'download':
 		case 'feedback-popup':
+		case 'flagged':
 			// We need to load posts for this display:
+
+			if( $disp == 'flagged' && ! is_logged_in() )
+			{	// Forbid access to flagged content for not logged in users:
+				global $disp;
+				$disp = '403';
+				$Messages->add( T_('You must log in before you can see your flagged content.'), 'error' );
+				break;
+			}
 
 			if( $disp == 'terms' )
 			{	// Initialize the redirect param to know what page redirect after accepting of terms:
@@ -207,7 +216,7 @@ function skin_init( $disp )
 					$canonical_url = url_add_param( $canonical_url, $page_param[1], '&' );
 				}
 
-				if( ! is_same_url( $ReqURL, $canonical_url ) )
+				if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
 				{	// The requested URL does not look like the canonical URL for this post...
 					// url difference was resolved
 					$url_resolved = false;
@@ -225,7 +234,7 @@ function skin_init( $disp )
 								$MainList->nav_target = $cat_param[1];
 							}
 						}
-						$url_resolved = is_same_url( $ReqURL, $extended_url );
+						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get( 'http_protocol' ) != 'always_redirect' );
 					}
 					if( preg_match( '|[&?]tag=([^&A-Z]+)|', $ReqURI, $tag_param ) )
 					{ // A tag post navigation param is set
@@ -240,7 +249,7 @@ function skin_init( $disp )
 								$MainList->nav_target = $tag_param[1];
 							}
 						}
-						$url_resolved = is_same_url( $ReqURL, $extended_url );
+						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get( 'http_protocol' ) != 'always_redirect' );
 					}
 
 					if( !$url_resolved && $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' && ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) ) )
@@ -383,7 +392,7 @@ var downloadInterval = setInterval( function()
 								}
 
 								$canonical_url = $Chapter->get_permanent_url( NULL, NULL, $MainList->get_active_filter('page'), NULL, '&' );
-								if( ! is_same_url($ReqURL, $canonical_url) )
+								if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
 								{	// fp> TODO: we're going to lose the additional params, it would be better to keep them...
 									// fp> what additional params actually?
 									if( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
@@ -424,7 +433,7 @@ var downloadInterval = setInterval( function()
 							|| $Blog->get_setting( 'relcanonical_tag_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url = $Blog->gen_tag_url( $MainList->get_active_filter('tags'), $MainList->get_active_filter('page'), '&' );
-						if( ! is_same_url($ReqURL, $canonical_url) )
+						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
 						{
 							if( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
 							{	// REDIRECT TO THE CANONICAL URL:
@@ -453,7 +462,7 @@ var downloadInterval = setInterval( function()
 							|| $Blog->get_setting( 'relcanonical_archive_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url =  $Blog->gen_archive_url( substr( $m, 0, 4 ), substr( $m, 4, 2 ), substr( $m, 6, 2 ), $w, '&', $MainList->get_active_filter('page') );
-						if( ! is_same_url($ReqURL, $canonical_url) )
+						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
 						{
 							if( $Blog->get_setting( 'canonical_archive_urls' ) && $redir == 'yes' )
 							{	// REDIRECT TO THE CANONICAL URL:
@@ -566,7 +575,7 @@ var downloadInterval = setInterval( function()
 			}
 			else
 			{ // Recipient was not defined, try set the blog owner as recipient
-				global $Blog;
+				global $Collection, $Blog;
 				if( empty( $Blog ) )
 				{ // Blog is not set, this is an invalid request
 					debug_die( 'Invalid send message request!');
@@ -641,7 +650,7 @@ var downloadInterval = setInterval( function()
 					// Set global variable to auto define the FB autocomplete plugin field
 					$recipients_selected = array( array(
 							'id'    => $recipient_User->ID,
-							'title' => $recipient_User->login,
+							'login' => $recipient_User->login,
 						) );
 
 					init_tokeninput_js( 'blog' );
@@ -1123,7 +1132,7 @@ var downloadInterval = setInterval( function()
 				// will have exited
 			}
 
-			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'loginurl', array( 'glue' => '&' ) ) );
 			}
@@ -1139,7 +1148,7 @@ var downloadInterval = setInterval( function()
 				header_redirect( $Blog->gen_blogurl(), false );
 			}
 
-			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'registerurl', array( 'glue' => '&' ) ) );
 			}
@@ -1159,7 +1168,7 @@ var downloadInterval = setInterval( function()
 				header_redirect( $Blog->gen_blogurl(), false );
 			}
 
-			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'lostpasswordurl', array( 'glue' => '&' ) ) );
 			}
@@ -1210,7 +1219,7 @@ var downloadInterval = setInterval( function()
 				// will have exited
 			}
 
-			if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $Blog->ID != $login_Blog->ID )
+			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'activateinfourl', array( 'glue' => '&' ) ) );
 			}
@@ -1242,6 +1251,7 @@ var downloadInterval = setInterval( function()
 			break;
 
 		case 'users':
+		case 'visits':
 			// Check if current user has an access to public list of the users:
 			check_access_users_list();
 
@@ -1377,7 +1387,7 @@ var downloadInterval = setInterval( function()
 			$display_params = array();
 
 			// Restrict comment status by parent item:
-			$edited_Comment->restrict_status_by_item();
+			$edited_Comment->restrict_status();
 			break;
 
 		case 'useritems':
@@ -1482,6 +1492,12 @@ var downloadInterval = setInterval( function()
 				global $disp;
 				$disp = '404';
 			}
+			elseif( $Session->get( 'account_close_reason' ) )
+			{
+				global $account_close_reason;
+				$account_close_reason = $Session->get( 'account_close_reason' );
+				$Session->delete( 'account_close_reason' );
+			}
 			elseif( $Session->get( 'account_closing_success' ) )
 			{ // User has closed the account
 				global $account_closing_success;
@@ -1506,9 +1522,15 @@ var downloadInterval = setInterval( function()
 
 	$Debuglog->add('skin_init: $disp='.$disp. ' / $disp_detail='.$disp_detail.' / $seo_page_type='.$seo_page_type, 'skins' );
 
-	// Make this switch block special only for 404 page
+	// Make this switch block special only for 403 and 404 pages:
 	switch( $disp )
 	{
+		case '403':
+			// We have a 403 forbidden content error:
+			header_http_response( '403 Forbidden' );
+			$robots_index = false;
+			break;
+
 		case '404':
 			// We have a 404 unresolved content error
 			// How do we want do deal with it?
@@ -1546,6 +1568,9 @@ var downloadInterval = setInterval( function()
 	$Timer->start( 'Skin:display_init' );
 	$Skin->display_init();
 	$Timer->pause( 'Skin:display_init' );
+
+	// Send the predefined cookies:
+	evo_sendcookies();
 
 	// Send default headers:
 	// See comments inside of this function:
@@ -1699,11 +1724,10 @@ function skin_include( $template_name, $params = array() )
 	global $skins_path, $ads_current_skin_path, $disp;
 
 	// Globals that may be needed by the template:
-	global $Blog, $MainList, $Item;
+	global $Collection, $Blog, $MainList, $Item;
 	global $Plugins, $Skin;
 	global $current_User, $Hit, $Session, $Settings;
-	global $skin_url, $htsrv_url, $htsrv_url_sensitive;
-	global $samedomain_htsrv_url, $secure_htsrv_url;
+	global $skin_url;
 	global $credit_links, $skin_links, $francois_links, $fplanque_links, $skinfaktory_links;
 	/**
 	* @var Log
@@ -1744,6 +1768,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_pwdchange'      => '_profile.disp.php',
 				'disp_userprefs'      => '_profile.disp.php',
 				'disp_subs'           => '_profile.disp.php',
+				'disp_visits'         => '_profile.disp.php',
 				'disp_search'         => '_search.disp.php',
 				'disp_single'         => '_single.disp.php',
 				'disp_sitemap'        => '_sitemap.disp.php',
@@ -1761,6 +1786,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_access_requires_login' => '_access_requires_login.disp.php',
 				'disp_tags'           => '_tags.disp.php',
 				'disp_terms'          => '_terms.disp.php',
+				'disp_flagged'        => '_flagged.disp.php',
 			);
 
 		// Add plugin disp handlers:
@@ -1966,7 +1992,7 @@ function skin_template_path( $template_name )
  */
 function siteskin_include( $template_name, $params = array() )
 {
-	global $Settings, $skins_path, $Blog;
+	global $Settings, $skins_path, $Collection, $Blog;
 
 	if( ! $Settings->get( 'site_skins_enabled' ) )
 	{	// Site skins are not enabled:
@@ -1980,8 +2006,7 @@ function siteskin_include( $template_name, $params = array() )
 
 	// Globals that may be needed by the template:
 	global $current_User, $Hit, $Session, $Settings;
-	global $skin_url, $htsrv_url, $htsrv_url_sensitive;
-	global $samedomain_htsrv_url, $secure_htsrv_url;
+	global $skin_url;
 	global $credit_links, $skin_links, $francois_links, $fplanque_links, $skinfaktory_links;
 	/**
 	* @var Log
@@ -2061,7 +2086,7 @@ function siteskin_include( $template_name, $params = array() )
  */
 function skin_base_tag()
 {
-	global $skins_url, $skin, $Blog, $disp;
+	global $skins_url, $skin, $Collection, $Blog, $disp;
 
 	if( ! empty( $Blog ) )
 	{	// We are displaying a blog:
@@ -2097,7 +2122,7 @@ function skin_base_tag()
  */
 function skin_description_tag()
 {
-	global $Blog, $disp, $disp_detail, $MainList, $Chapter, $is_front;
+	global $Collection, $Blog, $disp, $disp_detail, $MainList, $Chapter, $is_front;
 
 	$r = '';
 
@@ -2146,7 +2171,7 @@ function skin_description_tag()
  */
 function skin_keywords_tag()
 {
-	global $Blog, $is_front, $disp, $MainList;
+	global $Collection, $Blog, $is_front, $disp, $MainList;
 
 	$r = '';
 
@@ -2189,7 +2214,7 @@ function skin_keywords_tag()
  */
 function skin_opengraph_tags()
 {
-	global $Blog, $disp, $MainList;
+	global $Collection, $Blog, $disp, $MainList;
 
 	if( empty( $Blog ) || ! $Blog->get_setting( 'tags_open_graph' ) )
 	{ // Open Graph tags are not allowed
@@ -2252,7 +2277,7 @@ function skin_opengraph_tags()
 
 function skin_twitter_tags()
 {
-	global $Blog, $disp, $MainList;
+	global $Collection, $Blog, $disp, $MainList;
 
 	if( empty( $Blog ) || ! $Blog->get_setting( 'tags_twitter_card' ) )
 	{ // Twitter summary card tags are not allowed
@@ -2313,7 +2338,7 @@ function skin_twitter_tags()
  */
 function skin_404_header()
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	// We have a 404 unresolved content error
 	// How do we want do deal with it?
@@ -2670,7 +2695,7 @@ function skin_body_attrs( $params = array() )
 			'class' => NULL
 		), $params );
 
-	global $PageCache, $Blog, $disp, $disp_detail, $Item, $current_User;
+	global $PageCache, $Collection, $Blog, $disp, $disp_detail, $Item, $current_User;
 
 	// WARNING: Caching! We're not supposed to have Session dependent stuff in here. This is for debugging only!
 	global $Session;

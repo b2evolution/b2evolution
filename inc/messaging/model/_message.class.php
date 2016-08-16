@@ -201,6 +201,75 @@ class Message extends DataObject
 
 
 	/**
+	 * Link attachments from temporary object to new created Message
+	 *
+	 * @return boolean TRUE on success linking
+	 */
+	function link_from_Request()
+	{
+		global $DB;
+
+		if( $this->ID == 0 )
+		{	// The message must be stored in DB:
+			return false;
+		}
+
+		$temp_link_owner_ID = param( 'temp_link_owner_ID', 'integer', 0 );
+
+		$TemporaryIDCache = & get_TemporaryIDCache();
+		if( ! ( $TemporaryID = & $TemporaryIDCache->get_by_ID( $temp_link_owner_ID, false, false ) ) )
+		{	// No temporary object of attachments:
+			return false;
+		}
+
+		if( $TemporaryID->type != 'message' )
+		{	// Wrong temporary object:
+			return false;
+		}
+
+		// Load all links:
+		$LinkOwner = new LinkMessage( NULL, $TemporaryID->ID );
+		$LinkOwner->load_Links();
+
+		if( empty( $LinkOwner->Links ) )
+		{	// No links:
+			return false;
+		}
+
+		// Change link owner from temporary to message object:
+		$DB->query( 'UPDATE T_links
+			  SET link_msg_ID = '.$this->ID.',
+			      link_tmp_ID = NULL
+			WHERE link_tmp_ID = '.$TemporaryID->ID );
+
+		// Move all temporary files to folder of new created message:
+		foreach( $LinkOwner->Links as $msg_Link )
+		{
+			if( $msg_File = & $msg_Link->get_File() &&
+			    $msg_FileRoot = & $msg_File->get_FileRoot() )
+			{
+				if( ! file_exists( $msg_FileRoot->ads_path.'private_message/pm'.$this->ID.'/' ) )
+				{	// Create if folder doesn't exist for files of new created message:
+					if( evo_mkdir( $msg_FileRoot->ads_path.'private_message/pm'.$this->ID.'/' ) )
+					{
+						$tmp_folder_path = $msg_FileRoot->ads_path.'private_message/tmp'.$TemporaryID->ID.'/';
+					}
+				}
+				$msg_File->move_to( $msg_FileRoot->type, $msg_FileRoot->in_type_ID, 'private_message/pm'.$this->ID.'/'.$msg_File->get_name() );
+			}
+		}
+
+		if( isset( $tmp_folder_path ) && file_exists( $tmp_folder_path ) )
+		{	// Remove temp folder from disk completely:
+			rmdir_r( $tmp_folder_path );
+		}
+
+		// Delete temporary object from DB:
+		$TemporaryID->dbdelete();
+	}
+
+
+	/**
 	 * Get Thread object
 	 */
 	function & get_Thread()
@@ -323,6 +392,9 @@ class Message extends DataObject
 					if( $this->dbupdate_last_contact_datetime() )
 					{
 						$DB->commit();
+
+						// Link attachments from temporary object to new created Message:
+						$this->link_from_Request();
 
 						$this->send_email_notifications( false );
 						return true;

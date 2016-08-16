@@ -30,7 +30,7 @@ global $dispatcher, $allow_evo_stats, $blog;
 if( empty( $_GET['blog'] ) )
 { // Use dashboard for selected blog only from GET request
 	$blog = 0;
-	unset( $Blog );
+	unset( $Blog, $Collection );
 }
 
 // Site dashboard

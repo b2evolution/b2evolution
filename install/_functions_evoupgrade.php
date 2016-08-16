@@ -5553,7 +5553,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_end();
 
 		task_begin( 'Create table for User post read status... ' );
-		db_create_table( 'T_users__postreadstatus', '
+		db_create_table( $tableprefix.'users__postreadstatus', '
 			uprs_user_ID int(11) unsigned NOT NULL,
 			uprs_post_ID int(11) unsigned NOT NULL,
 			uprs_read_post_ts TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
@@ -7397,7 +7397,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 11755, 'Creating collection user favorites table...' ) )
-	{ // part of 6.7.1-beta
+	{	// part of 6.7.1-beta
 		db_create_table( 'T_coll_user_favs', '
 				cufv_user_ID INT(10) UNSIGNED NOT NULL,
 				cufv_blog_ID INT(11) UNSIGNED NOT NULL,
@@ -7406,45 +7406,57 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		// If system user count is less than or equal to 10, Add favorites based on previous blog_favorite settings
 		load_funcs( 'tools/model/_system.funcs.php' );
 		$user_IDs = system_get_user_IDs();
-		$user_count = count( $user_IDs );
 
-		$SQL = new SQL();
-		$SQL->SELECT( '*' );
-		$SQL->FROM( 'T_blogs' );
-		$SQL->ORDER_BY( 'blog_ID' );
-		$blogs = $DB->get_results( $SQL->get() );
+		$colls_SQL = new SQL( 'Get ALL collections' );
+		$colls_SQL->SELECT( 'blog_ID, blog_owner_user_ID, blog_favorite' );
+		$colls_SQL->FROM( 'T_blogs' );
+		$colls_SQL->ORDER_BY( 'blog_ID' );
+		$colls = $DB->get_results( $colls_SQL->get() );
 
-		$SQL = 'INSERT INTO T_coll_user_favs ( cufv_blog_ID, cufv_user_ID ) VALUES ';
-		$values = array();
-
-		// Collection owners will automatically favorite their collection
-		foreach( $blogs as $blog )
-		{
-			$values[] = '( '.$blog->blog_ID.', '.$blog->blog_owner_user_ID.' )';
+		$user_colls_count = array();
+		$insert_values = array();
+		foreach( $colls as $coll )
+		{	// Collection owners will automatically favorite their collections:
+			if( ! isset( $user_colls_count[ $coll->blog_owner_user_ID ] ) )
+			{	// Initialize a count of favorite collections for each user:
+				$user_colls_count[ $coll->blog_owner_user_ID ] = 1;
+			}
+			if( $user_colls_count[ $coll->blog_owner_user_ID ] <= 7 )
+			{	// Make favorite only first 7 collections for each user:
+				$insert_values[] = '( '.$coll->blog_ID.', '.$coll->blog_owner_user_ID.' )';
+				$user_colls_count[ $coll->blog_owner_user_ID ]++;
+			}
 		}
 
-		if( $user_count <= 10 )
-		{
-			foreach( $blogs as $blog )
+		if( count( $user_IDs ) <= 10 )
+		{	// Make collections favorite for other users only if system has <= 10 users:
+			foreach( $user_IDs as $user_ID )
 			{
-				if( $blog->blog_favorite )
-				{ // currently has favorite status
-					foreach( $user_IDs as $user_ID )
-					{
-						$values[] = '( '.$blog->blog_ID.', '.$user_ID.' )';
+				if( ! isset( $user_colls_count[ $user_ID ] ) )
+				{	// Initialize a count of favorite collections for each user:
+					$user_colls_count[ $user_ID ] = 1;
+				}
+				foreach( $colls as $coll )
+				{
+					if( $user_colls_count[ $user_ID ] > 7 )
+					{	// Make favorite only first 7 collections for each user:
+						break;
+					}
+					if( $coll->blog_favorite && $user_ID != $coll->blog_owner_user_ID )
+					{	// Skip collection owner, because it has this collection as favorite automatically above:
+						$insert_values[] = '( '.$coll->blog_ID.', '.$user_ID.' )';
+						$user_colls_count[ $user_ID ]++;
 					}
 				}
 			}
 		}
 
-		$values = array_unique( $values );
-		if( $values )
-		{
-			$SQL .= implode( ', ', $values );
-			$DB->query( $SQL );
+		if( count( $insert_values ) )
+		{	// Insert rows of favorite collections per users in DB:
+			$DB->query( 'INSERT INTO T_coll_user_favs ( cufv_blog_ID, cufv_user_ID ) VALUES '.implode( ', ', $insert_values ) );
 		}
 
-		// Drop blog_favorite column
+		// Drop blog_favorite column:
 		db_drop_col( 'T_blogs', 'blog_favorite' );
 		upg_task_end();
 	}
@@ -7487,8 +7499,74 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11775, 'Add new types "Text" and "HTML" for custom fields of item types...' ) )
-	{	// part of 6.7.3-stable
+	if( upg_task_start( 11775, 'Upgrading posts and comments statuses depeding on max allowed status by their collections...' ) )
+	{	// part of 6.7.4-stable
+		$BlogCache = & get_BlogCache();
+		$BlogCache->load_all( 'ID', 'ASC' );
+		foreach( $BlogCache->cache as $Blog )
+		{
+			$Blog->update_reduced_status_data();
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11780, 'Upgrading subscription settings of collections...' ) )
+	{	// part of 6.7.4-stable
+		$DB->query( 'REPLACE INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
+				SELECT cset_coll_ID, "allow_comment_subscriptions", 1
+				  FROM T_coll_settings
+				 WHERE cset_name = "allow_subscriptions"
+				   AND cset_value = 1' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11785, 'Upgrading email log table...' ) )
+	{	// part of 6.7.5-stable
+		$DB->query( 'ALTER TABLE T_email__log
+			MODIFY emlog_message MEDIUMTEXT DEFAULT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11790, 'Fix number of favorite collections per each user...' ) )
+	{	// part of 6.7.5-stable
+		// Get users which have more than 20 favorite collections:
+		$more_fav_coll_users_SQL = new SQL();
+		$more_fav_coll_users_SQL->SELECT( 'cufv_user_ID' );
+		$more_fav_coll_users_SQL->FROM( 'T_coll_user_favs' );
+		$more_fav_coll_users_SQL->GROUP_BY( 'cufv_user_ID' );
+		$more_fav_coll_users_SQL->HAVING( 'COUNT( cufv_blog_ID ) > 20' );
+		$more_fav_coll_user_IDs = $DB->get_col( $more_fav_coll_users_SQL->get() );
+
+		foreach( $more_fav_coll_user_IDs as $more_fav_coll_user_ID )
+		{
+			// Get first 7 collections which should be kept as favorite after upgrade:
+			$first_colls_SQL = new SQL();
+			$first_colls_SQL->SELECT( 'cufv_blog_ID' );
+			$first_colls_SQL->FROM( 'T_coll_user_favs' );
+			$first_colls_SQL->WHERE( 'cufv_user_ID = '.$more_fav_coll_user_ID );
+			$first_colls_SQL->ORDER_BY( 'cufv_blog_ID' );
+			$first_colls_SQL->LIMIT( '7' );
+			$first_coll_IDs = $DB->get_col( $first_colls_SQL->get() );
+
+			if( count( $first_coll_IDs ) )
+			{	// Delete collections from favorite list:
+				$DB->query( 'DELETE FROM T_coll_user_favs
+					WHERE cufv_user_ID = '.$more_fav_coll_user_ID.'
+					  AND cufv_blog_ID NOT IN ( '.$DB->quote( $first_coll_IDs ).' )' );
+			}
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11795, 'Upgrading posts table...' ) )
+	{	// part of 6.7.5-stable
+		$DB->query( 'ALTER TABLE T_items__item
+			MODIFY post_excerpt_autogenerated  TINYINT(1) NOT NULL DEFAULT 1' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12000, 'Add new types "Text" and "HTML" for custom fields of item types...' ) )
+	{	// part of 6.7.5-stable
 		$DB->query( 'ALTER TABLE T_items__item_settings
 			MODIFY COLUMN iset_value varchar( 10000 ) NULL' );
 		$DB->query( 'ALTER TABLE T_items__type_custom_field
@@ -7496,8 +7574,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11780, 'Update widget container "Item Single"...' ) )
-	{	// part of 6.7.3-stable
+	if( upg_task_start( 12005, 'Update widget container "Item Single"...' ) )
+	{	// part of 6.7.5-stable
 		$DB->begin();
 		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
 		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_code, wi_order' );
@@ -7554,8 +7632,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11785, 'Create new widget container "404 Page"...' ) )
-	{	// part of 6.7.3-stable
+	if( upg_task_start( 12010, 'Create new widget container "404 Page"...' ) )
+	{	// part of 6.7.5-stable
 		$coll_IDs = $DB->get_col( 'SELECT blog_ID FROM T_blogs' );
 		if( $coll_IDs )
 		{
@@ -7573,8 +7651,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11790, 'Rename table "T_antispam" to "T_antispam__keyword"...' ) )
-	{	// part of 6.7.4-stable
+	if( upg_task_start( 12015, 'Rename table "T_antispam" to "T_antispam__keyword"...' ) )
+	{	// part of 6.7.5-stable
 		$DB->query( 'RENAME TABLE '.$tableprefix.'antispam TO T_antispam__keyword' );
 		$DB->query( "ALTER TABLE T_antispam__keyword
 			CHANGE aspm_ID     askw_ID     bigint(11) NOT NULL auto_increment,
@@ -7585,18 +7663,109 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11795, 'Upgrading posts and comments statuses depeding on max allowed status by their collections...' ) )
-	{	// part of 6.7.4-stable
-		$BlogCache = & get_BlogCache();
-		$BlogCache->load_all( 'ID', 'ASC' );
-		foreach( $BlogCache->cache as $Blog )
-		{
-			$Blog->update_reduced_status_data();
-		}
+	if( upg_task_start( 12020, 'Upgrade table user post data...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'RENAME TABLE '.$tableprefix.'users__postreadstatus TO T_items__user_data' );
+		$DB->query( "ALTER TABLE T_items__user_data
+			CHANGE uprs_user_ID         itud_user_ID          INT(11) UNSIGNED NOT NULL,
+			CHANGE uprs_post_ID         itud_item_ID          INT(11) UNSIGNED NOT NULL,
+			CHANGE uprs_read_post_ts    itud_read_item_ts     TIMESTAMP NULL DEFAULT NULL,
+			CHANGE uprs_read_comment_ts itud_read_comments_ts TIMESTAMP NULL DEFAULT NULL,
+			ADD                         itud_flagged_item     TINYINT(1) NOT NULL DEFAULT 0" );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11800, 'Creating sections table...' ) )
+	if( upg_task_start( 12025, 'Creating table for user profile visits...' ) )
+	{	// part of 6.8.0-alpha
+		db_create_table( 'T_users__profile_visits', '
+				upv_visited_user_ID INT(11) UNSIGNED NOT NULL,
+				upv_visitor_user_ID INT(11) UNSIGNED NOT NULL,
+				upv_last_visit_ts   TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00",
+				PRIMARY KEY ( upv_visited_user_ID, upv_visitor_user_ID )' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12030, 'Upgrade base domains table...') )
+	{ // part of 6.8.0-alpha
+		db_add_col( 'T_basedomains', 'dom_comment', 'VARCHAR(255) DEFAULT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12035, 'Create table for items votes...' ) )
+	{	// part of 6.8.0-alpha
+		db_create_table( 'T_items__votes', '
+			itvt_item_ID INT UNSIGNED NOT NULL,
+			itvt_user_ID INT UNSIGNED NOT NULL,
+			itvt_updown  TINYINT(1) NULL DEFAULT NULL,
+			itvt_report  ENUM( "clean", "rated", "adult", "inappropriate", "spam" ) COLLATE ascii_general_ci NULL DEFAULT NULL,
+			itvt_ts      TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00",
+			PRIMARY KEY (itvt_item_ID, itvt_user_ID),
+			KEY itvt_item_ID (itvt_item_ID),
+			KEY itvt_user_ID (itvt_user_ID)' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12040, 'Upgrade table posts for voting...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_items__item
+			ADD post_addvotes   INT NOT NULL DEFAULT 0,
+			ADD post_countvotes INT UNSIGNED NOT NULL DEFAULT 0' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12045, 'Update table post types...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'UPDATE T_items__type
+			  SET ityp_allow_disabling_comments = 1
+			WHERE ityp_usage LIKE "intro%"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12050, 'Upgrade table post types...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_items__type
+			ADD ityp_comment_form_msg       TEXT NULL DEFAULT NULL AFTER ityp_use_comments,
+			ADD ityp_allow_comment_form_msg TINYINT DEFAULT 0      AFTER ityp_comment_form_msg' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12055, 'Upgrade links table...' ) )
+	{	// part of 6.8.0-alpha
+		db_add_col( 'T_links', 'link_ecmp_ID', 'int(11) unsigned  NULL COMMENT \'Used for linking files to email campaign\' AFTER link_usr_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12060, 'Upgrade files table...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_files
+			MODIFY file_root_type ENUM("absolute","user","collection","shared","skins","import","emailcampaign") COLLATE ascii_general_ci NOT NULL DEFAULT "absolute"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12065, 'Upgrade blogs table...') )
+	{ // part of 6.8.0-alpha
+		db_add_col( 'T_blogs', 'blog_http_protocol', 'ENUM("always_redirect", "allow_both") DEFAULT "always_redirect" AFTER blog_access_type' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12070, 'Create table for temporary ID...' ) )
+	{	// part of 6.8.0-alpha
+		db_create_table( 'T_temporary_ID', '
+			tmp_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			tmp_type VARCHAR(32) COLLATE ascii_general_ci NOT NULL,
+			PRIMARY KEY (tmp_ID)' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12075, 'Upgrade links table...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_links
+			ADD link_msg_ID int(11) unsigned  NULL COMMENT \'Used for linking files to private message\' AFTER link_ecmp_ID,
+			ADD link_tmp_ID int(11) unsigned  NULL COMMENT \'Used for linking files to new creating object\' AFTER link_msg_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 6.8.0-alpha
 		db_create_table( 'T_section', '
 				sec_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -7607,13 +7776,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11805, 'Upgrading collections table...' ) )
+	if( upg_task_start( 13005, 'Upgrading collections table...' ) )
 	{	// part of 6.8.0-alpha
 		db_add_col( 'T_blogs', 'blog_sec_ID', 'INT(11) UNSIGNED NOT NULL DEFAULT 1' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11810, 'Create default section...' ) )
+	if( upg_task_start( 13010, 'Create default section...' ) )
 	{	// part of 6.8.0-alpha
 		$DB->query( 'INSERT INTO T_section ( sec_ID, sec_name, sec_order, sec_owner_user_ID )
 			VALUES ( 1, "No Section", 1, 1 )' );
@@ -7627,14 +7796,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11815, 'Upgrading general settings table...' ) )
+	if( upg_task_start( 13015, 'Upgrading general settings table...' ) )
 	{	// part of 6.8.0-alpha
 		$DB->query( 'ALTER TABLE T_settings
 			MODIFY set_name VARCHAR(50) COLLATE ascii_general_ci NOT NULL' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11820, 'Install default site skin...' ) )
+	if( upg_task_start( 13020, 'Install default site skin...' ) )
 	{	// part of 6.8.0-alpha
 		load_funcs( 'skins/_skin.funcs.php' );
 		$SkinCache = & get_SkinCache();

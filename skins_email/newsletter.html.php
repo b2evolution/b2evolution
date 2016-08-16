@@ -14,8 +14,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.html.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $htsrv_url;
-
 // Default params:
 $params = array_merge( array(
 		'message_html' => '',
@@ -25,7 +23,7 @@ echo $params['message_html'];
 
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'If you don\'t want to receive this newsletter anymore, click here:' )
-			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=newsletter&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
+			.' <a href="'.get_htsrv_url().'quick_unsubscribe.php?type=newsletter&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
 			.T_('instant unsubscribe').'</a>.';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------

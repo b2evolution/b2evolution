@@ -265,14 +265,14 @@ div.delete_messages ul li {
   border-radius: 4px;
 }
 .evo_post__comments .evo_form__comment.form-horizontal.evo_form__comment_meta {
-  border: 2px solid #5133ab;
-  background-color: #f7f4ff;
+  border: 2px solid #5bc0de;
+  background-color: #d9edf7;
 }
 .evo_post__comments .evo_form__comment.form-horizontal .form_info {
   display: block;
   text-align: center;
   padding: 10px;
-  color: #5133ab;
+  color: #5bc0de;
 }
 #comment_filter_form fieldset {
   margin-bottom: 20px;
@@ -307,15 +307,15 @@ div.delete_messages ul li {
   color: #888;
 }
 .evo_comments_container .evo_comment.evo_comment__status_meta {
-  border: 2px solid #5133ab;
+  border: 2px solid #5bc0de;
 }
 .evo_comments_container .evo_comment.evo_comment__status_meta .panel-heading,
 .evo_comments_container .evo_comment.evo_comment__status_meta .panel-footer {
-  background-color: #f7f4ff;
-  border-bottom: 1px solid #5133ab;
+  background-color: #d9edf7;
+  border-bottom: 1px solid #5bc0de;
 }
 .evo_comments_container .evo_comment.evo_comment__status_meta .panel-footer {
-  border-top: 1px solid #5133ab;
+  border-top: 1px solid #5bc0de;
   border-bottom: none;
 }
 .evo_comments_container .evo_comment.evo_comment__status_trash {
@@ -596,7 +596,7 @@ fieldset ul {
   margin-top: 1px;
 }
 .dashboard_comments_block__meta .panel-body {
-  background-color: #f7f4ff;
+  background-color: #d9edf7;
 }
 .chart .label {
   color: #000;
@@ -658,30 +658,40 @@ fieldset ul {
   display: inline-block;
 }
 #itemform_links .panel,
-#cmntform_links .panel {
+#cmntform_links .panel,
+#ecmpform_links .panel,
+#msgform_links .panel {
   overflow: hidden;
 }
 #itemform_links .panel-body,
-#cmntform_links .panel-body {
+#cmntform_links .panel-body,
+#ecmpform_links .panel-body,
+#msgform_links .panel-body {
   padding: 0;
+}
+#msgform_links {
+  margin-bottom: 20px;
 }
 #itemform_goals td {
   padding-bottom: 2px;
 }
-#attachmentframe_wrapper {
+#attachments_fieldset_wrapper {
   width: 100%;
   height: 160px;
   position: relative;
-  overflow: hidden;
   padding-bottom: 6px;
   box-sizing: content-box;
 }
-#attachmentframe_wrapper .ui-resizable-s {
+#attachments_fieldset_wrapper #attachments_fieldset_block {
+  overflow: auto;
+  height: 100%;
+}
+#attachments_fieldset_wrapper .ui-resizable-s {
   background: #c0c0c0;
   height: 6px;
   bottom: 0;
 }
-#attachmentframe_wrapper .ui-resizable-s:after {
+#attachments_fieldset_wrapper .ui-resizable-s:after {
   content: "...";
   font-size: 10px;
   top: -7px;
@@ -689,12 +699,15 @@ fieldset ul {
   text-align: center;
   display: block;
 }
-#attachmentframe_wrapper #attachmentframe_disabler {
+#attachments_fieldset_wrapper .table_scroll {
+  position: relative;
+}
+#attachments_fieldset_wrapper table tbody .dragged {
+  opacity: 0.8;
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+}
+#attachments_fieldset_wrapper table tbody td {
+  cursor: move;
 }
 #filelist_tbody tr:first-child .action_icon_link_move_up,
 #filelist_tbody tr:last-child .action_icon_link_move_down {
@@ -1477,7 +1490,7 @@ table.diff td.diff-title-addedline {
   color: #ff6666;
 }
 .status_color_meta {
-  color: #5133ab;
+  color: #5bc0de;
 }
 .btn[class*=btn-status-] {
   border: 1px solid #ccc;
@@ -1594,5 +1607,5 @@ table.diff td.diff-title-addedline {
   background-color: #ff6666;
 }
 .evo_checkbox_status__meta {
-  background-color: #5133ab;
+  background-color: #5bc0de;
 }

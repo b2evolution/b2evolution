@@ -217,6 +217,12 @@ switch( $content_mode )
 			
 			// Title and number of photos in album
 			echo $params['content_title_start'];
+				// Flag:
+				$Item->flag( array(
+						'before' => '<span class="pull-left">',
+						'after'  => '</span>',
+					) );
+				// Title:
 				$Item->title( array(
 						'link_type' => 'permalink',
 						'before'    => '<h4 class="panel-title">',
@@ -297,9 +303,8 @@ switch( $content_mode )
 					'link_to'     => $params['more_link_to'],
 				) );
 
-			// Display images that are linked "after more" to this post:
-			if( ! empty($params['image_size']) && $more && $Item->has_content_parts($params) /* only if not displayed all images already */ )
-			{	
+			if( ! empty( $params['image_size'] ) && ( $more || $params['force_more'] ) && $Item->has_content_parts( $params ) /* only if not displayed all images already */ )
+			{	// Display images that are linked "after more" to this post:
 				$Item->images( array(
 						'before'              => $params['before_images'],
 						'before_image'        => $params['before_image'],

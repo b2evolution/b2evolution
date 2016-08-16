@@ -272,7 +272,7 @@ switch( $action )
 
 				$BlogCache->remove_by_ID( $blog );
 				unset( $edited_Blog );
-				unset( $Blog );
+				unset( $Blog, $Collection );
 				forget_param( 'blog' );
 				set_working_blog( 0 );
 				$UserSettings->delete( 'selected_blog' );	// Needed or subsequent pages may try to access the delete blog

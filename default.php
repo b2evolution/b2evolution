@@ -51,6 +51,9 @@ init_fontawesome_icons( 'fontawesome-glyphicons' );
 
 add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 
+// Send the predefined cookies:
+evo_sendcookies();
+
 headers_content_mightcache( 'text/html' );		// In most situations, you do NOT want to cache dynamic content!
 ?>
 <!DOCTYPE html>

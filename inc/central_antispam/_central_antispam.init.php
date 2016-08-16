@@ -9,12 +9,12 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for central antispam module to function properly
  */
-$required_php_version[ 'central_antispam' ] = '5.0';
+$required_php_version[ 'central_antispam' ] = '5.2';
 
 /**
  * Minimum MYSQL version required for central antispam module to function properly
  */
-$required_mysql_version[ 'central_antispam' ] = '4.1';
+$required_mysql_version[ 'central_antispam' ] = '5.0.3';
 
 /**
  * Aliases for table names:
@@ -99,57 +99,99 @@ class central_antispam_Module extends Module
 
 
 	/**
-	 * Translations
-	 *
-	 * @param mixed $string
-	 * @param mixed $req_locale
-	 * @return string
-	 */
-	function T_( $string, $req_locale = '' )
-	{
-		global $current_locale;
-
-		static $trans = array(
-			'' => '',
-		);
-
-		if( $current_locale == 'fr-FR' )
-		{
-			if( isset( $trans[ $string ] ) )
-			{
-				return $trans[ $string ];
-			}
-		}
-
-		return T_( $string );
-	}
-
-
-	/**
 	 * Builds the 2nd half of the menu. This is the one with the configuration features
 	 *
 	 * At some point this might be displayed differently than the 1st half.
 	 */
 	function build_menu_3()
 	{
-		global $AdminUI, $admin_url;
+		global $AdminUI, $admin_url, $current_User;
+
+		if( ! is_logged_in() || ! $current_User->check_perm( 'centralantispam', 'view' ) )
+		{	// Don't display menu if current user has no acces to central antispam:
+			return;
+		}
 
 		// Display Central Antispam menu:
 		$AdminUI->add_menu_entries( NULL, array(
 			'central_antispam' => array(
-				'text' => $this->T_('Central Antispam'),
+				'text' => T_('Central Antispam'),
 				'href' => $admin_url.'?ctrl=central_antispam',
 				'entries' => array(
 					'keywords' => array(
-						'text' => $this->T_('Keywords'),
+						'text' => T_('Keywords'),
 						'href' => $admin_url.'?ctrl=central_antispam&amp;tab=keywords',
 					),
-					'sources' => array(
-						'text' => $this->T_('Reporters'),
-						'href' => $admin_url.'?ctrl=central_antispam&amp;tab=sources',
+					'reporters' => array(
+						'text' => T_('Reporters'),
+						'href' => $admin_url.'?ctrl=central_antispam&amp;tab=reporters',
 					),
 				),
 			) ) );
+	}
+
+
+	/**
+	 * Get default module permissions
+	 *
+	 * #param integer Group ID
+	 * @return array
+	 */
+	function get_default_group_permissions( $grp_ID )
+	{
+		switch( $grp_ID )
+		{
+			case 1: // Administrators group ID equals 1
+				$perm_centralantispam = 'allowed';
+				break;
+			default: // Other groups
+				$perm_centralantispam = 'none';
+				break;
+		}
+
+		// We can return as many default permissions as we want:
+		// e.g. array ( permission_name => permission_value, ... , ... )
+		return $permissions = array(
+				'perm_centralantispam' => $perm_centralantispam
+			);
+	}
+
+
+	/**
+	 * Get available group permissions
+	 *
+	 * @return array
+	 */
+	function get_available_group_permissions()
+	{
+		// 'label' is used in the group form as label for radio buttons group
+		// 'user_func' is used to check user permission. This function should be defined in module initializer.
+		// 'group_func' is used to check group permission. This function should be defined in module initializer.
+		// 'perm_block' group form block where this permissions will be displayed. Now available, the following blocks: additional, system
+		// 'options' is permission options
+		$permissions = array(
+			'perm_centralantispam' => array(
+				'label' => T_('Allow central antispam management'),
+				'user_func'  => 'check_centralantispam_user_perm',
+				'group_func' => 'check_centralantispam_group_perm',
+				'perm_block' => 'additional',
+				'perm_type' => 'checkbox',
+				'note' => '',
+				),
+		);
+		// We can return as many permissions as we want.
+		// In other words, one module can return many pluggable permissions.
+		return $permissions;
+	}
+
+
+	/**
+	 * Check permission for the group
+	 */
+	function check_centralantispam_group_perm( $permlevel, $permvalue, $permtarget )
+	{
+		// Only 'allowed' value means group has permission
+		return $permvalue == 'allowed';
 	}
 
 
@@ -158,7 +200,7 @@ class central_antispam_Module extends Module
 	 */
 	function upgrade_b2evo_tables()
 	{
-		global $DB, $tableprefix;
+		global $DB, $tableprefix, $old_db_version;
 
 		// Check if DB tables of this module were installed before:
 		$existing_tables = $DB->get_col( 'SHOW TABLES LIKE "'.$tableprefix.'centralantispam__%"' );
@@ -172,7 +214,10 @@ class central_antispam_Module extends Module
 				cakw_status          ENUM("new", "published", "revoked") NOT NULL DEFAULT "new",
 				cakw_statuschange_ts TIMESTAMP NULL,
 				cakw_lastreport_ts   TIMESTAMP NULL,
-				PRIMARY KEY (cakw_ID)' );
+				PRIMARY KEY (cakw_ID),
+				INDEX cakw_keyword (cakw_keyword(255)),
+				INDEX cakw_statuschange_ts (cakw_statuschange_ts),
+				INDEX cakw_lastreport_ts (cakw_lastreport_ts)' );
 			task_end();
 		}
 
@@ -197,6 +242,80 @@ class central_antispam_Module extends Module
 				PRIMARY KEY carpt_PK (carpt_cakw_ID, carpt_casrc_ID)' );
 			task_end();
 		}
+
+		if( $old_db_version < 12066 )
+		{	// part of 6.8.0-alpha
+			task_begin( 'Upgrade central antispam keywords table...' );
+			$DB->query( 'ALTER TABLE T_centralantispam__keyword
+				MODIFY cakw_status ENUM("new", "published", "revoked", "ignored") NOT NULL DEFAULT "new"' );
+			task_end();
+		}
+	}
+
+
+	/**
+	 * Handle collections module htsrv actions
+	 */
+	function handle_htsrv_action()
+	{
+		global $current_User, $DB, $Session, $localtimenow, $debug, $debug_jslog;
+
+		if( ! is_logged_in() )
+		{	// User must be logged in:
+			bad_request_die( T_( 'You are not logged in.' ) );
+		}
+
+		load_funcs( 'central_antispam/model/_central_antispam.funcs.php' );
+
+		// Do not append Debuglog to response!
+		$debug = false;
+
+		// Do not append Debug JSlog to response!
+		$debug_jslog = false;
+
+		switch( param_action() )
+		{
+			case 'cakeyword_status_edit':
+				// Update status of central antispam keyword from list screen by clicking on the status column:
+
+				// Check that this action request is not a CSRF hacked request:
+				$Session->assert_received_crumb( 'cakeyword' );
+
+				// Check permission:
+				$current_User->check_perm( 'centralantispam', 'edit', true );
+
+				$new_status = param( 'new_status', 'string' );
+				$cakw_ID = param( 'cakw_ID', 'integer', true );
+				$statuschange_ts = date( 'Y-m-d H:i:s', $localtimenow );
+
+				$DB->query( 'UPDATE T_centralantispam__keyword
+						SET cakw_status = '.( empty( $new_status ) ? 'NULL' : $DB->quote( $new_status ) ).',
+								cakw_statuschange_ts = '.$DB->quote( $statuschange_ts ).'
+					WHERE cakw_ID ='.$DB->quote( $cakw_ID ) );
+				echo '<a href="#" rel="'.$new_status.'" style="color:#FFF" color="'.ca_get_keyword_status_color( $new_status ).'" date="'.format_to_output( mysql2localedatetime_spans( $statuschange_ts ), 'htmlspecialchars' ).'">'.ca_get_keyword_status_title( $new_status ).'</a>';
+				break;
+
+			case 'casource_status_edit':
+				// Update status of central antispam source from list screen by clicking on the status column:
+
+				// Check that this action request is not a CSRF hacked request:
+				$Session->assert_received_crumb( 'casource' );
+
+				// Check permission:
+				$current_User->check_perm( 'centralantispam', 'edit', true );
+
+				$new_status = param( 'new_status', 'string' );
+				$casrc_ID = param( 'casrc_ID', 'integer', true );
+
+				$DB->query( 'UPDATE T_centralantispam__source
+						SET casrc_status = '.( empty( $new_status ) ? 'NULL' : $DB->quote( $new_status ) ).'
+					WHERE casrc_ID ='.$DB->quote( $casrc_ID ) );
+				echo '<a href="#" rel="'.$new_status.'" style="color:#FFF" color="'.ca_get_source_status_color( $new_status ).'">'.ca_get_source_status_title( $new_status ).'</a>';
+				break;
+		}
+
+		// EXit here because next code will try to call "header_redirect()":
+		exit(0);
 	}
 }
 

@@ -21,7 +21,7 @@ class bootstrap_manual_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.3';
+	var $version = '6.8.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -399,7 +399,7 @@ class bootstrap_manual_Skin extends Skin
 		}
 
 		// Display left navigation column only on these pages:
-		return in_array( $disp, array( 'front', 'posts', 'single', 'search', 'edit', 'edit_comment', 'catdir', 'search', '404' ) );
+		return in_array( $disp, array( 'front', 'posts', 'flagged', 'single', 'search', 'edit', 'edit_comment', 'catdir', 'search', '404' ) );
 	}
 
 
@@ -411,7 +411,7 @@ class bootstrap_manual_Skin extends Skin
 	 */
 	function is_visible_container( $container_key )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $Blog->has_access() )
 		{	// If current user has an access to this collection then don't restrict containers:

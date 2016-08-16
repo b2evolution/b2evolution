@@ -27,18 +27,18 @@ $Form->begin_form( 'fform' );
 
 $Form->add_crumb( 'casource' );
 $Form->hidden_ctrl();
-$Form->hidden( 'tab', 'sources' );
+$Form->hidden( 'tab', 'reporters' );
 $Form->hidden( 'casrc_ID', $edited_CaSource->ID );
 
-$Form->begin_fieldset( $central_antispam_Module->T_('Edit reporter') );
+$Form->begin_fieldset( T_('Edit reporter') );
 
-$Form->info( $central_antispam_Module->T_('URL'), $edited_CaSource->baseurl );
+$Form->info( T_('URL'), $edited_CaSource->baseurl );
 
-$Form->select_input_array( 'casrc_status', $edited_CaSource->status, ca_get_source_statuses(), $central_antispam_Module->T_('Status') );
+$Form->select_input_array( 'casrc_status', $edited_CaSource->status, ca_get_source_statuses(), T_('Status') );
 
 $Form->end_fieldset();
 
-$Form->end_form( array( array( 'submit', 'actionArray[source_save]', $central_antispam_Module->T_('Save changes!'), 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'actionArray[source_save]', T_('Save changes!'), 'SaveButton' ) ) );
 
 
 // Reports of the edited source:
@@ -55,16 +55,16 @@ $CountSQL->WHERE( 'carpt_casrc_ID = '.$DB->quote( $edited_CaSource->ID ) );
 
 $Results = new Results( $SQL->get(), 'carpt_', '-D', $UserSettings->get( 'results_per_page' ), $CountSQL->get() );
 
-$Results->title = $central_antispam_Module->T_('Reports');
+$Results->title = T_('Reports');
 
 $Results->cols[] = array(
-		'th' => $central_antispam_Module->T_('Keyword'),
+		'th' => T_('Keyword'),
 		'order' => 'cakw_keyword',
 		'td' => '$cakw_keyword$',
 	);
 
 $Results->cols[] = array(
-		'th' => $central_antispam_Module->T_('Date'),
+		'th' => T_('Date'),
 		'th_class' => 'shrinkwrap',
 		'order' => 'carpt_ts',
 		'td' => '%mysql2localedatetime_spans( #carpt_ts# )%',

@@ -41,10 +41,13 @@ $schema_queries['T_centralantispam__keyword'] = array(
 		"CREATE TABLE T_centralantispam__keyword (
 			cakw_ID              INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			cakw_keyword         VARCHAR(2000) NULL,
-			cakw_status          ENUM('new', 'published', 'revoked') NOT NULL DEFAULT 'new',
+			cakw_status          ENUM('new', 'published', 'revoked', 'ignored') NOT NULL DEFAULT 'new',
 			cakw_statuschange_ts TIMESTAMP NULL,
 			cakw_lastreport_ts   TIMESTAMP NULL,
-			PRIMARY KEY (cakw_ID)
+			PRIMARY KEY (cakw_ID),
+			INDEX cakw_keyword (cakw_keyword(255)),
+			INDEX cakw_statuschange_ts (cakw_statuschange_ts),
+			INDEX cakw_lastreport_ts (cakw_lastreport_ts)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" );
 
 

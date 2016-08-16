@@ -17,7 +17,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $app_version, $disp, $Blog, $Skin, $Settings;
+global $app_version, $disp, $Collection, $Blog, $Skin, $Settings;
 
 if( evo_version_compare( $app_version, '6.4' ) < 0 )
 { // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.

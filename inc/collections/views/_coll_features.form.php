@@ -46,6 +46,19 @@ $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
 
 	$Form->checkbox( 'disp_featured_above_list', $edited_Blog->get_setting( 'disp_featured_above_list' ), T_('Featured post above list'), T_('Check to display a featured post above the list (as long as no Intro post is displayed.') );
 
+	$ItemTypeCache = & get_ItemTypeCache();
+	$enabled_item_types = $edited_Blog->get_enabled_item_types( 'post' );
+	$show_post_types_options = array();
+	$show_post_types_values = explode( ',', $edited_Blog->get_setting( 'show_post_types' ) );
+	foreach( $enabled_item_types as $enabled_item_type_ID )
+	{
+		if( ( $enabled_ItemType = & $ItemTypeCache->get_by_ID( $enabled_item_type_ID, false, false ) ) )
+		{
+			$show_post_types_options[] = array( 'show_post_types[]', $enabled_item_type_ID, $enabled_ItemType->get_name(), ! in_array( $enabled_item_type_ID, $show_post_types_values ) );
+		}
+	}
+	$Form->checklist( $show_post_types_options, '', T_('Show post types') );
+
 	$Form->output = false;
 	$Form->switch_layout( 'none' );
 	$timestamp_min_duration_input = $Form->duration_input( 'timestamp_min_duration', $edited_Blog->get_setting('timestamp_min_duration'), '' );
@@ -124,7 +137,21 @@ $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_setting
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Post moderation') . get_manual_link('post-moderation') );
+
+$Form->begin_fieldset( T_('Voting options').get_manual_link( 'item-voting-options' ), array( 'id' => 'voting_options' ) );
+
+	$voting_disabled = ! $edited_Blog->get_setting( 'voting_positive' );
+
+	$Form->checkbox( 'voting_positive', $edited_Blog->get_setting( 'voting_positive' ), T_('Allow Positive vote'), get_icon( 'thumb_up', 'imgtag', array( 'title' => T_('Allow Positive vote') ) ) );
+
+	$Form->checkbox( 'voting_neutral', $edited_Blog->get_setting( 'voting_neutral' ), T_('Allow Neutral vote'), get_icon( 'ban', 'imgtag', array( 'title' => T_('Allow Neutral vote') ) ), '', 1, $voting_disabled );
+
+	$Form->checkbox( 'voting_negative', $edited_Blog->get_setting( 'voting_negative' ), T_('Allow Negative vote'), get_icon( 'thumb_down', 'imgtag', array( 'title' => T_('Allow Negative vote') ) ), '', 1, $voting_disabled );
+
+$Form->end_fieldset();
+
+
+$Form->begin_fieldset( T_('Post moderation').get_manual_link( 'post-moderation' ) );
 
 	// Get max allowed visibility status:
 	$max_allowed_status = get_highest_publish_status( 'comment', $edited_Blog->ID, false );
@@ -219,6 +246,11 @@ $Form->begin_fieldset( T_('RSS/Atom feeds').get_manual_link('item-feeds-features
 	}
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Subscriptions').get_manual_link( 'item-subscriptions' ) );
+	$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post.') );
+	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
+$Form->end_fieldset();
+
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>
@@ -234,6 +266,18 @@ jQuery( 'input[name=in_skin_editing]' ).click( function()
 	{
 		jQuery( 'input[name=in_skin_editing_renderers]' ).attr( 'disabled', 'disabled' );
 		jQuery( 'input[name=in_skin_editing_category]' ).attr( 'disabled', 'disabled' );
+	}
+} );
+
+jQuery( '#voting_positive' ).click( function()
+{
+	if( jQuery( this ).is( ':checked' ) )
+	{
+		jQuery( '#voting_neutral, #voting_negative' ).removeAttr( 'disabled' );
+	}
+	else
+	{
+		jQuery( '#voting_neutral, #voting_negative' ).attr( 'disabled', 'disabled' ).removeAttr( 'checked' );
 	}
 } );
 </script>

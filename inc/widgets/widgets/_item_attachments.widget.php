@@ -177,7 +177,7 @@ class item_attachments_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog, $Item;
+		global $Collection, $Blog, $Item;
 
 		return array(
 				'wi_ID'        => $this->ID, // Have the widget settings changed ?

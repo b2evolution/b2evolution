@@ -99,10 +99,10 @@ class Session
 	{
 		global $DB, $Debuglog, $current_User, $localtimenow, $Messages, $Settings, $UserSettings;
 		global $Hit;
-		global $cookie_session, $cookie_expires, $cookie_path, $cookie_domain;
+		global $cookie_session, $cookie_expires;
 
-		$Debuglog->add( 'Session: cookie_domain='.$cookie_domain, 'request' );
-		$Debuglog->add( 'Session: cookie_path='.$cookie_path, 'request' );
+		$Debuglog->add( 'Session: cookie_domain='.get_cookie_domain(), 'request' );
+		$Debuglog->add( 'Session: cookie_path='.get_cookie_path(), 'request' );
 
 		$session_cookie = param_cookie( $cookie_session, 'string', '' );
 		if( empty( $session_cookie ) )
@@ -248,7 +248,7 @@ class Session
 			$this->ID = $DB->insert_id;
 
 			// Set a cookie valid for ~ 10 years:
-			evo_setcookie( $cookie_session, $this->ID.'_'.$this->key, time()+315360000, $cookie_path, $cookie_domain, false, true );
+			evo_setcookie( $cookie_session, $this->ID.'_'.$this->key, time()+315360000, '', '', false, true );
 
 			$Debuglog->add( 'Session: ID (generated): '.$this->ID, 'request' );
 			$Debuglog->add( 'Session: Cookie sent.', 'request' );
@@ -374,7 +374,7 @@ class Session
 	 */
 	function logout()
 	{
-		global $Debuglog, $cookie_session, $cookie_path, $cookie_domain;
+		global $Debuglog, $cookie_session;
 
 		// Invalidate the session key (no one will be able to use this session again)
 		$this->key = NULL;
@@ -385,7 +385,7 @@ class Session
 		$this->user_ID = NULL; // Unset user_ID after invalidating/saving the session above, to keep the user info attached to the old session.
 
 		// clean up the session cookie:
-		evo_setcookie( $cookie_session, '', 200000000, $cookie_path, $cookie_domain, false, true );
+		evo_setcookie( $cookie_session, '', 200000000, '', '', false, true );
 	}
 
 
@@ -660,6 +660,12 @@ class Session
 
 		// ERROR MESSAGE, with form/button to bypass and enough warning hopefully.
 		// TODO: dh> please review carefully!
+		global $io_charset;
+		// erhsatingin > Most browsers will output this is in the <head> section. Either this or possibility of multiple <head> declarations.
+		// echo '<head>';
+		echo '<meta http-equiv="Content-Type" content="text/html; charset='.$io_charset.'" />';
+		// echo '</head>';
+
 		echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
 		echo '<h3 style="color:#f00;">'.T_('Incorrect crumb received!').' ['.$crumb_name.']</h3>';
 		echo '<p>'.T_('Your request was stopped for security reasons.').'</p>';

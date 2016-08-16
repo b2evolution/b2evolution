@@ -54,6 +54,18 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 				'<img src="http://example.com/" />' => '<img src="http://example.com/" />',
 				'<img src=http://example.com/ />' => '<img src=http://example.com/ />',
 				'<div>http://example.com/</div>' => '<div><a href="http://example.com/">http://example.com/</a></div>',
+
+				// XSS sample:
+				'text http://test_url.test"onmouseover="alert(1)"onerror=1 "text' => 'text <a href="http://test_url.test">http://test_url.test</a>"onmouseover="alert(1)"onerror=1 "text',
+
+				// Test stop symbols:
+				'Please check: http://example.com/index.php?issue=123&page=4; message #5' => 'Please check: <a href="http://example.com/index.php?issue=123&page=4">http://example.com/index.php?issue=123&page=4</a>; message #5',
+				'Info here: http://info.info!' => 'Info here: <a href="http://info.info">http://info.info</a>!',
+				'Did you read this instruction https://doc.com/ip/settings.html? page 3' => 'Did you read this instruction <a href="https://doc.com/ip/settings.html">https://doc.com/ip/settings.html</a>? page 3',
+				'Link http://test.net<p>Detailed info below:</p>' => 'Link <a href="http://test.net">http://test.net</a><p>Detailed info below:</p>',
+				'Go to http://doc.com/page/56>' => 'Go to <a href="http://doc.com/page/56">http://doc.com/page/56</a>>',
+				'Text http://example.com{sample}' => 'Text <a href="http://example.com">http://example.com</a>{sample}',
+				'Plugins{doc http://plugins.com/doc/page/4}' => 'Plugins{doc <a href="http://plugins.com/doc/page/4">http://plugins.com/doc/page/4</a>}',
 			) as $lText => $lExpected )
 		{
 			$this->assertEqual( make_clickable($lText), $lExpected );
@@ -262,13 +274,37 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( get_base_domain('hostname'), 'hostname' );
 		$this->assertEqual( get_base_domain('http://hostname'), 'hostname' );
 		$this->assertEqual( get_base_domain('www.example.com'), 'example.com' );
-		$this->assertEqual( get_base_domain('www2.example.com'), 'www2.example.com' );  // We no longer treat www2.ex.com equal to ex.com
-		$this->assertEqual( get_base_domain('subdom.example.com'), 'subdom.example.com' );
-		$this->assertEqual( get_base_domain('https://www.hello.example.com/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
-		$this->assertEqual( get_base_domain('https://www.sub1.hello.example.com/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
-		$this->assertEqual( get_base_domain('https://sub1.hello.example.com/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
-		$this->assertEqual( get_base_domain('https://hello.example.com/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
-		$this->assertEqual( get_base_domain('https://hello.example.com:8080/path/1/2/3/page.html?param=hello#location'), 'hello.example.com' );
+		$this->assertEqual( get_base_domain('www2.example.com'), 'example.com' );  // We no longer treat www2.ex.com equal to ex.com
+		$this->assertEqual( get_base_domain('subdom.example.com'), 'example.com' );
+		$this->assertEqual( get_base_domain('sub2.subdom.example.net'), 'example.net' );
+		$this->assertEqual( get_base_domain('sub3.sub2.subdom.example.org'), 'example.org' );
+		$this->assertEqual( get_base_domain('https://www.hello.example.com/path/1/2/3/page.html?param=hello#location'), 'example.com' );
+		$this->assertEqual( get_base_domain('https://www.sub1.hello.example.com/path/1/2/3/page.html?param=hello#location'), 'example.com' );
+		$this->assertEqual( get_base_domain('https://sub1.hello.example.com/path/1/2/3/page.html?param=hello#location'), 'example.com' );
+		$this->assertEqual( get_base_domain('https://hello.example.com/path/1/2/3/page.html?param=hello#location'), 'example.com' );
+		$this->assertEqual( get_base_domain('https://hello.example.com:8080/path/1/2/3/page.html?param=hello#location'), 'example.com' );
+		$this->assertEqual( get_base_domain('https://hello.example.net:8080/path/1/2/3/page.html?param=hello#location'), 'example.net' );
+		$this->assertEqual( get_base_domain('https://hello.example.org:8080/path/1/2/3/page.html?param=hello#location'), 'example.org' );
+		$this->assertEqual( get_base_domain('https://lessons.teachers.city.edu:443/index.php#lesson45'), 'city.edu' );
+		$this->assertEqual( get_base_domain('ftp://projects.roads.gov/region.php#plan'), 'roads.gov' );
+		$this->assertEqual( get_base_domain('http://domain.gouv.fr:8080/index.php#anchor'), 'domain.gouv.fr' );
+		$this->assertEqual( get_base_domain('http://www14.domain.gouv.fr:8080/index.php#anchor'), 'domain.gouv.fr' );
+		$this->assertEqual( get_base_domain('https://sub.domain.gouv.fr:8080/page.html'), 'domain.gouv.fr' );
+		$this->assertEqual( get_base_domain('http://www.sub.domain.gouv.fr:8080/'), 'domain.gouv.fr' );
+		$this->assertEqual( get_base_domain('http://sub2.sub.domain.gouv.fr:8080/'), 'domain.gouv.fr' );
+		$this->assertEqual( get_base_domain('https://www2.sub2.sub.domain.gouv.fr:8080/'), 'domain.gouv.fr' );
+		$this->assertEqual( get_base_domain('http://b2evo.re:8080/'), 'b2evo.re' );
+		$this->assertEqual( get_base_domain('https://www6.b2evo.re:8080/'), 'b2evo.re' );
+		$this->assertEqual( get_base_domain('http://test.b2evo.re:8080/sitemap.xml'), 'test.b2evo.re' );
+		$this->assertEqual( get_base_domain('http://www2000.test.b2evo.re:8080/'), 'test.b2evo.re' );
+		$this->assertEqual( get_base_domain('https://sub.test.b2evo.re:8080/'), 'test.b2evo.re' );
+		$this->assertEqual( get_base_domain('https://www0.sub.test.b2evo.re:8080/'), 'test.b2evo.re' );
+		$this->assertEqual( get_base_domain('http://sub.test.b2evo.re:8080/install/index.htm#step3'), 'test.b2evo.re' );
+		$this->assertEqual( get_base_domain('http://www1.sub.test.b2evo.re:8080/'), 'test.b2evo.re' );
+		$this->assertEqual( get_base_domain('http://192.168.1.100:8080/'), '192.168.1.100' );
+		$this->assertEqual( get_base_domain('http://www5.192.168.1.100:8080/'), '168.1.100' );
+		$this->assertEqual( get_base_domain('https://localhost:8080/b2evo/github/site/'), 'localhost' );
+		$this->assertEqual( get_base_domain('http://www.localhost:8080/b2evo/github/site/'), 'localhost' );
 
 		// Anchor after domain name, used by spammers:
 		$this->assertEqual( get_base_domain('http://example.com#anchor'), 'example.com' );

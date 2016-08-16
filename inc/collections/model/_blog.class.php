@@ -71,6 +71,7 @@ class Blog extends DataObject
 	var $locale;
 	var $order;
 	var $access_type;
+	var $http_protocol;
 
 	/*
 	 * ?> TODO: we should have an extra DB column that either defines type of blog_siteurl
@@ -93,7 +94,17 @@ class Blog extends DataObject
 
 
 	/**
-	 * The URL to the basepath of that blog.
+	 * The basepath of that collection.
+	 *
+	 * Lazy filled by get_basepath()
+	 *
+	 * @var string
+	 */
+	var $basepath;
+
+
+	/**
+	 * The URL to the basepath of that collection.
 	 * This is supposed to be the same as $baseurl but localized to the domain of the blog/
 	 *
 	 * Lazy filled by get_basepath_url()
@@ -101,6 +112,46 @@ class Blog extends DataObject
 	 * @var string
 	 */
 	var $basepath_url;
+
+
+	/**
+	 * The domain of that collection.
+	 *
+	 * Lazy filled by get_baseurl_root()
+	 *
+	 * @var string
+	 */
+	var $baseurl_root;
+
+
+	/**
+	 * The domain for cookie of that collection.
+	 *
+	 * Lazy filled by get_cookie_domain()
+	 *
+	 * @var string
+	 */
+	var $cookie_domain;
+
+
+	/**
+	 * The path for cookie of that collection.
+	 *
+	 * Lazy filled by get_cookie_path()
+	 *
+	 * @var string
+	 */
+	var $cookie_path;
+
+
+	/**
+	 * The htsrv URLs to the basepath of that collection.
+	 *
+	 * Lazy filled by get_htsrv_url()
+	 *
+	 * @var array: 0 - normal URL, 1 - secure URL
+	 */
+	var $htsrv_urls;
 
 	/**
 	 * Additional settings for the collection.  lazy filled.
@@ -178,6 +229,7 @@ class Blog extends DataObject
 			$this->longdesc = $db_row->blog_longdesc;
 			$this->locale = $db_row->blog_locale;
 			$this->access_type = $db_row->blog_access_type;
+			$this->http_protocol = $db_row->blog_http_protocol;
 			$this->siteurl = $db_row->blog_siteurl;
 			$this->urlname = $db_row->blog_urlname;
 			$this->links_blog_ID = $db_row->blog_links_blog_ID; // DEPRECATED
@@ -274,10 +326,6 @@ class Blog extends DataObject
 	 */
 	function init_by_kind( $kind, $name = NULL, $shortname = NULL, $urlname = NULL )
 	{
-		// Allow email subscriptions by default:
-		$this->set_setting( 'allow_subscriptions', '1' );
-		$this->set_setting( 'allow_item_subscriptions', '1' );
-
 		switch( $kind )
 		{
 			case 'main':
@@ -818,6 +866,12 @@ class Blog extends DataObject
 			$disp_featured_above_list = param( 'disp_featured_above_list', 'integer', 0 );
 			$this->set_setting( 'disp_featured_above_list', $disp_featured_above_list );
 
+			// Show post types:
+			$checked_item_types = param( 'show_post_types', 'array:integer', array() );
+			$unchecked_item_types = array_diff( $this->get_enabled_item_types( 'post' ), $checked_item_types );
+			// Store only unchecked item types in order to keep all new item types enabled by default:
+			$this->set_setting( 'show_post_types', implode( ',', $unchecked_item_types ) );
+
 			// Front office statuses
 			$this->load_inskin_statuses( 'post' );
 
@@ -841,6 +895,15 @@ class Blog extends DataObject
 				}
 			}
 			$this->set_setting( 'post_moderation_statuses', implode( ',', $post_moderation_statuses ) );
+
+			// Subscriptions:
+			$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
+			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+
+			// Voting options:
+			$this->set_setting( 'voting_positive', param( 'voting_positive', 'integer', 0 ) );
+			$this->set_setting( 'voting_neutral', param( 'voting_neutral', 'integer', 0 ) );
+			$this->set_setting( 'voting_negative', param( 'voting_negative', 'integer', 0 ) );
 		}
 
 		if( in_array( 'comments', $groups ) )
@@ -858,6 +921,7 @@ class Blog extends DataObject
 			$this->set_setting( 'moderation_statuses', implode( ',', $blog_moderation_statuses ) );
 
 			$this->set_setting( 'comment_quick_moderation',  param( 'comment_quick_moderation', 'string', 'expire' ) );
+			$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'comments_detect_email', param( 'comments_detect_email', 'integer', 0 ) );
 			$this->set_setting( 'comments_register', param( 'comments_register', 'integer', 0 ) );
@@ -913,6 +977,7 @@ class Blog extends DataObject
 
 			// Subscriptions:
 			$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
+			$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 
 			// Sitemaps:
@@ -928,6 +993,9 @@ class Blog extends DataObject
 			{ // Only admin can set this setting to 'Public'
 				$this->set_setting( 'new_feedback_status', $new_feedback_status );
 			}
+			$this->set_setting( 'comment_form_msg', param( 'comment_form_msg', 'text' ) );
+			$this->set_setting( 'require_anon_name', param( 'require_anon_name', 'string', '0' ) );
+			$this->set_setting( 'require_anon_email', param( 'require_anon_email', 'string', '0' ) );
 			$this->set_setting( 'allow_anon_url', param( 'allow_anon_url', 'string', '0' ) );
 			$this->set_setting( 'allow_html_comment', param( 'allow_html_comment', 'string', '0' ) );
 			$this->set_setting( 'allow_attachments', param( 'allow_attachments', 'string', 'registered' ) );
@@ -1052,7 +1120,7 @@ class Blog extends DataObject
 
 			if( in_array( 'login', $groups ) )
 			{ // we want to load the login params:
-				if( ! get_setting_Blog( 'login_blog_ID' ) )
+				if( ! get_setting_Blog( 'login_blog_ID', $this ) )
 				{ // Update this only when no blog is defined for login/registration
 					$this->set_setting( 'in_skin_login', param( 'in_skin_login', 'integer', 0 ) );
 				}
@@ -1108,7 +1176,7 @@ class Blog extends DataObject
 					else
 					{ // It is not valid absolute URL, don't update the blog 'siteurl' to avoid errors
 						$allow_new_access_type = false; // If site url is not updated do not allow access_type update either
-						$Messages->add( T_('Collection Folder URL').': '.sprintf( T_('%s is an invalid absolute URL'), '&laquo;'.htmlspecialchars( $blog_siteurl ).'&raquo;' )
+						$Messages->add( T_('Collection base URL').': '.sprintf( T_('%s is an invalid absolute URL'), '&laquo;'.htmlspecialchars( $blog_siteurl ).'&raquo;' )
 							.'. '.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>) and it must contain at least one \'/\' sign after the domain name!'), 'error' );
 					}
 				}
@@ -1133,15 +1201,54 @@ class Blog extends DataObject
 				}
 			}
 
+			if( ( $http_protocol = param( 'blog_http_protocol', 'string', 'always_redirect' ) ) !== NULL )
+			{
+				$this->set( 'http_protocol', $http_protocol );
+			}
+
+			if( ( param( 'cookie_domain_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
+			{	// Cookies:
+				$this->set_setting( 'cookie_domain_type', get_param( 'cookie_domain_type' ) );
+				if( get_param( 'cookie_domain_type' ) == 'custom' )
+				{	// Update custom cookie domain:
+					$cookie_domain_custom = param( 'cookie_domain_custom', 'string', NULL );
+					preg_match( '#^https?://(.+?)(:(.+?))?$#', $this->get_baseurl_root(), $coll_host );
+					if( empty( $coll_host[1] ) || ! preg_match( '#(^|\.)'.preg_quote( preg_replace( '#^\.#i', '', $cookie_domain_custom ) ).'$#i', $coll_host[1] ) )
+					{	// Wrong cookie domain:
+						param_error( 'cookie_domain_custom', T_('The custom cookie domain must be a parent of the collection domain.') );
+					}
+					$this->set_setting( 'cookie_domain_custom', $cookie_domain_custom );
+				}
+				else
+				{	// Reset custom cookie domain:
+					$this->set_setting( 'cookie_domain_custom', '' );
+				}
+
+				$this->set_setting( 'cookie_path_type', param( 'cookie_path_type', 'string', NULL ) );
+				if( get_param( 'cookie_path_type' ) == 'custom' )
+				{	// Update custom cookie path:
+					$cookie_path_custom = param( 'cookie_path_custom', 'string', NULL );
+					if( ! preg_match( '#^'.preg_quote( preg_replace( '#/$#i', '', $cookie_path_custom ) ).'(/|$)#i', $this->get_basepath() ) )
+					{	// Wrong cookie path:
+						param_error( 'cookie_path_custom', T_('The custom cookie path must be a parent of the collection path.') );
+					}
+					$this->set_setting( 'cookie_path_custom', $cookie_path_custom );
+				}
+				else
+				{	// Reset custom cookie path:
+					$this->set_setting( 'cookie_path_custom', '' );
+				}
+			}
 
 			if( ( param( 'rsc_assets_url_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
 			{ // Assets URLs / CDN:
 
 				// Check all assets types url settings:
 				$assets_url_data = array(
-					'rsc_assets_url_type'   => array( 'url' => 'rsc_assets_absolute_url', 'folder' => '/rsc/' ),
-					'media_assets_url_type' => array( 'url' => 'media_assets_absolute_url', 'folder' => '/media/' ),
-					'skins_assets_url_type' => array( 'url' => 'skins_assets_absolute_url', 'folder' => '/skins/' ),
+					'rsc_assets_url_type'     => array( 'url' => 'rsc_assets_absolute_url',     'folder' => '/rsc/' ),
+					'media_assets_url_type'   => array( 'url' => 'media_assets_absolute_url',   'folder' => '/media/' ),
+					'skins_assets_url_type'   => array( 'url' => 'skins_assets_absolute_url',   'folder' => '/skins/' ),
+					'plugins_assets_url_type' => array( 'url' => 'plugins_assets_absolute_url', 'folder' => '/plugins/' ),
 				);
 
 				foreach( $assets_url_data as $asset_url_type => $asset_url_data )
@@ -1166,6 +1273,34 @@ class Blog extends DataObject
 					{ // It is not valid absolute URL, don't update it to avoid errors
 						$Messages->add( sprintf( T_('Absolute URL for %s'), $asset_url_data['folder'] ).': '.sprintf( T_('%s is an invalid absolute URL'), '&laquo;'.htmlspecialchars( $assets_absolute_url_value ).'&raquo;' )
 							.'. '.T_('You must provide an absolute URL (starting with <code>http://</code>, <code>https://</code> or <code>//</code>) and it must ending with \'/\' sign!'), 'error' );
+					}
+				}
+
+				if( $this->get( 'access_type' ) == 'absolute' &&
+				    ( $this->get_setting( 'rsc_assets_url_type' ) == 'basic' ||
+				      $this->get_setting( 'media_assets_url_type' ) == 'basic' ||
+				      $this->get_setting( 'skins_assets_url_type' ) == 'basic' ||
+				      $this->get_setting( 'plugins_assets_url_type' ) == 'basic' ) )
+				{	// Display warning for such settings combination:
+					$Messages->add( T_('WARNING: you will be loading your assets from a different domain. This may cause problems if you don\'t know exactly what you are doing. Please check the Assets URLs panel below.'), 'warning' );
+				}
+
+				if( $this->get_setting( 'skins_assets_url_type' ) != 'relative' )
+				{	// Display warning if skins path is used as NOT relative url:
+					if( $this->get_setting( 'rsc_assets_url_type' ) == 'relative' )
+					{	// If rsc path is relative url:
+						$Messages->add( sprintf( T_('WARNING: your %s and %s assets URL seem to be configured in a potentially undesirable way. Please check your Assets URLs below.'),
+							'<code>/rsc/</code>', '<code>/skins/</code>' ), 'warning' );
+					}
+					if( $this->get_setting( 'media_assets_url_type' ) == 'relative' )
+					{	// If media path is relative url:
+						$Messages->add( sprintf( T_('WARNING: your %s and %s assets URL seem to be configured in a potentially undesirable way. Please check your Assets URLs below.'),
+							'<code>/media/</code>', '<code>/skins/</code>' ), 'warning' );
+					}
+					if( $this->get_setting( 'plugins_assets_url_type' ) == 'relative' )
+					{	// If plugins path is relative url:
+						$Messages->add( sprintf( T_('WARNING: your %s and %s assets URL seem to be configured in a potentially undesirable way. Please check your Assets URLs below.'),
+							'<code>/plugins/</code>', '<code>/skins/</code>' ), 'warning' );
 					}
 				}
 			}
@@ -1406,7 +1541,7 @@ class Blog extends DataObject
 	 */
 	function gen_blogurl( $type = 'default' )
 	{
-		global $baseurl, $basedomain, $Settings;
+		global $baseprotocol, $basehost, $baseport, $baseurl, $Settings;
 
 		switch( $this->get( 'access_type' ) )
 		{
@@ -1444,7 +1579,7 @@ class Blog extends DataObject
 				return $baseurl.$this->siteurl;
 
 			case 'subdom':
-				return preg_replace( '#(https?://)#i', '$1'.$this->urlname.'.', $baseurl );
+				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.$baseport.'/';
 
 			case 'absolute':
 				return $this->siteurl;
@@ -1461,7 +1596,7 @@ class Blog extends DataObject
 	 */
 	function gen_baseurl()
 	{
-		global $baseurl, $basedomain;
+		global $baseprotocol, $basehost, $baseport, $baseurl;
 
 		switch( $this->get( 'access_type' ) )
 		{
@@ -1485,7 +1620,7 @@ class Blog extends DataObject
 				break;
 
 			case 'subdom':
-				return preg_replace( '#(https?://)#i', '$1'.$this->urlname.'.', $baseurl );
+				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.$baseport.'/';
 
 			case 'absolute':
 				$url = $this->siteurl;
@@ -1506,36 +1641,47 @@ class Blog extends DataObject
 
 
 	/**
-	 * This is the domain of the blog.
+	 * This is the domain of the collection.
 	 * This returns NO trailing slash.
+	 *
+	 * @return string
 	 */
 	function get_baseurl_root()
 	{
-		if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $this->gen_baseurl(), $matches ) )
-		{
-			return $matches[1];
+		if( empty( $this->baseurl_root ) )
+		{	// Initialize collection domain only first time:
+			if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $this->gen_baseurl(), $matches ) )
+			{
+				$this->baseurl_root = $matches[1];
+			}
+			else
+			{
+				debug_die( 'Blog::get(baseurl)/baseurlroot - assertion failed [baseurl: '.$this->gen_baseurl().'].' );
+			}
 		}
-		debug_die( 'Blog::get(baseurl)/baseurlroot - assertion failed [baseurl: '.$this->gen_baseurl().'].' );
+
+		return $this->baseurl_root;
 	}
 
 
 	/**
-	 * Get the URL to the basepath of that blog.
+	 * Get the URL to the basepath of that collection.
 	 * This is supposed to be the same as $baseurl but localized to the domain of the blog/
+	 *
+	 * @return string
 	 */
 	function get_basepath_url()
 	{
 		if( empty( $this->basepath_url ) )
 		{
-			if( $this->access_type == 'absolute' )
-			{ // Use whole url when it is absolute
-				// Remove text like 'index.php' at the end
+			if( $this->get( 'access_type' ) == 'absolute' )
+			{	// Use whole url when it is absolute:
+				// Remove text like 'index.php' at the end:
 				$this->basepath_url = preg_replace( '/^(.+\/)([^\/]+\.[^\/]+)?$/', '$1', $this->get( 'siteurl' ) );
 			}
 			else
-			{ // Build url from base and sub path
-				global $basesubpath;
-				$this->basepath_url = $this->get_baseurl_root().$basesubpath;
+			{	// Build url from base and sub path:
+				$this->basepath_url = $this->get_baseurl_root().$this->get_basepath();
 			}
 		}
 
@@ -1544,13 +1690,167 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get the URL of the htsrv folder, on the current blog's domain (which is NOT always the same as the $baseurl domain!).
+	 * Get the basepath of this collection relative to domain
+	 *
+	 * @return string
 	 */
-	function get_local_htsrv_url()
+	function get_basepath()
 	{
-		global $htsrv_subdir;
+		if( empty( $this->basepath ) )
+		{	// Initialize base path only first time:
+			if( $this->get( 'access_type' ) == 'absolute' )
+			{	// If collection URL is absolute we should extract sub path from the URL because it can be different than site url:
+				$this->basepath = str_replace( $this->get_baseurl_root(), '', $this->get_basepath_url() );
+			}
+			else
+			{	// Otherwise we can use sub path of site url:
+				global $basesubpath;
+				$this->basepath = $basesubpath;
+			}
+		}
 
-		return $this->get_basepath_url().$htsrv_subdir;
+		return $this->basepath;
+	}
+
+
+	/**
+	 * Get cookie domain of this collection
+	 *
+	 * @param boolean|string FALSE - use dependon of setting,
+	 *                       'auto' - force to use automatic cookie domain,
+	 *                       'custom' - force to use custom cookie domain
+	 * @return string
+	 */
+	function get_cookie_domain( $force_type = false )
+	{
+		if( empty( $this->cookie_domain ) )
+		{	// Initialize only first time:
+			$cookie_domain_type = ( $force_type === false ) ? $this->get_setting( 'cookie_domain_type' ) : $force_type;
+
+			if( $cookie_domain_type == 'custom' )
+			{	// Custom cookie domain:
+				return $this->get_setting( 'cookie_domain_custom' );
+			}
+			else
+			{	// Automatic cookie domain:
+				if( $this->get( 'access_type' ) == 'absolute' )
+				{	// If collection URL is absolute we should extract cookie domain from the URL because it can be different than site url:
+					preg_match( '#^https?://(.+?)(:(.+?))?$#', $this->get_baseurl_root(), $matches );
+					$coll_host = $matches[1];
+
+					if( strpos( $coll_host, '.' ) === false )
+					{	// localhost or windows machine name:
+						$this->cookie_domain = $coll_host;
+					}
+					elseif( preg_match( '~^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$~i', $coll_host ) )
+					{	// The basehost is an IP address, use the basehost as it is:
+						$this->cookie_domain = $coll_host;
+					}
+					else
+					{	// Keep the part of the basehost after the www. :
+						$this->cookie_domain = preg_replace( '/^(www\. )? (.+)$/xi', '.$2', $coll_host );
+					}
+				}
+				else
+				{	// Otherwise we can use sub path of site url:
+					global $cookie_domain;
+					$this->cookie_domain = $cookie_domain;
+				}
+			}
+		}
+
+		return $this->cookie_domain;
+	}
+
+
+	/**
+	 * Get cookie path of this collection
+	 *
+	 * @param boolean|string FALSE - use dependon of setting,
+	 *                       'auto' - force to use automatic cookie path,
+	 *                       'custom' - force to use custom cookie path
+	 * @return string
+	 */
+	function get_cookie_path( $force_type = false )
+	{
+		if( empty( $this->cookie_path ) )
+		{	// Initialize only first time:
+			$cookie_domain_type = ( $force_type === false ) ? $this->get_setting( 'cookie_path_type' ) : $force_type;
+
+			if( $cookie_domain_type == 'custom' )
+			{	// Custom cookie path:
+				return $this->get_setting( 'cookie_path_custom' );
+			}
+			else
+			{	// Automatic cookie path:
+				$this->cookie_path = $this->get_basepath();
+			}
+		}
+
+		return $this->cookie_path;
+	}
+
+
+	/**
+	 * Get URL to htsrv folder
+	 *
+	 * Note: For back-office or no collection page _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
+	 *
+	 * @param boolean TRUE to use https URL
+	 * @return string URL to htsrv folder
+	 */
+	function get_htsrv_url( $force_https = false )
+	{
+		$force_https = intval( $force_https );
+
+		if( ! isset( $this->htsrv_urls[ $force_https ] ) )
+		{	// Initialize collection htsrv URL only first time and store in cache:
+			global $htsrv_url, $htsrv_url_sensitive, $htsrv_subdir;
+
+			if( ! is_array( $this->htsrv_urls ) )
+			{
+				$this->htsrv_urls = array();
+			}
+
+			if( $force_https )
+			{	// If secure htsrv URL is required:
+				$required_htsrv_url = $htsrv_url_sensitive;
+			}
+			else
+			{	// If normal htsrv URL is required:
+				$required_htsrv_url = $htsrv_url;
+			}
+
+			// Cut htsrv folder from end of the URL:
+			$required_htsrv_url = substr( $required_htsrv_url, 0, strlen( $required_htsrv_url ) - strlen( $htsrv_subdir ) );
+
+			if( strpos( $this->get_basepath_url(), $required_htsrv_url ) !== false )
+			{	// If current request path contains the required htsrv URL:
+				return $required_htsrv_url.$htsrv_subdir;
+			}
+
+			$coll_url_parts = @parse_url( $this->get_basepath_url() );
+			$htsrv_url_parts = @parse_url( $required_htsrv_url );
+			if( ! isset( $coll_url_parts['host'] ) || ! isset( $htsrv_url_parts['host'] ) )
+			{
+				debug_die( 'Invalid hosts!' );
+			}
+
+			$coll_domain = $coll_url_parts['host']
+				.( empty( $coll_url_parts['port'] ) ? '' : ':'.$coll_url_parts['port'] )
+				.( empty( $coll_url_parts['path'] ) ? '' : $coll_url_parts['path'] );
+			$htsrv_domain = $htsrv_url_parts['host']
+				.( empty( $htsrv_url_parts['port'] ) ? '' : ':'.$htsrv_url_parts['port'] )
+				.( empty( $htsrv_url_parts['path'] ) ? '' : $htsrv_url_parts['path'] );
+
+			// Replace domain + path of htsrv URL with current request:
+			$this->htsrv_urls[ $force_https ] = substr_replace( $required_htsrv_url, $coll_domain, strpos( $required_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) );
+
+			// Revert htsrv folder to end of the URL which has been cut above:
+			$this->htsrv_urls[ $force_https ] .= $htsrv_subdir;
+		}
+
+		return $this->htsrv_urls[ $force_https ];
 	}
 
 
@@ -1558,23 +1858,32 @@ class Blog extends DataObject
 	 * Get the URL of the media folder, on the current blog's domain (which is NOT always the same as the $baseurl domain!).
 	 *
 	 * @param string NULL to use current media_assets_url_type setting.  Use 'basic', 'relative' or 'absolute' to force.
+	 * @param boolean TRUE - to don't force relative URL to absolute on back-office, mail template and feed skin
 	 * @return string URL to /media/ folder
 	 */
-	function get_local_media_url( $url_type = NULL )
+	function get_local_media_url( $url_type = NULL, $force_normal_using = false )
 	{
 		$url_type = is_null( $url_type ) ? $this->get_setting( 'media_assets_url_type' ) : $url_type;
 
 		if( $url_type == 'relative' )
-		{ // Relative URL
-			global $media_subdir;
-			return $this->get_basepath_url().$media_subdir;
+		{	// Relative URL:
+			if( ! $force_normal_using && is_admin_page() )
+			{	// Force to absolute base URL on back-office side and email template:
+				global $media_url;
+				return $media_url;
+			}
+			else
+			{	// Use absolute URL relative to collection media folder:
+				global $media_subdir;
+				return $this->get_baseurl_root().$this->get_basepath().$media_subdir;
+			}
 		}
 		elseif( $url_type == 'absolute' )
-		{ // Absolute URL
+		{	// Absolute URL:
 			return $this->get_setting( 'media_assets_absolute_url' );
 		}
 		else// == 'basic'
-		{ // Basic URL from config
+		{	// Basic URL from config:
 			global $media_url;
 			return $media_url;
 		}
@@ -1594,7 +1903,7 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{ // Relative URL
 			global $rsc_subdir;
-			return $this->get_basepath_url().$rsc_subdir;
+			return $this->get_basepath().$rsc_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL
@@ -1621,7 +1930,7 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{ // Relative URL
 			global $skins_subdir;
-			return $this->get_basepath_url().$skins_subdir;
+			return $this->get_basepath().$skins_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL
@@ -1631,6 +1940,33 @@ class Blog extends DataObject
 		{ // Basic URL from config
 			global $skins_url;
 			return $skins_url;
+		}
+	}
+
+
+	/**
+	 * Get the URL of the plugins folder, on the current collection's domain (which is NOT always the same as the $baseurl domain!).
+	 *
+	 * @param string NULL to use current plugins_assets_url_type setting. Use 'basic', 'relative' or 'absolute' to force.
+	 * @return string URL to /plugins/ folder
+	 */
+	function get_local_plugins_url( $url_type = NULL )
+	{
+		$url_type = is_null( $url_type ) ? $this->get_setting( 'plugins_assets_url_type' ) : $url_type;
+
+		if( $url_type == 'relative' )
+		{	// Relative URL:
+			global $plugins_subdir;
+			return $this->get_basepath().$plugins_subdir;
+		}
+		elseif( $url_type == 'absolute' )
+		{	// Absolute URL:
+			return $this->get_setting( 'plugins_assets_absolute_url' );
+		}
+		else// == 'basic'
+		{	// Basic Config URL from config:
+			global $plugins_url;
+			return $plugins_url;
 		}
 	}
 
@@ -1862,7 +2198,7 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get allowed post status for current user in this blog
+	 * Checks if the requested item status can be used by current user and if not, get max allowed item status of the collection
 	 *
 	 * @todo make default a Blog param
 	 *
@@ -2176,7 +2512,7 @@ class Blog extends DataObject
 	 */
 	function get( $parname, $params = array() )
 	{
-		global $xmlsrv_url, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog;
+		global $xmlsrv_url, $basehost, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog;
 
 		if( gettype( $params ) != 'array' )
 		{
@@ -2192,7 +2528,7 @@ class Blog extends DataObject
 		{
 			case 'access_type':
 				$access_type_value = parent::get( $parname );
-				if( $access_type_value == 'subdom' && is_ip_url_domain( $baseurl ) )
+				if( $access_type_value == 'subdom' && is_valid_ip_format( $basehost ) )
 				{	// Don't allow subdomain for IP address:
 					$access_type_value = 'index.php';
 				}
@@ -2288,7 +2624,7 @@ class Blog extends DataObject
 			case 'activateinfourl':
 			case 'access_requires_loginurl':
 				$url_disp = str_replace( 'url', '', $parname );
-				if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) )
+				if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $this ) )
 				{ // Use special blog for login/register actions if it is defined in general settings
 					return url_add_param( $login_Blog->gen_blogurl(), 'disp='.$url_disp, $params['glue'] );
 				}
@@ -2307,6 +2643,10 @@ class Blog extends DataObject
 
 			case 'contactsurl':
 				$disp_param = 'contacts';
+				break;
+
+			case 'flaggedurl':
+				$disp_param = 'flagged';
 				break;
 
 			case 'helpurl':
@@ -4108,30 +4448,39 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get all enabled item types for this collection
+	 * Get enabled item types for this collection by usage
 	 *
+	 * @param string|NULL Item type usage: 'post', 'page', 'intro-front' and etc.
 	 * @return array
 	 */
-	function get_enabled_item_types()
+	function get_enabled_item_types( $usage = NULL )
 	{
 		if( empty( $this->ID ) )
-		{ // This is new blog, it doesn't have the enabled item types
+		{	// This is new blog, it doesn't have the enabled item types:
 			return array();
 		}
 
 		if( ! isset( $this->enabled_item_types ) )
-		{ // Get all enabled item types by one sql query and only first time to cache result:
+		{	// Get all enabled item types by one sql query and only first time to cache result:
 			global $DB;
 
-			$SQL = new SQL();
-			$SQL->SELECT( 'itc_ityp_ID' );
+			$SQL = new SQL( 'Get all enabled item types for collection #'.$this->ID );
+			$SQL->SELECT( 'itc_ityp_ID, ityp_usage' );
 			$SQL->FROM( 'T_items__type_coll' );
+			$SQL->FROM_add( 'INNER JOIN T_items__type ON itc_ityp_ID = ityp_ID' );
 			$SQL->WHERE( 'itc_coll_ID = '.$this->ID );
 
-			$this->enabled_item_types = $DB->get_col( $SQL->get() );
+			$this->enabled_item_types = $DB->get_assoc( $SQL->get(), $SQL->title );
 		}
 
-		return $this->enabled_item_types;
+		if( $usage === NULL )
+		{	// Get all item types:
+			return array_keys( $this->enabled_item_types );
+		}
+		else
+		{	// Restrict item types by requested usage value:
+			return array_keys( $this->enabled_item_types, $usage );
+		}
 	}
 
 

@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $disp, $MainList, $legend_statuses, $legend_icons;
+global $Collection, $Blog, $disp, $MainList, $legend_statuses, $legend_icons;
 
 $legends = array();
 

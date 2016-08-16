@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $AdminUI;
 
-global $Blog, $Session;
+global $Collection, $Blog, $Session;
 
 /*
  * Initialize everything
@@ -45,7 +45,7 @@ switch( $action )
 			$LinkOwner = & $edited_Link->get_LinkOwner();
 
 			// Load the blog we're in:
-			$Blog = & $LinkOwner->get_Blog();
+			$Collection = $Blog = & $LinkOwner->get_Blog();
 			set_working_blog( $Blog->ID );
 		}
 		else
@@ -72,7 +72,7 @@ if( $action == 'edit_links' || $action == 'sort_links' )
 	$LinkOwner = get_link_owner( $link_type, $object_ID );
 	if( empty( $Blog ) )
 	{ // Load the blog we're in:
-		$Blog = & $LinkOwner->get_Blog();
+		$Collection = $Blog = & $LinkOwner->get_Blog();
 		set_working_blog( $Blog->ID );
 	}
 }
@@ -90,9 +90,6 @@ switch( $action )
 
 		// Check permission:
 		$LinkOwner->check_perm( 'edit', true );
-
-		// Add JavaScript to handle links modifications.
-		require_js( 'links.js' );
 		break;
 
 	case 'unlink': // Unlink a file from object:
@@ -106,7 +103,7 @@ switch( $action )
 
 		if( $link_File = & $edited_Link->get_File() )
 		{
-			syslog_insert( sprintf( 'File %s was unlinked from %s with ID=%s', '[['.$link_File->get_name().']]', $LinkOwner->type, $LinkOwner->link_Object->ID ), 'info', 'file', $link_File->ID );
+			syslog_insert( sprintf( 'File %s was unlinked from %s with ID=%s', '[['.$link_File->get_name().']]', $LinkOwner->type, $LinkOwner->get_ID() ), 'info', 'file', $link_File->ID );
 		}
 
 		if( $action == 'delete' && $edited_Link->can_be_file_deleted() )
@@ -236,10 +233,25 @@ switch( $action )
 			}
 		}
 
-		param( 'iframe_name', 'string', '', true );
+		$Messages->add( T_('The attachments have been sorted by file name.'), 'success' );
 
-		// Need to specify where to redirect, otherwise referrer will be used
-		$redirect_url = $admin_url.'?ctrl=links&action=edit_links&link_type='.$LinkOwner->type.'&mode=iframe&iframe_name='.$iframe_name.'&link_object_ID='.$LinkOwner->get_ID();
+		// Need to specify where to redirect, otherwise referrer will be used:
+		switch( $LinkOwner->type )
+		{
+			case 'item':
+				$redirect_url = $admin_url.'?ctrl=items&action=edit&p='.$LinkOwner->get_ID();
+				break;
+			case 'comment':
+				$redirect_url = $admin_url.'?ctrl=comments&action=edit&comment_ID='.$LinkOwner->get_ID();
+				break;
+			case 'emailcampaign':
+				$redirect_url = $admin_url.'?ctrl=campaigns&action=edit&tab=compose&ecmp_ID='.$LinkOwner->get_ID();
+				break;
+			default:
+				param( 'iframe_name', 'string', '', true );
+				$redirect_url = $admin_url.'?ctrl=links&action=edit_links&link_type='.$LinkOwner->type.'&mode=iframe&iframe_name='.$iframe_name.'&link_object_ID='.$LinkOwner->get_ID();
+				break;
+		}
 		header_redirect( $redirect_url );
 		break;
 

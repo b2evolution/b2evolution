@@ -64,10 +64,12 @@ $core_componentwidget_defs = array(
 			'coll_avatar',
 			'free_html',
 			'user_links',
+			'social_links'
 		),
 	'menu_item' => array(
 			'menu_link',
 			'msg_menu_link',
+			'flag_menu_link',
 			'profile_menu_link',
 		),
 	'navigation' => array(
@@ -84,6 +86,7 @@ $core_componentwidget_defs = array(
 			'coll_post_list',         // Simple Post list
 			'coll_page_list',         // Simple Page list
 			'coll_related_post_list', // Simple Related Posts list
+			'coll_flagged_list',      // Simplified UIL: Flagged Items
 			'coll_item_list',         // Universal Item list
 			'coll_featured_intro',    // Featured/Intro Post
 			'coll_media_index',       // Photo index
@@ -96,6 +99,7 @@ $core_componentwidget_defs = array(
 			'item_tags',
 			'item_about_author',
 			'item_seen_by',
+			'item_vote',
 		),
 	'collection' => array(
 			'coll_logo',

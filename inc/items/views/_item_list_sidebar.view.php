@@ -21,7 +21,7 @@ global $AdminUI;
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var Plugins
  */
@@ -34,8 +34,9 @@ global $ItemList;
 $pp = $ItemList->param_prefix;
 
 global $tab;
-global ${$pp.'show_past'}, ${$pp.'show_future'}, ${$pp.'show_statuses'}, ${$pp.'s'}, ${$pp.'sentence'}, ${$pp.'exact'}, ${$pp.'author'}, ${$pp.'author_login'}, ${$pp.'assgn'}, ${$pp.'assgn_login'}, ${$pp.'status'};
+global ${$pp.'flagged'}, ${$pp.'show_past'}, ${$pp.'show_future'}, ${$pp.'show_statuses'}, ${$pp.'s'}, ${$pp.'sentence'}, ${$pp.'exact'}, ${$pp.'author'}, ${$pp.'author_login'}, ${$pp.'assgn'}, ${$pp.'assgn_login'}, ${$pp.'status'};
 
+$flagged = ${$pp.'flagged'};
 $show_past = ${$pp.'show_past'};
 $show_future = ${$pp.'show_future'};
 $show_statuses = ${$pp.'show_statuses'};
@@ -94,7 +95,14 @@ echo $Widget->replace_vars( $template['block_start'] );
 		echo '<fieldset class="clearfix">';
 		echo '<legend>'.T_('Posts to show').'</legend>';
 		?>
-		<div>
+		<p>
+
+			<input type="checkbox" name="<?php echo $pp ?>flagged" value="1" id="flagged" class="checkbox" <?php if( $flagged ) echo 'checked="checked" '?> />
+			<label for="flagged"><?php echo T_('Flagged') ?></label><br />
+
+		</p>
+
+		<p>
 
 		<input type="checkbox" name="<?php echo $pp ?>show_past" value="1" id="ts_min" class="checkbox" <?php if( $show_past ) echo 'checked="checked" '?> />
 		<label for="ts_min"><?php echo T_('Past') ?></label><br />
@@ -102,9 +110,9 @@ echo $Widget->replace_vars( $template['block_start'] );
 		<input type="checkbox" name="<?php echo $pp ?>show_future" value="1" id="ts_max" class="checkbox" <?php if( $show_future ) echo 'checked="checked" '?> />
 		<label for="ts_max"><?php echo T_('Future') ?></label>
 
-		</div>
+		</p>
 
-		<div>
+		<p>
 
 		<?php
 		// Get those statuses that current User can't view in this blog, and don't display those as filters
@@ -119,7 +127,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 		}
 		?>
 
-		</div>
+		</p>
 
 		<?php
 		echo '</fieldset>';

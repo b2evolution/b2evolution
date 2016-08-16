@@ -47,7 +47,7 @@ if( empty( $blog ) )
 }
 else
 { // Page title for selected blog domains
-	global $Blog;
+	global $Collection, $Blog;
 	$page_title = sprintf( T_('Referring domains for collection %s'), $Blog->get( 'shortname' ) );
 }
 
@@ -219,7 +219,7 @@ if( $current_User->check_perm( 'stats', 'edit' ) )
 	// Print JS to edit a domain type
 	echo_editable_column_js( array(
 		'column_selector' => '.dom_type_edit',
-		'ajax_url'        => get_secure_htsrv_url().'async.php?action=dom_type_edit&'.url_crumb( 'domtype' ),
+		'ajax_url'        => get_htsrv_url().'async.php?action=dom_type_edit&'.url_crumb( 'domtype' ),
 		'options'         => stats_dom_type_titles( true ),
 		'new_field_name'  => 'new_dom_type',
 		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',
@@ -228,7 +228,7 @@ if( $current_User->check_perm( 'stats', 'edit' ) )
 	// Print JS to edit a domain status
 	echo_editable_column_js( array(
 		'column_selector' => '.dom_status_edit',
-		'ajax_url'        => get_secure_htsrv_url().'async.php?action=dom_status_edit&'.url_crumb( 'domstatus' ),
+		'ajax_url'        => get_htsrv_url().'async.php?action=dom_status_edit&'.url_crumb( 'domstatus' ),
 		'options'         => stats_dom_status_titles( true ),
 		'new_field_name'  => 'new_dom_status',
 		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',

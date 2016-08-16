@@ -50,7 +50,7 @@ if( !isset( $params ) )
 $params = array_merge( array(
 	'form_class_thread' => 'evo_form evo_form__thread',
 	'form_title' => '',
-	'form_action' => $samedomain_htsrv_url.'action.php?mname=messaging',
+	'form_action' => get_htsrv_url().'action.php?mname=messaging',
 	'form_name' => '',
 	'form_layout' => NULL,
 	'cols' => 40,

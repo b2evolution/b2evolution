@@ -72,7 +72,7 @@ if( $blog == 0 && empty( $sec_ID ) )
 		elseif( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
 		{ // Selected a new blog:
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 		}
 	}
 }

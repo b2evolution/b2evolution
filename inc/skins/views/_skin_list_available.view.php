@@ -61,7 +61,7 @@ switch( $skin_type )
 if( $tab == 'coll_skin' )
 {	// We are installing new skin for collection:
 	$BlogCache = & get_BlogCache();
-	$Blog = & $BlogCache->get_by_ID( $blog );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 	$block_title = sprintf( T_('Install a new %s skin for %s:'), $skin_type_title, $Blog->get( 'name' ) );
 }
 elseif( $tab == 'site_skin' )

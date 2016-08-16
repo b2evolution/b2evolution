@@ -36,7 +36,8 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Subscriptions').get_manual_link( 'subscriptions-other' ) );
-	$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post and/or comment.') );
+	$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post.') );
+	$Form->checkbox( 'allow_comment_subscriptions', $edited_Blog->get_setting( 'allow_comment_subscriptions' ), '', T_('Allow users to subscribe and receive email notifications for each new comment.') );
 	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
 	// TODO: checkbox 'Enable RSS/Atom feeds'
 	// TODO2: which feeds (skins)?

@@ -24,7 +24,7 @@ load_class( 'items/model/_itemlist.class.php', 'ItemList2' );
  */
 function init_MainList( $items_nb_limit )
 {
-	global $MainList, $Blog, $Plugins, $Skin;
+	global $MainList, $Collection, $Blog, $Plugins, $Skin;
 	global $preview;
 	global $disp;
 	global $postIDlist, $postIDarray;
@@ -39,21 +39,35 @@ function init_MainList( $items_nb_limit )
 
 		if( ! $preview )
 		{
-			if( $disp == 'page' )
-			{	// Get pages:
-				$MainList->set_default_filters( array(
-						'itemtype_usage' => 'page' // pages
-					) );
-			}
+			switch( $disp )
+			{
+				case 'page':
+					$MainList->set_default_filters( array(
+							'itemtype_usage' => 'page' // Only pages
+						) );
+					break;
 
-			if( $disp == 'terms' )
-			{	// Allow all post types:
-				$MainList->set_default_filters( array(
-						'itemtype_usage' => 'page,special'
-					) );
-			}
+				case 'terms':
+					$MainList->set_default_filters( array(
+							'itemtype_usage' => 'page,special' // Allow all post types
+						) );
+					break;
 
-			// else: we are in posts mode
+				case 'posts':
+					if( $Blog->get_setting( 'show_post_types' ) != '' )
+					{	// Exclude items with types which are hidden by collection setting "Show post types":
+						$MainList->set_default_filters( array(
+								'types' => '-'.$Blog->get_setting( 'show_post_types' )
+							) );
+					}
+					break;
+
+				case 'flagged':
+					$MainList->set_default_filters( array(
+							'flagged' => 1
+						) );
+					break;
+			}
 
 			// pre_dump( $MainList->default_filters );
 			$MainList->load_from_Request( false );
@@ -109,7 +123,7 @@ function init_MainList( $items_nb_limit )
  */
 function init_inskin_editing()
 {
-	global $Blog, $edited_Item, $action, $form_action;
+	global $Collection, $Blog, $edited_Item, $action, $form_action;
 	global $item_tags, $item_title, $item_content;
 	global $admin_url, $redirect_to, $advanced_edit_link;
 
@@ -183,9 +197,9 @@ function init_inskin_editing()
 
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit', '&' );
 	}
-
-	// Restrict item status to max allowed by item collection:
-	$edited_Item->restrict_status_by_collection();
+	
+	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:Restrict item status to max allowed by item collection:
+	$edited_Item->restrict_status();
 
 	// Used in the edit form:
 
@@ -213,7 +227,7 @@ function init_inskin_editing()
 			'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'\' );',
 		);
 
-	$form_action = get_samedomain_htsrv_url().'item_edit.php';
+	$form_action = get_htsrv_url().'item_edit.php';
 }
 
 /**
@@ -232,7 +246,7 @@ function init_inskin_editing()
  */
 function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 {
-	global $Blog, $cat;
+	global $Collection, $Blog, $cat;
 	global $disp, $disp_detail, $MainList, $FeaturedList;
 	global $featured_displayed_item_IDs;
 
@@ -315,7 +329,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 		if( isset($Blog) )
 
 		if( $FeaturedList->result_num_rows == 0 && $restrict_disp != 'front'
-			&& isset($Blog) 
+			&& isset($Blog)
 			&& $Blog->get_setting('disp_featured_above_list') )
 		{ // No Intro page was found, try to find a featured post instead:
 
@@ -398,7 +412,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	$slug_changed = param( 'slug_changed' );
 	if( $slug_changed == 0 )
 	{ // this should only happen when the slug is auto generated
-		global $Blog;
+		global $Collection, $Blog;
 		if( isset( $Blog ) )
 		{ // Get max length of slug from current blog setting
 			$count_of_words = $Blog->get_setting('slug_limit');
@@ -867,7 +881,7 @@ function statuses_where_clause( $show_statuses = NULL, $dbprefix = 'post_', $req
 function get_post_cat_setting( $blog )
 {
 	$BlogCache = & get_BlogCache();
-	$Blog = $BlogCache->get_by_ID( $blog, false, false );
+	$Collection = $Blog = $BlogCache->get_by_ID( $blog, false, false );
 	if( ! $Blog )
 	{
 		return -1;
@@ -1470,7 +1484,7 @@ function cat_select_new( & $cat_display_params )
  */
 function attach_browse_tabs( $display_tabs3 = true )
 {
-	global $AdminUI, $Blog, $current_User, $admin_url, $ItemTypeCache;
+	global $AdminUI, $Collection, $Blog, $current_User, $admin_url, $ItemTypeCache;
 
 	if( empty( $Blog ) )
 	{ // No blog
@@ -1568,7 +1582,7 @@ function attach_browse_tabs( $display_tabs3 = true )
  */
 function get_item_type_tabs()
 {
-	global $DB, $Blog;
+	global $DB, $Collection, $Blog;
 
 	if( empty( $Blog ) )
 	{ // Don't get the item types if Blog is not defined
@@ -1672,7 +1686,7 @@ function visibility_select( & $Form, $post_status, $mass_create = false, $labels
 {
 	$labels = array_merge( get_visibility_statuses('notes-array'), $labels );
 
-	global $current_User, $Blog;
+	global $current_User, $Collection, $Blog;
 
 	$mass_create_statuses = array( 'redirected' );
 
@@ -1825,7 +1839,7 @@ function load_publish_status( $creating = false )
  */
 function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, $display_preview = false )
 {
-	global $Blog, $current_User, $UserSettings;
+	global $Collection, $Blog, $current_User, $UserSettings;
 	global $next_action, $highest_publish_status; // needs to be passed out for echo_publishnowbutton_js( $action )
 
 	list( $highest_publish_status, $publish_text ) = get_highest_publish_status( 'post', $Blog->ID );
@@ -1933,7 +1947,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
  */
 function echo_item_status_buttons( $Form, $edited_Item )
 {
-	global $next_action, $action, $Blog;
+	global $next_action, $action, $Collection, $Blog;
 
 	// Get those statuses which are not allowed for the current User to create posts in this blog
 	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status ), array( 'trash' ) );
@@ -2087,7 +2101,6 @@ function echo_status_dropdown_button_js( $type = 'post' )
  */
 function echo_autocomplete_tags()
 {
-	global $restapi_url;
 ?>
 	<script type="text/javascript">
 	function init_autocomplete_tags( selector )
@@ -2103,7 +2116,7 @@ function echo_autocomplete_tags()
 			}
 		}
 
-		jQuery( selector ).tokenInput( '<?php echo $restapi_url.'tags' ?>',
+		jQuery( selector ).tokenInput( '<?php echo get_restapi_url().'tags' ?>',
 		{
 			theme: 'facebook',
 			queryParam: 's',
@@ -2157,7 +2170,7 @@ function echo_autocomplete_tags()
  */
 function check_perm_posttype( $item_typ_ID, $post_extracats )
 {
-	global $Blog, $current_User;
+	global $Collection, $Blog, $current_User;
 
 	$ItemTypeCache = & get_ItemTypeCache();
 	$ItemType = & $ItemTypeCache->get_by_ID( $item_typ_ID );
@@ -2314,7 +2327,7 @@ function check_cross_posting( & $post_category, & $post_extracats, $prev_main_ca
  */
 function check_categories( & $post_category, & $post_extracats, $Item = NULL, $from = 'backoffice' )
 {
-	global $Messages, $Blog, $blog;
+	global $Messages, $Collection, $Blog, $blog;
 
 	if( $from == 'backoffice' || empty( $Item ) || $Item->ID == 0 || $Blog->get_setting( 'in_skin_editing_category' ) )
 	{	// If this is back-office OR categories are allowed to update from front-office:
@@ -2475,7 +2488,7 @@ function check_categories( & $post_category, & $post_extracats, $Item = NULL, $f
  */
 function check_categories_nosave( & $post_category, & $post_extracats, $Item = NULL, $from = 'backoffice' )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( $from == 'backoffice' || empty( $Item ) || $Item->ID == 0 || $Blog->get_setting( 'in_skin_editing_category' ) )
 	{	// If this is back-office OR categories are allowed to update from front-office:
@@ -2543,7 +2556,7 @@ function echo_onchange_goal_cat()
 			jQuery.ajax(
 			{
 				type: 'POST',
-				url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+				url: '<?php echo get_htsrv_url(); ?>async.php',
 				data: 'action=get_goals&cat_id=' + cat_ID + '&blogid=<?php echo $blog; ?>&crumb_itemgoal=<?php echo get_crumb( 'itemgoal' ); ?>',
 				success: function( result )
 				{
@@ -2634,10 +2647,10 @@ function echo_show_comments_changed( $comment_type )
  */
 function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage = 1, $limit = NULL, $comment_IDs = array(), $filterset_name = '', $expiry_status = 'active', $comment_type = 'feedback' )
 {
-	global $inc_path, $status_list, $Blog, $admin_url;
+	global $inc_path, $status_list, $Collection, $Blog, $admin_url;
 
 	$BlogCache = & get_BlogCache();
-	$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 
 	if( empty( $limit ) )
 	{ // Get default limit from curent user's setting
@@ -2752,7 +2765,7 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 	global $current_User, $localtimenow;
 
 	$Item = & $Comment->get_Item();
-	$Blog = & $Item->get_Blog();
+	$Collection = $Blog = & $Item->get_Blog();
 
 	$is_published = ( $Comment->get( 'status' ) == 'published' );
 	$expiry_delay = $Item->get_setting( 'comment_expiry_delay' );
@@ -3106,7 +3119,7 @@ function echo_comment_pages( $item_ID, $currentpage, $comments_number, $params =
 function check_item_perm_edit( $post_ID, $do_redirect = true )
 {
 	global $Messages;
-	global $Blog, $current_User;
+	global $Collection, $Blog, $current_User;
 
 	$user_can_edit = false;
 
@@ -3172,25 +3185,30 @@ function check_item_perm_edit( $post_ID, $do_redirect = true )
 /**
  * Check permission for creating of a new item by current user
  *
+ * @param object Blog/Collection, NULL to use current collection
  * @return boolean, TRUE if user can create a new post for the current blog
  */
-function check_item_perm_create()
+function check_item_perm_create( $check_Blog = NULL )
 {
-	global $Blog;
+	if( $check_Blog === NULL )
+	{	// Use current collection by default:
+		global $Collection, $Blog;
+		$check_Blog = $Blog;
+	}
 
-	if( empty( $Blog ) )
+	if( empty( $check_Blog ) )
 	{	// Strange case, but we restrict to create a new post
 		return false;
 	}
 
-	if( ! is_logged_in( false ) || ! $Blog->get_setting( 'in_skin_editing' ) )
+	if( ! is_logged_in( false ) || ! $check_Blog->get_setting( 'in_skin_editing' ) )
 	{	// Don't allow anonymous users to create a new post & If setting is OFF
 		return false;
 	}
 	else
 	{	// Check permissions for current user
 		global $current_User;
-		return $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID );
+		return $current_User->check_perm( 'blog_post_statuses', 'edit', false, $check_Blog->ID );
 	}
 
 	return true;
@@ -3213,7 +3231,7 @@ function item_new_link( $before = '', $after = '', $link_text = '', $link_title 
  */
 function get_item_new_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( ! check_item_perm_create() )
 	{	// Don't allow users to create a new post
@@ -3529,7 +3547,7 @@ function items_manual_results_block( $params = array() )
 		return;
 	}
 
-	global $current_User, $blog, $Blog, $admin_url, $Session;
+	global $current_User, $blog, $Collection, $Blog, $admin_url, $Session;
 
 	$result_fadeout = $Session->get( 'fadeout_array' );
 
@@ -3541,14 +3559,14 @@ function items_manual_results_block( $params = array() )
 		$blog = get_param( 'blog' );
 		if( !empty( $blog ) )
 		{ // Get Blog by ID
-			$Blog = $BlogCache->get_by_ID( $blog, false );
+			$Collection = $Blog = $BlogCache->get_by_ID( $blog, false );
 		}
 		if( empty( $Blog ) && !empty( $cat_ID ) )
 		{ // Get Blog from chapter ID
 			$ChapterCache = & get_ChapterCache();
 			if( $Chapter = & $ChapterCache->get_by_ID( $cat_ID, false ) )
 			{
-				$Blog = $Chapter->get_Blog();
+				$Collection = $Blog = $Chapter->get_Blog();
 				$blog = $Blog->ID;
 			}
 		}
@@ -3931,44 +3949,54 @@ function item_inskin_display( $Item )
  */
 function load_user_data_for_items( $post_ids = NULL )
 {
-	global $DB, $current_User, $user_post_read_statuses;
+	global $DB, $current_User, $cache_items_user_data;
 
 	if( ! is_logged_in() )
 	{	// There are no logged in user:
 		return;
 	}
 
-	if( is_array( $user_post_read_statuses ) )
+	if( is_array( $cache_items_user_data ) )
 	{	// User read statuses were already set:
 		return;
 	}
 	else
 	{	// Init with an empty array:
-		$user_post_read_statuses = array();
+		$cache_items_user_data = array();
 	}
 
-	$post_condition = empty( $post_ids ) ? NULL : 'uprs_post_ID IN ( '.implode( ',', $post_ids ).' )';
+	$post_condition = empty( $post_ids ) ? NULL : 'itud_item_ID IN ( '.implode( ',', $post_ids ).' )';
 
 	// SELECT current User's post and comment read statuses for all post with the given ids:
-	$SQL = new SQL( 'Load all read post date statuses for user #'.$current_User->ID );
-	$SQL->SELECT( 'uprs_post_ID, uprs_read_post_ts' );
-	$SQL->FROM( 'T_users__postreadstatus' );
-	$SQL->WHERE( 'uprs_user_ID = '.$DB->quote( $current_User->ID ) );
+	$SQL = new SQL( 'Load all items data for user #'.$current_User->ID );
+	$SQL->SELECT( 'itud_item_ID AS item_ID, IFNULL( itud_read_item_ts, 0 ) AS item_date, IFNULL( itud_read_comments_ts, 0 )AS comments_date, itud_flagged_item AS item_flag' );
+	$SQL->FROM( 'T_items__user_data' );
+	$SQL->WHERE( 'itud_user_ID = '.$DB->quote( $current_User->ID ) );
 	$SQL->WHERE_and( $post_condition );
 	// Set those post read statuses which were opened before:
-	$user_post_read_statuses = $DB->get_assoc( $SQL->get(), $SQL->title );
+	$data_rows = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
 
 	if( empty( $post_ids ) )
 	{	// The load was not requested for specific posts, so we have loaded all information what we have, ther rest of the posts were not read by this user:
 		return;
 	}
 
-	// Set new posts read statuses:
+	// Prepare array to proper format:
+	foreach( $data_rows as $r => $row )
+	{
+		// Make item ID as key:
+		$row_item_ID = $row['item_ID'];
+		unset( $row['item_ID'] );
+
+		$cache_items_user_data[ $row_item_ID ] = $row;
+	}
+
+	// Set new item user data:
 	foreach( $post_ids as $post_ID )
 	{	// Make sure to set read statuses for each requested post ID:
-		if( ! isset( $user_post_read_statuses[ $post_ID ] ) )
-		{	// Set each read status to 0:
-			$user_post_read_statuses[ $post_ID ] = 0;
+		if( ! isset( $cache_items_user_data[ $post_ID ] ) )
+		{	// If no item user data yet, Set default empty data:
+			$cache_items_user_data[ $post_ID ] = NULL;
 		}
 	}
 }
@@ -3982,7 +4010,7 @@ function load_user_data_for_items( $post_ids = NULL )
  */
 function items_results( & $items_Results, $params = array() )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
@@ -4116,7 +4144,7 @@ function items_results( & $items_Results, $params = array() )
  */
 function item_type_global_icons( $object_Widget )
 {
-	global $current_User, $admin_url, $DB, $Blog;
+	global $current_User, $admin_url, $DB, $Collection, $Blog;
 
 	if( is_logged_in() && ! empty( $Blog ) && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 	{ // We have permission to add a post with at least one status:
@@ -4246,7 +4274,7 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 				if( $nb_comments_moderation > 0 )
 				{
 					$comments_icon_params['style'] = 'color:#cc0099';
-					$comments_icon_params['title'] = T_('There are come comments awaiting moderation.');
+					$comments_icon_params['title'] = T_('There are some comments awaiting moderation.');
 				}
 			}
 
@@ -4266,7 +4294,7 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 		{	// If at least one meta comment exists
 			$item_Blog = & $Item->get_Blog();
 			$col .= '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$item_Blog->ID.'&amp;p='.$Item->ID.'&amp;comment_type=meta#comments">'
-					.get_icon( 'comments', 'imgtag', array( 'style' => 'color:#F00', 'title' => T_('Meta comments') ) )
+					.get_icon( 'comments', 'imgtag', array( 'style' => 'color:#5bc0de', 'title' => T_('Meta comments') ) )
 				.'</a> ';
 		}
 	}
@@ -4308,7 +4336,7 @@ function item_row_type( $Item )
  */
 function item_row_status( $Item, $index )
 {
-	global $current_User, $AdminUI, $Blog, $admin_url;
+	global $current_User, $AdminUI, $Collection, $Blog, $admin_url;
 
 	if( empty( $Blog ) )
 	{ // global Blog object is not set, e.g. back-office User activity tab
@@ -4392,12 +4420,12 @@ function item_edit_actions( $Item )
  */
 function manual_display_chapters( $params = array() )
 {
-	global $Blog, $blog, $cat_ID;
+	global $Collection, $Blog, $blog, $cat_ID;
 
 	if( empty( $Blog ) && !empty( $blog ) )
 	{ // Set Blog if it still doesn't exist
 		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $blog, false );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false );
 	}
 
 	if( empty( $Blog ) )

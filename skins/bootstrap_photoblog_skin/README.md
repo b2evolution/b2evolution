@@ -1,6 +1,6 @@
 ## Bootstrap Photoblog Skin
 
-Skin version: 6.7.3-stable.
+Skin version: 6.8.0-alpha.
 
 ====
 
@@ -15,3 +15,8 @@ Skin version: 6.7.3-stable.
 ### Single Page
 
 ![disp=single](skinshot_single.jpg)
+
+### Update log
+
+#### v6.8.0-alpha
+- LESS modules includes moved from skin style to generic b2evo CSS file

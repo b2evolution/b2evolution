@@ -2214,7 +2214,7 @@ function create_htaccess_deny( $dir )
  */
 function display_dragdrop_upload_button( $params = array() )
 {
-	global $htsrv_url, $blog, $Settings, $current_User;
+	global $blog, $Settings, $current_User, $b2evo_icons_type;
 
 	$params = array_merge( array(
 			'before'           => '',
@@ -2258,9 +2258,16 @@ function display_dragdrop_upload_button( $params = array() )
 	}
 
 	$root_and_path = $params['fileroot_ID'].'::'.$params['path'];
-	$quick_upload_url = $htsrv_url.'quick_upload.php?upload=true'.( empty( $blog ) ? '' : '&blog='.$blog );
+	$quick_upload_url = get_htsrv_url().'quick_upload.php?upload=true'
+		.( empty( $blog ) ? '' : '&blog='.$blog )
+		.'&b2evo_icons_type='.$b2evo_icons_type;
 
 	echo $params['before'];
+
+	if( $params['LinkOwner'] !== NULL && $params['LinkOwner']->is_temp )
+	{	// Use this field to know a form is submitted with temporary link owner(when object is creating and still doesn't exist in DB):
+		echo '<input type="hidden" name="temp_link_owner_ID" value="'.$params['LinkOwner']->get_ID().'" />';
+	}
 
 	?>
 	<div id="file-uploader" style="width:100%">
@@ -2293,11 +2300,9 @@ function display_dragdrop_upload_button( $params = array() )
 
 		<?php
 		if( $params['LinkOwner'] !== NULL )
-		{ // Add params to link a file right after uploading
-			global $b2evo_icons_type;
+		{	// Add params to link a file right after uploading:
 			$link_owner_type = $params['LinkOwner']->type;
-			$link_owner_ID = ( $link_owner_type == 'item' ? $params['LinkOwner']->Item->ID : $params['LinkOwner']->Comment->ID );
-			echo 'url += "&link_owner='.$link_owner_type.'_'.$link_owner_ID.'&b2evo_icons_type='.$b2evo_icons_type.'"';
+			echo 'url += "&link_owner='.$link_owner_type.'_'.$params['LinkOwner']->get_ID().'"';
 		}
 		?>
 
@@ -2449,7 +2454,10 @@ function display_dragdrop_upload_button( $params = array() )
 							this_row.find( '.qq-upload-link-id' ).html( responseJSON.success.link_ID );
 							this_row.find( '.qq-upload-image' ).html( responseJSON.success.link_preview );
 							this_row.find( '.qq-upload-link-actions' ).prepend( responseJSON.success.link_actions );
-							this_row.find( '.qq-upload-link-position' ).html( responseJSON.success.link_position );
+							if( typeof( responseJSON.success.link_position ) != 'undefined' )
+							{
+								this_row.find( '.qq-upload-link-position' ).html( responseJSON.success.link_position );
+							}
 							init_colorbox( this_row.find( '.qq-upload-image a[rel^="lightbox"]' ) );
 						}
 					}
@@ -2485,8 +2493,8 @@ function display_dragdrop_upload_button( $params = array() )
 		?>
 		function update_iframe_height()
 		{
-			var wrapper_height = jQuery( 'body' ).height();
-			jQuery( 'div#attachmentframe_wrapper', window.parent.document ).css( { 'height': wrapper_height, 'max-height': wrapper_height } );
+			var table_height = jQuery( '#attachments_fieldset_table' ).height();
+			jQuery( '#attachments_fieldset_wrapper' ).css( { 'height': table_height, 'max-height': table_height } );
 		}
 		<?php } ?>
 
@@ -2520,7 +2528,7 @@ function display_dragdrop_upload_button( $params = array() )
 			jQuery.ajax(
 			{ // Replace old file name with new
 				type: 'POST',
-				url: '<?php echo get_secure_htsrv_url(); ?>async.php',
+				url: '<?php echo get_htsrv_url(); ?>async.php',
 				data:
 				{
 					action: 'conflict_files',

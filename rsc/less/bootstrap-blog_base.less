@@ -6,104 +6,37 @@
  * Override this with style.css in your skin folder.
  */
 
-@import "inc/star_rating.inc.less";
+
+// ----- WIDGETS -----
+ 
+// About Author widget:
+@import "_about_author_widget.module.less";
+
+// Universal item list widget & Recent posts widget:
+@import "_universal_item_list_widget.module.less";
+
+// Media Index widget:
+@import "_coll_media_index_widget.module.less";
+
+// User Avatars (User List) widget:
+@import "_user_avatars_widget.module.less";
+
+// Organization Members widget:
+@import "_org_members_widget.module.less";
+
+
+// ----- PLUGINS -----
+
+// CSS overrides for "HTML 5 VideoJS Player" plugin:
 @import "inc/video-js-overrides.inc.less";
 
-// Hides pager elements with active_distance > 1 on small devices
 
-// this will hide pseudo prev_list and pseudo next_list links by default
-li[class^="listnav_distance_"], li[class*=" listnav_distance_"] {
-	display: none;
-}
+// -----
 
-// Do the following the screen is greater than or equal to 320px
-@media only screen and (min-width: 320px) {
-	// hide all active distance first
-	li[class^="active_distance_"], li[class*=" active_distance_"] {
-		display: none;
-	}
 
-	// hide previous and next
-	li.listnav_prev, li.listnav_next {
-		display: none;
-	}
+// Rating Summary for all comments of the selected post on disp=single:
+@import "inc/star_rating.inc.less";
 
-	// hide previous list and next list
-	li.listnav_prev_list, li.listnav_next_list {
-		display: none;
-	}
-
-	// round the corners of the first and last page
-	li.listnav_first > a {
-		border-top-left-radius: 4px;
-		border-bottom-left-radius: 4px;
-	}
-
-	li.listnav_last > a {
-		border-top-right-radius: 4px;
-		border-bottom-right-radius: 4px;
-	}
-
-	// show only active distance 1
-	li[class="active_distance_1"] {
-		display: inline;
-	}
-
-	// show pseudo previous/next list 1
-	li[class="listnav_distance_1"] {
-		display: inline;
-	}
-}
-
-@media only screen and (min-width: 480px) {
-	// show active distance 2
-	li[class="active_distance_2"] {
-		display: inline;
-	}
-
-	// hide pseudo previous/next 1...
-	li[class="listnav_distance_1"] {
-		display: none;
-	}
-
-	// ...and show next pseudo previous/next list 2
-	li[class="listnav_distance_2"] {
-		display: inline;
-	}
-}
-
-@media only screen and (min-width: 768px) {
-	// show all active distance
-	li[class^="active_distance_"], li[class*=" active_distance_"] {
-		display: inline;
-	}
-
-	// hide all pseudo previous/next lists
-	li[class^="listnav_distance_"], li[class*=" listnav_distance_"] {
-		display: none;
-	}
-
-	// show previous/next list pages
-	li.listnav_prev_list, li.listnav_next_list {
-		display: inline;
-	}
-}
-
-@media only screen and (min-width: 992px) {
-	// show previous/next pages
-	li.listnav_prev, li.listnav_next {
-		display: inline;
-	}
-
-	// remove round corners on the first and last page
-	li.listnav_first > a {
-		border-radius: 0;
-	}
-
-	li.listnav_last > a {
-		border-radius: 0;
-	}
-}
 
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
@@ -405,6 +338,10 @@ ul li.widget_core_coll_item_list.nobullets ul li:before {
 .action_icon {
 	margin: 0 2px;
 	font-weight: bold;
+	// Fix alignment for flag buttons:
+	&.evo_post_flag_btn {
+		margin-left: 0;
+	}
 }
 .title_action_icons {
 	float: right;
@@ -647,7 +584,7 @@ div.item_location {
 .note.status_meta span,			// This is deprecated
 .evo_status__meta {				// This is clean
 	color: #fff !important;
-	background-color: #5133ab !important;
+	background-color: #5bc0de !important;
 }
 
 .evo_content_block span[class*=status_] span {

@@ -55,6 +55,7 @@ skin_include( '_html_header.inc.php', array(
 	'posts_text'        => $posts_text,
 	'useritems_text'    => T_('User\'s topics'),
 	'usercomments_text' => T_('User\'s replies'),
+	'flagged_text'      => T_('Flagged topics'),
 ) );
 // -------------------------------- END OF HEADER --------------------------------
 
@@ -182,6 +183,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'comments_text'     => T_('Latest Replies'),
 					'front_text'        => '',
 					'posts_text'        => '',
+					'flagged_text'      => '',
 					'useritems_text'    => T_('User\'s topics'),
 					'usercomments_text' => T_('User\'s replies'),
 					'register_text'     => '',
