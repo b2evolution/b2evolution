@@ -888,6 +888,14 @@ class Message extends DataObject
 		if( !isset( $r ) )
 		{
 			$data = $this->text;
+
+			// Render inline file tags like [image:123:caption] or [file:123:caption] :
+			$data = render_inline_files( $data, $this, array(
+					'check_code_block' => true,
+					'image_size'       => 'original',
+					'image_link_rel'   => 'lightbox[m'.$this->ID.']',
+				) );
+
 			$Plugins->trigger_event( 'FilterMsgContent', array( 'data' => & $data, 'Message' => $this ) );
 			$r = format_to_output( $data, $format );
 

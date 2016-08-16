@@ -2451,6 +2451,10 @@ div.message_toolbars {
 .evo_private_messages_list .panel.results {
   margin-bottom: 20px;
 }
+.evo_private_messages_list .image_block img {
+  max-width: 100%;
+  height: auto;
+}
 @media (min-width: 768px) {
   div.coll-dashboard-block-3 {
     float: left;

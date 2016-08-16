@@ -334,7 +334,7 @@ if( $is_recipient )
 			}
 
 			// ####################### ATTACHMENTS/LINKS #########################
-			if( isset( $GLOBALS['files_Module'] )
+			if( is_admin_page() && isset( $GLOBALS['files_Module'] )
 				&& $current_User->check_perm( 'files', 'view' ) )
 			{	// Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files:
 				load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );

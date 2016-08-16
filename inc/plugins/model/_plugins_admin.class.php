@@ -143,6 +143,7 @@ class Plugins_admin extends Plugins
 				'RenderItemAttachment' => 'Renders item attachment.',
 				'RenderCommentAttachment' => 'Renders comment attachment.',
 				'RenderMessageAsHtml' => 'Renders message content when generated as HTML.',
+				'RenderMessageAttachment' => 'Renders message attachment.',
 				'RenderEmailAsHtml' => 'Renders email content when generated as HTML.',
 				'RenderEmailAttachment' => 'Renders email campaign attachment.',
 				'RenderURL' => 'Renders file by URL.',

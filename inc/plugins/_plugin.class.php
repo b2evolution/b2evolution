@@ -2145,6 +2145,24 @@ class Plugin
 		return $this->RenderItemAsHtml( $params );
 	}
 
+
+	/**
+	 * Event handler: Called when rendering attachments of message contents.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'Message': the {@link Message} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function RenderMessageAttachment( & $params )
+	{
+		// Use this render by default temporarily:
+		return $this->RenderItemAttachment( $params );
+	}
+
 	// }}}
 
 

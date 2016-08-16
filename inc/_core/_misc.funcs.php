@@ -8136,6 +8136,14 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 	if( !isset( $LinkList ) )
 	{	// Get list of attached Links only first time:
+		if( $Object->ID == 0 )
+		{	// Get temporary object ID on preview new creating object:
+			$temp_link_owner_ID = param( 'temp_link_owner_ID', 'integer', NULL );
+		}
+		else
+		{	// Don't use temporary object for existing object:
+			$temp_link_owner_ID = NULL;
+		}
 		switch( $object_class )
 		{
 			case 'Item':
@@ -8146,6 +8154,11 @@ function render_inline_tags( $Object, $tags, $params = array() )
 			case 'EmailCampaign':
 				$LinkOwner = new LinkEmailCampaign( $Object );
 				$plugin_event_name = 'RenderEmailAttachment';
+				break;
+
+			case 'Message':
+				$LinkOwner = new LinkMessage( $Object, $temp_link_owner_ID );
+				$plugin_event_name = 'RenderMessageAttachment';
 				break;
 
 			default:
@@ -8277,15 +8290,24 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 					if( $inline_type == 'image' )
 					{	// Generate the IMG tag with all the alt, title and desc if available:
-						if( $object_class == 'Item' )
-						{	// Get the IMG tag with link to original image or to Item page:
-							$inlines[ $current_inline ] = $Object->get_attached_image_tag( $Link, $current_image_params );
-						}
-						else
-						{	// Get the IMG tag without link:
-							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
-									'image_link_to' => false
-								) ) );
+						switch( $object_class )
+						{
+							case 'Item':
+								// Get the IMG tag with link to original image or to Item page:
+								$inlines[ $current_inline ] = $Object->get_attached_image_tag( $Link, $current_image_params );
+								break;
+
+							case 'EmailCampaign':
+								// Get the IMG tag without link for email content:
+								$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
+										'image_link_to' => false
+									) ) );
+								break;
+
+							default:
+								// Get the IMG tag with link to original big image:
+								$inlines[ $current_inline ] = $Link->get_tag( array_merge( $params, $current_image_params ) );
+								break;
 						}
 					}
 					elseif( $inline_type == 'inline' )
@@ -8368,15 +8390,24 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						'image_class'         => implode( ' ', $thumbnail_classes ),
 					);
 
-					if( $object_class == 'Item' )
-					{	// Get the IMG tag with link to original image or to Item page:
-						$inlines[ $current_inline ] = $Object->get_attached_image_tag( $Link, $current_image_params );
-					}
-					else
-					{	// Get the IMG tag without link:
-						$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
-								'image_link_to' => false
-							) ) );
+					switch( $object_class )
+					{
+						case 'Item':
+							// Get the IMG tag with link to original image or to Item page:
+							$inlines[ $current_inline ] = $Object->get_attached_image_tag( $Link, $current_image_params );
+							break;
+
+						case 'EmailCampaign':
+							// Get the IMG tag without link for email content:
+							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
+									'image_link_to' => false
+								) ) );
+							break;
+
+						default:
+							// Get the IMG tag with link to original big image:
+							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $params, $current_image_params ) );
+							break;
 					}
 				}
 				else

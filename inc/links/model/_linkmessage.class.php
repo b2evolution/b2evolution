@@ -68,15 +68,7 @@ class LinkMessage extends LinkOwner
 	 */
 	function get_positions( $file_ID = NULL )
 	{
-		$positions = array(
-				// TRANS: Noun - we're talking about a teaser image i-e: an image that appears before content
-				'teaser'     => T_('Teaser'),
-				// TRANS: noun - we're talking about an inline image i-e: an image that appears in the middle of some text
-				'inline'     => T_('Inline'),
-				'attachment' => T_('Attachment'),
-			);
-
-		return $positions;
+		return array( 'inline' => T_('Inline') );
 	}
 
 
@@ -169,7 +161,7 @@ class LinkMessage extends LinkOwner
 		switch( $parname )
 		{
 			case 'name':
-				return 'post';
+				return 'message';
 		}
 		return parent::get( $parname );
 	}
