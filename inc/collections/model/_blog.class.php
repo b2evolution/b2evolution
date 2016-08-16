@@ -1824,28 +1824,23 @@ class Blog extends DataObject
 
 		if( $url_type == 'relative' )
 		{	// Relative URL:
-			global $media_subdir, $Skin;
-			if( ! $force_normal_using )
-			{	// Don't force URL value to normal using on front-office:
-				if( is_admin_page() || is_mail_template() )
-				{	// Force to absolute base URL on back-office side and email template:
-					global $media_url;
-					return $media_url;
-				}
-				elseif( isset( $Skin ) && $Skin->get( 'type' ) == 'feed' )
-				{	// Force to absolute collection URL on feed skins:
-					return $this->get_baseurl_root().$this->get_basepath().$media_subdir;
-				}
+			if( ! $force_normal_using && is_admin_page() )
+			{	// Force to absolute base URL on back-office side and email template:
+				global $media_url;
+				return $media_url;
 			}
-			// Use relative URL for other skins:
-			return $this->get_basepath().$media_subdir;
+			else
+			{	// Use absolute URL relative to collection media folder:
+				global $media_subdir;
+				return $this->get_baseurl_root().$this->get_basepath().$media_subdir;
+			}
 		}
 		elseif( $url_type == 'absolute' )
-		{ // Absolute URL
+		{	// Absolute URL:
 			return $this->get_setting( 'media_assets_absolute_url' );
 		}
 		else// == 'basic'
-		{ // Basic URL from config
+		{	// Basic URL from config:
 			global $media_url;
 			return $media_url;
 		}
