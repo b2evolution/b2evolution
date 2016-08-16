@@ -61,7 +61,6 @@ $widget_groups = array (
 $core_componentwidget_defs = array(
 	'multipurpose' => array(
 			'image',
-			'coll_avatar',
 			'free_html',
 			'user_links',
 		),
@@ -112,6 +111,7 @@ $core_componentwidget_defs = array(
 		),
 	'user' => array(
 			'user_login',
+			'user_profile_pics',
 			'user_register',
 			'user_tools',
 			'user_info',

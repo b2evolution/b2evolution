@@ -85,7 +85,7 @@ $date_default_timezone = '';
 /**
  * Thumbnail size definitions.
  *
- * NOTE: this gets used for general resizing, too. E.g. in the coll_avatar_Widget.
+ * NOTE: this gets used for general resizing, too. E.g. in the user_profile_pics_Widget.
  *
  * type, width, height, quality, percent of blur effect
  */

@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the coll_avatar_Widget class.
+ * This file implements the user_profile_pics_Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -17,13 +17,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
 
 /**
- * coll_avatar_Widget Class.
+ * user_profile_pics_Widget Class.
  *
  * This displays the blog owner's avatar.
  *
  * @package evocore
  */
-class coll_avatar_Widget extends ComponentWidget
+class user_profile_pics_Widget extends ComponentWidget
 {
 	/**
 	 * Constructor
@@ -31,7 +31,7 @@ class coll_avatar_Widget extends ComponentWidget
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'coll_avatar' );
+		parent::__construct( $db_row, 'core', 'user_profile_pics' );
 	}
 
 

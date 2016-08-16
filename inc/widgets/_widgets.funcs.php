@@ -250,7 +250,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 			}
 			if( ( ! $initial_install || $blog_id != $blog_forums_ID ) && $kind != 'forum' )
 			{ // Don't install these Sidebar widgets for blog 'Forums'
-				add_basic_widget( $wico_id, 'coll_avatar', 'core', 20 );
+				add_basic_widget( $wico_id, 'user_profile_pics', 'core', 20 );
 				if( $blog_id > $blog_a_ID )
 				{
 					add_basic_widget( $wico_id, 'evo_Calr', 'plugin', 30 );
@@ -428,7 +428,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	{
 		$wico_id = $blog_containers['user_profile_left']['wico_ID'];
 		// User Profile Picture(s):
-		add_basic_widget( $wico_id, 'coll_avatar', 'core', 10, array(
+		add_basic_widget( $wico_id, 'user_profile_pics', 'core', 10, array(
 				'thumb_size'        => 'crop-top-320x320',
 				'thumb_class'       => 'main_profile_picture',
 				'force_size'        => '300x300',
@@ -528,7 +528,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	{
 		$wico_id = $blog_containers['user_profile_right']['wico_ID'];
 		// User Profile Picture(s):
-		add_basic_widget( $wico_id, 'coll_avatar', 'core', 10, array(
+		add_basic_widget( $wico_id, 'user_profile_pics', 'core', 10, array(
 				'display_main'     => 0,
 				'display_other'    => 1,
 				'thumb_size'       => 'crop-top-80x80',

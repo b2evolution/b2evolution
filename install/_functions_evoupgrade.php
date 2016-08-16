@@ -7630,6 +7630,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11810, 'Rename widget "coll_avatar" to "user_profile_pics"...' ) )
+	{	// part of 6.7.3-stable
+		$DB->query( 'UPDATE T_widget__widget
+			  SET wi_code = "user_profile_pics"
+			WHERE wi_code = "coll_avatar"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

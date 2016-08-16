@@ -127,7 +127,7 @@ class WidgetCache extends DataObjectCache
 		fp>alex TODO: This feature is ok BUT please move this code into the offending widget files
 		             there must not be any hard coced widget named in this class
 
-			if( ! isset($GLOBALS['files_Module']) && in_array( $row->wi_code, array('coll_media_index', 'coll_avatar') ) )
+			if( ! isset($GLOBALS['files_Module']) && in_array( $row->wi_code, array('coll_media_index', 'user_profile_pics') ) )
 			{	// Disable widgets dependent on files_Module
 				$r = NULL;
 				return $r;
