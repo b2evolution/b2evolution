@@ -351,6 +351,15 @@ class Blog extends DataObject
 				$this->set( 'shortname', empty($shortname) ? T_('Tracker') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'tracker' : $urlname );
 				$this->set_setting( 'use_workflow', 1 );
+				// Try to find post type "Forum Topic" in DB
+				global $DB;
+				$forum_topic_type_ID = $DB->get_var( 'SELECT ityp_ID
+					 FROM T_items__type
+					WHERE ityp_name = "Forum Topic"' );
+				if( $forum_topic_type_ID )
+				{ // Set default post type as "Forum Topic"
+					$this->set_setting( 'default_post_type', $forum_topic_type_ID );
+				}
 				break;
 
 			case 'forum':
@@ -4544,6 +4553,10 @@ class Blog extends DataObject
 
 			case 'manual':
 				$default_post_types = array( 'Manual Page' );
+				break;
+
+			case 'group':
+				$default_post_types = array( 'Forum Topic', 'Bug Report' );
 				break;
 
 			default: // 'std'

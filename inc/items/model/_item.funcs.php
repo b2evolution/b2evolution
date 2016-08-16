@@ -197,7 +197,7 @@ function init_inskin_editing()
 
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit', '&' );
 	}
-	
+
 	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:Restrict item status to max allowed by item collection:
 	$edited_Item->restrict_status();
 

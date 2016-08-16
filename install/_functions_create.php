@@ -354,6 +354,10 @@ function create_default_data()
 			'use_comment_expiration' => 'never',
 			'use_custom_fields'      => 0,
 		);
+	$post_types[] = array(
+			'name' => 'Bug Report',
+			'allow_html'     => 0,
+		);
 	// Default settings:
 	$post_type_default_settings = array(
 			'name'                     => '',
@@ -403,15 +407,20 @@ function create_default_data()
 
 
 	task_begin( 'Creating default Post Statuses... ' );
-	$DB->query( "
-		INSERT INTO T_items__status ( pst_name )
-		VALUES ( 'New' ),
-					 ( 'In Progress' ),
-					 ( 'Duplicate' ),
-					 ( 'Not A Bug' ),
-					 ( 'In Review' ),
-					 ( 'Fixed' ),
-					 ( 'Closed' )" );
+	$post_status = array( 'New', 'In Progress', 'Duplicate', 'Not A Bug', 'In Review', 'Fixed', 'Closed', 'OK' );
+
+	$DB->query( "INSERT INTO T_items__status ( pst_name )	VALUES ( '".implode( "' ),( '", $post_status )." ')" );
+	task_end();
+
+
+	task_begin( 'Creating default post status and post type associations...' );
+	// Enable all post statuses for post type Bug Report
+	$DB->query( 'INSERT INTO T_items__status_type (its_pst_ID, its_ityp_ID)
+			( SELECT pst_ID, ityp_ID FROM T_items__type, T_items__status WHERE ityp_name = "Bug Report" )' );
+
+	// Enable post status 'New', 'Duplicate', 'In Review' and 'OK' for all post types
+	$DB->query( 'INSERT IGNORE INTO T_items__status_type (its_pst_ID, its_ityp_ID)
+			( SELECT pst_ID, ityp_ID FROM T_items__type, T_items__status WHERE pst_name IN ( "New", "Duplicate", "In Review", "OK" ) )' );
 	task_end();
 
 

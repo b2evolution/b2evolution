@@ -780,8 +780,18 @@ class Item extends ItemLight
 		$item_Blog = $this->get_Blog();
 		if( $item_Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $item_Blog->ID ) )
 		{	// Update workflow properties only when it is enabled by collection setting and allowed for current user:
-			param( 'item_st_ID', 'integer', NULL );
-			$this->set_from_Request( 'pst_ID', 'item_st_ID', true );
+			$ItemTypeCache = & get_ItemTypeCache();
+			$current_ItemType = $ItemTypeCache->get_by_ID( $this->get( 'ityp_ID' ) );
+			$item_status = param( 'item_st_ID', 'integer', NULL );
+
+			if( in_array( $item_status, $current_ItemType->get_applicable_post_status() ) || $item_status == NULL )
+			{
+				$this->set_from_Request( 'pst_ID', 'item_st_ID', true );
+			}
+			else
+			{
+				param_error( 'item_st_ID', sprintf( T_('Invalid task status for post type %s'), $current_ItemType->get_name() ) );
+			}
 
 			$item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', NULL );
 			$item_assigned_user_login = param( 'item_assigned_user_login', 'string', NULL );

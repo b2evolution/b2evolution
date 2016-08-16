@@ -7311,9 +7311,12 @@ function echo_editable_column_js( $params = array() )
 	if( $params['field_type'] == 'select' )
 	{
 		$options = '';
-		foreach( $params['options'] as $option_value => $option_title )
+		if( is_array( $params['options'] ) )
 		{
-			$options .= '\''.$option_value.'\':\''.$option_title.'\','."\n";
+			foreach( $params['options'] as $option_value => $option_title )
+			{
+				$options .= '\''.$option_value.'\':\''.$option_title.'\','."\n";
+			}
 		}
 	}
 
@@ -7333,7 +7336,16 @@ jQuery( document ).ready( function()
 			value = ajax_debug_clear( value );
 			<?php if( $params['field_type'] == 'select' ) { ?>
 			var result = value.match( /rel="([^"]*)"/ );
-			return { <?php echo $options; ?>'selected' : result[1] }
+			<?php
+			if( is_array( $params['options'] ) )
+			{
+				echo "return { ".$options."'selected' : result[1] }";
+			}
+			else
+			{
+				echo "return ".$params['options'];
+			}
+			?>
 			<?php } else { ?>
 			var result = value.match( />\s*([^<]+)\s*</ );
 			return result[1] == '<?php echo $params['null_text'] ?>' ? '' : result[1];

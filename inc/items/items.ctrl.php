@@ -1119,6 +1119,18 @@ switch( $action )
 		if( $Blog->is_item_type_enabled( $ityp_ID ) )
 		{ // Set new post type only if it is enabled for the Blog:
 			$edited_Item->set( 'ityp_ID', $ityp_ID );
+
+			// Check if current post status is still applicable for new post type
+			if( $edited_Item->get( 'pst_ID' ) != NULL )
+			{
+				$ItemTypeCache = & get_ItemTypeCache();
+				$current_ItemType = $ItemTypeCache->get_by_ID( $ityp_ID );
+				if( ! in_array( $edited_Item->get( 'pst_ID' ), $current_ItemType->get_applicable_post_status() ) )
+				{
+					$edited_Item->set( 'pst_ID', NULL );
+					$Messages->add( T_('The current item status is no longer valid for the new item type and has been reset.'), 'warning' );
+				}
+			}
 		}
 
 		// Unset old object of Post Type to reload it on next page

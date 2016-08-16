@@ -153,6 +153,7 @@ class ItemType extends DataObject
 		return array(
 				array( 'table' => 'T_items__type_coll', 'fk' => 'itc_ityp_ID', 'msg' => T_('%d Post type associations with collections') ),
 				array( 'table' => 'T_items__type_custom_field', 'fk' => 'itcf_ityp_ID', 'msg' => T_('%d Custom field definitions') ),
+				array( 'table' => 'T_items__status_type', 'fk' => 'its_ityp_ID', 'msg' => T_('%d Item status associations') )
 			);
 	}
 
@@ -628,6 +629,47 @@ class ItemType extends DataObject
 		}
 
 		return $custom_fields;
+	}
+
+
+	/**
+	 * Get associated post status
+	 *
+	 * @return array IDs of associated post status
+	 */
+	function get_applicable_post_status()
+	{
+		global $DB;
+
+		$sql = 'SELECT its_pst_ID FROM T_items__status_type WHERE its_ityp_ID = '.$this->ID;
+		$item_status_array = $DB->get_col( $sql );
+		$item_status_array = array_map( 'intval', $item_status_array );
+
+		return $item_status_array;
+	}
+
+
+	/**
+	 * Get post status not associated with current item type
+	 *
+	 * @return array IDs of post status not valid for current item type
+	 */
+	function get_ignored_post_status( )
+	{
+		global $DB;
+
+		$sql = 'SELECT pst_ID FROM T_items__status WHERE pst_ID NOT IN ( SELECT its_pst_ID FROM T_items__status_type WHERE its_ityp_ID = '.$this->ID.' )';
+		/*
+		$sql = 'SELECT pst_ID
+							FROM T_items__status
+							JOIN T_items__type
+							LEFT JOIN T_items__status_type ON its_ityp_ID = ityp_ID AND its_pst_ID = pst_ID
+							WHERE ityp_ID = '.$this->ID.'	AND its_pst_ID IS NULL';
+		*/
+		$item_status_array = $DB->get_col( $sql );
+		$item_status_array = array_map( 'intval', $item_status_array );
+
+		return $item_status_array;
 	}
 }
 

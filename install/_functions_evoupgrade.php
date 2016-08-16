@@ -7765,6 +7765,20 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12080, 'Create table for post type status...' ) )
+	{ // part of 6.8.0-alpha
+		db_create_table( 'T_items__status_type', '
+			its_pst_ID INT(11) UNSIGNED NOT NULL,
+			its_ityp_ID INT(11) UNSIGNED NOT NULL,
+			PRIMARY KEY (its_ityp_ID, its_pst_ID)' );
+
+			// Enable all post statuses for all post types
+			$DB->query( 'INSERT INTO T_items__status_type (its_pst_ID, its_ityp_ID)
+					( SELECT pst_ID, ityp_ID FROM T_items__type INNER JOIN T_items__status )' );
+
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
