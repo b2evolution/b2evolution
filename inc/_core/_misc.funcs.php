@@ -6137,11 +6137,6 @@ function get_active_opcode_cache()
 		return 'OPCache';
 	}
 
-	if( function_exists( 'apc_cache_info' ) && ini_get( 'apc.enabled' ) )
-	{
-		return 'APC';
-	}
-
 	return 'none';
 }
 
