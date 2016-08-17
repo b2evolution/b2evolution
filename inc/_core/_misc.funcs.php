@@ -5891,17 +5891,17 @@ function get_from_mem_cache( $key, & $success )
 
 	$Timer->resume( 'get_from_mem_cache', false );
 
-	if( function_exists( 'apc_fetch' ) )
+	if( function_exists( 'apcu_fetch' ) )
+	{	// APCu
+		$r = apcu_fetch( $key, $success );
+	}
+	elseif( function_exists( 'apc_fetch' ) )
 	{	// APC
 		$r = apc_fetch( $key, $success );
 	}
 	elseif( function_exists( 'xcache_get' ) && ini_get( 'xcache.var_size' ) > 0 )
 	{	// XCache
 		$r = xcache_get( $key );
-	}
-	elseif( function_exists( 'apcu_fetch' ) )
-	{	// APCu
-		$r = apcu_fetch( $key, $success );
 	}
 
 	if( ! isset($success) )
@@ -5939,17 +5939,17 @@ function set_to_mem_cache( $key, $payload, $ttl = 0 )
 
 	$Timer->resume( 'set_to_mem_cache', false );
 
-	if( function_exists( 'apc_store' ) )
+	if( function_exists( 'apcu_store' ) )
+	{	// APCu
+		$r = apcu_store( $key, $payload, $ttl );
+	}
+	elseif( function_exists( 'apc_store' ) )
 	{	// APC
 		$r = apc_store( $key, $payload, $ttl );
 	}
 	elseif( function_exists( 'xcache_set' ) && ini_get( 'xcache.var_size' ) > 0 )
 	{	// XCache
 		$r = xcache_set( $key, $payload, $ttl );
-	}
-	elseif( function_exists( 'apcu_store' ) )
-	{	// APCu
-		$r = apcu_store( $key, $payload, $ttl );
 	}
 	else
 	{	// No available cache module:
@@ -6072,14 +6072,14 @@ function & get_IconLegend()
  */
 function get_active_opcode_cache()
 {
-	if( function_exists('apc_cache_info') && ini_get('apc.enabled') ) # disabled for CLI (see apc.enable_cli), however: just use this setting and do not call the function.
+	if( function_exists('opcache_invalidate') )
 	{
-		// fp>blueyed? why did you remove the following 2 lines? your comment above is not clear.
-		$apc_info = apc_cache_info( '', true );
-		if( isset( $apc_info['num_slots'] ) && ( $apc_info['num_slots'] ) )
-		{
-			return 'APC';
-		}
+		return 'OPCache';
+	}
+
+	if( function_exists('apc_delete_file') )
+	{
+		return 'APC';
 	}
 
 	// xcache: xcache.var_size must be > 0. xcache_set is not necessary (might have been disabled).
@@ -6097,16 +6097,6 @@ function get_active_opcode_cache()
 		}
 	}
 
-	if( ini_get( 'opcache.enable' ) )
-	{
-		return 'OPCache';
-	}
-
-	if( function_exists( 'apc_cache_info' ) && ini_get( 'apc.enabled' ) )
-	{
-		return 'APC';
-	}
-
 	return 'none';
 }
 
@@ -6118,12 +6108,12 @@ function get_active_opcode_cache()
  */
 function get_active_user_cache()
 {
-	if( function_exists( 'apcu_cache_info' ) && ini_get( 'apc.enabled' ) )
+	if( function_exists( 'apcu_cache_info' ) /* && ini_get( 'apc.enabled' ) */ )
 	{
 		return 'APCu';
 	}
 
-	if( function_exists( 'apc_cache_info' ) && ini_get( 'apc.enabled' ) )
+	if( function_exists( 'apc_cache_info' ) /* && ini_get( 'apc.enabled' ) */ )
 	{
 		return 'APC';
 	}
