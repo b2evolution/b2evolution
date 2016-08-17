@@ -33,40 +33,6 @@ class gmcode_plugin extends Plugin
 
 
 	/**
-	 * GreyMatter formatting search array
-	 *
-	 * @access private
-	 */
-	var $search = array(
-			'# \*\* (.+?) \*\* #x',                // **bold**
-			'# \\\\ (.+?) \\\\ #x',                // \\italics\\
-			'# (?<!:) \x2f\x2f (.+?) \x2f\x2f #x', // //italics// (not preceded by : as in http://)
-			'# __ (.+?) __ #x',                    // __underline__
-			'/ \#\# (.+?) \#\# /x',                // ##tt##
-			'/ %%
-				( \s*? \n )?      # Eat optional blank line after %%%
-				(.+?)
-				( \n \s*? )?      # Eat optional blank line before %%%
-				%%
-			/sx'                                   // %%codeblock%%
-		);
-
-	/**
-	 * HTML replace array
-	 *
-	 * @access private
-	 */
-	var $replace = array(
-			'<strong>$1</strong>',
-			'<em>$1</em>',
-			'<em>$1</em>',
-			'<span style="text-decoration:underline">$1</span>',
-			'<tt>$1</tt>',
-			'<div class="codeblock"><pre><code>$2</code></pre></div>'
-		);
-
-
-	/**
 	 * Init
 	 */
 	function PluginInit( & $params )
@@ -120,7 +86,32 @@ class gmcode_plugin extends Plugin
 	 */
 	function replace_callback( $text )
 	{
-		return preg_replace( $this->search, $this->replace, $text );
+		// Search array:
+		$search = array(
+				'# \*\* (.+?) \*\* #x',                // **bold**
+				'# \\\\ (.+?) \\\\ #x',                // \\italics\\
+				'# (?<!:) \x2f\x2f (.+?) \x2f\x2f #x', // //italics// (not preceded by : as in http://)
+				'# __ (.+?) __ #x',                    // __underline__
+				'/ \#\# (.+?) \#\# /x',                // ##tt##
+				'/ %%
+					( \s*? \n )?      # Eat optional blank line after %%%
+					(.+?)
+					( \n \s*? )?      # Eat optional blank line before %%%
+					%%
+				/sx'                                   // %%codeblock%%
+			);
+
+		// HTML replace array:
+		$replace = array(
+				'<strong>$1</strong>',
+				'<em>$1</em>',
+				'<em>$1</em>',
+				'<span style="text-decoration:underline">$1</span>',
+				'<tt>$1</tt>',
+				'<div class="codeblock"><pre><code>$2</code></pre></div>'
+			);
+
+		return preg_replace( $search, $replace, $text );
 	}
 
 }
