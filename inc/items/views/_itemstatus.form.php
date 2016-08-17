@@ -53,7 +53,7 @@ else
 }
 
 $Results = new Results( $SQL->get(), 'ityp_' );
-$Results->title = T_('Applicable Post Types');
+$Results->title = T_('Item Types allowed for this Item Status').get_manual_link( 'item-statuses-allowed-per-item-type' );
 $Results->cols[] = array(
 		'th' => T_('ID'),
 		'th_class' => 'shrinkwrap',
@@ -61,16 +61,48 @@ $Results->cols[] = array(
 		'td_class' => 'center'
 	);
 
+function item_status_type_checkbox( $row )
+{
+	$title = $row->ityp_name;
+	$r = '<input type="checkbox"';
+	$r .= ' name="type_'.$row->ityp_ID.'"';
+
+	if( isset( $row->its_pst_ID ) && ! empty( $row->its_pst_ID ) )
+	{
+		$r .= ' checked="checked"';
+	}
+
+	$r .= ' class="checkbox" value="1" title="'.$title.'" />';
+
+	return $r;
+}
+
 $Results->cols[] = array(
-		'th' => T_('Applicable Post Type'),
+		'th' => T_('Allowed Item Type'),
 		'th_class' => 'shrinkwrap',
 		'td' => '%item_status_type_checkbox( {row} )%',
 		'td_class' => 'center'
 	);
 
+function get_name_for_itemtype( $id, $name )
+{
+	global $current_User;
+
+	if( $current_User->check_perm( 'options', 'edit' ) )
+	{ // Not reserved id AND current User has permission to edit the global settings
+		$ret_name = '<a href="'.regenerate_url( 'ctrl,action,ID,pst_ID', 'ctrl=itemtypes&amp;ityp_ID='.$id.'&amp;action=edit' ).'">'.$name.'</a>';
+	}
+	else
+	{
+		$ret_name = $name;
+	}
+
+	return '<strong>'.$ret_name.'</strong>';
+}
+
 $Results->cols[] = array(
 		'th' => T_('Name'),
-		'td' => '$ityp_name$'
+		'td' => '%get_name_for_itemtype( #ityp_ID#, #ityp_name# )%'
 	);
 
 $display_params = array(
@@ -96,21 +128,5 @@ if( $creating )
 else
 {
 	$Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) ) );
-}
-
-function item_status_type_checkbox( $row )
-{
-	$title = $row->ityp_name;
-	$r = '<input type="checkbox"';
-	$r .= ' name="type_'.$row->ityp_ID.'"';
-
-	if( isset( $row->its_pst_ID ) && ! empty( $row->its_pst_ID ) )
-	{
-		$r .= ' checked="checked"';
-	}
-
-	$r .= ' class="checkbox" value="1" title="'.$title.'" />';
-
-	return $r;
 }
 ?>

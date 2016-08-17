@@ -105,6 +105,9 @@ switch( $action )
 			$edited_Itemtype->dbinsert();
 			$Messages->add( T_('New Post Type created.'), 'success' );
 
+			// Update allowed item statuses
+			$edited_Itemtype->update_item_statuses_from_Request();
+
 			// What next?
 			switch( $action )
 			{
@@ -146,6 +149,7 @@ switch( $action )
 			// Update in DB:
 			$DB->begin();
 
+			$edited_Itemtype->update_item_statuses_from_Request();
 			$edited_Itemtype->dbupdate();
 			$Messages->add( T_('Post type updated.'), 'success' );
 

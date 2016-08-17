@@ -74,11 +74,15 @@ class ItemStatus extends DataObject
 		return ! param_errors_detected();
 	}
 
-	function update_item_types()
+
+	/**
+	 * Update item types associated with this item status
+	 */
+	function update_item_types_from_Request()
 	{
 		global $DB;
 
-		$applicable_values = array();
+		$allowed_values = array();
 		$remove_values = array();
 
 		// Item Types
@@ -92,7 +96,7 @@ class ItemStatus extends DataObject
 
 			if( $item_type )
 			{
-				$applicable_values[] = "( $loop_type_ID, $this->ID )";
+				$allowed_values[] = "( $loop_type_ID, $this->ID )";
 			}
 			else
 			{
@@ -100,10 +104,10 @@ class ItemStatus extends DataObject
 			}
 		}
 
-		if( $applicable_values )
+		if( $allowed_values )
 		{
 			$DB->query( 'REPLACE INTO T_items__status_type( its_ityp_ID, its_pst_ID )
-					VALUES '.implode( ', ', $applicable_values ) );
+					VALUES '.implode( ', ', $allowed_values ) );
 		}
 
 		if( $remove_values )

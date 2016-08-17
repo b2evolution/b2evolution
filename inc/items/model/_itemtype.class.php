@@ -671,6 +671,50 @@ class ItemType extends DataObject
 
 		return $item_status_array;
 	}
+
+
+	/**
+	 * Update item statuses associated with this item type
+	 */
+	function update_item_statuses_from_Request()
+	{
+		global $DB;
+
+		$allowed_values = array();
+		$remove_values = array();
+
+		// Item Types
+		$item_status_IDs = param( 'item_status_IDs', 'string', true );
+		$item_status_IDs = explode( ',', $item_status_IDs );
+
+		foreach( $item_status_IDs as $loop_status_ID )
+		{
+			$loop_status_ID = intval( $loop_status_ID );
+			$item_status = param( 'status_'.$loop_status_ID, 'integer', 0 );
+
+			if( $item_status )
+			{
+				$allowed_values[] = "( $this->ID, $loop_status_ID )";
+			}
+			else
+			{
+				$remove_values[] = $loop_status_ID;
+			}
+		}
+
+		if( $allowed_values )
+		{
+			$DB->query( 'REPLACE INTO T_items__status_type( its_ityp_ID, its_pst_ID )
+					VALUES '.implode( ', ', $allowed_values ) );
+		}
+
+		if( $remove_values )
+		{
+			$DB->query( 'DELETE FROM T_items__status_type
+					WHERE its_ityp_ID = '.$this->ID.'
+					AND its_pst_ID IN ('.implode( ',', $remove_values ).')' );
+		}
+	}
 }
 
 ?>
