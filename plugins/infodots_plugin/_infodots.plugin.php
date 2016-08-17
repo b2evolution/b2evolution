@@ -178,7 +178,7 @@ class infodots_plugin extends Plugin
 	 *
 	 * Renders code:
 	 * from [infodot:1234:40:60:20ex]html text[enddot]
-	 * to <div class="infodots_info" id="infodot_1234_1" xy="40:60" style="width:20ex:>html text</div>
+	 * to <div class="infodots_info" id="infodot_1234_1" data-xy="40:60" style="width:20ex:>html text</div>
 	 * This html <div> is hidden by css .infodots_info { display: none; }. 
 	 * This plugin event is called only once to render content.
 	 * This only generates the content divs. The red dots themselves are added later to the evo_image_block divs, in the "RenderItemAttachment" event.
@@ -239,7 +239,7 @@ class infodots_plugin extends Plugin
 	 *
 	 * Renders code:
 	 * from [infodot:1234:40:60:20ex]html text[enddot]
-	 * to <div class="infodots_info" id="infodot_1234_1" xy="40:60" style="width:20ex:>html text</div>
+	 * to <div class="infodots_info" id="infodot_1234_1" data-xy="40:60" style="width:20ex:>html text</div>
 	 * This html <div> is hidden by css .infodots_info { display: none; }. 
 	 * This plugin event is called only once to render content.
 	 * This only generates the content divs. The red dots themselves are added later to the evo_image_block divs, in the "RenderCommentAttachment" event.
@@ -261,7 +261,7 @@ class infodots_plugin extends Plugin
 
 	/**
 	 * Render infodots from like [infodot:1234:40:60:20ex]html text[enddot]
-	 *    to <div class="infodots_info" id="infodot_1234_1" xy="40:60" style="width:20ex:>html text</div>
+	 *    to <div class="infodots_info" id="infodot_1234_1" data-xy="40:60" style="width:20ex:>html text</div>
 	 *
 	 * @param string Object ID: for example, 'itm_123', 'cmt_456'.
 	 * @param string Source content
@@ -350,7 +350,7 @@ class infodots_plugin extends Plugin
 			$tooltip_width = ( strlen( intval( $tooltip_width ) ) == strlen( $tooltip_width ) ? $tooltip_width.'px' : $tooltip_width );
 			$tooltip_width = ' style="width:'.$tooltip_width.'"';
 		}
-		$dot_xy = ' xy="'.$this->dots[ $link_ID ][ $dot_num - 1 ]['x'].':'.$this->dots[ $link_ID ][ $dot_num - 1 ]['y'].'"';
+		$dot_xy = ' data-xy="'.$this->dots[ $link_ID ][ $dot_num - 1 ]['x'].':'.$this->dots[ $link_ID ][ $dot_num - 1 ]['y'].'"';
 
 		$this->dot_numbers[ $link_ID ]++;
 
@@ -383,7 +383,7 @@ class infodots_plugin extends Plugin
 	 *
 	 * Renders code:
 	 * from the before collected array $this->dots
-	 * OR from the prerendered content <div class="infodots_info" id="infodot_1234_1" xy="40:60">html text</div>
+	 * OR from the prerendered content <div class="infodots_info" id="infodot_1234_1" data-xy="40:60">html text</div>
 	 * to <div class="infodots_dot" rel="infodot_1234_1" style="left:40px;top:60px"></div>
 	 *
 	 * @param array Associative array of parameters. $params['File'] - attachment, $params['data'] - output
@@ -420,7 +420,7 @@ class infodots_plugin extends Plugin
 
 		if( ! isset( $this->loaded_objects[ $this->object_ID ] ) )
 		{ // Load the info dots if they were not loaded before:
-			replace_content_outcode( '#<div class="infodots_info" id="infodot_(\d+)_(\d+)" xy="(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)"[^>]*>(.+?)</div>#is', 
+			replace_content_outcode( '#<div class="infodots_info" id="infodot_(\d+)_(\d+)" data-xy="(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)"[^>]*>(.+?)</div>#is', 
 				array( $this, 'load_infodot_from_rendered_content' ), $content, 'replace_content_callback' );
 			$this->loaded_objects[ $this->object_ID ] = 1;
 		}
@@ -449,7 +449,7 @@ class infodots_plugin extends Plugin
 	 *
 	 * Renders the red dots before each image by getting them from array $this->dots if it was initialized during RenderItemAsHtml().
 	 * If RenderItemAsHtml() was not called (which happens if content was already pre-rendered) then the array $this->dots is built by preg_match from prerendered content 
-	 * from hidden div <div class="infodots_info" id="infodot_1234_1" xy="40:60" style="width:20ex:>html text</div>
+	 * from hidden div <div class="infodots_info" id="infodot_1234_1" data-xy="40:60" style="width:20ex:>html text</div>
 	 *
 	 * The dots are rendered as <div class="infodots_image"> <div class="infodots_dot" rel="infodot_1234_1" style="left:40px;top:60px"></div> </div> before attached image.
 	 *
