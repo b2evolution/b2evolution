@@ -25,7 +25,7 @@ class videoplug_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '6.7.5';
+	var $version = '6.7.6';
 	var $number_of_installs = 1;
 
 

@@ -1244,7 +1244,6 @@ class Blog extends DataObject
 
 				if( $this->get( 'access_type' ) == 'absolute' &&
 				    ( $this->get_setting( 'rsc_assets_url_type' ) == 'basic' ||
-				      $this->get_setting( 'media_assets_url_type' ) == 'basic' ||
 				      $this->get_setting( 'skins_assets_url_type' ) == 'basic' ||
 				      $this->get_setting( 'plugins_assets_url_type' ) == 'basic' ) )
 				{	// Display warning for such settings combination:
@@ -1257,11 +1256,6 @@ class Blog extends DataObject
 					{	// If rsc path is relative url:
 						$Messages->add( sprintf( T_('WARNING: your %s and %s assets URL seem to be configured in a potentially undesirable way. Please check your Assets URLs below.'),
 							'<code>/rsc/</code>', '<code>/skins/</code>' ), 'warning' );
-					}
-					if( $this->get_setting( 'media_assets_url_type' ) == 'relative' )
-					{	// If media path is relative url:
-						$Messages->add( sprintf( T_('WARNING: your %s and %s assets URL seem to be configured in a potentially undesirable way. Please check your Assets URLs below.'),
-							'<code>/media/</code>', '<code>/skins/</code>' ), 'warning' );
 					}
 					if( $this->get_setting( 'plugins_assets_url_type' ) == 'relative' )
 					{	// If plugins path is relative url:
