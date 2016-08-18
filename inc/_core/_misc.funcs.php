@@ -8520,4 +8520,73 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 	return $inlines;
 }
+
+function php_to_jquery_date_format( $php_format )
+{
+	$tokens = array(
+			// Day
+			'd' => 'dd',
+			'D' => 'D',
+			'j' => 'd',
+			'l' => 'DD',
+			'N' => '',
+			'S' => '',
+			'w' => '',
+			'z' => 'o',
+			// Week
+			'W' => '',
+			// Month
+			'F' => 'MM',
+			'm' => 'mm',
+			'M' => 'M',
+			'n' => 'm',
+			't' => '',
+			// Year
+			'L' => '',
+			'o' => '',
+			'Y' => 'yy',
+			'y' => 'y',
+			// Time
+			'a' => '',
+			'A' => '',
+			'B' => '',
+			'g' => '',
+			'G' => '',
+			'h' => '',
+			'H' => '',
+			'i' => '',
+			's' => '',
+			'u' => '' );
+
+	$js_format = "";
+	$escaping = false;
+	for( $i = 0; $i < strlen( $php_format ); $i++ )
+	{
+		$char = $php_format[$i];
+		if($char === '\\') // PHP date format escaping character
+		{
+			$i++;
+			if( $escaping ) $js_format .= $php_format[$i];
+			else $js_format .= '\'' . $php_format[$i];
+			$escaping = true;
+		}
+		else
+		{
+			if( $escaping )
+			{
+				$jqueryui_format .= "'"; $escaping = false;
+			}
+			if( isset( $tokens[$char] ) )
+			{
+				$js_format .= $tokens[$char];
+			}
+			else
+			{
+				$js_format .= $char;
+			}
+		}
+	}
+
+	return $js_format;
+}
 ?>

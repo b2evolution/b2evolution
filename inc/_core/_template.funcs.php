@@ -184,8 +184,8 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 
 	$allow_collection_redirect = false;
 
-	if( $external_redirect 
-		&& $allow_redirects_to_different_domain == 'all_collections_and_redirected_posts' 
+	if( $external_redirect
+		&& $allow_redirects_to_different_domain == 'all_collections_and_redirected_posts'
 		&& ! $redirected_post )
 	{ // If a redirect is external and we allow to redirect to all collection domains:
 		global $basehost;
@@ -1513,7 +1513,8 @@ function init_datepicker_js( $relative_to = 'rsc_url' )
 	require_css( '#jqueryUI_css#', $relative_to );
 
 	$datefmt = locale_datefmt();
-	$datefmt = str_replace( array( 'd', 'j', 'm', 'Y' ), array( 'dd', 'd', 'mm', 'yy' ), $datefmt );
+	//$datefmt = str_replace( array( 'd', 'j', 'm', 'Y' ), array( 'dd', 'd', 'mm', 'yy' ), $datefmt );
+	$datefmt = php_to_jquery_date_format( $datefmt );
 	add_js_headline( 'jQuery(document).ready( function(){
 		var monthNames = ["'.T_('January').'","'.T_('February').'", "'.T_('March').'",
 						  "'.T_('April').'", "'.T_('May').'", "'.T_('June').'",

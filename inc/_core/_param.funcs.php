@@ -991,7 +991,7 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 			case "D": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_abbrev"])))).")";
 			case "e": // b2evo extension!
 				return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_letter"])))).")";
-			case "S": return "(st|nd|rd|th)"; // english suffix for day
+			case "S": return "(st|nd|rd|th)?"; // english suffix for day. Made optional as jQuery formatDate does not support this format.
 
 			case "m": return "([0-1]\\d)"; // month, 01-12
 			case "n": return "(1?\\d)"; // month, 1-12
