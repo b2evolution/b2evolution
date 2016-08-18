@@ -197,18 +197,19 @@ function update_urlpreview( baseurl, url_path )
 	{
 		url_path = '';
 	}
-	if( ! baseurl.match( /\/[^\/]+\.[^\/]+$/ ) )
+	if( ! baseurl.match( /\/[^\/]+\.[^\/]+\/$/ ) )
 	{
 		baseurl = baseurl.replace( /\/$/, '' ) + '/';
 	}
 	jQuery( '#urlpreview' ).html( baseurl + url_path );
 
-	baseurl = baseurl.replace( /^(.+\/)([^\/]+\.[^\/]+)?$/, '$1' );
-	baseurl = baseurl.replace( /^(https?:\/\/(.+?)(:.+?)?)\//, '/' );
-	jQuery( '#rsc_assets_url_type_relative' ).html( baseurl + 'rsc/' );
+	var basepath = baseurl.replace( /^(.+\/)([^\/]+\.[^\/]+)?$/, '$1' );
+	basepath = basepath.replace( /^(https?:\/\/(.+?)(:.+?)?)\//i, '/' );
+
 	jQuery( '#media_assets_url_type_relative' ).html( baseurl + 'media/' );
-	jQuery( '#skins_assets_url_type_relative' ).html( baseurl + 'skins/' );
-	jQuery( '#plugins_assets_url_type_relative' ).html( baseurl + 'plugins/' );
+	jQuery( '#rsc_assets_url_type_relative' ).html( basepath + 'rsc/' );
+	jQuery( '#skins_assets_url_type_relative' ).html( basepath + 'skins/' );
+	jQuery( '#plugins_assets_url_type_relative' ).html( basepath + 'plugins/' );
 }
 
 // Update blog url name in several places on the page:
