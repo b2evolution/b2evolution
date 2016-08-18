@@ -372,8 +372,8 @@ class infodots_plugin extends Plugin
 		$this->load_infodot_from_source( array(
 				0 => $matches[0],
 				3 => $matches[1],
-				4 => $matches[3],
-				5 => $matches[4]
+				4 => $matches[4],
+				5 => $matches[5]
 			), true );
 	}
 
@@ -420,7 +420,7 @@ class infodots_plugin extends Plugin
 
 		if( ! isset( $this->loaded_objects[ $this->object_ID ] ) )
 		{ // Load the info dots if they were not loaded before:
-			replace_content_outcode( '#<div class="infodots_info" id="infodot_(\d+)_(\d+)" data-xy="(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)"[^>]*>(.+?)</div>#is', 
+			replace_content_outcode( '#<div class="infodots_info" id="infodot_(\d+)_(\d+)" (data-)?xy="(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)"[^>]*>(.+?)</div>#is', 
 				array( $this, 'load_infodot_from_rendered_content' ), $content, 'replace_content_callback' );
 			$this->loaded_objects[ $this->object_ID ] = 1;
 		}
