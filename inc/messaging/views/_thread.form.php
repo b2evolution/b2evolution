@@ -123,6 +123,16 @@ if( !empty( $message_renderer_checkboxes ) )
 	$Form->info( T_('Text Renderers'), $message_renderer_checkboxes );
 }
 
+// ####################### ATTACHMENTS/LINKS #########################
+if( is_admin_page() && isset( $GLOBALS['files_Module'] )
+	&& $current_User->check_perm( 'files', 'view' ) )
+{	// Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files:
+	load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
+	global $LinkOwner; // Initialize this object as global because this is used in many link functions
+	$LinkOwner = new LinkMessage( $edited_Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
+	display_attachments_fieldset( $Form, $LinkOwner );
+}
+
 global $thrd_recipients_array, $recipients_selected;
 if( !empty( $thrd_recipients_array ) )
 {	// Initialize the preselected users (from post request or when user send a message to own contacts)

@@ -116,7 +116,9 @@ class Message extends DataObject
 	static function get_delete_cascades()
 	{
 		return array(
-				array( 'table'=>'T_messaging__prerendering', 'fk'=>'mspr_msg_ID', 'msg'=>T_('%d prerendered content') )
+				array( 'table'=>'T_messaging__prerendering', 'fk'=>'mspr_msg_ID', 'msg'=>T_('%d prerendered content') ),
+				array( 'table'=>'T_links', 'fk'=>'link_msg_ID', 'msg'=>T_('%d links to destination private messages'),
+						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
 			);
 	}
 
@@ -202,8 +204,6 @@ class Message extends DataObject
 
 	/**
 	 * Link attachments from temporary object to new created Message
-	 *
-	 * @return boolean TRUE on success linking
 	 */
 	function link_from_Request()
 	{
@@ -211,7 +211,7 @@ class Message extends DataObject
 
 		if( $this->ID == 0 )
 		{	// The message must be stored in DB:
-			return false;
+			return;
 		}
 
 		$temp_link_owner_ID = param( 'temp_link_owner_ID', 'integer', 0 );
@@ -219,12 +219,12 @@ class Message extends DataObject
 		$TemporaryIDCache = & get_TemporaryIDCache();
 		if( ! ( $TemporaryID = & $TemporaryIDCache->get_by_ID( $temp_link_owner_ID, false, false ) ) )
 		{	// No temporary object of attachments:
-			return false;
+			return;
 		}
 
 		if( $TemporaryID->type != 'message' )
 		{	// Wrong temporary object:
-			return false;
+			return;
 		}
 
 		// Load all links:
@@ -233,7 +233,7 @@ class Message extends DataObject
 
 		if( empty( $LinkOwner->Links ) )
 		{	// No links:
-			return false;
+			return;
 		}
 
 		// Change link owner from temporary to message object:
@@ -270,6 +270,79 @@ class Message extends DataObject
 
 
 	/**
+	 * Link attachments from other message object to this Message
+	 * Used to copy all links from one to another if new thread is sent to multiple recipients as individual messages
+	 */
+	function link_from_Message( $source_msg_ID )
+	{
+		if( $this->ID == 0 || $source_msg_ID == 0 )
+		{	// Current and source message must be created in DB:
+			return;
+		}
+
+		// Find all matches with inline tags:
+		preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):(\d+)(:?)([^\]]*)\]/i', $this->text, $inlines );
+
+		if( empty( $inlines[0] ) )
+		{	// If content of source message doesn't contain inline tags then we should update a content of current message,
+			// so we do a quick copying of all links from source message to current:
+			global $DB;
+			$DB->query( 'INSERT INTO T_links
+			     ( link_msg_ID,   link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_file_ID, link_ltype_ID, link_position, link_order )
+			SELECT '.$this->ID.', link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_file_ID, link_ltype_ID, link_position, link_order
+			  FROM T_links
+			 WHERE link_msg_ID = '.$source_msg_ID );
+		}
+		else
+		{	// The source message content contains at least one inline tag,
+			// therefore we must update content of current message to update the link IDs of the inline tags
+
+			// Load all links of the source message:
+			$MessageCache = & get_MessageCache();
+			$source_Message = & $MessageCache->get_by_ID( $source_msg_ID, false, false );
+			$source_LinkOwner = new LinkMessage( $source_Message );
+			$source_LinkOwner->load_Links();
+
+			if( empty( $source_LinkOwner->Links ) )
+			{	// No links:
+				return;
+			}
+
+			// Initialize link owner for current message:
+			$this_LinkOwner = new LinkMessage( $this );
+
+			// Store in this array a relation of source link IDs and new copied link IDs of this message:
+			$new_link_IDs = array();
+
+			// Copy each link from source message to current:
+			foreach( $source_LinkOwner->Links as $source_Link )
+			{
+				if( $new_link_ID = $this_LinkOwner->add_link( $source_Link->file_ID, $source_Link->position, $source_Link->order ) )
+				{	// If new link is added then store this in array in order to update the message content for inline tags like [image:123]:
+					$new_link_IDs[ $source_Link->ID ] = $new_link_ID;
+				}
+			}
+
+			// Replace link IDs of source message in inline tags to new inserted Links of current message:
+			$search_inline_tags = array();
+			$replace_inline_tags = array();
+			foreach( $inlines[0] as $i => $inline_tag )
+			{
+				$search_inline_tags[] = $inline_tag;
+				$replace_inline_tags[] = '['.$inlines[1][ $i ].':'
+					.$new_link_IDs[ $inlines[2][ $i ] ] // ID of new Link
+					.$inlines[3][ $i ].$inlines[4][ $i ].']';
+			}
+			$new_message_content = replace_content_outcode( $search_inline_tags, $replace_inline_tags, $this->text, 'replace_content', 'str' );
+
+			// Update message content in DB:
+			$this->set( 'text', $new_message_content );
+			$this->dbupdate();
+		}
+	}
+
+
+	/**
 	 * Get Thread object
 	 */
 	function & get_Thread()
@@ -287,10 +360,11 @@ class Message extends DataObject
 	/**
 	 * Insert discussion (one thread for all recipients)
 	 *
-	 * @param User who sent the message, it must be set only if it is not the current User
-	 * @return true if success, false otherwise
+	 * @param object User who sent the message, it must be set only if it is not the current User
+	 * @param integer Source message ID (used to copy links/attachments from previous message in mode of individual messages for multiple recipients)
+	 * @return boolean|integer ID of inserted message if success, false otherwise
 	 */
-	function dbinsert_discussion( $from_User = NULL )
+	function dbinsert_discussion( $from_User = NULL, $source_msg_ID = NULL )
 	{
 		global $DB;
 
@@ -314,8 +388,17 @@ class Message extends DataObject
 						{
 							$DB->commit();
 
+							if( $source_msg_ID === NULL )
+							{	// Link attachments from temporary object to new created Message:
+								$this->link_from_Request();
+							}
+							else
+							{	// Link attachments from source Message object to this Message:
+								$this->link_from_Message( $source_msg_ID );
+							}
+
 							$this->send_email_notifications( true, $from_User );
-							return true;
+							return $this->ID;
 						}
 					}
 				}
@@ -335,15 +418,24 @@ class Message extends DataObject
 	 */
 	function dbinsert_individual( $from_User = NULL )
 	{
+		$source_msg_ID = NULL;
+
 		foreach( $this->Thread->recipients_list as $recipient_ID )
 		{
 			$message = $this->clone_message( $this );
 
 			$message->Thread->recipients_list = array( $recipient_ID );
 
-			if ( !$message->dbinsert_discussion( $from_User ) )
+			$this_msg_ID = $message->dbinsert_discussion( $from_User, $source_msg_ID );
+			if( ! $this_msg_ID )
 			{
 				return false;
+			}
+
+			if( $source_msg_ID === NULL )
+			{	// Use first message as source for all next messages:
+				// (Used to copy links/attachments from first message all next)
+				$source_msg_ID = $this_msg_ID;
 			}
 		}
 
