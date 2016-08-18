@@ -21,11 +21,12 @@ div.widget_core_coll_related_post_list {
 			background-color: #fafafa;
 			border-radius: 4px;
 		}
+		
 		// With teaser or with excerpt
 		&.evo_withteaser, &.evo_withexcerpt {
 			// Wrapper div
 			.widget_rwd_blocks {
-				//
+			
 				> div {
 					display: inline-block;
 					float: none; // We removed default bootstrap's style here because of the issue with floated divs with uneven heights in multiple rows
@@ -33,7 +34,6 @@ div.widget_core_coll_related_post_list {
 				}
 
 				.widget_rwd_content {
-
 					// Important for limiting the max image size to it's parent's max width
 					.item_first_image img {
 						max-width: 100%;
@@ -368,18 +368,35 @@ div.evo_container__sidebar2 {
 
 // Responsive layout of the post title when no teaser, no excerpt and special placement
 @media (max-width: 1599px) {
-		div.widget_core_coll_item_list,
-		div.widget_core_coll_post_list {
-			&.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
-				font-size: 20px;
-			}
+	div.widget_core_coll_item_list,
+	div.widget_core_coll_post_list {
+		&.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
+			font-size: 20px;
 		}
+	}
 }
 @media (max-width: 1199px) {
-		div.widget_core_coll_item_list,
-		div.widget_core_coll_post_list {
-			&.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
-				font-size: 18px;
-			}
+	div.widget_core_coll_item_list,
+	div.widget_core_coll_post_list {
+		&.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
+			font-size: 18px;
 		}
+	}
+}
+// iPhone 6 Plus sizes;
+// Here placeholder is set to width 100% by default,
+// because we already have predefined placeholder dimensions for specific image formats <380px,
+// so for every image format bigger than 380px on device/browser width <414px, we have full-width placeholder
+@media (max-width: 414px) {
+	div.widget_core_coll_item_list,
+	div.widget_core_coll_featured_posts,
+	div.widget_core_coll_post_list,
+	div.widget_core_coll_page_list,
+	div.widget_core_coll_related_post_list {
+	
+		&.evo_1pic__special ul li .item_first_image_placeholder {
+			height: 290px;
+			width: 100%;
+		}
+	}
 }
