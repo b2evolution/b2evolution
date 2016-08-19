@@ -681,15 +681,15 @@ function get_request_title( $params = array() )
 			$cp = param( 'cp', 'integer', 0 ); // Copy post from Front-office
 			if( $action == 'edit_switchtab' || $p > 0 || $post_ID > 0 )
 			{	// Edit post
-				$title = sprintf( T_('Edit %s'), $type_name );
+				$title = sprintf( T_('Edit [%s]'), $type_name );
 			}
 			else if( $cp > 0 )
 			{	// Copy post
-				$title = sprintf( T_('Duplicate %s'), $type_name );
+				$title = sprintf( T_('Duplicate [%s]'), $type_name );
 			}
 			else
 			{	// Create post
-				$title = sprintf( T_('New %s'), $type_name );
+				$title = sprintf( T_('New [%s]'), $type_name );
 			}
 			if( $params['display_edit_links'] && $params['auto_pilot'] != 'seo_title' )
 			{ // Add advanced edit and close icon
