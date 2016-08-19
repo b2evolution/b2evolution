@@ -2841,7 +2841,7 @@ class Item extends ItemLight
 
 			$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $params, true );
 			if( count( $r_params ) != 0 && isset( $r_params['plugin_ID'] ) )
-			{ // Render attachments by plugin, Append the html content to $params['data'] and to $r
+			{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
 				if( ! $params['get_rendered_attachments'] )
 				{ // Restore $r value and mark this item has the rendered attachments
 					$r = $temp_r;
@@ -3052,7 +3052,7 @@ class Item extends ItemLight
 
 			$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $params, true );
 			if( count( $r_params ) != 0 && isset( $r_params['plugin_ID'] ) )
-			{
+			{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
 				continue;
 			}
 
@@ -7509,7 +7509,7 @@ class Item extends ItemLight
 							// or else modifications to the params are not applied in PHP7
 							$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_image_params, true );
 							if( count( $r_params ) != 0 && isset( $r_params['plugin_ID'] ) )
-							{	// Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r
+							{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
 								if( ! $r_params['get_rendered_attachments'] )
 								{ // Restore $r value and mark this item has the rendered attachments
 									$r = $temp_r;
@@ -7593,7 +7593,7 @@ class Item extends ItemLight
 							// or else modifications to the params are not applied in PHP7
 							$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_video_params );
 							if( count( $r_params ) != 0 )
-							{
+							{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
 								$link_tag = $r_params['data'];
 							}
 							else

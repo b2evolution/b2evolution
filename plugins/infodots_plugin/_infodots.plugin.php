@@ -472,8 +472,8 @@ class infodots_plugin extends Plugin
 		// Render dots
 		$this->render_infodots( $params, $Item->get_prerendered_content( 'htmlbody' ) );
 
-		// Plugin just modifies the params and doesn't touch/render a real object
-		// So return FALSE here everytime to don't rewrite the real object
+		// Plugin only adds data to $params['before_image?] but doesn?t actually display the image.
+		// So, return false to communicate we do NOT display the image, so that the core will take care of displaying the image:
 		return false;
 	}
 

@@ -2794,7 +2794,7 @@ class Comment extends DataObject
 
 			$r_params = $Plugins->trigger_event_first_true( 'RenderCommentAttachment', $params, true );
 			if( count( $r_params ) != 0 && isset( $r_params['plugin_ID'] ) )
-			{ // File was processed by plugin
+			{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
 				if( $link_position == 'teaser' )
 				{ // Image should be displayed above content
 					$images_above_content .= $r;
