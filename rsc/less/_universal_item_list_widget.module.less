@@ -286,3 +286,17 @@ div.evo_container__sidebar2 {
 		}
 	}
 }
+// Here placeholder's max-width is set to 290px (plus bootstraps 15px paddings each side = 320px, which is min size we want to target), because we want to prevent placeholders from exceeding the parent div
+@media (max-width: 414px) {
+	div.widget_core_coll_item_list,
+	div.widget_core_coll_featured_posts,
+	div.widget_core_coll_post_list,
+	div.widget_core_coll_page_list,
+	div.widget_core_coll_related_post_list {
+	
+		&.evo_1pic__special ul li .item_first_image_placeholder {
+			max-width: 290px;
+			max-height: 290px;
+		}
+	}
+}
