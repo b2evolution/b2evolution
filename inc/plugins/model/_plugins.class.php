@@ -857,6 +857,7 @@ class Plugins
 	 * @param array Associative array of parameters for the Plugin
 	 * @param boolean TRUE to force to return params even if plugin method doesn't return true,
 	 *                i.e. it doesn't touch/render real object, such plugin only modify the params, for example "Info dots renderer" plugin
+// TODO: fp>yura: revert this because it's a temporary hack.
 	 * @return array The (modified) params array with key "plugin_ID" set to the last called plugin;
 	 *               Empty array if no Plugin returned true or no Plugin has this event registered.
 	 */
