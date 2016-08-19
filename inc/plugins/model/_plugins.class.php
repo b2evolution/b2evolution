@@ -855,10 +855,12 @@ class Plugins
 	 *
 	 * @param string event name, see {@link Plugins_admin::get_supported_events()}
 	 * @param array Associative array of parameters for the Plugin
+	 * @param boolean TRUE to force to return params even if plugin method doesn't return true,
+	 *                i.e. it doesn't touch/render real object, such plugin only modify the params, for example "Info dots renderer" plugin
 	 * @return array The (modified) params array with key "plugin_ID" set to the last called plugin;
 	 *               Empty array if no Plugin returned true or no Plugin has this event registered.
 	 */
-	function trigger_event_first_true( $event, $params = NULL )
+	function trigger_event_first_true( $event, $params = NULL, $return_params = false )
 	{
 		global $Debuglog;
 
@@ -881,7 +883,15 @@ class Plugins
 				return $params;
 			}
 		}
-		return array();
+
+		if( $return_params )
+		{	// Force to return the updated params:
+			return $params;
+		}
+		else
+		{	// Return empty array:
+			return array();
+		}
 	}
 
 

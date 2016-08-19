@@ -2839,7 +2839,8 @@ class Item extends ItemLight
 				$params[ $param_key ] = & $params[ $param_key ];
 			}
 
-			if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $params ) ) != 0 )
+			$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $params, true );
+			if( count( $r_params ) != 0 && isset( $r_params['plugin_ID'] ) )
 			{ // Render attachments by plugin, Append the html content to $params['data'] and to $r
 				if( ! $params['get_rendered_attachments'] )
 				{ // Restore $r value and mark this item has the rendered attachments
@@ -2848,6 +2849,9 @@ class Item extends ItemLight
 				}
 				continue;
 			}
+
+			// Update params because they may be modified by some plugin above:
+			$params = $r_params;
 
 			if( ! $File->is_image() )
 			{ // Skip anything that is not an image
@@ -3046,10 +3050,14 @@ class Item extends ItemLight
 				$params[ $param_key ] = & $params[ $param_key ];
 			}
 
-			if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $params ) ) != 0 )
+			$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $params, true );
+			if( count( $r_params ) != 0 && isset( $r_params['plugin_ID'] ) )
 			{
 				continue;
 			}
+
+			// Update params because they may be modified by some plugin above:
+			$params = $r_params;
 
 			if( $File->is_image() )
 			{ // Skip images because these are displayed inline already
@@ -7499,8 +7507,8 @@ class Item extends ItemLight
 
 							// We need to assign the result of trigger_event_first_true to a variable before counting
 							// or else modifications to the params are not applied in PHP7
-							$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_image_params );
-							if( count( $r_params ) != 0 )
+							$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $current_image_params, true );
+							if( count( $r_params ) != 0 && isset( $r_params['plugin_ID'] ) )
 							{	// Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r
 								if( ! $r_params['get_rendered_attachments'] )
 								{ // Restore $r value and mark this item has the rendered attachments
@@ -7509,6 +7517,9 @@ class Item extends ItemLight
 								}
 								continue;
 							}
+
+							// Update params because they may be modified by some plugin above:
+							$current_image_params = $r_params;
 
 							if( $inline_type == 'image' )
 							{ // Generate the IMG tag with all the alt, title and desc if available
