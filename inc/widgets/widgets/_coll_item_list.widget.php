@@ -340,12 +340,30 @@ class coll_item_list_Widget extends ComponentWidget
 			echo $this->disp_params['block_end'];
 			return;
 		}
+		
+		// @var $placeholder_dimension is empty by default
+		$placeholder_dimension = '';
+		if( $this->disp_params['attached_pics'] != 'none' && 		// If "Display first image"
+		    $this->disp_params['disp_first_image'] == 'special' &&  // If "Special image placement"
+			$this->disp_params['layout'] == 'list' )				// If "List layout"
+		/**
+		 * Create placeholder dimension from selected thumb_size param
+		 */
+		{
+			// Selected image format is converted to string in format: i.e. '80 80'
+			preg_match_all('!\d+!', $this->disp_params['thumb_size'], $placeholder_dimensions);
+			// Implode "," to string: '80,80' and handle it as list in format '$ph_width,$ph_height'
+			// Since we want placeholders to be squares and we have rectangle image sizes (i.e. fit-160x120), we use $ph_width for both placeholder height and width
+			list($ph_width, $ph_height) = explode(',', implode(',', $placeholder_dimensions[0]));
+			
+			$placeholder_dimension = 'style="width:' . $ph_width . 'px;height:' . $ph_width . 'px"';
+		}
 
 		// Define default template params that can be rewritten by skin
 		$this->disp_params = array_merge( array(
 				'item_first_image_before'      => '<div class="item_first_image">',
 				'item_first_image_after'       => '</div>',
-				'item_first_image_placeholder' => '<div class="item_first_image_placeholder"><a href="$item_permaurl$"></a></div>',
+				'item_first_image_placeholder' => '<div class="item_first_image_placeholder" ' . $placeholder_dimension . '><a href="$item_permaurl$"></a></div>',
 				'item_title_before'            => '<div class="item_title">',
 				'item_title_after'             => '</div>',
 				'item_title_single_before'     => '',

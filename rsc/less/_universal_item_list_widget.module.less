@@ -75,10 +75,12 @@ div.widget_core_coll_related_post_list {
 				vertical-align: middle;
 				// Placeholder when "Display first picture" selected, but no picture to show
 				.item_first_image_placeholder {
-					display: block;
+					display: table;
 					float: left;
-					height: 80px;
-					width: 80px;
+					// height: 80px;
+					// width: 80px;
+					max-width: 380px;
+					max-height: 380px;
 					background: @placeholder-background-color;
 					margin-right: 6px;
 					-webkit-border-radius: 3px;
@@ -88,12 +90,12 @@ div.widget_core_coll_related_post_list {
 					border-radius: 3px;
 					&:before {
 						font-family: FontAwesome;
-						display: block;
+						display: table-cell;
 						content: '\f0f6';
 						color: @placeholder-icon-color;
 						font-size: 40px;
-						margin-top: 12px;
-						margin-left: 23px;
+						vertical-align: middle;
+						text-align: center;
 					}
 				}
 				// Post title (when special placement selected)
@@ -269,18 +271,18 @@ div.evo_container__sidebar2 {
 
 // Responsive layout of the post title when no teaser, no excerpt and special placement
 @media (max-width: 1599px) {
-		div.widget_core_coll_item_list,
-		div.widget_core_coll_post_list {
-			&.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
-				font-size: 20px;
-			}
+	div.widget_core_coll_item_list,
+	div.widget_core_coll_post_list {
+		&.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
+			font-size: 20px;
 		}
+	}
 }
 @media (max-width: 1199px) {
-		div.widget_core_coll_item_list,
-		div.widget_core_coll_post_list {
-			&.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
-				font-size: 18px;
-			}
+	div.widget_core_coll_item_list,
+	div.widget_core_coll_post_list {
+		&.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
+			font-size: 18px;
 		}
+	}
 }
