@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2016-08-19 23:09+0200\n"
+"POT-Creation-Date: 2016-08-19 23:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3270,6 +3270,8 @@ msgid "Duplicate [%s]"
 msgstr ""
 
 #: ../../../inc/_core/_template.funcs.php:692
+#: ../../../inc/collections/collections.ctrl.php:99 ../inc/items/items.ctrl.php:512
+#: ../../../inc/skins/views/_coll_sel_skin.view.php:22
 #, php-format
 msgid "New [%s]"
 msgstr ""
@@ -5621,7 +5623,7 @@ msgid "New users automatically get a new blog"
 msgstr ""
 
 #: ../../../inc/collections/_collections.init.php:504
-msgid "Maximum number of blogs allowed"
+msgid "Maximum number of collections allowed"
 msgstr ""
 
 #: ../../../inc/collections/_collections.init.php:510
@@ -6049,12 +6051,6 @@ msgstr ""
 #: ../../../inc/collections/views/_coll_general.form.php:32
 #, php-format
 msgid "New \"%s\" collection"
-msgstr ""
-
-#: ../../../inc/collections/collections.ctrl.php:99 ../inc/items/items.ctrl.php:512
-#: ../../../inc/skins/views/_coll_sel_skin.view.php:22
-#, php-format
-msgid "New %s"
 msgstr ""
 
 #: ../../../inc/collections/collections.ctrl.php:150
