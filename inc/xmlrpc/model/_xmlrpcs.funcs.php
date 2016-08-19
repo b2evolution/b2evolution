@@ -1060,7 +1060,7 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 		if( !empty($author) && ( $block = antispam_check( $author ) ) )
 		{
 			// Log incident in system log
-			syslog_insert( sprintf( T_('Antispam: Supplied name "%s" contains blacklisted word "%s".'), $author, $block ), 'error', 'comment', $commented_Item->ID );
+			syslog_insert( sprintf( 'Antispam: Supplied name "%s" contains blacklisted word "%s".', $author, $block ), 'error', 'comment', $commented_Item->ID );
 			return xmlrpcs_resperror( 5, T_('Supplied name is invalid.') );
 		}
 
@@ -1068,7 +1068,7 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 			&& ( !is_email($email)|| ( $block = antispam_check( $email ) ) ) )
 		{
 			// Log incident in system log
-			syslog_insert( sprintf( T_('Antispam: Supplied email address "%s" contains blacklisted word "%s".'), $email, $block ), 'error', 'comment', $commented_Item->ID );
+			syslog_insert( sprintf( 'Antispam: Supplied email address "%s" contains blacklisted word "%s".', $email, $block ), 'error', 'comment', $commented_Item->ID );
 			return xmlrpcs_resperror( 5, T_('Supplied email address is invalid.') );
 		}
 

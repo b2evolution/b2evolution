@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2016-08-19 22:15+0200\n"
+"POT-Creation-Date: 2016-08-19 23:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1054,19 +1054,8 @@ msgstr ""
 msgid "Please fill in your email."
 msgstr ""
 
-#: ../../../htsrv/comment_post.php:191 ../inc/xmlrpc/model/_xmlrpcs.funcs.php:1063
-#, php-format
-msgid "Antispam: Supplied name \"%s\" contains blacklisted word \"%s\"."
-msgstr ""
-
 #: ../../../htsrv/comment_post.php:193 ../inc/xmlrpc/model/_xmlrpcs.funcs.php:1064
 msgid "Supplied name is invalid."
-msgstr ""
-
-#: ../../../htsrv/comment_post.php:200 ../htsrv/message_send.php:158
-#: ../../../inc/xmlrpc/model/_xmlrpcs.funcs.php:1071
-#, php-format
-msgid "Antispam: Supplied email address \"%s\" contains blacklisted word \"%s\"."
 msgstr ""
 
 #: ../../../htsrv/comment_post.php:202 ../htsrv/message_send.php:160
@@ -1403,11 +1392,6 @@ msgstr ""
 
 #: ../../../htsrv/message_send.php:83
 msgid "Please do not send empty messages."
-msgstr ""
-
-#: ../../../htsrv/message_send.php:88
-#, php-format
-msgid "Antispam: Supplied message is invalid / appears to be spam. Message contains blacklisted word \"%s\"."
 msgstr ""
 
 #: ../../../htsrv/message_send.php:90
@@ -3034,11 +3018,6 @@ msgstr ""
 msgid "Please select a gender."
 msgstr ""
 
-#: ../../../inc/_core/_param.funcs.php:2339
-#, php-format
-msgid "Antispam: Illegal content found. Content contains blacklisted word \"%s\"."
-msgstr ""
-
 #: ../../../inc/_core/_param.funcs.php:2347
 msgid "Illegal content found (spam?)"
 msgstr ""
@@ -3282,19 +3261,17 @@ msgstr ""
 
 #: ../../../inc/_core/_template.funcs.php:684
 #, php-format
-msgid "Edit %s"
+msgid "Edit [%s]"
 msgstr ""
 
-#: ../../../inc/_core/_template.funcs.php:688 ../inc/items/items.ctrl.php:567
+#: ../../../inc/_core/_template.funcs.php:688
 #, php-format
-msgid "Duplicate %s"
+msgid "Duplicate [%s]"
 msgstr ""
 
 #: ../../../inc/_core/_template.funcs.php:692
-#: ../../../inc/collections/collections.ctrl.php:99 ../inc/items/items.ctrl.php:512
-#: ../../../inc/skins/views/_coll_sel_skin.view.php:22
 #, php-format
-msgid "New %s"
+msgid "New [%s]"
 msgstr ""
 
 #: ../../../inc/_core/_template.funcs.php:717 ../inc/_core/_template.funcs.php:746
@@ -3746,11 +3723,6 @@ msgstr ""
 
 #: ../../../inc/_core/_url.funcs.php:162
 msgid "URL must be a full path starting with \"/\" or an anchor starting with \"#\"."
-msgstr ""
-
-#: ../../../inc/_core/_url.funcs.php:171
-#, php-format
-msgid "Antispam: URL \"%s\" not allowed. The URL contains blacklisted word \"%s\"."
 msgstr ""
 
 #: ../../../inc/_core/_url.funcs.php:174
@@ -6077,6 +6049,12 @@ msgstr ""
 #: ../../../inc/collections/views/_coll_general.form.php:32
 #, php-format
 msgid "New \"%s\" collection"
+msgstr ""
+
+#: ../../../inc/collections/collections.ctrl.php:99 ../inc/items/items.ctrl.php:512
+#: ../../../inc/skins/views/_coll_sel_skin.view.php:22
+#, php-format
+msgid "New %s"
 msgstr ""
 
 #: ../../../inc/collections/collections.ctrl.php:150
@@ -12434,11 +12412,6 @@ msgstr ""
 msgid "%s could not be resized to target resolution of %dx%d pixels."
 msgstr ""
 
-#: ../../../inc/files/model/_file.funcs.php:1714
-#, php-format
-msgid "User %s has uploaded the file %s -- Size: %s"
-msgstr ""
-
 #: ../../../inc/files/model/_file.funcs.php:1957
 #: ../../../inc/widgets/widgets/_image.widget.php:53
 #: ../../../plugins/markdown_plugin/_markdown.plugin.php:429
@@ -13924,6 +13897,11 @@ msgstr ""
 #: ../../../inc/items/items.ctrl.php:362
 #, php-format
 msgid "&laquo;%s&raquo; couldn't be posted."
+msgstr ""
+
+#: ../../../inc/items/items.ctrl.php:567
+#, php-format
+msgid "Duplicate %s"
 msgstr ""
 
 #: ../../../inc/items/items.ctrl.php:610 ../inc/items/items.ctrl.php:707
@@ -17927,11 +17905,6 @@ msgstr ""
 #: ../../../inc/messaging/model/_message.class.php:672
 #, php-format
 msgid "%s cannot be notified of this new message because we have no default messaging collection and %s has no access to the backoffice."
-msgstr ""
-
-#: ../../../inc/messaging/model/_message.class.php:673
-#, php-format
-msgid "%s cannot be notified for new/pending private messages because we have no default messaging collection and %s has no access to the backoffice."
 msgstr ""
 
 #: ../../../inc/messaging/model/_messaging.funcs.php:180
@@ -24583,11 +24556,6 @@ msgstr ""
 #: ../../../inc/users/model/_user.class.php:6365
 #, php-format
 msgid "You are already a member of \"%s\"."
-msgstr ""
-
-#: ../../../inc/users/model/_user.funcs.php:28
-#, php-format
-msgid "User %s was created"
 msgstr ""
 
 #: ../../../inc/users/model/_user.funcs.php:127

@@ -85,7 +85,7 @@ if( empty( $message ) )
 elseif( $antispam_on_message_form && ( $block = antispam_check( $message ) ) )
 { // a blacklisted keyword has been found in the message:
 	// Log incident in system log
-	syslog_insert( sprintf( T_('Antispam: Supplied message is invalid / appears to be spam. Message contains blacklisted word "%s".'), $block ), 'error' );
+	syslog_insert( sprintf( 'Antispam: Supplied message is invalid / appears to be spam. Message contains blacklisted word "%s".', $block ), 'error' );
 
 	$Messages->add( T_('The supplied message is invalid / appears to be spam.'), 'error' );
 }
@@ -155,7 +155,7 @@ if( empty($sender_address) )
 elseif( !is_email($sender_address) || ( $block = antispam_check( $sender_address ) ) ) // TODO: dh> using antispam_check() here might not allow valid users to contact the admin in case of problems due to the antispam list itself.. :/
 {
 	// Log incident in system log
-	syslog_insert( sprintf( T_('Antispam: Supplied email address "%s" contains blacklisted word "%s".'), $sender_address, $block ), 'error' );
+	syslog_insert( sprintf( 'Antispam: Supplied email address "%s" contains blacklisted word "%s".', $sender_address, $block ), 'error' );
 
 	$Messages->add( T_('Supplied email address is invalid.'), 'error' );
 }
