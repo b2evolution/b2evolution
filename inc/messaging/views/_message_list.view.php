@@ -160,7 +160,7 @@ if( $action == 'preview' )
 		'.$current_User->ID.' AS msg_user_ID, '.$DB->quote( $current_User->login ).' AS msg_author,
 		'.$DB->quote( $current_User->firstname ).' AS msg_firstname, '.$DB->quote( $current_User->lastname ).' AS msg_lastname,
 		'.$DB->quote( $current_User->avatar_file_ID ).' AS msg_user_avatar_ID,
-		'.$DB->quote( '<b>'.T_('PREVIEW').':</b><br /> '.$edited_Message->get_prerendered_content() ).' AS msg_text, '.$DB->quote( $edited_Message->renderers ).' AS msg_renderers,
+		'.$DB->quote( $edited_Message->text ).' AS msg_text, '.$DB->quote( $edited_Message->renderers ).' AS msg_renderers,
 		'.$DB->quote( $edited_Thread->title ).' AS thread_title
 	)
 	UNION
@@ -213,7 +213,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Message'),
 		'td_class' => 'left top message_text',
-		'td' => '%col_msg_format_text( #msg_ID#, #msg_text# )%',
+		'td' => '@get_content()@@get_images()@@get_files()@',
 	);
 /**
  * Read?:

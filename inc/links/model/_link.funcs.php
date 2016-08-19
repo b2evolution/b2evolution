@@ -166,7 +166,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 	if( $current_User->check_perm( 'files', 'view' )
 		&& $LinkOwner->check_perm( 'edit', false ) )
 	{ // Check that we have permission to edit owner:
-		$attach_files_url = $admin_url.'?ctrl=files&amp;fm_mode=link_object&amp;link_type=item&amp;link_object_ID='.$LinkOwner->get_ID();
+		$attach_files_url = $admin_url.'?ctrl=files&amp;fm_mode=link_object&amp;link_type='.$LinkOwner->type.( $LinkOwner->type != 'message' ? '&amp;link_object_ID='.$LinkOwner->get_ID() : '' );
 		if( $linkowner_FileList = $LinkOwner->get_attachment_FileList( 1 ) )
 		{	// Get first file of the Link Owner:
 			$linkowner_File = & $linkowner_FileList->get_next();

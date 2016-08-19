@@ -2288,41 +2288,6 @@ function col_msg_author( $user_ID, $datetime )
 
 
 /**
- * Get formatted message text
- *
- * @param integer Message ID
- * @param string Thread title
- * @return string Formatted message text
- */
-function col_msg_format_text( $msg_ID, $msg_text )
-{
-	$MessageCache = & get_MessageCache();
-	if( $Message = & $MessageCache->get_by_ID( $msg_ID, false, false ) )
-	{ // Get the prerendered content
-		$msg_text = $Message->get_content();
-	}
-
-	if( empty( $msg_text ) )
-	{
-		return format_to_output( $msg_text, 'htmlspecialchars' );
-	}
-
-	/**** yura> This below code is moved to the Plugins and to $Message->get_content() :
-
-	// WARNING: the messages may contain MALICIOUS HTML and javascript snippets. They must ALWAYS be ESCAPED prior to display!
-	$msg_text = htmlentities( $msg_text, ENT_COMPAT, $evo_charset );
-
-	$msg_text = make_clickable( $msg_text );
-	$msg_text = preg_replace( '#<a #i', '<a rel="nofollow" target="_blank"', $msg_text );
-	$msg_text = nl2br( $msg_text );
-
-	****/
-
-	return $msg_text;
-}
-
-
-/**
  * Get authors list to display who already had read current message
  *
  * @param integer Message ID
