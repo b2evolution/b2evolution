@@ -74,11 +74,15 @@ function & get_link_owner( $link_type, $object_ID )
 			switch( $TemporaryID->get( 'type' ) )
 			{
 				case 'message':
-					$LinkOwner = new LinkMessage( NULL, $object_ID );
+					$LinkOwner = new LinkMessage( new Message(), $object_ID );
+					break;
+
+				case 'item':
+					$LinkOwner = new LinkItem( new Item(), $object_ID );
 					break;
 			}
+			$LinkOwner->tmp_ID = $object_ID;
 			$LinkOwner->type = 'temporary';
-			$LinkOwner->is_temp = true;
 			break;
 
 		default:
@@ -101,7 +105,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 	global $admin_url, $AdminUI;
 	global $current_User, $action;
 
-	if( $LinkOwner->type == 'item' && ! $LinkOwner->is_temp && ! $LinkOwner->Item->get_type_setting( 'allow_attachments' ) )
+	if( $LinkOwner->type == 'item' && ! $LinkOwner->is_temp() && ! $LinkOwner->Item->get_type_setting( 'allow_attachments' ) )
 	{ // Attachments are not allowed for current post type
 		return;
 	}
@@ -115,7 +119,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 	switch( $LinkOwner->type )
 	{
 		case 'item':
-			$window_title = $LinkOwner->is_temp ? '' : format_to_js( sprintf( T_('Attach files to "%s"'), $LinkOwner->Item->get( 'title' ) ) );
+			$window_title = $LinkOwner->is_temp() ? '' : format_to_js( sprintf( T_('Attach files to "%s"'), $LinkOwner->Item->get( 'title' ) ) );
 			$form_id = 'itemform_links';
 			break;
 

@@ -140,7 +140,7 @@ switch( $LinkOwner->type )
 {
 	case 'item':
 		$upload_fileroot = FileRoot::gen_ID( 'collection', $Blog->ID );
-		$upload_path = '/quick-uploads/p'.$LinkOwner->get_ID().'/';
+		$upload_path = '/quick-uploads/'.( $LinkOwner->is_temp() ? 'tmp' : 'p' ).$LinkOwner->get_ID().'/';
 		break;
 
 	case 'comment':
@@ -155,7 +155,7 @@ switch( $LinkOwner->type )
 
 	case 'message':
 		$upload_fileroot = FileRoot::gen_ID( 'user', $current_User->ID );
-		$upload_path = '/private_message/'.( $LinkOwner->is_temp ? 'tmp' : 'pm' ).$LinkOwner->get_ID().'/';
+		$upload_path = '/private_message/'.( $LinkOwner->is_temp() ? 'tmp' : 'pm' ).$LinkOwner->get_ID().'/';
 		break;
 }
 

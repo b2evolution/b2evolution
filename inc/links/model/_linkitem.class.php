@@ -27,11 +27,14 @@ class LinkItem extends LinkOwner
 
 	/**
 	 * Constructor
+	 *
+	 * @param object Item
+	 * @param integer ID of temporary object from table T_temporary_ID (Used to link files to new creating item)
 	 */
-	function __construct( $Item )
+	function __construct( $Item, $tmp_ID = NULL )
 	{
 		// call parent contsructor
-		parent::__construct( $Item, 'item', 'itm_ID' );
+		parent::__construct( $Item, 'item', 'itm_ID', $tmp_ID );
 		$this->Item = & $this->link_Object;
 
 		$this->_trans = array(
@@ -56,7 +59,16 @@ class LinkItem extends LinkOwner
 	function check_perm( $permlevel, $assert = false )
 	{
 		global $current_User;
-		return $current_User->check_perm( 'item_post!CURSTATUS', $permlevel, $assert, $this->Item );
+
+		if( $this->is_temp() )
+		{	// Check permission for new creating item:
+			global $blog;
+			return $current_User->check_perm( 'blog_post_statuses', 'edit', false, $blog );
+		}
+		else
+		{	// Check permission for existing item in DB:
+			return $current_User->check_perm( 'item_post!CURSTATUS', $permlevel, $assert, $this->Item );
+		}
 	}
 
 	/**
@@ -143,7 +155,14 @@ class LinkItem extends LinkOwner
 		if( is_null( $this->Links ) )
 		{ // Links have not been loaded yet:
 			$LinkCache = & get_LinkCache();
-			$this->Links = $LinkCache->get_by_item_ID( $this->Item->ID );
+			if( $this->is_temp() )
+			{
+				$this->Links = $LinkCache->get_by_temporary_ID( $this->get_ID() );
+			}
+			else
+			{
+				$this->Links = $LinkCache->get_by_item_ID( $this->Item->ID );
+			}
 		}
 	}
 
@@ -170,8 +189,10 @@ class LinkItem extends LinkOwner
 		$edited_Link->set( 'order', $order );
 		if( $edited_Link->dbinsert() )
 		{
-			// New link was added to the item, invalidate blog's media BlockCache
-			BlockCache::invalidate_key( 'media_coll_ID', $this->Item->get_blog_ID() );
+			if( ! $this->is_temp() )
+			{	// New link was added to the item, invalidate blog's media BlockCache:
+				BlockCache::invalidate_key( 'media_coll_ID', $this->Item->get_blog_ID() );
+			}
 
 			$FileCache = & get_FileCache();
 			$File = $FileCache->get_by_ID( $file_ID, false, false );
@@ -179,8 +200,8 @@ class LinkItem extends LinkOwner
 			$file_dir = $File->dir_or_file();
 			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s',  ucfirst( $file_dir ), '[['.$file_name.']]', $this->type, $this->get_ID() ), 'info', 'file', $file_ID );
 
-			if( $update_owner )
-			{ // Update last touched date of the Item
+			if( ! $this->is_temp() && $update_owner )
+			{	// Update last touched date of the Item:
 				$this->update_last_touched_date();
 			}
 
@@ -226,8 +247,16 @@ class LinkItem extends LinkOwner
 	 */
 	function get_edit_url()
 	{
-		$this->load_Blog();
-		return '?ctrl=items&amp;blog='.$this->Blog->ID.'&amp;action=edit&amp;p='.$this->Item->ID;
+		if( $this->is_temp() )
+		{
+			global $Blog;
+			return '?ctrl=items&amp;blog='.$Blog->ID.'&amp;action=new';
+		}
+		else
+		{
+			$this->load_Blog();
+			return '?ctrl=items&amp;blog='.$this->Blog->ID.'&amp;action=edit&amp;p='.$this->Item->ID;
+		}
 	}
 
 	/**
@@ -245,7 +274,7 @@ class LinkItem extends LinkOwner
 	 */
 	function update_last_touched_date()
 	{
-		if( !empty( $this->Item ) )
+		if( ! empty( $this->Item ) && ! $this->is_temp() )
 		{	// Update Item if it exists
 			$this->Item->update_last_touched_date();
 		}
@@ -274,8 +303,10 @@ class LinkItem extends LinkOwner
 			}
 		}
 
-		// Update last touched date of the Item
-		$this->update_last_touched_date();
+		if( ! $this->is_temp() )
+		{	// Update last touched date of the Item
+			$this->update_last_touched_date();
+		}
 	}
 }
 

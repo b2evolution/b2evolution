@@ -2264,7 +2264,7 @@ function display_dragdrop_upload_button( $params = array() )
 
 	echo $params['before'];
 
-	if( $params['LinkOwner'] !== NULL && $params['LinkOwner']->is_temp )
+	if( $params['LinkOwner'] !== NULL && $params['LinkOwner']->is_temp() )
 	{	// Use this field to know a form is submitted with temporary link owner(when object is creating and still doesn't exist in DB):
 		echo '<input type="hidden" name="temp_link_owner_ID" value="'.$params['LinkOwner']->get_ID().'" />';
 	}
@@ -2301,8 +2301,7 @@ function display_dragdrop_upload_button( $params = array() )
 		<?php
 		if( $params['LinkOwner'] !== NULL )
 		{	// Add params to link a file right after uploading:
-			$link_owner_type = $params['LinkOwner']->type;
-			echo 'url += "&link_owner='.$link_owner_type.'_'.$params['LinkOwner']->get_ID().'"';
+			echo 'url += "&link_owner='.$params['LinkOwner']->type.'_'.$params['LinkOwner']->get_ID().'_'.intval( $params['LinkOwner']->is_temp() ).'"';
 		}
 		?>
 

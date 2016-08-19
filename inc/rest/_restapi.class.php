@@ -1861,7 +1861,7 @@ class RestApi
 
 		if( $link_File = & $deleted_Link->get_File() )
 		{
-			syslog_insert( sprintf( 'File %s was unlinked from %s with ID=%s', '[['.$link_File->get_name().']]', $LinkOwner->type, $LinkOwner->link_Object->ID ), 'info', 'file', $link_File->ID );
+			syslog_insert( sprintf( 'File %s was unlinked from %s with ID=%s', '[['.$link_File->get_name().']]', $LinkOwner->type, $LinkOwner->get_ID() ), 'info', 'file', $link_File->ID );
 		}
 
 		if( $action == 'delete' && $deleted_Link->can_be_file_deleted() )
