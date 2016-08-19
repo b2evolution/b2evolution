@@ -879,6 +879,7 @@ class Plugins
 			if( $r === true )
 			{
 				$Debuglog->add( 'Plugin ID '.$l_plugin_ID.' returned true!', 'plugins' );
+				// Save the ID of the plugin which returned true:
 				$params['plugin_ID'] = & $l_plugin_ID;
 				return $params;
 			}
