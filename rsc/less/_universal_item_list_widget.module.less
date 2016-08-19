@@ -21,11 +21,12 @@ div.widget_core_coll_related_post_list {
 			background-color: #fafafa;
 			border-radius: 4px;
 		}
+		
 		// With teaser or with excerpt
 		&.evo_withteaser, &.evo_withexcerpt {
 			// Wrapper div
 			.widget_rwd_blocks {
-				//
+			
 				> div {
 					display: inline-block;
 					float: none; // We removed default bootstrap's style here because of the issue with floated divs with uneven heights in multiple rows
@@ -33,7 +34,6 @@ div.widget_core_coll_related_post_list {
 				}
 
 				.widget_rwd_content {
-
 					// Important for limiting the max image size to it's parent's max width
 					.item_first_image img {
 						max-width: 100%;
@@ -75,10 +75,10 @@ div.widget_core_coll_related_post_list {
 				vertical-align: middle;
 				// Placeholder when "Display first picture" selected, but no picture to show
 				.item_first_image_placeholder {
-					display: block;
+					display: table;
 					float: left;
-					height: 80px;
-					width: 80px;
+					width: 380px;
+					height: 380px;
 					background: @placeholder-background-color;
 					margin-right: 6px;
 					-webkit-border-radius: 3px;
@@ -88,18 +88,16 @@ div.widget_core_coll_related_post_list {
 					border-radius: 3px;
 					&:before {
 						font-family: FontAwesome;
-						display: block;
+						display: table-cell;
 						content: '\f0f6';
 						color: @placeholder-icon-color;
 						font-size: 40px;
-						margin-top: 12px;
-						margin-left: 23px;
+						vertical-align: middle;
+						text-align: center;
 					}
 				}
 				// Post title (when special placement selected)
 				div.item_title {
-					vertical-align: middle;
-					height: 80px;
 					// Multiple ellipis lines - for Safari
 					display: -webkit-box;
 					display: table-cell; // Overrides -webkit-box on Mozilla & Chrome
@@ -107,7 +105,108 @@ div.widget_core_coll_related_post_list {
 					-webkit-box-orient: vertical;
 					overflow: hidden;
 					text-overflow: ellipsis;
+					vertical-align: middle;
+					height: 80px;
 				}
+			}
+		}
+
+		&.evo_imgsize_crop-15x15,
+		&.evo_imgsize_crop-top-15x15 {
+			.item_first_image_placeholder {
+				width: 15px;
+				height: 15px;
+				&:before {
+					font-size: 8px;
+				}
+			}
+			.item_title {
+				height: 15px;
+				font-size: 15px;
+			}
+		}
+		&.evo_imgsize_crop-32x32,
+		&.evo_imgsize_crop-top-32x32 {
+			.item_first_image_placeholder {
+				width: 32px;
+				height: 32px;
+				&:before {
+					font-size: 18px;
+				}
+			}
+			.item_title {
+				height: 32px;
+				font-size: 16px;
+			}
+		}
+		&.evo_imgsize_crop-64x64,
+		&.evo_imgsize_crop-top-64x64 {
+			.item_first_image_placeholder {
+				width: 64px;
+				height: 64px;
+			}	
+			&:before {
+				font-size: 24px;
+			}
+			.item_title {
+				height: 64px;
+				font-size: 18px;
+			}
+		}
+		&.evo_imgsize_crop-80x80,
+		&.evo_imgsize_crop-top-80x80,
+		&.evo_imgsize_fit-80x80 {
+			.item_first_image_placeholder {
+				width: 80px;
+				height: 80px;
+			}
+			&:before {
+				font-size: 40px;
+			}
+		}
+		&.evo_imgsize_crop-128x128,
+		&.evo_imgsize_fit-128x128 {
+			.item_first_image_placeholder {
+				width: 128px;
+				height: 128px;
+			}
+		}
+		&.evo_imgsize_crop-top-160x160,
+		&.evo_imgsize_fit-160x120,
+		&.evo_imgsize_fit-160x160,
+		&.evo_imgsize_fit-160x160-blur-13,
+		&.evo_imgsize_fit-160x160-blur-18 {
+			.item_first_image_placeholder {
+				width: 160px;
+				height: 160px;
+			}
+		}
+		&.evo_imgsize_crop-192x192,
+		&.evo_imgsize_fit-192x192 {
+			.item_first_image_placeholder {
+				width: 192px;
+				height: 192px;
+			}
+		}
+		&.evo_imgsize_crop-top-200x200 {
+			.item_first_image_placeholder {
+				width: 200px;
+				height: 200px;
+			}
+		}
+		&.evo_imgsize_crop-256x256,
+		&.evo_imgsize_fit-256x256 {
+			.item_first_image_placeholder {
+				width: 256px;
+				height: 256px;
+			}
+		}
+		&.evo_imgsize_crop-top-320x320,
+		&.evo_imgsize_crop-top-320x320-blur-8,
+		&.evo_imgsize_fit-320x320 {
+			.item_first_image_placeholder {
+				width: 320px;
+				height: 320px;
 			}
 		}
 	}
@@ -269,18 +368,35 @@ div.evo_container__sidebar2 {
 
 // Responsive layout of the post title when no teaser, no excerpt and special placement
 @media (max-width: 1599px) {
-		div.widget_core_coll_item_list,
-		div.widget_core_coll_post_list {
-			&.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
-				font-size: 20px;
-			}
+	div.widget_core_coll_item_list,
+	div.widget_core_coll_post_list {
+		&.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
+			font-size: 20px;
 		}
+	}
 }
 @media (max-width: 1199px) {
-		div.widget_core_coll_item_list,
-		div.widget_core_coll_post_list {
-			&.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
-				font-size: 18px;
-			}
+	div.widget_core_coll_item_list,
+	div.widget_core_coll_post_list {
+		&.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
+			font-size: 18px;
 		}
+	}
+}
+// iPhone 6 Plus sizes;
+// Here placeholder is set to width 100% by default,
+// because we already have predefined placeholder dimensions for specific image formats <380px,
+// so for every image format bigger than 380px on device/browser width <414px, we have full-width placeholder
+@media (max-width: 414px) {
+	div.widget_core_coll_item_list,
+	div.widget_core_coll_featured_posts,
+	div.widget_core_coll_post_list,
+	div.widget_core_coll_page_list,
+	div.widget_core_coll_related_post_list {
+	
+		&.evo_1pic__special ul li .item_first_image_placeholder {
+			height: 290px;
+			width: 100%;
+		}
+	}
 }
