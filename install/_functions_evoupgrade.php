@@ -7691,6 +7691,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+// fp> TMP NOTE: This was current status of antispam
+
 	if( upg_task_start( 12035, 'Create table for items votes...' ) )
 	{	// part of 6.8.0-alpha
 		db_create_table( 'T_items__votes', '
