@@ -266,6 +266,28 @@ if( empty($tab) )
 			$template_action = $action;
 			break;
 
+		case 'delete_item_versions':
+			param( 'confirmed', 'integer', 0 );
+
+			if( $confirmed )
+			{
+				$count = $DB->get_var( 'SELECT COUNT(*) FROM T_items__version' );
+				$DB->query( 'TRUNCATE TABLE T_items__version' );
+				if( $count > 0 )
+				{
+					$Messages->add( sprintf( T_('Cleared %d records from the item versions table.'), $count ) );
+				}
+				else
+				{
+					$Messages->add( sprintf( T_('Item versions table already empty.'), $count ), 'note' );
+				}
+			}
+			else
+			{
+				$action ='show_delete_item_versions';
+			}
+			break;
+
 		case 'del_obsolete_tags':
 			$DB->query('
 				DELETE T_items__tag FROM T_items__tag
@@ -449,6 +471,11 @@ if( empty($tab) )
 			$threads_count = $users_count * $users_count - $users_count + 1;
 
 			$AdminUI->disp_view( 'tools/views/_create_messages.form.php' );
+			break;
+
+		case 'show_delete_item_versions':
+			$AdminUI->disp_view( 'tools/views/_delete_item_versions.form.php' );
+			$AdminUI->disp_view( 'tools/views/_misc_tools.view.php' );
 			break;
 
 
