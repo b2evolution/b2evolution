@@ -669,7 +669,7 @@ $Form->begin_form();
 			{ // User can edit:
 				$field_options['rename'] = T_('Rename files...');
 				$field_options['delete'] = T_('Delete files...');
-				$field_options['create_zip'] = T_('Create ZIP archive...');
+				$field_options['create_zip'] = T_('Create ZIP archive').'...';
 				// NOTE: No delete confirmation by javascript, we need to check DB integrity!
 			}
 
