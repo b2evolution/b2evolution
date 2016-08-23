@@ -98,14 +98,14 @@ if( ! empty( $chapters ) )
 				{ // No images, but some attachments(e.g. videos) are rendered by plugins
 					$item_first_image = $Item->get_permanent_link( '<b>'.T_('Click to see contents').'</b>', '#', 'album_nopic' );
 				}
-				
+
 				// Print first image
 				echo $item_first_image;
-				
+
 				// Wrap post without image in borders
 				echo '<section class="evo_post__full panel panel-default">';
 				echo '<div class="evo_post__full_text panel-body">';
-				
+
 				// Display a title
 				echo $Item->get_title( array(
 						'before' => '<header><div class="evo_post_title"><h3>',
@@ -113,10 +113,10 @@ if( ! empty( $chapters ) )
 						) );
 				// Restore previous locale (Blog locale)
 				locale_restore_previous();
-				
+
 				// Subtitle info
 				echo '<div class="small text-muted">';
-		
+
 				if( $Item->status != 'published' )
 				{
 					$Item->format_status( array(
@@ -157,7 +157,7 @@ if( ! empty( $chapters ) )
 					'before'    => ' &bull; ',
 					'after'     => '',
 				) );
-				
+
 				echo '</div></header>';
 
 				// We want excerpt here - shrinked post
@@ -170,12 +170,7 @@ if( ! empty( $chapters ) )
 				<footer>
 					<?php // FOOTER OF THE POST
 						if( ! $Item->is_intro() ) // Do NOT apply tags, comments and feedback on intro posts
-						{ // List all tags attached to this post:
-							$Item->tags( array(
-									'before'    => '<nav class="small post_tags">',
-									'after'     => '</nav>',
-									'separator' => ' ',
-								) );
+						{
 					?>
 
 					<nav>

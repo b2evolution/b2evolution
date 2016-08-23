@@ -7781,6 +7781,72 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12085, 'Update widget container "Item Single"...' ) )
+	{ // part of 6.8.0-alpha
+		$DB->begin();
+		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
+		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_code, wi_order' );
+		$SQL->FROM( 'T_widget' );
+		$SQL->WHERE( 'wi_sco_name = "Item Single"' );
+		$SQL->ORDER_BY( 'wi_coll_ID, wi_order' );
+		$coll_item_single_widgets = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+		$coll_widgets = array();
+		foreach( $coll_item_single_widgets as $coll_item_single_widget )
+		{
+			if( ! isset( $coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] ) )
+			{	// If the "Item Single" has no widget "Item Content":
+				$coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] = 1;
+			}
+			if( $coll_item_single_widget['wi_code'] == 'item_tags' )
+			{ // If the "Item Single" contains widget "Item Tags" then make order of this widget a negative
+				$coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] = -1;
+			}
+			if( $coll_item_single_widget['wi_code'] == 'item_attachments' && $coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] > 0 )
+			{	// If the "Item Single" contains widget "Item Content" and the widget order is positive then keep an order of this widget:
+				$coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] = $coll_item_single_widget['wi_order'] + 1;
+			}
+		}
+
+		$item_tags_widget_rows = array();
+		foreach( $coll_widgets as $coll_ID => $widget_order )
+		{	// Insert new widget "Item Tags" to each collection that has a container "Item Single" with no existing "Item Tags" widget :
+			if( $widget_order > 0 )
+			{
+				$item_tags_widget_rows[] = '( '.$coll_ID.', "Item Single", '.$widget_order.', "item_tags" )';
+				// Check and update not unique widget orders:
+				$not_unique_widget_ID = $DB->get_var( 'SELECT wi_ID
+					FROM T_widget
+					WHERE wi_coll_ID = '.$coll_ID.'
+						AND wi_sco_name = "Item Single"
+						AND wi_order = '.$widget_order );
+				if( $not_unique_widget_ID > 0 )
+				{	// The collection has not unique widget order:
+					$update_order_widgets = array();
+					foreach( $coll_item_single_widgets as $coll_item_single_widget )
+					{
+						if( $coll_item_single_widget['wi_coll_ID'] == $coll_ID && $coll_item_single_widget['wi_order'] >= $widget_order )
+						{	// Increase a widget order to avoid mysql errors of duplicate entry:
+							$update_order_widgets[] = $coll_item_single_widget['wi_ID'];
+						}
+					}
+					for( $w = count( $update_order_widgets ) - 1; $w >= 0 ; $w-- )
+					{	// Update not unique widget orders:
+						$DB->query( 'UPDATE T_widget
+								SET   wi_order = wi_order + 1
+								WHERE wi_ID = '.$update_order_widgets[ $w ] );
+					}
+				}
+			}
+		}
+		if( count( $item_tags_widget_rows ) )
+		{	// Insert new widgets "Item Tags" into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
+			  VALUES '.implode( ', ', $item_tags_widget_rows ) );
+		}
+		$DB->commit();
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

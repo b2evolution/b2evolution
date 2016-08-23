@@ -127,8 +127,8 @@ class item_tags_Widget extends ComponentWidget
 		$this->convert_legacy_param( 'widget_coll_item_tags_separator', 'widget_item_tags_separator' );
 
 		$this->disp_params = array_merge( array(
-				'widget_item_tags_before'    => T_('Tags').': ',
-				'widget_item_tags_after'     => '',
+				'widget_item_tags_before'    => '<nav class="small post_tags">'.T_('Tags').': ',
+				'widget_item_tags_after'     => '</nav>',
 				'widget_item_tags_separator' => ', ',
 			), $this->disp_params );
 
