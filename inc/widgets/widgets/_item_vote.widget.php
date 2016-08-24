@@ -145,7 +145,7 @@ class item_vote_Widget extends ComponentWidget
 			return;
 		}
 
-		echo $this->disp_params['block_start'];
+		echo add_tag_class( $this->disp_params['block_start'], 'clearfix' );
 		echo $this->disp_params['block_body_start'];
 
 		$this->display_voting_panel( $widget_Item, $params );

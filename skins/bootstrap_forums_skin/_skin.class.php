@@ -378,7 +378,12 @@ class bootstrap_forums_Skin extends Skin
 					white-space: normal;
 					margin-top: 3px;
 				}
-				.disp_single .single_topic .evo_content_block .panel-body .evo_post__full, .disp_single .evo_comment .panel-body .evo_comment_text p, .disp_single .post_tags {
+				.disp_single .single_topic .evo_content_block .panel-body .evo_post__full,
+				.disp_single .evo_comment .panel-body .evo_comment_text p,
+				.disp_single .post_tags,
+				.disp_single .evo_voting_panel,
+				.disp_single .evo_seen_by
+				{
 					padding-left: 15px;
 				}
 				\n
