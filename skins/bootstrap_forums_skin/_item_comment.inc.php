@@ -46,7 +46,7 @@ $params = array_merge( array(
 		'Comment'               => NULL, // This object MUST be passed as a param!
 		'display_vote_helpful'  => true,
 	), $params );
-	
+
 // In this skin, it makes no sense to navigate in any different mode than "same category"
 // Use the category from param
 $current_cat = param( 'cat', 'integer', 0 );
@@ -138,7 +138,7 @@ switch( $Comment->get( 'type' ) )
 			$Comment->msgform_link( $Blog->get( 'msgformurl' ) );
 		}
 		break;
-		
+
 	// ON *DISP = SINGLE* SHOW THE FOLLOWING TITLE FOR EACH COMMENT
 	case 'comment': // Display a comment:
 	case 'meta': // Display a meta comment:
@@ -231,6 +231,7 @@ echo $params['comment_avatar_before'];
 $Comment->author2( array(
 					'link_text'  => 'only_avatar',
 					'thumb_size' => 'crop-top-80x80',
+					'after_user' => ''
 				) );
 echo $params['comment_avatar_after'];
 
