@@ -98,6 +98,12 @@ class item_tags_Widget extends ComponentWidget
 					'size' => 40,
 					'note' => T_( 'This is the title to display' ),
 					'defaultvalue' => '',
+				),
+				'before_list' => array(
+					'label' => T_( 'Before List' ),
+					'size' => 40,
+					'note' => T_( 'Label before the list of tags' ),
+					'defaultvalue' => 'Tags:'
 				)
 			), parent::get_param_definitions( $params ) );
 
@@ -127,9 +133,10 @@ class item_tags_Widget extends ComponentWidget
 		$this->convert_legacy_param( 'widget_coll_item_tags_separator', 'widget_item_tags_separator' );
 
 		$this->disp_params = array_merge( array(
-				'widget_item_tags_before'    => '<nav class="small post_tags">'.T_('Tags').': ',
-				'widget_item_tags_after'     => '</nav>',
-				'widget_item_tags_separator' => ', ',
+				'widget_item_tags_before'      => '<nav class="small post_tags">',
+				'widget_item_tags_before_list' => $this->disp_params['before_list'],
+				'widget_item_tags_after'       => '</nav>',
+				'widget_item_tags_separator'   => ', ',
 			), $this->disp_params );
 
 		echo $this->disp_params['block_start'];
@@ -138,7 +145,7 @@ class item_tags_Widget extends ComponentWidget
 
 		// List all tags attached to the Item:
 		$Item->tags( array(
-				'before'    => $this->disp_params['widget_item_tags_before'],
+				'before'    => $this->disp_params['widget_item_tags_before'].( $this->disp_params['widget_item_tags_before_list'] ? $this->disp_params['widget_item_tags_before_list'].' ' : '' ),
 				'after'     => $this->disp_params['widget_item_tags_after'],
 				'separator' => $this->disp_params['widget_item_tags_separator'],
 			) );

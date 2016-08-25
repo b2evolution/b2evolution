@@ -193,7 +193,7 @@ skin_widget( array(
 								'after_attach_size'  => ')</span>',
 							),
 						// Template params for "Item Tags" widget
-						'widget_item_tags_before'    => '<nav class="small post_tags">'.T_('Tags').': ',
+						'widget_item_tags_before'    => '<nav class="small post_tags">',
 						'widget_item_tags_after'     => '</nav>',
 					) );
 					// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
