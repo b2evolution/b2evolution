@@ -43,7 +43,7 @@ $Form->end_form( array( array( 'submit', 'actionArray[keyword_save]', T_('Save c
 
 // Reports of the edited keyword:
 $SQL = new SQL();
-$SQL->SELECT( 'casrc_baseurl, carpt_ts' );
+$SQL->SELECT( 'casrc_ID, casrc_baseurl, carpt_ts' );
 $SQL->FROM( 'T_centralantispam__report' );
 $SQL->FROM_add( 'INNER JOIN T_centralantispam__source ON carpt_casrc_ID = casrc_ID' );
 $SQL->WHERE( 'carpt_cakw_ID = '.$DB->quote( $edited_CaKeyword->ID ) );
@@ -57,10 +57,26 @@ $Results = new Results( $SQL->get(), 'carpt_', '-D', $UserSettings->get( 'result
 
 $Results->title = T_('Reports');
 
+function get_link_for_url( $id, $url )
+{
+	global $current_User;
+
+	if( $current_User->check_perm( 'centralantispam', 'edit' ) )
+	{ // Not reserved id AND current User has permission to edit the global settings
+		$ret_url = '<a href="'.regenerate_url( 'action,tab,cakw_ID', 'action=source_edit&amp;tab=reporters&amp;casrc_ID='.$id ).'">'.$url.'</a>';
+	}
+	else
+	{
+		$ret_url = $url;
+	}
+
+	return '<strong>'.$ret_url.'</strong>';
+}
+
 $Results->cols[] = array(
 		'th' => T_('Url'),
 		'order' => 'casrc_baseurl',
-		'td' => '$casrc_baseurl$',
+		'td' => '%get_link_for_url( #casrc_ID#, #casrc_baseurl# )%',
 	);
 
 $Results->cols[] = array(
