@@ -151,7 +151,7 @@ class coll_comment_list_Widget extends ComponentWidget
 
 		$filters = array(
 				'types' => array( 'comment','trackback','pingback' ),
-				'statuses' => array( 'published' ),
+				'statuses' => explode( ',', $listBlog->get_setting( 'comment_inskin_statuses' ) ),
 				'order' => $order,
 				'comments' => $limit,
 			);
