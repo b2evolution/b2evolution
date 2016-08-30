@@ -935,6 +935,8 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 	$additional_comments_item_IDs = array();
 	$demo_users = get_demo_users( $use_demo_user );
 
+	$BlogCache = & get_BlogCache();
+
 	switch( $collection_type )
 	{
 		// =======================================================================================================
@@ -942,6 +944,12 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			// Sample categories
 			$cat_home_b2evo = cat_create( 'b2evolution', 'NULL', $blog_ID, NULL, true );
 			$cat_home_contrib = cat_create( T_('Contributors'), 'NULL', $blog_ID, NULL, true );
+
+			if( $edited_Blog = $BlogCache->get_by_ID( $blog_ID, false, false ) )
+			{
+				$edited_Blog->set_setting( 'default_cat_ID', $cat_home_b2evo );
+				$edited_Blog->dbupdate();
+			}
 
 			// Sample post
 			// Insert three ADVERTISEMENTS for home blog:
@@ -1061,6 +1069,12 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 					$cat_movies = cat_create( T_('Movies'), $cat_life, $blog_ID, NULL, true );
 					$cat_music = cat_create( T_('Music'), $cat_life, $blog_ID, NULL, true );
 				$cat_web = cat_create( T_('On the web'), $cat_fun, $blog_ID, NULL, true );
+
+			if( $edited_Blog = $BlogCache->get_by_ID( $blog_ID, false, false ) )
+			{
+				$edited_Blog->set_setting( 'default_cat_ID', $cat_ann_a );
+				$edited_Blog->dbupdate();
+			}
 
 			// Sample posts
 			// Insert a post:
@@ -1245,6 +1259,12 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			$cat_b2evo = cat_create( T_('b2evolution Tips'), 'NULL', $blog_ID );
 			$cat_additional_skins = cat_create( T_('Get additional skins'), 'NULL', $blog_ID );
 
+			if( $edited_Blog = $BlogCache->get_by_ID( $blog_ID, false, false ) )
+			{
+				$edited_Blog->set_setting( 'default_cat_ID', $cat_ann_b );
+				$edited_Blog->dbupdate();
+			}
+
 			// Sample posts
 
 			// Insert sidebar links into Blog B
@@ -1374,6 +1394,12 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			// Sample categories
 			$cat_photo_album = cat_create( T_('Landscapes'), 'NULL', $blog_ID, NULL, true );
 
+			if( $edited_Blog = $BlogCache->get_by_ID( $blog_ID, false, false ) )
+			{
+				$edited_Blog->set_setting( 'default_cat_ID', $cat_photo_album );
+				$edited_Blog->dbupdate();
+			}
+
 			// Sample posts
 
 			// Insert a PAGE:
@@ -1468,6 +1494,13 @@ a school bus stop where you wouldn\'t really expect it!
 						$cat_forums_music = cat_create( T_('Music'), $cat_forums_life, $blog_ID, NULL, true );
 						$cat_forums_sports = cat_create( T_('Sports'), $cat_forums_life, $blog_ID, NULL, true );
 					$cat_forums_web = cat_create( T_('On the web'), $cat_forums_fun, $blog_ID, NULL, true, 5 );
+
+			if( $edited_Blog = $BlogCache->get_by_ID( $blog_ID, false, false ) )
+			{
+				$edited_Blog->set_setting( 'default_cat_ID', $cat_forums_forum_group );
+				$edited_Blog->dbupdate();
+			}
+
 
 			// Sample posts
 
@@ -1596,6 +1629,13 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			$cat_manual_blogs = cat_create( T_('Blogs'), $cat_manual_everyday, $blog_ID, NULL, true, 35 );
 			$cat_manual_photos = cat_create( T_('Photo Albums'), $cat_manual_everyday, $blog_ID, NULL, true, 25 );
 			$cat_manual_forums = cat_create( T_('Forums'), $cat_manual_everyday, $blog_ID, NULL, true, 5 );
+
+
+			if( $edited_Blog = $BlogCache->get_by_ID( $blog_ID, false, false ) )
+			{
+				$edited_Blog->set_setting( 'default_cat_ID', $cat_manual_intro );
+				$edited_Blog->dbupdate();
+			}
 
 			// Sample posts
 
@@ -2011,6 +2051,12 @@ Hello
 			// Sample categories
 			$cat_group_bugs = cat_create( T_('Bug'), NULL, $blog_ID, NULL, true, 10 );
 			$cat_group_features = cat_create( T_('Feature Request'), NULL, $blog_ID, NULL, true, 20 );
+
+			if( $edited_Blog = $BlogCache->get_by_ID( $blog_ID, false, false ) )
+			{
+				$edited_Blog->set_setting( 'default_cat_ID', $cat_group_bugs );
+				$edited_Blog->dbupdate();
+			}
 
 			// Sample posts
 			$tasks = 'ABCDEFGHIJKLMNOPQRST';
