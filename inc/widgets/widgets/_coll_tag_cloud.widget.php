@@ -182,19 +182,19 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 		// Source collections:
 		// Get a list of quoted blog IDs
-		$blog_ids = sanitize_id_list($this->disp_params['blog_ids'], true);
-		if( empty($blog) && empty($blog_ids) )
+		$blog_ids = sanitize_id_list( $this->disp_params['blog_ids'], true );
+		if( empty( $blog ) && empty( $blog_ids ) )
 		{	// Nothing to display
 			return;
 		}
-		elseif( empty($blog_ids) )
+		elseif( empty( $blog_ids ) )
 		{	// Use current Blog
 			$blog_ids = $blog;
 		}
 
 		// Destination:
 		if( $destination_coll_ID = $this->disp_params['destination_coll_ID'] )
-		{	// Get destination Colelction, but allow error, in that case we'll get NULL
+		{	// Get destination Collection, but allow error, in that case we'll get NULL
 			$destination_Blog = $BlogCache->get_by_ID( $destination_coll_ID, false );
 		}
 		else
@@ -203,8 +203,7 @@ class coll_tag_cloud_Widget extends ComponentWidget
 		}
 
 		$results = get_tags( $blog_ids, $this->disp_params['max_tags'], /* $this->disp_params['filter_list'] */ NULL, false );
-
-		if( empty($results) )
+		if( empty( $results ) )
 		{	// No tags!
 			return;
 		}
@@ -218,9 +217,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 		if($this->disp_params['tag_ordering'] == 'ASC')
 		{
-			usort($results, array($this, 'tag_cloud_cmp'));
+			usort( $results, array($this, 'tag_cloud_cmp') );
 		}
-		elseif($this->disp_params['tag_ordering'] == 'RAND')
+		elseif( $this->disp_params['tag_ordering'] == 'RAND' )
 		{
 			shuffle( $results );
 		}
@@ -242,13 +241,13 @@ class coll_tag_cloud_Widget extends ComponentWidget
 			}
 
 			// If there's a space in the tag name, quote it:
-			$tag_name_disp = strpos($row->tag_name, ' ')
-				? '&laquo;'.format_to_output($row->tag_name, 'htmlbody').'&raquo;'
-				: format_to_output($row->tag_name, 'htmlbody');
+			$tag_name_disp = strpos( $row->tag_name, ' ' )
+				? '&laquo;'.format_to_output( $row->tag_name, 'htmlbody' ).'&raquo;'
+				: format_to_output( $row->tag_name, 'htmlbody' );
 
 			$font_size = floor( $row->tag_count * $size_span / $count_span + $min_size );
 
-			if( !is_null($destination_Blog) )
+			if( !is_null( $destination_Blog ) )
 			{
 				$l_Blog = $destination_Blog;
 			}
@@ -272,9 +271,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 	}
 
 
-	function tag_cloud_cmp($a, $b)
+	function tag_cloud_cmp( $a, $b )
 	{
-		return strcasecmp($a->tag_name, $b->tag_name);
+		return strcasecmp( $a->tag_name, $b->tag_name );
 	}
 }
 ?>
