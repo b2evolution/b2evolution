@@ -344,6 +344,7 @@ class Item extends ItemLight
 				}
 			}
 			$this->set( 'locale', ( isset( $new_item_locale ) ? $new_item_locale : $default_locale ) );
+			$this->set( 'status', 'draft' );
 		}
 		else
 		{
