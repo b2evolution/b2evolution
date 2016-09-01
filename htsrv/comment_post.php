@@ -188,7 +188,7 @@ else
 	if( !empty( $author ) && ( $block = antispam_check( $author ) ) )
 	{
 		// Log incident in system log
-		syslog_insert( sprintf( T_('Antispam: Supplied name "%s" contains blacklisted word "%s".'), $author, $block ), 'error', 'comment', $comment_item_ID );
+		syslog_insert( sprintf( 'Antispam: Supplied name "%s" contains blacklisted word "%s".', $author, $block ), 'error', 'comment', $comment_item_ID );
 
 		$Messages->add( T_('Supplied name is invalid.'), 'error' );
 	}
@@ -197,7 +197,7 @@ else
 		&& ( !is_email( $email )|| ( $block = antispam_check( $email ) ) ) )
 	{
 		// Log incident in system log
-		syslog_insert( sprintf( T_('Antispam: Supplied email address "%s" contains blacklisted word "%s".'), $email, $block ), 'error', 'comment', $comment_item_ID );
+		syslog_insert( sprintf( 'Antispam: Supplied email address "%s" contains blacklisted word "%s".', $email, $block ), 'error', 'comment', $comment_item_ID );
 
 		$Messages->add( T_('Supplied email address is invalid.'), 'error' );
 	}

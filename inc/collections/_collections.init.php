@@ -501,7 +501,7 @@ class collections_Module extends Module
 				'note' => T_( 'New users automatically get a new blog'),
 				),
 			'perm_max_createblog_num' => array(
-				'label' => T_('Maximum number of blogs allowed'),
+				'label' => T_('Maximum number of collections allowed'),
 				'user_func' => 'check_createblog_user_perm',
 				'group_funct' => 'check_createblog_group_perm',
 				'perm_block' => 'blogging',

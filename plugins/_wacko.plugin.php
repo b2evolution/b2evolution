@@ -22,40 +22,13 @@ class wacko_plugin extends Plugin
 	var $code = 'b2evWcko';
 	var $name = 'Wacko formatting';
 	var $priority = 30;
-	var $version = '6.7.5';
+	var $version = '6.7.6';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
 	var $help_topic = 'wacko-plugin';
 	var $number_of_installs = 1;
 
-	/**
-	 * GreyMatter formatting search array
-	 *
-	 * @access private
-	 */
-	var $search = array(
-			'#( ^ | [\s\S] ) ====== (.+?) ====== #x',
-			'#( ^ | [\s\S] ) ===== (.+?) ===== #x',
-			'#( ^ | [\s\S] ) ==== (.+?) ==== #x',
-			'#( ^ | [\s\S] ) === (.+?) === #x',
-			'#( ^ | [\s\S] ) == (.+?) == #x',
-			'#^ \s* --- \s* $#xm',	// multiline start/stop checking
-		);
-
-	/**
-	 * HTML replace array
-	 *
-	 * @access private
-	 */
-	var $replace = array(
-			'$1<h6>$2</h6>',
-			'$1<h5>$2</h5>',
-			'$1<h4>$2</h4>',
-			'$1<h3>$2</h3>',
-			'$1<h2>$2</h2>',
-			'<hr />',
-		);
 
 	/**
 	 * Init
@@ -99,7 +72,25 @@ class wacko_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		$content = replace_content_outcode( $this->search, $this->replace, $content );
+		// Search array:
+		$search = array(
+				'#( ^ | [\s\S] ) ====== (.+?) ====== #x',
+				'#( ^ | [\s\S] ) ===== (.+?) ===== #x',
+				'#( ^ | [\s\S] ) ==== (.+?) ==== #x',
+				'#( ^ | [\s\S] ) === (.+?) === #x',
+				'#( ^ | [\s\S] ) == (.+?) == #x',
+				'#^ \s* --- \s* $#xm',	// multiline start/stop checking
+			);
+		// HTML replace array:
+		$replace = array(
+				'$1<h6>$2</h6>',
+				'$1<h5>$2</h5>',
+				'$1<h4>$2</h4>',
+				'$1<h3>$2</h3>',
+				'$1<h2>$2</h2>',
+				'<hr />',
+			);
+		$content = replace_content_outcode( $search, $replace, $content );
 
 		// Find bullet lists
 		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false || strstr( $content, '`' ) !== false )

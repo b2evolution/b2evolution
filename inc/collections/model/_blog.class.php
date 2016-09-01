@@ -1192,7 +1192,6 @@ class Blog extends DataObject
 
 				if( $this->get( 'access_type' ) == 'absolute' &&
 				    ( $this->get_setting( 'rsc_assets_url_type' ) == 'basic' ||
-				      $this->get_setting( 'media_assets_url_type' ) == 'basic' ||
 				      $this->get_setting( 'skins_assets_url_type' ) == 'basic' ||
 				      $this->get_setting( 'plugins_assets_url_type' ) == 'basic' ) )
 				{	// Display warning for such settings combination:
@@ -1205,11 +1204,6 @@ class Blog extends DataObject
 					{	// If rsc path is relative url:
 						$Messages->add( sprintf( T_('WARNING: your %s and %s assets URL seem to be configured in a potentially undesirable way. Please check your Assets URLs below.'),
 							'<code>/rsc/</code>', '<code>/skins/</code>' ), 'warning' );
-					}
-					if( $this->get_setting( 'media_assets_url_type' ) == 'relative' )
-					{	// If media path is relative url:
-						$Messages->add( sprintf( T_('WARNING: your %s and %s assets URL seem to be configured in a potentially undesirable way. Please check your Assets URLs below.'),
-							'<code>/media/</code>', '<code>/skins/</code>' ), 'warning' );
 					}
 					if( $this->get_setting( 'plugins_assets_url_type' ) == 'relative' )
 					{	// If plugins path is relative url:
@@ -1772,35 +1766,32 @@ class Blog extends DataObject
 	 * Get the URL of the media folder, on the current blog's domain (which is NOT always the same as the $baseurl domain!).
 	 *
 	 * @param string NULL to use current media_assets_url_type setting.  Use 'basic', 'relative' or 'absolute' to force.
+	 * @param boolean TRUE - to don't force relative URL to absolute on back-office, mail template and feed skin
 	 * @return string URL to /media/ folder
 	 */
-	function get_local_media_url( $url_type = NULL )
+	function get_local_media_url( $url_type = NULL, $force_normal_using = false )
 	{
 		$url_type = is_null( $url_type ) ? $this->get_setting( 'media_assets_url_type' ) : $url_type;
 
 		if( $url_type == 'relative' )
 		{	// Relative URL:
-			global $media_subdir, $Skin;
-			if( is_admin_page() )
-			{	// Force to absolute base URL on back-office side:
+			if( ! $force_normal_using && is_admin_page() )
+			{	// Force to absolute base URL on back-office side and email template:
 				global $media_url;
 				return $media_url;
 			}
-			elseif( isset( $Skin ) && $Skin->get( 'type' ) == 'feed' )
-			{	// Force to absolute collection URL on feed skins:
-				return $this->get_baseurl_root().$this->get_basepath().$media_subdir;
-			}
 			else
-			{	// Use relative URL for other skins:
-				return $this->get_basepath().$media_subdir;
+			{	// Use absolute URL relative to collection media folder:
+				global $media_subdir;
+				return $this->get_baseurl_root().$this->get_basepath().$media_subdir;
 			}
 		}
 		elseif( $url_type == 'absolute' )
-		{ // Absolute URL
+		{	// Absolute URL:
 			return $this->get_setting( 'media_assets_absolute_url' );
 		}
 		else// == 'basic'
-		{ // Basic URL from config
+		{	// Basic URL from config:
 			global $media_url;
 			return $media_url;
 		}

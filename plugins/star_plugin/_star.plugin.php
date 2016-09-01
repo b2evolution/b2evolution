@@ -23,18 +23,12 @@ class star_plugin extends Plugin
 	var $code = 'b2evStar';
 	var $name = 'Star renderer';
 	var $priority = 55;
-	var $version = '6.7.5';
+	var $version = '6.7.6';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
 	var $help_topic = 'star-plugin';
 	var $number_of_installs = 1;
-
-	/*
-	 * Internal vars
-	 */
-	var $search_text;
-	var $replace_func;
 
 
 	/**
@@ -44,11 +38,6 @@ class star_plugin extends Plugin
 	{
 		$this->short_desc = T_('Star formatting e-g [stars:2.3/5]');
 		$this->long_desc = T_('This plugin allows to render star ratings inside blog posts and comments by using the syntax [stars:2.3/5] for example');
-
-		// Pattern to search the stars
-		$this->search_text = '#\[stars:([\d\.]+)(/\d+)?\]#';
-		// Function to build template for stars
-		$this->replace_func = array( $this, 'get_stars_template' );
 	}
 
 
@@ -93,8 +82,7 @@ class star_plugin extends Plugin
 	 */
 	function RenderItemAsHtml( & $params )
 	{
-		$content = & $params['data'];
-		$content = replace_content_outcode( $this->search_text, $this->replace_func, $content, 'replace_content_callback' );
+		$params['data'] = $this->render_stars( $params['data'] );
 
 		return true;
 	}
@@ -109,8 +97,7 @@ class star_plugin extends Plugin
 	 */
 	function RenderMessageAsHtml( & $params )
 	{
-		$content = & $params['data'];
-		$content = replace_content_outcode( $this->search_text, $this->replace_func, $content, 'replace_content_callback' );
+		$params['data'] = $this->render_stars( $params['data'] );
 
 		return true;
 	}
@@ -139,10 +126,30 @@ class star_plugin extends Plugin
 		$comment_Item = & $Comment->get_Item();
 		$item_Blog = & $comment_Item->get_Blog();
 		if( in_array( $this->code, $Comment->get_renderers_validated() ) )
-		{ // apply_comment_rendering is set to render
-			$content = & $params['data'];
-			$content = replace_content_outcode( $this->search_text, $this->replace_func, $content, 'replace_content_callback' );
+		{	// If apply_comment_rendering is set to render:
+			$params['data'] = $this->render_stars( $params['data'] );
 		}
+	}
+
+
+	/**
+	 * Render stars template from [[stars:3/7]
+	 *  to <span class="star_plugin" style="width:112px">
+	 *       <span>*</span>
+	 *       <span>*</span>
+	 *       <span>*</span>
+	 *       <span class="empty">-</span>
+	 *       <span class="empty">-</span>
+	 *       <span class="empty">-</span>
+	 *       <span class="empty">-</span>
+	 *     </span>
+	 *
+	 * @param string Source content
+	 * @return string Rendered content
+	 */
+	function render_stars( $content )
+	{
+		return replace_content_outcode( '#\[stars:([\d\.]+)(/\d+)?\]#', array( $this, 'get_stars_template' ), $content, 'replace_content_callback' );
 	}
 
 

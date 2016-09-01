@@ -21,7 +21,7 @@ class infodots_plugin extends Plugin
 	var $code = 'b2evoDot';
 	var $name = 'Info dots renderer';
 	var $priority = 95;
-	var $version = '6.7.5';
+	var $version = '6.7.6';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -178,7 +178,10 @@ class infodots_plugin extends Plugin
 	 *
 	 * Renders code:
 	 * from [infodot:1234:40:60:20ex]html text[enddot]
-	 * to <div class="infodots_info" id="infodot_1234_1" xy="40:60" style="width:20ex:>html text</div>
+	 * to <div class="infodots_info" id="infodot_1234_1" data-xy="40:60" style="width:20ex:>html text</div>
+	 * This html <div> is hidden by css .infodots_info { display: none; }. 
+	 * This plugin event is called only once to render content.
+	 * This only generates the content divs. The red dots themselves are added later to the evo_image_block divs, in the "RenderItemAttachment" event.
 	 * 
 	 * This event also collects all dots in the array $this->dots.
 	 *
@@ -186,16 +189,7 @@ class infodots_plugin extends Plugin
 	 */
 	function RenderItemAsHtml( & $params )
 	{
-		$content = & $params['data'];
-		$Item = $params['Item'];
-
-		// Pattern to search the infodots like [infodot:1234:40:60:20ex]html text[enddot]:
-		$infodot_pattern = '#((<br />|<p>)\r?\n?)?\[infodot:(\d+):(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)(:\d+[pxecm%]*)?\](.+?)\[enddot\](\r?\n?(<br />|</p>))?#is';
-
-		$this->dot_numbers = NULL;
-		$this->object_ID = 'itm_'.$Item->ID;
-		$content = replace_content_outcode( $infodot_pattern, array( $this, 'load_infodot_from_source' ), $content, 'replace_content_callback' );
-		$this->loaded_objects[ $this->object_ID ] = 1;
+		$params['data'] = $this->render_infodot_captions( 'itm_'.$params['Item']->ID, $params['data'] );
 
 		return true;
 	}
@@ -245,7 +239,10 @@ class infodots_plugin extends Plugin
 	 *
 	 * Renders code:
 	 * from [infodot:1234:40:60:20ex]html text[enddot]
-	 * to <div class="infodots_info" id="infodot_1234_1" xy="40:60" style="width:20ex:>html text</div>
+	 * to <div class="infodots_info" id="infodot_1234_1" data-xy="40:60" style="width:20ex:>html text</div>
+	 * This html <div> is hidden by css .infodots_info { display: none; }. 
+	 * This plugin event is called only once to render content.
+	 * This only generates the content divs. The red dots themselves are added later to the evo_image_block divs, in the "RenderCommentAttachment" event.
 	 * 
 	 * This event also collects all dots in the array $this->dots.
 	 *
@@ -256,17 +253,32 @@ class infodots_plugin extends Plugin
 		$Comment = & $params['Comment'];
 
 		if( in_array( $this->code, $Comment->get_renderers_validated() ) )
-		{ // apply_comment_rendering is set to render
-			$content = & $params['data'];
-
-			// Pattern to search the infodots like [infodot:1234:40:60:20ex]html text[enddot]:
-			$infodot_pattern = '#((<br />|<p>)\r?\n?)?\[infodot:(\d+):(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)(:\d+[pxecm%]*)?\](.+?)\[enddot\](\r?\n?(<br />|</p>))?#is';
-
-			$this->dot_numbers = NULL;
-			$this->object_ID = 'cmt_'.$Comment->ID;
-			$content = replace_content_outcode( $infodot_pattern, array( $this, 'load_infodot_from_source' ), $content, 'replace_content_callback' );
-			$this->loaded_objects[ $this->object_ID ] = 1;
+		{	// If apply_comment_rendering is set to render:
+			$params['data'] = $this->render_infodot_captions( 'cmt_'.$Comment->ID, $params['data'] );
 		}
+	}
+
+
+	/**
+	 * Render infodots from like [infodot:1234:40:60:20ex]html text[enddot]
+	 *    to <div class="infodots_info" id="infodot_1234_1" data-xy="40:60" style="width:20ex:>html text</div>
+	 *
+	 * @param string Object ID: for example, 'itm_123', 'cmt_456'.
+	 * @param string Source content
+	 * @return string Rendered content
+	 */
+	function render_infodot_captions( $object_ID, $content )
+	{
+		$this->dot_numbers = NULL;
+		$this->object_ID = $object_ID;
+
+		$content = replace_content_outcode( '#((<br />|<p>)\r?\n?)?\[infodot:(\d+):(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)(:\d+[pxecm%]*)?\](.+?)\[enddot\](\r?\n?(<br />|</p>))?#is',
+				array( $this, 'load_infodot_from_source' ),
+				$content, 'replace_content_callback' );
+
+		$this->loaded_objects[ $this->object_ID ] = 1;
+
+		return $content;
 	}
 
 
@@ -338,7 +350,7 @@ class infodots_plugin extends Plugin
 			$tooltip_width = ( strlen( intval( $tooltip_width ) ) == strlen( $tooltip_width ) ? $tooltip_width.'px' : $tooltip_width );
 			$tooltip_width = ' style="width:'.$tooltip_width.'"';
 		}
-		$dot_xy = ' xy="'.$this->dots[ $link_ID ][ $dot_num - 1 ]['x'].':'.$this->dots[ $link_ID ][ $dot_num - 1 ]['y'].'"';
+		$dot_xy = ' data-xy="'.$this->dots[ $link_ID ][ $dot_num - 1 ]['x'].':'.$this->dots[ $link_ID ][ $dot_num - 1 ]['y'].'"';
 
 		$this->dot_numbers[ $link_ID ]++;
 
@@ -360,8 +372,8 @@ class infodots_plugin extends Plugin
 		$this->load_infodot_from_source( array(
 				0 => $matches[0],
 				3 => $matches[1],
-				4 => $matches[3],
-				5 => $matches[4]
+				4 => $matches[4],
+				5 => $matches[5]
 			), true );
 	}
 
@@ -371,7 +383,7 @@ class infodots_plugin extends Plugin
 	 *
 	 * Renders code:
 	 * from the before collected array $this->dots
-	 * OR from the prerendered content <div class="infodots_info" id="infodot_1234_1" xy="40:60">html text</div>
+	 * OR from the prerendered content <div class="infodots_info" id="infodot_1234_1" data-xy="40:60">html text</div>
 	 * to <div class="infodots_dot" rel="infodot_1234_1" style="left:40px;top:60px"></div>
 	 *
 	 * @param array Associative array of parameters. $params['File'] - attachment, $params['data'] - output
@@ -408,7 +420,7 @@ class infodots_plugin extends Plugin
 
 		if( ! isset( $this->loaded_objects[ $this->object_ID ] ) )
 		{ // Load the info dots if they were not loaded before:
-			replace_content_outcode( '#<div class="infodots_info" id="infodot_(\d+)_(\d+)" xy="(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)"[^>]*>(.+?)</div>#is', 
+			replace_content_outcode( '#<div class="infodots_info" id="infodot_(\d+)_(\d+)" (data-)?xy="(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)"[^>]*>(.+?)</div>#is', 
 				array( $this, 'load_infodot_from_rendered_content' ), $content, 'replace_content_callback' );
 			$this->loaded_objects[ $this->object_ID ] = 1;
 		}
@@ -433,10 +445,11 @@ class infodots_plugin extends Plugin
 	/**
 	 * Event handler: Called when displaying item attachment.
 	 *
-	 * Renders the red dots before each image by getting them from array $this->dots if it was initialized during RenderItemAsHtml().
+	 * THis will render the red dots in the same <div> as the image, which is important for using relative positioning based on the image coordinates.
 	 *
+	 * Renders the red dots before each image by getting them from array $this->dots if it was initialized during RenderItemAsHtml().
 	 * If RenderItemAsHtml() was not called (which happens if content was already pre-rendered) then the array $this->dots is built by preg_match from prerendered content 
-	 * from hidden div <div class="infodots_info" id="infodot_1234_1" xy="40:60" style="width:20ex:>html text</div>
+	 * from hidden div <div class="infodots_info" id="infodot_1234_1" data-xy="40:60" style="width:20ex:>html text</div>
 	 *
 	 * The dots are rendered as <div class="infodots_image"> <div class="infodots_dot" rel="infodot_1234_1" style="left:40px;top:60px"></div> </div> before attached image.
 	 *
@@ -459,14 +472,16 @@ class infodots_plugin extends Plugin
 		// Render dots
 		$this->render_infodots( $params, $Item->get_prerendered_content( 'htmlbody' ) );
 
-		// Plugin just modifies the params and doesn't touch/render a real object
-		// So return FALSE here everytime to don't rewrite the real object
+		// Plugin only adds data to $params['before_image?] but doesn?t actually display the image.
+		// So, return false to communicate we do NOT display the image, so that the core will take care of displaying the image:
 		return false;
 	}
 
 
 	/**
 	 * Event handler: Called when displaying comment attachment.
+	 *
+	 * See sister function RenderItemAttachment() above for more details.
 	 *
 	 * @param array Associative array of parameters. $params['File'] - attachment, $params['data'] - output
 	 * @return boolean true if plugin rendered this attachment

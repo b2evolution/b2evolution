@@ -670,7 +670,7 @@ class Message extends DataObject
 			if( $message_link === false )
 			{	// If the recipient has no access to messages page:
 				$Messages->add( sprintf( T_('%s cannot be notified of this new message because we have no default messaging collection and %s has no access to the backoffice.'), $notify_User->get( 'login' ), $notify_User->get( 'login' ) ), 'error' );
-				syslog_insert( sprintf( T_('%s cannot be notified for new/pending private messages because we have no default messaging collection and %s has no access to the backoffice.'), $notify_User->get( 'login' ), $notify_User->get( 'login' ) ), 'error' );
+				syslog_insert( sprintf( '%s cannot be notified for new/pending private messages because we have no default messaging collection and %s has no access to the backoffice.', $notify_User->get( 'login' ), $notify_User->get( 'login' ) ), 'error' );
 				continue;
 			}
 

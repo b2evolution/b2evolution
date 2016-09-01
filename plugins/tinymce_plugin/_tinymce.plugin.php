@@ -36,7 +36,7 @@ class tinymce_plugin extends Plugin
 	var $code = 'evo_TinyMCE';
 	var $name = 'TinyMCE';
 	var $priority = 10;
-	var $version = '6.7.5';
+	var $version = '6.7.6';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -511,7 +511,7 @@ class tinymce_plugin extends Plugin
 						ed.on( 'init', tmce_init.oninit );
 					}
 
-					jQuery( 'textarea#<?php echo $params['content_id']; ?>' ).tinymce( tmce_init );
+					tinymce.init( tmce_init );
 				}
 			}
 
@@ -726,6 +726,7 @@ class tinymce_plugin extends Plugin
 
 		// Configuration: -- http://wiki.moxiecode.com/index.php/TinyMCE:Configuration
 		$init_options = array();
+		$init_options[] = 'selector: "textarea#'.$content_id.'"';
 		if( $this->Settings->get( 'use_gzip_compressor' ) )
 		{	// Load script to use gzip compressor:
 			$init_options[] = 'script_url: "'.get_require_url( 'tiny_mce/tinymce.gzip.php', 'blog', 'js' ).'"';
