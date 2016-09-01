@@ -103,7 +103,7 @@ class user_avatars_Widget extends ComponentWidget
 						'random'  => T_('Random users'),
 						'regdate' => T_('Most recent registrations'),
 						'moddate' => T_('Most recent profile updates'),
-						'numposts' => T_('Number of posts'),
+						'numposts' => T_('Number of (Public+Community+Member) posts'),
 					),
 				'defaultvalue' => 'random',
 			),
