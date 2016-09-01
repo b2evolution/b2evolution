@@ -939,7 +939,9 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	}
 
 	// Get default post_inskin_statuses as SQL expression
-// fp>erwin: why do we need this?
+	// fp>erwin: why do we need this?
+	// erwin>fp: We need to get the default post_inskin_statuses of a collection depending on the collection type in the case that there is currently no explicit collection setting record,
+	//           this is similar to what is specified in the Blog::get_setting()
 	$default_inskin_statuses = 'published,community,protected,private,review'; // see Blog::get_setting() for default inskin statuses
 	$case_SQL = '( CASE blog_type WHEN "forum" THEN "'.$default_inskin_statuses.',draft"';
 	$case_SQL .= ' ELSE "'.$default_inskin_statuses.'"';
