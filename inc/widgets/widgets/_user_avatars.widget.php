@@ -66,7 +66,7 @@ class user_avatars_Widget extends ComponentWidget
 				'options' => array(
 						'rwd'  => T_( 'RWD Blocks' ),
 						'flow' => T_( 'Flowing Blocks' ),
-						'list' => T_( 'List' ),
+						'list' => T_( 'List' ), 
 						'grid' => T_( 'Table' ),
 					 ),
 				'defaultvalue' => 'flow',
@@ -223,20 +223,10 @@ class user_avatars_Widget extends ComponentWidget
 		$SQL->FROM( 'T_users' );
 		if( $this->disp_params[ 'order_by' ] == 'numposts' )
 		{ // Highest number of posts
-			// Get default post_inskin_statuses as SQL expression
-			$default_inskin_statuses = 'published,community,protected,private,review'; // see Blog::get_setting() for default inskin statuses
-			$case_SQL = '( CASE blog_type WHEN "forum" THEN "'.$default_inskin_statuses.',draft"';
-			$case_SQL .= ' ELSE "'.$default_inskin_statuses.'"';
-			$case_SQL .= ' END ) COLLATE utf8_general_ci';
-
 			$SQL->FROM_add( 'LEFT JOIN
 							( SELECT items_item.post_creator_user_ID, count(*) as user_numposts
 								FROM T_items__item as items_item
-								INNER JOIN T_postcats ON postcat_post_ID = post_ID
-								INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-								LEFT JOIN T_blogs ON blog_ID = cat_blog_ID
-								LEFT JOIN T_coll_settings ON cset_coll_ID = cat_blog_ID AND cset_name = "post_inskin_statuses"
-								WHERE LOCATE( post_status, IF( cset_name IS NULL, '.$case_SQL.', cset_value ) ) > 0
+								WHERE items_item.post_status IN ( "published", "community", "protected" )
     							GROUP BY items_item.post_creator_user_ID
     						) user_posts
     						ON user_posts.post_creator_user_ID = user_ID ' );
