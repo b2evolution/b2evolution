@@ -5901,13 +5901,14 @@ class Item extends ItemLight
 	 */
 	function handle_notifications( $executed_by_userid = NULL, $is_new_item = false, $force_members = false, $force_community = false, $force_pings = false )
 	{
-		global $Settings, $Messages, $localtimenow;
+		global $Settings, $Messages, $localtimenow, $Debuglog;
 
 		// Immediate notifications? Asynchronous? Off?
 		$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
 		if( $notifications_mode == 'off' )
 		{	// Don't send any notifications nor pings:
+			$Debuglog->add( 'Item->handle_notifications() : Notifications are turned OFF!', 'notifications' );
 			return false;
 		}
 
@@ -5919,6 +5920,7 @@ class Item extends ItemLight
 
 		// FIRST: Moderators need to be notified immediately, even if the post is a draft/review and/or has an issue_date in the future.
 		// fp> NOTE: for simplicity, for now, we will NOT make a scheduled job for this (but we will probably do so in the future)
+		$Debuglog->add( 'Item->handle_notifications() : Moderator notifications will always be immediate (never scheduled)', 'notifications' );
 		// Send email notifications to users who can moderate this item:
 		$already_notified_user_IDs = $this->send_moderation_emails( $executed_by_userid, $is_new_item );
 
@@ -5954,6 +5956,7 @@ class Item extends ItemLight
 		    $this->check_notifications_flags( array( 'members_notified', 'community_notified', 'pings_sent' ) ) )
 		{	// All possible notifications have already been sent and no forcing for any notification:
 			$Messages->add( T_('All possible notifications have already been sent: skipping notifications...'), 'note' );
+			$Debuglog->add( 'Item->handle_notifications() : All possible notifications have already been sent: skipping notifications...', 'notifications' );
 			return false;
 		}
 
@@ -5961,6 +5964,8 @@ class Item extends ItemLight
 
 		if( $notifications_mode == 'immediate' && strtotime( $this->issue_date ) <= $localtimenow )
 		{	// We want to send the notifications immediately (can only be done if post does not have an issue_date in the future):
+
+			$Debuglog->add( 'Item->handle_notifications() : Sending immediate Pings & Subscriber notifications', 'notifications' );
 
 			// Send outbound pings: (will only do something if visibility is 'public')
 			$this->send_outbound_pings( $force_pings );
@@ -5989,6 +5994,8 @@ class Item extends ItemLight
 			// Note: in case of successive edits of a post we may create many cron jobs for it.
 			// It will be the responsibility of the cron jobs to detect if another one is already running and not execute twice or more times concurrently.
 
+			$Debuglog->add( 'Item->handle_notifications() : Scheduling notifications through a cron job', 'notifications' );
+
 			load_class( '/cron/model/_cronjob.class.php', 'Cronjob' );
 			$item_Cronjob = new Cronjob();
 
@@ -6014,7 +6021,7 @@ class Item extends ItemLight
 			// Save cronjob to DB:
 			if( $item_Cronjob->dbinsert() )
 			{
-				$Messages->add( T_('Scheduling email notifications for subscribers.'), 'note' );
+				$Messages->add( T_('Scheduling Pings & Subscriber email notifications.'), 'note' );
 
 				// Memorize the cron job ID which is going to handle this post:
 				$this->set( 'notifications_ctsk_ID', $item_Cronjob->ID );
@@ -6172,7 +6179,7 @@ class Item extends ItemLight
 	 */
 	function send_email_notifications( $executed_by_userid = NULL, $is_new_item = false, $already_notified_user_IDs = NULL, $force_members = false, $force_community = false )
 	{
-		global $DB, $debug, $Messages;
+		global $DB, $debug, $Messages, $Debuglog;
 
 		if( $executed_by_userid === NULL && is_logged_in() )
 		{	// Use current user by default:
@@ -6288,9 +6295,12 @@ class Item extends ItemLight
 			return $notified_flags;
 		}
 
+		$Debuglog->add( 'Ready to send notifications to members? : '.($notify_members ? 'Yes' : 'No' ), 'notifications' );
+		$Debuglog->add( 'Ready to send notifications to community? : '.($notify_community ? 'Yes' : 'No' ), 'notifications' );
+
 		// Get list of users who want to be notified:
 		// TODO: also use extra cats/blogs??
-		$SQL = new SQL( 'Get list of users who want to be notified about new items on colection #'.$this->get_blog_ID() );
+		$SQL = new SQL( 'Get list of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID() );
 		$SQL->SELECT( 'DISTINCT sub_user_ID' );
 		$SQL->FROM( 'T_subscriptions' );
 		$SQL->WHERE( 'sub_coll_ID = '.$this->get_blog_ID() );
@@ -6305,6 +6315,9 @@ class Item extends ItemLight
 		}
 		$notify_users = $DB->get_col( $SQL->get(), 0, $SQL->title );
 
+		$Debuglog->add( 'Number of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID().' = '.count($notify_users), 'notifications' );
+		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice($notify_users, 0, 10) ), 'notifications' );
+
 		// Load all users who will be notified:
 		$UserCache = & get_UserCache();
 		$UserCache->load_list( $notify_users );
@@ -6312,14 +6325,18 @@ class Item extends ItemLight
 		$members_count = 0;
 		$community_count = 0;
 		foreach( $notify_users as $u => $user_ID )
-		{	// Check each subscribed user if we can send notification to him depending on current request and item settings:
+		{	// Check for each subscribed User, if we can send a notification to him depending on current request and Item settings:
+
 			if( ! ( $notify_User = & $UserCache->get_by_ID( $user_ID, false, false ) ) )
-			{	// Wrong user, Skip it:
+			{	// Invalid User, Skip it:
+				$Debuglog->add( 'User #'.$user_ID.' is invalid.', 'notifications'  );
 				unset( $notify_users[ $u ] );
 				continue;
 			}
-			// Check if the user is member of the collection:
+
+			// Check if the User is member of the collection:
 			$is_member = $notify_User->check_perm( 'blog_ismember', 'view', false, $this->get_blog_ID() );
+
 			if( $notify_members && $notify_community )
 			{	// We can notify all subscribed users:
 				if( $is_member )
@@ -6339,6 +6356,7 @@ class Item extends ItemLight
 				}
 				else
 				{	// Skip not member:
+					$Debuglog->add( 'User #'.$user_ID.' is a not a member but at this time, we only want to notify members.', 'notifications'  );
 					unset( $notify_users[ $u ] );
 				}
 			}
@@ -6350,17 +6368,21 @@ class Item extends ItemLight
 				}
 				else
 				{	// Skip member:
+					$Debuglog->add( 'User #'.$user_ID.' is a member but we at this time, we only want to notify community.', 'notifications'  );
 					unset( $notify_users[ $u ] );
 				}
 			}
 		}
 
+		$Debuglog->add( 'Number of users who are allowed to be notified about new items on colection #'.$this->get_blog_ID().' = '.count($notify_users), 'notifications' );
+		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice($notify_users, 0, 10) ), 'notifications' );
+
 		if( $notify_members )
-		{	// Display a message to know how much members are notified:
+		{	// Display a message to know how many members are notified:
 			$Messages->add( sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count ), 'note' );
 		}
 		if( $notify_community )
-		{	// Display a message to know how much community users are notified:
+		{	// Display a message to know how many community users are notified:
 			$Messages->add( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), 'note' );
 		}
 
