@@ -5835,7 +5835,7 @@ function format_to_js( $unformatted )
 
 
 /**
- * Get available cort oprions for items
+ * Get available sort options for items
  *
  * @return array key=>name
  */
@@ -5851,13 +5851,14 @@ function get_available_sort_options()
 		'last_touched_ts' => T_('Date last touched'),
 		'urltitle'        => T_('URL "filename"'),
 		'priority'        => T_('Priority'),
+		'numviews'        => T_('Number of members who have viewed the post (If tracking enabled)'),
 		'RAND'            => T_('Random order!'),
 	);
 }
 
 
 /**
- * Get available cort oprions for blogs
+ * Get available sort options for blogs
  *
  * @return array key=>name
  */

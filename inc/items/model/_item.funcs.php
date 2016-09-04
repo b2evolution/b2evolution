@@ -4003,6 +4003,26 @@ function load_user_data_for_items( $post_ids = NULL )
 
 
 /**
+ * Get total number of members who has viewed the item
+ *
+ * @param object Item
+ * @return integer Total number of members who has viewed the item
+ */
+function get_item_numviews( $Item )
+{
+	global $DB;
+
+	// SELECT current User's post and comment read statuses for all post with the given ids:
+	$SQL = new SQL( 'Get total number of members who have viewed the post' );
+	$SQL->SELECT( 'COUNT(*)' );
+	$SQL->FROM( 'T_items__user_data' );
+	$SQL->WHERE( 'itud_item_ID = '.$Item->ID );
+
+	return $DB->get_var( $SQL->get() );
+}
+
+
+/**
  * Initialize Results object for items list
  *
  * @param object Results
