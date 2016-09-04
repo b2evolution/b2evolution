@@ -95,6 +95,18 @@ class coll_tag_cloud_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		$visibility_statuses = get_visibility_statuses( 'raw', array( 'deprecated', 'redirected', 'trash' ) );
+		$default_visible_statuses = array( 'published', 'community', 'protected' );
+		$option_statuses = array();
+		foreach( $visibility_statuses as $status => $status_text )
+		{
+			$option_statuses[] = array(
+				'inskin_'.$status,
+				$status_text,
+				in_array( $status, $default_visible_statuses ) ? 1 : 0
+			);
+		}
+
 		$r = array_merge( array(
 			'title' => array(
 					'type' => 'text',
@@ -116,6 +128,12 @@ class coll_tag_cloud_Widget extends ComponentWidget
 					'allow_empty' => true,
 					'size' => 2,
 					'note' => T_('Collection ID. Leave empty for automatic selection.'),
+				),
+			'visibility_statuses' => array(
+					'label' => T_('Visibility statuses'),
+					'type' => 'checklist',
+					'options' => $option_statuses,
+					'note' => T_('Only tags associated to posts with the above visibilities will be retained.')
 				),
 			'max_tags' => array(
 					'type' => 'integer',
@@ -202,7 +220,16 @@ class coll_tag_cloud_Widget extends ComponentWidget
 			$destination_Blog = NULL;
 		}
 
-		$results = get_tags( $blog_ids, $this->disp_params['max_tags'], /* $this->disp_params['filter_list'] */ NULL, false );
+		$visibility_statuses = get_visibility_statuses( 'raw', array( 'deprecated', 'redirected', 'trash' ) );
+		$filter_inskin_statuses = array();
+		foreach( $visibility_statuses as $status => $status_text )
+		{
+			if( isset( $this->disp_params['visibility_statuses']['inskin_'.$status] ) && $this->disp_params['visibility_statuses']['inskin_'.$status] )
+			{
+				$filter_inskin_statuses[] = $status;
+			}
+		}
+		$results = get_tags( $blog_ids, $this->disp_params['max_tags'], /* $this->disp_params['filter_list'] */ NULL, false, $filter_inskin_statuses );
 		if( empty( $results ) )
 		{	// No tags!
 			return;

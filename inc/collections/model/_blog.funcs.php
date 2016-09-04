@@ -916,7 +916,7 @@ function get_highest_publish_status( $type, $blog, $with_label = true, $restrict
  * @param bool true to skip tags from pages, intro posts and sidebar stuff
  * @return array of tags
  */
-function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts = false )
+function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts = false, $post_statuses = array( 'published' ) )
 {
 	global $DB, $localtimenow;
 
@@ -938,15 +938,6 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 		$where_cat_clause = trim( $Blog->get_sql_where_aggregate_coll_IDs( 'cat_blog_ID' ) );
 	}
 
-	// Get default post_inskin_statuses as SQL expression
-	// fp>erwin: why do we need this?
-	// erwin>fp: We need to get the default post_inskin_statuses of a collection depending on the collection type in the case that there is currently no explicit collection setting record,
-	//           this is similar to what is specified in the Blog::get_setting()
-	$default_inskin_statuses = 'published,community,protected,private,review'; // see Blog::get_setting() for default inskin statuses
-	$case_SQL = '( CASE blog_type WHEN "forum" THEN "'.$default_inskin_statuses.',draft"';
-	$case_SQL .= ' ELSE "'.$default_inskin_statuses.'"';
-	$case_SQL .= ' END ) COLLATE utf8_general_ci';
-
 	// Build query to get the tags:
 	$tags_SQL = new SQL();
 
@@ -957,12 +948,10 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__item ON itag_itm_ID = post_ID' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
-	$tags_SQL->FROM_add( 'LEFT JOIN T_coll_settings ON cat_blog_ID = cset_coll_ID AND cset_name = "post_inskin_statuses"' );
-	$tags_SQL->FROM_add( 'LEFT JOIN T_blogs ON cat_blog_ID = blog_ID' );
 	$tags_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
 
 	$tags_SQL->WHERE( $where_cat_clause );
-	$tags_SQL->WHERE_and( 'LOCATE( post_status, IF( cset_name IS NULL, '.$case_SQL.', cset_value ) ) > 0' );
+	$tags_SQL->WHERE_and( 'post_status IN ("'.implode( '", "', $post_statuses ).'")' );
 	$tags_SQL->WHERE_and( 'post_datestart < '.$DB->quote( remove_seconds( $localtimenow ) ) );
 
 	if( $skip_intro_posts )
