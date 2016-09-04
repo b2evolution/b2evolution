@@ -3814,9 +3814,10 @@ class Comment extends DataObject
 		$members_count = 0;
 		$community_count = 0;
 		foreach( $notify_users as $user_ID => $notify_type )
-		{	// Check each subscribed user if we can send notification to him depending on current request and item settings:
+		{	// Check for each subscribed User, if we can send a notification to him depending on current request and Item settings:
+
 			if( ! ( $notify_User = & $UserCache->get_by_ID( $user_ID, false, false ) ) )
-			{	// Wrong user, Skip it:
+			{	// Invalid User, Skip it:
 				unset( $notify_users[ $user_ID ] );
 				continue;
 			}
@@ -3858,11 +3859,11 @@ class Comment extends DataObject
 		}
 
 		if( $notify_members )
-		{	// Display a message to know how much members are notified:
+		{	// Display a message to know how many members are notified:
 			$Messages->add( sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count ), 'note' );
 		}
 		if( $notify_community )
-		{	// Display a message to know how much community users are notified:
+		{	// Display a message to know how many community users are notified:
 			$Messages->add( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), 'note' );
 		}
 
