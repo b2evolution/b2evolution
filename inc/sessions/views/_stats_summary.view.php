@@ -17,8 +17,8 @@ global $blog, $admin_url, $AdminUI, $agent_type_color, $hit_type_color, $Hit, $S
 
 echo '<h2 class="page-title">'.T_('Global hits - Summary').get_manual_link('global_hits_summary').'</h2>';
 
-// Display buttons to toggle between type of hits summary data(Live or Aggregate):
-display_hits_summary_toggler();
+// Display panel with buttons to control a view of hits summary pages:
+display_hits_summary_panel();
 
 // Check if it is a mode to display a live data:
 $is_live_mode = ( get_hits_summary_mode() == 'live' );

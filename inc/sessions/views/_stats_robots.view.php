@@ -25,8 +25,8 @@ echo '<h2 class="page-title">'.T_('Hits from indexing robots / spiders / crawler
 
 echo '<p class="notes">'.T_('In order to be detected, robots must be listed in /conf/_stats.php.').'</p>';
 
-// Display buttons to toggle between type of hits summary data(Live or Aggregate):
-display_hits_summary_toggler();
+// Display panel with buttons to control a view of hits summary pages:
+display_hits_summary_panel();
 
 // Check if it is a mode to display a live data:
 $is_live_mode = ( get_hits_summary_mode() == 'live' );

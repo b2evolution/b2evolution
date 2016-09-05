@@ -225,6 +225,18 @@ switch( $action )
 		}
 		$action = 'domain_new';
 		break;
+
+	case 'aggregate':
+		// Aggregate the hits and sessions:
+		Hitlist::aggregate_hits();
+		Hitlist::aggregate_sessions();
+
+		$Messages->add( T_('The hits have been aggregated.'), 'success' );
+
+		// Redirect to referer page:
+		header_redirect( $admin_url.'?ctrl=stats&tab='.$tab.'&tab3='.$tab3.'&blog='.$blog, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
 }
 
 if( isset($collections_Module) && $tab_from != 'antispam' )

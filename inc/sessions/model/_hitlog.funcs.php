@@ -1255,9 +1255,11 @@ function stats_goal_hit_extra_params( $ghit_params )
 
 
 /**
- * Display buttons to toggle between type of hits summary data(Live or Aggregate)
+ * Display panel with buttons to control a view of hits summary pages:
+ *     - Two buttons to toggle between type of hits summary data(Live or Aggregate)
+ *     - Button to aggregate hits and sessions right now
  */
-function display_hits_summary_toggler()
+function display_hits_summary_panel()
 {
 	global $ReqURL;
 
@@ -1267,17 +1269,25 @@ function display_hits_summary_toggler()
 
 	echo '<div class="btn-group">';
 
+	// Button to switch to view the live hits:
 	echo '<a href="'.url_add_param( $current_url, 'hits_summary_mode=live' ).'"'
 		.' class="btn btn-default'.( $hits_summary_mode == 'live' ? ' active' : '' ).'">'
 		.T_('Live data')
 		.'</a>';
 
+	// Button to switch to view the aggregated hits data:
 	echo '<a href="'.url_add_param( $current_url, 'hits_summary_mode=aggregate' ).'"'
 		.' class="btn btn-default'.( $hits_summary_mode == 'aggregate' ? ' active' : '' ).'">'
 		.T_('Aggregate data')
 		.'</a>';
 
 	echo '</div>';
+
+	// Button to aggregate hits right now:
+	echo '<a href="'.url_add_param( $current_url, 'action=aggregate' ).'"'
+		.' class="btn btn-default pull-right">'
+		.T_('Aggregate Now')
+		.'</a>';
 }
 
 
