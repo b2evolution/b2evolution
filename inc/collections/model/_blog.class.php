@@ -3609,6 +3609,18 @@ class Blog extends DataObject
 		return $this->name;
 	}
 
+
+	/**
+	 * Get the short name of the blog
+	 *
+	 * @return sring
+	 */
+	function get_shortname()
+	{
+		return $this->shortname;
+	}
+
+
 	/**
 	 * Get the name of the blog limited by length
 	 *

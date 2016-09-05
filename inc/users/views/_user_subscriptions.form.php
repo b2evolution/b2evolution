@@ -339,7 +339,7 @@ else
 		$Form->output = false;
 
 		$subscribe_blog_ID = param( 'subscribe_blog' , '', isset( $Blog ) ? $Blog->ID : 0 );
-		$subscribe_blogs_select = $Form->select_input_object( 'subscribe_blog', $subscribe_blog_ID, $BlogCache, '', array( 'object_callback' => 'get_option_list_parent' ) ).'</span>';
+		$subscribe_blogs_select = $Form->select_input_object( 'subscribe_blog', $subscribe_blog_ID, $BlogCache, '', array( 'object_callback' => 'get_option_list_parent', 'loop_object_method' => 'get_shortname' ) ).'</span>';
 		$subscribe_blogs_button = $Form->button( array(
 			'name'  => 'actionArray[subscribe]',
 			'value' => T_('Subscribe'),
