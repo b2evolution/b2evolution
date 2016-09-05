@@ -1788,8 +1788,8 @@ div.error_additional_content {
   color: #0a0;
 }
 .evo_comment ul {
-  margin: 0;
   list-style-position: inside;
+  margin: 0 0 10px 0px;
 }
 .evo_comment_rating {
   margin: 3px;
