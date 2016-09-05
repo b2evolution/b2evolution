@@ -48,6 +48,7 @@ $login = NULL;
 $pass = NULL;
 $pass_md5 = NULL;
 $email_login = false;
+$check_login_crumb = true;
 
 if( isset( $_POST[ $dummy_fields[ 'login' ] ] ) && isset( $_POST[ $dummy_fields[ 'pwd' ] ] ) )
 { // Trying to log in with a POST
@@ -60,6 +61,12 @@ elseif( isset( $_GET[ $dummy_fields[ 'login' ] ] ) )
 	$login = $_GET[ $dummy_fields[ 'login' ] ];
 	$pass = isset( $_GET[ $dummy_fields[ 'pwd' ] ] ) ? $_GET[ $dummy_fields[ 'pwd' ] ] : '';
 	unset( $_GET[ $dummy_fields[ 'pwd' ] ] ); // password will be hashed below
+}
+elseif( $Settings->get( 'http_auth_accept' ) && ! $Session->has_User() && isset( $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'] ) )
+{	// Trying to log in with HTTP basic authentication:
+	$login = $_SERVER['PHP_AUTH_USER'];
+	$pass = $_SERVER['PHP_AUTH_PW'];
+	$check_login_crumb = false;
 }
 
 $Debuglog->add( 'Login: login: '.var_export( htmlspecialchars( $login, ENT_COMPAT, $evo_charset ), true ), '_init_login' );
@@ -101,9 +108,11 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 
 	header_nocache();		// Don't take risks here :p
 
-	// Check that this login request is not a CSRF hacked request:
-	$Session->assert_received_crumb( 'loginform' );
-	// fp> NOTE: TODO: now that we require going through the login form (instead of URL params), all the login logic that is here can probably be moved to login.php ?
+	if( $check_login_crumb )
+	{	// Check that this login request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'loginform' );
+		// fp> NOTE: TODO: now that we require going through the login form (instead of URL params), all the login logic that is here can probably be moved to login.php ?
+	}
 
 	// Note: login and password cannot include ' or " or > or <
 	// Note: login cannot include @

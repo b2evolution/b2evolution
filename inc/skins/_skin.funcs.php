@@ -1134,6 +1134,12 @@ var downloadInterval = setInterval( function()
 				header_redirect( $login_Blog->get( 'loginurl', array( 'glue' => '&' ) ) );
 			}
 
+			if( $Settings->get( 'http_auth_require' ) && ! isset( $_SERVER['PHP_AUTH_USER'] ) )
+			{	// Require HTTP authentication:
+				header( 'WWW-Authenticate: Basic realm="b2evolution"' );
+				header( 'HTTP/1.0 401 Unauthorized' );
+			}
+
 			$seo_page_type = 'Login form';
 			$robots_index = false;
 			break;

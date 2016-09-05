@@ -690,6 +690,13 @@ switch( $action )
 
 	default:
 		// Display login form:
+
+		if( $Settings->get( 'http_auth_require' ) && ! isset( $_SERVER['PHP_AUTH_USER'] ) )
+		{	// Require HTTP authentication:
+			header( 'WWW-Authenticate: Basic realm="b2evolution"' );
+			header( 'HTTP/1.0 401 Unauthorized' );
+		}
+
 		require $adminskins_path.'login/_login_form.main.php';
 }
 
