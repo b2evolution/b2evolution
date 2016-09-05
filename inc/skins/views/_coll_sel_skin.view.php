@@ -17,7 +17,7 @@ global $kind, $admin_url, $action, $AdminUI, $Session;
 
 $kind_title = get_collection_kinds( $kind );
 
-echo '<h2 class="page-title">'.sprintf( T_('New %s'), $kind_title ).':</h2>';
+echo '<h2 class="page-title">'.sprintf( T_('New [%s]'), $kind_title ).':</h2>';
 
 if( $action == 'new-selskin' )
 { // Select an existing skin

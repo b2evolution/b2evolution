@@ -2336,7 +2336,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 			default:
 				$object_type = NULL;
 		}
-		syslog_insert( sprintf( T_('Antispam: Illegal content found. Content contains blacklisted word "%s".'), $block ), 'error', $object_type );
+		syslog_insert( sprintf( 'Antispam: Illegal content found. Content contains blacklisted word "%s".', $block ), 'error', $object_type );
 	}
 
 	if( $error && $verbose )

@@ -122,7 +122,7 @@ else
 
 $has_messaging_perm = $edited_User->check_perm( 'perm_messaging', 'reply', false );
 
-$Form->begin_fieldset( T_('Email').( is_admin_page() ? get_manual_link( 'user-notifications-tab' ) : '' ) );
+$Form->begin_fieldset( T_('Email').( is_admin_page() ? get_manual_link( 'user-notifications-email-panel' ) : '' ) );
 
 	$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'" class="'.button_class().'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
 
@@ -151,7 +151,7 @@ $Form->begin_fieldset( T_('Email').( is_admin_page() ? get_manual_link( 'user-no
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Communications') );
+$Form->begin_fieldset( T_('Communications').( is_admin_page() ? get_manual_link( 'user-communications-panel' ) : '' ) );
 
 	$has_messaging_perm = $edited_User->check_perm( 'perm_messaging', 'reply', false );
 	$messaging_options = array(	array( 'PM', 1, T_( 'private messages on this site.' ), ( ( $UserSettings->get( 'enable_PM', $edited_User->ID ) ) && ( $has_messaging_perm ) ), !$has_messaging_perm || $disabled ) );
@@ -186,7 +186,7 @@ $Form->begin_fieldset( T_('Communications') );
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Notifications') );
+$Form->begin_fieldset( T_('Notifications').( is_admin_page() ? get_manual_link( 'user-notifications-panel' ) : '' ) );
 
 	// User notification options
 	$notify_options = array();
@@ -252,7 +252,7 @@ $Form->begin_fieldset( T_('Notifications') );
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Newsletters') );
+$Form->begin_fieldset( T_('Newsletter subscriptions').( is_admin_page() ? get_manual_link( 'user-newsletters-panel' ) : '' ) );
 
 	$newsletter_options = array(
 		array( 'edited_user_newsletter_news', 1, T_( 'Send me news about this site.' ).' <span class="note">'.T_('Each message contains an easy 1 click unsubscribe link.').'</span>', $UserSettings->get( 'newsletter_news',  $edited_User->ID ) ),
@@ -272,7 +272,7 @@ $Form->begin_fieldset( T_('Newsletters') );
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Blog subscriptions'), array( 'id' => 'subs' ) );
+$Form->begin_fieldset( T_('Collection subscriptions').( is_admin_page() ? get_manual_link( 'user-coll-subscriptions-panel' ) : '' ), array( 'id' => 'subs' ) );
 
 		// Get those blogs for which we have already subscriptions (for this user)
 		$blog_subs_SQL = new SQL( 'Get those blogs for which we have already subscriptions for this user #'.$edited_User->ID );
@@ -298,6 +298,14 @@ $Form->begin_fieldset( T_('Blog subscriptions'), array( 'id' => 'subs' ) );
 			}
 
 			$subs_blog_IDs[] = $sub_Blog->ID;
+
+			// Skip because the user no longer has access to the collection - but only after adding the collection ID to the $subs_blog_IDs array.
+			// The subscription will be removed from the DB when the user saves the form
+			if( ! $sub_Blog->has_access( $edited_User ) )
+			{
+				continue;
+			}
+
 			$subscriptions = array();
 			if( $sub_Blog->get_setting( 'allow_subscriptions' ) )
 			{	// If subscription is allowed for new posts:
@@ -339,7 +347,7 @@ else
 		$Form->output = false;
 
 		$subscribe_blog_ID = param( 'subscribe_blog' , '', isset( $Blog ) ? $Blog->ID : 0 );
-		$subscribe_blogs_select = $Form->select_input_object( 'subscribe_blog', $subscribe_blog_ID, $BlogCache, '', array( 'object_callback' => 'get_option_list_parent' ) ).'</span>';
+		$subscribe_blogs_select = $Form->select_input_object( 'subscribe_blog', $subscribe_blog_ID, $BlogCache, '', array( 'object_callback' => 'get_option_list_parent', 'loop_object_method' => 'get_shortname' ) ).'</span>';
 		$subscribe_blogs_button = $Form->button( array(
 			'name'  => 'actionArray[subscribe]',
 			'value' => T_('Subscribe'),
@@ -385,7 +393,7 @@ else
 }
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Individual post subscriptions') );
+$Form->begin_fieldset( T_('Individual post subscriptions').( is_admin_page() ? get_manual_link( 'user-post-subscriptions-panel' ) : '' ) );
 
 	$sql = 'SELECT DISTINCT post_ID, blog_ID, blog_shortname
 				FROM T_items__subscriptions

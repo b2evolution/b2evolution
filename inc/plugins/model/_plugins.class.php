@@ -870,19 +870,21 @@ class Plugins
 		if( empty($this->index_event_IDs[$event]) )
 		{ // No events registered
 			$Debuglog->add( 'No registered plugins.', 'plugins' );
-			return array();
+// DON'T RETURN HERE BECAUSE OF DIRTY HACK!!!
 		}
-
-		$Debuglog->add( 'Registered plugin IDs: '.implode( ', ', $this->index_event_IDs[$event]), 'plugins' );
-		foreach( $this->index_event_IDs[$event] as $l_plugin_ID )
-		{
-			$r = $this->call_method( $l_plugin_ID, $event, $params );
-			if( $r === true )
+		else
+		{	// We have some events registered, loop through them:
+			$Debuglog->add( 'Registered plugin IDs: '.implode( ', ', $this->index_event_IDs[$event]), 'plugins' );
+			foreach( $this->index_event_IDs[$event] as $l_plugin_ID )
 			{
-				$Debuglog->add( 'Plugin ID '.$l_plugin_ID.' returned true!', 'plugins' );
-				// Save the ID of the plugin which returned true:
-				$params['plugin_ID'] = & $l_plugin_ID;
-				return $params;
+				$r = $this->call_method( $l_plugin_ID, $event, $params );
+				if( $r === true )
+				{
+					$Debuglog->add( 'Plugin ID '.$l_plugin_ID.' returned true!', 'plugins' );
+					// Save the ID of the plugin which returned true:
+					$params['plugin_ID'] = & $l_plugin_ID;
+					return $params;
+				}
 			}
 		}
 

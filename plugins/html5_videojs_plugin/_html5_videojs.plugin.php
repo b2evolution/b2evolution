@@ -22,7 +22,7 @@ class html5_videojs_plugin extends Plugin
 	var $code = 'b2evH5VJSP';
 	var $name = 'HTML 5 VideoJS Player';
 	var $priority = 80;
-	var $version = '6.7.6';
+	var $version = '6.7.7';
 	var $group = 'files';
 	var $number_of_installs = 1;
 	var $allow_ext = array( 'flv', 'm4v', 'f4v', 'mp4', 'ogv', 'webm' );

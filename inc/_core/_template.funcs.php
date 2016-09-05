@@ -442,7 +442,7 @@ function get_request_title( $params = array() )
 			'user_text'           => T_('User: %s'),
 			'users_text'          => T_('Users'),
 			'closeaccount_text'   => T_('Close account'),
-			'subs_text'           => T_('Notifications'),
+			'subs_text'           => T_('Notifications & Subscriptions'),
 			'visits_text'         => T_('Profile Visits'),
 			'comments_text'       => T_('Latest Comments'),
 			'feedback-popup_text' => T_('Feedback'),
@@ -688,15 +688,15 @@ function get_request_title( $params = array() )
 			$cp = param( 'cp', 'integer', 0 ); // Copy post from Front-office
 			if( $action == 'edit_switchtab' || $p > 0 || $post_ID > 0 )
 			{	// Edit post
-				$title = sprintf( T_('Edit %s'), $type_name );
+				$title = sprintf( T_('Edit [%s]'), $type_name );
 			}
 			else if( $cp > 0 )
 			{	// Copy post
-				$title = sprintf( T_('Duplicate %s'), $type_name );
+				$title = sprintf( T_('Duplicate [%s]'), $type_name );
 			}
 			else
 			{	// Create post
-				$title = sprintf( T_('New %s'), $type_name );
+				$title = sprintf( T_('New [%s]'), $type_name );
 			}
 			if( $params['display_edit_links'] && $params['auto_pilot'] != 'seo_title' )
 			{ // Add advanced edit and close icon

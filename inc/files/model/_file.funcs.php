@@ -1711,7 +1711,7 @@ function report_user_upload( $File )
 	global $current_User;
 	load_funcs( 'files/model/_file.funcs.php' );
 
-	syslog_insert( sprintf( T_('User %s has uploaded the file %s -- Size: %s'),
+	syslog_insert( sprintf( 'User %s has uploaded the file %s -- Size: %s',
 			$current_User->login, '[['.$File->get_full_path().']]', bytesreadable( $File->get_size(), false ) ), 'info', 'file', $File->ID );
 }
 

@@ -509,7 +509,7 @@ switch( $action )
 		{	// Get item type to set a pge title:
 			$ItemTypeCache = & get_ItemTypeCache();
 			$ItemType = & $ItemTypeCache->get_by_ID( $item_typ_ID );
-			$title = sprintf( T_('New %s'), $ItemType->get_name() );
+			$title = sprintf( T_('New [%s]'), $ItemType->get_name() );
 		}
 
 		$AdminUI->breadcrumbpath_add( $title, '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$item_typ_ID );

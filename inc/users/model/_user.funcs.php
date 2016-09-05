@@ -25,7 +25,7 @@ load_class( 'users/model/_user.class.php', 'User' );
 	*/
 function report_user_create( $User )
 {
-	syslog_insert( sprintf( T_('User %s was created'), '[['.$User->login.']]' ), 'info', 'user', $User->ID );
+	syslog_insert( sprintf( 'User %s was created', '[['.$User->login.']]' ), 'info', 'user', $User->ID );
 }
 
 
