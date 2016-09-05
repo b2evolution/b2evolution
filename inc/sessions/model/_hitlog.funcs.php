@@ -1252,4 +1252,50 @@ function stats_goal_hit_extra_params( $ghit_params )
 
 	return htmlspecialchars( $ghit_params );
 }
+
+
+/**
+ * Display buttons to toggle between type of hits summary data(Live or Aggregate)
+ */
+function display_hits_summary_toggler()
+{
+	global $ReqURL;
+
+	$hits_summary_mode = get_hits_summary_mode();
+
+	$current_url = preg_replace( '/(\?|&)hits_summary_mode=([^&]+|$)/', '', $ReqURL );
+
+	echo '<div class="btn-group">';
+
+	echo '<a href="'.url_add_param( $current_url, 'hits_summary_mode=live' ).'"'
+		.' class="btn btn-default'.( $hits_summary_mode == 'live' ? ' active' : '' ).'">'
+		.T_('Live data')
+		.'</a>';
+
+	echo '<a href="'.url_add_param( $current_url, 'hits_summary_mode=aggregate' ).'"'
+		.' class="btn btn-default'.( $hits_summary_mode == 'aggregate' ? ' active' : '' ).'">'
+		.T_('Aggregate data')
+		.'</a>';
+
+	echo '</div>';
+}
+
+
+/**
+ * Get mode of hits summary data
+ *
+ * @return string Mode: 'live' or 'aggregate'
+ */
+function get_hits_summary_mode()
+{
+	global $Session;
+
+	$hits_summary_mode = $Session->get( 'hits_summary_mode' );
+	if( empty( $hits_summary_mode ) )
+	{	// Set mode to display the aggregated data by default:
+		$hits_summary_mode = 'aggregate';
+	}
+
+	return $hits_summary_mode;
+}
 ?>

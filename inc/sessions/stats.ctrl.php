@@ -251,6 +251,12 @@ if( isset( $tab_real ) )
 switch( $tab )
 {
 	case 'summary':
+		param( 'hits_summary_mode', 'string' );
+		if( ! empty( $hits_summary_mode ) )
+		{	// Save a selected mode of hits summary data in session variable:
+			$Session->set( 'hits_summary_mode', $hits_summary_mode );
+		}
+
 		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('Summary'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 		if( empty($tab3) )
