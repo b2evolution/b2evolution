@@ -298,6 +298,14 @@ $Form->begin_fieldset( T_('Collection subscriptions').( is_admin_page() ? get_ma
 			}
 
 			$subs_blog_IDs[] = $sub_Blog->ID;
+
+			// Skip because the user no longer has access to the collection - but only after adding the collection ID to the $subs_blog_IDs array.
+			// The subscription will be removed from the DB when the user saves the form
+			if( ! $sub_Blog->has_access( $edited_User ) )
+			{
+				continue;
+			}
+
 			$subscriptions = array();
 			if( $sub_Blog->get_setting( 'allow_subscriptions' ) )
 			{	// If subscription is allowed for new posts:
