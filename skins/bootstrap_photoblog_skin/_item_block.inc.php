@@ -25,7 +25,7 @@ $params = array_merge( array(
 		// Controlling the title:
 		'disp_title'                 => true,
 		'item_title_line_before'     => '<div class="evo_post_title">',	// Note: we use an extra class because it facilitates styling
-			'item_title_before'          => '<h2>',	
+			'item_title_before'          => '<h2>',
 			'item_title_after'           => '</h2>',
 			'item_title_single_before'   => '<h1>',	// This replaces the above in case of disp=single or disp=page
 			'item_title_single_after'    => '</h1>',
@@ -76,9 +76,9 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				'restrict_to_image_position' => 'teaser',
 			) );
 	?>
-	
+
 	<div class="evo_post_wrapper <?php if(!$Item->is_intro()){echo 'well';} ?>">
-	
+
 	<header>
 	<?php
 		// ------- Title -------
@@ -117,12 +117,12 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 
 			echo $params['item_title_line_after'];
 		}
-		
+
 		if( ! $Item->is_intro() )
 		{ // Don't display the following for intro posts
 
 			echo '<div class="small text-muted">';
-		
+
 			if( $Item->status != 'published' )
 			{
 				$Item->format_status( array(
@@ -163,13 +163,13 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				'before'    => ' &bull; ',
 				'after'     => '',
 			) );
-			
+
 			echo '</div>';
 		}
 	?>
-	
+
 	</header>
-	
+
 	<?php
 	if( $disp == 'single' )
 	{
@@ -188,8 +188,8 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
 			// Template params for "Item Tags" widget
-			'widget_item_tags_before'    => '<div class="small">'.T_('Tags').': ',
-			'widget_item_tags_after'     => '</div>',
+			'widget_item_tags_before'    => '<nav class="small post_tags">',
+			'widget_item_tags_after'     => '</nav>',
 			// Params for skin file "_item_content.inc.php"
 			'widget_item_content_params' => $params,
 			// Template params for "Item Attachments" widget:
@@ -219,18 +219,13 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	// this will end a </section>
 	}
 	?>
-	
+
 	</div> <!-- ../content_end_full_text -->
 
 		<?php
 			if( ! $Item->is_intro() ) // Do NOT apply tags, comments and feedback on intro posts
 			{ // List all tags attached to this post:
 				echo '<footer>';
-				$Item->tags( array(
-						'before'    => '<nav class="small post_tags">',
-						'after'     => '</nav>',
-						'separator' => ' ',
-					) );
 		?>
 
 		<nav>
@@ -260,10 +255,10 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 						) );
 		?>
 		</nav>
-			<?php 
+			<?php
 				echo '</footer>';
 			} ?>
-	
+
 	</div><!-- ../evo_post_wrapper -->
 	</section>  <!-- ../content_end_full -->
 

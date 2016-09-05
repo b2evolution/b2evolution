@@ -101,7 +101,7 @@ if( $current_User->check_perm( 'files', 'view' ) )
 						);
 }
 
-if( $LinkOwner->type != 'emailcampaign' )
+if( count( $LinkOwner->get_positions() ) > 1 )
 {	// Don't display a position column for email campaign because it always has only one position 'inline':
 	$Results->cols[] = array(
 						'th' => T_('Position'),
@@ -179,7 +179,7 @@ display_dragdrop_upload_button( array(
 							.'<a class="qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'
 						.'</div>'
 					.'</td>'
-					.( $LinkOwner->type != 'emailcampaign' ? '<td class="qq-upload-link-position lastcol shrinkwrap"></td>' : '' )
+					.( count( $LinkOwner->get_positions() ) > 1 ? '<td class="qq-upload-link-position lastcol shrinkwrap"></td>' : '' )
 				.'</tr></table>',
 		'display_support_msg'    => false,
 		'additional_dropzone'    => '#filelist_tbody',

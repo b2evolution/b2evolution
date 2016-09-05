@@ -2799,8 +2799,9 @@ class Comment extends DataObject
 				$params[ $param_key ] = & $params[ $param_key ];
 			}
 
-			if( count( $Plugins->trigger_event_first_true( 'RenderCommentAttachment', $params ) ) != 0 )
-			{ // File was processed by plugin
+			$r_params = $Plugins->trigger_event_first_true( 'RenderCommentAttachment', $params, true );
+			if( count( $r_params ) != 0 && isset( $r_params['plugin_ID'] ) )
+			{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
 				if( $link_position == 'teaser' )
 				{ // Image should be displayed above content
 					$images_above_content .= $r;
@@ -2812,6 +2813,10 @@ class Comment extends DataObject
 				unset( $attachments[ $index ] );
 				continue;
 			}
+
+			// Update params because they may be modified by some plugin above:
+			$params = $r_params;
+
 			if( $File->is_image() )
 			{ // File is image
 				if( $params['attachments_mode'] == 'view' )
@@ -3816,9 +3821,10 @@ class Comment extends DataObject
 		$members_count = 0;
 		$community_count = 0;
 		foreach( $notify_users as $user_ID => $notify_type )
-		{	// Check each subscribed user if we can send notification to him depending on current request and item settings:
+		{	// Check for each subscribed User, if we can send a notification to him depending on current request and Item settings:
+
 			if( ! ( $notify_User = & $UserCache->get_by_ID( $user_ID, false, false ) ) )
-			{	// Wrong user, Skip it:
+			{	// Invalid User, Skip it:
 				unset( $notify_users[ $user_ID ] );
 				continue;
 			}
@@ -3860,11 +3866,11 @@ class Comment extends DataObject
 		}
 
 		if( $notify_members )
-		{	// Display a message to know how much members are notified:
+		{	// Display a message to know how many members are notified:
 			$Messages->add( sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count ), 'note' );
 		}
 		if( $notify_community )
-		{	// Display a message to know how much community users are notified:
+		{	// Display a message to know how many community users are notified:
 			$Messages->add( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), 'note' );
 		}
 

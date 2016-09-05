@@ -630,6 +630,12 @@ class ItemListLight extends DataObjectList2
 			$this->filters['orderby'] = $this->Blog->get_setting('orderby');
 		}
 
+		if( isset( $this->filters['orderby'] ) && $this->filters['orderby'] == 'numviews' )
+		{ // Order by number of views
+			$this->ItemQuery->FROM_add( 'LEFT JOIN ( SELECT itud_item_ID, COUNT(*) AS '.$this->Cache->dbprefix.'numviews FROM T_items__user_data GROUP BY itud_item_ID ) AS numviews
+					ON '.$this->Cache->dbIDname.' = numviews.itud_item_ID' );
+		}
+
 		if( empty($order_by) )
 		{
 			$available_fields = array_keys( get_available_sort_options() );
@@ -770,10 +776,10 @@ class ItemListLight extends DataObjectList2
 	 *
 	 * Contrary to ItemList2, we only do 1 query here and we extract only a few selected params.
 	 * Basically all we want is being able to generate permalinks.
-	 * 
+	 *
 	 * We need this query() stub in order to call it from restart() and still
 	 * let derivative classes override it
-	 * 
+	 *
 	 * @deprecated Use new function run_query()
 	 */
 	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
@@ -1156,7 +1162,7 @@ class ItemListLight extends DataObjectList2
 				$filter_class_i++;
 				$tags = implode( $params['separator_comma'], $tag_names );
 				$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
-					( count( $tag_names ) > 1 ? 
+					( count( $tag_names ) > 1 ?
 						array( $params['tags_text'], $params['before_items'].$tags.$params['after_items'] ) :
 						array( $params['tag_text'], $tags ) ),
 					$params['group_mask'] );
@@ -1335,7 +1341,7 @@ class ItemListLight extends DataObjectList2
 					}
 					$filter_class_i++;
 					$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
-						( count( $status_titles ) > 1 ? 
+						( count( $status_titles ) > 1 ?
 							array( $params['visibility_text'], $params['before_items'].implode( $params['separator_comma'], $status_titles ).$params['after_items'] ) :
 							array( $params['visibility_text'], implode( $params['separator_comma'], $status_titles ) ) ),
 						$params['group_mask'] );

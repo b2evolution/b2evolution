@@ -229,7 +229,7 @@ class Blog extends DataObject
 			$this->longdesc = $db_row->blog_longdesc;
 			$this->locale = $db_row->blog_locale;
 			$this->access_type = $db_row->blog_access_type;
-			$this->http_protocol = $db_row->blog_http_protocol;
+			$this->http_protocol = isset( $db_row->blog_http_protocol ) ? $db_row->blog_http_protocol : 'always_redirect';
 			$this->siteurl = $db_row->blog_siteurl;
 			$this->urlname = $db_row->blog_urlname;
 			$this->links_blog_ID = $db_row->blog_links_blog_ID; // DEPRECATED
@@ -364,6 +364,15 @@ class Blog extends DataObject
 				$this->set( 'shortname', empty($shortname) ? T_('Tracker') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'tracker' : $urlname );
 				$this->set_setting( 'use_workflow', 1 );
+				// Try to find post type "Forum Topic" in DB
+				global $DB;
+				$forum_topic_type_ID = $DB->get_var( 'SELECT ityp_ID
+					 FROM T_items__type
+					WHERE ityp_name = "Forum Topic"' );
+				if( $forum_topic_type_ID )
+				{ // Set default post type as "Forum Topic"
+					$this->set_setting( 'default_post_type', $forum_topic_type_ID );
+				}
 				break;
 
 			case 'forum':
@@ -1278,7 +1287,6 @@ class Blog extends DataObject
 
 				if( $this->get( 'access_type' ) == 'absolute' &&
 				    ( $this->get_setting( 'rsc_assets_url_type' ) == 'basic' ||
-				      $this->get_setting( 'media_assets_url_type' ) == 'basic' ||
 				      $this->get_setting( 'skins_assets_url_type' ) == 'basic' ||
 				      $this->get_setting( 'plugins_assets_url_type' ) == 'basic' ) )
 				{	// Display warning for such settings combination:
@@ -1291,11 +1299,6 @@ class Blog extends DataObject
 					{	// If rsc path is relative url:
 						$Messages->add( sprintf( T_('WARNING: your %s and %s assets URL seem to be configured in a potentially undesirable way. Please check your Assets URLs below.'),
 							'<code>/rsc/</code>', '<code>/skins/</code>' ), 'warning' );
-					}
-					if( $this->get_setting( 'media_assets_url_type' ) == 'relative' )
-					{	// If media path is relative url:
-						$Messages->add( sprintf( T_('WARNING: your %s and %s assets URL seem to be configured in a potentially undesirable way. Please check your Assets URLs below.'),
-							'<code>/media/</code>', '<code>/skins/</code>' ), 'warning' );
 					}
 					if( $this->get_setting( 'plugins_assets_url_type' ) == 'relative' )
 					{	// If plugins path is relative url:
@@ -3705,6 +3708,18 @@ class Blog extends DataObject
 		return $this->name;
 	}
 
+
+	/**
+	 * Get the short name of the blog
+	 *
+	 * @return sring
+	 */
+	function get_shortname()
+	{
+		return $this->shortname;
+	}
+
+
 	/**
 	 * Get the name of the blog limited by length
 	 *
@@ -4243,9 +4258,14 @@ class Blog extends DataObject
 	 *
 	 * @return boolean TRUE on success
 	 */
-	function has_access()
+	function has_access( $User = NULL )
 	{
 		global $current_User;
+
+		if( is_null( $User ) )
+		{
+			$User = $current_User;
+		}
 
 		$allow_access = $this->get_setting( 'allow_access' );
 
@@ -4258,7 +4278,7 @@ class Blog extends DataObject
 		{	// Only logged in users have an access to this collection:
 			return false;
 		}
-		elseif( $allow_access == 'members' && ! $current_User->check_perm( 'blog_ismember', 'view', false, $this->ID ) )
+		elseif( $allow_access == 'members' && ! $User->check_perm( 'blog_ismember', 'view', false, $this->ID ) )
 		{	// Current user must be a member of this collection:
 			return false;
 		}
@@ -4587,6 +4607,10 @@ class Blog extends DataObject
 
 			case 'manual':
 				$default_post_types = array( 'Manual Page' );
+				break;
+
+			case 'group':
+				$default_post_types = array( 'Forum Topic', 'Bug Report' );
 				break;
 
 			default: // 'std'

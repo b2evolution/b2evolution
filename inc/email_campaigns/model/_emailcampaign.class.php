@@ -96,6 +96,8 @@ class EmailCampaign extends DataObject
 	{
 		return array(
 				array( 'table'=>'T_email__campaign_send', 'fk'=>'csnd_camp_ID', 'msg'=>T_('%d links with users') ),
+				array( 'table'=>'T_links', 'fk'=>'link_ecmp_ID', 'msg'=>T_('%d links to destination email campaigns'),
+						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
 			);
 	}
 

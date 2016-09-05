@@ -197,7 +197,7 @@ function init_inskin_editing()
 
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit', '&' );
 	}
-	
+
 	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:Restrict item status to max allowed by item collection:
 	$edited_Item->restrict_status();
 
@@ -3999,6 +3999,26 @@ function load_user_data_for_items( $post_ids = NULL )
 			$cache_items_user_data[ $post_ID ] = NULL;
 		}
 	}
+}
+
+
+/**
+ * Get total number of members who has viewed the item
+ *
+ * @param object Item
+ * @return integer Total number of members who has viewed the item
+ */
+function get_item_numviews( $Item )
+{
+	global $DB;
+
+	// SELECT current User's post and comment read statuses for all post with the given ids:
+	$SQL = new SQL( 'Get total number of members who have viewed the post' );
+	$SQL->SELECT( 'COUNT(*)' );
+	$SQL->FROM( 'T_items__user_data' );
+	$SQL->WHERE( 'itud_item_ID = '.$Item->ID );
+
+	return $DB->get_var( $SQL->get() );
 }
 
 

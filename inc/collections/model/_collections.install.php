@@ -354,6 +354,14 @@ $schema_queries = array_merge( $schema_queries, array(
 			UNIQUE itemtypecoll ( itc_ityp_ID, itc_coll_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
+	'T_items__status_type' => array(
+		'Creating table for PostType-to-Status relationships',
+		"CREATE TABLE T_items__status_type (
+			its_pst_ID INT(11) UNSIGNED NOT NULL,
+			its_ityp_ID INT(11) UNSIGNED NOT NULL,
+			PRIMARY KEY ( its_ityp_ID, its_pst_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
 	'T_items__tag' => array(
 		'Creating table for Tags',
 		"CREATE TABLE T_items__tag (

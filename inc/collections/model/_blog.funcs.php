@@ -951,7 +951,7 @@ function get_highest_publish_status( $type, $blog, $with_label = true, $restrict
  * @param bool true to skip tags from pages, intro posts and sidebar stuff
  * @return array of tags
  */
-function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts = false )
+function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts = false, $post_statuses = array( 'published' ) )
 {
 	global $DB, $localtimenow;
 
@@ -986,7 +986,7 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	$tags_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
 
 	$tags_SQL->WHERE( $where_cat_clause );
-	$tags_SQL->WHERE_and( 'post_status = "published"' );
+	$tags_SQL->WHERE_and( 'post_status IN ("'.implode( '", "', $post_statuses ).'")' );
 	$tags_SQL->WHERE_and( 'post_datestart < '.$DB->quote( remove_seconds( $localtimenow ) ) );
 
 	if( $skip_intro_posts )

@@ -5835,7 +5835,7 @@ function format_to_js( $unformatted )
 
 
 /**
- * Get available cort oprions for items
+ * Get available sort options for items
  *
  * @return array key=>name
  */
@@ -5851,13 +5851,14 @@ function get_available_sort_options()
 		'last_touched_ts' => T_('Date last touched'),
 		'urltitle'        => T_('URL "filename"'),
 		'priority'        => T_('Priority'),
+		'numviews'        => T_('Number of members who have viewed the post (If tracking enabled)'),
 		'RAND'            => T_('Random order!'),
 	);
 }
 
 
 /**
- * Get available cort oprions for blogs
+ * Get available sort options for blogs
  *
  * @return array key=>name
  */
@@ -5926,17 +5927,17 @@ function get_from_mem_cache( $key, & $success )
 
 	$Timer->resume( 'get_from_mem_cache', false );
 
-	if( function_exists( 'apc_fetch' ) )
+	if( function_exists( 'apcu_fetch' ) )
+	{	// APCu
+		$r = apcu_fetch( $key, $success );
+	}
+	elseif( function_exists( 'apc_fetch' ) )
 	{	// APC
 		$r = apc_fetch( $key, $success );
 	}
 	elseif( function_exists( 'xcache_get' ) && ini_get( 'xcache.var_size' ) > 0 )
 	{	// XCache
 		$r = xcache_get( $key );
-	}
-	elseif( function_exists( 'apcu_fetch' ) )
-	{	// APCu
-		$r = apcu_fetch( $key, $success );
 	}
 
 	if( ! isset($success) )
@@ -5974,17 +5975,17 @@ function set_to_mem_cache( $key, $payload, $ttl = 0 )
 
 	$Timer->resume( 'set_to_mem_cache', false );
 
-	if( function_exists( 'apc_store' ) )
+	if( function_exists( 'apcu_store' ) )
+	{	// APCu
+		$r = apcu_store( $key, $payload, $ttl );
+	}
+	elseif( function_exists( 'apc_store' ) )
 	{	// APC
 		$r = apc_store( $key, $payload, $ttl );
 	}
 	elseif( function_exists( 'xcache_set' ) && ini_get( 'xcache.var_size' ) > 0 )
 	{	// XCache
 		$r = xcache_set( $key, $payload, $ttl );
-	}
-	elseif( function_exists( 'apcu_store' ) )
-	{	// APCu
-		$r = apcu_store( $key, $payload, $ttl );
 	}
 	else
 	{	// No available cache module:
@@ -6107,14 +6108,14 @@ function & get_IconLegend()
  */
 function get_active_opcode_cache()
 {
-	if( function_exists('apc_cache_info') && ini_get('apc.enabled') ) # disabled for CLI (see apc.enable_cli), however: just use this setting and do not call the function.
+	if( function_exists('opcache_invalidate') )
 	{
-		// fp>blueyed? why did you remove the following 2 lines? your comment above is not clear.
-		$apc_info = apc_cache_info( '', true );
-		if( isset( $apc_info['num_slots'] ) && ( $apc_info['num_slots'] ) )
-		{
-			return 'APC';
-		}
+		return 'OPCache';
+	}
+
+	if( function_exists('apc_delete_file') )
+	{
+		return 'APC';
 	}
 
 	// xcache: xcache.var_size must be > 0. xcache_set is not necessary (might have been disabled).
@@ -6132,16 +6133,6 @@ function get_active_opcode_cache()
 		}
 	}
 
-	if( ini_get( 'opcache.enable' ) )
-	{
-		return 'OPCache';
-	}
-
-	if( function_exists( 'apc_cache_info' ) && ini_get( 'apc.enabled' ) )
-	{
-		return 'APC';
-	}
-
 	return 'none';
 }
 
@@ -6153,12 +6144,12 @@ function get_active_opcode_cache()
  */
 function get_active_user_cache()
 {
-	if( function_exists( 'apcu_cache_info' ) && ini_get( 'apc.enabled' ) )
+	if( function_exists( 'apcu_cache_info' ) /* && ini_get( 'apc.enabled' ) */ )
 	{
 		return 'APCu';
 	}
 
-	if( function_exists( 'apc_cache_info' ) && ini_get( 'apc.enabled' ) )
+	if( function_exists( 'apc_cache_info' ) /* && ini_get( 'apc.enabled' ) */ )
 	{
 		return 'APC';
 	}
@@ -7311,9 +7302,12 @@ function echo_editable_column_js( $params = array() )
 	if( $params['field_type'] == 'select' )
 	{
 		$options = '';
-		foreach( $params['options'] as $option_value => $option_title )
+		if( is_array( $params['options'] ) )
 		{
-			$options .= '\''.$option_value.'\':\''.$option_title.'\','."\n";
+			foreach( $params['options'] as $option_value => $option_title )
+			{
+				$options .= '\''.$option_value.'\':\''.$option_title.'\','."\n";
+			}
 		}
 	}
 
@@ -7333,7 +7327,16 @@ jQuery( document ).ready( function()
 			value = ajax_debug_clear( value );
 			<?php if( $params['field_type'] == 'select' ) { ?>
 			var result = value.match( /rel="([^"]*)"/ );
-			return { <?php echo $options; ?>'selected' : result[1] }
+			<?php
+			if( is_array( $params['options'] ) )
+			{
+				echo "return { ".$options."'selected' : result[1] }";
+			}
+			else
+			{
+				echo "return ".$params['options'];
+			}
+			?>
 			<?php } else { ?>
 			var result = value.match( />\s*([^<]+)\s*</ );
 			return result[1] == '<?php echo $params['null_text'] ?>' ? '' : result[1];
@@ -8129,6 +8132,14 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 	if( !isset( $LinkList ) )
 	{	// Get list of attached Links only first time:
+		if( $Object->ID == 0 )
+		{	// Get temporary object ID on preview new creating object:
+			$temp_link_owner_ID = param( 'temp_link_owner_ID', 'integer', NULL );
+		}
+		else
+		{	// Don't use temporary object for existing object:
+			$temp_link_owner_ID = NULL;
+		}
 		switch( $object_class )
 		{
 			case 'Item':
@@ -8139,6 +8150,11 @@ function render_inline_tags( $Object, $tags, $params = array() )
 			case 'EmailCampaign':
 				$LinkOwner = new LinkEmailCampaign( $Object );
 				$plugin_event_name = 'RenderEmailAttachment';
+				break;
+
+			case 'Message':
+				$LinkOwner = new LinkMessage( $Object, $temp_link_owner_ID );
+				$plugin_event_name = 'RenderMessageAttachment';
 				break;
 
 			default:
@@ -8270,15 +8286,24 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 					if( $inline_type == 'image' )
 					{	// Generate the IMG tag with all the alt, title and desc if available:
-						if( $object_class == 'Item' )
-						{	// Get the IMG tag with link to original image or to Item page:
-							$inlines[ $current_inline ] = $Object->get_attached_image_tag( $Link, $current_image_params );
-						}
-						else
-						{	// Get the IMG tag without link:
-							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
-									'image_link_to' => false
-								) ) );
+						switch( $object_class )
+						{
+							case 'Item':
+								// Get the IMG tag with link to original image or to Item page:
+								$inlines[ $current_inline ] = $Object->get_attached_image_tag( $Link, $current_image_params );
+								break;
+
+							case 'EmailCampaign':
+								// Get the IMG tag without link for email content:
+								$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
+										'image_link_to' => false
+									) ) );
+								break;
+
+							default:
+								// Get the IMG tag with link to original big image:
+								$inlines[ $current_inline ] = $Link->get_tag( array_merge( $params, $current_image_params ) );
+								break;
 						}
 					}
 					elseif( $inline_type == 'inline' )
@@ -8361,15 +8386,24 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						'image_class'         => implode( ' ', $thumbnail_classes ),
 					);
 
-					if( $object_class == 'Item' )
-					{	// Get the IMG tag with link to original image or to Item page:
-						$inlines[ $current_inline ] = $Object->get_attached_image_tag( $Link, $current_image_params );
-					}
-					else
-					{	// Get the IMG tag without link:
-						$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
-								'image_link_to' => false
-							) ) );
+					switch( $object_class )
+					{
+						case 'Item':
+							// Get the IMG tag with link to original image or to Item page:
+							$inlines[ $current_inline ] = $Object->get_attached_image_tag( $Link, $current_image_params );
+							break;
+
+						case 'EmailCampaign':
+							// Get the IMG tag without link for email content:
+							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
+									'image_link_to' => false
+								) ) );
+							break;
+
+						default:
+							// Get the IMG tag with link to original big image:
+							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $params, $current_image_params ) );
+							break;
 					}
 				}
 				else
@@ -8486,5 +8520,74 @@ function render_inline_tags( $Object, $tags, $params = array() )
 	}
 
 	return $inlines;
+}
+
+function php_to_jquery_date_format( $php_format )
+{
+	$tokens = array(
+			// Day
+			'd' => 'dd',
+			'D' => 'D',
+			'j' => 'd',
+			'l' => 'DD',
+			'N' => '',
+			'S' => '',
+			'w' => '',
+			'z' => 'o',
+			// Week
+			'W' => '',
+			// Month
+			'F' => 'MM',
+			'm' => 'mm',
+			'M' => 'M',
+			'n' => 'm',
+			't' => '',
+			// Year
+			'L' => '',
+			'o' => '',
+			'Y' => 'yy',
+			'y' => 'y',
+			// Time
+			'a' => '',
+			'A' => '',
+			'B' => '',
+			'g' => '',
+			'G' => '',
+			'h' => '',
+			'H' => '',
+			'i' => '',
+			's' => '',
+			'u' => '' );
+
+	$js_format = "";
+	$escaping = false;
+	for( $i = 0; $i < strlen( $php_format ); $i++ )
+	{
+		$char = $php_format[$i];
+		if($char === '\\') // PHP date format escaping character
+		{
+			$i++;
+			if( $escaping ) $js_format .= $php_format[$i];
+			else $js_format .= '\'' . $php_format[$i];
+			$escaping = true;
+		}
+		else
+		{
+			if( $escaping )
+			{
+				$jqueryui_format .= "'"; $escaping = false;
+			}
+			if( isset( $tokens[$char] ) )
+			{
+				$js_format .= $tokens[$char];
+			}
+			else
+			{
+				$js_format .= $char;
+			}
+		}
+	}
+
+	return $js_format;
 }
 ?>

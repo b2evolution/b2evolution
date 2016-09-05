@@ -58,6 +58,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_items__user_data'         => $tableprefix.'items__user_data',
 		'T_items__version'           => $tableprefix.'items__version',
 		'T_items__votes'             => $tableprefix.'items__votes',
+		'T_items__status_type'       => $tableprefix.'items__status_type',
 		'T_links'                    => $tableprefix.'links',
 		'T_links__vote'              => $tableprefix.'links__vote',
 		'T_postcats'                 => $tableprefix.'postcats',
@@ -558,7 +559,7 @@ class collections_Module extends Module
 				'note' => '',
 				),
 			'perm_max_createblog_num' => array(
-				'label' => T_('Maximum number of blogs allowed'),
+				'label' => T_('Maximum number of collections allowed'),
 				'user_func' => 'check_createblog_user_perm',
 				'group_funct' => 'check_createblog_group_perm',
 				'perm_block' => 'blogging',

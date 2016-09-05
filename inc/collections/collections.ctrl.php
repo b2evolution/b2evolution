@@ -141,7 +141,7 @@ switch( $action )
 			$edited_Blog->set( 'sec_ID', $sec_ID );
 		}
 
-		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( T_('New %s'), get_collection_kinds($kind) ) ) );
+		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( T_('New [%s]'), get_collection_kinds($kind) ) ) );
 		break;
 
 	case 'create':

@@ -92,6 +92,9 @@ switch( $action )
 			// Insert in DB:
 			$edited_ItemStatus->dbinsert();
 
+			// Update allowed item types
+			$edited_ItemStatus->update_item_types_from_Request();
+
 			$Messages->add( T_('New Post Status has been created.'), 'success' );
 
 			switch( $action )
@@ -130,7 +133,7 @@ switch( $action )
 		// load data from request
 		if( $edited_ItemStatus->load_from_Request() )
 		{	// We could load data from form without errors:
-
+			$edited_ItemStatus->update_item_types_from_Request();
 			$edited_ItemStatus->dbupdate();
 			$Messages->add( T_('Post Status has been updated.'), 'success' );
 

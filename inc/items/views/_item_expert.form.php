@@ -621,7 +621,10 @@ $Form->begin_form( '', '', $params );
 
 			$ItemStatusCache = & get_ItemStatusCache();
 			$ItemStatusCache->load_all();
-			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true ), T_('Task status') );
+
+			$ItemTypeCache = & get_ItemTypeCache();
+			$current_ItemType = $ItemTypeCache->get_by_ID( $edited_Item->ityp_ID );
+			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status') );
 
 			echo ' '; // allow wrapping!
 

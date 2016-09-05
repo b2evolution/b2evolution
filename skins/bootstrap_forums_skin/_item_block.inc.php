@@ -192,6 +192,9 @@ skin_widget( array(
 								'before_attach_size' => ' <span class="evo_file_size">(',
 								'after_attach_size'  => ')</span>',
 							),
+						// Template params for "Item Tags" widget
+						'widget_item_tags_before'    => '<nav class="small post_tags">',
+						'widget_item_tags_after'     => '</nav>',
 					) );
 					// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 					?>
@@ -205,15 +208,6 @@ skin_widget( array(
 					// Note: You can customize the default item content by copying the generic
 					// /skins/_item_content.inc.php file into the current skin folder.
 					// -------------------------- END OF POST CONTENT -------------------------
-				}
-
-				if( ! $Item->is_intro() )
-				{ // List all tags attached to this topic:
-					$Item->tags( array(
-							'before'    => '<nav class="small post_tags">',
-							'after'     => '</nav>',
-							'separator' => ' ',
-						) );
 				}
 				?>
 			</div>

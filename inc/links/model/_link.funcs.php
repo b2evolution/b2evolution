@@ -101,7 +101,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 	global $admin_url, $AdminUI;
 	global $current_User, $action;
 
-	if( $LinkOwner->type == 'item' && ! $LinkOwner->Item->get_type_setting( 'allow_attachments' ) )
+	if( $LinkOwner->type == 'item' && ! $LinkOwner->is_temp && ! $LinkOwner->Item->get_type_setting( 'allow_attachments' ) )
 	{ // Attachments are not allowed for current post type
 		return;
 	}
@@ -115,7 +115,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 	switch( $LinkOwner->type )
 	{
 		case 'item':
-			$window_title = format_to_js( sprintf( T_('Attach files to "%s"'), $LinkOwner->Item->get( 'title' ) ) );
+			$window_title = $LinkOwner->is_temp ? '' : format_to_js( sprintf( T_('Attach files to "%s"'), $LinkOwner->Item->get( 'title' ) ) );
 			$form_id = 'itemform_links';
 			break;
 
@@ -130,13 +130,12 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 			break;
 
 		case 'message':
-			//$Thread = & $LinkOwner->Message->get_Thread();
-			$window_title = '';// format_to_js( sprintf( T_('Attach files to message "%s"'), $Thread->get( 'title' ) ) );
+			$window_title = '';
 			$form_id = 'msgform_links';
 			break;
 
 		default:
-			$window_title = TS_('Attach files');
+			$window_title = '';
 			$form_id = 'atchform_links';
 			break;
 	}
@@ -166,7 +165,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 	if( $current_User->check_perm( 'files', 'view' )
 		&& $LinkOwner->check_perm( 'edit', false ) )
 	{ // Check that we have permission to edit owner:
-		$attach_files_url = $admin_url.'?ctrl=files&amp;fm_mode=link_object&amp;link_type=item&amp;link_object_ID='.$LinkOwner->get_ID();
+		$attach_files_url = $admin_url.'?ctrl=files&amp;fm_mode=link_object&amp;link_type='.$LinkOwner->type.( $LinkOwner->type != 'message' ? '&amp;link_object_ID='.$LinkOwner->get_ID() : '' );
 		if( $linkowner_FileList = $LinkOwner->get_attachment_FileList( 1 ) )
 		{	// Get first file of the Link Owner:
 			$linkowner_File = & $linkowner_FileList->get_next();

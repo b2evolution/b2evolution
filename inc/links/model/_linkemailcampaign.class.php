@@ -195,7 +195,7 @@ class LinkEmailCampaign extends LinkOwner
 		{	// Find inline image placeholders if link ID is defined:
 			preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):'.$link_ID.':?[^\]]*\]/i', $this->EmailCampaign->email_text, $inline_images );
 			if( ! empty( $inline_images[0] ) )
-			{	// There are inline image placeholders in the post content:
+			{	// There are inline image placeholders in the email content:
 				$this->EmailCampaign->set( 'email_text', str_replace( $inline_images[0], '', $this->EmailCampaign->email_text ) );
 				$this->EmailCampaign->dbupdate();
 				return;

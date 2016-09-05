@@ -185,7 +185,7 @@ else
 	if( !empty( $author ) && ( $block = antispam_check( $author ) ) )
 	{
 		// Log incident in system log
-		syslog_insert( sprintf( T_('Antispam: Supplied name "%s" contains blacklisted word "%s".'), $author, $block ), 'error', 'comment', $comment_item_ID );
+		syslog_insert( sprintf( 'Antispam: Supplied name "%s" contains blacklisted word "%s".', $author, $block ), 'error', 'comment', $comment_item_ID );
 
 		$Messages->add( T_('Supplied name is invalid.'), 'error' );
 	}
@@ -194,7 +194,7 @@ else
 		&& ( !is_email( $email )|| ( $block = antispam_check( $email ) ) ) )
 	{
 		// Log incident in system log
-		syslog_insert( sprintf( T_('Antispam: Supplied email address "%s" contains blacklisted word "%s".'), $email, $block ), 'error', 'comment', $comment_item_ID );
+		syslog_insert( sprintf( 'Antispam: Supplied email address "%s" contains blacklisted word "%s".', $email, $block ), 'error', 'comment', $comment_item_ID );
 
 		$Messages->add( T_('Supplied email address is invalid.'), 'error' );
 	}
@@ -303,8 +303,7 @@ if( !empty( $preview_attachments ) )
 	}
 }
 
-if( $commented_Item->can_attach() && ( $action == 'preview' ) &&
-    !empty( $_FILES['uploadfile'] ) && !empty( $_FILES['uploadfile']['size'] ) && !empty( $_FILES['uploadfile']['size'][0] ) )
+if( $commented_Item->can_attach() && !empty( $_FILES['uploadfile'] ) && !empty( $_FILES['uploadfile']['size'] ) && !empty( $_FILES['uploadfile']['size'][0] ) )
 { // attaching files is permitted
 	$FileRootCache = & get_FileRootCache();
 	if( is_logged_in() )

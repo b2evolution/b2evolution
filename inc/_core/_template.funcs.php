@@ -184,8 +184,8 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 
 	$allow_collection_redirect = false;
 
-	if( $external_redirect 
-		&& $allow_redirects_to_different_domain == 'all_collections_and_redirected_posts' 
+	if( $external_redirect
+		&& $allow_redirects_to_different_domain == 'all_collections_and_redirected_posts'
 		&& ! $redirected_post )
 	{ // If a redirect is external and we allow to redirect to all collection domains:
 		global $basehost;
@@ -442,7 +442,7 @@ function get_request_title( $params = array() )
 			'user_text'           => T_('User: %s'),
 			'users_text'          => T_('Users'),
 			'closeaccount_text'   => T_('Close account'),
-			'subs_text'           => T_('Notifications'),
+			'subs_text'           => T_('Notifications & Subscriptions'),
 			'visits_text'         => T_('Profile Visits'),
 			'comments_text'       => T_('Latest Comments'),
 			'feedback-popup_text' => T_('Feedback'),
@@ -688,15 +688,15 @@ function get_request_title( $params = array() )
 			$cp = param( 'cp', 'integer', 0 ); // Copy post from Front-office
 			if( $action == 'edit_switchtab' || $p > 0 || $post_ID > 0 )
 			{	// Edit post
-				$title = sprintf( T_('Edit %s'), $type_name );
+				$title = sprintf( T_('Edit [%s]'), $type_name );
 			}
 			else if( $cp > 0 )
 			{	// Copy post
-				$title = sprintf( T_('Duplicate %s'), $type_name );
+				$title = sprintf( T_('Duplicate [%s]'), $type_name );
 			}
 			else
 			{	// Create post
-				$title = sprintf( T_('New %s'), $type_name );
+				$title = sprintf( T_('New [%s]'), $type_name );
 			}
 			if( $params['display_edit_links'] && $params['auto_pilot'] != 'seo_title' )
 			{ // Add advanced edit and close icon
@@ -1548,7 +1548,8 @@ function init_datepicker_js( $relative_to = 'rsc_url' )
 	require_css( '#jqueryUI_css#', $relative_to );
 
 	$datefmt = locale_datefmt();
-	$datefmt = str_replace( array( 'd', 'j', 'm', 'Y' ), array( 'dd', 'd', 'mm', 'yy' ), $datefmt );
+	//$datefmt = str_replace( array( 'd', 'j', 'm', 'Y' ), array( 'dd', 'd', 'mm', 'yy' ), $datefmt );
+	$datefmt = php_to_jquery_date_format( $datefmt );
 	add_js_headline( 'jQuery(document).ready( function(){
 		var monthNames = ["'.T_('January').'","'.T_('February').'", "'.T_('March').'",
 						  "'.T_('April').'", "'.T_('May').'", "'.T_('June').'",

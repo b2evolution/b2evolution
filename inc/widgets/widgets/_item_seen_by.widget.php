@@ -196,8 +196,9 @@ class item_seen_by_Widget extends ComponentWidget
 		}
 
 		// Print out all member logins with post read statuses:
+		echo '<span class="evo_seen_by">';
 		echo sprintf( T_('Seen by: %s'), implode( ', ', $login_users ) );
-
+		echo '</span>';
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
 

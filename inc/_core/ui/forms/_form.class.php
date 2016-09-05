@@ -1213,6 +1213,8 @@ class Form extends Widget
 				case "j": return "d"; // day, 1-31
 				case "l": return "EE"; // weekday (name)
 				case "D": return "E"; // weekday (abbr)
+				case "S": return "";
+
 				case "e": return ""; // weekday letter, not supported
 
 				case "m": return "MM"; // month, 01-12
