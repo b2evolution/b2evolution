@@ -1112,10 +1112,20 @@ class User extends DataObject
 				// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
 				if( $subscribe_blog_ID && ( $sub_items || $sub_comments ) )
 				{ // We need to record values:
-					$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
-					  VALUES ( '.$DB->quote( $subscribe_blog_ID ).', '.$DB->quote( $this->ID ).', '.$DB->quote( $sub_items ).', '.$DB->quote( $sub_comments ).' )' );
+					$BlogCache = & get_BlogCache();
+					$subscribe_Blog = & $BlogCache->get_by_ID( $subscribe_blog_ID, false, false );
 
-					$Messages->add( T_('Subscriptions have been changed.'), 'success' );
+					if( $subscribe_Blog->has_access( $this ) )
+					{ // user has access to the collection
+						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
+							VALUES ( '.$DB->quote( $subscribe_blog_ID ).', '.$DB->quote( $this->ID ).', '.$DB->quote( $sub_items ).', '.$DB->quote( $sub_comments ).' )' );
+
+						$Messages->add( T_('Subscriptions have been changed.'), 'success' );
+					}
+					else
+					{
+						$Messages->add( T_('User has no access to the selected blog.'), 'error' );
+					}
 				}
 				else
 				{ // Display an error message to inform user about incorrect actions

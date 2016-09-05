@@ -4159,9 +4159,14 @@ class Blog extends DataObject
 	 *
 	 * @return boolean TRUE on success
 	 */
-	function has_access()
+	function has_access( $User = NULL )
 	{
 		global $current_User;
+
+		if( is_null( $User ) )
+		{
+			$User = $current_User;
+		}
 
 		$allow_access = $this->get_setting( 'allow_access' );
 
@@ -4174,7 +4179,7 @@ class Blog extends DataObject
 		{	// Only logged in users have an access to this collection:
 			return false;
 		}
-		elseif( $allow_access == 'members' && ! $current_User->check_perm( 'blog_ismember', 'view', false, $this->ID ) )
+		elseif( $allow_access == 'members' && ! $User->check_perm( 'blog_ismember', 'view', false, $this->ID ) )
 		{	// Current user must be a member of this collection:
 			return false;
 		}
