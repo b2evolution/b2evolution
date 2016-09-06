@@ -1097,39 +1097,44 @@ class User extends DataObject
 
 		// ******* Notifications form ******* //
 		$is_subscriptions_form = param( 'subscriptions_form', 'boolean', false );
-
+		$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 		if( $is_subscriptions_form )
 		{
 			if( $action == 'subscribe' )
 			{ // Do only subscribe to new blog (Don't update the user's settings from the same form)
 
-				// A selected blog to subscribe
-				$subscribe_blog_ID = param( 'subscribe_blog', 'integer', 0 );
-				// Get checkbox values:
-				$sub_items    = param( 'sub_items_new',    'integer', 0 );
-				$sub_comments = param( 'sub_comments_new', 'integer', 0 );
+				// If notifications are temporarily disabled, no subscription options should be lost when user saves.
+				// When notification are turned back on, the subscription will resume as they were before.
+				if( $notifications_mode != 'off' )
+				{
+					// A selected blog to subscribe
+					$subscribe_blog_ID = param( 'subscribe_blog', 'integer', 0 );
+					// Get checkbox values:
+					$sub_items    = param( 'sub_items_new',    'integer', 0 );
+					$sub_comments = param( 'sub_comments_new', 'integer', 0 );
 
-				// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
-				if( $subscribe_blog_ID && ( $sub_items || $sub_comments ) )
-				{ // We need to record values:
-					$BlogCache = & get_BlogCache();
-					$subscribe_Blog = & $BlogCache->get_by_ID( $subscribe_blog_ID, false, false );
+					// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
+					if( $subscribe_blog_ID && ( $sub_items || $sub_comments ) )
+					{ // We need to record values:
+						$BlogCache = & get_BlogCache();
+						$subscribe_Blog = & $BlogCache->get_by_ID( $subscribe_blog_ID, false, false );
 
-					if( $subscribe_Blog->has_access( $this ) )
-					{ // user has access to the collection
-						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
-							VALUES ( '.$DB->quote( $subscribe_blog_ID ).', '.$DB->quote( $this->ID ).', '.$DB->quote( $sub_items ).', '.$DB->quote( $sub_comments ).' )' );
+						if( $subscribe_Blog->has_access( $this ) )
+						{ // user has access to the collection
+							$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
+								VALUES ( '.$DB->quote( $subscribe_blog_ID ).', '.$DB->quote( $this->ID ).', '.$DB->quote( $sub_items ).', '.$DB->quote( $sub_comments ).' )' );
 
-						$Messages->add( T_('Subscriptions have been changed.'), 'success' );
+							$Messages->add( T_('Subscriptions have been changed.'), 'success' );
+						}
+						else
+						{
+							$Messages->add( T_('User has no access to the selected blog.'), 'error' );
+						}
 					}
 					else
-					{
-						$Messages->add( T_('User has no access to the selected blog.'), 'error' );
+					{ // Display an error message to inform user about incorrect actions
+						$Messages->add( T_('Please select at least one setting to subscribe on the selected blog.'), 'error' );
 					}
-				}
-				else
-				{ // Display an error message to inform user about incorrect actions
-					$Messages->add( T_('Please select at least one setting to subscribe on the selected blog.'), 'error' );
 				}
 			}
 			else
@@ -1214,66 +1219,71 @@ class User extends DataObject
 				param_integer_range( 'edited_user_newsletter_limit', 0, 999, T_('Newsletter limit must be between %d and %d.') );
 				$UserSettings->set( 'newsletter_limit', param( 'edited_user_newsletter_limit', 'integer', 0 ), $this->ID );
 
-				/**
-				 * Update the subscriptions:
-				 */
-				$subs_blog_IDs = param( 'subs_blog_IDs', 'string', true );
-				$subs_item_IDs = param( 'subs_item_IDs', 'string', true );
-
-				// Work the blogs:
-				$subscription_values = array();
-				$unsubscribed = array();
-				$subs_blog_IDs = explode( ',', $subs_blog_IDs );
-				foreach( $subs_blog_IDs as $loop_blog_ID )
+				// If notifications are temporarily disabled, no subscription options should be lost when user saves.
+				// When notification are turned back on, the subscription will resume as they were before.
+				if( $notifications_mode != 'off' )
 				{
-					// Make sure no dirty hack is coming in here:
-					$loop_blog_ID = intval( $loop_blog_ID );
+					/**
+					* Update the subscriptions:
+					*/
+					$subs_blog_IDs = param( 'subs_blog_IDs', 'string', true );
+					$subs_item_IDs = param( 'subs_item_IDs', 'string', true );
 
-					// Get checkbox values:
-					$sub_items    = param( 'sub_items_'.$loop_blog_ID,    'integer', 0 );
-					$sub_comments = param( 'sub_comments_'.$loop_blog_ID, 'integer', 0 );
-
-					if( $sub_items || $sub_comments )
-					{	// We have a subscription for this blog
-						$subscription_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_comments )";
-					}
-					else
-					{	// No subscription here:
-						$unsubscribed[] = $loop_blog_ID;
-					}
-				}
-
-				// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
-				if( count( $subscription_values ) )
-				{	// We need to record values:
-					$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
-												VALUES '.implode( ', ', $subscription_values ) );
-				}
-
-				if( count( $unsubscribed ) )
-				{	// We need to make sure some values are cleared:
-					$DB->query( 'DELETE FROM T_subscriptions
-												 WHERE sub_user_ID = '.$this->ID.'
-													 AND sub_coll_ID IN ('.implode( ', ', $unsubscribed ).')' );
-				}
-
-				// Individual post subscriptions
-				if( !empty( $subs_item_IDs ) )
-				{ // user was subscribed to at least one post update notification
-					$subs_item_IDs = explode( ',', $subs_item_IDs );
+					// Work the blogs:
+					$subscription_values = array();
 					$unsubscribed = array();
-					foreach( $subs_item_IDs as $loop_item_ID )
+					$subs_blog_IDs = explode( ',', $subs_blog_IDs );
+					foreach( $subs_blog_IDs as $loop_blog_ID )
 					{
-						if( !param( 'item_sub_'.$loop_item_ID, 'integer', 0 ) )
-						{ // user wants to unsubscribe from this post notifications
-							$unsubscribed[] = $loop_item_ID;
+						// Make sure no dirty hack is coming in here:
+						$loop_blog_ID = intval( $loop_blog_ID );
+
+						// Get checkbox values:
+						$sub_items    = param( 'sub_items_'.$loop_blog_ID,    'integer', 0 );
+						$sub_comments = param( 'sub_comments_'.$loop_blog_ID, 'integer', 0 );
+
+						if( $sub_items || $sub_comments )
+						{	// We have a subscription for this blog
+							$subscription_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_comments )";
+						}
+						else
+						{	// No subscription here:
+							$unsubscribed[] = $loop_blog_ID;
 						}
 					}
-					if( !empty( $unsubscribed ) )
-					{ // unsubscribe list is not empty, delete not wanted subscriptions
-						$DB->query( 'DELETE FROM T_items__subscriptions
-												 WHERE isub_user_ID = '.$this->ID.'
-													 AND isub_item_ID IN ('.implode( ', ', $unsubscribed ).')' );
+
+					// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
+					if( count( $subscription_values ) )
+					{	// We need to record values:
+						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
+													VALUES '.implode( ', ', $subscription_values ) );
+					}
+
+					if( count( $unsubscribed ) )
+					{	// We need to make sure some values are cleared:
+						$DB->query( 'DELETE FROM T_subscriptions
+													WHERE sub_user_ID = '.$this->ID.'
+														AND sub_coll_ID IN ('.implode( ', ', $unsubscribed ).')' );
+					}
+
+					// Individual post subscriptions
+					if( !empty( $subs_item_IDs ) )
+					{ // user was subscribed to at least one post update notification
+						$subs_item_IDs = explode( ',', $subs_item_IDs );
+						$unsubscribed = array();
+						foreach( $subs_item_IDs as $loop_item_ID )
+						{
+							if( !param( 'item_sub_'.$loop_item_ID, 'integer', 0 ) )
+							{ // user wants to unsubscribe from this post notifications
+								$unsubscribed[] = $loop_item_ID;
+							}
+						}
+						if( !empty( $unsubscribed ) )
+						{ // unsubscribe list is not empty, delete not wanted subscriptions
+							$DB->query( 'DELETE FROM T_items__subscriptions
+													WHERE isub_user_ID = '.$this->ID.'
+														AND isub_item_ID IN ('.implode( ', ', $unsubscribed ).')' );
+						}
 					}
 				}
 			}

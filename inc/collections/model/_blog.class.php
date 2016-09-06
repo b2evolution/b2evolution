@@ -434,12 +434,13 @@ class Blog extends DataObject
 	 */
 	function load_from_Request( $groups = array() )
 	{
-		global $Messages, $default_locale, $DB;
+		global $Messages, $default_locale, $DB, $Settings;
 
 		/**
 		 * @var User
 		 */
 		global $admin_url, $current_User;
+		$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
 		// Load collection settings and clear update cascade array
 		$this->load_CollectionSettings();
@@ -827,9 +828,14 @@ class Blog extends DataObject
 			}
 			$this->set_setting( 'post_moderation_statuses', implode( ',', $post_moderation_statuses ) );
 
-			// Subscriptions:
-			$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
-			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+			// If notifications are temporarily disabled, no subscription options should be lost when user saves.
+			// When notification are turned back on, the subscriptions will resume as they were before.
+			if( $notifications_mode != 'off' )
+			{
+				// Subscriptions:
+				$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+			}
 		}
 
 		if( in_array( 'comments', $groups ) )
@@ -847,8 +853,16 @@ class Blog extends DataObject
 			$this->set_setting( 'moderation_statuses', implode( ',', $blog_moderation_statuses ) );
 
 			$this->set_setting( 'comment_quick_moderation',  param( 'comment_quick_moderation', 'string', 'expire' ) );
-			$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
-			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+
+			// If notifications are temporarily disabled, no subscription options should be lost when user saves.
+			// When notification are turned back on, the subscriptions will resume as they were before.
+			if( $notifications_mode != 'off' )
+			{
+				// Subscriptions:
+				$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+			}
+
 			$this->set_setting( 'comments_detect_email', param( 'comments_detect_email', 'integer', 0 ) );
 			$this->set_setting( 'comments_register', param( 'comments_register', 'integer', 0 ) );
 		}
@@ -901,10 +915,15 @@ class Blog extends DataObject
 			// Tracking:
 			$this->set_setting( 'track_unread_content', param( 'track_unread_content', 'integer', 0 ) );
 
-			// Subscriptions:
-			$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
-			$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
-			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+			// If notifications are temporarily disabled, no subscription options should be lost when user saves.
+			// When notification are turned back on, the subscriptions will resume as they were before.
+			if( $notifications_mode != 'off' )
+			{
+				// Subscriptions:
+				$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+			}
 
 			// Sitemaps:
 			$this->set_setting( 'enable_sitemaps', param( 'enable_sitemaps', 'integer', 0 ) );
