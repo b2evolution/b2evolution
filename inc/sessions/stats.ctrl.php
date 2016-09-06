@@ -228,6 +228,14 @@ switch( $action )
 
 	case 'aggregate':
 		// Aggregate the hits and sessions:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'aggregate' );
+
+		// Check permission:
+		$current_User->check_perm( 'stats', 'edit', true );
+
+		// Do the aggregations:
 		Hitlist::aggregate_hits();
 		Hitlist::aggregate_sessions();
 

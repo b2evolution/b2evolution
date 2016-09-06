@@ -1261,7 +1261,7 @@ function stats_goal_hit_extra_params( $ghit_params )
  */
 function display_hits_summary_panel()
 {
-	global $ReqURL;
+	global $ReqURL, $current_User;
 
 	$hits_summary_mode = get_hits_summary_mode();
 
@@ -1283,11 +1283,13 @@ function display_hits_summary_panel()
 
 	echo '</div>';
 
-	// Button to aggregate hits right now:
-	echo '<a href="'.url_add_param( $current_url, 'action=aggregate' ).'"'
-		.' class="btn btn-default pull-right">'
-		.T_('Aggregate Now')
-		.'</a>';
+	if( $current_User->check_perm( 'stats', 'edit' ) )
+	{	// Display button to aggregate hits right now only if current user has a permission to edit hits:
+		echo '<a href="'.url_add_param( $current_url, 'action=aggregate&'.url_crumb( 'aggregate' ) ).'"'
+			.' class="btn btn-default pull-right">'
+			.T_('Aggregate Now')
+			.'</a>';
+	}
 }
 
 
