@@ -122,7 +122,7 @@ else
 
 $has_messaging_perm = $edited_User->check_perm( 'perm_messaging', 'reply', false );
 
-$Form->begin_fieldset( T_('Email').( is_admin_page() ? get_manual_link( 'user-notifications-email-panel' ) : '' ) );
+$Form->begin_fieldset( T_('Receiving emails').( is_admin_page() ? get_manual_link( 'user-notifications-email-panel' ) : '' ) );
 
 	$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'" class="'.button_class().'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
 
@@ -151,7 +151,8 @@ $Form->begin_fieldset( T_('Email').( is_admin_page() ? get_manual_link( 'user-no
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Communications').( is_admin_page() ? get_manual_link( 'user-communications-panel' ) : '' ) );
+
+$Form->begin_fieldset( T_('Receiving private messages').( is_admin_page() ? get_manual_link( 'user-communications-panel' ) : '' ) );
 
 	$has_messaging_perm = $edited_User->check_perm( 'perm_messaging', 'reply', false );
 	$messaging_options = array(	array( 'PM', 1, T_( 'private messages on this site.' ), ( ( $UserSettings->get( 'enable_PM', $edited_User->ID ) ) && ( $has_messaging_perm ) ), !$has_messaging_perm || $disabled ) );
@@ -186,71 +187,6 @@ $Form->begin_fieldset( T_('Communications').( is_admin_page() ? get_manual_link(
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Notifications').( is_admin_page() ? get_manual_link( 'user-notifications-panel' ) : '' ) );
-
-	// User notification options
-	$notify_options = array();
-	if( $has_messaging_perm )
-	{ // show messaging notification settings only if messaging is available for edited user
-		$notify_options[] = array( 'edited_user_notify_messages', 1, T_('I receive a private message.'),  $UserSettings->get( 'notify_messages', $edited_User->ID ), $disabled );
-		$notify_options[] = array( 'edited_user_notify_unread_messages', 1, sprintf( T_('I have unread private messages for more than %s.'), seconds_to_period( $unread_messsage_reminder_threshold ) ),  $UserSettings->get( 'notify_unread_messages', $edited_User->ID ), $disabled, sprintf( T_('This notification is sent only once every %s days.'), array_shift( $unread_message_reminder_delay ) ) );
-	}
-	if( $edited_User->check_role( 'post_owner' ) )
-	{ // user has at least one post or user has right to create new post
-		$notify_options[] = array( 'edited_user_notify_publ_comments', 1, T_('a comment is published on one of <strong>my</strong> posts.'), $UserSettings->get( 'notify_published_comments', $edited_User->ID ), $disabled );
-	}
-	$is_comment_moderator = $edited_User->check_role( 'comment_moderator' );
-	if( $is_comment_moderator || $edited_User->check_role( 'comment_editor' ) )
-	{	// edited user has permission to edit other than his own comments at least in one status in one collection:
-		$notify_options[] = array( 'edited_user_notify_cmt_moderation', 1, T_('a comment is posted and I have permissions to moderate it.'), $UserSettings->get( 'notify_comment_moderation', $edited_User->ID ), $disabled );
-		$notify_options[] = array( 'edited_user_notify_edit_cmt_moderation', 1, T_('a comment is modified and I have permissions to moderate it.'), $UserSettings->get( 'notify_edit_cmt_moderation', $edited_User->ID ), $disabled );
-	}
-	if( $edited_User->check_perm( 'admin', 'restricted', false ) )
-	{ // edited user has a permission to back-office
-		$notify_options[] = array( 'edited_user_notify_meta_comments', 1, T_('a meta comment is posted.'), $UserSettings->get( 'notify_meta_comments', $edited_User->ID ), $disabled );
-	}
-	if( $is_comment_moderator )
-	{ // edited user is comment moderator at least in one blog
-		$notify_options[] = array( 'edited_user_send_cmt_moderation_reminder', 1, sprintf( T_('comments are awaiting moderation for more than %s.'), seconds_to_period( $comment_moderation_reminder_threshold ) ), $UserSettings->get( 'send_cmt_moderation_reminder', $edited_User->ID ), $disabled );
-	}
-	if( $edited_User->check_role( 'post_moderator' ) )
-	{ // edited user is post moderator at least in one blog
-		$notify_options[] = array( 'edited_user_notify_post_moderation', 1, T_('a post is created and I have permissions to moderate it.'), $UserSettings->get( 'notify_post_moderation', $edited_User->ID ), $disabled );
-		$notify_options[] = array( 'edited_user_notify_edit_pst_moderation', 1, T_('a post is modified and I have permissions to moderate it.'), $UserSettings->get( 'notify_edit_pst_moderation', $edited_User->ID ), $disabled );
-		$notify_options[] = array( 'edited_user_send_pst_moderation_reminder', 1, sprintf( T_('posts are awaiting moderation for more than %s.'), seconds_to_period( $post_moderation_reminder_threshold ) ), $UserSettings->get( 'send_pst_moderation_reminder', $edited_User->ID ), $disabled );
-	}
-	if( $current_User->check_perm( 'users', 'edit' ) )
-	{ // current User is an administrator
-		$notify_options[] = array( 'edited_user_send_activation_reminder', 1, sprintf( T_('my account was deactivated or is not activated for more than %s.').get_admin_badge( 'user' ), seconds_to_period( $activate_account_reminder_threshold ) ), $UserSettings->get( 'send_activation_reminder', $edited_User->ID ) );
-	}
-	if( $edited_User->check_perm( 'users', 'edit' ) )
-	{ // edited user has permission to edit all users, save notification preferences
-		$notify_options[] = array( 'edited_user_notify_new_user_registration', 1, T_( 'a new user has registered.' ), $UserSettings->get( 'notify_new_user_registration', $edited_User->ID ), $disabled );
-		$notify_options[] = array( 'edited_user_notify_activated_account', 1, T_( 'an account was activated.' ), $UserSettings->get( 'notify_activated_account', $edited_User->ID ), $disabled );
-		$notify_options[] = array( 'edited_user_notify_closed_account', 1, T_( 'an account was closed.' ), $UserSettings->get( 'notify_closed_account', $edited_User->ID ), $disabled );
-		$notify_options[] = array( 'edited_user_notify_reported_account', 1, T_( 'an account was reported.' ), $UserSettings->get( 'notify_reported_account', $edited_User->ID ), $disabled );
-		$notify_options[] = array( 'edited_user_notify_changed_account', 1, T_( 'an account was changed.' ), $UserSettings->get( 'notify_changed_account', $edited_User->ID ), $disabled );
-	}
-	if( $edited_User->check_perm( 'options', 'edit' ) )
-	{ // edited user has permission to edit options, save notification preferences
-		$notify_options[] = array( 'edited_user_notify_cronjob_error', 1, T_( 'a scheduled task ends with an error or timeout.' ), $UserSettings->get( 'notify_cronjob_error',  $edited_User->ID ), $disabled );
-	}
-	if( !empty( $notify_options ) )
-	{
-		$Form->checklist( $notify_options, 'edited_user_notification', T_( 'Notify me by email whenever' ), false, false, $checklist_params );
-	}
-
-	// Limit notifications:
-	if( $is_admin_page )
-	{ // Back office view
-		$Form->text_input( 'edited_user_notification_email_limit', $UserSettings->get( 'notification_email_limit',  $edited_User->ID ), 3, T_( 'Limit notifications to' ), '', array( 'maxlength' => 3, 'required' => true, 'input_suffix' => ' <b>'.T_('emails per day').'</b>' ) );
-	}
-	else
-	{ // Front office view
-		$Form->text_input( 'edited_user_notification_email_limit', $UserSettings->get( 'notification_email_limit',  $edited_User->ID ), 3, T_( 'Limit notifications to %s emails per day' ), '', array( 'maxlength' => 3, 'required' => true, 'inline' => true ) );
-	}
-
-$Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Newsletter subscriptions').( is_admin_page() ? get_manual_link( 'user-newsletters-panel' ) : '' ) );
 
@@ -271,6 +207,7 @@ $Form->begin_fieldset( T_('Newsletter subscriptions').( is_admin_page() ? get_ma
 	}
 
 $Form->end_fieldset();
+
 
 $notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
@@ -397,6 +334,7 @@ if( $notifications_mode != 'off' )
 	}
 	$Form->end_fieldset();
 
+
 	$Form->begin_fieldset( T_('Individual post subscriptions').( is_admin_page() ? get_manual_link( 'user-post-subscriptions-panel' ) : '' ) );
 
 		$sql = 'SELECT DISTINCT post_ID, blog_ID, blog_shortname
@@ -454,7 +392,74 @@ if( $notifications_mode != 'off' )
 	$Form->end_fieldset();
 }
 
-	/***************  Buttons  **************/
+$Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_manual_link( 'user-notifications-panel' ) : '' ) );
+
+	// User notification options
+	$notify_options = array();
+	if( $has_messaging_perm )
+	{ // show messaging notification settings only if messaging is available for edited user
+		$notify_options[] = array( 'edited_user_notify_messages', 1, T_('I receive a private message.'),  $UserSettings->get( 'notify_messages', $edited_User->ID ), $disabled );
+		$notify_options[] = array( 'edited_user_notify_unread_messages', 1, sprintf( T_('I have unread private messages for more than %s.'), seconds_to_period( $unread_messsage_reminder_threshold ) ),  $UserSettings->get( 'notify_unread_messages', $edited_User->ID ), $disabled, sprintf( T_('This notification is sent only once every %s days.'), array_shift( $unread_message_reminder_delay ) ) );
+	}
+	if( $edited_User->check_role( 'post_owner' ) )
+	{ // user has at least one post or user has right to create new post
+		$notify_options[] = array( 'edited_user_notify_publ_comments', 1, T_('a comment is published on one of <strong>my</strong> posts.'), $UserSettings->get( 'notify_published_comments', $edited_User->ID ), $disabled );
+	}
+	$is_comment_moderator = $edited_User->check_role( 'comment_moderator' );
+	if( $is_comment_moderator || $edited_User->check_role( 'comment_editor' ) )
+	{	// edited user has permission to edit other than his own comments at least in one status in one collection:
+		$notify_options[] = array( 'edited_user_notify_cmt_moderation', 1, T_('a comment is posted and I have permissions to moderate it.'), $UserSettings->get( 'notify_comment_moderation', $edited_User->ID ), $disabled );
+		$notify_options[] = array( 'edited_user_notify_edit_cmt_moderation', 1, T_('a comment is modified and I have permissions to moderate it.'), $UserSettings->get( 'notify_edit_cmt_moderation', $edited_User->ID ), $disabled );
+	}
+	if( $edited_User->check_perm( 'admin', 'restricted', false ) )
+	{ // edited user has a permission to back-office
+		$notify_options[] = array( 'edited_user_notify_meta_comments', 1, T_('a meta comment is posted.'), $UserSettings->get( 'notify_meta_comments', $edited_User->ID ), $disabled );
+	}
+	if( $is_comment_moderator )
+	{ // edited user is comment moderator at least in one blog
+		$notify_options[] = array( 'edited_user_send_cmt_moderation_reminder', 1, sprintf( T_('comments are awaiting moderation for more than %s.'), seconds_to_period( $comment_moderation_reminder_threshold ) ), $UserSettings->get( 'send_cmt_moderation_reminder', $edited_User->ID ), $disabled );
+	}
+	if( $edited_User->check_role( 'post_moderator' ) )
+	{ // edited user is post moderator at least in one blog
+		$notify_options[] = array( 'edited_user_notify_post_moderation', 1, T_('a post is created and I have permissions to moderate it.'), $UserSettings->get( 'notify_post_moderation', $edited_User->ID ), $disabled );
+		$notify_options[] = array( 'edited_user_notify_edit_pst_moderation', 1, T_('a post is modified and I have permissions to moderate it.'), $UserSettings->get( 'notify_edit_pst_moderation', $edited_User->ID ), $disabled );
+		$notify_options[] = array( 'edited_user_send_pst_moderation_reminder', 1, sprintf( T_('posts are awaiting moderation for more than %s.'), seconds_to_period( $post_moderation_reminder_threshold ) ), $UserSettings->get( 'send_pst_moderation_reminder', $edited_User->ID ), $disabled );
+	}
+	if( $current_User->check_perm( 'users', 'edit' ) )
+	{ // current User is an administrator
+		$notify_options[] = array( 'edited_user_send_activation_reminder', 1, sprintf( T_('my account was deactivated or is not activated for more than %s.').get_admin_badge( 'user' ), seconds_to_period( $activate_account_reminder_threshold ) ), $UserSettings->get( 'send_activation_reminder', $edited_User->ID ) );
+	}
+	if( $edited_User->check_perm( 'users', 'edit' ) )
+	{ // edited user has permission to edit all users, save notification preferences
+		$notify_options[] = array( 'edited_user_notify_new_user_registration', 1, T_( 'a new user has registered.' ), $UserSettings->get( 'notify_new_user_registration', $edited_User->ID ), $disabled );
+		$notify_options[] = array( 'edited_user_notify_activated_account', 1, T_( 'an account was activated.' ), $UserSettings->get( 'notify_activated_account', $edited_User->ID ), $disabled );
+		$notify_options[] = array( 'edited_user_notify_closed_account', 1, T_( 'an account was closed.' ), $UserSettings->get( 'notify_closed_account', $edited_User->ID ), $disabled );
+		$notify_options[] = array( 'edited_user_notify_reported_account', 1, T_( 'an account was reported.' ), $UserSettings->get( 'notify_reported_account', $edited_User->ID ), $disabled );
+		$notify_options[] = array( 'edited_user_notify_changed_account', 1, T_( 'an account was changed.' ), $UserSettings->get( 'notify_changed_account', $edited_User->ID ), $disabled );
+	}
+	if( $edited_User->check_perm( 'options', 'edit' ) )
+	{ // edited user has permission to edit options, save notification preferences
+		$notify_options[] = array( 'edited_user_notify_cronjob_error', 1, T_( 'a scheduled task ends with an error or timeout.' ), $UserSettings->get( 'notify_cronjob_error',  $edited_User->ID ), $disabled );
+	}
+	if( !empty( $notify_options ) )
+	{
+		$Form->checklist( $notify_options, 'edited_user_notification', T_( 'Notify me by email whenever' ), false, false, $checklist_params );
+	}
+
+	// Limit notifications:
+	if( $is_admin_page )
+	{ // Back office view
+		$Form->text_input( 'edited_user_notification_email_limit', $UserSettings->get( 'notification_email_limit',  $edited_User->ID ), 3, T_( 'Limit notifications to' ), '', array( 'maxlength' => 3, 'required' => true, 'input_suffix' => ' <b>'.T_('emails per day').'</b>' ) );
+	}
+	else
+	{ // Front office view
+		$Form->text_input( 'edited_user_notification_email_limit', $UserSettings->get( 'notification_email_limit',  $edited_User->ID ), 3, T_( 'Limit notifications to %s emails per day' ), '', array( 'maxlength' => 3, 'required' => true, 'inline' => true ) );
+	}
+
+$Form->end_fieldset();
+
+
+/***************  Buttons  **************/
 
 if( $action != 'view' )
 {	// Edit buttons

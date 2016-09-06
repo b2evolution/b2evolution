@@ -96,13 +96,14 @@ class coll_tag_cloud_Widget extends ComponentWidget
 	function get_param_definitions( $params )
 	{
 		$visibility_statuses = get_visibility_statuses( 'raw', array( 'deprecated', 'redirected', 'trash' ) );
+		$visibility_statuses_icons = get_visibility_statuses( 'icons', array( 'deprecated', 'redirected', 'trash' ) );
 		$default_visible_statuses = array( 'published', 'community', 'protected' );
 		$option_statuses = array();
 		foreach( $visibility_statuses as $status => $status_text )
 		{
 			$option_statuses[] = array(
 				'inskin_'.$status,
-				$status_text,
+				$visibility_statuses_icons[$status].' '.$status_text,
 				in_array( $status, $default_visible_statuses ) ? 1 : 0
 			);
 		}
@@ -119,7 +120,7 @@ class coll_tag_cloud_Widget extends ComponentWidget
 					'type' => 'text',
 					'label' => T_('Source collections'),
 					'note' => T_('Comma-separated list of collection IDs. Leave empty for current collection.'),
-					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*)?$/',
+					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|\*)?$/',
 													  'error' => T_('Invalid list of Collection IDs.') ),
 				),
 			'destination_coll_ID' => array(
@@ -199,15 +200,22 @@ class coll_tag_cloud_Widget extends ComponentWidget
 		$BlogCache = & get_BlogCache();
 
 		// Source collections:
-		// Get a list of quoted blog IDs
-		$blog_ids = sanitize_id_list( $this->disp_params['blog_ids'], true );
-		if( empty( $blog ) && empty( $blog_ids ) )
-		{	// Nothing to display
-			return;
+		if( $this->disp_params['blog_ids'] == '*' )
+		{
+			$blog_ids = $this->disp_params['blog_ids'];
 		}
-		elseif( empty( $blog_ids ) )
-		{	// Use current Blog
-			$blog_ids = $blog;
+		else
+		{
+			// Get a list of quoted blog IDs
+			$blog_ids = sanitize_id_list( $this->disp_params['blog_ids'], true );
+			if( empty( $blog ) && empty( $blog_ids ) )
+			{	// Nothing to display
+				return;
+			}
+			elseif( empty( $blog_ids ) )
+			{	// Use current Blog
+				$blog_ids = $blog;
+			}
 		}
 
 		// Destination:
