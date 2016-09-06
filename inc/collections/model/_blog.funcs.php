@@ -928,7 +928,11 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 		$blog_ids = $blog;
 	}
 
-	if( is_array( $blog_ids ) )
+	if( $blog_ids == '*' )
+	{
+		$where_cat_clause = '1';
+	}
+	elseif( is_array( $blog_ids ) )
 	{ // Get quoted ID list
 		$where_cat_clause = 'cat_blog_ID IN ( '.$DB->quote( $blog_ids ).' )';
 	}
@@ -948,7 +952,11 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__item ON itag_itm_ID = post_ID' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
-	$tags_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
+
+	if( $blog_ids != '*' || $skip_intro_posts )
+	{
+		$tags_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
+	}
 
 	$tags_SQL->WHERE( $where_cat_clause );
 	$tags_SQL->WHERE_and( 'post_status IN ("'.implode( '", "', $post_statuses ).'")' );
