@@ -946,7 +946,7 @@ function get_link_tag( $url, $text = '', $class = '', $max_url_length = 50 )
 		}
 	}
 
-	$link_attrs = array( 'href' => $url );
+	$link_attrs = array();
 
 	if( ! empty( $class ) )
 	{
@@ -960,7 +960,7 @@ function get_link_tag( $url, $text = '', $class = '', $max_url_length = 50 )
 		}
 	}
 
-	return '<a'.get_field_attribs_as_string( $link_attrs ).'>'.$text.'</a>';
+	return '<a href="'.str_replace( '&amp;', '&', $url ).'"'.get_field_attribs_as_string( $link_attrs ).'>'.$text.'</a>';
 }
 
 

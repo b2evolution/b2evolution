@@ -539,41 +539,48 @@ $Form->begin_form( '', '', $params );
 						.( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ),
 					array( 'id' => 'itemform_meta_cmnt', 'fold' => true, 'deny_fold' => ( $total_comments_number > 0 ) ) );
 
-		global $CommentList, $UserSettings;
-		$CommentList = new CommentList2( $Blog );
-
-		// Filter list:
-		$CommentList->set_filters( array(
-			'types' => array( 'meta' ),
-			'statuses' => get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) ),
-			'order' => 'DESC',
-			'post_ID' => $edited_Item->ID,
-			'comments' => $UserSettings->get( 'results_per_page' ),
-			'page' => $currentpage,
-			'expiry_statuses' => array( 'active' ),
-		) );
-		$CommentList->query();
-
-		// comments_container value shows, current Item ID
-		echo '<div class="evo_content_block">';
-		echo '<div id="comments_container" value="'.$edited_Item->ID.'" class="evo_comments_container">';
-		// display comments
-		$CommentList->display_if_empty( array(
-				'before'    => '<div class="evo_comment"><p>',
-				'after'     => '</p></div>',
-				'msg_empty' => T_('No feedback for this post yet...'),
-			) );
-		require $inc_path.'comments/views/_comment_list.inc.php';
-		echo '</div>'; // comments_container div
-		echo '</div>';
-
-		if( $current_User->check_perm( 'meta_comment', 'add', false, $edited_Item ) )
-		{ // Display a link to add new meta comment if current user has a permission
-			echo action_icon( T_('Add meta comment').'...', 'new', $admin_url.'?ctrl=items&amp;p='.$edited_Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments', T_('Add meta comment').' &raquo;', 3, 4 );
+		if( $creating )
+		{	// Display button to save new creating item:
+			$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ T_('Save post to start adding Meta comments'), 'btn-primary' ) );
 		}
+		else
+		{	// Display meta comments of the edited item:
+			global $CommentList, $UserSettings;
+			$CommentList = new CommentList2( $Blog );
 
-		// Load JS functions to work with meta comments:
-		load_funcs( 'comments/model/_comment_js.funcs.php' );
+			// Filter list:
+			$CommentList->set_filters( array(
+				'types' => array( 'meta' ),
+				'statuses' => get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) ),
+				'order' => 'DESC',
+				'post_ID' => $edited_Item->ID,
+				'comments' => $UserSettings->get( 'results_per_page' ),
+				'page' => $currentpage,
+				'expiry_statuses' => array( 'active' ),
+			) );
+			$CommentList->query();
+
+			// comments_container value shows, current Item ID
+			echo '<div class="evo_content_block">';
+			echo '<div id="comments_container" value="'.$edited_Item->ID.'" class="evo_comments_container">';
+			// display comments
+			$CommentList->display_if_empty( array(
+					'before'    => '<div class="evo_comment"><p>',
+					'after'     => '</p></div>',
+					'msg_empty' => T_('No meta comment for this post yet...'),
+				) );
+			require $inc_path.'comments/views/_comment_list.inc.php';
+			echo '</div>'; // comments_container div
+			echo '</div>';
+
+			if( $current_User->check_perm( 'meta_comment', 'add', false, $edited_Item ) )
+			{ // Display a link to add new meta comment if current user has a permission
+				echo action_icon( T_('Add meta comment').'...', 'new', $admin_url.'?ctrl=items&amp;p='.$edited_Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments', T_('Add meta comment').' &raquo;', 3, 4 );
+			}
+
+			// Load JS functions to work with meta comments:
+			load_funcs( 'comments/model/_comment_js.funcs.php' );
+		}
 
 		$Form->end_fieldset();
 	}
