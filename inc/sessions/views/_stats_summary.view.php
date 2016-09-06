@@ -52,6 +52,7 @@ else
 	{	// Filter by collection:
 		$SQL->WHERE( 'hagg_coll_ID = '.$DB->quote( $blog ) );
 	}
+	filter_aggregated_hits_by_date( $SQL, 'hagg_date' );
 }
 $SQL->GROUP_BY( 'year, month, day, hit_agent_type, hit_type' );
 $SQL->ORDER_BY( 'year DESC, month DESC, day DESC, hit_agent_type, hit_type' );

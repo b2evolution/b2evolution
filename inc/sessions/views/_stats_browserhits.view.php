@@ -65,6 +65,7 @@ else
 		EXTRACT( DAY FROM hagg_date ) AS day' );
 	$SQL->FROM( 'T_hits__aggregate' );
 	$SQL->WHERE( 'hagg_agent_type = "browser"' );
+	filter_aggregated_hits_by_date( $SQL, 'hagg_date' );
 
 	$sessions_SQL->SELECT( 'hags_date AS hit_date, hags_count_browser' );
 	$sessions_SQL->FROM( 'T_hits__aggregate_sessions' );
@@ -78,6 +79,7 @@ else
 	{	// Get ALL aggregated sessions:
 		$sessions_SQL->WHERE( 'hags_coll_ID = 0' );
 	}
+	filter_aggregated_hits_by_date( $sessions_SQL, 'hags_date' );
 }
 $SQL->GROUP_BY( 'year, month, day, referer_type, hit_type' );
 $SQL->ORDER_BY( 'year DESC, month DESC, day DESC, referer_type, hit_type' );

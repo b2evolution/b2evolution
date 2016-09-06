@@ -245,6 +245,26 @@ switch( $action )
 		header_redirect( $admin_url.'?ctrl=stats&tab='.$tab.'&tab3='.$tab3.'&blog='.$blog, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
+
+	case 'filter_aggregated':
+		// Filter the aggregated data by date:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'aggfilter' );
+
+		// Save the filter data in settings of current user:
+		$UserSettings->set( 'agg_period', param( 'agg_period', 'string' ) );
+		if( $agg_period == 'specific_month' )
+		{
+			$UserSettings->set( 'agg_month', param( 'agg_month', 'integer' ) );
+			$UserSettings->set( 'agg_year', param( 'agg_year', 'integer' ) );
+		}
+		$UserSettings->dbupdate();
+
+		// Redirect to referer page:
+		header_redirect( $admin_url.'?ctrl=stats&tab='.$tab.'&tab3='.$tab3.'&blog='.$blog, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
 }
 
 if( isset($collections_Module) && $tab_from != 'antispam' )

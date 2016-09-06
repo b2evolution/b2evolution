@@ -112,6 +112,8 @@ class UserSettings extends AbstractSettings
 		'admin_skin' => 'bootstrap',  // User default admin skin
 
 		'suggest_item_tags' => 1, // Suggest to autocomplete item tags on edit form
+
+		'agg_period' => 'last_30_days', // Date period to filter the aggregated hits data
 	);
 
 	/**

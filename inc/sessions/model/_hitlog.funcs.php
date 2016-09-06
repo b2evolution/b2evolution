@@ -1267,7 +1267,7 @@ function display_hits_summary_panel()
 
 	$current_url = preg_replace( '/(\?|&)hits_summary_mode=([^&]+|$)/', '', $ReqURL );
 
-	echo '<div class="btn-group">';
+	echo '<div class="btn-group pull-left">';
 
 	// Button to switch to view the live hits:
 	echo '<a href="'.url_add_param( $current_url, 'hits_summary_mode=live' ).'"'
@@ -1283,12 +1283,131 @@ function display_hits_summary_panel()
 
 	echo '</div>';
 
+	if( $hits_summary_mode == 'aggregate' )
+	{	// Filter the aggregated data by date period:
+		global $UserSettings;
+
+		echo '<div class="evo_aggregate_filter pull-left">';
+		$Form = new Form();
+		$Form->hidden_ctrl();
+		$Form->hidden( 'tab', get_param( 'tab' ) );
+		$Form->hidden( 'tab3', get_param( 'tab3' ) );
+		$Form->hidden( 'blog', get_param( 'blog' ) );
+		$Form->hidden( 'action', 'filter_aggregated' );
+		$Form->add_crumb( 'aggfilter' );
+
+		$Form->switch_layout( 'none' );
+
+		$Form->begin_form();
+
+		$Form->select_input_array( 'agg_period', $UserSettings->get( 'agg_period' ), array(
+				'last_30_days'   => T_( 'Last 30 days' ),
+				'last_60_days'   => T_( 'Last 60 days' ),
+				'current_month'  => T_( 'Current Month to date' ),
+				'specific_month' => T_( 'Specific Month:' ),
+			), T_('Show') );
+
+		$months_years_params = array( 'force_keys_as_values' => true );
+		if( $UserSettings->get( 'agg_period' ) != 'specific_month' )
+		{
+			$months_years_params['style'] = 'display:none';
+		}
+		$months = array();
+		for( $m = 1; $m <= 12; $m++ )
+		{
+			$months[ $m ] = T_( date( 'F', mktime( 0, 0, 0, $m ) ) );
+		}
+		$agg_month = $UserSettings->get( 'agg_month' );
+		$Form->select_input_array( 'agg_month', ( empty( $agg_month ) ? date( 'n' ) : $agg_month ), $months, '', NULL, $months_years_params );
+
+		$years = array();
+		for( $y = date( 'Y' ) - 20; $y <= date( 'Y' ); $y++ )
+		{
+			$years[ $y ] = $y;
+		}
+		$agg_year = $UserSettings->get( 'agg_year' );
+		$Form->select_input_array( 'agg_year', ( empty( $agg_year ) ? date( 'Y' ) : $agg_year ), $years, '', NULL, $months_years_params );
+
+		$Form->end_form( array( array( 'submit', 'submit', T_('Filter'), 'btn-info' ) ) );
+
+		echo '<script type="text/javascript">
+			jQuery( "#agg_period" ).change( function()
+			{
+				if( jQuery( this ).val() == "specific_month" )
+				{
+					jQuery( "#agg_month, #agg_year" ).show();
+				}
+				else
+				{
+					jQuery( "#agg_month, #agg_year" ).hide();
+				}
+			} );
+			</script>';
+
+		echo '</div>';
+	}
+
 	if( $current_User->check_perm( 'stats', 'edit' ) )
 	{	// Display button to aggregate hits right now only if current user has a permission to edit hits:
 		echo '<a href="'.url_add_param( $current_url, 'action=aggregate&'.url_crumb( 'aggregate' ) ).'"'
 			.' class="btn btn-default pull-right">'
 			.T_('Aggregate Now')
 			.'</a>';
+	}
+
+	echo '<div class="clear"></div>';
+}
+
+
+/**
+ * Filter the aggregated hits data by date period
+ *
+ * @param object SQL
+ * @param string Name of date field
+ */
+function filter_aggregated_hits_by_date( & $SQL, $date_field_name )
+{
+	global $DB, $UserSettings;
+
+	switch( $UserSettings->get( 'agg_period' ) )
+	{
+		case 'last_60_days':
+			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 60 ) );
+			break;
+
+		case 'current_month':
+			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), 1 ) );
+			break;
+
+		case 'specific_month':
+			$agg_month = $UserSettings->get( 'agg_month' );
+			$agg_year = $UserSettings->get( 'agg_year' );
+			if( empty( $agg_month ) )
+			{
+				$agg_month = date( 'm' );
+			}
+			if( empty( $agg_year ) )
+			{
+				$agg_year = date( 'Y' );
+			}
+			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, $agg_month, 1, $agg_year ) );
+			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, $agg_month + 1, 1, $agg_year ) );
+			break;
+
+		case 'last_30_days':
+		default:
+			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 30 ) );
+			break;
+	}
+
+	if( ! empty( $start_date ) )
+	{
+		$SQL->WHERE_and( $date_field_name.' >= '.$DB->quote( $start_date ) );
+	}
+
+	if( ! empty( $end_date ) )
+	{
+		$SQL->WHERE_and( $date_field_name.' < '.$DB->quote( $end_date ) );
 	}
 }
 
