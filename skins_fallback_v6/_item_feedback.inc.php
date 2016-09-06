@@ -103,7 +103,8 @@ modules_call_method( 'before_comments', $params );
 // -------------------- END OF MODULES EVENT ---------------------
 
 // Check if user is allowed to see comments, display corresponding message if not allowed
-if( $Item->can_see_comments( true ) )
+if( ( $params['disp_meta_comments'] && is_logged_in() && $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
+    || $Item->can_see_comments( true ) )
 { // user is allowed to see comments
 	if( empty($c) )
 	{	// Comments not requested
