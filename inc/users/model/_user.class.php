@@ -2702,8 +2702,8 @@ class User extends DataObject
 					$Item = & $Comment->get_Item();
 				}
 				elseif( $permlevel == 'blog' )
-				{	// Set Blog from target object:
-					$Collection = $Blog = & $perm_target;
+				{	// Set blog ID from target value:
+					$blog_ID = $perm_target_ID;
 				}
 				else
 				{ // Invalid permission level
@@ -2711,7 +2711,7 @@ class User extends DataObject
 					break;
 				}
 
-				if( empty( $Item ) && empty( $Blog ) )
+				if( empty( $Item ) && empty( $blog_ID ) )
 				{	// Item or Blog must be defined to check these permissions
 					$perm = false;
 					break;
@@ -2772,7 +2772,7 @@ class User extends DataObject
 
 					case 'blog':
 						// Check perms to view all meta comments of the collection:
-						if( $this->check_perm( 'blog_del_post', '', false, $Blog->ID ) )
+						if( $this->check_perm( 'blog_del_post', '', false, $blog_ID ) )
 						{ // If User can delete any item of the collection
 							$perm = true;
 							break;

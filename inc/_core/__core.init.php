@@ -1145,13 +1145,21 @@ class _core_Module extends Module
 				}
 
 				// Check if user has permission for published, draft or depreceted comments (any of these)
-				if( $current_User->check_perm( 'blog_comments', 'edit', false, $Blog->ID ) )
+				if( $current_User->check_perm( 'blog_comments', 'view', false, $Blog->ID ) )
 				{ // Comments:
 					$entries['blog']['entries']['comments'] = array(
 							'text' => T_('Comments').'&hellip;',
 							'href' => $admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;filter=restore',
 						);
 					$display_separator = true;
+				}
+				elseif( $current_User->check_perm( 'meta_comment', 'blog', false, $Blog->ID ) )
+				{	// Only meta comments:
+					$entries['blog']['entries']['comments'] = array(
+							'text' => T_('Comments').'&hellip;',
+							'href' => $admin_url.'?ctrl=comments&amp;tab3=meta&amp;filter=restore&amp;blog='.$Blog->ID,
+						);
+					$display_separator = true;	
 				}
 
 				// Chapters / Categories:
