@@ -2681,11 +2681,12 @@ class User extends DataObject
 				// Check permission for meta comment:
 
 				if( $permlevel == 'view' || $permlevel == 'add' )
-				{ // Set Item from target object
+				{	// Set Item from target object:
 					$Item = & $perm_target;
+					$blog_ID = $Item->get_blog_ID();
 				}
 				elseif( $permlevel == 'edit' || $permlevel == 'moderate' || $permlevel == 'delete' )
-				{ // Set Comment from target object
+				{	// Set Comment from target object:
 					$Comment = & $perm_target;
 					if( empty( $Comment ) || ! $Comment->is_meta() )
 					{ // Comment must be defined and meta to check these permissions
@@ -2693,13 +2694,14 @@ class User extends DataObject
 						break;
 					}
 					$Item = & $Comment->get_Item();
+					$blog_ID = $Item->get_blog_ID();
 				}
 				elseif( $permlevel == 'blog' )
 				{	// Set blog ID from target value:
 					$blog_ID = $perm_target_ID;
 				}
 				else
-				{ // Invalid permission level
+				{	// Invalid permission level
 					$perm = false;
 					break;
 				}
@@ -2715,23 +2717,18 @@ class User extends DataObject
 					case 'view':
 					case 'add':
 						// Check perms to View/Add meta comments:
-						$blog_ID = $Item->get_blog_ID();
-						$perm = // If User can edit or delete this Item
+						$perm = // If User can edit the Item
 								$this->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item )
-								// OR If User can delete any Item of the Blog
-								|| $this->check_perm( 'blog_del_post', '', false, $blog_ID )
-								// OR If User is explicitly allowed in the user permissions
-								|| $this->check_perm_blogusers( 'meta_comment', '', $blog_ID )
-								// OR If User belongs to a group explicitly allowed in the group permissions
-								|| $this->Group->check_perm_bloggroups( 'meta_comment', $permlevel, $blog_ID, $Item, $this );
+								// OR If User can view all meta comments of the collection
+								|| $this->check_perm( 'meta_comment', 'blog', false, $blog_ID );
 						break;
 
 					case 'edit':
 						// Check perms to Edit meta comment
-						$perm = // User can edit only own meta comment
-								$Comment->author_user_ID == $this->ID
-								// AND User must has a permission to view meta comments
-								&& $this->check_perm( 'meta_comment', 'view', false, $Item );
+						$perm = // If User is explicitly allowed in the user permissions
+								$this->check_perm_blogusers( 'meta_comment', 'edit', $blog_ID, $Comment )
+								// OR If User belongs to a group explicitly allowed in the group permissions
+								|| $this->Group->check_perm_bloggroups( 'meta_comment', 'edit', $blog_ID, $Comment );
 						break;
 
 					case 'moderate':
@@ -2740,36 +2737,19 @@ class User extends DataObject
 						break;
 
 					case 'delete':
-						// Check perms to Delete meta comment:
-						if( $this->check_perm( 'blog_del_post', '', false, $Item->get_blog_ID() ) )
-						{ // If User can delete this Item
-							$perm = true;
-							break;
-						}
-						if( $this->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) &&
-						    $Comment->author_user_ID == $this->ID )
-						{ // If it is own meta comment of the User
-							$perm = true;
-							break;
-						}
-
-						// Check perms to Delete meta based on user/group settings
-						if( $Comment->author_user_ID == $this->ID &&
-								( $this->check_perm_blogusers( 'meta_comment', 'any', $Item->get_blog_ID() )
-								|| $this->Group->check_perm_bloggroups( 'meta_comment', $permlevel, $Item->get_blog_ID(), $Item, $this) ) )
-						{
-							$perm = true;
-							break;
+						// Check perms to Delete meta comments:
+						if( $this->check_perm( 'blog_del_cmts', 'edit', false, $blog_ID ) )
+						{	// Only if it is allowed to delete comments on the collection:
+							$perm = $this->check_perm( 'meta_comment', 'blog', false, $blog_ID );
 						}
 						break;
 
 					case 'blog':
 						// Check perms to view all meta comments of the collection:
-						if( $this->check_perm( 'blog_del_post', '', false, $blog_ID ) )
-						{ // If User can delete any item of the collection
-							$perm = true;
-							break;
-						}
+						$perm = // If User is explicitly allowed in the user permissions
+								$this->check_perm_blogusers( 'meta_comment', 'view', $blog_ID )
+								// OR If User belongs to a group explicitly allowed in the group permissions
+								|| $this->Group->check_perm_bloggroups( 'meta_comment', 'view', $blog_ID );
 						break;
 				}
 

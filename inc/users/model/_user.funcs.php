@@ -2203,7 +2203,13 @@ function check_blog_advanced_perm( & $blog_perms, $user_ID, $permname, $permleve
 			break;
 
 		case 'meta_comment':
-			return $blog_perms['blog_meta_comment'];
+			$edit_permname = 'blog_edit_cmt';
+			$perm = $blog_perms['blog_meta_comment'];
+			if( ! empty( $perm_target ) )
+			{
+				$Comment = & $perm_target;
+				$creator_user_ID = $Comment->author_user_ID;
+			}
 			break;
 
 		case 'files':
