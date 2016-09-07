@@ -1145,7 +1145,7 @@ class _core_Module extends Module
 				}
 
 				// Check if user has permission for published, draft or depreceted comments (any of these)
-				if( $current_User->check_perm( 'blog_comments', 'edit', false, $Blog->ID ) )
+				if( $current_User->check_perm( 'blog_comments', 'view', false, $Blog->ID ) )
 				{ // Comments:
 					$entries['blog']['entries']['comments'] = array(
 							'text' => T_('Comments').'&hellip;',

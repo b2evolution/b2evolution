@@ -1545,7 +1545,7 @@ function attach_browse_tabs( $display_tabs3 = true )
 
 	if( $display_tabs3 )
 	{
-		if( $current_User->check_perm( 'blog_comments', 'edit', false, $Blog->ID ) )
+		if( $current_User->check_perm( 'blog_comments', 'view', false, $Blog->ID ) )
 		{	// User has permission to edit published, draft or deprecated comments (at least one kind)
 			$AdminUI->add_menu_entries( array( 'collections', 'comments' ), array(
 				'fullview' => array(

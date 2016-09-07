@@ -739,7 +739,7 @@ class collections_Module extends Module
 					'order' => 'group_last' ),
 			);
 
-		$perm_comments = $current_User->check_perm( 'blog_comments', 'edit', false, $blog );
+		$perm_comments = $current_User->check_perm( 'blog_comments', 'view', false, $blog );
 		$perm_cats = $current_User->check_perm( 'blog_cats', '', false, $blog );
 
 		// Posts

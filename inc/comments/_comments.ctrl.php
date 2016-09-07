@@ -142,7 +142,7 @@ switch( $action )
 		}
 		else
 		{	// For normal comments:
-			$selected = autoselect_blog( 'blog_comments', 'edit' );
+			$selected = autoselect_blog( 'blog_comments', 'view' );
 		}
 		if( ! $selected )
 		{ // No blog could be selected
@@ -229,7 +229,7 @@ switch( $action )
 		$AdminUI->title_titlearea = T_('Editing comment').' #'.$edited_Comment->ID;
 
 		// Generate available blogs list:
-		$AdminUI->set_coll_list_params( 'blog_comments', 'edit', array( 'ctrl' => 'comments', 'filter' => 'restore' ) );
+		$AdminUI->set_coll_list_params( 'blog_comments', 'view', array( 'ctrl' => 'comments', 'filter' => 'restore' ) );
 
 		/*
 		 * Add sub menu entries:
@@ -677,7 +677,7 @@ switch( $action )
 		$AdminUI->title_titlearea = T_('Latest comments');
 
 		// Generate available blogs list:
-		$AdminUI->set_coll_list_params( 'blog_comments', 'edit', array( 'ctrl' => 'comments', 'filter' => 'restore', 'tab3' => $tab3 ) );
+		$AdminUI->set_coll_list_params( 'blog_comments', 'view', array( 'ctrl' => 'comments', 'filter' => 'restore', 'tab3' => $tab3 ) );
 
 		/*
 		 * Add sub menu entries:
