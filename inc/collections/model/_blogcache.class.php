@@ -407,7 +407,9 @@ class BlogCache extends DataObjectCache
 			case 'blog_comments':
 				// user needs to have permission for at least one kind of comments
 				$sql .= "OR bloguser_perm_cmtstatuses <> ''
-						OR bloggroup_perm_cmtstatuses <> ''";
+						OR bloggroup_perm_cmtstatuses <> ''
+						OR bloguser_perm_meta_comment = 1
+						OR bloggroup_perm_meta_comment = 1";
 				break;
 
 			case 'stats':

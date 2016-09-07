@@ -1153,6 +1153,14 @@ class _core_Module extends Module
 						);
 					$display_separator = true;
 				}
+				elseif( $current_User->check_perm( 'meta_comment', 'blog', false, $Blog->ID ) )
+				{	// Only meta comments:
+					$entries['blog']['entries']['comments'] = array(
+							'text' => T_('Comments').'&hellip;',
+							'href' => $admin_url.'?ctrl=comments&amp;tab3=meta&amp;filter=restore&amp;blog='.$Blog->ID,
+						);
+					$display_separator = true;	
+				}
 
 				// Chapters / Categories:
 				if( $current_User->check_perm( 'blog_cats', 'edit', false, $Blog->ID ) )

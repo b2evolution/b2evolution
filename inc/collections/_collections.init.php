@@ -757,6 +757,15 @@ class collections_Module extends Module
 				);
 			$last_group_menu_entry = 'comments';
 		}
+		elseif( $current_User->check_perm( 'meta_comment', 'blog', false, $blog ) )
+		{	// User has a permission only for meta comments:
+			$collection_menu_entries['comments'] = array(
+					'text' => T_('Comments'),
+					'href' => $admin_url.'?ctrl=comments&amp;tab3=meta&amp;blog='.$blog.'&amp;filter=restore',
+				);
+			$last_group_menu_entry = 'comments';
+		}
+
 		if( $perm_cats )
 		{ // Categories
 			$collection_menu_entries['categories'] = array(
