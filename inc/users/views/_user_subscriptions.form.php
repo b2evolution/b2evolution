@@ -250,11 +250,11 @@ if( $notifications_mode != 'off' )
 				$subscriptions = array();
 				if( $sub_Blog->get_setting( 'allow_subscriptions' ) )
 				{	// If subscription is allowed for new posts:
-					$subscriptions[] = array( 'sub_items_'.$sub_Blog->ID, '1', T_('All posts'), $blog_sub->sub_items );
+					$subscriptions[] = array( 'sub_items_'.$sub_Blog->ID, '1', T_('Notify me of any new post in this collection'), $blog_sub->sub_items );
 				}
 				if( $sub_Blog->get_setting( 'allow_comment_subscriptions' ) )
 				{	// If subscription is allowed for new comments:
-					$subscriptions[] = array( 'sub_comments_'.$sub_Blog->ID, '1', T_('All comments'), $blog_sub->sub_comments );
+					$subscriptions[] = array( 'sub_comments_'.$sub_Blog->ID, '1', T_('Notify me of any new comment in this collection'), $blog_sub->sub_comments );
 				}
 				$Form->checklist( $subscriptions, 'subscriptions', $sub_Blog->dget( 'shortname', 'htmlbody' ) );
 			}
@@ -281,23 +281,16 @@ if( $notifications_mode != 'off' )
 		}
 		else
 		{ // Display a form to subscribe on new blog
-			$Form->info_field( '', T_('Choose additional subscriptions').':', array( 'class' => 'info_full' ) );
-			$label_blogs_prefix = $label_blogs_suffix = '';
-
-			$Form->switch_layout( 'none' );
-			$Form->output = false;
-
 			$subscribe_blog_ID = param( 'subscribe_blog' , '', isset( $Blog ) ? $Blog->ID : 0 );
-			$subscribe_blogs_select = $Form->select_input_object( 'subscribe_blog', $subscribe_blog_ID, $BlogCache, '', array( 'object_callback' => 'get_option_list_parent', 'loop_object_method' => 'get_shortname' ) ).'</span>';
-			$subscribe_blogs_button = $Form->button( array(
-				'name'  => 'actionArray[subscribe]',
-				'value' => T_('Subscribe'),
-				'style' => 'float:left;margin-left:20px;'
-			) );
-
-			$Form->switch_layout( NULL );
-			$Form->switch_template_parts( $params['skin_form_params'] );
-			$Form->output = true;
+			$Form->begin_line( T_('Also available') );
+				$subscribe_blogs_select = $Form->select_input_object( 'subscribe_blog', $subscribe_blog_ID, $BlogCache, '', array( 'object_callback' => 'get_option_list_parent', 'loop_object_method' => 'get_shortname' ) );
+				$subscribe_items_new = $Form->hidden( 'sub_items_new', 1 );
+				$subscribe_blogs_button = $Form->button( array(
+					'name'  => 'actionArray[subscribe]',
+					'value' => T_('Subscribe to this collection'),
+					'style' => 'margin-left:10px;'
+				) );
+			$Form->end_line();
 
 			// Get collection to set proper active checkboxes on page loading:
 			if( isset( $BlogCache->cache[ $subscribe_blog_ID ] ) )
@@ -318,18 +311,6 @@ if( $notifications_mode != 'off' )
 				$enabled_subs_settings .= $subscribe_Blog->get_setting( 'allow_comment_subscriptions' ) ? 'c' : '';
 				$Form->hidden( 'coll_subs_settings_'.$subscribe_Blog->ID, $enabled_subs_settings );
 			}
-
-			$subscriptions = array(
-					array( 'sub_items_new',    '1', T_('All posts'),    0, $selected_subscribe_Blog->get_setting( 'allow_subscriptions' ) ? 0 : 1 ),
-					array( 'sub_comments_new', '1', T_('All comments'), 0, $selected_subscribe_Blog->get_setting( 'allow_comment_subscriptions' ) ? 0 : 1 )
-				);
-			$label_suffix = $Form->label_suffix;
-			$Form->label_suffix = '';
-			$Form->checklist( $subscriptions, 'subscribe_blog', trim( $subscribe_blogs_select ), false, false, array(
-				'field_suffix' => $subscribe_blogs_button,
-				'input_prefix' => '<div class="floatleft">',
-				'input_suffix' => '</div>' ) );
-			$Form->label_suffix = $label_suffix;
 		}
 	}
 	$Form->end_fieldset();
