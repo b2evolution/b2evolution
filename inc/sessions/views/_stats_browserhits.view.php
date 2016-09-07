@@ -94,6 +94,9 @@ $sessions = $DB->get_assoc( $sessions_SQL->get(), $SQL->title );
  */
 if( count($res_hits) )
 {
+	// Find the dates without hits and fill them with 0 to display on graph and table:
+	$res_hits = fill_empty_hit_days( $res_hits );
+
 	$last_date = 0;
 
 	$col_mapping = array(

@@ -1429,4 +1429,55 @@ function get_hits_summary_mode()
 
 	return $hits_summary_mode;
 }
+
+
+/**
+ * Find the dates without hits and fill them with 0 to display on graph and table
+ *
+ * @param array Source hits data
+ * @return array Fixed hits data
+ */
+function fill_empty_hit_days( $hits_data )
+{
+	$fixed_hits_data = array();
+
+	if( empty( $hits_data ) )
+	{
+		return $fixed_hits_data;
+	}
+
+	// Get additional fields which must be exist in each array item of new filled empty day below:
+	$additional_fields = array_diff_key( $hits_data[0], array( 'hits' => 0, 'year' => 0, 'month' => 0, 'day' => 0 ) );
+
+	foreach( $hits_data as $hit )
+	{
+		$this_date = $hit['year'].'-'.$hit['month'].'-'.$hit['day'];
+
+		if( isset( $prev_date ) && $prev_date != $this_date )
+		{	// If hits are from another day:
+			$prev_time = strtotime( $prev_date ) - 86400;
+			$this_time = strtotime( $this_date );
+
+			if( $prev_time != $this_time )
+			{	// If previous date is not previous day(it means some day has no hits):
+				$empty_days = ( $prev_time - $this_time ) / 86400;
+				for( $d = 0; $d <= $empty_days; $d++ )
+				{	// Add each empty day to array with 0 hits count:
+					$empty_day = $prev_time - $d * 86400;
+					$fixed_hits_data[] = array(
+							'hits'     => 0,
+							'year'     => date( 'Y', $empty_day ),
+							'month'    => date( 'n', $empty_day ),
+							'day'      => date( 'j', $empty_day ),
+						) + $additional_fields;
+				}
+			}
+		}
+
+		$prev_date = $hit['year'].'-'.$hit['month'].'-'.$hit['day'];
+		$fixed_hits_data[] = $hit;
+	}
+
+	return $fixed_hits_data;
+}
 ?>

@@ -64,6 +64,9 @@ $res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
  */
 if( count($res_hits) )
 {
+	// Find the dates without hits and fill them with 0 to display on graph and table:
+	$res_hits = fill_empty_hit_days( $res_hits );
+
 	$last_date = 0;
 
 	// This defines what hits will go where
