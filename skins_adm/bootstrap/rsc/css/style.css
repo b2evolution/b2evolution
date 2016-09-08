@@ -845,6 +845,7 @@ h2.user_title {
   font-weight: normal;
   color: #999;
   margin: 40px 0 30px;
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;

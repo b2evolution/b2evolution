@@ -245,8 +245,7 @@ if( ( $current_User->ID == $edited_User->ID ) || $can_moderate_user )
 		$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 );
 
 		// Upload
-		$info_content = '<input name="uploadfile[]" type="file" size="10" />';
-		$Form->info( T_('Upload a new picture'), $info_content );
+		$Form->file_input( 'uploadfile[]', NULL, T_('Upload a new picture'), '', array( 'size' => 10 ) );
 
 		$action_buttons = array( array( 'submit', NULL, '> '.T_('Upload!'), 'btn btn-primary ActionButton' ) );
 		$Form->buttons( $action_buttons );

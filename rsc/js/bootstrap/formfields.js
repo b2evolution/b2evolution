@@ -42,7 +42,7 @@ function form_error_field_popover( this_obj )
 }
 
 // Prepare event focus for the form fields with popover effect:
-var form_error_fields_selector = 'input.field_error[type=text], input.field_error[type=radio], span.checkbox_error input[type=checkbox], select.field_error, textarea.field_error';
+var form_error_fields_selector = 'input.field_error[type=text], input.field_error[type=radio], span.checkbox_error input[type=checkbox], select.field_error, textarea.field_error, input.field_error[type=file]';
 jQuery( document ).on( 'mouseover focus', form_error_fields_selector, function()
 { // Initialize popover only on first event calling:
 	form_error_field_popover( this );
