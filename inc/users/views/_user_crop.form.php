@@ -131,7 +131,7 @@ if( $display_mode == 'js' )
 
 if( $can_crop )
 {
-	$Form->button( array( 'type' => 'submit', 'name'=>'actionArray[crop]', 'value'=> T_('Crop'), 'class' => 'SaveButton btn-primary' ) );
+	$Form->button( array( 'type' => 'submit', 'name'=>'actionArray[crop]', 'value'=> T_('Apply'), 'class' => 'SaveButton btn-primary' ) );
 }
 
 // Start displaying content
