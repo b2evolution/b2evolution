@@ -496,7 +496,7 @@ $Form->begin_form( '', '', $params );
 
 	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'expert' ) );
 
-	if( $current_User->check_perm( 'meta_comment', 'view', false, $edited_Item ) )
+	if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 	{
 		// ####################### META COMMENTS #########################
 		$currentpage = param( 'currentpage', 'integer', 1 );
@@ -542,7 +542,7 @@ $Form->begin_form( '', '', $params );
 			echo '</div>'; // comments_container div
 			echo '</div>';
 
-			if( $current_User->check_perm( 'meta_comment', 'add', false, $edited_Item ) )
+			if( $current_User->check_perm( 'meta_comment', 'add', false, $Blog->ID ) )
 			{ // Display a link to add new meta comment if current user has a permission
 				echo action_icon( T_('Add meta comment').'...', 'new', $admin_url.'?ctrl=items&amp;p='.$edited_Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments', T_('Add meta comment').' &raquo;', 3, 4 );
 			}

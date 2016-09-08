@@ -354,7 +354,7 @@ while( $Item = & $ItemList->get_item() )
 		if( $action == 'view' )
 		{ // We are looking at a single post, include files and comments:
 
-			if( $comment_type == 'meta' && ! $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
+			if( $comment_type == 'meta' && ! $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 			{ // Current user cannot views meta comments
 				$comment_type = 'feedback';
 			}
@@ -393,7 +393,7 @@ while( $Item = & $ItemList->get_item() )
 			}
 			echo '</div>';
 
-			if( $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
+			if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 			{ // Display tabs to switch between user and meta comments Only if current user can views meta comments
 				$switch_comment_type_url = $admin_url.'?ctrl=items&amp;blog='.$blog.'&amp;p='.$Item->ID;
 				$metas_count = generic_ctp_number( $Item->ID, 'metas', 'total' );
@@ -521,7 +521,7 @@ while( $Item = & $ItemList->get_item() )
 			require $inc_path.'comments/views/_comment_list.inc.php';
 			echo '</div>'; // comments_container div
 
-			if( ( $comment_type == 'meta' && $current_User->check_perm( 'meta_comment', 'add', false, $Item ) ) // User can add meta comment on the Item
+			if( ( $comment_type == 'meta' && $current_User->check_perm( 'meta_comment', 'add', false, $Blog->ID ) ) // User can add meta comment on the Item
 			    || $Item->can_comment() ) // User can add standard comment
 			{
 
