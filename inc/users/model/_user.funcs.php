@@ -4292,11 +4292,12 @@ function echo_user_crop_avatar_window()
 	echo '<script type="text/javascript">
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_crop_profile_pic = \''.TS_('Crop profile picture').'\';
-		var evo_js_lang_crop = \''.TS_('Crop').'\';
+		var evo_js_lang_crop = \''.TS_('Apply').'\';
 		var evo_js_user_crop_ajax_url = \''.( is_admin_page() ? $admin_url : get_htsrv_url().'anon_async.php' ).'\';
 		var evo_js_is_backoffice = '.( is_admin_page() ? 'true' : 'false' ).';
 		var evo_js_blog = '.( isset( $blog ) ? $blog : 0 ).';
 		var evo_js_crumb_user = \''.get_crumb( 'user' ).'\';
+		evo_js_lang_close = \''.TS_('Cancel').'\';
 	</script>';
 }
 

@@ -1384,7 +1384,7 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 	$uploadfile_desc = param( 'uploadfile_desc', 'array:string', array() );
 	$uploadfile_name = param( 'uploadfile_name', 'array:string', array() );
 
-	// LOOP THROUGH ALL UPLOADED FILES AND PROCCESS EACH ONE:
+	// LOOP THROUGH ALL UPLOADED FILES AND PROCESS EACH ONE:
 	foreach( $_FILES['uploadfile']['name'] as $lKey => $lName )
 	{
 		if( empty( $lName ) )
@@ -1396,6 +1396,7 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 				 || !empty( $uploadfile_name[$lKey] ) )
 			{ // User specified params but NO file! Warn the user:
 				$failedFiles[$lKey] = T_( 'Please select a local file to upload.' );
+				param_error( 'uploadfile[]', NULL, $failedFiles[$lKey] );
 			}
 			// Abort upload for this file:
 			continue;

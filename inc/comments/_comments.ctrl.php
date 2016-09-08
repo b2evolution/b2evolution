@@ -60,7 +60,7 @@ switch( $action )
 		if( $edited_Comment->is_meta() )
 		{ // Use special permissions for meta comment
 			$check_permname = 'meta_comment';
-			$check_permlevel = 'delete';
+			$check_permlevel = $action == 'delete' ? 'delete' : 'edit';
 		}
 		elseif( $action == 'publish' || $action == 'update_publish' )
 		{ // Load the new comment status from publish request and set perm check values
@@ -207,7 +207,7 @@ switch( $tab3 )
 
 	case 'meta':
 		// Check permission for meta comments:
-		$current_User->check_perm( 'meta_comment', 'blog', true, $Blog );
+		$current_User->check_perm( 'meta_comment', 'view', true, $Blog->ID );
 
 		$AdminUI->breadcrumbpath_add( T_('Meta discussion'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;tab3='.$tab3.'&amp;filter=restore' );
 		break;

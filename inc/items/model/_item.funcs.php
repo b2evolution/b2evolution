@@ -1566,7 +1566,7 @@ function attach_browse_tabs( $display_tabs3 = true )
 				) );
 		}
 
-		if( $current_User->check_perm( 'meta_comment', 'blog', false, $Blog ) )
+		if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 		{	// Initialize menu entry for meta discussion if current user has a permission:
 			$AdminUI->add_menu_entries( array( 'collections', 'comments' ), array(
 				'meta' => array(
@@ -2697,7 +2697,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 			global $current_User;
 			$ItemCache = & get_ItemCache();
 			$Item = & $ItemCache->get_by_ID( $item_ID, false, false );
-			if( ! $Item || empty( $current_User ) || ! $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
+			if( ! $Item || empty( $current_User ) || ! $current_User->check_perm( 'meta_comment', 'view', false, $blog_ID ) )
 			{ // Current user has no permissions to view meta comments
 				$comment_type = 'feedback';
 			}
@@ -2792,8 +2792,8 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 	echo '">';
 
 	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) ||
-	    ( $Comment->is_meta() && $current_User->check_perm( 'meta_comment', 'view', false, $Item ) ) )
-	{ // User can moderate this comment OR Comment is meta and current user can view it
+	    ( $Comment->is_meta() && $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) ) )
+	{	// User can moderate this comment OR Comment is meta and current user can view meta comments of the collection:
 		echo '<div class="panel-heading small">';
 		echo '<div>';
 
@@ -4310,13 +4310,12 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 		$col .= '</a> ';
 	}
 
-	if( $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
+	if( $current_User->check_perm( 'meta_comment', 'view', false, $Item->get_blog_ID() ) )
 	{	// Display icon of meta comments Only if current user can views meta comments:
 		$metas_count = generic_ctp_number( $Item->ID, 'metas', 'total' );
 		if( $metas_count > 0 )
 		{	// If at least one meta comment exists
-			$item_Blog = & $Item->get_Blog();
-			$col .= '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$item_Blog->ID.'&amp;p='.$Item->ID.'&amp;comment_type=meta#comments">'
+			$col .= '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$Item->get_blog_ID().'&amp;p='.$Item->ID.'&amp;comment_type=meta#comments">'
 					.get_icon( 'comments', 'imgtag', array( 'style' => 'color:#5bc0de', 'title' => T_('Meta comments') ) )
 				.'</a> ';
 		}

@@ -19,8 +19,8 @@ global $disp;
 if( ( $disp == 'single' || $disp == 'page' ) &&
     isset( $Item ) && $Item->ID > 0 &&
     is_logged_in() &&
-    $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
-{ // Display the meta comments if current user can edit this post:
+    $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+{	// Display the meta comments if current user has a permission:
 
 	$Form = new Form();
 
@@ -31,8 +31,8 @@ if( ( $disp == 'single' || $disp == 'page' ) &&
 	$Form->begin_fieldset( T_('Meta comments')
 						.( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ) );
 
-	if( $current_User->check_perm( 'meta_comment', 'add', false, $Item ) )
-	{ // Display a link to add new meta comment if current user has a permission
+	if( $current_User->check_perm( 'meta_comment', 'add', false, $Blog->ID ) )
+	{	// Display a link to add new meta comment if current user has a permission:
 		global $admin_url;
 		echo '<p>'.action_icon( T_('Add a meta comment'), 'new', $admin_url.'?ctrl=items&amp;p='.$Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments', T_('Add a meta comment').' &raquo;', 3, 4 ).'</p>';
 	}
