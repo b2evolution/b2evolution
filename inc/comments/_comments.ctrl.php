@@ -60,7 +60,7 @@ switch( $action )
 		if( $edited_Comment->is_meta() )
 		{ // Use special permissions for meta comment
 			$check_permname = 'meta_comment';
-			$check_permlevel = 'delete';
+			$check_permlevel = $action == 'delete' ? 'delete' : 'edit';
 		}
 		elseif( $action == 'publish' || $action == 'update_publish' )
 		{ // Load the new comment status from publish request and set perm check values

@@ -2460,20 +2460,7 @@ class Comment extends DataObject
 	function get_permanent_url( $glue = '&amp;', $meta_anchor = '#' )
 	{
 		$this->get_Item();
-
-		if( $this->is_meta() )
-		{ // Meta comment is not published on front-office, Get url to back-office
-			global $admin_url;
-			if( $meta_anchor == '#' )
-			{	// Use default anchor:
-				$meta_anchor = '#'.$this->get_anchor();
-			}
-			return $admin_url.'?ctrl=items'.$glue.'blog='.$this->Item->get_blog_ID().$glue.'p='.$this->Item->ID.$glue.'comment_type=meta'.$meta_anchor;
-		}
-		else
-		{ // Normal comment
-			return $this->Item->get_single_url( 'auto', '', $glue ).'#'.$this->get_anchor();
-		}
+		return $this->Item->get_single_url( 'auto', '', $glue ).'#'.$this->get_anchor();
 	}
 
 
@@ -4622,7 +4609,7 @@ class Comment extends DataObject
 		{	// Only change status to update it on the edit forms and Display a warning:
 			$this->status = $comment_allowed_status;
 
-			if( $current_status != $this->get( 'status' ) )
+			if( $current_status != $this->get( 'status' ) && ! $this->is_meta() )
 			{	// If current comment status cannot be used because it is restricted by parent item:
 				global $Messages;
 
