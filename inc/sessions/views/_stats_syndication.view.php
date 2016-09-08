@@ -109,7 +109,7 @@ if( count($res_hits) )
 			$agent_type_color['rss'],
 		);
 
-	$chart[ 'canvas_bg' ] = array( 'width'  => 780, 'height' => 355 );
+	$chart[ 'canvas_bg' ] = array( 'width'  => '100%', 'height' => 355 );
 
 	echo '<div class="center">';
 	load_funcs('_ext/_canvascharts.php');

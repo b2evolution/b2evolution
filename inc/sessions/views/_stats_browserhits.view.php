@@ -218,7 +218,7 @@ if( count($res_hits) )
 			$referer_type_color['session'],
 		);
 
-	$chart[ 'canvas_bg' ] = array( 'width'  => 780, 'height' => 355 );
+	$chart[ 'canvas_bg' ] = array( 'width'  => '100%', 'height' => 355 );
 
 	echo '<div class="center">';
 	load_funcs('_ext/_canvascharts.php');
