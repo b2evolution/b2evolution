@@ -637,8 +637,8 @@ if( $action == 'dashboard' )
 			echo '<div class="col-xs-12 col-sm-12 col-md-9 col-md-pull-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '2' : '0' ).' col-lg-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '6' : '9' ).' col-lg-pull-0 coll-dashboard-block-3">';
 		}
 
-		if( $current_User->check_perm( 'meta_comment', 'blog', false, $Blog ) )
-		{
+		if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+		{	// If user has a perm to view meta comments of the collection:
 
 			// Latest Meta Comments Block
 			$Timer->start( 'Panel: Latest Meta Comments' );
