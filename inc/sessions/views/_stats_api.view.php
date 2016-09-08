@@ -44,6 +44,9 @@ if( $is_live_mode )
 		$SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
 		$sessions_SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
 	}
+
+	$hits_start_date = NULL;
+	$hits_end_date = date( 'Y-m-d' );
 }
 else
 {	// Get the aggregated data:
@@ -54,7 +57,10 @@ else
 		EXTRACT( DAY FROM hagg_date ) AS day' );
 	$SQL->FROM( 'T_hits__aggregate' );
 	$SQL->WHERE( 'hagg_type = "api"' );
-	filter_aggregated_hits_by_date( $SQL, 'hagg_date' );
+	// Filter by date:
+	list( $hits_start_date, $hits_end_date ) = get_filter_aggregated_hits_dates();
+	$SQL->WHERE_and( 'hagg_date >= '.$DB->quote( $hits_start_date ) );
+	$SQL->WHERE_and( 'hagg_date <= '.$DB->quote( $hits_end_date ) );
 
 	$sessions_SQL->SELECT( 'hags_date AS hit_date, hags_count_api' );
 	$sessions_SQL->FROM( 'T_hits__aggregate_sessions' );
@@ -68,7 +74,9 @@ else
 	{	// Get ALL aggregated sessions:
 		$sessions_SQL->WHERE( 'hags_coll_ID = 0' );
 	}
-	filter_aggregated_hits_by_date( $sessions_SQL, 'hags_date' );
+	// Filter by date:
+	$sessions_SQL->WHERE_and( 'hags_date >= '.$DB->quote( $hits_start_date ) );
+	$sessions_SQL->WHERE_and( 'hags_date <= '.$DB->quote( $hits_end_date ) );
 }
 $SQL->GROUP_BY( 'year, month, day, referer_type' );
 $SQL->ORDER_BY( 'year DESC, month DESC, day DESC, referer_type' );
@@ -84,7 +92,7 @@ $sessions = $DB->get_assoc( $sessions_SQL->get(), $SQL->title );
 if( count( $res_hits ) )
 {
 	// Find the dates without hits and fill them with 0 to display on graph and table:
-	$res_hits = fill_empty_hit_days( $res_hits );
+	$res_hits = fill_empty_hit_days( $res_hits, $hits_start_date, $hits_end_date );
 
 	$last_date = 0;
 

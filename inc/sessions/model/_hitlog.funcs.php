@@ -1360,23 +1360,24 @@ function display_hits_summary_panel()
 
 
 /**
- * Filter the aggregated hits data by date period
+ * Get dates for filter the aggregated hits
  *
- * @param object SQL
- * @param string Name of date field
+ * @return array Array with two items: 0 - start date, 1 - end date
  */
-function filter_aggregated_hits_by_date( & $SQL, $date_field_name )
+function get_filter_aggregated_hits_dates()
 {
 	global $DB, $UserSettings;
 
 	switch( $UserSettings->get( 'agg_period' ) )
 	{
 		case 'last_60_days':
-			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 60 ) );
+			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 59 ) ); // Date of 60 days ago
+			$end_date = date( 'Y-m-d' ); // Today
 			break;
 
 		case 'current_month':
-			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), 1 ) );
+			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), 1 ) ); // First day of current month
+			$end_date = date( 'Y-m-d' ); // Today
 			break;
 
 		case 'specific_month':
@@ -1390,25 +1391,18 @@ function filter_aggregated_hits_by_date( & $SQL, $date_field_name )
 			{
 				$agg_year = date( 'Y' );
 			}
-			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, $agg_month, 1, $agg_year ) );
-			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, $agg_month + 1, 1, $agg_year ) );
+			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, $agg_month, 1, $agg_year ) ); // First day of the selected month
+			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, $agg_month + 1, 0, $agg_year ) ); // Last day of the selected month
 			break;
 
 		case 'last_30_days':
 		default:
-			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 30 ) );
+			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 29 ) ); // Date of 30 days ago
+			$end_date = date( 'Y-m-d' ); // Today
 			break;
 	}
 
-	if( ! empty( $start_date ) )
-	{
-		$SQL->WHERE_and( $date_field_name.' >= '.$DB->quote( $start_date ) );
-	}
-
-	if( ! empty( $end_date ) )
-	{
-		$SQL->WHERE_and( $date_field_name.' < '.$DB->quote( $end_date ) );
-	}
+	return array( $start_date, $end_date );
 }
 
 
@@ -1435,9 +1429,11 @@ function get_hits_summary_mode()
  * Find the dates without hits and fill them with 0 to display on graph and table
  *
  * @param array Source hits data
+ * @param string Start date of hits log in format 'YYYY-mm-dd'
+ * @param string End date of hits log in format 'YYYY-mm-dd'
  * @return array Fixed hits data
  */
-function fill_empty_hit_days( $hits_data )
+function fill_empty_hit_days( $hits_data, $start_date, $end_date )
 {
 	$fixed_hits_data = array();
 
@@ -1448,6 +1444,48 @@ function fill_empty_hit_days( $hits_data )
 
 	// Get additional fields which must be exist in each array item of new filled empty day below:
 	$additional_fields = array_diff_key( $hits_data[0], array( 'hits' => 0, 'year' => 0, 'month' => 0, 'day' => 0 ) );
+
+	// Check if hits data array contains start and end dates:
+	$start_date_is_contained = empty( $start_date );
+	$end_date_is_contained = empty( $end_date );
+	if( ! $start_date_is_contained || ! $end_date_is_contained )
+	{
+		foreach( $hits_data as $hit )
+		{
+			$this_date = $hit['year'].'-'.$hit['month'].'-'.$hit['day'];
+			if( $this_date == $start_date )
+			{	// The start date is detected:
+				$start_date_is_contained = true;
+			}
+			if( $this_date == $end_date )
+			{	// The start date is detected:
+				$end_date_is_contained = true;
+			}
+			if( $start_date_is_contained && $end_date_is_contained )
+			{	// Stop array searching here because we have found the dates:
+				break;
+			}
+		}
+	}
+
+	if( ! $start_date_is_contained )
+	{	// Add item to array with 0 for start date if stats has no data for the date:
+		array_push( $hits_data, array(
+				'hits'     => 0,
+				'year'     => date( 'Y', strtotime( $start_date ) ),
+				'month'    => date( 'n', strtotime( $start_date ) ),
+				'day'      => date( 'j', strtotime( $start_date ) ),
+			) + $additional_fields );
+	}
+	if( ! $end_date_is_contained )
+	{	// Add item to array with 0 for end date if stats has no data for the date:
+		array_unshift( $hits_data, array(
+				'hits'     => 0,
+				'year'     => date( 'Y', strtotime( $end_date ) ),
+				'month'    => date( 'n', strtotime( $end_date ) ),
+				'day'      => date( 'j', strtotime( $end_date ) ),
+			) + $additional_fields );
+	}
 
 	foreach( $hits_data as $hit )
 	{

@@ -44,6 +44,9 @@ if( $is_live_mode )
 	{	// Filter by collection:
 		$SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
 	}
+
+	$hits_start_date = NULL;
+	$hits_end_date = date( 'Y-m-d' );
 }
 else
 {	// Get the aggregated data:
@@ -57,7 +60,10 @@ else
 	{	// Filter by collection:
 		$SQL->WHERE_and( 'hagg_coll_ID = '.$DB->quote( $blog ) );
 	}
-	filter_aggregated_hits_by_date( $SQL, 'hagg_date' );
+	// Filter by date:
+	list( $hits_start_date, $hits_end_date ) = get_filter_aggregated_hits_dates();
+	$SQL->WHERE_and( 'hagg_date >= '.$DB->quote( $hits_start_date ) );
+	$SQL->WHERE_and( 'hagg_date <= '.$DB->quote( $hits_end_date ) );
 }
 $SQL->GROUP_BY( 'year, month, day' );
 $SQL->ORDER_BY( 'year DESC, month DESC, day DESC' );
@@ -69,7 +75,7 @@ $res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
 if( count($res_hits) )
 {
 	// Find the dates without hits and fill them with 0 to display on graph and table:
-	$res_hits = fill_empty_hit_days( $res_hits );
+	$res_hits = fill_empty_hit_days( $res_hits, $hits_start_date, $hits_end_date );
 
 	$last_date = 0;
 
