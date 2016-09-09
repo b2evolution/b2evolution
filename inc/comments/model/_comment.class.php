@@ -1990,12 +1990,18 @@ class Comment extends DataObject
 			return false;
 		}
 
-		global $current_User;
+		global $current_User, $blog;
 
 		if( is_null( $current_status ) )
 		{ // Use status of comment if param is NULL
 			$current_status = $this->status;
 		}
+
+		$comment_Item = & $this->get_Item();
+		// Comment status cannot be more than post status, restrict it:
+		$restrict_max_allowed_status = ( $comment_Item ? $comment_Item->status : '' );
+		// Get those statuses which are not allowed for the current User to edit comment in this blog:
+		$restricted_statuses = get_restricted_statuses( $blog, 'blog_comment!', 'edit', $current_status, $restrict_max_allowed_status );
 
 		$status_order = get_visibility_statuses( 'ordered-array' );
 		$status_index = get_visibility_statuses( 'ordered-index', array( 'redirected' ) );
@@ -2009,7 +2015,14 @@ class Comment extends DataObject
 		while( !$has_perm && ( $publish ? ( $curr_index < 4 ) : ( $curr_index > 0 ) ) )
 		{ // Check until the user has permission or there is no more status to check
 			$curr_index = $publish ? ( $curr_index + 1 ) : ( $curr_index - 1 );
-			$has_perm = $current_User->check_perm( 'comment!'.$status_order[$curr_index][0], 'moderate', false, $this );
+			if( in_array( $status_order[$curr_index][0], $restricted_statuses ) )
+			{	// The status is restricted for this comment by its item or collection settings:
+				$has_perm = false;
+			}
+			else
+			{	// Check if current user can moderate this comment to the next/prev status:
+				$has_perm = $current_User->check_perm( 'comment!'.$status_order[$curr_index][0], 'moderate', false, $this );
+			}
 		}
 		if( $has_perm )
 		{ // An available status has been found
