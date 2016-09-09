@@ -52,6 +52,62 @@ pre, code {
 }
 // ---------------- //
 
+// Class for box-shadow on post images
+img.raised,
+.image_block.raised img {
+	-webkit-box-shadow: 0px 0px 11px 0px rgba(0,0,0,0.3);
+	-moz-box-shadow: 0px 0px 11px 0px rgba(0,0,0,0.3);
+	box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
+}
+
+// Class for thumbnail format on post images
+img.thumbnail,
+.image_block.thumbnail img {
+	max-width: 200px !important;
+	max-height: 200px !important;
+    min-height: auto !important;
+	display: inline-block;
+}
+.thumbnail img {
+	min-height: auto !important;
+}
+
+// Class for gray border around image or around image wrapper div
+img.border, 
+.image_block.border img {
+	border: 1px solid #666;
+}
+
+// Class for red border around image or around image wrapper div
+img.redborder, 
+.image_block.redborder img {
+	border: 1px solid red;
+}
+
+// Class for removing border around image or around image wrapper div
+img.noborder, 
+.image_block.noborder img {
+	border: none;
+}
+
+// Class for removing border-radius from image or from image wrapper div
+img.squared, 
+.image_block.squared img {
+	border-radius: 0;
+}
+
+// Class for adding bootstrap-default 4px border-radius to image or image wrapper div
+img.rounded, 
+.image_block.rounded img {
+	border-radius: 4px;
+}
+
+// Class for adding circle shape to image or image wrapper div
+img.round, 
+.image_block.round img {
+	border-radius: 50%;
+}
+
 // Block alignment helpers:
 .floatleft {
 	float: left;
