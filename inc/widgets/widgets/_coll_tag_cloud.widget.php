@@ -280,7 +280,7 @@ class coll_tag_cloud_Widget extends ComponentWidget
 				? '&laquo;'.format_to_output( $row->tag_name, 'htmlbody' ).'&raquo;'
 				: format_to_output( $row->tag_name, 'htmlbody' );
 
-			$font_size = floor( $row->tag_count * $size_span / $count_span + $min_size );
+			$font_size = floor( $size_span * max( 1, $row->tag_count - $min_count ) / $count_span ) + $min_size;
 
 			if( !is_null( $destination_Blog ) )
 			{
