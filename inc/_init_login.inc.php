@@ -314,7 +314,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 				$attempt_ip = $attempt[1];
 
 				$plugin_country_by_IP = '';
-				if( ! empty( $geoip_Plugin ) && $Country = & $geoip_Plugin->get_country_by_IP( $attempt_ip ) )
+				if( ! empty( $geoip_Plugin ) && $Country = $geoip_Plugin->get_country_by_IP( $attempt_ip ) )
 				{ // Get country by IP if plugin is enabled
 					$plugin_country_by_IP = ' ('.$Country->get_name().')';
 				}
