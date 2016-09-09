@@ -97,6 +97,8 @@ class google_maps_plugin extends Plugin
 	 */
 	function get_widget_param_definitions( $params )
 	{
+		global $preview;
+
 		$r = array_merge( array(
 			'map_title' => array(
 				'label' => T_('Widget title'),
@@ -122,6 +124,11 @@ class google_maps_plugin extends Plugin
 				'note' => ''
 				),
 			), parent::get_widget_param_definitions( $params ) );
+
+		if( $preview && isset( $r['allow_blockcache'] ) )
+		{	// Disable block caching for this widget when item is previewed currently:
+			$r['allow_blockcache']['defaultvalue'] = false;
+		}
 
 		return $r;
 	}
