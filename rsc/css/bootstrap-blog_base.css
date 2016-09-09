@@ -683,6 +683,18 @@ div.results .status_meta span {
 .vs_draft .evo_status__draft {
   display: block;
 }
+.raised img {
+  box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
+}
+.thumbnail {
+  max-width: 200px !important;
+  max-height: 200px !important;
+  min-height: auto !important;
+  display: inline-block;
+}
+.thumbnail img {
+  min-height: auto !important;
+}
 .evo_image_index {
   margin: 1ex auto;
   text-align: center;
@@ -901,7 +913,6 @@ input.btn-lg {
   margin: 0 1em 1em 0;
 }
 .evo_item_workflow_form .evo_item_workflow_form__fields {
-  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;

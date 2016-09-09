@@ -899,15 +899,3 @@ ol.breadcrumb {
 .cat_title .btn-group .btn {
   float: none;
 }
-.raised img {
-  box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
-}
-.thumbnail {
-  max-width: 200px !important;
-  max-height: 200px !important;
-  min-height: auto !important;
-  display: inline-block;
-}
-.thumbnail img {
-  min-height: auto !important;
-}
