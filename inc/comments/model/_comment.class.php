@@ -211,6 +211,7 @@ class Comment extends DataObject
 			$this->notif_status = 'noreq';
 			$this->in_reply_to_cmt_ID = 0;
 			$this->set_renderers( array( 'default' ) );
+			$this->set( 'status', 'draft' );
 		}
 		else
 		{
