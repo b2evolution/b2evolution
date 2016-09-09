@@ -1106,6 +1106,14 @@ var downloadInterval = setInterval( function()
 			display_user_email_status_message();
 			break;
 
+		case 'access_requires_login':
+			if( $Settings->get( 'http_auth_require' ) && ! isset( $_SERVER['PHP_AUTH_USER'] ) )
+			{	// Require HTTP authentication:
+				header( 'WWW-Authenticate: Basic realm="b2evolution"' );
+				header( 'HTTP/1.0 401 Unauthorized' );
+			}
+			break;
+
 		case 'login':
 			global $Plugins;
 

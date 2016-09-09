@@ -49,6 +49,7 @@ $pass = NULL;
 $pass_md5 = NULL;
 $email_login = false;
 $check_login_crumb = true;
+$report_wrong_pass_hashing = true;
 
 if( isset( $_POST[ $dummy_fields[ 'login' ] ] ) && isset( $_POST[ $dummy_fields[ 'pwd' ] ] ) )
 { // Trying to log in with a POST
@@ -67,6 +68,7 @@ elseif( $Settings->get( 'http_auth_accept' ) && ! $Session->has_User() && isset(
 	$login = $_SERVER['PHP_AUTH_USER'];
 	$pass = $_SERVER['PHP_AUTH_PW'];
 	$check_login_crumb = false;
+	$report_wrong_pass_hashing = false;
 }
 
 $Debuglog->add( 'Login: login: '.var_export( htmlspecialchars( $login, ENT_COMPAT, $evo_charset ), true ), '_init_login' );
@@ -239,7 +241,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 			{	// Password NOT hashed by Javascript:
 				$pass_ok = ( $User->pass == md5( $User->salt.$pass, true ) );
 				$Debuglog->add( 'Login: Compared raw passwords. Result: '.(int)$pass_ok, '_init_login' );
-				if( $pass_ok && can_use_hashed_password() )
+				if( $report_wrong_pass_hashing && $pass_ok && can_use_hashed_password() )
 				{	// Report about this unsecure login action:
 					syslog_insert( sprintf( 'User %s logged in without password hashing.', $User->login ), 'error', 'user', $User->ID, 'core', NULL, $User->ID );
 					$Messages->add( T_('WARNING: password hashing did not work. You just logged in insecurely. Please report this to your administrator.'), 'error' );
