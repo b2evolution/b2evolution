@@ -95,6 +95,7 @@ $core_componentwidget_defs = array(
 	'infoitem' => array(
 			'item_content',
 			'item_attachments',
+			'item_location',
 			'item_small_print',
 			'item_tags',
 			'item_about_author',
