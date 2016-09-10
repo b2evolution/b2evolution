@@ -11,28 +11,26 @@
 @import "inc/sprite_icons.inc.less";
 
 @import "inc/fontawesome_icons.inc.less";
+@import "inc/loader.inc.less";
 
 @import "inc/visibility_status_colors.inc.less";
 
 @import "inc/userfield_icons.inc.less";
+
 @import "inc/current_filters.inc.less";
-
-
-
-
-
-// GIF animation is used while AJAX request is loading:
-span.loader_img {
-	display: inline-block;
-	width: 32px;
-	height: 32px;
-	background: url(../img/ajax-loader/fff.gif) no-repeat center;
+// Bootstrap specific Styles of filters for current selection of the posts (widget "Current filters"):
+.filter_item div {
+	height: 24px !important;
+	line-height: 18px !important;
 }
-span.loader_img.loader_user_report,
-span.loader_img.loader_user_deldata {
-	background-image: url(../img/ajax-loader/777.gif);
+div.filters .filter_item {
+	margin: 1px;
+	div {
+		margin: 0;
+	}
 }
-// ---------------- //
+
+// ------
 
 // Meta categories that appears on categories widget:
 .widget_core_coll_category_list {
@@ -72,19 +70,8 @@ span.loader_img.loader_user_deldata {
 		display: inline;
 	}
 }
-// ---------------- //
 
-// Styles of filters for current selection of the posts (widget "Current filters"):
-.filter_item div {
-	height: 24px !important;
-	line-height: 18px !important;
-}
-div.filters .filter_item {
-	margin: 1px;
-	div {
-		margin: 0;
-	}
-}
+// ---------------- //
 
 // Meta comments:
 .evo_comment__meta {
