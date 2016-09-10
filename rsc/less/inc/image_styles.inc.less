@@ -1,15 +1,20 @@
 // Classes to help styling of images
 // May be used in User Generated Content
 
-// Aligning small img with text:
+img {
+	border:none;
+}
 
+
+// Aligning small img with text:
 .top {
 	vertical-align: top;
 }
 .middle {
 	vertical-align: middle;
 }
-.bottom {
+.bottom,
+img.icon {
 	vertical-align: bottom;
 }
 .baseline {
@@ -19,8 +24,8 @@
 	vertical-align: text-bottom;
 }
 
-// Classes for adding borders to images, or images added into a wrapper div through [image:] short tag:
 
+// Classes for adding borders to images, or images added into a wrapper div through [image:] short tag:
 
 // Add a diffuse box box-shadow:
 img.raised,

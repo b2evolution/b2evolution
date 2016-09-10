@@ -67,13 +67,17 @@ code {
       -ms-hyphens: none;
           hyphens: none;
 }
+img {
+  border: none;
+}
 .top {
   vertical-align: top;
 }
 .middle {
   vertical-align: middle;
 }
-.bottom {
+.bottom,
+img.icon {
   vertical-align: bottom;
 }
 .baseline {
@@ -164,7 +168,7 @@ img.round,
  *   ch - Switzerland
  */
 span.flag {
-  border: 1px solid #000000;
+  border: 1px solid #666;
   background: url(../icons/flags_sprite.png) no-repeat;
   width: 16px;
   height: 11px;
@@ -269,6 +273,7 @@ a:hover .fa-x-rollover-black {
   position: relative;
   left: 0.1em;
 }
+img.loadimg,
 span.loader_img {
   display: inline-block;
   width: 32px;
@@ -583,12 +588,6 @@ code,
 samp {
   font-family: Menlo, Monaco, "Courier New", Courier, monospace;
 }
-pre,
-code {
-  -webkit-hyphens: none;
-      -ms-hyphens: none;
-          hyphens: none;
-}
 blockquote {
   border: 1px solid #eee;
   background-color: #eee;
@@ -623,6 +622,14 @@ blockquote {
 .small_details {
   font-size: 84%;
   color: #555;
+}
+img.flag {
+  vertical-align: middle;
+  border: 1px solid #666;
+}
+img.flagtop {
+  vertical-align: top;
+  border: 1px solid #666;
 }
 a.roundbutton,
 a.roundbutton_text,
@@ -1001,7 +1008,7 @@ div.message_toolbars div.edit_toolbar {
 
 /*
  * Obviously, this file no longer contains only basic styles.
- * It now also contains all sorts of base styles like the toolbar and debug for backward comaptibility with older skins... :/
+ * It now also contains all sorts of base styles like the toolbar and debug for backward compatibility with older skins... :/
  */
 div.dev-blocks {
   border: 1px solid #f00;
@@ -1311,10 +1318,10 @@ a.overlay_link:hover b {
   color: #666;
 }
 .user.man {
-  color: #00F;
+  color: #0080FF;
 }
 .user.woman {
-  color: #e100af;
+  color: #FF66FF;
 }
 .user.nogender,
 .user.anonymous.nogender {
@@ -1491,26 +1498,6 @@ a[rel~=nofollow]:not([class~=btn]):hover {
   background: #f8e0e0;
   -khtml-border-radius: 2px;
   border-radius: 2px;
-}
-img {
-  border: none;
-}
-img.icon {
-  vertical-align: bottom;
-}
-img.flag {
-  vertical-align: middle;
-  border: 1px solid #000;
-}
-img.flagtop {
-  vertical-align: top;
-  border: 1px solid #000;
-}
-img.loadimg {
-  display: inline-block;
-  min-width: 64px;
-  min-height: 64px;
-  background: url(../img/ajax-loader/fff.gif) no-repeat center;
 }
 div.single_image_zone {
   overflow: hidden;

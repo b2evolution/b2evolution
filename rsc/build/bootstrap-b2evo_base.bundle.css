@@ -64,13 +64,17 @@ pre,
 code {
   hyphens: none;
 }
+img {
+  border: none;
+}
 .top {
   vertical-align: top;
 }
 .middle {
   vertical-align: middle;
 }
-.bottom {
+.bottom,
+img.icon {
   vertical-align: bottom;
 }
 .baseline {
@@ -161,7 +165,7 @@ img.round,
  *   ch - Switzerland
  */
 span.flag {
-  border: 1px solid #000000;
+  border: 1px solid #666;
   background: url(../icons/flags_sprite.png) no-repeat;
   width: 16px;
   height: 11px;
@@ -266,6 +270,7 @@ a:hover .fa-x-rollover-black {
   position: relative;
   left: 0.1em;
 }
+img.loadimg,
 span.loader_img {
   display: inline-block;
   width: 32px;
@@ -860,10 +865,10 @@ a.overlay_link:hover b {
   color: #666;
 }
 .user.man {
-  color: #00F;
+  color: #0080FF;
 }
 .user.woman {
-  color: #e100af;
+  color: #FF66FF;
 }
 .user.nogender,
 .user.anonymous.nogender {
