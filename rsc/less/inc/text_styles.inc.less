@@ -1,0 +1,82 @@
+// Classes to help styling of text
+// May be used in User Generated Content
+
+// WARNING: may be overriden by item_base.less
+// fp> TODO: cleanup item_base.less ?
+
+// Text colors:
+.red {
+	color: #f00;
+}
+.orange {
+	color: #f60;
+}
+.green {
+	color: #0c0
+}
+.black {
+	color: #000;
+}
+.gray,
+.grey,
+.dimmed,
+.disabled {
+	color: #999;
+}
+
+// Small note:
+.note,
+.notes {
+	font-size: 84%;
+	color: #999;
+	font-weight:normal;
+}
+
+// Text alignment helpers:
+.left {
+	text-align: left;
+}
+.center {
+	text-align: center;
+}
+.right {
+	text-align: right;
+}
+
+// Block/span without wrapping/line breaks
+.nobr,
+.nowrap,
+.line {
+	white-space: nowrap;
+}
+
+// Expended lists:
+.expanded li {
+	margin-top: 1ex;
+	margin-bottom: 1ex;
+}
+
+a.discreet {
+	text-decoration: none;
+}
+
+del,
+.deleted {
+	color: #999;
+}
+ins,
+.inserted {
+	color: #a44;
+}
+
+acronym,
+abbr {
+	border-bottom: 1px dotted #666;
+	cursor: help;
+}
+
+// Don't break words on a new ine for code blocks
+pre, code {
+	hyphens: none;
+}
+
