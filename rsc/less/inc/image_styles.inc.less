@@ -1,0 +1,60 @@
+// Classes to help styling of images
+
+// Aligning small img with text:
+
+.top {
+	vertical-align: top;
+}
+.middle {
+	vertical-align: middle;
+}
+.bottom {
+	vertical-align: bottom;
+}
+.baseline {
+	vertical-align: baseline;
+}
+.text-bottom {
+	vertical-align: text-bottom;
+}
+
+// Classes for adding borders to images, or images added into a wrapper div through [image:] short tag:
+
+
+// Add a diffuse box box-shadow:
+img.raised,
+.image_block.raised img {
+	box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
+}
+// Remove shadow
+img.noshadow,
+.image_block.raised img {
+	box-shadow: none;
+}
+
+// Ass a gray border:
+img.border, 
+.image_block.border img {
+	border: 1px solid #666;
+}
+// Remove border:
+img.noborder, 
+.image_block.noborder img {
+	border: none;
+}
+
+// Remove any border-radius:
+img.squared, 
+.image_block.squared img {
+	border-radius: 0;
+}
+// Add bootstrap-default 4px border-radius:
+img.rounded, 
+.image_block.rounded img {
+	border-radius: 4px;
+}
+// Make image round/oval:
+img.round, 
+.image_block.round img {
+	border-radius: 50%;
+}

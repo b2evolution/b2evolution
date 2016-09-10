@@ -3,6 +3,49 @@
  * These are now the real basic styles that once used to be in basic.css
  * These are included in basic.css but also in item_base.css so they are available in WYSIWYG editors
  */
+.top {
+  vertical-align: top;
+}
+.middle {
+  vertical-align: middle;
+}
+.bottom {
+  vertical-align: bottom;
+}
+.baseline {
+  vertical-align: baseline;
+}
+.text-bottom {
+  vertical-align: text-bottom;
+}
+img.raised,
+.image_block.raised img {
+  box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
+}
+img.noshadow,
+.image_block.raised img {
+  box-shadow: none;
+}
+img.border,
+.image_block.border img {
+  border: 1px solid #666;
+}
+img.noborder,
+.image_block.noborder img {
+  border: none;
+}
+img.squared,
+.image_block.squared img {
+  border-radius: 0;
+}
+img.rounded,
+.image_block.rounded img {
+  border-radius: 4px;
+}
+img.round,
+.image_block.round img {
+  border-radius: 50%;
+}
 /* The sprite image file is located: "/rsc/icons/flags_sprite.png"
  * **** To change this file use the original file from: "/rsc/icons/src/flags.PSD"
  * **** You should save the changed file as PNG-8 with 256 colors to the "flags_sprite.png"
@@ -447,15 +490,6 @@ code {
 }
 .right {
   text-align: right;
-}
-.top {
-  vertical-align: top;
-}
-.middle {
-  vertical-align: middle;
-}
-.bottom {
-  vertical-align: bottom;
 }
 .floatleft {
   float: left;

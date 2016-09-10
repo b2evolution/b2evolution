@@ -422,6 +422,49 @@ a:hover .fa-x-rollover-black {
 .filter_item.blue div.icon:hover {
   background: #6a91df;
 }
+.top {
+  vertical-align: top;
+}
+.middle {
+  vertical-align: middle;
+}
+.bottom {
+  vertical-align: bottom;
+}
+.baseline {
+  vertical-align: baseline;
+}
+.text-bottom {
+  vertical-align: text-bottom;
+}
+img.raised,
+.image_block.raised img {
+  box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
+}
+img.noshadow,
+.image_block.raised img {
+  box-shadow: none;
+}
+img.border,
+.image_block.border img {
+  border: 1px solid #666;
+}
+img.noborder,
+.image_block.noborder img {
+  border: none;
+}
+img.squared,
+.image_block.squared img {
+  border-radius: 0;
+}
+img.rounded,
+.image_block.rounded img {
+  border-radius: 4px;
+}
+img.round,
+.image_block.round img {
+  border-radius: 50%;
+}
 code,
 samp {
   font-family: Menlo, Monaco, "Courier New", Courier, monospace;
@@ -447,63 +490,6 @@ code {
 }
 .right {
   text-align: right;
-}
-.top {
-  vertical-align: top;
-}
-.middle {
-  vertical-align: middle;
-}
-.bottom {
-  vertical-align: bottom;
-}
-img.raised,
-.image_block.raised img {
-  -webkit-box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
-  -moz-box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
-  box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
-}
-img.thumbnail,
-.image_block.thumbnail img {
-  max-width: 200px !important;
-  max-height: 200px !important;
-  min-height: auto !important;
-  display: inline-block;
-}
-.thumbnail img {
-  min-height: auto !important;
-}
-img.border,
-.image_block.border img {
-  border: 1px solid #666;
-}
-img.redborder,
-.image_block.redborder img {
-  border: 1px solid red;
-}
-img.noborder,
-.image_block.noborder img {
-  border: none;
-}
-img.squared,
-.image_block.squared img {
-  border-radius: 0;
-}
-img.rounded,
-.image_block.rounded img {
-  border-radius: 4px;
-}
-img.round,
-.image_block.round img {
-  border-radius: 50%;
-}
-img.hover_transparent,
-.image_block.hover_transparent img {
-  transition: .15s ease;
-}
-img.hover_transparent:hover,
-.image_block.hover_transparent img:hover {
-  opacity: 0.7;
 }
 .floatleft {
   float: left;
