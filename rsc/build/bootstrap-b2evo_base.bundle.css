@@ -497,6 +497,14 @@ img.round,
 .image_block.round img {
   border-radius: 50%;
 }
+img.hover_transparent,
+.image_block.hover_transparent img {
+  transition: .15s ease;
+}
+img.hover_transparent:hover,
+.image_block.hover_transparent img:hover {
+  opacity: 0.7;
+}
 .floatleft {
   float: left;
 }
