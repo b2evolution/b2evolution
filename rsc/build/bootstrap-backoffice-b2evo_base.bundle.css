@@ -84,7 +84,7 @@ img.raised,
   box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
 }
 img.noshadow,
-.image_block.raised img {
+.image_block.noshadow img {
   box-shadow: none;
 }
 img.border,
