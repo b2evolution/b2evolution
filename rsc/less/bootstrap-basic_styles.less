@@ -3,199 +3,34 @@
  * These are included in basic.css but also in item_base.css so they are available in WYSIWYG editors
  */
 
+@import "inc/text_styles.inc.less";
+@import "inc/image_styles.inc.less";
+@import "inc/block_styles.inc.less";
+
 @import "inc/sprite_flags.inc.less";
 @import "inc/sprite_icons.inc.less";
-@import "inc/visibility_status_colors.inc.less";
+
 @import "inc/fontawesome_icons.inc.less";
+@import "inc/loader.inc.less";
+
+@import "inc/visibility_status_colors.inc.less";
+
 @import "inc/userfield_icons.inc.less";
+
 @import "inc/current_filters.inc.less";
-
-// Use special font for code blocks in order to have the same width for each char
-code, samp {
-	font-family: Menlo, Monaco, "Courier New", Courier, monospace;
-	/* font-size: 107%; */
+// Bootstrap specific Styles of filters for current selection of the posts (widget "Current filters"):
+.filter_item div {
+	height: 24px !important;
+	line-height: 18px !important;
+}
+div.filters .filter_item {
+	margin: 1px;
+	div {
+		margin: 0;
+	}
 }
 
-// Don't break words on new line for code blocks
-pre, code {
-	-webkit-hyphens: none;
-	-moz-hyphens: none;
-	-ms-hyphens: none;
-	hyphens: none;
-}
-
-// Block without new line breaks
-.nobr,
-.nowrap,
-.line {
-	white-space: nowrap;
-}
-
-// Text alignment helpers:
-.left {
-	text-align: left;
-}
-.center {
-	text-align: center;
-}
-.right {
-	text-align: right;
-}
-.top {
-	vertical-align: top;
-}
-.middle {
-	vertical-align: middle;
-}
-.bottom {
-	vertical-align: bottom;
-}
-// ---------------- //
-
-// Block alignment helpers:
-.floatleft {
-	float: left;
-}
-.floatright {
-	float: right;
-}
-.clear{
-	clear: both;
-}
-// ---------------- //
-
-// Block styles:
-.inline {
-	display: inline;
-}
-/* DUPLICATES BOOTSTRAP STYLE
-.hidden {
-	display: none;
-}
-*/
-
-.absolute_center {
-	display: block;
-	margin: auto;
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-}
-/* I DON'T THINK THESE APPLY TO ANYTHING
-.indented {
-	margin-left: 3em;
-}
-.border {
-	border: 1px solid #000;
-}
-.margin1ex {
-	margin: 1ex;
-}
-.margin2ex {
-	margin: 2ex;
-}
-.mb1 {
-	margin-bottom: 1px;
-}
-*/
-// ---------------- //
-
-// Font sizes:
-/* UNNECESSARY STYLES, SINCE THERE ARE SMALL STYLES ON BOOTSTRAP
-.small92 {
-	font-size: 92%;
-}
-.small84 {
-	font-size: 84%;
-}
-.small80 {
-	font-size: 80%;
-}
-.small_details {
-	font-size: 84%;
-	color: #555;
-}
-*/
-.note,
-.notes,
-.dimmed {
-	font-size: 84%;
-	color: #999;
-	font-weight:normal;
-}
-// ---------------- //
-
-// Text colors:
-.red {
-	color: #f00;
-}
-.orange {
-	color: #f60;
-}
-.green {
-	color: #0c0
-}
-.black {
-	color: #000;
-}
-.disabled {
-	color: #999;
-}
-// ---------------- //
-
-acronym,
-abbr {
-	border-bottom: 1px dotted #000;
-	// ALLREADY INCLUDED IN BOOTSTRAP: 
-	// cursor: help;
-}
-del {
-	color: #999999;
-}
-ins {
-	color: #009999;
-	text-decoration: none;
-}
-
-.expanded li {
-	margin-top: 1ex;
-	margin-bottom: 1ex;
-}
-
-/* I THINK THIS REFERS TO NOTHING
-a.discreet {
-	text-decoration: none;
-}
-*/
-
-// Image alignment
-img.leftmargin {
-	float:left;
-	margin-right:1ex;
-	margin-top:.2ex;
-	margin-bottom:.2ex;
-}
-img.rightmargin, div.rightmargin {
-	float:right;
-	margin-left:1ex;
-	margin-top:.2ex;
-	margin-bottom:.2ex;
-}
-
-// GIF animation is used while AJAX request is loading:
-span.loader_img {
-	display: inline-block;
-	width: 32px;
-	height: 32px;
-	background: url(../img/ajax-loader/fff.gif) no-repeat center;
-}
-span.loader_img.loader_user_report,
-span.loader_img.loader_user_deldata {
-	background-image: url(../img/ajax-loader/777.gif);
-}
-// ---------------- //
+// ------
 
 // Meta categories that appears on categories widget:
 .widget_core_coll_category_list {
@@ -235,19 +70,8 @@ span.loader_img.loader_user_deldata {
 		display: inline;
 	}
 }
-// ---------------- //
 
-// Styles of filters for current selection of the posts (widget "Current filters"):
-.filter_item div {
-	height: 24px !important;
-	line-height: 18px !important;
-}
-div.filters .filter_item {
-	margin: 1px;
-	div {
-		margin: 0;
-	}
-}
+// ---------------- //
 
 // Meta comments:
 .evo_comment__meta {
