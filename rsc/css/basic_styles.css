@@ -287,7 +287,11 @@ a:hover .fa-flag-o.fa-x--hover:before {
   position: relative;
   left: 0.1em;
 }
-img.loadimg,
+img.loadimg {
+  width: 32px;
+  height: 32px;
+  background: url(../img/ajax-loader/fff.gif) no-repeat center;
+}
 span.loader_img {
   display: inline-block;
   width: 32px;
