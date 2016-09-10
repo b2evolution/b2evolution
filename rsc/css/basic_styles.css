@@ -66,13 +66,17 @@ code {
       -ms-hyphens: none;
           hyphens: none;
 }
+img {
+  border: none;
+}
 .top {
   vertical-align: top;
 }
 .middle {
   vertical-align: middle;
 }
-.bottom {
+.bottom,
+img.icon {
   vertical-align: bottom;
 }
 .baseline {
@@ -163,7 +167,7 @@ img.round,
  *   ch - Switzerland
  */
 span.flag {
-  border: 1px solid #000000;
+  border: 1px solid #666;
   background: url(../icons/flags_sprite.png) no-repeat;
   width: 16px;
   height: 11px;
@@ -283,6 +287,7 @@ a:hover .fa-flag-o.fa-x--hover:before {
   position: relative;
   left: 0.1em;
 }
+img.loadimg,
 span.loader_img {
   display: inline-block;
   width: 32px;
@@ -597,12 +602,6 @@ code,
 samp {
   font-family: Menlo, Monaco, "Courier New", Courier, monospace;
 }
-pre,
-code {
-  -webkit-hyphens: none;
-      -ms-hyphens: none;
-          hyphens: none;
-}
 blockquote {
   border: 1px solid #eee;
   background-color: #eee;
@@ -637,6 +636,14 @@ blockquote {
 .small_details {
   font-size: 84%;
   color: #555;
+}
+img.flag {
+  vertical-align: middle;
+  border: 1px solid #666;
+}
+img.flagtop {
+  vertical-align: top;
+  border: 1px solid #666;
 }
 a.roundbutton,
 a.roundbutton_text,
