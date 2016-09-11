@@ -393,6 +393,23 @@ switch( $action )
 		header_redirect( $admin_url.'?ctrl=items&action='.$prev_action.( $item_ID > 0 ? '&p='.$item_ID : '' ).'&blog='.$blog );
 		break;
 
+	case 'hide_wysiwyg_warning':
+	case 'show_wysiwyg_warning':
+		// Show/hide warning when switching from markup to WYSIWYG
+		$Session->assert_received_crumb( 'item' );
+
+		// Check that this action request is not a CSRF hacked request:
+		$UserSettings->set( 'show_wysiwyg_warning_'.$blog, ( $action == 'show_wysiwyg_warning' ? 1: 0 ) );
+		$UserSettings->dbupdate();
+
+		// Update setting:
+		$prev_action = param( 'prev_action', 'string', '' );
+		$item_ID = param( 'p', 'integer', 0 );
+
+		// REDIRECT / EXIT
+		header_redirect( $admin_url.'?ctrl=items&action='.$prev_action.( $item_ID > 0 ? '&p='.$item_ID : '' ).'&blog='.$blog );
+		break;
+
 	case 'reset_quick_settings':
 		// Reset quick default settings for current user on the edit item screen:
 
@@ -889,9 +906,9 @@ switch( $action )
 			}
 		}
 
-		if( $redirect_to !== NULL ) 
-		{	// The redirect url was NOT set to NULL ( $blog_redirect_setting == 'no' ) 
-	 
+		if( $redirect_to !== NULL )
+		{	// The redirect url was NOT set to NULL ( $blog_redirect_setting == 'no' )
+
 			// TRY TO REDIRECT / EXIT
 			header_redirect( $redirect_to, 303, false, true /* RETURN if forbidden */ );
 
@@ -1085,9 +1102,9 @@ switch( $action )
 			$redirect_to = NULL;
 		}
 
-		if( $redirect_to !== NULL ) 
-		{	// The redirect url was NOT set to NULL ( $blog_redirect_setting == 'no' ) 
-	 
+		if( $redirect_to !== NULL )
+		{	// The redirect url was NOT set to NULL ( $blog_redirect_setting == 'no' )
+
 			// TRY TO REDIRECT / EXIT
 			header_redirect( $redirect_to, 303, false, true /* RETURN if forbidden */ );
 
