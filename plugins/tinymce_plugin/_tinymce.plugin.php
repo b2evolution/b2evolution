@@ -327,13 +327,81 @@ class tinymce_plugin extends Plugin
 		</div>
 
 		<script type="text/javascript">
+			<?php
+				global $UserSettings;
+				$show_wysiwyg_warning = $UserSettings->get_collection_setting( 'show_wysiwyg_warning', $Blog->ID );
+				$display_warning = ( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ) ? 'true' : 'false';
+			?>
+			var displayWarning = <?php echo $display_warning;?>;
+			function confirmSwitch()
+			{
+				if( jQuery( 'input[name=hideWarning]' ).is(':checked') )
+				{ // Do not show this warning again for this collection
+					var ajax_url = '<?php echo get_htsrv_url().'async.php?action=hide_wysiwyg_warning&blog='.$Blog->ID.'&'.url_crumb( 'item' );?>';
+
+					jQuery.ajax( {
+						type: "GET",
+						dataType: "html",
+						url: ajax_url,
+						success: function( data )
+						{
+							displayWarning = false;
+
+							// toggle show/hide WYSIWYG switch in post edit form
+							if (typeof toggleWYSIWYGSwitch == 'function')
+							{ // make sure function exists first before calling
+								toggleWYSIWYGSwitch( false );
+							}
+						}
+					} );
+
+
+					// This is the non-AJAX version to toggle display of warning when switching from markup to WYSIWYG.
+					// Warning: User could lose unsaved changes when this option is used.
+					//<?php
+					//global $admin_url;
+					//$item_ID = get_param( 'p' ) > 0 ? get_param( 'p' ) : $edited_Item->ID;
+					//$prev_action = $item_ID > 0 ? 'edit' : 'new';
+					//$quick_setting_url = $admin_url.'?ctrl=items&prev_action='.$prev_action.( $item_ID > 0 ? '&p='.$item_ID : '' )
+					//		.'&blog='.$Blog->ID.'&'.url_crumb( 'item' ).'&action=hide_wysiwyg_warning';
+					//echo 'var quick_setting_url = \''.$quick_setting_url.'\';';
+					//?>
+					//window.location = quick_setting_url;
+				}
+
+				// switch to WYSIWYG
+				tinymce_plugin_toggleEditor('<?php echo $params['content_id']; ?>');
+
+				// close the modal window
+				closeModalWindow();
+
+				return false;
+			}
 			jQuery( '[id^=tinymce_plugin_toggle_button_]').click( function()
 			{
-				if( jQuery( this ).val() == 'WYSIWYG' && ! confirm( '<?php echo TS_('WARNING: By switching to WYSIWYG, you might lose newline and paragraph marks as well as some other formatting. Your text is safe though! Are you sure you want to switch?') ?>' ) )
-				{ // Switch to WYSIWYG only after confirmation
-					return;
+				if( jQuery( this ).val() == 'WYSIWYG' )
+				{
+					if( displayWarning )
+					{
+						evo_js_lang_close = '<?php echo TS_('Cancel');?>';
+						openModalWindow( '<p><?php echo TS_('By switching to WYSIWYG, you might lose newline and paragraph marks as well as some other formatting. Your text is safe though! Are you sure you want to switch?');?></p>'
+							+ '<form>'
+							+ '<input type="checkbox" name="hideWarning" value="1"> ' + '<?php echo TS_("Don't show this again for this Collection");?>'
+							+ '<input type="submit" name="submit" onclick="return confirmSwitch();">'
+							+ '</form>',
+							'500px', '', true,
+							'<span class="text-danger"><?php echo TS_('WARNING');?></span>',
+							[ '<?php echo TS_('OK');?>', 'btn-primary' ] );
+					}
+					else
+					{
+						tinymce_plugin_toggleEditor('<?php echo $params['content_id']; ?>');
+					}
 				}
-				tinymce_plugin_toggleEditor('<?php echo $params['content_id']; ?>');
+				else
+				{
+					tinymce_plugin_toggleEditor('<?php echo $params['content_id']; ?>');
+				}
 			} );
 
 			/**
