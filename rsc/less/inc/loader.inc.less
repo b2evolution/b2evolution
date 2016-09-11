@@ -1,7 +1,13 @@
 // See also: _results_ajax_loading.module.less
 
-// GIF animation is used while images or AJAX requests are loading:
-img.loadimg,
+// GIF animation is used while images are loading:
+img.loadimg {
+	min-width: 32px;
+	min-height: 32px;
+	background: url(../img/ajax-loader/fff.gif) no-repeat center;
+}
+
+// GIF animation is used while AJAX requests are loading:
 span.loader_img {
 	display: inline-block;
 	width: 32px;
