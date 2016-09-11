@@ -650,7 +650,7 @@ switch( $action )
 			param_check_not_empty( 'zipname', T_('Please provide the name of the archive.') );
 			if( ! empty( $zipname ) )
 			{ // Check extenssion of the entered file name:
-				param_check_regexp( 'zipname', '#\.zip$#i', T_('File name must be ended in .ZIP') );
+				param_check_regexp( 'zipname', '#\.zip$#i', T_('File name must end with .zip') );
 			}
 		}
 
