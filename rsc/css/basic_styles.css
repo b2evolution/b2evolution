@@ -290,8 +290,8 @@ a:hover .fa-flag-o.fa-x--hover:before {
   left: 0.1em;
 }
 img.loadimg {
-  width: 32px;
-  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
   background: url(../img/ajax-loader/fff.gif) no-repeat center;
 }
 span.loader_img {
