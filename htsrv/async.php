@@ -833,6 +833,7 @@ switch( $action )
 			.'</div>';
 
 		break;
+
 	case 'hide_wysiwyg_warning':
 		// Show/hide warning when switching from markup to WYSIWYG
 		$Session->assert_received_crumb( 'item' );
