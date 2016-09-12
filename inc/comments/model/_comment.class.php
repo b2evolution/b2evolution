@@ -4332,6 +4332,11 @@ class Comment extends DataObject
 			return false;
 		}
 
+		if( $this->is_meta() )
+		{	// Don't allow a replying for meta comments:
+			return false;
+		}
+
 		$this->get_Item();
 		$this->Item->load_Blog();
 
