@@ -1590,7 +1590,7 @@ class Skin extends DataObject
 								'toolbar_after'        => '</div>',
 								'toolbar_title_before' => '<div class="btn-toolbar-title">',
 								'toolbar_title_after'  => '</div>',
-								'toolbar_group_before' => '<div class="btn-group" role="group">',
+								'toolbar_group_before' => '<div class="btn-group btn-group-xs" role="group">',
 								'toolbar_group_after'  => '</div>',
 								'toolbar_button_class' => 'btn btn-default',
 							);
