@@ -63,7 +63,7 @@ elseif( isset( $_GET[ $dummy_fields[ 'login' ] ] ) )
 	$pass = isset( $_GET[ $dummy_fields[ 'pwd' ] ] ) ? $_GET[ $dummy_fields[ 'pwd' ] ] : '';
 	unset( $_GET[ $dummy_fields[ 'pwd' ] ] ); // password will be hashed below
 }
-elseif( $Settings->get( 'http_auth_accept' ) && ! $Session->has_User() && isset( $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'] ) )
+elseif( empty( $disable_http_auth ) && $Settings->get( 'http_auth_accept' ) && ! $Session->has_User() && isset( $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'] ) )
 {	// Trying to log in with HTTP basic authentication:
 	$login = $_SERVER['PHP_AUTH_USER'];
 	$pass = $_SERVER['PHP_AUTH_PW'];

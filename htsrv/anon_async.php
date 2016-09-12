@@ -18,6 +18,11 @@
  */
 require_once dirname(__FILE__).'/../conf/_config.php';
 
+// Disable log in with HTTP basic authentication because we need some action even for anonymous users,
+// but it is impossible if wrong login was entered on "HTTP Basic Authentication" form.
+// (Used to correct work of action "get_user_salt")
+$disable_http_auth = true;
+
 require_once $inc_path.'_main.inc.php';
 
 load_funcs( '../inc/skins/_skin.funcs.php' );
