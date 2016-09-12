@@ -245,9 +245,12 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 		$max_count = $results[0]->tag_count;
 		$min_count = $results[count($results)-1]->tag_count;
-		$count_span = max( 1, $max_count - $min_count );
-		$max_size = $this->disp_params['tag_max_size'];
-		$min_size = $this->disp_params['tag_min_size'];
+
+		$count_span = abs( $max_count - $min_count );
+
+		// Added max() and min() just in case values are incorrectly defined in the widget settings
+		$max_size = max( $this->disp_params['tag_max_size'], $this->disp_params['tag_min_size'] );
+		$min_size = min( $this->disp_params['tag_min_size'], $this->disp_params['tag_max_size'] );
 		$size_span = $max_size - $min_size;
 
 		if($this->disp_params['tag_ordering'] == 'ASC')
@@ -280,7 +283,14 @@ class coll_tag_cloud_Widget extends ComponentWidget
 				? '&laquo;'.format_to_output( $row->tag_name, 'htmlbody' ).'&raquo;'
 				: format_to_output( $row->tag_name, 'htmlbody' );
 
-			$font_size = floor( $size_span * max( 1, $row->tag_count - $min_count ) / $count_span ) + $min_size;
+			if( $count_span === 0 )
+			{ // edge case where there is only a single tag
+				$font_size = $max_size;
+			}
+			else
+			{
+				$font_size = floor( ( $size_span * ( $row->tag_count - $min_count ) / $count_span ) + $min_size );
+			}
 
 			if( !is_null( $destination_Blog ) )
 			{
