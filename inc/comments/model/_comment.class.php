@@ -4339,6 +4339,11 @@ class Comment extends DataObject
 			return false;
 		}
 
+		if( $this->is_meta() )
+		{	// Don't allow a replying for meta comments:
+			return false;
+		}
+
 		$this->get_Item();
 		$this->Item->load_Blog();
 
@@ -4606,15 +4611,19 @@ class Comment extends DataObject
 
 		$commented_Item = & $this->get_Item();
 
-		// Do not restrict if meta comment and user has the proper permission. Change meta comment status to 'protected'.
-		if( $this->is_meta() && $commented_Item &&
-		    ! $current_User->check_perm( 'meta_comment', 'view', false, $commented_Item->get_blog_ID() ) )
-		{
-			$comment_allowed_status = 'protected';
+		if( $this->is_meta() )
+		{	// Meta comment:
+			if( ! is_logged_in() || ( $commented_Item && ! $current_User->check_perm( 'meta_comment', 'view', false, $commented_Item->get_blog_ID() ) ) )
+			{	// Change meta comment status to 'protected' if user has no perm to view them:
+				$comment_allowed_status = 'protected';
+			}
+			else
+			{	// Do not restrict if meta comment and user has the proper permission:
+				$comment_allowed_status = $current_status;
+			}
 		}
 		else
-		{
-			// Restrict status to max allowed by parent item:
+		{	// Restrict status of normal comment to max allowed by parent item:
 			$comment_allowed_status = $this->get_allowed_status();
 			if( empty( $comment_allowed_status ) && $commented_Item && ( $item_Blog = & $commented_Item->get_Blog() ) )
 			{	// If min allowed status is not found then use what default status is allowed:

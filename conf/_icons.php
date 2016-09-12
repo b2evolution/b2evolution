@@ -873,7 +873,7 @@ function get_icon_info( $name )
 			'fa' => 'filter'
 		);
 		case 'reset_filters': return array(
-			'alt'  => T_('Reset all filters'),
+			'alt'  => T_('Reset all filters!'),
 			'size' => array( 16, 16 ),
 			'xy' => array( 144, 112 ),
 			'glyph' => 'filter',
