@@ -2680,7 +2680,7 @@ class User extends DataObject
 			case 'meta_comment':
 				// Check permission for meta comment:
 
-				if( $permlevel == 'edit'|| $permlevel == 'moderate' || $permlevel == 'delete' )
+				if( $permlevel == 'edit' || $permlevel == 'delete' )
 				{	// Set Comment from target object:
 					$Comment = & $perm_target;
 					if( empty( $Comment ) || ! $Comment->is_meta() )
@@ -2696,14 +2696,20 @@ class User extends DataObject
 					$blog_ID = $perm_target_ID;
 				}
 				else
-				{	// Invalid permission level
+				{	// Permission level is not allowed for all meta comments (For example 'moderate')
 					$perm = false;
 					break;
 				}
 
-				if( empty( $Item ) && empty( $blog_ID ) )
+				if( empty( $blog_ID ) )
 				{	// Item or Blog must be defined to check these permissions:
 					$perm = false;
+					break;
+				}
+
+				if( $this->check_perm_blog_global( $blog_ID, $permlevel ) )
+				{	// User has global permission on this collection:
+					$perm = true;
 					break;
 				}
 
@@ -2732,11 +2738,6 @@ class User extends DataObject
 								$this->check_perm_blogusers( 'meta_comment', 'edit', $blog_ID, $Comment )
 								// OR If User belongs to a group explicitly allowed in the group permissions
 								|| ( $this->get_Group() && $this->Group->check_perm_bloggroups( 'meta_comment', 'edit', $blog_ID, $Comment ) );
-						break;
-
-					case 'moderate':
-						// Moderation is not available for meta comment
-						$perm = false;
 						break;
 
 					case 'delete':
