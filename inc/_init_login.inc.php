@@ -67,8 +67,12 @@ elseif( $Settings->get( 'http_auth_accept' ) && ! $Session->has_User() && isset(
 {	// Trying to log in with HTTP basic authentication:
 	$login = $_SERVER['PHP_AUTH_USER'];
 	$pass = $_SERVER['PHP_AUTH_PW'];
+	// Don't check crumb because it is impossible to send by this auth method:
 	$check_login_crumb = false;
+	// Don't report about not hashing password because it is impossible to send by this auth method:
 	$report_wrong_pass_hashing = false;
+	// Set action to simulate a form submit button like '<input type="submit" name="login_action[login]" >' for correct redirect after successful login:
+	$login_action = array( 'login' => '' );
 }
 
 $Debuglog->add( 'Login: login: '.var_export( htmlspecialchars( $login, ENT_COMPAT, $evo_charset ), true ), '_init_login' );
