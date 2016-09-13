@@ -1107,15 +1107,22 @@ var downloadInterval = setInterval( function()
 			break;
 
 		case 'access_requires_login':
+			global $login_mode;
+
 			if( $Settings->get( 'http_auth_require' ) && ! isset( $_SERVER['PHP_AUTH_USER'] ) )
 			{	// Require HTTP authentication:
 				header( 'WWW-Authenticate: Basic realm="b2evolution"' );
 				header( 'HTTP/1.0 401 Unauthorized' );
 			}
+
+			if( ! empty( $login_mode ) && $login_mode == 'http_basic_auth' )
+			{	// Display this error if user already tried to log in by HTTP basic authentication and it was failed:
+				$Messages->add( T_('Wrong Login/Password provided by browser (HTTP Auth).'), 'error' );
+			}
 			break;
 
 		case 'login':
-			global $Plugins;
+			global $Plugins, $login_mode;
 
 			if( is_logged_in() )
 			{ // User is already logged in
@@ -1146,6 +1153,11 @@ var downloadInterval = setInterval( function()
 			{	// Require HTTP authentication:
 				header( 'WWW-Authenticate: Basic realm="b2evolution"' );
 				header( 'HTTP/1.0 401 Unauthorized' );
+			}
+
+			if( ! empty( $login_mode ) && $login_mode == 'http_basic_auth' )
+			{	// Display this error if user already tried to log in by HTTP basic authentication and it was failed:
+				$Messages->add( T_('Wrong Login/Password provided by browser (HTTP Auth).'), 'error' );
 			}
 
 			$seo_page_type = 'Login form';

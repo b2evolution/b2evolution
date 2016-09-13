@@ -347,7 +347,10 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		// This will cause the login screen to "popup" (again)
 		if( $login_mode == 'http_basic_auth' )
 		{	// If wrong login from HTTP basic authentication
-			$login_error = T_('Wrong Login/Password provided by browser (HTTP Auth).');
+			if( ! empty( $is_login_page ) )
+			{	// Display this error and login form only if user really is requesting a login page:
+				$login_error = T_('Wrong Login/Password provided by browser (HTTP Auth).');
+			}
 		}
 		else
 		{	// If wrong login from standard POST forms or GET request:
