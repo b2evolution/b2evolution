@@ -32,7 +32,6 @@ $params = array_merge( array(
 siteskin_init();
 
 init_bubbletip_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) ); // Add jQuery bubbletip plugin
-require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 // CSS for IE9. NOTE: Don't use php checking here because of page caching!
 add_headline( '<!--[if IE 9 ]>' );
 require_css( 'ie9.css', 'blog' );

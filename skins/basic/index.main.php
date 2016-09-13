@@ -21,8 +21,6 @@ if( evo_version_compare( $app_version, '2.4.1' ) < 0 )
 // Do inits depending on current $disp:
 skin_init( $disp );
 
-require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
-
 // The following is temporary and should be moved to some SiteSkin class
 siteskin_init();
 
