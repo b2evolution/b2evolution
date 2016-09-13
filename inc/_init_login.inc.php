@@ -52,19 +52,22 @@ $check_login_crumb = true;
 $report_wrong_pass_hashing = true;
 
 if( isset( $_POST[ $dummy_fields[ 'login' ] ] ) && isset( $_POST[ $dummy_fields[ 'pwd' ] ] ) )
-{ // Trying to log in with a POST
+{	// Trying to log in with a POST:
+	$login_mode = 'post_form';
 	$login = $_POST[ $dummy_fields[ 'login' ] ];
 	$pass = $_POST[ $dummy_fields[ 'pwd' ] ];
 	unset( $_POST[ $dummy_fields[ 'pwd' ] ] ); // password will be hashed below
 }
 elseif( isset( $_GET[ $dummy_fields[ 'login' ] ] ) )
-{ // Trying to log in with a GET; we might only provide a user here.
+{	// Trying to log in with a GET; we might only provide a user here.
+	$login_mode = 'get_request';
 	$login = $_GET[ $dummy_fields[ 'login' ] ];
 	$pass = isset( $_GET[ $dummy_fields[ 'pwd' ] ] ) ? $_GET[ $dummy_fields[ 'pwd' ] ] : '';
 	unset( $_GET[ $dummy_fields[ 'pwd' ] ] ); // password will be hashed below
 }
 elseif( empty( $disable_http_auth ) && $Settings->get( 'http_auth_accept' ) && ! $Session->has_User() && isset( $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'] ) )
 {	// Trying to log in with HTTP basic authentication:
+	$login_mode = 'http_basic_auth';
 	$login = $_SERVER['PHP_AUTH_USER'];
 	$pass = $_SERVER['PHP_AUTH_PW'];
 	// Don't check crumb because it is impossible to send by this auth method:
@@ -342,7 +345,14 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	elseif( empty( $login_error ) )
 	{ // if the login_error wasn't set yet, add the default one:
 		// This will cause the login screen to "popup" (again)
-		$login_error = T_('Wrong login/password.');
+		if( $login_mode == 'http_basic_auth' )
+		{	// If wrong login from HTTP basic authentication
+			$login_error = T_('Wrong Login/Password provided by browser (HTTP Auth).');
+		}
+		else
+		{	// If wrong login from standard POST forms or GET request:
+			$login_error = T_('The Login/Password you entered is wrong.');
+		}
 
 		if( isset( $login_attempts ) )
 		{ // Save new login attempt into DB
