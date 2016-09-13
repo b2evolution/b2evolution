@@ -69,7 +69,7 @@ code {
 img {
   border: none;
   max-width: 100%;
-  max-height: auto;
+  height: auto;
 }
 .top {
   vertical-align: top;
