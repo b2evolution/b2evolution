@@ -594,7 +594,6 @@ if( $display_mode == 'normal' )
 
 	var b2evo_dispatcher_url = "'.$admin_url.'";' );
 	require_js( '#jqueryUI#' ); // auto requires jQuery
-	require_js( 'communication.js' ); // auto requires jQuery
 	require_js( 'blog_widgets.js' );
 	require_css( 'blog_widgets.css' );
 

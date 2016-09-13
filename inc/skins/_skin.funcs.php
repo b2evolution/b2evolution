@@ -297,8 +297,6 @@ function skin_init( $disp )
 			// Save global $Item to $download_Item, because $Item can be rewritten by function get_featured_Item() in some skins
 			$GLOBALS['download_Item'] = & $Item;
 
-			init_ajax_forms( 'blog' ); // auto requires jQuery
-
 			// Initialize JavaScript to download file after X seconds
 			add_js_headline( '
 jQuery( document ).ready( function ()
@@ -331,7 +329,6 @@ var downloadInterval = setInterval( function()
 			break;
 
 		case 'posts':
-			init_ajax_forms( 'blog' ); // auto requires jQuery
 			// fp> if we add this here, we have to exetnd the inner if()
 			// init_ratings_js( 'blog' );
 

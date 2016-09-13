@@ -189,15 +189,6 @@ module.exports = function(grunt) {
 				src: 'rsc/js/functions.js',
 				dest: 'rsc/js/build/functions.min.js'
 			},
-			ajaxcomjs: {
-				options: {
-					// Extend default banner:
-					banner: '<%= uglify.options.banner %>// This includes 2 files \n'
-				},
-				nonull: true, // Display missing files
-				src: ['rsc/js/ajax.js', 'rsc/js/communication.js'],
-				dest: 'rsc/js/build/ajaxcom.min.js',
-			},
 			*/
 			// Colorbox + Voting + Touchswipe
 			colorbox: {
@@ -272,13 +263,14 @@ module.exports = function(grunt) {
 			// JS files that are used on back-office standard skins:
 			evo_backoffice: {
 				options: {
-					banner: '/* This includes 14 files: functions.js, ajax.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, '+
+					banner: '/* This includes 15 files: functions.js, ajax.js, communication.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, '+
 						'src/evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js, '+
 						'src/evo_user_org.js, src/evo_rest_api.js, src/evo_links.js */\n'
 				},
 				nonull: true, // Display missing files
 				src: ['rsc/js/functions.js',
 							'rsc/js/ajax.js',
+							'rsc/js/communication.js',
 							'rsc/js/form_extensions.js',
 							'rsc/js/extracats.js',
 							'rsc/js/dynamic_select.js',
@@ -296,13 +288,14 @@ module.exports = function(grunt) {
 			// JS files that are used on back-office bootstrap skins:
 			evo_backoffice_bootstrap: {
 				options: {
-					banner: '/* This includes 14 files: functions.js, ajax.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, '+
+					banner: '/* This includes 15 files: functions.js, ajax.js, communication.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, '+
 						'src/bootstrap-evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js, '+
 						'src/evo_user_org.js, src/evo_rest_api.js, src/evo_links.js */\n'
 				},
 				nonull: true, // Display missing files
 				src: ['rsc/js/functions.js',
 							'rsc/js/ajax.js',
+							'rsc/js/communication.js',
 							'rsc/js/form_extensions.js',
 							'rsc/js/extracats.js',
 							'rsc/js/dynamic_select.js',

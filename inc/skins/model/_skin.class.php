@@ -982,9 +982,6 @@ class Skin extends DataObject
 
 					global $Collection, $Blog, $current_User;
 
-					// Used to init functions for AJAX forms to add a comment:
-					init_ajax_forms( 'blog' );
-
 					// Used to set rating for a new comment:
 					init_ratings_js( 'blog' );
 
