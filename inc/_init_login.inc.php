@@ -357,10 +357,10 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 			$login_error = T_('The Login/Password you entered is wrong.');
 		}
 
-		if( isset( $login_attempts ) )
-		{ // Save new login attempt into DB
+		if( isset( $login_attempts ) && ( $login_mode != 'http_basic_auth' || count( $login_attempts ) == 0 ) )
+		{	// Save new login attempt into DB only if it is not HTTP basic authentication or first time:
 			if( count( $login_attempts ) == 9 )
-			{ // Unset first attempt to clear a space for new attempt
+			{	// Unset first attempt to clear a space for new attempt:
 				unset( $login_attempts[0] );
 			}
 			$login_attempts[] = $localtimenow.'|'.( array_key_exists( 'REMOTE_ADDR', $_SERVER ) ? $_SERVER['REMOTE_ADDR'] : '' );
