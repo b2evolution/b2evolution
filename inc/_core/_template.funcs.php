@@ -2604,7 +2604,7 @@ function display_login_js_handler( $params )
 			error: function( jqXHR, textStatus, errorThrown )
 			{	// Display error text on error request:
 				requestSent = false;
-				alert( 'Error: could not get hash Salt from server. Please contact the site admin and check the browser and server error logs.' );
+				alert( 'Error: could not get hash Salt from server. Please contact the site admin and check the browser and server error logs. (' + textStatus + ': ' + errorThrown + ')' );
 			}
 		});
 
