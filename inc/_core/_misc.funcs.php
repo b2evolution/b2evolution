@@ -8142,7 +8142,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 		switch( $object_class )
 		{
 			case 'Item':
-				$LinkOwner = new LinkItem( $Object );
+				$LinkOwner = new LinkItem( $Object, $temp_link_owner_ID );
 				$plugin_event_name = 'RenderItemAttachment';
 				break;
 

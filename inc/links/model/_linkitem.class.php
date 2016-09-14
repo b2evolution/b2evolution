@@ -222,7 +222,17 @@ class LinkItem extends LinkOwner
 	{
 		if( is_null( $this->Blog ) )
 		{
-			$this->Blog = & $this->Item->get_Blog();
+			$Item = $this->Item;
+			if( $Item->ID == 0 )
+			{	// This is a request of new creating Item (for example, preview mode),
+				// We should use current collection, because new Item has no category ID yet here to load Collection:
+				global $Blog;
+				$this->Blog = $Blog;
+			}
+			else
+			{	// Use Collection of the existing Item:
+				$this->Blog = & $this->Item->get_Blog();
+			}
 		}
 	}
 

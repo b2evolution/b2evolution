@@ -78,6 +78,7 @@ function & get_link_owner( $link_type, $object_ID )
 					break;
 
 				case 'item':
+					load_class( 'items/model/_item.class.php', 'Item' );
 					$LinkOwner = new LinkItem( new Item(), $object_ID );
 					break;
 			}
