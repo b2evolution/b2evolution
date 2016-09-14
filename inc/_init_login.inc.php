@@ -357,8 +357,10 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 			$login_error = T_('The Login/Password you entered is wrong.');
 		}
 
-		if( isset( $login_attempts ) && ( $login_mode != 'http_basic_auth' || count( $login_attempts ) == 0 ) )
-		{	// Save new login attempt into DB only if it is not HTTP basic authentication or first time:
+		$current_login_pass = $login.':'.( empty( $pwd_hashed ) ? $pass : implode( '', $pwd_hashed ) );
+
+		if( isset( $login_attempts ) && $current_login_pass != $Session->get( 'wrong_loginpass' ) )
+		{	// Save new login attempt into DB only if previous login data were different:
 			if( count( $login_attempts ) == 9 )
 			{	// Unset first attempt to clear a space for new attempt:
 				unset( $login_attempts[0] );
@@ -367,6 +369,9 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 			$UserSettings->set( 'login_attempts', implode( ';', $login_attempts ), $User->ID );
 			$UserSettings->dbupdate();
 		}
+
+		// Save current wrong login/pass in session to know on next login trying that we get new data:
+		$Session->set( 'wrong_loginpass', $current_login_pass );
 	}
 
 }
