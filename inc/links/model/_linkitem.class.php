@@ -254,18 +254,37 @@ class LinkItem extends LinkOwner
 
 	/**
 	 * Get Item edit url
+	 *
+	 * @return string URL
 	 */
 	function get_edit_url()
 	{
-		if( $this->is_temp() )
-		{
-			global $Blog;
-			return '?ctrl=items&amp;blog='.$Blog->ID.'&amp;action=new';
+		if( is_admin_page() )
+		{	// Back-office:
+			global $admin_url;
+			if( $this->is_temp() )
+			{	// New creating Item:
+				global $Blog;
+				return $admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;action=new';
+			}
+			else
+			{	// The edited Item:
+				$this->load_Blog();
+				return $admin_url.'?ctrl=items&amp;blog='.$this->Blog->ID.'&amp;action=edit&amp;p='.$this->Item->ID;
+			}
 		}
 		else
-		{
-			$this->load_Blog();
-			return '?ctrl=items&amp;blog='.$this->Blog->ID.'&amp;action=edit&amp;p='.$this->Item->ID;
+		{	// Front-office:
+			global $Blog;
+			if( $this->is_temp() )
+			{	// New creating Item:
+				return url_add_param( $Blog->get( 'url' ), 'disp=edit' );
+			}
+			else
+			{	// The edited Item:
+				return url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;p='.$this->Item->ID );
+			}
+			
 		}
 	}
 
@@ -304,7 +323,7 @@ class LinkItem extends LinkOwner
 
 		if( ! empty( $link_ID ) )
 		{ // Find inline image placeholders if link ID is defined
-			preg_match_all( '/\[(image|file|inline|video|audio):'.$link_ID.':?[^\]]*\]/i', $this->Item->content, $inline_images );
+			preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):'.$link_ID.':?[^\]]*\]/i', $this->Item->content, $inline_images );
 			if( ! empty( $inline_images[0] ) )
 			{ // There are inline image placeholders in the post content
 				$this->Item->set( 'content', str_replace( $inline_images[0], '', $this->Item->content ) );

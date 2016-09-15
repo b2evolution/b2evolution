@@ -146,7 +146,7 @@ function evo_link_delete( event_object, type, link_ID, action )
 			var b2evoCanvas = window.document.getElementById( 'itemform_post_content' );
 			if( b2evoCanvas != null )
 			{ // Canvas exists
-				var regexp = new RegExp( '\\\[(image|file|inline|video|audio):' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
+				var regexp = new RegExp( '\\\[(image|file|inline|video|audio|thumbnail):' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
 				textarea_str_replace( b2evoCanvas, regexp, '', window.document );
 			}
 		}

@@ -249,7 +249,8 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_report.js',
 							'rsc/js/src/evo_user_contact_groups.js',
 							'rsc/js/src/evo_rest_api.js',
-							'rsc/js/src/evo_item_flag.js'],
+							'rsc/js/src/evo_item_flag.js',
+							'rsc/js/src/evo_links.js'],
 				dest: 'rsc/js/build/evo_frontoffice.bmin.js'
 			},
 			// JS files that are used on front-office bootstrap skins:
@@ -264,7 +265,8 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_report.js',
 							'rsc/js/src/evo_user_contact_groups.js',
 							'rsc/js/src/evo_rest_api.js',
-							'rsc/js/src/evo_item_flag.js'],
+							'rsc/js/src/evo_item_flag.js',
+							'rsc/js/src/evo_links.js'],
 				dest: 'rsc/js/build/bootstrap-evo_frontoffice.bmin.js'
 			},
 			// JS files that are used on back-office standard skins:

@@ -103,7 +103,7 @@ function & get_link_owner( $link_type, $object_ID )
  */
 function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false, $fold = false )
 {
-	global $admin_url, $AdminUI;
+	global $admin_url, $inc_path;
 	global $current_User, $action;
 
 	if( $LinkOwner->type == 'item' && ! $LinkOwner->is_temp() && ! $LinkOwner->Item->get_type_setting( 'allow_attachments' ) )
@@ -165,10 +165,14 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 		return;
 	}
 
-	$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' );
+	if( is_admin_page() )
+	{	// Display a link to manual page only on back-office:
+		$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' );
+	}
 
-	if( $current_User->check_perm( 'files', 'view' )
-		&& $LinkOwner->check_perm( 'edit', false ) )
+	if( $current_User->check_perm( 'admin', 'restricted' )
+	    && $current_User->check_perm( 'files', 'view' )
+	    && $LinkOwner->check_perm( 'edit', false ) )
 	{ // Check that we have permission to edit owner:
 		$attach_files_url = $admin_url.'?ctrl=files&amp;fm_mode=link_object&amp;link_type='.$LinkOwner->type.( $LinkOwner->type != 'message' ? '&amp;link_object_ID='.$LinkOwner->get_ID() : '' );
 		if( $linkowner_FileList = $LinkOwner->get_attachment_FileList( 1 ) )
@@ -195,8 +199,9 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 			.action_icon( T_('Refresh'), 'refresh', $LinkOwner->get_edit_url(),
 				T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\' )' ) )
 
-			.action_icon( T_('Sort'), 'ascending', $admin_url
-				.'?ctrl=links&amp;action=sort_links&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;'.url_crumb( 'link' ),
+			.action_icon( T_('Sort'), 'ascending', ( is_admin_page() || $current_User->check_perm( 'admin', 'restricted' ) )
+				? $admin_url.'?ctrl=links&amp;action=sort_links&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;'.url_crumb( 'link' )
+				: $LinkOwner->get_edit_url().'#',
 				T_('Sort'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\', \'sort\' )' ) )
 
 		.'</span>';
@@ -213,7 +218,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 	echo '<div id="attachments_fieldset_wrapper">';
 		echo '<div id="attachments_fieldset_block">';
 			echo '<div id="attachments_fieldset_table">';
-				$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+				require $inc_path.'links/views/_link_list.view.php';
 			echo '</div>';
 		echo '</div>';
 	echo '</div>';

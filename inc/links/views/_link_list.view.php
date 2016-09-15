@@ -24,7 +24,7 @@ global $Collection, $Blog;
  */
 global $LinkOwner;
 
-global $AdminUI, $current_User;
+global $AdminUI, $Skin, $current_User;
 
 if( empty( $Blog ) )
 {
@@ -111,7 +111,7 @@ if( count( $LinkOwner->get_positions() ) > 1 )
 }
 
 // Add attr "id" to handle quick uploader
-$compact_results_params = $AdminUI->get_template( 'compact_results' );
+$compact_results_params = is_admin_page() ? $AdminUI->get_template( 'compact_results' ) : $Skin->get_template( 'compact_results' );
 $compact_results_params['body_start'] = str_replace( '<tbody', '<tbody id="filelist_tbody"', $compact_results_params['body_start'] );
 $compact_results_params['no_results_start'] = str_replace( '<tbody', '<tbody id="filelist_tbody"', $compact_results_params['no_results_start'] );
 

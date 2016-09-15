@@ -1514,7 +1514,7 @@ class Item extends ItemLight
 	 */
 	function check_and_clear_inline_files( $content )
 	{
-		preg_match_all( '/\[(image|file):(\d+):?[^\]]*\]/i', $content, $inline_images );
+		preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):(\d+):?[^\]]*\]/i', $content, $inline_images );
 
 		if( empty( $inline_images[1] ) )
 		{ // There are no inline image placeholders in the post content
