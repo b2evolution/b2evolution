@@ -188,7 +188,8 @@ param( 'display', 'string', 'normal' );
 param( 'htaccess', 'string', 'test' );
 // pre_dump( $htaccess );
 
-// check if we should try to connect to db if config is not done
+
+// check if we should try to connect to db if config is not done:
 switch( $action )
 {
 	case 'evoupgrade':
@@ -217,7 +218,10 @@ switch( $action )
 		break;
 }
 
+// pre_dump($action);
+
 $timestamp = time() - 120; // We start dates 2 minutes ago because their dates increase 1 second at a time and we want everything to be visible when the user watches the blogs right after install :P
+
 
 // Load all available locale defintions:
 locales_load_available_defs();
@@ -233,10 +237,12 @@ if( ! empty( $default_locale ) && ! empty( $locales ) && isset( $locales[ $defau
 	$evo_charset = $locales[ $default_locale ]['charset'];
 }
 
+
 if( $action == 'newdb' )
 { // Check request for quick installation AND Update basic config file from url params:
 	$basic_config_file_result = check_quick_install_request();
 }
+
 
 if( $config_is_done || $try_db_connect )
 { // Connect to DB:
@@ -279,6 +285,7 @@ if( $config_is_done || $try_db_connect )
 	}
 }
 
+
 if( ! $use_locale_from_request )
 { // detect language
 	// try to check if db already exists and default locale is set on it
@@ -303,10 +310,12 @@ if( ! locale_activate( $default_locale ) )
 
 init_charsets( $current_charset );
 
+
 if( $action == 'menu-install' && ! ( $old_db_version = get_db_version() ) )
 { // Force to step 3 (Select install options) if DB is not installed yet
 	$action = 'menu-options';
 }
+
 
 switch( $action )
 {
@@ -410,8 +419,7 @@ if( $display != 'cli' )
 
 		<!-- InstanceBeginEditable name="Main" -->
 <?php
-} // END OF: $display != 'cli'else
-else
+} // END OF: $display != 'cli'
 
 if( ! $install_memory_limit_allow )
 { // Display error that current memory limit size is not enough for correct using:
@@ -419,12 +427,13 @@ if( ! $install_memory_limit_allow )
 		ini_get( 'memory_limit' ), 'href="http://b2evolution.net/web-hosting/"' ) );
 }
 
-// echo $action;
 $date_timezone = ini_get( "date.timezone" );
 if( empty( $date_timezone ) && empty( $date_default_timezone ) )
 { // The default timezone is not set, display a warning
 	display_install_messages( sprintf( T_("No default time zone is set. Please open PHP.ini and set the value of 'date.timezone' (Example: date.timezone = Europe/Paris) or open /conf/_advanced.php and set the value of %s (Example: %s)"), '$date_default_timezone', '$date_default_timezone = \'Europe/Paris\';' ) );
 }
+
+// pre_dump($action);
 
 if( ( $config_is_done || $try_db_connect ) && ( $DB->error ) )
 { // DB connect was unsuccessful, restart conf
@@ -449,6 +458,9 @@ if( $req_errors = install_validate_requirements() )
 	display_install_messages( $req_errors );
 	die;
 }
+
+// pre_dump($action);
+
 
 switch( $action )
 {
@@ -497,6 +509,9 @@ switch( $action )
 
 			// Display only a locale selector:
 			display_locale_selector();
+
+			// And display message again to make it extra clear:
+			display_install_messages( T_('b2evolution cannot be installed on the current configuration.') );
 
 			break;
 		}
@@ -1233,7 +1248,14 @@ switch( $action )
 		// A link to back to install menu
 		display_install_back_link();
 		break;
+
+
+	default:
+		// This should not happen!
+		pre_dump($action);
 }
+
+// pre_dump($action);
 
 block_close();
 
