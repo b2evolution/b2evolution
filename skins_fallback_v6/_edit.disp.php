@@ -344,11 +344,11 @@ else
 if( $edited_Item->get_type_setting( 'allow_attachments' ) )
 { // ####################### ATTACHMENTS FIELDSETS #########################
 	global $advanced_edit_link;
-	$perm_attach = ( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) );
-	echo '<div class="well center">';
-	if( $perm_attach )
-	{	// If current user has a permission to attach files to this post
+	$perm_view_files = $current_User->check_perm( 'files', 'view' );
+	if( $perm_view_files && $current_User->check_perm( 'admin', 'restricted' ) )
+	{	// If current user has a permission to attach files to the edited Item from back-office:
 		$advanced_edit_link_params = ' href="'.$advanced_edit_link['href'].'" onclick="'.$advanced_edit_link['onclick'].'"';
+		echo '<div class="well center">';
 		if( $creating )
 		{	// New post
 			echo sprintf( T_('If you need to attach files, please use <a %s>Advanced Edit</a>.'), $advanced_edit_link_params );
@@ -357,9 +357,11 @@ if( $edited_Item->get_type_setting( 'allow_attachments' ) )
 		{	// Edit post
 			echo sprintf( T_('If you need to attach additional files, please use <a %s>Advanced Edit</a>.'), $advanced_edit_link_params );
 		}
+		echo '</div>';
 	}
-	else
-	{	// If current user has no permission to attach files to this post
+	elseif( $edited_Item->can_attach() )
+	{	// If current user can attach files to comments of the edited Item
+		echo '<div class="well center">';
 		if( $creating )
 		{	// New post
 			echo T_('If you need to attach files, please add a comment right after you post this.');
@@ -368,10 +370,10 @@ if( $edited_Item->get_type_setting( 'allow_attachments' ) )
 		{	// Edit post
 			echo T_('If you need to attach additional files, please add a comment right after you edit this.');
 		}
+		echo '</div>';
 	}
-	echo '</div>';
-	if( $perm_attach )
-	{
+	if( $perm_view_files )
+	{	// If current user has a permission to view files
 		$LinkOwner = new LinkItem( $edited_Item );
 		if( $LinkOwner->count_links() )
 		{	// Display the attached files:
