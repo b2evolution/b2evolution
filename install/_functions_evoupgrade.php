@@ -7779,6 +7779,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12085, 'Upgrade links table...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_temporary_ID
+			ADD tmp_coll_ID INT(11) UNSIGNED NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

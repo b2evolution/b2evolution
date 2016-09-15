@@ -116,13 +116,19 @@ class LinkOwner
 			}
 			else
 			{	// Create new temporary object:
+				global $blog;
 				$tmp_link_Object = new TemporaryID();
 				$tmp_link_Object->set( 'type', $this->type );
+				if( ! empty( $blog ) )
+				{
+					$tmp_link_Object->set( 'coll_ID', $blog );
+				}
 				$tmp_link_Object->dbinsert();
 			}
 
 			// Mark this link owner is using a temporary object:
 			$this->link_Object->tmp_ID = $tmp_link_Object->ID;
+			$this->link_Object->tmp_coll_ID = $tmp_link_Object->get( 'coll_ID' );
 			$this->link_Object->type = $tmp_link_Object->get( 'type' );
 		}
 	}

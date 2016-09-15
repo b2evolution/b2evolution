@@ -62,8 +62,7 @@ class LinkItem extends LinkOwner
 
 		if( $this->is_temp() )
 		{	// Check permission for new creating item:
-			global $blog;
-			return $current_User->check_perm( 'blog_post_statuses', 'edit', false, $blog );
+			return $current_User->check_perm( 'blog_post_statuses', 'edit', false, $this->link_Object->tmp_coll_ID );
 		}
 		else
 		{	// Check permission for existing item in DB:

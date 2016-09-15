@@ -514,8 +514,9 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_temporary_ID' => array(
 		'Creating table for temporary ID',
 		"CREATE TABLE T_temporary_ID (
-			tmp_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-			tmp_type VARCHAR(32) COLLATE ascii_general_ci NOT NULL,
+			tmp_ID      INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			tmp_type    VARCHAR(32) COLLATE ascii_general_ci NOT NULL,
+			tmp_coll_ID INT(11) UNSIGNED NULL,
 			PRIMARY KEY (tmp_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
