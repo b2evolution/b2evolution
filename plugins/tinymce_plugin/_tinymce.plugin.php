@@ -329,7 +329,14 @@ class tinymce_plugin extends Plugin
 		<script type="text/javascript">
 			<?php
 				global $UserSettings;
-				$show_wysiwyg_warning = $UserSettings->get_collection_setting( 'show_wysiwyg_warning', $Blog->ID );
+				if( empty( $Blog ) )
+				{
+					$show_wysiwyg_warning = $UserSettings->get( 'show_wysiwyg_warning' );
+				}
+				else
+				{
+					$show_wysiwyg_warning = $UserSettings->get_collection_setting( 'show_wysiwyg_warning', $Blog->ID );
+				}
 				$display_warning = ( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ) ? 'true' : 'false';
 			?>
 			var displayWarning = <?php echo $display_warning;?>;
@@ -337,7 +344,7 @@ class tinymce_plugin extends Plugin
 			{
 				if( jQuery( 'input[name=hideWarning]' ).is(':checked') )
 				{ // Do not show this warning again for this collection
-					var ajax_url = '<?php echo get_htsrv_url().'async.php?action=hide_wysiwyg_warning&blog='.$Blog->ID.'&'.url_crumb( 'item' );?>';
+					var ajax_url = '<?php echo get_htsrv_url().'async.php?action=hide_wysiwyg_warning'.( empty( $Blog ) ? '' : '&blog='.$Blog->ID ).'&'.url_crumb( 'item' );?>';
 
 					jQuery.ajax( {
 						type: "GET",

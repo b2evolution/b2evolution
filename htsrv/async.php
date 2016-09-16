@@ -836,13 +836,21 @@ switch( $action )
 
 	case 'hide_wysiwyg_warning':
 		// Show/hide warning when switching from markup to WYSIWYG
+
+		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'item' );
 
 		param( 'blog', 'integer' );
 		param( 'item_ID', 'integer' );
 
-		// Check that this action request is not a CSRF hacked request:
-		$UserSettings->set( 'show_wysiwyg_warning_'.$blog, 0 );
+		if( empty( $blog ) )
+		{
+			$UserSettings->set( 'show_wysiwyg_warning', 0 );
+		}
+		else
+		{
+			$UserSettings->set( 'show_wysiwyg_warning_'.$blog, 0 );
+		}
 		$UserSettings->dbupdate();
 		break;
 
