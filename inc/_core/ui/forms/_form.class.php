@@ -3646,6 +3646,249 @@ class Form extends Widget
 	}
 
 
+	function fileselect( $field_name, $field_value, $field_label, $field_note = '', $field_params = array() )
+	{
+		global $thumbnail_sizes, $file_select_js_initialized;
+
+		//$field_params['note'] = $field_note;
+		$this->handle_common_params( $field_params, $field_name, $field_label );
+
+		$field_params = array_merge( array(
+				'field_item_start' => '<div class="file_select_item" data-item-value="%value%">',
+				'field_item_end' => '</div>',
+				'size_name' => 'crop-64x64',
+				'class' => '',
+
+				'window_title' => T_('Attach files'),
+				'remove_file_text' => T_('Remove file'),
+				'file_limit' => 1000,
+				'value_separator' => ';',
+				'overflow_mode' => 'queue', // valid values are queue and stack
+
+				'link_owner_type' => 'item',
+				'link_owner_ID' => '23',
+				'link_position' => NULL,
+				'file_type' => NULL,
+				'root' => '',
+				'path' => ''
+			), $field_params );
+
+			$FileCache = & get_FileCache();
+			$counter = 0;
+
+			$field_values = empty( $field_value ) ? $field_value : explode( $field_params['value_separator'], $field_value );
+
+			$r = $this->begin_field();
+			$unlink_icon = get_icon( 'unlink' ); // we'll use this to replace the icon in the AJAX added file_select_items later
+			$r .= '<input type="hidden" id="'.$field_name.'" name="'.$field_name.'" value="'.$field_value.'">';
+
+			$r .= '<div name="'.$field_name.'" class="file_select_wrapper" data-max-length="'.$field_params['file_limit'].'" data-thumb-size="'.$field_params['size_name'].'" data-overflow-mode="'.$field_params['overflow_mode'].'">';
+
+			if( ! empty( $field_values ) )
+			{
+				foreach( $field_values as $file_ID )
+				{
+					$File = & $FileCache->get_by_ID( $file_ID );
+
+					$r .= str_replace( '%value%', $file_ID, $field_params['field_item_start'] );
+					$r .= $File->get_thumb_imgtag( $field_params['size_name'], $field_params['class'] );
+					$r .= '<br>';
+					$blog_param = empty( $blog ) ? '' : '&amp;blog='.$blog;
+					$r .= action_icon( $field_params['remove_file_text'], 'unlink',
+							'', NULL, NULL, NULL,
+							array( 'onclick' => 'return file_select_delete( this, \''.$field_name.'\' );' ) );
+
+					$r .= $field_params['field_item_end'];
+					$counter++;
+				}
+			}
+
+			if( ! isset( $thumbnail_sizes[ $field_params['size_name'] ] ) )
+			{ // Wrong thumbnail size name
+				debug_die( 'Invalid thumbnail size name' );
+			}
+			$thumb_type = $thumbnail_sizes[ $field_params['size_name'] ][0];
+			$thumb_width = $thumbnail_sizes[ $field_params['size_name'] ][1];
+			$thumb_height = $thumbnail_sizes[ $field_params['size_name'] ][2];
+
+			$click_function = 'return window.parent.file_select_attachment_window( this, \''.$field_params['root'].'\', \''.$field_params['path'].'\' );';
+			$button_label = ( $counter === 0 ? T_('Select') : get_icon( 'new' ).' '.T_('Add') );
+
+			$r .= '<button class="btn btn-default file_select_item" onclick="'.$click_function.'" style="display: '.( $counter < $field_params['file_limit'] ? 'block' : 'none' )
+					.'; height: '.$thumb_height.'px; width: '.$thumb_width.'px;">'.$button_label.'</button>';
+
+			$r .= '</div>';
+			$r .= $this->end_field();
+			echo_modalwindow_js();
+
+			if( empty( $file_select_js_initialized ) )
+			{
+				$r .= '
+						<script type="text/javascript">
+						var fsel_size, fsel_name;
+
+						function file_select_attachment_window( event_object, root, path, fm_highlight )
+						{
+							field_object = jQuery( event_object ).closest( ".file_select_wrapper" );
+							fsel_size = field_object.data( "thumbSize" );
+							fsel_name = field_object.attr( "name" );
+
+							openModalWindow( \'<span class="loader_img loader_user_report absolute_center" title="'.T_('Loading...').'"></span>\',
+								"90%", "80%", true, "'.$field_params['window_title'].'", "", true );
+							jQuery.ajax(
+							{
+								type: "POST",
+								url: "'.get_htsrv_url().'async.php",
+								data:
+								{
+									"action": "file_attachment",
+									"crumb_file": "'.get_crumb( 'file' ).'",
+									"root": typeof( root ) == "undefined" ? "" : root,
+									"path": typeof( path ) == "undefined" ? "" : path,
+									"fm_highlight": typeof( fm_highlight ) == "undefined" ? "" : fm_highlight,
+									"field_name": field_object.attr( "name" )
+								},
+								success: function(result)
+								{
+									openModalWindow( result, "90%", "80%", true, "'.$field_params['window_title'].'", "" );
+								}
+							} );
+							return false;
+						}
+
+						function file_select_add( fieldName, fieldValue )
+						{
+							// check if value is alreay present
+							var inputField = jQuery( "input#" + fieldName );
+							var values = inputField.val().split( "'.$field_params['value_separator'].'" );
+							if( values.indexOf( "" + fieldValue ) == -1 )
+							{
+								// Add new item
+								jQuery.ajax({
+									type: "GET",
+									url: "'.get_htsrv_url().'anon_async.php",
+									data: {
+											action: "get_file_select_item",
+											field_name: fieldName,
+											file_ID: fieldValue,
+											params: '.json_encode( $field_params ).'
+										},
+									success: function( result )
+										{
+											result = jQuery.parseJSON( ajax_debug_clear( result) );
+											var fieldName = result.fieldName;
+											var inputField = jQuery( "input#" + fieldName );
+											var wrapper = jQuery( "div[name=" + fieldName + "].file_select_wrapper" );
+											var maxLength = wrapper.data( "maxLength" );
+											var overflowMode = wrapper.data( "overflowMode" );
+											var addButton = jQuery( "button", wrapper );
+											var items = jQuery( ".file_select_item:not(button)", wrapper );
+											var lastItem = items.last();
+
+											// Attach new item
+											// check if adding item will result to an overflow
+											if( items.length >= maxLength )
+											{ // remove extra item first depending on overflow mode
+												if( overflowMode == "queue" )
+												{
+													file_select_delete( items.first(), fieldName );
+												}
+												else if( overflowMode == "stack" )
+												{
+													file_select_delete( items.last(), fieldName );
+												}
+
+												items = jQuery( ".file_select_item:not(button)", wrapper );
+												lastItem = items.last();
+											}
+											var newItem = jQuery( atob( result.item ) );
+											newItem.find( "span.icon" ).replaceWith("'.addslashes( $unlink_icon ).'"); // replace unlink icon with skin specific icon saved earlier
+											if( lastItem.length )
+											{ // attachment already exists, add to the last
+												newItem.insertAfter( lastItem );
+											}
+											else
+											{ // no attachments yet
+												wrapper.prepend( newItem );
+											}
+
+											items = jQuery( ".file_select_item:not(button)", wrapper );
+											lastItem = items.last();
+
+											// Toggle add button
+											addButton.html( items.length === 0 ? "'.T_('Select').'" : \''.get_icon( 'new').' '.T_('Add').'...\' );
+											if( maxLength > items.length )
+											{
+												addButton.show();
+											}
+											else
+											{
+												addButton.hide();
+											}
+
+											// append field value
+											var values = inputField.val();
+											values = values ? ( inputField.val().split( "'.$field_params['value_separator'].'" ) ) : [];
+											values.push( fieldValue );
+											inputField.val( values.join( "'.$field_params['value_separator'].'" ) );
+										}
+								});
+
+							}
+							else
+							{
+								console.log( "Value already exists in " + fieldName + "!" );
+							}
+
+							return false;
+						}
+
+						function file_select_delete( event_object, fieldName )
+						{
+
+							var wrapper = jQuery( event_object ).closest( ".file_select_wrapper" );
+							var item = jQuery( event_object ).closest( ".file_select_item" );
+							var fieldValue = item.data( "itemValue" ).toString(); // converted to string because it will later be compared to array of strings
+							var maxLength = wrapper.data( "maxLength" );
+							var addButton = jQuery( "button", wrapper );
+
+							// Remove file select item
+							item.remove();
+
+							var items = jQuery( ".file_select_item:not(button)", wrapper );
+							var lastItem = items.last();
+
+							// Toggle add button
+							addButton.html( items.length === 0 ? "'.T_('Select').'" : "'.T_('Add').'..." );
+							if( maxLength > items.length )
+							{
+								addButton.show();
+							}
+							else
+							{
+								addButton.hide();
+							}
+
+							// Change input value
+							var inputField = jQuery( "input#" + fieldName );
+							var values = inputField.val().split( "'.$field_params['value_separator'].'" );
+							var index =  values.indexOf( fieldValue );
+							if( index != -1 )
+							{
+								values.splice( index, 1 );
+							}
+							inputField.val( values.join( "'.$field_params['value_separator'].'" ) );
+
+							return false;
+						}
+						</script>';
+			}
+
+			$file_select_js_initialized = true;
+			return $this->display_or_return( $r );
+	}
+
+
 	/**
 	 * Generate a general input element.
 	 *

@@ -1358,6 +1358,32 @@ switch( $action )
 		require $inc_path.'users/views/_user_groups.form.php';
 		break;
 
+	case 'get_file_select_item':
+		$field_params = param( 'params', 'array', true );
+		$field_name = param( 'field_name', 'string', true );
+		$file_ID = param( 'file_ID', 'integer', true );
+
+		$FileCache = & get_FileCache();
+		$File = & $FileCache->get_by_ID( $file_ID );
+
+		$r = str_replace( '%value%', $file_ID, $field_params['field_item_start'] );
+		$r .= $File->get_thumb_imgtag( $field_params['size_name'], $field_params['class'] );
+		$r .= '<br>';
+		$blog_param = empty( $blog ) ? '' : '&amp;blog='.$blog;
+
+		$r .= action_icon( $field_params['remove_file_text'], 'unlink',
+				'', NULL, NULL, NULL,
+				array( 'onclick' => 'return file_select_delete( this, \''.$field_name.'\' );' ) );
+
+		$r .= $field_params['field_item_end'];
+
+		echo json_encode( array(
+				'fieldName' => $field_name,
+				'item' => base64_encode( $r )
+			) );
+
+		break;
+
 	default:
 		$Ajaxlog->add( T_('Incorrect action!'), 'error' );
 		break;

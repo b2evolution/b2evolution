@@ -58,7 +58,7 @@ global $fm_mode, $fm_hide_dirtree, $create_name, $ads_list_path, $mode;
 global $linkctrl, $linkdata;
 
 // Name of the iframe we want some actions to come back to:
-global $iframe_name;
+global $iframe_name, $field_name;
 
 $Form = new Form( NULL, 'FilesForm', 'post', 'none' );
 $Form->begin_form();
@@ -329,6 +329,19 @@ $Form->begin_form();
 								regenerate_url( 'fm_selected', 'action=link_data&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
 								NULL, NULL, NULL, array() );
 
+					echo ' ';
+				}
+
+				if( isset( $field_name ) && !$lFile->is_dir() )
+				{
+					$link_attribs = array();
+					$link_action = 'set_field';
+					$link_attribs['target'] = '_parent';
+					$link_attribs['class'] = 'action_icon select_file btn btn-primary btn-xs';
+					$link_attribs['onclick'] = 'return window.parent.file_select_add( \''.$field_name.'\', '.$lFile->ID.' );';
+					echo action_icon( T_('Select file'), 'link',
+							regenerate_url( 'fm_selected', 'action=file_select&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
+							' '.T_('Select'), NULL, 5, $link_attribs );
 					echo ' ';
 				}
 			}
@@ -818,6 +831,16 @@ $Form->begin_form();
 				jQuery( document ).on( 'click', 'a.link_file', function()
 				{
 					jQuery( this ).parent().append( '<div class="green"><?php echo TS_('The file has been linked.'); ?></div>' );
+				} );
+			} );
+
+			// Display a message to inform user after the file was selected
+			jQuery( document ).ready( function()
+			{
+				jQuery( document ).on( 'click', 'a.select_file', function()
+				{
+					jQuery( '.selected_msg' ).remove();
+					jQuery( this ).parent().append( '<div class="green selected_msg"><?php echo TS_('The file has been selected.'); ?></div>' );
 				} );
 			} );
 			// -->
