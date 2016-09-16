@@ -11,4 +11,4 @@
 	url = https://fplanque@github.com/b2evolution/clean1_skin.git
 [submodule "skins/pureforums_skin"]
 	path = skins/pureforums_skin
-	url = C:/wamp/www/repo_skins/pureforums_skin
+	url = https://fplanque@github.com/b2evolution/pureforums_skin.git
