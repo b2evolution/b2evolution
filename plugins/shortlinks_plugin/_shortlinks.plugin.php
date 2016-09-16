@@ -841,7 +841,8 @@ class shortlinks_plugin extends Plugin
 				r += '</select>'
 					+ '</div>'
 					+ '<div id="shortlinks_posts_block"></div>'
-					+ '<div id="shortlinks_post_block"></div>';
+					+ '<div id="shortlinks_post_block"></div>'
+					+ '<div id="shortlinks_post_form"></div>';
 
 				shortlinks_end_loading( '#shortlinks_wrapper', r );
 
@@ -990,7 +991,7 @@ class shortlinks_plugin extends Plugin
 			if( jQuery( '#shortlinks_post_block' ).data( 'post' ) == post_id )
 			{	// If user loads the same post, just display the cached content to save ajax calls:
 				// Show the action buttons:
-				jQuery( '#shortlinks_btn_back, #shortlinks_btn_insert' ).show();
+				jQuery( '#shortlinks_btn_back_to_list, #shortlinks_btn_insert' ).show();
 			}
 			else
 			{	// Load new post:
@@ -1024,13 +1025,14 @@ class shortlinks_plugin extends Plugin
 
 					shortlinks_end_loading( '#shortlinks_post_block', item_content );
 
-					// Display the buttons to back and insert a post link to textarea
+					// Display the buttons to back and insert a post link to textarea:
 					var buttons_side_obj = jQuery( '.shortlinks_post_buttons' ).length ?
 						jQuery( '.shortlinks_post_buttons' ) :
 						jQuery( '#shortlinks_post_content' );
-					jQuery( '#shortlinks_btn_back, #shortlinks_btn_insert' ).remove();
-					buttons_side_obj.after( '<button id="shortlinks_btn_back" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
-						+ '<button id="shortlinks_btn_insert" data-urltitle="' + post.urltitle + '" class="btn btn-primary"><?php echo sprintf( TS_('Insert %s'), '[[\' + post.urltitle + \']]' ); ?></button>' );
+					jQuery( '#shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form' ).remove();
+					buttons_side_obj.after( '<button id="shortlinks_btn_back_to_list" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
+						+ '<button id="shortlinks_btn_insert" data-urltitle="' + post.urltitle + '" class="btn btn-primary"><?php echo sprintf( TS_('Insert %s'), '[[\' + post.urltitle + \']]' ); ?></button>'
+						+ '<button id="shortlinks_btn_form" data-id="' + post.id + '" data-urlname="' + coll_urlname + '" class="btn btn-info"><?php echo TS_('Insert Complex Link'); ?></button>' );
 				} );
 			}
 
@@ -1051,14 +1053,112 @@ class shortlinks_plugin extends Plugin
 			closeModalWindow();
 		} );
 
-		// Back to previous list:
-		jQuery( document ).on( 'click', '#shortlinks_btn_back', function()
+		// Display a form to insert complex link:
+		jQuery( document ).on( 'click', '#shortlinks_btn_form', function()
 		{
-			// Show the lists of collectionss and posts:
+			var coll_urlname = jQuery( this ).data( 'urlname' );
+			var post_id = jQuery( this ).data( 'id' );
+
+			// Hide the post preview block:
+			jQuery( '#shortlinks_post_block, #shortlinks_btn_insert' ).hide();
+
+			// Show the form to select options before insert complex link:
+			jQuery( '#shortlinks_post_form' ).show();
+
+			if( jQuery( '#shortlinks_post_form' ).html() == '' )
+			{	// Initialize a form to insert complex:
+				jQuery( '#shortlinks_post_form' ).html(
+						//'<p><label><input type="checkbox" id="shortlinks_form_full_cover" /> <?php echo TS_('Insert full cover image'); ?></label><p>' +
+						'<p><label><input type="checkbox" id="shortlinks_form_title" checked="checked" /> <?php echo TS_('Insert title'); ?></label><p>' +
+						//'<p><label><input type="checkbox" id="shortlinks_form_thumb_cover" checked="checked" /> <?php echo TS_('Insert thumbnail of cover image'); ?></label><p>' +
+						'<p><label><input type="checkbox" id="shortlinks_form_excerpt" checked="checked" /> <?php echo TS_('Insert excerpt'); ?></label><p>' +
+						//'<p><label><input type="checkbox" id="shortlinks_form_teaser" /> <?php echo TS_('Insert teaser'); ?></label><p>' +
+						'<p><label><input type="checkbox" id="shortlinks_form_more" checked="checked" /> <?php echo TS_('Insert "Read more" link'); ?></label><p>'
+					);
+			}
+
+			// Display the buttons to back and insert a complex link to textarea:
+			var buttons_side_obj = jQuery( '.shortlinks_post_buttons' ).length ?
+				jQuery( '.shortlinks_post_buttons' ) :
+				jQuery( '#shortlinks_post_content' );
+			jQuery( '#shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form' ).hide();
+			buttons_side_obj.after( '<button id="shortlinks_btn_back_to_post" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
+				+ '<button id="shortlinks_btn_insert_complex" data-id="' + post_id + '" data-urlname="' + coll_urlname + '" class="btn btn-primary"><?php echo TS_('Insert Complex Link'); ?></button>' );
+
+			// To prevent link default event:
+			return false;
+		} );
+
+		// Insert complex link:
+		jQuery( document ).on( 'click', '#shortlinks_btn_insert_complex', function()
+		{
+			var coll_urlname = jQuery( this ).data( 'urlname' );
+			var post_id = jQuery( this ).data( 'id' );
+
+			if( ! jQuery( 'input[id^=shortlinks_form_]' ).is( ':checked' ) )
+			{	// Display message if no item option checkbox is checked:
+				alert( '<?php echo TS_('Please select at least one item option to insert.'); ?>' );
+				return false;
+			}
+
+			shortlinks_api_request( 'collections/' + coll_urlname + '/items/' + post_id, '#shortlinks_post_form', function( post )
+			{	// Get the item fields to insert the selected:
+				var post_content = '';
+
+				if( jQuery( '#shortlinks_form_title' ).is( ':checked' ) )
+				{	// Title:
+					post_content += "\r\n" + '## [[' + post.urltitle + ' ' + post.title +  ']]';
+				}
+				if( jQuery( '#shortlinks_form_excerpt' ).is( ':checked' ) )
+				{	// Excerpt:
+					post_content += "\r\n" + post.excerpt;
+				}
+				if( jQuery( '#shortlinks_form_more' ).is( ':checked' ) )
+				{	// "Read more" link:
+					post_content += "\r\n" + '[[' + post.urltitle + ' <?php echo TS_('Read more'); ?>...]]';
+				}
+				if( post_content != '' )
+				{
+					post_content = post_content + "\r\n";
+				}
+
+				shortlinks_end_loading( '#shortlinks_post_block', jQuery( '#shortlinks_post_block' ).html() );
+
+				if( typeof( tinyMCE ) != 'undefined' && typeof( tinyMCE.activeEditor ) != 'undefined' && tinyMCE.activeEditor )
+				{	// tinyMCE plugin is active now, we should focus cursor to the edit area:
+					tinyMCE.execCommand( 'mceFocus', false, tinyMCE.activeEditor.id );
+				}
+				// Insert tag text in area:
+				textarea_wrap_selection( b2evoCanvas, post_content, '', 0 );
+				// Close main modal window:
+				closeModalWindow();
+			} );
+
+			// To prevent link default event:
+			return false;
+		} );
+
+		// Back to previous list:
+		jQuery( document ).on( 'click', '#shortlinks_btn_back_to_list', function()
+		{
+			// Show the lists of collections and posts:
 			jQuery( '#shortlinks_colls_list, #shortlinks_posts_block' ).show();
 
 			// Hide the post preview block and action buttons:
-			jQuery( '#shortlinks_post_block, #shortlinks_btn_back, #shortlinks_btn_insert' ).hide();
+			jQuery( '#shortlinks_post_block, #shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form' ).hide();
+
+			// To prevent link default event:
+			return false;
+		} );
+
+		// Back to previous post preview:
+		jQuery( document ).on( 'click', '#shortlinks_btn_back_to_post', function()
+		{
+			// Show the post preview block and action buttons:
+			jQuery( '#shortlinks_post_block, #shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form' ).show();
+
+			// Hide the post complex form and action buttons:
+			jQuery( '#shortlinks_btn_back_to_post, #shortlinks_btn_insert_complex, #shortlinks_post_form' ).hide();
 
 			// To prevent link default event:
 			return false;
