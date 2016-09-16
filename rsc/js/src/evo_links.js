@@ -64,7 +64,7 @@ function evo_link_change_position( selectInput, url, crumb )
 {
 	var oThis = selectInput;
 	var new_position = selectInput.value;
-	jQuery.get( url + 'async.php?action=set_object_link_position&link_ID=' + selectInput.id.substr(17) + '&link_position=' + new_position + '&crumb_link=' + crumb, {
+	jQuery.get( url + 'anon_async.php?action=set_object_link_position&link_ID=' + selectInput.id.substr(17) + '&link_position=' + new_position + '&crumb_link=' + crumb, {
 	}, function(r, status) {
 		r = ajax_debug_clear( r );
 		if( r == "OK" ) {

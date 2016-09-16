@@ -136,10 +136,12 @@ else
 // Load FileRoot class to get fileroot ID of collection below:
 load_class( '/files/model/_fileroot.class.php', 'FileRoot' );
 
-switch( $LinkOwner->type )
+$link_owner_type = ( $LinkOwner->type == 'temporary' ) ? $LinkOwner->link_Object->type : $LinkOwner->type;
+
+switch( $link_owner_type )
 {
 	case 'item':
-		$upload_fileroot = FileRoot::gen_ID( 'collection', $Blog->ID );
+		$upload_fileroot = FileRoot::gen_ID( 'collection', ( $LinkOwner->is_temp() ? $LinkOwner->link_Object->tmp_coll_ID : $Blog->ID ) );
 		$upload_path = '/quick-uploads/'.( $LinkOwner->is_temp() ? 'tmp' : 'p' ).$LinkOwner->get_ID().'/';
 		break;
 

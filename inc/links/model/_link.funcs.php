@@ -106,13 +106,15 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 	global $admin_url, $inc_path;
 	global $current_User, $action;
 
-	if( $LinkOwner->type == 'item' && ! $LinkOwner->is_temp() && ! $LinkOwner->Item->get_type_setting( 'allow_attachments' ) )
-	{ // Attachments are not allowed for current post type
+	if( ! isset( $GLOBALS[ 'files_Module' ] ) )
+	{	// Files module is not enabled:
 		return;
 	}
 
-	if( ! isset( $GLOBALS[ 'files_Module' ] ) )
-	{
+	if( ! is_logged_in()
+	    || ! $current_User->check_perm( 'files', 'view' )
+	    || ! $LinkOwner->check_perm( 'edit', false ) )
+	{	// Current user has no perm to view files:
 		return;
 	}
 
@@ -170,11 +172,9 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 		$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' );
 	}
 
-	if( $current_User->check_perm( 'admin', 'restricted' )
-	    && $current_User->check_perm( 'files', 'view' )
-	    && $LinkOwner->check_perm( 'edit', false ) )
-	{ // Check that we have permission to edit owner:
-		$attach_files_url = $admin_url.'?ctrl=files&amp;fm_mode=link_object&amp;link_type='.$LinkOwner->type.( $LinkOwner->type != 'message' ? '&amp;link_object_ID='.$LinkOwner->get_ID() : '' );
+	if( $current_User->check_perm( 'admin', 'restricted' ) )
+	{	// Check if current user has a permission to back-office files manager:
+		$attach_files_url = $admin_url.'?ctrl=files&amp;fm_mode=link_object&amp;link_type='.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).( $LinkOwner->type != 'message' ? '&amp;link_object_ID='.$LinkOwner->get_ID() : '' );
 		if( $linkowner_FileList = $LinkOwner->get_attachment_FileList( 1 ) )
 		{	// Get first file of the Link Owner:
 			$linkowner_File = & $linkowner_FileList->get_next();
@@ -188,7 +188,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 		$fieldset_title .= ' - '
 			.action_icon( T_('Attach existing files'), 'folder', $attach_files_url,
 				T_('Attach existing files'), 3, 4,
-				array( 'onclick' => 'return link_attachment_window( \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\' )' ) )
+				array( 'onclick' => 'return link_attachment_window( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\' )' ) )
 			.action_icon( T_('Attach existing files'), 'permalink', $attach_files_url,
 				T_('Attach existing files'), 1, 0,
 				array( 'target' => '_blank' ) );
@@ -197,12 +197,12 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 	$fieldset_title .= '<span class="floatright">&nbsp;'
 
 			.action_icon( T_('Refresh'), 'refresh', $LinkOwner->get_edit_url(),
-				T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\' )' ) )
+				T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\' )' ) )
 
 			.action_icon( T_('Sort'), 'ascending', ( is_admin_page() || $current_User->check_perm( 'admin', 'restricted' ) )
 				? $admin_url.'?ctrl=links&amp;action=sort_links&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;'.url_crumb( 'link' )
 				: $LinkOwner->get_edit_url().'#',
-				T_('Sort'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\', \'sort\' )' ) )
+				T_('Sort'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'sort\' )' ) )
 
 		.'</span>';
 
@@ -558,7 +558,7 @@ jQuery( document ).ready( function()
 
 			jQuery.ajax(
 			{
-				url: '<?php echo get_htsrv_url(); ?>async.php',
+				url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 				type: 'POST',
 				data:
 				{

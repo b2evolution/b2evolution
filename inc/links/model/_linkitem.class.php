@@ -263,8 +263,7 @@ class LinkItem extends LinkOwner
 			global $admin_url;
 			if( $this->is_temp() )
 			{	// New creating Item:
-				global $Blog;
-				return $admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;action=new';
+				return $admin_url.'?ctrl=items&amp;blog='.$this->link_Object->tmp_coll_ID.'&amp;action=new';
 			}
 			else
 			{	// The edited Item:
@@ -283,7 +282,6 @@ class LinkItem extends LinkOwner
 			{	// The edited Item:
 				return url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;p='.$this->Item->ID );
 			}
-			
 		}
 	}
 
@@ -292,8 +290,31 @@ class LinkItem extends LinkOwner
 	 */
 	function get_view_url()
 	{
-		$this->load_Blog();
-		return '?ctrl=items&amp;blog='.$this->Blog->ID.'&amp;p='.$this->Item->ID;
+		if( is_admin_page() )
+		{	// Back-office:
+			global $admin_url;
+			if( $this->is_temp() )
+			{	// New creating Item:
+				return $admin_url.'?ctrl=items&amp;blog='.$this->link_Object->tmp_coll_ID.'&amp;action=new';
+			}
+			else
+			{	// The edited Item:
+				$this->load_Blog();
+				return $admin_url.'?ctrl=items&amp;blog='.$this->Blog->ID.'&amp;p='.$this->Item->ID;
+			}
+		}
+		else
+		{	// Front-office:
+			global $Blog;
+			if( $this->is_temp() )
+			{	// New creating Item:
+				return url_add_param( $Blog->get( 'url' ), 'disp=edit' );
+			}
+			else
+			{	// The edited Item:
+				return url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;p='.$this->Item->ID );
+			}
+		}
 	}
 
 
