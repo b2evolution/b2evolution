@@ -266,6 +266,8 @@ class tinymce_plugin extends Plugin
 	 */
 	function AdminDisplayEditorButton( & $params )
 	{
+		global $UserSettings;
+
 		if( empty( $params['content_id'] ) )
 		{	// Value of html attribute "id" of textarea where tibymce is applied
 			// Don't allow empty id:
@@ -292,6 +294,9 @@ class tinymce_plugin extends Plugin
 					return false;
 				}
 
+				$show_wysiwyg_warning = $UserSettings->get_collection_setting( 'show_wysiwyg_warning', $Blog->ID );
+				$hide_warning_url = get_htsrv_url().'async.php?action=hide_wysiwyg_warning&type=item'.( empty( $Blog ) ? '' : '&blog='.$Blog->ID ).'&'.url_crumb( 'item' );
+
 				$state_params = array(
 						'type' => $params['target_type'],
 						'blog' => $Blog->ID,
@@ -302,6 +307,9 @@ class tinymce_plugin extends Plugin
 			case 'EmailCampaign':
 				// Initialize settings for email campaign:
 				$edited_EmailCampaign = & $params['target_object'];
+
+				$show_wysiwyg_warning = $UserSettings->get( 'show_wysiwyg_warning_emailcampaign' );
+				$hide_warning_url = get_htsrv_url().'async.php?action=hide_wysiwyg_warning&type=emailcampaign'.url_crumb( 'campaign' );
 
 				$state_params = array(
 						'type'  => $params['target_type'],
@@ -327,17 +335,12 @@ class tinymce_plugin extends Plugin
 		</div>
 
 		<script type="text/javascript">
-			<?php
-				global $UserSettings;
-				$show_wysiwyg_warning = $UserSettings->get_collection_setting( 'show_wysiwyg_warning', $Blog->ID );
-				$display_warning = ( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ) ? 'true' : 'false';
-			?>
-			var displayWarning = <?php echo $display_warning;?>;
+			var displayWarning = <?php echo ( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ) ? 'true' : 'false';?>;
 			function confirmSwitch()
 			{
 				if( jQuery( 'input[name=hideWarning]' ).is(':checked') )
 				{ // Do not show this warning again for this collection
-					var ajax_url = '<?php echo get_htsrv_url().'async.php?action=hide_wysiwyg_warning&blog='.$Blog->ID.'&'.url_crumb( 'item' );?>';
+					var ajax_url = '<?php echo $hide_warning_url;?>';
 
 					jQuery.ajax( {
 						type: "GET",
