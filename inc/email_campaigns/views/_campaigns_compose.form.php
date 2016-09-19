@@ -15,7 +15,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $admin_url, $tab;
-global $edited_EmailCampaign, $Plugins;
+global $edited_EmailCampaign, $Plugins, $UserSettings;
 
 $Form = new Form( NULL, 'campaign_form' );
 $Form->begin_form( 'fform' );
@@ -59,6 +59,18 @@ $Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCamp
 	$Form->inputstart = $form_inputstart;
 	$Form->inputend = $form_inputend;
 
+	$quick_setting_url = $admin_url.'?ctrl=campaigns&amp;ecmp_ID='.$edited_EmailCampaign->ID.'&amp;'.url_crumb( 'campaign' ).'&amp;tab=compose&amp;action=';
+
+	$show_wysiwyg_warning = $UserSettings->get( 'show_wysiwyg_warning_emailcampaign' );
+	$r = '<p id="active_wysiwyg_switch" style="display: '.( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ? 'block' : 'none' ).';">';
+	$r .= action_icon( '', 'activate', $quick_setting_url.'hide_wysiwyg_warning', T_('Show an alert when switching from markup to WYSIWYG'), 3, 4 );
+	$r .= '</p>';
+
+	$r .= '<p id="disable_wysiwyg_switch" style="display: '.( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ? 'none' : 'block' ).';">';
+	$r .= action_icon( '', 'deactivate', $quick_setting_url.'show_wysiwyg_warning', T_('Never show alert when switching from markup to WYSIWYG'), 3, 4 );
+	$r .= '</p>';
+	$Form->info( '', $r );
+
 	// set b2evoCanvas for plugins:
 	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "ecmp_email_text" );</script>';
 
@@ -79,3 +91,18 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 $Form->end_form( $buttons );
 
 ?>
+<script type="text/javascript">
+function toggleWYSIWYGSwitch( val )
+{
+	if( val )
+	{
+		jQuery( 'p#active_wysiwyg_switch' ).show();
+		jQuery( 'p#disable_wysiwyg_switch' ).hide();
+	}
+	else
+	{
+		jQuery( 'p#active_wysiwyg_switch' ).hide();
+		jQuery( 'p#disable_wysiwyg_switch' ).show();
+	}
+}
+</script>
