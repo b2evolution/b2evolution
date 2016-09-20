@@ -2800,6 +2800,9 @@ class Comment extends DataObject
 				$params[ $param_key ] = & $params[ $param_key ];
 			}
 
+			// Prepare params before rendering comment attachment:
+			$Plugins->trigger_event_first_true_with_params( 'PrepareForRenderCommentAttachment', $params );
+
 			if( count( $Plugins->trigger_event_first_true( 'RenderCommentAttachment', $params ) ) != 0 )
 			{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
 				if( $link_position == 'teaser' )

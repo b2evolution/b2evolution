@@ -1171,6 +1171,9 @@ class Message extends DataObject
 				$params[ $param_key ] = & $params[ $param_key ];
 			}
 
+			// Prepare params before rendering message attachment:
+			$Plugins->trigger_event_first_true_with_params( 'PrepareForRenderMessageAttachment', $params );
+
 			if( count( $Plugins->trigger_event_first_true( 'RenderMessageAttachment', $params ) ) != 0 )
 			{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
 				if( ! $params['get_rendered_attachments'] )
@@ -1320,6 +1323,9 @@ class Message extends DataObject
 			{	// Skip not "attachment" links:
 				continue;
 			}
+
+			// Prepare params before rendering message attachment:
+			$Plugins->trigger_event_first_true_with_params( 'PrepareForRenderMessageAttachment', $params );
 
 			if( count( $Plugins->trigger_event_first_true( 'RenderMessageAttachment', $params ) ) != 0 )
 			{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:

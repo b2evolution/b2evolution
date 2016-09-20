@@ -855,8 +855,8 @@ class Plugins
 	 *
 	 * @param string event name, see {@link Plugins_admin::get_supported_events()}
 	 * @param array Associative array of parameters for the Plugin
-	 * @param boolean TRUE to force to return params even if plugin method doesn't return true,
-	 *                i.e. it doesn't touch/render real object, such plugin only modify the params, for example "Info dots renderer" plugin
+	 * @return array The (modified) params array with key "plugin_ID" set to the last called plugin;
+	 *               Empty array if no Plugin returned true or no Plugin has this event registered.
 	 */
 	function trigger_event_first_true( $event, $params = NULL )
 	{
@@ -884,6 +884,45 @@ class Plugins
 				}
 			}
 		}
+		return array();
+	}
+
+
+	/**
+	 * Call all plugins for a given event, until the first one returns true.
+	 *
+	 * @param string event name, see {@link Plugins_admin::get_supported_events()}
+	 * @param array Associative array of parameters for the Plugin
+	 * @return array The (modified) params array with key "plugin_ID" set to the last called plugin;
+	 *               Empty array if no Plugin returned true or no Plugin has this event registered.
+	 */
+	function trigger_event_first_true_with_params( $event, & $params )
+	{
+		global $Debuglog;
+
+		$Debuglog->add( 'Trigger event '.$event.' (first true)', 'plugins' );
+
+		if( empty( $this->index_event_IDs[ $event ] ) )
+		{	// No events registered
+			$Debuglog->add( 'No registered plugins.', 'plugins' );
+// DON'T RETURN HERE BECAUSE OF DIRTY HACK!!!
+		}
+		else
+		{	// We have some events registered, loop through them:
+			$Debuglog->add( 'Registered plugin IDs: '.implode( ', ', $this->index_event_IDs[ $event ] ), 'plugins' );
+			foreach( $this->index_event_IDs[ $event ] as $l_plugin_ID )
+			{
+				$r = $this->call_method( $l_plugin_ID, $event, $params );
+				if( $r === true )
+				{
+					$Debuglog->add( 'Plugin ID '.$l_plugin_ID.' returned true!', 'plugins' );
+					// Save the ID of the plugin which returned true:
+					$params['plugin_ID'] = & $l_plugin_ID;
+					return $params;
+				}
+			}
+		}
+
 		return array();
 	}
 

@@ -1397,6 +1397,23 @@ class Plugin
 
 
 	/**
+	 * Event handler: Called prepare params before rendering attachments of item contents.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'Item': the {@link Item} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function PrepareForRenderItemAttachment( & $params )
+	{
+		return false; // Do nothing by default.
+	}
+
+
+	/**
 	 * Event handler: Called when rendering attachments of item contents.
 	 *
 	 * Note: You have to change $params['data'] (which gets passed by reference).
@@ -2147,6 +2164,23 @@ class Plugin
 
 
 	/**
+	 * Event handler: Called prepare params before rendering attachments of message contents.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'Message': the {@link Message} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function PrepareForRenderMessageAttachment( & $params )
+	{
+		return false; // Do nothing by default.
+	}
+
+
+	/**
 	 * Event handler: Called when rendering attachments of message contents.
 	 *
 	 * Note: You have to change $params['data'] (which gets passed by reference).
@@ -2230,6 +2264,23 @@ class Plugin
 	{
 		// Use this render by default temporarily
 		return $this->RenderItemAsHtml( $params );
+	}
+
+
+	/**
+	 * Event handler: Called prepare params before rendering attachments of email campaign contents.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'EmailCampaign': the {@link EmailCampaign} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function PrepareForRenderEmailAttachment( & $params )
+	{
+		return false; // Do nothing by default.
 	}
 
 

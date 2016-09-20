@@ -3089,6 +3089,9 @@ class Item extends ItemLight
 				$params[ $param_key ] = & $params[ $param_key ];
 			}
 
+			// Prepare params before rendering item attachment:
+			$Plugins->trigger_event_first_true_with_params( 'PrepareForRenderItemAttachment', $params );
+
 			if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $params ) ) != 0 )
 			{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
 				if( ! $params['get_rendered_attachments'] )
@@ -3306,6 +3309,9 @@ class Item extends ItemLight
 			{	// Skip not "attachment" links:
 				continue;
 			}
+
+			// Prepare params before rendering item attachment:
+			$Plugins->trigger_event_first_true_with_params( 'PrepareForRenderItemAttachment', $params );
 
 			if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $params ) ) != 0 )
 			{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
