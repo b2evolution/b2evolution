@@ -136,6 +136,7 @@ class infodots_plugin extends Plugin
 				showOnInit: true,
 				deltaShift: ( jQuery( this ).css( "box-sizing" ) == "border-box" ? -18 : -5 ),
 				wrapperContainer: infodots_bubbletip_wrapperContainer,
+				zIndex: 1001,
 			} );
 		}
 		jQuery( this ).addClass( "hovered" );
