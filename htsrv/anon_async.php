@@ -1361,24 +1361,23 @@ switch( $action )
 	case 'get_file_select_item':
 		$field_params = param( 'params', 'array', true );
 		$field_name = param( 'field_name', 'string', true );
-		$file_ID = param( 'file_ID', 'integer', true );
+		$root = param( 'root', 'string', true );
+		$file_path = param( 'path', 'string', true );
 
 		$FileCache = & get_FileCache();
-		$File = & $FileCache->get_by_ID( $file_ID );
+		list( $root_type, $root_in_type_ID ) = explode( '_', $root, 2 );
+		if( ! ( $current_File = $FileCache->get_by_root_and_path( $root_type, $root_in_type_ID, $file_path ) ) )
+		{	// No file:
+			debug_die( 'No such file' );
+			// Exit here.
+		}
 
-		$r = str_replace( '%value%', $file_ID, $field_params['field_item_start'] );
-		$r .= $File->get_thumb_imgtag( $field_params['size_name'], $field_params['class'] );
-		$r .= '<br>';
-		$blog_param = empty( $blog ) ? '' : '&amp;blog='.$blog;
-
-		$r .= action_icon( $field_params['remove_file_text'], 'unlink',
-				'', NULL, NULL, NULL,
-				array( 'onclick' => 'return file_select_delete( this, \''.$field_name.'\' );' ) );
-
-		$r .= $field_params['field_item_end'];
+		$current_File->load_meta( true ); // erhsatingin > can we force create file meta in DB here or should this whole thing require login?
+		$r = get_file_select_item( $current_File->ID, $field_params );
 
 		echo json_encode( array(
 				'fieldName' => $field_name,
+				'fieldValue' => $current_File->ID,
 				'item' => base64_encode( $r )
 			) );
 

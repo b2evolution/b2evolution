@@ -332,13 +332,15 @@ $Form->begin_form();
 					echo ' ';
 				}
 
-				if( isset( $field_name ) && !$lFile->is_dir() )
+				if( $fm_mode == 'file_select' && !empty( $field_name )  && !$lFile->is_dir() )
 				{
+					$root = FileRoot::gen_ID( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID() );
+					$path = $lFile->get_rdfp_rel_path();
 					$link_attribs = array();
 					$link_action = 'set_field';
 					$link_attribs['target'] = '_parent';
 					$link_attribs['class'] = 'action_icon select_file btn btn-primary btn-xs';
-					$link_attribs['onclick'] = 'return window.parent.file_select_add( \''.$field_name.'\', '.$lFile->ID.' );';
+					$link_attribs['onclick'] = 'return window.parent.file_select_add( \''.$field_name.'\', \''.$root.'\', \''.$path.'\' );';
 					echo action_icon( T_('Select file'), 'link',
 							regenerate_url( 'fm_selected', 'action=file_select&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
 							' '.T_('Select'), NULL, 5, $link_attribs );
