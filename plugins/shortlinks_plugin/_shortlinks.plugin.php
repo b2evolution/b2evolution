@@ -1138,15 +1138,23 @@ class shortlinks_plugin extends Plugin
 				dest_type = 'emailcampaign';
 				dest_object_ID = jQuery( 'input[type=hidden][name=ecmp_ID]' ).val();
 			}
+			else if( jQuery( 'input[type=hidden][name=thrd_ID]' ).length )
+			{	// Message form:
+				dest_type = 'message';
+				dest_object_ID = 0;
+			}/*
 			else if( jQuery( 'input[type=hidden][name=temp_link_owner_ID]' ).length )
 			{	// New object form:
 				dest_type = 'temporary';
 				dest_object_ID = jQuery( 'input[type=hidden][name=temp_link_owner_ID]' ).val();
-			}
+			}*/
 
-			if( dest_type != false &&
-			    jQuery( '#shortlinks_form_full_cover, #shortlinks_form_thumb_cover, #shortlinks_form_teaser' ).is( ':checked' ) &&
-			    jQuery( '#shortlinks_hidden_cover_link' ).val() != '' && jQuery( '#shortlinks_hidden_teaser_link' ).val() != '' )
+			// Check if at least one image is requested to insert:
+			var insert_images = ( jQuery( '#shortlinks_form_full_cover, #shortlinks_form_thumb_cover, #shortlinks_form_teaser' ).is( ':checked' ) &&
+			    jQuery( '#shortlinks_hidden_cover_link' ).val() != '' &&
+					jQuery( '#shortlinks_hidden_teaser_link' ).val() != '' );
+
+			if( insert_images && dest_type != false && dest_object_ID > 0 )
 			{	// We need to insert at least one image/file inline tag:
 				shortlinks_start_loading( '#shortlinks_post_block' );
 
@@ -1203,6 +1211,10 @@ class shortlinks_plugin extends Plugin
 			}
 			else
 			{	// Insert only simple text without images:
+				if( insert_images )
+				{	// Display this alert if user wants to insert image for new creating object:
+					alert( 'Please save your ' + dest_type + ' before trying to attach files. This limitation will be removed in a future version of b2evolution.' );
+				}
 				shortlinks_insert_complex_link();
 			}
 
