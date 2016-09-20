@@ -296,6 +296,7 @@ class tinymce_plugin extends Plugin
 
 				$show_wysiwyg_warning = $UserSettings->get_collection_setting( 'show_wysiwyg_warning', $Blog->ID );
 				$hide_warning_url = get_htsrv_url().'async.php?action=hide_wysiwyg_warning&type=item'.( empty( $Blog ) ? '' : '&blog='.$Blog->ID ).'&'.url_crumb( 'item' );
+				$wysiwyg_checkbox_label = TS_("Don't show this again for this Collection");
 
 				$state_params = array(
 						'type' => $params['target_type'],
@@ -310,6 +311,7 @@ class tinymce_plugin extends Plugin
 
 				$show_wysiwyg_warning = $UserSettings->get( 'show_wysiwyg_warning_emailcampaign' );
 				$hide_warning_url = get_htsrv_url().'async.php?action=hide_wysiwyg_warning&type=emailcampaign'.url_crumb( 'campaign' );
+				$wysiwyg_checkbox_label = TS_("Don't show this again when composing email campaigns");
 
 				$state_params = array(
 						'type'  => $params['target_type'],
@@ -389,7 +391,7 @@ class tinymce_plugin extends Plugin
 						evo_js_lang_close = '<?php echo TS_('Cancel');?>';
 						openModalWindow( '<p><?php echo TS_('By switching to WYSIWYG, you might lose newline and paragraph marks as well as some other formatting. Your text is safe though! Are you sure you want to switch?');?></p>'
 							+ '<form>'
-							+ '<input type="checkbox" name="hideWarning" value="1"> ' + '<?php echo TS_("Don't show this again for this Collection");?>'
+							+ '<input type="checkbox" name="hideWarning" value="1"> ' + '<?php echo $wysiwyg_checkbox_label;?>'
 							+ '<input type="submit" name="submit" onclick="return confirmSwitch();">'
 							+ '</form>',
 							'500px', '', true,
