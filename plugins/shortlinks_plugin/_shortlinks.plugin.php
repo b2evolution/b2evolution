@@ -852,7 +852,7 @@ class shortlinks_plugin extends Plugin
 					+ '<div id="shortlinks_post_form" style="display:none">'
 						+ '<input type="hidden" id="shortlinks_hidden_ID" />'
 						+ '<input type="hidden" id="shortlinks_hidden_cover_link" />'
-						+ '<input type="hidden" id="shortlinks_hidden_teaser_links" />'
+						+ '<input type="hidden" id="shortlinks_hidden_teaser_link" />'
 						+ '<input type="hidden" id="shortlinks_hidden_urltitle" />'
 						+ '<input type="hidden" id="shortlinks_hidden_title" />'
 						+ '<input type="hidden" id="shortlinks_hidden_excerpt" />'
@@ -1026,7 +1026,7 @@ class shortlinks_plugin extends Plugin
 					jQuery( '#shortlinks_hidden_title' ).val( post.title );
 					jQuery( '#shortlinks_hidden_excerpt' ).val( post.excerpt );
 					jQuery( '#shortlinks_hidden_cover_link' ).val( '' );
-					jQuery( '#shortlinks_hidden_teaser_links' ).val( '' );
+					jQuery( '#shortlinks_hidden_teaser_link' ).val( '' );
 
 					// Item title:
 					var item_content = '<h2>' + post.title + '</h2>';
@@ -1044,8 +1044,10 @@ class shortlinks_plugin extends Plugin
 								)
 							{
 								item_content += '<img src="' + attachment.url + '" />';
-								// Store link ID of teaser images in hidden field to use on insert complex link:
-								jQuery( '#shortlinks_hidden_teaser_links' ).val( jQuery( '#shortlinks_hidden_teaser_links' ).val() + ',' + attachment.link_ID );
+								if( attachment.position == 'teaser' && jQuery( '#shortlinks_hidden_teaser_link' ).val() == '' )
+								{	// Store link ID of first teaser image in hidden field to use on insert complex link:
+									jQuery( '#shortlinks_hidden_teaser_link' ).val( attachment.link_ID );
+								}
 							}
 							if( attachment.type == 'image' && attachment.position == 'cover' )
 							{	// Store link ID of cover image in hidden field to use on insert complex link:
@@ -1144,7 +1146,7 @@ class shortlinks_plugin extends Plugin
 
 			if( dest_type != false &&
 			    jQuery( '#shortlinks_form_full_cover, #shortlinks_form_thumb_cover, #shortlinks_form_teaser' ).is( ':checked' ) &&
-			    jQuery( '#shortlinks_hidden_cover_link' ).val() != '' && jQuery( '#shortlinks_hidden_teaser_links' ).val() != '' )
+			    jQuery( '#shortlinks_hidden_cover_link' ).val() != '' && jQuery( '#shortlinks_hidden_teaser_link' ).val() != '' )
 			{	// We need to insert at least one image/file inline tag:
 				shortlinks_start_loading( '#shortlinks_post_block' );
 
@@ -1161,6 +1163,7 @@ class shortlinks_plugin extends Plugin
 					'dest_type':        dest_type,
 					'dest_object_ID':   dest_object_ID,
 					'dest_position':    'inline',
+					'limit_position':   1,
 				}, function( data )
 				{
 					var full_cover = '';

@@ -2134,8 +2134,28 @@ class RestApi
 
 		$dest_last_order = $dest_LinkOwner->get_last_order() + 1;
 
+		// Limit files per each position, 0 - for unlimit:
+		$limit_position = param( 'limit_position', 'integer', 0 );
+		if( $limit_position )
+		{
+			$position_counts = array();
+		}
+
 		while( $source_Link = & $source_LinkList->get_next() )
 		{	// Copy a Link to new object:
+			if( $limit_position )
+			{
+				if( ! isset( $position_counts[ $source_Link->position ] ) )
+				{
+					$position_counts[ $source_Link->position ] = 0;
+				}
+				if( $position_counts[ $source_Link->position ] >= $limit_position )
+				{	// Skip this because of limit per position:
+					continue;
+				}
+				$position_counts[ $source_Link->position ]++;
+			}
+
 			if( $source_File = & $source_Link->get_File() &&
 			    $new_link_ID = $dest_LinkOwner->add_link( $source_Link->file_ID, ( empty( $dest_position ) ? $source_Link->position : $dest_position ), $dest_last_order++ ) )
 			{
