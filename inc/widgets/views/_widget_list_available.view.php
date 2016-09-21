@@ -62,6 +62,7 @@ $core_componentwidget_defs = array(
 	'multipurpose' => array(
 			'image',
 			'free_html',
+			'separator',
 			'user_links',
 		),
 	'menu_item' => array(

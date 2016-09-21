@@ -454,7 +454,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 				'after_info'  => '</h2>',
 			) );
 		// Free HTML / Separator:
-		add_basic_widget( $wico_id, 'free_html', 'core', 60, array( 'content' => '<hr class="profile_separator" />' ) );
+		add_basic_widget( $wico_id, 'separator', 'core', 60 );
 		// User info / :
 		add_basic_widget( $wico_id, 'user_info', 'core', 70, array(
 				'info'        => 'gender_age',
@@ -468,7 +468,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 				'after_info'  => '</p>',
 			) );
 		// Free HTML / Separator:
-		add_basic_widget( $wico_id, 'free_html', 'core', 90, array( 'content' => '<hr class="profile_separator" />' ) );
+		add_basic_widget( $wico_id, 'separator', 'core', 90 );
 		// User action / Edit my profile:
 		add_basic_widget( $wico_id, 'user_action', 'core', 100, array(
 				'button'           => 'edit_profile',
@@ -512,7 +512,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 				'widget_css_class' => 'profile_buttons',
 			) );
 		// Free HTML / Separator:
-		add_basic_widget( $wico_id, 'free_html', 'core', 160, array( 'content' => '<hr class="profile_separator" />' ) );
+		add_basic_widget( $wico_id, 'separator', 'core', 160 );
 		// User info / Organizations:
 		add_basic_widget( $wico_id, 'user_info', 'core', 170, array(
 				'info'        => 'orgs',
