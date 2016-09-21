@@ -117,6 +117,7 @@ $core_componentwidget_defs = array(
 			'user_tools',
 			'user_info',
 			'user_action',
+			'user_fields',
 		),
 	'other' => array(
 			'subcontainer',

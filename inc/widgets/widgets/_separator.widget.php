@@ -109,6 +109,8 @@ class separator_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_start'];
 
+		$this->disp_title();
+
 		echo $this->disp_params['block_body_start'];
 
 		echo '<hr />';

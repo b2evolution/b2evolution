@@ -104,42 +104,6 @@ echo '<div class="profile_column_right">';
 	) );
 	// ----------------------------- END OF "User Profile - Right" CONTAINER -----------------------------
 
-	// Load the user fields:
-	$User->userfields_load();
-
-	// fp> TODO: have some clean iteration support
-	$group_ID = 0;
-	foreach( $User->userfields as $userfield )
-	{
-		if( $group_ID != $userfield->ufgp_ID )
-		{ // Start new group
-			if( $group_ID > 0 )
-			{ // End previous group
-				$profileForm->end_fieldset();
-			}
-			$profileForm->begin_fieldset( $userfield->ufgp_name, array( 'id' => 'fieldset_user_fields' ) );
-		}
-
-		if( $userfield->ufdf_type == 'text' )
-		{ // convert textarea values
-			$userfield->uf_varchar = nl2br( $userfield->uf_varchar );
-		}
-
-		$userfield_icon = '';
-		if( ! empty( $userfield->ufdf_icon_name ) )
-		{ // Icon
-			$userfield_icon = '<span class="'.$userfield->ufdf_icon_name.' ufld_'.$userfield->ufdf_code.' ufld__textcolor"></span> ';
-		}
-
-		$profileForm->info( $userfield_icon.$userfield->ufdf_name, $userfield->uf_varchar );
-
-		$group_ID = $userfield->ufgp_ID;
-	}
-	if( $group_ID > 0 )
-	{	// End fieldset if userfields are exist
-		$profileForm->end_fieldset();
-	}
-
 	$profileForm->begin_fieldset( T_( 'Reputation' ) );
 
 		$profileForm->info( T_('Number of posts'), $User->get_reputation_posts() );
