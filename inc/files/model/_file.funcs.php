@@ -2832,45 +2832,4 @@ function echo_file_properties()
 </script>
 <?php
 }
-
-function get_file_select_item( $file_ID, $params = array() )
-{
-	$FileCache = & get_FileCache();
-	$File = & $FileCache->get_by_ID( $file_ID );
-
-	$params = array_merge( array(
-			'field_item_start' => '<div class="file_select_item" data-item-value="%value%">',
-			'field_item_end' => '</div>',
-			'size_name' => 'crop-64x64',
-			'class' => '',
-			'remove_file_text' => T_('Remove file'),
-			'edit_file_text' => T_('Select another'),
-			'max_file_num' => 1
-		), $params );
-
-	$r = str_replace( '%value%', $file_ID, $params['field_item_start'] );
-	$r .= $File->get_thumb_imgtag( $params['size_name'], $params['class'] );
-	$blog_param = empty( $blog ) ? '' : '&amp;blog='.$blog;
-	if( $params['max_file_num'] > 1 )
-	{
-		$r .= '<br>';
-	}
-	else
-	{
-		$r .= ' ';
-	}
-	$r .= action_icon( $params['remove_file_text'], 'remove',
-			'', T_('Remove'), NULL, $params['max_file_num'] > 1 ? NULL : 4,
-			array( 'onclick' => 'return file_select_delete( this );' ),
-			array( 'class' => 'remove_file_icon' ) );
-	$r .= ' ';
-	$r .= action_icon( $params['edit_file_text'], 'edit',
-			'', T_('Select another'), NULL, $params['max_file_num'] > 1 ? NULL : 4,
-			array( 'onclick' => 'return window.parent.file_select_attachment_window( this, true );' ),
-			array( 'class' => 'edit_file_icon' ) );
-
-	$r .= $params['field_item_end'];
-
-	return $r;
-}
 ?>

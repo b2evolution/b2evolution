@@ -1373,7 +1373,7 @@ switch( $action )
 		}
 
 		$current_File->load_meta( true ); // erhsatingin > can we force create file meta in DB here or should this whole thing require login?
-		$r = get_file_select_item( $current_File->ID, $field_params );
+		$r = file_select_item( $current_File->ID, $field_params );
 
 		echo json_encode( array(
 				'fieldName' => $field_name,

@@ -3690,7 +3690,7 @@ class Form extends Widget
 			{
 				foreach( $field_values as $file_ID )
 				{
-					$r .= get_file_select_item( $file_ID, $field_params );
+					$r .= file_select_item( $file_ID, $field_params );
 					$counter++;
 				}
 			}
