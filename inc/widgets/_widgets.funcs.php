@@ -431,9 +431,9 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		add_basic_widget( $wico_id, 'user_profile_pics', 'core', 10, array(
 				'link_to'           => 'fullsize',
 				'thumb_size'        => 'crop-top-320x320',
-				'thumb_class'       => 'main_profile_picture',
 				'anon_thumb_size'   => 'crop-top-320x320-blur-8',
 				'anon_overlay_show' => '1',
+				'widget_css_class'  => 'main_profile_picture',
 			) );
 		// User info / Name:
 		add_basic_widget( $wico_id, 'user_info', 'core', 20, array(

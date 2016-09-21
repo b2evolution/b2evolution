@@ -105,13 +105,6 @@ class user_profile_pics_Widget extends ComponentWidget
 					'note' => sprintf( /* TRANS: %s is a config variable name */ T_('List of available image sizes is defined in %s.'), '$thumbnail_sizes' ),
 					'defaultvalue' => 'fit-160x160',
 				),
-			'thumb_class' => array(
-					'type' => 'text',
-					'label' => T_('Image class'),
-					'note' => '',
-					'defaultvalue' => '',
-					'size' => 60,
-				),
 			'before_image' => array(
 					'type'         => 'html_input',
 					'label'        => T_('Before picture'),
@@ -194,7 +187,6 @@ class user_profile_pics_Widget extends ComponentWidget
 					'link_to'       => ( $this->disp_params['link_to'] == 'userpage' ? 'userpage' : 'none' ),
 					'link_text'     => 'avatar',
 					'thumb_size'    => is_logged_in() ? $this->disp_params['thumb_size'] : $this->get_param( 'anon_thumb_size' ),
-					'thumb_class'   => $this->get_param( 'thumb_class' ),
 					'thumb_zoom'    => ( $this->disp_params['link_to'] == 'fullsize' ),
 					'thumb_overlay' => $thumb_overlay_text,
 				) );

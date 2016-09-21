@@ -2341,7 +2341,7 @@ input.btn-lg {
   max-width: 960px;
   margin: auto;
 }
-.main_profile_picture {
+div.main_profile_picture img {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   -ms-border-radius: 4px;
