@@ -346,10 +346,10 @@ switch( $action )
 		// Site long name
 		$Settings->set( 'notification_long_name', param( 'notification_long_name', 'string', '' ) );
 
-		// Small site logo url
-		param( 'notification_logo', 'string', '' );
-		param_check_url( 'notification_logo', 'http-https' );
+		// Small site logo
+		param( 'notification_logo', 'integer', NULL );
 		$Settings->set( 'notification_logo', get_param( 'notification_logo' ) );
+
 
 		// Site footer text
 		$Settings->set( 'site_footer_text', param( 'site_footer_text', 'string', '' ) );

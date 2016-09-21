@@ -3650,7 +3650,7 @@ class Form extends Widget
 	{
 		global $thumbnail_sizes, $file_select_js_initialized;
 
-		//$field_params['note'] = $field_note;
+		$field_params['note'] = $field_note;
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
 		$field_params = array_merge( array(

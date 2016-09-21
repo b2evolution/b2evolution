@@ -76,7 +76,7 @@ $Form->begin_fieldset( T_('Properties').get_manual_link( 'categories-tab' ) );
 	$Form->checkbox_input( 'cat_lock', $edited_Chapter->lock, T_('Locked category'), array( 'note' => T_('Check this to lock all posts under this category. (Note: for posts with multiple categories, the post is only locked if *all* its categories are locked.)') ) );
 
 	$field_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select category image') );
-	$Form->fileselect( 'cat_image_file_ID', $edited_Chapter->get( 'image_file_ID' ), T_('Category image'), T_('Select a category image'), $field_params );
+	$Form->fileselect( 'cat_image_file_ID', $edited_Chapter->get( 'image_file_ID' ), T_('Category image'), NULL, $field_params );
 
 $Form->end_fieldset();
 
