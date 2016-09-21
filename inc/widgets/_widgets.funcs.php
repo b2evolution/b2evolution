@@ -89,6 +89,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	// Additional sub containers:
 	$blog_containers['front_page_column_a'] = array( 'Front Page Column A', 1, 0 );
 	$blog_containers['front_page_column_b'] = array( 'Front Page Column B', 1, 0 );
+	$blog_containers['user_page_reputation'] = array( 'User Page - Reputation', 1, 0 );
 
 	// Create rows to insert for all collection containers:
 	$widget_containers_sql_rows = array();
@@ -548,8 +549,48 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 				'after_field_value'  => '</div></div>',
 				'after_group'        => '</div></div><fieldset>',
 			) );
+		// Reputation:
+		add_basic_widget( $wico_id, 'subcontainer', 'core', 30, array(
+				'title'     => T_('Reputation'),
+				'container' => 'user_page_reputation',
+			) );
 	}
 
+	/* User Page - Reputation */
+	if( array_key_exists( 'user_page_reputation', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['user_page_reputation']['wico_ID'];
+		// User info / Number of posts:
+		add_basic_widget( $wico_id, 'user_info', 'core', 10, array(
+				'title' => T_('Number of posts'),
+				'info'  => 'posts',
+			) );
+		// User info / Comments:
+		add_basic_widget( $wico_id, 'user_info', 'core', 20, array(
+				'title' => T_('Comments'),
+				'info'  => 'comments',
+			) );
+		// User info / Photos:
+		add_basic_widget( $wico_id, 'user_info', 'core', 30, array(
+				'title' => T_('Photos'),
+				'info'  => 'photos',
+			) );
+		// User info / Audio:
+		add_basic_widget( $wico_id, 'user_info', 'core', 40, array(
+				'title' => T_('Audio'),
+				'info'  => 'audio',
+			) );
+		// User info / Other files:
+		add_basic_widget( $wico_id, 'user_info', 'core', 50, array(
+				'title' => T_('Other files'),
+				'info'  => 'files',
+			) );
+		// User info / Spam fighter score:
+		add_basic_widget( $wico_id, 'user_info', 'core', 60, array(
+				'title' => T_('Spam fighter score'),
+				'info'  => 'spam',
+			) );
+	}
 
 	// Check if there are widgets to create
 	if( ! empty( $basic_widgets_insert_sql_rows ) )

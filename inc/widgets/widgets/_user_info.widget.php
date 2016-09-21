@@ -100,12 +100,12 @@ class user_info_Widget extends ComponentWidget
 							'gender_age' => T_('Gender & Age group'),
 							'location'   => T_('Location'),
 							'orgs'       => T_('Organizations'),
-							/*'posts'      => T_('Number of posts'),
+							'posts'      => T_('Number of posts'),
 							'comments'   => T_('Comments'),
 							'photos'     => T_('Photos'),
 							'audio'      => T_('Audio'),
 							'files'      => T_('Other files'),
-							'spam'       => T_('Spam fighter score'),*/
+							'spam'       => T_('Spam fighter score'),
 						),
 					'defaultvalue' => 'name',
 				),
@@ -235,6 +235,36 @@ class user_info_Widget extends ComponentWidget
 					}
 					$r = implode( ' &middot; ', $org_names );
 				}
+				break;
+
+			case 'posts':
+				// Number of posts:
+				$r = $target_User->get_reputation_posts();
+				break;
+
+			case 'comments':
+				// Comments:
+				$r = $target_User->get_reputation_comments();
+				break;
+
+			case 'photos':
+				// Photos:
+				$r = $target_User->get_reputation_files( array( 'file_type' => 'image' ) );
+				break;
+
+			case 'audio':
+				// Audio:
+				$r = $target_User->get_reputation_files( array( 'file_type' => 'audio' ) );
+				break;
+
+			case 'files':
+				// Other files:
+				$r = $target_User->get_reputation_files( array( 'file_type' => 'other' ) );
+				break;
+
+			case 'spam':
+				// Spam fighter score:
+				$r = $target_User->get_reputation_spam();
 				break;
 		}
 
