@@ -85,8 +85,18 @@ class user_profile_pics_Widget extends ComponentWidget
 			'display_other' => array(
 					'type' => 'checkbox',
 					'label' => T_('Display additional pictures'),
-					'note' => '',
+					'note' => T_('NOTE: Only for logged in and activated users.'),
 					'defaultvalue' => 0,
+				),
+			'link_to' => array(
+					'label' => T_('Link to'),
+					'note' => '',
+					'type' => 'radio',
+					'field_lines' => true,
+					'options' => array(
+							array( 'userpage', T_('User profile') ),
+							array( 'fullsize', T_('Full-size profile picture (using colorbox)') ) ),
+					'defaultvalue' => 'userpage',
 				),
 			'thumb_size' => array(
 					'type' => 'select',
@@ -165,9 +175,6 @@ class user_profile_pics_Widget extends ComponentWidget
 		if( $this->get_param( 'display_main' ) )
 		{	// Display main profile pictures:
 
-			// Check if the target user is viewed currently:
-			$current_user_is_viewed = ( $disp == 'user' && $this->disp_params[ 'widget_context' ] == 'user' );
-
 			// Set overlay text:
 			$thumb_overlay_text = '';
 			if( ! is_logged_in() && $this->get_param( 'anon_overlay_show' ) )
@@ -184,11 +191,11 @@ class user_profile_pics_Widget extends ComponentWidget
 			}
 
 			$profile_image_tag = $target_User->get_link( array(
-					'link_to'       => $current_user_is_viewed ? 'none' : 'userpage',  // TODO: make configurable $this->disp_params['link_to']
+					'link_to'       => ( $this->disp_params['link_to'] == 'userpage' ? 'userpage' : 'none' ),
 					'link_text'     => 'avatar',
 					'thumb_size'    => is_logged_in() ? $this->disp_params['thumb_size'] : $this->get_param( 'anon_thumb_size' ),
 					'thumb_class'   => $this->get_param( 'thumb_class' ),
-					'thumb_zoom'    => $current_user_is_viewed,
+					'thumb_zoom'    => ( $this->disp_params['link_to'] == 'fullsize' ),
 					'thumb_overlay' => $thumb_overlay_text,
 				) );
 
@@ -207,6 +214,7 @@ class user_profile_pics_Widget extends ComponentWidget
 				$user_pictures = $target_User->get_avatar_Links();
 				if( count( $user_pictures ) > 0 )
 				{
+					$image_link_to = ( $this->disp_params['link_to'] == 'fullsize' ? 'original' : $target_User->get_userpage_url() );
 					foreach( $user_pictures as $user_Link )
 					{
 						echo $user_Link->get_tag( array(
@@ -215,9 +223,9 @@ class user_profile_pics_Widget extends ComponentWidget
 							'after_image_legend'  => NULL,
 							'after_image'         => $this->get_param( 'after_image' ),
 							'image_size'          => $this->disp_params['thumb_size'],
-							'image_link_to'       => 'original',
+							'image_link_to'       => $image_link_to,
 							'image_link_title'    => $target_User->login,
-							'image_link_rel'      => 'lightbox[user]'
+							'image_link_rel'      => ( $this->disp_params['link_to'] == 'fullsize' ? 'lightbox[user]' : '' )
 						) );
 					}
 				}

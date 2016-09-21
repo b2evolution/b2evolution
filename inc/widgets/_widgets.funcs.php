@@ -429,6 +429,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		$wico_id = $blog_containers['user_profile_left']['wico_ID'];
 		// User Profile Picture(s):
 		add_basic_widget( $wico_id, 'user_profile_pics', 'core', 10, array(
+				'link_to'           => 'fullsize',
 				'thumb_size'        => 'crop-top-320x320',
 				'thumb_class'       => 'main_profile_picture',
 				'anon_thumb_size'   => 'crop-top-320x320-blur-8',
@@ -530,6 +531,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		add_basic_widget( $wico_id, 'user_profile_pics', 'core', 10, array(
 				'display_main'     => 0,
 				'display_other'    => 1,
+				'link_to'          => 'fullsize',
 				'thumb_size'       => 'crop-top-80x80',
 				'before_image'     => '<div class="avatartag">',
 				'after_image'      => '</div>',
