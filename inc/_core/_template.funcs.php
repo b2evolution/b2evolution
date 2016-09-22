@@ -1848,29 +1848,23 @@ function bullet( $bool )
 }
 
 
-
-
 /**
  * Stub: Links to previous and next post in single post mode
  */
 function item_prevnext_links( $params = array() )
 {
-	global $disp;
+	global $disp, $MainList;
 
-	if( $disp == 'download' )
-	{ // Don't display the links on download page
+	if( ! isset( $MainList ) || ! $MainList->single_post || $disp == 'download' )
+	{	// Don't display the links in NOT single post mode and on download page:
 		return;
 	}
 
-	global $MainList;
-
 	$params = array_merge( array( 'target_blog' => 'auto' ), $params );
 
-	if( isset( $MainList ) )
-	{
-		$MainList->prevnext_item_links( $params );
-	}
+	$MainList->prevnext_item_links( $params );
 }
+
 
 /**
  * Stub: Links to previous and next user in single user mode
