@@ -386,6 +386,9 @@ echo '<div class="profile_column_right">';
 
 		$profileForm->info( T_('Joined'), mysql2localedate( $User->datecreated ) );
 
+		$user_lastseen = $User->get( 'lastseen_ts' );
+		$profileForm->info( T_('Last seen on'), ( empty( $user_lastseen ) ? '' : mysql2localedatetime( $user_lastseen ) ) );
+
 		$profileForm->info( T_('Number of posts'), $User->get_reputation_posts() );
 
 		$profileForm->info( T_('Comments'), '<span class="reputation_message">'.$User->get_reputation_comments().'</span>' );
