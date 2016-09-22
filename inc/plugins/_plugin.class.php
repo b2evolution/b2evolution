@@ -474,6 +474,9 @@ class Plugin
 	 *              (with label, note etc). (optional, default is numeric keys, which are not editable)
 	 *       'max_count': maximum count of sets (optional, default is no restriction)
 	 *       'min_count': minimum count of sets (optional, default is no restriction)
+	 *		 'fileselect': opens a modal window to select file. The following can be set for this type:
+	 *       		'root': default root
+	 *					'path': default path
 	 * 'note' (gets displayed as a note to the param field),
 	 * 'size': Size of the HTML input field (applies to types 'text', 'password' and 'integer'; defaults to 15)
 	 * 'maxlength': maxlength attribute for the input field (See 'size' above; defaults to no limit)

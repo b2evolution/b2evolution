@@ -18,7 +18,7 @@ global $baseurl, $Settings;
 if( $Settings->get( 'notification_logo' ) != '' )
 {
 	$FileCache = & get_FileCache();
-	if( ( $File = get_FileCache()->get_by_ID( $Settings->get( 'notification_logo' ) ) ) && $File->is_image() )
+	if( ( $File = get_FileCache()->get_by_ID( $Settings->get( 'notification_logo' ), false ) ) && $File->is_image() )
 	{
 		$site_title = $Settings->get( 'notification_long_name' ) != '' ? ' title="'.$Settings->dget( 'notification_long_name', 'htmlattr' ).'"' : '';
 		$site_name_text = '<img src="'.$File->get_url().'" alt="'.$Settings->dget( 'notification_short_name', 'htmlattr' ).'"'.$site_title.' />';

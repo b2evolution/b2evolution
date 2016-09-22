@@ -1372,6 +1372,10 @@ switch( $action )
 			// Exit here.
 		}
 
+		// decode params with HTML tags
+		$field_params['field_item_start'] = base64_decode( $field_params['field_item_start'] );
+		$field_params['field_item_end'] = base64_decode( $field_params['field_item_end'] );
+
 		$current_File->load_meta( true ); // erhsatingin > can we force create file meta in DB here or should this whole thing require login?
 		$r = file_select_item( $current_File->ID, $field_params );
 

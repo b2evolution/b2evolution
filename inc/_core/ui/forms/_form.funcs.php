@@ -315,7 +315,7 @@ function form_textarea( $field_name, $field_value, $field_rows, $field_label, $f
 function file_select_item( $file_ID, $params = array() )
 {
 	$FileCache = & get_FileCache();
-	$File = & $FileCache->get_by_ID( $file_ID );
+	$File = & $FileCache->get_by_ID( $file_ID, false );
 
 	$params = array_merge( array(
 			'field_item_start' => '<div class="file_select_item" data-item-value="%value%">',
@@ -329,7 +329,14 @@ function file_select_item( $file_ID, $params = array() )
 
 	$r = str_replace( '%value%', $file_ID, $params['field_item_start'] );
 	$r .= $params['max_file_num'] > 1 ? '<div>' : '';
-	$r .= $File->get_thumb_imgtag( $params['size_name'], $params['class'] );
+	if( $File )
+	{
+		$r .= $File->get_thumb_imgtag( $params['size_name'], $params['class'] );
+	}
+	else
+	{
+		$r .= '<div class="bg-danger">File Not Found</div>';
+	}
 	$blog_param = empty( $blog ) ? '' : '&amp;blog='.$blog;
 	if( $params['max_file_num'] > 1 )
 	{

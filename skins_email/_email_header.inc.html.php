@@ -41,7 +41,7 @@ if( $Settings->get( 'notification_logo' ) != '' || $Settings->get( 'notification
 if( $Settings->get( 'notification_logo' ) != '' )
 { // Display site logo
 	$FileCache = & get_FileCache();
-	if( ( $File = get_FileCache()->get_by_ID( $Settings->get( 'notification_logo' ) ) ) && $File->is_image() )
+	if( ( $File = get_FileCache()->get_by_ID( $Settings->get( 'notification_logo' ), false ) ) && $File->is_image() )
 	{
 		$site_name = $Settings->get( 'notification_long_name' ) != '' ? $Settings->get( 'notification_long_name' ) : $Settings->get( 'notification_short_name' );
 		echo '<img src="'.$File->get_url().'" alt="'.$site_name.'" />';

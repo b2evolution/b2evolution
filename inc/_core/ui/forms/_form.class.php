@@ -3712,6 +3712,11 @@ class Form extends Widget
 			$r .= $this->end_field();
 			echo_modalwindow_js();
 
+			// We have to encode the params that contain HTML tags
+			$script_params = $field_params;
+			$script_params['field_item_start'] = base64_encode( $script_params['field_item_start'] );
+			$script_params['field_item_end'] = base64_encode( $script_params['field_item_end'] );
+
 			if( empty( $file_select_js_initialized ) )
 			{
 				$r .= '
@@ -3766,7 +3771,7 @@ class Form extends Widget
 										"field_name": fieldName,
 										"root": root,
 										"path": path,
-										"params": '.json_encode( $field_params ).'
+										"params": '.json_encode( $script_params ).'
 									},
 								success: function( result )
 									{
@@ -3818,8 +3823,8 @@ class Form extends Widget
 											}
 										}
 
-										newItem.find( "span.remove_file_icon" ).replaceWith("'.addslashes( $remove_icon ).'"); // replace unlink icon with skin specific icon saved earlier
-										newItem.find( "span.edit_file_icon" ).replaceWith("'.addslashes( $edit_icon ).'"); // replace unlink icon with skin specific icon saved earlier
+										newItem.find( "span.remove_file_icon" ).replaceWith(\''.$remove_icon.'\'); // replace unlink icon with skin specific icon saved earlier
+										newItem.find( "span.edit_file_icon" ).replaceWith(\''.$edit_icon.'\'); // replace unlink icon with skin specific icon saved earlier
 
 										items = jQuery( ".file_select_item:not(button)", wrapper );
 										lastItem = items.last();
