@@ -91,8 +91,13 @@ class image_Widget extends ComponentWidget
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
+				'image_file_ID' => array(
+					'label' => T_('Image'),
+					'defaultvalue' => '',
+					'type' => 'fileselect',
+				),
 				'image_source' => array(
-					'label' => T_('Image source'),
+					'label' => T_('Fallback image source'),
 					'note' => '',
 					'type' => 'radio',
 					'options' => array(
@@ -102,12 +107,11 @@ class image_Widget extends ComponentWidget
 					'defaultvalue' => 'skin',
 				),
 				'image_file' => array(
-					'label' => T_('Image filename'),
-					'note' => T_('Relative to the root of the selected source.'),
+					'label' => T_('Fallback image filename'),
+					'note' => T_('If no file was selected. Relative to the root of the selected source.'),
 					'defaultvalue' => 'logo.png',
 					'valid_pattern' => array( 'pattern'=>'~^[a-z0-9_\-/][a-z0-9_.\-/]*$~i',
 																		'error'=>T_('Invalid filename.') ),
-					'size' => 128,
 				),
 				'size_begin_line' => array(
 					'type' => 'begin_line',
@@ -161,6 +165,15 @@ class image_Widget extends ComponentWidget
 	{
 		global $Collection, $Blog;
 
+		$file_ID = $this->disp_params['image_file_ID'];
+		$FileCache = & get_FileCache();
+		$File = false;
+
+		if( ! empty( $file_ID ) )
+		{
+			$File = & $FileCache->get_by_ID( $file_ID, false );
+		}
+
 		switch( $this->disp_params['image_source'] )
 		{
 			case 'skin':
@@ -203,9 +216,18 @@ class image_Widget extends ComponentWidget
 			$image_attrs .= ' height="'.intval( $this->disp_params['height'] ).'"';
 		}
 
-		echo '<a href="'.$Blog->get( 'url' ).'">'
-							.'<img src="'.$image_url.$this->disp_params['image_file'].'" alt=""'.$image_attrs.' />'
-							.'</a>';
+		if( ! empty( $File ) )
+		{
+			echo '<a href="'.$Blog->get( 'url' ).'">'
+								.'<img src="'.$File->get_url().'" alt=""'.$image_attrs.' />'
+								.'</a>';
+		}
+		else
+		{
+			echo '<a href="'.$Blog->get( 'url' ).'">'
+								.'<img src="'.$image_url.$this->disp_params['image_file'].'" alt=""'.$image_attrs.' />'
+								.'</a>';
+		}
 
 		echo $this->disp_params['block_end'];
 
