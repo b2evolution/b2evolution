@@ -385,6 +385,8 @@ echo '<div class="profile_column_right">';
 
 	$profileForm->begin_fieldset( T_( 'Reputation' ) );
 
+		$profileForm->info( T_('Joined'), mysql2localedate( $User->datecreated ) );
+
 		$profileForm->info( T_('Number of posts'), $User->get_reputation_posts() );
 
 		$profileForm->info( T_('Comments'), '<span class="reputation_message">'.$User->get_reputation_comments().'</span>' );
