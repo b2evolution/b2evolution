@@ -100,6 +100,8 @@ class user_info_Widget extends ComponentWidget
 							'gender_age' => T_('Gender & Age group'),
 							'location'   => T_('Location'),
 							'orgs'       => T_('Organizations'),
+							'joined'     => T_('Joined'),
+							'last_visit' => T_('Last Visit'),
 							'posts'      => T_('Number of posts'),
 							'comments'   => T_('Comments'),
 							'photos'     => T_('Photos'),
@@ -234,6 +236,21 @@ class user_info_Widget extends ComponentWidget
 						}
 					}
 					$r = implode( ' &middot; ', $org_names );
+				}
+				break;
+
+			case 'joined':
+				// Joined:
+				$r = mysql2localedate( $target_User->datecreated );
+				break;
+
+			case 'last_visit':
+				// Last Visit:
+				global $Blog;
+				$r = '';
+				if( $Blog->get_setting( 'userdir_lastseen' ) )
+				{	// Display last visit only if it is enabled by current collection:
+					$r = get_lastseen_date( $target_User->get( 'lastseen_ts' ), $Blog->get_setting( 'userdir_lastseen_view' ), $Blog->get_setting( 'userdir_lastseen_cheat' ) );
 				}
 				break;
 

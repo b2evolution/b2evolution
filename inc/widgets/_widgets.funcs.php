@@ -560,33 +560,43 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	if( array_key_exists( 'user_page_reputation', $blog_containers ) )
 	{
 		$wico_id = $blog_containers['user_page_reputation']['wico_ID'];
-		// User info / Number of posts:
+		// User info / Joined:
 		add_basic_widget( $wico_id, 'user_info', 'core', 10, array(
+				'title' => T_('Joined'),
+				'info'  => 'joined',
+			) );
+		// User info / Last Visit:
+		add_basic_widget( $wico_id, 'user_info', 'core', 20, array(
+				'title' => T_('Last seen on'),
+				'info'  => 'last_visit',
+			) );
+		// User info / Number of posts:
+		add_basic_widget( $wico_id, 'user_info', 'core', 30, array(
 				'title' => T_('Number of posts'),
 				'info'  => 'posts',
 			) );
 		// User info / Comments:
-		add_basic_widget( $wico_id, 'user_info', 'core', 20, array(
+		add_basic_widget( $wico_id, 'user_info', 'core', 40, array(
 				'title' => T_('Comments'),
 				'info'  => 'comments',
 			) );
 		// User info / Photos:
-		add_basic_widget( $wico_id, 'user_info', 'core', 30, array(
+		add_basic_widget( $wico_id, 'user_info', 'core', 50, array(
 				'title' => T_('Photos'),
 				'info'  => 'photos',
 			) );
 		// User info / Audio:
-		add_basic_widget( $wico_id, 'user_info', 'core', 40, array(
+		add_basic_widget( $wico_id, 'user_info', 'core', 60, array(
 				'title' => T_('Audio'),
 				'info'  => 'audio',
 			) );
 		// User info / Other files:
-		add_basic_widget( $wico_id, 'user_info', 'core', 50, array(
+		add_basic_widget( $wico_id, 'user_info', 'core', 70, array(
 				'title' => T_('Other files'),
 				'info'  => 'files',
 			) );
 		// User info / Spam fighter score:
-		add_basic_widget( $wico_id, 'user_info', 'core', 60, array(
+		add_basic_widget( $wico_id, 'user_info', 'core', 80, array(
 				'title' => T_('Spam fighter score'),
 				'info'  => 'spam',
 			) );
