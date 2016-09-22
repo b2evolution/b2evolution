@@ -386,8 +386,7 @@ echo '<div class="profile_column_right">';
 
 		$profileForm->info( T_('Joined'), mysql2localedate( $User->datecreated ) );
 
-		$user_lastseen = $User->get( 'lastseen_ts' );
-		$profileForm->info( T_('Last seen on'), ( empty( $user_lastseen ) ? '' : mysql2localedatetime( $user_lastseen ) ) );
+		$profileForm->info( T_('Last seen on'), get_lastseen_date( $User->get( 'lastseen_ts' ), $Blog->get_setting( 'userdir_lastseen_view' ), $Blog->get_setting( 'userdir_lastseen_cheat' ) ) );
 
 		$profileForm->info( T_('Number of posts'), $User->get_reputation_posts() );
 
