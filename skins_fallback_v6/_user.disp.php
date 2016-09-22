@@ -387,7 +387,10 @@ echo '<div class="profile_column_right">';
 
 		$profileForm->info( T_('Joined'), mysql2localedate( $User->datecreated ) );
 
-		$profileForm->info( T_('Last seen on'), get_lastseen_date( $User->get( 'lastseen_ts' ), $Blog->get_setting( 'userdir_lastseen_view' ), $Blog->get_setting( 'userdir_lastseen_cheat' ) ) );
+		if( $Blog->get_setting( 'userdir_lastseen' ) )
+		{	// Display last visit only if it is enabled by current collection:
+			$profileForm->info( T_('Last seen on'), get_lastseen_date( $User->get( 'lastseen_ts' ), $Blog->get_setting( 'userdir_lastseen_view' ), $Blog->get_setting( 'userdir_lastseen_cheat' ) ) );
+		}
 
 		$profileForm->info( T_('Number of posts'), $User->get_reputation_posts() );
 
