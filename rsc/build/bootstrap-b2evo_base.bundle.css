@@ -2352,18 +2352,6 @@ input.btn-lg {
 .profile_column_right #fieldset_user_fields {
   overflow: hidden;
 }
-.profile_buttons .btn,
-.profile_buttons .btn-group {
-  width: 100%;
-}
-.profile_buttons .btn-group .btn {
-  width: 50%;
-}
-.profile_buttons a.btn button {
-  background: none;
-  border: none;
-  padding: 0;
-}
 .profile_column_right legend.panel-heading {
   padding: 10px 15px;
 }
@@ -2439,6 +2427,21 @@ input.btn-lg {
   display: inline-block;
   vertical-align: top;
   margin: 0 0.5em 0.5em 0;
+}
+.widget_core_user_action {
+  margin-bottom: 10px;
+}
+.widget_core_user_action .btn,
+.widget_core_user_action.btn-group {
+  width: 100%;
+}
+.widget_core_user_action.btn-group .btn {
+  width: 50%;
+}
+.widget_core_user_action a.btn button {
+  background: none;
+  border: none;
+  padding: 0;
 }
 .evo_content_block table {
   margin: 1em 0;

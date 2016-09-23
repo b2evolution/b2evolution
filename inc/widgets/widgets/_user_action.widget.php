@@ -97,20 +97,6 @@ class user_action_Widget extends ComponentWidget
 						),
 					'defaultvalue' => 'edit_profile',
 				),
-				'before_button' => array(
-					'type'         => 'html_input',
-					'label'        => T_('Before button'),
-					'note'         => T_('HTML text to display before button.'),
-					'defaultvalue' => '',
-					'size'         => 60,
-				),
-				'after_button' => array(
-					'type'         => 'html_input',
-					'label'        => T_('After button'),
-					'note'         => T_('HTML text to display after button.'),
-					'defaultvalue' => '',
-					'size'         => 60,
-				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -277,11 +263,7 @@ class user_action_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		echo $this->get_param( 'before_button' );
-
 		echo $r;
-
-		echo $this->get_param( 'after_button' );
 
 		echo $this->disp_params['block_body_end'];
 
