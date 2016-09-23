@@ -105,20 +105,6 @@ class user_profile_pics_Widget extends ComponentWidget
 					'note' => sprintf( /* TRANS: %s is a config variable name */ T_('List of available image sizes is defined in %s.'), '$thumbnail_sizes' ),
 					'defaultvalue' => 'fit-160x160',
 				),
-			'before_image' => array(
-					'type'         => 'html_input',
-					'label'        => T_('Before picture'),
-					'note'         => T_('HTML text to display before each profile picture.'),
-					'defaultvalue' => '',
-					'size'         => 60,
-				),
-			'after_image' => array(
-					'type'         => 'html_input',
-					'label'        => T_('After picture'),
-					'note'         => T_('HTML text to display after each profile picture.'),
-					'defaultvalue' => '',
-					'size'         => 60,
-				),
 			'anon_thumb_size' => array(
 					'type' => 'select',
 					'label' => T_('Image size for anonymous users'),
@@ -210,10 +196,10 @@ class user_profile_pics_Widget extends ComponentWidget
 					foreach( $user_pictures as $user_Link )
 					{
 						echo $user_Link->get_tag( array(
-							'before_image'        => $this->get_param( 'before_image' ),
+							'before_image'        => NULL,
 							'before_image_legend' => NULL,
 							'after_image_legend'  => NULL,
-							'after_image'         => $this->get_param( 'after_image' ),
+							'after_image'         => NULL,
 							'image_size'          => $this->disp_params['thumb_size'],
 							'image_link_to'       => $image_link_to,
 							'image_link_title'    => $target_User->login,

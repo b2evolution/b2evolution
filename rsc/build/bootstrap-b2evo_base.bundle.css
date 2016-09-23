@@ -2341,24 +2341,6 @@ input.btn-lg {
   max-width: 960px;
   margin: auto;
 }
-div.main_profile_picture img {
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
-  border-radius: 4px;
-}
-div.other_profile_pictures {
-  text-align: left;
-  margin-bottom: 10px;
-}
-div.other_profile_pictures img {
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
-  border-radius: 4px;
-}
 .profile_column_left {
   float: left;
   width: 300px;
@@ -2417,6 +2399,46 @@ div.other_profile_pictures img {
   .evo_form .control-buttons .preview {
     margin-bottom: 4px;
   }
+}
+.widget_core_user_info.evo_user_info_name,
+.widget_core_user_info.evo_user_info_nickname,
+.widget_core_user_info.evo_user_info_login {
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.1;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+.widget_core_user_info.evo_user_info_name {
+  font-size: 36px;
+}
+.widget_core_user_info.evo_user_info_login {
+  color: #777;
+}
+.widget_core_user_info.evo_user_info_gender,
+.widget_core_user_info.evo_user_info_location,
+.widget_core_user_info.evo_user_info_orgs {
+  margin-bottom: 10px;
+}
+.widget_core_user_info.evo_user_info_location {
+  white-space: nowrap;
+}
+.widget_core_user_profile_pics.evo_user_profile_pics_main img,
+.widget_core_user_profile_pics.evo_user_profile_pics_other img {
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
+}
+.widget_core_user_profile_pics.evo_user_profile_pics_other {
+  text-align: left;
+  margin-bottom: 10px;
+}
+.widget_core_user_profile_pics.evo_user_profile_pics_other a {
+  display: inline-block;
+  vertical-align: top;
+  margin: 0 0.5em 0.5em 0;
 }
 .evo_content_block table {
   margin: 1em 0;
@@ -2578,29 +2600,6 @@ div.other_profile_pictures img {
 }
 .evo_container__sidebar .evo_poll__title {
   white-space: normal;
-}
-.widget_core_user_info.evo_user_info_name,
-.widget_core_user_info.evo_user_info_nickname,
-.widget_core_user_info.evo_user_info_login {
-  font-size: 30px;
-  font-weight: 500;
-  line-height: 1.1;
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
-.widget_core_user_info.evo_user_info_name {
-  font-size: 36px;
-}
-.widget_core_user_info.evo_user_info_login {
-  color: #777;
-}
-.widget_core_user_info.evo_user_info_gender,
-.widget_core_user_info.evo_user_info_location,
-.widget_core_user_info.evo_user_info_orgs {
-  margin-bottom: 10px;
-}
-.widget_core_user_info.evo_user_info_location {
-  white-space: nowrap;
 }
 
 /**

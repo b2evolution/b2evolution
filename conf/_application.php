@@ -21,7 +21,7 @@ $app_version = '6.7.3-stable';
  * Release date (ISO)
  * @global string
  */
-$app_date = '2016-09-21';
+$app_date = '2016-09-23';
 
 /**
  * Long version string for checking differences

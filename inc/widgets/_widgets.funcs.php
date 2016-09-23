@@ -434,7 +434,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 				'thumb_size'        => 'crop-top-320x320',
 				'anon_thumb_size'   => 'crop-top-320x320-blur-8',
 				'anon_overlay_show' => '1',
-				'widget_css_class'  => 'main_profile_picture',
+				'widget_css_class'  => 'evo_user_profile_pics_main',
 			) );
 		// User info / Name:
 		add_basic_widget( $wico_id, 'user_info', 'core', 20, array(
@@ -528,9 +528,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 				'display_other'    => 1,
 				'link_to'          => 'fullsize',
 				'thumb_size'       => 'crop-top-80x80',
-				'before_image'     => '<div class="avatartag">',
-				'after_image'      => '</div>',
-				'widget_css_class' => 'other_profile_pictures',
+				'widget_css_class' => 'evo_user_profile_pics_other',
 			) );
 		// User fields:
 		add_basic_widget( $wico_id, 'user_fields', 'core', 20, array(

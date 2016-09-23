@@ -824,16 +824,6 @@ input.btn-lg {
 	max-width: 960px;
 	margin: auto;
 }
-div.main_profile_picture img {
-	.border-radius;
-}
-div.other_profile_pictures {
-	text-align: left;
-	margin-bottom: 10px;
-	img {
-		.border-radius;
-	}
-}
 .profile_column_left {
 	float: left;
 	width: 300px;
@@ -893,6 +883,49 @@ div.other_profile_pictures {
 @media (max-width: 375px) {
 	.evo_form .control-buttons .submit, .evo_form .control-buttons .preview { // Separates form buttons on low resolution when they are not inline
 		margin-bottom: 4px;
+	}
+}
+// Widgets on profile page (disp=user):
+.widget_core_user_info {
+	&.evo_user_info_name,
+	&.evo_user_info_nickname,
+	&.evo_user_info_login {
+		font-size: 30px;
+		font-weight: 500;
+		line-height: 1.1;
+		margin-top: 20px;
+		margin-bottom: 10px;
+	}
+	&.evo_user_info_name {
+		font-size: 36px;
+	}
+	&.evo_user_info_login {
+		color: #777;
+	}
+	&.evo_user_info_gender,
+	&.evo_user_info_location,
+	&.evo_user_info_orgs {
+		margin-bottom: 10px;
+	}
+	&.evo_user_info_location {
+		white-space: nowrap;
+	}
+}
+.widget_core_user_profile_pics {
+	&.evo_user_profile_pics_main,
+	&.evo_user_profile_pics_other {
+		img {
+			.border-radius;
+		}
+	}
+	&.evo_user_profile_pics_other {
+		text-align: left;
+		margin-bottom: 10px;
+		a {
+			display: inline-block;
+			vertical-align: top;
+			margin: 0 0.5em 0.5em 0;
+		}
 	}
 }
 
@@ -1070,31 +1103,4 @@ div.other_profile_pictures {
 }
 .evo_container__sidebar .evo_poll__title {
 	white-space: normal;
-}
-
-// Widgets on disp=user:
-.widget_core_user_info {
-	&.evo_user_info_name,
-	&.evo_user_info_nickname,
-	&.evo_user_info_login {
-		font-size: 30px;
-		font-weight: 500;
-		line-height: 1.1;
-		margin-top: 20px;
-		margin-bottom: 10px;
-	}
-	&.evo_user_info_name {
-		font-size: 36px;
-	}
-	&.evo_user_info_login {
-		color: #777;
-	}
-	&.evo_user_info_gender,
-	&.evo_user_info_location,
-	&.evo_user_info_orgs {
-		margin-bottom: 10px;
-	}
-	&.evo_user_info_location {
-		white-space: nowrap;
-	}
 }
