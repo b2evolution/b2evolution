@@ -110,31 +110,29 @@ echo '<div class="profile_column_right">';
 		'widget_user_fields_before_field_value' => '<div class="controls fixedform-controls form-control-static">',
 		'widget_user_fields_after_field_value'  => '</div></div>',
 		'widget_user_fields_after_group'        => '</div></div><fieldset>',
+		// The following (optional) params will be used as defaults for widgets with code "subcontainer":
+		'widget_params_by_code_subcontainer' => array(
+			// This will enclose each widget in a block:
+			'block_start'       => '<div class="$wi_class$"><fieldset class="fieldset"><div class="panel panel-default">',
+			'block_end'         => '</div><fieldset></div>',
+			// This will enclose the title of each widget:
+			'block_title_start' => '<legend class="panel-heading">',
+			'block_title_end'   => '</legend><div class="panel-body">',
+			// The following (optional) params will be used as defaults for widgets with code "user_info":
+			'widget_params_by_code_user_info' => array(
+				// This will enclose each widget in a block:
+				'block_start'       => '<div class="$wi_class$ form-group fixedform-group">',
+				'block_end'         => '</div>',
+				// This will enclose the title of each widget:
+				'block_title_start' => '<label class="control-label fixedform-label">',
+				'block_title_end'   => ':</label>',
+				// This will enclose the title of each widget:
+				'block_body_start'  => '<div class="controls fixedform-controls form-control-static">',
+				'block_body_end'    => '</div>',
+			),
+		),
 	) );
 	// ----------------------------- END OF "User Profile - Right" CONTAINER -----------------------------
-
-	$profileForm->begin_fieldset( T_( 'Reputation' ) );
-
-		$profileForm->info( T_('Joined'), mysql2localedate( $User->datecreated ) );
-
-		if( $Blog->get_setting( 'userdir_lastseen' ) )
-		{	// Display last visit only if it is enabled by current collection:
-			$profileForm->info( T_('Last seen on'), get_lastseen_date( $User->get( 'lastseen_ts' ), $Blog->get_setting( 'userdir_lastseen_view' ), $Blog->get_setting( 'userdir_lastseen_cheat' ) ) );
-		}
-
-		$profileForm->info( T_('Number of posts'), $User->get_reputation_posts() );
-
-		$profileForm->info( T_('Comments'), '<span class="reputation_message">'.$User->get_reputation_comments().'</span>' );
-
-		$profileForm->info( T_('Photos'), '<span class="reputation_message">'.$User->get_reputation_files( array( 'file_type' => 'image' ) ).'</span>' );
-
-		$profileForm->info( T_('Audio'), '<span class="reputation_message">'.$User->get_reputation_files( array( 'file_type' => 'audio' ) ).'</span>' );
-
-		$profileForm->info( T_('Other files'), '<span class="reputation_message">'.$User->get_reputation_files( array( 'file_type' => 'other' ) ).'</span>' );
-
-		$profileForm->info( T_('Spam fighter score'), '<span class="reputation_message">'.$User->get_reputation_spam().'</span>' );
-
-	$profileForm->end_fieldset();
 
 	$Plugins->trigger_event( 'DisplayProfileFormFieldset', array( 'Form' => & $profileForm, 'User' => & $User, 'edit_layout' => 'public' ) );
 

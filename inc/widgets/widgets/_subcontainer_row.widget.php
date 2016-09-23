@@ -148,6 +148,11 @@ class subcontainer_row_Widget extends ComponentWidget
 
 		echo $this->disp_params['rwd_start'];
 
+		if( isset( $params['widget_params_by_code_'.$this->code] ) )
+		{	// Use specific widget params if they are defined for this widget by code:
+			$params = array_merge( $params, $params['widget_params_by_code_'.$this->code] );
+		}
+
 		for( $i = 1; $i <= 6; $i++ )
 		{
 			if( empty( $this->disp_params['column'.$i.'_container'] ) )
@@ -216,6 +221,9 @@ class subcontainer_row_Widget extends ComponentWidget
 			{	// Let the Widget display itself (with contextual params):
 				$widget_timer_name = 'Widget->display('.$ComponentWidget->code.')';
 				$Timer->start( $widget_timer_name );
+				// Clear the display params in order to use new custom if they are defined for this widget from skin side by param "widget_params_by_code_subcontainer_row":
+				// (otherwise the params will be used from first initialized widget container by $subcontainer_code)
+				$ComponentWidget->disp_params = NULL;
 				$ComponentWidget->display_with_cache( $params );
 				$Timer->pause( $widget_timer_name );
 			}

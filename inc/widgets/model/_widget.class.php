@@ -566,6 +566,10 @@ class ComponentWidget extends DataObject
 					'limit' => 100,
 				), $widget_defaults, $params, $this->param_array );
 
+		if( isset( $params['widget_params_by_code_'.$this->code] ) )
+		{	// Use specific widget params if they are defined for this widget by code:
+			$params = array_merge( $params, $params['widget_params_by_code_'.$this->code] );
+		}
 
 		// Customize params to the current widget:
 
