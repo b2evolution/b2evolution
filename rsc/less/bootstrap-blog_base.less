@@ -1071,3 +1071,30 @@ div.other_profile_pictures {
 .evo_container__sidebar .evo_poll__title {
 	white-space: normal;
 }
+
+// Widgets on disp=user:
+.widget_core_user_info {
+	&.evo_user_info_name,
+	&.evo_user_info_nickname,
+	&.evo_user_info_login {
+		font-size: 30px;
+		font-weight: 500;
+		line-height: 1.1;
+		margin-top: 20px;
+		margin-bottom: 10px;
+	}
+	&.evo_user_info_name {
+		font-size: 36px;
+	}
+	&.evo_user_info_login {
+		color: #777;
+	}
+	&.evo_user_info_gender,
+	&.evo_user_info_location,
+	&.evo_user_info_orgs {
+		margin-bottom: 10px;
+	}
+	&.evo_user_info_location {
+		white-space: nowrap;
+	}
+}

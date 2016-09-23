@@ -111,20 +111,6 @@ class user_info_Widget extends ComponentWidget
 						),
 					'defaultvalue' => 'name',
 				),
-				'before_info' => array(
-					'type'         => 'html_input',
-					'label'        => T_('Before info'),
-					'note'         => T_('HTML text to display before info value.'),
-					'defaultvalue' => '',
-					'size'         => 60,
-				),
-				'after_info' => array(
-					'type'         => 'html_input',
-					'label'        => T_('After info'),
-					'note'         => T_('HTML text to display after info value.'),
-					'defaultvalue' => '',
-					'size'         => 60,
-				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -298,11 +284,7 @@ class user_info_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		echo $this->get_param( 'before_info' );
-
 		echo $r;
-
-		echo $this->get_param( 'after_info' );
 
 		echo $this->disp_params['block_body_end'];
 

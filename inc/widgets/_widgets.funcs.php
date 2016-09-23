@@ -438,35 +438,30 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 			) );
 		// User info / Name:
 		add_basic_widget( $wico_id, 'user_info', 'core', 20, array(
-				'info'        => 'name',
-				'before_info' => '<h1>',
-				'after_info'  => '</h1>',
+				'info'             => 'name',
+				'widget_css_class' => 'evo_user_info_name',
 			) );
 		// User info / Nickname:
 		add_basic_widget( $wico_id, 'user_info', 'core', 30, array(
-				'info'        => 'nickname',
-				'before_info' => '<h2>',
-				'after_info'  => '</h2>',
+				'info'             => 'nickname',
+				'widget_css_class' => 'evo_user_info_nickname',
 			) );
 		// User info / Login:
 		add_basic_widget( $wico_id, 'user_info', 'core', 40, array(
-				'info'        => 'login',
-				'before_info' => '<h2 class="text-muted">',
-				'after_info'  => '</h2>',
+				'info'             => 'login',
+				'widget_css_class' => 'evo_user_info_login',
 			) );
 		// Free HTML / Separator:
 		add_basic_widget( $wico_id, 'separator', 'core', 60 );
 		// User info / :
 		add_basic_widget( $wico_id, 'user_info', 'core', 70, array(
-				'info'        => 'gender_age',
-				'before_info' => '<p>',
-				'after_info'  => '</p>',
+				'info'             => 'gender_age',
+				'widget_css_class' => 'evo_user_info_gender',
 			) );
 		// User info / Location:
 		add_basic_widget( $wico_id, 'user_info', 'core', 80, array(
-				'info'        => 'location',
-				'before_info' => '<p>',
-				'after_info'  => '</p>',
+				'info'             => 'location',
+				'widget_css_class' => 'evo_user_info_location',
 			) );
 		// Free HTML / Separator:
 		add_basic_widget( $wico_id, 'separator', 'core', 90 );
@@ -516,10 +511,9 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		add_basic_widget( $wico_id, 'separator', 'core', 160 );
 		// User info / Organizations:
 		add_basic_widget( $wico_id, 'user_info', 'core', 170, array(
-				'info'        => 'orgs',
-				'title'       => T_('Organizations').':',
-				'before_info' => '<p>',
-				'after_info'  => '</p>',
+				'info'             => 'orgs',
+				'title'            => T_('Organizations').':',
+				'widget_css_class' => 'evo_user_info_orgs',
 			) );
 	}
 
