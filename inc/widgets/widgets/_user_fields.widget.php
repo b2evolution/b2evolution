@@ -87,62 +87,6 @@ class user_fields_Widget extends ComponentWidget
 					'size' => 40,
 					'defaultvalue' => '',
 				),
-				'before_group' => array(
-					'type'         => 'html_input',
-					'label'        => T_('Before group'),
-					'note'         => T_('HTML text to display before fields group.'),
-					'defaultvalue' => '<div>',
-					'size'         => 100,
-				),
-				'before_group_title' => array(
-					'type'         => 'html_input',
-					'label'        => T_('Before group title'),
-					'note'         => T_('HTML text to display before fields group title.'),
-					'defaultvalue' => '<h3>',
-					'size'         => 100,
-				),
-				'after_group_title' => array(
-					'type'         => 'html_input',
-					'label'        => T_('After group title'),
-					'note'         => T_('HTML text to display after fields group title.'),
-					'defaultvalue' => '</h3>',
-					'size'         => 100,
-				),
-				'before_field_title' => array(
-					'type'         => 'html_input',
-					'label'        => T_('Before field title'),
-					'note'         => T_('HTML text to display before field title.'),
-					'defaultvalue' => '<p><strong>',
-					'size'         => 100,
-				),
-				'after_field_title' => array(
-					'type'         => 'html_input',
-					'label'        => T_('After field title'),
-					'note'         => T_('HTML text to display after field title.'),
-					'defaultvalue' => ':</strong> ',
-					'size'         => 100,
-				),
-				'before_field_value' => array(
-					'type'         => 'html_input',
-					'label'        => T_('Before field value'),
-					'note'         => T_('HTML text to display before field value.'),
-					'defaultvalue' => '',
-					'size'         => 100,
-				),
-				'after_field_value' => array(
-					'type'         => 'html_input',
-					'label'        => T_('After field value'),
-					'note'         => T_('HTML text to display after field value.'),
-					'defaultvalue' => '</p>',
-					'size'         => 100,
-				),
-				'after_group' => array(
-					'type'         => 'html_input',
-					'label'        => T_('After group'),
-					'note'         => T_('HTML text to display after fields group.'),
-					'defaultvalue' => '</div>',
-					'size'         => 100,
-				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -159,6 +103,17 @@ class user_fields_Widget extends ComponentWidget
 		global $Settings;
 
 		$this->init_display( $params );
+
+		$this->disp_params = array_merge( array(
+				'widget_user_fields_before_group'       => '<div>',
+				'widget_user_fields_before_group_title' => '<h3>',
+				'widget_user_fields_after_group_title'  => '</h3>',
+				'widget_user_fields_before_field_title' => '<p><strong>',
+				'widget_user_fields_after_field_title'  => ':</strong> ',
+				'widget_user_fields_before_field_value' => '',
+				'widget_user_fields_after_field_value'  => '</p>',
+				'widget_user_fields_after_group'        => '</div>',
+			), $this->disp_params );
 
 		if( ! ( $target_User = & $this->get_target_User() ) )
 		{	// The target user is not detected, Nothing to display:
@@ -188,13 +143,13 @@ class user_fields_Widget extends ComponentWidget
 			{	// Start new group:
 				if( $group_ID > 0 )
 				{	// End previous group:
-					echo $this->get_param( 'after_group' );
+					echo $this->disp_params['widget_user_fields_after_group'];
 				}
-				echo $this->get_param( 'before_group' );
+				echo $this->disp_params['widget_user_fields_before_group'];
 				// Group title:
-				echo $this->get_param( 'before_group_title' );
+				echo $this->disp_params['widget_user_fields_before_group_title'];
 				echo $userfield->ufgp_name;
-				echo $this->get_param( 'after_group_title' );
+				echo $this->disp_params['widget_user_fields_after_group_title'];
 			}
 
 			if( $userfield->ufdf_type == 'text' )
@@ -209,20 +164,20 @@ class user_fields_Widget extends ComponentWidget
 			}
 
 			// Field title:
-			echo $this->get_param( 'before_field_title' )
+			echo $this->disp_params['widget_user_fields_before_field_title']
 				.$userfield_icon.$userfield->ufdf_name
-				.$this->get_param( 'after_field_title' );
+				.$this->disp_params['widget_user_fields_after_field_title'];
 
 			// Field value:
-			echo $this->get_param( 'before_field_value' )
+			echo $this->disp_params['widget_user_fields_before_field_value']
 				.$userfield->uf_varchar
-				.$this->get_param( 'after_field_value' );
+				.$this->disp_params['widget_user_fields_after_field_value'];
 
 			$group_ID = $userfield->ufgp_ID;
 		}
 		if( $group_ID > 0 )
 		{	// End group if user fields are exist:
-			echo $this->get_param( 'after_group' );
+			echo $this->disp_params['widget_user_fields_after_group'];
 		}
 
 		echo $this->disp_params['block_body_end'];

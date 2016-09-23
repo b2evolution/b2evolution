@@ -515,16 +515,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 				'widget_css_class' => 'evo_user_profile_pics_other',
 			) );
 		// User fields:
-		add_basic_widget( $wico_id, 'user_fields', 'core', 20, array(
-				'before_group'       => '<fieldset class="fieldset"><div class="panel panel-default">',
-				'before_group_title' => '<legend class="panel-heading">',
-				'after_group_title'  => '</legend><div class="panel-body">',
-				'before_field_title' => '<div class="form-group fixedform-group"><label class="control-label fixedform-label">',
-				'after_field_title'  => ':</label>',
-				'before_field_value' => '<div class="controls fixedform-controls form-control-static">',
-				'after_field_value'  => '</div></div>',
-				'after_group'        => '</div></div><fieldset>',
-			) );
+		add_basic_widget( $wico_id, 'user_fields', 'core', 20 );
 		// Reputation:
 		add_basic_widget( $wico_id, 'subcontainer', 'core', 30, array(
 				'title'     => T_('Reputation'),

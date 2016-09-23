@@ -101,6 +101,15 @@ echo '<div class="profile_column_right">';
 		// This will enclose the title of each widget:
 		'block_title_start' => '<h3>',
 		'block_title_end' => '</h3>',
+		// Template params for "User fields" widget:
+		'widget_user_fields_before_group'       => '<fieldset class="fieldset"><div class="panel panel-default">',
+		'widget_user_fields_before_group_title' => '<legend class="panel-heading">',
+		'widget_user_fields_after_group_title'  => '</legend><div class="panel-body">',
+		'widget_user_fields_before_field_title' => '<div class="form-group fixedform-group"><label class="control-label fixedform-label">',
+		'widget_user_fields_after_field_title'  => ':</label>',
+		'widget_user_fields_before_field_value' => '<div class="controls fixedform-controls form-control-static">',
+		'widget_user_fields_after_field_value'  => '</div></div>',
+		'widget_user_fields_after_group'        => '</div></div><fieldset>',
 	) );
 	// ----------------------------- END OF "User Profile - Right" CONTAINER -----------------------------
 
