@@ -7942,6 +7942,20 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12105, 'Upgrade items table...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( "ALTER TABLE T_items__item
+			MODIFY post_status ENUM('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NOT NULL DEFAULT 'draft'" );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12110, 'Upgrade comments table...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( "ALTER TABLE T_comments
+			MODIFY comment_status ENUM('published','community','deprecated','protected','private','review','draft','trash') COLLATE ascii_general_ci DEFAULT 'draft' NOT NULL" );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
