@@ -125,6 +125,22 @@ function evo_link_insert_inline( type, link_ID, caption )
 
 
 /**
+ * Insert short tag into the post
+ *
+ * @param string Type: 'image', 'file', 'video'
+ * @param integer File ID
+ * @param string Caption text
+ */
+function evo_link_insert_tag( insert_tag )
+{
+	if( typeof( b2evoCanvas ) != 'undefined' )
+	{ // Canvas exists, insert tag
+		textarea_wrap_selection( b2evoCanvas, insert_tag, '', 1, window.document );
+	}
+}
+
+
+/**
  * Unlink/Delete an attachment from Item or Comment
  *
  * @param object Event object

@@ -3534,6 +3534,76 @@ function item_priority_color( $priority )
 
 
 /**
+ * Prints out Javascript to open image insert modal
+ */
+function echo_image_insert_modal()
+{
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+?>
+<script type="text/javascript">
+	function evo_item_image_insert( blog, tagType, linkID, callback )
+	{
+		var evo_js_lang_loading = '<?php echo TS_('Loading');?>';
+		var evo_js_lang_insert_image = '<?php echo T_('Insert image into post');?>';
+		var evo_js_lang_modal_action = '<?php echo TS_('Insert');?>';
+		evo_js_lang_close = '<?php echo TS_('Cancel');?>';
+
+		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="' + evo_js_lang_loading + '"></span>',
+			'800px', '480px', true, evo_js_lang_insert_image, evo_js_lang_modal_action, true );
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo get_htsrv_url(); ?>anon_async.php',
+			data:
+			{
+				'action': 'get_insert_image_form',
+				'tag_type': tagType,
+				'link_ID': linkID,
+				'blog': blog,
+				'callback': callback
+			},
+			success: function(result)
+			{
+				openModalWindow( result, '90%', '80%', true, evo_js_lang_insert_image, evo_js_lang_modal_action );
+			}
+		} );
+		return false;
+	}
+
+	function evo_item_image_edit( blog, shortTag, callback )
+	{
+		var evo_js_lang_loading = '<?php echo TS_('Loading');?>';
+		var evo_js_lang_edit_image = '<?php echo T_('Edit image');?>';
+		var evo_js_lang_modal_action = '<?php echo TS_('Update');?>';
+		evo_js_lang_close = '<?php echo TS_('Cancel');?>';
+
+		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="' + evo_js_lang_loading + '"></span>',
+			'800px', '480px', true, evo_js_lang_edit_image, evo_js_lang_modal_action, true );
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo get_htsrv_url(); ?>anon_async.php',
+			data:
+			{
+				'action': 'get_edit_image_form',
+				'short_tag': shortTag,
+				'blog': blog,
+				'callback': callback
+			},
+			success: function(result)
+			{
+				openModalWindow( result, '90%', '80%', true, evo_js_lang_edit_image, evo_js_lang_modal_action );
+			}
+		} );
+		return false;
+	}
+</script>
+<?php
+}
+
+
+/**
  * Display the manual pages results table
  *
  * @param array Params

@@ -468,7 +468,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 		{
 			$r .= ' '.get_icon( 'add__yellow', 'imgtag', array(
 					'title'   => T_('Insert thumbnail into the post'),
-					'onclick' => 'evo_link_insert_inline( \'thumbnail\', '.$link_ID.', \'medium:left\' )',
+					'onclick' => 'evo_item_image_insert( '.$blog.', \'image\', '.$link_ID.', \'evo_link_insert_tag\' )',
 					'style'   => 'cursor:default;'
 				) );
 		}

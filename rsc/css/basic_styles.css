@@ -63,6 +63,7 @@ abbr {
 pre,
 code {
   -webkit-hyphens: none;
+     -moz-hyphens: none;
       -ms-hyphens: none;
           hyphens: none;
 }
