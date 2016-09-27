@@ -526,6 +526,8 @@ class ComponentWidget extends DataObject
 					'list_end' => '</ul>',
 					'item_start' => '<li>',
 					'item_end' => '</li>',
+					'item_title_start' => '<strong>',
+					'item_title_end' => ':</strong> ',
 					'link_default_class' => 'default',
 					'link_selected_class' => 'selected',
 					'item_text_start' => '',

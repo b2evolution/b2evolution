@@ -102,14 +102,18 @@ echo '<div class="profile_column_right">';
 		'block_title_start' => '<h3>',
 		'block_title_end' => '</h3>',
 		// Template params for "User fields" widget:
-		'widget_user_fields_before_group'       => '<fieldset class="fieldset"><div class="panel panel-default">',
-		'widget_user_fields_before_group_title' => '<legend class="panel-heading">',
-		'widget_user_fields_after_group_title'  => '</legend><div class="panel-body">',
-		'widget_user_fields_before_field_title' => '<div class="form-group fixedform-group"><label class="control-label fixedform-label">',
-		'widget_user_fields_after_field_title'  => ':</label>',
-		'widget_user_fields_before_field_value' => '<div class="controls fixedform-controls form-control-static">',
-		'widget_user_fields_after_field_value'  => '</div></div>',
-		'widget_user_fields_after_group'        => '</div></div><fieldset>',
+		'group_start'      => '<fieldset class="fieldset"><div class="panel panel-default">',
+		'group_item_start' => '<legend class="panel-heading">',
+		'group_item_end'   => '</legend>',
+		'list_start'       => '<div class="panel-body">',
+		'item_start'       => '<div class="form-group fixedform-group">',
+		'item_title_start' => '<label class="control-label fixedform-label">',
+		'item_title_end'   => ':</label>',
+		'item_text_start'  => '<div class="controls fixedform-controls form-control-static">',
+		'item_text_end'    => '</div>',
+		'item_end'         => '</div>',
+		'list_end'         => '</div>',
+		'group_end'        => '</div><fieldset>',
 		// The following (optional) params will be used as defaults for widgets with code "subcontainer":
 		'widget_params_by_code_subcontainer' => array(
 			// This will enclose each widget in a block:

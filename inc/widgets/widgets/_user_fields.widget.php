@@ -104,17 +104,6 @@ class user_fields_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		$this->disp_params = array_merge( array(
-				'widget_user_fields_before_group'       => '<div>',
-				'widget_user_fields_before_group_title' => '<h3>',
-				'widget_user_fields_after_group_title'  => '</h3>',
-				'widget_user_fields_before_field_title' => '<p><strong>',
-				'widget_user_fields_after_field_title'  => ':</strong> ',
-				'widget_user_fields_before_field_value' => '',
-				'widget_user_fields_after_field_value'  => '</p>',
-				'widget_user_fields_after_group'        => '</div>',
-			), $this->disp_params );
-
 		if( ! ( $target_User = & $this->get_target_User() ) )
 		{	// The target user is not detected, Nothing to display:
 			return true;
@@ -140,17 +129,26 @@ class user_fields_Widget extends ComponentWidget
 		foreach( $target_User->userfields as $userfield )
 		{
 			if( $group_ID != $userfield->ufgp_ID )
-			{	// Start new group:
+			{	// If new group is starting:
 				if( $group_ID > 0 )
 				{	// End previous group:
-					echo $this->disp_params['widget_user_fields_after_group'];
+					echo $this->disp_params['list_end'];
+					echo $this->disp_params['group_end'];
 				}
-				echo $this->disp_params['widget_user_fields_before_group'];
+				// Start new group:
+				echo $this->disp_params['group_start'];
+
 				// Group title:
-				echo $this->disp_params['widget_user_fields_before_group_title'];
+				echo $this->disp_params['group_item_start'];
 				echo $userfield->ufgp_name;
-				echo $this->disp_params['widget_user_fields_after_group_title'];
+				echo $this->disp_params['group_item_end'];
+
+				// Start list of user fields:
+				echo $this->disp_params['list_start'];
 			}
+
+			// Start user field:
+			echo $this->disp_params['item_start'];
 
 			if( $userfield->ufdf_type == 'text' )
 			{	// Convert textarea values to html format:
@@ -164,20 +162,24 @@ class user_fields_Widget extends ComponentWidget
 			}
 
 			// Field title:
-			echo $this->disp_params['widget_user_fields_before_field_title']
+			echo $this->disp_params['item_title_start']
 				.$userfield_icon.$userfield->ufdf_name
-				.$this->disp_params['widget_user_fields_after_field_title'];
+				.$this->disp_params['item_title_end'];
 
 			// Field value:
-			echo $this->disp_params['widget_user_fields_before_field_value']
+			echo $this->disp_params['item_text_start']
 				.$userfield->uf_varchar
-				.$this->disp_params['widget_user_fields_after_field_value'];
+				.$this->disp_params['item_text_end'];
 
 			$group_ID = $userfield->ufgp_ID;
+
+			// End user field:
+			echo $this->disp_params['item_end'];
 		}
 		if( $group_ID > 0 )
-		{	// End group if user fields are exist:
-			echo $this->disp_params['widget_user_fields_after_group'];
+		{	// End group if user fields have been found:
+			echo $this->disp_params['list_end'];
+			echo $this->disp_params['group_end'];
 		}
 
 		echo $this->disp_params['block_body_end'];
