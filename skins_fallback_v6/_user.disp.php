@@ -115,7 +115,7 @@ echo '<div class="profile_column_right">';
 		'list_end'         => '</div>',
 		'group_end'        => '</div><fieldset>',
 		// The following (optional) params will be used as defaults for widgets with code "subcontainer":
-		'widget_params_by_code_subcontainer' => array(
+		'override_params_for_subcontainer' => array(
 			// This will enclose each widget in a block:
 			'block_start'       => '<div class="$wi_class$"><fieldset class="fieldset"><div class="panel panel-default">',
 			'block_end'         => '</div><fieldset></div>',
@@ -123,7 +123,7 @@ echo '<div class="profile_column_right">';
 			'block_title_start' => '<legend class="panel-heading">',
 			'block_title_end'   => '</legend><div class="panel-body">',
 			// The following (optional) params will be used as defaults for widgets with code "user_info":
-			'widget_params_by_code_user_info' => array(
+			'override_params_for_user_info' => array(
 				// This will enclose each widget in a block:
 				'block_start'       => '<div class="$wi_class$ form-group fixedform-group">',
 				'block_end'         => '</div>',
