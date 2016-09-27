@@ -176,7 +176,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 			{
 				echo '<div class="ft_assigned col-lg-2 col-md-2 col-sm-3 col-sm-offset-0 col-xs-6">';
 				echo '<div class="ft_assigned_header">';
-				echo '<a href="'.$url.'"  style="color: '.$priority_color.';">'.T_('Assigned to:').'</a>';
+				echo '<a href="'.$url.'"  style="color: '.$priority_color.';">'.T_('Assigned to').':</a>';
 				echo '</div>';
 
 				// Assigned user avatar
