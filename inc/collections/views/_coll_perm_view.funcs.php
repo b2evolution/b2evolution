@@ -882,6 +882,16 @@ function colls_groups_perms_results( & $Results, $params = array() )
 			'td_class' => 'center',
 		);
 
+	// Analytics:
+	$Results->cols[] = array(
+			'th' => T_('Analytics'),
+			'th_class' => 'checkright',
+			'order' => 'bloggroup_perm_analytics',
+			'default_dir' => 'D',
+			'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_analytics\', \''.format_to_output( T_('Permission to view collection\'s analytics'), 'htmlattr' ).'\' )%',
+			'td_class' => 'center',
+		);
+
 	$Results->cols[] = array(
 			'th' => '&nbsp;',
 			'td' => '%perm_check_all( {row}, \'bloggroup_\' )%',

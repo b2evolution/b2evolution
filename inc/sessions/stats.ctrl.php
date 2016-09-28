@@ -52,11 +52,11 @@ if( $tab == 'domains' && $current_User->check_perm( 'stats', 'edit' ) )
 	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 }
 
-if( $blog == 0 )
+if( $blog == 0 || ! $current_User->check_perm( 'stats', 'list', false, $blog ) )
 {
 	if( ! $perm_view_all && isset( $collections_Module ) )
 	{ // Find a blog we can view stats for:
-		if( ! $selected = autoselect_blog( 'stats', 'view' ) )
+		if( ! $selected = autoselect_blog( 'stats', 'list' ) )
 		{ // No blog could be selected
 			$Messages->add( T_('Sorry, there is no blog you have permission to view stats for.'), 'error' );
 			$action = 'nil';

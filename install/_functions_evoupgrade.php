@@ -7565,8 +7565,28 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11800, 'Upgrading collection-user permissions table...' ) )
+	{	// part of 6.7.7-stable
+		$DB->query( 'ALTER TABLE T_coll_user_perms
+			ADD bloguser_perm_analytics tinyint NOT NULL default 0' );
+		$DB->query( 'UPDATE T_coll_user_perms
+			  SET bloguser_perm_analytics = 1
+			WHERE bloguser_perm_properties = 1' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11805, 'Upgrading collection-group permissions table...' ) )
+	{	// part of 6.7.7-stable
+		$DB->query( 'ALTER TABLE T_coll_group_perms
+			ADD bloggroup_perm_analytics tinyint NOT NULL default 0' );
+		$DB->query( 'UPDATE T_coll_group_perms
+			  SET bloggroup_perm_analytics = 1
+			WHERE bloggroup_perm_properties = 1' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 12000, 'Add new types "Text" and "HTML" for custom fields of item types...' ) )
-	{	// part of 6.7.5-stable
+	{	// part of 6.8.0-alpha
 		$DB->query( 'ALTER TABLE T_items__item_settings
 			MODIFY COLUMN iset_value varchar( 10000 ) NULL' );
 		$DB->query( 'ALTER TABLE T_items__type_custom_field
@@ -7575,7 +7595,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12005, 'Update widget container "Item Single"...' ) )
-	{	// part of 6.7.5-stable
+	{	// part of 6.8.0-alpha
 		$DB->begin();
 		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
 		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_code, wi_order' );
@@ -7633,7 +7653,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12010, 'Create new widget container "404 Page"...' ) )
-	{	// part of 6.7.5-stable
+	{	// part of 6.8.0-alpha
 		$coll_IDs = $DB->get_col( 'SELECT blog_ID FROM T_blogs' );
 		if( $coll_IDs )
 		{
@@ -7652,7 +7672,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12015, 'Rename table "T_antispam" to "T_antispam__keyword"...' ) )
-	{	// part of 6.7.5-stable
+	{	// part of 6.8.0-alpha
 		$DB->query( 'RENAME TABLE '.$tableprefix.'antispam TO T_antispam__keyword' );
 		$DB->query( "ALTER TABLE T_antispam__keyword
 			CHANGE aspm_ID     askw_ID     bigint(11) NOT NULL auto_increment,

@@ -354,7 +354,8 @@ class BlogCache extends DataObjectCache
 		$Group = $for_User->Group;
 		// First check if we have a global access perm:
 		if( $Group->check_perm( 'blogs', $permlevel ) ||
-		    ( $permname == 'blog_media_browse' && $Group->check_perm( 'files', 'edit' ) ) )
+		    ( $permname == 'blog_media_browse' && $Group->check_perm( 'files', 'edit' ) ) ||
+		    ( $permname == 'stats' && $Group->check_perm( 'stats', 'view' ) ) )
 		{ // If group grants a global permission:
 			$this->clear();
 			if( isset( $sql_filter ) )
@@ -413,7 +414,8 @@ class BlogCache extends DataObjectCache
 				break;
 
 			case 'stats':
-				$permname = 'blog_properties';	// TEMP
+				$permname = 'blog_analytics';
+			case 'blog_analytics':
 			case 'blog_cats':
 			case 'blog_properties':
 			case 'blog_admin':

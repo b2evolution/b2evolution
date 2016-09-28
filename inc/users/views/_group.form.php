@@ -227,7 +227,7 @@ $Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_prope
 							array( 'user', T_('View stats for specific blogs'), T_('Based on each blog\'s edit permissions') ), // fp> dirty hack, I'll tie this to blog edit perm for now
 							array( 'view', T_('View stats for all blogs') ),
 							array( 'edit', T_('Full Access'), T_('Includes deleting/reassigning of stats') )
-						), T_('Stats'), true );
+						), T_('Analytics'), true );
 
 	// Display pluggable permissions:
 	display_pluggable_permissions( $Form, 'additional' );
