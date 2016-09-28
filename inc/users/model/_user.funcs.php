@@ -2103,6 +2103,7 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 						'blog_media_upload'       => 0,
 						'blog_media_browse'       => 0,
 						'blog_media_change'       => 0,
+						'blog_analytics'          => 0,
 					);
 			}
 		}
