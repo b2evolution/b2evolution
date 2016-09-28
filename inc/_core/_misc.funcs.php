@@ -8226,6 +8226,9 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					$current_image_params = $params;
 					$current_file_params = array();
 
+					// Use image class for inline img tags:
+					$current_file_params['class'] = ( empty( $current_image_params['image_class'] ) ? '' : $current_image_params['image_class'] );
+
 					if( ! empty( $inline[3] ) ) // check if second colon is present
 					{
 						// Get the inline params: caption and class
@@ -8252,13 +8255,11 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						{ // A class name is set for the inline tags
 							$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $class_index ] ) ) );
 							if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
-							{ // Overwrite 'before_image' setting to add an extra class name
-								$current_image_params['before_image'] = '<div class="image_block '.$image_extraclass.'">';
-								// 'after_image' setting must be also defined, becuase it may be different than the default '</div>'
-								$current_image_params['after_image'] = '</div>';
+							{	// Overwrite 'before_image' setting to add an extra class name:
+								$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $image_extraclass ) );
 
-								// Set class for file inline tags
-								$current_file_params['class'] = $image_extraclass;
+								// Append extra class to file inline img tags:
+								$current_file_params['class'] = trim( $current_file_params['class'].' '.$image_extraclass );
 							}
 						}
 					}
@@ -8311,10 +8312,8 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						}
 					}
 					elseif( $inline_type == 'inline' )
-					{ // Generate simple IMG tag with original image size
-						$inlines[$current_inline] = '<img src="'.$File->get_url().'"'
-							.( empty( $current_file_params['class'] ) ? '' : ' class="'.$current_file_params['class'].'"' )
-							.' />';
+					{	// Generate simple IMG tag with resized image size:
+						$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '', $current_file_params['class'], '', '', '' );
 					}
 				}
 				else
