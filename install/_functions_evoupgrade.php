@@ -7565,6 +7565,26 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11800, 'Upgrading collection-user permissions table...' ) )
+	{	// part of 6.7.7-stable
+		$DB->query( 'ALTER TABLE T_coll_user_perms
+			ADD bloguser_perm_analytics tinyint NOT NULL default 0' );
+		$DB->query( 'UPDATE T_coll_user_perms
+			  SET bloguser_perm_analytics = 1
+			WHERE bloguser_perm_properties = 1' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11805, 'Upgrading collection-group permissions table...' ) )
+	{	// part of 6.7.7-stable
+		$DB->query( 'ALTER TABLE T_coll_group_perms
+			ADD bloggroup_perm_analytics tinyint NOT NULL default 0' );
+		$DB->query( 'UPDATE T_coll_group_perms
+			  SET bloggroup_perm_analytics = 1
+			WHERE bloggroup_perm_properties = 1' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

@@ -2073,6 +2073,7 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 				'blog_media_upload'       => $row[$prefix.'_perm_media_upload'],
 				'blog_media_browse'       => $row[$prefix.'_perm_media_browse'],
 				'blog_media_change'       => $row[$prefix.'_perm_media_change'],
+				'blog_analytics'          => $row[$prefix.'_perm_analytics'],
 			);
 	}
 
@@ -2137,10 +2138,9 @@ function check_blog_advanced_perm( & $blog_perms, $user_ID, $permname, $permleve
 	switch( $permname )
 	{
 		case 'stats':
-			// Wiewing stats is the same perm as being authorized to edit properties: (TODO...)
 			if( $permlevel == 'view' )
 			{
-				return $blog_perms['blog_properties'];
+				return $blog_perms['blog_analytics'];
 			}
 			// No other perm can be granted here (TODO...)
 			return false;

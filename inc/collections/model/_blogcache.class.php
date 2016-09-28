@@ -413,7 +413,8 @@ class BlogCache extends DataObjectCache
 				break;
 
 			case 'stats':
-				$permname = 'blog_properties';	// TEMP
+				$permname = 'blog_analytics';
+			case 'blog_analytics':
 			case 'blog_cats':
 			case 'blog_properties':
 			case 'blog_admin':

@@ -3006,14 +3006,16 @@ class Blog extends DataObject
 						bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts,
 						bloguser_perm_cmtstatuses, bloguser_perm_edit_cmt,
 						bloguser_perm_meta_comment, bloguser_perm_cats, bloguser_perm_properties, bloguser_perm_admin,
-						bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
+						bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change,
+						bloguser_perm_analytics )
 					VALUES ( '.$this->ID.', '.$this->owner_user_ID.', 1, 1,
 						"published,community,deprecated,protected,private,review,draft,redirected", "admin", "all",
 						1, 1,
 						1, 1, 1,
 						"published,community,deprecated,protected,private,review,draft", "all",
 						1, 1, 1, 1,
-						1, 1, 1 )' );
+						1, 1, 1,
+						1 )' );
 		}
 
 		// Create default category:
@@ -3135,7 +3137,8 @@ class Blog extends DataObject
 				{prefix}perm_edit, {prefix}perm_delpost, {prefix}perm_edit_ts, {prefix}perm_delcmts,
 				{prefix}perm_recycle_owncmts, {prefix}perm_vote_spam_cmts, {prefix}perm_cmtstatuses,
 				{prefix}perm_edit_cmt, {prefix}perm_meta_comment, {prefix}perm_cats, {prefix}perm_properties,
-				{prefix}perm_admin, {prefix}perm_media_upload, {prefix}perm_media_browse, {prefix}perm_media_change';
+				{prefix}perm_admin, {prefix}perm_media_upload, {prefix}perm_media_browse, {prefix}perm_media_change,
+				{prefix}perm_analytics';
 
 		// Copy all permissions "collection per user" from duplicated collection to new created:
 		$coll_user_perm_fields = 'bloguser_user_ID, '.str_replace( '{prefix}', 'bloguser_', $coll_perm_fields );
@@ -3255,6 +3258,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 1,
 				'perm_media_browse'    => 1,
 				'perm_media_change'    => 1,
+				'perm_analytics'       => 1,
 			),
 			'moderators' => array(
 				'ismember'             => 1,
@@ -3276,6 +3280,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 1,
 				'perm_media_browse'    => 1,
 				'perm_media_change'    => 1,
+				'perm_analytics'       => 0,
 			),
 			'editors' => array(
 				'ismember'             => 1,
@@ -3297,6 +3302,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 1,
 				'perm_media_browse'    => 1,
 				'perm_media_change'    => 0,
+				'perm_analytics'       => 0,
 			)
 		);
 		if( $this->type == 'forum' )
@@ -3321,6 +3327,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 1,
 				'perm_media_browse'    => 1,
 				'perm_media_change'    => 0,
+				'perm_analytics'       => 0,
 			);
 			$group_permissions['users'] = array(
 				'ismember'             => 1,
@@ -3342,6 +3349,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 1,
 				'perm_media_browse'    => 0,
 				'perm_media_change'    => 0,
+				'perm_analytics'       => 0,
 			);
 			$group_permissions['suspect'] = array(
 				'ismember'             => 1,
@@ -3363,6 +3371,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 0,
 				'perm_media_browse'    => 0,
 				'perm_media_change'    => 0,
+				'perm_analytics'       => 0,
 			);
 		}
 
@@ -3388,6 +3397,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 0,
 				'perm_media_browse'    => 0,
 				'perm_media_change'    => 0,
+				'perm_analytics'       => 0,
 			);
 		}
 
