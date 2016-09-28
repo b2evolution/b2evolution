@@ -2815,7 +2815,7 @@ class User extends DataObject
 				$this->get_Group();
 
 				// Group may grant VIEW acces, FULL access:
-				if( $this->Group->check_perm( $permname, $permlevel ) )
+				if( $this->Group->check_perm( $permname, $permlevel, $perm_target ) )
 				{ // If group grants a global permission:
 					$perm = true;
 					break;
@@ -2828,6 +2828,10 @@ class User extends DataObject
 					{ // Check groups for permissions to this specific blog:
 						$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target );
 					}
+				}
+				elseif( $permlevel == 'list' && $perm_target == NULL )
+				{	// Check if at least one collection has a perm to view analytics for this user:
+					$perm = check_coll_first_perm( 'perm_analytics', 'user', $this->ID );
 				}
 				break;
 

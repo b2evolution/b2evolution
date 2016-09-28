@@ -2139,8 +2139,8 @@ function check_blog_advanced_perm( & $blog_perms, $user_ID, $permname, $permleve
 	switch( $permname )
 	{
 		case 'stats':
-			if( $permlevel == 'view' )
-			{
+			if( $permlevel == 'view' || $permlevel == 'list' )
+			{	// If current user has a permission to view the collection:
 				return $blog_perms['blog_analytics'];
 			}
 			// No other perm can be granted here (TODO...)
@@ -2315,6 +2315,50 @@ function check_blog_advanced_perm( & $blog_perms, $user_ID, $permname, $permleve
 	}
 
 	return $perm;
+}
+
+
+/**
+ * Check if at least one collection has a permission for given target
+ *
+ * @param string Permission name
+ * @param string Target type: 'user', 'group'
+ * @param integer Target ID
+ * @return boolean
+ */
+function check_coll_first_perm( $perm_name, $target_type, $target_ID )
+{
+	global $DB;
+
+	if( empty( $target_ID ) )
+	{	// Target ID must be defined:
+		return false;
+	}
+
+	switch( $target_type )
+	{
+		case 'user':
+			$table = 'T_coll_user_perms';
+			$field_perm_name = 'bloguser_'.$perm_name;
+			$field_ID_name = 'bloguser_user_ID';
+			break;
+
+		case 'group':
+			$table = 'T_coll_group_perms';
+			$field_perm_name = 'bloggroup_'.$perm_name;
+			$field_ID_name = 'bloggroup_group_ID';
+			break;
+	}
+
+	// Try to find first collection that has a requested permission:
+	$SQL = new SQL( 'Check if '.$target_type.' #'.$target_ID.' has at least one collection with permission ['.$perm_name.']' );
+	$SQL->SELECT( $field_perm_name );
+	$SQL->FROM( $table );
+	$SQL->WHERE( $field_ID_name.' = '.$target_ID );
+	$SQL->WHERE_and( $field_perm_name.' = 1' );
+	$SQL->LIMIT( 1 );
+
+	return boolval( $DB->get_var( $SQL->get(), 0 , NULL, $SQL->title ) );
 }
 
 
