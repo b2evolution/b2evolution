@@ -8226,9 +8226,6 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					$current_image_params = $params;
 					$current_file_params = array();
 
-					// Use image class for inline img tags:
-					$current_file_params['class'] = ( empty( $current_image_params['image_class'] ) ? '' : $current_image_params['image_class'] );
-
 					if( ! empty( $inline[3] ) ) // check if second colon is present
 					{
 						// Get the inline params: caption and class
@@ -8259,7 +8256,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 								$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $image_extraclass ) );
 
 								// Append extra class to file inline img tags:
-								$current_file_params['class'] = trim( $current_file_params['class'].' '.$image_extraclass );
+								$current_file_params['class'] = $image_extraclass;
 							}
 						}
 					}
@@ -8313,7 +8310,8 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					}
 					elseif( $inline_type == 'inline' )
 					{	// Generate simple IMG tag with resized image size:
-						$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '', $current_file_params['class'], '', '', '' );
+						$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '',
+							( empty( $current_file_params['class'] ) ? '' : $current_file_params['class'] ), '', '', '' );
 					}
 				}
 				else
