@@ -22,14 +22,14 @@ module.exports = function(grunt) {
 				files: {
 					// target.css file: source.less file
 					'rsc/build/testless.css': 'rsc/less/test.less',
-					
+
 					// Basic styles:
 					'rsc/css/basic_styles.css': 'rsc/less/basic_styles.less',
 					'rsc/css/basic.css':        'rsc/less/basic.less',
 					'rsc/css/blog_base.css':    'rsc/less/blog_base.less',
 					'rsc/css/item_base.css':    'rsc/less/item_base.less',
 
-					// Fp> the following probaly needs to be merged with the font and back office bundles below					
+					// Fp> the following probaly needs to be merged with the font and back office bundles below
 					'rsc/css/bootstrap-blog_base.css': 'rsc/less/bootstrap-blog_base.less', // Used on several back-office pages
 
 					// Bootstrap front-office styles:
@@ -98,7 +98,7 @@ module.exports = function(grunt) {
 
 		// Configuration for the concatenate tasks:
 		concat: {
-			options: { 
+			options: {
 				// The following will appear on top of the created files:
 				// banner: '/*! <%= pkg.name %> v<%= pkg.version %> */\n',
 			},
@@ -162,7 +162,7 @@ module.exports = function(grunt) {
 					'skins/bootstrap_gallery_skin/style.min.css': 'skins/bootstrap_gallery_skin/style.css',
 					'skins/bootstrap_manual_skin/style.min.css':  'skins/bootstrap_manual_skin/style.css',
 					'skins_adm/bootstrap/rsc/css/style.min.css':  'skins_adm/bootstrap/rsc/css/style.css',
-				}	
+				}
 			},
 			skin_evopress: {
 				src: 'skins/evopress/evopress.bundle.css',
@@ -199,6 +199,16 @@ module.exports = function(grunt) {
 				dest: 'rsc/js/build/ajaxcom.min.js',
 			},
 			*/
+			// TinyMCE
+			tinymce: {
+				files: {
+					'rsc/js/tiny_mce/plugins/image/plugin.min.js': 'rsc/js/tiny_mce/plugins/image/plugin.js',
+					'rsc/js/tiny_mce/plugins/link/plugin.min.js': 'rsc/js/tiny_mce/plugins/link/plugin.js',
+					'rsc/js/tiny_mce/plugins/b2evo_attachments/plugin.min.js': 'rsc/js/tiny_mce/plugins/b2evo_attachments/plugin.js',
+					'rsc/js/tiny_mce/plugins/b2evo_shorttags/plugin.min.js': 'rsc/js/tiny_mce/plugins/b2evo_shorttags/plugin.js',
+				}
+			},
+
 			// Colorbox + Voting + Touchswipe
 			colorbox: {
 				options: {
@@ -215,7 +225,7 @@ module.exports = function(grunt) {
 				},
 				nonull: true, // Display missing files
 				// fp>yura: why isn't jquery.bubbletip.js bundled into this?
-				// if plugins.js is used only for editing we should probably move it to a textedit.bundle		
+				// if plugins.js is used only for editing we should probably move it to a textedit.bundle
 				src: ['rsc/js/bubbletip.js', 'rsc/js/plugins.js', 'rsc/js/userfields.js', 'rsc/js/colorpicker.js'],
 				dest: 'rsc/js/build/bubbletip.bmin.js'
 			},
