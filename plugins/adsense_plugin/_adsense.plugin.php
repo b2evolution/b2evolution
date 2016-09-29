@@ -23,6 +23,7 @@ class adsense_plugin extends Plugin
 	var $name = 'AdSense';
 	var $priority = 10;
 	var $group = 'rendering';
+	var $subgroup = 'other';
 	var $help_url = 'http://b2evolution.net/blog-ads/adsense-plugin.php';
 	var $short_desc;
 	var $long_desc;
@@ -114,6 +115,27 @@ class adsense_plugin extends Plugin
 
 
 	/**
+	 * Get definitions for widget specific editable params
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_widget_param_definitions( $params )
+	{
+		$r = array_merge( array(
+			'title' => array(
+				'label' => T_('Block title'),
+				'note' => T_('Title to display in your skin.'),
+				'size' => 40,
+				'defaultvalue' => '',
+			),
+		), parent::get_widget_param_definitions( $params ) );
+
+		return $r;
+	}
+
+
+	/**
 	 * Comments out the adsense tags so that they don't get worked on by other renderers like Auto-P
 	 *
 	 * @param mixed $params
@@ -175,28 +197,32 @@ class adsense_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		$content = replace_content_outcode( '~<!-- \[adsense:\] -->~', array( $this, 'DisplayItem_callback' ), $content, 'replace_content_callback' );
+		$content = replace_content_outcode( '~<!-- \[adsense:\] -->~', array( $this, 'get_adsense_block' ), $content, 'replace_content_callback' );
 
 		return true;
 	}
 
 
 	/**
+	 * Get AdSense block
 	 *
+	 * @param array Matches of replace result if it is used as callback
+	 * @param boolean TRUE to limit a count of AdSense blocks by setting
+	 * @return string AdSense block
 	 */
-	function DisplayItem_callback( $matches )
+	function get_adsense_block( $matches = array(), $limit_by_counter = true )
 	{
 		global $Collection, $Blog;
 
-	  	/**
+		/**
 		 * How many blocks already displayed?
 		 */
 		static $adsense_blocks_counter = 0;
 
 		$adsense_blocks_counter++;
 
-		if( $adsense_blocks_counter > $this->Settings->get( 'max_blocks_in_content' ) )
-		{
+		if( $limit_by_counter && $adsense_blocks_counter > $this->get_coll_setting( 'coll_max_blocks_in_content', $Blog ) )
+		{	// Stop AdSense blocks because of limit by setting:
 			return '<!-- Adsense block #'.$adsense_blocks_counter.' not displayed since it exceed the limit of '
 							.$this->get_coll_setting( 'coll_max_blocks_in_content', $Blog ).' -->';
 		}
@@ -341,6 +367,36 @@ class adsense_plugin extends Plugin
 		echo '<input type="button" id="adsense_default" title="'.T_('Insert AdSense block').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="textarea_wrap_selection|b2evoCanvas|[adsense:]| |1" value="'.T_('AdSense').'" />';
 		echo $this->get_template( 'toolbar_group_after' );
 		echo $this->get_template( 'toolbar_after' );
+
+		return true;
+	}
+
+
+	/**
+	 * Event handler: SkinTag (widget)
+	 *
+	 * @param array Associative array of parameters.
+	 * @return boolean did we display?
+	 */
+	function SkinTag( & $params )
+	{
+		echo $params['block_start'];
+
+		if( $params['block_display_title'] && ! empty( $params['title'] ) )
+		{	// Display widget title:
+			echo $params['block_title_start'];
+			echo $params['title'];
+			echo $params['block_title_end'];
+		}
+
+		echo $params['block_body_start'];
+
+		// Display AdSense block:
+		echo $this->get_adsense_block( array(), false );
+
+		echo $params['block_body_end'];
+
+		echo $params['block_end'];
 
 		return true;
 	}
