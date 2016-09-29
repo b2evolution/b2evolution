@@ -469,6 +469,29 @@ class google_maps_plugin extends Plugin
 	var geocoder = new google.maps.Geocoder();
 	var geo_region = null;
 
+	// If the map is initially hidden, we will need to trigger the resize event of the map when it is initially shown,
+	// otherwise the map display will be empty for quite a while.
+	var mapEl = jQuery( '#map_canvas' );
+
+	if( mapEl.not(':visible') )
+	{ // map is hidden in folded fieldset
+		var target = document.getElementById( 'itemform_googlemap' ).parentElement; // this is the element that we need to observe
+		var config = { attributes: true };
+		var observer = new MutationObserver( function( mutations )
+			{
+				mutations.forEach( function( mutation )
+					{
+						if( mapEl.is( ':visible' ) )
+						{ // map is now visible
+							google.maps.event.trigger( map, 'resize' );
+							observer.disconnect(); // we only need to do this once so we can stop observing
+						}
+					} );
+			} );
+
+		observer.observe( target, config );
+	}
+
 	function set_region(region_code)
 	{
 		geo_region = region_code;
