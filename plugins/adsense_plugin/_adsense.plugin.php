@@ -78,6 +78,12 @@ class adsense_plugin extends Plugin
 					'defaultvalue' => 3,
 					'note' => T_('Maximum number of AdSense blocks the plugin should expand in post contents. Google terms typically set the limit to 3. You may wish to set it to less if you add blocks into the sidebar.'),
 				),
+			'auto_block' => array(
+					'label' => 'Auto blocks',
+					'type' => 'checkbox',
+					'defaultvalue' => 0,
+					'note' => T_('Automatically add an ad block in the middle of any post that has no [adsense:] tag yet.'),
+				),
 			);
 
 		return $r;
@@ -107,6 +113,12 @@ class adsense_plugin extends Plugin
 					'maxlength' => 2,
 					'defaultvalue' => $this->Settings->get('max_blocks_in_content'),
 					'note' => T_('Maximum number of AdSense blocks the plugin should expand in post contents. Google terms typically set the limit to 3. You may wish to set it to less if you add blocks into the sidebar.'),
+				),
+			'coll_auto_block' => array(
+					'label' => 'Auto blocks',
+					'type' => 'checkbox',
+					'defaultvalue' => $this->Settings->get('auto_block'),
+					'note' => T_('Automatically add an ad block in the middle of any post that has no <code>[adsense:]</code> tag yet.'),
 				),
 			);
 
@@ -144,7 +156,7 @@ class adsense_plugin extends Plugin
 	{
 		$content = & $params['content'];
 
-		$content = preg_replace( '~\[(adsense:)\]~', '<!-- [$1] -->', $content );
+		$content = replace_content_outcode( '~\[(adsense:)\]~', '<!-- [$1] -->', $content );
 
 		return true;
 	}
@@ -159,7 +171,7 @@ class adsense_plugin extends Plugin
 	{
 		$content = & $params['content'];
 
-		$content = preg_replace( '~<!-- \[(adsense:)\] -->~', '[$1]', $content );
+		$content = replace_content_outcode( '~<!-- \[(adsense:)\] -->~', '[$1]', $content );
 
 		return true;
 	}
@@ -181,8 +193,24 @@ class adsense_plugin extends Plugin
 	 */
 	function RenderItemAsHtml( & $params )
 	{
-		// Dummy placeholder. Without it the plugin would ne be considered to be a renderer...
-		return false;
+		if( empty( $params['Item'] ) )
+		{	// Allow only for Items
+			return false;
+		}
+
+		$content = & $params['data'];
+		$Item = & $params['Item'];
+		$item_Blog = & $params['Item']->get_Blog();
+
+		if( ! $this->get_coll_setting( 'coll_auto_block', $item_Blog ) )
+		{	// Don't insert auto blocks because it is not enabled by setting:
+			return false;
+		}
+
+		// Insert AdSense block automatically in the middle of content that has no this tag yet:
+		$content = $this->insert_auto_adsense_block( $content );
+
+		return true;
 	}
 
 
@@ -229,6 +257,45 @@ class adsense_plugin extends Plugin
 
 		return $this->get_coll_setting( 'coll_adsense_block', $Blog );
 	}
+
+
+	/**
+	 * Insert AdSense block automatically in the middle of content that has no this tag yet
+	 *
+	 * @param string
+	 * @return string
+	 */
+	function insert_auto_adsense_block( $content )
+	{
+		if( preg_match_outcode( '~\[adsense:\]~', $content, $matches ) )
+		{	// If at least one AdSense block exists in content then we should NOT insert auto block:
+			return $content;
+		}
+
+		// Split content by end of paragraph:
+		$splitted_content = preg_split( '~</p>~', $content );
+
+		// Get the middle of content:
+		$middle_index = floor( count( $splitted_content ) / 2 ) - 1;
+		if( $middle_index < 0 )
+		{
+			$middle_index = 0;
+		}
+
+		// Insert auto block in the middle of content:
+		$auto_content = '';
+		foreach( $splitted_content as $p => $content_part )
+		{
+			$auto_content .= $content_part.'</p>';
+			if( $middle_index == $p )
+			{	// This is middle of content, insert auto block:
+				$auto_content .= '<!-- [adsense:] -->';
+			}
+		}
+
+		return $auto_content;
+	}
+
 
 	/**
 	 * Filter out adsense tags from XML content.
