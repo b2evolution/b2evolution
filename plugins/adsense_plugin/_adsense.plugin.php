@@ -21,7 +21,7 @@ class adsense_plugin extends Plugin
 {
 	var $code = 'evo_adsense';
 	var $name = 'AdSense';
-	var $priority = 10;
+	var $priority = 85;
 	var $group = 'rendering';
 	var $subgroup = 'other';
 	var $help_url = 'http://b2evolution.net/blog-ads/adsense-plugin.php';
