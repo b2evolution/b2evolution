@@ -25,9 +25,9 @@ $current_User->check_perm( 'options', 'view', true );
 
 $AdminUI->set_path( 'site', 'tags' );
 
-param_action( 'list', true );
+param_action( 'list' );
 
-if( param( 'tag_ID', 'integer', '', true) )
+if( param( 'tag_ID', 'integer', '', true ) )
 { // Load item tag:
 	$ItemTagCache = & get_ItemTagCache();
 	if( ( $edited_ItemTag = & $ItemTagCache->get_by_ID( $tag_ID, false ) ) === false )
@@ -74,7 +74,7 @@ switch( $action )
 			$Messages->add( T_('New tag has been created.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=itemtags', 303 ); // Will EXIT
+			header_redirect( get_controller_view_url(), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'new';
@@ -100,7 +100,7 @@ switch( $action )
 			$Messages->add( T_('Tag has been updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=itemtags', 303 ); // Will EXIT
+			header_redirect( get_controller_view_url(), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'edit';
@@ -126,7 +126,7 @@ switch( $action )
 			forget_param( 'tag_ID' );
 			$Messages->add( $msg, 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( regenerate_url( 'action', '', '', '&' ), 303 ); // Will EXIT
+			header_redirect( get_controller_view_url(), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		else
@@ -188,7 +188,7 @@ switch( $action )
 
 		if( empty( $edited_ItemTag ) || empty( $old_ItemTag ) )
 		{ // Wrong request, Redirect to item tags
-			header_redirect( $admin_url.'?ctrl=itemtags', 303 ); // Will EXIT
+			header_redirect( get_controller_view_url(), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 
@@ -248,7 +248,7 @@ switch( $action )
 		$Messages->add( sprintf( T_('Removed %d obsolete tag entries.'), $DB->rows_affected ), 'success' );
 
 		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( $admin_url.'?ctrl=itemtags', 303 ); // Will EXIT
+		header_redirect( get_controller_view_url(), 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 }
@@ -295,10 +295,14 @@ switch( $action )
 		$edited_ItemTag->confirm_delete(
 				sprintf( T_('Delete tag "%s"?'), '<b>'.$edited_ItemTag->dget( 'name' ).'</b>' ),
 				'tag', $action, get_memorized( 'action' ) );
-		// NO BREAK
+		// list tags after confirmation form:
+		$AdminUI->disp_view( 'items/views/_itemtags.view.php' );
+		break;
 	case 'list':
 		// list tags:
 		$AdminUI->disp_view( 'items/views/_itemtags.view.php' );
+		// Save controller view URL in Session:
+		save_controller_view_url();
 		break;
 }
 

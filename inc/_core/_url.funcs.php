@@ -1009,4 +1009,51 @@ function url_check_same_domain( $main_url, $check_url )
 	// Check subdomain
 	return $same_domain || ( substr( $check_url_host, - ( strlen( $main_url_host ) + 1 ) ) == '.'.$main_url_host );
 }
+
+
+/**
+ * Save controller view URL in Session
+ * Use to store current filtered page in order to display it after redirecting from edit forms
+ */
+function save_controller_view_url()
+{
+	global $Session;
+
+	// Get current controller:
+	$ctrl = get_param( 'ctrl' );
+
+	if( empty( $ctrl ) || empty( $_SERVER['REQUEST_URI'] ) )
+	{	// No required data to execute this operation:
+		return;
+	}
+
+	// Save URL in Session:
+	$Session->set( 'ctrl_views_'.$ctrl, $_SERVER['REQUEST_URI'] );
+	$Session->dbsave();
+}
+
+
+/**
+ * Get controller view URL from Session
+ *
+ * @return string URL to last saved filtered page
+ */
+function get_controller_view_url()
+{
+	global $Session;
+
+	// Get current controller:
+	$ctrl = get_param( 'ctrl' );
+
+	// Try to get an URL from Session:
+	$ctrl_views_url = $Session->get( 'ctrl_views_'.$ctrl );
+
+	if( empty( $ctrl_views_url ) )
+	{	// Set default page if the URL is not defined by some reason yet:
+		global $admin_url;
+		$ctrl_views_url = $admin_url.'?ctrl='.$ctrl;
+	}
+
+	return $ctrl_views_url;
+}
 ?>
