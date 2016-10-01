@@ -354,7 +354,8 @@ class BlogCache extends DataObjectCache
 		$Group = $for_User->Group;
 		// First check if we have a global access perm:
 		if( $Group->check_perm( 'blogs', $permlevel ) ||
-		    ( $permname == 'blog_media_browse' && $Group->check_perm( 'files', 'edit' ) ) )
+		    ( $permname == 'blog_media_browse' && $Group->check_perm( 'files', 'edit' ) ) ||
+		    ( $permname == 'stats' && $Group->check_perm( 'stats', 'view' ) ) )
 		{ // If group grants a global permission:
 			$this->clear();
 			if( isset( $sql_filter ) )
@@ -407,11 +408,14 @@ class BlogCache extends DataObjectCache
 			case 'blog_comments':
 				// user needs to have permission for at least one kind of comments
 				$sql .= "OR bloguser_perm_cmtstatuses <> ''
-						OR bloggroup_perm_cmtstatuses <> ''";
+						OR bloggroup_perm_cmtstatuses <> ''
+						OR bloguser_perm_meta_comment = 1
+						OR bloggroup_perm_meta_comment = 1";
 				break;
 
 			case 'stats':
-				$permname = 'blog_properties';	// TEMP
+				$permname = 'blog_analytics';
+			case 'blog_analytics':
 			case 'blog_cats':
 			case 'blog_properties':
 			case 'blog_admin':
@@ -514,8 +518,8 @@ class BlogCache extends DataObjectCache
 
 		if( $Settings->get( 'subscribe_new_blogs' ) == 'public' )
 		{	// If a subscribing is available only for the public collections:
-			$blog_cache_SQL->WHERE_and( '( blog_in_bloglist IN ( "public", "logged" ) ) OR
-				( blog_in_bloglist = "member" AND (
+			$blog_cache_SQL->WHERE_and( '( blog_ID NOT IN ( SELECT cset_coll_ID FROM evo_coll_settings WHERE cset_name = "allow_access" AND cset_value = "members" ) ) OR
+				( blog_ID IN ( SELECT cset_coll_ID FROM evo_coll_settings WHERE cset_name = "allow_access" AND cset_value = "members" ) AND (
 					( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND bloguser_user_ID = '.$User->ID.' ) OR
 					( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND bloggroup_group_ID = '.$User->grp_ID.' )
 				) )' );

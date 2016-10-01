@@ -22,6 +22,9 @@ global $UserSettings;
 
 $action = param_action( 'list' );
 
+// Set the third level tab
+param( 'tab3', 'string', '', true );
+
 // We should activate toolbar menu items for this controller
 $activate_collection_toolbar = true;
 
@@ -57,7 +60,7 @@ switch( $action )
 		if( $edited_Comment->is_meta() )
 		{ // Use special permissions for meta comment
 			$check_permname = 'meta_comment';
-			$check_permlevel = 'delete';
+			$check_permlevel = $action == 'delete' ? 'delete' : 'edit';
 		}
 		elseif( $action == 'publish' || $action == 'update_publish' )
 		{ // Load the new comment status from publish request and set perm check values
@@ -133,7 +136,14 @@ switch( $action )
 		}
 
 		// Check permission:
-		$selected = autoselect_blog( 'blog_comments', 'edit' );
+		if( $tab3 == 'meta' )
+		{	// For meta comments:
+			$selected = autoselect_blog( 'meta_comment', 'blog' );
+		}
+		else
+		{	// For normal comments:
+			$selected = autoselect_blog( 'blog_comments', 'view' );
+		}
 		if( ! $selected )
 		{ // No blog could be selected
 			$Messages->add( T_('You have no permission to edit comments.' ), 'error' );
@@ -183,9 +193,6 @@ switch( $action )
 		debug_die( 'unhandled action 1' );
 }
 
-// Set the third level tab
-param( 'tab3', 'string', '', true );
-
 $AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
 $AdminUI->breadcrumbpath_add( T_('Comments'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;filter=restore' );
 switch( $tab3 )
@@ -200,7 +207,7 @@ switch( $tab3 )
 
 	case 'meta':
 		// Check permission for meta comments:
-		$current_User->check_perm( 'meta_comment', 'blog', true, $Blog );
+		$current_User->check_perm( 'meta_comment', 'view', true, $Blog->ID );
 
 		$AdminUI->breadcrumbpath_add( T_('Meta discussion'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;tab3='.$tab3.'&amp;filter=restore' );
 		break;
@@ -222,7 +229,7 @@ switch( $action )
 		$AdminUI->title_titlearea = T_('Editing comment').' #'.$edited_Comment->ID;
 
 		// Generate available blogs list:
-		$AdminUI->set_coll_list_params( 'blog_comments', 'edit', array( 'ctrl' => 'comments', 'filter' => 'restore' ) );
+		$AdminUI->set_coll_list_params( 'blog_comments', 'view', array( 'ctrl' => 'comments', 'filter' => 'restore' ) );
 
 		/*
 		 * Add sub menu entries:
@@ -670,7 +677,7 @@ switch( $action )
 		$AdminUI->title_titlearea = T_('Latest comments');
 
 		// Generate available blogs list:
-		$AdminUI->set_coll_list_params( 'blog_comments', 'edit', array( 'ctrl' => 'comments', 'filter' => 'restore', 'tab3' => $tab3 ) );
+		$AdminUI->set_coll_list_params( 'blog_comments', 'view', array( 'ctrl' => 'comments', 'filter' => 'restore', 'tab3' => $tab3 ) );
 
 		/*
 		 * Add sub menu entries:

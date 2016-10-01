@@ -2,6 +2,156 @@
  * These are now the real basic styles that once used to be in basic.css
  * These are included in basic.css but also in item_base.css so they are available in WYSIWYG editors
  */
+.red {
+  color: #f00;
+}
+.orange {
+  color: #f60;
+}
+.green {
+  color: #00cc00;
+}
+.black {
+  color: #000;
+}
+.gray,
+.grey,
+.dimmed,
+.disabled {
+  color: #999;
+}
+.note,
+.notes {
+  font-size: 84%;
+  color: #999;
+  font-weight: normal;
+}
+.left {
+  text-align: left;
+}
+.center {
+  text-align: center;
+}
+.right {
+  text-align: right;
+}
+.nobr,
+.nowrap,
+.line {
+  white-space: nowrap;
+}
+.expanded li {
+  margin-top: 1ex;
+  margin-bottom: 1ex;
+}
+a.discreet {
+  text-decoration: none;
+}
+del,
+.deleted {
+  color: #999;
+}
+ins,
+.inserted {
+  color: #a44;
+}
+acronym,
+abbr {
+  border-bottom: 1px dotted #666;
+  cursor: help;
+}
+pre,
+code {
+  hyphens: none;
+}
+img {
+  border: none;
+}
+.top {
+  vertical-align: top;
+}
+.middle {
+  vertical-align: middle;
+}
+.bottom,
+img.icon {
+  vertical-align: bottom;
+}
+.baseline {
+  vertical-align: baseline;
+}
+.text-bottom {
+  vertical-align: text-bottom;
+}
+img.raised,
+.image_block.raised img {
+  box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
+}
+img.noshadow,
+.image_block.noshadow img {
+  box-shadow: none;
+}
+img.border,
+.image_block.border img {
+  border: 1px solid #666;
+}
+img.noborder,
+.image_block.noborder img {
+  border: none;
+}
+img.squared,
+.image_block.squared img {
+  border-radius: 0;
+}
+img.rounded,
+.image_block.rounded img {
+  border-radius: 4px;
+}
+img.round,
+.image_block.round img {
+  border-radius: 50%;
+}
+img.embossed,
+.image_block.embossed img {
+  border: 5px solid;
+  border-color: rgba(238, 238, 238, 0.6) rgba(34, 34, 34, 0.6) rgba(51, 51, 51, 0.8) rgba(231, 231, 231, 0.6);
+}
+.floatleft {
+  float: left;
+}
+.floatright {
+  float: right;
+}
+.leftmargin {
+  float: left;
+  margin-right: 1ex;
+  margin-top: .2ex;
+  margin-bottom: .2ex;
+}
+.rightmargin {
+  float: right;
+  margin-left: 1ex;
+  margin-top: .2ex;
+  margin-bottom: .2ex;
+}
+.clear {
+  clear: both;
+}
+.inline-block {
+  display: inline-block;
+}
+.inline {
+  display: inline;
+}
+.margin1ex {
+  margin: 1ex;
+}
+.margin2ex {
+  margin: 2ex;
+}
+.indented {
+  padding-left: 3em;
+}
 /* The sprite image file is located: "/rsc/icons/flags_sprite.png"
  * **** To change this file use the original file from: "/rsc/icons/src/flags.PSD"
  * **** You should save the changed file as PNG-8 with 256 colors to the "flags_sprite.png"
@@ -20,7 +170,7 @@
  *   ch - Switzerland
  */
 span.flag {
-  border: 1px solid #000000;
+  border: 1px solid #666;
   background: url(../icons/flags_sprite.png) no-repeat;
   width: 16px;
   height: 11px;
@@ -79,6 +229,66 @@ button.action_icon {
   border: none;
   padding: 0;
   cursor: pointer;
+}
+span.fa {
+  line-height: inherit;
+  font-size: 14px;
+}
+.btn span.fa {
+  line-height: 14px;
+}
+a.action_icon span.fa {
+  margin-right: 2px;
+}
+a.roundbutton .fa,
+a.roundbutton:hover .fa,
+a.roundbutton_text .fa,
+a.roundbutton_text:hover .fa {
+  color: #000;
+}
+a:hover .fa-x-rollover-green {
+  color: #0C0 !important;
+}
+a:hover .fa-x-rollover-red {
+  color: #C00 !important;
+}
+a:hover .fa-x-rollover-red-light {
+  color: #F00 !important;
+}
+a:hover .fa-x-rollover-orange {
+  color: #F90 !important;
+}
+a:hover .fa-x-rollover-black {
+  color: #000 !important;
+}
+.fa-x-external-link--nudge:before {
+  position: relative;
+  top: 0.05em;
+  left: 0.11em;
+}
+.fa-x-linkedin--nudge:before {
+  position: relative;
+  top: -0.05em;
+  left: 0.04em;
+}
+.fa-x-google-plus--nudge:before {
+  position: relative;
+  left: 0.1em;
+}
+img.loadimg {
+  min-width: 32px;
+  min-height: 32px;
+  background: url(../img/ajax-loader/fff.gif) no-repeat center;
+}
+span.loader_img {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  background: url(../img/ajax-loader/fff.gif) no-repeat center;
+}
+span.loader_img.loader_user_report,
+span.loader_img.loader_user_deldata {
+  background-image: url(../img/ajax-loader/777.gif);
 }
 .status_color_draft {
   color: #ffff99;
@@ -188,51 +398,6 @@ button.action_icon {
 .btn-status-trash:hover {
   color: #fff;
   background-color: #ff4444;
-}
-span.fa {
-  line-height: inherit;
-  font-size: 14px;
-}
-.btn span.fa {
-  line-height: 14px;
-}
-a.action_icon span.fa {
-  margin-right: 2px;
-}
-a.roundbutton .fa,
-a.roundbutton:hover .fa,
-a.roundbutton_text .fa,
-a.roundbutton_text:hover .fa {
-  color: #000;
-}
-a:hover .fa-x-rollover-green {
-  color: #0C0 !important;
-}
-a:hover .fa-x-rollover-red {
-  color: #C00 !important;
-}
-a:hover .fa-x-rollover-red-light {
-  color: #F00 !important;
-}
-a:hover .fa-x-rollover-orange {
-  color: #F90 !important;
-}
-a:hover .fa-x-rollover-black {
-  color: #000 !important;
-}
-.fa-x-external-link--nudge:before {
-  position: relative;
-  top: 0.05em;
-  left: 0.11em;
-}
-.fa-x-linkedin--nudge:before {
-  position: relative;
-  top: -0.05em;
-  left: 0.04em;
-}
-.fa-x-google-plus--nudge:before {
-  position: relative;
-  left: 0.1em;
 }
 .ufld_yahooim.ufld__textcolor,
 .ufld_yahooim.ufld__hovertextcolor:hover {
@@ -422,163 +587,15 @@ a:hover .fa-x-rollover-black {
 .filter_item.blue div.icon:hover {
   background: #6a91df;
 }
-code,
-samp {
-  font-family: Menlo, Monaco, "Courier New", Courier, monospace;
-  /* font-size: 107%; */
+.filter_item div {
+  height: 24px !important;
+  line-height: 18px !important;
 }
-pre,
-code {
-  -webkit-hyphens: none;
-  -moz-hyphens: none;
-  -ms-hyphens: none;
-  hyphens: none;
+div.filters .filter_item {
+  margin: 1px;
 }
-.nobr,
-.nowrap,
-.line {
-  white-space: nowrap;
-}
-.left {
-  text-align: left;
-}
-.center {
-  text-align: center;
-}
-.right {
-  text-align: right;
-}
-.top {
-  vertical-align: top;
-}
-.middle {
-  vertical-align: middle;
-}
-.bottom {
-  vertical-align: bottom;
-}
-.floatleft {
-  float: left;
-}
-.floatright {
-  float: right;
-}
-.clear {
-  clear: both;
-}
-.inline {
-  display: inline;
-}
-/* DUPLICATES BOOTSTRAP STYLE
-.hidden {
-	display: none;
-}
-*/
-.absolute_center {
-  display: block;
-  margin: auto;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-/* I DON'T THINK THESE APPLY TO ANYTHING
-.indented {
-	margin-left: 3em;
-}
-.border {
-	border: 1px solid #000;
-}
-.margin1ex {
-	margin: 1ex;
-}
-.margin2ex {
-	margin: 2ex;
-}
-.mb1 {
-	margin-bottom: 1px;
-}
-*/
-/* UNNECESSARY STYLES, SINCE THERE ARE SMALL STYLES ON BOOTSTRAP
-.small92 {
-	font-size: 92%;
-}
-.small84 {
-	font-size: 84%;
-}
-.small80 {
-	font-size: 80%;
-}
-.small_details {
-	font-size: 84%;
-	color: #555;
-}
-*/
-.note,
-.notes,
-.dimmed {
-  font-size: 84%;
-  color: #999;
-  font-weight: normal;
-}
-.red {
-  color: #f00;
-}
-.orange {
-  color: #f60;
-}
-.green {
-  color: #00cc00;
-}
-.black {
-  color: #000;
-}
-.disabled {
-  color: #999;
-}
-acronym,
-abbr {
-  border-bottom: 1px dotted #000;
-}
-del {
-  color: #999999;
-}
-ins {
-  color: #009999;
-  text-decoration: none;
-}
-.expanded li {
-  margin-top: 1ex;
-  margin-bottom: 1ex;
-}
-/* I THINK THIS REFERS TO NOTHING
-a.discreet {
-	text-decoration: none;
-}
-*/
-img.leftmargin {
-  float: left;
-  margin-right: 1ex;
-  margin-top: .2ex;
-  margin-bottom: .2ex;
-}
-img.rightmargin,
-div.rightmargin {
-  float: right;
-  margin-left: 1ex;
-  margin-top: .2ex;
-  margin-bottom: .2ex;
-}
-span.loader_img {
-  display: inline-block;
-  width: 32px;
-  height: 32px;
-  background: url(../img/ajax-loader/fff.gif) no-repeat center;
-}
-span.loader_img.loader_user_report,
-span.loader_img.loader_user_deldata {
-  background-image: url(../img/ajax-loader/777.gif);
+div.filters .filter_item div {
+  margin: 0;
 }
 .widget_core_coll_category_list label {
   font-weight: normal;
@@ -616,16 +633,6 @@ span.loader_img.loader_user_deldata {
 }
 .widget_core_coll_category_list .tile label {
   display: inline;
-}
-.filter_item div {
-  height: 24px !important;
-  line-height: 18px !important;
-}
-div.filters .filter_item {
-  margin: 1px;
-}
-div.filters .filter_item div {
-  margin: 0;
 }
 .evo_comment__meta {
   border: 2px solid #5bc0de;
@@ -867,10 +874,10 @@ a.overlay_link:hover b {
   color: #666;
 }
 .user.man {
-  color: #00F;
+  color: #0080FF;
 }
 .user.woman {
-  color: #e100af;
+  color: #FF66FF;
 }
 .user.nogender,
 .user.anonymous.nogender {

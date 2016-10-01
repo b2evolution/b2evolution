@@ -834,6 +834,37 @@ switch( $action )
 
 		break;
 
+	case 'hide_wysiwyg_warning':
+		// Hide warning when switching from markup to WYSIWYG
+		param( 'type', 'string' );
+
+		switch( $type )
+		{
+			case 'item':
+				// Check that this action request is not a CSRF hacked request:
+				$Session->assert_received_crumb( 'item' );
+
+				param( 'blog', 'integer' );
+				param( 'item_ID', 'integer' );
+
+				$UserSettings->set( 'show_wysiwyg_warning_'.$blog, 0 );
+				$UserSettings->dbupdate();
+				break;
+
+			case 'emailcampaign':
+				// Check that this action request is not a CSRF hacked request:
+				$Session->assert_received_crumb( 'campaign' );
+
+				$UserSettings->set( 'show_wysiwyg_warning_emailcampaign', 0 );
+				$UserSettings->dbupdate();
+				break;
+
+			default:
+				$incorrect_action = true;
+		}
+
+		break;
+
 	default:
 		$incorrect_action = true;
 		break;

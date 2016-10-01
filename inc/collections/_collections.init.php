@@ -739,7 +739,7 @@ class collections_Module extends Module
 					'order' => 'group_last' ),
 			);
 
-		$perm_comments = $current_User->check_perm( 'blog_comments', 'edit', false, $blog );
+		$perm_comments = $current_User->check_perm( 'blog_comments', 'view', false, $blog );
 		$perm_cats = $current_User->check_perm( 'blog_cats', '', false, $blog );
 
 		// Posts
@@ -749,14 +749,17 @@ class collections_Module extends Module
 			);
 		$last_group_menu_entry = 'posts';
 
-		if( $perm_comments )
-		{ // User has permission to edit published, draft or deprecated comments (at least one kind)
+		if( $perm_comments || $current_User->check_perm( 'meta_comment', 'view', false, $blog ) )
+		{	// Initialize comments menu tab if user can view normal or meta comments of the collection:
 			$collection_menu_entries['comments'] = array(
 					'text' => T_('Comments'),
-					'href' => $admin_url.'?ctrl=comments&amp;blog='.$blog.'&amp;filter=restore',
+					'href' => $admin_url.'?ctrl=comments&amp;blog='.$blog.'&amp;filter=restore'
+						// Set url to meta comments page if user has a perm to view only meta comments:
+						.( $perm_comments ? '' : '&amp;tab3=meta' ),
 				);
 			$last_group_menu_entry = 'comments';
 		}
+
 		if( $perm_cats )
 		{ // Categories
 			$collection_menu_entries['categories'] = array(

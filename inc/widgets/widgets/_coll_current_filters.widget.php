@@ -211,7 +211,7 @@ class coll_current_filters_Widget extends ComponentWidget
 
 			if( $params['display_button_reset'] )
 			{ // Button to reset all filters
-				echo '<p>'.action_icon( T_('Reset all filters'), 'reset_filters',
+				echo '<p>'.action_icon( T_('Reset all filters!'), 'reset_filters',
 					regenerate_url( 'catsel,cat,'
 						.$params['ItemList']->param_prefix.'tag,'
 						.$params['ItemList']->param_prefix.'author,'
@@ -235,7 +235,7 @@ class coll_current_filters_Widget extends ComponentWidget
 						.$params['ItemList']->param_prefix.'dstop,'
 						.$params['ItemList']->param_prefix.'show_past,'
 						.$params['ItemList']->param_prefix.'show_future' ),
-					' '.T_('Reset all filters'), 3, 4 ).'<p>';
+					' '.T_('Reset all filters!'), 3, 4 ).'<p>';
 			}
 		}
 

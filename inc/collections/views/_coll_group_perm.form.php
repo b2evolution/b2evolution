@@ -64,7 +64,7 @@ $SQL->SELECT( 'grp_ID, grp_name, grp_usage, grp_level, bloggroup_perm_poststatus
 	. 'bloggroup_perm_delcmts, bloggroup_perm_recycle_owncmts, bloggroup_perm_vote_spam_cmts, bloggroup_perm_cmtstatuses + 0 as perm_cmtstatuses, bloggroup_perm_edit_cmt,'
 	. 'bloggroup_perm_delpost, bloggroup_perm_edit_ts, bloggroup_perm_meta_comment, bloggroup_perm_cats,'
 	. 'bloggroup_perm_properties, bloggroup_perm_admin, bloggroup_perm_media_upload,'
-	. 'bloggroup_perm_media_browse, bloggroup_perm_media_change,'
+	. 'bloggroup_perm_media_browse, bloggroup_perm_media_change, bloggroup_perm_analytics,'
 	. 'IF( ( grp_perm_blogs = "viewall" OR grp_perm_blogs = "editall" ), 1, bloggroup_ismember ) AS bloggroup_ismember' );
 $SQL->FROM( 'T_groups' );
 $SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON ( grp_ID = bloggroup_group_ID AND bloggroup_blog_ID = '.$edited_Blog->ID.' )' );
@@ -236,7 +236,7 @@ $Results->cols[] = array(
 								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'draft\', \''.format_to_output( T_('Permission to comment into this blog with draft status'), 'htmlattr' ).'\', \'comment\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'deprecated\', \''.format_to_output( T_('Permission to comment into this blog with deprecated status'), 'htmlattr' ).'\', \'comment\' )%'.
 								'<span style="display: inline-block; min-width: 5px;"></span>'.
-								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_meta_comment\', \''.format_to_output( T_('Permission to post meta comments into this blog'), 'htmlattr' ).'\' )%',
+								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_meta_comment\', \''.format_to_output( T_('Permission to post meta comments on this collection'), 'htmlattr' ).'\' )%',
 						'td_class' => 'center',
 					);
 
@@ -303,6 +303,16 @@ $Results->cols[] = array(
 						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_media_upload\', \''.format_to_output( T_('Permission to upload into blog\'s media folder'), 'htmlattr' ).'\' )%'.
 								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_media_browse\', \''.format_to_output( T_('Permission to browse blog\'s media folder'), 'htmlattr' ).'\' )%'.
 								'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_media_change\', \''.format_to_output( T_('Permission to change the blog\'s media folder content'), 'htmlattr' ).'\' )%',
+						'td_class' => 'center',
+					);
+
+// Analytics:
+$Results->cols[] = array(
+						'th' => T_('Analytics'),
+						'th_class' => 'checkright',
+						'order' => 'bloggroup_perm_analytics',
+						'default_dir' => 'D',
+						'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_analytics\', \''.format_to_output( T_('Permission to view collection\'s analytics'), 'htmlattr' ).'\' )%',
 						'td_class' => 'center',
 					);
 

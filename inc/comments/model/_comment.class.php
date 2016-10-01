@@ -211,6 +211,7 @@ class Comment extends DataObject
 			$this->notif_status = 'noreq';
 			$this->in_reply_to_cmt_ID = 0;
 			$this->set_renderers( array( 'default' ) );
+			$this->set( 'status', 'draft' );
 		}
 		else
 		{
@@ -1989,12 +1990,18 @@ class Comment extends DataObject
 			return false;
 		}
 
-		global $current_User;
+		global $current_User, $blog;
 
 		if( is_null( $current_status ) )
 		{ // Use status of comment if param is NULL
 			$current_status = $this->status;
 		}
+
+		$comment_Item = & $this->get_Item();
+		// Comment status cannot be more than post status, restrict it:
+		$restrict_max_allowed_status = ( $comment_Item ? $comment_Item->status : '' );
+		// Get those statuses which are not allowed for the current User to edit comment in this blog:
+		$restricted_statuses = get_restricted_statuses( $blog, 'blog_comment!', 'edit', $current_status, $restrict_max_allowed_status );
 
 		$status_order = get_visibility_statuses( 'ordered-array' );
 		$status_index = get_visibility_statuses( 'ordered-index', array( 'redirected' ) );
@@ -2008,7 +2015,14 @@ class Comment extends DataObject
 		while( !$has_perm && ( $publish ? ( $curr_index < 4 ) : ( $curr_index > 0 ) ) )
 		{ // Check until the user has permission or there is no more status to check
 			$curr_index = $publish ? ( $curr_index + 1 ) : ( $curr_index - 1 );
-			$has_perm = $current_User->check_perm( 'comment!'.$status_order[$curr_index][0], 'moderate', false, $this );
+			if( in_array( $status_order[$curr_index][0], $restricted_statuses ) )
+			{	// The status is restricted for this comment by its item or collection settings:
+				$has_perm = false;
+			}
+			else
+			{	// Check if current user can moderate this comment to the next/prev status:
+				$has_perm = $current_User->check_perm( 'comment!'.$status_order[$curr_index][0], 'moderate', false, $this );
+			}
 		}
 		if( $has_perm )
 		{ // An available status has been found
@@ -2460,20 +2474,7 @@ class Comment extends DataObject
 	function get_permanent_url( $glue = '&amp;', $meta_anchor = '#' )
 	{
 		$this->get_Item();
-
-		if( $this->is_meta() )
-		{ // Meta comment is not published on front-office, Get url to back-office
-			global $admin_url;
-			if( $meta_anchor == '#' )
-			{	// Use default anchor:
-				$meta_anchor = '#'.$this->get_anchor();
-			}
-			return $admin_url.'?ctrl=items'.$glue.'blog='.$this->Item->get_blog_ID().$glue.'p='.$this->Item->ID.$glue.'comment_type=meta'.$meta_anchor;
-		}
-		else
-		{ // Normal comment
-			return $this->Item->get_single_url( 'auto', '', $glue ).'#'.$this->get_anchor();
-		}
+		return $this->Item->get_single_url( 'auto', '', $glue ).'#'.$this->get_anchor();
 	}
 
 
@@ -3814,9 +3815,10 @@ class Comment extends DataObject
 		$members_count = 0;
 		$community_count = 0;
 		foreach( $notify_users as $user_ID => $notify_type )
-		{	// Check each subscribed user if we can send notification to him depending on current request and item settings:
+		{	// Check for each subscribed User, if we can send a notification to him depending on current request and Item settings:
+
 			if( ! ( $notify_User = & $UserCache->get_by_ID( $user_ID, false, false ) ) )
-			{	// Wrong user, Skip it:
+			{	// Invalid User, Skip it:
 				unset( $notify_users[ $user_ID ] );
 				continue;
 			}
@@ -3858,11 +3860,11 @@ class Comment extends DataObject
 		}
 
 		if( $notify_members )
-		{	// Display a message to know how much members are notified:
+		{	// Display a message to know how many members are notified:
 			$Messages->add( sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count ), 'note' );
 		}
 		if( $notify_community )
-		{	// Display a message to know how much community users are notified:
+		{	// Display a message to know how many community users are notified:
 			$Messages->add( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), 'note' );
 		}
 
@@ -4330,6 +4332,11 @@ class Comment extends DataObject
 			return false;
 		}
 
+		if( $this->is_meta() )
+		{	// Don't allow a replying for meta comments:
+			return false;
+		}
+
 		$this->get_Item();
 		$this->Item->load_Blog();
 
@@ -4597,15 +4604,19 @@ class Comment extends DataObject
 
 		$commented_Item = & $this->get_Item();
 
-		// Do not restrict if meta comment and user has the proper permission. Change meta comment status to 'protected'.
-		if( $this->is_meta() && $commented_Item &&
-		    ! $current_User->check_perm( 'meta_comment', 'view', false, $commented_Item ) )
-		{
-			$comment_allowed_status = 'protected';
+		if( $this->is_meta() )
+		{	// Meta comment:
+			if( ! is_logged_in() || ( $commented_Item && ! $current_User->check_perm( 'meta_comment', 'view', false, $commented_Item->get_blog_ID() ) ) )
+			{	// Change meta comment status to 'protected' if user has no perm to view them:
+				$comment_allowed_status = 'protected';
+			}
+			else
+			{	// Do not restrict if meta comment and user has the proper permission:
+				$comment_allowed_status = $current_status;
+			}
 		}
 		else
-		{
-			// Restrict status to max allowed by parent item:
+		{	// Restrict status of normal comment to max allowed by parent item:
 			$comment_allowed_status = $this->get_allowed_status();
 			if( empty( $comment_allowed_status ) && $commented_Item && ( $item_Blog = & $commented_Item->get_Blog() ) )
 			{	// If min allowed status is not found then use what default status is allowed:
@@ -4621,7 +4632,7 @@ class Comment extends DataObject
 		{	// Only change status to update it on the edit forms and Display a warning:
 			$this->status = $comment_allowed_status;
 
-			if( $current_status != $this->get( 'status' ) )
+			if( $current_status != $this->get( 'status' ) && ! $this->is_meta() )
 			{	// If current comment status cannot be used because it is restricted by parent item:
 				global $Messages;
 

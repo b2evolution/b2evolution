@@ -47,7 +47,7 @@ module.exports = function(grunt) {
 							// Basic styles for all bootstrap skins
 							'rsc/less/bootstrap-basic_styles.less',
 							'rsc/less/bootstrap-basic.less',
-							'rsc/less/bootstrap-item_base.less',		// fp> I added this because blockquote was not properly styles in the backoffice
+							'rsc/less/bootstrap-item_base.less',		// fp> I added this because blockquote was not properly styled in the backoffice
 							'rsc/less/bootstrap-evoskins.less'			// Common styles for all bootstrap skins
 						],
 

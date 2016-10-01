@@ -3,77 +3,48 @@
  * These are included in basic.css but also in item_base.css so they are available in WYSIWYG editors
  */
 
+@import "inc/text_styles.inc.less";
+@import "inc/image_styles.inc.less";
+@import "inc/block_styles.inc.less";
+
 @import "inc/sprite_flags.inc.less";
 @import "inc/sprite_icons.inc.less";
-@import "inc/visibility_status_colors.inc.less";
+
 @import "inc/fontawesome_icons.inc.less";
+@import "inc/loader.inc.less";
+
+@import "inc/visibility_status_colors.inc.less";
+
 @import "inc/userfield_icons.inc.less";
+
 @import "inc/current_filters.inc.less";
+// Legacy specific Styles of filters for current selection of the posts (widget "Current filters"):
+.filter_item div.icon {
+	height: 22px;
+}
+
+// ------
 
 // Use special font for code blocks in order to have the same width for each char
 code, samp {
 	font-family: Menlo, Monaco, "Courier New", Courier, monospace;
-	/* font-size: 107%; */
 }
 
-// Don't break words on new line for code blocks
-pre, code {
-	-webkit-hyphens: none;
-	-moz-hyphens: none;
-	-ms-hyphens: none;
-	hyphens: none;
+blockquote {
+	border: 1px solid #eee;
+	background-color: #eee;
+	margin: 1em;
+	padding: 1ex 1em;
 }
 
-// Block without new line breaks
-.nobr,
-.nowrap,
-.line {
-	white-space: nowrap;
-}
 
-// Text alignment helpers:
-.left {
-	text-align: left;
-}
-.center {
-	text-align: center;
-}
-.right {
-	text-align: right;
-}
-.top {
-	vertical-align: top;
-}
-.middle {
-	vertical-align: middle;
-}
-.bottom {
-	vertical-align: bottom;
-}
-// ---------------- //
+// --- For Legacy skins: ---
 
-// Block alignment helpers:
-.floatleft {
-	float: left;
-}
-.floatright {
-	float: right;
-}
-.clear{
-	clear: both;
-}
-// ---------------- //
-
-// Block styles:
-.inline {
-	display: inline;
-}
+// Hide something (for legacy skins)
 .hidden {
 	display: none;
 }
-.indented {
-	margin-left: 3em;
-}
+
 .absolute_center {
 	display: block;
 	margin: auto;
@@ -83,21 +54,12 @@ pre, code {
 	left: 0;
 	right: 0;
 }
-.border {
-	border: 1px solid #000;
-}
-.margin1ex {
-	margin: 1ex;
-}
-.margin2ex {
-	margin: 2ex;
-}
+
 .mb1 {
 	margin-bottom: 1px;
 }
-// ---------------- //
 
-// Font sizes:
+// Font sizes (for legacy skins only)
 .small92 {
 	font-size: 92%;
 }
@@ -112,69 +74,17 @@ pre, code {
 	font-size: 84%;
 	color: #555;
 }
-.note,
-.notes,
-.dimmed {
-	font-size: 84%;
-	color: #999;
-	font-weight:normal;
-}
-// ---------------- //
 
-// Text colors:
-.red {
-	color: #f00;
+img.flag {
+	vertical-align:middle;
+	border:1px solid #666;
 }
-.orange {
-	color: #f60;
-}
-.green {
-	color: #0c0
-}
-.black {
-	color: #000;
-}
-.disabled {
-	color: #999;
-}
-// ---------------- //
-
-acronym,
-abbr {
-	border-bottom: 1px dotted #000;
-	cursor: help;
-}
-del {
-	color: #999999;
-}
-ins {
-	color: #009999;
-	text-decoration: none;
+img.flagtop {
+	vertical-align:top;
+	border:1px solid #666;
 }
 
-.expanded li {
-	margin-top: 1ex;
-	margin-bottom: 1ex;
-}
-
-a.discreet {
-	text-decoration: none;
-}
-
-// Image alignment
-img.leftmargin {
-	float:left;
-	margin-right:1ex;
-	margin-top:.2ex;
-	margin-bottom:.2ex;
-}
-img.rightmargin, div.rightmargin {
-	float:right;
-	margin-left:1ex;
-	margin-top:.2ex;
-	margin-bottom:.2ex;
-}
-
+// --- Rounded buttons (For Legacy skins) ---
 
 // The links that look as buttons with round corners:
 a.roundbutton, a.roundbutton_text, span.roundbutton {
@@ -529,6 +439,7 @@ span.roundbutton.rbtn_black:hover, .roundbutton_group span.roundbutton.rbtn_blac
 		color: #fff;
 	}
 }
+
 // ---------------- //
 
 // Toolbars with buttons before the edit post/comment forms:
@@ -561,19 +472,7 @@ div.comment_toolbars div.edit_toolbar, div.message_toolbars div.edit_toolbar {
 	width: 100%;
 	border-bottom: none;
 }
-// ---------------- //
 
-// GIF animation is used while AJAX request is loading:
-span.loader_img {
-	display: inline-block;
-	width: 32px;
-	height: 32px;
-	background: url(../img/ajax-loader/fff.gif) no-repeat center;
-}
-span.loader_img.loader_user_report,
-span.loader_img.loader_user_deldata {
-	background-image: url(../img/ajax-loader/777.gif);
-}
 // ---------------- //
 
 // Meta categories that appears on categories widget:
@@ -587,10 +486,4 @@ span.loader_img.loader_user_deldata {
 			visibility: hidden;
 		}
 	}
-}
-// ---------------- //
-
-// Styles of filters for current selection of the posts (widget "Current filters"):
-.filter_item div.icon {
-	height: 22px;
 }

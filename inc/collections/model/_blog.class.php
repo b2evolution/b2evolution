@@ -434,12 +434,13 @@ class Blog extends DataObject
 	 */
 	function load_from_Request( $groups = array() )
 	{
-		global $Messages, $default_locale, $DB;
+		global $Messages, $default_locale, $DB, $Settings;
 
 		/**
 		 * @var User
 		 */
 		global $admin_url, $current_User;
+		$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
 		// Load collection settings and clear update cascade array
 		$this->load_CollectionSettings();
@@ -827,9 +828,14 @@ class Blog extends DataObject
 			}
 			$this->set_setting( 'post_moderation_statuses', implode( ',', $post_moderation_statuses ) );
 
-			// Subscriptions:
-			$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
-			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+			// If notifications are temporarily disabled, no subscription options should be lost when user saves.
+			// When notification are turned back on, the subscriptions will resume as they were before.
+			if( $notifications_mode != 'off' )
+			{
+				// Subscriptions:
+				$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+			}
 		}
 
 		if( in_array( 'comments', $groups ) )
@@ -847,8 +853,16 @@ class Blog extends DataObject
 			$this->set_setting( 'moderation_statuses', implode( ',', $blog_moderation_statuses ) );
 
 			$this->set_setting( 'comment_quick_moderation',  param( 'comment_quick_moderation', 'string', 'expire' ) );
-			$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
-			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+
+			// If notifications are temporarily disabled, no subscription options should be lost when user saves.
+			// When notification are turned back on, the subscriptions will resume as they were before.
+			if( $notifications_mode != 'off' )
+			{
+				// Subscriptions:
+				$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+			}
+
 			$this->set_setting( 'comments_detect_email', param( 'comments_detect_email', 'integer', 0 ) );
 			$this->set_setting( 'comments_register', param( 'comments_register', 'integer', 0 ) );
 		}
@@ -901,10 +915,15 @@ class Blog extends DataObject
 			// Tracking:
 			$this->set_setting( 'track_unread_content', param( 'track_unread_content', 'integer', 0 ) );
 
-			// Subscriptions:
-			$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
-			$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
-			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+			// If notifications are temporarily disabled, no subscription options should be lost when user saves.
+			// When notification are turned back on, the subscriptions will resume as they were before.
+			if( $notifications_mode != 'off' )
+			{
+				// Subscriptions:
+				$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+			}
 
 			// Sitemaps:
 			$this->set_setting( 'enable_sitemaps', param( 'enable_sitemaps', 'integer', 0 ) );
@@ -2987,14 +3006,16 @@ class Blog extends DataObject
 						bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts,
 						bloguser_perm_cmtstatuses, bloguser_perm_edit_cmt,
 						bloguser_perm_meta_comment, bloguser_perm_cats, bloguser_perm_properties, bloguser_perm_admin,
-						bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
+						bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change,
+						bloguser_perm_analytics )
 					VALUES ( '.$this->ID.', '.$this->owner_user_ID.', 1, 1,
 						"published,community,deprecated,protected,private,review,draft,redirected", "admin", "all",
 						1, 1,
 						1, 1, 1,
 						"published,community,deprecated,protected,private,review,draft", "all",
 						1, 1, 1, 1,
-						1, 1, 1 )' );
+						1, 1, 1,
+						1 )' );
 		}
 
 		// Create default category:
@@ -3116,7 +3137,8 @@ class Blog extends DataObject
 				{prefix}perm_edit, {prefix}perm_delpost, {prefix}perm_edit_ts, {prefix}perm_delcmts,
 				{prefix}perm_recycle_owncmts, {prefix}perm_vote_spam_cmts, {prefix}perm_cmtstatuses,
 				{prefix}perm_edit_cmt, {prefix}perm_meta_comment, {prefix}perm_cats, {prefix}perm_properties,
-				{prefix}perm_admin, {prefix}perm_media_upload, {prefix}perm_media_browse, {prefix}perm_media_change';
+				{prefix}perm_admin, {prefix}perm_media_upload, {prefix}perm_media_browse, {prefix}perm_media_change,
+				{prefix}perm_analytics';
 
 		// Copy all permissions "collection per user" from duplicated collection to new created:
 		$coll_user_perm_fields = 'bloguser_user_ID, '.str_replace( '{prefix}', 'bloguser_', $coll_perm_fields );
@@ -3236,6 +3258,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 1,
 				'perm_media_browse'    => 1,
 				'perm_media_change'    => 1,
+				'perm_analytics'       => 1,
 			),
 			'moderators' => array(
 				'ismember'             => 1,
@@ -3257,6 +3280,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 1,
 				'perm_media_browse'    => 1,
 				'perm_media_change'    => 1,
+				'perm_analytics'       => 0,
 			),
 			'editors' => array(
 				'ismember'             => 1,
@@ -3278,6 +3302,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 1,
 				'perm_media_browse'    => 1,
 				'perm_media_change'    => 0,
+				'perm_analytics'       => 0,
 			)
 		);
 		if( $this->type == 'forum' )
@@ -3302,6 +3327,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 1,
 				'perm_media_browse'    => 1,
 				'perm_media_change'    => 0,
+				'perm_analytics'       => 0,
 			);
 			$group_permissions['users'] = array(
 				'ismember'             => 1,
@@ -3323,6 +3349,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 1,
 				'perm_media_browse'    => 0,
 				'perm_media_change'    => 0,
+				'perm_analytics'       => 0,
 			);
 			$group_permissions['suspect'] = array(
 				'ismember'             => 1,
@@ -3344,6 +3371,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 0,
 				'perm_media_browse'    => 0,
 				'perm_media_change'    => 0,
+				'perm_analytics'       => 0,
 			);
 		}
 
@@ -3369,6 +3397,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 0,
 				'perm_media_browse'    => 0,
 				'perm_media_change'    => 0,
+				'perm_analytics'       => 0,
 			);
 		}
 
@@ -3608,6 +3637,18 @@ class Blog extends DataObject
 	{
 		return $this->name;
 	}
+
+
+	/**
+	 * Get the short name of the blog
+	 *
+	 * @return sring
+	 */
+	function get_shortname()
+	{
+		return $this->shortname;
+	}
+
 
 	/**
 	 * Get the name of the blog limited by length
@@ -4147,9 +4188,14 @@ class Blog extends DataObject
 	 *
 	 * @return boolean TRUE on success
 	 */
-	function has_access()
+	function has_access( $User = NULL )
 	{
 		global $current_User;
+
+		if( is_null( $User ) )
+		{
+			$User = $current_User;
+		}
 
 		$allow_access = $this->get_setting( 'allow_access' );
 
@@ -4162,7 +4208,7 @@ class Blog extends DataObject
 		{	// Only logged in users have an access to this collection:
 			return false;
 		}
-		elseif( $allow_access == 'members' && ! $current_User->check_perm( 'blog_ismember', 'view', false, $this->ID ) )
+		elseif( $allow_access == 'members' && ! $User->check_perm( 'blog_ismember', 'view', false, $this->ID ) )
 		{	// Current user must be a member of this collection:
 			return false;
 		}

@@ -3,12 +3,6 @@
  * These are the default styles that are used INSIDE of a blog post.
  * Override this with an item.css file in your skin folder.
  */
-blockquote {
-  border: 2px dotted #ccc;
-  background-color: #eee;
-  margin: 1em 2em;
-  padding: 0 1ex;
-}
 pre {
   overflow: hidden;
 }

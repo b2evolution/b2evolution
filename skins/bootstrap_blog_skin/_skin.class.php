@@ -21,7 +21,7 @@ class bootstrap_blog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.6';
+	var $version = '6.7.7';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -88,7 +88,7 @@ class bootstrap_blog_Skin extends Skin
 				),
 					'layout' => array(
 						'label' => T_('Layout'),
-						'note' => '',
+						'note' => T_('Select skin layout.'),
 						'defaultvalue' => 'right_sidebar',
 						'options' => array(
 								'single_column'              => T_('Single Column Large'),
@@ -102,14 +102,14 @@ class bootstrap_blog_Skin extends Skin
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px',
+						'note' => 'px. ' . T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'allow_empty' => true,
 					),
 					'font_size' => array(
 						'label' => T_('Font size'),
-						'note' => '',
+						'note' => T_('Select content font size.'),
 						'defaultvalue' => 'default',
 						'options' => array(
 								'default'        => T_('Default (14px)'),

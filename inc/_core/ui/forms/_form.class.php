@@ -1113,6 +1113,94 @@ class Form extends Widget
 
 
 	/**
+	 * Builds a file input field
+	 *
+	 * @param string the field name
+	 * @param string the field value
+	 * @param string the field label
+	 * @param string the field note
+	 * @param array Extended attributes, see {@link input_field()}
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function file_input( $field_name, $field_value, $field_label, $field_note = '', $field_params = array() )
+	{
+
+		$field_params = array_merge( array(
+				'type' => 'file',
+				'value' => $field_value,
+				'note' => $field_note,
+				'name' => $field_name,
+				'label' => $field_label,
+				'class' => ''
+			), $field_params );
+
+		$element = $this->get_input_element( $field_params );
+
+		$field_params = array_merge( array(
+				'note_format' => ' <small class="notes">%s</small>',
+			), $field_params );
+
+		if( isset($field_params['format_info']) )
+		{
+			$format_info = $field_params['format_info'];
+			unset($field_params['format_info']); // not an HTML element
+		}
+		else
+		{
+			$format_info = 'htmlbody';
+		}
+
+		$r = $this->fieldstart;
+
+		// Start the new form field and inject an automatic DOM id
+		// This is useful to show/hide the whole field by JS.
+		if( !empty( $this->_common_params['id'] ) )
+		{
+			$ffield_id = ' id="ffield_'.$this->_common_params['id'].'" ';
+		}
+		else
+		{ // No ID in case there's no id/name given for a field.
+			$ffield_id = '';
+		}
+		$r = $this->fieldstart;
+		if( !empty( $field_params['class'] ) )
+		{
+			if( strpos( $r, 'class="' ) === false )
+			{ // Add class attribute
+				$ffield_id .= ' class="'.$field_params['class'].'"';
+			}
+			else
+			{ // Append classes to attribute
+				$r = str_replace( ' class="', ' class="'.$field_params['class'].' ', $r );
+			}
+		}
+		$r = str_replace( '$ID$', $ffield_id, $r );
+
+		$r .= $this->get_label();
+
+		$r .= $this->infostart;
+
+		// PAYLOAD:
+		$r .= format_to_output( $element, $format_info );
+
+		// Taken from end_field() - but we use $infoend:
+		if( !empty($this->_common_params['note']) )
+		{ // We have a note
+			$r .= sprintf( $this->_common_params['note_format'], $this->_common_params['note'] );
+		}
+
+		if( isset($this->_common_params['field_suffix']) )
+		{
+			$r .= $this->_common_params['field_suffix'];
+		}
+
+		$r .= $this->infoend.$this->fieldend;
+
+		return $this->display_or_return( $r );
+	}
+
+
+	/**
 	 * Builds a password input field.
 	 *
 	 * Calls the text() method with a 'password' parameter.

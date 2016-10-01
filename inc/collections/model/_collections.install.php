@@ -409,6 +409,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloguser_perm_media_upload    tinyint NOT NULL default 0,
 			bloguser_perm_media_browse    tinyint NOT NULL default 0,
 			bloguser_perm_media_change    tinyint NOT NULL default 0,
+			bloguser_perm_analytics       tinyint NOT NULL default 0,
 			PRIMARY KEY bloguser_pk (bloguser_blog_ID,bloguser_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -437,6 +438,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloggroup_perm_media_upload    tinyint NOT NULL default 0,
 			bloggroup_perm_media_browse    tinyint NOT NULL default 0,
 			bloggroup_perm_media_change    tinyint NOT NULL default 0,
+			bloggroup_perm_analytics       tinyint NOT NULL default 0,
 			PRIMARY KEY bloggroup_pk (bloggroup_blog_ID,bloggroup_group_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 

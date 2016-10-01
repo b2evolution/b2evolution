@@ -21,7 +21,7 @@ class bootstrap_main_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.6';
+	var $version = '6.7.7';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -85,9 +85,10 @@ class bootstrap_main_Skin extends Skin
 				),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px',
+						'note' => 'px. ' . T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
+						'size' => '7',
 						'allow_empty' => true,
 					),
 				'section_layout_end' => array(
@@ -100,6 +101,7 @@ class bootstrap_main_Skin extends Skin
 				),
 					'front_bg_image' => array(
 						'label' => T_('Background image'),
+						'note' => T_('Set background image in Main Area section.'),
 						'defaultvalue' => 'shared/global/sunset/sunset.jpg',
 						'type' => 'text',
 						'size' => '50'
@@ -113,13 +115,13 @@ class bootstrap_main_Skin extends Skin
 				),
 					'front_width' => array(
 						'label' => T_('Width'),
-						'note' => '',
+						'note' => T_('Adjust width of the Main Area container.'),
 						'size' => '7',
 						'defaultvalue' => '450px',
 					),
 					'front_position' => array(
 						'label' => T_('Position'),
-						'note' => '',
+						'note' => T_('Select the position of Main Area container.'),
 						'defaultvalue' => 'left',
 						'options' => array(
 								'left'   => T_('Left'),
@@ -130,14 +132,14 @@ class bootstrap_main_Skin extends Skin
 					),
 					'front_bg_color' => array(
 						'label' => T_('Background color'),
-						'note' => T_('E-g: #ff0000 for red'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#000000',
 						'type' => 'color',
 					),
 					'front_bg_opacity' => array(
 						'label' => T_('Background opacity'),
-						'note' => '%',
-						'size' => '2',
+						'note' => '%. ' . T_('Adjust the background transparency level.'),
+						'size' => '7',
 						'maxlength' => '3',
 						'defaultvalue' => '10',
 						'type' => 'integer',
@@ -148,31 +150,31 @@ class bootstrap_main_Skin extends Skin
 					),
 					'pict_title_color' => array(
 						'label' => T_('Title color'),
-						'note' => T_('E-g: #ff0000 for red'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#F0F0F0',
 						'type' => 'color',
 					),
 					'front_text_color' => array(
 						'label' => T_('Text color'),
-						'note' => T_('E-g: #00ff00 for green'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
 					'front_link_color' => array(
 						'label' => T_('Link color'),
-						'note' => T_('E-g: #0000ff for blue'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
 					'pict_muted_color' => array(
 						'label' => T_('Muted text color'),
-						'note' => T_('E-g: #ff0000 for red'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#F0F0F0',
 						'type' => 'color',
 					),
 					'front_icon_color' => array(
 						'label' => T_('Inverse icon color'),
-						'note' => T_('E-g: #00ff00 for green'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#CCCCCC',
 						'type' => 'color',
 					),
@@ -185,7 +187,7 @@ class bootstrap_main_Skin extends Skin
 				),
 					'secondary_text_color' => array(
 						'label' => T_('Text color'),
-						'note' => T_('E-g: #00ff00 for green'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),

@@ -21,7 +21,7 @@ class bootstrap_photoblog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.6';
+	var $version = '6.7.7';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -90,7 +90,7 @@ class bootstrap_photoblog_Skin extends Skin
 				),
 					'layout' => array(
 						'label' => T_('Layout'),
-						'note' => '',
+						'note' => T_('Select skin layout.'),
 						'defaultvalue' => 'single_column',
 						'options' => array(
 								'single_column'              => T_('Single Column Large'),
@@ -102,14 +102,14 @@ class bootstrap_photoblog_Skin extends Skin
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px',
+						'note' => 'px. ' . T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'allow_empty' => true,
 					),
 					'font_size' => array(
 						'label' => T_('Font size'),
-						'note' => '',
+						'note' => T_('Select content font size.'),
 						'defaultvalue' => 'default',
 						'options' => array(
 								'default'        => T_('Default (14px)'),
@@ -132,31 +132,31 @@ class bootstrap_photoblog_Skin extends Skin
 				),
 					'background_color' => array(
 						'label' => T_('Page background color'),
-						'note' => T_('Default: #fff'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
 					),
 					'page_text_color' => array(
 						'label' => T_('Page text color'),
-						'note' => T_('Default: #333'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_link_color' => array(
 						'label' => T_('Page link color'),
-						'note' => T_('Default: #337ab7'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
 					'page_link_h_color' => array(
 						'label' => T_('Page link hover color'),
-						'note' => T_('Default: #23527c'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#23527c',
 						'type' => 'color',
 					),
 					'well_color' => array(
 						'label' => T_('Post background color'),
-						'note' => T_('Default: #f5f5f5'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#f5f5f5',
 						'type' => 'color',
 					),
@@ -172,25 +172,25 @@ class bootstrap_photoblog_Skin extends Skin
 				),
 					'active_color' => array(
 						'label' => T_('Active navigation link color'),
-						'note' => T_('Default: #555'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#555',
 						'type' => 'color',
 					),
 					'default_color' => array(
 						'label' => T_('Default navigation links color'),
-						'note' => T_('Default: #337ab7'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
 					'default_h_color' => array(
 						'label' => T_('Default navigation links hover color'),
-						'note' => T_('Default: #337ab7'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#23527c',
 						'type' => 'color',
 					),
 					'default_bgh_color' => array(
 						'label' => T_('Default navigation links hover background-color'),
-						'note' => T_('Default: #eee'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#eee',
 						'type' => 'color',
 					),

@@ -30,13 +30,21 @@ param( 'plugin_ID', 'integer', true );
 param( 'method', 'string', '' );
 param( 'params', 'string', null ); // serialized
 
-if( is_null($params) )
-{ // Default:
+if( is_null( $params ) )
+{	// Use empty array by default if params are not sent by request:
 	$params = array();
 }
 else
-{ // params given. This may result in "false", but this means that unserializing failed.
-	$params = @unserialize($params);
+{	// Params given:
+	if( (substr( $params, 0, 2 ) == 'a:') && (stripos($params, 'O:') == false) )
+	{	// Allow to unserialize only arrays + check there is no Object in the array (We NEVER want to unserialize an object)
+		// (This may result in "false", but this means that unserializing failed)
+		$params = @unserialize( $params );
+	}
+	else
+	{	// Restrict all non array params to empty array:
+		bad_request_die( 'Invalid params! Cannot unserialize.' );
+	}
 }
 
 

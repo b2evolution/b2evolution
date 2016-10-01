@@ -357,6 +357,12 @@ function echo_comment_status_buttons( $Form, $edited_Comment )
 {
 	global $Blog;
 
+	if( $edited_Comment->is_meta() )
+	{	// Don't suggest to change a status of meta comment:
+		$Form->submit( array( 'actionArray[update]', T_('Save Changes!'), 'SaveButton', '' ) );
+		return;
+	}
+
 	$comment_Item = & $edited_Comment->get_Item();
 	// Comment status cannot be more than post status, restrict it:
 	$restrict_max_allowed_status = ( $comment_Item ? $comment_Item->status : '' );

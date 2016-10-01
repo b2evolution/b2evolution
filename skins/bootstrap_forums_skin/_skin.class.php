@@ -21,7 +21,7 @@ class bootstrap_forums_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.6';
+	var $version = '6.7.7';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -85,7 +85,7 @@ class bootstrap_forums_Skin extends Skin
 				),
 					'layout_general' => array(
 						'label' => T_('General Layout'),
-						'note' => '',
+						'note' => T_('Select global skin layout.'),
 						'defaultvalue' => 'no_sidebar',
 						'options' => array(
 								'no_sidebar'    => T_('No Sidebar'),
@@ -96,7 +96,7 @@ class bootstrap_forums_Skin extends Skin
 					),
 					'layout_single' => array(
 						'label' => T_('Single Thread Layout'),
-						'note' => '',
+						'note' => T_('Select skin layout for single threads') . ' (disp=single).',
 						'defaultvalue' => 'no_sidebar',
 						'options' => array(
 								'no_sidebar'    => T_('No Sidebar'),
@@ -107,9 +107,10 @@ class bootstrap_forums_Skin extends Skin
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px',
+						'note' => 'px. ' . T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
+						'size' => '7',
 						'allow_empty' => true,
 					),
 				'section_layout_end' => array(

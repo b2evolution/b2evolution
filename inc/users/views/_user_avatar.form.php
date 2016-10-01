@@ -148,7 +148,7 @@ if( $edited_User->has_avatar() && ( $avatar_Link = & $edited_User->get_avatar_Li
 		$duplicated_files_message = '';
 		if( is_admin_page() && $can_moderate_user )
 		{ // Only if current user can edit this user
-			// Allow to forbid main picture 
+			// Allow to forbid main picture
 			$forbid_picture_text = T_( 'Forbid using as main profile picture' );
 			$forbid_picture_url = $ctrl_param.'&amp;action=forbid_avatar&amp;'.url_crumb('user');
 			$forbid_link = action_icon( $forbid_picture_text, 'move_down_orange', $forbid_picture_url, ' '.$forbid_picture_text, 3, 4 ).'<br />';
@@ -245,9 +245,10 @@ if( ( $current_User->ID == $edited_User->ID ) || $can_moderate_user )
 		$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 );
 
 		// Upload
-		$info_content = '<input name="uploadfile[]" type="file" size="10" />';
-		$info_content .= '<input class="btn btn-primary ActionButton" type="submit" value="&gt; './* TRANS: action */ T_('Upload!').'" />';
-		$Form->info( T_('Upload a new picture'), $info_content );
+		$Form->file_input( 'uploadfile[]', NULL, T_('Upload a new picture'), '', array( 'size' => 10 ) );
+
+		$action_buttons = array( array( 'submit', NULL, '> '.T_('Upload!'), 'btn btn-primary ActionButton' ) );
+		$Form->buttons( $action_buttons );
 	}
 
 	$more_content = '';

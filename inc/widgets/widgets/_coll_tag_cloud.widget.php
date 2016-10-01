@@ -95,6 +95,19 @@ class coll_tag_cloud_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		$visibility_statuses = get_visibility_statuses( 'raw', array( 'deprecated', 'redirected', 'trash' ) );
+		$visibility_statuses_icons = get_visibility_statuses( 'icons', array( 'deprecated', 'redirected', 'trash' ) );
+		$default_visible_statuses = array( 'published', 'community', 'protected' );
+		$option_statuses = array();
+		foreach( $visibility_statuses as $status => $status_text )
+		{
+			$option_statuses[] = array(
+				'inskin_'.$status,
+				$visibility_statuses_icons[$status].' '.$status_text,
+				in_array( $status, $default_visible_statuses ) ? 1 : 0
+			);
+		}
+
 		$r = array_merge( array(
 			'title' => array(
 					'type' => 'text',
@@ -107,7 +120,7 @@ class coll_tag_cloud_Widget extends ComponentWidget
 					'type' => 'text',
 					'label' => T_('Source collections'),
 					'note' => T_('Comma-separated list of collection IDs. Leave empty for current collection.'),
-					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*)?$/',
+					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|\*)?$/',
 													  'error' => T_('Invalid list of Collection IDs.') ),
 				),
 			'destination_coll_ID' => array(
@@ -116,6 +129,12 @@ class coll_tag_cloud_Widget extends ComponentWidget
 					'allow_empty' => true,
 					'size' => 2,
 					'note' => T_('Collection ID. Leave empty for automatic selection.'),
+				),
+			'visibility_statuses' => array(
+					'label' => T_('Visibility statuses'),
+					'type' => 'checklist',
+					'options' => $option_statuses,
+					'note' => T_('Only tags associated to posts with the above visibilities will be retained.')
 				),
 			'max_tags' => array(
 					'type' => 'integer',
@@ -181,15 +200,22 @@ class coll_tag_cloud_Widget extends ComponentWidget
 		$BlogCache = & get_BlogCache();
 
 		// Source collections:
-		// Get a list of quoted blog IDs
-		$blog_ids = sanitize_id_list( $this->disp_params['blog_ids'], true );
-		if( empty( $blog ) && empty( $blog_ids ) )
-		{	// Nothing to display
-			return;
+		if( $this->disp_params['blog_ids'] == '*' )
+		{
+			$blog_ids = $this->disp_params['blog_ids'];
 		}
-		elseif( empty( $blog_ids ) )
-		{	// Use current Blog
-			$blog_ids = $blog;
+		else
+		{
+			// Get a list of quoted blog IDs
+			$blog_ids = sanitize_id_list( $this->disp_params['blog_ids'], true );
+			if( empty( $blog ) && empty( $blog_ids ) )
+			{	// Nothing to display
+				return;
+			}
+			elseif( empty( $blog_ids ) )
+			{	// Use current Blog
+				$blog_ids = $blog;
+			}
 		}
 
 		// Destination:
@@ -202,7 +228,16 @@ class coll_tag_cloud_Widget extends ComponentWidget
 			$destination_Blog = NULL;
 		}
 
-		$results = get_tags( $blog_ids, $this->disp_params['max_tags'], /* $this->disp_params['filter_list'] */ NULL, false );
+		$visibility_statuses = get_visibility_statuses( 'raw', array( 'deprecated', 'redirected', 'trash' ) );
+		$filter_inskin_statuses = array();
+		foreach( $visibility_statuses as $status => $status_text )
+		{
+			if( isset( $this->disp_params['visibility_statuses']['inskin_'.$status] ) && $this->disp_params['visibility_statuses']['inskin_'.$status] )
+			{
+				$filter_inskin_statuses[] = $status;
+			}
+		}
+		$results = get_tags( $blog_ids, $this->disp_params['max_tags'], /* $this->disp_params['filter_list'] */ NULL, false, $filter_inskin_statuses );
 		if( empty( $results ) )
 		{	// No tags!
 			return;
@@ -210,9 +245,12 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 		$max_count = $results[0]->tag_count;
 		$min_count = $results[count($results)-1]->tag_count;
-		$count_span = max( 1, $max_count - $min_count );
-		$max_size = $this->disp_params['tag_max_size'];
-		$min_size = $this->disp_params['tag_min_size'];
+
+		$count_span = abs( $max_count - $min_count );
+
+		// Added max() and min() just in case values are incorrectly defined in the widget settings
+		$max_size = max( $this->disp_params['tag_max_size'], $this->disp_params['tag_min_size'] );
+		$min_size = min( $this->disp_params['tag_min_size'], $this->disp_params['tag_max_size'] );
 		$size_span = $max_size - $min_size;
 
 		if($this->disp_params['tag_ordering'] == 'ASC')
@@ -245,7 +283,14 @@ class coll_tag_cloud_Widget extends ComponentWidget
 				? '&laquo;'.format_to_output( $row->tag_name, 'htmlbody' ).'&raquo;'
 				: format_to_output( $row->tag_name, 'htmlbody' );
 
-			$font_size = floor( $row->tag_count * $size_span / $count_span + $min_size );
+			if( $count_span === 0 )
+			{ // edge case where there is only a single tag
+				$font_size = $max_size;
+			}
+			else
+			{
+				$font_size = floor( ( $size_span * ( $row->tag_count - $min_count ) / $count_span ) + $min_size );
+			}
 
 			if( !is_null( $destination_Blog ) )
 			{

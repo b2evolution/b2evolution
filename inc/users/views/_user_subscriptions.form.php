@@ -122,7 +122,7 @@ else
 
 $has_messaging_perm = $edited_User->check_perm( 'perm_messaging', 'reply', false );
 
-$Form->begin_fieldset( T_('Email').( is_admin_page() ? get_manual_link( 'user-notifications-email-panel' ) : '' ) );
+$Form->begin_fieldset( T_('Receiving emails').( is_admin_page() ? get_manual_link( 'user-notifications-email-panel' ) : '' ) );
 
 	$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'" class="'.button_class().'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
 
@@ -151,7 +151,8 @@ $Form->begin_fieldset( T_('Email').( is_admin_page() ? get_manual_link( 'user-no
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Communications').( is_admin_page() ? get_manual_link( 'user-communications-panel' ) : '' ) );
+
+$Form->begin_fieldset( T_('Receiving private messages').( is_admin_page() ? get_manual_link( 'user-communications-panel' ) : '' ) );
 
 	$has_messaging_perm = $edited_User->check_perm( 'perm_messaging', 'reply', false );
 	$messaging_options = array(	array( 'PM', 1, T_( 'private messages on this site.' ), ( ( $UserSettings->get( 'enable_PM', $edited_User->ID ) ) && ( $has_messaging_perm ) ), !$has_messaging_perm || $disabled ) );
@@ -186,7 +187,201 @@ $Form->begin_fieldset( T_('Communications').( is_admin_page() ? get_manual_link(
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Notifications').( is_admin_page() ? get_manual_link( 'user-notifications-panel' ) : '' ) );
+
+$Form->begin_fieldset( T_('Newsletter subscriptions').( is_admin_page() ? get_manual_link( 'user-newsletters-panel' ) : '' ) );
+
+	$newsletter_options = array(
+		array( 'edited_user_newsletter_news', 1, T_( 'Send me news about this site.' ).' <span class="note">'.T_('Each message contains an easy 1 click unsubscribe link.').'</span>', $UserSettings->get( 'newsletter_news',  $edited_User->ID ) ),
+		array( 'edited_user_newsletter_ads', 1, T_( 'I want to receive ADs that may be relevant to my interests.' ), $UserSettings->get( 'newsletter_ads',  $edited_User->ID ) )
+	);
+	$Form->checklist( $newsletter_options, 'edited_user_newsletter', T_( 'Newsletter' ), false, false, $checklist_params );
+
+	// Limit newsletters:
+	if( $is_admin_page )
+	{ // Back office view
+		$Form->text_input( 'edited_user_newsletter_limit', $UserSettings->get( 'newsletter_limit',  $edited_User->ID ), 3, T_( 'Limit newsletters to' ), '', array( 'maxlength' => 3, 'required' => true, 'input_suffix' => ' <b>'.T_('emails per day').'</b>' ) );
+	}
+	else
+	{ // Front office view
+		$Form->text_input( 'edited_user_newsletter_limit', $UserSettings->get( 'newsletter_limit',  $edited_User->ID ), 3, T_( 'Limit newsletters to %s emails per day' ), '', array( 'maxlength' => 3, 'required' => true, 'inline' => true ) );
+	}
+
+$Form->end_fieldset();
+
+
+$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
+
+if( $notifications_mode != 'off' )
+{
+	$Form->begin_fieldset( T_('Collection subscriptions').( is_admin_page() ? get_manual_link( 'user-coll-subscriptions-panel' ) : '' ), array( 'id' => 'subs' ) );
+
+			// Get those blogs for which we have already subscriptions (for this user)
+			$blog_subs_SQL = new SQL( 'Get those blogs for which we have already subscriptions for this user #'.$edited_User->ID );
+			$blog_subs_SQL->SELECT( 'blog_ID, sub_items, sub_comments' );
+			$blog_subs_SQL->FROM( 'T_blogs' );
+			$blog_subs_SQL->FROM_add( 'INNER JOIN T_subscriptions ON blog_ID = sub_coll_ID AND sub_user_ID = '.$edited_User->ID );
+			$blog_subs_SQL->WHERE( 'sub_items = 1' );
+			$blog_subs_SQL->WHERE_or( 'sub_comments = 1' );
+			$blog_subs = $DB->get_results( $blog_subs_SQL->get(), OBJECT, $blog_subs_SQL->title );
+
+			$BlogCache = & get_BlogCache();
+			$subs_blog_IDs = array();
+			foreach( $blog_subs AS $blog_sub )
+			{
+				if( ! ( $sub_Blog = & $BlogCache->get_by_ID( $blog_sub->blog_ID, false, false ) ) )
+				{	// Skip wrong collection:
+					continue;
+				}
+				if( ! ( $sub_Blog->get_setting( 'allow_subscriptions' ) && $blog_sub->sub_items ) &&
+						! ( $sub_Blog->get_setting( 'allow_comment_subscriptions' ) && $blog_sub->sub_comments ) )
+				{	// Skip because the collection doesn't allow any subscription:
+					continue;
+				}
+
+				$subs_blog_IDs[] = $sub_Blog->ID;
+
+				// Skip because the user no longer has access to the collection - but only after adding the collection ID to the $subs_blog_IDs array.
+				// The subscription will be removed from the DB when the user saves the form
+				if( ! $sub_Blog->has_access( $edited_User ) )
+				{
+					continue;
+				}
+
+				$subscriptions = array();
+				if( $sub_Blog->get_setting( 'allow_subscriptions' ) )
+				{	// If subscription is allowed for new posts:
+					$subscriptions[] = array( 'sub_items_'.$sub_Blog->ID, '1', T_('Notify me of any new post in this collection'), $blog_sub->sub_items );
+				}
+				if( $sub_Blog->get_setting( 'allow_comment_subscriptions' ) )
+				{	// If subscription is allowed for new comments:
+					$subscriptions[] = array( 'sub_comments_'.$sub_Blog->ID, '1', T_('Notify me of any new comment in this collection'), $blog_sub->sub_comments );
+				}
+				$Form->checklist( $subscriptions, 'subscriptions', $sub_Blog->dget( 'shortname', 'htmlbody' ) );
+			}
+
+			$Form->hidden( 'subs_blog_IDs', implode( ',', $subs_blog_IDs ) );
+
+	if( $is_admin_page && $Settings->get( 'subscribe_new_blogs' ) == 'page' )
+	{	// To subscribe from blog page only
+		$Form->info_field( '', T_('In order to subscribe to a new blog, go to the relevant blog and subscribe from there.'), array( 'class' => 'info_full' ) );
+	}
+	else
+	{	// To subscribe from current list of blogs
+
+		// Load collections which have the enabled settings to subscribe on new posts or comments:
+		$BlogCache = new BlogCache();
+		$BlogCache->load_subscription_colls( $edited_User, $subs_blog_IDs );
+
+		if( empty( $BlogCache->cache ) )
+		{	// No blogs to subscribe
+			if( empty( $subs_blog_IDs ) )
+			{	// Display this info if really no blogs to subscribe
+				$Form->info_field( '', T_('Sorry, no blogs available to subscribe.'), array( 'class' => 'info_full' ) );
+			}
+		}
+		else
+		{ // Display a form to subscribe on new blog
+			$subscribe_blog_ID = param( 'subscribe_blog' , '', isset( $Blog ) ? $Blog->ID : 0 );
+			if( empty( $blog_subs ) )
+			{
+				$Form->begin_line( T_('Subscribe to') );
+			}
+			else
+			{
+				$Form->begin_line( T_('Also available') );
+			}
+
+				$subscribe_blogs_select = $Form->select_input_object( 'subscribe_blog', $subscribe_blog_ID, $BlogCache, '', array( 'object_callback' => 'get_option_list_parent', 'loop_object_method' => 'get_shortname' ) );
+				$subscribe_items_new = $Form->hidden( 'sub_items_new', 1 );
+				$subscribe_blogs_button = $Form->button( array(
+					'name'  => 'actionArray[subscribe]',
+					'value' => T_('Subscribe to this collection'),
+					'style' => 'margin-left:10px;'
+				) );
+			$Form->end_line();
+
+			// Get collection to set proper active checkboxes on page loading:
+			if( isset( $BlogCache->cache[ $subscribe_blog_ID ] ) )
+			{	// Get selected collection:
+				$selected_subscribe_Blog = $BlogCache->cache[ $subscribe_blog_ID ];
+			}
+			else
+			{	// Get first collection from list:
+				foreach( $BlogCache->cache as $selected_subscribe_Blog )
+				{
+					break;
+				}
+			}
+
+			foreach( $BlogCache->cache as $subscribe_Blog )
+			{	// These hidden fields are used only by JS to know what subscription settings are enabled for each collection:
+				$enabled_subs_settings = $subscribe_Blog->get_setting( 'allow_subscriptions' ) ? 'p' : '';
+				$enabled_subs_settings .= $subscribe_Blog->get_setting( 'allow_comment_subscriptions' ) ? 'c' : '';
+				$Form->hidden( 'coll_subs_settings_'.$subscribe_Blog->ID, $enabled_subs_settings );
+			}
+		}
+	}
+	$Form->end_fieldset();
+
+
+	$Form->begin_fieldset( T_('Individual post subscriptions').( is_admin_page() ? get_manual_link( 'user-post-subscriptions-panel' ) : '' ) );
+
+		$sql = 'SELECT DISTINCT post_ID, blog_ID, blog_shortname
+					FROM T_items__subscriptions
+						INNER JOIN T_items__item ON isub_item_ID = post_ID
+						INNER JOIN T_categories ON post_main_cat_ID = cat_ID
+						INNER JOIN T_blogs ON cat_blog_ID = blog_ID
+					WHERE isub_user_ID = '.$edited_User->ID.' AND isub_comments <> 0
+					ORDER BY blog_ID, post_ID ASC';
+		$individual_posts_subs = $DB->get_results( $sql );
+		$subs_item_IDs = array();
+		if( empty( $individual_posts_subs ) )
+		{
+			$Form->info_field( '', T_( 'You are not subscribed to any updates on specific posts yet.' ), array( 'class' => 'info_full' ) );
+		}
+		else
+		{
+			global $admin_url;
+			$ItemCache = & get_ItemCache();
+
+			$Form->info_field( '', T_( 'You are subscribed to be notified of all new comments on the following posts' ).':', array( 'class' => 'info_full' ) );
+			$blog_name = NULL;
+			foreach( $individual_posts_subs as $row )
+			{
+				if( ! ( $Item = $ItemCache->get_by_ID( $row->post_ID, false, false ) ) )
+				{ // Item doesn't exist anymore
+					continue;
+				}
+				$subs_item_IDs[] = $row->post_ID;
+				if( $blog_name != $row->blog_shortname )
+				{
+					if( !empty( $blog_name ) )
+					{
+						$Form->checklist( $post_subs, 'item_subscriptions', $blog_name );
+					}
+					$blog_name = $row->blog_shortname;
+					$post_subs = array();
+				}
+				if( is_admin_page() && $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $Item ) )
+				{ // Link title to back-office if user has a permission
+					$item_title = '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$row->blog_ID.'&amp;p='.$Item->ID.'">'.format_to_output( $Item->title ).'</a>';
+				}
+				else
+				{ // Link title to front-office
+					$item_title = $Item->get_permanent_link( '#title#' );
+				}
+				$post_subs[] = array( 'item_sub_'.$row->post_ID, 1, $item_title, 1 );
+			}
+			// display individual post subscriptions from the last Blog
+			$Form->checklist( $post_subs, 'item_subscriptions', $blog_name );
+		}
+		$Form->hidden( 'subs_item_IDs', implode( ',', $subs_item_IDs ) );
+		$Form->info_field( '', T_( 'To subscribe to notifications on a specifc post, go to that post and click "Notify me when someone comments" at the end of the comment list.' ), array( 'class' => 'info_full' ) );
+
+	$Form->end_fieldset();
+}
+
+$Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_manual_link( 'user-notifications-panel' ) : '' ) );
 
 	// User notification options
 	$notify_options = array();
@@ -252,196 +447,8 @@ $Form->begin_fieldset( T_('Notifications').( is_admin_page() ? get_manual_link( 
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Newsletter subscriptions').( is_admin_page() ? get_manual_link( 'user-newsletters-panel' ) : '' ) );
 
-	$newsletter_options = array(
-		array( 'edited_user_newsletter_news', 1, T_( 'Send me news about this site.' ).' <span class="note">'.T_('Each message contains an easy 1 click unsubscribe link.').'</span>', $UserSettings->get( 'newsletter_news',  $edited_User->ID ) ),
-		array( 'edited_user_newsletter_ads', 1, T_( 'I want to receive ADs that may be relevant to my interests.' ), $UserSettings->get( 'newsletter_ads',  $edited_User->ID ) )
-	);
-	$Form->checklist( $newsletter_options, 'edited_user_newsletter', T_( 'Newsletter' ), false, false, $checklist_params );
-
-	// Limit newsletters:
-	if( $is_admin_page )
-	{ // Back office view
-		$Form->text_input( 'edited_user_newsletter_limit', $UserSettings->get( 'newsletter_limit',  $edited_User->ID ), 3, T_( 'Limit newsletters to' ), '', array( 'maxlength' => 3, 'required' => true, 'input_suffix' => ' <b>'.T_('emails per day').'</b>' ) );
-	}
-	else
-	{ // Front office view
-		$Form->text_input( 'edited_user_newsletter_limit', $UserSettings->get( 'newsletter_limit',  $edited_User->ID ), 3, T_( 'Limit newsletters to %s emails per day' ), '', array( 'maxlength' => 3, 'required' => true, 'inline' => true ) );
-	}
-
-$Form->end_fieldset();
-
-$Form->begin_fieldset( T_('Collection subscriptions').( is_admin_page() ? get_manual_link( 'user-coll-subscriptions-panel' ) : '' ), array( 'id' => 'subs' ) );
-
-		// Get those blogs for which we have already subscriptions (for this user)
-		$blog_subs_SQL = new SQL( 'Get those blogs for which we have already subscriptions for this user #'.$edited_User->ID );
-		$blog_subs_SQL->SELECT( 'blog_ID, sub_items, sub_comments' );
-		$blog_subs_SQL->FROM( 'T_blogs' );
-		$blog_subs_SQL->FROM_add( 'INNER JOIN T_subscriptions ON blog_ID = sub_coll_ID AND sub_user_ID = '.$edited_User->ID );
-		$blog_subs_SQL->WHERE( 'sub_items = 1' );
-		$blog_subs_SQL->WHERE_or( 'sub_comments = 1' );
-		$blog_subs = $DB->get_results( $blog_subs_SQL->get(), OBJECT, $blog_subs_SQL->title );
-
-		$BlogCache = & get_BlogCache();
-		$subs_blog_IDs = array();
-		foreach( $blog_subs AS $blog_sub )
-		{
-			if( ! ( $sub_Blog = & $BlogCache->get_by_ID( $blog_sub->blog_ID, false, false ) ) )
-			{	// Skip wrong collection:
-				continue;
-			}
-			if( ! ( $sub_Blog->get_setting( 'allow_subscriptions' ) && $blog_sub->sub_items ) &&
-			    ! ( $sub_Blog->get_setting( 'allow_comment_subscriptions' ) && $blog_sub->sub_comments ) )
-			{	// Skip because the collection doesn't allow any subscription:
-				continue;
-			}
-
-			$subs_blog_IDs[] = $sub_Blog->ID;
-			$subscriptions = array();
-			if( $sub_Blog->get_setting( 'allow_subscriptions' ) )
-			{	// If subscription is allowed for new posts:
-				$subscriptions[] = array( 'sub_items_'.$sub_Blog->ID, '1', T_('All posts'), $blog_sub->sub_items );
-			}
-			if( $sub_Blog->get_setting( 'allow_comment_subscriptions' ) )
-			{	// If subscription is allowed for new comments:
-				$subscriptions[] = array( 'sub_comments_'.$sub_Blog->ID, '1', T_('All comments'), $blog_sub->sub_comments );
-			}
-			$Form->checklist( $subscriptions, 'subscriptions', $sub_Blog->dget( 'shortname', 'htmlbody' ) );
-		}
-
-		$Form->hidden( 'subs_blog_IDs', implode( ',', $subs_blog_IDs ) );
-
-if( $is_admin_page && $Settings->get( 'subscribe_new_blogs' ) == 'page' )
-{	// To subscribe from blog page only
-	$Form->info_field( '', T_('In order to subscribe to a new blog, go to the relevant blog and subscribe from there.'), array( 'class' => 'info_full' ) );
-}
-else
-{	// To subscribe from current list of blogs
-
-	// Load collections which have the enabled settings to subscribe on new posts or comments:
-	$BlogCache = new BlogCache();
-	$BlogCache->load_subscription_colls( $edited_User, $subs_blog_IDs );
-
-	if( empty( $BlogCache->cache ) )
-	{	// No blogs to subscribe
-		if( empty( $subs_blog_IDs ) )
-		{	// Display this info if really no blogs to subscribe
-			$Form->info_field( '', T_('Sorry, no blogs available to subscribe.'), array( 'class' => 'info_full' ) );
-		}
-	}
-	else
-	{ // Display a form to subscribe on new blog
-		$Form->info_field( '', T_('Choose additional subscriptions').':', array( 'class' => 'info_full' ) );
-		$label_blogs_prefix = $label_blogs_suffix = '';
-
-		$Form->switch_layout( 'none' );
-		$Form->output = false;
-
-		$subscribe_blog_ID = param( 'subscribe_blog' , '', isset( $Blog ) ? $Blog->ID : 0 );
-		$subscribe_blogs_select = $Form->select_input_object( 'subscribe_blog', $subscribe_blog_ID, $BlogCache, '', array( 'object_callback' => 'get_option_list_parent' ) ).'</span>';
-		$subscribe_blogs_button = $Form->button( array(
-			'name'  => 'actionArray[subscribe]',
-			'value' => T_('Subscribe'),
-			'style' => 'float:left;margin-left:20px;'
-		) );
-
-		$Form->switch_layout( NULL );
-		$Form->switch_template_parts( $params['skin_form_params'] );
-		$Form->output = true;
-
-		// Get collection to set proper active checkboxes on page loading:
-		if( isset( $BlogCache->cache[ $subscribe_blog_ID ] ) )
-		{	// Get selected collection:
-			$selected_subscribe_Blog = $BlogCache->cache[ $subscribe_blog_ID ];
-		}
-		else
-		{	// Get first collection from list:
-			foreach( $BlogCache->cache as $selected_subscribe_Blog )
-			{
-				break;
-			}
-		}
-
-		foreach( $BlogCache->cache as $subscribe_Blog )
-		{	// These hidden fields are used only by JS to know what subscription settings are enabled for each collection:
-			$enabled_subs_settings = $subscribe_Blog->get_setting( 'allow_subscriptions' ) ? 'p' : '';
-			$enabled_subs_settings .= $subscribe_Blog->get_setting( 'allow_comment_subscriptions' ) ? 'c' : '';
-			$Form->hidden( 'coll_subs_settings_'.$subscribe_Blog->ID, $enabled_subs_settings );
-		}
-
-		$subscriptions = array(
-				array( 'sub_items_new',    '1', T_('All posts'),    0, $selected_subscribe_Blog->get_setting( 'allow_subscriptions' ) ? 0 : 1 ),
-				array( 'sub_comments_new', '1', T_('All comments'), 0, $selected_subscribe_Blog->get_setting( 'allow_comment_subscriptions' ) ? 0 : 1 )
-			);
-		$label_suffix = $Form->label_suffix;
-		$Form->label_suffix = '';
-		$Form->checklist( $subscriptions, 'subscribe_blog', trim( $subscribe_blogs_select ), false, false, array(
-			'field_suffix' => $subscribe_blogs_button,
-			'input_prefix' => '<div class="floatleft">',
-			'input_suffix' => '</div>' ) );
-		$Form->label_suffix = $label_suffix;
-	}
-}
-$Form->end_fieldset();
-
-$Form->begin_fieldset( T_('Individual post subscriptions').( is_admin_page() ? get_manual_link( 'user-post-subscriptions-panel' ) : '' ) );
-
-	$sql = 'SELECT DISTINCT post_ID, blog_ID, blog_shortname
-				FROM T_items__subscriptions
-					INNER JOIN T_items__item ON isub_item_ID = post_ID
-					INNER JOIN T_categories ON post_main_cat_ID = cat_ID
-					INNER JOIN T_blogs ON cat_blog_ID = blog_ID
-				WHERE isub_user_ID = '.$edited_User->ID.' AND isub_comments <> 0
-				ORDER BY blog_ID, post_ID ASC';
-	$individual_posts_subs = $DB->get_results( $sql );
-	$subs_item_IDs = array();
-	if( empty( $individual_posts_subs ) )
-	{
-		$Form->info_field( '', T_( 'You are not subscribed to any updates on specific posts yet.' ), array( 'class' => 'info_full' ) );
-	}
-	else
-	{
-		global $admin_url;
-		$ItemCache = & get_ItemCache();
-
-		$Form->info_field( '', T_( 'You are subscribed to be notified of all new comments on the following posts' ).':', array( 'class' => 'info_full' ) );
-		$blog_name = NULL;
-		foreach( $individual_posts_subs as $row )
-		{
-			if( ! ( $Item = $ItemCache->get_by_ID( $row->post_ID, false, false ) ) )
-			{ // Item doesn't exist anymore
-				continue;
-			}
-			$subs_item_IDs[] = $row->post_ID;
-			if( $blog_name != $row->blog_shortname )
-			{
-				if( !empty( $blog_name ) )
-				{
-					$Form->checklist( $post_subs, 'item_subscriptions', $blog_name );
-				}
-				$blog_name = $row->blog_shortname;
-				$post_subs = array();
-			}
-			if( is_admin_page() && $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $Item ) )
-			{ // Link title to back-office if user has a permission
-				$item_title = '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$row->blog_ID.'&amp;p='.$Item->ID.'">'.format_to_output( $Item->title ).'</a>';
-			}
-			else
-			{ // Link title to front-office
-				$item_title = $Item->get_permanent_link( '#title#' );
-			}
-			$post_subs[] = array( 'item_sub_'.$row->post_ID, 1, $item_title, 1 );
-		}
-		// display individual post subscriptions from the last Blog
-		$Form->checklist( $post_subs, 'item_subscriptions', $blog_name );
-	}
-	$Form->hidden( 'subs_item_IDs', implode( ',', $subs_item_IDs ) );
-	$Form->info_field( '', T_( 'To subscribe to notifications on a specifc post, go to that post and click "Notify me when someone comments" at the end of the comment list.' ), array( 'class' => 'info_full' ) );
-
-$Form->end_fieldset();
-
-	/***************  Buttons  **************/
+/***************  Buttons  **************/
 
 if( $action != 'view' )
 {	// Edit buttons

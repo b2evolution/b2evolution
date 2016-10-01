@@ -2073,6 +2073,7 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 				'blog_media_upload'       => $row[$prefix.'_perm_media_upload'],
 				'blog_media_browse'       => $row[$prefix.'_perm_media_browse'],
 				'blog_media_change'       => $row[$prefix.'_perm_media_change'],
+				'blog_analytics'          => $row[$prefix.'_perm_analytics'],
 			);
 	}
 
@@ -2102,6 +2103,7 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 						'blog_media_upload'       => 0,
 						'blog_media_browse'       => 0,
 						'blog_media_change'       => 0,
+						'blog_analytics'          => 0,
 					);
 			}
 		}
@@ -2137,10 +2139,9 @@ function check_blog_advanced_perm( & $blog_perms, $user_ID, $permname, $permleve
 	switch( $permname )
 	{
 		case 'stats':
-			// Wiewing stats is the same perm as being authorized to edit properties: (TODO...)
-			if( $permlevel == 'view' )
-			{
-				return $blog_perms['blog_properties'];
+			if( $permlevel == 'view' || $permlevel == 'list' )
+			{	// If current user has a permission to view the collection:
+				return $blog_perms['blog_analytics'];
 			}
 			// No other perm can be granted here (TODO...)
 			return false;
@@ -2203,7 +2204,13 @@ function check_blog_advanced_perm( & $blog_perms, $user_ID, $permname, $permleve
 			break;
 
 		case 'meta_comment':
-			return $blog_perms['blog_meta_comment'];
+			$edit_permname = 'blog_edit_cmt';
+			$perm = $blog_perms['blog_meta_comment'];
+			if( ! empty( $perm_target ) )
+			{
+				$Comment = & $perm_target;
+				$creator_user_ID = $Comment->author_user_ID;
+			}
 			break;
 
 		case 'files':
@@ -2308,6 +2315,50 @@ function check_blog_advanced_perm( & $blog_perms, $user_ID, $permname, $permleve
 	}
 
 	return $perm;
+}
+
+
+/**
+ * Check if at least one collection has a permission for given target
+ *
+ * @param string Permission name
+ * @param string Target type: 'user', 'group'
+ * @param integer Target ID
+ * @return boolean
+ */
+function check_coll_first_perm( $perm_name, $target_type, $target_ID )
+{
+	global $DB;
+
+	if( empty( $target_ID ) )
+	{	// Target ID must be defined:
+		return false;
+	}
+
+	switch( $target_type )
+	{
+		case 'user':
+			$table = 'T_coll_user_perms';
+			$field_perm_name = 'bloguser_'.$perm_name;
+			$field_ID_name = 'bloguser_user_ID';
+			break;
+
+		case 'group':
+			$table = 'T_coll_group_perms';
+			$field_perm_name = 'bloggroup_'.$perm_name;
+			$field_ID_name = 'bloggroup_group_ID';
+			break;
+	}
+
+	// Try to find first collection that has a requested permission:
+	$SQL = new SQL( 'Check if '.$target_type.' #'.$target_ID.' has at least one collection with permission ['.$perm_name.']' );
+	$SQL->SELECT( $field_perm_name );
+	$SQL->FROM( $table );
+	$SQL->WHERE( $field_ID_name.' = '.$target_ID );
+	$SQL->WHERE_and( $field_perm_name.' = 1' );
+	$SQL->LIMIT( 1 );
+
+	return boolval( $DB->get_var( $SQL->get(), 0 , NULL, $SQL->title ) );
 }
 
 
@@ -4269,11 +4320,12 @@ function echo_user_crop_avatar_window()
 	echo '<script type="text/javascript">
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_crop_profile_pic = \''.TS_('Crop profile picture').'\';
-		var evo_js_lang_crop = \''.TS_('Crop').'\';
+		var evo_js_lang_crop = \''.TS_('Apply').'\';
 		var evo_js_user_crop_ajax_url = \''.( is_admin_page() ? $admin_url : get_htsrv_url().'anon_async.php' ).'\';
 		var evo_js_is_backoffice = '.( is_admin_page() ? 'true' : 'false' ).';
 		var evo_js_blog = '.( isset( $blog ) ? $blog : 0 ).';
 		var evo_js_crumb_user = \''.get_crumb( 'user' ).'\';
+		evo_js_lang_close = \''.TS_('Cancel').'\';
 	</script>';
 }
 
