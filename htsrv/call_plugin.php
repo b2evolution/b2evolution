@@ -36,7 +36,7 @@ if( is_null( $params ) )
 }
 else
 {	// Params given:
-	if( (substr( $params, 0, 2 ) == 'a:') && (stripos($params, 'O:') == false) )
+	if( ( substr( $params, 0, 2 ) == 'a:' ) && ( ! preg_match( '/(;|{|})O:\+?[0-9]+:"/', $params ) ) )
 	{	// Allow to unserialize only arrays + check there is no Object in the array (We NEVER want to unserialize an object)
 		// (This may result in "false", but this means that unserializing failed)
 		$params = @unserialize( $params );
