@@ -7585,6 +7585,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11810, 'Upgrading plugins table...' ) )
+	{	// part of 6.7.7-stable
+		$DB->query( 'ALTER TABLE T_plugins
+			MODIFY plug_priority TINYINT UNSIGNED NOT NULL default 50' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
