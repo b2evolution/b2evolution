@@ -66,8 +66,8 @@ class ParamFuncsTestCase extends EvoUnitTestCase
 	{
 		// The following is somewhat odd behaviour, but it's a touchy subject, so as long as it works like that,
 		// let's leave it like that.
-		$_POST['test1'] = '';
-		$this->assertEqual( param( 'test1', 'array', array() ), '' );
+		$_POST['test1[]'] = '';
+		$this->assertEqual( param( 'test1', 'array', array() ), array() );
 
 		$this->assertIdentical( param( 'test2', 'array', array() ), array() );
 	}
@@ -84,6 +84,8 @@ class ParamFuncsTestCase extends EvoUnitTestCase
 
 	function test_param_check_passwords()
 	{
+		$_POST['p1'] = '';
+		$_POST['p2'] = '';
 		set_param('p1', '0');
 		set_param('p2', '0');
 		$this->assertTrue( param_check_passwords('p1', 'p2', true, 0) );
