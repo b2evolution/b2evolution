@@ -98,6 +98,72 @@ class ParamFuncsTestCase extends EvoUnitTestCase
 		set_param('p2', '2');
 		$this->assertFalse( param_check_passwords('p1', 'p2') );
 	}
+
+
+	function test_param_check_serialized_array()
+	{
+		// Simple array:
+		//   $params = array( 'a' => 'b' );
+		set_param( 'params', 'a:1:{s:1:"a";s:1:"b";}' );
+		$this->assertTrue( param_check_serialized_array( 'params' ) );
+
+		// Simple object:
+		//   $params = new stdClass();
+		//   $params->a = 'b';
+		set_param( 'params', 'O:8:"stdClass":1:{s:1:"a";s:1:"b";}' );
+		$this->assertFalse( param_check_serialized_array( 'params' ) );
+
+		// Array contains an object with string key:
+		//   $Object = new stdClass();
+		//   $Object->a = 'b';
+		//   $params = array( 'a' => 'b', 'c' => $Object );
+		set_param( 'params', 'a:2:{s:1:"a";s:1:"b";s:1:"c";O:8:"stdClass":1:{s:1:"a";s:1:"b";}}' );
+		$this->assertFalse( param_check_serialized_array( 'params' ) );
+
+		// Array contains an object with integer key:
+		//   $Object = new stdClass();
+		//   $Object->a = 'b';
+		//   $params = array( 'a' => 'b', 123 => $Object );
+		set_param( 'params', 'a:2:{s:1:"a";s:1:"b";i:123;O:8:"stdClass":1:{s:1:"a";s:1:"b";}}' );
+		$this->assertFalse( param_check_serialized_array( 'params' ) );
+
+		// Array contains a string with PART of fake object structure:
+		//   $params = array( 'a' => 'b', 'c' => ';O:8:' );
+		set_param( 'params', 'a:2:{s:1:"a";s:1:"b";s:1:"c";s:5:";O:8:";}' );
+		$this->assertTrue( param_check_serialized_array( 'params' ) );
+
+		// Array contains a string with FULL fake object structure:
+		//   $params = array( 'a' => 'b', 'c' => 'a:2:{s:1:"a";s:1:"b";i:123;O:8:"stdClass":1:{s:1:"a";s:1:"b";}}' );
+		set_param( 'params', 'a:2:{s:1:"a";s:1:"b";s:1:"c";s:63:"a:2:{s:1:"a";s:1:"b";i:123;O:8:"stdClass":1:{s:1:"a";s:1:"b";}}";}' );
+		$this->assertTrue( param_check_serialized_array( 'params' ) );
+
+		// Array contains a string with FULL fake object structure AND object:
+		//   $Object = new stdClass();
+		//   $Object->a = 'b';
+		//   $params = array( 'a' => 'b', 'c' => 'a:2:{s:1:"a";s:1:"b";i:123;O:8:"stdClass":1:{s:1:"a";s:1:"b";}}', 'd' => $Object );
+		set_param( 'params', 'a:3:{s:1:"a";s:1:"b";s:1:"c";s:63:"a:2:{s:1:"a";s:1:"b";i:123;O:8:"stdClass":1:{s:1:"a";s:1:"b";}}";s:1:"d";O:8:"stdClass":1:{s:1:"a";s:1:"b";}}' );
+		$this->assertFalse( param_check_serialized_array( 'params' ) );
+
+		// String:
+		//   $params = 'a';
+		set_param( 'params', 's:1:"a";' );
+		$this->assertFalse( param_check_serialized_array( 'params' ) );
+
+		// Integer:
+		//   $params = 456;
+		set_param( 'params', 'i:456;' );
+		$this->assertFalse( param_check_serialized_array( 'params' ) );
+
+		// Float:
+		//   $params = 123.456;
+		set_param( 'params', 'd:123.4560000000000030695446184836328029632568359375;' );
+		$this->assertFalse( param_check_serialized_array( 'params' ) );
+
+		// NULL:
+		//   $params = NULL;
+		set_param( 'params', 'N;' );
+		$this->assertFalse( param_check_serialized_array( 'params' ) );
+	}
 }
 
 

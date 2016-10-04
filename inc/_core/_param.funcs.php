@@ -2572,4 +2572,50 @@ function isset_param( $var )
 	return isset($_POST[$var]) || isset($_GET[$var]);
 }
 
+
+/**
+ * Check if a serialized data is an array and doesn't contain any object inside
+ *
+ * @param string Param name from request
+ * @return boolean TRUE on expected data
+ */
+function param_check_serialized_array( $param_name )
+{
+	$param_value = get_param( $param_name );
+
+	if( ! is_string( $param_value ) )
+	{	// A serialized data must be a string:
+		return false;
+	}
+
+	// Search all string items in the serialized array:
+	preg_match_all( '/[{;]s:(\d+):"/', $param_value, $matches, PREG_OFFSET_CAPTURE );
+	foreach( $matches[0] as $m => $match )
+	{	// And replace its values with spaces in order to don't decide below the following string values as object structures:
+		//    a:2:{s:1:"a";s:1:"b";i:123;O:8:"stdClass":1:{s:1:"a";s:1:"b";}}
+		$param_value = substr_replace( $param_value, str_repeat( ' ', (int)$matches[1][ $m ][0] ), $match[1] + strlen( $match[0] ), (int)$matches[1][ $m ][0] );
+	}
+
+	if(
+		// Allow to unserialize only arrays, main reason is an excluding of object structure like:
+		//     - O:7:"Results":1:{s:3:"sql";s:21:"SELECT * FROM T_users";}
+		( substr( $param_value, 0, 2 ) == 'a:' ) &&
+		// + Check there is no Object in the array (We NEVER want to unserialize an object):
+		//     a:1:{s:3:"key";O:8:"stdClass":1:{s:1:"x";i:1;}}
+		//     a:1:{i:123;O:8:"stdClass":1:{s:1:"x";i:1;}}
+		//     a:1:{s:3:"key";a:1:{s:3:"sub";O:8:"stdClass":1:{s:1:"x";i:1;}}}
+		//     a:1:{s:3:"key";a:1:{i:456;O:8:"stdClass":1:{s:1:"x";i:1;}}}
+		//   This checking exclude real string with object structure value like ';O:8:':
+		//     a:1:{s:3:"key";s:5:";O:8:";}
+		( ! preg_match( '/(s:\d+:"[^"]*"|i:\d+);O:\+?[0-9]+:"/', $param_value ) )
+	)
+	{	// Correct data:
+		return true;
+	}
+	else
+	{	// Wrong data:
+		return false;
+	}
+}
+
 ?>
