@@ -892,7 +892,7 @@ switch( $action )
 
 				if( $fm_Filelist->contains( $loop_src_File ) === false )
 				{ // File not in filelist (expected if not same dir)
-					$fm_Filelist->add( $File );
+					$fm_Filelist->add( $loop_src_File );
 				}
 
 				if( ! empty( $success_message ) )
