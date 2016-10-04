@@ -588,6 +588,9 @@ switch( $tab )
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'email-plugins-settings' );
+
+				// Initialize JS for color picker field on the edit plugin settings form:
+				init_colorpicker_js();
 				break;
 		}
 

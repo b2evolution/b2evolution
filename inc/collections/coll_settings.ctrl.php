@@ -1008,6 +1008,8 @@ else
 			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 			$AdminUI->breadcrumbpath_add( T_('Plugins'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			$AdminUI->set_page_manual_link( 'blog-plugin-settings' );
+			// Initialize JS for color picker field on the edit plugin settings form:
+			init_colorpicker_js();
 			break;
 
 		case 'advanced':

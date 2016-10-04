@@ -812,6 +812,8 @@ switch( $action )
 	case 'edit_settings':
 		$AdminUI->append_to_titlearea( '<a href="'.regenerate_url('', 'action=edit_settings&amp;plugin_ID='.$edit_Plugin->ID).'">'
 			.sprintf( T_('Edit plugin &laquo;%s&raquo; (ID %d)'), $edit_Plugin->name, $edit_Plugin->ID ).'</a>' );
+		// Initialize JS for color picker field on the edit plugin settings form:
+		init_colorpicker_js();
 		break;
 
 	case 'disp_help_plain': // just the help, without any payload
