@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2016-10-01 19:43+0200\n"
+"POT-Creation-Date: 2016-10-04 18:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Francois Planque <transifex@planque.com>, 2016\n"
 "Language-Team: French (France) (https://www.transifex.com/fplanque/teams/23/fr_FR/)\n"
@@ -334,7 +334,7 @@ msgstr "Délier"
 
 #: ../../../conf/_icons.php:651 ../conf/_icons.php:666
 #: ../../../inc/collections/views/_coll_home.form.php:43
-#: ../../../inc/plugins/plugins.ctrl.php:1039
+#: ../../../inc/plugins/plugins.ctrl.php:1041
 #: ../../../inc/plugins/views/_plugin_list.view.php:227
 #: ../../../inc/plugins/views/_plugin_list_available.view.php:38
 #: ../../../inc/plugins/views/_plugin_settings.form.php:66
@@ -1032,7 +1032,7 @@ msgstr "Enregistrer les modifications!"
 #: ../../../inc/tools/views/_misc_tools.view.php:79
 #: ../../../inc/users/model/_user.funcs.php:4328 ../install/index.php:751
 #: ../../../install/index.php:870 ../install/index.php:1223
-#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:391
+#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:416
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -2012,9 +2012,9 @@ msgstr ""
 #: ../../../inc/collections/coll_settings.ctrl.php:994
 #: ../../../inc/collections/coll_settings.ctrl.php:1001
 #: ../../../inc/collections/coll_settings.ctrl.php:1008
-#: ../../../inc/collections/coll_settings.ctrl.php:1015
-#: ../../../inc/collections/coll_settings.ctrl.php:1023
-#: ../../../inc/collections/coll_settings.ctrl.php:1031
+#: ../../../inc/collections/coll_settings.ctrl.php:1017
+#: ../../../inc/collections/coll_settings.ctrl.php:1025
+#: ../../../inc/collections/coll_settings.ctrl.php:1033
 #: ../../../inc/collections/collections.ctrl.php:395
 #: ../../../inc/files/file_settings.ctrl.php:189
 #: ../../../inc/files/file_types.ctrl.php:194
@@ -2342,7 +2342,7 @@ msgstr "Montrer containers"
 #: ../../../inc/collections/coll_settings.ctrl.php:925
 #: ../../../inc/items/views/_itemtype.form.php:45
 #: ../../../inc/messaging/model/_messaging.funcs.php:398
-#: ../../../inc/messaging/msg_settings.ctrl.php:145
+#: ../../../inc/messaging/msg_settings.ctrl.php:147
 #: ../../../inc/users/views/_group.form.php:150
 msgid "General"
 msgstr "Général"
@@ -2365,6 +2365,7 @@ msgstr "SEO"
 #: ../../../inc/collections/coll_settings.ctrl.php:1009
 #: ../../../inc/items/views/_item_expert.form.php:688
 #: ../../../inc/maintenance/model/_backup.class.php:66
+#: ../../../inc/tools/email.ctrl.php:587
 msgid "Plugins"
 msgstr "Plugins"
 
@@ -2454,7 +2455,7 @@ msgstr "Retours"
 #: ../inc/locales/translation.ctrl.php:134
 #: ../../../inc/maintenance/backup.ctrl.php:48
 #: ../../../inc/maintenance/upgrade.ctrl.php:47
-#: ../inc/plugins/plugins.ctrl.php:850
+#: ../inc/plugins/plugins.ctrl.php:852
 #: ../../../inc/regional/cities.ctrl.php:307
 #: ../inc/regional/countries.ctrl.php:272
 #: ../../../inc/regional/currencies.ctrl.php:214
@@ -3100,7 +3101,7 @@ msgstr "Idx Blog"
 #: ../../../inc/locales/_locale_settings.form.php:89
 #: ../../../inc/locales/_locale_settings.form.php:260
 #: ../../../inc/messaging/views/_contact_list.view.php:315
-#: ../../../inc/plugins/plugins.ctrl.php:1017
+#: ../../../inc/plugins/plugins.ctrl.php:1019
 #: ../../../inc/plugins/views/_plugin_settings.form.php:60
 #: ../../../inc/regional/views/_city.form.php:46
 #: ../../../inc/regional/views/_city_list.view.php:207
@@ -4180,7 +4181,7 @@ msgstr "ATTENTION: Supprimer cet objet supprimera également:"
 #: ../../../inc/_core/model/dataobjects/_dataobject.class.php:838
 #: ../../../inc/_core/ui/results/_resultsel.class.php:522
 #: ../../../inc/collections/views/_coll_general.form.php:78
-#: ../../../inc/plugins/plugins.ctrl.php:978
+#: ../../../inc/plugins/plugins.ctrl.php:980
 msgid "THIS CANNOT BE UNDONE!"
 msgstr "CETTE OPERATION N'EST PAS REVERSIBLE!"
 
@@ -4190,7 +4191,7 @@ msgstr "CETTE OPERATION N'EST PAS REVERSIBLE!"
 #: ../../../inc/collections/views/_coll_general.form.php:86
 #: ../../../inc/messaging/_messaging.init.php:546
 #: ../../../inc/messaging/_messaging.init.php:657
-#: ../../../inc/plugins/plugins.ctrl.php:980 ../install/index.php:1153
+#: ../../../inc/plugins/plugins.ctrl.php:982 ../install/index.php:1153
 msgid "I am sure!"
 msgstr "Je suis sûr!"
 
@@ -5422,7 +5423,7 @@ msgstr "Adresse IP"
 #: ../../../inc/items/views/_item_history.view.php:123
 #: ../../../inc/items/views/_itemstatuses.view.php:31
 #: ../../../inc/items/views/_itemtypes.view.php:79
-#: ../../../inc/plugins/plugins.ctrl.php:1025
+#: ../../../inc/plugins/plugins.ctrl.php:1027
 #: ../inc/polls/views/_polls.view.php:105
 #: ../../../inc/sessions/views/_stats_goalcats.view.php:39
 #: ../../../inc/sessions/views/_stats_goals.view.php:104
@@ -6605,17 +6606,17 @@ msgstr "Type de collection"
 msgid "Skin selection"
 msgstr "Sélection de skin"
 
-#: ../../../inc/collections/coll_settings.ctrl.php:1016
+#: ../../../inc/collections/coll_settings.ctrl.php:1018
 msgid "Advanced settings"
 msgstr "Réglages avancés"
 
-#: ../../../inc/collections/coll_settings.ctrl.php:1024
+#: ../../../inc/collections/coll_settings.ctrl.php:1026
 #: ../../../inc/collections/views/_coll_user_perm.form.php:101
 #: ../../../inc/users/views/_user_admin.form.php:63
 msgid "User permissions"
 msgstr "Perms utilisateurs"
 
-#: ../../../inc/collections/coll_settings.ctrl.php:1032
+#: ../../../inc/collections/coll_settings.ctrl.php:1034
 #: ../../../inc/collections/views/_coll_group_perm.form.php:96
 msgid "Group permissions"
 msgstr "Perms groupes"
@@ -8712,7 +8713,7 @@ msgstr "Contenu standard des posts (en s'arrêtant à \"[teaserbreak]\")"
 #: ../../../inc/collections/views/_coll_seo.form.php:248
 #: ../../../inc/collections/views/_coll_seo.form.php:300
 msgid "Teaser images will be displayed"
-msgstr ""
+msgstr "Les images des Teasers seront affichées"
 
 #: ../../../inc/collections/views/_coll_features.form.php:90
 #: ../../../inc/collections/views/_coll_other.form.php:68
@@ -8725,7 +8726,7 @@ msgstr ""
 #: ../../../inc/collections/views/_coll_seo.form.php:249
 #: ../../../inc/collections/views/_coll_seo.form.php:301
 msgid "All images will be displayed"
-msgstr ""
+msgstr "Toutes les images seront affichées"
 
 #: ../../../inc/collections/views/_coll_features.form.php:90
 #: ../../../inc/collections/views/_coll_features.form.php:213
@@ -9181,7 +9182,7 @@ msgstr "Affichée sur le gabarit principal."
 #: ../../../inc/collections/views/_coll_general.form.php:252
 #, php-format
 msgid "Save and duplicate all settings from %s"
-msgstr ""
+msgstr "Enregistrer et dupliquer tous les réglages de %s"
 
 #: ../../../inc/collections/views/_coll_group_perm.form.php:90
 #: ../../../inc/collections/views/_coll_user_perm.form.php:98
@@ -9375,7 +9376,7 @@ msgstr "Permission de commenter sur ce blog avec le statut déprécié"
 #: ../../../inc/collections/views/_coll_group_perm.form.php:239
 #: ../../../inc/collections/views/_coll_user_perm.form.php:216
 msgid "Permission to post meta comments on this collection"
-msgstr ""
+msgstr "Permission de poster des meta commentaires sur cette collectio"
 
 #. TRANS: SHORT table header on TWO lines
 #: ../../../inc/collections/views/_coll_group_perm.form.php:245
@@ -9716,7 +9717,7 @@ msgstr ""
 
 #: ../../../inc/collections/views/_coll_plugin_settings.form.php:60
 msgid "Show plugins from group"
-msgstr ""
+msgstr "Montrer les plugins du groupe"
 
 #: ../../../inc/collections/views/_coll_plugin_settings.form.php:126
 msgid "There are no plugins providing blog-specific settings."
@@ -10574,16 +10575,16 @@ msgstr "Relatif à baseurl"
 
 #: ../../../inc/collections/views/_coll_urls.form.php:165
 msgid "Subdomain of basehost"
-msgstr ""
+msgstr "Sous-domaine de basehost"
 
 #: ../../../inc/collections/views/_coll_urls.form.php:173
 msgid "Subdomain"
-msgstr ""
+msgstr "Sous-domaine"
 
 #: ../../../inc/collections/views/_coll_urls.form.php:174
 #, php-format
 msgid "(Not possible for %s)"
-msgstr ""
+msgstr "(Pas possible pour %s)"
 
 #: ../../../inc/collections/views/_coll_urls.form.php:179
 #: ../../../inc/collections/views/_coll_urls.form.php:365
@@ -10592,7 +10593,7 @@ msgstr "URL absolue"
 
 #: ../../../inc/collections/views/_coll_urls.form.php:245
 msgid "Cookie Settings"
-msgstr ""
+msgstr "Réglages de Cookies"
 
 #: ../../../inc/collections/views/_coll_urls.form.php:257
 #: ../../../inc/collections/views/_coll_urls.form.php:262
@@ -10606,17 +10607,17 @@ msgstr "Automatique"
 #: ../../../inc/collections/views/_coll_urls.form.php:263
 #: ../../../inc/tools/views/_email_smtp.form.php:81
 msgid "Custom"
-msgstr ""
+msgstr "Personnalisé"
 
 #: ../../../inc/collections/views/_coll_urls.form.php:259
 #: ../../../inc/collections/views/_coll_urls.form.php:268
 msgid "Cookie domain"
-msgstr ""
+msgstr "Domaine des Cookies"
 
 #: ../../../inc/collections/views/_coll_urls.form.php:264
 #: ../../../inc/collections/views/_coll_urls.form.php:269
 msgid "Cookie path"
-msgstr ""
+msgstr "Chemin d'accès des Cookies"
 
 #: ../../../inc/collections/views/_coll_urls.form.php:275
 msgid "Assets URLs / CDN support"
@@ -10738,11 +10739,11 @@ msgstr "Pays"
 
 #: ../../../inc/collections/views/_coll_user_dir.form.php:55
 msgid "Flag"
-msgstr ""
+msgstr "Drapeau"
 
 #: ../../../inc/collections/views/_coll_user_dir.form.php:57
 msgid "Both"
-msgstr ""
+msgstr "Les deux"
 
 #: ../../../inc/collections/views/_coll_user_dir.form.php:60
 #: ../../../inc/items/model/_item.funcs.php:3281
@@ -10962,14 +10963,14 @@ msgstr "Succès"
 #: ../../../inc/maintenance/model/_maintenance.funcs.php:751
 #: ../../../inc/maintenance/model/_maintenance.funcs.php:757
 #: ../../../inc/maintenance/model/_maintenance.funcs.php:763
+#: ../../../inc/tools/model/_email.funcs.php:989
 #: ../../../inc/tools/model/_email.funcs.php:990
-#: ../../../inc/tools/model/_email.funcs.php:991
+#: ../../../inc/tools/model/_email.funcs.php:1021
 #: ../../../inc/tools/model/_email.funcs.php:1022
-#: ../../../inc/tools/model/_email.funcs.php:1023
+#: ../../../inc/tools/model/_email.funcs.php:1073
 #: ../../../inc/tools/model/_email.funcs.php:1074
-#: ../../../inc/tools/model/_email.funcs.php:1075
+#: ../../../inc/tools/model/_email.funcs.php:1118
 #: ../../../inc/tools/model/_email.funcs.php:1119
-#: ../../../inc/tools/model/_email.funcs.php:1120
 msgid "Failed"
 msgstr "Echec"
 
@@ -11028,7 +11029,7 @@ msgstr "%d contenus pré-formattés"
 #: ../../../inc/tools/model/_wp.funcs.php:173
 #: ../inc/tools/model/_wp.funcs.php:206
 #: ../../../inc/tools/model/_wp.funcs.php:245
-#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:399
+#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:424
 msgid "OK"
 msgstr "OK"
 
@@ -11676,7 +11677,7 @@ msgid "Feedback info"
 msgstr "Info sur les réactions"
 
 #: ../../../inc/comments/views/_comment.form.php:260
-#: ../../../inc/email_campaigns/views/_campaigns_compose.form.php:85
+#: ../../../inc/email_campaigns/views/_campaigns_compose.form.php:84
 #: ../../../inc/items/views/_item_expert.form.php:687
 #: ../../../inc/items/views/_item_list_full.view.php:659
 #: ../../../inc/items/views/_item_mass.form.php:174
@@ -12225,7 +12226,7 @@ msgstr "Répéter tous les"
 #: ../../../inc/cron/views/_cronjob.form.php:72
 #: ../../../inc/cron/views/_cronjob.view.php:38
 msgid "+/- variation of:"
-msgstr ""
+msgstr "+/- variation de:"
 
 #: ../../../inc/cron/views/_cronjob.form.php:68
 msgid "Auto"
@@ -12617,21 +12618,11 @@ msgstr "Supprimer cette adresse email!"
 msgid "Compose message for: %s"
 msgstr "Composer message pour: %s"
 
-#: ../../../inc/email_campaigns/views/_campaigns_compose.form.php:55
-#: ../../../inc/items/views/_item_expert.form.php:875
-msgid "Show an alert when switching from markup to WYSIWYG"
-msgstr ""
-
-#: ../../../inc/email_campaigns/views/_campaigns_compose.form.php:58
-#: ../../../inc/items/views/_item_expert.form.php:879
-msgid "Never show alert when switching from markup to WYSIWYG"
-msgstr ""
-
-#: ../../../inc/email_campaigns/views/_campaigns_compose.form.php:71
+#: ../../../inc/email_campaigns/views/_campaigns_compose.form.php:70
 msgid "HTML Message"
 msgstr "Message HTML"
 
-#: ../../../inc/email_campaigns/views/_campaigns_compose.form.php:92
+#: ../../../inc/email_campaigns/views/_campaigns_compose.form.php:91
 msgid "Save & continue"
 msgstr "Enregistrer & Continuer"
 
@@ -15700,14 +15691,14 @@ msgstr ""
 #: ../../../inc/items/model/_item.class.php:6136
 #, php-format
 msgid "[%s] New post awaiting moderation: \"%s\""
-msgstr ""
+msgstr "[%s] Posts en attente de modération: \"%s\""
 
 #. TRANS: Subject of the mail to send on new posts to moderators. First %s is
 #. blog name, the second %s is the item's title.
 #: ../../../inc/items/model/_item.class.php:6141
 #, php-format
 msgid "[%s] New post may need moderation: \"%s\""
-msgstr ""
+msgstr "[%s] Nouveau post (modération potentiellement nécessaire): \"%s\""
 
 #: ../../../inc/items/model/_item.class.php:6238
 msgid ""
@@ -15970,7 +15961,7 @@ msgstr "Ce post n'a pas de réactions pour le moment..."
 #: ../../../inc/items/model/_item.funcs.php:2780
 #, php-format
 msgid "<a %s>Meta comment</a> on %s"
-msgstr ""
+msgstr "<a %s>Meta commentaire</a> sur %s"
 
 #: ../../../inc/items/model/_item.funcs.php:2819
 msgid "EXPIRED"
@@ -16391,7 +16382,7 @@ msgstr "Page"
 #: ../../../inc/items/model/_itemtypecache.class.php:100
 #: ../../../inc/items/views/_itemtypes.view.php:176
 msgid "Intro-Front"
-msgstr ""
+msgstr "Intro-Front"
 
 #: ../../../inc/items/model/_itemtypecache.class.php:101
 #: ../../../inc/items/views/_itemtypes.view.php:178
@@ -16401,17 +16392,17 @@ msgstr "Intro-Principale"
 #: ../../../inc/items/model/_itemtypecache.class.php:102
 #: ../../../inc/items/views/_itemtypes.view.php:180
 msgid "Intro-Cat"
-msgstr ""
+msgstr "Intro-Cat"
 
 #: ../../../inc/items/model/_itemtypecache.class.php:103
 #: ../../../inc/items/views/_itemtypes.view.php:182
 msgid "Intro-Tag"
-msgstr ""
+msgstr "Intro-Tag"
 
 #: ../../../inc/items/model/_itemtypecache.class.php:104
 #: ../../../inc/items/views/_itemtypes.view.php:184
 msgid "Intro-Sub"
-msgstr ""
+msgstr "Intro-Sub"
 
 #: ../../../inc/items/model/_itemtypecache.class.php:105
 #: ../../../inc/items/views/_itemtypes.view.php:186
@@ -16785,7 +16776,7 @@ msgstr "Montrer le bouton \"Publier!\" lorsque c'est pertinent."
 msgid "Never show the quick \"Publish!\" button."
 msgstr "Ne jamais montrer le bouton \"Publier!\"."
 
-#: ../../../inc/items/views/_item_expert.form.php:885
+#: ../../../inc/items/views/_item_expert.form.php:888
 msgid "Reset defaults for this screen."
 msgstr "RAZ des réglages de cet écran."
 
@@ -17256,7 +17247,7 @@ msgstr "Nouveau type de post"
 #: ../../../inc/items/views/_itemtypes.view.php:194
 #: ../../../inc/users/views/_group.view.php:87
 msgid "Usage"
-msgstr ""
+msgstr "Usage"
 
 #: ../../../inc/items/views/_itemtype.form.php:60
 msgid "Permission level"
@@ -18391,7 +18382,7 @@ msgstr "Le fichier .POT a été importé dans la base de données avec succès"
 
 #: ../../../inc/locales/locales.ctrl.php:470
 #: ../inc/locales/translation.ctrl.php:135
-#: ../../../inc/plugins/plugins.ctrl.php:851
+#: ../../../inc/plugins/plugins.ctrl.php:853
 #: ../inc/regional/cities.ctrl.php:308
 #: ../../../inc/regional/countries.ctrl.php:273
 #: ../../../inc/regional/currencies.ctrl.php:215
@@ -19195,7 +19186,7 @@ msgid "There are no new updates."
 msgstr "Aucune nouvelle mise à jour n'est disponible."
 
 #: ../../../inc/maintenance/views/_upgrade.form.php:42
-#: ../../../inc/plugins/plugins.ctrl.php:1027
+#: ../../../inc/plugins/plugins.ctrl.php:1029
 #: ../../../inc/plugins/views/_plugin_list.view.php:213
 #: ../../../inc/plugins/views/_plugin_list_available.view.php:37
 #: ../../../inc/skins/views/_skin_list.view.php:51
@@ -19326,8 +19317,10 @@ msgstr "Envoi de rappels à propos de messages non lus"
 #: ../../../inc/messaging/messages.ctrl.php:60
 #: ../../../skins_fallback_v5/_messages.disp.php:58
 #: ../../../skins_fallback_v6/_messages.disp.php:58
-msgid "The requested thread does not exist any longer."
-msgstr "La conversation demandée n'existe plus."
+msgid ""
+"The private conversation you are trying to access does not exist any longer."
+msgstr ""
+"La conversation privée à laquelle vous souhaitez d'accéder n'existe plus."
 
 #: ../../../inc/messaging/_messaging.init.php:537
 #: ../inc/messaging/abuse.ctrl.php:60
@@ -19502,7 +19495,6 @@ msgstr ""
 
 #: ../../../inc/messaging/model/_messaging.funcs.php:406
 #: ../../../inc/messaging/msg_settings.ctrl.php:138
-#: ../inc/tools/email.ctrl.php:587
 msgid "Renderers"
 msgstr ""
 
@@ -20064,9 +20056,9 @@ msgstr "Desc non dispo"
 msgid "No description available"
 msgstr "Description non disponible"
 
-#: ../../../inc/plugins/_plugin.class.php:589
-#: ../inc/plugins/_plugin.class.php:661
-#: ../../../inc/plugins/_plugin.class.php:699
+#: ../../../inc/plugins/_plugin.class.php:601
+#: ../inc/plugins/_plugin.class.php:673
+#: ../../../inc/plugins/_plugin.class.php:711
 msgid ""
 "Note: The plugin code is empty, so this plugin will not work as an \"opt-"
 "out\", \"opt-in\" or \"lazy\" renderer."
@@ -20075,45 +20067,45 @@ msgstr ""
 "fonctionnera pas avec les mode de formattage \"opt-out\", \"opt-in\" ou "
 "\"lazy\"."
 
-#: ../../../inc/plugins/_plugin.class.php:597
+#: ../../../inc/plugins/_plugin.class.php:609
 msgid "Apply rendering to posts"
 msgstr "Appliquer le format aux posts"
 
-#: ../../../inc/plugins/_plugin.class.php:604
+#: ../../../inc/plugins/_plugin.class.php:616
 msgid "Apply rendering to comments"
 msgstr "Appliquer le format aux commentaires"
 
-#: ../../../inc/plugins/_plugin.class.php:619
+#: ../../../inc/plugins/_plugin.class.php:631
 msgid "Use for posts"
 msgstr ""
 
-#: ../../../inc/plugins/_plugin.class.php:629
+#: ../../../inc/plugins/_plugin.class.php:641
 msgid "Use for comments"
 msgstr ""
 
-#: ../../../inc/plugins/_plugin.class.php:668
+#: ../../../inc/plugins/_plugin.class.php:680
 msgid "Apply rendering to messages"
 msgstr ""
 
-#: ../../../inc/plugins/_plugin.class.php:706
+#: ../../../inc/plugins/_plugin.class.php:718
 msgid "Apply rendering to emails"
 msgstr ""
 
-#: ../../../inc/plugins/_plugin.class.php:925
+#: ../../../inc/plugins/_plugin.class.php:937
 msgid "My Tab"
 msgstr "Mon Onglet"
 
-#: ../../../inc/plugins/_plugin.class.php:3424
+#: ../../../inc/plugins/_plugin.class.php:3440
 msgid "Homepage of the plugin"
 msgstr "Page d'accueil du plugin"
 
-#: ../../../inc/plugins/_plugin.class.php:3433
+#: ../../../inc/plugins/_plugin.class.php:3449
 #, php-format
 msgid "Click %s to access full documentation for this plugin"
 msgstr "Cliquez %s pour accéder à la documentation complète pour ce plugin"
 
-#: ../../../inc/plugins/_plugin.class.php:3554
-#: ../inc/plugins/plugins.ctrl.php:1008
+#: ../../../inc/plugins/_plugin.class.php:3570
+#: ../inc/plugins/plugins.ctrl.php:1010
 #: ../../../inc/plugins/views/_plugin_list.view.php:152
 msgid "Edit plugin settings!"
 msgstr "Modifier les réglages du plugin!"
@@ -20191,7 +20183,7 @@ msgid "The database has been updated."
 msgstr "La base données a été mise à jour."
 
 #: ../../../inc/plugins/_plugin.funcs.php:1217
-#: ../../../install/_functions_evoupgrade.php:7789
+#: ../../../install/_functions_evoupgrade.php:7796
 msgid "The DB schema has been changed since confirmation."
 msgstr "Le schéma de la base de données a changé depuis la confirmation."
 
@@ -20425,8 +20417,9 @@ msgstr "Code du plugin mis à jour."
 
 #: ../../../inc/plugins/plugins.ctrl.php:561
 #: ../inc/plugins/plugins.ctrl.php:724
-msgid "Plugin priority must be numeric (0-100)."
-msgstr "La priorité du plugin doit être numérique (0-100)."
+#, php-format
+msgid "Plugin priority must be numeric (%s)."
+msgstr ""
 
 #: ../../../inc/plugins/plugins.ctrl.php:566
 #: ../inc/plugins/plugins.ctrl.php:731
@@ -20451,35 +20444,35 @@ msgstr "Le plugin demandé n'existe pas!"
 msgid "Edit plugin &laquo;%s&raquo; (ID %d)"
 msgstr "Modifier le plugin &laquo;%s&raquo; (ID %d)"
 
-#: ../../../inc/plugins/plugins.ctrl.php:831
+#: ../../../inc/plugins/plugins.ctrl.php:833
 #, php-format
 msgid "Help for plugin &laquo;%s&raquo;"
 msgstr "Aide pour le plugin &laquo;%s&raquo;"
 
-#: ../../../inc/plugins/plugins.ctrl.php:834
+#: ../../../inc/plugins/plugins.ctrl.php:836
 msgid "External help page"
 msgstr "Page d'aide externe"
 
-#: ../../../inc/plugins/plugins.ctrl.php:852
+#: ../../../inc/plugins/plugins.ctrl.php:854
 msgid "Plugin configuration"
 msgstr "Configuration du plugin"
 
-#: ../../../inc/plugins/plugins.ctrl.php:905
+#: ../../../inc/plugins/plugins.ctrl.php:907
 msgid "Cancel installation!"
 msgstr "Annuler l'installation!"
 
 #. TRANS: %d is ID, %d name
-#: ../../../inc/plugins/plugins.ctrl.php:907
+#: ../../../inc/plugins/plugins.ctrl.php:909
 #, php-format
 msgid "Finish setup for plugin #%d (%s)"
 msgstr "Fin de l'installation pour le plugin n°%d (%s)."
 
-#: ../../../inc/plugins/plugins.ctrl.php:914
+#: ../../../inc/plugins/plugins.ctrl.php:916
 msgid "The plugin needs the following database changes."
 msgstr "Le plugin requiert les modifications de base de donnée suivantes."
 
-#: ../../../inc/plugins/plugins.ctrl.php:918
-#: ../../../install/_functions_evoupgrade.php:7826
+#: ../../../inc/plugins/plugins.ctrl.php:920
+#: ../../../install/_functions_evoupgrade.php:7833
 msgid ""
 "The following database changes will be carried out. If you are not sure what"
 " this means, it will probably be alright."
@@ -20488,31 +20481,31 @@ msgstr ""
 "vous n'êtes pas sûr de ce que cela signifie, il n'y aura probablement pas de"
 " problème."
 
-#: ../../../inc/plugins/plugins.ctrl.php:932
+#: ../../../inc/plugins/plugins.ctrl.php:934
 msgid "Install!"
 msgstr "Installer!"
 
-#: ../../../inc/plugins/plugins.ctrl.php:951
+#: ../../../inc/plugins/plugins.ctrl.php:953
 msgid "Cancel uninstall!"
 msgstr "Annuler la désinstallation!"
 
 #. TRANS: %d is ID, %d name
-#: ../../../inc/plugins/plugins.ctrl.php:953
+#: ../../../inc/plugins/plugins.ctrl.php:955
 #, php-format
 msgid "Uninstall plugin #%d (%s)"
 msgstr "Desinstallation du plugin n°%d (%s)."
 
-#: ../../../inc/plugins/plugins.ctrl.php:964
+#: ../../../inc/plugins/plugins.ctrl.php:966
 msgid "Uninstalling this plugin will also delete its database tables:"
 msgstr ""
 "Désinstaller ce plugin va aussi supprimer ses tables de la base de données:"
 
-#: ../../../inc/plugins/plugins.ctrl.php:1012
+#: ../../../inc/plugins/plugins.ctrl.php:1014
 msgid "Close info!"
 msgstr "Fermer infos!"
 
 #. TRANS: Code of a plugin
-#: ../../../inc/plugins/plugins.ctrl.php:1018
+#: ../../../inc/plugins/plugins.ctrl.php:1020
 #: ../../../inc/plugins/views/_plugin_list.view.php:197
 #: ../../../inc/plugins/views/_plugin_settings.form.php:104
 #: ../../../inc/regional/views/_country.form.php:37
@@ -20530,7 +20523,7 @@ msgstr "Fermer infos!"
 msgid "Code"
 msgstr "Code"
 
-#: ../../../inc/plugins/plugins.ctrl.php:1020
+#: ../../../inc/plugins/plugins.ctrl.php:1022
 msgid ""
 "This 8-32 character code identifies the plugin when it needs to be called "
 "directly and specifically. This is especially useful for renderer plugins "
@@ -20540,24 +20533,24 @@ msgstr ""
 "l'invoquer directement et spécifiquement. Ceci est particulièrement utile "
 "pour les plugins de rendu et les widgets (SkinTags)."
 
-#: ../../../inc/plugins/plugins.ctrl.php:1021
+#: ../../../inc/plugins/plugins.ctrl.php:1023
 #: ../../../inc/plugins/views/_plugin_settings.form.php:62
 msgid "Short desc"
 msgstr "Desc courte"
 
-#: ../../../inc/plugins/plugins.ctrl.php:1022
+#: ../../../inc/plugins/plugins.ctrl.php:1024
 msgid "Long desc"
 msgstr "Desc longue"
 
-#: ../../../inc/plugins/plugins.ctrl.php:1028
+#: ../../../inc/plugins/plugins.ctrl.php:1030
 msgid "Classname"
 msgstr "Nom de Classe"
 
-#: ../../../inc/plugins/plugins.ctrl.php:1029
+#: ../../../inc/plugins/plugins.ctrl.php:1031
 msgid "Class file"
 msgstr "Fichier Classe"
 
-#: ../../../inc/plugins/plugins.ctrl.php:1054
+#: ../../../inc/plugins/plugins.ctrl.php:1056
 #: ../inc/skins/model/_skin.class.php:553
 #: ../../../inc/skins/model/_skin.class.php:622
 #: ../../../inc/skins/model/_skin.class.php:623
@@ -23648,20 +23641,20 @@ msgstr ""
 "La méthode de cryptage %s doit être disponible sur ce système afin d'activer"
 " la passerelle SMTP."
 
-#: ../../../inc/tools/model/_email.funcs.php:982
+#: ../../../inc/tools/model/_email.funcs.php:981
 msgid "Check SMTP settings..."
 msgstr "Vérifier les réglages SMTP..."
 
-#: ../../../inc/tools/model/_email.funcs.php:1009
+#: ../../../inc/tools/model/_email.funcs.php:1008
 msgid "Test SMTP connection..."
 msgstr "Tester la connexion SMTP..."
 
-#: ../../../inc/tools/model/_email.funcs.php:1051
+#: ../../../inc/tools/model/_email.funcs.php:1050
 #, php-format
 msgid "Attempting to send a text email to \"%s\" via external SMTP server..."
 msgstr ""
 
-#: ../../../inc/tools/model/_email.funcs.php:1096
+#: ../../../inc/tools/model/_email.funcs.php:1095
 #, php-format
 msgid "Attempting to send a text email to \"%s\" via PHP..."
 msgstr ""
@@ -25291,23 +25284,23 @@ msgstr ""
 
 #: ../../../inc/tools/views/_email_other.form.php:49
 msgid "Sending"
-msgstr ""
+msgstr "Envoi"
 
 #: ../../../inc/tools/views/_email_other.form.php:52
 msgid "Chunk Size"
-msgstr ""
+msgstr "Paquet d'envois"
 
 #: ../../../inc/tools/views/_email_other.form.php:52
 msgid "emails at a time"
-msgstr ""
+msgstr "emails à la fois"
 
 #: ../../../inc/tools/views/_email_other.form.php:54
 msgid "Delay between chunks"
-msgstr ""
+msgstr "Délai entre les paquets d'envois"
 
 #: ../../../inc/tools/views/_email_other.form.php:54
 msgid "timing between scheduled job runs"
-msgstr ""
+msgstr "temporisation entre les exécutions de la tâche programmée"
 
 #: ../../../inc/tools/views/_email_return.view.php:71
 msgid "Returned emails"
@@ -25358,7 +25351,7 @@ msgstr ""
 
 #: ../../../inc/tools/views/_email_return_settings.form.php:90
 msgid "IMAP Folder"
-msgstr ""
+msgstr "Dossier IMAP"
 
 #: ../../../inc/tools/views/_email_return_settings.form.php:90
 msgid "Which folder holds your returned email."
@@ -25482,7 +25475,7 @@ msgstr "Source email brut"
 
 #: ../../../inc/tools/views/_email_settings.form.php:43
 msgid "Email envelope"
-msgstr ""
+msgstr "Enveloppe email"
 
 #: ../../../inc/tools/views/_email_settings.form.php:52
 msgid "remove customizations"
@@ -28111,7 +28104,7 @@ msgstr "Niveau de l'utilisateur modifié."
 #: ../../../inc/users/users.ctrl.php:187
 #, php-format
 msgid "Spammer &laquo;%s&raquo; [%s] deleted."
-msgstr ""
+msgstr "Spammeur &laquo;%s&raquo; [%s] supprimé."
 
 #: ../../../inc/users/users.ctrl.php:187
 #, php-format
@@ -28121,7 +28114,7 @@ msgstr "L'utilisateur &laquo;%s&raquo; [%s] a été supprimé."
 #: ../../../inc/users/users.ctrl.php:192
 #, php-format
 msgid "Spammer &laquo;%s&raquo; deleted."
-msgstr ""
+msgstr "Spammeur &laquo;%s&raquo; supprimé."
 
 #: ../../../inc/users/users.ctrl.php:214
 #, php-format
@@ -30761,6 +30754,7 @@ msgstr "Liste des catégories; un clic filtre sur la catégorie désignée."
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:47
 #: ../../../plugins/_archives.plugin.php:320
 #: ../plugins/_calendar.plugin.php:81
+#: ../../../plugins/test_plugin/_test.plugin.php:293
 msgid "Block title"
 msgstr "Titre du bloc"
 
@@ -30902,6 +30896,7 @@ msgstr "Filtrer les catégories"
 #: ../../../inc/widgets/widgets/_user_tools.widget.php:48
 #: ../../../plugins/_archives.plugin.php:321
 #: ../plugins/_calendar.plugin.php:82
+#: ../../../plugins/test_plugin/_test.plugin.php:294
 msgid "Title to display in your skin."
 msgstr "Titre à afficher dans votre skin."
 
@@ -32027,7 +32022,7 @@ msgstr ""
 
 #: ../../../inc/widgets/widgets/_item_small_print.widget.php:107
 msgid "Format"
-msgstr ""
+msgstr "Format"
 
 #: ../../../inc/widgets/widgets/_item_small_print.widget.php:108
 msgid "Select what format should be displayed"
@@ -32039,11 +32034,11 @@ msgstr ""
 
 #: ../../../inc/widgets/widgets/_item_small_print.widget.php:112
 msgid "Revisions"
-msgstr ""
+msgstr "Révisions"
 
 #: ../../../inc/widgets/widgets/_item_small_print.widget.php:117
 msgid "Avatar Size"
-msgstr ""
+msgstr "Taille de la photo de profil"
 
 #. TRANS: date
 #: ../../../inc/widgets/widgets/_item_small_print.widget.php:197
@@ -32080,11 +32075,11 @@ msgstr "Voir l'historique"
 #: ../../../inc/widgets/widgets/_item_tags.widget.php:65
 #: ../../../inc/widgets/widgets/_item_tags.widget.php:74
 msgid "Item Tags"
-msgstr ""
+msgstr "Tags de l'Item"
 
 #: ../../../inc/widgets/widgets/_item_tags.widget.php:83
 msgid "Display item tags."
-msgstr ""
+msgstr "Afficher les tags de l'Item."
 
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:20
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:508
@@ -33840,7 +33835,7 @@ msgstr ""
 #: ../../../install/_functions_create.php:3219
 #: ../install/_functions_create.php:3220
 msgid "Markdown Example"
-msgstr ""
+msgstr "Exemple Markdown"
 
 #: ../../../install/_functions_delete.php:77
 msgid "Reset done!"
@@ -33882,15 +33877,15 @@ msgstr ""
 msgid "Linkblog"
 msgstr "Linkblog"
 
-#: ../../../install/_functions_evoupgrade.php:7774
+#: ../../../install/_functions_evoupgrade.php:7781
 msgid "The database schema is up to date."
 msgstr "Le schéma de base de données est à jour."
 
-#: ../../../install/_functions_evoupgrade.php:7815
+#: ../../../install/_functions_evoupgrade.php:7822
 msgid "Upgrade database"
 msgstr "Mise à jour de la base de données!"
 
-#: ../../../install/_functions_evoupgrade.php:7824
+#: ../../../install/_functions_evoupgrade.php:7831
 msgid ""
 "The version number is correct, but we have detected changes in the database "
 "schema. This can happen if you've been using development versions directly "
@@ -33900,7 +33895,7 @@ msgstr ""
 "dans le schéma de la base. Celà peut arriver si vous avez utilisé des "
 "versions de développement provenant de GitHub..."
 
-#: ../../../install/_functions_evoupgrade.php:7838
+#: ../../../install/_functions_evoupgrade.php:7845
 msgid "Try to Repair/Upgrade database now!"
 msgstr "Essayez de Réparer/Mettre à jour la base de données maintenant!"
 
@@ -34431,7 +34426,7 @@ msgstr "b2evolution ne peut pas être installé à cause des erreurs suivantes:"
 
 #: ../../../install/index.php:514
 msgid "b2evolution cannot be installed on the current configuration."
-msgstr ""
+msgstr "b2evolution ne peut pas être installé sur la configuation actuelle."
 
 #: ../../../install/index.php:529
 msgid ""
@@ -35452,7 +35447,7 @@ msgstr "Satellite"
 
 #: ../../../plugins/_google_maps.plugin.php:105
 msgid "API key"
-msgstr ""
+msgstr "Clef API"
 
 #: ../../../plugins/_google_maps.plugin.php:108
 #, php-format
@@ -36523,7 +36518,7 @@ msgstr "Insérer codespan de Markup"
 
 #: ../../../plugins/prism_plugin/_prism.plugin.php:438
 #: ../../../plugins/prism_plugin/_prism.plugin.php:449
-#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:333
+#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:381
 msgid "Markup"
 msgstr "Markup"
 
@@ -36636,29 +36631,33 @@ msgstr "Plugin de Test"
 msgid "This plugin responds to virtually all possible plugin events :P"
 msgstr "Ce plugin répond pratiquement à tous les évènements de plugins :P"
 
-#: ../../../plugins/test_plugin/_test.plugin.php:113
+#: ../../../plugins/test_plugin/_test.plugin.php:114
 msgid "Multiple select"
 msgstr "Sélection multiple"
 
-#: ../../../plugins/test_plugin/_test.plugin.php:117
+#: ../../../plugins/test_plugin/_test.plugin.php:118
 msgid "Paper"
 msgstr "Papier"
 
-#: ../../../plugins/test_plugin/_test.plugin.php:117
+#: ../../../plugins/test_plugin/_test.plugin.php:118
 msgid "Scissors"
 msgstr "Ciseaux"
 
-#: ../../../plugins/test_plugin/_test.plugin.php:117
+#: ../../../plugins/test_plugin/_test.plugin.php:118
 msgid "Stone"
 msgstr "Caillou"
 
-#: ../../../plugins/test_plugin/_test.plugin.php:119
+#: ../../../plugins/test_plugin/_test.plugin.php:120
 msgid ""
 "This is a free style Multiple Select. You can choose zero or one or more "
 "items"
 msgstr ""
 "Ceci est une Selection Multiple libre. Vous pouvez choisir zero ou un ou "
 "plusieurs éléments"
+
+#: ../../../plugins/test_plugin/_test.plugin.php:3110
+msgid "TEST Column"
+msgstr ""
 
 #: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:46
 msgid "Javascript WYSIWYG editor"
@@ -36755,45 +36754,53 @@ msgstr ""
 "TinyMCE de mieux gérer les langues qui s'écrivent de la droite vers la "
 "gauche."
 
-#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:299
+#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:298
 msgid "Don't show this again for this Collection"
 msgstr ""
 
-#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:314
+#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:312
 msgid "Don't show this again when composing email campaigns"
 msgstr ""
 
-#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:334
+#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:357
+msgid "Show an alert when switching from markup to WYSIWYG"
+msgstr ""
+
+#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:358
+msgid "Never show alert when switching from markup to WYSIWYG"
+msgstr ""
+
+#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:382
 msgid "Toggle to the markup/pro editor."
 msgstr "Basculer vers l'éditeur markup/pro."
 
-#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:336
+#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:384
 msgid "Toggle to the WYSIWYG editor."
 msgstr "Basculer vers l'éditeur WYSIWYG"
 
-#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:392
+#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:417
 msgid ""
 "By switching to WYSIWYG, you might lose newline and paragraph marks as well "
 "as some other formatting. Your text is safe though! Are you sure you want to"
 " switch?"
 msgstr ""
 
-#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:398
+#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:423
 msgid "WARNING"
 msgstr ""
 
-#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:507
+#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:532
 #, php-format
 msgid "TinyMCE javascript could not be loaded. Check the \"%s\" plugin setting."
 msgstr ""
 "Le javascript TinyMCE  n'a pas pu être chargé. Vérifiez le \"%s\" réglage du"
 " plugin."
 
-#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:508
+#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:533
 msgid "URL to TinyMCE"
 msgstr "URL vers TinyMCE"
 
-#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:1074
+#: ../../../plugins/tinymce_plugin/_tinymce.plugin.php:1131
 #, php-format
 msgid ""
 "TinyMCE plugin cannot uses the compressor because folder %s is not writable"
