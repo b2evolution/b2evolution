@@ -4,10 +4,55 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 	var renderedTags = [];
 	var selected;
 
+	// Keys allowed when a renderedTag is selected
+	var allowedKeys = [];
+	allowedKeys.push( 16, 17, 18, 19 ); // Ctrl, Alt, Shift, Pause/Break
+	allowedKeys.push( 20, 27, 45 ); // Capslock, Esc, Insert
+	allowedKeys.push( 33, 34, 35, 36 ); // PgUp, PgDn, End, Home
+	allowedKeys.push( 37, 38, 39, 40 ); // Arrow keys
+	allowedKeys.push( 91, 92, 93 ); // Left and right Windows Keys, select key
+	allowedKeys.push( 112, 113, 114, 115, 116, 117, 118, 119 ,120, 121, 122, 123 ); // function keys
+	allowedKeys.push( 144, 145 ); // NumLock, ScrollLock
+
 	var self = this;
 	self.selected = function() {
 		return selected;
 	};
+
+
+	/**
+	 * Marks the selected ( renderedTag ) node as active
+	 */
+	function select( node )
+	{
+		var dom = editor.dom;
+
+		if ( node !== selected ) {
+			// Make sure that the editor is focused.
+			// It is possible that the editor is not focused when the mouse event fires
+			// without focus, the selection will not work properly.
+			editor.getBody().focus();
+
+			deselect();
+			selected = node;
+
+			// Do not allow cut and paste operation within the selected node
+			jQuery( selected ).on( 'paste cut', _stop ).addClass( 'evo_selected' );
+
+			// Necessary to prevent manipulating the selection/focus
+			dom.bind( selected, 'beforedeactivate focusin focusout', _stop );
+		}
+	}
+
+
+	/**
+	 * Deselects the current active node
+	 */
+	function deselect()
+	{
+		jQuery( selected ).off( 'paste cut beforedeactive focusin focusout' ).removeClass( 'evo_selected' );
+		selected = null;
+	}
 
 	/**
 	 * Add [image:] button
@@ -243,35 +288,9 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 		return false;
 	}
 
-	function select( node )
-	{
-		var dom = editor.dom;
-
-		if ( node !== selected ) {
-			// Make sure that the editor is focused.
-			// It is possible that the editor is not focused when the mouse event fires
-			// without focus, the selection will not work properly.
-			editor.getBody().focus();
-
-			deselect();
-			selected = node;
-
-			// Do not allow cut and paste operation within the selected node
-			jQuery( selected ).bind( 'paste cut', _stop );
-
-			// Necessary to prevent manipulating the selection/focus
-			dom.bind( selected, 'beforedeactivate focusin focusout', _stop );
-		}
-	}
-
-	function deselect()
-	{
-		jQuery( selected ).off( 'paste cut beforedeactive focusin focusout' );
-		selected = null;
-	}
 
 	/**
-	 * Fetches rendering data including  HTML fragments of submitted inline tags
+	 * Fetches rendering data including HTML fragments of submitted inline tags
 	 *
 	 * @param array List of inline tags to render
 	 * @param function Callback function after fetching the HTML fragments
@@ -310,9 +329,8 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 						var df = editor.dom.createFragment( returnedTags[tag] );
 						var tagData = parseTag( tag );
 
-						editor.dom.setAttrib( df.childNodes[0], 'data-b2evo-tag', window.encodeURIComponent( tag ) );
-						editor.dom.setAttrib( df.childNodes[0], 'data-b2evo-type', tagData.type );
-						editor.dom.addClass( df.childNodes[0], 'b2evo-tag' );
+						editor.dom.setAttrib( df.childNodes[0], 'data-evo-tag', window.encodeURIComponent( tag ) );
+						editor.dom.setAttrib( df.childNodes[0], 'data-evo-type', tagData.type );
 						wrapper.appendChild( df );
 
 						var renderedTag = getRenderedTag( tag );
@@ -370,7 +388,7 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 	 */
 	function renderInlineTags( content )
 	{
-		var re = /(<span.*?data-b2evo-tag.*?>)?(\[(image|video|audio):(\d+):?([^\[\]]*)\])(<\/span>)?/ig;
+		var re = /(<span.*?data-evo-tag.*?>)?(\[(image|thumbnail|inline|video|audio):(\d+):?([^\[\]]*)\])(<\/span>)?/ig;
 		var m;
 		var matches = [];
 		var inlineTags = [];
@@ -409,11 +427,13 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 				{
 					switch( matches[i].inlineType ) {
 						case 'image':
+						case 'thumbnail':
+						case 'inline':
 							content = content.replace( tag, renderedTag.html );
 							break;
 
 						default:
-							content = content.replace( tag, '<span style="color: green;" data-b2evo-tag>' + tag + '</span>' );
+							content = content.replace( tag, '<span style="color: green;" data-evo-tag>' + tag + '</span>' );
 					}
 				}
 			}
@@ -431,13 +451,13 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 	 */
 	function restoreShortTags( content ) {
 		// Cleanup errors
-		content = content.replace( /(<span [^>]+data-b2evo-error[^>]+>(.*?)<\/span>)/ig,
+		content = content.replace( /(<span [^>]+data-evo-error[^>]+>(.*?)<\/span>)/ig,
 			function( match, c, i )	{
 				return i;
 			});
 
 		// Cleanup other shorttags
-		var re = /(<span.*?data-b2evo-tag.*?>)?(\[(image|file|inline|video|audio|thumbnail):(\d+):?([^\[\]]*)\])(<\/span>)?/ig;
+		var re = /(<span.*?data-evo-tag.*?>)?(\[(image|file|inline|video|audio|thumbnail):(\d+):?([^\[\]]*)\])(<\/span>)?/ig;
 		while ( ( m = re.exec( content ) ) !== null ) {
 			if ( m.index === re.lastIndex ) {
 					re.lastIndex++;
@@ -450,8 +470,8 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 		// Cleanup [image:]
 		var df = editor.dom.createFragment( content );
 		var renderedNode;
-		while( renderedNode = df.querySelector( '[data-b2evo-tag]' ) ) {
-			var tag = window.decodeURIComponent( renderedNode.getAttributeNode( 'data-b2evo-tag' ).value );
+		while( renderedNode = df.querySelector( '[data-evo-tag]' ) ) {
+			var tag = window.decodeURIComponent( renderedNode.getAttributeNode( 'data-evo-tag' ).value );
 			renderedNode.parentNode.replaceChild( document.createTextNode( tag ), renderedNode );
 		}
 
@@ -479,7 +499,7 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 	 * @return mixed Root element of rendered node, False if give node is not part of a rendered node
 	 */
 	function getRenderedNode( node, nodeId ) {
-		if( !nodeId ) nodeId = 'data-b2evo-tag';
+		if( !nodeId ) nodeId = 'data-evo-tag';
 
 		while( node, node.parentNode ) {
 
@@ -502,7 +522,7 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 	 */
 	function getRenderedNodeData( node )
 	{
-		var tag = node.getAttribute( 'data-b2evo-tag' );
+		var tag = node.getAttribute( 'data-evo-tag' );
 
 		if( tag )	{
 			return parseTag( tag );
@@ -620,19 +640,12 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 	editor.on( 'keypress keydown keyup', function( event ) {
 		if( selected )
 		{
-			// TODO: move the following outside the function
-			var allowedKeys = [];
-			allowedKeys.push( 16, 17, 18, 19 ); // Ctrl, Alt, Shift, Pause/Break
-			allowedKeys.push( 20, 27, 45 ); // Capslock, Esc, Insert
-			allowedKeys.push( 33, 34, 35, 36 ); // PgUp, PgDn, End, Home
-			allowedKeys.push( 37, 38, 39, 40 ); // Arrow keys
-			allowedKeys.push( 91, 92, 93 ); // Left and right Windows Keys, select key
-			allowedKeys.push( 112, 113, 114, 115, 116, 117, 118, 119 ,120, 121, 122, 123 ); // function keys
-			allowedKeys.push( 144, 145 ); // NumLock, ScrollLock
-
 			if( event.which == 8 || event.which == 46 ) // Backspace, Delete
 			{
 				editor.dom.remove( selected );
+				deselect();
+				event.preventDefault();
+				return false;
 			}
 			else if( allowedKeys.indexOf( event.which ) == -1 )
 			{
@@ -645,7 +658,6 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 
 	// Select rendered node if selection has changed to child of rendered node
 	editor.on( 'NodeChange', function( event ) {
-
 		if( event.selectionChange )
 		{
 			var rNode = getRenderedNode( editor.selection.getNode() );
@@ -664,8 +676,8 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 
 	// Set rendered node type
 	editor.on( 'ResolveName', function( event ) {
-		if ( editor.dom.hasClass( event.target, 'b2evo-tag' ) ) {
-			var tagType = editor.dom.getAttrib( event.target, 'data-b2evo-type' );
+		if ( editor.dom.getAttrib( event.target, 'data-evo-tag' ) ) {
+			var tagType = editor.dom.getAttrib( event.target, 'data-evo-type' );
 			if( tagType ) {
 				event.name = '[' + tagType + ':]';
 			} else {
@@ -686,7 +698,7 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 		if( rNode )
 		{
 			select( rNode );
-			var tag = window.decodeURIComponent( rNode.getAttribute( 'data-b2evo-tag' ) );
+			var tag = window.decodeURIComponent( rNode.getAttribute( 'data-evo-tag' ) );
 			event.dataTransfer.setData( 'application/x-moz-node', event.target );
 			event.dataTransfer.setData( 'text/plain', tag );
 			event.dataTransfer.effectAllowed = 'move';

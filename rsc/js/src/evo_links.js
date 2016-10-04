@@ -107,7 +107,6 @@ function evo_link_insert_inline( type, link_ID, caption )
 
 		if( caption.length )
 		{
-			console.log( caption.length );
 			insert_tag += ':' + caption;
 		}
 
