@@ -652,7 +652,7 @@ class Plugin
 	{
 		if( $this->group != 'rendering' )
 		{
-			return array();
+			return $this->get_custom_setting_definitions( $params );
 		}
 
 		$render_note = '';
@@ -690,7 +690,7 @@ class Plugin
 	{
 		if( $this->group != 'rendering' )
 		{
-			return array();
+			return $this->get_custom_setting_definitions( $params );
 		}
 
 		$render_note = '';
@@ -1116,6 +1116,8 @@ class Plugin
 	 * Event handler: Called at the end of the skin's HTML BODY section.
 	 *
 	 * Use this to add any HTML snippet at the end of the generated page.
+	 *
+	 * @param array Associative array of parameters
 	 */
 	function SkinEndHtmlBody( & $params )
 	{
@@ -1126,6 +1128,8 @@ class Plugin
 	 * Event handler: Gets called before skin wrapper.
 	 *
 	 * Use this to add any HTML code before skin wrapper and after evo toolbar.
+	 *
+	 * @param array Associative array of parameters
 	 */
 	function BeforeSkinWrapper( & $params )
 	{
