@@ -36,14 +36,14 @@ if( is_null( $params ) )
 }
 else
 {	// Params given:
-	if( substr( $params, 0, 2 ) == 'a:' )
-	{	// Allow to unserialize only arrays, to avoid object injection vulnerability:
+	if( param_check_serialized_array( 'params' ) )
+	{	// If the params is a serialized array and doesn't contain any object inside:
 		// (This may result in "false", but this means that unserializing failed)
 		$params = @unserialize( $params );
 	}
 	else
 	{	// Restrict all non array params to empty array:
-		$params = array();
+		bad_request_die( 'Invalid params! Cannot unserialize.' );
 	}
 }
 

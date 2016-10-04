@@ -558,7 +558,7 @@ switch( $action )
 
 
 		// Plugin priority
-		if( param_check_range( 'edited_plugin_priority', 0, 100, T_('Plugin priority must be numeric (0-100).'), true ) )
+		if( param_check_range( 'edited_plugin_priority', 0, 255, sprintf( T_('Plugin priority must be numeric (%s).'), '0-255' ), true ) )
 		{
 			$updated = $admin_Plugins->set_priority( $edit_Plugin->ID, $edited_plugin_priority );
 			if( $updated === 1 )
@@ -721,7 +721,7 @@ switch( $action )
 		// Priority:
 		if( ! preg_match( '~^1?\d?\d$~', $edited_plugin_priority ) )
 		{
-			param_error( 'edited_plugin_priority', T_('Plugin priority must be numeric (0-100).') );
+			param_error( 'edited_plugin_priority', sprintf( T_('Plugin priority must be numeric (%s).'), '0-255' ) );
 		}
 		else
 		{
@@ -812,6 +812,8 @@ switch( $action )
 	case 'edit_settings':
 		$AdminUI->append_to_titlearea( '<a href="'.regenerate_url('', 'action=edit_settings&amp;plugin_ID='.$edit_Plugin->ID).'">'
 			.sprintf( T_('Edit plugin &laquo;%s&raquo; (ID %d)'), $edit_Plugin->name, $edit_Plugin->ID ).'</a>' );
+		// Initialize JS for color picker field on the edit plugin settings form:
+		init_colorpicker_js();
 		break;
 
 	case 'disp_help_plain': // just the help, without any payload

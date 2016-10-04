@@ -1080,9 +1080,9 @@ class Plugins_admin extends Plugins
 	{
 		global $DB;
 
-		if( ! preg_match( '~^1?\d?\d$~', $priority ) ) // using preg_match() to catch floating numbers
+		if( ! preg_match( '~^[12]?\d?\d$~', $priority ) ) // using preg_match() to catch floating numbers
 		{
-			debug_die( 'Plugin priority must be numeric (0-100).' );
+			debug_die( 'Plugin priority must be numeric (0-255).' );
 		}
 
 		$Plugin = & $this->get_by_ID($plugin_ID);

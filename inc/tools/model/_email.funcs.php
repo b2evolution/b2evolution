@@ -867,8 +867,7 @@ function evo_mail_smtp( $to, $subject, $message, $headers = array() )
 					// MULTIPLE:
 					if( is_array( $message ) )
 					{ // Body is multiple
-						$Swift_Message->setBody( $message['html'], 'multipart/alternative', $message['charset'] );
-						$Swift_Message->addPart( $message['html'], 'text/html', $message['charset'] );
+						$Swift_Message->setBody( $message['html'], 'text/html', $message['charset'] );
 						$Swift_Message->addPart( $message['text'], 'text/plain', $message['charset'] );
 						break;
 					}

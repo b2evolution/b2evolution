@@ -2358,7 +2358,7 @@ function check_coll_first_perm( $perm_name, $target_type, $target_ID )
 	$SQL->WHERE_and( $field_perm_name.' = 1' );
 	$SQL->LIMIT( 1 );
 
-	return boolval( $DB->get_var( $SQL->get(), 0 , NULL, $SQL->title ) );
+	return (bool)$DB->get_var( $SQL->get(), 0 , NULL, $SQL->title );
 }
 
 

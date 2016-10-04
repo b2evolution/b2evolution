@@ -198,7 +198,7 @@ $Results->cols[] = array(
 								'%coll_perm_status_checkbox( {row}, \'bloguser_\', \'draft\', \''.format_to_output( T_('Permission to comment into this blog with draft status'), 'htmlattr' ).'\', \'comment\' )%'.
 								'%coll_perm_status_checkbox( {row}, \'bloguser_\', \'deprecated\', \''.format_to_output( T_('Permission to comment into this blog with deprecated status'), 'htmlattr' ).'\', \'comment\' )%'.
 								'<span style="display: inline-block; min-width: 5px;"></span>'.
-								'%coll_perm_checkbox( {row}, \'bloguser_\', \'perm_meta_comment\', \''.format_to_output( T_('Permission to post meta comments into this blog'), 'htmlattr' ).'\' )%',
+								'%coll_perm_checkbox( {row}, \'bloguser_\', \'perm_meta_comment\', \''.format_to_output( T_('Permission to post meta comments on this collection'), 'htmlattr' ).'\' )%',
 						'td_class' => 'center',
 					);
 
