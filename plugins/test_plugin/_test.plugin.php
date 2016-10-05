@@ -424,7 +424,13 @@ class test_plugin extends Plugin
 	 */
 	function GetDbLayout()
 	{
-		return array();
+		return array(
+				'CREATE TABLE '.$this->get_sql_table( 'test_table_name' ).' (
+					test_ID   INT UNSIGNED NOT NULL AUTO_INCREMENT,
+					test_name VARCHAR( 255 ) NOT NULL,
+					PRIMARY KEY( test_ID )
+				) ENGINE = innodb DEFAULT CHARSET = utf8'
+			);
 	}
 
 
@@ -662,7 +668,7 @@ class test_plugin extends Plugin
 	 *
 	 * @see Plugin::AdminDisplayEditorButton()
 	 * @param array Associative array of parameters.
-	 *   - 'target_type': either 'Comment' or 'Item'.
+	 *   - 'target_type': either 'Comment' or 'Item' or 'EmailCampaign'.
 	 *   - 'edit_layout': "inskin", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
 	 *                    NOTE: Please respect the "inskin" mode, which should display only the most simple things!
 	 * @return boolean did we display a button?
@@ -936,6 +942,32 @@ class test_plugin extends Plugin
 	function SkinBeginHtmlHead( & $params )
 	{
 		require_js( '#jquery#', 'blog' );
+	}
+
+
+	/**
+	 * Event handler: Called at the end of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinEndHtmlHead( & $params )
+	{
+		require_js( '#jquery#', 'blog' );
+	}
+
+
+	/**
+	 * Event handler: Called at the beginning of the skin's HTML BODY section.
+	 *
+	 * Use this to add any HTML snippet at the beginning of the generated page.
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinBeginHtmlBody( & $params )
+	{
+		echo 'TEST plugin: SkinBeginHtmlBody event.';
 	}
 
 

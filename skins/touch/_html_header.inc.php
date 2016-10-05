@@ -67,11 +67,14 @@ require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 		$Blog->disp( 'user_css', 'raw');
 		$Blog->disp_setting( 'head_includes', 'raw');
 	?>
+	<?php $Plugins->trigger_event( 'SkinEndHtmlHead' ); ?>
 </head>
 
 <body<?php skin_body_attrs( array( 'class' => 'low-contrast-linen-wptouch-bg' ) ); ?>>
 <?php
-$Blog->disp_setting( 'body_includes', 'raw');
+$Blog->disp_setting( 'body_includes', 'raw' );
+
+$Plugins->trigger_event( 'SkinBeginHtmlBody' );
 
 // Call BeforeSkinWrapper to display additional info:
 $Plugins->trigger_event( 'BeforeSkinWrapper' );

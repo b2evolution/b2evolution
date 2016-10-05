@@ -971,7 +971,7 @@ class Plugin
 	 * You should provide an unique html ID with each button.
 	 *
 	 * @param array Associative array of parameters.
-	 *   - 'target_type': either 'Comment' or 'Item'.
+	 *   - 'target_type': either 'Comment' or 'Item' or 'EmailCampaign'.
 	 *   - 'edit_layout': "inskin", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
 	 *                    NOTE: Please respect the "inskin" mode, which should display only the most simple things!
 	 * @return boolean did we display a button?
@@ -1120,6 +1120,30 @@ class Plugin
 	 * @param array Associative array of parameters
 	 */
 	function SkinBeginHtmlHead( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called at the end of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinEndHtmlHead( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called at the beginning of the skin's HTML BODY section.
+	 *
+	 * Use this to add any HTML snippet at the beginning of the generated page.
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinBeginHtmlBody( & $params )
 	{
 	}
 
