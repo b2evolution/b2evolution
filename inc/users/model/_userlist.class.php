@@ -872,8 +872,12 @@ class UserList extends DataObjectList2
 			$this->filters = array_merge( $this->default_filters, $this->filters );
 		}
 		else
-		{ // Reset the filters
-			$this->filters = array();
+		{	// Reset the filters:
+			$this->filters = $this->default_filters;
+			// We want to reset the memorized filterset:
+			$Session->delete( $this->filterset_name );
+			// Memorize global variables:
+			$this->set_filters( array() );
 		}
 
 		// Rewrite a previous order to new value
