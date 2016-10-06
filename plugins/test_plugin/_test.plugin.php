@@ -1754,7 +1754,7 @@ class test_plugin extends Plugin
 
 	/**
 	 * Event handler: Called in the submit button section of the
-	 * frontend comment form.
+	 * front-office comment form.
 	 *
 	 * @see Plugin::DisplayCommentFormButton()
 	 * @param array Associative array of parameters
@@ -2008,7 +2008,7 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Called at the end of the frontend message form, which
+	 * Event handler: Called at the end of the front-office message form, which
 	 * allows to send an email to a user/commentator.
 	 *
 	 * You might want to use this to inject antispam payload to use in
@@ -2033,7 +2033,7 @@ class test_plugin extends Plugin
 
 	/**
 	 * Event handler: Called in the submit button section of the
-	 * frontend message form.
+	 * front-office message form.
 	 *
 	 * @see Plugin::DisplayMessageFormButton()
 	 * @param array Associative array of parameters
@@ -2121,7 +2121,6 @@ class test_plugin extends Plugin
 	 * Event handler: Called when rendering message contents as HTML. (CACHED)
 	 *
 	 * The rendered content will be *cached* and the cached content will be reused on subsequent displays.
-	 * Use {@link DisplayContentAsHtml()} instead if you want to do rendering at display time.
 	 *
 	 * Note: You have to change $params['data'] (which gets passed by reference).
 	 *
@@ -2190,7 +2189,6 @@ class test_plugin extends Plugin
 	 * Event handler: Called when rendering email contents as HTML. (CACHED)
 	 *
 	 * The rendered content will be *cached* and the cached content will be reused on subsequent displays.
-	 * Use {@link DisplayContentAsHtml()} instead if you want to do rendering at display time.
 	 *
 	 * Note: You have to change $params['data'] (which gets passed by reference).
 	 *
@@ -2476,7 +2474,7 @@ class test_plugin extends Plugin
 
 	// PluginEmailSettings {{{
 	/**
-	 * Event handler: Called as action just before updating plugin's messages settings.
+	 * Event handler: Called as action just before updating plugin's email campaign settings.
 	 *
 	 * Use this to add notes/errors through {@link Plugin::msg()} or to process saved settings.
 	 *
@@ -2751,9 +2749,9 @@ class test_plugin extends Plugin
 	 *   - 'Form': the user profile form generating object (by reference)
 	 *   - 'User': the edited user object (by reference)
 	 *   - 'edit_layout':
-	 *			"public" - public frontend user profile form (info only),
-	 *			"private" - private frontend user profile form (editable),
-	 *   - 'is_admin_page': (boolean) indicates whether we are in frontend or backoffice
+	 *			"public" - public front-office user profile form (info only),
+	 *			"private" - private front-office user profile form (editable),
+	 *   - 'is_admin_page': (boolean) indicates whether we are in front-office or backoffice
 	 */
 	function DisplayProfileFormFieldset( & $params )
 	{
