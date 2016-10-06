@@ -424,7 +424,13 @@ class test_plugin extends Plugin
 	 */
 	function GetDbLayout()
 	{
-		return array();
+		return array(
+				'CREATE TABLE '.$this->get_sql_table( 'test_table_name' ).' (
+					test_ID   INT UNSIGNED NOT NULL AUTO_INCREMENT,
+					test_name VARCHAR( 255 ) NOT NULL,
+					PRIMARY KEY( test_ID )
+				) ENGINE = innodb DEFAULT CHARSET = utf8'
+			);
 	}
 
 
@@ -662,7 +668,7 @@ class test_plugin extends Plugin
 	 *
 	 * @see Plugin::AdminDisplayEditorButton()
 	 * @param array Associative array of parameters.
-	 *   - 'target_type': either 'Comment' or 'Item'.
+	 *   - 'target_type': either 'Comment' or 'Item' or 'EmailCampaign'.
 	 *   - 'edit_layout': "inskin", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
 	 *                    NOTE: Please respect the "inskin" mode, which should display only the most simple things!
 	 * @return boolean did we display a button?
@@ -940,6 +946,32 @@ class test_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Called at the end of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinEndHtmlHead( & $params )
+	{
+		require_js( '#jquery#', 'blog' );
+	}
+
+
+	/**
+	 * Event handler: Called at the beginning of the skin's HTML BODY section.
+	 *
+	 * Use this to add any HTML snippet at the beginning of the generated page.
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinBeginHtmlBody( & $params )
+	{
+		echo 'TEST plugin: SkinBeginHtmlBody event.';
+	}
+
+
+	/**
 	 * Event handler: Called at the end of the skin's HTML BODY section.
 	 *
 	 * Use this to add any HTML snippet at the end of the generated page.
@@ -1206,7 +1238,7 @@ class test_plugin extends Plugin
 	 * Event handler: Defines blog kinds, their names and description.
 	 * Define blog settings in {@link Plugin::InitCollectionKinds()} method of your plugin.
 	 *
-	 * Note: You can change default blog kinds $params['default_kinds'] (which get passed by reference).
+	 * Note: You can change default blog kinds $params['kinds'] (which get passed by reference).
 	 *
 	 * @see Plugin::GetCollectionKinds()
 	 * @param array Associative array of parameters
@@ -1679,7 +1711,7 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Called at the end of the "Edit comment" form.
+	 * Event handler: Called at the end of the "Edit comment" form on back-office.
 	 *
 	 * @see Plugin::AdminDisplayCommentFormFieldset()
 	 * @param array Associative array of parameters
@@ -1699,7 +1731,7 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Called at the end of the frontend comment form.
+	 * Event handler: Called at the end of the front-office comment form.
 	 *
 	 * You might want to use this to inject antispam payload to use in
 	 * in {@link GetSpamKarmaForComment()} or modify the Comment according

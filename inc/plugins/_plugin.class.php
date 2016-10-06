@@ -971,7 +971,7 @@ class Plugin
 	 * You should provide an unique html ID with each button.
 	 *
 	 * @param array Associative array of parameters.
-	 *   - 'target_type': either 'Comment' or 'Item'.
+	 *   - 'target_type': either 'Comment' or 'Item' or 'EmailCampaign'.
 	 *   - 'edit_layout': "inskin", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
 	 *                    NOTE: Please respect the "inskin" mode, which should display only the most simple things!
 	 * @return boolean did we display a button?
@@ -1120,6 +1120,30 @@ class Plugin
 	 * @param array Associative array of parameters
 	 */
 	function SkinBeginHtmlHead( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called at the end of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinEndHtmlHead( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called at the beginning of the skin's HTML BODY section.
+	 *
+	 * Use this to add any HTML snippet at the beginning of the generated page.
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinBeginHtmlBody( & $params )
 	{
 	}
 
@@ -1355,7 +1379,7 @@ class Plugin
 	 * Event handler: Defines blog kinds, their names and description.
 	 * Define blog settings in {@link Plugin::InitCollectionKinds()} method of your plugin.
 	 *
-	 * Note: You can change default blog kinds $params['default_kinds'] (which get passed by reference).
+	 * Note: You can change default blog kinds $params['kinds'] (which get passed by reference).
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'kinds': dafault blog kinds (by reference)
@@ -1786,7 +1810,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called at the end of the "Edit comment" form.
+	 * Event handler: Called at the end of the "Edit comment" form on back-office.
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Form': the {@link Form} object (by reference)
@@ -1801,7 +1825,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called at the end of the frontend comment form.
+	 * Event handler: Called at the end of the front-office comment form.
 	 *
 	 * You might want to use this to inject antispam payload to use in
 	 * in {@link GetSpamKarmaForComment()} or modify the Comment according
@@ -1819,7 +1843,7 @@ class Plugin
 
 	/**
 	 * Event handler: Called in the submit button section of the
-	 * frontend comment form.
+	 * front-office comment form.
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Form': the comment form generating object

@@ -243,6 +243,8 @@ class Plugins_admin extends Plugins
 				'BeforeBlogDisplay' => 'Gets called before a (part of the blog) gets displayed.',
 				'InitMainList' => 'Initializes the MainList object. Use this method to create your own MainList, see init_MainList()',
 				'SkinBeginHtmlHead' => 'Gets called at the top of the HTML HEAD section in a skin.',
+				'SkinEndHtmlHead' => 'Gets called at the end of the HTML HEAD section in a skin.',
+				'SkinBeginHtmlBody' => 'Gets called at the top of the skin\'s HTML BODY section.',
 				'SkinEndHtmlBody' => 'Gets called at the end of the skin\'s HTML BODY section.',
 				'DisplayTrackbackAddr' => 'Called to display the trackback URL for an item.',
 				'BeforeSkinWrapper' => 'Gets called before skin wrapper.',
