@@ -1379,7 +1379,7 @@ class Plugin
 	 * Event handler: Defines blog kinds, their names and description.
 	 * Define blog settings in {@link Plugin::InitCollectionKinds()} method of your plugin.
 	 *
-	 * Note: You can change default blog kinds $params['default_kinds'] (which get passed by reference).
+	 * Note: You can change default blog kinds $params['kinds'] (which get passed by reference).
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'kinds': dafault blog kinds (by reference)
@@ -1776,7 +1776,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called at the end of the "Edit comment" form.
+	 * Event handler: Called at the end of the "Edit comment" form on back-office.
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Form': the {@link Form} object (by reference)
@@ -1791,7 +1791,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called at the end of the frontend comment form.
+	 * Event handler: Called at the end of the front-office comment form.
 	 *
 	 * You might want to use this to inject antispam payload to use in
 	 * in {@link GetSpamKarmaForComment()} or modify the Comment according
@@ -1809,7 +1809,7 @@ class Plugin
 
 	/**
 	 * Event handler: Called in the submit button section of the
-	 * frontend comment form.
+	 * front-office comment form.
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Form': the comment form generating object
