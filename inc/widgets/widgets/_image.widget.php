@@ -139,6 +139,12 @@ class image_Widget extends ComponentWidget
 					'type' => 'end_line',
 					'label' => T_('pixels'),
 				),
+				'alt' => array(
+					'label' => T_('Image Alt text'),
+					'note' => '',
+					'defaultvalue' => '',
+					'size' => 128,
+				),
 				'check_file' => array(
 					'label' => T_('Check file'),
 					'note' => T_('Check if file exists. If not, no IMG tag will be created.'),
@@ -204,7 +210,7 @@ class image_Widget extends ComponentWidget
 		}
 
 		echo '<a href="'.$Blog->get( 'url' ).'">'
-							.'<img src="'.$image_url.$this->disp_params['image_file'].'" alt=""'.$image_attrs.' />'
+							.'<img src="'.$image_url.$this->disp_params['image_file'].'" alt="'.format_to_output( $this->disp_params['alt'], 'htmlattr' ).'"'.$image_attrs.' />'
 							.'</a>';
 
 		echo $this->disp_params['block_end'];
