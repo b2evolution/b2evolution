@@ -644,7 +644,7 @@ switch( $action )
 				// Display VIEW:
 				$AdminUI->disp_view( 'widgets/views/_widget.form.php' );
 				$output = ob_get_clean();
-				send_javascript_message( array( 'widgetSettings' => $output ) );
+				send_javascript_message( array( 'widgetSettings' => array( $output, $edited_ComponentWidget->get( 'type' ), $edited_ComponentWidget->get( 'code' ) ) ) );
 				break;
 
 			case 'normal' :

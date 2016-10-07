@@ -401,12 +401,12 @@ function editWidget( widget )
 /*
  * This is called when we get the response from the server:
  */
-function widgetSettings( the_html )
+function widgetSettings( the_html, wi_type, wi_code )
 {
 	// add placeholder for widgets settings form:
 	jQuery( 'body' ).append( '<div id="screen_mask" onclick="closeWidgetSettings()"></div><div id="widget_settings" class="modal-content"></div>' );
 	jQuery( '#screen_mask' ).fadeTo(1,0.5).fadeIn(200);
-	jQuery( '#widget_settings' ).html( the_html ).addClass( 'widget_settings_active' );
+	jQuery( '#widget_settings' ).html( the_html ).addClass( 'widget_settings_active edit_widget_' + wi_type + '_' + wi_code );
 	jQuery( '#widget_settings' ).prepend( jQuery( '#server_messages' ) );
 	AttachServerRequest( 'form' ); // send form via hidden iframe
 
