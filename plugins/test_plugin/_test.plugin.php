@@ -42,7 +42,7 @@ class test_plugin extends Plugin
 	 * These variables MAY be overriden.
 	 */
 	var $number_of_installs = 1;
-	var $group = 'test';
+	var $group = 'rendering';
 
 
 	/**
@@ -731,7 +731,22 @@ class test_plugin extends Plugin
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
-		echo '<div class="edit_toolbar">This is the TEST Toolbar</div>';
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
+
+		echo $this->get_template( 'toolbar_title_before' );
+		echo 'TEST toolbar for Item:';
+		echo $this->get_template( 'toolbar_title_after' );
+
+		echo $this->get_template( 'toolbar_group_before' );
+		echo '<input type="button" class="'.$this->get_template( 'toolbar_button_class' ).'" value="TEST 1" onclick="alert(\'TEST 1\')" />';
+		echo '<input type="button" class="'.$this->get_template( 'toolbar_button_class' ).'" value="TEST 2" onclick="alert(\'TEST 2\')" />';
+		echo $this->get_template( 'toolbar_group_after' );
+
+		echo $this->get_template( 'toolbar_group_before' );
+		echo '<input type="button" class="'.$this->get_template( 'toolbar_button_class' ).'" value="TEST 3" onclick="alert(\'TEST 3 from second group\')" />';
+		echo $this->get_template( 'toolbar_group_after' );
+
+		echo $this->get_template( 'toolbar_after' );
 
 		return true;
 	}
@@ -1289,7 +1304,7 @@ class test_plugin extends Plugin
 	{
 		$params['kinds'] = array_merge( $params['kinds'], array(
 				'test_kind' => array(
-					'name' => 'Just another blog type',
+					'name' => 'Just another collection type',
 					'desc' => 'This is the TEST plugin handling the GetCollectionKinds event.',
 				),
 				'std' => array( // override standard blog settings
@@ -1358,7 +1373,7 @@ class test_plugin extends Plugin
 	 */
 	function RenderItemAsHtml( & $params )
 	{
-		$params['data'] = 'TEST['.$params['data'].']TEST';
+		$params['data'] = 'TEST['.$params['data'].']TEST - RenderItemAsHtml()';
 
 		return true;
 	}
@@ -1385,7 +1400,9 @@ class test_plugin extends Plugin
 	 */
 	function RenderItemAsXml( & $params )
 	{
-		return false;		// Do nothing by default.
+		$params['data'] = 'TEST['.$params['data'].']TEST - RenderItemAsXml()';
+
+		return true;
 	}
 
 
@@ -1404,7 +1421,9 @@ class test_plugin extends Plugin
 	 */
 	function RenderItemAsText()
 	{
-		return false;		// Do nothing by default.
+		$params['data'] = 'TEST['.$params['data'].']TEST - RenderItemAsText()';
+
+		return true;
 	}
 
 
@@ -1744,7 +1763,22 @@ class test_plugin extends Plugin
 	 */
 	function DisplayCommentToolbar( & $params )
 	{
-		echo '<div class="edit_toolbar">This is the TEST Comment Toolbar</div>';
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
+
+		echo $this->get_template( 'toolbar_title_before' );
+		echo 'TEST toolbar for Comment:';
+		echo $this->get_template( 'toolbar_title_after' );
+
+		echo $this->get_template( 'toolbar_group_before' );
+		echo '<input type="button" class="'.$this->get_template( 'toolbar_button_class' ).'" value="TEST 1" onclick="alert(\'TEST 1\')" />';
+		echo '<input type="button" class="'.$this->get_template( 'toolbar_button_class' ).'" value="TEST 2" onclick="alert(\'TEST 2\')" />';
+		echo $this->get_template( 'toolbar_group_after' );
+
+		echo $this->get_template( 'toolbar_group_before' );
+		echo '<input type="button" class="'.$this->get_template( 'toolbar_button_class' ).'" value="TEST 3" onclick="alert(\'TEST 3 from second group\')" />';
+		echo $this->get_template( 'toolbar_group_after' );
+
+		echo $this->get_template( 'toolbar_after' );
 
 		return true;
 	}
@@ -2041,7 +2075,22 @@ class test_plugin extends Plugin
 	 */
 	function DisplayMessageToolbar( & $params )
 	{
-		echo '<div class="edit_toolbar">This is the TEST Message Toolbar</div>';
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
+
+		echo $this->get_template( 'toolbar_title_before' );
+		echo 'TEST toolbar for Message:';
+		echo $this->get_template( 'toolbar_title_after' );
+
+		echo $this->get_template( 'toolbar_group_before' );
+		echo '<input type="button" class="'.$this->get_template( 'toolbar_button_class' ).'" value="TEST 1" onclick="alert(\'TEST 1\')" />';
+		echo '<input type="button" class="'.$this->get_template( 'toolbar_button_class' ).'" value="TEST 2" onclick="alert(\'TEST 2\')" />';
+		echo $this->get_template( 'toolbar_group_after' );
+
+		echo $this->get_template( 'toolbar_group_before' );
+		echo '<input type="button" class="'.$this->get_template( 'toolbar_button_class' ).'" value="TEST 3" onclick="alert(\'TEST 3 from second group\')" />';
+		echo $this->get_template( 'toolbar_group_after' );
+
+		echo $this->get_template( 'toolbar_after' );
 
 		return true;
 	}
@@ -2192,7 +2241,22 @@ class test_plugin extends Plugin
 	 */
 	function DisplayEmailToolbar( & $params )
 	{
-		echo '<div class="edit_toolbar">This is the TEST Email Toolbar</div>';
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
+
+		echo $this->get_template( 'toolbar_title_before' );
+		echo 'TEST toolbar for Email Campaign:';
+		echo $this->get_template( 'toolbar_title_after' );
+
+		echo $this->get_template( 'toolbar_group_before' );
+		echo '<input type="button" class="'.$this->get_template( 'toolbar_button_class' ).'" value="TEST 1" onclick="alert(\'TEST 1\')" />';
+		echo '<input type="button" class="'.$this->get_template( 'toolbar_button_class' ).'" value="TEST 2" onclick="alert(\'TEST 2\')" />';
+		echo $this->get_template( 'toolbar_group_after' );
+
+		echo $this->get_template( 'toolbar_group_before' );
+		echo '<input type="button" class="'.$this->get_template( 'toolbar_button_class' ).'" value="TEST 3" onclick="alert(\'TEST 3 from second group\')" />';
+		echo $this->get_template( 'toolbar_group_after' );
+
+		echo $this->get_template( 'toolbar_after' );
 
 		return true;
 	}
