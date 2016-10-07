@@ -2081,7 +2081,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called at the end of the frontend message form, which
+	 * Event handler: Called at the end of the front-office message form, which
 	 * allows to send an email to a user/commentator.
 	 *
 	 * You might want to use this to inject antispam payload to use in
@@ -2100,7 +2100,7 @@ class Plugin
 
 	/**
 	 * Event handler: Called in the submit button section of the
-	 * frontend message form.
+	 * front-office message form.
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Form': the comment form generating object
@@ -2290,7 +2290,6 @@ class Plugin
 	 * Event handler: Called when rendering email contents as HTML. (CACHED)
 	 *
 	 * The rendered content will be *cached* and the cached content will be reused on subsequent displays.
-	 * Use {@link DisplayContentAsHtml()} instead if you want to do rendering at display time.
 	 *
 	 * Note: You have to change $params['data'] (which gets passed by reference).
 	 *
@@ -2580,7 +2579,7 @@ class Plugin
 
 	// PluginEmailSettings {{{
 	/**
-	 * Event handler: Called as action just before updating plugin's messages settings.
+	 * Event handler: Called as action just before updating plugin's email campaign settings.
 	 *
 	 * Use this to add notes/errors through {@link Plugin::msg()} or to process saved settings.
 	 */
@@ -2822,9 +2821,9 @@ class Plugin
 	 *   - 'Form': the user profile form generating object (by reference)
 	 *   - 'User': the edited user object (by reference)
 	 *   - 'edit_layout':
-	 *			"public" - public frontend user profile form (info only),
-	 *			"private" - private frontend user profile form (editable),
-	 *   - 'is_admin_page': (boolean) indicates whether we are in frontend or backoffice
+	 *			"public" - public front-office user profile form (info only),
+	 *			"private" - private front-office user profile form (editable),
+	 *   - 'is_admin_page': (boolean) indicates whether we are in front-office or back-office
 	 */
 	function DisplayProfileFormFieldset( & $params )
 	{
