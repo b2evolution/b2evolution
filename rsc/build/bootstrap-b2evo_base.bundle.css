@@ -3293,7 +3293,6 @@ span.NonExistentWikiWord {
 }
 /* Styles used by TinyMCE b2evo_shorttags plugin */
 .evo_selected {
-  border: 1px dashed #ccc;
   background-color: #eee;
 }
 

@@ -2,7 +2,8 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 
 	var win;
 	var renderedTags = [];
-	var selected;
+	var selected, selectedType;
+	var forRemoval = false;
 
 	// Keys allowed when a renderedTag is selected
 	var allowedKeys = [];
@@ -23,8 +24,7 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 	/**
 	 * Marks the selected ( renderedTag ) node as active
 	 */
-	function select( node )
-	{
+	function select( node )	{
 		var dom = editor.dom;
 
 		if ( node !== selected ) {
@@ -35,12 +35,24 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 
 			deselect();
 			selected = node;
+			selectedType = node.getAttribute( 'data-evo-type' );
 
 			// Do not allow cut and paste operation within the selected node
-			jQuery( selected ).on( 'paste cut', _stop ).addClass( 'evo_selected' );
+			dom.bind( selected, 'paste cut', _stop );
+			dom.addClass( selected, 'evo_selected' );
 
 			// Necessary to prevent manipulating the selection/focus
 			dom.bind( selected, 'beforedeactivate focusin focusout', _stop );
+
+			// Set cursor position
+			var img = dom.select( 'img:first', selected );
+			if( img.length ) {
+				editor.selection.select( img[0] );
+			} else {
+				editor.selection.setCursorLocation( selected );
+			}
+
+			editor.nodeChanged();
 		}
 	}
 
@@ -48,240 +60,278 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 	/**
 	 * Deselects the current active node
 	 */
-	function deselect()
-	{
-		jQuery( selected ).off( 'paste cut beforedeactive focusin focusout' ).removeClass( 'evo_selected' );
+	function deselect()	{
+		var dom = editor.dom;
+
+		dom.unbind( selected, 'paste cut beforedeactive focusin focusout' );
+		dom.removeClass( selected, 'evo_selected' );
 		selected = null;
+		selectedType = null;
+
+		editor.selection.collapse();
 	}
+
+
+	/**
+	 * Removes the specified node
+	 */
+	function remove( node )	{
+		if( selected == node ) {
+			deselect();
+		}
+		editor.undoManager.transact( function() {
+			editor.dom.remove( node );
+		});
+	}
+
 
 	/**
 	 * Add [image:] button
 	 */
-	editor.addButton( 'b2evo_image', {
+	editor.addButton( 'evo_image', {
 		text: '[image:]',
 		icon: false,
-		tooltip: 'Insert Image',
+		tooltip: 'Edit image',
 		onclick: function() {
-			if( editor.getParam( 'postID' ) ) 	{
-				var attachments = editor.getParam( 'attachments' );
-				var inlineImages = [];
-				for( var i = 0; i < attachments.length; i++ )
-				{
-					if( attachments[i].type == 'image' && attachments[i].position == 'inline' ) {
-						inlineImages.push( attachments[i] );
-					}
-				}
-				if( ! jQuery.isEmptyObject( inlineImages ) ) {
-					showDialog( inlineImages );
-				}
-				else
-				{
-					alert( 'You must have at least one attached image in the Inline position.' );
-				}
+			if( selected && ( selectedType == 'image' ) ) {
+				var selectedData = getRenderedNodeData( selected );
+
+				win = editor.windowManager.open( {
+					title: 'Edit Image',
+					body: [
+						{
+							type: 'textbox',
+							name: 'caption',
+							label: 'Caption',
+							minWidth: 500,
+							value: selectedData.caption && !selectedData.disableCaption ? selectedData.caption : null,
+							disabled: selectedData.disableCaption
+						},
+						{
+							type: 'checkbox',
+							name: 'disableCaption',
+							label: 'Disable caption',
+							checked: selectedData.disableCaption,
+						},
+						{
+							type: 'textbox',
+							name: 'extraClass',
+							label: 'Additional class:',
+							minWidth: 500,
+							value: selectedData.extraClass ? selectedData.extraClass : null
+						},
+					],
+					buttons: [
+						{
+							text: 'Update',
+							onclick: function() {
+								var captionCtrl = win.find('#caption')[0];
+								var disableCaptionCtrl = win.find('#disableCaption')[0];
+								var classCtrl = win.find('#extraClass')[0];
+								var tag = '[image:' + selectedData.linkId;
+
+								if( disableCaptionCtrl.checked() || captionCtrl.value() == '-' ) {
+									tag += ':-';
+								} else {
+									tag += ':' + captionCtrl.value();
+								}
+								tag += classCtrl.value() ? ':' + classCtrl.value() : '';
+								tag += ']';
+
+								// Get rendered tag and output directly
+								var renderedTag = getRenderedTag( tag );
+
+								if( renderedTag === false )
+								{
+									getRenderedTags( [ tag ], function( rTags ) {
+											for( var i = 0; i < renderedTags.length; i++ )
+											{
+												if( renderedTags[i].shortTag == tag )
+												{
+													renderedTag = renderedTags[i];
+													break;
+												}
+											}
+
+											if( renderedTag )
+											{
+												if( selected )
+												{
+													editor.dom.replace( renderedTag.node, selected, false );
+												}
+												else
+												{
+													editor.insertContent( renderedTag.html );
+												}
+
+												editor.windowManager.close();
+											}
+										} );
+								}
+								else
+								{
+									if( selected )
+									{
+										editor.dom.replace( renderedTag.node, selected, false );
+									}
+									else
+									{
+										editor.insertContent( renderedTag.html );
+									}
+
+									editor.windowManager.close();
+								}
+							}
+						},
+						{
+							text: 'Cancel',
+							onclick: 'close'
+						},
+					]
+				} );
+
+				var disableCaptionCtrl = win.find( '#disableCaption' )[0];
+				var captionCtrl = win.find( '#caption' )[0];
+
+				disableCaptionCtrl.on( 'click', function( event ) {
+					captionCtrl.disabled( disableCaptionCtrl.checked() );
+				} );
+
 			} else {
-				alert( 'You must save the post (at least as a draft) before you can attach images.' );
+				alert( 'To insert an image, attach a picture to the post in the Attachments panel below; then click the (+) icon in the Attachments panel.' );
 			}
 		},
 		onPostRender: function()
 		{
 			var imageButton = this;
 			editor.on( 'NodeChange', function( event ) {
-				if( selected )
-				{
-					var data = getRenderedNodeData( selected );
-					imageButton.active( data['type'] == 'image' );
-				}
-				else
-				{
-					imageButton.active( false );
-				}
+				imageButton.active( selectedType == 'image' );
 			});
 		}
 	});
 
 
 	/**
-	 *  Build the list of attachments
+	 * Add [thumbnail:] button
 	 */
-	function buildListItems( inputList, itemCallback, filetype) {
-		function appendItems( values, output ) {
-			output = output || [];
+	editor.addButton( 'evo_thumbnail', {
+		text: '[thumbnail:]',
+		icon: false,
+		tooltip: 'Edit thumbnail',
+		onclick: function() {
+			if( selected && ( selectedType == 'thumbnail' ) ) {
+				var selectedData = getRenderedNodeData( selected );
 
-			tinymce.each( values, function( item ) {
-				if( filetype && filetype != item.type )
-				{
-					// Do nothing
-				}
-				else
-				{
-					menuItem = { text: item.title || item.name, value: item.link_ID };
-					output.push( menuItem );
-				}
-			} );
-
-			return output;
-		}
-
-		return appendItems( inputList, [] );
-	}
-
-
-	/**
-	 * Show dialog for inline images
-	 *
-	 * @param array
-	 */
-	function showDialog( attachmentList )
-	{
-		var selectedData = null;
-		if( selected ) {
-			selectedData = getRenderedNodeData( selected );
-		}
-
-		if( attachmentList ) {
-			imageListCtrl = {
-				type: 'listbox',
-				name: 'link',
-				label: 'Attached images',
-				values: buildListItems(
-						attachmentList,
-						function( item ) {
-							item.value = editor.convertURL( item.value || item.url, 'src' );
+				win = editor.windowManager.open({
+					title: 'Edit Thumbnail',
+					body: [
+						{
+							type: 'listbox',
+							name: 'alignment',
+							label: 'Alignment:',
+							values: [
+								{ text: 'left', value: 'left' },
+								{ text: 'right', value: 'right' }
+							],
+							value: selectedData ? selectedData.alignment : 'left'
 						},
-						'image'	),
-				value: selectedData ? selectedData.linkId : null
-			};
-		}
-
-		win = editor.windowManager.open({
-			title: 'Insert/Edit Image',
-			body: [
-				imageListCtrl,
-				{
-					type: 'container',
-					label: 'Caption:',
-					layout: 'flex',
-					direction: 'row',
-					align: 'center',
-					spacing: 5,
-					items: [
+						{
+							type: 'listbox',
+							name: 'size',
+							label: 'Size',
+							values: [
+								{ text: 'small', value: 'small' },
+								{ text: 'medium',	value: 'medium' },
+								{ text: 'large', value: 'large' }
+							],
+							value: selectedData ? selectedData.size : 'medium'
+						},
 						{
 							type: 'textbox',
-							name: 'caption',
-							value: ( selectedData && selectedData.caption != '-' ) ? selectedData.caption : null
+							name: 'extraClass',
+							label: 'Additional class:',
+							minWidth: 500,
+							value: selectedData ? selectedData.extraClass : null
+						}
+					],
+					buttons: [
+						{
+							text: 'Update',
+							onclick: function() {
+								var sizeCtrl = win.find('#size')[0];
+								var alignCtrl = win.find('#alignment')[0];
+								var classCtrl = win.find('#extraClass')[0];
+								var tag = '[thumbnail:' + selectedData.linkId;
+
+								tag += ':' + sizeCtrl.value();
+								tag += ':' + alignCtrl.value();
+								tag += classCtrl.value() ? ':' + classCtrl.value() : '';
+								tag += ']';
+
+								// Get rendered tag and output directly
+								var renderedTag = getRenderedTag( tag );
+
+								if( renderedTag === false )
+								{
+									getRenderedTags( [ tag ], function( rTags ) {
+											for( var i = 0; i < renderedTags.length; i++ )
+											{
+												if( renderedTags[i].shortTag == tag )
+												{
+													renderedTag = renderedTags[i];
+													break;
+												}
+											}
+
+											if( renderedTag )
+											{
+												if( selected )
+												{
+													editor.dom.replace( renderedTag.node, selected, false );
+												}
+												else
+												{
+													editor.insertContent( renderedTag.html );
+												}
+
+												editor.windowManager.close();
+											}
+										} );
+								}
+								else
+								{
+									if( selected )
+									{
+										editor.dom.replace( renderedTag.node, selected, false );
+									}
+									else
+									{
+										editor.insertContent( renderedTag.html );
+									}
+
+									editor.windowManager.close();
+								}
+							}
 						},
 						{
-							type: 'checkbox',
-							name: 'nocaption',
-							text: 'Do not show caption',
-							checked: ( selectedData && selectedData.caption == '-' ),
-							onclick: function() {
-								var captionCtrl = win.find( '#caption' )[0];
-								captionCtrl.disabled( this.checked() );
-							}
-						}
+							text: 'Cancel',
+							onclick: 'close'
+						},
 					]
-				},
-				{
-					type: 'listbox',
-					name: 'alignment',
-					label: 'Alignment:',
-					values: [
-						{ text: 'none', value: '' },
-						{ text: 'left', value: '.floatleft' },
-						{ text: 'right', value: '.floatright' }
-					],
-					value: selectedData ? selectedData.alignment : ''
-				},
-				{
-					type: 'textbox',
-					name: 'imageClass',
-					label: 'Additional class:',
-					value: selectedData ? selectedData.extraClass : null
-				}
-			],
-			buttons: [
-				{
-					text: 'Cancel',
-					onclick: 'close'
-				},
-				{
-					text: selected ? 'Update' : 'Insert',
-					onclick: function() {
-						var linkCtrl = win.find('#link')[0];
-						var captionCtrl = win.find('#caption')[0];
-						var noCaptionCtrl = win.find('#nocaption')[0];
-						var alignCtrl = win.find('#alignment')[0];
-						var classCtrl = win.find('#imageClass')[0];
-						var tag = '[image:' + linkCtrl.value();
+				});
+			} else {
+				alert( 'To insert a thumbnail, attach a picture to the post in the Attachments panel below; then click the (+) icon in the Attachments panel.' );
+			}
+		},
+		onPostRender: function()
+		{
+			var thumbnailButton = this;
+			editor.on( 'NodeChange', function( event ) {
+				thumbnailButton.active( selectedType == 'thumbnail' );
+			});
+		}
+	});
 
-						if( noCaptionCtrl.checked() || captionCtrl.value() ||  alignCtrl.value() )
-						{
-							tag += ':';
-
-							if( noCaptionCtrl.checked() )	{
-								tag += '-';
-							} else if( captionCtrl.value() ) {
-								tag += captionCtrl.value();
-							}
-
-							if( alignCtrl.value() || classCtrl.value() )
-							{
-								var alignClass = alignCtrl.value();
-								tag += ':' + alignClass + classCtrl.value();
-							}
-						}
-
-						tag += ']';
-
-						// Get rendered tag and output directly
-						var renderedTag = getRenderedTag( tag );
-
-						if( renderedTag === false )
-						{
-							getRenderedTags( [ tag ], function( rTags ) {
-									for( var i = 0; i < renderedTags.length; i++ )
-									{
-										if( renderedTags[i].shortTag == tag )
-										{
-											renderedTag = renderedTags[i];
-											break;
-										}
-									}
-
-									if( renderedTag )
-									{
-										if( selected )
-										{
-											editor.dom.replace( renderedTag.node, selected, false );
-										}
-										else
-										{
-											editor.insertContent( renderedTag.html );
-										}
-
-										editor.windowManager.close();
-									}
-								} );
-						}
-						else
-						{
-							if( selected )
-							{
-								editor.dom.replace( renderedTag.node, selected, false );
-							}
-							else
-							{
-								editor.insertContent( renderedTag.html );
-							}
-
-							editor.windowManager.close();
-						}
-					}
-				}
-			]
-		})
-	}
 
 	function _stop( event ) {
 		event.stopPropagation();
@@ -501,16 +551,7 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 	function getRenderedNode( node, nodeId ) {
 		if( !nodeId ) nodeId = 'data-evo-tag';
 
-		while( node, node.parentNode ) {
-
-			if( node.nodeName != '#text' && node.getAttribute( nodeId ) ) {
-				return node;
-			}
-
-			node = node.parentNode;
-		}
-
-		return false;
+		return editor.dom.getParent( node, '[' + nodeId + ']' );
 	}
 
 
@@ -552,38 +593,62 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 
 			switch( data.type ) {
 				case 'image':
-					var options = m[3]
+					var options = m[3];
 					if( options ) {
-						options = options.split(':');
-						if( options[0] ) {
-							data['caption'] = options[0];
-						}
-						if( options[1] ) {
-							var extraClass = options[1];
-							var alignClasses = [ '.floatleft', '.floatright' ];
-							var maxIndex = -1, index;
-							for( var i = 0; i < alignClasses.length; i++ ) {
-								index = extraClass.indexOf( alignClasses[i] );
-								if( index > maxIndex ) {
-									maxIndex = index;
-									data['alignment'] = alignClasses[i];
-								}
-							}
+						options = options.split( ':' );
 
-							var cls = extraClass.split('.');
-							data['extraClass'] = '';
-							for( var i = 0; i < cls.length; i++ ) {
-								if( cls[i] == '' || alignClasses.indexOf( '.' + cls[i] ) !== -1 ) {
-									continue;
-								} else {
-									data['extraClass'] += '.' + cls[i];
-								}
-							}
+						if( options[0] ) {
+							if( options[0] == '-' ) {
+								data['caption'] = null;
+								data['disableCaption'] = true;
+							} else {
+								data['caption'] = options[0];
+								data['disableCaption'] = false;
+ 							}
+						} else {
+							data['caption'] = null;
+							data['disableCaption'] = false;
+						}
+
+						if( options[1] ) {
+							data['extraClass'] = options[1];
+						} else {
+							data['extraClass'] = null;
 						}
 					}
 					else
 					{
 						data['caption'] = null;
+						data['extraClass'] = null;
+					}
+					break;
+
+				case 'thumbnail':
+					var options = m[3];
+					if( options ) {
+						options = options.split( ':' );
+
+						if( options[0] && ['small', 'medium', 'large'].indexOf( options[0] ) != -1 ) {
+							data['size'] = options[0];
+						} else {
+							data['size'] = 'medium';
+						}
+
+						if( options[1] && ['left', 'right'].indexOf( options[1] ) != -1 ) {
+							data['alignment'] = options[1];
+						} else {
+							data['alignment'] = 'left';
+						}
+
+						if( options[2] ) {
+							data['extraClass'] = options[2];
+						} else {
+							data['extraClass'] = null;
+						}
+
+					} else {
+						data['size'] = 'medium';
+						data['alignment'] = 'left';
 						data['extraClass'] = null;
 					}
 					break;
@@ -600,15 +665,14 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 
 
 	// Render shorttags into rendered nodes
-	editor.on( 'BeforeSetContent', function( event )  {
+	editor.on( 'BeforeSetContent', function( event ) {
 		event.content = renderInlineTags( event.content );
 	});
 
 
 	// Restore rendered nodes into shorttags again
 	editor.on( 'PostProcess', function( event )	{
-		if( event.get )
-		{
+		if( event.get )	{
 			event.content = restoreShortTags( event.content );
 		}
 	});
@@ -621,60 +685,100 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 
 
 	// Check if selected node is part of rendered node
-	editor.on( 'mousedown mouseup click', function( event ) {
-		var rNode = getRenderedNode( event.target );
 
-		if( rNode )
-		{
-			select( rNode );
-			//editor.selection.select( rNode );
-		}
-		else
-		{
+	editor.on( 'mousedown mouseup click touchend', function( event ) {
+		var renderedNode = getRenderedNode( event.target );
+
+		if( renderedNode ) {
+			event.stopImmediatePropagation();
+			event.preventDefault();
+			select( renderedNode );
+		}	else {
 			deselect();
 		}
-	}, true);
+	}, true );
 
 
 	// Prevent editing if current selection part of rendered node
-	editor.on( 'keypress keydown keyup', function( event ) {
-		if( selected )
-		{
-			if( event.which == 8 || event.which == 46 ) // Backspace, Delete
-			{
-				editor.dom.remove( selected );
-				deselect();
+	editor.on( 'keydown', function( event ) {
+		var dom = editor.dom,
+				selection = editor.selection,
+				node, renderedNode;
+
+		node = selection.getNode();
+		renderedNode = getRenderedNode( node );
+
+		if( selected ) {
+			if( event.which == 8 || event.which == 46 ) { // Backspace, Delete
+				forRemoval = selected;
+				event.preventDefault();
+				return false;
+			}	else if( allowedKeys.indexOf( event.which ) == -1 )	{
 				event.preventDefault();
 				return false;
 			}
-			else if( allowedKeys.indexOf( event.which ) == -1 )
-			{
-				event.preventDefault();
-				return false;
+
+			switch( event.which )	{
+				case 37: // Left
+				case 38: // Up
+					// No need to do anything as cursor position is already at the start of the rendered node
+					if( renderedNode.previousSibling ) {
+						// Move the cursor to the beginning of the selected node first
+						selection.setCursorLocation( selected );
+					}
+					break;
+
+				case 39: // Right
+				case 40: // Down
+					if( renderedNode.nextSibling ) {
+						selection.setCursorLocation( renderedNode.nextSibling );
+						event.preventDefault();
+						return false;
+					}
+					break;
+			}
+		}	else {
+			if( ! selection.isCollapsed() ) {
+				range = selection.getRng();
+
+				if( renderedNode = getRenderedNode( range.endContainer ) ) {
+					clonedRange = range.cloneRange();
+					selection.select( renderedNode.previousSibling, true );
+					selection.collapse();
+					tempRange = selection.getRng();
+					clonedRange.setEnd( tempRange.endContainer, tempRange.endOffset );
+					selection.setRng( clonedRange );
+				} else if( renderedNode = getRenderedNode( range.startContainer ) ) {
+					clonedRange = range.cloneRange();
+					clonedRange.setStart( renderedNode.nextSibling, 0 );
+					selection.setRng( clonedRange );
+				}
 			}
 		}
 	}, true );
 
 
-	// Select rendered node if selection has changed to child of rendered node
-	editor.on( 'NodeChange', function( event ) {
-		if( event.selectionChange )
-		{
-			var rNode = getRenderedNode( editor.selection.getNode() );
-			if( rNode )
-			{
-				select( rNode );
-				//editor.selection.select( rNode );
-			}
-			else
-			{
-				deselect();
-			}
+	editor.on( 'keyup', function( event ) {
+		var dom = editor.dom,
+				selection = editor.selection,
+				node, renderedNode;
+
+		node = selection.getNode();
+		renderedNode = getRenderedNode( node );
+
+		if( renderedNode ) {
+			select( renderedNode );
+		}	else	{
+			deselect();
 		}
-	});
+
+		if( forRemoval ) {
+			remove( forRemoval );
+			forRemoval = false;
+		}
+	} );
 
 
-	// Set rendered node type
 	editor.on( 'ResolveName', function( event ) {
 		if ( editor.dom.getAttrib( event.target, 'data-evo-tag' ) ) {
 			var tagType = editor.dom.getAttrib( event.target, 'data-evo-type' );
@@ -693,18 +797,15 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 
 	// Set dragged element data
 	editor.on( 'dragstart', function( event ) {
-		var rNode = getRenderedNode( event.target );
+		var renderedNode = getRenderedNode( event.target );
 
-		if( rNode )
-		{
-			select( rNode );
-			var tag = window.decodeURIComponent( rNode.getAttribute( 'data-evo-tag' ) );
+		if( renderedNode )	{
+			select( renderedNode );
+			var tag = window.decodeURIComponent( renderedNode.getAttribute( 'data-evo-tag' ) );
 			event.dataTransfer.setData( 'application/x-moz-node', event.target );
 			event.dataTransfer.setData( 'text/plain', tag );
 			event.dataTransfer.effectAllowed = 'move';
-		}
-		else
-		{
+		}	else {
 			deselect();
 		}
 	});
@@ -715,9 +816,9 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 		var target = event.target,
 			tag = event.dataTransfer.getData( 'text/plain' );
 
-		var rNode = getRenderedNode( target );
-		if( rNode ) {
-			target = rNode;
+		var renderedNode = getRenderedNode( target );
+		if( renderedNode ) {
+			target = renderedNode;
 		}
 
 		// Dragged element dropped on body itself and we are unable to determine
@@ -729,7 +830,7 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 		}
 
 		// An element belonging to a rendered node was dragged and dropped
-		if( rNode && tag && selected ) {
+		if( renderedNode && tag && selected ) {
 			event.preventDefault();
 			target.insertAdjacentHTML( 'beforebegin', tag );
 			editor.dom.remove( selected );
@@ -747,21 +848,21 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 		// or inserted is added to a text node (instead of the renderedNode).
 		editor.on( 'BeforeSetContent', function() {
 			var walker, target,
-				rNode = getRenderedNode( selection.getNode() );
+				renderedNode = getRenderedNode( selection.getNode() );
 
 			// If the selection is not within a renderedNode, bail.
-			if ( !rNode ) {
+			if ( !renderedNode ) {
 				return;
 			}
 
-			if ( !rNode.nextSibling || getRenderedNode( rNode.nextSibling ) ) {
+			if ( !renderedNode.nextSibling || getRenderedNode( renderedNode.nextSibling ) ) {
 				// If there are no additional nodes or the next node is a
 				// renderedNode, create a text node after the current renderedNode.
 				target = editor.getDoc().createTextNode('');
-				editor.dom.insertAfter( target, rNode );
+				editor.dom.insertAfter( target, renderedNode );
 			} else {
 				// Otherwise, find the next text node.
-				walker = new tinymce.dom.TreeWalker( rNode.nextSibling, rNode.nextSibling );
+				walker = new tinymce.dom.TreeWalker( renderedNode.nextSibling, renderedNode.nextSibling );
 				target = walker.next();
 			}
 

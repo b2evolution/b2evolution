@@ -503,7 +503,10 @@ class tinymce_plugin extends Plugin
 									{
 										var value = params.before + sel + params.after;
 									}
-									inst.selection.setContent(value);
+									inst.undoManager.transact( function() {
+										inst.selection.setContent(value);
+									} );
+
 
 									return true;
 								}, true );
@@ -728,7 +731,8 @@ class tinymce_plugin extends Plugin
 			}
 
 			$tmce_theme_advanced_buttons3_array[] = 'code';
-			$tmce_theme_advanced_buttons3_array[] = 'b2evo_image';
+			$tmce_theme_advanced_buttons3_array[] = 'evo_image';
+			$tmce_theme_advanced_buttons3_array[] = 'evo_thumbnail';
 
 			/* ----------- button row 4 ------------ */
 
