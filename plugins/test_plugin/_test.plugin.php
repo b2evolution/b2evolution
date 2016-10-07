@@ -1099,7 +1099,7 @@ class test_plugin extends Plugin
 	{
 		if( $params['skin'] == 'bootstrap_blog_skin' )
 		{
-			global $skins_path, $app_version, $disp, $ads_current_skin_path, $disp_handlers, $disp_handler, $Skin;
+			global $skins_path, $app_version, $disp, $ads_current_skin_path, $disp_handlers, $disp_handler, $Skin, $Blog;
 
 			$ads_current_skin_path = $skins_path.$params['skin'].'/';
 
@@ -1729,6 +1729,7 @@ class test_plugin extends Plugin
 	 */
 	function DisplayTrackbackAddr( & $params )
 	{
+		echo str_replace( '%url%', 'TEST plugin DisplayTrackbackAddr', $params['template'] );
 	}
 
 
@@ -1747,6 +1748,7 @@ class test_plugin extends Plugin
 	 */
 	function ItemApplyAsRenderer( & $params )
 	{
+		return true;
 	}
 
 	// }}}
@@ -1933,7 +1935,15 @@ class test_plugin extends Plugin
 	 */
 	function GetSpamKarmaForComment( & $params )
 	{
-		return;
+		$count = preg_match_all( '~(https?|ftp)://~i', $params['Comment']->content, $matches );
+
+		if( $count > 5 )
+		{	// If comment has more 5 urls decide this comment is spam:
+			return 100;
+		}
+
+		// Not spam comment:
+		return -100;
 	}
 
 
@@ -2030,6 +2040,7 @@ class test_plugin extends Plugin
 	 */
 	function FilterCommentAuthor( & $params )
 	{
+		$params['data'] = $params['data'].' TEST plugin FilterCommentAuthor()';
 	}
 
 
@@ -2045,6 +2056,7 @@ class test_plugin extends Plugin
 	 */
 	function FilterCommentAuthorUrl( & $params )
 	{
+		$params['data'] = $params['data'].' TEST plugin FilterCommentAuthorUrl()';
 	}
 
 
