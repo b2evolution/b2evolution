@@ -417,7 +417,15 @@ class Blog extends DataObject
 
 			case 'std':
 			default:
-				$this->set( 'type', 'std' );
+				if( $kind != 'std' )
+				{	// Check if given kind is allowed by system or plugins:
+					$kinds = get_collection_kinds();
+					if( ! isset( $kinds[ $kind ] ) )
+					{	// If unknown kind, restrict this to standard:
+						$kind = 'std';
+					}
+				}
+				$this->set( 'type', $kind );
 				$this->set( 'name', empty($name) ? T_('Public Blog') : $name );
 				$this->set( 'shortname', empty($shortname) ? T_('Blog') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'blog' : $urlname );
