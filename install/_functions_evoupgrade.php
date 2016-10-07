@@ -7592,13 +7592,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 11815, 'Upgrading collections table...' ) )
-	{	// part of 6.7.8-stable
-		$DB->query( 'ALTER TABLE T_blogs
-			MODIFY blog_type VARCHAR( 16 ) COLLATE ascii_general_ci DEFAULT "std" NOT NULL' );
-		upg_task_end();
-	}
-
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
