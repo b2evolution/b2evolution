@@ -1455,7 +1455,7 @@ class test_plugin extends Plugin
 	 *   - 'view_type': What part of a post are we displaying: 'teaser', 'extension' or 'full'
 	 * @return boolean Have we changed something?
 	 */
-	function RenderItemAsText()
+	function RenderItemAsText( & $params )
 	{
 		$params['data'] = 'TEST['.$params['data'].']TEST - RenderItemAsText()';
 
@@ -2374,6 +2374,32 @@ class test_plugin extends Plugin
 	 */
 	function CacheObjects( & $params )
 	{
+		switch( $params['action'] )
+		{
+			case 'get':
+				// Get cache object:
+				if( $params['key'] == 'object_GroupCache' )
+				{	// Initialize group cache object with custom params:
+					$allow_none_text = NT_('No group').' - TEST plugin';
+					$GroupCache = new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID', 'grp_name', 'grp_name DESC', $allow_none_text );
+
+					// Set data param and return true to don't use core initialization for group cache object:
+					$params['data'] = & $GroupCache;
+					return true;
+				}
+				break;
+
+			case 'set':
+				// Set cache object:
+				if( $params['key'] == 'object_ItemTypeCache' )
+				{
+					$ItemTypeCache = & $params['data'];
+
+					// Force to load all item type by this plugin:
+					$ItemTypeCache->load_all();
+				}
+				break;
+		}
 	}
 
 
@@ -2409,6 +2435,8 @@ class test_plugin extends Plugin
 	 */
 	function CacheIsCollectingContent()
 	{
+		// Uncomment a line below if this plugin is collecting a content in cache currently:
+		// return true;
 	}
 
 

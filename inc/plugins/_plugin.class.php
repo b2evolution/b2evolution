@@ -1500,7 +1500,7 @@ class Plugin
 	 *   - 'view_type': What part of a post are we displaying: 'teaser', 'extension' or 'full'
 	 * @return boolean Have we changed something?
 	 */
-	function RenderItemAsText()
+	function RenderItemAsText( & $params )
 	{
 		return false;		// Do nothing by default.
 	}
