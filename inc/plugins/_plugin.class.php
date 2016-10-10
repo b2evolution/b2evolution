@@ -1072,6 +1072,34 @@ class Plugin
 	{
 	}
 
+
+	/**
+	 * Event handler: Called at the beginning of the "Edit wdiget" form on back-office.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the {@link Form} object (by reference)
+	 *   - 'ComponentWidget': the Widget which gets edited (by reference)
+	 * @return boolean did we display something?
+	 */
+	function WidgetBeginSettingsForm( & $params )
+	{
+		return false; // Do nothing by default.
+	}
+
+
+	/**
+	 * Event handler: Called at the end of the "Edit wdiget" form on back-office.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the {@link Form} object (by reference)
+	 *   - 'ComponentWidget': the Widget which gets edited (by reference)
+	 * @return boolean did we display something?
+	 */
+	function WidgetEndSettingsForm( & $params )
+	{
+		return false; // Do nothing by default.
+	}
+
 	// }}}
 
 

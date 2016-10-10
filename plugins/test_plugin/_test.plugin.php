@@ -854,6 +854,42 @@ class test_plugin extends Plugin
 		}
 	}
 
+
+	/**
+	 * Event handler: Called at the beginning  of the "Edit wdiget" form on back-office.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the {@link Form} object (by reference)
+	 *   - 'ComponentWidget': the Widget which gets edited (by reference)
+	 * @return boolean did we display something?
+	 */
+	function WidgetBeginSettingsForm( & $params )
+	{
+		$params['Form']->begin_fieldset( 'TEST plugin', array( 'id' => 'WidgetBeginSettingsForm' ) );
+		$params['Form']->info_field( 'TEST plugin', 'This is the TEST plugin responding to the WidgetBeginSettingsForm event for widget #'.$params['ComponentWidget']->ID.'.' );
+		$params['Form']->end_fieldset( 'Foo' );
+
+		return true;
+	}
+
+
+	/**
+	 * Event handler: Called at the end  of the "Edit wdiget" form on back-office.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the {@link Form} object (by reference)
+	 *   - 'ComponentWidget': the Widget which gets edited (by reference)
+	 * @return boolean did we display something?
+	 */
+	function WidgetEndSettingsForm( & $params )
+	{
+		$params['Form']->begin_fieldset( 'TEST plugin', array( 'id' => 'WidgetEndSettingsForm' ) );
+		$params['Form']->info_field( 'TEST plugin', 'This is the TEST plugin responding to the WidgetEndSettingsForm event for widget #'.$params['ComponentWidget']->ID.'.' );
+		$params['Form']->end_fieldset( 'Foo' );
+
+		return true;
+	}
+
 	// }}}
 
 
