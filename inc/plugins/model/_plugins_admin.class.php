@@ -107,6 +107,9 @@ class Plugins_admin extends Plugins
 
 				'AdminBeginPayload' => 'This gets called before the main payload in the backoffice is displayed.',
 
+				'WidgetBeginSettingsForm' => 'This gets called at the beginning of the "Edit wdiget" form on back-office.',
+				'WidgetEndSettingsForm' => 'This gets called at the end of the "Edit wdiget" form on back-office.',
+
 				'CacheObjects' => 'Cache data objects.',
 				'CachePageContent' => 'Cache page content.',
 				'CacheIsCollectingContent' => 'Gets asked for if we are generating cached content.',

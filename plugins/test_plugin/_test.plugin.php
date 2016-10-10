@@ -854,6 +854,42 @@ class test_plugin extends Plugin
 		}
 	}
 
+
+	/**
+	 * Event handler: Called at the beginning  of the "Edit wdiget" form on back-office.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the {@link Form} object (by reference)
+	 *   - 'ComponentWidget': the Widget which gets edited (by reference)
+	 * @return boolean did we display something?
+	 */
+	function WidgetBeginSettingsForm( & $params )
+	{
+		$params['Form']->begin_fieldset( 'TEST plugin', array( 'id' => 'WidgetBeginSettingsForm' ) );
+		$params['Form']->info_field( 'TEST plugin', 'This is the TEST plugin responding to the WidgetBeginSettingsForm event for widget #'.$params['ComponentWidget']->ID.'.' );
+		$params['Form']->end_fieldset( 'Foo' );
+
+		return true;
+	}
+
+
+	/**
+	 * Event handler: Called at the end  of the "Edit wdiget" form on back-office.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the {@link Form} object (by reference)
+	 *   - 'ComponentWidget': the Widget which gets edited (by reference)
+	 * @return boolean did we display something?
+	 */
+	function WidgetEndSettingsForm( & $params )
+	{
+		$params['Form']->begin_fieldset( 'TEST plugin', array( 'id' => 'WidgetEndSettingsForm' ) );
+		$params['Form']->info_field( 'TEST plugin', 'This is the TEST plugin responding to the WidgetEndSettingsForm event for widget #'.$params['ComponentWidget']->ID.'.' );
+		$params['Form']->end_fieldset( 'Foo' );
+
+		return true;
+	}
+
 	// }}}
 
 
@@ -1099,7 +1135,7 @@ class test_plugin extends Plugin
 	{
 		if( $params['skin'] == 'bootstrap_blog_skin' )
 		{
-			global $skins_path, $app_version, $disp, $ads_current_skin_path, $disp_handlers, $disp_handler, $Skin;
+			global $skins_path, $app_version, $disp, $ads_current_skin_path, $disp_handlers, $disp_handler, $Skin, $Blog;
 
 			$ads_current_skin_path = $skins_path.$params['skin'].'/';
 
@@ -1419,7 +1455,7 @@ class test_plugin extends Plugin
 	 *   - 'view_type': What part of a post are we displaying: 'teaser', 'extension' or 'full'
 	 * @return boolean Have we changed something?
 	 */
-	function RenderItemAsText()
+	function RenderItemAsText( & $params )
 	{
 		$params['data'] = 'TEST['.$params['data'].']TEST - RenderItemAsText()';
 
@@ -1729,6 +1765,7 @@ class test_plugin extends Plugin
 	 */
 	function DisplayTrackbackAddr( & $params )
 	{
+		echo str_replace( '%url%', 'TEST plugin DisplayTrackbackAddr', $params['template'] );
 	}
 
 
@@ -1747,6 +1784,7 @@ class test_plugin extends Plugin
 	 */
 	function ItemApplyAsRenderer( & $params )
 	{
+		return true;
 	}
 
 	// }}}
@@ -1933,7 +1971,15 @@ class test_plugin extends Plugin
 	 */
 	function GetSpamKarmaForComment( & $params )
 	{
-		return;
+		$count = preg_match_all( '~(https?|ftp)://~i', $params['Comment']->content, $matches );
+
+		if( $count > 5 )
+		{	// If comment has more 5 urls decide this comment is spam:
+			return 100;
+		}
+
+		// Not spam comment:
+		return -100;
 	}
 
 
@@ -2030,6 +2076,7 @@ class test_plugin extends Plugin
 	 */
 	function FilterCommentAuthor( & $params )
 	{
+		$params['data'] = $params['data'].' TEST plugin FilterCommentAuthor()';
 	}
 
 
@@ -2045,6 +2092,7 @@ class test_plugin extends Plugin
 	 */
 	function FilterCommentAuthorUrl( & $params )
 	{
+		$params['data'] = $params['data'].' TEST plugin FilterCommentAuthorUrl()';
 	}
 
 
@@ -2326,6 +2374,32 @@ class test_plugin extends Plugin
 	 */
 	function CacheObjects( & $params )
 	{
+		switch( $params['action'] )
+		{
+			case 'get':
+				// Get cache object:
+				if( $params['key'] == 'object_GroupCache' )
+				{	// Initialize group cache object with custom params:
+					$allow_none_text = NT_('No group').' - TEST plugin';
+					$GroupCache = new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID', 'grp_name', 'grp_name DESC', $allow_none_text );
+
+					// Set data param and return true to don't use core initialization for group cache object:
+					$params['data'] = & $GroupCache;
+					return true;
+				}
+				break;
+
+			case 'set':
+				// Set cache object:
+				if( $params['key'] == 'object_ItemTypeCache' )
+				{
+					$ItemTypeCache = & $params['data'];
+
+					// Force to load all item type by this plugin:
+					$ItemTypeCache->load_all();
+				}
+				break;
+		}
 	}
 
 
@@ -2361,6 +2435,8 @@ class test_plugin extends Plugin
 	 */
 	function CacheIsCollectingContent()
 	{
+		// Uncomment a line below if this plugin is collecting a content in cache currently:
+		// return true;
 	}
 
 
