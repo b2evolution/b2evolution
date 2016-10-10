@@ -8393,6 +8393,10 @@ class Item extends ItemLight
 				$allowed = ( $is_logged_in && $current_User->check_perm( 'blog_post!draft', 'create', false, $this->Blog->ID )
 					&& $current_User->ID == $this->creator_user_ID );
 				break;
+
+			default:
+				// Decide the unknown item statuses as not visible for front-office:
+				$allowed = false;
 		}
 
 		return $allowed;
