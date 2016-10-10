@@ -99,7 +99,7 @@ $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_setting
 		array( array( 'no', T_( 'No' ), T_( 'Check this to view list of the posts.' ) ),
 			array( 'blog', T_( 'View home page' ), T_( 'Check this to automatically view the blog after publishing a post.' ) ),
 			array( 'post', T_( 'View new post' ), T_( 'Check this to automatically view the post page.' ) ), ),
-			T_( 'View blog after publishing' ), true );
+			T_( 'View blog after creating' ), true );
 
 	$Form->radio( 'editing_goto_blog', $edited_Blog->get_setting( 'editing_goto_blog' ),
 		array( array( 'no', T_( 'No' ), T_( 'Check this to view list of the posts.' ) ),
