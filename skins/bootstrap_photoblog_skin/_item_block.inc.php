@@ -188,8 +188,9 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
 			// Template params for "Item Tags" widget
-			'widget_item_tags_before'    => '<div class="small">'.T_('Tags').': ',
+			'widget_item_tags_before'    => '<nav class="small post_tags">',
 			'widget_item_tags_after'     => '</div>',
+			'widget_item_tags_separator' => ' ',
 			// Params for skin file "_item_content.inc.php"
 			'widget_item_content_params' => $params,
 			
@@ -214,7 +215,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	</div> <!-- ../content_end_full_text -->
 
 		<?php
-			if( ! $Item->is_intro() ) // Do NOT apply tags, comments and feedback on intro posts
+			if( ! $Item->is_intro() && $disp == 'posts' ) // Do NOT apply tags, comments and feedback on intro posts
 			{ // List all tags attached to this post:
 				echo '<footer>';
 				$Item->tags( array(
