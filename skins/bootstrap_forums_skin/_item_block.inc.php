@@ -173,6 +173,10 @@ skin_widget( array(
 						// This will enclose the title of each widget:
 						'block_title_start' => '<h3>',
 						'block_title_end' => '</h3>',
+						// Template params for "Item Tags" widget
+						'widget_item_tags_before'    => '<nav class="small post_tags">',
+						'widget_item_tags_after'     => '</nav>',
+						'widget_item_tags_separator' => ' ',
 						// Params for skin file "_item_content.inc.php"
 						'widget_item_content_params' => $params,
 					) );
@@ -188,15 +192,15 @@ skin_widget( array(
 					// Note: You can customize the default item content by copying the generic
 					// /skins/_item_content.inc.php file into the current skin folder.
 					// -------------------------- END OF POST CONTENT -------------------------
-				}
-
-				if( ! $Item->is_intro() )
-				{ // List all tags attached to this topic:
-					$Item->tags( array(
-							'before'    => '<nav class="small post_tags">',
-							'after'     => '</nav>',
-							'separator' => ' ',
-						) );
+					
+					if( ! $Item->is_intro() )
+					{ // List all tags attached to this topic:
+						$Item->tags( array(
+								'before'    => '<nav class="small post_tags">',
+								'after'     => '</nav>',
+								'separator' => ' ',
+							) );
+					}
 				}
 				?>
 			</div>
