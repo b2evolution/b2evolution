@@ -240,6 +240,10 @@ span.fa {
 a.action_icon span.fa {
   margin-right: 2px;
 }
+span.fa.action_icon.empty_placeholder {
+  margin-right: 4px;
+  visibility: hidden;
+}
 a.roundbutton .fa,
 a.roundbutton:hover .fa,
 a.roundbutton_text .fa,

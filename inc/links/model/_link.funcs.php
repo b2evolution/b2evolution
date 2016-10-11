@@ -430,9 +430,14 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 					.get_icon( 'permalink', 'imgtag', array( 'title' => $title ) ).'</a> ';
 	}
 
-	// Delete link.
+	// Unlink/Delete icons:
 	if( $LinkOwner->check_perm( 'edit' ) )
-	{ // Check that we have permission to edit LinkOwner object:
+	{	// If current user has a permission to edit LinkOwner object
+		// Unlink icon:
+		$r .= action_icon( T_('Delete this link!'), 'unlink',
+					$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=unlink'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
+					array( 'onclick' => 'item_unlink('.$link_ID.')' ) );
+		// Delete icon:
 		$LinkCache = & get_LinkCache();
 		$Link = & $LinkCache->get_by_ID( $link_ID, false, false );
 		if( $Link && $Link->can_be_file_deleted() )
@@ -445,10 +450,8 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 								.'\' ) && item_unlink('.$link_ID.')' ) );
 		}
 		else
-		{	// If current user can only unlink
-			$r .= action_icon( T_('Delete this link!'), 'unlink',
-						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=unlink'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
-						array( 'onclick' => 'item_unlink('.$link_ID.')' ) );
+		{	// If current user can only unlink the attachment (probably it is linked to several objects)
+			$r .= get_icon( 'delete', 'imgtag', array( 'class' => 'action_icon empty_placeholder' ) );
 		}
 	}
 
