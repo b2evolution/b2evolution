@@ -45,11 +45,15 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 			dom.bind( selected, 'beforedeactivate focusin focusout', _stop );
 
 			// Set cursor position
-			var img = dom.select( 'img:first', selected );
-			if( img.length ) {
-				editor.selection.select( img[0] );
+			if( dom.is( selected, 'img' ) ) {
+				editor.selection.select( selected );
 			} else {
-				editor.selection.setCursorLocation( selected );
+				var img = dom.select( 'img:first', selected );
+				if( img.length ) {
+					editor.selection.select( img[0] );
+				} else {
+					editor.selection.setCursorLocation( selected );
+				}
 			}
 
 			editor.nodeChanged();
@@ -63,12 +67,14 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 	function deselect()	{
 		var dom = editor.dom;
 
-		dom.unbind( selected, 'paste cut beforedeactive focusin focusout' );
-		dom.removeClass( selected, 'evo_selected' );
-		selected = null;
-		selectedType = null;
+		if( selected ) {
+			dom.unbind( selected, 'paste cut beforedeactive focusin focusout' );
+			dom.removeClass( selected, 'evo_selected' );
+			selected = null;
+			selectedType = null;
 
-		editor.selection.collapse();
+			editor.selection.collapse();
+		}
 	}
 
 
@@ -93,6 +99,11 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 		icon: false,
 		tooltip: 'Edit image',
 		onclick: function() {
+			if( ! editor.getParam( 'postID' ) )	{
+				alert( 'Please save post first to start uploading files.' );
+				return false;
+			}
+
 			if( selected && ( selectedType == 'image' ) ) {
 				var selectedData = getRenderedNodeData( selected );
 
@@ -144,23 +155,17 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 								if( renderedTag === false )
 								{
 									getRenderedTags( [ tag ], function( rTags ) {
-											for( var i = 0; i < renderedTags.length; i++ )
-											{
-												if( renderedTags[i].shortTag == tag )
-												{
+											for( var i = 0; i < renderedTags.length; i++ ) {
+												if( renderedTags[i].shortTag == tag )	{
 													renderedTag = renderedTags[i];
 													break;
 												}
 											}
 
-											if( renderedTag )
-											{
-												if( selected )
-												{
+											if( renderedTag )	{
+												if( selected ) {
 													editor.dom.replace( renderedTag.node, selected, false );
-												}
-												else
-												{
+												} else {
 													editor.insertContent( renderedTag.html );
 												}
 
@@ -170,12 +175,9 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 								}
 								else
 								{
-									if( selected )
-									{
+									if( selected ) {
 										editor.dom.replace( renderedTag.node, selected, false );
-									}
-									else
-									{
+									}	else {
 										editor.insertContent( renderedTag.html );
 									}
 
@@ -198,7 +200,19 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 				} );
 
 			} else {
-				alert( 'To insert an image, attach a picture to the post in the Attachments panel below; then click the (+) icon in the Attachments panel.' );
+				var root, path, fm_highlight;
+				openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="Loading..."></span>',
+						'80%', '', true, 'Select image to insert', '', true );
+				jQuery.ajax(
+				{
+					type: 'POST',
+					url: editor.getParam( 'modal_url' ),
+					success: function(result)
+					{
+						openModalWindow( result, '90%', '80%', true, 'Select image', '' );
+					}
+				} );
+				return false;
 			}
 		},
 		onPostRender: function()
@@ -219,10 +233,15 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 		icon: false,
 		tooltip: 'Edit thumbnail',
 		onclick: function() {
+			if( ! editor.getParam( 'postID' ) )	{
+				alert( 'Please save post first to start uploading files.' );
+				return false;
+			}
+
 			if( selected && ( selectedType == 'thumbnail' ) ) {
 				var selectedData = getRenderedNodeData( selected );
 
-				win = editor.windowManager.open({
+				win = editor.windowManager.open( {
 					title: 'Edit Thumbnail',
 					body: [
 						{
@@ -271,41 +290,29 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 								// Get rendered tag and output directly
 								var renderedTag = getRenderedTag( tag );
 
-								if( renderedTag === false )
-								{
+								if( renderedTag === false )	{
 									getRenderedTags( [ tag ], function( rTags ) {
-											for( var i = 0; i < renderedTags.length; i++ )
-											{
-												if( renderedTags[i].shortTag == tag )
-												{
+											for( var i = 0; i < renderedTags.length; i++ ) {
+												if( renderedTags[i].shortTag == tag )	{
 													renderedTag = renderedTags[i];
 													break;
 												}
 											}
 
-											if( renderedTag )
-											{
-												if( selected )
-												{
+											if( renderedTag )	{
+												if( selected ) {
 													editor.dom.replace( renderedTag.node, selected, false );
-												}
-												else
-												{
+												}	else {
 													editor.insertContent( renderedTag.html );
 												}
 
 												editor.windowManager.close();
 											}
 										} );
-								}
-								else
-								{
-									if( selected )
-									{
+								}	else {
+									if( selected ) {
 										editor.dom.replace( renderedTag.node, selected, false );
-									}
-									else
-									{
+									}	else {
 										editor.insertContent( renderedTag.html );
 									}
 
@@ -320,7 +327,19 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 					]
 				});
 			} else {
-				alert( 'To insert a thumbnail, attach a picture to the post in the Attachments panel below; then click the (+) icon in the Attachments panel.' );
+				openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="Loading..."></span>',
+						'80%', '', true, 'Select image to insert', '', true );
+				jQuery.ajax(
+				{
+					type: 'POST',
+					url: editor.getParam( 'modal_url' ),
+					success: function(result)
+					{
+						openModalWindow( result, '90%', '80%', true, 'Select image', '' );
+					}
+				} );
+				return false;
+				//alert( 'To insert a thumbnail, attach a picture to the post in the Attachments panel below; then click the (+) icon in the Attachments panel.' );
 			}
 		},
 		onPostRender: function()
@@ -328,6 +347,107 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 			var thumbnailButton = this;
 			editor.on( 'NodeChange', function( event ) {
 				thumbnailButton.active( selectedType == 'thumbnail' );
+			});
+		}
+	});
+
+	/**
+	 * Add [inline:] button
+	 */
+	editor.addButton( 'evo_inline', {
+		text: '[inline:]',
+		icon: false,
+		tooltip: 'Edit inline',
+		onclick: function() {
+			if( ! editor.getParam( 'postID' ) )	{
+				alert( 'Please save post first to start uploading files.' );
+				return false;
+			}
+
+			if( selected && ( selectedType == 'inline' ) ) {
+				var selectedData = getRenderedNodeData( selected );
+
+				win = editor.windowManager.open({
+					title: 'Edit Inline',
+					body: [
+						{
+							type: 'textbox',
+							name: 'extraClass',
+							label: 'Additional class:',
+							minWidth: 500,
+							value: selectedData ? selectedData.extraClass : null
+						}
+					],
+					buttons: [
+						{
+							text: 'Update',
+							onclick: function() {
+								var classCtrl = win.find('#extraClass')[0];
+								var tag = '[inline:' + selectedData.linkId;
+
+								tag += classCtrl.value() ? ':' + classCtrl.value() : '';
+								tag += ']';
+
+								// Get rendered tag and output directly
+								var renderedTag = getRenderedTag( tag );
+
+								if( renderedTag === false )	{
+									getRenderedTags( [ tag ], function( rTags ) {
+											for( var i = 0; i < renderedTags.length; i++ ) {
+												if( renderedTags[i].shortTag == tag )	{
+													renderedTag = renderedTags[i];
+													break;
+												}
+											}
+
+											if( renderedTag )	{
+												if( selected ) {
+													editor.dom.replace( renderedTag.node, selected, false );
+												}	else {
+													editor.insertContent( renderedTag.html );
+												}
+
+												editor.windowManager.close();
+											}
+										} );
+								}	else {
+									if( selected ) {
+										editor.dom.replace( renderedTag.node, selected, false );
+									}	else {
+										editor.insertContent( renderedTag.html );
+									}
+
+									editor.windowManager.close();
+								}
+							}
+						},
+						{
+							text: 'Cancel',
+							onclick: 'close'
+						},
+					]
+				});
+			} else {
+				openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="Loading..."></span>',
+						'80%', '', true, 'Select image to insert', '', true );
+				jQuery.ajax(
+				{
+					type: 'POST',
+					url: editor.getParam( 'modal_url' ),
+					success: function(result)
+					{
+						openModalWindow( result, '90%', '80%', true, 'Select image', '' );
+					}
+				} );
+				return false;
+				//alert( 'To insert an inline image, attach a picture to the post in the Attachments panel below; then click the (+) icon in the Attachments panel.' );
+			}
+		},
+		onPostRender: function()
+		{
+			var inlineButton = this;
+			editor.on( 'NodeChange', function( event ) {
+				inlineButton.active( selectedType == 'inline' );
 			});
 		}
 	});
@@ -368,7 +488,7 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 			tagsParam = tagsParam.join( '&' );
 
 			tinymce.util.XHR.send({
-				url: editor.getParam( 'async_url' ) + '?action=render_inlines&p=' + editor.getParam( 'postID' ),
+				url: editor.getParam( 'anon_async_url' ) + '?action=render_inlines&p=' + editor.getParam( 'postID' ),
 				content_type : 'application/x-www-form-urlencoded',
 				data: tagsParam,
 				success: function( data ) {
@@ -420,8 +540,7 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 	 */
 	function getRenderedTag( tag ) {
 		var n = renderedTags.length;
-		for( var i = 0; i < n; i++ )
-		{
+		for( var i = 0; i < n; i++ ) {
 			if( renderedTags[i].shortTag == tag ) {
 				return renderedTags[i];
 			}
@@ -436,8 +555,7 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 	 *
 	 * @param string Content of the post
 	 */
-	function renderInlineTags( content )
-	{
+	function renderInlineTags( content ) {
 		var re = /(<span.*?data-evo-tag.*?>)?(\[(image|thumbnail|inline|video|audio):(\d+):?([^\[\]]*)\])(<\/span>)?/ig;
 		var m;
 		var matches = [];
@@ -447,7 +565,8 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 			if ( m.index === re.lastIndex ) {
 					re.lastIndex++;
 			}
-			matches.push({
+
+			matches.push( {
 				shortTag: m[2],
 				inlineType: m[3],
 				linkId: parseInt( m[4] ),
@@ -459,22 +578,18 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 		}
 
 		getRenderedTags( inlineTags, function( returnedTags ) {
-			if( returnedTags )
-			{
+			if( returnedTags ) {
 				update();
 			}
-		});
+		} );
 
 		var n = matches.length;
-		for( var i = 0; i < n; i++ )
-		{
-			if( matches[i] && !matches[i].openTag && !matches[i].closeTag )
-			{
+		for( var i = 0; i < n; i++ ) {
+			if( matches[i] && !matches[i].openTag && !matches[i].closeTag )	{
 				var tag = matches[i].shortTag;
-
 				var renderedTag = getRenderedTag( tag );
-				if( renderedTag !== false && renderedTag.rendered !== false )
-				{
+
+				if( renderedTag !== false && renderedTag.rendered !== false )	{
 					switch( matches[i].inlineType ) {
 						case 'image':
 						case 'thumbnail':
@@ -517,7 +632,7 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 			}
 		}
 
-		// Cleanup [image:]
+		// Cleanup rendered nodes
 		var df = editor.dom.createFragment( content );
 		var renderedNode;
 		while( renderedNode = df.querySelector( '[data-evo-tag]' ) ) {
@@ -649,6 +764,15 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 					} else {
 						data['size'] = 'medium';
 						data['alignment'] = 'left';
+						data['extraClass'] = null;
+					}
+					break;
+
+				case 'inline':
+					var options = m[3];
+					if( options ) {
+						data['extraClass'] = options;
+					} else {
 						data['extraClass'] = null;
 					}
 					break;

@@ -2217,6 +2217,7 @@ function display_dragdrop_upload_button( $params = array() )
 	global $blog, $Settings, $current_User;
 
 	$params = array_merge( array(
+			'button_ID'        => 'file-uploader',
 			'before'           => '',
 			'after'            => '',
 			'fileroot_ID'      => 0, // Root type and ID, e.g. collection_1
@@ -2263,7 +2264,7 @@ function display_dragdrop_upload_button( $params = array() )
 	echo $params['before'];
 
 	?>
-	<div id="file-uploader" style="width:100%">
+	<div id="<?php echo $params['button_ID'];?>" style="width:100%">
 		<noscript>
 			<p><?php echo T_('Please enable JavaScript to use file uploader.'); ?></p>
 		</noscript>
@@ -2304,13 +2305,13 @@ function display_dragdrop_upload_button( $params = array() )
 		{
 			uploader = new qq.FileUploader(
 			{
-				element: document.getElementById( 'file-uploader' ),
+				element: document.getElementById( '<?php echo $params['button_ID'];?>' ),
 				listElement: <?php echo $params['listElement']; ?>,
 				list_style: '<?php echo $params['list_style']; ?>',
 				additional_dropzone: '<?php echo $params['additional_dropzone']; ?>',
 				action: url,
 				sizeLimit: <?php echo ( $Settings->get( 'upload_maxkb' ) * 1024 ); ?>,
-				debug: true,
+				debug: false,
 				messages: {
 					typeError: '<?php echo TS_('{file} has an invalid extension. Only {extensions} are allowed.'); ?>',
 					sizeError: '<?php echo TS_('{file} cannot be uploaded because it is too large ({fileSize}). The maximum allowed upload size is {sizeLimit}.'); ?>',

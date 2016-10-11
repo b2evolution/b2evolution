@@ -704,8 +704,8 @@ fieldset ul {
 #attachments_fieldset_wrapper table tbody td {
   cursor: move;
 }
-#filelist_tbody tr:first-child .action_icon_link_move_up,
-#filelist_tbody tr:last-child .action_icon_link_move_down {
+.filelist_tbody tr:first-child .action_icon_link_move_up,
+.filelist_tbody tr:last-child .action_icon_link_move_down {
   visibility: hidden;
 }
 table.filelist {

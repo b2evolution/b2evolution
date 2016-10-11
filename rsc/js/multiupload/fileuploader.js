@@ -783,7 +783,7 @@ qq.extend(qq.FileUploader.prototype, {
 		else // table
 		{
 			jQuery( fileElement ).attr( 'rel', this._formatFileName(fileName) );
-			var tr_prev = jQuery( '#filelist_tbody tr:last' );
+			var tr_prev = jQuery( '.filelist_tbody tr:last' );
 			var tr_class = 'even';
 			if( tr_prev.hasClass( 'even' ) )
 			{
@@ -794,7 +794,7 @@ qq.extend(qq.FileUploader.prototype, {
 					rel: 'file_upload_' + id,
 					class: tr_class
 				} );
-			jQuery( '#filelist_tbody' ).append( item_tbody.html() );
+			jQuery( '.filelist_tbody' ).append( item_tbody.html() );
 		}
 	},
 	_getItemByFileId: function(id){

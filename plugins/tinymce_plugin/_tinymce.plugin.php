@@ -504,7 +504,7 @@ class tinymce_plugin extends Plugin
 										var value = params.before + sel + params.after;
 									}
 									inst.undoManager.transact( function() {
-										inst.selection.setContent(value);
+										inst.selection.setContent( value );
 									} );
 
 
@@ -731,8 +731,7 @@ class tinymce_plugin extends Plugin
 			}
 
 			$tmce_theme_advanced_buttons3_array[] = 'code';
-			$tmce_theme_advanced_buttons3_array[] = 'evo_image';
-			$tmce_theme_advanced_buttons3_array[] = 'evo_thumbnail';
+			$tmce_theme_advanced_buttons3_array[] = 'evo_image evo_thumbnail evo_inline';
 
 			/* ----------- button row 4 ------------ */
 
@@ -778,7 +777,8 @@ class tinymce_plugin extends Plugin
 		$init_options[] = 'collection: "'.$this->collection.'"';
 		$init_options[] = 'postID: '.$this->post_ID;
 		$init_options[] = 'rest_url: "'.get_htsrv_url().'rest.php"';
-		$init_options[] = 'async_url: "'.get_htsrv_url().'anon_async.php"';
+		$init_options[] = 'anon_async_url: "'.get_htsrv_url().'anon_async.php"';
+		$init_options[] = 'modal_url: "'.$this->get_htsrv_url( 'insert_inline', array( 'post_ID' => $this->post_ID ), '&' ).'"';
 
 		$init_options[] = 'fontsize_formats: "8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt"';
 
@@ -965,6 +965,36 @@ class tinymce_plugin extends Plugin
 		}
 	}
 
+	function htsrv_insert_inline( $params )
+	{
+		global $UserSettings, $current_User, $adminskins_path, $AdminUI;
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+		$AdminUI = new AdminUI();
+		load_funcs( 'links/model/_link.funcs.php' );
+
+		if( ! isset( $params['post_ID'] ) )
+		{
+			return;
+		}
+		$ItemCache = & get_ItemCache();
+		$edited_Item = & $ItemCache->get_by_ID( $params['post_ID'] );
+
+		if( isset( $GLOBALS['files_Module'] )
+		&& $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item )
+		&& $current_User->check_perm( 'files', 'view', false ) )
+		{ // Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
+			load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
+			global $LinkOwner; // Initialize this object as global because this is used in many link functions
+			$LinkOwner = new LinkItem( $edited_Item );
+
+			// Set a different dragand drop button ID
+			global $dragdropbutton_ID;
+			$dragdropbutton_ID = 'file-uploader-modal';
+			$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+		}
+	}
+
 	/**
 	 * Get editor state
 	 *
@@ -1054,7 +1084,7 @@ class tinymce_plugin extends Plugin
 	 */
 	function GetHtsrvMethods()
 	{
-		return array( 'save_editor_state'/*, 'get_item_content_css'*/ );
+		return array( 'save_editor_state', 'insert_inline'/*, 'get_item_content_css'*/ );
 	}
 
 

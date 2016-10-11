@@ -26,6 +26,9 @@ global $LinkOwner;
 
 global $AdminUI, $current_User;
 
+// Override $dragdropbutton_ID to enable multiple drag and buton
+global $dragdropbutton_ID;
+
 // Override $debug in order to keep the display of the iframe neat
 global $debug;
 $debug = 0;
@@ -116,8 +119,8 @@ if( $LinkOwner->type != 'emailcampaign' )
 
 // Add attr "id" to handle quick uploader
 $compact_results_params = $AdminUI->get_template( 'compact_results' );
-$compact_results_params['body_start'] = str_replace( '<tbody', '<tbody id="filelist_tbody"', $compact_results_params['body_start'] );
-$compact_results_params['no_results_start'] = str_replace( '<tbody', '<tbody id="filelist_tbody"', $compact_results_params['no_results_start'] );
+$compact_results_params['body_start'] = str_replace( '<tbody', '<tbody class="filelist_tbody"', $compact_results_params['body_start'] );
+$compact_results_params['no_results_start'] = str_replace( '<tbody', '<tbody class="filelist_tbody"', $compact_results_params['no_results_start'] );
 
 $Results->display( $compact_results_params );
 
@@ -160,11 +163,12 @@ switch( $LinkOwner->type )
 
 // Display a button to quick upload the files by drag&drop method
 display_dragdrop_upload_button( array(
+		'button_ID' => isset( $dragdropbutton_ID ) ? $dragdropbutton_ID : 'file-uploader',
 		'before' => '<div id="fileuploader_form">',
 		'after'  => '</div>',
 		'fileroot_ID'      => $upload_fileroot,
 		'path'             => $upload_path,
-		'listElement'      => 'jQuery( "#filelist_tbody" ).get(0)',
+		'listElement'      => 'jQuery( ".filelist_tbody" ).get(0)',
 		'list_style'       => 'table',
 		'template_filerow' => '<table><tr>'
 					.'<td class="firstcol shrinkwrap qq-upload-image"><span class="qq-upload-spinner">&nbsp;</span></td>'
@@ -181,7 +185,7 @@ display_dragdrop_upload_button( array(
 					.( $LinkOwner->type != 'emailcampaign' ? '<td class="qq-upload-link-position lastcol shrinkwrap"></td>' : '' )
 				.'</tr></table>',
 		'display_support_msg'    => false,
-		'additional_dropzone'    => '#filelist_tbody',
+		'additional_dropzone'    => '.filelist_tbody',
 		'filename_before'        => '',
 		'LinkOwner'              => $LinkOwner,
 		'display_status_success' => false,

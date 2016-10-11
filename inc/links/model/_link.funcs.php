@@ -365,13 +365,15 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 		$r .= action_icon( T_('Move upwards'), 'move_up',
 						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=link_move_up'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
 						array( 'class' => 'action_icon_link_move_up',
-									 'onclick' => 'return evo_link_change_order( this, '.$link_ID.', \'move_up\' )' ) );
+									 'onclick' => 'return evo_link_change_order( this, '.$link_ID.', \'move_up\' )',
+									 'data-link-id' => $link_ID ) );
 
 		// Allow to move down all rows except of last, This action icon is hidden by CSS for last row
 		$r .= ' '.action_icon( T_('Move down'), 'move_down',
 						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=link_move_down'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
 						array( 'class' => 'action_icon_link_move_down',
-									 'onclick' => 'return evo_link_change_order( this, '.$link_ID.', \'move_down\' )' ) );
+									 'onclick' => 'return evo_link_change_order( this, '.$link_ID.', \'move_down\' )',
+									 'data-link-id' => $link_ID ) );
 	}
 
 	if( $current_File && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
@@ -402,13 +404,15 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=delete'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
 						array( 'onclick' => 'return confirm( \''
 								.sprintf( TS_('Are you sure want to DELETE the file &laquo;%s&raquo;?\nThis CANNOT be reversed!'), utf8_strip_tags( link_destination() ) )
-								.'\' ) && evo_link_delete( this, \''.$LinkOwner->type.'\', '.$link_ID.', \'delete\' )' ) );
+								.'\' ) && evo_link_delete( this, \''.$LinkOwner->type.'\', '.$link_ID.', \'delete\' )',
+								'data-link-id' => $link_ID ) );
 		}
 		else
 		{	// If current user can only unlink
 			$r .= action_icon( T_('Delete this link!'), 'unlink',
 						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=unlink'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
-						array( 'onclick' => 'return evo_link_delete( this, \''.$LinkOwner->type.'\', '.$link_ID.', \'unlink\' )' ) );
+						array( 'onclick' => 'return evo_link_delete( this, \''.$LinkOwner->type.'\', '.$link_ID.', \'unlink\' )',
+								'data-link-id' => $link_ID ) );
 		}
 	}
 
@@ -461,7 +465,7 @@ function display_link_position( & $row )
 {
 	global $LinkOwner;
 
-	$r = '<select id="display_position_'.$row->link_ID.'">'
+	$r = '<select id="display_position_'.$row->link_ID.'" class="link_position_select" data-link-id='.$row->link_ID.'>'
 			.Form::get_select_options_string( $LinkOwner->get_positions( $row->file_ID ), $row->link_position, true)
 		.'</select>';
 

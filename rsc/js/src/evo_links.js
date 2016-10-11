@@ -112,17 +112,19 @@ function evo_link_insert_inline( type, link_ID, caption )
 
 		insert_tag += ']';
 
+		// Change the position to inline first before inserting so that the image|thumbnail|inline will be rendered
+		var position_selectors = jQuery( '.link_position_select[data-link-id=' + link_ID + ']');
+		jQuery.each( position_selectors, function( i, selector ) {
+			var selector = jQuery( selector );
+			// Change the position to 'Inline'
+			if( selector.val() != 'inline' )
+			{
+				selector.val( 'inline' ).change();
+			}
+		} );
+
 		// Insert an image tag
 		textarea_wrap_selection( b2evoCanvas, insert_tag, '', 0, window.document );
-
-		var $position_selector = jQuery( '#display_position_' + link_ID );
-		if( $position_selector.length != 0 )
-		{ // Change the position to 'Inline'
-			if( $position_selector.val() != 'inline' )
-			{
-				$position_selector.val( 'inline' ).change();
-			}
-		}
 	}
 }
 
@@ -159,7 +161,12 @@ function evo_link_delete( event_object, type, link_ID, action )
 		}
 
 		// Remove attachment row from table:
-		jQuery( event_object ).closest( 'tr' ).remove();
+		var rows = jQuery( 'a[data-link-id=' + link_ID + ']' ).closest( 'tr' );
+		jQuery.each( rows, function( i, row ) {
+			var row = jQuery( row );
+			row.remove();
+		});
+
 
 		// Update the attachment block height after deleting row:
 		evo_link_fix_wrapper_height();
@@ -184,16 +191,19 @@ function evo_link_change_order( event_object, link_ID, action )
 	function( data )
 	{
 		// Change an order in the attachments table
-		var row = jQuery( event_object ).closest( 'tr' );
-		if( action == 'move_up' )
-		{	// Move up:
-			row.prev().before( row );
-		}
-		else
-		{	// Move down:
-			row.next().after( row );
-		}
-		evoFadeSuccess( row );
+		var rows = jQuery( 'a[data-link-id=' + link_ID + ']' ).closest( 'tr' );
+		jQuery.each( rows, function( i, row ) {
+			var row = jQuery( row );
+			if( action == 'move_up' )
+			{	// Move up:
+				row.prev().before( row );
+			}
+			else
+			{	// Move down:
+				row.next().after( row );
+			}
+			evoFadeSuccess( row );
+		} );
 	},
 	'POST' );
 
