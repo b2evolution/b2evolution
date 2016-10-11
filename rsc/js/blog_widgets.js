@@ -1,5 +1,10 @@
 /**
  * Server communication functions - widgets javascript interface
+ * This file contains JS code to work with collection widgets in back-office:
+ *    - Add new widget in list
+ *    - Sort widgets in list by drag and drop
+ *    - Edit widget in modal window
+ *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
  * @author yabs - http://innervisions.org.uk/
@@ -62,7 +67,10 @@ jQuery(document).ready( function()
 	delete_icon_tag = jQuery( '.delete_icon_hook' ).find( 'a' ).html();// grab the delete icon
 	//get crumb url from delete url and then add it in toggleWidget
 	crumb_url = jQuery( '.delete_icon_hook' ).find( 'a' ).attr('href');
-	crumb_url = crumb_url.match(/crumb_.*?$/);
+	if( typeof( crumb_url ) != 'undefined' )
+	{
+		crumb_url = crumb_url.match(/crumb_.*?$/);
+	}
 	// Modify the current widgets screen
 	// remove the "no widgets yet" placeholder:
 	jQuery( ".new_widget" ).parent().parent().remove();
@@ -350,7 +358,7 @@ function getWidgetOrder()
 		containers_list += container+',';
 	}
 
-	var r = 'blog='+blog+'&'+query_string+'container_list='+containers_list;
+	var r = ( typeof( blog ) != 'undefined' ? 'blog='+blog : '' ) +'&'+query_string+'container_list='+containers_list;
 
 	// console.log( r );
 
