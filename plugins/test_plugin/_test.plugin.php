@@ -1135,7 +1135,7 @@ class test_plugin extends Plugin
 	{
 		if( $params['skin'] == 'bootstrap_blog_skin' )
 		{
-			global $skins_path, $app_version, $disp, $ads_current_skin_path, $disp_handlers, $disp_handler, $Skin, $Blog;
+			global $skins_path, $app_version, $disp, $ads_current_skin_path, $disp_handlers, $disp_handler, $Skin, $Blog, $Item;
 
 			$ads_current_skin_path = $skins_path.$params['skin'].'/';
 
@@ -1860,6 +1860,9 @@ class test_plugin extends Plugin
 		$params['Form']->info_field( 'TEST plugin', 'This is the TEST plugin responding to the DisplayCommentFormFieldset event.' );
 		$params['Form']->end_fieldset( 'Foo' );
 
+		$params['form_type'] = 'comment';
+		$this->CaptchaPayload( $params );
+
 		return true;
 	}
 
@@ -1934,6 +1937,14 @@ class test_plugin extends Plugin
 	function BeforeCommentFormInsert( & $params )
 	{
 		$this->msg( 'This is the TEST plugin responding to the BeforeCommentFormInsert event.' );
+
+		$params['form_type'] = 'comment';
+
+		if( $this->CaptchaValidated( $params ) === false )
+		{	// Some error on captcha validation:
+			$validate_error = $params['validate_error'];
+			param_error( 'captcha_'.$this->code.'_'.$this->ID.'_answer', $validate_error );
+		}
 	}
 
 
@@ -2478,6 +2489,13 @@ class test_plugin extends Plugin
 	 */
 	function PluginSettingsValidateSet( & $params )
 	{
+		if( $params['name'] == 'input_me' )
+		{
+			if( $params['value'] != 'fine' && $params['value'] != 'bad' )
+			{
+				return 'Answer can be either "fine" or "bad".';
+			}
+		}
 	}
 
 
@@ -2553,6 +2571,13 @@ class test_plugin extends Plugin
 	 */
 	function PluginUserSettingsValidateSet( & $params )
 	{
+		if( $params['name'] == 'deactivate' )
+		{
+			if( $params['value'] == 0 )
+			{
+				return 'Plaese enable setting "Deactivate" of Test plugin.';
+			}
+		}
 	}
 
 
@@ -3069,7 +3094,37 @@ class test_plugin extends Plugin
 	 */
 	function CaptchaPayload( & $params )
 	{
-		echo 'TEST plugin: CaptchaPayload event.';
+		if( ! isset( $params['form_type'] ) || $params['form_type'] != 'comment' )
+		{	// Apply captcha only for comment form:
+			return;
+		}
+
+		// Get current or new question:
+		$question = $this->get_captcha_question();
+
+		if( empty( $question ) )
+		{	// No question detected:
+			echo 'Test plugin CaptchaPayload: Sorry, impossible to initialize questions for captcha validation.';
+			return;
+		}
+
+		if( ! isset( $params['Form'] ) )
+		{	// There's no Form where we add to, but we create our own form:
+			$Form = new Form( regenerate_url() );
+			$Form->begin_form();
+		}
+		else
+		{
+			$Form = & $params['Form'];
+		}
+
+		$Form->info( 'TEST Captcha question', $question['question'] );
+		$Form->text_input( 'captcha_'.$this->code.'_'.$this->ID.'_answer', param( 'captcha_'.$this->code.'_'.$this->ID.'_answer', 'string', '' ), 10, 'TEST Captcha answer' );
+
+		if( ! isset( $params['Form'] ) )
+		{	// There's no Form where we add to, but our own form:
+			$Form->end_form( array( array( 'submit', 'submit', $this->T_('Validate me'), 'ActionButton' ) ) );
+		}
 	}
 
 
@@ -3094,6 +3149,44 @@ class test_plugin extends Plugin
 	 */
 	function CaptchaValidated( & $params )
 	{
+		if( ! isset( $params['form_type'] ) || $params['form_type'] != 'comment' )
+		{	// Apply captcha only for comment form:
+			return;
+		}
+
+		$posted_answer = utf8_strtolower( param( 'captcha_'.$this->code.'_'.$this->ID.'_answer', 'string', '' ) );
+
+		if( empty( $posted_answer ) )
+		{
+			$this->debug_log( 'captcha_'.$this->code.'_'.$this->ID.'_answer' );
+			$params['validate_error'] = 'Please enter TEST captcha answer.';
+			if( $comment_Item = & $params['Comment']->get_Item() )
+			{
+				syslog_insert( 'Comment TEST captcha answer is not entered', 'warning', 'item', $comment_Item->ID, 'plugin', $this->ID );
+			}
+			return false;
+		}
+
+		// Get current question:
+		$current_question = $this->get_captcha_question();
+
+		if( $posted_answer != utf8_strtolower( $current_question['answer'] ) )
+		{	// Wrong answer:
+			$this->debug_log( 'Posted ('.$posted_answer.') and answer "test" do not match!' );
+			$params['validate_error'] = 'The entered TEST answer is incorrect.';
+			if( $comment_Item = & $params['Comment']->get_Item() )
+			{
+				syslog_insert( 'Comment TEST captcha answer is incorrect', 'warning', 'item', $comment_Item->ID, 'plugin', $this->ID );
+			}
+			return false;
+		}
+
+		// If answer is correct:
+		//   We should clean the question ID that was assigned for current session and IP address
+		//   It gives to assign new question on the next captcha event
+		$this->CaptchaValidatedCleanup( $params );
+
+		return true;
 	}
 
 
@@ -3111,6 +3204,10 @@ class test_plugin extends Plugin
 	 */
 	function CaptchaValidatedCleanup( & $params )
 	{
+		global $Session;
+
+		// Remove question ID from session
+		$Session->delete( 'captcha_'.$this->code.'_'.$this->ID );
 	}
 
 
@@ -3287,7 +3384,7 @@ class test_plugin extends Plugin
 	 */
 	function GetUserFromCountrySuffix( & $params )
 	{
-		return '';
+		return 'Test plugin event "GetUserFromCountrySuffix"';
 	}
 
 
@@ -3323,6 +3420,85 @@ class test_plugin extends Plugin
 			$params['Results']->cols[] = $column;
 		}
 	}
+
+
+	////////// Custom plugin methods - START //////////
+
+
+	/**
+	 * Assign config questions
+	 *
+	 * @return array Questions array
+	 */
+	function get_captcha_questions()
+	{
+		return array(
+				'1' => array( 'question' => 'Question 1?', 'answer' => 'Answer 1' ),
+				'2' => array( 'question' => 'Question 2?', 'answer' => 'Answer 2' ),
+			);
+	}
+
+	/**
+	 * Get question for current session
+	 *
+	 * @return array Question data from plugin config
+	 */
+	function get_captcha_question()
+	{
+		global $Session;
+
+		$question = NULL;
+
+		// Get question ID from Session:
+		$this->question_ID = $Session->get( 'captcha_'.$this->code.'_'.$this->ID );
+
+		if( empty( $this->question_ID ) )
+		{	// Assign new random question for current Session:
+			$question = $this->get_new_captcha_question();
+		}
+
+		if( empty( $question ) && ! empty( $this->question_ID ) )
+		{	// Get question data:
+			$questions = $this->get_captcha_questions();
+			if( isset( $questions[ $this->question_ID ] ) )
+			{
+				$question = $questions[ $this->question_ID ];
+			}
+
+			if( empty( $question ) )
+			{	// Assign random question if previous question doesn't exist in config:
+				// This case may happens when admin changed the questions but user has the old question ID in the session
+				$question = $this->get_new_captcha_question();
+			}
+		}
+
+		return $question;
+	}
+
+
+	/**
+	 * Assign new random question for current session
+	 *
+	 * @return array Question data with keys 'question' and 'answer'
+	 */
+	function get_new_captcha_question()
+	{
+		global $Session;
+
+		$questions = $this->get_captcha_questions();
+
+		// Get random question:
+		$this->question_index = rand( 1, count( $questions ) );
+
+		// Save the assigned question index in the session:
+		$Session->set( 'captcha_'.$this->code.'_'.$this->ID, $this->question_index );
+		$Session->dbsave();
+
+		return $questions[ $this->question_index ];
+	}
+
+
+	////////// Custom plugin methods - END //////////
 }
 
 ?>

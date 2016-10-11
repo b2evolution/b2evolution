@@ -106,7 +106,7 @@ echo '</div>';
 
 		<?php
 		// Go Grab the featured post:
-		if( $Item = & get_featured_Item() )
+		if( $Item = get_featured_Item() )
 		{ // We have a featured/intro post to display:
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 			echo '<div class="panel panel-default"><div class="panel-body">';
