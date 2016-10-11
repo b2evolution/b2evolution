@@ -3123,7 +3123,7 @@ class test_plugin extends Plugin
 
 		if( ! isset( $params['Form'] ) )
 		{	// There's no Form where we add to, but our own form:
-			$Form->end_form( array( array( 'submit', 'submit', $this->T_('Validate me'), 'ActionButton' ) ) );
+			$Form->end_form( array( array( 'submit', 'submit', 'Validate me', 'ActionButton' ) ) );
 		}
 	}
 
@@ -3414,7 +3414,7 @@ class test_plugin extends Plugin
 		if( in_array( $params['table'], array( 'sessions', 'activity', 'ipranges', 'top_ips' ) ) )
 		{	// Display column only for required tables by Test plugin:
 			$column = array(
-				'th' => T_('TEST Column'),
+				'th' => 'TEST Column',
 				'td' => 'TEST Value',
 			);
 			$params['Results']->cols[] = $column;
