@@ -170,7 +170,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 		<?php
 		// Go Grab the featured post:
-		if( ! in_array( $disp, array( 'single', 'page' ) ) && $Item = & get_featured_Item() )
+		if( ! in_array( $disp, array( 'single', 'page' ) ) && $Item = get_featured_Item() )
 		{	// We have a featured/intro post to display:
 			$intro_item_style = '';
 			$LinkOwner = new LinkItem( $Item );

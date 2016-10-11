@@ -146,7 +146,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 	<?php
 	// Go Grab the featured post:
-	if( $Item = & get_featured_Item() )
+	if( $Item = get_featured_Item() )
 	{	// We have a featured/intro post to display:
 		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 		skin_include( '_item_block.inc.php', array(
