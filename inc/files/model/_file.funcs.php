@@ -2430,7 +2430,7 @@ function display_dragdrop_upload_button( $params = array() )
 								+ '<span class="fname">' + file_name + '</span>'
 								<?php echo ( $params['status_conflict_place'] == 'before_button' ) ? "+ ' - ".$status_conflict_message."'" : ''; ?>
 								+ ' - <a href="#" '
-								+ 'class="<?php echo button_class( 'text' ); ?> roundbutton_text_noicon qq-conflict-replace" '
+								+ 'class="<?php echo button_class( 'text' ); ?> roundbutton_text_noicon qq-conflict-replace btn btn-default btn-xs" '
 								+ 'old="' + responseJSON.success.oldpath + '" '
 								+ 'new="' + responseJSON.success.newpath + '">'
 								+ '<div><?php echo TS_('Use this new file to replace the old file'); ?></div>'
