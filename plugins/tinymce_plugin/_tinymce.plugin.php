@@ -967,7 +967,9 @@ class tinymce_plugin extends Plugin
 
 	function htsrv_insert_inline( $params )
 	{
-		global $UserSettings, $current_User, $adminskins_path, $AdminUI;
+		global $UserSettings, $current_User, $adminskins_path, $AdminUI, $is_admin_page;
+
+		$is_admin_page = true;
 		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
 		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
 		$AdminUI = new AdminUI();
