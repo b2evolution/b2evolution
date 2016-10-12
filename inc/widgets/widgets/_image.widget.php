@@ -122,7 +122,7 @@ class image_Widget extends ComponentWidget
 						'hide_label' => true,
 						'valid_pattern' => array(
 								'pattern' => '~^(\d+(px|%)?)?$~i',
-								'error'   => T_('Invalid image size, it must be a number in pixels or percents.') ),
+								'error'   => sprintf( T_('Invalid image size, it must be specified in px or %%.') ) ),
 					),
 					'size_separator' => array(
 						'label' => ' x ',
@@ -137,7 +137,7 @@ class image_Widget extends ComponentWidget
 						'hide_label' => true,
 						'valid_pattern' => array(
 								'pattern' => '~^(\d+(px|%)?)?$~i',
-								'error'   => T_('Invalid image size, it must be a number in pixels or percents.') ),
+								'error'   => sprintf( T_('Invalid image size, it must be specified in px or %%.') ) ),
 					),
 				'size_end_line' => array(
 					'type' => 'end_line',
