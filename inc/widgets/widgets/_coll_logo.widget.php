@@ -144,7 +144,7 @@ class coll_logo_Widget extends ComponentWidget
 				),
 				'alt' => array(
 					'label' => T_('Image Alt text'),
-					'note' => T_('Leam empty to use collection title by default.'),
+					'note' => T_('Leave empty to use collection title by default.'),
 					'defaultvalue' => '',
 					'size' => 128,
 				),
