@@ -62,6 +62,11 @@ var crumb_url = '';
  */
 jQuery(document).ready( function()
 {
+	if( jQuery( '#current_widgets' ).length == 0 )
+	{	// Initialize widgets list only if we really are there:
+		return;
+	}
+
 	// grab some constants -- fp> TODO: this is flawed. Fails when starting with an empty blog having ZERO widgets. Init that in .php
 	edit_icon_tag = jQuery( '.edit_icon_hook' ).find( 'a' ).html();// grab the edit icon
 	delete_icon_tag = jQuery( '.delete_icon_hook' ).find( 'a' ).html();// grab the delete icon
