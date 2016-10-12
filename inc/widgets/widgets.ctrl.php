@@ -279,9 +279,15 @@ switch( $action )
 					send_javascript_message( $methods, true );
 					break;
 			}
-			$action = 'list';
-			$Session->set( 'fadeout_id', $edited_ComponentWidget->ID );
-			header_redirect( '?ctrl=widgets&blog='.$Blog->ID, 303 );
+			if( $action == 'update_edit' )
+			{	// Stay on edit widget form:
+				header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&action=edit&wi_ID='.$edited_ComponentWidget->ID, 303 );
+			}
+			else
+			{	// Redirect to widgets list:
+				$Session->set( 'fadeout_id', $edited_ComponentWidget->ID );
+				header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
+			}
 		}
 		elseif( $display_mode == 'js' )
 		{ // send errors back as js
@@ -594,7 +600,6 @@ if( $display_mode == 'normal' )
 
 	var b2evo_dispatcher_url = "'.$admin_url.'";' );
 	require_js( '#jqueryUI#' ); // auto requires jQuery
-	require_js( 'blog_widgets.js' );
 	require_css( 'blog_widgets.css' );
 
 
