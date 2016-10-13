@@ -238,6 +238,8 @@ $schema_queries = array(
 		"CREATE TABLE T_locales (
 			loc_locale varchar(20) NOT NULL default '',
 			loc_datefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'y-m-d',
+			loc_longdatefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'Y-m-d',
+			loc_extdatefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'Y M d',
 			loc_timefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'H:i:s',
 			loc_shorttimefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'H:i',
 			loc_startofweek TINYINT UNSIGNED NOT NULL DEFAULT 1,

@@ -92,6 +92,12 @@ if( $action == 'edit' )
 	// Date format
 	$Form->text_input( 'newloc_datefmt', ( isset( $ltemplate['datefmt'] ) ? $ltemplate['datefmt'] : get_param( 'newloc_datefmt' ) ), 20,
 		T_('Date format'), T_('See below.'), array( 'required' => true ) );
+	// Long Date format
+	$Form->text_input( 'newloc_longdatefmt', ( isset( $ltemplate['longdatefmt'] ) ? $ltemplate['longdatefmt'] : get_param( 'newloc_longdatefmt' ) ), 20,
+		T_('Long date format'), T_('See below.') );
+	// Extended Date format
+	$Form->text_input( 'newloc_extdatefmt', ( isset( $ltemplate['extdatefmt'] ) ? $ltemplate['extdatefmt'] : get_param( 'newloc_extdatefmt' ) ), 20,
+		T_('Extended date format'), T_('See below.') );
 	// Time format
 	$Form->text_input( 'newloc_timefmt', ( isset( $ltemplate['timefmt'] ) ? $ltemplate['timefmt'] : get_param( 'newloc_timefmt' ) ), 20,
 		T_('Time format'), T_('See below.'), array( 'required' => true ) );
@@ -260,6 +266,8 @@ else
 		<th><?php echo T_('Name') ?></th>
 		<th><?php echo T_('Charset') ?></th>
 		<th><?php echo T_('Date fmt') ?></th>
+		<th><?php echo T_('Long date fmt') ?></th>
+		<th><?php echo T_('Extended date fmt') ?></th>
 		<th><?php echo T_('Time fmt') ?></th>
 		<th><?php echo T_('Short time fmt') ?></th>
 		<th title="<?php echo T_('Day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc');
@@ -293,6 +301,8 @@ else
 		// Generate preview of date/time-format:
 		locale_temp_switch( $lkey );
 		$datefmt_preview = date_i18n( $locale_data['datefmt'], $localtimenow );
+		$longdatefmt_preview = date_i18n( $locale_data['longdatefmt'], $localtimenow );
+		$extdatefmt_preview = date_i18n( $locale_data['extdatefmt'], $localtimenow );
 		$timefmt_preview = date_i18n( $locale_data['timefmt'], $localtimenow );
 		$shorttimefmt_preview = date_i18n( ( ! empty( $locale_data['shorttimefmt'] ) ? $locale_data['shorttimefmt'] : str_replace( ':s', '', $locale_data['timefmt'] ) ), $localtimenow );
 		locale_restore_previous();
@@ -336,6 +346,12 @@ else
 				</td>
 				<td>
 					<input type="text" name="loc_'.$i.'_datefmt" value="'.format_to_output( $locale_data['datefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $datefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />
+				</td>
+				<td>
+					<input type="text" name="loc_'.$i.'_longdatefmt" value="'.format_to_output( $locale_data['longdatefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $longdatefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />
+				</td>
+				<td>
+					<input type="text" name="loc_'.$i.'_extdatefmt" value="'.format_to_output( $locale_data['extdatefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $extdatefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />
 				</td>
 				<td>
 					<input type="text" name="loc_'.$i.'_timefmt" value="'.format_to_output( $locale_data['timefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $timefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />

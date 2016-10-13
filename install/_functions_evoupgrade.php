@@ -7990,6 +7990,17 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12120, 'Upgrade locales table...' ) )
+	{ // part of 6.8.0-alpha
+		db_add_col( 'T_locales', 'loc_longdatefmt', 'varchar(20) COLLATE ascii_general_ci NOT NULL default "Y-m-d" AFTER loc_datefmt' );
+		db_add_col( 'T_locales', 'loc_extdatefmt', 'varchar(20) COLLATE ascii_general_ci NOT NULL default "Y M d" AFTER loc_longdatefmt' );
+
+		// Update existing locales
+		$DB->query( 'UPDATE T_locales	SET loc_longdatefmt = REPLACE( loc_datefmt, "y", "Y")' );
+		$DB->query( 'UPDATE T_locales	SET loc_extdatefmt = REPLACE( REPLACE( REPLACE( REPLACE( REPLACE( loc_longdatefmt, "m", "M"), ".", " " ), "-", " " ), "/", " "), "\\\\", " ")' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
