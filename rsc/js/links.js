@@ -46,17 +46,16 @@ function evo_display_position_onchange( selectInput, url, crumb )
  * @param integer File ID
  * @param string Caption text
  */
-function insert_inline_link( type, link_ID, caption )
+function insert_inline_link( type, link_ID, option )
 {
 	var b2evoCanvas = window.parent.document.getElementById('itemform_post_content');
 	if( b2evoCanvas != null )
 	{ // Canvas exists
 		var insert_tag = '[' + type + ':' + link_ID;
 
-		if( caption.length )
+		if( option.length )
 		{
-			console.log( caption.length );
-			insert_tag += ':' + caption;
+			insert_tag += ':' + option;
 		}
 
 		insert_tag += ']';

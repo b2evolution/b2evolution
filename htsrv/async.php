@@ -126,6 +126,12 @@ switch( $action )
 		param('link_ID', 'integer', true);
 		param('link_position', 'string', true);
 
+		// Don't display the inline position reminder again until the user logs out or loses the session cookie
+		if( $link_position == 'inline' )
+		{
+			$Session->set( 'display_inline_reminder', 'false' );
+		}
+
 		$LinkCache = & get_LinkCache();
 		if( ( $Link = & $LinkCache->get_by_ID( $link_ID ) ) === false )
 		{	// Bad request with incorrect link ID

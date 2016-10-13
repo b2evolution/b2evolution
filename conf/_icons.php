@@ -1028,7 +1028,23 @@ function get_icon_info( $name )
 			'xy' => array( 32, 224 ),
 			'glyph' => 'plus-sign',
 			'fa' => 'plus-circle',
-			'color' => '#0C0'
+			'color' => '#0c0'
+		);
+		case 'add__yellow': return array(
+			'alt'  => T_('Add'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 32, 224 ),
+			'glyph' => 'plus-sign',
+			'fa' => 'plus-circle',
+			'color' => '#fc0'
+		);
+		case 'add__blue': return array(
+			'alt'  => T_('Add'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 32, 224 ),
+			'glyph' => 'plus-sign',
+			'fa' => 'plus-circle',
+			'color' => '#337ab7'
 		);
 		case 'minus': return array(
 			'alt'  => T_('Remove'),
