@@ -57,6 +57,7 @@ $params = array_merge( array(
 						'block_separator' => '<br /><br />' ) ) )
 			) ),
 		'comment_mode'         => '', // Can be 'quote' from GET request
+		'comment_type'         => 'comment',
 	), $params );
 
 $comment_reply_ID = param( 'reply_ID', 'integer', 0 );
@@ -146,6 +147,8 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 		if( ( $Comment = get_comment_from_session() ) == NULL )
 		{ // there is no saved Comment in Session
 			$Comment = new Comment();
+			$Comment->set( 'type', $params['comment_type'] );
+			$Comment->set( 'item_ID', $Item->ID );
 			if( ( !empty( $PageCache ) ) && ( $PageCache->is_collecting ) )
 			{	// This page is going into the cache, we don't want personal data cached!!!
 				// fp> These fields should be filled out locally with Javascript tapping directly into the cookies. Anyone JS savvy enough to do that?
@@ -278,6 +281,7 @@ function validateCommentForm(form)
 	//           before display!
 
 	$Form->add_crumb( 'comment' );
+	$Form->hidden( 'comment_type', $params['comment_type'] );
 	$Form->hidden( 'comment_item_ID', $Item->ID );
 	if( !empty( $comment_reply_ID ) )
 	{
@@ -320,7 +324,7 @@ function validateCommentForm(form)
 		}
 	}
 
-	if( $Item->can_rate() )
+	if( ! $Comment->is_meta() && $Item->can_rate() )
 	{ // Comment rating:
 		ob_start();
 		$Comment->rating_input( array( 'item_ID' => $Item->ID ) );
@@ -333,27 +337,36 @@ function validateCommentForm(form)
 		$Form->info_field( '', $params['policy_text'] );
 	}
 
+	// Set prefix for js code in plugins:
+	$plugin_js_prefix = ( $params['comment_type'] == 'meta' ? 'meta_' : '' );
+
 	ob_start();
 	echo '<div class="comment_toolbars">';
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'DisplayCommentToolbar', array( 'Comment' => & $Comment, 'Item' => & $Item ) );
+	$Plugins->trigger_event( 'DisplayCommentToolbar', array(
+			'Comment'     => & $Comment,
+			'Item'        => & $Item,
+			'js_prefix'   => $plugin_js_prefix,
+		) );
 	echo '</div>';
 	$comment_toolbar = ob_get_clean();
 
 	// Message field:
+	$content_id = $dummy_fields['content'].'_'.$params['comment_type'];
 	$form_inputstart = $Form->inputstart;
 	$Form->inputstart .= $comment_toolbar;
 	$note = '';
 	// $note = T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags));
-	$Form->textarea_input( $dummy_fields[ 'content' ], $comment_content, $params['textarea_lines'], $params['form_comment_text'], array(
-			'note' => $note,
-			'cols' => 38,
-			'class' => 'autocomplete_usernames'
+	$Form->textarea_input( $dummy_fields['content'], $comment_content, $params['textarea_lines'], $params['form_comment_text'], array(
+			'note'  => $note,
+			'cols'  => 38,
+			'class' => 'autocomplete_usernames',
+			'id'    => $content_id,
 		) );
 	$Form->inputstart = $form_inputstart;
 
-	// set b2evoCanvas for plugins
-	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
+	// Set canvas object for plugins:
+	echo '<script type="text/javascript">var '.$plugin_js_prefix.'b2evoCanvas = document.getElementById( "'.$content_id.'" );</script>';
 
 	// Attach files:
 	if( !empty( $comment_attachments ) )

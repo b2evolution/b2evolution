@@ -669,6 +669,16 @@ div.filters .filter_item div {
   border-top: 1px solid #5bc0de;
   background-color: #d9edf7;
 }
+.panel-meta {
+  border: 2px solid #5bc0de;
+}
+.panel-meta .panel-heading {
+  border-bottom: 1px solid #5bc0de;
+  background-color: #d9edf7;
+}
+.panel-meta .panel-body {
+  background-color: #d9edf7;
+}
 .evo_voting_panel > span.fa {
   margin-right: 4px;
   margin-left: 2px;

@@ -14,7 +14,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $disp;
+global $disp, $Session;
 
 if( ( $disp == 'single' || $disp == 'page' ) &&
     isset( $Item ) && $Item->ID > 0 &&
@@ -24,17 +24,19 @@ if( ( $disp == 'single' || $disp == 'page' ) &&
 
 	$Form = new Form();
 
-	$Form->begin_form();
-
 	$total_comments_number = generic_ctp_number( $Item->ID, 'metas', 'total' );
 
 	$Form->begin_fieldset( T_('Meta comments')
-						.( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ) );
+						.( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ),
+						array( 'class' => 'evo_item_meta_comments' ) );
 
 	if( $current_User->check_perm( 'meta_comment', 'add', false, $Blog->ID ) )
-	{	// Display a link to add new meta comment if current user has a permission:
-		global $admin_url;
-		echo '<p>'.action_icon( T_('Add a meta comment'), 'new', $admin_url.'?ctrl=items&amp;p='.$Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments', T_('Add a meta comment').' &raquo;', 3, 4 ).'</p>';
+	{	// Display a form to add new meta comment if current user has a permission:
+		skin_include( '_item_comment_form.inc.php', array_merge( $params, array(
+				'form_title_start' => '<div class="panel '.( $Session->get('core.preview_Comment') ? 'panel-danger' : 'panel-default' ).' panel-meta">'
+				                     .'<div class="panel-heading"><h4 class="panel-title">',
+				'comment_type' => 'meta',
+			) ) );
 	}
 
 	// Unset a comment counter to set new for meta comments:
@@ -57,6 +59,4 @@ if( ( $disp == 'single' || $disp == 'page' ) &&
 	// /skins/_item_feedback.inc.php file into the current skin folder.
 
 	$Form->end_fieldset();
-
-	$Form->end_form();
 }

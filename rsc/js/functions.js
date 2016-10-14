@@ -462,6 +462,10 @@ jQuery( document ).ready( function()
 			{ // Replace special param with global object
 				func_args[ i ] = b2evoCanvas;
 			}
+			else if( func_args[ i ] == 'meta_b2evoCanvas' )
+			{ // Replace special param with global object
+				func_args[ i ] = meta_b2evoCanvas;
+			}
 			else if( func_args[ i ] == ' ' )
 			{ // Fix an empty param
 				func_args[ i ] = '';
