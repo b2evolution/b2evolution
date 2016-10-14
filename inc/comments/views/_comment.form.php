@@ -198,8 +198,8 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 <?php
 	// ####################### RATING #########################
-	if( $comment_Item->can_rate()
-		|| !empty( $edited_Comment->rating ) )
+	if( ! $edited_Comment->is_meta() &&
+	    ( $comment_Item->can_rate() || !empty( $edited_Comment->rating ) ) )
 	{	// Rating is editable
 		$Form->begin_fieldset( T_('Rating'), array( 'id' => 'cmntform_rating', 'fold' => true ) );
 
