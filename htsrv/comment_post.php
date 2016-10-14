@@ -260,7 +260,7 @@ else
 	$Comment->set( 'allow_msgform', $comment_allow_msgform );
 }
 
-if( $commented_Item->can_rate() )
+if( ! $Comment->is_meta() && $commented_Item->can_rate() )
 {	// Comment rating:
 	$Comment->set( 'rating', $comment_rating );
 }

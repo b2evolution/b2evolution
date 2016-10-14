@@ -587,7 +587,7 @@ while( $Item = & $ItemList->get_item() )
 
 			$Form->info( T_('User'), $current_User->get_identity_link( array( 'link_text' => 'name' ) ).' '.get_user_profile_link( ' [', ']', T_('Edit profile') )  );
 
-			if( $Item->can_rate() )
+			if( $comment_type != 'meta' && $Item->can_rate() )
 			{	// Comment rating:
 				ob_start();
 				$Comment->rating_input( array( 'item_ID' => $Item->ID ) );
