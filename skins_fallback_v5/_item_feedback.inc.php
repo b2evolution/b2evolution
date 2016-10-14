@@ -194,7 +194,7 @@ if( $Item->can_see_comments( true ) )
 	{
 		if( empty($disp_title) )
 		{	// No title yet
-			if( $title = $Item->get_feedback_title( 'feedbacks', '', T_('Feedback awaiting moderation'), T_('Feedback awaiting moderation'), array( 'review', 'draft' ), false ) )
+			if( $title = $Item->get_feedback_title( 'feedbacks', '', T_('Feedback awaiting moderation'), T_('Feedback awaiting moderation'), '#moderation#', false ) )
 			{ // We have some feedback awaiting moderation: we'll want to show that in the title
 				$disp_title[] = $title;
 			}
