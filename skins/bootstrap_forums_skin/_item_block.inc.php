@@ -106,15 +106,15 @@ skin_widget( array(
 		// Author info:
 		echo '<div class="ft_author_info">'.T_('Thread started by');
 		$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
-		echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
+		echo ', '.mysql2date( locale_extdatefmt().' '.locale_shorttimefmt(), $Item->datecreated );
 		echo '<span class="text-muted"> &ndash; '
-				.T_('Last touched:').' '.mysql2date( 'D M j, Y H:i', $Item->get( 'last_touched_ts' ) )
+				.T_('Last touched:').' '.mysql2date( locale_extdatefmt().' '.locale_shorttimefmt(), $Item->get( 'last_touched_ts' ) )
 			.'</span>';
 		echo '</div>';
 		// Author info - shrinked:
 		echo '<div class="ft_author_info shrinked">'.T_('Started by');
 		$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
-		echo ', '.mysql2date( 'm/j/y', $Item->datecreated );
+		echo ', '.mysql2date( locale_datefmt(), $Item->datecreated );
 		echo '</div>';
 		?>
 	</div>
@@ -137,7 +137,7 @@ skin_widget( array(
 						$Item->issue_time( array(
 								'before'      => '<span class="text-muted">',
 								'after'       => '</span> &nbsp; &nbsp; ',
-								'time_format' => 'M j, Y H:i',
+								'time_format' => locale_extdatefmt().' '.locale_shorttimefmt(),
 							) );
 					?>
 				</h4>

@@ -402,6 +402,44 @@ function locale_datefmt( $locale = NULL )
 
 
 /**
+ * Returns the current locale's default long date format
+ * @param string Locale, must be set in {@link $locales}
+ * @return string Date format of the locale, e.g. 'd.m.Y'
+ */
+function locale_longdatefmt( $locale = NULL )
+{
+	global $locales;
+
+	if( empty($locale) )
+	{
+		global $current_locale;
+		$locale = $current_locale;
+	}
+
+	return $locales[$locale]['longdatefmt'];
+}
+
+
+/**
+ * Returns the current locale's default extended date format
+ * @param string Locale, must be set in {@link $locales}
+ * @return string Date format of the locale, e.g. 'd.m.Y'
+ */
+function locale_extdatefmt( $locale = NULL )
+{
+	global $locales;
+
+	if( empty($locale) )
+	{
+		global $current_locale;
+		$locale = $current_locale;
+	}
+
+	return $locales[$locale]['extdatefmt'];
+}
+
+
+/**
  * Returns the current locale's default time format
  */
 function locale_timefmt()
@@ -428,6 +466,7 @@ function locale_datetimefmt( $separator = ' ' )
 
 	return $locales[$current_locale]['datefmt'].$separator.$locales[$current_locale]['timefmt'];
 }
+
 
 /**
  * Returns the current locale's start of week

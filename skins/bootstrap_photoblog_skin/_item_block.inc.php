@@ -138,7 +138,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			$Item->issue_time( array(
 					'before'      => ' '.T_('posted on '),
 					'after'       => ' ',
-					'time_format' => 'M j, Y',
+					'time_format' => locale_extdatefmt(),
 				) );
 
 			// Author

@@ -94,7 +94,7 @@ class geoip_plugin extends Plugin
 
 		if( file_exists( $this->geoip_file_path ) )
 		{
-			$datfile_info = sprintf( T_('Last updated on %s'), date( locale_datefmt().' '.locale_timefmt(), filemtime( $this->geoip_file_path ) ) );
+			$datfile_info = sprintf( T_('Last updated on %s'), date( locale_datetimefmt(), filemtime( $this->geoip_file_path ) ) );
 		}
 		else
 		{
@@ -695,7 +695,7 @@ jQuery( document ).ready( function()
 				global $admin_url;
 				if( file_exists( $this->geoip_file_path ) )
 				{
-					$datfile_info = sprintf( T_('Last updated on %s'), date( locale_datefmt().' '.locale_timefmt(), filemtime( $this->geoip_file_path ) ) );
+					$datfile_info = sprintf( T_('Last updated on %s'), date( locale_datetimefmt(), filemtime( $this->geoip_file_path ) ) );
 				}
 				else
 				{

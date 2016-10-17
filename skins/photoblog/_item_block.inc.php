@@ -106,7 +106,7 @@ $params = array_merge( array(
 				$Item->issue_date( array(
 						'before'      => '<span class="timestamp">',
 						'after'       => '</span>',
-						'date_format' => locale_datefmt().' H:i',
+						'date_format' => locale_datefmt().' '.locale_shorttimefmt(),
 					) );
 			?>
 
