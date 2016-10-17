@@ -2515,10 +2515,10 @@ function balance_tags( $text )
 
 			// Tag Cleaning
 
-			// Push if not img, br, hr, param or input
-			if($tag != 'br' && $tag != 'img' && $tag != 'hr' && $tag != 'param' && $tag != 'input')
+			// Push if not img, br, hr, param, input, link, meta or base:
+			if( ! in_array( $tag, array( 'br', 'img', 'hr', 'param', 'input', 'link', 'meta', 'base' ) ) )
 			{
-				$stacksize = array_push ($tagstack, $tag);
+				$stacksize = array_push( $tagstack, $tag );
 				$closing = '>';
 			}
 			else
