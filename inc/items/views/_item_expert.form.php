@@ -952,6 +952,8 @@ echo_regional_js( 'item', $edited_Item->region_visible() );
 echo_onchange_goal_cat();
 // Fieldset folding
 echo_fieldset_folding_js();
+// Save and restore item content field height and scroll position:
+echo_item_content_position_js( get_param( 'content_height' ), get_param( 'content_scroll' ) );
 
 // JS to post excerpt mode switching:
 ?>

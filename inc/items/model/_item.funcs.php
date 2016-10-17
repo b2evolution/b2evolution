@@ -2052,7 +2052,7 @@ function echo_publishnowbutton_js()
  * JS Behaviour: Output JavaScript code to dynamically select status by dropdown
  * button or submit a form if the button is used for submit action
  *
- * This function is used by the post and omment edit screens.
+ * This function is used by the post and comment edit screens.
  *
  * @param string Type: 'post' or 'commnet'
  */
@@ -2094,6 +2094,60 @@ function echo_status_dropdown_button_js( $type = 'post' )
 		} );
 	</script>
 	<?php
+}
+
+
+/**
+ * JS Behaviour: Output JavaScript code to save and restore item content field height and scroll position
+ *
+ * @param integer Height value to restore
+ * @param integer Scroll position value to restore
+ */
+function echo_item_content_position_js( $height, $scroll_position )
+{
+?>
+	<script type="text/javascript">
+	// Send current height and scroll position of the item content field to the submitting form:
+	jQuery( '[name="actionArray[update_edit]"]' ).click( function()
+	{
+		// Simple textarea editor:
+		var content_height = jQuery( '#itemform_post_content' ).height();
+		var content_scroll = jQuery( '#itemform_post_content' ).scrollTop();
+
+		if( jQuery( '#itemform_post_content_ifr' ).length > 0 )
+		{	// TinyMCE is ON:
+			content_height = jQuery( '#itemform_post_content_ifr' ).height();
+			content_scroll = jQuery( '#itemform_post_content_ifr' ).contents().find( 'body' ).scrollTop();
+		}
+
+		// Append the hidden fields with height and scroll position values to submit with current form:
+		jQuery( this ).closest( 'form' ).append( '<input type="hidden" name="content_height" value="' + content_height + '" />' +
+			'<input type="hidden" name="content_scroll" value="' + content_scroll + '" />' );
+	} );
+<?php
+	if( ! empty( $height ) )
+	{
+?>
+	// Restore height and scroll position on form load:
+	jQuery( document ).ready( function()
+	{
+		jQuery( '#itemform_post_content' ).height( <?php echo $height; ?> );
+		jQuery( '#itemform_post_content' ).scrollTop( <?php echo $scroll_position; ?> );
+
+		jQuery( document ).on( 'DOMNodeInserted', '#itemform_post_content_ifr', function()
+		{	// TinyMCE is inserted:
+			jQuery( '#itemform_post_content_ifr' ).height( <?php echo $height; ?> );
+			setTimeout( function()
+			{	// Change scroll position after 100ms delaying because on inserting event the iframe is empty:
+				jQuery( '#itemform_post_content_ifr' ).contents().find( 'body' ).scrollTop( <?php echo $scroll_position; ?> );
+			}, 100 );
+		} );
+	} );
+<?php
+	}
+?>
+	</script>
+<?php
 }
 
 

@@ -151,6 +151,12 @@ switch( $action )
 		// What form button has been pressed?
 		param( 'save', 'string', '' );
 		$exit_after_save = ( $action != 'update_edit' && $action != 'extract_tags' );
+
+		if( $action == 'update_edit' )
+		{	// Get params to restore height and scroll position of item content field:
+			param( 'content_height', 'integer', 0 );
+			param( 'content_scroll', 'integer', 0 );
+		}
 		break;
 
 	case 'update_type':
