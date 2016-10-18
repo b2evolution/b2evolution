@@ -8037,6 +8037,46 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12130, 'Create new widget container "Item Single Header"...' ) )
+	{ // part of 6.8.0-alpha
+		$DB->begin();
+		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
+		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_order, wi_enabled, wi_code, wi_params, blog_type' );
+		$SQL->FROM( 'T_widget' );
+		$SQL->FROM_add( 'LEFT JOIN T_blogs ON blog_id = wi_coll_ID' );
+		$SQL->WHERE( 'wi_sco_name = "Item Single"' );
+		$SQL->ORDER_BY( 'wi_coll_ID, wi_order' );
+		$coll_item_single_widgets = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+		$coll_widgets = array();
+		foreach( $coll_item_single_widgets as $coll_item_single_widget )
+		{
+			if( ! isset( $coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] ) )
+			{	// If the "Item Single" has no widget "Item Content":
+				$coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] = $coll_item_single_widget['blog_type'];
+			}
+		}
+
+		$item_info_line_widget_rows = array();
+		foreach( $coll_widgets as $coll_ID => $blog_type )
+		{	// Insert new widget "Item Info Line" to each collection that has a container "Item Single":
+			if( in_array( $blog_type, array( 'forum', 'group' ) ) )
+			{
+				$item_info_line_widget_rows[] = '( '.$coll_ID.', "Item Single Header", 10, "item_info_line", "a:14:{s:5:\"title\";s:0:\"\";s:9:\"flag_icon\";i:1;s:14:\"permalink_icon\";i:0;s:13:\"before_author\";s:10:\"started_by\";s:11:\"date_format\";s:8:\"extended\";s:9:\"post_time\";i:1;s:12:\"last_touched\";i:1;s:8:\"category\";i:0;s:9:\"edit_link\";i:0;s:16:\"widget_css_class\";s:0:\"\";s:9:\"widget_ID\";s:0:\"\";s:16:\"allow_blockcache\";i:0;s:11:\"time_format\";s:4:\"none\";s:12:\"display_date\";s:12:\"date_created\";}" )';
+			}
+			else
+			{
+				$item_info_line_widget_rows[] = '( '.$coll_ID.', "Item Single Header", 10, "item_info_line", NULL )';
+			}
+		}
+		if( count( $item_info_line_widget_rows ) )
+		{	// Insert new widget "Item Info Line" into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code, wi_params )
+			  VALUES '.implode( ', ', $item_info_line_widget_rows ) );
+		}
+		$DB->commit();
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

@@ -100,43 +100,21 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				) );
 		}
 
-		// Flag:
-		$Item->flag();
+		// ------------------------- "Item Single - Header" CONTAINER EMBEDDED HERE --------------------------
+		// Display container contents:
+		skin_container( /* TRANS: Widget container name */ NT_('Item Single Header'), array(
+			'widget_context' => 'item',	// Signal that we are displaying within an Item
+			// The following (optional) params will be used as defaults for widgets included in this container:
+			// This will enclose each widget in a block:
+			'block_start' => '<div class="$wi_class$">',
+			'block_end' => '</div>',
+			// This will enclose the title of each widget:
+			'block_title_start' => '<h3>',
+			'block_title_end' => '</h3>',
 
-		// Permalink:
-		$Item->permanent_link( array(
-				'text' => '#icon#',
-			) );
-
-		// We want to display the post time:
-		$Item->issue_time( array(
-				'before'      => ' '.T_('posted on '),
-				'after'       => ' ',
-				'time_format' => locale_extdatefmt(),
-			) );
-
-		// Author
-		$Item->author( array(
-			'before'    => /* TRANS: author name */ ' '.T_('by').' ',
-			'after'     => ' ',
-			'link_text' => $params['author_link_text'],
+			'author_link_text' => $params['author_link_text'],
 		) );
-
-		// Categories
-		$Item->categories( array(
-			'before'          => /* TRANS: category name(s) */ T_('in').' ',
-			'after'           => ' ',
-			'include_main'    => true,
-			'include_other'   => true,
-			'include_external'=> true,
-			'link_categories' => true,
-		) );
-
-		// Link for editing
-		$Item->edit_link( array(
-			'before'    => ' &bull; ',
-			'after'     => '',
-		) );
+		// ----------------------------- END OF "Item Single - Header" CONTAINER -----------------------------
 	?>
 	</div>
 	<?php
@@ -191,6 +169,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 		// /skins/_item_content.inc.php file into the current skin folder.
 		// -------------------------- END OF POST CONTENT -------------------------
 	// this will end a </section>
+	}
 	?>
 
 	<footer>
@@ -227,8 +206,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 						) );
 		?>
 		</nav>
-		<?php }
-	} ?>
+		<?php } ?>
 	</footer>
 
 	<?php

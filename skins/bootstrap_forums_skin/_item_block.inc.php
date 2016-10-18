@@ -97,25 +97,21 @@ skin_widget( array(
 				'link_type' => 'permalink'
 			) );
 
-		// Flag:
-		$Item->flag( array(
-				'before' => '<span class="pull-left">',
-				'after'  => '</span>',
-			) );
+		// ------------------------- "Item Single - Header" CONTAINER EMBEDDED HERE --------------------------
+		// Display container contents:
+		skin_container( /* TRANS: Widget container name */ NT_('Item Single Header'), array(
+			'widget_context' => 'item',	// Signal that we are displaying within an Item
+			// The following (optional) params will be used as defaults for widgets included in this container:
+			// This will enclose each widget in a block:
+			'block_start' => '<div class="$wi_class$">',
+			'block_end' => '</div>',
+			// This will enclose the title of each widget:
+			'block_title_start' => '<h3>',
+			'block_title_end' => '</h3>',
 
-		// Author info:
-		echo '<div class="ft_author_info">'.T_('Thread started by');
-		$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
-		echo ', '.mysql2date( locale_extdatefmt().' '.locale_shorttimefmt(), $Item->datecreated );
-		echo '<span class="text-muted"> &ndash; '
-				.T_('Last touched:').' '.mysql2date( locale_extdatefmt().' '.locale_shorttimefmt(), $Item->get( 'last_touched_ts' ) )
-			.'</span>';
-		echo '</div>';
-		// Author info - shrinked:
-		echo '<div class="ft_author_info shrinked">'.T_('Started by');
-		$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
-		echo ', '.mysql2date( locale_datefmt(), $Item->datecreated );
-		echo '</div>';
+			'author_link_text' => $params['author_link_text'],
+		) );
+		// ----------------------------- END OF "Item Single - Header" CONTAINER -----------------------------
 		?>
 	</div>
 
