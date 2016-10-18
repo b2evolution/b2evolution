@@ -1282,7 +1282,7 @@ class Form extends Widget
 
 		if( empty($field_params['date_format']) )
 		{	// Use locale date format:
-			$date_format = locale_datefmt();
+			$date_format = locale_input_datefmt();
 		}
 		else
 		{

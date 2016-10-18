@@ -1385,7 +1385,7 @@ function add_js_for_toolbar( $relative_to = 'rsc_url' )
 
 /**
  * Registers headlines required by AJAX forms, but only if javascript forms are enabled in blog settings.
- * 
+ *
  * @deprecated Because we don't need communication.js to work with AJAX forms
  */
 function init_ajax_forms( $relative_to = 'blog' )
@@ -1514,7 +1514,7 @@ function init_datepicker_js( $relative_to = 'rsc_url' )
 	require_js( '#jqueryUI#', $relative_to );
 	require_css( '#jqueryUI_css#', $relative_to );
 
-	$datefmt = locale_datefmt();
+	$datefmt = locale_input_datefmt();
 	//$datefmt = str_replace( array( 'd', 'j', 'm', 'Y' ), array( 'dd', 'd', 'mm', 'yy' ), $datefmt );
 	$datefmt = php_to_jquery_date_format( $datefmt );
 	add_js_headline( 'jQuery(document).ready( function(){
