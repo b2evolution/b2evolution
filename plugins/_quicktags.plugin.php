@@ -113,7 +113,7 @@ class quicktags_plugin extends Plugin
 		}
 
 		$params = array_merge( array(
-				'js_prefix'   => '',
+				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
 			), $params );
 
 		$simple = ( isset( $params['edit_layout'] ) && $params['edit_layout'] == 'inskin' );
@@ -371,7 +371,6 @@ class quicktags_plugin extends Plugin
 		 */
 		function <?php echo $params['js_prefix']; ?>b2evoInsertTag( myField, i )
 		{
-			console.log( myField );
 			// we need to know if something is selected.
 			// First, ask plugins, then try IE and Mozilla.
 			var sel_text = b2evo_Callbacks.trigger_callback("get_selected_text_for_"+myField.id);

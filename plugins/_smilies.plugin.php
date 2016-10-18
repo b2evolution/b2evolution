@@ -196,7 +196,7 @@ XX(      graydead.gif
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never'
 		    && is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
 		{
-			return $this->display_smiley_bar();
+			return $this->display_smiley_bar( $params );
 		}
 		return false;
 	}
@@ -234,7 +234,7 @@ XX(      graydead.gif
 		    && ( ( is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
 		    || ( !is_logged_in() && $this->Settings->get( 'use_toolbar_default' ) ) ) )
 		{
-			return $this->display_smiley_bar();
+			return $this->display_smiley_bar( $params );
 		}
 		return false;
 	}
@@ -253,7 +253,7 @@ XX(      graydead.gif
 		&& ( ( is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
 			|| ( !is_logged_in() && $this->Settings->get( 'use_toolbar_default' ) ) ) )
 		{
-			return $this->display_smiley_bar();
+			return $this->display_smiley_bar( $params );
 		}
 		return false;
 	}
@@ -272,7 +272,7 @@ XX(      graydead.gif
 		&& ( ( is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
 			|| ( !is_logged_in() && $this->Settings->get( 'use_toolbar_default' ) ) ) )
 		{
-			return $this->display_smiley_bar();
+			return $this->display_smiley_bar( $params );
 		}
 		return false;
 	}
@@ -281,10 +281,15 @@ XX(      graydead.gif
 	/**
 	 * Display the smiley toolbar
 	 *
+	 * @param array Params
 	 * @return boolean did we display a toolbar?
 	 */
-	function display_smiley_bar()
+	function display_smiley_bar( $params )
 	{
+		$params = array_merge( array(
+				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
+			), $params );
+
 		$this->InitSmilies();	// check smilies cached
 
 		$grins = '';
@@ -296,7 +301,7 @@ XX(      graydead.gif
 				$smiled[] = $smiley['image'];
 
 				$grins .= '<span class="'.$this->get_template( 'toolbar_button_class' ).'"'
-					.' data-func="textarea_wrap_selection|b2evoCanvas|'.str_replace( array( "'", '|' ), array( "\'", '\|' ), $smiley['code'] ).'| |1">'
+					.' data-func="textarea_wrap_selection|'.$params['js_prefix'].'b2evoCanvas|'.str_replace( array( "'", '|' ), array( "\'", '\|' ), $smiley['code'] ).'| |1">'
 						.$this->get_smiley_img_tag( $smiley )
 					.'</span> ';
 			}
@@ -305,7 +310,7 @@ XX(      graydead.gif
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_group_before' );
 		echo $grins;
 		echo $this->get_template( 'toolbar_group_after' );

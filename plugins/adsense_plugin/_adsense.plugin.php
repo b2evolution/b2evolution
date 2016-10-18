@@ -342,7 +342,7 @@ class adsense_plugin extends Plugin
 			return false;
 		}
 
-		return $this->DisplayCodeToolbar();
+		return $this->DisplayCodeToolbar( $params );
 	}
 
 
@@ -357,7 +357,7 @@ class adsense_plugin extends Plugin
 		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{
-			return $this->DisplayCodeToolbar();
+			return $this->DisplayCodeToolbar( $params );
 		}
 
 		return false;
@@ -375,7 +375,7 @@ class adsense_plugin extends Plugin
 		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{
-			return $this->DisplayCodeToolbar();
+			return $this->DisplayCodeToolbar( $params );
 		}
 
 		return false;
@@ -414,24 +414,29 @@ class adsense_plugin extends Plugin
 			return false;
 		}
 
-		return $this->DisplayCodeToolbar();
+		return $this->DisplayCodeToolbar( $params );
 	}
 
 
 	/**
 	 * Display a code toolbar
 	 *
+	 * @param array Params
 	 * @return boolean did we display a toolbar?
 	 */
-	function DisplayCodeToolbar()
+	function DisplayCodeToolbar( $params = array() )
 	{
+		$params = array_merge( array(
+				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
+			), $params );
+
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_title_before' ).'AdSense: '.$this->get_template( 'toolbar_title_after' );
 		echo $this->get_template( 'toolbar_group_before' );
-		echo '<input type="button" id="adsense_default" title="'.T_('Insert AdSense block').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="textarea_wrap_selection|b2evoCanvas|[adsense:]| |1" value="'.T_('AdSense').'" />';
+		echo '<input type="button" id="adsense_default" title="'.T_('Insert AdSense block').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="textarea_wrap_selection|'.$params['js_prefix'].'b2evoCanvas|[adsense:]| |1" value="'.T_('AdSense').'" />';
 		echo $this->get_template( 'toolbar_group_after' );
 		echo $this->get_template( 'toolbar_after' );
 

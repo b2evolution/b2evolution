@@ -431,7 +431,11 @@ function validateCommentForm(form)
 	}
 
 	// Display renderers
-	$comment_renderer_checkboxes = $Plugins->get_renderer_checkboxes( $comment_renderers, array( 'Blog' => & $Blog, 'setting_name' => 'coll_apply_comment_rendering' ) );
+	$comment_renderer_checkboxes = $Plugins->get_renderer_checkboxes( $comment_renderers, array(
+			'Blog'         => & $Blog,
+			'setting_name' => 'coll_apply_comment_rendering',
+			'js_prefix'    => $plugin_js_prefix,
+		) );
 	if( !empty( $comment_renderer_checkboxes ) )
 	{
 		$Form->info( T_('Text Renderers'), $comment_renderer_checkboxes );
