@@ -8001,6 +8001,42 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12125, 'Upgrade locales table...' ) )
+	{ // part of 6.8.0-alpha
+		db_add_col( 'T_locales', 'loc_input_datefmt', 'varchar(20) COLLATE ascii_general_ci NOT NULL default "Y-m-d" AFTER loc_extdatefmt' );
+		db_add_col( 'T_locales', 'loc_input_timefmt', 'varchar(20) COLLATE ascii_general_ci NOT NULL default "H:i:s" AFTER loc_shorttimefmt' );
+
+		// Only allow numeric date formats
+		$DB->begin();
+		$SQL = new SQL( 'Get all short date formats"' );
+		$SQL->SELECT( 'loc_locale, loc_datefmt, loc_timefmt' );
+		$SQL->FROM( 'T_locales' );
+		$locales = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+
+		foreach( $locales as $locale )
+		{
+			$date_format_regex = '/[^dDjmnYy:\.,\-_\/\\\\ ]/';
+			$time_format_regex = '/[^gGhHisu:\-_\., \/\\\\ ]/';
+			$values = array( 'locale' => $locale['loc_locale'] );
+
+			if( preg_match( $date_format_regex, $locale['loc_datefmt'] ) )
+			{ // format contains invalid character, use default
+				$values['date'] = 'Y-m-d';
+			}
+			else
+			{
+				$values['date'] = $locale['loc_datefmt'];
+			}
+
+			$values['time'] = 'H:i:s';
+
+			$sql = 'UPDATE T_locales SET loc_input_datefmt = "'.$values['date'].'", loc_input_timefmt = "'.$values['time'].'" WHERE loc_locale = "'.$values['locale'].'"';
+			$DB->query( $sql );
+		}
+		$DB->commit();
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

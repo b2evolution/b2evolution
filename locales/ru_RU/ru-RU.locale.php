@@ -20,8 +20,10 @@ $locale_defs['ru-RU'] = array(
 		'datefmt' => 'j.m.Y',
 		'longdatefmt' => 'j.m.Y',
 		'extdatefmt' => 'j M Y',
+		'input_datefmt' => 'j.m.Y',
 		'timefmt' => 'H:i:s',
 		'shorttimefmt' => 'H:i',
+		'input_timefmt' => 'H:i:s',
 		'startofweek' => 1,
 		'transliteration_map' => array(
 			'А'=>'A', 'Б'=>'B', 'В'=>'V', 'Г'=>'G', 'Д'=>'D', 'Е'=>'E', 'Ё'=>'YO', 'Ж'=>'ZH', 'З'=>'Z', 'И'=>'I', 'Й'=>'J',

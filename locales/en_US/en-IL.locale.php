@@ -15,8 +15,10 @@ $locale_defs['en-IL'] = array(
 		'datefmt' => 'Y-m-d',
 		'longdatefmt' => 'Y-m-d',
 		'extdatefmt' => 'Y M d',
+		'input_datefmt' => 'Y-m-d',
 		'timefmt' => 'H:i:s',
 		'shorttimefmt' => 'H:i',
+		'input_timefmt' => 'H:i:s',
 		'startofweek' => 1,
 		'messages' => 'en_US',
 	);
