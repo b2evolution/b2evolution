@@ -236,6 +236,19 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 		skin_include( '_item_meta_comments.inc.php', array(
 				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
 				'comment_end'           => '</article>',
+				'comment_post_display'	=> false,	// Do we want ot display the title of the post we're referring to?
+				'comment_post_before'   => '<h3 class="evo_comment_post_title">',
+				'comment_post_after'    => '</h3>',
+				'comment_title_before'  => '<div class="panel-heading"><h4 class="evo_comment_title panel-title">',
+				'comment_title_after'   => '</h4></div><div class="panel-body">',
+				'comment_avatar_before' => '<span class="evo_comment_avatar">',
+				'comment_avatar_after'  => '</span>',
+				'comment_rating_before' => '<div class="evo_comment_rating">',
+				'comment_rating_after'  => '</div>',
+				'comment_text_before'   => '<div class="evo_comment_text">',
+				'comment_text_after'    => '</div>',
+				'comment_info_before'   => '<footer class="evo_comment_footer clear text-muted"><small>',
+				'comment_info_after'    => '</small></footer></div>',
 			) );
 		// ---------------------- END OF META COMMENTS ---------------------
 	}

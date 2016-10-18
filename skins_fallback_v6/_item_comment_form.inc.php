@@ -22,7 +22,7 @@ global $Collection, $Blog, $dummy_fields;
 // Default params:
 $params = array_merge( array(
 		'disp_comment_form'    => true,
-		'form_title_start'     => '<div class="panel '.( $Session->get('core.preview_Comment') ? 'panel-danger' : 'panel-default' ).'">'
+		'form_title_start'     => '<div class="panel '.( $Session->get( 'core.preview_Comment'.( isset( $params['comment_type'] ) && $params['comment_type'] == 'meta' ? 'meta' : '' ) ) ? 'panel-danger' : 'panel-default' ).'">'
 																.'<div class="panel-heading"><h4 class="panel-title">',
 		'form_title_end'       => '</h4></div><div class="panel-body">',
 		'form_title_text'      => T_('Leave a comment'),
@@ -80,7 +80,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	echo $params['before_comment_form'];
 
 	// INIT/PREVIEW:
-	if( $Comment = get_comment_from_session( 'preview' ) )
+	if( $Comment = get_comment_from_session( 'preview', $params['comment_type'] ) )
 	{	// We have a comment to preview
 		if( $Comment->item_ID == $Item->ID )
 		{ // display PREVIEW:
@@ -141,7 +141,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	}
 	else
 	{ // New comment:
-		if( ( $Comment = get_comment_from_session() ) == NULL )
+		if( ( $Comment = get_comment_from_session( 'unsaved', $params['comment_type'] ) ) == NULL )
 		{ // there is no saved Comment in Session
 			$Comment = new Comment();
 			$Comment->set( 'type', $params['comment_type'] );
