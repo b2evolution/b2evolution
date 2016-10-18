@@ -376,7 +376,7 @@ if( $Messages->has_errors() && $action != 'preview' )
 {
 	$Comment->set( 'preview_attachments', $preview_attachments );
 	$Comment->set( 'checked_attachments', $checked_attachments );
-	save_comment_to_session( $Comment );
+	save_comment_to_session( $Comment, 'unsaved', $comment_type );
 
 	if( !empty( $reply_ID ) )
 	{
@@ -418,7 +418,7 @@ if( $action == 'preview' )
 	$Comment->set( 'email_is_detected', $comments_email_is_detected ); // used to change a style of the comment
 	// Set Comment Item object to NULL, so this way the Item object won't be serialized, but the item_ID is still set
 	$Comment->Item = NULL;
-	$Session->set( 'core.preview_Comment', $Comment );
+	save_comment_to_session( $Comment, 'preview', $comment_type );
 	$Session->set( 'core.no_CachePageContent', 1 );
 	$Session->dbsave();
 
@@ -468,7 +468,7 @@ if( $action == 'preview' )
 }
 else
 { // delete any preview comment from session data:
-	$Session->delete( 'core.preview_Comment' );
+	$Session->delete( 'core.preview_Comment'.( $comment_type == 'meta' ? $comment_type : '' ) );
 }
 
 
