@@ -109,7 +109,7 @@ if( $action == 'edit' )
 		T_('Short time format'), T_('See below.'), array( 'required' => true ) );
 	// Input time format
 	$Form->text_input( 'newloc_input_timefmt', ( isset( $ltemplate['input_timefmt'] ) ? $ltemplate['input_timefmt'] : get_param( 'newloc_input_timefmt' ) ), 20,
-		T_('Input time format'), T_('See below.'), array( 'required' => true ) );
+		T_('Input time format'), T_('See below.') );
 	// Start of week
 	$Form->dayOfWeek( 'newloc_startofweek', ( isset( $ltemplate['startofweek'] ) ? $ltemplate['startofweek'] : get_param( 'newloc_startofweek' ) ),
 		T_('Start of week'), T_('Day at the start of the week.') );
