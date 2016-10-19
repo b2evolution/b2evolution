@@ -2515,8 +2515,8 @@ function balance_tags( $text )
 
 			// Tag Cleaning
 
-			// Push if not img, br, hr, param, input, link, meta or base:
-			if( ! in_array( $tag, array( 'br', 'img', 'hr', 'param', 'input', 'link', 'meta', 'base' ) ) )
+			// Push if not void HTML tags:
+			if( ! in_array( $tag, array( 'br', 'img', 'hr', 'param', 'input', 'link', 'meta', 'base', 'area', 'col', 'command', 'embed', 'keygen', 'source', 'track', 'wbr' ) ) )
 			{
 				$stacksize = array_push( $tagstack, $tag );
 				$closing = '>';
