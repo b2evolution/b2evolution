@@ -6067,7 +6067,7 @@ class User extends DataObject
 		$total_upload = $this->get_total_upload();
 		if( empty( $total_upload ) )
 		{
-			$total_upload = T_('0 bytes');
+			$total_upload = '0 '.T_('B.');
 		}
 		else
 		{
