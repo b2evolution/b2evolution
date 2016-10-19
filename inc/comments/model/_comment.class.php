@@ -4338,11 +4338,6 @@ class Comment extends DataObject
 			return false;
 		}
 
-		if( $this->is_meta() )
-		{	// Don't allow a replying for meta comments:
-			return false;
-		}
-
 		$this->get_Item();
 		$this->Item->load_Blog();
 
@@ -4375,7 +4370,16 @@ class Comment extends DataObject
 		}
 		$class = ' class="'.trim( $class ).'"';
 
-		$url = url_add_param( $this->Item->get_permanent_url(), 'reply_ID='.$this->ID.'&amp;redir=no' ).'#form_p'.$this->Item->ID;
+		// Initialize an url to reply on comment:
+		if( is_admin_page() )
+		{	// for back-office:
+			global $admin_url;
+			$url = $admin_url.'?ctrl=items&amp;blog='.$this->Item->Blog->ID.'&amp;p='.$this->Item->ID.( $this->is_meta() ? '&amp;comment_type=meta' : '' ).'&amp;reply_ID='.$this->ID.'#comment_checkchanges';
+		}
+		else
+		{	// for front-office:
+			$url = url_add_param( $this->Item->get_permanent_url(), 'reply_ID='.$this->ID.( $this->is_meta() ? '&amp;comment_type=meta' : '' ).'&amp;redir=no' ).'#'.( $this->is_meta() ? 'meta_' : '' ).'form_p'.$this->Item->ID;
+		}
 
 		echo $before;
 

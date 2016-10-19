@@ -2702,52 +2702,35 @@ function echo_show_comments_changed( $comment_type )
  * @param string Expiry status: 'all', 'active', 'expired'
  * @param string Type of the comments: 'feedback' or 'meta'
  */
-function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage = 1, $limit = NULL, $comment_IDs = array(), $filterset_name = '', $expiry_status = 'active', $comment_type = 'feedback' )
+function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage = 1, $limit = NULL, $exclude_comment_IDs = array(), $filterset_name = '', $expiry_status = 'active', $comment_type = 'feedback' )
 {
 	global $inc_path, $status_list, $Collection, $Blog, $admin_url;
 
 	$BlogCache = & get_BlogCache();
 	$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 
+	// Use mode "Threaded comments" only for item's comments:
+	$threaded_comments_mode = ( $item_ID > 0 && $Blog->get_setting( 'threaded_comments' ) );
+
+	if( $threaded_comments_mode )
+	{	// Force comments list page size to 1000 on mode "Threaded comments":
+		$limit = 1000;
+	}
+
 	if( empty( $limit ) )
-	{ // Get default limit from curent user's setting
+	{	// Get default limit from curent user's setting:
 		global $UserSettings;
 		$limit = $UserSettings->get( 'results_per_page' );
 	}
 
+	// Initialize comments list as global var because it is used in other functions/includes below:
 	global $CommentList;
 	$CommentList = new CommentList2( $Blog, $limit, 'CommentCache', '', $filterset_name );
 
-	$exlude_ID_list = NULL;
-	if( !empty($comment_IDs) )
-	{
-		$exlude_ID_list = '-'.implode( ",", $comment_IDs );
-	}
-
-	if( empty( $statuses ) )
-	{
-		$statuses = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
-	}
-
-	if( $expiry_status == 'all' )
-	{ // Display all comments
-		$expiry_statuses = array( 'active', 'expired' );
-	}
-	else
-	{ // Display active or expired comments
-		$expiry_statuses = array( $expiry_status );
-	}
-
-	// if item_ID == -1 then don't use item filter! display all comments from current blog
-	if( $item_ID == -1 )
-	{
-		$item_ID = NULL;
-	}
-	// set redirect_to
-	if( ! is_null( $item_ID ) )
-	{
+	if( $item_ID > 0 )
+	{	// Set filters to display only comments of the given Item:
 		if( $comment_type == 'meta' )
-		{ // Check if current user can sees meta comments of this item
+		{	// Check if current user can sees meta comments of this item:
 			global $current_User;
 			$ItemCache = & get_ItemCache();
 			$Item = & $ItemCache->get_by_ID( $item_ID, false, false );
@@ -2757,34 +2740,36 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 			}
 		}
 
-		// redirect to the items full view
+		if( empty( $statuses ) )
+		{	// Get all status keys by default except of 'redirected', 'trash':
+			$statuses = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
+		}
+
+		// Set a redirect param to the item view page:
 		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=items&blog='.$blog_ID.'&p='.$item_ID, '&' ) );
 		param( 'item_id', 'integer', $item_ID );
 		param( 'currentpage', 'integer', $currentpage );
-		if( count( $statuses ) == 1 )
-		{
-			$show_comments = $statuses[0];
-		}
-		else
-		{
-			$show_comments = 'all';
-		}
+		$show_comments = ( count( $statuses ) == 1 ? $statuses[0] : 'all' );
 		$comments_number_mode = ( $comment_type == 'meta' ? 'metas' : 'comments' );
 		param( 'comments_number', 'integer', generic_ctp_number( $item_ID, $comments_number_mode, $show_comments ) );
-		// Filter list:
+
+		// Filter comments list:
 		$CommentList->set_filters( array(
-			'types' => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment', 'trackback', 'pingback' ),
-			'statuses' => $statuses,
-			'expiry_statuses' => $expiry_statuses,
-			'comment_ID_list' => $exlude_ID_list,
-			'post_ID' => $item_ID,
-			'order' => $comment_type == 'meta' ? 'DESC' : 'ASC',//$order,
-			'comments' => $limit,
-			'page' => $currentpage,
+			'types'             => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment', 'trackback', 'pingback' ),
+			'statuses'          => $statuses,
+			'expiry_statuses'   => ( $expiry_status == 'all' ? array( 'active', 'expired' ) : array( $expiry_status ) ),
+			'comment_ID_list'   => ( empty( $exclude_comment_IDs ) ? NULL : '-'.implode( ",", $exclude_comment_IDs ) ),
+			'post_ID'           => $item_ID,
+			'order'             => $comment_type == 'meta' ? 'DESC' : 'ASC',//$order,
+			'comments'          => $limit,
+			'page'              => $currentpage,
+			'threaded_comments' => $threaded_comments_mode,
 		) );
 	}
 	else
-	{ // redirect to the comments full view
+	{	// Set filters to display all comments of the collection:
+
+		// Set a redirect param to the comments full view:
 		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=comments&blog='.$blog_ID.'&filter=restore', '&' ) );
 		// this is an ajax call we always have to restore the filterst (we can set filters only without ajax call)
 		$CommentList->set_filters( array(
@@ -2803,7 +2788,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 		'msg_empty' => T_('No feedback for this post yet...'),
 	) );
 
-	// display comments
+	// Display comments:
 	require $inc_path.'comments/views/_comment_list.inc.php';
 }
 
@@ -2815,9 +2800,10 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
  * @param string where to redirect after comment edit
  * @param boolean true to set the new redirect param, false otherwise
  * @param integer Comment index in the current list, FALSE - to don't display a comment index
+ * @param integer A reply level (Used on mode "Threaded comments" to shift a comment block to right)
  * @param boolean TRUE to display info for meta comment
  */
-function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $comment_index = NULL, $display_meta_title = false )
+function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $comment_index = NULL, $display_meta_title = false, $reply_level = 0 )
 {
 	global $current_User, $localtimenow;
 
@@ -2828,8 +2814,15 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 	$expiry_delay = $Item->get_setting( 'comment_expiry_delay' );
 	$is_expired = ( !empty( $expiry_delay ) && ( ( $localtimenow - mysql2timestamp( $Comment->get( 'date' ) ) ) > $expiry_delay ) );
 
+	// Initialize a style shift for replied comment to 20px to the right for each level:
+	$reply_level_style = ( $reply_level > 0 ? ' style="margin-left:'.( 20 * $reply_level ).'px"' : '' );
+
 	echo '<a name="c'.$Comment->ID.'"></a>';
-	echo '<div id="comment_'.$Comment->ID.'" class="panel '.( $Comment->ID > 0 ? 'panel-default' : 'panel-warning' ).' evo_comment evo_comment__status_';
+	if( empty( $Comment->ID ) )
+	{	// Display warning about preview mode:
+		echo '<h4 class="text-warning"'.$reply_level_style.'>'.T_('PREVIEW Comment:').'</h4>';
+	}
+	echo '<div id="comment_'.( $Comment->ID ? $Comment->ID : 'preview' ).'" class="panel '.( $Comment->ID > 0 ? 'panel-default' : 'panel-warning' ).' evo_comment evo_comment__status_';
 	// check if comment is expired
 	if( $is_expired )
 	{ // comment is expired
@@ -2843,7 +2836,7 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 	{ // comment is not expired and not meta
 		$Comment->status('raw');
 	}
-	echo '">';
+	echo '"'.$reply_level_style.'>';
 
 	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) ||
 	    ( $Comment->is_meta() && $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) ) )
@@ -2981,6 +2974,9 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 			{ // Display Spam Voting system
 				$Comment->vote_spam( '', '', '&amp;', $save_context, true );
 			}
+
+			// Display a link for replying to the Comment:
+			$Comment->reply_link();
 
 			echo '<div class="clearfix"></div>';
 			echo '</div>';

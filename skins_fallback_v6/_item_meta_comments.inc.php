@@ -54,6 +54,7 @@ if( ( $disp == 'single' || $disp == 'page' ) &&
 		'disp_rating_summary'   => false,
 		'disp_notification'     => false,
 		'comments_per_page'     => 20,
+		'comment_type'          => 'meta',
 	), $params ) );
 	// Note: You can customize the default item feedback by copying the generic
 	// /skins/_item_feedback.inc.php file into the current skin folder.

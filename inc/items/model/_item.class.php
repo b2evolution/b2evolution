@@ -1288,7 +1288,8 @@ class Item extends ItemLight
 
 		if( $display )
 		{ // display a comment form section even if comment form won't be displayed, "add new comment" links should point to this section
-			echo '<a id="form_p'.$this->ID.'"></a>';
+			$comment_form_anchor = empty( $params['comment_form_anchor'] ) ? 'form_p' : $params['comment_form_anchor'];
+			echo '<a id="'.$comment_form_anchor.$this->ID.'"></a>';
 		}
 
 		if( ! $this->get_type_setting( 'use_comments' ) )

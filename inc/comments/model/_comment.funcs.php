@@ -721,30 +721,43 @@ function save_comment_to_session( $Comment, $kind = 'unsaved', $type = '' )
  */
 function get_comment_from_session( $kind = 'unsaved', $type = '' )
 {
-	global $Session;
+	global $Session, $b2evo_session_comments;
 
 	if( $type != 'meta' )
 	{	// Use default type if it is not allowed:
 		$type = '';
 	}
 
-	if( ( $Comment = $Session->get( 'core.'.$kind.'_Comment'.$type ) ) && $Comment instanceof Comment )
-	{	// If Comment is detected for current Session:
+	$session_var_name = 'core.'.$kind.'_Comment'.$type;
 
-		// Delete Comment to clear Session data:
-		$Session->delete( 'core.'.$kind.'_Comment'.$type );
+	if( ! isset( $b2evo_session_comments[ $session_var_name ] ) )
+	{	// Set Comment to cache array:
+		if( ! is_array( $b2evo_session_comments ) )
+		{	// Initialize array for caching:
+			$b2evo_session_comments = array();
+		}
 
-		// Return Comment:
-		return $Comment;
+		if( ( $Comment = $Session->get( $session_var_name ) ) && $Comment instanceof Comment )
+		{	// If Comment is detected for current Session:
+
+			// Delete Comment to clear Session data:
+			$Session->delete( $session_var_name );
+		}
+		else
+		{	// Comment is not detected, Return NULL:
+			$Comment = NULL;
+		}
+
+		// Cache Comment in global var:
+		$b2evo_session_comments[ $session_var_name ] = $Comment;
 	}
 
-	// Comment is not detected, Return NULL:
-	return NULL;
+	return $b2evo_session_comments[ $session_var_name ];
 }
 
 
 /**
- * Dispay the replies of a comment
+ * Dispay the replies of a comment on front-office
  *
  * @param integer Comment ID
  * @param array Template params
@@ -815,6 +828,45 @@ function display_comment_replies( $comment_ID, $params = array(), $level = 1 )
 			// Display the rest replies recursively
 			display_comment_replies( $Comment->ID, $params, $level + 1 );
 		}
+	}
+}
+
+
+/**
+ * Dispay the replies of a comment on back-office
+ *
+ * @param integer Comment ID
+ * @param array Params
+ * @param integer Level
+ */
+function echo_comment_replies( $comment_ID, $params, $level = 1 )
+{
+	global $CommentReplies;
+	
+	if( ! isset( $CommentReplies[ $comment_ID ] ) )
+	{	// This comment has no replies, Exit here:
+		return false;
+	}
+
+	$params = array_merge( array(
+			'redirect_to'        => NULL,
+			'save_context'       => false,
+			'comment_index'      => NULL,
+			'display_meta_title' => false,
+		), $params );
+
+	foreach( $CommentReplies[ $comment_ID ] as $Comment )
+	{	// Loop through the replies:
+
+		// Display a comment:
+		echo_comment( $Comment, $params['redirect_to'], $params['save_context'], $params['comment_index'], $params['display_meta_title'], $level );
+		if( $params['comment_index'] !== false )
+		{	// Decrease a comment index only when it is requested:
+			$params['comment_index']--;
+		}
+
+		// Display the rest replies recursively:
+		echo_comment_replies( $Comment->ID, $params, $level + 1 );
 	}
 }
 

@@ -73,6 +73,10 @@ $comment_renderers = array( 'default' );
 /*
  * Comment form:
  */
+if( $params['comment_type'] == 'meta' )
+{	// Use different form anchor for meta comments:
+	$params['comment_form_anchor'] = 'meta_form_p';
+}
 $section_title = $params['form_title_start'].$params['form_title_text'].$params['form_title_end'];
 if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_error'], $params['after_comment_error'], '#', $params['comment_closed_text'], $section_title, $params ) )
 { // We want to display the comments form and the item can be commented on:
@@ -280,7 +284,9 @@ function validateCommentForm(form)
 	$Form->add_crumb( 'comment' );
 	$Form->hidden( 'comment_type', $params['comment_type'] );
 	$Form->hidden( 'comment_item_ID', $Item->ID );
-	if( !empty( $comment_reply_ID ) )
+
+	$comment_type = param( 'comment_type', 'string', 'comment' );
+	if( ! empty( $comment_reply_ID ) && $comment_type == $params['comment_type'] )
 	{
 		$Form->hidden( 'reply_ID', $comment_reply_ID );
 

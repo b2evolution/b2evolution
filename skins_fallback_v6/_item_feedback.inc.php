@@ -86,6 +86,7 @@ $params = array_merge( array(
 		'nav_page_current_template' => '<span><b>$page_num$</b></span>',
 		'comments_per_page'     => NULL, // Used instead of blog setting "comments_per_page"
 		'pagination'            => array(),
+		'comment_type'          => 'comment',
 	), $params );
 
 
@@ -320,7 +321,7 @@ if( ( $params['disp_meta_comments'] && is_logged_in() && $current_User->check_pe
 			global $CommentReplies;
 			$CommentReplies = array();
 
-			if( $Comment = get_comment_from_session( 'preview' ) )
+			if( $Comment = get_comment_from_session( 'preview', $params['comment_type'] ) )
 			{	// Init PREVIEW comment
 				if( $Comment->item_ID == $Item->ID )
 				{

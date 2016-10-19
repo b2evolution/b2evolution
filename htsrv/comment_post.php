@@ -454,7 +454,8 @@ if( $action == 'preview' )
 	// Passthrough comment_cookies & comment_allow_msgform params:
 	// fp> moved this down here in order to keep return URLs clean whenever this is not needed.
 	$redirect_to = url_add_param( $redirect_to, 'redir=no&comment_cookies='.$comment_cookies
-		.'&comment_allow_msgform='.$comment_allow_msgform, '&' );
+		.'&comment_allow_msgform='.$comment_allow_msgform
+		.'&comment_type='.$comment_type, '&' );
 
 	if( !empty( $reply_ID ) )
 	{
