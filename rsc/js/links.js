@@ -48,7 +48,7 @@ function evo_display_position_onchange( selectInput, url, crumb )
  */
 function insert_inline_link( type, link_ID, option )
 {
-	var b2evoCanvas = window.parent.document.getElementById('itemform_post_content');
+	var b2evoCanvas = window.parent.document.getElementById( 'itemform_post_content' );
 	if( b2evoCanvas != null )
 	{ // Canvas exists
 		var insert_tag = '[' + type + ':' + link_ID;
@@ -68,7 +68,9 @@ function insert_inline_link( type, link_ID, option )
 		{ // Change the position to 'Inline'
 			if( $position_selector.val() != 'inline' )
 			{
+				deferInlineReminder = true;
 				$position_selector.val( 'inline' ).change();
+				deferInlineReminder = false;
 			}
 		}
 	}

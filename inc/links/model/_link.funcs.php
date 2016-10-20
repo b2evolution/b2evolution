@@ -557,12 +557,14 @@ function echo_link_position_js()
 ?>
 <script type="text/javascript">
 var displayInlineReminder = <?php echo $Session->get( 'display_inline_reminder', 'true' );?>;
+var deferInlineReminder = false;
+
 jQuery( document ).on( 'change', 'select[id^=display_position_]', {
 		url:   '<?php echo get_htsrv_url(); ?>',
 		crumb: '<?php echo get_crumb( 'link' ); ?>',
 }, function( event )
 {
-	if( this.value == 'inline' && displayInlineReminder )
+	if( this.value == 'inline' && displayInlineReminder && !deferInlineReminder )
 	{ // Display inline position reminder
 		alert( '<?php echo T_('You can use the (+) icons to change the position to inline and automatically insert a short tag at the current cursor position.');?>' );
 		displayInlineReminder = false;
