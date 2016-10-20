@@ -189,14 +189,15 @@ if( $disp == 'single' )
 
 	<?php
 	// Go Grab the featured post:
-	if( $Item = get_featured_Item() )
+	if( $Item = & get_featured_Item() )
 	{	// We have a featured/intro post to display:
 		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 		skin_include( '_item_block.inc.php', array(
 				'feature_block' => true,
-				'content_mode' => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
-				'intro_mode'   => 'normal',	// Intro posts will be displayed in normal mode
-				'item_class'   => 'featured_post',
+				'content_mode'  => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
+				'intro_mode'    => 'normal',	// Intro posts will be displayed in normal mode
+				'item_class'    => 'featured_post',
+				'Item'          => $Item,
 			) );
 		// ----------------------------END ITEM BLOCK  ----------------------------
 	}

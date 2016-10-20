@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $Item;
 
 // ------------------------------- START OF INTRO POST -------------------------------
-if( $Item = get_featured_Item() )
+if( $Item = & get_featured_Item() )
 { // We have a intro-front post to display:
 ?>
 <div id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( array( 'item_class' => 'jumbotron evo_content_block evo_post' ) ) ?>" lang="<?php $Item->lang() ?>">
@@ -47,7 +47,7 @@ if( $Item = get_featured_Item() )
 		) );
 
 	// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-	skin_include( '_item_content.inc.php', $params );
+	skin_include( '_item_content.inc.php', array_merge( $params, array( 'Item' => $Item ) ) );
 	// Note: You can customize the default item content by copying the generic
 	// /skins/_item_content.inc.php file into the current skin folder.
 	// -------------------------- END OF POST CONTENT -------------------------
