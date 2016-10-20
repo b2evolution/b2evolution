@@ -119,7 +119,7 @@ switch( $Comment->get( 'type' ) )
 			) );
 
 		echo ' <span class="text-muted">';
-		$Comment->date( 'M j, Y H:i' );
+		$Comment->date( locale_extdatefmt().' '.locale_shorttimefmt() );
 		echo '</span>';
 
 		// Post title
@@ -177,7 +177,7 @@ switch( $Comment->get( 'type' ) )
 			) );
 
 		echo ' <span class="text-muted">';
-		$Comment->date( 'M j, Y H:i' );
+		$Comment->date( locale_extdatefmt().' '.locale_shorttimefmt() );
 		echo '</span>';
 
 		if( ! $Comment->get_author_User() )

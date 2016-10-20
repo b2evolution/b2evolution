@@ -1420,15 +1420,17 @@ function add_js_for_toolbar( $relative_to = 'rsc_url' )
 
 /**
  * Registers headlines required by AJAX forms, but only if javascript forms are enabled in blog settings.
+ *
+ * @deprecated Because we don't need communication.js to work with AJAX forms
  */
 function init_ajax_forms( $relative_to = 'blog' )
 {
-	global $Collection, $Blog;
+	/*global $Collection, $Blog;
 
 	if( !empty($Blog) && $Blog->get_setting('ajax_form_enabled') )
 	{
 		require_js( 'communication.js', $relative_to );
-	}
+	}*/
 }
 
 
@@ -1547,7 +1549,7 @@ function init_datepicker_js( $relative_to = 'rsc_url' )
 	require_js( '#jqueryUI#', $relative_to );
 	require_css( '#jqueryUI_css#', $relative_to );
 
-	$datefmt = locale_datefmt();
+	$datefmt = locale_input_datefmt();
 	//$datefmt = str_replace( array( 'd', 'j', 'm', 'Y' ), array( 'dd', 'd', 'mm', 'yy' ), $datefmt );
 	$datefmt = php_to_jquery_date_format( $datefmt );
 	add_js_headline( 'jQuery(document).ready( function(){
@@ -1893,29 +1895,23 @@ function bullet( $bool )
 }
 
 
-
-
 /**
  * Stub: Links to previous and next post in single post mode
  */
 function item_prevnext_links( $params = array() )
 {
-	global $disp;
+	global $disp, $MainList;
 
-	if( $disp == 'download' )
-	{ // Don't display the links on download page
+	if( ! isset( $MainList ) || ! $MainList->single_post || $disp == 'download' )
+	{	// Don't display the links in NOT single post mode and on download page:
 		return;
 	}
 
-	global $MainList;
-
 	$params = array_merge( array( 'target_blog' => 'auto' ), $params );
 
-	if( isset( $MainList ) )
-	{
-		$MainList->prevnext_item_links( $params );
-	}
+	$MainList->prevnext_item_links( $params );
 }
+
 
 /**
  * Stub: Links to previous and next user in single user mode
@@ -2645,6 +2641,11 @@ function display_login_js_handler( $params )
 				// Append the correct login action as hidden input field
 				pwd_container.append( '<input type="hidden" value="1" name="login_action[login]">' );
 				form.submit();
+			},
+			error: function( jqXHR, textStatus, errorThrown )
+			{	// Display error text on error request:
+				requestSent = false;
+				alert( 'Error: could not get hash Salt from server. Please contact the site admin and check the browser and server error logs. (' + textStatus + ': ' + errorThrown + ')' );
 			}
 		});
 

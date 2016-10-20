@@ -1171,8 +1171,10 @@ class Message extends DataObject
 				$params[ $param_key ] = & $params[ $param_key ];
 			}
 
-			$r_params = $Plugins->trigger_event_first_true( 'RenderMessageAttachment', $params, true );
-			if( count( $r_params ) != 0 && isset( $r_params['plugin_ID'] ) )
+			// Prepare params before rendering message attachment:
+			$Plugins->trigger_event_first_true_with_params( 'PrepareForRenderMessageAttachment', $params );
+
+			if( count( $Plugins->trigger_event_first_true( 'RenderMessageAttachment', $params ) ) != 0 )
 			{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
 				if( ! $params['get_rendered_attachments'] )
 				{ // Restore $r value and mark this message has the rendered attachments
@@ -1181,9 +1183,6 @@ class Message extends DataObject
 				}
 				continue;
 			}
-
-			// Update params because they may be modified by some plugin above:
-			$params = $r_params;
 
 			if( ! $File->is_image() )
 			{	// Skip anything that is not an image:
@@ -1325,14 +1324,13 @@ class Message extends DataObject
 				continue;
 			}
 
-			$r_params = $Plugins->trigger_event_first_true( 'RenderMessageAttachment', $params, true );
-			if( count( $r_params ) != 0 && isset( $r_params['plugin_ID'] ) )
+			// Prepare params before rendering message attachment:
+			$Plugins->trigger_event_first_true_with_params( 'PrepareForRenderMessageAttachment', $params );
+
+			if( count( $Plugins->trigger_event_first_true( 'RenderMessageAttachment', $params ) ) != 0 )
 			{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
 				continue;
 			}
-
-			// Update params because they may be modified by some plugin above:
-			$params = $r_params;
 
 			if( $File->is_image() && $Link->get( 'position' ) != 'attachment' )
 			{	// Skip images (except those in the attachment position) because these are displayed inline already:

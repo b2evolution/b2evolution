@@ -169,7 +169,7 @@ $params = array_merge( array(
 				) );
 			$Item->lastedit_user( array(
 					'before'    => T_('Last edit by '),
-					'after'     => T_(' on ').$Item->get_mod_date( 'F jS, Y' ),
+					'after'     => T_(' on ').$Item->get_mod_date( locale_extdatefmt() ),
 					'link_text' => 'auto',
 				) );
 			'</p>';

@@ -300,8 +300,6 @@ function skin_init( $disp )
 			// Save global $Item to $download_Item, because $Item can be rewritten by function get_featured_Item() in some skins
 			$GLOBALS['download_Item'] = & $Item;
 
-			init_ajax_forms( 'blog' ); // auto requires jQuery
-
 			// Initialize JavaScript to download file after X seconds
 			add_js_headline( '
 jQuery( document ).ready( function ()
@@ -334,7 +332,6 @@ var downloadInterval = setInterval( function()
 			break;
 
 		case 'posts':
-			init_ajax_forms( 'blog' ); // auto requires jQuery
 			// fp> if we add this here, we have to exetnd the inner if()
 			// init_ratings_js( 'blog' );
 
@@ -1109,8 +1106,23 @@ var downloadInterval = setInterval( function()
 			display_user_email_status_message();
 			break;
 
+		case 'access_requires_login':
+			global $login_mode;
+
+			if( $Settings->get( 'http_auth_require' ) && ! isset( $_SERVER['PHP_AUTH_USER'] ) )
+			{	// Require HTTP authentication:
+				header( 'WWW-Authenticate: Basic realm="b2evolution"' );
+				header( 'HTTP/1.0 401 Unauthorized' );
+			}
+
+			if( ! empty( $login_mode ) && $login_mode == 'http_basic_auth' )
+			{	// Display this error if user already tried to log in by HTTP basic authentication and it was failed:
+				$Messages->add( T_('Wrong Login/Password provided by browser (HTTP Auth).'), 'error' );
+			}
+			break;
+
 		case 'login':
-			global $Plugins;
+			global $Plugins, $login_mode;
 
 			if( is_logged_in() )
 			{ // User is already logged in
@@ -1135,6 +1147,17 @@ var downloadInterval = setInterval( function()
 			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'loginurl', array( 'glue' => '&' ) ) );
+			}
+
+			if( $Settings->get( 'http_auth_require' ) && ! isset( $_SERVER['PHP_AUTH_USER'] ) )
+			{	// Require HTTP authentication:
+				header( 'WWW-Authenticate: Basic realm="b2evolution"' );
+				header( 'HTTP/1.0 401 Unauthorized' );
+			}
+
+			if( ! empty( $login_mode ) && $login_mode == 'http_basic_auth' )
+			{	// Display this error if user already tried to log in by HTTP basic authentication and it was failed:
+				$Messages->add( T_('Wrong Login/Password provided by browser (HTTP Auth).'), 'error' );
 			}
 
 			$seo_page_type = 'Login form';

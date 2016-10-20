@@ -179,7 +179,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 			{
 				echo '<div class="ft_assigned col-lg-2 col-md-2 col-sm-3 col-sm-offset-0 col-xs-6">';
 				echo '<div class="ft_assigned_header">';
-				echo '<a href="'.$url.'"  style="color: '.$priority_color.';">'.T_('Assigned to:').'</a>';
+				echo '<a href="'.$url.'"  style="color: '.$priority_color.';">'.T_('Assigned to').':</a>';
 				echo '</div>';
 
 				// Assigned user avatar
@@ -204,7 +204,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 				echo '</div>';
 				echo '<div class="ft_assigned_info">';
 			}
-	
+
 			// Workflow status
 			echo '<span><a href="'.$url.'">'.item_td_task_cell( 'status', $Item, false ).'</a></span>';
 			echo '</div>';
@@ -241,7 +241,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 					'link_text'   => 'auto',
 				) );
 
-			$Item->issue_date( array( 'date_format' => 'm/d/y') );
+			$Item->issue_date( array( 'date_format' => locale_datefmt() ) );
 
 			echo '</div>';
 
@@ -297,7 +297,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 
 		// Last comment date
 		echo '<span class="last_mod_date">';
-		$latest_Comment->date( $display_workflow ? 'm/d/y' : 'D M j, Y H:i' );
+		$latest_Comment->date( $display_workflow ? locale_datefmt() : locale_extdatefmt().' '.locale_shorttimefmt() );
 		echo '</span>';
 
 		echo ' <a class="nowrap"  href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest post')
@@ -328,7 +328,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 
 		// Last modification date
 		echo '<span class="last_mod_date">';
-		echo $display_workflow ? $Item->get_mod_date( 'm/d/y' ) : $Item->get_mod_date( 'D M j, Y H:i' );
+		echo $display_workflow ? $Item->get_mod_date( locale_datefmt() ) : $Item->get_mod_date( locale_extdatefmt().' '.locale_shorttimefmt() );
 		echo '</span>';
 
 		echo ' <a class="nowrap" href="'.$Item->get_permanent_url().'" title="'.T_('View latest post')
@@ -350,7 +350,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 							'after_user' => ' '
 				) );
 
-			$latest_Comment->date('m/j/y ');
+			$latest_Comment->date( locale_datefmt() );
 			echo ' <a href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest post')
 					.'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
 		}
@@ -362,7 +362,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 					'after_user' => ' ',
 				) );
 
-			echo $Item->get_mod_date( 'm/j/y' );
+			echo $Item->get_mod_date( locale_datefmt() );
 			echo ' <a href="'.$Item->get_permanent_url().'" title="'.T_('View latest post').
 					'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
 		}

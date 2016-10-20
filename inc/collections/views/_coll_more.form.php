@@ -17,7 +17,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @var Blog
  */
 global $edited_Blog;
+global $Settings;
 
+$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
 $Form = new Form( NULL, 'coll_more_checkchanges' );
 
@@ -34,14 +36,16 @@ $Form->begin_fieldset( T_('Tracking').get_manual_link( 'tracking-other' ) );
 	$Form->checkbox( 'track_unread_content', $edited_Blog->get_setting( 'track_unread_content' ), T_('Tracking of unread content'), T_('Check this if you want this blog to display special marks in case of unread posts and comments.') );
 $Form->end_fieldset();
 
-
-$Form->begin_fieldset( T_('Subscriptions').get_manual_link( 'subscriptions-other' ) );
-	$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post.') );
-	$Form->checkbox( 'allow_comment_subscriptions', $edited_Blog->get_setting( 'allow_comment_subscriptions' ), '', T_('Allow users to subscribe and receive email notifications for each new comment.') );
-	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
-	// TODO: checkbox 'Enable RSS/Atom feeds'
-	// TODO2: which feeds (skins)?
-$Form->end_fieldset();
+if( $notifications_mode != 'off' )
+{
+	$Form->begin_fieldset( T_('Subscriptions').get_manual_link( 'subscriptions-other' ) );
+		$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post.') );
+		$Form->checkbox( 'allow_comment_subscriptions', $edited_Blog->get_setting( 'allow_comment_subscriptions' ), '', T_('Allow users to subscribe and receive email notifications for each new comment.') );
+		$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
+		// TODO: checkbox 'Enable RSS/Atom feeds'
+		// TODO2: which feeds (skins)?
+	$Form->end_fieldset();
+}
 
 
 $Form->begin_fieldset( T_('Sitemaps').get_manual_link( 'sitemaps-other' ) );

@@ -18,8 +18,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $edited_Blog, $AdminUI;
-
+global $edited_Blog, $AdminUI, $Settings;
+$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
 $Form = new Form( NULL, 'coll_features_checkchanges' );
 
@@ -44,7 +44,7 @@ $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
 												), '' );
 	$Form->end_line( T_('per page') );
 
-	$Form->checkbox( 'disp_featured_above_list', $edited_Blog->get_setting( 'disp_featured_above_list' ), T_('Featured post above list'), T_('Check to display a featured post above the list (as long as no Intro post is displayed.') );
+	$Form->checkbox( 'disp_featured_above_list', $edited_Blog->get_setting( 'disp_featured_above_list' ), T_('Featured post above list'), T_('Check to display a featured post above the list (as long as no Intro post is displayed).') );
 
 	$ItemTypeCache = & get_ItemTypeCache();
 	$enabled_item_types = $edited_Blog->get_enabled_item_types( 'post' );
@@ -99,7 +99,7 @@ $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_setting
 		array( array( 'no', T_( 'No' ), T_( 'Check this to view list of the posts.' ) ),
 			array( 'blog', T_( 'View home page' ), T_( 'Check this to automatically view the blog after publishing a post.' ) ),
 			array( 'post', T_( 'View new post' ), T_( 'Check this to automatically view the post page.' ) ), ),
-			T_( 'View blog after publishing' ), true );
+			T_( 'View blog after creating' ), true );
 
 	$Form->radio( 'editing_goto_blog', $edited_Blog->get_setting( 'editing_goto_blog' ),
 		array( array( 'no', T_( 'No' ), T_( 'Check this to view list of the posts.' ) ),
@@ -246,10 +246,13 @@ $Form->begin_fieldset( T_('RSS/Atom feeds').get_manual_link('item-feeds-features
 	}
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Subscriptions').get_manual_link( 'item-subscriptions' ) );
-	$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post.') );
-	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
-$Form->end_fieldset();
+if( $notifications_mode != 'off' )
+{
+	$Form->begin_fieldset( T_('Subscriptions').get_manual_link( 'item-subscriptions' ) );
+		$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post.') );
+		$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
+	$Form->end_fieldset();
+}
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 

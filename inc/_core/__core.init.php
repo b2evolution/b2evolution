@@ -1144,12 +1144,14 @@ class _core_Module extends Module
 					$display_separator = true;
 				}
 
-				// Check if user has permission for published, draft or depreceted comments (any of these)
-				if( $current_User->check_perm( 'blog_comments', 'edit', false, $Blog->ID ) )
-				{ // Comments:
+				$perm_comments = $current_User->check_perm( 'blog_comments', 'view', false, $Blog->ID );
+				if( $perm_comments || $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+				{	// Initialize comments menu tab if user can view normal or meta comments of the collection:
 					$entries['blog']['entries']['comments'] = array(
 							'text' => T_('Comments').'&hellip;',
-							'href' => $admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;filter=restore',
+							'href' => $admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;filter=restore'
+								// Set url to meta comments page if user has a perm to view only meta comments:
+								.( $perm_comments ? '' : '&amp;tab3=meta' ),
 						);
 					$display_separator = true;
 				}

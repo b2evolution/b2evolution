@@ -33,6 +33,75 @@ $GLOBALS['debug_params'] = false;
 
 
 /**
+ * Format param value to valid value depending on type
+ *
+ * @param mixed Param value
+ * @param string Force value type to one of:
+ * - integer
+ * - float, double
+ * - string (strips (HTML-)Tags, trims whitespace)
+ * - text like string but allows multiple lines
+ * - html (does nothing, for now)
+ * - raw (does nothing)
+ * - boolean (will force type to boolean, but you can't use 'true' as a default since it has special meaning. There is no real reason to pass booleans on a URL though. Passing 0 and 1 as integers seems to be best practice).
+ * - url (like string but dies on illegal urls)
+ * - htmlspecialchars (convert all html to special characters)
+ * @return mixed Formated param value
+ */
+function param_format( $value, $type = 'raw' )
+{
+	switch( $type )
+	{
+		case 'html': // Technically does the same as "raw", but may do more in the future.
+		case 'raw':
+			// Clean utf8:
+			return utf8_clean( $value );
+
+		case 'htmlspecialchars':
+			global $evo_charset;
+			// convert all html to special characters:
+			$value = utf8_trim( htmlspecialchars( $value, ENT_COMPAT, $evo_charset ) );
+			// cross-platform newlines:
+			return preg_replace( "~(\r\n|\r)~", "\n", $value );
+
+		case 'text':
+			// strip out any html:
+			$value = utf8_trim( utf8_strip_tags( $value ) );
+			// cross-platform newlines:
+			return preg_replace( "~(\r\n|\r)~", "\n", $value );
+
+		case 'string':
+			// Make sure the string is a single line
+			$value = preg_replace( '~\r|\n~', '', $value );
+			// strip out any html:
+			$value = utf8_strip_tags( $value );
+			return utf8_trim( $value );
+
+		case 'url':
+			// Decode url:
+			$value = urldecode( $value );
+			// strip out any html:
+			$value = utf8_trim( utf8_strip_tags( $value ) );
+			// Remove new line chars and double quote from url
+			return preg_replace( '~\r|\n|"~', '', $value );
+
+		case 'boolean':
+			return (bool)$value;
+
+		case 'integer':
+			return intval( $value );
+
+		case 'float':
+		case 'double':
+			return floatval( $value );
+
+		default:
+			// Unknown format type:
+			return $value;
+	}
+}
+
+/**
  * Sets a parameter with values from the request or to provided default,
  * except if param is already set!
  *
@@ -61,6 +130,7 @@ $GLOBALS['debug_params'] = false;
  * - '/^...$/' check regexp pattern match (string)
  * - boolean (will force type to boolean, but you can't use 'true' as a default since it has special meaning. There is no real reason to pass booleans on a URL though. Passing 0 and 1 as integers seems to be best practice).
  * - url (like string but dies on illegal urls)
+ * - htmlspecialchars (convert all html to special characters)
  * Value type will be forced only if resulting value (probably from default then) is !== NULL
  * @param mixed Default value or TRUE if user input required
  * @param boolean Do we need to memorize this to regenerate the URL for this page?
@@ -159,8 +229,8 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
 				}
 
-				// Clean utf8:
-				$GLOBALS[$var] = utf8_clean( $GLOBALS[$var] );
+				// Format param to valid value:
+				$GLOBALS[$var] = param_format( $GLOBALS[$var], $type );
 
 				// do nothing
 				if( isset($Debuglog) ) $Debuglog->add( 'param(-): <strong>'.$var.'</strong> as RAW Unsecure HTML', 'params' );
@@ -172,10 +242,9 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
 				}
 
-				// convert all html to special characters:
-				$GLOBALS[$var] = utf8_trim( htmlspecialchars( $GLOBALS[$var], ENT_COMPAT, $evo_charset ) );
-				// cross-platform newlines:
-				$GLOBALS[$var] = preg_replace( "~(\r\n|\r)~", "\n", $GLOBALS[$var] );
+				// Format param to valid value:
+				$GLOBALS[$var] = param_format( $GLOBALS[$var], $type );
+
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as text with html special chars', 'params' );
 				break;
 
@@ -185,10 +254,9 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
 				}
 
-				// strip out any html:
-				$GLOBALS[$var] = utf8_trim( utf8_strip_tags($GLOBALS[$var]) );
-				// cross-platform newlines:
-				$GLOBALS[$var] = preg_replace( "~(\r\n|\r)~", "\n", $GLOBALS[$var] );
+				// Format param to valid value:
+				$GLOBALS[$var] = param_format( $GLOBALS[$var], $type );
+
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as text', 'params' );
 				break;
 
@@ -198,16 +266,8 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
 				}
 
-				// echo $var, '=', $GLOBALS[$var], '<br />';
-				// Make sure the string is a single line
-				$GLOBALS[$var] = preg_replace( '~\r|\n~', '', $GLOBALS[$var] );
-
-				// strip out any html:
-				$GLOBALS[$var] = utf8_strip_tags($GLOBALS[$var]);
-
-				// echo "param $var=".$GLOBALS[$var]."<br />\n";
-				$GLOBALS[$var] = utf8_trim($GLOBALS[$var]);
-				// echo "param $var=".$GLOBALS[$var]."<br />\n";
+				// Format param to valid value:
+				$GLOBALS[$var] = param_format( $GLOBALS[$var], $type );
 
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as string', 'params' );
 				break;
@@ -218,12 +278,8 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
 				}
 
-				// Decode url:
-				$GLOBALS[$var] = urldecode( $GLOBALS[$var] );
-				// strip out any html:
-				$GLOBALS[$var] = utf8_trim( utf8_strip_tags( $GLOBALS[$var] ) );
-				// Remove new line chars and double quote from url
-				$GLOBALS[$var] = preg_replace( '~\r|\n|"~', '', $GLOBALS[$var] );
+				// Format param to valid value:
+				$GLOBALS[$var] = param_format( $GLOBALS[$var], $type );
 
 				if( ! empty( $GLOBALS[$var] ) && ! preg_match( '#^(/|\?|https?://)#i', $GLOBALS[$var] ) )
 				{ // We cannot accept this MISMATCH:
@@ -281,10 +337,8 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 
 						if( $contains_strings )
 						{ // Prepare string elements of array
-							// Make sure the string is a single line
-							$var_value = preg_replace( '~\r|\n~', '', $var_value );
-							// strip out any html:
-							$globals_var[$i][$j] = utf8_trim( utf8_strip_tags( $var_value ) );
+							// Format param to valid value:
+							$globals_var[$i][$j] = param_format( $var_value, 'string' );
 							continue;
 						}
 
@@ -2515,10 +2569,10 @@ function balance_tags( $text )
 
 			// Tag Cleaning
 
-			// Push if not img, br, hr, param or input
-			if($tag != 'br' && $tag != 'img' && $tag != 'hr' && $tag != 'param' && $tag != 'input')
+			// Push if not void HTML tags:
+			if( ! in_array( $tag, array( 'br', 'img', 'hr', 'param', 'input', 'link', 'meta', 'base', 'area', 'col', 'command', 'embed', 'keygen', 'source', 'track', 'wbr' ) ) )
 			{
-				$stacksize = array_push ($tagstack, $tag);
+				$stacksize = array_push( $tagstack, $tag );
 				$closing = '>';
 			}
 			else
@@ -2570,6 +2624,52 @@ function balance_tags( $text )
 function isset_param( $var )
 {
 	return isset($_POST[$var]) || isset($_GET[$var]);
+}
+
+
+/**
+ * Check if a serialized data is an array and doesn't contain any object inside
+ *
+ * @param string Param name from request
+ * @return boolean TRUE on expected data
+ */
+function param_check_serialized_array( $param_name )
+{
+	$param_value = get_param( $param_name );
+
+	if( ! is_string( $param_value ) )
+	{	// A serialized data must be a string:
+		return false;
+	}
+
+	// Search all string items in the serialized array:
+	preg_match_all( '/[{;]s:(\d+):"/', $param_value, $matches, PREG_OFFSET_CAPTURE );
+	foreach( $matches[0] as $m => $match )
+	{	// And replace its values with spaces in order to don't decide below the following string values as object structures:
+		//    a:2:{s:1:"a";s:1:"b";i:123;O:8:"stdClass":1:{s:1:"a";s:1:"b";}}
+		$param_value = substr_replace( $param_value, str_repeat( ' ', (int)$matches[1][ $m ][0] ), $match[1] + strlen( $match[0] ), (int)$matches[1][ $m ][0] );
+	}
+
+	if(
+		// Allow to unserialize only arrays, main reason is an excluding of object structure like:
+		//     - O:7:"Results":1:{s:3:"sql";s:21:"SELECT * FROM T_users";}
+		( substr( $param_value, 0, 2 ) == 'a:' ) &&
+		// + Check there is no Object in the array (We NEVER want to unserialize an object):
+		//     a:1:{s:3:"key";O:8:"stdClass":1:{s:1:"x";i:1;}}
+		//     a:1:{i:123;O:8:"stdClass":1:{s:1:"x";i:1;}}
+		//     a:1:{s:3:"key";a:1:{s:3:"sub";O:8:"stdClass":1:{s:1:"x";i:1;}}}
+		//     a:1:{s:3:"key";a:1:{i:456;O:8:"stdClass":1:{s:1:"x";i:1;}}}
+		//   This checking exclude real string with object structure value like ';O:8:':
+		//     a:1:{s:3:"key";s:5:";O:8:";}
+		( ! preg_match( '/(s:\d+:"[^"]*"|i:\d+);O:\+?[0-9]+:"/', $param_value ) )
+	)
+	{	// Correct data:
+		return true;
+	}
+	else
+	{	// Wrong data:
+		return false;
+	}
 }
 
 ?>

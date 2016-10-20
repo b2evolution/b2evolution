@@ -374,7 +374,13 @@ class Session
 	 */
 	function logout()
 	{
-		global $Debuglog, $cookie_session;
+		global $Debuglog, $cookie_session, $Settings;
+
+		if( $Settings->get( 'http_auth_accept' ) && isset( $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'] ) )
+		{	// Don't log out when user is logged in by HTTP basic authentication because it is possible only after browser closing:
+			// (to avoid infinite redirection after logout to $baseurl)
+			return;
+		}
 
 		// Invalidate the session key (no one will be able to use this session again)
 		$this->key = NULL;

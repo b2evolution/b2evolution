@@ -14,8 +14,12 @@ $locale_defs['fr-CA'] = array(
 		'messages' => 'fr_FR',
 		'charset' => 'utf-8',
 		'datefmt' => 'm/d/y',
+		'longdatefmt' => 'm/d/Y',
+		'extdatefmt' => 'M d Y',
+		'input_datefmt' => 'm/d/y',
 		'timefmt' => 'h:i:s a',
 		'shorttimefmt' => 'h:i a',
+		'input_timefmt' => 'H:i:s',
 		'startofweek' => 0,
 		'transliteration_map' => array(),
 	);

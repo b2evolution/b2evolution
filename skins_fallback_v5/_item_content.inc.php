@@ -223,7 +223,7 @@ switch( $content_mode )
 
 		if( $params['content_display_full'] )
 		{	// We want to display text, not just images:
-		
+
 			echo '<div class="bText">';
 
 			// URL link, if the post has one:
@@ -311,9 +311,6 @@ switch( $content_mode )
 
 			echo '</div>';
 		}
-
-		// Display location info
-		$Item->location( '<div class="item_location"><strong>'.T_('Location').': </strong>', '</div>' );
 
 		echo $params['content_end_full'];
 

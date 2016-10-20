@@ -214,7 +214,7 @@ switch( $content_mode )
 	default:
 		// Normal dislpay:  (and Full display if force_more is true)
 		echo $params['content_start_full'];
-			
+
 			// Title and number of photos in album
 			echo $params['content_title_start'];
 				// Flag:
@@ -268,7 +268,7 @@ switch( $content_mode )
 		{	// We want to display text, not just images:
 
 			echo $params['content_start_full_text'];
-						
+
 			// URL link, if the post has one:
 			$Item->url_link( array(
 					'before'        => $params['before_url_link'],
@@ -365,7 +365,7 @@ switch( $content_mode )
 					'block_start' => $params['footer_text_start'],
 					'block_end'   => $params['footer_text_end'],
 				) );
-							
+
 				// URL link, if the post has one:
 				$Item->url_link( array(
 						'before'        => '<div class="small evo_print text-muted">'.T_('Link').': ',
@@ -374,13 +374,11 @@ switch( $content_mode )
 						'url_template'  => '$url$',
 						'target'        => '',
 						'podcast'       => false,        // DO NOT display mp3 player if post type is podcast
-					) );			
-				
+					) );
+
 			echo $params['content_end_full_text'];
 		}
 
-		// Display location info
-		$Item->location( '<div class="evo_post_location"><strong>'.T_('Location').': </strong>', '</div>' );
 
 		echo $params['content_end_full'];
 

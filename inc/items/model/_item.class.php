@@ -1288,7 +1288,8 @@ class Item extends ItemLight
 
 		if( $display )
 		{ // display a comment form section even if comment form won't be displayed, "add new comment" links should point to this section
-			echo '<a id="form_p'.$this->ID.'"></a>';
+			$comment_form_anchor = empty( $params['comment_form_anchor'] ) ? 'form_p' : $params['comment_form_anchor'];
+			echo '<a id="'.$comment_form_anchor.$this->ID.'"></a>';
 		}
 
 		if( ! $this->get_type_setting( 'use_comments' ) )
@@ -3089,8 +3090,10 @@ class Item extends ItemLight
 				$params[ $param_key ] = & $params[ $param_key ];
 			}
 
-			$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $params, true );
-			if( count( $r_params ) != 0 && isset( $r_params['plugin_ID'] ) )
+			// Prepare params before rendering item attachment:
+			$Plugins->trigger_event_first_true_with_params( 'PrepareForRenderItemAttachment', $params );
+
+			if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $params ) ) != 0 )
 			{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
 				if( ! $params['get_rendered_attachments'] )
 				{ // Restore $r value and mark this item has the rendered attachments
@@ -3099,9 +3102,6 @@ class Item extends ItemLight
 				}
 				continue;
 			}
-
-			// Update params because they may be modified by some plugin above:
-			$params = $r_params;
 
 			if( ! $File->is_image() )
 			{ // Skip anything that is not an image
@@ -3311,14 +3311,13 @@ class Item extends ItemLight
 				continue;
 			}
 
-			$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $params, true );
-			if( count( $r_params ) != 0 && isset( $r_params['plugin_ID'] ) )
+			// Prepare params before rendering item attachment:
+			$Plugins->trigger_event_first_true_with_params( 'PrepareForRenderItemAttachment', $params );
+
+			if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $params ) ) != 0 )
 			{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
 				continue;
 			}
-
-			// Update params because they may be modified by some plugin above:
-			$params = $r_params;
 
 			if( $File->is_image() && $Link->get( 'position' ) != 'attachment' )
 			{ // Skip images (except those in the attachment position) because these are displayed inline already
@@ -3608,7 +3607,7 @@ class Item extends ItemLight
 
 		$params = array_merge( array(
 									'type' => 'feedbacks',		// Kind of feedbacks to count
-									'status' => 'published',	// Status of feedbacks to count
+									'status' => '#',	// Statuses of feedbacks to count, can be a string for one status or array for several. '#' - active front-office comment statuses, '#moderation#' - "require moderation" statuses.
 									'link_before' => '',
 									'link_after' => '',
 									'link_text_zero' => '#',
@@ -3782,9 +3781,11 @@ class Item extends ItemLight
 	 * @param string Link text to display when there are 0 comments
 	 * @param string Link text to display when there is 1 comment
 	 * @param string Link text to display when there are >1 comments (include %d for # of comments)
-	 * @param string Status of feedbacks to count
+	 * @param string|array Statuses of feedbacks to count, a string for one status, an array for several statuses,
+	 *                     '#' - to use currently active front-office comment statuses of the item's collection
+	 *                     '#moderation#' - to use all comment statuses which require moderation on front-office for the item's collection
 	 */
-	function get_feedback_title( $type = 'feedbacks',	$zero = '#', $one = '#', $more = '#', $status = 'published', $filter_by_perm = true )
+	function get_feedback_title( $type = 'feedbacks',	$zero = '#', $one = '#', $more = '#', $statuses = '#', $filter_by_perm = true )
 	{
 		if( ! $this->can_see_comments() )
 		{	// Comments disabled
@@ -3829,11 +3830,22 @@ class Item extends ItemLight
 				debug_die( "Unknown feedback type [$type]" );
 		}
 
-		$number = generic_ctp_number( $this->ID, $type, $status, false, $filter_by_perm );
+		if( $statuses == '#' )
+		{	// Get all comment statuses which are actived on front-office for the item's collection:
+			$this->load_Blog();
+			$statuses = explode( ',', $this->Blog->get_setting( 'comment_inskin_statuses' ) );
+		}
+		elseif( $statuses == '#moderation#' )
+		{	// Get all comment statuses which require moderation on front-office for the item's collection:
+			$this->load_Blog();
+			$statuses = explode( ',', $this->Blog->get_setting( 'moderation_statuses' ) );
+		}
+
+		$number = generic_ctp_number( $this->ID, $type, $statuses, false, $filter_by_perm );
 		if( !$filter_by_perm )
 		{ // This is the case when we are only counting comments awaiting moderation, return only not visible feedbacks number
 			// count feedbacks with the same statuses where user has permission
-			$visible_number = generic_ctp_number( $this->ID, $type, $status, false, true );
+			$visible_number = generic_ctp_number( $this->ID, $type, $statuses, false, true );
 			$number = $number - $visible_number;
 		}
 
@@ -4002,7 +4014,7 @@ class Item extends ItemLight
 		$one = str_replace( '%s', $edit_comments_link, $one );
 		$more = str_replace( '%s', $edit_comments_link, $more );
 
-		$r = $this->get_feedback_title( $type, $zero, $one, $more, array( 'draft', 'review' ), false );
+		$r = $this->get_feedback_title( $type, $zero, $one, $more, '#moderation#', false );
 
 		if( !empty( $r ) )
 		{
@@ -8367,6 +8379,82 @@ class Item extends ItemLight
 	function notifications_allowed()
 	{
 		return ( $this->get_type_setting( 'usage' ) != 'special' );
+	}
+
+
+	/**
+	 * Check if this item can be displayed for current user on front-office
+	 *
+	 * @return boolean
+	 */
+	function can_be_displayed()
+	{
+		if( empty( $this->ID ) )
+		{	// Item is not created yet, so it cannot be displayed:
+			return false;
+		}
+
+		// Load collection of this Item:
+		$this->load_Blog();
+
+		// Get item statuses which are visible on front-office:
+		$show_statuses = get_inskin_statuses( $this->Blog->ID, 'post' );
+
+		if( ! in_array( $this->get( 'status' ), $show_statuses ) )
+		{	// This Item has a status which cannot be displayed on front-office:
+			return false;
+		}
+
+		global $current_User;
+		$is_logged_in = is_logged_in( false );
+
+		switch( $this->get( 'status' ) )
+		{
+			case 'published':
+				// Published posts are always allowed:
+				$allowed = true;
+				break;
+
+			case 'community':
+				// It is always allowed for logged in users:
+				$allowed = $is_logged_in;
+				break;
+
+			case 'protected':
+				// It is always allowed for members:
+				$allowed = ( $is_logged_in && $current_User->check_perm( 'blog_ismember', 1, false, $this->Blog->ID ) );
+				break;
+
+			case 'private':
+				// It is allowed for users who has global 'editall' permission:
+				$allowed = ( $is_logged_in && $current_User->check_perm( 'blogs', 'editall' ) );
+				if( ! $allowed && $is_logged_in && $current_User->check_perm( 'blog_post!private', 'create', false, $this->Blog->ID ) )
+				{	// Own private posts are allowed if user can create private posts:
+					$allowed = ( $current_User->ID == $this->creator_user_ID );
+				}
+				break;
+
+			case 'review':
+				// It is allowed for users who have at least 'lt' posts edit permission :
+				$allowed = ( $is_logged_in && $current_User->check_perm( 'blog_post!review', 'moderate', false, $this->Blog->ID ) );
+				if( ! $allowed && $is_logged_in && $current_User->check_perm( 'blog_post!review', 'create', false, $this->Blog->ID ) )
+				{	// Own posts with 'review' status are allowed if user can create posts with 'review' status
+					$allowed = ( $current_User->ID == $this->creator_user_ID );
+				}
+				break;
+
+			case 'draft':
+				// In front-office only authors may see their own draft posts, but only if the have permission to create draft posts:
+				$allowed = ( $is_logged_in && $current_User->check_perm( 'blog_post!draft', 'create', false, $this->Blog->ID )
+					&& $current_User->ID == $this->creator_user_ID );
+				break;
+
+			default:
+				// Decide the unknown item statuses as not visible for front-office:
+				$allowed = false;
+		}
+
+		return $allowed;
 	}
 
 

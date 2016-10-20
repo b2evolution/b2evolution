@@ -132,7 +132,7 @@ if( ! empty( $chapters ) )
 				$Item->issue_time( array(
 						'before'      => ' '.T_('posted on '),
 						'after'       => ' ',
-						'time_format' => 'M j, Y',
+						'time_format' => locale_extdatefmt(),
 					) );
 
 				// Author

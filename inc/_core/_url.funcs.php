@@ -946,7 +946,7 @@ function get_link_tag( $url, $text = '', $class = '', $max_url_length = 50 )
 		}
 	}
 
-	$link_attrs = array( 'href' => $url );
+	$link_attrs = array( 'href' => str_replace( '&amp;', '&', $url ) );
 
 	if( ! empty( $class ) )
 	{

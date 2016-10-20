@@ -17,6 +17,12 @@
  * Includes:
  */
 require_once dirname(__FILE__).'/../conf/_config.php';
+
+/**
+ * @global boolean Is this a login page?
+ */
+$is_login_page = true;
+
 require_once $inc_path.'_main.inc.php';
 
 $login = param( $dummy_fields['login'], 'string', '' );
@@ -690,6 +696,13 @@ switch( $action )
 
 	default:
 		// Display login form:
+
+		if( $Settings->get( 'http_auth_require' ) && ! isset( $_SERVER['PHP_AUTH_USER'] ) )
+		{	// Require HTTP authentication:
+			header( 'WWW-Authenticate: Basic realm="b2evolution"' );
+			header( 'HTTP/1.0 401 Unauthorized' );
+		}
+
 		require $adminskins_path.'login/_login_form.main.php';
 }
 

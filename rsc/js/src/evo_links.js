@@ -95,16 +95,15 @@ function evo_link_change_position( selectInput, url, crumb )
  * @param integer File ID
  * @param string Caption text
  */
-function evo_link_insert_inline( type, link_ID, caption )
+function evo_link_insert_inline( type, link_ID, option )
 {
 	if( typeof( b2evoCanvas ) != 'undefined' )
 	{ // Canvas exists
 		var insert_tag = '[' + type + ':' + link_ID;
 
-		if( caption.length )
+		if( option.length )
 		{
-			console.log( caption.length );
-			insert_tag += ':' + caption;
+			insert_tag += ':' + option;
 		}
 
 		insert_tag += ']';
@@ -117,7 +116,9 @@ function evo_link_insert_inline( type, link_ID, caption )
 		{ // Change the position to 'Inline'
 			if( $position_selector.val() != 'inline' )
 			{
+				deferInlineReminder = true;
 				$position_selector.val( 'inline' ).change();
+				deferInlineReminder = false;
 			}
 		}
 	}

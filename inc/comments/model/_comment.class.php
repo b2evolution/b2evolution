@@ -211,6 +211,7 @@ class Comment extends DataObject
 			$this->notif_status = 'noreq';
 			$this->in_reply_to_cmt_ID = 0;
 			$this->set_renderers( array( 'default' ) );
+			$this->set( 'status', 'draft' );
 		}
 		else
 		{
@@ -1996,12 +1997,18 @@ class Comment extends DataObject
 			return false;
 		}
 
-		global $current_User;
+		global $current_User, $blog;
 
 		if( is_null( $current_status ) )
 		{ // Use status of comment if param is NULL
 			$current_status = $this->status;
 		}
+
+		$comment_Item = & $this->get_Item();
+		// Comment status cannot be more than post status, restrict it:
+		$restrict_max_allowed_status = ( $comment_Item ? $comment_Item->status : '' );
+		// Get those statuses which are not allowed for the current User to edit comment in this blog:
+		$restricted_statuses = get_restricted_statuses( $blog, 'blog_comment!', 'edit', $current_status, $restrict_max_allowed_status );
 
 		$status_order = get_visibility_statuses( 'ordered-array' );
 		$status_index = get_visibility_statuses( 'ordered-index', array( 'redirected' ) );
@@ -2015,7 +2022,14 @@ class Comment extends DataObject
 		while( !$has_perm && ( $publish ? ( $curr_index < 4 ) : ( $curr_index > 0 ) ) )
 		{ // Check until the user has permission or there is no more status to check
 			$curr_index = $publish ? ( $curr_index + 1 ) : ( $curr_index - 1 );
-			$has_perm = $current_User->check_perm( 'comment!'.$status_order[$curr_index][0], 'moderate', false, $this );
+			if( in_array( $status_order[$curr_index][0], $restricted_statuses ) )
+			{	// The status is restricted for this comment by its item or collection settings:
+				$has_perm = false;
+			}
+			else
+			{	// Check if current user can moderate this comment to the next/prev status:
+				$has_perm = $current_User->check_perm( 'comment!'.$status_order[$curr_index][0], 'moderate', false, $this );
+			}
 		}
 		if( $has_perm )
 		{ // An available status has been found
@@ -2467,20 +2481,7 @@ class Comment extends DataObject
 	function get_permanent_url( $glue = '&amp;', $meta_anchor = '#' )
 	{
 		$this->get_Item();
-
-		if( $this->is_meta() )
-		{ // Meta comment is not published on front-office, Get url to back-office
-			global $admin_url;
-			if( $meta_anchor == '#' )
-			{	// Use default anchor:
-				$meta_anchor = '#'.$this->get_anchor();
-			}
-			return $admin_url.'?ctrl=items'.$glue.'blog='.$this->Item->get_blog_ID().$glue.'p='.$this->Item->ID.$glue.'comment_type=meta'.$meta_anchor;
-		}
-		else
-		{ // Normal comment
-			return $this->Item->get_single_url( 'auto', '', $glue ).'#'.$this->get_anchor();
-		}
+		return $this->Item->get_single_url( 'auto', '', $glue ).'#'.$this->get_anchor();
 	}
 
 
@@ -2799,8 +2800,10 @@ class Comment extends DataObject
 				$params[ $param_key ] = & $params[ $param_key ];
 			}
 
-			$r_params = $Plugins->trigger_event_first_true( 'RenderCommentAttachment', $params, true );
-			if( count( $r_params ) != 0 && isset( $r_params['plugin_ID'] ) )
+			// Prepare params before rendering comment attachment:
+			$Plugins->trigger_event_first_true_with_params( 'PrepareForRenderCommentAttachment', $params );
+
+			if( count( $Plugins->trigger_event_first_true( 'RenderCommentAttachment', $params ) ) != 0 )
 			{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
 				if( $link_position == 'teaser' )
 				{ // Image should be displayed above content
@@ -2813,9 +2816,6 @@ class Comment extends DataObject
 				unset( $attachments[ $index ] );
 				continue;
 			}
-
-			// Update params because they may be modified by some plugin above:
-			$params = $r_params;
 
 			if( $File->is_image() )
 			{ // File is image
@@ -4370,7 +4370,16 @@ class Comment extends DataObject
 		}
 		$class = ' class="'.trim( $class ).'"';
 
-		$url = url_add_param( $this->Item->get_permanent_url(), 'reply_ID='.$this->ID.'&amp;redir=no' ).'#form_p'.$this->Item->ID;
+		// Initialize an url to reply on comment:
+		if( is_admin_page() )
+		{	// for back-office:
+			global $admin_url;
+			$url = $admin_url.'?ctrl=items&amp;blog='.$this->Item->Blog->ID.'&amp;p='.$this->Item->ID.( $this->is_meta() ? '&amp;comment_type=meta' : '' ).'&amp;reply_ID='.$this->ID.'#comment_checkchanges';
+		}
+		else
+		{	// for front-office:
+			$url = url_add_param( $this->Item->get_permanent_url(), 'reply_ID='.$this->ID.( $this->is_meta() ? '&amp;comment_type=meta' : '' ).'&amp;redir=no' ).'#'.( $this->is_meta() ? 'meta_' : '' ).'form_p'.$this->Item->ID;
+		}
 
 		echo $before;
 
@@ -4605,15 +4614,19 @@ class Comment extends DataObject
 
 		$commented_Item = & $this->get_Item();
 
-		// Do not restrict if meta comment and user has the proper permission. Change meta comment status to 'protected'.
-		if( $this->is_meta() && $commented_Item &&
-		    ! $current_User->check_perm( 'meta_comment', 'view', false, $commented_Item ) )
-		{
-			$comment_allowed_status = 'protected';
+		if( $this->is_meta() )
+		{	// Meta comment:
+			if( ! is_logged_in() || ( $commented_Item && ! $current_User->check_perm( 'meta_comment', 'view', false, $commented_Item->get_blog_ID() ) ) )
+			{	// Change meta comment status to 'protected' if user has no perm to view them:
+				$comment_allowed_status = 'protected';
+			}
+			else
+			{	// Do not restrict if meta comment and user has the proper permission:
+				$comment_allowed_status = $current_status;
+			}
 		}
 		else
-		{
-			// Restrict status to max allowed by parent item:
+		{	// Restrict status of normal comment to max allowed by parent item:
 			$comment_allowed_status = $this->get_allowed_status();
 			if( empty( $comment_allowed_status ) && $commented_Item && ( $item_Blog = & $commented_Item->get_Blog() ) )
 			{	// If min allowed status is not found then use what default status is allowed:
@@ -4629,7 +4642,7 @@ class Comment extends DataObject
 		{	// Only change status to update it on the edit forms and Display a warning:
 			$this->status = $comment_allowed_status;
 
-			if( $current_status != $this->get( 'status' ) )
+			if( $current_status != $this->get( 'status' ) && ! $this->is_meta() )
 			{	// If current comment status cannot be used because it is restricted by parent item:
 				global $Messages;
 

@@ -85,7 +85,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 		$Form->hidden_ctrl();
 		$Form->button_input( array(
 				'tag'   => 'button',
-				'value' => get_icon( 'filter' ).' '.T_('Filter'),
+				'value' => get_icon( 'filter' ).' './* TRANS: Verb */ T_('Filter'),
 				'class' => 'search btn-info pull-right',
 			) );
 
@@ -324,7 +324,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 		echo '<br />';
 		$Form->button_input( array(
 				'tag'   => 'button',
-				'value' => get_icon( 'filter' ).' '.T_('Filter'),
+				'value' => get_icon( 'filter' ).' './* TRANS: Verb */ T_('Filter'),
 				'class' => 'search btn-info',
 			) );
 

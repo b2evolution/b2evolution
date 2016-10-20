@@ -497,10 +497,6 @@ if( $inskin && !empty( $Blog ) )
 	exit(0);
 }
 
-// Load jQuery library and functions to work with ajax response
-require_js( '#jquery#' );
-require_js( 'ajax.js' );
-
 // Display reg form:
 require $adminskins_path.'login/_reg_form.main.php';
 

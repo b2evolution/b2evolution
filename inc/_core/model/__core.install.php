@@ -238,8 +238,12 @@ $schema_queries = array(
 		"CREATE TABLE T_locales (
 			loc_locale varchar(20) NOT NULL default '',
 			loc_datefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'y-m-d',
+			loc_longdatefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'Y-m-d',
+			loc_extdatefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'Y M d',
+			loc_input_datefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'Y-m-d',
 			loc_timefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'H:i:s',
 			loc_shorttimefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'H:i',
+			loc_input_timefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'H:i:s',
 			loc_startofweek TINYINT UNSIGNED NOT NULL DEFAULT 1,
 			loc_name varchar(40) NOT NULL default '',
 			loc_messages varchar(20) NOT NULL default '',
@@ -286,7 +290,7 @@ $schema_queries = array(
 		'Creating plugins table',
 		"CREATE TABLE T_plugins (
 			plug_ID              INT(11) UNSIGNED NOT NULL auto_increment,
-			plug_priority        TINYINT NOT NULL default 50,
+			plug_priority        TINYINT UNSIGNED NOT NULL default 50,
 			plug_classname       VARCHAR(40) COLLATE ascii_general_ci NOT NULL default '',
 			plug_code            VARCHAR(32) COLLATE ascii_general_ci NULL,
 			plug_version         VARCHAR(42) COLLATE ascii_general_ci NOT NULL default '0',

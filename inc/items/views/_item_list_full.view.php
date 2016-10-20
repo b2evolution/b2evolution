@@ -354,7 +354,7 @@ while( $Item = & $ItemList->get_item() )
 		if( $action == 'view' )
 		{ // We are looking at a single post, include files and comments:
 
-			if( $comment_type == 'meta' && ! $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
+			if( $comment_type == 'meta' && ! $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 			{ // Current user cannot views meta comments
 				$comment_type = 'feedback';
 			}
@@ -393,7 +393,7 @@ while( $Item = & $ItemList->get_item() )
 			}
 			echo '</div>';
 
-			if( $current_User->check_perm( 'meta_comment', 'view', false, $Item ) )
+			if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 			{ // Display tabs to switch between user and meta comments Only if current user can views meta comments
 				$switch_comment_type_url = $admin_url.'?ctrl=items&amp;blog='.$blog.'&amp;p='.$Item->ID;
 				$metas_count = generic_ctp_number( $Item->ID, 'metas', 'total' );
@@ -444,26 +444,12 @@ while( $Item = & $ItemList->get_item() )
 				$expiry_statuses[] = 'expired';
 			}
 
-			global $CommentList;
-			$CommentList = new CommentList2( $Blog );
-
-			// Filter list:
-			$CommentList->set_filters( array(
-				'types' => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment','trackback','pingback' ),
-				'statuses' => $statuses,
-				'order' => $comment_type == 'meta' ? 'DESC' : 'ASC',
-				'post_ID' => $Item->ID,
-				'comments' => $UserSettings->get( 'results_per_page' ),
-				'page' => $currentpage,
-				'expiry_statuses' => $expiry_statuses,
-			) );
-			$CommentList->query();
-
 			// We do not want to comment actions use new redirect
 			param( 'save_context', 'boolean', false );
 			param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$Item->ID, '&' ), false, true );
 			param( 'item_id', 'integer', $Item->ID );
 			param( 'show_comments', 'string', $show_comments, false, true );
+			$comment_reply_ID = param( 'reply_ID', 'integer', 0 );
 
 			// Display status filter
 			?>
@@ -509,32 +495,28 @@ while( $Item = & $ItemList->get_item() )
 				}
 			}
 
-			// comments_container value shows, current Item ID
+			// Display comments of the viewed Item:
 			echo '<div id="comments_container" value="'.$Item->ID.'" class="evo_comments_container">';
-			// display comments
-			$CommentList->display_if_empty( array(
-					'before'    => '<div class="evo_comment"><p>',
-					'after'     => '</p></div>',
-					'msg_empty' => T_('No feedback for this post yet...'),
-				) );
+			echo_item_comments( $blog, $Item->ID, $statuses, $currentpage, NULL, array(), '', $expiry_statuses, $comment_type );
+			echo '</div>';
 
-			require $inc_path.'comments/views/_comment_list.inc.php';
-			echo '</div>'; // comments_container div
-
-			if( ( $comment_type == 'meta' && $current_User->check_perm( 'meta_comment', 'add', false, $Item ) ) // User can add meta comment on the Item
+			if( ( $comment_type == 'meta' && $current_User->check_perm( 'meta_comment', 'add', false, $Blog->ID ) ) // User can add meta comment on the Item
 			    || $Item->can_comment() ) // User can add standard comment
 			{
 
 			// Try to get a previewed Comment and check if it is for current viewed Item:
-			$preview_Comment = $Session->get( 'core.preview_Comment' );
+			$preview_Comment = get_comment_from_session( 'preview', $comment_type );
 			$preview_Comment = ( empty( $preview_Comment ) || $preview_Comment->item_ID != $Item->ID ) ? false : $preview_Comment;
 
 			if( $preview_Comment )
-			{	// Display a previewed comment:
-				echo '<h4 class="text-warning">'.T_('PREVIEW Comment:').'</h4>';
-				echo '<div class="evo_comments_container">';
-				echo_comment( $preview_Comment );
-				echo '</div>';
+			{	// If preview comment is displayed currently
+
+				if( empty( $comment_reply_ID ) || empty( $preview_Comment->in_reply_to_cmt_ID ) )
+				{	// Display a previewed comment under all comments only if it is not replied on any other comment:
+					echo '<div class="evo_comments_container">';
+					echo_comment( $preview_Comment );
+					echo '</div>';
+				}
 
 				// Display the error message again after preview of comment:
 				$Messages->add( T_('This is a preview only! Do not forget to send your comment!'), 'error' );
@@ -559,21 +541,36 @@ while( $Item = & $ItemList->get_item() )
 				$checked_attachments = $Comment->checked_attachments;
 				// Get what renderer checkboxes were selected on form:
 				$comment_renderers = explode( '.', $Comment->get( 'renderers' ) );
-
-				// Delete any preview comment from session data:
-				$Session->delete( 'core.preview_Comment' );
 			}
 			else
 			{	// Create new Comment:
-				$Comment = new Comment();
+				if( ( $Comment = get_comment_from_session( 'unsaved', $comment_type ) ) === NULL )
+				{	// There is no saved Comment in Session
+					$Comment = new Comment();
+					$comment_attachments = '';
+					$checked_attachments = '';
+				}
+				else
+				{	// Get params from Session:
+					// comment_attachments contains all file IDs that have been attached
+					$comment_attachments = $Comment->preview_attachments;
+					// checked_attachments contains all attachment file IDs which checkbox was checked in
+					$checked_attachments = $Comment->checked_attachments;
+				}
 				$comment_content = $Comment->get( 'content' );
-				$comment_attachments = '';
 				$comment_renderers = $Comment->get_renderers();
 			}
 
 			$Form = new Form( get_htsrv_url().'comment_post.php', 'comment_checkchanges', 'post', NULL, 'multipart/form-data' );
 
 			$Form->begin_form( 'evo_form evo_form__comment '.( $comment_type == 'meta' ? ' evo_form__comment_meta' : '' ) );
+
+			if( ! empty( $comment_reply_ID ) )
+			{
+				$Form->hidden( 'reply_ID', $comment_reply_ID );
+				// Display a link to scroll back up to replying comment:
+				echo '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$Item->Blog->ID.'&amp;p='.$Item->ID.'&amp;reply_ID='.$comment_reply_ID.'#c'.$comment_reply_ID.'" class="comment_reply_current" rel="'.$comment_reply_ID.'">'.T_('You are currently replying to a specific comment').'</a>';
+			}
 
 			if( $comment_type == 'meta' )
 			{
@@ -583,11 +580,11 @@ while( $Item = & $ItemList->get_item() )
 			$Form->add_crumb( 'comment' );
 			$Form->hidden( 'comment_item_ID', $Item->ID );
 			$Form->hidden( 'comment_type', $comment_type );
-			$Form->hidden( 'redirect_to', $ReqURI );
+			$Form->hidden( 'redirect_to', $admin_url.'?ctrl=items&blog='.$Item->Blog->ID.'&p='.$Item->ID.'&comment_type='.$comment_type );
 
 			$Form->info( T_('User'), $current_User->get_identity_link( array( 'link_text' => 'name' ) ).' '.get_user_profile_link( ' [', ']', T_('Edit profile') )  );
 
-			if( $Item->can_rate() )
+			if( $comment_type != 'meta' && $Item->can_rate() )
 			{	// Comment rating:
 				ob_start();
 				$Comment->rating_input( array( 'item_ID' => $Item->ID ) );

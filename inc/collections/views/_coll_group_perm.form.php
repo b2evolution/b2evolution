@@ -47,7 +47,7 @@ $SQL->SELECT( $edited_Blog->ID.' AS blog_ID, grp_ID, grp_name, grp_usage, grp_le
 	. 'bloggroup_perm_delcmts, bloggroup_perm_recycle_owncmts, bloggroup_perm_vote_spam_cmts, bloggroup_perm_cmtstatuses + 0 as perm_cmtstatuses, bloggroup_perm_edit_cmt,'
 	. 'bloggroup_perm_delpost, bloggroup_perm_edit_ts, bloggroup_perm_meta_comment, bloggroup_perm_cats,'
 	. 'bloggroup_perm_properties, bloggroup_perm_admin, bloggroup_perm_media_upload,'
-	. 'bloggroup_perm_media_browse, bloggroup_perm_media_change,'
+	. 'bloggroup_perm_media_browse, bloggroup_perm_media_change, bloggroup_perm_analytics,'
 	. 'IF( ( grp_perm_blogs = "viewall" OR grp_perm_blogs = "editall" ), 1, bloggroup_ismember ) AS bloggroup_ismember' );
 $SQL->FROM( 'T_groups' );
 $SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON ( grp_ID = bloggroup_group_ID AND bloggroup_blog_ID = '.$edited_Blog->ID.' )' );

@@ -89,7 +89,7 @@ switch( $action )
 				$Settings->set( 'notification_logo',  param( 'notification_logo', 'string', '' ) );
 				break;
 
-			case 'renderers':
+			case 'plugins':
 				// Update email renderers settings:
 				load_funcs('plugins/_plugin.funcs.php');
 
@@ -551,7 +551,7 @@ switch( $tab )
 
 		if( empty( $tab3 ) )
 		{	// Default tab3 for this case:
-			$tab3 = 'renderers';
+			$tab3 = 'plugins';
 		}
 
 		switch( $tab3 )
@@ -582,12 +582,15 @@ switch( $tab )
 				$AdminUI->set_page_manual_link( 'email-other-settings' );
 				break;
 
-			case 'renderers':
+			case 'plugins':
 			default:
-				$AdminUI->breadcrumbpath_add( T_('Renderers'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( T_('Plugins'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
-				$AdminUI->set_page_manual_link( 'email-renderers-settings' );
+				$AdminUI->set_page_manual_link( 'email-plugins-settings' );
+
+				// Initialize JS for color picker field on the edit plugin settings form:
+				init_colorpicker_js();
 				break;
 		}
 
@@ -692,7 +695,7 @@ switch( $tab )
 				$AdminUI->disp_view( 'tools/views/_email_other.form.php' );
 				break;
 
-			case 'renderers':
+			case 'plugins':
 			default:
 				$AdminUI->disp_view( 'tools/views/_email_renderers.form.php' );
 		}

@@ -151,6 +151,12 @@ switch( $action )
 		// What form button has been pressed?
 		param( 'save', 'string', '' );
 		$exit_after_save = ( $action != 'update_edit' && $action != 'extract_tags' );
+
+		if( $action == 'update_edit' )
+		{	// Get params to restore height and scroll position of item content field:
+			param( 'content_height', 'integer', 0 );
+			param( 'content_scroll', 'integer', 0 );
+		}
 		break;
 
 	case 'update_type':
@@ -386,6 +392,23 @@ switch( $action )
 		$UserSettings->set( 'show_quick_publish_'.$blog, ( $action == 'show_quick_button' ? 1 : 0 ) );
 		$UserSettings->dbupdate();
 
+		$prev_action = param( 'prev_action', 'string', '' );
+		$item_ID = param( 'p', 'integer', 0 );
+
+		// REDIRECT / EXIT
+		header_redirect( $admin_url.'?ctrl=items&action='.$prev_action.( $item_ID > 0 ? '&p='.$item_ID : '' ).'&blog='.$blog );
+		break;
+
+	case 'hide_wysiwyg_warning':
+	case 'show_wysiwyg_warning':
+		// Show/hide warning when switching from markup to WYSIWYG
+		$Session->assert_received_crumb( 'item' );
+
+		// Check that this action request is not a CSRF hacked request:
+		$UserSettings->set( 'show_wysiwyg_warning_'.$blog, ( $action == 'show_wysiwyg_warning' ? 1: 0 ) );
+		$UserSettings->dbupdate();
+
+		// Update setting:
 		$prev_action = param( 'prev_action', 'string', '' );
 		$item_ID = param( 'p', 'integer', 0 );
 
@@ -866,20 +889,20 @@ switch( $action )
 		// We want to highlight the edited object on next list display:
 		$Session->set( 'fadeout_array', array( 'item-'.$edited_Item->ID ) );
 
-		if( $edited_Item->status == 'published' &&
+		if( $edited_Item->status != 'redirected' &&
 		    ! strpos( $redirect_to, 'tab=tracker' ) &&
 		    ! strpos( $redirect_to, 'tab=manual' ) )
-		{	// Where to go after publishing the post?
+		{	// Where to go after creating the post?
 			// yura> When a post is created from "workflow" or "manual" we should display a post list
 
-			// Where do we want to go after publishing?
-			if( $edited_Item->Blog->get_setting( 'enable_goto_blog' ) == 'blog' )
-			{	// go to blog:
+			// Where do we want to go after creating?
+			if( $edited_Item->Blog->get_setting( 'enable_goto_blog' ) == 'blog' && $edited_Item->can_be_displayed() )
+			{	// Redirect to collection home page ONLY if current user can view it:
 				$edited_Item->load_Blog();
 				$redirect_to = $edited_Item->Blog->gen_blogurl();
 			}
-			elseif( $edited_Item->Blog->get_setting( 'enable_goto_blog' ) == 'post' )
-			{	// redirect to post page:
+			elseif( $edited_Item->Blog->get_setting( 'enable_goto_blog' ) == 'post' && $edited_Item->can_be_displayed() )
+			{	// Redirect to item page to view new created item ONLY if current user can view it:
 				$redirect_to = $edited_Item->get_permanent_url();
 			}
 			else// 'no'
@@ -889,9 +912,9 @@ switch( $action )
 			}
 		}
 
-		if( $redirect_to !== NULL ) 
-		{	// The redirect url was NOT set to NULL ( $blog_redirect_setting == 'no' ) 
-	 
+		if( $redirect_to !== NULL )
+		{	// The redirect url was NOT set to NULL ( $blog_redirect_setting == 'no' )
+
 			// TRY TO REDIRECT / EXIT
 			header_redirect( $redirect_to, 303, false, true /* RETURN if forbidden */ );
 
@@ -945,9 +968,6 @@ switch( $action )
 		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
 		// Check permission on post type: (also verifies that post type is enabled and NOT reserved)
 		check_perm_posttype( $item_typ_ID, $post_extracats );
-
-		// Is this post publishing right now?
-		$is_publishing = ( $edited_Item->get( 'status' ) != 'published' && $post_status == 'published' );
 
 		// UPDATE POST:
 		// Set the params we already got:
@@ -1043,7 +1063,7 @@ switch( $action )
 			break;
 		}
 
-		// Where to go after publishing the post?
+		// Where to go after editing the post?
 		if( $edited_Item->status == 'redirected' ||
 		    strpos( $redirect_to, 'tab=tracker' ) )
 		{ // We should show the posts list if:
@@ -1055,23 +1075,18 @@ switch( $action )
 		{	// Use the original $redirect_to if a post is updated from "manual" view tab:
 			$blog_redirect_setting = 'orig';
 		}
-		elseif( $is_publishing )
-		{	// The post's last status wasn't "published", but we're going to publish it now:
-			$edited_Item->load_Blog();
-			$blog_redirect_setting = $edited_Item->Blog->get_setting( 'enable_goto_blog' );
-		}
 		else
-		{ // The post was changed
+		{	// The post was changed:
 			$blog_redirect_setting = $edited_Item->Blog->get_setting( 'editing_goto_blog' );
 		}
 
-		if( $blog_redirect_setting == 'blog' )
-		{ // go to blog:
+		if( $blog_redirect_setting == 'blog' && $edited_Item->can_be_displayed() )
+		{	// Redirect to collection home page ONLY if current user can view it:
 			$edited_Item->load_Blog();
 			$redirect_to = $edited_Item->Blog->gen_blogurl();
 		}
-		elseif( $blog_redirect_setting == 'post' )
-		{ // redirect to post page:
+		elseif( $blog_redirect_setting == 'post' && $edited_Item->can_be_displayed() )
+		{	// Redirect to item page to view new created item ONLY if current user can view it:
 			$redirect_to = $edited_Item->get_permanent_url();
 		}
 		elseif( $blog_redirect_setting == 'orig' )
@@ -1085,9 +1100,9 @@ switch( $action )
 			$redirect_to = NULL;
 		}
 
-		if( $redirect_to !== NULL ) 
-		{	// The redirect url was NOT set to NULL ( $blog_redirect_setting == 'no' ) 
-	 
+		if( $redirect_to !== NULL )
+		{	// The redirect url was NOT set to NULL ( $blog_redirect_setting == 'no' )
+
 			// TRY TO REDIRECT / EXIT
 			header_redirect( $redirect_to, 303, false, true /* RETURN if forbidden */ );
 
@@ -1349,13 +1364,13 @@ switch( $action )
 		{ // We clicked publish button from the front office
 			header_redirect( $redirect_to );
 		}
-		elseif( $edited_Item->Blog->get_setting( 'enable_goto_blog' ) == 'blog' )
-		{	// Redirect to blog:
+		elseif( $edited_Item->Blog->get_setting( 'enable_goto_blog' ) == 'blog' && $edited_Item->can_be_displayed() )
+		{	// Redirect to collection home page ONLY if current user can view it:
 			$edited_Item->load_Blog();
 			header_redirect( $edited_Item->Blog->gen_blogurl() );
 		}
-		elseif( $edited_Item->Blog->get_setting( 'enable_goto_blog' ) == 'post' )
-		{	// Redirect to post page:
+		elseif( $edited_Item->Blog->get_setting( 'enable_goto_blog' ) == 'post' && $edited_Item->can_be_displayed() )
+		{	// Redirect to item page to view new created item ONLY if current user can view it:
 			header_redirect( $edited_Item->get_permanent_url() );
 		}
 		else// 'no'
@@ -1785,7 +1800,6 @@ if( ( isset( $tab ) && in_array( $tab, array( 'full', 'type', 'tracker' ) ) ) ||
 
 // Load the appropriate blog navigation styles (including calendar, comment forms...):
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
-require_js( 'communication.js' ); // auto requires jQuery
 init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 
 /* fp> I am disabling this. We haven't really used per-blof styles yet and at the moment it creates interference with boostrap Admin

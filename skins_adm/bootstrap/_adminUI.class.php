@@ -139,7 +139,7 @@ class AdminUI extends AdminUI_general
 							 <span class="icon-bar"></span>
 						</button>
 						<a class="navbar-brand" href="'.$admin_url.'?ctrl=dashboard"'
-								.( $Settings->get( 'site_color' ) != '' ? 'style="color:'.$Settings->get( 'site_color' ).'"' : '' ).'>'
+								.( $Settings->get( 'site_color' ) != '' ? ' style="color:'.$Settings->get( 'site_color' ).'"' : '' ).'>'
 							.$Settings->get( 'site_code' )
 						.'</a>
 				 </div>

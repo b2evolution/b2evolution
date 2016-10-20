@@ -358,6 +358,7 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 									'perm_media_upload'    => 0,
 									'perm_media_browse'    => 0,
 									'perm_media_change'    => 0,
+									'perm_analytics'       => 0,
 								) );
 							break;
 
@@ -384,6 +385,7 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 									'perm_media_upload'    => 1,
 									'perm_media_browse'    => 1,
 									'perm_media_change'    => 1,
+									'perm_analytics'       => 0,
 								) );
 							break;
 
@@ -410,6 +412,7 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 									'perm_media_upload'    => 1,
 									'perm_media_browse'    => 1,
 									'perm_media_change'    => 1,
+									'perm_analytics'       => 1,
 								) );
 							break;
 					}
@@ -420,7 +423,7 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 							bloguser_perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit, bloguser_perm_delpost, bloguser_perm_edit_ts,
 							bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts, bloguser_perm_cmtstatuses,
 							bloguser_perm_edit_cmt, bloguser_perm_cats, bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,
-							bloguser_perm_media_browse, bloguser_perm_media_change )
+							bloguser_perm_media_browse, bloguser_perm_media_change, bloguser_perm_analytics )
 						VALUES ( '.implode( '), (', $adv_perm_coll_insert_values ).' )' );
 				}
 			}

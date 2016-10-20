@@ -353,9 +353,6 @@ switch( $content_mode )
 			echo $params['content_end_full_text'];
 		}
 
-		// Display location info
-		$Item->location( '<div class="evo_post_location"><strong>'.T_('Location').': </strong>', '</div>' );
-
 		echo $params['content_end_full'];
 
 }

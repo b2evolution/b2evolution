@@ -167,10 +167,12 @@ function blog_update_perms( $object_ID, $context = 'user' )
 		$perm_media_browse = param( 'blog_perm_media_browse_'.$loop_ID, 'integer', 0 );
 		$perm_media_change = param( 'blog_perm_media_change_'.$loop_ID, 'integer', 0 );
 
+		$perm_analytics = param( 'blog_perm_analytics_'.$loop_ID, 'integer', 0 );
+
 		// Update those permissions in DB:
 
 		if( $ismember || $can_be_assignee || count($perm_post) || $perm_delpost || $perm_edit_ts || $perm_delcmts || $perm_recycle_owncmts || $perm_vote_spam_comments || $perm_cmtstatuses ||
-			$perm_meta_comments || $perm_cats || $perm_properties || $perm_admin || $perm_media_upload || $perm_media_browse || $perm_media_change )
+			$perm_meta_comments || $perm_cats || $perm_properties || $perm_admin || $perm_media_upload || $perm_media_browse || $perm_media_change || $perm_analytics )
 		{ // There are some permissions for this user:
 			$ismember = 1;	// Must have this permission
 
@@ -180,7 +182,7 @@ function blog_update_perms( $object_ID, $context = 'user' )
 																$perm_delpost, $perm_edit_ts, $perm_delcmts, $perm_recycle_owncmts, $perm_vote_spam_comments, $perm_cmtstatuses,
 																".$DB->quote( $perm_edit_cmt ).",
 																$perm_meta_comments, $perm_cats, $perm_properties, $perm_admin, $perm_media_upload,
-																$perm_media_browse, $perm_media_change )";
+																$perm_media_browse, $perm_media_change, $perm_analytics )";
 		}
 	}
 
@@ -191,7 +193,7 @@ function blog_update_perms( $object_ID, $context = 'user' )
 											{$prefix}perm_poststatuses, {$prefix}perm_item_type, {$prefix}perm_edit, {$prefix}perm_delpost, {$prefix}perm_edit_ts,
 											{$prefix}perm_delcmts, {$prefix}perm_recycle_owncmts, {$prefix}perm_vote_spam_cmts, {$prefix}perm_cmtstatuses, {$prefix}perm_edit_cmt,
 											{$prefix}perm_meta_comment, {$prefix}perm_cats, {$prefix}perm_properties, {$prefix}perm_admin,
-											{$prefix}perm_media_upload, {$prefix}perm_media_browse, {$prefix}perm_media_change )
+											{$prefix}perm_media_upload, {$prefix}perm_media_browse, {$prefix}perm_media_change, {$prefix}perm_analytics )
 									VALUES ".implode( ',', $inserted_values ) );
 	}
 
@@ -963,7 +965,11 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 		$blog_ids = $blog;
 	}
 
-	if( is_array( $blog_ids ) )
+	if( $blog_ids == '*' )
+	{
+		$where_cat_clause = '1';
+	}
+	elseif( is_array( $blog_ids ) )
 	{ // Get quoted ID list
 		$where_cat_clause = 'cat_blog_ID IN ( '.$DB->quote( $blog_ids ).' )';
 	}
@@ -983,7 +989,11 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__item ON itag_itm_ID = post_ID' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
-	$tags_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
+
+	if( $blog_ids != '*' || $skip_intro_posts )
+	{
+		$tags_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
+	}
 
 	$tags_SQL->WHERE( $where_cat_clause );
 	$tags_SQL->WHERE_and( 'post_status IN ("'.implode( '", "', $post_statuses ).'")' );

@@ -79,7 +79,7 @@ switch( $Comment->get( 'type' ) )
 	case 'meta': // Display a meta comment:
 		if( $Comment->is_meta() )
 		{	// Meta comment:
-			echo '<span class="badge badge-info">'.$comment_template_counter.'</span> ';
+			echo '<span class="badge badge-info">'.( $comment_template_counter < 0 ? 0 : $comment_template_counter ).'</span> ';
 		}
 
 		if( empty($Comment->ID) )

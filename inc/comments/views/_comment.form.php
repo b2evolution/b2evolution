@@ -37,7 +37,7 @@ $Form->switch_template_parts(
 		'inputstart_checkbox' => '<div class="controls col-lg-8 col-md-8 col-sm-9"><div class="checkbox"><label>' )
 );
 
-$link_attribs = array( 'style' => 'margin-left:3ex', 'class' => 'btn btn-sm btn-default action_icon' ); // Avoid misclicks by all means!
+$link_attribs = array( 'style' => 'margin-left:1ex', 'class' => 'btn btn-sm btn-default action_icon' ); // Avoid misclicks by all means!
 if( $current_User->check_perm( 'blog_post!draft', 'edit', false, $Blog->ID ) )
 {
 	$Form->global_icon( T_( 'Post as a quote' ), 'elevate', '?ctrl=comments&amp;action=elevate&amp;type=quote&amp;comment_ID='.$edited_Comment->ID.'&amp;'.url_crumb('comment'),
@@ -199,8 +199,8 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 <?php
 	// ####################### RATING #########################
-	if( $comment_Item->can_rate()
-		|| !empty( $edited_Comment->rating ) )
+	if( ! $edited_Comment->is_meta() &&
+	    ( $comment_Item->can_rate() || !empty( $edited_Comment->rating ) ) )
 	{	// Rating is editable
 		$Form->begin_fieldset( T_('Rating'), array( 'id' => 'cmntform_rating', 'fold' => true ) );
 

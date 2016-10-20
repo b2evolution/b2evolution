@@ -2073,6 +2073,7 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 				'blog_media_upload'       => $row[$prefix.'_perm_media_upload'],
 				'blog_media_browse'       => $row[$prefix.'_perm_media_browse'],
 				'blog_media_change'       => $row[$prefix.'_perm_media_change'],
+				'blog_analytics'          => $row[$prefix.'_perm_analytics'],
 			);
 	}
 
@@ -2102,6 +2103,7 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 						'blog_media_upload'       => 0,
 						'blog_media_browse'       => 0,
 						'blog_media_change'       => 0,
+						'blog_analytics'          => 0,
 					);
 			}
 		}
@@ -2137,10 +2139,9 @@ function check_blog_advanced_perm( & $blog_perms, $user_ID, $permname, $permleve
 	switch( $permname )
 	{
 		case 'stats':
-			// Wiewing stats is the same perm as being authorized to edit properties: (TODO...)
-			if( $permlevel == 'view' )
-			{
-				return $blog_perms['blog_properties'];
+			if( $permlevel == 'view' || $permlevel == 'list' )
+			{	// If current user has a permission to view the collection:
+				return $blog_perms['blog_analytics'];
 			}
 			// No other perm can be granted here (TODO...)
 			return false;
@@ -2203,7 +2204,13 @@ function check_blog_advanced_perm( & $blog_perms, $user_ID, $permname, $permleve
 			break;
 
 		case 'meta_comment':
-			return $blog_perms['blog_meta_comment'];
+			$edit_permname = 'blog_edit_cmt';
+			$perm = $blog_perms['blog_meta_comment'];
+			if( ! empty( $perm_target ) )
+			{
+				$Comment = & $perm_target;
+				$creator_user_ID = $Comment->author_user_ID;
+			}
 			break;
 
 		case 'files':
@@ -2312,6 +2319,50 @@ function check_blog_advanced_perm( & $blog_perms, $user_ID, $permname, $permleve
 
 
 /**
+ * Check if at least one collection has a permission for given target
+ *
+ * @param string Permission name
+ * @param string Target type: 'user', 'group'
+ * @param integer Target ID
+ * @return boolean
+ */
+function check_coll_first_perm( $perm_name, $target_type, $target_ID )
+{
+	global $DB;
+
+	if( empty( $target_ID ) )
+	{	// Target ID must be defined:
+		return false;
+	}
+
+	switch( $target_type )
+	{
+		case 'user':
+			$table = 'T_coll_user_perms';
+			$field_perm_name = 'bloguser_'.$perm_name;
+			$field_ID_name = 'bloguser_user_ID';
+			break;
+
+		case 'group':
+			$table = 'T_coll_group_perms';
+			$field_perm_name = 'bloggroup_'.$perm_name;
+			$field_ID_name = 'bloggroup_group_ID';
+			break;
+	}
+
+	// Try to find first collection that has a requested permission:
+	$SQL = new SQL( 'Check if '.$target_type.' #'.$target_ID.' has at least one collection with permission ['.$perm_name.']' );
+	$SQL->SELECT( $field_perm_name );
+	$SQL->FROM( $table );
+	$SQL->WHERE( $field_ID_name.' = '.$target_ID );
+	$SQL->WHERE_and( $field_perm_name.' = 1' );
+	$SQL->LIMIT( 1 );
+
+	return (bool)$DB->get_var( $SQL->get(), 0 , NULL, $SQL->title );
+}
+
+
+/**
  * Display user edit forms action icons
  *
  * @param object Widget(Form,Table,Results) where to display
@@ -2324,6 +2375,8 @@ function echo_user_actions( $Widget, $edited_User, $action )
 
 	if( $edited_User->ID != 0 )
 	{ // show these actions only if user already exists
+		$link_attribs = array( 'style' => 'margin-left:1ex', 'class' => 'btn btn-sm btn-default action_icon' );
+
 		if( $current_User->ID != $edited_User->ID && $current_User->check_status( 'can_report_user' ) )
 		{
 			global $user_tab;
@@ -2338,17 +2391,22 @@ function echo_user_actions( $Widget, $edited_User, $action )
 				$report_text_title = $report_text = T_('You have reported this user');
 				$report_text = '<span class="red">'.$report_text.'</span>';
 			}
-			$Widget->global_icon( $report_text_title, 'warning_yellow', $admin_url.'?ctrl=user&amp;user_tab=report&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.$report_text, 3, 4, array( 'onclick' => 'return user_report( '.$edited_User->ID.', \''.( empty( $user_tab ) ? 'profile' : $user_tab ).'\')' ) );
+			$report_user_link_attribs = array_merge( $link_attribs, array( 'onclick' => 'return user_report( '.$edited_User->ID.', \''.( empty( $user_tab ) ? 'profile' : $user_tab ).'\')' ) );
+			$Widget->global_icon( $report_text_title, 'warning_yellow', $admin_url.'?ctrl=user&amp;user_tab=report&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.$report_text, 3, 4, $report_user_link_attribs );
 		}
 		if( ( $current_User->check_perm( 'users', 'edit', false ) ) && ( $current_User->ID != $edited_User->ID )
 			&& ( $edited_User->ID != 1 ) )
 		{
-			$Widget->global_icon( T_('Delete this user!'), 'delete', $admin_url.'?ctrl=users&amp;action=delete&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete'), 3, 4  );
-			$Widget->global_icon( T_('Delete this user as spammer!'), 'delete', $admin_url.'?ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete spammer'), 3, 4  );
+			$Widget->global_icon( T_('Delete this user!'), 'delete', $admin_url.'?ctrl=users&amp;action=delete&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete'), 3, 4, $link_attribs  );
+			$Widget->global_icon( T_('Delete this user as spammer!'), 'delete', $admin_url.'?ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete spammer'), 3, 4, $link_attribs );
+		}
+		if( $current_User->check_perm( 'files', 'all', false ) )
+		{
+			$Widget->global_icon( T_('Files...'), 'folder', $admin_url.'?ctrl=files&root=user_'.$current_User->ID.'&new_root=user_'.$edited_User->ID, ' '.T_('Files...'), 3, 4, $link_attribs );
 		}
 		if( $edited_User->get_msgform_possibility( $current_User ) )
 		{
-			$Widget->global_icon( T_('Compose message'), 'comments', $admin_url.'?ctrl=threads&action=new&user_login='.$edited_User->login );
+			$Widget->global_icon( T_('Compose message'), 'comments', $admin_url.'?ctrl=threads&action=new&user_login='.$edited_User->login, T_('Compose message'), 4, 1, $link_attribs );
 		}
 	}
 
@@ -2357,7 +2415,7 @@ function echo_user_actions( $Widget, $edited_User, $action )
 	{
 		$redirect_to = regenerate_url( 'user_ID,action,ctrl,user_tab', 'ctrl=users' );
 	}
-	$Widget->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', $redirect_to );
+	$Widget->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', $redirect_to, T_('Close'), 4 , 1, $link_attribs );
 }
 
 
@@ -2941,7 +2999,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 	global $action;
 
 	// Array contains values of the new fields from the request
-	$uf_new_fields = param( 'uf_'.$new_field_name, 'array:array:string' );
+	$uf_new_fields = param( 'uf_'.$new_field_name, 'array' );
 
 	// Type of the new field
 	global $new_field_type;
@@ -2963,7 +3021,15 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 			$Form->begin_fieldset( $userfield->ufgp_name.( is_admin_page() ? get_manual_link( 'user-profile-tab-userfields' ) : '' ) , array( 'id' => $userfield->ufgp_ID ) );
 		}
 
-		$userfield_type = ( $userfield->ufdf_type == 'text' || $userfield->ufdf_type == 'url' ) ? $userfield->ufdf_type : 'string';
+		$userfield_type = $userfield->ufdf_type;
+		if( $userfield_type == 'number' )
+		{	// Change number type of integer because we have this type name preparing in function param():
+			$userfield_type = 'integer';
+		}
+		elseif( $userfield_type != 'text' && $userfield_type != 'url' )
+		{	// Use all other params as string, Only text and url have a preparing in function param():
+			$userfield_type = 'string';
+		}
 		$uf_val = param( 'uf_'.$userfield->uf_ID, $userfield_type, NULL );
 
 		$uf_ID = $userfield->uf_ID;
@@ -2975,8 +3041,32 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 			global $$value_num;	// Used when user add a many fields with the same type
 			$$value_num = (int)$$value_num;
 			if( isset( $uf_new_fields[$userfield->ufdf_ID][$$value_num] ) )
-			{	// Get a value from submitted form
+			{	// Get a value from submitted form:
 				$uf_val = $uf_new_fields[$userfield->ufdf_ID][$$value_num];
+				switch( $userfield->ufdf_type )
+				{
+					case 'url':
+						// Format url field to valid value:
+						$uf_val = param_format( $uf_val, 'url' );
+						break;
+
+					case 'text':
+						// Format text field to valid value:
+						$uf_val = param_format( $uf_val, 'text' );
+						break;
+
+					case 'number':
+						// Format number field to valid value:
+						$uf_val = param_format( $uf_val, 'integer' );
+						break;
+
+					case 'email':
+					case 'word':
+					case 'phone':
+						// Format string fields to valid value:
+						$uf_val = param_format( $uf_val, 'string' );
+						break;
+				}
 				$$value_num++;
 			}
 		}
@@ -4183,7 +4273,7 @@ function display_user_email_status_message( $user_ID = 0 )
 	// Display info about last error only when such data exists
 	$email_last_sent_ts = ( empty( $EmailAddress ) ? '' : $EmailAddress->get( 'last_sent_ts' ) );
 	$last_error_info = empty( $email_last_sent_ts ) ? '' :
-		' '.sprintf( /* TRANS: date of last error */ T_( '(last error was detected on %s)' ), mysql2localedatetime_spans( $email_last_sent_ts, 'M-d' ) );
+		' '.sprintf( /* TRANS: date of last error */ T_( '(last error was detected on %s)' ), mysql2localedatetime_spans( $email_last_sent_ts ) );
 
 	switch( $email_status )
 	{
@@ -4279,11 +4369,12 @@ function echo_user_crop_avatar_window()
 	echo '<script type="text/javascript">
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_crop_profile_pic = \''.TS_('Crop profile picture').'\';
-		var evo_js_lang_crop = \''.TS_('Crop').'\';
+		var evo_js_lang_crop = \''.TS_('Apply').'\';
 		var evo_js_user_crop_ajax_url = \''.( is_admin_page() ? $admin_url : get_htsrv_url().'anon_async.php' ).'\';
 		var evo_js_is_backoffice = '.( is_admin_page() ? 'true' : 'false' ).';
 		var evo_js_blog = '.( isset( $blog ) ? $blog : 0 ).';
 		var evo_js_crumb_user = \''.get_crumb( 'user' ).'\';
+		evo_js_lang_close = \''.TS_('Cancel').'\';
 	</script>';
 }
 
@@ -5075,6 +5166,11 @@ function users_results_block( $params = array() )
 	$UserList->title = $params['results_title'];
 	$UserList->no_results_text = $params['results_no_text'];
 
+	if( $action == 'show_recent' )
+	{	// Reset filters to default in order to view all recent registered users:
+		set_param( 'filter', 'reset' );
+	}
+
 	$UserList->set_default_filters( $default_filters );
 	$UserList->load_from_Request();
 
@@ -5082,7 +5178,7 @@ function users_results_block( $params = array() )
 	users_results( $UserList, $params );
 
 	if( $action == 'show_recent' )
-	{ // Sort an users list by "Registered" field
+	{	// Sort an users list by "Registered" field:
 		$UserList->set_order( 'user_created_datetime' );
 	}
 

@@ -873,7 +873,7 @@ function get_icon_info( $name )
 			'fa' => 'filter'
 		);
 		case 'reset_filters': return array(
-			'alt'  => T_('Reset all filters'),
+			'alt'  => T_('Reset all filters!'),
 			'size' => array( 16, 16 ),
 			'xy' => array( 144, 112 ),
 			'glyph' => 'filter',
@@ -1049,7 +1049,23 @@ function get_icon_info( $name )
 			'xy' => array( 32, 224 ),
 			'glyph' => 'plus-sign',
 			'fa' => 'plus-circle',
-			'color' => '#0C0'
+			'color' => '#0c0'
+		);
+		case 'add__yellow': return array(
+			'alt'  => T_('Add'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 32, 224 ),
+			'glyph' => 'plus-sign',
+			'fa' => 'plus-circle',
+			'color' => '#fc0'
+		);
+		case 'add__blue': return array(
+			'alt'  => T_('Add'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 32, 224 ),
+			'glyph' => 'plus-sign',
+			'fa' => 'plus-circle',
+			'color' => '#337ab7'
 		);
 
 		case 'add__yellow': return array(

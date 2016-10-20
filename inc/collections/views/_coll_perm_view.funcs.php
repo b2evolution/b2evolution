@@ -812,7 +812,7 @@ function colls_groups_perms_results( & $Results, $params = array() )
 					'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'draft\', \''.format_to_output( T_('Permission to comment into this blog with draft status'), 'htmlattr' ).'\', \'comment\' )%'.
 					'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'deprecated\', \''.format_to_output( T_('Permission to comment into this blog with deprecated status'), 'htmlattr' ).'\', \'comment\' )%'.
 					'<span style="display: inline-block; min-width: 5px;"></span>'.
-					'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_meta_comment\', \''.format_to_output( T_('Permission to post meta comments into this blog'), 'htmlattr' ).'\' )%',
+					'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_meta_comment\', \''.format_to_output( T_('Permission to post meta comments into this collection'), 'htmlattr' ).'\' )%',
 			'td_class' => 'center nowrap',
 		);
 
@@ -879,6 +879,16 @@ function colls_groups_perms_results( & $Results, $params = array() )
 			'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_media_upload\', \''.format_to_output( T_('Permission to upload into blog\'s media folder'), 'htmlattr' ).'\' )%'.
 					'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_media_browse\', \''.format_to_output( T_('Permission to browse blog\'s media folder'), 'htmlattr' ).'\' )%'.
 					'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_media_change\', \''.format_to_output( T_('Permission to change the blog\'s media folder content'), 'htmlattr' ).'\' )%',
+			'td_class' => 'center',
+		);
+
+	// Analytics:
+	$Results->cols[] = array(
+			'th' => T_('Analytics'),
+			'th_class' => 'checkright',
+			'order' => 'bloggroup_perm_analytics',
+			'default_dir' => 'D',
+			'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_analytics\', \''.format_to_output( T_('Permission to view collection\'s analytics'), 'htmlattr' ).'\' )%',
 			'td_class' => 'center',
 		);
 

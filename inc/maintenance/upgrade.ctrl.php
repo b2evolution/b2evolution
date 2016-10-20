@@ -362,7 +362,7 @@ switch( $action )
 		}
 		else
 		{ // Old/Same version
-			echo '<div class="action_messages"><div class="log_error" style="text-align:center;font-weight:bold">'.$new_version_status.'</div></div>';
+			echo '<div class="alert '.( $new_version_status['error'] == 'old' ? 'alert-danger' : 'alert-warning' ).'">'.$new_version_status['message'].'</div>';
 		}
 
 		echo '<p>'
@@ -373,7 +373,7 @@ switch( $action )
 				.'<li>'.T_( 'A backup will be performed' ).'</li>'
 				.'<li>'.T_( 'The upgrade will be applied' ).'</li>'
 				.'<li>'.T_( 'The install script of the new version will be called' ).'</li>'
-				.'<li>'.sprintf( T_( 'The cleanup rules from %s will be applied' ), '<b>upgrade_policy.conf</b>' ).'</li>'
+				.'<li>'.sprintf( T_( 'The cleanup rules from %s will be applied' ), '<code>'.get_upgrade_config_file_name().'</code>' ).'</li>'
 				.'<li>'.T_( 'The site will switch to normal mode again at the end of the install script.' ).'</li>'
 			.'</ul></p>';
 

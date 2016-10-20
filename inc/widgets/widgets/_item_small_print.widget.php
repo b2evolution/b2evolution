@@ -127,6 +127,24 @@ class item_small_print_Widget extends ComponentWidget
 
 
 	/**
+	 * Prepare display params
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function init_display( $params )
+	{
+		global $preview;
+
+		parent::init_display( $params );
+
+		if( $preview )
+		{	// Disable block caching for this widget when item is previewed currently:
+			$this->disp_params['allow_blockcache'] = 0;
+		}
+	}
+
+
+	/**
 	 * Display the widget!
 	 *
 	 * @param array $params MUST contain at least the basic display params
@@ -179,7 +197,7 @@ class item_small_print_Widget extends ComponentWidget
 			{ // We want to display the post date:
 				$Item->issue_time( array(
 						'before'      => /* TRANS: date */ T_('This entry was posted on').' ',
-						'time_format' => 'F jS, Y',
+						'time_format' => locale_extdatefmt(),
 					) );
 				$Item->issue_time( array(
 						'before'      => /* TRANS: time */ T_('at').' ',
@@ -231,7 +249,7 @@ class item_small_print_Widget extends ComponentWidget
 
 			$Item->lastedit_user( array(
 					'before'    => T_('Last edit by').' ',
-					'after'     => /* TRANS: "on" is followed by a date here */ ' '.T_('on').' '.$Item->get_mod_date( 'F jS, Y' ),
+					'after'     => /* TRANS: "on" is followed by a date here */ ' '.T_('on').' '.$Item->get_mod_date( locale_extdatefmt() ),
 					'link_text' => 'auto',
 				) );
 

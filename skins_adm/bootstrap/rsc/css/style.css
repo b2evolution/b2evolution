@@ -356,7 +356,7 @@ div.delete_messages ul li {
 .vote_spam {
   float: left;
   padding-left: 10px;
-  line-height: 33px;
+  line-height: 34px;
 }
 .vote_spam a.action_icon {
   font-size: inherit;
@@ -369,6 +369,12 @@ div.delete_messages ul li {
 }
 .dashboard_action_area .vote_spam a.action_icon {
   font-size: 12px;
+}
+.comment_reply {
+  float: left;
+  display: inline-block;
+  margin-left: 10px;
+  line-height: 34px;
 }
 .evo_content_block span[class*="status_"] {
   left: 8px;
@@ -1608,4 +1614,16 @@ table.diff td.diff-title-addedline {
 }
 .evo_checkbox_status__meta {
   background-color: #5bc0de;
+}
+.evo_aggregate_filter {
+  white-space: nowrap;
+}
+.evo_aggregate_filter label {
+  padding-top: 5px;
+  padding-right: 5px;
+  width: auto;
+}
+.evo_aggregate_filter select {
+  display: inline;
+  width: auto;
 }

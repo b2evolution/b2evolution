@@ -921,6 +921,43 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 
 
 /**
+ * Perform a global regular expression match outside blocks <code></code>, <pre></pre> and markdown codeblocks
+ *
+ * @param string Pattern to search for
+ * @param string Content
+ * @param array Array of all matches in multi-dimensional array
+ * @return integer|boolean Number of full pattern matches (which might be zero), or FALSE if an error occurred.
+ */
+function preg_match_outcode( $search, $content, & $matches )
+{
+	if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false || strstr( $content, '`' ) !== false )
+	{	// Call preg_match_all() on everything outside code/pre and markdown codeblocks:
+		return callback_on_non_matching_blocks( $content,
+			'~(`|<(code|pre)[^>]*>).*?(\1|</\2>)~is',
+			'preg_match_outcode_callback', array( $search, & $matches ) );
+	}
+	else
+	{	// No code/pre blocks, search in the whole thing:
+		return preg_match_all( $search, $content, $matches );
+	}
+}
+
+
+/**
+ * Used for function callback_on_non_matching_blocks(), because there is different order of params
+ *
+ * @param string Pattern to search for
+ * @param string Content
+ * @param array Array of all matches in multi-dimensional array
+ * @return integer|boolean Number of full pattern matches (which might be zero), or FALSE if an error occurred.
+ */
+function preg_match_outcode_callback( $content, $search, & $matches )
+{
+	return preg_match_all( $search, $content, $matches );
+}
+
+
+/**
  * Replace content outside blocks <code></code>, <pre></pre> and markdown codeblocks
  *
  * @param array|string Search list
@@ -8144,17 +8181,20 @@ function render_inline_tags( $Object, $tags, $params = array() )
 		{
 			case 'Item':
 				$LinkOwner = new LinkItem( $Object );
-				$plugin_event_name = 'RenderItemAttachment';
+				$prepare_plugin_event_name = 'PrepareForRenderItemAttachment';
+				$render_plugin_event_name = 'RenderItemAttachment';
 				break;
 
 			case 'EmailCampaign':
 				$LinkOwner = new LinkEmailCampaign( $Object );
-				$plugin_event_name = 'RenderEmailAttachment';
+				$prepare_plugin_event_name = 'PrepareForRenderEmailAttachment';
+				$render_plugin_event_name = 'RenderEmailAttachment';
 				break;
 
 			case 'Message':
 				$LinkOwner = new LinkMessage( $Object, $temp_link_owner_ID );
-				$plugin_event_name = 'RenderMessageAttachment';
+				$prepare_plugin_event_name = 'PrepareForRenderMessageAttachment';
+				$render_plugin_event_name = 'RenderMessageAttachment';
 				break;
 
 			default:
@@ -8249,12 +8289,10 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						{ // A class name is set for the inline tags
 							$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $class_index ] ) ) );
 							if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
-							{ // Overwrite 'before_image' setting to add an extra class name
-								$current_image_params['before_image'] = '<div class="image_block '.$image_extraclass.'">';
-								// 'after_image' setting must be also defined, becuase it may be different than the default '</div>'
-								$current_image_params['after_image'] = '</div>';
+							{	// Overwrite 'before_image' setting to add an extra class name:
+								$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $image_extraclass ) );
 
-								// Set class for file inline tags
+								// Append extra class to file inline img tags:
 								$current_file_params['class'] = $image_extraclass;
 							}
 						}
@@ -8272,13 +8310,14 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						$current_image_params[ $param_key ] = & $current_image_params[ $param_key ];
 					}
 
-					// We need to assign the result of trigger_event_first_true to a variable before counting
-					// or else modifications to the params are not applied in PHP7
-					$r_params = $Plugins->trigger_event_first_true( $plugin_event_name, $current_image_params );
-					if( count( $r_params ) != 0 )
-					{	// Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r
-						if( ! $r_params['get_rendered_attachments'] )
-						{ // Restore $r value and mark this item has the rendered attachments
+					// Prepare params before rendering attachment:
+					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_image_params );
+
+					// Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r:
+					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_image_params ) ) != 0 )
+					{	// This attachment has been rendered by a plugin (to $current_image_params['data']):
+						if( ! $current_image_params['get_rendered_attachments'] )
+						{	// Restore $r value and mark this item has the rendered attachments:
 							$r = $temp_r;
 							$plugin_render_attachments = true;
 						}
@@ -8307,10 +8346,9 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						}
 					}
 					elseif( $inline_type == 'inline' )
-					{ // Generate simple IMG tag with original image size
-						$inlines[$current_inline] = '<img src="'.$File->get_url().'"'
-							.( empty( $current_file_params['class'] ) ? '' : ' class="'.$current_file_params['class'].'"' )
-							.' />';
+					{	// Generate simple IMG tag with resized image size:
+						$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '',
+							( empty( $current_file_params['class'] ) ? '' : $current_file_params['class'] ), '', '', '' );
 					}
 				}
 				else
@@ -8464,12 +8502,13 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						$current_video_params[ $param_key ] = & $current_video_params[ $param_key ];
 					}
 
-					// We need to assign the result of trigger_event_first_true to a variable before counting
-					// or else modifications to the params are not applied in PHP7
-					$r_params = $Plugins->trigger_event_first_true( $plugin_event_name, $current_video_params );
-					if( count( $r_params ) != 0 )
-					{
-						$inlines[$current_inline] = $r_params['data'];
+					// Prepare params before rendering attachment:
+					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_video_params );
+
+					// Render attachments by plugin:
+					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_video_params ) ) != 0 )
+					{	// This attachment has been rendered by a plugin (to $current_video_params['data']):
+						$inlines[$current_inline] = $current_video_params['data'];
 					}
 					else
 					{ // no plugin available or was able to render the tag
@@ -8495,13 +8534,13 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						$current_audio_params[ $param_key ] = & $current_audio_params[ $param_key ];
 					}
 
-					// We need to assign the result of trigger_event_first_true to a variable before counting
-					// or else modifications to the params are not applied in PHP7
-					$r_params = $Plugins->trigger_event_first_true( $plugin_event_name, $current_audio_params );
+					// Prepare params before rendering attachment:
+					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_audio_params );
 
-					if( count( $r_params ) != 0 )
-					{
-						$inlines[$current_inline] =  $r_params['data'];
+					// Render attachments by plugin:
+					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_audio_params ) ) != 0 )
+					{	// This attachment has been rendered by a plugin (to $current_audio_params['data']):
+						$inlines[$current_inline] =  $current_audio_params['data'];
 					}
 					else
 					{ // no plugin available or was able to render the tag

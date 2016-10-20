@@ -97,25 +97,21 @@ skin_widget( array(
 				'link_type' => 'permalink'
 			) );
 
-		// Flag:
-		$Item->flag( array(
-				'before' => '<span class="pull-left">',
-				'after'  => '</span>',
-			) );
+		// ------------------------- "Item Single - Header" CONTAINER EMBEDDED HERE --------------------------
+		// Display container contents:
+		skin_container( /* TRANS: Widget container name */ NT_('Item Single Header'), array(
+			'widget_context' => 'item',	// Signal that we are displaying within an Item
+			// The following (optional) params will be used as defaults for widgets included in this container:
+			// This will enclose each widget in a block:
+			'block_start' => '<div class="$wi_class$">',
+			'block_end' => '</div>',
+			// This will enclose the title of each widget:
+			'block_title_start' => '<h3>',
+			'block_title_end' => '</h3>',
 
-		// Author info:
-		echo '<div class="ft_author_info">'.T_('Thread started by');
-		$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
-		echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
-		echo '<span class="text-muted"> &ndash; '
-				.T_('Last touched:').' '.mysql2date( 'D M j, Y H:i', $Item->get( 'last_touched_ts' ) )
-			.'</span>';
-		echo '</div>';
-		// Author info - shrinked:
-		echo '<div class="ft_author_info shrinked">'.T_('Started by');
-		$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
-		echo ', '.mysql2date( 'm/j/y', $Item->datecreated );
-		echo '</div>';
+			'author_link_text' => $params['author_link_text'],
+		) );
+		// ----------------------------- END OF "Item Single - Header" CONTAINER -----------------------------
 		?>
 	</div>
 
@@ -137,7 +133,7 @@ skin_widget( array(
 						$Item->issue_time( array(
 								'before'      => '<span class="text-muted">',
 								'after'       => '</span> &nbsp; &nbsp; ',
-								'time_format' => 'M j, Y H:i',
+								'time_format' => locale_extdatefmt().' '.locale_shorttimefmt(),
 							) );
 					?>
 				</h4>
@@ -180,6 +176,10 @@ skin_widget( array(
 						// This will enclose the title of each widget:
 						'block_title_start' => '<h3>',
 						'block_title_end' => '</h3>',
+						// Template params for "Item Tags" widget
+						'widget_item_tags_before'    => '<nav class="small post_tags">',
+						'widget_item_tags_after'     => '</nav>',
+						'widget_item_tags_separator' => ' ',
 						// Params for skin file "_item_content.inc.php"
 						'widget_item_content_params' => $params,
 						// Template params for "Item Attachments" widget:
@@ -208,6 +208,15 @@ skin_widget( array(
 					// Note: You can customize the default item content by copying the generic
 					// /skins/_item_content.inc.php file into the current skin folder.
 					// -------------------------- END OF POST CONTENT -------------------------
+
+					if( ! $Item->is_intro() )
+					{ // List all tags attached to this topic:
+						$Item->tags( array(
+								'before'    => '<nav class="small post_tags">',
+								'after'     => '</nav>',
+								'separator' => ' ',
+							) );
+					}
 				}
 				?>
 			</div>
