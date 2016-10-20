@@ -1500,7 +1500,6 @@ class User extends DataObject
 				'mask'         => '$login$', // $avatar$ $login$
 				'login_format' => 'htmlbody',
 				'avatar_size'  => 'crop-top-15x15',
-				'login_text'   => 'login', // name | login
 				'use_style'    => false, // true - to use attr "style", e.g. on email templates
 				'protocol'     => '', // Protocol is used for gravatar, example: 'http:' or 'https:'
 			), $params );
@@ -1511,14 +1510,8 @@ class User extends DataObject
 
 		if( strpos( $params['mask'], '$login$' ) !== false )
 		{ // Display login or preferred name
-			if( $params['login_text'] == 'name' )
-			{ // Use nickname or fullname
-				$login = $this->get_username( $params['login_format'] );
-			}
-			else
-			{ // Use a login
-				$login = $this->dget( 'login', $params['login_format'] );
-			}
+			$login = $this->get_username( $params['login_format'] );
+
 			// Add class "login" to detect logins by js plugins
 			$class = ( $login == $this->login ? 'login ' : '' );
 		}

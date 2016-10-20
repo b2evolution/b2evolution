@@ -1037,7 +1037,7 @@ class Comment extends DataObject
 				'after_user'   => '#',	// After Member user
 				'format'       => 'htmlbody',
 				'link_to'      => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' 'userpage>userurl'
-				'link_text'    => 'preferredname', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+				'link_text'    => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 				'link_rel'     => '',
 				'link_class'   => '',
 				'thumb_size'   => 'crop-top-32x32',
