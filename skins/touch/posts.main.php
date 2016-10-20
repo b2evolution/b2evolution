@@ -64,15 +64,16 @@ skin_include( '_body_header.inc.php' );
 
 <?php
 // Go Grab the featured post:
-if( $Item = get_featured_Item() )
+if( $Item = & get_featured_Item() )
 {	// We have a featured/intro post to display:
 	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 	skin_include( '_item_block.inc.php', array(
 			'feature_block' => true,
-			'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
-			'intro_mode'   => 'normal',	// Intro posts will be displayed in normal mode
-			'item_class'   => 'featured_post',
-			'image_size'	 =>	'fit-400x320',
+			'content_mode'  => 'auto',		// 'auto' will auto select depending on $disp-detail
+			'intro_mode'    => 'normal',	// Intro posts will be displayed in normal mode
+			'item_class'    => 'featured_post',
+			'image_size'    => 'fit-400x320',
+			'Item'          => $Item,
 		) );
 	// ----------------------------END ITEM BLOCK  ----------------------------
 }

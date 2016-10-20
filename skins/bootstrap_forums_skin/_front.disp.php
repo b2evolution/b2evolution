@@ -40,7 +40,7 @@ if( ! is_array( $legend_icons ) )
 }
 
 // ------------------------------- START OF INTRO-FRONT POST -------------------------------
-if( $Item = get_featured_Item( 'front' ) )
+if( $Item = & get_featured_Item( 'front' ) )
 { // We have a intro-front post to display:
 ?>
 <div id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>">
@@ -68,7 +68,7 @@ if( $Item = get_featured_Item( 'front' ) )
 		) );
 
 	// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-	skin_include( '_item_content.inc.php', $params );
+	skin_include( '_item_content.inc.php', array_merge( $params, array( 'Item' => $Item ) ) );
 	// Note: You can customize the default item content by copying the generic
 	// /skins/_item_content.inc.php file into the current skin folder.
 	// -------------------------- END OF POST CONTENT -------------------------
