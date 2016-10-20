@@ -440,8 +440,8 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 		// Delete icon:
 		$LinkCache = & get_LinkCache();
 		$Link = & $LinkCache->get_by_ID( $link_ID, false, false );
-		if( $Link && $Link->can_be_file_deleted() )
-		{	// If current user has a permission to delete a file completely
+		if( ! $current_File->is_dir() && $Link && $Link->can_be_file_deleted() )
+		{	// If current user has a permission to delete a file(not folder) completely
 			$File = & $Link->get_File();
 			$r .= action_icon( T_('Delete this file!'), 'delete',
 						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=delete'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
