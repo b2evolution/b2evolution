@@ -116,7 +116,9 @@ function evo_link_insert_inline( type, link_ID, option )
 		{ // Change the position to 'Inline'
 			if( $position_selector.val() != 'inline' )
 			{
+				deferInlineReminder = true;
 				$position_selector.val( 'inline' ).change();
+				deferInlineReminder = false;
 			}
 		}
 	}

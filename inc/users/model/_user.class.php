@@ -761,7 +761,14 @@ class User extends DataObject
 				}
 
 				$field_type = $this->userfield_defs[$userfield->uf_ufdf_ID][0];
-				$field_type = ( $field_type == 'text' || $field_type == 'url' ) ? $field_type : 'string';
+				if( $field_type == 'number' )
+				{	// Change number type of integer because we have this type name preparing in function param():
+					$field_type = 'integer';
+				}
+				elseif( $field_type != 'text' && $field_type != 'url' )
+				{	// Use all other params as string, Only text and url have a preparing in function param():
+					$field_type = 'string';
+				}
 				$uf_val = param( 'uf_'.$userfield->uf_ID, $field_type, '' );
 
 				if( $this->userfield_defs[$userfield->uf_ufdf_ID][0] == 'list' && $uf_val == '---' )
@@ -769,7 +776,6 @@ class User extends DataObject
 					$uf_val = '';
 				}
 
-				$uf_val = trim( strip_tags( $uf_val ) );
 				if( empty( $uf_val ) && $this->userfield_defs[$userfield->uf_ufdf_ID][2] == 'require' )
 				{	// Display error for empty required field
 					if( $current_User->check_perm( 'users', 'edit' ) )
@@ -817,24 +823,34 @@ class User extends DataObject
 				$user_id = param( 'orig_user_ID', 'integer', 0 );
 				if( $user_id !== 0 )
 				{
-					$userfield_IDs = $DB->get_results( '
-								SELECT uf_ID, uf_ufdf_ID
-									FROM T_users__fields
-								 WHERE uf_user_ID = '.$user_id );
-					foreach( $userfield_IDs as $userfield_ID )
+					$SQL = new SQL( 'Get all user fields of duplicated user #'.$user_id );
+					$SQL->SELECT( 'uf_ID, ufdf_ID, ufdf_type' );
+					$SQL->FROM( 'T_users__fields' );
+					$SQL->FROM_add( 'INNER JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID' );
+					$SQL->WHERE( 'uf_user_ID = '.$user_id );
+					$copied_userfields = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+					foreach( $copied_userfields as $copied_userfield )
 					{
-						$uf_val = param( 'uf_'.$userfield_ID->uf_ID, 'string', '' );
-						$uf_type = $userfield_ID->uf_ufdf_ID;
-						if( !empty($uf_val) )
-						{
-							$this->userfield_add( $uf_type, $uf_val );
+						$field_type = $copied_userfield->ufdf_type;
+						if( $field_type == 'number' )
+						{	// Change number type of integer because we have this type name preparing in function param():
+							$field_type = 'integer';
+						}
+						elseif( $field_type != 'text' && $field_type != 'url' )
+						{	// Use all other params as string, Only text and url have a preparing in function param():
+							$field_type = 'string';
+						}
+						$uf_val = param( 'uf_'.$copied_userfield->uf_ID, $field_type, '' );
+						if( ! empty( $uf_val ) )
+						{	// Copy user field only if it is not empty:
+							$this->userfield_add( $copied_userfield->ufdf_ID, $uf_val );
 						}
 					}
 				}
 			}
 
-			$uf_new_fields = param( 'uf_new', 'array:array:string' );	// Recommended & required fields (it still not saved in DB)
-			$uf_add_fields = param( 'uf_add', 'array:array:string' );	// Added fields
+			$uf_new_fields = param( 'uf_new', 'array' );	// Recommended & required fields (it still not saved in DB)
+			$uf_add_fields = param( 'uf_add', 'array' );	// Added fields
 
 			// Add a new field: (JS is not enabled)
 			if( $action == 'add_field' )
@@ -918,26 +934,42 @@ class User extends DataObject
 								$uf_new_val = '';
 							}
 
-							$uf_new_val = trim( strip_tags( $uf_new_val ) );
 							if( $uf_new_val != '' )
-							{	// Insert a new field in DB if it is filled
-								if( $this->userfield_defs[$uf_new_id][0] == 'url' )
-								{	// Check url fields
-									// Decode url:
-									$uf_new_val = urldecode( $uf_new_val );
-									// strip out any html:
-									$uf_new_val = utf8_trim( utf8_strip_tags( $uf_new_val ) );
-									// Remove new line chars and double quote from url
-									$uf_new_val = preg_replace( '~\r|\n|"~', '', $uf_new_val );
-									param_check_url( 'uf_'.$uf_type.'['.$uf_new_id.'][]', 'commenting' );
+							{	// Insert a new field in DB if it is filled:
+								switch( $this->userfield_defs[$uf_new_id][0] )
+								{
+									case 'url':
+										// Format url field to valid value:
+										$uf_new_val = param_format( $uf_new_val, 'url' );
+										// Check url fields:
+										param_check_url( 'uf_'.$uf_type.'['.$uf_new_id.'][]', 'commenting' );
+										break;
+
+									case 'text':
+										// Format text field to valid value:
+										$uf_new_val = param_format( $uf_new_val, 'text' );
+										break;
+
+									case 'number':
+										// Format number field to valid value:
+										$uf_new_val = param_format( $uf_new_val, 'integer' );
+										break;
+
+									case 'email':
+									case 'word':
+									case 'phone':
+										// Format string fields to valid value:
+										$uf_new_val = param_format( $uf_new_val, 'string' );
+										break;
 								}
+
 								if( $this->userfield_defs[$uf_new_id][4] == 'list' )
 								{	// Option "Multiple values" == "List style"
 									// Split by comma and save each phrase as separate field
 									$uf_new_val = explode( ',', $uf_new_val );
 									foreach( $uf_new_val as $val )
 									{
-										$val = trim( $val );
+										$val = param_format( $val, 'string' );
 										if( !empty( $val ) )
 										{	// Exclude empty values(spaces)
 											$this->userfield_add( (int)$uf_new_id, $val );

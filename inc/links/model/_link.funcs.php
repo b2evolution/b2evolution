@@ -426,8 +426,8 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 		// Delete icon:
 		$LinkCache = & get_LinkCache();
 		$Link = & $LinkCache->get_by_ID( $link_ID, false, false );
-		if( $Link && $Link->can_be_file_deleted() )
-		{	// If current user has a permission to delete a file completely
+		if( ! $current_File->is_dir() && $Link && $Link->can_be_file_deleted() )
+		{	// If current user has a permission to delete a file(not folder) completely
 			$File = & $Link->get_File();
 			$r .= action_icon( T_('Delete this file!'), 'delete',
 						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=delete'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
@@ -522,12 +522,14 @@ function echo_link_position_js()
 ?>
 <script type="text/javascript">
 var displayInlineReminder = <?php echo $Session->get( 'display_inline_reminder', 'true' );?>;
+var deferInlineReminder = false;
+
 jQuery( document ).on( 'change', 'select[id^=display_position_]', {
 		url:   '<?php echo get_htsrv_url(); ?>',
 		crumb: '<?php echo get_crumb( 'link' ); ?>',
 }, function( event )
 {
-	if( this.value == 'inline' && displayInlineReminder )
+	if( this.value == 'inline' && displayInlineReminder && !deferInlineReminder )
 	{ // Display inline position reminder
 		alert( '<?php echo T_('You can use the (+) icons to change the position to inline and automatically insert a short tag at the current cursor position.');?>' );
 		displayInlineReminder = false;
