@@ -900,6 +900,28 @@ class DataObjectCache
 	}
 
 
+	/**
+	 * Returns option array for Form->cheklist()
+	 *
+	 * Load the cache if necessary
+	 *
+	 * @param string Field name
+	 * @param array IDs to ignore.
+	 * @return array Options
+	 */
+	function get_checklist_options( $field_name, $ignore_IDs = array() )
+	{
+		$options = array();
+
+		$names = $this->get_option_array( $ignore_IDs );
+		foreach( $names as $ID => $name )
+		{
+			$options[] = array( $field_name.'[]', $ID, $name, 0 );
+		}
+
+		return $options;
+	}
+
 
 	/**
 	 * Returns option array with cache contents

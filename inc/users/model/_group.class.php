@@ -230,6 +230,11 @@ class Group extends DataObject
 			{ // Admin group has always admin perm, it can not be set or changed.
 				continue;
 			}
+			elseif( $name == 'perm_allowed_sections' )
+			{	// This permission is represented by checklist:
+				$value = param( 'edited_grp_'.$name, 'array:integer', '' );
+				$value = implode( ',', $value );
+			}
 			else
 			{
 				$value = param( 'edited_grp_'.$name, 'string', '' );
@@ -238,6 +243,13 @@ class Group extends DataObject
 			{ // if radio is not set, then doesn't change the settings
 				$GroupSettings->set( $name, $value, $this->ID );
 			}
+		}
+
+		// Check if default section is in allowed list:
+		$perm_allowed_sections = explode( ',', $GroupSettings->get( 'perm_allowed_sections', $this->ID ) );
+		if( ! in_array( $GroupSettings->get( 'perm_default_sec_ID', $this->ID ), $perm_allowed_sections ) )
+		{
+			param_error( 'edited_grp_perm_default_sec_ID', T_('Default section must be in allowed kind of collections.') );
 		}
 
 		return !param_errors_detected();

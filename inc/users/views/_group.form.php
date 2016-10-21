@@ -94,6 +94,21 @@ function display_pluggable_permissions( &$Form, $perm_block )
 							$Form->checkbox_input( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name] == 'allowed', $perm['label'], array( 'input_suffix' => ' '.$perm['note'], 'value' => 'allowed' ) );
 						break;
 
+						case 'checklist':
+							$checklist_values = explode( ',', $GroupSettings->permission_values[$perm_name] );
+							if( ! empty( $checklist_values ) )
+							{	// If at least one option is selected:
+								foreach( $perm['options'] as $o => $checklist_option )
+								{
+									if( in_array( $checklist_option[1], $checklist_values ) )
+									{	// This option is selected for the group:
+										$perm['options'][ $o ][3] = 1;
+									}
+								}
+							}
+							$Form->checklist( $perm['options'], 'edited_grp_'.$perm_name, $perm['label'], false, false, array( 'note' => $perm['note'] ) );
+						break;
+
 						case 'radiobox':
 							if( ! isset( $perm['field_lines'] ) )
 							{
