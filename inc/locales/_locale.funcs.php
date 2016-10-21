@@ -949,7 +949,20 @@ function locale_updateDB()
 		}
 		elseif( $lnr != 0 )  // be sure to have catched a locale before
 		{
-			if( $lfield == 'startofweek' && ( $lfield < 0 || $lfield > 6 ) )
+			if( $lfield == 'datefmt' && empty( $pval ) )
+			{
+				param_error( $pkey, sprintf( T_('Locale %s date format cannot be empty'), $plocale ) );
+			}
+			elseif( $lfield == 'timefmt' && empty( $pval ) )
+			{
+				param_error( $pkey, sprintf( T_('Locale %s time format cannot be empty'), $plocale ) );
+			}
+			elseif( $lfield == 'shorttimefmt' && empty( $pval ) )
+			{
+				param_error( $pkey, sprintf( T_('Locale %s short time cannot be empty'), $plocale ) );
+			}
+
+			if( $lfield == 'startofweek' && ( $pval < 0 || $pval > 6 ) )
 			{ // startofweek must be between 0 and 6
 				continue;
 			}
@@ -967,6 +980,11 @@ function locale_updateDB()
 			}
 			$templocales[ $plocale ][ $lfield ] = $pval;
 		}
+	}
+
+	if( $Messages->has_errors() )
+	{
+		return false;
 	}
 
 	$locales = $templocales;

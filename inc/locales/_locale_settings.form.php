@@ -317,6 +317,42 @@ else
 		$input_timefmt_preview = date_i18n( $locale_data['input_timefmt'], $localtimenow );
 		locale_restore_previous();
 
+		$datefmt = param( 'loc_'.$i.'_datefmt', 'string', NULL );
+		$timefmt = param( 'loc_'.$i.'_timefmt', 'string', NULL );
+		$shorttimefmt = param( 'loc_'.$i.'_shorttimefmt', 'string', NULL );
+
+		$Form->output = false;
+		$Form->switch_layout( 'none' );
+		$datefmt_input = $Form->get_input_element( array(
+				'type' => 'text',
+				'name' => 'loc_'.$i.'_datefmt',
+				'value' => isset( $datefmt ) ? $datefmt : $locale_data['datefmt'],
+				'title' => sprintf( T_('Preview: %s'), $datefmt_preview ),
+				'class' => 'form-control input-sm',
+				'maxlength' => 20,
+				'size' => 6,
+				'hide_label' => true ) );
+		$timefmt_input = $Form->get_input_element( array(
+				'type' => 'text',
+				'name' => 'loc_'.$i.'_timefmt',
+				'value' => isset( $timefmt ) ? $timefmt : $locale_data['timefmt'],
+				'title' => sprintf( T_('Preview: %s'), $timefmt_preview ),
+				'class' => 'form-control input-sm',
+				'maxlength' => 20,
+				'size' => 6,
+				'hide_label' => true ) );
+		$shorttimefmt_input = $Form->get_input_element( array(
+				'type' => 'text',
+				'name' => 'loc_'.$i.'_shorttimefmt',
+				'value' => isset( $shorttimefmt ) ? $shorttimefmt : $locale_data['shorttimefmt'],
+				'title' => sprintf( T_('Preview: %s'), $shorttimefmt_preview ),
+				'class' => 'form-control input-sm',
+				'maxlength' => 20,
+				'size' => 6,
+				'hide_label' => true ) );
+		$Form->switch_layout( NULL );
+		$Form->output = true;
+
 		?>
 		<tr class="<?php echo ( ( $i % 2 == 1 ) ? 'odd' : 'even' ) ?>">
 		<td class="firstcol left" title="<?php echo T_('Priority').': '.$locale_data['priority'].', '.T_('Charset').': '.$locale_data['charset'].', '.T_('Lang file').': '.$locale_data['messages'] ?>">
@@ -363,15 +399,9 @@ else
 				<td>
 					<input type="text" name="loc_'.$i.'_extdatefmt" value="'.format_to_output( $locale_data['extdatefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $extdatefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />
 				</td>
-				<td>
-					<input type="text" name="loc_'.$i.'_input_datefmt" value="'.format_to_output( $locale_data['input_datefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $input_datefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />
-				</td>
-				<td>
-					<input type="text" name="loc_'.$i.'_timefmt" value="'.format_to_output( $locale_data['timefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $timefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />
-				</td>
-				<td>
-					<input type="text" name="loc_'.$i.'_shorttimefmt" value="'.format_to_output( ( ! empty( $locale_data['shorttimefmt'] ) ? $locale_data['shorttimefmt'] : str_replace( ':s', '', $locale_data['timefmt'] ) ), 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $shorttimefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />
-				</td>
+				<td>'.$datefmt_input.'</td>
+				<td>'.$timefmt_input.'</td>
+				<td>'.$shorttimefmt_input.'</td>
 				<td>
 					<input type="text" name="loc_'.$i.'_input_timefmt" value="'.format_to_output( $locale_data['input_timefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $input_timefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />
 				</td>
