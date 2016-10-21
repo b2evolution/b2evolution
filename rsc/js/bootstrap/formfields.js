@@ -27,13 +27,16 @@ function form_error_field_popover( this_obj )
 	jQuery( this_obj ).popover( 'destroy' );
 
 	// Initialize the popover:
-	jQuery( this_obj ).popover(
-	{
-		trigger: 'manual',
-		placement: ( tag_name == 'SELECT' || tag_name == 'TEXTAREA' ) ? 'top' : 'bottom',
-		html: true,
-		content: '<span class="field_error">' + tip_text + '</span>',
-	} );
+	if( tip_text )
+	{ // Only do this if there is actually something to display
+		jQuery( this_obj ).popover(
+		{
+			trigger: 'manual',
+			placement: ( tag_name == 'SELECT' || tag_name == 'TEXTAREA' ) ? 'top' : 'bottom',
+			html: true,
+			content: '<span class="field_error">' + tip_text + '</span>',
+		} );
+	}
 
 	jQuery( this_obj ).on( 'show.bs.popover', function()
 	{ // Add this class to avoid of the repeating of init popover:
