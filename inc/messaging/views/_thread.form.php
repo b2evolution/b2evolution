@@ -140,7 +140,8 @@ if( !empty( $thrd_recipients_array ) )
 	{
 		$recipients_selected[] = array(
 			'id'    => $recipient_ID,
-			'login' => $thrd_recipients_array['login'][$rnum]
+			'login' => $thrd_recipients_array['login'][$rnum],
+			'fullname' => $thrd_recipients_array['fullname'][$rnum]
 		);
 	}
 }
@@ -175,7 +176,7 @@ jQuery( '#thrd_recipients' ).tokenInput(
 		tokenFormatter: function( user )
 		{
 			return '<li>' +
-					user.login +
+					<?php echo $Settings->get( 'username_display' ) == 'name' ? 'user.fullname' : 'user.login';?> +
 					'<input type="hidden" name="thrd_recipients_array[id][]" value="' + user.id + '" />' +
 					'<input type="hidden" name="thrd_recipients_array[login][]" value="' + user.login + '" />' +
 				'</li>';
