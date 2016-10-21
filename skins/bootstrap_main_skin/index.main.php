@@ -186,14 +186,15 @@ if( $is_pictured_page )
 
 		<?php
 		// Go Grab the featured post:
-		if( ! in_array( $disp, array( 'single', 'page' ) ) && $Item = get_featured_Item() )
+		if( ! in_array( $disp, array( 'single', 'page' ) ) && $Item = & get_featured_Item() )
 		{ // We have a featured/intro post to display:
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 			echo '<div class="panel panel-default"><div class="panel-body">';
 			skin_include( '_item_block.inc.php', array(
 					'feature_block' => true,
-					'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
-					'intro_mode'   => 'normal',	// Intro posts will be displayed in normal mode
+					'content_mode'  => 'auto',		// 'auto' will auto select depending on $disp-detail
+					'intro_mode'    => 'normal',	// Intro posts will be displayed in normal mode
+					'Item'          => $Item,
 				) );
 			echo '</div></div>';
 			// ----------------------------END ITEM BLOCK  ----------------------------

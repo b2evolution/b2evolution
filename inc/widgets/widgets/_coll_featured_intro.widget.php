@@ -180,7 +180,7 @@ class coll_featured_intro_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		// Go Grab the featured post:
-		if( $Item = get_featured_Item( 'front', $this->disp_params['blog_ID'] ) )
+		if( $Item = & get_featured_Item( 'front', $this->disp_params['blog_ID'] ) )
 		{ // We have a featured/intro post to display:
 			$item_style = '';
 			$LinkOwner = new LinkItem( $Item );
@@ -214,6 +214,7 @@ class coll_featured_intro_Widget extends ComponentWidget
 					'item_title_link_type' => $this->disp_params['item_title_link_type'],
 					'attached_pics'        => $this->disp_params['attached_pics'],
 					'item_pic_link_type'   => $this->disp_params['item_pic_link_type'],
+					'Item'                 => $Item,
 				) );
 			echo $this->disp_params['featured_intro_after'];
 			echo $this->disp_params['block_body_end'];

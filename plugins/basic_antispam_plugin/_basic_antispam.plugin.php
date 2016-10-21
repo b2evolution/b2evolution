@@ -210,7 +210,7 @@ class basic_antispam_plugin extends Plugin
 	/**
 	 * Check for duplicate comments.
 	 *
-	 * @param array Params 
+	 * @param array Params
 	 */
 	function BeforeCommentFormInsert( & $params )
 	{
@@ -626,7 +626,7 @@ class basic_antispam_plugin extends Plugin
 	{
 		global $DB;
 
-		if( ! $this->Settings->get('check_dupes') )
+		if( ! $this->Settings->get( 'check_dupes' ) )
 		{
 			return false;
 		}
@@ -641,24 +641,24 @@ class basic_antispam_plugin extends Plugin
 				  FROM T_comments
 				 WHERE comment_item_ID = '.$Comment->item_ID;
 
-		if( isset($Comment->author_user_ID) )
+		if( isset( $Comment->author_user_ID ) )
 		{ // registered user:
 			$sql .= ' AND comment_author_user_ID = '.$Comment->author_user_ID;
 		}
 		else
 		{ // visitor (also trackback):
 			$sql_ors = array();
-			if( ! empty($Comment->author) )
+			if( ! empty( $Comment->author ) )
 			{
-				$sql_ors[] = 'comment_author = '.$DB->quote($Comment->author);
+				$sql_ors[] = 'comment_author = '.$DB->quote( $Comment->author );
 			}
-			if( ! empty($Comment->author_email) )
+			if( ! empty( $Comment->author_email ) )
 			{
 				$sql_ors[] = 'comment_author_email = '.$DB->quote( $Comment->author_email );
 			}
-			if( ! empty($Comment->author_url) )
+			if( ! empty( $Comment->author_url ) )
 			{
-				$sql_ors[] = 'comment_author_url = '.$DB->quote($Comment->author_url);
+				$sql_ors[] = 'comment_author_url = '.$DB->quote( $Comment->author_url );
 			}
 
 			if( ! empty($sql_ors) )
@@ -667,7 +667,8 @@ class basic_antispam_plugin extends Plugin
 			}
 		}
 
-		$sql .= ' AND comment_content = '.$DB->quote($Comment->content).' LIMIT 1';
+		$sql .= ' AND comment_type = '.$DB->quote( $Comment->get( 'type' ) );
+		$sql .= ' AND comment_content = '.$DB->quote( $Comment->content ).' LIMIT 1';
 
 		return $DB->get_var( $sql, 0, 0, 'Checking for duplicate feedback content.' );
 	}
