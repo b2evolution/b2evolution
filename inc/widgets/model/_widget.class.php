@@ -579,6 +579,8 @@ class ComponentWidget extends DataObject
 		switch( $this->type )
 		{
 			case 'plugin':
+				// Set widget ID param to make it available in plugin function SkinTag():
+				$this->disp_params['wi_ID'] = $this->ID;
 				// Call plugin (will return false if Plugin is not enabled):
 				if( $Plugins->call_by_code( $this->code, $this->disp_params ) )
 				{
