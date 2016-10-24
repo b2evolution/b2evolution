@@ -12,13 +12,6 @@
 
 
 /**
- * @internal strings various <img> tags
- * these will be set during Init()
- */
-var edit_icon_tag = ''; // edit icon image tag
-var delete_icon_tag = ''; // delete icon image tag
-
-/**
  * @internal string current_widgets
  * holds the list of current widgets
  */
@@ -43,12 +36,6 @@ var reorder_delay = 200;
  */
 var reorder_delay_remaining = 0;
 
-/**
- * @internal string current_widgets
- * crumb to be added to urls
- */
-var crumb_url = '';
-
 
 /**
  * Init()
@@ -57,21 +44,12 @@ var crumb_url = '';
  */
 jQuery(document).ready( function()
 {
-	// grab some constants -- fp> TODO: this is flawed. Fails when starting with an empty blog having ZERO widgets. Init that in .php
-	edit_icon_tag = jQuery( '.edit_icon_hook' ).find( 'a' ).html();// grab the edit icon
-	delete_icon_tag = jQuery( '.delete_icon_hook' ).find( 'a' ).html();// grab the delete icon
-	//get crumb url from delete url and then add it in toggleWidget
-	crumb_url = jQuery( '.delete_icon_hook' ).find( 'a' ).attr('href');
-	crumb_url = crumb_url.match(/crumb_.*?$/);
-	// Modify the current widgets screen
-	// remove the "no widgets yet" placeholder:
-	jQuery( ".new_widget" ).parent().parent().remove();
-	// get rid of the odd/even classes and add our own class:
-	jQuery( ".odd" ).addClass( "widget_row" ).removeClass( ".odd" );
-	jQuery( ".even" ).addClass( "widget_row" ).removeClass( ".even" );
+	// Make widget rows drag and drop:
+	makeDragnDrop( '.draggable_widget' );
 
 	// make container title droppable -- fp> This works but gives no visual feedback. It would actually be cool to drop 'after' the current line in which case dropping on the title would make sense
-	jQuery( '.fieldset_title' ).each( function(){
+	jQuery( '.fieldset_title' ).each( function()
+	{
 		jQuery( this ).droppable(
 		{
 			accept: ".draggable_widget", // classname of objects that can be dropped
@@ -93,49 +71,6 @@ jQuery(document).ready( function()
 			}
 		});
 	});
-
-	// grab the widget ID out of the "delete" url and add as ID to parent row:
-	jQuery( '.widget_row td:nth-child(7)' ).each( function()
-	{
-		var widget_id = jQuery( this ).find( 'a' ).attr( "href" );
-		widget_id = widget_id.match(/wi_ID=([0-9]+)/)[1] // extract ID
-		jQuery( this ).parent().attr( "id", "wi_ID_"+widget_id ); // add ID to parent row
-	});
-
-	// Convert the tables:
-	var the_widgets = new Array();
-	jQuery( ".widget_container_list" ).each( function()
-	{ // grab each container
-		var container = jQuery( this ).attr( "id" );
-		the_widgets[ container ] = new Array();
-		jQuery( "#"+container+" .widget_row" ).each( function()
-		{ // grab each widget in container
-			var widget = jQuery( this ).attr( "id" );
-			the_widgets[ container ][ widget ] = new Array();
-			the_widgets[ container ][ widget ]["name"] = jQuery( '#' + widget ).find( '.widget_name' ).parent().html();
-			the_widgets[ container ][ widget ]["class"] = jQuery( this ).attr( "className" );
-			the_widgets[ container ][ widget ]["enabled"] = jQuery( '#' + widget + ' .widget_is_enabled' ).size();
-			the_widgets[ container ][ widget ]["cache"] = jQuery( '#' + widget + ' .widget_cache_status [rel]' ).attr( 'rel' );
-		} );
-	});
-
-	// create new container for each current container
-	for( container in the_widgets )
-	{	// loop through each container
-		var is_droppable = !jQuery( '#'+container ).hasClass( "no-drop" );
-		newContainer = jQuery( "<ul id=\"container_"+container+"\" class=\"widget_container\"></ul>" );
-		if( !is_droppable )
-		{	// container doesn't exist in skin
-			jQuery( newContainer ).addClass( 'no-drop' );
-		}
-		jQuery( "#"+container ).replaceWith( newContainer );// replace table with new container
-
-		// create widget entry for each widget in each container
-		for( widget in the_widgets[container] )
-		{	// loop through all widgets in this container
-			createWidget( widget, container, 0, the_widgets[container][widget]["name"], the_widgets[container][widget]["class"], the_widgets[container][widget]["enabled"], the_widgets[container][widget]["cache"] );
-		}
-	}
 
 	// disable dropping on empty containers:
 	jQuery( '.no-drop .draggable_widget').droppable( "disable" );
@@ -306,7 +241,7 @@ function bufferedServerCall()
 
 		current_widgets = new_widget_order; // store current order
 		//add crumbs here
-		new_widget_order += '&' + crumb_url;
+		new_widget_order += '&' + widget_crumb_url_param;
 		jQuery( '.pending_update' ).removeClass( 'pending_update' ).addClass( 'server_updating' ); // change class to "updating"
 
 		SendAdminRequest( 'widgets', 're-order', new_widget_order, false ); // send current order to server
@@ -644,7 +579,7 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
  */
 function toggleWidget( wi_ID )
 {
-	SendAdminRequest( 'widgets', 'toggle', 'wi_ID=' + wi_ID.substr( 6 ) + '&' + crumb_url, true );
+	SendAdminRequest( 'widgets', 'toggle', 'wi_ID=' + wi_ID.substr( 6 ) + '&' + widget_crumb_url_param, true );
 	return false;
 }
 
@@ -656,7 +591,7 @@ function toggleWidget( wi_ID )
  */
 function doToggle( wi_ID, wi_enabled )
 {
-	jQuery( '#wi_ID_' + wi_ID + ' .widget_state' ).html( '<a href="#" class="toggle_state" onclick="return toggleWidget( \'wi_ID_'+wi_ID+'\', \''+crumb_url+'\' );">'+
+	jQuery( '#wi_ID_' + wi_ID + ' .widget_state' ).html( '<a href="#" class="toggle_state" onclick="return toggleWidget( \'wi_ID_'+wi_ID+'\', \''+widget_crumb_url_param+'\' );">'+
 				( wi_enabled ? enabled_icon_tag : disabled_icon_tag )+
 			'</a>' );
 	if( wi_enabled )
@@ -680,7 +615,7 @@ function doToggle( wi_ID, wi_enabled )
  */
 function toggleCacheWidget( wi_ID, action )
 {
-	SendAdminRequest( 'widgets', 'cache_' + action, 'wi_ID=' + wi_ID.substr( 6 ) + '&' + crumb_url, true );
+	SendAdminRequest( 'widgets', 'cache_' + action, 'wi_ID=' + wi_ID.substr( 6 ) + '&' + widget_crumb_url_param, true );
 	return false;
 }
 

@@ -659,6 +659,8 @@ if( $display_mode == 'normal' )
 	 *
 	 * @internal Tblue> We get the whole img tags here (easier).
 	 */
+	var edit_icon_tag = \''.get_icon( 'edit', 'imgtag', array( 'title' => T_( 'Edit widget settings!' ) ) ).'\';
+	var delete_icon_tag = \''.get_icon( 'delete', 'imgtag', array( 'title' => T_( 'Remove this widget!' ) ) ).'\';
 	var enabled_icon_tag = \''.get_icon( 'bullet_green', 'imgtag', array( 'title' => T_( 'The widget is enabled.' ) ) ).'\';
 	var disabled_icon_tag = \''.get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_( 'The widget is disabled.' ) ) ).'\';
 	var activate_icon_tag = \''.get_icon( 'activate', 'imgtag', array( 'title' => T_( 'Enable this widget!' ) ) ).'\';
@@ -667,6 +669,8 @@ if( $display_mode == 'normal' )
 	var cache_disabled_icon_tag = \''.get_icon( 'block_cache_off', 'imgtag', array( 'title' => T_( 'Caching is disabled. Click to enable.' ) ) ).'\';
 	var cache_disallowed_icon_tag = \''.get_icon( 'block_cache_disabled', 'imgtag', array( 'title' => T_( 'This widget cannot be cached.' ) ) ).'\';
 	var cache_denied_icon_tag = \''.get_icon( 'block_cache_denied', 'imgtag', array( 'title' => T_( 'This widget could be cached but the block cache is OFF. Click to enable.' ) ) ).'\';
+
+	var widget_crumb_url_param = \''.url_crumb( 'widget' ).'\';
 
 	var b2evo_dispatcher_url = "'.$admin_url.'";' );
 	require_js( '#jqueryUI#' ); // auto requires jQuery
