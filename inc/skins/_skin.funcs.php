@@ -548,16 +548,12 @@ var downloadInterval = setInterval( function()
 			elseif( !empty( $comment_id ) )
 			{ // comment id is set, try to get comment author user
 				$CommentCache = & get_CommentCache();
-				$Comment = $CommentCache->get_by_ID( $comment_id, false );
-
-				if( $Comment = $CommentCache->get_by_ID( $comment_id, false ) )
+				if( $Comment = & $CommentCache->get_by_ID( $comment_id, false ) )
 				{
 					$recipient_User = & $Comment->get_author_User();
 					if( empty( $recipient_User ) && ( $Comment->allow_msgform ) && ( is_email( $Comment->get_author_email() ) ) )
 					{ // set allow message form to email because comment author (not registered) accepts email
 						$allow_msgform = 'email';
-						param( 'recipient_address', 'string', $Comment->get_author_email() );
-						param( 'recipient_name', 'string', $Comment->get_author_name() );
 					}
 				}
 			}
