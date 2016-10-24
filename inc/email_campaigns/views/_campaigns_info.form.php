@@ -14,8 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $admin_url, $tab;
-global $users_numbers, $edited_EmailCampaign;
+global $admin_url, $tab, $edited_EmailCampaign;
 
 $Form = new Form( NULL, 'campaign_form' );
 $Form->begin_form( 'fform' );
@@ -33,11 +32,6 @@ $Form->begin_fieldset( T_('Campaign info').get_manual_link( 'creating-an-email-c
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Newsletter recipients') );
-	if( !empty( $users_numbers ) )
-	{ // We know this data only one time after selecting users
-		$Form->info( T_('Number of accounts in filterset'), $users_numbers['all'] );
-		$Form->info( T_('Number of active accounts in filterset'), $users_numbers['active'] );
-	}
 	$Form->info( T_('Currently selected recipients'), $edited_EmailCampaign->get_users_count(), '('.T_('Accounts which accept newsletter emails').') - <a href="'.$admin_url.'?ctrl=campaigns&amp;action=change_users&amp;ecmp_ID='.$edited_EmailCampaign->ID.'">'.T_('Change selection').' &gt;&gt;</a>' );
 	$Form->info( T_('Already received'), $edited_EmailCampaign->get_users_count( 'accept' ), '('.T_('Accounts which have already been sent this newsletter').')' );
 	$Form->info( T_('Ready to send'), $edited_EmailCampaign->get_users_count( 'wait' ), '('.T_('Accounts which have not been sent this newsletter yet').')' );
