@@ -1576,6 +1576,26 @@ function create_default_posts_location()
 
 
 /**
+ * Create default newsletters
+ */
+function create_default_newsletters()
+{
+	global $DB, $create_sample_contents;
+
+	task_begin( 'Creating default newsletters... ' );
+
+	if( $create_sample_contents )
+	{
+		$DB->query( 'INSERT INTO T_email__newsletter ( enlt_name, enlt_label )
+			VALUES ( "News", "Send me news about this site." ),
+			       ( "Promotions", "I want to receive ADs that may be relevant to my interests." )' );
+	}
+
+	task_end();
+}
+
+
+/**
  * Create default email campaigns
  */
 function create_default_email_campaigns()

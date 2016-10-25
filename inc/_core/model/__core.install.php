@@ -481,6 +481,16 @@ $schema_queries = array(
 			UNIQUE                      emadr_address (emadr_address)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
+	'T_email__newsletter' => array(
+		'Creating email newsletters table',
+		"CREATE TABLE T_email__newsletter (
+			enlt_ID     INT NOT NULL AUTO_INCREMENT,
+			enlt_name   VARCHAR(255) NOT NULL,
+			enlt_label  VARCHAR(255) NULL,
+			enlt_active TINYINT(1) UNSIGNED DEFAULT 1,
+			PRIMARY KEY (enlt_ID)
+		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
+
 	'T_email__campaign' => array(
 		'Creating email campaigns table',
 		"CREATE TABLE T_email__campaign (

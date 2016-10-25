@@ -8077,6 +8077,26 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12135, 'Creating email newsletters table...' ) )
+	{	// part of 6.8.0-alpha
+		db_create_table( 'T_email__newsletter', "
+			enlt_ID     INT NOT NULL AUTO_INCREMENT,
+			enlt_name   VARCHAR(255) NOT NULL,
+			enlt_label  VARCHAR(255) NULL,
+			enlt_active TINYINT(1) UNSIGNED DEFAULT 1,
+			PRIMARY KEY (enlt_ID)",
+			'ENGINE = myisam' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12140, 'Creating default newsletters...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'INSERT INTO T_email__newsletter ( enlt_name, enlt_label )
+			VALUES ( "News", "Send me news about this site." ),
+			       ( "Promotions", "I want to receive ADs that may be relevant to my interests." )' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

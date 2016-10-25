@@ -260,6 +260,9 @@ function install_newdb()
 	}
 
 	evo_flush();
+	create_default_newsletters();
+
+	evo_flush();
 	create_default_email_campaigns();
 
 	// Update the progress bar status
