@@ -8080,7 +8080,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 12135, 'Creating email newsletters table...' ) )
 	{	// part of 6.8.0-alpha
 		db_create_table( 'T_email__newsletter', "
-			enlt_ID     INT NOT NULL AUTO_INCREMENT,
+			enlt_ID     INT UNSIGNED NOT NULL AUTO_INCREMENT,
 			enlt_name   VARCHAR(255) NOT NULL,
 			enlt_label  VARCHAR(255) NULL,
 			enlt_active TINYINT(1) UNSIGNED DEFAULT 1,
@@ -8094,6 +8094,65 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$DB->query( 'INSERT INTO T_email__newsletter ( enlt_name, enlt_label )
 			VALUES ( "News", "Send me news about this site." ),
 			       ( "Promotions", "I want to receive ADs that may be relevant to my interests." )' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12145, 'Creating email newsletter subscriptions table...' ) )
+	{	// part of 6.8.0-alpha
+		db_create_table( 'T_email__newsletter_subscription', "
+			enls_user_ID INT UNSIGNED NOT NULL,
+			enls_enlt_ID INT UNSIGNED NOT NULL,
+			PRIMARY KEY (enls_user_ID, enls_enlt_ID)",
+			'ENGINE = myisam' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12150, 'Updating user newsletter subscriptions...' ) )
+	{	// part of 6.8.0-alpha
+		$news_SQL = new SQL( 'Get all users which are subscribed on news about this site' );
+		$news_SQL->SELECT( 'user_ID' );
+		$news_SQL->FROM( 'T_users' );
+		$news_SQL->FROM_add( 'LEFT OUTER JOIN T_users__usersettings ON user_ID = uset_user_ID' );
+		$news_SQL->FROM_add( 'AND uset_name = "newsletter_news"' );
+		$news_SQL->WHERE( 'uset_value = 1' );
+		// If General setting "newsletter_news" = 1 we also should include all users without defined user's setting "newsletter_news":
+		$news_SQL->WHERE_or( 'uset_value IS NULL' );
+		$news_user_IDs = $DB->get_col( $news_SQL->get(), 0, $news_SQL->title );
+
+		$ads_SQL = new SQL( 'Get all users which are subscribed to receive ADs' );
+		$ads_SQL->SELECT( 'user_ID' );
+		$ads_SQL->FROM( 'T_users' );
+		$ads_SQL->FROM_add( 'LEFT OUTER JOIN T_users__usersettings ON user_ID = uset_user_ID' );
+		$ads_SQL->FROM_add( 'AND uset_name = "newsletter_ads"' );
+		$ads_SQL->WHERE( 'uset_value = 1' );
+		$ads_user_IDs = $DB->get_col( $ads_SQL->get(), 0, $ads_SQL->title );
+
+		$newsletter_subscription_rows = array();
+		foreach( $news_user_IDs as $news_user_ID )
+		{
+			$newsletter_subscription_rows[] = '( '.$news_user_ID.', 1 )';
+		}
+		foreach( $ads_user_IDs as $ads_user_ID )
+		{
+			$newsletter_subscription_rows[] = '( '.$ads_user_ID.', 2 )';
+		}
+
+		if( count( $newsletter_subscription_rows ) )
+		{	// Insert user newsletter subscriptions:
+			$DB->query( 'INSERT INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )
+				VALUES '.implode( ',', $newsletter_subscription_rows ) );
+		}
+
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12155, 'Upgrading email campaigns table...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_email__campaign
+			MODIFY ecmp_email_title VARCHAR(255) NOT NULL' );
+		$DB->query( 'UPDATE T_email__campaign
+			  SET ecmp_email_title = ecmp_name
+			WHERE ecmp_email_title = ""' );
 		upg_task_end();
 	}
 

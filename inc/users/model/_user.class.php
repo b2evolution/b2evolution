@@ -158,6 +158,18 @@ class User extends DataObject
 	var $is_collection_owner;
 
 	/**
+	 * IDs of newsletters which this user is subscribed on
+	 * @var array
+	 */
+	var $newsletter_subscriptions;
+
+	/**
+	 * TRUE if user's newsletter subscriptions were updated during user updating
+	 * @var boolean
+	 */
+	var $newsletter_subscriptions_updated = false;
+
+	/**
 	 * Constructor
 	 *
 	 * @param object DB row
@@ -1248,9 +1260,9 @@ class User extends DataObject
 					$UserSettings->set( 'notify_cronjob_error', param( 'edited_user_notify_cronjob_error', 'integer', 0 ), $this->ID );
 				}
 
-				// Newsletter
-				$UserSettings->set( 'newsletter_news', param( 'edited_user_newsletter_news', 'integer', 0 ), $this->ID );
-				$UserSettings->set( 'newsletter_ads', param( 'edited_user_newsletter_ads', 'integer', 0 ), $this->ID );
+				// Newsletters:
+				$newsletter_subscriptions = param( 'edited_user_newsletters', 'array:integer', NULL );
+				$this->set_newsletter_subscriptions( $newsletter_subscriptions );
 
 				// Emails limit per day
 				param_integer_range( 'edited_user_notification_email_limit', 0, 999, T_('Notificaiton email limit must be between %d and %d.') );
@@ -3547,6 +3559,9 @@ class User extends DataObject
 			// Reset new fields in object:
 			$this->new_fields = array();
 		}
+
+		// Update newsletter subscriptions:
+		$this->update_newsletter_subscriptions();
 
 		// Notify plugins:
 		// Example: An authentication plugin could synchronize/update the password of the user.
@@ -6697,6 +6712,123 @@ class User extends DataObject
 		}
 
 		return $this->flagged_items_count;
+	}
+
+
+	/**
+	 * Get IDs of newsletters which this user is subscribed on
+	 *
+	 * @return array
+	 */
+	function get_newsletter_subscriptions()
+	{
+		if( empty( $this->ID ) )
+		{	// Only created user can has the newsletter subscriptions:
+			return array();
+		}
+
+		if( ! isset( $this->newsletter_subscriptions ) )
+		{	// Initialize newsletter subscriptions array only on first request:
+			global $DB;
+
+			$SQL = new SQL( 'Get newsletter subscriptions of user #'.$this->ID );
+			$SQL->SELECT( 'enls_enlt_ID' );
+			$SQL->FROM( 'T_email__newsletter_subscription' );
+			$SQL->WHERE( 'enls_user_ID = '.$this->ID );
+			$this->newsletter_subscriptions = $DB->get_col( $SQL->get(), 0, $SQL->title );
+		}
+
+		return $this->newsletter_subscriptions;
+	}
+
+
+	/**
+	 * Set newsletter subscriptions for this user
+	 *
+	 * @param array
+	 */
+	function set_newsletter_subscriptions( $new_subscriptions )
+	{
+		$prev_subscriptions = $this->get_newsletter_subscriptions();
+
+		if( ! is_array( $new_subscriptions ) )
+		{	// This must be an array:
+			$new_subscriptions = array();
+		}
+
+		foreach( $new_subscriptions as $n => $new_subscription_ID )
+		{
+			// Format each value to integer:
+			$new_subscription_ID = intval( $new_subscription_ID );
+			if( empty( $new_subscription_ID ) )
+			{	// Unset wrong value:
+				unset( $new_subscriptions[ $n ] );
+			}
+			else
+			{	// Keep integer values only:
+				$new_subscriptions[ $n ] = $new_subscription_ID;
+			}
+		}
+
+		// Check if subscriptions were updated:
+		if( count( $prev_subscriptions ) != count( $new_subscriptions ) )
+		{	// If a count of subscriptions are not equals then mark they are updated:
+			$this->newsletter_subscriptions_updated = true;
+		}
+		else
+		{
+			sort( $new_subscriptions );
+			sort( $prev_subscriptions );
+			if( $prev_subscriptions != $new_subscriptions )
+			{	// If subscriptions were really updated:
+				$this->newsletter_subscriptions_updated = true;
+			}
+		}
+
+		// Set new subscriptions:
+		$this->newsletter_subscriptions = $new_subscriptions;
+	}
+
+
+	/**
+	 * Update newsletter subscriptions of this user
+	 *
+	 * @return boolean TRUE on success updating
+	 */
+	function update_newsletter_subscriptions()
+	{
+		if( empty( $this->ID ) )
+		{	// Only created user can has the newsletter subscriptions:
+			return false;
+		}
+
+		if( ! $this->newsletter_subscriptions_updated )
+		{	// Nothing to update:
+			return false;
+		}
+
+		global $DB;
+
+		// Clear newsletter subscriptions before updating:
+		$DB->query( 'DELETE FROM T_email__newsletter_subscription
+			WHERE enls_user_ID = '.$this->ID,
+			'Clear newsletter subscriptions of user #'.$this->ID.' before updating to new' );
+
+		if( empty( $this->newsletter_subscriptions ) )
+		{	// No new subscriptions to insert:
+			return true;
+		}
+
+		$newsletter_subscription_rows = array();
+		foreach( $this->newsletter_subscriptions as $newsletter_subscription_ID )
+		{
+			$newsletter_subscription_rows[] = '( '.$this->ID.', '.$newsletter_subscription_ID.' )';
+		}
+		// Insert subscriptions:
+		return $DB->query( 'INSERT INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )
+			VALUES '.implode( ',', $newsletter_subscription_rows ),
+			'Insert newsletter subscriptions for user #'.$this->ID.' as updating' );
+		
 	}
 }
 

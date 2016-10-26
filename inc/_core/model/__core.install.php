@@ -484,11 +484,19 @@ $schema_queries = array(
 	'T_email__newsletter' => array(
 		'Creating email newsletters table',
 		"CREATE TABLE T_email__newsletter (
-			enlt_ID     INT NOT NULL AUTO_INCREMENT,
+			enlt_ID     INT UNSIGNED NOT NULL AUTO_INCREMENT,
 			enlt_name   VARCHAR(255) NOT NULL,
 			enlt_label  VARCHAR(255) NULL,
 			enlt_active TINYINT(1) UNSIGNED DEFAULT 1,
 			PRIMARY KEY (enlt_ID)
+		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
+
+	'T_email__newsletter_subscription' => array(
+		'Creating email newsletter subscriptions table',
+		"CREATE TABLE T_email__newsletter_subscription (
+			enls_user_ID INT UNSIGNED NOT NULL,
+			enls_enlt_ID INT UNSIGNED NOT NULL,
+			PRIMARY KEY (enls_user_ID, enls_enlt_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
 	'T_email__campaign' => array(
@@ -497,7 +505,7 @@ $schema_queries = array(
 			ecmp_ID              INT NOT NULL AUTO_INCREMENT,
 			ecmp_date_ts         TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			ecmp_name            VARCHAR(255) NOT NULL,
-			ecmp_email_title     VARCHAR(255) NULL,
+			ecmp_email_title     VARCHAR(255) NOT NULL,
 			ecmp_email_html      TEXT NULL,
 			ecmp_email_text      TEXT NULL,
 			ecmp_email_plaintext TEXT NULL,

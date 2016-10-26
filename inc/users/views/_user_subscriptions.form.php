@@ -190,11 +190,19 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Newsletter subscriptions').( is_admin_page() ? get_manual_link( 'user-newsletters-panel' ) : '' ) );
 
-	$newsletter_options = array(
-		array( 'edited_user_newsletter_news', 1, T_( 'Send me news about this site.' ).' <span class="note">'.T_('Each message contains an easy 1 click unsubscribe link.').'</span>', $UserSettings->get( 'newsletter_news',  $edited_User->ID ) ),
-		array( 'edited_user_newsletter_ads', 1, T_( 'I want to receive ADs that may be relevant to my interests.' ), $UserSettings->get( 'newsletter_ads',  $edited_User->ID ) )
-	);
-	$Form->checklist( $newsletter_options, 'edited_user_newsletter', T_( 'Newsletter' ), false, false, $checklist_params );
+	$NewsletterCache = get_NewsletterCache();
+	$NewsletterCache->load_where( 'enlt_active = 1' );
+
+	if( count( $NewsletterCache->cache ) )
+	{	// If at least one newsletter is active:
+		$user_newsletter_subscriptions = $edited_User->get_newsletter_subscriptions();
+		$newsletter_options = array();
+		foreach( $NewsletterCache->cache as $Newsletter )
+		{
+			$newsletter_options[] = array( 'edited_user_newsletters[]', $Newsletter->ID, $Newsletter->get( 'name' ).': '.$Newsletter->get( 'label' ), in_array( $Newsletter->ID, $user_newsletter_subscriptions ) );
+		}
+		$Form->checklist( $newsletter_options, 'edited_user_newsletter', T_( 'Newsletter' ), false, false, $checklist_params );
+	}
 
 	// Limit newsletters:
 	if( $is_admin_page )

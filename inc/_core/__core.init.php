@@ -74,6 +74,7 @@ $db_config['aliases'] = array(
 		'T_email__returns'         => $tableprefix.'email__returns',
 		'T_email__address'         => $tableprefix.'email__address',
 		'T_email__newsletter'      => $tableprefix.'email__newsletter',
+		'T_email__newsletter_subscription' => $tableprefix.'email__newsletter_subscription',
 		'T_email__campaign'        => $tableprefix.'email__campaign',
 		'T_email__campaign_send'   => $tableprefix.'email__campaign_send',
 		'T_syslog'                 => $tableprefix.'syslog',
