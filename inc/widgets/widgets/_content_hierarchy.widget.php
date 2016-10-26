@@ -124,14 +124,14 @@ class content_hierarchy_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Item;
+		global $Item, $disp;
 
 		$this->init_display( $params );
 
 		echo $this->disp_params['block_start'];
 
-		if( !empty( $Item ) )
-		{ // Set selected Item in the params
+		if( ( $disp == 'single' || $disp == 'page' ) && ! empty( $Item ) )
+		{	// Set selected Item in the params ONLY if we really view item page:
 			$params['selected_item_ID'] = $Item->ID;
 		}
 
