@@ -19,7 +19,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Get number of users for newsletter from UserList filterset
  *
  * @return array Numbers of users:
- *     'all' - Currently selected recipients (Accounts which accept newsletter emails)
+ *     'all' - Currently selected recipients (Accounts which accept newsletter of the campaign)
+	 *   'filter'  - Filtered active users which accept newsletter of the campaign
  *     'active' - Already received (Accounts which have already been sent this newsletter)
  *     'newsletter' - Ready to send (Accounts which have not been sent this newsletter yet)
  */
@@ -27,6 +28,7 @@ function get_newsletter_users_numbers()
 {
 	$numbers = array(
 			'all'        => 0,
+			'filter'     => 0,
 			'active'     => 0,
 			'newsletter' => 0,
 		);
@@ -39,7 +41,7 @@ function get_newsletter_users_numbers()
 
 		$numbers['all'] = count( $users_IDs );
 
-		// Get number of all active users
+		// Get number of all active users:
 		$SQL = new SQL();
 		$SQL->SELECT( 'COUNT( * )' );
 		$SQL->FROM( 'T_users' );
@@ -47,7 +49,7 @@ function get_newsletter_users_numbers()
 		$SQL->WHERE_and( 'user_status IN ( \'activated\', \'autoactivated\' )' );
 		$numbers['active'] = $DB->get_var( $SQL->get() );
 
-		// Get number of all active users which accept newsletter email
+		// Get number of all active users which accept email newsletter:
 		$SQL = get_newsletter_users_sql( $users_IDs );
 		$SQL->SELECT( 'COUNT( * )' );
 		$numbers['newsletter'] = $DB->get_var( $SQL->get() );
@@ -58,7 +60,7 @@ function get_newsletter_users_numbers()
 
 
 /**
- * Get SQL for active users which accept newsletter email
+ * Get SQL for active users which accept email newsletter
  *
  * @param array users IDs
  * @return object SQL
@@ -75,11 +77,11 @@ function get_newsletter_users_sql( $users_IDs )
 	$SQL->WHERE( 'u.user_ID IN ( '.implode( ', ', $users_IDs ).' )' );
 	$SQL->WHERE_and( 'u.user_status IN ( \'activated\', \'autoactivated\' )' );
 	if( $Settings->get( 'def_newsletter_news' ) )
-	{	// If General setting "newsletter_news" = 1 we also should include all users without defined user's setting "newsletter_news"
+	{	// If General setting "newsletter_news" = 1 we also should include all users without defined user's setting "newsletter_news":
 		$SQL->WHERE_and( '( us.uset_value = 1 OR us.uset_value IS NULL )' );
 	}
 	else
-	{	// If General setting "newsletter_news" = 0 we take only users which accept newsletter email
+	{	// If General setting "newsletter_news" = 0 we take only users which accept email newsletter:
 		$SQL->WHERE_and( 'us.uset_value = 1' );
 	}
 

@@ -190,7 +190,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Newsletter subscriptions').( is_admin_page() ? get_manual_link( 'user-newsletters-panel' ) : '' ) );
 
-	$NewsletterCache = get_NewsletterCache();
+	$NewsletterCache = & get_NewsletterCache();
 	$NewsletterCache->load_where( 'enlt_active = 1' );
 
 	if( count( $NewsletterCache->cache ) )

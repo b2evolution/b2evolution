@@ -8141,6 +8141,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		{	// Insert user newsletter subscriptions:
 			$DB->query( 'INSERT INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )
 				VALUES '.implode( ',', $newsletter_subscription_rows ) );
+
+			// Clear old user settings:
+			$DB->query( 'DELETE FROM T_users__usersettings
+				WHERE uset_name IN ( "newsletter_news", "newsletter_ads" )' );
 		}
 
 		upg_task_end();
@@ -8153,6 +8157,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$DB->query( 'UPDATE T_email__campaign
 			  SET ecmp_email_title = ecmp_name
 			WHERE ecmp_email_title = ""' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12160, 'Upgrading email campaigns table...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_email__campaign
+			MODIFY ecmp_ID      INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			DROP   ecmp_name,
+			ADD    ecmp_enlt_ID INT UNSIGNED NOT NULL AFTER ecmp_date_ts' );
+		// Set first newsletter by default:
+		$DB->query( 'UPDATE T_email__campaign
+			SET ecmp_enlt_ID = 1' );
 		upg_task_end();
 	}
 

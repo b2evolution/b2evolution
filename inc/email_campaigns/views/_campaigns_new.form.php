@@ -22,9 +22,12 @@ $Form->hidden( 'ctrl', 'campaigns' );
 $Form->hidden( 'action', 'add' );
 
 $Form->begin_fieldset( T_('New campaign').get_manual_link( 'creating-an-email-campaign' ) );
-	$Form->text_input( 'ecmp_name', '', 60, T_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
+	$NewsletterCache = & get_NewsletterCache();
+	$NewsletterCache->load_where( 'enlt_active = 1' );
+	$Form->select_input_object( 'ecmp_enlt_ID', '', $NewsletterCache, T_('Send to subscribers of'), array( 'required' => true ) );
+	$Form->text_input( 'ecmp_email_title', '', 60, T_('Email title'), '', array( 'maxlength' => 255, 'required' => true ) );
 $Form->end_fieldset();
 
-$Form->end_form( array( array( 'submit', 'submit', T_('Create campaign and select recipients'), 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'submit', T_('Create campaign'), 'SaveButton' ) ) );
 
 ?>

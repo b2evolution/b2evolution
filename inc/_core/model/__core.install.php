@@ -502,9 +502,9 @@ $schema_queries = array(
 	'T_email__campaign' => array(
 		'Creating email campaigns table',
 		"CREATE TABLE T_email__campaign (
-			ecmp_ID              INT NOT NULL AUTO_INCREMENT,
+			ecmp_ID              INT UNSIGNED NOT NULL AUTO_INCREMENT,
 			ecmp_date_ts         TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-			ecmp_name            VARCHAR(255) NOT NULL,
+			ecmp_enlt_ID         INT UNSIGNED NOT NULL,
 			ecmp_email_title     VARCHAR(255) NOT NULL,
 			ecmp_email_html      TEXT NULL,
 			ecmp_email_text      TEXT NULL,

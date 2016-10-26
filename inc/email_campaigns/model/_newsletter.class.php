@@ -52,6 +52,32 @@ class Newsletter extends DataObject
 
 
 	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		return array(
+				array( 'table'=>'T_email__campaign', 'fk'=>'ecmp_enlt_ID', 'msg'=>T_('%d campaigns are assigned to this newsletter') ),
+			);
+	}
+
+
+	/**
+	 * Get delete cascade settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_cascades()
+	{
+		return array(
+				array( 'table'=>'T_email__newsletter_subscription', 'fk'=>'enls_enlt_ID', 'msg'=>T_('%d user subscriptions') ),
+			);
+	}
+
+
+	/**
 	 * Load data from Request form fields.
 	 *
 	 * @return boolean true if loaded data seems valid.
@@ -73,6 +99,17 @@ class Newsletter extends DataObject
 		$this->set_from_Request( 'label', 'enlt_label', true );
 
 		return ! param_errors_detected();
+	}
+
+
+	/**
+	 * Get name of newsletter
+	 *
+	 * @return string Name of newsletter
+	 */
+	function get_name()
+	{
+		return $this->get( 'name' );
 	}
 }
 

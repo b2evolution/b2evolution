@@ -446,16 +446,17 @@ function & get_EmailAddressCache()
 /**
  * Get the NewsletterCache
  *
+ * @param string The text that gets used for the "None" option in the objects options list (Default: T_('Unknown')).
  * @return NewsletterCache
  */
-function & get_NewsletterCache()
+function & get_NewsletterCache( $allow_none_text = NULL )
 {
 	global $NewsletterCache;
 
 	if( ! isset( $NewsletterCache ) )
 	{	// Cache doesn't exist yet:
 		load_class( 'email_campaigns/model/_newsletter.class.php', 'Newsletter' );
-		$NewsletterCache = new DataObjectCache( 'Newsletter', false, 'T_email__newsletter', 'enlt_', 'enlt_ID' );
+		$NewsletterCache = new DataObjectCache( 'Newsletter', false, 'T_email__newsletter', 'enlt_', 'enlt_ID', 'enlt_name', 'enlt_name', $allow_none_text );
 	}
 
 	return $NewsletterCache;

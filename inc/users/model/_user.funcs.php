@@ -3299,6 +3299,16 @@ function callback_filter_userlist( & $Form )
 			$Form->select_input_object( 'org', get_param('org'), $OrganizationCache, T_('Organization'), array( 'allow_none' => true ) );
 		}
 	}
+
+	if( is_admin_page() )
+	{	// Filter by newsletter only on back-office:
+		$NewsletterCache = & get_NewsletterCache( T_('All') );
+		$NewsletterCache->load_all();
+		if( count( $NewsletterCache->cache ) > 0 )
+		{
+			$Form->select_input_object( 'newsletter', get_param( 'newsletter' ), $NewsletterCache, T_('Subscribed to'), array( 'allow_none' => true ) );
+		}
+	}
 	echo '<br />';
 
 	$criteria_types = param( 'criteria_type', 'array:integer' );

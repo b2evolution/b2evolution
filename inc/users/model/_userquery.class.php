@@ -508,6 +508,32 @@ class UserQuery extends SQL
 		$this->FROM_add( 'INNER JOIN T_users__user_org ON uorg_user_ID = user_ID AND uorg_org_ID = '.$DB->quote( $org_ID ) );
 	}
 
+
+	/**
+	 * Select by newsletter ID
+	 *
+	 * @param integer Newsletter ID
+	 */
+	function where_newsletter( $newsletter_ID )
+	{
+		global $DB;
+
+		$newsletter_ID = intval( $newsletter_ID );
+
+		if( empty( $newsletter_ID ) )
+		{
+			return;
+		}
+
+		$this->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$DB->quote( $newsletter_ID ) );
+	}
+
+
+	/**
+	 * Restrict with viewed user
+	 *
+	 * @param integer User ID
+	 */
 	function where_viewed_user( $user_ID )
 	{
 		global $DB;

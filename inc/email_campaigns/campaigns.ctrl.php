@@ -37,6 +37,25 @@ if( param( 'ecmp_ID', 'integer', '', true) )
 
 switch( $action )
 {
+	case 'new':
+		// New Email Campaign form:
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
+		// Check if at least one newsletter is active:
+		$NewsletterCache = & get_NewsletterCache();
+		$NewsletterCache->load_where( 'enlt_active = 1' );
+		if( empty( $NewsletterCache->cache ) )
+		{
+			$Messages->add( T_('You must create an active Newsletter before you can create a new Campaign'), 'error' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=newsletters', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		break;
+
 	case 'add':
 		// Add Email Campaign...
 
@@ -58,10 +77,10 @@ switch( $action )
 		$new_EmailCampaign->dbinsert();
 		$Session->set( 'edited_campaign_ID', $new_EmailCampaign->ID );
 
-		$Messages->add( T_('The email campaign was created. Please select the recipients.'), 'success' );
+		$Messages->add( T_('The email campaign was created.'), 'success' );
 
 		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( $admin_url.'?ctrl=users&action=newsletter', 303 ); // Will EXIT
+		header_redirect( $admin_url.'?ctrl=campaigns&action=edit&ecmp_ID='.$new_EmailCampaign->ID, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
@@ -122,7 +141,7 @@ switch( $action )
 		$Session->set( 'edited_campaign_ID', $edited_EmailCampaign->ID );
 
 		// Redirect to select users:
-		header_redirect( $admin_url.'?ctrl=users&action=newsletter', 303 ); // Will EXIT
+		header_redirect( $admin_url.'?ctrl=users&action=newsletter&filter=new&newsletter='.$edited_EmailCampaign->get( 'enlt_ID' ), 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
@@ -146,7 +165,6 @@ switch( $action )
 		if( empty( $edited_EmailCampaign ) )
 		{ // Create new email campaign if it didn't create before
 			$edited_EmailCampaign = new EmailCampaign();
-			$edited_EmailCampaign->set( 'name', 'New campaign' );
 			$edited_EmailCampaign->dbinsert();
 		}
 
