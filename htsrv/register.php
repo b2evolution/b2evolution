@@ -366,7 +366,8 @@ switch( $action )
 			$UserSettings->set( 'registration_trigger_url' , $session_registration_trigger_url, $new_User->ID );
 		}
 		$UserSettings->set( 'created_fromIPv4', ip2int( $Hit->IP ), $new_User->ID );
-		$UserSettings->set( 'user_domain', $Hit->get_remote_host( true ), $new_User->ID );
+		$user_domain = $Hit->get_remote_host( true );
+		$UserSettings->set( 'user_domain', $user_domain, $new_User->ID );
 		$UserSettings->set( 'user_browser', substr( $Hit->get_user_agent(), 0 , 200 ), $new_User->ID );
 		$UserSettings->dbupdate();
 
@@ -377,10 +378,18 @@ switch( $action )
 					VALUES ( '.$DB->quote( $Blog->ID ).', '.$DB->quote( $new_User->ID ).', '.$DB->quote( intval( $auto_subscribe_posts ) ).', '.$DB->quote( intval( $auto_subscribe_comments ) ).' )' );
 		}
 
+		// Get user domain status:
+		load_funcs( 'sessions/model/_hitlog.funcs.php' );
+		$DomainCache = & get_DomainCache();
+		$Domain = & get_Domain_by_subdomain( $user_domain );
+		$dom_status_titles = stats_dom_status_titles();
+		$dom_status = $dom_status_titles[ $Domain ? $Domain->get( 'status' ) : 'unknown' ];
+
 		// Send notification email about new user registrations to users with edit users permission
 		$email_template_params = array(
 				'country'     => $new_User->get( 'ctry_ID' ),
 				'reg_country' => $new_User->get( 'reg_ctry_ID' ),
+				'reg_domain'  => $user_domain.' ('.$dom_status.')',
 				'firstname'   => $firstname,
 				'lastname'    => $lastname,
 				'fullname'    => $new_User->get( 'fullname' ),
