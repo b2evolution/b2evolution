@@ -499,6 +499,7 @@ class EmailCampaign extends DataObject
 				'include_greeting' => false,
 				'message_html'     => $this->get( 'email_html' ),
 				'message_text'     => $this->get( 'email_plaintext' ),
+				'newsletter'       => $this->get( 'enlt_ID' ),
 			);
 
 		if( $mode == 'test' )

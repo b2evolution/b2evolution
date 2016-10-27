@@ -133,8 +133,28 @@ $edited_User = $UserCache->get_by_ID( $user_ID, false, false );
 
 			case 'newsletter':
 				// unsubscribe from newsletter
-				$UserSettings->set( 'newsletter_news', '0', $edited_User->ID );
-				$UserSettings->dbupdate();
+
+				// Use first newsletter by default for old unsubscribe url when we had only one static newsletter,
+				//    which was upgraded to Newsletter with ID = 1
+				$newsletter_ID = param( 'newsletter', 'integer', 1 );
+
+				$check_SQL = new SQL( 'Check if user #'.$edited_User->ID.' is subscribed on newsletter #'.$newsletter_ID );
+				$check_SQL->SELECT( 'enls_user_ID' );
+				$check_SQL->FROM( 'T_email__newsletter_subscription' );
+				$check_SQL->WHERE( 'enls_user_ID = '.$DB->quote( $edited_User->ID ) );
+				$check_SQL->WHERE_and( 'enls_enlt_ID = '.$DB->quote( $newsletter_ID ) );
+
+				if( $DB->get_var( $check_SQL->get(), 0, NULL, $check_SQL->title ) )
+				{	// Delete a subscription only the user was really subscribed:
+					$DB->query( 'DELETE FROM T_email__newsletter_subscription
+						WHERE enls_user_ID = '.$DB->quote( $edited_User->ID ).'
+						  AND enls_enlt_ID = '.$DB->quote( $newsletter_ID ),
+						'Unsubscribe user #'.$edited_User->ID.' from newsletter #'.$newsletter_ID );
+				}
+				else
+				{	// Display a message is the user is not subscribed on the requested newsletter:
+					$msg = T_('You are not subscribed on this newsletter.');
+				}
 				break;
 
 			case 'user_registration':
