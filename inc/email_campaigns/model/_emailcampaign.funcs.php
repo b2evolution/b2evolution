@@ -16,80 +16,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * Get number of users for newsletter from UserList filterset
- *
- * @return array Numbers of users:
- *     'all' - Currently selected recipients (Accounts which accept newsletter of the campaign)
-	 *   'filter'  - Filtered active users which accept newsletter of the campaign
- *     'active' - Already received (Accounts which have already been sent this newsletter)
- *     'newsletter' - Ready to send (Accounts which have not been sent this newsletter yet)
- */
-function get_newsletter_users_numbers()
-{
-	$numbers = array(
-			'all'        => 0,
-			'filter'     => 0,
-			'active'     => 0,
-			'newsletter' => 0,
-		);
-
-	$users_IDs = get_filterset_user_IDs();
-
-	if( count( $users_IDs ) )
-	{ // Found users in the filterset
-		global $DB;
-
-		$numbers['all'] = count( $users_IDs );
-
-		// Get number of all active users:
-		$SQL = new SQL();
-		$SQL->SELECT( 'COUNT( * )' );
-		$SQL->FROM( 'T_users' );
-		$SQL->WHERE( 'user_ID IN ( '.implode( ', ', $users_IDs ).' )' );
-		$SQL->WHERE_and( 'user_status IN ( \'activated\', \'autoactivated\' )' );
-		$numbers['active'] = $DB->get_var( $SQL->get() );
-
-		// Get number of all active users which accept email newsletter:
-		$SQL = get_newsletter_users_sql( $users_IDs );
-		$SQL->SELECT( 'COUNT( * )' );
-		$numbers['newsletter'] = $DB->get_var( $SQL->get() );
-	}
-
-	return $numbers;
-}
-
-
-/**
- * Get SQL for active users which accept email newsletter
- *
- * @param array users IDs
- * @return object SQL
- */
-function get_newsletter_users_sql( $users_IDs )
-{
-	global $Settings;
-
-	$SQL = new SQL();
-	$SQL->SELECT( 'u.user_ID' );
-	$SQL->FROM( 'T_users u' );
-	$SQL->FROM_add( 'LEFT OUTER JOIN T_users__usersettings us ON u.user_ID = us.uset_user_ID' );
-	$SQL->FROM_add( 'AND us.uset_name = \'newsletter_news\'' );
-	$SQL->WHERE( 'u.user_ID IN ( '.implode( ', ', $users_IDs ).' )' );
-	$SQL->WHERE_and( 'u.user_status IN ( \'activated\', \'autoactivated\' )' );
-	if( $Settings->get( 'def_newsletter_news' ) )
-	{	// If General setting "newsletter_news" = 1 we also should include all users without defined user's setting "newsletter_news":
-		$SQL->WHERE_and( '( us.uset_value = 1 OR us.uset_value IS NULL )' );
-	}
-	else
-	{	// If General setting "newsletter_news" = 0 we take only users which accept email newsletter:
-		$SQL->WHERE_and( 'us.uset_value = 1' );
-	}
-
-	return $SQL;
-}
-
-
-/**
  * Get user IDs from current filterset of users list
  *
  * @param string Filterset name
@@ -196,6 +122,22 @@ function get_campaign_tab_url( $current_tab, $campaign_ID, $type = 'current', $g
 	}
 
 	return '';
+}
+
+
+/**
+ * Get EmailCampaign object from object which is used to select recipients
+ *
+ * @return object EmailCampaign
+ */
+function & get_session_EmailCampaign()
+{
+	global $Session;
+
+	$EmailCampaignCache = & get_EmailCampaignCache();
+	$edited_EmailCampaign = & $EmailCampaignCache->get_by_ID( intval( $Session->get( 'edited_campaign_ID' ) ), false, false );
+
+	return $edited_EmailCampaign;
 }
 
 ?>

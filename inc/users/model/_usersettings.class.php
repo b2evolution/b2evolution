@@ -139,9 +139,6 @@ class UserSettings extends AbstractSettings
 		'enable_PM' => 1,
 		'enable_email' => 1,
 
-		'newsletter_news' => 1, // Send news
-		'newsletter_ads'  => 0, // Send ADs
-
 		'notification_email_limit' => 3, // How many notification email is allowed per day for this user
 		'newsletter_limit' => 1, // How many newsletter email is allowed per day for this user
 	);

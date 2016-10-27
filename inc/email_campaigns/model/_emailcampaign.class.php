@@ -106,39 +106,43 @@ class EmailCampaign extends DataObject
 
 
 	/**
-	 * Add users for this campaign in DB
+	 * Add recipients for this campaign into DB
 	 *
 	 * @param array|NULL Array of user IDs, NULL - to get user IDs from current filterset of users list
 	 */
-	function add_users( $new_users_IDs = NULL )
+	function add_recipients( $filtered_users_IDs = NULL )
 	{
 		global $DB;
 
-		if( $new_users_IDs === NULL )
+		if( $filtered_users_IDs === NULL )
 		{	// Get user IDs from current filterset of users list:
-			$new_users_IDs = get_filterset_user_IDs();
+			$filtered_users_IDs = get_filterset_user_IDs();
 		}
 
-		if( count( $new_users_IDs ) )
-		{ // Users are found in the filterset
+		if( count( $filtered_users_IDs ) )
+		{	// If users are found in the filterset
 
-			// Get all active users which accept newsletter email
-			$new_users_SQL = get_newsletter_users_sql( $new_users_IDs );
-			$new_users = $DB->get_col( $new_users_SQL->get() );
+			// Get all active users which accept email newsletter of this campaign:
+			$new_users_SQL = new SQL( 'Get recipients of newsletter #'.$this->get( 'enlt_ID' ) );
+			$new_users_SQL->SELECT( 'user_ID' );
+			$new_users_SQL->FROM( 'T_users' );
+			$new_users_SQL->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID' );
+			$new_users_SQL->WHERE( 'user_ID IN ( '.$DB->quote( $filtered_users_IDs ).' )' );
+			$new_users_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
+			$new_users_SQL->WHERE_and( 'enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
+			$new_users = $DB->get_col( $new_users_SQL->get(), 0, $new_users_SQL->title );
 
-			// Remove the users which didn't receive email before:
-			$DB->query( 'DELETE FROM T_email__campaign_send
-				WHERE csnd_camp_ID = '.$DB->quote( $this->ID ).'
-				  AND csnd_emlog_ID IS NULL' );
+			// Remove the filtered recipients which didn't receive email newsletter yet:
+			$this->remove_recipients();
 
-			// Get users which already received newsletter email
-			$old_users = $this->get_users( 'receive' );
+			// Get users which already received email newsletter:
+			$old_users = $this->get_recipients( 'receive' );
 
-			// Exclude old users from new users (To store value of csnd_emlog_ID)
+			// Exclude old users from new users (To store value of csnd_emlog_ID):
 			$new_users = array_diff( $new_users, $old_users );
 
 			if( count( $new_users ) )
-			{ // Insert new users for this campaign
+			{	// Insert new users for this campaign:
 				$insert_SQL = 'INSERT INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID ) VALUES';
 				foreach( $new_users as $user_ID )
 				{
@@ -147,6 +151,24 @@ class EmailCampaign extends DataObject
 				$DB->query( substr( $insert_SQL, 0, -1 ) );
 			}
 		}
+	}
+
+
+	/**
+	 * Remove the filtered recipients which didn't receive email newsletter yet
+	 */
+	function remove_recipients()
+	{
+		if( empty( $this->ID ) )
+		{	// Email campaign must be created in DB:
+			return;
+		}
+
+		global $DB;
+
+		$DB->query( 'DELETE FROM T_email__campaign_send
+			WHERE csnd_camp_ID = '.$DB->quote( $this->ID ).'
+			  AND csnd_emlog_ID IS NULL' );
 	}
 
 
@@ -195,7 +217,7 @@ class EmailCampaign extends DataObject
 
 
 	/**
-	 * Get user IDs of this campaign
+	 * Get recipient user IDs of this campaign
 	 *
 	 * @param string Type of users:
 	 *   'all'     - All active users which accept newsletter of this campaign
@@ -204,7 +226,7 @@ class EmailCampaign extends DataObject
 	 *   'wait'    - Users which still didn't receive email by some reason (Probably their newsletter limit was full)
 	 * @return array user IDs
 	 */
-	function get_users( $type = 'all' )
+	function get_recipients( $type = 'all' )
 	{
 		global $DB;
 
@@ -214,14 +236,14 @@ class EmailCampaign extends DataObject
 		}
 
 		// Get users from DB:
-		$users_SQL = new SQL();
+		$users_SQL = new SQL( 'Get recipients of campaign #'.$this->ID );
 		$users_SQL->SELECT( 'user_ID, csnd_emlog_ID, csnd_user_ID' );
 		$users_SQL->FROM( 'T_users' );
 		$users_SQL->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID' );
 		$users_SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON ( csnd_camp_ID = '.$DB->quote( $this->ID ).' AND ( csnd_user_ID = user_ID OR csnd_user_ID IS NULL ) )' );
 		$users_SQL->WHERE( 'enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
 		$users_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
-		$users = $DB->get_results( $users_SQL->get(), OBJECT, 'Get users of campaign #'.$this->ID );
+		$users = $DB->get_results( $users_SQL->get(), OBJECT, $users_SQL->title );
 
 		$this->users['all'] = array();
 		$this->users['filter'] = array();
@@ -237,7 +259,7 @@ class EmailCampaign extends DataObject
 				$this->users['filter'][] = $user_data->user_ID;
 			}
 			elseif( $user_data->csnd_user_ID > 0 )
-			{	// This user didn't still receive email:
+			{	// This user didn't receive email yet:
 				$this->users['wait'][] = $user_data->user_ID;
 				$this->users['filter'][] = $user_data->user_ID;
 			}
@@ -248,7 +270,7 @@ class EmailCampaign extends DataObject
 
 
 	/**
-	 * Get the users number of this campaign
+	 * Get the recipients number of this campaign
 	 *
 	 * @param string Type of users:
 	 *   'all'     - All active users which accept newsletter of this campaign
@@ -257,9 +279,9 @@ class EmailCampaign extends DataObject
 	 *   'wait'    - Users which still didn't receive email by some reason (Probably their newsletter limit was full)
 	 * @return integer Number of users
 	 */
-	function get_users_count( $type = 'all' )
+	function get_recipients_count( $type = 'all' )
 	{
-		return count( $this->get_users( $type ) );
+		return count( $this->get_recipients( $type ) );
 	}
 
 
@@ -276,7 +298,7 @@ class EmailCampaign extends DataObject
 		$r = parent::dbinsert();
 
 		// Update recipients:
-		$this->update_users();
+		$this->update_recipients();
 
 		return $r;
 	}
@@ -295,7 +317,7 @@ class EmailCampaign extends DataObject
 		$r = parent::dbupdate();
 
 		// Update recipients only if newsletter has been changed:
-		$this->update_users();
+		$this->update_recipients();
 
 		return $r;
 	}
@@ -347,18 +369,22 @@ class EmailCampaign extends DataObject
 	/**
 	 * Update recipients after newsletter of this email campaign was changed
 	 */
-	function update_users()
+	function update_recipients()
 	{
+		if( empty( $this->ID ) )
+		{	// Email campaign must be created in DB:
+			return;
+		}
+
 		if( empty( $this->newsletter_is_changed ) )
-		{	// Newsletter of this this email campaign was not changed, Don't update recipients:
+		{	// Newsletter of this email campaign was not changed, Don't update recipients:
 			return;
 		}
 
 		global $DB;
 
-		// Clear recipients of previous newsletter:
-		$DB->query( 'DELETE FROM T_email__campaign_send
-			WHERE csnd_camp_ID = '.$this->ID );
+		// Remove the filtered recipients of previous newsletter which didn't receive it yet:
+		$this->remove_recipients();
 
 		// Insert recipients of current newsletter:
 		$DB->query( 'INSERT INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID )
@@ -446,7 +472,7 @@ class EmailCampaign extends DataObject
 			$result = false;
 		}
 
-		if( $mode != 'test' && count( $this->get_users( 'wait' ) ) == 0 )
+		if( $mode != 'test' && count( $this->get_recipients( 'wait' ) ) == 0 )
 		{ // No users found which wait this newsletter
 			if( $display_messages )
 			{
@@ -510,7 +536,7 @@ class EmailCampaign extends DataObject
 		global $DB, $localtimenow, $mail_log_insert_ID, $Settings, $Messages;
 
 		// Send emails only for users which still don't receive emails:
-		$user_IDs = $this->get_users( 'wait' );
+		$user_IDs = $this->get_recipients( 'wait' );
 
 		if( empty( $user_IDs ) )
 		{ // No users, Exit here
@@ -691,7 +717,7 @@ class EmailCampaign extends DataObject
 			return false;
 		}
 
-		if( $this->get_users_count( 'wait' ) > 0 )
+		if( $this->get_recipients_count( 'wait' ) > 0 )
 		{	// Create cron job only when at least one user is waiting a newsletter of this email campaing:
 			load_class( '/cron/model/_cronjob.class.php', 'Cronjob' );
 			$email_campaign_Cronjob = new Cronjob();

@@ -35,10 +35,10 @@ $Form->begin_fieldset( T_('Newsletter recipients') );
 	$NewsletterCache = & get_NewsletterCache();
 	$NewsletterCache->load_where( 'enlt_active = 1 OR enlt_ID = '.intval( $edited_EmailCampaign->get( 'enlt_ID' ) ) );
 	$Form->select_input_object( 'ecmp_enlt_ID', $edited_EmailCampaign->get( 'enlt_ID' ), $NewsletterCache, T_('Send to subscribers of'), array( 'required' => true, 'field_suffix' => '<a href="'.$change_filter_url.'" class="btn btn-default">'.T_('Update').'</a>' ) );
-	$Form->info( T_('Currently selected recipients'), $edited_EmailCampaign->get_users_count(), '('.T_('Accounts which currently accept this newsletter').')' );
-	$Form->info( T_('After additional filter'), $edited_EmailCampaign->get_users_count( 'filter' ), '('.T_('Accounts that match your additional filter').') <a href="'.$change_filter_url.'" class="btn btn-default">'.T_('Change filter').'</a>' );
-	$Form->info( T_('Already received'), $edited_EmailCampaign->get_users_count( 'receive' ), '('.T_('Accounts which have already been sent this newsletter').')' );
-	$Form->info( T_('Ready to send'), $edited_EmailCampaign->get_users_count( 'wait' ), '('.T_('Accounts which have not been sent this newsletter yet').')' );
+	$Form->info( T_('Currently selected recipients'), $edited_EmailCampaign->get_recipients_count(), '('.T_('Accounts which currently accept this newsletter').')' );
+	$Form->info( T_('After additional filter'), $edited_EmailCampaign->get_recipients_count( 'filter' ), '('.T_('Accounts that match your additional filter').') <a href="'.$change_filter_url.'" class="btn btn-default">'.T_('Change filter').'</a>' );
+	$Form->info( T_('Already received'), $edited_EmailCampaign->get_recipients_count( 'receive' ), '('.T_('Accounts which have already been sent this newsletter').')' );
+	$Form->info( T_('Ready to send'), $edited_EmailCampaign->get_recipients_count( 'wait' ), '('.T_('Accounts which have not been sent this newsletter yet').')' );
 $Form->end_fieldset();
 
 $buttons = array();
