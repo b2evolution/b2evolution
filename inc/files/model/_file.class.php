@@ -2206,7 +2206,7 @@ class File extends DataObject
 					// Get the relative dirpath of this file to use in the url
 					$rdfp_dirname = dirname( $this->_rdfp_rel_path );
 					$rdfp_dirpath = ( $rdfp_dirname == '.' ) ? '' : $rdfp_dirname.'/';
-					$url = $this->_FileRoot->ads_url.$rdfp_dirpath.$Settings->get( 'evocache_foldername' ).'/'.$this->_name.'/'.$this->get_thumb_name( $size_name, $size_x ).'?mtime='.$this->get_lastmod_ts().'&root='.$this->_FileRoot->ID.'&path='.$this->get_rdfp_rel_path();
+					$url = $this->_FileRoot->ads_url.$rdfp_dirpath.$Settings->get( 'evocache_foldername' ).'/'.$this->_name.'/'.$this->get_thumb_name( $size_name, $size_x ).'?mtime='.$this->get_lastmod_ts();
 					$url = str_replace( '\/', '', $url ); // Fix incorrect path
 					return $url;
 				}
