@@ -19,6 +19,11 @@ global $admin_url, $tab, $edited_EmailCampaign;
 $Form = new Form( NULL, 'campaign_form' );
 $Form->begin_form( 'fform' );
 
+if( $current_User->check_perm( 'emails', 'edit' ) )
+{	// Print out this fake button on top in order to use submit action "save" on press "Enter" key:
+	echo '<input type="submit" name="actionArray[save]" style="position:absolute;left:-1000px" />';
+}
+
 $Form->add_crumb( 'campaign' );
 $Form->hidden( 'ctrl', 'campaigns' );
 $Form->hidden( 'current_tab', $tab );
