@@ -8172,6 +8172,33 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12165, 'Updating general default newsletter settings...' ) )
+	{	// part of 6.8.0-alpha
+		$old_settings_SQL = new SQL( 'Get all default newsletter settings' );
+		$old_settings_SQL->SELECT( 'set_name, set_value' );
+		$old_settings_SQL->FROM( 'T_settings' );
+		$old_settings_SQL->WHERE( 'set_name IN ( "def_newsletter_news", "def_newsletter_ads" )' );
+		$old_settings = $DB->get_assoc( $old_settings_SQL->get(), 0, $old_settings_SQL->title );
+
+		$new_settings = array();
+		if( ! isset( $old_settings['def_newsletter_news'] ) || $old_settings['def_newsletter_news'] )
+		{	// First newsletter setting(news) is enabled by default or saved in DB:
+			$new_settings[] = '1';
+		}
+		if( ! empty( $old_settings['def_newsletter_ads'] ) )
+		{	// Second newsletter setting(ads) is saved in DB:
+			$new_settings[] = '2';
+		}
+		// Insert new newsletter setting instead of old:
+		$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
+			VALUES ( "def_newsletters", "'.implode( ',', $new_settings ).'" )' );
+		// Delete old newsletter settings:
+		$DB->query( 'DELETE FROM T_settings
+			WHERE set_name IN ( "def_newsletter_news", "def_newsletter_ads" )' );
+
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

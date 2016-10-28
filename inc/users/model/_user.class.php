@@ -3460,7 +3460,7 @@ class User extends DataObject
 	 */
 	function dbinsert( $create_auto_blog = true )
 	{
-		global $Plugins, $DB;
+		global $Plugins, $DB, $Settings;
 
 		$DB->begin();
 
@@ -3476,6 +3476,10 @@ class User extends DataObject
 				// Reset new fields in object:
 				$this->new_fields = array();
 			}
+
+			// Insert default newsletter subscriptions for this user:
+			$def_newsletters = ( $Settings->get( 'def_newsletters' ) == '' ? array() : explode( ',', $Settings->get( 'def_newsletters' ) ) );
+			$this->insert_newsletter_subscriptions( $def_newsletters );
 
 			// Notify plugins:
 			// A user could be created also in another DB (to synchronize it with b2evo)
@@ -6815,20 +6819,40 @@ class User extends DataObject
 			WHERE enls_user_ID = '.$this->ID,
 			'Clear newsletter subscriptions of user #'.$this->ID.' before updating to new' );
 
-		if( empty( $this->newsletter_subscriptions ) )
+		// Insert newsletter subscriptions for this user:
+		return $this->insert_newsletter_subscriptions( $this->newsletter_subscriptions );
+	}
+
+
+	/**
+	 * Insert newsletter subscriptions for this user
+	 *
+	 * @param array Mewsletter IDs
+	 * @return boolean TRUE on success updating
+	 */
+	function insert_newsletter_subscriptions( $newsletter_IDs )
+	{
+		if( empty( $this->ID ) )
+		{	// Only created user can has the newsletter subscriptions:
+			return false;
+		}
+
+		if( empty( $newsletter_IDs ) )
 		{	// No new subscriptions to insert:
 			return true;
 		}
 
+		global $DB;
+
 		$newsletter_subscription_rows = array();
-		foreach( $this->newsletter_subscriptions as $newsletter_subscription_ID )
+		foreach( $newsletter_IDs as $newsletter_ID )
 		{
-			$newsletter_subscription_rows[] = '( '.$this->ID.', '.$newsletter_subscription_ID.' )';
+			$newsletter_subscription_rows[] = '( '.$this->ID.', '.$newsletter_ID.' )';
 		}
 		// Insert subscriptions:
 		return $DB->query( 'INSERT INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )
 			VALUES '.implode( ',', $newsletter_subscription_rows ),
-			'Insert newsletter subscriptions for user #'.$this->ID.' as updating' );
+			'Insert newsletter subscriptions for user #'.$this->ID );
 		
 	}
 }

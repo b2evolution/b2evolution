@@ -113,8 +113,7 @@ class GeneralSettings extends AbstractSettings
 		'def_notify_meta_comments' => '1',
 		'def_notify_post_moderation' => '1',
 		'def_notify_edit_pst_moderation' => '1',
-		'def_newsletter_news' => '1',
-		'def_newsletter_ads' => '0',
+		'def_newsletters' => '1',
 		'def_notification_email_limit' => '3',
 		'def_newsletter_limit' => '1',
 
