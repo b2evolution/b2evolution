@@ -121,6 +121,35 @@ switch( $action )
 		// We have EXITed already at this point!!
 		break;
 
+	case 'update_newsletter':
+		// Update Newsletter of Campaign:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'campaign' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
+		$current_tab = param( 'current_tab', 'string', 'info' );
+
+		// Update only newsletter of the edited Email Campaign:
+		param( 'ecmp_enlt_ID', 'integer', NULL );
+		param_string_not_empty( 'ecmp_enlt_ID', T_('Please select a newsletter.') );
+		$edited_EmailCampaign->set_from_Request( 'enlt_ID' );
+
+		// Save changes in DB:
+		$edited_EmailCampaign->dbupdate();
+
+		// Update recipients only if newsletter has been changed:
+		$edited_EmailCampaign->update_recipients( true );
+
+		$Messages->add( T_('Newsletter of the email campaign has been updated.'), 'success' );
+
+		// Redirect after saving:
+		header_redirect( get_campaign_tab_url( $current_tab, $edited_EmailCampaign->ID ), 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
+
 	case 'hide_wysiwyg_warning':
 	case 'show_wysiwyg_warning':
 		global $UserSettings;

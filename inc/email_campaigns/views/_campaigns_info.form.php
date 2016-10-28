@@ -31,12 +31,15 @@ $Form->begin_fieldset( T_('Campaign info').get_manual_link( 'creating-an-email-c
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Newsletter recipients') );
-	$change_filter_url = $admin_url.'?ctrl=campaigns&amp;action=change_users&amp;ecmp_ID='.$edited_EmailCampaign->ID;
 	$NewsletterCache = & get_NewsletterCache();
 	$NewsletterCache->load_where( 'enlt_active = 1 OR enlt_ID = '.intval( $edited_EmailCampaign->get( 'enlt_ID' ) ) );
-	$Form->select_input_object( 'ecmp_enlt_ID', $edited_EmailCampaign->get( 'enlt_ID' ), $NewsletterCache, T_('Send to subscribers of'), array( 'required' => true, 'field_suffix' => '<a href="'.$change_filter_url.'" class="btn btn-default">'.T_('Update').'</a>' ) );
+	$Form->select_input_object( 'ecmp_enlt_ID', $edited_EmailCampaign->get( 'enlt_ID' ), $NewsletterCache, T_('Send to subscribers of'), array(
+			'required'     => true,
+			'field_suffix' => '<input type="submit" name="actionArray[update_newsletter]" class="btn btn-default" value="'.format_to_output( T_('Update'), 'htmlattr' ).'" />' ) );
 	$Form->info( T_('Currently selected recipients'), $edited_EmailCampaign->get_recipients_count(), '('.T_('Accounts which currently accept this newsletter').')' );
-	$Form->info( T_('After additional filter'), $edited_EmailCampaign->get_recipients_count( 'filter' ), '('.T_('Accounts that match your additional filter').') <a href="'.$change_filter_url.'" class="btn btn-default">'.T_('Change filter').'</a>' );
+	$Form->info( T_('After additional filter'), $edited_EmailCampaign->get_recipients_count( 'filter' ),
+		'('.T_('Accounts that match your additional filter')
+		.') <a href="'.$admin_url.'?ctrl=campaigns&amp;action=change_users&amp;ecmp_ID='.$edited_EmailCampaign->ID.'" class="btn btn-default">'.T_('Change filter').'</a>' );
 	$Form->info( T_('Already received'), $edited_EmailCampaign->get_recipients_count( 'receive' ), '('.T_('Accounts which have already been sent this newsletter').')' );
 	$Form->info( T_('Ready to send'), $edited_EmailCampaign->get_recipients_count( 'wait' ), '('.T_('Accounts which have not been sent this newsletter yet').')' );
 $Form->end_fieldset();

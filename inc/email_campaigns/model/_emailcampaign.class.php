@@ -368,15 +368,17 @@ class EmailCampaign extends DataObject
 
 	/**
 	 * Update recipients after newsletter of this email campaign was changed
+	 *
+	 * @param boolean TRUE to force the updating
 	 */
-	function update_recipients()
+	function update_recipients( $force_update = false )
 	{
 		if( empty( $this->ID ) )
 		{	// Email campaign must be created in DB:
 			return;
 		}
 
-		if( empty( $this->newsletter_is_changed ) )
+		if( ! $force_update && empty( $this->newsletter_is_changed ) )
 		{	// Newsletter of this email campaign was not changed, Don't update recipients:
 			return;
 		}
