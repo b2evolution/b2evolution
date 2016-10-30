@@ -526,7 +526,7 @@ while( $Item = & $ItemList->get_item() )
 			{
 
 			// Try to get a previewed Comment and check if it is for current viewed Item:
-			$preview_Comment = $Session->get( 'core.preview_Comment' );
+			$preview_Comment = get_comment_from_session( 'preview', $comment_type );
 			$preview_Comment = ( empty( $preview_Comment ) || $preview_Comment->item_ID != $Item->ID ) ? false : $preview_Comment;
 
 			if( $preview_Comment )
@@ -559,15 +559,23 @@ while( $Item = & $ItemList->get_item() )
 				$checked_attachments = $Comment->checked_attachments;
 				// Get what renderer checkboxes were selected on form:
 				$comment_renderers = explode( '.', $Comment->get( 'renderers' ) );
-
-				// Delete any preview comment from session data:
-				$Session->delete( 'core.preview_Comment' );
 			}
 			else
 			{	// Create new Comment:
-				$Comment = new Comment();
+				if( ( $Comment = get_comment_from_session( 'unsaved', $comment_type ) ) === NULL )
+				{	// There is no saved Comment in Session
+					$Comment = new Comment();
+					$comment_attachments = '';
+					$checked_attachments = '';
+				}
+				else
+				{	// Get params from Session:
+					// comment_attachments contains all file IDs that have been attached
+					$comment_attachments = $Comment->preview_attachments;
+					// checked_attachments contains all attachment file IDs which checkbox was checked in
+					$checked_attachments = $Comment->checked_attachments;
+				}
 				$comment_content = $Comment->get( 'content' );
-				$comment_attachments = '';
 				$comment_renderers = $Comment->get_renderers();
 			}
 
@@ -587,7 +595,7 @@ while( $Item = & $ItemList->get_item() )
 
 			$Form->info( T_('User'), $current_User->get_identity_link( array( 'link_text' => 'name' ) ).' '.get_user_profile_link( ' [', ']', T_('Edit profile') )  );
 
-			if( $Item->can_rate() )
+			if( $comment_type != 'meta' && $Item->can_rate() )
 			{	// Comment rating:
 				ob_start();
 				$Comment->rating_input( array( 'item_ID' => $Item->ID ) );

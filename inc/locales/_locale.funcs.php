@@ -193,7 +193,7 @@ if( isset( $use_l10n ) && $use_l10n )
 			// Return the English string:
 			$r = $string;
 
-			// $messages_charset = 'iso-8859-1'; // our .php file encoding  
+			// $messages_charset = 'iso-8859-1'; // our .php file encoding
 			// fp> I am changing the above for the User custom field group labels (in theroy the php files are plain ASCII anyways!!)
 			$messages_charset = $evo_charset;
 		}
@@ -389,15 +389,7 @@ function locale_charset( $disp = true )
  */
 function locale_datefmt( $locale = NULL )
 {
-	global $locales;
-
-	if( empty($locale) )
-	{
-		global $current_locale;
-		$locale = $current_locale;
-	}
-
-	return $locales[$locale]['datefmt'];
+	return locale_get( 'datefmt', $locale );
 }
 
 
@@ -406,9 +398,7 @@ function locale_datefmt( $locale = NULL )
  */
 function locale_timefmt()
 {
-	global $locales, $current_locale;
-
-	return $locales[$current_locale]['timefmt'];
+	return locale_get( 'timefmt' );
 }
 
 /**
@@ -416,17 +406,13 @@ function locale_timefmt()
  */
 function locale_shorttimefmt()
 {
-	global $locales, $current_locale;
-
-	return $locales[$current_locale]['shorttimefmt'];
+	return locale_get( 'shorttimefmt' );
 }
 
 
 function locale_datetimefmt( $separator = ' ' )
 {
-	global $locales, $current_locale;
-
-	return $locales[$current_locale]['datefmt'].$separator.$locales[$current_locale]['timefmt'];
+	return locale_get( 'datefmt' ).$separator.locale_get( 'timefmt' );
 }
 
 /**
@@ -436,9 +422,7 @@ function locale_datetimefmt( $separator = ' ' )
  */
 function locale_startofweek()
 {
-	global $locales, $current_locale;
-
-	return (int)$locales[$current_locale]['startofweek'];
+	return ( int ) locale_get( 'startofweek' );
 }
 
 
@@ -887,7 +871,20 @@ function locale_updateDB()
 		}
 		elseif( $lnr != 0 )  // be sure to have catched a locale before
 		{
-			if( $lfield == 'startofweek' && ( $lfield < 0 || $lfield > 6 ) )
+			if( $lfield == 'datefmt' && empty( $pval ) )
+			{
+				param_error( $pkey, sprintf( T_('Locale %s date format cannot be empty'), $plocale ) );
+			}
+			elseif( $lfield == 'timefmt' && empty( $pval ) )
+			{
+				param_error( $pkey, sprintf( T_('Locale %s time format cannot be empty'), $plocale ) );
+			}
+			elseif( $lfield == 'shorttimefmt' && empty( $pval ) )
+			{
+				param_error( $pkey, sprintf( T_('Locale %s short time cannot be empty'), $plocale ) );
+			}
+
+			if( $lfield == 'startofweek' && ( $pval < 0 || $pval > 6 ) )
 			{ // startofweek must be between 0 and 6
 				continue;
 			}
@@ -905,6 +902,11 @@ function locale_updateDB()
 			}
 			$templocales[ $plocale ][ $lfield ] = $pval;
 		}
+	}
+
+	if( $Messages->has_errors() )
+	{
+		return false;
 	}
 
 	$locales = $templocales;
@@ -1601,6 +1603,65 @@ function locale_check_default()
 			.'1 )' );
 	}
 
+}
+
+
+/**
+ * Returns the locale's default field value
+ *
+ * @param string Locale field
+ * @param string Locale name, '#' to get default value not specific to a locale
+ * @param mixed Value to return if locale field is empty and no default value is set
+ * @return mixed Locale field value
+ */
+function locale_get( $field, $locale = NULL, $default = NULL )
+{
+	global $locales;
+
+	if( is_null( $locale ) )
+	{
+		global $current_locale;
+		$locale = $current_locale;
+	}
+
+	if( $locale == '#' || empty( $locales[$locale][$field] ) )
+	{
+		$default_values = array(
+			'datefmt' => 'Y-m-d',
+			'timefmt' => 'H:i:s',
+			'shorttimefmt' => 'H:i'
+		);
+
+		return isset( $default_values[$field] ) ? $default_values[$field] : $default;
+	}
+	else
+	{
+		return $locales[$locale][$field];
+	}
+}
+
+
+/**
+ * Set default values of locales formats
+ *
+ * @param array Locale
+ * @param array Source locale
+ */
+function locale_set_default_formats( & $locale, $source_locale = NULL )
+{
+	if( is_null( $source_locale ) )
+	{
+		$source_locale = $locale;
+	}
+
+	foreach( $source_locale as $l_key => $l_value )
+	{
+		if( $default_value = locale_get( $l_key, $source_locale ) )
+		{
+			$locale[$l_key] = $default_value;
+		}
+
+	}
 }
 
 ?>

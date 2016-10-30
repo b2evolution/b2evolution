@@ -19,7 +19,7 @@ load_funcs('plugins/_plugin.funcs.php');
  * @var ComponentWidget
  */
 global $edited_ComponentWidget;
-global $Blog, $admin_url, $AdminUI;
+global $Blog, $admin_url, $AdminUI, $Plugins;
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
@@ -33,6 +33,12 @@ if( ! isset( $AdminUI ) || ! isset( $AdminUI->skin_name ) || $AdminUI->skin_name
 
 $Form->begin_form( 'fform', sprintf( $creating ?  T_('New widget "%s" in container "%s"') : T_('Edit widget "%s" in container "%s"'), $edited_ComponentWidget->get_name(), $edited_ComponentWidget->get( 'sco_name' ) )
 		.' '.action_icon( T_('Open relevant page in online manual'), 'manual', $edited_ComponentWidget->get_help_url(), NULL, 5, NULL, array( 'target' => '_blank' ) ) );
+
+// Plugin widget form event:
+$Plugins->trigger_event( 'WidgetBeginSettingsForm', array(
+		'Form'            => & $Form,
+		'ComponentWidget' => & $edited_ComponentWidget,
+	) );
 
 	$Form->add_crumb( 'widget' );
 	$Form->hidden( 'action', $creating ? 'create' : 'update' );
@@ -85,9 +91,17 @@ $Form->end_fieldset();
 //       catch any params/settings maybe? Although this could be done in the
 //       same hook in most cases probably. (dh)
 
-$Form->end_form( array(
+$Form->buttons( array(
 		array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ),
 		array( 'submit', 'actionArray[update_edit]', T_('Save and continue editing...'), 'SaveButton' )
 	) );
+
+// Plugin widget form event:
+$Plugins->trigger_event( 'WidgetEndSettingsForm', array(
+		'Form'            => & $Form,
+		'ComponentWidget' => & $edited_ComponentWidget,
+	) );
+
+$Form->end_form();
 
 ?>

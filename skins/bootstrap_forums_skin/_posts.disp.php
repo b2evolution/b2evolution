@@ -194,10 +194,12 @@ if( isset( $MainList ) && ( empty( $single_cat_ID ) || ! empty( $multi_cat_IDs )
 
 if( $single_cat_ID )
 { // Go to grab the featured posts only on pages with defined category:
-	while( $Item = get_featured_Item() )
+	while( $Item = & get_featured_Item() )
 	{ // We have a intro post to display:
 		// ---------------------- ITEM LIST INCLUDED HERE ------------------------
-		skin_include( '_item_list.inc.php' );
+		skin_include( '_item_list.inc.php', array(
+				'Item' => $Item
+			) );
 		// ----------------------------END ITEM LIST  ----------------------------
 	}
 }

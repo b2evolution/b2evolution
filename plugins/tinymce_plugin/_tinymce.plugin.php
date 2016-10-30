@@ -36,7 +36,7 @@ class tinymce_plugin extends Plugin
 	var $code = 'evo_TinyMCE';
 	var $name = 'TinyMCE';
 	var $priority = 10;
-	var $version = '6.7.7';
+	var $version = '6.7.8';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -266,7 +266,7 @@ class tinymce_plugin extends Plugin
 	 */
 	function AdminDisplayEditorButton( & $params )
 	{
-		global $UserSettings;
+		global $wysiwyg_toggle_switch_js_initialized;
 
 		if( empty( $params['content_id'] ) )
 		{	// Value of html attribute "id" of textarea where tibymce is applied
@@ -294,8 +294,7 @@ class tinymce_plugin extends Plugin
 					return false;
 				}
 
-				$show_wysiwyg_warning = $UserSettings->get_collection_setting( 'show_wysiwyg_warning', $Blog->ID );
-				$hide_warning_url = get_htsrv_url().'async.php?action=hide_wysiwyg_warning&type=item'.( empty( $Blog ) ? '' : '&blog='.$Blog->ID ).'&'.url_crumb( 'item' );
+				$show_wysiwyg_warning = $this->UserSettings->get( 'show_wysiwyg_warning_'.$Blog->ID );
 				$wysiwyg_checkbox_label = TS_("Don't show this again for this Collection");
 
 				$state_params = array(
@@ -309,8 +308,7 @@ class tinymce_plugin extends Plugin
 				// Initialize settings for email campaign:
 				$edited_EmailCampaign = & $params['target_object'];
 
-				$show_wysiwyg_warning = $UserSettings->get( 'show_wysiwyg_warning_emailcampaign' );
-				$hide_warning_url = get_htsrv_url().'async.php?action=hide_wysiwyg_warning&type=emailcampaign'.url_crumb( 'campaign' );
+				$show_wysiwyg_warning = $this->UserSettings->get( 'show_wysiwyg_warning_emailcampaign' );
 				$wysiwyg_checkbox_label = TS_("Don't show this again when composing email campaigns");
 
 				$state_params = array(
@@ -324,290 +322,318 @@ class tinymce_plugin extends Plugin
 				return false;
 		}
 
-		// Get init params, depending on edit mode: simple|expert
-		$tmce_init = $this->get_tmce_init( $params['edit_layout'], $params['content_id'] );
-
+		if( empty( $wysiwyg_toggle_switch_js_initialized ) )
+		{
 		?>
-
-		<div class="btn-group">
-			<input id="tinymce_plugin_toggle_button_html" type="button" value="<?php echo format_to_output( $this->T_('Markup'), 'htmlattr' ); ?>" class="btn btn-default active" disabled="disabled"
-				title="<?php echo format_to_output( $this->T_('Toggle to the markup/pro editor.'), 'htmlattr' ); ?>" />
-			<input id="tinymce_plugin_toggle_button_wysiwyg" type="button" value="WYSIWYG" class="btn btn-default"
-				title="<?php echo format_to_output( $this->T_('Toggle to the WYSIWYG editor.'), 'htmlattr' ); ?>" />
-		</div>
-
-		<script type="text/javascript">
-			var displayWarning = <?php echo ( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ) ? 'true' : 'false';?>;
-			function confirmSwitch()
+			<script type="text/javascript">
+			function toggle_switch_warning( state )
 			{
-				if( jQuery( 'input[name=hideWarning]' ).is(':checked') )
-				{ // Do not show this warning again for this collection
-					var ajax_url = '<?php echo $hide_warning_url;?>';
-
-					jQuery.ajax( {
-						type: "GET",
-						dataType: "html",
-						url: ajax_url,
-						success: function( data )
+				var params = <?php echo json_encode( $state_params );?>;
+				var activate_link = '<?php echo $this->get_htsrv_url( 'save_wysiwyg_warning_state', array_merge( $state_params, array( 'on' => 1 ) ), '&' );?>';
+				var deactivate_link = '<?php echo $this->get_htsrv_url( 'save_wysiwyg_warning_state', array_merge( $state_params, array( 'on' => 0 ) ), '&' );?>';
+				jQuery.get( ( state ? activate_link : deactivate_link ),
+						function( data )
 						{
-							displayWarning = false;
+							// Fire wysiwyg warning state change event
+							jQuery( document ).trigger( 'wysiwyg_warning_changed', [ state ] );
+						} );
+			}
+			</script>
+		<?php
+			$wysiwyg_toggle_switch_js_initialized = true;
+		}
 
-							// toggle show/hide WYSIWYG switch in post edit form
-							if (typeof toggleWYSIWYGSwitch == 'function')
-							{ // make sure function exists first before calling
-								toggleWYSIWYGSwitch( false );
+		switch( $params['edit_layout'] )
+		{
+			case 'expert_quicksettings':
+				$params = array_merge( array(
+						'quicksetting_item_id' => 'quicksetting_wysiwyg_switch',
+						'quicksetting_item_start' => '<span id="%quicksetting_id%">',
+						'quicksetting_item_end' => '</span>'
+					), $params );
+
+				$params['quicksetting_item_start'] = str_replace( '%quicksetting_id%', $params['quicksetting_item_id'], $params['quicksetting_item_start'] );
+
+				$activate_warning_link = action_icon( '', 'activate', '', T_('Show an alert when switching from markup to WYSIWYG'), 3, 4, array( 'onclick' => 'toggle_switch_warning( false ); return false;' ) );
+				$deactivate_warning_link = action_icon( '', 'deactivate', '', T_('Never show alert when switching from markup to WYSIWYG'), 3, 4, array( 'onclick' => 'toggle_switch_warning( true ); return false;' ) );
+
+				echo $params['quicksetting_item_start'];
+				echo ( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ) ? $activate_warning_link : $deactivate_warning_link;
+				echo $params['quicksetting_item_end'];
+				?>
+				<script type="text/javascript">
+					var quicksetting_switch = jQuery( '#<?php echo $params['quicksetting_item_id'];?>' );
+					jQuery( document ).on( 'wysiwyg_warning_changed', function( event, state ) {
+							quicksetting_switch.html( state ? '<?php echo $activate_warning_link;?>' : '<?php echo $deactivate_warning_link;?>' );
+						} );
+				</script>
+				<?php
+
+				return true;
+
+			default:
+				// Get init params, depending on edit mode: simple|expert
+				$tmce_init = $this->get_tmce_init( $params['edit_layout'], $params['content_id'] );
+
+				?>
+
+				<div class="btn-group">
+					<input id="tinymce_plugin_toggle_button_html" type="button" value="<?php echo format_to_output( $this->T_('Markup'), 'htmlattr' ); ?>" class="btn btn-default active" disabled="disabled"
+						title="<?php echo format_to_output( $this->T_('Toggle to the markup/pro editor.'), 'htmlattr' ); ?>" />
+					<input id="tinymce_plugin_toggle_button_wysiwyg" type="button" value="WYSIWYG" class="btn btn-default"
+						title="<?php echo format_to_output( $this->T_('Toggle to the WYSIWYG editor.'), 'htmlattr' ); ?>" />
+				</div>
+
+				<script type="text/javascript">
+					var displayWarning = <?php echo ( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ) ? 'true' : 'false';?>;
+
+					jQuery( document ).on( 'wysiwyg_warning_changed', function( event, state ) {
+						displayWarning = state;
+					} );
+
+					function confirm_switch()
+					{
+						if( jQuery( 'input[name=hideWarning]' ).is(':checked') )
+						{ // Do not show warning again
+							toggle_switch_warning( false );
+						}
+
+						// switch to WYSIWYG
+						tinymce_plugin_toggleEditor('<?php echo $params['content_id']; ?>');
+
+						// close the modal window
+						closeModalWindow();
+
+						return false;
+					}
+
+					jQuery( '[id^=tinymce_plugin_toggle_button_]').click( function()
+					{
+						if( jQuery( this ).val() == 'WYSIWYG' )
+						{
+							if( displayWarning )
+							{
+								evo_js_lang_close = '<?php echo TS_('Cancel');?>';
+								openModalWindow( '<p><?php echo TS_('By switching to WYSIWYG, you might lose newline and paragraph marks as well as some other formatting. Your text is safe though! Are you sure you want to switch?');?></p>'
+									+ '<form>'
+									+ '<input type="checkbox" name="hideWarning" value="1"> ' + '<?php echo $wysiwyg_checkbox_label;?>'
+									+ '<input type="submit" name="submit" onclick="return confirm_switch();">'
+									+ '</form>',
+									'500px', '', true,
+									'<span class="text-danger"><?php echo TS_('WARNING');?></span>',
+									[ '<?php echo TS_('OK');?>', 'btn-primary' ] );
+							}
+							else
+							{
+								tinymce_plugin_toggleEditor('<?php echo $params['content_id']; ?>');
 							}
 						}
-					} );
-
-
-					// This is the non-AJAX version to toggle display of warning when switching from markup to WYSIWYG.
-					// Warning: User could lose unsaved changes when this option is used.
-					//<?php
-					//global $admin_url;
-					//$item_ID = get_param( 'p' ) > 0 ? get_param( 'p' ) : $edited_Item->ID;
-					//$prev_action = $item_ID > 0 ? 'edit' : 'new';
-					//$quick_setting_url = $admin_url.'?ctrl=items&prev_action='.$prev_action.( $item_ID > 0 ? '&p='.$item_ID : '' )
-					//		.'&blog='.$Blog->ID.'&'.url_crumb( 'item' ).'&action=hide_wysiwyg_warning';
-					//echo 'var quick_setting_url = \''.$quick_setting_url.'\';';
-					//?>
-					//window.location = quick_setting_url;
-				}
-
-				// switch to WYSIWYG
-				tinymce_plugin_toggleEditor('<?php echo $params['content_id']; ?>');
-
-				// close the modal window
-				closeModalWindow();
-
-				return false;
-			}
-			jQuery( '[id^=tinymce_plugin_toggle_button_]').click( function()
-			{
-				if( jQuery( this ).val() == 'WYSIWYG' )
-				{
-					if( displayWarning )
-					{
-						evo_js_lang_close = '<?php echo TS_('Cancel');?>';
-						openModalWindow( '<p><?php echo TS_('By switching to WYSIWYG, you might lose newline and paragraph marks as well as some other formatting. Your text is safe though! Are you sure you want to switch?');?></p>'
-							+ '<form>'
-							+ '<input type="checkbox" name="hideWarning" value="1"> ' + '<?php echo $wysiwyg_checkbox_label;?>'
-							+ '<input type="submit" name="submit" onclick="return confirmSwitch();">'
-							+ '</form>',
-							'500px', '', true,
-							'<span class="text-danger"><?php echo TS_('WARNING');?></span>',
-							[ '<?php echo TS_('OK');?>', 'btn-primary' ] );
-					}
-					else
-					{
-						tinymce_plugin_toggleEditor('<?php echo $params['content_id']; ?>');
-					}
-				}
-				else
-				{
-					tinymce_plugin_toggleEditor('<?php echo $params['content_id']; ?>');
-				}
-			} );
-
-			/**
-			 * Toggle TinyMCE editor on/off.
-			 * This updates the corresponding PluginUserSetting, too.
-			 */
-			function tinymce_plugin_toggleEditor(id)
-			{
-				jQuery( '[id^=tinymce_plugin_toggle_button_]' ).removeClass( 'active' ).attr( 'disabled', 'disabled' );
-
-				if( ! tinymce_plugin_init_done )
-				{
-					tinymce_plugin_init_done = true;
-					// call this method on init again, with "null" id, so that mceAddControl gets called.
-					tinymce_plugin_init_tinymce( function() {tinymce_plugin_toggleEditor(null)} );
-					return;
-				}
-
-				if( ! tinymce.get( id ) )
-				{ // Turn on WYSIWYG editor
-					tinymce.execCommand( 'mceAddEditor', false, id );
-					jQuery.get( '<?php echo $this->get_htsrv_url( 'save_editor_state', array_merge( $state_params, array( 'on' => 1 ) ), '&' ); ?>' );
-					jQuery( '#tinymce_plugin_toggle_button_wysiwyg' ).addClass( 'active' );
-					jQuery( '#tinymce_plugin_toggle_button_html' ).removeAttr( 'disabled' );
-					jQuery( '[name="editor_code"]').attr('value', '<?php echo $this->code; ?>' );
-					// Hide the plugin toolbars that allow to insert html tags
-					jQuery( '.quicktags_toolbar, .evo_code_toolbar, .evo_prism_toolbar, .b2evMark_toolbar' ).hide();
-					jQuery( '#block_renderer_evo_code, #block_renderer_evo_prism, #block_renderer_b2evMark' ).addClass( 'disabled' );
-					jQuery( 'input#renderer_evo_code, input#renderer_evo_prism, input#renderer_b2evMark' ).each( function()
-					{
-						if( jQuery( this ).is( ':checked' ) )
+						else
 						{
-							jQuery( this ).addClass( 'checked' );
+							tinymce_plugin_toggleEditor('<?php echo $params['content_id']; ?>');
 						}
-						jQuery( this ).attr( 'disabled', 'disabled' ).removeAttr( 'checked' );
 					} );
-				}
-				else
-				{ // Hide the editor, Display only source HTML
-					tinymce.execCommand( 'mceRemoveEditor', false, id );
-					jQuery.get( '<?php echo $this->get_htsrv_url( 'save_editor_state', array_merge( $state_params, array( 'on' => 0 ) ), '&' ); ?>' );
-					jQuery( '#tinymce_plugin_toggle_button_html' ).addClass( 'active' );
-					jQuery( '#tinymce_plugin_toggle_button_wysiwyg' ).removeAttr( 'disabled' );
-					jQuery( '[name="editor_code"]' ).attr( 'value', 'html' );
-					// Show the plugin toolbars that allow to insert html tags
-					jQuery( '.quicktags_toolbar, .evo_code_toolbar, .evo_prism_toolbar, .b2evMark_toolbar' ).show();
-					jQuery( '#block_renderer_evo_code, #block_renderer_evo_prism, #block_renderer_b2evMark' ).removeClass( 'disabled' );
-					jQuery( 'input#renderer_evo_code, input#renderer_evo_prism, input#renderer_b2evMark' ).each( function()
+
+					/**
+					* Toggle TinyMCE editor on/off.
+					* This updates the corresponding PluginUserSetting, too.
+					*/
+					function tinymce_plugin_toggleEditor(id)
 					{
-						if( jQuery( this ).hasClass( 'checked' ) )
+						jQuery( '[id^=tinymce_plugin_toggle_button_]' ).removeClass( 'active' ).attr( 'disabled', 'disabled' );
+
+						if( ! tinymce_plugin_init_done )
 						{
-							jQuery( this ).attr( 'checked', 'checked' ).removeClass( 'checked' );
+							tinymce_plugin_init_done = true;
+							// call this method on init again, with "null" id, so that mceAddControl gets called.
+							tinymce_plugin_init_tinymce( function() {tinymce_plugin_toggleEditor(null)} );
+							return;
 						}
-						jQuery( this ).removeAttr( 'disabled' );
+
+						if( ! tinymce.get( id ) )
+						{ // Turn on WYSIWYG editor
+							tinymce.execCommand( 'mceAddEditor', false, id );
+							jQuery.get( '<?php echo $this->get_htsrv_url( 'save_editor_state', array_merge( $state_params, array( 'on' => 1 ) ), '&' ); ?>' );
+							jQuery( '#tinymce_plugin_toggle_button_wysiwyg' ).addClass( 'active' );
+							jQuery( '#tinymce_plugin_toggle_button_html' ).removeAttr( 'disabled' );
+							jQuery( '[name="editor_code"]').attr('value', '<?php echo $this->code; ?>' );
+							// Hide the plugin toolbars that allow to insert html tags
+							jQuery( '.quicktags_toolbar, .evo_code_toolbar, .evo_prism_toolbar, .b2evMark_toolbar' ).hide();
+							jQuery( '#block_renderer_evo_code, #block_renderer_evo_prism, #block_renderer_b2evMark' ).addClass( 'disabled' );
+							jQuery( 'input#renderer_evo_code, input#renderer_evo_prism, input#renderer_b2evMark' ).each( function()
+							{
+								if( jQuery( this ).is( ':checked' ) )
+								{
+									jQuery( this ).addClass( 'checked' );
+								}
+								jQuery( this ).attr( 'disabled', 'disabled' ).removeAttr( 'checked' );
+							} );
+						}
+						else
+						{ // Hide the editor, Display only source HTML
+							tinymce.execCommand( 'mceRemoveEditor', false, id );
+							jQuery.get( '<?php echo $this->get_htsrv_url( 'save_editor_state', array_merge( $state_params, array( 'on' => 0 ) ), '&' ); ?>' );
+							jQuery( '#tinymce_plugin_toggle_button_html' ).addClass( 'active' );
+							jQuery( '#tinymce_plugin_toggle_button_wysiwyg' ).removeAttr( 'disabled' );
+							jQuery( '[name="editor_code"]' ).attr( 'value', 'html' );
+							// Show the plugin toolbars that allow to insert html tags
+							jQuery( '.quicktags_toolbar, .evo_code_toolbar, .evo_prism_toolbar, .b2evMark_toolbar' ).show();
+							jQuery( '#block_renderer_evo_code, #block_renderer_evo_prism, #block_renderer_b2evMark' ).removeClass( 'disabled' );
+							jQuery( 'input#renderer_evo_code, input#renderer_evo_prism, input#renderer_b2evMark' ).each( function()
+							{
+								if( jQuery( this ).hasClass( 'checked' ) )
+								{
+									jQuery( this ).attr( 'checked', 'checked' ).removeClass( 'checked' );
+								}
+								jQuery( this ).removeAttr( 'disabled' );
+							} );
+						}
+					}
+
+					// Init array with all usernames from the page for autocomplete plugin
+					var autocomplete_static_options = [];
+					jQuery( '.user.login' ).each( function()
+					{
+						var login = jQuery( this ).text();
+						if( login != '' && autocomplete_static_options.indexOf( login ) == -1 )
+						{
+							if( login[0] == '@' )
+							{
+								login = login.substr( 1 );
+							}
+							autocomplete_static_options.push( login );
+						}
 					} );
-				}
-			}
+					autocomplete_static_options = autocomplete_static_options.join();
 
-			// Init array with all usernames from the page for autocomplete plugin
-			var autocomplete_static_options = [];
-			jQuery( '.user.login' ).each( function()
-			{
-				var login = jQuery( this ).text();
-				if( login != '' && autocomplete_static_options.indexOf( login ) == -1 )
-				{
-					if( login[0] == '@' )
-					{
-						login = login.substr( 1 );
-					}
-					autocomplete_static_options.push( login );
-				}
-			} );
-			autocomplete_static_options = autocomplete_static_options.join();
+					var tmce_init={<?php echo $tmce_init; ?>};
+					var tinymce_plugin_displayed_error = false;
+					var tinymce_plugin_init_done = false;
 
-			var tmce_init={<?php echo $tmce_init; ?>};
-			var tinymce_plugin_displayed_error = false;
-			var tinymce_plugin_init_done = false;
+					</script>
 
-			</script>
-
-			<?php
-			// Load TinyMCE Javascript source file:
-			// This cannot be done through AJAX, since there appear to be scope problems on init then (TinyMCE problem?! - "u not defined").
-			// Anyway, not using AJAX to fetch the file makes it more cachable anyway.
-			require_js( '#tinymce#', 'blog', false, true );
-			require_js( '#tinymce_jquery#', 'blog', false, true );
-			?>
-
-			<script type="text/javascript">
-			function tinymce_plugin_init_tinymce(oninit)
-			{
-				// Init tinymce:
-				if( typeof tinymce == "undefined" )
-				{
-					if( ! tinymce_plugin_displayed_error )
-					{
-						alert( '<?php echo str_replace("'", "\'",
-							sprintf( $this->T_('TinyMCE javascript could not be loaded. Check the "%s" plugin setting.'),
-							$this->T_('URL to TinyMCE') ) ) ?>' );
-						tinymce_plugin_displayed_error = true;
-					}
-				}
-				else
-				{
 					<?php
-					global $Plugins;
-					$Plugins->trigger_event('tinymce_before_init');
+					// Load TinyMCE Javascript source file:
+					// This cannot be done through AJAX, since there appear to be scope problems on init then (TinyMCE problem?! - "u not defined").
+					// Anyway, not using AJAX to fetch the file makes it more cachable anyway.
+					require_js( '#tinymce#', 'blog', false, true );
+					require_js( '#tinymce_jquery#', 'blog', false, true );
 					?>
 
-					// Define oninit function for TinyMCE
-					if( typeof tmce_init.oninit != "undefined" )
+					<script type="text/javascript">
+					function tinymce_plugin_init_tinymce(oninit)
 					{
-						oninit = function() {
-							tmce_init.oninit();
-							oninit();
-						}
-					}
-
-					tmce_init.oninit = function ()
-					{
-						oninit();
-
-						// Provide hooks for textarea manipulation (where other plugins should hook into):
-						var ed = tinymce.get("<?php echo $params['content_id']; ?>");
-						if( ed && typeof b2evo_Callbacks == "object" )
+						// Init tinymce:
+						if( typeof tinymce == "undefined" )
 						{
-							// add a callback, that returns the selected (raw) html:
-							b2evo_Callbacks.register_callback( "get_selected_text_for_<?php echo $params['content_id']; ?>", function(value) {
-									var inst = tinymce.get("<?php echo $params['content_id']; ?>");
-									if( ! inst ) return null;
-									return inst.selection.getContent();
-								}, true );
+							if( ! tinymce_plugin_displayed_error )
+							{
+								alert( '<?php echo str_replace("'", "\'",
+									sprintf( $this->T_('TinyMCE javascript could not be loaded. Check the "%s" plugin setting.'),
+									$this->T_('URL to TinyMCE') ) ) ?>' );
+								tinymce_plugin_displayed_error = true;
+							}
+						}
+						else
+						{
+							<?php
+							global $Plugins;
+							$Plugins->trigger_event('tinymce_before_init');
+							?>
 
-							// add a callback, that wraps a selection:
-							b2evo_Callbacks.register_callback( "wrap_selection_for_<?php echo $params['content_id']; ?>", function(params) {
-									var inst = tinymce.get("<?php echo $params['content_id']; ?>");
-									if( ! inst ) return null;
-									var sel = inst.selection.getContent();
+							// Define oninit function for TinyMCE
+							if( typeof tmce_init.oninit != "undefined" )
+							{
+								oninit = function() {
+									tmce_init.oninit();
+									oninit();
+								}
+							}
 
-									if( params.replace )
-									{
-										var value = params.before + params.after;
-									}
-									else
-									{
-										var value = params.before + sel + params.after;
-									}
-									inst.selection.setContent(value);
+							tmce_init.oninit = function ()
+							{
+								oninit();
 
-									return true;
-								}, true );
+								// Provide hooks for textarea manipulation (where other plugins should hook into):
+								var ed = tinymce.get("<?php echo $params['content_id']; ?>");
+								if( ed && typeof b2evo_Callbacks == "object" )
+								{
+									// add a callback, that returns the selected (raw) html:
+									b2evo_Callbacks.register_callback( "get_selected_text_for_<?php echo $params['content_id']; ?>", function(value) {
+											var inst = tinymce.get("<?php echo $params['content_id']; ?>");
+											if( ! inst ) return null;
+											return inst.selection.getContent();
+										}, true );
 
-							// add a callback, that replaces a string
-							b2evo_Callbacks.register_callback( "str_replace_for_<?php echo $params['content_id']; ?>", function(params) {
-									var inst = tinymce.get("<?php echo $params['content_id']; ?>");
-									if( ! inst ) return null;
+									// add a callback, that wraps a selection:
+									b2evo_Callbacks.register_callback( "wrap_selection_for_<?php echo $params['content_id']; ?>", function(params) {
+											var inst = tinymce.get("<?php echo $params['content_id']; ?>");
+											if( ! inst ) return null;
+											var sel = inst.selection.getContent();
 
-									// Replace substring with new value
-									inst.setContent( inst.getContent().replace( params.search, params.replace ) );
+											if( params.replace )
+											{
+												var value = params.before + params.after;
+											}
+											else
+											{
+												var value = params.before + sel + params.after;
+											}
+											inst.selection.setContent(value);
 
-									return true;
-								}, true );
+											return true;
+										}, true );
 
-							// add a callback, that lets us insert raw content:
-							// DEPRECATED, used in b2evo 1.10.x
-							b2evo_Callbacks.register_callback( "insert_raw_into_<?php echo $params['content_id']; ?>", function(value) {
-									tinymce.execInstanceCommand( "<?php echo $params['content_id']; ?>", "mceInsertRawHTML", false, value );
-									return true;
-							}, true );
+									// add a callback, that replaces a string
+									b2evo_Callbacks.register_callback( "str_replace_for_<?php echo $params['content_id']; ?>", function(params) {
+											var inst = tinymce.get("<?php echo $params['content_id']; ?>");
+											if( ! inst ) return null;
+
+											// Replace substring with new value
+											inst.setContent( inst.getContent().replace( params.search, params.replace ) );
+
+											return true;
+										}, true );
+
+									// add a callback, that lets us insert raw content:
+									// DEPRECATED, used in b2evo 1.10.x
+									b2evo_Callbacks.register_callback( "insert_raw_into_<?php echo $params['content_id']; ?>", function(value) {
+											tinymce.execInstanceCommand( "<?php echo $params['content_id']; ?>", "mceInsertRawHTML", false, value );
+											return true;
+									}, true );
+								}
+							}
+
+							tmce_init.setup = function( ed )
+							{
+								ed.on( 'init', tmce_init.oninit );
+							}
+
+							tinymce.init( tmce_init );
 						}
 					}
 
-					tmce_init.setup = function( ed )
-					{
-						ed.on( 'init', tmce_init.oninit );
-					}
+				</script>
 
-					tinymce.init( tmce_init );
+				<?php
+				$use_tinymce = $this->get_editor_state( $state_params );
+
+				$editor_code = 'html';
+				if( $use_tinymce )
+				{ // User used MCE last time, load MCE on document.ready:
+					$editor_code = $this->code;
+					echo '<script type="text/javascript">jQuery( tinymce_plugin_toggleEditor("'.$params['content_id'].'") );</script>';
 				}
-			}
+				// By default set the editor code to an empty string
+				echo '<input type="hidden" name="editor_code" value="">';
+				// If the js is enabled set the editor code to the currently used value
+				echo '<script type="text/javascript">jQuery(\'[name="editor_code"]\').attr(\'value\', \''.$editor_code.'\');</script>';
 
-		</script>
+				// We also want to save the 'last used/not-used' state: (if no NULLs, this won't change anything)
+				$this->htsrv_save_editor_state( array_merge( $state_params, array( 'on' => $use_tinymce ) ) );
 
-		<?php
-		$use_tinymce = $this->get_editor_state( $state_params );
-
-		$editor_code = 'html';
-		if( $use_tinymce )
-		{ // User used MCE last time, load MCE on document.ready:
-			$editor_code = $this->code;
-			echo '<script type="text/javascript">jQuery( tinymce_plugin_toggleEditor("'.$params['content_id'].'") );</script>';
+				return true;
 		}
-		// By default set the editor code to an empty string
-		echo '<input type="hidden" name="editor_code" value="">';
-		// If the js is enabled set the editor code to the currently used value
-		echo '<script type="text/javascript">jQuery(\'[name="editor_code"]\').attr(\'value\', \''.$editor_code.'\');</script>';
-
-		// We also want to save the 'last used/not-used' state: (if no NULLs, this won't change anything)
-		$this->htsrv_save_editor_state( array_merge( $state_params, array( 'on' => $use_tinymce ) ) );
-
-		return true;
 	}
 
 
@@ -849,7 +875,10 @@ class tinymce_plugin extends Plugin
 				$Skin = $SkinCache->get_by_ID( $blog_skin_ID );
 				$item_css_url = $skins_url.$Skin->folder.'/item.css';
 				// else: $item_css_url = $rsc_url.'css/item_base.css';
-				$content_css .= ','.$item_css_url;		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
+				if( file_exists( $item_css_url ) )
+				{
+					$content_css .= ','.$item_css_url;		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
+				}
 			}
 			// else item_default.css -- is it still possible to have no skin ?
 		}
@@ -963,6 +992,34 @@ class tinymce_plugin extends Plugin
 		}
 	}
 
+
+	/**
+	 * AJAX callback to save WYSIWYG switch warning state (on or off).
+	 *
+	 * @param array Params
+	 */
+	function htsrv_save_wysiwyg_warning_state( $params )
+	{
+		if( ! isset( $params['on'] ) )
+		{ // Wrong request:
+			 return;
+		}
+
+		switch( $params['type'] )
+		{
+			case 'Item':
+				$this->UserSettings->set( 'show_wysiwyg_warning_'.intval( $params['blog'] ), intval( $params['on'] ) );
+				break;
+
+			case 'EmailCampaign':
+				$this->UserSettings->set( 'show_wysiwyg_warning_emailcampaign', intval( $params['on'] ) );
+				break;
+		}
+
+		$this->UserSettings->dbupdate();
+	}
+
+
 	/**
 	 * Get editor state
 	 *
@@ -1052,7 +1109,7 @@ class tinymce_plugin extends Plugin
 	 */
 	function GetHtsrvMethods()
 	{
-		return array( 'save_editor_state'/*, 'get_item_content_css'*/ );
+		return array( 'save_editor_state', 'save_wysiwyg_warning_state'/*, 'get_item_content_css'*/ );
 	}
 
 

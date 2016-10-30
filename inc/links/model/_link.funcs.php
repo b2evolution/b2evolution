@@ -430,13 +430,18 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 					.get_icon( 'permalink', 'imgtag', array( 'title' => $title ) ).'</a> ';
 	}
 
-	// Delete link.
+	// Unlink/Delete icons:
 	if( $LinkOwner->check_perm( 'edit' ) )
-	{ // Check that we have permission to edit LinkOwner object:
+	{	// If current user has a permission to edit LinkOwner object
+		// Unlink icon:
+		$r .= action_icon( T_('Delete this link!'), 'unlink',
+					$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=unlink'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
+					array( 'onclick' => 'item_unlink('.$link_ID.')' ) );
+		// Delete icon:
 		$LinkCache = & get_LinkCache();
 		$Link = & $LinkCache->get_by_ID( $link_ID, false, false );
-		if( $Link && $Link->can_be_file_deleted() )
-		{	// If current user has a permission to delete a file completely
+		if( ! $current_File->is_dir() && $Link && $Link->can_be_file_deleted() )
+		{	// If current user has a permission to delete a file(not folder) completely
 			$File = & $Link->get_File();
 			$r .= action_icon( T_('Delete this file!'), 'delete',
 						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=delete'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
@@ -445,14 +450,35 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 								.'\' ) && item_unlink('.$link_ID.')' ) );
 		}
 		else
-		{	// If current user can only unlink
-			$r .= action_icon( T_('Delete this link!'), 'unlink',
-						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=unlink'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
-						array( 'onclick' => 'item_unlink('.$link_ID.')' ) );
+		{	// If current user can only unlink the attachment (probably it is linked to several objects)
+			$r .= get_icon( 'delete', 'imgtag', array( 'class' => 'action_icon empty_placeholder' ) );
 		}
 	}
 
-	if( $link_type == 'item' && $current_File )
+	return $r;
+}
+
+
+/**
+ * Display link position edit action
+ *
+ * @param $row
+ */
+function display_link_position( & $row )
+{
+	global $LinkOwner;
+	global $current_File;
+	// TODO: fp>dh: can you please implement cumbs in here? I don't clearly understand your code.
+	// TODO: dh> only handle images
+
+	$id = 'display_position_'.$row->link_ID;
+
+	// NOTE: dh> using method=get so that we can use regenerate_url (for non-JS).
+	$r = '<form action="" method="post">
+		<select id="'.$id.'" name="link_position">'
+		.Form::get_select_options_string( $LinkOwner->get_positions( $row->file_ID ), $row->link_position, true).'</select>';
+
+	if( $current_File )
 	{ // Display icon to insert image|video into post inline
 		$type = $current_File->get_file_type();
 
@@ -474,34 +500,35 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 				$type = 'file';
 				break;
 		}
-		$r .= ' '.get_icon( 'add', 'imgtag', array(
-				'title'   => sprintf( T_('Insert %s into the post'), $type ),
-				'onclick' => 'insert_inline_link( \''.$type.'\', '.$link_ID.', \'\' )',
-				'style'   => 'cursor:default;'
-			) );
+
+		if( $type == 'image' )
+		{
+			$r .= ' '.get_icon( 'add', 'imgtag', array(
+						'title'   => sprintf( T_('Insert %s tag into the post'), '['.$type.':]' ),
+						'onclick' => 'insert_inline_link( \'image\', '.$row->link_ID.', \'\' )',
+						'style'   => 'cursor:default;'
+					) );
+		}
+
+		if( $type == 'image' )
+		{
+			$r .= ' '.get_icon( 'add__yellow', 'imgtag', array(
+						'title'   => T_('Insert [thumbnail:] tag into the post'),
+						'onclick' => 'insert_inline_link( \'thumbnail\', '.$row->link_ID.', \'medium:left\' )',
+						'style'   => 'cursor:default;'
+					) );
+		}
+
+		if( $type == 'audio' || $type == 'video'  || $type == 'file' )
+		{
+			$r .= ' '.get_icon( 'add__blue', 'imgtag', array(
+						'title'   => sprintf( T_('Insert %s tag into the post'), '['.$type.':]' ),
+						'onclick' => 'insert_inline_link( \''.$type.'\', '.$row->link_ID.', \'\' )',
+						'style'   => 'cursor:default;'
+					) );
+		}
+
 	}
-
-	return $r;
-}
-
-
-/**
- * Display link position edit action
- *
- * @param $row
- */
-function display_link_position( & $row )
-{
-	global $LinkOwner;
-	// TODO: fp>dh: can you please implement cumbs in here? I don't clearly understand your code.
-	// TODO: dh> only handle images
-
-	$id = 'display_position_'.$row->link_ID;
-
-	// NOTE: dh> using method=get so that we can use regenerate_url (for non-JS).
-	$r = '<form action="" method="post">
-		<select id="'.$id.'" name="link_position">'
-		.Form::get_select_options_string( $LinkOwner->get_positions( $row->file_ID ), $row->link_position, true).'</select>';
 
 	$r .= '<noscript>';
 	// Add hidden fields for non-JS
@@ -526,13 +553,22 @@ function display_link_position( & $row )
  */
 function echo_link_position_js()
 {
+	global $Session;
 ?>
 <script type="text/javascript">
+var displayInlineReminder = <?php echo $Session->get( 'display_inline_reminder', 'true' );?>;
+var deferInlineReminder = false;
+
 jQuery( document ).on( 'change', 'select[id^=display_position_]', {
 		url:   '<?php echo get_htsrv_url(); ?>',
-		crumb: '<?php echo get_crumb( 'link' ); ?>'
+		crumb: '<?php echo get_crumb( 'link' ); ?>',
 }, function( event )
 {
+	if( this.value == 'inline' && displayInlineReminder && !deferInlineReminder )
+	{ // Display inline position reminder
+		alert( '<?php echo T_('You can use the (+) icons to change the position to inline and automatically insert a short tag at the current cursor position.');?>' );
+		displayInlineReminder = false;
+	}
 	evo_display_position_onchange( this, event.data.url, event.data.crumb );
 } );
 </script>

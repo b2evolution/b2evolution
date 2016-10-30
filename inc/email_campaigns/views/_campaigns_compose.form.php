@@ -48,16 +48,15 @@ $Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCamp
 			'edit_layout'   => 'expert',
 		) );
 
-	echo '<div style="margin-left: 5px;">';
-	$quick_setting_url = $admin_url.'?ctrl=campaigns&amp;ecmp_ID='.$edited_EmailCampaign->ID.'&amp;'.url_crumb( 'campaign' ).'&amp;tab=compose&amp;action=';
-	$show_wysiwyg_warning = $UserSettings->get( 'show_wysiwyg_warning_emailcampaign' );
-	$wysiwyg_switch = '<p id="active_wysiwyg_switch" class="edit_actions_text" style="display: '.( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ? 'block' : 'none' ).';">';
-	$wysiwyg_switch .= action_icon( '', 'activate', $quick_setting_url.'hide_wysiwyg_warning', T_('Show an alert when switching from markup to WYSIWYG'), 3, 4 );
-	$wysiwyg_switch .= '</p>';
-	$wysiwyg_switch .= '<p id="disable_wysiwyg_switch" class="edit_actions_text" style="display: '.( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ? 'none' : 'block' ).';">';
-	$wysiwyg_switch .= action_icon( '', 'deactivate', $quick_setting_url.'show_wysiwyg_warning', T_('Never show alert when switching from markup to WYSIWYG'), 3, 4 );
-	$wysiwyg_switch .= '</p>';
-	echo $wysiwyg_switch;
+	echo '<div style="margin: 7px 0 0 5px; display: flex; align-items: center;">';
+	ob_start();
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
+			'target_type'   => 'EmailCampaign',
+			'target_object' => $edited_EmailCampaign,
+			'content_id'    => 'ecmp_email_text',
+			'edit_layout'   => 'expert_quicksettings',
+		) );
+	$quick_setting_switch = ob_get_flush();
 	echo '</div>';
 
 	echo '</div>';

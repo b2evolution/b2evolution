@@ -1,5 +1,10 @@
 /**
  * Server communication functions - widgets javascript interface
+ * This file contains JS code to work with collection widgets in back-office:
+ *    - Add new widget in list
+ *    - Sort widgets in list by drag and drop
+ *    - Edit widget in modal window
+ *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
  * @author yabs - http://innervisions.org.uk/
@@ -57,12 +62,20 @@ var crumb_url = '';
  */
 jQuery(document).ready( function()
 {
+	if( jQuery( '#current_widgets' ).length == 0 )
+	{	// Initialize widgets list only if we really are there:
+		return;
+	}
+
 	// grab some constants -- fp> TODO: this is flawed. Fails when starting with an empty blog having ZERO widgets. Init that in .php
 	edit_icon_tag = jQuery( '.edit_icon_hook' ).find( 'a' ).html();// grab the edit icon
 	delete_icon_tag = jQuery( '.delete_icon_hook' ).find( 'a' ).html();// grab the delete icon
 	//get crumb url from delete url and then add it in toggleWidget
 	crumb_url = jQuery( '.delete_icon_hook' ).find( 'a' ).attr('href');
-	crumb_url = crumb_url.match(/crumb_.*?$/);
+	if( typeof( crumb_url ) != 'undefined' )
+	{
+		crumb_url = crumb_url.match(/crumb_.*?$/);
+	}
 	// Modify the current widgets screen
 	// remove the "no widgets yet" placeholder:
 	jQuery( ".new_widget" ).parent().parent().remove();
@@ -350,7 +363,7 @@ function getWidgetOrder()
 		containers_list += container+',';
 	}
 
-	var r = 'blog='+blog+'&'+query_string+'container_list='+containers_list;
+	var r = ( typeof( blog ) != 'undefined' ? 'blog='+blog : '' ) +'&'+query_string+'container_list='+containers_list;
 
 	// console.log( r );
 
@@ -401,12 +414,12 @@ function editWidget( widget )
 /*
  * This is called when we get the response from the server:
  */
-function widgetSettings( the_html )
+function widgetSettings( the_html, wi_type, wi_code )
 {
 	// add placeholder for widgets settings form:
 	jQuery( 'body' ).append( '<div id="screen_mask" onclick="closeWidgetSettings()"></div><div id="widget_settings" class="modal-content"></div>' );
 	jQuery( '#screen_mask' ).fadeTo(1,0.5).fadeIn(200);
-	jQuery( '#widget_settings' ).html( the_html ).addClass( 'widget_settings_active' );
+	jQuery( '#widget_settings' ).html( the_html ).addClass( 'widget_settings_active edit_widget_' + wi_type + '_' + wi_code );
 	jQuery( '#widget_settings' ).prepend( jQuery( '#server_messages' ) );
 	AttachServerRequest( 'form' ); // send form via hidden iframe
 

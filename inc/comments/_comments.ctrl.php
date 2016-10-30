@@ -774,7 +774,6 @@ if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit',
 }
 
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
-require_js( 'communication.js' ); // auto requires jQuery
 // Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 require_js_helper( 'colorbox' );
 

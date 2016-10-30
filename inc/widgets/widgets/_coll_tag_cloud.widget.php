@@ -284,8 +284,8 @@ class coll_tag_cloud_Widget extends ComponentWidget
 				: format_to_output( $row->tag_name, 'htmlbody' );
 
 			if( $count_span === 0 )
-			{ // edge case where there is only a single tag
-				$font_size = $max_size;
+			{ // edge case where there is only a single tag or all tags have the same count
+				$font_size = floor( ( $max_size - $min_size ) / 2 ) + $min_size;
 			}
 			else
 			{

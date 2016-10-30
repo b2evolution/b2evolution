@@ -1674,6 +1674,11 @@ function skin_include( $template_name, $params = array() )
 	$timer_name = 'skin_include('.$template_name.')';
 	$Timer->resume( $timer_name );
 
+	if( ! empty( $params['Item'] ) )
+	{	// Get Item from params:
+		$Item = $params['Item'];
+	}
+
 	if( $template_name == '$disp$' )
 	{ // This is a special case.
 		// We are going to include a template based on $disp:

@@ -107,7 +107,7 @@ if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
 
 $Results->cols[] = array(
 						'th' => T_('Position'),
-						'td_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap left',
 						'td' => '%display_link_position( {row} )%',
 					);
 

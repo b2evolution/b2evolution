@@ -81,7 +81,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	echo $params['before_comment_form'];
 
 	// INIT/PREVIEW:
-	if( $Comment = $Session->get('core.preview_Comment') )
+	if( $Comment = get_comment_from_session( 'preview' ) )
 	{	// We have a comment to preview
 		if( $Comment->item_ID == $Item->ID )
 		{ // display PREVIEW:
@@ -129,9 +129,6 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 			global $Messages;
 			$Messages->display();
 		}
-
-		// delete any preview comment from session data:
-		$Session->delete( 'core.preview_Comment' );
 	}
 	else
 	{ // New comment:

@@ -189,15 +189,6 @@ module.exports = function(grunt) {
 				src: 'rsc/js/functions.js',
 				dest: 'rsc/js/build/functions.min.js'
 			},
-			ajaxcomjs: {
-				options: {
-					// Extend default banner:
-					banner: '<%= uglify.options.banner %>// This includes 2 files \n'
-				},
-				nonull: true, // Display missing files
-				src: ['rsc/js/ajax.js', 'rsc/js/communication.js'],
-				dest: 'rsc/js/build/ajaxcom.min.js',
-			},
 			*/
 			// Colorbox + Voting + Touchswipe
 			colorbox: {
@@ -271,10 +262,12 @@ module.exports = function(grunt) {
 				nonull: true, // Display missing files
 				src: ['rsc/js/functions.js',
 							'rsc/js/ajax.js',
+							'rsc/js/communication.js',
 							'rsc/js/form_extensions.js',
 							'rsc/js/extracats.js',
 							'rsc/js/dynamic_select.js',
 							'rsc/js/backoffice.js',
+							'rsc/js/blog_widgets.js',
 							'rsc/js/src/evo_modal_window.js',
 							'rsc/js/src/evo_user_crop.js',
 							'rsc/js/src/evo_user_report.js',
@@ -291,10 +284,12 @@ module.exports = function(grunt) {
 				nonull: true, // Display missing files
 				src: ['rsc/js/functions.js',
 							'rsc/js/ajax.js',
+							'rsc/js/communication.js',
 							'rsc/js/form_extensions.js',
 							'rsc/js/extracats.js',
 							'rsc/js/dynamic_select.js',
 							'rsc/js/backoffice.js',
+							'rsc/js/blog_widgets.js',
 							'rsc/js/src/bootstrap-evo_modal_window.js',
 							'rsc/js/src/evo_user_crop.js',
 							'rsc/js/src/evo_user_report.js',

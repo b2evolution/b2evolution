@@ -36,8 +36,8 @@ if( is_null( $params ) )
 }
 else
 {	// Params given:
-	if( (substr( $params, 0, 2 ) == 'a:') && (stripos($params, 'O:') == false) )
-	{	// Allow to unserialize only arrays + check there is no Object in the array (We NEVER want to unserialize an object)
+	if( param_check_serialized_array( 'params' ) )
+	{	// If the params is a serialized array and doesn't contain any object inside:
 		// (This may result in "false", but this means that unserializing failed)
 		$params = @unserialize( $params );
 	}

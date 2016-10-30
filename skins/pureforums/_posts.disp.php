@@ -164,7 +164,7 @@ if( isset( $MainList ) && ( empty( $cat ) ||
 
 if( ! empty( $cat ) )
 { // Go to grab the featured posts only on pages with defined category:
-	while( $Item = get_featured_Item() )
+	while( $Item = & get_featured_Item() )
 	{ // We have a intro post to display:
 		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 		skin_include( '_item_list.inc.php', array(
@@ -173,6 +173,7 @@ if( ! empty( $cat ) )
 				'intro_mode'    => 'normal',	// Intro posts will be displayed in normal mode
 				'item_class'    => 'featured_post',
 				'image_size'    => 'fit-400x320',
+				'Item'          => $Item,
 			) );
 		// ----------------------------END ITEM BLOCK  ----------------------------
 	}

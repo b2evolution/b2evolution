@@ -349,7 +349,7 @@ class tar_file extends archive
 {
 	function __construct($name)
 	{
-		$this->archive($name);
+		parent::__construct($name);
 		$this->options['type'] = "tar";
 	}
 
@@ -606,7 +606,7 @@ class zip_file extends archive
 {
 	function __construct($name)
 	{
-		$this->archive($name);
+		parent::__construct($name);
 		$this->options['type'] = "zip";
 	}
 

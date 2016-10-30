@@ -445,10 +445,15 @@ class Plugin
 	 *              as "legend" tag with types "array" and "fieldset".
 	 * 'defaultvalue': Default value for the setting, defaults to '' (empty string)
 	 * 'type', which can be:
-	 *     'text' (default): a simple string
+	 *     'text' (default): an input field to enter a string
+	 *     'string': static text to print out on plugin settings edit form the 'label' of a param
+	 *     'begin_line': start a group of several params in one by <code>$Form->begin_line( param[label] );</code> (Use together with end_line)
+	 *     'end_line': start a group of several params in one by <code>$Form->end_line( param[label] );</code> (Use together with begin_line)
 	 *     'password': like text, but hidden during input
 	 *     'html_input' : like text, but allows html
-	 *     'checkbox': either 0 or 1
+	 *     'checkbox': a checkbox field to set values either 0 or 1
+	 *     'checklist': a field or several checkboxes, you must set 'options' for it:
+	 *         'options': an array of options ( 'name', 'value' ), see {@link Form::checklist()}.
 	 *     'integer': a number (no float, can have leading "+" or "-") (like 'text' for input, but gets validated when submitting)
 	 *     'float': a floating number (can have leading "+" or "-", e.g. "+1", "-0.05") (like 'text' for input, but gets validated when submitting)
 	 *     'textarea': several lines of input. The following can be set for this type:
@@ -462,19 +467,26 @@ class Plugin
 	 *     'select_user': a drop down field, providing all existing groups (User ID is the value or "" if "allow_none" is true) (WARNING: does not scale - not recommended)
 	 *     'radio' : radio select (options on same line by default)
 	 *          'field_lines' : set to true to have options on separate line
-	 *     'array': a subset of settings. The value gets automagically (un)serialized through get() and set().
-	 *         The following keys apply to this type:
+	 *     'array': a subset of settings without type forcing or checking
+	 *                 for sub-entries involved (e.g., if you have an entry of type "integer", you could get
+	 *                 a non-numeric string there). NOTE: VERY UNSAFE!
+	 *     'array:integer': a subset of settings with type forcing to integer
+	 *     'array:array:integer':  a subset of settings with type forcing to integer
+	 *     'array:string': a subset of settings with type forcing to string
+	 *     'array:array:string': a subset of settings with type forcing to string
+	 *     'array:regexp': a subset of settings with type forcing by regexp
+	 *         The value gets automagically (un)serialized through get() and set().
+	 *         The following keys apply to these types:
 	 *        'entries': an array with meta information about sub-settings
 	 *             (which can be everything from the top-level, except: "valid_pattern", "valid_range").
-	 *             Note: currently there's no type forcing or checking
-	 *                 for sub-entries involved (e.g., if you have an entry of type "integer", you could get
-	 *                 a non-numeric string there).
-	 *         fp> TODO: !!!! very unsafe
 	 *        'key': defines the key to use for each entry. This may be a text input for example
 	 *              (with label, note etc). (optional, default is numeric keys, which are not editable)
-	 *       'max_count': maximum count of sets (optional, default is no restriction)
-	 *       'min_count': minimum count of sets (optional, default is no restriction)
+	 *        'max_count': maximum count of sets (optional, default is no restriction)
+	 *        'min_count': minimum count of sets (optional, default is no restriction)
+	 *      'info': a form info field with label and info text see {@link Form::info()}; you must set 'info' for text.
+	 *      'color': a form color picker field, use 'defaultvalue' in format '#FFFFFF'
 	 * 'note' (gets displayed as a note to the param field),
+	 * 'info': Text for param with type 'info'
 	 * 'size': Size of the HTML input field (applies to types 'text', 'password' and 'integer'; defaults to 15)
 	 * 'maxlength': maxlength attribute for the input field (See 'size' above; defaults to no limit)
 	 * 'disabled': if true, it adds a 'disabled="disabled"' html attribute to the element and the value cannot be changed
@@ -652,7 +664,7 @@ class Plugin
 	{
 		if( $this->group != 'rendering' )
 		{
-			return array();
+			return $this->get_custom_setting_definitions( $params );
 		}
 
 		$render_note = '';
@@ -690,7 +702,7 @@ class Plugin
 	{
 		if( $this->group != 'rendering' )
 		{
-			return array();
+			return $this->get_custom_setting_definitions( $params );
 		}
 
 		$render_note = '';
@@ -959,7 +971,7 @@ class Plugin
 	 * You should provide an unique html ID with each button.
 	 *
 	 * @param array Associative array of parameters.
-	 *   - 'target_type': either 'Comment' or 'Item'.
+	 *   - 'target_type': either 'Comment' or 'Item' or 'EmailCampaign'.
 	 *   - 'edit_layout': "inskin", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
 	 *                    NOTE: Please respect the "inskin" mode, which should display only the most simple things!
 	 * @return boolean did we display a button?
@@ -1060,6 +1072,34 @@ class Plugin
 	{
 	}
 
+
+	/**
+	 * Event handler: Called at the beginning of the "Edit wdiget" form on back-office.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the {@link Form} object (by reference)
+	 *   - 'ComponentWidget': the Widget which gets edited (by reference)
+	 * @return boolean did we display something?
+	 */
+	function WidgetBeginSettingsForm( & $params )
+	{
+		return false; // Do nothing by default.
+	}
+
+
+	/**
+	 * Event handler: Called at the end of the "Edit wdiget" form on back-office.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the {@link Form} object (by reference)
+	 *   - 'ComponentWidget': the Widget which gets edited (by reference)
+	 * @return boolean did we display something?
+	 */
+	function WidgetEndSettingsForm( & $params )
+	{
+		return false; // Do nothing by default.
+	}
+
 	// }}}
 
 
@@ -1113,9 +1153,35 @@ class Plugin
 
 
 	/**
+	 * Event handler: Called at the end of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinEndHtmlHead( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called at the beginning of the skin's HTML BODY section.
+	 *
+	 * Use this to add any HTML snippet at the beginning of the generated page.
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinBeginHtmlBody( & $params )
+	{
+	}
+
+
+	/**
 	 * Event handler: Called at the end of the skin's HTML BODY section.
 	 *
 	 * Use this to add any HTML snippet at the end of the generated page.
+	 *
+	 * @param array Associative array of parameters
 	 */
 	function SkinEndHtmlBody( & $params )
 	{
@@ -1126,6 +1192,8 @@ class Plugin
 	 * Event handler: Gets called before skin wrapper.
 	 *
 	 * Use this to add any HTML code before skin wrapper and after evo toolbar.
+	 *
+	 * @param array Associative array of parameters
 	 */
 	function BeforeSkinWrapper( & $params )
 	{
@@ -1339,7 +1407,7 @@ class Plugin
 	 * Event handler: Defines blog kinds, their names and description.
 	 * Define blog settings in {@link Plugin::InitCollectionKinds()} method of your plugin.
 	 *
-	 * Note: You can change default blog kinds $params['default_kinds'] (which get passed by reference).
+	 * Note: You can change default blog kinds $params['kinds'] (which get passed by reference).
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'kinds': dafault blog kinds (by reference)
@@ -1432,7 +1500,7 @@ class Plugin
 	 *   - 'view_type': What part of a post are we displaying: 'teaser', 'extension' or 'full'
 	 * @return boolean Have we changed something?
 	 */
-	function RenderItemAsText()
+	function RenderItemAsText( & $params )
 	{
 		return false;		// Do nothing by default.
 	}
@@ -1736,7 +1804,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called at the end of the "Edit comment" form.
+	 * Event handler: Called at the end of the "Edit comment" form on back-office.
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Form': the {@link Form} object (by reference)
@@ -1751,7 +1819,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called at the end of the frontend comment form.
+	 * Event handler: Called at the end of the front-office comment form.
 	 *
 	 * You might want to use this to inject antispam payload to use in
 	 * in {@link GetSpamKarmaForComment()} or modify the Comment according
@@ -1769,7 +1837,7 @@ class Plugin
 
 	/**
 	 * Event handler: Called in the submit button section of the
-	 * frontend comment form.
+	 * front-office comment form.
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Form': the comment form generating object
@@ -2007,7 +2075,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called at the end of the frontend message form, which
+	 * Event handler: Called at the end of the front-office message form, which
 	 * allows to send an email to a user/commentator.
 	 *
 	 * You might want to use this to inject antispam payload to use in
@@ -2026,7 +2094,7 @@ class Plugin
 
 	/**
 	 * Event handler: Called in the submit button section of the
-	 * frontend message form.
+	 * front-office message form.
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Form': the comment form generating object
@@ -2181,7 +2249,6 @@ class Plugin
 	 * Event handler: Called when rendering email contents as HTML. (CACHED)
 	 *
 	 * The rendered content will be *cached* and the cached content will be reused on subsequent displays.
-	 * Use {@link DisplayContentAsHtml()} instead if you want to do rendering at display time.
 	 *
 	 * Note: You have to change $params['data'] (which gets passed by reference).
 	 *
@@ -2436,7 +2503,7 @@ class Plugin
 
 	// PluginEmailSettings {{{
 	/**
-	 * Event handler: Called as action just before updating plugin's messages settings.
+	 * Event handler: Called as action just before updating plugin's email campaign settings.
 	 *
 	 * Use this to add notes/errors through {@link Plugin::msg()} or to process saved settings.
 	 */
@@ -2678,9 +2745,9 @@ class Plugin
 	 *   - 'Form': the user profile form generating object (by reference)
 	 *   - 'User': the edited user object (by reference)
 	 *   - 'edit_layout':
-	 *			"public" - public frontend user profile form (info only),
-	 *			"private" - private frontend user profile form (editable),
-	 *   - 'is_admin_page': (boolean) indicates whether we are in frontend or backoffice
+	 *			"public" - public front-office user profile form (info only),
+	 *			"private" - private front-office user profile form (editable),
+	 *   - 'is_admin_page': (boolean) indicates whether we are in front-office or back-office
 	 */
 	function DisplayProfileFormFieldset( & $params )
 	{

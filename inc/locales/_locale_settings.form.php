@@ -63,9 +63,19 @@ if( $action == 'edit' )
 		$newlocale = get_param( 'newloc_locale' ) != '' ? get_param( 'newloc_locale' ) : $newlocale;
 		foreach( $ltemplate as $lt_key => $lt_value )
 		{
-			if( get_param( 'newloc_'.$lt_key ) != '' )
-			{ // Display what user has entered on previous form instead of what saved in DB
-				$ltemplate[ $lt_key ] = get_param( 'newloc_'.$lt_key );
+			if( ! is_null( get_param( 'newloc_'.$lt_key ) ) )
+			{
+				if( get_param( 'newloc_'.$lt_key ) == '' )
+				{ // Empty value, use default value if available
+					if( $default_value = locale_get( $lt_key, '#' ) )
+					{
+						$ltemplate[$lt_key] = $default_value;
+					}
+				}
+				else
+				{ // Display what user has entered on previous form instead of what was saved in DB
+					$ltemplate[ $lt_key ] = get_param( 'newloc_'.$lt_key );
+				}
 			}
 		}
 	}
@@ -90,13 +100,13 @@ if( $action == 'edit' )
 	// Charset
 	$Form->info( T_('Charset'), 'utf-8' );
 	// Date format
-	$Form->text_input( 'newloc_datefmt', ( isset( $ltemplate['datefmt'] ) ? $ltemplate['datefmt'] : get_param( 'newloc_datefmt' ) ), 20,
+	$Form->text_input( 'newloc_datefmt', ( isset( $ltemplate['datefmt'] ) ? $ltemplate['datefmt'] : locale_get( 'datefmt', ( $newlocale ? $newlocale : '#' ) ) ), 20,
 		T_('Date format'), T_('See below.'), array( 'required' => true ) );
 	// Time format
-	$Form->text_input( 'newloc_timefmt', ( isset( $ltemplate['timefmt'] ) ? $ltemplate['timefmt'] : get_param( 'newloc_timefmt' ) ), 20,
+	$Form->text_input( 'newloc_timefmt', ( isset( $ltemplate['timefmt'] ) ? $ltemplate['timefmt'] : locale_get( 'timefmt', ( $newlocale ? $newlocale : '#' ) ) ), 20,
 		T_('Time format'), T_('See below.'), array( 'required' => true ) );
 	// Short time format
-	$Form->text_input( 'newloc_shorttimefmt', ( isset( $ltemplate['shorttimefmt'] ) ? $ltemplate['shorttimefmt'] : get_param( 'newloc_shorttimefmt' ) ), 20,
+	$Form->text_input( 'newloc_shorttimefmt', ( isset( $ltemplate['shorttimefmt'] ) ? $ltemplate['shorttimefmt'] : locale_get( 'shorttimefmt', ( $newlocale ? $newlocale : '#' ) ) ), 20,
 		T_('Short time format'), T_('See below.'), array( 'required' => true ) );
 	// Start of week
 	$Form->dayOfWeek( 'newloc_startofweek', ( isset( $ltemplate['startofweek'] ) ? $ltemplate['startofweek'] : get_param( 'newloc_startofweek' ) ),
@@ -290,12 +300,67 @@ else
 	{
 		$i++;
 
+		$ltemplate = $locale_data;
+		foreach( $ltemplate as $lt_key => $lt_value )
+		{
+			if( ! is_null( get_param( 'loc_'.$i.'_'.$lt_key ) ) )
+			{
+				if( get_param( 'loc_'.$i.'_'.$lt_key ) == '' )
+				{ // Empty value, use default value if available
+					if( $default_value = locale_get( $lt_key, '#' ) )
+					{
+						$ltemplate[$lt_key] = $default_value;
+					}
+				}
+				else
+				{ // Display what user has entered on previous form instead of what was saved in DB
+					$ltemplate[ $lt_key ] = get_param( 'loc_'.$i.'_'.$lt_key );
+				}
+			}
+		}
+
+		$datefmt = isset( $ltemplate['datefmt'] ) ? $ltemplate['datefmt'] : locale_get( 'datefmt', $lkey );
+		$timefmt = isset( $ltemplate['timefmt'] ) ? $ltemplate['timefmt'] : locale_get( 'timefmt', $lkey );
+		$shorttimefmt = isset( $ltemplate['shorttimefmt'] ) ? $ltemplate['shorttimefmt'] : locale_get( 'shorttimefmt', $lkey );
+
 		// Generate preview of date/time-format:
 		locale_temp_switch( $lkey );
-		$datefmt_preview = date_i18n( $locale_data['datefmt'], $localtimenow );
-		$timefmt_preview = date_i18n( $locale_data['timefmt'], $localtimenow );
-		$shorttimefmt_preview = date_i18n( ( ! empty( $locale_data['shorttimefmt'] ) ? $locale_data['shorttimefmt'] : str_replace( ':s', '', $locale_data['timefmt'] ) ), $localtimenow );
+		$datefmt_preview = date_i18n( $datefmt, $localtimenow );
+		$timefmt_preview = date_i18n( $timefmt, $localtimenow );
+		$shorttimefmt_preview = date_i18n( ( ! empty( $shorttimefmt ) ? $shorttimefmt : str_replace( ':s', '', $timefmt ) ), $localtimenow );
 		locale_restore_previous();
+
+		$Form->output = false;
+		$Form->switch_layout( 'none' );
+		$datefmt_input = $Form->get_input_element( array(
+				'type' => 'text',
+				'name' => 'loc_'.$i.'_datefmt',
+				'value' => $datefmt,
+				'title' => sprintf( T_('Preview: %s'), $datefmt_preview ),
+				'class' => 'form-control input-sm',
+				'maxlength' => 20,
+				'size' => 6,
+				'hide_label' => true ) );
+		$timefmt_input = $Form->get_input_element( array(
+				'type' => 'text',
+				'name' => 'loc_'.$i.'_timefmt',
+				'value' => $timefmt,
+				'title' => sprintf( T_('Preview: %s'), $timefmt_preview ),
+				'class' => 'form-control input-sm',
+				'maxlength' => 20,
+				'size' => 6,
+				'hide_label' => true ) );
+		$shorttimefmt_input = $Form->get_input_element( array(
+				'type' => 'text',
+				'name' => 'loc_'.$i.'_shorttimefmt',
+				'value' => $shorttimefmt,
+				'title' => sprintf( T_('Preview: %s'), $shorttimefmt_preview ),
+				'class' => 'form-control input-sm',
+				'maxlength' => 20,
+				'size' => 6,
+				'hide_label' => true ) );
+		$Form->switch_layout( NULL );
+		$Form->output = true;
 
 		?>
 		<tr class="<?php echo ( ( $i % 2 == 1 ) ? 'odd' : 'even' ) ?>">
@@ -334,15 +399,9 @@ else
 				<td'.( $locale_data['charset'] == 'utf-8' ? '' : ' class="red"' ).'>
 					'.$locale_data['charset'].'
 				</td>
-				<td>
-					<input type="text" name="loc_'.$i.'_datefmt" value="'.format_to_output( $locale_data['datefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $datefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />
-				</td>
-				<td>
-					<input type="text" name="loc_'.$i.'_timefmt" value="'.format_to_output( $locale_data['timefmt'], 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $timefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />
-				</td>
-				<td>
-					<input type="text" name="loc_'.$i.'_shorttimefmt" value="'.format_to_output( ( ! empty( $locale_data['shorttimefmt'] ) ? $locale_data['shorttimefmt'] : str_replace( ':s', '', $locale_data['timefmt'] ) ), 'formvalue' ).'" maxlength="20" size="6" title="'.format_to_output( sprintf( T_('Preview: %s'), $shorttimefmt_preview ), 'formvalue' ).'" class="form-control input-sm" />
-				</td>
+				<td>'.$datefmt_input.'</td>
+				<td>'.$timefmt_input.'</td>
+				<td>'.$shorttimefmt_input.'</td>
 				<td>';
 			$Form->switch_layout( 'none' );
 			$Form->dayOfWeek( 'loc_'.$i.'_startofweek', $locale_data['startofweek'], '', '', 'input-sm' );

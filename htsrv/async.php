@@ -126,6 +126,12 @@ switch( $action )
 		param('link_ID', 'integer', true);
 		param('link_position', 'string', true);
 
+		// Don't display the inline position reminder again until the user logs out or loses the session cookie
+		if( $link_position == 'inline' )
+		{
+			$Session->set( 'display_inline_reminder', 'false' );
+		}
+
 		$LinkCache = & get_LinkCache();
 		if( ( $Link = & $LinkCache->get_by_ID( $link_ID ) ) === false )
 		{	// Bad request with incorrect link ID
@@ -831,37 +837,6 @@ switch( $action )
 					.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"'
 					.' onload="document.getElementById(\'import_files_loader\').style.display=\'none\'">loading</iframe>'
 			.'</div>';
-
-		break;
-
-	case 'hide_wysiwyg_warning':
-		// Hide warning when switching from markup to WYSIWYG
-		param( 'type', 'string' );
-
-		switch( $type )
-		{
-			case 'item':
-				// Check that this action request is not a CSRF hacked request:
-				$Session->assert_received_crumb( 'item' );
-
-				param( 'blog', 'integer' );
-				param( 'item_ID', 'integer' );
-
-				$UserSettings->set( 'show_wysiwyg_warning_'.$blog, 0 );
-				$UserSettings->dbupdate();
-				break;
-
-			case 'emailcampaign':
-				// Check that this action request is not a CSRF hacked request:
-				$Session->assert_received_crumb( 'campaign' );
-
-				$UserSettings->set( 'show_wysiwyg_warning_emailcampaign', 0 );
-				$UserSettings->dbupdate();
-				break;
-
-			default:
-				$incorrect_action = true;
-		}
 
 		break;
 

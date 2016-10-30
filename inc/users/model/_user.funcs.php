@@ -2358,7 +2358,7 @@ function check_coll_first_perm( $perm_name, $target_type, $target_ID )
 	$SQL->WHERE_and( $field_perm_name.' = 1' );
 	$SQL->LIMIT( 1 );
 
-	return boolval( $DB->get_var( $SQL->get(), 0 , NULL, $SQL->title ) );
+	return (bool)$DB->get_var( $SQL->get(), 0 , NULL, $SQL->title );
 }
 
 
@@ -2976,7 +2976,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 	global $action;
 
 	// Array contains values of the new fields from the request
-	$uf_new_fields = param( 'uf_'.$new_field_name, 'array:array:string' );
+	$uf_new_fields = param( 'uf_'.$new_field_name, 'array' );
 
 	// Type of the new field
 	global $new_field_type;
@@ -2998,7 +2998,15 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 			$Form->begin_fieldset( $userfield->ufgp_name.( is_admin_page() ? get_manual_link( 'user-profile-tab-userfields' ) : '' ) , array( 'id' => $userfield->ufgp_ID ) );
 		}
 
-		$userfield_type = ( $userfield->ufdf_type == 'text' || $userfield->ufdf_type == 'url' ) ? $userfield->ufdf_type : 'string';
+		$userfield_type = $userfield->ufdf_type;
+		if( $userfield_type == 'number' )
+		{	// Change number type of integer because we have this type name preparing in function param():
+			$userfield_type = 'integer';
+		}
+		elseif( $userfield_type != 'text' && $userfield_type != 'url' )
+		{	// Use all other params as string, Only text and url have a preparing in function param():
+			$userfield_type = 'string';
+		}
 		$uf_val = param( 'uf_'.$userfield->uf_ID, $userfield_type, NULL );
 
 		$uf_ID = $userfield->uf_ID;
@@ -3010,8 +3018,32 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 			global $$value_num;	// Used when user add a many fields with the same type
 			$$value_num = (int)$$value_num;
 			if( isset( $uf_new_fields[$userfield->ufdf_ID][$$value_num] ) )
-			{	// Get a value from submitted form
+			{	// Get a value from submitted form:
 				$uf_val = $uf_new_fields[$userfield->ufdf_ID][$$value_num];
+				switch( $userfield->ufdf_type )
+				{
+					case 'url':
+						// Format url field to valid value:
+						$uf_val = param_format( $uf_val, 'url' );
+						break;
+
+					case 'text':
+						// Format text field to valid value:
+						$uf_val = param_format( $uf_val, 'text' );
+						break;
+
+					case 'number':
+						// Format number field to valid value:
+						$uf_val = param_format( $uf_val, 'integer' );
+						break;
+
+					case 'email':
+					case 'word':
+					case 'phone':
+						// Format string fields to valid value:
+						$uf_val = param_format( $uf_val, 'string' );
+						break;
+				}
 				$$value_num++;
 			}
 		}
@@ -5115,6 +5147,11 @@ function users_results_block( $params = array() )
 	$UserList->title = $params['results_title'];
 	$UserList->no_results_text = $params['results_no_text'];
 
+	if( $action == 'show_recent' )
+	{	// Reset filters to default in order to view all recent registered users:
+		set_param( 'filter', 'reset' );
+	}
+
 	$UserList->set_default_filters( $default_filters );
 	$UserList->load_from_Request();
 
@@ -5122,7 +5159,7 @@ function users_results_block( $params = array() )
 	users_results( $UserList, $params );
 
 	if( $action == 'show_recent' )
-	{ // Sort an users list by "Registered" field
+	{	// Sort an users list by "Registered" field:
 		$UserList->set_order( 'user_created_datetime' );
 	}
 
