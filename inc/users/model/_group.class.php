@@ -249,7 +249,7 @@ class Group extends DataObject
 		$perm_allowed_sections = explode( ',', $GroupSettings->get( 'perm_allowed_sections', $this->ID ) );
 		if( ! in_array( $GroupSettings->get( 'perm_default_sec_ID', $this->ID ), $perm_allowed_sections ) )
 		{
-			param_error( 'edited_grp_perm_default_sec_ID', T_('Default section must be in allowed kind of collections.') );
+			param_error( 'edited_grp_perm_default_sec_ID', T_('Default kind must be in allowed kind of collections.') );
 		}
 
 		return !param_errors_detected();
@@ -348,7 +348,8 @@ class Group extends DataObject
 					$SectionCache = & get_SectionCache();
 					if( $Section = & $SectionCache->get_by_ID( $perm_target, false, false ) )
 					{
-						if( $permlevel != 'edit' && $Section->ID == $this->get_setting( 'perm_default_sec_ID' ) )
+						$allowed_section_IDs = explode( ',', $this->get_setting( 'perm_allowed_sections' ) );
+						if( $permlevel != 'edit' && in_array( $Section->ID, $allowed_section_IDs ) )
 						{	// Allow to view or create a collection if the requested section is default of this group:
 							$perm = true;
 						}

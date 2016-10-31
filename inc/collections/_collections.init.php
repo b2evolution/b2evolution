@@ -565,7 +565,7 @@ class collections_Module extends Module
 				'note' => T_('New users automatically get a new collection (in the Section specified below)'),
 				),
 			'perm_default_sec_ID' => array(
-				'label' => T_('Default Section for new Collections'),
+				'label' => T_('Default Kind for new Collections'),
 				'user_func'  => 'check_default_sec_user_perm',
 				'group_func' => 'check_default_sec_group_perm',
 				'perm_block' => 'blogging',

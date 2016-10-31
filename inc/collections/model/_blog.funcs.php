@@ -1639,8 +1639,9 @@ function blogs_all_results_block( $params = array() )
 		$section_where_sql = '';
 		if( $params['grouped'] )
 		{	// Get default section of the current user group:
+			global $DB;
 			$user_Group = & $current_User->get_Group();
-			$section_where_sql .= 'sec_ID = '.$user_Group->get_setting( 'perm_default_sec_ID' ).' OR ';
+			$section_where_sql .= 'sec_ID IN ( '.$DB->quote( explode( ',', $user_Group->get_setting( 'perm_allowed_sections' ) ) ).' ) OR ';
 			// Get all sections where current user is owner:
 			$section_where_sql .= 'sec_owner_user_ID = '.$current_User->ID.' OR ';
 		}

@@ -75,9 +75,9 @@ class SectionCache extends DataObjectCache
 					$where_sql .= 'sec_ID IN ( '.$DB->quote( $sec_IDs ).' ) OR ';
 				}
 
-				// Load default section of current user group:
+				// Load allowed sections for current user group:
 				$user_Group = & $current_User->get_Group();
-				$where_sql .= 'sec_ID = '.$DB->quote( $user_Group->get_setting( 'perm_default_sec_ID' ) ).' OR ';
+				$where_sql .= 'sec_ID IN ( '.$DB->quote( explode( ',', $user_Group->get_setting( 'perm_allowed_sections' ) ) ).' ) OR ';
 
 				// Load all sections where user is owner:
 				$where_sql .= 'sec_owner_user_ID = '.$DB->quote( $current_User->ID );
