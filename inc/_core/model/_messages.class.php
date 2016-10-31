@@ -74,6 +74,13 @@ class Messages
 	var $params = array();
 
 	/**
+	 * Indicates message group is open or not.
+	 *
+	 * @var boolean
+	 */
+	var $message_group_open = false;
+
+	/**
 	 * The  message group header.
 	 *
 	 * @var string
@@ -150,10 +157,10 @@ class Messages
 		$this->count = 0;
 		$this->has_errors = false;
 
+		$this->message_group_open = false;
 		$this->message_group_header = NULL;
 		$this->message_group_text = array();
 		$this->message_group_type = 'error';
-		$this->display_empty_group = false;
 		$this->group_count = 0;
 	}
 
@@ -166,7 +173,7 @@ class Messages
 	 */
 	function add( $text, $type = 'error' )
 	{
-		$this->close_message_group();
+		$this->close_group();
 
 		$this->messages_text[$this->count] = $text;
 		$this->messages_type[$this->count] = $type;
@@ -198,17 +205,15 @@ class Messages
 
 		if( $this->has_open_group() )
 		{	// Check if this is still the same group by comparing the first text of message group, message group type and display empty group values
-			$same_group = ( $this->message_group_header === $p_Messages->message_group_header )
-					&& ( $this->message_group_type == $p_Messages->message_group_type )
-					&& ( $this->display_empty_group == $p_Messages->display_empty_group );
+			$same_group = ( $this->message_group_header === $p_Messages->message_group_header )	&& ( $this->message_group_type == $p_Messages->message_group_type );
 
 			if( ! $same_group )
-			{ // No longer the same message group, close the previous group and append to message queue
-				$r = $p_Messages->close_message_group( true );
+			{ // No longer the same message group, close the previous group and append to current message queue
+				$r = $p_Messages->close_group( true );
 				$this->add( $r[0], $r[1] );
 			}
 			else
-			{ // Append group messages except for the first text
+			{ // Append group messages
 				$this->group_count += $p_Messages->group_count;
 				for( $i = 0; $i < $p_Messages->group_count; $i++ )
 				{
@@ -218,32 +223,28 @@ class Messages
 		}
 		else
 		{ // No open group, just copy the other object's group values
+			$this->message_group_open = $p_Messages->message_group_open;
 			$this->message_group_header = $p_Messages->message_group_header;
 			$this->message_group_text = $p_Messages->message_group_text;
 			$this->message_group_type = $p_Messages->message_group_type;
-			$this->display_empty_group = $p_Messages->display_empty_group;
 			$this->group_count = $p_Messages->group_count;
 		}
 	}
 
 
 	/**
-	 * Start a message group. The text will be one of the values used to determine group identity.
+	 * Closes any open group and start a new group
 	 *
-	 * @param string the message
+	 * @param string the group header/title
 	 * @param string the message type, it can have this values: 'success', 'warning', 'error', 'note'
-	 * @param boolean display the message group even if there are no group item
 	 */
-	function start_group( $text = '', $type = 'error', $display_empty = false )
+	function start_group( $header = NULL, $type = 'error' )
 	{
-		if( is_null( $text ) )
-		{
-			$text = '';
-		}
+		$this->close_group();
 
-		$this->message_group_header = $text;
+		$this->message_group_header = $header;
 		$this->message_group_type = $type;
-		$this->display_empty_group = $display_empty;
+		$this->message_group_open = true;
 	}
 
 
@@ -251,18 +252,22 @@ class Messages
 	 * Add a group item message
 	 *
 	 * @param string the message
+	 * @param string the message type, it can have this values: 'success', 'warning', 'error', 'note'
+	 * @param string the group header/title
+	 * @param boolean closes any open group and start a new group
 	 */
-	function add_to_group( $text )
+	function add_to_group( $text, $type = 'error', $header = NULL, $force_new_group = false )
 	{
-		if( is_null( $this->message_group_header ) )
+		if( $force_new_group || ( $this->message_group_open && ( ( $this->message_group_type != $type ) || ( $this->message_group_header != $header ) ) ) )
 		{
-			debug_die( 'No group to add the message' );
+			$this->close_group();
 		}
-		else
-		{
-			$this->message_group_text[$this->group_count] = $text;
-			$this->group_count++;
-		}
+
+		$this->message_group_header = $header;
+		$this->message_group_type = $type;
+		$this->message_group_text[$this->group_count] = $text;
+		$this->group_count++;
+		$this->message_group_open = true;
 	}
 
 
@@ -270,34 +275,38 @@ class Messages
 	 * Closes the current message group and add to message queue.
 	 *
 	 * @param boolean True to only output message group but not add it to the message queue
-	 * @return mixed True if group message is added to message queue, array of group message and message type of current group
+	 * @return mixed NULL if there is no open group messag otherwise an array of group message and message type of current group
 	 */
-	function close_message_group( $output = false )
+	function close_group( $output = false )
 	{
 		if( $this->has_open_group() )
 		{
-			$message = $this->params['before_group'].$this->message_group_header;
-			for( $i = 0; $i < $this->group_count; $i++ )
-			{
-				$message .= $this->params['before_group_item'].$this->message_group_text[$i].$this->params['after_group_item'];
-			}
-			$message .= $this->params['after_group'];
-
-			if( $output )
-			{
-				return array( $message, $this->message_group_type );
+			if( $this->group_count === 1 && empty( $this->message_group_header ) )
+			{ // There is only a single group item and no header text to display, display as single line message
+				$message = $this->message_group_text[0];
 			}
 			else
 			{
-				// Clear message group
-				$this->message_group_header = NULL;
-				$this->message_group_text = array();
-				$this->group_count = 0;
-
-				$this->add( $message, $this->message_group_type );
-				return true;
+				$message = $this->params['before_group'].$this->message_group_header;
+				for( $i = 0; $i < $this->group_count; $i++ )
+				{
+					$message .= $this->params['before_group_item'].$this->message_group_text[$i].$this->params['after_group_item'];
+				}
+				$message .= $this->params['after_group'];
 			}
+
+			// Clear message group
+			$this->message_group_open = false;
+			$this->message_group_header = NULL;
+			$this->message_group_text = array();
+			$this->group_count = 0;
+
+			$this->add( $message, $this->message_group_type );
+
+			return array( $message, $this->message_group_type );
 		}
+
+		return NULL;
 	}
 
 
@@ -308,7 +317,7 @@ class Messages
 	 */
 	function has_open_group()
 	{
-		return $this->group_count > 0 || ( $this->group_count === 0 && $this->display_empty_group && ! empty( $this->message_group_header ) );
+		return $this->message_group_open;
 	}
 
 
@@ -327,7 +336,7 @@ class Messages
 	{
 		if( $this->has_open_group() )
 		{
-			$this->close_message_group();
+			$this->close_group();
 		}
 
 		if( $this->count )
@@ -370,7 +379,7 @@ class Messages
 	{
 		if( $this->has_open_group() )
 		{
-			$this->close_message_group();
+			$this->close_group();
 		}
 
 		if( $this->count == 0 ) {
@@ -441,7 +450,7 @@ class Messages
 	{
 		if( $this->has_open_group() )
 		{
-			$this->close_message_group();
+			$this->close_group();
 		}
 
 		if( !$this->count )
