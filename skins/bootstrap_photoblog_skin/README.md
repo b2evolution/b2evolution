@@ -1,9 +1,5 @@
 ## Bootstrap Photoblog Skin
 
-Skin version: 6.8.0-alpha.
-
-====
-
 ### Front Page
 
 ![disp=front](skinshot_front.jpg)
