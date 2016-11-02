@@ -77,10 +77,7 @@ if( $edited_User->ID == 1 )
 {	// This is Admin user, Don't allow to change status, primary group:
 	echo '<input type="hidden" name="edited_user_grp_ID" value="'.$edited_User->grp_ID.'" />';
 	$Form->info( T_('Account status'), $status_icon.' '.T_( 'Autoactivated' ) );
-	$Form->info(
-		// TRANS: Type: Primary user group, Secondary user group
-		sprintf( T_('%s user group'), get_admin_badge( 'group', '#', '#', '#', 'primary' ) )
-		, $edited_User->Group->dget('name') );
+	$Form->info( sprintf( T_('<span %s>Primary</span> user group'), 'class="label label-primary"' ), $edited_User->Group->dget('name') );
 }
 else
 {	// Allow to change status and primary group for non-admin users:
@@ -89,9 +86,7 @@ else
 		.' ( grp_usage = "primary" OR grp_ID = '.$edited_User->grp_ID.' )' );
 	$GroupCache->all_loaded = true;
 	$Form->select_input_array( 'edited_user_status', $edited_User->get( 'status' ), get_user_statuses(), T_( 'Account status' ), '', array( 'input_prefix' => $status_icon ) );
-	$Form->select_object( 'edited_user_grp_ID', $edited_User->grp_ID, $GroupCache,
-		// TRANS: Type: Primary user group, Secondary user group
-		sprintf( T_('%s user group'), get_admin_badge( 'group', '#', '#', '#', 'primary' ) ) );
+	$Form->select_object( 'edited_user_grp_ID', $edited_User->grp_ID, $GroupCache, sprintf( T_('<span %s>Primary</span> user group'), 'class="label label-primary"' ) );
 }
 
 // Reload secondary group cache for the selects below to exclude groups that are not available for current user:
@@ -106,15 +101,7 @@ $GroupCache->load_where( ( empty( $group_where_sql ) ? '' : $group_where_sql.' A
 $GroupCache->all_loaded = true;
 foreach( $user_secondary_groups as $s => $user_secondary_Group )
 {
-	if( $s == 0 )
-	{	// TRANS: Type: Primary user group, Secondary user group
-		$field_title = sprintf( T_('%s user groups'), get_admin_badge( 'group', '#', '#', '#', 'secondary' ) );
-	}
-	else
-	{
-		$field_title = '';
-	}
-
+	$field_title = ( $s == 0 ? sprintf( T_('<span %s>Secondary</span> user groups'), 'class="label label-info"' ) : '' );
 	$field_add_icon = get_icon( 'add', 'imgtag', array( 'class' => 'add_secondary_group', 'style' => 'cursor:pointer' ) );
 
 	if( empty( $user_secondary_Group ) || $user_secondary_Group->can_be_assigned() )
