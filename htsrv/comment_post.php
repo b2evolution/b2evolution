@@ -175,11 +175,11 @@ else
 	// We need some id info from the anonymous user:
 	if( $commented_Item->Blog->get_setting( 'require_anon_name' ) && empty( $author ) )
 	{	// Author name is required for anonymous users:
-		$Messages->add( T_('Please fill in your name.'), 'error' );
+		$Messages->add_to_group( T_('Please fill in your name.'), 'error', T_('Validation error:') );
 	}
 	if( $commented_Item->Blog->get_setting( 'require_anon_email' ) && empty( $email ) )
 	{	// Author email address is required for anonymous users:
-		$Messages->add( T_('Please fill in your email.'), 'error' );
+		$Messages->add_to_group( T_('Please fill in your email.'), 'error', T_('Validation error:') );
 	}
 
 	if( !empty( $author ) && ( $block = antispam_check( $author ) ) )
@@ -187,7 +187,7 @@ else
 		// Log incident in system log
 		syslog_insert( sprintf( 'Antispam: Supplied name "%s" contains blacklisted word "%s".', $author, $block ), 'error', 'comment', $comment_item_ID );
 
-		$Messages->add( T_('Supplied name is invalid.'), 'error' );
+		$Messages->add_to_group( T_('Supplied name is invalid.'), 'error', T_('Validation error:') );
 	}
 
 	if( !empty( $email )
@@ -196,7 +196,7 @@ else
 		// Log incident in system log
 		syslog_insert( sprintf( 'Antispam: Supplied email address "%s" contains blacklisted word "%s".', $email, $block ), 'error', 'comment', $comment_item_ID );
 
-		$Messages->add( T_('Supplied email address is invalid.'), 'error' );
+		$Messages->add_to_group( T_('Supplied email address is invalid.'), 'error', T_('Validation error:') );
 	}
 
 
@@ -214,7 +214,7 @@ else
 	// a title for their comment or whatever...
 	if( $error = validate_url( $url, 'commenting' ) )
 	{
-		$Messages->add( T_('Supplied website address is invalid: ').$error, 'error' );
+		$Messages->add_to_group( T_('Supplied website address is invalid: ').$error, 'error', T_('Validation error:') );
 	}
 
 	if( $commented_Item->Blog->get_setting( 'comments_detect_email' ) )
@@ -324,7 +324,7 @@ if( $commented_Item->can_attach() && !empty( $_FILES['uploadfile'] ) && !empty( 
 		$uploadedFiles = $result['uploadedFiles'];
 		if( !empty( $result['failedFiles'] ) )
 		{ // upload failed
-			$Messages->add( T_( 'Couldn\'t attach selected file:' ).$result['failedFiles'][0], 'warning' );
+			$Messages->add_to_group( T_( 'Couldn\'t attach selected file:' ).$result['failedFiles'][0], 'error' );
 		}
 		if( !empty( $uploadedFiles ) )
 		{ // upload succeeded
@@ -357,7 +357,7 @@ if( $commented_Item->can_attach() && !empty( $_FILES['uploadfile'] ) && !empty( 
 
 if( empty( $comment ) && $checked_attachments_count == 0 )
 { // comment should not be empty!
-	$Messages->add( T_('Please do not send empty comments.'), 'error' );
+	$Messages->add_to_group( T_('Please do not send empty comments.'), 'error', T_('Validation error:') );
 }
 
 
@@ -424,7 +424,7 @@ if( $action == 'preview' )
 
 	// This message serves the purpose that the next page will not even try to retrieve preview from cache... (and won't collect data to be cached)
 	// This is session based, so it's not 100% safe to prevent caching. We are also using explicit caching prevention whenever personal data is displayed
-	$Messages->add( T_('This is a preview only! Do not forget to send your comment!'), 'error' );
+	$Messages->add_to_group( T_('This is a preview only! Do not forget to send your comment!'), 'error', T_('Preview:') );
 
 	if( $comments_email_is_detected )
 	{ // Comment contains an email address, We should show an error about this
@@ -436,7 +436,7 @@ if( $action == 'preview' )
 			}
 			$link_log_in = 'href="'.get_login_url( 'blocked comment email', $commented_Item->get_url( 'public_view' ) ).'"';
 			$link_register = 'href="'.get_user_register_url( $commented_Item->get_url( 'public_view' ), 'blocked comment email' ).'"';
-			$Messages->add( sprintf( T_('Your comment contains an email address. Please <a %s>log in</a> or <a %s>create an account now</a> instead. This will allow people to send you private messages without revealing your email address to SPAM robots.'), $link_log_in, $link_register ), 'error' );
+			$Messages->add_to_group( sprintf( T_('Your comment contains an email address. Please <a %s>log in</a> or <a %s>create an account now</a> instead. This will allow people to send you private messages without revealing your email address to SPAM robots.'), $link_log_in, $link_register ), 'error', T_('Preview:') );
 
 			// Save the user data if he will go to register form after this action
 			$register_user = array(
@@ -447,7 +447,7 @@ if( $action == 'preview' )
 		}
 		else
 		{	// No registration
-			$Messages->add( T_('Your comment contains an email address. We recommend you check the box "Allow message form." below instead. This will allow people to contact you without revealing your email address to SPAM robots.'), 'error' );
+			$Messages->add_to_group( T_('Your comment contains an email address. We recommend you check the box "Allow message form." below instead. This will allow people to contact you without revealing your email address to SPAM robots.'), 'error', T_('Preview:') );
 		}
 	}
 
