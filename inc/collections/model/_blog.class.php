@@ -2333,8 +2333,8 @@ class Blog extends DataObject
 			{ // add error
 				if( is_admin_page() )
 				{
-					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), $msg_mediadir_path )
-								.get_manual_link('media_file_permission_errors'), 'error' );
+					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), $msg_mediadir_path ),
+							'error', T_('Blog media file permission error').get_manual_link('media_file_permission_errors').':' );
 				}
 				return false;
 			}
@@ -2342,8 +2342,8 @@ class Blog extends DataObject
 			{ // add error
 				if( is_admin_page() )
 				{
-					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created."), $msg_mediadir_path )
-								.get_manual_link('directory_creation_error'), 'error' );
+					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; could not be created."), $msg_mediadir_path ),
+							'error', T_('Blog media directory creation error').get_manual_link('directory_creation_error').':' );
 				}
 				return false;
 			}
@@ -2351,7 +2351,7 @@ class Blog extends DataObject
 			{ // add note:
 				if( is_admin_page() )
 				{
-					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; has been created with permissions %s."), $msg_mediadir_path, substr( sprintf('%o', fileperms($mediadir)), -3 ) ), 'success' );
+					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; has been created with permissions %s."), $msg_mediadir_path, substr( sprintf('%o', fileperms($mediadir)), -3 ) ), 'success', T_('Blog media directory created:') );
 				}
 			}
 		}
