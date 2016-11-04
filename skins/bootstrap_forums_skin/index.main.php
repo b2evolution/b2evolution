@@ -198,22 +198,26 @@ siteskin_include( '_site_body_header.inc.php' );
 		?>
 
 		<?php
-		if( in_array( $disp, array( 'front', 'single', 'page', 'posts' ) ) )
-		{ // Widget 'Search form':
-			skin_widget( array(
-					// CODE for the widget:
-					'widget' => 'coll_search_form',
-					// Optional display params
+		if( in_array( $disp, array( 'front', 'single', 'page', 'posts', 'flagged' ) ) )
+		{
+			// ------------------------- "Navigation" CONTAINER EMBEDDED HERE --------------------------
+			// Display container and contents:
+			skin_container( NT_('Navigation'), array(
+					// The following params will be used as defaults for widgets included in this container:
 					'block_display_title'  => false,
 					'search_class'         => 'compact_search_form',
 					'search_input_before'  => '<div class="input-group">',
 					'search_input_after'   => '',
 					'search_submit_before' => '<span class="input-group-btn">',
 					'search_submit_after'  => '</span></div>',
-					'button'               => T_('Search')
+					'button'               => T_('Search'),
+					'list_start'           => '<nav><ol class="breadcrumb">',
+					'list_end'             => '</ol></nav><div class="clear"></div>',
+					'item_mask'            => '<li><a href="$url$">$title$</a></li>',
+					'item_active_mask'     => '<li class="active">$title$</li>',
+					'suffix_text'          => ( ( $disp == 'posts' && empty( $cat ) ) ? T_('Latest topics') : ( $disp == 'flagged' ? T_('Flagged topics') : '' ) ),
 				) );
-			// Display a button to view the Recent/New Topics:
-			$Skin->display_button_recent_topics();
+			// ----------------------------- END OF "Navigation" CONTAINER -----------------------------
 		}
 		?>
 

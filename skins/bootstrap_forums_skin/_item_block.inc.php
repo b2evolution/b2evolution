@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $preview, $dummy_fields, $cat, $current_User, $app_version;
+global $Item, $preview, $dummy_fields, $current_User, $app_version;
 
 /**
  * @var array Save all statuses that used on this page in order to show them in the footer legend
@@ -44,19 +44,6 @@ if( $current_cat == 0 )
 { // Use main category by default because the category wasn't set
 	$current_cat = $Item->main_cat_ID;
 }
-
-// Breadcrumbs
-$cat = $current_cat;
-skin_widget( array(
-		// CODE for the widget:
-		'widget' => 'breadcrumb_path',
-		// Optional display params
-		'block_start'      => '<ol class="breadcrumb">',
-		'block_end'        => '</ol><div class="clear"></div>',
-		'separator'        => '',
-		'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-		'item_active_mask' => '<li class="active">$title$</li>',
-	) );
 ?>
 
 <a name="top"></a>

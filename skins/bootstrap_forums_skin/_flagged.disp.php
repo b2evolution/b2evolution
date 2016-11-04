@@ -17,19 +17,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-// Breadcrumbs
-skin_widget( array(
-		// CODE for the widget:
-		'widget' => 'breadcrumb_path',
-		// Optional display params
-		'block_start'      => '<ol class="breadcrumb">',
-		'block_end'        => '</ol><div class="clear"></div>',
-		'separator'        => '',
-		'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-		'item_active_mask' => '<li class="active">$title$</li>',
-		'suffix_text'      => T_('Flagged topics'),
-	) );
-
 // ---------------------------------- START OF POSTS ------------------------------------
 ?>
 <div class="panel panel-default forums_list">

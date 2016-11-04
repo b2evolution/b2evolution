@@ -30,28 +30,11 @@ $single_cat_ID = intval( $cat );
 $multi_cat_IDs = get_param( 'cat_array' );
 
 if( $single_cat_ID )
-{
-	$ChapterCache = & get_ChapterCache();
-	$current_Chapter = & $ChapterCache->get_by_ID( $single_cat_ID, false, false );
-}
-
-// Breadcrumbs
-skin_widget( array(
-		// CODE for the widget:
-		'widget' => 'breadcrumb_path',
-		// Optional display params
-		'block_start'      => '<ol class="breadcrumb">',
-		'block_end'        => '</ol><div class="clear"></div>',
-		'separator'        => '',
-		'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-		'item_active_mask' => '<li class="active">$title$</li>',
-		'suffix_text'      => empty( $single_cat_ID ) ? T_('Latest topics') : '',
-	) );
-
-if( $single_cat_ID )
 {	// Display sub-chapters:
 
 $ChapterCache = & get_ChapterCache();
+$current_Chapter = & $ChapterCache->get_by_ID( $single_cat_ID, false, false );
+
 $chapters = $ChapterCache->get_chapters( $Blog->ID, $single_cat_ID, true );
 
 if( count( $chapters ) > 0 )

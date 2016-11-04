@@ -42,8 +42,6 @@ class breadcrumb_path_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		load_funcs( 'files/model/_image.funcs.php' );
-
 		$r = array_merge( array(
 				'separator' => array(
 					'label' => T_('Separator'),
@@ -189,6 +187,8 @@ class breadcrumb_path_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_start'];
 
+		echo $this->disp_params['list_start'];
+
 		// Print out the breadcrumbs
 		$breadcrumbs = array_reverse( $breadcrumbs );
 		foreach( $breadcrumbs as $b => $breadcrumb )
@@ -206,6 +206,8 @@ class breadcrumb_path_Widget extends ComponentWidget
 				echo $this->disp_params['separator'];
 			}
 		}
+
+		echo $this->disp_params['list_end'];
 
 		echo $this->disp_params['block_end'];
 

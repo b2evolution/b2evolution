@@ -22,18 +22,6 @@ $params = array(
 		'item_class' => 'jumbotron evo_content_block evo_post',
 	);
 
-// Breadcrumbs
-skin_widget( array(
-		// CODE for the widget:
-		'widget' => 'breadcrumb_path',
-		// Optional display params
-		'block_start'      => '<ol class="breadcrumb">',
-		'block_end'        => '</ol><div class="clear"></div>',
-		'separator'        => '',
-		'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-		'item_active_mask' => '<li class="active">$title$</li>',
-	) );
-
 if( ! is_array( $legend_icons ) )
 { // Init this array only first time
 	$legend_icons = array();

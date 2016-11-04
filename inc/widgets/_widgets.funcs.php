@@ -148,12 +148,19 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	}
 
 	/* Navigation */
-	if( $kind == 'manual' )
+	if( $kind == 'forum' )
+	{
+		// Search Form
+		add_basic_widget( $blog_id, 'Navigation', 'coll_search_form', 'core', 10 );
+		// Items button
+		add_basic_widget( $blog_id, 'Navigation', 'items_button', 'core', 20 );
+	}
+	if( in_array( $kind, array( 'manual', 'forum' ) ) )
 	{
 		// Breadcrumb Path
-		add_basic_widget( $blog_id, 'Navigation', 'breadcrumb_path', 'core', 10, array(
+		add_basic_widget( $blog_id, 'Navigation', 'breadcrumb_path', 'core', 30, array(
 				'separator'  => '',
-				'min_crumbs' => 2,
+				'min_crumbs' => ( $kind == 'forum' ? 1 : 2 ),
 			) );
 	}
 

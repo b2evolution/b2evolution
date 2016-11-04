@@ -80,6 +80,7 @@ $core_componentwidget_defs = array(
 			'breadcrumb_path',
 			'coll_common_links',
 			'coll_current_filters',
+			'items_button',
 		),
 	'content' => array(
 			'coll_featured_posts',    // Simplified UIL: Featured Posts

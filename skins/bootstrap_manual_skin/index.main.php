@@ -140,8 +140,8 @@ siteskin_include( '_site_body_header.inc.php' );
 			// Display container and contents:
 			skin_container( NT_('Navigation'), array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start'      => '<nav><ol class="breadcrumb">',
-					'block_end'        => '</ol></nav>',
+					'list_start'       => '<nav><ol class="breadcrumb">',
+					'list_end'         => '</ol></nav>',
 					'item_mask'        => '<li><a href="$url$">$title$</a></li>',
 					'item_active_mask' => '<li class="active">$title$</li>',
 				) );
