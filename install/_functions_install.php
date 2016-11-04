@@ -1796,6 +1796,7 @@ function update_basic_config_file( $params = array() )
 	global $baseurl, $admin_email, $config_is_done, $action;
 
 	$params = array_merge( array(
+			'create_db'      => 0,
 			'db_user'        => '',
 			'db_password'    => '',
 			'db_name'        => '',
@@ -1814,16 +1815,30 @@ function update_basic_config_file( $params = array() )
 		global $basic_config_file_result_messages;
 	}
 
-	// Connect to DB:
+	// Connect to DB host (without selecting DB because we should maybe create this by request):
 	$DB = new DB( array(
 			'user'     => $params['db_user'],
 			'password' => $params['db_password'],
-			'name'     => $params['db_name'],
 			'host'     => $params['db_host'],
 			'aliases'          => $db_config['aliases'],
 			'connection_charset' => empty( $db_config['connection_charset'] ) ? DB::php_to_mysql_charmap( $evo_charset ) : $db_config['connection_charset'],
 			'halt_on_error'      => false
 		) );
+
+	if( $params['create_db'] )
+	{	// Try to create DB if it doesn't exist yet:
+		$DB->query( 'CREATE DATABASE IF NOT EXISTS `'.$params['db_name'].'`
+			CHARACTER SET '.$DB->connection_charset );
+		if( $DB->error )
+		{
+			display_install_messages( sprintf( T_('You don\'t seem to have permission to create this new database on "%s" (%s).'), $params['db_host'], $DB->last_error ) );
+			$action = 'start';
+			return true;
+		}
+	}
+
+	// Select DB:
+	$DB->select( $params['db_name'] );
 
 	if( $DB->error )
 	{ // restart conf
