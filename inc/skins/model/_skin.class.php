@@ -414,7 +414,7 @@ class Skin extends DataObject
 
 			if( $c )
 			{
-				$Messages->add_to_group( sprintf( T_('%d containers have been found in skin template &laquo;%s&raquo;.'), $c, $rf_main_subpath ), 'success', T_('Installing skin:') );
+				$Messages->add_to_group( sprintf( T_('%d containers have been found in skin template &laquo;%s&raquo;.'), $c, $rf_main_subpath ), 'success', T_('Containers found:') );
 			}
 		}
 
