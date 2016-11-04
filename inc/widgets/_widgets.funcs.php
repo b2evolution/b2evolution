@@ -147,6 +147,16 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		}
 	}
 
+	/* Navigation */
+	if( $kind == 'manual' )
+	{
+		// Breadcrumb Path
+		add_basic_widget( $blog_id, 'Navigation', 'breadcrumb_path', 'core', 10, array(
+				'separator'  => '',
+				'min_crumbs' => 2,
+			) );
+	}
+
 	/* Item Single Header */
 	if( in_array( $kind, array( 'forum', 'group' ) ) )
 	{

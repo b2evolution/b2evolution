@@ -130,22 +130,6 @@ if( $Skin->is_visible_container( 'menu' ) )
 
 		<!-- =================================== START OF MAIN AREA =================================== -->
 		<?php
-			if( ! empty( $cat ) )
-			{ // Display breadcrumbs if some category is selected
-				skin_widget( array(
-						// CODE for the widget:
-						'widget' => 'breadcrumb_path',
-						// Optional display params
-						'block_start'      => '<nav><ol class="breadcrumb">',
-						'block_end'        => '</ol></nav>',
-						'separator'        => '',
-						'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-						'item_active_mask' => '<li class="active">$title$</li>',
-					) );
-			}
-		?>
-
-		<?php
 			// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
 			request_title( array(
 					'title_before'      => '<h1 class="page_title">',

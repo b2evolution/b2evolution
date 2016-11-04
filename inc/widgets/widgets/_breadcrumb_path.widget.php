@@ -56,6 +56,14 @@ class breadcrumb_path_Widget extends ComponentWidget
 					'options' => array( 'blog' => T_('Collection name'), 'cat' => T_('Root parent category') ),
 					'defaultvalue' => 'blog',
 				),
+				'min_crumbs' => array(
+					'label' => T_('Min number to display'),
+					'type' => 'integer',
+					'size' => 1,
+					'note' => T_('Minimum number of breadcrumbs to display widget.'),
+					'defaultvalue' => 1,
+					'valid_range' => array( 'min' => 1 ),
+				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -131,6 +139,10 @@ class breadcrumb_path_Widget extends ComponentWidget
 			global $Item;
 			if( ! empty( $Item ) )
 			{
+				if( empty( $cat ) )
+				{	// Set a category as main of current Item:
+					$cat = $Item->main_cat_ID;
+				}
 				$breadcrumbs[] = array(
 						'title' => $Item->dget( 'title' ),
 						// Don't get an item url because we don't use a link for last crumb
@@ -170,8 +182,8 @@ class breadcrumb_path_Widget extends ComponentWidget
 				);
 		}
 
-		if( empty( $breadcrumbs ) )
-		{ // Nothing to display
+		if( count( $breadcrumbs ) < $this->disp_params['min_crumbs'] )
+		{	// Don't display widget if number of breabcrumbs is less than required:
 			return;
 		}
 
