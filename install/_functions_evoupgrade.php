@@ -8071,6 +8071,83 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12135 ) )
+	{	// part of 6.8.0-beta
+
+		/* ---- Install basic widgets for container "Navigation": ---- START */
+		global $basic_widgets_insert_sql_rows;
+		$basic_widgets_insert_sql_rows = array();
+
+		/**
+		 * Add a widget to global array in order to insert it in DB by single SQL query later
+		 *
+		 * @param integer Blog ID
+		 * @param string Container name
+		 * @param string Type
+		 * @param string Code
+		 * @param integer Order
+		 * @param array|string|NULL Widget params
+		 * @param integer 1 - enabled, 0 - disabled
+		 */
+		function add_basic_widget_12135( $blog_ID, $container_name, $code, $type, $order, $params = NULL, $enabled = 1 )
+		{
+			global $basic_widgets_insert_sql_rows, $DB;
+
+			if( is_null( $params ) )
+			{ // NULL
+				$params = 'NULL';
+			}
+			elseif( is_array( $params ) )
+			{ // array
+				$params = $DB->quote( serialize( $params ) );
+			}
+			else
+			{ // string
+				$params = $DB->quote( $params );
+			}
+
+			$basic_widgets_insert_sql_rows[] = '( '
+				.$blog_ID.', '
+				.$DB->quote( $container_name ).', '
+				.$order.', '
+				.$enabled.', '
+				.$DB->quote( $type ).', '
+				.$DB->quote( $code ).', '
+				.$params.' )';
+		}
+
+		$collections = $DB->get_assoc( 'SELECT blog_ID, blog_type
+			 FROM T_blogs
+			WHERE blog_type IN ( "manual", "forum" )
+			ORDER BY blog_ID' );
+		foreach( $collections as $coll_ID => $coll_type )
+		{
+			task_begin( 'Installing default "Navigation" widgets for collection #'.$coll_ID.'... ' );
+			if( $coll_type == 'forum' )
+			{
+				// Search Form
+				add_basic_widget_12135( $coll_ID, 'Navigation', 'coll_search_form', 'core', 10 );
+				// Items button
+				add_basic_widget_12135( $coll_ID, 'Navigation', 'items_button', 'core', 20 );
+			}
+			// Breadcrumb Path
+			add_basic_widget_12135( $coll_ID, 'Navigation', 'breadcrumb_path', 'core', 30, array(
+					'separator'  => '',
+					'min_crumbs' => ( $coll_type == 'forum' ? 1 : 2 ),
+				) );
+			task_end();
+		}
+
+		if( ! empty( $basic_widgets_insert_sql_rows ) )
+		{	// Insert the widget records by single SQL query:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
+		}
+		/* ---- Install basic widgets for container "Navigation": ---- END */
+
+		upg_task_end( false );
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
