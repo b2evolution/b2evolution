@@ -525,13 +525,13 @@ class collections_Module extends Module
 				'note' => T_( 'New users automatically get a new blog'),
 				),
 			'perm_max_createblog_num' => array(
-				'label' => T_('Maximum number of collections allowed'),
+				'label' => T_('Maximum collections'),
 				'user_func' => 'check_createblog_user_perm',
 				'group_funct' => 'check_createblog_group_perm',
 				'perm_block' => 'blogging',
 				'perm_type' => 'text_input',
 				'maxlength' => 2,
-				'note' => T_('Leave empty for no limit'),
+				'note' => T_('Users will not be able to create collections if they already own the maximum number of collections (or more).'),
 				),
 			);
 		return $permissions;

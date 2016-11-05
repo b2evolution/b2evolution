@@ -2373,9 +2373,10 @@ function echo_user_actions( $Widget, $edited_User, $action )
 {
 	global $current_User, $admin_url;
 
+	$link_attribs = array( 'style' => 'margin-left:1ex', 'class' => 'btn btn-sm btn-default action_icon' );
+
 	if( $edited_User->ID != 0 )
 	{ // show these actions only if user already exists
-		$link_attribs = array( 'style' => 'margin-left:1ex', 'class' => 'btn btn-sm btn-default action_icon' );
 
 		if( $current_User->ID != $edited_User->ID && $current_User->check_status( 'can_report_user' ) )
 		{
@@ -3220,8 +3221,7 @@ function callback_filter_userlist( & $Form )
 				'0'  => T_('All (Grouped)'),
 			) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
 		$Form->select_input_array( 'group', get_param('group'), $group_options_array,
-			// TRANS: Type: Primary Group, Secondary Group
-			sprintf( T_('%s Group'), get_admin_badge( 'group', '#', '#', '#', 'primary' ) ),
+			sprintf( T_('<span %s>Primary</span> Group'), 'class="label label-primary"' ),
 			'', array( 'force_keys_as_values' => true ) );
 
 		// Secondary group:
@@ -3232,8 +3232,7 @@ function callback_filter_userlist( & $Form )
 				'0'  => T_('All'),
 			) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
 		$Form->select_input_array( 'group2', get_param('group2'), $group_options_array,
-			// TRANS: Type: Primary Group, Secondary Group
-			sprintf( T_('%s Group'), get_admin_badge( 'group', '#', '#', '#', 'secondary' ) ),
+			sprintf( T_('<span %s>Secondary</span> Group'), 'class="label label-info"' ),
 			'', array( 'force_keys_as_values' => true ) );
 	}
 

@@ -389,15 +389,7 @@ function locale_charset( $disp = true )
  */
 function locale_datefmt( $locale = NULL )
 {
-	global $locales;
-
-	if( empty($locale) )
-	{
-		global $current_locale;
-		$locale = $current_locale;
-	}
-
-	return $locales[$locale]['datefmt'];
+	return locale_get( 'datefmt', $locale );
 }
 
 
@@ -463,9 +455,7 @@ function locale_input_datefmt( $locale = NULL )
  */
 function locale_timefmt()
 {
-	global $locales, $current_locale;
-
-	return $locales[$current_locale]['timefmt'];
+	return locale_get( 'timefmt' );
 }
 
 /**
@@ -473,17 +463,13 @@ function locale_timefmt()
  */
 function locale_shorttimefmt()
 {
-	global $locales, $current_locale;
-
-	return $locales[$current_locale]['shorttimefmt'];
+	return locale_get( 'shorttimefmt' );
 }
 
 
 function locale_datetimefmt( $separator = ' ' )
 {
-	global $locales, $current_locale;
-
-	return $locales[$current_locale]['datefmt'].$separator.$locales[$current_locale]['timefmt'];
+	return locale_get( 'datefmt' ).$separator.locale_get( 'timefmt' );
 }
 
 
@@ -494,9 +480,7 @@ function locale_datetimefmt( $separator = ' ' )
  */
 function locale_startofweek()
 {
-	global $locales, $current_locale;
-
-	return (int)$locales[$current_locale]['startofweek'];
+	return ( int ) locale_get( 'startofweek' );
 }
 
 
@@ -953,13 +937,17 @@ function locale_updateDB()
 			{
 				param_error( $pkey, sprintf( T_('Locale %s date format cannot be empty'), $plocale ) );
 			}
+			elseif( $lfield == 'input_datefmt' && empty( $pval ) )
+			{
+				param_error( $pkey, sprintf( T_('Locale %s input date format cannot be empty'), $plocale ) );
+			}
 			elseif( $lfield == 'timefmt' && empty( $pval ) )
 			{
 				param_error( $pkey, sprintf( T_('Locale %s time format cannot be empty'), $plocale ) );
 			}
-			elseif( $lfield == 'shorttimefmt' && empty( $pval ) )
+			elseif( $lfield == 'input_timefmt' && empty( $pval ) )
 			{
-				param_error( $pkey, sprintf( T_('Locale %s short time cannot be empty'), $plocale ) );
+				param_error( $pkey, sprintf( T_('Locale %s input time format cannot be empty'), $plocale ) );
 			}
 
 			if( $lfield == 'startofweek' && ( $pval < 0 || $pval > 6 ) )
@@ -1551,8 +1539,8 @@ function locale_insert_default()
 
 			$insert_data[] = '( '.$DB->quote( $a_locale ).', '
 				.$DB->quote( $locales[ $a_locale ]['datefmt'] ).', '
-				.$DB->quote( $locales[ $a_locale ]['longdatefmt'] ).', '
-				.$DB->quote( $locales[ $a_locale ]['extdatefmt'] ).', '
+				.$DB->quote( empty( $locales[ $a_locale ]['longdatefmt'] ) ? str_replace( 'y', 'Y', $locales[ $a_locale ]['datefmt'] ) : $locales[ $a_locale ]['longdatefmt'] ).', '
+				.$DB->quote( empty( $locales[ $a_locale ]['extdatefmt'] ) ? str_replace( array( '.', ',', '\\', '/' ), ' ', str_replace( array( 'y', 'm' ), array( 'Y', 'M' ), $locales[ $a_locale ]['datefmt'] ) ) : $locales[ $a_locale ]['extdatefmt'] ).', '
 				.$DB->quote( $locales[ $a_locale ]['input_datefmt'] ).', '
 				.$DB->quote( $locales[ $a_locale ]['timefmt'] ).', '
 				.$DB->quote( empty( $locales[ $a_locale ]['shorttimefmt'] ) ? str_replace( ':s', '', $locales[ $a_locale ]['timefmt'] ) : $locales[ $a_locale ]['shorttimefmt'] ).', '
@@ -1610,8 +1598,8 @@ function locale_restore_defaults( $restored_locales )
 		// Restore all locale fields to default values:
 		$DB->query( 'UPDATE T_locales SET
 			loc_datefmt             = '.$DB->quote( $restored_locale['datefmt'] ).',
-			loc_longdatefmt         = '.$DB->quote( $restored_locale['longdatefmt'] ).',
-			loc_extdatefmt          = '.$DB->quote( $restored_locale['extdatefmt'] ).',
+			loc_longdatefmt         = '.$DB->quote( empty( $restored_locale['longdatefmt'] ) ? str_replace( 'y', 'Y', $restored_locale['datefmt'] ) : $restored_locale['longdatefmt'] ).',
+			loc_extdatefmt          = '.$DB->quote( empty( $restored_locale['extdatefmt'] ) ? str_replace( array( '.', '-', '\\', '/'), ' ', str_replace( array( 'y', 'm' ), array( 'Y', 'M' ), $restored_locale['datefmt'] ) ) : $restored_locale['extdatefmt'] ).',
 			loc_input_datefmt       = '.$DB->quote( $restored_locale['input_datefmt'] ).',
 			loc_timefmt             = '.$DB->quote( $restored_locale['timefmt'] ).',
 			loc_shorttimefmt        = '.$DB->quote( empty( $restored_locale['shorttimefmt'] ) ? str_replace( ':s', '', $restored_locale['timefmt'] ) : $restored_locale['shorttimefmt'] ).',
@@ -1685,8 +1673,8 @@ function locale_check_default()
 			.'VALUES ( '
 			.$DB->quote( $current_default_locale ).', '
 			.$DB->quote( $locales[ $current_default_locale ]['datefmt'] ).', '
-			.$DB->quote( $locales[ $current_default_locale ]['longdatefmt'] ).', '
-			.$DB->quote( $locales[ $current_default_locale ]['extdatefmt'] ).', '
+			.$DB->quote( empty( $locales[ $current_default_locale ]['longdatefmt'] ) ? str_replace( 'y', 'Y', $locales[ $current_default_locale ]['datefmt'] ) : $locales[ $current_default_locale ]['longdatefmt'] ).', '
+			.$DB->quote( empty( $locales[ $current_default_locale ]['extdatefmt'] ) ? str_replace( array( '.'. '-', '\\', '/' ), ' ', str_replace( array( 'y', 'm' ), array( 'Y', 'Y' ), $locales[ $current_default_locale ]['datefmt'] ) ) : $locales[ $current_default_locale ]['extdatefmt'] ).', '
 			.$DB->quote( $locales[ $current_default_locale ]['input_datefmt'] ).', '
 			.$DB->quote( $locales[ $current_default_locale ]['timefmt'] ).', '
 			.$DB->quote( empty( $locales[ $current_default_locale ]['shorttimefmt'] ) ? str_replace( ':s', '', $locales[ $current_default_locale ]['timefmt'] ) : $locales[ $current_default_locale ]['shorttimefmt'] ).', '
@@ -1699,6 +1687,106 @@ function locale_check_default()
 			.'1 )' );
 	}
 
+}
+
+
+/**
+ * Returns the locale's default field value
+ *
+ * @param string Locale field
+ * @param string Locale name, '#' to get default value not specific to a locale
+ * @param mixed Value to return if locale field is empty and no default value is assigned
+ * @return mixed Locale field value
+ */
+function locale_get( $field, $locale = NULL, $default = NULL )
+{
+	global $locales;
+
+	if( is_null( $locale ) )
+	{
+		global $current_locale;
+		$locale = $current_locale;
+	}
+
+	if( $locale == '#' || empty( $locales[$locale][$field] ) )
+	{
+		$default_values = array(
+			'datefmt' => 'Y-m-d',
+			'longdatefmt' => 'Y-m-d',
+			'extdatefmt' => 'M d Y',
+			'input_datefmt' => 'Y-m-d',
+			'timefmt' => 'H:i:s',
+			'shorttimefmt' => 'H:i',
+			'input_timefmt' => 'H:i:s'
+		);
+
+		switch( $field )
+		{
+			case 'longdatefmt':
+				if( isset( $locales[$locale]['datefmt'] ) )
+				{
+					return str_replace( 'y', 'Y', $locales[$locale]['datefmt'] );
+				}
+				else
+				{
+					return isset( $default ) ? $default : $default_values['longdatefmt'];
+				}
+				break;
+
+			case 'extdatefmt':
+				if( isset( $locales[$locale]['datefmt'] ) )
+				{
+					return str_replace( array( '.', '-', '\\', '/' ), ' ', str_replace( array( 'm', 'y' ), array( 'M', 'Y' ), $locales[$locale]['datefmt'] ) );
+				}
+				else
+				{
+					return isset( $default ) ? $default : $default_values['extdatefmt'];
+				}
+				break;
+
+			case 'shorttimefmt':
+				if( isset( $locales[$locale]['timefmt'] ) )
+				{
+					return str_replace( ':s', '', $locales[$locale]['timefmt'] );
+				}
+				else
+				{
+					return isset( $default ) ? $default : $default_values['shorttimefmt'];
+				}
+				break;
+
+			default:
+				return isset( $default_values[$field] ) ? $default_values[$field] : ( isset( $default ) ? $default : NULL );
+		}
+	}
+	else
+	{
+		return $locales[$locale][$field];
+	}
+}
+
+
+/**
+ * Set default values of locales formats
+ *
+ * @param array Locale
+ * @param array Source locale
+ */
+function locale_set_default_formats( & $locale, $source_locale = NULL )
+{
+	if( is_null( $source_locale ) )
+	{
+		$source_locale = $locale;
+	}
+
+	foreach( $source_locale as $l_key => $l_value )
+	{
+		if( $default_value = locale_get( $l_key, $source_locale ) )
+		{
+			$locale[$l_key] = $default_value;
+		}
+
+	}
 }
 
 ?>

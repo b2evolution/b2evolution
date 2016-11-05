@@ -35,7 +35,7 @@ class archives_plugin extends Plugin
 	var $name;
 	var $code = 'evo_Arch';
 	var $priority = 50;
-	var $version = '6.7.7';
+	var $version = '6.7.8';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'navigation';

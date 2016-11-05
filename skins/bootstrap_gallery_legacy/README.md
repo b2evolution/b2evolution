@@ -1,9 +1,5 @@
 ## Bootstrap Gallery (Legacy) Skin
 
-Skin version: 6.8.0-alpha.
-
-====
-
 ### Single Page
 
 ![disp=single](skinshot.jpg)
