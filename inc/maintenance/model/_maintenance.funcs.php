@@ -155,7 +155,7 @@ a clean DB may make it impossible to ever ugrade your b2evolution in the future.
 		}
 		else
 		{ // Maintenance file has not been created
-			echo '</p><p style="color:red">'.sprintf( T_( 'Unable to switch maintenance mode. Maintenance file can\'t be created: &laquo;%s&raquo;' ), $maintenance_mode_file ).'</p>';
+			echo '</p><p style="color:red">'.sprintf( T_( 'Unable to switch to maintenance mode. Maintenance file can\'t be created: &laquo;%s&raquo;' ), $maintenance_mode_file ).'</p>';
 			evo_flush();
 
 			return false;
