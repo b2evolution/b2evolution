@@ -881,7 +881,7 @@ function locale_updateDB()
 			}
 			elseif( $lfield == 'shorttimefmt' && empty( $pval ) )
 			{
-				param_error( $pkey, sprintf( T_('Locale %s short time cannot be empty'), $plocale ) );
+				param_error( $pkey, sprintf( T_('Locale %s short time format cannot be empty'), $plocale ) );
 			}
 
 			if( $lfield == 'startofweek' && ( $pval < 0 || $pval > 6 ) )

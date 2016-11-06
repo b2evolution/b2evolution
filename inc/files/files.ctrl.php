@@ -78,6 +78,10 @@ if( $path == './' )
  */
 if( param( 'link_type', 'string', NULL, true, false, false ) && param( 'link_object_ID', 'integer', NULL, true, false, false ) )
 { // Load Requested LinkOwner object:
+	if( $root == 'skins_0' )
+	{	// Deny to link skin files to objects:
+		debug_die( 'Skin files are not allowed to link to objects!' );
+	}
 	$LinkOwner = get_link_owner( $link_type, $link_object_ID );
 	if( empty( $LinkOwner ) )
 	{ // We could not find the owner object to link:
@@ -91,6 +95,10 @@ if( param( 'link_type', 'string', NULL, true, false, false ) && param( 'link_obj
 
 if( param( 'user_ID', 'integer', NULL, true, false, false ) )
 { // Load Requested user:
+	if( $root == 'skins_0' )
+	{	// Deny to link skin files to objects:
+		debug_die( 'Skin files are not allowed to link to objects!' );
+	}
 	$UserCache = & get_UserCache();
 	if( ($edited_User = & $UserCache->get_by_ID( $user_ID, false )) === false )
 	{	// We could not find the contact to link:

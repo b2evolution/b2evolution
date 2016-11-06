@@ -3197,8 +3197,7 @@ function callback_filter_userlist( & $Form )
 				'0'  => T_('All (Grouped)'),
 			) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
 		$Form->select_input_array( 'group', get_param('group'), $group_options_array,
-			// TRANS: Type: Primary Group, Secondary Group
-			sprintf( T_('%s Group'), get_admin_badge( 'group', '#', '#', '#', 'primary' ) ),
+			sprintf( T_('<span %s>Primary</span> Group'), 'class="label label-primary"' ),
 			'', array( 'force_keys_as_values' => true ) );
 
 		// Secondary group:
@@ -3209,8 +3208,7 @@ function callback_filter_userlist( & $Form )
 				'0'  => T_('All'),
 			) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
 		$Form->select_input_array( 'group2', get_param('group2'), $group_options_array,
-			// TRANS: Type: Primary Group, Secondary Group
-			sprintf( T_('%s Group'), get_admin_badge( 'group', '#', '#', '#', 'secondary' ) ),
+			sprintf( T_('<span %s>Secondary</span> Group'), 'class="label label-info"' ),
 			'', array( 'force_keys_as_values' => true ) );
 	}
 

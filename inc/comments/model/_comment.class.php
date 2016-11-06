@@ -4531,18 +4531,26 @@ class Comment extends DataObject
 	/*
 	 * Get max allowed comment status depending on parent item status
 	 *
+	 * @param string Status key to check if it is allowed, NULL- to use current comment status
 	 * @return string Status key
 	 */
-	function get_allowed_status()
+	function get_allowed_status( $current_status = NULL )
 	{
 		$comment_Item = & $this->get_Item();
 		$item_Blog = & $comment_Item->get_Blog();
 
-		// Current comment status:
-		$current_status = $this->get( 'status' );
+		if( $current_status === NULL )
+		{	// Use current comment status:
+			$current_status = $this->get( 'status' );
+		}
 
 		// Restrict status to max allowed for item collection:
-		$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->status );
+		$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->get( 'status' ) );
+		if( empty( $item_restricted_status ) )
+		{	// If max allowed status is not detected because for example current User has no perm to item status,
+			// then use current status of the Item in order to restrict max comment status below:
+			$item_restricted_status = $comment_Item->get( 'status' );
+		}
 
 		// Comment status cannot be more than post status, restrict it:
 		$restricted_statuses = get_restricted_statuses( $item_Blog->ID, 'blog_comment!', 'edit', '', $item_restricted_status );
