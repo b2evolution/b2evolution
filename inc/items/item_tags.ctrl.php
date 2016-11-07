@@ -58,7 +58,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 		break;
- 
+
 	case 'create':
 		// Create new tag...
 		$edited_ItemTag = new ItemTag();
@@ -85,7 +85,7 @@ switch( $action )
 
 	case 'update':
 		// Update tag...
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'tag' );
 
@@ -243,12 +243,12 @@ switch( $action )
 		$DB->query( 'DELETE T_items__itemtag FROM T_items__itemtag
 				LEFT JOIN T_items__item ON itag_itm_ID = post_ID
 			 WHERE post_ID IS NULL' );
-		$Messages->add( sprintf( T_('Removed %d associations with non-existing posts.'), $DB->rows_affected ), 'success' );
+		$Messages->add_to_group( sprintf( T_('Removed %d associations with non-existing posts.'), $DB->rows_affected ), 'success', T_('Deleting orphan tags:') );
 
 		$DB->query( 'DELETE T_items__tag FROM T_items__tag
 				LEFT JOIN T_items__itemtag ON tag_ID = itag_tag_ID
 			 WHERE itag_itm_ID IS NULL' );
-		$Messages->add( sprintf( T_('Removed %d obsolete tag entries.'), $DB->rows_affected ), 'success' );
+		$Messages->add_to_group( sprintf( T_('Removed %d obsolete tag entries.'), $DB->rows_affected ), 'success', T_('Deleting orphan tags:') );
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $return_to ? $return_to : $admin_url.'?ctrl=itemtags', 303 ); // Will EXIT
