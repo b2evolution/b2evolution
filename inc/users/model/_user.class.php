@@ -3279,10 +3279,14 @@ class User extends DataObject
 
 		// Count blog ids where this user has the required permissions for the given role
 		$SQL = new SQL();
-		$SQL->SELECT( 'count( blog_ID )' );
+		$SQL->SELECT( 'COUNT( DISTINCT blog_ID )' );
 		$SQL->FROM( 'T_blogs' );
 		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0 AND blog_ID = bloguser_blog_ID AND bloguser_user_ID = '.$this->ID.' )' );
-		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0 AND blog_ID = bloggroup_blog_ID AND bloggroup_group_ID = '.$this->grp_ID.' )' );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON ( blog_advanced_perms <> 0
+			AND blog_ID = bloggroup_blog_ID
+			AND ( bloggroup_group_ID = '.$this->grp_ID.'
+			      OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$this->ID.' ) )
+			)' );
 		$SQL->WHERE( 'blog_owner_user_ID = '.$this->ID );
 		$SQL->WHERE_or( $where_clause );
 
