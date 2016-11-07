@@ -356,9 +356,27 @@ class files_Module extends Module
 							return $perm;
 						}
 						$perm = $current_User->check_perm_blogusers( 'files', $permlevel, $permtarget->in_type_ID );
-						if ( ! $perm )
-						{ // Check groups for permissions for this specific blog:
+						if( ! $perm )
+						{	// Check primary group for permissions for this specific collection:
 							$perm = $current_User->Group->check_perm_bloggroups( 'files', $permlevel, $permtarget->in_type_ID );
+
+							if( ! $perm )
+							{	// Check secondary group for permissions for this specific collection:
+
+								// Get secondary usergroups of current User:
+								$secondary_groups = $current_User->get_secondary_groups();
+
+								// Find first secondary usergroup that grants the required permission:
+								foreach( $secondary_groups as $secondary_Group )
+								{
+									if( $secondary_Group->check_perm_bloggroups( 'files', $permlevel, $permtarget->in_type_ID ) )
+									{	// Secondary usergroup grants requested permissions on the target collection:
+										$perm = true;
+										// Stop checking other groups:
+										break;
+									}
+								}
+							}
 						}
 						return $perm;
 					}
