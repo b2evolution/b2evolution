@@ -1590,7 +1590,7 @@ function param_error( $var, $err_msg, $field_err_msg = NULL, $group_header = NUL
 
 	if( is_null( $group_header ) )
 	{
-		$group_header = T_('Validation error:');
+		$group_header = T_('Validation errors:');
 	}
 
 	if( ! isset( $param_input_err_messages[$var] ) )
@@ -2435,7 +2435,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 				: sprintf( T_('Illegal content found: blacklisted word &laquo;%s&raquo;.'), htmlspecialchars($block) );
 		}
 
-		$Messages->add_to_group(	$errmsg, 'error', T_('Validation error:') );
+		$Messages->add_to_group(	$errmsg, 'error', T_('Validation errors:') );
 	}
 
 	$content = trim( $content );
@@ -2479,7 +2479,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 		$css_tweaks_error = ( ( ! $allow_css_tweaks ) && preg_match( '#\s((style|class|id)\s*=)#i', $check, $matches ) );
 		if( $css_tweaks_error && $verbose )
 		{
-			$Messages->add_to_group( T_('Illegal CSS markup found: ').htmlspecialchars($matches[1]), 'error', T_('Validation error:') );
+			$Messages->add_to_group( T_('Illegal CSS markup found: ').htmlspecialchars($matches[1]), 'error', T_('Validation errors:') );
 		}
 
 		// CHECK JAVASCRIPT:
@@ -2490,21 +2490,21 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 				|| preg_match( '#=["\'\s]*((javascript|vbscript|about):)#i', $check, $matches ) ) );
 		if( $javascript_error && $verbose )
 		{
-			$Messages->add_to_group( T_('Illegal javascript markup found: ').htmlspecialchars($matches[1]), 'error', T_('Validation error:') );
+			$Messages->add_to_group( T_('Illegal javascript markup found: ').htmlspecialchars($matches[1]), 'error', T_('Validation errors:') );
 		}
 
 		// CHECK IFRAMES:
 		$iframe_error = ( ( ! $allow_iframes ) && preg_match( '~( < \s* //? \s* (frame|iframe) )~xi', $check, $matches ) );
 		if( $iframe_error && $verbose )
 		{
-			$Messages->add_to_group( T_('Illegal frame markup found: ').htmlspecialchars($matches[1]), 'error', T_('Validation error:') );
+			$Messages->add_to_group( T_('Illegal frame markup found: ').htmlspecialchars($matches[1]), 'error', T_('Validation errors:') );
 		}
 
 		// CHECK OBJECTS:
 		$object_error = ( ( ! $allow_objects ) && preg_match( '~( < \s* //? \s* (applet|object|param|embed) )~xi', $check, $matches ) );
 		if( $object_error && $verbose )
 		{
-			$Messages->add_to_group( T_('Illegal object markup found: ').htmlspecialchars($matches[1]), 'error', T_('Validation error:') );
+			$Messages->add_to_group( T_('Illegal object markup found: ').htmlspecialchars($matches[1]), 'error', T_('Validation errors:') );
 		}
 
 		// Set the final error value based on all of the results
@@ -2517,8 +2517,8 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 			&& ( ! empty( $Group ) ) // This one will basically prevent this case from happening when commenting
 			&& $User->check_perm( 'users', 'edit', false ) )
 		{
-			$Messages->add( sprintf( T_('(Note: To get rid of the above validation warnings, you can deactivate unwanted validation rules in your <a %s>Group settings</a>.)'),
-										'href="'.$admin_url.'?ctrl=groups&amp;grp_ID='.$Group->ID.'"' ), 'error' );
+			$Messages->add_to_group( sprintf( T_('To get rid of the above validation warnings, you can deactivate unwanted validation rules in your <a %s>Group settings</a>.'),
+										'href="'.$admin_url.'?ctrl=groups&amp;grp_ID='.$Group->ID.'"' ), 'error', T_('Validation errors:') );
 		}
 		return false;
 	}

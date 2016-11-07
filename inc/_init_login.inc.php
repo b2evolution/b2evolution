@@ -335,7 +335,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 						date( locale_datefmt().' '.locale_timefmt(), $attempt[0] ),
 						$attempt_ip,
 						$plugin_country_by_IP
-					), 'error', T_('Invalid login attempt:') );
+					), 'error', T_('Invalid login attempts:') );
 			}
 			// Clear the attempts list
 			$UserSettings->delete( 'login_attempts', $current_User->ID );

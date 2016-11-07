@@ -175,11 +175,11 @@ else
 	// We need some id info from the anonymous user:
 	if( $commented_Item->Blog->get_setting( 'require_anon_name' ) && empty( $author ) )
 	{	// Author name is required for anonymous users:
-		$Messages->add_to_group( T_('Please fill in your name.'), 'error', T_('Validation error:') );
+		$Messages->add_to_group( T_('Please fill in your name.'), 'error', T_('Validation errors:') );
 	}
 	if( $commented_Item->Blog->get_setting( 'require_anon_email' ) && empty( $email ) )
 	{	// Author email address is required for anonymous users:
-		$Messages->add_to_group( T_('Please fill in your email.'), 'error', T_('Validation error:') );
+		$Messages->add_to_group( T_('Please fill in your email.'), 'error', T_('Validation errors:') );
 	}
 
 	if( !empty( $author ) && ( $block = antispam_check( $author ) ) )
@@ -187,7 +187,7 @@ else
 		// Log incident in system log
 		syslog_insert( sprintf( 'Antispam: Supplied name "%s" contains blacklisted word "%s".', $author, $block ), 'error', 'comment', $comment_item_ID );
 
-		$Messages->add_to_group( T_('Supplied name is invalid.'), 'error', T_('Validation error:') );
+		$Messages->add_to_group( T_('Supplied name is invalid.'), 'error', T_('Validation errors:') );
 	}
 
 	if( !empty( $email )
@@ -196,7 +196,7 @@ else
 		// Log incident in system log
 		syslog_insert( sprintf( 'Antispam: Supplied email address "%s" contains blacklisted word "%s".', $email, $block ), 'error', 'comment', $comment_item_ID );
 
-		$Messages->add_to_group( T_('Supplied email address is invalid.'), 'error', T_('Validation error:') );
+		$Messages->add_to_group( T_('Supplied email address is invalid.'), 'error', T_('Validation errors:') );
 	}
 
 
@@ -214,7 +214,7 @@ else
 	// a title for their comment or whatever...
 	if( $error = validate_url( $url, 'commenting' ) )
 	{
-		$Messages->add_to_group( T_('Supplied website address is invalid: ').$error, 'error', T_('Validation error:') );
+		$Messages->add_to_group( T_('Supplied website address is invalid: ').$error, 'error', T_('Validation errors:') );
 	}
 
 	if( $commented_Item->Blog->get_setting( 'comments_detect_email' ) )
@@ -357,7 +357,7 @@ if( $commented_Item->can_attach() && !empty( $_FILES['uploadfile'] ) && !empty( 
 
 if( empty( $comment ) && $checked_attachments_count == 0 )
 { // comment should not be empty!
-	$Messages->add_to_group( T_('Please do not send empty comments.'), 'error', T_('Validation error:') );
+	$Messages->add_to_group( T_('Please do not send empty comments.'), 'error', T_('Validation errors:') );
 }
 
 

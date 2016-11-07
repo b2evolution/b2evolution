@@ -333,7 +333,7 @@ class XHTML_Validator
 	{
 		global $Messages;
 		$this->error = true;
-		$Messages->add_to_group( $string, $this->msg_type, T_('Validation error:') );
+		$Messages->add_to_group( $string, $this->msg_type, T_('Validation errors:') );
 	}
 
 	/**

@@ -75,19 +75,19 @@ $Comment = NULL;
 
 if( empty($subject) )
 {
-	$Messages->add_to_group( T_('Please fill in the subject of your message.'), 'error', T_('Validation error:') );
+	$Messages->add_to_group( T_('Please fill in the subject of your message.'), 'error', T_('Validation errors:') );
 }
 
 if( empty( $message ) )
 { // message should not be empty!
-	$Messages->add_to_group( T_('Please do not send empty messages.'), 'error', T_('Validation error:') );
+	$Messages->add_to_group( T_('Please do not send empty messages.'), 'error', T_('Validation errors:') );
 }
 elseif( $Settings->get( 'antispam_block_contact_form' ) && ( $block = antispam_check( $message ) ) )
 { // a blacklisted keyword has been found in the message:
 	// Log incident in system log
 	syslog_insert( sprintf( 'Antispam: Supplied message is invalid / appears to be spam. Message contains blacklisted word "%s".', $block ), 'error' );
 
-	$Messages->add_to_group( T_('The supplied message is invalid / appears to be spam.'), 'error', T_('Validation error:') );
+	$Messages->add_to_group( T_('The supplied message is invalid / appears to be spam.'), 'error', T_('Validation errors:') );
 }
 
 // Getting current blog info:
@@ -146,18 +146,18 @@ elseif( ! empty( $comment_id ) )
 
 if( empty($sender_name) )
 {
-	$Messages->add_to_group( T_('Please fill in your name.'), 'error', T_('Validation error:') );
+	$Messages->add_to_group( T_('Please fill in your name.'), 'error', T_('Validation errors:') );
 }
 if( empty($sender_address) )
 {
-	$Messages->add_to_group( T_('Please fill in your email.'), 'error', T_('Validation error:') );
+	$Messages->add_to_group( T_('Please fill in your email.'), 'error', T_('Validation errors:') );
 }
 elseif( !is_email($sender_address) || ( $block = antispam_check( $sender_address ) ) ) // TODO: dh> using antispam_check() here might not allow valid users to contact the admin in case of problems due to the antispam list itself.. :/
 {
 	// Log incident in system log
 	syslog_insert( sprintf( 'Antispam: Supplied email address "%s" contains blacklisted word "%s".', $sender_address, $block ), 'error' );
 
-	$Messages->add_to_group( T_('Supplied email address is invalid.'), 'error', T_('Validation error:') );
+	$Messages->add_to_group( T_('Supplied email address is invalid.'), 'error', T_('Validation errors:') );
 }
 
 if( empty( $recipient_User ) && empty( $recipient_address ) )
