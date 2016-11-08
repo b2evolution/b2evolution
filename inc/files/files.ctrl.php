@@ -1102,7 +1102,7 @@ switch( $action )
 						// Let's make the link!
 						$LinkOwner->add_link( $l_File->ID, ( $order == 1 ? 'teaser' : 'aftermore' ), $order++ );
 
-						$Messages->add( sprintf( T_('&laquo;%s&raquo; has been attached.'), $l_File->dget('name') ), 'success' );
+						$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; has been attached.'), $l_File->dget('name') ), 'success', T_('Attaching files:') );
 
 					} while( $l_File = & $selected_Filelist->get_next() );
 
