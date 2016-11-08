@@ -340,7 +340,7 @@ class EmailCampaign extends DataObject
 		{ // Email title is empty
 			if( $display_messages )
 			{
-				$Messages->add( T_('Please enter an email title.'), 'error' );
+				$Messages->add_to_group( T_('Please enter an email title.'), 'error', T_('Validation errors:') );
 			}
 			$result = false;
 		}
@@ -349,7 +349,7 @@ class EmailCampaign extends DataObject
 		{	// Email message is empty:
 			if( $display_messages )
 			{
-				$Messages->add( T_('Please enter a text message.'), 'error' );
+				$Messages->add_to_group( T_('Please enter a text message.'), 'error', T_('Validation errors:') );
 			}
 			$result = false;
 		}
@@ -358,7 +358,7 @@ class EmailCampaign extends DataObject
 		{ // No users found which wait this newsletter
 			if( $display_messages )
 			{
-				$Messages->add( T_('No recipients found for this campaign.'), 'error' );
+				$Messages->add_to_group( T_('No recipients found for this campaign.'), 'error', T_('Validation errors:') );
 			}
 			$result = false;
 		}
