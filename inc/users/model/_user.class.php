@@ -2525,8 +2525,8 @@ class User extends DataObject
 						// Check blog user perms to see if user may recycle his own posts comments
 						$perm = $this->check_perm_blogusers( 'blog_recycle_owncmts', $permlevel, $blog_ID );
 						if( ! $perm )
-						{ // Check groups for permissions to this specific blog:
-							$perm = $this->Group->check_perm_bloggroups( 'blog_recycle_owncmts', $permlevel, $blog_ID );
+						{	// Check primary and secondary groups for permissions to this specific collection:
+							$perm = $this->check_perm_bloggroups( 'blog_recycle_owncmts', $permlevel, $blog_ID );
 						}
 					}
 				}
@@ -2590,48 +2590,14 @@ class User extends DataObject
 				if( $perm_target_ID > 0 )
 				{	// Check the permissions below only for requested target collection:
 
-					if( $primary_Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_ID ) )
-					{	// Primary advanced usergroup permissions on the target collection grant the requested permission:
+					if( $this->check_perm_bloggroups( $permname, $permlevel, $perm_target_ID ) )
+					{	// Primary or Secondary advanced usergroups permissions on the target collection grant the requested permission:
 						$perm = true;
 						// Stop checking other perms:
 						break;
 					}
 
-					// Get secondary usergroups for this User:
-					$secondary_groups = $this->get_secondary_groups();
-
-					// Check which secondary usergroup's advanced permissions must still be loaded: (we may have some in cache already)
-					$notloaded_secondary_group_IDs = array();
-					foreach( $secondary_groups as $secondary_Group )
-					{
-						if( ! isset( $secondary_Group->blog_post_statuses[ $perm_target_ID ] ) )
-						{	// We must still load advanced permissions for this secondary usergroup:
-							$notloaded_secondary_group_IDs[] = $secondary_Group->ID;
-						}
-					}
-
-					if( count( $notloaded_secondary_group_IDs ) )
-					{	// Load advanced permissions of secondary usergroups in a single query:
-						$coll_advanced_perms = NULL;
-						load_blog_advanced_perms( $coll_advanced_perms, $perm_target_ID, $notloaded_secondary_group_IDs, 'bloggroup' );
-					}
-
-					// Find first secondary usergroup that grants the required permission:
-					foreach( $secondary_groups as $secondary_Group )
-					{
-						if( isset( $coll_advanced_perms, $coll_advanced_perms[ $secondary_Group->ID ] ) )
-						{	// Set advanced usergroup permissions from array loaded above:
-							$secondary_Group->blog_post_statuses[ $perm_target_ID ] = $coll_advanced_perms[ $secondary_Group->ID ];
-						}
-						if( $secondary_Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_ID ) )
-						{	// Secondary usergroup grants requested permissions on the target collection:
-							$perm = true;
-							// Stop checking other groups and other perms:
-							break 2;
-						}
-					}
-
-					// Check usr specific perms:
+					// Check user specific perms:
 					if( $this->check_perm_blogusers( $permname, $permlevel, $perm_target_ID ) )
 					{	// Advanced user permissions on the target collection grant the requested permission:
 						$perm = true;
@@ -2696,16 +2662,16 @@ class User extends DataObject
 				$blog_permname = 'blog_comment!'.$Comment->status;
 				$perm = $perm || $this->check_perm_blogusers( $blog_permname, $permlevel, $blog_ID, $Comment );
 				if( ! $perm )
-				{ // Check groups for permissions to this specific blog:
-					$perm = $this->Group->check_perm_bloggroups( $blog_permname, $permlevel, $blog_ID, $Comment, $this );
+				{	// Check primary and secondary groups for permissions to this specific collection:
+					$perm = $this->check_perm_bloggroups( $blog_permname, $permlevel, $blog_ID, $Comment, $this );
 				}
 				if( $perm && ( $Comment->status != $check_status ) )
 				{ // also check the requested status permissions at the blog level
 					$blog_permname = 'blog_comment!'.$check_status;
 					$perm = $this->check_perm_blogusers( $blog_permname, 'create', $blog_ID );
 					if( ! $perm )
-					{ // Check groups for permissions to this specific blog:
-						$perm = $this->Group->check_perm_bloggroups( $blog_permname, 'create', $blog_ID );
+					{	// Check primary and secondary groups for permissions to this specific collection:
+						$perm = $this->check_perm_bloggroups( $blog_permname, 'create', $blog_ID );
 					}
 				}
 				break;
@@ -2753,8 +2719,8 @@ class User extends DataObject
 						// Check perms to View meta comments of the collection:
 						$perm = // If User is explicitly allowed in the user permissions
 								$this->check_perm_blogusers( 'meta_comment', 'view', $blog_ID )
-								// OR If User belongs to a group explicitly allowed in the group permissions
-								|| ( $this->get_Group() && $this->Group->check_perm_bloggroups( 'meta_comment', 'view', $blog_ID ) );
+								// OR If User belongs to primary or secondary groups explicitly allowed in the group permissions
+								|| $this->check_perm_bloggroups( 'meta_comment', 'view', $blog_ID );
 						break;
 
 					case 'add':
@@ -2769,8 +2735,8 @@ class User extends DataObject
 						// Check perms to Edit meta comment:
 						$perm = // If User is explicitly allowed in the user permissions
 								$this->check_perm_blogusers( 'meta_comment', 'edit', $blog_ID, $Comment )
-								// OR If User belongs to a group explicitly allowed in the group permissions
-								|| ( $this->get_Group() && $this->Group->check_perm_bloggroups( 'meta_comment', 'edit', $blog_ID, $Comment ) );
+								// OR If User belongs to primary or secondary groups explicitly allowed in the group permissions
+								|| $this->check_perm_bloggroups( 'meta_comment', 'edit', $blog_ID, $Comment );
 						break;
 
 					case 'delete':
@@ -2828,16 +2794,16 @@ class User extends DataObject
 				$blog_permname = 'blog_post!'.$Item->status;
 				$perm = $this->check_perm_blogusers( $blog_permname, $permlevel, $blog_ID, $Item );
 				if( ! $perm )
-				{ // Check groups for permissions to this specific blog:
-					$perm = $this->Group->check_perm_bloggroups( $blog_permname, $permlevel, $blog_ID, $Item, $this );
+				{	// Check primary and secondary groups for permissions to this specific collection:
+					$perm = $this->check_perm_bloggroups( $blog_permname, $permlevel, $blog_ID, $Item, $this );
 				}
 				if( $perm && ( $Item->status != $check_status ) )
 				{ // also check the requested status permissions at the blog level
 					$blog_permname = 'blog_post!'.$check_status;
 					$perm = $this->check_perm_blogusers( $blog_permname, 'create', $blog_ID );
 					if( ! $perm )
-					{ // Check groups for permissions to this specific blog:
-						$perm = $this->Group->check_perm_bloggroups( $blog_permname, 'create', $blog_ID );
+					{	// Check primary and secondary groups for permissions to this specific collection:
+						$perm = $this->check_perm_bloggroups( $blog_permname, 'create', $blog_ID );
 					}
 				}
 				break;
@@ -2857,8 +2823,8 @@ class User extends DataObject
 				{ // Check user perm for this blog:
 					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
 					if ( ! $perm )
-					{ // Check groups for permissions to this specific blog:
-						$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target );
+					{	// Check primary and secondary groups for permissions to this specific collection:
+						$perm = $this->check_perm_bloggroups( $permname, $permlevel, $perm_target );
 					}
 				}
 				elseif( $permlevel == 'list' && $perm_target == NULL )
@@ -2968,8 +2934,8 @@ class User extends DataObject
 				{	// Check specific blog perms:
 					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
 					if ( ! $perm )
-					{ // Check groups for permissions for this specific blog:
-						$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target );
+					{	// Check primary and secondary groups for permissions for this specific collection:
+						$perm = $this->check_perm_bloggroups( $permname, $permlevel, $perm_target );
 					}
 				}
 */
@@ -3123,6 +3089,73 @@ class User extends DataObject
 
 		// Check permission and return the result
 		return check_blog_advanced_perm( $this->blog_post_statuses[$perm_target_blog], $this->ID, $permname, $permlevel, $perm_target );
+	}
+
+
+	/**
+	 * Check permission for primary and secondary groups of this user on a specified collection
+	 *
+	 * This is not for direct use, please call {@link User::check_perm()} instead
+	 *
+	 * @see User::check_perm()
+	 * @param string Permission name
+	 * @param string Permission level
+	 * @param integer Permission target blog ID
+	 * @param object Item that we want to edit
+	 * @param object User for who we would like to check this permission
+	 * @return boolean false if permission denied
+	 */
+	function check_perm_bloggroups( $permname, $permlevel, $perm_target_blog, $perm_target = NULL, $User = NULL )
+	{
+		// Get primary group of this User:
+		$primary_Group = & $this->get_Group();
+
+		if( $primary_Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_blog, $perm_target, $User ) )
+		{	// Primary advanced usergroup permissions on the target collection grant the requested permission:
+			return true;
+			// Stop checking other perms.
+		}
+
+		// Get secondary usergroups for this User:
+		$secondary_groups = $this->get_secondary_groups();
+
+		if( empty( $secondary_groups ) )
+		{	// Stop checking other perms if this User has no secondary groups:
+			return false;
+		}
+
+		// Check which secondary usergroup's advanced permissions must still be loaded: (we may have some in cache already)
+		$notloaded_secondary_group_IDs = array();
+		foreach( $secondary_groups as $secondary_Group )
+		{
+			if( ! isset( $secondary_Group->blog_post_statuses[ $perm_target_blog ] ) )
+			{	// We must still load advanced permissions for this secondary usergroup:
+				$notloaded_secondary_group_IDs[] = $secondary_Group->ID;
+			}
+		}
+
+		if( count( $notloaded_secondary_group_IDs ) )
+		{	// Load advanced permissions of secondary usergroups in a single query:
+			$coll_advanced_perms = NULL;
+			load_blog_advanced_perms( $coll_advanced_perms, $perm_target_blog, $notloaded_secondary_group_IDs, 'bloggroup' );
+		}
+
+		// Find first secondary usergroup that grants the required permission:
+		foreach( $secondary_groups as $secondary_Group )
+		{
+			if( isset( $coll_advanced_perms, $coll_advanced_perms[ $secondary_Group->ID ] ) )
+			{	// Set advanced usergroup permissions from array loaded above:
+				$secondary_Group->blog_post_statuses[ $perm_target_blog ] = $coll_advanced_perms[ $secondary_Group->ID ];
+			}
+			if( $secondary_Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_blog, $perm_target, $User ) )
+			{	// Secondary usergroup grants requested permissions on the target collection:
+				return true;
+				// Stop checking other groups and other perms.
+			}
+		}
+
+		// All groups of this User have no requested permission on a specified collection:
+		return false;
 	}
 
 
