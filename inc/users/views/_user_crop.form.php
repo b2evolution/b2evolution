@@ -154,8 +154,8 @@ if( $can_crop )
 <style>
 	#workarea img {
 		object-fit: contain;
-		width: <?php echo $workarea_width;?>;
-		height: <?php echo $workarea_height;?>;
+		width: <?php echo $content_width;?>;
+		height: <?php echo $content_height;?>;
 		visibility: hidden;
 	}
 
