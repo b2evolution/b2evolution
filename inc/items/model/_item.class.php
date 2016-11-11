@@ -1314,6 +1314,42 @@ class Item extends ItemLight
 
 
 	/**
+	 * Check if current User can see meta comments on this Item
+	 *
+	 * @return boolean
+	 */
+	function can_see_meta_comments()
+	{
+		if( ! is_logged_in() )
+		{	// User must be logged in
+			return false;
+		}
+
+		global $current_User;
+
+		return $current_User->check_perm( 'meta_comment', 'view', false, $this->get_blog_ID() );
+	}
+
+
+	/**
+	 * Check if current User can leave meta comment on this Item
+	 *
+	 * @return boolean
+	 */
+	function can_meta_comment()
+	{
+		if( ! is_logged_in() )
+		{	// User must be logged in
+			return false;
+		}
+
+		global $current_User;
+
+		return $current_User->check_perm( 'meta_comment', 'add', false, $this->get_blog_ID() );
+	}
+
+
+	/**
 	 * Check if current user is allowed for several action in this post's blog
 	 *
 	 * @private function
