@@ -111,6 +111,7 @@ $core_componentwidget_defs = array(
 			'coll_member_count',
 			'coll_xml_feeds',
 			'coll_subscription',
+			'coll_activity_stats',
 		),
 	'site' => array(
 			'colls_list_public',
