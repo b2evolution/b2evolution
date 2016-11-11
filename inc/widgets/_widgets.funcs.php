@@ -349,6 +349,13 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	add_basic_widget( $blog_id, 'Front Page Secondary Area', 'coll_flagged_list', 'core', 20 );
 
 
+	/* Forum Front Secondary Area */
+	if( $kind == 'forum' )
+	{
+		add_basic_widget( $blog_id, 'Forum Front Secondary Area', 'coll_activity_stats', 'core', 10 );
+	}
+
+
 	/* 404 Page */
 	add_basic_widget( $blog_id, '404 Page', 'page_404_not_found', 'core', 10 );
 	add_basic_widget( $blog_id, '404 Page', 'coll_search_form', 'core', 20 );

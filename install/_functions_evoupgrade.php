@@ -8071,6 +8071,44 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12135, 'Create new widget container "Forum Front Secondary Area" for forums...' ) )
+	{
+		$DB->begin();
+		$SQL = new SQL( 'Get all "forum" collections' );
+		$SQL->SELECT( 'blog_ID' );
+		$SQL->FROM( 'T_blogs' );
+		$SQL->WHERE( 'blog_type = "forum"' );
+		$forum_collections = $DB->get_col( $SQL->get() );
+
+		$item_tags_widget_rows = array();
+		foreach( $forum_collections as $coll_ID )
+		{	// Insert new widget "Collection Activity Stats" to each forum collection
+			$widget_orde = 10;
+			$item_tags_widget_rows[] = '( '.$coll_ID.', "Forum Front Secondary Area", '.$widget_order.', "coll_activity_stats" )';
+			// Check and update not unique widget orders just to make sure:
+			$not_unique_widget_ID = $DB->get_var( 'SELECT wi_ID
+				FROM T_widget
+				WHERE wi_coll_ID = '.$coll_ID.'
+					AND wi_sco_name = "Forum Front Secondary Area"
+					AND wi_order = '.$widget_order );
+			if( $not_unique_widget_ID > 0 )
+			{	// The collection has no unique widget order, move all widgets with wi_order >= 10:
+				$DB->query( 'UPDATE T_widget
+						SET wi_order = wi_order + 1
+						WHERE wi_coll_ID ='.$coll_ID.'
+						AND wi_sco_name = "Forum Front Secondary Area"
+						AND wi_order >= '.$widget_order );
+			}
+		}
+		if( count( $item_tags_widget_rows ) )
+		{	// Insert new widgets "Item Tags" into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
+			  VALUES '.implode( ', ', $item_tags_widget_rows ) );
+		}
+		$DB->commit();
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
