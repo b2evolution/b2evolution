@@ -1409,7 +1409,7 @@ form div.avatartag a {
 .jcrop-keymgr {
   visibility: hidden;
 }
-#workarea img,
+#user_crop_workarea img,
 .preview_cropped_image img {
   max-width: none;
 }
