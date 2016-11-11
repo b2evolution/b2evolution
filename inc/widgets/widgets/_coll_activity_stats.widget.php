@@ -73,26 +73,37 @@ class coll_activity_stats_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		load_funcs( 'files/model/_image.funcs.php' );
+		$visibility_statuses = get_visibility_statuses( 'raw', array( 'deprecated', 'redirected', 'trash' ) );
+		$visibility_statuses_icons = get_visibility_statuses( 'icons', array( 'deprecated', 'redirected', 'trash' ) );
+		$default_visible_statuses = array( 'published', 'community', 'protected' );
+		$option_statuses = array();
+		foreach( $visibility_statuses as $status => $status_text )
+		{
+			$option_statuses[] = array(
+				'inskin_'.$status,
+				$visibility_statuses_icons[$status].' '.$status_text,
+				in_array( $status, $default_visible_statuses ) ? 1 : 0
+			);
+		}
 
 		$r = array_merge( array(
-			'title' => array(
+				'title' => array(
 					'label' => T_( 'Title' ),
 					'size' => 40,
 					'note' => T_( 'This is the title to display' ),
-					'defaultvalue' => '',
+					'defaultvalue' => 'Activity Stats',
 				),
-			'height' => array(
-						'label' => T_('Chart height'),
-						'note' => '',
-						'defaultvalue' => '300',
-						'allow_empty' => true,
-						'size' => 4,
-						'valid_pattern' => array(
-								'pattern' => '~^(\d+(px|%)?)?$~i',
-								'error'   => sprintf( T_('Invalid image size, it must be specified in px or %%.') ) ),
-					),
-			'time_period' => array(
+				'height' => array(
+					'label' => T_('Chart height'),
+					'note' => '',
+					'defaultvalue' => '300',
+					'allow_empty' => true,
+					'size' => 4,
+					'valid_pattern' => array(
+							'pattern' => '~^(\d+(px)?)?$~i',
+							'error'   => sprintf( T_('Invalid chart height, it must be specified in px.') ) ),
+				),
+				'time_period' => array(
 					'type' => 'select',
 					'label' => T_('Period'),
 					'options' => array(
@@ -102,6 +113,13 @@ class coll_activity_stats_Widget extends ComponentWidget
 					'note' => T_('Period of activity to display'),
 					'defaultvalue' => 'last_month',
 				),
+				'visibility_statuses' => array(
+					'label' => T_('Visibility statuses'),
+					'type' => 'checklist',
+					'options' => $option_statuses,
+					'note' => T_('Only topics and comments with the above visibilities will be counted.')
+				),
+
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -151,6 +169,16 @@ class coll_activity_stats_Widget extends ComponentWidget
 		$users_registered = $DB->get_assoc( $SQL->get(), $SQL->title );
 
 		// Get posts created
+		$visibility_statuses = get_visibility_statuses( 'raw', array( 'deprecated', 'redirected', 'trash' ) );
+		$filter_inskin_statuses = array();
+		foreach( $visibility_statuses as $status => $status_text )
+		{
+			if( isset( $this->disp_params['visibility_statuses']['inskin_'.$status] ) && $this->disp_params['visibility_statuses']['inskin_'.$status] )
+			{
+				$filter_inskin_statuses[] = $status;
+			}
+		}
+
 		$SQL = new SQL( 'Get count of new topics created per day' );
 		$SQL->SELECT( 'DATE(post_datestart) AS date_issued, COUNT(*) AS post_count' );
 		$SQL->FROM( 'T_items__item' );
@@ -158,7 +186,7 @@ class coll_activity_stats_Widget extends ComponentWidget
 		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $Blog->ID ) );
 		$SQL->WHERE_and( 'post_datestart > '.$DB->quote( $start_date ) );
 		$SQL->WHERE_and( 'post_datestart <= '.$DB->quote( $end_date ) );
-		//$SQL->WHERE_and( 'post_status = "published"' );
+		$SQL->WHERE_and( 'post_status IN ("'.implode( '","', $filter_inskin_statuses ).'")' );
 		$SQL->GROUP_BY( 'DATE(post_datestart)' );
 		$posts_created = $DB->get_assoc( $SQL->get(), $SQL->title );
 
@@ -171,7 +199,7 @@ class coll_activity_stats_Widget extends ComponentWidget
 		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $Blog->ID ) );
 		$SQL->WHERE_and( 'comment_date > '.$DB->quote( $start_date ) );
 		$SQL->WHERE_and( 'comment_date <= '.$DB->quote( $end_date ) );
-		//$SQL->WHERE_and( 'comment_status = "published"' );
+		$SQL->WHERE_and( 'comment_status IN ("'.implode( '","', $filter_inskin_statuses ).'")' );
 		$SQL->GROUP_BY( 'DATE(comment_date)' );
 		$comments = $DB->get_assoc( $SQL->get(), $SQL->title );
 
@@ -216,7 +244,6 @@ class coll_activity_stats_Widget extends ComponentWidget
 		$chart[ 'canvas_bg' ] = array( 'width'  => '100%', 'height' => $this->disp_params['height'] );
 
 		return $chart;
-		//$SQL = new SQL( 'Get collection activity' );
 	}
 
 	/**
@@ -240,7 +267,6 @@ class coll_activity_stats_Widget extends ComponentWidget
 		echo $this->disp_params['block_body_start'];
 
 		CanvasBarsChart( $chart );
-
 
 		echo $this->disp_params['block_body_end'];
 
