@@ -385,6 +385,29 @@ siteskin_include( '_site_body_header.inc.php' );
 
 </div><!-- .row -->
 
+<?php
+// ------------------------- "Forum Front Secondary Area" CONTAINER EMBEDDED HERE --------------------------
+if( $disp == 'front' )
+{
+?>
+<section class="secondary_area">
+	<div class="evo_container evo_container__forum_front_secondary">
+	<?php
+		// Display container and contents:
+		skin_container( NT_('Forum Front Secondary Area'), array(
+				// The following params will be used as defaults for widgets included in this container:
+				'block_start'       => '<div class="widget $wi_class$">',
+				'block_end'         => '</div>',
+				'block_title_start' => '<h2 class="page-header">',
+				'block_title_end'   => '</h2>',
+			) );
+		// ----------------------------- END OF "Forum Front Secondary Area" CONTAINER -----------------------------
+	?>
+	</div>
+</section>
+<?php
+}
+?>
 
 <footer class="row">
 
