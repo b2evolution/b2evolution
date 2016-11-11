@@ -274,7 +274,10 @@ function save_image( $imh, $path, $mimetype, $quality = 90, $chmod = NULL )
 			global $Settings;
 			$chmod = $Settings->get('fm_default_chmod_file');
 		}
-		chmod( $path, octdec( $chmod ) );
+		if( ! @chmod( $path, octdec( $chmod ) ) )
+		{
+			$err = sprintf( '!The permissions of file %s could not be changed to %s', '[['.$path.']]', $chmod );
+		}
 	}
 
 	return $err;
@@ -579,8 +582,12 @@ function crop_image( $File, $x, $y, $width, $height, $min_size = 0, $max_size = 
 		return false;
 	}
 
-	// Save image
-	save_image( $dst_imh, $File->get_full_path(), $Filetype->mimetype );
+	// Save image:
+	$save_image_err = save_image( $dst_imh, $File->get_full_path(), $Filetype->mimetype );
+	if( $save_image_err !== NULL )
+	{	// Some error has been detected on save image:
+		syslog_insert( substr( $save_image_err, 1 ), 'error', 'file', $File->ID );
+	}
 
 	// Remove the old thumbnails
 	$File->rm_cache();
