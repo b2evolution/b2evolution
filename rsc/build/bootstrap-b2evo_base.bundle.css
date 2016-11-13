@@ -1409,6 +1409,10 @@ form div.avatartag a {
 .jcrop-keymgr {
   visibility: hidden;
 }
+#user_crop_workarea img,
+.preview_cropped_image img {
+  max-width: none;
+}
 .evo_label_inline {
   margin-left: 2ex;
 }

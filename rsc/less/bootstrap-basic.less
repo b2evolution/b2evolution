@@ -291,6 +291,12 @@ form {
 .jcrop-keymgr {
 	visibility: hidden;
 }
+// Fix image cropping, because max-width:100% of main img style breaks this:
+#user_crop_workarea, .preview_cropped_image {
+	img {
+		max-width: none;
+	}
+}
 // ---------------- //
 
 // Form styles:
