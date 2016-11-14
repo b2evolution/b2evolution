@@ -237,7 +237,7 @@ class coll_tag_cloud_Widget extends ComponentWidget
 				$filter_inskin_statuses[] = $status;
 			}
 		}
-		$results = get_tags( $blog_ids, $this->disp_params['max_tags'], /* $this->disp_params['filter_list'] */ NULL, false, $filter_inskin_statuses );
+		$results = get_tags( $blog_ids, $this->disp_params['max_tags'], /* $this->disp_params['filter_list'] */ NULL, false, $filter_inskin_statuses, is_null( $destination_Blog ) );
 		if( empty( $results ) )
 		{	// No tags!
 			return;

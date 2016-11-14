@@ -947,13 +947,13 @@ function get_highest_publish_status( $type, $blog, $with_label = true, $restrict
 /**
  * Retrieves all tags from published posts
  *
- * @param integer the id of the blog or array of blog ids. Set NULL to use current blog
+ * @param mixed id of the collection or array of collection ids. Set to NULL to use current blog or '*' to use all collections
  * @param integer maximum number of returned tags
  * @param string a comma separated list of tags to ignore/exclude
  * @param bool true to skip tags from pages, intro posts and sidebar stuff
  * @return array of tags
  */
-function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts = false, $post_statuses = array( 'published' ) )
+function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts = false, $post_statuses = array( 'published' ), $get_cat_blog_ID = false )
 {
 	global $DB, $localtimenow;
 
@@ -982,13 +982,24 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	// Build query to get the tags:
 	$tags_SQL = new SQL();
 
-	$tags_SQL->SELECT( 'tag_name, COUNT( DISTINCT itag_itm_ID ) AS tag_count, tag_ID, cat_blog_ID' );
+	if( $get_cat_blog_ID )
+	{
+		$tags_SQL->SELECT( 'tag_name, COUNT( DISTINCT itag_itm_ID ) AS tag_count, tag_ID, cat_blog_ID' );
+	}
+	else
+	{
+		$tags_SQL->SELECT( 'tag_name, COUNT( DISTINCT itag_itm_ID ) AS tag_count, tag_ID' );
+	}
 
 	$tags_SQL->FROM( 'T_items__tag' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__item ON itag_itm_ID = post_ID' );
-	$tags_SQL->FROM_add( 'INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID' );
-	$tags_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
+
+	if( $get_cat_blog_ID )
+	{
+		$tags_SQL->FROM_add( 'INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID' );
+		$tags_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
+	}
 
 	if( $blog_ids != '*' || $skip_intro_posts )
 	{
