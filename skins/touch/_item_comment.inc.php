@@ -66,7 +66,7 @@ $Comment = & $params['Comment'];
 			if( $Comment->status != 'published' )
 			{
 				$Comment->format_status( array(
-						'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+						'template' => '<div class="floatright"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 					) );
 			}
 			$Comment->rating();

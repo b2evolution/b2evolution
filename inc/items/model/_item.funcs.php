@@ -1961,7 +1961,7 @@ function echo_item_status_buttons( $Form, $edited_Item )
 	$next_action = ( is_create_action( $action ) ? 'create' : 'update' );
 
 	$Form->hidden( 'post_status', $edited_Item->status );
-	echo '<div class="btn-group dropup post_status_dropdown">';
+	echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="top" title="'.get_status_tooltip_title( $edited_Item->status ).'">';
 	echo '<button type="submit" class="btn btn-status-'.$edited_Item->status.'" name="actionArray['.$next_action.']">'
 				.'<span>'.T_( $status_options[ $edited_Item->status ] ).'</span>'
 			.'</button>'
@@ -2907,7 +2907,7 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 		if( ! $Comment->is_meta() )
 		{	// Display status banner only for normal comments:
 			$Comment->format_status( array(
-					'template' => '<div class="pull-right"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+					'template' => '<div class="pull-right"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 				) );
 		}
 		if( ! $Comment->is_meta() )
@@ -4168,7 +4168,7 @@ function items_results( & $items_Results, $params = array() )
 	}
 
 	if( $params['display_status'] )
-	{ // Display Ord column
+	{ // Display status column
 		$items_Results->cols[] = array(
 				'th' => T_('Status'),
 				'th_class' => 'shrinkwrap',
@@ -4312,7 +4312,7 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 	if( $display_status && is_logged_in() )
 	{ // Display status
 		$col .= $Item->get_format_status( array(
-				'template' => '<div class="pull-right"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+				'template' => '<div class="pull-right"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 			) );
 	}
 
@@ -4429,10 +4429,10 @@ function item_row_status( $Item, $index )
 	    isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
 	{ // Use dropdown for bootstrap skin and if current user can edit this post
 		$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
-		$r = '<div class="btn-group '.( $index > 5 ? 'dropup' : 'dropdown' ).' post_status_dropdown">'
+		$r = '<div class="btn-group '.( $index > 5 ? 'dropup' : 'dropdown' ).' post_status_dropdown" data-toggle="tooltip" data-placement="top" title="'.get_status_tooltip_title( $Item->status ).'">'
 				.'<button type="button" class="btn btn-sm btn-status-'.$Item->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
 						.'<span>'.$status_options[ $Item->status ].'</span>'
-					.' <span class="caret"></span></button>'
+					.'&nbsp<span class="caret"></span></button>'
 				.'<ul class="dropdown-menu" role="menu" aria-labelledby="post_status_dropdown">';
 		foreach( $status_options as $status_key => $status_title )
 		{
@@ -4446,7 +4446,7 @@ function item_row_status( $Item, $index )
 	else
 	{ // Display only status badge when user has no permission to edit this post and for non-bootstrap skin
 		$r = $Item->get_format_status( array(
-			'template' => '<span class="note status_$status$"><span>$status_title$</span></span>',
+			'template' => '<span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span>',
 		) );
 	}
 
