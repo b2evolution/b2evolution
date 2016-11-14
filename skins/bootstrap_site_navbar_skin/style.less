@@ -3,12 +3,41 @@
  */
 
 .bootstrap_site_navbar_header {
-	.nav {
-		margin: 0 15px 0 0;
-		.login {
-			padding-top: 9px;
-			padding-bottom: 9px;
-			line-height: 32px;
+	.navbar {
+		margin-bottom: 0;
+		.navbar-collapse {
+			padding: 0;
+			.nav {
+				margin: 0;
+				.login {
+					padding-top: 4px;
+					padding-bottom: 4px;
+					line-height: 32px;
+					img {
+						border-radius: 4px;
+					}
+				}
+			}
+		}
+	}
+}
+
+@media (min-width: 768px) {
+	.bootstrap_site_navbar_header {
+		.navbar {
+			.navbar-collapse {
+				.nav {
+					&.navbar-left {
+						margin-right: 15px;
+					}
+					&.navbar-right {
+						.login {
+							padding-top: 9px;
+							padding-bottom: 9px;
+						}
+					}
+				}
+			}
 		}
 	}
 }

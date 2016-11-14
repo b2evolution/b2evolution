@@ -31,82 +31,19 @@ else
 		<div class="container-fluid level1">
 
 			<div class="navbar-header<?php echo $site_title_class; ?>">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-menu" aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+	  
 				<a href="<?php echo $baseurl; ?>" class="navbar-brand"><?php echo $site_name_text; ?></a>
 			</div>
 
-			<div class="navbar-collapse collapse">
-				<ul class="nav navbar-nav navbar-right">
-	<?php
-		// Optional display params for widgets below
-		$right_menu_params = array(
-				'block_start' => '',
-				'block_end' => '',
-				'block_display_title' => false,
-				'list_start' => '',
-				'list_end' => '',
-				'item_start' => '<li>',
-				'item_end' => '</li>',
-				'item_selected_start' => '<li>',
-				'item_selected_end' => '</li>',
-				'link_selected_class' => '',
-				'link_default_class' => '',
-			);
+			<div class="collapse navbar-collapse" id="navbar-collapse-menu">
 
-		if( is_logged_in() )
-		{ // Display the following menus when current user is logged in
-
-			// Profile link:
-			// Call widget directly (without container):
-			skin_widget( array_merge( $right_menu_params, array(
-				// CODE for the widget:
-				'widget' => 'profile_menu_link',
-				// Optional display params
-				'profile_picture_size' => 'crop-top-32x32',
-			) ) );
-
-			// Messaging link:
-			// Call widget directly (without container):
-			skin_widget( array_merge( $right_menu_params, array(
-				// CODE for the widget:
-				'widget' => 'msg_menu_link',
-				// Optional display params
-				'link_type' => 'messages',
-			) ) );
-
-			// Logout link:
-			// Call widget directly (without container):
-			skin_widget( array_merge( $right_menu_params, array(
-				// CODE for the widget:
-				'widget' => 'menu_link',
-				// Optional display params
-				'link_type' => 'logout',
-			) ) );
-		}
-		else
-		{ // Display the following menus when current user is NOT logged in
-
-			// Login link:
-			// Call widget directly (without container):
-			skin_widget( array_merge( $right_menu_params, array(
-				// CODE for the widget:
-				'widget' => 'menu_link',
-				// Optional display params
-				'link_type' => 'login',
-			) ) );
-
-			// Register link:
-			// Call widget directly (without container):
-			skin_widget( array_merge( $right_menu_params, array(
-				// CODE for the widget:
-				'widget' => 'menu_link',
-				// Optional display params
-				'link_type' => 'register',
-			) ) );
-		}
-	?>
-				</ul><?php // END OF <ul class="nav navbar-nav navbar-right"> ?>
-
-				<ul class="nav navbar-nav">
+				<ul class="nav navbar-nav navbar-left">
 <?php
 			if( $site_Skin->get_setting( 'grouping' ) )
 			{	// Display the grouped header tabs:
@@ -193,6 +130,78 @@ else
 			}
 ?>
 				</ul><?php // END OF <ul class="nav navbar-nav"> ?>
+				
+
+				<ul class="nav navbar-nav navbar-right">
+				<?php
+					// Optional display params for widgets below
+					$right_menu_params = array(
+							'block_start' => '',
+							'block_end' => '',
+							'block_display_title' => false,
+							'list_start' => '',
+							'list_end' => '',
+							'item_start' => '<li>',
+							'item_end' => '</li>',
+							'item_selected_start' => '<li>',
+							'item_selected_end' => '</li>',
+							'link_selected_class' => '',
+							'link_default_class' => '',
+						);
+
+					if( is_logged_in() )
+					{ // Display the following menus when current user is logged in
+
+						// Profile link:
+						// Call widget directly (without container):
+						skin_widget( array_merge( $right_menu_params, array(
+							// CODE for the widget:
+							'widget' => 'profile_menu_link',
+							// Optional display params
+							'profile_picture_size' => 'crop-top-32x32',
+						) ) );
+
+						// Messaging link:
+						// Call widget directly (without container):
+						skin_widget( array_merge( $right_menu_params, array(
+							// CODE for the widget:
+							'widget' => 'msg_menu_link',
+							// Optional display params
+							'link_type' => 'messages',
+						) ) );
+
+						// Logout link:
+						// Call widget directly (without container):
+						skin_widget( array_merge( $right_menu_params, array(
+							// CODE for the widget:
+							'widget' => 'menu_link',
+							// Optional display params
+							'link_type' => 'logout',
+						) ) );
+					}
+					else
+					{ // Display the following menus when current user is NOT logged in
+
+						// Login link:
+						// Call widget directly (without container):
+						skin_widget( array_merge( $right_menu_params, array(
+							// CODE for the widget:
+							'widget' => 'menu_link',
+							// Optional display params
+							'link_type' => 'login',
+						) ) );
+
+						// Register link:
+						// Call widget directly (without container):
+						skin_widget( array_merge( $right_menu_params, array(
+							// CODE for the widget:
+							'widget' => 'menu_link',
+							// Optional display params
+							'link_type' => 'register',
+						) ) );
+					}
+				?>
+				</ul><?php // END OF <ul class="nav navbar-nav navbar-right"> ?>
 			</div><?php // END OF <div class="navbar-collapse collapse"> ?>
 
 		</div><?php // END OF <div class="container-fluid level1"> ?>
