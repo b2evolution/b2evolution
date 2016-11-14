@@ -555,7 +555,7 @@ class Form extends Widget
 					$this->inputend       = "\n";
 					$this->infostart      = '';
 					$this->infoend        = "\n";
-					$this->fieldend       = '</span>'.get_icon( 'pixel' )."\n";
+					$this->fieldend       = '</span>'."\n";
 					$this->buttonsstart   = '';
 					$this->buttonsend     = "\n";
 					$this->customstart    = '';

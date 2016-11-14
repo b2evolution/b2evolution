@@ -218,7 +218,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 </div>
 
-<div class="clear"><?php echo get_icon( 'pixel' ); ?></div>
+<div class="clear"></div>
 
 </div>
 </div>

@@ -186,7 +186,7 @@ span.flag {
   box-sizing: content-box;
 }
 span.icon {
-  background: url(../icons/icons_sprite.png) no-repeat -112px -48px;
+  background: url(../icons/icons_sprite.png) no-repeat;
   width: 16px;
   height: 16px;
   line-height: 16px;

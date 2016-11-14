@@ -103,7 +103,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				'prev_text' => '<span class="pb_icon prev" title="'.T_('Previous').'"></span>',
 				'next_text' => '<span class="pb_icon next" title="'.T_('Next').'"></span>',
 				'no_prev_text' => '',
-				'no_next_text' => get_icon( 'pixel', 'imgtag', array( 'size' => array( 29, 29 ), 'xy' => array( 13, 13 ), 'class' => 'no_nav' ) ),
+				'no_next_text' => get_icon( 'pixel', 'imgtag', array( 'size' => array( 29, 29 ), 'class' => 'no_nav' ) ),
 			) );
 		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 	?>
@@ -115,7 +115,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				'block_start' => '<div class="nav_right">',
 				'next_start'  => '',
 				'next_text' => '<span class="pb_icon next" title="'.T_('Next').'"></span>',
-				'next_no_item' => get_icon( 'pixel', 'imgtag', array( 'size' => array( 29, 29 ), 'xy' => array( 13, 13 ), 'class' => 'no_nav' ) ),
+				'next_no_item' => get_icon( 'pixel', 'imgtag', array( 'size' => array( 29, 29 ), 'class' => 'no_nav' ) ),
 				'next_end'    => ' ',
 				'prev_start'  => '',
 				'prev_text' => '<span class="pb_icon prev" title="'.T_('Previous').'"></span>',

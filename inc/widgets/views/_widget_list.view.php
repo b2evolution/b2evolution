@@ -307,6 +307,6 @@ echo '</span>';
 
 $Form->end_form();
 
-echo get_icon( 'pixel', 'imgtag', array( 'class' => 'clear' ) );
+echo get_icon( 'pixel', 'imgtag', array( 'class' => 'clearfix' ) );
 
 ?>

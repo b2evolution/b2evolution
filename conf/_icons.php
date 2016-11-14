@@ -27,10 +27,8 @@ function get_icon_info( $name )
 
 	switch( $name )
 	{
-		case 'pixel': return array(
-			'alt'  => '',
+		case 'pixel': return array( // blank icon
 			'size' => array( 1, 1 ),
-			'xy' => array( 0, 0 )
 		);
 
 		case 'folder': return array( // icon for folders

@@ -1139,7 +1139,7 @@ class AdminUI_general extends Menu
 					'infostart' => '',
 					'infoend' => '',
 					'inputend' => "\n",
-					'fieldend' => '</span>'.get_icon( 'pixel' )."\n",
+					'fieldend' => '</span>'."\n",
 					'buttonsstart' => '',
 					'buttonsend' => "\n",
 					'customstart' => '',

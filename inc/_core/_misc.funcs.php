@@ -4704,6 +4704,11 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			{ // Use span tag with sprite instead of img
 				$styles = array();
 
+				if( $iconKey == 'pixel' )
+				{	// Use inline-block displaying for "pixel" icon because it doesn't use default class "icon":
+					$styles[] = 'display: inline-block';
+				}
+
 				if( isset( $params['xy'] ) )
 				{ // Get background position from params
 					$styles[] = "background-position: ".$params['xy'][0]."px ".$params['xy'][1]."px";
@@ -4737,7 +4742,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 				}
 				if( count( $styles ) > 0 )
 				{
-					$params['style'] = implode( '; ', $styles);
+					$params['style'] = implode( '; ', $styles );
 				}
 
 				if( ! isset( $params['title'] ) )
@@ -4753,13 +4758,16 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					}
 				}
 
+				// Use default class "icon" only for not "pixel" icon in order to don't load icons_sprite.png:
+				$default_class = ( $iconKey == 'pixel' ? '' : 'icon' );
+
 				if( isset( $params['class'] ) )
-				{	// Get class from params
-					$params['class'] = 'icon '.$params['class'];
+				{	// Get class from params:
+					$params['class'] = trim( $default_class.' '.$params['class'] );
 				}
-				else
-				{	// Set default class
-					$params['class'] = 'icon';
+				elseif( ! empty( $default_class ) )
+				{	// Set default class:
+					$params['class'] = $default_class;
 				}
 
 				// Add all the attributes:

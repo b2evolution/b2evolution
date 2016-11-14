@@ -324,7 +324,6 @@ class Skin extends DataObject
 
 		if( $display_containers )
 		{ // End of visible container:
-			//echo get_icon( 'pixel', 'imgtag', array( 'class' => 'clear' ) );
 			echo '</div>';
 		}
 
@@ -1757,7 +1756,7 @@ class Skin extends DataObject
 					'inputend' => "\n",
 					'infostart' => '',
 					'infoend' => "\n",
-					'fieldend' => '</span>'.get_icon( 'pixel' )."\n",
+					'fieldend' => '</span>'."\n",
 					'buttonsstart' => '',
 					'buttonsend' => "\n",
 					'customstart' => '',

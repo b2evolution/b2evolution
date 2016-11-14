@@ -246,7 +246,7 @@ if( $disp != 'front' && $disp != 'download' && $disp != 'terms' )
 </div>
 </div>
 
-<div class="clear"><?php echo get_icon( 'pixel' ); ?></div>
+<div class="clear"></div>
 
 <div id="pageFooter">
 	<?php

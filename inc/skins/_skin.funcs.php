@@ -1892,7 +1892,6 @@ function skin_include( $template_name, $params = array() )
 
 	if( $display_includes )
 	{ // End of visible container:
-		// echo get_icon( 'pixel', 'imgtag', array( 'class' => 'clear' ) );
 		echo '</div>';
 	}
 
@@ -2049,7 +2048,6 @@ function siteskin_include( $template_name, $params = array(), $force = false )
 
 	if( $display_includes )
 	{ // End of visible container:
-		// echo get_icon( 'pixel', 'imgtag', array( 'class' => 'clear' ) );
 		echo '</div>';
 	}
 

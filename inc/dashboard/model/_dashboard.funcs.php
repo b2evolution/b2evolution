@@ -504,7 +504,6 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 				'text'      => get_icon( 'edit_button' ).' '.T_('Edit')
 			) );
 		$Item->publish_link( '', '', '#', '#', 'PublishButton btn btn-status-published' );
-		echo get_icon( 'pixel' );
 		echo '</div>';
 
 		if( ( $Item->status !== 'draft' ) || ( $Item->creator_user_ID == $current_User->ID ) )
