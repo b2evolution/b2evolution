@@ -1177,6 +1177,19 @@ function get_visibility_statuses( $format = '', $exclude = array('trash'), $chec
 				);
 			break;
 
+		case 'tooltip-titles':
+			$r = array(
+					'published'  => T_('This is visible by everyone.'),
+					'community'  => T_('This is visible by logged-in users only.'),
+					'protected'  => T_('This is visible by members only.'),
+					'review'     => T_('This is waiting for review and is visible by moderator only.'),
+					'private'    => T_('This is visible by the owner/author of the post and collection administrators.'),
+					'draft'      => is_admin_page() ? T_('This is a draft') : T_('This is a draft and visible only by the owner/author of the post and collection administrators.'),
+					'deprecated' => T_('This is deprecated and visible in the Back-Office only.'),
+					'redirected' => T_('This will redirect to another page when accessed from the Front-Office.'),
+				);
+			break;
+
 		case 'ordered-array': // indexed array, ordered from the lowest to the highest public level
 			$r = array(
 				0 => array( 'deprecated', '', T_('Deprecate!'), 'grey' ),
@@ -1383,6 +1396,20 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow
 	return $result;
 }
 
+
+function get_status_tooltip_title( $status )
+{
+	$visibility_statuses = get_visibility_statuses( 'tooltip-titles' );
+
+	if( isset( $visibility_statuses[$status] ) )
+	{
+		return $visibility_statuses[$status];
+	}
+	else
+	{
+		debug_die( 'Invalid status value' );
+	}
+}
 
 /**
  * Get Blog object from general setting

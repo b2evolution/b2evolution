@@ -3306,16 +3306,17 @@ class Comment extends DataObject
 	/**
 	 * Display status of item in a formatted way, following a provided template
 	 *
-	 * There are 2 possible variables:
+	 * There are 3 possible variables:
 	 * - $status$ = the raw status
 	 * - $status_title$ = the human readable text version of the status (translated to current language)
+	 * - $tooltip_title$ = the human readable text version of the status for tooltip
 	 *
 	 * @param array Params
 	 */
 	function format_status( $params = array() )
 	{
 		$params = array_merge( array(
-				'template'     => '<div class="evo_status evo_status_$status$">$status_title$</div>',
+				'template'     => '<div class="evo_status evo_status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$>$status_title$</div>',
 				'format'       => 'htmlbody', // Output format, see {@link format_to_output()}
 				'status'       => NULL,
 				'status_title' => NULL,
@@ -3336,8 +3337,8 @@ class Comment extends DataObject
 			$params['status_title'] = $this->get( 't_status' );
 		}
 
-		$r = str_replace( array( '$status$', '$status_title$' ),
-			array( $params['status'], $params['status_title'] ),
+		$r = str_replace( array( '$status$', '$status_title$', '$tooltip_title$' ),
+			array( $params['status'], $params['status_title'], get_status_tooltip_title( $params['status'] ) ),
 			$params['template'] );
 
 		echo format_to_output( $r, $params['format'] );
