@@ -598,13 +598,11 @@ span.loader_img.loader_user_deldata {
   display: inline-block;
 }
 .widget_core_coll_category_list .evo_cat_meta {
-  font-weight: bold;
-  color: #000;
   list-style: square;
   margin-left: 20px;
 }
-.widget_core_coll_category_list .evo_cat_meta label,
-.widget_core_coll_category_list .evo_cat_meta a {
+.widget_core_coll_category_list .evo_cat_meta > label,
+.widget_core_coll_category_list .evo_cat_meta > a {
   font-weight: bold;
   color: #000;
 }

@@ -619,11 +619,11 @@ class coll_item_list_Widget extends ComponentWidget
 		$content_is_displayed = false;
 
 		if( isset( $items_map_by_chapter[$Chapter->ID] ) && ( count( $items_map_by_chapter[$Chapter->ID] ) > 0 ) )
-		{ // Display Chapter only if it has some items
+		{	// Display Chapter only if it has some items:
 			echo $this->get_layout_item_start();
 			$Chapter->get_Blog();
 			echo '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get('name').'</a>';
-			echo $this->get_layout_item_end();
+
 			echo $this->disp_params['group_start'];
 
 			$item_index = 0;
@@ -632,8 +632,9 @@ class coll_item_list_Widget extends ComponentWidget
 				$content_is_displayed = $this->disp_contents( $iterator_Item, true, $item_index ) || $content_is_displayed;
 			}
 
-			// Close cat group
+			// Close category group:
 			echo $this->disp_params['group_end'];
+			echo $this->get_layout_item_end();
 		}
 
 		return $content_is_displayed;
