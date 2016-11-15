@@ -559,8 +559,6 @@ class ComponentWidget extends DataObject
 					'group_end' => '</ul>',
 					'group_item_start' => '<li>',
 					'group_item_end' => '</li>',
-					'group_item_selected_start' => '<li class="selected">',
-					'group_item_selected_end' => '</li>',
 					'notes_start' => '<div class="notes">',
 					'notes_end' => '</div>',
 					'tag_cloud_start' => '<p class="tag_cloud">',
