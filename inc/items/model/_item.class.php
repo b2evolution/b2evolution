@@ -637,7 +637,7 @@ class Item extends ItemLight
 		}
 
 		// URL associated with Item:
-		$post_url = param( 'post_url', 'string', NULL );
+		$post_url = param( 'post_url', 'url', NULL );
 		if( $post_url !== NULL )
 		{
 			param_check_url( 'post_url', 'posting', '' );

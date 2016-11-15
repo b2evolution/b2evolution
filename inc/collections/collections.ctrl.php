@@ -300,7 +300,7 @@ switch( $action )
 		$Settings->set( 'notification_long_name', param( 'notification_long_name', 'string', '' ) );
 
 		// Small site logo url
-		param( 'notification_logo', 'string', '' );
+		param( 'notification_logo', 'url', '' );
 		param_check_url( 'notification_logo', 'http-https' );
 		$Settings->set( 'notification_logo', get_param( 'notification_logo' ) );
 
