@@ -2074,6 +2074,9 @@ div.results tr.placeholder + tr:not( :nth-child(2)):not(.dragged) > td,
 div.results tr.dragged + tr:not( :nth-child(2)):not(.dragged) > td {
   border-top: none;
 }
+div.results img {
+  max-width: none;
+}
 div.filters {
   margin-bottom: 0;
   background: none;
