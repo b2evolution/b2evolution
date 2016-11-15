@@ -27,7 +27,7 @@ else
 
 <div class="bootstrap_site_navbar_header">
 
-	<nav class="navbar navbar-default">
+	<nav class="navbar navbar-default navbar-static-top">
 		<div class="container-fluid level1">
 
 			<div class="navbar-header<?php echo $site_title_class; ?>">
@@ -260,3 +260,32 @@ if( $site_Skin->get_setting( 'grouping' ) &&
 ?>
 
 </div><?php // END OF <div class="bootstrap_site_header"> ?>
+
+<a href="#" class="btn btn-primary slide-top <?php if (is_logged_in()) {echo 'logged_in_margin_top';} ?>"><i class="fa fa-angle-double-up"></i></a>
+
+<script type="text/javascript">
+
+	// Scroll to Top
+	// ======================================================================== /
+	// browser window scroll ( in pixels ) after which the "scroll to top" link is show
+	var offset = 400,
+	// browser window scroll (in pixels) after which the "scroll to top" link opacity is reduced
+	offset_opacity = 1200,
+	// duration of the top scrolling animatiion (in ms)
+	scroll_top_duration = 700,
+	// grab the "back to top" link
+	$slide_top = $( '.slide-top' );
+	
+	// hide or show the "scroll to top" link
+	$(window).scroll( function() {
+		( $(this).scrollTop() > offset ) ? $slide_top.addClass('slide-top-visible') : $slide_top.removeClass('slide-top-visible');
+    });
+
+	// Smooth scroll to top
+	$slide_top.on( 'click', function(event) {
+		event.preventDefault();
+		$( 'body, html' ).animate({
+			scrollTop: 0,
+		}, scroll_top_duration );
+    });
+</script>
