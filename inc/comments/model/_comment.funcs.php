@@ -309,7 +309,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
 			{ // Use dropdown for bootstrap skin
 				$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
 				$Form->hidden( 'comment_status', $edited_Comment->status );
-				echo '<div class="btn-group dropup comment_status_dropdown">';
+				echo '<div class="btn-group dropup comment_status_dropdown" data-toggle="tooltip" data-placement="top" data-container="body" title="'.get_status_tooltip_title( $edited_Comment->status ).'">';
 				echo '<button type="button" class="btn btn-status-'.$edited_Comment->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="comment_status_dropdown">'
 								.'<span>'.$status_options[ $edited_Comment->status ].'</span>'
 							.' <span class="caret"></span></button>';
@@ -842,7 +842,7 @@ function display_comment_replies( $comment_ID, $params = array(), $level = 1 )
 function echo_comment_replies( $comment_ID, $params, $level = 1 )
 {
 	global $CommentReplies;
-	
+
 	if( ! isset( $CommentReplies[ $comment_ID ] ) )
 	{	// This comment has no replies, Exit here:
 		return false;

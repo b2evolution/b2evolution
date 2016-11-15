@@ -1095,6 +1095,10 @@ function get_inskin_statuses_options( & $edited_Blog, $type )
 				'', // Note
 				'', // Class
 				$status_is_hidden, // Hidden field instead of checkbox?
+				array(
+					'data-toggle' => 'tooltip',
+					'data-placement' => 'top',
+					'title' => get_status_tooltip_title( $status ) )
 			);
 	}
 
