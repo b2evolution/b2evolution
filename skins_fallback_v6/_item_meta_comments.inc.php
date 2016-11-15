@@ -18,8 +18,7 @@ global $disp, $Session;
 
 if( ( $disp == 'single' || $disp == 'page' ) &&
     isset( $Item ) && $Item->ID > 0 &&
-    is_logged_in() &&
-    $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+    $Item->can_see_meta_comments() )
 {	// Display the meta comments if current user has a permission:
 
 	$Form = new Form();
@@ -30,7 +29,7 @@ if( ( $disp == 'single' || $disp == 'page' ) &&
 						.( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ),
 						array( 'class' => 'evo_item_meta_comments' ) );
 
-	if( $current_User->check_perm( 'meta_comment', 'add', false, $Blog->ID ) )
+	if( $Item->can_meta_comment() )
 	{	// Display a form to add new meta comment if current user has a permission:
 		skin_include( '_item_comment_form.inc.php', array_merge( $params, array(
 				'form_title_start' => '<div class="panel '.( $Session->get('core.preview_Comment') ? 'panel-danger' : 'panel-default' ).' panel-meta">'

@@ -947,13 +947,13 @@ function get_highest_publish_status( $type, $blog, $with_label = true, $restrict
 /**
  * Retrieves all tags from published posts
  *
- * @param integer the id of the blog or array of blog ids. Set NULL to use current blog
+ * @param mixed id of the collection or array of collection ids. Set to NULL to use current blog or '*' to use all collections
  * @param integer maximum number of returned tags
  * @param string a comma separated list of tags to ignore/exclude
  * @param bool true to skip tags from pages, intro posts and sidebar stuff
  * @return array of tags
  */
-function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts = false, $post_statuses = array( 'published' ) )
+function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts = false, $post_statuses = array( 'published' ), $get_cat_blog_ID = false )
 {
 	global $DB, $localtimenow;
 
@@ -982,13 +982,24 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	// Build query to get the tags:
 	$tags_SQL = new SQL();
 
-	$tags_SQL->SELECT( 'tag_name, COUNT( DISTINCT itag_itm_ID ) AS tag_count, tag_ID, cat_blog_ID' );
+	if( $get_cat_blog_ID )
+	{
+		$tags_SQL->SELECT( 'tag_name, COUNT( DISTINCT itag_itm_ID ) AS tag_count, tag_ID, cat_blog_ID' );
+	}
+	else
+	{
+		$tags_SQL->SELECT( 'tag_name, COUNT( DISTINCT itag_itm_ID ) AS tag_count, tag_ID' );
+	}
 
 	$tags_SQL->FROM( 'T_items__tag' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__item ON itag_itm_ID = post_ID' );
-	$tags_SQL->FROM_add( 'INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID' );
-	$tags_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
+
+	if( $get_cat_blog_ID )
+	{
+		$tags_SQL->FROM_add( 'INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID' );
+		$tags_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
+	}
 
 	if( $blog_ids != '*' || $skip_intro_posts )
 	{
@@ -1610,7 +1621,7 @@ function blogs_all_results_block( $params = array() )
 	}
 
 	$SQL = new SQL();
-	$SQL->SELECT( 'T_blogs.*, user_login, IF( cufv_user_id IS NULL, 0, 1 ) AS blog_favorite' );
+	$SQL->SELECT( 'DISTINCT blog_ID, T_blogs.*, user_login, IF( cufv_user_id IS NULL, 0, 1 ) AS blog_favorite' );
 	if( $params['grouped'] )
 	{	// Get collections with groups:
 		$SQL->SELECT_add( ', sec_ID, sec_name, sec_order, sec_owner_user_ID' );
@@ -1629,13 +1640,11 @@ function blogs_all_results_block( $params = array() )
 
 	if( ! $current_User->check_perm( 'blogs', 'view' ) )
 	{ // We do not have perm to view all blogs... we need to restrict to those we're a member of:
-
-		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0'
-			. ' AND blog_ID = bloguser_blog_ID'
-			. ' AND bloguser_user_ID = ' . $current_User->ID . ' )'
-			. ' LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0'
-			. ' AND blog_ID = bloggroup_blog_ID'
-			. ' AND bloggroup_group_ID = ' . $current_User->grp_ID . ' )' );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON ( blog_ID = bloguser_blog_ID'
+			. ' AND bloguser_user_ID = ' . $current_User->ID . ' )' );
+		$SQL->FROM_add( ' LEFT JOIN T_coll_group_perms ON ( blog_ID = bloggroup_blog_ID'
+			. ' AND ( bloggroup_group_ID = ' . $current_User->grp_ID
+			. '       OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$current_User->ID.' ) ) )' );
 		$section_where_sql = '';
 		if( $params['grouped'] )
 		{	// Get default section of the current user group:
@@ -1645,7 +1654,8 @@ function blogs_all_results_block( $params = array() )
 			// Get all sections where current user is owner:
 			$section_where_sql .= 'sec_owner_user_ID = '.$current_User->ID.' OR ';
 		}
-		$SQL->WHERE( $section_where_sql
+		$SQL->WHERE( 'blog_advanced_perms <> 0' );
+		$SQL->WHERE_and( $section_where_sql
 			. 'blog_owner_user_ID = ' . $current_User->ID
 			. ' OR bloguser_ismember <> 0'
 			. ' OR bloggroup_ismember <> 0' );

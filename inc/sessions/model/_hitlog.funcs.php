@@ -1386,12 +1386,12 @@ function get_filter_aggregated_hits_dates()
 	{
 		case 'last_60_days':
 			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 59 ) ); // Date of 60 days ago
-			$end_date = date( 'Y-m-d' ); // Today
+			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1 ) ); // Yesterday
 			break;
 
 		case 'current_month':
 			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), 1 ) ); // First day of current month
-			$end_date = date( 'Y-m-d' ); // Today
+			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1 ) ); // Yesterday
 			break;
 
 		case 'specific_month':
@@ -1412,7 +1412,7 @@ function get_filter_aggregated_hits_dates()
 		case 'last_30_days':
 		default:
 			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 29 ) ); // Date of 30 days ago
-			$end_date = date( 'Y-m-d' ); // Today
+			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1 ) ); // Yesterday
 			break;
 	}
 

@@ -1409,6 +1409,10 @@ form div.avatartag a {
 .jcrop-keymgr {
   visibility: hidden;
 }
+#user_crop_workarea img,
+.preview_cropped_image img {
+  max-width: none;
+}
 .evo_label_inline {
   margin-left: 2ex;
 }
@@ -1557,6 +1561,12 @@ table.widget_grid div {
 }
 .evo_private_messages_list .table_scroll table.table tr td {
   vertical-align: top;
+}
+table.table td.thread_with img {
+  margin-bottom: 5px;
+}
+table.table td.thread_with > span:last-child img {
+  margin-bottom: 0;
 }
 .ufld_icon_links {
   text-align: center;
@@ -2069,6 +2079,9 @@ div.results tr.placeholder td {
 div.results tr.placeholder + tr:not( :nth-child(2)):not(.dragged) > td,
 div.results tr.dragged + tr:not( :nth-child(2)):not(.dragged) > td {
   border-top: none;
+}
+div.results img {
+  max-width: none;
 }
 div.filters {
   margin-bottom: 0;

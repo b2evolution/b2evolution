@@ -95,6 +95,7 @@ class Group extends DataObject
 			$this->set( 'name', T_('New group') );
 			$this->set( 'perm_blogs', 'user' );
 			$this->set( 'perm_stats', 'none' );
+			$this->set( 'usage', 'primary' );
 		}
 		else
 		{

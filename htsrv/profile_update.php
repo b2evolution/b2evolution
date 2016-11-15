@@ -144,7 +144,7 @@ switch( $action )
 		$result = $current_User->crop_avatar( $file_ID, $image_crop_data[0], $image_crop_data[1], $image_crop_data[2], $image_crop_data[3] );
 		if( $result !== true )
 		{ // If error on crop action then redirect to avatar profile page
-			header_redirect( $redirect_to );
+			header_redirect( get_user_avatar_url() );
 		}
 		break;
 

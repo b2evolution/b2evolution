@@ -1673,6 +1673,9 @@ div.avatartag.main .avatar_actions {
     max-height: 245px;
   }
 }
+#user_crop_content {
+  padding: 10px;
+}
 #image_crop_block {
   display: table;
 }
