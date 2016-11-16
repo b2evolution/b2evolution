@@ -129,8 +129,9 @@ class bootstrap_site_navbar_Skin extends Skin
 		// Get current collection ID:
 		$current_blog_ID = isset( $Blog ) ? $Blog->ID : NULL;
 
-		// Load all sections except of "No Section":
+		// Load all sections except of "No Section" because collections of this section are displayed as separate tabs at the end:
 		$SectionCache = & get_SectionCache();
+		$SectionCache->clear();
 		$SectionCache->load_where( 'sec_ID != 1' );
 
 		$this->header_tab_active = NULL;
