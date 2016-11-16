@@ -737,7 +737,17 @@ class Skin extends DataObject
 	 */
 	function get_param_definitions( $params )
 	{
+		global $Blog;
+
 		$r = array();
+
+		// Skin v7 definitions for kind of current collection:
+		if( $this->get_api_version() == 7 && method_exists( $this, 'get_param_definitions_'.$Blog->get( 'type' ) ) )
+		{	// If skin has declared the method for collection kind:
+			$coll_kind_param_definitions = call_user_func( array( $this, 'get_param_definitions_'.$Blog->get( 'type' ) ), $params );
+
+			$r = array_merge( $coll_kind_param_definitions, $r );
+		}
 
 		return $r;
 	}
@@ -895,7 +905,7 @@ class Skin extends DataObject
 	 */
 	function display_init( /*optional: $features = array() */ )
 	{
-		global $debug, $Messages, $disp, $UserSettings;
+		global $debug, $Messages, $disp, $UserSettings, $Blog;
 
 		// We get the optional arg this way for PHP7 comaptibility:
 		@list( $features ) = func_get_args();
@@ -995,13 +1005,29 @@ class Skin extends DataObject
 					// You should make sure this is called ahead of any custom generated CSS.
 					if( $this->use_min_css == false
 						|| $debug
-						|| ( $this->use_min_css == 'check' && !file_exists(dirname(__FILE__).'/style.min.css' ) ) )
+						|| ( $this->use_min_css == 'check' && ! file_exists( $this->get_path().'style.min.css' ) ) )
 					{	// Use readable CSS:
 						$this->require_css( 'style.css' );
 					}
 					else
 					{	// Use minified CSS:
 						$this->require_css( 'style.min.css' );
+					}
+
+					if( $this->get_api_version() == 7 )
+					{	// Get skin css file from folder of collection kind:
+						$skin_css_folder = $Blog->get( 'type' ).'/';
+						if( file_exists( $this->get_path().$skin_css_folder.'style.css' ) && 
+							( $this->use_min_css == false
+							|| $debug
+							|| ( $this->use_min_css == 'check' && ! file_exists( $this->get_path().$skin_css_folder.'style.min.css' ) ) ) )
+						{	// Use readable CSS:
+							$this->require_css( $skin_css_folder.'style.css' );
+						}
+						elseif( file_exists( $this->get_path().$skin_css_folder.'style.min.css' ) )
+						{	// Use minified CSS:
+							$this->require_css( $skin_css_folder.'style.min.css' );
+						}
 					}
 					break;
 
@@ -1285,6 +1311,12 @@ class Skin extends DataObject
 		else
 		{ // Standard skin
 			require_js( 'build/evo_frontoffice.bmin.js', 'blog' );
+		}
+
+		// Skin v7 specific initializations for kind of current collection:
+		if( $this->get_api_version() == 7 && method_exists( $this, 'display_init_'.$Blog->get( 'type' ) ) )
+		{	// If skin has declared the method for collection kind:
+			call_user_func( array( $this, 'display_init_'.$Blog->get( 'type' ) ) );
 		}
 	}
 

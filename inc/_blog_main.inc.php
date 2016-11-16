@@ -858,7 +858,13 @@ if( !empty( $skin ) )
 			{ // Get template name for the current Item if it is defined by its Item Type:
 				$disp_handler_custom = $ItemType->get( 'template_name' ).'.main.php';
 
-				if( file_exists( $disp_handler = $ads_current_skin_path.$disp_handler_custom ) )
+				
+				if( $Skin->get_api_version() == 7 && file_exists( $disp_handler = $ads_current_skin_path.$Blog->get( 'type' ).'/'.$disp_handler_custom ) )
+				{ // Custom template is found in skin folder for current collection kind:
+					$disp_handler_custom_found = true;
+					$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (custom for item type and collection kind)', 'skins' );
+				}
+				elseif( file_exists( $disp_handler = $ads_current_skin_path.$disp_handler_custom ) )
 				{ // Custom template is found in skin folder:
 					$disp_handler_custom_found = true;
 					$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (custom for item type)', 'skins' );
@@ -873,20 +879,35 @@ if( !empty( $skin ) )
 			{ // Set $disp_handler only if it is not defined above:
 				if( ! empty( $disp_handlers[ $disp ] ) )
 				{
-					if( file_exists( $disp_handler = $ads_current_skin_path.$disp_handlers[ $disp ] ) )
-					{ // The current skin has a customized page handler for this disp:
+					if( $Skin->get_api_version() == 7 && file_exists( $disp_handler = $ads_current_skin_path.$Blog->get( 'type' ).'/'.$disp_handlers[ $disp ] ) )
+					{	// The current skin has a customized page handler for this disp and current collection kind:
+						$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (custom to this theme and collection kind)', 'skins' );
+					}
+					elseif( file_exists( $disp_handler = $ads_current_skin_path.$disp_handlers[ $disp ] ) )
+					{	// The current skin has a customized page handler for this disp:
 						$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (custom to this skin)', 'skins' );
 					}
+					elseif( $Skin->get_api_version() == 7 && file_exists( $disp_handler = $ads_current_skin_path.$Blog->get( 'type' ).'/index.main.php' ) )
+					{	// Fallback to the default "index" handler from the current skin dir for current collection kind:
+						$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (default handler for collection kind)', 'skins' );
+					}
 					else
-					{ // Fallback to the default "index" handler from the current skin dir:
+					{	// Fallback to the default "index" handler from the current skin dir:
 						$disp_handler = $ads_current_skin_path.'index.main.php';
 						$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (default handler)', 'skins' );
 					}
 				}
 				else
-				{ // Use the default handler from the skins dir:
-					$disp_handler = $ads_current_skin_path.'index.main.php';
-					$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (default index handler)', 'skins' );
+				{	// Use the default handler from the skins dir:
+					if( $Skin->get_api_version() == 7 && file_exists( $disp_handler = $ads_current_skin_path.$Blog->get( 'type' ).'/index.main.php' ) )
+					{	// For current collection kind:
+						$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (default handler for collection kind)', 'skins' );
+					}
+					else
+					{	// For all other kinds:
+						$disp_handler = $ads_current_skin_path.'index.main.php';
+						$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (default index handler)', 'skins' );
+					}
 				}
 			}
 

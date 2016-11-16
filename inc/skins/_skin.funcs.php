@@ -1856,7 +1856,8 @@ function skin_include( $template_name, $params = array() )
 			if( ! empty( $item_type_template_name ) )
 			{	// The item type has a specific template for this display:
 				$item_type_template_name = '_'.$item_type_template_name.'.disp.php';
-				if( file_exists( $ads_current_skin_path.$item_type_template_name ) ||
+				if( ( $Skin->get_api_version() == 7 && file_exists( $ads_current_skin_path.$Blog->get( 'type' ).'/'.$item_type_template_name ) ) ||
+						file_exists( $ads_current_skin_path.$item_type_template_name ) ||
 						skin_fallback_path( $item_type_template_name ) )
 				{	// Use template file name of the Item Type only if it exists:
 					$template_name = $item_type_template_name;
@@ -1871,6 +1872,12 @@ function skin_include( $template_name, $params = array() )
 	{ // This disp mode is handled by a plugin:
 		$debug_info = 'Call plugin';
 		$disp_handled = 'plugin';
+	}
+	elseif( $Skin->get_api_version() == 7 && file_exists( $ads_current_skin_path.$Blog->get( 'type' ).'/'.$template_name ) )
+	{ // The skin has a customized handler, use that one instead:
+		$file = $ads_current_skin_path.$Blog->get( 'type' ).'/'.$template_name;
+		$debug_info = '<b>Theme template for collection kind</b>: '.rel_path_to_base( $file );
+		$disp_handled = 'custom';
 	}
 	elseif( file_exists( $ads_current_skin_path.$template_name ) )
 	{ // The skin has a customized handler, use that one instead:
@@ -1960,12 +1967,21 @@ function skin_fallback_path( $template_name, $skin_api_version = NULL )
 	global $Skin, $basepath;
 
 	if( $skin_api_version === NULL && ! empty( $Skin ) )
-	{ // Get API version of the current skin
+	{	// Get API version of the current skin:
 		$skin_api_version = $Skin->get_api_version();
 	}
 
-	if( $skin_api_version == 6 )
-	{ // Check fallback file for v6 API skin
+	if( $skin_api_version == 7 )
+	{	// Check fallback file for v7 API skin:
+		$fallback_path = $basepath.'skins_fallback_v7/'.$template_name;
+		if( file_exists( $fallback_path ) )
+		{
+			return $fallback_path;
+		}
+	}
+
+	if( $skin_api_version >= 6 )
+	{	// Check fallback file for v6 API skin:
 		$fallback_path = $basepath.'skins_fallback_v6/'.$template_name;
 		if( file_exists( $fallback_path ) )
 		{
@@ -1973,7 +1989,7 @@ function skin_fallback_path( $template_name, $skin_api_version = NULL )
 		}
 	}
 
-	// Check fallback file for v5 API skin
+	// Check fallback file for v5 API skin:
 	$fallback_path = $basepath.'skins_fallback_v5/'.$template_name;
 	if( file_exists( $fallback_path ) )
 	{

@@ -53,6 +53,11 @@ module.exports = function(grunt) {
 						],
 
 					// Bootstrap skins
+					'skins/green_bootstrap_theme/style.css':        'skins/green_bootstrap_theme/style.less',
+					'skins/green_bootstrap_theme/std/style.css':    'skins/green_bootstrap_theme/std/style.less',
+					'skins/green_bootstrap_theme/photo/style.css':  'skins/green_bootstrap_theme/photo/style.less',
+					'skins/green_bootstrap_theme/forum/style.css':  'skins/green_bootstrap_theme/forum/style.less',
+					'skins/green_bootstrap_theme/manual/style.css': 'skins/green_bootstrap_theme/manual/style.less',
 					'skins/bootstrap_blog_skin/style.css':    'skins/bootstrap_blog_skin/style.less',
 					'skins/bootstrap_main_skin/style.css':    'skins/bootstrap_main_skin/style.less',
 					'skins/bootstrap_forums_skin/style.css':  'skins/bootstrap_forums_skin/style.less',
@@ -149,6 +154,11 @@ module.exports = function(grunt) {
 			bootstrap_skins: {
 				files: {
 					// Bootstrap skins
+					'skins/green_bootstrap_theme/style.min.css':        'skins/green_bootstrap_theme/style.css',
+					'skins/green_bootstrap_theme/std/style.min.css':    'skins/green_bootstrap_theme/std/style.css',
+					'skins/green_bootstrap_theme/photo/style.min.css':  'skins/green_bootstrap_theme/photo/style.css',
+					'skins/green_bootstrap_theme/forum/style.min.css':  'skins/green_bootstrap_theme/forum/style.css',
+					'skins/green_bootstrap_theme/manual/style.min.css': 'skins/green_bootstrap_theme/manual/style.css',
 					'skins/bootstrap_blog_skin/style.min.css':    'skins/bootstrap_blog_skin/style.css',
 					'skins/bootstrap_main_skin/style.min.css':    'skins/bootstrap_main_skin/style.css',
 					'skins/bootstrap_forums_skin/style.min.css':  'skins/bootstrap_forums_skin/style.css',
