@@ -340,7 +340,7 @@ $user_gender_color = array(
 $activity_type_color = array(
 	'users'     => 'FF9900',
 	'posts'    => '6699CC',
-	'comments'  => '339966'
+	'comments' => '5BC0DE'
 );
 
 ?>
