@@ -238,8 +238,8 @@ class coll_activity_stats_Widget extends ComponentWidget
 
 		array_unshift( $chart['chart_data'][0], '' );
 		array_unshift( $chart['chart_data'][1], T_('User registrations') );
-		array_unshift( $chart['chart_data'][2], T_('Topics created') );
-		array_unshift( $chart['chart_data'][3], T_('Comments made') );
+		array_unshift( $chart['chart_data'][2], T_('New topics') );
+		array_unshift( $chart['chart_data'][3], T_('New replies') );
 
 		$chart[ 'canvas_bg' ] = array( 'width'  => '100%', 'height' => $this->disp_params['height'] );
 
