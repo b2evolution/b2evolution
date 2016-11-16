@@ -8083,7 +8083,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$item_tags_widget_rows = array();
 		foreach( $forum_collections as $coll_ID )
 		{	// Insert new widget "Collection Activity Stats" to each forum collection
-			$widget_orde = 10;
+			$widget_order = 10;
 			$item_tags_widget_rows[] = '( '.$coll_ID.', "Forum Front Secondary Area", '.$widget_order.', "coll_activity_stats" )';
 			// Check and update not unique widget orders just to make sure:
 			$not_unique_widget_ID = $DB->get_var( 'SELECT wi_ID
