@@ -331,11 +331,11 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 					$attempt_ip .= ' '.gethostbyaddr( $attempt_ip );
 				}
 
-				$Messages->add( sprintf( T_('Someone tried to log in to your account with a wrong password on %s from %s%s'),
+				$Messages->add_to_group( sprintf( T_('Someone tried to log in to your account with a wrong password on %s from %s%s'),
 						date( locale_datefmt().' '.locale_timefmt(), $attempt[0] ),
 						$attempt_ip,
 						$plugin_country_by_IP
-					), 'error' );
+					), 'error', T_('Invalid login attempts:') );
 			}
 			// Clear the attempts list
 			$UserSettings->delete( 'login_attempts', $current_User->ID );

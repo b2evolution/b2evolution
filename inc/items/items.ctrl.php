@@ -305,7 +305,7 @@ switch( $action )
 						$new_Chapter->set( 'name', $new_categories[ $fileNum ] );
 						if( $new_Chapter->dbinsert() !== false )
 						{ // Category is created successfully
-							$Messages->add( sprintf( T_('New category %s created.'), '<b>'.$new_categories[ $fileNum ].'</b>' ), 'success' );
+							$Messages->add_to_group( sprintf( T_('New category %s created.'), '<b>'.$new_categories[ $fileNum ].'</b>' ), 'success', T_('Creating posts:') );
 							$ChapterCache->clear();
 						}
 						else
@@ -359,7 +359,7 @@ switch( $action )
 				// Invalidate blog's media BlockCache
 				BlockCache::invalidate_key( 'media_coll_ID', $edited_Item->get_blog_ID() );
 
-				$Messages->add( sprintf( T_('&laquo;%s&raquo; has been posted.'), $l_File->dget('name') ), 'success' );
+				$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; has been posted.'), $l_File->dget('name') ), 'success', T_('Creating posts:') );
 				$fileNum++;
 			}
 			else
