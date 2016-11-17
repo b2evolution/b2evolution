@@ -50,7 +50,7 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 		}
 	}
 
-	$message_content .= T_( 'Link to change your password:' )
+	$message_content .= T_( 'Link to reset your password:' )
 						."\n"
 						.'$secret_content_start$'
 						.get_htsrv_url( true ).'login.php?action=changepwd'
@@ -73,14 +73,14 @@ else
 	$message_note = T_( 'For security reasons the link is only valid for your current session (by means of your session cookie).' );
 }
 
-echo T_( 'Somebody (presumably you) has requested a password change for your account.' );
+echo T_( 'Somebody (presumably you) has requested a password reset for your account.' );
 echo "\n";
 echo $message_content;
 echo "\n-- \n";
 echo T_('Please note:').' '.$message_note;
 echo "\n\n";
 
-echo T_('If you did not request this password change, simply ignore this email.');
+echo T_('If you did not request this password reset, simply ignore this email.');
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.txt.php', $params );

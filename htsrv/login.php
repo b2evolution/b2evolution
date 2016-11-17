@@ -134,7 +134,7 @@ switch( $action )
 		$UserCache = & get_UserCache();
 		$UserCache->clear();
 		if( is_email( $login ) )
-		{ // User gave an email address, get first matching User (that is activated) for this email address:
+		{ // User gave an email address, get matching User accounts for this email address and also get first activated one as recipient for the reset email:
 			$only_activated = false;
 			// load all not closed users with this email address
 			$login = utf8_strtolower( $login );
@@ -200,26 +200,29 @@ switch( $action )
 		}
 		else
 		{
+			// Generate a Random key to include in the password reset link that will be sent by email:
 			$request_id = generate_random_key(22); // 22 to make it not too long for URL but unique/safe enough
 
-			// Count how many users match to this login ( It can be more then one in case of email login )
+			// Count how many users match the reset request ( It can be more than 1 in case an email address was provided instead of a unique login )
 			$user_ids = $UserCache->get_ID_array();
 			$user_count = count( $user_ids );
 
-			// Set blog param for email link
+			// Set blog param for email link:
 			$blog_param = '';
 			if( !empty( $blog ) )
 			{
 				$blog_param = '&inskin=true&blog='.$blog;
 			}
 
-			$subject = sprintf( T_( 'Password change request for %s' ), $login );
+			// Other params for the email:
+			$subject = sprintf( T_( 'Password reset request for %s' ), $login );
 			$email_template_params = array(
 					'user_count'     => $user_count,
 					'request_id'     => $request_id,
 					'blog_param'     => $blog_param,
 				);
 
+			// Send email to User using a template:
 			if( ! send_mail_to_User( $forgetful_User->ID, $subject, 'account_password_reset', $email_template_params, true ) )
 			{
 				$Messages->add( T_('Sorry, the email with the link to reset your password could not be sent.')
@@ -228,10 +231,10 @@ switch( $action )
 			else
 			{
 				$Session->set( 'core.changepwd.request_id', $request_id, 86400 * 2 ); // expires in two days (or when clicked)
-				$Session->set( 'core.changepwd.request_ts_login', $servertimenow.'_'.$login, 360 ); // request timestamp and login/email - expires in six minutes
+				$Session->set( 'core.changepwd.request_ts_login', $servertimenow.'_'.$login, $pwdchange_request_delay + 60 ); // request timestamp and login/email - session var expires 60 seconds after the allowed delay.
 				$Session->dbsave(); // save immediately
 
-				$Messages->add( T_('If you correctly entered your login or email address, a link to change your password has been sent to your registered email address.' ), 'success' );
+				$Messages->add( T_('If you correctly entered your login or email address, a link to reset your password has been sent to your registered email address.' ), 'success' );
 
 				syslog_insert( 'User requested password reset', 'info', 'user', $forgetful_User->ID );
 			}
