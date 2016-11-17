@@ -331,7 +331,7 @@ class EmailCampaign extends DataObject
 		{ // Email title is empty
 			if( $display_messages )
 			{
-				$Messages->add( T_('Please enter an email title.'), 'error' );
+				$Messages->add( T_('Please enter an email title for this campaign.'), 'error' );
 			}
 			$result = false;
 		}
@@ -340,7 +340,7 @@ class EmailCampaign extends DataObject
 		{	// Email message is empty:
 			if( $display_messages )
 			{
-				$Messages->add( T_('Please enter a text message.'), 'error' );
+				$Messages->add( T_('Please enter the email text for this campaign.'), 'error' );
 			}
 			$result = false;
 		}
@@ -501,12 +501,12 @@ class EmailCampaign extends DataObject
 		$wait_count = count( $this->users['wait'] );
 		if( $wait_count > 0 )
 		{	// Some recipients still wait this newsletter:
-			$Messages->add( sprintf( T_('Campaign has been sent to a chunk of %s recipients. %s recipients were skipped. %s recipients have not been sent to yet.'),
+			$Messages->add( sprintf( T_('Emails have been sent to a chunk of %s recipients. %s recipients were skipped. %s recipients have not been sent to yet.'),
 					$email_campaign_chunk_size, $email_skip_count, $wait_count ), 'warning' );
 		}
 		else
 		{	// All recipients received this bewsletter:
-			$Messages->add( T_('Campaign has been sent to all recipients.'), 'success' );
+			$Messages->add( T_('Emails have been sent to all recipients of this campaign.'), 'success' );
 		}
 		echo '<br />';
 		$Messages->display();
@@ -630,7 +630,7 @@ class EmailCampaign extends DataObject
 		{	// If no waiting users then don't create a cron job and reset ID of previous cron job:
 			$this->set( 'send_ctsk_ID', NULL, true );
 
-			$Messages->add( T_('A scheduled job has not been created for this campaign because no waiting users for newsletter.'), 'warning' );
+			$Messages->add( T_('No scheduled job has not been created for this campaign because no there are no waiting recipients for this campaing.'), 'warning' );
 		}
 
 		// Update the changed email campaing settings:
