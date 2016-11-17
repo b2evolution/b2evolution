@@ -372,6 +372,14 @@ $booststrap_install_form_params = array(
 		'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-4 col-sm-8">',
 		'buttonsend'     => "</div></div>\n\n",
 		'note_format'    => ' <span class="help-inline text-muted small">%s</span>',
+		// - checkbox
+		'fieldstart_checkbox'    => '<div class="form-group" $ID$>'."\n",
+		'fieldend_checkbox'      => "</div>\n\n",
+		'inputclass_checkbox'    => '',
+		'inputstart_checkbox'    => '<div class="col-sm-8 col-sm-offset-4"><div class="checkbox"><label>',
+		'inputend_checkbox'      => "</label></div></div>\n",
+		'checkbox_newline_start' => '<div class="checkbox">',
+		'checkbox_newline_end'   => "</div>\n",
 	);
 
 header('Content-Type: text/html; charset='.$evo_charset);
@@ -472,6 +480,7 @@ switch( $action )
 		 */
 		display_locale_selector();
 
+		param( 'conf_create_db', 'integer', 0 );
 		param( 'conf_db_user', 'string', true );
 		param( 'conf_db_password', 'raw', true );
 		param( 'conf_db_name', 'string', true );
@@ -483,6 +492,7 @@ switch( $action )
 
 		// Try to create/update basic config file:
 		$basic_config_params = array(
+				'create_db'      => $conf_create_db,
 				'db_user'        => $conf_db_user,
 				'db_password'    => $conf_db_password,
 				'db_name'        => $conf_db_name,
@@ -577,6 +587,7 @@ switch( $action )
 			?>
 				<p class="text-muted small"><?php echo T_('b2evolution stores blog posts, comments, user permissions, etc. in a MySQL database. You must create this database prior to installing b2evolution and provide the access parameters to this database below. If you are not familiar with this, you can ask your hosting provider to create the database for you.') ?></p>
 				<?php
+				$Form->checkbox( 'conf_create_db', param( 'conf_create_db', 'integer' ), '', T_('Try to create this DB if it doesn\'t exist yet (useful for developers)') );
 				$Form->text( 'conf_db_host', $conf_db_host, 16, T_('MySQL Host/Server'), sprintf( T_('Typically looks like "localhost" or "sql-6" or "sql-8.yourhost.net"...' ) ), 120 );
 				$Form->text( 'conf_db_name', $conf_db_name, 16, T_('MySQL Database'), sprintf( T_('Name of the MySQL database you have created on the server' ) ), 100);
 				$Form->text( 'conf_db_user', $conf_db_user, 16, T_('MySQL Username'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 );
