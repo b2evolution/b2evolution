@@ -52,22 +52,10 @@ if( $MainList->result_num_rows > 0 )
 ?>
 	</section>
 
-	<div class="panel-body comments_link__pagination">
 	<?php
-		// Buttons to post/reply
-		$Skin->display_post_button( 0 );
-		if( check_user_status( 'can_be_validated' ) )
-		{	// Display a warning if current user cannot post a topic because he must activate account:
-			global $Messages;
-			$Messages->clear();
-			$Messages->add( T_( 'You must activate your account before you can post a new topic.' )
-				.' <a href="'.get_activate_info_url( NULL, '&amp;' ).'">'.T_( 'More info &raquo;' ).'</a>', 'warning' );
-			$Messages->display();
-		}
-
 		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 		mainlist_page_links( array(
-				'block_start'           => '<ul class="pagination">',
+				'block_start'           => '<div class="panel-body comments_link__pagination"><ul class="pagination">',
 				'block_end'             => '</ul></div>',
 				'page_current_template' => '<span>$page_num$</span>',
 				'page_item_before'      => '<li>',
@@ -79,7 +67,6 @@ if( $MainList->result_num_rows > 0 )
 			) );
 		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 	?>
-	</div>
 </div>
 <?php
 // ---------------------------------- END OF POSTS ------------------------------------
