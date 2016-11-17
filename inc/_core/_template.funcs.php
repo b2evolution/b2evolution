@@ -2674,7 +2674,7 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 
 	// Display hidden fields
 	$Form->add_crumb( 'lostpassform' );
-	$Form->hidden( 'action', 'retrievepassword' );
+	$Form->hidden( 'action', 'resetpassword' );
 	foreach( $hidden_params as $key => $value )
 	{
 		$Form->hidden( $key, $value );
@@ -2693,11 +2693,11 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 
 	$Form->buttons_input( array( array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Send me a recovery email!'), 'class' => 'btn-primary btn-lg' ) ) );
 
-	echo '<b>'.T_('How to recover your password:').'</b>';
+	echo '<b>'.T_('How to reset your password:').'</b>';
 	echo '<ol>';
-	echo '<li>'.T_('Please enter you login (or email address) above.').'</li>';
+	echo '<li>'.T_('Please enter your login (or email address) above.').'</li>';
 	echo '<li>'.T_('An email will be sent to your registered email address immediately.').'</li>';
-	echo '<li>'.T_('As soon as you receive the email, click on the link therein to change your password.').'</li>';
+	echo '<li>'.T_('As soon as you receive the email, click on the link therein to reset your password.').'</li>';
 	echo '<li>'.T_('Your browser will open a page where you can chose a new password.').'</li>';
 	echo '</ol>';
 	echo '<p class="red"><strong>'.T_('Important: for security reasons, you must do steps 1 and 4 on the same computer and same web browser. Do not close your browser in between.').'</strong></p>';

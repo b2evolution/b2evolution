@@ -6086,7 +6086,36 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
 }
 
 /**
- * Helper functions to display User's reports results.
- * New ( not display helper ) functions must be created above user_reports_results function
+ * Validate current session is in a password reset process:
+ *
+ * return boolean true if valid
  */
+function validate_pwd_reset_session( $reqID, $forgetful_User )
+{
+	global $Session;
+
+	// Validate that params are passed:
+	if( ! $forgetful_User || empty( $reqID ) )
+	{ // This was not requested
+		return false;
+	}
+
+	locale_temp_switch( $forgetful_User->locale );
+
+	// Validate provided reqID against the one stored in the user's session
+	if( $Session->get( 'core.changepwd.request_id' ) != $reqID )
+	{
+		return false;
+	}
+
+	// Validate requested user login/email against the one stored in the user's session:
+	if( $Session->get( 'core.changepwd.request_for' ) != $forgetful_User->get( 'login' ) &&
+	    $Session->get( 'core.changepwd.request_for' ) != $forgetful_User->get( 'email' ) )
+	{
+		return false;
+	}
+
+	return true;
+}
+
 ?>
