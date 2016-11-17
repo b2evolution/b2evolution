@@ -56,7 +56,6 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 						.get_htsrv_url( true ).'login.php?action=changepwd'
 							.'&'.$dummy_fields[ 'login' ].'='.rawurlencode( $iterator_User->login )
 							.'&reqID='.$params['request_id']
-							.'&sessID='.$Session->ID  // used to detect cookie problems
 							.$params['blog_param']
 						.'$secret_content_end$'
 						."\n";

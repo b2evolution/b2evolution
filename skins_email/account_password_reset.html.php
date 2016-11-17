@@ -59,7 +59,6 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 	$url_change_password = get_htsrv_url( true ).'login.php?action=changepwd'
 		.'&'.$dummy_fields[ 'login' ].'='.rawurlencode( $iterator_User->login )
 		.'&reqID='.$params['request_id']
-		.'&sessID='.$Session->ID  // used to detect cookie problems
 		.$params['blog_param'];
 
 	// Restrict the password change url to be saved in the email logs

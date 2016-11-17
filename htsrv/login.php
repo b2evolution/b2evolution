@@ -184,6 +184,8 @@ switch( $action )
 		// echo 'email: ', $forgetful_User->email;
 		// echo 'locale: '.$forgetful_User->locale;
 
+		locale_temp_switch( $forgetful_User->locale );
+
 		if( $demo_mode )
 		{
 			$Messages->add( T_('You cannot reset passwords in demo mode.'), 'error' );
@@ -191,8 +193,6 @@ switch( $action )
 			$action = 'req_login';
 			break;
 		}
-
-		locale_temp_switch( $forgetful_User->locale );
 
 		if( empty( $forgetful_User->email ) )
 		{
@@ -234,8 +234,8 @@ switch( $action )
 			{
 				// Prevent too many identical password recovery emails:
 				$Session->set( 'core.changepwd.request_ts_login', $servertimenow.'_'.$login, $pwdchange_request_delay + 60 ); // Session var expires 60 seconds after the allowed delay.
-				// Secret key that will be included in to the reset email in order to validate it gets to the owner of the email address:
-				$Session->set( 'core.changepwd.request_id', $request_id, 86400 * 2 ); // Session var expires in two days (or when clicked)
+				// Secret key that will be included into the reset email in order to validate that it gets to the owner of the email address:
+				$Session->set( 'core.changepwd.request_id', $request_id, 86400 * 2 ); // Session var expires in two days (or when password changed)
 				// Target of the request (can be a login or an email address):
 				$Session->set( 'core.changepwd.request_for', $login, 86400 * 2 ); // Session var expires in two days (or when password changed)
 				$Session->dbsave(); // save immediately
@@ -256,46 +256,26 @@ switch( $action )
 		// Clicked "Reset password NOW" link from an password request email:
 
 		param( 'reqID', 'string', '' );
-		param( 'sessID', 'integer', '' );
 
 		$UserCache = & get_UserCache();
 		$forgetful_User = & $UserCache->get_by_login( $login );
 
-		locale_temp_switch( $forgetful_User->locale );
-
-		if( ! $forgetful_User || empty( $reqID ) )
-		{ // This was not requested
-			$Messages->add( T_('Invalid password change request! Please try again...'), 'error' );
-			$action = 'lostpassword';
-			$login_required = true; // Do not display "Without login.." link on the form
-			break;
-		}
-
-		if( $sessID != $Session->ID )
-		{ // Another session ID than for requesting password change link used!
-			$Messages->add( T_('You have to use the same session (by means of your session cookie) as when you have requested the action. Please try again...'), 'error' );
-			$action = 'lostpassword';
-			$login_required = true; // Do not display "Without login.." link on the form
-			break;
-		}
-
-		// Validate provided reqID against the one stored in the user's session
-		if( $Session->get( 'core.changepwd.request_id' ) != $reqID )
+		// Validate params against session vars:
+		if( ! validate_pwd_reset_session( $reqID, $forgetful_User ) )
 		{
-			$Messages->add( T_('Invalid password change request! Please try again...'), 'error' );
+			$Messages->add( T_('Invalid password change request! Remember you must use the same session (by means of your session cookie) as when you have requested the action. Please try again...'), 'error' );
+			locale_restore_previous();
 			$action = 'lostpassword';
 			$login_required = true; // Do not display "Without login.." link on the form
 			break;
 		}
 
-		// Link User to Session and Log in:
+  		// Link User to Session and Log in:
 		$Session->set_user_ID( $forgetful_User->ID );
 		$current_User = & $forgetful_User;
 
 		// Add Message to change the password:
-		$Messages->add( T_( 'Please change your password to something you remember now.' ), 'success' );
-
-		// Note: the 'core.changepwd.request_id' Session setting gets removed in b2users.php
+		$Messages->add( T_( 'Please choose a new password now...' ), 'note' );
 
 		// Redirect to the user's change password tab
 		$changepwd_url = NULL;
@@ -316,7 +296,7 @@ switch( $action )
 			$action = 'changepwd';
 		}
 		else
-		{ // redirect Will save $Messages into Session:
+		{ // redirect will save $Messages into Session:
 			header_redirect( $changepwd_url ); // display user's change password tab
 			/* exited */
 		}
@@ -338,20 +318,11 @@ switch( $action )
 
 		$forgetful_User = & $current_User;
 
-		locale_temp_switch( $forgetful_User->locale );
-
-		if( ! $forgetful_User || empty( $reqID ) )
-		{ // This was not requested
-			$Messages->add( T_('Invalid password change request! Please try again...'), 'error' );
-			$action = 'lostpassword';
-			$login_required = true; // Do not display "Without login.." link on the form
-			break;
-		}
-
-		// Validate provided reqID against the one stored in the user's session
-		if( $Session->get( 'core.changepwd.request_id' ) != $reqID )
+		// Validate params against session vars:
+		if( ! validate_pwd_reset_session( $reqID, $forgetful_User ) )
 		{
-			$Messages->add( T_('Invalid password change request! Please try again...'), 'error' );
+			$Messages->add( T_('Invalid password change request! Remember you must use the same session (by means of your session cookie) as when you have requested the action. Please try again...'), 'error' );
+			locale_restore_previous();
 			$action = 'lostpassword';
 			$login_required = true; // Do not display "Without login.." link on the form
 			break;
@@ -364,6 +335,12 @@ switch( $action )
 			$action = 'changepwd';
 			break;
 		}
+
+		// Clean up session variables:
+		$Session->delete( 'core.changepwd.request_ts_login' );
+		$Session->delete( 'core.changepwd.request_id' );
+		$Session->delete( 'core.changepwd.request_for' );
+		$Session->dbsave(); // save immediately
 
 		locale_restore_previous();
 
