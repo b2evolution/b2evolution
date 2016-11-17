@@ -712,7 +712,7 @@ function check_allow_disp( $disp )
 	}
 
 	$messages_content = $Messages->get_string( '', '', '', 'raw' );
-	if( ( strstr( $messages_content, 'disp=activateinfo' ) !== false ) || ( strstr( $messages_content, 'action=req_validatemail' ) !== false ) )
+	if( ( strstr( $messages_content, 'disp=activateinfo' ) !== false ) || ( strstr( $messages_content, 'action=req_activate_email' ) !== false ) )
 	{ // If there is already a message to display activateinfo link, then don't add this message again
 		return;
 	}

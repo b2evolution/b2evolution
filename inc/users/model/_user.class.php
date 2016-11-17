@@ -3814,15 +3814,15 @@ class User extends DataObject
 
 		if( $r )
 		{ // save request_id into Session
-			$request_ids = $Session->get( 'core.validatemail.request_ids' );
+			$request_ids = $Session->get( 'core.activateacc.request_ids' );
 			if( ( ! is_array($request_ids) ) || $email_changed )
 			{ // create new request ids array if it doesn't exist yet, or if user email changed ( this way the old request into the old email address won't be valid )
 				$request_ids = array();
 			}
 			$request_ids[] = $request_id;
-			$Session->set( 'core.validatemail.request_ids', $request_ids, 86400 * 2 ); // expires in two days (or when clicked)
+			$Session->set( 'core.activateacc.request_ids', $request_ids, 86400 * 2 ); // expires in two days (or when clicked)
 			// set a redirect_to session variable because this way after the account will be activated we will know where to redirect
-			$Session->set( 'core.validatemail.redirect_to', $redirect_to_after  );
+			$Session->set( 'core.activateacc.redirect_to', $redirect_to_after  );
 			$Session->dbsave(); // save immediately
 
 			// update last activation email timestamp
