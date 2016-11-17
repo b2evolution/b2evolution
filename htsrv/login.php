@@ -38,9 +38,9 @@ switch( $action )
 	case 'logout':
 		// log out the current user:
 
-		logout();          // logout $Session and set $current_User = NULL
+		logout(); // logout $Session and set $current_User = NULL
 
-		// TODO: to give the user feedback through Messages, we would need to start a new $Session here and append $Messages to it.
+		// TODO: to give the user feedback through $Messages, we would need to start a new $Session here and append $Messages to it.
 
 		// Redirect to $baseurl on logout if redirect URI is not set. Temporarily fix until we remove actions from redirect URIs
 		if( $redirect_to == $ReqURI )
@@ -58,6 +58,7 @@ switch( $action )
 		global $Session, $Messages, $UserSettings;
 		$Session->assert_received_crumb( 'closeaccountform' );
 
+		// Check if User has provided a reason for closing his account:
 		$reasons = trim( $Settings->get( 'account_close_reasons' ) );
 		param( 'account_close_type', 'string', '' );
 
@@ -73,7 +74,7 @@ switch( $action )
 
 		if( is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) )
 		{ // Admins cannot close own accounts
-			$Messages->add( T_( 'You cannot close your own account!' ) );
+			$Messages->add( T_( 'Since you are an Admin with User management privileges, you cannot close your own account!' ) );
 			// Redirect to show the errors:
 			header_redirect(); // Will EXIT
 			// We have EXITed already at this point!!
@@ -91,7 +92,7 @@ switch( $action )
 				);
 			send_admin_notification( NT_('User account closed'), 'account_closed', $email_template_params );
 
-			// Set this session var only to know when display a bye message
+			// Set this session var only to know when display a good-bye message:
 			$Session->set( 'account_closing_success', true );
 		}
 		else
@@ -222,7 +223,8 @@ switch( $action )
 					'blog_param'     => $blog_param,
 				);
 
-			// Send email to User using a template:
+			// Send email to User by using a text/html template:
+			// In case several Users have the same email address, the email will allow the recipient to choose which account he wants to reset:
 			if( ! send_mail_to_User( $forgetful_User->ID, $subject, 'account_password_reset', $email_template_params, true ) )
 			{
 				$Messages->add( T_('Sorry, the email with the link to reset your password could not be sent.')
@@ -230,8 +232,12 @@ switch( $action )
 			}
 			else
 			{
-				$Session->set( 'core.changepwd.request_id', $request_id, 86400 * 2 ); // expires in two days (or when clicked)
-				$Session->set( 'core.changepwd.request_ts_login', $servertimenow.'_'.$login, $pwdchange_request_delay + 60 ); // request timestamp and login/email - session var expires 60 seconds after the allowed delay.
+				// Prevent too many identical password recovery emails:
+				$Session->set( 'core.changepwd.request_ts_login', $servertimenow.'_'.$login, $pwdchange_request_delay + 60 ); // Session var expires 60 seconds after the allowed delay.
+				// Secret key that will be included in to the reset email in order to validate it gets to the owner of the email address:
+				$Session->set( 'core.changepwd.request_id', $request_id, 86400 * 2 ); // Session var expires in two days (or when clicked)
+				// Target of the request (can be a login or an email address):
+				$Session->set( 'core.changepwd.request_for', $login, 86400 * 2 ); // Session var expires in two days (or when password changed)
 				$Session->dbsave(); // save immediately
 
 				$Messages->add( T_('If you correctly entered your login or email address, a link to reset your password has been sent to your registered email address.' ), 'success' );
@@ -246,7 +252,9 @@ switch( $action )
 		break;
 
 
-	case 'changepwd': // Clicked "Change password request" link from a mail
+	case 'changepwd': 
+		// Clicked "Reset password NOW" link from an password request email:
+
 		param( 'reqID', 'string', '' );
 		param( 'sessID', 'integer', '' );
 
@@ -316,7 +324,8 @@ switch( $action )
 
 
 	case 'updatepwd':
-		// Update password(The submit action of the change password form)
+		// Update password (The submit action of the above reset password form):
+
 		param( 'reqID', 'string', '' );
 
 		if( ! is_logged_in() )
@@ -364,7 +373,9 @@ switch( $action )
 		break;
 
 
-	case 'activateaccount': // Clicked to activate account link from an account activation reminder email
+	case 'activateaccount': 
+		// Clicked link to activate account from an account activation reminder email:
+	
 		// Stop a request from the blocked IP addresses or Domains
 		antispam_block_request();
 
@@ -411,7 +422,9 @@ switch( $action )
 		/* exited */
 		break;
 
-	case 'validatemail': // Clicked "Validate email" link from a mail
+	case 'validatemail': 
+		// Clicked "Validate email" link from an email:
+
 		// Stop a request from the blocked IP addresses or Domains
 		antispam_block_request();
 
