@@ -316,7 +316,7 @@ function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
 	}
 	else
 	{ // Use normal/standard lostpassword form (without blog skin)
-		$activateinfo_url = get_htsrv_url( true ).'login.php?action=req_validatemail';
+		$activateinfo_url = get_htsrv_url( true ).'login.php?action=req_activate_email';
 	}
 
 	return url_add_param( $activateinfo_url, 'redirect_to='.rawurlencode( $redirect_to ), $glue ) ;
@@ -395,7 +395,7 @@ function redirect_after_account_activation()
 	if( $redirect_to == 'return_to_original' )
 	{ // we want to return to original page after account activation
 		// the redirect_to param should be set in the Session. This was set when the account activation email was sent.
-		$redirect_to = $Session->get( 'core.validatemail.redirect_to' );
+		$redirect_to = $Session->get( 'core.activateacc.redirect_to' );
 		// if the redirect_to is not set in the Session or is empty, we MUST NEVER let to redirect back to the origianl page which can be hotmail, gmail, etc.
 		if( empty( $redirect_to ) )
 		{ // session redirect_to was not set, initialize $redirect_to to the home page
@@ -3197,8 +3197,7 @@ function callback_filter_userlist( & $Form )
 				'0'  => T_('All (Grouped)'),
 			) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
 		$Form->select_input_array( 'group', get_param('group'), $group_options_array,
-			// TRANS: Type: Primary Group, Secondary Group
-			sprintf( T_('%s Group'), get_admin_badge( 'group', '#', '#', '#', 'primary' ) ),
+			sprintf( T_('<span %s>Primary</span> Group'), 'class="label label-primary"' ),
 			'', array( 'force_keys_as_values' => true ) );
 
 		// Secondary group:
@@ -3209,8 +3208,7 @@ function callback_filter_userlist( & $Form )
 				'0'  => T_('All'),
 			) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
 		$Form->select_input_array( 'group2', get_param('group2'), $group_options_array,
-			// TRANS: Type: Primary Group, Secondary Group
-			sprintf( T_('%s Group'), get_admin_badge( 'group', '#', '#', '#', 'secondary' ) ),
+			sprintf( T_('<span %s>Secondary</span> Group'), 'class="label label-info"' ),
 			'', array( 'force_keys_as_values' => true ) );
 	}
 
@@ -6056,7 +6054,36 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
 }
 
 /**
- * Helper functions to display User's reports results.
- * New ( not display helper ) functions must be created above user_reports_results function
+ * Validate current session is in a password reset process:
+ *
+ * return boolean true if valid
  */
+function validate_pwd_reset_session( $reqID, $forgetful_User )
+{
+	global $Session;
+
+	// Validate that params are passed:
+	if( ! $forgetful_User || empty( $reqID ) )
+	{ // This was not requested
+		return false;
+	}
+
+	locale_temp_switch( $forgetful_User->locale );
+
+	// Validate provided reqID against the one stored in the user's session
+	if( $Session->get( 'core.changepwd.request_id' ) != $reqID )
+	{
+		return false;
+	}
+
+	// Validate requested user login/email against the one stored in the user's session:
+	if( $Session->get( 'core.changepwd.request_for' ) != $forgetful_User->get( 'login' ) &&
+	    $Session->get( 'core.changepwd.request_for' ) != $forgetful_User->get( 'email' ) )
+	{
+		return false;
+	}
+
+	return true;
+}
+
 ?>

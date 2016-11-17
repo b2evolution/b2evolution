@@ -637,7 +637,7 @@ class Item extends ItemLight
 		}
 
 		// URL associated with Item:
-		$post_url = param( 'post_url', 'string', NULL );
+		$post_url = param( 'post_url', 'url', NULL );
 		if( $post_url !== NULL )
 		{
 			param_check_url( 'post_url', 'posting', '' );
@@ -1310,6 +1310,42 @@ class Item extends ItemLight
 
 		// Current user not allowed to comment in this blog
 		return false;
+	}
+
+
+	/**
+	 * Check if current User can see meta comments on this Item
+	 *
+	 * @return boolean
+	 */
+	function can_see_meta_comments()
+	{
+		if( ! is_logged_in() )
+		{	// User must be logged in
+			return false;
+		}
+
+		global $current_User;
+
+		return $current_User->check_perm( 'meta_comment', 'view', false, $this->get_blog_ID() );
+	}
+
+
+	/**
+	 * Check if current User can leave meta comment on this Item
+	 *
+	 * @return boolean
+	 */
+	function can_meta_comment()
+	{
+		if( ! is_logged_in() )
+		{	// User must be logged in
+			return false;
+		}
+
+		global $current_User;
+
+		return $current_User->check_perm( 'meta_comment', 'add', false, $this->get_blog_ID() );
 	}
 
 

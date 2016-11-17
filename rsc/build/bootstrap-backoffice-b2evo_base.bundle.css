@@ -1514,6 +1514,12 @@ table.widget_grid div {
 .evo_private_messages_list .table_scroll table.table tr td {
   vertical-align: top;
 }
+table.table td.thread_with img {
+  margin-bottom: 5px;
+}
+table.table td.thread_with > span:last-child img {
+  margin-bottom: 0;
+}
 .ufld_icon_links {
   text-align: center;
 }

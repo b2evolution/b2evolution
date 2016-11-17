@@ -464,7 +464,8 @@ class RestApi
 				$check_perm_blog_media_browse_group_SQL = new SQL();
 				$check_perm_blog_media_browse_group_SQL->SELECT( 'bloggroup_blog_ID' );
 				$check_perm_blog_media_browse_group_SQL->FROM( 'T_coll_group_perms' );
-				$check_perm_blog_media_browse_group_SQL->WHERE( 'bloggroup_group_ID = '.$current_User->Group->ID );
+				$check_perm_blog_media_browse_group_SQL->WHERE( '( bloggroup_group_ID = '.$current_User->Group->ID.'
+					OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$current_User->ID.' ) )' );
 				$check_perm_blog_media_browse_group_SQL->WHERE_and( 'bloggroup_perm_media_browse <> 0' );
 				$restrict_available_fileroots_sql .= ' OR blog_owner_user_ID = '.$current_User->ID
 					.' OR ( blog_advanced_perms <> 0 AND ( '

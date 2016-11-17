@@ -3769,7 +3769,9 @@ class Comment extends DataObject
 			$meta_SQL->FROM_add( 'LEFT JOIN T_groups__groupsettings ON user_grp_ID = gset_grp_ID AND gset_name = "perm_admin"' );
 			$meta_SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON user_ID = uset_user_ID AND uset_name = "notify_meta_comments"' );
 			$meta_SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON bloguser_user_ID = user_ID AND bloguser_blog_ID = '.$comment_item_Blog->ID );
-			$meta_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON bloggroup_group_ID = user_grp_ID AND bloggroup_blog_ID = '.$comment_item_Blog->ID );
+			$meta_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON bloggroup_blog_ID = '.$comment_item_Blog->ID.'
+				AND ( bloggroup_group_ID = user_grp_ID
+				      OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = user_ID ) )' );
 			// Check if users have access to the back-office:
 			$meta_SQL->WHERE( '( gset_value = "normal" OR gset_value = "restricted" )' );
 			// Check if the users would like to receive notifications about new meta comments:
@@ -4531,18 +4533,26 @@ class Comment extends DataObject
 	/*
 	 * Get max allowed comment status depending on parent item status
 	 *
+	 * @param string Status key to check if it is allowed, NULL- to use current comment status
 	 * @return string Status key
 	 */
-	function get_allowed_status()
+	function get_allowed_status( $current_status = NULL )
 	{
 		$comment_Item = & $this->get_Item();
 		$item_Blog = & $comment_Item->get_Blog();
 
-		// Current comment status:
-		$current_status = $this->get( 'status' );
+		if( $current_status === NULL )
+		{	// Use current comment status:
+			$current_status = $this->get( 'status' );
+		}
 
 		// Restrict status to max allowed for item collection:
-		$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->status );
+		$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->get( 'status' ) );
+		if( empty( $item_restricted_status ) )
+		{	// If max allowed status is not detected because for example current User has no perm to item status,
+			// then use current status of the Item in order to restrict max comment status below:
+			$item_restricted_status = $comment_Item->get( 'status' );
+		}
 
 		// Comment status cannot be more than post status, restrict it:
 		$restricted_statuses = get_restricted_statuses( $item_Blog->ID, 'blog_comment!', 'edit', '', $item_restricted_status );

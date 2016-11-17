@@ -542,7 +542,7 @@ $Form->begin_form( '', '', $params );
 			echo '</div>'; // comments_container div
 			echo '</div>';
 
-			if( $current_User->check_perm( 'meta_comment', 'add', false, $Blog->ID ) )
+			if( $edited_Item->can_meta_comment() )
 			{ // Display a link to add new meta comment if current user has a permission
 				echo action_icon( T_('Add meta comment').'...', 'new', $admin_url.'?ctrl=items&amp;p='.$edited_Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments', T_('Add meta comment').' &raquo;', 3, 4 );
 			}

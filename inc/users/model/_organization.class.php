@@ -134,7 +134,7 @@ class Organization extends DataObject
 		$this->set_from_Request( 'name', 'org_name' );
 
 		// Url
-		param( 'org_url', 'string' );
+		param( 'org_url', 'url' );
 		param_check_url( 'org_url', 'commenting' );
 		$this->set_from_Request( 'url', 'org_url', true );
 

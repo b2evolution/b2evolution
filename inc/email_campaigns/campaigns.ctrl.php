@@ -103,21 +103,6 @@ switch( $action )
 		// We have EXITed already at this point!!
 		break;
 
-	case 'hide_wysiwyg_warning':
-	case 'show_wysiwyg_warning':
-		global $UserSettings;
-
-		// Show/hide warning when switching from markup to WYSIWYG
-		$Session->assert_received_crumb( 'campaign' );
-
-		// Check that this action request is not a CSRF hacked request:
-		$UserSettings->set( 'show_wysiwyg_warning_emailcampaign', ( $action == 'show_wysiwyg_warning' ? 1: 0 ) );
-		$UserSettings->dbupdate();
-
-		// REDIRECT / EXIT
-		header_redirect( $admin_url.'?ctrl=campaigns&action=edit&ecmp_ID='.$edited_EmailCampaign->ID.'&tab=compose' );
-		break;
-
 	case 'change_users':
 		$Session->set( 'edited_campaign_ID', $edited_EmailCampaign->ID );
 
@@ -279,7 +264,7 @@ switch( $action )
 
 		if( $current_User->check_perm( 'options', 'view' ) )
 		{	// No access to view cron jobs:
-			$Messages->add( T_('Sorry, you don\'t have an access to view scheduled jobs.' ), 'warning' );
+			$Messages->add( T_('Sorry, you don\'t have permission to view scheduled jobs.' ), 'warning' );
 			$action = 'edit';
 			$tab = param( 'current_tab', 'string' );
 			break;

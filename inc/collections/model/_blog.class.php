@@ -572,12 +572,12 @@ class Blog extends DataObject
 			$this->set_setting( 'category_prefix', $category_prefix);
 		}
 
-		if( param( 'atom_redirect', 'string', NULL ) !== NULL )
+		if( param( 'atom_redirect', 'url', NULL ) !== NULL )
 		{
 			param_check_url( 'atom_redirect', 'commenting' );
 			$this->set_setting( 'atom_redirect', get_param( 'atom_redirect' ) );
 
-			param( 'rss2_redirect', 'string', NULL );
+			param( 'rss2_redirect', 'url', NULL );
 			param_check_url( 'rss2_redirect', 'commenting' );
 			$this->set_setting( 'rss2_redirect', get_param( 'rss2_redirect' ) );
 		}
@@ -1106,7 +1106,7 @@ class Blog extends DataObject
 
 				if( $access_type == 'absolute' )
 				{
-					$blog_siteurl = param( 'blog_siteurl_absolute', 'string', true );
+					$blog_siteurl = param( 'blog_siteurl_absolute', 'url', true );
 					if( preg_match( '#^https?://[^/]+/.*#', $blog_siteurl, $matches ) )
 					{ // It looks like valid absolute URL, so we may update the blog siteurl
 						$this->set( 'siteurl', $blog_siteurl );
@@ -1193,7 +1193,7 @@ class Blog extends DataObject
 					}
 					$this->set_setting( $asset_url_type, $asset_url_type_value );
 
-					$assets_absolute_url_value = param( $asset_url_data['url'], 'string', NULL );
+					$assets_absolute_url_value = param( $asset_url_data['url'], 'url', NULL );
 					if( ( get_param( $asset_url_type ) == 'absolute' ) && empty( $assets_absolute_url_value ) )
 					{ // Absolute URL cannot be empty
 						$Messages->add( sprintf( T_('Absolute URL for %s cannot be empty!'), $asset_url_data['folder'] ) );
@@ -1260,7 +1260,7 @@ class Blog extends DataObject
 				$this->set_from_Request( 'media_location' );
 				$this->set_media_subdir( param( 'blog_media_subdir', 'string', '' ) );
 				$this->set_media_fullpath( param( 'blog_media_fullpath', 'string', '' ) );
-				$this->set_media_url( param( 'blog_media_url', 'string', '' ) );
+				$this->set_media_url( param( 'blog_media_url', 'url', '' ) );
 
 				// check params
 				switch( $this->get( 'media_location' ) )

@@ -1060,6 +1060,20 @@ switch( $action )
 
 		$upgrade_result = upgrade_b2evo_tables( $action );
 
+		if( $is_automated_upgrade && $upgrade_result !== 'need-fix' )
+		{
+			if( $upgrade_result === true )
+			{	// After successful auto_upgrade or svn_upgrade we must remove files/folder based on the upgrade_policy.conf
+				remove_after_upgrade();
+			}
+			// Disable maintenance mode at the end of the upgrade script:
+			// TODO: check all exist conditions, and do this only when upgrade was aborted, not when upgrade failed in the middle...
+			if( ! switch_maintenance_mode( false, 'upgrade' ) )
+			{	// If error on switching out of maintenance mode:
+				$upgrade_result = false;
+			}
+		}
+
 		if( $upgrade_result === 'need-fix' )
 		{	// We are waiting for the user to click on "try to repair/upgrade now"...
 			// We already displayed the orange upgrade button. Offer an alternative:
@@ -1068,13 +1082,6 @@ switch( $action )
 		}
 		elseif( $upgrade_result === true )
 		{
-			if( $is_automated_upgrade )  // What EXACTLY does "$not_upgrade mean???"
-			{ // After successful auto_upgrade or svn_upgrade we must remove files/folder based on the upgrade_policy.conf
-				remove_after_upgrade();
-				// disable maintenance mode at the end of the upgrade script
-				switch_maintenance_mode( false, 'upgrade' );
-			}
-
 			// Update the progress bar status
 			update_install_progress_bar();
 
@@ -1089,13 +1096,6 @@ switch( $action )
 		}
 		else
 		{	// There has been an error during upgrade... (or upgrade was not performed)
-
-			if( $is_automated_upgrade )
-			{	// disable maintenance mode at the end of the upgrade script
-				// TODO: check all exist conditions, and do this only when upgrade was aborted, not when upgrade failed in the middle...
-				switch_maintenance_mode( false, 'upgrade' );
-			}
-
 			echo get_install_format_text( '<p class="alert alert-danger" style="margin-top: 40px;"><evo:error>'.T_('Upgrade failed!').'</evo:error></p>', 'p' );
 
 			// A link back to install menu

@@ -59,7 +59,7 @@ if( !$current_User->check_status( 'can_access_admin' ) )
 {
 	if( $current_User->check_status( 'can_be_validated' ) )
 	{ // redirect back to the login page
-		$action = 'req_validatemail';
+		$action = 'req_activate_email';
 		require $htsrv_path.'login.php';
 	}
 	else

@@ -129,11 +129,6 @@ if( $display_mode == 'js' )
 	$close_icon = action_icon( T_('Close this window'), 'close', '', '', 0, 0, array( 'id' => 'close_button', 'class' => 'floatright' ) );
 }
 
-if( $can_crop )
-{
-	$Form->button( array( 'type' => 'submit', 'name'=>'actionArray[crop]', 'value'=> T_('Apply'), 'class' => 'SaveButton btn-primary' ) );
-}
-
 // Start displaying content
 
 if( ! $can_crop )
@@ -144,18 +139,20 @@ if( ! $can_crop )
 }
 else
 {
-	echo '<div id="content" style="height: '.$content_height.'px; width: '. $content_width.'px;">';
+	echo '<div id="user_crop_content" style="height: '.$content_height.'px; width: '. $content_width.'px;">';
 	echo '</div>';
+
+	$Form->button( array( 'type' => 'submit', 'name'=>'actionArray[crop]', 'value'=> T_('Apply'), 'class' => 'SaveButton btn-primary' ) );
 }
 $Form->end_form();
 if( $can_crop )
 {
 ?>
 <style>
-	#workarea img {
+	#user_crop_workarea img {
 		object-fit: contain;
-		width: <?php echo $workarea_width;?>;
-		height: <?php echo $workarea_height;?>;
+		width: <?php echo $content_width;?>;
+		height: <?php echo $content_height;?>;
 		visibility: hidden;
 	}
 
@@ -419,14 +416,14 @@ if( $can_crop )
 
 	function render_content()
 	{
-		var content = jQuery( 'div#content' );
+		var content = jQuery( 'div#user_crop_content' );
 
 		var working_image = jQuery( '<img />', {
 				src: image_url
 			});
 
 		var workarea = jQuery( '<div />', {
-				id: 'workarea',
+				id: 'user_crop_workarea',
 				style: {
 					'background-color': '#f2f2f2',
 					height: workarea_height + 'px',
@@ -435,7 +432,7 @@ if( $can_crop )
 			});
 
 		var previews = jQuery( '<div />', {
-				id: 'preview',
+				id: 'user_crop_preview',
 				style: {
 					'background-color': 'white',
 					height: preview_size + 'px',
@@ -516,7 +513,7 @@ if( $can_crop )
 			content.append( workarea );
 			content.append( previews );
 
-			preview_images = jQuery( 'div#preview div.preview_cropped_image:not(:last-child)' );
+			preview_images = jQuery( 'div#user_crop_preview div.preview_cropped_image:not(:last-child)' );
 			preview_images.css( 'margin-bottom', 0 );
 			preview_images.css( 'margin-right', preview_margin + 'px' );
 		}
@@ -567,7 +564,7 @@ if( $can_crop )
 			content.append( previews );
 			content.append( jQuery( '<div />', { style: { clear: 'both' } } ) );
 
-			preview_images = jQuery( 'div#preview div.preview_cropped_image:not(:last-child)' );
+			preview_images = jQuery( 'div#user_crop_preview div.preview_cropped_image:not(:last-child)' );
 
 			if( preview_orientation == 'portrait' )
 			{
@@ -584,9 +581,9 @@ if( $can_crop )
 		// Adjust modal dimensions and content to minimize workarea margin
 		var wah_margin = workarea_height - ( original_image_height < working_image_height ? original_image_height : working_image_height );
 		var waw_margin = workarea_width - ( original_image_width < working_image_width ? original_image_width : working_image_width );
-		var modal_dialog = jQuery( 'div.modal-dialog' );
-		var modal_body = jQuery( 'div.modal-body' );
-		var content = jQuery( 'div#content' );
+		var modal_dialog = jQuery( 'div.modal-dialog' ).length ? jQuery( 'div.modal-dialog' ) : jQuery( '#overlay_wrap' );
+		var modal_body = jQuery( 'div.modal-body' ).length ? jQuery( 'div.modal-body' ) : jQuery( '#overlay_page' );
+		var content = jQuery( 'div#user_crop_content' );
 
 		//console.debug( 'Margin: ', wah_margin, waw_margin );
 		//console.debug( 'Workarea: ', workarea_height, workarea_width );
@@ -690,7 +687,7 @@ if( $can_crop )
 	render_content();
 
 	// Initialize jcrop tool only after the image is fully loaded
-	jQuery( '#workarea img' ).load( function()
+	jQuery( '#user_crop_workarea img' ).load( function()
 		{
 			init_jcrop_tool( jQuery( this ) );
 		});

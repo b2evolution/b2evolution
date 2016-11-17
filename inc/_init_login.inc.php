@@ -397,9 +397,9 @@ $action = param( 'action', 'string', NULL );
 // Check if the user needs to be validated, but is not yet:
 if( check_user_status( 'can_be_validated' ) // user is logged in but not validated and validation is required
 	&& $action != 'logout'
-	&& $action != 'req_validatemail' && $action != 'validatemail' && $validate_required )
+	&& $action != 'req_activate_email' && $action != 'activateacc_sec' && $validate_required )
 { // we're not in that action already:
-	$action = 'req_validatemail'; // for login.php
+	$action = 'req_activate_email'; // for login.php
 	if( $is_admin_page )
 	{
 		$login_error = T_('In order to access the admin interface, you must first activate your account by clicking on the activation link in the email we sent you. <b>See below:</b>');

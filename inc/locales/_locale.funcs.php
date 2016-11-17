@@ -881,7 +881,7 @@ function locale_updateDB()
 			}
 			elseif( $lfield == 'shorttimefmt' && empty( $pval ) )
 			{
-				param_error( $pkey, sprintf( T_('Locale %s short time cannot be empty'), $plocale ) );
+				param_error( $pkey, sprintf( T_('Locale %s short time format cannot be empty'), $plocale ) );
 			}
 
 			if( $lfield == 'startofweek' && ( $pval < 0 || $pval > 6 ) )
@@ -1037,29 +1037,34 @@ function locale_updateDB()
  */
 function convert_charset( $string, $dest_charset, $src_charset )
 {
-	if( isset($GLOBALS['Timer']) )
+	if( isset( $GLOBALS['Timer'] ) )
 	{
-		$GLOBALS['Timer']->resume('convert_charset', false );
+		$GLOBALS['Timer']->resume( 'convert_charset', false );
 	}
+
 	if( $dest_charset == $src_charset || $dest_charset == '' /* may happen if $evo_charset is not defined yet */ )
-	{ // no conversation required
-		if( isset($GLOBALS['Timer']) )
+	{	// no conversation required
+		if( isset( $GLOBALS['Timer'] ) )
 		{
-			$GLOBALS['Timer']->pause('convert_charset', false );
+			$GLOBALS['Timer']->pause( 'convert_charset', false );
 		}
 		return $string;
 	}
 
-	if( function_exists('mb_convert_variables') )
-	{ // mb_string extension:
+	if( function_exists( 'mb_convert_variables' ) )
+	{	// Convert by mbstring extension if it is enabled:
 		mb_convert_variables( $dest_charset, $src_charset, $string );
 	}
-	// pre_dump( $dest_charset, $src_charset, $string );
-
-	if( isset($GLOBALS['Timer']) )
-	{
-		$GLOBALS['Timer']->pause('convert_charset', false );
+	elseif( function_exists( 'iconv' ) )
+	{	// Convert by iconv extension it it is enabled:
+		$string = iconv( $src_charset, $dest_charset, $string );
 	}
+
+	if( isset( $GLOBALS['Timer'] ) )
+	{
+		$GLOBALS['Timer']->pause( 'convert_charset', false );
+	}
+
 	return $string;
 }
 

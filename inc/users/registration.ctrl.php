@@ -65,14 +65,14 @@ switch ( $action )
 		$after_email_validation = param( 'after_email_validation', 'string', 'return_to_original' );
 		if( $after_email_validation != 'return_to_original' )
 		{
-			$after_email_validation = param( 'specific_after_validation_url', 'string', NULL );
+			$after_email_validation = param( 'specific_after_validation_url', 'url', NULL );
 			param_check_url( 'specific_after_validation_url', 'http-https' );
 		}
 
 		$after_registration = param( 'after_registration', 'string', 'return_to_original' );
 		if( $after_registration != 'return_to_original' )
 		{
-			$after_registration = param( 'specific_after_registration_url', 'string', NULL );
+			$after_registration = param( 'specific_after_registration_url', 'url', NULL );
 			param_check_url( 'specific_after_registration_url', 'http-https' );
 		}
 

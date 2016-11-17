@@ -253,9 +253,23 @@ class BlogCache extends DataObjectCache
 			// Allow the collections that available for members:
 			global $current_User;
 			$sql_where .= ' OR ( blog_in_bloglist = "member" AND (
-					( SELECT grp_ID FROM T_groups WHERE grp_ID = '.$current_User->grp_ID.' AND grp_perm_blogs IN ( "viewall", "editall" ) ) OR
-					( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND bloguser_user_ID = '.$current_User->ID.' ) OR
-					( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND bloggroup_group_ID = '.$current_User->grp_ID.' )
+					( SELECT grp_ID
+					    FROM T_groups
+					   WHERE grp_ID = '.$current_User->grp_ID.'
+					     AND grp_perm_blogs IN ( "viewall", "editall" ) ) OR
+					( SELECT bloguser_user_ID
+					    FROM T_coll_user_perms
+					   WHERE bloguser_blog_ID = blog_ID
+					     AND bloguser_ismember = 1
+					     AND bloguser_user_ID = '.$current_User->ID.' ) OR
+					( SELECT bloggroup_group_ID
+					    FROM T_coll_group_perms
+					   WHERE bloggroup_blog_ID = blog_ID
+					     AND bloggroup_ismember = 1
+					     AND ( bloggroup_group_ID = '.$current_User->grp_ID.'
+					           OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$current_User->ID.' ) )
+					  LIMIT 1
+					)
 				) )';
 		}
 		$SQL->WHERE( '( '.$sql_where.' )' );
@@ -374,12 +388,14 @@ class BlogCache extends DataObjectCache
 		// Note: We only JOIN in the advanced perms if any given blog has them enabled,
 		// otherwise they are ignored!
 		$sql = 'SELECT DISTINCT T_blogs.*
-		          FROM T_blogs LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0
-		          																				AND blog_ID = bloguser_blog_ID
-		          																				AND bloguser_user_ID = '.$user_ID.' )
-		          		 LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0
-		          																	AND blog_ID = bloggroup_blog_ID
-		          																	AND bloggroup_group_ID = '.$Group->ID.' )';
+			FROM T_blogs
+			LEFT JOIN T_coll_user_perms ON ( blog_advanced_perms <> 0
+			      AND blog_ID = bloguser_blog_ID
+			      AND bloguser_user_ID = '.$user_ID.' )
+			LEFT JOIN T_coll_group_perms ON ( blog_advanced_perms <> 0
+			      AND blog_ID = bloggroup_blog_ID
+			      AND ( bloggroup_group_ID = '.$Group->ID.'
+			            OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$user_ID.' ) ) )';
 
 		if( isset( $sql_filter ) )
 		{	// Filter collections:
@@ -520,8 +536,19 @@ class BlogCache extends DataObjectCache
 		{	// If a subscribing is available only for the public collections:
 			$blog_cache_SQL->WHERE_and( '( blog_ID NOT IN ( SELECT cset_coll_ID FROM evo_coll_settings WHERE cset_name = "allow_access" AND cset_value = "members" ) ) OR
 				( blog_ID IN ( SELECT cset_coll_ID FROM evo_coll_settings WHERE cset_name = "allow_access" AND cset_value = "members" ) AND (
-					( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND bloguser_user_ID = '.$User->ID.' ) OR
-					( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND bloggroup_group_ID = '.$User->grp_ID.' )
+					( SELECT bloguser_user_ID
+					    FROM T_coll_user_perms
+					   WHERE bloguser_blog_ID = blog_ID
+					     AND bloguser_ismember = 1
+					     AND bloguser_user_ID = '.$User->ID.' ) OR
+					( SELECT bloggroup_group_ID
+					    FROM T_coll_group_perms
+					   WHERE bloggroup_blog_ID = blog_ID
+					     AND bloggroup_ismember = 1
+					     AND ( bloggroup_group_ID = '.$User->grp_ID.'
+					           OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$User->ID.' ) )
+					  LIMIT 1
+					)
 				) )' );
 		}
 

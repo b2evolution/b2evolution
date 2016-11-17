@@ -65,7 +65,7 @@ if( $Settings->get('system_lock') )
 // Check user permissions to post this comment:
 if( $comment_type == 'meta' )
 { // Meta comment
-	if( ! $current_User->check_perm( 'meta_comment', 'add', false, $Blog->ID ) )
+	if( ! $commented_Item->can_meta_comment() )
 	{ // Current user has no permission to post a meta comment
 		$Messages->add( T_('You cannot leave meta comments on this post!'), 'error' );
 		header_redirect(); // Will save $Messages into Session

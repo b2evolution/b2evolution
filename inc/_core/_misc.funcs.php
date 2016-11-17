@@ -7714,13 +7714,17 @@ jQuery( '.btn-group.dropdown.autoselected li a' ).click( function()
 {
 	var item = jQuery( this ).parent();
 	var status = item.attr( 'rel' );
-	var button = jQuery( this ).parent().parent().prev();
+	var dropdown_buttons = item.parent().parent().find( 'button' );
+	var first_button = dropdown_buttons.parent().find( 'button:first' );
 	var field_name = jQuery( this ).parent().parent().attr( 'aria-labelledby' );
 
 	// Change status class name to new changed for all buttons:
-	button.attr( 'class', button.attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + status ) );
+	dropdown_buttons.each( function()
+	{
+		jQuery( this ).attr( 'class', jQuery( this ).attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + status ) );
+	} );
 	// Update selector button to status title:
-	button.find( 'span:first' ).html( item.find( 'span:last' ).html() );
+	first_button.find( 'span:first' ).html( item.find( 'span:last' ).html() ); // update selector button to status title
 	// Update hidden field to new status value:
 	jQuery( 'input[type=hidden][name=' + field_name + ']' ).val( status );
 	// Hide dropdown menu:
@@ -7784,8 +7788,6 @@ function get_script_baseurl()
  */
 function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title = '#', $value = NULL )
 {
-	$badge_class = 'badge badge-warning';
-
 	switch( $type )
 	{
 		case 'coll':
@@ -7818,21 +7820,6 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
 			}
 			break;
 
-		case 'group':
-			if( $value == 'primary' )
-			{	// Use text for primary group:
-				$text = T_('Primary');
-				$badge_class = 'label label-primary';
-			}
-			else
-			{	// Use text for secondary group:
-				$text = T_('Secondary');
-				$badge_class = 'label label-info';
-			}
-			$title = '';
-			$manual_url = '';
-			break;
-
 		default:
 			// Unknown badge type:
 			return '';
@@ -7846,7 +7833,7 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
 	{	// Use link:
 		$r = ' <a href="'.get_manual_url( $manual_url ).'" target="_blank"';
 	}
-	$r .= ' class="'.$badge_class.'"';
+	$r .= ' class="badge badge-warning"';
 	if( ! empty( $title ) && $title != '#' )
 	{	// Use title for tooltip:
 		$r .= ' data-toggle="tooltip" data-placement="top" title="'.format_to_output( $title, 'htmlattr' ).'"';

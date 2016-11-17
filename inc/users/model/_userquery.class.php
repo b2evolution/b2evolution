@@ -184,7 +184,9 @@ class UserQuery extends SQL
 		$usergroups_SQL->SELECT( 'user_ID' );
 		$usergroups_SQL->FROM( 'T_users' );
 		$usergroups_SQL->FROM_add( 'INNER JOIN T_groups ON grp_ID = user_grp_ID' );
-		$usergroups_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON ( bloggroup_group_ID = grp_ID AND bloggroup_ismember = 1 )' );
+		$usergroups_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON ( bloggroup_ismember = 1
+			AND ( bloggroup_group_ID = grp_ID
+			      OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = user_ID ) ) )' );
 		$usergroups_SQL->WHERE( 'bloggroup_blog_ID = '.$DB->quote( $Blog->ID ) );
 
 		$members_count_sql = 'SELECT DISTINCT user_ID FROM ( '

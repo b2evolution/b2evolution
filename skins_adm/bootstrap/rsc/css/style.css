@@ -845,7 +845,6 @@ h2.user_title {
   font-weight: normal;
   color: #999;
   margin: 40px 0 30px;
-  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;
@@ -1220,6 +1219,14 @@ div.level3 nav .nav > li + li {
 }
 .skinshot .legend {
   margin: 0 1ex;
+  width: 240px;
+  height: 50px;
+  overflow: hidden;
+}
+.skinshot .legend label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .coll_settings_skinshot .skinshot {
   padding: 0;

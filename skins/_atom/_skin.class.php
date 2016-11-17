@@ -21,7 +21,7 @@ class _atom_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.8';
+	var $version = '6.7.9';
 
   /**
 	 * Get default name for the skin.

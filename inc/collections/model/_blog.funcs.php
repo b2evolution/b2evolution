@@ -712,7 +712,7 @@ function check_allow_disp( $disp )
 	}
 
 	$messages_content = $Messages->get_string( '', '', '', 'raw' );
-	if( ( strstr( $messages_content, 'disp=activateinfo' ) !== false ) || ( strstr( $messages_content, 'action=req_validatemail' ) !== false ) )
+	if( ( strstr( $messages_content, 'disp=activateinfo' ) !== false ) || ( strstr( $messages_content, 'action=req_activate_email' ) !== false ) )
 	{ // If there is already a message to display activateinfo link, then don't add this message again
 		return;
 	}
@@ -1558,20 +1558,20 @@ function blogs_all_results_block( $params = array() )
 	}
 
 	$SQL = new SQL();
-	$SQL->SELECT( 'T_blogs.*, user_login, IF( cufv_user_id IS NULL, 0, 1 ) AS blog_favorite' );
+	$SQL->SELECT( 'DISTINCT blog_ID, T_blogs.*, user_login, IF( cufv_user_id IS NULL, 0, 1 ) AS blog_favorite' );
 	$SQL->FROM( 'T_blogs INNER JOIN T_users ON blog_owner_user_ID = user_ID' );
 	$SQL->FROM_add( 'LEFT JOIN T_coll_user_favs ON ( cufv_blog_ID = blog_ID AND cufv_user_ID = '.$current_User->ID.' )' );
 
 	if( ! $current_User->check_perm( 'blogs', 'view' ) )
 	{ // We do not have perm to view all blogs... we need to restrict to those we're a member of:
 
-		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0'
-			. ' AND blog_ID = bloguser_blog_ID'
-			. ' AND bloguser_user_ID = ' . $current_User->ID . ' )'
-			. ' LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0'
-			. ' AND blog_ID = bloggroup_blog_ID'
-			. ' AND bloggroup_group_ID = ' . $current_User->grp_ID . ' )' );
-		$SQL->WHERE( 'blog_owner_user_ID = ' . $current_User->ID
+		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON ( blog_ID = bloguser_blog_ID'
+			. ' AND bloguser_user_ID = ' . $current_User->ID . ' )' );
+		$SQL->FROM_add( ' LEFT JOIN T_coll_group_perms ON ( blog_ID = bloggroup_blog_ID'
+			. ' AND ( bloggroup_group_ID = ' . $current_User->grp_ID
+			. '       OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$current_User->ID.' ) ) )' );
+		$SQL->WHERE( 'blog_advanced_perms <> 0' );
+		$SQL->WHERE_and( 'blog_owner_user_ID = ' . $current_User->ID
 			. ' OR bloguser_ismember <> 0'
 			. ' OR bloggroup_ismember <> 0' );
 
