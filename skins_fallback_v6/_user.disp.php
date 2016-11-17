@@ -113,7 +113,7 @@ echo '<div class="profile_column_right">';
 		'item_text_end'    => '</div>',
 		'item_end'         => '</div>',
 		'list_end'         => '</div>',
-		'group_end'        => '</div><fieldset>',
+		'group_end'        => '</div></fieldset>',
 		// The following (optional) params will be used as defaults for widgets with code "subcontainer":
 		'override_params_for_subcontainer' => array(
 			// This will enclose each widget in a block:
