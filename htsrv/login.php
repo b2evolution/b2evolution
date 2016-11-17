@@ -125,6 +125,7 @@ switch( $action )
 			if( ( $login == $last_request_login ) && ( ( $servertimenow - $pwdchange_request_delay ) < $last_request_ts ) )
 			{ // the same request was sent from the same session in the last $pwdchange_request_delay seconds ( 5 minutes by default )
 				$Messages->add( sprintf( T_('We have already sent you a password reset email at %s. Please allow %d minutes for delivery before requesting a new one.' ), date( locale_datetimefmt(), $last_request_ts ), $pwdchange_request_delay / 60 ) );
+				// Go back to login page:
 				$action = 'req_login';
 				break;
 			}
@@ -133,7 +134,7 @@ switch( $action )
 		$UserCache = & get_UserCache();
 		$UserCache->clear();
 		if( is_email( $login ) )
-		{ // user gave an email, get users by email
+		{ // User gave an email address, get first matching User (that is activated) for this email address:
 			$only_activated = false;
 			// load all not closed users with this email address
 			$login = utf8_strtolower( $login );
@@ -166,14 +167,15 @@ switch( $action )
 			$UserCache->rewind();
 		}
 		else
-		{ // get user by login
+		{ // User gave a login, get hat User by login:
 			$forgetful_User = & $UserCache->get_by_login( $login );
 		}
 
 		if( ! $forgetful_User )
-		{ // User does not exist
-			// pretend that the email is sent for avoiding guessing user_login
-			$Messages->add( T_('If you correctly entered your login or email address, a link to change your password has been sent to your registered email address.' ), 'success' );
+		{	// User does not exist
+			// pretend that the email is sent to make it harder for attackers to guess user logins
+			$Messages->add( T_('If you correctly entered your login or email address, a link to reset your password has been sent to your registered email address.' ), 'success' );
+			// Go back to login page:
 			$action = 'req_login';
 			break;
 		}
@@ -181,21 +183,19 @@ switch( $action )
 		// echo 'email: ', $forgetful_User->email;
 		// echo 'locale: '.$forgetful_User->locale;
 
-		if( $demo_mode && ($forgetful_User->ID <= 3) )
+		if( $demo_mode )
 		{
-			$Messages->add( T_('You cannot reset this account in demo mode.'), 'error' );
+			$Messages->add( T_('You cannot reset passwords in demo mode.'), 'error' );
+			// Go back to login page:
 			$action = 'req_login';
 			break;
 		}
 
 		locale_temp_switch( $forgetful_User->locale );
 
-		// DEBUG!
-		// echo $message.' (password not set yet, only when sending email does not fail);
-
 		if( empty( $forgetful_User->email ) )
 		{
-			$Messages->add( T_('You have no email address with your profile, therefore we cannot reset your password.')
+			$Messages->add( T_('Your user account has no associated email address; therefore we cannot reset your password.')
 				.' '.T_('Please try contacting the admin.'), 'error' );
 		}
 		else
