@@ -1186,9 +1186,9 @@ function get_visibility_statuses( $format = '', $exclude = array('trash'), $chec
 					'published'  => T_('This is visible by everyone.'),
 					'community'  => T_('This is visible by logged-in users only.'),
 					'protected'  => T_('This is visible by members only.'),
-					'review'     => T_('This is waiting for review and is visible by moderator only.'),
-					'private'    => T_('This is visible by the owner/author of the post and collection administrators.'),
-					'draft'      => is_admin_page() ? T_('This is a draft') : T_('This is a draft and visible only by the owner/author of the post and collection administrators.'),
+					'review'     => T_('This is waiting for review and is visible by moderators only.'),
+					'private'    => T_('This is visible only by the owner/author of the post and collection administrators.'),
+					'draft'      => is_admin_page() ? T_('This is a draft.') : T_('This is a draft and is visible only by the owner/author of the post and collection administrators.'),
 					'deprecated' => T_('This is deprecated and visible in the Back-Office only.'),
 					'redirected' => T_('This will redirect to another page when accessed from the Front-Office.'),
 				);
