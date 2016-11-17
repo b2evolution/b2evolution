@@ -1095,6 +1095,10 @@ function get_inskin_statuses_options( & $edited_Blog, $type )
 				'', // Note
 				'', // Class
 				$status_is_hidden, // Hidden field instead of checkbox?
+				array(
+					'data-toggle' => 'tooltip',
+					'data-placement' => 'top',
+					'title' => get_status_tooltip_title( $status ) )
 			);
 	}
 
@@ -1174,6 +1178,19 @@ function get_visibility_statuses( $format = '', $exclude = array('trash'), $chec
 					'draft'      => NT_('Save as Draft!'),
 					'deprecated' => NT_('Save as Deprecated!'),
 					'redirected' => NT_('Save as Redirected!'),
+				);
+			break;
+
+		case 'tooltip-titles':
+			$r = array(
+					'published'  => T_('This is visible by everyone.'),
+					'community'  => T_('This is visible by logged-in users only.'),
+					'protected'  => T_('This is visible by members only.'),
+					'review'     => T_('This is waiting for review and is visible by moderators only.'),
+					'private'    => T_('This is visible only by the owner/author of the post and collection administrators.'),
+					'draft'      => is_admin_page() ? T_('This is a draft.') : T_('This is a draft and is visible only by the owner/author of the post and collection administrators.'),
+					'deprecated' => T_('This is deprecated and visible in the Back-Office only.'),
+					'redirected' => T_('This will redirect to another page when accessed from the Front-Office.'),
 				);
 			break;
 
@@ -1383,6 +1400,20 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow
 	return $result;
 }
 
+
+function get_status_tooltip_title( $status )
+{
+	$visibility_statuses = get_visibility_statuses( 'tooltip-titles' );
+
+	if( isset( $visibility_statuses[$status] ) )
+	{
+		return $visibility_statuses[$status];
+	}
+	else
+	{
+		debug_die( 'Invalid status value' );
+	}
+}
 
 /**
  * Get Blog object from general setting

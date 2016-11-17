@@ -207,7 +207,7 @@ while( $Item = & $ItemList->get_item() )
 		<div class="panel-body">
 			<?php
 				$Item->format_status( array(
-						'template' => '<div class="pull-right"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+						'template' => '<div class="pull-right"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 					) );
 			?>
 			<!-- TODO: Tblue> Do not display link if item does not get displayed in the frontend (e. g. not published). -->
