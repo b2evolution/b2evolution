@@ -952,7 +952,7 @@ switch( $action )
 		 */
 		track_step( 'install-start' );
 
-		$create_sample_contents = param( 'create_sample_contents', 'boolean', false, true );
+		$create_sample_contents = param( 'create_sample_contents', 'string', false, true );   // during auto install this param can be 'all'
 		$create_sample_organization = param( 'create_sample_organization', 'boolean', false, true );
 		$create_demo_users = param( 'create_demo_users', 'boolean', false, true );
 
