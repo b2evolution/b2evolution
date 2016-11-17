@@ -432,7 +432,7 @@ function get_request_title( $params = array() )
 			'contacts_text'       => T_('Contacts'),
 			'login_text'          => /* TRANS: trailing space = verb */ T_('Login '),
 			'register_text'       => T_('Register'),
-			'req_validatemail'    => T_('Account activation'),
+			'req_activate_email'    => T_('Account activation'),
 			'account_activation'  => T_('Account activation'),
 			'lostpassword_text'   => T_('Lost your password?'),
 			'profile_text'        => T_('User Profile'),
@@ -597,9 +597,9 @@ function get_request_title( $params = array() )
 
 		case 'login':
 			// We are requesting the login form:
-			if( $action == 'req_validatemail' )
+			if( $action == 'req_activate_email' )
 			{
-				$r[] = $params['req_validatemail'];
+				$r[] = $params['req_activate_email'];
 			}
 			else
 			{
@@ -2343,7 +2343,7 @@ function display_login_form( $params )
 
 	if( $params['display_abort_link']
 		&& empty( $params['login_required'] )
-		&& $params['action'] != 'req_validatemail'
+		&& $params['action'] != 'req_activate_email'
 		&& strpos( $return_to, $admin_url ) !== 0
 		&& strpos( $ReqHost.$return_to, $admin_url ) !== 0 )
 	{ // No login required, allow to pass through
@@ -2421,9 +2421,9 @@ function display_login_form( $params )
 		}
 
 		$Form->hidden( 'validate_required', $params[ 'validate_required' ] );
-		if( isset( $params[ 'action' ],  $params[ 'reqID' ], $params[ 'sessID' ] ) &&  $params[ 'action' ] == 'validatemail' )
+		if( isset( $params[ 'action' ],  $params[ 'reqID' ], $params[ 'sessID' ] ) &&  $params[ 'action' ] == 'activateacc_sec' )
 		{ // the user clicked the link from the "validate your account" email, but has not been logged in; pass on the relevant data:
-			$Form->hidden( 'action', 'validatemail' );
+			$Form->hidden( 'action', 'activateacc_sec' );
 			$Form->hidden( 'reqID', $params[ 'reqID' ] );
 			$Form->hidden( 'sessID', $params[ 'sessID' ] );
 		}
@@ -2698,7 +2698,7 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 	echo '<li>'.T_('Please enter your login (or email address) above.').'</li>';
 	echo '<li>'.T_('An email will be sent to your registered email address immediately.').'</li>';
 	echo '<li>'.T_('As soon as you receive the email, click on the link therein to reset your password.').'</li>';
-	echo '<li>'.T_('Your browser will open a page where you can chose a new password.').'</li>';
+	echo '<li>'.T_('Your browser will open a page where you can set a new password.').'</li>';
 	echo '</ol>';
 	echo '<p class="red"><strong>'.T_('Important: for security reasons, you must do steps 1 and 4 on the same computer and same web browser. Do not close your browser in between.').'</strong></p>';
 
@@ -2775,7 +2775,7 @@ function display_activateinfo( $params )
 		$Form->begin_form( $params[ 'form_class' ] );
 
 		$Form->add_crumb( 'validateform' );
-		$Form->hidden( 'action', 'req_validatemail');
+		$Form->hidden( 'action', 'req_activate_email');
 		$Form->hidden( 'redirect_to', $params[ 'redirect_to' ] );
 		if( $params[ 'inskin' ] )
 		{
@@ -2786,7 +2786,7 @@ function display_activateinfo( $params )
 		{ // Form title in standard form
 			echo '<h4>'.$params['form_title'].'</h4>';
 		}
-		$Form->hidden( 'req_validatemail_submit', 1 ); // to know if the form has been submitted
+		$Form->hidden( 'req_activate_email_submit', 1 ); // to know if the form has been submitted
 
 		$Form->begin_fieldset();
 
@@ -2885,7 +2885,7 @@ function display_activateinfo( $params )
 		$Form->begin_form( 'evo_form__login' );
 
 		$Form->add_crumb( 'validateform' );
-		$Form->hidden( 'action', 'validatemail' );
+		$Form->hidden( 'action', 'activateacc_sec' );
 		$Form->hidden( 'redirect_to', url_rel_to_same_host( $redirect_to, get_htsrv_url( true ) ) );
 		$Form->hidden( 'reqID', 1 );
 		$Form->hidden( 'sessID', $Session->ID );

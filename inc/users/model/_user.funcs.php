@@ -316,7 +316,7 @@ function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
 	}
 	else
 	{ // Use normal/standard lostpassword form (without blog skin)
-		$activateinfo_url = get_htsrv_url( true ).'login.php?action=req_validatemail';
+		$activateinfo_url = get_htsrv_url( true ).'login.php?action=req_activate_email';
 	}
 
 	return url_add_param( $activateinfo_url, 'redirect_to='.rawurlencode( $redirect_to ), $glue ) ;
@@ -395,7 +395,7 @@ function redirect_after_account_activation()
 	if( $redirect_to == 'return_to_original' )
 	{ // we want to return to original page after account activation
 		// the redirect_to param should be set in the Session. This was set when the account activation email was sent.
-		$redirect_to = $Session->get( 'core.validatemail.redirect_to' );
+		$redirect_to = $Session->get( 'core.activateacc.redirect_to' );
 		// if the redirect_to is not set in the Session or is empty, we MUST NEVER let to redirect back to the origianl page which can be hotmail, gmail, etc.
 		if( empty( $redirect_to ) )
 		{ // session redirect_to was not set, initialize $redirect_to to the home page

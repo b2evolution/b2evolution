@@ -42,7 +42,7 @@ param( 'return_to', 'url', $ReqURI );
 switch( $action )
 {
 	case 'logout':
-		// log out the current user:
+		// Log the current user out:
 
 		logout(); // logout $Session and set $current_User = NULL
 
@@ -111,7 +111,8 @@ switch( $action )
 		break;
 
 	case 'resetpassword': 
-		// Send password change request by mail
+		// Send password reset request by email:
+
 		global $servertimenow;
 		$login_required = true; // Do not display "Without login.." link on the form
 
@@ -187,9 +188,6 @@ switch( $action )
 			break;
 		}
 
-		// echo 'email: ', $forgetful_User->email;
-		// echo 'locale: '.$forgetful_User->locale;
-
 		locale_temp_switch( $forgetful_User->locale );
 
 		if( $demo_mode )
@@ -259,7 +257,7 @@ switch( $action )
 
 
 	case 'changepwd': 
-		// Clicked "Reset password NOW" link from an password request email:
+		// User clicked "Reset password NOW" link from an password reset email:
 
 		param( 'reqID', 'string', '' );
 
@@ -310,7 +308,7 @@ switch( $action )
 
 
 	case 'updatepwd':
-		// Update password (The submit action of the above reset password form):
+		// User is updating his password (submit action of the above reset password form):
 
 		param( 'reqID', 'string', '' );
 
@@ -356,8 +354,8 @@ switch( $action )
 		break;
 
 
-	case 'activateaccount': 
-		// Clicked link to activate account from an account activation reminder email:
+	case 'activateacc_ez': 
+		// User clicked 'Activate NOW' or 'Reactivate NOW' from an account activation email with EASY activation process (first email or reminder):
 	
 		// Stop a request from the blocked IP addresses or Domains
 		antispam_block_request();
@@ -390,7 +388,7 @@ switch( $action )
 		elseif( empty( $last_reminder_key ) || ( $last_reminder_key != $reminder_key ) )
 		{ // the reminder key in db is empty or not equal with the received one
 			$Messages->add( T_('Invalid account activation request!'), 'error' );
-			$action = 'req_validatemail';
+			$action = 'req_activate_email';
 			break;
 		}
 
@@ -405,8 +403,9 @@ switch( $action )
 		/* exited */
 		break;
 
-	case 'validatemail': 
-		// Clicked "Validate email" link from an email:
+	case 'activateacc_sec': 
+		// User clicked 'Activate NOW' or 'Reactivate NOW' from an account activation email with SECURE activation process (first email or reminder):
+		// fp> NOTE: I am not sure secure process works allows reminders.
 
 		// Stop a request from the blocked IP addresses or Domains
 		antispam_block_request();
@@ -416,7 +415,7 @@ switch( $action )
 
 		if( check_user_status( 'is_validated' ) )
 		{ // Already validated, e.g. clicked on an obsolete email link:
-			$Messages->add( T_('Your email address has already been validated.'), 'note' );
+			$Messages->add( T_('Your account has already been activated.'), 'note' );
 			// no break: cleanup & redirect below
 		}
 		else
@@ -424,8 +423,8 @@ switch( $action )
 			// Check valid format:
 			if( empty($reqID) )
 			{ // This was not requested
-				$Messages->add( T_('Invalid email address validation request!'), 'error' );
-				$action = 'req_validatemail';
+				$Messages->add( T_('Invalid account activation request!'), 'error' );
+				$action = 'req_activate_email';
 				break;
 			}
 
@@ -433,17 +432,17 @@ switch( $action )
 			if( $sessID != $Session->ID )
 			{ // Another session ID than for requesting account validation link used!
 				$Messages->add( T_('You have to use the same session (by means of your session cookie) as when you have requested the action. Please try again...'), 'error' );
-				$action = 'req_validatemail';
+				$action = 'req_activate_email';
 				break;
 			}
 
 			// Validate provided reqID against the one stored in the user's session
-			$request_ids = $Session->get( 'core.validatemail.request_ids' );
+			$request_ids = $Session->get( 'core.activateacc.request_ids' );
 			if( ( ! is_array($request_ids) || ! in_array( $reqID, $request_ids ) )
 				&& ! ( isset($current_User) && $current_User->grp_ID == 1 && $reqID == 1 /* admin users can validate themselves by a button click */ ) )
 			{
-				$Messages->add( T_('Invalid email address validation request!'), 'error' );
-				$action = 'req_validatemail';
+				$Messages->add( T_('Invalid account activation request!'), 'error' );
+				$action = 'req_activate_email';
 				$login_required = true; // Do not display "Without login.." link on the form
 				break;
 			}
@@ -452,22 +451,22 @@ switch( $action )
 			{ // this can happen, if a new user registers and clicks on the "validate by email" link, without logging in first
 				// Note: we reuse $reqID and $sessID in the form to come back here.
 
-				$Messages->add( T_('Please login to validate your account.'), 'error' );
+				$Messages->add( T_('Please log in to activate your account.'), 'error' );
 				break;
 			}
 
 			// activate user account
 			$current_User->activate_from_Request();
 
-			$Messages->add( T_( 'Your email address has been validated.' ), 'success' );
+			$Messages->add( T_( 'Your account is now activated.' ), 'success' );
 		}
 
 		// init redirect_to
 		$redirect_to = redirect_after_account_activation();
 
 		// Cleanup:
-		$Session->delete('core.validatemail.request_ids');
-		$Session->delete('core.validatemail.redirect_to');
+		$Session->delete('core.activateacc.request_ids');
+		$Session->delete('core.activateacc.redirect_to');
 
 		// redirect Will save $Messages into Session:
 		header_redirect( $redirect_to );
@@ -481,8 +480,9 @@ switch( $action )
 /* For actions that other delegate to from the switch above: */
 switch( $action )
 {
-	case 'req_validatemail':
-		// Send activation link by email (initial form and action)
+	case 'req_activate_email':
+		// User wants to request a new activation link by email (initial form and action):
+
 		if( ! is_logged_in() )
 		{
 			$Messages->add( T_('You have to be logged in to request an account validation link.'), 'error' );
@@ -496,10 +496,10 @@ switch( $action )
 			break;
 		}
 
-		param( 'req_validatemail_submit', 'integer', 0 ); // has the form been submitted
+		param( 'req_activate_email_submit', 'integer', 0 ); // has the form been submitted
 		$email = utf8_strtolower( param( $dummy_fields['email'], 'string', $current_User->email ) ); // the email address is editable
 
-		if( $req_validatemail_submit )
+		if( $req_activate_email_submit )
 		{ // Form has been submitted
 			param_check_email( $dummy_fields['email'], true );
 
@@ -526,7 +526,7 @@ switch( $action )
 				}
 			}
 
-			// Call plugin event to allow catching input in general and validating own things from DisplayRegisterFormFieldset event
+			// Call plugin event to allow catching input in general and validating own things from DisplayRegisterFormFieldset event:
 			$Plugins->trigger_event( 'ValidateAccountFormSent' );
 
 			if( $Messages->has_errors() )
@@ -547,7 +547,7 @@ switch( $action )
 			$inskin_blog = $inskin ? $blog : NULL;
 			if( $current_User->send_validate_email( $redirect_to, $inskin_blog, $email_changed ) )
 			{
-				$Messages->add( sprintf( /* TRANS: %s gets replaced by the user's email address */ T_('An email has been sent to your email address (%s). Please click on the link therein to validate your account.'), $current_User->dget('email') ), 'success' );
+				$Messages->add( sprintf( /* TRANS: %s gets replaced by the user's email address */ T_('An email has been sent to your email address (%s). Please click on the link therein to activate your account.'), $current_User->dget('email') ), 'success' );
 			}
 			elseif( $demo_mode )
 			{
@@ -555,22 +555,22 @@ switch( $action )
 			}
 			else
 			{
-				$Messages->add( T_('Sorry, the email with the link to validate and activate your password could not be sent.')
+				$Messages->add( T_('Sorry, the email with the link to activate your account could not be sent.')
 							.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
 			}
 		}
 		else
 		{ // Form not yet submitted:
 			// Add a note, if we have already sent validation links:
-			$request_ids = $Session->get( 'core.validatemail.request_ids' );
+			$request_ids = $Session->get( 'core.activateacc.request_ids' );
 			if( is_array($request_ids) && count($request_ids) )
 			{
-				$Messages->add( sprintf( T_('We have already sent you %d email(s) with a validation link.'), count($request_ids) ), 'note' );
+				$Messages->add( sprintf( T_('We have already sent you %d email(s) with an activation link.'), count($request_ids) ), 'note' );
 			}
 
 			if( empty($current_User->email) )
 			{ // add (error) note to be displayed in the form
-				$Messages->add( T_('You have no email address with your profile, therefore we cannot validate it. Please give your email address below.'), 'error' );
+				$Messages->add( T_('Your user account has no associated email address; therefore we cannot activate it. Please provide your email address below.'), 'error' );
 			}
 		}
 		break;
@@ -619,8 +619,8 @@ if( $inskin && use_in_skin_login() )
 		{
 			$redirect_to = $Blog->gen_blogurl();
 		}
-		// check if action was req_validatemail
-		if( ( $action == 'req_validatemail' ) && !empty( $current_User ) )
+		// check if action was req_activate_email
+		if( ( $action == 'req_activate_email' ) && !empty( $current_User ) )
 		{ // redirect to inskin activate account page
 			$redirect = url_add_param( $Blog->gen_blogurl(), 'disp=activateinfo', '&' );
 			if( $Messages->has_errors() )
@@ -647,8 +647,9 @@ if( $inskin && use_in_skin_login() )
 	}
 }
 
+
 /**
- * Display standard login screen:
+ * Display one of the standard login management screens:
  */
 switch( $action )
 {
@@ -682,15 +683,15 @@ switch( $action )
 		require $adminskins_path.'login/_html_footer.inc.php';
 		break;
 
-	case 'req_validatemail':
+	case 'changepwd':
+		// Display form to reset password: (after 'lostpassword' form has been submitted and email has been received+clicked)
+		require $adminskins_path.'login/_reset_pwd_form.main.php';
+		break;
+
+	case 'req_activate_email':
 		// Send activation link by email (initial form and action)
 		// Display validation form:
 		require $adminskins_path.'login/_validate_form.main.php';
-		break;
-
-	case 'changepwd':
-		// Display form to change password:
-		require $adminskins_path.'login/_reset_pwd_form.main.php';
 		break;
 
 	default:
