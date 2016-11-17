@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the login screen. It also handles actions related to loggin in and registering.
+ * This is the login screen. It also handles actions related to logging in/out, registering, changing password and closing account.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -36,6 +36,8 @@ param( 'return_to', 'url', $ReqURI );
 switch( $action )
 {
 	case 'logout':
+		// log out the current user:
+
 		logout();          // logout $Session and set $current_User = NULL
 
 		// TODO: to give the user feedback through Messages, we would need to start a new $Session here and append $Messages to it.
@@ -50,7 +52,9 @@ switch( $action )
 		/* exited */
 		break;
 
-	case 'closeaccount': // close user account and log out
+	case 'closeaccount': 
+		// Close current user account and log out:
+
 		global $Session, $Messages, $UserSettings;
 		$Session->assert_received_crumb( 'closeaccountform' );
 
@@ -99,26 +103,28 @@ switch( $action )
 		/* exited */
 		break;
 
-	case 'retrievepassword': // Send password change request by mail
+	case 'resetpassword': 
+		// Send password change request by mail
 		global $servertimenow;
 		$login_required = true; // Do not display "Without login.." link on the form
 
 		if( empty( $login ) )
 		{ // Don't allow empty request
-			param_error( $dummy_fields['login'], T_('You must enter your username or your email address so we know where to send the password recovery email.'), '' );
+			param_error( $dummy_fields['login'], T_('You must enter your username or your email address so we know where to send the password reset email.'), '' );
 			// Set this var to know after redirection if error was here
 			$lostpassword_error = true;
 			$action = 'lostpassword';
 			break;
 		}
 
+		// Check if a password reset email was already requested recently and block too frequent requests:
 		$request_ts_login = $Session->get( 'core.changepwd.request_ts_login' );
 		if( $request_ts_login != NULL )
 		{
 			list( $last_request_ts, $last_request_login ) = preg_split( '~_~', $request_ts_login );
 			if( ( $login == $last_request_login ) && ( ( $servertimenow - $pwdchange_request_delay ) < $last_request_ts ) )
 			{ // the same request was sent from the same session in the last $pwdchange_request_delay seconds ( 5 minutes by default )
-				$Messages->add( sprintf( T_('We have already sent you a password recovery email at %s. Please allow %d minutes for delivery before requesting a new one.' ), date( locale_datetimefmt(), $last_request_ts ), $pwdchange_request_delay / 60 ) );
+				$Messages->add( sprintf( T_('We have already sent you a password reset email at %s. Please allow %d minutes for delivery before requesting a new one.' ), date( locale_datetimefmt(), $last_request_ts ), $pwdchange_request_delay / 60 ) );
 				$action = 'req_login';
 				break;
 			}
