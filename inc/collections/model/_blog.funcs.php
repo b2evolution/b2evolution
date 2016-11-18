@@ -966,7 +966,7 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	}
 
 	if( $blog_ids == '*' )
-	{
+	{ // All collections
 		$where_cat_clause = '1';
 	}
 	elseif( is_array( $blog_ids ) )
@@ -974,15 +974,15 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 		$where_cat_clause = 'cat_blog_ID IN ( '.$DB->quote( $blog_ids ).' )';
 	}
 	else
-	{ // Get list of relevant blogs
-		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ids );
+	{ // Get list of relevant/ aggregated collections
+		$Blog = & $BlogCache->get_by_ID( $blog_ids );
 		$where_cat_clause = trim( $Blog->get_sql_where_aggregate_coll_IDs( 'cat_blog_ID' ) );
 	}
 
 	// Build query to get the tags:
 	$tags_SQL = new SQL();
 
-	if( $get_cat_blog_ID )
+	if( $blog_ids != '*' || $get_cat_blog_ID )
 	{
 		$tags_SQL->SELECT( 'tag_name, COUNT( DISTINCT itag_itm_ID ) AS tag_count, tag_ID, cat_blog_ID' );
 	}
@@ -995,13 +995,13 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__item ON itag_itm_ID = post_ID' );
 
-	if( $get_cat_blog_ID )
+	if( $blog_ids != '*' || $get_cat_blog_ID )
 	{
 		$tags_SQL->FROM_add( 'INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID' );
 		$tags_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
 	}
 
-	if( $blog_ids != '*' || $skip_intro_posts )
+	if( $skip_intro_posts )
 	{
 		$tags_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
 	}
