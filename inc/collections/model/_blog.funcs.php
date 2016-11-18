@@ -977,6 +977,11 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	{ // Get list of relevant/ aggregated collections
 		$Blog = & $BlogCache->get_by_ID( $blog_ids );
 		$where_cat_clause = trim( $Blog->get_sql_where_aggregate_coll_IDs( 'cat_blog_ID' ) );
+
+		if( $Blog->get_setting( 'aggregate_coll_IDs' ) == '*' )
+		{
+			$blog_ids = '*';
+		}
 	}
 
 	// Build query to get the tags:
