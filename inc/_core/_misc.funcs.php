@@ -7819,19 +7819,13 @@ jQuery( '.btn-group.dropdown.autoselected li a' ).click( function()
 	var item = jQuery( this ).parent();
 	var status = item.attr( 'rel' );
 	var btn_group = item.parent().parent();
-	var dropdown_buttons = btn_group.find( 'button' );
-	var first_button = dropdown_buttons.parent().find( 'button:first' );
+	var button = jQuery( item.parent().parent().find( 'button:first' ) );
 	var field_name = jQuery( this ).parent().parent().attr( 'aria-labelledby' );
 
 	// Change status class name to new changed for all buttons:
-	dropdown_buttons.each( function()
-	{
-		jQuery( this ).attr( 'class', jQuery( this ).attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + status ) );
-	} );
-
+	button.attr( 'class', button.attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + status ) );
 	// Update selector button to status title:
-	first_button.find( 'span:first' ).html( item.find( 'span:last' ).html() ); // update selector button to status title
-
+	button.find( 'span:first' ).html( item.find( 'span:last' ).html() ); // update selector button to status title
 	// Update hidden field to new status value:
 	jQuery( 'input[type=hidden][name=' + field_name + ']' ).val( status );
 	// Hide dropdown menu:
