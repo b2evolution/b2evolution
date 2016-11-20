@@ -154,7 +154,8 @@ function display_base_config_recap()
  */
 function install_newdb()
 {
-	global $new_db_version, $admin_url, $baseurl, $install_login, $random_password, $create_sample_contents;
+	global $new_db_version, $admin_url, $baseurl, $install_login, $random_password;
+	global $create_sample_contents, $create_sample_organization, $create_demo_users;
 
 	/*
 	 * -----------------------------------------------------------------------------------
@@ -190,9 +191,47 @@ function install_newdb()
 	// Update the progress bar status
 	update_install_progress_bar();
 
+	// Create default data
 	echo get_install_format_text( '<h2>'.T_('Creating minimum default data...').'</h2>', 'h2' );
 	evo_flush();
 	create_default_data();
+
+
+	if( $create_sample_organization || $create_demo_users )
+	{
+		echo get_install_format_text( '<h2>'.T_('Creating sample organization and users...').'</h2>', 'h2' );
+		evo_flush();
+
+		// Create sample organization if selected
+		if( $create_sample_organization )
+		{
+			create_sample_organization();
+		}
+
+		// Create demo users if selected
+		if( $create_demo_users )
+		{
+			global $Settings;
+
+			// We're gonna need some environment in order to create the demo contents...
+			load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
+			load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
+			/**
+			* @var GeneralSettings
+			*/
+			$Settings = new GeneralSettings();
+
+			/**
+			* @var UserCache
+			*/
+			$UserCache = & get_UserCache();
+			// Create $current_User object.
+			// (Assigning by reference does not work with "global" keyword (PHP 5.2.8))
+			$GLOBALS['current_User'] = & $UserCache->get_by_ID( 1 );
+
+			create_demo_users();
+		}
+	}
 
 	if( $create_sample_contents )
 	{
@@ -424,6 +463,7 @@ function create_default_settings( $override = array() )
 	global $DB, $new_db_version, $default_locale;
 	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $spam_Group;
 	global $install_test_features, $create_sample_contents, $install_site_color, $local_installation;
+	global $create_sample_organization, $create_demo_users;
 
 	$defaults = array(
 		'db_version' => $new_db_version,
@@ -714,6 +754,11 @@ function install_basic_plugins( $old_db_version = 0 )
 			echo_install_log( 'TEST FEATURE: Activating plugin "Adjust headings"' );
 		}
 		install_plugin( 'cookie_consent_plugin', false );
+	}
+
+	if( $old_db_version < 11730 )
+	{
+		install_plugin( 'custom_tags_plugin', true );
 	}
 }
 
@@ -1139,9 +1184,7 @@ function do_install_htaccess( $upgrade = false, $force_htaccess = false )
 function get_antispam_query()
 {
 	//used base64_encode() for getting this code
-	$r = base64_decode('SU5TRVJUIElOVE8gVF9hbnRpc3BhbShhc3BtX3N0cmluZykgVkFMVUVTICgnb25saW5lLWNhc2lubycpLCAoJ3BlbmlzLWVubGFyZ2VtZW50JyksICgnb3JkZXItdmlhZ3JhJyksICgnb3JkZXItcGhlbnRlcm1pbmUnKSwgKCdvcmRlci14ZW5pY2FsJyksICgnb3JkZXItcHJvcGhlY2lhJyksICgnc2V4eS1saW5nZXJpZScpLCAoJy1wb3JuLScpLCAoJy1hZHVsdC0nKSwgKCctdGl0cy0nKSwgKCdidXktcGhlbnRlcm1pbmUnKSwgKCdvcmRlci1jaGVhcC1waWxscycpLCAoJ2J1eS14ZW5hZHJpbmUnKSwgKCdwYXJpcy1oaWx0b24nKSwgKCdwYXJpc2hpbHRvbicpLCAoJ2NhbWdpcmxzJyksICgnYWR1bHQtbW9kZWxzJyk=');
-	// pre_dump($r);
-	return $r;
+	return base64_decode('SU5TRVJUIElOVE8gVF9hbnRpc3BhbV9fa2V5d29yZCAoIGFza3dfc3RyaW5nICkgVkFMVUVTICgnb25saW5lLWNhc2lubycpLCAoJ3BlbmlzLWVubGFyZ2VtZW50JyksICgnb3JkZXItdmlhZ3JhJyksICgnb3JkZXItcGhlbnRlcm1pbmUnKSwgKCdvcmRlci14ZW5pY2FsJyksICgnb3JkZXItcHJvcGhlY2lhJyksICgnc2V4eS1saW5nZXJpZScpLCAoJy1wb3JuLScpLCAoJy1hZHVsdC0nKSwgKCctdGl0cy0nKSwgKCdidXktcGhlbnRlcm1pbmUnKSwgKCdvcmRlci1jaGVhcC1waWxscycpLCAoJ2J1eS14ZW5hZHJpbmUnKSwgKCdwYXJpcy1oaWx0b24nKSwgKCdwYXJpc2hpbHRvbicpLCAoJ2NhbWdpcmxzJyksICgnYWR1bHQtbW9kZWxzJyk=');
 }
 
 /**
@@ -1279,6 +1322,7 @@ function update_install_progress_bar()
 function get_install_steps_count()
 {
 	global $allow_install_test_features, $allow_evodb_reset;
+	global $create_sample_organization;
 
 	$steps = 0;
 
@@ -1305,6 +1349,12 @@ function get_install_steps_count()
 	// Before install default skins:
 	$steps++;
 
+	// Creating sample organization:
+	if( $create_sample_organization )
+	{
+		$steps++;
+	}
+
 	// Installing sample contents:
 	$create_sample_contents = param( 'create_sample_contents', 'string', '' );
 
@@ -1321,6 +1371,7 @@ function get_install_steps_count()
 			$install_collection_photos = 1;
 			$install_collection_forums = 1;
 			$install_collection_manual = 1;
+			$install_collection_tracker = 1;
 		}
 		else
 		{ // Array contains which collections should be installed
@@ -1331,6 +1382,7 @@ function get_install_steps_count()
 			$install_collection_photos = in_array( 'photos', $collections );
 			$install_collection_forums = in_array( 'forums', $collections );
 			$install_collection_manual = in_array( 'manual', $collections );
+			$install_collection_tracker = in_array( 'group', $collections );
 		}
 
 		if( $install_collection_home )
@@ -1355,6 +1407,11 @@ function get_install_steps_count()
 		}
 		if( $install_collection_manual )
 		{ // After installing of the blog "Manual"
+			$steps++;
+		}
+
+		if( $install_collection_tracker )
+		{ // After installing of the blog "Tracker"
 			$steps++;
 		}
 	}
@@ -1739,6 +1796,7 @@ function update_basic_config_file( $params = array() )
 	global $baseurl, $admin_email, $config_is_done, $action;
 
 	$params = array_merge( array(
+			'create_db'      => 0,
 			'db_user'        => '',
 			'db_password'    => '',
 			'db_name'        => '',
@@ -1757,16 +1815,30 @@ function update_basic_config_file( $params = array() )
 		global $basic_config_file_result_messages;
 	}
 
-	// Connect to DB:
+	// Connect to DB host (without selecting DB because we should maybe create this by request):
 	$DB = new DB( array(
 			'user'     => $params['db_user'],
 			'password' => $params['db_password'],
-			'name'     => $params['db_name'],
 			'host'     => $params['db_host'],
 			'aliases'          => $db_config['aliases'],
 			'connection_charset' => empty( $db_config['connection_charset'] ) ? DB::php_to_mysql_charmap( $evo_charset ) : $db_config['connection_charset'],
 			'halt_on_error'      => false
 		) );
+
+	if( $params['create_db'] )
+	{	// Try to create DB if it doesn't exist yet:
+		$DB->query( 'CREATE DATABASE IF NOT EXISTS `'.$params['db_name'].'`
+			CHARACTER SET '.$DB->connection_charset );
+		if( $DB->error )
+		{
+			display_install_messages( sprintf( T_('You don\'t seem to have permission to create this new database on "%s" (%s).'), $params['db_host'], $DB->last_error ) );
+			$action = 'start';
+			return true;
+		}
+	}
+
+	// Select DB:
+	$DB->select( $params['db_name'] );
 
 	if( $DB->error )
 	{ // restart conf

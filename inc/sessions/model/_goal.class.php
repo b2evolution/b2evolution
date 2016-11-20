@@ -194,7 +194,7 @@ class Goal extends DataObject
 			$existing_goal_ID = $this->dbexists( 'goal_key', $this->get( 'key' ) );
 			if( $existing_goal_ID )
 			{	// We have a duplicate goal:
-				global $Blog;
+				global $Collection, $Blog;
 				param_error( 'goal_key',
 					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
 						'href="?ctrl=goals&amp;action=edit'.( isset( $Blog ) ? '&amp;blog='.$Blog->ID : '' ).'&amp;goal_ID='.$existing_goal_ID.'"' ) );

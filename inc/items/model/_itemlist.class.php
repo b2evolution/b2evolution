@@ -201,7 +201,9 @@ class ItemList2 extends ItemListLight
 			".$DB->quote($item_typ_ID)." AS post_ityp_ID,
 			".$DB->quote($item_st_ID)." AS post_pst_ID,
 			".$DB->quote($item_deadline)." AS post_datedeadline,
-			".$DB->quote($item_priority)." AS post_priority,";
+			".$DB->quote($item_priority)." AS post_priority,
+			0 AS post_addvotes,
+			0 AS post_countvotes,";
 
 		$this->sql .= $DB->quote(param( 'item_order', 'double', NULL )).' AS post_order'.",\n"
 								.$DB->quote(param( 'item_featured', 'integer', NULL )).' AS post_featured'."\n";
@@ -250,10 +252,10 @@ class ItemList2 extends ItemListLight
 
 	/**
 	 * Run Query: GET DATA ROWS *** HEAVY ***
-	 * 
+	 *
 	 * We need this query() stub in order to call it from restart() and still
 	 * let derivative classes override it
-	 * 
+	 *
 	 * @deprecated Use new function run_query()
 	 */
 	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
@@ -321,6 +323,13 @@ class ItemList2 extends ItemListLight
 		// *** STEP 2 ***
 		$this->sql = 'SELECT *'.$select_temp_order.'
 			              FROM '.$this->Cache->dbtablename;
+
+		if( isset( $this->filters['orderby'] ) && $this->filters['orderby'] == 'numviews' )
+		{ // special case for order by number of views
+			$this->sql .= ' LEFT JOIN ( SELECT itud_item_ID, COUNT(*) AS '.$this->Cache->dbprefix.'numviews FROM T_items__user_data GROUP BY itud_item_ID ) AS numviews
+					ON '.$this->Cache->dbIDname.' = numviews.itud_item_ID';
+		}
+
 		if( !empty($ID_list) )
 		{
 			$this->sql .= ' WHERE '.$this->Cache->dbIDname.' IN ('.$ID_list.') '
@@ -713,6 +722,7 @@ class ItemList2 extends ItemListLight
 		$next_Query->where_visibility( $this->filters['visibility_array'] );
 		$next_Query->where_featured( $featured );
 		$next_Query->where_tags( $this->filters['tags'] );
+		$next_Query->where_flagged( $this->filters['flagged'] );
 
 		/*
 		 * ORDER BY stuff:
@@ -745,6 +755,12 @@ class ItemList2 extends ItemListLight
 
 		$next_Query->order_by( $order_by );
 
+		// Special case for numviews
+		if( $orderby_array[0] == 'numviews' )
+		{
+			$next_Query->FROM_add( 'LEFT JOIN ( SELECT itud_item_ID, COUNT(*) AS '.$this->Cache->dbprefix.'numviews FROM T_items__user_data GROUP BY itud_item_ID ) AS numviews
+				ON '.$this->Cache->dbIDname.' = numviews.itud_item_ID' );
+		}
 
 		// LIMIT to 1 single result
 		$next_Query->LIMIT( '1' );
@@ -775,6 +791,24 @@ class ItemList2 extends ItemListLight
 																	.$current_Item->ID
 																.')'
 														 );
+				break;
+
+			case 'numviews':
+				// we need to get the number of members who has viewed the post
+				$numviews = get_item_numviews( $current_Item );
+				$next_Query->WHERE_and( $this->Cache->dbprefix.$orderby_array[0]
+																.$operator
+																.$DB->quote($numviews)
+																.' OR ( '
+                                  .$this->Cache->dbprefix.$orderby_array[0]
+																	.' = '
+																	.$DB->quote($numviews)
+																	.' AND '
+																	.$this->Cache->dbIDname
+																	.$operator
+																	.$current_Item->ID
+																.')'
+															);
 				break;
 
 			case 'title':
@@ -948,7 +982,7 @@ class ItemList2 extends ItemListLight
 			return;
 		}
 
-		// Delegate query: 
+		// Delegate query:
 		load_user_data_for_items( $page_post_ids );
 	}
 }

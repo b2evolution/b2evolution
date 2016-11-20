@@ -54,7 +54,7 @@ switch( $action )
 		$edited_Comment_Item = & $edited_Comment->get_Item();
 		set_working_blog( $edited_Comment_Item->get_blog_ID() );
 		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $blog );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Some users can delete & change a status of comments in their own posts, set corresponding permlevel
 		if( $edited_Comment->is_meta() )
@@ -110,7 +110,7 @@ switch( $action )
 		$edited_Comment = & Comment_get_by_ID( $comment_ID );
 
 		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $blog );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check permission:
 		$current_User->check_perm( 'blog_post!draft', 'edit', true, $blog );
@@ -152,7 +152,7 @@ switch( $action )
 		elseif( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
 		{ // Selected a new blog:
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 		}
 		break;
 
@@ -167,7 +167,7 @@ switch( $action )
 		$edited_Comment_Item = & $edited_Comment->get_Item();
 		set_working_blog( $edited_Comment_Item->get_blog_ID() );
 		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $blog );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check permission for spam voting
 		$current_User->check_perm( 'blog_vote_spam_comments', 'edit', true, $Blog->ID );
@@ -771,6 +771,14 @@ if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit',
 	init_datepicker_js();
 	// Init JS to autocomplete the user logins:
 	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+	// Require colorbox js:
+	require_js_helper( 'colorbox' );
+	// Require File Uploader js and css:
+	require_js( 'multiupload/fileuploader.js' );
+	require_css( 'fileuploader.css' );
+	// Load JS files to make the links table sortable:
+	require_js( '#jquery#' );
+	require_js( 'jquery/jquery.sortable.min.js' );
 }
 
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation

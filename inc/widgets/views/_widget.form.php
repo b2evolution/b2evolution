@@ -19,7 +19,7 @@ load_funcs('plugins/_plugin.funcs.php');
  * @var ComponentWidget
  */
 global $edited_ComponentWidget;
-global $Blog, $admin_url, $AdminUI, $Plugins;
+global $Collection, $Blog, $admin_url, $AdminUI, $Plugins;
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );

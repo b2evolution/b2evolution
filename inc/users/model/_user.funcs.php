@@ -218,7 +218,7 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 			$blog_ID = $blog;
 		}
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog_ID );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 		if( ! empty( $redirect_url ) )
 		{
 			$redirect_url = url_rel_to_same_host( $redirect_url, $Blog->get( $blog_page, array( 'glue' => '&' ) ) );
@@ -258,7 +258,7 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
  */
 function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;', $return_to = NULL )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( empty( $redirect_to ) && $redirect_to !== false )
 	{ // Redirect back to current URL
@@ -303,7 +303,7 @@ function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;', $return_to 
  */
 function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( empty( $redirect_to ) )
 	{ // Redirect back to current URL
@@ -332,12 +332,12 @@ function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
  */
 function get_notifications_url( $glue = '&amp;', $user_ID = NULL )
 {
-	global $blog, $Blog, $admin_url;
+	global $blog, $Collection, $Blog, $admin_url;
 
 	if( ! empty( $blog ) && empty( $Blog ) )
-	{ // Try to initialize global $Blog object
+	{ // Try to initialize global $Collection, $Blog object
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog, false, false );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog, false, false );
 	}
 
 	$use_admin_page_url = false;
@@ -497,7 +497,7 @@ function send_admin_notification( $subject, $template_name, $template_params )
  */
 function use_in_skin_login()
 {
-	global $Blog, $blog;
+	global $Collection, $Blog, $blog;
 
 	if( is_admin_page() )
 	{ // Back-office page
@@ -510,9 +510,9 @@ function use_in_skin_login()
 	}
 
 	if( empty( $Blog ) )
-	{ // Try to initialize global $Blog object
+	{ // Try to initialize global $Collection, $Blog object
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog, false, false );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog, false, false );
 	}
 
 	if( get_setting_Blog( 'login_blog_ID', $Blog ) )
@@ -547,7 +547,7 @@ function show_toolbar()
  */
 function check_setting( $setting_name )
 {
-	global $Settings, $Blog;
+	global $Settings, $Collection, $Blog;
 
 	if( is_admin_page() || empty( $Blog ) )
 	{ // Check setting in the Back office or when Blog is not defined
@@ -676,7 +676,7 @@ function get_user_register_url( $redirect_to = NULL, $default_source_string = ''
 		}
 
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog_ID );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 
 		$register_url = $Blog->get( 'registerurl', array( 'glue' => $glue ) );
 	}
@@ -784,7 +784,7 @@ function get_user_logout_url( $blog_ID = NULL )
 		}
 		if( empty( $current_Blog ) )
 		{ // Use current blog
-			global $Blog;
+			global $Collection, $Blog;
 			$current_Blog = & $Blog;
 		}
 
@@ -1162,7 +1162,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 		$is_admin_tab = false;
 	}
 
-	if( ( !$is_admin_tab ) && ( ! in_array( $user_tab, array( 'profile', 'user', 'avatar', 'pwdchange', 'userprefs', 'subs', 'report' ) ) ) )
+	if( ( !$is_admin_tab ) && ( ! in_array( $user_tab, array( 'profile', 'user', 'avatar', 'pwdchange', 'userprefs', 'subs', 'visits', 'report' ) ) ) )
 	{
 		debug_die( 'Not supported user tab!' );
 	}
@@ -1179,7 +1179,7 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 	}
 	if( empty( $current_Blog ) )
 	{ // Use current blog
-		global $Blog;
+		global $Collection, $Blog;
 		$current_Blog = & $Blog;
 	}
 
@@ -1311,7 +1311,7 @@ function get_user_messaging_link( $before = '', $after = '', $link_text = '#', $
  */
 function get_user_messaging_url()
 {
-	global $current_User, $Blog;
+	global $current_User, $Collection, $Blog;
 
 	if( !is_logged_in() )
 	{
@@ -1375,7 +1375,7 @@ function get_user_contacts_link( $before = '', $after = '', $link_text = '#', $l
  */
 function get_user_contacts_url()
 {
-	global $current_User, $Blog;
+	global $current_User, $Collection, $Blog;
 
 	if( !is_logged_in() )
 	{
@@ -1996,7 +1996,7 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 	/**
 	 * @var Blog
 	 */
-	$Blog = & $BlogCache->get_by_ID( $perm_target_blog );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $perm_target_blog );
 	if( ! $Blog->advanced_perms )
 	{ // We do not abide to advanced perms
 		return false;
@@ -2375,6 +2375,9 @@ function echo_user_actions( $Widget, $edited_User, $action )
 
 	if( $edited_User->ID != 0 )
 	{ // show these actions only if user already exists
+
+		$link_attribs = array( 'style' => 'margin-left:1ex', 'class' => 'btn btn-sm btn-default action_icon' );
+
 		if( $current_User->ID != $edited_User->ID && $current_User->check_status( 'can_report_user' ) )
 		{
 			global $user_tab;
@@ -2389,17 +2392,22 @@ function echo_user_actions( $Widget, $edited_User, $action )
 				$report_text_title = $report_text = T_('You have reported this user');
 				$report_text = '<span class="red">'.$report_text.'</span>';
 			}
-			$Widget->global_icon( $report_text_title, 'warning_yellow', $admin_url.'?ctrl=user&amp;user_tab=report&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.$report_text, 3, 4, array( 'onclick' => 'return user_report( '.$edited_User->ID.', \''.( empty( $user_tab ) ? 'profile' : $user_tab ).'\')' ) );
+			$report_user_link_attribs = array_merge( $link_attribs, array( 'onclick' => 'return user_report( '.$edited_User->ID.', \''.( empty( $user_tab ) ? 'profile' : $user_tab ).'\')' ) );
+			$Widget->global_icon( $report_text_title, 'warning_yellow', $admin_url.'?ctrl=user&amp;user_tab=report&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.$report_text, 3, 4, $report_user_link_attribs );
 		}
 		if( ( $current_User->check_perm( 'users', 'edit', false ) ) && ( $current_User->ID != $edited_User->ID )
 			&& ( $edited_User->ID != 1 ) )
 		{
-			$Widget->global_icon( T_('Delete this user!'), 'delete', $admin_url.'?ctrl=users&amp;action=delete&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete'), 3, 4  );
-			$Widget->global_icon( T_('Delete this user as spammer!'), 'delete', $admin_url.'?ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete spammer'), 3, 4  );
+			$Widget->global_icon( T_('Delete this user!'), 'delete', $admin_url.'?ctrl=users&amp;action=delete&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete'), 3, 4, $link_attribs  );
+			$Widget->global_icon( T_('Delete this user as spammer!'), 'delete', $admin_url.'?ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete spammer'), 3, 4, $link_attribs );
+		}
+		if( $current_User->check_perm( 'files', 'all', false ) )
+		{
+			$Widget->global_icon( T_('Files...'), 'folder', $admin_url.'?ctrl=files&root=user_'.$current_User->ID.'&new_root=user_'.$edited_User->ID, ' '.T_('Files...'), 3, 4, $link_attribs );
 		}
 		if( $edited_User->get_msgform_possibility( $current_User ) )
 		{
-			$Widget->global_icon( T_('Compose message'), 'comments', $admin_url.'?ctrl=threads&action=new&user_login='.$edited_User->login );
+			$Widget->global_icon( T_('Compose message'), 'comments', $admin_url.'?ctrl=threads&action=new&user_login='.$edited_User->login, T_('Compose message'), 4, 1, $link_attribs );
 		}
 	}
 
@@ -2408,7 +2416,7 @@ function echo_user_actions( $Widget, $edited_User, $action )
 	{
 		$redirect_to = regenerate_url( 'user_ID,action,ctrl,user_tab', 'ctrl=users' );
 	}
-	$Widget->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', $redirect_to );
+	$Widget->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', $redirect_to, T_('Close'), 4 , 1 );
 }
 
 
@@ -2470,6 +2478,13 @@ function get_user_sub_entries( $is_admin, $user_ID )
 		$users_sub_entries['subs'] = array(
 							'text' => T_('Notifications'),
 							'href' => url_add_param( $base_url, $ctrl_param.'subs'.$user_param ) );
+
+		if( $Settings->get( 'enable_visit_tracking' ) == 1 )
+		{
+			$users_sub_entries['visits'] = array(
+								'text' => T_('Visits'),
+								'href' => url_add_param( $base_url, $ctrl_param.'visits'.$user_param ) );
+		}
 
 		if( $is_admin )
 		{	// show this only in backoffice
@@ -2627,6 +2642,15 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 	return '<div class="user_header">'.$result.'</div>'.'<div class="clear"></div>';
 }
 
+function add_user_profile_visit( $user_ID, $visitor_user_ID )
+{
+	global $DB, $servertimenow;
+
+	$timestamp = date2mysql( $servertimenow );
+
+	return $DB->query( 'REPLACE INTO T_users__profile_visits( upv_visited_user_ID, upv_visitor_user_ID, upv_last_visit_ts )
+			VALUES ( '.$user_ID.', '.$visitor_user_ID.', "'.$timestamp.'" )' );
+}
 
 /**
  * Check if user can receive new email today with the given email type or the limit was already exceeded
@@ -3162,7 +3186,7 @@ function userfield_prepare( & $userfield )
  */
 function callback_filter_userlist( & $Form )
 {
-	global $Settings, $current_User, $Blog, $edited_Organization;
+	global $Settings, $current_User, $Collection, $Blog, $edited_Organization;
 
 	$Form->hidden( 'filter', 'new' );
 
@@ -3888,6 +3912,8 @@ function display_voting_form( $params = array() )
 	$params = array_merge( array(
 			'vote_type'              => 'link',
 			'vote_ID'                => 0,
+			'widget_ID'              => 0,
+			'skin_ID'                => 0,
 			'display_like'           => true,
 			'display_noopinion'      => true,
 			'display_dontlike'       => true,
@@ -4024,50 +4050,52 @@ function display_voting_form( $params = array() )
 			$vote = $DB->get_row( $SQL->get() );
 
 			break;
+
+		case 'item':
+			// Item
+			$SQL = new SQL();
+			$SQL->SELECT( 'itvt_updown AS result' );
+			$SQL->FROM( 'T_items__votes' );
+			$SQL->WHERE( 'itvt_item_ID = '.$DB->quote( $params['vote_ID'] ) );
+			$SQL->WHERE_and( 'itvt_user_ID = '.$DB->quote( $current_User->ID ) );
+			$SQL->WHERE_and( 'itvt_updown IS NOT NULL' );
+			$vote = $DB->get_row( $SQL->get() );
+
+			break;
 	}
 
-	if( empty( $vote ) || is_null( $vote->result ) )
-	{	// Current user didn't vote for this file yet
-		$icon_like = 'thumb_up';
-		$icon_noopinion = 'ban';
-		$icon_dontlike = 'thumb_down';
-		$type_voted = '';
-	}
-	else
+	// Set all icons disabled by default:
+	$icon_like = 'thumb_up_disabled';
+	$icon_noopinion = 'ban_disabled';
+	$icon_dontlike = 'thumb_down_disabled';
+	$type_voted = '';
+
+	if( ! empty( $vote ) && ! is_null( $vote->result ) )
 	{	// Current user already voted for this file, We should set a disabled icons correctly
 		switch( $vote->result )
 		{
 			case '-1':
 				// Don't like
 				$type_voted = 'dontlike';
-				$icon_like = 'thumb_up_disabled';
-				$icon_noopinion = 'ban_disabled';
 				$icon_dontlike = 'thumb_down';
 				$params_dontlike['class'] = 'voted';
 				$params_dontlike['title'] = $params['title_dontlike_voted'];
-				unset( $params_dontlike['id'] );
 				break;
 
 			case '0':
 				// No opinion
 				$type_voted = 'noopinion';
-				$icon_like = 'thumb_up_disabled';
 				$icon_noopinion = 'ban';
-				$icon_dontlike = 'thumb_down_disabled';
 				$params_noopinion['class'] = 'voted';
 				$params_noopinion['title'] = $params['title_noopinion_voted'];
-				unset( $params_noopinion['id'] );
 				break;
 
 			case '1':
 				// Like
 				$type_voted = 'like';
 				$icon_like = 'thumb_up';
-				$icon_noopinion = 'ban_disabled';
-				$icon_dontlike = 'thumb_down_disabled';
 				$params_like['class'] = 'voted';
 				$params_like['title'] = $params['title_like_voted'];
-				unset( $params_like['id'] );
 				break;
 		}
 	}
@@ -4089,68 +4117,48 @@ function display_voting_form( $params = array() )
 	echo '<span class="vote_title">'.$vote_numbers.'<span class="vote_title_text">'.$params['title_text'].'</span></span>';
 
 	$blog_param = empty( $blog ) ? '' : '&blog='.$blog;
-	// Set this url for case when JavaScript is not enabled
+	// Set this url for case when JavaScript is not enabled:
 	$url = get_htsrv_url().'anon_async.php?action=voting&vote_type='.$params['vote_type'].'&vote_ID='.$params['vote_ID'].$blog_param.'&'.url_crumb( 'voting' );
-	// Save action url here in order to have new crumb on every voting form loading
+	// Save action url here in order to have new crumb on every voting form loading:
 	echo '<input type="hidden" id="voting_action" value="'.$url.'&b2evo_icons_type='.$b2evo_icons_type.'" />';
 	$redirect_to = regenerate_url();
 	if( strpos( $redirect_to, 'async.php' ) === false )
-	{	// Append a redirect param
+	{	// Append a redirect param:
 		$url .= '&redirect_to='.$redirect_to;
 	}
 
+	if( ! empty( $params['widget_ID'] ) )
+	{	// Append widget ID for action URL:
+		$url .= '&widget_ID='.intval( $params['widget_ID'] );
+	}
+
+	if( ! empty( $params['skin_ID'] ) )
+	{	// Append skin ID for action URL:
+		$url .= '&skin_ID='.intval( $params['skin_ID'] );
+	}
+
 	if( $params['display_like'] )
-	{	// Display 'Like' icon
-		$tag_icon = get_icon( $icon_like, 'imgtag', $params_like );
-		if( $type_voted == 'like' )
-		{
-			echo $tag_icon;
-		}
-		else
-		{
-			$url_like = $url.'&vote_action=like';
-			$class = ( strpos( $icon_like, 'disabled' ) !== false ) ? ' rollover_sprite' : '';
-			echo '<a href="'.$url_like.'" class="action_icon'.$class.'">'.$tag_icon.'</a>';
-		}
+	{	// Display 'Like' icon:
+		echo action_icon( '', $icon_like, $url.'&vote_action=like', '', 0, 0, array(), $params_like );
 	}
 
 	if( $params['display_noopinion'] )
-	{	// Display 'No opinion' icon
-		$tag_icon = get_icon( $icon_noopinion, 'imgtag', $params_noopinion );
-		if( $type_voted == 'noopinion' )
-		{
-			echo $tag_icon;
-		}
-		else
-		{
-			$url_noopinion = $url.'&vote_action=noopinion';
-			$class = ( strpos( $icon_noopinion, 'disabled' ) !== false ) ? ' rollover_sprite' : '';
-			echo '<a href="'.$url_noopinion.'" class="action_icon'.$class.'">'.$tag_icon.'</a>';
-		}
+	{	// Display 'No opinion' icon:
+		echo action_icon( '', $icon_noopinion, $url.'&vote_action=noopinion', '', 0, 0, array(), $params_noopinion );
 	}
 
 	if( $params['display_dontlike'] )
-	{	// Display 'Dont like' icon
-		$tag_icon = get_icon( $icon_dontlike, 'imgtag', $params_dontlike );
-		if( $type_voted == 'dontlike' )
-		{
-			echo $tag_icon;
-		}
-		else
-		{
-			$url_dontlike = $url.'&vote_action=dontlike';
-			$class = ( strpos( $icon_dontlike, 'disabled' ) !== false ) ? ' rollover_sprite' : '';
-			echo '<a href="'.$url_dontlike.'" class="action_icon'.$class.'">'.$tag_icon.'</a>';
-		}
+	{	// Display 'Dont like' icon:
+		echo action_icon( '', $icon_dontlike, $url.'&vote_action=dontlike', '', 0, 0, array(), $params_dontlike );
 	}
 
 	if( $params['display_inappropriate'] || $params['display_spam'] )
-	{	// Display separator between icons and checkboxes
+	{	// Display separator between icons and checkboxes:
 		echo '<span class="separator">&nbsp;</span>';
 	}
 
 	if( $params['display_inappropriate'] )
-	{	// Display 'Inappropriate' checkbox
+	{	// Display 'Inappropriate' checkbox:
 		echo '<label for="'.$params_inappropriate['id'].'" title="'.$params_inappropriate['title'].'">'.
 				'<input type="checkbox" id="'.$params_inappropriate['id'].'" name="'.$params_inappropriate['id'].'"'.$checked_inappropriate.' />'.
 				'<span>'.T_('Inappropriate').'</span>'.
@@ -4158,15 +4166,25 @@ function display_voting_form( $params = array() )
 	}
 
 	if( $params['display_spam'] )
-	{	// Display 'Spam' checkbox
+	{	// Display 'Spam' checkbox:
 		echo '<label for="'.$params_spam['id'].'" class="'.$params_spam['class'].'" title="'.$params_spam['title'].'">'.
 				'<input type="checkbox" id="'.$params_spam['id'].'" name="'.$params_spam['id'].'"'.$checked_spam.' />'.
 				'<span>'.T_('Spam').'</span>'.
 			'</label>';
 	}
 
-	// Create a hidden input with current ID
+	// Create a hidden input with current ID:
 	echo '<input type="hidden" id="votingID" value="'.$params['vote_ID'].'" />';
+
+	if( ! empty( $params['widget_ID'] ) )
+	{	// Create a hidden input with widget ID:
+		echo '<input type="hidden" id="widgetID" value="'.$params['widget_ID'].'" />';
+	}
+
+	if( ! empty( $params['skin_ID'] ) )
+	{	// Create a hidden input with skin ID:
+		echo '<input type="hidden" id="skinID" value="'.$params['skin_ID'].'" />';
+	}
 }
 
 
@@ -4211,7 +4229,7 @@ function find_users_with_same_email( $user_ID, $user_email, $message )
  */
 function display_user_email_status_message( $user_ID = 0 )
 {
-	global $Messages, $current_User, $Blog, $disp;
+	global $Messages, $current_User, $Collection, $Blog, $disp;
 
 	if( ! is_logged_in() || ( $user_ID != 0 && $user_ID != $current_User->ID ) )
 	{ // User must be logged in AND only for current User
@@ -4254,7 +4272,7 @@ function display_user_email_status_message( $user_ID = 0 )
 	// Display info about last error only when such data exists
 	$email_last_sent_ts = ( empty( $EmailAddress ) ? '' : $EmailAddress->get( 'last_sent_ts' ) );
 	$last_error_info = empty( $email_last_sent_ts ) ? '' :
-		' '.sprintf( /* TRANS: date of last error */ T_( '(last error was detected on %s)' ), mysql2localedatetime_spans( $email_last_sent_ts, 'M-d' ) );
+		' '.sprintf( /* TRANS: date of last error */ T_( '(last error was detected on %s)' ), mysql2localedatetime_spans( $email_last_sent_ts ) );
 
 	switch( $email_status )
 	{
@@ -4725,7 +4743,7 @@ function check_access_users_list( $mode = 'normal' )
 		}
 		else
 		{	// Normal request
-			global $Blog, $baseurl;
+			global $Collection, $Blog, $baseurl;
 			$Messages->add( $error_message );
 			header_redirect( ( empty( $Blog ) ? $baseurl : $Blog->gen_blogurl() ), 302 );
 		}
@@ -4762,7 +4780,7 @@ function check_access_users_list( $mode = 'normal' )
  */
 function check_access_user_profile( $user_ID, $mode = 'normal' )
 {
-	global $Blog, $baseurl, $Settings, $current_User, $Settings, $Messages;
+	global $Collection, $Blog, $baseurl, $Settings, $current_User, $Settings, $Messages;
 
 	// Set where to redirect in case of error:
 	$error_redirect_to = ( empty( $Blog ) ? $baseurl : $Blog->gen_blogurl() );
@@ -5054,6 +5072,7 @@ function users_results_block( $params = array() )
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
 			'org_ID'               => NULL,
+			'viewed_user'          => NULL,
 			'filterset_name'       => 'admin',
 			'results_param_prefix' => 'users_',
 			'results_title'        => T_('Users').get_manual_link('users_and_groups'),
@@ -5140,6 +5159,7 @@ function users_results_block( $params = array() )
 			'keywords_fields'     => $params['keywords_fields'],
 			'where_status_closed' => $params['where_status_closed'],
 			'where_org_ID'        => $params['org_ID'],
+			'where_viewed_user'   => $params['viewed_user'],
 		) );
 	$default_filters = array( 'order' => $params['results_order'], 'org' => $params['org_ID'] );
 	$UserList->title = $params['results_title'];
@@ -5276,7 +5296,7 @@ function users_results( & $UserList, $params = array() )
 			'display_regdate'    => true,
 			'display_regcountry' => true,
 			'display_update'     => true,
-			'display_lastvisit'  => true,
+			'display_lastvisit'  => false,
 			'display_lastvisit_view' => 'exact_date',
 			'display_lastvisit_cheat' => 0,
 			'display_contact'    => true,
@@ -5302,6 +5322,7 @@ function users_results( & $UserList, $params = array() )
 			'td_class_city'      => 'shrinkwrap small',
 			'th_class_lastvisit' => 'shrinkwrap small',
 			'td_class_lastvisit' => 'center small',
+			'viewed_user'        => false,
 		), $params );
 
 	if( $UserList->filters['group'] != -1 )
@@ -5699,6 +5720,17 @@ function users_results( & $UserList, $params = array() )
 					'th_class' => 'small',
 					'td_class' => 'shrinkwrap small',
 					'td' => '%user_td_org_actions( '.intval( $params['org_ID'] ).', #user_ID# )%'
+				);
+		}
+
+		if( $params['viewed_user'] )
+		{
+			$UserList->cols[] = array(
+					'th' => T_('Last visit on your profile'),
+					'th_class' => 'small',
+					//'td_class' => 'shrinkwrap small',
+					'order' => 'upv_last_visit_ts',
+					'td' => '%mysql2localedate( #upv_last_visit_ts#, "M-d" )%'
 				);
 		}
 	}

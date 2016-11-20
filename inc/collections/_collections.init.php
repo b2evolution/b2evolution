@@ -49,12 +49,15 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_items__itemtag'           => $tableprefix.'items__itemtag',
 		'T_items__prerendering'      => $tableprefix.'items__prerendering',
 		'T_items__status'            => $tableprefix.'items__status',
+		'T_items__subscriptions'     => $tableprefix.'items__subscriptions',
 		'T_items__tag'               => $tableprefix.'items__tag',
 		'T_items__type'              => $tableprefix.'items__type',
 		'T_items__type_custom_field' => $tableprefix.'items__type_custom_field',
 		'T_items__type_coll'         => $tableprefix.'items__type_coll',
-		'T_items__subscriptions'     => $tableprefix.'items__subscriptions',
+		'T_items__user_data'         => $tableprefix.'items__user_data',
 		'T_items__version'           => $tableprefix.'items__version',
+		'T_items__votes'             => $tableprefix.'items__votes',
+		'T_items__status_type'       => $tableprefix.'items__status_type',
 		'T_links'                    => $tableprefix.'links',
 		'T_links__vote'              => $tableprefix.'links__vote',
 		'T_postcats'                 => $tableprefix.'postcats',
@@ -62,6 +65,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_skins__skin'              => $tableprefix.'skins__skin',
 		'T_subscriptions'            => $tableprefix.'subscriptions',
 		'T_widget'                   => $tableprefix.'widget',
+		'T_temporary_ID'             => $tableprefix.'temporary_ID',
 	) );
 
 /**
@@ -316,6 +320,26 @@ function & get_LinkCache()
 	return $LinkCache;
 }
 
+
+/**
+ * Get the TemporaryIDCache
+ *
+ * @return TemporaryIDCache
+ */
+function & get_TemporaryIDCache()
+{
+	global $TemporaryIDCache;
+
+	if( ! isset( $TemporaryIDCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'links/model/_temporaryid.class.php', 'TemporaryID' );
+		$TemporaryIDCache = new DataObjectCache( 'TemporaryID', false, 'T_temporary_ID', 'tmp_', 'tmp_ID', 'tmp_ID', 'tmp_ID' );
+	}
+
+	return $TemporaryIDCache;
+}
+
+
 /**
  * Get the SkinCache
  *
@@ -501,13 +525,13 @@ class collections_Module extends Module
 				'note' => T_( 'New users automatically get a new blog'),
 				),
 			'perm_max_createblog_num' => array(
-				'label' => T_('Maximum number of collections allowed'),
+				'label' => T_('Maximum collections'),
 				'user_func' => 'check_createblog_user_perm',
 				'group_funct' => 'check_createblog_group_perm',
 				'perm_block' => 'blogging',
 				'perm_type' => 'text_input',
 				'maxlength' => 2,
-				'note' => T_('Leave empty for no limit'),
+				'note' => T_('Users will not be able to create collections if they already own the maximum number of collections (or more).'),
 				),
 			);
 		return $permissions;
@@ -584,7 +608,7 @@ class collections_Module extends Module
 		global $topleft_Menu, $topright_Menu;
 		global $current_User;
 		global $home_url, $admin_url, $debug, $seo_page_type, $robots_index;
-		global $Blog, $blog;
+		global $Collection, $Blog, $blog;
 
 		global $Settings;
 
@@ -635,7 +659,7 @@ class collections_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		global $Settings;
 		/**
 		 * @var AdminUI_general
@@ -719,7 +743,7 @@ class collections_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		/**
 		 * @var AdminUI_general
 		 */
@@ -911,7 +935,7 @@ class collections_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		/**
 		 * @var AdminUI_general
 		 */
@@ -1040,7 +1064,7 @@ class collections_Module extends Module
 				$linked_File = & $edited_Link->get_File();
 
 				// Load the blog we're in:
-				$Blog = & $LinkOwner->get_Blog();
+				$Collection = $Blog = & $LinkOwner->get_Blog();
 				set_working_blog( $Blog->ID );
 
 				// Check permission:

@@ -278,7 +278,7 @@ class tinymce_plugin extends Plugin
 		{
 			case 'Item':
 				// Initialize settings for item:
-				global $Blog;
+				global $Collection, $Blog;
 
 				$edited_Item = & $params['target_object'];
 
@@ -671,7 +671,7 @@ class tinymce_plugin extends Plugin
 	 */
 	function get_tmce_init( $edit_layout, $content_id )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 		global $Plugins;
 		global $localtimenow, $debug, $rsc_url, $rsc_path, $skins_url;
 		global $UserSettings;
@@ -1083,7 +1083,7 @@ class tinymce_plugin extends Plugin
 	{
 		$blog = $params['blog'];
 		$BlogCache = get_BlogCache($blog);
-		$Blog = $BlogCache->get_by_ID($blog);
+		$Collection = $Blog = $BlogCache->get_by_ID($blog);
 		$path = array_shift($this->get_item_css_path_and_url($Blog));
 		$r = file_get_contents($path);
 		if( $r )

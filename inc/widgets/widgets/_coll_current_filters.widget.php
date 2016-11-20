@@ -102,7 +102,8 @@ class coll_current_filters_Widget extends ComponentWidget
 						array( 'status', T_('Status'), 1 ),
 						array( 'visibility', T_('Visibility'), 1 ),
 						array( 'time', T_('Past/Future'), 0 ),
-						array( 'limit', T_('Limit by days'), 1 ) ),
+						array( 'limit', T_('Limit by days'), 1 ),
+						array( 'flagged', T_('Flagged'), 1 ) ),
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -175,6 +176,7 @@ class coll_current_filters_Widget extends ComponentWidget
 				'display_visibility' => ! empty( $this->disp_params['show_filters']['visibility'] ),
 				'display_time'       => ! empty( $this->disp_params['show_filters']['time'] ),
 				'display_limit'      => ! empty( $this->disp_params['show_filters']['limit'] ),
+				'display_flagged'    => ! empty( $this->disp_params['show_filters']['flagged'] ),
 			) ) );
 
 		if( empty( $filters ) && ! $this->disp_params['display_empty_filter'] )
@@ -234,7 +236,8 @@ class coll_current_filters_Widget extends ComponentWidget
 						.$params['ItemList']->param_prefix.'dstart,'
 						.$params['ItemList']->param_prefix.'dstop,'
 						.$params['ItemList']->param_prefix.'show_past,'
-						.$params['ItemList']->param_prefix.'show_future' ),
+						.$params['ItemList']->param_prefix.'show_future,'
+						.$params['ItemList']->param_prefix.'flagged' ),
 					' '.T_('Reset all filters!'), 3, 4 ).'<p>';
 			}
 		}

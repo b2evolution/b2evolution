@@ -16,7 +16,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog;
+global $Collection, $Blog;
 
 // --------------------------------- START OF POSTS -------------------------------------
 // Display message if no post:

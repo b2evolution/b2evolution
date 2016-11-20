@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_ItemTag;
 
-global $action, $admin_url, $display_merge_tags_form;
+global $action, $admin_url, $display_merge_tags_form, $return_to;
 
 if( ! empty( $edited_ItemTag->merge_tag_ID ) )
 { // Display a for to confirm merge the tag to other one
@@ -44,7 +44,7 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'itemtag_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel editing!'), 'close', ( $return_to ? $return_to : $admin_url.'?ctrl=itemtags' ) );
 
 $Form->begin_form( 'fform', ( $creating ?  T_('New Tag') : T_('Tag') ).get_manual_link( 'item-tag-form' ) );
 
@@ -109,7 +109,7 @@ if( $edited_ItemTag->ID > 0 )
 		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 		{ // Display the unlink icon if current user has the rights:
 			$r .= action_icon( T_('Unlink this tag from post!'), 'unlink',
-				regenerate_url( 'tag_ID,action,tag_filter', 'tag_ID='.$edited_ItemTag->ID.'&amp;item_ID='.$Item->ID.'&amp;action=unlink&amp;'.url_crumb( 'tag' ) ),
+				regenerate_url( 'tag_ID,action,tag_filter', 'tag_ID='.$edited_ItemTag->ID.'&amp;item_ID='.$Item->ID.'&amp;action=unlink&amp;return_to='.urlencode( regenerate_url( 'action', '', '', '&' ) ).'&amp;'.url_crumb( 'tag' ) ),
 				NULL, NULL, NULL,
 				array( 'onclick' => 'return confirm(\''.format_to_output( sprintf( TS_('Are you sure you want to remove the tag "%s" from "%s"?'),
 						$edited_ItemTag->dget( 'name' ),

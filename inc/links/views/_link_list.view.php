@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 
 /**
  * Needed by functions
@@ -26,13 +26,9 @@ global $LinkOwner;
 
 global $AdminUI, $current_User;
 
-// Override $debug in order to keep the display of the iframe neat
-global $debug;
-$debug = 0;
-
 if( empty( $Blog ) )
 {
-	$Blog = & $LinkOwner->get_Blog();
+	$Collection = $Blog = & $LinkOwner->get_Blog();
 }
 
 // Name of the iframe we want some actions to come back to:
@@ -41,7 +37,7 @@ $link_type = param( 'link_type', 'string', 'item', true );
 
 $SQL = $LinkOwner->get_SQL();
 
-$Results = new Results( $SQL->get(), 'link_', '', 1000 );
+$Results = new Results( $SQL->get(), '', '', 1000 );
 
 $Results->title = T_('Attachments');
 
@@ -57,7 +53,7 @@ function link_add_iframe( $link_destination )
 		$path = $current_File->get_rdfp_rel_path();
 
 		// this could be made more robust
-		$link_destination = str_replace( '<a ', "<a onclick=\"return window.parent.link_attachment_window( '${iframe_name}', '${link_type}', '${link_owner_ID}', '${root}', '${path}' );\" ", $link_destination );
+		$link_destination = str_replace( '<a ', "<a onclick=\"return link_attachment_window( '${link_type}', '${link_owner_ID}', '${root}', '${path}' );\" ", $link_destination );
 	}
 
 	return $link_destination;
@@ -96,7 +92,7 @@ $Results->cols[] = array(
 						'td_class' => 'shrinkwrap link_id_cell',
 					);
 
-if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
+if( $current_User->check_perm( 'files', 'view' ) )
 {
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
@@ -105,11 +101,14 @@ if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
 						);
 }
 
-$Results->cols[] = array(
+if( count( $LinkOwner->get_positions() ) > 1 )
+{	// Don't display a position column for email campaign because it always has only one position 'inline':
+	$Results->cols[] = array(
 						'th' => T_('Position'),
 						'td_class' => 'shrinkwrap left',
 						'td' => '%display_link_position( {row} )%',
 					);
+}
 
 // Add attr "id" to handle quick uploader
 $compact_results_params = $AdminUI->get_template( 'compact_results' );
@@ -134,12 +133,38 @@ else
 	$table_headers = '';
 }
 
+// Load FileRoot class to get fileroot ID of collection below:
+load_class( '/files/model/_fileroot.class.php', 'FileRoot' );
+
+switch( $LinkOwner->type )
+{
+	case 'item':
+		$upload_fileroot = FileRoot::gen_ID( 'collection', $Blog->ID );
+		$upload_path = '/quick-uploads/p'.$LinkOwner->get_ID().'/';
+		break;
+
+	case 'comment':
+		$upload_fileroot = FileRoot::gen_ID( 'collection', $Blog->ID );
+		$upload_path = '/quick-uploads/c'.$LinkOwner->get_ID().'/';
+		break;
+
+	case 'emailcampaign':
+		$upload_fileroot = FileRoot::gen_ID( 'emailcampaign', $LinkOwner->get_ID() );
+		$upload_path = '/'.$LinkOwner->get_ID().'/';
+		break;
+
+	case 'message':
+		$upload_fileroot = FileRoot::gen_ID( 'user', $current_User->ID );
+		$upload_path = '/private_message/'.( $LinkOwner->is_temp ? 'tmp' : 'pm' ).$LinkOwner->get_ID().'/';
+		break;
+}
+
 // Display a button to quick upload the files by drag&drop method
 display_dragdrop_upload_button( array(
 		'before' => '<div id="fileuploader_form">',
 		'after'  => '</div>',
-		'fileroot_ID'      => FileRoot::gen_ID( 'collection', $Blog->ID ),
-		'path'             => '/quick-uploads/'.( $LinkOwner->type == 'item' ? 'p' : 'c' ).$LinkOwner->link_Object->ID.'/',
+		'fileroot_ID'      => $upload_fileroot,
+		'path'             => $upload_path,
 		'listElement'      => 'jQuery( "#filelist_tbody" ).get(0)',
 		'list_style'       => 'table',
 		'template_filerow' => '<table><tr>'
@@ -154,7 +179,7 @@ display_dragdrop_upload_button( array(
 							.'<a class="qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'
 						.'</div>'
 					.'</td>'
-					.'<td class="qq-upload-link-position lastcol shrinkwrap"></td>'
+					.( count( $LinkOwner->get_positions() ) > 1 ? '<td class="qq-upload-link-position lastcol shrinkwrap"></td>' : '' )
 				.'</tr></table>',
 		'display_support_msg'    => false,
 		'additional_dropzone'    => '#filelist_tbody',

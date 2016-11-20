@@ -261,7 +261,7 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
  */
 function search_and_score_items( $search_term, $keywords, $quoted_parts )
 {
-	global $DB, $Blog;
+	global $DB, $Collection, $Blog;
 
 	// Prepare filters:
 	$search_ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), '', 'ItemCache', 'search_item' );
@@ -338,7 +338,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts )
  */
 function search_and_score_comments( $search_term, $keywords, $quoted_parts )
 {
-	global $DB, $Blog;
+	global $DB, $Collection, $Blog;
 
 	// Search between comments
 	$search_CommentList = new CommentList2( $Blog, '', 'CommentCache', 'search_comment' );
@@ -403,7 +403,7 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts )
  */
 function search_and_score_chapters( $search_term, $keywords, $quoted_parts )
 {
-	global $DB, $Blog;
+	global $DB, $Collection, $Blog;
 
 	// Init result array:
 	$search_result = array();
@@ -464,7 +464,7 @@ function search_and_score_chapters( $search_term, $keywords, $quoted_parts )
  */
 function search_and_score_tags( $search_term, $keywords, $quoted_parts )
 {
-	global $DB, $Blog;
+	global $DB, $Collection, $Blog;
 
 	// Init result array:
 	$search_result = array();
@@ -532,7 +532,7 @@ function perform_scored_search( $search_keywords, $search_types = 'all' )
 		return array();
 	}
 
-	global $Blog, $DB, $debug;
+	global $Collection, $Blog, $DB, $debug;
 	global $scores_map, $score_prefix, $score_map_key, $Debuglog;
 
 	// Get quoted parts parts of the search query
@@ -678,7 +678,7 @@ function perform_scored_search( $search_keywords, $search_types = 'all' )
  */
 function search_result_block( $params = array() )
 {
-	global $Blog, $Session, $debug;
+	global $Collection, $Blog, $Session, $debug;
 
 	$search_keywords = param( 's', 'string', '', true );
 

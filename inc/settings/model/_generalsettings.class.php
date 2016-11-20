@@ -37,6 +37,7 @@ class GeneralSettings extends AbstractSettings
 		'antispam_last_update' => '2000-01-01 00:00:00',
 		'antispam_threshold_publish' => '-90',
 		'antispam_threshold_delete' => '100', // do not delete by default!
+		'antispam_block_contact_form' => '1',	// Block spam words on contact form by antispam blacklist
 		'antispam_block_spam_referers' => '0',	// By default, let spam referers go in silently (just don't log them). This is in case the blacklist is too paranoid (social media, etc.)
 		'antispam_report_to_central' => '1',
 

@@ -18,10 +18,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Update the advanced user/group permissions for edited blog
  *
- * @param int Blog ID
- * @param string 'user' or 'group'
+ * @param integer Blog ID or Group ID
+ * @param string 'user', 'group' or 'coll'
  */
-function blog_update_perms( $blog, $context = 'user' )
+function blog_update_perms( $object_ID, $context = 'user' )
 {
 	global $DB;
 
@@ -30,36 +30,57 @@ function blog_update_perms( $blog, $context = 'user' )
 	 */
 	global $current_User;
 
-	if( $context == 'user' )
-	{
-		$table = 'T_coll_user_perms';
-		$prefix = 'bloguser_';
-		$ID_field = 'bloguser_user_ID';
-	}
-	else
-	{
-		$table = 'T_coll_group_perms';
-		$prefix = 'bloggroup_';
-		$ID_field = 'bloggroup_group_ID';
-	}
-
 	// Get affected user/group IDs:
 	$IDs = param( $context.'_IDs', '/^[0-9]+(,[0-9]+)*$/', '' );
 	$ID_array = explode( ',', $IDs );
 
-	// Can the current user touch advanced admin permissions?
-	if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $blog ) )
-	{ // We have no permission to touch advanced admins!
+	switch( $context )
+	{
+		case 'user':
+			$table = 'T_coll_user_perms';
+			$prefix = 'bloguser_';
+			$ID_field_main = 'bloguser_blog_ID';
+			$ID_field_edit = 'bloguser_user_ID';
+			$blog = $object_ID;
+			$coll_IDs = array( $blog );
+			break;
 
-		// Get the users/groups which are advanced admins
-		$admins_ID_array = $DB->get_col( "SELECT {$ID_field}
-																				FROM $table
-																			 WHERE {$ID_field} IN (".implode(',',$ID_array).")
-																							AND {$prefix}blog_ID = $blog
-																							AND {$prefix}perm_admin <> 0" );
+		case 'coll':
+			$table = 'T_coll_group_perms';
+			$prefix = 'bloggroup_';
+			$ID_field_main = 'bloggroup_group_ID';
+			$ID_field_edit = 'bloggroup_blog_ID';
+			$group_ID = $object_ID;
+			$coll_IDs = $ID_array;
+			break;
 
-		// Take the admins out of the list:
-		$ID_array = array_diff( $ID_array, $admins_ID_array );
+		case 'group':
+		default:
+			$table = 'T_coll_group_perms';
+			$prefix = 'bloggroup_';
+			$ID_field_main = 'bloggroup_blog_ID';
+			$ID_field_edit = 'bloggroup_group_ID';
+			$blog = $object_ID;
+			$coll_IDs = array( $blog );
+			break;
+	}
+
+	foreach( $coll_IDs as $coll_ID )
+	{
+		// Can the current user touch advanced admin permissions?
+		if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $coll_ID ) )
+		{ // We have no permission to touch advanced admins!
+
+			// Get the users/groups which are advanced admins
+			$admins_ID_array = $DB->get_col( "SELECT {$ID_field_edit}
+																					FROM $table
+																				 WHERE {$ID_field_edit} IN (".implode( ',',$ID_array ).")
+																								AND {$ID_field_main} = $object_ID
+																								AND {$prefix}perm_admin <> 0" );
+
+			// Take the admins out of the list:
+			$ID_array = array_diff( $ID_array, $admins_ID_array );
+		}
 	}
 
 	if( empty( $ID_array ) )
@@ -67,14 +88,18 @@ function blog_update_perms( $blog, $context = 'user' )
 		return;
 	}
 
-	// Delete old perms for this blog:
+	// Delete old perms for the edited collection/group:
 	$DB->query( "DELETE FROM $table
-								WHERE {$ID_field} IN (".implode(',',$ID_array).")
-											AND {$prefix}blog_ID = ".$blog );
+								WHERE {$ID_field_edit} IN (".implode( ',',$ID_array ).")
+											AND {$ID_field_main} = ".$object_ID );
 
 	$inserted_values = array();
 	foreach( $ID_array as $loop_ID )
 	{ // Check new permissions for each user:
+
+		// Get collection/object ID depedning on request:
+		$coll_ID = ( $context == 'coll' ? $loop_ID : $blog );
+		$main_object_ID = ( $context == 'coll' ? $group_ID : $blog );
 
 		// Use checkboxes
 		$perm_post = array();
@@ -129,7 +154,7 @@ function blog_update_perms( $blog, $context = 'user' )
 		$perm_cats = param( 'blog_perm_cats_'.$loop_ID, 'integer', 0 );
 		$perm_properties = param( 'blog_perm_properties_'.$loop_ID, 'integer', 0 );
 
-		if( $current_User->check_perm( 'blog_admin', 'edit', false, $blog ) )
+		if( $current_User->check_perm( 'blog_admin', 'edit', false, $coll_ID ) )
 		{ // We have permission to give advanced admins perm!
 			$perm_admin = param( 'blog_perm_admin_'.$loop_ID, 'integer', 0 );
 		}
@@ -152,7 +177,7 @@ function blog_update_perms( $blog, $context = 'user' )
 			$ismember = 1;	// Must have this permission
 
 			// insert new perms:
-			$inserted_values[] = " ( $blog, $loop_ID, $ismember, $can_be_assignee, ".$DB->quote( implode( ',',$perm_post ) ).",
+			$inserted_values[] = " ( $main_object_ID, $loop_ID, $ismember, $can_be_assignee, ".$DB->quote( implode( ',',$perm_post ) ).",
 																".$DB->quote( $perm_item_type ).", ".$DB->quote( $perm_edit ).",
 																$perm_delpost, $perm_edit_ts, $perm_delcmts, $perm_recycle_owncmts, $perm_vote_spam_comments, $perm_cmtstatuses,
 																".$DB->quote( $perm_edit_cmt ).",
@@ -164,7 +189,7 @@ function blog_update_perms( $blog, $context = 'user' )
 	// Proceed with insertions:
 	if( count( $inserted_values ) )
 	{
-		$DB->query( "INSERT INTO $table( {$prefix}blog_ID, {$ID_field}, {$prefix}ismember, {$prefix}can_be_assignee,
+		$DB->query( "INSERT INTO $table( {$ID_field_main}, {$ID_field_edit}, {$prefix}ismember, {$prefix}can_be_assignee,
 											{$prefix}perm_poststatuses, {$prefix}perm_item_type, {$prefix}perm_edit, {$prefix}perm_delpost, {$prefix}perm_edit_ts,
 											{$prefix}perm_delcmts, {$prefix}perm_recycle_owncmts, {$prefix}perm_vote_spam_cmts, {$prefix}perm_cmtstatuses, {$prefix}perm_edit_cmt,
 											{$prefix}perm_meta_comment, {$prefix}perm_cats, {$prefix}perm_properties, {$prefix}perm_admin,
@@ -179,21 +204,21 @@ function blog_update_perms( $blog, $context = 'user' )
 		  (
 		    SELECT cat_ID
 		      FROM T_categories
-		     WHERE cat_blog_ID = '.$DB->quote( $blog ).'
+		     WHERE cat_blog_ID IN ( '.$DB->quote( $coll_IDs ).' )
 		  )
 		  AND post_assigned_user_ID NOT IN
 		  (
 		    SELECT bloguser_user_ID
 		      FROM T_coll_user_perms
 		     WHERE bloguser_can_be_assignee = 1
-		       AND bloguser_blog_ID = '.$DB->quote( $blog ).'
+		       AND bloguser_blog_ID IN ( '.$DB->quote( $coll_IDs ).' )
 		  )
 		  AND post_assigned_user_ID NOT IN
 		  (
 		    SELECT user_ID
 		      FROM T_users INNER JOIN T_coll_group_perms ON user_grp_ID = bloggroup_group_ID
 		     WHERE bloggroup_can_be_assignee = 1
-		       AND bloggroup_blog_ID = '.$DB->quote( $blog ).'
+		       AND bloggroup_blog_ID IN ( '.$DB->quote( $coll_IDs ).' )
 		  )
 		  AND post_assigned_user_ID NOT IN
 		  (
@@ -201,7 +226,7 @@ function blog_update_perms( $blog, $context = 'user' )
 		      FROM T_users__secondary_user_groups
 		     INNER JOIN T_coll_group_perms ON sug_grp_ID = bloggroup_group_ID
 		     WHERE bloggroup_can_be_assignee = 1
-		       AND bloggroup_blog_ID = '.$DB->quote( $blog ).'
+		       AND bloggroup_blog_ID IN ( '.$DB->quote( $coll_IDs ).' )
 		  )' );
 
 	if( $DB->rows_affected > 0 )
@@ -211,7 +236,10 @@ function blog_update_perms( $blog, $context = 'user' )
 	}
 
 	// BLOCK CACHE INVALIDATION:
-	BlockCache::invalidate_key( 'set_coll_ID', $blog ); // Settings have changed
+	foreach( $coll_IDs as $coll_ID )
+	{
+		BlockCache::invalidate_key( 'set_coll_ID', $coll_ID ); // Settings have changed
+	}
 	BlockCache::invalidate_key( 'set_coll_ID', 'any' ); // Settings of a have changed (for widgets tracking a change on ANY blog)
 
 	// cont_coll_ID  // Content has not changed
@@ -278,14 +306,14 @@ function autoselect_blog( $permname, $permlevel = 'any' )
  */
 function valid_blog_requested()
 {
-	global $Blog, $Messages;
+	global $Collection, $Blog, $Messages;
 	if( empty( $Blog ) )
 	{ // The requested blog does not exist, Try to get other available blog for the current User
 		$blog_ID = get_working_blog();
 		if( $blog_ID )
 		{
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 		}
 	}
 
@@ -462,13 +490,13 @@ function set_cache_enabled( $cache_key, $new_status, $coll_ID = NULL, $save_sett
 
 	if( empty( $coll_ID ) )
 	{ // general cache
-		$Blog = NULL;
+		$Collection = $Blog = NULL;
 		$old_cache_status = $Settings->get( $cache_key );
 	}
 	else
 	{ // blog page cache
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $coll_ID );
+		$Collection = $Blog = $BlogCache->get_by_ID( $coll_ID );
 		$old_cache_status = $Blog->get_setting( $cache_key );
 	}
 
@@ -579,14 +607,21 @@ function init_requested_blog( $use_blog_param_first = true )
 
 	// No blog requested by URL param, let's try to match something in the URL:
 	$BlogCache = & get_BlogCache();
-	if( preg_match( '#^'.preg_quote($baseurl).'(index.php/)?([^/]+)#', $ReqHost.$ReqPath, $matches ) )
+
+	$re = "/^https?(.*)/i";
+	$str = preg_quote( $baseurl );
+	$subst = "https?$1";
+
+	$baseurl_regex = preg_replace($re, $subst, $str);
+
+	if( preg_match( '#^'.$baseurl_regex.'(index.php/)?([^/]+)#', $ReqHost.$ReqPath, $matches ) )
 	{ // We have an URL blog name:
 		$Debuglog->add( 'Found a potential URL collection name: '.$matches[2].' (in: '.$ReqHost.$ReqPath.')', 'detectblog' );
 		if( strpos( $matches[2], '.' ) !== false )
 		{	// There is an extension (like .php) in the collection name, ignore...
 			$Debuglog->add( 'Ignoring because it contains a dot.', 'detectblog' );
 		}
-		elseif( (($Blog = & $BlogCache->get_by_urlname( $matches[2], false )) !== false) ) /* SQL request '=' */
+		elseif( ( $Collection = $Blog = & $BlogCache->get_by_urlname( $matches[2], false ) ) !== false ) /* SQL request '=' */
 		{ // We found a matching blog:
 			$blog = $Blog->ID;
 			$Debuglog->add( 'Found matching blog: '.$blog, 'detectblog' );
@@ -609,7 +644,7 @@ function init_requested_blog( $use_blog_param_first = true )
 	}
 	$Debuglog->add( 'Looking up absolute url : '.$ReqAbsUrl, 'detectblog' );
 	// SQL request 'LIKE':
-	if( (($Blog = & $BlogCache->get_by_url( $ReqAbsUrl, false )) !== false) )
+	if( ( $Collection = $Blog = & $BlogCache->get_by_url( $ReqAbsUrl, false ) ) !== false )
 	{ // We found a matching blog:
 		$blog = $Blog->ID;
 		$Debuglog->add( 'Found matching blog: '.$blog, 'detectblog' );
@@ -630,7 +665,7 @@ function init_requested_blog( $use_blog_param_first = true )
 
 	// Still no blog requested, use default:
 	$blog = $Settings->get( 'default_blog_ID' );
-	$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 	if( $Blog !== false && $Blog !== NULL )
 	{ // We found a matching blog:
 		$Debuglog->add( 'Using default blog '.$blog, 'detectblog' );
@@ -658,7 +693,7 @@ function activate_blog_locale( $blog )
 	}
 
 	$BlogCache = & get_BlogCache();
-	$Blog = $BlogCache->get_by_ID( $blog, false, false );
+	$Collection = $Blog = $BlogCache->get_by_ID( $blog, false, false );
 	if( !empty( $Blog ) )
 	{ // Activate the blog locale
 		locale_activate( $Blog->get('locale') );
@@ -704,7 +739,7 @@ function init_blog_widgets( $blog_id )
  */
 function check_allow_disp( $disp )
 {
-	global $Blog, $Messages, $Settings, $current_User;
+	global $Collection, $Blog, $Messages, $Settings, $current_User;
 
 	if( !check_user_status( 'can_be_validated' ) )
 	{ // we don't have the case when user is logged in and the account is not active
@@ -912,13 +947,13 @@ function get_highest_publish_status( $type, $blog, $with_label = true, $restrict
 /**
  * Retrieves all tags from published posts
  *
- * @param integer the id of the blog or array of blog ids. Set NULL to use current blog
+ * @param mixed id of the collection or array of collection ids. Set to NULL to use current blog or '*' to use all collections
  * @param integer maximum number of returned tags
  * @param string a comma separated list of tags to ignore/exclude
  * @param bool true to skip tags from pages, intro posts and sidebar stuff
  * @return array of tags
  */
-function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts = false, $post_statuses = array( 'published' ) )
+function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts = false, $post_statuses = array( 'published' ), $get_cat_blog_ID = false )
 {
 	global $DB, $localtimenow;
 
@@ -940,20 +975,31 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	}
 	else
 	{ // Get list of relevant blogs
-		$Blog = & $BlogCache->get_by_ID( $blog_ids );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ids );
 		$where_cat_clause = trim( $Blog->get_sql_where_aggregate_coll_IDs( 'cat_blog_ID' ) );
 	}
 
 	// Build query to get the tags:
 	$tags_SQL = new SQL();
 
-	$tags_SQL->SELECT( 'tag_name, COUNT( DISTINCT itag_itm_ID ) AS tag_count, tag_ID, cat_blog_ID' );
+	if( $get_cat_blog_ID )
+	{
+		$tags_SQL->SELECT( 'tag_name, COUNT( DISTINCT itag_itm_ID ) AS tag_count, tag_ID, cat_blog_ID' );
+	}
+	else
+	{
+		$tags_SQL->SELECT( 'tag_name, COUNT( DISTINCT itag_itm_ID ) AS tag_count, tag_ID' );
+	}
 
 	$tags_SQL->FROM( 'T_items__tag' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__item ON itag_itm_ID = post_ID' );
-	$tags_SQL->FROM_add( 'INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID' );
-	$tags_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
+
+	if( $get_cat_blog_ID )
+	{
+		$tags_SQL->FROM_add( 'INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID' );
+		$tags_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
+	}
 
 	if( $blog_ids != '*' || $skip_intro_posts )
 	{
@@ -1002,7 +1048,7 @@ function get_inskin_statuses( $blog_ID, $type )
 	}
 
 	$BlogCache = & get_BlogCache();
-	$Blog = $BlogCache->get_by_ID( $blog_ID );
+	$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 	$inskin_statuses = $Blog->get_setting( ( $type == 'comment' ) ? 'comment_inskin_statuses' : 'post_inskin_statuses' );
 	return explode( ',', $inskin_statuses );
 }
@@ -1049,6 +1095,10 @@ function get_inskin_statuses_options( & $edited_Blog, $type )
 				'', // Note
 				'', // Class
 				$status_is_hidden, // Hidden field instead of checkbox?
+				array(
+					'data-toggle' => 'tooltip',
+					'data-placement' => 'top',
+					'title' => get_status_tooltip_title( $status ) )
 			);
 	}
 
@@ -1128,6 +1178,19 @@ function get_visibility_statuses( $format = '', $exclude = array('trash'), $chec
 					'draft'      => NT_('Save as Draft!'),
 					'deprecated' => NT_('Save as Deprecated!'),
 					'redirected' => NT_('Save as Redirected!'),
+				);
+			break;
+
+		case 'tooltip-titles':
+			$r = array(
+					'published'  => T_('This is visible by everyone.'),
+					'community'  => T_('This is visible by logged-in users only.'),
+					'protected'  => T_('This is visible by members only.'),
+					'review'     => T_('This is waiting for review and is visible by moderators only.'),
+					'private'    => T_('This is visible only by the owner/author of the post and collection administrators.'),
+					'draft'      => is_admin_page() ? T_('This is a draft.') : T_('This is a draft and is visible only by the owner/author of the post and collection administrators.'),
+					'deprecated' => T_('This is deprecated and visible in the Back-Office only.'),
+					'redirected' => T_('This will redirect to another page when accessed from the Front-Office.'),
 				);
 			break;
 
@@ -1337,6 +1400,20 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow
 	return $result;
 }
 
+
+function get_status_tooltip_title( $status )
+{
+	$visibility_statuses = get_visibility_statuses( 'tooltip-titles' );
+
+	if( isset( $visibility_statuses[$status] ) )
+	{
+		return $visibility_statuses[$status];
+	}
+	else
+	{
+		debug_die( 'Invalid status value' );
+	}
+}
 
 /**
  * Get Blog object from general setting

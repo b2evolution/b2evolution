@@ -18,9 +18,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @var Blog
  */
 global $edited_Blog;
-
-
 global $action, $next_action, $blogtemplate, $blog, $tab, $admin_url, $locales;
+global $Settings;
 
 $Form = new Form();
 
@@ -107,8 +106,63 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type-p
 			.'</a></p>';
 		}
 	}
+	if( $edited_Blog->get( 'type' ) == 'main' )
+	{ // Only show when collection is of type 'Main'
+		$set_as_checked = 0;
+		switch( $action )
+		{
+			case 'edit':
+				$set_as_checked = 0;
+				break;
+
+			case 'new-name':
+			case 'create':
+				$set_as_checked = 1;
+				break;
+		}
+
+		$set_as_options = array();
+		if( ! $Settings->get( 'info_blog_ID' ) )
+		{
+			$set_as_options[] = array( 'set_as_info_blog', 1, T_('Collection for info pages'), param( 'set_as_info_blog', 'boolean', $set_as_checked ) );
+		}
+		if( ! $Settings->get( 'login_blog_ID' ) )
+		{
+			$set_as_options[] = array( 'set_as_login_blog', 1, T_('Collection for login/registration'), param( 'set_as_login_blog', 'boolean', $set_as_checked ) );
+		}
+		if( ! $Settings->get( 'msg_blog_ID' ) )
+		{
+			$set_as_options[] = array( 'set_as_msg_blog', 1, T_('Collection for profiles/messaging'), param( 'set_as_msg_blog', 'boolean', $set_as_checked ) );
+		}
+
+		if( $set_as_options )
+		{
+			$Form->checklist( $set_as_options, 'set_as_options', T_('Automatically set as') );
+		}
+	}
 $Form->end_fieldset();
 
+if( in_array( $action, array( 'create', 'new-name' ) ) && $ctrl = 'collections' )
+{ // Only show demo content option when creating a new collection
+	$Form->begin_fieldset( T_( 'Demo contents' ).get_manual_link( 'collection-demo-content' ) );
+		$Form->radio( 'create_demo_contents', param( 'create_demo_contents', 'integer', 1 ),
+					array(
+						array( 1, T_('Initialize this collection with some demo contents') ),
+						array( 0, T_('Create an empty collection') ),
+					), T_('New contents'), true );
+		if( $current_User->check_perm( 'orgs', 'create', false ) )
+		{ // Permission to create organizations
+			$Form->checkbox( 'create_demo_org', param( 'create_demo_org', 'integer', 1 ),
+					T_( 'Create demo organization' ), T_( 'Create a demo organization if none exists.' ) );
+		}
+
+		if( $current_User->check_perm( 'users', 'edit', false ) )
+		{ // Permission to edit users
+			$Form->checkbox( 'create_demo_users', param( 'create_demo_users', 'integer', 1 ),
+					T_( 'Create demo users' ), T_( 'Create demo users as comment authors.' ) );
+		}
+	$Form->end_fieldset();
+}
 
 $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_parameters' ), array( 'class'=>'fieldset clear' ) );
 
@@ -255,6 +309,20 @@ $Form->end_form();
 
 ?>
 <script type="text/javascript">
+
+function updateDemoContentInputs()
+{
+	if( jQuery( 'input[name=create_demo_contents]:checked' ).val() == '1' )
+	{
+		jQuery( 'input[name=create_demo_org], input[name=create_demo_users]' ).removeAttr( 'disabled' );
+	}
+	else
+	{
+		jQuery( 'input[name=create_demo_org], input[name=create_demo_users]' ).attr( 'disabled', true );
+	}
+}
+
+jQuery( 'input[name=create_demo_contents]' ).click( updateDemoContentInputs );
 jQuery( 'input[name=advanced_perms]' ).click( function()
 {	// Display a proper label for "Allow access to" depending on selected "Permission management":
 	if( jQuery( this ).val() == '1' )
@@ -269,8 +337,12 @@ jQuery( 'input[name=advanced_perms]' ).click( function()
 	}
 } );
 
+
+updateDemoContentInputs();
+
 jQuery( '#blog_name' ).keyup( function()
 {	// Count characters of collection title(each html entity is counted as single char):
 	jQuery( '#blog_name_chars_count' ).html( jQuery( this ).val().replace( /&[^;\s]+;/g, '&' ).length );
 } );
+
 </script>

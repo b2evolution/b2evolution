@@ -168,7 +168,7 @@ class calendar_plugin extends Plugin
 	 */
 	function get_widget_cache_keys( $widget_ID = 0 )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		return array(
 				'wi_ID'        => $widget_ID, // Have the widget settings changed ?
@@ -222,7 +222,7 @@ class calendar_plugin extends Plugin
 		$itemlist_prefix = isset( $params['itemlist_prefix'] ) ? $params['itemlist_prefix'] : '';
 
 		global $month;
-		global $Blog, $cat_array, $cat_modifier;
+		global $Collection, $Blog, $cat_array, $cat_modifier;
 		global $show_statuses;
 		global $author, $assgn, $status, $types;
 		global ${$itemlist_prefix.'m'}, $w, $dstart;
@@ -985,7 +985,7 @@ class Calendar
 		/**
 		 * @var Blog
 		 */
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $this->link_type == 'context' )
 		{	// We want to preserve context:

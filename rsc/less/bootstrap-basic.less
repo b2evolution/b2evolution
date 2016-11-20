@@ -45,7 +45,6 @@ a[rel~=nofollow]:not([class~=btn]):hover {
 
 // Image styles:
 img.loadimg {
-	display: inline-block;
 	min-width: 64px;
 	min-height: 64px;
 	background: url(../img/ajax-loader/fff.gif) no-repeat center;
@@ -56,7 +55,24 @@ figure {
 .evo_image_block {
 	// WARNING: this will screw out backoffice layout (fulltext edit screen)
 	text-align: center;
+	.img-responsive {
+		display: inline-block;
+	}
 }
+
+// Definitions for [thumbnail:123] tag:
+.evo_thumbnail {
+  max-width: 100%;
+}
+.evo_thumbnail__left {
+  float: left;
+  margin: 0 4px 4px 0;
+}
+.evo_thumbnail__right {
+  float: right;
+  margin: 0 0 4px 4px;
+}
+
 // Used to limit max width of the replied comments,
 // because width of the replied comment can be very small
 // (Each level of the replied comments has additional 20px margin left)
@@ -275,6 +291,12 @@ form {
 .jcrop-keymgr {
 	visibility: hidden;
 }
+// Fix image cropping, because max-width:100% of main img style breaks this:
+#user_crop_workarea, .preview_cropped_image {
+	img {
+		max-width: none;
+	}
+}
 // ---------------- //
 
 // Form styles:
@@ -355,6 +377,12 @@ div.log_container, div.action_messages {
 		list-style: none;
 		margin: 0;
 		padding-left: 0;
+	}
+	ul.message_group {
+		li {
+			margin-left: 25px;
+			list-style: disc;
+		}
 	}
 }
 // ---------------- //

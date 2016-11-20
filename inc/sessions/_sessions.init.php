@@ -33,6 +33,8 @@ $required_mysql_version[ 'sessions' ] = '5.0.3';
  */
 $db_config['aliases']['T_basedomains'] = $tableprefix.'basedomains';
 $db_config['aliases']['T_hitlog'] = $tableprefix.'hitlog';
+$db_config['aliases']['T_hits__aggregate'] = $tableprefix.'hits__aggregate';
+$db_config['aliases']['T_hits__aggregate_sessions'] = $tableprefix.'hits__aggregate_sessions';
 $db_config['aliases']['T_sessions'] = $tableprefix.'sessions';
 $db_config['aliases']['T_track__goal'] = $tableprefix.'track__goal';
 $db_config['aliases']['T_track__goalhit'] = $tableprefix.'track__goalhit';
@@ -130,7 +132,7 @@ class sessions_Module extends Module
 		global $topleft_Menu;
 		global $current_User;
 		global $admin_url;
-		global $Blog, $activate_collection_toolbar;
+		global $Collection, $Blog, $activate_collection_toolbar;
 
 		if( !$current_User->check_perm( 'admin', 'normal' ) )
 		{
@@ -236,7 +238,7 @@ class sessions_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		/**
 		 * @var AdminUI_general
 		 */

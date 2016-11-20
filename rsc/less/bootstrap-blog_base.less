@@ -6,8 +6,37 @@
  * Override this with style.css in your skin folder.
  */
 
-@import "inc/star_rating.inc.less";
+
+// ----- WIDGETS -----
+ 
+// About Author widget:
+@import "_about_author_widget.module.less";
+
+// Universal item list widget & Recent posts widget:
+@import "_universal_item_list_widget.module.less";
+
+// Media Index widget:
+@import "_coll_media_index_widget.module.less";
+
+// User Avatars (User List) widget:
+@import "_user_avatars_widget.module.less";
+
+// Organization Members widget:
+@import "_org_members_widget.module.less";
+
+
+// ----- PLUGINS -----
+
+// CSS overrides for "HTML 5 VideoJS Player" plugin:
 @import "inc/video-js-overrides.inc.less";
+
+
+// -----
+
+
+// Rating Summary for all comments of the selected post on disp=single:
+@import "inc/star_rating.inc.less";
+
 
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
@@ -315,6 +344,10 @@ ul li.widget_core_coll_item_list.nobullets ul li:before {
 .action_icon {
 	margin: 0 2px;
 	font-weight: bold;
+	// Fix alignment for flag buttons:
+	&.evo_post_flag_btn {
+		margin-left: 0;
+	}
 }
 .title_action_icons {
 	float: right;

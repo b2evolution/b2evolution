@@ -269,7 +269,7 @@ class UserCache extends DataObjectCache
 		global $DB, $Debuglog;
 
 		$BlogCache = & get_BlogCache();
-		if( ! ( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) ) )
+		if( ! ( $Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) ) )
 		{	// Wrong request:
 			$Debuglog->add( "Collection #$blog_ID doesn't exist in DB on <strong>$this->objtype(Blog #$blog_ID members)</strong> into cache", 'dataobjects' );
 			return false;

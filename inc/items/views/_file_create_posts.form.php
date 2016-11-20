@@ -143,7 +143,7 @@ foreach( $images_list as $item )
 	}
 	else
 	{ // First post, Use a default category as selected on load form
-		global $Blog;
+		global $Collection, $Blog;
 		$selected_category_ID = isset( $Blog ) ? $Blog->get_default_cat_ID() : 1;
 	}
 

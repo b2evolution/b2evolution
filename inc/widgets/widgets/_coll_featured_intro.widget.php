@@ -182,10 +182,28 @@ class coll_featured_intro_Widget extends ComponentWidget
 		// Go Grab the featured post:
 		if( $Item = & get_featured_Item( 'front', $this->disp_params['blog_ID'] ) )
 		{ // We have a featured/intro post to display:
+			$item_style = '';
+			$LinkOwner = new LinkItem( $Item );
+			$LinkList = $LinkOwner->get_attachment_LinkList( 1, 'cover' );
+			if( ! empty( $LinkList ) &&
+					$Link = & $LinkList->get_next() &&
+					$File = & $Link->get_File() &&
+					$File->exists() &&
+					$File->is_image() )
+			{	// Use cover image of intro-post as background:
+				$item_style = 'background-image: url("'.$File->get_url().'")';
+			}
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 			echo $this->disp_params['block_start'];
 			echo $this->disp_params['block_body_start'];
-			echo $this->disp_params['featured_intro_before'];
+			if( empty( $item_style ) )
+			{	// No item style:
+				echo $this->disp_params['featured_intro_before'];
+			}
+			else
+			{	// Append item style to use cover as background:
+				echo update_html_tag_attribs( $this->disp_params['featured_intro_before'], array( 'style' => $item_style, 'class' => 'evo_hasbgimg' ) );
+			}
 			skin_include( $this->disp_params['skin_template'].'.inc.php', array(
 					'feature_block'        => true,
 					'content_mode'         => 'auto',   // 'auto' will auto select depending on $disp-detail
@@ -214,7 +232,7 @@ class coll_featured_intro_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog, $current_User;
+		global $Collection, $Blog, $current_User;
 
 		return array(
 				'wi_ID' => $this->ID, // Have the widget settings changed ?

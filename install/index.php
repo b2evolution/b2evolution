@@ -3,10 +3,10 @@
  * This is the main install menu
  *
  * ---------------------------------------------------------------------------------------------------------------
- * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT YOU DID NOT LOAD THIS FILE THROUGH A PHP WEB SERVER. 
+ * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT YOU DID NOT LOAD THIS FILE THROUGH A PHP WEB SERVER.
  * TO GET STARTED, GO TO THIS PAGE: http://b2evolution.net/man/getting-started
  * ---------------------------------------------------------------------------------------------------------------
- * 
+ *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
  * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
@@ -372,6 +372,14 @@ $booststrap_install_form_params = array(
 		'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-4 col-sm-8">',
 		'buttonsend'     => "</div></div>\n\n",
 		'note_format'    => ' <span class="help-inline text-muted small">%s</span>',
+		// - checkbox
+		'fieldstart_checkbox'    => '<div class="form-group" $ID$>'."\n",
+		'fieldend_checkbox'      => "</div>\n\n",
+		'inputclass_checkbox'    => '',
+		'inputstart_checkbox'    => '<div class="col-sm-8 col-sm-offset-4"><div class="checkbox"><label>',
+		'inputend_checkbox'      => "</label></div></div>\n",
+		'checkbox_newline_start' => '<div class="checkbox">',
+		'checkbox_newline_end'   => "</div>\n",
 	);
 
 header('Content-Type: text/html; charset='.$evo_charset);
@@ -472,6 +480,7 @@ switch( $action )
 		 */
 		display_locale_selector();
 
+		param( 'conf_create_db', 'integer', 0 );
 		param( 'conf_db_user', 'string', true );
 		param( 'conf_db_password', 'raw', true );
 		param( 'conf_db_name', 'string', true );
@@ -483,6 +492,7 @@ switch( $action )
 
 		// Try to create/update basic config file:
 		$basic_config_params = array(
+				'create_db'      => $conf_create_db,
 				'db_user'        => $conf_db_user,
 				'db_password'    => $conf_db_password,
 				'db_name'        => $conf_db_name,
@@ -577,6 +587,7 @@ switch( $action )
 			?>
 				<p class="text-muted small"><?php echo T_('b2evolution stores blog posts, comments, user permissions, etc. in a MySQL database. You must create this database prior to installing b2evolution and provide the access parameters to this database below. If you are not familiar with this, you can ask your hosting provider to create the database for you.') ?></p>
 				<?php
+				$Form->checkbox( 'conf_create_db', param( 'conf_create_db', 'integer' ), '', T_('Try to create this DB if it doesn\'t exist yet (useful for developers)') );
 				$Form->text( 'conf_db_host', $conf_db_host, 16, T_('MySQL Host/Server'), sprintf( T_('Typically looks like "localhost" or "sql-6" or "sql-8.yourhost.net"...' ) ), 120 );
 				$Form->text( 'conf_db_name', $conf_db_name, 16, T_('MySQL Database'), sprintf( T_('Name of the MySQL database you have created on the server' ) ), 100);
 				$Form->text( 'conf_db_user', $conf_db_user, 16, T_('MySQL Username'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 );
@@ -803,6 +814,7 @@ switch( $action )
 							'photos' => T_('Photos'),
 							'forums' => T_('Forums'),
 							'manual' => T_('Manual'),
+							'group'  => T_('Tracker'),
 						);
 
 					// Allow all modules to set what collections should be installed
@@ -830,18 +842,33 @@ switch( $action )
 					<?php } ?>
 				</div>
 			</div>
+
+			<div class="checkbox" style="margin-top: 15px">
+				<label>
+					<input type="checkbox" name="create_sample_organization" id="create_sample_organization" value="1" checked="checked" />
+					<?php echo T_('Create a sample organization');?>
+					</label>
+			</div>
+
+			<div class="checkbox" style="margin-top: 15px">
+				<label>
+					<input type="checkbox" name="create_demo_users" id="create_demo_users" value="1" checked="checked" />
+					<?php echo T_('Create demo users (in addition to the admin account)');?>
+					</label>
+			</div>
+
 			<?php
 			if( $allow_install_test_features )
 			{ // Checkbox to install all features
 			?>
 				<div class="checkbox" style="margin-top:15px">
 					<label>
-						<input accept=""type="checkbox" name="install_test_features" id="install_test_features" value="1" />
+						<input accept="" type="checkbox" name="install_test_features" id="install_test_features" value="1" />
 						<?php echo T_('Also install all test features.')?>
 					</label>
 				</div>
 			<?php } ?>
-	
+
 			<div class="checkbox" style="margin:15px 0 15px">
 				<label>
 					<input type="checkbox" name="local_installation" id="local_installation" value="1"<?php echo check_local_installation() ? ' checked="checked"' : ''; ?> />
@@ -850,7 +877,7 @@ switch( $action )
 			</div>
 
 			<p class="evo_form__install_buttons">
-			
+
 				<?php
 				if( ( ( $allow_evodb_reset >= 2 )
 				      || ( $allow_install_test_features && $allow_evodb_reset >= 1 ) )
@@ -868,7 +895,7 @@ switch( $action )
 				?>
 
 				<a href="index.php?locale=<?php echo $default_locale ?>" class="btn btn-default btn-lg"><?php echo T_('Cancel')?></a>
-	
+
 			</p>
 		</form>
 
@@ -925,7 +952,9 @@ switch( $action )
 		 */
 		track_step( 'install-start' );
 
-		$create_sample_contents = param( 'create_sample_contents', 'string', '' );
+		$create_sample_contents = param( 'create_sample_contents', 'string', false, true );   // during auto install this param can be 'all'
+		$create_sample_organization = param( 'create_sample_organization', 'boolean', false, true );
+		$create_demo_users = param( 'create_demo_users', 'boolean', false, true );
 
 		if( $allow_install_test_features )
 		{	// Allow to use $allow_install_test_features from request only when it is enabled in config:

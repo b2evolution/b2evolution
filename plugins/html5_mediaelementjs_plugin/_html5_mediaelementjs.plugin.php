@@ -48,7 +48,7 @@ class html5_mediaelementjs_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		require_css( '#mediaelement_css#', 'blog' );
 		require_js( '#jquery#', 'blog' );
@@ -163,6 +163,18 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 	{
 		return array_merge( parent::get_coll_setting_definitions( $params ),
 			array(
+				'use_for_posts' => array(
+					'label' => T_('Use for'),
+					'note' => T_('videos attached to posts'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
+					),
+				'use_for_comments' => array(
+					'label' => '',
+					'note' => T_('videos attached to comments'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
+					),
 				'skin' => array(
 					'label' => T_('Skin'),
 					'type' => 'select',
@@ -183,6 +195,7 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 					),
 				'allow_download' => array(
 					'label' => T_('Display Download Link'),
+					'note' => T_('Check to display a "Download this video" link under the video.'),
 					'type' => 'checkbox',
 					'defaultvalue' => 0,
 					),
@@ -247,6 +260,12 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 		$Item = & $params['Item'];
 		$item_Blog = $Item->get_Blog();
 
+		if( ( ! $in_comments && ! $this->get_coll_setting( 'use_for_posts', $item_Blog ) ) ||
+		    ( $in_comments && ! $this->get_coll_setting( 'use_for_comments', $item_Blog ) ) )
+		{ // Plugin is disabled for post/comment videos on this Blog
+			return false;
+		}
+
 		if( $File->exists() )
 		{
 			if( ! $File->is_audio() && $placeholder_File = & $Item->get_placeholder_File( $File ) )
@@ -299,7 +318,7 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 	 */
 	function RenderURL( & $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( empty( $params['url'] ) || ! $this->is_url_supported( $params['url'] ) )
 		{	// This file is not supported by plugin, Exit here:
@@ -313,7 +332,7 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 		}
 		else
 		{	// Use current collection:
-			global $Blog;
+			global $Collection, $Blog;
 			$player_Blog = $Blog;
 		}
 
@@ -427,7 +446,7 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 	 */
 	function get_skin_class()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$skin = $this->get_coll_setting( 'skin', $Blog );
 
@@ -444,7 +463,7 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 	 */
 	function require_skin()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$skin = $this->get_coll_setting( 'skin', $Blog );
 		if( !empty( $skin ) && $skin != 'default')

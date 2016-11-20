@@ -370,7 +370,7 @@ while( $loop_Plugin = & $Plugins->get_next() )
 
 $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-registration') );
 	$Form->begin_line( T_('Account registered on'), NULL, 'info' );
-		$Form->info_field( '', $edited_User->dget('datecreated'), array( 'note' => '('.date_ago( strtotime( $edited_User->get( 'datecreated' ) ) ).')') );
+		$Form->info_field( '', mysql2localedatetime( $edited_User->dget('datecreated') ), array( 'note' => '('.date_ago( strtotime( $edited_User->get( 'datecreated' ) ) ).')') );
 		$Form->info_field( '<b class="evo_label_inline">'.T_('From IP').': </b>', format_to_output( int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) ) ) );
 	$Form->end_line( NULL, 'info' );
 

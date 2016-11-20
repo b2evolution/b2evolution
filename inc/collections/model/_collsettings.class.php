@@ -58,16 +58,24 @@ class CollectionSettings extends AbstractSettings
 			'slug_limit' => 5,
 			'tags_meta_keywords' => 1,
 			'tags_open_graph' => 1,
+			'tags_twitter_card' => 1,
 			// 'post_moderation_statuses' => NULL,			// Possible values are a list of statuses from: 'community', 'protected', 'review', 'draft', but we don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 
+		// Item voting settings:
+			'voting_positive' => 1, // Allow Positive vote
+			'voting_neutral'  => 0, // Allow Neutral vote
+			'voting_negative' => 0, // Allow Negative vote
+
 		// Comment settings:
-			// 'new_feedback_status' => 'review',		// Default status for new anonymous comments: 'published', 'community', 'protected', 'private', 'review', 'draft' or 'deprecated'. We don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
+			'new_feedback_status' => 'review',			// Default status for new anonymous comments: 'published', 'community', 'protected', 'private', 'review', 'draft' or 'deprecated'. We don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 			// 'moderation_statuses' => NULL,			// Possible values are a list of statuses from: 'community', 'protected', 'review', 'draft', but we don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 			// 'comment_inskin_statuses' => NULL,       // Possible value is a set of statuses wihtout the 'trash' status, but we don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 			// 'post_inskin_statuses' => NULL,          // Same as in case of comments
 			'allow_comments' => 'any',
 			'allow_view_comments' => 'any',				// 'any', 'registered', 'member', 'moderator'
-			'allow_anon_url' => '0',
+			'require_anon_name' => 1,
+			'require_anon_email' => 1,
+			'allow_anon_url' => 0,
 			'allow_attachments' => 'registered',
 			'max_attachments' => '',
 			'display_rating_summary' => '1', // Display a summary of star ratings above the comments
@@ -151,6 +159,8 @@ class CollectionSettings extends AbstractSettings
 			'cache_enabled_widgets' => 0,
 			'in_skin_login' => 0,						// Use in skin login form every time it's possible
 			'in_skin_editing' => 0,
+			'in_skin_editing_renderers' => 1,
+			'in_skin_editing_category' => 1,
 			'default_cat_ID' => NULL,					// Default Cat for new posts
 			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet,evo_twitter', // ping plugin codes, separated by comma
 			'allow_subscriptions' => 1,         // Allow email subscriptions for new post by default

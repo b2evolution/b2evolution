@@ -104,7 +104,13 @@ $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedbac
 
 	echo '<div class="feedback_details_container">';
 
-	$Form->checkbox( 'allow_anon_url', $edited_Blog->get_setting( 'allow_anon_url' ), T_('Anonymous URLs'), T_('Allow anonymous commenters to submit an URL') );
+	$Form->textarea_input( 'comment_form_msg', $edited_Blog->get_setting( 'comment_form_msg' ), 3, T_('Message before comment form') );
+
+	$Form->checklist( array(
+			array( 'require_anon_name', 1, T_('Require a name'), $edited_Blog->get_setting( 'require_anon_name' ) ),
+			array( 'require_anon_email', 1, T_('Require an email'), $edited_Blog->get_setting( 'require_anon_email' ) ),
+			array( 'allow_anon_url', 1, T_('Allow to submit an URL'), $edited_Blog->get_setting( 'allow_anon_url' ) )
+		), 'allow_anon_url', T_('Anonymous comments') );
 
 	$Form->checkbox( 'allow_html_comment', $edited_Blog->get_setting( 'allow_html_comment' ),
 						T_( 'Allow HTML' ), T_( 'Check to allow HTML in comments.' ).' ('.T_('HTML code will pass several sanitization filters.').')' );
@@ -251,6 +257,10 @@ $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moder
 				'', // Note
 				'', // Class
 				$status_is_hidden, // Hidden field instead of checkbox?
+				array(
+					'data-toggle' => 'tooltip',
+					'data-placement' => 'top',
+					'title' => get_status_tooltip_title( $status ) )
 			);
 	}
 	$Form->checklist( $checklist_options, 'moderation_statuses', T_('"Require moderation" statuses'), false, false, array( 'note' => T_('Comments with the selected statuses will be considered to require moderation. They will trigger "moderation required" notifications and will appear as such on the collection dashboard.') ) );

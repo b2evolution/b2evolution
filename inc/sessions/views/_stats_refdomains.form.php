@@ -40,6 +40,8 @@ $Form->begin_form( 'fform', $creating ?  T_('New Domain') : T_('Domain') );
 
 	$Form->select_input_array( 'dom_status', $edited_Domain->get( 'status' ), stats_dom_status_titles() , T_('Spam status'), '', array( 'force_keys_as_values' => true, 'background_color' => stats_dom_status_colors(), 'required' => true ) );
 
+	$Form->text_input( 'dom_comment', $edited_Domain->get( 'comment' ), 255, T_('Comment'), '', array( 'maxlength' => 255 ) );
+
 $Form->end_form( array( array( 'submit', 'submit', $creating ? T_('Record') : T_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>

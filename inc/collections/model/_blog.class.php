@@ -65,6 +65,7 @@ class Blog extends DataObject
 	var $locale;
 	var $order;
 	var $access_type;
+	var $http_protocol;
 
 	/*
 	 * ?> TODO: we should have an extra DB column that either defines type of blog_siteurl
@@ -215,6 +216,7 @@ class Blog extends DataObject
 			$this->longdesc = $db_row->blog_longdesc;
 			$this->locale = $db_row->blog_locale;
 			$this->access_type = $db_row->blog_access_type;
+			$this->http_protocol = isset( $db_row->blog_http_protocol ) ? $db_row->blog_http_protocol : 'always_redirect';
 			$this->siteurl = $db_row->blog_siteurl;
 			$this->urlname = $db_row->blog_urlname;
 			$this->links_blog_ID = $db_row->blog_links_blog_ID; // DEPRECATED
@@ -317,7 +319,7 @@ class Blog extends DataObject
 				$this->set( 'type', 'main' );
 				$this->set( 'name', empty( $name ) ? T_('Homepage Title') : $name );
 				$this->set( 'shortname', empty( $shortname ) ? T_('Home') : $shortname );
-				$this->set( 'urlname', empty( $urlname ) ? 'main' : $urlname );
+				$this->set( 'urlname', empty( $urlname ) ? 'home' : $urlname );
 				$this->set_setting( 'front_disp', 'front' );
 				$this->set_setting( 'aggregate_coll_IDs', '*' );
 				$this->set_setting( 'in_skin_login', '1' );
@@ -325,9 +327,9 @@ class Blog extends DataObject
 
 			case 'photo':
 				$this->set( 'type', 'photo' );
-				$this->set( 'name', empty($name) ? T_('My photoblog') : $name );
-				$this->set( 'shortname', empty($shortname) ? T_('Photoblog') : $shortname );
-				$this->set( 'urlname', empty($urlname) ? 'photo' : $urlname );
+				$this->set( 'name', empty($name) ? T_('Photos') : $name );
+				$this->set( 'shortname', empty($shortname) ? T_('Photos') : $shortname );
+				$this->set( 'urlname', empty($urlname) ? 'photos' : $urlname );
 				$this->set_setting( 'posts_per_page', 12 );
 				$this->set_setting( 'archive_mode', 'postbypost' );
 				$this->set_setting( 'front_disp', 'posts' );
@@ -345,17 +347,26 @@ class Blog extends DataObject
 
 			case 'group':
 				$this->set( 'type', 'group' );
-				$this->set( 'name', empty($name) ? T_('Our blog') : $name );
-				$this->set( 'shortname', empty($shortname) ? T_('Group') : $shortname );
-				$this->set( 'urlname', empty($urlname) ? 'group' : $urlname );
+				$this->set( 'name', empty($name) ? T_('Tracker Title') : $name );
+				$this->set( 'shortname', empty($shortname) ? T_('Tracker') : $shortname );
+				$this->set( 'urlname', empty($urlname) ? 'tracker' : $urlname );
 				$this->set_setting( 'use_workflow', 1 );
+				// Try to find post type "Forum Topic" in DB
+				global $DB;
+				$forum_topic_type_ID = $DB->get_var( 'SELECT ityp_ID
+					 FROM T_items__type
+					WHERE ityp_name = "Forum Topic"' );
+				if( $forum_topic_type_ID )
+				{ // Set default post type as "Forum Topic"
+					$this->set_setting( 'default_post_type', $forum_topic_type_ID );
+				}
 				break;
 
 			case 'forum':
 				$this->set( 'type', 'forum' );
-				$this->set( 'name', empty($name) ? T_('My forum') : $name );
-				$this->set( 'shortname', empty($shortname) ? T_('Forum') : $shortname );
-				$this->set( 'urlname', empty($urlname) ? 'forum' : $urlname );
+				$this->set( 'name', empty($name) ? T_('Forums Title') : $name );
+				$this->set( 'shortname', empty($shortname) ? T_('Forums') : $shortname );
+				$this->set( 'urlname', empty($urlname) ? 'forums' : $urlname );
 				$this->set( 'advanced_perms', 1 );
 				$this->set_setting( 'post_navigation', 'same_category' );
 				$this->set_setting( 'allow_comments', 'registered' );
@@ -383,7 +394,7 @@ class Blog extends DataObject
 
 			case 'manual':
 				$this->set( 'type', 'manual' );
-				$this->set( 'name', empty($name) ? T_('Manual') : $name );
+				$this->set( 'name', empty($name) ? T_('Manual Title') : $name );
 				$this->set( 'shortname', empty($shortname) ? T_('Manual') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'manual' : $urlname );
 				$this->set_setting( 'post_navigation', 'same_category' );
@@ -406,8 +417,16 @@ class Blog extends DataObject
 
 			case 'std':
 			default:
-				$this->set( 'type', 'std' );
-				$this->set( 'name', empty($name) ? T_('My weblog') : $name );
+				if( $kind != 'std' )
+				{	// Check if given kind is allowed by system or plugins:
+					$kinds = get_collection_kinds();
+					if( ! isset( $kinds[ $kind ] ) )
+					{	// If unknown kind, restrict this to standard:
+						$kind = 'std';
+					}
+				}
+				$this->set( 'type', $kind );
+				$this->set( 'name', empty($name) ? T_('Public Blog') : $name );
 				$this->set( 'shortname', empty($shortname) ? T_('Blog') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'blog' : $urlname );
 				break;
@@ -506,15 +525,21 @@ class Blog extends DataObject
 					case 'public':
 						// Enable "Community" and "Members":
 						$enable_moderation_statuses = array( 'community', 'protected' );
+						$enable_comment_moderation_statuses = array( 'community', 'protected', 'review', 'draft' );
+						$disable_comment_moderation_statuses = array( 'private' );
 						break;
 					case 'users':
 						// Disable "Community" and Enable "Members":
 						$disable_moderation_statuses = array( 'community' );
 						$enable_moderation_statuses = array( 'protected' );
+						$enable_comment_moderation_statuses = array( 'protected', 'review', 'draft' );
+						$disable_comment_moderation_statuses = array( 'community', 'private' );
 						break;
 					case 'members':
 						// Disable "Community" and "Members":
 						$disable_moderation_statuses = array( 'community', 'protected' );
+						$enable_comment_moderation_statuses = array( 'review', 'draft' );
+						$disable_comment_moderation_statuses = array( 'community', 'protected', 'private' );
 						break;
 				}
 				$post_moderation_statuses = $this->get_setting( 'post_moderation_statuses' );
@@ -531,8 +556,19 @@ class Blog extends DataObject
 					$post_moderation_statuses = array_unique( array_merge( $enable_moderation_statuses, $post_moderation_statuses ) );
 					$comment_moderation_statuses = array_unique( array_merge( $enable_moderation_statuses, $comment_moderation_statuses ) );
 				}
+
+				if( ! empty( $disable_comment_moderation_statuses ) )
+				{
+					$comment_moderation_statuses = array_diff( $comment_moderation_statuses, $disable_comment_moderation_statuses );
+				}
+				if( ! empty( $enable_comment_moderation_statuses ) )
+				{
+					$comment_moderation_statuses = array_unique( array_merge( $enable_comment_moderation_statuses, $comment_moderation_statuses ) );
+				}
+
 				$this->set_setting( 'post_moderation_statuses', implode( ',', $post_moderation_statuses ) );
-				$this->set_setting( 'moderation_statuses', implode( ',', $comment_moderation_statuses ) );
+				// Force enabled statuses regardless of previous settings
+				$this->set_setting( 'moderation_statuses', implode( ',', $enable_comment_moderation_statuses ) );
 			}
 			if( $this->get_setting( 'allow_access' ) == 'users' || $this->get_setting( 'allow_access' ) == 'members' )
 			{ // Disable site maps, feeds and ping plugins when access is restricted on this blog
@@ -784,6 +820,16 @@ class Blog extends DataObject
 
 			$this->set_setting( 'post_categories', param( 'post_categories', 'string', NULL ) );
 
+			if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
+			{	// We have permission to edit advanced admin settings:
+				$this->set_setting( 'in_skin_editing', param( 'in_skin_editing', 'integer', 0 ) );
+				if( $this->get_setting( 'in_skin_editing' ) )
+				{
+					$this->set_setting( 'in_skin_editing_renderers', param( 'in_skin_editing_renderers', 'integer', 0 ) );
+					$this->set_setting( 'in_skin_editing_category', param( 'in_skin_editing_category', 'integer', 0 ) );
+				}
+			}
+
 			$this->set_setting( 'post_navigation', param( 'post_navigation', 'string', NULL ) );
 
 			// Show x days or x posts?:
@@ -836,6 +882,11 @@ class Blog extends DataObject
 				$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
 				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 			}
+
+			// Voting options:
+			$this->set_setting( 'voting_positive', param( 'voting_positive', 'integer', 0 ) );
+			$this->set_setting( 'voting_neutral', param( 'voting_neutral', 'integer', 0 ) );
+			$this->set_setting( 'voting_negative', param( 'voting_negative', 'integer', 0 ) );
 		}
 
 		if( in_array( 'comments', $groups ) )
@@ -938,6 +989,9 @@ class Blog extends DataObject
 			{ // Only admin can set this setting to 'Public'
 				$this->set_setting( 'new_feedback_status', $new_feedback_status );
 			}
+			$this->set_setting( 'comment_form_msg', param( 'comment_form_msg', 'text' ) );
+			$this->set_setting( 'require_anon_name', param( 'require_anon_name', 'string', '0' ) );
+			$this->set_setting( 'require_anon_email', param( 'require_anon_email', 'string', '0' ) );
 			$this->set_setting( 'allow_anon_url', param( 'allow_anon_url', 'string', '0' ) );
 			$this->set_setting( 'allow_html_comment', param( 'allow_html_comment', 'string', '0' ) );
 			$this->set_setting( 'allow_attachments', param( 'allow_attachments', 'string', 'registered' ) );
@@ -1003,6 +1057,7 @@ class Blog extends DataObject
 			$this->set_setting( 'categories_meta_description', param( 'categories_meta_description', 'integer', 0 ) );
 			$this->set_setting( 'tags_meta_keywords', param( 'tags_meta_keywords', 'integer', 0 ) );
 			$this->set_setting( 'tags_open_graph', param( 'tags_open_graph', 'integer', 0 ) );
+			$this->set_setting( 'tags_twitter_card', param( 'tags_twitter_card', 'integer', 0 ) );
 			$this->set_setting( 'download_noindex', param( 'download_noindex', 'integer', 0 ) );
 			$this->set_setting( 'download_nofollowto', param( 'download_nofollowto', 'integer', 0 ) );
 		}
@@ -1137,6 +1192,11 @@ class Blog extends DataObject
 				{ // The received siteurl value was correct, may update the access_type value
 					$this->set( 'access_type', $access_type );
 				}
+			}
+
+			if( ( $http_protocol = param( 'blog_http_protocol', 'string', 'always_redirect' ) ) !== NULL )
+			{
+				$this->set( 'http_protocol', $http_protocol );
 			}
 
 			if( ( param( 'cookie_domain_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
@@ -2238,7 +2298,7 @@ class Blog extends DataObject
 
 		if( ! $Settings->get( 'fm_enable_roots_blog' ) )
 		{ // User directories are disabled:
-			$Debuglog->add( 'Attempt to access blog media dir, but this feature is globally disabled', 'files' );
+			$Debuglog->add( 'Attempt to access collection media dir, but this feature is globally disabled', 'files' );
 			return false;
 		}
 
@@ -2258,7 +2318,7 @@ class Blog extends DataObject
 
 			case 'none':
 			default:
-				$Debuglog->add( 'Attempt to access blog media dir, but this feature is disabled for this blog', 'files' );
+				$Debuglog->add( 'Attempt to access collection media dir, but this feature is disabled for this colletion', 'files' );
 				return false;
 		}
 
@@ -2273,8 +2333,8 @@ class Blog extends DataObject
 			{ // add error
 				if( is_admin_page() )
 				{
-					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), $msg_mediadir_path )
-								.get_manual_link('media_file_permission_errors'), 'error' );
+					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), $msg_mediadir_path ),
+							'error', T_('Collection media file permission errors').get_manual_link('media_file_permission_errors').':' );
 				}
 				return false;
 			}
@@ -2282,8 +2342,8 @@ class Blog extends DataObject
 			{ // add error
 				if( is_admin_page() )
 				{
-					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created."), $msg_mediadir_path )
-								.get_manual_link('directory_creation_error'), 'error' );
+					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; could not be created."), $msg_mediadir_path ),
+							'error', T_('Collection media directory creation errors').get_manual_link('directory_creation_error').':' );
 				}
 				return false;
 			}
@@ -2291,7 +2351,7 @@ class Blog extends DataObject
 			{ // add note:
 				if( is_admin_page() )
 				{
-					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; has been created with permissions %s."), $msg_mediadir_path, substr( sprintf('%o', fileperms($mediadir)), -3 ) ), 'success' );
+					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; has been created with permissions %s."), $msg_mediadir_path, substr( sprintf('%o', fileperms($mediadir)), -3 ) ), 'success', T_('Collection media directories created:') );
 				}
 			}
 		}
@@ -2570,6 +2630,10 @@ class Blog extends DataObject
 
 			case 'contactsurl':
 				$disp_param = 'contacts';
+				break;
+
+			case 'flaggedurl':
+				$disp_param = 'flagged';
 				break;
 
 			case 'helpurl':
@@ -2980,8 +3044,6 @@ class Blog extends DataObject
 		// DB INSERT
 		$this->dbinsert();
 
-		$Messages->add( T_('The new blog has been created.'), 'success' );
-
 		// Change access mode if a stub file exists:
 		$stub_filename = 'blog'.$this->ID.'.php';
 		if( is_file( $basepath.$stub_filename ) )
@@ -2989,7 +3051,7 @@ class Blog extends DataObject
 			$DB->query( 'UPDATE T_blogs
 						SET blog_access_type = "relative", blog_siteurl = "'.$stub_filename.'"
 						WHERE blog_ID = '.$this->ID );
-			$Messages->add( sprintf(T_('The new blog has been associated with the stub file &laquo;%s&raquo;.'), $stub_filename ), 'success' );
+			$Messages->add_to_group( sprintf(T_('The new collection has been associated with the stub file &laquo;%s&raquo;.'), $stub_filename ), 'success', T_('New collection created:') );
 		}
 		elseif( $this->get( 'access_type' ) == 'relative' )
 		{ // Show error message only if stub file should exists!
@@ -3027,13 +3089,13 @@ class Blog extends DataObject
 		$edited_Chapter->set( 'urlname', $blog_urlname.'-main' );
 		$edited_Chapter->dbinsert();
 
-		$Messages->add( T_('A default category has been created for this blog.'), 'success' );
+		$Messages->add_to_group( T_('A default category has been created for this collection.'), 'success', T_('New collection created:') );
 
 		// ADD DEFAULT WIDGETS:
 		load_funcs( 'widgets/_widgets.funcs.php' );
 		insert_basic_widgets( $this->ID, false, $kind );
 
-		$Messages->add( T_('Default widgets have been set-up for this blog.'), 'success' );
+		$Messages->add_to_group( T_('Default widgets have been set-up for this collection.'), 'success', T_('New collection created:') );
 
 		$DB->commit();
 
@@ -3044,7 +3106,14 @@ class Blog extends DataObject
 			if( $result != NULL )
 			{
 				list( $status, $message ) = $result;
-				$Messages->add( $message, $status );
+				if( $status == 'success' )
+				{
+					$Messages->add_to_group( $message, $status, T_('New collection created:') );
+				}
+				else
+				{
+					$Messages->add( $message, $status );
+				}
 			}
 		}
 		$this->set_setting( 'cache_enabled_widgets', $Settings->get( 'newblog_cache_enabled_widget' ) );
@@ -4537,6 +4606,10 @@ class Blog extends DataObject
 
 			case 'manual':
 				$default_post_types = array( 'Manual Page' );
+				break;
+
+			case 'group':
+				$default_post_types = array( 'Forum Topic', 'Bug Report' );
 				break;
 
 			default: // 'std'

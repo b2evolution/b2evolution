@@ -97,7 +97,7 @@ class coll_avatar_Widget extends ComponentWidget
 	function display( $params )
 	{
 		global $cat_modifier;
-		global $Blog;
+		global $Collection, $Blog;
 
 		$this->init_display( $params );
 
@@ -132,7 +132,7 @@ class coll_avatar_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$owner_User = & $Blog->get_owner_User();
 

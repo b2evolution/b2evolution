@@ -43,9 +43,7 @@ if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 echo '</div>';
 ?>
 
-
 <div class="container main_page_wrapper">
-
 
 <div class="row">
 
@@ -205,13 +203,15 @@ echo '</div>';
 
 	</div><!-- .col -->
 
+	<!-- "Slide down" button -->
+	<div class="slide_button_wrap"><i class="fa fa-angle-down" id="slide_button"></i></div>
+
 </div><!-- .row -->
 
 </div><!-- .container -->
 
-
 <!-- =================================== START OF SECONDARY AREA =================================== -->
-<section class="secondary_area"><!-- white background -->
+<section class="secondary_area" id="slide_destination"><!-- white background, ID is used to slide here from "slide_button" -->
 <div class="container">
 
 	<div class="row">
@@ -303,11 +303,9 @@ echo '</div>';
 
 	</div><!-- .row -->
 
-
 </div><!-- .container -->
 
 </section><!-- .secondary_area -->
-
 
 <?php
 // ---------------------------- SITE FOOTER INCLUDED HERE ----------------------------

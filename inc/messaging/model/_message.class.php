@@ -116,7 +116,9 @@ class Message extends DataObject
 	static function get_delete_cascades()
 	{
 		return array(
-				array( 'table'=>'T_messaging__prerendering', 'fk'=>'mspr_msg_ID', 'msg'=>T_('%d prerendered content') )
+				array( 'table'=>'T_messaging__prerendering', 'fk'=>'mspr_msg_ID', 'msg'=>T_('%d prerendered content') ),
+				array( 'table'=>'T_links', 'fk'=>'link_msg_ID', 'msg'=>T_('%d links to destination private messages'),
+						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
 			);
 	}
 
@@ -201,6 +203,146 @@ class Message extends DataObject
 
 
 	/**
+	 * Link attachments from temporary object to new created Message
+	 */
+	function link_from_Request()
+	{
+		global $DB;
+
+		if( $this->ID == 0 )
+		{	// The message must be stored in DB:
+			return;
+		}
+
+		$temp_link_owner_ID = param( 'temp_link_owner_ID', 'integer', 0 );
+
+		$TemporaryIDCache = & get_TemporaryIDCache();
+		if( ! ( $TemporaryID = & $TemporaryIDCache->get_by_ID( $temp_link_owner_ID, false, false ) ) )
+		{	// No temporary object of attachments:
+			return;
+		}
+
+		if( $TemporaryID->type != 'message' )
+		{	// Wrong temporary object:
+			return;
+		}
+
+		// Load all links:
+		$LinkOwner = new LinkMessage( NULL, $TemporaryID->ID );
+		$LinkOwner->load_Links();
+
+		if( empty( $LinkOwner->Links ) )
+		{	// No links:
+			return;
+		}
+
+		// Change link owner from temporary to message object:
+		$DB->query( 'UPDATE T_links
+			  SET link_msg_ID = '.$this->ID.',
+			      link_tmp_ID = NULL
+			WHERE link_tmp_ID = '.$TemporaryID->ID );
+
+		// Move all temporary files to folder of new created message:
+		foreach( $LinkOwner->Links as $msg_Link )
+		{
+			if( $msg_File = & $msg_Link->get_File() &&
+			    $msg_FileRoot = & $msg_File->get_FileRoot() )
+			{
+				if( ! file_exists( $msg_FileRoot->ads_path.'private_message/pm'.$this->ID.'/' ) )
+				{	// Create if folder doesn't exist for files of new created message:
+					if( evo_mkdir( $msg_FileRoot->ads_path.'private_message/pm'.$this->ID.'/' ) )
+					{
+						$tmp_folder_path = $msg_FileRoot->ads_path.'private_message/tmp'.$TemporaryID->ID.'/';
+					}
+				}
+				$msg_File->move_to( $msg_FileRoot->type, $msg_FileRoot->in_type_ID, 'private_message/pm'.$this->ID.'/'.$msg_File->get_name() );
+			}
+		}
+
+		if( isset( $tmp_folder_path ) && file_exists( $tmp_folder_path ) )
+		{	// Remove temp folder from disk completely:
+			rmdir_r( $tmp_folder_path );
+		}
+
+		// Delete temporary object from DB:
+		$TemporaryID->dbdelete();
+	}
+
+
+	/**
+	 * Link attachments from other message object to this Message
+	 * Used to copy all links from one to another if new thread is sent to multiple recipients as individual messages
+	 */
+	function link_from_Message( $source_msg_ID )
+	{
+		if( $this->ID == 0 || $source_msg_ID == 0 )
+		{	// Current and source message must be created in DB:
+			return;
+		}
+
+		// Find all matches with inline tags:
+		preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):(\d+)(:?)([^\]]*)\]/i', $this->text, $inlines );
+
+		if( empty( $inlines[0] ) )
+		{	// If content of source message doesn't contain inline tags then we should update a content of current message,
+			// so we do a quick copying of all links from source message to current:
+			global $DB;
+			$DB->query( 'INSERT INTO T_links
+			     ( link_msg_ID,   link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_file_ID, link_ltype_ID, link_position, link_order )
+			SELECT '.$this->ID.', link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_file_ID, link_ltype_ID, link_position, link_order
+			  FROM T_links
+			 WHERE link_msg_ID = '.$source_msg_ID );
+		}
+		else
+		{	// The source message content contains at least one inline tag,
+			// therefore we must update content of current message to update the link IDs of the inline tags
+
+			// Load all links of the source message:
+			$MessageCache = & get_MessageCache();
+			$source_Message = & $MessageCache->get_by_ID( $source_msg_ID, false, false );
+			$source_LinkOwner = new LinkMessage( $source_Message );
+			$source_LinkOwner->load_Links();
+
+			if( empty( $source_LinkOwner->Links ) )
+			{	// No links:
+				return;
+			}
+
+			// Initialize link owner for current message:
+			$this_LinkOwner = new LinkMessage( $this );
+
+			// Store in this array a relation of source link IDs and new copied link IDs of this message:
+			$new_link_IDs = array();
+
+			// Copy each link from source message to current:
+			foreach( $source_LinkOwner->Links as $source_Link )
+			{
+				if( $new_link_ID = $this_LinkOwner->add_link( $source_Link->file_ID, $source_Link->position, $source_Link->order ) )
+				{	// If new link is added then store this in array in order to update the message content for inline tags like [image:123]:
+					$new_link_IDs[ $source_Link->ID ] = $new_link_ID;
+				}
+			}
+
+			// Replace link IDs of source message in inline tags to new inserted Links of current message:
+			$search_inline_tags = array();
+			$replace_inline_tags = array();
+			foreach( $inlines[0] as $i => $inline_tag )
+			{
+				$search_inline_tags[] = $inline_tag;
+				$replace_inline_tags[] = '['.$inlines[1][ $i ].':'
+					.$new_link_IDs[ $inlines[2][ $i ] ] // ID of new Link
+					.$inlines[3][ $i ].$inlines[4][ $i ].']';
+			}
+			$new_message_content = replace_content_outcode( $search_inline_tags, $replace_inline_tags, $this->text, 'replace_content', 'str' );
+
+			// Update message content in DB:
+			$this->set( 'text', $new_message_content );
+			$this->dbupdate();
+		}
+	}
+
+
+	/**
 	 * Get Thread object
 	 */
 	function & get_Thread()
@@ -218,10 +360,11 @@ class Message extends DataObject
 	/**
 	 * Insert discussion (one thread for all recipients)
 	 *
-	 * @param User who sent the message, it must be set only if it is not the current User
-	 * @return true if success, false otherwise
+	 * @param object User who sent the message, it must be set only if it is not the current User
+	 * @param integer Source message ID (used to copy links/attachments from previous message in mode of individual messages for multiple recipients)
+	 * @return boolean|integer ID of inserted message if success, false otherwise
 	 */
-	function dbinsert_discussion( $from_User = NULL )
+	function dbinsert_discussion( $from_User = NULL, $source_msg_ID = NULL )
 	{
 		global $DB;
 
@@ -245,8 +388,17 @@ class Message extends DataObject
 						{
 							$DB->commit();
 
+							if( $source_msg_ID === NULL )
+							{	// Link attachments from temporary object to new created Message:
+								$this->link_from_Request();
+							}
+							else
+							{	// Link attachments from source Message object to this Message:
+								$this->link_from_Message( $source_msg_ID );
+							}
+
 							$this->send_email_notifications( true, $from_User );
-							return true;
+							return $this->ID;
 						}
 					}
 				}
@@ -266,15 +418,24 @@ class Message extends DataObject
 	 */
 	function dbinsert_individual( $from_User = NULL )
 	{
+		$source_msg_ID = NULL;
+
 		foreach( $this->Thread->recipients_list as $recipient_ID )
 		{
 			$message = $this->clone_message( $this );
 
 			$message->Thread->recipients_list = array( $recipient_ID );
 
-			if ( !$message->dbinsert_discussion( $from_User ) )
+			$this_msg_ID = $message->dbinsert_discussion( $from_User, $source_msg_ID );
+			if( ! $this_msg_ID )
 			{
 				return false;
+			}
+
+			if( $source_msg_ID === NULL )
+			{	// Use first message as source for all next messages:
+				// (Used to copy links/attachments from first message all next)
+				$source_msg_ID = $this_msg_ID;
 			}
 		}
 
@@ -323,6 +484,9 @@ class Message extends DataObject
 					if( $this->dbupdate_last_contact_datetime() )
 					{
 						$DB->commit();
+
+						// Link attachments from temporary object to new created Message:
+						$this->link_from_Request();
 
 						$this->send_email_notifications( false );
 						return true;
@@ -816,6 +980,14 @@ class Message extends DataObject
 		if( !isset( $r ) )
 		{
 			$data = $this->text;
+
+			// Render inline file tags like [image:123:caption] or [file:123:caption] :
+			$data = render_inline_files( $data, $this, array(
+					'check_code_block' => true,
+					'image_size'       => 'original',
+					'image_link_rel'   => 'lightbox[m'.$this->ID.']',
+				) );
+
 			$Plugins->trigger_event( 'FilterMsgContent', array( 'data' => & $data, 'Message' => $this ) );
 			$r = format_to_output( $data, $format );
 
@@ -870,7 +1042,373 @@ class Message extends DataObject
 		$this->text = htmlentities( $this->text, ENT_COMPAT, $evo_charset );
 		*/
 
-		return $this->get_prerendered_content( $format );
+		$content = '';
+
+		if( empty( $this->ID ) )
+		{	// Preview mode for new creating message:
+			$content = '<b>'.T_('PREVIEW').':</b><br />';
+		}
+
+		$content .= $this->get_prerendered_content( $format );
+
+		return $content;
+	}
+
+
+	/**
+	 * Get block of images linked to the current Message
+	 *
+	 * @param array of params
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function get_images( $params = array(), $format = 'htmlbody' )
+	{
+		global $Plugins;
+
+		$r = '';
+
+		$params = array_merge( array(
+				'before'                     => '<div class="clear">',
+				'before_image'               => '<div class="image_block">',
+				'before_image_legend'        => '<div class="image_legend">',
+				'after_image_legend'         => '</div>',
+				'after_image'                => '</div>',
+				'after'                      => '</div>',
+				'image_size'                 => 'original',
+				'image_size_x'               => 1, // Use '2' to build 2x sized thumbnail that can be used for Retina display
+				'image_link_to'              => 'original', // Can be 'original' (image) or 'single' (this post)
+				'image_link_rel'             => 'lightbox[m'.$this->ID.']',
+				'limit'                      => 1000, // Max # of images displayed
+				'before_gallery'             => '<div class="evo_image_gallery">',
+				'after_gallery'              => '</div>',
+				'gallery_image_size'         => 'crop-80x80',
+				'gallery_image_limit'        => 1000,
+				'gallery_colls'              => 5,
+				'gallery_order'              => '', // 'ASC', 'DESC', 'RAND'
+				'gallery_link_rel'           => 'lightbox[m'.$this->ID.']',
+				'restrict_to_image_position' => 'inline', // 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+				'exclude_inline_tagged'      => true, // Use true to exclude inline attachments which are already rendered in content by inline tags like '[image:123]'
+				'data'                       =>  & $r,
+				'get_rendered_attachments'   => true,
+				'links_sql_select'           => '',
+				'links_sql_orderby'          => 'link_order',
+			), $params );
+
+		// Get list of ALL attached files:
+		$links_params = array(
+				'sql_select_add' => $params['links_sql_select'],
+				'sql_order_by'   => $params['links_sql_orderby']
+			);
+
+		if( empty( $this->ID ) )
+		{	// Preview mode for new creating message:
+			$tmp_object_ID = param( 'temp_link_owner_ID', 'integer', 0 );
+		}
+		else
+		{	// Normal mode for existing Message in DB:
+			$tmp_object_ID = NULL;
+		}
+
+		$LinkOwner = new LinkMessage( $this, $tmp_object_ID );
+		if( ! $LinkList = $LinkOwner->get_attachment_LinkList( 1000, $params['restrict_to_image_position'], NULL, $links_params ) )
+		{
+			return '';
+		}
+
+		$exclude_link_IDs = array();
+		if( $params['exclude_inline_tagged'] )
+		{	// Find all links which are already rendered in content by inline tags like '[image:123]':
+			preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):(\d+)(:?)([^\]]*)\]/i', $this->text, $inlines );
+			$exclude_link_IDs = $inlines[2];
+		}
+
+		$galleries = array();
+		$image_counter = 0;
+		$plugin_render_attachments = false;
+		while( $image_counter < $params['limit'] && $Link = & $LinkList->get_next() )
+		{
+			if( in_array( $Link->ID, $exclude_link_IDs ) )
+			{	// Skip this link because it is already rendered by inline tag like '[image:123]':
+				continue;
+			}
+
+			if( ! ( $File = & $Link->get_File() ) )
+			{	// No File object:
+				global $Debuglog;
+				$Debuglog->add( sprintf( 'Link ID#%d of message #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
+				continue;
+			}
+
+			if( ! $File->exists() )
+			{ // File doesn't exist
+				global $Debuglog;
+				$Debuglog->add( sprintf( 'File linked to message #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+				continue;
+			}
+
+			$params['File'] = $File;
+			$params['Link'] = $Link;
+			$params['Message'] = $this;
+
+			if( $File->is_dir() && $params['gallery_image_limit'] > 0 )
+			{ // This is a directory/gallery
+				if( ( $gallery = $File->get_gallery( $params ) ) != '' )
+				{ // Got gallery code
+					$galleries[] = $gallery;
+				}
+				continue;
+			}
+
+			if( ! $params['get_rendered_attachments'] )
+			{ // Save $r to temp var in order to don't get the rendered data from plugins
+				$temp_r = $r;
+			}
+
+			$temp_params = $params;
+			foreach( $params as $param_key => $param_value )
+			{ // Pass all params by reference, in order to give possibility to modify them by plugin
+				// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
+				$params[ $param_key ] = & $params[ $param_key ];
+			}
+
+			// Prepare params before rendering message attachment:
+			$Plugins->trigger_event_first_true_with_params( 'PrepareForRenderMessageAttachment', $params );
+
+			if( count( $Plugins->trigger_event_first_true( 'RenderMessageAttachment', $params ) ) != 0 )
+			{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
+				if( ! $params['get_rendered_attachments'] )
+				{ // Restore $r value and mark this message has the rendered attachments
+					$r = $temp_r;
+					$plugin_render_attachments = true;
+				}
+				continue;
+			}
+
+			if( ! $File->is_image() )
+			{	// Skip anything that is not an image:
+				continue;
+			}
+
+			// Generate the IMG tag with all the alt, title and desc if available:
+			$r .= $Link->get_tag( $params );
+
+			$image_counter++;
+			$params = $temp_params;
+		}
+
+		if( empty( $r ) && $plugin_render_attachments )
+		{	// This message doesn't contain the images but it has the rendered attachments by plugins:
+			$r .= 'plugin_render_attachments';
+		}
+
+		if( ! empty( $r ) )
+		{
+			$r = $params['before'].$r.$params['after'];
+
+			// Character conversions:
+			$r = format_to_output( $r, $format );
+		}
+
+		if( ! empty( $galleries ) )
+		{	// Append galleries:
+			$r .= "\n".format_to_output( implode( "\n", $galleries ), $format );
+		}
+
+		return $r;
+	}
+
+
+	/**
+	 * Get block of attachments/files linked to the current Message
+	 *
+	 * @param array Array of params
+	 * @param string Output format, see {@link format_to_output()}
+	 * @return string HTML
+	 */
+	function get_files( $params = array(), $format = 'htmlbody' )
+	{
+		global $Plugins;
+		$params = array_merge( array(
+				'before' =>              '<div class="message_attachments"><h3>'.T_('Attachments').':</h3><ul class="evo_files">',
+				'before_attach' =>         '<li>',
+				'before_attach_size' =>    '<span class="file_size">(',
+				'after_attach_size' =>     ')</span>',
+				'after_attach' =>          '</li>',
+				'after' =>               '</ul></div>',
+			// fp> TODO: we should only have one limit param. Or is there a good reason for having two?
+			// sam2kb> It's needed only for flexibility, in the meantime if user attaches 200 files he expects to see all of them in skin, I think.
+				'limit_attach' =>        1000, // Max # of files displayed
+				'limit' =>               1000,
+				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+				'restrict_to_image_position' => 'inline',
+				'exclude_inline_tagged'      => true, // Use true to exclude inline attachments which are already rendered in content by inline tags like '[image:123]'
+				'data'                       => '',
+				'attach_format'              => '$icon_link$ $file_link$ $file_size$ $file_desc$', // $icon_link$ $icon$ $file_link$ $file_size$ $file_desc$
+				'file_link_format'           => '$file_name$', // $icon$ $file_name$ $file_size$ $file_desc$
+				'file_link_class'            => '',
+				'file_link_text'             => 'filename', // 'filename' - Always display Filename, 'title' - Display Title if available
+				'download_link_icon'         => 'download',
+				'download_link_title'        => T_('Download file'),
+				'display_download_icon'      => true,
+				'display_file_size'          => true,
+				'display_file_desc'          => false,
+				'before_file_desc'           => '<span class="evo_file_description">',
+				'after_file_desc'            => '</span>',
+			), $params );
+
+		if( empty( $this->ID ) )
+		{	// Preview mode for new creating message:
+			$tmp_object_ID = param( 'temp_link_owner_ID', 'integer', 0 );
+		}
+		else
+		{	// Normal mode for existing Message in DB:
+			$tmp_object_ID = NULL;
+		}
+
+		// Get list of attached files:
+		$LinkOwner = new LinkMessage( $this, $tmp_object_ID );
+		if( ! $LinkList = $LinkOwner->get_attachment_LinkList( $params['limit'], $params['restrict_to_image_position'] ) )
+		{
+			return '';
+		}
+
+		$exclude_link_IDs = array();
+		if( $params['exclude_inline_tagged'] )
+		{	// Find all links which are already rendered in content by inline tags like '[image:123]':
+			preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):(\d+)(:?)([^\]]*)\]/i', $this->text, $inlines );
+			$exclude_link_IDs = $inlines[2];
+		}
+
+		load_funcs( 'files/model/_file.funcs.php' );
+
+		$r = '';
+		$i = 0;
+		$r_file = array();
+		/**
+		 * @var File
+		 */
+		$File = NULL;
+		while( ( $Link = & $LinkList->get_next() ) && $params['limit_attach'] > $i )
+		{
+			if( in_array( $Link->ID, $exclude_link_IDs ) )
+			{	// Skip this link because it is already rendered by inline tag like '[image:123]':
+				continue;
+			}
+
+			if( ! ( $File = & $Link->get_File() ) )
+			{	// No File object:
+				global $Debuglog;
+				$Debuglog->add( sprintf( 'Link ID#%d of message #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
+				continue;
+			}
+
+			if( ! $File->exists() )
+			{	// File doesn't exist:
+				global $Debuglog;
+				$Debuglog->add( sprintf( 'File linked to message #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+				continue;
+			}
+
+			$params['File'] = $File;
+			$params['Message'] = $this;
+
+			$temp_params = $params;
+			foreach( $params as $param_key => $param_value )
+			{	// Pass all params by reference, in order to give possibility to modify them by plugin:
+				// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
+				$params[ $param_key ] = & $params[ $param_key ];
+			}
+
+			if( $Link->get( 'position' ) != 'attachment' )
+			{	// Skip not "attachment" links:
+				continue;
+			}
+
+			// Prepare params before rendering message attachment:
+			$Plugins->trigger_event_first_true_with_params( 'PrepareForRenderMessageAttachment', $params );
+
+			if( count( $Plugins->trigger_event_first_true( 'RenderMessageAttachment', $params ) ) != 0 )
+			{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
+				continue;
+			}
+
+			if( $File->is_image() && $Link->get( 'position' ) != 'attachment' )
+			{	// Skip images (except those in the attachment position) because these are displayed inline already:
+				// fp> TODO: have a setting for each linked file to decide whether it should be displayed inline or as an attachment
+				continue;
+			}
+			elseif( $File->is_dir() )
+			{	// Skip directories/galleries:
+				continue;
+			}
+
+			// A link to download a file:
+
+			// Just icon with download icon:
+			$icon = ( $params['display_download_icon'] && $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$icon$' ) !== false ) ?
+					get_icon( $params['download_link_icon'], 'imgtag', array( 'title' => $params['download_link_title'] ) ) : '';
+
+			// A link with icon to download:
+			$icon_link = ( $params['display_download_icon'] && $File->exists() && strpos( $params['attach_format'], '$icon_link$' ) !== false ) ?
+					action_icon( $params['download_link_title'], $params['download_link_icon'], $Link->get_download_url(), '', 5 ) : '';
+
+			// File size info:
+			$file_size = ( $params['display_file_size'] && $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$file_size$' ) !== false ) ?
+					$params['before_attach_size'].bytesreadable( $File->get_size(), false, false ).$params['after_attach_size'] : '';
+
+			// File description:
+			$file_desc = '';
+			if( $params['display_file_desc'] && $File->exists() && strpos( $params['attach_format'].$params['file_link_format'], '$file_desc$' ) !== false )
+			{	// If description should be displayed:
+				$file_desc = nl2br( trim( $File->get( 'desc' ) ) );
+				if( $file_desc !== '' )
+				{	// If file has a filled description:
+					$params['before_file_desc'].$file_desc.$params['after_file_desc'];
+				}
+			}
+
+			// A link with file name or file title to download:
+			$file_link_format = str_replace( array( '$icon$', '$file_name$', '$file_size$' ),
+				array( $icon, '$text$', $file_size ),
+				$params['file_link_format'] );
+			if( $params['file_link_text'] == 'filename' || trim( $File->get( 'title' ) ) === '' )
+			{	// Use file name for link text:
+				$file_link_text = $File->get_name();
+			}
+			else
+			{	// Use file title only if it filled:
+				$file_link_text = $File->get( 'title' );
+			}
+			if( $File->exists() )
+			{	// Get file link to download if file exists:
+				$file_link = ( strpos( $params['attach_format'], '$file_link$' ) !== false ) ?
+						$File->get_view_link( $file_link_text, NULL, NULL, $file_link_format, $params['file_link_class'], $Link->get_download_url() ) : '';
+			}
+			else
+			{	// File doesn't exist, We cannot display a link, Display only file name and warning:
+				$file_link = ( strpos( $params['attach_format'], '$file_link$' ) !== false ) ?
+						$file_link_text.' - <span class="red nowrap">'.get_icon( 'warning_yellow' ).' '.T_('Missing attachment!').'</span>' : '';
+			}
+
+			$r_file[$i] = $params['before_attach'];
+			$r_file[$i] .= str_replace( array( '$icon$', '$icon_link$', '$file_link$', '$file_size$', '$file_desc$' ),
+				array( $icon, $icon_link, $file_link, $file_size, $file_desc ),
+				$params['attach_format'] );
+			$r_file[$i] .= $params['after_attach'];
+
+			$i++;
+			$params = $temp_params;
+		}
+
+		if( ! empty( $r_file ) )
+		{
+			$r = $params['before'].implode( "\n", $r_file ).$params['after'];
+
+			// Character conversions
+			$r = format_to_output( $r, $format );
+		}
+
+		return $r;
 	}
 }
 

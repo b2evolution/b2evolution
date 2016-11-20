@@ -17,6 +17,12 @@
  * Includes:
  */
 require_once dirname(__FILE__).'/../conf/_config.php';
+
+/**
+ * @global boolean Is this a login page?
+ */
+$is_login_page = true;
+
 require_once $inc_path.'_main.inc.php';
 
 $login = param( $dummy_fields['login'], 'string', '' );
@@ -280,7 +286,7 @@ switch( $action )
 		if( !empty( $blog ) )
 		{ // blog is set, redirect to in-skin change password form
 			$BlogCache = & get_BlogCache();
-			$Blog = $BlogCache->get_by_ID( $blog );
+			$Collection = $Blog = $BlogCache->get_by_ID( $blog );
 			if( $Blog )
 			{
 				$changepwd_url = $Blog->get( 'userurl', array( 'url_suffix' => 'disp=pwdchange&reqID='.$reqID, 'glue' => '&' ) );
@@ -602,7 +608,7 @@ $Debuglog->add( 'return_to: '.$return_to );
 if( $inskin && use_in_skin_login() )
 { // in-skin display:
 	$BlogCache = & get_BlogCache();
-	$Blog = $BlogCache->get_by_ID( $blog, false, false );
+	$Collection = $Blog = $BlogCache->get_by_ID( $blog, false, false );
 	if( ! empty( $Blog ) )
 	{
 		if( !empty( $login_error ) )
@@ -690,6 +696,13 @@ switch( $action )
 
 	default:
 		// Display login form:
+
+		if( $Settings->get( 'http_auth_require' ) && ! isset( $_SERVER['PHP_AUTH_USER'] ) )
+		{	// Require HTTP authentication:
+			header( 'WWW-Authenticate: Basic realm="b2evolution"' );
+			header( 'HTTP/1.0 401 Unauthorized' );
+		}
+
 		require $adminskins_path.'login/_login_form.main.php';
 }
 

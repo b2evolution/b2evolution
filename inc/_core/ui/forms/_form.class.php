@@ -858,7 +858,7 @@ class Form extends Widget
 			$folding_icon = get_fieldset_folding_icon( $field_params['id'], $field_params );
 			if( ! $field_params['deny_fold'] && is_logged_in() )
 			{ // Only loggedin users can fold fieldset
-				global $UserSettings, $Blog;
+				global $UserSettings, $Collection, $Blog;
 				if( empty( $Blog ) )
 				{ // Get user setting value
 					$value = intval( $UserSettings->get( 'fold_'.$field_params['id'] ) );
@@ -1282,7 +1282,7 @@ class Form extends Widget
 
 		if( empty($field_params['date_format']) )
 		{	// Use locale date format:
-			$date_format = locale_datefmt();
+			$date_format = locale_input_datefmt();
 		}
 		else
 		{
@@ -1301,6 +1301,8 @@ class Form extends Widget
 				case "j": return "d"; // day, 1-31
 				case "l": return "EE"; // weekday (name)
 				case "D": return "E"; // weekday (abbr)
+				case "S": return "";
+
 				case "e": return ""; // weekday letter, not supported
 
 				case "m": return "MM"; // month, 01-12
@@ -2131,6 +2133,7 @@ class Form extends Widget
 	 *  - an optional note
 	 *  - an optional class (html attribute)
 	 *  - an optional boolean TRUE - to print out an option as hidden field instead of checkbox
+	 *  - an optional array of additional attributes for the option label
 	 *
 	 * @todo Transform to $field_params schema.
 	 * @param array a two-dimensional array containing the parameters of the input tag
@@ -2173,8 +2176,15 @@ class Form extends Widget
 
 			$loop_field_note = empty( $option[5] ) ? '' : $option[5];
 
+			// extra params for checklist option label
+			$extra_attribs = '';
+			if( ! empty( $option[8] ) )
+			{
+				$extra_attribs = ' '.get_field_attribs_as_string( $option[8] );
+			}
+
 			// asimo>> add id for label: id = label_for_fieldname_fieldvalue
-			$r .= '<label'.( empty( $option[6] ) ? '' : ' class="'.$option[6].'"' ).' id="label_for_'.$loop_field_name.'_'.$option[1].'">';
+			$r .= '<label'.( empty( $option[6] ) ? '' : ' class="'.$option[6].'"' ).' id="label_for_'.$loop_field_name.'_'.$option[1].'"'.$extra_attribs.'>';
 
 			if( $add_highlight_spans )
 			{ // Need it to highlight checkbox for check_all and uncheck_all mouseover

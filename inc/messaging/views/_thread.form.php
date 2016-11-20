@@ -23,7 +23,7 @@ global $creating_success;
 
 global $DB, $action, $Plugins;
 
-global $Blog;
+global $Collection, $Blog;
 
 $creating = is_create_action( $action );
 
@@ -47,8 +47,8 @@ $params = array_merge( array(
 	'thrdtype' => param( 'thrdtype', 'string', 'discussion' ),  // alternative: individual
 	'skin_form_params' => array(),
 	'allow_select_recipients' => true,
-	'messages_list_start' => '',
-	'messages_list_end' => '',
+	'messages_list_start' => is_admin_page() ? '<div class="evo_private_messages_list">' : '',
+	'messages_list_end' => is_admin_page() ? '</div>' : '',
 	'messages_list_title' => $edited_Thread->title,
 	), $params );
 
@@ -121,6 +121,16 @@ $message_renderer_checkboxes = $Plugins->get_renderer_checkboxes( $current_rende
 if( !empty( $message_renderer_checkboxes ) )
 {
 	$Form->info( T_('Text Renderers'), $message_renderer_checkboxes );
+}
+
+// ####################### ATTACHMENTS/LINKS #########################
+if( is_admin_page() && isset( $GLOBALS['files_Module'] )
+	&& $current_User->check_perm( 'files', 'view' ) )
+{	// Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files:
+	load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
+	global $LinkOwner; // Initialize this object as global because this is used in many link functions
+	$LinkOwner = new LinkMessage( $edited_Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
+	display_attachments_fieldset( $Form, $LinkOwner );
 }
 
 global $thrd_recipients_array, $recipients_selected;
@@ -264,12 +274,14 @@ if( $action == 'preview' )
 	}
 
 	$preview_SQL = new SQL();
-	$preview_SQL->SELECT( '0 AS msg_ID, "'.date( 'Y-m-d H:i:s', $localtimenow ).'" AS msg_datetime,
+	$preview_SQL->SELECT( $current_User->ID.' AS msg_author_user_ID, 0 AS msg_thread_ID, 0 AS msg_ID, "'.date( 'Y-m-d H:i:s', $localtimenow ).'" AS msg_datetime,
 		'.$current_User->ID.' AS msg_user_ID,
-		'.$DB->quote( '<b>'.T_('PREVIEW').':</b><br /> '.$edited_Message->get_prerendered_content() ).' AS msg_text, "" AS msg_renderers,
+		'.$DB->quote( $edited_Message->text ).' AS msg_text, "" AS msg_renderers,
 		'.$DB->quote( $edited_Thread->title ).' AS thread_title' );
 
 	$Results = new Results( $preview_SQL->get(), 'pvwmsg_', '', NULL, 1 );
+
+	$Results->Cache = & get_MessageCache();
 
 	if( $creating_success )
 	{ // Display error messages again before preview of message
@@ -293,7 +305,7 @@ if( $action == 'preview' )
 	$Results->cols[] = array(
 			'th' => T_('Message'),
 			'td_class' => 'left top message_text',
-			'td' => '%col_msg_format_text( #msg_ID#, #msg_text# )%',
+			'td' => '@get_content()@@get_images()@@get_files()@',
 		);
 	/**
 	 * Read?:

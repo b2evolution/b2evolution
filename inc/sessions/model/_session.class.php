@@ -374,7 +374,13 @@ class Session
 	 */
 	function logout()
 	{
-		global $Debuglog, $cookie_session;
+		global $Debuglog, $cookie_session, $Settings;
+
+		if( $Settings->get( 'http_auth_accept' ) && isset( $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'] ) )
+		{	// Don't log out when user is logged in by HTTP basic authentication because it is possible only after browser closing:
+			// (to avoid infinite redirection after logout to $baseurl)
+			return;
+		}
 
 		// Invalidate the session key (no one will be able to use this session again)
 		$this->key = NULL;
@@ -726,6 +732,31 @@ class Session
 		global $pc_user_devices;
 
 		return array_key_exists( $this->sess_device, $pc_user_devices );
+	}
+
+
+	/**
+	 * Get first hit params of this session
+	 *
+	 * @return object Params, array, keys are names of T_hitlog fields: hit_ID, hit_sess_ID, hit_uri, hit_referer, hit_referer_dom_ID and etc.
+	 */
+	function get_first_hit_params()
+	{
+		if( ! isset( $this->first_hit_params ) )
+		{	// Get the params from DB only first time and then cache them:
+			global $DB;
+
+			$SQL = new SQL( 'Get first hit params of the session #'.$this->ID );
+			$SQL->SELECT( '*' );
+			$SQL->FROM( 'T_hitlog' );
+			$SQL->WHERE( 'hit_sess_ID = '.$DB->quote( $this->ID ) );
+			$SQL->ORDER_BY( 'hit_ID ASC' );
+			$SQL->LIMIT( '1' );
+
+			$this->first_hit_params = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title );
+		}
+
+		return $this->first_hit_params;
 	}
 }
 

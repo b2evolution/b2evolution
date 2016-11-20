@@ -264,7 +264,7 @@ class OnlineSessions
 	 */
 	function display_online_users( $params )
 	{
-		global $DB, $Blog, $UserSettings;
+		global $DB, $Collection, $Blog, $UserSettings;
 
 		if( !isset($this->_registered_Users) )
 		{

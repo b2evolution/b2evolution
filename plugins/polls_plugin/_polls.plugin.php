@@ -172,12 +172,12 @@ class polls_plugin extends Plugin
 		if( ! empty( $params['Item'] ) )
 		{	// Item is set, get Blog from post:
 			$edited_Item = & $params['Item'];
-			$Blog = & $edited_Item->get_Blog();
+			$Collection = $Blog = & $edited_Item->get_Blog();
 		}
 
 		if( empty( $Blog ) )
 		{	// Item is not set, try global Blog:
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available:
 				return false;
@@ -190,7 +190,7 @@ class polls_plugin extends Plugin
 			return false;
 		}
 
-		return $this->DisplayCodeToolbar();
+		return $this->DisplayCodeToolbar( $params );
 	}
 
 
@@ -209,13 +209,13 @@ class polls_plugin extends Plugin
 			if( ! empty( $Comment->item_ID ) )
 			{
 				$comment_Item = & $Comment->get_Item();
-				$Blog = & $comment_Item->get_Blog();
+				$Collection = $Blog = & $comment_Item->get_Blog();
 			}
 		}
 
 		if( empty( $Blog ) )
 		{	// Comment is not set, try global Blog:
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{	// We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available:
 				return false;
@@ -229,7 +229,7 @@ class polls_plugin extends Plugin
 		}
 */
 		// Print toolbar on screen
-		return $this->DisplayCodeToolbar();
+		return $this->DisplayCodeToolbar( $params );
 	}
 
 
@@ -244,7 +244,7 @@ class polls_plugin extends Plugin
 		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{	// Print toolbar on screen:
-			return $this->DisplayCodeToolbar();
+			return $this->DisplayCodeToolbar( $params );
 		}
 		return false;
 	}
@@ -252,8 +252,10 @@ class polls_plugin extends Plugin
 
 	/**
 	 * Display Toolbar
+	 *
+	 * @param array Params
 	 */
-	function DisplayCodeToolbar()
+	function DisplayCodeToolbar( $params = array() )
 	{
 		global $Hit, $debug;
 
@@ -261,6 +263,10 @@ class polls_plugin extends Plugin
 		{ // let's deactive toolbar on Lynx, because they don't work there
 			return false;
 		}
+
+		$params = array_merge( array(
+				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
+			), $params );
 
 		// Load JS to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
@@ -274,19 +280,19 @@ class polls_plugin extends Plugin
 		?>
 		<script type="text/javascript">
 		//<![CDATA[
-		function polls_toolbar( title )
+		function polls_toolbar( title, prefix )
 		{
 			var r = '<?php echo $this->get_template( 'toolbar_title_before' );?>'	+ title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>'
 					+ '<?php echo $this->get_template( 'toolbar_group_before' );?>'
 					+ '<input type="button" title="<?php echo TS_('Insert a Poll');?>"'
 					+ ' class="<?php echo $this->get_template( 'toolbar_button_class' );?>"'
-					+ ' data-func="polls_load_window" value="<?php echo TS_('Insert a Poll');?>" />'
+					+ ' data-func="polls_load_window|' + prefix + '" value="<?php echo TS_('Insert a Poll');?>" />'
 					+ '<?php echo $this->get_template( 'toolbar_group_after' );?>';
 
-			jQuery( '.<?php echo $this->code;?>_toolbar' ).html( r );
+			jQuery( '.' + prefix + '<?php echo $this->code;?>_toolbar' ).html( r );
 		}
 
-		function polls_load_window()
+		function polls_load_window( prefix )
 		{
 			openModalWindow( '<div id="poll_wrapper"></div>', 'auto', '', true,
 					'<?php echo TS_('Insert a Poll');?>',
@@ -294,7 +300,7 @@ class polls_plugin extends Plugin
 					true );
 
 			// Load available polls
-			polls_load_polls();
+			polls_load_polls( prefix );
 
 			// To prevent link default event
 			return false;
@@ -339,17 +345,19 @@ class polls_plugin extends Plugin
 			jQuery( obj_selector ).html( error_text );
 		}
 
-		function polls_load_polls()
+		function polls_load_polls( prefix )
 		{
+			prefix = ( prefix ? prefix : '' );
+
 			polls_api_request( 'polls', '#poll_wrapper', function( data )
 			{
-				var r = '<div id="polls_list">';
+				var r = '<div id="' + prefix + 'polls_list">';
 
 				r += '<ul>';
 				for( var p in data.polls )
 				{
 					var poll = data.polls[p];
-					r += '<li><a href="#" data-poll-id="' + poll.pqst_ID + '">' + poll.pqst_question_text + '</a></li>';
+					r += '<li><a href="#" data-poll-id="' + poll.pqst_ID + '" data-prefix="' + prefix + '">' + poll.pqst_question_text + '</a></li>';
 				}
 				r += '</ul>';
 				r += '</div>';
@@ -360,14 +368,17 @@ class polls_plugin extends Plugin
 		}
 
 		// Insert a poll short tag to textarea
-		jQuery( document ).on( 'click', '#polls_list a[data-poll-id]', function()
+		jQuery( document ).on( 'click', '#<?php echo $params['js_prefix']; ?>polls_list a[data-poll-id]', function()
 		{
 			if( typeof( tinyMCE ) != 'undefined' && typeof( tinyMCE.activeEditor ) != 'undefined' && tinyMCE.activeEditor )
 			{
 				tinyMCE.execCommand( 'mceFocus', false, tinyMCE.activeEditor.id );
 			}
+
+			var prefix = jQuery( this ).data( 'prefix' ) ? jQuery( this ).data( 'prefix' ) : '';
+
 			// Insert tag text in area
-			textarea_wrap_selection( b2evoCanvas, '[poll:' + jQuery( this ).data( 'pollId' ) + ']', '', 0 );
+			textarea_wrap_selection( window[ prefix + 'b2evoCanvas' ], '[poll:' + jQuery( this ).data( 'pollId' ) + ']', '', 0 );
 			// Close main modal window
 			closeModalWindow();
 
@@ -378,10 +389,10 @@ class polls_plugin extends Plugin
 		//]]>
 		</script>
 		<?php
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
 		?>
-		<script type="text/javascript">polls_toolbar( '<?php echo TS_('Polls:');?>' );</script>
+		<script type="text/javascript">polls_toolbar( '<?php echo TS_('Polls:');?>', '<?php echo $params['js_prefix']; ?>' );</script>
 		<?php
 
 		return true;

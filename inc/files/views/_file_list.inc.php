@@ -50,7 +50,7 @@ global $LinkOwner;
 
 global $edited_User;
 
-global $Blog, $blog;
+global $Collection, $Blog, $blog;
 
 global $fm_mode, $fm_hide_dirtree, $create_name, $ads_list_path, $mode;
 
@@ -298,6 +298,9 @@ $Form->begin_form();
 					if( $mode == 'upload' )
 					{	// We want the action to happen in the post attachments iframe:
 						$link_attribs['target'] = $iframe_name;
+						$link_attribs['onclick'] = 'return evo_link_attach( \''.$LinkOwner->type.'\', '.$LinkOwner->get_ID()
+								.', \''.FileRoot::gen_ID( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID() )
+								.'\', \''.$lFile->get_rdfp_rel_path().'\' )';
 						$link_action = 'link_inpost';
 					}
 					echo action_icon( T_('Link this file!'), 'link',
@@ -665,7 +668,7 @@ $Form->begin_form();
 			{ // User can edit:
 				$field_options['rename'] = T_('Rename files...');
 				$field_options['delete'] = T_('Delete files...');
-				$field_options['create_zip'] = T_('Create ZIP archive...');
+				$field_options['create_zip'] = T_('Create ZIP archive').'...';
 				// NOTE: No delete confirmation by javascript, we need to check DB integrity!
 			}
 

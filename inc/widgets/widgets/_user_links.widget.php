@@ -118,7 +118,7 @@ class user_links_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $DB, $Item, $Blog;
+		global $DB, $Item, $Collection, $Blog;
 
 		$this->init_display( $params );
 
@@ -188,20 +188,23 @@ class user_links_Widget extends ComponentWidget
 	 */
 	function & get_widget_User()
 	{
-		global $Item, $Blog;
+		global $Item, $Collection, $Blog;
 
 		$widget_User = NULL;
 
 		if( empty( $this->disp_params['login'] ) )
-		{ // No defined user in widget settings
-			// Note: There is no 'in-item' context in i7
-			if( ! empty( $Blog ) )
-			{ // Use an owner of the current $Blog
+		{	// No defined user in widget settings:
+			if( $this->disp_params['widget_context'] == 'item' && ! empty( $Item ) )
+			{	// Use an author of the current $Item (Only if we are in the context of displaying an Item, not if $Item is set from before):
+				$widget_User = & $Item->get_creator_User();
+			}
+			elseif( ! empty( $Blog ) )
+			{	// Use an owner of the current $Blog:
 				$widget_User = & $Blog->get_owner_User();
 			}
 		}
 		else
-		{ // Try to get user by login from DB
+		{	// Try to get user by login from DB:
 			$UserCache = & get_UserCache();
 			$widget_User = & $UserCache->get_by_login( $this->disp_params['login'] );
 		}
@@ -217,7 +220,7 @@ class user_links_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$cache_keys = array(
 				'wi_ID'       => $this->ID, // Have the widget settings changed ?

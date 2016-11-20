@@ -437,7 +437,7 @@ class messaging_Module extends Module
 	 */
 	function handle_htsrv_action()
 	{
-		global $current_User, $Blog, $Session, $Messages;
+		global $current_User, $Collection, $Blog, $Session, $Messages;
 
 		// Init objects we want to work on.
 		$action = param_action( true, true );

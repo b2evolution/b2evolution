@@ -14,7 +14,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $display_mode, $Blog;
+global $display_mode, $Collection, $Blog;
 
 /**
  * @var instance of User class

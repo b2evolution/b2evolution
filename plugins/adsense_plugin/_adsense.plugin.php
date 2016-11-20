@@ -21,8 +21,9 @@ class adsense_plugin extends Plugin
 {
 	var $code = 'evo_adsense';
 	var $name = 'AdSense';
-	var $priority = 10;
+	var $priority = 85;
 	var $group = 'rendering';
+	var $subgroup = 'other';
 	var $help_url = 'http://b2evolution.net/blog-ads/adsense-plugin.php';
 	var $short_desc;
 	var $long_desc;
@@ -77,6 +78,12 @@ class adsense_plugin extends Plugin
 					'defaultvalue' => 3,
 					'note' => T_('Maximum number of AdSense blocks the plugin should expand in post contents. Google terms typically set the limit to 3. You may wish to set it to less if you add blocks into the sidebar.'),
 				),
+			'auto_block' => array(
+					'label' => 'Auto blocks',
+					'type' => 'checkbox',
+					'defaultvalue' => 0,
+					'note' => T_('Automatically add an ad block in the middle of any post that has no [adsense:] tag yet.'),
+				),
 			);
 
 		return $r;
@@ -107,9 +114,36 @@ class adsense_plugin extends Plugin
 					'defaultvalue' => $this->Settings->get('max_blocks_in_content'),
 					'note' => T_('Maximum number of AdSense blocks the plugin should expand in post contents. Google terms typically set the limit to 3. You may wish to set it to less if you add blocks into the sidebar.'),
 				),
+			'coll_auto_block' => array(
+					'label' => 'Auto blocks',
+					'type' => 'checkbox',
+					'defaultvalue' => $this->Settings->get('auto_block'),
+					'note' => T_('Automatically add an ad block in the middle of any post that has no <code>[adsense:]</code> tag yet.'),
+				),
 			);
 
 		return array_merge( parent::get_coll_setting_definitions( $params ), $r );
+	}
+
+
+	/**
+	 * Get definitions for widget specific editable params
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_widget_param_definitions( $params )
+	{
+		$r = array_merge( array(
+			'title' => array(
+				'label' => T_('Block title'),
+				'note' => T_('Title to display in your skin.'),
+				'size' => 40,
+				'defaultvalue' => '',
+			),
+		), parent::get_widget_param_definitions( $params ) );
+
+		return $r;
 	}
 
 
@@ -122,7 +156,7 @@ class adsense_plugin extends Plugin
 	{
 		$content = & $params['content'];
 
-		$content = preg_replace( '~\[(adsense:)\]~', '<!-- [$1] -->', $content );
+		$content = replace_content_outcode( '~\[(adsense:)\]~', '<!-- [$1] -->', $content );
 
 		return true;
 	}
@@ -137,7 +171,7 @@ class adsense_plugin extends Plugin
 	{
 		$content = & $params['content'];
 
-		$content = preg_replace( '~<!-- \[(adsense:)\] -->~', '[$1]', $content );
+		$content = replace_content_outcode( '~<!-- \[(adsense:)\] -->~', '[$1]', $content );
 
 		return true;
 	}
@@ -159,8 +193,24 @@ class adsense_plugin extends Plugin
 	 */
 	function RenderItemAsHtml( & $params )
 	{
-		// Dummy placeholder. Without it the plugin would ne be considered to be a renderer...
-		return false;
+		if( empty( $params['Item'] ) )
+		{	// Allow only for Items
+			return false;
+		}
+
+		$content = & $params['data'];
+		$Item = & $params['Item'];
+		$item_Blog = & $params['Item']->get_Blog();
+
+		if( ! $this->get_coll_setting( 'coll_auto_block', $item_Blog ) )
+		{	// Don't insert auto blocks because it is not enabled by setting:
+			return false;
+		}
+
+		// Insert AdSense block automatically in the middle of content that has no this tag yet:
+		$content = $this->insert_auto_adsense_block( $content );
+
+		return true;
 	}
 
 
@@ -175,34 +225,77 @@ class adsense_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		$content = replace_content_outcode( '~<!-- \[adsense:\] -->~', array( $this, 'DisplayItem_callback' ), $content, 'replace_content_callback' );
+		$content = replace_content_outcode( '~<!-- \[adsense:\] -->~', array( $this, 'get_adsense_block' ), $content, 'replace_content_callback' );
 
 		return true;
 	}
 
 
 	/**
+	 * Get AdSense block
 	 *
+	 * @param array Matches of replace result if it is used as callback
+	 * @param boolean TRUE to limit a count of AdSense blocks by setting
+	 * @return string AdSense block
 	 */
-	function DisplayItem_callback( $matches )
+	function get_adsense_block( $matches = array(), $limit_by_counter = true )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
-	  	/**
+		/**
 		 * How many blocks already displayed?
 		 */
 		static $adsense_blocks_counter = 0;
 
 		$adsense_blocks_counter++;
 
-		if( $adsense_blocks_counter > $this->Settings->get( 'max_blocks_in_content' ) )
-		{
+		if( $limit_by_counter && $adsense_blocks_counter > $this->get_coll_setting( 'coll_max_blocks_in_content', $Blog ) )
+		{	// Stop AdSense blocks because of limit by setting:
 			return '<!-- Adsense block #'.$adsense_blocks_counter.' not displayed since it exceed the limit of '
 							.$this->get_coll_setting( 'coll_max_blocks_in_content', $Blog ).' -->';
 		}
 
 		return $this->get_coll_setting( 'coll_adsense_block', $Blog );
 	}
+
+
+	/**
+	 * Insert AdSense block automatically in the middle of content that has no this tag yet
+	 *
+	 * @param string
+	 * @return string
+	 */
+	function insert_auto_adsense_block( $content )
+	{
+		if( preg_match_outcode( '~\[adsense:\]~', $content, $matches ) )
+		{	// If at least one AdSense block exists in content then we should NOT insert auto block:
+			return $content;
+		}
+
+		// Split content by end of paragraph:
+		$splitted_content = preg_split( '~</p>~', $content );
+
+		// Get the middle of content:
+		$middle_index = floor( count( $splitted_content ) / 2 ) - 1;
+		if( $middle_index < 0 )
+		{
+			$middle_index = 0;
+		}
+
+		// Insert auto block in the middle of content:
+		$auto_content = '';
+		foreach( $splitted_content as $p => $content_part )
+		{
+			$auto_content .= $content_part.'</p>';
+			if( $middle_index == $p )
+			{	// This is middle of content, insert auto block:
+				$auto_content .= '<!-- [adsense:] -->';
+			}
+		}
+
+		return $auto_content;
+	}
+
 
 	/**
 	 * Filter out adsense tags from XML content.
@@ -231,12 +324,12 @@ class adsense_plugin extends Plugin
 		if( !empty( $params['Item'] ) )
 		{	// Item is set, get Blog from post:
 			$edited_Item = & $params['Item'];
-			$Blog = & $edited_Item->get_Blog();
+			$Collection = $Blog = & $edited_Item->get_Blog();
 		}
 
 		if( empty( $Blog ) )
 		{	// Item is not set, try global Blog:
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available:
 				return false;
@@ -249,7 +342,7 @@ class adsense_plugin extends Plugin
 			return false;
 		}
 
-		return $this->DisplayCodeToolbar();
+		return $this->DisplayCodeToolbar( $params );
 	}
 
 
@@ -264,7 +357,7 @@ class adsense_plugin extends Plugin
 		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{
-			return $this->DisplayCodeToolbar();
+			return $this->DisplayCodeToolbar( $params );
 		}
 
 		return false;
@@ -282,7 +375,7 @@ class adsense_plugin extends Plugin
 		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{
-			return $this->DisplayCodeToolbar();
+			return $this->DisplayCodeToolbar( $params );
 		}
 
 		return false;
@@ -302,13 +395,13 @@ class adsense_plugin extends Plugin
 		{	// Get a post of the comment:
 			if( $comment_Item = & $Comment->get_Item() )
 			{
-				$Blog = & $comment_Item->get_Blog();
+				$Collection = $Blog = & $comment_Item->get_Blog();
 			}
 		}
 
 		if( empty( $Blog ) )
 		{	// Item is not set, try global Blog
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available
 				return false;
@@ -321,26 +414,61 @@ class adsense_plugin extends Plugin
 			return false;
 		}
 
-		return $this->DisplayCodeToolbar();
+		return $this->DisplayCodeToolbar( $params );
 	}
 
 
 	/**
 	 * Display a code toolbar
 	 *
+	 * @param array Params
 	 * @return boolean did we display a toolbar?
 	 */
-	function DisplayCodeToolbar()
+	function DisplayCodeToolbar( $params = array() )
 	{
+		$params = array_merge( array(
+				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
+			), $params );
+
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_title_before' ).'AdSense: '.$this->get_template( 'toolbar_title_after' );
 		echo $this->get_template( 'toolbar_group_before' );
-		echo '<input type="button" id="adsense_default" title="'.T_('Insert AdSense block').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="textarea_wrap_selection|b2evoCanvas|[adsense:]| |1" value="'.T_('AdSense').'" />';
+		echo '<input type="button" id="adsense_default" title="'.T_('Insert AdSense block').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="textarea_wrap_selection|'.$params['js_prefix'].'b2evoCanvas|[adsense:]| |1" value="'.T_('AdSense').'" />';
 		echo $this->get_template( 'toolbar_group_after' );
 		echo $this->get_template( 'toolbar_after' );
+
+		return true;
+	}
+
+
+	/**
+	 * Event handler: SkinTag (widget)
+	 *
+	 * @param array Associative array of parameters.
+	 * @return boolean did we display?
+	 */
+	function SkinTag( & $params )
+	{
+		echo $params['block_start'];
+
+		if( $params['block_display_title'] && ! empty( $params['title'] ) )
+		{	// Display widget title:
+			echo $params['block_title_start'];
+			echo $params['title'];
+			echo $params['block_title_end'];
+		}
+
+		echo $params['block_body_start'];
+
+		// Display AdSense block:
+		echo $this->get_adsense_block( array(), false );
+
+		echo $params['block_body_end'];
+
+		echo $params['block_end'];
 
 		return true;
 	}

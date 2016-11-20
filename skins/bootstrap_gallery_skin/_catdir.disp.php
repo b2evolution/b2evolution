@@ -17,7 +17,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $Blog;
+global $Collection, $Blog;
 
 // Default params:
 $params = array_merge( array(
@@ -45,7 +45,7 @@ if( $Item = & get_featured_Item( 'catdir' ) )
 	if( $Item->status != 'published' )
 	{
 		$Item->format_status( array(
-				'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+				'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 			) );
 	}
 	$Item->title( array(
@@ -141,9 +141,13 @@ if( ! empty( $chapters ) )
 				{ // No images, but some attachments(e.g. videos) are rendered by plugins
 					$item_first_image = $Item->get_permanent_link( '<b>'.T_('Click to see contents').'</b>', '#', 'album_nopic' );
 				}
+				// Flag:
+				$item_flag = $Item->get_flag( array(
+						'only_flagged' => true
+					) );
 				// Display a title
 				echo $Item->get_title( array(
-					'before' => $item_first_image.'<br />',
+					'before' => $item_first_image.'<br />'.$item_flag,
 					) );
 				// Restore previous locale (Blog locale)
 				locale_restore_previous();

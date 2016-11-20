@@ -17,7 +17,7 @@ global $comment_allowed_tags;
 global $comment_cookies, $comment_allow_msgform;
 global $checked_attachments; // Set this var as global to use it in the method $Item->can_attach()
 global $PageCache;
-global $Blog, $dummy_fields;
+global $Collection, $Blog, $dummy_fields;
 
 // Default params:
 $params = array_merge( array(
@@ -255,6 +255,12 @@ function validateCommentForm(form)
 	$Form->switch_template_parts( $params['form_params'] );
 
 	$Form->begin_form( 'bComment', '', array( 'target' => '_self'/*, 'onsubmit' => 'return validateCommentForm(this);'*/ ) );
+
+	// Display a message before comment form:
+	$Item->display_comment_form_msg( array(
+			'before' => '<br /><div class="warning"><div class="action_messages">',
+			'after'  => '</div></div>',
+		) );
 
 	// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.
 	//           Actually, the best would be, if the $Form object could be changed by a plugin

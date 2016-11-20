@@ -316,7 +316,7 @@ class User extends DataObject
 				array( 'table'=>'T_messaging__contact_groupusers', 'fk'=>'cgu_user_ID', 'msg'=>T_('%d contacts from contact groups') ),
 				array( 'table'=>'T_pluginusersettings', 'fk'=>'puset_user_ID', 'msg'=>T_('%d user settings on plugins') ),
 				array( 'table'=>'T_users__fields', 'fk'=>'uf_user_ID', 'msg'=>T_('%d user fields') ),
-				array( 'table'=>'T_users__postreadstatus', 'fk'=>'uprs_user_ID', 'msg'=>T_('%d recordings of a post having been read') ),
+				array( 'table'=>'T_items__user_data', 'fk'=>'itud_user_ID', 'msg'=>T_('%d recordings of user data for a specific post') ),
 				array( 'table'=>'T_links', 'fk'=>'link_usr_ID', 'msg'=>T_('%d links to this user'),
 						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
 				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition'=>'file_root_type = "user"', 'msg'=>T_('%d files from this user file root') ),
@@ -327,6 +327,7 @@ class User extends DataObject
 				array( 'table'=>'T_users__user_org', 'fk'=>'uorg_user_ID', 'msg'=>T_('%d organization membership') ),
 				array( 'table'=>'T_polls__answer', 'fk'=>'pans_user_ID', 'msg'=>T_('%d poll answers') ),
 				array( 'table'=>'T_users__secondary_user_groups', 'fk'=>'sug_user_ID', 'msg'=>T_('%d secondary groups') ),
+				array( 'table'=>'T_users__profile_visits', 'fk'=>'upv_visited_user_ID', 'msg'=>T_('%d profile visits') ),
 			);
 	}
 
@@ -1092,6 +1093,12 @@ class User extends DataObject
 					}
 				}
 
+			}
+
+			if( $_POST['edited_user_pass1'] != trim( $_POST['edited_user_pass1'] ) ||
+			    $_POST['edited_user_pass2'] != trim( $_POST['edited_user_pass2'] ) )
+			{ // If new password was entered with spaces then inform user about this
+				$Messages->add( T_('The leading and traling spaces have been trimmed from the new password.'), 'warning' );
 			}
 		}
 
@@ -2066,7 +2073,7 @@ class User extends DataObject
 	function get_media_url()
 	{
 		global $media_url, $Settings, $Debuglog;
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( ! $Settings->get( 'fm_enable_roots_user' ) )
 		{ // User directories are disabled:
@@ -2141,7 +2148,7 @@ class User extends DataObject
 
 		if( empty( $current_Blog ) )
 		{ // Use current blog
-			global $Blog;
+			global $Collection, $Blog;
 			$current_Blog = & $Blog;
 		}
 
@@ -3000,7 +3007,7 @@ class User extends DataObject
 		/**
 		 * @var Blog
 		 */
-		$Blog = & $BlogCache->get_by_ID( $blog_ID );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID );
 
 		return ( $Blog->owner_user_ID == $this->ID );
 	}
@@ -3168,7 +3175,7 @@ class User extends DataObject
 	 */
 	function check_status( $action, $target = NULL )
 	{
-		global $Settings, $Blog;
+		global $Settings, $Collection, $Blog;
 
 		switch( $action )
 		{
@@ -3920,7 +3927,7 @@ class User extends DataObject
 
 		if( is_null($form_url) )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 			$form_url = isset($Blog) ? $Blog->get('msgformurl') : '';
 		}
 
@@ -4306,7 +4313,7 @@ class User extends DataObject
 			}
 			else
 			{ // Anonymous user get an avatar picture with link to login page
-				global $Blog;
+				global $Collection, $Blog;
 				$redirect_to = '';
 				if( isset( $Blog ) )
 				{ // Redirect user after login
@@ -4811,7 +4818,7 @@ class User extends DataObject
 						if( ( !is_admin_page() ) && ( !empty( $blog ) ) )
 						{ // set where to redirect in front office, another way it would go to profile_update.php
 							$BlogCache = & get_BlogCache();
-							$Blog = $BlogCache->get_by_ID( $blog, false );
+							$Collection = $Blog = $BlogCache->get_by_ID( $blog, false );
 							$redirect_to = rawurlencode( $Blog->get( 'userprefsurl' ) );
 						}
 						$activate_info_link = 'href="'.get_activate_info_url( $redirect_to, '&amp;' ).'"';
@@ -5060,7 +5067,7 @@ class User extends DataObject
 		}
 		else
 		{ // Front-office
-			global $Blog;
+			global $Collection, $Blog;
 			$url_rotate_90_left = get_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_90_left&file_ID='.$file_ID.'&'.url_crumb( 'user' );
 			$url_rotate_180 = get_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_180&file_ID='.$file_ID.'&'.url_crumb( 'user' );
 			$url_rotate_90_right = get_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_90_right&file_ID='.$file_ID.'&'.url_crumb( 'user' );
@@ -5230,7 +5237,7 @@ class User extends DataObject
 		}
 		else
 		{ // Front-office
-			global $Blog;
+			global $Collection, $Blog;
 			$url_crop = url_add_param( $Blog->gen_blogurl(), 'disp=avatar&action=crop&file_ID='.$file_ID );
 		}
 
@@ -5450,30 +5457,6 @@ class User extends DataObject
 		return NULL;
 	}
 
-	/**
-	 * Get session param from the user first session, hit
-	 * @param integer Session Id
-	 * @return object of params
-	 */
-	function get_first_session_hit_params( $sess_id )
-	{
-		global $DB;
-
-		$query = 'SELECT *
-					FROM T_hitlog
-					WHERE hit_sess_ID = '.$DB->quote( $sess_id ).'
-					ORDER BY hit_ID ASC
-					LIMIT 1';
-
-		$result = $DB->get_row( $query );
-
-		if( !empty( $result ) )
-		{
-			return $result;
-		}
-
-		return NULL;
-	}
 
 	/**
 	 * Send a welcome private message
@@ -5878,7 +5861,7 @@ class User extends DataObject
 			}
 			else
 			{	// For front-office
-				global $Blog;
+				global $Collection, $Blog;
 				if( ! empty( $Blog ) )
 				{	// Only if blog is defined
 					$total_num_posts_url = url_add_param( $Blog->gen_blogurl(), 'disp=useritems&amp;user_ID='.$this->ID );
@@ -6708,6 +6691,49 @@ class User extends DataObject
 		{	// No terms for this site:
 			return false;
 		}
+	}
+
+
+	/**
+	 * Get a count of flagged items by this user in current collection
+	 *
+	 * @return integer
+	 */
+	function get_flagged_items_count()
+	{
+		global $Collection, $Blog;
+
+		if( ! is_logged_in() )
+		{	// Only logged in users can have the flagged items:
+			return 0;
+		}
+
+		if( empty( $Blog ) )
+		{	// Collection must be defined:
+			return 0;
+		}
+
+		if( ! isset( $this->flagged_items_count ) )
+		{	// Get it from DB only first time and then cache in var:
+			global $current_User;
+
+			$flagged_ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
+
+			// Set additional debug info prefix for SQL queries in order to know what code executes it:
+			$flagged_ItemList2->query_title_prefix = 'Flagged Items';
+
+			// Filter only the flagged items:
+			$flagged_ItemList2->set_default_filters( array(
+					'flagged' => 1
+				) );
+
+			// Run query initialization to get total rows:
+			$flagged_ItemList2->query_init();
+
+			$this->flagged_items_count = $flagged_ItemList2->total_rows;
+		}
+
+		return $this->flagged_items_count;
 	}
 }
 

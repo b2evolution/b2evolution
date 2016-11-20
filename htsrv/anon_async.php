@@ -18,6 +18,11 @@
  */
 require_once dirname(__FILE__).'/../conf/_config.php';
 
+// Disable log in with HTTP basic authentication because we need some action even for anonymous users,
+// but it is impossible if wrong login was entered on "HTTP Basic Authentication" form.
+// (Used to correct work of action "get_user_salt")
+$disable_http_auth = true;
+
 require_once $inc_path.'_main.inc.php';
 
 load_funcs( '../inc/skins/_skin.funcs.php' );
@@ -56,7 +61,7 @@ switch( $action )
 		$ItemCache = & get_ItemCache();
 		$Item = $ItemCache->get_by_ID( $item_ID );
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog_ID );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 
 		locale_activate( $Blog->get('locale') );
 
@@ -84,7 +89,7 @@ switch( $action )
 		$post_id = NULL;
 		$comment_id = param( 'comment_id', 'integer', 0 );
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog_ID );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 
 		locale_activate( $Blog->get('locale') );
 
@@ -138,7 +143,7 @@ switch( $action )
 		if( $blog_ID > 0 )
 		{	// Get Blog if ID is set
 			$BlogCache = & get_BlogCache();
-			$Blog = $BlogCache->get_by_ID( $blog_ID );
+			$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 		}
 
 		if( $user_ID > 0 )
@@ -349,7 +354,7 @@ switch( $action )
 		else
 		{
 			$BlogCache = &get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
 			$skin_ID = $Blog->get_skin_ID();
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $skin_ID );
@@ -457,7 +462,7 @@ switch( $action )
 					if( ! empty( $blog_ID ) )
 					{ // If blog is defined we should check if we can display info about number of votes
 						$BlogCache = & get_BlogCache();
-						if( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) &&
+						if( ( $Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) ) &&
 						    $blog_skin_ID = $Blog->get_skin_ID() )
 						{
 							$LinkOwner = & $Link->get_LinkOwner();
@@ -532,7 +537,101 @@ switch( $action )
 					// We have EXITed already at this point!!
 				}
 
-				$Comment->vote_helpful( '', '', '&amp;', true, true );
+				if( param( 'skin_ID', 'integer', 0 ) > 0 )
+				{	// If request is from skin:
+					$SkinCache = & get_SkinCache();
+					$request_Skin = & $SkinCache->get_by_ID( get_param( 'skin_ID' ), false, false );
+					if( $request_Skin && method_exists( $request_Skin, 'display_comment_voting_panel' ) )
+					{	// Request skin to display a voting panel for item:
+						$request_Skin->display_comment_voting_panel( $Comment, array( 'display_wrapper' => false ) );
+						break 2;
+					}
+				}
+
+				$Comment->vote_helpful( '', '', '&amp;', true, true, array( 'display_wrapper' => false ) );
+				break;
+
+			case 'item':
+				// Vote on items:
+
+				$item_ID = intval( $vote_ID );
+				if( empty( $item_ID ) )
+				{	// No item ID
+					break 2;
+				}
+
+				$ItemCache = & get_ItemCache();
+				$Item = $ItemCache->get_by_ID( $item_ID, false );
+				if( ! $Item )
+				{	// Incorrect item ID:
+					break 2;
+				}
+
+				if( $current_User->ID == $Item->creator_user_ID )
+				{	// Do not allow users to vote on their own comments:
+					break 2;
+				}
+
+				$item_Blog = & $Item->get_Blog();
+
+				if( empty( $item_Blog ) || ! $item_Blog->get_setting( 'voting_positive' ) )
+				{	// If Users cannot vote:
+					break 2;
+				}
+
+				if( ! empty( $vote_action ) )
+				{	// Vote for the item:
+					switch( $vote_action )
+					{ // Set field value
+						case 'like':
+							$field_value = 'positive';
+							break;
+
+						case 'noopinion':
+							$field_value = 'neutral';
+							break;
+
+						case 'dontlike':
+							$field_value = 'negative';
+							break;
+					}
+
+					if( isset( $field_value ) )
+					{ // Update a vote of current user
+						$Item->set_vote( $field_value );
+						$Item->dbupdate();
+					}
+				}
+
+				if( ! empty( $redirect_to ) )
+				{	// Redirect to back page, It is used by browsers without JavaScript:
+					header_redirect( $redirect_to, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+				}
+
+				if( param( 'widget_ID', 'integer', 0 ) > 0 )
+				{	// If request is from widget:
+					$WidgetCache = & get_WidgetCache();
+					$item_Widget = & $WidgetCache->get_by_ID( get_param( 'widget_ID' ), false, false );
+					if( $item_Widget && $item_Widget->code == 'item_vote' )
+					{	// Request widget to display a voting panel for item:
+						$item_Widget->display_voting_panel( $Item, array( 'display_wrapper' => false ) );
+						break 2;
+					}
+				}
+				elseif( param( 'skin_ID', 'integer', 0 ) > 0 )
+				{	// If request is from skin:
+					$SkinCache = & get_SkinCache();
+					$request_Skin = & $SkinCache->get_by_ID( get_param( 'skin_ID' ), false, false );
+					if( $request_Skin && method_exists( $request_Skin, 'display_item_voting_panel' ) )
+					{	// Request skin to display a voting panel for item:
+						$request_Skin->display_item_voting_panel( $Item, array( 'display_wrapper' => false ) );
+						break 2;
+					}
+				}
+
+				// Display a voting panel for item:
+				$Item->display_voting_panel( array( 'display_wrapper' => false ) );
 				break;
 		}
 		break;
@@ -655,7 +754,7 @@ switch( $action )
 		else
 		{
 			$BlogCache = &get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
 			$skin_ID = $Blog->get_skin_ID();
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $skin_ID );
@@ -863,7 +962,7 @@ switch( $action )
 		else
 		{
 			$BlogCache = &get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
 			$skin_ID = $Blog->get_skin_ID();
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $skin_ID );
@@ -1165,7 +1264,7 @@ switch( $action )
 		}
 
 		$BlogCache = &get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
 		$skin_ID = $Blog->get_skin_ID();
 		$SkinCache = & get_SkinCache();
 		$Skin = & $SkinCache->get_by_ID( $skin_ID );
@@ -1206,7 +1305,7 @@ switch( $action )
 		else
 		{ // Load Blog skin
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
 			$skin_ID = $Blog->get_skin_ID();
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $skin_ID );
@@ -1247,7 +1346,7 @@ switch( $action )
 		else
 		{ // Load Blog skin
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
 			$skin_ID = $Blog->get_skin_ID();
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $skin_ID );

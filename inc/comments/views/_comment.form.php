@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var Comment
  */
@@ -37,7 +37,7 @@ $Form->switch_template_parts(
 		'inputstart_checkbox' => '<div class="controls col-lg-8 col-md-8 col-sm-9"><div class="checkbox"><label>' )
 );
 
-$link_attribs = array( 'style' => 'margin-left:3ex', 'class' => 'btn btn-sm btn-default action_icon' ); // Avoid misclicks by all means!
+$link_attribs = array( 'style' => 'margin-left:1ex', 'class' => 'btn btn-sm btn-default action_icon' ); // Avoid misclicks by all means!
 if( $current_User->check_perm( 'blog_post!draft', 'edit', false, $Blog->ID ) )
 {
 	$Form->global_icon( T_( 'Post as a quote' ), 'elevate', '?ctrl=comments&amp;action=elevate&amp;type=quote&amp;comment_ID='.$edited_Comment->ID.'&amp;'.url_crumb('comment'),
@@ -183,8 +183,9 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	if( isset($GLOBALS['files_Module']) )
 	{
 		load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
+		global $LinkOwner; // Initialize this object as global because this is used in many link functions
 		$LinkOwner = new LinkComment( $edited_Comment );
-		attachment_iframe( $Form, $LinkOwner, NULL, false, true );
+		display_attachments_fieldset( $Form, $LinkOwner, false, true );
 	}
 
 	// ####################### PLUGIN FIELDSETS #########################

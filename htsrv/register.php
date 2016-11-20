@@ -64,7 +64,7 @@ param( 'source', 'string', '' );
 param( 'redirect_to', 'url', '' ); // do not default to $admin_url; "empty" gets handled better in the end (uses $blogurl, if no admin perms).
 param( 'inskin', 'boolean', false, true );
 
-global $Blog;
+global $Collection, $Blog;
 if( $inskin && empty( $Blog ) )
 {
 	param( 'blog', 'integer', 0 );
@@ -72,7 +72,7 @@ if( $inskin && empty( $Blog ) )
 	if( isset( $blog) && $blog > 0 )
 	{
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog, false, false );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog, false, false );
 	}
 }
 
@@ -354,7 +354,7 @@ switch( $action )
 		$DB->commit();
 		$UserCache->add( $new_User );
 
-		$initial_hit = $new_User->get_first_session_hit_params( $Session->ID );
+		$initial_hit = $Session->get_first_hit_params();
 		if( ! empty ( $initial_hit ) )
 		{	// Save User Settings
 			$UserSettings->set( 'initial_blog_ID' , $initial_hit->hit_coll_ID, $new_User->ID );
@@ -505,10 +505,6 @@ if( $inskin && !empty( $Blog ) )
 	// already exited here
 	exit(0);
 }
-
-// Load jQuery library and functions to work with ajax response
-require_js( '#jquery#' );
-require_js( 'ajax.js' );
 
 // Display reg form:
 require $adminskins_path.'login/_reg_form.main.php';

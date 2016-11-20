@@ -90,6 +90,18 @@ class flowplayer_plugin extends Plugin
 	{
 		return array_merge( parent::get_coll_setting_definitions( $params ),
 			array(
+				'use_for_posts' => array(
+					'label' => T_('Use for'),
+					'note' => T_('videos attached to posts'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
+					),
+				'use_for_comments' => array(
+					'label' => '',
+					'note' => T_('videos attached to comments'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
+					),
 				'skin' => array(
 					'label' => T_('Skin'),
 					'type' => 'select',
@@ -108,7 +120,8 @@ class flowplayer_plugin extends Plugin
 					'valid_range' => array( 'min' => 1 ),
 					),
 				'allow_download' => array(
-					'label' => T_('Allow downloading of the video file'),
+					'label' => T_('Display Download Link'),
+					'note' => T_('Check to display a "Download this video" link under the video.'),
 					'type' => 'checkbox',
 					'defaultvalue' => 0,
 					),
@@ -153,6 +166,12 @@ class flowplayer_plugin extends Plugin
 
 		$Item = & $params['Item'];
 		$item_Blog = $Item->get_Blog();
+
+		if( ( ! $in_comments && ! $this->get_coll_setting( 'use_for_posts', $item_Blog ) ) ||
+		    ( $in_comments && ! $this->get_coll_setting( 'use_for_comments', $item_Blog ) ) )
+		{ // Plugin is disabled for post/comment videos on this Blog
+			return false;
+		}
 
 		$width = intval( $this->get_coll_setting( 'width', $item_Blog ) );
 		if( empty( $width ) )
@@ -274,7 +293,7 @@ class flowplayer_plugin extends Plugin
 	{
 		if( empty( $Blog ) )
 		{ // Get current Blog if it is not defined
-			global $Blog;
+			global $Collection, $Blog;
 		}
 
 		// Get a skin name from blog plugin setting

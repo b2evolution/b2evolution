@@ -23,6 +23,14 @@ if( get_param('display_mode') == 'js' )
 	echo '<h2 class="page-title">'.T_('Antispam blacklist').'</h2>';
 }
 
+echo '<p class="well">'.T_('User generated content containing keywords from the Antispam Blacklist will be rejected.');
+if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+{
+	global $antispamsrv_tos_url;
+	echo '<br />'.sprintf( T_('You can share your keywords with and retrive keywords from the Central Antispam Blacklist service <a %s>Terms of service</a>'), 'href="'.$antispamsrv_tos_url.'"' );
+}
+echo '</p>';
+
 // ADD KEYWORD FORM:
 if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'add' here once it's mature.
 { // add keyword or domain
@@ -42,39 +50,26 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'a
 }
 
 
-echo '<p class="center">'.T_('Any URL containing one of the following keywords will be banned from posts, comments and logs.');
-if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
-{
-	echo '<br />'.T_( 'If a keyword restricts legitimate domains, click on the green tick to stop banning with this keyword.');
-}
-echo '</p>';
-
-
-if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
-{ // User can edit:
-	?>
-	<p class="center">
-		[<a href="?ctrl=antispam&amp;action=poll&amp;<?php echo url_crumb('antispam') ?>"><?php echo T_('Request abuse update from centralized blacklist!') ?></a>]
-		[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
-	</p>
-	<?php
-}
-
-
 /*
  * Query antispam blacklist:
  */
 $keywords = param( 'keywords', 'string', '', true );
+$source = param( 'source', 'string', '', true );
 
 $SQL = new SQL();
 
-$SQL->SELECT( 'aspm_ID, aspm_string, aspm_source' );
-$SQL->FROM( 'T_antispam' );
+$SQL->SELECT( 'askw_ID, askw_string, askw_source' );
+$SQL->FROM( 'T_antispam__keyword' );
 
-if( !empty( $keywords ) )
-{
-	$SQL->add_search_field( 'aspm_string' );
+if( ! empty( $keywords ) )
+{	// Filter by keywords:
+	$SQL->add_search_field( 'askw_string' );
 	$SQL->WHERE_kw_search( $keywords, 'AND' );
+}
+
+if( ! empty( $source ) )
+{	// Filter by source:
+	$SQL->WHERE_and( 'askw_source = '.$DB->quote( $source ) );
 }
 
 // Create result set:
@@ -82,6 +77,11 @@ $Results = new Results( $SQL->get(), 'antispam_' );
 
 $Results->title = T_('Banned keywords blacklist');
 
+if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+{	// Allow to request keywords from Central Antispam if current user has a permission:
+	global $admin_url;
+	$Results->global_icon( T_('Request update from Central Antispam Blacklist'), '', $admin_url.'?ctrl=antispam&amp;action=poll&amp;'.url_crumb( 'antispam' ), T_('Request update from Central Antispam Blacklist'), 0, 0, array( 'class' => 'action_icon btn-primary' ) );
+}
 
 /**
  * Callback to add filters on top of the result set
@@ -91,6 +91,13 @@ $Results->title = T_('Banned keywords blacklist');
 function filter_antispam( & $Form )
 {
 	$Form->text( 'keywords', get_param('keywords'), 20, T_('Keywords'), T_('Separate with space'), 50 );
+
+	$Form->select_input_array( 'source', get_param( 'source' ), array(
+			''         => T_('All'),
+			'local'    => T_('Local'),
+			'reported' => T_('Reported'),
+			'central'  => T_('Central'),
+		), T_('Source') );
 }
 $Results->filter_area = array(
 	'callback' => 'filter_antispam',
@@ -107,66 +114,73 @@ $Results->filter_area = array(
  */
 $Results->cols[] = array(
 						'th' => T_('Keyword'),
-						'order' => 'aspm_string',
-						'td' => '%htmlspecialchars(#aspm_string#)%',
+						'order' => 'askw_string',
+						'td' => '%htmlspecialchars(#askw_string#)%',
 					);
 
 // Set columns:
 function antispam_source2( & $row )
 {
-	static $aspm_sources = NULL;
+	static $askw_sources = NULL;
 
-	if( $aspm_sources === NULL )
+	if( $askw_sources === NULL )
 	{
 		/**
 		 * the antispam sources
 		 * @var array
 		 * @static
 		 */
-		$aspm_sources = array (
+		$askw_sources = array (
 			'local' => T_('Local'),
 			'reported' => T_('Reported'),
 			'central' => T_('Central'),
 		);
 	}
 
-	return $aspm_sources[$row->aspm_source];
+	return $askw_sources[$row->askw_source];
 }
 $Results->cols[] = array(
 						'th' => T_('Source'),
-						'order' => 'aspm_source',
+						'th_class' => 'shrinkwrap',
+						'order' => 'askw_source',
 						'td' => '%antispam_source2({row})%',
 					);
 
 // Check if we need to display more:
 if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 { // User can edit, spamlist: add controls to output columns:
-	// Add CHECK to 1st column:
-	$Results->cols[0]['td'] = action_icon( TS_('Allow keyword back (Remove it from the blacklist)'), 'allowback',
-															 '?ctrl=antispam&amp;action=remove&amp;hit_ID=$aspm_ID$&amp;'.url_crumb('antispam') )
-															 .$Results->cols[0]['td'];
 
 	// Add a column for actions:
 	function antispam_actions( & $row )
 	{
+		global $admin_url;
+
 		$output = '';
 
-		if( $row->aspm_source == 'local' )
+		if( $row->askw_source == 'local' )
 		{
-			$output .= '[<a href="'.regenerate_url( 'action,keyword', 'action=report&amp;keyword='
-									.rawurlencode( $row->aspm_string )).'&amp;'.url_crumb('antispam').'" title="'.
-									T_('Report abuse to centralized ban blacklist!').'">'.
-									T_('Report').'</a>]';
+			$output .= '<a href="'.regenerate_url( 'action,keyword', 'action=report&amp;keyword='
+				.rawurlencode( $row->askw_string ) ).'&amp;'.url_crumb( 'antispam' ).'" title="'.
+				T_('Report abuse to centralized ban blacklist!').'" class="btn btn-warning btn-xs">'.
+				T_('Report').'</a> ';
 		}
 
-		return $output.'[<a href="'.regenerate_url( 'action,keyword', 'action=ban&amp;keyword='
-									.rawurlencode( $row->aspm_string )).'&amp;'.url_crumb('antispam').'" title="'.
-									T_('Check hit-logs and comments for this keyword!').'">'.
-									T_('Re-check').'</a>]';
+		$output .= '<a href="'.regenerate_url( 'action,keyword', 'action=ban&amp;keyword='
+			.rawurlencode( $row->askw_string ) ).'&amp;'.url_crumb( 'antispam' ).'" title="'.
+			T_('Check hit-logs and comments for this keyword!').'" class="btn btn-default btn-xs">'.
+			T_('Re-check').'</a>';
+
+		$output .= ' <a href="'.$admin_url.'?ctrl=antispam&amp;action=remove&amp;hit_ID='.$row->askw_ID.'&amp;'.url_crumb( 'antispam' )
+			.'" title="'.T_('Allow keyword back (Remove it from the blacklist)').'" class="btn btn-danger btn-xs">'.
+			T_('Remove from blacklist').'</a>';
+
+		return $output;
 	}
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
+							'th_class' => 'shrinkwrap',
 							'td' => '%antispam_actions({row})%',
+							'td_class' => 'nowrap',
 						);
 }
 

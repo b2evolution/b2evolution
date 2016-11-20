@@ -216,7 +216,15 @@ function makeDraggable( selector )
 		scrollSensitivity: 100, // distance from edge before scoll occurs
 		zIndex: 999, // z-index whilst dragging
 		opacity: .8, // opacity whilst dragging
-		cursor: "move" // change the cursor whilst dragging
+		cursor: "move", // change the cursor whilst dragging
+		start: function()
+		{	// Hide original row during dragging:
+			jQuery( this ).hide();
+		},
+		stop: function()
+		{	// Show original row after dragging:
+			jQuery( this ).show();
+		},
 	}).addClass( "draggable_widget" ); // add our css class
 }
 

@@ -1,27 +1,3 @@
-// --------- Universal item list widget & Recent posts widget ---------
-@import "../../rsc/less/_universal_item_list_widget.module.less";
-// --------------------------------------------------------------------
-
-// ------------------- Media Index widget --------------------
-@import "../../rsc/less/_coll_media_index_widget.module.less";
-// -----------------------------------------------------------
-
-// ----------- User Avatars (User List) widget ------------
-@import "../../rsc/less/_user_avatars_widget.module.less";
-// --------------------------------------------------------
-
-// -----------------About Author widget -------------------
-@import "../../rsc/less/_about_author_widget.module.less";
-// --------------------------------------------------------
-
-// ------------- Organization Members widget -------------
-@import "../../rsc/less/_org_members_widget.module.less";
-	// Override constants used in the module:
-	@widget_core_org_members-color: #333;
-	@widget_core_org_members-user-link-color: #000;
-	@widget_core_org_members-user-link-hover-color: #23527c;
-// -------------------------------------------------------
-
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
 	-moz-border-radius: @radius;
@@ -179,6 +155,9 @@ ol.breadcrumb {
 			}
 			a.ft_author_avatar:hover {
 				background-color: transparent !important;
+			}
+			.last_mod_date {
+				white-space: normal;
 			}
 		}
 		.ft_count {
@@ -631,6 +610,7 @@ body.round_avatars .single_topic .evo_content_block .ft_avatar {
 // Voting panels
 .vote_spam {
 	float: left;
+	height: 22px;
 	line-height: 22px;
 	.action_icon {
 		margin: 0;
@@ -639,11 +619,25 @@ body.round_avatars .single_topic .evo_content_block .ft_avatar {
 a.btn+.vote_spam {
 	margin-left: 5px;
 }
-.vote_helpful {
+.evo_voting_panel {
 	float: left;
-	display: block;
 	margin-right: 10px;
+	height: 22px;
 	line-height: 22px;
+	span.fa {
+		line-height: 20px;
+	}
+}
+// A link to reply on comment:
+.comment_reply {
+	height: 22px;
+	line-height: 22px;
+	margin-right: 10px;
+}
+
+// Button to quote a reply/topic:
+.quote_button {
+	margin-right: 10px;
 }
 
 // Form elements on item edit page
@@ -664,11 +658,17 @@ label.control-label[for=post_title] {
 }
 
 // Search form
-.widget_core_coll_search_form {
+main .widget_core_coll_search_form {
 	float: right;
 	width: 40%;
 	min-width: 250px;
 	margin: 0 0 20px 5px;
+	div.compact_search_form input.search_field {
+		width: 100%;
+	}
+}
+
+aside .widget_core_coll_search_form {
 	div.compact_search_form input.search_field {
 		width: 100%;
 	}
@@ -1071,7 +1071,7 @@ label.control-label[for=post_title] {
 // Comment-footer link TO TOP size FIX
 a.to_top {
 	font-size: 14px !important;
-	margin-right: 5px;
+	margin-right: 10px;
 	float: left;
 }
 

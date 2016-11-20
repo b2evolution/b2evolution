@@ -316,7 +316,7 @@ class RestApi
 	 */
 	private function module_collections()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		// Collection controller ('list' by default):
 		$coll_controller = isset( $this->args[2] ) ? $this->args[2] : 'list';
@@ -334,7 +334,7 @@ class RestApi
 			$coll_urlname = $this->args[1];
 
 			$BlogCache = & get_BlogCache();
-			if( ( $Blog = $BlogCache->get_by_urlname( $coll_urlname, false ) ) === false )
+			if( ( $Collection = $Blog = $BlogCache->get_by_urlname( $coll_urlname, false ) ) === false )
 			{	// Collection is not detected in DB by requested url name:
 				$this->halt( 'No collection found in DB by requested url name "'.$coll_urlname.'"', 'unknown_collection', 404 );
 				// Exit here.
@@ -362,6 +362,17 @@ class RestApi
 			}
 		}
 
+		// Try to get an object ID and action for example request "<baseurl>/api/v1/collections/<collname>/items/<id>/action":
+		$object_ID = empty( $this->args[3] ) ? NULL : intval( $this->args[3] );
+		$object_action = empty( $this->args[4] ) ? NULL : $this->args[4];
+		$coll_controller_params = array();
+
+		if( $object_ID && $object_action )
+		{	// Set controller name for single object and action:
+			$coll_controller = $coll_controller.'_'.$object_action;
+			$coll_controller_params[] = $object_ID;
+		}
+
 		if( ! method_exists( $this, 'controller_coll_'.$coll_controller ) )
 		{	// Unknown controller:
 			$this->halt( 'Unknown collection controller "'.$coll_controller.'"', 'unknown_controller' );
@@ -369,7 +380,7 @@ class RestApi
 		}
 
 		// Call collection controller to prepare current request:
-		$this->{'controller_coll_'.$coll_controller}();
+		call_user_func_array( array( $this, 'controller_coll_'.$coll_controller ), $coll_controller_params );
 	}
 
 
@@ -536,7 +547,7 @@ class RestApi
 	 */
 	private function controller_coll_items( $force_filters = array() )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		// Get param to limit number posts per page:
 		$api_per_page = param( 'per_page', 'integer', 10 );
@@ -669,7 +680,7 @@ class RestApi
 	 */
 	private function controller_coll_search()
 	{
-		global $Blog, $Session;
+		global $Collection, $Blog, $Session;
 
 		// Get additional params:
 		$api_page = param( 'page', 'integer', 1 );
@@ -883,7 +894,7 @@ class RestApi
 	 */
 	private function controller_coll_assignees()
 	{
-		global $current_User, $Blog, $DB;
+		global $current_User, $Collection, $Blog, $DB;
 
 		if( ! is_logged_in() || ! $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 		{	// Check permission: Current user must has a permission to be assignee of the collection:
@@ -989,7 +1000,7 @@ class RestApi
 	 */
 	private function controller_coll_favorite()
 	{
-		global $current_User, $Blog;
+		global $current_User, $Collection, $Blog;
 
 		if( ! is_logged_in() )
 		{	// Check permission: Current user must be logged in
@@ -1011,6 +1022,42 @@ class RestApi
 			$this->add_response( 'setting', $setting );
 		}
 	}
+
+
+	/**
+	 * Call item controller to flag by current user
+	 *
+	 * @param integer Item ID
+	 */
+	private function controller_coll_items_flag( $item_ID )
+	{
+		global $Collection, $Blog;
+
+		$ItemCache = & get_ItemCache();
+		if( ( $Item = & $ItemCache->get_by_ID( $item_ID, false, false ) ) === false )
+		{	// Item is not detected in DB by requested ID:
+			$this->halt( 'No item found in DB by requested ID #'.$item_ID, 'unknown_item', 404 );
+			// Exit here.
+		}
+
+		if( $Item->get_blog_ID() != $Blog->ID )
+		{	// Item should be called for current collection:
+			$this->halt( 'You request item #'.$Item->ID.' from another collection "'.$Blog->get( 'urlname' ).'"', 'wrong_item_coll', 403 );
+			// Exit here.
+		}
+
+		if( ! $Item->can_flag() )
+		{	// Don't display the flag button if it is not allowed by some reason:
+			$this->halt( 'You cannot flag the item #'.$Item->ID, 'cannot_flag_item', 403 );
+		}
+
+		// Flag or unflag item for current user:
+		$Item->update_flag();
+
+		// Return current state of flag:
+		$this->add_response( 'flag', $Item->get_user_data( 'item_flag' ), 'integer' );
+	}
+
 
 	/**** MODULE COLLECTIONS ---- END ****/
 
@@ -1344,7 +1391,7 @@ class RestApi
 		global $current_User;
 
 		if( ! is_logged_in() || ! $current_User->check_perm( 'users', 'edit' ) )
-		{	// Current user has no permission to delate the requested user:
+		{	// Current user has no permission to delete the requested user:
 			$this->halt( T_('You have no permission to edit other users!'), 'no_access', 403 );
 			// Exit here.
 		}
@@ -1698,4 +1745,430 @@ class RestApi
 	}
 
 	/**** MODULE POLLS ---- END ****/
+
+
+	/**** MODULE LINKS ---- START ****/
+
+
+	/**
+	 * Call module to prepare request for links
+	 */
+	private function module_links()
+	{
+		if( ! empty( $this->args[2] ) )
+		{	// Get action from request string:
+			$link_action = $this->args[2];
+		}
+		else
+		{	// Get action from param:
+			$link_action = param( 'action', 'string', '' );
+		}
+
+		// Set link controller '' by default:
+		$link_controller = '';
+
+		$request_method = isset( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : 'GET';
+		switch( $request_method )
+		{
+			case 'DELETE':
+				// Set controller to unlink/delete the requested link:
+				$link_controller = 'delete';
+				break;
+
+			case 'GET':
+			case 'POST':
+				// Actions to update the links:
+				switch( $link_action )
+				{
+					case 'move_up':
+					case 'move_down':
+						$link_controller = 'change_order';
+						break;
+
+					case 'attach':
+						$link_controller = 'attach';
+						break;
+
+					case 'refresh':
+					case 'sort':
+						$link_controller = 'refresh';
+						break;
+
+					case 'copy':
+						$link_controller = 'copy';
+						break;
+				}
+				break;
+		}
+
+		if( ! method_exists( $this, 'controller_link_'.$link_controller ) )
+		{	// Unknown controller:
+			$this->halt( 'Unknown link controller "'.$link_controller.'"', 'unknown_controller' );
+			// Exit here.
+		}
+
+		// Call collection controller to prepare current request:
+		$this->{'controller_link_'.$link_controller}();
+	}
+
+
+	/**
+	 * Get Link object
+	 *
+	 * @return object Link
+	 */
+	private function & get_Link()
+	{
+		// Get link ID:
+		$link_ID = empty( $this->args[1] ) ? 0 : intval( $this->args[1] );
+
+		$LinkCache = & get_LinkCache();
+		$Link = & $LinkCache->get_by_ID( $link_ID, false, false );
+
+		return $Link;
+	}
+
+
+	/**
+	 * Check permission if current user can update the requested link
+	 */
+	private function link_check_perm()
+	{
+		if( ! ( $Link = & $this->get_Link() ) )
+		{	// Wrong link request:
+			$this->halt( 'Invalid link ID', 'link_invalid_id' );
+			// Exit here.
+		}
+
+		$LinkOwner = & $Link->get_LinkOwner();
+
+		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
+		{	// Current user has no permission to unlink the requested link:
+			$this->halt( 'You have no permission to edit the requested link!', 'no_access', 403 );
+			// Exit here.
+		}
+	}
+
+
+	/**
+	 * Call link controller to unlink the requested link or delete file completely
+	 */
+	private function controller_link_delete()
+	{
+		// Check permission if current user can update the requested link:
+		$this->link_check_perm();
+
+		// Action: 'unlink - just unlink file from the owner, 'delete' - unlink and delete the file from disk and DB completely
+		$action = param( 'action', 'string', '' );
+
+		$deleted_Link = & $this->get_Link();
+		$LinkOwner = & $deleted_Link->get_LinkOwner();
+
+		if( $link_File = & $deleted_Link->get_File() )
+		{
+			syslog_insert( sprintf( 'File %s was unlinked from %s with ID=%s', '[['.$link_File->get_name().']]', $LinkOwner->type, $LinkOwner->link_Object->ID ), 'info', 'file', $link_File->ID );
+		}
+
+		if( $action == 'delete' && $deleted_Link->can_be_file_deleted() )
+		{	// Get a linked file to delete it after unlinking if it is allowed for current user:
+			$linked_File = & $deleted_Link->get_File();
+		}
+
+		// Unlink File from Item/Comment:
+		$deleted_link_ID = $deleted_Link->ID;
+		$deleted_Link->dbdelete();
+
+		$LinkOwner->after_unlink_action( $deleted_link_ID );
+
+		if( $action == 'delete' && ! empty( $linked_File ) )
+		{	// Delete a linked file from disk and DB completely:
+			$linked_File->unlink();
+		}
+
+		// The requested link has been deleted successfully:
+		$this->halt( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'delete_success', 200 );
+		// Exit here.
+	}
+
+
+	/**
+	 * Call link controller to change order the requested link
+	 */
+	private function controller_link_change_order()
+	{
+		// Check permission if current user can update the requested link:
+		$this->link_check_perm();
+
+		// Get action from request string:
+		$link_action = $this->args[2];
+
+		$edited_Link = & $this->get_Link();
+		$LinkOwner = & $edited_Link->get_LinkOwner();
+
+		$ownerLinks = $LinkOwner->get_Links();
+
+		// TODO fp> when moving an "after_more" above a "teaser" img, it should change to "teaser" too.
+		// TODO fp> when moving a "teaser" below an "aftermore" img, it should change to "aftermore" too.
+
+		// Switch order with the next/prev one:
+		if( $link_action == 'move_up' )
+		{
+			$switchcond = 'return ($loop_Link->get("order") > $i
+				&& $loop_Link->get("order") < '.$edited_Link->get( 'order' ).');';
+			$i = -1;
+		}
+		else
+		{
+			$switchcond = 'return ($loop_Link->get("order") < $i
+				&& $loop_Link->get("order") > '.$edited_Link->get( 'order' ).');';
+			$i = PHP_INT_MAX;
+		}
+		foreach( $ownerLinks as $loop_Link )
+		{	// Find nearest order:
+			if( $loop_Link == $edited_Link )
+				continue;
+
+			if( eval( $switchcond ) )
+			{
+				$i = $loop_Link->get( 'order' );
+				$switch_Link = $loop_Link;
+			}
+		}
+		if( $i > -1 && $i < PHP_INT_MAX )
+		{	// Switch the links:
+			$switch_Link->set( 'order', $edited_Link->get( 'order' ) );
+
+			// HACK: go through order=0 to avoid duplicate key conflict:
+			$edited_Link->set( 'order', 0 );
+			$edited_Link->dbupdate();
+			$switch_Link->dbupdate();
+
+			$edited_Link->set( 'order', $i );
+			$edited_Link->dbupdate();
+
+			// Update last touched date of Owners
+			$LinkOwner->update_last_touched_date();
+
+			// The requested link order has been changed successfully:
+			$this->halt( ( $link_action == 'move_up' )
+				? T_('Link has been moved up.')
+				: T_('Link has been moved down.'),
+				'change_order_success', 200 );
+			// Exit here.
+		}
+		else
+		{	// The requested link order has been changed successfully:
+			$this->halt( T_('Link order has not been changed.'), 'change_order_success', 403 );
+			// Exit here.
+		}
+	}
+
+
+	/**
+	 * Call link controller to change order the requested link
+	 */
+	private function controller_link_attach()
+	{
+		global $LinkOwner, $current_File;
+
+		$link_type = param( 'type', 'string' );
+		$link_object_ID = param( 'object_ID', 'string' );
+		$root = param( 'root', 'string' );
+		$file_path = param( 'path', 'string' );
+
+		$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+
+		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
+		{	// Current user has no permission to unlink the requested link:
+			$this->halt( 'You have no permission to attach a file!', 'no_access', 403 );
+			// Exit here.
+		}
+
+		$FileCache = & get_FileCache();
+		list( $root_type, $root_in_type_ID ) = explode( '_', $root, 2 );
+		if( ! ( $current_File = $FileCache->get_by_root_and_path( $root_type, $root_in_type_ID, $file_path ) ) )
+		{	// No file:
+			$this->halt( T_('Nothing selected.'), 'wrong_file', 403 );
+			// Exit here.
+		}
+
+		// Link the file to Item/Comment:
+		$link_ID = $current_File->link_to_Object( $LinkOwner );
+
+		$LinkCache = & get_LinkCache();
+		if( $Link = & $LinkCache->get_by_ID( $link_ID, false, false ) )
+		{	// Add data of new link to response:
+
+			// Use the glyph or font-awesome icons if requested by skin
+			param( 'b2evo_icons_type', 'string', 'fontawesome-glyphicons' );
+
+			$mask_row = (object) array(
+					'link_ID'       => $Link->ID,
+					'file_ID'       => $current_File->ID,
+					'link_position' => $Link->get( 'position' ),
+				);
+			$this->add_response( 'link', array(
+					'ID'       => $Link->ID,
+					'url'      => $current_File->get_view_link(),
+					'preview'  => $Link->get_preview_thumb(),
+					'actions'  => link_actions( $Link->ID, 'last', $link_type ),
+					'position' => display_link_position( $mask_row ),
+				) );
+		}
+
+		// File has been attached successfully:
+		$this->halt( $LinkOwner->translate( 'Selected files have been linked to xxx.' ), 'attach_success', 200 );
+		// Exit here.
+	}
+
+
+	/**
+	 * Call link controller to refresh a list of the links
+	 */
+	private function controller_link_refresh()
+	{
+		global $LinkOwner, $current_File, $disable_evo_flush;
+
+		$link_type = param( 'type', 'string' );
+		$link_object_ID = param( 'object_ID', 'string' );
+
+		$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+
+		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
+		{	// Current user has no permission to unlink the requested link:
+			$this->halt( 'You have no permission to list of the links!', 'no_access', 403 );
+			// Exit here.
+		}
+
+		if( get_param( 'action' ) == 'sort' )
+		{	// Sort the links:
+			$ownerLinks = $LinkOwner->get_Links();
+			usort( $ownerLinks, 'sort_links_by_filename' );
+
+			$max_order = 0;
+			$link_orders = array();
+			$link_count = count( $ownerLinks );
+			foreach( $ownerLinks as $link )
+			{
+				if( $link->order > $max_order )
+				{
+					$max_order = $link->order;
+				}
+				$link_orders[] = $link->order;
+			}
+
+			for( $i = 1; $i <= $link_count; $i++ )
+			{
+					$ownerLinks[$i - 1]->set( 'order', $i + $max_order );
+					$ownerLinks[$i - 1]->dbupdate();
+			}
+
+			for( $i = 1; $i <= $link_count; $i++ )
+			{
+				if( $ownerLinks[$i -1]->get( 'order' ) != $i )
+				{
+					$ownerLinks[$i - 1]->set( 'order', $i );
+					$ownerLinks[$i - 1]->dbupdate();
+				}
+			}
+		}
+
+		// Initialize admin skin:
+		global $current_User, $UserSettings, $is_admin_page, $adminskins_path, $AdminUI;
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		$is_admin_page = true;
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+		$AdminUI = new AdminUI();
+
+		// Disable function evo_flush() to correct handle a content below:
+		$disable_evo_flush = true;
+
+		// Get the refreshed content:
+		ob_start();
+		$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+		$refreshed_content = ob_get_clean();
+
+		$this->add_response( 'html', $refreshed_content );
+
+		if( get_param( 'action' ) == 'sort' )
+		{	// The sort has been done successfully:
+			$this->halt( T_('The attachments have been sorted by file name.'), 'sort_success', 200 );
+			// Exit here.
+		}
+		else
+		{	// The refresh has been done successfully:
+			$this->halt( 'A list of the links has been refreshed.', 'refresh_success', 200 );
+			// Exit here.
+		}
+	}
+
+
+	/**
+	 * Call link controller to copy Link from one object to another
+	 */
+	private function controller_link_copy()
+	{
+		$dest_type = param( 'dest_type', 'string' );
+		$dest_object_ID = param( 'dest_object_ID', 'string' );
+
+		$dest_LinkOwner = get_link_owner( $dest_type, $dest_object_ID );
+
+		if( ! is_logged_in() || ! $dest_LinkOwner->check_perm( 'edit', false ) )
+		{	// Current user has no permission to copy the requested link:
+			$this->halt( 'You have no permission to list of the links!', 'no_access', 403 );
+			// Exit here.
+		}
+
+		$source_type = param( 'source_type', 'string' );
+		$source_object_ID = param( 'source_object_ID', 'string' );
+		$source_position = trim( param( 'source_position', 'string' ), ',' );
+
+		$source_LinkOwner = get_link_owner( $source_type, $source_object_ID );
+
+		if( ! $source_LinkOwner || ! ( $source_LinkList = $source_LinkOwner->get_attachment_LinkList( 1000, $source_position ) ) )
+		{	// No requested links, Exit here:
+			$this->response = array();
+			return;
+		}
+
+		$dest_position = param( 'dest_position', 'string' );
+
+		$dest_last_order = $dest_LinkOwner->get_last_order() + 1;
+
+		// Limit files per each position, 0 - for unlimit:
+		$limit_position = param( 'limit_position', 'integer', 0 );
+		if( $limit_position )
+		{
+			$position_counts = array();
+		}
+
+		while( $source_Link = & $source_LinkList->get_next() )
+		{	// Copy a Link to new object:
+			if( $limit_position )
+			{
+				if( ! isset( $position_counts[ $source_Link->position ] ) )
+				{
+					$position_counts[ $source_Link->position ] = 0;
+				}
+				if( $position_counts[ $source_Link->position ] >= $limit_position )
+				{	// Skip this because of limit per position:
+					continue;
+				}
+				$position_counts[ $source_Link->position ]++;
+			}
+
+			if( $source_File = & $source_Link->get_File() &&
+			    $new_link_ID = $dest_LinkOwner->add_link( $source_Link->file_ID, ( empty( $dest_position ) ? $source_Link->position : $dest_position ), $dest_last_order++ ) )
+			{
+				$this->add_response( 'links', array(
+						'ID'            => $new_link_ID,
+						'file_type'     => $source_File->get_file_type(),
+						'orig_position' => $source_Link->position,
+					), 'array' );
+			}
+		}
+	}
+
+
+	/**** MODULE LINKS ---- END ****/
 }

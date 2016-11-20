@@ -811,7 +811,7 @@ class Hit
 	 */
 	function record_the_hit( $delayed = false )
 	{
-		global $DB, $Session, $ReqURI, $Blog, $blog, $localtimenow, $Debuglog, $disp, $ctrl, $http_response_code;
+		global $DB, $Session, $ReqURI, $Collection, $Blog, $blog, $localtimenow, $Debuglog, $disp, $ctrl, $http_response_code;
 
 		// To log current display and controller the global variables $disp and $ctrl are used. They can be setup while calling of some controller
 		// or while forming a page. In case if these variables aren't setup, NULL is recorded to the DB.
@@ -1429,7 +1429,7 @@ class Hit
 		// Parse referer
 		$pu = @parse_url($referer);
 
-		if( ! isset($pu['query']) || ! isset($pu['host']) )
+		if( ! isset( $pu['host'] ) )
 		{
 			return false;
 		}
@@ -1563,7 +1563,7 @@ class Hit
 			$key = trim(urldecode(implode(' ', $keys)));
 		}
 
-		if( empty($key) )
+		if( empty( $key ) && ! empty( $keyword_param ) )
 		{	// we haven't extracted a search key with the special cases above...
 			foreach( $keyword_param as $param )
 			{
@@ -1588,12 +1588,14 @@ class Hit
 
 		$key_param_in_query = false;
 		if( empty( $key ) && ! empty( $keyword_param ) )
-		{ // Check if empty key param exists in query, e.g. "/search?q=&other_param=text"
+		{	// Check if empty key param exists in query, e.g. "/search?q=&other_param=text"
+			// OR search engine supports urls without query param like Google:
 			foreach( $keyword_param as $k_param )
 			{
-				if( strpos( $query, '&'.$k_param.'=' ) !== false || strpos( $query, $k_param.'=' ) === 0 )
-				{ // Key param with empty value exists in query, We can decide this referer url as from search engine
+				if( $k_param === NULL || strpos( $query, '&'.$k_param.'=' ) !== false || strpos( $query, $k_param.'=' ) === 0 )
+				{	// Search engine supports urls without param OR Key param with empty value exists in query, We can decide this referer url as from search engine:
 					$key_param_in_query = true;
+					break;
 				}
 			}
 		}

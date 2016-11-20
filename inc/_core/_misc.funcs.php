@@ -473,6 +473,37 @@ function excerpt( $str, $maxlen = 254, $tail = '&hellip;' )
 
 
 /**
+ * Get a limited text-only excerpt based on number of words
+ *
+ * @param string
+ * @param int Maximum length
+ * @return string
+ */
+function excerpt_words( $str, $maxwords = 50 )
+{
+	// Add spaces
+	$str = str_replace( array( '<p>', '<br' ), array( ' <p>', ' <br' ), $str );
+
+	// Remove <code>
+	$str = preg_replace( '#<code>(.+)</code>#is', '', $str );
+
+	// Strip tags:
+	$str = strip_tags( $str );
+
+	// Remove spaces:
+	$str = preg_replace( '/[ \t]+/', ' ', $str);
+	$str = trim( $str );
+
+	// Ger rid of all new lines and Display the html tags as source text:
+	$str = trim( preg_replace( '#[\r\n\t\s]+#', ' ', $str ) );
+
+	$str = strmaxwords( $str, $maxwords );
+
+	return $str;
+}
+
+
+/**
  * Crop string to maxlen with &hellip; (default tail) at the end if needed.
  *
  * If $format is not "raw", we make sure to not cut in the middle of an
@@ -890,6 +921,43 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 
 
 /**
+ * Perform a global regular expression match outside blocks <code></code>, <pre></pre> and markdown codeblocks
+ *
+ * @param string Pattern to search for
+ * @param string Content
+ * @param array Array of all matches in multi-dimensional array
+ * @return integer|boolean Number of full pattern matches (which might be zero), or FALSE if an error occurred.
+ */
+function preg_match_outcode( $search, $content, & $matches )
+{
+	if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false || strstr( $content, '`' ) !== false )
+	{	// Call preg_match_all() on everything outside code/pre and markdown codeblocks:
+		return callback_on_non_matching_blocks( $content,
+			'~(`|<(code|pre)[^>]*>).*?(\1|</\2>)~is',
+			'preg_match_outcode_callback', array( $search, & $matches ) );
+	}
+	else
+	{	// No code/pre blocks, search in the whole thing:
+		return preg_match_all( $search, $content, $matches );
+	}
+}
+
+
+/**
+ * Used for function callback_on_non_matching_blocks(), because there is different order of params
+ *
+ * @param string Pattern to search for
+ * @param string Content
+ * @param array Array of all matches in multi-dimensional array
+ * @return integer|boolean Number of full pattern matches (which might be zero), or FALSE if an error occurred.
+ */
+function preg_match_outcode_callback( $content, $search, & $matches )
+{
+	return preg_match_all( $search, $content, $matches );
+}
+
+
+/**
  * Replace content outside blocks <code></code>, <pre></pre> and markdown codeblocks
  *
  * @param array|string Search list
@@ -1072,14 +1140,14 @@ function split_outcode( $separators, $content, $capture_separator = false )
  * @return string Content
  */
 function move_short_tags( $content, $pattern = NULL, $callback = NULL )
-{	// Move [image:] and [video:] tags out of <p> blocks
+{	// Move [image:], [video:] and [audio:] tags out of <p> blocks
 
 	// Get individual paragraphs
 	preg_match_all( '/<p[\s*|>].*?<\/p>/i', $content, $paragraphs );
 
 	if( is_null( $pattern ) )
 	{
-		$pattern = '/\[(image|video):\d+:?[^\[\]]*\]/i';
+		$pattern = '/\[(image|video|audio):\d+:?[^\[\]]*\]/i';
 	}
 
 	foreach( $paragraphs[0] as $i => $current_paragraph )
@@ -3481,7 +3549,7 @@ function exit_blocked_request( $block_type, $log_message, $syslog_origin_type = 
 	syslog_insert( $log_message, 'warning', NULL, NULL, $syslog_origin_type, $syslog_origin_ID );
 
 	// Print out this text to inform an user:
-	echo 'Blocked.';
+	echo 'This request has been blocked.';
 
 	if( $debug )
 	{ // Display additional info on debug mode:
@@ -4614,7 +4682,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					}
 					if( isset( $icon['size-'.$icon_param_name][1] ) )
 					{ // Height
-						$styles['width'] = 'height:'.$icon['size-'.$icon_param_name][1].'px';
+						$styles['height'] = 'height:'.$icon['size-'.$icon_param_name][1].'px';
 					}
 				}
 
@@ -5301,15 +5369,19 @@ function update_html_tag_attribs( $html_tag, $new_attribs, $attrib_actions = arr
 	$html_tag_name = $tag_match[1];
 
 	$old_attribs = array();
+	$updated_attribs = array();
 	if( preg_match_all( '@(\S+)=("|\'|)(.*)("|\'|>)@isU', $html_tag, $attr_matches ) )
 	{	// Get all existing attributes:
 		foreach( $attr_matches[1] as $o => $old_attr_name )
 		{
 			$old_attribs[ $old_attr_name ] = $attr_matches[3][ $o ];
+			if( ! isset( $new_attribs[ $old_attr_name ] ) )
+			{	// This attribute is not updated, keep current value:
+				$updated_attribs[] = $old_attr_name.'="'.format_to_output( $attr_matches[3][ $o ], 'formvalue' ).'"';
+			}
 		}
 	}
 
-	$updated_attribs = array();
 	foreach( $new_attribs as $new_attrib_name => $new_attrib_value )
 	{
 		if( isset( $old_attribs[ $new_attrib_name ] ) )
@@ -5574,7 +5646,7 @@ function hash_link_params( $link_array, $force_hash = NULL )
 	{
 		$key = $ReqHost.$ReqPath;
 
-		global $Blog;
+		global $Collection, $Blog;
 		if( !empty($Blog) && strpos( $Blog->get_setting('single_links'), 'param_' ) === 0 )
 		{	// We are on a blog that doesn't even have clean URLs for posts
 			$key .= $ReqURI;
@@ -5800,7 +5872,7 @@ function format_to_js( $unformatted )
 
 
 /**
- * Get available cort oprions for items
+ * Get available sort options for items
  *
  * @return array key=>name
  */
@@ -5816,13 +5888,14 @@ function get_available_sort_options()
 		'last_touched_ts' => T_('Date last touched'),
 		'urltitle'        => T_('URL "filename"'),
 		'priority'        => T_('Priority'),
+		'numviews'        => T_('Number of members who have viewed the post (If tracking enabled)'),
 		'RAND'            => T_('Random order!'),
 	);
 }
 
 
 /**
- * Get available cort oprions for blogs
+ * Get available sort options for blogs
  *
  * @return array key=>name
  */
@@ -6291,7 +6364,7 @@ function get_restapi_url()
  */
 function get_htsrv_url( $force_https = false )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( is_admin_page() || empty( $Blog ) )
 	{	// For back-office or when no collection page:
@@ -6314,7 +6387,7 @@ function get_htsrv_url( $force_https = false )
  */
 function get_samedomain_htsrv_url( $secure = false )
 {
-	global $ReqHost, $ReqPath, $htsrv_url, $htsrv_url_sensitive, $htsrv_subdir, $Blog;
+	global $ReqHost, $ReqPath, $htsrv_url, $htsrv_url_sensitive, $htsrv_subdir, $Collection, $Blog;
 
 	if( $secure )
 	{
@@ -7049,7 +7122,12 @@ function get_file_permissions_message()
  */
 function evo_flush()
 {
-	global $Timer;
+	global $Timer, $disable_evo_flush;
+
+	if( isset( $disable_evo_flush ) && $disable_evo_flush )
+	{	// This function is disabled (for example, used for ajax/rest api requests)
+		return;
+	}
 
 	$zlib_output_compression = ini_get( 'zlib.output_compression' );
 	if( empty( $zlib_output_compression ) || $zlib_output_compression == 'Off' )
@@ -7126,7 +7204,7 @@ function apm_log_custom_param( $name, $value )
  */
 function get_cookie_domain()
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( is_admin_page() || empty( $Blog ) )
 	{	// Use cookie domain of base url from config:
@@ -7149,7 +7227,7 @@ function get_cookie_domain()
  */
 function get_cookie_path()
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( is_admin_page() || empty( $Blog ) )
 	{	// Use cookie path of base url from config:
@@ -7252,6 +7330,7 @@ function echo_editable_column_js( $params = array() )
 			'field_type'      => 'select', // Type of the editable field: 'select', 'text'
 			'field_class'     => '', // Class of the editable field
 			'null_text'       => '', // Null text of an input field, Use TS_() to translate it
+			'callback_code'   => '', // Additional JS code after main callback code
 		), $params );
 
 	// Set onblur action to 'submit' when type is 'text' in order to don't miss the selected user login from autocomplete list
@@ -7260,9 +7339,12 @@ function echo_editable_column_js( $params = array() )
 	if( $params['field_type'] == 'select' )
 	{
 		$options = '';
-		foreach( $params['options'] as $option_value => $option_title )
+		if( is_array( $params['options'] ) )
 		{
-			$options .= '\''.$option_value.'\':\''.$option_title.'\','."\n";
+			foreach( $params['options'] as $option_value => $option_title )
+			{
+				$options .= '\''.$option_value.'\':\''.$option_title.'\','."\n";
+			}
 		}
 	}
 
@@ -7282,7 +7364,16 @@ jQuery( document ).ready( function()
 			value = ajax_debug_clear( value );
 			<?php if( $params['field_type'] == 'select' ) { ?>
 			var result = value.match( /rel="([^"]*)"/ );
-			return { <?php echo $options; ?>'selected' : result[1] }
+			<?php
+			if( is_array( $params['options'] ) )
+			{
+				echo "return { ".$options."'selected' : result[1] }";
+			}
+			else
+			{
+				echo "return ".$params['options'];
+			}
+			?>
 			<?php } else { ?>
 			var result = value.match( />\s*([^<]+)\s*</ );
 			return result[1] == '<?php echo $params['null_text'] ?>' ? '' : result[1];
@@ -7313,7 +7404,11 @@ jQuery( document ).ready( function()
 			{
 				evoFadeSuccess( this );
 			}
-			<?php } ?>
+			<?php
+			}
+			// Execute additional code:
+			echo $params['callback_code'];
+			?>
 		},
 		onsubmit: function( settings, original ) {},
 		submitdata : function( value, settings )
@@ -7407,7 +7502,7 @@ function button_class( $type = 'button', $jQuery_selector = false )
  */
 function echo_modalwindow_js()
 {
-	global $AdminUI, $Blog, $modal_window_js_initialized;
+	global $AdminUI, $Collection, $Blog, $modal_window_js_initialized;
 
 	if( ! empty( $modal_window_js_initialized ) )
 	{ // Don't print out these functions twice
@@ -7500,7 +7595,7 @@ function get_fieldset_folding_icon( $id, $params = array() )
 	}
 	else
 	{ // Get the fold value from user settings
-		global $UserSettings, $Blog;
+		global $UserSettings, $Collection, $Blog;
 		if( empty( $Blog ) )
 		{ // Get user setting value
 			$value = intval( $UserSettings->get( 'fold_'.$id ) );
@@ -7688,7 +7783,7 @@ function get_status_dropdown_button( $params = array() )
 	}
 	$status_icon_options = get_visibility_statuses( 'icons', $params['exclude_statuses'] );
 
-	$r = '<div class="btn-group dropdown autoselected">';
+	$r = '<div class="btn-group dropdown autoselected" data-toggle="tooltip" data-placement="top" data-container="body" title="'.get_status_tooltip_title( $params['value'] ).'">';
 	$r .= '<button type="button" class="btn btn-status-'.$params['value'].' dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'
 					.'<span>'.$status_options[ $params['value'] ].'</span>'
 				.' <span class="caret"></span></button>';
@@ -7708,13 +7803,23 @@ function get_status_dropdown_button( $params = array() )
  */
 function echo_form_dropdown_js()
 {
+	// Build a string to initialize javascript array with button titles
+	$tooltip_titles = get_visibility_statuses( 'tooltip-titles' );
+	$tooltip_titles_js_array = array();
+	foreach( $tooltip_titles as $status => $tooltip_title )
+	{
+		$tooltip_titles_js_array[] = $status.': \''.TS_( $tooltip_title ).'\'';
+	}
+	$tooltip_titles_js_array = implode( ', ', $tooltip_titles_js_array );
 ?>
 <script type="text/javascript">
 jQuery( '.btn-group.dropdown.autoselected li a' ).click( function()
 {
+	var item_status_tooltips = {<?php echo $tooltip_titles_js_array ?>};
 	var item = jQuery( this ).parent();
 	var status = item.attr( 'rel' );
-	var dropdown_buttons = item.parent().parent().find( 'button' );
+	var btn_group = item.parent().parent();
+	var dropdown_buttons = btn_group.find( 'button' );
 	var first_button = dropdown_buttons.parent().find( 'button:first' );
 	var field_name = jQuery( this ).parent().parent().attr( 'aria-labelledby' );
 
@@ -7723,12 +7828,17 @@ jQuery( '.btn-group.dropdown.autoselected li a' ).click( function()
 	{
 		jQuery( this ).attr( 'class', jQuery( this ).attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + status ) );
 	} );
+
 	// Update selector button to status title:
 	first_button.find( 'span:first' ).html( item.find( 'span:last' ).html() ); // update selector button to status title
+
 	// Update hidden field to new status value:
 	jQuery( 'input[type=hidden][name=' + field_name + ']' ).val( status );
 	// Hide dropdown menu:
 	item.parent().parent().removeClass( 'open' );
+
+	// Update tooltip
+	btn_group.tooltip( 'hide' ).attr( 'data-original-title', item_status_tooltips[status] ).tooltip( 'show' );
 
 	return false;
 } );
@@ -7987,5 +8097,538 @@ function can_use_hashed_password()
 	$transmit_hashed_password = (bool)$Settings->get( 'js_passwd_hashing' ) && !(bool)$Plugins->trigger_event_first_true( 'LoginAttemptNeedsRawPassword' );
 
 	return $transmit_hashed_password;
+}
+
+
+/**
+ * Convert inline file tags like [image|file:123:link title:.css_class_name] or [inline:123:.css_class_name] into HTML tags
+ *
+ * @param string Source content
+ * @param object Source object
+ * @param array Params
+ * @return string Content
+ */
+function render_inline_files( $content, $Object, $params = array() )
+{
+	if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+	{	// Call render_inline_files() on everything outside code/pre:
+		$params['check_code_block'] = false;
+		$content = callback_on_non_matching_blocks( $content,
+			'~<(code|pre)[^>]*>.*?</\1>~is',
+			'render_inline_files', array( $Object, $params ) );
+		return $content;
+	}
+
+	// No code/pre blocks, replace on the whole thing
+
+	// Remove block level short tags inside <p> blocks and move them before the paragraph
+	$content = move_short_tags( $content );
+
+	// Find all matches with inline tags
+	preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
+
+	if( !empty( $inlines[0] ) )
+	{	// There are inline tags in the content...
+
+		$rendered_tags = render_inline_tags( $Object, $inlines[0], $params );
+		foreach( $rendered_tags as $current_link_tag => $rendered_link_tag )
+		{
+			$content = str_replace( $current_link_tag, $rendered_link_tag, $content );
+		}
+	}
+
+	return $content;
+}
+
+
+/**
+ * Convert inline tags like [image:|file:|inline:|video:|audio:|thumbnail:] into HTML tags
+ *
+ * @param object Source object: Item, EmailCampaign
+ * @param array Inline tags
+ * @param array Params
+ * @return array Associative array of rendered HTML tags with inline tags as key
+ */
+function render_inline_tags( $Object, $tags, $params = array() )
+{
+	global $Plugins;
+	$inlines = array();
+
+	$params = array_merge( array(
+				'before'                   => '<div>',
+				'before_image'             => '<div class="image_block">',
+				'before_image_legend'      => '<div class="image_legend">',
+				'after_image_legend'       => '</div>',
+				'after_image'              => '</div>',
+				'after'                    => '</div>',
+				'image_size'               => 'fit-400x320',
+				'image_link_to'            => 'original', // Can be 'orginal' (image) or 'single' (this post)
+				'limit'                    => 1000, // Max # of images displayed
+				'get_rendered_attachments' => true,
+			), $params );
+
+	$object_class = get_class( $Object );
+
+	if( !isset( $LinkList ) )
+	{	// Get list of attached Links only first time:
+		if( $Object->ID == 0 )
+		{	// Get temporary object ID on preview new creating object:
+			$temp_link_owner_ID = param( 'temp_link_owner_ID', 'integer', NULL );
+		}
+		else
+		{	// Don't use temporary object for existing object:
+			$temp_link_owner_ID = NULL;
+		}
+		switch( $object_class )
+		{
+			case 'Item':
+				$LinkOwner = new LinkItem( $Object );
+				$prepare_plugin_event_name = 'PrepareForRenderItemAttachment';
+				$render_plugin_event_name = 'RenderItemAttachment';
+				break;
+
+			case 'EmailCampaign':
+				$LinkOwner = new LinkEmailCampaign( $Object );
+				$prepare_plugin_event_name = 'PrepareForRenderEmailAttachment';
+				$render_plugin_event_name = 'RenderEmailAttachment';
+				break;
+
+			case 'Message':
+				$LinkOwner = new LinkMessage( $Object, $temp_link_owner_ID );
+				$prepare_plugin_event_name = 'PrepareForRenderMessageAttachment';
+				$render_plugin_event_name = 'RenderMessageAttachment';
+				break;
+
+			default:
+				// Wrong source object type:
+				return false;
+		}
+		$LinkList = $LinkOwner->get_attachment_LinkList( $params['limit'], 'inline' );
+	}
+
+	if( empty( $LinkList ) )
+	{ // This Item has no attached files for 'inline' position, Exit here
+		return false;
+	}
+
+	foreach( $tags as $current_inline )
+	{
+		preg_match("/\[(image|file|inline|video|audio|thumbnail):(\d+)(:?)([^\]]*)\]/i", $current_inline, $inline);
+
+		if( empty( $inline ) )
+		{
+			$inlines[$current_inline] = $current_inline;
+			continue;
+		}
+
+		$inline_type = $inline[1]; // image|file|inline|video|audio|thumbnail
+		$current_link_ID = (int) $inline[2];
+
+		if( empty( $current_link_ID ) )
+		{ // Invalid link ID, Go to next match
+			$inlines[$current_inline] = $current_inline;
+			continue;
+		}
+
+		if( ! ( $Link = & $LinkList->get_by_field( 'link_ID', $current_link_ID ) ) )
+		{ // Link ID is not part of the linked files for position "inline"
+			$inlines[$current_inline] = $current_inline;
+			continue;
+		}
+
+		if( ! ( $File = & $Link->get_File() ) )
+		{ // No File object:
+			global $Debuglog;
+			$Debuglog->add( sprintf( 'Link ID#%d of '.$object_class.' #%d does not have a file object!', $Link->ID, $Object->ID ), array( 'error', 'files' ) );
+			$inlines[$current_inline] = $current_inline;
+			continue;
+		}
+
+		if( ! $File->exists() )
+		{ // File doesn't exist:
+			global $Debuglog;
+			$Debuglog->add( sprintf( 'File linked to '.$object_class.' #%d does not exist (%s)!', $Object->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+			$inlines[$current_inline] = $current_inline;
+			continue;
+		}
+
+		$params['File'] = $File;
+		$params['Link'] = $Link;
+		$params[ $object_class ] = $Object;
+
+		switch( $inline_type )
+		{
+			case 'image':
+			case 'inline': // valid file type: image
+				if( $File->is_image() )
+				{
+					$current_image_params = $params;
+					$current_file_params = array();
+
+					if( ! empty( $inline[3] ) ) // check if second colon is present
+					{
+						// Get the inline params: caption and class
+						$inline_params = explode( ':.', $inline[4] );
+
+						if( ! empty( $inline_params[0] ) )
+						{ // Caption is set, so overwrite the image link title
+							if( $inline_params[0] == '-' )
+							{ // Caption display is disabled
+								$current_image_params['image_link_title'] = '';
+								$current_image_params['hide_image_link_title'] = true;
+							}
+							else
+							{ // New image caption was set
+								$current_image_params['image_link_title'] = strip_tags( $inline_params[0] );
+							}
+
+							$current_image_params['image_desc'] = $current_image_params['image_link_title'];
+							$current_file_params['title'] = $inline_params[0];
+						}
+
+						$class_index = ( $inline_type == 'inline' ) ? 0 : 1; // [inline] tag doesn't have a caption, so 0 index is for class param
+						if( ! empty( $inline_params[ $class_index ] ) )
+						{ // A class name is set for the inline tags
+							$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $class_index ] ) ) );
+							if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
+							{	// Overwrite 'before_image' setting to add an extra class name:
+								$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $image_extraclass ) );
+
+								// Append extra class to file inline img tags:
+								$current_file_params['class'] = $image_extraclass;
+							}
+						}
+					}
+
+					if( ! $current_image_params['get_rendered_attachments'] )
+					{ // Save $r to temp var in order to don't get the rendered data from plugins
+						$temp_r = $r;
+					}
+
+					$temp_params = $current_image_params;
+					foreach( $current_image_params as $param_key => $param_value )
+					{ 	// Pass all params by reference, in order to give possibility to modify them by plugin
+						// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
+						$current_image_params[ $param_key ] = & $current_image_params[ $param_key ];
+					}
+
+					// Prepare params before rendering attachment:
+					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_image_params );
+
+					// Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r:
+					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_image_params ) ) != 0 )
+					{	// This attachment has been rendered by a plugin (to $current_image_params['data']):
+						if( ! $current_image_params['get_rendered_attachments'] )
+						{	// Restore $r value and mark this item has the rendered attachments:
+							$r = $temp_r;
+							$plugin_render_attachments = true;
+						}
+					}
+
+					if( $inline_type == 'image' )
+					{	// Generate the IMG tag with all the alt, title and desc if available:
+						switch( $object_class )
+						{
+							case 'Item':
+								// Get the IMG tag with link to original image or to Item page:
+								$inlines[ $current_inline ] = $Object->get_attached_image_tag( $Link, $current_image_params );
+								break;
+
+							case 'EmailCampaign':
+								// Get the IMG tag without link for email content:
+								$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
+										'image_link_to' => false
+									) ) );
+								break;
+
+							default:
+								// Get the IMG tag with link to original big image:
+								$inlines[ $current_inline ] = $Link->get_tag( array_merge( $params, $current_image_params ) );
+								break;
+						}
+					}
+					elseif( $inline_type == 'inline' )
+					{	// Generate simple IMG tag with resized image size:
+						$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '',
+							( empty( $current_file_params['class'] ) ? '' : $current_file_params['class'] ), '', '', '' );
+					}
+				}
+				else
+				{ // not an image file, do not process
+					$inlines[$current_inline] = $current_inline;
+				}
+				break;
+
+			case 'thumbnail':
+				if( $File->is_image() )
+				{
+					global $thumbnail_sizes;
+
+					$thumbnail_size = 'medium';
+					$thumbnail_position = 'left';
+
+					$thumbnail_classes = array();
+
+					if( ! empty( $inline[3] ) ) // check if second colon is present
+					{
+						// Get the inline params: caption and class
+						$inline_params = explode( ':', $inline[4] );
+
+						$valid_thumbnail_sizes = array( 'small', 'medium', 'large' );
+						if( ! empty( $inline_params[0] ) && in_array( $inline_params[0], $valid_thumbnail_sizes ) )
+						{
+							$thumbnail_size = $inline_params[0];
+						}
+
+						$valid_thumbnail_positions = array( 'left', 'right' );
+						if( ! empty( $inline_params[1] ) && in_array( $inline_params[1], $valid_thumbnail_positions ) )
+						{
+							$thumbnail_position = $inline_params[1];
+						}
+
+						if( ! empty( $inline_params[2] ) )
+						{
+							$extra_classes = explode( '.', ltrim( $inline_params[2], '.' ) );
+						}
+					}
+
+					switch( $thumbnail_size )
+					{
+						case 'small':
+							$thumbnail_size = 'fit-128x128';
+							break;
+
+						case 'large':
+							$thumbnail_size = 'fit-320x320';
+							break;
+
+						case 'medium':
+						default:
+							$thumbnail_size = 'fit-192x192';
+							break;
+					}
+
+					$thumbnail_classes[] = 'evo_thumbnail';
+					$thumbnail_classes[] = 'evo_thumbnail__'.$thumbnail_position;
+					if( isset( $extra_classes ) )
+					{
+						$thumbnail_classes = array_merge( $thumbnail_classes, $extra_classes );
+					}
+
+					$current_image_params = array(
+						'before_image'        => '',
+						'before_image_legend' => '', // can be NULL
+						'after_image_legend'  => '',
+						'after_image'         => '',
+						'image_size'          => $thumbnail_size,
+						'image_link_to'       => 'original',
+						'image_link_title'    => '',	// can be text or #title# or #desc#
+						'image_class'         => implode( ' ', $thumbnail_classes ),
+					);
+
+					switch( $object_class )
+					{
+						case 'Item':
+							// Get the IMG tag with link to original image or to Item page:
+							$inlines[ $current_inline ] = $Object->get_attached_image_tag( $Link, $current_image_params );
+							break;
+
+						case 'EmailCampaign':
+							// Get the IMG tag without link for email content:
+							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
+									'image_link_to' => false
+								) ) );
+							break;
+
+						default:
+							// Get the IMG tag with link to original big image:
+							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $params, $current_image_params ) );
+							break;
+					}
+				}
+				else
+				{
+					continue;
+				}
+				break;
+
+			case 'file': // valid file types: image, video, audio, other
+				$valid_file_types = array( 'image', 'video', 'audio', 'other' );
+				if( in_array( $File->get_file_type(), $valid_file_types ) )
+				{
+					if( ! empty( $inline[3] ) ) // check if second colon is present
+					{
+						// Get the file caption
+						$caption = $inline[4];
+
+						if( ! empty( $caption ) )
+						{ // Caption is set
+							$current_file_params['title'] = strip_tags( $caption );
+						}
+					}
+
+					if( empty( $current_file_params['title'] ) )
+					{ // Use real file name as title when it is not defined for inline tag
+						$file_title = $File->get( 'title' );
+						$current_file_params['title'] = ' '.( empty( $file_title ) ? $File->get_name() : $file_title );
+					}
+					elseif( $current_file_params['title'] == '-' )
+					{ // Don't display a title in this case, Only file icon will be displayed
+						$current_file_params['title'] = '';
+					}
+					else
+					{ // Add a space between file icon and title
+						$current_file_params['title'] = ' '.$current_file_params['title'];
+					}
+
+					$inlines[$current_inline] = '<a href="'.$File->get_url().'"'
+						.( empty( $current_file_params['class'] ) ? '' : ' class="'.$current_file_params['class'].'"' )
+						.'>'.$File->get_icon( $current_file_params ).$current_file_params['title'].'</a>';
+				}
+				else
+				{ // not a valid file type, do not process
+					$inlines[$current_inline] = $current_inline;
+				}
+				break;
+
+			case 'video':	// valid file type: video
+				if( $File->is_video() )
+				{
+					$current_video_params = $params;
+					// Create an empty dummy element where the plugin is expected to append the rendered video
+					$current_video_params['data'] = '';
+
+					foreach( $current_video_params as $param_key => $param_value )
+					{ // Pass all params by reference, in order to give possibility to modify them by plugin
+						// So plugins can add some data before/after tags (E.g. used by infodots plugin)
+						$current_video_params[ $param_key ] = & $current_video_params[ $param_key ];
+					}
+
+					// Prepare params before rendering attachment:
+					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_video_params );
+
+					// Render attachments by plugin:
+					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_video_params ) ) != 0 )
+					{	// This attachment has been rendered by a plugin (to $current_video_params['data']):
+						$inlines[$current_inline] = $current_video_params['data'];
+					}
+					else
+					{ // no plugin available or was able to render the tag
+						$inlines[$current_inline] = $current_inline;
+					}
+				}
+				else
+				{ // not a video file, do not process
+					$inlines[$current_inline] = $current_inline;
+				}
+				break;
+
+			case 'audio': // valid file type: audio
+				if( $File->is_audio() )
+				{
+					$current_audio_params = $params;
+					// Create an empty dummy element where the plugin is expected to append the rendered video
+					$current_audio_params['data'] = '';
+
+					foreach( $current_audio_params as $param_key => $param_value )
+					{ // Pass all params by reference, in order to give possibility to modify them by plugin
+						// So plugins can add some data before/after tags (E.g. used by infodots plugin)
+						$current_audio_params[ $param_key ] = & $current_audio_params[ $param_key ];
+					}
+
+					// Prepare params before rendering attachment:
+					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_audio_params );
+
+					// Render attachments by plugin:
+					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_audio_params ) ) != 0 )
+					{	// This attachment has been rendered by a plugin (to $current_audio_params['data']):
+						$inlines[$current_inline] =  $current_audio_params['data'];
+					}
+					else
+					{ // no plugin available or was able to render the tag
+						$inlines[$current_inline] = $current_inline;
+					}
+				}
+				else
+				{ // not a video file, do not process
+					$inlines[$current_inline] = $current_inline;
+				}
+				break;
+
+			default:
+				$inlines[$current_inline] = $current_inline;
+		}
+	}
+
+	return $inlines;
+}
+
+function php_to_jquery_date_format( $php_format )
+{
+	$tokens = array(
+			// Day
+			'd' => 'dd',
+			'D' => 'D',
+			'j' => 'd',
+			'l' => 'DD',
+			'N' => '',
+			'S' => '',
+			'w' => '',
+			'z' => 'o',
+			// Week
+			'W' => '',
+			// Month
+			'F' => 'MM',
+			'm' => 'mm',
+			'M' => 'M',
+			'n' => 'm',
+			't' => '',
+			// Year
+			'L' => '',
+			'o' => '',
+			'Y' => 'yy',
+			'y' => 'y',
+			// Time
+			'a' => '',
+			'A' => '',
+			'B' => '',
+			'g' => '',
+			'G' => '',
+			'h' => '',
+			'H' => '',
+			'i' => '',
+			's' => '',
+			'u' => '' );
+
+	$js_format = "";
+	$escaping = false;
+	for( $i = 0; $i < strlen( $php_format ); $i++ )
+	{
+		$char = $php_format[$i];
+		if($char === '\\') // PHP date format escaping character
+		{
+			$i++;
+			if( $escaping ) $js_format .= $php_format[$i];
+			else $js_format .= '\'' . $php_format[$i];
+			$escaping = true;
+		}
+		else
+		{
+			if( $escaping )
+			{
+				$jqueryui_format .= "'"; $escaping = false;
+			}
+			if( isset( $tokens[$char] ) )
+			{
+				$js_format .= $tokens[$char];
+			}
+			else
+			{
+				$js_format .= $char;
+			}
+		}
+	}
+
+	return $js_format;
 }
 ?>

@@ -157,30 +157,6 @@ $home_url = $baseurl;
 
 
 /**
- * Comments: Set this to 1 to require e-mail and name, or 0 to allow comments
- * without e-mail/name.
- * @global boolean $require_name_email
- */
-$require_name_email = 1;
-
-/**
- * Minimum interval (in seconds) between consecutive comments from same IP.
- * @global int $minimum_comment_interval
- */
-$minimum_comment_interval = 30;
-
-
-/**
- * Check antispam blacklist for private messages.
- *
- * Do you want to check the antispam blacklist when a message form is submitted?
- *
- * @global boolean $antispam_on_message_form
- */
-$antispam_on_message_form = 1;
-
-
-/**
  * By default images get copied into b2evo cache without resampling if they are smaller
  * than requested thumbnails.
  *
@@ -966,6 +942,14 @@ $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
 $antispamsrv_host = 'antispam.b2evo.net';
 $antispamsrv_port = 80;
 $antispamsrv_uri = '/evonetsrv/xmlrpc.php';
+// For local testing, use something like:
+// $antispamsrv_uri = '/.../xmlsrv/xmlrpc.php';
+$antispamsrv_tos_url = 'http://b2evolution.net/about/terms.html';
+
+/**
+ * Set TRUE if THIS server should be used as central antispam server
+ */
+$enable_blacklist_server_API = false;
 
 // This is for plugins to add CS files to the TinyMCE editor window:
 $tinymce_content_css = array();

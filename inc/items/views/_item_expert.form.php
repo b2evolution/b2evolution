@@ -24,7 +24,7 @@ global $edited_Item;
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var Plugins
  */
@@ -273,31 +273,62 @@ $Form->begin_form( '', '', $params );
 		&& $current_User->check_perm( 'files', 'view', false ) )
 	{ // Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
 		load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
+		global $LinkOwner; // Initialize this object as global because this is used in many link functions
 		$LinkOwner = new LinkItem( $edited_Item );
 		$fold_images_attachments_block = ( $orig_action != 'update_edit' && $orig_action != 'create_edit' ); // don't fold the links block on these two actions
-		attachment_iframe( $Form, $LinkOwner, $iframe_name, $creating, $fold_images_attachments_block );
+		display_attachments_fieldset( $Form, $LinkOwner, $creating, $fold_images_attachments_block );
 	}
-	// ############################ ADVANCED #############################
+
+
+	// ############################ CUSTOM FIELDS #############################
+
+	if( ! $edited_Item->get_type_setting( 'use_custom_fields' ) )
+	{	// All CUSTOM FIELDS are hidden by post type:
+		display_hidden_custom_fields( $Form, $edited_Item );
+	}
+	else
+	{	// CUSTOM FIELDS:
+		$custom_fields = $edited_Item->get_type_custom_fields();
+
+		if( count( $custom_fields ) )
+		{	// Display fieldset with custom fields only if at least one exists:
+			$Form->begin_fieldset( T_('Custom fields').get_manual_link( 'post-custom-fields-panel' ), array( 'id' => 'itemform_custom_fields', 'fold' => true ) );
+
+			echo '<table cellspacing="0" class="compose_layout">';
+
+			foreach( $custom_fields as $custom_field )
+			{	// Loop through custom fields:
+				echo '<tr><td class="label"><label for="item_'.$custom_field['type'].'_'.$custom_field['ID'].'"><strong>'.$custom_field['label'].':</strong></label></td>';
+				echo '<td class="input" width="97%">';
+				switch( $custom_field['type'] )
+				{
+					case 'double':
+						$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_double_'.$custom_field['ID'] ), 10, '', T_('can be decimal') );
+						break;
+					case 'varchar':
+						$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, '', '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+						break;
+					case 'text':
+						$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_text_'.$custom_field['ID'] ), 5, '' );
+						break;
+					case 'html':
+						$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_html_'.$custom_field['ID'] ), 5, '', array( 'note' => T_('This field allows HTML code') ) );
+						break;
+				}
+				echo '</td></tr>';
+			}
+
+			echo '</table>';
+
+			$Form->end_fieldset();
+		}
+	}
+
+	// ############################ ADVANCED PROPERTIES #############################
 
 	$Form->begin_fieldset( T_('Advanced properties').get_manual_link( 'post-advanced-properties-panel' ), array( 'id' => 'itemform_adv_props', 'fold' => true ) );
 
 	echo '<table cellspacing="0" class="compose_layout">';
-
-	if( ! $edited_Item->get_type_setting( 'use_custom_fields' ) )
-	{ // All CUSTOM FIELDS are hidden by post type
-		display_hidden_custom_fields( $Form, $edited_Item );
-	}
-	else
-	{ // CUSTOM FIELDS varchar
-		$custom_fields = $edited_Item->get_type_custom_fields( 'varchar' );
-		foreach( $custom_fields as $custom_field )
-		{ // Loop through custom varchar fields
-			echo '<tr><td class="label"><label for="item_varchar_'.$custom_field['ID'].'"><strong>'.$custom_field['label'].':</strong></label></td>';
-			echo '<td class="input" width="97%">';
-			$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, '', '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
-			echo '</td></tr>';
-		}
-	}
 
 	//add slug_changed field - needed for slug trim, if this field = 0 slug will trimmed
 	$Form->hidden( 'slug_changed', 0 );
@@ -597,7 +628,10 @@ $Form->begin_form( '', '', $params );
 
 			$ItemStatusCache = & get_ItemStatusCache();
 			$ItemStatusCache->load_all();
-			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true ), T_('Task status') );
+
+			$ItemTypeCache = & get_ItemTypeCache();
+			$current_ItemType = $ItemTypeCache->get_by_ID( $edited_Item->ityp_ID );
+			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status') );
 
 			echo ' '; // allow wrapping!
 
@@ -664,17 +698,6 @@ $Form->begin_form( '', '', $params );
 		echo '</td></tr>';
 	}
 
-	if( $edited_Item->get_type_setting( 'use_custom_fields' ) )
-	{ // Display CUSTOM FIELDS double only when its are allowed by post type setting
-		$custom_fields = $edited_Item->get_type_custom_fields( 'double' );
-		foreach( $custom_fields as $custom_field )
-		{ // Loop through custom double fields
-			echo '<tr><td><strong>'.$custom_field['label'].':</strong></td><td>';
-			$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_double_'.$custom_field['ID'] ), 10, '', T_('can be decimal') );
-			echo '</td></tr>';
-		}
-	}
-
 	echo '</table>';
 
 	$Form->switch_layout( NULL );
@@ -718,6 +741,14 @@ $Form->begin_form( '', '', $params );
 			<label title="<?php echo T_('Visitors cannot see nor leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="disabled" class="checkbox" <?php if( $post_comment_status == 'disabled' ) echo 'checked="checked"'; ?> />
 			<?php echo T_('Disabled') ?></label><br />
 		<?php
+		}
+
+		if( $edited_Item->get_type_setting( 'allow_comment_form_msg' ) )
+		{	// If custom message is allowed before comment form:
+			$Form->switch_layout( 'none' );
+			$Form->textarea_input( 'comment_form_msg', $edited_Item->get_setting( 'comment_form_msg' ), 3, T_('Message before comment form') );
+			echo '<br />';
+			$Form->switch_layout( NULL );
 		}
 
 		if( $edited_Item->get_type_setting( 'use_comment_expiration' ) != 'never' )
@@ -921,6 +952,8 @@ echo_regional_js( 'item', $edited_Item->region_visible() );
 echo_onchange_goal_cat();
 // Fieldset folding
 echo_fieldset_folding_js();
+// Save and restore item content field height and scroll position:
+echo_item_content_position_js( get_param( 'content_height' ), get_param( 'content_scroll' ) );
 
 // JS to post excerpt mode switching:
 ?>

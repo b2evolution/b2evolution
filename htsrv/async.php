@@ -240,7 +240,7 @@ switch( $action )
 		$current_User->check_perm( 'meta_comment', 'edit', true, $edited_Comment );
 
 		// Load Blog of the Item
-		$Blog = & $edited_Comment_Item->get_Blog();
+		$Collection = $Blog = & $edited_Comment_Item->get_Blog();
 
 		$comment_action = param( 'comment_action', 'string' );
 

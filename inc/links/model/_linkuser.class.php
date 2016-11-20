@@ -31,7 +31,7 @@ class LinkUser extends LinkOwner
 	function __construct( $User )
 	{
 		// call parent contsructor
-		parent::__construct( $User, 'user' );
+		parent::__construct( $User, 'user', 'usr_ID' );
 		$this->User = & $this->link_Object;
 
 		$this->_trans = array(
@@ -109,7 +109,7 @@ class LinkUser extends LinkOwner
 		}
 
 		$edited_Link = new Link();
-		$edited_Link->set( 'usr_ID', $this->User->ID );
+		$edited_Link->set( $this->get_ID_field_name(), $this->get_ID() );
 		$edited_Link->set( 'file_ID', $file_ID );
 		$edited_Link->set( 'position', $position );
 		$edited_Link->set( 'order', $order );
@@ -129,7 +129,7 @@ class LinkUser extends LinkOwner
 			$File = $FileCache->get_by_ID( $file_ID, false, false );
 			$file_name = empty( $File ) ? '' : $File->get_name();
 			$file_dir = $File->dir_or_file();
-			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s', ucfirst( $file_dir ), '[['.$file_name.']]', $this->type, $this->link_Object->ID ), 'info', 'file', $file_ID );
+			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s', ucfirst( $file_dir ), '[['.$file_name.']]', $this->type, $this->get_ID() ), 'info', 'file', $file_ID );
 
 			return $edited_Link->ID;
 		}
@@ -145,12 +145,6 @@ class LinkUser extends LinkOwner
 		// User has no blog
 	}
 
-	/**
-	 * Get where condition for select query to get User links
-	 */
-	function get_where_condition() {
-		return 'link_usr_ID = '.$this->User->ID;
-	}
 
 	/**
 	 * Get User parameter

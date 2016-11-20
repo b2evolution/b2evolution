@@ -38,7 +38,7 @@ global $current_User;
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 
 global $dispatcher;
 
@@ -94,7 +94,7 @@ switch( $action )
 		}
 
 		// Load the blog we're in:
-		$Blog = & $edited_Item->get_Blog();
+		$Collection = $Blog = & $edited_Item->get_Blog();
 		set_working_blog( $Blog->ID );
 
 		// Where are we going to redirect to?
@@ -142,7 +142,7 @@ switch( $action )
 		}
 
 		// Load the blog we're in:
-		$Blog = & $edited_Item->get_Blog();
+		$Collection = $Blog = & $edited_Item->get_Blog();
 		set_working_blog( $Blog->ID );
 
 		// Where are we going to redirect to?
@@ -151,6 +151,12 @@ switch( $action )
 		// What form button has been pressed?
 		param( 'save', 'string', '' );
 		$exit_after_save = ( $action != 'update_edit' && $action != 'extract_tags' );
+
+		if( $action == 'update_edit' )
+		{	// Get params to restore height and scroll position of item content field:
+			param( 'content_height', 'integer', 0 );
+			param( 'content_scroll', 'integer', 0 );
+		}
 		break;
 
 	case 'update_type':
@@ -194,7 +200,7 @@ switch( $action )
 			if( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
 			{	// Selected a new blog:
 				$BlogCache = & get_BlogCache();
-				$Blog = & $BlogCache->get_by_ID( $blog );
+				$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 			}
 
 			// Where are we going to redirect to?
@@ -240,7 +246,7 @@ switch( $action )
 		{
 			set_working_blog( $fm_FileRoot->in_type_ID );
 			// Load the blog we're in:
-			$Blog = & $BlogCache->get_by_ID( $blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 		}
 		// ---
 
@@ -299,7 +305,7 @@ switch( $action )
 						$new_Chapter->set( 'name', $new_categories[ $fileNum ] );
 						if( $new_Chapter->dbinsert() !== false )
 						{ // Category is created successfully
-							$Messages->add( sprintf( T_('New category %s created.'), '<b>'.$new_categories[ $fileNum ].'</b>' ), 'success' );
+							$Messages->add_to_group( sprintf( T_('New category %s created.'), '<b>'.$new_categories[ $fileNum ].'</b>' ), 'success', T_('Creating posts:') );
 							$ChapterCache->clear();
 						}
 						else
@@ -353,7 +359,7 @@ switch( $action )
 				// Invalidate blog's media BlockCache
 				BlockCache::invalidate_key( 'media_coll_ID', $edited_Item->get_blog_ID() );
 
-				$Messages->add( sprintf( T_('&laquo;%s&raquo; has been posted.'), $l_File->dget('name') ), 'success' );
+				$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; has been posted.'), $l_File->dget('name') ), 'success', T_('Creating posts:') );
 				$fileNum++;
 			}
 			else
@@ -482,8 +488,8 @@ switch( $action )
 		// but we need to make sure the requested/default one is ok:
 		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status );
 
-		// Check if new category was started to create. If yes then set up parameters for next page
-		check_categories_nosave ( $post_category, $post_extracats );
+		// Check if new category was started to create. If yes then set up parameters for next page:
+		check_categories_nosave( $post_category, $post_extracats, $edited_Item, ( $action == 'new_switchtab' ? 'frontoffice' : 'backoffice' ) );
 
 		$edited_Item->set ( 'main_cat_ID', $post_category );
 		if( $edited_Item->main_cat_ID && ( get_allow_cross_posting() < 2 ) && $edited_Item->get_blog_ID() != $blog )
@@ -558,8 +564,8 @@ switch( $action )
 		$post_comment_status = $edited_Item->get( 'comment_status' );
 		$post_extracats = postcats_get_byID( $p );
 
-		// Check if new category was started to create. If yes then set up parameters for next page
-		check_categories_nosave ( $post_category, $post_extracats );
+		// Check if new category was started to create. If yes then set up parameters for next page:
+		check_categories_nosave( $post_category, $post_extracats, $edited_Item );
 
 		// Initialize a page title depending on item type:
 		$ItemTypeCache = & get_ItemTypeCache();
@@ -591,8 +597,8 @@ switch( $action )
 		// from tab to tab via javascript when the editor wants to switch views...
 		$edited_Item->load_from_Request( true ); // needs Blog set
 
-		// Check if new category was started to create. If yes then set up parameters for next page
-		check_categories_nosave( $post_category, $post_extracats );
+		// Check if new category was started to create. If yes then set up parameters for next page:
+		check_categories_nosave( $post_category, $post_extracats,$edited_Item, ( $action == 'edit_switchtab' ? 'frontoffice' : 'backoffice' ) );
 
 		$edited_Item->set( 'main_cat_ID', $post_category );
 		if( $edited_Item->main_cat_ID && ( get_allow_cross_posting() < 2 ) && $edited_Item->get_blog_ID() != $blog )
@@ -734,7 +740,7 @@ switch( $action )
 			$post_status = load_publish_status( true );
 		}
 
-		// Check if new category was started to create. If yes check if it is valid.
+		// Check if new category was started to create. If yes check if it is valid:
 		check_categories( $post_category, $post_extracats );
 
 		// Check if allowed to cross post.
@@ -932,8 +938,8 @@ switch( $action )
 			$post_status = load_publish_status();
 		}
 
-		// Check if new category was started to create.  If yes check if it is valid.
-		$isset_category = check_categories( $post_category, $post_extracats );
+		// Check if new category was started to create.  If yes check if it is valid:
+		$isset_category = check_categories( $post_category, $post_extracats, $edited_Item );
 
 		// Check if allowed to cross post.
 		if( ! check_cross_posting( $post_category, $post_extracats, $edited_Item->main_cat_ID ) )
@@ -1111,6 +1117,18 @@ switch( $action )
 		if( $Blog->is_item_type_enabled( $ityp_ID ) )
 		{ // Set new post type only if it is enabled for the Blog:
 			$edited_Item->set( 'ityp_ID', $ityp_ID );
+
+			// Check if current post status is still applicable for new post type
+			if( $edited_Item->get( 'pst_ID' ) != NULL )
+			{
+				$ItemTypeCache = & get_ItemTypeCache();
+				$current_ItemType = $ItemTypeCache->get_by_ID( $ityp_ID );
+				if( ! in_array( $edited_Item->get( 'pst_ID' ), $current_ItemType->get_applicable_post_status() ) )
+				{
+					$edited_Item->set( 'pst_ID', NULL );
+					$Messages->add( T_('The current item status is no longer valid for the new item type and has been reset.'), 'warning' );
+				}
+			}
 		}
 
 		// Unset old object of Post Type to reload it on next page
@@ -1449,7 +1467,7 @@ switch( $action )
  */
 function init_list_mode()
 {
-	global $tab, $tab_type, $Blog, $UserSettings, $ItemList, $AdminUI, $current_User;
+	global $tab, $tab_type, $Collection, $Blog, $UserSettings, $ItemList, $AdminUI, $current_User;
 
 	// set default itemslist param prefix
 	$items_list_param_prefix = 'items_';
@@ -1787,8 +1805,16 @@ if( !empty( $Blog ) )
 */
 
 if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action, 'new' ) !== false )
-{ // Initialize js to autocomplete usernames in post/comment form
+{	// Initialize js to autocomplete usernames in post/comment form
 	init_autocomplete_usernames_js();
+	// Require colorbox js:
+	require_js_helper( 'colorbox' );
+	// Require File Uploader js and css:
+	require_js( 'multiupload/fileuploader.js' );
+	require_css( 'fileuploader.css' );
+	// Load JS files to make the links table sortable:
+	require_js( '#jquery#' );
+	require_js( 'jquery/jquery.sortable.min.js' );
 }
 
 if( in_array( $action, array( 'new', 'copy', 'create_edit', 'create_link', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish', 'extract_tags' ) ) )

@@ -96,7 +96,10 @@ if( $Item->can_see_comments( true ) )
 		if( $Item->can_see_comments() )
 		{	// User can see a comments
 			$type_list[] = 'comment';
-			if( $title = $Item->get_feedback_title( 'comments' ) )
+			$Item->load_Blog();
+			$comment_inskin_statuses = explode( ',', $Item->Blog->get_setting( 'comment_inskin_statuses' ) );
+
+			if( $title = $Item->get_feedback_title( 'comments', '#', '#', '#', $comment_inskin_statuses ) )
 			{
 				$disp_title[] = $title;
 			}

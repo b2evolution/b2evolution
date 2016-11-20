@@ -353,7 +353,7 @@ class Plugin
 		}
 		else
 		{ // Get plugin template from frontoffice skin
-			global $Blog;
+			global $Collection, $Blog;
 			if( ! empty( $Blog ) )
 			{
 				$skin_ID = $Blog->get_skin_ID();
@@ -1465,6 +1465,40 @@ class Plugin
 
 
 	/**
+	 * Event handler: Called prepare params before rendering attachments of item contents.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'Item': the {@link Item} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function PrepareForRenderItemAttachment( & $params )
+	{
+		return false; // Do nothing by default.
+	}
+
+
+	/**
+	 * Event handler: Called when rendering attachments of item contents.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'Item': the {@link Item} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function RenderItemAttachment( & $params )
+	{
+		return false; // Do nothing by default.
+	}
+
+
+	/**
 	 * Event handler: Called when rendering item/post contents as XML.
 	 *
 	 * Should this plugin apply to XML?
@@ -2196,6 +2230,41 @@ class Plugin
 		return $this->RenderItemAsHtml( $params );
 	}
 
+
+	/**
+	 * Event handler: Called prepare params before rendering attachments of message contents.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'Message': the {@link Message} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function PrepareForRenderMessageAttachment( & $params )
+	{
+		return false; // Do nothing by default.
+	}
+
+
+	/**
+	 * Event handler: Called when rendering attachments of message contents.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'Message': the {@link Message} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function RenderMessageAttachment( & $params )
+	{
+		// Use this render by default temporarily:
+		return $this->RenderItemAttachment( $params );
+	}
+
 	// }}}
 
 
@@ -2255,13 +2324,48 @@ class Plugin
 	 * @param array Associative array of parameters
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
-	 *   - 'EmailCampaign': the {@link Item} object which gets rendered.
+	 *   - 'EmailCampaign': the {@link EmailCampaign} object which gets rendered.
 	 * @return boolean Have we changed something?
 	 */
 	function RenderEmailAsHtml( & $params )
 	{
 		// Use this render by default temporarily
 		return $this->RenderItemAsHtml( $params );
+	}
+
+
+	/**
+	 * Event handler: Called prepare params before rendering attachments of email campaign contents.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'EmailCampaign': the {@link EmailCampaign} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function PrepareForRenderEmailAttachment( & $params )
+	{
+		return false; // Do nothing by default.
+	}
+
+
+	/**
+	 * Event handler: Called when rendering attachments of email campaign contents.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'EmailCampaign': the {@link EmailCampaign} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function RenderEmailAttachment( & $params )
+	{
+		// Use this render by default temporarily
+		return $this->RenderItemAttachment( $params );
 	}
 
 	// }}}
@@ -3141,7 +3245,7 @@ class Plugin
 	 */
 	function get_plugin_url( $dummy = false )
 	{
-		global $ReqHost, $plugins_url, $plugins_path, $Blog;
+		global $ReqHost, $plugins_url, $plugins_path, $Collection, $Blog;
 
 		if( empty( $this->_plugin_url ) )
 		{	// Initialize plugin URL only first time request:
@@ -3783,12 +3887,12 @@ class Plugin
 
 		if( empty( $blog ) )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 		}
 		else
 		{
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 		}
 
 		// Name of the setting in the blog settings:
@@ -3811,12 +3915,12 @@ class Plugin
 
 		if( empty( $blog ) )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 		}
 		else
 		{
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 		}
 
 		// Name of the setting in the blog settings:

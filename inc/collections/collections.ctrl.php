@@ -129,10 +129,57 @@ switch( $action )
 			// create the new blog
 			$edited_Blog->create( $kind );
 
+			global $Settings;
+
+			param( 'set_as_info_blog', 'boolean' );
+			param( 'set_as_login_blog', 'boolean' );
+			param( 'set_as_msg_blog', 'boolean' );
+
+			if( $set_as_info_blog && ! $Settings->get( 'info_blog_ID' ) )
+			{
+				$Settings->set( 'info_blog_ID', $edited_Blog->ID );
+			}
+			if( $set_as_login_blog && ! $Settings->get( 'login_blog_ID' ) )
+			{
+				$Settings->set( 'login_blog_ID', $edited_Blog->ID );
+			}
+			if( $set_as_msg_blog && ! $Settings->get( 'mgs_blog_ID' ) )
+			{
+				$Settings->set( 'msg_blog_ID', $edited_Blog->ID );
+			}
+			$Settings->dbupdate();
+
+			// create demo contents for the new blog
+			param( 'create_demo_contents', 'boolean' );
+			param( 'blog_locale', 'string' );
+			if( $create_demo_contents )
+			{
+				global $user_org_IDs;
+
+				load_funcs( 'collections/_demo_content.funcs.php' );
+				param( 'create_demo_org', 'boolean', false );
+				param( 'create_demo_users', 'boolean', false );
+				$user_org_IDs = NULL;
+
+				if( $create_demo_org && $current_User->check_perm( 'orgs', 'create', true ) )
+				{ // Create the demo organization
+					$user_org_IDs = array( create_demo_organization( $edited_Blog->owner_user_ID )->ID );
+				}
+				if( $create_demo_users )
+				{ // Create demo users
+					get_demo_users( true, NULL, $user_org_IDs );
+				}
+
+				// Switch locale to translate content
+				locale_temp_switch( $blog_locale );
+				create_sample_content( $kind, $edited_Blog->ID, $edited_Blog->owner_user_ID, $create_demo_users );
+				locale_restore_previous();
+			}
+
 			// We want to highlight the edited object on next list display:
 			// $Session->set( 'fadeout_array', array( 'blog_ID' => array($edited_Blog->ID) ) );
 
-			header_redirect( $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
+			header_redirect( $edited_Blog->gen_blogurl() );// will save $Messages into Session
 		}
 		break;
 
@@ -176,7 +223,7 @@ switch( $action )
 
 				$BlogCache->remove_by_ID( $blog );
 				unset( $edited_Blog );
-				unset( $Blog );
+				unset( $Blog, $Collection );
 				forget_param( 'blog' );
 				set_working_blog( 0 );
 				$UserSettings->delete( 'selected_blog' );	// Needed or subsequent pages may try to access the delete blog

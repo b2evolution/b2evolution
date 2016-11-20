@@ -183,7 +183,7 @@ class item_content_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog, $Item;
+		global $Collection, $Blog, $Item;
 
 		return array(
 				'wi_ID'        => $this->ID, // Cache each widget separately + Have the widget settings changed ?

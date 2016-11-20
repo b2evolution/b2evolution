@@ -66,6 +66,8 @@ code {
 }
 img {
   border: none;
+  max-width: 100%;
+  height: auto;
 }
 .top {
   vertical-align: top;
@@ -264,6 +266,21 @@ a:hover .fa-x-rollover-orange {
 }
 a:hover .fa-x-rollover-black {
   color: #000 !important;
+}
+a:hover .fa-x-rollover-grey {
+  color: #7f7f7f !important;
+}
+a:hover .fa-flag.fa-x--hover {
+  color: #F00 !important;
+}
+a:hover .fa-flag.fa-x--hover:before {
+  content: "\f11d";
+}
+a:hover .fa-flag-o.fa-x--hover {
+  color: #F00 !important;
+}
+a:hover .fa-flag-o.fa-x--hover:before {
+  content: "\f024";
 }
 .fa-x-external-link--nudge:before {
   position: relative;
@@ -651,6 +668,20 @@ div.filters .filter_item div {
 .evo_comment__meta .panel-footer {
   border-top: 1px solid #5bc0de;
   background-color: #d9edf7;
+}
+.panel-meta {
+  border: 2px solid #5bc0de;
+}
+.panel-meta .panel-heading {
+  border-bottom: 1px solid #5bc0de;
+  background-color: #d9edf7;
+}
+.panel-meta .panel-body {
+  background-color: #d9edf7;
+}
+.evo_voting_panel > span.fa {
+  margin-right: 4px;
+  margin-left: 2px;
 }
 
 /*
@@ -1156,7 +1187,6 @@ a[rel~=nofollow]:not([class~=btn]):hover {
   border-radius: 2px;
 }
 img.loadimg {
-  display: inline-block;
   min-width: 64px;
   min-height: 64px;
   background: url(../img/ajax-loader/fff.gif) no-repeat center;
@@ -1166,6 +1196,20 @@ figure {
 }
 .evo_image_block {
   text-align: center;
+}
+.evo_image_block .img-responsive {
+  display: inline-block;
+}
+.evo_thumbnail {
+  max-width: 100%;
+}
+.evo_thumbnail__left {
+  float: left;
+  margin: 0 4px 4px 0;
+}
+.evo_thumbnail__right {
+  float: right;
+  margin: 0 0 4px 4px;
 }
 .replied_comment .evo_image_block img {
   max-width: 100%;
@@ -1365,6 +1409,10 @@ form div.avatartag a {
 .jcrop-keymgr {
   visibility: hidden;
 }
+#user_crop_workarea img,
+.preview_cropped_image img {
+  max-width: none;
+}
 .evo_label_inline {
   margin-left: 2ex;
 }
@@ -1436,6 +1484,11 @@ div.action_messages li {
   list-style: none;
   margin: 0;
   padding-left: 0;
+}
+div.log_container ul.message_group li,
+div.action_messages ul.message_group li {
+  margin-left: 25px;
+  list-style: disc;
 }
 div.skin_error {
   border: 2px dotted #d99;
@@ -2001,23 +2054,39 @@ div.results .pagination {
   margin-bottom: 5px;
 }
 div.results tr.placeholder {
-  display: block;
-  background: red;
   position: relative;
-  margin: 0;
-  padding: 0;
-  border: none;
 }
 div.results tr.placeholder:before {
   content: "";
   position: absolute;
   width: 0;
   height: 0;
-  border: 5px solid transparent;
-  border-left-color: red;
+  border: 6px solid transparent;
+  border-left-color: #f00;
+  border-right: none;
   margin-top: -5px;
   left: 0;
-  border-right: none;
+}
+div.results tr.placeholder:after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: #F00;
+  left: 0;
+  margin-top: 1px;
+}
+div.results tr.placeholder td {
+  border: none;
+  height: 0;
+  padding: 0;
+}
+div.results tr.placeholder + tr:not( :nth-child(2)):not(.dragged) > td,
+div.results tr.dragged + tr:not( :nth-child(2)):not(.dragged) > td {
+  border-top: none;
+}
+div.results img {
+  max-width: none;
 }
 div.filters {
   margin-bottom: 0;
@@ -2422,6 +2491,10 @@ div.message_toolbars {
 }
 .evo_private_messages_list .panel.results {
   margin-bottom: 20px;
+}
+.evo_private_messages_list .image_block img {
+  max-width: 100%;
+  height: auto;
 }
 @media (min-width: 768px) {
   div.coll-dashboard-block-3 {

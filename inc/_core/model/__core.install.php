@@ -159,16 +159,6 @@ $schema_queries = array(
 			PRIMARY KEY ( urep_target_user_ID, urep_reporter_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
-	'T_users__postreadstatus' => array(
-		'Creating table for User post read status',
-		"CREATE TABLE T_users__postreadstatus (
-			uprs_user_ID int(11) unsigned NOT NULL,
-			uprs_post_ID int(11) unsigned NOT NULL,
-			uprs_read_post_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-			uprs_read_comment_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-			PRIMARY KEY ( uprs_user_ID, uprs_post_ID )
-		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
-
 	'T_users__invitation_code' => array(
 		'Creating table for User invitation codes',
 		"CREATE TABLE T_users__invitation_code (
@@ -213,6 +203,15 @@ $schema_queries = array(
 			PRIMARY KEY ( sug_user_ID, sug_grp_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
+	'T_users__profile_visits' => array(
+		'Crating table for profile visits',
+		"CREATE TABLE T_users__profile_visits (
+			upv_visited_user_ID INT(11) UNSIGNED NOT NULL,
+			upv_visitor_user_ID INT(11) UNSIGNED NOT NULL,
+			upv_last_visit_ts   TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			PRIMARY KEY ( upv_visited_user_ID, upv_visitor_user_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
 	'T_i18n_original_string' => array(
 		'Creating table for a latest version of the POT file',
 		"CREATE TABLE T_i18n_original_string (
@@ -239,8 +238,12 @@ $schema_queries = array(
 		"CREATE TABLE T_locales (
 			loc_locale varchar(20) NOT NULL default '',
 			loc_datefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'y-m-d',
+			loc_longdatefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'Y-m-d',
+			loc_extdatefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'Y M d',
+			loc_input_datefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'Y-m-d',
 			loc_timefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'H:i:s',
 			loc_shorttimefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'H:i',
+			loc_input_timefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'H:i:s',
 			loc_startofweek TINYINT UNSIGNED NOT NULL DEFAULT 1,
 			loc_name varchar(40) NOT NULL default '',
 			loc_messages varchar(20) NOT NULL default '',
@@ -251,14 +254,14 @@ $schema_queries = array(
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset COMMENT='saves available locales'
 		" ),
 
-	'T_antispam' => array(
+	'T_antispam__keyword' => array(
 		'Creating table for Antispam Blacklist',
-		"CREATE TABLE T_antispam (
-			aspm_ID bigint(11) NOT NULL auto_increment,
-			aspm_string varchar(80) NOT NULL,
-			aspm_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported',
-			PRIMARY KEY aspm_ID (aspm_ID),
-			UNIQUE aspm_string (aspm_string)
+		"CREATE TABLE T_antispam__keyword (
+			askw_ID bigint(11) NOT NULL auto_increment,
+			askw_string varchar(80) NOT NULL,
+			askw_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported',
+			PRIMARY KEY askw_ID (askw_ID),
+			UNIQUE askw_string (askw_string)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_antispam__iprange' => array(

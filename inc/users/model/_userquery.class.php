@@ -25,7 +25,7 @@ class UserQuery extends SQL
 {
 	/**
 	 * Fields of users table to search by keywords
-	 * 
+	 *
 	 */
 	var $keywords_fields = 'user_login, user_firstname, user_lastname, user_nickname, user_email';
 
@@ -158,7 +158,7 @@ class UserQuery extends SQL
 	 */
 	function where_members( $members )
 	{
-		global $DB, $Blog;
+		global $DB, $Collection, $Blog;
 
 		if( empty( $members ) || is_admin_page() || empty( $Blog ) || $Blog->get_setting( 'allow_access' ) != 'members' )
 		{ // Don't restrict
@@ -508,6 +508,13 @@ class UserQuery extends SQL
 		// Join Organization table
 		$this->SELECT_add( ', uorg_org_ID, uorg_accepted, uorg_role' );
 		$this->FROM_add( 'INNER JOIN T_users__user_org ON uorg_user_ID = user_ID AND uorg_org_ID = '.$DB->quote( $org_ID ) );
+	}
+
+	function where_viewed_user( $user_ID )
+	{
+		global $DB;
+		$this->SELECT_add( ', upv_visited_user_ID, upv_visitor_user_ID, upv_last_visit_ts' );
+		$this->FROM_add( 'RIGHT JOIN T_users__profile_visits ON upv_visitor_user_ID = user_ID AND upv_visited_user_ID = '.$DB->quote( $user_ID ) );
 	}
 
 	/**

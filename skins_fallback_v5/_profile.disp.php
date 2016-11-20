@@ -22,7 +22,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'regional/model/_country.class.php', 'Country' );
 
-global $Blog, $Session, $Messages, $inc_path;
+global $Collection, $Blog, $Session, $Messages, $inc_path;
 global $action, $user_profile_only, $edited_User, $form_action;
 
 if( ! is_logged_in() )
@@ -124,6 +124,9 @@ switch( $disp )
 		break;
 	case 'subs':
 		require $inc_path.'users/views/_user_subscriptions.form.php';
+		break;
+	case 'visits':
+		require $inc_path.'users/views/_user_profile_visits.view.php';
 		break;
 	default:
 		debug_die( "Unknown user tab" );

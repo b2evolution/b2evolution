@@ -191,7 +191,7 @@ class ItemLight extends DataObject
 				array( 'table'=>'T_items__item_settings', 'fk'=>'iset_item_ID', 'msg'=>T_('%d items settings') ),
 				array( 'table'=>'T_items__subscriptions', 'fk'=>'isub_item_ID', 'msg'=>T_('%d items subscriptions') ),
 				array( 'table'=>'T_items__prerendering', 'fk'=>'itpr_itm_ID', 'msg'=>T_('%d prerendered content') ),
-				array( 'table'=>'T_users__postreadstatus', 'fk'=>'uprs_post_ID', 'msg'=>T_('%d recordings of a post having been read') ),
+				array( 'table'=>'T_items__user_data', 'fk'=>'itud_item_ID', 'msg'=>T_('%d recordings of user data for a specific post') ),
 			);
 	}
 
@@ -770,13 +770,13 @@ class ItemLight extends DataObject
 			}
 			if( empty( $this->main_Chapter ) )
 			{	// If we still don't have a valid Chapter, display clean error and die().
-				global $admin_url, $Blog, $blog;
+				global $admin_url, $Collection, $Blog, $blog;
 				if( empty( $Blog ) )
 				{
 					if( !empty( $blog ) )
 					{
 						$BlogCache = & get_BlogCache();
-						$Blog = & $BlogCache->get_by_ID( $blog, false );
+						$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false );
 					}
 				}
 
@@ -979,7 +979,7 @@ class ItemLight extends DataObject
 	 */
 	function locale_temp_switch()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( ! empty( $Blog ) && $Blog->get_setting( 'post_locale_source' ) == 'blog' )
 		{ // Use locale what current blog is using now
@@ -1132,7 +1132,7 @@ class ItemLight extends DataObject
 	 */
 	function get_permanent_link( $text = '#', $title = '#', $class = '', $target_blog = '', $post_navigation = '', $nav_target = NULL )
 	{
-		global $current_User, $Blog;
+		global $current_User, $Collection, $Blog;
 
 		switch( $text )
 		{
@@ -1227,7 +1227,7 @@ class ItemLight extends DataObject
 	 */
 	function get_title( $params = array() )
 	{
-		global $ReqURL, $Blog, $MainList;
+		global $ReqURL, $Collection, $Blog, $MainList;
 
 		// Set default post navigation
 		$def_post_navigation = empty( $Blog ) ? 'same_blog' : $Blog->get_setting( 'post_navigation' );
@@ -1368,7 +1368,7 @@ class ItemLight extends DataObject
 
 
 	/**
-	 * Template tag: get excerpt 
+	 * Template tag: get excerpt
 	 * This light version does display only. It never tries to auto-generate the excerpt.
 	 *
 	 *  May be used in ItemLight lists such as sitemaps, feeds, recent posts, post widgets where the exceprt might be used as a title, etc.

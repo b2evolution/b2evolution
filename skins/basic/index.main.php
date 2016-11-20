@@ -21,8 +21,6 @@ if( evo_version_compare( $app_version, '2.4.1' ) < 0 )
 // Do inits depending on current $disp:
 skin_init( $disp );
 
-require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
-
 // The following is temporary and should be moved to some SiteSkin class
 siteskin_init();
 
@@ -189,6 +187,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
 					// Display container contents:
 					skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+						'widget_context' => 'item',	// Signal that we are displaying within an Item
 						// The following (optional) params will be used as defaults for widgets included in this container:
 						// This will enclose each widget in a block:
 						'block_start' => '<div class="$wi_class$">',

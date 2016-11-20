@@ -90,7 +90,7 @@ class infodots_plugin extends Plugin
 	 */
 	function init_html_head()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( ! isset( $Blog ) || (
 		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
@@ -134,8 +134,9 @@ class infodots_plugin extends Plugin
 			jQuery( this ).bubbletip( tooltip_obj,
 			{
 				showOnInit: true,
-				deltaShift: -5,
+				deltaShift: ( jQuery( this ).css( "box-sizing" ) == "border-box" ? -18 : -5 ),
 				wrapperContainer: infodots_bubbletip_wrapperContainer,
+				zIndex: 1001,
 			} );
 		}
 		jQuery( this ).addClass( "hovered" );
@@ -404,7 +405,7 @@ class infodots_plugin extends Plugin
 			return;
 		}
 
-		if( ( $LinkOwner = & $Link->get_LinkOwner() ) === false || ( $Blog = & $LinkOwner->get_Blog() ) === false )
+		if( ( $LinkOwner = & $Link->get_LinkOwner() ) === false || ( $Collection = $Blog = & $LinkOwner->get_Blog() ) === false )
 		{ // Couldn't get Blog object
 			return;
 		}
@@ -443,9 +444,9 @@ class infodots_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Called when displaying item attachment.
+	 * Event handler: Called prepare params before rendering attachments of item contents.
 	 *
-	 * THis will render the red dots in the same <div> as the image, which is important for using relative positioning based on the image coordinates.
+	 * This will render the red dots in the same <div> as the image, which is important for using relative positioning based on the image coordinates.
 	 *
 	 * Renders the red dots before each image by getting them from array $this->dots if it was initialized during RenderItemAsHtml().
 	 * If RenderItemAsHtml() was not called (which happens if content was already pre-rendered) then the array $this->dots is built by preg_match from prerendered content 
@@ -457,10 +458,10 @@ class infodots_plugin extends Plugin
 	 * @param boolean TRUE - when render in comments
 	 * @return boolean true if plugin rendered this attachment
 	 */
-	function RenderItemAttachment( & $params, $in_comments = false )
+	function PrepareForRenderItemAttachment( & $params )
 	{
 		if( empty( $params['Item'] ) || empty( $params['Link'] ) )
-		{ // Check input data
+		{	// Wrong input data, Exit here:
 			return false;
 		}
 
@@ -469,27 +470,25 @@ class infodots_plugin extends Plugin
 		$this->dot_numbers = NULL;
 		$this->object_ID = 'itm_'.$Item->ID;
 
-		// Render dots
+		// Render dots:
 		$this->render_infodots( $params, $Item->get_prerendered_content( 'htmlbody' ) );
 
-		// Plugin only adds data to $params['before_image?] but doesn?t actually display the image.
-		// So, return false to communicate we do NOT display the image, so that the core will take care of displaying the image:
-		return false;
+		return true;
 	}
 
 
 	/**
-	 * Event handler: Called when displaying comment attachment.
+	 * Event handler: Called prepare params before rendering attachments of comment content.
 	 *
 	 * See sister function RenderItemAttachment() above for more details.
 	 *
 	 * @param array Associative array of parameters. $params['File'] - attachment, $params['data'] - output
 	 * @return boolean true if plugin rendered this attachment
 	 */
-	function RenderCommentAttachment( & $params )
+	function PrepareForRenderCommentAttachment( & $params )
 	{
 		if( empty( $params['Comment'] ) || empty( $params['Link'] ) )
-		{ // Check input data
+		{	// Wrong input data, Exit here:
 			return false;
 		}
 
@@ -498,12 +497,10 @@ class infodots_plugin extends Plugin
 		$this->dot_numbers = NULL;
 		$this->object_ID = 'cmt_'.$Comment->ID;
 
-		// Render dots
+		// Render dots:
 		$this->render_infodots( $params, $Comment->get_prerendered_content( 'htmlbody' ) );
 
-		// Plugin just modifies the params and doesn't touch/render a real object
-		// So return FALSE here everytime to don't rewrite the real object
-		return false;
+		return true;
 	}
 }
 

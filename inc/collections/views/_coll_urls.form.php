@@ -239,6 +239,12 @@ jQuery( '[id$=_assets_absolute_url]' ).focus( function()
 	$blogurl = $edited_Blog->gen_blogurl();
 	$Form->info( T_('URL preview'), '<span id="urlpreview">'.$blogurl.'</span>' );
 
+	$http_protocol_options = array(
+		array( 'always_redirect', T_('Always redirect to URL above') ),
+		array( 'allow_both', sprintf( T_('Allow both %s and %s as valid URLs'), '<code>http</code>', '<code>https</code>' ) ) );
+
+		$Form->radio( 'blog_http_protocol', $edited_Blog->get( 'http_protocol' ), $http_protocol_options, T_('SSL'), true );
+
 $Form->end_fieldset();
 
 

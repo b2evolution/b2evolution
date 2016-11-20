@@ -186,7 +186,7 @@ class AdminUI_general extends Menu
 	*/
 	function breadcrumbpath_init( $add_blog = true, $additional_path = array() )
 	{
-		global $Blog, $Settings, $admin_url;
+		global $Collection, $Blog, $Settings, $admin_url;
 
 		// Path to site root
 		$site_style = $Settings->get( 'site_color' ) != '' ? 'style="color:'.$Settings->get( 'site_color' ).'"' : '';
@@ -223,7 +223,7 @@ class AdminUI_general extends Menu
 	*/
 	function breadcrumbpath_add( $text, $url, $help = NULL, $attrs = '' )
 	{
-		global $Blog, $current_User;
+		global $Collection, $Blog, $current_User;
 
 		$blog_ID = isset($Blog) ? $Blog->ID : 0;
 		$url = str_replace( '$blog$', $blog_ID, $url );
@@ -994,9 +994,9 @@ class AdminUI_general extends Menu
 							'line_start_odd' => '<tr class="odd">'."\n",
 							'line_start_last' => '<tr class="even lastline">'."\n",
 							'line_start_odd_last' => '<tr class="odd lastline">'."\n",
-								'col_start' => '<td $class_attrib$>',
-								'col_start_first' => '<td class="firstcol $class$">',
-								'col_start_last' => '<td class="lastcol $class$">',
+								'col_start' => '<td $class_attrib$ $colspan_attrib$>',
+								'col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+								'col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
 								'col_end' => "</td>\n",
 							'line_end' => "</tr>\n\n",
 							'grp_line_start' => '<tr class="group">'."\n",
@@ -1074,9 +1074,9 @@ class AdminUI_general extends Menu
 							'line_start_odd' => '<tr class="odd">'."\n",
 							'line_start_last' => '<tr class="even lastline">'."\n",
 							'line_start_odd_last' => '<tr class="odd lastline">'."\n",
-								'col_start' => '<td $class_attrib$>',
-								'col_start_first' => '<td class="firstcol $class$">',
-								'col_start_last' => '<td class="lastcol $class$">',
+								'col_start' => '<td $class_attrib$ $colspan_attrib$>',
+								'col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+								'col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
 								'col_end' => "</td>\n",
 							'line_end' => "</tr>\n\n",
 							'grp_line_start' => '<tr class="group">'."\n",

@@ -48,18 +48,34 @@ $login = NULL;
 $pass = NULL;
 $pass_md5 = NULL;
 $email_login = false;
+$check_login_crumb = true;
+$report_wrong_pass_hashing = true;
 
 if( isset( $_POST[ $dummy_fields[ 'login' ] ] ) && isset( $_POST[ $dummy_fields[ 'pwd' ] ] ) )
-{ // Trying to log in with a POST
+{	// Trying to log in with a POST:
+	$login_mode = 'post_form';
 	$login = $_POST[ $dummy_fields[ 'login' ] ];
 	$pass = $_POST[ $dummy_fields[ 'pwd' ] ];
 	unset( $_POST[ $dummy_fields[ 'pwd' ] ] ); // password will be hashed below
 }
 elseif( isset( $_GET[ $dummy_fields[ 'login' ] ] ) )
-{ // Trying to log in with a GET; we might only provide a user here.
+{	// Trying to log in with a GET; we might only provide a user here.
+	$login_mode = 'get_request';
 	$login = $_GET[ $dummy_fields[ 'login' ] ];
 	$pass = isset( $_GET[ $dummy_fields[ 'pwd' ] ] ) ? $_GET[ $dummy_fields[ 'pwd' ] ] : '';
 	unset( $_GET[ $dummy_fields[ 'pwd' ] ] ); // password will be hashed below
+}
+elseif( empty( $disable_http_auth ) && $Settings->get( 'http_auth_accept' ) && ! $Session->has_User() && isset( $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'] ) )
+{	// Trying to log in with HTTP basic authentication:
+	$login_mode = 'http_basic_auth';
+	$login = $_SERVER['PHP_AUTH_USER'];
+	$pass = $_SERVER['PHP_AUTH_PW'];
+	// Don't check crumb because it is impossible to send by this auth method:
+	$check_login_crumb = false;
+	// Don't report about not hashing password because it is impossible to send by this auth method:
+	$report_wrong_pass_hashing = false;
+	// Set action to simulate a form submit button like '<input type="submit" name="login_action[login]" >' for correct redirect after successful login:
+	$login_action = array( 'login' => '' );
 }
 
 $Debuglog->add( 'Login: login: '.var_export( htmlspecialchars( $login, ENT_COMPAT, $evo_charset ), true ), '_init_login' );
@@ -101,9 +117,11 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 
 	header_nocache();		// Don't take risks here :p
 
-	// Check that this login request is not a CSRF hacked request:
-	$Session->assert_received_crumb( 'loginform' );
-	// fp> NOTE: TODO: now that we require going through the login form (instead of URL params), all the login logic that is here can probably be moved to login.php ?
+	if( $check_login_crumb )
+	{	// Check that this login request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'loginform' );
+		// fp> NOTE: TODO: now that we require going through the login form (instead of URL params), all the login logic that is here can probably be moved to login.php ?
+	}
 
 	// Note: login and password cannot include ' or " or > or <
 	// Note: login cannot include @
@@ -230,7 +248,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 			{	// Password NOT hashed by Javascript:
 				$pass_ok = ( $User->pass == md5( $User->salt.$pass, true ) );
 				$Debuglog->add( 'Login: Compared raw passwords. Result: '.(int)$pass_ok, '_init_login' );
-				if( $pass_ok && can_use_hashed_password() )
+				if( $report_wrong_pass_hashing && $pass_ok && can_use_hashed_password() )
 				{	// Report about this unsecure login action:
 					syslog_insert( sprintf( 'User %s logged in without password hashing.', $User->login ), 'error', 'user', $User->ID, 'core', NULL, $User->ID );
 					$Messages->add( T_('WARNING: password hashing did not work. You just logged in insecurely. Please report this to your administrator.'), 'error' );
@@ -303,7 +321,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 				$attempt_ip = $attempt[1];
 
 				$plugin_country_by_IP = '';
-				if( ! empty( $geoip_Plugin ) && $Country = & $geoip_Plugin->get_country_by_IP( $attempt_ip ) )
+				if( ! empty( $geoip_Plugin ) && $Country = $geoip_Plugin->get_country_by_IP( $attempt_ip ) )
 				{ // Get country by IP if plugin is enabled
 					$plugin_country_by_IP = ' ('.$Country->get_name().')';
 				}
@@ -313,11 +331,11 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 					$attempt_ip .= ' '.gethostbyaddr( $attempt_ip );
 				}
 
-				$Messages->add( sprintf( T_('Someone tried to log in to your account with a wrong password on %s from %s%s'),
+				$Messages->add_to_group( sprintf( T_('Someone tried to log in to your account with a wrong password on %s from %s%s'),
 						date( locale_datefmt().' '.locale_timefmt(), $attempt[0] ),
 						$attempt_ip,
 						$plugin_country_by_IP
-					), 'error' );
+					), 'error', T_('Invalid login attempts:') );
 			}
 			// Clear the attempts list
 			$UserSettings->delete( 'login_attempts', $current_User->ID );
@@ -327,18 +345,33 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	elseif( empty( $login_error ) )
 	{ // if the login_error wasn't set yet, add the default one:
 		// This will cause the login screen to "popup" (again)
-		$login_error = T_('Wrong login/password.');
+		if( $login_mode == 'http_basic_auth' )
+		{	// If wrong login from HTTP basic authentication
+			if( ! empty( $is_login_page ) )
+			{	// Display this error and login form only if user really is requesting a login page:
+				$login_error = T_('Wrong Login/Password provided by browser (HTTP Auth).');
+			}
+		}
+		else
+		{	// If wrong login from standard POST forms or GET request:
+			$login_error = T_('The Login/Password you entered is wrong.');
+		}
 
-		if( isset( $login_attempts ) )
-		{ // Save new login attempt into DB
+		$current_login_pass = $login.':'.( empty( $pwd_hashed ) ? $pass : implode( '', $pwd_hashed ) );
+
+		if( isset( $login_attempts ) && $current_login_pass != $Session->get( 'wrong_loginpass' ) )
+		{	// Save new login attempt into DB only if previous login data were different:
 			if( count( $login_attempts ) == 9 )
-			{ // Unset first attempt to clear a space for new attempt
+			{	// Unset first attempt to clear a space for new attempt:
 				unset( $login_attempts[0] );
 			}
 			$login_attempts[] = $localtimenow.'|'.( array_key_exists( 'REMOTE_ADDR', $_SERVER ) ? $_SERVER['REMOTE_ADDR'] : '' );
 			$UserSettings->set( 'login_attempts', implode( ';', $login_attempts ), $User->ID );
 			$UserSettings->dbupdate();
 		}
+
+		// Save current wrong login/pass in session to know on next login trying that we get new data:
+		$Session->set( 'wrong_loginpass', $current_login_pass );
 	}
 
 }
@@ -459,7 +492,7 @@ if( ! empty( $login_error ) || ( $login_required && ! is_logged_in() ) )
 		if( empty( $Blog ) && init_requested_blog() )
 		{ // $blog is set, init $Blog also
 			$BlogCache = & get_BlogCache();
-			$Blog = $BlogCache->get_by_ID( $blog, false, false );
+			$Collection = $Blog = $BlogCache->get_by_ID( $blog, false, false );
 		}
 
 		$blog_skin_ID = NULL;

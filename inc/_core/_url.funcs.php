@@ -710,7 +710,7 @@ function url_absolute( $url, $base = NULL )
 
 	if( empty($base) )
 	{	// Detect current page base
-		global $Blog, $ReqHost, $base_tag_set, $baseurl;
+		global $Collection, $Blog, $ReqHost, $base_tag_set, $baseurl;
 
 		if( $base_tag_set )
 		{	// <base> tag is set
@@ -812,10 +812,20 @@ function is_absolute_url( $url )
  * while others use uppercase (lighttpd).
  * @return boolean
  */
-function is_same_url( $a, $b )
+function is_same_url( $a, $b, $ignore_http_protocol = FALSE )
 {
 	$a = preg_replace_callback('~%[0-9A-F]{2}~', create_function('$m', 'return strtolower($m[0]);'), $a);
 	$b = preg_replace_callback('~%[0-9A-F]{2}~', create_function('$m', 'return strtolower($m[0]);'), $b);
+
+	if( $ignore_http_protocol )
+	{
+		$re = "/^https?\:\/\/(.*)/i";
+		$subst = "$1";
+
+		$a = preg_replace( $re, $subst, $a );
+		$b = preg_replace( $re, $subst, $b );
+	}
+
 	return $a == $b;
 }
 
@@ -884,7 +894,7 @@ function idna_decode( $url )
  */
 function get_dispctrl_url( $dispctrl, $params = '' )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( $params != '' )
 	{

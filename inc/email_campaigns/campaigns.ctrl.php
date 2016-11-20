@@ -334,6 +334,17 @@ if( $action == 'edit' )
 	{
 		$AdminUI->breadcrumbpath_add( $campaign_edit_modes[ $tab ]['text'], $campaign_edit_modes[ $tab ]['href'] );
 	}
+
+	if( $tab == 'compose' )
+	{	// Require colorbox js:
+		require_js_helper( 'colorbox' );
+		// Require File Uploader js and css:
+		require_js( 'multiupload/fileuploader.js' );
+		require_css( 'fileuploader.css' );
+		// Load JS files to make the links table sortable:
+		require_js( '#jquery#' );
+		require_js( 'jquery/jquery.sortable.min.js' );
+	}
 }
 else
 { // List of campaigns

@@ -210,7 +210,7 @@ class coll_category_list_Widget extends ComponentWidget
 	function display( $params )
 	{
 		global $cat_modifier;
-		global $Blog;
+		global $Collection, $Blog;
 
 		$this->init_display( $params );
 

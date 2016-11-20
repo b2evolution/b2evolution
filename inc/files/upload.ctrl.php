@@ -369,7 +369,7 @@ if( ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
 					.'</ul>';
 			}
 
-			$Messages->add( $success_msg, 'success' );
+			$Messages->add_to_group( $success_msg, 'success', T_('Uploading files:') );
 		}
 	}
 

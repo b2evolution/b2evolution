@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var ItemList2
  */
@@ -29,7 +29,7 @@ global $Session;
 if( $highlight = param( 'highlight', 'integer', NULL ) )
 {	// There are lines we want to highlight:
 	$result_fadeout = array( 'post_ID' => array($highlight) );
-} 
+}
 elseif ( $highlight = $Session->get( 'highlight_id' ) )
 {
 	$result_fadeout = array( 'post_ID' => array($highlight) );
@@ -95,7 +95,7 @@ $ItemList->cols[] = array(
 						'th_class' => 'shrinkwrap',
 						'td_class' => '%item_td_task_class( #post_ID#, #post_pst_ID#, "task_status_edit" )%',
 						'td' => '%item_td_task_cell( "status", {Obj} )%',
-						'extra' => array( 'rel' => '#post_ID#', 'format_to_output' => false )
+						'extra' => array( 'rel' => '#post_ID#', 'data-post-type' => '#post_ityp_ID#', 'format_to_output' => false )
 					);
 
 
@@ -196,18 +196,38 @@ echo_editable_column_js( array(
 	'null_text'       => TS_('No user') ) );
 
 // Print JS to edit a task status
-$ItemStatusCache = & get_ItemStatusCache();
-$ItemStatusCache->load_all();
-$task_statuses = array( 0 => T_('No status') );
-foreach( $ItemStatusCache->cache as $ItemStatus )
+global $DB;
+$post_status_types = $DB->get_results( 'SELECT its_ityp_ID, its_pst_ID, pst_name FROM T_items__status_type LEFT JOIN T_items__status ON pst_ID = its_pst_ID' );
+$post_statuses = array();
+foreach( $post_status_types as $post_status_type )
 {
+	if( ! isset( $post_statuses[$post_status_type->its_ityp_ID] ) )
+	{
+		$post_statuses[$post_status_type->its_ityp_ID] = array();
+	}
+
 	// Add '_' to don't break a sorting by name on jeditable:
-	$task_statuses[ '_'.$ItemStatus->ID ] = $ItemStatus->name;
+	$post_statuses[$post_status_type->its_ityp_ID]['_'.$post_status_type->its_pst_ID] = $post_status_type->pst_name;
 }
+
+?>
+<script type="text/javascript">
+	var itemStatuses = <?php echo json_encode( $post_statuses );?>;
+
+	function getApplicableStatus( el, selected ) {
+		var postType = el.attr( "data-post-type" );
+		var statuses = itemStatuses[postType];
+		statuses[0] = 'No status';
+		statuses['selected'] = selected;
+
+		return statuses;
+	}
+</script>
+<?php
 echo_editable_column_js( array(
 	'column_selector' => '.task_status_edit',
 	'ajax_url'        => get_htsrv_url().'async.php?action=item_task_edit&field=status&'.url_crumb( 'itemtask' ),
-	'options'         => $task_statuses,
+	'options'         => 'getApplicableStatus( jQuery( this ), result[1] );',
 	'new_field_name'  => 'new_status',
 	'ID_value'        => 'jQuery( this ).attr( "rel" )',
 	'ID_name'         => 'post_ID' ) );

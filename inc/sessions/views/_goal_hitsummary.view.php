@@ -103,7 +103,7 @@ if( count( $goal_rows ) && count( $hitgroup_array ) )
 	}
 
 	// Chart params
-	$chart['canvas_bg'] = array( 'width' => 780, 'height' => 355 );
+	$chart['canvas_bg'] = array( 'width' => '100%', 'height' => 355 );
 
 	// Print out chart
 	echo '<div class="center">';

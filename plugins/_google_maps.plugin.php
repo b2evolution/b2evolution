@@ -169,7 +169,7 @@ class google_maps_plugin extends Plugin
 	 */
 	function get_widget_cache_keys( $widget_ID = 0 )
 	{
-		global $Blog, $Item;
+		global $Collection, $Blog, $Item;
 
 		return array(
 				'wi_ID'        => $widget_ID, // Have the widget settings changed ?
@@ -222,7 +222,7 @@ class google_maps_plugin extends Plugin
 	 */
 	function AdminDisplayItemFormFieldset( & $params )
 	{
-		global $Blog, $DB, $admin_url;
+		global $Collection, $Blog, $DB, $admin_url;
 
 		// fp>vitaliy : make thhis title configurable per blog . default shoul dbe as below.
 		$plugin_title = $this->Settings->get( 'map_title_coll'.$Blog->ID );
@@ -925,7 +925,7 @@ function locate()
 
 	function SkinTag( & $params )
 	{
-		global $Blog, $Item;
+		global $Collection, $Blog, $Item;
 
 		if( empty( $Item ) )
 		{	// Don't display this widget when no Item object:

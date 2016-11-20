@@ -124,6 +124,12 @@ class coll_item_list_Widget extends ComponentWidget
 						),
 					'defaultvalue' => 'all',
 				),
+				'flagged' => array(
+					'label' => T_('Flagged'),
+					'note' => T_('Do you want to restrict only to flagged contents?'),
+					'type' => 'checkbox',
+					'defaultvalue' => 0,
+				),
 				'follow_mainlist' => array(
 					'label' => T_('Follow Main List'),
 					'note' => T_('Do you want to restrict to contents related to what is displayed in the main area?'),
@@ -177,6 +183,16 @@ class coll_item_list_Widget extends ComponentWidget
 					'note' => T_( 'Maximum number of items to display.' ),
 					'size' => 4,
 					'defaultvalue' => 10,
+				),
+				'disp_cat' => array(
+					'label' => T_('Category'),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'no',   T_('No display') ),
+							array( 'main', T_('Display main category') ),
+							array( 'all',  T_('Display all categories') ) ),
+					'defaultvalue' => 'no',
 				),
 				'disp_title' => array(
 					'label' => T_( 'Titles' ),
@@ -322,7 +338,7 @@ class coll_item_list_Widget extends ComponentWidget
 		 * @var ItemList2
 		 */
 		global $MainList;
-		global $BlogCache, $Blog;
+		global $BlogCache, $Collection, $Blog;
 		global $Item, $Settings;
 
 		$this->init_display( $params );
@@ -346,6 +362,9 @@ class coll_item_list_Widget extends ComponentWidget
 				'item_first_image_before'      => '<div class="item_first_image">',
 				'item_first_image_after'       => '</div>',
 				'item_first_image_placeholder' => '<div class="item_first_image_placeholder"><a href="$item_permaurl$"></a></div>',
+				'item_categories_before'       => '<div class="item_categories">',
+				'item_categories_after'        => ': </div>',
+				'item_categories_separator'    => ', ',
 				'item_title_before'            => '<div class="item_title">',
 				'item_title_after'             => '</div>',
 				'item_title_single_before'     => '',
@@ -415,6 +434,11 @@ class coll_item_list_Widget extends ComponentWidget
 			$filters['featured'] = false;
 		}
 
+		if( $this->disp_params['flagged'] == 1 )
+		{	// Restrict to flagged Items:
+			$filters['flagged'] = true;
+		}
+
 
 		if( $this->disp_params['follow_mainlist'] == 'tags' )
 		{	// Restrict to Item tagged with some tag used in the Mainlist:
@@ -475,6 +499,7 @@ class coll_item_list_Widget extends ComponentWidget
 
 		// Check if the widget displays only single title
 		$this->disp_params['disp_only_title'] = ! (
+				( $this->disp_params['disp_cat'] != 'no' ) || // display categories
 				( $this->disp_params['attached_pics'] != 'none' ) || // display first and other images
 				( $this->disp_params['disp_excerpt'] ) || // display excerpt
 				( $this->disp_params['disp_teaser'] ) // display teaser
@@ -707,6 +732,19 @@ class coll_item_list_Widget extends ComponentWidget
 					'limit'       => 1,
 				), $cover_image_params ),
 				$content_is_displayed );
+		}
+
+		if( $this->disp_params['disp_cat'] != 'no' )
+		{	// Display categories:
+			$disp_Item->categories( array(
+					'before'           => $this->disp_params['item_categories_before'],
+					'after'            => $this->disp_params['item_categories_after'],
+					'separator'        => $this->disp_params['item_categories_separator'],
+					'include_main'     => true,
+					'include_other'    => ( $this->disp_params['disp_cat'] == 'all' ),
+					'include_external' => ( $this->disp_params['disp_cat'] == 'all' ),
+					'link_categories'  => true,
+				) );
 		}
 
 		if( $this->disp_params['disp_title'] )
@@ -979,7 +1017,7 @@ class coll_item_list_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$blog_ID = intval( $this->disp_params['blog_ID'] );
 

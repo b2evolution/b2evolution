@@ -80,7 +80,7 @@ class coll_subscription_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $Blog, $admin_url;
+		global $Collection, $Blog, $admin_url;
 
 		$r = array_merge( array(
 				'title' => array(
@@ -123,7 +123,7 @@ class coll_subscription_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 		global $Plugins;
 		global $rsc_url;
 		global $current_User;

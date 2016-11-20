@@ -119,6 +119,7 @@ class ItemListLight extends DataObjectList2
 		// Initialize the default filter set:
 		$this->set_default_filters( array(
 				'filter_preset' => NULL,
+				'flagged' => false,
 				'ts_min' => $timestamp_min,
 				'ts_max' => $timestamp_max,
 				'ts_created_max' => NULL,
@@ -292,6 +293,11 @@ class ItemListLight extends DataObjectList2
 			memorize_param( $this->param_prefix.'w', '/^(0?[0-9]|[1-4][0-9]|5[0-3])$/', $this->default_filters['week'], $this->filters['week'] );            // Week number
 			memorize_param( $this->param_prefix.'dstart', 'integer', $this->default_filters['ymdhms_min'], $this->filters['ymdhms_min'] ); // YearMonth(Day) to start at
 			memorize_param( $this->param_prefix.'dstop', 'integer', $this->default_filters['ymdhms_max'], $this->filters['ymdhms_max'] ); // YearMonth(Day) to start at
+
+			/*
+			 * Restrict by flagged items:
+			 */
+			memorize_param( $this->param_prefix.'flagged', 'integer', $this->default_filters['flagged'], $this->filters['flagged'] );
 
 			// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
 			if( is_null($this->default_filters['ts_min'])
@@ -476,6 +482,12 @@ class ItemListLight extends DataObjectList2
 		$this->filters['ymdhms_max'] = param_compact_date( $this->param_prefix.'dstop', $this->default_filters['ymdhms_max'], true, T_( 'Invalid date' ) ); // YearMonth(Day) to stop at
 
 
+		/*
+		 * Restrict by flagged items:
+		 */
+		$this->filters['flagged'] = param( $this->param_prefix.'flagged', 'integer', $this->default_filters['flagged'], true );
+
+
 		// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
 		// So far, these act as SILENT filters. They will not advertise their filtering in titles etc.
 		$this->filters['ts_min'] = $this->default_filters['ts_min'];
@@ -603,6 +615,7 @@ class ItemListLight extends DataObjectList2
 		$this->ItemQuery->where_datecreated( $this->filters['ts_created_max'] );
 		$this->ItemQuery->where_visibility( $this->filters['visibility_array'], $this->filters['coll_IDs'] );
 		$this->ItemQuery->where_featured( $this->filters['featured'] );
+		$this->ItemQuery->where_flagged( $this->filters['flagged'] );
 
 
 		/*
@@ -615,6 +628,12 @@ class ItemListLight extends DataObjectList2
 		elseif( $this->filters['orderby'] == 'ID_list' )
 		{	// Use blog setting here because 'orderby' might be set to 'ID_list' as default filter
 			$this->filters['orderby'] = $this->Blog->get_setting('orderby');
+		}
+
+		if( isset( $this->filters['orderby'] ) && $this->filters['orderby'] == 'numviews' )
+		{ // Order by number of views
+			$this->ItemQuery->FROM_add( 'LEFT JOIN ( SELECT itud_item_ID, COUNT(*) AS '.$this->Cache->dbprefix.'numviews FROM T_items__user_data GROUP BY itud_item_ID ) AS numviews
+					ON '.$this->Cache->dbIDname.' = numviews.itud_item_ID' );
 		}
 
 		if( empty($order_by) )
@@ -757,10 +776,10 @@ class ItemListLight extends DataObjectList2
 	 *
 	 * Contrary to ItemList2, we only do 1 query here and we extract only a few selected params.
 	 * Basically all we want is being able to generate permalinks.
-	 * 
+	 *
 	 * We need this query() stub in order to call it from restart() and still
 	 * let derivative classes override it
-	 * 
+	 *
 	 * @deprecated Use new function run_query()
 	 */
 	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
@@ -935,6 +954,7 @@ class ItemListLight extends DataObjectList2
 				'display_locale'      => true,
 				'display_time'        => true,
 				'display_limit'       => true,
+				'display_flagged'     => true,
 
 				'group_mask'          => '$group_title$$filter_items$', // $group_title$, $filter_items$
 				'filter_mask'         => '"$filter_name$"', // $group_title$, $filter_name$, $clear_icon$
@@ -1142,7 +1162,7 @@ class ItemListLight extends DataObjectList2
 				$filter_class_i++;
 				$tags = implode( $params['separator_comma'], $tag_names );
 				$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
-					( count( $tag_names ) > 1 ? 
+					( count( $tag_names ) > 1 ?
 						array( $params['tags_text'], $params['before_items'].$tags.$params['after_items'] ) :
 						array( $params['tag_text'], $tags ) ),
 					$params['group_mask'] );
@@ -1321,7 +1341,7 @@ class ItemListLight extends DataObjectList2
 					}
 					$filter_class_i++;
 					$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
-						( count( $status_titles ) > 1 ? 
+						( count( $status_titles ) > 1 ?
 							array( $params['visibility_text'], $params['before_items'].implode( $params['separator_comma'], $status_titles ).$params['after_items'] ) :
 							array( $params['visibility_text'], implode( $params['separator_comma'], $status_titles ) ) ),
 						$params['group_mask'] );
@@ -1444,6 +1464,21 @@ class ItemListLight extends DataObjectList2
 			else
 			{
 				debug_die( 'Unhandled LIMITING mode in ItemList:'.$this->filters['unit'].' (paged mode is obsolete)' );
+			}
+		}
+
+
+		// FLAGGED:
+		if( $params['display_flagged'] )
+		{
+			if( ! empty( $this->filters['flagged'] ) )
+			{	// Display when only flagged items:
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'flagged' ) ) : '';
+				$title_array['flagged'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
+					array( T_('Flagged'), $unit_clear_icon, $filter_classes[ $filter_class_i ] ),
+					$params['filter_mask_nogroup'] );
+				$filter_class_i++;
 			}
 		}
 

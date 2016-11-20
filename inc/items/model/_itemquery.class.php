@@ -45,6 +45,7 @@ class ItemQuery extends SQL
 	var $phrase;
 	var $exact;
 	var $featured;
+	var $flagged;
 
 
 	/**
@@ -308,7 +309,7 @@ class ItemQuery extends SQL
 		{ // Blog IDs are not defined, Use them depending on current collection setting
 			// NOTE! collection can be 0, for example, on disp=usercomments|useritems where we display data from all collections
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $this->blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $this->blog );
 			$aggregate_coll_IDs = $Blog->get_setting( 'aggregate_coll_IDs' );
 		}
 
@@ -973,6 +974,29 @@ class ItemQuery extends SQL
 		$search_sql = '( '.implode( ' '.$operator_sql.' ', $search_sql ).' )';
 
 		$this->WHERE_and( $search_sql );
+	}
+
+
+	/**
+	 * Restrict to the flagged items
+	 *
+	 * @param boolean TRUE - Restrict to flagged items, FALSE - Don't restrict/Get all items
+	 */
+	function where_flagged( $flagged = false )
+	{
+		global $current_User;
+
+		$this->flagged = $flagged;
+
+		if( ! $this->flagged )
+		{	// Don't restrict if it is not requested or if user is not logged in:
+			return;
+		}
+
+		// Get items which are flagged by current user:
+		$this->FROM_add( 'INNER JOIN T_items__user_data ON '.$this->dbIDname.' = itud_item_ID
+			AND itud_flagged_item = 1
+			AND itud_user_ID = '.( is_logged_in() ? $current_User->ID : '-1' ) );
 	}
 
 

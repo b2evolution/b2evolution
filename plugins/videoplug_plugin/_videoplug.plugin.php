@@ -106,12 +106,12 @@ class videoplug_plugin extends Plugin
 		if( !empty( $params['Item'] ) )
 		{	// Item is set, get Blog from post:
 			$edited_Item = & $params['Item'];
-			$Blog = & $edited_Item->get_Blog();
+			$Collection = $Blog = & $edited_Item->get_Blog();
 		}
 
 		if( empty( $Blog ) )
 		{	// Item is not set, try global Blog:
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available:
 				return false;
@@ -124,7 +124,7 @@ class videoplug_plugin extends Plugin
 			return false;
 		}
 
-		return $this->DisplayCodeToolbar();
+		return $this->DisplayCodeToolbar( $params );
 	}
 
 
@@ -139,7 +139,7 @@ class videoplug_plugin extends Plugin
 		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{
-			return $this->DisplayCodeToolbar();
+			return $this->DisplayCodeToolbar( $params );
 		}
 
 		return false;
@@ -157,7 +157,7 @@ class videoplug_plugin extends Plugin
 		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{
-			return $this->DisplayCodeToolbar();
+			return $this->DisplayCodeToolbar( $params );
 		}
 
 		return false;
@@ -177,13 +177,13 @@ class videoplug_plugin extends Plugin
 		{	// Get a post of the comment:
 			if( $comment_Item = & $Comment->get_Item() )
 			{
-				$Blog = & $comment_Item->get_Blog();
+				$Collection = $Blog = & $comment_Item->get_Blog();
 			}
 		}
 
 		if( empty( $Blog ) )
 		{	// Item is not set, try global Blog
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available
 				return false;
@@ -196,24 +196,29 @@ class videoplug_plugin extends Plugin
 			return false;
 		}
 
-		return $this->DisplayCodeToolbar();
+		return $this->DisplayCodeToolbar( $params );
 	}
 
 
 	/**
 	 * Display a code toolbar
 	 *
+	 * @param array Params
 	 * @return boolean did we display a toolbar?
 	 */
-	function DisplayCodeToolbar()
+	function DisplayCodeToolbar( $params = array() )
 	{
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
+		$params = array_merge( array(
+				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
+			), $params );
+
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 
 		echo $this->get_template( 'toolbar_title_before' ).T_('Video').': '.$this->get_template( 'toolbar_title_after' );
 		echo $this->get_template( 'toolbar_group_before' );
-		echo '<input type="button" id="video_youtube" title="'.T_('Insert Youtube video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|youtube" value="YouTube" />';
-		echo '<input type="button" id="video_vimeo" title="'.T_('Insert vimeo video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|vimeo" value="Vimeo" />';
-		echo '<input type="button" id="video_dailymotion" title="'.T_('Insert DailyMotion video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|dailymotion" value="DailyMotion" />';
+		echo '<input type="button" id="video_youtube" title="'.T_('Insert Youtube video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|youtube|'.$params['js_prefix'].'" value="YouTube" />';
+		echo '<input type="button" id="video_vimeo" title="'.T_('Insert vimeo video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|vimeo|'.$params['js_prefix'].'" value="Vimeo" />';
+		echo '<input type="button" id="video_dailymotion" title="'.T_('Insert DailyMotion video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|dailymotion|'.$params['js_prefix'].'" value="DailyMotion" />';
 		echo $this->get_template( 'toolbar_group_after' );
 
 		echo $this->get_template( 'toolbar_after' );
@@ -223,7 +228,7 @@ class videoplug_plugin extends Plugin
 
 		?><script type="text/javascript">
 			//<![CDATA[
-			function videotag( tag )
+			function videotag( tag, prefix )
 			{
 				while( 1 )
 				{
@@ -288,7 +293,7 @@ class videoplug_plugin extends Plugin
 
 				tag = '[video:'+tag+':'+video_ID+']';
 
-				textarea_wrap_selection( b2evoCanvas, tag, '', 1 );
+				textarea_wrap_selection( window[ ( prefix ? prefix : '' ) + 'b2evoCanvas' ], tag, '', 1 );
 			}
 			//]]>
 		</script><?php

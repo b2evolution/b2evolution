@@ -490,7 +490,7 @@ function tool_create_sample_messages( $num_loops, $num_messages, $num_words, $ma
 {
 	global $Messages, $DB;
 
-	echo T_('Creating of the sample messages...');
+	echo T_('Creating sample messages...');
 	evo_flush();
 
 	/**

@@ -5553,7 +5553,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_end();
 
 		task_begin( 'Create table for User post read status... ' );
-		db_create_table( 'T_users__postreadstatus', '
+		db_create_table( $tableprefix.'users__postreadstatus', '
 			uprs_user_ID int(11) unsigned NOT NULL,
 			uprs_post_ID int(11) unsigned NOT NULL,
 			uprs_read_post_ts TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\',
@@ -7589,6 +7589,485 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	{	// part of 6.7.7-stable
 		$DB->query( 'ALTER TABLE T_plugins
 			MODIFY plug_priority TINYINT UNSIGNED NOT NULL default 50' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12000, 'Add new types "Text" and "HTML" for custom fields of item types...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_items__item_settings
+			MODIFY COLUMN iset_value varchar( 10000 ) NULL' );
+		$DB->query( 'ALTER TABLE T_items__type_custom_field
+			MODIFY COLUMN itcf_type ENUM( "double", "varchar", "text", "html" ) COLLATE ascii_general_ci NOT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12005, 'Update widget container "Item Single"...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->begin();
+		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
+		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_code, wi_order' );
+		$SQL->FROM( 'T_widget' );
+		$SQL->WHERE( 'wi_sco_name = "Item Single"' );
+		$SQL->ORDER_BY( 'wi_coll_ID, wi_order' );
+		$coll_item_single_widgets = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+		$coll_widgets = array();
+		foreach( $coll_item_single_widgets as $coll_item_single_widget )
+		{
+			if( ! isset( $coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] ) )
+			{	// If the "Item Single" has no widget "Item Content":
+				$coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] = 1;
+			}
+			if( $coll_item_single_widget['wi_code'] == 'item_content' )
+			{	// If the "Item Single" contains widget "Item Content" then keep an order of this widget:
+				$coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] = $coll_item_single_widget['wi_order'] + 1;
+			}
+		}
+		$item_attachments_widget_rows = array();
+		foreach( $coll_widgets as $coll_ID => $widget_order )
+		{	// Insert new widget "Item Attachments" to each colleaction that has a container "Item Single":
+			$item_attachments_widget_rows[] = '( '.$coll_ID.', "Item Single", '.$widget_order.', "item_attachments" )';
+			// Check and update not unique widget orders:
+			$not_unique_widget_ID = $DB->get_var( 'SELECT wi_ID
+				 FROM T_widget
+				WHERE wi_coll_ID = '.$coll_ID.'
+					AND wi_sco_name = "Item Single"
+					AND wi_order = '.$widget_order );
+			if( $not_unique_widget_ID > 0 )
+			{	// The collection has not unique widget order:
+				$update_order_widgets = array();
+				foreach( $coll_item_single_widgets as $coll_item_single_widget )
+				{
+					if( $coll_item_single_widget['wi_coll_ID'] == $coll_ID && $coll_item_single_widget['wi_order'] >= $widget_order )
+					{	// Increase a widget order to avoid mysql errors of duplicate entry:
+						$update_order_widgets[] = $coll_item_single_widget['wi_ID'];
+					}
+				}
+				for( $w = count( $update_order_widgets ) - 1; $w >= 0 ; $w-- )
+				{	// Update not unique widget orders:
+					$DB->query( 'UPDATE T_widget
+							SET   wi_order = wi_order + 1
+							WHERE wi_ID = '.$update_order_widgets[ $w ] );
+				}
+			}
+		}
+		if( count( $item_attachments_widget_rows ) )
+		{	// Insert new widgets "Item Attachments" into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
+			  VALUES '.implode( ', ', $item_attachments_widget_rows ) );
+		}
+		$DB->commit();
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12010, 'Create new widget container "404 Page"...' ) )
+	{	// part of 6.8.0-alpha
+		$coll_IDs = $DB->get_col( 'SELECT blog_ID FROM T_blogs' );
+		if( $coll_IDs )
+		{
+			$page_404_widget_rows = array();
+			foreach( $coll_IDs as $coll_ID )
+			{
+				$page_404_widget_rows[] = '( '.$coll_ID.', "404 Page", 10, "page_404_not_found" )';
+				$page_404_widget_rows[] = '( '.$coll_ID.', "404 Page", 20, "coll_search_form" )';
+				$page_404_widget_rows[] = '( '.$coll_ID.', "404 Page", 30, "coll_tag_cloud" )';
+			}
+			// Insert new widgets for container "404 Page" into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
+			  VALUES '.implode( ', ', $page_404_widget_rows ) );
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12015, 'Rename table "T_antispam" to "T_antispam__keyword"...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'RENAME TABLE '.$tableprefix.'antispam TO T_antispam__keyword' );
+		$DB->query( "ALTER TABLE T_antispam__keyword
+			CHANGE aspm_ID     askw_ID     bigint(11) NOT NULL auto_increment,
+			CHANGE aspm_string askw_string varchar(80) NOT NULL,
+			CHANGE aspm_source askw_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported',
+			DROP INDEX aspm_string,
+			ADD UNIQUE askw_string ( askw_string )" );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12020, 'Upgrade table user post data...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'RENAME TABLE '.$tableprefix.'users__postreadstatus TO T_items__user_data' );
+		$DB->query( "ALTER TABLE T_items__user_data
+			CHANGE uprs_user_ID         itud_user_ID          INT(11) UNSIGNED NOT NULL,
+			CHANGE uprs_post_ID         itud_item_ID          INT(11) UNSIGNED NOT NULL,
+			CHANGE uprs_read_post_ts    itud_read_item_ts     TIMESTAMP NULL DEFAULT NULL,
+			CHANGE uprs_read_comment_ts itud_read_comments_ts TIMESTAMP NULL DEFAULT NULL,
+			ADD                         itud_flagged_item     TINYINT(1) NOT NULL DEFAULT 0" );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12025, 'Creating table for user profile visits...' ) )
+	{	// part of 6.8.0-alpha
+		db_create_table( 'T_users__profile_visits', '
+				upv_visited_user_ID INT(11) UNSIGNED NOT NULL,
+				upv_visitor_user_ID INT(11) UNSIGNED NOT NULL,
+				upv_last_visit_ts   TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00",
+				PRIMARY KEY ( upv_visited_user_ID, upv_visitor_user_ID )' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12030, 'Upgrade base domains table...') )
+	{ // part of 6.8.0-alpha
+		db_add_col( 'T_basedomains', 'dom_comment', 'VARCHAR(255) DEFAULT NULL' );
+		upg_task_end();
+	}
+
+// fp> TMP NOTE: This was current status of antispam
+
+	if( upg_task_start( 12035, 'Create table for items votes...' ) )
+	{	// part of 6.8.0-alpha
+		db_create_table( 'T_items__votes', '
+			itvt_item_ID INT UNSIGNED NOT NULL,
+			itvt_user_ID INT UNSIGNED NOT NULL,
+			itvt_updown  TINYINT(1) NULL DEFAULT NULL,
+			itvt_report  ENUM( "clean", "rated", "adult", "inappropriate", "spam" ) COLLATE ascii_general_ci NULL DEFAULT NULL,
+			itvt_ts      TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00",
+			PRIMARY KEY (itvt_item_ID, itvt_user_ID),
+			KEY itvt_item_ID (itvt_item_ID),
+			KEY itvt_user_ID (itvt_user_ID)' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12040, 'Upgrade table posts for voting...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_items__item
+			ADD post_addvotes   INT NOT NULL DEFAULT 0,
+			ADD post_countvotes INT UNSIGNED NOT NULL DEFAULT 0' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12045, 'Update table post types...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'UPDATE T_items__type
+			  SET ityp_allow_disabling_comments = 1
+			WHERE ityp_usage LIKE "intro%"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12050, 'Upgrade table post types...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_items__type
+			ADD ityp_comment_form_msg       TEXT NULL DEFAULT NULL AFTER ityp_use_comments,
+			ADD ityp_allow_comment_form_msg TINYINT DEFAULT 0      AFTER ityp_comment_form_msg' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12055, 'Upgrade links table...' ) )
+	{	// part of 6.8.0-alpha
+		db_add_col( 'T_links', 'link_ecmp_ID', 'int(11) unsigned  NULL COMMENT \'Used for linking files to email campaign\' AFTER link_usr_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12060, 'Upgrade files table...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_files
+			MODIFY file_root_type ENUM("absolute","user","collection","shared","skins","import","emailcampaign") COLLATE ascii_general_ci NOT NULL DEFAULT "absolute"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12065, 'Upgrade blogs table...') )
+	{ // part of 6.8.0-alpha
+		db_add_col( 'T_blogs', 'blog_http_protocol', 'ENUM("always_redirect", "allow_both") DEFAULT "always_redirect" AFTER blog_access_type' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12070, 'Create table for temporary ID...' ) )
+	{	// part of 6.8.0-alpha
+		db_create_table( 'T_temporary_ID', '
+			tmp_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			tmp_type VARCHAR(32) COLLATE ascii_general_ci NOT NULL,
+			PRIMARY KEY (tmp_ID)' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12075, 'Upgrade links table...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_links
+			ADD link_msg_ID int(11) unsigned  NULL COMMENT \'Used for linking files to private message\' AFTER link_ecmp_ID,
+			ADD link_tmp_ID int(11) unsigned  NULL COMMENT \'Used for linking files to new creating object\' AFTER link_msg_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12080, 'Create table for post type status...' ) )
+	{ // part of 6.8.0-alpha
+		db_create_table( 'T_items__status_type', '
+			its_pst_ID INT(11) UNSIGNED NOT NULL,
+			its_ityp_ID INT(11) UNSIGNED NOT NULL,
+			PRIMARY KEY (its_ityp_ID, its_pst_ID)' );
+
+			// Enable all post statuses for all post types
+			$DB->query( 'INSERT INTO T_items__status_type (its_pst_ID, its_ityp_ID)
+					( SELECT pst_ID, ityp_ID FROM T_items__type INNER JOIN T_items__status )' );
+
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12085, 'Update widget container "Item Single"...' ) )
+	{ // part of 6.8.0-alpha
+		$DB->begin();
+		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
+		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_code, wi_order' );
+		$SQL->FROM( 'T_widget' );
+		$SQL->WHERE( 'wi_sco_name = "Item Single"' );
+		$SQL->ORDER_BY( 'wi_coll_ID, wi_order' );
+		$coll_item_single_widgets = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+		$coll_widgets = array();
+		foreach( $coll_item_single_widgets as $coll_item_single_widget )
+		{
+			if( ! isset( $coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] ) )
+			{	// If the "Item Single" has no widget "Item Content":
+				$coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] = 1;
+			}
+			if( $coll_item_single_widget['wi_code'] == 'item_tags' )
+			{ // If the "Item Single" contains widget "Item Tags" then make order of this widget a negative
+				$coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] = -1;
+			}
+			if( $coll_item_single_widget['wi_code'] == 'item_attachments' && $coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] > 0 )
+			{	// If the "Item Single" contains widget "Item Content" and the widget order is positive then keep an order of this widget:
+				$coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] = $coll_item_single_widget['wi_order'] + 1;
+			}
+		}
+
+		$item_tags_widget_rows = array();
+		foreach( $coll_widgets as $coll_ID => $widget_order )
+		{	// Insert new widget "Item Tags" to each collection that has a container "Item Single" with no existing "Item Tags" widget :
+			if( $widget_order > 0 )
+			{
+				$item_tags_widget_rows[] = '( '.$coll_ID.', "Item Single", '.$widget_order.', "item_tags" )';
+				// Check and update not unique widget orders:
+				$not_unique_widget_ID = $DB->get_var( 'SELECT wi_ID
+					FROM T_widget
+					WHERE wi_coll_ID = '.$coll_ID.'
+						AND wi_sco_name = "Item Single"
+						AND wi_order = '.$widget_order );
+				if( $not_unique_widget_ID > 0 )
+				{	// The collection has not unique widget order:
+					$update_order_widgets = array();
+					foreach( $coll_item_single_widgets as $coll_item_single_widget )
+					{
+						if( $coll_item_single_widget['wi_coll_ID'] == $coll_ID && $coll_item_single_widget['wi_order'] >= $widget_order )
+						{	// Increase a widget order to avoid mysql errors of duplicate entry:
+							$update_order_widgets[] = $coll_item_single_widget['wi_ID'];
+						}
+					}
+					for( $w = count( $update_order_widgets ) - 1; $w >= 0 ; $w-- )
+					{	// Update not unique widget orders:
+						$DB->query( 'UPDATE T_widget
+								SET   wi_order = wi_order + 1
+								WHERE wi_ID = '.$update_order_widgets[ $w ] );
+					}
+				}
+			}
+		}
+		if( count( $item_tags_widget_rows ) )
+		{	// Insert new widgets "Item Tags" into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
+			  VALUES '.implode( ', ', $item_tags_widget_rows ) );
+		}
+		$DB->commit();
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12090, 'Creating table for Hits aggregations...' ) )
+	{	// part of 6.8.0-alpha
+		db_create_table( 'T_hits__aggregate', "
+			hagg_ID           INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			hagg_date         DATE NOT NULL DEFAULT '2000-01-01',
+			hagg_coll_ID      INT(11) UNSIGNED NULL DEFAULT NULL,
+			hagg_type         ENUM('standard','rss','admin','ajax', 'service', 'api') COLLATE ascii_general_ci DEFAULT 'standard' NOT NULL,
+			hagg_referer_type ENUM('search','special','spam','referer','direct','self') COLLATE ascii_general_ci NOT NULL,
+			hagg_agent_type   ENUM('robot','browser','unknown') COLLATE ascii_general_ci DEFAULT 'unknown' NOT NULL,
+			hagg_count        INT(11) UNSIGNED NOT NULL,
+			PRIMARY KEY       (hagg_ID),
+			UNIQUE            hagg_date_coll_ID_types (hagg_date, hagg_coll_ID, hagg_type, hagg_referer_type, hagg_agent_type)",
+			'ENGINE = myisam');
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12095, 'Creating table for aggregations of hit sessions...' ) )
+	{	// part of 6.8.0-alpha
+		db_create_table( 'T_hits__aggregate_sessions', "
+			hags_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			hags_date          DATE NOT NULL DEFAULT '2000-01-01',
+			hags_coll_ID       INT(11) UNSIGNED NULL DEFAULT NULL,
+			hags_count_browser INT(11) UNSIGNED NOT NULL DEFAULT 0,
+			hags_count_api     INT(11) UNSIGNED NOT NULL DEFAULT 0,
+			PRIMARY KEY        (hags_ID),
+			UNIQUE             hags_date_coll_ID (hags_date, hags_coll_ID)",
+			'ENGINE = myisam' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12100, 'Update widget container "Item Single" by adding "Item Location" widget...' ) )
+	{ // part of 6.8.0-alpha
+		$DB->begin();
+		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
+		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_code, wi_order' );
+		$SQL->FROM( 'T_widget' );
+		$SQL->WHERE( 'wi_sco_name = "Item Single"' );
+		$SQL->ORDER_BY( 'wi_coll_ID, wi_order' );
+		$coll_item_single_widgets = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+		$coll_widgets = array();
+		$coll_attachments_widget = array();
+		foreach( $coll_item_single_widgets as $coll_item_single_widget )
+		{
+			if( ! isset( $coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] ) )
+			{	// If the "Item Single" has no widget "Item Content":
+				$coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] = 1;
+			}
+			if( $coll_item_single_widget['wi_code'] == 'item_content' && ! in_array( $coll_item_single_widget['wi_coll_ID'], $coll_attachments_widget ) )
+			{ // If the "Item Single" contains widget "Item Content" then take order of this widget
+				$coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] = $coll_item_single_widget['wi_order'] + 1;
+			}
+			if( $coll_item_single_widget['wi_code'] == 'item_attachments' )
+			{ // If the "Item Single" contains widget "Item Attachments" then take order of this widget
+				$coll_attachments_widget[] = $coll_item_single_widget['wi_coll_ID'];
+				$coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] = $coll_item_single_widget['wi_order'] + 1;
+			}
+		}
+
+		$item_locations_widget_rows = array();
+		foreach( $coll_widgets as $coll_ID => $widget_order )
+		{	// Insert new widget "Item Location" to each collection that has a container "Item Single":
+			$item_locations_widget_rows[] = '( '.$coll_ID.', "Item Single", '.$widget_order.', "item_location" )';
+			// Check and update not unique widget orders:
+			$not_unique_widget_ID = $DB->get_var( 'SELECT wi_ID
+				 FROM T_widget
+				WHERE wi_coll_ID = '.$coll_ID.'
+					AND wi_sco_name = "Item Single"
+					AND wi_order = '.$widget_order );
+			if( $not_unique_widget_ID > 0 )
+			{	// The collection has not unique widget order:
+				$update_order_widgets = array();
+				foreach( $coll_item_single_widgets as $coll_item_single_widget )
+				{
+					if( $coll_item_single_widget['wi_coll_ID'] == $coll_ID && $coll_item_single_widget['wi_order'] >= $widget_order )
+					{	// Increase a widget order to avoid mysql errors of duplicate entry:
+						$update_order_widgets[] = $coll_item_single_widget['wi_ID'];
+					}
+				}
+				for( $w = count( $update_order_widgets ) - 1; $w >= 0 ; $w-- )
+				{	// Update not unique widget orders:
+					$DB->query( 'UPDATE T_widget
+							SET   wi_order = wi_order + 1
+							WHERE wi_ID = '.$update_order_widgets[ $w ] );
+				}
+			}
+		}
+		if( count( $item_locations_widget_rows ) )
+		{	// Insert new widgets "Item Locations" into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
+			  VALUES '.implode( ', ', $item_locations_widget_rows ) );
+		}
+		$DB->commit();
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12105, 'Upgrade items table...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( "ALTER TABLE T_items__item
+			MODIFY post_status ENUM('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NOT NULL DEFAULT 'draft'" );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12110, 'Upgrade comments table...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( "ALTER TABLE T_comments
+			MODIFY comment_status ENUM('published','community','deprecated','protected','private','review','draft','trash') COLLATE ascii_general_ci DEFAULT 'draft' NOT NULL" );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12115, 'Upgrading collections table...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_blogs
+			MODIFY blog_type VARCHAR( 16 ) COLLATE ascii_general_ci DEFAULT "std" NOT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12120, 'Upgrade locales table...' ) )
+	{ // part of 6.8.0-alpha
+		db_add_col( 'T_locales', 'loc_longdatefmt', 'varchar(20) COLLATE ascii_general_ci NOT NULL default "Y-m-d" AFTER loc_datefmt' );
+		db_add_col( 'T_locales', 'loc_extdatefmt', 'varchar(20) COLLATE ascii_general_ci NOT NULL default "Y M d" AFTER loc_longdatefmt' );
+
+		// Update existing locales
+		$DB->query( 'UPDATE T_locales	SET loc_longdatefmt = REPLACE( loc_datefmt, "y", "Y")' );
+		$DB->query( 'UPDATE T_locales	SET loc_extdatefmt = REPLACE( REPLACE( REPLACE( REPLACE( REPLACE( loc_longdatefmt, "m", "M"), ".", " " ), "-", " " ), "/", " "), "\\\\", " ")' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12125, 'Upgrade locales table...' ) )
+	{	// part of 6.8.0-alpha
+		db_add_col( 'T_locales', 'loc_input_datefmt', 'varchar(20) COLLATE ascii_general_ci NOT NULL default "Y-m-d" AFTER loc_extdatefmt' );
+		db_add_col( 'T_locales', 'loc_input_timefmt', 'varchar(20) COLLATE ascii_general_ci NOT NULL default "H:i:s" AFTER loc_shorttimefmt' );
+
+		// Allow only numeric date formats:
+		$DB->begin();
+		$SQL = new SQL( 'Get all short date formats"' );
+		$SQL->SELECT( 'loc_locale, loc_datefmt, loc_timefmt' );
+		$SQL->FROM( 'T_locales' );
+		$locales = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+
+		foreach( $locales as $loc_data )
+		{
+			$loc_data_datefmt = $loc_data['loc_datefmt'];
+
+			if( preg_match( '/[^dDjmnYy:\.,\-_\/\\\\ ]/', $loc_data_datefmt ) )
+			{	// If locale date format contains at least one invalid character then use default date format:
+				$loc_data_datefmt = 'Y-m-d';
+			}
+
+			$DB->query( 'UPDATE T_locales
+				  SET loc_input_datefmt = '.$DB->quote( $loc_data_datefmt ).',
+				      loc_input_timefmt = "H:i:s"
+				WHERE loc_locale = '.$DB->quote( $loc_data['loc_locale'] ) );
+		}
+		$DB->commit();
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12130, 'Create new widget container "Item Single Header"...' ) )
+	{ // part of 6.8.0-alpha
+		$DB->begin();
+		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
+		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_order, wi_enabled, wi_code, wi_params, blog_type' );
+		$SQL->FROM( 'T_widget' );
+		$SQL->FROM_add( 'LEFT JOIN T_blogs ON blog_id = wi_coll_ID' );
+		$SQL->WHERE( 'wi_sco_name = "Item Single"' );
+		$SQL->ORDER_BY( 'wi_coll_ID, wi_order' );
+		$coll_item_single_widgets = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+		$coll_widgets = array();
+		foreach( $coll_item_single_widgets as $coll_item_single_widget )
+		{
+			if( ! isset( $coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] ) )
+			{	// If the "Item Single" has no widget "Item Content":
+				$coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] = $coll_item_single_widget['blog_type'];
+			}
+		}
+
+		$item_info_line_widget_rows = array();
+		foreach( $coll_widgets as $coll_ID => $blog_type )
+		{	// Insert new widget "Item Info Line" to each collection that has a container "Item Single":
+			if( in_array( $blog_type, array( 'forum', 'group' ) ) )
+			{
+				$item_info_line_widget_rows[] = '( '.$coll_ID.', "Item Single Header", 10, "item_info_line", "a:14:{s:5:\"title\";s:0:\"\";s:9:\"flag_icon\";i:1;s:14:\"permalink_icon\";i:0;s:13:\"before_author\";s:10:\"started_by\";s:11:\"date_format\";s:8:\"extended\";s:9:\"post_time\";i:1;s:12:\"last_touched\";i:1;s:8:\"category\";i:0;s:9:\"edit_link\";i:0;s:16:\"widget_css_class\";s:0:\"\";s:9:\"widget_ID\";s:0:\"\";s:16:\"allow_blockcache\";i:0;s:11:\"time_format\";s:4:\"none\";s:12:\"display_date\";s:12:\"date_created\";}" )';
+			}
+			else
+			{
+				$item_info_line_widget_rows[] = '( '.$coll_ID.', "Item Single Header", 10, "item_info_line", NULL )';
+			}
+		}
+		if( count( $item_info_line_widget_rows ) )
+		{	// Insert new widget "Item Info Line" into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code, wi_params )
+			  VALUES '.implode( ', ', $item_info_line_widget_rows ) );
+		}
+		$DB->commit();
 		upg_task_end();
 	}
 

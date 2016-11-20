@@ -391,7 +391,7 @@ div.delete_messages ul {
 .vote_spam {
 	float: left;
 	padding-left: 10px;
-	line-height: 33px;
+	line-height: 34px;
 	a.action_icon {
 		font-size: inherit;
 		.icon {
@@ -404,6 +404,12 @@ div.delete_messages ul {
 	a.action_icon {
 		font-size: 12px;
 	}
+}
+.comment_reply {
+	float: left;
+	display: inline-block;
+	margin-left: 10px;
+	line-height: 34px;
 }
 // Status banner
 .evo_content_block span[class*="status_"] {
@@ -656,7 +662,7 @@ fieldset ul {
 		display: block;
 	}
 }
-#itemform_adv_props {
+#itemform_adv_props, #itemform_custom_fields {
 	div.tile, div.controls {
 		width: 100%;
 	}
@@ -672,6 +678,8 @@ fieldset ul {
 		font-weight: normal;
 		display: block;
 	}
+}
+#itemform_adv_props {
 	ul.token-input-list-facebook {
 		width: 100%;
 		max-width: 100%;
@@ -691,7 +699,7 @@ fieldset ul {
 		display: inline-block;
 	}
 }
-#itemform_links, #cmntform_links {
+#itemform_links, #cmntform_links, #ecmpform_links, #msgform_links {
 	.panel {
 		overflow: hidden;
 	}
@@ -699,19 +707,25 @@ fieldset ul {
 		padding: 0;
 	}
 }
+#msgform_links {
+	margin-bottom: 20px;
+}
 #itemform_goals td {
 	padding-bottom: 2px;
 }
 
 // Attachments / links
-#attachmentframe_wrapper {
+#attachments_fieldset_wrapper {
 	width: 100%;
 	height: 160px;
 	position: relative;
-	overflow: hidden;
 	padding-bottom: 6px;
 	box-sizing: content-box;
- .ui-resizable-s {
+	#attachments_fieldset_block {
+		overflow: auto;
+		height: 100%;
+	}
+	.ui-resizable-s {
 		background: #c0c0c0;
 		height: 6px;
 		bottom: 0;
@@ -724,12 +738,18 @@ fieldset ul {
 			display: block;
 		}
 	}
-	#attachmentframe_disabler {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
+	.table_scroll {
+		// Use this position to fix red triangle when attachment is dragged by mouse:
+		position: relative;
+	}
+	table tbody {
+		.dragged {
+			opacity: 0.8;
+			position: absolute;
+		}
+		td {
+			cursor: move;
+		}
 	}
 }
 #filelist_tbody {
@@ -1627,4 +1647,18 @@ table.diff {
 }
 .evo_checkbox_status__meta {
 	background-color: @status_color_meta;
+}
+
+// Aggregate filter form:
+.evo_aggregate_filter {
+	white-space: nowrap;
+	label {
+		padding-top: 5px;
+		padding-right: 5px;
+		width: auto;
+	}
+	select {
+		display: inline;
+		width: auto;
+	}
 }

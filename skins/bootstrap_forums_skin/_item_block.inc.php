@@ -96,19 +96,22 @@ skin_widget( array(
 				'after'     => '</h2>',
 				'link_type' => 'permalink'
 			) );
-				// Author info:
-				echo '<div class="ft_author_info">'.T_('Thread started by');
-				$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
-				echo ', '.mysql2date( 'D M j, Y H:i', $Item->datecreated );
-				echo '<span class="text-muted"> &ndash; '
-						.T_('Last touched:').' '.mysql2date( 'D M j, Y H:i', $Item->get( 'last_touched_ts' ) )
-					.'</span>';
-				echo '</div>';
-				// Author info - shrinked:
-				echo '<div class="ft_author_info shrinked">'.T_('Started by');
-				$Item->author( array( 'link_text' => 'auto', 'after' => '' ) );
-				echo ', '.mysql2date( 'm/j/y', $Item->datecreated );
-				echo '</div>';
+
+		// ------------------------- "Item Single - Header" CONTAINER EMBEDDED HERE --------------------------
+		// Display container contents:
+		skin_container( /* TRANS: Widget container name */ NT_('Item Single Header'), array(
+			'widget_context' => 'item',	// Signal that we are displaying within an Item
+			// The following (optional) params will be used as defaults for widgets included in this container:
+			// This will enclose each widget in a block:
+			'block_start' => '<div class="$wi_class$">',
+			'block_end' => '</div>',
+			// This will enclose the title of each widget:
+			'block_title_start' => '<h3>',
+			'block_title_end' => '</h3>',
+
+			'author_link_text' => $params['author_link_text'],
+		) );
+		// ----------------------------- END OF "Item Single - Header" CONTAINER -----------------------------
 		?>
 	</div>
 
@@ -130,7 +133,7 @@ skin_widget( array(
 						$Item->issue_time( array(
 								'before'      => '<span class="text-muted">',
 								'after'       => '</span> &nbsp; &nbsp; ',
-								'time_format' => 'M j, Y H:i',
+								'time_format' => locale_extdatefmt().' '.locale_shorttimefmt(),
 							) );
 					?>
 				</h4>
@@ -140,7 +143,7 @@ skin_widget( array(
 						{ // Status banner
 							echo '<div class="cell2">';
 							$Item->format_status( array(
-									'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+									'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 								) );
 							$legend_statuses[] = $Item->status;
 							echo '</div>';
@@ -179,6 +182,19 @@ skin_widget( array(
 						'widget_item_tags_separator' => ' ',
 						// Params for skin file "_item_content.inc.php"
 						'widget_item_content_params' => $params,
+						// Template params for "Item Attachments" widget:
+						'widget_item_attachments_params' => array(
+								'limit_attach'       => 1000,
+								'before'             => '<div class="evo_post_attachments"><h3>'.T_('Attachments').':</h3><ul class="evo_files">',
+								'after'              => '</ul></div>',
+								'before_attach'      => '<li class="evo_file">',
+								'after_attach'       => '</li>',
+								'before_attach_size' => ' <span class="evo_file_size">(',
+								'after_attach_size'  => ')</span>',
+							),
+						// Template params for "Item Tags" widget
+						'widget_item_tags_before'    => '<nav class="small post_tags">',
+						'widget_item_tags_after'     => '</nav>',
 					) );
 					// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 					?>
@@ -192,7 +208,7 @@ skin_widget( array(
 					// Note: You can customize the default item content by copying the generic
 					// /skins/_item_content.inc.php file into the current skin folder.
 					// -------------------------- END OF POST CONTENT -------------------------
-					
+
 					if( ! $Item->is_intro() )
 					{ // List all tags attached to this topic:
 						$Item->tags( array(
@@ -206,7 +222,7 @@ skin_widget( array(
 			</div>
 		</div><!-- ../panel-body -->
 
-		<div class="panel-footer clearfix">
+		<div class="panel-footer clearfix small">
 		<a href="<?php echo $Item->get_permanent_url(); ?>#skin_wrapper" class="to_top"><?php echo T_('Back to top'); ?></a>
 		<?php
 			// Check if BBcode plugin is enabled for current blog
@@ -224,6 +240,10 @@ skin_widget( array(
 			{	// Display button to quote this post
 				echo '<a href="'.$Item->get_permanent_url().'?mode=quote&amp;qp='.$Item->ID.'#form_p'.$Item->ID.'" title="'.T_('Reply with quote').'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
 			}
+
+			// Display a panel with voting buttons for item:
+			$Skin->display_item_voting_panel( $Item );
+
 			echo '<div class="floatright">';
 			$Item->edit_link( array(
 					'before' => ' ',

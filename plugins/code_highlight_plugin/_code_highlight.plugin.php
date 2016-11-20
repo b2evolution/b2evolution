@@ -192,13 +192,13 @@ class code_highlight_plugin extends Plugin
 			if( !empty( $Comment->item_ID ) )
 			{
 				$comment_Item = & $Comment->get_Item();
-				$Blog = & $comment_Item->get_Blog();
+				$Collection = $Blog = & $comment_Item->get_Blog();
 			}
 		}
 
 		if( empty( $Blog ) )
 		{ // Comment is not set, try global Blog
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{ // We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available
 				return false;
@@ -210,7 +210,7 @@ class code_highlight_plugin extends Plugin
 		&& ( ( is_logged_in() && $this->UserSettings->get( 'display_toolbar' ) )
 			|| ( !is_logged_in() && $this->Settings->get( 'toolbar_default' ) ) ) )
 		{
-			return $this->DisplayCodeToolbar();
+			return $this->DisplayCodeToolbar( $params );
 		}
 		return false;
 	}
@@ -229,7 +229,7 @@ class code_highlight_plugin extends Plugin
 		&& ( ( is_logged_in() && $this->UserSettings->get( 'display_toolbar' ) )
 			|| ( !is_logged_in() && $this->Settings->get( 'toolbar_default' ) ) ) )
 		{
-			return $this->DisplayCodeToolbar();
+			return $this->DisplayCodeToolbar( $params );
 		}
 		return false;
 	}
@@ -248,7 +248,7 @@ class code_highlight_plugin extends Plugin
 		&& ( ( is_logged_in() && $this->UserSettings->get( 'display_toolbar' ) )
 			|| ( !is_logged_in() && $this->Settings->get( 'toolbar_default' ) ) ) )
 		{
-			return $this->DisplayCodeToolbar();
+			return $this->DisplayCodeToolbar( $params );
 		}
 		return false;
 	}
@@ -267,12 +267,12 @@ class code_highlight_plugin extends Plugin
 		if( !empty( $params['Item'] ) )
 		{	// Item is set, get Blog from post
 			$edited_Item = & $params['Item'];
-			$Blog = & $edited_Item->get_Blog();
+			$Collection = $Blog = & $edited_Item->get_Blog();
 		}
 
 		if( empty( $Blog ) )
 		{	// Item is not set, try global Blog
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available
 				return false;
@@ -284,34 +284,43 @@ class code_highlight_plugin extends Plugin
 		{	// This plugin is disabled for this blog or user doesn't want the toolbar, don't display it:
 			return false;
 		}
-		$this->DisplayCodeToolbar();
+		$this->DisplayCodeToolbar( $params );
 	}
 
 
-	function DisplayCodeToolbar()
+	/**
+	 * Display toolbar
+	 *
+	 * @param array Params
+	 */
+	function DisplayCodeToolbar( $params = array() )
 	{
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
+		$params = array_merge( array(
+				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
+			), $params );
+
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 
 		// TODO: dh> make this optional.. just like with line numbers, this "Code" line is not feasible with oneliners.
 		echo $this->get_template( 'toolbar_title_before' ).T_('Code').': '.$this->get_template( 'toolbar_title_after' );
 		echo $this->get_template( 'toolbar_group_before' );
-		echo '<input type="button" id="code_samp" title="'.T_('Insert &lt;samp&gt; tag').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="code_tag|samp" value="samp" />';
-		echo '<input type="button" id="code_kbd" title="'.T_('Insert &lt;kbd&gt; tag').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="code_tag|kbd" value="kbd" />';
-		echo '<input type="button" id="code_var" title="'.T_('Insert &lt;var&gt; tag').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="code_tag|var" value="var" />';
-		echo '<input type="button" id="code_code" title="'.T_('Insert &lt;code&gt; tag').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="code_tag|code" value="code" />';
+		echo '<input type="button" id="code_samp" title="'.T_('Insert &lt;samp&gt; tag').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'code_tag|samp" value="samp" />';
+		echo '<input type="button" id="code_kbd" title="'.T_('Insert &lt;kbd&gt; tag').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'code_tag|kbd" value="kbd" />';
+		echo '<input type="button" id="code_var" title="'.T_('Insert &lt;var&gt; tag').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'code_tag|var" value="var" />';
+		echo '<input type="button" id="code_code" title="'.T_('Insert &lt;code&gt; tag').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'code_tag|code" value="code" />';
 		echo $this->get_template( 'toolbar_group_after' );
 
 		echo $this->get_template( 'toolbar_group_before' );
-		echo '<input type="button" id="codespan" title="'.T_('Insert codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codespan_tag| " value="codespan" />';
+		echo '<input type="button" id="codespan" title="'.T_('Insert codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'codespan_tag| " value="codespan" />';
 		echo $this->get_template( 'toolbar_group_after' );
 
 		echo $this->get_template( 'toolbar_group_before' );
-		echo '<input type="button" id="codeblock" title="'.T_('Insert codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codeblock_tag| " value="codeblock" />';
-		echo '<input type="button" id="codeblock_xml" title="'.T_('Insert XML codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codeblock_tag|xml" value="XML" />';
-		echo '<input type="button" id="codeblock_html" title="'.T_('Insert HTML codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codeblock_tag|html" value="HTML" />';
-		echo '<input type="button" id="codeblock_php" title="'.T_('Insert PHP codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codeblock_tag|php" value="PHP" />';
-		echo '<input type="button" id="codeblock_css" title="'.T_('Insert CSS codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codeblock_tag|css" value="CSS" />';
-		echo '<input type="button" id="codeblock_shell" title="'.T_('Insert Shell codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="codeblock_tag|shell" value="Shell" />';
+		echo '<input type="button" id="codeblock" title="'.T_('Insert codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'codeblock_tag| " value="codeblock" />';
+		echo '<input type="button" id="codeblock_xml" title="'.T_('Insert XML codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'codeblock_tag|xml" value="XML" />';
+		echo '<input type="button" id="codeblock_html" title="'.T_('Insert HTML codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'codeblock_tag|html" value="HTML" />';
+		echo '<input type="button" id="codeblock_php" title="'.T_('Insert PHP codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'codeblock_tag|php" value="PHP" />';
+		echo '<input type="button" id="codeblock_css" title="'.T_('Insert CSS codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'codeblock_tag|css" value="CSS" />';
+		echo '<input type="button" id="codeblock_shell" title="'.T_('Insert Shell codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'codeblock_tag|shell" value="Shell" />';
 		echo $this->get_template( 'toolbar_group_after' );
 
 		echo $this->get_template( 'toolbar_after' );
@@ -321,23 +330,23 @@ class code_highlight_plugin extends Plugin
 
 		?><script type="text/javascript">
 			//<![CDATA[
-			function code_tag( tag_name )
+			function <?php echo $params['js_prefix']; ?>code_tag( tag_name )
 			{
 				tag = '<' + tag_name + '>';
 
-				textarea_wrap_selection( b2evoCanvas, tag, '</' + tag_name + '>', 0 );
+				textarea_wrap_selection( <?php echo $params['js_prefix']; ?>b2evoCanvas, tag, '</' + tag_name + '>', 0 );
 			}
-			function codespan_tag( lang )
+			function <?php echo $params['js_prefix']; ?>codespan_tag( lang )
 			{
 				tag = '[codespan]';
 
-				textarea_wrap_selection( b2evoCanvas, tag, '[/codespan]', 0 );
+				textarea_wrap_selection( <?php echo $params['js_prefix']; ?>b2evoCanvas, tag, '[/codespan]', 0 );
 			}
-			function codeblock_tag( lang )
+			function <?php echo $params['js_prefix']; ?>codeblock_tag( lang )
 			{
 				tag = '[codeblock lang="'+lang+'" line="1"]';
 
-				textarea_wrap_selection( b2evoCanvas, tag, '[/codeblock]', 0 );
+				textarea_wrap_selection( <?php echo $params['js_prefix']; ?>b2evoCanvas, tag, '[/codeblock]', 0 );
 			}
 			//]]>
 		</script><?php
@@ -618,7 +627,7 @@ class code_highlight_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( ! isset( $Blog ) || (
 		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&

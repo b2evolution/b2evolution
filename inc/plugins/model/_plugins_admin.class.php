@@ -143,10 +143,16 @@ class Plugins_admin extends Plugins
 				'RenderItemAsHtml' => 'Renders content when generated as HTML.',
 				'RenderItemAsXml' => 'Renders content when generated as XML.',
 				'RenderItemAsText' => 'Renders content when generated as plain text.',
+				'PrepareForRenderItemAttachment' => 'Prepare to render item attachment.',
 				'RenderItemAttachment' => 'Renders item attachment.',
+				'PrepareForRenderCommentAttachment' => 'Prepare to render comment attachment.',
 				'RenderCommentAttachment' => 'Renders comment attachment.',
 				'RenderMessageAsHtml' => 'Renders message content when generated as HTML.',
+				'PrepareForRenderMessageAttachment' => 'Prepare to render message attachment.',
+				'RenderMessageAttachment' => 'Renders message attachment.',
 				'RenderEmailAsHtml' => 'Renders email content when generated as HTML.',
+				'PrepareForRenderEmailAttachment' => 'Prepare to render email campaign attachment.',
+				'RenderEmailAttachment' => 'Renders email campaign attachment.',
 				'RenderURL' => 'Renders file by URL.',
 
 
@@ -1496,7 +1502,7 @@ class Plugins_admin extends Plugins
 		if( !isset( $params['object_Blog'] ) &&
 		    ( !isset( $params['object_type'] ) || ( isset( $params['object_type'] ) && $params['object_type'] != 'Message' ) ) )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{
 				return false;

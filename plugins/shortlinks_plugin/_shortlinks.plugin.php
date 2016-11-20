@@ -468,12 +468,12 @@ class shortlinks_plugin extends Plugin
 		if( ! empty( $params['Item'] ) )
 		{	// Item is set, get Blog from post:
 			$edited_Item = & $params['Item'];
-			$Blog = & $edited_Item->get_Blog();
+			$Collection = $Blog = & $edited_Item->get_Blog();
 		}
 
 		if( empty( $Blog ) )
 		{	// Item is not set, try global Blog:
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available:
 				return false;
@@ -487,7 +487,7 @@ class shortlinks_plugin extends Plugin
 		}
 
 		// Print toolbar on screen:
-		return $this->DisplayCodeToolbar( $Blog );
+		return $this->DisplayCodeToolbar( $Blog, $params );
 	}
 
 
@@ -505,13 +505,13 @@ class shortlinks_plugin extends Plugin
 			if( ! empty( $Comment->item_ID ) )
 			{
 				$comment_Item = & $Comment->get_Item();
-				$Blog = & $comment_Item->get_Blog();
+				$Collection = $Blog = & $comment_Item->get_Blog();
 			}
 		}
 
 		if( empty( $Blog ) )
 		{	// Comment is not set, try global Blog:
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{	// We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available:
 				return false;
@@ -525,7 +525,7 @@ class shortlinks_plugin extends Plugin
 		}
 
 		// Print toolbar on screen
-		return $this->DisplayCodeToolbar( $Blog );
+		return $this->DisplayCodeToolbar( $Blog, $params );
 	}
 
 
@@ -577,6 +577,10 @@ class shortlinks_plugin extends Plugin
 			return false;
 		}
 
+		$params = array_merge( array(
+				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
+			), $params );
+
 		// Load js to work with textarea:
 		require_js( 'functions.js', 'blog', true, true );
 
@@ -588,24 +592,24 @@ class shortlinks_plugin extends Plugin
 
 		?><script type="text/javascript">
 		//<![CDATA[
-		function shortlinks_toolbar( title )
+		function shortlinks_toolbar( title, prefix )
 		{
 			var r = '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>'
 				+ '<?php echo $this->get_template( 'toolbar_group_before' ); ?>'
 
 				+ '<input type="button" title="<?php echo TS_('Link to a Post') ?>"'
 				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
-				+ ' data-func="shortlinks_load_window" value="<?php echo TS_('Link to a Post') ?>" />'
+				+ ' data-func="shortlinks_load_window|' + prefix + '" value="<?php echo TS_('Link to a Post') ?>" />'
 
 				+ '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
 
-				jQuery( '.<?php echo $this->code ?>_toolbar' ).html( r );
+				jQuery( '.' + prefix + '<?php echo $this->code ?>_toolbar' ).html( r );
 		}
 
 		/**
 		 * Load main modal window to select collection and posts
 		 */
-		function shortlinks_load_window()
+		function shortlinks_load_window( prefix )
 		{
 			openModalWindow( '<div id="shortlinks_wrapper"></div>', 'auto', '', true,
 				'<?php echo TS_('Link to a Post'); ?>', // Window title
@@ -613,7 +617,7 @@ class shortlinks_plugin extends Plugin
 				true );
 
 			// Load collections:
-			shortlinks_load_colls( '<?php echo empty( $Blog ) ? '' : $Blog->get( 'urlname' ); ?>' );
+			shortlinks_load_colls( '<?php echo empty( $Blog ) ? '' : $Blog->get( 'urlname' ); ?>', prefix );
 
 			// Set max-height to keep the action buttons on screen:
 			var modal_window = jQuery( '#shortlinks_wrapper' ).parent();
@@ -671,14 +675,21 @@ class shortlinks_plugin extends Plugin
 		 * @param string REST API path
 		 * @param string Object selector
 		 * @param function Function on success request
+		 * @param array Additional params
 		 */
-		function shortlinks_api_request( api_path, obj_selector, func )
+		function shortlinks_api_request( api_path, obj_selector, func, params )
 		{
 			shortlinks_start_loading( obj_selector );
 
+			if( typeof( params ) == 'undefined' )
+			{
+				params = {};
+			}
+
 			jQuery.ajax(
 			{
-				url: restapi_url + api_path
+				url: restapi_url + api_path,
+				data: params
 			} )
 			.then( func, function( jqXHR )
 			{	// Error request, Display the error data:
@@ -814,8 +825,9 @@ class shortlinks_plugin extends Plugin
 		 * Load all available collections for current user:
 		 *
 		 * @param string Current collection urlname
+		 * @param string Prefix to use several toolbars on one page
 		 */
-		function shortlinks_load_colls( current_coll_urlname )
+		function shortlinks_load_colls( current_coll_urlname, prefix )
 		{
 			shortlinks_api_request( 'collections', '#shortlinks_wrapper', function( data )
 			{	// Display the colllections on success request:
@@ -841,7 +853,22 @@ class shortlinks_plugin extends Plugin
 				r += '</select>'
 					+ '</div>'
 					+ '<div id="shortlinks_posts_block"></div>'
-					+ '<div id="shortlinks_post_block"></div>';
+					+ '<div id="shortlinks_post_block"></div>'
+					+ '<div id="shortlinks_post_form" style="display:none">'
+						+ '<input type="hidden" id="shortlinks_hidden_prefix" value="' + ( prefix ? prefix : '' ) + '" />'
+						+ '<input type="hidden" id="shortlinks_hidden_ID" />'
+						+ '<input type="hidden" id="shortlinks_hidden_cover_link" />'
+						+ '<input type="hidden" id="shortlinks_hidden_teaser_link" />'
+						+ '<input type="hidden" id="shortlinks_hidden_urltitle" />'
+						+ '<input type="hidden" id="shortlinks_hidden_title" />'
+						+ '<input type="hidden" id="shortlinks_hidden_excerpt" />'
+						+ '<p><label><input type="checkbox" id="shortlinks_form_full_cover" /> <?php echo TS_('Insert full cover image'); ?></label><p>'
+						+ '<p><label><input type="checkbox" id="shortlinks_form_title" checked="checked" /> <?php echo TS_('Insert title'); ?></label><p>'
+						+ '<p><label><input type="checkbox" id="shortlinks_form_thumb_cover" checked="checked" /> <?php echo TS_('Insert thumbnail of cover image'); ?></label><p>'
+						+ '<p><label><input type="checkbox" id="shortlinks_form_excerpt" checked="checked" /> <?php echo TS_('Insert excerpt'); ?></label><p>'
+						+ '<p><label><input type="checkbox" id="shortlinks_form_teaser" /> <?php echo TS_('Insert teaser'); ?></label><p>'
+						+ '<p><label><input type="checkbox" id="shortlinks_form_more" checked="checked" /> <?php echo TS_('Insert "Read more" link'); ?></label><p>'
+					+ '</div>';
 
 				shortlinks_end_loading( '#shortlinks_wrapper', r );
 
@@ -942,6 +969,11 @@ class shortlinks_plugin extends Plugin
 			} );
 		}
 
+	if( typeof( b2evo_shortlinks_plugin_initialized ) == 'undefined' )
+	{	// Initialize the code below only once:
+
+		b2evo_shortlinks_plugin_initialized = true;
+
 		// Load the posts of the selected collection:
 		jQuery( document ).on( 'change', '#shortlinks_colls_list select', function()
 		{
@@ -990,7 +1022,7 @@ class shortlinks_plugin extends Plugin
 			if( jQuery( '#shortlinks_post_block' ).data( 'post' ) == post_id )
 			{	// If user loads the same post, just display the cached content to save ajax calls:
 				// Show the action buttons:
-				jQuery( '#shortlinks_btn_back, #shortlinks_btn_insert' ).show();
+				jQuery( '#shortlinks_btn_back_to_list, #shortlinks_btn_insert' ).show();
 			}
 			else
 			{	// Load new post:
@@ -998,6 +1030,14 @@ class shortlinks_plugin extends Plugin
 				shortlinks_api_request( 'collections/' + coll_urlname + '/items/' + post_id, '#shortlinks_post_block', function( post )
 				{	// Display the post data on success request:
 					jQuery( '#shortlinks_post_block' ).data( 'post', post.id );
+
+					// Store item field values in hidden inputs to use on insert complex link:
+					jQuery( '#shortlinks_hidden_ID' ).val( post.id );
+					jQuery( '#shortlinks_hidden_urltitle' ).val( post.urltitle );
+					jQuery( '#shortlinks_hidden_title' ).val( post.title );
+					jQuery( '#shortlinks_hidden_excerpt' ).val( post.excerpt );
+					jQuery( '#shortlinks_hidden_cover_link' ).val( '' );
+					jQuery( '#shortlinks_hidden_teaser_link' ).val( '' );
 
 					// Item title:
 					var item_content = '<h2>' + post.title + '</h2>';
@@ -1015,6 +1055,14 @@ class shortlinks_plugin extends Plugin
 								)
 							{
 								item_content += '<img src="' + attachment.url + '" />';
+								if( attachment.position == 'teaser' && jQuery( '#shortlinks_hidden_teaser_link' ).val() == '' )
+								{	// Store link ID of first teaser image in hidden field to use on insert complex link:
+									jQuery( '#shortlinks_hidden_teaser_link' ).val( attachment.link_ID );
+								}
+							}
+							if( attachment.type == 'image' && attachment.position == 'cover' )
+							{	// Store link ID of cover image in hidden field to use on insert complex link:
+								jQuery( '#shortlinks_hidden_cover_link' ).val( attachment.link_ID );
 							}
 						}
 						item_content += '</div>';
@@ -1024,13 +1072,14 @@ class shortlinks_plugin extends Plugin
 
 					shortlinks_end_loading( '#shortlinks_post_block', item_content );
 
-					// Display the buttons to back and insert a post link to textarea
+					// Display the buttons to back and insert a post link to textarea:
 					var buttons_side_obj = jQuery( '.shortlinks_post_buttons' ).length ?
 						jQuery( '.shortlinks_post_buttons' ) :
 						jQuery( '#shortlinks_post_content' );
-					jQuery( '#shortlinks_btn_back, #shortlinks_btn_insert' ).remove();
-					buttons_side_obj.after( '<button id="shortlinks_btn_back" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
-						+ '<button id="shortlinks_btn_insert" data-urltitle="' + post.urltitle + '" class="btn btn-primary"><?php echo sprintf( TS_('Insert %s'), '[[\' + post.urltitle + \']]' ); ?></button>' );
+					jQuery( '#shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form' ).remove();
+					buttons_side_obj.after( '<button id="shortlinks_btn_back_to_list" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
+						+ '<button id="shortlinks_btn_insert" class="btn btn-primary"><?php echo sprintf( TS_('Insert %s'), '[[\' + post.urltitle + \']]' ); ?></button>'
+						+ '<button id="shortlinks_btn_form" class="btn btn-info"><?php echo TS_('Insert Complex Link'); ?></button>' );
 				} );
 			}
 
@@ -1046,19 +1095,215 @@ class shortlinks_plugin extends Plugin
 				tinyMCE.execCommand( 'mceFocus', false, tinyMCE.activeEditor.id );
 			}
 			// Insert tag text in area:
-			textarea_wrap_selection( b2evoCanvas, '[[' + jQuery( this ).data( 'urltitle' ) + ']]', '', 0 );
+			textarea_wrap_selection( window[ jQuery( '#shortlinks_hidden_prefix' ).val() + 'b2evoCanvas' ], '[[' + jQuery( '#shortlinks_hidden_urltitle' ).val() + ']]', '', 0 );
 			// Close main modal window:
 			closeModalWindow();
 		} );
 
-		// Back to previous list:
-		jQuery( document ).on( 'click', '#shortlinks_btn_back', function()
+		// Display a form to insert complex link:
+		jQuery( document ).on( 'click', '#shortlinks_btn_form', function()
 		{
-			// Show the lists of collectionss and posts:
+			var coll_urlname = jQuery( this ).data( 'urlname' );
+
+			// Hide the post preview block:
+			jQuery( '#shortlinks_post_block, #shortlinks_btn_insert' ).hide();
+
+			// Show the form to select options before insert complex link:
+			jQuery( '#shortlinks_post_form' ).show();
+
+			// Display the buttons to back and insert a complex link to textarea:
+			var buttons_side_obj = jQuery( '.shortlinks_post_buttons' ).length ?
+				jQuery( '.shortlinks_post_buttons' ) :
+				jQuery( '#shortlinks_post_content' );
+			jQuery( '#shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form' ).hide();
+			buttons_side_obj.after( '<button id="shortlinks_btn_back_to_post" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
+				+ '<button id="shortlinks_btn_insert_complex" class="btn btn-primary"><?php echo TS_('Insert Complex Link'); ?></button>' );
+
+			// To prevent link default event:
+			return false;
+		} );
+
+		// Insert complex link:
+		jQuery( document ).on( 'click', '#shortlinks_btn_insert_complex', function()
+		{
+			if( ! jQuery( 'input[id^=shortlinks_form_]' ).is( ':checked' ) )
+			{	// Display message if no item option checkbox is checked:
+				alert( '<?php echo TS_('Please select at least one item option to insert.'); ?>' );
+				return false;
+			}
+
+			var dest_type = false;
+			var dest_object_ID = false;
+			if( jQuery( 'input[type=hidden][name=p]' ).length )
+			{	// Item form:
+				dest_type = 'item';
+				dest_object_ID = jQuery( 'input[type=hidden][name=p]' ).val();
+			}
+			else if( jQuery( 'input[type=hidden][name=comment_ID]' ).length )
+			{	// Comment form:
+				dest_type = 'comment';
+				dest_object_ID = jQuery( 'input[type=hidden][name=comment_ID]' ).val();
+			}
+			else if( jQuery( 'input[type=hidden][name=ecmp_ID]' ).length )
+			{	// Email Campaign form:
+				dest_type = 'emailcampaign';
+				dest_object_ID = jQuery( 'input[type=hidden][name=ecmp_ID]' ).val();
+			}
+			else if( jQuery( 'input[type=hidden][name=thrd_ID]' ).length )
+			{	// Message form:
+				dest_type = 'message';
+				dest_object_ID = 0;
+			}/*
+			else if( jQuery( 'input[type=hidden][name=temp_link_owner_ID]' ).length )
+			{	// New object form:
+				dest_type = 'temporary';
+				dest_object_ID = jQuery( 'input[type=hidden][name=temp_link_owner_ID]' ).val();
+			}*/
+
+			// Check if at least one image is requested to insert:
+			var insert_images = ( jQuery( '#shortlinks_form_full_cover, #shortlinks_form_thumb_cover, #shortlinks_form_teaser' ).is( ':checked' ) &&
+			    jQuery( '#shortlinks_hidden_cover_link' ).val() != '' &&
+					jQuery( '#shortlinks_hidden_teaser_link' ).val() != '' );
+
+			if( insert_images && dest_type != false && dest_object_ID > 0 )
+			{	// We need to insert at least one image/file inline tag:
+				shortlinks_start_loading( '#shortlinks_post_block' );
+
+				var source_position = ( jQuery( '#shortlinks_form_full_cover, #shortlinks_form_thumb_cover' ).is( ':checked' ) ? 'cover' : '' )
+					+ ',' + ( jQuery( '#shortlinks_form_teaser' ).is( ':checked' ) ? 'teaser' : '' );
+
+				// Call REST API request to copy the links from the selected Item to the edited object:
+				evo_rest_api_request( 'links',
+				{
+					'action':           'copy',
+					'source_type':      'item',
+					'source_object_ID': jQuery( '#shortlinks_hidden_ID' ).val(),
+					'source_position':  source_position,
+					'dest_type':        dest_type,
+					'dest_object_ID':   dest_object_ID,
+					'dest_position':    'inline',
+					'limit_position':   1,
+				}, function( data )
+				{
+					var full_cover = '';
+					var thumb_cover = '';
+					var teasers = '';
+
+					for( var l in data.links )
+					{
+						var link = data.links[l];
+						if( link.orig_position == 'cover' )
+						{	// Build inline tags for cover image:
+							if( jQuery( '#shortlinks_form_full_cover' ).is( ':checked' ) )
+							{	// Full cover image:
+								full_cover = '[image:' + link.ID + ']';
+							}
+							if( jQuery( '#shortlinks_form_thumb_cover' ).is( ':checked' ) )
+							{	// Thumbnail cover image:
+								thumb_cover = '[thumbnail:' + link.ID + ']';
+							}
+						}
+						else if( link.orig_position == 'teaser' && jQuery( '#shortlinks_form_teaser' ).is( ':checked' ) )
+						{	// Build inline tags for teaser files:
+							teasers += "\r\n" + '[' + ( link.file_type == 'other' ? 'file' : link.file_type ) + ':' + link.ID + ']';
+						}
+					}
+					shortlinks_insert_complex_link( full_cover, thumb_cover, teasers );
+
+					shortlinks_end_loading( '#shortlinks_post_block', jQuery( '#shortlinks_post_block' ).html() );
+
+					// Refresh the attachments block after adding new links:
+					var refresh_attachments_button = jQuery( 'a[onclick*=evo_link_refresh_list]' );
+					if( refresh_attachments_button.length )
+					{
+						refresh_attachments_button.click();
+					}
+				} );
+			}
+			else
+			{	// Insert only simple text without images:
+				if( insert_images )
+				{	// Display this alert if user wants to insert image for new creating object:
+					alert( 'Please save your ' + dest_type + ' before trying to attach files. This limitation will be removed in a future version of b2evolution.' );
+				}
+				shortlinks_insert_complex_link();
+			}
+
+			// To prevent link default event:
+			return false;
+		} );
+
+		/*
+		 * Insert complex link data to content
+		 *
+		 * @param string Full cover image inline tag
+		 * @param string Thumbnail cover image inline tag
+		 * @param string Teaser image inline tags
+		 */
+		function shortlinks_insert_complex_link( full_cover, thumb_cover, teasers )
+		{
+			var post_content = '';
+
+			if( typeof( full_cover ) != 'undefined' && full_cover != '' )
+			{	// Full cover image:
+				post_content += "\r\n" + full_cover;
+			}
+			if( jQuery( '#shortlinks_form_title' ).is( ':checked' ) )
+			{	// Title:
+				post_content += "\r\n" + '## [[' + jQuery( '#shortlinks_hidden_urltitle' ).val() + ' ' + jQuery( '#shortlinks_hidden_title' ).val() + ']]';
+			}
+			if( typeof( thumb_cover ) != 'undefined' && thumb_cover != '' )
+			{	// Thumbnail cover image:
+				post_content += "\r\n" + thumb_cover;
+			}
+			if( jQuery( '#shortlinks_form_excerpt' ).is( ':checked' ) )
+			{	// Excerpt:
+				post_content += "\r\n" + jQuery( '#shortlinks_hidden_excerpt' ).val();
+			}
+			if( typeof( teasers ) != 'undefined' && teasers != '' )
+			{	// Teaser images:
+				post_content += teasers;
+			}
+			if( jQuery( '#shortlinks_form_more' ).is( ':checked' ) )
+			{	// "Read more" link:
+				post_content += "\r\n" + '[[' + jQuery( '#shortlinks_hidden_urltitle' ).val() + ' <?php echo TS_('Read more'); ?>...]]';
+			}
+			if( post_content != '' )
+			{
+				post_content = post_content + "\r\n\r\n";
+			}
+
+			if( typeof( tinyMCE ) != 'undefined' && typeof( tinyMCE.activeEditor ) != 'undefined' && tinyMCE.activeEditor )
+			{	// tinyMCE plugin is active now, we should focus cursor to the edit area:
+				tinyMCE.execCommand( 'mceFocus', false, tinyMCE.activeEditor.id );
+			}
+			// Insert tag text in area:
+			textarea_wrap_selection( window[ jQuery( '#shortlinks_hidden_prefix' ).val() + 'b2evoCanvas' ], post_content, '', 0 );
+			// Close main modal window:
+			closeModalWindow();
+		}
+
+		// Back to previous list:
+		jQuery( document ).on( 'click', '#shortlinks_btn_back_to_list', function()
+		{
+			// Show the lists of collections and posts:
 			jQuery( '#shortlinks_colls_list, #shortlinks_posts_block' ).show();
 
 			// Hide the post preview block and action buttons:
-			jQuery( '#shortlinks_post_block, #shortlinks_btn_back, #shortlinks_btn_insert' ).hide();
+			jQuery( '#shortlinks_post_block, #shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form' ).hide();
+
+			// To prevent link default event:
+			return false;
+		} );
+
+		// Back to previous post preview:
+		jQuery( document ).on( 'click', '#shortlinks_btn_back_to_post', function()
+		{
+			// Show the post preview block and action buttons:
+			jQuery( '#shortlinks_post_block, #shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form' ).show();
+
+			// Hide the post complex form and action buttons:
+			jQuery( '#shortlinks_btn_back_to_post, #shortlinks_btn_insert_complex, #shortlinks_post_form' ).hide();
 
 			// To prevent link default event:
 			return false;
@@ -1082,12 +1327,14 @@ class shortlinks_plugin extends Plugin
 			// To prevent link default event:
 			return false;
 		} );
+
+	}
 		//]]>
 		</script><?php
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script type="text/javascript">shortlinks_toolbar( '<?php echo TS_('Short Links:'); ?>' );</script><?php
+		?><script type="text/javascript">shortlinks_toolbar( '<?php echo TS_('Short Links:'); ?>', '<?php echo $params['js_prefix']; ?>' );</script><?php
 
 		return true;
 	}

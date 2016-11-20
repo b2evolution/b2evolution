@@ -237,7 +237,7 @@ switch( $action )
 				break;
 
 			case 'other':
-				/* Campaign sending: */
+				/* Campaign/Newsletter throttling: */
 
 				// Sending:
 				$Settings->set( 'email_campaign_send_mode', param( 'email_campaign_send_mode', 'string', 'immediate' ) );

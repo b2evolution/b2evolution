@@ -1045,7 +1045,7 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 			case "D": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_abbrev"])))).")";
 			case "e": // b2evo extension!
 				return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_letter"])))).")";
-			case "S": return "(st|nd|rd|th)"; // english suffix for day
+			case "S": return "(st|nd|rd|th)?"; // english suffix for day. Made optional as jQuery formatDate does not support this format.
 
 			case "m": return "([0-1]\\d)"; // month, 01-12
 			case "n": return "(1?\\d)"; // month, 1-12
@@ -1484,26 +1484,26 @@ function param_check_passwords( $var1, $var2, $required = false, $min_length = 6
 
 	if( ! strlen( $pass1 ) )
 	{
-		param_error( $var1, $params['msg_pass_new'] );
-		param_error( $var2, $params['msg_pass_twice'] );
+		param_error( $var1, '<span class="pass_check_new">'.$params['msg_pass_new'].'</span>' );
+		param_error( $var2, '<span class="pass_check_twice">'.$params['msg_pass_twice'].'</span>' );
 		return false;
 	}
 	if( ! strlen( $pass2 ) )
 	{
-		param_error( $var2, $params['msg_pass_twice'] );
+		param_error( $var2, '<span class="pass_check_twice">'.$params['msg_pass_twice'].'</span>' );
 		return false;
 	}
 
 	// checking the password has been typed twice the same:
 	if( $pass1 != $pass2 )
 	{
-		param_error_multiple( array( $var1, $var2 ), $params['msg_pass_diff'] );
+		param_error_multiple( array( $var1, $var2 ), '<span class="pass_check_diff">'.$params['msg_pass_diff'].'</span>' );
 		return false;
 	}
 
 	if( utf8_strlen( $pass1 ) < $min_length )
 	{ // Checking min length
-		param_error_multiple( array( $var1, $var2 ), sprintf( $params['msg_pass_min'], $min_length ) );
+		param_error_multiple( array( $var1, $var2 ), '<span class="pass_check_min">'.sprintf( $params['msg_pass_min'], $min_length ).'</span>' );
 		return false;
 	}
 
@@ -1582,10 +1582,16 @@ function param_get_error_msg( $var )
  * @param string param name
  * @param string|NULL error message (by using NULL you can only add an error to the field, but not the $Message object)
  * @param string|NULL error message for form field ($err_msg gets used if === NULL).
+ * @param string|NULL error message
  */
-function param_error( $var, $err_msg, $field_err_msg = NULL )
+function param_error( $var, $err_msg, $field_err_msg = NULL, $group_header = NULL )
 {
 	global $param_input_err_messages;
+
+	if( is_null( $group_header ) )
+	{
+		$group_header = T_('Validation errors:');
+	}
 
 	if( ! isset( $param_input_err_messages[$var] ) )
 	{ // We haven't already recorded an error for this field:
@@ -1597,7 +1603,7 @@ function param_error( $var, $err_msg, $field_err_msg = NULL )
 
 		if( isset($err_msg) )
 		{
-			param_add_message_to_Log( $var, $err_msg, 'error' );
+			param_add_message_to_Log( $var, $err_msg, 'error', $group_header );
 		}
 	}
 }
@@ -1643,7 +1649,7 @@ function param_error_multiple( $vars, $err_msg, $field_err_msg = NULL )
  * @param string param name
  * @param string error message
  */
-function param_add_message_to_Log( $var, $err_msg, $log_category = 'error' )
+function param_add_message_to_Log( $var, $err_msg, $log_category = 'error', $group_header = NULL )
 {
 	global $link_param_err_messages_to_field_IDs;
 	global $Messages;
@@ -1660,16 +1666,37 @@ function param_add_message_to_Log( $var, $err_msg, $log_category = 'error' )
 
 		if( substr($err_msg, 0, 4) == '</a>' )
 		{ // There was a link at the beginning of $err_msg: we do not prepend an emtpy link before it
-			$Messages->add( substr( $err_msg, 4 ).'</a>', $log_category );
+			if( empty( $group_header ) )
+			{
+				$Messages->add( substr( $err_msg, 4 ).'</a>', $log_category );
+			}
+			else
+			{
+				$Messages->add_to_group( substr( $err_msg, 4 ).'</a>', $log_category, $group_header );
+			}
 		}
 		else
 		{
-			$Messages->add( $start_link.$err_msg.'</a>', $log_category );
+			if( empty( $group_header ) )
+			{
+				$Messages->add( $start_link.$err_msg.'</a>', $log_category );
+			}
+			else
+			{
+				$Messages->add_to_group( $start_link.$err_msg.'</a>', $log_category, $group_header );
+			}
 		}
 	}
 	else
 	{
-		$Messages->add( $err_msg, $log_category );
+		if( empty( $group_header ) )
+		{
+			$Messages->add( $err_msg, $log_category );
+		}
+		else
+		{
+			$Messages->add_to_group( $err_msg, $log_category, $group_header );
+		}
 	}
 }
 
@@ -2408,7 +2435,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 				: sprintf( T_('Illegal content found: blacklisted word &laquo;%s&raquo;.'), htmlspecialchars($block) );
 		}
 
-		$Messages->add(	$errmsg, 'error' );
+		$Messages->add_to_group(	$errmsg, 'error', T_('Validation errors:') );
 	}
 
 	$content = trim( $content );
@@ -2452,7 +2479,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 		$css_tweaks_error = ( ( ! $allow_css_tweaks ) && preg_match( '#\s((style|class|id)\s*=)#i', $check, $matches ) );
 		if( $css_tweaks_error && $verbose )
 		{
-			$Messages->add( T_('Illegal CSS markup found: ').htmlspecialchars($matches[1]), 'error' );
+			$Messages->add_to_group( T_('Illegal CSS markup found: ').htmlspecialchars($matches[1]), 'error', T_('Validation errors:') );
 		}
 
 		// CHECK JAVASCRIPT:
@@ -2463,21 +2490,21 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 				|| preg_match( '#=["\'\s]*((javascript|vbscript|about):)#i', $check, $matches ) ) );
 		if( $javascript_error && $verbose )
 		{
-			$Messages->add( T_('Illegal javascript markup found: ').htmlspecialchars($matches[1]), 'error' );
+			$Messages->add_to_group( T_('Illegal javascript markup found: ').htmlspecialchars($matches[1]), 'error', T_('Validation errors:') );
 		}
 
 		// CHECK IFRAMES:
 		$iframe_error = ( ( ! $allow_iframes ) && preg_match( '~( < \s* //? \s* (frame|iframe) )~xi', $check, $matches ) );
 		if( $iframe_error && $verbose )
 		{
-			$Messages->add( T_('Illegal frame markup found: ').htmlspecialchars($matches[1]), 'error' );
+			$Messages->add_to_group( T_('Illegal frame markup found: ').htmlspecialchars($matches[1]), 'error', T_('Validation errors:') );
 		}
 
 		// CHECK OBJECTS:
 		$object_error = ( ( ! $allow_objects ) && preg_match( '~( < \s* //? \s* (applet|object|param|embed) )~xi', $check, $matches ) );
 		if( $object_error && $verbose )
 		{
-			$Messages->add( T_('Illegal object markup found: ').htmlspecialchars($matches[1]), 'error' );
+			$Messages->add_to_group( T_('Illegal object markup found: ').htmlspecialchars($matches[1]), 'error', T_('Validation errors:') );
 		}
 
 		// Set the final error value based on all of the results
@@ -2490,8 +2517,8 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 			&& ( ! empty( $Group ) ) // This one will basically prevent this case from happening when commenting
 			&& $User->check_perm( 'users', 'edit', false ) )
 		{
-			$Messages->add( sprintf( T_('(Note: To get rid of the above validation warnings, you can deactivate unwanted validation rules in your <a %s>Group settings</a>.)'),
-										'href="'.$admin_url.'?ctrl=groups&amp;grp_ID='.$Group->ID.'"' ), 'error' );
+			$Messages->add_to_group( sprintf( T_('To get rid of the above validation warnings, you can deactivate unwanted validation rules in your <a %s>Group settings</a>.'),
+										'href="'.$admin_url.'?ctrl=groups&amp;grp_ID='.$Group->ID.'"' ), 'error', T_('Validation errors:') );
 		}
 		return false;
 	}

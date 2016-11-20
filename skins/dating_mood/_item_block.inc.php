@@ -43,7 +43,7 @@ $params = array_merge( array(
 		if( $Item->status != 'published' )
 		{
 			$Item->format_status( array(
-					'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+					'template' => '<div class="floatright"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 				) );
 		}
 		$Item->permanent_link( array(
@@ -82,6 +82,7 @@ $params = array_merge( array(
 		// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
 		// Display container contents:
 		skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+			'widget_context' => 'item',	// Signal that we are displaying within an Item
 			// The following (optional) params will be used as defaults for widgets included in this container:
 			// This will enclose each widget in a block:
 			'block_start' => '<div class="$wi_class$">',
@@ -90,8 +91,8 @@ $params = array_merge( array(
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
 			// Template params for "Item Tags" widget
-			'widget_item_tags_before'    => '<div class="bSmallPrint">'.T_('Tags').': ',
-			'widget_item_tags_after'     => '</div>',
+			'widget_item_tags_before'    => '<nav class="small post_tags bSmallPrint">',
+			'widget_item_tags_after'     => '</nav>',
 			// Params for skin file "_item_content.inc.php"
 			'widget_item_content_params' => array( 'image_size' => 'fit-400x320' ),
 		) );

@@ -277,7 +277,7 @@ function get_allowed_statuses( $blog )
  */
 function echo_comment_buttons( $Form, $edited_Comment )
 {
-	global $Blog, $AdminUI;
+	global $Collection, $Blog, $AdminUI;
 
 	if( $edited_Comment->is_meta() )
 	{ // Meta comments don't have a status, Display only one button to update
@@ -309,7 +309,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
 			{ // Use dropdown for bootstrap skin
 				$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
 				$Form->hidden( 'comment_status', $edited_Comment->status );
-				echo '<div class="btn-group dropup comment_status_dropdown">';
+				echo '<div class="btn-group dropup comment_status_dropdown" data-toggle="tooltip" data-placement="top" data-container="body" title="'.get_status_tooltip_title( $edited_Comment->status ).'">';
 				echo '<button type="button" class="btn btn-status-'.$edited_Comment->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="comment_status_dropdown">'
 								.'<span>'.$status_options[ $edited_Comment->status ].'</span>'
 							.' <span class="caret"></span></button>';
@@ -355,7 +355,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
  */
 function echo_comment_status_buttons( $Form, $edited_Comment )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( $edited_Comment->is_meta() )
 	{	// Don't suggest to change a status of meta comment:
@@ -721,30 +721,43 @@ function save_comment_to_session( $Comment, $kind = 'unsaved', $type = '' )
  */
 function get_comment_from_session( $kind = 'unsaved', $type = '' )
 {
-	global $Session;
+	global $Session, $b2evo_session_comments;
 
 	if( $type != 'meta' )
 	{	// Use default type if it is not allowed:
 		$type = '';
 	}
 
-	if( ( $Comment = $Session->get( 'core.'.$kind.'_Comment'.$type ) ) && $Comment instanceof Comment )
-	{	// If Comment is detected for current Session:
+	$session_var_name = 'core.'.$kind.'_Comment'.$type;
 
-		// Delete Comment to clear Session data:
-		$Session->delete( 'core.'.$kind.'_Comment'.$type );
+	if( ! isset( $b2evo_session_comments[ $session_var_name ] ) )
+	{	// Set Comment to cache array:
+		if( ! is_array( $b2evo_session_comments ) )
+		{	// Initialize array for caching:
+			$b2evo_session_comments = array();
+		}
 
-		// Return Comment:
-		return $Comment;
+		if( ( $Comment = $Session->get( $session_var_name ) ) && $Comment instanceof Comment )
+		{	// If Comment is detected for current Session:
+
+			// Delete Comment to clear Session data:
+			$Session->delete( $session_var_name );
+		}
+		else
+		{	// Comment is not detected, Return NULL:
+			$Comment = NULL;
+		}
+
+		// Cache Comment in global var:
+		$b2evo_session_comments[ $session_var_name ] = $Comment;
 	}
 
-	// Comment is not detected, Return NULL:
-	return NULL;
+	return $b2evo_session_comments[ $session_var_name ];
 }
 
 
 /**
- * Dispay the replies of a comment
+ * Dispay the replies of a comment on front-office
  *
  * @param integer Comment ID
  * @param array Template params
@@ -820,13 +833,52 @@ function display_comment_replies( $comment_ID, $params = array(), $level = 1 )
 
 
 /**
+ * Dispay the replies of a comment on back-office
+ *
+ * @param integer Comment ID
+ * @param array Params
+ * @param integer Level
+ */
+function echo_comment_replies( $comment_ID, $params, $level = 1 )
+{
+	global $CommentReplies;
+
+	if( ! isset( $CommentReplies[ $comment_ID ] ) )
+	{	// This comment has no replies, Exit here:
+		return false;
+	}
+
+	$params = array_merge( array(
+			'redirect_to'        => NULL,
+			'save_context'       => false,
+			'comment_index'      => NULL,
+			'display_meta_title' => false,
+		), $params );
+
+	foreach( $CommentReplies[ $comment_ID ] as $Comment )
+	{	// Loop through the replies:
+
+		// Display a comment:
+		echo_comment( $Comment, $params['redirect_to'], $params['save_context'], $params['comment_index'], $params['display_meta_title'], $level );
+		if( $params['comment_index'] !== false )
+		{	// Decrease a comment index only when it is requested:
+			$params['comment_index']--;
+		}
+
+		// Display the rest replies recursively:
+		echo_comment_replies( $Comment->ID, $params, $level + 1 );
+	}
+}
+
+
+/**
  * JS Behaviour: Output JavaScript code to reply the comments
  *
  * @param object Item
  */
 function echo_comment_reply_js( $Item )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( !isset( $Blog ) )
 	{
@@ -890,7 +942,7 @@ function echo_comment_moderate_js()
 		return false;
 	}
 
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( empty( $Blog ) )
 	{
@@ -964,7 +1016,7 @@ function comment_mass_delete_process( $mass_type, $deletable_comments_query )
 		return;
 	}
 
-	global $DB, $cache_comments_has_replies, $user_post_read_statuses, $cache_postcats;
+	global $DB, $cache_comments_has_replies, $cache_items_user_data, $cache_postcats;
 
 	/**
 	 * Disable log queries because it increases the memory and stops the process with error "Allowed memory size of X bytes exhausted..."
@@ -1010,7 +1062,7 @@ function comment_mass_delete_process( $mass_type, $deletable_comments_query )
 			$ItemCache->clear();
 			$ChapterCache->clear();
 			$cache_comments_has_replies = array();
-			$user_post_read_statuses = array();
+			$cache_items_user_data = array();
 			$cache_postcats = array();
 
 			// Get new portion of deletable comments

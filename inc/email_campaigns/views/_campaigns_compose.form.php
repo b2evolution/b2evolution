@@ -85,6 +85,19 @@ $Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCamp
 	}
 $Form->end_fieldset();
 
+
+// ####################### ATTACHMENTS/LINKS #########################
+if( isset( $GLOBALS['files_Module'] )
+	&& $current_User->check_perm( 'emails', 'edit' )
+	&& $current_User->check_perm( 'files', 'view' ) )
+{	// Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files:
+	load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
+	global $LinkOwner; // Initialize this object as global because this is used in many link functions
+	$LinkOwner = new LinkEmailCampaign( $edited_EmailCampaign );
+	display_attachments_fieldset( $Form, $LinkOwner );
+}
+
+
 $buttons = array();
 if( $current_User->check_perm( 'emails', 'edit' ) )
 { // User must has a permission to edit emails

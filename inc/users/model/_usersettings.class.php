@@ -45,6 +45,7 @@ class UserSettings extends AbstractSettings
 
 		// Folding settings, 1 - Hide, 0 - Show
 		'fold_itemform_links' => 1,
+		'fold_itemform_custom_fields' => 1,
 		'fold_itemform_googlemap' => 1,
 		'fold_itemform_meta_cmnt' => 1,
 		'fold_itemform_extra' => 1,
@@ -111,6 +112,8 @@ class UserSettings extends AbstractSettings
 		'admin_skin' => 'bootstrap',  // User default admin skin
 
 		'suggest_item_tags' => 1, // Suggest to autocomplete item tags on edit form
+
+		'agg_period' => 'last_30_days', // Date period to filter the aggregated hits data
 	);
 
 	/**
@@ -322,7 +325,7 @@ class UserSettings extends AbstractSettings
 	{
 		if( $coll_ID === NULL )
 		{ // Use current blog ID by default
-			global $Blog;
+			global $Collection, $Blog;
 
 			if( ! empty( $Blog ) )
 			{

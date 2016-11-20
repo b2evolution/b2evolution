@@ -140,6 +140,16 @@ class msg_menu_link_Widget extends ComponentWidget
 					'defaultvalue' => '',
 					'disabled' => $msg_Blog ? 'disabled' : false,
 				),
+				'visibility' => array(
+					'label' => T_( 'Visibility' ),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'always', T_( 'Always show (cacheable)') ),
+							array( 'access', T_( 'Only show if access is allowed (not cacheable)' ) ) ),
+					'defaultvalue' => 'always',
+					'field_lines' => true,
+				),
 				'show_to' => array(
 					'label' => T_( 'Show to' ),
 					'note' => '',
@@ -215,13 +225,18 @@ class msg_menu_link_Widget extends ComponentWidget
 
 		if( empty( $current_Blog ) )
 		{ // Blog is not defined in setting or it doesn't exist in DB
-			global $Blog;
+			global $Collection, $Blog;
 			// Use current blog
 			$current_Blog = & $Blog;
 		}
 
 		if( empty( $current_Blog ) )
 		{ // Don't use this widget without current collection:
+			return false;
+		}
+
+		if( $this->disp_params['visibility'] == 'access' && ! $current_Blog->has_access() )
+		{	// Don't use this widget because current user has no access to the collection:
 			return false;
 		}
 

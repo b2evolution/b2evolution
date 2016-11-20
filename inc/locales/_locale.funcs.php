@@ -394,6 +394,63 @@ function locale_datefmt( $locale = NULL )
 
 
 /**
+ * Returns the current locale's default long date format
+ * @param string Locale, must be set in {@link $locales}
+ * @return string Date format of the locale, e.g. 'd.m.Y'
+ */
+function locale_longdatefmt( $locale = NULL )
+{
+	global $locales;
+
+	if( empty($locale) )
+	{
+		global $current_locale;
+		$locale = $current_locale;
+	}
+
+	return $locales[$locale]['longdatefmt'];
+}
+
+
+/**
+ * Returns the current locale's default extended date format
+ * @param string Locale, must be set in {@link $locales}
+ * @return string Date format of the locale, e.g. 'd.m.Y'
+ */
+function locale_extdatefmt( $locale = NULL )
+{
+	global $locales;
+
+	if( empty($locale) )
+	{
+		global $current_locale;
+		$locale = $current_locale;
+	}
+
+	return $locales[$locale]['extdatefmt'];
+}
+
+
+/**
+ * Returns the current locale's default input date format
+ * @param string Locale, must be set in {@link $locales}
+ * @return string Date format of the locale, e.g. 'd.m.Y'
+ */
+function locale_input_datefmt( $locale = NULL )
+{
+	global $locales;
+
+	if( empty($locale) )
+	{
+		global $current_locale;
+		$locale = $current_locale;
+	}
+
+	return $locales[$locale]['input_datefmt'];
+}
+
+
+/**
  * Returns the current locale's default time format
  */
 function locale_timefmt()
@@ -414,6 +471,7 @@ function locale_datetimefmt( $separator = ' ' )
 {
 	return locale_get( 'datefmt' ).$separator.locale_get( 'timefmt' );
 }
+
 
 /**
  * Returns the current locale's start of week
@@ -692,7 +750,7 @@ function locale_overwritefromDB()
 	$usedprios = array();  // remember which priorities are used already.
 	$priocounter = 0;
 	$query = 'SELECT
-						loc_locale, loc_datefmt, loc_timefmt, loc_shorttimefmt, loc_startofweek,
+						loc_locale, loc_datefmt, loc_longdatefmt, loc_extdatefmt, loc_input_datefmt, loc_timefmt, loc_shorttimefmt, loc_input_timefmt, loc_startofweek,
 						loc_name, loc_messages, loc_priority, loc_transliteration_map, loc_enabled
 						FROM T_locales ORDER BY loc_priority';
 
@@ -747,8 +805,12 @@ function locale_overwritefromDB()
 		$locales[ $row['loc_locale'] ] = array(
 				'charset'      => $loc_charset,
 				'datefmt'      => $row['loc_datefmt'],
+				'longdatefmt'  => $row['loc_longdatefmt'],
+				'extdatefmt'   => $row['loc_extdatefmt'],
+				'input_datefmt' => $row['loc_input_datefmt'],
 				'timefmt'      => $row['loc_timefmt'],
 				'shorttimefmt' => $row['loc_shorttimefmt'],
+				'input_timefmt' => $row['loc_input_timefmt'],
 				'startofweek'  => $row['loc_startofweek'],
 				'name'         => $row['loc_name'],
 				'messages'     => $row['loc_messages'],
@@ -875,13 +937,17 @@ function locale_updateDB()
 			{
 				param_error( $pkey, sprintf( T_('Locale %s date format cannot be empty'), $plocale ) );
 			}
+			elseif( $lfield == 'input_datefmt' && empty( $pval ) )
+			{
+				param_error( $pkey, sprintf( T_('Locale %s input date format cannot be empty'), $plocale ) );
+			}
 			elseif( $lfield == 'timefmt' && empty( $pval ) )
 			{
 				param_error( $pkey, sprintf( T_('Locale %s time format cannot be empty'), $plocale ) );
 			}
-			elseif( $lfield == 'shorttimefmt' && empty( $pval ) )
+			elseif( $lfield == 'input_timefmt' && empty( $pval ) )
 			{
-				param_error( $pkey, sprintf( T_('Locale %s short time format cannot be empty'), $plocale ) );
+				param_error( $pkey, sprintf( T_('Locale %s input time format cannot be empty'), $plocale ) );
 			}
 
 			if( $lfield == 'startofweek' && ( $pval < 0 || $pval > 6 ) )
@@ -959,7 +1025,9 @@ function locale_updateDB()
 		}
 	}
 
-	$query = "REPLACE INTO T_locales ( loc_locale, loc_datefmt, loc_timefmt, loc_shorttimefmt, loc_startofweek, loc_name, loc_messages, loc_priority, loc_transliteration_map, loc_enabled ) VALUES ";
+	$query = "REPLACE INTO T_locales ( loc_locale, loc_datefmt, loc_longdatefmt, loc_extdatefmt, loc_input_datefmt,
+			loc_timefmt, loc_shorttimefmt, loc_input_timefmt, loc_startofweek, loc_name, loc_messages, loc_priority,
+			loc_transliteration_map, loc_enabled ) VALUES ";
 	foreach( $locales as $localekey => $lval )
 	{
 		if( empty($lval['messages']) )
@@ -983,8 +1051,12 @@ function locale_updateDB()
 		$query .= '(
 			'.$DB->quote($localekey).',
 			'.$DB->quote($lval['datefmt']).',
+			'.$DB->quote($lval['longdatefmt']).',
+			'.$DB->quote($lval['extdatefmt']).',
+			'.$DB->quote($lval['input_datefmt']).',
 			'.$DB->quote($lval['timefmt']).',
 			'.$DB->quote($lval['shorttimefmt']).',
+			'.$DB->quote($lval['input_timefmt']).',
 			'.$DB->quote($lval['startofweek']).',
 			'.$DB->quote($lval['name']).',
 			'.$DB->quote($lval['messages']).',
@@ -1472,8 +1544,12 @@ function locale_insert_default()
 
 			$insert_data[] = '( '.$DB->quote( $a_locale ).', '
 				.$DB->quote( $locales[ $a_locale ]['datefmt'] ).', '
+				.$DB->quote( empty( $locales[ $a_locale ]['longdatefmt'] ) ? str_replace( 'y', 'Y', $locales[ $a_locale ]['datefmt'] ) : $locales[ $a_locale ]['longdatefmt'] ).', '
+				.$DB->quote( empty( $locales[ $a_locale ]['extdatefmt'] ) ? str_replace( array( '.', ',', '\\', '/' ), ' ', str_replace( array( 'y', 'm' ), array( 'Y', 'M' ), $locales[ $a_locale ]['datefmt'] ) ) : $locales[ $a_locale ]['extdatefmt'] ).', '
+				.$DB->quote( $locales[ $a_locale ]['input_datefmt'] ).', '
 				.$DB->quote( $locales[ $a_locale ]['timefmt'] ).', '
 				.$DB->quote( empty( $locales[ $a_locale ]['shorttimefmt'] ) ? str_replace( ':s', '', $locales[ $a_locale ]['timefmt'] ) : $locales[ $a_locale ]['shorttimefmt'] ).', '
+				.$DB->quote( $locales[ $a_locale ]['input_timefmt'] ).', '
 				.$DB->quote( $locales[ $a_locale ]['startofweek'] ).', '
 				.$DB->quote( $locales[ $a_locale ]['name'] ).', '
 				.$DB->quote( $locales[ $a_locale ]['messages'] ).', '
@@ -1485,7 +1561,7 @@ function locale_insert_default()
 		if( count( $insert_data ) )
 		{ // Do insert only if at least one locale requires this
 			$DB->query( 'INSERT INTO T_locales '
-					 .'( loc_locale, loc_datefmt, loc_timefmt, loc_shorttimefmt, '
+					 .'( loc_locale, loc_datefmt, loc_longdatefmt, loc_extdatefmt, loc_input_datefmt, loc_timefmt, loc_shorttimefmt, loc_input_timefmt, '
 					 .'loc_startofweek, loc_name, loc_messages, loc_priority, '
 					 .'loc_transliteration_map, loc_enabled ) '
 					 .'VALUES '.implode( ', ', $insert_data ) );
@@ -1527,8 +1603,12 @@ function locale_restore_defaults( $restored_locales )
 		// Restore all locale fields to default values:
 		$DB->query( 'UPDATE T_locales SET
 			loc_datefmt             = '.$DB->quote( $restored_locale['datefmt'] ).',
+			loc_longdatefmt         = '.$DB->quote( empty( $restored_locale['longdatefmt'] ) ? str_replace( 'y', 'Y', $restored_locale['datefmt'] ) : $restored_locale['longdatefmt'] ).',
+			loc_extdatefmt          = '.$DB->quote( empty( $restored_locale['extdatefmt'] ) ? str_replace( array( '.', '-', '\\', '/'), ' ', str_replace( array( 'y', 'm' ), array( 'Y', 'M' ), $restored_locale['datefmt'] ) ) : $restored_locale['extdatefmt'] ).',
+			loc_input_datefmt       = '.$DB->quote( $restored_locale['input_datefmt'] ).',
 			loc_timefmt             = '.$DB->quote( $restored_locale['timefmt'] ).',
 			loc_shorttimefmt        = '.$DB->quote( empty( $restored_locale['shorttimefmt'] ) ? str_replace( ':s', '', $restored_locale['timefmt'] ) : $restored_locale['shorttimefmt'] ).',
+			loc_input_timefmt       = '.$DB->quote( $restored_locale['input_timefmt'] ).',
 			loc_startofweek         = '.$DB->quote( $restored_locale['startofweek'] ).',
 			loc_name                = '.$DB->quote( $restored_locale['name'] ).',
 			loc_messages            = '.$DB->quote( $restored_locale['messages'] ).',
@@ -1592,14 +1672,18 @@ function locale_check_default()
 
 		// Insert default locale into DB in order to make it enabled:
 		$DB->query( 'INSERT INTO T_locales '
-			.'( loc_locale, loc_datefmt, loc_timefmt, loc_shorttimefmt, '
+			.'( loc_locale, loc_datefmt, loc_longdatefmt, loc_extdatefmt, loc_input_datefmt, loc_timefmt, loc_shorttimefmt, loc_input_timefmt, '
 			.'loc_startofweek, loc_name, loc_messages, loc_priority, '
 			.'loc_transliteration_map, loc_enabled ) '
 			.'VALUES ( '
 			.$DB->quote( $current_default_locale ).', '
 			.$DB->quote( $locales[ $current_default_locale ]['datefmt'] ).', '
+			.$DB->quote( empty( $locales[ $current_default_locale ]['longdatefmt'] ) ? str_replace( 'y', 'Y', $locales[ $current_default_locale ]['datefmt'] ) : $locales[ $current_default_locale ]['longdatefmt'] ).', '
+			.$DB->quote( empty( $locales[ $current_default_locale ]['extdatefmt'] ) ? str_replace( array( '.'. '-', '\\', '/' ), ' ', str_replace( array( 'y', 'm' ), array( 'Y', 'Y' ), $locales[ $current_default_locale ]['datefmt'] ) ) : $locales[ $current_default_locale ]['extdatefmt'] ).', '
+			.$DB->quote( $locales[ $current_default_locale ]['input_datefmt'] ).', '
 			.$DB->quote( $locales[ $current_default_locale ]['timefmt'] ).', '
 			.$DB->quote( empty( $locales[ $current_default_locale ]['shorttimefmt'] ) ? str_replace( ':s', '', $locales[ $current_default_locale ]['timefmt'] ) : $locales[ $current_default_locale ]['shorttimefmt'] ).', '
+			.$DB->quote( $locales[ $current_default_locale ]['input_timefmt'] ).', '
 			.$DB->quote( $locales[ $current_default_locale ]['startofweek'] ).', '
 			.$DB->quote( $locales[ $current_default_locale ]['name'] ).', '
 			.$DB->quote( $locales[ $current_default_locale ]['messages'] ).', '
@@ -1616,7 +1700,7 @@ function locale_check_default()
  *
  * @param string Locale field
  * @param string Locale name, '#' to get default value not specific to a locale
- * @param mixed Value to return if locale field is empty and no default value is set
+ * @param mixed Value to return if locale field is empty and no default value is assigned
  * @return mixed Locale field value
  */
 function locale_get( $field, $locale = NULL, $default = NULL )
@@ -1633,11 +1717,52 @@ function locale_get( $field, $locale = NULL, $default = NULL )
 	{
 		$default_values = array(
 			'datefmt' => 'Y-m-d',
+			'longdatefmt' => 'Y-m-d',
+			'extdatefmt' => 'M d Y',
+			'input_datefmt' => 'Y-m-d',
 			'timefmt' => 'H:i:s',
-			'shorttimefmt' => 'H:i'
+			'shorttimefmt' => 'H:i',
+			'input_timefmt' => 'H:i:s'
 		);
 
-		return isset( $default_values[$field] ) ? $default_values[$field] : $default;
+		switch( $field )
+		{
+			case 'longdatefmt':
+				if( isset( $locales[$locale]['datefmt'] ) )
+				{
+					return str_replace( 'y', 'Y', $locales[$locale]['datefmt'] );
+				}
+				else
+				{
+					return isset( $default ) ? $default : $default_values['longdatefmt'];
+				}
+				break;
+
+			case 'extdatefmt':
+				if( isset( $locales[$locale]['datefmt'] ) )
+				{
+					return str_replace( array( '.', '-', '\\', '/' ), ' ', str_replace( array( 'm', 'y' ), array( 'M', 'Y' ), $locales[$locale]['datefmt'] ) );
+				}
+				else
+				{
+					return isset( $default ) ? $default : $default_values['extdatefmt'];
+				}
+				break;
+
+			case 'shorttimefmt':
+				if( isset( $locales[$locale]['timefmt'] ) )
+				{
+					return str_replace( ':s', '', $locales[$locale]['timefmt'] );
+				}
+				else
+				{
+					return isset( $default ) ? $default : $default_values['shorttimefmt'];
+				}
+				break;
+
+			default:
+				return isset( $default_values[$field] ) ? $default_values[$field] : ( isset( $default ) ? $default : NULL );
+		}
 	}
 	else
 	{

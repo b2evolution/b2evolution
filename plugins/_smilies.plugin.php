@@ -190,13 +190,13 @@ XX(      graydead.gif
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $Blog );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never'
 		    && is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
 		{
-			return $this->display_smiley_bar();
+			return $this->display_smiley_bar( $params );
 		}
 		return false;
 	}
@@ -216,13 +216,13 @@ XX(      graydead.gif
 			if( !empty( $Comment->item_ID ) )
 			{
 				$comment_Item = & $Comment->get_Item();
-				$Blog = & $comment_Item->get_Blog();
+				$Collection = $Blog = & $comment_Item->get_Blog();
 			}
 		}
 
 		if( empty( $Blog ) )
 		{ // Comment is not set, try global Blog
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{ // We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available
 				return false;
@@ -234,7 +234,7 @@ XX(      graydead.gif
 		    && ( ( is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
 		    || ( !is_logged_in() && $this->Settings->get( 'use_toolbar_default' ) ) ) )
 		{
-			return $this->display_smiley_bar();
+			return $this->display_smiley_bar( $params );
 		}
 		return false;
 	}
@@ -253,7 +253,7 @@ XX(      graydead.gif
 		&& ( ( is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
 			|| ( !is_logged_in() && $this->Settings->get( 'use_toolbar_default' ) ) ) )
 		{
-			return $this->display_smiley_bar();
+			return $this->display_smiley_bar( $params );
 		}
 		return false;
 	}
@@ -272,7 +272,7 @@ XX(      graydead.gif
 		&& ( ( is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
 			|| ( !is_logged_in() && $this->Settings->get( 'use_toolbar_default' ) ) ) )
 		{
-			return $this->display_smiley_bar();
+			return $this->display_smiley_bar( $params );
 		}
 		return false;
 	}
@@ -281,10 +281,15 @@ XX(      graydead.gif
 	/**
 	 * Display the smiley toolbar
 	 *
+	 * @param array Params
 	 * @return boolean did we display a toolbar?
 	 */
-	function display_smiley_bar()
+	function display_smiley_bar( $params )
 	{
+		$params = array_merge( array(
+				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
+			), $params );
+
 		$this->InitSmilies();	// check smilies cached
 
 		$grins = '';
@@ -296,7 +301,7 @@ XX(      graydead.gif
 				$smiled[] = $smiley['image'];
 
 				$grins .= '<span class="'.$this->get_template( 'toolbar_button_class' ).'"'
-					.' data-func="textarea_wrap_selection|b2evoCanvas|'.str_replace( array( "'", '|' ), array( "\'", '\|' ), $smiley['code'] ).'| |1">'
+					.' data-func="textarea_wrap_selection|'.$params['js_prefix'].'b2evoCanvas|'.str_replace( array( "'", '|' ), array( "\'", '\|' ), $smiley['code'] ).'| |1">'
 						.$this->get_smiley_img_tag( $smiley )
 					.'</span> ';
 			}
@@ -305,7 +310,7 @@ XX(      graydead.gif
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_group_before' );
 		echo $grins;
 		echo $this->get_template( 'toolbar_group_after' );
@@ -426,7 +431,7 @@ XX(      graydead.gif
 	 */
 	function ReplaceInlinePlaceholderSafe( $text )
 	{
-		return callback_on_non_matching_blocks( $text, '~\[(image|file|inline):\d+:?[^\]]*\]~', array( & $this, 'preg_insert_smilies_callback' ) );
+		return callback_on_non_matching_blocks( $text, '~\[(image|file|inline|video|audio):\d+:?[^\]]*\]~', array( & $this, 'preg_insert_smilies_callback' ) );
 	}
 
 

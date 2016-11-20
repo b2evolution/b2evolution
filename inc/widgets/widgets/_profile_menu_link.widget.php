@@ -107,6 +107,16 @@ class profile_menu_link_Widget extends ComponentWidget
 					'defaultvalue' => '',
 					'disabled' => $msg_Blog ? 'disabled' : false,
 				),
+				'visibility' => array(
+					'label' => T_( 'Visibility' ),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'always', T_( 'Always show (cacheable)') ),
+							array( 'access', T_( 'Only show if access is allowed (not cacheable)' ) ) ),
+					'defaultvalue' => 'always',
+					'field_lines' => true,
+				),
 			), parent::get_param_definitions( $params ) );
 
 		if( isset( $r['allow_blockcache'] ) )
@@ -164,6 +174,11 @@ class profile_menu_link_Widget extends ComponentWidget
 
 		if( empty( $current_Blog ) )
 		{	// Don't use this widget without current collection:
+			return false;
+		}
+
+		if( $this->disp_params['visibility'] == 'access' && ! $current_Blog->has_access() )
+		{	// Don't use this widget because current user has no access to the collection:
 			return false;
 		}
 

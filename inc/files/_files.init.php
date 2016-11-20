@@ -457,7 +457,7 @@ class files_Module extends Module
 		global $topleft_Menu;
 		global $current_User;
 		global $admin_url;
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $current_User->check_perm( 'admin', 'standard' ) )
 		{
@@ -507,7 +507,7 @@ class files_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		global $Settings;
 		/**
 		 * @var AdminUI_general

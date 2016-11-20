@@ -17,12 +17,12 @@ global $comment_allowed_tags;
 global $comment_cookies, $comment_allow_msgform;
 global $checked_attachments; // Set this var as global to use it in the method $Item->can_attach()
 global $PageCache, $Session;
-global $Blog, $dummy_fields;
+global $Collection, $Blog, $dummy_fields;
 
 // Default params:
 $params = array_merge( array(
 		'disp_comment_form'    => true,
-		'form_title_start'     => '<div class="panel '.( $Session->get('core.preview_Comment') ? 'panel-danger' : 'panel-default' ).'">'
+		'form_title_start'     => '<div class="panel '.( $Session->get( 'core.preview_Comment'.( isset( $params['comment_type'] ) && $params['comment_type'] == 'meta' ? 'meta' : '' ) ) ? 'panel-danger' : 'panel-default' ).'">'
 																.'<div class="panel-heading"><h4 class="panel-title">',
 		'form_title_end'       => '</h4></div><div class="panel-body">',
 		'form_title_text'      => T_('Leave a comment'),
@@ -57,6 +57,7 @@ $params = array_merge( array(
 						'block_separator' => '<br /><br />' ) ) )
 			) ),
 		'comment_mode'         => '', // Can be 'quote' from GET request
+		'comment_type'         => 'comment',
 	), $params );
 
 $comment_reply_ID = param( 'reply_ID', 'integer', 0 );
@@ -72,6 +73,10 @@ $comment_renderers = array( 'default' );
 /*
  * Comment form:
  */
+if( $params['comment_type'] == 'meta' )
+{	// Use different form anchor for meta comments:
+	$params['comment_form_anchor'] = 'meta_form_p';
+}
 $section_title = $params['form_title_start'].$params['form_title_text'].$params['form_title_end'];
 if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_error'], $params['after_comment_error'], '#', $params['comment_closed_text'], $section_title, $params ) )
 { // We want to display the comments form and the item can be commented on:
@@ -79,7 +84,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	echo $params['before_comment_form'];
 
 	// INIT/PREVIEW:
-	if( $Comment = get_comment_from_session( 'preview' ) )
+	if( $Comment = get_comment_from_session( 'preview', $params['comment_type'] ) )
 	{	// We have a comment to preview
 		if( $Comment->item_ID == $Item->ID )
 		{ // display PREVIEW:
@@ -140,9 +145,11 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	}
 	else
 	{ // New comment:
-		if( ( $Comment = get_comment_from_session() ) == NULL )
+		if( ( $Comment = get_comment_from_session( 'unsaved', $params['comment_type'] ) ) == NULL )
 		{ // there is no saved Comment in Session
 			$Comment = new Comment();
+			$Comment->set( 'type', $params['comment_type'] );
+			$Comment->set( 'item_ID', $Item->ID );
 			if( ( !empty( $PageCache ) ) && ( $PageCache->is_collecting ) )
 			{	// This page is going into the cache, we don't want personal data cached!!!
 				// fp> These fields should be filled out locally with Javascript tapping directly into the cookies. Anyone JS savvy enough to do that?
@@ -247,6 +254,9 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	echo $params['form_title_text'];
 	echo $params['form_title_end'];
 
+	// Display a message before comment form:
+	$Item->display_comment_form_msg();
+
 /*
 	echo '<script type="text/javascript">
 /* <![CDATA[ *
@@ -272,8 +282,11 @@ function validateCommentForm(form)
 	//           before display!
 
 	$Form->add_crumb( 'comment' );
+	$Form->hidden( 'comment_type', $params['comment_type'] );
 	$Form->hidden( 'comment_item_ID', $Item->ID );
-	if( !empty( $comment_reply_ID ) )
+
+	$comment_type = param( 'comment_type', 'string', 'comment' );
+	if( ! empty( $comment_reply_ID ) && $comment_type == $params['comment_type'] )
 	{
 		$Form->hidden( 'reply_ID', $comment_reply_ID );
 
@@ -314,7 +327,7 @@ function validateCommentForm(form)
 		}
 	}
 
-	if( $Item->can_rate() )
+	if( ! $Comment->is_meta() && $Item->can_rate() )
 	{ // Comment rating:
 		ob_start();
 		$Comment->rating_input( array( 'item_ID' => $Item->ID ) );
@@ -327,27 +340,36 @@ function validateCommentForm(form)
 		$Form->info_field( '', $params['policy_text'] );
 	}
 
+	// Set prefix for js code in plugins:
+	$plugin_js_prefix = ( $params['comment_type'] == 'meta' ? 'meta_' : '' );
+
 	ob_start();
 	echo '<div class="comment_toolbars">';
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'DisplayCommentToolbar', array( 'Comment' => & $Comment, 'Item' => & $Item ) );
+	$Plugins->trigger_event( 'DisplayCommentToolbar', array(
+			'Comment'     => & $Comment,
+			'Item'        => & $Item,
+			'js_prefix'   => $plugin_js_prefix,
+		) );
 	echo '</div>';
 	$comment_toolbar = ob_get_clean();
 
 	// Message field:
+	$content_id = $dummy_fields['content'].'_'.$params['comment_type'];
 	$form_inputstart = $Form->inputstart;
 	$Form->inputstart .= $comment_toolbar;
 	$note = '';
 	// $note = T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags));
-	$Form->textarea_input( $dummy_fields[ 'content' ], $comment_content, $params['textarea_lines'], $params['form_comment_text'], array(
-			'note' => $note,
-			'cols' => 38,
-			'class' => 'autocomplete_usernames'
+	$Form->textarea_input( $dummy_fields['content'], $comment_content, $params['textarea_lines'], $params['form_comment_text'], array(
+			'note'  => $note,
+			'cols'  => 38,
+			'class' => 'autocomplete_usernames',
+			'id'    => $content_id,
 		) );
 	$Form->inputstart = $form_inputstart;
 
-	// set b2evoCanvas for plugins
-	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
+	// Set canvas object for plugins:
+	echo '<script type="text/javascript">var '.$plugin_js_prefix.'b2evoCanvas = document.getElementById( "'.$content_id.'" );</script>';
 
 	// Attach files:
 	if( !empty( $comment_attachments ) )
@@ -412,7 +434,11 @@ function validateCommentForm(form)
 	}
 
 	// Display renderers
-	$comment_renderer_checkboxes = $Plugins->get_renderer_checkboxes( $comment_renderers, array( 'Blog' => & $Blog, 'setting_name' => 'coll_apply_comment_rendering' ) );
+	$comment_renderer_checkboxes = $Plugins->get_renderer_checkboxes( $comment_renderers, array(
+			'Blog'         => & $Blog,
+			'setting_name' => 'coll_apply_comment_rendering',
+			'js_prefix'    => $plugin_js_prefix,
+		) );
 	if( !empty( $comment_renderer_checkboxes ) )
 	{
 		$Form->info( T_('Text Renderers'), $comment_renderer_checkboxes );

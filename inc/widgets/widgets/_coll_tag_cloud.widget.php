@@ -102,9 +102,18 @@ class coll_tag_cloud_Widget extends ComponentWidget
 		foreach( $visibility_statuses as $status => $status_text )
 		{
 			$option_statuses[] = array(
-				'inskin_'.$status,
-				$visibility_statuses_icons[$status].' '.$status_text,
-				in_array( $status, $default_visible_statuses ) ? 1 : 0
+				'inskin_'.$status, // name
+				$visibility_statuses_icons[$status].' '.$status_text, // option label
+				in_array( $status, $default_visible_statuses ) ? 1 : 0, // default value
+				NULL, // dummy parameter, will not be used since 1st and 3rd element will determine if option is checked
+				NULL, // disabled option
+				NULL, // note
+				NULL, // class
+				NULL, // render as hidden
+				array( // option label attributes
+					'data-toggle' => 'tooltip',
+					'data-placement' => 'top',
+					'title' => get_status_tooltip_title( $status ) )
 			);
 		}
 
@@ -237,7 +246,7 @@ class coll_tag_cloud_Widget extends ComponentWidget
 				$filter_inskin_statuses[] = $status;
 			}
 		}
-		$results = get_tags( $blog_ids, $this->disp_params['max_tags'], /* $this->disp_params['filter_list'] */ NULL, false, $filter_inskin_statuses );
+		$results = get_tags( $blog_ids, $this->disp_params['max_tags'], /* $this->disp_params['filter_list'] */ NULL, false, $filter_inskin_statuses, is_null( $destination_Blog ) );
 		if( empty( $results ) )
 		{	// No tags!
 			return;

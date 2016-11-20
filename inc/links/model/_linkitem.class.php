@@ -31,7 +31,7 @@ class LinkItem extends LinkOwner
 	function __construct( $Item )
 	{
 		// call parent contsructor
-		parent::__construct( $Item, 'item' );
+		parent::__construct( $Item, 'item', 'itm_ID' );
 		$this->Item = & $this->link_Object;
 
 		$this->_trans = array(
@@ -67,7 +67,17 @@ class LinkItem extends LinkOwner
 	 */
 	function get_positions( $file_ID = NULL )
 	{
-		$positions = array(
+		$positions = array();
+
+		$FileCache = & get_FileCache();
+		$File = $FileCache->get_by_ID( $file_ID, false, false );
+		if( $File && $File->is_image() )
+		{ // Only images can have this position
+			// TRANS: Noun - we're talking about a cover image i-e: an image that used as cover for a post
+			$positions['cover'] = T_('Cover');
+		}
+
+		$positions = array_merge( $positions, array(
 				// TRANS: Noun - we're talking about a teaser image i-e: an image that appears before content
 				'teaser'     => T_('Teaser'),
 				// TRANS: Noun - we're talking about a teaser image i-e: an image that appears before content and with image url linked to permalink
@@ -77,17 +87,16 @@ class LinkItem extends LinkOwner
 				// TRANS: Noun - we're talking about a footer image i-e: an image that appears after "more" content separator
 				'aftermore'  => T_('After "more"'),
 				// TRANS: noun - we're talking about an inline image i-e: an image that appears in the middle of some text
-				'inline'     => T_('Inline'),
-				// TRANS: Noun - we're talking about a fallback image i-e: an image that used as fallback for video file
-				'fallback'   => T_('Fallback'),
-			);
+				'inline'     => T_('Inline')
+			) );
 
-		$FileCache = & get_FileCache();
-		if( ( $File = $FileCache->get_by_ID( $file_ID, false, false ) ) && $File->is_image() )
+		if( $File && $File->is_image() )
 		{ // Only images can have this position
-			// TRANS: Noun - we're talking about a cover image i-e: an image that used as cover for a post
-			$positions['cover'] = T_('Cover');
+			// TRANS: Noun - we're talking about a fallback image i-e: an image that used as fallback for video file
+			$positions['fallback'] = T_('Fallback');
 		}
+
+		$positions['attachment'] = T_('Attachment');
 
 		return $positions;
 	}
@@ -155,7 +164,7 @@ class LinkItem extends LinkOwner
 		}
 
 		$edited_Link = new Link();
-		$edited_Link->set( 'itm_ID', $this->Item->ID );
+		$edited_Link->set( $this->get_ID_field_name(), $this->get_ID() );
 		$edited_Link->set( 'file_ID', $file_ID );
 		$edited_Link->set( 'position', $position );
 		$edited_Link->set( 'order', $order );
@@ -168,7 +177,7 @@ class LinkItem extends LinkOwner
 			$File = $FileCache->get_by_ID( $file_ID, false, false );
 			$file_name = empty( $File ) ? '' : $File->get_name();
 			$file_dir = $File->dir_or_file();
-			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s',  ucfirst( $file_dir ), '[['.$file_name.']]', $this->type, $this->link_Object->ID ), 'info', 'file', $file_ID );
+			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s',  ucfirst( $file_dir ), '[['.$file_name.']]', $this->type, $this->get_ID() ), 'info', 'file', $file_ID );
 
 			if( $update_owner )
 			{ // Update last touched date of the Item
@@ -196,12 +205,6 @@ class LinkItem extends LinkOwner
 		}
 	}
 
-	/**
-	 * Get where condition for select query to get Item links
-	 */
-	function get_where_condition() {
-		return 'link_itm_ID = '.$this->Item->ID;
-	}
 
 	/**
 	 * Get Item parameter
@@ -262,7 +265,7 @@ class LinkItem extends LinkOwner
 
 		if( ! empty( $link_ID ) )
 		{ // Find inline image placeholders if link ID is defined
-			preg_match_all( '/\[(image|file|inline):'.$link_ID.':?[^\]]*\]/i', $this->Item->content, $inline_images );
+			preg_match_all( '/\[(image|file|inline|video|audio):'.$link_ID.':?[^\]]*\]/i', $this->Item->content, $inline_images );
 			if( ! empty( $inline_images[0] ) )
 			{ // There are inline image placeholders in the post content
 				$this->Item->set( 'content', str_replace( $inline_images[0], '', $this->Item->content ) );

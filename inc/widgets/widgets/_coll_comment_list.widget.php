@@ -75,6 +75,18 @@ class coll_comment_list_Widget extends ComponentWidget
 				'defaultvalue' => T_( 'Read the full comment' ),
 				'type' => 'text',
 			),
+			'comment_excerpt' => array(
+				'label' => T_('Comment excerpt'),
+				'note' => T_('Show comment excerpt version'),
+				'defaultvalue' => false,
+				'type' => 'checkbox'
+			),
+			'max_words' => array(
+				'label' => T_('Max words'),
+				'note' => T_('Maximum number of words shown in the excerpt'),
+				'size' => 4,
+				'defaultvalue' => 20
+			),
 			'blog_ID' => array(
 				'label' => T_( 'Collection' ),
 				'note' => T_( 'ID of the collection to use, leave empty for the current collection.' ),
@@ -127,13 +139,27 @@ class coll_comment_list_Widget extends ComponentWidget
 
 
 	/**
+	 * Prepare display params
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function init_display( $params )
+	{
+		parent::init_display( $params );
+
+		$this->disp_params['comment_excerpt_before'] = '<p class="comment_excerpt">';
+		$this->disp_params['comment_excerpt_after'] = '</p>';
+	}
+
+
+	/**
 	 * Display the widget!
 	 *
 	 * @param array MUST contain at least the basic display params
 	 */
 	function display( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$this->init_display( $params );
 
@@ -187,8 +213,8 @@ class coll_comment_list_Widget extends ComponentWidget
 			}
 
 			/**
-			* @var Comment
-			*/
+			 * @var Comment
+			 */
 			while( $Comment = & $CommentList->get_next() )
 			{ // Loop through comments:
 				// Load comment's Item object:
@@ -200,6 +226,12 @@ class coll_comment_list_Widget extends ComponentWidget
 					'text'        => $Comment->Item->title,
 					'title'       => $this->disp_params[ 'hover_text' ],
 					) );
+				if( $this->disp_params['comment_excerpt'] )
+				{
+					echo $this->disp_params['comment_excerpt_before'];
+					echo excerpt_words( $Comment->get_content(), $this->disp_params['max_words'] );
+					echo $this->disp_params['comment_excerpt_after'];
+				}
 				echo $this->disp_params[ 'item_end' ];
 			}	// End of comment loop.}
 

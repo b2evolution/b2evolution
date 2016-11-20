@@ -356,7 +356,7 @@ div.delete_messages ul li {
 .vote_spam {
   float: left;
   padding-left: 10px;
-  line-height: 33px;
+  line-height: 34px;
 }
 .vote_spam a.action_icon {
   font-size: inherit;
@@ -369,6 +369,12 @@ div.delete_messages ul li {
 }
 .dashboard_action_area .vote_spam a.action_icon {
   font-size: 12px;
+}
+.comment_reply {
+  float: left;
+  display: inline-block;
+  margin-left: 10px;
+  line-height: 34px;
 }
 .evo_content_block span[class*="status_"] {
   left: 8px;
@@ -622,10 +628,13 @@ fieldset ul {
   display: block;
 }
 #itemform_adv_props div.tile,
-#itemform_adv_props div.controls {
+#itemform_custom_fields div.tile,
+#itemform_adv_props div.controls,
+#itemform_custom_fields div.controls {
   width: 100%;
 }
-#itemform_adv_props td.label {
+#itemform_adv_props td.label,
+#itemform_custom_fields td.label {
   background: none;
   color: #000;
   text-shadow: none;
@@ -633,7 +642,8 @@ fieldset ul {
   vertical-align: top;
   padding: 9px 10px 0 0;
 }
-#itemform_adv_props .help-inline label {
+#itemform_adv_props .help-inline label,
+#itemform_custom_fields .help-inline label {
   font-weight: normal;
   display: block;
 }
@@ -654,30 +664,40 @@ fieldset ul {
   display: inline-block;
 }
 #itemform_links .panel,
-#cmntform_links .panel {
+#cmntform_links .panel,
+#ecmpform_links .panel,
+#msgform_links .panel {
   overflow: hidden;
 }
 #itemform_links .panel-body,
-#cmntform_links .panel-body {
+#cmntform_links .panel-body,
+#ecmpform_links .panel-body,
+#msgform_links .panel-body {
   padding: 0;
+}
+#msgform_links {
+  margin-bottom: 20px;
 }
 #itemform_goals td {
   padding-bottom: 2px;
 }
-#attachmentframe_wrapper {
+#attachments_fieldset_wrapper {
   width: 100%;
   height: 160px;
   position: relative;
-  overflow: hidden;
   padding-bottom: 6px;
   box-sizing: content-box;
 }
-#attachmentframe_wrapper .ui-resizable-s {
+#attachments_fieldset_wrapper #attachments_fieldset_block {
+  overflow: auto;
+  height: 100%;
+}
+#attachments_fieldset_wrapper .ui-resizable-s {
   background: #c0c0c0;
   height: 6px;
   bottom: 0;
 }
-#attachmentframe_wrapper .ui-resizable-s:after {
+#attachments_fieldset_wrapper .ui-resizable-s:after {
   content: "...";
   font-size: 10px;
   top: -7px;
@@ -685,12 +705,15 @@ fieldset ul {
   text-align: center;
   display: block;
 }
-#attachmentframe_wrapper #attachmentframe_disabler {
+#attachments_fieldset_wrapper .table_scroll {
+  position: relative;
+}
+#attachments_fieldset_wrapper table tbody .dragged {
+  opacity: 0.8;
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+}
+#attachments_fieldset_wrapper table tbody td {
+  cursor: move;
 }
 #filelist_tbody tr:first-child .action_icon_link_move_up,
 #filelist_tbody tr:last-child .action_icon_link_move_down {
@@ -845,6 +868,7 @@ h2.user_title {
   font-weight: normal;
   color: #999;
   margin: 40px 0 30px;
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;
@@ -1599,4 +1623,16 @@ table.diff td.diff-title-addedline {
 }
 .evo_checkbox_status__meta {
   background-color: #5bc0de;
+}
+.evo_aggregate_filter {
+  white-space: nowrap;
+}
+.evo_aggregate_filter label {
+  padding-top: 5px;
+  padding-right: 5px;
+  width: auto;
+}
+.evo_aggregate_filter select {
+  display: inline;
+  width: auto;
 }

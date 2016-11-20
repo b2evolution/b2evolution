@@ -433,7 +433,7 @@ function stats_blog_name()
 	global $row_stats;
 
 	$BlogCache = & get_BlogCache();
-	$Blog = & $BlogCache->get_by_ID($row_stats['hit_coll_ID']);
+	$Collection = $Blog = & $BlogCache->get_by_ID($row_stats['hit_coll_ID']);
 
 	$Blog->disp('name');
 }
@@ -1251,5 +1251,271 @@ function stats_goal_hit_extra_params( $ghit_params )
 	}
 
 	return htmlspecialchars( $ghit_params );
+}
+
+
+/**
+ * Display panel with buttons to control a view of hits summary pages:
+ *     - Two buttons to toggle between type of hits summary data(Live or Aggregate)
+ *     - Button to aggregate hits and sessions right now
+ */
+function display_hits_summary_panel()
+{
+	global $ReqURL, $current_User;
+
+	$hits_summary_mode = get_hits_summary_mode();
+
+	$current_url = preg_replace( '/(\?|&)hits_summary_mode=([^&]+|$)/', '', $ReqURL );
+
+	echo '<div class="btn-group pull-left">';
+
+	// Button to switch to view the live hits:
+	echo '<a href="'.url_add_param( $current_url, 'hits_summary_mode=live' ).'"'
+		.' class="btn btn-default'.( $hits_summary_mode == 'live' ? ' active' : '' ).'">'
+		.T_('Live data')
+		.'</a>';
+
+	// Button to switch to view the aggregated hits data:
+	echo '<a href="'.url_add_param( $current_url, 'hits_summary_mode=aggregate' ).'"'
+		.' class="btn btn-default'.( $hits_summary_mode == 'aggregate' ? ' active' : '' ).'">'
+		.T_('Aggregate data')
+		.'</a>';
+
+	echo '</div>';
+
+	if( $hits_summary_mode == 'aggregate' )
+	{	// Filter the aggregated data by date period:
+		global $UserSettings;
+
+		echo '<div class="evo_aggregate_filter pull-left">';
+		$Form = new Form();
+		$Form->hidden_ctrl();
+		$Form->hidden( 'tab', get_param( 'tab' ) );
+		$Form->hidden( 'tab3', get_param( 'tab3' ) );
+		$Form->hidden( 'blog', get_param( 'blog' ) );
+		$Form->hidden( 'action', 'filter_aggregated' );
+		$Form->add_crumb( 'aggfilter' );
+
+		$Form->switch_layout( 'none' );
+
+		$Form->begin_form();
+
+		$Form->select_input_array( 'agg_period', $UserSettings->get( 'agg_period' ), array(
+				'last_30_days'   => T_( 'Last 30 days' ),
+				'last_60_days'   => T_( 'Last 60 days' ),
+				'current_month'  => T_( 'Current Month to date' ),
+				'specific_month' => T_( 'Specific Month:' ),
+			), T_('Show') );
+
+		$months_years_params = array( 'force_keys_as_values' => true );
+		if( $UserSettings->get( 'agg_period' ) != 'specific_month' )
+		{
+			$months_years_params['style'] = 'display:none';
+		}
+		$months = array();
+		for( $m = 1; $m <= 12; $m++ )
+		{
+			$months[ $m ] = T_( date( 'F', mktime( 0, 0, 0, $m ) ) );
+		}
+		$agg_month = $UserSettings->get( 'agg_month' );
+		$Form->select_input_array( 'agg_month', ( empty( $agg_month ) ? date( 'n' ) : $agg_month ), $months, '', NULL, $months_years_params );
+
+		$years = array();
+		for( $y = date( 'Y' ) - 20; $y <= date( 'Y' ); $y++ )
+		{
+			$years[ $y ] = $y;
+		}
+		$agg_year = $UserSettings->get( 'agg_year' );
+		$Form->select_input_array( 'agg_year', ( empty( $agg_year ) ? date( 'Y' ) : $agg_year ), $years, '', NULL, $months_years_params );
+
+		$Form->end_form( array( array( 'submit', 'submit', T_('Filter'), 'btn-info' ) ) );
+
+		echo '<script type="text/javascript">
+			jQuery( "#agg_period" ).change( function()
+			{
+				if( jQuery( this ).val() == "specific_month" )
+				{
+					jQuery( "#agg_month, #agg_year" ).show();
+				}
+				else
+				{
+					jQuery( "#agg_month, #agg_year" ).hide();
+				}
+			} );
+			</script>';
+
+		echo '</div>';
+	}
+
+	if( $current_User->check_perm( 'stats', 'edit' ) )
+	{	// Display button to aggregate hits right now only if current user has a permission to edit hits:
+		echo '<a href="'.url_add_param( $current_url, 'action=aggregate&'.url_crumb( 'aggregate' ) ).'"'
+			.' class="btn btn-default pull-right">'
+			.T_('Aggregate Now')
+			.'</a>';
+	}
+
+	echo '<div class="clear"></div>';
+}
+
+
+/**
+ * Get dates for filter the aggregated hits
+ *
+ * @return array Array with two items: 0 - start date, 1 - end date
+ */
+function get_filter_aggregated_hits_dates()
+{
+	global $DB, $UserSettings;
+
+	switch( $UserSettings->get( 'agg_period' ) )
+	{
+		case 'last_60_days':
+			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 59 ) ); // Date of 60 days ago
+			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1 ) ); // Yesterday
+			break;
+
+		case 'current_month':
+			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), 1 ) ); // First day of current month
+			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1 ) ); // Yesterday
+			break;
+
+		case 'specific_month':
+			$agg_month = $UserSettings->get( 'agg_month' );
+			$agg_year = $UserSettings->get( 'agg_year' );
+			if( empty( $agg_month ) )
+			{
+				$agg_month = date( 'm' );
+			}
+			if( empty( $agg_year ) )
+			{
+				$agg_year = date( 'Y' );
+			}
+			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, $agg_month, 1, $agg_year ) ); // First day of the selected month
+			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, $agg_month + 1, 0, $agg_year ) ); // Last day of the selected month
+			break;
+
+		case 'last_30_days':
+		default:
+			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 29 ) ); // Date of 30 days ago
+			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1 ) ); // Yesterday
+			break;
+	}
+
+	return array( $start_date, $end_date );
+}
+
+
+/**
+ * Get mode of hits summary data
+ *
+ * @return string Mode: 'live' or 'aggregate'
+ */
+function get_hits_summary_mode()
+{
+	global $Session;
+
+	$hits_summary_mode = $Session->get( 'hits_summary_mode' );
+	if( empty( $hits_summary_mode ) )
+	{	// Set mode to display the aggregated data by default:
+		$hits_summary_mode = 'aggregate';
+	}
+
+	return $hits_summary_mode;
+}
+
+
+/**
+ * Find the dates without hits and fill them with 0 to display on graph and table
+ *
+ * @param array Source hits data
+ * @param string Start date of hits log in format 'YYYY-mm-dd'
+ * @param string End date of hits log in format 'YYYY-mm-dd'
+ * @return array Fixed hits data
+ */
+function fill_empty_hit_days( $hits_data, $start_date, $end_date )
+{
+	$fixed_hits_data = array();
+
+	if( empty( $hits_data ) )
+	{
+		return $fixed_hits_data;
+	}
+
+	// Get additional fields which must be exist in each array item of new filled empty day below:
+	$additional_fields = array_diff_key( $hits_data[0], array( 'hits' => 0, 'year' => 0, 'month' => 0, 'day' => 0 ) );
+
+	// Check if hits data array contains start and end dates:
+	$start_date_is_contained = empty( $start_date );
+	$end_date_is_contained = empty( $end_date );
+	if( ! $start_date_is_contained || ! $end_date_is_contained )
+	{
+		foreach( $hits_data as $hit )
+		{
+			$this_date = $hit['year'].'-'.$hit['month'].'-'.$hit['day'];
+			if( $this_date == $start_date )
+			{	// The start date is detected:
+				$start_date_is_contained = true;
+			}
+			if( $this_date == $end_date )
+			{	// The start date is detected:
+				$end_date_is_contained = true;
+			}
+			if( $start_date_is_contained && $end_date_is_contained )
+			{	// Stop array searching here because we have found the dates:
+				break;
+			}
+		}
+	}
+
+	if( ! $start_date_is_contained )
+	{	// Add item to array with 0 for start date if stats has no data for the date:
+		array_push( $hits_data, array(
+				'hits'     => 0,
+				'year'     => date( 'Y', strtotime( $start_date ) ),
+				'month'    => date( 'n', strtotime( $start_date ) ),
+				'day'      => date( 'j', strtotime( $start_date ) ),
+			) + $additional_fields );
+	}
+	if( ! $end_date_is_contained )
+	{	// Add item to array with 0 for end date if stats has no data for the date:
+		array_unshift( $hits_data, array(
+				'hits'     => 0,
+				'year'     => date( 'Y', strtotime( $end_date ) ),
+				'month'    => date( 'n', strtotime( $end_date ) ),
+				'day'      => date( 'j', strtotime( $end_date ) ),
+			) + $additional_fields );
+	}
+
+	foreach( $hits_data as $hit )
+	{
+		$this_date = $hit['year'].'-'.$hit['month'].'-'.$hit['day'];
+
+		if( isset( $prev_date ) && $prev_date != $this_date )
+		{	// If hits are from another day:
+			$prev_time = strtotime( $prev_date ) - 86400;
+			$this_time = strtotime( $this_date );
+
+			if( $prev_time != $this_time )
+			{	// If previous date is not previous day(it means some day has no hits):
+				$empty_days = ( $prev_time - $this_time ) / 86400;
+				for( $d = 0; $d <= $empty_days; $d++ )
+				{	// Add each empty day to array with 0 hits count:
+					$empty_day = $prev_time - $d * 86400;
+					$fixed_hits_data[] = array(
+							'hits'     => 0,
+							'year'     => date( 'Y', $empty_day ),
+							'month'    => date( 'n', $empty_day ),
+							'day'      => date( 'j', $empty_day ),
+						) + $additional_fields;
+				}
+			}
+		}
+
+		$prev_date = $hit['year'].'-'.$hit['month'].'-'.$hit['day'];
+		$fixed_hits_data[] = $hit;
+	}
+
+	return $fixed_hits_data;
 }
 ?>

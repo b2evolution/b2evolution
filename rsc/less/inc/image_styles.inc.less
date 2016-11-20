@@ -3,6 +3,11 @@
 
 img {
 	border:none;
+
+	// The following will achieve "fake responsiveness" for images inserted with raw <img src=""> tags.
+	// It will also constrain images added with [inline:]
+	max-width: 100%; 
+	height: auto;
 }
 
 

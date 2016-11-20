@@ -116,11 +116,13 @@ class image_Widget extends ComponentWidget
 					'width' => array(
 						'label' => T_('Image width'),
 						'note' => '',
-						'type' => 'integer',
-						'defaultvalue' => '300',
+						'defaultvalue' => '300px',
 						'allow_empty' => true,
 						'size' => 4,
 						'hide_label' => true,
+						'valid_pattern' => array(
+								'pattern' => '~^(\d+(px|%)?)?$~i',
+								'error'   => sprintf( T_('Invalid image size, it must be specified in px or %%.') ) ),
 					),
 					'size_separator' => array(
 						'label' => ' x ',
@@ -129,15 +131,23 @@ class image_Widget extends ComponentWidget
 					'height' => array(
 						'label' => T_('Image height'),
 						'note' => '',
-						'type' => 'integer',
 						'defaultvalue' => '',
 						'allow_empty' => true,
 						'size' => 4,
 						'hide_label' => true,
+						'valid_pattern' => array(
+								'pattern' => '~^(\d+(px|%)?)?$~i',
+								'error'   => sprintf( T_('Invalid image size, it must be specified in px or %%.') ) ),
 					),
 				'size_end_line' => array(
 					'type' => 'end_line',
-					'label' => T_('pixels'),
+					'label' => T_('Leave blank for auto.'),
+				),
+				'alt' => array(
+					'label' => T_('Image Alt text'),
+					'note' => '',
+					'defaultvalue' => '',
+					'size' => 128,
 				),
 				'check_file' => array(
 					'label' => T_('Check file'),
@@ -159,7 +169,7 @@ class image_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		switch( $this->disp_params['image_source'] )
 		{
@@ -190,22 +200,22 @@ class image_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		// Collection logo:
 		echo $this->disp_params['block_start'];
 
-		$image_attrs = '';
-		if( ! empty( $this->disp_params['width'] ) )
-		{ // Image width
-			$image_attrs .= ' width="'.intval( $this->disp_params['width'] ).'"';
-		}
-		if( ! empty( $this->disp_params['height'] ) )
-		{ // Image height
-			$image_attrs .= ' height="'.intval( $this->disp_params['height'] ).'"';
-		}
+		// Initialize image attributes:
+		$image_attrs = array(
+				'src'   => $image_url.$this->disp_params['image_file'],
+				'alt'   => $this->disp_params['alt'],
+			);
+		// Image width:
+		$image_attrs['style'] = 'width:'.( empty( $this->disp_params['width'] ) ? 'auto' : format_to_output( $this->disp_params['width'], 'htmlattr' ) ).';';
+		// Image height:
+		$image_attrs['style'] .= 'height:'.( empty( $this->disp_params['height'] ) ? 'auto' : format_to_output( $this->disp_params['height'], 'htmlattr' ) ).';';
+		// If no unit is specified in a size, consider the unit to be px:
+		$image_attrs['style'] = preg_replace( '/(\d+);/', '$1px;', $image_attrs['style'] );
 
-		echo '<a href="'.$Blog->get( 'url' ).'">'
-							.'<img src="'.$image_url.$this->disp_params['image_file'].'" alt=""'.$image_attrs.' />'
-							.'</a>';
+		// Print out image html tag with link to current collection front page:
+		echo '<a href="'.$Blog->get( 'url' ).'"><img'.get_field_attribs_as_string( $image_attrs ).' /></a>';
 
 		echo $this->disp_params['block_end'];
 

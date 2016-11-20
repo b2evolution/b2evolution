@@ -66,8 +66,10 @@ class widescroll_plugin extends Plugin
 
 	/**
 	 * Display Toolbar
+	 *
+	 * @param array Params
 	 */
-	function DisplayCodeToolbar()
+	function DisplayCodeToolbar( $params = array() )
 	{
 		global $Hit;
 
@@ -75,6 +77,10 @@ class widescroll_plugin extends Plugin
 		{ // let's deactivate toolbar on Lynx, because they don't work there.
 			return false;
 		}
+
+		$params = array_merge( array(
+				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
+			), $params );
 
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
@@ -98,7 +104,7 @@ class widescroll_plugin extends Plugin
 				'<?php echo TS_('Teaser break') ?>', ''
 			);
 
-		function widescroll_toolbar( title )
+		function widescroll_toolbar( title, prefix )
 		{
 			var r = '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>'
 				+ '<?php echo $this->get_template( 'toolbar_group_before' ); ?>';
@@ -106,11 +112,11 @@ class widescroll_plugin extends Plugin
 			{
 				var button = widescroll_buttons[i];
 				r += '<input type="button" id="' + button.id + '" title="' + button.title + '"'
-					+ ( typeof( button.style ) != 'undefined' ? ' style="' + button.style + '"' : '' ) + ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="widescroll_insert_tag|b2evoCanvas|'+i+'" value="' + button.text + '" />';
+					+ ( typeof( button.style ) != 'undefined' ? ' style="' + button.style + '"' : '' ) + ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="widescroll_insert_tag|' + prefix + 'b2evoCanvas|'+i+'" value="' + button.text + '" />';
 			}
 			r += '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
 
-			jQuery( '.<?php echo $this->code ?>_toolbar' ).html( r );
+			jQuery( '.' + prefix + '<?php echo $this->code ?>_toolbar' ).html( r );
 		}
 
 		function widescroll_insert_tag( canvas_field, i )
@@ -125,9 +131,9 @@ class widescroll_plugin extends Plugin
 		//]]>
 		</script><?php
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script type="text/javascript">widescroll_toolbar( '<?php echo TS_('Wide scroll:'); ?> ' );</script><?php
+		?><script type="text/javascript">widescroll_toolbar( '<?php echo TS_('Wide scroll:'); ?>', '<?php echo $params['js_prefix']; ?>' );</script><?php
 
 		return true;
 	}
@@ -151,14 +157,14 @@ class widescroll_plugin extends Plugin
 		if( ! empty( $params['Item'] ) )
 		{ // Item is set, get Blog from post
 			$edited_Item = & $params['Item'];
-			$Blog = & $edited_Item->get_Blog();
+			$Collection = $Blog = & $edited_Item->get_Blog();
 			// We editing an Item, Check if HTML is allowed for the post type:
 			$allow_HTML = $edited_Item->get_type_setting( 'allow_html' );
 		}
 
 		if( empty( $Blog ) )
 		{ // Item is not set, try global Blog
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{ // We can't get a Blog, this way "apply_rendering" plugin collection setting is not available
 				return false;
@@ -185,7 +191,7 @@ class widescroll_plugin extends Plugin
 		$tinymce_content_css[] = get_require_url( $this->get_plugin_url().'tinymce_editor.css', true, 'css', $this->version.'+'.$app_version_long );
 
 		// Print toolbar on screen
-		return $this->DisplayCodeToolbar();
+		return $this->DisplayCodeToolbar( $params );
 	}
 
 
@@ -203,13 +209,13 @@ class widescroll_plugin extends Plugin
 			if( !empty( $Comment->item_ID ) )
 			{
 				$comment_Item = & $Comment->get_Item();
-				$Blog = & $comment_Item->get_Blog();
+				$Collection = $Blog = & $comment_Item->get_Blog();
 			}
 		}
 
 		if( empty( $Blog ) )
 		{ // Comment is not set, try global Blog
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{ // We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available
 				return false;
@@ -228,7 +234,7 @@ class widescroll_plugin extends Plugin
 		}
 
 		// Print toolbar on screen
-		return $this->DisplayCodeToolbar();
+		return $this->DisplayCodeToolbar( $params );
 	}
 
 
@@ -254,7 +260,7 @@ class widescroll_plugin extends Plugin
 		}
 
 		// Print toolbar on screen:
-		return $this->DisplayCodeToolbar();
+		return $this->DisplayCodeToolbar( $params );
 	}
 
 
@@ -273,7 +279,7 @@ class widescroll_plugin extends Plugin
 		}
 
 		// Print toolbar on screen:
-		return $this->DisplayCodeToolbar();
+		return $this->DisplayCodeToolbar( $params );
 	}
 
 
@@ -286,7 +292,7 @@ class widescroll_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( ! isset( $Blog ) || (
 		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&

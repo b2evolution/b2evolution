@@ -30,7 +30,7 @@ if( ! empty( $blog ) )
 	activate_blog_locale( $blog );
 	// Initialize collection object because it may be used in some functions:
 	$BlogCache = & get_BlogCache();
-	$Blog = & $BlogCache->get_by_ID( $blog );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 }
 
 foreach( $modules as $module )

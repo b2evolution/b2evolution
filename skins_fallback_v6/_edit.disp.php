@@ -15,7 +15,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $Session, $inc_path;
+global $Collection, $Blog, $Session, $inc_path;
 global $action, $form_action;
 
 /**
@@ -158,21 +158,33 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'suggest_item_tags', $UserSettings->get( 'suggest_item_tags' ) );
 	}
 
-	$disp_edit_categories = true;
+	if( $Blog->get_setting( 'in_skin_editing_category' ) )
+	{	// If categories are allowed to update from front-office:
+		$disp_edit_categories = true;
+	}
+	else
+	{	// Don't allow to update the categories:
+		$disp_edit_categories = false;
+		if( $edited_Item->ID == 0 )
+		{	// Force to store category Id in hidden field only for new creating items:
+			$params['disp_edit_categories'] = false;
+		}
+	}
+
 	if( ! $params['disp_edit_categories'] )
-	{	// When categories are hidden, we store a cat_ID in the hidden input
+	{	// When categories are hidden, we store a cat_ID in the hidden input:
 		if( $edited_Item->ID > 0 )
-		{	// Get cat_ID from existing Item
+		{	// Get cat_ID from existing Item:
 			$main_Chapter = $edited_Item->get_main_Chapter();
 			$cat = $main_Chapter->ID;
 		}
 		else
-		{	// Forums skin get cat_ID from $_GET
+		{	// Forums skin get cat_ID from $_GET:
 			$cat = param( 'cat', 'integer', 0 );
 		}
 
 		if( $cat > 0 )
-		{	// Store a cat_ID
+		{	// Store a cat_ID:
 			$Form->hidden( 'post_category', $cat );
 			$Form->hidden( 'cat', $cat );
 			$disp_edit_categories = false;
@@ -251,7 +263,14 @@ $Form->begin_form( 'inskin', '', $form_params );
 	$Form->end_fieldset();
 
 	// ################### TEXT RENDERERS & CATEGORIES ###################
-	$item_renderer_checkboxes = $edited_Item->get_renderer_checkboxes();
+	if( $Blog->get_setting( 'in_skin_editing_renderers' ) )
+	{	// If text renderers are allowed to update from front-office:
+		$item_renderer_checkboxes = $edited_Item->get_renderer_checkboxes();
+	}
+	else
+	{	// Don't allow to update the text renderers:
+		$item_renderer_checkboxes = false;
+	}
 
 	if( ! empty( $item_renderer_checkboxes ) && $disp_edit_categories )
 	{ // Use two columns layout when we display text renderer checkboxes and categories blocks
@@ -322,19 +341,23 @@ else
 	{
 		$Form->begin_fieldset( T_('Additional fields') );
 
-		foreach( $custom_fields as $field )
-		{ // Display each custom field
-			if( $field['type'] == 'varchar' )
+		foreach( $custom_fields as $custom_field )
+		{	// Display each custom field:
+			switch( $custom_field['type'] )
 			{
-				$field_note = '';
-				$field_params = array( 'maxlength' => 255, 'style' => 'width:100%' );
+				case 'double':
+					$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_double_'.$custom_field['ID'] ), 10, $custom_field['label'], T_('can be decimal') );
+					break;
+				case 'varchar':
+					$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, $custom_field['label'], '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+					break;
+				case 'text':
+					$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_text_'.$custom_field['ID'] ), 5, $custom_field['label'] );
+					break;
+				case 'html':
+					$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_html_'.$custom_field['ID'] ), 5, $custom_field['label'], array( 'note' => T_('This field allows HTML code') ) );
+					break;
 			}
-			else
-			{	// type == double
-				$field_note = T_('can be decimal');
-				$field_params = array();
-			}
-			$Form->text_input( 'item_'.$field['type'].'_'.$field['ID'], $edited_Item->get_setting( 'custom_'.$field['type'].'_'.$field['ID'] ), 10, $field['label'], $field_note, $field_params );
 		}
 
 		$Form->end_fieldset();
