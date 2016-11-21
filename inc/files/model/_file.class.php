@@ -1880,7 +1880,7 @@ class File extends DataObject
 	 *
 	 * @return boolean true on success, false on failure
 	 */
-	function dbinsert( )
+	function dbinsert()
 	{
 		global $Debuglog, $current_User;
 
@@ -1897,7 +1897,14 @@ class File extends DataObject
 		$Debuglog->add( 'Inserting meta data for new file into db', 'files' );
 
 		// Let's make sure the bare minimum gets saved to DB:
-		$this->set_param( 'creator_user_ID', 'integer', $current_User->ID );
+		if( is_logged_in() )
+		{	// Use ID of current logged in user:
+			$this->set_param( 'creator_user_ID', 'integer', $current_User->ID );
+		}
+		elseif( $this->_FileRoot->type == 'user' )
+		{	// Try to use ID of root user:
+			$this->set_param( 'creator_user_ID', 'integer', $this->_FileRoot->in_type_ID );
+		}
 		$this->set_param( 'root_type', 'string', $this->_FileRoot->type );
 		$this->set_param( 'root_ID', 'number', $this->_FileRoot->in_type_ID );
 		$this->set_param( 'path', 'string', $this->_rdfp_rel_path );
