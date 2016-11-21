@@ -956,6 +956,12 @@ switch( $action )
 		$create_sample_organization = param( 'create_sample_organization', 'boolean', false, true );
 		$create_demo_users = param( 'create_demo_users', 'boolean', false, true );
 
+		if( $create_sample_contents == 'all' )
+		{ // Override create sample organization and demo user setting
+			$create_sample_organization = true;
+			$create_demo_users = true;
+		}
+
 		if( $allow_install_test_features )
 		{	// Allow to use $allow_install_test_features from request only when it is enabled in config:
 			$install_test_features = param( 'install_test_features', 'boolean', false );
