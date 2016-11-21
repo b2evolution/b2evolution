@@ -5284,11 +5284,15 @@ class Item extends ItemLight
 			$this->set_creator_User( $current_User );
 		}
 
-		// Create new slug with validated title
-		$new_Slug = new Slug();
-		$new_Slug->set( 'title', urltitle_validate( $this->urltitle, $this->title, $this->ID, false, $new_Slug->dbprefix.'title', $new_Slug->dbprefix.'itm_ID', $new_Slug->dbtablename, $this->locale ) );
-		$new_Slug->set( 'type', 'item' );
-		$this->set( 'urltitle', $new_Slug->get( 'title' ) );
+		// Validate urltitle/slug:
+		$orig_urltitle = $this->urltitle;
+		$urltitles = explode( ',', $this->urltitle );
+		foreach( $urltitles as $u => $urltitle_value )
+		{
+			$urltitles[ $u ] = utf8_trim( $urltitle_value );
+		}
+		$orig_urltitle = implode( ',', array_unique( $urltitles ) );
+		$this->set( 'urltitle', urltitle_validate( $urltitles[0], $this->title, $this->ID, false, 'slug_title', 'slug_itm_ID', 'T_slug', $this->locale ) );
 
 		$this->update_renderers_from_Plugins();
 
@@ -5342,8 +5346,25 @@ class Item extends ItemLight
 			}
 
 			// Let's handle the slugs:
-			// set slug item ID:
-			$new_Slug->set( 'itm_ID', $this->ID );
+			$new_slugs = $this->update_slugs( $orig_urltitle );
+
+			if( $result && ! empty( $new_slugs ) )
+			{	// If we have new created slugs, we have to insert it into the database:
+				foreach( $new_slugs as $s => $new_Slug )
+				{
+					if( $new_Slug->ID == 0 )
+					{	// Insert only new created slugs:
+						if( ! $new_Slug->dbinsert() )
+						{
+							$result = false;
+						}
+						elseif( $s == 0 )
+						{
+							$new_canonical_Slug = $new_slugs[0];
+						}
+					}
+				}
+			}
 
 			// Create tiny slug:
 			$new_tiny_Slug = new Slug();
@@ -5353,9 +5374,9 @@ class Item extends ItemLight
 			$new_tiny_Slug->set( 'type', 'item' );
 			$new_tiny_Slug->set( 'itm_ID', $this->ID );
 
-			if( $result && ( $result = ( $new_Slug->dbinsert() && $new_tiny_Slug->dbinsert() ) ) )
+			if( $result && ( $result = ( isset( $new_canonical_Slug ) && $new_tiny_Slug->dbinsert() ) ) )
 			{
-				$this->set( 'canonical_slug_ID', $new_Slug->ID );
+				$this->set( 'canonical_slug_ID', $new_canonical_Slug->ID );
 				$this->set( 'tiny_slug_ID', $new_tiny_Slug->ID );
 				if( $result = parent::dbupdate() )
 				{
