@@ -60,6 +60,8 @@ class basic_antispam_plugin extends Plugin
 	 */
 	function GetDefaultSettings( & $params )
 	{
+		global $app_version;
+
 		return array(
 				'min_comment_interval' => array(
 					'type' => 'integer',
@@ -113,6 +115,27 @@ class basic_antispam_plugin extends Plugin
 					'label' => T_('Check referers for URL'),
 					'note' => T_('Check refering pages, if they contain our URL. This may generate a lot of additional traffic!'),
 					'defaultvalue' => '0',
+				),
+				'exceptions' => array(
+					'label' => T_('Exceptions for certain User Groups'),
+					'note' => '',
+					'type' => version_compare( $app_version, '6.6.5', '>' ) ? 'array:array:string' : 'array',
+					'entries' => array(
+						'user_group' => array(
+							'label' => T_('User group'),
+							'defaultvalue' => 0,
+							'type' => 'select_group',
+							'note' => '',
+						),
+						'max_number_of_links_feedback' => array(
+							'type' => 'integer',
+							'label' => T_('Feedback sensitivity to links'),
+							'note' => T_('If a comment has more than this number of links in it, it will get 100 percent spam karma. -1 to disable it.'),
+							'help' => '#set_max_number_of_links',
+							'defaultvalue' => '4',
+							'size' => 3,
+						),
+					)
 				),
 
 			);
@@ -685,6 +708,49 @@ class basic_antispam_plugin extends Plugin
 		return true;
 	}
 
+
+	/**
+	 * Get exception setting value depending on group of current user
+	 *
+	 * @param string Setting name
+	 * @return string Setting value
+	 */
+	function get_exception_setting( $setting_name )
+	{
+		if( ! is_logged_in() )
+		{	// Use common plugin setting if current user is not logged in:
+			return $this->Settings->get( $setting_name );
+		}
+
+		$exceptions = $this->Settings->get( 'exceptions' );
+
+		if( empty( $exceptions ) )
+		{	// Use common plugin setting if exceptions are not defined:
+			return $this->Settings->get( $setting_name );
+		}
+
+		global $current_User;
+
+		// Try to find exception setting for group of current logged in user:
+		foreach( $exceptions as $exception )
+		{
+			if( $current_User->get( 'grp_ID' ) == $exception['user_group'] &&
+			    isset( $exception[ $setting_name ] ) )
+			{	// Exception is detected, Use this and stop a searching of others:
+				$setting_value = $exception[ $setting_name ];
+				break;
+			}
+		}
+
+		if( isset( $setting_value ) )
+		{	// Use setting of detected exception for group of current logged in user:
+			return $setting_value;
+		}
+		else
+		{	// Use common plugin setting if exception is not detected for group of current logged in user:
+			return $this->Settings->get( $setting_name );
+		}
+	}
 }
 
 ?>
