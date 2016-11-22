@@ -153,7 +153,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		// Search Form
 		add_basic_widget( $blog_id, 'Navigation', 'coll_search_form', 'core', 10 );
 		// Items button
-		add_basic_widget( $blog_id, 'Navigation', 'items_button', 'core', 20 );
+		add_basic_widget( $blog_id, 'Navigation', 'recent_items_button', 'core', 20 );
 	}
 	if( in_array( $kind, array( 'manual', 'forum' ) ) )
 	{

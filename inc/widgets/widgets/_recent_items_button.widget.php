@@ -22,7 +22,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  *
  * @package evocore
  */
-class items_button_Widget extends ComponentWidget
+class recent_items_button_Widget extends ComponentWidget
 {
 	/**
 	 * Constructor
@@ -30,7 +30,7 @@ class items_button_Widget extends ComponentWidget
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'items_button' );
+		parent::__construct( $db_row, 'core', 'recent_items_button' );
 	}
 
 
@@ -62,7 +62,7 @@ class items_button_Widget extends ComponentWidget
 	 */
 	function get_help_url()
 	{
-		return get_manual_url( 'items-button-widget' );
+		return get_manual_url( 'recent-items-button-widget' );
 	}
 
 
@@ -71,7 +71,7 @@ class items_button_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Items button');
+		return T_('Recent Items Button');
 	}
 
 
@@ -89,7 +89,7 @@ class items_button_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Items button');
+		return T_('Recent Items Button');
 	}
 
 

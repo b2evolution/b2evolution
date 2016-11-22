@@ -8128,7 +8128,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				// Search Form
 				add_basic_widget_12135( $coll_ID, 'Navigation', 'coll_search_form', 'core', 10 );
 				// Items button
-				add_basic_widget_12135( $coll_ID, 'Navigation', 'items_button', 'core', 20 );
+				add_basic_widget_12135( $coll_ID, 'Navigation', 'recent_items_button', 'core', 20 );
 			}
 			// Breadcrumb Path
 			add_basic_widget_12135( $coll_ID, 'Navigation', 'breadcrumb_path', 'core', 30, array(
