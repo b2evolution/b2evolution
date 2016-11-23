@@ -3051,7 +3051,7 @@ class File extends DataObject
 				$UserCache = & get_UserCache();
 				$User = & $UserCache->get_by_ID( $file_root_ID, false, false );
 
-				$link_text = $User ? $User->get_colored_login( array( 'use_style' => $params['use_style'] ) ) : T_('Deleted user');
+				$link_text = $User ? $User->get_colored_login( array( 'use_style' => $params['use_style'], 'login_text' => 'name' ) ) : T_('Deleted user');
 				$link_class = $User ? $User->get_gender_class() : 'user';
 				$link_url = $admin_url.'?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$file_root_ID;
 
