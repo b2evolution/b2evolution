@@ -818,6 +818,10 @@ class Blog extends DataObject
 
 			$this->set_setting( 'default_post_status', param( 'default_post_status', 'string', NULL ) );
 
+			param( 'old_content_alert', 'integer', NULL );
+			param_check_range( 'old_content_alert', 1, 12, T_('Old content alert must be numeric (1-12).'), false );
+			$this->set_setting( 'old_content_alert', get_param( 'old_content_alert' ), true );
+
 			$this->set_setting( 'post_categories', param( 'post_categories', 'string', NULL ) );
 
 			if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
