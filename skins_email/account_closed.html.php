@@ -33,7 +33,7 @@ if( empty( $params['closed_by_admin'] ) )
 }
 else
 { // Admin closed current user account
-	printf( T_('A user account was closed %s days after creation by %s'), $params['days_count'], get_user_colored_login_link( $params['closed_by_admin'], array( 'use_style' => true, 'protocol' => 'http:' ) ) );
+	printf( T_('A user account was closed %s days after creation by %s'), $params['days_count'], get_user_colored_login_link( $params['closed_by_admin'], array( 'use_style' => true, 'protocol' => 'http:', 'login_text' => 'name' ) ) );
 }
 echo "</p>\n";
 

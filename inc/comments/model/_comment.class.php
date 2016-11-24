@@ -1037,7 +1037,7 @@ class Comment extends DataObject
 				'after_user'   => '#',	// After Member user
 				'format'       => 'htmlbody',
 				'link_to'      => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' 'userpage>userurl'
-				'link_text'    => 'preferredname', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+				'link_text'    => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 				'link_rel'     => '',
 				'link_class'   => '',
 				'thumb_size'   => 'crop-top-32x32',
@@ -3923,8 +3923,8 @@ class Comment extends DataObject
 		// Get author email address. It will be visible for moderators/blog/post owners only -- NOT for other subscribers
 		if( $this->get_author_User() )
 		{ // Comment from a registered user:
-			$reply_to = $this->author_User->get('email');
-			$author_name = $this->author_User->get('login');
+			$reply_to = $this->author_User->get( 'email' );
+			$author_name = $this->author_User->get_username();
 			$author_user_ID = $this->author_User->ID;
 		}
 		elseif( ! empty( $this->author_email ) )

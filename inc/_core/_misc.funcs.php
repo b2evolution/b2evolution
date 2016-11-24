@@ -4120,6 +4120,13 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 		  //   and with simple login text in PLAIN TEXT format
 			if( $format == 'html' )
 			{
+				$username = $User->get_colored_login( array(
+						'mask'      => '$avatar$ $login$',
+						'login_text'=> 'name',
+						'use_style' => true,
+						'protocol'  => 'http:',
+					) );
+
 				$user_login = $User->get_colored_login( array(
 						'mask'      => '$avatar$ $login$',
 						'use_style' => true,
@@ -4128,9 +4135,10 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 			}
 			else
 			{
+				$username = $User->get_username();
 				$user_login = $User->login;
 			}
-			$formated_message = str_replace( '$login$', $user_login, $formated_message );
+			$formated_message = str_replace( array( '$login$', '$username$' ), array( $user_login, $username ) , $formated_message );
 		}
 
 		$template_message .= $formated_message;

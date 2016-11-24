@@ -1551,6 +1551,7 @@ class User extends DataObject
 			{ // Use a login
 				$login = $this->dget( 'login', $params['login_format'] );
 			}
+
 			// Add class "login" to detect logins by js plugins
 			$class = ( $login == $this->login ? 'login ' : '' );
 		}
@@ -4902,7 +4903,7 @@ class User extends DataObject
 							'email'           => $this->email,
 							'reason'          => $account_close_reason,
 							'user_ID'         => $this->ID,
-							'closed_by_admin' => $current_User->login,
+							'closed_by_admin' => $current_User->get_username(),
 							'days_count'      => $this->get_days_count_close()
 						);
 					send_admin_notification( NT_('User account closed'), 'account_closed', $email_template_params );
@@ -4942,7 +4943,7 @@ class User extends DataObject
 						$email_template_params = array(
 							'User' => $this,
 							'login' => $this->login, // this is required in the send_admin_notification
-							'activated_by_admin' => $current_User->login,
+							'activated_by_admin' => $current_User->get_username(),
 						);
 						send_admin_notification( NT_('New user account activated'), 'account_activated', $email_template_params );
 					}

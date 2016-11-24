@@ -313,7 +313,7 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		}
 		echo $Comment->get_title( array(
 				'author_format' => '<strong>%s</strong>',
-				'link_text'     => 'login',
+				'link_text'     => 'auto',
 				'linked_type'   => $is_meta,
 			) );
 		$comment_Item = & $Comment->get_Item();

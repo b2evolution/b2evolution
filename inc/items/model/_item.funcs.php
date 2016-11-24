@@ -4767,7 +4767,7 @@ function item_td_task_cell( $type, $Item, $editable = true )
 			{
 				$UserCache = & get_UserCache();
 				$User = & $UserCache->get_by_ID( $Item->assigned_user_ID );
-				$title = $User->get_colored_login( array( 'mask' => '$avatar$ $login$' ) );
+				$title = $User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'login_text' => 'name' ) );
 			}
 			break;
 

@@ -3747,7 +3747,7 @@ function add_report_from( $user_ID, $status, $info )
 							'report_status'  => get_report_status_text( $status ),
 							'report_info'    => $info,
 							'user_ID'        => $user_ID,
-							'reported_by'    => $current_User->login,
+							'reported_by'    => $current_User->get_username(),
 						);
 		// send notificaiton ( it will be send to only those users who want to receive this kind of notifications )
 		send_admin_notification( NT_('User account reported'), 'account_reported', $email_template_params );

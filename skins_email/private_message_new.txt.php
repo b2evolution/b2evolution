@@ -36,15 +36,15 @@ $from_User = ( $params['from_User'] == NULL ) ? $current_User : $params['from_Us
 
 if( $params['new_thread'] )
 {
-	echo sprintf( T_( '%s just sent you a private message with the title %s.' ), $from_User->login, '"'.$Message->Thread->title.'"' );
+	echo sprintf( T_( '%s just sent you a private message with the title %s.' ), $from_User->get_username(), '"'.$Message->Thread->title.'"' );
 }
 elseif( count( $params['thrd_recipients'] ) == 1 )
 {
-	echo sprintf( T_( '%s just replied to your private message in the %s conversation.' ), $from_User->login, '"'.$Message->Thread->title.'"' );
+	echo sprintf( T_( '%s just replied to your private message in the %s conversation.' ), $from_User->get_username(), '"'.$Message->Thread->title.'"' );
 }
 else
 {
-	echo sprintf( T_( '%s just replied to the %s conversation.' ), $from_User->login, '"'.$Message->Thread->title.'"' );
+	echo sprintf( T_( '%s just replied to the %s conversation.' ), $from_User->get_username(), '"'.$Message->Thread->title.'"' );
 }
 
 echo "\n\n";

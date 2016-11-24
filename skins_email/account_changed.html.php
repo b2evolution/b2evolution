@@ -25,7 +25,7 @@ $params = array_merge( array(
 	), $params );
 
 
-echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_('There have been significant changes on this user profile made by %s'), '<b>'.$current_User->get( 'login' ).'</b>' ).':</p>'."\n";
+echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_('There have been significant changes on this user profile made by %s'), '<b>'.$current_User->get_username().'</b>' ).':</p>'."\n";
 
 echo '<table'.emailskin_style( 'table.email_table.bordered' ).' cellspacing="0">'."\n";
 echo '<thead><tr><th'.emailskin_style( 'table.email_table.bordered thead th' ).'>'.T_('Field').'</th>'
@@ -75,7 +75,7 @@ if( $User = & $UserCache->get_by_ID( $params['user_ID'], false, false ) )
 		echo '<p'.emailskin_style( '.p' ).'>'.T_('A new profile picture file was uploaded:').'</p>'."\n";
 		echo '<p'.emailskin_style( '.p' ).'>'.$new_File->get_tag( '', '', '', '', 'fit-320x320','original', '', '', '', '', '', '#', '', 1, 'none' ).'</p>'."\n";
 	}
-	// Display warning message about duplicated files 
+	// Display warning message about duplicated files
 	echo $duplicated_files_message;
 
 	// User's pictures:
