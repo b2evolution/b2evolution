@@ -759,16 +759,17 @@ class User extends DataObject
 					continue;
 				}
 
+				$uf_val = param( 'uf_'.$userfield->uf_ID, 'raw' );
 				$field_type = $this->userfield_defs[$userfield->uf_ufdf_ID][0];
 				if( $field_type == 'number' )
-				{	// Change number type of integer because we have this type name preparing in function param():
+				{	// Change number type of integer because we have this type name preparing in function param_format():
 					$field_type = 'integer';
 				}
 				elseif( $field_type != 'text' && $field_type != 'url' )
-				{	// Use all other params as string, Only text and url have a preparing in function param():
+				{	// Use all other params as string, Only text and url have a preparing in function param_format():
 					$field_type = 'string';
 				}
-				$uf_val = param( 'uf_'.$userfield->uf_ID, $field_type, '' );
+				$uf_val = param_format( $uf_val, $field_type );
 
 				if( $this->userfield_defs[$userfield->uf_ufdf_ID][0] == 'list' && $uf_val == '---' )
 				{	// Option list has a value '---' for empty value
@@ -830,16 +831,17 @@ class User extends DataObject
 					$copied_userfields = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
 					foreach( $copied_userfields as $copied_userfield )
 					{
+						$uf_val = param( 'uf_'.$copied_userfield->uf_ID, 'raw' );
 						$field_type = $copied_userfield->ufdf_type;
 						if( $field_type == 'number' )
-						{	// Change number type of integer because we have this type name preparing in function param():
+						{	// Change number type of integer because we have this type name preparing in function param_format():
 							$field_type = 'integer';
 						}
 						elseif( $field_type != 'text' && $field_type != 'url' )
-						{	// Use all other params as string, Only text and url have a preparing in function param():
+						{	// Use all other params as string, Only text and url have a preparing in function param_format():
 							$field_type = 'string';
 						}
-						$uf_val = param( 'uf_'.$copied_userfield->uf_ID, $field_type, '' );
+						$uf_val = param_format( $uf_val, $field_type );
 						if( ! empty( $uf_val ) )
 						{	// Copy user field only if it is not empty:
 							$this->userfield_add( $copied_userfield->ufdf_ID, $uf_val );
