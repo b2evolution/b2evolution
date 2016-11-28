@@ -2134,6 +2134,17 @@ function echo_item_content_position_js( $height, $scroll_position )
 			content_scroll = jQuery( '#itemform_post_content_ifr' ).contents().find( 'body' ).scrollTop();
 		}
 
+		content_height = parseInt( content_height );
+		if( isNaN( content_height ) )
+		{	// Allow only integer value for content height:
+			content_height = 0;
+		}
+		content_scroll = parseInt( content_scroll );
+		if( isNaN( content_scroll ) )
+		{	// Allow only integer value for content scroll position:
+			content_scroll = 0;
+		}
+
 		// Append the hidden fields with height and scroll position values to submit with current form:
 		jQuery( this ).closest( 'form' ).append( '<input type="hidden" name="content_height" value="' + content_height + '" />' +
 			'<input type="hidden" name="content_scroll" value="' + content_scroll + '" />' );
