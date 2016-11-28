@@ -7684,7 +7684,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$DB->query( "ALTER TABLE T_antispam__keyword
 			CHANGE aspm_ID     askw_ID     bigint(11) NOT NULL auto_increment,
 			CHANGE aspm_string askw_string varchar(80) NOT NULL,
-			CHANGE aspm_source askw_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported',
+			CHANGE aspm_source askw_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported'" );
+		// Use this query separately from above because MariaDB versions 10+ create an error:
+		$DB->query( "ALTER TABLE T_antispam__keyword
 			DROP INDEX aspm_string,
 			ADD UNIQUE askw_string ( askw_string )" );
 		upg_task_end();
