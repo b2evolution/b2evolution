@@ -178,6 +178,10 @@ $Form->begin_form( 'inskin', '', $form_params );
 			$disp_edit_categories = false;
 		}
 	}
+	if( $disp_edit_categories && get_post_cat_setting( $Blog->ID ) < 1 )
+	{	// Categories block is hidden when main category is assigned automatically:
+		$disp_edit_categories = false;
+	}
 
 	$Form->begin_fieldset( get_request_title( array_merge( array(
 			'edit_links_template' => array(
