@@ -814,9 +814,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							ADD COLUMN blog_access_type VARCHAR(10) NOT NULL DEFAULT 'index.php' AFTER blog_locale,
 							ADD COLUMN blog_force_skin tinyint(1) NOT NULL default 0 AFTER blog_default_skin,
 							ADD COLUMN blog_in_bloglist tinyint(1) NOT NULL DEFAULT 1 AFTER blog_disp_bloglist,
-							ADD COLUMN blog_links_blog_ID INT(4) NOT NULL DEFAULT 0,
-							ADD UNIQUE KEY blog_stub (blog_stub)";
+							ADD COLUMN blog_links_blog_ID INT(4) NOT NULL DEFAULT 0";
 		$DB->query( $query );
+		// Use this query separately from above because MariaDB versions 10+ create an error:
+		$DB->query( 'ALTER TABLE T_blogs
+			ADD UNIQUE KEY blog_stub (blog_stub)' );
 
 		$query = "UPDATE T_blogs
 							SET blog_access_type = 'stub',
@@ -1125,7 +1127,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							ADD COLUMN blog_allowcomments VARCHAR(20) NOT NULL default 'post_by_post' AFTER blog_keywords,
 							ADD COLUMN blog_allowblogcss TINYINT(1) NOT NULL default 1 AFTER blog_allowpingbacks,
 							ADD COLUMN blog_allowusercss TINYINT(1) NOT NULL default 1 AFTER blog_allowblogcss,
-							DROP INDEX blog_stub,
 							ADD COLUMN blog_stub VARCHAR(255) NOT NULL DEFAULT 'stub' AFTER blog_staticfilename,
 							ADD COLUMN blog_commentsexpire INT(4) NOT NULL DEFAULT 0 AFTER blog_links_blog_ID,
 							ADD COLUMN blog_media_location ENUM( 'default', 'subdir', 'custom', 'none' ) DEFAULT 'default' NOT NULL AFTER blog_commentsexpire,
@@ -1133,6 +1134,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							ADD COLUMN blog_media_fullpath VARCHAR( 255 ) NOT NULL AFTER blog_media_subdir,
 							ADD COLUMN blog_media_url VARCHAR(255) NOT NULL AFTER blog_media_fullpath";
 		$DB->query( $query );
+		// Use this query separately from above because MariaDB versions 10+ create an error:
+		$DB->query( 'ALTER TABLE T_blogs
+							DROP INDEX blog_stub' );
 
 		$query = "ALTER TABLE T_blogs
 							ADD UNIQUE blog_urlname ( blog_urlname )";
@@ -2603,17 +2607,21 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$query = "ALTER TABLE T_hitlog
 			 CHANGE COLUMN hit_ID hit_ID              INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			 CHANGE COLUMN hit_datetime hit_datetime  DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
-			 ADD COLUMN hit_keyphrase_keyp_ID         INT UNSIGNED DEFAULT NULL AFTER hit_referer_dom_ID,
-			 ADD INDEX hit_remote_addr ( hit_remote_addr ),
-			 ADD INDEX hit_sess_ID        ( hit_sess_ID )";
+			 ADD COLUMN hit_keyphrase_keyp_ID         INT UNSIGNED DEFAULT NULL AFTER hit_referer_dom_ID";
 		$DB->query( $query );
+		// Use this query separately from above because MariaDB versions 10+ create an error:
+		$DB->query( 'ALTER TABLE T_hitlog
+			 ADD INDEX hit_remote_addr ( hit_remote_addr ),
+			 ADD INDEX hit_sess_ID     ( hit_sess_ID )' );
 		echo "OK.<br />\n";
 
 		echo 'Upgrading sessions table... ';
 		$DB->query( "ALTER TABLE T_sessions
 			ALTER COLUMN sess_lastseen SET DEFAULT '2000-01-01 00:00:00',
-			ADD COLUMN sess_hitcount  INT(10) UNSIGNED NOT NULL DEFAULT 1 AFTER sess_key,
-			ADD KEY sess_user_ID (sess_user_ID)" );
+			ADD COLUMN sess_hitcount  INT(10) UNSIGNED NOT NULL DEFAULT 1 AFTER sess_key" );
+		// Use this query separately from above because MariaDB versions 10+ create an error:
+		$DB->query(	'ALTER TABLE T_sessions
+			ADD KEY sess_user_ID (sess_user_ID)' );
 		echo "OK.<br />\n";
 
 		echo 'Creating goal tracking table... ';
@@ -4974,8 +4982,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		task_begin( 'Upgrading Files table...' );
 		$DB->query( 'ALTER TABLE T_files
-			DROP INDEX file,
 			ADD COLUMN file_path_hash char(32) default NULL' );
+		// Use this query separately from above because MariaDB versions 10+ create an error:
+		$DB->query( 'ALTER TABLE T_files
+			DROP INDEX file' );
 		// Change file path length to the max allowed value
 		$DB->query( "ALTER TABLE T_files CHANGE COLUMN file_path file_path VARCHAR(767) NOT NULL DEFAULT ''" );
 		$DB->query( 'UPDATE T_files SET file_path_hash = MD5( CONCAT( file_root_type, file_root_ID, file_path ) )');
