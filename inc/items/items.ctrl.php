@@ -1556,6 +1556,9 @@ function init_list_mode()
 					'itemtype_usage' => implode( ',', get_item_type_usage_by_tab( $tab_type ) ),
 				) );
 			$AdminUI->breadcrumbpath_add( T_( $tab_type ), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab_type='.urlencode( $tab_type ).'&amp;filter=restore' );
+
+			// JS to edit an order of items from list view:
+			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 			break;
 
 		case 'tracker':

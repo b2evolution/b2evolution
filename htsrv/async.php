@@ -683,6 +683,37 @@ switch( $action )
 		echo '<a href="#" rel="'.$new_value.'"'.$new_attrs.'>'.$new_title.'</a>';
 		break;
 
+	case 'item_order_edit':
+		// Update an order of Item from list screen by clicking on the cell:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'itemorder' );
+
+		$item_order = param( 'new_item_order', 'string' );
+		$post_ID = param( 'post_ID', 'integer' );
+
+		$ItemCache = & get_ItemCache();
+		$Item = & $ItemCache->get_by_ID( $post_ID );
+
+		// Check permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $Item );
+
+		if( $item_order === '-' || $item_order === '' )
+		{	// Set NULL for these values:
+			$item_order = NULL;
+		}
+		else
+		{	// Make an order to integer:
+			$item_order = intval( $item_order );
+		}
+
+		$Item->set( 'order', $item_order, true );
+		$Item->dbupdate();
+
+		// Return a link to make the cell editable on next time:
+		echo '<a href="#" rel="'.$Item->ID.'">'.( $item_order === NULL ? '-' : $item_order ).'</a>';
+		break;
+
 	case 'cat_order_edit':
 		// Update order of a chapter from list screen by clicking on the order column
 

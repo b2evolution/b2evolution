@@ -4207,9 +4207,11 @@ function items_results( & $items_Results, $params = array() )
 	{ // Display Ord column
 		$items_Results->cols[] = array(
 				'th' => T_('Ord'),
+				'th_class' => 'shrinkwrap',
 				'order' => $params['field_prefix'].'order',
-				'td_class' => 'right',
-				'td' => '$post_order$',
+				'td_class' => 'right item_order_edit',
+				'td' => '%item_row_order( {Obj} )%',
+				'extra' => array( 'rel' => '#post_ID#' ),
 			);
 	}
 
@@ -4477,6 +4479,30 @@ function item_row_status( $Item, $index )
 
 	return $r;
 }
+
+
+/**
+ * Get a html code to edit an item order from table by AJAX
+ *
+ * @param object Item
+ * @return string
+ */
+function item_row_order( $Item )
+{
+	global $current_User;
+
+	$item_order = $Item->get( 'order' );
+
+	if( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+	{	// If current user can edit the Item then allow to edit an order by AJAX:
+		return '<a href="#" rel="'.$Item->ID.'">'.( $item_order === NULL ? '-' : $item_order ).'</a>';
+	}
+	else
+	{	// If current user cannot edit the Item then display a static text
+		return $item_order;
+	}
+}
+
 
 /**
  * Edit Actions:
