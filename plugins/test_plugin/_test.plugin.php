@@ -95,7 +95,8 @@ class test_plugin extends Plugin
 			),
 			'my_select' => array(
 				'label' => 'Selector',
-				'id' => $this->classname.'_my_select',
+				'id' => $this->classname.'_my_select_id',
+				'class' => $this->classname.'_my_select_class',
 				'onchange' => 'document.getElementById("'.$this->classname.'_a_disabled_one").disabled = ( this.value == "sun" );',
 				'defaultvalue' => 'one',
 				'type' => 'select',
