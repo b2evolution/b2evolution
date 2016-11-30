@@ -399,7 +399,7 @@ if( $edited_Item->get_type_setting( 'allow_attachments' ) )
 		}
 		echo '</div>';
 	}
-	if( $perm_view_files )
+	if( $perm_view_files && $edited_Item->ID > 0 )
 	{	// If current user has a permission to view files
 		$LinkOwner = new LinkItem( $edited_Item );
 		if( $LinkOwner->count_links() )
