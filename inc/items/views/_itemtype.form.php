@@ -295,9 +295,12 @@ $Results->display( $display_params );
 
 
 $item_status_IDs = array();
-foreach( $Results->rows as $row )
-{
-	$item_status_IDs[] = $row->pst_ID;
+if( $Results->result_num_rows > 0 )
+{	// If at least one post status exists in DB:
+	foreach( $Results->rows as $row )
+	{
+		$item_status_IDs[] = $row->pst_ID;
+	}
 }
 $Form->hidden( 'item_status_IDs', implode( ',', $item_status_IDs ) );
 

@@ -316,7 +316,7 @@ function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
 	}
 	else
 	{ // Use normal/standard lostpassword form (without blog skin)
-		$activateinfo_url = get_htsrv_url( true ).'login.php?action=req_validatemail';
+		$activateinfo_url = get_htsrv_url( true ).'login.php?action=req_activate_email';
 	}
 
 	return url_add_param( $activateinfo_url, 'redirect_to='.rawurlencode( $redirect_to ), $glue ) ;
@@ -395,7 +395,7 @@ function redirect_after_account_activation()
 	if( $redirect_to == 'return_to_original' )
 	{ // we want to return to original page after account activation
 		// the redirect_to param should be set in the Session. This was set when the account activation email was sent.
-		$redirect_to = $Session->get( 'core.validatemail.redirect_to' );
+		$redirect_to = $Session->get( 'core.activateacc.redirect_to' );
 		// if the redirect_to is not set in the Session or is empty, we MUST NEVER let to redirect back to the origianl page which can be hotmail, gmail, etc.
 		if( empty( $redirect_to ) )
 		{ // session redirect_to was not set, initialize $redirect_to to the home page
@@ -3022,20 +3022,14 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 			$Form->begin_fieldset( $userfield->ufgp_name.( is_admin_page() ? get_manual_link( 'user-profile-tab-userfields' ) : '' ) , array( 'id' => $userfield->ufgp_ID ) );
 		}
 
-		$userfield_type = $userfield->ufdf_type;
-		if( $userfield_type == 'number' )
-		{	// Change number type of integer because we have this type name preparing in function param():
-			$userfield_type = 'integer';
-		}
-		elseif( $userfield_type != 'text' && $userfield_type != 'url' )
-		{	// Use all other params as string, Only text and url have a preparing in function param():
-			$userfield_type = 'string';
-		}
-		$uf_val = param( 'uf_'.$userfield->uf_ID, $userfield_type, NULL );
+		// Get a value of existing field in DB (after submit form):
+		$uf_val = param( 'uf_'.$userfield->uf_ID, 'raw', NULL );
 
 		$uf_ID = $userfield->uf_ID;
 		if( $userfield->uf_ID == '0' )
-		{	// Set uf_ID for new (not saved) fields (recommended & require types)
+		{	// Try to get a value of new added field (not saved in DB) (recommended & require types):
+
+			// Set uf_ID for new field:
 			$userfield->uf_ID = $new_field_name.'['.$userfield->ufdf_ID.'][]';
 
 			$value_num = 'uf_'.$new_field_name.'_'.$userfield->ufdf_ID.'prev_value_num';
@@ -3044,30 +3038,6 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 			if( isset( $uf_new_fields[$userfield->ufdf_ID][$$value_num] ) )
 			{	// Get a value from submitted form:
 				$uf_val = $uf_new_fields[$userfield->ufdf_ID][$$value_num];
-				switch( $userfield->ufdf_type )
-				{
-					case 'url':
-						// Format url field to valid value:
-						$uf_val = param_format( $uf_val, 'url' );
-						break;
-
-					case 'text':
-						// Format text field to valid value:
-						$uf_val = param_format( $uf_val, 'text' );
-						break;
-
-					case 'number':
-						// Format number field to valid value:
-						$uf_val = param_format( $uf_val, 'integer' );
-						break;
-
-					case 'email':
-					case 'word':
-					case 'phone':
-						// Format string fields to valid value:
-						$uf_val = param_format( $uf_val, 'string' );
-						break;
-				}
 				$$value_num++;
 			}
 		}
@@ -3075,6 +3045,19 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 		if( is_null( $uf_val ) )
 		{	// No value submitted yet, get DB val:
 			$uf_val = $userfield->uf_varchar;
+		}
+		else
+		{	// Format a submitted value for valid format:
+			$userfield_type = $userfield->ufdf_type;
+			if( $userfield_type == 'number' )
+			{	// Change number type of integer because we have this type name preparing in function param_format():
+				$userfield_type = 'integer';
+			}
+			elseif( $userfield_type != 'text' && $userfield_type != 'url' )
+			{	// Use all other params as string, Only text and url have a preparing in function param_format():
+				$userfield_type = 'string';
+			}
+			$uf_val = param_format( $uf_val, $userfield_type );
 		}
 
 		$field_note = '';
@@ -3747,7 +3730,7 @@ function add_report_from( $user_ID, $status, $info )
 							'report_status'  => get_report_status_text( $status ),
 							'report_info'    => $info,
 							'user_ID'        => $user_ID,
-							'reported_by'    => $current_User->login,
+							'reported_by'    => $current_User->get_username(),
 						);
 		// send notificaiton ( it will be send to only those users who want to receive this kind of notifications )
 		send_admin_notification( NT_('User account reported'), 'account_reported', $email_template_params );
@@ -6086,7 +6069,36 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
 }
 
 /**
- * Helper functions to display User's reports results.
- * New ( not display helper ) functions must be created above user_reports_results function
+ * Validate current session is in a password reset process:
+ *
+ * return boolean true if valid
  */
+function validate_pwd_reset_session( $reqID, $forgetful_User )
+{
+	global $Session;
+
+	// Validate that params are passed:
+	if( ! $forgetful_User || empty( $reqID ) )
+	{ // This was not requested
+		return false;
+	}
+
+	locale_temp_switch( $forgetful_User->locale );
+
+	// Validate provided reqID against the one stored in the user's session
+	if( $Session->get( 'core.changepwd.request_id' ) != $reqID )
+	{
+		return false;
+	}
+
+	// Validate requested user login/email against the one stored in the user's session:
+	if( $Session->get( 'core.changepwd.request_for' ) != $forgetful_User->get( 'login' ) &&
+	    $Session->get( 'core.changepwd.request_for' ) != $forgetful_User->get( 'email' ) )
+	{
+		return false;
+	}
+
+	return true;
+}
+
 ?>

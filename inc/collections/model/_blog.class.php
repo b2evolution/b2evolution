@@ -2341,7 +2341,7 @@ class Blog extends DataObject
 
 		if( ! $Settings->get( 'fm_enable_roots_blog' ) )
 		{ // User directories are disabled:
-			$Debuglog->add( 'Attempt to access blog media dir, but this feature is globally disabled', 'files' );
+			$Debuglog->add( 'Attempt to access collection media dir, but this feature is globally disabled', 'files' );
 			return false;
 		}
 
@@ -2361,7 +2361,7 @@ class Blog extends DataObject
 
 			case 'none':
 			default:
-				$Debuglog->add( 'Attempt to access blog media dir, but this feature is disabled for this blog', 'files' );
+				$Debuglog->add( 'Attempt to access collection media dir, but this feature is disabled for this colletion', 'files' );
 				return false;
 		}
 
@@ -2376,8 +2376,8 @@ class Blog extends DataObject
 			{ // add error
 				if( is_admin_page() )
 				{
-					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), $msg_mediadir_path )
-								.get_manual_link('media_file_permission_errors'), 'error' );
+					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), $msg_mediadir_path ),
+							'error', T_('Collection media file permission errors').get_manual_link('media_file_permission_errors').':' );
 				}
 				return false;
 			}
@@ -2385,8 +2385,8 @@ class Blog extends DataObject
 			{ // add error
 				if( is_admin_page() )
 				{
-					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created."), $msg_mediadir_path )
-								.get_manual_link('directory_creation_error'), 'error' );
+					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; could not be created."), $msg_mediadir_path ),
+							'error', T_('Collection media directory creation errors').get_manual_link('directory_creation_error').':' );
 				}
 				return false;
 			}
@@ -2394,7 +2394,7 @@ class Blog extends DataObject
 			{ // add note:
 				if( is_admin_page() )
 				{
-					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; has been created with permissions %s."), $msg_mediadir_path, substr( sprintf('%o', fileperms($mediadir)), -3 ) ), 'success' );
+					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; has been created with permissions %s."), $msg_mediadir_path, substr( sprintf('%o', fileperms($mediadir)), -3 ) ), 'success', T_('Collection media directories created:') );
 				}
 			}
 		}
@@ -3087,8 +3087,6 @@ class Blog extends DataObject
 		// DB INSERT
 		$this->dbinsert();
 
-		$Messages->add( T_('The new blog has been created.'), 'success' );
-
 		// Change access mode if a stub file exists:
 		$stub_filename = 'blog'.$this->ID.'.php';
 		if( is_file( $basepath.$stub_filename ) )
@@ -3096,7 +3094,7 @@ class Blog extends DataObject
 			$DB->query( 'UPDATE T_blogs
 						SET blog_access_type = "relative", blog_siteurl = "'.$stub_filename.'"
 						WHERE blog_ID = '.$this->ID );
-			$Messages->add( sprintf(T_('The new blog has been associated with the stub file &laquo;%s&raquo;.'), $stub_filename ), 'success' );
+			$Messages->add_to_group( sprintf(T_('The new collection has been associated with the stub file &laquo;%s&raquo;.'), $stub_filename ), 'success', T_('New collection created:') );
 		}
 		elseif( $this->get( 'access_type' ) == 'relative' )
 		{ // Show error message only if stub file should exists!
@@ -3134,13 +3132,13 @@ class Blog extends DataObject
 		$edited_Chapter->set( 'urlname', $blog_urlname.'-main' );
 		$edited_Chapter->dbinsert();
 
-		$Messages->add( T_('A default category has been created for this blog.'), 'success' );
+		$Messages->add_to_group( T_('A default category has been created for this collection.'), 'success', T_('New collection created:') );
 
 		// ADD DEFAULT WIDGETS:
 		load_funcs( 'widgets/_widgets.funcs.php' );
 		insert_basic_widgets( $this->ID, false, $kind );
 
-		$Messages->add( T_('Default widgets have been set-up for this blog.'), 'success' );
+		$Messages->add_to_group( T_('Default widgets have been set-up for this collection.'), 'success', T_('New collection created:') );
 
 		$DB->commit();
 
@@ -3151,7 +3149,14 @@ class Blog extends DataObject
 			if( $result != NULL )
 			{
 				list( $status, $message ) = $result;
-				$Messages->add( $message, $status );
+				if( $status == 'success' )
+				{
+					$Messages->add_to_group( $message, $status, T_('New collection created:') );
+				}
+				else
+				{
+					$Messages->add( $message, $status );
+				}
 			}
 		}
 		$this->set_setting( 'cache_enabled_widgets', $Settings->get( 'newblog_cache_enabled_widget' ) );

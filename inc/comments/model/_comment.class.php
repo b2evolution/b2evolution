@@ -1037,7 +1037,7 @@ class Comment extends DataObject
 				'after_user'   => '#',	// After Member user
 				'format'       => 'htmlbody',
 				'link_to'      => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' 'userpage>userurl'
-				'link_text'    => 'preferredname', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+				'link_text'    => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 				'link_rel'     => '',
 				'link_class'   => '',
 				'thumb_size'   => 'crop-top-32x32',
@@ -3306,16 +3306,17 @@ class Comment extends DataObject
 	/**
 	 * Display status of item in a formatted way, following a provided template
 	 *
-	 * There are 2 possible variables:
+	 * There are 3 possible variables:
 	 * - $status$ = the raw status
 	 * - $status_title$ = the human readable text version of the status (translated to current language)
+	 * - $tooltip_title$ = the human readable text version of the status for tooltip
 	 *
 	 * @param array Params
 	 */
 	function format_status( $params = array() )
 	{
 		$params = array_merge( array(
-				'template'     => '<div class="evo_status evo_status_$status$">$status_title$</div>',
+				'template'     => '<div class="evo_status evo_status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$>$status_title$</div>',
 				'format'       => 'htmlbody', // Output format, see {@link format_to_output()}
 				'status'       => NULL,
 				'status_title' => NULL,
@@ -3336,8 +3337,8 @@ class Comment extends DataObject
 			$params['status_title'] = $this->get( 't_status' );
 		}
 
-		$r = str_replace( array( '$status$', '$status_title$' ),
-			array( $params['status'], $params['status_title'] ),
+		$r = str_replace( array( '$status$', '$status_title$', '$tooltip_title$' ),
+			array( $params['status'], $params['status_title'], get_status_tooltip_title( $params['status'] ) ),
 			$params['template'] );
 
 		echo format_to_output( $r, $params['format'] );
@@ -3435,13 +3436,13 @@ class Comment extends DataObject
 		{	// Only change DB flag to "members_notified" but do NOT actually send notifications:
 			$force_members = false;
 			$notified_flags[] = 'members_notified';
-			$Messages->add( T_('Marking email notifications for members as sent.'), 'note' );
+			$Messages->add_to_group( T_('Marking email notifications for members as sent.'), 'note', T_('Sending notifications:') );
 		}
 		if( $force_community == 'mark' )
 		{	// Only change DB flag to "community_notified" but do NOT actually send notifications:
 			$force_community = false;
 			$notified_flags[] = 'community_notified';
-			$Messages->add( T_('Marking email notifications for community as sent.'), 'note' );
+			$Messages->add_to_group( T_('Marking email notifications for community as sent.'), 'note', T_('Sending notifications:') );
 		}
 		if( ! empty( $notified_flags ) )
 		{	// Save the marked processing status to DB:
@@ -3453,7 +3454,7 @@ class Comment extends DataObject
 		if( ( $force_members != 'force' && $force_community != 'force' ) &&
 		    $this->check_notifications_flags( array( 'members_notified', 'community_notified' ) ) )
 		{	// All possible notifications have already been sent:
-			$Messages->add( T_('All possible notifications have already been sent: skipping notifications...'), 'note' );
+			$Messages->add_to_group( T_('All possible notifications have already been sent: skipping notifications...'), 'note', T_('Sending notifications:') );
 			return false;
 		}
 
@@ -3497,7 +3498,7 @@ class Comment extends DataObject
 			// Save cronjob to DB:
 			if( $comment_Cronjob->dbinsert() )
 			{
-				$Messages->add( T_('Scheduling email notifications for subscribers.'), 'note' );
+				$Messages->add_to_group( T_('Scheduling email notifications for subscribers.'), 'note', T_('Sending notifications:') );
 
 				// Memorize the cron job ID which is going to handle this post:
 				$this->set( 'notif_ctsk_ID', $comment_Cronjob->ID );
@@ -3587,7 +3588,7 @@ class Comment extends DataObject
 		// Update comment notification params:
 		$this->dbupdate();
 
-		$Messages->add( sprintf( T_('Sending %d email notifications to moderators.'), count( $notify_users ) ), 'note' );
+		$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), count( $notify_users ) ), 'note', T_('Sending notifications:') );
 
 		return $notified_user_IDs;
 	}
@@ -3621,7 +3622,7 @@ class Comment extends DataObject
 
 		if( ! $comment_item_Blog->get_setting( 'allow_item_subscriptions' ) )
 		{	// Subscriptions not enabled!
-			$Messages->add( T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.'), 'note' );
+			$Messages->add_to_group( T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.'), 'note', T_('Sending notifications:') );
 			return array();
 		}
 
@@ -3629,27 +3630,27 @@ class Comment extends DataObject
 		{	// Don't send notifications about comments with not allowed status:
 			$status_titles = get_visibility_statuses( '', array() );
 			$status_title = isset( $status_titles[ $this->get( 'status' ) ] ) ? $status_titles[ $this->get( 'status' ) ] : $this->get( 'status' );
-			$Messages->add( sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title ), 'note' );
+			$Messages->add_to_group( sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title ), 'note', T_('Sending notifications:') );
 			return array();
 		}
 
 		if( $force_members == 'skip' && $force_community == 'skip' )
 		{	// Skip subscriber notifications because of it is forced by param:
-			$Messages->add( T_('Skipping email notifications to subscribers.'), 'note' );
+			$Messages->add_to_group( T_('Skipping email notifications to subscribers.'), 'note', T_('Sending notifications:') );
 			return array();
 		}
 
 		if( $force_members == 'force' && $force_community == 'force' )
 		{	// Force to members and community:
-			$Messages->add( T_('Force sending email notifications to subscribers...'), 'note' );
+			$Messages->add_to_group( T_('Force sending email notifications to subscribers...'), 'note', T_('Sending notifications:') );
 		}
 		elseif( $force_members == 'force' )
 		{	// Force to members only:
-			$Messages->add( T_('Force sending email notifications to subscribed members...'), 'note' );
+			$Messages->add_to_group( T_('Force sending email notifications to subscribed members...'), 'note', T_('Sending notifications:') );
 		}
 		elseif( $force_community == 'force' )
 		{	// Force to community only:
-			$Messages->add( T_('Force sending email notifications to other subscribers...'), 'note' );
+			$Messages->add_to_group( T_('Force sending email notifications to other subscribers...'), 'note', T_('Sending notifications:') );
 		}
 
 		$notify_members = false;
@@ -3676,18 +3677,18 @@ class Comment extends DataObject
 
 		if( ! $notify_members && ! $notify_community )
 		{	// Everyone has already been notified, nothing to do:
-			$Messages->add( T_('Skipping email notifications to subscribers because they were already notified.'), 'note' );
+			$Messages->add_to_group( T_('Skipping email notifications to subscribers because they were already notified.'), 'note', T_('Sending notifications:') );
 			return array();
 		}
 
 		if( $notify_members && $force_members == 'skip' )
 		{	// Skip email notifications to members because it is forced by param:
-			$Messages->add( T_('Skipping email notifications to subscribed members.'), 'note' );
+			$Messages->add_to_group( T_('Skipping email notifications to subscribed members.'), 'note', T_('Sending notifications:') );
 			$notify_members = false;
 		}
 		if( $notify_community && $force_community == 'skip' )
 		{	// Skip email notifications to community because it is forced by param:
-			$Messages->add( T_('Skipping email notifications to other subscribers.'), 'note' );
+			$Messages->add_to_group( T_('Skipping email notifications to other subscribers.'), 'note', T_('Sending notifications:') );
 			$notify_community = false;
 		}
 
@@ -3869,11 +3870,11 @@ class Comment extends DataObject
 
 		if( $notify_members )
 		{	// Display a message to know how many members are notified:
-			$Messages->add( sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count ), 'note' );
+			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count ), 'note', T_('Sending notifications:') );
 		}
 		if( $notify_community )
 		{	// Display a message to know how many community users are notified:
-			$Messages->add( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), 'note' );
+			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), 'note', T_('Sending notifications:') );
 		}
 
 		if( empty( $notify_users ) )
@@ -3922,8 +3923,8 @@ class Comment extends DataObject
 		// Get author email address. It will be visible for moderators/blog/post owners only -- NOT for other subscribers
 		if( $this->get_author_User() )
 		{ // Comment from a registered user:
-			$reply_to = $this->author_User->get('email');
-			$author_name = $this->author_User->get('login');
+			$reply_to = $this->author_User->get( 'email' );
+			$author_name = $this->author_User->get_username();
 			$author_user_ID = $this->author_User->ID;
 		}
 		elseif( ! empty( $this->author_email ) )

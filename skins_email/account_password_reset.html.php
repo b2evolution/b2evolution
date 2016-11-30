@@ -59,7 +59,6 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 	$url_change_password = get_htsrv_url( true ).'login.php?action=changepwd'
 		.'&'.$dummy_fields[ 'login' ].'='.rawurlencode( $iterator_User->login )
 		.'&reqID='.$params['request_id']
-		.'&sessID='.$Session->ID  // used to detect cookie problems
 		.$params['blog_param'];
 
 	// Restrict the password change url to be saved in the email logs
@@ -67,7 +66,7 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 
 	// Buttons:
 	$message_content .= '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
-	$message_content .= get_link_tag( $url_change_password, T_( 'Change your password NOW' ), 'div.buttons a+a.button_yellow' )."\n";
+	$message_content .= get_link_tag( $url_change_password, T_( 'Reset your password NOW' ), 'div.buttons a+a.button_yellow' )."\n";
 	$message_content .= "</div>\n";
 
 	if( $params['user_count'] > 1 )
@@ -87,13 +86,13 @@ else
 	$message_note = T_( 'For security reasons the link is only valid for your current session (by means of your session cookie).' );
 }
 
-echo '<p'.emailskin_style( '.p' ).'>'.T_( 'Somebody (presumably you) has requested a password change for your account.' )."</p>\n";
+echo '<p'.emailskin_style( '.p' ).'>'.T_( 'Somebody (presumably you) has requested a password reset for your account.' )."</p>\n";
 
 echo $message_content;
 
 echo '<p'.emailskin_style( '.p+.note' ).'>'.T_('Please note:').' '.$message_note."</p>\n";
 
-echo '<p'.emailskin_style( '.p' ).'><i'.emailskin_style( '.note' ).'>'.T_('If you did not request this password change, simply ignore this email.').'</i></p>';
+echo '<p'.emailskin_style( '.p' ).'><i'.emailskin_style( '.note' ).'>'.T_('If you did not request this password reset, simply ignore this email.').'</i></p>';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.html.php', $params );

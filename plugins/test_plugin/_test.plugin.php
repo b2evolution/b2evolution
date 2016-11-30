@@ -34,7 +34,7 @@ class test_plugin extends Plugin
 	var $name = 'Test';
 	var $code = 'evo_TEST';
 	var $priority = 50;
-	var $version = '6.7.8';
+	var $version = '6.7.9';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -95,7 +95,8 @@ class test_plugin extends Plugin
 			),
 			'my_select' => array(
 				'label' => 'Selector',
-				'id' => $this->classname.'_my_select',
+				'id' => $this->classname.'_my_select_id',
+				'class' => $this->classname.'_my_select_class',
 				'onchange' => 'document.getElementById("'.$this->classname.'_a_disabled_one").disabled = ( this.value == "sun" );',
 				'defaultvalue' => 'one',
 				'type' => 'select',

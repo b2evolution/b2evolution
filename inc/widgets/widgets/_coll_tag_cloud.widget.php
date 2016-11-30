@@ -102,9 +102,18 @@ class coll_tag_cloud_Widget extends ComponentWidget
 		foreach( $visibility_statuses as $status => $status_text )
 		{
 			$option_statuses[] = array(
-				'inskin_'.$status,
-				$visibility_statuses_icons[$status].' '.$status_text,
-				in_array( $status, $default_visible_statuses ) ? 1 : 0
+				'inskin_'.$status, // name
+				$visibility_statuses_icons[$status].' '.$status_text, // option label
+				in_array( $status, $default_visible_statuses ) ? 1 : 0, // default value
+				NULL, // dummy parameter, will not be used since 1st and 3rd element will determine if option is checked
+				NULL, // disabled option
+				NULL, // note
+				NULL, // class
+				NULL, // render as hidden
+				array( // option label attributes
+					'data-toggle' => 'tooltip',
+					'data-placement' => 'top',
+					'title' => get_status_tooltip_title( $status ) )
 			);
 		}
 
@@ -208,6 +217,15 @@ class coll_tag_cloud_Widget extends ComponentWidget
 		{
 			// Get a list of quoted blog IDs
 			$blog_ids = sanitize_id_list( $this->disp_params['blog_ids'], true );
+
+			// function sanitize_id_list above will always return an array
+			// but for the get_tags function invoked below, we just want an integer if it is a single element array
+			// so that the appropriate aggregates collections will be used
+			if( count( $blog_ids ) === 1 )
+			{
+				$blog_ids = $blog_ids[0];
+			}
+
 			if( empty( $blog ) && empty( $blog_ids ) )
 			{	// Nothing to display
 				return;

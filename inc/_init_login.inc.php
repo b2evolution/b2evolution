@@ -331,11 +331,11 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 					$attempt_ip .= ' '.gethostbyaddr( $attempt_ip );
 				}
 
-				$Messages->add( sprintf( T_('Someone tried to log in to your account with a wrong password on %s from %s%s'),
+				$Messages->add_to_group( sprintf( T_('Someone tried to log in to your account with a wrong password on %s from %s%s'),
 						date( locale_datefmt().' '.locale_timefmt(), $attempt[0] ),
 						$attempt_ip,
 						$plugin_country_by_IP
-					), 'error' );
+					), 'error', T_('Invalid login attempts:') );
 			}
 			// Clear the attempts list
 			$UserSettings->delete( 'login_attempts', $current_User->ID );
@@ -430,9 +430,9 @@ $action = param( 'action', 'string', NULL );
 // Check if the user needs to be validated, but is not yet:
 if( check_user_status( 'can_be_validated' ) // user is logged in but not validated and validation is required
 	&& $action != 'logout'
-	&& $action != 'req_validatemail' && $action != 'validatemail' && $validate_required )
+	&& $action != 'req_activate_email' && $action != 'activateacc_sec' && $validate_required )
 { // we're not in that action already:
-	$action = 'req_validatemail'; // for login.php
+	$action = 'req_activate_email'; // for login.php
 	if( $is_admin_page )
 	{
 		$login_error = T_('In order to access the admin interface, you must first activate your account by clicking on the activation link in the email we sent you. <b>See below:</b>');

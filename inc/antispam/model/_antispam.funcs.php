@@ -231,7 +231,7 @@ function antispam_poll_abuse()
 	// Get datetime from last update, because we only want newer stuff...
 	$last_update = $Settings->get( 'antispam_last_update' );
 	// Encode it in the XML-RPC format
-	$Messages->add( T_('Latest update timestamp').': '.$last_update, 'note' );
+	$Messages->add_to_group( T_('Latest update timestamp').': '.$last_update, 'note', T_('Updating antispam:') );
 	$startat = mysql2date( 'Ymd\TH:i:s', $last_update );
 	//$startat = iso8601_encode( mktime(substr($m,11,2),substr($m,14,2),substr($m,17,2),substr($m,5,2),substr($m,8,2),substr($m,0,4)) );
 
@@ -247,7 +247,7 @@ function antispam_poll_abuse()
 								)
 							);
 
-	$Messages->add( sprintf( T_('Requesting abuse list from %s...'), $antispamsrv_host ), 'note' );
+	$Messages->add_to_group( sprintf( T_('Requesting abuse list from %s...'), $antispamsrv_host ), 'note', T_('Updating antispam:') );
 
 	$result = $client->send( $message );
 
@@ -259,7 +259,7 @@ function antispam_poll_abuse()
 			$response = xmlrpc_decode_recurse( $response );
 			if( !isset( $response['strings'] ) || !isset( $response['lasttimestamp'] ) )
 			{
-				$Messages->add( T_('Incomplete reponse.'), 'error' );
+				$Messages->add( T_('Incomplete response.'), 'error' );
 				$ret = false;
 			}
 			else
@@ -267,28 +267,27 @@ function antispam_poll_abuse()
 				$value = $response['strings'];
 				if( count( $value ) == 0 )
 				{
-					$Messages->add( T_('No new blacklisted strings are available.'), 'note' );
+					$Messages->add_to_group( T_('No new blacklisted strings are available.'), 'note', T_('Updating antispam:') );
 				}
 				else
 				{ // We got an array of strings:
-					$Messages->add( T_('Adding strings to local blacklist:'), 'note' );
 					foreach( $value as $banned_string )
 					{
 						if( antispam_create( $banned_string, 'central' ) )
 						{ // Creation successed
-							$Messages->add( T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '
-								.T_('OK.'), 'note' );
+							$Messages->add_to_group( T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '
+								.T_('OK.'), 'note', T_('Adding strings to local blacklist:') );
 						}
 						else
 						{ // Was already handled
-							$Messages->add( T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '
-								.T_('Not necessary! (Already handled)'), 'note' );
+							$Messages->add_to_group( T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '
+								.T_('Not necessary! (Already handled)'), 'note', T_('Adding strings to local blacklist:') );
 							antispam_update_source( $banned_string, 'central' );
 						}
 					}
 					// Store latest timestamp:
 					$endedat = date('Y-m-d H:i:s', iso8601_decode( $response['lasttimestamp'] ) );
-					$Messages->add( T_('New latest update timestamp').': '.$endedat, 'note' );
+					$Messages->add( T_('New latest update timestamp').': '.$endedat, 'note', T_('Adding strings to local blacklist:') );
 
 					$Settings->set( 'antispam_last_update', $endedat );
 					$Settings->dbupdate();
@@ -989,8 +988,7 @@ function antispam_bankruptcy_delete( $blog_IDs = array(), $comment_status = NULL
 			$sql_comments_where.'
 			LIMIT 10000' );
 
-		echo ' .';
-		evo_flush();
+		echo_progress_text();
 	}
 
 	echo 'OK';

@@ -68,11 +68,11 @@ function dbm_delete_pagecache( $display_details = true )
 	{ // Display message only when it is required:
 		if( $result )
 		{
-			$Messages->add( sprintf( T_('General cache deleted: %s'), $cache_path.'general' ), 'note' );
+			$Messages->add_to_group( sprintf( T_('General cache deleted: %s'), $cache_path.'general' ), 'note', T_('Clearing page caches:') );
 		}
 		else
 		{
-			$Messages->add( sprintf( T_('Could not delete general cache: %s'), $cache_path.'general' ), 'error' );
+			$Messages->add_to_group( sprintf( T_('Could not delete general cache: %s'), $cache_path.'general' ), 'error', T_('Page cache clearing errors:') );
 		}
 	}
 
@@ -91,11 +91,11 @@ function dbm_delete_pagecache( $display_details = true )
 			{ // Display message only when it is required:
 				if( $result )
 				{
-					$Messages->add( sprintf( T_('Blog %d cache deleted: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'note' );
+					$Messages->add_to_group( sprintf( T_('Blog %d cache deleted: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'note', T_('Clearing page caches:') );
 				}
 				else
 				{
-					$Messages->add( sprintf( T_('Could not delete blog %d cache: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'error' );
+					$Messages->add_to_group( sprintf( T_('Could not delete blog %d cache: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'error', T_('Page cache clearing errors:') );
 				}
 			}
 			// Create .htaccess file with deny rules
@@ -358,9 +358,8 @@ function dbm_delete_broken_posts()
 				echo '<p class="red">'.sprintf( T_('Cannot delete post with ID %s'), $broken_Item->ID ).'</p>';
 			}
 			if( $r % 100 == 0 )
-			{ // Display a log dot after each 100 processed posts
-				echo '. ';
-				evo_flush();
+			{	// Display a log dot after each 100 processed posts:
+				echo_progress_text();
 			}
 		}
 	}
@@ -490,8 +489,7 @@ function dbm_delete_orphan_files()
 			}
 		}
 
-		echo ' .';
-		evo_flush();
+		echo_progress_text();
 
 		// Clear cache after each page to save memory
 		$FileCache->clear();
@@ -566,8 +564,7 @@ function dbm_delete_orphan_file_roots()
 	}
 
 	/* USERS */
-	echo '. ';
-	evo_flush();
+	echo_progress_text();
 
 	// Get logins of all existing users
 	$SQL = new SQL();
@@ -600,8 +597,7 @@ function dbm_delete_orphan_file_roots()
 	}
 
 	/* DELETE broken  file roots */
-	echo '. ';
-	evo_flush();
+	echo_progress_text();
 
 	foreach( $delete_dirs as $delete_dir )
 	{
@@ -616,8 +612,7 @@ function dbm_delete_orphan_file_roots()
 	}
 
 	/* DELETE orphan DB file records of the blogs and the users */
-	echo '. ';
-	evo_flush();
+	echo_progress_text();
 
 	$count_files_deleted = $DB->query( 'DELETE f, l, lv FROM T_files AS f
 			 LEFT JOIN T_links AS l ON l.link_file_ID = f.file_ID
@@ -839,6 +834,8 @@ function echo_progress_log_update( $progress_log_id, $done, $all )
 	</script>
 	<?php
 	echo '</span>';
+
+	evo_flush();
 }
 
 

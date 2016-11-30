@@ -121,7 +121,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 				if( $Skin->enabled_status_banner( $Item->status ) )
 				{ // Status:
 					$Item->format_status( array(
-							'template' => '<div class="cell2"><div class="evo_status evo_status__$status$ badge">$status_title$</div></div>',
+							'template' => '<div class="cell2"><div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="'.get_status_tooltip_title( $Item->status ).'">$status_title$</div></div>',
 						) );
 					$legend_statuses[] = $Item->status;
 				}

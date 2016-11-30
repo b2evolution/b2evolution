@@ -747,7 +747,7 @@ function check_allow_disp( $disp )
 	}
 
 	$messages_content = $Messages->get_string( '', '', '', 'raw' );
-	if( ( strstr( $messages_content, 'disp=activateinfo' ) !== false ) || ( strstr( $messages_content, 'action=req_validatemail' ) !== false ) )
+	if( ( strstr( $messages_content, 'disp=activateinfo' ) !== false ) || ( strstr( $messages_content, 'action=req_activate_email' ) !== false ) )
 	{ // If there is already a message to display activateinfo link, then don't add this message again
 		return;
 	}
@@ -966,7 +966,7 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	}
 
 	if( $blog_ids == '*' )
-	{
+	{ // All collections
 		$where_cat_clause = '1';
 	}
 	elseif( is_array( $blog_ids ) )
@@ -974,15 +974,20 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 		$where_cat_clause = 'cat_blog_ID IN ( '.$DB->quote( $blog_ids ).' )';
 	}
 	else
-	{ // Get list of relevant blogs
-		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ids );
+	{ // Get list of relevant/ aggregated collections
+		$Blog = & $BlogCache->get_by_ID( $blog_ids );
 		$where_cat_clause = trim( $Blog->get_sql_where_aggregate_coll_IDs( 'cat_blog_ID' ) );
+
+		if( $Blog->get_setting( 'aggregate_coll_IDs' ) == '*' )
+		{
+			$blog_ids = '*';
+		}
 	}
 
 	// Build query to get the tags:
 	$tags_SQL = new SQL();
 
-	if( $get_cat_blog_ID )
+	if( $blog_ids != '*' || $get_cat_blog_ID )
 	{
 		$tags_SQL->SELECT( 'tag_name, COUNT( DISTINCT itag_itm_ID ) AS tag_count, tag_ID, cat_blog_ID' );
 	}
@@ -995,13 +1000,13 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__item ON itag_itm_ID = post_ID' );
 
-	if( $get_cat_blog_ID )
+	if( $blog_ids != '*' || $get_cat_blog_ID )
 	{
 		$tags_SQL->FROM_add( 'INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID' );
 		$tags_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
 	}
 
-	if( $blog_ids != '*' || $skip_intro_posts )
+	if( $skip_intro_posts )
 	{
 		$tags_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
 	}
@@ -1095,6 +1100,10 @@ function get_inskin_statuses_options( & $edited_Blog, $type )
 				'', // Note
 				'', // Class
 				$status_is_hidden, // Hidden field instead of checkbox?
+				array(
+					'data-toggle' => 'tooltip',
+					'data-placement' => 'top',
+					'title' => get_status_tooltip_title( $status ) )
 			);
 	}
 
@@ -1174,6 +1183,19 @@ function get_visibility_statuses( $format = '', $exclude = array('trash'), $chec
 					'draft'      => NT_('Save as Draft!'),
 					'deprecated' => NT_('Save as Deprecated!'),
 					'redirected' => NT_('Save as Redirected!'),
+				);
+			break;
+
+		case 'tooltip-titles':
+			$r = array(
+					'published'  => T_('This is visible by everyone.'),
+					'community'  => T_('This is visible by logged-in users only.'),
+					'protected'  => T_('This is visible by members only.'),
+					'review'     => T_('This is waiting for review and is visible by moderators only.'),
+					'private'    => T_('This is visible only by the owner/author of the post and collection administrators.'),
+					'draft'      => is_admin_page() ? T_('This is a draft.') : T_('This is a draft and is visible only by the owner/author of the post and collection administrators.'),
+					'deprecated' => T_('This is deprecated and visible in the Back-Office only.'),
+					'redirected' => T_('This will redirect to another page when accessed from the Front-Office.'),
 				);
 			break;
 
@@ -1383,6 +1405,20 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow
 	return $result;
 }
 
+
+function get_status_tooltip_title( $status )
+{
+	$visibility_statuses = get_visibility_statuses( 'tooltip-titles' );
+
+	if( isset( $visibility_statuses[$status] ) )
+	{
+		return $visibility_statuses[$status];
+	}
+	else
+	{
+		debug_die( 'Invalid status value' );
+	}
+}
 
 /**
  * Get Blog object from general setting
@@ -1640,9 +1676,9 @@ function blogs_all_results_block( $params = array() )
 
 	if( ! $current_User->check_perm( 'blogs', 'view' ) )
 	{ // We do not have perm to view all blogs... we need to restrict to those we're a member of:
-		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON ( blog_ID = bloguser_blog_ID'
+		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON ( blog_advanced_perms <> 0 AND blog_ID = bloguser_blog_ID'
 			. ' AND bloguser_user_ID = ' . $current_User->ID . ' )' );
-		$SQL->FROM_add( ' LEFT JOIN T_coll_group_perms ON ( blog_ID = bloggroup_blog_ID'
+		$SQL->FROM_add( ' LEFT JOIN T_coll_group_perms ON ( blog_advanced_perms <> 0 AND blog_ID = bloggroup_blog_ID'
 			. ' AND ( bloggroup_group_ID = ' . $current_User->grp_ID
 			. '       OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$current_User->ID.' ) ) )' );
 		$section_where_sql = '';
@@ -1654,8 +1690,7 @@ function blogs_all_results_block( $params = array() )
 			// Get all sections where current user is owner:
 			$section_where_sql .= 'sec_owner_user_ID = '.$current_User->ID.' OR ';
 		}
-		$SQL->WHERE( 'blog_advanced_perms <> 0' );
-		$SQL->WHERE_and( $section_where_sql
+		$SQL->WHERE( $section_where_sql
 			. 'blog_owner_user_ID = ' . $current_User->ID
 			. ' OR bloguser_ismember <> 0'
 			. ' OR bloggroup_ismember <> 0' );

@@ -835,18 +835,19 @@ switch( $action )
 
 						if( $new_name == $old_name )
 						{ // Name has not changed...
-							$Messages->add( sprintf( T_('&laquo;%s&raquo; has not been renamed'), $old_name ), 'note' );
+							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; has not been renamed'), $old_name ), 'note', T_('Renaming files:') );
 							continue;
 						}
 						// Perform rename:
 						if( ! $loop_src_File->rename_to( $new_name ) )
 						{
-							$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
-								$old_name, $new_name ), 'error' );
+							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
+								$old_name, $new_name ), 'error', T_('Renaming files') );
 							continue;
 						}
 
 						$success_message = sprintf( T_('&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;'), $old_name, $new_name );
+						$success_title = T_('Renaming files:');
 						break;
 
 					case 'copy':
@@ -856,7 +857,7 @@ switch( $action )
 
 						if( $old_path == $new_path && $loop_src_File->_FileRoot->ID == $selected_Filelist->_FileRoot->ID )
 						{ // File path has not changed...
-							$Messages->add( sprintf( T_('&laquo;%s&raquo; has not been copied'), $old_path ), 'note' );
+							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; has not been copied'), $old_path ), 'note', T_('Copying files:') );
 							continue;
 						}
 
@@ -866,11 +867,12 @@ switch( $action )
 						// Perform copy:
 						if( ! $loop_src_File->copy_to( $dest_File ) )
 						{ // failed
-							$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be copied to &laquo;%s&raquo;'), $old_path, $new_path ), 'error' );
+							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; could not be copied to &laquo;%s&raquo;'), $old_path, $new_path ), 'error', T_('Copying files:') );
 							continue;
 						}
 
 						$success_message = sprintf( T_('&laquo;%s&raquo; has been successfully copied to &laquo;%s&raquo;'), $old_path, $new_path );
+						$success_title = T_('Copying files:');
 						break;
 
 					case 'move':
@@ -880,18 +882,19 @@ switch( $action )
 
 						if( $old_path == $new_path && $loop_src_File->_FileRoot->ID == $selected_Filelist->_FileRoot->ID )
 						{ // File path has not changed...
-							$Messages->add( sprintf( T_('&laquo;%s&raquo; has not been moved'), $old_path ), 'note' );
+							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; has not been moved'), $old_path ), 'note', T_('Moving files:') );
 							continue;
 						}
 
 						// Perform move:
 						if( ! $loop_src_File->move_to( $selected_Filelist->get_root_type(), $selected_Filelist->get_root_ID(), $new_path ) )
 						{ // failed
-							$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be moved to &laquo;%s&raquo;'), $old_path, $new_path ), 'error' );
+							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; could not be moved to &laquo;%s&raquo;'), $old_path, $new_path ), 'error', T_('Moving files:') );
 							continue;
 						}
 
 						$success_message = sprintf( T_('&laquo;%s&raquo; has been successfully moved to &laquo;%s&raquo;'), $old_path, $new_path );
+						$success_title = T_('Moving files:');
 						break;
 				}
 
@@ -905,7 +908,7 @@ switch( $action )
 
 				if( ! empty( $success_message ) )
 				{
-					$Messages->add( $success_message, 'success' );
+					$Messages->add_to_group( $success_message, 'success', $success_title );
 				}
 			}
 
@@ -1099,7 +1102,7 @@ switch( $action )
 						// Let's make the link!
 						$LinkOwner->add_link( $l_File->ID, ( $order == 1 ? 'teaser' : 'aftermore' ), $order++ );
 
-						$Messages->add( sprintf( T_('&laquo;%s&raquo; has been attached.'), $l_File->dget('name') ), 'success' );
+						$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; has been attached.'), $l_File->dget('name') ), 'success', T_('Creating post:') );
 
 					} while( $l_File = & $selected_Filelist->get_next() );
 

@@ -1332,7 +1332,8 @@ form#thread_checkchanges ul.token-input-list-facebook {
 .global_icons.no_title {
   margin-bottom: 22px;
 }
-input[name=new_cat_order] {
+input[name=new_cat_order],
+input[name=new_item_order] {
   width: 100%;
 }
 .filters_item_list_table {

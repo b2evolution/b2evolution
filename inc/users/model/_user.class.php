@@ -760,16 +760,17 @@ class User extends DataObject
 					continue;
 				}
 
+				$uf_val = param( 'uf_'.$userfield->uf_ID, 'raw' );
 				$field_type = $this->userfield_defs[$userfield->uf_ufdf_ID][0];
 				if( $field_type == 'number' )
-				{	// Change number type of integer because we have this type name preparing in function param():
+				{	// Change number type of integer because we have this type name preparing in function param_format():
 					$field_type = 'integer';
 				}
 				elseif( $field_type != 'text' && $field_type != 'url' )
-				{	// Use all other params as string, Only text and url have a preparing in function param():
+				{	// Use all other params as string, Only text and url have a preparing in function param_format():
 					$field_type = 'string';
 				}
-				$uf_val = param( 'uf_'.$userfield->uf_ID, $field_type, '' );
+				$uf_val = param_format( $uf_val, $field_type );
 
 				if( $this->userfield_defs[$userfield->uf_ufdf_ID][0] == 'list' && $uf_val == '---' )
 				{	// Option list has a value '---' for empty value
@@ -831,16 +832,17 @@ class User extends DataObject
 					$copied_userfields = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
 					foreach( $copied_userfields as $copied_userfield )
 					{
+						$uf_val = param( 'uf_'.$copied_userfield->uf_ID, 'raw' );
 						$field_type = $copied_userfield->ufdf_type;
 						if( $field_type == 'number' )
-						{	// Change number type of integer because we have this type name preparing in function param():
+						{	// Change number type of integer because we have this type name preparing in function param_format():
 							$field_type = 'integer';
 						}
 						elseif( $field_type != 'text' && $field_type != 'url' )
-						{	// Use all other params as string, Only text and url have a preparing in function param():
+						{	// Use all other params as string, Only text and url have a preparing in function param_format():
 							$field_type = 'string';
 						}
-						$uf_val = param( 'uf_'.$copied_userfield->uf_ID, $field_type, '' );
+						$uf_val = param_format( $uf_val, $field_type );
 						if( ! empty( $uf_val ) )
 						{	// Copy user field only if it is not empty:
 							$this->userfield_add( $copied_userfield->ufdf_ID, $uf_val );
@@ -1551,6 +1553,7 @@ class User extends DataObject
 			{ // Use a login
 				$login = $this->dget( 'login', $params['login_format'] );
 			}
+
 			// Add class "login" to detect logins by js plugins
 			$class = ( $login == $this->login ? 'login ' : '' );
 		}
@@ -3822,15 +3825,15 @@ class User extends DataObject
 
 		if( $r )
 		{ // save request_id into Session
-			$request_ids = $Session->get( 'core.validatemail.request_ids' );
+			$request_ids = $Session->get( 'core.activateacc.request_ids' );
 			if( ( ! is_array($request_ids) ) || $email_changed )
 			{ // create new request ids array if it doesn't exist yet, or if user email changed ( this way the old request into the old email address won't be valid )
 				$request_ids = array();
 			}
 			$request_ids[] = $request_id;
-			$Session->set( 'core.validatemail.request_ids', $request_ids, 86400 * 2 ); // expires in two days (or when clicked)
+			$Session->set( 'core.activateacc.request_ids', $request_ids, 86400 * 2 ); // expires in two days (or when clicked)
 			// set a redirect_to session variable because this way after the account will be activated we will know where to redirect
-			$Session->set( 'core.validatemail.redirect_to', $redirect_to_after  );
+			$Session->set( 'core.activateacc.redirect_to', $redirect_to_after  );
 			$Session->dbsave(); // save immediately
 
 			// update last activation email timestamp
@@ -4903,7 +4906,7 @@ class User extends DataObject
 							'email'           => $this->email,
 							'reason'          => $account_close_reason,
 							'user_ID'         => $this->ID,
-							'closed_by_admin' => $current_User->login,
+							'closed_by_admin' => $current_User->get_username(),
 							'days_count'      => $this->get_days_count_close()
 						);
 					send_admin_notification( NT_('User account closed'), 'account_closed', $email_template_params );
@@ -4943,7 +4946,7 @@ class User extends DataObject
 						$email_template_params = array(
 							'User' => $this,
 							'login' => $this->login, // this is required in the send_admin_notification
-							'activated_by_admin' => $current_User->login,
+							'activated_by_admin' => $current_User->get_username(),
 						);
 						send_admin_notification( NT_('New user account activated'), 'account_activated', $email_template_params );
 					}

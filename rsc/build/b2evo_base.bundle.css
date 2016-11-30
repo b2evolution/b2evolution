@@ -1922,6 +1922,11 @@ div.log_container,
 div.action_messages {
   margin: 1ex;
 }
+div.log_container ul.message_group li,
+div.action_messages ul.message_group li {
+  margin-left: 25px;
+  list-style: disc;
+}
 div.log_container ul,
 div.action_messages ul,
 div.log_container ol,

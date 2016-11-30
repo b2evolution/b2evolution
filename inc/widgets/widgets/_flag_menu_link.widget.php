@@ -60,7 +60,7 @@ class flag_menu_link_Widget extends ComponentWidget
 	 */
 	function get_short_desc()
 	{
-		return $this->get_name();
+		return format_to_output( $this->disp_params['link_text'] );
 	}
 
 

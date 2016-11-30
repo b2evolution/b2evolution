@@ -4120,6 +4120,13 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 		  //   and with simple login text in PLAIN TEXT format
 			if( $format == 'html' )
 			{
+				$username = $User->get_colored_login( array(
+						'mask'      => '$avatar$ $login$',
+						'login_text'=> 'name',
+						'use_style' => true,
+						'protocol'  => 'http:',
+					) );
+
 				$user_login = $User->get_colored_login( array(
 						'mask'      => '$avatar$ $login$',
 						'use_style' => true,
@@ -4128,9 +4135,10 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 			}
 			else
 			{
+				$username = $User->get_username();
 				$user_login = $User->login;
 			}
-			$formated_message = str_replace( '$login$', $user_login, $formated_message );
+			$formated_message = str_replace( array( '$login$', '$username$' ), array( $user_login, $username ) , $formated_message );
 		}
 
 		$template_message .= $formated_message;
@@ -7150,6 +7158,21 @@ function evo_flush()
 	}
 }
 
+
+/**
+ * Disaply a progress text with additional buffer filling in order
+ * to make function flush() work on some apache/php configs
+ */
+function echo_progress_text( $text = '.' )
+{
+	echo str_repeat( ' ', 4096 ) // to fill the output buffer in order to flush data
+		."\n" // new line char is required as flag of that output portion is printed out
+		.$text; // progress text
+
+	evo_flush();
+}
+
+
 // ---------- APM : Application Performance Monitoring -----------
 
 /**
@@ -7783,7 +7806,7 @@ function get_status_dropdown_button( $params = array() )
 	}
 	$status_icon_options = get_visibility_statuses( 'icons', $params['exclude_statuses'] );
 
-	$r = '<div class="btn-group dropdown autoselected">';
+	$r = '<div class="btn-group dropdown autoselected" data-toggle="tooltip" data-placement="top" data-container="body" title="'.get_status_tooltip_title( $params['value'] ).'">';
 	$r .= '<button type="button" class="btn btn-status-'.$params['value'].' dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'
 					.'<span>'.$status_options[ $params['value'] ].'</span>'
 				.' <span class="caret"></span></button>';
@@ -7803,27 +7826,36 @@ function get_status_dropdown_button( $params = array() )
  */
 function echo_form_dropdown_js()
 {
+	// Build a string to initialize javascript array with button titles
+	$tooltip_titles = get_visibility_statuses( 'tooltip-titles' );
+	$tooltip_titles_js_array = array();
+	foreach( $tooltip_titles as $status => $tooltip_title )
+	{
+		$tooltip_titles_js_array[] = $status.': \''.TS_( $tooltip_title ).'\'';
+	}
+	$tooltip_titles_js_array = implode( ', ', $tooltip_titles_js_array );
 ?>
 <script type="text/javascript">
 jQuery( '.btn-group.dropdown.autoselected li a' ).click( function()
 {
+	var item_status_tooltips = {<?php echo $tooltip_titles_js_array ?>};
 	var item = jQuery( this ).parent();
 	var status = item.attr( 'rel' );
-	var dropdown_buttons = item.parent().parent().find( 'button' );
-	var first_button = dropdown_buttons.parent().find( 'button:first' );
+	var btn_group = item.parent().parent();
+	var button = jQuery( item.parent().parent().find( 'button:first' ) );
 	var field_name = jQuery( this ).parent().parent().attr( 'aria-labelledby' );
 
 	// Change status class name to new changed for all buttons:
-	dropdown_buttons.each( function()
-	{
-		jQuery( this ).attr( 'class', jQuery( this ).attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + status ) );
-	} );
+	button.attr( 'class', button.attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + status ) );
 	// Update selector button to status title:
-	first_button.find( 'span:first' ).html( item.find( 'span:last' ).html() ); // update selector button to status title
+	button.find( 'span:first' ).html( item.find( 'span:last' ).html() ); // update selector button to status title
 	// Update hidden field to new status value:
 	jQuery( 'input[type=hidden][name=' + field_name + ']' ).val( status );
 	// Hide dropdown menu:
 	item.parent().parent().removeClass( 'open' );
+
+	// Update tooltip
+	btn_group.tooltip( 'hide' ).attr( 'data-original-title', item_status_tooltips[status] ).tooltip( 'show' );
 
 	return false;
 } );

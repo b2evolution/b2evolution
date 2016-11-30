@@ -97,19 +97,17 @@ function phpbb_log( $message, $type = 'message', $nl = '<br />', $bl = '' )
 	switch( $type )
 	{
 		case 'error':
-			echo $bl.'<span class="red">'.$message.'</span>'.$nl;
+			echo_progress_text( $bl.'<span class="red">'.$message.'</span>'.$nl );
 			break;
 
 		case 'warning':
-			echo $bl.'<span class="orange">'.T_('WARNING: ').$message.'</span>'.$nl;
+			echo_progress_text( $bl.'<span class="orange">'.T_('WARNING: ').$message.'</span>'.$nl );
 			break;
 
 		default:
-			echo $bl.$message.$nl;
+			echo_progress_text( $bl.$message.$nl );
 			break;
 	}
-
-	evo_flush();
 }
 
 

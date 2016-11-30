@@ -56,5 +56,5 @@ else
 if( $params['include_greeting'] )
 { // Display the greeting message
 ?>
-<p<?php echo emailskin_style( '.p' ); ?>><?php echo T_( 'Hello $login$!' ); ?></p>
+<p<?php echo emailskin_style( '.p' ); ?>><?php echo T_( 'Hello $username$!' ); ?></p>
 <?php } ?>

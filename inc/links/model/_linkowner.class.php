@@ -99,7 +99,14 @@ class LinkOwner
 	{
 		$this->ID_field_name = $ID_field_name;
 		$this->type = $type;
-		$this->set_object( $link_Object, $tmp_ID );
+		if( $type == 'message' )
+		{	// Allow to link files only for new creating message:
+			$this->set_object( $link_Object, $tmp_ID );
+		}
+		else
+		{	// Others allow to link files only for existing object:
+			$this->link_Object = $link_Object;
+		}
 	}
 
 

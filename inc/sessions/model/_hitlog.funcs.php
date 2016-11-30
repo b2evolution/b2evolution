@@ -964,9 +964,8 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 		if( $display_process )
 		{
 			if( $insert_data_count % 100 == 0 )
-			{ // Display a process of creating by one dot for 100 hits
-				echo ' .';
-				evo_flush();
+			{	// Display a process of creating by one dot for 100 hits:
+				echo_progress_text();
 			}
 		}
 	}

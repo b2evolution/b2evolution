@@ -1485,6 +1485,11 @@ div.action_messages li {
   margin: 0;
   padding-left: 0;
 }
+div.log_container ul.message_group li,
+div.action_messages ul.message_group li {
+  margin-left: 25px;
+  list-style: disc;
+}
 div.skin_error {
   border: 2px dotted #d99;
   background: #fbf2ee;
