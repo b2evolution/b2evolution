@@ -21,7 +21,7 @@ global $edited_Message;
 global $edited_Thread;
 global $creating_success;
 
-global $DB, $action, $Plugins;
+global $DB, $action, $Plugins, $Settings;
 
 global $Collection, $Blog;
 
