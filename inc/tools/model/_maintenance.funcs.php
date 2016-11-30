@@ -490,8 +490,7 @@ function dbm_delete_orphan_files()
 			}
 		}
 
-		echo ' .';
-		evo_flush();
+		echo_progress_text();
 
 		// Clear cache after each page to save memory
 		$FileCache->clear();
@@ -839,6 +838,8 @@ function echo_progress_log_update( $progress_log_id, $done, $all )
 	</script>
 	<?php
 	echo '</span>';
+
+	evo_flush();
 }
 
 

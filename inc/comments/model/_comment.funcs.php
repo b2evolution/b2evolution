@@ -1053,8 +1053,7 @@ function comment_mass_delete_process( $mass_type, $deletable_comments_query )
 		}
 
 		// Display progress dot
-		echo ' .';
-		evo_flush();
+		echo_progress_text();
 
 		if( empty( $deletable_comment_ids ) )
 		{
