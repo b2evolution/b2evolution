@@ -69,8 +69,9 @@ function tool_create_sample_collections( $num_collections, $perm_management, $al
 		$count++;
 
 		if( $count % 100 == 0 )
-		{	// Display a process of creating by one dot for 100 collections:
-			echo_progress_text();
+		{	// Display a process of creating by one dot for 100 comments:
+			echo ' .';
+			evo_flush();
 		}
 
 		// Clear all debug messages, To avoid an error about full memory:
@@ -174,8 +175,9 @@ function tool_create_sample_comments( $blog_ID, $num_comments, $num_posts )
 			$count++;
 
 			if( $count % 100 == 0 )
-			{	// Display a process of creating by one dot for 100 comments:
-				echo_progress_text();
+			{ // Display a process of creating by one dot for 100 comments
+				echo ' .';
+				evo_flush();
 			}
 
 			// Clear all debug messages, To avoid an error about full memory
@@ -242,8 +244,10 @@ function tool_create_sample_posts( $blog_ID, $num_posts )
 		$count++;
 
 		if( $count % 100 == 0 )
-		{	// Display a process of creating by one dot for 100 posts:
-			echo_progress_text();
+		{ // Display a process of creating by one dot for 100 posts
+			echo ' .';
+			//pre_dump( memory_get_usage() );
+			evo_flush();
 		}
 
 		// Clear all debug messages, To avoid an error about full memory
@@ -431,7 +435,8 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 
 		if( $count % 20 == 0 )
 		{	// Display a process of creating by one dot for 20 users:
-			echo_progress_text();
+			echo ' .';
+			evo_flush();
 		}
 
 		// Clear all debug messages, To avoid an error about full memory:
@@ -541,8 +546,9 @@ function tool_create_sample_messages( $num_loops, $num_messages, $num_words, $ma
 					$count_messages++;
 
 					if( $count_messages % 100 == 0 )
-					{	// Display a process of creating by one dot for 100 messages:
-						echo_progress_text();
+					{ // Display a process of creating by one dot for 100 users
+						echo ' .';
+						evo_flush();
 					}
 				}
 
@@ -608,7 +614,8 @@ function tool_test_flush()
 {
 	for( $i = 1; $i <= 30; $i++ )
 	{
-		echo_progress_text( T_('Sleeping for 1 second...').'<br />' );
+		echo T_('Sleeping for 1 second...').'<br />';
+		evo_flush();
 		sleep( 1 );
 	}
 }

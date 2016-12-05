@@ -988,7 +988,8 @@ function antispam_bankruptcy_delete( $blog_IDs = array(), $comment_status = NULL
 			$sql_comments_where.'
 			LIMIT 10000' );
 
-		echo_progress_text();
+		echo ' .';
+		evo_flush();
 	}
 
 	echo 'OK';

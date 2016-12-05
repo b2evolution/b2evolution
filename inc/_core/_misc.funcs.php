@@ -7158,21 +7158,6 @@ function evo_flush()
 	}
 }
 
-
-/**
- * Disaply a progress text with additional buffer filling in order
- * to make function flush() work on some apache/php configs
- */
-function echo_progress_text( $text = '.' )
-{
-	echo str_repeat( ' ', 4096 ) // to fill the output buffer in order to flush data
-		."\n" // new line char is required as flag of that output portion is printed out
-		.$text; // progress text
-
-	evo_flush();
-}
-
-
 // ---------- APM : Application Performance Monitoring -----------
 
 /**

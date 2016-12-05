@@ -870,7 +870,8 @@ jQuery( document ).ready( function()
 				break;
 		}
 
-		echo_progress_text( $before.$message.$after );
+		echo $before.$message.$after;
+		evo_flush();
 	}
 }
 
