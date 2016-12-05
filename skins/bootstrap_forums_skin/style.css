@@ -891,6 +891,14 @@ ol.breadcrumb {
   max-width: 100%;
   display: inline-block;
 }
+.forums_list .ft_date a.icon_latest_reply:active,
+.forums_list .ft_date_shrinked a.icon_latest_reply:active,
+.forums_list .ft_date_shrinked_more a.icon_latest_reply:active,
+.forums_list .ft_date a.icon_latest_reply:hover,
+.forums_list .ft_date_shrinked a.icon_latest_reply:hover,
+.forums_list .ft_date_shrinked_more a.icon_latest_reply:hover {
+  text-decoration: none;
+}
 .forums_list .ft_author_avatar {
   float: left;
   margin-right: 10px;
@@ -1509,6 +1517,12 @@ label.control-label[for=post_title] {
     display: block;
     vertical-align: top;
     margin: 0px;
+  }
+}
+@media screen and (max-width: 360px) {
+  /* Disp posts */
+  .posts_panel .ft_date_shrinked.item_list .datestamp_shrinked {
+    display: none;
   }
 }
 .posts_panel_title_wrapper {

@@ -313,14 +313,20 @@ ol.breadcrumb {
 		line-height: 16px;
 		margin-top: 3px;
 		div.ft_date_header {
-				margin-bottom: 5px;
-			}
+			margin-bottom: 5px;
+		}
 		span.user.anonymous, span.identity_link_username {
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
 			max-width: 100%;
 			display: inline-block;
+		}
+	}
+	// Remove underline from hover
+	.ft_date, .ft_date_shrinked, .ft_date_shrinked_more {
+		a.icon_latest_reply:active, a.icon_latest_reply:hover {
+			text-decoration: none;
 		}
 	}
 	.ft_author_avatar {
@@ -1031,6 +1037,18 @@ label.control-label[for=post_title] {
 				display: block;
 				vertical-align: top;
 				margin: 0px;
+			}
+		}
+	}
+}
+
+@media screen and (max-width: 360px) {
+	/* Disp posts */
+	.posts_panel {
+		.ft_date_shrinked.item_list {
+			// Hide comment date
+			.datestamp_shrinked {
+				display: none;
 			}
 		}
 	}
