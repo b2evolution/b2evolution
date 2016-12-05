@@ -7137,6 +7137,13 @@ function evo_flush()
 		return;
 	}
 
+	// To fill the output buffer in order to flush data:
+	// NOTE: Uncomment the below line if flush doesn't work as expected
+	// echo str_repeat( ' ', 4096 );
+
+	// New line char is required as flag of that output portion is printed out:
+	echo "\n";
+
 	$zlib_output_compression = ini_get( 'zlib.output_compression' );
 	if( empty( $zlib_output_compression ) || $zlib_output_compression == 'Off' )
 	{ // This function helps to turn off output buffering
