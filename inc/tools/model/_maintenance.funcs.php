@@ -358,8 +358,9 @@ function dbm_delete_broken_posts()
 				echo '<p class="red">'.sprintf( T_('Cannot delete post with ID %s'), $broken_Item->ID ).'</p>';
 			}
 			if( $r % 100 == 0 )
-			{	// Display a log dot after each 100 processed posts:
-				echo_progress_text();
+			{ // Display a log dot after each 100 processed posts
+				echo '. ';
+				evo_flush();
 			}
 		}
 	}
@@ -564,7 +565,8 @@ function dbm_delete_orphan_file_roots()
 	}
 
 	/* USERS */
-	echo_progress_text();
+	echo '. ';
+	evo_flush();
 
 	// Get logins of all existing users
 	$SQL = new SQL();
@@ -597,7 +599,8 @@ function dbm_delete_orphan_file_roots()
 	}
 
 	/* DELETE broken  file roots */
-	echo_progress_text();
+	echo '. ';
+	evo_flush();
 
 	foreach( $delete_dirs as $delete_dir )
 	{
@@ -612,7 +615,8 @@ function dbm_delete_orphan_file_roots()
 	}
 
 	/* DELETE orphan DB file records of the blogs and the users */
-	echo_progress_text();
+	echo '. ';
+	evo_flush();
 
 	$count_files_deleted = $DB->query( 'DELETE f, l, lv FROM T_files AS f
 			 LEFT JOIN T_links AS l ON l.link_file_ID = f.file_ID
