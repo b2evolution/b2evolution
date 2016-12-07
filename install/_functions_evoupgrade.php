@@ -8083,6 +8083,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12135, 'Upgrade table of user field definitions...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_users__fielddefs
+			MODIFY ufdf_code varchar(20) COLLATE ascii_bin UNIQUE NOT NULL COMMENT "Code MUST be lowercase ASCII only"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
