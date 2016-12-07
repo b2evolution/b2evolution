@@ -2625,10 +2625,10 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 	// user status
 	$user_status_icons = get_user_status_icons();
 	$user_status_titles = get_user_statuses();
-	$user_status = ' <small class="nowrap">('.$user_status_icons[ $edited_User->get( 'status' ) ].' '.$user_status_titles[ $edited_User->get( 'status' ) ].')</small>';
+	$user_status = ' <small>('.$user_status_icons[ $edited_User->get( 'status' ) ].' '.$user_status_titles[ $edited_User->get( 'status' ) ].')</small>';
 
 	// set title
-	$form_title = '<h2 class="user_title">'.$edited_User->get_colored_login( array( 'login_text' => 'name' ) ).$user_status.' &ndash; '.$user_tab_title.'</h2>';
+	$form_title = '<h2 class="user_title">'.$edited_User->get_colored_login( array( 'login_text' => 'name' ) ).'<span class="nowrap">'.$user_status.' &ndash;</span> '.$user_tab_title.'</h2>';
 
 	// set avatar tag
 	$avatar_tag = $edited_User->get_avatar_imgtag( 'crop-top-48x48', 'floatleft', '', true );

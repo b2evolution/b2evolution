@@ -863,6 +863,9 @@ h2.user_title {
   margin-top: 0;
   margin-bottom: 18px;
 }
+h2.user_title::first-line {
+  line-height: 52px;
+}
 .tool_steps {
   text-align: center;
   font-size: 14px;
