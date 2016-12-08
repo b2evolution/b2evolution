@@ -3944,6 +3944,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'private_messages_unread_reminder':
 			case 'post_new':
 			case 'comment_new':
+			case 'comment_spam':
 			case 'account_activated':
 			case 'account_closed':
 			case 'account_reported':

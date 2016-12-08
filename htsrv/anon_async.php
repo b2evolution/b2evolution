@@ -378,8 +378,11 @@ switch( $action )
 				break;
 			}
 
+			// Update a vote of the comment for current User:
 			$edited_Comment->set_vote( 'spam', param( 'vote', 'string' ) );
 			$edited_Comment->dbupdate();
+
+			// Display a panel for next spam voting:
 			$edited_Comment->vote_spam( '', '', '&amp;', true, true, array(
 					'display'            => true,
 					'button_group_class' => button_class( 'group' ).( is_admin_page() ? ' btn-group-sm' : '' ),

@@ -585,6 +585,11 @@ class Comment extends DataObject
 
 		$DB->commit();
 
+		if( $vote_type == 'spam' && $vote_value == 'spam' )
+		{	// This is a voting about spam comment we should inform moderators:
+			$this->send_vote_spam_emails();
+		}
+
 		return;
 	}
 
@@ -4045,6 +4050,76 @@ class Comment extends DataObject
 		}
 
 		blocked_emails_display();
+	}
+
+
+	/**
+	 * Send "comment spam" emails for those users who have permission to moderate this comment.
+	 */
+	function send_vote_spam_emails()
+	{
+		global $current_User, $Settings, $UserSettings;
+
+		if( ! is_logged_in() )
+		{	// Only loggen in users can vote on comments
+			return;
+		}
+
+		if( $this->is_meta() )
+		{	// Meta comments have no spam voting
+			return;
+		}
+
+		$UserCache = & get_UserCache();
+
+		$comment_Item = & $this->get_Item();
+		$comment_item_Blog = & $comment_Item->get_Blog();
+		$coll_owner_User = $comment_item_Blog->get_owner_User();
+
+		$moderators = array();
+
+		$moderators_to_notify = $comment_item_Blog->get_comment_moderator_user_data();
+		$notify_moderation_setting_name = 'notify_edit_cmt_moderation';
+
+		foreach( $moderators_to_notify as $moderator )
+		{
+			$notify_moderator = is_null( $moderator->$notify_moderation_setting_name ) ? $Settings->get( 'def_'.$notify_moderation_setting_name ) : $moderator->$notify_moderation_setting_name;
+			if( $notify_moderator )
+			{	// Include user to notify because of enabled setting:
+				$moderators[] = $moderator->user_ID;
+			}
+		}
+		if( $UserSettings->get( $notify_moderation_setting_name, $coll_owner_User->ID ) && is_email( $coll_owner_User->get( 'email' ) ) )
+		{	// Include collection owner:
+			$moderators[] = $coll_owner_User->ID;
+		}
+
+		$email_subject = sprintf( T_('[%s] Spam comment may need moderation on "%s"'), $comment_item_Blog->get( 'shortname' ), $comment_Item->get( 'title' ) );
+		$email_template_params = array(
+				'Comment'  => $this,
+				'Blog'     => $comment_item_Blog,
+				'Item'     => $comment_Item,
+				'voter_ID' => $current_User->ID,
+			);
+
+		// Load all moderators, and check each edit permission on this comment:
+		$UserCache->load_list( $moderators );
+		foreach( $moderators as $moderator_ID )
+		{
+			if( $moderator_ID == $current_User->ID )
+			{	// Don't send email to the voter:
+				continue;
+			}
+			$moderator_User = $UserCache->get_by_ID( $moderator_ID, false );
+			if( $moderator_User && $moderator_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) )
+			{	// If moderator has a permission to edit this comment:
+				$moderator_Group = $moderator_User->get_Group();
+				$email_template_params['notify_full'] = $moderator_Group->check_perm( 'comment_moderation_notif', 'full' );
+
+				// Send email to the moderator:
+				send_mail_to_User( $moderator_ID, $email_subject, 'comment_spam', $email_template_params );
+			}
+		}
 	}
 
 
