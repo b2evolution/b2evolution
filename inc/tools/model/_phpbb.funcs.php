@@ -251,7 +251,7 @@ function phpbb_table_insert_links( $table_name, $links )
 
 	if( count( $links_data ) > 0 )
 	{	// Insert the rest records
-			mysql_query( $DB->dbhandle, 'INSERT INTO '.phpbb_table_name( $table_name ).' ( phpbb_ID, b2evo_ID )
+			mysqli_query( $DB->dbhandle, 'INSERT INTO '.phpbb_table_name( $table_name ).' ( phpbb_ID, b2evo_ID )
 					VALUES '.implode( ', ', $links_data ) );
 	}
 }
@@ -1801,7 +1801,7 @@ function phpbb_import_messages_texts( $thread_ID, $message )
 	mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'messaging__message ( msg_author_user_ID, msg_datetime, msg_thread_ID, msg_text, msg_renderers )
 			VALUES '.implode( ', ', $message_import_data ) );
 
-	mysql_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'messaging__threadstatus ( tsta_thread_ID, tsta_user_ID, tsta_first_unread_msg_ID )
+	mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'messaging__threadstatus ( tsta_thread_ID, tsta_user_ID, tsta_first_unread_msg_ID )
 			VALUES '.implode( ', ', $threadstatus_import_data ) );
 
 	return count( $message_import_data );
@@ -1853,8 +1853,7 @@ function phpbb_forums_list( & $Form )
 	foreach( $categories as $category )
 	{
 		$Form->checkbox_input( 'phpbb_categories[]', !is_array( $import_categories ) || in_array( $category->cat_id, $import_categories ), '', array(
-				'input_prefix' => '<label>',
-				'input_suffix' => ' '.$category->cat_title.'</label>',
+				'input_suffix' => $category->cat_title,
 				'value' => $category->cat_id
 			) );
 
@@ -1955,10 +1954,9 @@ function phpbb_subforums_list( & $Form, $cat_id, $forum_parent_id = 0 )
 	foreach( $forums as $forum )
 	{	// Display forums
 		$Form->checkbox_input( 'phpbb_forums[]', !is_array( $import_forums ) || in_array( $forum->forum_id, $import_forums ), '', array(
-				'input_prefix' => '<label>',
-				'input_suffix' => ' '.$forum->forum_name.'</label>',
+				'input_prefix' => '<span style="margin-left:'.( $phpbb_subforums_list_level * 20 ).'px">',
+				'input_suffix' => ' '.$forum->forum_name.'</span>',
 				'value' => $forum->forum_id,
-				'style' => 'margin-left:'.( $phpbb_subforums_list_level * 20 ).'px',
 			) );
 		phpbb_subforums_list( $Form, 0, $forum->forum_id );
 	}
@@ -1994,7 +1992,7 @@ function phpbb_import_avatar( $user_ID, $path_avatars, $user_avatar )
 					  AND user_avatar_file_ID IS NULL' );
 			// Insert a link with new file
 			global $localtimenow;
-			mysql_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'links
+			mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'links
 				       ( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_usr_ID, link_file_ID )
 				VALUES ( '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $imported_file_ID ).' )' );
 		}
