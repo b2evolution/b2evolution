@@ -4079,17 +4079,16 @@ class Comment extends DataObject
 		$moderators = array();
 
 		$moderators_to_notify = $comment_item_Blog->get_comment_moderator_user_data();
-		$notify_moderation_setting_name = 'notify_edit_cmt_moderation';
 
 		foreach( $moderators_to_notify as $moderator )
 		{
-			$notify_moderator = is_null( $moderator->$notify_moderation_setting_name ) ? $Settings->get( 'def_'.$notify_moderation_setting_name ) : $moderator->$notify_moderation_setting_name;
+			$notify_moderator = is_null( $moderator->notify_spam_cmt_moderation ) ? $Settings->get( 'def_notify_spam_cmt_moderation' ) : $moderator->notify_spam_cmt_moderation;
 			if( $notify_moderator )
 			{	// Include user to notify because of enabled setting:
 				$moderators[] = $moderator->user_ID;
 			}
 		}
-		if( $UserSettings->get( $notify_moderation_setting_name, $coll_owner_User->ID ) && is_email( $coll_owner_User->get( 'email' ) ) )
+		if( $UserSettings->get( 'notify_spam_cmt_moderation', $coll_owner_User->ID ) && is_email( $coll_owner_User->get( 'email' ) ) )
 		{	// Include collection owner:
 			$moderators[] = $coll_owner_User->ID;
 		}
