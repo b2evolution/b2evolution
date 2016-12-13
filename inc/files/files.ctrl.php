@@ -1542,8 +1542,8 @@ if( $mode != 'modal' )
 	// require colorbox js
 	require_js_helper( 'colorbox' );
 	// require File Uploader js and css
-	require_js( 'multiupload/fileuploader.js' );
-	require_css( 'fileuploader.css' );
+	require_js( 'multiupload/fine-uploader.js' );
+	require_css( 'fine-uploader.css' );
 
 	if( $mode == 'upload' || $mode == 'import' )
 	{ // Add css to remove spaces around window

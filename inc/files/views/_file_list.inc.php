@@ -556,58 +556,73 @@ $Form->begin_form();
 				$icon_to_link_files = '';
 			}
 
-			$template_filerow = '<table><tr>'
-				.'<td class="checkbox firstcol qq-upload-checkbox">&nbsp;</td>'
-				.'<td class="icon_type qq-upload-image"><span class="qq-upload-spinner">&nbsp;</span></td>';
+			$template = '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="#button_text#">'
+				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'
+				.'<span class="qq-upload-drop-area-text-selector"></span>'
+				.'</div>'
+				.'<div class="qq-upload-button-selector qq-upload-button">'
+				.'<div>#button_text#</div>'
+				.'</div>'
+				.'<span class="qq-drop-processing-selector qq-drop-processing">'
+				.'<span>'.TS_('Processing dropped files...').'</span>'
+				.'<span class="qq-drop-processing-spinner-selector qq-drop-processing-spinner"></span>'
+				.'</span>'
+				.'<table>'
+				.'<tbody class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">'
+				.'<tr>';
+
+			$template .= '<td class="checkbox firstcol qq-upload-checkbox">&nbsp;</td>';
+			$template .= '<td class="icon_type qq-upload-image"><span class="qq-upload-spinner-selector qq-upload-spinner">&nbsp;</span></td>';
 			if( $fm_flatmode )
 			{
-				$template_filerow .= '<td class="filepath">'.( empty( $path ) ? './' : $path ).'</td>';
+				$template .= '<td class="filepath">'.( empty( $path ) ? './' : $path ).'</td>';
 			}
-			$template_filerow .= '<td class="fm_filename qq-upload-file">&nbsp;</td>';
+			$template .= '<td class="fm_filename qq-upload-file-selector">&nbsp;</td>';
 			if( $UserSettings->get('fm_showtypes') )
 			{
-				$template_filerow .= '<td class="type">&nbsp;</td>';
+				$template .= '<td class="type qq-upload-file-type">&nbsp;</td>';
 			}
 			if( $UserSettings->get( 'fm_showcreator' ) )
 			{
-				$template_filerow .= '<td class="center">&nbsp;</td>';
+				$template .= '<td class="center qq-upload-file-creator">&nbsp;</td>';
 			}
 			if( $UserSettings->get( 'fm_showdownload' ) )
 			{
-				$template_filerow .= '<td class="center">&nbsp;</td>';
+				$template .= '<td class="center qq-upload-downloads">&nbsp;</td>';
 			}
-			$template_filerow .= '<td class="size"><span class="qq-upload-size">&nbsp;</span><span class="qq-upload-spinner">&nbsp;</span></td>';
+			$template .= '<td class="size"><span class="qq-upload-size-selector qq-upload-size">&nbsp;</span></td>';
 			if( $UserSettings->get('fm_showdate') != 'no' )
 			{
-				$template_filerow .= '<td class="qq-upload-status timestamp">'.TS_('Uploading...').'</td>';
+				$template .= '<td class="qq-upload-status-text-selector qq-upload-status-text timestamp">'.TS_('Uploading...').'</td>';
 			}
 			if( $UserSettings->get('fm_showfsperms') )
 			{
-				$template_filerow .= '<td class="perms">&nbsp;</td>';
+				$template .= '<td class="perms">&nbsp;</td>';
 			}
 			if( $UserSettings->get('fm_showfsowner') )
 			{
-				$template_filerow .= '<td class="fsowner">&nbsp;</td>';
+				$template .= '<td class="fsowner">&nbsp;</td>';
 			}
 			if( $UserSettings->get('fm_showfsgroup') )
 			{
-				$template_filerow .= '<td class="fsgroup">&nbsp;</td>';
+				$template .= '<td class="fsgroup">&nbsp;</td>';
 			}
-			$template_filerow .= '<td class="actions lastcol">';
+			$template .= '<td class="actions lastcol">';
 			if( $UserSettings->get('fm_showdate') == 'no' )
 			{ // Display status in the last column if column with datetime is hidden
-				$template_filerow .= '<span class="qq-upload-status">'.TS_('Uploading...').'</span> ';
+				$template .= '<span class="qq-upload-status-text-selector qq-upload-status-text">'.TS_('Uploading...').'</span> ';
 			}
-			$template_filerow .= '<a class="qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'
-				.'</td>'
-			.'</tr></table>';
+			$template .= '<a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'.'</td>';
+
+			$template .= '</tr></tbody></table>	</div>';
+
 			// Display a button to quick upload the files by drag&drop method
 			display_dragdrop_upload_button( array(
 					'fileroot_ID'         => $fm_FileRoot->ID,
 					'path'                => $path,
 					'listElement'         => 'jQuery( "#filelist_tbody" ).get(0)',
 					'list_style'          => 'table',
-					'template_filerow'    => $template_filerow,
+					'template'            => $template,
 					'display_support_msg' => false,
 					'additional_dropzone' => '#filelist_tbody',
 					'filename_before'     => $icon_to_link_files,

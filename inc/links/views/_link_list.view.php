@@ -167,20 +167,32 @@ display_dragdrop_upload_button( array(
 		'path'             => $upload_path,
 		'listElement'      => 'jQuery( "#filelist_tbody" ).get(0)',
 		'list_style'       => 'table',
-		'template_filerow' => '<table><tr>'
-					.'<td class="firstcol shrinkwrap qq-upload-image"><span class="qq-upload-spinner">&nbsp;</span></td>'
-					.'<td class="qq-upload-file fm_filename">&nbsp;</td>'
-					.'<td class="qq-upload-link-id shrinkwrap link_id_cell">&nbsp;</td>'
-					.'<td class="qq-upload-link-actions shrinkwrap">'
-						.'<div class="qq-upload-status">'
-							.TS_('Uploading...')
-							.'<span class="qq-upload-spinner"></span>'
-							.'<span class="qq-upload-size"></span>'
-							.'<a class="qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'
-						.'</div>'
-					.'</td>'
-					.( count( $LinkOwner->get_positions() ) > 1 ? '<td class="qq-upload-link-position lastcol shrinkwrap"></td>' : '' )
-				.'</tr></table>',
+		'template'         => '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="#button_text#">'
+				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'
+					.'<span class="qq-upload-drop-area-text-selector"></span>'
+				.'</div>'
+				.'<div class="qq-upload-button-selector qq-upload-button">'
+					.'<div>#button_text#</div>'
+				.'</div>'
+				.'<span class="qq-drop-processing-selector qq-drop-processing">'
+					.'<span>'.TS_('Processing dropped files...').'</span>'
+					.'<span class="qq-drop-processing-spinner-selector qq-drop-processing-spinner"></span>'
+				.'</span>'
+				.'<table>'
+					.'<tbody class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">'
+						.'<tr>'
+							.'<td class="firstcol shrinkwrap qq-upload-image"><span class="qq-upload-spinner-selector qq-upload-spinner">&nbsp;</span></td>'
+							.'<td class="qq-upload-file-selector fm_filename">&nbsp;</td>'
+							.'<td class="qq-upload-link-id shrinkwrap link_id_cell">&nbsp;</td>'
+							.'<td class="qq-upload-link-actions shrinkwrap">'
+								.'<div class="qq-upload-status-text-selector qq-upload-status-text">'
+									.TS_('Uploading...')
+									.'<span class="qq-upload-size-selector qq-upload-size"></span>'
+									.'<a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'
+								.'</div>'
+							.'</td>'
+							.( count( $LinkOwner->get_positions() ) > 1 ? '<td class="qq-upload-link-position lastcol shrinkwrap"></td>' : '' )
+						.'</tr>',
 		'display_support_msg'    => false,
 		'additional_dropzone'    => '#filelist_tbody',
 		'filename_before'        => '',
