@@ -528,20 +528,13 @@ function htmlspecialchars_decode (string, quote_style) {
             }
         };
         qq.toElement = function() {
-            var div = document.createElement("div");
-            return function(html) {
-                div.innerHTML = html;
-                var element = div.firstChild;
-                div.removeChild(element);
-                return element;
-            };
-        }();
-        qq.toTableElement = function() {
-            var table = document.createElement("table");
-            return function(html) {
-                table.innerHTML = html;
-                var element = table.firstChild.firstChild;
-                table.firstChild.removeChild(element);
+            return function(html, containerTag) {
+                var validContainerTags = ["div", "tbody", "ul"];
+                if (!containerTag || validContainerTags.indexOf(containerTag.toLowerCase()) == -1) containerTag = "div";
+                var container = document.createElement(containerTag);
+                container.innerHTML = html;
+                var element = container.firstChild;
+                container.removeChild(element);
                 return element;
             };
         }();
@@ -7112,21 +7105,7 @@ function htmlspecialchars_decode (string, quote_style) {
                 isCancelDisabled = true;
             },
             addFile: function(id, name, prependInfo, hideForever, batch) {
-                var fileEl;
-                var re = /<([a-zA-Z]+)(>|.*?[^?]>)/;
-                var result = re.exec( templateHtml.fileTemplate );
-                if( result && result[1] == 'tr' )
-                {
-                    fileEl = qq.toTableElement( templateHtml.fileTemplate );
-                }
-                else
-                {
-                    fileEl = qq.toElement(templateHtml.fileTemplate);
-                }
-
-                var fileNameEl = getTemplateEl(fileEl, selectorClasses.file);
-                var uploaderEl = getTemplateEl(container, selectorClasses.uploader), fileContainer = batch ? fileBatch.content : fileList, thumb;
-
+                var fileEl = qq.toElement(templateHtml.fileTemplate, fileList.tagName), fileNameEl = getTemplateEl(fileEl, selectorClasses.file), uploaderEl = getTemplateEl(container, selectorClasses.uploader), fileContainer = batch ? fileBatch.content : fileList, thumb;
                 if (batch) {
                     fileBatch.map[id] = fileEl;
                 }
