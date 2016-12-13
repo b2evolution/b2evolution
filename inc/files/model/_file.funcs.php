@@ -2332,6 +2332,7 @@ function display_dragdrop_upload_button( $params = array() )
 			'conflict_file_format'   => 'simple', // 'simple' - file name text, 'full_path_link' - a link with text as full file path
 			'resize_frame'           => false, // Resize frame on upload new image
 			'table_headers'          => '', // Use this html text as table headers when first file is loaded
+			'noresults'              => ''
 		), $params );
 
 	$FileRootCache = & get_FileRootCache();
@@ -2420,6 +2421,9 @@ function display_dragdrop_upload_button( $params = array() )
 				template: document.getElementById( 'qq-template'),
 				element: document.getElementById( 'file-uploader' ),
 				listElement: <?php echo $params['listElement']; ?>,
+				dragAndDrop: {
+					extraDropzones: <?php echo $params['additional_dropzone'];?>
+				},
 				//additional_dropzone: '<?php echo $params['additional_dropzone']; ?>',
 				debug: false,
 				messages: {
@@ -2449,39 +2453,35 @@ function display_dragdrop_upload_button( $params = array() )
 							noresults_row.remove();
 						}
 
-						evo_link_fix_wrapper_height();
+						setTimeout( function()
+							{
+								evo_link_fix_wrapper_height();
+								<?php
+								if( $params['resize_frame'] )
+								{ // Resize frame after upload new image
+								?>
+								update_iframe_height();
+								jQuery( 'img' ).on( 'load', function() { update_iframe_height(); } );
+								<?php } ?>
+							}, 10 );
 					},
 					onComplete: function( id, fileName, responseJSON )
 					{
 						if( responseJSON != undefined )
 						{
-							var text, checkbox;
-
-							if( responseJSON.specialchars == 1 )
+							var text;
+							if( responseJSON.data.text )
 							{
-								if( responseJSON.data.text )
+								if( responseJSON.specialchars == 1 )
 								{
 									text = htmlspecialchars_decode( responseJSON.data.text );
 								}
-								if( responseJSON.data.checkbox )
-								{
-									checkbox = htmlspecialchars_decode( responseJSON.data.checkbox );
-								}
-							}
-							else
-							{
-								if( responseJSON.data.text )
+								else
 								{
 									text = responseJSON.data.text;
 								}
-								if( responseJSON.data.checkbox )
-								{
-									checkbox = responseJSON.data.checkbox;
-								}
 							}
-
 							text = base64_decode( text );
-							checkbox = base64_decode( checkbox );
 
 							<?php
 							if( $params['list_style'] == 'list' )
@@ -2531,7 +2531,7 @@ function display_dragdrop_upload_button( $params = array() )
 							// File name or url to view file
 							var file_name = ( typeof( responseJSON.data.link_url ) != 'undefined' ) ? responseJSON.data.link_url : responseJSON.data.newname;
 
-							this_row.find( '.qq-upload-checkbox' ).html( checkbox );
+							this_row.find( '.qq-upload-checkbox' ).html( responseJSON.data.checkbox );
 
 							if( responseJSON.data.status == 'success' )
 							{ // Success upload
@@ -2547,6 +2547,7 @@ function display_dragdrop_upload_button( $params = array() )
 								this_row.find( '.qq-upload-file-selector' ).html( filename_before
 									+ '<input type="hidden" value="' + responseJSON.data.newpath + '" />'
 									+ '<span class="fname">' + file_name + '</span>' + warning );
+								this_row.find( '.qq-upload-size-selector' ).html( responseJSON.data.filesize );
 
 								if( responseJSON.data.filetype )
 								{
@@ -2634,9 +2635,31 @@ function display_dragdrop_upload_button( $params = array() )
 						update_iframe_height();
 						jQuery( 'img' ).on( 'load', function() { update_iframe_height(); } );
 						<?php } ?>
+					},
+					onCancel: function( id, fileName )
+					{
+						<?php
+						if( $params['list_style'] == 'table' )
+						{
+						?>
+							setTimeout( function()
+							{ // allow some time to remove cancelled row first before determining the number of rows
+								var container = jQuery( '#filelist_tbody' );
+								var rows = container.find( 'tr' );
+								if( !rows.length )
+								{
+									var noresult = '<?php echo preg_replace( "/\s+/", " ", $params['noresults'] );?>';
+									container.append( noresult );
+								}
+							}, 10 );
+						<?php
+						}
+						?>
 					}
 				}
 			} );
+
+			// Update upload button text
 			jQuery( 'div.qq-upload-button-selector > div' ).html( button_text );
 		} );
 

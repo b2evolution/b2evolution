@@ -10,7 +10,14 @@
     background: #880000;
     border-bottom: 1px solid #DDD;
     color: #FFF;
+    font-weight: bold;
 }
+
+.qq-upload-button span {
+    font-weight:normal;
+    font-size:small;
+}
+
 .qq-upload-button-hover {
     background: #CC0000;
 }
@@ -45,7 +52,7 @@
     min-height: 40px;
 }
 .qq-upload-drop-area-active {
-    background: #FF7171;
+    /*background: #FF7171;*/
 }
 .qq-upload-list {
     margin: 0;

@@ -27,10 +27,6 @@ function out_echo( $message, $specialchars, $display = true )
 	{
 		$message['text'] = base64_encode( $message['text'] );
 	}
-	if( isset( $message['checkbox'] ) )
-	{
-		$message['checkbox'] = base64_encode( $message['checkbox'] );
-	}
 
 	if( $specialchars == 1 )
 	{
@@ -38,10 +34,6 @@ function out_echo( $message, $specialchars, $display = true )
 		if( isset( $message['text'] ) )
 		{
 			$message['text'] = htmlspecialchars( $message['text'] );
-		}
-		if( isset( $message['checkbox' ] ) )
-		{
-			$message['checkbox'] = htmlspecialchars( $message['checkbox'] );
 		}
 	}
 	else
@@ -344,6 +336,7 @@ if( $upload )
 
 		$message['newname'] = $newName;
 		$message['newpath'] = $newFile->get_root_and_rel_path();
+		$message['filesize'] = bytesReadable( $newFile->get_size() );
 
 		if( $UserSettings->get('fm_showtypes') )
 		{

@@ -502,26 +502,29 @@ $Form->begin_form();
 		+ (int)$UserSettings->get('fm_imglistpreview');
 
 
+	ob_start();
+	?>
+
+	<tr class="noresults">
+		<td class="firstcol">&nbsp;</td> <?php /* blueyed> This empty column is needed so that the defaut width:100% style of the main column below makes the column go over the whole screen */ ?>
+		<td class="lastcol" colspan="<?php echo $filetable_cols - 1 ?>" id="fileman_error">
+			<?php
+				if( ! $Messages->has_errors() )
+				{ // no Filelist errors, the directory must be empty
+					$Messages->clear();
+					$Messages->add( T_('No files found.')
+						.( $fm_Filelist->is_filtering() ? '<br />'.T_('Filter').': &laquo;'.$fm_Filelist->get_filter().'&raquo;' : '' ), 'error' );
+					$Messages->display( '', '' );
+				}
+			?>
+		</td>
+	</tr>
+
+	<?php
+	$noresults = ob_get_clean();
 	if( $countFiles == 0 )
 	{ // Filelist errors or "directory is empty"
-		?>
-
-		<tr class="noresults">
-			<td class="firstcol">&nbsp;</td> <?php /* blueyed> This empty column is needed so that the defaut width:100% style of the main column below makes the column go over the whole screen */ ?>
-			<td class="lastcol" colspan="<?php echo $filetable_cols - 1 ?>" id="fileman_error">
-				<?php
-					if( ! $Messages->has_errors() )
-					{ // no Filelist errors, the directory must be empty
-						$Messages->clear();
-						$Messages->add( T_('No files found.')
-							.( $fm_Filelist->is_filtering() ? '<br />'.T_('Filter').': &laquo;'.$fm_Filelist->get_filter().'&raquo;' : '' ), 'error' );
-						$Messages->display( '', '' );
-					}
-				?>
-			</td>
-		</tr>
-
-		<?php
+		echo $noresults;
 	}
 
 	echo '</tbody>';
@@ -590,7 +593,7 @@ $Form->begin_form();
 			{
 				$template .= '<td class="center qq-upload-downloads">&nbsp;</td>';
 			}
-			$template .= '<td class="size"><span class="qq-upload-size-selector qq-upload-size">&nbsp;</span></td>';
+			$template .= '<td class="size"><span class="qq-upload-size-selector">&nbsp;</span></td>';
 			if( $UserSettings->get('fm_showdate') != 'no' )
 			{
 				$template .= '<td class="qq-upload-status-text-selector qq-upload-status-text timestamp">'.TS_('Uploading...').'</td>';
@@ -624,8 +627,9 @@ $Form->begin_form();
 					'list_style'          => 'table',
 					'template'            => $template,
 					'display_support_msg' => false,
-					'additional_dropzone' => '#filelist_tbody',
+					'additional_dropzone' => '[ document.getElementById( "filelist_tbody" ) ]',
 					'filename_before'     => $icon_to_link_files,
+					'noresults'           => $noresults
 				) );
 			?>
 			</td>
