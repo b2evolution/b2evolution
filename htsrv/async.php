@@ -97,11 +97,19 @@ switch( $action )
 			bad_request_die('Invalid Plugin.');
 		}
 		param( 'set_type', 'string', '' ); // "Settings" or "UserSettings"
-		if( $set_type != 'Settings' /* && $set_type != 'UserSettings' */ )
+		if( $set_type != 'Settings' && $set_type != 'UserSettings' )
 		{
 			bad_request_die('Invalid set_type param!');
 		}
 		param( 'set_path', '/^\w+(?:\[\w+\])+$/', '' );
+		param( 'set_target_id', 'integer' );
+
+		$set_target = NULL;
+		if( $set_type == 'UserSettings' )
+		{	// Get user for plugin settings:
+			$UserCache = & get_UserCache();
+			$set_target = & $UserCache->get_by_ID( $set_target_id );
+		}
 
 		load_funcs('plugins/_plugin.funcs.php');
 
@@ -112,7 +120,7 @@ switch( $action )
 		$r = get_plugin_settings_node_by_path( $Plugin, $set_type, $set_path, /* create: */ false );
 
 		$Form = new Form(); // fake Form to display plugin setting
-		autoform_display_field( $set_path, $r['set_meta'], $Form, $set_type, $Plugin, NULL, $r['set_node'] );
+		autoform_display_field( $set_path, $r['set_meta'], $Form, $set_type, $Plugin, $set_target, $r['set_node'] );
 		break;
 
 	case 'set_object_link_position':

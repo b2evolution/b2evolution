@@ -420,7 +420,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								action: 'add_plugin_sett_set',
 								plugin_ID: '{$Obj->ID}',
 								set_type: '$set_type',
-								set_path: '$set_path'
+								set_path: '$set_path'"
+								.( $set_target ? ', set_target_id: '.$set_target->ID : '' )."
 							},
 							function(r, status) {
 								jQuery('#".$parname."_add_new').replaceWith(r);
