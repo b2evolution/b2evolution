@@ -85,6 +85,10 @@ function upg_task_start( $version, $title = '' )
 			task_begin( $title );
 		}
 
+		// Begin a transaction for the upgrade block:
+		global $DB;
+		$DB->begin();
+
 		return true;
 	}
 	else
@@ -105,6 +109,10 @@ function upg_task_end( $print_result = true )
 
 	if( ! empty( $upgrade_db_version ) )
 	{	// Only if the upgrade task is not ended yet:
+
+		// End current transaction of the upgrade block:
+		global $DB;
+		$DB->commit();
 
 		if( $print_result )
 		{	// Print out the end of task:
@@ -7613,7 +7621,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 	if( upg_task_start( 12005, 'Update widget container "Item Single"...' ) )
 	{	// part of 6.8.0-alpha
-		$DB->begin();
 		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
 		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_code, wi_order' );
 		$SQL->FROM( 'T_widget' );
@@ -7665,7 +7672,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
 			  VALUES '.implode( ', ', $item_attachments_widget_rows ) );
 		}
-		$DB->commit();
 		upg_task_end();
 	}
 
@@ -7821,8 +7827,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12085, 'Update widget container "Item Single"...' ) )
-	{ // part of 6.8.0-alpha
-		$DB->begin();
+	{	// part of 6.8.0-alpha
 		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
 		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_code, wi_order' );
 		$SQL->FROM( 'T_widget' );
@@ -7882,7 +7887,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
 			  VALUES '.implode( ', ', $item_tags_widget_rows ) );
 		}
-		$DB->commit();
 		upg_task_end();
 	}
 
@@ -7917,8 +7921,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12100, 'Update widget container "Item Single" by adding "Item Location" widget...' ) )
-	{ // part of 6.8.0-alpha
-		$DB->begin();
+	{	// part of 6.8.0-alpha
 		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
 		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_code, wi_order' );
 		$SQL->FROM( 'T_widget' );
@@ -7977,7 +7980,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
 			  VALUES '.implode( ', ', $item_locations_widget_rows ) );
 		}
-		$DB->commit();
 		upg_task_end();
 	}
 
@@ -8019,7 +8021,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_add_col( 'T_locales', 'loc_input_timefmt', 'varchar(20) COLLATE ascii_general_ci NOT NULL default "H:i:s" AFTER loc_shorttimefmt' );
 
 		// Allow only numeric date formats:
-		$DB->begin();
 		$SQL = new SQL( 'Get all short date formats"' );
 		$SQL->SELECT( 'loc_locale, loc_datefmt, loc_timefmt' );
 		$SQL->FROM( 'T_locales' );
@@ -8039,13 +8040,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				      loc_input_timefmt = "H:i:s"
 				WHERE loc_locale = '.$DB->quote( $loc_data['loc_locale'] ) );
 		}
-		$DB->commit();
 		upg_task_end();
 	}
 
 	if( upg_task_start( 12130, 'Create new widget container "Item Single Header"...' ) )
-	{ // part of 6.8.0-alpha
-		$DB->begin();
+	{	// part of 6.8.0-alpha
 		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
 		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_order, wi_enabled, wi_code, wi_params, blog_type' );
 		$SQL->FROM( 'T_widget' );
@@ -8079,7 +8078,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code, wi_params )
 			  VALUES '.implode( ', ', $item_info_line_widget_rows ) );
 		}
-		$DB->commit();
 		upg_task_end();
 	}
 
