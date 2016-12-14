@@ -1970,6 +1970,7 @@ function htmlspecialchars_decode (string, quote_style) {
                 extensionsForMessage = allowedExtensions.join(", ").toLowerCase();
                 r("{file}", this._options.formatFileName(name));
                 r("{extensions}", extensionsForMessage);
+                r("{fileSize}", this._formatSize(item.size));
                 r("{sizeLimit}", this._formatSize(validationBase.sizeLimit));
                 r("{minSizeLimit}", this._formatSize(validationBase.minSizeLimit));
                 placeholderMatch = message.match(/(\{\w+\})/g);

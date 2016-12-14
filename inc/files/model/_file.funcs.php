@@ -2424,7 +2424,6 @@ function display_dragdrop_upload_button( $params = array() )
 				dragAndDrop: {
 					extraDropzones: <?php echo $params['additional_dropzone'];?>
 				},
-				//additional_dropzone: '<?php echo $params['additional_dropzone']; ?>',
 				debug: false,
 				messages: {
 					typeError: '<?php echo TS_('{file} has an invalid extension. Only {extensions} are allowed.'); ?>',
@@ -2434,8 +2433,7 @@ function display_dragdrop_upload_button( $params = array() )
 					onLeave: '<?php echo TS_('Files are currently being uploaded. If you leave this page now, the upload will be cancelled.'); ?>'
 				},
 				validation: {
-					//sizeLimit: <?php echo min( array( return_bytes( ini_get('post_max_size') ), return_bytes( ini_get('upload_max_filesize') ), $Settings->get( 'upload_maxkb') * 1024 ) );?>,
-					sizeLimit: <?php echo $Settings->get( 'upload_maxkb') * 1024;?>,
+					sizeLimit: <?php echo min( array( return_bytes( ini_get('post_max_size') ), return_bytes( ini_get('upload_max_filesize') ), $Settings->get( 'upload_maxkb') * 1024 ) );?>,
 					allowedExtensions: <?php echo json_encode( $allowed_extensions );?>
 				},
 				callbacks: {
