@@ -8461,67 +8461,8 @@ class Item extends ItemLight
 			return false;
 		}
 
-		// Load collection of this Item:
-		$this->load_Blog();
-
-		// Get item statuses which are visible on front-office:
-		$show_statuses = get_inskin_statuses( $this->Blog->ID, 'post' );
-
-		if( ! in_array( $this->get( 'status' ), $show_statuses ) )
-		{	// This Item has a status which cannot be displayed on front-office:
-			return false;
-		}
-
-		global $current_User;
-		$is_logged_in = is_logged_in( false );
-
-		switch( $this->get( 'status' ) )
-		{
-			case 'published':
-				// Published posts are always allowed:
-				$allowed = true;
-				break;
-
-			case 'community':
-				// It is always allowed for logged in users:
-				$allowed = $is_logged_in;
-				break;
-
-			case 'protected':
-				// It is always allowed for members:
-				$allowed = ( $is_logged_in && $current_User->check_perm( 'blog_ismember', 1, false, $this->Blog->ID ) );
-				break;
-
-			case 'private':
-				// It is allowed for users who has global 'editall' permission:
-				$allowed = ( $is_logged_in && $current_User->check_perm( 'blogs', 'editall' ) );
-				if( ! $allowed && $is_logged_in && $current_User->check_perm( 'blog_post!private', 'create', false, $this->Blog->ID ) )
-				{	// Own private posts are allowed if user can create private posts:
-					$allowed = ( $current_User->ID == $this->creator_user_ID );
-				}
-				break;
-
-			case 'review':
-				// It is allowed for users who have at least 'lt' posts edit permission :
-				$allowed = ( $is_logged_in && $current_User->check_perm( 'blog_post!review', 'moderate', false, $this->Blog->ID ) );
-				if( ! $allowed && $is_logged_in && $current_User->check_perm( 'blog_post!review', 'create', false, $this->Blog->ID ) )
-				{	// Own posts with 'review' status are allowed if user can create posts with 'review' status
-					$allowed = ( $current_User->ID == $this->creator_user_ID );
-				}
-				break;
-
-			case 'draft':
-				// In front-office only authors may see their own draft posts, but only if the have permission to create draft posts:
-				$allowed = ( $is_logged_in && $current_User->check_perm( 'blog_post!draft', 'create', false, $this->Blog->ID )
-					&& $current_User->ID == $this->creator_user_ID );
-				break;
-
-			default:
-				// Decide the unknown item statuses as not visible for front-office:
-				$allowed = false;
-		}
-
-		return $allowed;
+		// Check if this Item can be displayed with current status:
+		return can_be_displayed_with_status( $this->get( 'status' ), 'post', $this->get_blog_ID(), $this->creator_user_ID );
 	}
 }
 ?>

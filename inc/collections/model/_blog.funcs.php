@@ -1339,6 +1339,80 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow
 
 
 /**
+ * Check if item/comment can be displayed with status for current user on front-office
+ *
+ * @param string Status
+ * @param string Type: 'item', 'comment'
+ * @param integer Blog ID
+ * @param integer Creator user ID
+ * @return boolean
+ */
+function can_be_displayed_with_status( $status, $type, $blog_ID, $creator_user_ID )
+{
+	// Get statuses which are visible on front-office:
+	$show_statuses = get_inskin_statuses( $blog_ID, $type );
+
+	if( ! in_array( $status, $show_statuses ) )
+	{	// This Item has a status which cannot be displayed on front-office:
+		return false;
+	}
+
+	global $current_User;
+	$is_logged_in = is_logged_in( false );
+
+	$permname = ( $type == 'item' ? 'blog_post!' : 'blog_comment!' ).$status;
+
+	switch( $status )
+	{
+		case 'published':
+			// Published items/comments are always allowed:
+			$allowed = true;
+			break;
+
+		case 'community':
+			// It is always allowed for logged in users:
+			$allowed = $is_logged_in;
+			break;
+
+		case 'protected':
+			// It is always allowed for members:
+			$allowed = ( $is_logged_in && $current_User->check_perm( 'blog_ismember', 1, false, $blog_ID ) );
+			break;
+
+		case 'private':
+			// It is allowed for users who has global 'editall' permission:
+			$allowed = ( $is_logged_in && $current_User->check_perm( 'blogs', 'editall' ) );
+			if( ! $allowed && $is_logged_in && $current_User->check_perm( $permname, 'create', false, $blog_ID ) )
+			{	// Own private items/comments are allowed if user can create private items/comments:
+				$allowed = ( $current_User->ID == $creator_user_ID );
+			}
+			break;
+
+		case 'review':
+			// It is allowed for users who have at least 'lt' items/comments edit permission :
+			$allowed = ( $is_logged_in && $current_User->check_perm( $permname, 'moderate', false, $blog_ID ) );
+			if( ! $allowed && $is_logged_in && $current_User->check_perm( $permname, 'create', false, $blog_ID ) )
+			{	// Own items/comments with 'review' status are allowed if user can create items/comments with 'review' status
+				$allowed = ( $current_User->ID == $creator_user_ID );
+			}
+			break;
+
+		case 'draft':
+			// In front-office only authors may see their own draft items/comments, but only if the have permission to create draft items/comments:
+			$allowed = ( $is_logged_in && $current_User->check_perm( $permname, 'create', false, $blog_ID )
+				&& $current_User->ID == $creator_user_ID );
+			break;
+
+		default:
+			// Decide the unknown item/comment statuses as not visible for front-office:
+			$allowed = false;
+	}
+
+	return $allowed;
+}
+
+
+/**
  * Get Blog object from general setting
  *
  * @param string Setting name: 'default_blog_ID', 'info_blog_ID', 'login_blog_ID', 'msg_blog_ID'

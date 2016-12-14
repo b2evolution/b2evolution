@@ -4677,6 +4677,25 @@ class Comment extends DataObject
 		// TRUE if all requested flags are in current item notifications flags:
 		return ( count( array_diff( $flags, $this->get( 'notif_flags' ) ) ) == 0 );
 	}
+
+
+	/**
+	 * Check if this comment can be displayed for current user on front-office
+	 *
+	 * @return boolean
+	 */
+	function can_be_displayed()
+	{
+		if( empty( $this->ID ) )
+		{	// Comment is not created yet, so it cannot be displayed:
+			return false;
+		}
+
+		// Load Item of this comment to get a collection ID:
+		$Item = & $this->get_Item();
+
+		return can_be_displayed_with_status( $this->get( 'status' ), 'comment', $Item->get_blog_ID(), $this->author_user_ID );
+	}
 }
 
 ?>
