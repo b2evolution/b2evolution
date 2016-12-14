@@ -130,11 +130,17 @@ if( $upload && ( !$current_User->check_perm( 'files', 'add', false, $fm_FileRoot
 if( $upload )
 { // Create the object and assign property
 
+	$size_limits = array( return_bytes( ini_get( 'post_max_size' ) ), return_bytes( ini_get( 'upload_max_filesize') ) );
+	if( $Settings->get( 'upload_maxkb' ) )
+	{
+		$size_limits[] = $Settings->get( 'upload_maxkb' ) * 1024;
+	}
+
 	$file = new UploadHandler();
 	// Specify the list of valid extensions, ex. array("jpeg", "xml", "bmp")
 	$file->allowedExtensions = array(); // all files types allowed by default
 	// Specify max file size in bytes.
-	$file->sizeLimit = $Settings->get( 'upload_maxkb') ? $Settings->get( 'upload_maxkb' ) * 1024 : null;
+	$file->sizeLimit = min( $size_limits );
 	// Specify the input name set in the javascript.
 	$file->inputName = "qqfile"; // matches Fine Uploader's default inputName value by default
 	// If you want to use the chunking/resume feature, specify the folder to temporarily save parts.
