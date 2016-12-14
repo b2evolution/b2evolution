@@ -2861,7 +2861,6 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 	$Item = & $Comment->get_Item();
 	$Collection = $Blog = & $Item->get_Blog();
 
-	$is_published = ( $Comment->get( 'status' ) == 'published' );
 	$expiry_delay = $Item->get_setting( 'comment_expiry_delay' );
 	$is_expired = ( !empty( $expiry_delay ) && ( ( $localtimenow - mysql2timestamp( $Comment->get( 'date' ) ) ) > $expiry_delay ) );
 
@@ -3054,8 +3053,8 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 		echo '</div>';
 		echo '</div>';
 
-		if( $is_published )
-		{
+		if( $Comment->can_be_displayed() )
+		{	// Display more info if current user can view this comment on front-office:
 			echo '<div class="panel-body">';
 			echo '<div class="bCommentTitle">';
 			echo $Comment->get_title();
