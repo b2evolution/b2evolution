@@ -2720,7 +2720,7 @@ function echo_show_comments_changed( $comment_type )
  *
  * @param integer Blog ID
  * @param integer Item ID
- * @param array Status filters
+ * @param array|string Status filters array or strings: '#only_moderation#', '#only_valid#', 
  * @param integer Limit
  * @param array Comments IDs string to exclude from the list
  * @param string Filterset name
@@ -2729,7 +2729,7 @@ function echo_show_comments_changed( $comment_type )
  */
 function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage = 1, $limit = NULL, $exclude_comment_IDs = array(), $filterset_name = '', $expiry_status = 'active', $comment_type = 'feedback' )
 {
-	global $inc_path, $status_list, $Collection, $Blog, $admin_url;
+	global $inc_path, $Collection, $Blog, $admin_url;
 
 	$BlogCache = & get_BlogCache();
 	$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
@@ -2762,6 +2762,32 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 			if( ! $Item || empty( $current_User ) || ! $current_User->check_perm( 'meta_comment', 'view', false, $blog_ID ) )
 			{ // Current user has no permissions to view meta comments
 				$comment_type = 'feedback';
+			}
+		}
+
+		if( is_string( $statuses ) )
+		{	// Try to get statuses from predefined constants:
+			if( $statuses == '#only_moderation#' )
+			{	// Get only statuses that require moderation:
+				$statuses = explode( ',', $Blog->get_setting( 'moderation_statuses' ) );
+			}
+			elseif( $statuses == '#only_valid#' )
+			{	// Get only valid statuses:
+				$all_statuses = get_visibility_statuses( 'keys', array( 'deprecated', 'redirected', 'trash' ) );
+				$moderation_statuses = explode( ',', $Blog->get_setting( 'moderation_statuses' ) );
+				$statuses = array_diff( $all_statuses, $moderation_statuses );
+			}
+			elseif( $statuses == '#all#' )
+			{	// Get all statuses:
+				$statuses = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
+			}
+			elseif( strlen( $statuses ) > 2 )
+			{	// Get the requested statuses from string like '(published,private,draft)':
+				$statuses = explode( ',', substr( $statuses, 1, strlen( $statuses ) - 2 ) );
+			}
+			else
+			{	// Wrong status request by string format:
+				$statuses = NULL;
 			}
 		}
 

@@ -368,23 +368,14 @@ switch( $action )
 		}
 
 		if( in_array( $request_from, array( 'items', 'comments' ) ) )
-		{ // AJAX request goes from backoffice and ctrl = items or comments
-			if( strlen($statuses) > 2 )
-			{
-				$statuses = substr( $statuses, 1, strlen($statuses) - 2 );
-			}
-			$status_list = explode( ',', $statuses );
-			if( $status_list == NULL )
-			{
-				$status_list = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
-			}
+		{	// AJAX request goes from backoffice and ctrl = items or comments:
 
 			// In case of comments_fullview we must set a filterset name to be abble to restore filterset.
 			// If $item_ID is not valid, then this requests came from the comments_fullview
 			// TODO: asimo> This should be handled with a better solution
 			$filterset_name = /*'';*/( $item_ID > 0 ) ? '' : 'fullview';
 
-			echo_item_comments( $blog, $item_ID, $status_list, $currentpage, $limit, array(), $filterset_name, $expiry_status, $comment_type );
+			echo_item_comments( $blog, $item_ID, $statuses, $currentpage, $limit, array(), $filterset_name, $expiry_status, $comment_type );
 		}
 		break;
 
@@ -435,18 +426,8 @@ switch( $action )
 		$AdminUI = new AdminUI();
 
 		if( in_array( $request_from, array( 'items', 'comments' ) ) )
-		{ // AJAX request goes from backoffice and ctrl = items or comments
-			if( strlen($statuses) > 2 )
-			{
-				$statuses = substr( $statuses, 1, strlen($statuses) - 2 );
-			}
-			$status_list = explode( ',', $statuses );
-			if( $status_list == NULL )
-			{ // init statuses
-				$status_list = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
-			}
-
-			echo_item_comments( $blog, $item_ID, $status_list, $currentpage, NULL, array(), '', $expiry_status, $comment_type );
+		{	// AJAX request goes from backoffice and ctrl = items or comments
+			echo_item_comments( $blog, $item_ID, $statuses, $currentpage, NULL, array(), '', $expiry_status, $comment_type );
 		}
 		elseif( $request_from == 'dashboard' || $request_from == 'coll_settings' )
 		{ // AJAX request goes from backoffice dashboard

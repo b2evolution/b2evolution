@@ -535,16 +535,16 @@ function get_limit()
 
 function get_show_statuses()
 {
-	if( jQuery('#only_draft') && jQuery('#only_draft').is(':checked') )
+	if( jQuery('#only_moderation') && jQuery('#only_moderation').is(':checked') )
 	{
-		return '(draft)';
+		return '#only_moderation#';
 	}
-	else if( jQuery('#only_published') && jQuery('#only_published').is(':checked') )
+	else if( jQuery('#only_valid') && jQuery('#only_valid').is(':checked') )
 	{
-		return '(published)';
+		return '#only_valid#';
 	}
 
-	return '(published,community,protected,private,review,draft,deprecated)';
+	return '#all#';
 }
 
 function get_expiry_status()

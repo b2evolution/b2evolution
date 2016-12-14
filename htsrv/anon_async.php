@@ -1060,22 +1060,12 @@ switch( $action )
 			$item_ID = param( 'itemid', 'integer' );
 			$currentpage = param( 'currentpage', 'integer', 1 );
 
-			if( strlen($statuses) > 2 )
-			{
-				$statuses = substr( $statuses, 1, strlen($statuses) - 2 );
-			}
-			$status_list = explode( ',', $statuses );
-			if( $status_list == NULL )
-			{
-				$status_list = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
-			}
-
 			// In case of comments_fullview we must set a filterset name to be abble to restore filterset.
 			// If $moderation is not NULL, then this requests came from the comments_fullview
 			// TODO: asimo> This should be handled with a better solution
 			$filterset_name = ( $item_ID > 0 ) ? '' : 'fullview';
 
-			echo_item_comments( $blog, $item_ID, $status_list, $currentpage, $limit, array(), $filterset_name, $expiry_status );
+			echo_item_comments( $blog, $item_ID, $statuses, $currentpage, $limit, array(), $filterset_name, $expiry_status );
 		}
 		elseif( $request_from == 'front' )
 		{ // AJAX request goes from frontoffice
