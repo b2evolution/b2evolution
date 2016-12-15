@@ -451,7 +451,7 @@ while( $Item = & $ItemList->get_item() )
 			$CommentList->set_filters( array(
 				'types' => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment','trackback','pingback' ),
 				'statuses' => $statuses,
-				'order' => $comment_type == 'meta' ? 'DESC' : 'ASC',
+				'order' => $comment_type == 'meta' ? 'DESC' : $Blog->get_setting( 'comments_orderdir' ),
 				'post_ID' => $Item->ID,
 				'comments' => $UserSettings->get( 'results_per_page' ),
 				'page' => $currentpage,

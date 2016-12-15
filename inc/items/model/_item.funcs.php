@@ -2659,9 +2659,10 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 	{
 		$item_ID = NULL;
 	}
-	// set redirect_to
+
 	if( ! is_null( $item_ID ) )
-	{
+	{	// Initialize comments list for ctrl=items&p=x to get comments only of the item:
+
 		if( $comment_type == 'meta' )
 		{ // Check if current user can sees meta comments of this item
 			global $current_User;
@@ -2694,18 +2695,20 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 			'expiry_statuses' => $expiry_statuses,
 			'comment_ID_list' => $exlude_ID_list,
 			'post_ID' => $item_ID,
-			'order' => $comment_type == 'meta' ? 'DESC' : 'ASC',//$order,
+			'order' => $comment_type == 'meta' ? 'DESC' : $Blog->get_setting( 'comments_orderdir' ),
 			'comments' => $limit,
 			'page' => $currentpage,
 		) );
 	}
 	else
-	{ // redirect to the comments full view
+	{	// Initialize comments list for ctrl=comments to get all comments:
+
+		// Set a redirect to the comments full view:
 		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=comments&blog='.$blog_ID.'&filter=restore', '&' ) );
 		// this is an ajax call we always have to restore the filterst (we can set filters only without ajax call)
 		$CommentList->set_filters( array(
 			'types' => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment', 'trackback', 'pingback' ),
-			'order' => $comment_type == 'meta' ? 'DESC' : 'ASC',
+			'order' => 'DESC',
 		) );
 		$CommentList->restore_filterset();
 	}
