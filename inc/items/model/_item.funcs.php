@@ -2811,7 +2811,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 			'expiry_statuses'   => ( $expiry_status == 'all' ? array( 'active', 'expired' ) : array( $expiry_status ) ),
 			'comment_ID_list'   => ( empty( $exclude_comment_IDs ) ? NULL : '-'.implode( ",", $exclude_comment_IDs ) ),
 			'post_ID'           => $item_ID,
-			'order'             => $comment_type == 'meta' ? 'DESC' : 'ASC',//$order,
+			'order'             => $comment_type == 'meta' ? 'DESC' : $Blog->get_setting( 'comments_orderdir' ),
 			'comments'          => $limit,
 			'page'              => $currentpage,
 			'threaded_comments' => $threaded_comments_mode,
@@ -2825,7 +2825,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 		// this is an ajax call we always have to restore the filterst (we can set filters only without ajax call)
 		$CommentList->set_filters( array(
 			'types' => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment', 'trackback', 'pingback' ),
-			'order' => $comment_type == 'meta' ? 'DESC' : 'ASC',
+			'order' => 'DESC',
 		) );
 		$CommentList->restore_filterset();
 	}
