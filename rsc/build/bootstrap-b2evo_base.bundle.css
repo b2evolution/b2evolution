@@ -3341,6 +3341,30 @@ span.NonExistentWikiWord {
   div.checkbox:last-of-type {
     padding-bottom: 7px;
   }
+  .text-left-sm {
+    text-align: left;
+  }
+  .text-right-sm {
+    text-align: right;
+  }
+}
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+  .text-left-md {
+    text-align: left;
+  }
+  .text-right-md {
+    text-align: right;
+  }
+}
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  .text-left-lg {
+    text-align: left;
+  }
+  .text-right-lg {
+    text-align: right;
+  }
 }
 .glyphicon {
   font-family: 'Glyphicons Halflings' !important;

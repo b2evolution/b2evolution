@@ -223,42 +223,46 @@ skin_widget( array(
 		</div><!-- ../panel-body -->
 
 		<div class="panel-footer clearfix small">
-		<a href="<?php echo $Item->get_permanent_url(); ?>#skin_wrapper" class="to_top"><?php echo T_('Back to top'); ?></a>
-		<?php
-			// Check if BBcode plugin is enabled for current blog
-			$bbcode_plugin_is_enabled = false;
-			if( class_exists( 'bbcode_plugin' ) )
-			{ // Plugin exists
-				global $Plugins;
-				$bbcode_Plugin = & $Plugins->get_by_classname( 'bbcode_plugin' );
-				if( $bbcode_Plugin->status == 'enabled' && $bbcode_Plugin->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) != 'never' )
-				{ // Plugin is enabled and activated for comments
-					$bbcode_plugin_is_enabled = true;
-				}
-			}
-			if( $bbcode_plugin_is_enabled && $Item->can_comment( NULL ) )
-			{	// Display button to quote this post
-				echo '<a href="'.$Item->get_permanent_url().'?mode=quote&amp;qp='.$Item->ID.'#form_p'.$Item->ID.'" title="'.T_('Reply with quote').'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
-			}
+			<div class="row">
+				<div class="col-xs-12 col-lg-6">
+					<a href="<?php echo $Item->get_permanent_url(); ?>#skin_wrapper" class="to_top"><?php echo T_('Back to top'); ?></a>
+					<?php
+						// Check if BBcode plugin is enabled for current blog
+						$bbcode_plugin_is_enabled = false;
+						if( class_exists( 'bbcode_plugin' ) )
+						{ // Plugin exists
+							global $Plugins;
+							$bbcode_Plugin = & $Plugins->get_by_classname( 'bbcode_plugin' );
+							if( $bbcode_Plugin->status == 'enabled' && $bbcode_Plugin->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) != 'never' )
+							{ // Plugin is enabled and activated for comments
+								$bbcode_plugin_is_enabled = true;
+							}
+						}
+						if( $bbcode_plugin_is_enabled && $Item->can_comment( NULL ) )
+						{	// Display button to quote this post
+							echo '<a href="'.$Item->get_permanent_url().'?mode=quote&amp;qp='.$Item->ID.'#form_p'.$Item->ID.'" title="'.T_('Reply with quote').'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
+						}
 
-			// Display a panel with voting buttons for item:
-			$Skin->display_item_voting_panel( $Item );
-
-			echo '<div class="floatright">';
-			$Item->edit_link( array(
-					'before' => ' ',
-					'after'  => '',
-					'title'  => T_('Edit this topic'),
-					'text'   => '#',
-					'class'  => button_class( 'text' ),
-				) );
-			echo ' <span class="'.button_class( 'group' ).'">';
-			// Set redirect after publish to the same category view of the items permanent url
-			$redirect_after_publish = $Item->add_navigation_param( $Item->get_permanent_url(), 'same_category', $current_cat );
-			$Item->next_status_link( array( 'before' => ' ', 'class' => button_class( 'text' ), 'post_navigation' => 'same_category', 'nav_target' => $current_cat ), true );
-			$Item->next_status_link( array( 'class' => button_class( 'text' ), 'before_text' => '', 'post_navigation' => 'same_category', 'nav_target' => $current_cat ), false );
-			$Item->delete_link( '', '', '#', T_('Delete this topic'), button_class( 'text' ), false, '#', TS_('You are about to delete this post!\\nThis cannot be undone!'), get_caturl( $current_cat ) );
-			echo '</span>';
+						// Display a panel with voting buttons for item:
+						$Skin->display_item_voting_panel( $Item );
+					?>
+					</div>
+					<?php
+					echo '<div class="col-xs-12 col-lg-6 text-left-sm text-right-lg">';
+						$Item->edit_link( array(
+								'before' => ' ',
+								'after'  => '',
+								'title'  => T_('Edit this topic'),
+								'text'   => '#',
+								'class'  => button_class( 'text' ),
+							) );
+						echo ' <span class="'.button_class( 'group' ).'">';
+						// Set redirect after publish to the same category view of the items permanent url
+						$redirect_after_publish = $Item->add_navigation_param( $Item->get_permanent_url(), 'same_category', $current_cat );
+						$Item->next_status_link( array( 'before' => ' ', 'class' => button_class( 'text' ), 'post_navigation' => 'same_category', 'nav_target' => $current_cat ), true );
+						$Item->next_status_link( array( 'class' => button_class( 'text' ), 'before_text' => '', 'post_navigation' => 'same_category', 'nav_target' => $current_cat ), false );
+						$Item->delete_link( '', '', '#', T_('Delete this topic'), button_class( 'text' ), false, '#', TS_('You are about to delete this post!\\nThis cannot be undone!'), get_caturl( $current_cat ) );
+						echo '</span>';
 			echo '</div>';
 		?>
 

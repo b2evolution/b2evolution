@@ -243,7 +243,7 @@ ol.breadcrumb {
 		color: #8b96a1;
 		font-size: 90%;
 		line-height: 16px;
-		
+
 		div.ft_date_header {
 				margin-bottom: 5px;
 			}
@@ -612,6 +612,22 @@ body.round_avatars .single_topic .evo_content_block .ft_avatar {
 		.border-radius(50%);
 	}
 }
+.evo_content_block, .evo_comment {
+	.panel-footer {
+		.row {
+			> div {
+				> a, > span:not(.btn-group), > div, .btn-group > a {
+					margin-top: 2px;
+					margin-bottom: 2px;
+				}
+				.vote_spam .btn-group a {
+					margin-top: 0;
+					margin-bottom: 0;
+				}
+			}
+		}
+	}
+}
 
 // Voting panels
 .vote_spam {
@@ -804,7 +820,7 @@ aside .widget_core_coll_search_form {
 			float: left;
 			margin-top: 4px;
 			line-height: 22px;
-			
+
 			span {
 				vertical-align: top;
 			}

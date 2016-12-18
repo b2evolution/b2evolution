@@ -2243,19 +2243,21 @@ function get_atags( $content )
  */
 function add_tag_class( $content, $class, $limit = 1 )
 {
-	// Check if there's an opening tag
-	if( preg_match( '/<.*>/i', $content ) )
-	{
-		// Check if class attribute is already defined
-		if( preg_match( '/\sclass\s*=/i', $content) )
-		{ // Insert class
-			$content = preg_replace( '/(<.*)(class\s*=\s*")(.*)"/i', '$1$2$3 '.$class.'"', $content, $limit );
-		}
-		else
+	$content = preg_replace_callback( '/<[^\/].*?>/i',
+		function( $matches ) use ( $class )
 		{
-			$content = preg_replace( '/>/i', ' class="'.$class.'"$1>', $content, $limit );
-		}
-	}
+			// Check if class attribute is already defined
+			if( preg_match( '/\sclass\s*=/i', $matches[0] ) )
+			{ // Insert class
+				//$content = preg_replace( '/(<.*)(class\s*=\s*")(.*)"/i', '$1$2$3 '.$class.'"', $content, $limit );
+				return preg_replace( '/(<[a-zA-z_:]\s*?.*?\s*?class=")(.*?)(".*?>)/i', '$1$2 '.$class.'$3', $matches[0] );
+			}
+			else
+			{
+				return preg_replace( '/>/i', ' class="'.$class.'"$1>', $matches[0] );
+			}
+		},
+		$content, $limit );
 
 	return $content;
 }

@@ -1854,7 +1854,7 @@ class Comment extends DataObject
 		echo $before;
 
 		$style = $params['display'] ? '' : ' style="display:none"';
-		echo '<div id="vote_spam_'.$this->ID.'" class="vote_spam"'.$style.'>';
+		echo '<div id="vote_spam_'.$this->ID.'" class="vote_spam nowrap"'.$style.'>';
 
 		$vote_result = $this->get_vote_spam_disabled();
 
@@ -1938,7 +1938,7 @@ class Comment extends DataObject
 
 		if( $params['display_wrapper'] )
 		{	// Display wrapper:
-			echo '<span id="vote_helpful_'.$this->ID.'" class="evo_voting_panel '.( empty( $params['class'] ) ? '' : ' '.$params['class'] ).'">';
+			echo '<span id="vote_helpful_'.$this->ID.'" class="nowrap evo_voting_panel'.( empty( $params['class'] ) ? '' : ' '.$params['class'] ).'">';
 		}
 
 		echo $params['before_title'];
