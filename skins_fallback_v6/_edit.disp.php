@@ -205,9 +205,9 @@ $Form->begin_form( 'inskin', '', $form_params );
 			) ), $params ) ) );
 	$Form->output = true;
 	$advanced_edit_text = T_('Advanced editing');
-	$edit_links = preg_replace( '/ '.$advanced_edit_text.'/', '<span class="hidden-xs">$1</span>', $edit_links );
+	$edit_links = preg_replace( '/ '.$advanced_edit_text.'/', '<span class="hidden-xs">$0</span>', $edit_links );
 	$cancel_text = T_('Cancel editing');
-	$edit_links = preg_replace( '/ '.$cancel_text.'/', '<span class="hidden-xs">$1</span>', $edit_links );
+	$edit_links = preg_replace( '/ '.$cancel_text.'/', '<span class="hidden-xs">$0</span>', $edit_links );
 	echo $edit_links;
 
 
