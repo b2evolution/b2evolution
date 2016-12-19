@@ -1207,10 +1207,10 @@ switch( $action )
 		$result = array();
 
 		if( $get_widget_login_hidden_fields )
-		{ // Get the loginform crumb, the password encryption salt, and the Session ID for the widget login form
-			$pwd_salt = $Session->get('core.pwd_salt');
-			if( empty($pwd_salt) )
-			{ // Session salt is not generated yet, needs to generate
+		{	// Get the loginform crumb, the password encryption salt, and the Session ID for the widget login form:
+			$pwd_salt = $Session->get( 'core.pwd_salt' );
+			if( empty( $pwd_salt ) )
+			{	// Session salt is not generated yet, needs to generate:
 				$pwd_salt = generate_random_key(64);
 				$Session->set( 'core.pwd_salt', $pwd_salt, 86400 /* expire in 1 day */ );
 				$Session->dbsave(); // save now, in case there's an error later, and not saving it would prevent the user from logging in.
@@ -1219,7 +1219,12 @@ switch( $action )
 			$result['pwd_salt'] = $pwd_salt;
 			$result['session_id'] = $Session->ID;
 		}
+		else
+		{	// Get the password encryption salt for normal login form:
+			$pwd_salt = param( 'pwd_salt', 'string', '' );
+		}
 
+		$raw_password = param( 'raw_'.$dummy_fields[ 'pwd' ], 'string', '' );
 		$login = param( $dummy_fields[ 'login' ], 'string', '' );
 		$check_field = is_email( $login ) ? 'user_email' : 'user_login';
 
@@ -1234,7 +1239,12 @@ switch( $action )
 		{ // User with the given login was not found add one random salt value
 			$salts[] = generate_random_key( 8 );
 		}
-		$result['salts'] = $salts;
+
+		$result['pwd_hashed'] = array();
+		foreach( $salts as $salt )
+		{
+			$result['pwd_hashed'][] = sha1( md5( $salt.$raw_password ).$pwd_salt );
+		}
 
 		echo evo_json_encode( $result );
 
