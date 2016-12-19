@@ -641,7 +641,8 @@ function phpbb_import_users()
 			}
 			else
 			{	// phpBB v2:
-				$user_data['user_pass'] = $phpbb_user->user_password;
+				$user_data['user_pass'] = hex2bin( $phpbb_user->user_password );
+				$user_data['user_pass_driver'] = 'evo$md5';
 				$user_data['user_level'] = $phpbb_user->user_level;
 				$user_data['user_status'] = $phpbb_user->user_active == '1' ? 'autoactivated' : 'closed';
 			}

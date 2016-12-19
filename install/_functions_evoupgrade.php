@@ -8088,6 +8088,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12140, 'Upgrade table of users...' ) )
+	{	// part of 6.8.2-stable
+		db_add_col( 'T_users', 'user_pass_driver', 'VARCHAR(16) NOT NULL default "evo$md5" AFTER user_salt' );
+		$DB->query( 'UPDATE T_users
+			  SET user_pass_driver = "evo$salted"
+			WHERE user_salt != ""' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

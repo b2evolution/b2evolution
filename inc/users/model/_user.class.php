@@ -34,6 +34,7 @@ class User extends DataObject
 	var $login;
 	var $pass;
 	var $salt;
+	var $pass_driver;
 	var $firstname;
 	var $lastname;
 	var $nickname;
@@ -217,6 +218,7 @@ class User extends DataObject
 			$this->login = $db_row->user_login;
 			$this->pass = $db_row->user_pass;
 			$this->salt = $db_row->user_salt;
+			$this->pass_driver = $db_row->user_pass_driver;
 			$this->firstname = $db_row->user_firstname;
 			$this->lastname = $db_row->user_lastname;
 			$this->nickname = $db_row->user_nickname;
@@ -2290,6 +2292,7 @@ class User extends DataObject
 
 		$this->set( 'pass', md5( $new_pass_salt.$raw_password, true ) );
 		$this->set( 'salt', $new_pass_salt );
+		$this->set( 'pass_driver', 'evo$salted' );
 	}
 
 
