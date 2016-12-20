@@ -44,6 +44,9 @@ if( empty($current_User) || ! $current_User->check_perm( 'admin', 'restricted' )
 	require $adminskins_path.'_access_denied.main.php';
 }
 
+// Send the predefined cookies:
+evo_sendcookies();
+
 // Make sure the async responses are never cached:
 header_nocache();
 header_content_type( 'text/html', $io_charset );

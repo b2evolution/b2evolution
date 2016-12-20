@@ -34,6 +34,9 @@ $blog_ID = param( 'blog', 'integer' );
 // Initialize this array in order to don't load JS files twice in they have been already loaded on parent page:
 $required_js = param( 'required_js', 'array:string', array(), false, true );
 
+// Send the predefined cookies:
+evo_sendcookies();
+
 // Make sure the async responses are never cached:
 header_nocache();
 header_content_type( 'text/html', $io_charset );
