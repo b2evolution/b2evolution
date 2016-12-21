@@ -23,6 +23,7 @@ function phpbb_tables_aliases( $phpbb_db_prefix )
 {
 	$phpbb_db_aliases = array(
 			'BB_users'         => $phpbb_db_prefix.'users',
+			'BB_user_fields'   => $phpbb_db_prefix.'profile_fields_data',
 			'BB_ranks'         => $phpbb_db_prefix.'ranks',
 			'BB_categories'    => $phpbb_db_prefix.'categories',
 			'BB_forums'        => $phpbb_db_prefix.'forums',
@@ -483,8 +484,9 @@ function phpbb_import_users()
 	if( $phpbb_version == 3 )
 	{	// phpBB v3:
 		$users_SQL->SELECT( 'u.user_id, u.user_inactive_reason, u.username, u.user_password, u.user_email, u.user_lang, u.user_regdate,
-							 u.user_icq, u.user_website, u.user_aim, u.user_yim, u.user_msnm, u.user_interests, u.user_rank,
+							 uf.pf_phpbb_icq AS user_icq, uf.pf_phpbb_website AS user_website, "" AS user_aim, "" AS user_yim, "" AS user_msnm, uf.pf_phpbb_interests AS user_interests, u.user_rank,
 							 u.user_allow_viewonline, u.user_notify_pm, u.user_avatar' );
+		$users_SQL->FROM_add( 'LEFT JOIN BB_user_fields uf ON uf.user_id = u.user_id' );
 	}
 	else
 	{	// phpBB v2:
