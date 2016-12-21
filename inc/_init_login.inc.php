@@ -234,7 +234,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 					#pre_dump( sha1($User->pass.$pwd_salt), $pwd_hashed );
 					foreach( $pwd_hashed as $encrypted_password )
 					{
-						$pass_ok = ( sha1( bin2hex( $User->pass ).$pwd_salt_sess ) == $encrypted_password );
+						$pass_ok = ( sha1( $User->pass.$pwd_salt_sess ) == $encrypted_password );
 						if( $pass_ok )
 						{ // Break after the first matching password
 							break;
@@ -246,7 +246,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 			}
 			else
 			{	// Password NOT hashed by Javascript:
-				$pass_ok = ( $User->pass == md5( $User->salt.$pass, true ) );
+				$pass_ok = $User->check_password( $pass );
 				$Debuglog->add( 'Login: Compared raw passwords. Result: '.(int)$pass_ok, '_init_login' );
 				if( $report_wrong_pass_hashing && $pass_ok && can_use_hashed_password() )
 				{	// Report about this unsecure login action:

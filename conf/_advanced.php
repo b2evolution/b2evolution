@@ -690,6 +690,18 @@ $pwdchange_request_delay = 300; // 5 minutes
 
 
 /**
+ * Password drivers
+ *
+ * Key is a code of password driver,
+ * Value is a file name of class in the folder /inc/users/model/passwords/.
+ */
+$password_drivers = array(
+		'evo$salted' => 'evo_salted',
+		'evo$md5'    => 'evo_md5',
+	);
+
+
+/**
  * Account activation reminder settings.
  * Each element of the array is given in seconds
  * Assume that the number of element in the array below is n then the following must be followed:

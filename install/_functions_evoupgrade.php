@@ -8097,6 +8097,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12145, 'Updating users pass storage...' ) )
+	{	// part of 6.8.2-stable
+		$DB->query( 'ALTER TABLE T_users MODIFY COLUMN user_pass VARBINARY(32)' );
+		$DB->query( 'UPDATE T_users SET user_pass = LOWER( HEX( user_pass ) )' );
+		$DB->query( 'ALTER TABLE T_users MODIFY COLUMN user_pass VARCHAR(64) NOT NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

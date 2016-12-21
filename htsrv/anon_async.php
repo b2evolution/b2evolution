@@ -1231,22 +1231,34 @@ switch( $action )
 		$login = param( $dummy_fields[ 'login' ], 'string', '' );
 		$check_field = is_email( $login ) ? 'user_email' : 'user_login';
 
-		// Get the most recently used 3 users with matching email address
-		$salts = $DB->get_col('SELECT user_salt FROM T_users
+		// Get the most recently used 3 users with matching email address:
+		$salts = $DB->get_results( 'SELECT user_salt, user_pass_driver FROM T_users
 						WHERE '.$check_field.' = '.$DB->quote( utf8_strtolower( $login ) ).'
 						ORDER BY user_lastseen_ts DESC, user_status ASC
-						LIMIT 3' );
+						LIMIT 3', ARRAY_A );
 
-		// Make sure to return at least one salt, to make it unable to guess if user exists with the given login
+		// Make sure to return at least one hashed password, to make it unable to guess if user exists with the given login
 		if( empty( $salts ) )
 		{ // User with the given login was not found add one random salt value
-			$salts[] = generate_random_key( 8 );
+			$salts[] = array(
+					'user_salt'        => generate_random_key( 8 ),
+					'user_pass_driver' => 'evo$salted',
+				);
 		}
 
 		$result['pwd_hashed'] = array();
 		foreach( $salts as $salt )
 		{
-			$result['pwd_hashed'][] = sha1( md5( $salt.$raw_password ).$pwd_salt );
+			// Get password driver by code:
+			$user_PasswordDriver = get_PasswordDriver( $salt['user_pass_driver'] );
+
+			if( ! $user_PasswordDriver )
+			{	// Skip this user because he has an unknown password driver:
+				continue;
+			}
+
+			// Hash password by driver and with additional sha1 hashing to don't send DB data throught AJAX:
+			$result['pwd_hashed'][] = sha1( $user_PasswordDriver->hash( $raw_password, $salt['user_salt'] ).$pwd_salt );
 		}
 
 		echo evo_json_encode( $result );

@@ -84,10 +84,10 @@ function check_user_status( $action, $target = NULL )
  *
  * @param string login
  * @param string password
- * @param boolean Is the password parameter already MD5()'ed?
+ * @param boolean Is the password parameter already hashed?
  * @return boolean
  */
-function user_pass_ok( $login, $pass, $pass_is_md5 = false )
+function user_pass_ok( $login, $pass, $pass_is_hashed = false )
 {
 	$UserCache = & get_UserCache();
 	$User = & $UserCache->get_by_login( $login );
@@ -97,7 +97,7 @@ function user_pass_ok( $login, $pass, $pass_is_md5 = false )
 	}
 	// echo 'got data for: ', $User->login;
 
-	return $User->check_password( $pass, $pass_is_md5 );
+	return $User->check_password( $pass, $pass_is_hashed );
 }
 
 
@@ -6099,6 +6099,65 @@ function validate_pwd_reset_session( $reqID, $forgetful_User )
 	}
 
 	return true;
+}
+
+
+/**
+ * Get password driver by code
+ *
+ * @param string Prefix of password driver OR use empty string to get first driver from config which is supported by server
+ * @return object|NULL Password driver
+ */
+function get_PasswordDriver( $driver_code = '' )
+{
+	global $password_drivers, $password_drivers_cache, $inc_path;
+
+	if( isset( $password_drivers_cache[ $driver_code ] ) )
+	{	// Get password driver from cache if it already exists there:
+		return $password_drivers_cache[ $driver_code ];
+	}
+	// Else get password driver by code and store in cache:
+
+	if( ! is_array( $password_drivers_cache ) )
+	{	// Initialize the cache array:
+		$password_drivers_cache = array();
+	}
+
+	$PasswordDriver = NULL;
+
+	foreach( $password_drivers as $code => $file_name )
+	{
+		if( $code == $driver_code || empty( $driver_code ) )
+		{	// The requested password driver is detected in config
+
+			// Check if password driver class exists in the system:
+			$driver_file_path = 'users/model/passwords/'.$file_name.'.php';
+			if( file_exists( $inc_path.$driver_file_path ) )
+			{	// Class file exists on the disk
+				$driver_class_name = str_replace( '_', '', lcfirst( ucwords( $file_name, '_' ) ) ).'PasswordDriver';
+				// Load the class:
+				load_class( $driver_file_path, $driver_class_name );
+
+				if( class_exists( $driver_class_name ) )
+				{	// Class exists in the system
+					$PasswordDriver = new $driver_class_name();
+					if( $PasswordDriver->is_supported() )
+					{	// If the password driver is supported then stop search others:
+						break;
+					}
+					else
+					{	// The password driver is NOT supported by server (probably it has an old PHP verstion), go to search next supported driver:
+						$PasswordDriver = NULL;
+					}
+				}
+			}
+		}
+	}
+
+	// Store password driver in cache:
+	$password_drivers_cache[ $driver_code ] = $PasswordDriver;
+
+	return $PasswordDriver;
 }
 
 ?>

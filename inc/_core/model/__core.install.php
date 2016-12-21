@@ -77,7 +77,7 @@ $schema_queries = array(
 		"CREATE TABLE T_users (
 			user_ID int(11) unsigned NOT NULL auto_increment,
 			user_login varchar(20) NOT NULL,
-			user_pass BINARY(16) NOT NULL,
+			user_pass VARCHAR(64) NOT NULL,
 			user_salt CHAR(8) NOT NULL default '',
 			user_pass_driver VARCHAR(16) NOT NULL default 'evo\$md5',
 			user_grp_ID int(4) NOT NULL default 1,
