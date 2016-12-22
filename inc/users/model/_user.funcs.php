@@ -6103,38 +6103,83 @@ function validate_pwd_reset_session( $reqID, $forgetful_User )
 
 
 /**
+ * Get password drivers config
+ *
+ * @return array Password drivers:
+ *         - Key is a driver key and file name of class in the folder /inc/users/model/passwords/,
+ *         - Value is a code of password driver.
+ */
+function get_password_drivers()
+{
+	$password_drivers = array(
+			'evo_salted' => 'evo$salted',
+			'evo_md5'    => 'evo$md5',
+			'bcrypt_2y'  => 'bb$2y',
+			'bcrypt'     => 'bb$2a',
+			'salted_md5' => 'bb$H',
+			'phpass'     => 'bb$P',
+		);
+
+	return $password_drivers;
+}
+
+
+/**
  * Get password driver by code
  *
- * @param string Prefix of password driver OR use empty string to get first driver from config which is supported by server
+ * @param string Code of password driver OR use empty string to get first driver from config which is supported by server
  * @return object|NULL Password driver
  */
 function get_PasswordDriver( $driver_code = '' )
 {
-	global $password_drivers, $password_drivers_cache, $inc_path;
+	global $enabled_password_drivers, $cached_password_drivers, $inc_path;
 
-	if( isset( $password_drivers_cache[ $driver_code ] ) )
+	if( isset( $cached_password_drivers[ $driver_code ] ) )
 	{	// Get password driver from cache if it already exists there:
-		return $password_drivers_cache[ $driver_code ];
+		return $cached_password_drivers[ $driver_code ];
 	}
 	// Else get password driver by code and store in cache:
 
-	if( ! is_array( $password_drivers_cache ) )
+	if( ! is_array( $cached_password_drivers ) )
 	{	// Initialize the cache array:
-		$password_drivers_cache = array();
+		$cached_password_drivers = array();
 	}
 
 	$PasswordDriver = NULL;
 
-	foreach( $password_drivers as $code => $file_name )
+	// Get password drivers config:
+	$config_password_drivers = get_password_drivers();
+
+	// 
+	$allowed_password_drivers = $enabled_password_drivers;
+
+	if( ! empty( $driver_code )
+	    && ( $drv_key = array_search( $driver_code, $config_password_drivers ) ) !== false
+	    && ! in_array( $drv_key, $enabled_password_drivers ) )
+	{	// If the requested password driver is not enabled currently,
+		// This can happens when admin disabled some driver but old users still want log in.
+		// Allow to use the driver:
+		array_unshift( $allowed_password_drivers, $drv_key );
+	}
+
+	foreach( $allowed_password_drivers as $drv_key )
 	{
-		if( $code == $driver_code || empty( $driver_code ) )
+		if( ! isset( $config_password_drivers[ $drv_key ] ) )
+		{	// Driver is not detected by key, Skip this wrong:
+			continue;
+		}
+
+		// Get driver code by key:
+		$drv_code = isset( $config_password_drivers[ $drv_key ] ) ? $config_password_drivers[ $drv_key ] : '';
+
+		if( $drv_code == $driver_code || empty( $driver_code ) )
 		{	// The requested password driver is detected in config
 
 			// Check if password driver class exists in the system:
-			$driver_file_path = 'users/model/passwords/'.$file_name.'.php';
+			$driver_file_path = 'users/model/passwords/'.$drv_key.'.php';
 			if( file_exists( $inc_path.$driver_file_path ) )
 			{	// Class file exists on the disk
-				$driver_class_name = str_replace( '_', '', lcfirst( ucwords( $file_name, '_' ) ) ).'PasswordDriver';
+				$driver_class_name = str_replace( '_', '', lcfirst( ucwords( $drv_key, '_' ) ) ).'PasswordDriver';
 				// Load the class:
 				load_class( $driver_file_path, $driver_class_name );
 
@@ -6155,7 +6200,7 @@ function get_PasswordDriver( $driver_code = '' )
 	}
 
 	// Store password driver in cache:
-	$password_drivers_cache[ $driver_code ] = $PasswordDriver;
+	$cached_password_drivers[ $driver_code ] = $PasswordDriver;
 
 	return $PasswordDriver;
 }

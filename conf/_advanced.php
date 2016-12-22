@@ -690,18 +690,25 @@ $pwdchange_request_delay = 300; // 5 minutes
 
 
 /**
- * Password drivers
+ * Enabled password drivers.
+ * List what drivers must be enabled on your server.
+ * By default only first driver(which is support by server configuration) will be used to store new updated passwords in DB.
  *
- * Key is a code of password driver,
- * Value is a file name of class in the folder /inc/users/model/passwords/.
+ *   possible driver valuse:
+ *     - evo_salted
+ *     - bcrypt_2y
+ *     - bcrypt
+ *     - salted_md5
+ *     - phpass
+ *     - evo_md5 // Use this driver as last choice only.
  */
-$password_drivers = array(
-		'evo$salted' => 'evo_salted',
-		'evo$md5'    => 'evo_md5',
-		'bb$2y'      => 'bcrypt_2y',
-		'bb$2a'      => 'bcrypt',
-		'bb$H'       => 'salted_md5',
-		'bb$P'       => 'phpass',
+$enabled_password_drivers = array(
+		'evo_salted',
+		'bcrypt_2y',
+		'bcrypt',
+		'salted_md5',
+		'phpass',
+		'evo_md5', // Use this driver as last choice only.
 	);
 
 
