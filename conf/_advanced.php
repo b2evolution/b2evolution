@@ -698,6 +698,8 @@ $pwdchange_request_delay = 300; // 5 minutes
 $password_drivers = array(
 		'evo$salted' => 'evo_salted',
 		'evo$md5'    => 'evo_md5',
+		'bb$2y'      => 'bcrypt_2y',
+		'bb$2a'      => 'bcrypt',
 	);
 
 

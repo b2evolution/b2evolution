@@ -22,6 +22,54 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class PasswordDriver
 {
 	/**
+	 * base64 alphabet
+	 * @var string
+	 */
+	public $itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+	/**
+	 * Last salt value that was generated to store this in DB T_users -> user_salt
+	 * @var string
+	 */
+	protected $last_generated_salt = '';
+
+
+	/**
+	 * Get code of the password driver
+	 *
+	 * @return string
+	 */
+	public function get_code()
+	{
+		return $this->code;
+	}
+
+
+	/**
+	 * Get prefix of the password driver
+	 * E.g. prefix of code `bb$2y` must be `$2y$`
+	 * such prefix value is required to encrypt e.g. by password driver "bcrypt"
+	 *
+	 * @return string
+	 */
+	public function get_prefix()
+	{
+		return preg_replace( '#^[a-z]+#', '', $this->code ).'$';
+	}
+
+
+	/**
+	 * Get last generated salt
+	 *
+	 * @return string
+	 */
+	public function get_last_generated_salt()
+	{
+		return $this->last_generated_salt;
+	}
+
+
+	/**
 	* Check if hash type is supported
 	*
 	* @return boolean TRUE if supported, FALSE if not
@@ -37,9 +85,10 @@ class PasswordDriver
 	 *
 	 * @param string Password
 	 * @param string Salt
+	 * @param string Old hash, used to extract a salt from old hash, can be useful on checking with entered password
 	 * @return string Hashed password
 	 */
-	public function hash( $password, $salt = '' )
+	public function hash( $password, $salt = '', $old_hash = '' )
 	{
 	}
 
@@ -94,6 +143,55 @@ class PasswordDriver
 		}
 
 		return $difference === 0;
+	}
+
+	/**
+	* Base64 encode hash
+	*
+	* @param string Input string
+	* @param integer $count Input string length
+	*
+	* @return string base64 encoded string
+	*/
+	public function hash_encode64( $input, $count )
+	{
+		$output = '';
+		$i = 0;
+
+		do
+		{
+			$value = ord( $input[ $i++ ] );
+			$output .= $this->itoa64[ $value & 0x3f ];
+
+			if( $i < $count )
+			{
+				$value |= ord( $input[ $i ] ) << 8;
+			}
+
+			$output .= $this->itoa64[ ($value >> 6) & 0x3f ];
+
+			if( $i++ >= $count )
+			{
+				break;
+			}
+
+			if( $i < $count )
+			{
+				$value |= ord( $input[ $i ] ) << 16;
+			}
+
+			$output .= $this->itoa64[ ( $value >> 12 ) & 0x3f ];
+
+			if( $i++ >= $count )
+			{
+				break;
+			}
+
+			$output .= $this->itoa64[ ( $value >> 18 ) & 0x3f ];
+		}
+		while( $i < $count );
+
+		return $output;
 	}
 }
 ?>

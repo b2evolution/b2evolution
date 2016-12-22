@@ -281,7 +281,8 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		{ // save the user for later hits
 			$Session->set_User( $current_User );
 
-			if( empty( $current_User->salt ) )
+			$user_PasswordDriver = $current_User->get_PasswordDriver();
+			if( $user_PasswordDriver->get_code() == 'evo$md5' )
 			{
 				$Messages->add( sprintf( T_('For best security, we recommend you <a %s>change your password now</a>. This will allow to re-encrypt your password in our database in a more secure way.'), 'href="'.get_user_pwdchange_url().'"' ), 'warning' );
 			}

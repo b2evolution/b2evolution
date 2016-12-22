@@ -637,13 +637,22 @@ function phpbb_import_users()
 				);
 			if( $phpbb_version == 3 )
 			{	// phpBB v3:
-				$user_data['user_pass'] = '';
+				if( preg_match( '/^(\$[^\$]+)(\$[^\$]+)*\$([^\$]+)$/', $phpbb_user->user_password, $password_data ) )
+				{	// Save password value and password driver code in two separate fields:
+					$user_data['user_pass'] = $password_data[3];
+					$user_data['user_pass_driver'] = 'bb'.$password_data[1];
+				}
+				else
+				{	// Unknown password format:
+					$user_data['user_pass'] = '';
+					$user_data['user_pass_driver'] = 'evo$salted';
+				}
 				$user_data['user_level'] = 0;
 				$user_data['user_status'] = $phpbb_user->user_inactive_reason == '0' ? 'autoactivated' : 'closed';
 			}
 			else
 			{	// phpBB v2:
-				$user_data['user_pass'] = hex2bin( $phpbb_user->user_password );
+				$user_data['user_pass'] = $phpbb_user->user_password;
 				$user_data['user_pass_driver'] = 'evo$md5';
 				$user_data['user_level'] = $phpbb_user->user_level;
 				$user_data['user_status'] = $phpbb_user->user_active == '1' ? 'autoactivated' : 'closed';

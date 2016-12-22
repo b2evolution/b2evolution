@@ -2291,15 +2291,12 @@ class User extends DataObject
 	 */
 	function set_password( $raw_password )
 	{
-		// Generate new salt to save a password
-		$new_pass_salt = generate_random_key( 8 );
+		// Use first password driver from config array for new password updating:
+		$PasswordDriver = get_PasswordDriver();
 
-		// Use evo salted password driver for new password updating:
-		$PasswordDriver = get_PasswordDriver( 'evo$salted' );
-
-		$this->set( 'pass', $PasswordDriver->hash( $raw_password, $new_pass_salt ) );
-		$this->set( 'salt', $new_pass_salt );
-		$this->set( 'pass_driver', $PasswordDriver::CODE );
+		$this->set( 'pass', $PasswordDriver->hash( $raw_password ) );
+		$this->set( 'salt', $PasswordDriver->get_last_generated_salt() );
+		$this->set( 'pass_driver', $PasswordDriver->get_code() );
 	}
 
 

@@ -23,7 +23,7 @@ load_class( 'users/model/passwords/_passworddriver.class.php', 'PasswordDriver' 
  */
 class evoSaltedPasswordDriver extends PasswordDriver
 {
-	const CODE = 'evo$salted';
+	protected $code = 'evo$salted';
 
 
 	/**
@@ -31,10 +31,17 @@ class evoSaltedPasswordDriver extends PasswordDriver
 	 *
 	 * @param string Password
 	 * @param string Salt
+	 * @param string Old hash, used to extract a salt from old hash, can be useful on checking with entered password
 	 * @return string Hashed password
 	 */
-	public function hash( $password, $salt = '' )
+	public function hash( $password, $salt = '', $old_hash = '' )
 	{
+		if( $salt == '' )
+		{	// Generate new salt:
+			$this->last_generated_salt = generate_random_key( 8 );
+			$salt = $this->last_generated_salt;
+		}
+
 		return md5( $salt.$password );
 	}
 }
