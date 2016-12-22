@@ -701,6 +701,7 @@ $password_drivers = array(
 		'bb$2y'      => 'bcrypt_2y',
 		'bb$2a'      => 'bcrypt',
 		'bb$H'       => 'salted_md5',
+		'bb$P'       => 'phpass',
 	);
 
 
