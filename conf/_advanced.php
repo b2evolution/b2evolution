@@ -700,6 +700,7 @@ $password_drivers = array(
 		'evo$md5'    => 'evo_md5',
 		'bb$2y'      => 'bcrypt_2y',
 		'bb$2a'      => 'bcrypt',
+		'bb$H'       => 'salted_md5',
 	);
 
 

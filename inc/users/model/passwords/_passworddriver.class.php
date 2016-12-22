@@ -193,5 +193,17 @@ class PasswordDriver
 
 		return $output;
 	}
+
+
+	/**
+	 * Clear a hash from password driver prefix
+	 *
+	 * @return string
+	 */
+	public function clear_hash( $hash )
+	{
+		// Remove the driver prefix from the generated hash:
+		return preg_replace( '#^'.preg_quote( $this->get_prefix() ).'#', '', $hash );
+	}
 }
 ?>

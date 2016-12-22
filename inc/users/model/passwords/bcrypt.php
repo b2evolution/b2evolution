@@ -79,10 +79,7 @@ class bcryptPasswordDriver extends PasswordDriver
 			return false;
 		}
 
-		// Remove the driver prefix from the generated hash:
-		$hash = preg_replace( '#^'.preg_quote( $this->get_prefix() ).'#', '', $hash );
-
-		return $hash;
+		return $this->clear_hash( $hash );
 	}
 
 
