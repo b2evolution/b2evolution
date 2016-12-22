@@ -78,6 +78,43 @@ $add_response_end_comment = true;
 //     output only a small part of what the "real controller" does..
 switch( $action )
 {
+	case 'get_whois_info':
+		param( 'query', 'string' );
+		param( 'window_height', 'integer' );
+
+		load_class('_ext/phpwhois/whois.main.php', 'whois' );
+
+		$whois = new Whois();
+
+		// Set to true if you want to allow proxy requests
+		$allowproxy = false;
+
+		// get faster but less acurate results
+		$whois->deep_whois = empty( $_GET['fast'] );
+
+		// To use special whois servers (see README)
+		//$whois->UseServer( 'uk', 'whois.nic.uk:1043?{hname} {ip} {query}' );
+		//$whois->UseServer( 'au', 'whois-check.ausregistry.net.au' );
+
+		// Comment the following line to disable support for non ICANN tld's
+		$whois->non_icann = true;
+
+		$result = $whois->Lookup( $query );
+
+		$winfo = '<pre style="height: '.( $window_height - 200 ).'px; overflow: auto;">';
+		if( ! empty( $result['rawdata'] ) )
+		{
+			$winfo .= format_to_output( implode( $result['rawdata'], "\n" ), 'text' );
+		}
+		else
+		{
+			$winfo = format_to_output( implode( $whois->Query['errstr'], "\n" ) )."<br></br>";
+		}
+		$winfo .= '</pre>';
+
+		echo $winfo;
+		break;
+
 	case 'add_plugin_sett_set':
 		// Dislay a new Plugin(User)Settings set ( it's used only from plugins with "array" type settings):
 
