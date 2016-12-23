@@ -31,10 +31,9 @@ class evoSaltedPasswordDriver extends PasswordDriver
 	 *
 	 * @param string Password
 	 * @param string Salt
-	 * @param string Old hash, used to extract a salt from old hash, can be useful on checking with entered password
 	 * @return string Hashed password
 	 */
-	public function hash( $password, $salt = '', $old_hash = '' )
+	public function hash( $password, $salt = '' )
 	{
 		if( $salt == '' )
 		{	// Generate new salt:

@@ -639,10 +639,14 @@ function phpbb_import_users()
 			{	// phpBB v3:
 				if( preg_match( '/^(\$[^\$]+)(\$[^\$]+)*\$([^\$]+)$/', $phpbb_user->user_password, $password_data ) )
 				{	// Save password value and password driver code in two separate fields:
-					$user_data['user_pass'] = $password_data[3];
 					$user_data['user_pass_driver'] = 'bb'.$password_data[1];
+					if( $user_PasswordDriver = get_PasswordDriver( $user_data['user_pass_driver'] ) )
+					{
+						$user_data['user_salt'] = $user_PasswordDriver->extract_salt( $phpbb_user->user_password );
+						$user_data['user_pass'] = $user_PasswordDriver->clear_hash( $phpbb_user->user_password );
+					}
 				}
-				else
+				if( ! isset( $user_data['user_pass'] ) )
 				{	// Unknown password format:
 					$user_data['user_pass'] = '';
 					$user_data['user_pass_driver'] = 'evo$salted';
@@ -2175,14 +2179,14 @@ function phpbb_check_step( $step_name )
 	else if( empty( $steps_levels[ $current_step ] ) )
 	{	// Invalid current step name!
 		return false;
-	}
+	}/*
 	else if( $steps_levels[ $step_name ] <= $steps_levels[ $current_step ] )
 	{	// User tries open previous step that already been processed
 		phpbb_log( T_('This import step has already been processed.'), 'error', ' ' );
 		// Continue button
 		// echo '<input type="submit" class="SaveButton" value="'.( $steps_levels[ $step_name ] < max( $steps_levels ) ? T_('Continue!') : T_('Go to Forum') ).'" name="submit" />';
 		return false;
-	}
+	}*/
 
 	// Save step name in the Sessions
 	phpbb_set_var( 'current_step', $step_name, true );

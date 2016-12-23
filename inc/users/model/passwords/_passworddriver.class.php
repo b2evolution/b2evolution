@@ -22,6 +22,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class PasswordDriver
 {
 	/**
+	 * Length of salt
+	 * @var integer
+	 */
+	protected $salt_length = 0;
+
+	/**
 	 * base64 alphabet
 	 * @var string
 	 */
@@ -85,10 +91,9 @@ class PasswordDriver
 	 *
 	 * @param string Password
 	 * @param string Salt
-	 * @param string Old hash, used to extract a salt from old hash, can be useful on checking with entered password
 	 * @return string Hashed password
 	 */
-	public function hash( $password, $salt = '', $old_hash = '' )
+	public function hash( $password, $salt = '' )
 	{
 	}
 
@@ -196,14 +201,34 @@ class PasswordDriver
 
 
 	/**
-	 * Clear a hash from password driver prefix
+	 * Extract a salt from hash
 	 *
-	 * @return string
+	 * @param string Full hash with prefix and salt
+	 * @return string Salt
+	 */
+	public function extract_salt( $hash )
+	{
+		$salt = substr( $hash, strlen( $this->get_prefix() ), $this->salt_length );
+
+		if( strlen( $salt ) != $this->salt_length )
+		{
+			return '';
+		}
+
+		return $salt;
+	}
+
+
+	/**
+	 * Clear a hash from password driver prefix and password salt
+	 *
+	 * @param string Full hash with prefix and salt
+	 * @return string Password without prefix and salt
 	 */
 	public function clear_hash( $hash )
 	{
-		// Remove the driver prefix from the generated hash:
-		return preg_replace( '#^'.preg_quote( $this->get_prefix() ).'#', '', $hash );
+		// Remove the driver prefix and password salt from the generated hash:
+		return substr( $hash, strlen( $this->get_prefix() ) + $this->salt_length );
 	}
 }
 ?>

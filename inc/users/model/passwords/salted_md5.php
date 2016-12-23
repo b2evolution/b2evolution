@@ -25,120 +25,93 @@ class saltedMd5PasswordDriver extends PasswordDriver
 {
 	protected $code = 'bb$H';
 
+	/**
+	 * Length of salt
+	 * @var integer
+	 */
+	protected $salt_length = 9;
+
 
 	/**
 	 * Hash password
 	 *
 	 * @param string Password
-	 * @param string Settings
-	 * @param string Old hash, used to extract a salt from old hash, can be useful on checking with entered password
+	 * @param string Salt
 	 * @return string Hashed password
 	 */
-	public function hash( $password, $setting = '', $old_hash = '' )
+	public function hash( $password, $salt = '' )
 	{
-		if( empty( $setting ) && $old_hash != '' )
-		{	// Use setting from old hash when a request to compare a hash with entered password:
-			$setting = $old_hash;
+		if( empty( $salt ) )
+		{	// Generate salt for new hashing:
+			$salt = $this->get_random_salt();
 		}
 
-		if( $setting )
+		if( ( $count_log2 = $this->get_count_setting( $salt ) ) === false )
 		{
-			if( ( $settings = $this->get_hash_settings( $this->get_prefix().$setting ) ) === false )
-			{
-				// Return md5 of password if settings do not
-				// comply with our standards. This will only
-				// happen if pre-determined settings are
-				// directly passed to the driver. The manager
-				// will not do this. Same as the old hashing
-				// implementation in phpBB 3.0
-				return md5( $password );
-			}
-		}
-		else
-		{
-			$settings = $this->get_hash_settings( $this->get_random_salt() );
+			// Return md5 of password if settings do not
+			// comply with our standards. This will only
+			// happen if pre-determined settings are
+			// directly passed to the driver. The manager
+			// will not do this. Same as the old hashing
+			// implementation in phpBB 3.0
+			return md5( $password );
 		}
 
-		$hash = md5( $settings['salt'].$password, true );
+		$hash = md5( substr( $salt, 1 ).$password, true );
 		do
 		{
 			$hash = md5( $hash.$password, true );
 		}
-		while( --$settings['count'] );
+		while( --$count_log2 );
 
-		$output = $settings['full'];
-		$output .= $this->hash_encode64( $hash, 16 );
-
-		return $this->clear_hash( $output );
+		return $this->hash_encode64( $hash, 16 );
 	}
 
 
 	/**
-	 * Check password against the supplied hash
+	 * Get a random salt value
 	 *
-	 * @param string Password
-	 * @param string Salt
-	 * @param string Hash
-	 * @param boolean Is the password parameter already hashed?
-	 * @return boolean TRUE if password is correct, else FALSE
+	 * @return string Salt for password hashing
 	 */
-	public function check( $password, $salt, $hash, $password_is_hashed = false )
-	{
-		if( strlen( $hash ) !== 31 )
-		{
-			return md5( $password ) === $hash;
-		}
-
-		return $this->string_compare( $hash, $this->hash( $password, $hash ) );
-	}
-
-	/**
-	* Get a random salt value
-	*
-	* @return string Salt for password hashing
-	*/
 	protected function get_random_salt()
 	{
 		$count = 6;
 
 		$random = generate_random_key( $count );
 
-		$salt = $this->get_prefix();
-		$salt .= $this->itoa64[ min( $count + 5, 30 ) ];
+		$salt = $this->itoa64[ min( $count + 5, 30 ) ];
 		$salt .= $this->hash_encode64( $random, $count );
+
+		// Save last generated salt to know what value write in DB on user password updating:
+		$this->last_generated_salt = $salt;
 
 		return $salt;
 	}
 
+
 	/**
-	* Get hash settings
-	*
-	* @param string The hash that contains the settings
-	*
-	* @return boolean|array Array containing the count_log2, salt, and full
-	*   hash settings string or false if supplied hash is empty
-	*   or contains incorrect settings
-	*/
-	public function get_hash_settings( $hash )
+	 * Get setting count_log2 from salt to generate new hash
+	 *
+	 * @param string The salt that contains the setting in first char
+	 *
+	 * @return boolean|integer Containing the count_log2
+	 *         or false if supplied salt is incorrect
+	 */
+	public function get_count_setting( $salt )
 	{
-		if( empty( $hash ) )
-		{
+		if( empty( $salt ) || strlen( $salt ) != $this->salt_length )
+		{	// Wrong salt format:
 			return false;
 		}
 
-		$count_log2 = strpos( $this->itoa64, $hash[3] );
-		$salt = substr( $hash, 4, 8 );
+		$count_log2 = strpos( $this->itoa64, $salt[0] );
 
-		if( $count_log2 < 7 || $count_log2 > 30 || strlen( $salt ) != 8 )
-		{
+		if( $count_log2 < 7 || $count_log2 > 30 )
+		{	// Not allowed value:
 			return false;
 		}
 
-		return array(
-			'count'	=> 1 << $count_log2,
-			'salt'	=> $salt,
-			'full'	=> substr( $hash, 0, 12 ),
-		);
+		return 1 << $count_log2;
 	}
 }
 ?>

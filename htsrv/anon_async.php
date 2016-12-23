@@ -1232,7 +1232,7 @@ switch( $action )
 		$check_field = is_email( $login ) ? 'user_email' : 'user_login';
 
 		// Get the most recently used 3 users with matching email address:
-		$salts = $DB->get_results( 'SELECT user_salt, user_pass, user_pass_driver FROM T_users
+		$salts = $DB->get_results( 'SELECT user_salt, user_pass_driver FROM T_users
 						WHERE '.$check_field.' = '.$DB->quote( utf8_strtolower( $login ) ).'
 						ORDER BY user_lastseen_ts DESC, user_status ASC
 						LIMIT 3', ARRAY_A );
@@ -1242,7 +1242,6 @@ switch( $action )
 		{ // User with the given login was not found add one random salt value
 			$salts[] = array(
 					'user_salt'        => generate_random_key( 8 ),
-					'user_pass'        => '',
 					'user_pass_driver' => 'evo$salted',
 				);
 		}
@@ -1259,7 +1258,7 @@ switch( $action )
 			}
 
 			// Hash password by driver and with additional sha1 hashing to don't send DB data throught AJAX:
-			$result['pwd_hashed'][] = sha1( $user_PasswordDriver->hash( $raw_password, $salt['user_salt'], $salt['user_pass'] ).$pwd_salt );
+			$result['pwd_hashed'][] = sha1( $user_PasswordDriver->hash( $raw_password, $salt['user_salt'] ).$pwd_salt );
 		}
 
 		echo evo_json_encode( $result );

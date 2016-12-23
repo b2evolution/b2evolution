@@ -31,10 +31,9 @@ class evoMd5PasswordDriver extends PasswordDriver
 	 *
 	 * @param string Password
 	 * @param string Salt (Not used by this password driver)
-	 * @param string Old hash, used to extract a salt from old hash, can be useful on checking with entered password
 	 * @return string Hashed password
 	 */
-	public function hash( $password, $salt = '', $old_hash = '' )
+	public function hash( $password, $salt = '' )
 	{
 		return md5( $password );
 	}
