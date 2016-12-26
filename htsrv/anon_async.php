@@ -1222,12 +1222,7 @@ switch( $action )
 			$result['pwd_salt'] = $pwd_salt;
 			$result['session_id'] = $Session->ID;
 		}
-		else
-		{	// Get the password encryption salt for normal login form:
-			$pwd_salt = param( 'pwd_salt', 'string', '' );
-		}
 
-		$raw_password = param( 'raw_'.$dummy_fields[ 'pwd' ], 'string', '' );
 		$login = param( $dummy_fields[ 'login' ], 'string', '' );
 		$check_field = is_email( $login ) ? 'user_email' : 'user_login';
 
@@ -1246,7 +1241,8 @@ switch( $action )
 				);
 		}
 
-		$result['pwd_hashed'] = array();
+		$result['salts'] = array();
+		$result['codes'] = array();
 		foreach( $salts as $salt )
 		{
 			// Get password driver by code:
@@ -1257,8 +1253,8 @@ switch( $action )
 				continue;
 			}
 
-			// Hash password by driver and with additional sha1 hashing to don't send DB data throught AJAX:
-			$result['pwd_hashed'][] = sha1( $user_PasswordDriver->hash( $raw_password, $salt['user_salt'] ).$pwd_salt );
+			$result['salts'][] = $salt['user_salt'];
+			$result['codes'][] = $user_PasswordDriver->get_javascript_hash_code( 'raw_password', 'salts[index]' );
 		}
 
 		echo evo_json_encode( $result );

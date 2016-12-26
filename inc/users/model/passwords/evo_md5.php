@@ -37,5 +37,20 @@ class evoMd5PasswordDriver extends PasswordDriver
 	{
 		return md5( $password );
 	}
+
+
+	/**
+	 * Get JavaScript code to hash password on browser/client side
+	 *
+	 * @param string Name of password variable in JS code
+	 * @param string Name of salt variable in JS code
+	 * @return string
+	 */
+	public function get_javascript_hash_code( $var_password_name, $var_salt_name )
+	{
+		$js_code = 'hex_md5( '.$var_password_name.' )';
+
+		return $js_code;
+	}
 }
 ?>

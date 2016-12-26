@@ -69,6 +69,101 @@ class saltedMd5PasswordDriver extends PasswordDriver
 
 
 	/**
+	 * Get JavaScript code to hash password on browser/client side
+	 *
+	 * @param string Name of password variable in JS code
+	 * @param string Name of salt variable in JS code
+	 * @return string
+	 */
+	public function get_javascript_hash_code( $var_password_name, $var_salt_name )
+	{
+		$js_code = '
+function salted_md5_hash_encode64( input, count )
+{
+	var output = "";
+	var i = 0;
+	var itoa64 = "'.$this->itoa64.'";
+
+	do
+	{
+		value = input[ i++ ].charCodeAt(0);
+		output += itoa64[ value & 0x3f ];
+
+		if( i < count )
+		{
+			value |= input[ i ].charCodeAt(0) << 8;
+		}
+
+		output += itoa64[ (value >> 6) & 0x3f ];
+
+		if( i++ >= count )
+		{
+			break;
+		}
+
+		if( i < count )
+		{
+			value |= input[ i ].charCodeAt(0) << 16;
+		}
+
+		output += itoa64[ ( value >> 12 ) & 0x3f ];
+
+		if( i++ >= count )
+		{
+			break;
+		}
+
+		output += itoa64[ ( value >> 18 ) & 0x3f ];
+	}
+	while( i < count );
+
+	return output;
+}
+
+function salted_md5_get_count_setting( salt )
+{
+	if( salt == "" || salt.length != '.$this->salt_length.' )
+	{	// Wrong salt format:
+		return false;
+	}
+
+	var itoa64 = "'.$this->itoa64.'";
+	var count_log2 = itoa64.indexOf( salt[0] );
+
+	if( count_log2 < 7 || count_log2 > 30 )
+	{	// Not allowed value:
+		return false;
+	}
+
+	return 1 << count_log2;
+}
+
+function salted_md5_hash( password, salt )
+{
+	var count_log2 = salted_md5_get_count_setting( salt );
+	if( count_log2 === false )
+	{
+		return hex_md5( password );
+	}
+
+	var hash = rstr_md5( salt.substring( 1 ) + password );
+	do
+	{
+		hash = rstr_md5( hash + password );
+	}
+	while( --count_log2 );
+
+	return salted_md5_hash_encode64( hash, 16 );
+}
+
+salted_md5_hash( '.$var_password_name.', '.$var_salt_name.' );
+';
+
+		return $js_code;
+	}
+
+
+	/**
 	 * Get a random salt value
 	 *
 	 * @return string Salt for password hashing

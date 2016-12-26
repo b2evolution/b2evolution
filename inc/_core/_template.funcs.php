@@ -2560,8 +2560,6 @@ function display_login_js_handler( $params )
 				'<?php echo $dummy_fields[ 'login' ]; ?>': username,
 				'action': 'get_user_salt',
 				'get_widget_login_hidden_fields': get_widget_login_hidden_fields,
-				'raw_<?php echo $dummy_fields[ 'pwd' ]; ?>': form.<?php echo $dummy_fields[ 'pwd' ]; ?>.value,
-				'pwd_salt': form.pwd_salt.value,
 				'crumb_loginsalt': '<?php echo get_crumb('loginsalt'); ?>',
 			},
 			success: function(result) {
@@ -2575,7 +2573,9 @@ function display_login_js_handler( $params )
 					return;
 				}
 
-				var pwd_hashed = parsed_result['pwd_hashed'];
+				var raw_password = form.<?php echo $dummy_fields[ 'pwd' ]; ?>.value;
+				var salts = parsed_result['salts'];
+				var codes = parsed_result['codes'];
 
 				if( get_widget_login_hidden_fields )
 				{
@@ -2584,9 +2584,11 @@ function display_login_js_handler( $params )
 					sessionid = parsed_result['session_id'];
 				}
 
-				for( var index in pwd_hashed )
+				for( var index in salts )
 				{
-					pwd_container.append( '<input type="hidden" value="' + pwd_hashed[index] + '" name="pwd_hashed[]">' );
+					var pwd_hashed = eval( codes[ index ] );
+					pwd_hashed = hex_sha1( pwd_hashed + form.pwd_salt.value );
+					pwd_container.append( '<input type="hidden" value="' + pwd_hashed + '" name="pwd_hashed[]">' );
 				}
 
 				form.<?php echo $dummy_fields[ 'pwd' ]; ?>.value = 'padding_padding_padding_padding_padding_padding_hashed_' + sessionid; /* to detect cookie problems */

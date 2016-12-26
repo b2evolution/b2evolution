@@ -230,5 +230,18 @@ class PasswordDriver
 		// Remove the driver prefix and password salt from the generated hash:
 		return substr( $hash, strlen( $this->get_prefix() ) + $this->salt_length );
 	}
+
+
+	/**
+	 * Get JavaScript code to hash password on browser/client side
+	 *
+	 * @param string Name of password variable in JS code
+	 * @param string Name of salt variable in JS code
+	 * @return string
+	 */
+	public function get_javascript_hash_code( $var_password_name, $var_salt_name )
+	{
+		return '';
+	}
 }
 ?>
