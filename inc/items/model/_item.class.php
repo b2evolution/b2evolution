@@ -7595,6 +7595,8 @@ class Item extends ItemLight
 				$params['Link'] = $Link;
 				$params['Item'] = $this;
 
+				$current_file_params = array();
+
 				switch( $inline_type )
 				{
 					case 'image':
@@ -7602,7 +7604,6 @@ class Item extends ItemLight
 						if( $File->is_image() )
 						{
 							$current_image_params = $params;
-							$current_file_params = array();
 
 							if( ! empty( $inlines[3][$i] ) ) // check if second colon is present
 							{
