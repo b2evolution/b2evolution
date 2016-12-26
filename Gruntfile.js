@@ -120,7 +120,7 @@ module.exports = function(grunt) {
 			 */
 			// Login screen:
 			sha1_md5: {
-				src: ['rsc/js/src/sha1.js', 'rsc/js/src/md5.js'],
+				src: ['rsc/js/src/sha1.js', 'rsc/js/src/md5.js', 'rsc/js/src/twin-bcrypt.js'],
 				dest: 'rsc/js/build/sha1_md5.bundle.js',
 			},
 		},

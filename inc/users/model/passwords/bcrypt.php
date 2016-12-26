@@ -77,7 +77,50 @@ class bcryptPasswordDriver extends PasswordDriver
 			return false;
 		}
 
-		return $this->clear_hash( $hash, $salt );
+		return $this->clear_hash( $hash );
+	}
+
+
+	/**
+	 * Get JavaScript code to hash password on browser/client side
+	 *
+	 * @param string Name of password variable in JS code
+	 * @param string Name of salt variable in JS code
+	 * @return string
+	 */
+	public function get_javascript_hash_code( $var_password_name, $var_salt_name )
+	{
+		$js_code = '
+function bcrypt_clear_hash( hash )
+{
+	return hash.substr( '.( strlen( $this->get_prefix() ) + $this->salt_length ).' );
+}
+
+function bcrypt_hash( password, salt )
+{
+	var code = "'.( ! $this->is_supported() ? 'bb$2a' : $this->get_code() ).'";
+
+	if( code === "bb$2a" )
+	{
+		if( password[ password.length - 1 ].charCodeAt(0) & 128 )
+		{
+			return false;
+		}
+	}
+
+	var hash = TwinBcrypt.hashSync( password, "'.$this->get_prefix().'" + salt );
+	if( hash.length < 60 )
+	{
+		return false;
+	}
+
+	return bcrypt_clear_hash( hash );
+}
+
+bcrypt_hash( '.$var_password_name.', '.$var_salt_name.' );
+';
+
+		return $js_code;
 	}
 
 
