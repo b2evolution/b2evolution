@@ -6867,7 +6867,7 @@ class Item extends ItemLight
 	 */
 	function send_outbound_pings( $force_pings = false )
 	{
-		global $Plugins, $baseurl, $Messages, $evonetsrv_host, $test_pings_for_real;
+		global $Plugins, $baseurl, $Messages, $evonetsrv_host, $allow_post_pings_on_localhost;
 
 		if( ! $this->notifications_allowed() )
 		{	// Don't send pings about some post/usages like "special":
@@ -6910,19 +6910,13 @@ class Item extends ItemLight
 			}
 		}
 
-		load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
-
-		$this->load_Blog();
-		$ping_plugins = trim( $this->Blog->get_setting( 'ping_plugins' ) );
-		$ping_plugins = empty( $ping_plugins ) ? array() :  array_unique( explode( ',', $this->Blog->get_setting( 'ping_plugins' ) ) );
-
 		// init result
 		$r = true;
 
-		if( (preg_match( '#^http://localhost[/:]#', $baseurl)
-				|| preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) ) /* domain ending in ".local" */
-			&& $evonetsrv_host != 'localhost'	// OK if we are pinging locally anyway ;)
-			&& empty($test_pings_for_real) )
+		if( empty( $allow_post_pings_on_localhost ) &&
+		    $evonetsrv_host != 'localhost' && // OK if we are pinging locally anyway ;)
+		    ( preg_match( '#^http://localhost[/:]#', $baseurl ) ||
+		      preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) ) ) /* domain ending in ".local" */
 		{	// Don't send pings from localhost:
 			$Messages->add_to_group( T_('Skipping pings (Running on localhost).'), 'note', T_('Sending notifications:') );
 			return false;
@@ -6930,6 +6924,12 @@ class Item extends ItemLight
 		else
 		{	// Send pings:
 			$Messages->add_to_group( T_('Trying to find plugins for sending outbound pings...'), 'note', T_('Sending notifications:') );
+
+			load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
+
+			$this->load_Blog();
+			$ping_plugins = trim( $this->Blog->get_setting( 'ping_plugins' ) );
+			$ping_plugins = empty( $ping_plugins ) ? array() :  array_unique( explode( ',', $this->Blog->get_setting( 'ping_plugins' ) ) );
 
 			foreach( $ping_plugins as $plugin_code )
 			{

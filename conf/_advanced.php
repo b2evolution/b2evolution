@@ -916,6 +916,12 @@ $library_local_urls = array(
 
 
 /**
+ * Allow to send outbound pings on localhost
+ */
+$allow_post_pings_on_localhost = false;
+
+
+/**
  * Proxy configuration for all outgoing connections (like pinging b2evolution.net or twitter, etc...)
  * Leave empty if you don't want to use a proxy.
  */
