@@ -8268,6 +8268,8 @@ function render_inline_tags( $Object, $tags, $params = array() )
 		$params['Link'] = $Link;
 		$params[ $object_class ] = $Object;
 
+		$current_file_params = array();
+
 		switch( $inline_type )
 		{
 			case 'image':
@@ -8275,7 +8277,6 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				if( $File->is_image() )
 				{
 					$current_image_params = $params;
-					$current_file_params = array();
 
 					if( ! empty( $inline[3] ) ) // check if second colon is present
 					{
