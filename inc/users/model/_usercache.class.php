@@ -152,7 +152,7 @@ class UserCache extends DataObjectCache
 	 * @param string current session password salt
 	 * @return false|array false if user with this email not exists, array( $User, $exists_more ) pair otherwise
 	 */
-	function get_by_emailAndPwd( $email, $pass, $pwd_hashed = NULL, $pwd_salt = NULL )
+	function get_by_emailAndPwd( $email, $pass, $pwd_hashed = NULL, $pepper = NULL )
 	{
 		global $DB;
 
@@ -187,7 +187,7 @@ class UserCache extends DataObjectCache
 				$pwd_matched = false;
 				foreach( $pwd_hashed as $encrypted_password )
 				{
-					$pwd_matched = ( sha1( $row->user_pass.$pwd_salt ) == $encrypted_password );
+					$pwd_matched = ( sha1( $row->user_pass.$pepper ) == $encrypted_password );
 					if( $pwd_matched )
 					{ // The corresponding user was found
 						break;

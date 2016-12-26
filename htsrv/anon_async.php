@@ -1211,15 +1211,15 @@ switch( $action )
 
 		if( $get_widget_login_hidden_fields )
 		{	// Get the loginform crumb, the password encryption salt, and the Session ID for the widget login form:
-			$pwd_salt = $Session->get( 'core.pwd_salt' );
-			if( empty( $pwd_salt ) )
+			$pepper = $Session->get( 'core.pepper' );
+			if( empty( $pepper ) )
 			{	// Session salt is not generated yet, needs to generate:
-				$pwd_salt = generate_random_key(64);
-				$Session->set( 'core.pwd_salt', $pwd_salt, 86400 /* expire in 1 day */ );
+				$pepper = generate_random_key(64);
+				$Session->set( 'core.pepper', $pepper, 86400 /* expire in 1 day */ );
 				$Session->dbsave(); // save now, in case there's an error later, and not saving it would prevent the user from logging in.
 			}
 			$result['crumb'] = get_crumb( 'loginform' );
-			$result['pwd_salt'] = $pwd_salt;
+			$result['pepper'] = $pepper;
 			$result['session_id'] = $Session->ID;
 		}
 
