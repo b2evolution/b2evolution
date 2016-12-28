@@ -2575,7 +2575,7 @@ function display_login_js_handler( $params )
 
 				var raw_password = form.<?php echo $dummy_fields[ 'pwd' ]; ?>.value;
 				var salts = parsed_result['salts'];
-				var codes = parsed_result['codes'];
+				var hash_algo = parsed_result['hash_algo'];
 
 				if( get_widget_login_hidden_fields )
 				{
@@ -2586,7 +2586,7 @@ function display_login_js_handler( $params )
 
 				for( var index in salts )
 				{
-					var pwd_hashed = eval( codes[ index ] );
+					var pwd_hashed = eval( hash_algo[ index ] );
 					pwd_hashed = hex_sha1( pwd_hashed + form.pepper.value );
 					pwd_container.append( '<input type="hidden" value="' + pwd_hashed + '" name="pwd_hashed[]">' );
 				}

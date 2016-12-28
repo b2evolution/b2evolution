@@ -1242,7 +1242,7 @@ switch( $action )
 		}
 
 		$result['salts'] = array();
-		$result['codes'] = array();
+		$result['hash_algo'] = array();
 		foreach( $salts as $salt )
 		{
 			// Get password driver by code:
@@ -1254,7 +1254,7 @@ switch( $action )
 			}
 
 			$result['salts'][] = $salt['user_salt'];
-			$result['codes'][] = $user_PasswordDriver->get_javascript_hash_code( 'raw_password', 'salts[index]' );
+			$result['hash_algo'][] = $user_PasswordDriver->get_javascript_hash_code( 'raw_password', 'salts[index]' );
 		}
 
 		echo evo_json_encode( $result );
