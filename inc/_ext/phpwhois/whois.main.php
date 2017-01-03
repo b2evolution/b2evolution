@@ -1,4 +1,6 @@
 <?php
+// erhsatingin > Updated deprecated constructor
+
 /*
 Whois.php        PHP classes to conduct whois queries
 
@@ -48,8 +50,10 @@ class Whois extends WhoisClient
 	/*
 	 * Constructor function
 	 */
-	function Whois()
+	function __construct()
 		{
+		parent::__construct();
+
 		// Load DATA array
 		@require('whois.servers.php');
 

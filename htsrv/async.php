@@ -104,7 +104,15 @@ switch( $action )
 		$winfo = '<pre style="height: '.( $window_height - 200 ).'px; overflow: auto;">';
 		if( ! empty( $result['rawdata'] ) )
 		{
-			$winfo .= format_to_output( implode( $result['rawdata'], "\n" ), 'text' );
+			// Highlight lines starting with orgname: or org-name: (case insensitive)
+			for( $i = 0; $i < count( $result['rawdata'] ); $i++ )
+			{
+				if( preg_match( '/^(orgname:|org-name:)/i', $result['rawdata'][$i] ) )
+				{
+					$result['rawdata'][$i] = '<span style="font-weight: bold;">'.$result['rawdata'][$i].'</span>';
+				}
+			}
+			$winfo .= format_to_output( implode( $result['rawdata'], "\n" ) );
 		}
 		else
 		{
