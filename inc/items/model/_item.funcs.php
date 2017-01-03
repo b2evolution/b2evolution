@@ -2720,7 +2720,7 @@ function echo_show_comments_changed( $comment_type )
  *
  * @param integer Blog ID
  * @param integer Item ID
- * @param array|string Status filters array or strings: '#only_moderation#', '#only_valid#', 
+ * @param array|string Status filters array or strings: '#only_moderation#', '#only_valid#',
  * @param integer Limit
  * @param array Comments IDs string to exclude from the list
  * @param string Filterset name
@@ -4478,7 +4478,7 @@ function item_row_status( $Item, $index )
 	$status_options = get_visibility_statuses( '', $exclude_statuses );
 
 	if( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) &&
-	    isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
+	    isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' && !empty( $status_options ) )
 	{ // Use dropdown for bootstrap skin and if current user can edit this post
 		$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
 		$r = '<div class="btn-group '.( $index > 5 ? 'dropup' : 'dropdown' ).' post_status_dropdown" data-toggle="tooltip" data-placement="top" data-container="body"  title="'.get_status_tooltip_title( $Item->status ).'">'
