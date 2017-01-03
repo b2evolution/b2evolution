@@ -4460,17 +4460,10 @@ function item_row_type( $Item )
  */
 function item_row_status( $Item, $index )
 {
-	global $current_User, $AdminUI, $Collection, $Blog, $admin_url;
+	global $current_User, $AdminUI, $Collection, $admin_url;
 
-	if( empty( $Blog ) )
-	{ // global Blog object is not set, e.g. back-office User activity tab
-		$Item->load_Blog();
-		$blog_ID = $Item->Blog->ID;
-	}
-	else
-	{
-		$blog_ID = $Blog->ID;
-	}
+	$Item->load_Blog();
+	$blog_ID = $Item->Blog->ID;
 
 	// Get those statuses which are not allowed for the current User to create posts in this blog
 	$exclude_statuses = array_merge( get_restricted_statuses( $blog_ID, 'blog_post!', 'create', $Item->status ), array( 'trash' ) );
