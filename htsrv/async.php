@@ -109,7 +109,7 @@ switch( $action )
 			{
 				if( preg_match( '/^(orgname:|org-name:)/i', $result['rawdata'][$i] ) )
 				{
-					$result['rawdata'][$i] = '<span style="font-weight: bold;">'.$result['rawdata'][$i].'</span>';
+					$result['rawdata'][$i] = '<span style="font-weight: bold; background-color: yellow;">'.$result['rawdata'][$i].'</span>';
 				}
 			}
 			$winfo .= format_to_output( implode( $result['rawdata'], "\n" ) );
