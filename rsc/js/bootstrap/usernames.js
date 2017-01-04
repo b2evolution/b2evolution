@@ -35,6 +35,12 @@ jQuery( document ).ready(function()
 	/** Init popover for User Avatar **/
 
 	var link_number = 1;
+
+	// Add small container for bubbletip cache, tucked far away but NOT HIDDEN
+	var bubbletipContainer = jQuery( '<div></div>' );
+	bubbletipContainer.height( 1 ).width( 1 ).offset({ top: -1000, left: -1000 }).css({ overflow: 'hidden', position: 'absolute' });
+	jQuery( 'body' ).append( bubbletipContainer );
+
 	jQuery( document ).on( 'mouseover', '[rel^=bubbletip_]', function()
 	{ // Prepare event mouseover for an element with popover effect
 		var link = jQuery( this );
@@ -68,8 +74,8 @@ jQuery( document ).ready(function()
 			};
 			if( jQuery( '#' + div_cache_ID ).length == 0 )
 			{ // Create a div for cache user data
-				jQuery( 'body' ).append( '<div id="' + div_cache_ID + '" style="display:none;"></div>' );
-				var cache = jQuery( '#' + div_cache_ID );
+				var cache = jQuery( '<div id="' + div_cache_ID + '"></div>' );
+				bubbletipContainer.append( cache );
 
 				jQuery.ajax(
 				{ // Get user info
@@ -95,10 +101,13 @@ jQuery( document ).ready(function()
 							link.popover( popover_params );
 							if( show_on_init )
 							{ // Show popover
-								link.popover( 'show' );
+								window.setTimeout( function()
+								{
+									link.popover( 'show' );
+								}, 10 );
 							}
 							// Remove this from attr 'rel' to avoid of the repeating of init popover
-							link.attr( 'rel', link.attr( 'rel').replace( /bubbletip_(user_|comment_)[\d\s]+/g, '' ) );
+							link.attr( 'rel', link.attr( 'rel' ).replace( /bubbletip_(user_|comment_)[\d\s]+/g, '' ) );
 						}
 					}
 				});
@@ -109,9 +118,10 @@ jQuery( document ).ready(function()
 				{ // Ajax content is downloaded and we can show a popover
 					// Remove a title temporary to don't display title on popover
 					var link_title = link.attr( 'title' );
+					var cache = jQuery( '#' + div_cache_ID );
 					link.removeAttr( 'title' );
 					// Init popover
-					popover_params.content = jQuery( '#' + div_cache_ID ).html();
+					popover_params.content = cache.html();
 					link.popover( popover_params );
 					link.popover( 'show' );
 					// Restore a title
