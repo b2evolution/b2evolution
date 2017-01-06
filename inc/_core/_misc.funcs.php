@@ -2243,21 +2243,48 @@ function get_atags( $content )
  */
 function add_tag_class( $content, $class, $limit = 1 )
 {
-	$content = preg_replace_callback( '/<[^\/].*?>/i',
-		function( $matches ) use ( $class )
-		{
-			// Check if class attribute is already defined
-			if( preg_match( '/\sclass\s*=/i', $matches[0] ) )
-			{ // Insert class
-				//$content = preg_replace( '/(<.*)(class\s*=\s*")(.*)"/i', '$1$2$3 '.$class.'"', $content, $limit );
-				return preg_replace( '/(<[a-zA-z_:]\s*?.*?\s*?class=")(.*?)(".*?>)/i', '$1$2 '.$class.'$3', $matches[0] );
-			}
-			else
+	if( version_compare( phpversion(), '5.3', '>=' ) )
+	{
+		$content = preg_replace_callback( '/<[^\/].*?>/i',
+			function( $matches ) use ( $class )
 			{
-				return preg_replace( '/>/i', ' class="'.$class.'"$1>', $matches[0] );
-			}
-		},
-		$content, $limit );
+				// Check if class attribute is already defined
+				if( preg_match( '/\sclass\s*=/i', $matches[0] ) )
+				{ // Insert class
+					//$content = preg_replace( '/(<.*)(class\s*=\s*")(.*)"/i', '$1$2$3 '.$class.'"', $content, $limit );
+					return preg_replace( '/(<[a-zA-z_:]\s*?.*?\s*?class=")(.*?)(".*?>)/i', '$1$2 '.$class.'$3', $matches[0] );
+				}
+				else
+				{
+					return preg_replace( '/>/i', ' class="'.$class.'"$1>', $matches[0] );
+				}
+			},
+			$content, $limit );
+	}
+	else
+	{
+		global $add_class;
+		$add_class = $class;
+
+		$content = preg_replace_callback( '/<[^\/].*?>/i',
+			function( $matches )
+			{
+				// for versions < 5.3
+				global $add_class;
+				// Check if class attribute is already defined
+				if( preg_match( '/\sclass\s*=/i', $matches[0] ) )
+				{ // Insert class
+					//$content = preg_replace( '/(<.*)(class\s*=\s*")(.*)"/i', '$1$2$3 '.$class.'"', $content, $limit );
+					return preg_replace( '/(<[a-zA-z_:]\s*?.*?\s*?class=")(.*?)(".*?>)/i', '$1$2 '.$add_class.'$3', $matches[0] );
+				}
+				else
+				{
+					return preg_replace( '/>/i', ' class="'.$add_class.'"$1>', $matches[0] );
+				}
+			},
+			$content, $limit );
+		unset( $add_class );
+	}
 
 	return $content;
 }
