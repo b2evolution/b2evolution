@@ -369,6 +369,16 @@ function ban_url( authorurl )
 			'90%', '', true,
 			'<?php echo TS_('Confirm ban & delete'); ?>',
 			[ '<?php echo TS_('Perform selected operations'); ?>', 'btn-danger', '#antispam_ban' ], true, false, 'modal_window_frame_ban' );
+
+	var submitButton = jQuery( '.modal-footer button:submit' ).not( '[data-dismiss=modal]' );
+	submitButton.on( 'click', function() { addSpinner( this ) } );
+	jQuery( '#modal_window_frame_ban' ).on( 'load', function() {
+		if( submitButton.hasClass( 'btn-spinner' ) )
+		{
+			submitButton.removeClass( 'btn-spinner' );
+			submitButton.css( 'width', '-=24px' );
+		}
+	});
 }
 
 // Refresh comments on dashboard after ban url -> delete comment

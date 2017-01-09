@@ -7566,7 +7566,8 @@ function echo_modalwindow_js_bootstrap()
 {
 	// Initialize variables for the file "bootstrap-evo_modal_window.js":
 	echo '<script type="text/javascript">
-		var evo_js_lang_close = \''.TS_('Close').'\';
+		var evo_js_lang_close = \''.TS_('Close').'\'
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 	</script>';
 }
 
