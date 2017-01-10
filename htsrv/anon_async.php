@@ -34,6 +34,9 @@ $blog_ID = param( 'blog', 'integer' );
 // Initialize this array in order to don't load JS files twice in they have been already loaded on parent page:
 $required_js = param( 'required_js', 'array:string', array(), false, true );
 
+// Send the predefined cookies:
+evo_sendcookies();
+
 // Make sure the async responses are never cached:
 header_nocache();
 header_content_type( 'text/html', $io_charset );
@@ -209,7 +212,7 @@ switch( $action )
 			$height = $thumbnail_sizes[$avatar_size][2];
 			// Display user avatar with login
 			// Attributes 'w' & 'h' we use for following js-scale div If image is downloading first time (Fix bubbletip)
-			echo '<div class="center" w="'.$width.'" h="'.$height.'">';
+			echo '<div class="center" w="'.$width.'" h="'.$height.'" style="min-height: '.( $height + 20 ).'px; min-width: '.$width.'px;">';
 			echo get_avatar_imgtag( $User->login, 'login', true, $avatar_size, 'avatar_above_login', '', $avatar_overlay_text, $link_class, true, '' );
 			echo '</div>';
 
@@ -378,8 +381,11 @@ switch( $action )
 				break;
 			}
 
+			// Update a vote of the comment for current User:
 			$edited_Comment->set_vote( 'spam', param( 'vote', 'string' ) );
 			$edited_Comment->dbupdate();
+
+			// Display a panel for next spam voting:
 			$edited_Comment->vote_spam( '', '', '&amp;', true, true, array(
 					'display'            => true,
 					'button_group_class' => button_class( 'group' ).( is_admin_page() ? ' btn-group-sm' : '' ),
@@ -1057,22 +1063,12 @@ switch( $action )
 			$item_ID = param( 'itemid', 'integer' );
 			$currentpage = param( 'currentpage', 'integer', 1 );
 
-			if( strlen($statuses) > 2 )
-			{
-				$statuses = substr( $statuses, 1, strlen($statuses) - 2 );
-			}
-			$status_list = explode( ',', $statuses );
-			if( $status_list == NULL )
-			{
-				$status_list = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
-			}
-
 			// In case of comments_fullview we must set a filterset name to be abble to restore filterset.
 			// If $moderation is not NULL, then this requests came from the comments_fullview
 			// TODO: asimo> This should be handled with a better solution
 			$filterset_name = ( $item_ID > 0 ) ? '' : 'fullview';
 
-			echo_item_comments( $blog, $item_ID, $status_list, $currentpage, $limit, array(), $filterset_name, $expiry_status );
+			echo_item_comments( $blog, $item_ID, $statuses, $currentpage, $limit, array(), $filterset_name, $expiry_status );
 		}
 		elseif( $request_from == 'front' )
 		{ // AJAX request goes from frontoffice

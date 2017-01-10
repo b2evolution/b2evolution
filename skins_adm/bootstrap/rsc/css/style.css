@@ -54,7 +54,7 @@ div.status_icon {
 .widget_actions a,
 .no_icon {
   font-weight: bold;
-  margin: 0 2px;
+  margin: 2px;
 }
 .btn-group .action_icon {
   margin-left: 0;
@@ -860,7 +860,11 @@ tr#fileuploader_form td {
   margin-top: 10px;
 }
 h2.user_title {
+  margin-top: 0;
   margin-bottom: 18px;
+}
+h2.user_title::first-line {
+  line-height: 52px;
 }
 .tool_steps {
   text-align: center;

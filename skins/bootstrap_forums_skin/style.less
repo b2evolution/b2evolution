@@ -243,7 +243,7 @@ ol.breadcrumb {
 		color: #8b96a1;
 		font-size: 90%;
 		line-height: 16px;
-		
+
 		div.ft_date_header {
 				margin-bottom: 5px;
 			}
@@ -292,14 +292,20 @@ ol.breadcrumb {
 		line-height: 16px;
 		margin-top: 3px;
 		div.ft_date_header {
-				margin-bottom: 5px;
-			}
+			margin-bottom: 5px;
+		}
 		span.user.anonymous, span.identity_link_username {
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
 			max-width: 100%;
 			display: inline-block;
+		}
+	}
+	// Remove underline from hover
+	.ft_date, .ft_date_shrinked, .ft_date_shrinked_more {
+		a.icon_latest_reply:active, a.icon_latest_reply:hover {
+			text-decoration: none;
 		}
 	}
 	.ft_author_avatar {
@@ -606,6 +612,31 @@ body.round_avatars .single_topic .evo_content_block .ft_avatar {
 		.border-radius(50%);
 	}
 }
+.evo_content_block, .evo_comment {
+	.panel-footer {
+		> a, > span:not(.btn-group), > div {
+			margin-top: 2px;
+			margin-bottom: 2px;
+		}
+		.vote_spam {
+			margin-right: 10px;
+			.btn-group a {
+				margin-top: 0;
+				margin-bottom: 0;
+			}
+		}
+		.comment_edit_btn {
+			display: none;
+			margin-right: 5px;
+		}
+		.action_btn_group {
+			float: right;
+			.comment_edit_btn {
+				display: inline-block;
+			}
+		}
+	}
+}
 
 // Voting panels
 .vote_spam {
@@ -716,6 +747,19 @@ aside .widget_core_coll_search_form {
 			margin-top: 12px !important;
 		}
 	}
+	.evo_content_block, .evo_comment {
+		.panel-footer {
+			.comment_edit_btn {
+				display: inline-block;
+			}
+			.action_btn_group {
+				float: left;
+				.comment_edit_btn {
+					display: none;
+				}
+			}
+		}
+	}
 }
 
 @media screen and (max-width: 991px) {
@@ -798,7 +842,7 @@ aside .widget_core_coll_search_form {
 			float: left;
 			margin-top: 4px;
 			line-height: 22px;
-			
+
 			span {
 				vertical-align: top;
 			}
@@ -827,8 +871,6 @@ aside .widget_core_coll_search_form {
 		.evo_comment_post_title {
 			display: block !important;
 		}
-	}
-	.vs_published {
 		.evo_comment_avatar {
 			margin-right: 15px;
 		}
@@ -917,9 +959,10 @@ aside .widget_core_coll_search_form {
 			display: none;
 		}
 		.ft_date_shrinked.item_list {
-			float: none;
-			text-align: left;
 			display: inline;
+			float: none;
+			padding-right: 0;
+			text-align: left;
 			margin-top: 4px;
 		}
 	}
@@ -1031,6 +1074,18 @@ aside .widget_core_coll_search_form {
 				display: block;
 				vertical-align: top;
 				margin: 0px;
+			}
+		}
+	}
+}
+
+@media screen and (max-width: 360px) {
+	/* Disp posts */
+	.posts_panel {
+		.ft_date_shrinked.item_list {
+			// Hide comment date
+			.datestamp_shrinked {
+				display: none;
 			}
 		}
 	}

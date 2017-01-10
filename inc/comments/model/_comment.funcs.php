@@ -1053,7 +1053,8 @@ function comment_mass_delete_process( $mass_type, $deletable_comments_query )
 		}
 
 		// Display progress dot
-		echo_progress_text();
+		echo ' .';
+		evo_flush();
 
 		if( empty( $deletable_comment_ids ) )
 		{
@@ -1378,7 +1379,7 @@ function get_type( $Comment )
 {
 	global $current_User;
 
-	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+	if( $Comment->can_be_displayed() || $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 	{
 		return $Comment->get( 'type' );
 	}
@@ -1399,7 +1400,7 @@ function get_author( $Comment )
 {
 	global $current_User;
 
-	if( $Comment->get( 'status' ) == 'published' || $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+	if( $Comment->can_be_displayed() || $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 	{
 		$author_User = $Comment->get_author_User();
 		if( $author_User != NULL )

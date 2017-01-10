@@ -253,7 +253,7 @@ echo $params['comment_body_after'];
 /* ======================== START OF COMMENT FOOTER ======================== */
 ?>
 <div class="panel-footer small clearfix">
-		<a href="<?php
+	<a href="<?php
 		if( $disp == 'comments' )
 		{	// We are displaying a comment in the Latest comments page:
 			echo $Blog->get('lastcommentsurl');
@@ -290,10 +290,13 @@ echo $params['comment_body_after'];
 	// Display Spam Voting system
 	$Comment->vote_spam( '', '', '&amp;', true, true );
 
-	echo '<div class="pull-right">';
+	echo '<span class="pull-left">';
 		$comment_redirect_url = rawurlencode( $Comment->get_permanent_url() );
-		$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), button_class( 'text' ), '&amp;', true, $comment_redirect_url ); /* Link for editing */
-		echo ' <span class="'.button_class( 'group' ).'">';
+		$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), button_class( 'text' ).' comment_edit_btn', '&amp;', true, $comment_redirect_url ); /* Link for editing */
+	echo '</span>';
+	echo '<div class="action_btn_group">';
+		$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), button_class( 'text' ).' comment_edit_btn', '&amp;', true, $comment_redirect_url ); /* Link for editing */
+		echo '<span class="'.button_class( 'group' ).'">';
 		$delete_button_is_displayed = is_logged_in() && $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $Comment );
 		$Comment->moderation_links( array(
 				'ajax_button' => true,
@@ -305,7 +308,7 @@ echo $params['comment_body_after'];
 
 		echo '</span>';
 	echo '</div>';
-?>
+	?>
 </div>
 
 <?php echo $params['comment_end'];

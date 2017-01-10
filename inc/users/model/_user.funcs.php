@@ -2366,17 +2366,17 @@ function check_coll_first_perm( $perm_name, $target_type, $target_ID )
  * Display user edit forms action icons
  *
  * @param object Widget(Form,Table,Results) where to display
- * @param objcet Edited User
+ * @param object Edited User
  * @param string the action string, 'view' or 'edit'
  */
 function echo_user_actions( $Widget, $edited_User, $action )
 {
 	global $current_User, $admin_url;
 
+	$link_attribs = array( 'style' => 'margin-left:1ex; margin-bottom:1ex;', 'class' => 'btn btn-sm btn-default action_icon' );
+
 	if( $edited_User->ID != 0 )
 	{ // show these actions only if user already exists
-
-		$link_attribs = array( 'style' => 'margin-left:1ex', 'class' => 'btn btn-sm btn-default action_icon' );
 
 		if( $current_User->ID != $edited_User->ID && $current_User->check_status( 'can_report_user' ) )
 		{
@@ -2416,7 +2416,7 @@ function echo_user_actions( $Widget, $edited_User, $action )
 	{
 		$redirect_to = regenerate_url( 'user_ID,action,ctrl,user_tab', 'ctrl=users' );
 	}
-	$Widget->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', $redirect_to, T_('Close'), 4 , 1 );
+	$Widget->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', $redirect_to, T_('Close'), 4 , 1, $link_attribs );
 }
 
 
@@ -2628,7 +2628,7 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 	$user_status = ' <small>('.$user_status_icons[ $edited_User->get( 'status' ) ].' '.$user_status_titles[ $edited_User->get( 'status' ) ].')</small>';
 
 	// set title
-	$form_title = '<h2 class="user_title">'.$edited_User->get_colored_login( array( 'login_text' => 'name' ) ).$user_status.' &ndash; '.$user_tab_title.'</h2>';
+	$form_title = '<h2 class="user_title">'.$edited_User->get_colored_login( array( 'login_text' => 'name' ) ).'<span class="nowrap">'.$user_status.' &ndash;</span> '.$user_tab_title.'</h2>';
 
 	// set avatar tag
 	$avatar_tag = $edited_User->get_avatar_imgtag( 'crop-top-48x48', 'floatleft', '', true );

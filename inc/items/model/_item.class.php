@@ -6867,7 +6867,7 @@ class Item extends ItemLight
 	 */
 	function send_outbound_pings( $force_pings = false )
 	{
-		global $Plugins, $baseurl, $Messages, $evonetsrv_host, $test_pings_for_real;
+		global $Plugins, $baseurl, $Messages, $evonetsrv_host, $allow_post_pings_on_localhost;
 
 		if( ! $this->notifications_allowed() )
 		{	// Don't send pings about some post/usages like "special":
@@ -6910,19 +6910,13 @@ class Item extends ItemLight
 			}
 		}
 
-		load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
-
-		$this->load_Blog();
-		$ping_plugins = trim( $this->Blog->get_setting( 'ping_plugins' ) );
-		$ping_plugins = empty( $ping_plugins ) ? array() :  array_unique( explode( ',', $this->Blog->get_setting( 'ping_plugins' ) ) );
-
 		// init result
 		$r = true;
 
-		if( (preg_match( '#^http://localhost[/:]#', $baseurl)
-				|| preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) ) /* domain ending in ".local" */
-			&& $evonetsrv_host != 'localhost'	// OK if we are pinging locally anyway ;)
-			&& empty($test_pings_for_real) )
+		if( empty( $allow_post_pings_on_localhost ) &&
+		    $evonetsrv_host != 'localhost' && // OK if we are pinging locally anyway ;)
+		    ( preg_match( '#^http://localhost[/:]#', $baseurl ) ||
+		      preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) ) ) /* domain ending in ".local" */
 		{	// Don't send pings from localhost:
 			$Messages->add_to_group( T_('Skipping pings (Running on localhost).'), 'note', T_('Sending notifications:') );
 			return false;
@@ -6930,6 +6924,12 @@ class Item extends ItemLight
 		else
 		{	// Send pings:
 			$Messages->add_to_group( T_('Trying to find plugins for sending outbound pings...'), 'note', T_('Sending notifications:') );
+
+			load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
+
+			$this->load_Blog();
+			$ping_plugins = trim( $this->Blog->get_setting( 'ping_plugins' ) );
+			$ping_plugins = empty( $ping_plugins ) ? array() :  array_unique( explode( ',', $this->Blog->get_setting( 'ping_plugins' ) ) );
 
 			foreach( $ping_plugins as $plugin_code )
 			{
@@ -8505,67 +8505,8 @@ class Item extends ItemLight
 			return false;
 		}
 
-		// Load collection of this Item:
-		$this->load_Blog();
-
-		// Get item statuses which are visible on front-office:
-		$show_statuses = get_inskin_statuses( $this->Blog->ID, 'post' );
-
-		if( ! in_array( $this->get( 'status' ), $show_statuses ) )
-		{	// This Item has a status which cannot be displayed on front-office:
-			return false;
-		}
-
-		global $current_User;
-		$is_logged_in = is_logged_in( false );
-
-		switch( $this->get( 'status' ) )
-		{
-			case 'published':
-				// Published posts are always allowed:
-				$allowed = true;
-				break;
-
-			case 'community':
-				// It is always allowed for logged in users:
-				$allowed = $is_logged_in;
-				break;
-
-			case 'protected':
-				// It is always allowed for members:
-				$allowed = ( $is_logged_in && $current_User->check_perm( 'blog_ismember', 1, false, $this->Blog->ID ) );
-				break;
-
-			case 'private':
-				// It is allowed for users who has global 'editall' permission:
-				$allowed = ( $is_logged_in && $current_User->check_perm( 'blogs', 'editall' ) );
-				if( ! $allowed && $is_logged_in && $current_User->check_perm( 'blog_post!private', 'create', false, $this->Blog->ID ) )
-				{	// Own private posts are allowed if user can create private posts:
-					$allowed = ( $current_User->ID == $this->creator_user_ID );
-				}
-				break;
-
-			case 'review':
-				// It is allowed for users who have at least 'lt' posts edit permission :
-				$allowed = ( $is_logged_in && $current_User->check_perm( 'blog_post!review', 'moderate', false, $this->Blog->ID ) );
-				if( ! $allowed && $is_logged_in && $current_User->check_perm( 'blog_post!review', 'create', false, $this->Blog->ID ) )
-				{	// Own posts with 'review' status are allowed if user can create posts with 'review' status
-					$allowed = ( $current_User->ID == $this->creator_user_ID );
-				}
-				break;
-
-			case 'draft':
-				// In front-office only authors may see their own draft posts, but only if the have permission to create draft posts:
-				$allowed = ( $is_logged_in && $current_User->check_perm( 'blog_post!draft', 'create', false, $this->Blog->ID )
-					&& $current_User->ID == $this->creator_user_ID );
-				break;
-
-			default:
-				// Decide the unknown item statuses as not visible for front-office:
-				$allowed = false;
-		}
-
-		return $allowed;
+		// Check if this Item can be displayed with current status:
+		return can_be_displayed_with_status( $this->get( 'status' ), 'post', $this->get_blog_ID(), $this->creator_user_ID );
 	}
 
 

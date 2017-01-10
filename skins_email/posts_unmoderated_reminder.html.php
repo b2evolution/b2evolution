@@ -33,7 +33,7 @@ foreach( $params['blogs'] as $blog_ID )
 	echo '<li>'.
 			$moderation_Blog->get( 'shortname' ).
 			' ('.sprintf( T_( '%s posts waiting' ), $params['posts'][$blog_ID] ).') - '.
-			get_link_tag( $admin_url.'?coll_settings&tab=&blog='.$blog_ID, T_('Click here to moderate').' &raquo;', '.a' ).
+			get_link_tag( $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$blog_ID, T_('Click here to moderate').' &raquo;', '.a' ).
 		'</li>';
 }
 echo '</ul>';

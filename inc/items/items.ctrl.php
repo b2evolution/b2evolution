@@ -154,8 +154,8 @@ switch( $action )
 
 		if( $action == 'update_edit' )
 		{	// Get params to restore height and scroll position of item content field:
-			param( 'content_height', 'integer', 0 );
-			param( 'content_scroll', 'integer', 0 );
+			$content_height = intval( param( 'content_height', 'string', 0 ) );
+			$content_scroll = intval( param( 'content_scroll', 'string', 0 ) );
 		}
 		break;
 

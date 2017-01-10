@@ -9,38 +9,74 @@
  */
 function form_error_field_popover( this_obj )
 {
-	if( jQuery( this_obj ).hasClass( 'popovererror' ) )
+	var $obj = jQuery( this_obj );
+
+	if( $obj.hasClass( 'popovererror' ) )
 	{ // Popover is already initialized on this form field
 		return true;
 	}
 
-	var tip_text = jQuery( 'span.field_error[rel="' + jQuery( this_obj ).attr( 'name' ) + '"]' ).html();
+	var tip_text = jQuery( 'span.field_error[rel="' + $obj.attr( 'name' ) + '"]' ).html();
 
 	if( tip_text == '' )
 	{ // Skip field without error message:
 		return true;
 	}
 
-	var tag_name = jQuery( this_obj ).prop( 'tagName' );
+	var tag_name = $obj.prop( 'tagName' );
 
 	// Destroy it before to avoid issues when a field is already focused:
-	jQuery( this_obj ).popover( 'destroy' );
+	$obj.popover( 'destroy' );
+
+	if( $obj.prop( 'tagName' ) == 'INPUT' && $obj.hasClass( 'form_date_input' ) )
+	{
+		// This is a hack to force the datepicker to generate its content so we can get its height prior to its display
+		// and properly determine its location
+		try
+		{
+			$.datepicker._updateDatepicker( $.datepicker._getInst( this_obj ) );
+		}
+		catch( err )
+		{
+			console.error( 'Unable to generate datepicker content using private methods _updateDatepicker() and _getInst()' );
+		}
+	}
 
 	// Initialize the popover:
 	if( tip_text )
 	{ // Only do this if there is actually something to display
-		jQuery( this_obj ).popover(
+		$obj.popover(
 		{
 			trigger: 'manual',
-			placement: ( tag_name == 'SELECT' || tag_name == 'TEXTAREA' ) ? 'top' : 'bottom',
+			placement: function() {
+				var bottomCal; // calendar will be shown at the bottom of the input
+
+				if( $obj.prop( 'tagName' ) == 'INPUT' && $obj.hasClass( 'form_date_input' ) )
+				{
+					var $window = jQuery( window ),
+							$calDiv = jQuery( '#ui-datepicker-div' );
+
+					if( $calDiv.is( ':visible' ) )
+					{ // Calendar is visible, we will place the popover opposite that
+						bottomCal = $calDiv.offset().top > $obj.offset().top;
+					}
+					else
+					{ // Determine calendar position, calendar height should already be available by now
+						var bottomSpace = $window.height() - ( ( $obj.offset().top - $window.scrollTop() ) +  $obj.outerHeight() );
+						bottomCal = bottomSpace >= $calDiv.outerHeight();
+					}
+				}
+
+				return ( tag_name == 'SELECT' || tag_name == 'TEXTAREA' || ( tag_name == 'INPUT' && bottomCal ) ) ? 'top' : 'bottom'
+			},
 			html: true,
 			content: '<span class="field_error">' + tip_text + '</span>',
 		} );
 	}
 
-	jQuery( this_obj ).on( 'show.bs.popover', function()
+	$obj.on( 'show.bs.popover', function()
 	{ // Add this class to avoid of the repeating of init popover:
-		jQuery( this_obj ).addClass( 'popovererror' );
+		$obj.addClass( 'popovererror' );
 	} );
 }
 

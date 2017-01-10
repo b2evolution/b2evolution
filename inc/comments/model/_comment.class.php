@@ -585,6 +585,11 @@ class Comment extends DataObject
 
 		$DB->commit();
 
+		if( $vote_type == 'spam' && $vote_value == 'spam' )
+		{	// This is a voting about spam comment we should inform moderators:
+			$this->send_vote_spam_emails();
+		}
+
 		return;
 	}
 
@@ -1849,7 +1854,7 @@ class Comment extends DataObject
 		echo $before;
 
 		$style = $params['display'] ? '' : ' style="display:none"';
-		echo '<div id="vote_spam_'.$this->ID.'" class="vote_spam"'.$style.'>';
+		echo '<div id="vote_spam_'.$this->ID.'" class="vote_spam nowrap"'.$style.'>';
 
 		$vote_result = $this->get_vote_spam_disabled();
 
@@ -1933,7 +1938,7 @@ class Comment extends DataObject
 
 		if( $params['display_wrapper'] )
 		{	// Display wrapper:
-			echo '<span id="vote_helpful_'.$this->ID.'" class="evo_voting_panel '.( empty( $params['class'] ) ? '' : ' '.$params['class'] ).'">';
+			echo '<span id="vote_helpful_'.$this->ID.'" class="nowrap evo_voting_panel'.( empty( $params['class'] ) ? '' : ' '.$params['class'] ).'">';
 		}
 
 		echo $params['before_title'];
@@ -4049,6 +4054,75 @@ class Comment extends DataObject
 
 
 	/**
+	 * Send "comment spam" emails for those users who have permission to moderate this comment.
+	 */
+	function send_vote_spam_emails()
+	{
+		global $current_User, $Settings, $UserSettings;
+
+		if( ! is_logged_in() )
+		{	// Only loggen in users can vote on comments
+			return;
+		}
+
+		if( $this->is_meta() )
+		{	// Meta comments have no spam voting
+			return;
+		}
+
+		$UserCache = & get_UserCache();
+
+		$comment_Item = & $this->get_Item();
+		$comment_item_Blog = & $comment_Item->get_Blog();
+		$coll_owner_User = $comment_item_Blog->get_owner_User();
+
+		$moderators = array();
+
+		$moderators_to_notify = $comment_item_Blog->get_comment_moderator_user_data();
+
+		foreach( $moderators_to_notify as $moderator )
+		{
+			$notify_moderator = is_null( $moderator->notify_spam_cmt_moderation ) ? $Settings->get( 'def_notify_spam_cmt_moderation' ) : $moderator->notify_spam_cmt_moderation;
+			if( $notify_moderator )
+			{	// Include user to notify because of enabled setting:
+				$moderators[] = $moderator->user_ID;
+			}
+		}
+		if( $UserSettings->get( 'notify_spam_cmt_moderation', $coll_owner_User->ID ) && is_email( $coll_owner_User->get( 'email' ) ) )
+		{	// Include collection owner:
+			$moderators[] = $coll_owner_User->ID;
+		}
+
+		$email_subject = sprintf( T_('[%s] Spam comment may need moderation on "%s"'), $comment_item_Blog->get( 'shortname' ), $comment_Item->get( 'title' ) );
+		$email_template_params = array(
+				'Comment'  => $this,
+				'Blog'     => $comment_item_Blog,
+				'Item'     => $comment_Item,
+				'voter_ID' => $current_User->ID,
+			);
+
+		// Load all moderators, and check each edit permission on this comment:
+		$UserCache->load_list( $moderators );
+		foreach( $moderators as $moderator_ID )
+		{
+			if( $moderator_ID == $current_User->ID )
+			{	// Don't send email to the voter:
+				continue;
+			}
+			$moderator_User = $UserCache->get_by_ID( $moderator_ID, false );
+			if( $moderator_User && $moderator_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) )
+			{	// If moderator has a permission to edit this comment:
+				$moderator_Group = $moderator_User->get_Group();
+				$email_template_params['notify_full'] = $moderator_Group->check_perm( 'comment_moderation_notif', 'full' );
+
+				// Send email to the moderator:
+				send_mail_to_User( $moderator_ID, $email_subject, 'comment_spam', $email_template_params );
+			}
+		}
+	}
+
+
+	/**
 	 * Handle quick moderation secret param: checks if comment secret should expire after first comment moderation, and delete the secret if required
 	 * This should be called after every kind of commment moderation
 	 */
@@ -4687,6 +4761,25 @@ class Comment extends DataObject
 
 		// TRUE if all requested flags are in current item notifications flags:
 		return ( count( array_diff( $flags, $this->get( 'notif_flags' ) ) ) == 0 );
+	}
+
+
+	/**
+	 * Check if this comment can be displayed for current user on front-office
+	 *
+	 * @return boolean
+	 */
+	function can_be_displayed()
+	{
+		if( empty( $this->ID ) )
+		{	// Comment is not created yet, so it cannot be displayed:
+			return false;
+		}
+
+		// Load Item of this comment to get a collection ID:
+		$Item = & $this->get_Item();
+
+		return can_be_displayed_with_status( $this->get( 'status' ), 'comment', $Item->get_blog_ID(), $this->author_user_ID );
 	}
 }
 

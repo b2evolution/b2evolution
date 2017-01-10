@@ -41,12 +41,12 @@ $user_status_icons = get_user_status_icons();
 
 $Form = new Form( NULL, 'user_checkchanges' );
 
-$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
+$Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
 
 echo_user_actions( $Form, $edited_User, 'edit' );
 
 $form_text_title = T_( 'User admin settings' ); // used for js confirmation message on leave the changed form
-$form_title = get_usertab_header( $edited_User, 'admin', T_( 'User admin settings' ).get_manual_link( 'user-admin-tab' ) );
+$form_title = get_usertab_header( $edited_User, 'admin', '<span class="nowrap">'.T_( 'User admin settings' ).'</span>'.get_manual_link( 'user-admin-tab' ) );
 
 $Form->begin_form( 'fform', $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
@@ -424,7 +424,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 		}
 	}
 	$Form->begin_line( T_('From Domain'), NULL, ( $display_user_domain && $perm_stat_edit ? '' : 'info' ) );
-		$Form->info_field( '', $user_domain_formatted );
+		$Form->info_field( '', $user_domain_formatted.' '.action_icon( NULL, 'magnifier', '', NULL, NULL, NULL, array( 'onclick' => 'return get_whois_info(\''.int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) ).'\');' ), array( 'alt' => 'View Whois info' ) ) );
 		if( $display_user_domain )
 		{	// Display status of Domain if current user has a permission:
 			$domain_status = $Domain ? $Domain->get( 'status' ) : 'unknown';
@@ -661,4 +661,33 @@ jQuery( '#edited_domain_status, #edited_initial_referer_status' ).change( functi
 	}
 } );
 <?php } ?>
+
+function get_whois_info( ip_address )
+{
+	var window_height = jQuery( window ).height();
+	var margin_size_height = 20;
+	var modal_height = window_height - ( margin_size_height * 2 );
+
+	openModalWindow(
+			'<span id="spinner" class="loader_img loader_user_report absolute_center" title="<?php echo T_('Querying WHOIS server...');?>"></span>',
+			'90%', modal_height + 'px', true, 'WHOIS - ' + ip_address, true, true );
+
+	jQuery.ajax(
+	{
+		type: 'GET',
+		url: '<?php echo get_htsrv_url().'async.php';?>',
+		data: {
+			action: 'get_whois_info',
+			query: ip_address,
+			window_height: modal_height
+		},
+		success: function( result )
+		{
+			openModalWindow( result, '90%', modal_height + 'px', true, 'WHOIS - ' + ip_address, true );
+		}
+	} );
+
+	return false;
+}
+
 </script>

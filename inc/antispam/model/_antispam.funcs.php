@@ -408,7 +408,7 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 	{
 		if( $noperms_count == 0 )
 		{ // There isn't any affected comment witch corresponding status
-			printf( '<p>'.T_('No %s comments match the keyword [%s].').'</p>', '<strong>'.$status.'</strong>', htmlspecialchars($keyword) );
+			printf( '<p>'.T_('No %s comments match the keyword %s.').'</p>', '<strong>'.$status.'</strong>', '<code>'.htmlspecialchars($keyword).'</code>' );
 		}
 		else
 		{ // There are affected comment witch corresponding status, but current user has no permission
@@ -988,7 +988,8 @@ function antispam_bankruptcy_delete( $blog_IDs = array(), $comment_status = NULL
 			$sql_comments_where.'
 			LIMIT 10000' );
 
-		echo_progress_text();
+		echo ' .';
+		evo_flush();
 	}
 
 	echo 'OK';

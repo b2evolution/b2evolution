@@ -567,7 +567,8 @@ class phpsvnclient {
 
             if( $display_progress && $i == 10 )
             {
-                echo_progress_text();
+                echo ' .';
+                evo_flush();
                 $i = 0;
             }
             $i++;

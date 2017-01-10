@@ -95,6 +95,12 @@ $edited_User = $UserCache->get_by_ID( $user_ID, false, false );
 				$UserSettings->dbupdate();
 				break;
 
+			case 'comment_moderator_spam':
+				// unsubscribe from spam comment may need moderation notifications:
+				$UserSettings->set( 'notify_spam_cmt_moderation', '0', $edited_User->ID );
+				$UserSettings->dbupdate();
+				break;
+
 			case 'pst_moderation_reminder':
 				// unsubscribe from post moderation reminder notifications
 				$UserSettings->set( 'send_pst_moderation_reminder', '0', $edited_User->ID );
