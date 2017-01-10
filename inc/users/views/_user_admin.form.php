@@ -424,7 +424,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 		}
 	}
 	$Form->begin_line( T_('From Domain'), NULL, ( $display_user_domain && $perm_stat_edit ? '' : 'info' ) );
-		$Form->info_field( '', $user_domain_formatted );
+		$Form->info_field( '', $user_domain_formatted.' '.action_icon( NULL, 'magnifier', '', NULL, NULL, NULL, array( 'onclick' => 'return get_whois_info(\''.int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) ).'\');' ), array( 'alt' => 'View Whois info' ) ) );
 		if( $display_user_domain )
 		{	// Display status of Domain if current user has a permission:
 			$domain_status = $Domain ? $Domain->get( 'status' ) : 'unknown';
@@ -661,4 +661,33 @@ jQuery( '#edited_domain_status, #edited_initial_referer_status' ).change( functi
 	}
 } );
 <?php } ?>
+
+function get_whois_info( ip_address )
+{
+	var window_height = jQuery( window ).height();
+	var margin_size_height = 20;
+	var modal_height = window_height - ( margin_size_height * 2 );
+
+	openModalWindow(
+			'<span id="spinner" class="loader_img loader_user_report absolute_center" title="<?php echo T_('Querying WHOIS server...');?>"></span>',
+			'90%', modal_height + 'px', true, 'WHOIS - ' + ip_address, true, true );
+
+	jQuery.ajax(
+	{
+		type: 'GET',
+		url: '<?php echo get_htsrv_url().'async.php';?>',
+		data: {
+			action: 'get_whois_info',
+			query: ip_address,
+			window_height: modal_height
+		},
+		success: function( result )
+		{
+			openModalWindow( result, '90%', modal_height + 'px', true, 'WHOIS - ' + ip_address, true );
+		}
+	} );
+
+	return false;
+}
+
 </script>

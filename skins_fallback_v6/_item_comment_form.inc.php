@@ -31,7 +31,7 @@ $params = array_merge( array(
 		'form_params'          => array( // Use to change structure of form, i.e. fieldstart, fieldend and etc.
 			'comments_disabled_before' => '<p class="alert alert-warning">',
 			'comments_disabled_after' => '</p>',
-			), 
+			),
 		'policy_text'          => '',
 		'author_link_text'     => 'auto',
 		'textarea_lines'       => 10,
@@ -305,8 +305,11 @@ function validateCommentForm(form)
 
 	if( check_user_status( 'is_validated' ) )
 	{ // User is logged in and activated:
+		$temp_infostart = $Form->infostart;
+		$Form->switch_template_parts( array( 'infostart' => add_tag_class( $Form->infostart, 'inline-block' ) ) );
 		$Form->info_field( T_('User'), '<strong>'.$current_User->get_identity_link( array(
-				'link_text' => $params['author_link_text'] ) ).'</strong>' );
+				'link_text' => $params['author_link_text'] ) ).'</strong>', array( 'class' => 'row' ) );
+		$Form->infostart = $temp_infostart;
 	}
 	else
 	{ // User is not logged in or not activated:

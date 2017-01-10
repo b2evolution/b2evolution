@@ -35,7 +35,7 @@ $UserCache = & get_UserCache();
 $voter_User = & $UserCache->get_by_ID( $params['voter_ID'] );
 $voter_name = get_user_colored_login_link( $voter_User->get( 'login' ), array( 'use_style' => true, 'protocol' => 'http:', 'login_text' => 'name' ) );
 
-$notify_message = '<p'.emailskin_style( '.p' ).'>'.sprintf( T_('%s voted as spam comment on %s in %s.'), '<b>'.$voter_name.'</b>', '<b>'.get_link_tag( $Item->get_permanent_url( '', '', '&' ), $Item->get( 'title' ), '.a' ).'</b>', '<b>'.$Blog->get('shortname').'</b>' )."</p>\n";
+$notify_message = '<p'.emailskin_style( '.p' ).'>'.sprintf( T_('%s reported comment as spam on %s in %s.'), '<b>'.$voter_name.'</b>', '<b>'.get_link_tag( $Item->get_permanent_url( '', '', '&' ), $Item->get( 'title' ), '.a' ).'</b>', '<b>'.$Blog->get('shortname').'</b>' )."</p>\n";
 
 if( $params['notify_full'] )
 {	// Long format notification:
@@ -110,8 +110,8 @@ echo "</div>\n";
 
 // add unsubscribe and edit links
 $params['unsubscribe_text'] = T_( 'You are a moderator of this blog and you are receiving notifications when a comment may need moderation.' ).'<br />'
-	.T_( 'If you don\'t want to receive any more notifications about moderating updated comments, click here' ).': '
-	.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=comment_moderator_edit&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
+	.T_( 'If you don\'t want to receive any more notifications about moderating spam comments, click here' ).': '
+	.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=comment_moderator_spam&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.html.php', $params );

@@ -15,18 +15,19 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher, $flush_action;
+global $dispatcher, $flush_action, $phpbb_tool_title;
 
 phpbb_display_steps( 3 );
 
 $Form = new Form();
 
-$Form->begin_form( 'fform', T_('phpBB Importer').' - '.T_('Step 3: Import users') );
+$Form->begin_form( 'fform', $phpbb_tool_title.' - '.T_('Step 3: Import users') );
 evo_flush();
 
 $Form->add_crumb( 'phpbb' );
 $Form->hidden_ctrl();
 $Form->hidden( 'action', 'forums' );
+$Form->hidden( 'ver', get_param( 'ver' ) );
 
 if( $flush_action == 'users' )
 {

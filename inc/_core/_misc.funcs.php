@@ -2243,21 +2243,29 @@ function get_atags( $content )
  */
 function add_tag_class( $content, $class, $limit = 1 )
 {
-	// Check if there's an opening tag
-	if( preg_match( '/<.*>/i', $content ) )
-	{
-		// Check if class attribute is already defined
-		if( preg_match( '/\sclass\s*=/i', $content) )
-		{ // Insert class
-			$content = preg_replace( '/(<.*)(class\s*=\s*")(.*)"/i', '$1$2$3 '.$class.'"', $content, $limit );
-		}
-		else
-		{
-			$content = preg_replace( '/>/i', ' class="'.$class.'"$1>', $content, $limit );
-		}
-	}
+	global $add_class;
+	$add_class = $class;
+
+	$content = preg_replace_callback( '/<[^\/].*?>/i', 'callback_add_tag_class',
+		$content, $limit );
+
+	unset( $add_class );
 
 	return $content;
+}
+function callback_add_tag_class( $matches )
+{
+	global $add_class;
+	// Check if class attribute is already defined
+	if( preg_match( '/\sclass\s*=/i', $matches[0] ) )
+	{ // Insert class
+		//$content = preg_replace( '/(<.*)(class\s*=\s*")(.*)"/i', '$1$2$3 '.$class.'"', $content, $limit );
+		return preg_replace( '/(<[a-zA-z_:]\s*?.*?\s*?class=")(.*?)(".*?>)/i', '$1$2 '.$add_class.'$3', $matches[0] );
+	}
+	else
+	{
+		return preg_replace( '/>/i', ' class="'.$add_class.'"$1>', $matches[0] );
+	}
 }
 
 
@@ -7558,7 +7566,8 @@ function echo_modalwindow_js_bootstrap()
 {
 	// Initialize variables for the file "bootstrap-evo_modal_window.js":
 	echo '<script type="text/javascript">
-		var evo_js_lang_close = \''.TS_('Close').'\';
+		var evo_js_lang_close = \''.TS_('Close').'\'
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 	</script>';
 }
 
@@ -8266,6 +8275,8 @@ function render_inline_tags( $Object, $tags, $params = array() )
 		$params['Link'] = $Link;
 		$params[ $object_class ] = $Object;
 
+		$current_file_params = array();
+
 		switch( $inline_type )
 		{
 			case 'image':
@@ -8273,7 +8284,6 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				if( $File->is_image() )
 				{
 					$current_image_params = $params;
-					$current_file_params = array();
 
 					if( ! empty( $inline[3] ) ) // check if second colon is present
 					{

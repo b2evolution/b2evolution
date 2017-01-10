@@ -646,6 +646,8 @@ class autolinks_plugin extends Plugin
 	 */
 	function replace_callback( $matches )
 	{
+		global $disp, $Item;
+
 		$link_attrs = '';
 		if( $this->setting_nofollow_auto )
 		{	// Add attribute rel="nofollow" for auto-links:
@@ -692,6 +694,13 @@ class autolinks_plugin extends Plugin
 				$this->previous_word = $word.$after_word;
 				$this->previous_lword = $lword.$after_word;
 				$this->previous_used = false;
+				return $r;
+			}
+
+			if( ( $disp == 'single' || $disp == 'page' ) &&
+			    isset( $Item ) &&
+			    $Item->get_permanent_url() == $url )
+			{	// Do not make a link to same permalink URL of the current Item:
 				return $r;
 			}
 

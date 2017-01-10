@@ -2720,7 +2720,7 @@ function echo_show_comments_changed( $comment_type )
  *
  * @param integer Blog ID
  * @param integer Item ID
- * @param array Status filters
+ * @param array|string Status filters array or strings: '#only_moderation#', '#only_valid#',
  * @param integer Limit
  * @param array Comments IDs string to exclude from the list
  * @param string Filterset name
@@ -2729,7 +2729,7 @@ function echo_show_comments_changed( $comment_type )
  */
 function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage = 1, $limit = NULL, $exclude_comment_IDs = array(), $filterset_name = '', $expiry_status = 'active', $comment_type = 'feedback' )
 {
-	global $inc_path, $status_list, $Collection, $Blog, $admin_url;
+	global $inc_path, $Collection, $Blog, $admin_url;
 
 	$BlogCache = & get_BlogCache();
 	$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
@@ -2765,6 +2765,32 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 			}
 		}
 
+		if( is_string( $statuses ) )
+		{	// Try to get statuses from predefined constants:
+			if( $statuses == '#only_moderation#' )
+			{	// Get only statuses that require moderation:
+				$statuses = explode( ',', $Blog->get_setting( 'moderation_statuses' ) );
+			}
+			elseif( $statuses == '#only_valid#' )
+			{	// Get only valid statuses:
+				$all_statuses = get_visibility_statuses( 'keys', array( 'deprecated', 'redirected', 'trash' ) );
+				$moderation_statuses = explode( ',', $Blog->get_setting( 'moderation_statuses' ) );
+				$statuses = array_diff( $all_statuses, $moderation_statuses );
+			}
+			elseif( $statuses == '#all#' )
+			{	// Get all statuses:
+				$statuses = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
+			}
+			elseif( strlen( $statuses ) > 2 )
+			{	// Get the requested statuses from string like '(published,private,draft)':
+				$statuses = explode( ',', substr( $statuses, 1, strlen( $statuses ) - 2 ) );
+			}
+			else
+			{	// Wrong status request by string format:
+				$statuses = NULL;
+			}
+		}
+
 		if( empty( $statuses ) )
 		{	// Get all status keys by default except of 'redirected', 'trash':
 			$statuses = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
@@ -2785,7 +2811,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 			'expiry_statuses'   => ( $expiry_status == 'all' ? array( 'active', 'expired' ) : array( $expiry_status ) ),
 			'comment_ID_list'   => ( empty( $exclude_comment_IDs ) ? NULL : '-'.implode( ",", $exclude_comment_IDs ) ),
 			'post_ID'           => $item_ID,
-			'order'             => $comment_type == 'meta' ? 'DESC' : 'ASC',//$order,
+			'order'             => $comment_type == 'meta' ? 'DESC' : $Blog->get_setting( 'comments_orderdir' ),
 			'comments'          => $limit,
 			'page'              => $currentpage,
 			'threaded_comments' => $threaded_comments_mode,
@@ -2799,7 +2825,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 		// this is an ajax call we always have to restore the filterst (we can set filters only without ajax call)
 		$CommentList->set_filters( array(
 			'types' => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment', 'trackback', 'pingback' ),
-			'order' => $comment_type == 'meta' ? 'DESC' : 'ASC',
+			'order' => 'DESC',
 		) );
 		$CommentList->restore_filterset();
 	}
@@ -2835,7 +2861,6 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 	$Item = & $Comment->get_Item();
 	$Collection = $Blog = & $Item->get_Blog();
 
-	$is_published = ( $Comment->get( 'status' ) == 'published' );
 	$expiry_delay = $Item->get_setting( 'comment_expiry_delay' );
 	$is_expired = ( !empty( $expiry_delay ) && ( ( $localtimenow - mysql2timestamp( $Comment->get( 'date' ) ) ) > $expiry_delay ) );
 
@@ -3028,8 +3053,8 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 		echo '</div>';
 		echo '</div>';
 
-		if( $is_published )
-		{
+		if( $Comment->can_be_displayed() )
+		{	// Display more info if current user can view this comment on front-office:
 			echo '<div class="panel-body">';
 			echo '<div class="bCommentTitle">';
 			echo $Comment->get_title();
@@ -4435,17 +4460,10 @@ function item_row_type( $Item )
  */
 function item_row_status( $Item, $index )
 {
-	global $current_User, $AdminUI, $Collection, $Blog, $admin_url;
+	global $current_User, $AdminUI, $Collection, $admin_url;
 
-	if( empty( $Blog ) )
-	{ // global Blog object is not set, e.g. back-office User activity tab
-		$Item->load_Blog();
-		$blog_ID = $Item->Blog->ID;
-	}
-	else
-	{
-		$blog_ID = $Blog->ID;
-	}
+	$Item->load_Blog();
+	$blog_ID = $Item->Blog->ID;
 
 	// Get those statuses which are not allowed for the current User to create posts in this blog
 	$exclude_statuses = array_merge( get_restricted_statuses( $blog_ID, 'blog_post!', 'create', $Item->status ), array( 'trash' ) );
@@ -4453,7 +4471,7 @@ function item_row_status( $Item, $index )
 	$status_options = get_visibility_statuses( '', $exclude_statuses );
 
 	if( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) &&
-	    isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
+	    isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' && !empty( $status_options ) )
 	{ // Use dropdown for bootstrap skin and if current user can edit this post
 		$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
 		$r = '<div class="btn-group '.( $index > 5 ? 'dropup' : 'dropdown' ).' post_status_dropdown" data-toggle="tooltip" data-placement="top" data-container="body"  title="'.get_status_tooltip_title( $Item->status ).'">'

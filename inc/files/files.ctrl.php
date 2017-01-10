@@ -715,7 +715,7 @@ switch( $action )
 		}
 		else // $action == 'create_zip'
 		{	// Display a message after successful creating of ZIP archive:
-			$Messages->add( sprintf( T_('ZIP archive "%s" has been created.'), $zipname ), 'success' );
+			$Messages->add_to_group( sprintf( T_('ZIP archive "%s" has been created.'), $zipname ), 'success', T_('Creating ZIP file...') );
 
 			if( $delete_files )
 			{	// We should delete the files after creating ZIP archive:
@@ -731,22 +731,22 @@ switch( $action )
 
 					if( $restriction_Messages->count() )
 					{ // There are restrictions:
-						$Messages->add( $l_File->get_prefixed_name().': '.T_('cannot be deleted because of the following relations')
-							.$restriction_Messages->display( NULL, NULL, false, false ) );
+						$Messages->add_to_group( $l_File->get_prefixed_name().': '.T_('cannot be deleted because of the following relations')
+							.$restriction_Messages->display( NULL, NULL, false, false ), 'warning', T_('Creating ZIP file...') );
 						// Skip this file
 						continue;
 					}
 
 					if( $l_File->unlink() )
 					{
-						$Messages->add( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.')
-										: T_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->dget('name') ), 'success' );
+						$Messages->add_to_group( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.')
+										: T_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->dget('name') ), 'success', T_('Creating ZIP file...') );
 						$fm_Filelist->remove( $l_File );
 					}
 					else
 					{
-						$Messages->add( sprintf( ( $l_File->is_dir() ? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).')
-										: T_('Could not delete the file &laquo;%s&raquo;.') ), $l_File->dget('name') ), 'error' );
+						$Messages->add_to_group( sprintf( ( $l_File->is_dir() ? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).')
+										: T_('Could not delete the file &laquo;%s&raquo;.') ), $l_File->dget('name') ), 'error', T_('Creating ZIP file...') );
 					}
 				}
 			}
@@ -957,22 +957,22 @@ switch( $action )
 
 				if( $restriction_Messages->count() )
 				{ // There are restrictions:
-					$Messages->add( $l_File->get_prefixed_name().': '.T_('cannot be deleted because of the following relations')
-						.$restriction_Messages->display( NULL, NULL, false, false ) );
+					$Messages->add_to_group( $l_File->get_prefixed_name().': '.T_('cannot be deleted because of the following relations')
+						.$restriction_Messages->display( NULL, NULL, false, false ), 'warning', T_('Deleting files...') );
 					// Skip this file
 					continue;
 				}
 
 				if( $l_File->unlink() )
 				{
-					$Messages->add( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.')
-									: T_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->dget('name') ), 'success' );
+					$Messages->add_to_group( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.')
+									: T_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->dget('name') ), 'success', T_('Deleting files...') );
 					$fm_Filelist->remove( $l_File );
 				}
 				else
 				{
-					$Messages->add( sprintf( ( $l_File->is_dir() ? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).')
-									: T_('Could not delete the file &laquo;%s&raquo;.') ), $l_File->dget('name') ), 'error' );
+					$Messages->add_to_group( sprintf( ( $l_File->is_dir() ? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).')
+									: T_('Could not delete the file &laquo;%s&raquo;.') ), $l_File->dget('name') ), 'error', T_('Deleting files...') );
 				}
 			}
 			$action = 'list';

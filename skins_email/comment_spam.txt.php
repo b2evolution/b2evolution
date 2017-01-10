@@ -33,7 +33,7 @@ $Item = $params['Item'];
 $UserCache = & get_UserCache();
 $voter_User = & $UserCache->get_by_ID( $params['voter_ID'] );
 
-$notify_message = sprintf( T_('%s voted as spam comment on %s in %s.'), $voter_User->get( 'login' ), '"'.$Item->get( 'title' ).'"', '"'.$Blog->get( 'shortname' ).'"' )."\n\n";
+$notify_message = sprintf( T_('%s reported comment as spam on %s in %s.'), $voter_User->get( 'login' ), '"'.$Item->get( 'title' ).'"', '"'.$Blog->get( 'shortname' ).'"' )."\n\n";
 
 if( $params['notify_full'] )
 {	// Long format notification:
@@ -112,8 +112,8 @@ echo $notify_message;
 
 // add unsubscribe and edit links:
 $params['unsubscribe_text'] = T_( 'You are a moderator of this blog and you are receiving notifications when a comment may need moderation.' )."\n"
-	.T_( 'If you don\'t want to receive any more notifications about moderating updated comments, click here' ).': '
-	.get_htsrv_url().'quick_unsubscribe.php?type=comment_moderator_edit&user_ID=$user_ID$&key=$unsubscribe_key$';
+	.T_( 'If you don\'t want to receive any more notifications about moderating spam comments, click here' ).': '
+	.get_htsrv_url().'quick_unsubscribe.php?type=comment_moderator_spam&user_ID=$user_ID$&key=$unsubscribe_key$';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.txt.php', $params );

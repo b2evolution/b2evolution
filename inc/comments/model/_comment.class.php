@@ -1854,7 +1854,7 @@ class Comment extends DataObject
 		echo $before;
 
 		$style = $params['display'] ? '' : ' style="display:none"';
-		echo '<div id="vote_spam_'.$this->ID.'" class="vote_spam"'.$style.'>';
+		echo '<div id="vote_spam_'.$this->ID.'" class="vote_spam nowrap"'.$style.'>';
 
 		$vote_result = $this->get_vote_spam_disabled();
 
@@ -1938,7 +1938,7 @@ class Comment extends DataObject
 
 		if( $params['display_wrapper'] )
 		{	// Display wrapper:
-			echo '<span id="vote_helpful_'.$this->ID.'" class="evo_voting_panel '.( empty( $params['class'] ) ? '' : ' '.$params['class'] ).'">';
+			echo '<span id="vote_helpful_'.$this->ID.'" class="nowrap evo_voting_panel'.( empty( $params['class'] ) ? '' : ' '.$params['class'] ).'">';
 		}
 
 		echo $params['before_title'];
@@ -4079,17 +4079,16 @@ class Comment extends DataObject
 		$moderators = array();
 
 		$moderators_to_notify = $comment_item_Blog->get_comment_moderator_user_data();
-		$notify_moderation_setting_name = 'notify_edit_cmt_moderation';
 
 		foreach( $moderators_to_notify as $moderator )
 		{
-			$notify_moderator = is_null( $moderator->$notify_moderation_setting_name ) ? $Settings->get( 'def_'.$notify_moderation_setting_name ) : $moderator->$notify_moderation_setting_name;
+			$notify_moderator = is_null( $moderator->notify_spam_cmt_moderation ) ? $Settings->get( 'def_notify_spam_cmt_moderation' ) : $moderator->notify_spam_cmt_moderation;
 			if( $notify_moderator )
 			{	// Include user to notify because of enabled setting:
 				$moderators[] = $moderator->user_ID;
 			}
 		}
-		if( $UserSettings->get( $notify_moderation_setting_name, $coll_owner_User->ID ) && is_email( $coll_owner_User->get( 'email' ) ) )
+		if( $UserSettings->get( 'notify_spam_cmt_moderation', $coll_owner_User->ID ) && is_email( $coll_owner_User->get( 'email' ) ) )
 		{	// Include collection owner:
 			$moderators[] = $coll_owner_User->ID;
 		}
@@ -4762,6 +4761,25 @@ class Comment extends DataObject
 
 		// TRUE if all requested flags are in current item notifications flags:
 		return ( count( array_diff( $flags, $this->get( 'notif_flags' ) ) ) == 0 );
+	}
+
+
+	/**
+	 * Check if this comment can be displayed for current user on front-office
+	 *
+	 * @return boolean
+	 */
+	function can_be_displayed()
+	{
+		if( empty( $this->ID ) )
+		{	// Comment is not created yet, so it cannot be displayed:
+			return false;
+		}
+
+		// Load Item of this comment to get a collection ID:
+		$Item = & $this->get_Item();
+
+		return can_be_displayed_with_status( $this->get( 'status' ), 'comment', $Item->get_blog_ID(), $this->author_user_ID );
 	}
 }
 

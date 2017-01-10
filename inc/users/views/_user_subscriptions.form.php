@@ -399,6 +399,7 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 	{	// edited user has permission to edit other than his own comments at least in one status in one collection:
 		$notify_options[] = array( 'edited_user_notify_cmt_moderation', 1, T_('a comment is posted and I have permissions to moderate it.'), $UserSettings->get( 'notify_comment_moderation', $edited_User->ID ), $disabled );
 		$notify_options[] = array( 'edited_user_notify_edit_cmt_moderation', 1, T_('a comment is modified and I have permissions to moderate it.'), $UserSettings->get( 'notify_edit_cmt_moderation', $edited_User->ID ), $disabled );
+		$notify_options[] = array( 'edited_user_notify_spam_cmt_moderation', 1, T_('a comment is reported as spam and I have permissions to moderate it.'), $UserSettings->get( 'notify_spam_cmt_moderation', $edited_User->ID ), $disabled );
 	}
 	if( $edited_User->check_perm( 'admin', 'restricted', false ) )
 	{ // edited user has a permission to back-office

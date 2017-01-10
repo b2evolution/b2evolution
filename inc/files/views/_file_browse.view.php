@@ -114,6 +114,7 @@ if( isset( $edited_User ) )
 					$Form->begin_form();
 					$Form->hidden_ctrl();
 					$Form->hiddens_by_key( get_memorized(), array('fm_filter', 'fm_filter_regex') );
+					echo get_icon( 'filter' );
 					?>
 
 					<label for="fm_filter" class="tooltitle"><?php echo T_('Filter') ?>:</label>
@@ -132,7 +133,7 @@ if( isset( $edited_User ) )
 						}
 					?>
 
-					<input type="submit" name="actionArray[filter]" class="SmallButton btn btn-warning btn-sm"
+					<input type="submit" name="actionArray[filter]" class="SmallButton btn btn-info btn-sm"
 						value="<?php echo format_to_output( T_('Apply'), 'formvalue' ) ?>" />
 
 					<?php
@@ -140,7 +141,7 @@ if( isset( $edited_User ) )
 					{ // "reset filter" form
 						?>
 						<button type="submit" name="actionArray[filter_unset]" value="<?php echo T_('Unset filter'); ?>"
-							title="<?php echo T_('Unset filter'); ?>" class="ActionButton" style="background:none;border:none;padding:0;cursor:pointer;"><?php echo get_icon( 'delete' ) ?></button>
+							title="<?php echo T_('Unset filter'); ?>" class="ActionButton btn btn-warning btn-sm"><?php echo T_('Reset');?></button>
 						<?php
 					}
 				$Form->end_form();

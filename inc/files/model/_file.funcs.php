@@ -2084,7 +2084,8 @@ function copy_file( $file_path, $root_ID, $path, $check_perms = true )
 		if( $correct_Filetype && $correct_Filetype->is_allowed() )
 		{	// A FileType with the given mime type exists in database and it is an allowed file type for current User
 			// The "correct" extension is a plausible one, proceed...
-			$correct_extension = array_shift($correct_Filetype->get_extensions());
+			$correct_extensions = $correct_Filetype->get_extensions();
+			$correct_extension = array_shift( $correct_extensions );
 			$path_info = pathinfo($newName);
 			$current_extension = $path_info['extension'];
 
@@ -2372,6 +2373,7 @@ function display_dragdrop_upload_button( $params = array() )
 	$allowed_extensions = $DB->get_col( 'SELECT ftyp_extensions FROM T_filetypes'.$condition );
 	$allowed_extensions = implode( ' ', $allowed_extensions );
 	$allowed_extensions = explode( ' ', $allowed_extensions );
+	sort( $allowed_extensions );
 
 	?>
 	<div id="file-uploader" style="width:100%">
@@ -2590,8 +2592,8 @@ function display_dragdrop_upload_button( $params = array() )
 									<?php echo ( $params['status_conflict_place'] == 'before_button' ) ? "+ ' - ".$status_conflict_message."'" : ''; ?>
 									+ ' - <a href="#" '
 									+ 'class="<?php echo button_class( 'text' ); ?> roundbutton_text_noicon qq-conflict-replace" '
-									+ 'old="' + responseJSON.data.oldpath + '" '
-									+ 'new="' + responseJSON.data.newpath + '">'
+									+ 'old="' + responseJSON.data.oldname + '" '
+									+ 'new="' + responseJSON.data.newname + '">'
 									+ '<div><?php echo TS_('Use this new file to replace the old file'); ?></div>'
 									+ '<div style="display:none"><?php echo TS_('Revert'); ?></div>'
 									+ '</a>'
