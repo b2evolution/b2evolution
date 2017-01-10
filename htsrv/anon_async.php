@@ -212,7 +212,7 @@ switch( $action )
 			$height = $thumbnail_sizes[$avatar_size][2];
 			// Display user avatar with login
 			// Attributes 'w' & 'h' we use for following js-scale div If image is downloading first time (Fix bubbletip)
-			echo '<div class="center" w="'.$width.'" h="'.$height.'">';
+			echo '<div class="center" w="'.$width.'" h="'.$height.'" style="min-height: '.( $height + 20 ).'px; min-width: '.$width.'px;">';
 			echo get_avatar_imgtag( $User->login, 'login', true, $avatar_size, 'avatar_above_login', '', $avatar_overlay_text, $link_class, true, '' );
 			echo '</div>';
 

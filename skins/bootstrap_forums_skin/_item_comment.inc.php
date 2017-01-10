@@ -253,51 +253,50 @@ echo $params['comment_body_after'];
 /* ======================== START OF COMMENT FOOTER ======================== */
 ?>
 <div class="panel-footer small clearfix">
-	<div class="row">
-		<div class="col-xs-12 col-lg-6">
-			<a href="<?php
-			if( $disp == 'comments' )
-			{	// We are displaying a comment in the Latest comments page:
-				echo $Blog->get('lastcommentsurl');
-			}
-			else
-			{	// We are displaying a comment under a post/topic:
-				echo $Item->get_permanent_url();
-			}
-			?>#skin_wrapper" class="to_top"><?php echo T_('Back to top'); ?></a>
-		<?php
-		// Check if BBcode plugin is enabled for current blog
-		$bbcode_plugin_is_enabled = false;
-		if( class_exists( 'bbcode_plugin' ) )
-		{ // Plugin exists
-			global $Plugins;
-			$bbcode_Plugin = & $Plugins->get_by_classname( 'bbcode_plugin' );
-			if( $bbcode_Plugin->status == 'enabled' && $bbcode_Plugin->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) != 'never' )
-			{ // Plugin is enabled and activated for comments
-				$bbcode_plugin_is_enabled = true;
-			}
+	<a href="<?php
+		if( $disp == 'comments' )
+		{	// We are displaying a comment in the Latest comments page:
+			echo $Blog->get('lastcommentsurl');
 		}
-		if( $bbcode_plugin_is_enabled && $commented_Item && $commented_Item->can_comment( NULL ) )
-		{ // Display button to quote this comment
-			echo '<a href="'.$commented_Item->get_permanent_url().'?mode=quote&amp;qc='.$Comment->ID.'#form_p'.$commented_Item->ID.'" title="'.T_('Reply with quote').'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
+		else
+		{	// We are displaying a comment under a post/topic:
+			echo $Item->get_permanent_url();
 		}
-
-		$Comment->reply_link( ' ', ' ', '#', '#', 'pull-left' ); /* Link for replying to the Comment */
-
-		if( $params['display_vote_helpful'] )
-		{	// Display a voting panel for comment:
-			$Skin->display_comment_voting_panel( $Comment );
-		}
-
-		// Display Spam Voting system
-		$Comment->vote_spam( '', '', '&amp;', true, true );
-		?>
-	</div>
+		?>#skin_wrapper" class="to_top"><?php echo T_('Back to top'); ?></a>
 	<?php
-	echo '<div class="col-xs-12 col-lg-6 text-left-sm text-right-lg">';
+	// Check if BBcode plugin is enabled for current blog
+	$bbcode_plugin_is_enabled = false;
+	if( class_exists( 'bbcode_plugin' ) )
+	{ // Plugin exists
+		global $Plugins;
+		$bbcode_Plugin = & $Plugins->get_by_classname( 'bbcode_plugin' );
+		if( $bbcode_Plugin->status == 'enabled' && $bbcode_Plugin->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) != 'never' )
+		{ // Plugin is enabled and activated for comments
+			$bbcode_plugin_is_enabled = true;
+		}
+	}
+	if( $bbcode_plugin_is_enabled && $commented_Item && $commented_Item->can_comment( NULL ) )
+	{ // Display button to quote this comment
+		echo '<a href="'.$commented_Item->get_permanent_url().'?mode=quote&amp;qc='.$Comment->ID.'#form_p'.$commented_Item->ID.'" title="'.T_('Reply with quote').'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
+	}
+
+	$Comment->reply_link( ' ', ' ', '#', '#', 'pull-left' ); /* Link for replying to the Comment */
+
+	if( $params['display_vote_helpful'] )
+	{	// Display a voting panel for comment:
+		$Skin->display_comment_voting_panel( $Comment );
+	}
+
+	// Display Spam Voting system
+	$Comment->vote_spam( '', '', '&amp;', true, true );
+
+	echo '<span class="pull-left">';
 		$comment_redirect_url = rawurlencode( $Comment->get_permanent_url() );
-		$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), button_class( 'text' ), '&amp;', true, $comment_redirect_url ); /* Link for editing */
-		echo ' <span class="'.button_class( 'group' ).'">';
+		$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), button_class( 'text' ).' comment_edit_btn', '&amp;', true, $comment_redirect_url ); /* Link for editing */
+	echo '</span>';
+	echo '<div class="action_btn_group">';
+		$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), button_class( 'text' ).' comment_edit_btn', '&amp;', true, $comment_redirect_url ); /* Link for editing */
+		echo '<span class="'.button_class( 'group' ).'">';
 		$delete_button_is_displayed = is_logged_in() && $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $Comment );
 		$Comment->moderation_links( array(
 				'ajax_button' => true,
@@ -309,8 +308,7 @@ echo $params['comment_body_after'];
 
 		echo '</span>';
 	echo '</div>';
-?>
-	</div>
+	?>
 </div>
 
 <?php echo $params['comment_end'];

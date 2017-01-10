@@ -64,7 +64,7 @@ jQuery( document ).ready(function()
 				placement: 'top',
 				html: true,
 				delay: { 'hide': 400 },
-				template: '<div class="popover"><div class="arrow"></div><div class="popover-content"></div></div>'
+				template: '<div class="popover user_bubbletip"><div class="arrow"></div><div class="popover-content"></div></div>'
 			};
 			if( jQuery( '#' + div_cache_ID ).length == 0 )
 			{ // Create a div for cache user data
@@ -82,6 +82,13 @@ jQuery( document ).ready(function()
 						{ // Init Popover only if ajax content is received
 							result = ajax_debug_clear( result );
 							cache.html( result );
+
+							var img = cache.find( 'img' );
+							img.on( 'load', function() {
+								var popover = jQuery( '.popover.user_bubbletip' );
+								popover.css( 'top',  link.offset().top - popover.outerHeight() );
+							});
+
 							var show_on_init = true;
 							if( link.hasClass( 'hide_popover' ) )
 							{ // We use this class as flag to understand that when ajax was loading

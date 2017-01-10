@@ -4145,3 +4145,9 @@ div.message_toolbars {
     float: right;
   }
 }
+.btn-spinner {
+  background-image: url(../img/ajax-loader/000.gif);
+  background-size: 14px 14px;
+  background-repeat: no-repeat;
+  background-position: left 5px center;
+}
