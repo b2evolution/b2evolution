@@ -621,7 +621,7 @@ fieldset ul {
 #itemform_content .panel-title > a.post_type_link:hover {
   color: #23527c;
 }
-#itemform_extra input {
+#itemform_extra input:not( #item_issue_date ) {
   max-width: 80px;
 }
 #itemform_extra > div.fieldset > label {

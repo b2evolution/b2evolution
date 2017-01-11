@@ -1316,6 +1316,30 @@ class Form extends Widget
 					return $m[0];
 			}' ), $date_format );
 
+		// Get max length of each date component
+		$js_date_length = preg_replace_callback( '~(\\\)?(\w)~', create_function( '$m', '
+			if( $m[1] == "\\\" ) return "\\\".$m[0]; // leave escaped
+			switch( $m[2] )
+			{
+				case "d": return "xx"; // day, 01-31
+				case "j": return "XX"; // day, 1-31
+				case "l": return "XXXXXXXXX"; // weekday (name)
+				case "D": return "XXX"; // weekday (abbr)
+				case "S": return "";
+
+				case "e": return ""; // weekday letter, not supported
+
+				case "m": return "XX"; // month, 01-12
+				case "n": return "XX"; // month, 1-12
+				case "F": return "XXXXXXXXX"; // full month name; "name or abbr" in date.js
+				case "M": return "XXX"; // month name abbr
+
+				case "y": return "XX"; // year, 00-99
+				case "Y": return "XXXX"; // year, XXXX
+				default:
+					return "_";
+			}' ), $date_format );
+
 		$field_params['type'] = 'text';
 
 		if( param_has_error( $field_name )
@@ -1360,7 +1384,7 @@ class Form extends Widget
 
 		if( !isset($field_params['size']) )
 		{ // Get size out of $date_format if not explicitly set
-			$field_params['size'] = strlen( $js_date_format );
+			$field_params['size'] = strlen( $js_date_length );
 		}
 
 		/*

@@ -1926,8 +1926,8 @@ a.btn.action_icon.hoverlink {
   display: inline-block;
   margin: 0 0 2px;
 }
-.form-horizontal #itemform_extra .form-group input[type=text],
-.form-horizontal #itemform_edit_timestamp .form-group input[type=text] {
+.form-horizontal #itemform_extra .form-group input[type=text]:not( #item_issue_date ),
+.form-horizontal #itemform_edit_timestamp .form-group input[type=text]:not( #item_issue_date ) {
   max-width: 85px;
 }
 .form-horizontal #itemform_extra td,
