@@ -4565,6 +4565,34 @@ function echo_user_edit_membership_js( $edited_Organization )
 
 
 /**
+ * Initialize JavaScript for AJAX loading of popup window to confirm removal of user from organization
+ *
+ * @param object Organization
+ */
+function echo_user_remove_membership_js( $edited_Organization )
+{
+	global $admin_url, $current_User;
+
+	if( ! $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
+	{	// User must has an edit perm to remove user in organization:
+		return;
+	}
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_deldata.js":
+	echo '<script type="text/javascript">
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_remove_user_membership = \''.TS_('WARNING').'\';
+		var evo_js_lang_remove = \''.TS_('Continue').'\';
+		var evo_js_user_org_ajax_url = \''.$admin_url.'\';
+		var evo_js_crumb_organization = \''.get_crumb( 'organization' ).'\';
+	</script>';
+}
+
+
+/**
  * Check invitation code and display error on incorrect code
  * This function is used on registration form
  *
@@ -6025,6 +6053,10 @@ function user_td_org_actions( $org_ID, $user_ID )
 				'onclick' => 'return user_edit( '.$org_ID.', '.$user_ID.' );'
 			);
 		$r .= action_icon( T_('Edit membership...'), 'edit', '#', NULL, NULL, NULL, $link_params );
+		$link_params = array(
+				'onclick' => 'return user_remove( '.$org_ID.', '.$user_ID.' );'
+			);
+		$r .= action_icon( T_('Remove user from organization'), 'delete', '#', NULL, NULL, NULL, $link_params );
 	}
 	else
 	{
