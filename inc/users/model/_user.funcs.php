@@ -2638,7 +2638,7 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 	$AdminUI->set_path( 'users', 'users', $user_tab );
 	$user_menu3 = $AdminUI->get_html_menu( array( 'users', 'users' ), 'menu3' );
 
-	$result = $avatar_tag.'<div class="user_header_content">'.$form_title.$user_menu3.'</div>';
+	$result = $avatar_tag.'<div class="user_header_content">'.$form_title.'</div></div></div></div><div class="row"><div class="col-xs-12"><div class="user_header"><div class="user_header_content">'.$user_menu3.'</div>';
 	return '<div class="user_header">'.$result.'</div>'.'<div class="clear"></div>';
 }
 
