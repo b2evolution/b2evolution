@@ -1321,23 +1321,23 @@ class Form extends Widget
 			if( $m[1] == "\\\" ) return "\\\".$m[0]; // leave escaped
 			switch( $m[2] )
 			{
-				case "d": return "xx"; // day, 01-31
-				case "j": return "XX"; // day, 1-31
-				case "l": return "XXXXXXXXX"; // weekday (name)
-				case "D": return "XXX"; // weekday (abbr)
+				case "d": return "nn"; // day, 01-31(2)
+				case "j": return "nn"; // day, 1-31(2)
+				case "l": return "XXXXXXXXX"; // weekday (name) - Wednesday(9)
+				case "D": return "XXX"; // weekday (abbr)(3)
 				case "S": return "";
 
 				case "e": return ""; // weekday letter, not supported
 
-				case "m": return "XX"; // month, 01-12
-				case "n": return "XX"; // month, 1-12
-				case "F": return "XXXXXXXXX"; // full month name; "name or abbr" in date.js
-				case "M": return "XXX"; // month name abbr
+				case "m": return "nn"; // month, 01-12(2)
+				case "n": return "nn"; // month, 1-12(2)
+				case "F": return "XXXXXXXXX"; // full month name; "name or abbr" in date.js - September(9)
+				case "M": return "XXX"; // month name abbr(3)
 
-				case "y": return "XX"; // year, 00-99
-				case "Y": return "XXXX"; // year, XXXX
+				case "y": return "nn"; // year, 00-99(2)
+				case "Y": return "nnnn"; // year, 1970 to 2038(4)
 				default:
-					return "_";
+					return "_"; // (1)
 			}' ), $date_format );
 
 		$field_params['type'] = 'text';
