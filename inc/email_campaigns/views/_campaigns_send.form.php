@@ -76,7 +76,7 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 		{	// Asynchronous sending mode:
 			if( $edited_EmailCampaign->get_Cronjob() )
 			{	// Cron job was already created:
-				$button_title = T_('Go to scheduler to see send jobs for this campaign');
+				$button_title = T_('See scheduled send jobs for this campaign');
 				$button_action = 'view_cron';
 			}
 			else
