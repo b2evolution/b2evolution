@@ -190,14 +190,26 @@ $Form->begin_form( 'inskin', '', $form_params );
 			$disp_edit_categories = false;
 		}
 	}
+	if( $disp_edit_categories && get_post_cat_setting( $Blog->ID ) < 1 )
+	{	// Categories block is hidden when main category is assigned automatically:
+		$disp_edit_categories = false;
+	}
 
-	$Form->begin_fieldset( get_request_title( array_merge( array(
+	$Form->output = false;
+	$edit_links = $Form->begin_fieldset( get_request_title( array_merge( array(
 			'edit_links_template' => array(
 				'before'              => '<span class="pull-right">',
 				'after'               => '</span>',
 				'advanced_link_class' => 'btn btn-info btn-sm',
 				'close_link_class'    => 'btn btn-default btn-sm',
 			) ), $params ) ) );
+	$Form->output = true;
+	$advanced_edit_text = T_('Advanced editing');
+	$edit_links = preg_replace( '/ '.$advanced_edit_text.'/', '<span class="hidden-xs">$0</span>', $edit_links );
+	$cancel_text = T_('Cancel editing');
+	$edit_links = preg_replace( '/ '.$cancel_text.'/', '<span class="hidden-xs">$0</span>', $edit_links );
+	echo $edit_links;
+
 
 	// ############################ POST CONTENTS #############################
 	// Title input:
@@ -395,7 +407,7 @@ if( $edited_Item->get_type_setting( 'allow_attachments' ) )
 		}
 		echo '</div>';
 	}
-	if( $perm_view_files )
+	if( $perm_view_files && $edited_Item->ID > 0 )
 	{	// If current user has a permission to view files
 		$LinkOwner = new LinkItem( $edited_Item );
 		if( $LinkOwner->count_links() )

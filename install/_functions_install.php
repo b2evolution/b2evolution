@@ -1621,10 +1621,10 @@ function check_local_installation()
 	global $basehost;
 
 	return php_sapi_name() != 'cli' && // NOT php CLI mode
-		( $basehost == 'localhost' 
+		( $basehost == 'localhost'
 			|| ( isset( $_SERVER['SERVER_ADDR'] ) && ( $_SERVER['SERVER_ADDR'] == '127.0.0.1' || $_SERVER['SERVER_ADDR'] == '::1' ) ) // IPv6 address of 127.0.0.1
-			|| ( isset( $_SERVER['REMOTE_ADDR'] ) && ( $_SERVER['REMOTE_ADDR'] == '127.0.0.1' || $_SERVER['REMOTE_ADDR'] == '::1' ) ) 
-			|| ( isset( $_SERVER['HTTP_HOST'] ) && ( $_SERVER['HTTP_HOST'] == '127.0.0.1' || $_SERVER['HTTP_HOST'] == '::1' ) ) 
+			|| ( isset( $_SERVER['REMOTE_ADDR'] ) && ( $_SERVER['REMOTE_ADDR'] == '127.0.0.1' || $_SERVER['REMOTE_ADDR'] == '::1' ) )
+			|| ( isset( $_SERVER['HTTP_HOST'] ) && ( $_SERVER['HTTP_HOST'] == '127.0.0.1' || $_SERVER['HTTP_HOST'] == '::1' ) )
 			|| ( isset( $_SERVER['SERVER_NAME'] ) && ( $_SERVER['SERVER_NAME'] == '127.0.0.1' || $_SERVER['SERVER_NAME'] == '::1' ) )
 		);
 }
@@ -1680,7 +1680,7 @@ function display_install_result_window( $title, $body )
  */
 function check_quick_install_request()
 {
-	global $config_is_done, $db_config, $install_login, $install_password, $Messages;
+	global $config_is_done, $db_config, $conf_path, $install_login, $install_password, $Messages;
 
 	$admin_login = param( 'admin_login', 'string', '' );
 	$admin_password = param( 'admin_password', 'string', '' );
@@ -1769,9 +1769,19 @@ function check_quick_install_request()
 			$db_config['host'] = $db_host;
 		}
 		else
-		{ // Failed on createing of basic config file
+		{ // Failed on creation of basic config file
 			return false;
 		}
+	}
+	elseif( ! file_exists( $conf_path.'_basic_config.php' ) )
+	{
+		global $basic_config_file_result_messages;
+
+		ob_start();
+		display_install_messages( T_('You must pass db_config params or create a <code>/conf/_basic_config.php</code> file before calling the installer.') );
+
+		$basic_config_file_result_messages = ob_get_clean();
+		return false;
 	}
 
 	// Revert config admin email to original value:

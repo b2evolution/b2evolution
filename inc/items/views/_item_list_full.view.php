@@ -419,19 +419,21 @@ while( $Item = & $ItemList->get_item() )
 
 			echo '<div class="clearfix"></div>';
 
+			$comment_moderation_statuses = explode( ',', $Blog->get_setting( 'moderation_statuses' ) );
+
 			$currentpage = param( 'currentpage', 'integer', 1 );
 			$total_comments_number = generic_ctp_number( $Item->ID, ( $comment_type == 'meta' ? 'metas' : 'total' ), 'total' );
-			$draft_comments_number = generic_ctp_number( $Item->ID, ( $comment_type == 'meta' ? 'metas' : 'total' ), 'draft' );
-			// decide to show all comments, or only drafts
+			$moderation_comments_number = generic_ctp_number( $Item->ID, ( $comment_type == 'meta' ? 'metas' : 'total' ), $comment_moderation_statuses );
+			// Decide to show all comments, or only which require moderation:
 			if( ( $comment_type != 'meta' ) && // Display all comments in meta mode by default
-			    ( $total_comments_number > 5 && $draft_comments_number > 0 ) )
-			{ // show only drafts
-				$statuses = array( 'draft' );
-				$show_comments = 'draft';
-				param( 'comments_number', 'integer', $draft_comments_number );
+			    ( $total_comments_number > 5 && $moderation_comments_number > 0 ) )
+			{	// Show only requiring moderation comments:
+				$statuses = $comment_moderation_statuses;
+				$show_comments = 'moderation';
+				param( 'comments_number', 'integer', $moderation_comments_number );
 			}
 			else
-			{ // show all comments
+			{	// Show all comments:
 				$statuses = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
 				$show_comments = 'all';
 				param( 'comments_number', 'integer', $total_comments_number );
@@ -466,12 +468,12 @@ while( $Item = & $ItemList->get_item() )
 				?>
 				<div class="tile"><label><?php echo T_('Show').':' ?></label></div>
 				<div class="tile">
-					<input type="radio" name="show_comments" value="draft" id="only_draft" class="radio" <?php if( $show_comments == 'draft' ) echo 'checked="checked" '?> />
-					<label for="only_draft"><?php echo T_('Drafts') ?></label>
+					<input type="radio" name="show_comments" value="moderation" id="only_moderation" class="radio" <?php if( $show_comments == 'moderation' ) echo 'checked="checked" '?> />
+					<label for="only_moderation"><?php echo T_('Requiring moderation') ?></label>
 				</div>
 				<div class="tile">
-					<input type="radio" name="show_comments" value="published" id="only_published" class="radio" <?php if( $show_comments == 'published' ) echo 'checked="checked" '?> />
-					<label for="only_published"><?php echo T_('Published') ?></label>
+					<input type="radio" name="show_comments" value="valid" id="only_valid" class="radio" <?php if( $show_comments == 'valid' ) echo 'checked="checked" '?> />
+					<label for="only_valid"><?php echo T_('Valid') ?></label>
 				</div>
 				<div class="tile">
 					<input type="radio" name="show_comments" value="all" id="show_all" class="radio" <?php if( $show_comments == 'all' ) echo 'checked="checked" '?> />

@@ -4684,7 +4684,12 @@ class Blog extends DataObject
 	/**
 	 * Get data of moderators which must be notified about new/edited comment
 	 *
-	 * @return array Array where each row is array with keys: user_email, user_ID, notify_comment_moderation, notify_edit_cmt_moderation
+	 * @return array Array where each row is array with keys:
+	 *                - user_email
+	 *                - user_ID
+	 *                - notify_comment_moderation
+	 *                - notify_edit_cmt_moderation
+	 *                - notify_spam_cmt_moderation
 	 */
 	function get_comment_moderator_user_data()
 	{
@@ -4693,10 +4698,11 @@ class Blog extends DataObject
 			global $DB;
 
 			$SQL = new SQL( 'Get list of moderators to notify about new/edited comment of collection #'.$this->ID );
-			$SQL->SELECT( 'DISTINCT user_email, user_ID, s1.uset_value as notify_comment_moderation, s2.uset_value as notify_edit_cmt_moderation' );
+			$SQL->SELECT( 'DISTINCT user_email, user_ID, s1.uset_value as notify_comment_moderation, s2.uset_value as notify_edit_cmt_moderation, s3.uset_value as notify_spam_cmt_moderation' );
 			$SQL->FROM( 'T_users' );
 			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings AS s1 ON s1.uset_user_ID = user_ID AND s1.uset_name = "notify_comment_moderation"' );
 			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings AS s2 ON s2.uset_user_ID = user_ID AND s2.uset_name = "notify_edit_cmt_moderation"' );
+			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings AS s3 ON s3.uset_user_ID = user_ID AND s3.uset_name = "notify_spam_cmt_moderation"' );
 			$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
 			$SQL->WHERE( 'LENGTH( TRIM( user_email ) ) > 0' );
 			$SQL->WHERE_and( '( grp_perm_blogs = "editall" )

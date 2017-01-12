@@ -760,16 +760,17 @@ class User extends DataObject
 					continue;
 				}
 
+				$uf_val = param( 'uf_'.$userfield->uf_ID, 'raw' );
 				$field_type = $this->userfield_defs[$userfield->uf_ufdf_ID][0];
 				if( $field_type == 'number' )
-				{	// Change number type of integer because we have this type name preparing in function param():
+				{	// Change number type of integer because we have this type name preparing in function param_format():
 					$field_type = 'integer';
 				}
 				elseif( $field_type != 'text' && $field_type != 'url' )
-				{	// Use all other params as string, Only text and url have a preparing in function param():
+				{	// Use all other params as string, Only text and url have a preparing in function param_format():
 					$field_type = 'string';
 				}
-				$uf_val = param( 'uf_'.$userfield->uf_ID, $field_type, '' );
+				$uf_val = param_format( $uf_val, $field_type );
 
 				if( $this->userfield_defs[$userfield->uf_ufdf_ID][0] == 'list' && $uf_val == '---' )
 				{	// Option list has a value '---' for empty value
@@ -831,16 +832,17 @@ class User extends DataObject
 					$copied_userfields = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
 					foreach( $copied_userfields as $copied_userfield )
 					{
+						$uf_val = param( 'uf_'.$copied_userfield->uf_ID, 'raw' );
 						$field_type = $copied_userfield->ufdf_type;
 						if( $field_type == 'number' )
-						{	// Change number type of integer because we have this type name preparing in function param():
+						{	// Change number type of integer because we have this type name preparing in function param_format():
 							$field_type = 'integer';
 						}
 						elseif( $field_type != 'text' && $field_type != 'url' )
-						{	// Use all other params as string, Only text and url have a preparing in function param():
+						{	// Use all other params as string, Only text and url have a preparing in function param_format():
 							$field_type = 'string';
 						}
-						$uf_val = param( 'uf_'.$copied_userfield->uf_ID, $field_type, '' );
+						$uf_val = param_format( $uf_val, $field_type );
 						if( ! empty( $uf_val ) )
 						{	// Copy user field only if it is not empty:
 							$this->userfield_add( $copied_userfield->ufdf_ID, $uf_val );
@@ -1211,9 +1213,10 @@ class User extends DataObject
 				}
 				$is_comment_moderator = $this->check_role( 'comment_moderator' );
 				if( $is_comment_moderator || $this->check_role( 'comment_editor' ) )
-				{	// update 'notify_comment_moderation' and 'notify_edit_cmt_moderation' only if user is comment moderator/editor at least in one collection:
+				{	// update 'notify_comment_moderation', 'notify_edit_cmt_moderation' and 'notify_spam_cmt_moderation' only if user is comment moderator/editor at least in one collection:
 					$UserSettings->set( 'notify_comment_moderation', param( 'edited_user_notify_cmt_moderation', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'notify_edit_cmt_moderation', param( 'edited_user_notify_edit_cmt_moderation', 'integer', 0 ), $this->ID );
+					$UserSettings->set( 'notify_spam_cmt_moderation', param( 'edited_user_notify_spam_cmt_moderation', 'integer', 0 ), $this->ID );
 				}
 				if( $this->check_perm( 'admin', 'restricted', false ) )
 				{ // update 'notify_meta_comments' only if edited user has a permission to back-office
@@ -1551,6 +1554,7 @@ class User extends DataObject
 			{ // Use a login
 				$login = $this->dget( 'login', $params['login_format'] );
 			}
+
 			// Add class "login" to detect logins by js plugins
 			$class = ( $login == $this->login ? 'login ' : '' );
 		}
@@ -4902,7 +4906,7 @@ class User extends DataObject
 							'email'           => $this->email,
 							'reason'          => $account_close_reason,
 							'user_ID'         => $this->ID,
-							'closed_by_admin' => $current_User->login,
+							'closed_by_admin' => $current_User->get_username(),
 							'days_count'      => $this->get_days_count_close()
 						);
 					send_admin_notification( NT_('User account closed'), 'account_closed', $email_template_params );
@@ -4942,7 +4946,7 @@ class User extends DataObject
 						$email_template_params = array(
 							'User' => $this,
 							'login' => $this->login, // this is required in the send_admin_notification
-							'activated_by_admin' => $current_User->login,
+							'activated_by_admin' => $current_User->get_username(),
 						);
 						send_admin_notification( NT_('New user account activated'), 'account_activated', $email_template_params );
 					}

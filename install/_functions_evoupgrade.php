@@ -85,6 +85,10 @@ function upg_task_start( $version, $title = '' )
 			task_begin( $title );
 		}
 
+		// Begin a transaction for the upgrade block:
+		global $DB;
+		$DB->begin();
+
 		return true;
 	}
 	else
@@ -105,6 +109,10 @@ function upg_task_end( $print_result = true )
 
 	if( ! empty( $upgrade_db_version ) )
 	{	// Only if the upgrade task is not ended yet:
+
+		// End current transaction of the upgrade block:
+		global $DB;
+		$DB->commit();
 
 		if( $print_result )
 		{	// Print out the end of task:
@@ -814,9 +822,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							ADD COLUMN blog_access_type VARCHAR(10) NOT NULL DEFAULT 'index.php' AFTER blog_locale,
 							ADD COLUMN blog_force_skin tinyint(1) NOT NULL default 0 AFTER blog_default_skin,
 							ADD COLUMN blog_in_bloglist tinyint(1) NOT NULL DEFAULT 1 AFTER blog_disp_bloglist,
-							ADD COLUMN blog_links_blog_ID INT(4) NOT NULL DEFAULT 0,
-							ADD UNIQUE KEY blog_stub (blog_stub)";
+							ADD COLUMN blog_links_blog_ID INT(4) NOT NULL DEFAULT 0";
 		$DB->query( $query );
+		// Use this query separately from above because MariaDB versions 10+ create an error:
+		$DB->query( 'ALTER TABLE T_blogs
+			ADD UNIQUE KEY blog_stub (blog_stub)' );
 
 		$query = "UPDATE T_blogs
 							SET blog_access_type = 'stub',
@@ -1125,7 +1135,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							ADD COLUMN blog_allowcomments VARCHAR(20) NOT NULL default 'post_by_post' AFTER blog_keywords,
 							ADD COLUMN blog_allowblogcss TINYINT(1) NOT NULL default 1 AFTER blog_allowpingbacks,
 							ADD COLUMN blog_allowusercss TINYINT(1) NOT NULL default 1 AFTER blog_allowblogcss,
-							DROP INDEX blog_stub,
 							ADD COLUMN blog_stub VARCHAR(255) NOT NULL DEFAULT 'stub' AFTER blog_staticfilename,
 							ADD COLUMN blog_commentsexpire INT(4) NOT NULL DEFAULT 0 AFTER blog_links_blog_ID,
 							ADD COLUMN blog_media_location ENUM( 'default', 'subdir', 'custom', 'none' ) DEFAULT 'default' NOT NULL AFTER blog_commentsexpire,
@@ -1133,6 +1142,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							ADD COLUMN blog_media_fullpath VARCHAR( 255 ) NOT NULL AFTER blog_media_subdir,
 							ADD COLUMN blog_media_url VARCHAR(255) NOT NULL AFTER blog_media_fullpath";
 		$DB->query( $query );
+		// Use this query separately from above because MariaDB versions 10+ create an error:
+		$DB->query( 'ALTER TABLE T_blogs
+							DROP INDEX blog_stub' );
 
 		$query = "ALTER TABLE T_blogs
 							ADD UNIQUE blog_urlname ( blog_urlname )";
@@ -2603,17 +2615,21 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$query = "ALTER TABLE T_hitlog
 			 CHANGE COLUMN hit_ID hit_ID              INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			 CHANGE COLUMN hit_datetime hit_datetime  DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
-			 ADD COLUMN hit_keyphrase_keyp_ID         INT UNSIGNED DEFAULT NULL AFTER hit_referer_dom_ID,
-			 ADD INDEX hit_remote_addr ( hit_remote_addr ),
-			 ADD INDEX hit_sess_ID        ( hit_sess_ID )";
+			 ADD COLUMN hit_keyphrase_keyp_ID         INT UNSIGNED DEFAULT NULL AFTER hit_referer_dom_ID";
 		$DB->query( $query );
+		// Use this query separately from above because MariaDB versions 10+ create an error:
+		$DB->query( 'ALTER TABLE T_hitlog
+			 ADD INDEX hit_remote_addr ( hit_remote_addr ),
+			 ADD INDEX hit_sess_ID     ( hit_sess_ID )' );
 		echo "OK.<br />\n";
 
 		echo 'Upgrading sessions table... ';
 		$DB->query( "ALTER TABLE T_sessions
 			ALTER COLUMN sess_lastseen SET DEFAULT '2000-01-01 00:00:00',
-			ADD COLUMN sess_hitcount  INT(10) UNSIGNED NOT NULL DEFAULT 1 AFTER sess_key,
-			ADD KEY sess_user_ID (sess_user_ID)" );
+			ADD COLUMN sess_hitcount  INT(10) UNSIGNED NOT NULL DEFAULT 1 AFTER sess_key" );
+		// Use this query separately from above because MariaDB versions 10+ create an error:
+		$DB->query(	'ALTER TABLE T_sessions
+			ADD KEY sess_user_ID (sess_user_ID)' );
 		echo "OK.<br />\n";
 
 		echo 'Creating goal tracking table... ';
@@ -4974,8 +4990,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		task_begin( 'Upgrading Files table...' );
 		$DB->query( 'ALTER TABLE T_files
-			DROP INDEX file,
 			ADD COLUMN file_path_hash char(32) default NULL' );
+		// Use this query separately from above because MariaDB versions 10+ create an error:
+		$DB->query( 'ALTER TABLE T_files
+			DROP INDEX file' );
 		// Change file path length to the max allowed value
 		$DB->query( "ALTER TABLE T_files CHANGE COLUMN file_path file_path VARCHAR(767) NOT NULL DEFAULT ''" );
 		$DB->query( 'UPDATE T_files SET file_path_hash = MD5( CONCAT( file_root_type, file_root_ID, file_path ) )');
@@ -7603,7 +7621,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 	if( upg_task_start( 12005, 'Update widget container "Item Single"...' ) )
 	{	// part of 6.8.0-alpha
-		$DB->begin();
 		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
 		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_code, wi_order' );
 		$SQL->FROM( 'T_widget' );
@@ -7655,7 +7672,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
 			  VALUES '.implode( ', ', $item_attachments_widget_rows ) );
 		}
-		$DB->commit();
 		upg_task_end();
 	}
 
@@ -7684,7 +7700,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$DB->query( "ALTER TABLE T_antispam__keyword
 			CHANGE aspm_ID     askw_ID     bigint(11) NOT NULL auto_increment,
 			CHANGE aspm_string askw_string varchar(80) NOT NULL,
-			CHANGE aspm_source askw_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported',
+			CHANGE aspm_source askw_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported'" );
+		// Use this query separately from above because MariaDB versions 10+ create an error:
+		$DB->query( "ALTER TABLE T_antispam__keyword
 			DROP INDEX aspm_string,
 			ADD UNIQUE askw_string ( askw_string )" );
 		upg_task_end();
@@ -7809,8 +7827,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12085, 'Update widget container "Item Single"...' ) )
-	{ // part of 6.8.0-alpha
-		$DB->begin();
+	{	// part of 6.8.0-alpha
 		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
 		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_code, wi_order' );
 		$SQL->FROM( 'T_widget' );
@@ -7870,7 +7887,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
 			  VALUES '.implode( ', ', $item_tags_widget_rows ) );
 		}
-		$DB->commit();
 		upg_task_end();
 	}
 
@@ -7905,8 +7921,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12100, 'Update widget container "Item Single" by adding "Item Location" widget...' ) )
-	{ // part of 6.8.0-alpha
-		$DB->begin();
+	{	// part of 6.8.0-alpha
 		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
 		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_code, wi_order' );
 		$SQL->FROM( 'T_widget' );
@@ -7965,7 +7980,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
 			  VALUES '.implode( ', ', $item_locations_widget_rows ) );
 		}
-		$DB->commit();
 		upg_task_end();
 	}
 
@@ -8007,7 +8021,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_add_col( 'T_locales', 'loc_input_timefmt', 'varchar(20) COLLATE ascii_general_ci NOT NULL default "H:i:s" AFTER loc_shorttimefmt' );
 
 		// Allow only numeric date formats:
-		$DB->begin();
 		$SQL = new SQL( 'Get all short date formats"' );
 		$SQL->SELECT( 'loc_locale, loc_datefmt, loc_timefmt' );
 		$SQL->FROM( 'T_locales' );
@@ -8027,13 +8040,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				      loc_input_timefmt = "H:i:s"
 				WHERE loc_locale = '.$DB->quote( $loc_data['loc_locale'] ) );
 		}
-		$DB->commit();
 		upg_task_end();
 	}
 
 	if( upg_task_start( 12130, 'Create new widget container "Item Single Header"...' ) )
-	{ // part of 6.8.0-alpha
-		$DB->begin();
+	{	// part of 6.8.0-alpha
 		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
 		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_order, wi_enabled, wi_code, wi_params, blog_type' );
 		$SQL->FROM( 'T_widget' );
@@ -8067,7 +8078,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code, wi_params )
 			  VALUES '.implode( ', ', $item_info_line_widget_rows ) );
 		}
-		$DB->commit();
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12135, 'Upgrade table of user field definitions...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_users__fielddefs
+			MODIFY ufdf_code varchar(20) COLLATE ascii_bin UNIQUE NOT NULL COMMENT "Code MUST be lowercase ASCII only"' );
 		upg_task_end();
 	}
 

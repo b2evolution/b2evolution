@@ -154,8 +154,8 @@ switch( $action )
 
 		if( $action == 'update_edit' )
 		{	// Get params to restore height and scroll position of item content field:
-			param( 'content_height', 'integer', 0 );
-			param( 'content_scroll', 'integer', 0 );
+			$content_height = intval( param( 'content_height', 'string', 0 ) );
+			$content_scroll = intval( param( 'content_scroll', 'string', 0 ) );
 		}
 		break;
 
@@ -1556,6 +1556,9 @@ function init_list_mode()
 					'itemtype_usage' => implode( ',', get_item_type_usage_by_tab( $tab_type ) ),
 				) );
 			$AdminUI->breadcrumbpath_add( T_( $tab_type ), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab_type='.urlencode( $tab_type ).'&amp;filter=restore' );
+
+			// JS to edit an order of items from list view:
+			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 			break;
 
 		case 'tracker':

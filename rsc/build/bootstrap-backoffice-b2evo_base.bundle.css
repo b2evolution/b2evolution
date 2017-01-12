@@ -1731,6 +1731,30 @@ span.NonExistentWikiWord {
   div.checkbox:last-of-type {
     padding-bottom: 7px;
   }
+  .text-left-sm {
+    text-align: left;
+  }
+  .text-right-sm {
+    text-align: right;
+  }
+}
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+  .text-left-md {
+    text-align: left;
+  }
+  .text-right-md {
+    text-align: right;
+  }
+}
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  .text-left-lg {
+    text-align: left;
+  }
+  .text-right-lg {
+    text-align: right;
+  }
 }
 .glyphicon {
   font-family: 'Glyphicons Halflings' !important;
@@ -1902,8 +1926,8 @@ a.btn.action_icon.hoverlink {
   display: inline-block;
   margin: 0 0 2px;
 }
-.form-horizontal #itemform_extra .form-group input[type=text],
-.form-horizontal #itemform_edit_timestamp .form-group input[type=text] {
+.form-horizontal #itemform_extra .form-group input[type=text]:not( #item_issue_date ),
+.form-horizontal #itemform_edit_timestamp .form-group input[type=text]:not( #item_issue_date ) {
   max-width: 85px;
 }
 .form-horizontal #itemform_extra td,
@@ -2510,4 +2534,10 @@ div.message_toolbars {
   div.coll-dashboard-block-3 {
     float: right;
   }
+}
+.btn-spinner {
+  background-image: url(../img/ajax-loader/000.gif);
+  background-size: 14px 14px;
+  background-repeat: no-repeat;
+  background-position: left 5px center;
 }

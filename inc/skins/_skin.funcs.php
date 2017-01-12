@@ -641,6 +641,7 @@ var downloadInterval = setInterval( function()
 					$recipients_selected = array( array(
 							'id'    => $recipient_User->ID,
 							'login' => $recipient_User->login,
+							'fullname' => $recipient_User->get_username()
 						) );
 
 					init_tokeninput_js( 'blog' );

@@ -77,7 +77,7 @@ div.status_icon {
 // Action icons
 .action_icon, .widget_actions a, .no_icon {
 	font-weight: bold;
-	margin: 0 2px;
+	margin: 2px;
 }
 // Remove spaces between the spam voting buttons
 .btn-group .action_icon {
@@ -655,7 +655,7 @@ fieldset ul {
 	}
 }
 #itemform_extra {
-	input {
+	input:not( #item_issue_date ) {
 		max-width: 80px;
 	}
 	> div.fieldset > label {
@@ -908,7 +908,12 @@ tr#fileuploader_form td {
 }
 
 h2.user_title {
+	margin-top: 0;
 	margin-bottom: 18px;
+}
+
+h2.user_title::first-line {
+	line-height: 52px;
 }
 
 // phpBB importer
@@ -1444,8 +1449,9 @@ form#thread_checkchanges ul.token-input-list-facebook {
 	}
 }
 
-// Input field to edit order in table column by ajax
-input[name=new_cat_order] {
+// Input field to edit item/cat order in table column by ajax
+input[name=new_cat_order],
+input[name=new_item_order] {
 	width: 100%;
 }
 

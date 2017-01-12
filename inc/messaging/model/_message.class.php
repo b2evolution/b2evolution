@@ -850,7 +850,7 @@ class Message extends DataObject
 
 			// Change locale here to localize the email subject and content
 			locale_temp_switch( $notify_User->get( 'locale' ) );
-			$sender_login = ( $from_User === NULL ) ? $current_User->login : $from_User->login;
+			$sender_login = ( $from_User === NULL ) ? $current_User->get_username() : $from_User->get_username();
 			$localized_subject = sprintf( T_( $subject ), $sender_login );
 			// Note: Not activated users won't get notification email
 			if( send_mail_to_User( $recipient_ID, $localized_subject, 'private_message_new', $email_template_params ) )

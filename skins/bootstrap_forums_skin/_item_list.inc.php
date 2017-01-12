@@ -350,7 +350,10 @@ $display_workflow = ( $disp == 'posts' ) &&
 							'after_user' => ' '
 				) );
 
+			echo '<span class="datestamp_shrinked">';
 			$latest_Comment->date( locale_datefmt() );
+			echo '</span>';
+
 			echo ' <a href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest post')
 					.'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
 		}
@@ -363,6 +366,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 				) );
 
 			echo $Item->get_mod_date( locale_datefmt() );
+
 			echo ' <a href="'.$Item->get_permanent_url().'" title="'.T_('View latest post').
 					'" class="icon_latest_reply"><i class="fa fa-arrow-right"></i>&nbsp;<i class="fa fa-file-o"></i></a>';
 		}

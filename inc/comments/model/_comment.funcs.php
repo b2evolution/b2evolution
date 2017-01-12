@@ -1379,7 +1379,7 @@ function get_type( $Comment )
 {
 	global $current_User;
 
-	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+	if( $Comment->can_be_displayed() || $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 	{
 		return $Comment->get( 'type' );
 	}
@@ -1400,7 +1400,7 @@ function get_author( $Comment )
 {
 	global $current_User;
 
-	if( $Comment->get( 'status' ) == 'published' || $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+	if( $Comment->can_be_displayed() || $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 	{
 		$author_User = $Comment->get_author_User();
 		if( $author_User != NULL )

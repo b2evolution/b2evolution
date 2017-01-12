@@ -966,7 +966,7 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	}
 
 	if( $blog_ids == '*' )
-	{
+	{ // All collections
 		$where_cat_clause = '1';
 	}
 	elseif( is_array( $blog_ids ) )
@@ -974,15 +974,20 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 		$where_cat_clause = 'cat_blog_ID IN ( '.$DB->quote( $blog_ids ).' )';
 	}
 	else
-	{ // Get list of relevant blogs
-		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ids );
+	{ // Get list of relevant/ aggregated collections
+		$Blog = & $BlogCache->get_by_ID( $blog_ids );
 		$where_cat_clause = trim( $Blog->get_sql_where_aggregate_coll_IDs( 'cat_blog_ID' ) );
+
+		if( $Blog->get_setting( 'aggregate_coll_IDs' ) == '*' )
+		{
+			$blog_ids = '*';
+		}
 	}
 
 	// Build query to get the tags:
 	$tags_SQL = new SQL();
 
-	if( $get_cat_blog_ID )
+	if( $blog_ids != '*' || $get_cat_blog_ID )
 	{
 		$tags_SQL->SELECT( 'tag_name, COUNT( DISTINCT itag_itm_ID ) AS tag_count, tag_ID, cat_blog_ID' );
 	}
@@ -995,13 +1000,13 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__item ON itag_itm_ID = post_ID' );
 
-	if( $get_cat_blog_ID )
+	if( $blog_ids != '*' || $get_cat_blog_ID )
 	{
 		$tags_SQL->FROM_add( 'INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID' );
 		$tags_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
 	}
 
-	if( $blog_ids != '*' || $skip_intro_posts )
+	if( $skip_intro_posts )
 	{
 		$tags_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
 	}
@@ -1416,6 +1421,80 @@ function get_status_tooltip_title( $status )
 }
 
 /**
+ * Check if item/comment can be displayed with status for current user on front-office
+ *
+ * @param string Status
+ * @param string Type: 'item', 'comment'
+ * @param integer Blog ID
+ * @param integer Creator user ID
+ * @return boolean
+ */
+function can_be_displayed_with_status( $status, $type, $blog_ID, $creator_user_ID )
+{
+	// Get statuses which are visible on front-office:
+	$show_statuses = get_inskin_statuses( $blog_ID, $type );
+
+	if( ! in_array( $status, $show_statuses ) )
+	{	// This Item has a status which cannot be displayed on front-office:
+		return false;
+	}
+
+	global $current_User;
+	$is_logged_in = is_logged_in( false );
+
+	$permname = ( $type == 'item' ? 'blog_post!' : 'blog_comment!' ).$status;
+
+	switch( $status )
+	{
+		case 'published':
+			// Published items/comments are always allowed:
+			$allowed = true;
+			break;
+
+		case 'community':
+			// It is always allowed for logged in users:
+			$allowed = $is_logged_in;
+			break;
+
+		case 'protected':
+			// It is always allowed for members:
+			$allowed = ( $is_logged_in && $current_User->check_perm( 'blog_ismember', 1, false, $blog_ID ) );
+			break;
+
+		case 'private':
+			// It is allowed for users who has global 'editall' permission:
+			$allowed = ( $is_logged_in && $current_User->check_perm( 'blogs', 'editall' ) );
+			if( ! $allowed && $is_logged_in && $current_User->check_perm( $permname, 'create', false, $blog_ID ) )
+			{	// Own private items/comments are allowed if user can create private items/comments:
+				$allowed = ( $current_User->ID == $creator_user_ID );
+			}
+			break;
+
+		case 'review':
+			// It is allowed for users who have at least 'lt' items/comments edit permission :
+			$allowed = ( $is_logged_in && $current_User->check_perm( $permname, 'moderate', false, $blog_ID ) );
+			if( ! $allowed && $is_logged_in && $current_User->check_perm( $permname, 'create', false, $blog_ID ) )
+			{	// Own items/comments with 'review' status are allowed if user can create items/comments with 'review' status
+				$allowed = ( $current_User->ID == $creator_user_ID );
+			}
+			break;
+
+		case 'draft':
+			// In front-office only authors may see their own draft items/comments, but only if the have permission to create draft items/comments:
+			$allowed = ( $is_logged_in && $current_User->check_perm( $permname, 'create', false, $blog_ID )
+				&& $current_User->ID == $creator_user_ID );
+			break;
+
+		default:
+			// Decide the unknown item/comment statuses as not visible for front-office:
+			$allowed = false;
+	}
+
+	return $allowed;
+}
+
+
+/**
  * Get Blog object from general setting
  *
  * @param string Setting name: 'default_blog_ID', 'info_blog_ID', 'login_blog_ID', 'msg_blog_ID'
@@ -1642,13 +1721,12 @@ function blogs_all_results_block( $params = array() )
 	if( ! $current_User->check_perm( 'blogs', 'view' ) )
 	{ // We do not have perm to view all blogs... we need to restrict to those we're a member of:
 
-		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON ( blog_ID = bloguser_blog_ID'
+		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON ( blog_advanced_perms <> 0 AND blog_ID = bloguser_blog_ID'
 			. ' AND bloguser_user_ID = ' . $current_User->ID . ' )' );
-		$SQL->FROM_add( ' LEFT JOIN T_coll_group_perms ON ( blog_ID = bloggroup_blog_ID'
+		$SQL->FROM_add( ' LEFT JOIN T_coll_group_perms ON ( blog_advanced_perms <> 0 AND blog_ID = bloggroup_blog_ID'
 			. ' AND ( bloggroup_group_ID = ' . $current_User->grp_ID
 			. '       OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$current_User->ID.' ) ) )' );
-		$SQL->WHERE( 'blog_advanced_perms <> 0' );
-		$SQL->WHERE_and( 'blog_owner_user_ID = ' . $current_User->ID
+		$SQL->WHERE( 'blog_owner_user_ID = ' . $current_User->ID
 			. ' OR bloguser_ismember <> 0'
 			. ' OR bloggroup_ismember <> 0' );
 

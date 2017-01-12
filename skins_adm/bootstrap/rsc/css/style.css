@@ -54,7 +54,7 @@ div.status_icon {
 .widget_actions a,
 .no_icon {
   font-weight: bold;
-  margin: 0 2px;
+  margin: 2px;
 }
 .btn-group .action_icon {
   margin-left: 0;
@@ -621,7 +621,7 @@ fieldset ul {
 #itemform_content .panel-title > a.post_type_link:hover {
   color: #23527c;
 }
-#itemform_extra input {
+#itemform_extra input:not( #item_issue_date ) {
   max-width: 80px;
 }
 #itemform_extra > div.fieldset > label {
@@ -860,7 +860,11 @@ tr#fileuploader_form td {
   margin-top: 10px;
 }
 h2.user_title {
+  margin-top: 0;
   margin-bottom: 18px;
+}
+h2.user_title::first-line {
+  line-height: 52px;
 }
 .tool_steps {
   text-align: center;
@@ -1333,7 +1337,8 @@ form#thread_checkchanges ul.token-input-list-facebook {
 .global_icons.no_title {
   margin-bottom: 22px;
 }
-input[name=new_cat_order] {
+input[name=new_cat_order],
+input[name=new_item_order] {
   width: 100%;
 }
 .filters_item_list_table {

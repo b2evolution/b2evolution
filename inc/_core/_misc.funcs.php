@@ -2243,21 +2243,29 @@ function get_atags( $content )
  */
 function add_tag_class( $content, $class, $limit = 1 )
 {
-	// Check if there's an opening tag
-	if( preg_match( '/<.*>/i', $content ) )
-	{
-		// Check if class attribute is already defined
-		if( preg_match( '/\sclass\s*=/i', $content) )
-		{ // Insert class
-			$content = preg_replace( '/(<.*)(class\s*=\s*")(.*)"/i', '$1$2$3 '.$class.'"', $content, $limit );
-		}
-		else
-		{
-			$content = preg_replace( '/>/i', ' class="'.$class.'"$1>', $content, $limit );
-		}
-	}
+	global $add_class;
+	$add_class = $class;
+
+	$content = preg_replace_callback( '/<[^\/].*?>/i', 'callback_add_tag_class',
+		$content, $limit );
+
+	unset( $add_class );
 
 	return $content;
+}
+function callback_add_tag_class( $matches )
+{
+	global $add_class;
+	// Check if class attribute is already defined
+	if( preg_match( '/\sclass\s*=/i', $matches[0] ) )
+	{ // Insert class
+		//$content = preg_replace( '/(<.*)(class\s*=\s*")(.*)"/i', '$1$2$3 '.$class.'"', $content, $limit );
+		return preg_replace( '/(<[a-zA-z_:]\s*?.*?\s*?class=")(.*?)(".*?>)/i', '$1$2 '.$add_class.'$3', $matches[0] );
+	}
+	else
+	{
+		return preg_replace( '/>/i', ' class="'.$add_class.'"$1>', $matches[0] );
+	}
 }
 
 
@@ -3944,6 +3952,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'private_messages_unread_reminder':
 			case 'post_new':
 			case 'comment_new':
+			case 'comment_spam':
 			case 'account_activated':
 			case 'account_closed':
 			case 'account_reported':
@@ -4120,6 +4129,13 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 		  //   and with simple login text in PLAIN TEXT format
 			if( $format == 'html' )
 			{
+				$username = $User->get_colored_login( array(
+						'mask'      => '$avatar$ $login$',
+						'login_text'=> 'name',
+						'use_style' => true,
+						'protocol'  => 'http:',
+					) );
+
 				$user_login = $User->get_colored_login( array(
 						'mask'      => '$avatar$ $login$',
 						'use_style' => true,
@@ -4128,9 +4144,10 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 			}
 			else
 			{
+				$username = $User->get_username();
 				$user_login = $User->login;
 			}
-			$formated_message = str_replace( '$login$', $user_login, $formated_message );
+			$formated_message = str_replace( array( '$login$', '$username$' ), array( $user_login, $username ) , $formated_message );
 		}
 
 		$template_message .= $formated_message;
@@ -7129,6 +7146,13 @@ function evo_flush()
 		return;
 	}
 
+	// To fill the output buffer in order to flush data:
+	// NOTE: Uncomment the below line if flush doesn't work as expected
+	// echo str_repeat( ' ', 4096 );
+
+	// New line char is required as flag of that output portion is printed out:
+	echo "\n";
+
 	$zlib_output_compression = ini_get( 'zlib.output_compression' );
 	if( empty( $zlib_output_compression ) || $zlib_output_compression == 'Off' )
 	{ // This function helps to turn off output buffering
@@ -7542,7 +7566,8 @@ function echo_modalwindow_js_bootstrap()
 {
 	// Initialize variables for the file "bootstrap-evo_modal_window.js":
 	echo '<script type="text/javascript">
-		var evo_js_lang_close = \''.TS_('Close').'\';
+		var evo_js_lang_close = \''.TS_('Close').'\'
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 	</script>';
 }
 
@@ -7819,19 +7844,13 @@ jQuery( '.btn-group.dropdown.autoselected li a' ).click( function()
 	var item = jQuery( this ).parent();
 	var status = item.attr( 'rel' );
 	var btn_group = item.parent().parent();
-	var dropdown_buttons = btn_group.find( 'button' );
-	var first_button = dropdown_buttons.parent().find( 'button:first' );
+	var button = jQuery( item.parent().parent().find( 'button:first' ) );
 	var field_name = jQuery( this ).parent().parent().attr( 'aria-labelledby' );
 
 	// Change status class name to new changed for all buttons:
-	dropdown_buttons.each( function()
-	{
-		jQuery( this ).attr( 'class', jQuery( this ).attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + status ) );
-	} );
-
+	button.attr( 'class', button.attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + status ) );
 	// Update selector button to status title:
-	first_button.find( 'span:first' ).html( item.find( 'span:last' ).html() ); // update selector button to status title
-
+	button.find( 'span:first' ).html( item.find( 'span:last' ).html() ); // update selector button to status title
 	// Update hidden field to new status value:
 	jQuery( 'input[type=hidden][name=' + field_name + ']' ).val( status );
 	// Hide dropdown menu:
@@ -8256,6 +8275,8 @@ function render_inline_tags( $Object, $tags, $params = array() )
 		$params['Link'] = $Link;
 		$params[ $object_class ] = $Object;
 
+		$current_file_params = array();
+
 		switch( $inline_type )
 		{
 			case 'image':
@@ -8263,7 +8284,6 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				if( $File->is_image() )
 				{
 					$current_image_params = $params;
-					$current_file_params = array();
 
 					if( ! empty( $inline[3] ) ) // check if second colon is present
 					{

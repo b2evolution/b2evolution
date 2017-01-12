@@ -443,6 +443,23 @@ if( empty( $date_timezone ) && empty( $date_default_timezone ) )
 
 // pre_dump($action);
 
+if( isset( $basic_config_file_result ) && !$basic_config_file_result )
+{
+	if( ! empty( $basic_config_file_result_messages ) )
+	{ // Display messages that were generated on creating basic config file on quick installation:
+		echo $basic_config_file_result_messages;
+	}
+
+	if( $display == 'normal' )
+	{ // Set action to display a start form of installation:
+		$action = 'start';
+	}
+	else // 'compact'
+	{ // Use fake action to don't provide a form to set db access data on compact mode:
+		$action = 'none';
+	}
+}
+
 if( ( $config_is_done || $try_db_connect ) && ( $DB->error ) )
 { // DB connect was unsuccessful, restart conf
 	display_install_messages( T_('ERROR: Impossible to connect to Database.') );
@@ -545,66 +562,66 @@ switch( $action )
 			else
 			{
 
-			// Set default params if not provided otherwise:
-			param( 'conf_db_user', 'string', $db_config['user'] );
-			param( 'conf_db_password', 'raw', $db_config['password'] );
-			param( 'conf_db_name', 'string', $db_config['name'] );
-			param( 'conf_db_host', 'string', $db_config['host'] );
-			param( 'conf_db_tableprefix', 'string', $tableprefix );
-			// Guess baseurl:
-			// TODO: dh> IMHO HTTP_HOST would be a better default, because it's what the user accesses for install.
-			//       fp, please change it, if it's ok. SERVER_NAME might get used if HTTP_HOST is not given, but that shouldn't be the case normally.
-			// fp> ok for change and test after first 3.x-stable release
-			$baseurl = 'http://'.( isset( $_SERVER['SERVER_NAME'] ) ? $_SERVER['SERVER_NAME'] : 'yourserver.com' );
-			if( isset( $_SERVER['SERVER_PORT'] ) && ( $_SERVER['SERVER_PORT'] != '80' ) )
-				$baseurl .= ':'.$_SERVER['SERVER_PORT'];
+				// Set default params if not provided otherwise:
+				param( 'conf_db_user', 'string', $db_config['user'] );
+				param( 'conf_db_password', 'raw', $db_config['password'] );
+				param( 'conf_db_name', 'string', $db_config['name'] );
+				param( 'conf_db_host', 'string', $db_config['host'] );
+				param( 'conf_db_tableprefix', 'string', $tableprefix );
+				// Guess baseurl:
+				// TODO: dh> IMHO HTTP_HOST would be a better default, because it's what the user accesses for install.
+				//       fp, please change it, if it's ok. SERVER_NAME might get used if HTTP_HOST is not given, but that shouldn't be the case normally.
+				// fp> ok for change and test after first 3.x-stable release
+				$baseurl = 'http://'.( isset( $_SERVER['SERVER_NAME'] ) ? $_SERVER['SERVER_NAME'] : 'yourserver.com' );
+				if( isset( $_SERVER['SERVER_PORT'] ) && ( $_SERVER['SERVER_PORT'] != '80' ) )
+					$baseurl .= ':'.$_SERVER['SERVER_PORT'];
 
-			// ############ Get ReqPath & ReqURI ##############
-			list($ReqPath,$ReqURI) = get_ReqURI();
+				// ############ Get ReqPath & ReqURI ##############
+				list($ReqPath,$ReqURI) = get_ReqURI();
 
-			$baseurl .= preg_replace( '#/install(/(index.php)?)?$#', '', $ReqPath ).'/';
+				$baseurl .= preg_replace( '#/install(/(index.php)?)?$#', '', $ReqPath ).'/';
 
-			param( 'conf_baseurl', 'string', $baseurl );
-			param( 'conf_admin_email', 'string', $admin_email );
+				param( 'conf_baseurl', 'string', $baseurl );
+				param( 'conf_admin_email', 'string', $admin_email );
 
-			?>
+				?>
 
-			<p><?php echo T_('The basic configuration file (<code>/conf/_basic_config.php</code>) has not been created yet. You can do automatically generate it by filling out the form below.') ?></p>
+				<p><?php echo T_('The basic configuration file (<code>/conf/_basic_config.php</code>) has not been created yet. You can do automatically generate it by filling out the form below.') ?></p>
 
-			<p><?php echo T_('This is the minimum info we need to set up b2evolution on this server:') ?></p>
+				<p><?php echo T_('This is the minimum info we need to set up b2evolution on this server:') ?></p>
 
-			<?php
-			$Form = new Form( 'index.php' );
-
-			$Form->switch_template_parts( $booststrap_install_form_params );
-
-			$Form->begin_form( 'form-horizontal' );
-
-			$Form->hidden( 'action', 'conf' );
-			$Form->hidden( 'locale', $default_locale );
-
-			block_open( T_('Database you want to install into') );
-			?>
-				<p class="text-muted small"><?php echo T_('b2evolution stores blog posts, comments, user permissions, etc. in a MySQL database. You must create this database prior to installing b2evolution and provide the access parameters to this database below. If you are not familiar with this, you can ask your hosting provider to create the database for you.') ?></p>
 				<?php
-				$Form->checkbox( 'conf_create_db', param( 'conf_create_db', 'integer' ), '', T_('Try to create this DB if it doesn\'t exist yet (useful for developers)') );
-				$Form->text( 'conf_db_host', $conf_db_host, 16, T_('MySQL Host/Server'), sprintf( T_('Typically looks like "localhost" or "sql-6" or "sql-8.yourhost.net"...' ) ), 120 );
-				$Form->text( 'conf_db_name', $conf_db_name, 16, T_('MySQL Database'), sprintf( T_('Name of the MySQL database you have created on the server' ) ), 100);
-				$Form->text( 'conf_db_user', $conf_db_user, 16, T_('MySQL Username'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 );
-				$Form->text( 'conf_db_password', $conf_db_password, 16, T_('MySQL Password'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 ); // no need to hyde this. nobody installs b2evolution from a public place
-				// Too confusing for (most) newbies.	form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('MySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with this. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
-			block_close();
+				$Form = new Form( 'index.php' );
 
-			block_open( T_('Additional settings') );
-				$Form->text( 'conf_baseurl', $conf_baseurl, 50, T_('Base URL'), sprintf( T_('This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY or not much will work. If you want to test b2evolution on your local machine, in order for login cookies to work, you MUST use http://<strong>localhost</strong>/path... Do NOT use your machine\'s name!' ) ), 120 );
-				$Form->text( 'conf_admin_email', $conf_admin_email, 50, T_('Your email'), sprintf( T_('This is used to create your admin account. You will receive notifications for comments on your blog, etc.' ) ), 80 );
-			block_close();
+				$Form->switch_template_parts( $booststrap_install_form_params );
 
-			$Form->end_form( array( array( 'name' => 'submit', 'value' => T_('Update config file'), 'class' => 'btn-primary btn-lg' ),
-					array( 'type' => 'reset', 'value' => T_('Reset'), 'class' => 'btn-default btn-lg' )
-				) );
+				$Form->begin_form( 'form-horizontal' );
 
-			break;
+				$Form->hidden( 'action', 'conf' );
+				$Form->hidden( 'locale', $default_locale );
+
+				block_open( T_('Database you want to install into') );
+				?>
+					<p class="text-muted small"><?php echo T_('b2evolution stores blog posts, comments, user permissions, etc. in a MySQL database. You must create this database prior to installing b2evolution and provide the access parameters to this database below. If you are not familiar with this, you can ask your hosting provider to create the database for you.') ?></p>
+					<?php
+					$Form->checkbox( 'conf_create_db', param( 'conf_create_db', 'integer' ), '', T_('Try to create this DB if it doesn\'t exist yet (useful for developers)') );
+					$Form->text( 'conf_db_host', $conf_db_host, 16, T_('MySQL Host/Server'), sprintf( T_('Typically looks like "localhost" or "sql-6" or "sql-8.yourhost.net"...' ) ), 120 );
+					$Form->text( 'conf_db_name', $conf_db_name, 16, T_('MySQL Database'), sprintf( T_('Name of the MySQL database you have created on the server' ) ), 100);
+					$Form->text( 'conf_db_user', $conf_db_user, 16, T_('MySQL Username'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 );
+					$Form->text( 'conf_db_password', $conf_db_password, 16, T_('MySQL Password'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 ); // no need to hyde this. nobody installs b2evolution from a public place
+					// Too confusing for (most) newbies.	form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('MySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with this. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
+				block_close();
+
+				block_open( T_('Additional settings') );
+					$Form->text( 'conf_baseurl', $conf_baseurl, 50, T_('Base URL'), sprintf( T_('This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY or not much will work. If you want to test b2evolution on your local machine, in order for login cookies to work, you MUST use http://<strong>localhost</strong>/path... Do NOT use your machine\'s name!' ) ), 120 );
+					$Form->text( 'conf_admin_email', $conf_admin_email, 50, T_('Your email'), sprintf( T_('This is used to create your admin account. You will receive notifications for comments on your blog, etc.' ) ), 80 );
+				block_close();
+
+				$Form->end_form( array( array( 'name' => 'submit', 'value' => T_('Update config file'), 'class' => 'btn-primary btn-lg' ),
+						array( 'type' => 'reset', 'value' => T_('Reset'), 'class' => 'btn-default btn-lg' )
+					) );
+
+				break;
 			}
 		}
 		// if config was already done, move on to main menu:
@@ -955,6 +972,12 @@ switch( $action )
 		$create_sample_contents = param( 'create_sample_contents', 'string', false, true );   // during auto install this param can be 'all'
 		$create_sample_organization = param( 'create_sample_organization', 'boolean', false, true );
 		$create_demo_users = param( 'create_demo_users', 'boolean', false, true );
+
+		if( $create_sample_contents == 'all' )
+		{ // Override create sample organization and demo user setting
+			$create_sample_organization = true;
+			$create_demo_users = true;
+		}
 
 		if( $allow_install_test_features )
 		{	// Allow to use $allow_install_test_features from request only when it is enabled in config:

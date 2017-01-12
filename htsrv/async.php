@@ -44,6 +44,9 @@ if( empty($current_User) || ! $current_User->check_perm( 'admin', 'restricted' )
 	require $adminskins_path.'_access_denied.main.php';
 }
 
+// Send the predefined cookies:
+evo_sendcookies();
+
 // Make sure the async responses are never cached:
 header_nocache();
 header_content_type( 'text/html', $io_charset );
@@ -75,6 +78,51 @@ $add_response_end_comment = true;
 //     output only a small part of what the "real controller" does..
 switch( $action )
 {
+	case 'get_whois_info':
+		param( 'query', 'string' );
+		param( 'window_height', 'integer' );
+
+		load_class('_ext/phpwhois/whois.main.php', 'whois' );
+
+		$whois = new Whois();
+
+		// Set to true if you want to allow proxy requests
+		$allowproxy = false;
+
+		// get faster but less acurate results
+		$whois->deep_whois = empty( $_GET['fast'] );
+
+		// To use special whois servers (see README)
+		//$whois->UseServer( 'uk', 'whois.nic.uk:1043?{hname} {ip} {query}' );
+		//$whois->UseServer( 'au', 'whois-check.ausregistry.net.au' );
+
+		// Comment the following line to disable support for non ICANN tld's
+		$whois->non_icann = true;
+
+		$result = $whois->Lookup( $query );
+
+		$winfo = '<pre style="height: '.( $window_height - 200 ).'px; overflow: auto;">';
+		if( ! empty( $result['rawdata'] ) )
+		{
+			// Highlight lines starting with orgname: or org-name: (case insensitive)
+			for( $i = 0; $i < count( $result['rawdata'] ); $i++ )
+			{
+				if( preg_match( '/^(orgname:|org-name:)/i', $result['rawdata'][$i] ) )
+				{
+					$result['rawdata'][$i] = '<span style="font-weight: bold; background-color: yellow;">'.$result['rawdata'][$i].'</span>';
+				}
+			}
+			$winfo .= format_to_output( implode( $result['rawdata'], "\n" ) );
+		}
+		else
+		{
+			$winfo = format_to_output( implode( $whois->Query['errstr'], "\n" ) )."<br></br>";
+		}
+		$winfo .= '</pre>';
+
+		echo $winfo;
+		break;
+
 	case 'add_plugin_sett_set':
 		// Dislay a new Plugin(User)Settings set ( it's used only from plugins with "array" type settings):
 
@@ -368,23 +416,14 @@ switch( $action )
 		}
 
 		if( in_array( $request_from, array( 'items', 'comments' ) ) )
-		{ // AJAX request goes from backoffice and ctrl = items or comments
-			if( strlen($statuses) > 2 )
-			{
-				$statuses = substr( $statuses, 1, strlen($statuses) - 2 );
-			}
-			$status_list = explode( ',', $statuses );
-			if( $status_list == NULL )
-			{
-				$status_list = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
-			}
+		{	// AJAX request goes from backoffice and ctrl = items or comments:
 
 			// In case of comments_fullview we must set a filterset name to be abble to restore filterset.
 			// If $item_ID is not valid, then this requests came from the comments_fullview
 			// TODO: asimo> This should be handled with a better solution
 			$filterset_name = /*'';*/( $item_ID > 0 ) ? '' : 'fullview';
 
-			echo_item_comments( $blog, $item_ID, $status_list, $currentpage, $limit, array(), $filterset_name, $expiry_status, $comment_type );
+			echo_item_comments( $blog, $item_ID, $statuses, $currentpage, $limit, array(), $filterset_name, $expiry_status, $comment_type );
 		}
 		break;
 
@@ -435,18 +474,8 @@ switch( $action )
 		$AdminUI = new AdminUI();
 
 		if( in_array( $request_from, array( 'items', 'comments' ) ) )
-		{ // AJAX request goes from backoffice and ctrl = items or comments
-			if( strlen($statuses) > 2 )
-			{
-				$statuses = substr( $statuses, 1, strlen($statuses) - 2 );
-			}
-			$status_list = explode( ',', $statuses );
-			if( $status_list == NULL )
-			{ // init statuses
-				$status_list = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
-			}
-
-			echo_item_comments( $blog, $item_ID, $status_list, $currentpage, NULL, array(), '', $expiry_status, $comment_type );
+		{	// AJAX request goes from backoffice and ctrl = items or comments
+			echo_item_comments( $blog, $item_ID, $statuses, $currentpage, NULL, array(), '', $expiry_status, $comment_type );
 		}
 		elseif( $request_from == 'dashboard' || $request_from == 'coll_settings' )
 		{ // AJAX request goes from backoffice dashboard
@@ -681,6 +710,37 @@ switch( $action )
 
 		// Return a link to make the cell editable on next time
 		echo '<a href="#" rel="'.$new_value.'"'.$new_attrs.'>'.$new_title.'</a>';
+		break;
+
+	case 'item_order_edit':
+		// Update an order of Item from list screen by clicking on the cell:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'itemorder' );
+
+		$item_order = param( 'new_item_order', 'string' );
+		$post_ID = param( 'post_ID', 'integer' );
+
+		$ItemCache = & get_ItemCache();
+		$Item = & $ItemCache->get_by_ID( $post_ID );
+
+		// Check permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $Item );
+
+		if( $item_order === '-' || $item_order === '' )
+		{	// Set NULL for these values:
+			$item_order = NULL;
+		}
+		else
+		{	// Make an order to integer:
+			$item_order = intval( $item_order );
+		}
+
+		$Item->set( 'order', $item_order, true );
+		$Item->dbupdate();
+
+		// Return a link to make the cell editable on next time:
+		echo '<a href="#" rel="'.$Item->ID.'">'.( $item_order === NULL ? '-' : $item_order ).'</a>';
 		break;
 
 	case 'cat_order_edit':

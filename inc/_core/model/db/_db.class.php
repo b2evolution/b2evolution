@@ -1537,7 +1537,7 @@ class DB
 
 
 	/**
-	 * BEGIN A TRANSCATION
+	 * BEGIN A TRANSACTION
 	 *
 	 * Note:  By default, MySQL runs with autocommit mode enabled.
 	 * This means that as soon as you execute a statement that updates (modifies)

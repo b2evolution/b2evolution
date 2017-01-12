@@ -2366,17 +2366,17 @@ function check_coll_first_perm( $perm_name, $target_type, $target_ID )
  * Display user edit forms action icons
  *
  * @param object Widget(Form,Table,Results) where to display
- * @param objcet Edited User
+ * @param object Edited User
  * @param string the action string, 'view' or 'edit'
  */
 function echo_user_actions( $Widget, $edited_User, $action )
 {
 	global $current_User, $admin_url;
 
+	$link_attribs = array( 'style' => 'margin-left:1ex; margin-bottom:1ex;', 'class' => 'btn btn-sm btn-default action_icon' );
+
 	if( $edited_User->ID != 0 )
 	{ // show these actions only if user already exists
-
-		$link_attribs = array( 'style' => 'margin-left:1ex', 'class' => 'btn btn-sm btn-default action_icon' );
 
 		if( $current_User->ID != $edited_User->ID && $current_User->check_status( 'can_report_user' ) )
 		{
@@ -2416,7 +2416,7 @@ function echo_user_actions( $Widget, $edited_User, $action )
 	{
 		$redirect_to = regenerate_url( 'user_ID,action,ctrl,user_tab', 'ctrl=users' );
 	}
-	$Widget->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', $redirect_to, T_('Close'), 4 , 1 );
+	$Widget->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', $redirect_to, T_('Close'), 4 , 1, $link_attribs );
 }
 
 
@@ -2628,7 +2628,7 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 	$user_status = ' <small>('.$user_status_icons[ $edited_User->get( 'status' ) ].' '.$user_status_titles[ $edited_User->get( 'status' ) ].')</small>';
 
 	// set title
-	$form_title = '<h2 class="user_title">'.$edited_User->get_colored_login( array( 'login_text' => 'name' ) ).$user_status.' &ndash; '.$user_tab_title.'</h2>';
+	$form_title = '<h2 class="user_title">'.$edited_User->get_colored_login( array( 'login_text' => 'name' ) ).'<span class="nowrap">'.$user_status.' &ndash;</span> '.$user_tab_title.'</h2>';
 
 	// set avatar tag
 	$avatar_tag = $edited_User->get_avatar_imgtag( 'crop-top-48x48', 'floatleft', '', true );
@@ -2638,7 +2638,7 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 	$AdminUI->set_path( 'users', 'users', $user_tab );
 	$user_menu3 = $AdminUI->get_html_menu( array( 'users', 'users' ), 'menu3' );
 
-	$result = $avatar_tag.'<div class="user_header_content">'.$form_title.$user_menu3.'</div>';
+	$result = $avatar_tag.'<div class="user_header_content">'.$form_title.'</div></div></div></div><div class="row"><div class="col-xs-12"><div class="user_header"><div class="user_header_content">'.$user_menu3.'</div>';
 	return '<div class="user_header">'.$result.'</div>'.'<div class="clear"></div>';
 }
 
@@ -3022,20 +3022,14 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 			$Form->begin_fieldset( $userfield->ufgp_name.( is_admin_page() ? get_manual_link( 'user-profile-tab-userfields' ) : '' ) , array( 'id' => $userfield->ufgp_ID ) );
 		}
 
-		$userfield_type = $userfield->ufdf_type;
-		if( $userfield_type == 'number' )
-		{	// Change number type of integer because we have this type name preparing in function param():
-			$userfield_type = 'integer';
-		}
-		elseif( $userfield_type != 'text' && $userfield_type != 'url' )
-		{	// Use all other params as string, Only text and url have a preparing in function param():
-			$userfield_type = 'string';
-		}
-		$uf_val = param( 'uf_'.$userfield->uf_ID, $userfield_type, NULL );
+		// Get a value of existing field in DB (after submit form):
+		$uf_val = param( 'uf_'.$userfield->uf_ID, 'raw', NULL );
 
 		$uf_ID = $userfield->uf_ID;
 		if( $userfield->uf_ID == '0' )
-		{	// Set uf_ID for new (not saved) fields (recommended & require types)
+		{	// Try to get a value of new added field (not saved in DB) (recommended & require types):
+
+			// Set uf_ID for new field:
 			$userfield->uf_ID = $new_field_name.'['.$userfield->ufdf_ID.'][]';
 
 			$value_num = 'uf_'.$new_field_name.'_'.$userfield->ufdf_ID.'prev_value_num';
@@ -3044,30 +3038,6 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 			if( isset( $uf_new_fields[$userfield->ufdf_ID][$$value_num] ) )
 			{	// Get a value from submitted form:
 				$uf_val = $uf_new_fields[$userfield->ufdf_ID][$$value_num];
-				switch( $userfield->ufdf_type )
-				{
-					case 'url':
-						// Format url field to valid value:
-						$uf_val = param_format( $uf_val, 'url' );
-						break;
-
-					case 'text':
-						// Format text field to valid value:
-						$uf_val = param_format( $uf_val, 'text' );
-						break;
-
-					case 'number':
-						// Format number field to valid value:
-						$uf_val = param_format( $uf_val, 'integer' );
-						break;
-
-					case 'email':
-					case 'word':
-					case 'phone':
-						// Format string fields to valid value:
-						$uf_val = param_format( $uf_val, 'string' );
-						break;
-				}
 				$$value_num++;
 			}
 		}
@@ -3075,6 +3045,19 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 		if( is_null( $uf_val ) )
 		{	// No value submitted yet, get DB val:
 			$uf_val = $userfield->uf_varchar;
+		}
+		else
+		{	// Format a submitted value for valid format:
+			$userfield_type = $userfield->ufdf_type;
+			if( $userfield_type == 'number' )
+			{	// Change number type of integer because we have this type name preparing in function param_format():
+				$userfield_type = 'integer';
+			}
+			elseif( $userfield_type != 'text' && $userfield_type != 'url' )
+			{	// Use all other params as string, Only text and url have a preparing in function param_format():
+				$userfield_type = 'string';
+			}
+			$uf_val = param_format( $uf_val, $userfield_type );
 		}
 
 		$field_note = '';
@@ -3747,7 +3730,7 @@ function add_report_from( $user_ID, $status, $info )
 							'report_status'  => get_report_status_text( $status ),
 							'report_info'    => $info,
 							'user_ID'        => $user_ID,
-							'reported_by'    => $current_User->login,
+							'reported_by'    => $current_User->get_username(),
 						);
 		// send notificaiton ( it will be send to only those users who want to receive this kind of notifications )
 		send_admin_notification( NT_('User account reported'), 'account_reported', $email_template_params );
@@ -4575,6 +4558,34 @@ function echo_user_edit_membership_js( $edited_Organization )
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_edit_membership = \''.TS_('Edit membership').get_manual_link( 'edit-user-membership' ).'\';
 		var evo_js_lang_edit = \''.TS_('Edit').'\';
+		var evo_js_user_org_ajax_url = \''.$admin_url.'\';
+		var evo_js_crumb_organization = \''.get_crumb( 'organization' ).'\';
+	</script>';
+}
+
+
+/**
+ * Initialize JavaScript for AJAX loading of popup window to confirm removal of user from organization
+ *
+ * @param object Organization
+ */
+function echo_user_remove_membership_js( $edited_Organization )
+{
+	global $admin_url, $current_User;
+
+	if( ! $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
+	{	// User must has an edit perm to remove user in organization:
+		return;
+	}
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_deldata.js":
+	echo '<script type="text/javascript">
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_remove_user_membership = \''.TS_('WARNING').'\';
+		var evo_js_lang_remove = \''.TS_('Continue').'\';
 		var evo_js_user_org_ajax_url = \''.$admin_url.'\';
 		var evo_js_crumb_organization = \''.get_crumb( 'organization' ).'\';
 	</script>';
@@ -6042,6 +6053,10 @@ function user_td_org_actions( $org_ID, $user_ID )
 				'onclick' => 'return user_edit( '.$org_ID.', '.$user_ID.' );'
 			);
 		$r .= action_icon( T_('Edit membership...'), 'edit', '#', NULL, NULL, NULL, $link_params );
+		$link_params = array(
+				'onclick' => 'return user_remove( '.$org_ID.', '.$user_ID.' );'
+			);
+		$r .= action_icon( T_('Remove user from organization'), 'delete', '#', NULL, NULL, NULL, $link_params );
 	}
 	else
 	{

@@ -374,8 +374,16 @@ switch( $action )
 			if( $User->check_status( 'is_validated' ) )
 			{ // Already activated, e.g. clicked on an obsolete email link:
 				$Messages->add( T_('Your account has already been activated.'), 'note' );
-				$action = 'req_login';
-				break;
+				if( is_logged_in() )
+				{	// Redirect to base url if user is already logged in:
+					header_redirect( $baseurl );
+					/* exited */
+				}
+				else
+				{	// Display a login form if user is not logged in yet:
+					$action = 'req_login';
+					break;
+				}
 			}
 			elseif( $User->check_status( 'is_closed' ) )
 			{ // Account was closed, don't let to activate the account

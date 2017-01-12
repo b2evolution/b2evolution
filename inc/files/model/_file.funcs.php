@@ -2044,7 +2044,8 @@ function copy_file( $file_path, $root_ID, $path, $check_perms = true )
 		if( $correct_Filetype && $correct_Filetype->is_allowed() )
 		{	// A FileType with the given mime type exists in database and it is an allowed file type for current User
 			// The "correct" extension is a plausible one, proceed...
-			$correct_extension = array_shift($correct_Filetype->get_extensions());
+			$correct_extensions = $correct_Filetype->get_extensions();
+			$correct_extension = array_shift( $correct_extensions );
 			$path_info = pathinfo($newName);
 			$current_extension = $path_info['extension'];
 
@@ -2319,10 +2320,10 @@ function display_dragdrop_upload_button( $params = array() )
 				sizeLimit: <?php echo ( $Settings->get( 'upload_maxkb' ) * 1024 ); ?>,
 				debug: true,
 				messages: {
-					typeError: '<?php echo TS_('{file} has an invalid extension. Only {extensions} are allowed.'); ?>',
-					sizeError: '<?php echo TS_('{file} cannot be uploaded because it is too large ({fileSize}). The maximum allowed upload size is {sizeLimit}.'); ?>',
-					minSizeError: '<?php echo TS_('{file} is too small. The minimum file size is {minSizeLimit}.'); ?>',
-					emptyError: '<?php echo TS_('{file} is empty. Please select non-empty files.'); ?>',
+					typeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} has an invalid extension. Only {extensions} are allowed.'); ?>',
+					sizeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} cannot be uploaded because it is too large ({fileSize}). The maximum allowed upload size is {sizeLimit}.'); ?>',
+					minSizeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} is too small. The minimum file size is {minSizeLimit}.'); ?>',
+					emptyError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} is empty. Please select non-empty files.'); ?>',
 					onLeave: '<?php echo TS_('Files are currently being uploaded. If you leave this page now, the upload will be cancelled.'); ?>'
 				},
 				onSubmit: function( id, fileName )
@@ -2436,9 +2437,9 @@ function display_dragdrop_upload_button( $params = array() )
 								+ '<span class="fname">' + file_name + '</span>'
 								<?php echo ( $params['status_conflict_place'] == 'before_button' ) ? "+ ' - ".$status_conflict_message."'" : ''; ?>
 								+ ' - <a href="#" '
-								+ 'class="<?php echo button_class( 'text' ); ?> roundbutton_text_noicon qq-conflict-replace" '
-								+ 'old="' + responseJSON.success.oldpath + '" '
-								+ 'new="' + responseJSON.success.newpath + '">'
+								+ 'class="<?php echo button_class( 'text_warning' ); ?> btn-sm roundbutton_text_noicon qq-conflict-replace" '
+								+ 'old="' + responseJSON.success.oldname + '" '
+								+ 'new="' + responseJSON.success.newname + '">'
 								+ '<div><?php echo TS_('Use this new file to replace the old file'); ?></div>'
 								+ '<div style="display:none"><?php echo TS_('Revert'); ?></div>'
 								+ '</a>'

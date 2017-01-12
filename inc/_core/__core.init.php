@@ -763,13 +763,13 @@ class _core_Module extends Module
 				array( 'label' => T_( 'New Comment subscription notifications' ) ), $notifications_array
 				),
 			'comment_moderation_notif' => array_merge(
-				array( 'label' => T_( 'New Comment moderation notifications' ) ), $notifications_array
+				array( 'label' => T_( 'Comment moderation notifications' ) ), $notifications_array
 				),
 			'post_subscription_notif' => array_merge(
 				array( 'label' => T_( 'New Post subscription notifications' ) ), $notifications_array
 				),
 			'post_moderation_notif' => array_merge(
-				array( 'label' => T_( 'New Post moderation notifications' ) ), $notifications_array
+				array( 'label' => T_( 'Post moderation notifications' ) ), $notifications_array
 				),
 			'cross_country_allow_profiles' => array(
 				'label' => T_('Users'),

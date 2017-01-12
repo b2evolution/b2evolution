@@ -5564,11 +5564,15 @@ class Item extends ItemLight
 			$this->set_creator_User( $current_User );
 		}
 
-		// Create new slug with validated title
-		$new_Slug = new Slug();
-		$new_Slug->set( 'title', urltitle_validate( $this->urltitle, $this->title, $this->ID, false, $new_Slug->dbprefix.'title', $new_Slug->dbprefix.'itm_ID', $new_Slug->dbtablename, $this->locale ) );
-		$new_Slug->set( 'type', 'item' );
-		$this->set( 'urltitle', $new_Slug->get( 'title' ) );
+		// Validate urltitle/slug:
+		$orig_urltitle = $this->urltitle;
+		$urltitles = explode( ',', $this->urltitle );
+		foreach( $urltitles as $u => $urltitle_value )
+		{
+			$urltitles[ $u ] = utf8_trim( $urltitle_value );
+		}
+		$orig_urltitle = implode( ',', array_unique( $urltitles ) );
+		$this->set( 'urltitle', urltitle_validate( $urltitles[0], $this->title, $this->ID, false, 'slug_title', 'slug_itm_ID', 'T_slug', $this->locale ) );
 
 		$this->update_renderers_from_Plugins();
 
@@ -5622,8 +5626,25 @@ class Item extends ItemLight
 			}
 
 			// Let's handle the slugs:
-			// set slug item ID:
-			$new_Slug->set( 'itm_ID', $this->ID );
+			$new_slugs = $this->update_slugs( $orig_urltitle );
+
+			if( $result && ! empty( $new_slugs ) )
+			{	// If we have new created slugs, we have to insert it into the database:
+				foreach( $new_slugs as $s => $new_Slug )
+				{
+					if( $new_Slug->ID == 0 )
+					{	// Insert only new created slugs:
+						if( ! $new_Slug->dbinsert() )
+						{
+							$result = false;
+						}
+						elseif( $s == 0 )
+						{
+							$new_canonical_Slug = $new_slugs[0];
+						}
+					}
+				}
+			}
 
 			// Create tiny slug:
 			$new_tiny_Slug = new Slug();
@@ -5633,9 +5654,9 @@ class Item extends ItemLight
 			$new_tiny_Slug->set( 'type', 'item' );
 			$new_tiny_Slug->set( 'itm_ID', $this->ID );
 
-			if( $result && ( $result = ( $new_Slug->dbinsert() && $new_tiny_Slug->dbinsert() ) ) )
+			if( $result && ( $result = ( isset( $new_canonical_Slug ) && $new_tiny_Slug->dbinsert() ) ) )
 			{
-				$this->set( 'canonical_slug_ID', $new_Slug->ID );
+				$this->set( 'canonical_slug_ID', $new_canonical_Slug->ID );
 				$this->set( 'tiny_slug_ID', $new_tiny_Slug->ID );
 				if( $result = parent::dbupdate() )
 				{
@@ -5870,8 +5891,12 @@ class Item extends ItemLight
 		else
 		{ // Update was successful
 			if( $db_changed )
-			{ // There were some db modification, delete prerendered content
+			{	// There were some db modification
+				// Delete prerendered content:
 				$this->delete_prerendered_content();
+
+				// Update comments of this Item:
+				$this->update_comments();
 			}
 
 			$DB->commit();
@@ -5950,6 +5975,54 @@ class Item extends ItemLight
 		}
 
 		return $edited_slugs;
+	}
+
+
+	/**
+	 * Update comments of this Item
+	 */
+	function update_comments()
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{	// This function can works only with existing Item:
+			return;
+		}
+
+		if( isset( $this->previous_status ) )
+		{	// Restrict comments status by this Item status if it has been changed:
+			$max_allowed_comment_status = $this->get( 'status' );
+			if( $max_allowed_comment_status == 'redirected' )
+			{	// Comments cannot have a status "Redirected", so reduce them only to "Deprecated":
+				$max_allowed_comment_status = 'deprecated';
+			}
+
+			$ordered_statuses = get_visibility_statuses( 'ordered-index' );
+			$reduce_comment_status = false;
+			$reduced_statuses = array();
+			foreach( $ordered_statuses as $status_key => $status_order )
+			{
+				if( $status_key == $max_allowed_comment_status )
+				{	// This status is max allowed for item's comments, Reduce all next higher statuses:
+					$reduce_comment_status = true;
+					continue;
+				}
+				if( $reduce_comment_status )
+				{	// This comment status must be reduced to current status of this Item:
+					$reduced_statuses[] = $status_key;
+				}
+			}
+
+			if( ! empty( $reduced_statuses ) )
+			{	// Reduce statuses of item's comments to current status of this Item:
+				$DB->query( 'UPDATE T_comments
+					  SET comment_status = '.$DB->quote( $max_allowed_comment_status ).'
+					WHERE comment_item_ID = '.$this->ID.'
+					  AND comment_status IN ( '.$DB->quote( $reduced_statuses ).' )',
+					'Reduce comments statutes to status of Item #'.$this->ID );
+			}
+		}
 	}
 
 
@@ -6794,7 +6867,7 @@ class Item extends ItemLight
 	 */
 	function send_outbound_pings( $force_pings = false )
 	{
-		global $Plugins, $baseurl, $Messages, $evonetsrv_host, $test_pings_for_real;
+		global $Plugins, $baseurl, $Messages, $evonetsrv_host, $allow_post_pings_on_localhost;
 
 		if( ! $this->notifications_allowed() )
 		{	// Don't send pings about some post/usages like "special":
@@ -6837,19 +6910,13 @@ class Item extends ItemLight
 			}
 		}
 
-		load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
-
-		$this->load_Blog();
-		$ping_plugins = trim( $this->Blog->get_setting( 'ping_plugins' ) );
-		$ping_plugins = empty( $ping_plugins ) ? array() :  array_unique( explode( ',', $this->Blog->get_setting( 'ping_plugins' ) ) );
-
 		// init result
 		$r = true;
 
-		if( (preg_match( '#^http://localhost[/:]#', $baseurl)
-				|| preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) ) /* domain ending in ".local" */
-			&& $evonetsrv_host != 'localhost'	// OK if we are pinging locally anyway ;)
-			&& empty($test_pings_for_real) )
+		if( empty( $allow_post_pings_on_localhost ) &&
+		    $evonetsrv_host != 'localhost' && // OK if we are pinging locally anyway ;)
+		    ( preg_match( '#^http://localhost[/:]#', $baseurl ) ||
+		      preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) ) ) /* domain ending in ".local" */
 		{	// Don't send pings from localhost:
 			$Messages->add_to_group( T_('Skipping pings (Running on localhost).'), 'note', T_('Sending notifications:') );
 			return false;
@@ -6857,6 +6924,12 @@ class Item extends ItemLight
 		else
 		{	// Send pings:
 			$Messages->add_to_group( T_('Trying to find plugins for sending outbound pings...'), 'note', T_('Sending notifications:') );
+
+			load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
+
+			$this->load_Blog();
+			$ping_plugins = trim( $this->Blog->get_setting( 'ping_plugins' ) );
+			$ping_plugins = empty( $ping_plugins ) ? array() :  array_unique( explode( ',', $this->Blog->get_setting( 'ping_plugins' ) ) );
 
 			foreach( $ping_plugins as $plugin_code )
 			{
@@ -8432,67 +8505,8 @@ class Item extends ItemLight
 			return false;
 		}
 
-		// Load collection of this Item:
-		$this->load_Blog();
-
-		// Get item statuses which are visible on front-office:
-		$show_statuses = get_inskin_statuses( $this->Blog->ID, 'post' );
-
-		if( ! in_array( $this->get( 'status' ), $show_statuses ) )
-		{	// This Item has a status which cannot be displayed on front-office:
-			return false;
-		}
-
-		global $current_User;
-		$is_logged_in = is_logged_in( false );
-
-		switch( $this->get( 'status' ) )
-		{
-			case 'published':
-				// Published posts are always allowed:
-				$allowed = true;
-				break;
-
-			case 'community':
-				// It is always allowed for logged in users:
-				$allowed = $is_logged_in;
-				break;
-
-			case 'protected':
-				// It is always allowed for members:
-				$allowed = ( $is_logged_in && $current_User->check_perm( 'blog_ismember', 1, false, $this->Blog->ID ) );
-				break;
-
-			case 'private':
-				// It is allowed for users who has global 'editall' permission:
-				$allowed = ( $is_logged_in && $current_User->check_perm( 'blogs', 'editall' ) );
-				if( ! $allowed && $is_logged_in && $current_User->check_perm( 'blog_post!private', 'create', false, $this->Blog->ID ) )
-				{	// Own private posts are allowed if user can create private posts:
-					$allowed = ( $current_User->ID == $this->creator_user_ID );
-				}
-				break;
-
-			case 'review':
-				// It is allowed for users who have at least 'lt' posts edit permission :
-				$allowed = ( $is_logged_in && $current_User->check_perm( 'blog_post!review', 'moderate', false, $this->Blog->ID ) );
-				if( ! $allowed && $is_logged_in && $current_User->check_perm( 'blog_post!review', 'create', false, $this->Blog->ID ) )
-				{	// Own posts with 'review' status are allowed if user can create posts with 'review' status
-					$allowed = ( $current_User->ID == $this->creator_user_ID );
-				}
-				break;
-
-			case 'draft':
-				// In front-office only authors may see their own draft posts, but only if the have permission to create draft posts:
-				$allowed = ( $is_logged_in && $current_User->check_perm( 'blog_post!draft', 'create', false, $this->Blog->ID )
-					&& $current_User->ID == $this->creator_user_ID );
-				break;
-
-			default:
-				// Decide the unknown item statuses as not visible for front-office:
-				$allowed = false;
-		}
-
-		return $allowed;
+		// Check if this Item can be displayed with current status:
+		return can_be_displayed_with_status( $this->get( 'status' ), 'post', $this->get_blog_ID(), $this->creator_user_ID );
 	}
 
 
