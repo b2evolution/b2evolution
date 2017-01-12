@@ -45,11 +45,11 @@ $Form->begin_fieldset( T_('Access information for database of phpBB forum') );
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Select a blog for import') );
+$Form->begin_fieldset( T_('Destination collection') );
 
 	$BlogCache = & get_BlogCache();
 
-	$Form->select_input_object( 'forum_blog_ID', param( 'forum_blog_ID', 'integer', phpbb_get_var( 'blog_ID' ) ), $BlogCache, T_('Blog for import'), array(
+	$Form->select_input_object( 'forum_blog_ID', param( 'forum_blog_ID', 'integer', phpbb_get_var( 'blog_ID' ) ), $BlogCache, T_('Destination collection'), array(
 			'note' => T_('Select the destination forum collection.').' <a href="'.$admin_url.'?ctrl=collections&action=new">'.T_('Create new collection').' &raquo;</a>',
 			'allow_none' => true,
 			'object_callback' => 'get_option_list_forums' ) );
