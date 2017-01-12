@@ -71,3 +71,30 @@ function user_edit( org_ID, user_ID )
 
 	return false;
 }
+
+function user_remove( org_ID, user_ID )
+{
+	openModalWindow( '<span class="loader_img loader_user_deldata absolute_center" title="' + evo_js_lang_loading + '"></span>',
+			'450px', '', true,
+			'<span class="text-danger">' + evo_js_lang_remove_user_membership + '</span>', evo_js_lang_remove, true );
+
+	jQuery.ajax(
+	{
+		type: 'POST',
+		url: evo_js_user_org_ajax_url,
+		data:
+		{
+			'ctrl': 'organizations',
+			'action': 'remove_user',
+			'user_ID': user_ID,
+			'display_mode': 'js',
+			'crumb_user': evo_js_crumb_organization,
+		},
+		success: function( result )
+		{
+			openModalWindow( result, '450px', '', true, '<span class="text-danger">' + evo_js_lang_remove_user_membership + '</span>', evo_js_lang_remove );
+		}
+	});
+
+	return false;
+}

@@ -252,6 +252,41 @@ switch( $action )
 		header_redirect( '?ctrl=organizations&action=edit&org_ID='.$edited_Organization->ID.'&filter=refresh', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
+
+	case 'unlink_user':
+		// Remove user from organization:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'organization' );
+
+		// Check permission:
+		$current_User->check_perm( 'orgs', 'edit', true, $edited_Organization );
+
+		$user_login = param( 'user_login', 'string', NULL );
+		param_check_not_empty( 'user_login', T_('Please enter the login of the user you wish to add.') );
+		if( ! empty( $user_login ) )
+		{	// If the login is entered:
+			$UserCache = & get_UserCache();
+			$login_User = & $UserCache->get_by_login( $user_login );
+			if( empty( $login_User ) )
+			{	// Wrong entered login:
+				param_error( 'user_login', sprintf( T_('User &laquo;%s&raquo; does not exist!'), $user_login ) );
+			}
+		}
+
+		if( ! param_errors_detected() )
+		{	// Link user only when request has no errors:
+			$result = $DB->query( 'DELETE FROM T_users__user_org WHERE uorg_user_ID = '.$login_User->ID.' AND uorg_org_ID = '.$edited_Organization->ID );
+			if( $result )
+			{	// Display a message after successful linking:
+				$Messages->add( sprintf( T_('%s removed removed from the organization.'), $login_User->get( 'preferredname') ), 'success');
+			}
+		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=organizations&action=edit&org_ID='.$edited_Organization->ID.'&filter=refresh', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
 }
 
 if( $display_mode != 'js')
@@ -308,6 +343,7 @@ switch( $action )
 		// Init JS for form to add user to organization:
 		echo_user_add_organization_js( $edited_Organization );
 		echo_user_edit_membership_js( $edited_Organization );
+		echo_user_remove_membership_js( $edited_Organization );
 		break;
 
 	case 'add_user':
@@ -330,6 +366,14 @@ switch( $action )
 		$AdminUI->disp_view( 'users/views/_organization_user_edit.form.php' );
 		break;
 
+	case 'remove_user':
+		if( $display_mode == 'js' )
+		{
+			$debug = false;
+			$debug_jslog = false;
+		}
+		$AdminUI->disp_view( 'users/views/_organization_user_remove.form.php' );
+		break;
 
 	default:
 		// No specific request, list all organizations:
