@@ -2031,15 +2031,15 @@ function get_param_urlencoded($var, $value, $glue = '&amp;')
  */
 function is_regexp( $reg_exp, $includes_delim = false )
 {
-	$sPREVIOUSHANDLER = set_error_handler( '_trapError' );
+	set_error_handler( '_trapError' );
 	if( ! $includes_delim )
 	{
 		$reg_exp = '#'.str_replace( '#', '\#', $reg_exp ).'#';
 	}
 	preg_match( $reg_exp, '' );
-	restore_error_handler( $sPREVIOUSHANDLER );
+	restore_error_handler();
 
-	return !_traperror();
+	return !_trapError();
 }
 
 
