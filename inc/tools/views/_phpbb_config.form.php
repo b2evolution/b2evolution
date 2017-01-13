@@ -15,7 +15,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $phpbb_db_config, $phpbb_blog_ID, $phpbb_tool_title, $admin_url;
+global $phpbb_db_config, $phpbb_blog_ID, $phpbb_tool_title, $admin_url, $phpbb_version;
 
 phpbb_display_steps( 1 );
 
@@ -42,6 +42,11 @@ $Form->begin_fieldset( T_('Access information for database of phpBB forum') );
 	$Form->text( 'db_prefix', param( 'db_prefix', 'string', $phpbb_db_config['prefix'] ), 20, T_('Table prefix') );
 
 	$Form->text( 'path_avatars', param( 'path_avatars', 'string', phpbb_get_var( 'path_avatars' ) ), 80, T_('Source for avatars'), '', 1000 );
+
+	if( $phpbb_version == 3 )
+	{	// Only for phpBB3:
+		$Form->text( 'path_attachments', param( 'path_attachments', 'string', phpbb_get_var( 'path_attachments' ) ), 80, T_('Source for attachments'), '', 1000 );
+	}
 
 $Form->end_fieldset();
 
