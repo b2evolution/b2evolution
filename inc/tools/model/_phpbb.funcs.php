@@ -483,8 +483,26 @@ function phpbb_import_users()
 	$users_SQL = $phpbb_users_SQL;
 	if( $phpbb_version == 3 )
 	{	// phpBB v3:
+
+		// Detect what user fields exist in phpBB database:
+		$db_user_fields = $phpbb_DB->get_col( 'SHOW COLUMNS FROM BB_user_fields' );
+		$sel_fields = array( 'icq', 'website', 'aim', 'yim', 'msnm', 'interests', 'facebook', 'googleplus', 'location', 'skype', 'twitter', 'yahoo', 'youtube', 'aol' );
+		foreach( $sel_fields as $s => $sel_field_key )
+		{
+			if( in_array( 'pf_phpbb_'.$sel_field_key, $db_user_fields ) )
+			{	// Try to get a value if user field exists:
+				$sel_fields[ $sel_field_key ] = 'uf.pf_phpbb_'.$sel_field_key;
+			}
+			else
+			{	// Select empty value if field isn't detected in DB:
+				$sel_fields[ $sel_field_key ] = '""';
+			}
+			$sel_fields[ $sel_field_key ] .= ' AS user_'.$sel_field_key;
+			unset( $sel_fields[ $s ] );
+		}
+
 		$users_SQL->SELECT( 'u.user_id, u.user_inactive_reason, u.username, u.user_password, u.user_email, u.user_lang, u.user_regdate,
-							 uf.pf_phpbb_icq AS user_icq, uf.pf_phpbb_website AS user_website, "" AS user_aim, "" AS user_yim, "" AS user_msnm, uf.pf_phpbb_interests AS user_interests, u.user_rank,
+							 '.implode( ', ', $sel_fields ).', u.user_rank,
 							 u.user_allow_viewonline, u.user_notify_pm, u.user_avatar' );
 		$users_SQL->FROM_add( 'LEFT JOIN BB_user_fields uf ON uf.user_id = u.user_id' );
 	}
@@ -757,6 +775,14 @@ function phpbb_import_user_fields( $phpbb_user, $b2evo_user_ID )
 		'msnm'      => 'MSN/Live IM',
 		'occ'       => 'Role',
 		'interests' => 'I like',
+		'facebook'  => 'Facebook',
+		'googleplus'=> 'Google Plus',
+		'location'  => 'Main address',
+		'skype'     => 'Skype',
+		'twitter'   => 'Twitter',
+		'yahoo'     => 'Yahoo IM',
+		'youtube'   => 'YouTube',
+		'aol'       => 'AOL AIM',
 	);
 
 	$fields_types_IDs = array();
@@ -786,6 +812,10 @@ function phpbb_import_user_fields( $phpbb_user, $b2evo_user_ID )
 	$import_data = array();
 	foreach( $fields_types_IDs as $field_type => $field_ID )
 	{
+		if( ! isset( $phpbb_user->{'user_'.$field_type} ) )
+		{	// Skip this user field because the given phpBB DB doesn't contain it:
+			continue;
+		}
 		$field_value = trim( $phpbb_user->{'user_'.$field_type} );
 		if( $field_type == 'rank' )
 		{	// If field is "rank" we should get the value from table "phpbb_ranks" by rank_ID
