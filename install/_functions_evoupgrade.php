@@ -8088,7 +8088,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12140, 'Upgrade table of users...' ) )
+	// Start of Password-drivers branch
+
+	if( upg_task_start( 12200, 'Upgrade table of users...' ) )
 	{	// part of 6.8.2-stable
 		db_add_col( 'T_users', 'user_pass_driver', 'VARCHAR(16) NOT NULL default "evo$md5" AFTER user_salt' );
 		$DB->query( 'UPDATE T_users
@@ -8097,7 +8099,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12145, 'Updating users pass storage...' ) )
+	if( upg_task_start( 12205, 'Updating users pass storage...' ) )
 	{	// part of 6.8.2-stable
 		$DB->query( 'ALTER TABLE T_users MODIFY COLUMN user_pass VARBINARY(32)' );
 		$DB->query( 'UPDATE T_users SET user_pass = LOWER( HEX( user_pass ) )' );
@@ -8105,12 +8107,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12150, 'Upgrade table of users...' ) )
+	if( upg_task_start( 12210, 'Upgrade table of users...' ) )
 	{	// part of 6.8.2-stable
 		$DB->query( 'ALTER TABLE T_users
 			MODIFY user_salt VARCHAR(32) NOT NULL default ""' );
 		upg_task_end();
 	}
+
+	// End of Password-drivers branch
 
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
