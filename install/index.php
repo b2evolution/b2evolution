@@ -586,7 +586,7 @@ switch( $action )
 
 				?>
 
-				<p><?php echo T_('The basic configuration file (<code>/conf/_basic_config.php</code>) has not been created yet. You can do automatically generate it by filling out the form below.') ?></p>
+			<p><?php echo T_('The basic configuration file (<code>/conf/_basic_config.php</code>) has not been created yet. You can automatically generate it by filling out the form below.') ?></p>
 
 				<p><?php echo T_('This is the minimum info we need to set up b2evolution on this server:') ?></p>
 
