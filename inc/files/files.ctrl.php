@@ -343,8 +343,15 @@ $Debuglog->add( count($fm_selected).' selected files/directories', 'files' );
  * @global Filelist
  */
 $selected_Filelist = new Filelist( $fm_FileRoot, $ads_list_path );
+
+// Prevent directory traversal using '..'
+$re = '/\/?\.\.\/+/';
 foreach( $fm_selected as $l_source_path )
 {
+	if( preg_match( $re, $l_source_path ) )
+	{
+		debug_die( 'Invalid fm_selected parameter value' );
+	}
 	$selected_Filelist->add_by_subpath( urldecode($l_source_path), true );
 }
 
