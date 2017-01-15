@@ -448,7 +448,7 @@ function create_default_data()
 			(17, 'mov', 'Quicktime video', 'video/quicktime', 'file_video', 'browser', 'registered'),
 			(18, 'm4v', 'MPEG video file', 'video/x-m4v', 'file_video', 'browser', 'registered'),
 			(19, 'flv', 'Flash video file', 'video/x-flv', 'file_video', 'browser', 'registered'),
-			(20, 'swf', 'Flash video file', 'application/x-shockwave-flash', 'file_video', 'browser', 'registered'),
+			(20, 'swf', 'Flash video file', 'application/x-shockwave-flash', 'file_video', 'browser', 'admin'),
 			(21, 'webm', 'WebM video file', 'video/webm', 'file_video', 'browser', 'registered'),
 			(22, 'ogv', 'Ogg video file', 'video/ogg', 'file_video', 'browser', 'registered'),
 			(23, 'm3u8', 'M3U8 video file', 'application/x-mpegurl', 'file_video', 'browser', 'registered'),

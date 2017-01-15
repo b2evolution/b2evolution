@@ -7592,6 +7592,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11815, 'Updating file types table...' ) )
+	{ // part of 6.7.10-stable
+		$DB->query( 'UPDATE T_filetypes
+				SET ftyp_allowed = "admin"
+			WHERE ftyp_extensions REGEXP "[[:<:]]swf[[:>:]]"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
