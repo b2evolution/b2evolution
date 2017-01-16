@@ -722,7 +722,7 @@ class ChapterCache extends DataObjectCache
 	/**
 	 * Return recursive display of loaded categories
 	 *
-	 * @param array callback funtions (to format the display)
+	 * @param array callback functions (to format the display)
 	 * @param integer|NULL NULL for all subsets
 	 * @param array categories list to display
 	 * @param integer depth of categories list

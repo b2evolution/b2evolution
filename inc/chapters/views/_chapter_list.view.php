@@ -80,6 +80,17 @@ function cat_line( $Chapter, $level )
 	}
 	$r .= '<td class="center">'.$makedef_icon.'</td>';
 
+	// Image
+	$file_ID = $Chapter->get( 'image_file_ID' );
+	$cat_thumb = '';
+	if( $file_ID )
+	{
+		$FileCache = & get_FileCache();
+		$cat_image_File = & $FileCache->get_by_ID( $file_ID, false, false );
+		$cat_thumb = $cat_image_File->get_thumb_imgtag( 'crop-48x48' );
+	}
+	$r .= '<td>'.$cat_thumb.'</td>';
+
 	// Name
 	if( $permission_to_edit )
 	{	// We have permission permission to edit:
@@ -233,6 +244,10 @@ $Table->cols[] = array(
 					);
 $Table->cols[] = array(
 						'th' => T_('Default'),
+						'th_class' => 'shrinkwrap',
+					);
+$Table->cols[] = array(
+						'th' => T_('Image'),
 						'th_class' => 'shrinkwrap',
 					);
 $Table->cols[] = array(

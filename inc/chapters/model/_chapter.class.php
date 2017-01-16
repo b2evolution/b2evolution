@@ -619,6 +619,9 @@ class Chapter extends DataObject
 		{
 			case 'subcat_ordering':
 				return $this->get_subcat_ordering( false );
+
+			case 'image_file_ID':
+				return $this->image_file_ID;
 		}
 
 		return parent::get( $parname );
