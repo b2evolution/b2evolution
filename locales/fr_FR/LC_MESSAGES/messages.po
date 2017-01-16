@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2017-01-12 00:29+0100\n"
+"POT-Creation-Date: 2017-01-16 23:22+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Francois Planque <transifex@planque.com>, 2016\n"
 "Language-Team: French (France) (https://www.transifex.com/fplanque/teams/23/fr_FR/)\n"
@@ -339,7 +339,8 @@ msgstr "Délier"
 #: ../../../inc/plugins/views/_plugin_list_available.view.php:38
 #: ../../../inc/plugins/views/_plugin_settings.form.php:66
 #: ../../../inc/slugs/views/_slug.form.php:40
-#: ../skins/asevo/_body_footer.inc.php:40
+#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:327
+#: ../../../skins/asevo/_body_footer.inc.php:40
 #: ../../../skins/bootstrap_blog_skin/access_denied.main.php:309
 #: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:308
 #: ../../../skins/bootstrap_blog_skin/help.main.php:314
@@ -3418,6 +3419,7 @@ msgstr "Plan du site"
 
 #: ../../../inc/_core/_template.funcs.php:430
 #: ../../../inc/collections/views/_coll_home.form.php:45
+#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:269
 #: ../../../skins/bootstrap_blog_skin/index.main.php:256
 #: ../../../skins/bootstrap_forums_skin/index.main.php:284
 #: ../../../skins/bootstrap_main_skin/front.main.php:192
@@ -3439,6 +3441,7 @@ msgstr "Se connecter "
 #: ../inc/_core/_template.funcs.php:2440
 #: ../../../inc/users/model/_user.funcs.php:624
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:403
+#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:248
 #: ../../../skins/bootstrap_blog_skin/index.main.php:237
 #: ../../../skins/bootstrap_forums_skin/index.main.php:265
 #: ../../../skins/bootstrap_main_skin/front.main.php:171
@@ -3454,6 +3457,7 @@ msgstr "S'inscrire"
 #: ../../../inc/_core/_template.funcs.php:435
 #: ../inc/_core/_template.funcs.php:436
 #: ../../../inc/users/views/_registration.form.php:108
+#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:255
 #: ../../../skins/bootstrap_blog_skin/index.main.php:244
 #: ../../../skins/bootstrap_forums_skin/index.main.php:272
 #: ../../../skins/bootstrap_main_skin/front.main.php:178
@@ -4258,7 +4262,7 @@ msgstr "Entrée"
 #: ../../../inc/cron/cronjobs.ctrl.php:32
 #: ../../../inc/email_campaigns/campaigns.ctrl.php:34
 #: ../../../inc/files/file_types.ctrl.php:31 ../inc/files/files.ctrl.php:105
-#: ../../../inc/files/files.ctrl.php:360
+#: ../../../inc/files/files.ctrl.php:367
 #: ../inc/items/item_statuses.ctrl.php:43
 #: ../../../inc/items/item_tags.ctrl.php:37
 #: ../inc/items/item_types.ctrl.php:53 ../../../inc/links/links.ctrl.php:53
@@ -6303,7 +6307,7 @@ msgid "Send reminders about posts awaiting moderation"
 msgstr "Envoyer des rappels à propos des posts en attente de modération"
 
 #: ../../../inc/collections/_collections.init.php:1034
-#: ../../../inc/files/files.ctrl.php:360 ../inc/links/links.ctrl.php:53
+#: ../../../inc/files/files.ctrl.php:367 ../inc/links/links.ctrl.php:53
 #: ../../../inc/users/views/_invitation.view.php:49
 #: ../../../inc/users/views/_invitation.view.php:57
 #: ../../../inc/users/views/_invitation.view.php:59
@@ -12418,7 +12422,7 @@ msgstr "Blogs"
 #: ../inc/files/_files.init.php:490 ../../../inc/files/_files.init.php:526
 #: ../inc/files/file_moderation.ctrl.php:39
 #: ../../../inc/files/file_settings.ctrl.php:188
-#: ../../../inc/files/file_types.ctrl.php:193 ../inc/files/files.ctrl.php:1527
+#: ../../../inc/files/file_types.ctrl.php:193 ../inc/files/files.ctrl.php:1534
 #: ../../../inc/files/upload.ctrl.php:402
 #: ../../../inc/items/views/_item_list_full.view.php:292
 msgid "Files"
@@ -13060,15 +13064,15 @@ msgstr ""
 "proprement géré par b2evolution. Merci de vérifier et d'augmenter la "
 "variable &laquo;%s&raquo;."
 
-#: ../../../inc/files/files.ctrl.php:403
+#: ../../../inc/files/files.ctrl.php:410
 msgid "Directory creation is disabled."
 msgstr "La création de répertoires est désactivée."
 
-#: ../../../inc/files/files.ctrl.php:409
+#: ../../../inc/files/files.ctrl.php:416
 msgid "Cannot create a directory without name."
 msgstr "Impossible de créer un dossier sans nom."
 
-#: ../../../inc/files/files.ctrl.php:431
+#: ../../../inc/files/files.ctrl.php:438
 msgid ""
 "The new file access path is too long, shorter folder names would be "
 "required."
@@ -13076,226 +13080,226 @@ msgstr ""
 "Le nouveau chemin d'accès est trop long, des noms de dossiers plus courts "
 "sont nécessaires."
 
-#: ../../../inc/files/files.ctrl.php:437 ../inc/files/files.ctrl.php:487
+#: ../../../inc/files/files.ctrl.php:444 ../inc/files/files.ctrl.php:494
 #: ../../../inc/xmlrpc/model/_xmlrpcs.funcs.php:243
 #, php-format
 msgid "The file &laquo;%s&raquo; already exists."
 msgstr "Le fichier &laquo;%s&raquo; existe déjà."
 
-#: ../../../inc/files/files.ctrl.php:443
+#: ../../../inc/files/files.ctrl.php:450
 #, php-format
 msgid "Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;."
 msgstr ""
 "Impossible de créer le dossier &laquo;%s&raquo; dans &laquo;%s&raquo;."
 
-#: ../../../inc/files/files.ctrl.php:448
+#: ../../../inc/files/files.ctrl.php:455
 #, php-format
 msgid "The directory &laquo;%s&raquo; has been created."
 msgstr "Le dossier &laquo;%s&raquo; a été créé."
 
-#: ../../../inc/files/files.ctrl.php:465
+#: ../../../inc/files/files.ctrl.php:472
 msgid "File creation is disabled."
 msgstr "La création de fichiers est désactivée."
 
-#: ../../../inc/files/files.ctrl.php:471
+#: ../../../inc/files/files.ctrl.php:478
 msgid "Cannot create a file without name."
 msgstr "Impossible de créer un fichier sans nom."
 
-#: ../../../inc/files/files.ctrl.php:493
+#: ../../../inc/files/files.ctrl.php:500
 #, php-format
 msgid "Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;."
 msgstr ""
 "Impossible de créer le fichier &laquo;%s&raquo; dans &laquo;%s&raquo;."
 
-#: ../../../inc/files/files.ctrl.php:498
+#: ../../../inc/files/files.ctrl.php:505
 #, php-format
 msgid "The file &laquo;%s&raquo; has been created."
 msgstr "Le fichier &laquo;%s&raquo; a été créé."
 
-#: ../../../inc/files/files.ctrl.php:530
+#: ../../../inc/files/files.ctrl.php:537
 msgid "Your user settings have been updated."
 msgstr "Vos réglages utilisateurs ont été mis à jour."
 
-#: ../../../inc/files/files.ctrl.php:560 ../inc/files/files.ctrl.php:1143
+#: ../../../inc/files/files.ctrl.php:567 ../inc/files/files.ctrl.php:1150
 #, php-format
 msgid "You are not allowed to edit &laquo;%s&raquo;."
 msgstr "Vous n'êtes pas autorisé à modifier &laquo;%s&raquo;."
 
-#: ../../../inc/files/files.ctrl.php:575
+#: ../../../inc/files/files.ctrl.php:582
 #, php-format
 msgid "The file &laquo;%s&raquo; has been updated."
 msgstr "Le fichier &laquo;%s&raquo; a été mis à jour."
 
-#: ../../../inc/files/files.ctrl.php:579
+#: ../../../inc/files/files.ctrl.php:586
 #, php-format
 msgid "The file &laquo;%s&raquo; could not be updated."
 msgstr "Le fichier &laquo;%s&raquo; n'a pas pu être mis à jour."
 
-#: ../../../inc/files/files.ctrl.php:645 ../inc/files/files.ctrl.php:792
-#: ../../../inc/files/files.ctrl.php:938 ../inc/files/files.ctrl.php:1025
-#: ../../../inc/files/files.ctrl.php:1267 ../inc/files/files.ctrl.php:1342
-#: ../../../inc/files/files.ctrl.php:1378 ../inc/files/files.ctrl.php:1427
+#: ../../../inc/files/files.ctrl.php:652 ../inc/files/files.ctrl.php:799
+#: ../../../inc/files/files.ctrl.php:945 ../inc/files/files.ctrl.php:1032
+#: ../../../inc/files/files.ctrl.php:1274 ../inc/files/files.ctrl.php:1349
+#: ../../../inc/files/files.ctrl.php:1385 ../inc/files/files.ctrl.php:1434
 #: ../../../inc/files/views/_file_list.inc.php:767
 msgid "Nothing selected."
 msgstr "Vous n'avez rien sélectionné."
 
-#: ../../../inc/files/files.ctrl.php:658
+#: ../../../inc/files/files.ctrl.php:665
 msgid "Please provide the name of the archive."
 msgstr "Merci de fournir un nom pour l'archive."
 
-#: ../../../inc/files/files.ctrl.php:661
+#: ../../../inc/files/files.ctrl.php:668
 msgid "File name must end with .zip"
 msgstr "Le nom de fichier doit se terminer en .zip"
 
-#: ../../../inc/files/files.ctrl.php:718
+#: ../../../inc/files/files.ctrl.php:725
 #, php-format
 msgid "ZIP archive \"%s\" has been created."
 msgstr "L'archive ZIP \"%s\" a été créée."
 
-#: ../../../inc/files/files.ctrl.php:734 ../inc/files/files.ctrl.php:957
-#: ../../../inc/files/files.ctrl.php:995
+#: ../../../inc/files/files.ctrl.php:741 ../inc/files/files.ctrl.php:964
+#: ../../../inc/files/files.ctrl.php:1002
 msgid "cannot be deleted because of the following relations"
 msgstr "ne peut être supprimé à cause des relations suivantes"
 
-#: ../../../inc/files/files.ctrl.php:742 ../inc/files/files.ctrl.php:965
+#: ../../../inc/files/files.ctrl.php:749 ../inc/files/files.ctrl.php:972
 #, php-format
 msgid "The directory &laquo;%s&raquo; has been deleted."
 msgstr "Le dossier &laquo;%s&raquo; a été supprimé."
 
-#: ../../../inc/files/files.ctrl.php:743 ../inc/files/files.ctrl.php:966
+#: ../../../inc/files/files.ctrl.php:750 ../inc/files/files.ctrl.php:973
 #, php-format
 msgid "The file &laquo;%s&raquo; has been deleted."
 msgstr "Le fichier &laquo;%s&raquo; a été supprimé."
 
-#: ../../../inc/files/files.ctrl.php:748 ../inc/files/files.ctrl.php:971
+#: ../../../inc/files/files.ctrl.php:755 ../inc/files/files.ctrl.php:978
 #, php-format
 msgid "Could not delete the directory &laquo;%s&raquo; (not empty?)."
 msgstr "Impossible de supprimer le dossier &laquo;%s&raquo; (non vide?)."
 
-#: ../../../inc/files/files.ctrl.php:749 ../inc/files/files.ctrl.php:972
+#: ../../../inc/files/files.ctrl.php:756 ../inc/files/files.ctrl.php:979
 #: ../../../inc/tools/model/_wp.funcs.php:235
 #, php-format
 msgid "Could not delete the file &laquo;%s&raquo;."
 msgstr "Impossible de supprimer le fichier &laquo;%s&raquo;."
 
-#: ../../../inc/files/files.ctrl.php:773 ../inc/files/files.ctrl.php:931
-#: ../../../inc/files/files.ctrl.php:1420
+#: ../../../inc/files/files.ctrl.php:780 ../inc/files/files.ctrl.php:938
+#: ../../../inc/files/files.ctrl.php:1427
 msgid "You have no permission to edit/modify files."
 msgstr "Vous n'avez pas la permission de modifier des fichiers."
 
-#: ../../../inc/files/files.ctrl.php:838
+#: ../../../inc/files/files.ctrl.php:845
 #, php-format
 msgid "&laquo;%s&raquo; has not been renamed"
 msgstr "Le fichier &laquo;%s&raquo; n'a pas été renommé."
 
-#: ../../../inc/files/files.ctrl.php:844 ../inc/files/files.ctrl.php:1231
+#: ../../../inc/files/files.ctrl.php:851 ../inc/files/files.ctrl.php:1238
 #, php-format
 msgid "&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;"
 msgstr "&laquo;%s&raquo; n'a pas pu être renommé en &laquo;%s&raquo;"
 
-#: ../../../inc/files/files.ctrl.php:849 ../inc/files/files.ctrl.php:1222
+#: ../../../inc/files/files.ctrl.php:856 ../inc/files/files.ctrl.php:1229
 #, php-format
 msgid "&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;"
 msgstr "&laquo;%s&raquo; a bien été renommé en &laquo;%s&raquo;"
 
-#: ../../../inc/files/files.ctrl.php:859 ../inc/files/files.ctrl.php:1284
+#: ../../../inc/files/files.ctrl.php:866 ../inc/files/files.ctrl.php:1291
 #, php-format
 msgid "&laquo;%s&raquo; has not been copied"
 msgstr "&laquo;%s&raquo; n'a pas été copié"
 
-#: ../../../inc/files/files.ctrl.php:869 ../inc/files/files.ctrl.php:1294
+#: ../../../inc/files/files.ctrl.php:876 ../inc/files/files.ctrl.php:1301
 #, php-format
 msgid "&laquo;%s&raquo; could not be copied to &laquo;%s&raquo;"
 msgstr "&laquo;%s&raquo; n'a pas pu être copié vers &laquo;%s&raquo;"
 
-#: ../../../inc/files/files.ctrl.php:873 ../inc/files/files.ctrl.php:1298
+#: ../../../inc/files/files.ctrl.php:880 ../inc/files/files.ctrl.php:1305
 #, php-format
 msgid "&laquo;%s&raquo; has been successfully copied to &laquo;%s&raquo;"
 msgstr "&laquo;%s&raquo; a été copié vers &laquo;%s&raquo;"
 
-#: ../../../inc/files/files.ctrl.php:883
+#: ../../../inc/files/files.ctrl.php:890
 #, php-format
 msgid "&laquo;%s&raquo; has not been moved"
 msgstr "&laquo;%s&raquo; n'a pas été déplacé"
 
-#: ../../../inc/files/files.ctrl.php:890
+#: ../../../inc/files/files.ctrl.php:897
 #, php-format
 msgid "&laquo;%s&raquo; could not be moved to &laquo;%s&raquo;"
 msgstr "&laquo;%s&raquo; n'a pas pu être déplacé vers &laquo;%s&raquo;"
 
-#: ../../../inc/files/files.ctrl.php:894
+#: ../../../inc/files/files.ctrl.php:901
 #, php-format
 msgid "&laquo;%s&raquo; has been successfully moved to &laquo;%s&raquo;"
 msgstr "&laquo;%s&raquo; a été déplacé vers &laquo;%s&raquo;"
 
-#: ../../../inc/files/files.ctrl.php:1043 ../inc/items/items.ctrl.php:214
+#: ../../../inc/files/files.ctrl.php:1050 ../inc/items/items.ctrl.php:214
 #: ../../../inc/items/items.ctrl.php:249
 msgid "No destination blog is selected."
 msgstr "Aucun blog destination n'est sélectionné."
 
-#: ../../../inc/files/files.ctrl.php:1052
+#: ../../../inc/files/files.ctrl.php:1059
 msgid "Sorry, you have no permission to post into this blog."
 msgstr "Désolé, vous n'avez la permission de poster dans ce blog."
 
-#: ../../../inc/files/files.ctrl.php:1102
+#: ../../../inc/files/files.ctrl.php:1109
 #, php-format
 msgid "&laquo;%s&raquo; has been attached."
 msgstr "&laquo;%s&raquo; a été attaché."
 
-#: ../../../inc/files/files.ctrl.php:1110 ../inc/items/items.ctrl.php:794
+#: ../../../inc/files/files.ctrl.php:1117 ../inc/items/items.ctrl.php:794
 msgid "Couldn't create the new post"
 msgstr "Impossible de créer le nouveau post"
 
-#: ../../../inc/files/files.ctrl.php:1199
+#: ../../../inc/files/files.ctrl.php:1206
 #, php-format
 msgid "File properties for &laquo;%s&raquo; have been updated."
 msgstr "Les propriétés du fichier &laquo;%s&raquo; ont été mises à jour."
 
-#: ../../../inc/files/files.ctrl.php:1203
+#: ../../../inc/files/files.ctrl.php:1210
 #, php-format
 msgid "File properties for &laquo;%s&raquo; have not changed."
 msgstr "Les propriétés du fichier &laquo;%s&raquo; n'ont pas changé."
 
-#: ../../../inc/files/files.ctrl.php:1313
+#: ../../../inc/files/files.ctrl.php:1320
 #: ../inc/files/model/_file.funcs.php:1422
 #, php-format
 msgid "Your profile picture must have a minimum size of %dx%d pixels."
 msgstr "Votre photo de profil doit avoir une taille minimale de %dx%d pixels."
 
-#: ../../../inc/files/files.ctrl.php:1327
+#: ../../../inc/files/files.ctrl.php:1334
 msgid "Your profile picture has been changed."
 msgstr "Votre photo de profil a été modifiée."
 
-#: ../../../inc/files/files.ctrl.php:1439
+#: ../../../inc/files/files.ctrl.php:1446
 msgid "You have to give a default permission!"
 msgstr "Vous devez donner une permission par défaut!"
 
-#: ../../../inc/files/files.ctrl.php:1446
+#: ../../../inc/files/files.ctrl.php:1453
 msgid "Read-only"
 msgstr "Lecture seule"
 
-#: ../../../inc/files/files.ctrl.php:1447
+#: ../../../inc/files/files.ctrl.php:1454
 msgid "Read and write"
 msgstr "Lecture/Ecriture"
 
-#: ../../../inc/files/files.ctrl.php:1461 ../inc/files/files.ctrl.php:1483
+#: ../../../inc/files/files.ctrl.php:1468 ../inc/files/files.ctrl.php:1490
 #, php-format
 msgid "Permissions for &laquo;%s&raquo; have not been changed."
 msgstr "Les permissions pour &laquo;%s&raquo; n'ont pas été modifiées."
 
-#: ../../../inc/files/files.ctrl.php:1474
+#: ../../../inc/files/files.ctrl.php:1481
 #, php-format
 msgid "Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;."
 msgstr ""
 "Echec du changement de permissions sur &laquo;%s&raquo; vers "
 "&laquo;%s&raquo;."
 
-#: ../../../inc/files/files.ctrl.php:1487
+#: ../../../inc/files/files.ctrl.php:1494
 #, php-format
 msgid "Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;."
 msgstr "Permissions de &laquo;%s&raquo; changées en &laquo;%s&raquo;."
 
-#: ../../../inc/files/files.ctrl.php:1531 ../inc/files/upload.ctrl.php:406
+#: ../../../inc/files/files.ctrl.php:1538 ../inc/files/upload.ctrl.php:406
 #, php-format
 msgid "You are ready to post files from %s into %s..."
 msgstr "Vous pouvez maintenant poster des fichiers de %s dans %s..."
@@ -13703,6 +13707,7 @@ msgstr ""
 #: ../../../inc/files/model/_file.funcs.php:2319
 msgid "{file} has an invalid extension. Only {extensions} are allowed."
 msgstr ""
+"{file} a une extension invalide. Seules sont autorisées: {extensions}."
 
 #. TRANS: strings in {} must NOT be translated
 #: ../../../inc/files/model/_file.funcs.php:2320
@@ -13710,22 +13715,27 @@ msgid ""
 "{file} cannot be uploaded because it is too large ({fileSize}). The maximum "
 "allowed upload size is {sizeLimit}."
 msgstr ""
+"{file} ne peut pas être uploadé car il est trop volumineux ({fileSize}). La "
+"taille maximale autorisée est {sizeLimit}."
 
 #. TRANS: strings in {} must NOT be translated
 #: ../../../inc/files/model/_file.funcs.php:2321
 msgid "{file} is too small. The minimum file size is {minSizeLimit}."
 msgstr ""
+"{file} est trop petit. La taille minimale autorisée est {minSizeLimit}."
 
 #. TRANS: strings in {} must NOT be translated
 #: ../../../inc/files/model/_file.funcs.php:2322
 msgid "{file} is empty. Please select non-empty files."
-msgstr ""
+msgstr "{file} est vide. Merci de sélectionner des fichiers non vides."
 
 #: ../../../inc/files/model/_file.funcs.php:2323
 msgid ""
 "Files are currently being uploaded. If you leave this page now, the upload "
 "will be cancelled."
 msgstr ""
+"Des fichiers sont en cours d'upload. Si vous quittez la page maintenant, "
+"l'upload va être annulé."
 
 #: ../../../inc/files/model/_file.funcs.php:2375
 msgid "Upload ERROR"
@@ -14277,7 +14287,7 @@ msgstr "Fichiers à inclure"
 
 #: ../../../inc/files/views/_file_create_zip.form.php:41
 msgid "Delete these files upon successful archive creation"
-msgstr ""
+msgstr "Supprimer ces fichiers après création de l'archive"
 
 #: ../../../inc/files/views/_file_delete.form.php:26
 msgid "Cancel delete!"
@@ -14484,7 +14494,7 @@ msgstr "Créer de multiples posts (1 par image)"
 
 #: ../../../inc/files/views/_file_list.inc.php:656
 msgid "Copy/Move to another directory..."
-msgstr ""
+msgstr "Copier/Déplacer vers un autre répertoire..."
 
 #: ../../../inc/files/views/_file_list.inc.php:661
 msgid "Insert IMG/link into post"
@@ -14500,7 +14510,7 @@ msgstr "Supprimer fichiers..."
 
 #: ../../../inc/files/views/_file_list.inc.php:668
 msgid "Create ZIP archive..."
-msgstr ""
+msgstr "Créer une archive ZIP..."
 
 #: ../../../inc/files/views/_file_list.inc.php:673
 msgid "Download files as ZIP archive..."
@@ -14524,7 +14534,7 @@ msgstr "Le fichier a été lié."
 
 #: ../../../inc/files/views/_file_move_copy.form.php:22
 msgid "Cancel move/copy!"
-msgstr ""
+msgstr "Annuler le déplacement/la copie!"
 
 #: ../../../inc/files/views/_file_move_copy.form.php:49
 #: ../../../inc/files/views/_file_rename.form.php:45
@@ -14708,6 +14718,7 @@ msgstr ""
 #, php-format
 msgid "KB. This cannot be higher than your PHP/Webserver setting (PHP: %s)!"
 msgstr ""
+"Ko. Ceci ne peut être supérieur à votre réglage PHP/serveur web (PHP: %s)!"
 
 #: ../../../inc/files/views/_file_settings.form.php:177
 msgid "Maximum upload filesize"
@@ -15193,6 +15204,8 @@ msgid ""
 "Please note: this item is also cross-posted to the following other "
 "categories/collections: %s"
 msgstr ""
+"Notez bien: cet item est également cross-posté dans les autres "
+"catégories/collections suivantes: %s"
 
 #: ../../../inc/items/items.ctrl.php:1002
 msgid "The post couldn't be updated."
@@ -15713,7 +15726,7 @@ msgstr "Impossible de configurer les catégories sélectionnées!"
 
 #: ../../../inc/items/model/_item.class.php:6068
 msgid "Marking pings as sent."
-msgstr ""
+msgstr "Marquer pings comme envoyés."
 
 #: ../../../inc/items/model/_item.class.php:6110
 #, php-format
@@ -20253,7 +20266,7 @@ msgid "The database has been updated."
 msgstr "La base données a été mise à jour."
 
 #: ../../../inc/plugins/_plugin.funcs.php:1217
-#: ../../../install/_functions_evoupgrade.php:7796
+#: ../../../install/_functions_evoupgrade.php:7804
 msgid "The DB schema has been changed since confirmation."
 msgstr "Le schéma de la base de données a changé depuis la confirmation."
 
@@ -20542,7 +20555,7 @@ msgid "The plugin needs the following database changes."
 msgstr "Le plugin requiert les modifications de base de donnée suivantes."
 
 #: ../../../inc/plugins/plugins.ctrl.php:920
-#: ../../../install/_functions_evoupgrade.php:7833
+#: ../../../install/_functions_evoupgrade.php:7841
 msgid ""
 "The following database changes will be carried out. If you are not sure what"
 " this means, it will probably be alright."
@@ -27716,6 +27729,7 @@ msgstr "Dernière visite"
 #: ../../../inc/users/model/_user.funcs.php:5572
 #: ../../../inc/widgets/widgets/_coll_common_links.widget.php:258
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:355
+#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:320
 #: ../../../skins/asevo/_body_footer.inc.php:33
 #: ../../../skins/basic/access_denied.main.php:135
 #: ../../../skins/basic/access_requires_login.main.php:136
@@ -32260,6 +32274,7 @@ msgid "Do not try to highlight (cacheable)"
 msgstr ""
 
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:263
+#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:110
 #: ../../../skins/asevo/index.main.php:45
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:216
 #: ../../../skins/bootstrap_blog_skin/access_denied.main.php:105
@@ -33945,15 +33960,15 @@ msgstr ""
 msgid "Linkblog"
 msgstr "Linkblog"
 
-#: ../../../install/_functions_evoupgrade.php:7781
+#: ../../../install/_functions_evoupgrade.php:7789
 msgid "The database schema is up to date."
 msgstr "Le schéma de base de données est à jour."
 
-#: ../../../install/_functions_evoupgrade.php:7822
+#: ../../../install/_functions_evoupgrade.php:7830
 msgid "Upgrade database"
 msgstr "Mise à jour de la base de données!"
 
-#: ../../../install/_functions_evoupgrade.php:7831
+#: ../../../install/_functions_evoupgrade.php:7839
 msgid ""
 "The version number is correct, but we have detected changes in the database "
 "schema. This can happen if you've been using development versions directly "
@@ -33963,7 +33978,7 @@ msgstr ""
 "dans le schéma de la base. Celà peut arriver si vous avez utilisé des "
 "versions de développement provenant de GitHub..."
 
-#: ../../../install/_functions_evoupgrade.php:7845
+#: ../../../install/_functions_evoupgrade.php:7853
 msgid "Try to Repair/Upgrade database now!"
 msgstr "Essayez de Réparer/Mettre à jour la base de données maintenant!"
 
@@ -34517,12 +34532,9 @@ msgstr ""
 #: ../../../install/index.php:562
 msgid ""
 "The basic configuration file (<code>/conf/_basic_config.php</code>) has not "
-"been created yet. You can do automatically generate it by filling out the "
-"form below."
+"been created yet. You can automatically generate it by filling out the form "
+"below."
 msgstr ""
-"Le fichier de configuration de base (<code>/conf/_basic_config.php</code>) "
-"n'a pas encore été créé. Vous pouvez le faire générer automatiquement en "
-"remplissant le formulaire ci-dessous."
 
 #: ../../../install/index.php:564
 msgid "This is the minimum info we need to set up b2evolution on this server:"
@@ -34905,6 +34917,326 @@ msgstr "Français (FR) utf-8"
 #: ../../../locales/ru_RU/ru-RU.locale.php:17
 msgid "Russian (RU) utf-8"
 msgstr "Russe (RU) utf-8"
+
+#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:67
+#: ../../../skins/basic/access_denied.main.php:62
+#: ../../../skins/basic/access_requires_login.main.php:63
+#: ../../../skins/basic/help.main.php:68 ../skins/basic/index.main.php:63
+#: ../../../skins/basic/msgform.main.php:69
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:215
+#: ../../../skins/bootstrap_blog_skin/access_denied.main.php:52
+#: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:52
+#: ../../../skins/bootstrap_blog_skin/help.main.php:57
+#: ../../../skins/bootstrap_blog_skin/index.main.php:51
+#: ../../../skins/bootstrap_blog_skin/msgform.main.php:58
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:275
+#: ../../../skins/bootstrap_forums_skin/access_denied.main.php:55
+#: ../../../skins/bootstrap_forums_skin/access_requires_login.main.php:55
+#: ../../../skins/bootstrap_forums_skin/help.main.php:61
+#: ../../../skins/bootstrap_forums_skin/index.main.php:79
+#: ../../../skins/bootstrap_forums_skin/msgform.main.php:62
+#: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:257
+#: ../../../skins/bootstrap_gallery_legacy/access_denied.main.php:52
+#: ../../../skins/bootstrap_gallery_legacy/access_requires_login.main.php:52
+#: ../../../skins/bootstrap_gallery_legacy/help.main.php:58
+#: ../../../skins/bootstrap_gallery_legacy/index.main.php:50
+#: ../../../skins/bootstrap_gallery_legacy/msgform.main.php:59
+#: ../../../skins/bootstrap_gallery_legacy/single.main.php:50
+#: ../../../skins/bootstrap_gallery_skin/_skin.class.php:257
+#: ../../../skins/bootstrap_gallery_skin/access_denied.main.php:52
+#: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:52
+#: ../../../skins/bootstrap_gallery_skin/help.main.php:58
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:50
+#: ../../../skins/bootstrap_gallery_skin/msgform.main.php:59
+#: ../../../skins/bootstrap_gallery_skin/single.main.php:50
+#: ../../../skins/bootstrap_main_skin/_skin.class.php:285
+#: ../../../skins/bootstrap_main_skin/access_denied.main.php:63
+#: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:63
+#: ../../../skins/bootstrap_main_skin/help.main.php:67
+#: ../../../skins/bootstrap_main_skin/index.main.php:67
+#: ../../../skins/bootstrap_main_skin/msgform.main.php:68
+#: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:57
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:192
+#: ../../../skins/bootstrap_manual_skin/access_denied.main.php:51
+#: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:51
+#: ../../../skins/bootstrap_manual_skin/help.main.php:57
+#: ../../../skins/bootstrap_manual_skin/index.main.php:55
+#: ../../../skins/bootstrap_manual_skin/msgform.main.php:58
+#: ../../../skins/bootstrap_photoblog_skin/_skin.class.php:291
+#: ../../../skins/bootstrap_photoblog_skin/access_denied.main.php:52
+#: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:52
+#: ../../../skins/bootstrap_photoblog_skin/help.main.php:58
+#: ../../../skins/bootstrap_photoblog_skin/index.main.php:51
+#: ../../../skins/bootstrap_photoblog_skin/msgform.main.php:59
+#: ../../../skins/clean1_skin/_body_header.inc.php:29
+#: ../../../skins/dating_mood/access_denied.main.php:42
+#: ../../../skins/dating_mood/access_requires_login.main.php:43
+#: ../../../skins/dating_mood/help.main.php:48
+#: ../../../skins/dating_mood/index.main.php:44
+#: ../../../skins/dating_mood/msgform.main.php:49
+#: ../../../skins/evopress/_body_header.inc.php:29
+#: ../../../skins/horizon_blog_skin/access_denied.main.php:52
+#: ../../../skins/horizon_blog_skin/access_requires_login.main.php:52
+#: ../../../skins/horizon_blog_skin/index.main.php:48
+#: ../../../skins/horizon_blog_skin/single.main.php:48
+#: ../../../skins/horizon_main_skin/_skin.class.php:291
+#: ../../../skins/horizon_main_skin/access_denied.main.php:68
+#: ../../../skins/horizon_main_skin/access_requires_login.main.php:69
+#: ../../../skins/horizon_main_skin/index.main.php:78
+#: ../../../skins/photoalbums/access_denied.main.php:43
+#: ../../../skins/photoalbums/access_requires_login.main.php:42
+#: ../../../skins/photoalbums/help.main.php:49
+#: ../../../skins/photoalbums/index.main.php:48
+#: ../../../skins/photoalbums/msgform.main.php:50
+#: ../../../skins/photoblog/access_denied.main.php:39
+#: ../../../skins/photoblog/access_requires_login.main.php:40
+#: ../../../skins/photoblog/help.main.php:45
+#: ../skins/photoblog/index.main.php:44
+#: ../../../skins/photoblog/msgform.main.php:46
+#: ../../../skins/pureforums/access_denied.main.php:60
+#: ../../../skins/pureforums/access_requires_login.main.php:61
+#: ../../../skins/pureforums/help.main.php:66
+#: ../skins/pureforums/index.main.php:94
+#: ../../../skins/pureforums/msgform.main.php:67
+msgid "Page Top"
+msgstr "Haut de page"
+
+#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:87
+#: ../../../skins/asevo/access_denied.main.php:44
+#: ../../../skins/asevo/access_requires_login.main.php:45
+#: ../../../skins/asevo/help.main.php:50 ../skins/asevo/index.main.php:72
+#: ../../../skins/asevo/msgform.main.php:51
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:214
+#: ../../../skins/bootstrap_blog_skin/access_denied.main.php:77
+#: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:77
+#: ../../../skins/bootstrap_blog_skin/help.main.php:82
+#: ../../../skins/bootstrap_blog_skin/index.main.php:71
+#: ../../../skins/bootstrap_blog_skin/msgform.main.php:83
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:274
+#: ../../../skins/bootstrap_forums_skin/access_denied.main.php:80
+#: ../../../skins/bootstrap_forums_skin/access_requires_login.main.php:80
+#: ../../../skins/bootstrap_forums_skin/help.main.php:86
+#: ../../../skins/bootstrap_forums_skin/index.main.php:99
+#: ../../../skins/bootstrap_forums_skin/msgform.main.php:87
+#: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:256
+#: ../../../skins/bootstrap_gallery_legacy/access_denied.main.php:77
+#: ../../../skins/bootstrap_gallery_legacy/access_requires_login.main.php:77
+#: ../../../skins/bootstrap_gallery_legacy/help.main.php:83
+#: ../../../skins/bootstrap_gallery_legacy/index.main.php:80
+#: ../../../skins/bootstrap_gallery_legacy/msgform.main.php:84
+#: ../../../skins/bootstrap_gallery_legacy/single.main.php:80
+#: ../../../skins/bootstrap_gallery_skin/_skin.class.php:256
+#: ../../../skins/bootstrap_gallery_skin/access_denied.main.php:77
+#: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:77
+#: ../../../skins/bootstrap_gallery_skin/help.main.php:83
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:80
+#: ../../../skins/bootstrap_gallery_skin/msgform.main.php:84
+#: ../../../skins/bootstrap_gallery_skin/single.main.php:80
+#: ../../../skins/bootstrap_main_skin/_skin.class.php:284
+#: ../../../skins/bootstrap_main_skin/access_denied.main.php:88
+#: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:88
+#: ../../../skins/bootstrap_main_skin/help.main.php:92
+#: ../../../skins/bootstrap_main_skin/index.main.php:87
+#: ../../../skins/bootstrap_main_skin/msgform.main.php:93
+#: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:77
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:191
+#: ../../../skins/bootstrap_manual_skin/access_denied.main.php:76
+#: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:76
+#: ../../../skins/bootstrap_manual_skin/help.main.php:82
+#: ../../../skins/bootstrap_manual_skin/index.main.php:75
+#: ../../../skins/bootstrap_manual_skin/msgform.main.php:83
+#: ../../../skins/bootstrap_photoblog_skin/_skin.class.php:290
+#: ../../../skins/bootstrap_photoblog_skin/access_denied.main.php:77
+#: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:77
+#: ../../../skins/bootstrap_photoblog_skin/help.main.php:83
+#: ../../../skins/bootstrap_photoblog_skin/index.main.php:71
+#: ../../../skins/bootstrap_photoblog_skin/msgform.main.php:84
+#: ../../../skins/clean1_skin/_body_header.inc.php:74
+#: ../../../skins/dating_mood/access_denied.main.php:60
+#: ../../../skins/dating_mood/access_requires_login.main.php:61
+#: ../../../skins/dating_mood/help.main.php:66
+#: ../../../skins/dating_mood/index.main.php:62
+#: ../../../skins/dating_mood/msgform.main.php:67
+#: ../../../skins/evopress/_body_header.inc.php:44
+#: ../../../skins/horizon_blog_skin/access_denied.main.php:77
+#: ../../../skins/horizon_blog_skin/access_requires_login.main.php:77
+#: ../../../skins/horizon_blog_skin/index.main.php:65
+#: ../../../skins/horizon_blog_skin/single.main.php:65
+#: ../../../skins/horizon_main_skin/_skin.class.php:290
+#: ../../../skins/horizon_main_skin/access_denied.main.php:86
+#: ../../../skins/horizon_main_skin/access_requires_login.main.php:87
+#: ../../../skins/horizon_main_skin/index.main.php:97
+#: ../../../skins/pureforums/access_denied.main.php:87
+#: ../../../skins/pureforums/access_requires_login.main.php:88
+#: ../../../skins/pureforums/help.main.php:93
+#: ../skins/pureforums/index.main.php:121
+#: ../../../skins/pureforums/msgform.main.php:94
+msgid "Header"
+msgstr "Entête"
+
+#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:235
+#: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:146
+#: ../../../skins/bootstrap_blog_skin/index.main.php:224
+#: ../../../skins/bootstrap_forums_skin/access_requires_login.main.php:149
+#: ../../../skins/bootstrap_forums_skin/index.main.php:252
+#: ../../../skins/bootstrap_gallery_legacy/access_requires_login.main.php:146
+#: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:146
+#: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:157
+#: ../../../skins/bootstrap_main_skin/front.main.php:158
+#: ../../../skins/bootstrap_main_skin/index.main.php:238
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:313
+#: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:146
+#: ../../../skins/bootstrap_photoblog_skin/index.main.php:224
+#: ../../../skins/horizon_blog_skin/access_requires_login.main.php:146
+#: ../../../skins/horizon_blog_skin/index.main.php:263
+#: ../../../skins/horizon_blog_skin/single.main.php:272
+#: ../../../skins/horizon_main_skin/access_requires_login.main.php:117
+#: ../../../skins/horizon_main_skin/index.main.php:264
+#: ../../../skins_adm/login/_login_form.main.php:38
+msgid "Log in to your account"
+msgstr "Connectez-vous à votre compte"
+
+#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:297
+#: ../../../skins/bootstrap_blog_skin/_skin.class.php:219
+#: ../../../skins/bootstrap_blog_skin/access_denied.main.php:276
+#: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:275
+#: ../../../skins/bootstrap_blog_skin/help.main.php:281
+#: ../../../skins/bootstrap_blog_skin/index.main.php:362
+#: ../../../skins/bootstrap_blog_skin/msgform.main.php:282
+#: ../../../skins/bootstrap_forums_skin/_skin.class.php:277
+#: ../../../skins/bootstrap_forums_skin/access_denied.main.php:184
+#: ../../../skins/bootstrap_forums_skin/access_requires_login.main.php:183
+#: ../../../skins/bootstrap_forums_skin/help.main.php:190
+#: ../../../skins/bootstrap_forums_skin/index.main.php:395
+#: ../../../skins/bootstrap_forums_skin/msgform.main.php:191
+#: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:259
+#: ../../../skins/bootstrap_gallery_legacy/access_denied.main.php:181
+#: ../../../skins/bootstrap_gallery_legacy/access_requires_login.main.php:180
+#: ../../../skins/bootstrap_gallery_legacy/help.main.php:187
+#: ../../../skins/bootstrap_gallery_legacy/index.main.php:213
+#: ../../../skins/bootstrap_gallery_legacy/msgform.main.php:188
+#: ../../../skins/bootstrap_gallery_legacy/single.main.php:330
+#: ../../../skins/bootstrap_gallery_skin/_skin.class.php:259
+#: ../../../skins/bootstrap_gallery_skin/access_denied.main.php:181
+#: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:180
+#: ../../../skins/bootstrap_gallery_skin/help.main.php:187
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:213
+#: ../../../skins/bootstrap_gallery_skin/msgform.main.php:188
+#: ../../../skins/bootstrap_gallery_skin/single.main.php:331
+#: ../../../skins/bootstrap_main_skin/_skin.class.php:287
+#: ../../../skins/bootstrap_main_skin/access_denied.main.php:198
+#: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:198
+#: ../../../skins/bootstrap_main_skin/front.main.php:242
+#: ../../../skins/bootstrap_main_skin/help.main.php:202
+#: ../../../skins/bootstrap_main_skin/index.main.php:300
+#: ../../../skins/bootstrap_main_skin/msgform.main.php:203
+#: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:374
+#: ../../../skins/bootstrap_manual_skin/_skin.class.php:196
+#: ../../../skins/bootstrap_manual_skin/access_denied.main.php:322
+#: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:313
+#: ../../../skins/bootstrap_manual_skin/help.main.php:328
+#: ../../../skins/bootstrap_manual_skin/index.main.php:301
+#: ../../../skins/bootstrap_manual_skin/msgform.main.php:329
+#: ../../../skins/bootstrap_photoblog_skin/_skin.class.php:293
+#: ../../../skins/bootstrap_photoblog_skin/access_denied.main.php:181
+#: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:180
+#: ../../../skins/bootstrap_photoblog_skin/help.main.php:187
+#: ../../../skins/bootstrap_photoblog_skin/index.main.php:277
+#: ../../../skins/bootstrap_photoblog_skin/msgform.main.php:188
+#: ../../../skins/dating_mood/access_denied.main.php:142
+#: ../../../skins/dating_mood/access_requires_login.main.php:142
+#: ../../../skins/dating_mood/help.main.php:148
+#: ../../../skins/dating_mood/index.main.php:254
+#: ../../../skins/dating_mood/msgform.main.php:149
+#: ../../../skins/horizon_blog_skin/access_denied.main.php:276
+#: ../../../skins/horizon_blog_skin/access_requires_login.main.php:275
+#: ../../../skins/horizon_blog_skin/index.main.php:399
+#: ../../../skins/horizon_blog_skin/single.main.php:432
+#: ../../../skins/horizon_main_skin/_skin.class.php:293
+#: ../../../skins/horizon_main_skin/access_denied.main.php:146
+#: ../../../skins/horizon_main_skin/access_requires_login.main.php:147
+#: ../../../skins/horizon_main_skin/index.main.php:355
+#: ../../../skins/photoalbums/_body_footer.inc.php:23
+#: ../../../skins/pureforums/access_denied.main.php:145
+#: ../../../skins/pureforums/access_requires_login.main.php:147
+#: ../../../skins/pureforums/help.main.php:151
+#: ../../../skins/pureforums/index.main.php:242
+#: ../../../skins/pureforums/msgform.main.php:152
+msgid "Footer"
+msgstr "Pied de page"
+
+#: ../../../media/blogs/a/quick-uploads/tmp6/index.main.php:321
+#: ../../../skins/asevo/_body_footer.inc.php:34
+#: ../../../skins/basic/access_denied.main.php:136
+#: ../../../skins/basic/access_requires_login.main.php:137
+#: ../../../skins/basic/help.main.php:142 ../skins/basic/index.main.php:303
+#: ../../../skins/basic/msgform.main.php:143
+#: ../../../skins/bootstrap_blog_skin/access_denied.main.php:303
+#: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:302
+#: ../../../skins/bootstrap_blog_skin/help.main.php:308
+#: ../../../skins/bootstrap_blog_skin/index.main.php:386
+#: ../../../skins/bootstrap_blog_skin/msgform.main.php:309
+#: ../../../skins/bootstrap_forums_skin/access_denied.main.php:211
+#: ../../../skins/bootstrap_forums_skin/access_requires_login.main.php:210
+#: ../../../skins/bootstrap_forums_skin/help.main.php:217
+#: ../../../skins/bootstrap_forums_skin/index.main.php:421
+#: ../../../skins/bootstrap_forums_skin/msgform.main.php:218
+#: ../../../skins/bootstrap_gallery_legacy/_body_footer.inc.php:31
+#: ../../../skins/bootstrap_gallery_legacy/access_denied.main.php:208
+#: ../../../skins/bootstrap_gallery_legacy/access_requires_login.main.php:207
+#: ../../../skins/bootstrap_gallery_legacy/help.main.php:214
+#: ../../../skins/bootstrap_gallery_legacy/index.main.php:237
+#: ../../../skins/bootstrap_gallery_legacy/msgform.main.php:215
+#: ../../../skins/bootstrap_gallery_legacy/single.main.php:354
+#: ../../../skins/bootstrap_gallery_skin/_body_footer.inc.php:31
+#: ../../../skins/bootstrap_gallery_skin/access_denied.main.php:208
+#: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:207
+#: ../../../skins/bootstrap_gallery_skin/help.main.php:214
+#: ../../../skins/bootstrap_gallery_skin/index.main.php:237
+#: ../../../skins/bootstrap_gallery_skin/msgform.main.php:215
+#: ../../../skins/bootstrap_gallery_skin/single.main.php:355
+#: ../../../skins/bootstrap_main_skin/access_denied.main.php:223
+#: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:223
+#: ../../../skins/bootstrap_main_skin/front.main.php:266
+#: ../../../skins/bootstrap_main_skin/help.main.php:227
+#: ../../../skins/bootstrap_main_skin/index.main.php:324
+#: ../../../skins/bootstrap_main_skin/msgform.main.php:228
+#: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:398
+#: ../../../skins/bootstrap_manual_skin/access_denied.main.php:347
+#: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:338
+#: ../../../skins/bootstrap_manual_skin/help.main.php:353
+#: ../../../skins/bootstrap_manual_skin/index.main.php:325
+#: ../../../skins/bootstrap_manual_skin/msgform.main.php:354
+#: ../../../skins/bootstrap_photoblog_skin/access_denied.main.php:208
+#: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:207
+#: ../../../skins/bootstrap_photoblog_skin/help.main.php:214
+#: ../../../skins/bootstrap_photoblog_skin/index.main.php:301
+#: ../../../skins/bootstrap_photoblog_skin/msgform.main.php:215
+#: ../../../skins/clean1_skin/_body_footer.inc.php:33
+#: ../../../skins/dating_mood/access_denied.main.php:162
+#: ../../../skins/dating_mood/access_requires_login.main.php:162
+#: ../../../skins/dating_mood/help.main.php:168
+#: ../../../skins/dating_mood/index.main.php:274
+#: ../../../skins/dating_mood/msgform.main.php:169
+#: ../../../skins/evopress/_body_footer.inc.php:35
+#: ../../../skins/horizon_blog_skin/access_denied.main.php:303
+#: ../../../skins/horizon_blog_skin/access_requires_login.main.php:302
+#: ../../../skins/horizon_blog_skin/index.main.php:422
+#: ../../../skins/horizon_blog_skin/single.main.php:455
+#: ../../../skins/horizon_main_skin/access_denied.main.php:168
+#: ../../../skins/horizon_main_skin/access_requires_login.main.php:169
+#: ../../../skins/horizon_main_skin/index.main.php:377
+#: ../../../skins/photoalbums/_body_footer.inc.php:34
+#: ../../../skins/photoblog/_body_footer.inc.php:27
+#: ../../../skins/pureforums/access_denied.main.php:167
+#: ../../../skins/pureforums/access_requires_login.main.php:169
+#: ../../../skins/pureforums/help.main.php:173
+#: ../../../skins/pureforums/index.main.php:264
+#: ../../../skins/pureforums/msgform.main.php:174
+#: ../../../skins/touch/_body_footer.inc.php:33
+#: ../../../skins_fallback_v5/_body_footer.inc.php:24
+msgid "Send a message to the owner of this blog..."
+msgstr "Envoyer un messager au propriétaire de ce blog..."
 
 #: ../../../plugins/_adjust_headings.plugin.php:41
 msgid "Adjust heading levels so they are consistent for all posts."
@@ -37134,78 +37466,6 @@ msgstr "En réponse à:"
 msgid "%s in response to: %s"
 msgstr "%s en réponse à: %s"
 
-#: ../../../skins/asevo/_body_footer.inc.php:34
-#: ../../../skins/basic/access_denied.main.php:136
-#: ../../../skins/basic/access_requires_login.main.php:137
-#: ../../../skins/basic/help.main.php:142 ../skins/basic/index.main.php:303
-#: ../../../skins/basic/msgform.main.php:143
-#: ../../../skins/bootstrap_blog_skin/access_denied.main.php:303
-#: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:302
-#: ../../../skins/bootstrap_blog_skin/help.main.php:308
-#: ../../../skins/bootstrap_blog_skin/index.main.php:386
-#: ../../../skins/bootstrap_blog_skin/msgform.main.php:309
-#: ../../../skins/bootstrap_forums_skin/access_denied.main.php:211
-#: ../../../skins/bootstrap_forums_skin/access_requires_login.main.php:210
-#: ../../../skins/bootstrap_forums_skin/help.main.php:217
-#: ../../../skins/bootstrap_forums_skin/index.main.php:421
-#: ../../../skins/bootstrap_forums_skin/msgform.main.php:218
-#: ../../../skins/bootstrap_gallery_legacy/_body_footer.inc.php:31
-#: ../../../skins/bootstrap_gallery_legacy/access_denied.main.php:208
-#: ../../../skins/bootstrap_gallery_legacy/access_requires_login.main.php:207
-#: ../../../skins/bootstrap_gallery_legacy/help.main.php:214
-#: ../../../skins/bootstrap_gallery_legacy/index.main.php:237
-#: ../../../skins/bootstrap_gallery_legacy/msgform.main.php:215
-#: ../../../skins/bootstrap_gallery_legacy/single.main.php:354
-#: ../../../skins/bootstrap_gallery_skin/_body_footer.inc.php:31
-#: ../../../skins/bootstrap_gallery_skin/access_denied.main.php:208
-#: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:207
-#: ../../../skins/bootstrap_gallery_skin/help.main.php:214
-#: ../../../skins/bootstrap_gallery_skin/index.main.php:237
-#: ../../../skins/bootstrap_gallery_skin/msgform.main.php:215
-#: ../../../skins/bootstrap_gallery_skin/single.main.php:355
-#: ../../../skins/bootstrap_main_skin/access_denied.main.php:223
-#: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:223
-#: ../../../skins/bootstrap_main_skin/front.main.php:266
-#: ../../../skins/bootstrap_main_skin/help.main.php:227
-#: ../../../skins/bootstrap_main_skin/index.main.php:324
-#: ../../../skins/bootstrap_main_skin/msgform.main.php:228
-#: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:398
-#: ../../../skins/bootstrap_manual_skin/access_denied.main.php:347
-#: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:338
-#: ../../../skins/bootstrap_manual_skin/help.main.php:353
-#: ../../../skins/bootstrap_manual_skin/index.main.php:325
-#: ../../../skins/bootstrap_manual_skin/msgform.main.php:354
-#: ../../../skins/bootstrap_photoblog_skin/access_denied.main.php:208
-#: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:207
-#: ../../../skins/bootstrap_photoblog_skin/help.main.php:214
-#: ../../../skins/bootstrap_photoblog_skin/index.main.php:301
-#: ../../../skins/bootstrap_photoblog_skin/msgform.main.php:215
-#: ../../../skins/clean1_skin/_body_footer.inc.php:33
-#: ../../../skins/dating_mood/access_denied.main.php:162
-#: ../../../skins/dating_mood/access_requires_login.main.php:162
-#: ../../../skins/dating_mood/help.main.php:168
-#: ../../../skins/dating_mood/index.main.php:274
-#: ../../../skins/dating_mood/msgform.main.php:169
-#: ../../../skins/evopress/_body_footer.inc.php:35
-#: ../../../skins/horizon_blog_skin/access_denied.main.php:303
-#: ../../../skins/horizon_blog_skin/access_requires_login.main.php:302
-#: ../../../skins/horizon_blog_skin/index.main.php:422
-#: ../../../skins/horizon_blog_skin/single.main.php:455
-#: ../../../skins/horizon_main_skin/access_denied.main.php:168
-#: ../../../skins/horizon_main_skin/access_requires_login.main.php:169
-#: ../../../skins/horizon_main_skin/index.main.php:377
-#: ../../../skins/photoalbums/_body_footer.inc.php:34
-#: ../../../skins/photoblog/_body_footer.inc.php:27
-#: ../../../skins/pureforums/access_denied.main.php:167
-#: ../../../skins/pureforums/access_requires_login.main.php:169
-#: ../../../skins/pureforums/help.main.php:173
-#: ../../../skins/pureforums/index.main.php:264
-#: ../../../skins/pureforums/msgform.main.php:174
-#: ../../../skins/touch/_body_footer.inc.php:33
-#: ../../../skins_fallback_v5/_body_footer.inc.php:24
-msgid "Send a message to the owner of this blog..."
-msgstr "Envoyer un messager au propriétaire de ce blog..."
-
 #. TRANS: Widget container name
 #: ../../../skins/asevo/_item_block.inc.php:97
 #: ../skins/basic/index.main.php:191
@@ -37531,78 +37791,6 @@ msgstr "Afficher le sexe"
 msgid "Autocomplete usernames"
 msgstr "Compléter automatiquement les noms d'utilisateurs"
 
-#: ../../../skins/asevo/access_denied.main.php:44
-#: ../../../skins/asevo/access_requires_login.main.php:45
-#: ../../../skins/asevo/help.main.php:50 ../skins/asevo/index.main.php:72
-#: ../../../skins/asevo/msgform.main.php:51
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:214
-#: ../../../skins/bootstrap_blog_skin/access_denied.main.php:77
-#: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:77
-#: ../../../skins/bootstrap_blog_skin/help.main.php:82
-#: ../../../skins/bootstrap_blog_skin/index.main.php:71
-#: ../../../skins/bootstrap_blog_skin/msgform.main.php:83
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:274
-#: ../../../skins/bootstrap_forums_skin/access_denied.main.php:80
-#: ../../../skins/bootstrap_forums_skin/access_requires_login.main.php:80
-#: ../../../skins/bootstrap_forums_skin/help.main.php:86
-#: ../../../skins/bootstrap_forums_skin/index.main.php:99
-#: ../../../skins/bootstrap_forums_skin/msgform.main.php:87
-#: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:256
-#: ../../../skins/bootstrap_gallery_legacy/access_denied.main.php:77
-#: ../../../skins/bootstrap_gallery_legacy/access_requires_login.main.php:77
-#: ../../../skins/bootstrap_gallery_legacy/help.main.php:83
-#: ../../../skins/bootstrap_gallery_legacy/index.main.php:80
-#: ../../../skins/bootstrap_gallery_legacy/msgform.main.php:84
-#: ../../../skins/bootstrap_gallery_legacy/single.main.php:80
-#: ../../../skins/bootstrap_gallery_skin/_skin.class.php:256
-#: ../../../skins/bootstrap_gallery_skin/access_denied.main.php:77
-#: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:77
-#: ../../../skins/bootstrap_gallery_skin/help.main.php:83
-#: ../../../skins/bootstrap_gallery_skin/index.main.php:80
-#: ../../../skins/bootstrap_gallery_skin/msgform.main.php:84
-#: ../../../skins/bootstrap_gallery_skin/single.main.php:80
-#: ../../../skins/bootstrap_main_skin/_skin.class.php:284
-#: ../../../skins/bootstrap_main_skin/access_denied.main.php:88
-#: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:88
-#: ../../../skins/bootstrap_main_skin/help.main.php:92
-#: ../../../skins/bootstrap_main_skin/index.main.php:87
-#: ../../../skins/bootstrap_main_skin/msgform.main.php:93
-#: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:77
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:191
-#: ../../../skins/bootstrap_manual_skin/access_denied.main.php:76
-#: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:76
-#: ../../../skins/bootstrap_manual_skin/help.main.php:82
-#: ../../../skins/bootstrap_manual_skin/index.main.php:75
-#: ../../../skins/bootstrap_manual_skin/msgform.main.php:83
-#: ../../../skins/bootstrap_photoblog_skin/_skin.class.php:290
-#: ../../../skins/bootstrap_photoblog_skin/access_denied.main.php:77
-#: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:77
-#: ../../../skins/bootstrap_photoblog_skin/help.main.php:83
-#: ../../../skins/bootstrap_photoblog_skin/index.main.php:71
-#: ../../../skins/bootstrap_photoblog_skin/msgform.main.php:84
-#: ../../../skins/clean1_skin/_body_header.inc.php:74
-#: ../../../skins/dating_mood/access_denied.main.php:60
-#: ../../../skins/dating_mood/access_requires_login.main.php:61
-#: ../../../skins/dating_mood/help.main.php:66
-#: ../../../skins/dating_mood/index.main.php:62
-#: ../../../skins/dating_mood/msgform.main.php:67
-#: ../../../skins/evopress/_body_header.inc.php:44
-#: ../../../skins/horizon_blog_skin/access_denied.main.php:77
-#: ../../../skins/horizon_blog_skin/access_requires_login.main.php:77
-#: ../../../skins/horizon_blog_skin/index.main.php:65
-#: ../../../skins/horizon_blog_skin/single.main.php:65
-#: ../../../skins/horizon_main_skin/_skin.class.php:290
-#: ../../../skins/horizon_main_skin/access_denied.main.php:86
-#: ../../../skins/horizon_main_skin/access_requires_login.main.php:87
-#: ../../../skins/horizon_main_skin/index.main.php:97
-#: ../../../skins/pureforums/access_denied.main.php:87
-#: ../../../skins/pureforums/access_requires_login.main.php:88
-#: ../../../skins/pureforums/help.main.php:93
-#: ../skins/pureforums/index.main.php:121
-#: ../../../skins/pureforums/msgform.main.php:94
-msgid "Header"
-msgstr "Entête"
-
 #: ../../../skins/asevo/index.main.php:187
 #: ../../../skins/bootstrap_blog_skin/_skin.class.php:217
 #: ../../../skins/bootstrap_blog_skin/access_denied.main.php:180
@@ -37687,88 +37875,6 @@ msgstr "Adresse de trackback pour ce post:"
 #, php-format
 msgid "No %s for this post yet..."
 msgstr "Ce post n'a pas de %s pour le moment..."
-
-#: ../../../skins/basic/access_denied.main.php:62
-#: ../../../skins/basic/access_requires_login.main.php:63
-#: ../../../skins/basic/help.main.php:68 ../skins/basic/index.main.php:63
-#: ../../../skins/basic/msgform.main.php:69
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:215
-#: ../../../skins/bootstrap_blog_skin/access_denied.main.php:52
-#: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:52
-#: ../../../skins/bootstrap_blog_skin/help.main.php:57
-#: ../../../skins/bootstrap_blog_skin/index.main.php:51
-#: ../../../skins/bootstrap_blog_skin/msgform.main.php:58
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:275
-#: ../../../skins/bootstrap_forums_skin/access_denied.main.php:55
-#: ../../../skins/bootstrap_forums_skin/access_requires_login.main.php:55
-#: ../../../skins/bootstrap_forums_skin/help.main.php:61
-#: ../../../skins/bootstrap_forums_skin/index.main.php:79
-#: ../../../skins/bootstrap_forums_skin/msgform.main.php:62
-#: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:257
-#: ../../../skins/bootstrap_gallery_legacy/access_denied.main.php:52
-#: ../../../skins/bootstrap_gallery_legacy/access_requires_login.main.php:52
-#: ../../../skins/bootstrap_gallery_legacy/help.main.php:58
-#: ../../../skins/bootstrap_gallery_legacy/index.main.php:50
-#: ../../../skins/bootstrap_gallery_legacy/msgform.main.php:59
-#: ../../../skins/bootstrap_gallery_legacy/single.main.php:50
-#: ../../../skins/bootstrap_gallery_skin/_skin.class.php:257
-#: ../../../skins/bootstrap_gallery_skin/access_denied.main.php:52
-#: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:52
-#: ../../../skins/bootstrap_gallery_skin/help.main.php:58
-#: ../../../skins/bootstrap_gallery_skin/index.main.php:50
-#: ../../../skins/bootstrap_gallery_skin/msgform.main.php:59
-#: ../../../skins/bootstrap_gallery_skin/single.main.php:50
-#: ../../../skins/bootstrap_main_skin/_skin.class.php:285
-#: ../../../skins/bootstrap_main_skin/access_denied.main.php:63
-#: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:63
-#: ../../../skins/bootstrap_main_skin/help.main.php:67
-#: ../../../skins/bootstrap_main_skin/index.main.php:67
-#: ../../../skins/bootstrap_main_skin/msgform.main.php:68
-#: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:57
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:192
-#: ../../../skins/bootstrap_manual_skin/access_denied.main.php:51
-#: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:51
-#: ../../../skins/bootstrap_manual_skin/help.main.php:57
-#: ../../../skins/bootstrap_manual_skin/index.main.php:55
-#: ../../../skins/bootstrap_manual_skin/msgform.main.php:58
-#: ../../../skins/bootstrap_photoblog_skin/_skin.class.php:291
-#: ../../../skins/bootstrap_photoblog_skin/access_denied.main.php:52
-#: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:52
-#: ../../../skins/bootstrap_photoblog_skin/help.main.php:58
-#: ../../../skins/bootstrap_photoblog_skin/index.main.php:51
-#: ../../../skins/bootstrap_photoblog_skin/msgform.main.php:59
-#: ../../../skins/clean1_skin/_body_header.inc.php:29
-#: ../../../skins/dating_mood/access_denied.main.php:42
-#: ../../../skins/dating_mood/access_requires_login.main.php:43
-#: ../../../skins/dating_mood/help.main.php:48
-#: ../../../skins/dating_mood/index.main.php:44
-#: ../../../skins/dating_mood/msgform.main.php:49
-#: ../../../skins/evopress/_body_header.inc.php:29
-#: ../../../skins/horizon_blog_skin/access_denied.main.php:52
-#: ../../../skins/horizon_blog_skin/access_requires_login.main.php:52
-#: ../../../skins/horizon_blog_skin/index.main.php:48
-#: ../../../skins/horizon_blog_skin/single.main.php:48
-#: ../../../skins/horizon_main_skin/_skin.class.php:291
-#: ../../../skins/horizon_main_skin/access_denied.main.php:68
-#: ../../../skins/horizon_main_skin/access_requires_login.main.php:69
-#: ../../../skins/horizon_main_skin/index.main.php:78
-#: ../../../skins/photoalbums/access_denied.main.php:43
-#: ../../../skins/photoalbums/access_requires_login.main.php:42
-#: ../../../skins/photoalbums/help.main.php:49
-#: ../../../skins/photoalbums/index.main.php:48
-#: ../../../skins/photoalbums/msgform.main.php:50
-#: ../../../skins/photoblog/access_denied.main.php:39
-#: ../../../skins/photoblog/access_requires_login.main.php:40
-#: ../../../skins/photoblog/help.main.php:45
-#: ../skins/photoblog/index.main.php:44
-#: ../../../skins/photoblog/msgform.main.php:46
-#: ../../../skins/pureforums/access_denied.main.php:60
-#: ../../../skins/pureforums/access_requires_login.main.php:61
-#: ../../../skins/pureforums/help.main.php:66
-#: ../skins/pureforums/index.main.php:94
-#: ../../../skins/pureforums/msgform.main.php:67
-msgid "Page Top"
-msgstr "Haut de page"
 
 #: ../../../skins/basic/access_denied.main.php:67
 #: ../../../skins/basic/access_requires_login.main.php:68
@@ -37965,95 +38071,6 @@ msgstr "Container \"%s\""
 #: ../../../skins/horizon_blog_skin/single.main.php:384
 msgid "Sidebar 2"
 msgstr "Barre latérale 2"
-
-#: ../../../skins/bootstrap_blog_skin/_skin.class.php:219
-#: ../../../skins/bootstrap_blog_skin/access_denied.main.php:276
-#: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:275
-#: ../../../skins/bootstrap_blog_skin/help.main.php:281
-#: ../../../skins/bootstrap_blog_skin/index.main.php:362
-#: ../../../skins/bootstrap_blog_skin/msgform.main.php:282
-#: ../../../skins/bootstrap_forums_skin/_skin.class.php:277
-#: ../../../skins/bootstrap_forums_skin/access_denied.main.php:184
-#: ../../../skins/bootstrap_forums_skin/access_requires_login.main.php:183
-#: ../../../skins/bootstrap_forums_skin/help.main.php:190
-#: ../../../skins/bootstrap_forums_skin/index.main.php:395
-#: ../../../skins/bootstrap_forums_skin/msgform.main.php:191
-#: ../../../skins/bootstrap_gallery_legacy/_skin.class.php:259
-#: ../../../skins/bootstrap_gallery_legacy/access_denied.main.php:181
-#: ../../../skins/bootstrap_gallery_legacy/access_requires_login.main.php:180
-#: ../../../skins/bootstrap_gallery_legacy/help.main.php:187
-#: ../../../skins/bootstrap_gallery_legacy/index.main.php:213
-#: ../../../skins/bootstrap_gallery_legacy/msgform.main.php:188
-#: ../../../skins/bootstrap_gallery_legacy/single.main.php:330
-#: ../../../skins/bootstrap_gallery_skin/_skin.class.php:259
-#: ../../../skins/bootstrap_gallery_skin/access_denied.main.php:181
-#: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:180
-#: ../../../skins/bootstrap_gallery_skin/help.main.php:187
-#: ../../../skins/bootstrap_gallery_skin/index.main.php:213
-#: ../../../skins/bootstrap_gallery_skin/msgform.main.php:188
-#: ../../../skins/bootstrap_gallery_skin/single.main.php:331
-#: ../../../skins/bootstrap_main_skin/_skin.class.php:287
-#: ../../../skins/bootstrap_main_skin/access_denied.main.php:198
-#: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:198
-#: ../../../skins/bootstrap_main_skin/front.main.php:242
-#: ../../../skins/bootstrap_main_skin/help.main.php:202
-#: ../../../skins/bootstrap_main_skin/index.main.php:300
-#: ../../../skins/bootstrap_main_skin/msgform.main.php:203
-#: ../../../skins/bootstrap_manual_skin/404_not_found.main.php:374
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:196
-#: ../../../skins/bootstrap_manual_skin/access_denied.main.php:322
-#: ../../../skins/bootstrap_manual_skin/access_requires_login.main.php:313
-#: ../../../skins/bootstrap_manual_skin/help.main.php:328
-#: ../../../skins/bootstrap_manual_skin/index.main.php:301
-#: ../../../skins/bootstrap_manual_skin/msgform.main.php:329
-#: ../../../skins/bootstrap_photoblog_skin/_skin.class.php:293
-#: ../../../skins/bootstrap_photoblog_skin/access_denied.main.php:181
-#: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:180
-#: ../../../skins/bootstrap_photoblog_skin/help.main.php:187
-#: ../../../skins/bootstrap_photoblog_skin/index.main.php:277
-#: ../../../skins/bootstrap_photoblog_skin/msgform.main.php:188
-#: ../../../skins/dating_mood/access_denied.main.php:142
-#: ../../../skins/dating_mood/access_requires_login.main.php:142
-#: ../../../skins/dating_mood/help.main.php:148
-#: ../../../skins/dating_mood/index.main.php:254
-#: ../../../skins/dating_mood/msgform.main.php:149
-#: ../../../skins/horizon_blog_skin/access_denied.main.php:276
-#: ../../../skins/horizon_blog_skin/access_requires_login.main.php:275
-#: ../../../skins/horizon_blog_skin/index.main.php:399
-#: ../../../skins/horizon_blog_skin/single.main.php:432
-#: ../../../skins/horizon_main_skin/_skin.class.php:293
-#: ../../../skins/horizon_main_skin/access_denied.main.php:146
-#: ../../../skins/horizon_main_skin/access_requires_login.main.php:147
-#: ../../../skins/horizon_main_skin/index.main.php:355
-#: ../../../skins/photoalbums/_body_footer.inc.php:23
-#: ../../../skins/pureforums/access_denied.main.php:145
-#: ../../../skins/pureforums/access_requires_login.main.php:147
-#: ../../../skins/pureforums/help.main.php:151
-#: ../../../skins/pureforums/index.main.php:242
-#: ../../../skins/pureforums/msgform.main.php:152
-msgid "Footer"
-msgstr "Pied de page"
-
-#: ../../../skins/bootstrap_blog_skin/access_requires_login.main.php:146
-#: ../../../skins/bootstrap_blog_skin/index.main.php:224
-#: ../../../skins/bootstrap_forums_skin/access_requires_login.main.php:149
-#: ../../../skins/bootstrap_forums_skin/index.main.php:252
-#: ../../../skins/bootstrap_gallery_legacy/access_requires_login.main.php:146
-#: ../../../skins/bootstrap_gallery_skin/access_requires_login.main.php:146
-#: ../../../skins/bootstrap_main_skin/access_requires_login.main.php:157
-#: ../../../skins/bootstrap_main_skin/front.main.php:158
-#: ../../../skins/bootstrap_main_skin/index.main.php:238
-#: ../../../skins/bootstrap_manual_skin/_skin.class.php:313
-#: ../../../skins/bootstrap_photoblog_skin/access_requires_login.main.php:146
-#: ../../../skins/bootstrap_photoblog_skin/index.main.php:224
-#: ../../../skins/horizon_blog_skin/access_requires_login.main.php:146
-#: ../../../skins/horizon_blog_skin/index.main.php:263
-#: ../../../skins/horizon_blog_skin/single.main.php:272
-#: ../../../skins/horizon_main_skin/access_requires_login.main.php:117
-#: ../../../skins/horizon_main_skin/index.main.php:264
-#: ../../../skins_adm/login/_login_form.main.php:38
-msgid "Log in to your account"
-msgstr "Connectez-vous à votre compte"
 
 #: ../../../skins/bootstrap_forums_skin/_comments.disp.php:36
 #: ../../../skins/pureforums/_comments.disp.php:36
