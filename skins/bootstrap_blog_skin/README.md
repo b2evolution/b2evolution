@@ -1,9 +1,5 @@
 ## Bootstrap Blog Skin
 
-Skin version: 6.8.0-aplha.
-
-====
-
 ### Front Page
 
 ![disp=front](skinshot_front.jpg)

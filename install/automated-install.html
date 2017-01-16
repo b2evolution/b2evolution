@@ -42,7 +42,7 @@
 	<h2>3. Run the install script</h2>
 	<p>At this point you can call b2evolution's install script through an HTTP GET request (wget, cURL, etc..) of this form:</p>
 	<pre>http://example.com/install/index.php?locale=en-US&amp;action=newdb&amp;create_sample_contents=all</pre>
-	
+
 	<h3>Use this form to generate an automated install test URL:</h3>
 	<form action="index.php" method="get" style="background-color:#ddd">
 		<input type="hidden" name="action" value="newdb" />
@@ -137,6 +137,7 @@
 		<li>&lt;evo:error&gt;The DB schema has been changed since confirmation.&lt;/evo:error&gt;</li>
 		<li>&lt;evo:error&gt;b2evolution cannot be installed, because of the following errors:&lt;/evo:error&gt;</li>
 		<li>&lt;evo:error&gt;It seems that the database config settings you entered don't work. Please check them carefully and try again...&lt;/evo:error&gt;</li>
+		<li>&lt;evo:error&gt;You must pass db_config params or create a &lt;code&gt;/conf/_basic_config.php&lt;/code&gt; file before calling the installer.&lt;/evo:error&gt;</li>
 		<li>&lt;evo:error&gt;Could not load original conf file [/conf/_basic_config.php]. Is it missing?&lt;/evo:error&gt;</li>
 		<li>&lt;evo:error&gt;No default time zone is set. Please open PHP.ini and set the value of 'date.timezone' (Example: date.timezone = Europe/Paris) or open /conf/_advanced.php and set the value of $date_default_timezone (Example: $date_default_timezone = 'Europe/Paris';)&lt;/evo:error&gt;</li>
 		<li>&lt;evo:error&gt;ERROR: Impossible to connect to Database.&lt;/evo:error&gt;</li>

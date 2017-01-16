@@ -21,7 +21,7 @@ $Form->global_icon( T_('Cancel viewing!'), 'close', regenerate_url( 'blog' ) );
 
 $Form->begin_form( 'fform', sprintf( T_('Returned mail ID#%s'), $MailReturn->emret_ID ) );
 
-$Form->info( T_('Date'), mysql2localedatetime_spans( $MailReturn->emret_timestamp, 'Y-m-d', 'H:i:sP' ) );
+$Form->info( T_('Date'), mysql2localedatetime_spans( $MailReturn->emret_timestamp ) );
 
 $Form->info( T_('Error Type'), dre_decode_error_type( $MailReturn->emret_errtype ) );
 

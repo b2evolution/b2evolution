@@ -246,6 +246,10 @@ span.fa {
 a.action_icon span.fa {
   margin-right: 2px;
 }
+span.fa.action_icon.empty_placeholder {
+  margin-right: 4px;
+  visibility: hidden;
+}
 a.roundbutton .fa,
 a.roundbutton:hover .fa,
 a.roundbutton_text .fa,
@@ -1673,6 +1677,9 @@ div.avatartag.main .avatar_actions {
     max-height: 245px;
   }
 }
+#user_crop_content {
+  padding: 10px;
+}
 #image_crop_block {
   display: table;
 }
@@ -1956,6 +1963,11 @@ input.invisible {
 div.log_container,
 div.action_messages {
   margin: 1ex;
+}
+div.log_container ul.message_group li,
+div.action_messages ul.message_group li {
+  margin-left: 25px;
+  list-style: disc;
 }
 div.log_container ul,
 div.action_messages ul,

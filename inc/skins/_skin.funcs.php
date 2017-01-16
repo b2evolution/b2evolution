@@ -364,7 +364,7 @@ var downloadInterval = setInterval( function()
 						//      - selecting exactly one cat through catsel[] is NOT OK since not equivalent (will exclude children)
 
 						// echo 'SINGLE CAT PAGE';
-						// fp> add this?: $disp_detail = 'posts-topcat';  // may become 'posts-subcat' below.
+						$disp_detail = 'posts-topcat';  // may become 'posts-subcat' below.
 
 						if( ( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
 							|| $Blog->get_setting( 'relcanonical_cat_urls' ) )
@@ -554,16 +554,12 @@ var downloadInterval = setInterval( function()
 			elseif( !empty( $comment_id ) )
 			{ // comment id is set, try to get comment author user
 				$CommentCache = & get_CommentCache();
-				$Comment = $CommentCache->get_by_ID( $comment_id, false );
-
-				if( $Comment = $CommentCache->get_by_ID( $comment_id, false ) )
+				if( $Comment = & $CommentCache->get_by_ID( $comment_id, false ) )
 				{
 					$recipient_User = & $Comment->get_author_User();
 					if( empty( $recipient_User ) && ( $Comment->allow_msgform ) && ( is_email( $Comment->get_author_email() ) ) )
 					{ // set allow message form to email because comment author (not registered) accepts email
 						$allow_msgform = 'email';
-						param( 'recipient_address', 'string', $Comment->get_author_email() );
-						param( 'recipient_name', 'string', $Comment->get_author_name() );
 					}
 				}
 			}
@@ -645,6 +641,7 @@ var downloadInterval = setInterval( function()
 					$recipients_selected = array( array(
 							'id'    => $recipient_User->ID,
 							'login' => $recipient_User->login,
+							'fullname' => $recipient_User->get_username()
 						) );
 
 					init_tokeninput_js( 'blog' );
@@ -1210,15 +1207,15 @@ var downloadInterval = setInterval( function()
 				$after_email_validation = $Settings->get( 'after_email_validation' );
 				if( $after_email_validation == 'return_to_original' )
 				{ // we want to return to original page after account activation
-					// check if Session 'validatemail.redirect_to' param is still set
-					$redirect_to = $Session->get( 'core.validatemail.redirect_to' );
+					// check if Session 'activateacc.redirect_to' param is still set
+					$redirect_to = $Session->get( 'core.activateacc.redirect_to' );
 					if( empty( $redirect_to ) )
 					{ // Session param is empty try to get general redirect_to param
 						$redirect_to = param( 'redirect_to', 'url', '' );
 					}
 					else
 					{ // cleanup validateemail.redirect_to param from session
-						$Session->delete('core.validatemail.redirect_to');
+						$Session->delete('core.activateacc.redirect_to');
 					}
 				}
 				else
@@ -1713,6 +1710,11 @@ function skin_include( $template_name, $params = array() )
 	$timer_name = 'skin_include('.$template_name.')';
 	$Timer->resume( $timer_name );
 
+	if( ! empty( $params['Item'] ) )
+	{	// Get Item from params:
+		$Item = $params['Item'];
+	}
+
 	if( $template_name == '$disp$' )
 	{ // This is a special case.
 		// We are going to include a template based on $disp:
@@ -2111,7 +2113,7 @@ function skin_description_tag()
 			$r = $Blog->get( 'shortdesc' );
 		}
 	}
-	elseif( $disp_detail == 'posts-cat' || $disp_detail == 'posts-subcat' )
+	elseif( $disp_detail == 'posts-cat' || $disp_detail == 'posts-topcat' || $disp_detail == 'posts-subcat' )
 	{
 		if( $Blog->get_setting( 'categories_meta_description' ) && ( ! empty( $Chapter ) ) )
 		{

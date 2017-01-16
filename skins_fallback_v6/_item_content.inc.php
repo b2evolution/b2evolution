@@ -118,6 +118,7 @@ if( $content_mode == 'auto' )
 	switch( $disp_detail )
 	{
 		case 'posts-cat':
+		case 'posts-topcat':
 		case 'posts-subcat':
 			$content_mode = $Blog->get_setting('chapter_content');
 			break;

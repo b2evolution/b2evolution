@@ -93,6 +93,7 @@ $core_componentwidget_defs = array(
 			'coll_comment_list',      // Comment list
 		),
 	'infoitem' => array(
+			'item_info_line',
 			'item_content',
 			'item_attachments',
 			'item_location',

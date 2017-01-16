@@ -62,7 +62,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	// Passthrough some attributes to elements:
 	foreach( $parmeta as $k => $v )
 	{
-		if( in_array( $k, array( 'id', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect', 'cols', 'rows', 'maxlength' ) ) )
+		if( in_array( $k, array( 'id', 'class', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect', 'cols', 'rows', 'maxlength' ) ) )
 		{
 			$params[$k] = $v;
 		}
@@ -264,7 +264,13 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$meta_option_checked = $set_value === NULL ?
 					/* default value */ $meta_option[2] :
 					/* saved value */   ! empty( $set_value[ $meta_option[0] ] );
-				$options[] = array( $input_name.'['.$meta_option[0].']', 1, $meta_option[1], $meta_option_checked );
+
+				$meta_option_disabled = isset( $meta_option[4] ) ? $meta_option[4] : NULL;
+				$meta_option_note = isset( $meta_option[5] ) ? $meta_option[5] : NULL;
+				$meta_option_class = isset( $meta_option[6] ) ? $meta_option[6] : NULL;
+				$meta_option_hidden = isset( $meta_option[7] ) ? $meta_option[7] : NULL;
+				$meta_option_label_attribs = isset( $meta_option[8] ) ? $meta_option[8] : NULL;
+				$options[] = array( $input_name.'['.$meta_option[0].']', 1, $meta_option[1], $meta_option_checked, $meta_option_disabled, $meta_option_note, $meta_option_class, $meta_option_hidden, $meta_option_label_attribs );
 			}
 			$Form->checklist( $options, $input_name, $set_label, false, false, $params );
 			break;

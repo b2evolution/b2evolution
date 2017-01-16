@@ -653,7 +653,7 @@ class Item extends ItemLight
 		}
 
 		// URL associated with Item:
-		$post_url = param( 'post_url', 'string', NULL );
+		$post_url = param( 'post_url', 'url', NULL );
 		if( $post_url !== NULL )
 		{
 			param_check_url( 'post_url', 'posting', '' );
@@ -1288,7 +1288,8 @@ class Item extends ItemLight
 
 		if( $display )
 		{ // display a comment form section even if comment form won't be displayed, "add new comment" links should point to this section
-			echo '<a id="form_p'.$this->ID.'"></a>';
+			$comment_form_anchor = empty( $params['comment_form_anchor'] ) ? 'form_p' : $params['comment_form_anchor'];
+			echo '<a id="'.$comment_form_anchor.$this->ID.'"></a>';
 		}
 
 		if( ! $this->get_type_setting( 'use_comments' ) )
@@ -1363,6 +1364,42 @@ class Item extends ItemLight
 
 		// Current user not allowed to comment in this blog
 		return false;
+	}
+
+
+	/**
+	 * Check if current User can see meta comments on this Item
+	 *
+	 * @return boolean
+	 */
+	function can_see_meta_comments()
+	{
+		if( ! is_logged_in() )
+		{	// User must be logged in
+			return false;
+		}
+
+		global $current_User;
+
+		return $current_User->check_perm( 'meta_comment', 'view', false, $this->get_blog_ID() );
+	}
+
+
+	/**
+	 * Check if current User can leave meta comment on this Item
+	 *
+	 * @return boolean
+	 */
+	function can_meta_comment()
+	{
+		if( ! is_logged_in() )
+		{	// User must be logged in
+			return false;
+		}
+
+		global $current_User;
+
+		return $current_User->check_perm( 'meta_comment', 'add', false, $this->get_blog_ID() );
 	}
 
 
@@ -3089,8 +3126,10 @@ class Item extends ItemLight
 				$params[ $param_key ] = & $params[ $param_key ];
 			}
 
-			$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $params, true );
-			if( count( $r_params ) != 0 && isset( $r_params['plugin_ID'] ) )
+			// Prepare params before rendering item attachment:
+			$Plugins->trigger_event_first_true_with_params( 'PrepareForRenderItemAttachment', $params );
+
+			if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $params ) ) != 0 )
 			{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
 				if( ! $params['get_rendered_attachments'] )
 				{ // Restore $r value and mark this item has the rendered attachments
@@ -3099,9 +3138,6 @@ class Item extends ItemLight
 				}
 				continue;
 			}
-
-			// Update params because they may be modified by some plugin above:
-			$params = $r_params;
 
 			if( ! $File->is_image() )
 			{ // Skip anything that is not an image
@@ -3311,14 +3347,13 @@ class Item extends ItemLight
 				continue;
 			}
 
-			$r_params = $Plugins->trigger_event_first_true( 'RenderItemAttachment', $params, true );
-			if( count( $r_params ) != 0 && isset( $r_params['plugin_ID'] ) )
+			// Prepare params before rendering item attachment:
+			$Plugins->trigger_event_first_true_with_params( 'PrepareForRenderItemAttachment', $params );
+
+			if( count( $Plugins->trigger_event_first_true( 'RenderItemAttachment', $params ) ) != 0 )
 			{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
 				continue;
 			}
-
-			// Update params because they may be modified by some plugin above:
-			$params = $r_params;
 
 			if( $File->is_image() && $Link->get( 'position' ) != 'attachment' )
 			{ // Skip images (except those in the attachment position) because these are displayed inline already
@@ -3608,7 +3643,7 @@ class Item extends ItemLight
 
 		$params = array_merge( array(
 									'type' => 'feedbacks',		// Kind of feedbacks to count
-									'status' => 'published',	// Status of feedbacks to count
+									'status' => '#',	// Statuses of feedbacks to count, can be a string for one status or array for several. '#' - active front-office comment statuses, '#moderation#' - "require moderation" statuses.
 									'link_before' => '',
 									'link_after' => '',
 									'link_text_zero' => '#',
@@ -3782,9 +3817,11 @@ class Item extends ItemLight
 	 * @param string Link text to display when there are 0 comments
 	 * @param string Link text to display when there is 1 comment
 	 * @param string Link text to display when there are >1 comments (include %d for # of comments)
-	 * @param string Status of feedbacks to count
+	 * @param string|array Statuses of feedbacks to count, a string for one status, an array for several statuses,
+	 *                     '#' - to use currently active front-office comment statuses of the item's collection
+	 *                     '#moderation#' - to use all comment statuses which require moderation on front-office for the item's collection
 	 */
-	function get_feedback_title( $type = 'feedbacks',	$zero = '#', $one = '#', $more = '#', $status = 'published', $filter_by_perm = true )
+	function get_feedback_title( $type = 'feedbacks',	$zero = '#', $one = '#', $more = '#', $statuses = '#', $filter_by_perm = true )
 	{
 		if( ! $this->can_see_comments() )
 		{	// Comments disabled
@@ -3829,11 +3866,22 @@ class Item extends ItemLight
 				debug_die( "Unknown feedback type [$type]" );
 		}
 
-		$number = generic_ctp_number( $this->ID, $type, $status, false, $filter_by_perm );
+		if( $statuses == '#' )
+		{	// Get all comment statuses which are actived on front-office for the item's collection:
+			$this->load_Blog();
+			$statuses = explode( ',', $this->Blog->get_setting( 'comment_inskin_statuses' ) );
+		}
+		elseif( $statuses == '#moderation#' )
+		{	// Get all comment statuses which require moderation on front-office for the item's collection:
+			$this->load_Blog();
+			$statuses = explode( ',', $this->Blog->get_setting( 'moderation_statuses' ) );
+		}
+
+		$number = generic_ctp_number( $this->ID, $type, $statuses, false, $filter_by_perm );
 		if( !$filter_by_perm )
 		{ // This is the case when we are only counting comments awaiting moderation, return only not visible feedbacks number
 			// count feedbacks with the same statuses where user has permission
-			$visible_number = generic_ctp_number( $this->ID, $type, $status, false, true );
+			$visible_number = generic_ctp_number( $this->ID, $type, $statuses, false, true );
 			$number = $number - $visible_number;
 		}
 
@@ -4002,7 +4050,7 @@ class Item extends ItemLight
 		$one = str_replace( '%s', $edit_comments_link, $one );
 		$more = str_replace( '%s', $edit_comments_link, $more );
 
-		$r = $this->get_feedback_title( $type, $zero, $one, $more, array( 'draft', 'review' ), false );
+		$r = $this->get_feedback_title( $type, $zero, $one, $more, '#moderation#', false );
 
 		if( !empty( $r ) )
 		{
@@ -4854,9 +4902,10 @@ class Item extends ItemLight
 	/**
 	 * Get status of item in a formatted way, following a provided template
 	 *
-	 * There are 2 possible variables:
+	 * There are 3 possible variables:
 	 * - $status$ = the raw status
 	 * - $status_title$ = the human readable text version of the status (translated to current language)
+	 * - $tooltip_title$ = the human readable text version of the status for the tooltip
 	 *
 	 * @param array Params
 	 * @return string
@@ -4864,12 +4913,13 @@ class Item extends ItemLight
 	function get_format_status( $params = array() )
 	{
 		$params = array_merge( array(
-				'template' => '<div class="evo_status evo_status_$status$">$status_title$</div>',
+				'template' => '<div class="evo_status evo_status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 				'format'   => 'htmlbody', // Output format, see {@link format_to_output()}
 			), $params );
 
 		$r = str_replace( '$status$', $this->status, $params['template'] );
 		$r = str_replace( '$status_title$', $this->get('t_status'), $r );
+		$r = str_replace( '$tooltip_title$', get_status_tooltip_title( $this->status ), $r );
 
 		return format_to_output( $r, $params['format'] );
 	}
@@ -5514,11 +5564,15 @@ class Item extends ItemLight
 			$this->set_creator_User( $current_User );
 		}
 
-		// Create new slug with validated title
-		$new_Slug = new Slug();
-		$new_Slug->set( 'title', urltitle_validate( $this->urltitle, $this->title, $this->ID, false, $new_Slug->dbprefix.'title', $new_Slug->dbprefix.'itm_ID', $new_Slug->dbtablename, $this->locale ) );
-		$new_Slug->set( 'type', 'item' );
-		$this->set( 'urltitle', $new_Slug->get( 'title' ) );
+		// Validate urltitle/slug:
+		$orig_urltitle = $this->urltitle;
+		$urltitles = explode( ',', $this->urltitle );
+		foreach( $urltitles as $u => $urltitle_value )
+		{
+			$urltitles[ $u ] = utf8_trim( $urltitle_value );
+		}
+		$orig_urltitle = implode( ',', array_unique( $urltitles ) );
+		$this->set( 'urltitle', urltitle_validate( $urltitles[0], $this->title, $this->ID, false, 'slug_title', 'slug_itm_ID', 'T_slug', $this->locale ) );
 
 		$this->update_renderers_from_Plugins();
 
@@ -5572,8 +5626,25 @@ class Item extends ItemLight
 			}
 
 			// Let's handle the slugs:
-			// set slug item ID:
-			$new_Slug->set( 'itm_ID', $this->ID );
+			$new_slugs = $this->update_slugs( $orig_urltitle );
+
+			if( $result && ! empty( $new_slugs ) )
+			{	// If we have new created slugs, we have to insert it into the database:
+				foreach( $new_slugs as $s => $new_Slug )
+				{
+					if( $new_Slug->ID == 0 )
+					{	// Insert only new created slugs:
+						if( ! $new_Slug->dbinsert() )
+						{
+							$result = false;
+						}
+						elseif( $s == 0 )
+						{
+							$new_canonical_Slug = $new_slugs[0];
+						}
+					}
+				}
+			}
 
 			// Create tiny slug:
 			$new_tiny_Slug = new Slug();
@@ -5583,9 +5654,9 @@ class Item extends ItemLight
 			$new_tiny_Slug->set( 'type', 'item' );
 			$new_tiny_Slug->set( 'itm_ID', $this->ID );
 
-			if( $result && ( $result = ( $new_Slug->dbinsert() && $new_tiny_Slug->dbinsert() ) ) )
+			if( $result && ( $result = ( isset( $new_canonical_Slug ) && $new_tiny_Slug->dbinsert() ) ) )
 			{
-				$this->set( 'canonical_slug_ID', $new_Slug->ID );
+				$this->set( 'canonical_slug_ID', $new_canonical_Slug->ID );
 				$this->set( 'tiny_slug_ID', $new_tiny_Slug->ID );
 				if( $result = parent::dbupdate() )
 				{
@@ -5820,8 +5891,12 @@ class Item extends ItemLight
 		else
 		{ // Update was successful
 			if( $db_changed )
-			{ // There were some db modification, delete prerendered content
+			{	// There were some db modification
+				// Delete prerendered content:
 				$this->delete_prerendered_content();
+
+				// Update comments of this Item:
+				$this->update_comments();
 			}
 
 			$DB->commit();
@@ -5900,6 +5975,54 @@ class Item extends ItemLight
 		}
 
 		return $edited_slugs;
+	}
+
+
+	/**
+	 * Update comments of this Item
+	 */
+	function update_comments()
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{	// This function can works only with existing Item:
+			return;
+		}
+
+		if( isset( $this->previous_status ) )
+		{	// Restrict comments status by this Item status if it has been changed:
+			$max_allowed_comment_status = $this->get( 'status' );
+			if( $max_allowed_comment_status == 'redirected' )
+			{	// Comments cannot have a status "Redirected", so reduce them only to "Deprecated":
+				$max_allowed_comment_status = 'deprecated';
+			}
+
+			$ordered_statuses = get_visibility_statuses( 'ordered-index' );
+			$reduce_comment_status = false;
+			$reduced_statuses = array();
+			foreach( $ordered_statuses as $status_key => $status_order )
+			{
+				if( $status_key == $max_allowed_comment_status )
+				{	// This status is max allowed for item's comments, Reduce all next higher statuses:
+					$reduce_comment_status = true;
+					continue;
+				}
+				if( $reduce_comment_status )
+				{	// This comment status must be reduced to current status of this Item:
+					$reduced_statuses[] = $status_key;
+				}
+			}
+
+			if( ! empty( $reduced_statuses ) )
+			{	// Reduce statuses of item's comments to current status of this Item:
+				$DB->query( 'UPDATE T_comments
+					  SET comment_status = '.$DB->quote( $max_allowed_comment_status ).'
+					WHERE comment_item_ID = '.$this->ID.'
+					  AND comment_status IN ( '.$DB->quote( $reduced_statuses ).' )',
+					'Reduce comments statutes to status of Item #'.$this->ID );
+			}
+		}
 	}
 
 
@@ -6210,19 +6333,19 @@ class Item extends ItemLight
 		{	// Only change DB flag to "members_notified" but do NOT actually send notifications:
 			$force_members = false;
 			$notified_flags[] = 'members_notified';
-			$Messages->add( T_('Marking email notifications for members as sent.'), 'note' );
+			$Messages->add_to_group( T_('Marking email notifications for members as sent.'), 'note', T_('Sending notifications:') );
 		}
 		if( $force_community == 'mark' )
 		{	// Only change DB flag to "community_notified" but do NOT actually send notifications:
 			$force_community = false;
 			$notified_flags[] = 'community_notified';
-			$Messages->add( T_('Marking email notifications for community as sent.'), 'note' );
+			$Messages->add_to_group( T_('Marking email notifications for community as sent.'), 'note', T_('Sending notifications:') );
 		}
 		if( $force_pings == 'mark' )
 		{	// Only change DB flag to "pings_sent" but do NOT actually send pings:
 			$force_pings = false;
 			$notified_flags[] = 'pings_sent';
-			$Messages->add( T_('Marking pings as sent.'), 'note' );
+			$Messages->add_to_group( T_('Marking pings as sent.'), 'note', T_('Sending notifications:') );
 		}
 		if( ! empty( $notified_flags ) )
 		{	// Save the marked processing status to DB:
@@ -6234,7 +6357,7 @@ class Item extends ItemLight
 		if( ( $force_members != 'force' && $force_community != 'force' && $force_pings != 'force' ) &&
 		    $this->check_notifications_flags( array( 'members_notified', 'community_notified', 'pings_sent' ) ) )
 		{	// All possible notifications have already been sent and no forcing for any notification:
-			$Messages->add( T_('All possible notifications have already been sent: skipping notifications...'), 'note' );
+			$Messages->add_to_group( T_('All possible notifications have already been sent: skipping notifications...'), 'note', T_('Sending notifications:') );
 			$Debuglog->add( 'Item->handle_notifications() : All possible notifications have already been sent: skipping notifications...', 'notifications' );
 			return false;
 		}
@@ -6300,7 +6423,7 @@ class Item extends ItemLight
 			// Save cronjob to DB:
 			if( $item_Cronjob->dbinsert() )
 			{
-				$Messages->add( T_('Scheduling Pings & Subscriber email notifications.'), 'note' );
+				$Messages->add_to_group( T_('Scheduling Pings & Subscriber email notifications.'), 'note', T_('Sending notifications:') );
 
 				// Memorize the cron job ID which is going to handle this post:
 				$this->set( 'notifications_ctsk_ID', $item_Cronjob->ID );
@@ -6435,7 +6558,7 @@ class Item extends ItemLight
 		// Save the new processing status to DB, but do not update last edited by user, slug or post excerpt:
 		$this->dbupdate( false, false, false );
 
-		$Messages->add( sprintf( T_('Sending %d email notifications to moderators.'), count( $notified_user_IDs ) ), 'note' );
+		$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), count( $notified_user_IDs ) ), 'note', T_('Sending notifications:')  );
 
 		return $notified_user_IDs;
 	}
@@ -6470,14 +6593,14 @@ class Item extends ItemLight
 
 		if( ! $edited_Blog->get_setting( 'allow_subscriptions' ) )
 		{	// Subscriptions not enabled!
-			$Messages->add( T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.'), 'note' );
+			$Messages->add_to_group( T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.'), 'note', T_('Sending notifications:') );
 			return array();
 		}
 
 		if( ! $this->notifications_allowed() )
 		{	// Don't send notifications about some post/usages like "special":
 			// Note: this is a safety but this case should never happen, so don't make translators work on this:
-			$Messages->add( 'This post type/usage cannot support notifications: skipping notifications...', 'note' );
+			$Messages->add_to_group( 'This post type/usage cannot support notifications: skipping notifications...', 'note', T_('Sending notifications:') );
 			return array();
 		}
 
@@ -6485,27 +6608,27 @@ class Item extends ItemLight
 		{	// Don't send notifications about items with not allowed status:
 			$status_titles = get_visibility_statuses( '', array() );
 			$status_title = isset( $status_titles[ $this->get( 'status' ) ] ) ? $status_titles[ $this->get( 'status' ) ] : $this->get( 'status' );
-			$Messages->add( sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title ), 'note' );
+			$Messages->add_to_group( sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title ), 'note', T_('Sending notifications:') );
 			return array();
 		}
 
 		if( $force_members == 'skip' && $force_community == 'skip' )
 		{	// Skip subscriber notifications because of it is forced by param:
-			$Messages->add( T_('Skipping email notifications to subscribers.'), 'note' );
+			$Messages->add_to_group( T_('Skipping email notifications to subscribers.'), 'note', T_('Sending notifications:') );
 			return array();
 		}
 
 		if( $force_members == 'force' && $force_community == 'force' )
 		{	// Force to members and community:
-			$Messages->add( T_('Force sending email notifications to subscribers...'), 'note' );
+			$Messages->add_to_group( T_('Force sending email notifications to subscribers...'), 'note', T_('Sending notifications:') );
 		}
 		elseif( $force_members == 'force' )
 		{	// Force to members only:
-			$Messages->add( T_('Force sending email notifications to subscribed members...'), 'note' );
+			$Messages->add_to_group( T_('Force sending email notifications to subscribed members...'), 'note', T_('Sending notifications:') );
 		}
 		elseif( $force_community == 'force' )
 		{	// Force to community only:
-			$Messages->add( T_('Force sending email notifications to other subscribers...'), 'note' );
+			$Messages->add_to_group( T_('Force sending email notifications to other subscribers...'), 'note', T_('Sending notifications:') );
 		}
 		else
 		{	// Check if email notifications can be sent for this item currently:
@@ -6514,7 +6637,7 @@ class Item extends ItemLight
 			// fp> I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
 			if( $this->get_type_setting( 'usage' ) != 'post' )
 			{	// Don't send outbound pings for items that are not regular posts:
-				$Messages->add( T_('This post type/usage doesn\'t need notifications by default: skipping notifications...'), 'note' );
+				$Messages->add_to_group( T_('This post type/usage doesn\'t need notifications by default: skipping notifications...'), 'note', T_('Sending notifications:') );
 				return array();
 			}
 		}
@@ -6543,18 +6666,18 @@ class Item extends ItemLight
 
 		if( ! $notify_members && ! $notify_community )
 		{	// Everyone has already been notified, nothing to do:
-			$Messages->add( T_('Skipping email notifications to subscribers because they were already notified.'), 'note' );
+			$Messages->add_to_group( T_('Skipping email notifications to subscribers because they were already notified.'), 'note', T_('Sending notifications:') );
 			return array();
 		}
 
 		if( $notify_members && $force_members == 'skip' )
 		{	// Skip email notifications to members because it is forced by param:
-			$Messages->add( T_('Skipping email notifications to subscribed members.'), 'note' );
+			$Messages->add_to_group( T_('Skipping email notifications to subscribed members.'), 'note', T_('Sending notifications:') );
 			$notify_members = false;
 		}
 		if( $notify_community && $force_community == 'skip' )
 		{	// Skip email notifications to community because it is forced by param:
-			$Messages->add( T_('Skipping email notifications to other subscribers.'), 'note' );
+			$Messages->add_to_group( T_('Skipping email notifications to other subscribers.'), 'note', T_('Sending notifications:') );
 			$notify_community = false;
 		}
 
@@ -6658,11 +6781,11 @@ class Item extends ItemLight
 
 		if( $notify_members )
 		{	// Display a message to know how many members are notified:
-			$Messages->add( sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count ), 'note' );
+			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count ), 'note', T_('Sending notifications:') );
 		}
 		if( $notify_community )
 		{	// Display a message to know how many community users are notified:
-			$Messages->add( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), 'note' );
+			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), 'note', T_('Sending notifications:') );
 		}
 
 		if( empty( $notify_users ) )
@@ -6744,37 +6867,37 @@ class Item extends ItemLight
 	 */
 	function send_outbound_pings( $force_pings = false )
 	{
-		global $Plugins, $baseurl, $Messages, $evonetsrv_host, $test_pings_for_real;
+		global $Plugins, $baseurl, $Messages, $evonetsrv_host, $allow_post_pings_on_localhost;
 
 		if( ! $this->notifications_allowed() )
 		{	// Don't send pings about some post/usages like "special":
 			// Note: this is a safety but this case should never happen, so don't make translators work on this:
-			$Messages->add( 'This post type/usage cannot support pings: skipping pings...', 'note' );
+			$Messages->add_to_group( 'This post type/usage cannot support pings: skipping pings...', 'note', T_('Sending notifications:') );
 			return false;
 		}
 
 		if( $this->get( 'status' ) != 'published' )
 		{	// Don't send pings if item is not 'public':
-			$Messages->add( T_('Skipping outbound pings because item is not published yet.'), 'note' );
+			$Messages->add_to_group( T_('Skipping outbound pings because item is not published yet.'), 'note', T_('Sending notifications:') );
 			return false;
 		}
 
 		if( $force_pings == 'skip' )
 		{	// Skip pings because it is forced by param:
-			$Messages->add( T_('Skipping outbound pings.'), 'note' );
+			$Messages->add_to_group( T_('Skipping outbound pings.'), 'note', T_('Sending notifications:') );
 			return false;
 		}
 
 		if( $force_pings == 'force' )
 		{	// Force pings:
-			$Messages->add( T_('Force sending outbound pings...'), 'note' );
+			$Messages->add_to_group( T_('Force sending outbound pings...'), 'note', T_('Sending notifications:') );
 		}
 		else
 		{	// Check if pings can be sent for this item currently:
 
 			if( $this->check_notifications_flags( 'pings_sent' ) )
 			{	// Don't send pings if they have already been sent:
-				$Messages->add( T_('Skipping outbound pings because they were already sent.'), 'note' );
+				$Messages->add_to_group( T_('Skipping outbound pings because they were already sent.'), 'note', T_('Sending notifications:') );
 				return false;
 			}
 
@@ -6782,31 +6905,31 @@ class Item extends ItemLight
 			// fp> I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
 			if( $this->get_type_setting( 'usage' ) != 'post' )
 			{	// Don't send outbound pings for items that are not regular posts:
-				$Messages->add( T_('This post type/usage doesn\'t need pings by default: skipping pings...'), 'note' );
+				$Messages->add_to_group( T_('This post type/usage doesn\'t need pings by default: skipping pings...'), 'note', T_('Sending notifications:') );
 				return false;
 			}
 		}
 
-		load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
-
-		$this->load_Blog();
-		$ping_plugins = trim( $this->Blog->get_setting( 'ping_plugins' ) );
-		$ping_plugins = empty( $ping_plugins ) ? array() :  array_unique( explode( ',', $this->Blog->get_setting( 'ping_plugins' ) ) );
-
 		// init result
 		$r = true;
 
-		if( (preg_match( '#^http://localhost[/:]#', $baseurl)
-				|| preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) ) /* domain ending in ".local" */
-			&& $evonetsrv_host != 'localhost'	// OK if we are pinging locally anyway ;)
-			&& empty($test_pings_for_real) )
+		if( empty( $allow_post_pings_on_localhost ) &&
+		    $evonetsrv_host != 'localhost' && // OK if we are pinging locally anyway ;)
+		    ( preg_match( '#^http://localhost[/:]#', $baseurl ) ||
+		      preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) ) ) /* domain ending in ".local" */
 		{	// Don't send pings from localhost:
-			$Messages->add( T_('Skipping pings (Running on localhost).'), 'note' );
+			$Messages->add_to_group( T_('Skipping pings (Running on localhost).'), 'note', T_('Sending notifications:') );
 			return false;
 		}
 		else
 		{	// Send pings:
-			$Messages->add( T_('Trying to find plugins for sending outbound pings...'), 'note' );
+			$Messages->add_to_group( T_('Trying to find plugins for sending outbound pings...'), 'note', T_('Sending notifications:') );
+
+			load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
+
+			$this->load_Blog();
+			$ping_plugins = trim( $this->Blog->get_setting( 'ping_plugins' ) );
+			$ping_plugins = empty( $ping_plugins ) ? array() :  array_unique( explode( ',', $this->Blog->get_setting( 'ping_plugins' ) ) );
 
 			foreach( $ping_plugins as $plugin_code )
 			{
@@ -6836,7 +6959,7 @@ class Item extends ItemLight
 						}
 					}
 
-					$Messages->add( implode( '<br />', $ping_messages ), 'note' );
+					$Messages->add_to_group( implode( '<br />', $ping_messages ), 'note', T_('Sending notifications:') );
 				}
 			}
 		}
@@ -8367,6 +8490,23 @@ class Item extends ItemLight
 	function notifications_allowed()
 	{
 		return ( $this->get_type_setting( 'usage' ) != 'special' );
+	}
+
+
+	/**
+	 * Check if this item can be displayed for current user on front-office
+	 *
+	 * @return boolean
+	 */
+	function can_be_displayed()
+	{
+		if( empty( $this->ID ) )
+		{	// Item is not created yet, so it cannot be displayed:
+			return false;
+		}
+
+		// Check if this Item can be displayed with current status:
+		return can_be_displayed_with_status( $this->get( 'status' ), 'post', $this->get_blog_ID(), $this->creator_user_ID );
 	}
 
 

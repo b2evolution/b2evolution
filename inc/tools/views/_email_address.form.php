@@ -35,13 +35,13 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New email address') : T_('Email a
 	$email_status_icon = '<div id="email_status_icon" class="status_icon">'.emadr_get_status_icon( $edited_EmailAddress->get( 'status' ) ).'</div>';
 	$Form->select_input_array( 'emadr_status', $edited_EmailAddress->get( 'status' ), emadr_get_status_titles(), 'Status', '', array( 'force_keys_as_values' => true, 'background_color' => emadr_get_status_colors(), 'required' => true, 'input_prefix' => $email_status_icon ) );
 
-	$Form->info( T_('Last sent date'), mysql2localedatetime_spans( $edited_EmailAddress->get( 'last_sent_ts' ), "M-d" ) );
+	$Form->info( T_('Last sent date'), mysql2localedatetime_spans( $edited_EmailAddress->get( 'last_sent_ts' ) ) );
 
 	$Form->text_input( 'emadr_sent_count', $edited_EmailAddress->get( 'sent_count' ), 20, T_('Sent count'), '' );
 
 	$Form->text_input( 'emadr_sent_last_returnerror', $edited_EmailAddress->get( 'sent_last_returnerror' ), 20, T_('Sent count since last error'), '' );
 
-	$Form->info( T_('Last error date'), mysql2localedatetime_spans( $edited_EmailAddress->get( 'last_error_ts' ), "M-d" ) );
+	$Form->info( T_('Last error date'), mysql2localedatetime_spans( $edited_EmailAddress->get( 'last_error_ts' ) ) );
 
 	$Form->text_input( 'emadr_prmerror_count', $edited_EmailAddress->get( 'prmerror_count' ), 20, T_('Permanent errors count'), '' );
 

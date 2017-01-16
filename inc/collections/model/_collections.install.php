@@ -70,7 +70,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			blog_media_subdir    VARCHAR( 255 ) NULL,
 			blog_media_fullpath  VARCHAR( 255 ) NULL,
 			blog_media_url       VARCHAR( 255 ) NULL,
-			blog_type            ENUM( 'main', 'std', 'photo', 'group', 'forum', 'manual' ) COLLATE ascii_general_ci DEFAULT 'std' NOT NULL,
+			blog_type            VARCHAR( 16 ) COLLATE ascii_general_ci DEFAULT 'std' NOT NULL,
 			blog_order           int(11) NULL DEFAULT NULL,
 			PRIMARY KEY blog_ID (blog_ID),
 			UNIQUE KEY blog_urlname (blog_urlname)
@@ -136,7 +136,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_datecreated            TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			post_datemodified           TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			post_last_touched_ts        TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-			post_status                 enum('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NOT NULL default 'published',
+			post_status                 ENUM('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NOT NULL DEFAULT 'draft',
 			post_pst_ID                 int(11) unsigned NULL,
 			post_ityp_ID                int(10) unsigned NOT NULL DEFAULT 1,
 			post_locale                 VARCHAR(20) NOT NULL DEFAULT 'en-EU',
@@ -193,7 +193,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_ID                 int(11) unsigned NOT NULL auto_increment,
 			comment_item_ID            int(11) unsigned NOT NULL default 0,
 			comment_type               enum('comment','linkback','trackback','pingback','meta') COLLATE ascii_general_ci NOT NULL default 'comment',
-			comment_status             ENUM('published','community','deprecated','protected','private','review','draft','trash') COLLATE ascii_general_ci DEFAULT 'published' NOT NULL,
+			comment_status             ENUM('published','community','deprecated','protected','private','review','draft','trash') COLLATE ascii_general_ci DEFAULT 'draft' NOT NULL,
 			comment_in_reply_to_cmt_ID INT(10) unsigned NULL,
 			comment_author_user_ID     int unsigned NULL default NULL,
 			comment_author             varchar(100) NULL,
@@ -447,6 +447,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloguser_perm_media_upload    tinyint NOT NULL default 0,
 			bloguser_perm_media_browse    tinyint NOT NULL default 0,
 			bloguser_perm_media_change    tinyint NOT NULL default 0,
+			bloguser_perm_analytics       tinyint NOT NULL default 0,
 			PRIMARY KEY bloguser_pk (bloguser_blog_ID,bloguser_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -475,6 +476,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloggroup_perm_media_upload    tinyint NOT NULL default 0,
 			bloggroup_perm_media_browse    tinyint NOT NULL default 0,
 			bloggroup_perm_media_change    tinyint NOT NULL default 0,
+			bloggroup_perm_analytics       tinyint NOT NULL default 0,
 			PRIMARY KEY bloggroup_pk (bloggroup_blog_ID,bloggroup_group_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 

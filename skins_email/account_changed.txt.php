@@ -27,7 +27,7 @@ $params = array_merge( array(
 $cell_length = 20;
 $row_separator = str_repeat( '-', $cell_length * 3 + 10 )."\n";
 
-echo sprintf( T_('There have been significant changes on this user profile made by %s'), $current_User->get( 'login' ) ).':'."\n\n";
+echo sprintf( T_('There have been significant changes on this user profile made by %s'), $current_User->get_username() ).':'."\n\n";
 
 echo $row_separator;
 echo str_pad( T_('Field'), $cell_length ).' | '

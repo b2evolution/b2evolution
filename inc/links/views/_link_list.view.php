@@ -105,7 +105,7 @@ if( count( $LinkOwner->get_positions() ) > 1 )
 {	// Don't display a position column for email campaign because it always has only one position 'inline':
 	$Results->cols[] = array(
 						'th' => T_('Position'),
-						'td_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap left',
 						'td' => '%display_link_position( {row} )%',
 					);
 }

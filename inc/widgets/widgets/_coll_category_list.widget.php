@@ -349,6 +349,8 @@ class coll_category_list_Widget extends ComponentWidget
 					echo $this->disp_params['list_end'];
 				}
 			}
+
+			echo $this->disp_params['collist_end'];
 		}
 
 
@@ -483,10 +485,12 @@ class coll_category_list_Widget extends ComponentWidget
 		    ( $this->disp_params['mark_parents'] && $Chapter->ID != $first_selected_cat_ID && in_array( $Chapter->ID, $this->disp_params['current_parents'] ) ) )
 		{ // This category should be selected
 			$start_tag = $this->disp_params['item_selected_start'];
+			$end_tag = $this->disp_params['item_selected_end'];
 		}
 		else
 		{
 			$start_tag = $this->disp_params['item_start'];
+			$end_tag = $this->disp_params['item_end'];
 		}
 
 		if( empty( $Chapter->children ) )
@@ -548,7 +552,7 @@ class coll_category_list_Widget extends ComponentWidget
 		// To close the whole group of categories with all of it's children see @cat_before_level and @cat_after_level
 		// Note: If this solution will not work, and we can't add the 'item_end' here, then create new after_line callback,
 		// which then must be called from a the ChapterCache recurse method
-		$r .= $this->disp_params['item_end'];
+		$r .= $end_tag;
 
 		return $r;
 	}

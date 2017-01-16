@@ -350,7 +350,6 @@ switch( $action )
 		param( 'notification_logo', 'integer', NULL );
 		$Settings->set( 'notification_logo', get_param( 'notification_logo' ) );
 
-
 		// Site footer text
 		$Settings->set( 'site_footer_text', param( 'site_footer_text', 'string', '' ) );
 

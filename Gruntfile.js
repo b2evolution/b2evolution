@@ -32,6 +32,7 @@ module.exports = function(grunt) {
 					// Fp> the following probaly needs to be merged with the font and back office bundles below					
 					'rsc/css/bootstrap-blog_base.css': 'rsc/less/bootstrap-blog_base.less', // Used on several back-office pages
 
+
 					// Bootstrap front-office styles:
 					'rsc/build/bootstrap-b2evo_base.bundle.css': [
 							// Basic styles for all bootstrap skins
@@ -69,20 +70,16 @@ module.exports = function(grunt) {
 		},
 
 		// Configuration for the scss->css compiling tasks:
-		sass: {
-			development: {
-				options: {
-					style: 'expanded',
-				},
-				files: {
+		// sass: {
+			// development: {
+				// options: {
+					// style: 'expanded',
+				// },
+				// files: {
 					// target.css file: source.scss file
-					//'rsc/build/testscss.css': 'rsc/scss/test.scss',
-					'skins/pureforums/pureforums_header.css': 'skins/pureforums/pureforums_header.scss',
-					'skins/pureforums/pureforums_main.css': 'skins/pureforums/pureforums_main.scss',
-					'skins/pureforums/pureforums_footer.css': 'skins/pureforums/pureforums_footer.scss',
-				}
-			}
-		},
+				// }
+			// }
+		// },
 
 		// Configuration for Autoprefixing tasks:
 		autoprefixer: {
@@ -117,11 +114,6 @@ module.exports = function(grunt) {
 				nonull: true, // Display missing files
 				src: ['skins/evopress/style.css', 'skins/evopress/item.css'],
 				dest: 'skins/evopress/evopress.bundle.css',
-			},
-			skin_pureforums: {
-				nonull: true, // Display missing files
-				src: ['skins/pureforums/pureforums_header.css', 'skins/pureforums/pureforums_main.css', 'skins/pureforums/pureforums_footer.css'],
-				dest: 'skins/pureforums/pureforums.bundle.css',
 			},
 			/*
 			 * JS:
@@ -167,10 +159,6 @@ module.exports = function(grunt) {
 			skin_evopress: {
 				src: 'skins/evopress/evopress.bundle.css',
 				dest: 'skins/evopress/evopress.bmin.css',
-			},
-			skin_pureforums: {
-				src: 'skins/pureforums/pureforums.bundle.css',
-				dest: 'skins/pureforums/pureforums.bmin.css',
 			},
 		},
 
@@ -275,6 +263,7 @@ module.exports = function(grunt) {
 							'rsc/js/extracats.js',
 							'rsc/js/dynamic_select.js',
 							'rsc/js/backoffice.js',
+							'rsc/js/blog_widgets.js',
 							'rsc/js/src/evo_modal_window.js',
 							'rsc/js/src/evo_images.js',
 							'rsc/js/src/evo_user_crop.js',
@@ -300,6 +289,7 @@ module.exports = function(grunt) {
 							'rsc/js/extracats.js',
 							'rsc/js/dynamic_select.js',
 							'rsc/js/backoffice.js',
+							'rsc/js/blog_widgets.js',
 							'rsc/js/src/bootstrap-evo_modal_window.js',
 							'rsc/js/src/evo_images.js',
 							'rsc/js/src/evo_user_crop.js',
@@ -393,6 +383,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-markdown');
 
 	// Default task(s):
-	grunt.registerTask('default', ['less','sass','autoprefixer','concat','cssmin','uglify','markdown']);
+	grunt.registerTask('default', ['less','autoprefixer','concat','cssmin','uglify','markdown']);
 
 };

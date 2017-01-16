@@ -41,12 +41,12 @@ $user_status_icons = get_user_status_icons();
 
 $Form = new Form( NULL, 'user_checkchanges' );
 
-$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
+$Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
 
 echo_user_actions( $Form, $edited_User, 'edit' );
 
 $form_text_title = T_( 'User admin settings' ); // used for js confirmation message on leave the changed form
-$form_title = get_usertab_header( $edited_User, 'admin', T_( 'User admin settings' ).get_manual_link( 'user-admin-tab' ) );
+$form_title = get_usertab_header( $edited_User, 'admin', '<span class="nowrap">'.T_( 'User admin settings' ).'</span>'.get_manual_link( 'user-admin-tab' ) );
 
 $Form->begin_form( 'fform', $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
@@ -77,10 +77,7 @@ if( $edited_User->ID == 1 )
 {	// This is Admin user, Don't allow to change status, primary group:
 	echo '<input type="hidden" name="edited_user_grp_ID" value="'.$edited_User->grp_ID.'" />';
 	$Form->info( T_('Account status'), $status_icon.' '.T_( 'Autoactivated' ) );
-	$Form->info(
-		// TRANS: Type: Primary user group, Secondary user group
-		sprintf( T_('%s user group'), get_admin_badge( 'group', '#', '#', '#', 'primary' ) )
-		, $edited_User->Group->dget('name') );
+	$Form->info( sprintf( T_('<span %s>Primary</span> user group'), 'class="label label-primary"' ), $edited_User->Group->dget('name') );
 }
 else
 {	// Allow to change status and primary group for non-admin users:
@@ -89,9 +86,7 @@ else
 		.' ( grp_usage = "primary" OR grp_ID = '.$edited_User->grp_ID.' )' );
 	$GroupCache->all_loaded = true;
 	$Form->select_input_array( 'edited_user_status', $edited_User->get( 'status' ), get_user_statuses(), T_( 'Account status' ), '', array( 'input_prefix' => $status_icon ) );
-	$Form->select_object( 'edited_user_grp_ID', $edited_User->grp_ID, $GroupCache,
-		// TRANS: Type: Primary user group, Secondary user group
-		sprintf( T_('%s user group'), get_admin_badge( 'group', '#', '#', '#', 'primary' ) ) );
+	$Form->select_object( 'edited_user_grp_ID', $edited_User->grp_ID, $GroupCache, sprintf( T_('<span %s>Primary</span> user group'), 'class="label label-primary"' ) );
 }
 
 // Reload secondary group cache for the selects below to exclude groups that are not available for current user:
@@ -106,15 +101,7 @@ $GroupCache->load_where( ( empty( $group_where_sql ) ? '' : $group_where_sql.' A
 $GroupCache->all_loaded = true;
 foreach( $user_secondary_groups as $s => $user_secondary_Group )
 {
-	if( $s == 0 )
-	{	// TRANS: Type: Primary user group, Secondary user group
-		$field_title = sprintf( T_('%s user groups'), get_admin_badge( 'group', '#', '#', '#', 'secondary' ) );
-	}
-	else
-	{
-		$field_title = '';
-	}
-
+	$field_title = ( $s == 0 ? sprintf( T_('<span %s>Secondary</span> user groups'), 'class="label label-info"' ) : '' );
 	$field_add_icon = get_icon( 'add', 'imgtag', array( 'class' => 'add_secondary_group', 'style' => 'cursor:pointer' ) );
 
 	if( empty( $user_secondary_Group ) || $user_secondary_Group->can_be_assigned() )
@@ -383,7 +370,7 @@ while( $loop_Plugin = & $Plugins->get_next() )
 
 $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-registration') );
 	$Form->begin_line( T_('Account registered on'), NULL, 'info' );
-		$Form->info_field( '', $edited_User->dget('datecreated'), array( 'note' => '('.date_ago( strtotime( $edited_User->get( 'datecreated' ) ) ).')') );
+		$Form->info_field( '', mysql2localedatetime( $edited_User->dget('datecreated') ), array( 'note' => '('.date_ago( strtotime( $edited_User->get( 'datecreated' ) ) ).')') );
 		$Form->info_field( '<b class="evo_label_inline">'.T_('From IP').': </b>', format_to_output( int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) ) ) );
 	$Form->end_line( NULL, 'info' );
 
@@ -437,7 +424,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 		}
 	}
 	$Form->begin_line( T_('From Domain'), NULL, ( $display_user_domain && $perm_stat_edit ? '' : 'info' ) );
-		$Form->info_field( '', $user_domain_formatted );
+		$Form->info_field( '', $user_domain_formatted.' '.action_icon( NULL, 'magnifier', '', NULL, NULL, NULL, array( 'onclick' => 'return get_whois_info(\''.int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) ).'\');' ), array( 'alt' => 'View Whois info' ) ) );
 		if( $display_user_domain )
 		{	// Display status of Domain if current user has a permission:
 			$domain_status = $Domain ? $Domain->get( 'status' ) : 'unknown';
@@ -674,4 +661,33 @@ jQuery( '#edited_domain_status, #edited_initial_referer_status' ).change( functi
 	}
 } );
 <?php } ?>
+
+function get_whois_info( ip_address )
+{
+	var window_height = jQuery( window ).height();
+	var margin_size_height = 20;
+	var modal_height = window_height - ( margin_size_height * 2 );
+
+	openModalWindow(
+			'<span id="spinner" class="loader_img loader_user_report absolute_center" title="<?php echo T_('Querying WHOIS server...');?>"></span>',
+			'90%', modal_height + 'px', true, 'WHOIS - ' + ip_address, true, true );
+
+	jQuery.ajax(
+	{
+		type: 'GET',
+		url: '<?php echo get_htsrv_url().'async.php';?>',
+		data: {
+			action: 'get_whois_info',
+			query: ip_address,
+			window_height: modal_height
+		},
+		success: function( result )
+		{
+			openModalWindow( result, '90%', modal_height + 'px', true, 'WHOIS - ' + ip_address, true );
+		}
+	} );
+
+	return false;
+}
+
 </script>

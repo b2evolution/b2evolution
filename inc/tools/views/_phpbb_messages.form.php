@@ -15,18 +15,19 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher, $flush_action;
+global $dispatcher, $flush_action, $phpbb_tool_title;
 
 phpbb_display_steps( 7 );
 
 $Form = new Form();
 
-$Form->begin_form( 'fform', T_('phpBB Importer').' - '.T_('Step 7: Import messages') );
+$Form->begin_form( 'fform', $phpbb_tool_title.' - '.T_('Step 7: Import messages') );
 evo_flush();
 
 $Form->add_crumb( 'phpbb' );
 $Form->hidden_ctrl();
 $Form->hidden( 'action', 'finish' );
+$Form->hidden( 'ver', get_param( 'ver' ) );
 
 if( $flush_action == 'messages' )
 {

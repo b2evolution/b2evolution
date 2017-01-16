@@ -15,18 +15,19 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $phpbb_db_config, $phpbb_blog_ID, $dispatcher;
+global $phpbb_db_config, $phpbb_blog_ID, $phpbb_tool_title, $admin_url;
 
 phpbb_display_steps( 1 );
 
 $Form = new Form();
 
-$Form->begin_form( 'fform', T_('phpBB Importer').' - '.T_('Step 1: Database connection') );
+$Form->begin_form( 'fform', $phpbb_tool_title.' - '.T_('Step 1: Database connection') );
 evo_flush();
 
 $Form->add_crumb( 'phpbb' );
 $Form->hidden_ctrl();
 $Form->hidden( 'action', 'database' );
+$Form->hidden( 'ver', get_param( 'ver' ) );
 
 $Form->begin_fieldset( T_('Access information for database of phpBB forum') );
 
@@ -49,7 +50,7 @@ $Form->begin_fieldset( T_('Select a blog for import') );
 	$BlogCache = & get_BlogCache();
 
 	$Form->select_input_object( 'forum_blog_ID', param( 'forum_blog_ID', 'integer', phpbb_get_var( 'blog_ID' ) ), $BlogCache, T_('Blog for import'), array(
-			'note' => T_('Select the destination forum collection.').' <a href="'.$dispatcher.'?ctrl=collections&action=new">'.T_('Create new collection').' &raquo;</a>',
+			'note' => T_('Select the destination forum collection.').' <a href="'.$admin_url.'?ctrl=collections&action=new">'.T_('Create new collection').' &raquo;</a>',
 			'allow_none' => true,
 			'object_callback' => 'get_option_list_forums' ) );
 

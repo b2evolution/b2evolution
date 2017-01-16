@@ -78,6 +78,10 @@ if( $path == './' )
  */
 if( param( 'link_type', 'string', NULL, true, false, false ) && param( 'link_object_ID', 'integer', NULL, true, false, false ) )
 { // Load Requested LinkOwner object:
+	if( $root == 'skins_0' )
+	{	// Deny to link skin files to objects:
+		debug_die( 'Skin files are not allowed to link to objects!' );
+	}
 	$LinkOwner = get_link_owner( $link_type, $link_object_ID );
 	if( empty( $LinkOwner ) )
 	{ // We could not find the owner object to link:
@@ -91,6 +95,10 @@ if( param( 'link_type', 'string', NULL, true, false, false ) && param( 'link_obj
 
 if( param( 'user_ID', 'integer', NULL, true, false, false ) )
 { // Load Requested user:
+	if( $root == 'skins_0' )
+	{	// Deny to link skin files to objects:
+		debug_die( 'Skin files are not allowed to link to objects!' );
+	}
 	$UserCache = & get_UserCache();
 	if( ($edited_User = & $UserCache->get_by_ID( $user_ID, false )) === false )
 	{	// We could not find the contact to link:
@@ -336,8 +344,15 @@ $Debuglog->add( count($fm_selected).' selected files/directories', 'files' );
  * @global Filelist
  */
 $selected_Filelist = new Filelist( $fm_FileRoot, $ads_list_path );
+
+// Prevent directory traversal using '..'
+$re = '/\/?\.\.\/+/';
 foreach( $fm_selected as $l_source_path )
 {
+	if( preg_match( $re, $l_source_path ) )
+	{
+		debug_die( 'Invalid fm_selected parameter value' );
+	}
 	$selected_Filelist->add_by_subpath( urldecode($l_source_path), true );
 }
 
@@ -708,7 +723,7 @@ switch( $action )
 		}
 		else // $action == 'create_zip'
 		{	// Display a message after successful creating of ZIP archive:
-			$Messages->add( sprintf( T_('ZIP archive "%s" has been created.'), $zipname ), 'success' );
+			$Messages->add_to_group( sprintf( T_('ZIP archive "%s" has been created.'), $zipname ), 'success', T_('Creating ZIP file...') );
 
 			if( $delete_files )
 			{	// We should delete the files after creating ZIP archive:
@@ -724,22 +739,22 @@ switch( $action )
 
 					if( $restriction_Messages->count() )
 					{ // There are restrictions:
-						$Messages->add( $l_File->get_prefixed_name().': '.T_('cannot be deleted because of the following relations')
-							.$restriction_Messages->display( NULL, NULL, false, false ) );
+						$Messages->add_to_group( $l_File->get_prefixed_name().': '.T_('cannot be deleted because of the following relations')
+							.$restriction_Messages->display( NULL, NULL, false, false ), 'warning', T_('Creating ZIP file...') );
 						// Skip this file
 						continue;
 					}
 
 					if( $l_File->unlink() )
 					{
-						$Messages->add( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.')
-										: T_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->dget('name') ), 'success' );
+						$Messages->add_to_group( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.')
+										: T_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->dget('name') ), 'success', T_('Creating ZIP file...') );
 						$fm_Filelist->remove( $l_File );
 					}
 					else
 					{
-						$Messages->add( sprintf( ( $l_File->is_dir() ? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).')
-										: T_('Could not delete the file &laquo;%s&raquo;.') ), $l_File->dget('name') ), 'error' );
+						$Messages->add_to_group( sprintf( ( $l_File->is_dir() ? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).')
+										: T_('Could not delete the file &laquo;%s&raquo;.') ), $l_File->dget('name') ), 'error', T_('Creating ZIP file...') );
 					}
 				}
 			}
@@ -828,18 +843,19 @@ switch( $action )
 
 						if( $new_name == $old_name )
 						{ // Name has not changed...
-							$Messages->add( sprintf( T_('&laquo;%s&raquo; has not been renamed'), $old_name ), 'note' );
+							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; has not been renamed'), $old_name ), 'note', T_('Renaming files:') );
 							continue;
 						}
 						// Perform rename:
 						if( ! $loop_src_File->rename_to( $new_name ) )
 						{
-							$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
-								$old_name, $new_name ), 'error' );
+							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
+								$old_name, $new_name ), 'error', T_('Renaming files') );
 							continue;
 						}
 
 						$success_message = sprintf( T_('&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;'), $old_name, $new_name );
+						$success_title = T_('Renaming files:');
 						break;
 
 					case 'copy':
@@ -849,7 +865,7 @@ switch( $action )
 
 						if( $old_path == $new_path && $loop_src_File->_FileRoot->ID == $selected_Filelist->_FileRoot->ID )
 						{ // File path has not changed...
-							$Messages->add( sprintf( T_('&laquo;%s&raquo; has not been copied'), $old_path ), 'note' );
+							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; has not been copied'), $old_path ), 'note', T_('Copying files:') );
 							continue;
 						}
 
@@ -859,11 +875,12 @@ switch( $action )
 						// Perform copy:
 						if( ! $loop_src_File->copy_to( $dest_File ) )
 						{ // failed
-							$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be copied to &laquo;%s&raquo;'), $old_path, $new_path ), 'error' );
+							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; could not be copied to &laquo;%s&raquo;'), $old_path, $new_path ), 'error', T_('Copying files:') );
 							continue;
 						}
 
 						$success_message = sprintf( T_('&laquo;%s&raquo; has been successfully copied to &laquo;%s&raquo;'), $old_path, $new_path );
+						$success_title = T_('Copying files:');
 						break;
 
 					case 'move':
@@ -873,18 +890,19 @@ switch( $action )
 
 						if( $old_path == $new_path && $loop_src_File->_FileRoot->ID == $selected_Filelist->_FileRoot->ID )
 						{ // File path has not changed...
-							$Messages->add( sprintf( T_('&laquo;%s&raquo; has not been moved'), $old_path ), 'note' );
+							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; has not been moved'), $old_path ), 'note', T_('Moving files:') );
 							continue;
 						}
 
 						// Perform move:
 						if( ! $loop_src_File->move_to( $selected_Filelist->get_root_type(), $selected_Filelist->get_root_ID(), $new_path ) )
 						{ // failed
-							$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be moved to &laquo;%s&raquo;'), $old_path, $new_path ), 'error' );
+							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; could not be moved to &laquo;%s&raquo;'), $old_path, $new_path ), 'error', T_('Moving files:') );
 							continue;
 						}
 
 						$success_message = sprintf( T_('&laquo;%s&raquo; has been successfully moved to &laquo;%s&raquo;'), $old_path, $new_path );
+						$success_title = T_('Moving files:');
 						break;
 				}
 
@@ -893,12 +911,12 @@ switch( $action )
 
 				if( $fm_Filelist->contains( $loop_src_File ) === false )
 				{ // File not in filelist (expected if not same dir)
-					$fm_Filelist->add( $File );
+					$fm_Filelist->add( $loop_src_File );
 				}
 
 				if( ! empty( $success_message ) )
 				{
-					$Messages->add( $success_message, 'success' );
+					$Messages->add_to_group( $success_message, 'success', $success_title );
 				}
 			}
 
@@ -947,22 +965,22 @@ switch( $action )
 
 				if( $restriction_Messages->count() )
 				{ // There are restrictions:
-					$Messages->add( $l_File->get_prefixed_name().': '.T_('cannot be deleted because of the following relations')
-						.$restriction_Messages->display( NULL, NULL, false, false ) );
+					$Messages->add_to_group( $l_File->get_prefixed_name().': '.T_('cannot be deleted because of the following relations')
+						.$restriction_Messages->display( NULL, NULL, false, false ), 'warning', T_('Deleting files...') );
 					// Skip this file
 					continue;
 				}
 
 				if( $l_File->unlink() )
 				{
-					$Messages->add( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.')
-									: T_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->dget('name') ), 'success' );
+					$Messages->add_to_group( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.')
+									: T_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->dget('name') ), 'success', T_('Deleting files...') );
 					$fm_Filelist->remove( $l_File );
 				}
 				else
 				{
-					$Messages->add( sprintf( ( $l_File->is_dir() ? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).')
-									: T_('Could not delete the file &laquo;%s&raquo;.') ), $l_File->dget('name') ), 'error' );
+					$Messages->add_to_group( sprintf( ( $l_File->is_dir() ? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).')
+									: T_('Could not delete the file &laquo;%s&raquo;.') ), $l_File->dget('name') ), 'error', T_('Deleting files...') );
 				}
 			}
 			$action = 'list';
@@ -1092,7 +1110,7 @@ switch( $action )
 						// Let's make the link!
 						$LinkOwner->add_link( $l_File->ID, ( $order == 1 ? 'teaser' : 'aftermore' ), $order++ );
 
-						$Messages->add( sprintf( T_('&laquo;%s&raquo; has been attached.'), $l_File->dget('name') ), 'success' );
+						$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; has been attached.'), $l_File->dget('name') ), 'success', T_('Creating post:') );
 
 					} while( $l_File = & $selected_Filelist->get_next() );
 

@@ -316,7 +316,7 @@ function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
 	}
 	else
 	{ // Use normal/standard lostpassword form (without blog skin)
-		$activateinfo_url = get_htsrv_url( true ).'login.php?action=req_validatemail';
+		$activateinfo_url = get_htsrv_url( true ).'login.php?action=req_activate_email';
 	}
 
 	return url_add_param( $activateinfo_url, 'redirect_to='.rawurlencode( $redirect_to ), $glue ) ;
@@ -395,7 +395,7 @@ function redirect_after_account_activation()
 	if( $redirect_to == 'return_to_original' )
 	{ // we want to return to original page after account activation
 		// the redirect_to param should be set in the Session. This was set when the account activation email was sent.
-		$redirect_to = $Session->get( 'core.validatemail.redirect_to' );
+		$redirect_to = $Session->get( 'core.activateacc.redirect_to' );
 		// if the redirect_to is not set in the Session or is empty, we MUST NEVER let to redirect back to the origianl page which can be hotmail, gmail, etc.
 		if( empty( $redirect_to ) )
 		{ // session redirect_to was not set, initialize $redirect_to to the home page
@@ -2073,6 +2073,7 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 				'blog_media_upload'       => $row[$prefix.'_perm_media_upload'],
 				'blog_media_browse'       => $row[$prefix.'_perm_media_browse'],
 				'blog_media_change'       => $row[$prefix.'_perm_media_change'],
+				'blog_analytics'          => $row[$prefix.'_perm_analytics'],
 			);
 	}
 
@@ -2102,6 +2103,7 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 						'blog_media_upload'       => 0,
 						'blog_media_browse'       => 0,
 						'blog_media_change'       => 0,
+						'blog_analytics'          => 0,
 					);
 			}
 		}
@@ -2137,10 +2139,9 @@ function check_blog_advanced_perm( & $blog_perms, $user_ID, $permname, $permleve
 	switch( $permname )
 	{
 		case 'stats':
-			// Wiewing stats is the same perm as being authorized to edit properties: (TODO...)
-			if( $permlevel == 'view' )
-			{
-				return $blog_perms['blog_properties'];
+			if( $permlevel == 'view' || $permlevel == 'list' )
+			{	// If current user has a permission to view the collection:
+				return $blog_perms['blog_analytics'];
 			}
 			// No other perm can be granted here (TODO...)
 			return false;
@@ -2318,19 +2319,64 @@ function check_blog_advanced_perm( & $blog_perms, $user_ID, $permname, $permleve
 
 
 /**
+ * Check if at least one collection has a permission for given target
+ *
+ * @param string Permission name
+ * @param string Target type: 'user', 'group'
+ * @param integer Target ID
+ * @return boolean
+ */
+function check_coll_first_perm( $perm_name, $target_type, $target_ID )
+{
+	global $DB;
+
+	if( empty( $target_ID ) )
+	{	// Target ID must be defined:
+		return false;
+	}
+
+	switch( $target_type )
+	{
+		case 'user':
+			$table = 'T_coll_user_perms';
+			$field_perm_name = 'bloguser_'.$perm_name;
+			$field_ID_name = 'bloguser_user_ID';
+			break;
+
+		case 'group':
+			$table = 'T_coll_group_perms';
+			$field_perm_name = 'bloggroup_'.$perm_name;
+			$field_ID_name = 'bloggroup_group_ID';
+			break;
+	}
+
+	// Try to find first collection that has a requested permission:
+	$SQL = new SQL( 'Check if '.$target_type.' #'.$target_ID.' has at least one collection with permission ['.$perm_name.']' );
+	$SQL->SELECT( $field_perm_name );
+	$SQL->FROM( $table );
+	$SQL->WHERE( $field_ID_name.' = '.$target_ID );
+	$SQL->WHERE_and( $field_perm_name.' = 1' );
+	$SQL->LIMIT( 1 );
+
+	return (bool)$DB->get_var( $SQL->get(), 0 , NULL, $SQL->title );
+}
+
+
+/**
  * Display user edit forms action icons
  *
  * @param object Widget(Form,Table,Results) where to display
- * @param objcet Edited User
+ * @param object Edited User
  * @param string the action string, 'view' or 'edit'
  */
 function echo_user_actions( $Widget, $edited_User, $action )
 {
 	global $current_User, $admin_url;
 
+	$link_attribs = array( 'style' => 'margin-left:1ex; margin-bottom:1ex;', 'class' => 'btn btn-sm btn-default action_icon' );
+
 	if( $edited_User->ID != 0 )
 	{ // show these actions only if user already exists
-		$link_attribs = array( 'style' => 'margin-left:1ex', 'class' => 'btn btn-sm btn-default action_icon' );
 
 		if( $current_User->ID != $edited_User->ID && $current_User->check_status( 'can_report_user' ) )
 		{
@@ -2582,7 +2628,7 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 	$user_status = ' <small>('.$user_status_icons[ $edited_User->get( 'status' ) ].' '.$user_status_titles[ $edited_User->get( 'status' ) ].')</small>';
 
 	// set title
-	$form_title = '<h2 class="user_title">'.$edited_User->get_colored_login( array( 'login_text' => 'name' ) ).$user_status.' &ndash; '.$user_tab_title.'</h2>';
+	$form_title = '<h2 class="user_title">'.$edited_User->get_colored_login( array( 'login_text' => 'name' ) ).'<span class="nowrap">'.$user_status.' &ndash;</span> '.$user_tab_title.'</h2>';
 
 	// set avatar tag
 	$avatar_tag = $edited_User->get_avatar_imgtag( 'crop-top-48x48', 'floatleft', '', true );
@@ -2592,7 +2638,7 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 	$AdminUI->set_path( 'users', 'users', $user_tab );
 	$user_menu3 = $AdminUI->get_html_menu( array( 'users', 'users' ), 'menu3' );
 
-	$result = $avatar_tag.'<div class="user_header_content">'.$form_title.$user_menu3.'</div>';
+	$result = $avatar_tag.'<div class="user_header_content">'.$form_title.'</div></div></div></div><div class="row"><div class="col-xs-12"><div class="user_header"><div class="user_header_content">'.$user_menu3.'</div>';
 	return '<div class="user_header">'.$result.'</div>'.'<div class="clear"></div>';
 }
 
@@ -2954,7 +3000,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 	global $action;
 
 	// Array contains values of the new fields from the request
-	$uf_new_fields = param( 'uf_'.$new_field_name, 'array:array:string' );
+	$uf_new_fields = param( 'uf_'.$new_field_name, 'array' );
 
 	// Type of the new field
 	global $new_field_type;
@@ -2976,19 +3022,21 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 			$Form->begin_fieldset( $userfield->ufgp_name.( is_admin_page() ? get_manual_link( 'user-profile-tab-userfields' ) : '' ) , array( 'id' => $userfield->ufgp_ID ) );
 		}
 
-		$userfield_type = ( $userfield->ufdf_type == 'text' || $userfield->ufdf_type == 'url' ) ? $userfield->ufdf_type : 'string';
-		$uf_val = param( 'uf_'.$userfield->uf_ID, $userfield_type, NULL );
+		// Get a value of existing field in DB (after submit form):
+		$uf_val = param( 'uf_'.$userfield->uf_ID, 'raw', NULL );
 
 		$uf_ID = $userfield->uf_ID;
 		if( $userfield->uf_ID == '0' )
-		{	// Set uf_ID for new (not saved) fields (recommended & require types)
+		{	// Try to get a value of new added field (not saved in DB) (recommended & require types):
+
+			// Set uf_ID for new field:
 			$userfield->uf_ID = $new_field_name.'['.$userfield->ufdf_ID.'][]';
 
 			$value_num = 'uf_'.$new_field_name.'_'.$userfield->ufdf_ID.'prev_value_num';
 			global $$value_num;	// Used when user add a many fields with the same type
 			$$value_num = (int)$$value_num;
 			if( isset( $uf_new_fields[$userfield->ufdf_ID][$$value_num] ) )
-			{	// Get a value from submitted form
+			{	// Get a value from submitted form:
 				$uf_val = $uf_new_fields[$userfield->ufdf_ID][$$value_num];
 				$$value_num++;
 			}
@@ -2997,6 +3045,19 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 		if( is_null( $uf_val ) )
 		{	// No value submitted yet, get DB val:
 			$uf_val = $userfield->uf_varchar;
+		}
+		else
+		{	// Format a submitted value for valid format:
+			$userfield_type = $userfield->ufdf_type;
+			if( $userfield_type == 'number' )
+			{	// Change number type of integer because we have this type name preparing in function param_format():
+				$userfield_type = 'integer';
+			}
+			elseif( $userfield_type != 'text' && $userfield_type != 'url' )
+			{	// Use all other params as string, Only text and url have a preparing in function param_format():
+				$userfield_type = 'string';
+			}
+			$uf_val = param_format( $uf_val, $userfield_type );
 		}
 
 		$field_note = '';
@@ -3143,8 +3204,7 @@ function callback_filter_userlist( & $Form )
 				'0'  => T_('All (Grouped)'),
 			) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
 		$Form->select_input_array( 'group', get_param('group'), $group_options_array,
-			// TRANS: Type: Primary Group, Secondary Group
-			sprintf( T_('%s Group'), get_admin_badge( 'group', '#', '#', '#', 'primary' ) ),
+			sprintf( T_('<span %s>Primary</span> Group'), 'class="label label-primary"' ),
 			'', array( 'force_keys_as_values' => true ) );
 
 		// Secondary group:
@@ -3155,8 +3215,7 @@ function callback_filter_userlist( & $Form )
 				'0'  => T_('All'),
 			) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
 		$Form->select_input_array( 'group2', get_param('group2'), $group_options_array,
-			// TRANS: Type: Primary Group, Secondary Group
-			sprintf( T_('%s Group'), get_admin_badge( 'group', '#', '#', '#', 'secondary' ) ),
+			sprintf( T_('<span %s>Secondary</span> Group'), 'class="label label-info"' ),
 			'', array( 'force_keys_as_values' => true ) );
 	}
 
@@ -3671,7 +3730,7 @@ function add_report_from( $user_ID, $status, $info )
 							'report_status'  => get_report_status_text( $status ),
 							'report_info'    => $info,
 							'user_ID'        => $user_ID,
-							'reported_by'    => $current_User->login,
+							'reported_by'    => $current_User->get_username(),
 						);
 		// send notificaiton ( it will be send to only those users who want to receive this kind of notifications )
 		send_admin_notification( NT_('User account reported'), 'account_reported', $email_template_params );
@@ -4196,7 +4255,7 @@ function display_user_email_status_message( $user_ID = 0 )
 	// Display info about last error only when such data exists
 	$email_last_sent_ts = ( empty( $EmailAddress ) ? '' : $EmailAddress->get( 'last_sent_ts' ) );
 	$last_error_info = empty( $email_last_sent_ts ) ? '' :
-		' '.sprintf( /* TRANS: date of last error */ T_( '(last error was detected on %s)' ), mysql2localedatetime_spans( $email_last_sent_ts, 'M-d' ) );
+		' '.sprintf( /* TRANS: date of last error */ T_( '(last error was detected on %s)' ), mysql2localedatetime_spans( $email_last_sent_ts ) );
 
 	switch( $email_status )
 	{
@@ -4499,6 +4558,34 @@ function echo_user_edit_membership_js( $edited_Organization )
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_edit_membership = \''.TS_('Edit membership').get_manual_link( 'edit-user-membership' ).'\';
 		var evo_js_lang_edit = \''.TS_('Edit').'\';
+		var evo_js_user_org_ajax_url = \''.$admin_url.'\';
+		var evo_js_crumb_organization = \''.get_crumb( 'organization' ).'\';
+	</script>';
+}
+
+
+/**
+ * Initialize JavaScript for AJAX loading of popup window to confirm removal of user from organization
+ *
+ * @param object Organization
+ */
+function echo_user_remove_membership_js( $edited_Organization )
+{
+	global $admin_url, $current_User;
+
+	if( ! $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
+	{	// User must has an edit perm to remove user in organization:
+		return;
+	}
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_deldata.js":
+	echo '<script type="text/javascript">
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_remove_user_membership = \''.TS_('WARNING').'\';
+		var evo_js_lang_remove = \''.TS_('Continue').'\';
 		var evo_js_user_org_ajax_url = \''.$admin_url.'\';
 		var evo_js_crumb_organization = \''.get_crumb( 'organization' ).'\';
 	</script>';
@@ -5089,6 +5176,11 @@ function users_results_block( $params = array() )
 	$UserList->title = $params['results_title'];
 	$UserList->no_results_text = $params['results_no_text'];
 
+	if( $action == 'show_recent' )
+	{	// Reset filters to default in order to view all recent registered users:
+		set_param( 'filter', 'reset' );
+	}
+
 	$UserList->set_default_filters( $default_filters );
 	$UserList->load_from_Request();
 
@@ -5096,7 +5188,7 @@ function users_results_block( $params = array() )
 	users_results( $UserList, $params );
 
 	if( $action == 'show_recent' )
-	{ // Sort an users list by "Registered" field
+	{	// Sort an users list by "Registered" field:
 		$UserList->set_order( 'user_created_datetime' );
 	}
 
@@ -5961,6 +6053,10 @@ function user_td_org_actions( $org_ID, $user_ID )
 				'onclick' => 'return user_edit( '.$org_ID.', '.$user_ID.' );'
 			);
 		$r .= action_icon( T_('Edit membership...'), 'edit', '#', NULL, NULL, NULL, $link_params );
+		$link_params = array(
+				'onclick' => 'return user_remove( '.$org_ID.', '.$user_ID.' );'
+			);
+		$r .= action_icon( T_('Remove user from organization'), 'delete', '#', NULL, NULL, NULL, $link_params );
 	}
 	else
 	{
@@ -6005,7 +6101,36 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
 }
 
 /**
- * Helper functions to display User's reports results.
- * New ( not display helper ) functions must be created above user_reports_results function
+ * Validate current session is in a password reset process:
+ *
+ * return boolean true if valid
  */
+function validate_pwd_reset_session( $reqID, $forgetful_User )
+{
+	global $Session;
+
+	// Validate that params are passed:
+	if( ! $forgetful_User || empty( $reqID ) )
+	{ // This was not requested
+		return false;
+	}
+
+	locale_temp_switch( $forgetful_User->locale );
+
+	// Validate provided reqID against the one stored in the user's session
+	if( $Session->get( 'core.changepwd.request_id' ) != $reqID )
+	{
+		return false;
+	}
+
+	// Validate requested user login/email against the one stored in the user's session:
+	if( $Session->get( 'core.changepwd.request_for' ) != $forgetful_User->get( 'login' ) &&
+	    $Session->get( 'core.changepwd.request_for' ) != $forgetful_User->get( 'email' ) )
+	{
+		return false;
+	}
+
+	return true;
+}
+
 ?>

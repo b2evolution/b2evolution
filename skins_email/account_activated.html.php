@@ -55,6 +55,17 @@ if( $activated_User->reg_ctry_ID > 0 )
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Country').': </th><td'.emailskin_style( 'table.email_table td' ).'>'.$reg_Country->get_name().'</td></tr>'."\n";
 }
 
+$user_domain = $UserSettings->get( 'user_domain', $activated_User->ID );
+if( ! empty( $user_domain ) )
+{	// Get user domain status if domain field is defined:
+	load_funcs( 'sessions/model/_hitlog.funcs.php' );
+	$DomainCache = & get_DomainCache();
+	$Domain = & get_Domain_by_subdomain( $user_domain );
+	$dom_status_titles = stats_dom_status_titles();
+	$dom_status = $dom_status_titles[ $Domain ? $Domain->get( 'status' ) : 'unknown' ];
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Domain').': </th><td'.emailskin_style( 'table.email_table td' ).'>'.$user_domain.' ('.$dom_status.')'.'</td></tr>'."\n";
+}
+
 if( $activated_User->ctry_ID > 0 )
 { // Country field is defined
 	load_class( 'regional/model/_country.class.php', 'Country' );

@@ -99,7 +99,14 @@ class LinkOwner
 	{
 		$this->ID_field_name = $ID_field_name;
 		$this->type = $type;
-		$this->set_object( $link_Object, $tmp_ID );
+		if( $type == 'message' )
+		{	// Allow to link files only for new creating message:
+			$this->set_object( $link_Object, $tmp_ID );
+		}
+		else
+		{	// Others allow to link files only for existing object:
+			$this->link_Object = $link_Object;
+		}
 	}
 
 
@@ -480,6 +487,29 @@ class LinkOwner
 	{
 		// Update last touched date of the Owner
 		$this->update_last_touched_date();
+	}
+
+
+	/**
+	 * Get last order number of this Link Owner
+	 *
+	 * @return integer
+	 */
+	function get_last_order()
+	{
+		global $DB;
+
+		if( $this->get_ID() == 0 )
+		{
+			return 0;
+		}
+
+		$SQL = new SQL( 'Get last order number of the Link Owner ( '.$this->type.', #'.$this->get_ID().' )' );
+		$SQL->SELECT( 'MAX( link_order )' );
+		$SQL->FROM( 'T_links' );
+		$SQL->WHERE( 'link_'.$this->ID_field_name.' = '.$this->get_ID() );
+
+		return intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
 	}
 }
 

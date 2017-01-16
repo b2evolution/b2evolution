@@ -479,7 +479,7 @@ class messaging_Module extends Module
 			{ // Thread doesn't exists with this ID
 				unset( $edited_Thread );
 				forget_param( 'thrd_ID' );
-				$Messages->add( T_('The requested thread does not exist any longer.'), 'error' );
+				$Messages->add( T_('The private conversation you are trying to access does not exist any longer.'), 'error' );
 				$action = 'nil';
 			}
 		}

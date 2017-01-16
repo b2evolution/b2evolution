@@ -95,13 +95,13 @@ if( $is_admin )
 {
 	if( $new_user_creating )
 	{
-		$form_title = T_('Edit user profile');
+		$form_title = '<span class="nowrap">'.T_('Edit user profile').'</span>';
 	}
 	else
 	{
-		$form_text_title = T_( 'Edit profile' ).get_manual_link( 'user-profile-tab' ); // used for js confirmation message on leave the changed form
+		$form_text_title = '<span class="nowrap">'.T_( 'Edit profile' ).'</span>'.get_manual_link( 'user-profile-tab' ); // used for js confirmation message on leave the changed form
 		$form_title = get_usertab_header( $edited_User, 'profile', $form_text_title );
-		$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
+		$Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
 	}
 	$form_class = 'fform';
 }
@@ -139,7 +139,7 @@ if( $new_user_creating )
 
 	$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get( 'newusers_grp_ID' ) : $edited_User->grp_ID;
 	$GroupCache = & get_GroupCache();
-	$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_( 'User group' ) );
+	$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, sprintf( T_('<span %s>Primary</span> user group'), 'class="label label-primary"' ) );
 
 	$field_note = '[0 - 10]';
 	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('User level'), $field_note, array( 'required' => true ) );

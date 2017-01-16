@@ -154,14 +154,12 @@ $Form->begin_fieldset( T_('General').get_manual_link('group_properties_general')
 	$Form->radio( 'edited_grp_usage', $edited_Group->get( 'usage' ), array(
 			array(
 					'primary',
-					// TRANS: Type: Primary Group, Secondary Group
-					sprintf( T_('%s Group'), get_admin_badge( 'group', '#', '#', '#', 'primary' ) ),
+					sprintf( T_('<span %s>Primary</span> Group'), 'class="label label-primary"' ),
 					T_('General use case')
 				),
 			array(
 					'secondary',
-					// TRANS: Type: Primary Group, Secondary Group
-					sprintf( T_('%s Group'), get_admin_badge( 'group', '#', '#', '#', 'secondary' ) ),
+					sprintf( T_('<span %s>Secondary</span> Group'), 'class="label label-info"' ),
 					T_('Use if you need multiple groups per users')
 				)
 		), T_('Group usage'), true );
@@ -227,7 +225,7 @@ $Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_prope
 							array( 'user', T_('View stats for specific blogs'), T_('Based on each blog\'s edit permissions') ), // fp> dirty hack, I'll tie this to blog edit perm for now
 							array( 'view', T_('View stats for all blogs') ),
 							array( 'edit', T_('Full Access'), T_('Includes deleting/reassigning of stats') )
-						), T_('Stats'), true );
+						), T_('Analytics'), true );
 
 	// Display pluggable permissions:
 	display_pluggable_permissions( $Form, 'additional' );

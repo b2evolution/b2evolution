@@ -585,6 +585,11 @@ class Comment extends DataObject
 
 		$DB->commit();
 
+		if( $vote_type == 'spam' && $vote_value == 'spam' )
+		{	// This is a voting about spam comment we should inform moderators:
+			$this->send_vote_spam_emails();
+		}
+
 		return;
 	}
 
@@ -1037,7 +1042,7 @@ class Comment extends DataObject
 				'after_user'   => '#',	// After Member user
 				'format'       => 'htmlbody',
 				'link_to'      => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' 'userpage>userurl'
-				'link_text'    => 'preferredname', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+				'link_text'    => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 				'link_rel'     => '',
 				'link_class'   => '',
 				'thumb_size'   => 'crop-top-32x32',
@@ -1849,7 +1854,7 @@ class Comment extends DataObject
 		echo $before;
 
 		$style = $params['display'] ? '' : ' style="display:none"';
-		echo '<div id="vote_spam_'.$this->ID.'" class="vote_spam"'.$style.'>';
+		echo '<div id="vote_spam_'.$this->ID.'" class="vote_spam nowrap"'.$style.'>';
 
 		$vote_result = $this->get_vote_spam_disabled();
 
@@ -1933,7 +1938,7 @@ class Comment extends DataObject
 
 		if( $params['display_wrapper'] )
 		{	// Display wrapper:
-			echo '<span id="vote_helpful_'.$this->ID.'" class="evo_voting_panel '.( empty( $params['class'] ) ? '' : ' '.$params['class'] ).'">';
+			echo '<span id="vote_helpful_'.$this->ID.'" class="nowrap evo_voting_panel'.( empty( $params['class'] ) ? '' : ' '.$params['class'] ).'">';
 		}
 
 		echo $params['before_title'];
@@ -2800,8 +2805,10 @@ class Comment extends DataObject
 				$params[ $param_key ] = & $params[ $param_key ];
 			}
 
-			$r_params = $Plugins->trigger_event_first_true( 'RenderCommentAttachment', $params, true );
-			if( count( $r_params ) != 0 && isset( $r_params['plugin_ID'] ) )
+			// Prepare params before rendering comment attachment:
+			$Plugins->trigger_event_first_true_with_params( 'PrepareForRenderCommentAttachment', $params );
+
+			if( count( $Plugins->trigger_event_first_true( 'RenderCommentAttachment', $params ) ) != 0 )
 			{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
 				if( $link_position == 'teaser' )
 				{ // Image should be displayed above content
@@ -2814,9 +2821,6 @@ class Comment extends DataObject
 				unset( $attachments[ $index ] );
 				continue;
 			}
-
-			// Update params because they may be modified by some plugin above:
-			$params = $r_params;
 
 			if( $File->is_image() )
 			{ // File is image
@@ -3307,16 +3311,17 @@ class Comment extends DataObject
 	/**
 	 * Display status of item in a formatted way, following a provided template
 	 *
-	 * There are 2 possible variables:
+	 * There are 3 possible variables:
 	 * - $status$ = the raw status
 	 * - $status_title$ = the human readable text version of the status (translated to current language)
+	 * - $tooltip_title$ = the human readable text version of the status for tooltip
 	 *
 	 * @param array Params
 	 */
 	function format_status( $params = array() )
 	{
 		$params = array_merge( array(
-				'template'     => '<div class="evo_status evo_status_$status$">$status_title$</div>',
+				'template'     => '<div class="evo_status evo_status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$>$status_title$</div>',
 				'format'       => 'htmlbody', // Output format, see {@link format_to_output()}
 				'status'       => NULL,
 				'status_title' => NULL,
@@ -3337,8 +3342,8 @@ class Comment extends DataObject
 			$params['status_title'] = $this->get( 't_status' );
 		}
 
-		$r = str_replace( array( '$status$', '$status_title$' ),
-			array( $params['status'], $params['status_title'] ),
+		$r = str_replace( array( '$status$', '$status_title$', '$tooltip_title$' ),
+			array( $params['status'], $params['status_title'], get_status_tooltip_title( $params['status'] ) ),
 			$params['template'] );
 
 		echo format_to_output( $r, $params['format'] );
@@ -3436,13 +3441,13 @@ class Comment extends DataObject
 		{	// Only change DB flag to "members_notified" but do NOT actually send notifications:
 			$force_members = false;
 			$notified_flags[] = 'members_notified';
-			$Messages->add( T_('Marking email notifications for members as sent.'), 'note' );
+			$Messages->add_to_group( T_('Marking email notifications for members as sent.'), 'note', T_('Sending notifications:') );
 		}
 		if( $force_community == 'mark' )
 		{	// Only change DB flag to "community_notified" but do NOT actually send notifications:
 			$force_community = false;
 			$notified_flags[] = 'community_notified';
-			$Messages->add( T_('Marking email notifications for community as sent.'), 'note' );
+			$Messages->add_to_group( T_('Marking email notifications for community as sent.'), 'note', T_('Sending notifications:') );
 		}
 		if( ! empty( $notified_flags ) )
 		{	// Save the marked processing status to DB:
@@ -3454,7 +3459,7 @@ class Comment extends DataObject
 		if( ( $force_members != 'force' && $force_community != 'force' ) &&
 		    $this->check_notifications_flags( array( 'members_notified', 'community_notified' ) ) )
 		{	// All possible notifications have already been sent:
-			$Messages->add( T_('All possible notifications have already been sent: skipping notifications...'), 'note' );
+			$Messages->add_to_group( T_('All possible notifications have already been sent: skipping notifications...'), 'note', T_('Sending notifications:') );
 			return false;
 		}
 
@@ -3498,7 +3503,7 @@ class Comment extends DataObject
 			// Save cronjob to DB:
 			if( $comment_Cronjob->dbinsert() )
 			{
-				$Messages->add( T_('Scheduling email notifications for subscribers.'), 'note' );
+				$Messages->add_to_group( T_('Scheduling email notifications for subscribers.'), 'note', T_('Sending notifications:') );
 
 				// Memorize the cron job ID which is going to handle this post:
 				$this->set( 'notif_ctsk_ID', $comment_Cronjob->ID );
@@ -3588,7 +3593,7 @@ class Comment extends DataObject
 		// Update comment notification params:
 		$this->dbupdate();
 
-		$Messages->add( sprintf( T_('Sending %d email notifications to moderators.'), count( $notify_users ) ), 'note' );
+		$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), count( $notify_users ) ), 'note', T_('Sending notifications:') );
 
 		return $notified_user_IDs;
 	}
@@ -3622,7 +3627,7 @@ class Comment extends DataObject
 
 		if( ! $comment_item_Blog->get_setting( 'allow_item_subscriptions' ) )
 		{	// Subscriptions not enabled!
-			$Messages->add( T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.'), 'note' );
+			$Messages->add_to_group( T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.'), 'note', T_('Sending notifications:') );
 			return array();
 		}
 
@@ -3630,27 +3635,27 @@ class Comment extends DataObject
 		{	// Don't send notifications about comments with not allowed status:
 			$status_titles = get_visibility_statuses( '', array() );
 			$status_title = isset( $status_titles[ $this->get( 'status' ) ] ) ? $status_titles[ $this->get( 'status' ) ] : $this->get( 'status' );
-			$Messages->add( sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title ), 'note' );
+			$Messages->add_to_group( sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title ), 'note', T_('Sending notifications:') );
 			return array();
 		}
 
 		if( $force_members == 'skip' && $force_community == 'skip' )
 		{	// Skip subscriber notifications because of it is forced by param:
-			$Messages->add( T_('Skipping email notifications to subscribers.'), 'note' );
+			$Messages->add_to_group( T_('Skipping email notifications to subscribers.'), 'note', T_('Sending notifications:') );
 			return array();
 		}
 
 		if( $force_members == 'force' && $force_community == 'force' )
 		{	// Force to members and community:
-			$Messages->add( T_('Force sending email notifications to subscribers...'), 'note' );
+			$Messages->add_to_group( T_('Force sending email notifications to subscribers...'), 'note', T_('Sending notifications:') );
 		}
 		elseif( $force_members == 'force' )
 		{	// Force to members only:
-			$Messages->add( T_('Force sending email notifications to subscribed members...'), 'note' );
+			$Messages->add_to_group( T_('Force sending email notifications to subscribed members...'), 'note', T_('Sending notifications:') );
 		}
 		elseif( $force_community == 'force' )
 		{	// Force to community only:
-			$Messages->add( T_('Force sending email notifications to other subscribers...'), 'note' );
+			$Messages->add_to_group( T_('Force sending email notifications to other subscribers...'), 'note', T_('Sending notifications:') );
 		}
 
 		$notify_members = false;
@@ -3677,18 +3682,18 @@ class Comment extends DataObject
 
 		if( ! $notify_members && ! $notify_community )
 		{	// Everyone has already been notified, nothing to do:
-			$Messages->add( T_('Skipping email notifications to subscribers because they were already notified.'), 'note' );
+			$Messages->add_to_group( T_('Skipping email notifications to subscribers because they were already notified.'), 'note', T_('Sending notifications:') );
 			return array();
 		}
 
 		if( $notify_members && $force_members == 'skip' )
 		{	// Skip email notifications to members because it is forced by param:
-			$Messages->add( T_('Skipping email notifications to subscribed members.'), 'note' );
+			$Messages->add_to_group( T_('Skipping email notifications to subscribed members.'), 'note', T_('Sending notifications:') );
 			$notify_members = false;
 		}
 		if( $notify_community && $force_community == 'skip' )
 		{	// Skip email notifications to community because it is forced by param:
-			$Messages->add( T_('Skipping email notifications to other subscribers.'), 'note' );
+			$Messages->add_to_group( T_('Skipping email notifications to other subscribers.'), 'note', T_('Sending notifications:') );
 			$notify_community = false;
 		}
 
@@ -3776,7 +3781,9 @@ class Comment extends DataObject
 			$meta_SQL->FROM_add( 'LEFT JOIN T_groups__groupsettings ON user_grp_ID = gset_grp_ID AND gset_name = "perm_admin"' );
 			$meta_SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON user_ID = uset_user_ID AND uset_name = "notify_meta_comments"' );
 			$meta_SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON bloguser_user_ID = user_ID AND bloguser_blog_ID = '.$comment_item_Blog->ID );
-			$meta_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON bloggroup_group_ID = user_grp_ID AND bloggroup_blog_ID = '.$comment_item_Blog->ID );
+			$meta_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON bloggroup_blog_ID = '.$comment_item_Blog->ID.'
+				AND ( bloggroup_group_ID = user_grp_ID
+				      OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = user_ID ) )' );
 			// Check if users have access to the back-office:
 			$meta_SQL->WHERE( '( gset_value = "normal" OR gset_value = "restricted" )' );
 			// Check if the users would like to receive notifications about new meta comments:
@@ -3868,11 +3875,11 @@ class Comment extends DataObject
 
 		if( $notify_members )
 		{	// Display a message to know how many members are notified:
-			$Messages->add( sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count ), 'note' );
+			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count ), 'note', T_('Sending notifications:') );
 		}
 		if( $notify_community )
 		{	// Display a message to know how many community users are notified:
-			$Messages->add( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), 'note' );
+			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), 'note', T_('Sending notifications:') );
 		}
 
 		if( empty( $notify_users ) )
@@ -3921,8 +3928,8 @@ class Comment extends DataObject
 		// Get author email address. It will be visible for moderators/blog/post owners only -- NOT for other subscribers
 		if( $this->get_author_User() )
 		{ // Comment from a registered user:
-			$reply_to = $this->author_User->get('email');
-			$author_name = $this->author_User->get('login');
+			$reply_to = $this->author_User->get( 'email' );
+			$author_name = $this->author_User->get_username();
 			$author_user_ID = $this->author_User->ID;
 		}
 		elseif( ! empty( $this->author_email ) )
@@ -4043,6 +4050,75 @@ class Comment extends DataObject
 		}
 
 		blocked_emails_display();
+	}
+
+
+	/**
+	 * Send "comment spam" emails for those users who have permission to moderate this comment.
+	 */
+	function send_vote_spam_emails()
+	{
+		global $current_User, $Settings, $UserSettings;
+
+		if( ! is_logged_in() )
+		{	// Only loggen in users can vote on comments
+			return;
+		}
+
+		if( $this->is_meta() )
+		{	// Meta comments have no spam voting
+			return;
+		}
+
+		$UserCache = & get_UserCache();
+
+		$comment_Item = & $this->get_Item();
+		$comment_item_Blog = & $comment_Item->get_Blog();
+		$coll_owner_User = $comment_item_Blog->get_owner_User();
+
+		$moderators = array();
+
+		$moderators_to_notify = $comment_item_Blog->get_comment_moderator_user_data();
+
+		foreach( $moderators_to_notify as $moderator )
+		{
+			$notify_moderator = is_null( $moderator->notify_spam_cmt_moderation ) ? $Settings->get( 'def_notify_spam_cmt_moderation' ) : $moderator->notify_spam_cmt_moderation;
+			if( $notify_moderator )
+			{	// Include user to notify because of enabled setting:
+				$moderators[] = $moderator->user_ID;
+			}
+		}
+		if( $UserSettings->get( 'notify_spam_cmt_moderation', $coll_owner_User->ID ) && is_email( $coll_owner_User->get( 'email' ) ) )
+		{	// Include collection owner:
+			$moderators[] = $coll_owner_User->ID;
+		}
+
+		$email_subject = sprintf( T_('[%s] Spam comment may need moderation on "%s"'), $comment_item_Blog->get( 'shortname' ), $comment_Item->get( 'title' ) );
+		$email_template_params = array(
+				'Comment'  => $this,
+				'Blog'     => $comment_item_Blog,
+				'Item'     => $comment_Item,
+				'voter_ID' => $current_User->ID,
+			);
+
+		// Load all moderators, and check each edit permission on this comment:
+		$UserCache->load_list( $moderators );
+		foreach( $moderators as $moderator_ID )
+		{
+			if( $moderator_ID == $current_User->ID )
+			{	// Don't send email to the voter:
+				continue;
+			}
+			$moderator_User = $UserCache->get_by_ID( $moderator_ID, false );
+			if( $moderator_User && $moderator_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) )
+			{	// If moderator has a permission to edit this comment:
+				$moderator_Group = $moderator_User->get_Group();
+				$email_template_params['notify_full'] = $moderator_Group->check_perm( 'comment_moderation_notif', 'full' );
+
+				// Send email to the moderator:
+				send_mail_to_User( $moderator_ID, $email_subject, 'comment_spam', $email_template_params );
+			}
+		}
 	}
 
 
@@ -4339,11 +4415,6 @@ class Comment extends DataObject
 			return false;
 		}
 
-		if( $this->is_meta() )
-		{	// Don't allow a replying for meta comments:
-			return false;
-		}
-
 		$this->get_Item();
 		$this->Item->load_Blog();
 
@@ -4376,7 +4447,16 @@ class Comment extends DataObject
 		}
 		$class = ' class="'.trim( $class ).'"';
 
-		$url = url_add_param( $this->Item->get_permanent_url(), 'reply_ID='.$this->ID.'&amp;redir=no' ).'#form_p'.$this->Item->ID;
+		// Initialize an url to reply on comment:
+		if( is_admin_page() )
+		{	// for back-office:
+			global $admin_url;
+			$url = $admin_url.'?ctrl=items&amp;blog='.$this->Item->Blog->ID.'&amp;p='.$this->Item->ID.( $this->is_meta() ? '&amp;comment_type=meta' : '' ).'&amp;reply_ID='.$this->ID.'#comment_checkchanges';
+		}
+		else
+		{	// for front-office:
+			$url = url_add_param( $this->Item->get_permanent_url(), 'reply_ID='.$this->ID.( $this->is_meta() ? '&amp;comment_type=meta' : '' ).'&amp;redir=no' ).'#'.( $this->is_meta() ? 'meta_' : '' ).'form_p'.$this->Item->ID;
+		}
 
 		echo $before;
 
@@ -4538,18 +4618,26 @@ class Comment extends DataObject
 	/*
 	 * Get max allowed comment status depending on parent item status
 	 *
+	 * @param string Status key to check if it is allowed, NULL- to use current comment status
 	 * @return string Status key
 	 */
-	function get_allowed_status()
+	function get_allowed_status( $current_status = NULL )
 	{
 		$comment_Item = & $this->get_Item();
 		$item_Blog = & $comment_Item->get_Blog();
 
-		// Current comment status:
-		$current_status = $this->get( 'status' );
+		if( $current_status === NULL )
+		{	// Use current comment status:
+			$current_status = $this->get( 'status' );
+		}
 
 		// Restrict status to max allowed for item collection:
-		$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->status );
+		$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->get( 'status' ) );
+		if( empty( $item_restricted_status ) )
+		{	// If max allowed status is not detected because for example current User has no perm to item status,
+			// then use current status of the Item in order to restrict max comment status below:
+			$item_restricted_status = $comment_Item->get( 'status' );
+		}
 
 		// Comment status cannot be more than post status, restrict it:
 		$restricted_statuses = get_restricted_statuses( $item_Blog->ID, 'blog_comment!', 'edit', '', $item_restricted_status );
@@ -4673,6 +4761,25 @@ class Comment extends DataObject
 
 		// TRUE if all requested flags are in current item notifications flags:
 		return ( count( array_diff( $flags, $this->get( 'notif_flags' ) ) ) == 0 );
+	}
+
+
+	/**
+	 * Check if this comment can be displayed for current user on front-office
+	 *
+	 * @return boolean
+	 */
+	function can_be_displayed()
+	{
+		if( empty( $this->ID ) )
+		{	// Comment is not created yet, so it cannot be displayed:
+			return false;
+		}
+
+		// Load Item of this comment to get a collection ID:
+		$Item = & $this->get_Item();
+
+		return can_be_displayed_with_status( $this->get( 'status' ), 'comment', $Item->get_blog_ID(), $this->author_user_ID );
 	}
 }
 

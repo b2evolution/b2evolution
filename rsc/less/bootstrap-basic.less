@@ -291,6 +291,12 @@ form {
 .jcrop-keymgr {
 	visibility: hidden;
 }
+// Fix image cropping, because max-width:100% of main img style breaks this:
+#user_crop_workarea, .preview_cropped_image {
+	img {
+		max-width: none;
+	}
+}
 // ---------------- //
 
 // Form styles:
@@ -397,6 +403,12 @@ div.log_container, div.action_messages {
 		margin: 0;
 		padding-left: 0;
 	}
+	ul.message_group {
+		li {
+			margin-left: 25px;
+			list-style: disc;
+		}
+	}
 }
 // ---------------- //
 
@@ -480,6 +492,15 @@ table.widget_grid .note {
 // Align top all cells of messages table:
 .evo_private_messages_list .table_scroll table.table tr td {
 	vertical-align: top;
+}
+// Space between user avatars in threads table:
+table.table td.thread_with {
+	img {
+		margin-bottom: 5px;
+	}
+	> span:last-child img {
+		margin-bottom: 0;
+	}
 }
 // ---------------- //
 

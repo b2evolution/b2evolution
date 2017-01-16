@@ -356,9 +356,9 @@ class files_Module extends Module
 							return $perm;
 						}
 						$perm = $current_User->check_perm_blogusers( 'files', $permlevel, $permtarget->in_type_ID );
-						if ( ! $perm )
-						{ // Check groups for permissions for this specific blog:
-							$perm = $current_User->Group->check_perm_bloggroups( 'files', $permlevel, $permtarget->in_type_ID );
+						if( ! $perm )
+						{	// Check primary and secondary groups for permissions for this specific collection:
+							$perm = $current_User->check_perm_bloggroups( 'files', $permlevel, $permtarget->in_type_ID );
 						}
 						return $perm;
 					}

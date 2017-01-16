@@ -284,6 +284,14 @@ ol.breadcrumb {
   max-width: 100%;
   display: inline-block;
 }
+.forums_list .ft_date a.icon_latest_reply:active,
+.forums_list .ft_date_shrinked a.icon_latest_reply:active,
+.forums_list .ft_date_shrinked_more a.icon_latest_reply:active,
+.forums_list .ft_date a.icon_latest_reply:hover,
+.forums_list .ft_date_shrinked a.icon_latest_reply:hover,
+.forums_list .ft_date_shrinked_more a.icon_latest_reply:hover {
+  text-decoration: none;
+}
 .forums_list .ft_author_avatar {
   float: left;
   margin-right: 10px;
@@ -565,6 +573,37 @@ body.round_avatars .single_topic .evo_content_block .ft_avatar > span,
 body.round_avatars .single_topic .evo_content_block .ft_avatar a > img {
   border-radius: 50%;
 }
+.evo_content_block .panel-footer > a,
+.evo_comment .panel-footer > a,
+.evo_content_block .panel-footer > span:not(.btn-group),
+.evo_comment .panel-footer > span:not(.btn-group),
+.evo_content_block .panel-footer > div,
+.evo_comment .panel-footer > div {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+.evo_content_block .panel-footer .vote_spam,
+.evo_comment .panel-footer .vote_spam {
+  margin-right: 10px;
+}
+.evo_content_block .panel-footer .vote_spam .btn-group a,
+.evo_comment .panel-footer .vote_spam .btn-group a {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.evo_content_block .panel-footer .comment_edit_btn,
+.evo_comment .panel-footer .comment_edit_btn {
+  display: none;
+  margin-right: 5px;
+}
+.evo_content_block .panel-footer .action_btn_group,
+.evo_comment .panel-footer .action_btn_group {
+  float: right;
+}
+.evo_content_block .panel-footer .action_btn_group .comment_edit_btn,
+.evo_comment .panel-footer .action_btn_group .comment_edit_btn {
+  display: inline-block;
+}
 .vote_spam {
   float: left;
   height: 22px;
@@ -648,6 +687,18 @@ aside .widget_core_coll_search_form div.compact_search_form input.search_field {
   }
   .posts_panel .ft_count {
     margin-top: 12px !important;
+  }
+  .evo_content_block .panel-footer .comment_edit_btn,
+  .evo_comment .panel-footer .comment_edit_btn {
+    display: inline-block;
+  }
+  .evo_content_block .panel-footer .action_btn_group,
+  .evo_comment .panel-footer .action_btn_group {
+    float: left;
+  }
+  .evo_content_block .panel-footer .action_btn_group .comment_edit_btn,
+  .evo_comment .panel-footer .action_btn_group .comment_edit_btn {
+    display: none;
   }
 }
 @media screen and (max-width: 991px) {
@@ -735,7 +786,7 @@ aside .widget_core_coll_search_form div.compact_search_form input.search_field {
   .evo_comment .evo_comment_post_title {
     display: block !important;
   }
-  .vs_published .evo_comment_avatar {
+  .evo_comment .evo_comment_avatar {
     margin-right: 15px;
   }
   .single_topic .evo_content_block .panel-body .ft_avatar {
@@ -814,9 +865,10 @@ aside .widget_core_coll_search_form div.compact_search_form input.search_field {
     display: none;
   }
   .posts_panel .ft_date_shrinked.item_list {
-    float: none;
-    text-align: left;
     display: inline;
+    float: none;
+    padding-right: 0;
+    text-align: left;
     margin-top: 4px;
   }
   .evo_comment_avatar a img,
@@ -917,6 +969,12 @@ aside .widget_core_coll_search_form div.compact_search_form input.search_field {
     display: block;
     vertical-align: top;
     margin: 0px;
+  }
+}
+@media screen and (max-width: 360px) {
+  /* Disp posts */
+  .posts_panel .ft_date_shrinked.item_list .datestamp_shrinked {
+    display: none;
   }
 }
 .posts_panel_title_wrapper {

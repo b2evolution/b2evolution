@@ -2044,7 +2044,8 @@ function copy_file( $file_path, $root_ID, $path, $check_perms = true )
 		if( $correct_Filetype && $correct_Filetype->is_allowed() )
 		{	// A FileType with the given mime type exists in database and it is an allowed file type for current User
 			// The "correct" extension is a plausible one, proceed...
-			$correct_extension = array_shift($correct_Filetype->get_extensions());
+			$correct_extensions = $correct_Filetype->get_extensions();
+			$correct_extension = array_shift( $correct_extensions );
 			$path_info = pathinfo($newName);
 			$current_extension = $path_info['extension'];
 
@@ -2319,10 +2320,10 @@ function display_dragdrop_upload_button( $params = array() )
 				sizeLimit: <?php echo ( $Settings->get( 'upload_maxkb' ) * 1024 ); ?>,
 				debug: true,
 				messages: {
-					typeError: '<?php echo TS_('{file} has an invalid extension. Only {extensions} are allowed.'); ?>',
-					sizeError: '<?php echo TS_('{file} cannot be uploaded because it is too large ({fileSize}). The maximum allowed upload size is {sizeLimit}.'); ?>',
-					minSizeError: '<?php echo TS_('{file} is too small. The minimum file size is {minSizeLimit}.'); ?>',
-					emptyError: '<?php echo TS_('{file} is empty. Please select non-empty files.'); ?>',
+					typeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} has an invalid extension. Only {extensions} are allowed.'); ?>',
+					sizeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} cannot be uploaded because it is too large ({fileSize}). The maximum allowed upload size is {sizeLimit}.'); ?>',
+					minSizeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} is too small. The minimum file size is {minSizeLimit}.'); ?>',
+					emptyError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} is empty. Please select non-empty files.'); ?>',
 					onLeave: '<?php echo TS_('Files are currently being uploaded. If you leave this page now, the upload will be cancelled.'); ?>'
 				},
 				onSubmit: function( id, fileName )
@@ -2390,7 +2391,7 @@ function display_dragdrop_upload_button( $params = array() )
 						var filename_before = '<?php echo str_replace( "'", "\'", $params['filename_before'] ); ?>';
 						if( filename_before != '' )
 						{
-							filename_before = filename_before.replace( '$file_path$', responseJSON.success.path );
+							filename_before = filename_before.replace( '$file_path$', decodeURIComponent( responseJSON.success.path ) );
 						}
 
 						var warning = '';
@@ -2436,9 +2437,9 @@ function display_dragdrop_upload_button( $params = array() )
 								+ '<span class="fname">' + file_name + '</span>'
 								<?php echo ( $params['status_conflict_place'] == 'before_button' ) ? "+ ' - ".$status_conflict_message."'" : ''; ?>
 								+ ' - <a href="#" '
-								+ 'class="<?php echo button_class( 'text' ); ?> roundbutton_text_noicon qq-conflict-replace" '
-								+ 'old="' + responseJSON.success.oldpath + '" '
-								+ 'new="' + responseJSON.success.newpath + '">'
+								+ 'class="<?php echo button_class( 'text_warning' ); ?> btn-sm roundbutton_text_noicon qq-conflict-replace" '
+								+ 'old="' + responseJSON.success.oldname + '" '
+								+ 'new="' + responseJSON.success.newname + '">'
 								+ '<div><?php echo TS_('Use this new file to replace the old file'); ?></div>'
 								+ '<div style="display:none"><?php echo TS_('Revert'); ?></div>'
 								+ '</a>'
@@ -2831,5 +2832,94 @@ function echo_file_properties()
 	//]]>
 </script>
 <?php
+}
+
+
+/**
+ * Get root and relative file path by absolute path
+ *
+ * @param string Absolute path
+ * @return boolean|array FALSE - if root and path are not detected, Array with keys 'root' and 'path'
+ */
+function get_root_path_by_abspath( $abspath )
+{
+	if( empty( $abspath ) )
+	{	// If absolute path is empty do NOT try to decode it:
+		return false;
+	}
+
+	load_class( 'files/model/_fileroot.class.php', 'FileRoot' );
+
+	$abspath = explode( DIRECTORY_SEPARATOR, $abspath );
+
+	switch( $abspath[0] )
+	{
+		case 'users':
+			// User media dir:
+			$UserCache = & get_UserCache();
+			if( $file_User = & $UserCache->get_by_login( $abspath[1] ) )
+			{	// User is found by login:
+				$root = FileRoot::gen_ID( 'user', $file_User->ID );
+				$start_relpath = 2;
+			}
+			break;
+
+		case 'blogs':
+			// Collection media dir:
+			$BlogCache = & get_BlogCache();
+			if( $file_Blog = & $BlogCache->get_by_urlname( $abspath[1], false ) )
+			{	// Blog is found by urlname:
+				$root = FileRoot::gen_ID( 'collection', $file_Blog->ID );
+				$start_relpath = 2;
+			}
+			break;
+
+		case 'shared':
+			// Shared media dir:
+			$root = FileRoot::gen_ID( 'shared', 0 );
+			$start_relpath = 2;
+			break;
+
+		case 'import':
+			// Import media dir:
+			$root = FileRoot::gen_ID( 'import', 0 );
+			$start_relpath = 1;
+			break;
+
+		case 'emailcampaign':
+			// Email campaign media dir:
+			$EmailCampaignCache = & get_EmailCampaignCache();
+			if( $file_EmailCampaign = & $EmailCampaignCache->get_by_ID( $abspath[1], false ) )
+			{	// Email campaign is found by ID:
+				$root = FileRoot::gen_ID( 'emailcampaign', $file_EmailCampaign->ID );
+				$start_relpath = 1;
+			}
+			break;
+	}
+
+	if( ! empty( $root ) )
+	{	// Get relative path only if root is detected:
+		$relpath = '';
+		$abspath_length = count( $abspath );
+		for( $f = $start_relpath; $f < $abspath_length - 1; $f++ )
+		{
+			if( $f == $abspath_length - 3 )
+			{	// Skip this because it is a evocache folder:
+				continue;
+			}
+			$relpath .= $abspath[ $f ].( $f < $abspath_length - 2 ? DIRECTORY_SEPARATOR : '' );
+		}
+
+		if( ! empty( $relpath ) )
+		{	// Return data only if they both are detected:
+			return array(
+					'root' => $root,
+					'path' => $relpath,
+				);
+		}
+	}
+
+	// Data are not found correctly:
+	return false;
 }
 ?>

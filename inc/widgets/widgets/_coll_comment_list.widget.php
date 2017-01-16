@@ -209,7 +209,7 @@ class coll_comment_list_Widget extends ComponentWidget
 
 			if( empty( $this->disp_params[ 'author_link_text' ] ) )
 			{
-				$this->disp_params[ 'author_link_text' ] = 'login';
+				$this->disp_params[ 'author_link_text' ] = 'auto';
 			}
 
 			/**

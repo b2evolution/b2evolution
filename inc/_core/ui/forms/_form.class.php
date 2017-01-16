@@ -1282,7 +1282,7 @@ class Form extends Widget
 
 		if( empty($field_params['date_format']) )
 		{	// Use locale date format:
-			$date_format = locale_datefmt();
+			$date_format = locale_input_datefmt();
 		}
 		else
 		{
@@ -1314,6 +1314,30 @@ class Form extends Widget
 				case "Y": return "yyyy"; // year, XXXX
 				default:
 					return $m[0];
+			}' ), $date_format );
+
+		// Get max length of each date component
+		$js_date_length = preg_replace_callback( '~(\\\)?(\w)~', create_function( '$m', '
+			if( $m[1] == "\\\" ) return "\\\".$m[0]; // leave escaped
+			switch( $m[2] )
+			{
+				case "d": return "nn"; // day, 01-31(2)
+				case "j": return "nn"; // day, 1-31(2)
+				case "l": return "XXXXXXXXX"; // weekday (name) - Wednesday(9)
+				case "D": return "XXX"; // weekday (abbr)(3)
+				case "S": return "";
+
+				case "e": return ""; // weekday letter, not supported
+
+				case "m": return "nn"; // month, 01-12(2)
+				case "n": return "nn"; // month, 1-12(2)
+				case "F": return "XXXXXXXXX"; // full month name; "name or abbr" in date.js - September(9)
+				case "M": return "XXX"; // month name abbr(3)
+
+				case "y": return "nn"; // year, 00-99(2)
+				case "Y": return "nnnn"; // year, 1970 to 2038(4)
+				default:
+					return "_"; // (1)
 			}' ), $date_format );
 
 		$field_params['type'] = 'text';
@@ -1360,7 +1384,7 @@ class Form extends Widget
 
 		if( !isset($field_params['size']) )
 		{ // Get size out of $date_format if not explicitly set
-			$field_params['size'] = strlen( $js_date_format );
+			$field_params['size'] = strlen( $js_date_length );
 		}
 
 		/*
@@ -2133,6 +2157,7 @@ class Form extends Widget
 	 *  - an optional note
 	 *  - an optional class (html attribute)
 	 *  - an optional boolean TRUE - to print out an option as hidden field instead of checkbox
+	 *  - an optional array of additional attributes for the option label
 	 *
 	 * @todo Transform to $field_params schema.
 	 * @param array a two-dimensional array containing the parameters of the input tag
@@ -2175,8 +2200,15 @@ class Form extends Widget
 
 			$loop_field_note = empty( $option[5] ) ? '' : $option[5];
 
+			// extra params for checklist option label
+			$extra_attribs = '';
+			if( ! empty( $option[8] ) )
+			{
+				$extra_attribs = ' '.get_field_attribs_as_string( $option[8] );
+			}
+
 			// asimo>> add id for label: id = label_for_fieldname_fieldvalue
-			$r .= '<label'.( empty( $option[6] ) ? '' : ' class="'.$option[6].'"' ).' id="label_for_'.$loop_field_name.'_'.$option[1].'">';
+			$r .= '<label'.( empty( $option[6] ) ? '' : ' class="'.$option[6].'"' ).' id="label_for_'.$loop_field_name.'_'.$option[1].'"'.$extra_attribs.'>';
 
 			if( $add_highlight_spans )
 			{ // Need it to highlight checkbox for check_all and uncheck_all mouseover

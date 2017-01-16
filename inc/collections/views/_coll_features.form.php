@@ -44,7 +44,7 @@ $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
 												), '' );
 	$Form->end_line( T_('per page') );
 
-	$Form->checkbox( 'disp_featured_above_list', $edited_Blog->get_setting( 'disp_featured_above_list' ), T_('Featured post above list'), T_('Check to display a featured post above the list (as long as no Intro post is displayed.') );
+	$Form->checkbox( 'disp_featured_above_list', $edited_Blog->get_setting( 'disp_featured_above_list' ), T_('Featured post above list'), T_('Check to display a featured post above the list (as long as no Intro post is displayed).') );
 
 	$ItemTypeCache = & get_ItemTypeCache();
 	$enabled_item_types = $edited_Blog->get_enabled_item_types( 'post' );
@@ -99,7 +99,7 @@ $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_setting
 		array( array( 'no', T_( 'No' ), T_( 'Check this to view list of the posts.' ) ),
 			array( 'blog', T_( 'View home page' ), T_( 'Check this to automatically view the blog after publishing a post.' ) ),
 			array( 'post', T_( 'View new post' ), T_( 'Check this to automatically view the post page.' ) ), ),
-			T_( 'View blog after publishing' ), true );
+			T_( 'View blog after creating' ), true );
 
 	$Form->radio( 'editing_goto_blog', $edited_Blog->get_setting( 'editing_goto_blog' ),
 		array( array( 'no', T_( 'No' ), T_( 'Check this to view list of the posts.' ) ),
@@ -210,6 +210,10 @@ $Form->begin_fieldset( T_('Post moderation').get_manual_link( 'post-moderation' 
 				'', // Note
 				'', // Class
 				$status_is_hidden, // Hidden field instead of checkbox?
+				array(
+					'data-toggle' => 'tooltip',
+					'data-placement' => 'top',
+					'title' => get_status_tooltip_title( $status ) )
 			);
 	}
 	$Form->checklist( $checklist_options, 'post_moderation_statuses', T_('"Require moderation" statuses'), false, false, array( 'note' => T_('Posts with the selected statuses will be considered to require moderation. They will trigger "moderation required" notifications and will appear as such on the collection dashboard.') ) );

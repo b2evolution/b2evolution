@@ -361,6 +361,11 @@ function assign_profile_picture( & $User, $login = NULL )
 {
 	$File = new File( 'user', $User->ID, ( is_null( $login ) ? $User->login : $login ).'.jpg' );
 
+	if( ! $File->exists() )
+	{	// Don't assign if default user avatar doesn't exist on disk:
+		return;
+	}
+
 	// Load meta data AND MAKE SURE IT IS CREATED IN DB:
 	$File->load_meta( true );
 	$User->set( 'avatar_file_ID', $File->ID );
@@ -632,9 +637,13 @@ function get_demo_user( $login, $create = false, $group = NULL, $user_org_IDs = 
 			default:
 				// do nothing here
 		}
-		$DB->query( "
-				INSERT INTO T_users__usersettings ( uset_user_ID, uset_name, uset_value )
-				VALUES ( ".$demo_user->ID.", 'created_fromIPv4', '".ip2int( '127.0.0.1' )."' ), ( ".$demo_user->ID.", 'user_domain', 'localhost' )" );
+
+		if( $demo_user && ! empty( $demo_user->ID ) )
+		{	// Insert default user settings:
+			$DB->query( 'INSERT INTO T_users__usersettings ( uset_user_ID, uset_name, uset_value )
+				VALUES ( '.$demo_user->ID.', "created_fromIPv4", '.$DB->quote( ip2int( '127.0.0.1' ) ).' ),
+				       ( '.$demo_user->ID.', "user_domain", "localhost" )' );
+		}
 	}
 
 	return $demo_user;

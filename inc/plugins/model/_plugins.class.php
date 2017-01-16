@@ -855,13 +855,10 @@ class Plugins
 	 *
 	 * @param string event name, see {@link Plugins_admin::get_supported_events()}
 	 * @param array Associative array of parameters for the Plugin
-	 * @param boolean TRUE to force to return params even if plugin method doesn't return true,
-	 *                i.e. it doesn't touch/render real object, such plugin only modify the params, for example "Info dots renderer" plugin
-// TODO: fp>yura: revert this because it's a temporary hack.
 	 * @return array The (modified) params array with key "plugin_ID" set to the last called plugin;
 	 *               Empty array if no Plugin returned true or no Plugin has this event registered.
 	 */
-	function trigger_event_first_true( $event, $params = NULL, $return_params = false )
+	function trigger_event_first_true( $event, $params = NULL )
 	{
 		global $Debuglog;
 
@@ -887,15 +884,46 @@ class Plugins
 				}
 			}
 		}
+		return array();
+	}
 
-		if( $return_params )
-		{	// Force to return the updated params:
-			return $params;
+
+	/**
+	 * Call all plugins for a given event, until the first one returns true.
+	 *
+	 * @param string event name, see {@link Plugins_admin::get_supported_events()}
+	 * @param array Associative array of parameters for the Plugin
+	 * @return array The (modified) params array with key "plugin_ID" set to the last called plugin;
+	 *               Empty array if no Plugin returned true or no Plugin has this event registered.
+	 */
+	function trigger_event_first_true_with_params( $event, & $params )
+	{
+		global $Debuglog;
+
+		$Debuglog->add( 'Trigger event '.$event.' (first true)', 'plugins' );
+
+		if( empty( $this->index_event_IDs[ $event ] ) )
+		{	// No events registered
+			$Debuglog->add( 'No registered plugins.', 'plugins' );
+// DON'T RETURN HERE BECAUSE OF DIRTY HACK!!!
 		}
 		else
-		{	// Return empty array:
-			return array();
+		{	// We have some events registered, loop through them:
+			$Debuglog->add( 'Registered plugin IDs: '.implode( ', ', $this->index_event_IDs[ $event ] ), 'plugins' );
+			foreach( $this->index_event_IDs[ $event ] as $l_plugin_ID )
+			{
+				$r = $this->call_method( $l_plugin_ID, $event, $params );
+				if( $r === true )
+				{
+					$Debuglog->add( 'Plugin ID '.$l_plugin_ID.' returned true!', 'plugins' );
+					// Save the ID of the plugin which returned true:
+					$params['plugin_ID'] = & $l_plugin_ID;
+					return $params;
+				}
+			}
 		}
+
+		return array();
 	}
 
 
@@ -2076,6 +2104,9 @@ class Plugins
 
 		$name_prefix = isset( $params['name_prefix'] ) ? $params['name_prefix'] : '';
 
+		// Set different prefix if you use several toolbars on one page:
+		$js_prefix = isset( $params['js_prefix'] ) ? $params['js_prefix'] : '';
+
 		$this->restart(); // make sure iterator is at start position
 
 		if( ! is_array($current_renderers) )
@@ -2177,7 +2208,7 @@ class Plugins
 
 			$r .= '<div id="block_renderer_'.$loop_RendererPlugin->code.'">';
 
-			$r .= '<input type="checkbox" class="checkbox" name="'.$name_prefix.'renderers[]" value="'.$loop_RendererPlugin->code.'" id="renderer_'.$loop_RendererPlugin->code.'"';
+			$r .= '<input type="checkbox" class="checkbox" name="'.$name_prefix.'renderers[]" value="'.$loop_RendererPlugin->code.'" id="'.$js_prefix.'renderer_'.$loop_RendererPlugin->code.'"';
 
 			switch( $apply_rendering )
 			{
@@ -2209,8 +2240,14 @@ class Plugins
 					break;
 			}
 
-			$r .= ' title="'.format_to_output($loop_RendererPlugin->short_desc, 'formvalue').'" /> <label for="renderer_'.$loop_RendererPlugin->code.'" title="';
-			$r .= format_to_output($loop_RendererPlugin->short_desc, 'formvalue').'">';
+			$r .= ' title="'.format_to_output( $loop_RendererPlugin->short_desc, 'formvalue' ).'"';
+			if( ! empty( $js_prefix ) )
+			{	// Set prefix, Used in JS code to disable/enable plugin toolbar:
+				$r .= ' data-prefix="'.format_to_output( $js_prefix, 'formvalue' ).'"';
+			}
+			$r .= ' />';
+			$r .= ' <label for="'.$js_prefix.'renderer_'.$loop_RendererPlugin->code.'"';
+			$r .= ' title="'.format_to_output($loop_RendererPlugin->short_desc, 'formvalue').'">';
 			$r .= format_to_output($loop_RendererPlugin->name).'</label>';
 
 			// fp> TODO: the first thing we want here is a TINY javascript popup with the LONG desc. The links to readme and external help should be inside of the tiny popup.

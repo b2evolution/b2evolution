@@ -458,9 +458,9 @@ jQuery( document ).ready( function()
 		func_args.splice( 0, 1 );
 		for( var i = 0; i < func_args.length; i++ )
 		{
-			if( func_args[ i ] == 'b2evoCanvas' )
+			if( func_args[ i ].indexOf( 'b2evoCanvas' ) > -1 )
 			{ // Replace special param with global object
-				func_args[ i ] = b2evoCanvas;
+				func_args[ i ] = window[ func_args[ i ] ];
 			}
 			else if( func_args[ i ] == ' ' )
 			{ // Fix an empty param
@@ -487,7 +487,8 @@ jQuery( document ).ready( function()
 	// Enable/Disable plugin toolbars depending on selected plugins for current edit form:
 	function change_plugin_toolbar_activity( this_obj )
 	{
-		var toolbar_obj = jQuery( '.' + this_obj.val() + '_toolbar' );
+		var prefix = this_obj.data( 'prefix' ) ? this_obj.data( 'prefix' ) : '';
+		var toolbar_obj = jQuery( '.' + prefix + this_obj.val() + '_toolbar' );
 		if( toolbar_obj.length == 0 )
 		{ // Skip this function if plugin has no toolbar
 			return true;

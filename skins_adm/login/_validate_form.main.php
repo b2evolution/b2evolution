@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the account validation form. It gets included if the user needs to validate his account.
+ * This form allows the user to request a new activation email (in case of standard login forms, not in-skin login forms)
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -37,6 +37,7 @@ $params = array(
 	'activate_form_params' => $login_form_params,
 	'use_form_wrapper'     => false,
 );
+
 require skin_fallback_path( '_activateinfo.disp.php', 6 );
 
 // Footer

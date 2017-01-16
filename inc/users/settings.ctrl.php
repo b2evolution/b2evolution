@@ -20,7 +20,7 @@ switch ( $action )
 		$current_User->check_perm( 'users', 'edit', true );
 
 		// Session settings
-		$Settings->set( 'redirect_to_after_login', param( 'redirect_to_after_login', 'string', '' ) );
+		$Settings->set( 'redirect_to_after_login', param( 'redirect_to_after_login', 'url', '' ) );
 
 		$timeout_sessions = param_duration( 'timeout_sessions' );
 

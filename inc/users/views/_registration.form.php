@@ -86,6 +86,7 @@ $Form->begin_fieldset( T_('Default user settings').get_manual_link('default-user
 		array( 'notify_published_comments', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is published on one of <strong>my</strong> posts.' ), $Settings->get( 'def_notify_published_comments' ) ),
 		array( 'notify_comment_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is posted and I have permissions to moderate it.' ), $Settings->get( 'def_notify_comment_moderation' ) ),
 		array( 'notify_edit_cmt_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is modified and I have permissions to moderate it.' ), $Settings->get( 'def_notify_edit_cmt_moderation' ) ),
+		array( 'notify_spam_cmt_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is reported as spam and I have permissions to moderate it.' ), $Settings->get( 'def_notify_spam_cmt_moderation' ) ),
 		array( 'notify_meta_comments', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a meta comment is posted and I have permission to view it.' ), $Settings->get( 'def_notify_meta_comments' ) ),
 		array( 'notify_post_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a post is created and I have permissions to moderate it.' ), $Settings->get( 'def_notify_post_moderation' ) ),
 		array( 'notify_edit_pst_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a post is modified and I have permissions to moderate it.' ), $Settings->get( 'def_notify_edit_pst_moderation' ) ),

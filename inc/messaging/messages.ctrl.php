@@ -57,7 +57,7 @@ if( param( 'thrd_ID', 'integer', '', true ) )
 	{ // Thread doesn't exists with this ID
 		unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
-		$Messages->add( T_('The requested thread does not exist any longer.'), 'error' );
+		$Messages->add( T_('The private conversation you are trying to access does not exist any longer.'), 'error' );
 		$action = 'nil';
 	}
 	else if( ! $edited_Thread->check_thread_recipient( $current_User->ID ) && ! $perm_abuse_management )

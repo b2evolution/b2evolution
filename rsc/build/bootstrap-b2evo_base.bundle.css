@@ -242,6 +242,10 @@ span.fa {
 a.action_icon span.fa {
   margin-right: 2px;
 }
+span.fa.action_icon.empty_placeholder {
+  margin-right: 4px;
+  visibility: hidden;
+}
 a.roundbutton .fa,
 a.roundbutton:hover .fa,
 a.roundbutton_text .fa,
@@ -663,6 +667,16 @@ div.filters .filter_item div {
 }
 .evo_comment__meta .panel-footer {
   border-top: 1px solid #5bc0de;
+  background-color: #d9edf7;
+}
+.panel-meta {
+  border: 2px solid #5bc0de;
+}
+.panel-meta .panel-heading {
+  border-bottom: 1px solid #5bc0de;
+  background-color: #d9edf7;
+}
+.panel-meta .panel-body {
   background-color: #d9edf7;
 }
 .evo_voting_panel > span.fa {
@@ -1395,6 +1409,10 @@ form div.avatartag a {
 .jcrop-keymgr {
   visibility: hidden;
 }
+#user_crop_workarea img,
+.preview_cropped_image img {
+  max-width: none;
+}
 .evo_label_inline {
   margin-left: 2ex;
 }
@@ -1485,6 +1503,11 @@ div.action_messages li {
   margin: 0;
   padding-left: 0;
 }
+div.log_container ul.message_group li,
+div.action_messages ul.message_group li {
+  margin-left: 25px;
+  list-style: disc;
+}
 div.skin_error {
   border: 2px dotted #d99;
   background: #fbf2ee;
@@ -1561,6 +1584,12 @@ table.widget_grid div {
 }
 .evo_private_messages_list .table_scroll table.table tr td {
   vertical-align: top;
+}
+table.table td.thread_with img {
+  margin-bottom: 5px;
+}
+table.table td.thread_with > span:last-child img {
+  margin-bottom: 0;
 }
 .ufld_icon_links {
   text-align: center;
@@ -3330,6 +3359,30 @@ span.NonExistentWikiWord {
   div.checkbox:last-of-type {
     padding-bottom: 7px;
   }
+  .text-left-sm {
+    text-align: left;
+  }
+  .text-right-sm {
+    text-align: right;
+  }
+}
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+  .text-left-md {
+    text-align: left;
+  }
+  .text-right-md {
+    text-align: right;
+  }
+}
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  .text-left-lg {
+    text-align: left;
+  }
+  .text-right-lg {
+    text-align: right;
+  }
 }
 .glyphicon {
   font-family: 'Glyphicons Halflings' !important;
@@ -3501,8 +3554,8 @@ a.btn.action_icon.hoverlink {
   display: inline-block;
   margin: 0 0 2px;
 }
-.form-horizontal #itemform_extra .form-group input[type=text],
-.form-horizontal #itemform_edit_timestamp .form-group input[type=text] {
+.form-horizontal #itemform_extra .form-group input[type=text]:not( #item_issue_date ),
+.form-horizontal #itemform_edit_timestamp .form-group input[type=text]:not( #item_issue_date ) {
   max-width: 85px;
 }
 .form-horizontal #itemform_extra td,
@@ -3683,6 +3736,9 @@ div.results tr.placeholder td {
 div.results tr.placeholder + tr:not( :nth-child(2)):not(.dragged) > td,
 div.results tr.dragged + tr:not( :nth-child(2)):not(.dragged) > td {
   border-top: none;
+}
+div.results img {
+  max-width: none;
 }
 div.filters {
   margin-bottom: 0;
@@ -4106,4 +4162,10 @@ div.message_toolbars {
   div.coll-dashboard-block-3 {
     float: right;
   }
+}
+.btn-spinner {
+  background-image: url(../img/ajax-loader/000.gif);
+  background-size: 14px 14px;
+  background-repeat: no-repeat;
+  background-position: left 5px center;
 }

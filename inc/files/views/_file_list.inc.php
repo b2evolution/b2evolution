@@ -293,12 +293,11 @@ $Form->begin_form();
 				// fp> here might not be the best place to put the perm check
 				if( isset( $LinkOwner ) && $LinkOwner->check_perm( 'edit' ) )
 				{	// Offer option to link the file to an Item (or anything else):
-					$link_attribs = array();
+					$link_attribs = array( 'class' => 'action_icon link_file btn btn-primary btn-xs' );
 					$link_action = 'link';
 					if( $mode == 'upload' )
 					{	// We want the action to happen in the post attachments iframe:
 						$link_attribs['target'] = $iframe_name;
-						$link_attribs['class'] = 'action_icon link_file btn btn-primary btn-xs';
 						$link_attribs['onclick'] = 'return evo_link_attach( \''.$LinkOwner->type.'\', '.$LinkOwner->get_ID()
 								.', \''.FileRoot::gen_ID( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID() )
 								.'\', \''.$lFile->get_rdfp_rel_path().'\' )';
@@ -560,6 +559,9 @@ $Form->begin_form();
 				if( $mode == 'upload' )
 				{ // We want the action to happen in the post attachments iframe:
 					$link_attribs['target'] = $iframe_name;
+					$link_attribs['onclick'] = 'return evo_link_attach( \''.$LinkOwner->type.'\', '.$LinkOwner->get_ID()
+							.', \''.FileRoot::gen_ID( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID() )
+							.'\', \''.'$file_path$'.'\' )';
 					$link_attribs['class'] = 'action_icon link_file btn btn-primary btn-xs';
 					$link_action = 'link_inpost';
 				}

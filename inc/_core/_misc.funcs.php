@@ -921,6 +921,43 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 
 
 /**
+ * Perform a global regular expression match outside blocks <code></code>, <pre></pre> and markdown codeblocks
+ *
+ * @param string Pattern to search for
+ * @param string Content
+ * @param array Array of all matches in multi-dimensional array
+ * @return integer|boolean Number of full pattern matches (which might be zero), or FALSE if an error occurred.
+ */
+function preg_match_outcode( $search, $content, & $matches )
+{
+	if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false || strstr( $content, '`' ) !== false )
+	{	// Call preg_match_all() on everything outside code/pre and markdown codeblocks:
+		return callback_on_non_matching_blocks( $content,
+			'~(`|<(code|pre)[^>]*>).*?(\1|</\2>)~is',
+			'preg_match_outcode_callback', array( $search, & $matches ) );
+	}
+	else
+	{	// No code/pre blocks, search in the whole thing:
+		return preg_match_all( $search, $content, $matches );
+	}
+}
+
+
+/**
+ * Used for function callback_on_non_matching_blocks(), because there is different order of params
+ *
+ * @param string Pattern to search for
+ * @param string Content
+ * @param array Array of all matches in multi-dimensional array
+ * @return integer|boolean Number of full pattern matches (which might be zero), or FALSE if an error occurred.
+ */
+function preg_match_outcode_callback( $content, $search, & $matches )
+{
+	return preg_match_all( $search, $content, $matches );
+}
+
+
+/**
  * Replace content outside blocks <code></code>, <pre></pre> and markdown codeblocks
  *
  * @param array|string Search list
@@ -2206,21 +2243,29 @@ function get_atags( $content )
  */
 function add_tag_class( $content, $class, $limit = 1 )
 {
-	// Check if there's an opening tag
-	if( preg_match( '/<.*>/i', $content ) )
-	{
-		// Check if class attribute is already defined
-		if( preg_match( '/\sclass\s*=/i', $content) )
-		{ // Insert class
-			$content = preg_replace( '/(<.*)(class\s*=\s*")(.*)"/i', '$1$2$3 '.$class.'"', $content, $limit );
-		}
-		else
-		{
-			$content = preg_replace( '/>/i', ' class="'.$class.'"$1>', $content, $limit );
-		}
-	}
+	global $add_class;
+	$add_class = $class;
+
+	$content = preg_replace_callback( '/<[^\/].*?>/i', 'callback_add_tag_class',
+		$content, $limit );
+
+	unset( $add_class );
 
 	return $content;
+}
+function callback_add_tag_class( $matches )
+{
+	global $add_class;
+	// Check if class attribute is already defined
+	if( preg_match( '/\sclass\s*=/i', $matches[0] ) )
+	{ // Insert class
+		//$content = preg_replace( '/(<.*)(class\s*=\s*")(.*)"/i', '$1$2$3 '.$class.'"', $content, $limit );
+		return preg_replace( '/(<[a-zA-z_:]\s*?.*?\s*?class=")(.*?)(".*?>)/i', '$1$2 '.$add_class.'$3', $matches[0] );
+	}
+	else
+	{
+		return preg_replace( '/>/i', ' class="'.$add_class.'"$1>', $matches[0] );
+	}
 }
 
 
@@ -3907,6 +3952,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'private_messages_unread_reminder':
 			case 'post_new':
 			case 'comment_new':
+			case 'comment_spam':
 			case 'account_activated':
 			case 'account_closed':
 			case 'account_reported':
@@ -4083,6 +4129,13 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 		  //   and with simple login text in PLAIN TEXT format
 			if( $format == 'html' )
 			{
+				$username = $User->get_colored_login( array(
+						'mask'      => '$avatar$ $login$',
+						'login_text'=> 'name',
+						'use_style' => true,
+						'protocol'  => 'http:',
+					) );
+
 				$user_login = $User->get_colored_login( array(
 						'mask'      => '$avatar$ $login$',
 						'use_style' => true,
@@ -4091,9 +4144,10 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 			}
 			else
 			{
+				$username = $User->get_username();
 				$user_login = $User->login;
 			}
-			$formated_message = str_replace( '$login$', $user_login, $formated_message );
+			$formated_message = str_replace( array( '$login$', '$username$' ), array( $user_login, $username ) , $formated_message );
 		}
 
 		$template_message .= $formated_message;
@@ -7092,6 +7146,13 @@ function evo_flush()
 		return;
 	}
 
+	// To fill the output buffer in order to flush data:
+	// NOTE: Uncomment the below line if flush doesn't work as expected
+	// echo str_repeat( ' ', 4096 );
+
+	// New line char is required as flag of that output portion is printed out:
+	echo "\n";
+
 	$zlib_output_compression = ini_get( 'zlib.output_compression' );
 	if( empty( $zlib_output_compression ) || $zlib_output_compression == 'Off' )
 	{ // This function helps to turn off output buffering
@@ -7505,7 +7566,8 @@ function echo_modalwindow_js_bootstrap()
 {
 	// Initialize variables for the file "bootstrap-evo_modal_window.js":
 	echo '<script type="text/javascript">
-		var evo_js_lang_close = \''.TS_('Close').'\';
+		var evo_js_lang_close = \''.TS_('Close').'\'
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 	</script>';
 }
 
@@ -7746,7 +7808,7 @@ function get_status_dropdown_button( $params = array() )
 	}
 	$status_icon_options = get_visibility_statuses( 'icons', $params['exclude_statuses'] );
 
-	$r = '<div class="btn-group dropdown autoselected">';
+	$r = '<div class="btn-group dropdown autoselected" data-toggle="tooltip" data-placement="top" data-container="body" title="'.get_status_tooltip_title( $params['value'] ).'">';
 	$r .= '<button type="button" class="btn btn-status-'.$params['value'].' dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'
 					.'<span>'.$status_options[ $params['value'] ].'</span>'
 				.' <span class="caret"></span></button>';
@@ -7766,23 +7828,36 @@ function get_status_dropdown_button( $params = array() )
  */
 function echo_form_dropdown_js()
 {
+	// Build a string to initialize javascript array with button titles
+	$tooltip_titles = get_visibility_statuses( 'tooltip-titles' );
+	$tooltip_titles_js_array = array();
+	foreach( $tooltip_titles as $status => $tooltip_title )
+	{
+		$tooltip_titles_js_array[] = $status.': \''.TS_( $tooltip_title ).'\'';
+	}
+	$tooltip_titles_js_array = implode( ', ', $tooltip_titles_js_array );
 ?>
 <script type="text/javascript">
 jQuery( '.btn-group.dropdown.autoselected li a' ).click( function()
 {
+	var item_status_tooltips = {<?php echo $tooltip_titles_js_array ?>};
 	var item = jQuery( this ).parent();
 	var status = item.attr( 'rel' );
-	var button = jQuery( this ).parent().parent().prev();
+	var btn_group = item.parent().parent();
+	var button = jQuery( item.parent().parent().find( 'button:first' ) );
 	var field_name = jQuery( this ).parent().parent().attr( 'aria-labelledby' );
 
 	// Change status class name to new changed for all buttons:
 	button.attr( 'class', button.attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + status ) );
 	// Update selector button to status title:
-	button.find( 'span:first' ).html( item.find( 'span:last' ).html() );
+	button.find( 'span:first' ).html( item.find( 'span:last' ).html() ); // update selector button to status title
 	// Update hidden field to new status value:
 	jQuery( 'input[type=hidden][name=' + field_name + ']' ).val( status );
 	// Hide dropdown menu:
 	item.parent().parent().removeClass( 'open' );
+
+	// Update tooltip
+	btn_group.tooltip( 'hide' ).attr( 'data-original-title', item_status_tooltips[status] ).tooltip( 'show' );
 
 	return false;
 } );
@@ -7842,8 +7917,6 @@ function get_script_baseurl()
  */
 function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title = '#', $value = NULL )
 {
-	$badge_class = 'badge badge-warning';
-
 	switch( $type )
 	{
 		case 'coll':
@@ -7876,21 +7949,6 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
 			}
 			break;
 
-		case 'group':
-			if( $value == 'primary' )
-			{	// Use text for primary group:
-				$text = T_('Primary');
-				$badge_class = 'label label-primary';
-			}
-			else
-			{	// Use text for secondary group:
-				$text = T_('Secondary');
-				$badge_class = 'label label-info';
-			}
-			$title = '';
-			$manual_url = '';
-			break;
-
 		default:
 			// Unknown badge type:
 			return '';
@@ -7904,7 +7962,7 @@ function get_admin_badge( $type = 'coll', $manual_url = '#', $text = '#', $title
 	{	// Use link:
 		$r = ' <a href="'.get_manual_url( $manual_url ).'" target="_blank"';
 	}
-	$r .= ' class="'.$badge_class.'"';
+	$r .= ' class="badge badge-warning"';
 	if( ! empty( $title ) && $title != '#' )
 	{	// Use title for tooltip:
 		$r .= ' data-toggle="tooltip" data-placement="top" title="'.format_to_output( $title, 'htmlattr' ).'"';
@@ -8144,17 +8202,20 @@ function render_inline_tags( $Object, $tags, $params = array() )
 		{
 			case 'Item':
 				$LinkOwner = new LinkItem( $Object );
-				$plugin_event_name = 'RenderItemAttachment';
+				$prepare_plugin_event_name = 'PrepareForRenderItemAttachment';
+				$render_plugin_event_name = 'RenderItemAttachment';
 				break;
 
 			case 'EmailCampaign':
 				$LinkOwner = new LinkEmailCampaign( $Object );
-				$plugin_event_name = 'RenderEmailAttachment';
+				$prepare_plugin_event_name = 'PrepareForRenderEmailAttachment';
+				$render_plugin_event_name = 'RenderEmailAttachment';
 				break;
 
 			case 'Message':
 				$LinkOwner = new LinkMessage( $Object, $temp_link_owner_ID );
-				$plugin_event_name = 'RenderMessageAttachment';
+				$prepare_plugin_event_name = 'PrepareForRenderMessageAttachment';
+				$render_plugin_event_name = 'RenderMessageAttachment';
 				break;
 
 			default:
@@ -8214,6 +8275,8 @@ function render_inline_tags( $Object, $tags, $params = array() )
 		$params['Link'] = $Link;
 		$params[ $object_class ] = $Object;
 
+		$current_file_params = array();
+
 		switch( $inline_type )
 		{
 			case 'image':
@@ -8221,7 +8284,6 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				if( $File->is_image() )
 				{
 					$current_image_params = $params;
-					$current_file_params = array();
 
 					if( ! empty( $inline[3] ) ) // check if second colon is present
 					{
@@ -8249,12 +8311,10 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						{ // A class name is set for the inline tags
 							$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $class_index ] ) ) );
 							if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
-							{ // Overwrite 'before_image' setting to add an extra class name
-								$current_image_params['before_image'] = '<div class="image_block '.$image_extraclass.'">';
-								// 'after_image' setting must be also defined, becuase it may be different than the default '</div>'
-								$current_image_params['after_image'] = '</div>';
+							{	// Overwrite 'before_image' setting to add an extra class name:
+								$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $image_extraclass ) );
 
-								// Set class for file inline tags
+								// Append extra class to file inline img tags:
 								$current_file_params['class'] = $image_extraclass;
 							}
 						}
@@ -8272,13 +8332,14 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						$current_image_params[ $param_key ] = & $current_image_params[ $param_key ];
 					}
 
-					// We need to assign the result of trigger_event_first_true to a variable before counting
-					// or else modifications to the params are not applied in PHP7
-					$r_params = $Plugins->trigger_event_first_true( $plugin_event_name, $current_image_params );
-					if( count( $r_params ) != 0 )
-					{	// Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r
-						if( ! $r_params['get_rendered_attachments'] )
-						{ // Restore $r value and mark this item has the rendered attachments
+					// Prepare params before rendering attachment:
+					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_image_params );
+
+					// Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r:
+					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_image_params ) ) != 0 )
+					{	// This attachment has been rendered by a plugin (to $current_image_params['data']):
+						if( ! $current_image_params['get_rendered_attachments'] )
+						{	// Restore $r value and mark this item has the rendered attachments:
 							$r = $temp_r;
 							$plugin_render_attachments = true;
 						}
@@ -8307,10 +8368,9 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						}
 					}
 					elseif( $inline_type == 'inline' )
-					{ // Generate simple IMG tag with original image size
-						$inlines[$current_inline] = '<img src="'.$File->get_url().'"'
-							.( empty( $current_file_params['class'] ) ? '' : ' class="'.$current_file_params['class'].'"' )
-							.' />';
+					{	// Generate simple IMG tag with resized image size:
+						$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '',
+							( empty( $current_file_params['class'] ) ? '' : $current_file_params['class'] ), '', '', '' );
 					}
 				}
 				else
@@ -8464,12 +8524,13 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						$current_video_params[ $param_key ] = & $current_video_params[ $param_key ];
 					}
 
-					// We need to assign the result of trigger_event_first_true to a variable before counting
-					// or else modifications to the params are not applied in PHP7
-					$r_params = $Plugins->trigger_event_first_true( $plugin_event_name, $current_video_params );
-					if( count( $r_params ) != 0 )
-					{
-						$inlines[$current_inline] = $r_params['data'];
+					// Prepare params before rendering attachment:
+					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_video_params );
+
+					// Render attachments by plugin:
+					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_video_params ) ) != 0 )
+					{	// This attachment has been rendered by a plugin (to $current_video_params['data']):
+						$inlines[$current_inline] = $current_video_params['data'];
 					}
 					else
 					{ // no plugin available or was able to render the tag
@@ -8495,13 +8556,13 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						$current_audio_params[ $param_key ] = & $current_audio_params[ $param_key ];
 					}
 
-					// We need to assign the result of trigger_event_first_true to a variable before counting
-					// or else modifications to the params are not applied in PHP7
-					$r_params = $Plugins->trigger_event_first_true( $plugin_event_name, $current_audio_params );
+					// Prepare params before rendering attachment:
+					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_audio_params );
 
-					if( count( $r_params ) != 0 )
-					{
-						$inlines[$current_inline] =  $r_params['data'];
+					// Render attachments by plugin:
+					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_audio_params ) ) != 0 )
+					{	// This attachment has been rendered by a plugin (to $current_audio_params['data']):
+						$inlines[$current_inline] =  $current_audio_params['data'];
 					}
 					else
 					{ // no plugin available or was able to render the tag

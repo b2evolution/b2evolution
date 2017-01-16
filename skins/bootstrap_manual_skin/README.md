@@ -1,7 +1,5 @@
 ## Bootstrap Manual Skin
 
-Skin version: 6.8.0-alpha.
-
 ### Update log
 
 #### v6.8.0-alpha
