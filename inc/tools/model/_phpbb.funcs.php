@@ -1181,6 +1181,10 @@ function phpbb_import_topics()
 
 	$import_forums = phpbb_get_var( 'import_forums' );
 
+	// Reset previous values:
+	phpbb_unset_var( 'attachments_count_imported' );
+	phpbb_unset_var( 'attachments_count_missed' );
+
 	phpbb_log( T_('Importing topics...') );
 
 	/**
@@ -1988,6 +1992,8 @@ function phpbb_clear_temporary_data()
 	phpbb_unset_var( 'topics_count_imported' );
 	phpbb_unset_var( 'replies_count_imported' );
 	phpbb_unset_var( 'messages_count_imported' );
+	phpbb_unset_var( 'attachments_count_imported' );
+	phpbb_unset_var( 'attachments_count_missed' );
 }
 
 
@@ -2244,6 +2250,9 @@ function phpbb_import_attachments( $target_type, $path_attachments, $target_ID, 
 	$FileRootCache = & get_FileRootCache();
 	$FileCache = & get_FileCache();
 
+	$attachments_count_imported = phpbb_get_var( 'attachments_count_imported' );
+	$attachments_count_missed = phpbb_get_var( 'attachments_count_missed' );
+
 	$link_order = 1;
 	foreach( $attachments as $attachment )
 	{
@@ -2251,6 +2260,7 @@ function phpbb_import_attachments( $target_type, $path_attachments, $target_ID, 
 		{
 			if( ! file_exists( $path_attachments.$attachment->real_filename ) )
 			{	// The file doesn't exist, Skip it:
+				$attachments_count_missed++;
 				continue;
 			}
 			else
@@ -2261,6 +2271,7 @@ function phpbb_import_attachments( $target_type, $path_attachments, $target_ID, 
 
 		if( ! $users_IDs[ (string) $attachment->poster_id ] )
 		{	// Wrong file author:
+			$attachments_count_missed++;
 			continue;
 		}
 
@@ -2279,17 +2290,32 @@ function phpbb_import_attachments( $target_type, $path_attachments, $target_ID, 
 			$link_position = 'aftermore';
 		}
 
-		@rename( $path_attachments.$attachment->physical_filename, $path_attachments.$attachment->real_filename );
-		$imported_file_ID = copy_file( $path_attachments.$attachment->real_filename, $root_ID, $root_path, false );
-		if( ! empty( $imported_file_ID ) )
-		{
-			// Insert a link with new file:
-			global $localtimenow;
-			mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'links
-				       ( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_'.$target_type.'_ID, link_file_ID, link_position, link_order )
-				VALUES ( '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( $author_ID ).', '.$DB->quote( $author_ID ).', '.$DB->quote( $new_object_ID ).', '.$DB->quote( $imported_file_ID ).', "'.$link_position.'", '.( $link_order++ ).' )' );
+		if( ! @rename( $path_attachments.$attachment->physical_filename, $path_attachments.$attachment->real_filename ) )
+		{	// Impossible to rename file from phpBB format like "2_1df806e219313f4432b82040685b8ff1" to real file name with extension, Skip it:
+			$attachments_count_missed++;
+			continue;
 		}
+
+		// 
+		$imported_file_ID = copy_file( $path_attachments.$attachment->real_filename, $root_ID, $root_path, false );
+		if( empty( $imported_file_ID ) )
+		{	// Impossible to copy file from phpBB attachments folder to b2evolution media folder:
+			$attachments_count_missed++;
+			continue;
+		}
+
+		// Insert a link with new file:
+		global $localtimenow;
+		mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'links
+						 ( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_'.$target_type.'_ID, link_file_ID, link_position, link_order )
+			VALUES ( '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( $author_ID ).', '.$DB->quote( $author_ID ).', '.$DB->quote( $new_object_ID ).', '.$DB->quote( $imported_file_ID ).', "'.$link_position.'", '.( $link_order++ ).' )' );
+
+		$attachments_count_imported++;
 	}
+
+	// Update the count of imported/missed attachments:
+	phpbb_set_var( 'attachments_count_imported', $attachments_count_imported );
+	phpbb_set_var( 'attachments_count_missed', $attachments_count_missed );
 }
 
 
