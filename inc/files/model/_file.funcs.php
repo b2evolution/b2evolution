@@ -2391,7 +2391,7 @@ function display_dragdrop_upload_button( $params = array() )
 						var filename_before = '<?php echo str_replace( "'", "\'", $params['filename_before'] ); ?>';
 						if( filename_before != '' )
 						{
-							filename_before = filename_before.replace( '$file_path$', responseJSON.success.path );
+							filename_before = filename_before.replace( '$file_path$', decodeURIComponent( responseJSON.success.path ) );
 						}
 
 						var warning = '';
