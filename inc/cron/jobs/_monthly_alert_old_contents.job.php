@@ -7,6 +7,15 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+global $UserSettings;
+
+// Check if UserSettings exists because it must be initialized before email sending:
+if( empty( $UserSettings ) )
+{	// initialize UserSettings, because in CLI mode is not initialized yet:
+	load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
+	$UserSettings = new UserSettings();
+}
+
 // Select collections where we should find old posts to alert for moderators:
 $SQL = new SQL( 'Select collections which alert on old contents' );
 $SQL->SELECT( 'T_blogs.*' );
@@ -135,8 +144,18 @@ $all_required_user_IDs = array_unique( array_merge( $global_moderator_IDs, array
 $SQL = new SQL( 'Get all users for alert on old contents' );
 $SQL->SELECT( '*' );
 $SQL->FROM( 'T_users' );
+$SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "send_pst_stale_alert"' );
 $SQL->WHERE( 'user_ID IN ('.implode( ',', $all_required_user_IDs ).')' );
 $SQL->WHERE_and( 'LENGTH( TRIM( user_email ) ) > 0' );
+// Set notify moderation condition:
+if( $UserSettings->get( 'send_pst_stale_alert' ) )
+{	// A send stale posts alerter is set by default
+	$SQL->WHERE_and( '( ( uset_value IS NOT NULL AND uset_value <> \'0\' ) OR ( uset_value IS NULL ) )' );
+}
+else
+{	// A send stale posts alerter is NOT set by default
+	$SQL->WHERE_and( '( uset_value IS NOT NULL AND uset_value <> \'0\' )' );
+}
 if( count( $blocked_emails ) )
 {	// Restrict users by blocked email addresses:
 	$SQL->WHERE_and( 'user_email NOT IN ( "'.implode( '","', $blocked_emails ).'" )' );
@@ -149,7 +168,7 @@ $UserCache->load_by_sql( $SQL );
 
 if( empty( $UserCache->cache ) )
 {	// UserCache result is empty which means nobody wants to receive alert on old contents:
-	$result_message = 'Could not find any moderators wanting to receive post moderation notifications for the blogs that have posts pending moderation!';
+	$result_message = 'Could not find any moderators wanting to receive post moderation notifications for the blogs that have stale posts!';
 	return 1;
 }
 
@@ -233,7 +252,7 @@ foreach( $BlogCache->cache as $alert_Blog )
 		locale_temp_switch( $alert_User->get( 'locale' ) );
 
 		// Send one email message for each moderator per collection:
-		if( send_mail_to_User( $alert_User->ID, sprintf( T_('Stale contents found in %s'), $alert_Blog->get( 'shortname' ) ), 'posts_old_alerter', $email_params, false ) )
+		if( send_mail_to_User( $alert_User->ID, sprintf( T_('Stale contents found in %s'), $alert_Blog->get( 'shortname' ) ), 'posts_stale_alert', $email_params, false ) )
 		{
 			$mail_moderator_sent[ $alert_User->ID ] = 0;
 		}

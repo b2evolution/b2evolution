@@ -34,6 +34,12 @@ foreach( $params['posts'] as $post_ID )
 }
 echo '</ul>';
 
+// Footer vars:
+$params['unsubscribe_text'] = T_( 'You are a moderator in this blog, and you are receiving notifications when stale posts may need moderation.' ).'<br />'."\n"
+			.T_( 'If you don\'t want to receive any more notifications about stale posts, click here' ).': '
+			.'<a href="'.get_htsrv_url().'quick_unsubscribe.php?type=pst_stale_alert&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
+			.T_('instant unsubscribe').'</a>.';
+
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.html.php', $params );
 // ------------------------------- END OF EMAIL FOOTER --------------------------------
