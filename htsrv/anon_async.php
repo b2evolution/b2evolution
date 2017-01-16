@@ -1354,6 +1354,11 @@ switch( $action )
 		require $inc_path.'users/views/_user_groups.form.php';
 		break;
 
+	case 'test_api':
+		// Spec action to test API from ctrl=system:
+		echo 'ok';
+		break;
+
 	default:
 		$Ajaxlog->add( T_('Incorrect action!'), 'error' );
 		break;

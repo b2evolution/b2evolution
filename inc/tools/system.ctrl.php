@@ -654,7 +654,7 @@ $json_response = @file_get_contents( $baseurl.'api/v6/collections' );
 json_decode( $json_response );
 if( json_last_error() === JSON_ERROR_NONE )
 {	// Response is correct json data:
-	init_system_check( 'REST', 'OK' );
+	init_system_check( 'REST API', 'OK' );
 	disp_system_check( 'ok' );
 }
 else
@@ -678,6 +678,58 @@ else
 {	// Some error on XML-RPC request:
 	init_system_check( 'XML-RPC', T_('Failed') );
 	disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.') );
+}
+
+// AJAX anon_async.php:
+$ajax_response = @file_get_contents( $htsrv_url.'anon_async.php?action=test_api' );
+if( $ajax_response !== false )
+{	// Response is correct data:
+	init_system_check( 'AJAX anon_async.php', 'OK' );
+	disp_system_check( 'ok' );
+}
+else
+{	// Response is not correct data:
+	init_system_check( 'AJAX anon_async.php', T_('Failed') );
+	disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.' ) );
+}
+
+// AJAX async.php:
+$ajax_response = @file_get_contents( $htsrv_url.'async.php?action=test_api' );
+if( $ajax_response !== false )
+{	// Response is correct data:
+	init_system_check( 'AJAX async.php', 'OK' );
+	disp_system_check( 'ok' );
+}
+else
+{	// Response is not correct data:
+	init_system_check( 'AJAX async.php', T_('Failed') );
+	disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.' ) );
+}
+
+// AJAX action.php:
+$ajax_response = @file_get_contents( $htsrv_url.'action.php?mname=test_api' );
+if( $ajax_response !== false )
+{	// Response is correct data:
+	init_system_check( 'AJAX action.php', 'OK' );
+	disp_system_check( 'ok' );
+}
+else
+{	// Response is not correct data:
+	init_system_check( 'AJAX action.php', T_('Failed') );
+	disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.' ) );
+}
+
+// AJAX call_plugin.php:
+$ajax_response = @file_get_contents( $htsrv_url.'call_plugin.php?plugin_ID=-1&method=test_api' );
+if( $ajax_response !== false )
+{	// Response is correct data:
+	init_system_check( 'AJAX call_plugin.php', 'OK' );
+	disp_system_check( 'ok' );
+}
+else
+{	// Response is not correct data:
+	init_system_check( 'AJAX call_plugin.php', T_('Failed') );
+	disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.' ) );
 }
 
 $block_item_Widget->disp_template_raw( 'block_end' );
