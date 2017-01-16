@@ -563,8 +563,12 @@ function phpbb_import_users()
 			}
 			else
 			{	// Replace unauthorized chars from username
-				$user_login = preg_replace( '/([^a-z0-9_])/i', '_', $phpbb_user->username );
+				$user_login = preg_replace( '/([^a-z0-9_]+)/i', '_', $phpbb_user->username );
 				$user_login = utf8_substr( utf8_strtolower( $user_login ), 0, 20 );
+				if( $user_login == '_' )
+				{	// If all username chars are unauthorized
+					$user_login = 'user_1';
+				}
 			}
 
 			$user_has_duplicated_email = false;
@@ -620,6 +624,7 @@ function phpbb_import_users()
 			// Check if this user already exists with same login in b2evo DB
 			$user_login_number = 0;
 			$next_login = $user_login;
+			$user_login_mask = preg_replace( '#\d+$#', '', $user_login );
 			do
 			{
 				$SQL = new SQL();
@@ -628,7 +633,7 @@ function phpbb_import_users()
 				$SQL->WHERE( 'user_login = '.$DB->quote( $next_login ) );
 				if( $b2evo_user_ID = $DB->get_var( $SQL->get() ) )
 				{	// Duplicated user login, Change to next login by increasing the number at the end
-					$next_login = $user_login.( ++$user_login_number );
+					$next_login = $user_login_mask.( ++$user_login_number );
 				}
 			}
 			while( $b2evo_user_ID );
