@@ -118,12 +118,15 @@ function param_format( $value, $type = 'raw' )
  * - float, double
  * - string (strips (HTML-)Tags, trims whitespace)
  * - text like string but allows multiple lines
+ * - filepath like string but die execution if it contains unsecure string like "../"
  * - array (it may contains arbitrary array elements) NOTE: If there is one way to avoid and use some other array type then it should not be used
  * - array:integer (elements of array must be integer)
  * - array:string (strips (HTML-)Tags, trims whitespace of array's elements)
+ * - array:filepath (elements of array must be allowed file paths)
  * - array:/regexp/ (elements of array must match to the given regular expression) e.g. 'array:/^[a-z]*$/'
  * - array:array:integer (two dimensional array and the elements must be integers)
  * - array:array:string (strips (HTML-)Tags, trims whitespace of the two dimensional array's elements)
+ * - array:array:filepath (elements of array must be allowed file paths)
  * - html (does nothing, for now)
  * - raw (does nothing)
  * - '' (does nothing) -- DEPRECATED, use "raw" instead
@@ -289,6 +292,23 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as url', 'params' );
 				break;
 
+			case 'filepath':
+				if( ! is_scalar( $GLOBALS[$var] ) )
+				{	// This happens if someone uses "foo[]=x" where "foo" is expected as string
+					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
+				}
+
+				// Format param to valid value:
+				$GLOBALS[$var] = param_format( $GLOBALS[$var], 'string' );
+
+				if( ! empty( $GLOBALS[$var] ) && ( strpos( $GLOBALS[$var], '../' ) !== false || strpos( $GLOBALS[$var], '..\\' ) !== false ) )
+				{	// We cannot accept this unsecure file path:
+					bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
+				}
+
+				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as filepath', 'params' );
+				break;
+
 			case 'array:integer':
 			case 'array:array:integer':
 				// Set elements type to integer, and set the corresponding regular expression
@@ -296,19 +316,21 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				$elements_regexp = '/^(\+|-)?[0-9]+$/';
 			case 'array':
 			case 'array:string':
+			case 'array:filepath':
 			case 'array:regexp':
 			case 'array:array:string':
+			case 'array:array:filepath':
 				if( ! is_array( $GLOBALS[$var] ) )
 				{ // This param must be array
 					debug_die( 'param(-): <strong>'.$var.'</strong> is not array!' );
 				}
 
-				// Store current array in temp var for checking and preparing
+				// Store current array in temp var for checking and preparing:
 				$globals_var = $GLOBALS[$var];
-				// Check if the given array type is one dimensional array
-				$one_dimensional = ( ( $type == 'array' ) || ( $type == 'array:integer' ) || ( $type == 'array:string' ) || ( $type == 'array:regexp' ) );
-				// Check if the given array type should contains string elements
-				$contains_strings = ( ( $type == 'array:string' ) || ( $type == 'array:array:string' ) );
+				// Check if the given array type is one dimensional array:
+				$one_dimensional = ( ( $type == 'array' ) || ( $type == 'array:integer' ) || ( $type == 'array:string' ) || ( $type == 'array:filepath' ) || ( $type == 'array:regexp' ) );
+				// Check if the given array type should contains string elements:
+				$contains_strings = ( ( $type == 'array:string' ) || ( $type == 'array:array:string' ) || ( $type == 'array:filepath' ) || ( $type == 'array:array:filepath' ) );
 				if( $one_dimensional )
 				{ // Convert to a two dimensional array to handle one and two dimensional arrays the same way
 					$globals_var = array( $globals_var );
@@ -339,6 +361,14 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 						{ // Prepare string elements of array
 							// Format param to valid value:
 							$globals_var[$i][$j] = param_format( $var_value, 'string' );
+
+							if( $type == 'array:filepath' || $type == 'array:array:filepath'  )
+							{	// Special verifying for file path params:
+								if( ! empty( $globals_var[$i][$j] ) && ( strpos( $globals_var[$i][$j], '../' ) !== false || strpos( $globals_var[$i][$j], '..\\' ) !== false ) )
+								{	// We cannot accept this unsecure file path:
+									bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
+								}
+							}
 							continue;
 						}
 

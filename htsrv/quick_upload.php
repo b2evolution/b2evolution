@@ -224,7 +224,7 @@ $debug_jslog = false;
 global $current_User;
 
 param( 'upload', 'boolean', true );
-param( 'root_and_path', 'string', true );
+param( 'root_and_path', 'filepath', true );
 param( 'blog', 'integer' );
 param( 'link_owner', 'string' );
 // Use the glyph or font-awesome icons if requested by skin
