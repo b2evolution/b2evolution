@@ -8089,10 +8089,17 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12140, 'Updating file types table...' ) )
-	{ // part of 6.7.10-stable moved here so it also applies to 6.8.3 -> 6.8.4 upgrades
+	{	// part of 6.7.10-stable moved here so it also applies to 6.8.3 -> 6.8.4 upgrades
 		$DB->query( 'UPDATE T_filetypes
 				SET ftyp_allowed = "admin"
 			WHERE ftyp_extensions REGEXP "[[:<:]]swf[[:>:]]"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12145, 'Upgrade links table...' ) )
+	{	// part of 6.8.4-stable
+		$DB->query( 'ALTER TABLE T_temporary_ID
+			ADD tmp_coll_ID INT(11) UNSIGNED NULL' );
 		upg_task_end();
 	}
 

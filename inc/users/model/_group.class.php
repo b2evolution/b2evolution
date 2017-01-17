@@ -388,14 +388,6 @@ class Group extends DataObject
 				}
 				break;
 
-			case 'perm_files':
-				if( ! $this->check_perm( 'admin', 'restricted' ) )
-				{
-					$perm = false;
-					break;
-				}
-				// no break, perm_files is pluggable permission
-
 			default:
 
 				// Check pluggable permissions using group permission check function

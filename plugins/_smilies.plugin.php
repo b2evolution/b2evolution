@@ -431,7 +431,7 @@ XX(      graydead.gif
 	 */
 	function ReplaceInlinePlaceholderSafe( $text )
 	{
-		return callback_on_non_matching_blocks( $text, '~\[(image|file|inline|video|audio):\d+:?[^\]]*\]~', array( & $this, 'preg_insert_smilies_callback' ) );
+		return callback_on_non_matching_blocks( $text, '~\[(image|file|inline|video|audio|thumbnail):\d+:?[^\]]*\]~', array( & $this, 'preg_insert_smilies_callback' ) );
 	}
 
 

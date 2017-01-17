@@ -23,6 +23,7 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 class TemporaryID extends DataObject
 {
 	var $type;
+	var $coll_ID;
 
 	/**
 	 * Constructor
@@ -38,6 +39,7 @@ class TemporaryID extends DataObject
 		{
 			$this->ID = $db_row->tmp_ID;
 			$this->type = $db_row->tmp_type;
+			$this->coll_ID = $db_row->tmp_coll_ID;
 		}
 	}
 }

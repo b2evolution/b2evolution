@@ -21,7 +21,7 @@ $app_version = '6.8.4-stable';
  * Release date (ISO)
  * @global string
  */
-$app_date = '2017-01-16';
+$app_date = '2017-01-17';
 
 /**
  * Long version string for checking differences
@@ -36,7 +36,7 @@ $app_version_long = $app_version.'-'.$app_date;
  *
  * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 12140;
+$new_db_version = 12145;
 
 /**
  * Minimum PHP version required for b2evolution to function properly. It will contain each module own minimum PHP version as well.

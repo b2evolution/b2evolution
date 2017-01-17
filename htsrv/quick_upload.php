@@ -342,18 +342,25 @@ if( $upload )
 
 		if( ! empty( $link_owner ) )
 		{	// Try to link the uploaded file to the object Item/Comment/EmailCampaign:
-			list( $link_owner_type, $link_owner_ID ) = explode( '_', $link_owner, 2 );
+			list( $link_owner_type, $link_owner_ID, $link_owner_is_temp ) = explode( '_', $link_owner, 3 );
 			$link_owner_ID = intval( $link_owner_ID );
 			if( $link_owner_ID > 0 )
 			{
 				switch( $link_owner_type )
 				{
 					case 'item':
-						// Get LinkOwner object of the Item
-						$ItemCache = & get_ItemCache();
-						if( $linked_Item = & $ItemCache->get_by_ID( $link_owner_ID, false, false ) )
-						{
-							$LinkOwner = new LinkItem( $linked_Item );
+						if( $link_owner_is_temp )
+						{	// Get LinkOwner object of the Temporary ID for new creating Item:
+							load_class( 'items/model/_item.class.php', 'Item' );
+							$LinkOwner = new LinkItem( new Item(), $link_owner_ID );
+						}
+						else
+						{	// Get LinkOwner object of the Item:
+							$ItemCache = & get_ItemCache();
+							if( $linked_Item = & $ItemCache->get_by_ID( $link_owner_ID, false, false ) )
+							{
+								$LinkOwner = new LinkItem( $linked_Item );
+							}
 						}
 						break;
 
@@ -377,7 +384,8 @@ if( $upload )
 
 					case 'message':
 						// Get LinkOwner object of the Message:
-						$LinkOwner = new LinkMessage( NULL, $link_owner_ID );
+						load_class( 'messaging/model/_message.class.php', 'Message' );
+						$LinkOwner = new LinkMessage( new Message(), $link_owner_ID );
 						break;
 				}
 			}
