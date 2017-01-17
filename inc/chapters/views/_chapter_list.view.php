@@ -87,7 +87,10 @@ function cat_line( $Chapter, $level )
 	{
 		$FileCache = & get_FileCache();
 		$cat_image_File = & $FileCache->get_by_ID( $file_ID, false, false );
-		$cat_thumb = $cat_image_File->get_thumb_imgtag( 'crop-48x48' );
+		if( $cat_image_File )
+		{
+			$cat_thumb = $cat_image_File->get_thumb_imgtag( 'crop-48x48' );
+		}
 	}
 	$r .= '<td>'.$cat_thumb.'</td>';
 
