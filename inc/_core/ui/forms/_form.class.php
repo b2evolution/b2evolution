@@ -3737,8 +3737,7 @@ class Form extends Widget
 
 			$button_label = ( $counter === 0 ? T_('Select') : get_icon( 'new' ).' '.T_('Add') );
 
-			$r .= '<button class="btn btn-default file_select_item" onclick="return window.parent.file_select_attachment_window( this, false );" style="display: '.( $counter < $field_params['max_file_num'] ? 'block' : 'none' )
-					.'; height: '.$thumb_height.'px; width: '.$thumb_width.'px;">'.$button_label.'</button>';
+			$r .= '<button class="btn btn-default file_select_item" onclick="return window.parent.file_select_attachment_window( this, false );" style="display: '.( $counter < $field_params['max_file_num'] ? 'block' : 'none' ).';">'.$button_label.'</button>';
 
 			$r .= '</div>';
 			$r .= $this->end_field();
@@ -3877,6 +3876,12 @@ class Form extends Widget
 										values = values ? ( inputField.val().split( "'.$field_params['value_separator'].'" ) ) : [];
 										values.push( fieldValue );
 										inputField.val( values.join( "'.$field_params['value_separator'].'" ) );
+
+										// close modal if single item select
+										if( maxLength == 1 )
+										{
+											closeModalWindow();
+										}
 									}
 							});
 
