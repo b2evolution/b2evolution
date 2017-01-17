@@ -487,6 +487,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 			$params['root'] = isset( $parmeta['root'] ) ? $parmeta['root'] : '';
 			$params['path'] = isset( $parmeta['path'] ) ? $parmeta['path'] : '';
+			$params['size_name'] = isset( $parmeta['thumbnail_size'] ) ? $parmeta['thumbnail_size'] : 'crop-64x64';
 			$Form->fileselect( $input_name, $set_value, $set_label, '', $params );
 			break;
 

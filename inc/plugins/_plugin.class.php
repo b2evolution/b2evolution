@@ -485,7 +485,8 @@ class Plugin
 	 *        'min_count': minimum count of sets (optional, default is no restriction)
 	 *	   'fileselect': opens a modal window to select file. The following can be set for this type:
 	 *        'root': default root
-	 *		  	'path': default path
+	 *		  'path': default path
+	 *        'thumbnail_size': thumbnail size
 	 *     'info': a form info field with label and info text see {@link Form::info()}; you must set 'info' for text.
 	 *     'color': a form color picker field, use 'defaultvalue' in format '#FFFFFF'
 	 * 'note' (gets displayed as a note to the param field),

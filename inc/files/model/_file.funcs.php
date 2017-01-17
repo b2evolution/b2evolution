@@ -2249,6 +2249,7 @@ function display_dragdrop_upload_button( $params = array() )
 			'conflict_file_format'   => 'simple', // 'simple' - file name text, 'full_path_link' - a link with text as full file path
 			'resize_frame'           => false, // Resize frame on upload new image
 			'table_headers'          => '', // Use this html text as table headers when first file is loaded
+			'select_field_name'      => NULL, // Use it if you want to select a file right after uploading
 		), $params );
 
 	$FileRootCache = & get_FileRootCache();
@@ -2392,6 +2393,14 @@ function display_dragdrop_upload_button( $params = array() )
 						if( filename_before != '' )
 						{
 							filename_before = filename_before.replace( '$file_path$', decodeURIComponent( responseJSON.success.path ) );
+							<?php
+							if( !empty( $params[ 'select_field_name'] ) )
+							{
+							?>
+							filename_before = filename_before.replace( '$field_name$', '<?php echo $params['select_field_name'];?>' );
+							<?php
+							}
+							?>
 						}
 
 						var warning = '';

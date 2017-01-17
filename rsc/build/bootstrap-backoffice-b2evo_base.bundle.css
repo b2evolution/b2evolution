@@ -1478,11 +1478,12 @@ label.radiooption {
 .file_select_wrapper {
   display: flex;
   flex-flow: row wrap;
+  align-items: flex-start;
 }
 .file_select_wrapper .file_select_item {
   display: flex;
   flex-flow: row wrap;
-  margin-right: 5px;
+  margin-right: 8px;
   text-align: center;
 }
 .file_select_wrapper .file_select_item .item_actions {
@@ -1491,7 +1492,7 @@ label.radiooption {
   align-content: center;
   justify-content: center;
   text-align: left;
-  margin-left: 5px;
+  margin-left: 8px;
 }
 div.log_container ul,
 div.action_messages ul,

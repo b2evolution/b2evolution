@@ -95,6 +95,7 @@ class image_Widget extends ComponentWidget
 					'label' => T_('Image'),
 					'defaultvalue' => '',
 					'type' => 'fileselect',
+					'thumbnail_size' => 'fit-320x320',
 				),
 				'image_source' => array(
 					'label' => T_('Fallback image source'),

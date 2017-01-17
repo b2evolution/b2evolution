@@ -57,6 +57,9 @@ $Form->begin_fieldset( T_('Properties').get_manual_link( 'categories-tab' ) );
 
 	$Form->text_input( 'cat_urlname', $edited_Chapter->urlname, 40, T_('URL "slug"'), T_('Used for clean URLs. Must be unique.'), array( 'maxlength' => 255 ) );
 
+	$field_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select category image'), 'size_name' => 'fit-320x320' );
+	$Form->fileselect( 'cat_image_file_ID', $edited_Chapter->get( 'image_file_ID' ), T_('Category image'), NULL, $field_params );
+
 	$Form->text_input( 'cat_description', $edited_Chapter->description, 40, T_('Description'), T_('May be used as a title tag and/or meta description.'), array( 'maxlength' => 255 ) );
 
 	$parent_cat_order = $edited_Chapter->get_parent_subcat_ordering();
@@ -75,8 +78,6 @@ $Form->begin_fieldset( T_('Properties').get_manual_link( 'categories-tab' ) );
 
 	$Form->checkbox_input( 'cat_lock', $edited_Chapter->lock, T_('Locked category'), array( 'note' => T_('Check this to lock all posts under this category. (Note: for posts with multiple categories, the post is only locked if *all* its categories are locked.)') ) );
 
-	$field_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select category image') );
-	$Form->fileselect( 'cat_image_file_ID', $edited_Chapter->get( 'image_file_ID' ), T_('Category image'), NULL, $field_params );
 
 $Form->end_fieldset();
 
