@@ -514,7 +514,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_temporary_ID' => array(
-		'Creating table for temporary ID',
+		'Creating table for temporary IDs (used for uploads on new posts or messages)',
 		"CREATE TABLE T_temporary_ID (
 			tmp_ID      INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			tmp_type    VARCHAR(32) COLLATE ascii_general_ci NOT NULL,
