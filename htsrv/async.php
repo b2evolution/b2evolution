@@ -709,9 +709,9 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'files', 'add', true, $fileroot_ID );
 
-		param( 'path', 'string' );
-		param( 'oldfile', 'string' );
-		param( 'newfile', 'string' );
+		param( 'path', 'filepath' );
+		param( 'oldfile', 'filepath' );
+		param( 'newfile', 'filepath' );
 		param( 'format', 'string' );
 
 		$fileroot = explode( '_', $fileroot_ID );
@@ -756,7 +756,7 @@ switch( $action )
 		param( 'link_owner_ID', 'integer', true );
 		// Additional params, Used to highlight file/folder
 		param( 'root', 'string', '' );
-		param( 'path', 'string', '' );
+		param( 'path', 'filepath', '' );
 		param( 'fm_highlight', 'string', '' );
 
 		$additional_params = empty( $root ) ? '' : '&amp;root='.$root;
