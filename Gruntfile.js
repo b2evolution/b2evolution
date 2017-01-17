@@ -229,6 +229,7 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_contact_groups.js',
 							'rsc/js/src/evo_rest_api.js',
 							'rsc/js/src/evo_item_flag.js',
+							'rsc/js/src/evo_links.js',
 							'rsc/js/ajax.js'],
 				dest: 'rsc/js/build/evo_frontoffice.bmin.js'
 			},
@@ -245,6 +246,7 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_contact_groups.js',
 							'rsc/js/src/evo_rest_api.js',
 							'rsc/js/src/evo_item_flag.js',
+							'rsc/js/src/evo_links.js',
 							'rsc/js/ajax.js'],
 				dest: 'rsc/js/build/bootstrap-evo_frontoffice.bmin.js'
 			},

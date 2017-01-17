@@ -49,7 +49,7 @@ $AdminUI->set_path( 'files', 'browse' );
 param( 'ajax_request', 'integer', 0, true );
 
 // INIT params:
-if( param( 'root_and_path', 'string', '', false ) /* not memorized (default) */ && strpos( $root_and_path, '::' ) )
+if( param( 'root_and_path', 'filepath', '', false ) /* not memorized (default) */ && strpos( $root_and_path, '::' ) )
 { // root and path together: decode and override (used by "radio-click-dirtree")
 	list( $root, $path ) = explode( '::', $root_and_path, 2 );
 	// Memorize new root:
@@ -59,7 +59,7 @@ if( param( 'root_and_path', 'string', '', false ) /* not memorized (default) */ 
 else
 {
 	param( 'root', 'string', NULL, true ); // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
-	param( 'path', 'string', '/', true );  // the path relative to the root dir
+	param( 'path', 'filepath', '/', true );  // the path relative to the root dir
 	if( param( 'new_root', 'string', '' )
 		&& $new_root != $root )
 	{ // We have changed root in the select list
@@ -335,7 +335,7 @@ $Debuglog->add( 'path: '.var_export( $path, true ), 'files' );
  *
  * @global array
  */
-$fm_selected = param( 'fm_selected', 'array:string', array(), true );
+$fm_selected = param( 'fm_selected', 'array:filepath', array(), true );
 $Debuglog->add( count($fm_selected).' selected files/directories', 'files' );
 /**
  * The selected files (must be within current fileroot)
@@ -343,6 +343,7 @@ $Debuglog->add( count($fm_selected).' selected files/directories', 'files' );
  * @global Filelist
  */
 $selected_Filelist = new Filelist( $fm_FileRoot, $ads_list_path );
+
 foreach( $fm_selected as $l_source_path )
 {
 	$selected_Filelist->add_by_subpath( urldecode($l_source_path), true );
@@ -795,7 +796,7 @@ switch( $action )
 		}
 
 		param( 'confirmed', 'integer', 0 );
-		param( 'new_names', 'array:string', array() );
+		param( 'new_names', 'array:filepath', array() );
 
 		// Check params for each file to rename:
 		while( $loop_src_File = & $source_Filelist->get_next() )

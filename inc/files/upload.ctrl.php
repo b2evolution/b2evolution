@@ -56,7 +56,7 @@ param( 'iframe_name', 'string', '', true );
 $action = param_action();
 
 // INIT params:
-if( param( 'root_and_path', 'string', '', false ) /* not memorized (default) */ && strpos( $root_and_path, '::' ) )
+if( param( 'root_and_path', 'filepath', '', false ) /* not memorized (default) */ && strpos( $root_and_path, '::' ) )
 { // root and path together: decode and override (used by "radio-click-dirtree")
 	list( $root, $path ) = explode( '::', $root_and_path, 2 );
 	// Memorize new root:
@@ -66,7 +66,7 @@ if( param( 'root_and_path', 'string', '', false ) /* not memorized (default) */ 
 else
 {
 	param( 'root', 'string', NULL, true ); // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
-	param( 'path', 'string', '', true );  // the path relative to the root dir
+	param( 'path', 'filepath', '', true );  // the path relative to the root dir
 	if( param( 'new_root', 'string', '' )
 		&& $new_root != $root )
 	{ // We have changed root in the select list
@@ -227,7 +227,7 @@ $failedFiles = array();
  * Remember renamed files (and the messages)
  * @var array
  */
-param( 'renamedFiles', 'array:array:string', array(), true );
+param( 'renamedFiles', 'array:array:filepath', array(), true );
 $renamedMessages = array();
 
 // Process files we want to get from an URL:

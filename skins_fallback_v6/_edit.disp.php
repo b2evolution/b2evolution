@@ -376,50 +376,16 @@ else
 	}
 }
 
-if( $edited_Item->get_type_setting( 'allow_attachments' ) )
-{ // ####################### ATTACHMENTS FIELDSETS #########################
-	global $advanced_edit_link;
-	$perm_view_files = $current_User->check_perm( 'files', 'view' );
-	if( $perm_view_files && $current_User->check_perm( 'admin', 'restricted' ) )
-	{	// If current user has a permission to attach files to the edited Item from back-office:
-		$advanced_edit_link_params = ' href="'.$advanced_edit_link['href'].'" onclick="'.$advanced_edit_link['onclick'].'"';
-		echo '<div class="well center">';
-		if( $creating )
-		{	// New post
-			echo sprintf( T_('If you need to attach files, please use <a %s>Advanced Edit</a>.'), $advanced_edit_link_params );
-		}
-		else
-		{	// Edit post
-			echo sprintf( T_('If you need to attach additional files, please use <a %s>Advanced Edit</a>.'), $advanced_edit_link_params );
-		}
-		echo '</div>';
-	}
-	elseif( $edited_Item->can_attach() )
-	{	// If current user can attach files to comments of the edited Item
-		echo '<div class="well center">';
-		if( $creating )
-		{	// New post
-			echo T_('If you need to attach files, please add a comment right after you post this.');
-		}
-		else
-		{	// Edit post
-			echo T_('If you need to attach additional files, please add a comment right after you edit this.');
-		}
-		echo '</div>';
-	}
-	if( $perm_view_files && $edited_Item->ID > 0 )
-	{	// If current user has a permission to view files
-		$LinkOwner = new LinkItem( $edited_Item );
-		if( $LinkOwner->count_links() )
-		{	// Display the attached files:
-			$Form->begin_fieldset( T_('Attachments'), array( 'id' => 'post_attachments' ) );
-				display_attachments( $LinkOwner, array(
-						'block_start' => '<div class="attachment_list results">',
-						'table_start' => '<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0" cellpadding="0">',
-					) );
-			$Form->end_fieldset();
-		}
-	}
+// ####################### ATTACHMENTS/LINKS #########################
+if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
+    $current_User->check_perm( 'files', 'view', false ) )
+{	// If current user has a permission to view the files AND attachments are allowed for the item type:
+	load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
+	// Initialize this object as global because this is used in many link functions:
+	global $LinkOwner;
+	$LinkOwner = new LinkItem( $edited_Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
+	// Display attachments fieldset:
+	display_attachments_fieldset( $Form, $LinkOwner );
 }
 
 // ####################### PLUGIN FIELDSETS #########################

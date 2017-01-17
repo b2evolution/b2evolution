@@ -64,7 +64,7 @@ function evo_link_change_position( selectInput, url, crumb )
 {
 	var oThis = selectInput;
 	var new_position = selectInput.value;
-	jQuery.get( url + 'async.php?action=set_object_link_position&link_ID=' + selectInput.id.substr(17) + '&link_position=' + new_position + '&crumb_link=' + crumb, {
+	jQuery.get( url + 'anon_async.php?action=set_object_link_position&link_ID=' + selectInput.id.substr(17) + '&link_position=' + new_position + '&crumb_link=' + crumb, {
 	}, function(r, status) {
 		r = ajax_debug_clear( r );
 		if( r == "OK" ) {
@@ -147,7 +147,7 @@ function evo_link_delete( event_object, type, link_ID, action )
 			var b2evoCanvas = window.document.getElementById( 'itemform_post_content' );
 			if( b2evoCanvas != null )
 			{ // Canvas exists
-				var regexp = new RegExp( '\\\[(image|file|inline|video|audio):' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
+				var regexp = new RegExp( '\\\[(image|file|inline|video|audio|thumbnail):' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
 				textarea_str_replace( b2evoCanvas, regexp, '', window.document );
 			}
 		}

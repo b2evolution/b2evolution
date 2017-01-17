@@ -94,7 +94,7 @@ class LinkMessage extends LinkOwner
 		if( is_null( $this->Links ) )
 		{	// Links have not been loaded yet:
 			$LinkCache = & get_LinkCache();
-			if( $this->is_temp )
+			if( $this->is_temp() )
 			{
 				$this->Links = $LinkCache->get_by_temporary_ID( $this->get_ID() );
 			}
@@ -183,6 +183,8 @@ class LinkMessage extends LinkOwner
 	 */
 	function get_view_url()
 	{
+		global $admin_url;
+
 		$view_url = '';
 		if( ! empty( $this->Message ) && ( $this->Message instanceof Message ) && $Thread = & $this->Message->get_Thread() )
 		{

@@ -69,7 +69,7 @@ if( ! $public_access_to_media )
 }
 
 // Load the other params:
-param( 'path', 'string', true );
+param( 'path', 'filepath', true );
 param( 'size', 'string', NULL ); // Can be used for images.
 param( 'size_x', 'integer', 1 ); // Ratio size, can be 1, 2 and etc.
 param( 'mtime', 'integer', 0 );  // used for unique URLs (that never expire).
