@@ -301,7 +301,7 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				// Format param to valid value:
 				$GLOBALS[$var] = param_format( $GLOBALS[$var], 'string' );
 
-				if( ! empty( $GLOBALS[$var] ) && ( strpos( $GLOBALS[$var], '../' ) !== false || strpos( $GLOBALS[$var], '..\\' ) !== false ) )
+				if( ! is_safe_filepath( $GLOBALS[$var] ) )
 				{	// We cannot accept this unsecure file path:
 					bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
 				}
@@ -362,9 +362,9 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 							// Format param to valid value:
 							$globals_var[$i][$j] = param_format( $var_value, 'string' );
 
-							if( $type == 'array:filepath' || $type == 'array:array:filepath'  )
+							if( $type == 'array:filepath' || $type == 'array:array:filepath' )
 							{	// Special verifying for file path params:
-								if( ! empty( $globals_var[$i][$j] ) && ( strpos( $globals_var[$i][$j], '../' ) !== false || strpos( $globals_var[$i][$j], '..\\' ) !== false ) )
+								if( ! is_safe_filepath( $globals_var[$i][$j] ) )
 								{	// We cannot accept this unsecure file path:
 									bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
 								}
@@ -2727,6 +2727,28 @@ function param_check_serialized_array( $param_name )
 	{	// Wrong data:
 		return false;
 	}
+}
+
+
+/**
+ * Check if the file path is safe
+ *
+ * @param string File path
+ * @return boolean
+ */
+function is_safe_filepath( $filepath )
+{
+	if( empty( $filepath ) )
+	{	// Allow empty file path:
+		return true;
+	}
+
+	if( strpos( $filepath, '../' ) !== false || strpos( $filepath, '..\\' ) !== false )
+	{	// Don't allow a traversal directory:
+		return false;
+	}
+
+	return true;
 }
 
 ?>
