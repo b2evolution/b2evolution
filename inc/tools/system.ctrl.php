@@ -642,6 +642,99 @@ else
 $block_item_Widget->disp_template_raw( 'block_end' );
 
 
+
+/*
+ * API
+ */
+$block_item_Widget->title = T_('APIs');
+$block_item_Widget->disp_template_replaced( 'block_start' );
+
+// REST API:
+$json_response = @file_get_contents( $baseurl.'api/v6/collections' );
+json_decode( $json_response );
+if( json_last_error() === JSON_ERROR_NONE )
+{	// Response is correct json data:
+	init_system_check( 'REST API', 'OK' );
+	disp_system_check( 'ok' );
+}
+else
+{	// Response is not json data:
+	init_system_check( 'REST API', T_('Failed') );
+	disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.' ).' '.sprintf( T_('Probably you should update a file %s to the latest version or check permissions to use this file.'), '<code>.htaccess</code>' ) );
+}
+
+// XML-RPC:
+load_funcs( 'xmlrpc/model/_xmlrpc.funcs.php' );
+$url_data = parse_url( $baseurl );
+$client = new xmlrpc_client( 'xmlrpc.php', $url_data['host'], $url_data['port'] );
+$message = new xmlrpcmsg( 'system.listMethods' );
+$result = $client->send( $message );
+if( $result && ! $result->faultCode() )
+{	// XML-RPC request is successful:
+	init_system_check( 'XML-RPC', 'OK' );
+	disp_system_check( 'ok' );
+}
+else
+{	// Some error on XML-RPC request:
+	init_system_check( 'XML-RPC', T_('Failed') );
+	disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.') );
+}
+
+// AJAX anon_async.php:
+$ajax_response = @file_get_contents( $htsrv_url.'anon_async.php?action=test_api' );
+if( $ajax_response !== false )
+{	// Response is correct data:
+	init_system_check( 'AJAX anon_async.php', 'OK' );
+	disp_system_check( 'ok' );
+}
+else
+{	// Response is not correct data:
+	init_system_check( 'AJAX anon_async.php', T_('Failed') );
+	disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.' ) );
+}
+
+// AJAX async.php:
+$ajax_response = @file_get_contents( $htsrv_url.'async.php?action=test_api' );
+if( $ajax_response !== false )
+{	// Response is correct data:
+	init_system_check( 'AJAX async.php', 'OK' );
+	disp_system_check( 'ok' );
+}
+else
+{	// Response is not correct data:
+	init_system_check( 'AJAX async.php', T_('Failed') );
+	disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.' ) );
+}
+
+// AJAX action.php:
+$ajax_response = @file_get_contents( $htsrv_url.'action.php?mname=test_api' );
+if( $ajax_response !== false )
+{	// Response is correct data:
+	init_system_check( 'AJAX action.php', 'OK' );
+	disp_system_check( 'ok' );
+}
+else
+{	// Response is not correct data:
+	init_system_check( 'AJAX action.php', T_('Failed') );
+	disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.' ) );
+}
+
+// AJAX call_plugin.php:
+$ajax_response = @file_get_contents( $htsrv_url.'call_plugin.php?plugin_ID=-1&method=test_api' );
+if( $ajax_response !== false )
+{	// Response is correct data:
+	init_system_check( 'AJAX call_plugin.php', 'OK' );
+	disp_system_check( 'ok' );
+}
+else
+{	// Response is not correct data:
+	init_system_check( 'AJAX call_plugin.php', T_('Failed') );
+	disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.' ) );
+}
+
+$block_item_Widget->disp_template_raw( 'block_end' );
+
+
 // TODO: dh> output_buffering (recommend off)
 // TODO: dh> session.auto_start (recommend off)
 // TODO: dh> How to change ini settings in .htaccess (for mod_php), link to manual

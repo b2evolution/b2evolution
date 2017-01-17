@@ -39,8 +39,8 @@ $blog = NULL;
 param( 'action', 'string', '' );
 
 // Check global permission:
-if( empty($current_User) || ! $current_User->check_perm( 'admin', 'restricted' ) )
-{	// No permission to access admin...
+if( $action != 'test_api' && ( empty($current_User) || ! $current_User->check_perm( 'admin', 'restricted' ) ) )
+{	// No permission to access admin... (Exclude action of API testing in order to make a quick request without logging in)
 	require $adminskins_path.'_access_denied.main.php';
 }
 
@@ -898,6 +898,11 @@ switch( $action )
 					.' onload="document.getElementById(\'import_files_loader\').style.display=\'none\'">loading</iframe>'
 			.'</div>';
 
+		break;
+
+	case 'test_api':
+		// Spec action to test API from ctrl=system:
+		echo 'ok';
 		break;
 
 	default:

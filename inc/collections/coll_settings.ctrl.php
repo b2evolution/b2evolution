@@ -751,7 +751,7 @@ if( $action == 'dashboard' )
 			}
 			echo '<div class="items_container evo_content_block">';
 
-			$block_item_Widget->title = T_('Recently edited').get_manual_link( 'dashboard-recently-edited-posts' );
+			$block_item_Widget->title = T_('Recently edited posts').get_manual_link( 'dashboard-recently-edited-posts' );
 			$block_item_Widget->disp_template_replaced( 'block_start' );
 
 			while( $Item = & $ItemList->get_item() )

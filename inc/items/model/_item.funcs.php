@@ -296,6 +296,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 			switch( $disp_detail )
 			{
 				case 'posts-cat':
+				case 'posts-topcat':
 				case 'posts-subcat':
 					// The competing intro-* types are: 'cat' and 'all':
 					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!

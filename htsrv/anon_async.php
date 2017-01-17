@@ -212,7 +212,7 @@ switch( $action )
 			$height = $thumbnail_sizes[$avatar_size][2];
 			// Display user avatar with login
 			// Attributes 'w' & 'h' we use for following js-scale div If image is downloading first time (Fix bubbletip)
-			echo '<div class="center" w="'.$width.'" h="'.$height.'" style="min-height: '.( $height + 20 ).'px; min-width: '.$width.'px;">';
+			echo '<div class="center" w="'.$width.'" h="'.$height.'">';
 			echo get_avatar_imgtag( $User->login, 'login', true, $avatar_size, 'avatar_above_login', '', $avatar_overlay_text, $link_class, true, '' );
 			echo '</div>';
 
@@ -1352,6 +1352,11 @@ switch( $action )
 		$form_action = get_htsrv_url().'profile_update.php';
 
 		require $inc_path.'users/views/_user_groups.form.php';
+		break;
+
+	case 'test_api':
+		// Spec action to test API from ctrl=system:
+		echo 'ok';
 		break;
 
 	default:
