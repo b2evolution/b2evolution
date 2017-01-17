@@ -1565,22 +1565,8 @@ function phpbb_import_replies()
 		return; // Exit here
 	}
 
-	// Get a path where we should import topic attachments from:
-	$path_attachments = phpbb_get_import_path( 'path_attachments' );
-
 	$users_IDs = phpbb_table_get_links( 'users' );
 	$topics_IDs = phpbb_table_get_links( 'topics' );
-
-	$comment_fields = array(
-			'comment_item_ID',
-			'comment_author_user_ID',
-			'comment_date',
-			'comment_author_IP',
-			'comment_author',
-			'comment_content',
-			'comment_renderers',
-			'comment_status',
-		);
 
 	phpbb_log( T_('Start importing <b>replies</b> as <b>comments</b> into the b2evolution database...'), 'message', '' );
 
@@ -1660,23 +1646,15 @@ function phpbb_import_replies()
 				'comment_status'         => $DB->quote( 'published' ),
 			);
 
-			// Insert a reply:
-			mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'comments ( '.implode( ', ', $comment_fields ).' )
-				VALUES ( '.implode( ', ', $comment_data ).' )' );
-
-			$comment_ID = mysqli_insert_id( $DB->dbhandle );
-
-			if( $path_attachments )
-			{	// Import attachments of this reply:
-				phpbb_import_attachments( 'cmt', $path_attachments, $phpbb_reply->post_id, $comment_ID );
-			}
+			$comments_import_data[ $phpbb_reply->post_id ] = '( '.implode( ', ', $comment_data ).' )';
 
 			$comments_slugs_import_data[] = '( '.$DB->quote( 'forumpost-'.$phpbb_reply->post_id ).', '.$DB->quote( 'item' ).', '.$DB->quote( $topics_IDs[ (string) $phpbb_reply->topic_id ] ).' )';
 
 			if( count( $comments_import_data ) == 100 )
-			{	// Insert the 100 slugs for the replies in one query:
-				mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'slug ( slug_title, slug_type, slug_itm_ID )
-						VALUES '.implode( ', ', $comments_slugs_import_data ) );
+			{	// Insert the 100 comments in one query:
+				phpbb_insert_comments( $comments_import_data, $comments_slugs_import_data );
+				// Clear arrays for next portion:
+				$comments_import_data = array();
 				$comments_slugs_import_data = array();
 			}
 
@@ -1693,14 +1671,59 @@ function phpbb_import_replies()
 	while( count( $phpbb_replies ) > 0 );
 
 	if( count( $comments_import_data ) > 0 )
-	{	// Insert the 100 slugs for the replies in one query:
-		mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'slug ( slug_title, slug_type, slug_itm_ID )
-				VALUES '.implode( ', ', $comments_slugs_import_data ) );
+	{	// Insert the rest comments:
+		phpbb_insert_comments( $comments_import_data, $comments_slugs_import_data );
 	}
 
 	$DB->commit();
 
 	phpbb_set_var( 'replies_count_imported', $phpbb_replies_count_imported );
+}
+
+
+/**
+ * Insert comments in DB
+ *
+ * @param array Query data for the comments table
+ * @param array Query data for slugs of the comments
+ */
+function phpbb_insert_comments( $comments_import_data, $comments_slugs_import_data )
+{
+	global $DB, $tableprefix;
+
+	$comment_insert_result = mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'comments
+			( comment_item_ID, comment_author_user_ID, comment_date, comment_author_IP, comment_author, comment_content, comment_renderers, comment_status )
+			VALUES '.implode( ', ', $comments_import_data ) );
+
+	if( ! $comment_insert_result )
+	{	// Some errors
+		phpbb_log( '<br />'.sprintf( T_( 'MySQL error: %s.' ) , mysqli_error( $DB->dbhandle ) ), 'error', ' ' );
+	}
+	else
+	{
+		// Get a path where we should import the reply attachments from:
+		$path_attachments = phpbb_get_import_path( 'path_attachments' );
+
+		if( $path_attachments )
+		{	// If attachments should be inserted
+			// Get IDs of the last 100 inserted comments in single query above:
+			$last_inserted_comment_IDs = phpbb_get_last_inserted_IDs( $tableprefix.'comments', 'comment_ID', count( $comments_import_data ) );
+
+			$attachments_insert_queries = array();
+			$c = 0;
+			foreach( $comments_import_data as $reply_ID => $insert_data )
+			{	// Import attachments of the last 100 replies:
+				$attachments_insert_queries = array_merge( $attachments_insert_queries, phpbb_get_attachments_insert_data( 'cmt', $path_attachments, $reply_ID, $last_inserted_comment_IDs[ $c ] ) );
+				$c++;
+			}
+			// Insert the links of all 100 comments in single query:
+			phpbb_insert_attachments( 'cmt', $attachments_insert_queries );
+		}
+	}
+
+	// Insert the slugs for the replies
+	mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'slug ( slug_title, slug_type, slug_itm_ID )
+			VALUES '.implode( ', ', $comments_slugs_import_data ) );
 }
 
 /**
@@ -1895,7 +1918,7 @@ function phpbb_import_messages_texts( $thread_ID, $message )
 {
 	global $DB, $phpbb_DB, $tableprefix, $phpbb_version;
 
-	// Get a path where we should import topic attachments from:
+	// Get a path where we should import the message attachments from:
 	$path_attachments = phpbb_get_import_path( 'path_attachments' );
 
 	$SQL = new SQL();
@@ -1936,7 +1959,7 @@ function phpbb_import_messages_texts( $thread_ID, $message )
 			continue;
 		}
 
-		$message_import_data[] = '( '.
+		$message_import_data[ $message->id ] = '( '.
 				$DB->quote( $users_IDs[ $message->from_user_id ] ).', '.
 				$DB->quote( date( 'Y-m-d H:i:s', $message->time ) ).', '.
 				$DB->quote( $thread_ID ).', '.
@@ -1961,8 +1984,16 @@ function phpbb_import_messages_texts( $thread_ID, $message )
 	$msg_ID = mysqli_insert_id( $DB->dbhandle );
 
 	if( $path_attachments )
-	{	// Import attachments of this private message:
-		phpbb_import_attachments( 'msg', $path_attachments, $message->id, $msg_ID );
+	{	// If attachments should be inserted
+		// Get IDs of the last inserted messages in single query above:
+		$last_inserted_msg_IDs = phpbb_get_last_inserted_IDs( $tableprefix.'messaging__message', 'msg_ID', count( $message_import_data ) );
+
+		$m = 0;
+		foreach( $message_import_data as $message_id => $insert_data )
+		{	// Import attachments of the inserted private message:
+			phpbb_import_attachments( 'msg', $path_attachments, $message_id, $last_inserted_msg_IDs[ $m ] );
+			$m++;
+		}
 	}
 
 	mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'messaging__threadstatus ( tsta_thread_ID, tsta_user_ID, tsta_first_unread_msg_ID )
@@ -2226,14 +2257,72 @@ function phpbb_import_avatar( $user_ID, $path_avatars, $user_avatar )
  * @param string Attachments path
  * @param integer ID of topic, reply or private message (from phpBB DB)
  * @param integer ID of topic, reply or private message (from b2evolution DB)
+ * @param array|NULL Array of insert data or NULL to generate new
  */
 function phpbb_import_attachments( $target_type, $path_attachments, $target_ID, $new_object_ID )
 {
-	global $DB, $phpbb_DB, $tableprefix, $phpbb_version;
+	// Generate new data of insert query:
+	$attachments_insert_data = phpbb_get_attachments_insert_data( $target_type, $path_attachments, $target_ID, $new_object_ID );
+
+	// Insert the links in DB:
+	phpbb_insert_attachments( $target_type, $attachments_insert_data );
+}
+
+
+/**
+ * Insert attachments of topic, reply or private message
+ *
+ * @param string Target type: 'itm', 'cmt', 'msg'
+ * @param array|NULL Array of insert data or NULL to generate new
+ */
+function phpbb_insert_attachments( $target_type, $attachments_insert_data )
+{
+	global $DB, $tableprefix;
+
+	if( empty( $attachments_insert_data ) )
+	{	// Nothing to insert, Exit here:
+		return;
+	}
+
+	$attachments_count_imported = phpbb_get_var( 'attachments_count_imported' );
+	$attachments_count_missed = phpbb_get_var( 'attachments_count_missed' );
+
+	// Execute a query to insert the links:
+	$r = mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'links
+					 ( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_'.$target_type.'_ID, link_file_ID, link_position, link_order )
+		VALUES '.implode( ', ', $attachments_insert_data ) );
+
+	if( $r )
+	{
+		$attachments_count_imported += mysqli_affected_rows( $DB->dbhandle );
+	}
+	else
+	{
+		$attachments_count_missed += count( $attachments_insert_data );
+	}
+
+	// Update the count of imported/missed attachments:
+	phpbb_set_var( 'attachments_count_imported', $attachments_count_imported );
+	phpbb_set_var( 'attachments_count_missed', $attachments_count_missed );
+}
+
+
+/**
+ * Get data for an insert SQL query statement of attachments of topic, reply or private message
+ *
+ * @param string Target type: 'itm', 'cmt', 'msg'
+ * @param string Attachments path
+ * @param integer ID of topic, reply or private message (from phpBB DB)
+ * @param integer ID of topic, reply or private message (from b2evolution DB)
+ * @return array
+ */
+function phpbb_get_attachments_insert_data( $target_type, $path_attachments, $target_ID, $new_object_ID )
+{
+	global $DB, $phpbb_DB, $tableprefix, $phpbb_version, $localtimenow;
 
 	if( $phpbb_version != 3 )
 	{	// This function is only for phpBB3:
-		return;
+		return array();
 	}
 
 	$attachments = $phpbb_DB->get_results( 'SELECT poster_id, physical_filename, real_filename
@@ -2242,7 +2331,7 @@ function phpbb_import_attachments( $target_type, $path_attachments, $target_ID, 
 
 	if( empty( $attachments ) )
 	{	// This target has no attachment:
-		return;
+		return array();
 	}
 
 	$users_IDs = phpbb_table_get_links( 'users' );
@@ -2250,8 +2339,9 @@ function phpbb_import_attachments( $target_type, $path_attachments, $target_ID, 
 	$FileRootCache = & get_FileRootCache();
 	$FileCache = & get_FileCache();
 
-	$attachments_count_imported = phpbb_get_var( 'attachments_count_imported' );
 	$attachments_count_missed = phpbb_get_var( 'attachments_count_missed' );
+
+	$attachments_insert_data = array();
 
 	$link_order = 1;
 	foreach( $attachments as $attachment )
@@ -2296,26 +2386,23 @@ function phpbb_import_attachments( $target_type, $path_attachments, $target_ID, 
 			continue;
 		}
 
-		// 
+		// Copy a file from phpBB attachments folder to b2evolution media folder:
 		$imported_file_ID = copy_file( $path_attachments.$attachment->real_filename, $root_ID, $root_path, false );
 		if( empty( $imported_file_ID ) )
-		{	// Impossible to copy file from phpBB attachments folder to b2evolution media folder:
+		{	// Impossible to copy the file:
 			$attachments_count_missed++;
 			continue;
 		}
 
-		// Insert a link with new file:
-		global $localtimenow;
-		mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'links
-						 ( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_'.$target_type.'_ID, link_file_ID, link_position, link_order )
-			VALUES ( '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( $author_ID ).', '.$DB->quote( $author_ID ).', '.$DB->quote( $new_object_ID ).', '.$DB->quote( $imported_file_ID ).', "'.$link_position.'", '.( $link_order++ ).' )' );
-
-		$attachments_count_imported++;
+		// Initialize a part for VALUES of SQL query to insert a link with new file,
+		// For SQL "INSERT INTO links ( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_'.$target_type.'_ID, link_file_ID, link_position, link_order )":
+		$attachments_insert_data[] = '( '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( $author_ID ).', '.$DB->quote( $author_ID ).', '.$DB->quote( $new_object_ID ).', '.$DB->quote( $imported_file_ID ).', "'.$link_position.'", '.( $link_order++ ).' )';
 	}
 
-	// Update the count of imported/missed attachments:
-	phpbb_set_var( 'attachments_count_imported', $attachments_count_imported );
+	// Update the count of missed attachments:
 	phpbb_set_var( 'attachments_count_missed', $attachments_count_missed );
+
+	return $attachments_insert_data;
 }
 
 
@@ -2385,5 +2472,28 @@ function phpbb_display_steps( $current_step )
 		);
 
 	echo get_tool_steps( $steps, $current_step );
+}
+
+
+/**
+ * Get last inserted IDs
+ *
+ * @param string Table name
+ * @param string ID field name
+ * @param integer Number of last records
+ * @return array
+ */
+function phpbb_get_last_inserted_IDs( $table_name, $ID_field_name, $limit )
+{
+	global $DB;
+
+	$SQL = new SQL( 'Get IDs of last '.$limit.' inserted records in the table '.$table_name );
+	$SQL->SELECT( $ID_field_name );
+	$SQL->FROM( $table_name );
+	$SQL->ORDER_BY( $ID_field_name.' DESC' );
+	$SQL->LIMIT( $limit );
+	$last_inserted_IDs = $DB->get_col( $SQL->get(), 0, $SQL->title );
+
+	return array_reverse( $last_inserted_IDs );
 }
 ?>
