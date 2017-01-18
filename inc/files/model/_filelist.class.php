@@ -492,10 +492,16 @@ class Filelist
 	 */
 	function add_by_subpath( $rel_path, $mustExist = false )
 	{
-		$FileCache = & get_FileCache();
-		$NewFile = & $FileCache->get_by_root_and_path( $this->_FileRoot->type, $this->_FileRoot->in_type_ID, $rel_path );
+		$FileRoot = & $this->get_FileRoot();
 
-		return $this->add( $NewFile, $mustExist );
+		if( $FileRoot->contains( $rel_path ) )
+		{	// If a file is really contained in the FileRoot of this list:
+			$FileCache = & get_FileCache();
+			$NewFile = & $FileCache->get_by_root_and_path( $this->_FileRoot->type, $this->_FileRoot->in_type_ID, $rel_path );
+
+			// Add a file to this list:
+			return $this->add( $NewFile, $mustExist );
+		}
 	}
 
 
