@@ -2738,14 +2738,31 @@ function param_check_serialized_array( $param_name )
  */
 function is_safe_filepath( $filepath )
 {
+	global $filemanager_allow_dotdot_in_filenames;
+
+	if( ! isset( $filemanager_allow_dotdot_in_filenames ) )
+	{	// This config var is required:
+		debug_die( 'The var <strong>$filemanager_allow_dotdot_in_filenames</strong> must be defined in config file.' );
+	}
+
 	if( empty( $filepath ) )
 	{	// Allow empty file path:
 		return true;
 	}
 
-	if( strpos( $filepath, '../' ) !== false || strpos( $filepath, '..\\' ) !== false )
-	{	// Don't allow a traversal directory:
-		return false;
+	if( ! $filemanager_allow_dotdot_in_filenames )
+	{	// Check a file path for not allowed double dots:
+		$orig_filepath = '';
+		while( $filepath != $orig_filepath )
+		{	// Decode file path while it is possible:
+			$orig_filepath = $filepath;
+			$filepath = urldecode( $filepath );
+		}
+
+		if( strpos( $filepath, '../' ) !== false || strpos( $filepath, '..\\' ) !== false )
+		{	// Don't allow a traversal directory:
+			return false;
+		}
 	}
 
 	return true;
