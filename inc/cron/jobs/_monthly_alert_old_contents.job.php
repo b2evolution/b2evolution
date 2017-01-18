@@ -119,7 +119,7 @@ foreach( $specific_coll_moderators as $row )
 		if( $moderators[$row->user_ID][$row->blog_ID]['perm_edit_num'] < $row->perm_edit_num )
 		{	// The user and the group advanced post edit perm for this user are not the same, keep the higher perm value:
 			$moderators[$row->user_ID][$row->blog_ID]['perm_edit_num'] = intval( $row->perm_edit_num );
-			$moderators[$row->user_ID][$row->blog_ID]['perm_edit'] = $row->perm_edit_num;
+			$moderators[$row->user_ID][$row->blog_ID]['perm_edit'] = $row->perm_edit;
 		}
 		$current_perm_statuses = $moderators[$row->user_ID][$row->blog_ID]['perm_statuses'];
 		$row_perm_status = intval( $row->perm_poststatuses );
