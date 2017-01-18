@@ -51,7 +51,7 @@ $Form->begin_fieldset( T_('Report of the topics import') );
 
 	if( $phpbb_version == 3 )
 	{	// Only for phpBB3:
-		$Form->info( T_('Count of the imported / missed attachments'), intval( phpbb_get_var( 'attachments_count_imported' ) ).' / <b class="red">'.intval( phpbb_get_var( 'attachments_count_missed' ) ).'</b>' );
+		$Form->info( T_('Count of the imported / missing attachments'), intval( phpbb_get_var( 'attachments_count_imported' ) ).' / <b class="red">'.intval( phpbb_get_var( 'attachments_count_missing' ) ).'</b>' );
 	}
 
 	$BlogCache = & get_BlogCache();

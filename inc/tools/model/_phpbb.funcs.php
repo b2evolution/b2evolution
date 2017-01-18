@@ -1183,7 +1183,7 @@ function phpbb_import_topics()
 
 	// Reset previous values:
 	phpbb_unset_var( 'attachments_count_imported' );
-	phpbb_unset_var( 'attachments_count_missed' );
+	phpbb_unset_var( 'attachments_count_missing' );
 
 	phpbb_log( T_('Importing topics...') );
 
@@ -2024,7 +2024,7 @@ function phpbb_clear_temporary_data()
 	phpbb_unset_var( 'replies_count_imported' );
 	phpbb_unset_var( 'messages_count_imported' );
 	phpbb_unset_var( 'attachments_count_imported' );
-	phpbb_unset_var( 'attachments_count_missed' );
+	phpbb_unset_var( 'attachments_count_missing' );
 }
 
 
@@ -2285,7 +2285,7 @@ function phpbb_insert_attachments( $target_type, $attachments_insert_data )
 	}
 
 	$attachments_count_imported = phpbb_get_var( 'attachments_count_imported' );
-	$attachments_count_missed = phpbb_get_var( 'attachments_count_missed' );
+	$attachments_count_missing = phpbb_get_var( 'attachments_count_missing' );
 
 	// Execute a query to insert the links:
 	$r = mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'links
@@ -2298,12 +2298,12 @@ function phpbb_insert_attachments( $target_type, $attachments_insert_data )
 	}
 	else
 	{
-		$attachments_count_missed += count( $attachments_insert_data );
+		$attachments_count_missing += count( $attachments_insert_data );
 	}
 
-	// Update the count of imported/missed attachments:
+	// Update the count of imported/missing attachments:
 	phpbb_set_var( 'attachments_count_imported', $attachments_count_imported );
-	phpbb_set_var( 'attachments_count_missed', $attachments_count_missed );
+	phpbb_set_var( 'attachments_count_missing', $attachments_count_missing );
 }
 
 
@@ -2339,7 +2339,7 @@ function phpbb_get_attachments_insert_data( $target_type, $path_attachments, $ta
 	$FileRootCache = & get_FileRootCache();
 	$FileCache = & get_FileCache();
 
-	$attachments_count_missed = phpbb_get_var( 'attachments_count_missed' );
+	$attachments_count_missing = phpbb_get_var( 'attachments_count_missing' );
 
 	$attachments_insert_data = array();
 
@@ -2350,7 +2350,7 @@ function phpbb_get_attachments_insert_data( $target_type, $path_attachments, $ta
 		{
 			if( ! file_exists( $path_attachments.$attachment->real_filename ) )
 			{	// The file doesn't exist, Skip it:
-				$attachments_count_missed++;
+				$attachments_count_missing++;
 				continue;
 			}
 			else
@@ -2361,7 +2361,7 @@ function phpbb_get_attachments_insert_data( $target_type, $path_attachments, $ta
 
 		if( ! $users_IDs[ (string) $attachment->poster_id ] )
 		{	// Wrong file author:
-			$attachments_count_missed++;
+			$attachments_count_missing++;
 			continue;
 		}
 
@@ -2382,7 +2382,7 @@ function phpbb_get_attachments_insert_data( $target_type, $path_attachments, $ta
 
 		if( ! @rename( $path_attachments.$attachment->physical_filename, $path_attachments.$attachment->real_filename ) )
 		{	// Impossible to rename file from phpBB format like "2_1df806e219313f4432b82040685b8ff1" to real file name with extension, Skip it:
-			$attachments_count_missed++;
+			$attachments_count_missing++;
 			continue;
 		}
 
@@ -2390,7 +2390,7 @@ function phpbb_get_attachments_insert_data( $target_type, $path_attachments, $ta
 		$imported_file_ID = copy_file( $path_attachments.$attachment->real_filename, $root_ID, $root_path, false );
 		if( empty( $imported_file_ID ) )
 		{	// Impossible to copy the file:
-			$attachments_count_missed++;
+			$attachments_count_missing++;
 			continue;
 		}
 
@@ -2399,8 +2399,8 @@ function phpbb_get_attachments_insert_data( $target_type, $path_attachments, $ta
 		$attachments_insert_data[] = '( '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( $author_ID ).', '.$DB->quote( $author_ID ).', '.$DB->quote( $new_object_ID ).', '.$DB->quote( $imported_file_ID ).', "'.$link_position.'", '.( $link_order++ ).' )';
 	}
 
-	// Update the count of missed attachments:
-	phpbb_set_var( 'attachments_count_missed', $attachments_count_missed );
+	// Update the count of missing attachments:
+	phpbb_set_var( 'attachments_count_missing', $attachments_count_missing );
 
 	return $attachments_insert_data;
 }
