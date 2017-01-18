@@ -4775,7 +4775,7 @@ function manual_display_post_row( $Item, $level, $params = array() )
 	// Category image
 	$cat_thumb = '';
 	$ChapterCache = & get_ChapterCache();
-	if( $params['chapter_ID'] && ( $Chapter = & $ChapterCache->get_by_ID( $params['chapter_ID'], false, false ) ) )
+	if( $Item->main_cat_ID && ( $Chapter = & $ChapterCache->get_by_ID( $Item->main_cat_ID, false, false ) ) )
 	{
 		$file_ID = $Chapter->get( 'image_file_ID' );
 

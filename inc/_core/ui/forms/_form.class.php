@@ -3737,7 +3737,7 @@ class Form extends Widget
 
 			$button_label = ( $counter === 0 ? T_('Select') : get_icon( 'new' ).' '.T_('Add') );
 
-			$r .= '<button class="btn btn-default file_select_item" onclick="return window.parent.file_select_attachment_window( this, false );" style="display: '.( $counter < $field_params['max_file_num'] ? 'block' : 'none' ).';">'.$button_label.'</button>';
+			$r .= '<button class="btn btn-sm btn-info file_select_item" onclick="return window.parent.file_select_attachment_window( this, false );" style="display: '.( $counter < $field_params['max_file_num'] ? 'block' : 'none' ).';">'.$button_label.'</button>';
 
 			$r .= '</div>';
 			$r .= $this->end_field();
@@ -3877,6 +3877,9 @@ class Form extends Widget
 										values.push( fieldValue );
 										inputField.val( values.join( "'.$field_params['value_separator'].'" ) );
 
+										// Trigger change so bozo validator will pickup the change
+										inputField.trigger( "change" );
+
 										// close modal if single item select
 										if( maxLength == 1 )
 										{
@@ -3923,6 +3926,7 @@ class Form extends Widget
 								values.splice( index, 1 );
 							}
 							inputField.val( values.join( "'.$field_params['value_separator'].'" ) );
+							inputField.trigger( "change" );
 
 							return false;
 						}

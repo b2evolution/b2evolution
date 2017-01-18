@@ -2249,7 +2249,7 @@ function display_dragdrop_upload_button( $params = array() )
 			'conflict_file_format'   => 'simple', // 'simple' - file name text, 'full_path_link' - a link with text as full file path
 			'resize_frame'           => false, // Resize frame on upload new image
 			'table_headers'          => '', // Use this html text as table headers when first file is loaded
-			'select_field_name'      => NULL, // Use it if you want to select a file right after uploading
+			'filename_select'        => '', // Append this text before file name on success uploading of new file
 		), $params );
 
 	$FileRootCache = & get_FileRootCache();
@@ -2319,7 +2319,7 @@ function display_dragdrop_upload_button( $params = array() )
 				additional_dropzone: '<?php echo $params['additional_dropzone']; ?>',
 				action: url,
 				sizeLimit: <?php echo ( $Settings->get( 'upload_maxkb' ) * 1024 ); ?>,
-				debug: true,
+				debug: false,
 				messages: {
 					typeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} has an invalid extension. Only {extensions} are allowed.'); ?>',
 					sizeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} cannot be uploaded because it is too large ({fileSize}). The maximum allowed upload size is {sizeLimit}.'); ?>',
@@ -2390,17 +2390,22 @@ function display_dragdrop_upload_button( $params = array() )
 						var table_view = typeof( responseJSON.success.link_ID ) != 'undefined' ? 'link' : 'file';
 
 						var filename_before = '<?php echo str_replace( "'", "\'", $params['filename_before'] ); ?>';
+						var filename_select = '<?php echo str_replace( "'", "\'", $params['filename_select'] ); ?>';
 						if( filename_before != '' )
 						{
 							filename_before = filename_before.replace( '$file_path$', decodeURIComponent( responseJSON.success.path ) );
-							<?php
-							if( !empty( $params[ 'select_field_name'] ) )
+						}
+
+						if( filename_select != '' )
+						{
+							if( responseJSON.success.filetype == 'image' )
 							{
-							?>
-							filename_before = filename_before.replace( '$field_name$', '<?php echo $params['select_field_name'];?>' );
-							<?php
+								filename_select = filename_select.replace( '$file_path$', decodeURIComponent( responseJSON.success.path ) );
 							}
-							?>
+							else
+							{
+								filename_select = '';
+							}
 						}
 
 						var warning = '';
@@ -2425,7 +2430,7 @@ function display_dragdrop_upload_button( $params = array() )
 							this_row.find( '.qq-upload-status' ).html( '' );
 							<?php } ?>
 							this_row.find( '.qq-upload-image' ).html( text );
-							this_row.find( '.qq-upload-file' ).html( filename_before
+							this_row.find( '.qq-upload-file' ).html( filename_before + filename_select
 								+ '<input type="hidden" value="' + responseJSON.success.newpath + '" />'
 								+ '<span class="fname">' + file_name + '</span>' + warning );
 						}

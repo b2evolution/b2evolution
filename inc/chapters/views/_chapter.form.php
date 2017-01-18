@@ -28,7 +28,7 @@ global $Settings, $action, $subset_ID;
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
 
-$Form = new Form( NULL, 'form' );
+$Form = new Form( NULL, 'form_checkchanges' );
 
 $close_url = get_chapter_redirect_url( get_param( 'redirect_page' ), $edited_Chapter->parent_ID, $edited_Chapter->ID );
 $Form->global_icon( T_('Cancel editing!'), 'close', $close_url );
