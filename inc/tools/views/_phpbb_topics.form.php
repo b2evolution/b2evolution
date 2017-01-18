@@ -49,8 +49,8 @@ $Form->begin_fieldset( T_('Report of the topics import') );
 
 	$Form->info( T_('Count of the updated users'), (int)phpbb_get_var( 'users_count_updated' ) );
 
-	if( $phpbb_version == 3 )
-	{	// Only for phpBB3:
+	if( $phpbb_version == 3 && phpbb_get_import_path( 'path_attachments' ) )
+	{	// Only for phpBB3 and when source of attachments is defined and really exists:
 		$Form->info( T_('Count of the imported / missing attachments'), intval( phpbb_get_var( 'attachments_count_imported' ) ).' / <b class="red">'.intval( phpbb_get_var( 'attachments_count_missing' ) ).'</b>' );
 	}
 

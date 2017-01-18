@@ -2347,14 +2347,14 @@ function phpbb_get_attachments_insert_data( $target_type, $path_attachments, $ta
 	foreach( $attachments as $attachment )
 	{
 		if( ! file_exists( $path_attachments.$attachment->physical_filename ) )
-		{
+		{	// If physical file(like "2_1888733359c9d121321b5cfbe93ba714") doesn't exist then try to use file with real name(like "image.jpg")
 			if( ! file_exists( $path_attachments.$attachment->real_filename ) )
-			{	// The file doesn't exist, Skip it:
+			{	// The file with real name doesn't exist too, Skip this attachment:
 				$attachments_count_missing++;
 				continue;
 			}
 			else
-			{
+			{	// Use file with real name instead of physical:
 				$attachment->physical_filename = $attachment->real_filename;
 			}
 		}
