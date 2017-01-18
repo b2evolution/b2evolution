@@ -114,6 +114,8 @@ foreach( $specific_coll_moderators as $row )
 	}
 	if( isset( $moderators[$row->user_ID][$row->blog_ID] ) )
 	{	// Update user permissions on this collection:
+		// perm_edit    : 'no', 'own', 'lt', 'le', 'all' (real value from DB)
+		// perm_edit_num:  1,    2,     3,    4,    5    (index of the value from DB)
 		if( $moderators[$row->user_ID][$row->blog_ID]['perm_edit_num'] < $row->perm_edit_num )
 		{	// The user and the group advanced post edit perm for this user are not the same, keep the higher perm value:
 			$moderators[$row->user_ID][$row->blog_ID]['perm_edit_num'] = intval( $row->perm_edit_num );
