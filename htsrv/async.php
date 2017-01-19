@@ -107,7 +107,7 @@ switch( $action )
 			// Highlight lines starting with orgname: or org-name: (case insensitive)
 			for( $i = 0; $i < count( $result['rawdata'] ); $i++ )
 			{
-				if( preg_match( '/^(orgname:|org-name:)/i', $result['rawdata'][$i] ) )
+				if( preg_match( '/^(orgname:|org-name:|descr:)/i', $result['rawdata'][$i] ) )
 				{
 					$result['rawdata'][$i] = '<span style="font-weight: bold; background-color: yellow;">'.$result['rawdata'][$i].'</span>';
 				}
