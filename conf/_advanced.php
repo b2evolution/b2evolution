@@ -693,7 +693,7 @@ $dirpath_max_length = ( ( ( strtoupper( substr( PHP_OS, 0, 3 ) ) ) === 'WIN' ) ?
 
 /**
  * Allow double dots in file names
- * Use TRUE if you want to allow a traversal directory like "../../../filename"
+ * Use TRUE if you want to allow ".." in file and directory names like "..filename" or "dir..name"
  */
 $filemanager_allow_dotdot_in_filenames = false;
 
