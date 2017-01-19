@@ -2730,11 +2730,11 @@ function is_safe_filepath( $filepath )
 		{	// Decode file path while it is possible:
 			$orig_filepath = $filepath;
 			$filepath = urldecode( $filepath );
-		}
 
-		if( strpos( $filepath, '../' ) !== false || strpos( $filepath, '..\\' ) !== false )
-		{	// Don't allow a traversal directory:
-			return false;
+			if( strpos( $filepath, '../' ) !== false || strpos( $filepath, '..\\' ) !== false )
+			{	// Don't allow a traversal directory:
+				return false;
+			}
 		}
 	}
 
