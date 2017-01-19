@@ -271,7 +271,12 @@ class FileRoot
 		$real_abs_path = get_canonical_path( $this->ads_path.$rel_path );
 
 		// Check if the given file/folder is realy contained in this root:
-		return ( strpos( $real_abs_path, $this->ads_path ) === 0 );
+		if( ! empty( $real_abs_path ) && strpos( $real_abs_path, $this->ads_path ) !== 0 )
+		{	// Deny access from another file root:
+			debug_die( 'Denied access to files from another root!' );
+		}
+
+		return true;
 	}
 }
 

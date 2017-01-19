@@ -2750,20 +2750,23 @@ function is_safe_filepath( $filepath )
 		return true;
 	}
 
-	if( ! $filemanager_allow_dotdot_in_filenames )
-	{	// Check a file path for not allowed double dots:
-		$orig_filepath = '';
-		while( $filepath != $orig_filepath )
-		{	// Decode file path while it is possible:
-			$orig_filepath = $filepath;
-			$filepath = urldecode( $filepath );
-		}
+	if( ! $filemanager_allow_dotdot_in_filenames &&
+	    strpos( $filepath, '..' ) !== false )
+	{	// Don't allow .. in file path because it is disable by config:
+		return false;
+	}
+
+	do
+	{	// Decode file path while it is possible:
+		$orig_filepath = $filepath;
+		$filepath = urldecode( $filepath );
 
 		if( strpos( $filepath, '../' ) !== false || strpos( $filepath, '..\\' ) !== false )
 		{	// Don't allow a traversal directory:
 			return false;
 		}
 	}
+	while( $filepath != $orig_filepath );
 
 	return true;
 }
