@@ -17,9 +17,18 @@ global $baseurl, $Settings;
 <?php
 if( $Settings->get( 'notification_logo' ) != '' )
 {
-	$site_title = $Settings->get( 'notification_long_name' ) != '' ? ' title="'.$Settings->dget( 'notification_long_name', 'htmlattr' ).'"' : '';
-	$site_name_text = '<img src="'.$Settings->get( 'notification_logo' ).'" alt="'.$Settings->dget( 'notification_short_name', 'htmlattr' ).'"'.$site_title.' />';
-	$site_title_class = ' swhead_logo';
+	$FileCache = & get_FileCache();
+	if( ( $File = get_FileCache()->get_by_ID( $Settings->get( 'notification_logo' ), false ) ) && $File->is_image() )
+	{
+		$site_title = $Settings->get( 'notification_long_name' ) != '' ? ' title="'.$Settings->dget( 'notification_long_name', 'htmlattr' ).'"' : '';
+		$site_name_text = '<img src="'.$File->get_url().'" alt="'.$Settings->dget( 'notification_short_name', 'htmlattr' ).'"'.$site_title.' />';
+		$site_title_class = ' swhead_logo';
+	}
+	else
+	{
+		$site_name_text = $Settings->get( 'notification_short_name' );
+		$site_title_class = '';
+	}
 }
 else
 {

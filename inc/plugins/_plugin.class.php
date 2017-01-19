@@ -483,8 +483,12 @@ class Plugin
 	 *              (with label, note etc). (optional, default is numeric keys, which are not editable)
 	 *        'max_count': maximum count of sets (optional, default is no restriction)
 	 *        'min_count': minimum count of sets (optional, default is no restriction)
-	 *      'info': a form info field with label and info text see {@link Form::info()}; you must set 'info' for text.
-	 *      'color': a form color picker field, use 'defaultvalue' in format '#FFFFFF'
+	 *	   'fileselect': opens a modal window to select file. The following can be set for this type:
+	 *        'root': default root
+	 *		  'path': default path
+	 *        'thumbnail_size': thumbnail size
+	 *     'info': a form info field with label and info text see {@link Form::info()}; you must set 'info' for text.
+	 *     'color': a form color picker field, use 'defaultvalue' in format '#FFFFFF'
 	 * 'note' (gets displayed as a note to the param field),
 	 * 'info': Text for param with type 'info'
 	 * 'size': Size of the HTML input field (applies to types 'text', 'password' and 'integer'; defaults to 15)

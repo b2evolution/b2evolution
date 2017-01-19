@@ -414,6 +414,7 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 		$notify_options[] = array( 'edited_user_notify_post_moderation', 1, T_('a post is created and I have permissions to moderate it.'), $UserSettings->get( 'notify_post_moderation', $edited_User->ID ), $disabled );
 		$notify_options[] = array( 'edited_user_notify_edit_pst_moderation', 1, T_('a post is modified and I have permissions to moderate it.'), $UserSettings->get( 'notify_edit_pst_moderation', $edited_User->ID ), $disabled );
 		$notify_options[] = array( 'edited_user_send_pst_moderation_reminder', 1, sprintf( T_('posts are awaiting moderation for more than %s.'), seconds_to_period( $post_moderation_reminder_threshold ) ), $UserSettings->get( 'send_pst_moderation_reminder', $edited_User->ID ), $disabled );
+		$notify_options[] = array( 'edited_user_send_pst_stale_alert', 1, T_('there are stale posts and I have permission to moderate them.'), $UserSettings->get( 'send_pst_stale_alert', $edited_User->ID ), $disabled );
 	}
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{ // current User is an administrator

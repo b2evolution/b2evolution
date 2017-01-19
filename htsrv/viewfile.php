@@ -51,7 +51,7 @@ $current_User->check_perm( 'files', 'view', true, $perm_blog );
 
 // Load the other params:
 param( 'viewtype', 'string', true, true );
-param( 'path', 'string', true, true );
+param( 'path', 'filepath', true, true );
 
 if ( false !== strpos( urldecode( $path ), '..' ) )
 {

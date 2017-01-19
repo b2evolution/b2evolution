@@ -46,7 +46,7 @@ function evo_link_fix_wrapper_height()
 {
 	var table_height = jQuery( '#attachments_fieldset_table' ).height();
 	var wrapper_height = jQuery( '#attachments_fieldset_wrapper' ).height();
-	if( wrapper_height > table_height )
+	if( wrapper_height != table_height )
 	{
 		jQuery( '#attachments_fieldset_wrapper' ).height( jQuery( '#attachments_fieldset_table' ).height() );
 	}
@@ -64,7 +64,7 @@ function evo_link_change_position( selectInput, url, crumb )
 {
 	var oThis = selectInput;
 	var new_position = selectInput.value;
-	jQuery.get( url + 'async.php?action=set_object_link_position&link_ID=' + selectInput.id.substr(17) + '&link_position=' + new_position + '&crumb_link=' + crumb, {
+	jQuery.get( url + 'anon_async.php?action=set_object_link_position&link_ID=' + selectInput.id.substr(17) + '&link_position=' + new_position + '&crumb_link=' + crumb, {
 	}, function(r, status) {
 		r = ajax_debug_clear( r );
 		if( r == "OK" ) {
@@ -147,7 +147,7 @@ function evo_link_delete( event_object, type, link_ID, action )
 			var b2evoCanvas = window.document.getElementById( 'itemform_post_content' );
 			if( b2evoCanvas != null )
 			{ // Canvas exists
-				var regexp = new RegExp( '\\\[(image|file|inline|video|audio):' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
+				var regexp = new RegExp( '\\\[(image|file|inline|video|audio|thumbnail):' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
 				textarea_str_replace( b2evoCanvas, regexp, '', window.document );
 			}
 		}
@@ -217,16 +217,14 @@ function evo_link_attach( type, object_ID, root, path )
 	function( data )
 	{
 		var table_obj = jQuery( '#attachments_fieldset_table table', window.parent.document );
-		if( table_obj.length > 0 && typeof( data.link ) != 'undefined' )
-		{	// Append new link to the attachments table:
-			table_obj.append( '<tr>' +
-					'<td class="firstcol shrinkwrap">' + data.link.preview + '</td>' +
-					'<td class="fm_filename">' + data.link.url + '</td>' +
-					'<td class="shrinkwrap link_id_cell">' + data.link.ID + '</td>' +
-					'<td class="shrinkwrap">' + data.link.actions + '</td>' +
-					'<td class="lastcol shrinkwrap">' + data.link.position + '</td>' +
-				'</tr>' );
-		}
+		var table_parent = table_obj.parent;
+		var results_obj = jQuery( data.list_content );
+		table_obj.replaceWith( jQuery( 'table', results_obj ) ).promise().done( function( e ) {
+			// Delay for a few milleseconds after content is loaded to get the correct height
+			setTimeout( function() {
+				window.parent.evo_link_fix_wrapper_height();
+			}, 10 );
+		});
 	} );
 
 	return false;

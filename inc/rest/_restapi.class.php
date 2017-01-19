@@ -1859,14 +1859,17 @@ class RestApi
 		$this->link_check_perm();
 
 		// Action: 'unlink - just unlink file from the owner, 'delete' - unlink and delete the file from disk and DB completely
-		$action = param( 'action', 'string', '' );
+
+		// Note: param() currently does not work with DELETE and PUT requests
+		parse_str( file_get_contents('php://input'), $request_params );
+		$action = isset( $request_params['action'] ) ? $request_params['action'] : '';
 
 		$deleted_Link = & $this->get_Link();
 		$LinkOwner = & $deleted_Link->get_LinkOwner();
 
 		if( $link_File = & $deleted_Link->get_File() )
 		{
-			syslog_insert( sprintf( 'File %s was unlinked from %s with ID=%s', '[['.$link_File->get_name().']]', $LinkOwner->type, $LinkOwner->link_Object->ID ), 'info', 'file', $link_File->ID );
+			syslog_insert( sprintf( 'File %s was unlinked from %s with ID=%s', '[['.$link_File->get_name().']]', $LinkOwner->type, $LinkOwner->get_ID() ), 'info', 'file', $link_File->ID );
 		}
 
 		if( $action == 'delete' && $deleted_Link->can_be_file_deleted() )
@@ -2002,6 +2005,28 @@ class RestApi
 			// Use the glyph or font-awesome icons if requested by skin
 			param( 'b2evo_icons_type', 'string', 'fontawesome-glyphicons' );
 
+			global $LinkOwner, $current_File, $disable_evo_flush;
+
+			$link_type = param( 'type', 'string' );
+			$link_object_ID = param( 'object_ID', 'string' );
+
+			$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+
+			// Initialize admin skin:
+			global $current_User, $UserSettings, $is_admin_page, $adminskins_path, $AdminUI;
+			$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+			$is_admin_page = true;
+			require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+			$AdminUI = new AdminUI();
+
+			// Disable function evo_flush() to correct handle a content below:
+			$disable_evo_flush = true;
+
+			// Get the refreshed content:
+			ob_start();
+			$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+			$refreshed_content = ob_get_clean();
+
 			$mask_row = (object) array(
 					'link_ID'       => $Link->ID,
 					'file_ID'       => $current_File->ID,
@@ -2014,6 +2039,7 @@ class RestApi
 					'actions'  => link_actions( $Link->ID, 'last', $link_type ),
 					'position' => display_link_position( $mask_row ),
 				) );
+			$this->add_response( 'list_content', $refreshed_content );
 		}
 
 		// File has been attached successfully:

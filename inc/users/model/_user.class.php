@@ -1231,6 +1231,7 @@ class User extends DataObject
 					$UserSettings->set( 'notify_post_moderation', param( 'edited_user_notify_post_moderation', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'notify_edit_pst_moderation', param( 'edited_user_notify_edit_pst_moderation', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'send_pst_moderation_reminder', param( 'edited_user_send_pst_moderation_reminder', 'integer', 0 ), $this->ID );
+					$UserSettings->set( 'send_pst_stale_alert', param( 'edited_user_send_pst_stale_alert', 'integer', 0 ), $this->ID );
 				}
 				if( $this->grp_ID == 1 )
 				{

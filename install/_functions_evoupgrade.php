@@ -7795,7 +7795,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12070, 'Create table for temporary ID...' ) )
+	if( upg_task_start( 12070, 'Create table for temporary IDs...' ) )
 	{	// part of 6.8.0-alpha
 		db_create_table( 'T_temporary_ID', '
 			tmp_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -8089,10 +8089,23 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12140, 'Updating file types table...' ) )
-	{ // part of 6.7.10-stable moved here so it also applies to 6.8.3 -> 6.8.4 upgrades
+	{	// part of 6.7.10-stable moved here so it also applies to 6.8.3 -> 6.8.4 upgrades
 		$DB->query( 'UPDATE T_filetypes
 				SET ftyp_allowed = "admin"
 			WHERE ftyp_extensions REGEXP "[[:<:]]swf[[:>:]]"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12145, 'Upgrade Temporary IDs table...' ) )
+	{	// part of 6.8.4-stable
+		$DB->query( 'ALTER TABLE T_temporary_ID
+			ADD tmp_coll_ID INT(11) UNSIGNED NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12150, 'Upgrade categories table...' ) )
+	{	// part of 6.8.4-alpha
+		db_add_col( 'T_categories', 'cat_image_file_ID', 'int(10) unsigned  NULL AFTER cat_blog_ID' );
 		upg_task_end();
 	}
 

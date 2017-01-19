@@ -1475,6 +1475,27 @@ textarea.form_textarea_input {
 label.radiooption {
   margin-right: 1em;
 }
+.file_select_wrapper {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-start;
+}
+.file_select_wrapper .file_select_item {
+  display: flex;
+  flex-flow: row wrap;
+  margin-right: 8px;
+  text-align: center;
+}
+.file_select_wrapper .file_select_item .item_actions {
+  display: flex;
+  flex-shrink: 1;
+  flex-flow: column wrap;
+  justify-content: flex-start;
+  align-content: center;
+  justify-content: center;
+  text-align: left;
+  margin-left: 8px;
+}
 div.log_container ul,
 div.action_messages ul,
 div.log_container ol,

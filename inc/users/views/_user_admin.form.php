@@ -424,7 +424,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 		}
 	}
 	$Form->begin_line( T_('From Domain'), NULL, ( $display_user_domain && $perm_stat_edit ? '' : 'info' ) );
-		$Form->info_field( '', $user_domain_formatted.' '.action_icon( NULL, 'magnifier', '', NULL, NULL, NULL, array( 'onclick' => 'return get_whois_info(\''.int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) ).'\');' ), array( 'alt' => 'View Whois info' ) ) );
+		$Form->info_field( '', $user_domain_formatted.' <button class="btn btn-default" onclick="return get_whois_info(\''.int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) ).'\');">'.get_icon( 'magnifier' ).'</button>' );
 		if( $display_user_domain )
 		{	// Display status of Domain if current user has a permission:
 			$domain_status = $Domain ? $Domain->get( 'status' ) : 'unknown';
@@ -683,7 +683,11 @@ function get_whois_info( ip_address )
 		},
 		success: function( result )
 		{
-			openModalWindow( result, '90%', modal_height + 'px', true, 'WHOIS - ' + ip_address, true );
+			if( ajax_response_is_correct( result ) )
+			{
+				result = ajax_debug_clear( result );
+				openModalWindow( result, '90%', modal_height + 'px', true, 'WHOIS - ' + ip_address, true );
+			}
 		}
 	} );
 

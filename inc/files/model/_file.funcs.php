@@ -1991,7 +1991,7 @@ function get_available_filetype_icons()
  */
 function copy_file( $file_path, $root_ID, $path, $check_perms = true )
 {
-	global $current_User;
+	global $current_User, $force_upload_forbiddenext;
 
 	$FileRootCache = & get_FileRootCache();
 	$fm_FileRoot = & $FileRootCache->get_by_ID($root_ID, true);
@@ -2249,6 +2249,7 @@ function display_dragdrop_upload_button( $params = array() )
 			'conflict_file_format'   => 'simple', // 'simple' - file name text, 'full_path_link' - a link with text as full file path
 			'resize_frame'           => false, // Resize frame on upload new image
 			'table_headers'          => '', // Use this html text as table headers when first file is loaded
+			'filename_select'        => '', // Append this text before file name on success uploading of new file
 		), $params );
 
 	$FileRootCache = & get_FileRootCache();
@@ -2266,7 +2267,7 @@ function display_dragdrop_upload_button( $params = array() )
 
 	echo $params['before'];
 
-	if( $params['LinkOwner'] !== NULL && $params['LinkOwner']->is_temp )
+	if( $params['LinkOwner'] !== NULL && $params['LinkOwner']->is_temp() )
 	{	// Use this field to know a form is submitted with temporary link owner(when object is creating and still doesn't exist in DB):
 		echo '<input type="hidden" name="temp_link_owner_ID" value="'.$params['LinkOwner']->get_ID().'" />';
 	}
@@ -2303,8 +2304,7 @@ function display_dragdrop_upload_button( $params = array() )
 		<?php
 		if( $params['LinkOwner'] !== NULL )
 		{	// Add params to link a file right after uploading:
-			$link_owner_type = $params['LinkOwner']->type;
-			echo 'url += "&link_owner='.$link_owner_type.'_'.$params['LinkOwner']->get_ID().'"';
+			echo 'url += "&link_owner='.$params['LinkOwner']->type.'_'.$params['LinkOwner']->get_ID().'_'.intval( $params['LinkOwner']->is_temp() ).'"';
 		}
 		?>
 
@@ -2318,7 +2318,7 @@ function display_dragdrop_upload_button( $params = array() )
 				additional_dropzone: '<?php echo $params['additional_dropzone']; ?>',
 				action: url,
 				sizeLimit: <?php echo ( $Settings->get( 'upload_maxkb' ) * 1024 ); ?>,
-				debug: true,
+				debug: false,
 				messages: {
 					typeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} has an invalid extension. Only {extensions} are allowed.'); ?>',
 					sizeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} cannot be uploaded because it is too large ({fileSize}). The maximum allowed upload size is {sizeLimit}.'); ?>',
@@ -2389,9 +2389,22 @@ function display_dragdrop_upload_button( $params = array() )
 						var table_view = typeof( responseJSON.success.link_ID ) != 'undefined' ? 'link' : 'file';
 
 						var filename_before = '<?php echo str_replace( "'", "\'", $params['filename_before'] ); ?>';
+						var filename_select = '<?php echo str_replace( "'", "\'", $params['filename_select'] ); ?>';
 						if( filename_before != '' )
 						{
 							filename_before = filename_before.replace( '$file_path$', decodeURIComponent( responseJSON.success.path ) );
+						}
+
+						if( filename_select != '' )
+						{
+							if( responseJSON.success.filetype == 'image' )
+							{
+								filename_select = filename_select.replace( '$file_path$', decodeURIComponent( responseJSON.success.path ) );
+							}
+							else
+							{
+								filename_select = '';
+							}
 						}
 
 						var warning = '';
@@ -2416,7 +2429,7 @@ function display_dragdrop_upload_button( $params = array() )
 							this_row.find( '.qq-upload-status' ).html( '' );
 							<?php } ?>
 							this_row.find( '.qq-upload-image' ).html( text );
-							this_row.find( '.qq-upload-file' ).html( filename_before
+							this_row.find( '.qq-upload-file' ).html( filename_before + filename_select
 								+ '<input type="hidden" value="' + responseJSON.success.newpath + '" />'
 								+ '<span class="fname">' + file_name + '</span>' + warning );
 						}

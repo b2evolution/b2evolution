@@ -236,7 +236,7 @@ switch( $action )
 
 		$FileRootCache = & get_FileRootCache();
 		// getting root
-		$root = param( 'root' );
+		$root = param( 'root', 'string' );
 
 		$fm_FileRoot = & $FileRootCache->get_by_ID( $root, true );
 

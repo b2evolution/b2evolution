@@ -124,12 +124,13 @@ if( !empty( $message_renderer_checkboxes ) )
 }
 
 // ####################### ATTACHMENTS/LINKS #########################
-if( is_admin_page() && isset( $GLOBALS['files_Module'] )
-	&& $current_User->check_perm( 'files', 'view' ) )
-{	// Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files:
+if( is_admin_page() && $current_User->check_perm( 'files', 'view' ) )
+{	// If current user has a permission to view the files AND it is back-office:
 	load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
-	global $LinkOwner; // Initialize this object as global because this is used in many link functions
+	// Initialize this object as global because this is used in many link functions:
+	global $LinkOwner;
 	$LinkOwner = new LinkMessage( $edited_Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
+	// Display attachments fieldset:
 	display_attachments_fieldset( $Form, $LinkOwner );
 }
 

@@ -107,6 +107,12 @@ $edited_User = $UserCache->get_by_ID( $user_ID, false, false );
 				$UserSettings->dbupdate();
 				break;
 
+			case 'pst_stale_alert':
+				// unsubscribe from stale posts alert notifications:
+				$UserSettings->set( 'send_pst_stale_alert', '0', $edited_User->ID );
+				$UserSettings->dbupdate();
+				break;
+
 			case 'post_moderator':
 				// unsubscribe from new post moderation notifications:
 				$UserSettings->set( 'notify_post_moderation', '0', $edited_User->ID );

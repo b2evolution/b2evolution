@@ -1185,6 +1185,13 @@ class Skin extends DataObject
 					{	// Only if user wants this:
 						require_js( 'bozo_validator.js', 'blog' );
 					}
+
+					// Require File Uploader js and css:
+					require_js( 'multiupload/fileuploader.js', 'blog' );
+					require_css( 'fileuploader.css', 'blog' );
+					// Load JS files to make the links table sortable:
+					require_js( '#jquery#' );
+					require_js( 'jquery/jquery.sortable.min.js' );
 					break;
 
 				case 'disp_edit_comment':
@@ -1306,8 +1313,9 @@ class Skin extends DataObject
 				switch( $name )
 				{
 					case 'Results':
+					case 'compact_results':
 						// Results list (Used to view the lists of the users, messages, contacts and etc.):
-						return array(
+						$results_template = array(
 							'page_url' => '', // All generated links will refer to the current page
 							'before' => '<div class="results panel panel-default">',
 							'content_start' => '<div id="$prefix$ajax_content">',
@@ -1401,6 +1409,18 @@ class Skin extends DataObject
 							'after' => '</div>',
 							'sort_type' => 'basic'
 						);
+						if( $name == 'compact_results' )
+						{	// Use a little different template for compact results table:
+							$results_template = array_merge( $results_template, array(
+									'before' => '<div class="results">',
+									'head_title' => '',
+									'no_results_start' => '<div class="table_scroll">'."\n"
+																				.'<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0"><tbody>'."\n",
+									'no_results_end'   => '<tr class="lastline noresults"><td class="firstcol lastcol">$no_results$</td></tr>'
+																				.'</tbody></table></div>'."\n\n",
+								) );
+						}
+						return $results_template;
 
 					case 'blockspan_form':
 						// Form settings for filter area:
@@ -1646,6 +1666,7 @@ class Skin extends DataObject
 		switch( $name )
 		{
 			case 'Results':
+			case 'compact_results':
 				// Results list:
 				return array(
 					'page_url' => '', // All generated links will refer to the current page
