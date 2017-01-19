@@ -86,6 +86,11 @@ class Chapter extends DataObject
 	var $subcat_ordering;
 
 	/**
+	 * Category image
+ 	 */
+	var $image_file_ID;
+
+	/**
 	 * Constructor
 	 *
 	 * @param table Database row
@@ -101,11 +106,12 @@ class Chapter extends DataObject
 			$this->set( 'blog_ID', $subset_ID );
 		}
 		else
-		{	// Wa are loading an object:
+		{	// We are loading an object:
 			$this->ID = $db_row->cat_ID;
 			$this->name = $db_row->cat_name;
 			$this->parent_ID = $db_row->cat_parent_ID;
 			$this->blog_ID = $db_row->cat_blog_ID;
+			$this->image_file_ID = $db_row->cat_image_file_ID;
 			$this->urlname = $db_row->cat_urlname;
 			$this->description = $db_row->cat_description;
 			$this->order = $db_row->cat_order;
@@ -297,6 +303,10 @@ class Chapter extends DataObject
 		{	// Set parent ID:
 			$this->set_from_Request( 'parent_ID' );
 		}
+
+		// Check image file
+		param( 'cat_image_file_ID', 'integer' );
+		$this->set_from_Request( 'image_file_ID' );
 
 		// Check url name
 		param( 'cat_urlname', 'string' );
@@ -609,6 +619,9 @@ class Chapter extends DataObject
 		{
 			case 'subcat_ordering':
 				return $this->get_subcat_ordering( false );
+
+			case 'image_file_ID':
+				return $this->image_file_ID;
 		}
 
 		return parent::get( $parname );
@@ -822,6 +835,9 @@ class Chapter extends DataObject
 		{
  			case 'parent_ID':
 				return $this->set_param( $parname, 'string', $parvalue, true );
+
+			case 'image_file_ID':
+				return $this->set_param( $parname, 'integer', $parvalue, true );
 
 			case 'name':
 			case 'urlname':

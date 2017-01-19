@@ -157,6 +157,7 @@ param( 'linkdata', 'string', '', true );
 
 // Name of the iframe we want some actions to come back to:
 param( 'iframe_name', 'string', '', true );
+param( 'field_name', 'string', '', true );
 
 // Get root:
 $ads_list_path = false; // false by default, gets set if we have a valid root

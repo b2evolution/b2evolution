@@ -8101,6 +8101,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$DB->query( 'ALTER TABLE T_temporary_ID
 			ADD tmp_coll_ID INT(11) UNSIGNED NULL' );
 		upg_task_end();
+
+	if( upg_task_start( 12150, 'Upgrade categories table...' ) )
+	{	// part of 6.8.4-alpha
+		db_add_col( 'T_categories', 'cat_image_file_ID', 'int(10) unsigned  NULL AFTER cat_blog_ID' );
+		upg_task_end();
 	}
 
 	/*
