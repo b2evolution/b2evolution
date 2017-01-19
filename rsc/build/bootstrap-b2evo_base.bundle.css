@@ -1488,7 +1488,9 @@ label.radiooption {
 }
 .file_select_wrapper .file_select_item .item_actions {
   display: flex;
+  flex-shrink: 1;
   flex-flow: column wrap;
+  justify-content: flex-start;
   align-content: center;
   justify-content: center;
   text-align: left;

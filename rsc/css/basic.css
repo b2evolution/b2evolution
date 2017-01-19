@@ -846,9 +846,16 @@ label.radiooption {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  -webkit-flex-shrink: 1;
+      -ms-flex-negative: 1;
+          flex-shrink: 1;
   -webkit-flex-flow: column wrap;
       -ms-flex-flow: column wrap;
           flex-flow: column wrap;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
   -webkit-align-content: center;
       -ms-flex-line-pack: center;
           align-content: center;
