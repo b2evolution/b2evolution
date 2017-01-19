@@ -144,6 +144,15 @@ textarea.message_text {
 .evo_post .small.text-muted a .glyphicon {
   color: inherit;
 }
+.price_note {
+  position: absolute;
+  right: 14px;
+  top: -1px;
+  z-index: 1;
+}
+.price_note > span > span {
+  box-shadow: 0px 0px 20px -9px rgba(0, 0, 0, 0.75);
+}
 .evo_hasbgimg {
   background-repeat: no-repeat;
   background-size: cover;
@@ -265,18 +274,23 @@ div.action_messages,
 div.log_container {
   margin: 0;
 }
-.evo_post_title {
-  display: table;
-}
 .evo_post_title h2 {
-  display: table-cell;
   margin: 0;
-  padding: 20px 0 10px;
+  padding: 10px 0 10px;
+}
+.evo_post_title h2 a {
+  font-size: 20px;
 }
 .evo_post_title .btn-group {
   display: table-cell;
   padding: 20px 0 10px 30px;
   vertical-align: middle;
+}
+.evo_image_block {
+  margin: 0;
+}
+.edit-link-wrapper {
+  text-align: center;
 }
 footer.row {
   margin-top: 20px;

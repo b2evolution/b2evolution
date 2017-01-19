@@ -12,17 +12,6 @@
 	margin-top: 0;
 }
 
-// Intro post - Featured post background images sample
-//.well {
-//	background: url(images/7T0W8MYRN0.jpg) no-repeat center center;
-//	-webkit-background-size: cover;
-//	-moz-background-size: cover;
-//	-o-background-size: cover;
-//	background-size: cover;
-//	width: 100%;
-//	height: auto;
-//}
-
 // Login widget form
 .widget_core_user_login {
 	#login_form {
@@ -189,11 +178,16 @@ textarea.message_text {
 			color: inherit;
 		}
 	}
-// MILOS > @fp - This makes both "Comments" and "Full Story" button are displayed inline
-//	.more_link_button, .post_comments_link {
-//		display: inline-block;
-//		margin-right: 5px;
-//	}
+}
+// Price change
+.price_note {
+    position: absolute;
+    right: 14px;
+	top: -1px;
+    z-index: 1;
+	& > span > span {
+		box-shadow: 0px 0px 20px -9px rgba(0,0,0,0.75);
+	}
 }
 .evo_hasbgimg {
 	background-repeat: no-repeat;
@@ -323,17 +317,26 @@ div.action_messages, div.log_container {
 
 // Positions on the action buttons near page titles
 .evo_post_title {
-	display: table;
 	h2 {
-		display: table-cell;
 		margin: 0;
-		padding: 20px 0 10px;
+		padding: 10px 0 10px;
+		a {
+			font-size: 20px;
+		}
 	}
 	.btn-group {
 		display: table-cell;
 		padding: 20px 0 10px 30px;
 		vertical-align: middle;
 	}
+}
+
+// Images wrapper
+.evo_image_block {
+	margin: 0;
+}
+.edit-link-wrapper {
+	text-align: center;
 }
 
 // This skin needs this for disp=posts to separate from lower pagination

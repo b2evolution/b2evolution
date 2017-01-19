@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * ATTENTION: if you make a new skin you have to change the class name below accordingly
  */
-class bootstrap_blog_Skin extends Skin
+class bootstrap_catalog_Skin extends Skin
 {
 	/**
 	 * Skin version
@@ -36,7 +36,7 @@ class bootstrap_blog_Skin extends Skin
 	 */
 	function get_default_name()
 	{
-		return 'Bootstrap Blog';
+		return 'Bootstrap Catalog';
 	}
 
 
@@ -151,7 +151,27 @@ class bootstrap_blog_Skin extends Skin
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
 				),
-
+				
+				
+				'section_posts_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Articles Settings')
+				),
+					'post_columns' => array(
+						'label' => T_('Article columns'),
+						'note' => T_('Select how many columns of articles you want to display.'),
+						'defaultvalue' => 'three_columns',
+						'options' => array(
+								'one_column'        => T_('One column'),
+								'two_columns'       => T_('Two columns'),
+								'three_columns'   	=> T_('Three columns'),
+								'four_columns'  	=> T_('Four columns'),
+							),
+						'type' => 'select',
+					),
+				'section_posts_end' => array(
+					'layout' => 'end_fieldset',
+				),
 
 				'section_color_start' => array(
 					'layout' => 'begin_fieldset',
@@ -541,6 +561,31 @@ class bootstrap_blog_Skin extends Skin
 				// Right Sidebar
 			default:
 				return 'col-md-9';
+		}
+	}
+	
+	
+	/**
+	 * Get value for attbiute "class" of column block
+	 * depending on skin setting "Layout"
+	 *
+	 * @return string
+	 */
+	function get_post_columns_count()
+	{
+		switch( $this->get_setting( 'post_columns' ) )
+		{
+			case 'one_column':
+				// Single Column Large
+				return 'col-md-12';
+			case 'two_columns':
+				// Single Column Large
+				return 'col-md-6';
+			case 'four_columns':
+				// Single Column Large
+				return 'col-md-3';
+			default:
+				return 'col-md-4';
 		}
 	}
 }
