@@ -386,7 +386,7 @@ class bootstrap_gallery_legacy_Skin extends Skin
 		}
 		if( ! empty( $custom_styles ) )
 		{
-			$custom_css .= '	body, .panel, .avatar_main_frame { '.implode( ';', $custom_styles )." }\n";
+			$custom_css .= '	body { '.implode( ';', $custom_styles )." }\n";
 		}
 
 		global $thumbnail_sizes;

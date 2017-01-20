@@ -577,6 +577,11 @@ div.evo_image_index div:hover {
 .label {
   font-size: 14px !important;
 }
+.panel,
+.avatar_main_frame,
+.pagination li a {
+  background-color: transparent;
+}
 .powered_by a img {
   background-color: #ffffff;
   border-radius: 4px;
