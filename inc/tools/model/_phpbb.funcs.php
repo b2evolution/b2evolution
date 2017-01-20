@@ -1397,6 +1397,11 @@ function phpbb_import_topics()
 	phpbb_table_add( 'topics' );
 	phpbb_table_insert_links( 'topics', $topics_IDs );
 
+	if( empty( $path_attachments ) )
+	{	// Count missing attachments of the imported topics if the path is not correct:
+		phpbb_count_missing_attachments( array_keys( $topics_IDs ) );
+	}
+
 	$DB->commit();
 
 	phpbb_set_var( 'topics_count_imported', $phpbb_topics_count_imported );
@@ -1591,6 +1596,7 @@ function phpbb_import_replies()
 	$phpbb_replies_count_imported = 0;
 	$comments_import_data = array();
 	$comments_slugs_import_data = array();
+	$replies_IDs = array();
 	do
 	{	// Split by page to optimize process
 		// It gives to save the memory rather than if we get all replies by one query without LIMIT clause
@@ -1646,6 +1652,8 @@ function phpbb_import_replies()
 				'comment_status'         => $DB->quote( 'published' ),
 			);
 
+			$replies_IDs[] = $phpbb_reply->post_id;
+
 			$comments_import_data[ $phpbb_reply->post_id ] = '( '.implode( ', ', $comment_data ).' )';
 
 			$comments_slugs_import_data[] = '( '.$DB->quote( 'forumpost-'.$phpbb_reply->post_id ).', '.$DB->quote( 'item' ).', '.$DB->quote( $topics_IDs[ (string) $phpbb_reply->topic_id ] ).' )';
@@ -1673,6 +1681,14 @@ function phpbb_import_replies()
 	if( count( $comments_import_data ) > 0 )
 	{	// Insert the rest comments:
 		phpbb_insert_comments( $comments_import_data, $comments_slugs_import_data );
+	}
+
+	// Get a path where we should import the reply attachments from:
+	$path_attachments = phpbb_get_import_path( 'path_attachments' );
+
+	if( empty( $path_attachments ) )
+	{	// Count missing attachments of the imported replies if the path is not correct:
+		phpbb_count_missing_attachments( $replies_IDs );
 	}
 
 	$DB->commit();
@@ -1995,6 +2011,10 @@ function phpbb_import_messages_texts( $thread_ID, $message )
 			$m++;
 		}
 	}
+	else
+	{	// Count missing attachments of the imported messages if the path is not correct:
+		phpbb_count_missing_attachments( array_keys( $message_import_data ) );
+	}
 
 	mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'messaging__threadstatus ( tsta_thread_ID, tsta_user_ID, tsta_first_unread_msg_ID )
 			VALUES '.implode( ', ', $threadstatus_import_data ) );
@@ -2257,15 +2277,48 @@ function phpbb_import_avatar( $user_ID, $path_avatars, $user_avatar )
  * @param string Attachments path
  * @param integer ID of topic, reply or private message (from phpBB DB)
  * @param integer ID of topic, reply or private message (from b2evolution DB)
- * @param array|NULL Array of insert data or NULL to generate new
  */
 function phpbb_import_attachments( $target_type, $path_attachments, $target_ID, $new_object_ID )
 {
-	// Generate new data of insert query:
-	$attachments_insert_data = phpbb_get_attachments_insert_data( $target_type, $path_attachments, $target_ID, $new_object_ID );
+	if( empty( $path_attachments ) )
+	{	// Only count what missing attachments if the path is not correct:
+		phpbb_count_missing_attachments( $target_ID );
+	}
+	else
+	{	// Do the import if the path is correct:
 
-	// Insert the links in DB:
-	phpbb_insert_attachments( $target_type, $attachments_insert_data );
+		// Generate new data of insert query:
+		$attachments_insert_data = phpbb_get_attachments_insert_data( $target_type, $path_attachments, $target_ID, $new_object_ID );
+
+		// Insert the links in DB:
+		phpbb_insert_attachments( $target_type, $attachments_insert_data );
+	}
+}
+
+
+/**
+ * Count the missing attachments of topic, reply or private message
+ *
+ * @param array IDs of topic, reply or private message (from phpBB DB)
+ */
+function phpbb_count_missing_attachments( $target_IDs )
+{
+	global $phpbb_DB;
+
+	if( empty( $target_IDs ) )
+	{	// No targets, Don't count:
+		return;
+	}
+
+	$attachments_count_missing = phpbb_get_var( 'attachments_count_missing' );
+
+	// Get how much attachments have the targets:
+	$targets_missing_count = $phpbb_DB->get_var( 'SELECT COUNT( attach_id )
+		 FROM BB_attachments
+		WHERE post_msg_id IN ( '.$phpbb_DB->quote( $target_IDs ).' )' );
+
+	// Update the count of imported/missing attachments:
+	phpbb_set_var( 'attachments_count_missing', $attachments_count_missing + $targets_missing_count );
 }
 
 
