@@ -149,6 +149,9 @@ textarea.message_text {
 .evo_form__comment .form-group .controls .form-control-static {
   text-align: left;
 }
+.evo_post_comment_notification a {
+  white-space: normal;
+}
 .evo_post {
   margin-bottom: 2em;
 }
