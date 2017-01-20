@@ -457,7 +457,7 @@ if( $upload )
 			$message['status'] = 'success';
 			report_user_upload( $newFile );
 		}
-
+		$message['filetype'] = $newFile->get( 'type' );
 		$message['newname'] = $newName;
 		$message['newpath'] = $newFile->get_root_and_rel_path();
 		$message['warning'] = $warning;

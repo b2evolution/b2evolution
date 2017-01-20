@@ -668,6 +668,13 @@ $dirpath_max_length = ( ( ( strtoupper( substr( PHP_OS, 0, 3 ) ) ) === 'WIN' ) ?
 
 
 /**
+ * Allow double dots in file names
+ * Use TRUE if you want to allow ".." in file and directory names like "..filename" or "dir..name"
+ */
+$filemanager_allow_dotdot_in_filenames = false;
+
+
+/**
  * XMLRPC logging. Set this to 1 to log XMLRPC calls received by this server (into /xmlsrv/xmlrpc.log).
  *
  * Default: 0

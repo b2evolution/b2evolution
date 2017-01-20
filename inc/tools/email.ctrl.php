@@ -86,7 +86,8 @@ switch( $action )
 				$Settings->set( 'notification_long_name',  param( 'notification_long_name', 'string', '' ) );
 
 				// Site logo url
-				$Settings->set( 'notification_logo',  param( 'notification_logo', 'string', '' ) );
+				//$Settings->set( 'notification_logo',  param( 'notification_logo', 'string', '' ) );
+				$Settings->set( 'notification_logo',  param( 'notification_logo', 'integer', NULL ) );
 				break;
 
 			case 'plugins':
@@ -255,7 +256,7 @@ switch( $action )
 		}
 
 		if( ! $Messages->has_errors() )
-		{  
+		{
 			if( $Settings->dbupdate() )
 			{
 				if( ! empty( $syslog_message ) )

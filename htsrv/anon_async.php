@@ -1484,6 +1484,39 @@ switch( $action )
 		echo 'ok';
 		break;
 
+	case 'get_file_select_item':
+		$field_params = param( 'params', 'array', true );
+		$field_name = param( 'field_name', 'string', true );
+		$root = param( 'root', 'string', true );
+		$file_path = param( 'path', 'string', true );
+
+		$FileCache = & get_FileCache();
+		list( $root_type, $root_in_type_ID ) = explode( '_', $root, 2 );
+		if( ! ( $current_File = $FileCache->get_by_root_and_path( $root_type, $root_in_type_ID, $file_path ) ) )
+		{	// No file:
+			debug_die( 'No such file' );
+			// Exit here.
+		}
+
+		if( ! $current_File->is_image() )
+		{
+			debug_die( 'Incorrect file type for '.$field_name );
+		}
+
+		// decode params with HTML tags
+		$field_params['field_item_start'] = base64_decode( $field_params['field_item_start'] );
+		$field_params['field_item_end'] = base64_decode( $field_params['field_item_end'] );
+
+		$current_File->load_meta( true ); // erhsatingin > can we force create file meta in DB here or should this whole thing require login?
+		$r = file_select_item( $current_File->ID, $field_params );
+
+		echo json_encode( array(
+				'fieldName' => $field_name,
+				'fieldValue' => $current_File->ID,
+				'item' => base64_encode( $r )
+			) );
+		break;
+
 	default:
 		$Ajaxlog->add( T_('Incorrect action!'), 'error' );
 		break;

@@ -29,7 +29,7 @@ class LinkItem extends LinkOwner
 	 * Constructor
 	 *
 	 * @param object Item
-	 * @param integer ID of temporary object from table T_temporary_ID (Used to link files to new creating item)
+	 * @param integer ID of temporary object from table T_temporary_ID (used for uploads on new items)
 	 */
 	function __construct( $Item, $tmp_ID = NULL )
 	{

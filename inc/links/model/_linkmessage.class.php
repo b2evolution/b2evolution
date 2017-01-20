@@ -29,7 +29,7 @@ class LinkMessage extends LinkOwner
 	 * Constructor
 	 *
 	 * @param object Message
-	 * @param integer ID of temporary object from table T_temporary_ID (Used to link files to new creating message)
+	 * @param integer ID of temporary object from table T_temporary_ID (used for uploads on new messages)
 	 */
 	function __construct( $Message, $tmp_ID = NULL )
 	{

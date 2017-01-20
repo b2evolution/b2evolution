@@ -107,7 +107,7 @@ switch( $action )
 			// Highlight lines starting with orgname: or org-name: (case insensitive)
 			for( $i = 0; $i < count( $result['rawdata'] ); $i++ )
 			{
-				if( preg_match( '/^(orgname:|org-name:)/i', $result['rawdata'][$i] ) )
+				if( preg_match( '/^(orgname:|org-name:|descr:)/i', $result['rawdata'][$i] ) )
 				{
 					$result['rawdata'][$i] = '<span style="font-weight: bold; background-color: yellow;">'.$result['rawdata'][$i].'</span>';
 				}
@@ -766,6 +766,36 @@ switch( $action )
 		echo '<div style="background:#FFF;height:90%">'
 				.'<span id="link_attachment_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
 				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=upload&amp;ajax_request=1&amp;iframe_name='.$iframe_name.'&amp;fm_mode=link_object&amp;link_type='.$link_owner_type.'&amp;link_object_ID='.$link_owner_ID.$additional_params.'"'
+					.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"'
+					.' onload="document.getElementById(\'link_attachment_loader\').style.display=\'none\'">loading</iframe>'
+			.'</div>';
+
+		break;
+
+	case 'file_attachment':
+		// The content for popup window to link the files to the items/comments
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
+
+		// Check permission:
+		$current_User->check_perm( 'files', 'view' );
+
+		param( 'iframe_name', 'string', '' );
+		param( 'field_name', 'string', '' );
+		// Additional params, Used to highlight file/folder
+		param( 'root', 'string', '' );
+		param( 'path', 'string', '' );
+		param( 'fm_highlight', 'string', '' );
+
+		$additional_params = empty( $root ) ? '' : '&amp;root='.$root;
+		$additional_params .= empty( $path ) ? '' : '&amp;path='.$path;
+		$additional_params .= empty( $fm_highlight ) ? '' : '&amp;fm_highlight='.$fm_highlight;
+		//$additional_params .= empty( $field_name ) ? '' : '&amp;field_name='.$field_name;
+
+		echo '<div style="background:#FFF;height:90%">'
+				.'<span id="link_attachment_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
+				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=upload&amp;field_name='.$field_name.'&amp;ajax_request=1&amp;iframe_name='.$iframe_name.'&amp;fm_mode=file_select'.$additional_params.'"'
 					.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"'
 					.' onload="document.getElementById(\'link_attachment_loader\').style.display=\'none\'">loading</iframe>'
 			.'</div>';

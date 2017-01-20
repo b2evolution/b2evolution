@@ -40,8 +40,16 @@ if( $Settings->get( 'notification_logo' ) != '' || $Settings->get( 'notification
 <?php
 if( $Settings->get( 'notification_logo' ) != '' )
 { // Display site logo
-	$site_name = $Settings->get( 'notification_long_name' ) != '' ? $Settings->get( 'notification_long_name' ) : $Settings->get( 'notification_short_name' );
-	echo '<img src="'.$Settings->get( 'notification_logo' ).'" alt="'.$site_name.'" />';
+	$FileCache = & get_FileCache();
+	if( ( $File = get_FileCache()->get_by_ID( $Settings->get( 'notification_logo' ), false ) ) && $File->is_image() )
+	{
+		$site_name = $Settings->get( 'notification_long_name' ) != '' ? $Settings->get( 'notification_long_name' ) : $Settings->get( 'notification_short_name' );
+		echo '<img src="'.$File->get_url().'" alt="'.$site_name.'" />';
+	}
+	else
+	{
+		echo '<p'.emailskin_style( '.p+p.sitename' ).'>'.$Settings->get( 'notification_long_name' ).'</p>';
+	}
 }
 else
 { // No logo, Display only long site name

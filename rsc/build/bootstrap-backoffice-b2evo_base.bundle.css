@@ -1475,6 +1475,27 @@ textarea.form_textarea_input {
 label.radiooption {
   margin-right: 1em;
 }
+.file_select_wrapper {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-start;
+}
+.file_select_wrapper .file_select_item {
+  display: flex;
+  flex-flow: row wrap;
+  margin-right: 8px;
+  text-align: center;
+}
+.file_select_wrapper .file_select_item .item_actions {
+  display: flex;
+  flex-shrink: 1;
+  flex-flow: column wrap;
+  justify-content: flex-start;
+  align-content: center;
+  justify-content: center;
+  text-align: left;
+  margin-left: 8px;
+}
 div.log_container ul,
 div.action_messages ul,
 div.log_container ol,
@@ -2233,11 +2254,6 @@ select:focus:invalid:focus {
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
   -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
-}
-.panel,
-.pagination > li > a,
-.pagination > li > span {
-  background-color: transparent;
 }
 .panel-heading h4 {
   margin: 0;
