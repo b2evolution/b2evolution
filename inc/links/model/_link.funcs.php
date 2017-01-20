@@ -460,18 +460,9 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 		}
 		$r .= ' '.get_icon( 'add', 'imgtag', array(
 				'title'   => sprintf( T_('Insert %s into the post'), $type ),
-				'onclick' => 'evo_link_insert_inline( \''.$type.'\', '.$link_ID.', \'\' )',
+				'onclick' => 'evo_item_image_insert( '.$blog.', \'image\', '.$link_ID.', \'evo_link_insert_tag\' )',
 				'style'   => 'cursor:default;'
 			) );
-
-		if( $type == 'image' )
-		{
-			$r .= ' '.get_icon( 'add__yellow', 'imgtag', array(
-					'title'   => T_('Insert thumbnail into the post'),
-					'onclick' => 'evo_item_image_insert( '.$blog.', \'image\', '.$link_ID.', \'evo_link_insert_tag\' )',
-					'style'   => 'cursor:default;'
-				) );
-		}
 	}
 
 	return $r;

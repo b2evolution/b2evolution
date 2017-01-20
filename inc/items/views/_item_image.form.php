@@ -29,10 +29,10 @@ global $inline_class;
 	</ul>
 	<?php endif;?>
 	<div style="margin-top: 20px; display: flex; flex-flow: row nowrap; align-items: flex-start;">
-		<div style="display: flex; align-items: center; min-height: 192px;">
+		<div id="image_preview" style="display: flex; align-items: center; min-height: 192px; margin-right: 10px;">
 		<?php echo $File->get_thumb_imgtag( 'fit-192x192' ); ?>
 		</div>
-		<div>
+		<div style="flex-grow: 1">
 			<?php
 			$Form = new Form( NULL, 'form' );
 			$Form->begin_form( 'fform' );
@@ -40,14 +40,14 @@ global $inline_class;
 			$Form->begin_fieldset( T_('Parameters') );
 			echo '<div class="tab-content">';
 				echo '<div id="image" class="tab-pane'.($tag_type == 'image' ? ' active' : '' ).'">';
-				$Form->text( 'image_caption', $image_caption, 40, T_('Caption') );
-				$Form->checkbox( 'image_disable_caption', $image_disable_caption, '', T_('Disable caption') );
-				$Form->text( 'image_class', $image_class, 40, T_('Styles') );
-				$Form->info( '',
-						'<button class="btn btn-default btn-sm">border</button>
-						<button class="btn btn-default btn-sm">noborder</button>
-						<button class="btn btn-default btn-sm">rounded</button>
-						<button class="btn btn-default btn-sm">squared</button>' );
+				$Form->text( 'image_caption', $image_caption, 40, T_('Caption'), '<br>
+						<span style="display: flex; flex-flow: row; align-items: center; margin-top: 8px;">
+							<input type="checkbox" name="image_disable_caption" id="image_disable_caption" value="1" style="margin: 0 8px 0 0;"><span>'.T_('Disable caption').'</span></span>' );
+				$Form->text( 'image_class', $image_class, 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
+						<button class="btn btn-default btn-xs">border</button>
+						<button class="btn btn-default btn-xs">noborder</button>
+						<button class="btn btn-default btn-xs">rounded</button>
+						<button class="btn btn-default btn-xs">squared</button></div>' );
 				echo '</div>';
 
 				echo '<div id="thumbnail" class="tab-pane'.($tag_type == 'thumbnail' ? ' active' : '' ).'">';
@@ -60,19 +60,19 @@ global $inline_class;
 						array( 'left', 'left' ),
 						array( 'right', 'right' )
 					), T_( 'Alignment') );
-				$Form->text( 'thumbnail_class', $thumbnail_class, 40, T_('Styles') );
-				$Form->info( '', '<button class="btn btn-default btn-sm">border</button>
-						<button class="btn btn-default btn-sm">noborder</button>
-						<button class="btn btn-default btn-sm">rounded</button>
-						<button class="btn btn-default btn-sm">squared</button>' );
+				$Form->text( 'thumbnail_class', $thumbnail_class, 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
+						<button class="btn btn-default btn-xs">border</button>
+						<button class="btn btn-default btn-xs">noborder</button>
+						<button class="btn btn-default btn-xs">rounded</button>
+						<button class="btn btn-default btn-xs">squared</button></div>' );
 				echo '</div>';
 
 				echo '<div id="inline" class="tab-pane'.($tag_type == 'inline' ? ' active' : '' ).'">';
-				$Form->text( 'inline_class', $inline_class, 40, T_('Styles') );
-				$Form->info( '', '<button class="btn btn-default btn-sm">border</button>
-						<button class="btn btn-default btn-sm">noborder</button>
-						<button class="btn btn-default btn-sm">rounded</button>
-						<button class="btn btn-default btn-sm">squared</button>' );
+				$Form->text( 'inline_class', $inline_class, 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
+						<button class="btn btn-default btn-xs">border</button>
+						<button class="btn btn-default btn-xs">noborder</button>
+						<button class="btn btn-default btn-xs">rounded</button>
+						<button class="btn btn-default btn-xs">squared</button></div>' );
 				echo '</div>';
 			echo '</div>';
 
@@ -84,30 +84,50 @@ global $inline_class;
 
 			<script type="text/javascript">
 			jQuery( document ).ready( function() {
+				var img = jQuery( "#image_preview img" );
 				var tagType = jQuery( '.tab-content .tab-pane.active' ).attr( 'id' );
 
-				jQuery( 'div.tab-pane button.btn-sm' ).click( function() {
+				jQuery( 'div.tab-pane div.style_buttons button' ).click( function() {
 					return evo_image_add_class( this, jQuery( this ).text() );
 				} );
+
+				jQuery( "input[name$='_class']" ).on( 'change keydown', debounce( function() {
+					apply_image_class( jQuery( this ).val() );
+				}, 200 ) );
 
 				jQuery( 'input[name="' + tagType + '_disable_caption"]' ).click( function() {
 						var checkbox = jQuery( this );
 						jQuery( 'input[name="' + tagType + '_caption"]' ).prop( 'disabled', checkbox.is( ':checked' ) );
-					})
+					});
 			} );
+
+			function apply_image_class( imageClasses )
+			{
+				var img = jQuery( "#image_preview img" );
+
+				imageClasses = imageClasses.split( '.' );
+				img.removeClass();
+				for( var i = 0; i < imageClasses.length; i++ )
+				{
+					img.addClass( imageClasses[i] );
+				}
+			}
 
 			function evo_image_add_class( event_obj, className )
 			{
 				var input = jQuery( "input[name$='_class']", jQuery( event_obj ).closest( "div.tab-pane" ) );
+				var img = jQuery( "#image_preview img" );
 				var styles = input.val();
 
 				styles = styles.split( '.' );
 				if( styles.indexOf( className ) == -1 )
 				{
 					styles.push( className );
+					//img.addClass( className );
 				}
 
 				input.val( styles.join( '.' ) );
+				apply_image_class( input.val() );
 				return false;
 			}
 
@@ -165,6 +185,13 @@ global $inline_class;
 				{
 					callback = context[callback];
 					callback( shortTag );
+				}
+
+				// Trigger display position change
+				var display_position_select = jQuery( '#display_position_<?php echo $link_ID;?>' );
+				if( display_position_select.length )
+				{
+					display_position_select.val( 'inline' ).trigger( 'change' );
 				}
 
 				closeModalWindow();
