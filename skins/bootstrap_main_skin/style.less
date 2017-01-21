@@ -8,8 +8,22 @@
 		text-align: right;
 	}
 }
-div.widget_core_coll_tagline {
-	margin-bottom: 30px;
+// div.widget_core_coll_tagline {
+	// margin-bottom: 30px;
+// }
+.evo_container__front_page_primary {
+	padding-bottom: 30px;
+	.evo_widget {
+		margin-top: 30px;
+		div, h1, h2, p {
+			margin-top: 0;
+		}
+		div > p:last-child,
+		&:last-child > ul,
+		& > ul li:last-child {
+			margin-bottom: 0 !important;
+		}
+	}
 }
 .evo_container__front_page_secondary {
 	padding-top: 30px;
