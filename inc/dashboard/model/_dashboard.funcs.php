@@ -209,7 +209,7 @@ function get_comments_awaiting_moderation_number( $blog_ID )
 	global $DB;
 
 	$BlogCache = & get_BlogCache();
-	$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 	$moderation_statuses = $Blog->get_setting( 'moderation_statuses' );
 	$moderation_statuses_condition = '\''.str_replace( ',', '\',\'', $moderation_statuses ).'\'';
 
@@ -247,7 +247,7 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 	if( is_null( $CommentList ) )
 	{ // Inititalize CommentList
 		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 
 		$CommentList = new CommentList2( $Blog, NULL, 'CommentCache', 'cmnt_fullview_', 'fullview' );
 		$exlude_ID_list = NULL;
@@ -291,7 +291,7 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		if( ! $is_meta )
 		{	// Display status banner only for normal comments:
 			$Comment->format_status( array(
-					'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+					'template' => '<div class="floatright"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 				) );
 		}
 
@@ -313,7 +313,7 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		}
 		echo $Comment->get_title( array(
 				'author_format' => '<strong>%s</strong>',
-				'link_text'     => 'login',
+				'link_text'     => 'auto',
 				'linked_type'   => $is_meta,
 			) );
 		$comment_Item = & $Comment->get_Item();
@@ -435,7 +435,7 @@ function get_table_count( $table_name, $sql_where = '', $sql_from = '', $sql_tit
  */
 function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 {
-	global $Blog, $current_User, $admin_url;
+	global $Collection, $Blog, $current_User, $admin_url;
 
 	// Create empty List:
 	$ItemList = new ItemList2( $Blog, NULL, NULL );
@@ -493,7 +493,7 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 		$Item->get_creator_User();
 
 		$Item->format_status( array(
-				'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+				'template' => '<div class="floatright"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 			) );
 
 		echo '<div class="dashboard_float_actions">';

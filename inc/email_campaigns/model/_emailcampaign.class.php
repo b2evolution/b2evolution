@@ -96,6 +96,8 @@ class EmailCampaign extends DataObject
 	{
 		return array(
 				array( 'table'=>'T_email__campaign_send', 'fk'=>'csnd_camp_ID', 'msg'=>T_('%d links with users') ),
+				array( 'table'=>'T_links', 'fk'=>'link_ecmp_ID', 'msg'=>T_('%d links to destination email campaigns'),
+						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
 			);
 	}
 
@@ -243,6 +245,12 @@ class EmailCampaign extends DataObject
 
 		$email_text = $this->get( 'email_text' );
 
+		// Render inline file tags like [image:123:caption] or [file:123:caption] :
+		$email_text = render_inline_files( $email_text, $this, array(
+				'check_code_block' => true,
+				'image_size'       => 'original',
+			) );
+
 		// This must get triggered before any internal validation and must pass all relevant params.
 		$Plugins->trigger_event( 'EmailFormSent', array(
 				'content'         => & $email_text,
@@ -259,6 +267,7 @@ class EmailCampaign extends DataObject
 
 		// Save plain-text message:
 		$email_plaintext = preg_replace( '#<a[^>]+href="([^"]+)"[^>]*>[^<]*</a>#i', ' [ $1 ] ', $this->get( 'email_html' ) );
+		$email_plaintext = preg_replace( '#<img[^>]+src="([^"]+)"[^>]*>#i', ' [ $1 ] ', $email_plaintext );
 		$email_plaintext = preg_replace( '#[\n\r]#i', ' ', $email_plaintext );
 		$email_plaintext = preg_replace( '#<(p|/h[1-6]|ul|ol)[^>]*>#i', "\n\n", $email_plaintext );
 		$email_plaintext = preg_replace( '#<(br|h[1-6]|/li|code|pre|div|/?blockquote)[^>]*>#i', "\n", $email_plaintext );
@@ -331,7 +340,7 @@ class EmailCampaign extends DataObject
 		{ // Email title is empty
 			if( $display_messages )
 			{
-				$Messages->add( T_('Please enter an email title.'), 'error' );
+				$Messages->add_to_group( T_('Please enter an email title for this campaign.'), 'error', T_('Validation errors:') );
 			}
 			$result = false;
 		}
@@ -340,7 +349,7 @@ class EmailCampaign extends DataObject
 		{	// Email message is empty:
 			if( $display_messages )
 			{
-				$Messages->add( T_('Please enter a text message.'), 'error' );
+				$Messages->add_to_group( T_('Please enter the email text for this campaign.'), 'error', T_('Validation errors:') );
 			}
 			$result = false;
 		}
@@ -349,7 +358,7 @@ class EmailCampaign extends DataObject
 		{ // No users found which wait this newsletter
 			if( $display_messages )
 			{
-				$Messages->add( T_('No recipients found for this campaign.'), 'error' );
+				$Messages->add_to_group( T_('No recipients found for this campaign.'), 'error', T_('Validation errors:') );
 			}
 			$result = false;
 		}
@@ -501,12 +510,12 @@ class EmailCampaign extends DataObject
 		$wait_count = count( $this->users['wait'] );
 		if( $wait_count > 0 )
 		{	// Some recipients still wait this newsletter:
-			$Messages->add( sprintf( T_('Campaign has been sent to a chunk of %s recipients. %s recipients were skipped. %s recipients have not been sent to yet.'),
+			$Messages->add( sprintf( T_('Emails have been sent to a chunk of %s recipients. %s recipients were skipped. %s recipients have not been sent to yet.'),
 					$email_campaign_chunk_size, $email_skip_count, $wait_count ), 'warning' );
 		}
 		else
 		{	// All recipients received this bewsletter:
-			$Messages->add( T_('Campaign has been sent to all recipients.'), 'success' );
+			$Messages->add( T_('Emails have been sent to all recipients of this campaign.'), 'success' );
 		}
 		echo '<br />';
 		$Messages->display();
@@ -630,7 +639,7 @@ class EmailCampaign extends DataObject
 		{	// If no waiting users then don't create a cron job and reset ID of previous cron job:
 			$this->set( 'send_ctsk_ID', NULL, true );
 
-			$Messages->add( T_('A scheduled job has not been created for this campaign because no waiting users for newsletter.'), 'warning' );
+			$Messages->add( T_('No scheduled job has not been created for this campaign because no there are no waiting recipients for this campaing.'), 'warning' );
 		}
 
 		// Update the changed email campaing settings:

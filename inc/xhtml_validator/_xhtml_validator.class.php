@@ -277,7 +277,7 @@ class XHTML_Validator
 			{
 				$attr = 'data-*';
 			}
-			
+
 			if (!isset($this->tagattrs[$tag]) || !in_array($attr, explode(' ', $this->tagattrs[$tag])) )
 			{
 				$this->html_error( sprintf( T_('Tag &lt;%s&gt; may not have attribute %s="..."'), '<code>'.$tag.'</code>', '<code>'.$attr.'</code>' ) );
@@ -333,7 +333,7 @@ class XHTML_Validator
 	{
 		global $Messages;
 		$this->error = true;
-		$Messages->add( $string, $this->msg_type );
+		$Messages->add_to_group( $string, $this->msg_type, T_('Validation errors:') );
 	}
 
 	/**

@@ -33,6 +33,7 @@ skin_init( $disp );
 skin_include( '_html_header.inc.php', array(
 	'front_text' => '',
 	'posts_text' => isset( $bootstrap_manual_posts_text ) ? $bootstrap_manual_posts_text : '',
+	'flagged_text' => T_('Flagged pages'),
 ) );
 // -------------------------------- END OF HEADER --------------------------------
 
@@ -161,6 +162,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'catdir_text'       => '',
 					'front_text'        => '',
 					'posts_text'        => '',
+					'flagged_text'      => '',
 					'register_text'     => '',
 					'login_text'        => '',
 					'lostpassword_text' => '',

@@ -95,6 +95,7 @@ class Group extends DataObject
 			$this->set( 'name', T_('New group') );
 			$this->set( 'perm_blogs', 'user' );
 			$this->set( 'perm_stats', 'none' );
+			$this->set( 'usage', 'primary' );
 		}
 		else
 		{
@@ -221,7 +222,7 @@ class Group extends DataObject
 		foreach( $GroupSettings->permission_values as $name => $value )
 		{
 			// We need to handle checkboxes and radioboxes separately , because when a checkbox isn't checked the checkbox variable is not sent
-			if( $name == 'perm_createblog' || $name == 'perm_getblog' || $name == 'perm_templates'
+			if( $name == 'perm_createblog' || $name == 'perm_getblog' || $name == 'perm_templates' || $name == 'perm_centralantispam'
 				|| $name == 'cross_country_allow_profiles' || $name == 'cross_country_allow_contact' )
 			{ // These permissions are represented by checkboxes, all other pluggable group permissions are represented by radiobox.
 				$value = param( 'edited_grp_'.$name, 'string', 'denied' );
@@ -293,6 +294,7 @@ class Group extends DataObject
 	 *                - blogs
 	 *                - admin (levels "visible", "hidden")
 	 *                - messaging
+	 *                - centralantispam
 	 * @param string Requested permission level
 	 * @param mixed Permission target (blog ID, array of cat IDs...)
 	 * @return boolean True on success (permission is granted), false if permission is not granted
@@ -315,7 +317,7 @@ class Group extends DataObject
 			$permvalue = false; // This will result in $perm == false always. We go on for the $Debuglog..
 		}
 
-		$pluggable_perms = array( 'admin', 'shared_root', 'import_root', 'spamblacklist', 'slugs', 'templates', 'options', 'emails', 'files', 'users', 'orgs' );
+		$pluggable_perms = array( 'admin', 'shared_root', 'import_root', 'spamblacklist', 'slugs', 'templates', 'options', 'emails', 'files', 'users', 'orgs', 'centralantispam' );
 		if( in_array( $permname, $pluggable_perms ) )
 		{
 			$permname = 'perm_'.$permname;
@@ -364,22 +366,23 @@ class Group extends DataObject
 						break;
 
 					case 'view':
-						// User can ask for view perm...
-						if( $permlevel == 'view' )
+						// User can permissions to view all collections
+						if( $permlevel == 'view' || $permlevel == 'list' )
 						{
 							$perm = true;
 							break;
 						}
-						// ... or for any lower priority perm... (no break)
+						break;
 
 					case 'user':
 						// This is for stats. User perm can grant permissions in the User class
 						// Here it will just allow to list
 					case 'list':
 						// User can only ask for list perm
-						if( $permlevel == 'list' )
+						// But for requested collection we should check perm in user/group perms of the collections
+						if( $permlevel == 'list' && $perm_target === NULL )
 						{
-							$perm = true;
+							$perm = check_coll_first_perm( 'perm_analytics', 'group', $this->ID );
 							break;
 						}
 				}

@@ -12,14 +12,14 @@
  *
  * @package tests
  */
-require_once  dirname(__FILE__).'/../blogs/conf/_config.php';
+require_once  dirname(__FILE__).'/../conf/_config.php';
 
 define( 'EVO_MAIN_INIT', true );
 
 /**
  * class loader
  */
-require_once $inc_path.'_core/_class5.funcs.php';
+require_once $inc_path.'_core/_class_loader.funcs.php';
 require_once $inc_path.'_core/_misc.funcs.php';
 
 load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
@@ -37,7 +37,7 @@ switch( $target )
 		$test_user = 'admin';
 		$test_pass = $install_password;
 		pre_dump( $test_user, $test_pass );
-		$client = new xmlrpc_client( $basesubpath.$xmlsrv_subdir.'xmlrpc.php', $basehost, $baseport );
+		$client = new xmlrpc_client( $basesubpath.$xmlsrv_subdir.'xmlrpc.php', $basehost, substr( $baseport, 1 ) );
 		break;
 
 	default:

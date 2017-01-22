@@ -248,7 +248,7 @@ function system_check_blog_cache( $blog_ID = NULL, $repair = false )
 	global $Settings;
 	load_class( '_core/model/_pagecache.class.php', 'PageCache' );
 
-	$Blog = NULL;
+	$Collection = $Blog = $Collection = $Blog = NULL;
 	$result = NULL;
 	if( $blog_ID == NULL )
 	{
@@ -261,7 +261,7 @@ function system_check_blog_cache( $blog_ID = NULL, $repair = false )
 	else
 	{
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog_ID );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 		if( $Blog->get_setting( 'cache_enabled' ) )
 		{
 			$result = system_check_dir( 'cache', 'c'.$blog_ID.'/' );
@@ -329,7 +329,7 @@ function system_check_caches( $repair = true )
 			list( $status, $message ) = $result;
 			if( $status != 'ok' )
 			{
-				$Blog = $BlogCache->get_by_ID( $blog_ID );
+				$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 				$error_messages[] = sprintf( T_( '&laquo;%s&raquo; page cache folder' ),  $Blog->get( 'shortname' ) ).': '.$message;
 			}
 		}

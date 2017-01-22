@@ -95,13 +95,13 @@ if( $is_admin )
 {
 	if( $new_user_creating )
 	{
-		$form_title = T_('Edit user profile');
+		$form_title = '<span class="nowrap">'.T_('Edit user profile').'</span>';
 	}
 	else
 	{
-		$form_text_title = T_( 'Edit profile' ).get_manual_link( 'user-profile-tab' ); // used for js confirmation message on leave the changed form
+		$form_text_title = '<span class="nowrap">'.T_( 'Edit profile' ).'</span>'.get_manual_link( 'user-profile-tab' ); // used for js confirmation message on leave the changed form
 		$form_title = get_usertab_header( $edited_User, 'profile', $form_text_title );
-		$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
+		$Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
 	}
 	$form_class = 'fform';
 }
@@ -139,7 +139,7 @@ if( $new_user_creating )
 
 	$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get( 'newusers_grp_ID' ) : $edited_User->grp_ID;
 	$GroupCache = & get_GroupCache();
-	$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_( 'User group' ) );
+	$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, sprintf( T_('<span %s>Primary</span> user group'), 'class="label label-primary"' ) );
 
 	$field_note = '[0 - 10]';
 	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('User level'), $field_note, array( 'required' => true ) );
@@ -187,8 +187,8 @@ if( $action != 'view' )
 		}
 		else
 		{
-			$remove_picture_url = get_secure_htsrv_url().'profile_update.php?user_tab=avatar&amp;blog='.$Blog->ID.'&amp;action=remove_avatar&amp;'.url_crumb( 'user' );
-			$delete_picture_url = get_secure_htsrv_url().'profile_update.php?user_tab=avatar&amp;blog='.$Blog->ID.'&amp;action=delete_avatar&amp;file_ID='.$edited_User->avatar_file_ID.'&amp;'.url_crumb( 'user' );
+			$remove_picture_url = get_htsrv_url().'profile_update.php?user_tab=avatar&amp;blog='.$Blog->ID.'&amp;action=remove_avatar&amp;'.url_crumb( 'user' );
+			$delete_picture_url = get_htsrv_url().'profile_update.php?user_tab=avatar&amp;blog='.$Blog->ID.'&amp;action=delete_avatar&amp;file_ID='.$edited_User->avatar_file_ID.'&amp;'.url_crumb( 'user' );
 		}
 
 		if( $edited_User->has_avatar() || count( $user_avatars ) )
@@ -668,7 +668,7 @@ $Form->end_form();
 
 		jQuery.ajax({
 		type: 'POST',
-		url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+		url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 		data: 'action=get_user_new_field&user_id=<?php echo $edited_User->ID; ?>&field_id=' + field_id + params,
 		success: function(result)
 			{
@@ -760,7 +760,7 @@ $Form->end_form();
 
 		jQuery.ajax({
 		type: 'POST',
-		url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+		url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 		data: 'action=get_user_new_field&user_id=<?php echo $edited_User->ID; ?>&field_id=' + field_id + params,
 		success: function( result )
 			{
@@ -831,7 +831,7 @@ $Form->end_form();
 		jQuery.ajax(
 		{
 			type: 'POST',
-			url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+			url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 			data: 'action=get_user_new_org' + params,
 			success: function( result )
 			{
@@ -891,7 +891,7 @@ function bind_autocomplete( field_objs )
 	{	// If selected elements are exists
 		field_objs.autocomplete( {
 			source: function(request, response) {
-				jQuery.getJSON( '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php?action=get_user_field_autocomplete', {
+				jQuery.getJSON( '<?php echo get_htsrv_url(); ?>anon_async.php?action=get_user_field_autocomplete', {
 					term: request.term, attr_id: this.element[0].getAttribute( 'id' )
 				}, response);
 			},

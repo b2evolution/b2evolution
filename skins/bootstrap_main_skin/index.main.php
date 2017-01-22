@@ -192,8 +192,9 @@ if( $is_pictured_page )
 			echo '<div class="panel panel-default"><div class="panel-body">';
 			skin_include( '_item_block.inc.php', array(
 					'feature_block' => true,
-					'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
-					'intro_mode'   => 'normal',	// Intro posts will be displayed in normal mode
+					'content_mode'  => 'auto',		// 'auto' will auto select depending on $disp-detail
+					'intro_mode'    => 'normal',	// Intro posts will be displayed in normal mode
+					'Item'          => $Item,
 				) );
 			echo '</div></div>';
 			// ----------------------------END ITEM BLOCK  ----------------------------

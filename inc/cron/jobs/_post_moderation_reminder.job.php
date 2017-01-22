@@ -74,7 +74,8 @@ $bloguser_SQL->WHERE_and( 'bloguser_perm_poststatuses <> "" AND bloguser_perm_ed
 $bloggroup_SQL = new  SQL();
 $bloggroup_SQL->SELECT( 'user_ID, bloggroup_blog_ID as blog_ID, bloggroup_perm_poststatuses + 0 as perm_poststatuses, bloggroup_perm_edit as perm_edit' );
 $bloggroup_SQL->FROM( 'T_users' );
-$bloggroup_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON bloggroup_group_ID = user_grp_ID' );
+$bloggroup_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON ( bloggroup_group_ID = user_grp_ID
+	OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = user_ID ) )' );
 $bloggroup_SQL->FROM_add( 'LEFT JOIN T_blogs ON blog_ID = bloggroup_blog_ID' );
 $bloggroup_SQL->WHERE( sprintf( $not_global_moderator, 'user_ID' ) );
 $bloggroup_SQL->WHERE_and( 'blog_advanced_perms <> 0' );
@@ -186,7 +187,7 @@ foreach( $blog_posts as $row )
 {
 	if( $last_blog_ID != $row->blog_ID )
 	{
-		$Blog = & $BlogCache->get_by_ID( $row->blog_ID );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $row->blog_ID );
 		$blog_moderation_statuses = $Blog->get_setting( 'post_moderation_statuses' );
 		$last_blog_ID = $row->blog_ID;
 	}

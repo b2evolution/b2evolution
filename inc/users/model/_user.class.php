@@ -316,7 +316,7 @@ class User extends DataObject
 				array( 'table'=>'T_messaging__contact_groupusers', 'fk'=>'cgu_user_ID', 'msg'=>T_('%d contacts from contact groups') ),
 				array( 'table'=>'T_pluginusersettings', 'fk'=>'puset_user_ID', 'msg'=>T_('%d user settings on plugins') ),
 				array( 'table'=>'T_users__fields', 'fk'=>'uf_user_ID', 'msg'=>T_('%d user fields') ),
-				array( 'table'=>'T_users__postreadstatus', 'fk'=>'uprs_user_ID', 'msg'=>T_('%d recordings of a post having been read') ),
+				array( 'table'=>'T_items__user_data', 'fk'=>'itud_user_ID', 'msg'=>T_('%d recordings of user data for a specific post') ),
 				array( 'table'=>'T_links', 'fk'=>'link_usr_ID', 'msg'=>T_('%d links to this user'),
 						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
 				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition'=>'file_root_type = "user"', 'msg'=>T_('%d files from this user file root') ),
@@ -327,6 +327,7 @@ class User extends DataObject
 				array( 'table'=>'T_users__user_org', 'fk'=>'uorg_user_ID', 'msg'=>T_('%d organization membership') ),
 				array( 'table'=>'T_polls__answer', 'fk'=>'pans_user_ID', 'msg'=>T_('%d poll answers') ),
 				array( 'table'=>'T_users__secondary_user_groups', 'fk'=>'sug_user_ID', 'msg'=>T_('%d secondary groups') ),
+				array( 'table'=>'T_users__profile_visits', 'fk'=>'upv_visited_user_ID', 'msg'=>T_('%d profile visits') ),
 			);
 	}
 
@@ -759,15 +760,23 @@ class User extends DataObject
 					continue;
 				}
 
-				$field_type = ( $this->userfield_defs[$userfield->uf_ufdf_ID][0] == 'text' ) ? 'text' : 'string';
-				$uf_val = param( 'uf_'.$userfield->uf_ID, $field_type, '' );
+				$uf_val = param( 'uf_'.$userfield->uf_ID, 'raw' );
+				$field_type = $this->userfield_defs[$userfield->uf_ufdf_ID][0];
+				if( $field_type == 'number' )
+				{	// Change number type of integer because we have this type name preparing in function param_format():
+					$field_type = 'integer';
+				}
+				elseif( $field_type != 'text' && $field_type != 'url' )
+				{	// Use all other params as string, Only text and url have a preparing in function param_format():
+					$field_type = 'string';
+				}
+				$uf_val = param_format( $uf_val, $field_type );
 
 				if( $this->userfield_defs[$userfield->uf_ufdf_ID][0] == 'list' && $uf_val == '---' )
 				{	// Option list has a value '---' for empty value
 					$uf_val = '';
 				}
 
-				$uf_val = trim( strip_tags( $uf_val ) );
 				if( empty( $uf_val ) && $this->userfield_defs[$userfield->uf_ufdf_ID][2] == 'require' )
 				{	// Display error for empty required field
 					if( $current_User->check_perm( 'users', 'edit' ) )
@@ -815,24 +824,35 @@ class User extends DataObject
 				$user_id = param( 'orig_user_ID', 'integer', 0 );
 				if( $user_id !== 0 )
 				{
-					$userfield_IDs = $DB->get_results( '
-								SELECT uf_ID, uf_ufdf_ID
-									FROM T_users__fields
-								 WHERE uf_user_ID = '.$user_id );
-					foreach( $userfield_IDs as $userfield_ID )
+					$SQL = new SQL( 'Get all user fields of duplicated user #'.$user_id );
+					$SQL->SELECT( 'uf_ID, ufdf_ID, ufdf_type' );
+					$SQL->FROM( 'T_users__fields' );
+					$SQL->FROM_add( 'INNER JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID' );
+					$SQL->WHERE( 'uf_user_ID = '.$user_id );
+					$copied_userfields = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+					foreach( $copied_userfields as $copied_userfield )
 					{
-						$uf_val = param( 'uf_'.$userfield_ID->uf_ID, 'string', '' );
-						$uf_type = $userfield_ID->uf_ufdf_ID;
-						if( !empty($uf_val) )
-						{
-							$this->userfield_add( $uf_type, $uf_val );
+						$uf_val = param( 'uf_'.$copied_userfield->uf_ID, 'raw' );
+						$field_type = $copied_userfield->ufdf_type;
+						if( $field_type == 'number' )
+						{	// Change number type of integer because we have this type name preparing in function param_format():
+							$field_type = 'integer';
+						}
+						elseif( $field_type != 'text' && $field_type != 'url' )
+						{	// Use all other params as string, Only text and url have a preparing in function param_format():
+							$field_type = 'string';
+						}
+						$uf_val = param_format( $uf_val, $field_type );
+						if( ! empty( $uf_val ) )
+						{	// Copy user field only if it is not empty:
+							$this->userfield_add( $copied_userfield->ufdf_ID, $uf_val );
 						}
 					}
 				}
 			}
 
-			$uf_new_fields = param( 'uf_new', 'array:array:string' );	// Recommended & required fields (it still not saved in DB)
-			$uf_add_fields = param( 'uf_add', 'array:array:string' );	// Added fields
+			$uf_new_fields = param( 'uf_new', 'array' );	// Recommended & required fields (it still not saved in DB)
+			$uf_add_fields = param( 'uf_add', 'array' );	// Added fields
 
 			// Add a new field: (JS is not enabled)
 			if( $action == 'add_field' )
@@ -916,20 +936,42 @@ class User extends DataObject
 								$uf_new_val = '';
 							}
 
-							$uf_new_val = trim( strip_tags( $uf_new_val ) );
 							if( $uf_new_val != '' )
-							{	// Insert a new field in DB if it is filled
-								if( $this->userfield_defs[$uf_new_id][0] == 'url' )
-								{	// Check url fields
-									param_check_url( 'uf_'.$uf_type.'['.$uf_new_id.'][]', 'commenting' );
+							{	// Insert a new field in DB if it is filled:
+								switch( $this->userfield_defs[$uf_new_id][0] )
+								{
+									case 'url':
+										// Format url field to valid value:
+										$uf_new_val = param_format( $uf_new_val, 'url' );
+										// Check url fields:
+										param_check_url( 'uf_'.$uf_type.'['.$uf_new_id.'][]', 'commenting' );
+										break;
+
+									case 'text':
+										// Format text field to valid value:
+										$uf_new_val = param_format( $uf_new_val, 'text' );
+										break;
+
+									case 'number':
+										// Format number field to valid value:
+										$uf_new_val = param_format( $uf_new_val, 'integer' );
+										break;
+
+									case 'email':
+									case 'word':
+									case 'phone':
+										// Format string fields to valid value:
+										$uf_new_val = param_format( $uf_new_val, 'string' );
+										break;
 								}
+
 								if( $this->userfield_defs[$uf_new_id][4] == 'list' )
 								{	// Option "Multiple values" == "List style"
 									// Split by comma and save each phrase as separate field
 									$uf_new_val = explode( ',', $uf_new_val );
 									foreach( $uf_new_val as $val )
 									{
-										$val = trim( $val );
+										$val = param_format( $val, 'string' );
 										if( !empty( $val ) )
 										{	// Exclude empty values(spaces)
 											$this->userfield_add( (int)$uf_new_id, $val );
@@ -1054,6 +1096,12 @@ class User extends DataObject
 				}
 
 			}
+
+			if( $_POST['edited_user_pass1'] != trim( $_POST['edited_user_pass1'] ) ||
+			    $_POST['edited_user_pass2'] != trim( $_POST['edited_user_pass2'] ) )
+			{ // If new password was entered with spaces then inform user about this
+				$Messages->add( T_('The leading and traling spaces have been trimmed from the new password.'), 'warning' );
+			}
 		}
 
 
@@ -1090,29 +1138,44 @@ class User extends DataObject
 
 		// ******* Notifications form ******* //
 		$is_subscriptions_form = param( 'subscriptions_form', 'boolean', false );
-
+		$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 		if( $is_subscriptions_form )
 		{
 			if( $action == 'subscribe' )
 			{ // Do only subscribe to new blog (Don't update the user's settings from the same form)
 
-				// A selected blog to subscribe
-				$subscribe_blog_ID = param( 'subscribe_blog', 'integer', 0 );
-				// Get checkbox values:
-				$sub_items    = param( 'sub_items_new',    'integer', 0 );
-				$sub_comments = param( 'sub_comments_new', 'integer', 0 );
+				// If notifications are temporarily disabled, no subscription options should be lost when user saves.
+				// When notification are turned back on, the subscription will resume as they were before.
+				if( $notifications_mode != 'off' )
+				{
+					// A selected blog to subscribe
+					$subscribe_blog_ID = param( 'subscribe_blog', 'integer', 0 );
+					// Get checkbox values:
+					$sub_items    = param( 'sub_items_new',    'integer', 0 );
+					$sub_comments = param( 'sub_comments_new', 'integer', 0 );
 
-				// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
-				if( $subscribe_blog_ID && ( $sub_items || $sub_comments ) )
-				{ // We need to record values:
-					$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
-					  VALUES ( '.$DB->quote( $subscribe_blog_ID ).', '.$DB->quote( $this->ID ).', '.$DB->quote( $sub_items ).', '.$DB->quote( $sub_comments ).' )' );
+					// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
+					if( $subscribe_blog_ID && ( $sub_items || $sub_comments ) )
+					{ // We need to record values:
+						$BlogCache = & get_BlogCache();
+						$subscribe_Blog = & $BlogCache->get_by_ID( $subscribe_blog_ID, false, false );
 
-					$Messages->add( T_('Subscriptions have been changed.'), 'success' );
-				}
-				else
-				{ // Display an error message to inform user about incorrect actions
-					$Messages->add( T_('Please select at least one setting to subscribe on the selected blog.'), 'error' );
+						if( $subscribe_Blog->has_access( $this ) )
+						{ // user has access to the collection
+							$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
+								VALUES ( '.$DB->quote( $subscribe_blog_ID ).', '.$DB->quote( $this->ID ).', '.$DB->quote( $sub_items ).', '.$DB->quote( $sub_comments ).' )' );
+
+							$Messages->add( T_('Subscriptions have been changed.'), 'success' );
+						}
+						else
+						{
+							$Messages->add( T_('User has no access to the selected blog.'), 'error' );
+						}
+					}
+					else
+					{ // Display an error message to inform user about incorrect actions
+						$Messages->add( T_('Please select at least one setting to subscribe on the selected blog.'), 'error' );
+					}
 				}
 			}
 			else
@@ -1150,9 +1213,10 @@ class User extends DataObject
 				}
 				$is_comment_moderator = $this->check_role( 'comment_moderator' );
 				if( $is_comment_moderator || $this->check_role( 'comment_editor' ) )
-				{	// update 'notify_comment_moderation' and 'notify_edit_cmt_moderation' only if user is comment moderator/editor at least in one collection:
+				{	// update 'notify_comment_moderation', 'notify_edit_cmt_moderation' and 'notify_spam_cmt_moderation' only if user is comment moderator/editor at least in one collection:
 					$UserSettings->set( 'notify_comment_moderation', param( 'edited_user_notify_cmt_moderation', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'notify_edit_cmt_moderation', param( 'edited_user_notify_edit_cmt_moderation', 'integer', 0 ), $this->ID );
+					$UserSettings->set( 'notify_spam_cmt_moderation', param( 'edited_user_notify_spam_cmt_moderation', 'integer', 0 ), $this->ID );
 				}
 				if( $this->check_perm( 'admin', 'restricted', false ) )
 				{ // update 'notify_meta_comments' only if edited user has a permission to back-office
@@ -1197,66 +1261,71 @@ class User extends DataObject
 				param_integer_range( 'edited_user_newsletter_limit', 0, 999, T_('Newsletter limit must be between %d and %d.') );
 				$UserSettings->set( 'newsletter_limit', param( 'edited_user_newsletter_limit', 'integer', 0 ), $this->ID );
 
-				/**
-				 * Update the subscriptions:
-				 */
-				$subs_blog_IDs = param( 'subs_blog_IDs', 'string', true );
-				$subs_item_IDs = param( 'subs_item_IDs', 'string', true );
-
-				// Work the blogs:
-				$subscription_values = array();
-				$unsubscribed = array();
-				$subs_blog_IDs = explode( ',', $subs_blog_IDs );
-				foreach( $subs_blog_IDs as $loop_blog_ID )
+				// If notifications are temporarily disabled, no subscription options should be lost when user saves.
+				// When notification are turned back on, the subscription will resume as they were before.
+				if( $notifications_mode != 'off' )
 				{
-					// Make sure no dirty hack is coming in here:
-					$loop_blog_ID = intval( $loop_blog_ID );
+					/**
+					* Update the subscriptions:
+					*/
+					$subs_blog_IDs = param( 'subs_blog_IDs', 'string', true );
+					$subs_item_IDs = param( 'subs_item_IDs', 'string', true );
 
-					// Get checkbox values:
-					$sub_items    = param( 'sub_items_'.$loop_blog_ID,    'integer', 0 );
-					$sub_comments = param( 'sub_comments_'.$loop_blog_ID, 'integer', 0 );
-
-					if( $sub_items || $sub_comments )
-					{	// We have a subscription for this blog
-						$subscription_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_comments )";
-					}
-					else
-					{	// No subscription here:
-						$unsubscribed[] = $loop_blog_ID;
-					}
-				}
-
-				// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
-				if( count( $subscription_values ) )
-				{	// We need to record values:
-					$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
-												VALUES '.implode( ', ', $subscription_values ) );
-				}
-
-				if( count( $unsubscribed ) )
-				{	// We need to make sure some values are cleared:
-					$DB->query( 'DELETE FROM T_subscriptions
-												 WHERE sub_user_ID = '.$this->ID.'
-													 AND sub_coll_ID IN ('.implode( ', ', $unsubscribed ).')' );
-				}
-
-				// Individual post subscriptions
-				if( !empty( $subs_item_IDs ) )
-				{ // user was subscribed to at least one post update notification
-					$subs_item_IDs = explode( ',', $subs_item_IDs );
+					// Work the blogs:
+					$subscription_values = array();
 					$unsubscribed = array();
-					foreach( $subs_item_IDs as $loop_item_ID )
+					$subs_blog_IDs = explode( ',', $subs_blog_IDs );
+					foreach( $subs_blog_IDs as $loop_blog_ID )
 					{
-						if( !param( 'item_sub_'.$loop_item_ID, 'integer', 0 ) )
-						{ // user wants to unsubscribe from this post notifications
-							$unsubscribed[] = $loop_item_ID;
+						// Make sure no dirty hack is coming in here:
+						$loop_blog_ID = intval( $loop_blog_ID );
+
+						// Get checkbox values:
+						$sub_items    = param( 'sub_items_'.$loop_blog_ID,    'integer', 0 );
+						$sub_comments = param( 'sub_comments_'.$loop_blog_ID, 'integer', 0 );
+
+						if( $sub_items || $sub_comments )
+						{	// We have a subscription for this blog
+							$subscription_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_comments )";
+						}
+						else
+						{	// No subscription here:
+							$unsubscribed[] = $loop_blog_ID;
 						}
 					}
-					if( !empty( $unsubscribed ) )
-					{ // unsubscribe list is not empty, delete not wanted subscriptions
-						$DB->query( 'DELETE FROM T_items__subscriptions
-												 WHERE isub_user_ID = '.$this->ID.'
-													 AND isub_item_ID IN ('.implode( ', ', $unsubscribed ).')' );
+
+					// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
+					if( count( $subscription_values ) )
+					{	// We need to record values:
+						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
+													VALUES '.implode( ', ', $subscription_values ) );
+					}
+
+					if( count( $unsubscribed ) )
+					{	// We need to make sure some values are cleared:
+						$DB->query( 'DELETE FROM T_subscriptions
+													WHERE sub_user_ID = '.$this->ID.'
+														AND sub_coll_ID IN ('.implode( ', ', $unsubscribed ).')' );
+					}
+
+					// Individual post subscriptions
+					if( !empty( $subs_item_IDs ) )
+					{ // user was subscribed to at least one post update notification
+						$subs_item_IDs = explode( ',', $subs_item_IDs );
+						$unsubscribed = array();
+						foreach( $subs_item_IDs as $loop_item_ID )
+						{
+							if( !param( 'item_sub_'.$loop_item_ID, 'integer', 0 ) )
+							{ // user wants to unsubscribe from this post notifications
+								$unsubscribed[] = $loop_item_ID;
+							}
+						}
+						if( !empty( $unsubscribed ) )
+						{ // unsubscribe list is not empty, delete not wanted subscriptions
+							$DB->query( 'DELETE FROM T_items__subscriptions
+													WHERE isub_user_ID = '.$this->ID.'
+														AND isub_item_ID IN ('.implode( ', ', $unsubscribed ).')' );
+						}
 					}
 				}
 			}
@@ -1485,6 +1554,7 @@ class User extends DataObject
 			{ // Use a login
 				$login = $this->dget( 'login', $params['login_format'] );
 			}
+
 			// Add class "login" to detect logins by js plugins
 			$class = ( $login == $this->login ? 'login ' : '' );
 		}
@@ -2007,7 +2077,7 @@ class User extends DataObject
 	function get_media_url()
 	{
 		global $media_url, $Settings, $Debuglog;
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( ! $Settings->get( 'fm_enable_roots_user' ) )
 		{ // User directories are disabled:
@@ -2082,7 +2152,7 @@ class User extends DataObject
 
 		if( empty( $current_Blog ) )
 		{ // Use current blog
-			global $Blog;
+			global $Collection, $Blog;
 			$current_Blog = & $Blog;
 		}
 
@@ -2466,8 +2536,8 @@ class User extends DataObject
 						// Check blog user perms to see if user may recycle his own posts comments
 						$perm = $this->check_perm_blogusers( 'blog_recycle_owncmts', $permlevel, $blog_ID );
 						if( ! $perm )
-						{ // Check groups for permissions to this specific blog:
-							$perm = $this->Group->check_perm_bloggroups( 'blog_recycle_owncmts', $permlevel, $blog_ID );
+						{	// Check primary and secondary groups for permissions to this specific collection:
+							$perm = $this->check_perm_bloggroups( 'blog_recycle_owncmts', $permlevel, $blog_ID );
 						}
 					}
 				}
@@ -2507,6 +2577,7 @@ class User extends DataObject
 			case 'blog_item_type_admin':
 			case 'blog_edit_ts':
 			case 'blog_media_browse':
+			case 'blog_analytics':
 				// The owner of a collection has automatic permission to so many things:
 				if( $this->check_perm_blogowner( $perm_target_ID ) )
 				{	// Owner can do *almost* anything:
@@ -2530,48 +2601,14 @@ class User extends DataObject
 				if( $perm_target_ID > 0 )
 				{	// Check the permissions below only for requested target collection:
 
-					if( $primary_Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_ID ) )
-					{	// Primary advanced usergroup permissions on the target collection grant the requested permission:
+					if( $this->check_perm_bloggroups( $permname, $permlevel, $perm_target_ID ) )
+					{	// Primary or Secondary advanced usergroups permissions on the target collection grant the requested permission:
 						$perm = true;
 						// Stop checking other perms:
 						break;
 					}
 
-					// Get secondary usergroups for this User:
-					$secondary_groups = $this->get_secondary_groups();
-
-					// Check which secondary usergroup's advanced permissions must still be loaded: (we may have some in cache already)
-					$notloaded_secondary_group_IDs = array();
-					foreach( $secondary_groups as $secondary_Group )
-					{
-						if( ! isset( $secondary_Group->blog_post_statuses[ $perm_target_ID ] ) )
-						{	// We must still load advanced permissions for this secondary usergroup:
-							$notloaded_secondary_group_IDs[] = $secondary_Group->ID;
-						}
-					}
-
-					if( count( $notloaded_secondary_group_IDs ) )
-					{	// Load advanced permissions of secondary usergroups in a single query:
-						$coll_advanced_perms = NULL;
-						load_blog_advanced_perms( $coll_advanced_perms, $perm_target_ID, $notloaded_secondary_group_IDs, 'bloggroup' );
-					}
-
-					// Find first secondary usergroup that grants the required permission:
-					foreach( $secondary_groups as $secondary_Group )
-					{
-						if( isset( $coll_advanced_perms, $coll_advanced_perms[ $secondary_Group->ID ] ) )
-						{	// Set advanced usergroup permissions from array loaded above:
-							$secondary_Group->blog_post_statuses[ $perm_target_ID ] = $coll_advanced_perms[ $secondary_Group->ID ];
-						}
-						if( $secondary_Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_ID ) )
-						{	// Secondary usergroup grants requested permissions on the target collection:
-							$perm = true;
-							// Stop checking other groups and other perms:
-							break 2;
-						}
-					}
-
-					// Check usr specific perms:
+					// Check user specific perms:
 					if( $this->check_perm_blogusers( $permname, $permlevel, $perm_target_ID ) )
 					{	// Advanced user permissions on the target collection grant the requested permission:
 						$perm = true;
@@ -2636,16 +2673,16 @@ class User extends DataObject
 				$blog_permname = 'blog_comment!'.$Comment->status;
 				$perm = $perm || $this->check_perm_blogusers( $blog_permname, $permlevel, $blog_ID, $Comment );
 				if( ! $perm )
-				{ // Check groups for permissions to this specific blog:
-					$perm = $this->Group->check_perm_bloggroups( $blog_permname, $permlevel, $blog_ID, $Comment, $this );
+				{	// Check primary and secondary groups for permissions to this specific collection:
+					$perm = $this->check_perm_bloggroups( $blog_permname, $permlevel, $blog_ID, $Comment, $this );
 				}
 				if( $perm && ( $Comment->status != $check_status ) )
 				{ // also check the requested status permissions at the blog level
 					$blog_permname = 'blog_comment!'.$check_status;
 					$perm = $this->check_perm_blogusers( $blog_permname, 'create', $blog_ID );
 					if( ! $perm )
-					{ // Check groups for permissions to this specific blog:
-						$perm = $this->Group->check_perm_bloggroups( $blog_permname, 'create', $blog_ID );
+					{	// Check primary and secondary groups for permissions to this specific collection:
+						$perm = $this->check_perm_bloggroups( $blog_permname, 'create', $blog_ID );
 					}
 				}
 				break;
@@ -2653,96 +2690,72 @@ class User extends DataObject
 			case 'meta_comment':
 				// Check permission for meta comment:
 
-				if( $permlevel == 'view' || $permlevel == 'add' )
-				{ // Set Item from target object
-					$Item = & $perm_target;
-				}
-				elseif( $permlevel == 'edit' || $permlevel == 'moderate' || $permlevel == 'delete' )
-				{ // Set Comment from target object
+				if( $permlevel == 'edit' || $permlevel == 'delete' )
+				{	// Set Comment from target object:
 					$Comment = & $perm_target;
 					if( empty( $Comment ) || ! $Comment->is_meta() )
-					{ // Comment must be defined and meta to check these permissions
+					{	// Comment must be defined and meta to check these permissions:
 						$perm = false;
 						break;
 					}
 					$Item = & $Comment->get_Item();
+					$blog_ID = $Item->get_blog_ID();
 				}
-				elseif( $permlevel == 'blog' )
-				{	// Set Blog from target object:
-					$Blog = & $perm_target;
+				elseif( $permlevel == 'view' || $permlevel == 'add' || $permlevel == 'blog' )
+				{	// Set blog ID from target value:
+					$blog_ID = $perm_target_ID;
 				}
 				else
-				{ // Invalid permission level
+				{	// Permission level is not allowed for all meta comments (For example 'moderate')
 					$perm = false;
 					break;
 				}
 
-				if( empty( $Item ) && empty( $Blog ) )
-				{	// Item or Blog must be defined to check these permissions
+				if( empty( $blog_ID ) )
+				{	// Item or Blog must be defined to check these permissions:
 					$perm = false;
+					break;
+				}
+
+				if( $this->check_perm_blog_global( $blog_ID, $permlevel ) )
+				{	// User has global permission on this collection:
+					$perm = true;
 					break;
 				}
 
 				switch( $permlevel )
 				{
 					case 'view':
+					case 'blog': // deprecated perm level
+						// Check perms to View meta comments of the collection:
+						$perm = // If User is explicitly allowed in the user permissions
+								$this->check_perm_blogusers( 'meta_comment', 'view', $blog_ID )
+								// OR If User belongs to primary or secondary groups explicitly allowed in the group permissions
+								|| $this->check_perm_bloggroups( 'meta_comment', 'view', $blog_ID );
+						break;
+
 					case 'add':
-						// Check perms to View/Add meta comments:
-						$blog_ID = $Item->get_blog_ID();
-						$perm = // If User can edit or delete this Item
-								$this->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item )
-								// OR If User can delete any Item of the Blog
-								|| $this->check_perm( 'blog_del_post', '', false, $blog_ID )
-								// OR If User is explicitly allowed in the user permissions
-								|| $this->check_perm_blogusers( 'meta_comment', '', $blog_ID )
-								// OR If User belongs to a group explicitly allowed in the group permissions
-								|| $this->Group->check_perm_bloggroups( 'meta_comment', $permlevel, $blog_ID, $Item, $this );
+						// Check perms to Add meta comments to the collection items:
+						$perm = // If User can access to back-office
+								$this->check_perm( 'admin', 'restricted' )
+								// AND if user can view meta comment of the collection
+								&& $this->check_perm( 'meta_comment', 'view', false, $blog_ID );
 						break;
 
 					case 'edit':
-						// Check perms to Edit meta comment
-						$perm = // User can edit only own meta comment
-								$Comment->author_user_ID == $this->ID
-								// AND User must has a permission to view meta comments
-								&& $this->check_perm( 'meta_comment', 'view', false, $Item );
-						break;
-
-					case 'moderate':
-						// Moderation is not available for meta comment
-						$perm = false;
+						// Check perms to Edit meta comment:
+						$perm = // If User is explicitly allowed in the user permissions
+								$this->check_perm_blogusers( 'meta_comment', 'edit', $blog_ID, $Comment )
+								// OR If User belongs to primary or secondary groups explicitly allowed in the group permissions
+								|| $this->check_perm_bloggroups( 'meta_comment', 'edit', $blog_ID, $Comment );
 						break;
 
 					case 'delete':
-						// Check perms to Delete meta comment:
-						if( $this->check_perm( 'blog_del_post', '', false, $Item->get_blog_ID() ) )
-						{ // If User can delete this Item
-							$perm = true;
-							break;
-						}
-						if( $this->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) &&
-						    $Comment->author_user_ID == $this->ID )
-						{ // If it is own meta comment of the User
-							$perm = true;
-							break;
-						}
-
-						// Check perms to Delete meta based on user/group settings
-						if( $Comment->author_user_ID == $this->ID &&
-								( $this->check_perm_blogusers( 'meta_comment', 'any', $Item->get_blog_ID() )
-								|| $this->Group->check_perm_bloggroups( 'meta_comment', $permlevel, $Item->get_blog_ID(), $Item, $this) ) )
-						{
-							$perm = true;
-							break;
-						}
-						break;
-
-					case 'blog':
-						// Check perms to view all meta comments of the collection:
-						if( $this->check_perm( 'blog_del_post', '', false, $Blog->ID ) )
-						{ // If User can delete any item of the collection
-							$perm = true;
-							break;
-						}
+						// Check perms to Delete meta comments:
+						$perm = // If it is allowed to delete comments on the collection
+								$this->check_perm( 'blog_del_cmts', 'edit', false, $blog_ID )
+								// AND if user can view meta comment of the collection
+								&& $this->check_perm( 'meta_comment', 'view', false, $blog_ID );
 						break;
 				}
 
@@ -2792,16 +2805,16 @@ class User extends DataObject
 				$blog_permname = 'blog_post!'.$Item->status;
 				$perm = $this->check_perm_blogusers( $blog_permname, $permlevel, $blog_ID, $Item );
 				if( ! $perm )
-				{ // Check groups for permissions to this specific blog:
-					$perm = $this->Group->check_perm_bloggroups( $blog_permname, $permlevel, $blog_ID, $Item, $this );
+				{	// Check primary and secondary groups for permissions to this specific collection:
+					$perm = $this->check_perm_bloggroups( $blog_permname, $permlevel, $blog_ID, $Item, $this );
 				}
 				if( $perm && ( $Item->status != $check_status ) )
 				{ // also check the requested status permissions at the blog level
 					$blog_permname = 'blog_post!'.$check_status;
 					$perm = $this->check_perm_blogusers( $blog_permname, 'create', $blog_ID );
 					if( ! $perm )
-					{ // Check groups for permissions to this specific blog:
-						$perm = $this->Group->check_perm_bloggroups( $blog_permname, 'create', $blog_ID );
+					{	// Check primary and secondary groups for permissions to this specific collection:
+						$perm = $this->check_perm_bloggroups( $blog_permname, 'create', $blog_ID );
 					}
 				}
 				break;
@@ -2811,7 +2824,7 @@ class User extends DataObject
 				$this->get_Group();
 
 				// Group may grant VIEW acces, FULL access:
-				if( $this->Group->check_perm( $permname, $permlevel ) )
+				if( $this->Group->check_perm( $permname, $permlevel, $perm_target ) )
 				{ // If group grants a global permission:
 					$perm = true;
 					break;
@@ -2821,9 +2834,13 @@ class User extends DataObject
 				{ // Check user perm for this blog:
 					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
 					if ( ! $perm )
-					{ // Check groups for permissions to this specific blog:
-						$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target );
+					{	// Check primary and secondary groups for permissions to this specific collection:
+						$perm = $this->check_perm_bloggroups( $permname, $permlevel, $perm_target );
 					}
+				}
+				elseif( $permlevel == 'list' && $perm_target == NULL )
+				{	// Check if at least one collection has a perm to view analytics for this user:
+					$perm = check_coll_first_perm( 'perm_analytics', 'user', $this->ID );
 				}
 				break;
 
@@ -2928,8 +2945,8 @@ class User extends DataObject
 				{	// Check specific blog perms:
 					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
 					if ( ! $perm )
-					{ // Check groups for permissions for this specific blog:
-						$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target );
+					{	// Check primary and secondary groups for permissions for this specific collection:
+						$perm = $this->check_perm_bloggroups( $permname, $permlevel, $perm_target );
 					}
 				}
 */
@@ -2994,7 +3011,7 @@ class User extends DataObject
 		/**
 		 * @var Blog
 		 */
-		$Blog = & $BlogCache->get_by_ID( $blog_ID );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID );
 
 		return ( $Blog->owner_user_ID == $this->ID );
 	}
@@ -3039,7 +3056,7 @@ class User extends DataObject
 
 		// Group may grant VIEW access, FULL access:
 		$this->get_Group();
-		$group_permlevel = ( $permlevel == 'view' && $permlevel == 'any' ) ? 'viewall' : 'editall';
+		$group_permlevel = ( $permlevel == 'view' || $permlevel == 'any' ) ? 'viewall' : 'editall';
 		if( $this->Group->check_perm( 'blogs', $group_permlevel ) )
 		{ // If group grants a global permission:
 			return true;
@@ -3087,6 +3104,73 @@ class User extends DataObject
 
 
 	/**
+	 * Check permission for primary and secondary groups of this user on a specified collection
+	 *
+	 * This is not for direct use, please call {@link User::check_perm()} instead
+	 *
+	 * @see User::check_perm()
+	 * @param string Permission name
+	 * @param string Permission level
+	 * @param integer Permission target blog ID
+	 * @param object Item that we want to edit
+	 * @param object User for who we would like to check this permission
+	 * @return boolean false if permission denied
+	 */
+	function check_perm_bloggroups( $permname, $permlevel, $perm_target_blog, $perm_target = NULL, $User = NULL )
+	{
+		// Get primary group of this User:
+		$primary_Group = & $this->get_Group();
+
+		if( $primary_Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_blog, $perm_target, $User ) )
+		{	// Primary advanced usergroup permissions on the target collection grant the requested permission:
+			return true;
+			// Stop checking other perms.
+		}
+
+		// Get secondary usergroups for this User:
+		$secondary_groups = $this->get_secondary_groups();
+
+		if( empty( $secondary_groups ) )
+		{	// Stop checking other perms if this User has no secondary groups:
+			return false;
+		}
+
+		// Check which secondary usergroup's advanced permissions must still be loaded: (we may have some in cache already)
+		$notloaded_secondary_group_IDs = array();
+		foreach( $secondary_groups as $secondary_Group )
+		{
+			if( ! isset( $secondary_Group->blog_post_statuses[ $perm_target_blog ] ) )
+			{	// We must still load advanced permissions for this secondary usergroup:
+				$notloaded_secondary_group_IDs[] = $secondary_Group->ID;
+			}
+		}
+
+		if( count( $notloaded_secondary_group_IDs ) )
+		{	// Load advanced permissions of secondary usergroups in a single query:
+			$coll_advanced_perms = NULL;
+			load_blog_advanced_perms( $coll_advanced_perms, $perm_target_blog, $notloaded_secondary_group_IDs, 'bloggroup' );
+		}
+
+		// Find first secondary usergroup that grants the required permission:
+		foreach( $secondary_groups as $secondary_Group )
+		{
+			if( isset( $coll_advanced_perms, $coll_advanced_perms[ $secondary_Group->ID ] ) )
+			{	// Set advanced usergroup permissions from array loaded above:
+				$secondary_Group->blog_post_statuses[ $perm_target_blog ] = $coll_advanced_perms[ $secondary_Group->ID ];
+			}
+			if( $secondary_Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_blog, $perm_target, $User ) )
+			{	// Secondary usergroup grants requested permissions on the target collection:
+				return true;
+				// Stop checking other groups and other perms.
+			}
+		}
+
+		// All groups of this User have no requested permission on a specified collection:
+		return false;
+	}
+
+
+	/**
 	 * Check if user status permits the requested action
 	 *
 	 * @param string requested action
@@ -3095,7 +3179,7 @@ class User extends DataObject
 	 */
 	function check_status( $action, $target = NULL )
 	{
-		global $Settings, $Blog;
+		global $Settings, $Collection, $Blog;
 
 		switch( $action )
 		{
@@ -3239,10 +3323,14 @@ class User extends DataObject
 
 		// Count blog ids where this user has the required permissions for the given role
 		$SQL = new SQL();
-		$SQL->SELECT( 'count( blog_ID )' );
+		$SQL->SELECT( 'COUNT( DISTINCT blog_ID )' );
 		$SQL->FROM( 'T_blogs' );
 		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0 AND blog_ID = bloguser_blog_ID AND bloguser_user_ID = '.$this->ID.' )' );
-		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0 AND blog_ID = bloggroup_blog_ID AND bloggroup_group_ID = '.$this->grp_ID.' )' );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON ( blog_advanced_perms <> 0
+			AND blog_ID = bloggroup_blog_ID
+			AND ( bloggroup_group_ID = '.$this->grp_ID.'
+			      OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$this->ID.' ) )
+			)' );
 		$SQL->WHERE( 'blog_owner_user_ID = '.$this->ID );
 		$SQL->WHERE_or( $where_clause );
 
@@ -3689,7 +3777,7 @@ class User extends DataObject
 	 */
 	function send_validate_email( $redirect_to_after, $blog = NULL, $email_changed = false )
 	{
-		global $app_name, $Session, $secure_htsrv_url, $baseurl, $servertimenow;
+		global $app_name, $Session, $baseurl, $servertimenow;
 		global $Settings, $UserSettings;
 
 		// Display messages depending on user email status
@@ -3737,15 +3825,15 @@ class User extends DataObject
 
 		if( $r )
 		{ // save request_id into Session
-			$request_ids = $Session->get( 'core.validatemail.request_ids' );
+			$request_ids = $Session->get( 'core.activateacc.request_ids' );
 			if( ( ! is_array($request_ids) ) || $email_changed )
 			{ // create new request ids array if it doesn't exist yet, or if user email changed ( this way the old request into the old email address won't be valid )
 				$request_ids = array();
 			}
 			$request_ids[] = $request_id;
-			$Session->set( 'core.validatemail.request_ids', $request_ids, 86400 * 2 ); // expires in two days (or when clicked)
+			$Session->set( 'core.activateacc.request_ids', $request_ids, 86400 * 2 ); // expires in two days (or when clicked)
 			// set a redirect_to session variable because this way after the account will be activated we will know where to redirect
-			$Session->set( 'core.validatemail.redirect_to', $redirect_to_after  );
+			$Session->set( 'core.activateacc.redirect_to', $redirect_to_after  );
 			$Session->dbsave(); // save immediately
 
 			// update last activation email timestamp
@@ -3843,7 +3931,7 @@ class User extends DataObject
 
 		if( is_null($form_url) )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 			$form_url = isset($Blog) ? $Blog->get('msgformurl') : '';
 		}
 
@@ -4229,7 +4317,7 @@ class User extends DataObject
 			}
 			else
 			{ // Anonymous user get an avatar picture with link to login page
-				global $Blog;
+				global $Collection, $Blog;
 				$redirect_to = '';
 				if( isset( $Blog ) )
 				{ // Redirect user after login
@@ -4734,7 +4822,7 @@ class User extends DataObject
 						if( ( !is_admin_page() ) && ( !empty( $blog ) ) )
 						{ // set where to redirect in front office, another way it would go to profile_update.php
 							$BlogCache = & get_BlogCache();
-							$Blog = $BlogCache->get_by_ID( $blog, false );
+							$Collection = $Blog = $BlogCache->get_by_ID( $blog, false );
 							$redirect_to = rawurlencode( $Blog->get( 'userprefsurl' ) );
 						}
 						$activate_info_link = 'href="'.get_activate_info_url( $redirect_to, '&amp;' ).'"';
@@ -4818,7 +4906,7 @@ class User extends DataObject
 							'email'           => $this->email,
 							'reason'          => $account_close_reason,
 							'user_ID'         => $this->ID,
-							'closed_by_admin' => $current_User->login,
+							'closed_by_admin' => $current_User->get_username(),
 							'days_count'      => $this->get_days_count_close()
 						);
 					send_admin_notification( NT_('User account closed'), 'account_closed', $email_template_params );
@@ -4858,7 +4946,7 @@ class User extends DataObject
 						$email_template_params = array(
 							'User' => $this,
 							'login' => $this->login, // this is required in the send_admin_notification
-							'activated_by_admin' => $current_User->login,
+							'activated_by_admin' => $current_User->get_username(),
 						);
 						send_admin_notification( NT_('New user account activated'), 'account_activated', $email_template_params );
 					}
@@ -4983,10 +5071,10 @@ class User extends DataObject
 		}
 		else
 		{ // Front-office
-			global $Blog;
-			$url_rotate_90_left = get_secure_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_90_left&file_ID='.$file_ID.'&'.url_crumb( 'user' );
-			$url_rotate_180 = get_secure_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_180&file_ID='.$file_ID.'&'.url_crumb( 'user' );
-			$url_rotate_90_right = get_secure_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_90_right&file_ID='.$file_ID.'&'.url_crumb( 'user' );
+			global $Collection, $Blog;
+			$url_rotate_90_left = get_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_90_left&file_ID='.$file_ID.'&'.url_crumb( 'user' );
+			$url_rotate_180 = get_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_180&file_ID='.$file_ID.'&'.url_crumb( 'user' );
+			$url_rotate_90_right = get_htsrv_url().'profile_update.php?user_tab='.$params['user_tab'].'&blog='.$Blog->ID.'&user_ID='.$this->ID.'&action=rotate_avatar_90_right&file_ID='.$file_ID.'&'.url_crumb( 'user' );
 		}
 
 		$html = $params['before'];
@@ -5153,7 +5241,7 @@ class User extends DataObject
 		}
 		else
 		{ // Front-office
-			global $Blog;
+			global $Collection, $Blog;
 			$url_crop = url_add_param( $Blog->gen_blogurl(), 'disp=avatar&action=crop&file_ID='.$file_ID );
 		}
 
@@ -5373,30 +5461,6 @@ class User extends DataObject
 		return NULL;
 	}
 
-	/**
-	 * Get session param from the user first session, hit
-	 * @param integer Session Id
-	 * @return object of params
-	 */
-	function get_first_session_hit_params( $sess_id )
-	{
-		global $DB;
-
-		$query = 'SELECT *
-					FROM T_hitlog
-					WHERE hit_sess_ID = '.$DB->quote( $sess_id ).'
-					ORDER BY hit_ID ASC
-					LIMIT 1';
-
-		$result = $DB->get_row( $query );
-
-		if( !empty( $result ) )
-		{
-			return $result;
-		}
-
-		return NULL;
-	}
 
 	/**
 	 * Send a welcome private message
@@ -5801,7 +5865,7 @@ class User extends DataObject
 			}
 			else
 			{	// For front-office
-				global $Blog;
+				global $Collection, $Blog;
 				if( ! empty( $Blog ) )
 				{	// Only if blog is defined
 					$total_num_posts_url = url_add_param( $Blog->gen_blogurl(), 'disp=useritems&amp;user_ID='.$this->ID );
@@ -6076,7 +6140,7 @@ class User extends DataObject
 		$total_upload = $this->get_total_upload();
 		if( empty( $total_upload ) )
 		{
-			$total_upload = T_('0 bytes');
+			$total_upload = '0 '.T_('B.');
 		}
 		else
 		{
@@ -6631,6 +6695,49 @@ class User extends DataObject
 		{	// No terms for this site:
 			return false;
 		}
+	}
+
+
+	/**
+	 * Get a count of flagged items by this user in current collection
+	 *
+	 * @return integer
+	 */
+	function get_flagged_items_count()
+	{
+		global $Collection, $Blog;
+
+		if( ! is_logged_in() )
+		{	// Only logged in users can have the flagged items:
+			return 0;
+		}
+
+		if( empty( $Blog ) )
+		{	// Collection must be defined:
+			return 0;
+		}
+
+		if( ! isset( $this->flagged_items_count ) )
+		{	// Get it from DB only first time and then cache in var:
+			global $current_User;
+
+			$flagged_ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
+
+			// Set additional debug info prefix for SQL queries in order to know what code executes it:
+			$flagged_ItemList2->query_title_prefix = 'Flagged Items';
+
+			// Filter only the flagged items:
+			$flagged_ItemList2->set_default_filters( array(
+					'flagged' => 1
+				) );
+
+			// Run query initialization to get total rows:
+			$flagged_ItemList2->query_init();
+
+			$this->flagged_items_count = $flagged_ItemList2->total_rows;
+		}
+
+		return $this->flagged_items_count;
 	}
 }
 

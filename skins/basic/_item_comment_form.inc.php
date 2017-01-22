@@ -37,11 +37,11 @@ $comment_reply_ID = param( 'reply_ID', 'integer', 0 );
 		$comment_author_url = $Comment->author_url;
 		$comment_text = $Comment->content;
 	}
-	$redirect = htmlspecialchars(url_rel_to_same_host(regenerate_url('','','','&'), $htsrv_url));
+	$redirect = htmlspecialchars( url_rel_to_same_host( regenerate_url( '', '', '', '&' ), get_htsrv_url() ) );
 ?>
 
 <!-- form to add a comment -->
-<form action="<?php echo $htsrv_url ?>comment_post.php" method="post" id="bComment_form_id_<?php echo $Item->ID ?>">
+<form action="<?php echo get_htsrv_url() ?>comment_post.php" method="post" id="bComment_form_id_<?php echo $Item->ID ?>">
 
 	<input type="hidden" name="comment_item_ID" value="<?php echo $Item->ID() ?>" />
 	<input type="hidden" name="redirect_to" value="<?php echo $Item->get_feedback_url( $disp == 'feedback-popup', '&' ) ?>" />

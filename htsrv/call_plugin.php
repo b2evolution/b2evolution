@@ -30,13 +30,27 @@ param( 'plugin_ID', 'integer', true );
 param( 'method', 'string', '' );
 param( 'params', 'string', null ); // serialized
 
-if( is_null($params) )
-{ // Default:
+if( $plugin_ID === -1 & $method == 'test_api' )
+{	// Use this case to test API from ctrl=system:
+	echo 'ok';
+	exit(0);
+}
+
+if( is_null( $params ) )
+{	// Use empty array by default if params are not sent by request:
 	$params = array();
 }
 else
-{ // params given. This may result in "false", but this means that unserializing failed.
-	$params = @unserialize($params);
+{	// Params given:
+	if( param_check_serialized_array( 'params' ) )
+	{	// If the params is a serialized array and doesn't contain any object inside:
+		// (This may result in "false", but this means that unserializing failed)
+		$params = @unserialize( $params );
+	}
+	else
+	{	// Restrict all non array params to empty array:
+		bad_request_die( 'Invalid params! Cannot unserialize.' );
+	}
 }
 
 

@@ -30,7 +30,7 @@ class LinkComment extends LinkOwner
 	 */
 	function __construct( $edited_Comment )
 	{
-		parent::__construct( $edited_Comment, 'comment' );
+		parent::__construct( $edited_Comment, 'comment', 'cmt_ID' );
 		$this->Comment = & $this->link_Object;
 
 		$this->_trans = array(
@@ -116,7 +116,7 @@ class LinkComment extends LinkOwner
 			$File = $FileCache->get_by_ID( $file_ID, false, false );
 			$file_name = empty( $File ) ? '' : $File->get_name();
 			$file_dir = $File->dir_or_file();
-			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s', ucfirst( $file_dir ), '[['.$file_name.']]', $this->type, $this->link_Object->ID ), 'info', 'file', $file_ID );
+			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s', ucfirst( $file_dir ), '[['.$file_name.']]', $this->type, $this->get_ID() ), 'info', 'file', $file_ID );
 
 			if( $update_owner )
 			{ // Update last touched date of the Comment & Item
@@ -141,12 +141,6 @@ class LinkComment extends LinkOwner
 		}
 	}
 
-	/**
-	 * Get where condition for select query to get Comment links
-	 */
-	function get_where_condition() {
-		return 'link_cmt_ID = '.$this->Comment->ID;
-	}
 
 	/**
 	 * Get Comment parameter

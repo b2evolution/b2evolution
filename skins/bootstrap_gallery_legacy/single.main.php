@@ -138,16 +138,20 @@ siteskin_include( '_site_body_header.inc.php' );
 
 			<span class="nav_album_title">
 				<?php
+					// Flag:
+					$single_Item->flag();
+
+					// Title:
 					$single_Item->title( array(
 							'link_type' => 'permalink',
 							'before'    => '',
 							'after'     => '',
 						) );
 				?>
-				<?php 	
+				<?php
 					if( $Skin->enabled_status_banner( $single_Item->status ) )
 					{ // Status banner
-						$single_Item->format_status( array( 'template' => '<div class="evo_status evo_status__$status$ badge">$status_title$</div>' ) );						
+						$single_Item->format_status( array( 'template' => '<div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>' ) );
 					}
 					$single_Item->edit_link( array( // Link to backoffice for editing
 							'before'    => '',
@@ -157,7 +161,7 @@ siteskin_include( '_site_body_header.inc.php' );
 						) );
 				?>
 			</span><!-- .nav_album_title -->
-		
+
 			<?php
 				// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
 				item_prevnext_links( array(
@@ -177,14 +181,14 @@ siteskin_include( '_site_body_header.inc.php' );
 					) );
 				// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 			?>
-		
+
 			<div class="clear"></div>
-			
+
 			</nav><!-- .nav_album -->
 			</div><!-- .col -->
 		</div><!-- .row -->
 		<?php
-		} // ------------------- END OF NAVIGATION BAR FOR ALBUM(POST) ------------------- 
+		} // ------------------- END OF NAVIGATION BAR FOR ALBUM(POST) -------------------
 	?>
 
 	<?php
@@ -195,8 +199,8 @@ siteskin_include( '_site_body_header.inc.php' );
 			) );
 		// --------------------------------- END OF MESSAGES ---------------------------------
 	?>
-		
-	<article class="row">	
+
+	<article class="row">
 
 	<?php
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
@@ -387,7 +391,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 		?>
 	</div><!-- .col -->
-	
+
 </footer><!-- .row -->
 
 

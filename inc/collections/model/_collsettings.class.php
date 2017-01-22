@@ -58,16 +58,24 @@ class CollectionSettings extends AbstractSettings
 			'slug_limit' => 5,
 			'tags_meta_keywords' => 1,
 			'tags_open_graph' => 1,
+			'tags_twitter_card' => 1,
 			// 'post_moderation_statuses' => NULL,			// Possible values are a list of statuses from: 'community', 'protected', 'review', 'draft', but we don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 
+		// Item voting settings:
+			'voting_positive' => 1, // Allow Positive vote
+			'voting_neutral'  => 0, // Allow Neutral vote
+			'voting_negative' => 0, // Allow Negative vote
+
 		// Comment settings:
-			// 'new_feedback_status' => 'review',		// Default status for new anonymous comments: 'published', 'community', 'protected', 'private', 'review', 'draft' or 'deprecated'. We don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
+			'new_feedback_status' => 'review',			// Default status for new anonymous comments: 'published', 'community', 'protected', 'private', 'review', 'draft' or 'deprecated'. We don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 			// 'moderation_statuses' => NULL,			// Possible values are a list of statuses from: 'community', 'protected', 'review', 'draft', but we don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 			// 'comment_inskin_statuses' => NULL,       // Possible value is a set of statuses wihtout the 'trash' status, but we don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 			// 'post_inskin_statuses' => NULL,          // Same as in case of comments
 			'allow_comments' => 'any',
 			'allow_view_comments' => 'any',				// 'any', 'registered', 'member', 'moderator'
-			'allow_anon_url' => '0',
+			'require_anon_name' => 1,
+			'require_anon_email' => 1,
+			'allow_anon_url' => 0,
 			'allow_attachments' => 'registered',
 			'max_attachments' => '',
 			'display_rating_summary' => '1', // Display a summary of star ratings above the comments
@@ -151,10 +159,13 @@ class CollectionSettings extends AbstractSettings
 			'cache_enabled_widgets' => 0,
 			'in_skin_login' => 0,						// Use in skin login form every time it's possible
 			'in_skin_editing' => 0,
+			'in_skin_editing_renderers' => 1,
+			'in_skin_editing_category' => 1,
 			'default_cat_ID' => NULL,					// Default Cat for new posts
 			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet,evo_twitter', // ping plugin codes, separated by comma
-			'allow_subscriptions' => 0,      // Don't allow email subscriptions by default
-			'allow_item_subscriptions' => 0, // Don't allow email subscriptions for a specific post by default
+			'allow_subscriptions' => 1,         // Allow email subscriptions for new post by default
+			'allow_comment_subscriptions' => 1, // Allow email subscriptions for new comment by default
+			'allow_item_subscriptions' => 1,    // Allow email subscriptions for a specific post by default
 			'use_workflow' => 0,						// Don't use workflow by default
 			'aggregate_coll_IDs' => '',
 			'blog_footer_text' => 'This collection &copy;$year$ by $owner$',
@@ -171,9 +182,21 @@ class CollectionSettings extends AbstractSettings
 			'allow_html_comment' => 1, // Allow HTML in comments
 			'track_unread_content' => 0, // Should we track unread content on the specific blog. It can be modified on the Features/Other settings form.
 			'allow_access' => 'public', // Allow access to blog; Values: 'public' - Everyone (Public Blog), 'users' - Logged in users, 'members' - Members of the blog
+			// Assets URLs:
+			'rsc_assets_url_type' => 'relative', // Load generic /rsc/ assets from: 'basic', 'relative', 'absolute'
+			'rsc_assets_absolute_url' => '', // Absolute URL for setting 'rsc_assets_url_type' with selected option 'absolute'
+			'media_assets_url_type' => 'relative', // Load generic /media/ assets from: 'basic', 'relative', 'absolute'
+			'media_assets_absolute_url' => '', // Absolute URL for setting 'media_assets_url_type' with selected option 'absolute'
+			'skins_assets_url_type' => 'relative', // Load generic /skins/ assets from: 'basic', 'relative', 'absolute'
+			'skins_assets_absolute_url' => '', // Absolute URL for setting 'skins_assets_url_type' with selected option 'absolute'
+			'plugins_assets_url_type' => 'relative', // Load generic /plugins/ assets from: 'basic', 'relative', 'absolute'
+			'plugins_assets_absolute_url' => '', // Absolute URL for setting 'plugins_assets_url_type' with selected option 'absolute'
 			'locale_source' => 'blog', // Source of the locale for navigation/widget: 'blog', 'user'
 			'post_locale_source' => 'post', // Source of the locale for post content: 'post', 'blog'
 			'new_item_locale_source' => 'select_coll', // Source of the locale for new items: 'use_coll', 'select_coll', 'select_user'
+			// Cookie settings:
+			'cookie_domain_type' => 'auto', // Cookie domain type: 'auto', 'custom'
+			'cookie_path_type' => 'auto', // Cookie path type: 'auto', 'custom'
 
 		// User directory:
 			'userdir_picture' => 1,

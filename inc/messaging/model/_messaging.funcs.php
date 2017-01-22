@@ -296,7 +296,7 @@ function leave_thread( $thread_ID, $user_ID, $close_thread = false )
  */
 function get_messaging_url( $disp = 'threads' )
 {
-	global $admin_url, $is_admin_page, $Blog;
+	global $admin_url, $is_admin_page, $Collection, $Blog;
 	if( $is_admin_page || empty( $Blog ) )
 	{
 		return $admin_url.'?ctrl='.$disp;
@@ -368,7 +368,7 @@ function get_messages_link_to( $thread_ID = NULL, $user_ID = NULL )
  */
 function get_messaging_sub_entries( $is_admin )
 {
-	global $Blog, $current_User;
+	global $Collection, $Blog, $current_User;
 
 	if( $is_admin )
 	{
@@ -1284,7 +1284,7 @@ function get_contacts_groups_options( $selected_group_ID = NULL, $value_null = t
  */
 function get_contacts_groups_list( $user_ID, $params = array() )
 {
-	global $DB, $current_User, $Blog;
+	global $DB, $current_User, $Collection, $Blog;
 
 	$params = array_merge( array(
 			'list_start'  => '<table cellspacing="0" class="user_contacts_groups">',
@@ -2104,7 +2104,7 @@ function threads_results( & $threads_Results, $params = array() )
  */
 function col_thread_recipients( $thread_ID, $abuse_management )
 {
-	global $DB, $Blog;
+	global $DB, $Collection, $Blog;
 
 	$SQL = new SQL();
 	$SQL->SELECT( 'user_login' );
@@ -2256,7 +2256,7 @@ function col_thread_read_by( $thread_ID )
  */
 function col_thread_delete_action( $thread_ID )
 {
-	global $Blog, $samedomain_htsrv_url, $admin_url;
+	global $Collection, $Blog, $admin_url;
 
 	if( is_admin_page() )
 	{
@@ -2266,7 +2266,7 @@ function col_thread_delete_action( $thread_ID )
 	else
 	{
 		$redirect_to = get_dispctrl_url( 'threads' );
-		return action_icon( T_( 'Delete'), 'delete', $samedomain_htsrv_url.'action.php?mname=messaging&thrd_ID='.$thread_ID.'&action=delete&redirect_to='.$redirect_to.'&'.url_crumb( 'messaging_threads' ) );
+		return action_icon( T_( 'Delete'), 'delete', get_htsrv_url().'action.php?mname=messaging&thrd_ID='.$thread_ID.'&action=delete&redirect_to='.$redirect_to.'&'.url_crumb( 'messaging_threads' ) );
 	}
 }
 
@@ -2288,41 +2288,6 @@ function col_msg_author( $user_ID, $datetime )
 
 
 /**
- * Get formatted message text
- *
- * @param integer Message ID
- * @param string Thread title
- * @return string Formatted message text
- */
-function col_msg_format_text( $msg_ID, $msg_text )
-{
-	$MessageCache = & get_MessageCache();
-	if( $Message = & $MessageCache->get_by_ID( $msg_ID, false, false ) )
-	{ // Get the prerendered content
-		$msg_text = $Message->get_content();
-	}
-
-	if( empty( $msg_text ) )
-	{
-		return format_to_output( $msg_text, 'htmlspecialchars' );
-	}
-
-	/**** yura> This below code is moved to the Plugins and to $Message->get_content() :
-
-	// WARNING: the messages may contain MALICIOUS HTML and javascript snippets. They must ALWAYS be ESCAPED prior to display!
-	$msg_text = htmlentities( $msg_text, ENT_COMPAT, $evo_charset );
-
-	$msg_text = make_clickable( $msg_text );
-	$msg_text = preg_replace( '#<a #i', '<a rel="nofollow" target="_blank"', $msg_text );
-	$msg_text = nl2br( $msg_text );
-
-	****/
-
-	return $msg_text;
-}
-
-
-/**
  * Get authors list to display who already had read current message
  *
  * @param integer Message ID
@@ -2330,7 +2295,7 @@ function col_msg_format_text( $msg_ID, $msg_text )
  */
 function col_msg_read_by( $message_ID )
 {
-	global $read_status_list, $leave_status_list, $Blog, $current_User, $perm_abuse_management;
+	global $read_status_list, $leave_status_list, $Collection, $Blog, $current_User, $perm_abuse_management;
 
 	$UserCache = & get_UserCache();
 
@@ -2417,7 +2382,7 @@ function col_msg_read_by( $message_ID )
  */
 function col_msg_actions( $thrd_ID, $msg_ID )
 {
-	global $Blog, $samedomain_htsrv_url, $perm_abuse_management;
+	global $Collection, $Blog, $perm_abuse_management;
 
 	if( $msg_ID < 1 )
 	{ // Don't display actions in preview mode
@@ -2435,7 +2400,7 @@ function col_msg_actions( $thrd_ID, $msg_ID )
 	else
 	{
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=messages&thrd_ID='.$thrd_ID );
-		$action_url = $samedomain_htsrv_url.'action.php?mname=messaging&disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete&blog='.$Blog->ID;
+		$action_url = get_htsrv_url().'action.php?mname=messaging&disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete&blog='.$Blog->ID;
 		$action_url = url_add_param( $action_url, 'redirect_to='.rawurlencode( $redirect_to ), '&' );
 		return action_icon( T_( 'Delete'), 'delete', $action_url.'&'.url_crumb( 'messaging_messages' ) );
 	}

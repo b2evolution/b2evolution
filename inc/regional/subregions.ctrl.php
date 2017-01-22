@@ -163,44 +163,28 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Insert in DB:
-			$DB->begin();
-			$q = $edited_Subregion->dbexists();
-			if($q)
-			{	// We have a duplicate entry:
+			unset( $edited_Subregion->dbchanges['subrg_ctry_ID'] );
+			$edited_Subregion->dbinsert();
+			$Messages->add( T_('New region created.'), 'success' );
 
-				param_error( 'subrg_code',
-					sprintf( T_('This sub-region already exists. Do you want to <a %s>edit the existing sub-region</a>?'),
-						'href="?ctrl=subregions&amp;action=edit&amp;subrg_ID='.$q.'"' ) );
-			}
-			else
+			// What next?
+			switch( $action )
 			{
-				unset( $edited_Subregion->dbchanges['subrg_ctry_ID'] );
-				$edited_Subregion->dbinsert();
-				$Messages->add( T_('New region created.'), 'success' );
-			}
-			$DB->commit();
-
-			if( empty($q) )
-			{	// What next?
-
-				switch( $action )
-				{
-					case 'create_copy':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=subregions&action=new&subrg_ID='.$edited_Subregion->ID, 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create_new':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=subregions&action=new', 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=subregions', 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-				}
+				case 'create_copy':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=subregions&action=new&subrg_ID='.$edited_Subregion->ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create_new':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=subregions&action=new', 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=subregions', 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
 			}
 		}
 		break;
@@ -222,27 +206,13 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Update in DB:
-			$DB->begin();
-			$q = $edited_Subregion->dbexists();
-			if($q)
-			{	// We have a duplicate entry:
-				param_error( 'subrg_code',
-					sprintf( T_('This sub-region already exists. Do you want to <a %s>edit the existing sub-region</a>?'),
-						'href="?ctrl=subregions&amp;action=edit&amp;subrg_ID='.$q.'"' ) );
-			}
-			else
-			{
-				unset( $edited_Subregion->dbchanges['subrg_ctry_ID'] );
-				$edited_Subregion->dbupdate();
-				$Messages->add( T_('Region updated.'), 'success' );
-			}
-			$DB->commit();
+			unset( $edited_Subregion->dbchanges['subrg_ctry_ID'] );
+			$edited_Subregion->dbupdate();
+			$Messages->add( T_('Region updated.'), 'success' );
 
-			if( empty($q) )
-			{	// If no error, Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( '?ctrl=subregions', 303 ); // Will EXIT
-				// We have EXITed already at this point!!
-			}
+			// If no error, Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=subregions', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
 		break;
 

@@ -341,7 +341,7 @@ if( $upload )
 		prepare_uploaded_files( array( $newFile ) );
 
 		if( ! empty( $link_owner ) )
-		{ // Try to link the uploaded file to the object Item/Comment
+		{	// Try to link the uploaded file to the object Item/Comment/EmailCampaign:
 			list( $link_owner_type, $link_owner_ID ) = explode( '_', $link_owner, 2 );
 			$link_owner_ID = intval( $link_owner_ID );
 			if( $link_owner_ID > 0 )
@@ -364,6 +364,20 @@ if( $upload )
 						{
 							$LinkOwner = new LinkComment( $linked_Comment );
 						}
+						break;
+
+					case 'emailcampaign':
+						// Get LinkOwner object of the EmailCampaign:
+						$EmailCampaignCache = & get_EmailCampaignCache();
+						if( $linked_EmailCampaign = & $EmailCampaignCache->get_by_ID( $link_owner_ID, false, false ) )
+						{
+							$LinkOwner = new LinkEmailCampaign( $linked_EmailCampaign );
+						}
+						break;
+
+					case 'message':
+						// Get LinkOwner object of the Message:
+						$LinkOwner = new LinkMessage( NULL, $link_owner_ID );
 						break;
 				}
 			}
@@ -458,7 +472,10 @@ if( $upload )
 					'file_ID'       => $newFile->ID,
 					'link_position' => $new_Link->get( 'position' ),
 				);
-			$message['link_position'] = display_link_position( $mask_row );
+			if( count( $LinkOwner->get_positions() ) > 1 )
+			{	// Email campaign always has only one postion, so we don't need these data:
+				$message['link_position'] = display_link_position( $mask_row );
+			}
 		}
 
 		out_echo( $message, $specialchars );

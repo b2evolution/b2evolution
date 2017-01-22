@@ -53,7 +53,7 @@ switch( $type )
 
 			$message = sprintf( T_("We have received a request that you do not want to receive emails through\na message form on your comments anymore.\n\nTo confirm that this request is from you, please click on the following link:") )
 				."\n\n"
-				.$samedomain_htsrv_url.'anon_unsubscribe.php?type=comment&anon_email='.$anon_email.'&req_ID='.$req_ID
+				.get_htsrv_url().'anon_unsubscribe.php?type=comment&anon_email='.$anon_email.'&req_ID='.$req_ID
 				."\n\n"
 				.T_('Please note:')
 				.' '.T_('For security reasons the link is only valid for your current session (by means of your session cookie).')

@@ -15,7 +15,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $admin_url, $tab;
-global $edited_EmailCampaign, $Plugins;
+global $edited_EmailCampaign, $Plugins, $UserSettings;
 
 $Form = new Form( NULL, 'campaign_form' );
 $Form->begin_form( 'fform' );
@@ -39,7 +39,7 @@ $Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCamp
 	// Plugin buttons:
 	ob_start();
 	echo '<div class="edit_actions">';
-	echo '<div class="pull-left">';
+	echo '<div class="pull-left" style="display: flex; flex-direction: row; align-items: center;">';
 	// CALL PLUGINS NOW:
 	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
 			'target_type'   => 'EmailCampaign',
@@ -47,6 +47,18 @@ $Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCamp
 			'content_id'    => 'ecmp_email_text',
 			'edit_layout'   => 'expert',
 		) );
+
+	echo '<div style="margin: 7px 0 0 5px; display: flex; align-items: center;">';
+	ob_start();
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
+			'target_type'   => 'EmailCampaign',
+			'target_object' => $edited_EmailCampaign,
+			'content_id'    => 'ecmp_email_text',
+			'edit_layout'   => 'expert_quicksettings',
+		) );
+	$quick_setting_switch = ob_get_flush();
+	echo '</div>';
+
 	echo '</div>';
 	echo '</div>';
 	$email_plugin_buttons = ob_get_clean();
@@ -58,6 +70,8 @@ $Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCamp
 	$Form->textarea_input( 'ecmp_email_text', $edited_EmailCampaign->get( 'email_text' ), 20, T_('HTML Message'), array( 'required' => true ) );
 	$Form->inputstart = $form_inputstart;
 	$Form->inputend = $form_inputend;
+
+
 
 	// set b2evoCanvas for plugins:
 	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "ecmp_email_text" );</script>';
@@ -71,6 +85,19 @@ $Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCamp
 	}
 $Form->end_fieldset();
 
+
+// ####################### ATTACHMENTS/LINKS #########################
+if( isset( $GLOBALS['files_Module'] )
+	&& $current_User->check_perm( 'emails', 'edit' )
+	&& $current_User->check_perm( 'files', 'view' ) )
+{	// Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files:
+	load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
+	global $LinkOwner; // Initialize this object as global because this is used in many link functions
+	$LinkOwner = new LinkEmailCampaign( $edited_EmailCampaign );
+	display_attachments_fieldset( $Form, $LinkOwner );
+}
+
+
 $buttons = array();
 if( $current_User->check_perm( 'emails', 'edit' ) )
 { // User must has a permission to edit emails
@@ -79,3 +106,18 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 $Form->end_form( $buttons );
 
 ?>
+<script type="text/javascript">
+function toggleWYSIWYGSwitch( val )
+{
+	if( val )
+	{
+		jQuery( 'p#active_wysiwyg_switch' ).show();
+		jQuery( 'p#disable_wysiwyg_switch' ).hide();
+	}
+	else
+	{
+		jQuery( 'p#active_wysiwyg_switch' ).hide();
+		jQuery( 'p#disable_wysiwyg_switch' ).show();
+	}
+}
+</script>

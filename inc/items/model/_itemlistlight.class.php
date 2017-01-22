@@ -119,10 +119,12 @@ class ItemListLight extends DataObjectList2
 		// Initialize the default filter set:
 		$this->set_default_filters( array(
 				'filter_preset' => NULL,
+				'flagged' => false,
 				'ts_min' => $timestamp_min,
 				'ts_max' => $timestamp_max,
 				'ts_created_max' => NULL,
 				'coll_IDs' => NULL, // empty: current blog only; "*": all blogs; "1,2,3": blog IDs separated by comma; "-": current blog only and exclude the aggregated blogs
+				'cat_single' => NULL, 	// If we requested a "single category" page, ID of the top category
 				'cat_array' => array(),
 				'cat_modifier' => NULL,
 				'cat_focus' => 'wide',					// Search in extra categories, not just main cat
@@ -293,6 +295,11 @@ class ItemListLight extends DataObjectList2
 			memorize_param( $this->param_prefix.'dstart', 'integer', $this->default_filters['ymdhms_min'], $this->filters['ymdhms_min'] ); // YearMonth(Day) to start at
 			memorize_param( $this->param_prefix.'dstop', 'integer', $this->default_filters['ymdhms_max'], $this->filters['ymdhms_max'] ); // YearMonth(Day) to start at
 
+			/*
+			 * Restrict by flagged items:
+			 */
+			memorize_param( $this->param_prefix.'flagged', 'integer', $this->default_filters['flagged'], $this->filters['flagged'] );
+
 			// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
 			if( is_null($this->default_filters['ts_min'])
 				&& is_null($this->default_filters['ts_max'] ) )
@@ -380,9 +387,20 @@ class ItemListLight extends DataObjectList2
 		/*
 		 * Blog & Chapters/categories restrictions:
 		 */
+		$cat = param( 'cat', '/^[*\-\|]?([0-9]+(,[0-9]+)*)?$/', $this->default_filters['cat_modifier'], true ); // List of cats to restrict to
+		$catsel = param( 'catsel', 'array:integer', $this->default_filters['cat_array'], true );  // Array of cats to restrict to
+
+		if( empty( $catsel ) && preg_match( '~^[0-9]+$~', $cat ) )
+		{	// We are on a single cat page: (equivalent to $disp_detail == 'posts-topcat')
+			// NOTE: we must have selected EXACTLY ONE CATEGORY through the cat parameter
+			// BUT: - this can resolve to including children
+			//      - selecting exactly one cat through catsel[] is NOT OK since not equivalent (will exclude children)
+			// Record this "single cat":
+			$this->filters['cat_single'] = $cat;
+		}					
+
 		// Get chapters/categories (and compile those values right away)
-		param_compile_cat_array( /* TODO: check $this->Blog->ID == 1 ? 0 :*/ !is_null( $this->Blog ) ? $this->Blog->ID : 0,
-								$this->default_filters['cat_modifier'], $this->default_filters['cat_array'] );
+		param_compile_cat_array( !is_null( $this->Blog ) ? $this->Blog->ID : 0,	$cat, $catsel );
 
 		$this->filters['cat_array'] = get_param( 'cat_array' );
 		$this->filters['cat_modifier'] = get_param( 'cat_modifier' );
@@ -474,6 +492,12 @@ class ItemListLight extends DataObjectList2
 
 		$this->filters['ymdhms_min'] = param_compact_date( $this->param_prefix.'dstart', $this->default_filters['ymdhms_min'], true, T_( 'Invalid date' ) ); // YearMonth(Day) to start at
 		$this->filters['ymdhms_max'] = param_compact_date( $this->param_prefix.'dstop', $this->default_filters['ymdhms_max'], true, T_( 'Invalid date' ) ); // YearMonth(Day) to stop at
+
+
+		/*
+		 * Restrict by flagged items:
+		 */
+		$this->filters['flagged'] = param( $this->param_prefix.'flagged', 'integer', $this->default_filters['flagged'], true );
 
 
 		// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
@@ -603,6 +627,7 @@ class ItemListLight extends DataObjectList2
 		$this->ItemQuery->where_datecreated( $this->filters['ts_created_max'] );
 		$this->ItemQuery->where_visibility( $this->filters['visibility_array'], $this->filters['coll_IDs'] );
 		$this->ItemQuery->where_featured( $this->filters['featured'] );
+		$this->ItemQuery->where_flagged( $this->filters['flagged'] );
 
 
 		/*
@@ -617,6 +642,12 @@ class ItemListLight extends DataObjectList2
 			$this->filters['orderby'] = $this->Blog->get_setting('orderby');
 		}
 
+		if( isset( $this->filters['orderby'] ) && $this->filters['orderby'] == 'numviews' )
+		{ // Order by number of views
+			$this->ItemQuery->FROM_add( 'LEFT JOIN ( SELECT itud_item_ID, COUNT(*) AS '.$this->Cache->dbprefix.'numviews FROM T_items__user_data GROUP BY itud_item_ID ) AS numviews
+					ON '.$this->Cache->dbIDname.' = numviews.itud_item_ID' );
+		}
+
 		if( empty($order_by) )
 		{
 			$available_fields = array_keys( get_available_sort_options() );
@@ -625,6 +656,8 @@ class ItemListLight extends DataObjectList2
 			$available_fields[] = 'assigned_user_ID';
 			$available_fields[] = 'pst_ID';
 			$available_fields[] = 'datedeadline';
+			$available_fields[] = 'ityp_ID';
+			$available_fields[] = 'status';
 			$available_fields[] = 'T_categories.cat_name';
 			$available_fields[] = 'T_categories.cat_order';
 			$order_by = gen_order_clause( $this->filters['orderby'], $this->filters['order'], $this->Cache->dbprefix, $this->Cache->dbIDname, $available_fields );
@@ -755,10 +788,10 @@ class ItemListLight extends DataObjectList2
 	 *
 	 * Contrary to ItemList2, we only do 1 query here and we extract only a few selected params.
 	 * Basically all we want is being able to generate permalinks.
-	 * 
+	 *
 	 * We need this query() stub in order to call it from restart() and still
 	 * let derivative classes override it
-	 * 
+	 *
 	 * @deprecated Use new function run_query()
 	 */
 	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
@@ -902,6 +935,7 @@ class ItemListLight extends DataObjectList2
 				'category_text'       => T_('Category').': ',
 				'categories_text'     => T_('Categories').': ',
 				'categories_nor_text' => T_('All but '),
+				'categories_display'  => 'toplevel', 	// 'full' | 'toplevel'
 
 				'display_tag'         => true,
 				'tag_text'            => T_('Tag').': ',
@@ -933,6 +967,7 @@ class ItemListLight extends DataObjectList2
 				'display_locale'      => true,
 				'display_time'        => true,
 				'display_limit'       => true,
+				'display_flagged'     => true,
 
 				'group_mask'          => '$group_title$$filter_items$', // $group_title$, $filter_items$
 				'filter_mask'         => '"$filter_name$"', // $group_title$, $filter_name$, $clear_icon$
@@ -985,17 +1020,29 @@ class ItemListLight extends DataObjectList2
 		// CATEGORIES:
 		if( $params['display_category'] )
 		{
-			if( ! empty( $this->filters['cat_array'] ) )
+			$catlist = NULL;
+			if( $params['categories_display'] == 'toplevel' // We'd like to minimize display if possible
+				&& !empty($this->filters['cat_single']) )	// ... AND we are on a "single cat" page
+			{	// We want to show only the top cat (and not its children)
+				$catlist = array($this->filters['cat_single']);
+
+			}
+			elseif( ! empty( $this->filters['cat_array'] ) )
 			{ // We have requested specific categories...
+				$catlist = $this->filters['cat_array'];
+			}
+
+			if( !empty($catlist))
+			{	// We want to show some category names:
 				$cat_names = array();
 				$ChapterCache = & get_ChapterCache();
 				$catsel_param = get_param( 'catsel' );
-				foreach( $this->filters['cat_array'] as $cat_ID )
+				foreach( $catlist as $cat_ID )
 				{
 					if( ( $tmp_Chapter = & $ChapterCache->get_by_ID( $cat_ID, false ) ) !== false )
 					{ // It is almost never meaningful to die over an invalid cat when generating title
 						$cat_clear_url = regenerate_url( ( empty( $catsel_param ) ? 'cat=' : 'catsel=' ).$cat_ID );
-						if( $disp_detail == 'posts-subcat' || $disp_detail == 'posts-cat' )
+						if( $disp_detail == 'posts-topcat' || $disp_detail == 'posts-subcat' || $disp_detail == 'posts-cat' )
 						{ // Remove category url from $ReqPath when we use the cat url instead of cat ID
 							$cat_clear_url = str_replace( '/'.$tmp_Chapter->get_url_path(), '', $cat_clear_url );
 						}
@@ -1140,7 +1187,7 @@ class ItemListLight extends DataObjectList2
 				$filter_class_i++;
 				$tags = implode( $params['separator_comma'], $tag_names );
 				$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
-					( count( $tag_names ) > 1 ? 
+					( count( $tag_names ) > 1 ?
 						array( $params['tags_text'], $params['before_items'].$tags.$params['after_items'] ) :
 						array( $params['tag_text'], $tags ) ),
 					$params['group_mask'] );
@@ -1319,7 +1366,7 @@ class ItemListLight extends DataObjectList2
 					}
 					$filter_class_i++;
 					$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
-						( count( $status_titles ) > 1 ? 
+						( count( $status_titles ) > 1 ?
 							array( $params['visibility_text'], $params['before_items'].implode( $params['separator_comma'], $status_titles ).$params['after_items'] ) :
 							array( $params['visibility_text'], implode( $params['separator_comma'], $status_titles ) ) ),
 						$params['group_mask'] );
@@ -1442,6 +1489,21 @@ class ItemListLight extends DataObjectList2
 			else
 			{
 				debug_die( 'Unhandled LIMITING mode in ItemList:'.$this->filters['unit'].' (paged mode is obsolete)' );
+			}
+		}
+
+
+		// FLAGGED:
+		if( $params['display_flagged'] )
+		{
+			if( ! empty( $this->filters['flagged'] ) )
+			{	// Display when only flagged items:
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'flagged' ) ) : '';
+				$title_array['flagged'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
+					array( T_('Flagged'), $unit_clear_icon, $filter_classes[ $filter_class_i ] ),
+					$params['filter_mask_nogroup'] );
+				$filter_class_i++;
 			}
 		}
 

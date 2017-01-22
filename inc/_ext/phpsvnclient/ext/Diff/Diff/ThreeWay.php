@@ -39,7 +39,7 @@ class Text_Diff_ThreeWay extends Text_Diff {
      * @param array $final1  The first version to compare to.
      * @param array $final2  The second version to compare to.
      */
-    function Text_Diff_ThreeWay($orig, $final1, $final2)
+    function __construct($orig, $final1, $final2)
     {
         if (extension_loaded('xdiff')) {
             $engine = new Text_Diff_Engine_xdiff();
@@ -156,7 +156,7 @@ class Text_Diff_ThreeWay extends Text_Diff {
  */
 class Text_Diff_ThreeWay_Op {
 
-    function Text_Diff_ThreeWay_Op($orig = false, $final1 = false, $final2 = false)
+    function __construct($orig = false, $final1 = false, $final2 = false)
     {
         $this->orig = $orig ? $orig : array();
         $this->final1 = $final1 ? $final1 : array();
@@ -195,7 +195,7 @@ class Text_Diff_ThreeWay_Op {
  */
 class Text_Diff_ThreeWay_Op_copy extends Text_Diff_ThreeWay_Op {
 
-    function Text_Diff_ThreeWay_Op_Copy($lines = false)
+    function __construct($lines = false)
     {
         $this->orig = $lines ? $lines : array();
         $this->final1 = &$this->orig;
@@ -222,7 +222,7 @@ class Text_Diff_ThreeWay_Op_copy extends Text_Diff_ThreeWay_Op {
  */
 class Text_Diff_ThreeWay_BlockBuilder {
 
-    function Text_Diff_ThreeWay_BlockBuilder()
+    function __construct()
     {
         $this->_init();
     }

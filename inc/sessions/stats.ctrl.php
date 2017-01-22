@@ -52,11 +52,11 @@ if( $tab == 'domains' && $current_User->check_perm( 'stats', 'edit' ) )
 	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 }
 
-if( $blog == 0 )
+if( $blog == 0 || ! $current_User->check_perm( 'stats', 'list', false, $blog ) )
 {
 	if( ! $perm_view_all && isset( $collections_Module ) )
 	{ // Find a blog we can view stats for:
-		if( ! $selected = autoselect_blog( 'stats', 'view' ) )
+		if( ! $selected = autoselect_blog( 'stats', 'list' ) )
 		{ // No blog could be selected
 			$Messages->add( T_('Sorry, there is no blog you have permission to view stats for.'), 'error' );
 			$action = 'nil';
@@ -64,7 +64,7 @@ if( $blog == 0 )
 		elseif( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
 		{ // Selected a new blog:
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 		}
 	}
 }
@@ -161,6 +161,7 @@ switch( $action )
 			load_class( 'sessions/model/_domain.class.php', 'Domain' );
 			$edited_Domain = new Domain();
 			$edited_Domain->set( 'name', param( 'dom_name', 'string', '' ) );
+			$edited_Domain->set( 'type', param( 'dom_type', 'string', 'unknown' ) );
 			$edited_Domain->set( 'status', param( 'dom_status', 'string', 'unknown' ) );
 		}
 		else
@@ -224,6 +225,46 @@ switch( $action )
 		}
 		$action = 'domain_new';
 		break;
+
+	case 'aggregate':
+		// Aggregate the hits and sessions:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'aggregate' );
+
+		// Check permission:
+		$current_User->check_perm( 'stats', 'edit', true );
+
+		// Do the aggregations:
+		Hitlist::aggregate_hits();
+		Hitlist::aggregate_sessions();
+
+		$Messages->add( T_('The hits have been aggregated.'), 'success' );
+
+		// Redirect to referer page:
+		header_redirect( $admin_url.'?ctrl=stats&tab='.$tab.'&tab3='.$tab3.'&blog='.$blog, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
+
+	case 'filter_aggregated':
+		// Filter the aggregated data by date:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'aggfilter' );
+
+		// Save the filter data in settings of current user:
+		$UserSettings->set( 'agg_period', param( 'agg_period', 'string' ) );
+		if( $agg_period == 'specific_month' )
+		{
+			$UserSettings->set( 'agg_month', param( 'agg_month', 'integer' ) );
+			$UserSettings->set( 'agg_year', param( 'agg_year', 'integer' ) );
+		}
+		$UserSettings->dbupdate();
+
+		// Redirect to referer page:
+		header_redirect( $admin_url.'?ctrl=stats&tab='.$tab.'&tab3='.$tab3.'&blog='.$blog, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
 }
 
 if( isset($collections_Module) && $tab_from != 'antispam' )
@@ -250,6 +291,12 @@ if( isset( $tab_real ) )
 switch( $tab )
 {
 	case 'summary':
+		param( 'hits_summary_mode', 'string' );
+		if( ! empty( $hits_summary_mode ) )
+		{	// Save a selected mode of hits summary data in session variable:
+			$Session->set( 'hits_summary_mode', $hits_summary_mode );
+		}
+
 		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('Summary'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 		if( empty($tab3) )

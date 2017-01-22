@@ -21,7 +21,7 @@ class bootstrap_gallery_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.0';
+	var $version = '6.8.3';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -59,6 +59,34 @@ class bootstrap_gallery_Skin extends Skin
 
 
 	/**
+	 * Get supported collection kinds.
+	 *
+	 * This should be overloaded in skins.
+	 *
+	 * For each kind the answer could be:
+	 * - 'yes' : this skin does support that collection kind (the result will be was is expected)
+	 * - 'partial' : this skin is not a primary choice for this collection kind (but still produces an output that makes sense)
+	 * - 'maybe' : this skin has not been tested with this collection kind
+	 * - 'no' : this skin does not support that collection kind (the result would not be what is expected)
+	 * There may be more possible answers in the future...
+	 */
+	public function get_supported_coll_kinds()
+	{
+		$supported_kinds = array(
+				'main' => 'no',
+				'std' => 'no',		// Blog
+				'photo' => 'yes',
+				'forum' => 'no',
+				'manual' => 'no',
+				'group' => 'no',  // Tracker
+				// Any kind that is not listed should be considered as "maybe" supported
+			);
+
+		return $supported_kinds;
+	}
+
+
+	/*
 	 * What CSS framework does has this skin been designed with?
 	 *
 	 * This may impact default markup returned by Skin::get_template() for example
@@ -88,28 +116,29 @@ class bootstrap_gallery_Skin extends Skin
 				),
 					'max_image_height' => array(
 						'label' => T_('Max comment image height'),
-						'note' => 'px',
+						'note' => 'px. ' . T_('Set maximum height for comment images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
+						'size' => '7',
 						'allow_empty' => true,
 					),
 					'posts_thumb_size' => array(
 						'label' => T_('Thumbnail size for Albums'),
-						'note' => '',
+						'note' => T_('Select thumbnail size for Albums') . ' (disp=catdir).',
 						'defaultvalue' => 'crop-192x192',
 						'options' => get_available_thumb_sizes(),
 						'type' => 'select',
 					),
 					'single_thumb_size' => array(
 						'label' => T_('Thumbnail size inside Album'),
-						'note' => '',
+						'note' => T_('Select thumbnail size for images inside Albums') . ' (disp=single).',
 						'defaultvalue' => 'fit-640x480',
 						'options' => get_available_thumb_sizes(),
 						'type' => 'select',
 					),
 					'mediaidx_thumb_size' => array(
 						'label' => T_('Thumbnail size in Media index'),
-						'note' => '',
+						'note' => T_('Select thumbnail size for Media index images') . ' (disp=mediaidx).',
 						'defaultvalue' => 'fit-256x256',
 						'options' => get_available_thumb_sizes(),
 						'type' => 'select',
@@ -133,30 +162,30 @@ class bootstrap_gallery_Skin extends Skin
 						'label' => T_('Page text size'),
 						'note' => T_('Default value is 14 pixels.'),
 						'defaultvalue' => '14px',
-						'size' => '4px',
+						'size' => '7',
 						'type' => 'text',
 					),
 					'page_text_color' => array(
 						'label' => T_('Page text color'),
-						'note' => T_('E-g: #00ff00 for green'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_link_color' => array(
 						'label' => T_('Page link color'),
-						'note' => T_('E-g: #00ff00 for green'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
 					'current_tab_text_color' => array(
 						'label' => T_('Current tab text color'),
-						'note' => T_('E-g: #ff6600 for orange'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_bg_color' => array(
 						'label' => T_('Page background color'),
-						'note' => T_('E-g: #ff0000 for red'),
+						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
 					),
@@ -446,7 +475,7 @@ class bootstrap_gallery_Skin extends Skin
 	 */
 	function is_visible_container( $container_key )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $Blog->has_access() )
 		{	// If current user has an access to this collection then don't restrict containers:

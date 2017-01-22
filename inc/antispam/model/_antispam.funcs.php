@@ -37,8 +37,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * antispam_create(-)
  *
  * Insert a new abuse string into DB
+ *
+ * @param string Abuse string
+ * @param string Keyword source
+ * @return boolean TRUE if antispam keyword was inserted, FALSE if abuse string is empty or keyword is already in DB
  */
-function antispam_create( $abuse_string, $aspm_source = 'local' )
+function antispam_create( $abuse_string, $keyword_source = 'local' )
 {
 	global $DB;
 
@@ -50,15 +54,14 @@ function antispam_create( $abuse_string, $aspm_source = 'local' )
 	}
 
 	// Check if the string already is in the blacklist:
-	if( antispam_check($abuse_string) )
+	if( antispam_check( $abuse_string ) )
 	{
 		return false;
 	}
 
 	// Insert new string into DB:
-	$sql = "INSERT INTO T_antispam( aspm_string, aspm_source )
-					VALUES( '".$DB->escape($abuse_string)."', '$aspm_source' )";
-	$DB->query( $sql );
+	$DB->query( 'INSERT INTO T_antispam__keyword ( askw_string, askw_source )
+		VALUES ( '.$DB->quote( $abuse_string ).', '.$DB->quote( $keyword_source ).' )' );
 
 	return true;
 }
@@ -69,29 +72,32 @@ function antispam_create( $abuse_string, $aspm_source = 'local' )
  *
  * Note: We search by string because we sometimes don't know the ID
  * (e-g when download already in list/cache)
+ *
+ * @param string Abuse string
+ * @param string Keyword source
  */
-function antispam_update_source( $aspm_string, $aspm_source )
+function antispam_update_source( $abuse_string, $keyword_source )
 {
 	global $DB;
 
-	$sql = "UPDATE T_antispam
-					SET aspm_source = '$aspm_source'
-					WHERE aspm_string = '".$DB->escape($aspm_string)."'";
-	$DB->query( $sql );
+	$DB->query( 'UPDATE T_antispam__keyword
+		SET askw_source = '.$DB->quote( $keyword_source ).'
+		WHERE askw_string = '.$DB->quote( $abuse_string ) );
 }
 
 /*
  * antispam_delete(-)
  *
  * Remove an entry from the ban list
+ *
+ * @param integer antispam keyword ID
  */
-function antispam_delete( $string_ID )
+function antispam_delete( $keyword_ID )
 {
 	global $DB;
 
-	$sql = "DELETE FROM T_antispam
-					WHERE aspm_ID = $string_ID";
-	$DB->query( $sql );
+	$DB->query( 'DELETE FROM T_antispam__keyword
+		WHERE askw_ID = '.intval( $keyword_ID ) );
 }
 
 
@@ -116,13 +122,13 @@ function antispam_check( $haystack )
 {
 	global $DB, $Debuglog, $Timer;
 
-	// TODO: 'SELECT COUNT(*) FROM T_antispam WHERE aspm_string LIKE "%'.$url.'%" ?
+	// TODO: 'SELECT COUNT(*) FROM T_antispam__keyword WHERE askw_string LIKE "%'.$url.'%" ?
 
 	$Timer->resume( 'antispam_url' ); // resuming to get the total number..
 	$block = $DB->get_var(
-		'SELECT aspm_string
-		   FROM  T_antispam
-		  WHERE '.$DB->quote($haystack).' LIKE CONCAT("%",aspm_string,"%")
+		'SELECT askw_string
+		   FROM  T_antispam__keyword
+		  WHERE '.$DB->quote( $haystack ).' LIKE CONCAT("%",askw_string,"%")
 		  LIMIT 0, 1', 0, 0, 'Check URL against antispam blacklist' );
 	if( $block )
 	{
@@ -193,7 +199,7 @@ function antispam_report_abuse( $abuse_string )
 	}
 	else
 	{
-		$Messages->add( T_('Failed to report abuse to b2evolution.net.'), 'error' );
+		$Messages->add( sprintf( T_('Failed to report abuse to %s.'), $antispamsrv_host ), 'error' );
 	}
 
 	return $ret;
@@ -225,7 +231,7 @@ function antispam_poll_abuse()
 	// Get datetime from last update, because we only want newer stuff...
 	$last_update = $Settings->get( 'antispam_last_update' );
 	// Encode it in the XML-RPC format
-	$Messages->add( T_('Latest update timestamp').': '.$last_update, 'note' );
+	$Messages->add_to_group( T_('Latest update timestamp').': '.$last_update, 'note', T_('Updating antispam:') );
 	$startat = mysql2date( 'Ymd\TH:i:s', $last_update );
 	//$startat = iso8601_encode( mktime(substr($m,11,2),substr($m,14,2),substr($m,17,2),substr($m,5,2),substr($m,8,2),substr($m,0,4)) );
 
@@ -241,7 +247,7 @@ function antispam_poll_abuse()
 								)
 							);
 
-	$Messages->add( sprintf( T_('Requesting abuse list from %s...'), $antispamsrv_host ), 'note' );
+	$Messages->add_to_group( sprintf( T_('Requesting abuse list from %s...'), $antispamsrv_host ), 'note', T_('Updating antispam:') );
 
 	$result = $client->send( $message );
 
@@ -253,7 +259,7 @@ function antispam_poll_abuse()
 			$response = xmlrpc_decode_recurse( $response );
 			if( !isset( $response['strings'] ) || !isset( $response['lasttimestamp'] ) )
 			{
-				$Messages->add( T_('Incomplete reponse.'), 'error' );
+				$Messages->add( T_('Incomplete response.'), 'error' );
 				$ret = false;
 			}
 			else
@@ -261,28 +267,27 @@ function antispam_poll_abuse()
 				$value = $response['strings'];
 				if( count( $value ) == 0 )
 				{
-					$Messages->add( T_('No new blacklisted strings are available.'), 'note' );
+					$Messages->add_to_group( T_('No new blacklisted strings are available.'), 'note', T_('Updating antispam:') );
 				}
 				else
 				{ // We got an array of strings:
-					$Messages->add( T_('Adding strings to local blacklist:'), 'note' );
 					foreach( $value as $banned_string )
 					{
 						if( antispam_create( $banned_string, 'central' ) )
 						{ // Creation successed
-							$Messages->add( T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '
-								.T_('OK.'), 'note' );
+							$Messages->add_to_group( T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '
+								.T_('OK.'), 'note', T_('Adding strings to local blacklist:') );
 						}
 						else
 						{ // Was already handled
-							$Messages->add( T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '
-								.T_('Not necessary! (Already handled)'), 'note' );
+							$Messages->add_to_group( T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '
+								.T_('Not necessary! (Already handled)'), 'note', T_('Adding strings to local blacklist:') );
 							antispam_update_source( $banned_string, 'central' );
 						}
 					}
 					// Store latest timestamp:
 					$endedat = date('Y-m-d H:i:s', iso8601_decode( $response['lasttimestamp'] ) );
-					$Messages->add( T_('New latest update timestamp').': '.$endedat, 'note' );
+					$Messages->add( T_('New latest update timestamp').': '.$endedat, 'note', T_('Adding strings to local blacklist:') );
 
 					$Settings->set( 'antispam_last_update', $endedat );
 					$Settings->dbupdate();
@@ -403,7 +408,7 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 	{
 		if( $noperms_count == 0 )
 		{ // There isn't any affected comment witch corresponding status
-			printf( '<p>'.T_('No %s comments match the keyword [%s].').'</p>', '<strong>'.$status.'</strong>', htmlspecialchars($keyword) );
+			printf( '<p>'.T_('No %s comments match the keyword %s.').'</p>', '<strong>'.$status.'</strong>', '<code>'.htmlspecialchars($keyword).'</code>' );
 		}
 		else
 		{ // There are affected comment witch corresponding status, but current user has no permission
@@ -491,52 +496,24 @@ function get_ip_range( $ip_start, $ip_end, $aipr_ID = 0 )
  */
 function antispam_block_request()
 {
-	global $DB, $Plugins;
+	global $Plugins;
 
-	// Check block by IP
+	// Check to block by current IP addresses:
 	antispam_block_by_ip();
 
-	// Check block by domain
-	if( is_logged_in() )
-	{ // Current user is logged in, We also can check the domains with blocked status
-		global $current_User, $UserSettings;
+	// Check to block by current domain:
+	antispam_block_by_domain();
 
-		if( empty( $UserSettings ) )
-		{ // Initialize UserSettings
-			load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
-			$UserSettings = new UserSettings();
-		}
+	// Check to block by initial referer:
+	antispam_block_by_initial_referer();
 
-		$DomainCache = & get_DomainCache();
-
-		load_funcs('sessions/model/_hitlog.funcs.php');
-
-		$user_domain = $UserSettings->get( 'user_domain', $current_User->ID );
-		if( ! empty( $user_domain ) &&
-		    $Domain = & get_Domain_by_subdomain( $user_domain ) &&
-		    $Domain->get( 'status' ) == 'blocked' )
-		{ // The request from this domain must be blocked
-			$log_message = sprintf( 'A request from \'%s\' domain was blocked because of the domain \'%s\' is blocked.', $user_domain, $Domain->get( 'name' ) );
-			exit_blocked_request( 'Domain', $log_message ); // WILL exit();
-		}
-
-		$initial_referer = $UserSettings->get( 'initial_referer', $current_User->ID );
-		if( ! empty( $initial_referer ) &&
-		    $Domain = & get_Domain_by_url( $initial_referer ) &&
-		    $Domain->get( 'status' ) == 'blocked' )
-		{ // The request from this domain must be blocked
-			$log_message = sprintf( 'A request from \'%s\' initial referer was blocked because of the domain \'%s\' is blocked.', $initial_referer, $Domain->get( 'name' ) );
-			exit_blocked_request( 'Domain', $log_message ); // WILL exit();
-		}
-	}
-
-	// Check if plugins may block the request
+	// Check if plugins may block the request:
 	$Plugins->trigger_event( 'BeforeBlockableAction' );
 }
 
 
 /**
- * Block request by IP address
+ * Block request by current IP addresses
  */
 function antispam_block_by_ip()
 {
@@ -574,6 +551,59 @@ function antispam_block_by_ip()
 
 		$log_message = sprintf( 'A request with ( %s ) ip addresses was blocked because of a blocked IP range ID#%s.', implode( ', ', $request_ip_list ), $ip_range_ID );
 		exit_blocked_request( 'IP', $log_message ); // WILL exit();
+	}
+}
+
+
+/**
+ * Block request by current domain
+ */
+function antispam_block_by_domain()
+{
+	// Detect current IP adresses:
+	$current_ip_addreses = get_ip_list();
+
+	if( empty( $current_ip_addreses ) )
+	{	// Could not get any IP address, so can't check anything:
+		return;
+	}
+
+	load_funcs( 'sessions/model/_hitlog.funcs.php' );
+
+	foreach( $current_ip_addreses as $ip_address )
+	{
+		// Get domain name by current IP adress:
+		$ip_domain = gethostbyaddr( $ip_address );
+
+		if( ! empty( $ip_domain ) &&
+		    $Domain = & get_Domain_by_subdomain( $ip_domain ) &&
+		    $Domain->get( 'status' ) == 'blocked' )
+		{	// The request from this domain must be blocked:
+			$log_message = sprintf( 'A request from \'%s\' domain was blocked because of the domain \'%s\' is blocked.', $ip_domain, $Domain->get( 'name' ) );
+			exit_blocked_request( 'Domain', $log_message ); // WILL exit();
+		}
+	}
+}
+
+
+/**
+ * Block request by initial referer of current session
+ */
+function antispam_block_by_initial_referer()
+{
+	global $Session;
+
+	load_funcs( 'sessions/model/_hitlog.funcs.php' );
+
+	// Get first hit params of current session:
+	$first_hit_params = $Session->get_first_hit_params();
+
+	if( $first_hit_params && ! empty( $first_hit_params->hit_referer ) &&
+			$Domain = & get_Domain_by_url( $first_hit_params->hit_referer ) &&
+			$Domain->get( 'status' ) == 'blocked' )
+	{	// The request from this initial referer must be blocked:
+		$log_message = sprintf( 'A request from \'%s\' initial referer was blocked because of the domain \'%s\' is blocked.', $first_hit_params->hit_referer, $Domain->get( 'name' ) );
+		exit_blocked_request( 'Domain of initial referer', $log_message ); // WILL exit();
 	}
 }
 

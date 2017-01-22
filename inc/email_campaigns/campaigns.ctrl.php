@@ -261,10 +261,10 @@ switch( $action )
 			$tab = param( 'current_tab', 'string' );
 			break;
 		}
-		
+
 		if( $current_User->check_perm( 'options', 'view' ) )
 		{	// No access to view cron jobs:
-			$Messages->add( T_('Sorry, you don\'t have an access to view scheduled jobs.' ), 'warning' );
+			$Messages->add( T_('Sorry, you don\'t have permission to view scheduled jobs.' ), 'warning' );
 			$action = 'edit';
 			$tab = param( 'current_tab', 'string' );
 			break;
@@ -333,6 +333,17 @@ if( $action == 'edit' )
 	if( !empty( $campaign_edit_modes[ $tab ] ) )
 	{
 		$AdminUI->breadcrumbpath_add( $campaign_edit_modes[ $tab ]['text'], $campaign_edit_modes[ $tab ]['href'] );
+	}
+
+	if( $tab == 'compose' )
+	{	// Require colorbox js:
+		require_js_helper( 'colorbox' );
+		// Require File Uploader js and css:
+		require_js( 'multiupload/fileuploader.js' );
+		require_css( 'fileuploader.css' );
+		// Load JS files to make the links table sortable:
+		require_js( '#jquery#' );
+		require_js( 'jquery/jquery.sortable.min.js' );
 	}
 }
 else

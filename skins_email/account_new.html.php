@@ -14,12 +14,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.html.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url, $htsrv_url;
+global $admin_url;
 
 // Default params:
 $params = array_merge( array(
 		'country'     => '',
 		'reg_country' => '',
+		'reg_domain'  => '',
 		'fullname '   => '',
 		'gender'      => '',
 		'locale'      => '',
@@ -35,7 +36,7 @@ $params = array_merge( array(
 echo '<p'.emailskin_style( '.p' ).'>'.T_('A new user has registered on the site').':</p>'."\n";
 
 echo '<table'.emailskin_style( 'table.email_table' ).'>'."\n";
-echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Login').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_user_colored_login_link( $params['login'], array( 'use_style' => true, 'protocol' => 'http:' ) ).'</td></tr>'."\n";
+echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Login').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_user_colored_login_link( $params['login'], array( 'use_style' => true, 'protocol' => 'http:', 'login_text' => 'name' ) ).'</td></tr>'."\n";
 echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Email').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['email'].'</td></tr>'."\n";
 
 if( $params['fullname'] != '' )
@@ -49,6 +50,11 @@ if( $params['reg_country'] > 0 )
 	$CountryCache = & get_CountryCache();
 	$reg_Country = $CountryCache->get_by_ID( $params['reg_country'] );
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Country').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$reg_Country->get_name().'</td></tr>'."\n";
+}
+
+if( ! empty( $params['reg_domain'] ) )
+{	// Domain field is entered:
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Domain').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['reg_domain'].'</td></tr>'."\n";
 }
 
 if( $params['country'] > 0 )
@@ -112,7 +118,7 @@ echo "</div>\n";
 
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notifications about new user registrations, click here:' )
-			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=user_registration&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
+			.' <a href="'.get_htsrv_url().'quick_unsubscribe.php?type=user_registration&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
 			.T_('instant unsubscribe').'</a>.';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------

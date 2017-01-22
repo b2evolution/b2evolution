@@ -20,7 +20,7 @@ $default_ctrl = 'dashboard';
 /**
  * Minimum PHP version required for collections module to function properly
  */
-$required_php_version[ 'collections' ] = '5.0';
+$required_php_version[ 'collections' ] = '5.2';
 
 /**
  * Minimum MYSQL version required for collections module to function properly
@@ -49,12 +49,15 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_items__itemtag'           => $tableprefix.'items__itemtag',
 		'T_items__prerendering'      => $tableprefix.'items__prerendering',
 		'T_items__status'            => $tableprefix.'items__status',
+		'T_items__subscriptions'     => $tableprefix.'items__subscriptions',
 		'T_items__tag'               => $tableprefix.'items__tag',
 		'T_items__type'              => $tableprefix.'items__type',
 		'T_items__type_custom_field' => $tableprefix.'items__type_custom_field',
 		'T_items__type_coll'         => $tableprefix.'items__type_coll',
-		'T_items__subscriptions'     => $tableprefix.'items__subscriptions',
+		'T_items__user_data'         => $tableprefix.'items__user_data',
 		'T_items__version'           => $tableprefix.'items__version',
+		'T_items__votes'             => $tableprefix.'items__votes',
+		'T_items__status_type'       => $tableprefix.'items__status_type',
 		'T_links'                    => $tableprefix.'links',
 		'T_links__vote'              => $tableprefix.'links__vote',
 		'T_postcats'                 => $tableprefix.'postcats',
@@ -62,6 +65,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_skins__skin'              => $tableprefix.'skins__skin',
 		'T_subscriptions'            => $tableprefix.'subscriptions',
 		'T_widget'                   => $tableprefix.'widget',
+		'T_temporary_ID'             => $tableprefix.'temporary_ID',
 	) );
 
 /**
@@ -316,6 +320,26 @@ function & get_LinkCache()
 	return $LinkCache;
 }
 
+
+/**
+ * Get the TemporaryIDCache
+ *
+ * @return TemporaryIDCache
+ */
+function & get_TemporaryIDCache()
+{
+	global $TemporaryIDCache;
+
+	if( ! isset( $TemporaryIDCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'links/model/_temporaryid.class.php', 'TemporaryID' );
+		$TemporaryIDCache = new DataObjectCache( 'TemporaryID', false, 'T_temporary_ID', 'tmp_', 'tmp_ID', 'tmp_ID', 'tmp_ID' );
+	}
+
+	return $TemporaryIDCache;
+}
+
+
 /**
  * Get the SkinCache
  *
@@ -501,13 +525,13 @@ class collections_Module extends Module
 				'note' => T_( 'New users automatically get a new blog'),
 				),
 			'perm_max_createblog_num' => array(
-				'label' => T_('Maximum number of blogs allowed'),
+				'label' => T_('Maximum collections'),
 				'user_func' => 'check_createblog_user_perm',
 				'group_funct' => 'check_createblog_group_perm',
 				'perm_block' => 'blogging',
 				'perm_type' => 'text_input',
 				'maxlength' => 2,
-				'note' => T_('Leave empty for no limit'),
+				'note' => T_('Users will not be able to create collections if they already own the maximum number of collections (or more).'),
 				),
 			);
 		return $permissions;
@@ -584,7 +608,7 @@ class collections_Module extends Module
 		global $topleft_Menu, $topright_Menu;
 		global $current_User;
 		global $home_url, $admin_url, $debug, $seo_page_type, $robots_index;
-		global $Blog, $blog;
+		global $Collection, $Blog, $blog;
 
 		global $Settings;
 
@@ -635,7 +659,7 @@ class collections_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		global $Settings;
 		/**
 		 * @var AdminUI_general
@@ -719,7 +743,7 @@ class collections_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		/**
 		 * @var AdminUI_general
 		 */
@@ -739,7 +763,7 @@ class collections_Module extends Module
 					'order' => 'group_last' ),
 			);
 
-		$perm_comments = $current_User->check_perm( 'blog_comments', 'edit', false, $blog );
+		$perm_comments = $current_User->check_perm( 'blog_comments', 'view', false, $blog );
 		$perm_cats = $current_User->check_perm( 'blog_cats', '', false, $blog );
 
 		// Posts
@@ -749,14 +773,17 @@ class collections_Module extends Module
 			);
 		$last_group_menu_entry = 'posts';
 
-		if( $perm_comments )
-		{ // User has permission to edit published, draft or deprecated comments (at least one kind)
+		if( $perm_comments || $current_User->check_perm( 'meta_comment', 'view', false, $blog ) )
+		{	// Initialize comments menu tab if user can view normal or meta comments of the collection:
 			$collection_menu_entries['comments'] = array(
 					'text' => T_('Comments'),
-					'href' => $admin_url.'?ctrl=comments&amp;blog='.$blog.'&amp;filter=restore',
+					'href' => $admin_url.'?ctrl=comments&amp;blog='.$blog.'&amp;filter=restore'
+						// Set url to meta comments page if user has a perm to view only meta comments:
+						.( $perm_comments ? '' : '&amp;tab3=meta' ),
 				);
 			$last_group_menu_entry = 'comments';
 		}
+
 		if( $perm_cats )
 		{ // Categories
 			$collection_menu_entries['categories'] = array(
@@ -908,7 +935,7 @@ class collections_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		/**
 		 * @var AdminUI_general
 		 */
@@ -1003,7 +1030,7 @@ class collections_Module extends Module
 	function handle_htsrv_action()
 	{
 		global $demo_mode, $current_User, $DB, $Session, $Messages;
-		global $UserSettings, $samedomain_htsrv_url;
+		global $UserSettings;
 
 		if( !is_logged_in() )
 		{ // user must be logged in
@@ -1037,11 +1064,19 @@ class collections_Module extends Module
 				$linked_File = & $edited_Link->get_File();
 
 				// Load the blog we're in:
-				$Blog = & $LinkOwner->get_Blog();
+				$Collection = $Blog = & $LinkOwner->get_Blog();
 				set_working_blog( $Blog->ID );
 
 				// Check permission:
 				$LinkOwner->check_perm( 'edit', true );
+
+				if( $current_User->check_perm( 'files', 'edit' ) )
+				{	// If current User has permission to edit/delete files:
+					// Get number of objects where this file is attached to:
+					// TODO: attila>this must be handled with a different function
+					$file_links = get_file_links( $linked_File->ID, array( 'separator' => '<br />' ) );
+					$links_count = ( strlen( $file_links ) > 0 ) ? substr_count( $file_links, '<br />' ) + 1 : 0;
+				}
 
 				$confirmed = param( 'confirmed', 'integer', 0 );
 				if( $confirmed )
@@ -1057,10 +1092,7 @@ class collections_Module extends Module
 					if( $current_User->check_perm( 'files', 'edit' ) )
 					{ // current User has permission to edit/delete files
 						$file_name = $linked_File->get_name();
-						// Get number of objects where this file is attahced to
-						// TODO: attila>this must be handled with a different function
-						$file_links = get_file_links( $linked_File->ID, array( 'separator' => '<br />' ) );
-						$links_count = ( strlen( $file_links ) > 0 ) ? substr_count( $file_links, '<br />' ) + 1 : 0;
+						$links_count--;
 						if( $links_count > 0 )
 						{ // File is linked to other objects
 							$Messages->add( sprintf( T_('File %s is still linked to %d other objects'), $file_name, $links_count ), 'note' );
@@ -1080,10 +1112,17 @@ class collections_Module extends Module
 				}
 				else
 				{ // Display confirm unlink/delete message
-					$delete_url = $samedomain_htsrv_url.'action.php?mname=collections&action=unlink&link_ID='.$edited_Link->ID.'&confirmed=1&crumb_collections_unlink='.get_crumb( 'collections_unlink' );
+					$delete_url = get_htsrv_url().'action.php?mname=collections&action=unlink&link_ID='.$edited_Link->ID.'&confirmed=1&crumb_collections_unlink='.get_crumb( 'collections_unlink' );
 					$ok_button = '<a href="'.$delete_url.'" class="btn btn-danger">'.T_('I am sure!').'</a>';
 					$cancel_button = '<a href="'.$redirect_to.'" class="btn btn-default">'.T_('CANCEL').'</a>';
-					$msg = sprintf( T_( 'You are about to unlink and delete the attached file from %s path.' ), $linked_File->get_root_and_rel_path() );
+					if( isset( $links_count ) && $links_count == 1 )
+					{	// If the file will be deleted after confirmation:
+						$msg = sprintf( T_( 'You are about to unlink and delete the attached file from %s path.' ), $linked_File->get_root_and_rel_path() );
+					}
+					else
+					{	// If the file will be only unlinked after confirmation because it is also attached to other objects:
+						$msg = sprintf( T_( 'You are about to unlink the attached file %s.' ), $linked_File->get_root_and_rel_path() );
+					}
 					$msg .= '<br />'.T_( 'This CANNOT be undone!').'<br />'.T_( 'Are you sure?' ).'<br /><br />'.$ok_button."\t".$cancel_button;
 					$Messages->add( $msg, 'error' );
 				}

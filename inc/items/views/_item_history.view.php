@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 
 /**
  * @var Item
@@ -87,7 +87,7 @@ function iver_compare_selector( $revision_ID, $input_name, $selected, $direction
 	$iver_compare_selector[ $input_name ]++;
 
 	$style = '';
-	if( ( $iver_compare_selector[ $input_name ] < $selected && $direction == 'up' ) || 
+	if( ( $iver_compare_selector[ $input_name ] < $selected && $direction == 'up' ) ||
 	    ( $iver_compare_selector[ $input_name ] > $selected && $direction == 'down' ) )
 	{	// Hide inputs
 		$style = ' style="display:none"';
@@ -133,12 +133,12 @@ $Results->cols[] = array(
 						'default_dir' => 'D',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap',
-						'td' => '%mysql2localedatetime_spans( #iver_edit_datetime#, "Y-m-d", "H:i:s" )%',
+						'td' => '%mysql2localedatetime_spans( #iver_edit_datetime# )%',
 					);
 
 /**
  * Get item version editor login with link to user profile
- * 
+ *
  * @param integer editor user ID
  * @return string user profile link or 'Deleted user' text if the user doesn't exist anymore
  */

@@ -14,7 +14,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $admin_url, $Blog, $edited_Item;
+global $admin_url, $Collection, $Blog, $edited_Item;
 
 // Create query
 $SQL = new SQL();

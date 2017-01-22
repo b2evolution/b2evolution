@@ -32,6 +32,15 @@ if( ! isset($GLOBALS['files_Module']) )
 	debug_die( 'Files module is disabled or missing!' );
 }
 
+if( param( 'abspath', 'string', NULL ) !== NULL )
+{	// If absolute path is requested then try to decode it to root and relative path:
+	if( $decoded_data = get_root_path_by_abspath( $abspath ) )
+	{	// Root and path are decoded, Use them:
+		set_param( 'root', $decoded_data['root'] );
+		set_param( 'path', $decoded_data['path'] );
+	}
+}
+
 // We need this param early to check blog perms, if possible
 param( 'root', 'string', true ); // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
 

@@ -80,7 +80,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Cross posting').get_manual_link('collections-cross-posting-settings') );
 	$Form->checklist( array(
-		array( 'cross_posting', 1, T_('Allow admins to cross post to several collections'), $Settings->get('cross_posting'), false, T_('(Extra cats in different blogs)').get_admin_badge() ),
+		array( 'cross_posting', 1, T_('Allow admins to cross-post to several collections'), $Settings->get('cross_posting'), false, T_('(Extra cats in different blogs)').get_admin_badge() ),
 		array( 'cross_posting_blogs', 1, T_('Allow admins to move posts between collections'), $Settings->get('cross_posting_blogs'), false, T_('(Main cat can move to different blog)').get_admin_badge() ) ),
 		'allow_cross_posting', T_('Cross Posting') );
 

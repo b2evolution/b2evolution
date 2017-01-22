@@ -1254,15 +1254,21 @@ class Results extends Table
 			foreach( $this->cols as $col )
 			{ // For each column:
 
+				if( isset( $this->current_colspan ) && $this->current_colspan > 1 )
+				{	// Skip this column because previous column has a colspan:
+					$this->current_colspan--;
+					continue;
+				}
+
 				// COL START:
 				if ( ! empty($col['extra']) )
 				{
 					// array of extra params $col['extra']
-					$this->display_col_start( $col['extra'] );
+					$this->display_col_start( $col['extra'], $row );
 				}
 				else
 				{
-					$this->display_col_start();
+					$this->display_col_start( array(), $row );
 				}
 
 

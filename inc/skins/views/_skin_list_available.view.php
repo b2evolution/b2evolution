@@ -16,6 +16,16 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $skins_path, $admin_url, $redirect_to, $action, $kind, $blog;
 
 $skin_type = param( 'skin_type', 'string', '' );
+$collection_kind = param( 'collection_kind', 'string', NULL );
+
+if( $collection_kind !== NULL )
+{	// Collection kind was changed, use this value instead of previous kind value:
+	$kind = $collection_kind;
+}
+else
+{
+	$kind = param( 'kind', 'string', NULL );
+}
 
 /**
  * @var SkinCache
@@ -28,7 +38,7 @@ $block_item_Widget = new Widget( 'block_item' );
 if( get_param( 'tab' ) == 'current_skin' )
 {	// We are installing new skin for collection:
 	$BlogCache = & get_BlogCache();
-	$Blog = & $BlogCache->get_by_ID( $blog );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 	switch( $skin_type )
 	{
 		case 'normal':
@@ -81,7 +91,26 @@ $Form->select_input_array( 'skin_type', $skin_type, array(
 		'tablet'  => T_('Tablet skins'),
 		'feed'    => T_('Feed skins'),
 		'sitemap' => T_('Sitemap skins'),
-	), T_('Show'), '', array(
+	), T_('Skin type'), '', array(
+		'force_keys_as_values' => true,
+		'onchange' => 'this.form.submit()'
+	) );
+echo ' &nbsp;';
+
+if( $kind === NULL && isset( $Blog ) )
+{	// Kind is not specified, use type of current collection instead:
+	$kind = $Blog->type;
+}
+
+$Form->select_input_array( 'collection_kind', $kind, array(
+		'' => T_('All'),
+		'main' => T_('Main'),
+		'std' => T_('Blog'),
+		'photo' => T_('Photos'),
+		'forum' => T_('Forums'),
+		'manual' => T_('Manual'),
+		'group' => T_('Tracker')
+	), T_('Collection kind'), '', array(
 		'force_keys_as_values' => true,
 		'onchange' => 'this.form.submit()'
 	) );
@@ -119,29 +148,29 @@ foreach( $skin_folders as $skin_folder )
 		continue;
 	}
 
-	// What xxx_Skin class name do we expect from this skin? 
+	// What xxx_Skin class name do we expect from this skin?
 	// (remove optional "_skin" and always append "_Skin"):
-	$skin_class_name = preg_replace( '/_skin$/', '', $skin_folder ).'_Skin';	
+	$skin_class_name = preg_replace( '/_skin$/', '', $skin_folder ).'_Skin';
 
 	// Check if we already have such a skin
 	if( class_exists($skin_class_name) )
 	{	// This class already exists!
 		$disp_params = array(
-				'function'        => 'broken',	
+				'function'        => 'broken',
 				'msg'             => T_('DUPLICATE SKIN NAME'),
 			);
 	}
 	elseif( ! @$skin_class_file_contents = file_get_contents( $skins_path.$skin_folder.'/_skin.class.php' ) )
 	{ 	// Could not load the contents of the skin file:
 		$disp_params = array(
-				'function'        => 'broken',	
+				'function'        => 'broken',
 				'msg'             => T_('_skin.class.php NOT FOUND!'),
 			);
 	}
 	elseif( strpos( $skin_class_file_contents, 'class '.$skin_class_name.' extends Skin' ) === false )
 	{
 		$disp_params = array(
-				'function'        => 'broken',	
+				'function'        => 'broken',
 				'msg'             => T_('MALFORMED _skin.class.php'),
 			);
 
@@ -149,12 +178,16 @@ foreach( $skin_folders as $skin_folder )
 	elseif( ! $folder_Skin = & $SkinCache->new_obj( NULL, $skin_folder ) )
 	{ // We could not load the Skin class:
 		$disp_params = array(
-				'function'        => 'broken',	
+				'function'        => 'broken',
 				'msg'             => T_('_skin.class.php could not be loaded!'),
 			);
 	}
 	else
 	{	// Skin class seems fine...
+		if( $kind != '' && $folder_Skin->supports_coll_kind( $kind ) != 'yes' )
+		{ // Filter skin by support for collection type
+			continue;
+		}
 
 		if( ! empty( $skin_type ) && $folder_Skin->type != $skin_type )
 		{ // Filter skin by selected type:
@@ -181,7 +214,7 @@ foreach( $skin_folders as $skin_folder )
 
 	// Display skinshot:
 	Skin::disp_skinshot( $skin_folder, $skin_folder, $disp_params );
-	
+
 	$skins_exist = true;
 }
 

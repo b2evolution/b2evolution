@@ -115,11 +115,13 @@ class coll_logo_Widget extends ComponentWidget
 					'width' => array(
 						'label' => T_('Image width'),
 						'note' => '',
-						'type' => 'integer',
-						'defaultvalue' => '',
+						'defaultvalue' => '300px',
 						'allow_empty' => true,
 						'size' => 4,
 						'hide_label' => true,
+						'valid_pattern' => array(
+								'pattern' => '~^(\d+(px|%)?)?$~i',
+								'error'   => sprintf( T_('Invalid image size, it must be specified in px or %%.') ) ),
 					),
 					'size_separator' => array(
 						'label' => ' x ',
@@ -128,15 +130,23 @@ class coll_logo_Widget extends ComponentWidget
 					'height' => array(
 						'label' => T_('Image height'),
 						'note' => '',
-						'type' => 'integer',
 						'defaultvalue' => '',
 						'allow_empty' => true,
 						'size' => 4,
 						'hide_label' => true,
+						'valid_pattern' => array(
+								'pattern' => '~^(\d+(px|%)?)?$~i',
+								'error'   => sprintf( T_('Invalid image size, it must be specified in px or %%.') ) ),
 					),
 				'size_end_line' => array(
 					'type' => 'end_line',
-					'label' => T_('pixels'),
+					'label' => T_('Leave blank for auto.'),
+				),
+				'alt' => array(
+					'label' => T_('Image Alt text'),
+					'note' => T_('Leave empty to use collection title by default.'),
+					'defaultvalue' => '',
+					'size' => 128,
 				),
 				'check_file' => array(
 					'label' => T_('Check file'),
@@ -163,7 +173,7 @@ class coll_logo_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		switch( $this->disp_params['image_source'] )
 		{
@@ -207,18 +217,21 @@ class coll_logo_Widget extends ComponentWidget
 			$title .= $Blog->get( 'name' );
 		}
 		else
-		{ // Initialize the image tag for logo:
-			$image_attrs = '';
-			if( ! empty( $this->disp_params['width'] ) )
-			{ // Image width
-				$image_attrs .= ' width="'.intval( $this->disp_params['width'] ).'"';
-			}
-			if( ! empty( $this->disp_params['height'] ) )
-			{ // Image height
-				$image_attrs .= ' height="'.intval( $this->disp_params['height'] ).'"';
-			}
+		{	// Initialize the image tag for logo:
 
-			$title .= '<img src="'.$image_url.$this->disp_params['logo_file'].'" alt="'.$Blog->dget( 'name', 'htmlattr' ).'"'.$image_attrs.' />';
+			// Initialize image attributes:
+			$image_attrs = array(
+					'src'   => $image_url.$this->disp_params['logo_file'],
+					'alt'   => empty( $this->disp_params['alt'] ) ? $Blog->dget( 'name', 'htmlattr' ) : $this->disp_params['alt'],
+				);
+			// Image width:
+			$image_attrs['style'] = 'width:'.( empty( $this->disp_params['width'] ) ? 'auto' : format_to_output( $this->disp_params['width'], 'htmlattr' ) ).';';
+			// Image height:
+			$image_attrs['style'] .= 'height:'.( empty( $this->disp_params['height'] ) ? 'auto' : format_to_output( $this->disp_params['height'], 'htmlattr' ) ).';';
+			// If no unit is specified in a size, consider the unit to be px:
+			$image_attrs['style'] = preg_replace( '/(\d+);/', '$1px;', $image_attrs['style'] );
+
+			$title .= '<img'.get_field_attribs_as_string( $image_attrs ).' />';
 		}
 
 		$title .= '</a>';

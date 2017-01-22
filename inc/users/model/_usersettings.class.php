@@ -45,6 +45,7 @@ class UserSettings extends AbstractSettings
 
 		// Folding settings, 1 - Hide, 0 - Show
 		'fold_itemform_links' => 1,
+		'fold_itemform_custom_fields' => 1,
 		'fold_itemform_googlemap' => 1,
 		'fold_itemform_meta_cmnt' => 1,
 		'fold_itemform_extra' => 1,
@@ -111,6 +112,8 @@ class UserSettings extends AbstractSettings
 		'admin_skin' => 'bootstrap',  // User default admin skin
 
 		'suggest_item_tags' => 1, // Suggest to autocomplete item tags on edit form
+
+		'agg_period' => 'last_30_days', // Date period to filter the aggregated hits data
 	);
 
 	/**
@@ -129,6 +132,7 @@ class UserSettings extends AbstractSettings
 		'notify_published_comments' => 1, // Notify user when a comment is published in an own post
 		'notify_comment_moderation' => 1, // Notify when new comment is awaiting moderation and the user has right to moderate that comment
 		'notify_edit_cmt_moderation' => 1, // Notify when edited comment is awaiting moderation and the user has right to moderate that comment
+		'notify_spam_cmt_moderation' => 1, // Notify when comment is reported as spam and the user has right to moderate that comment
 		'notify_post_moderation' => 1, // Notify when a new post is awaiting moderation and the user has right to moderate that post
 		'notify_edit_pst_moderation' => 1, // Notify when a edited post is awaiting moderation and the user has right to moderate that post
 		'notify_meta_comments' => 1, // Notify user when a META comment is published in a post where user can sees meta comments
@@ -322,7 +326,7 @@ class UserSettings extends AbstractSettings
 	{
 		if( $coll_ID === NULL )
 		{ // Use current blog ID by default
-			global $Blog;
+			global $Collection, $Blog;
 
 			if( ! empty( $Blog ) )
 			{

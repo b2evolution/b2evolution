@@ -27,7 +27,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Messages class. For displaying notes, successful actions & errors.
  *
  * @todo CLEAN UP A LOT because of previous over factorization with Log class.
- * 
+ *
  * Messages can be logged into different categories (aka levels)
  * Examples: 'note', 'error'. Note: 'all' is reserved to display all categories together.
  * Messages can later be displayed grouped by category/level.
@@ -54,24 +54,68 @@ class Messages
 
 	/**
 	 * The number of messages
-	 * 
+	 *
 	 * @var integer
 	 */
 	var $count = 0;
 
 	/**
 	 * Error message was added or not.
-	 * 
+	 *
 	 * @var boolean
 	 */
 	var $has_errors = false;
 
 	/**
 	 * Params
-	 * 
+	 *
 	 * @var array
 	 */
 	var $params = array();
+
+	/**
+	 * Indicates message group is open or not.
+	 *
+	 * @var boolean
+	 */
+	var $message_group_open = false;
+
+	/**
+	 * The  message group header.
+	 *
+	 * @var string
+	 */
+	var $message_group_header = null;
+
+	/**
+	 * The stored message group text.
+	 *
+	 * @var array of Strings
+	 */
+	var $message_group_text = array();
+
+	/**
+	 * The current group message type
+	 *
+	 * @var string
+	 */
+	var $message_group_type = 'error';
+
+	/**
+	 * Display message group header even if the group is empty (no group item).
+	 * Even when set to True, the message group will still not be displayed if
+	 * the message group header is also empty.
+	 *
+	 * @var boolean
+	 */
+	var $display_empty_group = false;
+
+	/**
+	 * The number of messages in the current group
+	 *
+	 * @var integer
+	 */
+	var $group_count = 0;
 
 
 	/**
@@ -96,6 +140,10 @@ class Messages
 				'after_error'    => '',
 				'before_note'    => '',
 				'after_note'     => '',
+				'before_group'   => '<ul class="message_group">',
+				'after_group'    => '</ul>',
+				'before_group_item' => '<li>',
+				'after_group_item'  => '</li>'
 			), $params );
 	}
 
@@ -108,6 +156,12 @@ class Messages
 		$this->messages_type = array();
 		$this->count = 0;
 		$this->has_errors = false;
+
+		$this->message_group_open = false;
+		$this->message_group_header = NULL;
+		$this->message_group_text = array();
+		$this->message_group_type = 'error';
+		$this->group_count = 0;
 	}
 
 
@@ -119,6 +173,8 @@ class Messages
 	 */
 	function add( $text, $type = 'error' )
 	{
+		$this->close_group();
+
 		$this->messages_text[$this->count] = $text;
 		$this->messages_type[$this->count] = $type;
 		$this->count++;
@@ -146,6 +202,122 @@ class Messages
 				$this->has_errors = ( $p_Messages->messages_type[$i] == 'error' );
 			}
 		}
+
+		if( $this->has_open_group() )
+		{	// Check if this is still the same group by comparing the first text of message group, message group type and display empty group values
+			$same_group = ( $this->message_group_header === $p_Messages->message_group_header )	&& ( $this->message_group_type == $p_Messages->message_group_type );
+
+			if( ! $same_group )
+			{ // No longer the same message group, close the previous group and append to current message queue
+				$r = $p_Messages->close_group( true );
+				$this->add( $r[0], $r[1] );
+			}
+			else
+			{ // Append group messages
+				$this->group_count += $p_Messages->group_count;
+				for( $i = 0; $i < $p_Messages->group_count; $i++ )
+				{
+					$this->message_group_text[] = $p_Messages->message_group_text[$i];
+				}
+			}
+		}
+		else
+		{ // No open group, just copy the other object's group values
+			$this->message_group_open = $p_Messages->message_group_open;
+			$this->message_group_header = $p_Messages->message_group_header;
+			$this->message_group_text = $p_Messages->message_group_text;
+			$this->message_group_type = $p_Messages->message_group_type;
+			$this->group_count = $p_Messages->group_count;
+		}
+	}
+
+
+	/**
+	 * Closes any open group and start a new group
+	 *
+	 * @param string the group header/title
+	 * @param string the message type, it can have this values: 'success', 'warning', 'error', 'note'
+	 */
+	function start_group( $header = NULL, $type = 'error' )
+	{
+		$this->close_group();
+
+		$this->message_group_header = $header;
+		$this->message_group_type = $type;
+		$this->message_group_open = true;
+	}
+
+
+	/**
+	 * Add a group item message
+	 *
+	 * @param string the message
+	 * @param string the message type, it can have this values: 'success', 'warning', 'error', 'note'
+	 * @param string the group header/title
+	 * @param boolean closes any open group and start a new group
+	 */
+	function add_to_group( $text, $type = 'error', $header = NULL, $force_new_group = false )
+	{
+		if( $force_new_group || ( $this->message_group_open && ( ( $this->message_group_type != $type ) || ( $this->message_group_header != $header ) ) ) )
+		{
+			$this->close_group();
+		}
+
+		$this->message_group_header = $header;
+		$this->message_group_type = $type;
+		$this->message_group_text[$this->group_count] = $text;
+		$this->group_count++;
+		$this->message_group_open = true;
+	}
+
+
+	/**
+	 * Closes the current message group and add to message queue.
+	 *
+	 * @param boolean True to only output message group but not add it to the message queue
+	 * @return mixed NULL if there is no open group messag otherwise an array of group message and message type of current group
+	 */
+	function close_group( $output = false )
+	{
+		if( $this->has_open_group() )
+		{
+			if( $this->group_count === 1 && empty( $this->message_group_header ) )
+			{ // There is only a single group item and no header text to display, display as single line message
+				$message = $this->message_group_text[0];
+			}
+			else
+			{
+				$message = $this->params['before_group'].$this->message_group_header;
+				for( $i = 0; $i < $this->group_count; $i++ )
+				{
+					$message .= $this->params['before_group_item'].$this->message_group_text[$i].$this->params['after_group_item'];
+				}
+				$message .= $this->params['after_group'];
+			}
+
+			// Clear message group
+			$this->message_group_open = false;
+			$this->message_group_header = NULL;
+			$this->message_group_text = array();
+			$this->group_count = 0;
+
+			$this->add( $message, $this->message_group_type );
+
+			return array( $message, $this->message_group_type );
+		}
+
+		return NULL;
+	}
+
+
+	/**
+	 * Check if there is currently an open message group
+	 *
+	 * @return boolean
+	 */
+	function has_open_group()
+	{
+		return $this->message_group_open;
 	}
 
 
@@ -162,6 +334,11 @@ class Messages
 	 */
 	function disp( $before = '<div class="action_messages">', $after = '</div>' )
 	{
+		if( $this->has_open_group() )
+		{
+			$this->close_group();
+		}
+
 		if( $this->count )
 		{
 			global $preview;
@@ -200,6 +377,11 @@ class Messages
 	 */
 	function display( $head = NULL, $foot = NULL, $display = true, $outerdivclass = 'log_container' )
 	{
+		if( $this->has_open_group() )
+		{
+			$this->close_group();
+		}
+
 		if( $this->count == 0 ) {
 			return false;
 		}
@@ -266,6 +448,11 @@ class Messages
 	 */
 	function get_string( $head = '', $foot = '', $implodeBy = ', ', $format = 'striptags' )
 	{
+		if( $this->has_open_group() )
+		{
+			$this->close_group();
+		}
+
 		if( !$this->count )
 		{
 			return false;
@@ -307,7 +494,14 @@ class Messages
 	 */
 	function count()
 	{
-		return $this->count;
+		if( $this->has_open_group() )
+		{
+			return $this->count + 1;
+		}
+		else
+		{
+			return $this->count;
+		}
 	}
 
 
@@ -318,7 +512,14 @@ class Messages
 	 */
 	function has_errors()
 	{
-		return $this->has_errors;
+		if( $this->has_open_group() )
+		{
+			return $this->has_errors || $this->message_group_type == 'error';
+		}
+		else
+		{
+			return $this->has_errors;
+		}
 	}
 
 

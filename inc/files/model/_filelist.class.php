@@ -373,11 +373,11 @@ class Filelist
 	/**
 	 * Add a File object to the list (by reference).
 	 *
-	 * @param File File object (by reference)
+	 * @param object File object (by reference)
 	 * @param boolean Has the file to exist to get added?
 	 * @return boolean true on success, false on failure
 	 */
-	function add( & $File, $mustExist = false )
+	function add( $File, $mustExist = false )
 	{
 		if( !( $File instanceof file ) )
 		{	// Passed object is not a File!! :(
@@ -396,7 +396,7 @@ class Filelist
 		}
 
 
-		$this->_entries[$this->_total_entries] = & $File;
+		$this->_entries[$this->_total_entries] = $File;
 		$this->_md5_ID_index[$File->get_md5_ID()] = $this->_total_entries;
 		$this->_full_path_index[$File->get_full_path()] = $this->_total_entries;
 		$this->_rdfs_rel_path_index[$File->get_rdfs_rel_path()] = $this->_total_entries;

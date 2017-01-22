@@ -22,7 +22,7 @@ class wikitables_plugin extends Plugin
 	var $code = 'b2evWiTa';
 	var $name = 'Wiki Tables';
 	var $priority = 15;
-	var $version = '5.0.0';
+	var $version = '6.7.9';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -328,16 +328,16 @@ See manual for more.');
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( ! isset( $Blog ) || (
-		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' && 
+		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
 		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
 		{ // Don't load css/js files when plugin is not enabled
 			return;
 		}
 
-		require_css( $this->get_plugin_url( true ).'wikitables.css', 'blog' );
+		$this->require_css( 'wikitables.css' );
 	}
 
 

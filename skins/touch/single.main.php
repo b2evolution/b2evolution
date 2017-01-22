@@ -112,7 +112,7 @@ while( $Item = & mainlist_get_item() )
 			if( $Item->status != 'published' )
 			{
 				$Item->format_status( array(
-						'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+						'template' => '<div class="floatright"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 					) );
 			}
 		?>
@@ -121,6 +121,7 @@ while( $Item = & mainlist_get_item() )
 			// ------------------------- "Item - Single" CONTAINER EMBEDDED HERE --------------------------
 			// Display container contents:
 			skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+					'widget_context' => 'item',	// Signal that we are displaying within an Item
 					// The following (optional) params will be used as defaults for widgets included in this container:
 					// This will enclose each widget in a block:
 					'block_start' => '<div class="widget $wi_class$">',

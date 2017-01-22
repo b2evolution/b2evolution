@@ -867,20 +867,62 @@ class Plugins
 		if( empty($this->index_event_IDs[$event]) )
 		{ // No events registered
 			$Debuglog->add( 'No registered plugins.', 'plugins' );
-			return array();
+// DON'T RETURN HERE BECAUSE OF DIRTY HACK!!!
 		}
-
-		$Debuglog->add( 'Registered plugin IDs: '.implode( ', ', $this->index_event_IDs[$event]), 'plugins' );
-		foreach( $this->index_event_IDs[$event] as $l_plugin_ID )
-		{
-			$r = $this->call_method( $l_plugin_ID, $event, $params );
-			if( $r === true )
+		else
+		{	// We have some events registered, loop through them:
+			$Debuglog->add( 'Registered plugin IDs: '.implode( ', ', $this->index_event_IDs[$event]), 'plugins' );
+			foreach( $this->index_event_IDs[$event] as $l_plugin_ID )
 			{
-				$Debuglog->add( 'Plugin ID '.$l_plugin_ID.' returned true!', 'plugins' );
-				$params['plugin_ID'] = & $l_plugin_ID;
-				return $params;
+				$r = $this->call_method( $l_plugin_ID, $event, $params );
+				if( $r === true )
+				{
+					$Debuglog->add( 'Plugin ID '.$l_plugin_ID.' returned true!', 'plugins' );
+					// Save the ID of the plugin which returned true:
+					$params['plugin_ID'] = & $l_plugin_ID;
+					return $params;
+				}
 			}
 		}
+		return array();
+	}
+
+
+	/**
+	 * Call all plugins for a given event, until the first one returns true.
+	 *
+	 * @param string event name, see {@link Plugins_admin::get_supported_events()}
+	 * @param array Associative array of parameters for the Plugin
+	 * @return array The (modified) params array with key "plugin_ID" set to the last called plugin;
+	 *               Empty array if no Plugin returned true or no Plugin has this event registered.
+	 */
+	function trigger_event_first_true_with_params( $event, & $params )
+	{
+		global $Debuglog;
+
+		$Debuglog->add( 'Trigger event '.$event.' (first true)', 'plugins' );
+
+		if( empty( $this->index_event_IDs[ $event ] ) )
+		{	// No events registered
+			$Debuglog->add( 'No registered plugins.', 'plugins' );
+// DON'T RETURN HERE BECAUSE OF DIRTY HACK!!!
+		}
+		else
+		{	// We have some events registered, loop through them:
+			$Debuglog->add( 'Registered plugin IDs: '.implode( ', ', $this->index_event_IDs[ $event ] ), 'plugins' );
+			foreach( $this->index_event_IDs[ $event ] as $l_plugin_ID )
+			{
+				$r = $this->call_method( $l_plugin_ID, $event, $params );
+				if( $r === true )
+				{
+					$Debuglog->add( 'Plugin ID '.$l_plugin_ID.' returned true!', 'plugins' );
+					// Save the ID of the plugin which returned true:
+					$params['plugin_ID'] = & $l_plugin_ID;
+					return $params;
+				}
+			}
+		}
+
 		return array();
 	}
 
@@ -1303,7 +1345,7 @@ class Plugins
 		}
 		else
 		{ // use global Blog if it is set
-			global $Blog;
+			global $Collection, $Blog;
 			if( !empty( $Blog ) )
 			{
 				$setting_Blog = $Blog;
@@ -1927,7 +1969,7 @@ class Plugins
 		if( isset( $params['Item'] ) )
 		{ // Validate post renderers
 			$Item = & $params['Item'];
-			$Blog = & $Item->get_Blog();
+			$Collection = $Blog = & $Item->get_Blog();
 			$setting_name = 'coll_apply_rendering';
 			$setting_type = 'coll';
 		}
@@ -1935,25 +1977,25 @@ class Plugins
 		{ // Validate comment renderers
 			$Comment = & $params['Comment'];
 			$Item = & $Comment->get_Item();
-			$Blog = & $Item->get_Blog();
+			$Collection = $Blog = & $Item->get_Blog();
 			$setting_name = 'coll_apply_comment_rendering';
 			$setting_type = 'coll';
 		}
 		elseif( isset( $params['Message'] ) )
 		{ // Validate message renderers
-			$Blog = NULL;
+			$Collection = $Blog = NULL;
 			$setting_name = 'msg_apply_rendering';
 			$setting_type = 'msg';
 		}
 		elseif( isset( $params['EmailCampaign'] ) )
 		{	// Validate message renderers:
-			$Blog = NULL;
+			$Collection = $Blog = NULL;
 			$setting_name = 'email_apply_rendering';
 			$setting_type = 'email';
 		}
 		elseif( isset( $params['Blog'] ) && isset( $params['setting_name'] ) )
 		{ // Validate the given rendering option in the give Blog
-			$Blog = & $params['Blog'];
+			$Collection = $Blog = & $params['Blog'];
 			$setting_name = $params['setting_name'];
 			$setting_type = 'coll';
 			if( !in_array( $setting_name, array( 'coll_apply_rendering', 'coll_apply_comment_rendering' ) ) )
@@ -2062,6 +2104,9 @@ class Plugins
 
 		$name_prefix = isset( $params['name_prefix'] ) ? $params['name_prefix'] : '';
 
+		// Set different prefix if you use several toolbars on one page:
+		$js_prefix = isset( $params['js_prefix'] ) ? $params['js_prefix'] : '';
+
 		$this->restart(); // make sure iterator is at start position
 
 		if( ! is_array($current_renderers) )
@@ -2163,7 +2208,7 @@ class Plugins
 
 			$r .= '<div id="block_renderer_'.$loop_RendererPlugin->code.'">';
 
-			$r .= '<input type="checkbox" class="checkbox" name="'.$name_prefix.'renderers[]" value="'.$loop_RendererPlugin->code.'" id="renderer_'.$loop_RendererPlugin->code.'"';
+			$r .= '<input type="checkbox" class="checkbox" name="'.$name_prefix.'renderers[]" value="'.$loop_RendererPlugin->code.'" id="'.$js_prefix.'renderer_'.$loop_RendererPlugin->code.'"';
 
 			switch( $apply_rendering )
 			{
@@ -2195,8 +2240,14 @@ class Plugins
 					break;
 			}
 
-			$r .= ' title="'.format_to_output($loop_RendererPlugin->short_desc, 'formvalue').'" /> <label for="renderer_'.$loop_RendererPlugin->code.'" title="';
-			$r .= format_to_output($loop_RendererPlugin->short_desc, 'formvalue').'">';
+			$r .= ' title="'.format_to_output( $loop_RendererPlugin->short_desc, 'formvalue' ).'"';
+			if( ! empty( $js_prefix ) )
+			{	// Set prefix, Used in JS code to disable/enable plugin toolbar:
+				$r .= ' data-prefix="'.format_to_output( $js_prefix, 'formvalue' ).'"';
+			}
+			$r .= ' />';
+			$r .= ' <label for="'.$js_prefix.'renderer_'.$loop_RendererPlugin->code.'"';
+			$r .= ' title="'.format_to_output($loop_RendererPlugin->short_desc, 'formvalue').'">';
 			$r .= format_to_output($loop_RendererPlugin->name).'</label>';
 
 			// fp> TODO: the first thing we want here is a TINY javascript popup with the LONG desc. The links to readme and external help should be inside of the tiny popup.
@@ -2236,7 +2287,7 @@ class Plugins
 						default:
 							if( ! empty( $setting_Blog ) && $current_User->check_perm( 'blog_properties', 'edit', false, $setting_Blog->ID ) )
 							{ // Check if current user can edit the blog plugin settings
-								$settings_url = $admin_url.'?ctrl=coll_settings&amp;tab=renderers&amp;blog='.$setting_Blog->ID;
+								$settings_url = $admin_url.'?ctrl=coll_settings&amp;tab=plugins&amp;blog='.$setting_Blog->ID;
 							}
 							break;
 					}

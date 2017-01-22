@@ -243,7 +243,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	// Print JS to edit a country status
 	echo_editable_column_js( array(
 		'column_selector' => '.country_status_edit',
-		'ajax_url'        => get_secure_htsrv_url().'async.php?action=country_status_edit&'.url_crumb( 'country' ),
+		'ajax_url'        => get_htsrv_url().'async.php?action=country_status_edit&'.url_crumb( 'country' ),
 		'options'         => ctry_status_titles(),
 		'new_field_name'  => 'new_status',
 		'ID_value'        => 'jQuery( this ).attr( "id" )',

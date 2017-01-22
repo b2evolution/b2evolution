@@ -50,11 +50,11 @@ if( $demo_mode && ( $current_User->ID <= 3 ) )
 // Check that this action request is not a CSRF hacked request:
 $Session->assert_received_crumb( 'user' );
 
-$Blog = NULL;
+$Collection = $Blog = NULL;
 if( $blog > 0 )
 { // Get Blog
 	$BlogCache = & get_BlogCache();
-	$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 }
 
 switch( $action )
@@ -144,7 +144,7 @@ switch( $action )
 		$result = $current_User->crop_avatar( $file_ID, $image_crop_data[0], $image_crop_data[1], $image_crop_data[2], $image_crop_data[3] );
 		if( $result !== true )
 		{ // If error on crop action then redirect to avatar profile page
-			header_redirect( $redirect_to );
+			header_redirect( get_user_avatar_url() );
 		}
 		break;
 

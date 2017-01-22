@@ -14,12 +14,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.txt.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url, $htsrv_url;
+global $admin_url;
 
 // Default params:
 $params = array_merge( array(
 		'country'     => '',
 		'reg_country' => '',
+		'reg_domain'  => '',
 		'fullname'    => '',
 		'gender'      => '',
 		'locale'      => '',
@@ -49,6 +50,11 @@ if( $params['reg_country'] > 0 )
 	$CountryCache = & get_CountryCache();
 	$reg_Country = $CountryCache->get_by_ID( $params['reg_country'] );
 	echo T_('Registration Country').": ".$reg_Country->get_name()."\n";
+}
+
+if( ! empty( $params['reg_domain'] ) )
+{	// Domain field is entered:
+	echo T_('Registration Domain').": ".$params['reg_domain']."\n";
 }
 
 if( $params['country'] > 0 )
@@ -108,7 +114,7 @@ echo T_('Recent registrations').': '.$admin_url.'?ctrl=users&action=show_recent'
 
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notifications about new user registrations, click here:' ).' '.
-		$htsrv_url.'quick_unsubscribe.php?type=user_registration&user_ID=$user_ID$&key=$unsubscribe_key$';
+		get_htsrv_url().'quick_unsubscribe.php?type=user_registration&user_ID=$user_ID$&key=$unsubscribe_key$';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.txt.php', $params );

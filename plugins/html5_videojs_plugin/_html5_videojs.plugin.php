@@ -22,7 +22,7 @@ class html5_videojs_plugin extends Plugin
 	var $code = 'b2evH5VJSP';
 	var $name = 'HTML 5 VideoJS Player';
 	var $priority = 80;
-	var $version = '5.0.0';
+	var $version = '6.7.9';
 	var $group = 'files';
 	var $number_of_installs = 1;
 	var $allow_ext = array( 'flv', 'm4v', 'f4v', 'mp4', 'ogv', 'webm' );
@@ -48,12 +48,10 @@ class html5_videojs_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
-		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
-
-		require_css( '#videojs_css#', $relative_to );
-		require_js( '#videojs#', $relative_to );
+		require_css( '#videojs_css#', 'blog' );
+		require_js( '#videojs#', 'blog' );
 		$this->require_skin();
 
 		// Set a video size in css style, because option setting is ignored by some reason
@@ -94,6 +92,18 @@ class html5_videojs_plugin extends Plugin
 	{
 		return array_merge( parent::get_coll_setting_definitions( $params ),
 			array(
+				'use_for_posts' => array(
+					'label' => T_('Use for'),
+					'note' => T_('videos attached to posts'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
+					),
+				'use_for_comments' => array(
+					'label' => '',
+					'note' => T_('videos attached to comments'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
+					),
 				'skin' => array(
 					'label' => T_('Skin'),
 					'type' => 'select',
@@ -112,7 +122,8 @@ class html5_videojs_plugin extends Plugin
 					'valid_range' => array( 'min' => 1 ),
 					),
 				'allow_download' => array(
-					'label' => T_('Allow downloading of the video file'),
+					'label' => T_('Display Download Link'),
+					'note' => T_('Check to display a "Download this video" link under the video.'),
 					'type' => 'checkbox',
 					'defaultvalue' => 0,
 					),
@@ -151,12 +162,18 @@ class html5_videojs_plugin extends Plugin
 		$File = $params['File'];
 
 		if( ! $this->is_flp_video( $File ) )
-		{
+		{ // This file cannot be played with this player
 			return false;
 		}
 
 		$Item = & $params['Item'];
 		$item_Blog = $Item->get_Blog();
+
+		if( ( ! $in_comments && ! $this->get_coll_setting( 'use_for_posts', $item_Blog ) ) ||
+		    ( $in_comments && ! $this->get_coll_setting( 'use_for_comments', $item_Blog ) ) )
+		{ // Plugin is disabled for post/comment videos on this Blog
+			return false;
+		}
 
 		if( $File->exists() )
 		{
@@ -262,7 +279,7 @@ class html5_videojs_plugin extends Plugin
 	 */
 	function require_skin()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$skin = $this->get_coll_setting( 'skin', $Blog );
 		if( !empty( $skin ) && $skin != 'vjs-default-skin' )
@@ -270,7 +287,7 @@ class html5_videojs_plugin extends Plugin
 			$skins_path = dirname( $this->classfile_path ).'/skins';
 			if( file_exists( $skins_path.'/'.$skin.'/style.min.css' ) )
 			{	// Require css file only if it exists:
-				require_css( $this->get_plugin_url().'skins/'.$skin.'/style.min.css', 'relative' );
+				$this->require_css( 'skins/'.$skin.'/style.min.css' );
 			}
 		}
 	}

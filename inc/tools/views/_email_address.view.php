@@ -25,9 +25,9 @@ if( param( 'all_statuses', 'integer', 0, true ) )
 // Create result set:
 
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE emadr_ID, emadr_address, emadr_status, emadr_last_sent_ts, emadr_sent_count, emadr_sent_last_returnerror, emadr_last_error_ts, 
+$SQL->SELECT( 'SQL_NO_CACHE emadr_ID, emadr_address, emadr_status, emadr_last_sent_ts, emadr_sent_count, emadr_sent_last_returnerror, emadr_last_error_ts,
 ( emadr_prmerror_count + emadr_tmperror_count + emadr_spamerror_count + emadr_othererror_count ) AS emadr_all_count,
-emadr_prmerror_count, emadr_tmperror_count, emadr_spamerror_count, emadr_othererror_count, 
+emadr_prmerror_count, emadr_tmperror_count, emadr_spamerror_count, emadr_othererror_count,
 COUNT( user_ID ) AS users_count' );
 $SQL->FROM( 'T_email__address' );
 $SQL->FROM_add( 'LEFT JOIN T_users ON user_email = emadr_address' );
@@ -127,7 +127,7 @@ $Results->cols[] = array(
 		'order' => 'emadr_last_sent_ts',
 		'default_dir' => 'D',
 		'td_class' => 'timestamp',
-		'td' => '%mysql2localedatetime_spans( #emadr_last_sent_ts#, "M-d" )%',
+		'td' => '%mysql2localedatetime_spans( #emadr_last_sent_ts# )%',
 	);
 
 $Results->cols[] = array(
@@ -154,7 +154,7 @@ $Results->cols[] = array(
 		'order' => 'emadr_last_error_ts',
 		'default_dir' => 'D',
 		'td_class' => 'timestamp',
-		'td' => '%mysql2localedatetime_spans( #emadr_last_error_ts#, "M-d" )%',
+		'td' => '%mysql2localedatetime_spans( #emadr_last_error_ts# )%',
 	);
 
 $Results->cols[] = array(
@@ -227,7 +227,7 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 	// Print JS to edit an email status
 	echo_editable_column_js( array(
 		'column_selector' => '.emadr_status_edit',
-		'ajax_url'        => get_secure_htsrv_url().'async.php?action=emadr_status_edit&'.url_crumb( 'emadrstatus' ),
+		'ajax_url'        => get_htsrv_url().'async.php?action=emadr_status_edit&'.url_crumb( 'emadrstatus' ),
 		'options'         => emadr_get_status_titles(),
 		'new_field_name'  => 'new_status',
 		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',

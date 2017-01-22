@@ -65,6 +65,7 @@ class Blog extends DataObject
 	var $locale;
 	var $order;
 	var $access_type;
+	var $http_protocol;
 
 	/*
 	 * ?> TODO: we should have an extra DB column that either defines type of blog_siteurl
@@ -87,7 +88,17 @@ class Blog extends DataObject
 
 
 	/**
-	 * The URL to the basepath of that blog.
+	 * The basepath of that collection.
+	 *
+	 * Lazy filled by get_basepath()
+	 *
+	 * @var string
+	 */
+	var $basepath;
+
+
+	/**
+	 * The URL to the basepath of that collection.
 	 * This is supposed to be the same as $baseurl but localized to the domain of the blog/
 	 *
 	 * Lazy filled by get_basepath_url()
@@ -95,6 +106,46 @@ class Blog extends DataObject
 	 * @var string
 	 */
 	var $basepath_url;
+
+
+	/**
+	 * The domain of that collection.
+	 *
+	 * Lazy filled by get_baseurl_root()
+	 *
+	 * @var string
+	 */
+	var $baseurl_root;
+
+
+	/**
+	 * The domain for cookie of that collection.
+	 *
+	 * Lazy filled by get_cookie_domain()
+	 *
+	 * @var string
+	 */
+	var $cookie_domain;
+
+
+	/**
+	 * The path for cookie of that collection.
+	 *
+	 * Lazy filled by get_cookie_path()
+	 *
+	 * @var string
+	 */
+	var $cookie_path;
+
+
+	/**
+	 * The htsrv URLs to the basepath of that collection.
+	 *
+	 * Lazy filled by get_htsrv_url()
+	 *
+	 * @var array: 0 - normal URL, 1 - secure URL
+	 */
+	var $htsrv_urls;
 
 	/**
 	 * Additional settings for the collection.  lazy filled.
@@ -165,6 +216,7 @@ class Blog extends DataObject
 			$this->longdesc = $db_row->blog_longdesc;
 			$this->locale = $db_row->blog_locale;
 			$this->access_type = $db_row->blog_access_type;
+			$this->http_protocol = isset( $db_row->blog_http_protocol ) ? $db_row->blog_http_protocol : 'always_redirect';
 			$this->siteurl = $db_row->blog_siteurl;
 			$this->urlname = $db_row->blog_urlname;
 			$this->links_blog_ID = $db_row->blog_links_blog_ID; // DEPRECATED
@@ -261,17 +313,13 @@ class Blog extends DataObject
 	 */
 	function init_by_kind( $kind, $name = NULL, $shortname = NULL, $urlname = NULL )
 	{
-		// Allow email subscriptions by default:
-		$this->set_setting( 'allow_subscriptions', '1' );
-		$this->set_setting( 'allow_item_subscriptions', '1' );
-
 		switch( $kind )
 		{
 			case 'main':
 				$this->set( 'type', 'main' );
 				$this->set( 'name', empty( $name ) ? T_('Homepage Title') : $name );
 				$this->set( 'shortname', empty( $shortname ) ? T_('Home') : $shortname );
-				$this->set( 'urlname', empty( $urlname ) ? 'main' : $urlname );
+				$this->set( 'urlname', empty( $urlname ) ? 'home' : $urlname );
 				$this->set_setting( 'front_disp', 'front' );
 				$this->set_setting( 'aggregate_coll_IDs', '*' );
 				$this->set_setting( 'in_skin_login', '1' );
@@ -279,9 +327,9 @@ class Blog extends DataObject
 
 			case 'photo':
 				$this->set( 'type', 'photo' );
-				$this->set( 'name', empty($name) ? T_('My photoblog') : $name );
-				$this->set( 'shortname', empty($shortname) ? T_('Photoblog') : $shortname );
-				$this->set( 'urlname', empty($urlname) ? 'photo' : $urlname );
+				$this->set( 'name', empty($name) ? T_('Photos') : $name );
+				$this->set( 'shortname', empty($shortname) ? T_('Photos') : $shortname );
+				$this->set( 'urlname', empty($urlname) ? 'photos' : $urlname );
 				$this->set_setting( 'posts_per_page', 12 );
 				$this->set_setting( 'archive_mode', 'postbypost' );
 				$this->set_setting( 'front_disp', 'posts' );
@@ -299,17 +347,26 @@ class Blog extends DataObject
 
 			case 'group':
 				$this->set( 'type', 'group' );
-				$this->set( 'name', empty($name) ? T_('Our blog') : $name );
-				$this->set( 'shortname', empty($shortname) ? T_('Group') : $shortname );
-				$this->set( 'urlname', empty($urlname) ? 'group' : $urlname );
+				$this->set( 'name', empty($name) ? T_('Tracker Title') : $name );
+				$this->set( 'shortname', empty($shortname) ? T_('Tracker') : $shortname );
+				$this->set( 'urlname', empty($urlname) ? 'tracker' : $urlname );
 				$this->set_setting( 'use_workflow', 1 );
+				// Try to find post type "Forum Topic" in DB
+				global $DB;
+				$forum_topic_type_ID = $DB->get_var( 'SELECT ityp_ID
+					 FROM T_items__type
+					WHERE ityp_name = "Forum Topic"' );
+				if( $forum_topic_type_ID )
+				{ // Set default post type as "Forum Topic"
+					$this->set_setting( 'default_post_type', $forum_topic_type_ID );
+				}
 				break;
 
 			case 'forum':
 				$this->set( 'type', 'forum' );
-				$this->set( 'name', empty($name) ? T_('My forum') : $name );
-				$this->set( 'shortname', empty($shortname) ? T_('Forum') : $shortname );
-				$this->set( 'urlname', empty($urlname) ? 'forum' : $urlname );
+				$this->set( 'name', empty($name) ? T_('Forums Title') : $name );
+				$this->set( 'shortname', empty($shortname) ? T_('Forums') : $shortname );
+				$this->set( 'urlname', empty($urlname) ? 'forums' : $urlname );
 				$this->set( 'advanced_perms', 1 );
 				$this->set_setting( 'post_navigation', 'same_category' );
 				$this->set_setting( 'allow_comments', 'registered' );
@@ -337,7 +394,7 @@ class Blog extends DataObject
 
 			case 'manual':
 				$this->set( 'type', 'manual' );
-				$this->set( 'name', empty($name) ? T_('Manual') : $name );
+				$this->set( 'name', empty($name) ? T_('Manual Title') : $name );
 				$this->set( 'shortname', empty($shortname) ? T_('Manual') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'manual' : $urlname );
 				$this->set_setting( 'post_navigation', 'same_category' );
@@ -360,8 +417,16 @@ class Blog extends DataObject
 
 			case 'std':
 			default:
-				$this->set( 'type', 'std' );
-				$this->set( 'name', empty($name) ? T_('My weblog') : $name );
+				if( $kind != 'std' )
+				{	// Check if given kind is allowed by system or plugins:
+					$kinds = get_collection_kinds();
+					if( ! isset( $kinds[ $kind ] ) )
+					{	// If unknown kind, restrict this to standard:
+						$kind = 'std';
+					}
+				}
+				$this->set( 'type', $kind );
+				$this->set( 'name', empty($name) ? T_('Public Blog') : $name );
 				$this->set( 'shortname', empty($shortname) ? T_('Blog') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'blog' : $urlname );
 				break;
@@ -388,12 +453,13 @@ class Blog extends DataObject
 	 */
 	function load_from_Request( $groups = array() )
 	{
-		global $Messages, $default_locale, $DB;
+		global $Messages, $default_locale, $DB, $Settings;
 
 		/**
 		 * @var User
 		 */
 		global $admin_url, $current_User;
+		$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
 		// Load collection settings and clear update cascade array
 		$this->load_CollectionSettings();
@@ -413,9 +479,45 @@ class Blog extends DataObject
 			}
 
 			// Collection permissions:
-			$this->set( 'advanced_perms', param( 'advanced_perms', 'integer', 0 ) );
+			$prev_advanced_perms = $this->get( 'advanced_perms' );
+			$new_advanced_perms = param( 'advanced_perms', 'integer', 0 );
 			$prev_allow_access = $this->get_setting( 'allow_access' );
-			$this->set_setting( 'allow_access', param( 'blog_allow_access', 'string', '' ) );
+			$new_allow_access = param( 'blog_allow_access', 'string', '' );
+
+			if( get_param( 'action' ) != 'update_confirm' && $this->ID > 0 &&
+			    ( $prev_allow_access != $new_allow_access || $prev_advanced_perms != $new_advanced_perms ) )
+			{	// One of these settings is changing, try to check if max allowed status will be changed too:
+				$prev_max_allowed_status = $this->get_max_allowed_status();
+				$prev_access_title = $this->get_access_title();
+				$this->set( 'advanced_perms', $new_advanced_perms );
+				$this->set_setting( 'allow_access', $new_allow_access );
+				$new_max_allowed_status = $this->get_max_allowed_status();
+				$new_access_title = $this->get_access_title();
+
+				$status_orders = get_visibility_statuses( 'ordered-index' );
+				if( $status_orders[ $new_max_allowed_status ] < $status_orders[ $prev_max_allowed_status ] )
+				{	// If max allowed status will be reduced after collection updating:
+					$count_reduced_status_data = $this->get_count_reduced_status_data( $new_max_allowed_status );
+					if( $count_reduced_status_data !== false )
+					{	// If some posts or comment will be updated:
+						$this->confirmation = array();
+						$this->confirmation['title'] = sprintf( T_('You changed the access setting of this collection from "%s" to "%s". This will also:'), $prev_access_title, $new_access_title );
+						$status_titles = get_visibility_statuses();
+						foreach( $count_reduced_status_data['posts'] as $status_key => $count )
+						{
+							$this->confirmation['messages'][] = sprintf( T_('change %d posts from "%s" to "%s"'), intval( $count ), $status_titles[ $status_key ], $status_titles[ $new_max_allowed_status ] );
+						}
+						foreach( $count_reduced_status_data['comments'] as $status_key => $count )
+						{
+							$this->confirmation['messages'][] = sprintf( T_('change %d comments from "%s" to "%s"'), intval( $count ), $status_titles[ $status_key ], $status_titles[ $new_max_allowed_status ] );
+						}
+					}
+				}
+			}
+
+			$this->set( 'advanced_perms', $new_advanced_perms );
+			$this->set_setting( 'allow_access', $new_allow_access );
+
 			if( $prev_allow_access != $this->get_setting( 'allow_access' ) )
 			{	// If setting "Allow access to" is changed to:
 				switch( $this->get_setting( 'allow_access' ) )
@@ -423,15 +525,21 @@ class Blog extends DataObject
 					case 'public':
 						// Enable "Community" and "Members":
 						$enable_moderation_statuses = array( 'community', 'protected' );
+						$enable_comment_moderation_statuses = array( 'community', 'protected', 'review', 'draft' );
+						$disable_comment_moderation_statuses = array( 'private' );
 						break;
 					case 'users':
 						// Disable "Community" and Enable "Members":
 						$disable_moderation_statuses = array( 'community' );
 						$enable_moderation_statuses = array( 'protected' );
+						$enable_comment_moderation_statuses = array( 'protected', 'review', 'draft' );
+						$disable_comment_moderation_statuses = array( 'community', 'private' );
 						break;
 					case 'members':
 						// Disable "Community" and "Members":
 						$disable_moderation_statuses = array( 'community', 'protected' );
+						$enable_comment_moderation_statuses = array( 'review', 'draft' );
+						$disable_comment_moderation_statuses = array( 'community', 'protected', 'private' );
 						break;
 				}
 				$post_moderation_statuses = $this->get_setting( 'post_moderation_statuses' );
@@ -448,8 +556,19 @@ class Blog extends DataObject
 					$post_moderation_statuses = array_unique( array_merge( $enable_moderation_statuses, $post_moderation_statuses ) );
 					$comment_moderation_statuses = array_unique( array_merge( $enable_moderation_statuses, $comment_moderation_statuses ) );
 				}
+
+				if( ! empty( $disable_comment_moderation_statuses ) )
+				{
+					$comment_moderation_statuses = array_diff( $comment_moderation_statuses, $disable_comment_moderation_statuses );
+				}
+				if( ! empty( $enable_comment_moderation_statuses ) )
+				{
+					$comment_moderation_statuses = array_unique( array_merge( $enable_comment_moderation_statuses, $comment_moderation_statuses ) );
+				}
+
 				$this->set_setting( 'post_moderation_statuses', implode( ',', $post_moderation_statuses ) );
-				$this->set_setting( 'moderation_statuses', implode( ',', $comment_moderation_statuses ) );
+				// Force enabled statuses regardless of previous settings
+				$this->set_setting( 'moderation_statuses', implode( ',', $enable_comment_moderation_statuses ) );
 			}
 			if( $this->get_setting( 'allow_access' ) == 'users' || $this->get_setting( 'allow_access' ) == 'members' )
 			{ // Disable site maps, feeds and ping plugins when access is restricted on this blog
@@ -489,12 +608,12 @@ class Blog extends DataObject
 			$this->set_setting( 'category_prefix', $category_prefix);
 		}
 
-		if( param( 'atom_redirect', 'string', NULL ) !== NULL )
+		if( param( 'atom_redirect', 'url', NULL ) !== NULL )
 		{
 			param_check_url( 'atom_redirect', 'commenting' );
 			$this->set_setting( 'atom_redirect', get_param( 'atom_redirect' ) );
 
-			param( 'rss2_redirect', 'string', NULL );
+			param( 'rss2_redirect', 'url', NULL );
 			param_check_url( 'rss2_redirect', 'commenting' );
 			$this->set_setting( 'rss2_redirect', get_param( 'rss2_redirect' ) );
 		}
@@ -701,6 +820,16 @@ class Blog extends DataObject
 
 			$this->set_setting( 'post_categories', param( 'post_categories', 'string', NULL ) );
 
+			if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
+			{	// We have permission to edit advanced admin settings:
+				$this->set_setting( 'in_skin_editing', param( 'in_skin_editing', 'integer', 0 ) );
+				if( $this->get_setting( 'in_skin_editing' ) )
+				{
+					$this->set_setting( 'in_skin_editing_renderers', param( 'in_skin_editing_renderers', 'integer', 0 ) );
+					$this->set_setting( 'in_skin_editing_category', param( 'in_skin_editing_category', 'integer', 0 ) );
+				}
+			}
+
 			$this->set_setting( 'post_navigation', param( 'post_navigation', 'string', NULL ) );
 
 			// Show x days or x posts?:
@@ -714,6 +843,12 @@ class Blog extends DataObject
 
 			$disp_featured_above_list = param( 'disp_featured_above_list', 'integer', 0 );
 			$this->set_setting( 'disp_featured_above_list', $disp_featured_above_list );
+
+			// Show post types:
+			$checked_item_types = param( 'show_post_types', 'array:integer', array() );
+			$unchecked_item_types = array_diff( $this->get_enabled_item_types( 'post' ), $checked_item_types );
+			// Store only unchecked item types in order to keep all new item types enabled by default:
+			$this->set_setting( 'show_post_types', implode( ',', $unchecked_item_types ) );
 
 			// Front office statuses
 			$this->load_inskin_statuses( 'post' );
@@ -738,6 +873,20 @@ class Blog extends DataObject
 				}
 			}
 			$this->set_setting( 'post_moderation_statuses', implode( ',', $post_moderation_statuses ) );
+
+			// If notifications are temporarily disabled, no subscription options should be lost when user saves.
+			// When notification are turned back on, the subscriptions will resume as they were before.
+			if( $notifications_mode != 'off' )
+			{
+				// Subscriptions:
+				$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+			}
+
+			// Voting options:
+			$this->set_setting( 'voting_positive', param( 'voting_positive', 'integer', 0 ) );
+			$this->set_setting( 'voting_neutral', param( 'voting_neutral', 'integer', 0 ) );
+			$this->set_setting( 'voting_negative', param( 'voting_negative', 'integer', 0 ) );
 		}
 
 		if( in_array( 'comments', $groups ) )
@@ -755,7 +904,16 @@ class Blog extends DataObject
 			$this->set_setting( 'moderation_statuses', implode( ',', $blog_moderation_statuses ) );
 
 			$this->set_setting( 'comment_quick_moderation',  param( 'comment_quick_moderation', 'string', 'expire' ) );
-			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+
+			// If notifications are temporarily disabled, no subscription options should be lost when user saves.
+			// When notification are turned back on, the subscriptions will resume as they were before.
+			if( $notifications_mode != 'off' )
+			{
+				// Subscriptions:
+				$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+			}
+
 			$this->set_setting( 'comments_detect_email', param( 'comments_detect_email', 'integer', 0 ) );
 			$this->set_setting( 'comments_register', param( 'comments_register', 'integer', 0 ) );
 		}
@@ -808,9 +966,15 @@ class Blog extends DataObject
 			// Tracking:
 			$this->set_setting( 'track_unread_content', param( 'track_unread_content', 'integer', 0 ) );
 
-			// Subscriptions:
-			$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
-			$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+			// If notifications are temporarily disabled, no subscription options should be lost when user saves.
+			// When notification are turned back on, the subscriptions will resume as they were before.
+			if( $notifications_mode != 'off' )
+			{
+				// Subscriptions:
+				$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+			}
 
 			// Sitemaps:
 			$this->set_setting( 'enable_sitemaps', param( 'enable_sitemaps', 'integer', 0 ) );
@@ -825,6 +989,9 @@ class Blog extends DataObject
 			{ // Only admin can set this setting to 'Public'
 				$this->set_setting( 'new_feedback_status', $new_feedback_status );
 			}
+			$this->set_setting( 'comment_form_msg', param( 'comment_form_msg', 'text' ) );
+			$this->set_setting( 'require_anon_name', param( 'require_anon_name', 'string', '0' ) );
+			$this->set_setting( 'require_anon_email', param( 'require_anon_email', 'string', '0' ) );
 			$this->set_setting( 'allow_anon_url', param( 'allow_anon_url', 'string', '0' ) );
 			$this->set_setting( 'allow_html_comment', param( 'allow_html_comment', 'string', '0' ) );
 			$this->set_setting( 'allow_attachments', param( 'allow_attachments', 'string', 'registered' ) );
@@ -890,6 +1057,7 @@ class Blog extends DataObject
 			$this->set_setting( 'categories_meta_description', param( 'categories_meta_description', 'integer', 0 ) );
 			$this->set_setting( 'tags_meta_keywords', param( 'tags_meta_keywords', 'integer', 0 ) );
 			$this->set_setting( 'tags_open_graph', param( 'tags_open_graph', 'integer', 0 ) );
+			$this->set_setting( 'tags_twitter_card', param( 'tags_twitter_card', 'integer', 0 ) );
 			$this->set_setting( 'download_noindex', param( 'download_noindex', 'integer', 0 ) );
 			$this->set_setting( 'download_nofollowto', param( 'download_nofollowto', 'integer', 0 ) );
 		}
@@ -916,7 +1084,7 @@ class Blog extends DataObject
 
 			if( in_array( 'login', $groups ) )
 			{ // we want to load the login params:
-				if( ! get_setting_Blog( 'login_blog_ID' ) )
+				if( ! get_setting_Blog( 'login_blog_ID', $this ) )
 				{ // Update this only when no blog is defined for login/registration
 					$this->set_setting( 'in_skin_login', param( 'in_skin_login', 'integer', 0 ) );
 				}
@@ -993,7 +1161,7 @@ class Blog extends DataObject
 
 				if( $access_type == 'absolute' )
 				{
-					$blog_siteurl = param( 'blog_siteurl_absolute', 'string', true );
+					$blog_siteurl = param( 'blog_siteurl_absolute', 'url', true );
 					if( preg_match( '#^https?://[^/]+/.*#', $blog_siteurl, $matches ) )
 					{ // It looks like valid absolute URL, so we may update the blog siteurl
 						$this->set( 'siteurl', $blog_siteurl );
@@ -1001,7 +1169,7 @@ class Blog extends DataObject
 					else
 					{ // It is not valid absolute URL, don't update the blog 'siteurl' to avoid errors
 						$allow_new_access_type = false; // If site url is not updated do not allow access_type update either
-						$Messages->add( T_('Collection Folder URL').': '.sprintf( T_('%s is an invalid absolute URL'), '&laquo;'.htmlspecialchars( $blog_siteurl ).'&raquo;' )
+						$Messages->add( T_('Collection base URL').': '.sprintf( T_('%s is an invalid absolute URL'), '&laquo;'.htmlspecialchars( $blog_siteurl ).'&raquo;' )
 							.'. '.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>) and it must contain at least one \'/\' sign after the domain name!'), 'error' );
 					}
 				}
@@ -1026,15 +1194,54 @@ class Blog extends DataObject
 				}
 			}
 
+			if( ( $http_protocol = param( 'blog_http_protocol', 'string', 'always_redirect' ) ) !== NULL )
+			{
+				$this->set( 'http_protocol', $http_protocol );
+			}
+
+			if( ( param( 'cookie_domain_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
+			{	// Cookies:
+				$this->set_setting( 'cookie_domain_type', get_param( 'cookie_domain_type' ) );
+				if( get_param( 'cookie_domain_type' ) == 'custom' )
+				{	// Update custom cookie domain:
+					$cookie_domain_custom = param( 'cookie_domain_custom', 'string', NULL );
+					preg_match( '#^https?://(.+?)(:(.+?))?$#', $this->get_baseurl_root(), $coll_host );
+					if( empty( $coll_host[1] ) || ! preg_match( '#(^|\.)'.preg_quote( preg_replace( '#^\.#i', '', $cookie_domain_custom ) ).'$#i', $coll_host[1] ) )
+					{	// Wrong cookie domain:
+						param_error( 'cookie_domain_custom', T_('The custom cookie domain must be a parent of the collection domain.') );
+					}
+					$this->set_setting( 'cookie_domain_custom', $cookie_domain_custom );
+				}
+				else
+				{	// Reset custom cookie domain:
+					$this->set_setting( 'cookie_domain_custom', '' );
+				}
+
+				$this->set_setting( 'cookie_path_type', param( 'cookie_path_type', 'string', NULL ) );
+				if( get_param( 'cookie_path_type' ) == 'custom' )
+				{	// Update custom cookie path:
+					$cookie_path_custom = param( 'cookie_path_custom', 'string', NULL );
+					if( ! preg_match( '#^'.preg_quote( preg_replace( '#/$#i', '', $cookie_path_custom ) ).'(/|$)#i', $this->get_basepath() ) )
+					{	// Wrong cookie path:
+						param_error( 'cookie_path_custom', T_('The custom cookie path must be a parent of the collection path.') );
+					}
+					$this->set_setting( 'cookie_path_custom', $cookie_path_custom );
+				}
+				else
+				{	// Reset custom cookie path:
+					$this->set_setting( 'cookie_path_custom', '' );
+				}
+			}
 
 			if( ( param( 'rsc_assets_url_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
 			{ // Assets URLs / CDN:
 
 				// Check all assets types url settings:
 				$assets_url_data = array(
-					'rsc_assets_url_type'   => array( 'url' => 'rsc_assets_absolute_url', 'folder' => '/rsc/' ),
-					'media_assets_url_type' => array( 'url' => 'media_assets_absolute_url', 'folder' => '/media/' ),
-					'skins_assets_url_type' => array( 'url' => 'skins_assets_absolute_url', 'folder' => '/skins/' ),
+					'rsc_assets_url_type'     => array( 'url' => 'rsc_assets_absolute_url',     'folder' => '/rsc/' ),
+					'media_assets_url_type'   => array( 'url' => 'media_assets_absolute_url',   'folder' => '/media/' ),
+					'skins_assets_url_type'   => array( 'url' => 'skins_assets_absolute_url',   'folder' => '/skins/' ),
+					'plugins_assets_url_type' => array( 'url' => 'plugins_assets_absolute_url', 'folder' => '/plugins/' ),
 				);
 
 				foreach( $assets_url_data as $asset_url_type => $asset_url_data )
@@ -1046,7 +1253,7 @@ class Blog extends DataObject
 					}
 					$this->set_setting( $asset_url_type, $asset_url_type_value );
 
-					$assets_absolute_url_value = param( $asset_url_data['url'], 'string', NULL );
+					$assets_absolute_url_value = param( $asset_url_data['url'], 'url', NULL );
 					if( ( get_param( $asset_url_type ) == 'absolute' ) && empty( $assets_absolute_url_value ) )
 					{ // Absolute URL cannot be empty
 						$Messages->add( sprintf( T_('Absolute URL for %s cannot be empty!'), $asset_url_data['folder'] ) );
@@ -1059,6 +1266,28 @@ class Blog extends DataObject
 					{ // It is not valid absolute URL, don't update it to avoid errors
 						$Messages->add( sprintf( T_('Absolute URL for %s'), $asset_url_data['folder'] ).': '.sprintf( T_('%s is an invalid absolute URL'), '&laquo;'.htmlspecialchars( $assets_absolute_url_value ).'&raquo;' )
 							.'. '.T_('You must provide an absolute URL (starting with <code>http://</code>, <code>https://</code> or <code>//</code>) and it must ending with \'/\' sign!'), 'error' );
+					}
+				}
+
+				if( $this->get( 'access_type' ) == 'absolute' &&
+				    ( $this->get_setting( 'rsc_assets_url_type' ) == 'basic' ||
+				      $this->get_setting( 'skins_assets_url_type' ) == 'basic' ||
+				      $this->get_setting( 'plugins_assets_url_type' ) == 'basic' ) )
+				{	// Display warning for such settings combination:
+					$Messages->add( T_('WARNING: you will be loading your assets from a different domain. This may cause problems if you don\'t know exactly what you are doing. Please check the Assets URLs panel below.'), 'warning' );
+				}
+
+				if( $this->get_setting( 'skins_assets_url_type' ) != 'relative' )
+				{	// Display warning if skins path is used as NOT relative url:
+					if( $this->get_setting( 'rsc_assets_url_type' ) == 'relative' )
+					{	// If rsc path is relative url:
+						$Messages->add( sprintf( T_('WARNING: your %s and %s assets URL seem to be configured in a potentially undesirable way. Please check your Assets URLs below.'),
+							'<code>/rsc/</code>', '<code>/skins/</code>' ), 'warning' );
+					}
+					if( $this->get_setting( 'plugins_assets_url_type' ) == 'relative' )
+					{	// If plugins path is relative url:
+						$Messages->add( sprintf( T_('WARNING: your %s and %s assets URL seem to be configured in a potentially undesirable way. Please check your Assets URLs below.'),
+							'<code>/plugins/</code>', '<code>/skins/</code>' ), 'warning' );
 					}
 				}
 			}
@@ -1091,7 +1320,7 @@ class Blog extends DataObject
 				$this->set_from_Request( 'media_location' );
 				$this->set_media_subdir( param( 'blog_media_subdir', 'string', '' ) );
 				$this->set_media_fullpath( param( 'blog_media_fullpath', 'string', '' ) );
-				$this->set_media_url( param( 'blog_media_url', 'string', '' ) );
+				$this->set_media_url( param( 'blog_media_url', 'url', '' ) );
 
 				// check params
 				switch( $this->get( 'media_location' ) )
@@ -1152,7 +1381,7 @@ class Blog extends DataObject
 
 		}
 
-		return ! param_errors_detected();
+		return ! param_errors_detected() && empty( $this->confirmation );
 	}
 
 
@@ -1299,7 +1528,7 @@ class Blog extends DataObject
 	 */
 	function gen_blogurl( $type = 'default' )
 	{
-		global $baseurl, $basedomain, $Settings;
+		global $baseprotocol, $basehost, $baseport, $baseurl, $Settings;
 
 		switch( $this->get( 'access_type' ) )
 		{
@@ -1337,7 +1566,7 @@ class Blog extends DataObject
 				return $baseurl.$this->siteurl;
 
 			case 'subdom':
-				return preg_replace( '#(https?://)#i', '$1'.$this->urlname.'.', $baseurl );
+				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.$baseport.'/';
 
 			case 'absolute':
 				return $this->siteurl;
@@ -1354,7 +1583,7 @@ class Blog extends DataObject
 	 */
 	function gen_baseurl()
 	{
-		global $baseurl, $basedomain;
+		global $baseprotocol, $basehost, $baseport, $baseurl;
 
 		switch( $this->get( 'access_type' ) )
 		{
@@ -1378,7 +1607,7 @@ class Blog extends DataObject
 				break;
 
 			case 'subdom':
-				return preg_replace( '#(https?://)#i', '$1'.$this->urlname.'.', $baseurl );
+				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.$baseport.'/';
 
 			case 'absolute':
 				$url = $this->siteurl;
@@ -1399,36 +1628,47 @@ class Blog extends DataObject
 
 
 	/**
-	 * This is the domain of the blog.
+	 * This is the domain of the collection.
 	 * This returns NO trailing slash.
+	 *
+	 * @return string
 	 */
 	function get_baseurl_root()
 	{
-		if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $this->gen_baseurl(), $matches ) )
-		{
-			return $matches[1];
+		if( empty( $this->baseurl_root ) )
+		{	// Initialize collection domain only first time:
+			if( preg_match( '#^(https?://(.+?)(:.+?)?)/#', $this->gen_baseurl(), $matches ) )
+			{
+				$this->baseurl_root = $matches[1];
+			}
+			else
+			{
+				debug_die( 'Blog::get(baseurl)/baseurlroot - assertion failed [baseurl: '.$this->gen_baseurl().'].' );
+			}
 		}
-		debug_die( 'Blog::get(baseurl)/baseurlroot - assertion failed [baseurl: '.$this->gen_baseurl().'].' );
+
+		return $this->baseurl_root;
 	}
 
 
 	/**
-	 * Get the URL to the basepath of that blog.
+	 * Get the URL to the basepath of that collection.
 	 * This is supposed to be the same as $baseurl but localized to the domain of the blog/
+	 *
+	 * @return string
 	 */
 	function get_basepath_url()
 	{
 		if( empty( $this->basepath_url ) )
 		{
-			if( $this->access_type == 'absolute' )
-			{ // Use whole url when it is absolute
-				// Remove text like 'index.php' at the end
+			if( $this->get( 'access_type' ) == 'absolute' )
+			{	// Use whole url when it is absolute:
+				// Remove text like 'index.php' at the end:
 				$this->basepath_url = preg_replace( '/^(.+\/)([^\/]+\.[^\/]+)?$/', '$1', $this->get( 'siteurl' ) );
 			}
 			else
-			{ // Build url from base and sub path
-				global $basesubpath;
-				$this->basepath_url = $this->get_baseurl_root().$basesubpath;
+			{	// Build url from base and sub path:
+				$this->basepath_url = $this->get_baseurl_root().$this->get_basepath();
 			}
 		}
 
@@ -1437,13 +1677,167 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get the URL of the htsrv folder, on the current blog's domain (which is NOT always the same as the $baseurl domain!).
+	 * Get the basepath of this collection relative to domain
+	 *
+	 * @return string
 	 */
-	function get_local_htsrv_url()
+	function get_basepath()
 	{
-		global $htsrv_subdir;
+		if( empty( $this->basepath ) )
+		{	// Initialize base path only first time:
+			if( $this->get( 'access_type' ) == 'absolute' )
+			{	// If collection URL is absolute we should extract sub path from the URL because it can be different than site url:
+				$this->basepath = str_replace( $this->get_baseurl_root(), '', $this->get_basepath_url() );
+			}
+			else
+			{	// Otherwise we can use sub path of site url:
+				global $basesubpath;
+				$this->basepath = $basesubpath;
+			}
+		}
 
-		return $this->get_basepath_url().$htsrv_subdir;
+		return $this->basepath;
+	}
+
+
+	/**
+	 * Get cookie domain of this collection
+	 *
+	 * @param boolean|string FALSE - use dependon of setting,
+	 *                       'auto' - force to use automatic cookie domain,
+	 *                       'custom' - force to use custom cookie domain
+	 * @return string
+	 */
+	function get_cookie_domain( $force_type = false )
+	{
+		if( empty( $this->cookie_domain ) )
+		{	// Initialize only first time:
+			$cookie_domain_type = ( $force_type === false ) ? $this->get_setting( 'cookie_domain_type' ) : $force_type;
+
+			if( $cookie_domain_type == 'custom' )
+			{	// Custom cookie domain:
+				return $this->get_setting( 'cookie_domain_custom' );
+			}
+			else
+			{	// Automatic cookie domain:
+				if( $this->get( 'access_type' ) == 'absolute' )
+				{	// If collection URL is absolute we should extract cookie domain from the URL because it can be different than site url:
+					preg_match( '#^https?://(.+?)(:(.+?))?$#', $this->get_baseurl_root(), $matches );
+					$coll_host = $matches[1];
+
+					if( strpos( $coll_host, '.' ) === false )
+					{	// localhost or windows machine name:
+						$this->cookie_domain = $coll_host;
+					}
+					elseif( preg_match( '~^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$~i', $coll_host ) )
+					{	// The basehost is an IP address, use the basehost as it is:
+						$this->cookie_domain = $coll_host;
+					}
+					else
+					{	// Keep the part of the basehost after the www. :
+						$this->cookie_domain = preg_replace( '/^(www\. )? (.+)$/xi', '.$2', $coll_host );
+					}
+				}
+				else
+				{	// Otherwise we can use sub path of site url:
+					global $cookie_domain;
+					$this->cookie_domain = $cookie_domain;
+				}
+			}
+		}
+
+		return $this->cookie_domain;
+	}
+
+
+	/**
+	 * Get cookie path of this collection
+	 *
+	 * @param boolean|string FALSE - use dependon of setting,
+	 *                       'auto' - force to use automatic cookie path,
+	 *                       'custom' - force to use custom cookie path
+	 * @return string
+	 */
+	function get_cookie_path( $force_type = false )
+	{
+		if( empty( $this->cookie_path ) )
+		{	// Initialize only first time:
+			$cookie_domain_type = ( $force_type === false ) ? $this->get_setting( 'cookie_path_type' ) : $force_type;
+
+			if( $cookie_domain_type == 'custom' )
+			{	// Custom cookie path:
+				return $this->get_setting( 'cookie_path_custom' );
+			}
+			else
+			{	// Automatic cookie path:
+				$this->cookie_path = $this->get_basepath();
+			}
+		}
+
+		return $this->cookie_path;
+	}
+
+
+	/**
+	 * Get URL to htsrv folder
+	 *
+	 * Note: For back-office or no collection page _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
+	 *
+	 * @param boolean TRUE to use https URL
+	 * @return string URL to htsrv folder
+	 */
+	function get_htsrv_url( $force_https = false )
+	{
+		$force_https = intval( $force_https );
+
+		if( ! isset( $this->htsrv_urls[ $force_https ] ) )
+		{	// Initialize collection htsrv URL only first time and store in cache:
+			global $htsrv_url, $htsrv_url_sensitive, $htsrv_subdir;
+
+			if( ! is_array( $this->htsrv_urls ) )
+			{
+				$this->htsrv_urls = array();
+			}
+
+			if( $force_https )
+			{	// If secure htsrv URL is required:
+				$required_htsrv_url = $htsrv_url_sensitive;
+			}
+			else
+			{	// If normal htsrv URL is required:
+				$required_htsrv_url = $htsrv_url;
+			}
+
+			// Cut htsrv folder from end of the URL:
+			$required_htsrv_url = substr( $required_htsrv_url, 0, strlen( $required_htsrv_url ) - strlen( $htsrv_subdir ) );
+
+			if( strpos( $this->get_basepath_url(), $required_htsrv_url ) !== false )
+			{	// If current request path contains the required htsrv URL:
+				return $required_htsrv_url.$htsrv_subdir;
+			}
+
+			$coll_url_parts = @parse_url( $this->get_basepath_url() );
+			$htsrv_url_parts = @parse_url( $required_htsrv_url );
+			if( ! isset( $coll_url_parts['host'] ) || ! isset( $htsrv_url_parts['host'] ) )
+			{
+				debug_die( 'Invalid hosts!' );
+			}
+
+			$coll_domain = $coll_url_parts['host']
+				.( empty( $coll_url_parts['port'] ) ? '' : ':'.$coll_url_parts['port'] )
+				.( empty( $coll_url_parts['path'] ) ? '' : $coll_url_parts['path'] );
+			$htsrv_domain = $htsrv_url_parts['host']
+				.( empty( $htsrv_url_parts['port'] ) ? '' : ':'.$htsrv_url_parts['port'] )
+				.( empty( $htsrv_url_parts['path'] ) ? '' : $htsrv_url_parts['path'] );
+
+			// Replace domain + path of htsrv URL with current request:
+			$this->htsrv_urls[ $force_https ] = substr_replace( $required_htsrv_url, $coll_domain, strpos( $required_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) );
+
+			// Revert htsrv folder to end of the URL which has been cut above:
+			$this->htsrv_urls[ $force_https ] .= $htsrv_subdir;
+		}
+
+		return $this->htsrv_urls[ $force_https ];
 	}
 
 
@@ -1451,23 +1845,32 @@ class Blog extends DataObject
 	 * Get the URL of the media folder, on the current blog's domain (which is NOT always the same as the $baseurl domain!).
 	 *
 	 * @param string NULL to use current media_assets_url_type setting.  Use 'basic', 'relative' or 'absolute' to force.
+	 * @param boolean TRUE - to don't force relative URL to absolute on back-office, mail template and feed skin
 	 * @return string URL to /media/ folder
 	 */
-	function get_local_media_url( $url_type = NULL )
+	function get_local_media_url( $url_type = NULL, $force_normal_using = false )
 	{
 		$url_type = is_null( $url_type ) ? $this->get_setting( 'media_assets_url_type' ) : $url_type;
 
 		if( $url_type == 'relative' )
-		{ // Relative URL
-			global $media_subdir;
-			return $this->get_basepath_url().$media_subdir;
+		{	// Relative URL:
+			if( ! $force_normal_using && is_admin_page() )
+			{	// Force to absolute base URL on back-office side and email template:
+				global $media_url;
+				return $media_url;
+			}
+			else
+			{	// Use absolute URL relative to collection media folder:
+				global $media_subdir;
+				return $this->get_baseurl_root().$this->get_basepath().$media_subdir;
+			}
 		}
 		elseif( $url_type == 'absolute' )
-		{ // Absolute URL
+		{	// Absolute URL:
 			return $this->get_setting( 'media_assets_absolute_url' );
 		}
 		else// == 'basic'
-		{ // Basic URL from config
+		{	// Basic URL from config:
 			global $media_url;
 			return $media_url;
 		}
@@ -1487,7 +1890,7 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{ // Relative URL
 			global $rsc_subdir;
-			return $this->get_basepath_url().$rsc_subdir;
+			return $this->get_basepath().$rsc_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL
@@ -1514,7 +1917,7 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{ // Relative URL
 			global $skins_subdir;
-			return $this->get_basepath_url().$skins_subdir;
+			return $this->get_basepath().$skins_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL
@@ -1524,6 +1927,33 @@ class Blog extends DataObject
 		{ // Basic URL from config
 			global $skins_url;
 			return $skins_url;
+		}
+	}
+
+
+	/**
+	 * Get the URL of the plugins folder, on the current collection's domain (which is NOT always the same as the $baseurl domain!).
+	 *
+	 * @param string NULL to use current plugins_assets_url_type setting. Use 'basic', 'relative' or 'absolute' to force.
+	 * @return string URL to /plugins/ folder
+	 */
+	function get_local_plugins_url( $url_type = NULL )
+	{
+		$url_type = is_null( $url_type ) ? $this->get_setting( 'plugins_assets_url_type' ) : $url_type;
+
+		if( $url_type == 'relative' )
+		{	// Relative URL:
+			global $plugins_subdir;
+			return $this->get_basepath().$plugins_subdir;
+		}
+		elseif( $url_type == 'absolute' )
+		{	// Absolute URL:
+			return $this->get_setting( 'plugins_assets_absolute_url' );
+		}
+		else// == 'basic'
+		{	// Basic Config URL from config:
+			global $plugins_url;
+			return $plugins_url;
 		}
 	}
 
@@ -1755,7 +2185,7 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get allowed post status for current user in this blog
+	 * Checks if the requested item status can be used by current user and if not, get max allowed item status of the collection
 	 *
 	 * @todo make default a Blog param
 	 *
@@ -1768,7 +2198,7 @@ class Blog extends DataObject
 
 		if( ! is_logged_in() )
 		{	// User must be logged in:
-			return NULL;
+			return $this->get_max_allowed_status( $status );
 		}
 
 		if( empty( $status ) )
@@ -1868,7 +2298,7 @@ class Blog extends DataObject
 
 		if( ! $Settings->get( 'fm_enable_roots_blog' ) )
 		{ // User directories are disabled:
-			$Debuglog->add( 'Attempt to access blog media dir, but this feature is globally disabled', 'files' );
+			$Debuglog->add( 'Attempt to access collection media dir, but this feature is globally disabled', 'files' );
 			return false;
 		}
 
@@ -1888,7 +2318,7 @@ class Blog extends DataObject
 
 			case 'none':
 			default:
-				$Debuglog->add( 'Attempt to access blog media dir, but this feature is disabled for this blog', 'files' );
+				$Debuglog->add( 'Attempt to access collection media dir, but this feature is disabled for this colletion', 'files' );
 				return false;
 		}
 
@@ -1903,8 +2333,8 @@ class Blog extends DataObject
 			{ // add error
 				if( is_admin_page() )
 				{
-					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), $msg_mediadir_path )
-								.get_manual_link('media_file_permission_errors'), 'error' );
+					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), $msg_mediadir_path ),
+							'error', T_('Collection media file permission errors').get_manual_link('media_file_permission_errors').':' );
 				}
 				return false;
 			}
@@ -1912,8 +2342,8 @@ class Blog extends DataObject
 			{ // add error
 				if( is_admin_page() )
 				{
-					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; could not be created."), $msg_mediadir_path )
-								.get_manual_link('directory_creation_error'), 'error' );
+					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; could not be created."), $msg_mediadir_path ),
+							'error', T_('Collection media directory creation errors').get_manual_link('directory_creation_error').':' );
 				}
 				return false;
 			}
@@ -1921,7 +2351,7 @@ class Blog extends DataObject
 			{ // add note:
 				if( is_admin_page() )
 				{
-					$Messages->add( sprintf( T_("The blog's media directory &laquo;%s&raquo; has been created with permissions %s."), $msg_mediadir_path, substr( sprintf('%o', fileperms($mediadir)), -3 ) ), 'success' );
+					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; has been created with permissions %s."), $msg_mediadir_path, substr( sprintf('%o', fileperms($mediadir)), -3 ) ), 'success', T_('Collection media directories created:') );
 				}
 			}
 		}
@@ -2069,7 +2499,7 @@ class Blog extends DataObject
 	 */
 	function get( $parname, $params = array() )
 	{
-		global $xmlsrv_url, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog;
+		global $xmlsrv_url, $basehost, $baseurl, $basepath, $media_url, $current_User, $Settings, $Debuglog;
 
 		if( gettype( $params ) != 'array' )
 		{
@@ -2085,7 +2515,7 @@ class Blog extends DataObject
 		{
 			case 'access_type':
 				$access_type_value = parent::get( $parname );
-				if( $access_type_value == 'subdom' && is_ip_url_domain( $baseurl ) )
+				if( $access_type_value == 'subdom' && is_valid_ip_format( $basehost ) )
 				{	// Don't allow subdomain for IP address:
 					$access_type_value = 'index.php';
 				}
@@ -2181,7 +2611,7 @@ class Blog extends DataObject
 			case 'activateinfourl':
 			case 'access_requires_loginurl':
 				$url_disp = str_replace( 'url', '', $parname );
-				if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) )
+				if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $this ) )
 				{ // Use special blog for login/register actions if it is defined in general settings
 					return url_add_param( $login_Blog->gen_blogurl(), 'disp='.$url_disp, $params['glue'] );
 				}
@@ -2200,6 +2630,10 @@ class Blog extends DataObject
 
 			case 'contactsurl':
 				$disp_param = 'contacts';
+				break;
+
+			case 'flaggedurl':
+				$disp_param = 'flagged';
 				break;
 
 			case 'helpurl':
@@ -2610,8 +3044,6 @@ class Blog extends DataObject
 		// DB INSERT
 		$this->dbinsert();
 
-		$Messages->add( T_('The new blog has been created.'), 'success' );
-
 		// Change access mode if a stub file exists:
 		$stub_filename = 'blog'.$this->ID.'.php';
 		if( is_file( $basepath.$stub_filename ) )
@@ -2619,7 +3051,7 @@ class Blog extends DataObject
 			$DB->query( 'UPDATE T_blogs
 						SET blog_access_type = "relative", blog_siteurl = "'.$stub_filename.'"
 						WHERE blog_ID = '.$this->ID );
-			$Messages->add( sprintf(T_('The new blog has been associated with the stub file &laquo;%s&raquo;.'), $stub_filename ), 'success' );
+			$Messages->add_to_group( sprintf(T_('The new collection has been associated with the stub file &laquo;%s&raquo;.'), $stub_filename ), 'success', T_('New collection created:') );
 		}
 		elseif( $this->get( 'access_type' ) == 'relative' )
 		{ // Show error message only if stub file should exists!
@@ -2636,14 +3068,16 @@ class Blog extends DataObject
 						bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts,
 						bloguser_perm_cmtstatuses, bloguser_perm_edit_cmt,
 						bloguser_perm_meta_comment, bloguser_perm_cats, bloguser_perm_properties, bloguser_perm_admin,
-						bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
+						bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change,
+						bloguser_perm_analytics )
 					VALUES ( '.$this->ID.', '.$this->owner_user_ID.', 1, 1,
 						"published,community,deprecated,protected,private,review,draft,redirected", "admin", "all",
 						1, 1,
 						1, 1, 1,
 						"published,community,deprecated,protected,private,review,draft", "all",
 						1, 1, 1, 1,
-						1, 1, 1 )' );
+						1, 1, 1,
+						1 )' );
 		}
 
 		// Create default category:
@@ -2655,13 +3089,13 @@ class Blog extends DataObject
 		$edited_Chapter->set( 'urlname', $blog_urlname.'-main' );
 		$edited_Chapter->dbinsert();
 
-		$Messages->add( T_('A default category has been created for this blog.'), 'success' );
+		$Messages->add_to_group( T_('A default category has been created for this collection.'), 'success', T_('New collection created:') );
 
 		// ADD DEFAULT WIDGETS:
 		load_funcs( 'widgets/_widgets.funcs.php' );
 		insert_basic_widgets( $this->ID, false, $kind );
 
-		$Messages->add( T_('Default widgets have been set-up for this blog.'), 'success' );
+		$Messages->add_to_group( T_('Default widgets have been set-up for this collection.'), 'success', T_('New collection created:') );
 
 		$DB->commit();
 
@@ -2672,7 +3106,14 @@ class Blog extends DataObject
 			if( $result != NULL )
 			{
 				list( $status, $message ) = $result;
-				$Messages->add( $message, $status );
+				if( $status == 'success' )
+				{
+					$Messages->add_to_group( $message, $status, T_('New collection created:') );
+				}
+				else
+				{
+					$Messages->add( $message, $status );
+				}
 			}
 		}
 		$this->set_setting( 'cache_enabled_widgets', $Settings->get( 'newblog_cache_enabled_widget' ) );
@@ -2765,7 +3206,8 @@ class Blog extends DataObject
 				{prefix}perm_edit, {prefix}perm_delpost, {prefix}perm_edit_ts, {prefix}perm_delcmts,
 				{prefix}perm_recycle_owncmts, {prefix}perm_vote_spam_cmts, {prefix}perm_cmtstatuses,
 				{prefix}perm_edit_cmt, {prefix}perm_meta_comment, {prefix}perm_cats, {prefix}perm_properties,
-				{prefix}perm_admin, {prefix}perm_media_upload, {prefix}perm_media_browse, {prefix}perm_media_change';
+				{prefix}perm_admin, {prefix}perm_media_upload, {prefix}perm_media_browse, {prefix}perm_media_change,
+				{prefix}perm_analytics';
 
 		// Copy all permissions "collection per user" from duplicated collection to new created:
 		$coll_user_perm_fields = 'bloguser_user_ID, '.str_replace( '{prefix}', 'bloguser_', $coll_perm_fields );
@@ -2885,6 +3327,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 1,
 				'perm_media_browse'    => 1,
 				'perm_media_change'    => 1,
+				'perm_analytics'       => 1,
 			),
 			'moderators' => array(
 				'ismember'             => 1,
@@ -2906,6 +3349,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 1,
 				'perm_media_browse'    => 1,
 				'perm_media_change'    => 1,
+				'perm_analytics'       => 0,
 			),
 			'editors' => array(
 				'ismember'             => 1,
@@ -2927,6 +3371,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 1,
 				'perm_media_browse'    => 1,
 				'perm_media_change'    => 0,
+				'perm_analytics'       => 0,
 			)
 		);
 		if( $this->type == 'forum' )
@@ -2951,6 +3396,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 1,
 				'perm_media_browse'    => 1,
 				'perm_media_change'    => 0,
+				'perm_analytics'       => 0,
 			);
 			$group_permissions['users'] = array(
 				'ismember'             => 1,
@@ -2972,6 +3418,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 1,
 				'perm_media_browse'    => 0,
 				'perm_media_change'    => 0,
+				'perm_analytics'       => 0,
 			);
 			$group_permissions['suspect'] = array(
 				'ismember'             => 1,
@@ -2993,6 +3440,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 0,
 				'perm_media_browse'    => 0,
 				'perm_media_change'    => 0,
+				'perm_analytics'       => 0,
 			);
 		}
 
@@ -3018,6 +3466,7 @@ class Blog extends DataObject
 				'perm_media_upload'    => 0,
 				'perm_media_browse'    => 0,
 				'perm_media_change'    => 0,
+				'perm_analytics'       => 0,
 			);
 		}
 
@@ -3094,6 +3543,11 @@ class Blog extends DataObject
 		}
 
 		$Plugins->trigger_event( 'AfterCollectionUpdate', $params = array( 'Blog' => & $this ) );
+
+		if( get_param( 'action' ) == 'update_confirm' )
+		{	// Reduce statuses of posts and comments by max allowed status of this collection ONLY if this has been confirmed:
+			$this->update_reduced_status_data();
+		}
 
 		$DB->commit();
 
@@ -3252,6 +3706,18 @@ class Blog extends DataObject
 	{
 		return $this->name;
 	}
+
+
+	/**
+	 * Get the short name of the blog
+	 *
+	 * @return sring
+	 */
+	function get_shortname()
+	{
+		return $this->shortname;
+	}
+
 
 	/**
 	 * Get the name of the blog limited by length
@@ -3791,9 +4257,14 @@ class Blog extends DataObject
 	 *
 	 * @return boolean TRUE on success
 	 */
-	function has_access()
+	function has_access( $User = NULL )
 	{
 		global $current_User;
+
+		if( is_null( $User ) )
+		{
+			$User = $current_User;
+		}
 
 		$allow_access = $this->get_setting( 'allow_access' );
 
@@ -3806,7 +4277,7 @@ class Blog extends DataObject
 		{	// Only logged in users have an access to this collection:
 			return false;
 		}
-		elseif( $allow_access == 'members' && ! $current_User->check_perm( 'blog_ismember', 'view', false, $this->ID ) )
+		elseif( $allow_access == 'members' && ! $User->check_perm( 'blog_ismember', 'view', false, $this->ID ) )
 		{	// Current user must be a member of this collection:
 			return false;
 		}
@@ -3996,30 +4467,39 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get all enabled item types for this collection
+	 * Get enabled item types for this collection by usage
 	 *
+	 * @param string|NULL Item type usage: 'post', 'page', 'intro-front' and etc.
 	 * @return array
 	 */
-	function get_enabled_item_types()
+	function get_enabled_item_types( $usage = NULL )
 	{
 		if( empty( $this->ID ) )
-		{ // This is new blog, it doesn't have the enabled item types
+		{	// This is new blog, it doesn't have the enabled item types:
 			return array();
 		}
 
 		if( ! isset( $this->enabled_item_types ) )
-		{ // Get all enabled item types by one sql query and only first time to cache result:
+		{	// Get all enabled item types by one sql query and only first time to cache result:
 			global $DB;
 
-			$SQL = new SQL();
-			$SQL->SELECT( 'itc_ityp_ID' );
+			$SQL = new SQL( 'Get all enabled item types for collection #'.$this->ID );
+			$SQL->SELECT( 'itc_ityp_ID, ityp_usage' );
 			$SQL->FROM( 'T_items__type_coll' );
+			$SQL->FROM_add( 'INNER JOIN T_items__type ON itc_ityp_ID = ityp_ID' );
 			$SQL->WHERE( 'itc_coll_ID = '.$this->ID );
 
-			$this->enabled_item_types = $DB->get_col( $SQL->get() );
+			$this->enabled_item_types = $DB->get_assoc( $SQL->get(), $SQL->title );
 		}
 
-		return $this->enabled_item_types;
+		if( $usage === NULL )
+		{	// Get all item types:
+			return array_keys( $this->enabled_item_types );
+		}
+		else
+		{	// Restrict item types by requested usage value:
+			return array_keys( $this->enabled_item_types, $usage );
+		}
 	}
 
 
@@ -4128,6 +4608,10 @@ class Blog extends DataObject
 				$default_post_types = array( 'Manual Page' );
 				break;
 
+			case 'group':
+				$default_post_types = array( 'Forum Topic', 'Bug Report' );
+				break;
+
 			default: // 'std'
 				$default_post_types = array( 'Post', 'Podcast Episode', 'Post with Custom Fields', 'Child Post' );
 				break;
@@ -4200,7 +4684,12 @@ class Blog extends DataObject
 	/**
 	 * Get data of moderators which must be notified about new/edited comment
 	 *
-	 * @return array Array where each row is array with keys: user_email, user_ID, notify_comment_moderation, notify_edit_cmt_moderation
+	 * @return array Array where each row is array with keys:
+	 *                - user_email
+	 *                - user_ID
+	 *                - notify_comment_moderation
+	 *                - notify_edit_cmt_moderation
+	 *                - notify_spam_cmt_moderation
 	 */
 	function get_comment_moderator_user_data()
 	{
@@ -4209,10 +4698,11 @@ class Blog extends DataObject
 			global $DB;
 
 			$SQL = new SQL( 'Get list of moderators to notify about new/edited comment of collection #'.$this->ID );
-			$SQL->SELECT( 'DISTINCT user_email, user_ID, s1.uset_value as notify_comment_moderation, s2.uset_value as notify_edit_cmt_moderation' );
+			$SQL->SELECT( 'DISTINCT user_email, user_ID, s1.uset_value as notify_comment_moderation, s2.uset_value as notify_edit_cmt_moderation, s3.uset_value as notify_spam_cmt_moderation' );
 			$SQL->FROM( 'T_users' );
 			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings AS s1 ON s1.uset_user_ID = user_ID AND s1.uset_name = "notify_comment_moderation"' );
 			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings AS s2 ON s2.uset_user_ID = user_ID AND s2.uset_name = "notify_edit_cmt_moderation"' );
+			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings AS s3 ON s3.uset_user_ID = user_ID AND s3.uset_name = "notify_spam_cmt_moderation"' );
 			$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
 			$SQL->WHERE( 'LENGTH( TRIM( user_email ) ) > 0' );
 			$SQL->WHERE_and( '( grp_perm_blogs = "editall" )
@@ -4223,6 +4713,205 @@ class Blog extends DataObject
 		}
 
 		return $this->comment_moderator_user_data;
+	}
+
+
+	/**
+	 * Get collection type title depending on access settings:
+	 *
+	 * @return string
+	 */
+	function get_access_title()
+	{
+		switch( $this->get_setting( 'allow_access' ) )
+		{
+			case 'members':
+				if( $this->get( 'advanced_perms' ) )
+				{
+					return T_('Members only');
+				}
+				else
+				{
+					return T_('Private');
+				}
+
+			case 'users':
+				return T_('Community only');
+
+			default: // 'public'
+				return T_('Public');
+		}
+	}
+
+
+	/**
+	 * Get max allowed post/comment status on this collection depending on access settings
+	 *
+	 * @param string|NULL Status to check and reduce by max allowed, NULL - to use max allowed status of this collection
+	 * @return string
+	 */
+	function get_max_allowed_status( $check_status = NULL )
+	{
+		switch( $this->get_setting( 'allow_access' ) )
+		{
+			case 'members':
+				if( $this->get( 'advanced_perms' ) )
+				{
+					$max_allowed_status = 'protected';
+				}
+				else
+				{
+					$max_allowed_status = 'private';
+				}
+				break;
+
+			case 'users':
+				$max_allowed_status = 'community';
+				break;
+
+			default: // 'public'
+				$max_allowed_status = 'published';
+				break;
+		}
+
+		if( $check_status === NULL )
+		{	// Don't check the requested status:
+			return $max_allowed_status;
+		}
+
+		// Check if the requested status can be used on this collection:
+		$status_orders = get_visibility_statuses( 'ordered-index' );
+		$max_allowed_status_order = $status_orders[ $max_allowed_status ];
+		$check_status_order = $status_orders[ $check_status ];
+
+		if( $max_allowed_status_order >= $check_status_order )
+		{	// The requested status can be used on this collection:
+			return $check_status;
+		}
+		else
+		{	// Reduce the requested status by max allowed:
+			return $max_allowed_status;
+		}
+	}
+
+
+	/**
+	 * Get what statuses should be reduced by max allowed:
+	 *
+	 * @param string Max allowed status, NULL to get current
+	 * @return array Statuses
+	 */
+	function get_reduced_statuses( $max_allowed_status = NULL )
+	{
+		if( $max_allowed_status === NULL )
+		{	// Get current max allowed status for posts and comments o this collection:
+			$max_allowed_status = $this->get_max_allowed_status();
+		}
+
+		$status_orders = get_visibility_statuses( 'ordered-index' );
+		$max_allowed_status_order = $status_orders[ $max_allowed_status ];
+
+		// Find what statuses should be reduced by max allowed:
+		$reduced_statuses = array();
+		foreach( $status_orders as $status_key => $status_order )
+		{
+			if( $max_allowed_status_order < $status_order )
+			{	// This status must be updated because the level is more than max allowed:
+				$reduced_statuses[] = $status_key;
+			}
+		}
+
+		return $reduced_statuses;
+	}
+
+
+	/**
+	 * Get a count how much statuses of posts and comments will be reduced after new max allowed status of this collection
+	 *
+	 * @return array|boolean Array with keys 'posts' and 'comments' where each is array with key as status and value as a count | FALSE if nothing to update
+	 */
+	function get_count_reduced_status_data( $new_max_allowed_status )
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{	// Collection must be created before:
+			return false;
+		}
+
+		// Get statuses that should be reduced by max allowed:
+		$reduced_statuses = $this->get_reduced_statuses( $new_max_allowed_status );
+
+		if( empty( $reduced_statuses ) )
+		{	// No status to update:
+			return false;
+		}
+
+		$posts_SQL = new SQL( 'Get how much posts will be updated after new max allowed status of the collection #'.$this->ID );
+		$posts_SQL->SELECT( 'post_status, COUNT( post_ID )' );
+		$posts_SQL->FROM( 'T_items__item' );
+		$posts_SQL->FROM_add( 'INNER JOIN T_categories ON cat_ID = post_main_cat_ID' );
+		$posts_SQL->WHERE( 'cat_blog_ID = '.$this->ID );
+		$posts_SQL->WHERE_and( 'post_status IN ( '.$DB->quote( $reduced_statuses ).' )' );
+		$posts_SQL->GROUP_BY( 'post_status' );
+		$posts = $DB->get_assoc( $posts_SQL->get(), $posts_SQL->title );
+
+		$comments_SQL = new SQL( 'Get how much comments will be updated after new max allowed status of the collection #'.$this->ID );
+		$comments_SQL->SELECT( 'comment_status, COUNT( comment_ID )' );
+		$comments_SQL->FROM( 'T_comments' );
+		$comments_SQL->FROM_add( 'INNER JOIN T_items__item ON comment_item_ID = post_ID' );
+		$comments_SQL->FROM_add( 'INNER JOIN T_categories ON cat_ID = post_main_cat_ID' );
+		$comments_SQL->WHERE( 'cat_blog_ID = '.$this->ID );
+		$comments_SQL->WHERE_and( 'comment_status IN ( '.$DB->quote( $reduced_statuses ).' )' );
+		$comments_SQL->GROUP_BY( 'comment_status' );
+		$comments = $DB->get_assoc( $comments_SQL->get(), $comments_SQL->title );
+
+		if( empty( $posts ) && empty( $comments ) )
+		{	// All posts and comments have a correct status:
+			return false;
+		}
+
+		return array(
+				'posts'    => $posts,
+				'comments' => $comments,
+			);
+	}
+
+
+	/**
+	 * Reduce statuses of posts and comments by max allowed status of this collection
+	 */
+	function update_reduced_status_data()
+	{
+		global $DB;
+
+		// Get statuses that should be reduced by max allowed:
+		$reduced_statuses = $this->get_reduced_statuses();
+
+		if( empty( $reduced_statuses ) )
+		{	// Nothing to update:
+			return;
+		}
+
+		// Get max allowed status:
+		$max_allowed_status = $this->get_max_allowed_status();
+
+		// Update posts:
+		$DB->query( 'UPDATE T_items__item
+			INNER JOIN T_categories ON cat_ID = post_main_cat_ID
+			  SET post_status = '.$DB->quote( $max_allowed_status ).'
+			WHERE cat_blog_ID = '.$this->ID.'
+				AND post_status IN ( '.$DB->quote( $reduced_statuses ).' )',
+			'Reduce posts statuses by max allowed status of the collection #'.$this->ID );
+
+		// Update comments:
+		$DB->query( 'UPDATE T_comments
+			INNER JOIN T_items__item ON comment_item_ID = post_ID
+			INNER JOIN T_categories ON cat_ID = post_main_cat_ID
+			  SET comment_status = '.$DB->quote( $max_allowed_status ).'
+			WHERE cat_blog_ID = '.$this->ID.'
+				AND comment_status IN ( '.$DB->quote( $reduced_statuses ).' )',
+			'Reduce comments statuses by max allowed status of the collection #'.$this->ID );
 	}
 }
 

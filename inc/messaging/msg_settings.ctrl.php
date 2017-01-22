@@ -138,6 +138,8 @@ switch( $tab )
 		$AdminUI->breadcrumbpath_add( T_('Renderers'), '?ctrl=msgsettings&amp;tab=renderers' );
 		// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'messaging-plugin-settings' );
+		// Initialize JS for color picker field on the edit plugin settings form:
+		init_colorpicker_js();
 		break;
 
 	default:
