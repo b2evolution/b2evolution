@@ -29,6 +29,8 @@
   padding-top: 30px;
 }
 .secondary_area {
+  position: relative;
+  z-index: 1;
   width: 100%;
 }
 .secondary_area p {
@@ -44,6 +46,7 @@ html {
   height: 100%;
 }
 body {
+  overflow-x: visible !important;
   -webkit-font-smoothing: subpixel-antialiased;
 }
 div.front_main_area {
@@ -93,9 +96,6 @@ body.pictured .container.main_page_wrapper .panel input {
 body.pictured div#debug_info.debug {
   position: absolute;
   top: 100%;
-}
-body {
-  overflow-x: visible !important;
 }
 #bg_picture {
   display: table;
