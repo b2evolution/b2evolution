@@ -19,6 +19,7 @@
 			margin-top: 0;
 		}
 		div > p:last-child,
+		&:last-child > h2,
 		&:last-child > ul,
 		& > ul li:last-child {
 			margin-bottom: 0 !important;
@@ -31,7 +32,7 @@
 
 // Secondary Area:
 .secondary_area {
-	background-color: #FFF;
+	// background-color: #FFF; <-- set through customization options
 	width: 100%;
 	p {
 		margin-top: 10px;
@@ -79,7 +80,7 @@ body.pictured {
 	#skin_wrapper {
 		width: 100%;
 		height: 100%;
-		overflow-x: hidden; // Keep this to allow animate page down on webkit browsers
+		// overflow-x: hidden; // Keep this to allow animate page down on webkit browsers
 		&.skin_wrapper_loggedin {
 			// Use padding instead of margin to avoid a double scrolling on Windows FireFox
 			margin-top: 0;
@@ -111,17 +112,27 @@ body.pictured {
 		top: 100%;
 	}
 }
+body {
+	overflow-x: visible !important;
+}
 #bg_picture {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	width: 100%;
-	height: 100%;
+	//position: fixed;
+	// top: 0;
+	// left: 0;
+	// right: 0;
+	// bottom: 0;
+	// width: 100%;
+	// height: 100%;
+	display: table;
+    height: 100%;
+    min-height: 100%;
+    min-width: 100%;
+    position: relative;
+	width: 100%;	
+	background-attachment: fixed;
 	background-size: cover;
 	background-position: center center;
-	z-index: -999999;
+	// z-index: -999999;
 	img {
 		display: none;
 		width: 100%;
@@ -135,6 +146,7 @@ body.pictured {
 		#bg_picture {
 			position: relative;
 			height: auto;
+			min-height: auto;
 			img {
 				display: block;
 			}
@@ -506,6 +518,7 @@ body.pictured .secondary_area .widget_core_org_members {
 	position: fixed;
 	bottom: 20px;
 	left: 50%;
+	line-height: 1em;
 	#slide_button {
 		display: inline-block;
 		font-size: 55px;
