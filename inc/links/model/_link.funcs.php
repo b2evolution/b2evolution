@@ -460,7 +460,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 		}
 		$r .= ' '.get_icon( 'add', 'imgtag', array(
 				'title'   => sprintf( T_('Insert %s into the post'), $type ),
-				'onclick' => 'evo_item_image_insert( '.$blog.', \'image\', '.$link_ID.', \'evo_link_insert_tag\' )',
+				'onclick' => 'evo_item_image_insert( '.$blog.', \'image\', '.$link_ID.' )',
 				'style'   => 'cursor:default;'
 			) );
 	}

@@ -97,13 +97,13 @@ function evo_link_change_position( selectInput, url, crumb )
  */
 function evo_link_insert_inline( type, link_ID, caption )
 {
+
 	if( typeof( b2evoCanvas ) != 'undefined' )
 	{ // Canvas exists
 		var insert_tag = '[' + type + ':' + link_ID;
 
 		if( caption.length )
 		{
-			console.log( caption.length );
 			insert_tag += ':' + caption;
 		}
 
@@ -120,22 +120,6 @@ function evo_link_insert_inline( type, link_ID, caption )
 				$position_selector.val( 'inline' ).change();
 			}
 		}
-	}
-}
-
-
-/**
- * Insert short tag into the post
- *
- * @param string Type: 'image', 'file', 'video'
- * @param integer File ID
- * @param string Caption text
- */
-function evo_link_insert_tag( insert_tag )
-{
-	if( typeof( b2evoCanvas ) != 'undefined' )
-	{ // Canvas exists, insert tag
-		textarea_wrap_selection( b2evoCanvas, insert_tag, '', 1, window.document );
 	}
 }
 

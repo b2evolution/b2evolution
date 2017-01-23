@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 global $retrict_tag;
-global $link_ID, $tag_type, $callback;
+global $link_ID, $tag_type;
 global $image_caption, $image_disable_caption, $image_class;
 global $thumbnail_size, $thumbnail_alignment, $thumbnail_class;
 global $inline_class;
@@ -76,7 +76,7 @@ global $inline_class;
 				echo '</div>';
 			echo '</div>';
 
-			$Form->submit( array( 'value' => 'Insert', 'onclick' => 'return evo_image_submit( \''.$callback.'\', window.parent );' ) );
+			$Form->submit( array( 'value' => 'Insert', 'onclick' => 'return evo_image_submit();' ) );
 
 			$Form->end_fieldset();
 			$Form->end_form();
@@ -123,7 +123,6 @@ global $inline_class;
 				if( styles.indexOf( className ) == -1 )
 				{
 					styles.push( className );
-					//img.addClass( className );
 				}
 
 				input.val( styles.join( '.' ) );
@@ -131,13 +130,8 @@ global $inline_class;
 				return false;
 			}
 
-			function evo_image_submit( callback, context )
+			function evo_image_submit()
 			{
-				if( !context )
-				{
-					context = window.parent;
-				}
-
 				// Get active tab pane
 				var tagType = jQuery( '.tab-content .tab-pane.active' ).attr( 'id' );
 				var linkID = jQuery( 'input[name="link_ID"]' ).val();
@@ -153,46 +147,32 @@ global $inline_class;
 				}
 				var classes = jQuery( 'input[name="' + tagType + '_class"]' ).val();
 
-				var shortTag = '[';
-				shortTag += tagType + ':' + linkID;
+				var options = '';
 
 				if( tagType == 'image' )
 				{
 					if( noCaption )
 					{
-						shortTag += ':-';
+						options += '-';
 					}
 					else
 					{
-						shortTag += ':' + caption;
+						options += caption;
 					}
 				}
 
 				if( tagType == 'thumbnail' )
 				{
-					shortTag += ':' + size;
-					shortTag += ':' + alignment;
+					options += ( options == '' ? '' : ':' ) + size;
+					options += ':' + alignment;
 				}
 
 				if( classes )
 				{
-					shortTag += ':' + classes;
+					options += ( options == '' ? '' : ':' ) + classes;
 				}
 
-				shortTag += ']';
-
-				if( callback )
-				{
-					callback = context[callback];
-					callback( shortTag );
-				}
-
-				// Trigger display position change
-				var display_position_select = jQuery( '#display_position_<?php echo $link_ID;?>' );
-				if( display_position_select.length )
-				{
-					display_position_select.val( 'inline' ).trigger( 'change' );
-				}
+				window.parent.evo_link_insert_inline( tagType, linkID, options );
 
 				closeModalWindow();
 

@@ -3542,7 +3542,7 @@ function echo_image_insert_modal()
 	echo_modalwindow_js();
 ?>
 <script type="text/javascript">
-	function evo_item_image_insert( blog, tagType, linkID, callback )
+	function evo_item_image_insert( blog, tagType, linkID )
 	{
 		var evo_js_lang_loading = '<?php echo TS_('Loading');?>';
 		var evo_js_lang_insert_image = '<?php echo T_('Insert image into post');?>';
@@ -3561,7 +3561,6 @@ function echo_image_insert_modal()
 				'tag_type': tagType,
 				'link_ID': linkID,
 				'blog': blog,
-				'callback': callback
 			},
 			success: function(result)
 			{
@@ -3572,7 +3571,7 @@ function echo_image_insert_modal()
 		return false;
 	}
 
-	function evo_item_image_edit( blog, shortTag, callback )
+	function evo_item_image_edit( blog, shortTag )
 	{
 		var evo_js_lang_loading = '<?php echo TS_('Loading');?>';
 		var evo_js_lang_edit_image = '<?php echo T_('Edit image');?>';
@@ -3590,7 +3589,6 @@ function echo_image_insert_modal()
 				'action': 'get_edit_image_form',
 				'short_tag': shortTag,
 				'blog': blog,
-				'callback': callback
 			},
 			success: function(result)
 			{
