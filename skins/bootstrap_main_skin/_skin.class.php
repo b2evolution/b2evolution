@@ -146,7 +146,7 @@ class bootstrap_main_Skin extends Skin
 				),
 				'2_start' => array(
 					'layout' => 'begin_fieldset',
-					'label'  => T_('Front Page Main Area Overlay')
+					'label'  => T_('Front Page Main Area Settings')
 				),
 					'front_width' => array(
 						'label' => T_('Width'),
@@ -218,7 +218,7 @@ class bootstrap_main_Skin extends Skin
 				),
 				'3_start' => array(
 					'layout' => 'begin_fieldset',
-					'label'  => T_('Front Page Secondary Area Overlay')
+					'label'  => T_('Front Page Secondary Area Settings')
 				),
 					'secondary_bg_color' => array(
 						'label' => T_('Background color'),
@@ -233,6 +233,31 @@ class bootstrap_main_Skin extends Skin
 						'type' => 'color',
 					),
 				'3_end' => array(
+					'layout' => 'end_fieldset',
+				),
+				'4_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Featured posts Settings')
+				),
+					'bgimg_text_color' => array(
+						'label' => T_('Text color on background image'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),
+					'bgimg_link_color' => array(
+						'label' => T_('Link color on background image'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#6cb2ef',
+						'type' => 'color',
+					),
+					'bgimg_hover_link_color' => array(
+						'label' => T_('Hover link color on background image'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#6cb2ef',
+						'type' => 'color',
+					),
+				'4_end' => array(
 					'layout' => 'end_fieldset',
 				),
 				'section_colorbox_start' => array(
@@ -368,12 +393,12 @@ class bootstrap_main_Skin extends Skin
 			add_css_headline( '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }' );
 		}
 
+		// Add custom CSS:
+		$custom_css = '';
+
 		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) ) )
 		{
 			global $media_url, $media_path;
-
-			// Add custom CSS:
-			$custom_css = '';
 
 			$bg_image = $this->get_setting( 'front_bg_image' );
 			if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
@@ -461,25 +486,38 @@ class bootstrap_main_Skin extends Skin
 			{ // Custom text color on secondary area:
 				$custom_css .= 'section.secondary_area, .widget_core_org_members { color: '.$color." !important }\n";
 			}
-
-			if( ! empty( $custom_css ) )
-			{
-				if( $disp == 'front' )
-				{ // Use standard bootstrap style on width <= 640px only for disp=front
-					$custom_css = '@media only screen and (min-width: 641px)
-						{
-							'.$custom_css.'
-						}';
-				}
-				$custom_css = '<style type="text/css">
-	<!--
-		'.$custom_css.'
-	-->
-	</style>';
-				add_headline( $custom_css );
-			}
 		}
+		
 
+		if( $color = $this->get_setting( 'bgimg_text_color' ) )
+		{	// Custom text color on background image:
+			$custom_css .= '.evo_hasbgimg { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'bgimg_link_color' ) )
+		{	// Custom link color on background image:
+			$custom_css .= '.evo_hasbgimg a { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'bgimg_hover_link_color' ) )
+		{	// Custom link hover color on background image:
+			$custom_css .= '.evo_hasbgimg a:hover { color: '.$color." }\n";
+		}
+		
+		if( ! empty( $custom_css ) )
+		{
+			if( $disp == 'front' )
+			{ // Use standard bootstrap style on width <= 640px only for disp=front
+				$custom_css = '@media only screen and (min-width: 641px)
+					{
+						'.$custom_css.'
+					}';
+			}
+			$custom_css = '<style type="text/css">
+<!--
+'.$custom_css.'
+-->
+</style>';
+		add_headline( $custom_css );
+		}
 	}
 
 

@@ -209,7 +209,7 @@ if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 </div><!-- .row -->
 
 </div><!-- .container -->
-</div><!-- #bg_image -->
+</div><!-- #bg_picture -->
 
 <!-- =================================== START OF SECONDARY AREA =================================== -->
 <section class="secondary_area" id="slide_destination"><!-- white background, ID is used to slide here from "slide_button" -->
