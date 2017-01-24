@@ -70,15 +70,6 @@ if( $size_x != 1 && $size_x != 2 )
 	$size_x = 1;
 }
 
-// TODO: dh> this failed with filenames containing multiple dots!
-if ( false !== strpos( urldecode( $path ), '..' ) )
-// TODO: dh> fix this better. by adding is_relative_path()?
-// fp> the following doesn't look secure. I can't take the risk. What if the path ends with or is just '..' ? I don't want to allow this to go through.
-// if( preg_match( '~\.\.[/\\\]~', urldecode( $path ) ) )
-{
-	debug_die( 'Relative pathnames not allowed!' );
-}
-
 // Load fileroot info:
 $FileRootCache = & get_FileRootCache();
 $FileRoot = & $FileRootCache->get_by_ID( $root );

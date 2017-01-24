@@ -117,11 +117,11 @@ $categories = fcpf_categories_select();
 
 foreach( $images_list as $item )
 {
-	$File = & $FileCache->get_by_root_and_path( $fm_FileRoot->type,  $fm_FileRoot->in_type_ID, urldecode( $item ), true );
+	$File = & $FileCache->get_by_root_and_path( $fm_FileRoot->type,  $fm_FileRoot->in_type_ID, $item, true );
 	$title = $File->get( 'title' );
 	if( empty( $title ) )
 	{
-		$title = basename( urldecode( $File->get( 'name' ) ) );
+		$title = basename( $File->get( 'name' ) );
 	}
 	$Form->begin_fieldset( T_('Post #').( $post_counter + 1 ).get_manual_link( 'creating-posts-from-files' ) );
 	$Form->text_input( 'post_title['.$post_counter.']', $title, 40, T_('Post title') );
@@ -160,7 +160,7 @@ foreach( $images_list as $item )
 	// Clear last option to create a new for next item with other $post_counter
 	array_pop( $categories );
 
-	$Form->info( T_('Post content'), '<img src="'.$fm_FileRoot->ads_url.urldecode( $item ).'" width="200" />' );
+	$Form->info( T_('Post content'), '<img src="'.$fm_FileRoot->ads_url.$item.'" width="200" />' );
 
 	$Form->end_fieldset();
 

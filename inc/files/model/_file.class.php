@@ -242,6 +242,7 @@ class File extends DataObject
 		// If there's a valid file root, handle extra stuff. This should not get done when the FileRoot is invalid.
 		if( $this->_FileRoot )
 		{
+			// We probably don't need the windows backslashes replacing any more but leave it for safety because it doesn't hurt:
 			$this->_rdfp_rel_path = trim( str_replace( '\\', '/', $rdfp_rel_path ), '/' );
 			$this->_adfp_full_path = $this->_FileRoot->ads_path.$this->_rdfp_rel_path;
 			$this->_name = basename( $this->_adfp_full_path );
@@ -1662,8 +1663,8 @@ class File extends DataObject
 	function move_to( $root_type, $root_ID, $rdfp_rel_path )
 	{
 		$old_file_name = $this->get_name();
-		// echo "relpath= $rel_path ";
 
+		// We probably don't need the windows backslashes replacing any more but leave it for safety because it doesn't hurt:
 		$rdfp_rel_path = str_replace( '\\', '/', $rdfp_rel_path );
 		$FileRootCache = & get_FileRootCache();
 
@@ -1986,7 +1987,7 @@ class File extends DataObject
 			if( $always_open_dirs_in_fm || ! $public_access_to_media )
 			{ // open the dir in the filemanager:
 				// fp>> Note: we MUST NOT clear mode, especially when mode=upload, or else the IMG button disappears when entering a subdir
-				return regenerate_url( 'root,path', 'root='.$root_ID.'&amp;path='.$this->get_rdfs_rel_path() );
+				return regenerate_url( 'root,path', 'root='.$root_ID.'&amp;path='.rawurlencode( $this->get_rdfs_rel_path() ) );
 			}
 			else
 			{ // Public access: direct link to folder:
@@ -2003,10 +2004,10 @@ class File extends DataObject
 			switch( $Filetype->viewtype )
 			{
 				case 'image':
-					return  get_htsrv_url().'viewfile.php?root='.$root_ID.'&amp;path='.$this->_rdfp_rel_path.'&amp;viewtype=image';
+					return  get_htsrv_url().'viewfile.php?root='.$root_ID.'&amp;path='.rawurlencode( $this->_rdfp_rel_path ).'&amp;viewtype=image';
 
 				case 'text':
-					return get_htsrv_url().'viewfile.php?root='.$root_ID.'&amp;path='.$this->_rdfp_rel_path.'&amp;viewtype=text';
+					return get_htsrv_url().'viewfile.php?root='.$root_ID.'&amp;path='.rawurlencode( $this->_rdfp_rel_path ).'&amp;viewtype=text';
 
 				case 'download':	 // will NOT open a popup and will insert a Content-disposition: attachment; header
 					return $this->get_getfile_url();
@@ -2168,7 +2169,7 @@ class File extends DataObject
 			$rdfp_path = dirname( $this->get_rdfp_rel_path() );
 		}
 
-		$url_params = 'root='.$this->get_FileRoot()->ID.'&amp;path='.$rdfp_path.'/';
+		$url_params = 'root='.$this->get_FileRoot()->ID.'&amp;path='.rawurlencode( $rdfp_path .'/' );
 
 		if( ! is_null($link_obj_ID) )
 		{ // We want to open the filemanager in link mode:
@@ -2237,7 +2238,7 @@ class File extends DataObject
 			// This is for clean 'save as':
 			.rawurlencode( $this->_name )
 			// This is for locating the file:
-			.'?root='.$this->_FileRoot->ID.$glue.'path='.$this->_rdfp_rel_path
+			.'?root='.$this->_FileRoot->ID.$glue.'path='.rawurlencode( $this->_rdfp_rel_path )
 			.$glue.'mtime='.$this->get_lastmod_ts(); // TODO: dh> use salt here?!
 	}
 

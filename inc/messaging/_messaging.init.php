@@ -542,7 +542,7 @@ class messaging_Module extends Module
 						}
 						else
 						{
-							$delete_url = get_htsrv_url().'action.php?mname=messaging&thrd_ID='.$edited_Thread->ID.'&action=delete&confirmed=1&redirect_to='.$redirect_to.'&'.url_crumb( 'messaging_threads' );
+							$delete_url = get_htsrv_url().'action.php?mname=messaging&thrd_ID='.$edited_Thread->ID.'&action=delete&confirmed=1&redirect_to='.rawurlencode( $redirect_to ).'&'.url_crumb( 'messaging_threads' );
 							$ok_button = '<a href="'.$delete_url.'" class="btn btn-danger">'.T_( 'I am sure!' ).'</a>';
 							$cancel_button = '<a href="'.$redirect_to.'" class="btn btn-default">CANCEL</a>';
 							$msg = sprintf( T_( 'You are about to delete all messages in the conversation &laquo;%s&raquo;.' ), $edited_Thread->dget('title') );

@@ -78,12 +78,16 @@ function param_format( $value, $type = 'raw' )
 			return utf8_trim( $value );
 
 		case 'url':
-			// Decode url:
-			$value = urldecode( $value );
 			// strip out any html:
 			$value = utf8_trim( utf8_strip_tags( $value ) );
 			// Remove new line chars and double quote from url
 			return preg_replace( '~\r|\n|"~', '', $value );
+
+		case 'filepath':
+			// Fiel path must be a string:
+			$value = param_format( $value, 'string' );
+			// Replace windows backslashes:
+			return str_replace( '\\', '/', $value );
 
 		case 'boolean':
 			return (bool)$value;
@@ -299,7 +303,7 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				}
 
 				// Format param to valid value:
-				$GLOBALS[$var] = param_format( $GLOBALS[$var], 'string' );
+				$GLOBALS[$var] = param_format( $GLOBALS[$var], 'filepath' );
 
 				if( ! is_safe_filepath( $GLOBALS[$var] ) )
 				{	// We cannot accept this unsecure file path:
@@ -358,16 +362,19 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 						}
 
 						if( $contains_strings )
-						{ // Prepare string elements of array
-							// Format param to valid value:
-							$globals_var[$i][$j] = param_format( $var_value, 'string' );
-
+						{	// Prepare string elements of array:
 							if( $type == 'array:filepath' || $type == 'array:array:filepath' )
 							{	// Special verifying for file path params:
+								// Format param to valid file path value:
+								$globals_var[$i][$j] = param_format( $var_value, 'filepath' );
 								if( ! is_safe_filepath( $globals_var[$i][$j] ) )
 								{	// We cannot accept this unsecure file path:
 									bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
 								}
+							}
+							else
+							{	// Format param to valid string value:
+								$globals_var[$i][$j] = param_format( $var_value, 'string' );
 							}
 							continue;
 						}
