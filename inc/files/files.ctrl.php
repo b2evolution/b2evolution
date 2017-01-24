@@ -347,7 +347,7 @@ $selected_Filelist = new Filelist( $fm_FileRoot, $ads_list_path );
 
 foreach( $fm_selected as $l_source_path )
 {
-	$selected_Filelist->add_by_subpath( urldecode($l_source_path), true );
+	$selected_Filelist->add_by_subpath( $l_source_path, true );
 }
 
 
@@ -785,7 +785,7 @@ switch( $action )
 			$source_Filelist = new Filelist( $sources_Root );
 			foreach( $fm_selected as $l_source_path )
 			{
-				$source_Filelist->add_by_subpath( urldecode($l_source_path), true );
+				$source_Filelist->add_by_subpath( $l_source_path, true );
 			}
 		}
 

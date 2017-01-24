@@ -2265,7 +2265,7 @@ function col_thread_delete_action( $thread_ID )
 	}
 	else
 	{
-		$redirect_to = get_dispctrl_url( 'threads' );
+		$redirect_to = rawurlencode( get_dispctrl_url( 'threads' ) );
 		return action_icon( T_( 'Delete'), 'delete', get_htsrv_url().'action.php?mname=messaging&thrd_ID='.$thread_ID.'&action=delete&redirect_to='.$redirect_to.'&'.url_crumb( 'messaging_threads' ) );
 	}
 }
