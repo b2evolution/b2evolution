@@ -1196,6 +1196,7 @@ function get_visibility_statuses( $format = '', $exclude = array('trash'), $chec
 					'draft'      => is_admin_page() ? T_('This is a draft.') : T_('This is a draft and is visible only by the owner/author of the post and collection administrators.'),
 					'deprecated' => T_('This is deprecated and visible in the Back-Office only.'),
 					'redirected' => T_('This will redirect to another page when accessed from the Front-Office.'),
+					'trash'      => T_('This is a recycled.'),
 				);
 			break;
 
@@ -1340,9 +1341,10 @@ function compare_visibility_status( $first_status, $second_status )
  * @param string permlevel: 'view'/'edit' depending on where we would like to use it
  * @param string Status; Don't restrict this status by max allowed status, for example, if it is already used for the post/comment
  * @param string Restrict max collection allowed status by this. Used for example to restrict a comment status with its post status
+ * @param object Permission object: Item or Comment
  * @return array of restricted statuses
  */
-function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow_status = '', $restrict_max_allowed_status = '' )
+function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow_status = '', $restrict_max_allowed_status = '', $perm_target = NULL )
 {
 	global $current_User;
 
@@ -1378,7 +1380,7 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow
 	}
 
 	// 'trash' status is allowed only in case of comments, and only if user has a permission to delete a comment from the given collection
-	if( $prefix == 'blog_comment!' && ! ( is_logged_in() && $current_User->check_perm( 'blog_del_cmts', 'edit', false, $blog_ID ) ) )
+	if( $prefix == 'blog_comment!' && ! ( is_logged_in() && ! empty( $perm_target ) && $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $perm_target ) ) )
 	{ // not allowed
 		$result[] = 'trash';
 	}
@@ -1408,7 +1410,7 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow
 
 function get_status_tooltip_title( $status )
 {
-	$visibility_statuses = get_visibility_statuses( 'tooltip-titles' );
+	$visibility_statuses = get_visibility_statuses( 'tooltip-titles', array() );
 
 	if( isset( $visibility_statuses[$status] ) )
 	{

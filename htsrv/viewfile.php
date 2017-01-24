@@ -53,11 +53,6 @@ $current_User->check_perm( 'files', 'view', true, $perm_blog );
 param( 'viewtype', 'string', true, true );
 param( 'path', 'filepath', true, true );
 
-if ( false !== strpos( urldecode( $path ), '..' ) )
-{
-	debug_die( 'Relative pathnames not allowed!' );
-}
-
 // Load fileroot infos
 $FileRootCache = & get_FileRootCache();
 $FileRoot = & $FileRootCache->get_by_ID( $root );

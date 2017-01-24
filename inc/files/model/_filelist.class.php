@@ -899,6 +899,7 @@ class Filelist
 	 */
 	function & get_by_rdfs_path( $rdfs_path )
 	{
+		// We probably don't need the windows backslashes replacing any more but leave it for safety because it doesn't hurt:
 		$path = str_replace( '\\', '/', $rdfs_path );
 
 		if( isset( $this->_rdfs_rel_path_index[ $rdfs_path ] ) )
@@ -921,6 +922,7 @@ class Filelist
 	 */
 	function & get_by_full_path( $adfs_path )
 	{
+		// We probably don't need the windows backslashes replacing any more but leave it for safety because it doesn't hurt:
 		$path = str_replace( '\\', '/', $adfs_path );
 
 		if( isset( $this->_full_path_index[ $adfs_path ] ) )
@@ -1239,7 +1241,7 @@ class Filelist
 			{
 				$cd .= $dir.'/';
 			}
-			$r .= '<a href="'.regenerate_url( 'path', 'path='.$cd )
+			$r .= '<a href="'.regenerate_url( 'path', 'path='.rawurlencode( $cd ) )
 					.'" title="'.T_('Change to this directory').'">'.$dir.'</a>/';
 		}
 

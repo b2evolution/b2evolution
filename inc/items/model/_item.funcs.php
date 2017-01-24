@@ -4306,7 +4306,7 @@ function item_type_global_icons( $object_Widget )
 				$icon_group_create_mass = NULL;
 			}
 
-			$object_Widget->global_icon( T_('Mass edit the current post list...'), 'edit', $admin_url.'?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;redirect_to='.regenerate_url( 'action', '', '', '&' ), T_('Mass edit'), 3, 4 );
+			$object_Widget->global_icon( T_('Mass edit the current post list...'), 'edit', $admin_url.'?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;redirect_to='.rawurlencode( regenerate_url( 'action', '', '', '&' ) ), T_('Mass edit'), 3, 4 );
 
 			foreach( $item_types as $item_type )
 			{
