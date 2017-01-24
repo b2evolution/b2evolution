@@ -33,7 +33,7 @@ if( file_exists( $emailskins_path.'_email_style.css' ) )
 <body<?php echo emailskin_style( 'body.email' ); ?>>
 <div class="email_wrap"<?php echo emailskin_style( 'div.email_wrap' ); ?>>
 <?php
-$notification_logo_file_ID = intval( $Settings->get( 'notification_logo' ) );
+$notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
 if( $notification_logo_file_ID > 0 || $Settings->get( 'notification_long_name' ) != '' )
 {	// Display email header if logo or long site name are defined:
 ?>

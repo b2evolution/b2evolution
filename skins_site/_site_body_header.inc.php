@@ -15,7 +15,7 @@ global $baseurl, $Settings;
 <nav class="sitewide_header">
 
 <?php
-$notification_logo_file_ID = intval( $Settings->get( 'notification_logo' ) );
+$notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
 if( $notification_logo_file_ID > 0 &&
     ( $FileCache = & get_FileCache() ) &&
     ( $File = $FileCache->get_by_ID( $notification_logo_file_ID, false ) ) &&
