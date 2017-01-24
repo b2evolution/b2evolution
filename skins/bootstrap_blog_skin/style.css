@@ -281,3 +281,8 @@ div.log_container {
 footer.row {
   margin-top: 20px;
 }
+.panel,
+.avatar_main_frame,
+.pagination li a {
+  background-color: transparent;
+}

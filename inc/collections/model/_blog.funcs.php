@@ -1377,8 +1377,8 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow
 		$result[] = 'redirected';
 	}
 
-	// 'trash' status is allowed only in case of comments, and only if user has global editall permission
-	if( $prefix == 'blog_comment!' && ! ( is_logged_in() && $current_User->check_perm( 'blogs', 'editall', false ) ) )
+	// 'trash' status is allowed only in case of comments, and only if user has a permission to delete a comment from the given collection
+	if( $prefix == 'blog_comment!' && ! ( is_logged_in() && $current_User->check_perm( 'blog_del_cmts', 'edit', false, $blog_ID ) ) )
 	{ // not allowed
 		$result[] = 'trash';
 	}

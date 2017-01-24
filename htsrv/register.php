@@ -106,6 +106,9 @@ switch( $action )
 		// Stop a request from the blocked IP addresses or Domains
 		antispam_block_request();
 
+		// Stop a request from the blocked email address or its domain:
+		antispam_block_by_email( $email );
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'regform' );
 
