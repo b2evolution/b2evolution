@@ -426,12 +426,13 @@ class bootstrap_blog_Skin extends Skin
 		{ // Panel border color:
 			$custom_css .= '
 			.pagination li a, .pagination>li>a:focus, .pagination>li>a:hover, .pagination>li>span:focus, .pagination>li>span:hover,
-			.nav-tabs, .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover,
+			.nav-tabs,
 			.panel-default, .panel .panel-footer,
 			.panel .table, .panel .table th, .table-bordered>tbody>tr>td, .table-bordered>tbody>tr>th, .table-bordered>tfoot>tr>td, .table-bordered>tfoot>tr>th, .table-bordered>thead>tr>td, .table-bordered>thead>tr>th
 			{ border-color: '.$color." }\n";
 			$custom_css .= '.panel .panel-heading { border-color: '.$color."; background-color: $color }\n";
 			$custom_css .= '.nav-tabs>li>a:hover { border-bottom: 1px solid '.$color." }\n";
+			$custom_css .= '.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover { border-top-color: '.$color."; border-left-color: $color; border-right-color: $color }\n";
 		}
 		if( $color = $this->get_setting( 'panel_heading_bg_color' ) )
 		{ // Panel border color:

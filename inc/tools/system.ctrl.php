@@ -202,6 +202,26 @@ if( $mediadir_status == 'error' )
 init_system_check( T_( 'Media directory' ), $mediadir_msg.' - '.$media_path );
 disp_system_check( $mediadir_status, $mediadir_long );
 
+// .htaccess
+$htaccess_path = $basepath.'.htaccess';
+$sample_htaccess_path = $basepath.'sample.htaccess';
+init_system_check( '.htaccess', $htaccess_path );
+if( ! file_exists( $htaccess_path ) )
+{	// No .htaccess
+	disp_system_check( 'error', T_('Error').': '.sprintf( T_('%s has not been found.'), '<code>.htaccess</code>' ) );
+}
+elseif( ! file_exists( $sample_htaccess_path ) )
+{	// No sample.htaccess
+	disp_system_check( 'warning', T_('Warning').': '.sprintf( T_('%s has not been found.'), '<code>sample.htaccess</code>' ) );
+}
+elseif( trim( file_get_contents( $htaccess_path ) ) != trim( file_get_contents( $sample_htaccess_path ) ) )
+{	// Different .htaccess
+	disp_system_check( 'warning', T_('Warning').': '.sprintf( T_('%s differs from %s'), '<code>.htaccess</code>', '<code>sample.htaccess</code>' ) );
+}
+else
+{	// All OK
+	disp_system_check( 'ok', sprintf( T_('%s is identical to %s'), '<code>.htaccess</code>', '<code>sample.htaccess</code>' ) );
+}
 
 // /install/ folder deleted?
 init_system_check( T_( 'Install folder' ), $system_stats['install_removed'] ?  T_('Deleted') : T_('Not deleted').' - '.$basepath.$install_subdir );
