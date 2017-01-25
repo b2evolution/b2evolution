@@ -69,6 +69,7 @@ body.pictured {
 body.pictured #skin_wrapper {
   width: 100%;
   height: 100%;
+  overflow-x: hidden;
 }
 body.pictured #skin_wrapper.skin_wrapper_loggedin {
   margin-top: 0;

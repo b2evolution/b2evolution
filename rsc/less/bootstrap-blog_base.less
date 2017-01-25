@@ -1059,10 +1059,14 @@ div#fileuploader_form {
 		// Use this position to fix red triangle when attachment is dragged by mouse:
 		position: relative;
 	}
+	div.results, div.table_scroll {
+		overflow: initial;
+	}
 	table tbody {
 		.dragged {
 			opacity: 0.8;
 			position: absolute;
+			z-index: 1000;
 		}
 		td {
 			cursor: move;
