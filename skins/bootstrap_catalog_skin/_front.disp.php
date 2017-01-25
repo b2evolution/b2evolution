@@ -30,7 +30,7 @@ skin_container( NT_('Front Page Main Area'), array(
 	) );
 // --------------------- END OF "Front Page Main Area" CONTAINER -----------------------
 */
-/*
+
 // --------------------------------- START OF CATEGORY LIST --------------------------------
 skin_widget( array(
 		// CODE for the widget:
@@ -92,7 +92,7 @@ function get_post_IDs_by_cat_ID($category_id)
 	$SQL->GROUP_BY( 'post_datemodified' );
 	$SQL->LIMIT( 1 );
 	$blog_posts = $DB->get_results( $SQL->get() );
-	$blog_posts_array = array();
+	$blog_post_sst = array();
 	foreach( $blog_posts as $blog_post) {
 		$blog_posts_array[] = $blog_post;
 	}
@@ -101,26 +101,8 @@ function get_post_IDs_by_cat_ID($category_id)
 }
 
 // $Item = & $ItemCache->get_by_ID( $post_ID, false, false );
-var_dump( get_post_IDs_by_cat_ID(5) );
-echo get_post_IDs_by_cat_ID(5);
-	
-// Display message if no post:
-display_if_empty();
-
-echo '<div class="row">';
-	while( mainlist_get_item() )
-	{ // For each blog post, do everything below up to the closing curly brace "}"
-
-		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-		skin_include( '_item_block.inc.php', array_merge( array(
-				'content_mode' => 'excerpt', // 'auto' will auto select depending on $disp-detail
-			), $params ) );
-		// ----------------------------END ITEM BLOCK  ----------------------------
-
-	} // ---------------------------------- END OF POSTS ------------------------------------
-echo '</div>';
-
-*/
+var_dump( get_post_IDs_by_cat_ID(5)[0] );
+printf (get_post_IDs_by_cat_ID(5));
 
 $params = array_merge( array(
 	'author_link_text'              => 'auto',

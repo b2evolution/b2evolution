@@ -48,7 +48,8 @@ $params = array_merge( array(
 	<?php
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
 		
-		if( $Item->get_cover_image_url() ) {
+		if( $Item->get_cover_image_url() )
+		{	// If current item has cover image
 				$Item->images( array(
 					'before_images'            => '<div class="evo_post_images">',
 					'before_image'             => '<div class="evo_post_images"><figure class="evo_image_block cover_image_wrapper">',
@@ -57,7 +58,7 @@ $params = array_merge( array(
 					'after_image'              => '</figure></div>',
 					'after_images'             => '</div>',
 					'image_class'              => 'img-responsive',
-					'image_size'               => 'fit-1280x720',
+					'image_size'               => 'crop-480x320',
 					'image_limit'              =>  1,
 					'image_link_to'            => 'original', // Can be 'original', 'single' or empty          <i class="fa fa-link" aria-hidden="true"></i>
 
@@ -68,6 +69,10 @@ $params = array_merge( array(
 					// We want ONLY cover image to display here
 					'restrict_to_image_position' => 'cover',
 				) );
+		}
+		else
+		{	// If current item does not have cover image
+			echo '<div class="noimage_wrapper" style="width:480px;height:320px;max-width:100%"></div>';
 		}
 
 		// ------- Title -------

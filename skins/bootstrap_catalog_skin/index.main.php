@@ -115,7 +115,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <div class="row">
 
-	<div class="<?php echo $Skin->get_column_class(); ?>">
+	<div class="<?php echo $disp == 'front' ? 'col-lg-12' : $Skin->get_column_class(); ?>">
 
 		<main><!-- This is were a link like "Jump to main content" would land -->
 
@@ -276,7 +276,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 
 	<?php
-	if( $Skin->is_visible_sidebar() )
+	if( $Skin->is_visible_sidebar() && $disp != 'front' )
 	{ // Display sidebar:
 	?>
 	<aside class="col-md-3<?php echo ( $Skin->get_setting( 'layout' ) == 'left_sidebar' ? ' pull-left' : '' ); ?>">

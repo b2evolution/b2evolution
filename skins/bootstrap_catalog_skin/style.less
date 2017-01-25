@@ -179,16 +179,6 @@ textarea.message_text {
 		}
 	}
 }
-// Price change
-.price_note {
-    position: absolute;
-    right: 14px;
-	top: -1px;
-    z-index: 1;
-	& > span > span {
-		box-shadow: 0px 0px 20px -9px rgba(0,0,0,0.75);
-	}
-}
 .evo_hasbgimg {
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -315,11 +305,35 @@ div.action_messages, div.log_container {
 	margin: 0;
 }
 
+// Images wrapper
+.evo_image_block {
+	margin: 0;
+}
+
+// This skin needs this for disp=posts to separate from lower pagination
+footer.row {
+	margin-top: 20px;
+}
+
+
+// =====================================================================
+
+// Disp = front post structure
+.price_note {
+    position: absolute;
+    right: 14px;
+	top: -1px;
+    z-index: 1;
+	& > span > span {
+		box-shadow: 0px 0px 20px -9px rgba(0,0,0,0.75);
+	}
+}
 // Positions on the action buttons near page titles
 .evo_post_title {
 	h2 {
+		font-size: 20px;
 		margin: 0;
-		padding: 10px 0 10px;
+		padding: 20px 0 10px;
 		a {
 			font-size: 20px;
 		}
@@ -330,16 +344,19 @@ div.action_messages, div.log_container {
 		vertical-align: middle;
 	}
 }
-
-// Images wrapper
-.evo_image_block {
-	margin: 0;
+.evo_post__price {
+    padding: 10px 0;
+	.oldprice {
+		color: #DC143C;
+		text-decoration: line-through;
+	}
+	.newprice {
+		color: #99EE44;
+		font-size: 18px;
+		margin-left: 8px;
+	}
 }
 .edit-link-wrapper {
+	padding: 10px 0;
 	text-align: center;
-}
-
-// This skin needs this for disp=posts to separate from lower pagination
-footer.row {
-	margin-top: 20px;
 }

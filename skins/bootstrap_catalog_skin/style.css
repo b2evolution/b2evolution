@@ -144,15 +144,6 @@ textarea.message_text {
 .evo_post .small.text-muted a .glyphicon {
   color: inherit;
 }
-.price_note {
-  position: absolute;
-  right: 14px;
-  top: -1px;
-  z-index: 1;
-}
-.price_note > span > span {
-  box-shadow: 0px 0px 20px -9px rgba(0, 0, 0, 0.75);
-}
 .evo_hasbgimg {
   background-repeat: no-repeat;
   background-size: cover;
@@ -274,9 +265,25 @@ div.action_messages,
 div.log_container {
   margin: 0;
 }
-.evo_post_title h2 {
+.evo_image_block {
   margin: 0;
-  padding: 10px 0 10px;
+}
+footer.row {
+  margin-top: 20px;
+}
+.price_note {
+  position: absolute;
+  right: 14px;
+  top: -1px;
+  z-index: 1;
+}
+.price_note > span > span {
+  box-shadow: 0px 0px 20px -9px rgba(0, 0, 0, 0.75);
+}
+.evo_post_title h2 {
+  font-size: 20px;
+  margin: 0;
+  padding: 20px 0 10px;
 }
 .evo_post_title h2 a {
   font-size: 20px;
@@ -286,12 +293,19 @@ div.log_container {
   padding: 20px 0 10px 30px;
   vertical-align: middle;
 }
-.evo_image_block {
-  margin: 0;
+.evo_post__price {
+  padding: 10px 0;
+}
+.evo_post__price .oldprice {
+  color: #DC143C;
+  text-decoration: line-through;
+}
+.evo_post__price .newprice {
+  color: #99EE44;
+  font-size: 18px;
+  margin-left: 8px;
 }
 .edit-link-wrapper {
+  padding: 10px 0;
   text-align: center;
-}
-footer.row {
-  margin-top: 20px;
 }
