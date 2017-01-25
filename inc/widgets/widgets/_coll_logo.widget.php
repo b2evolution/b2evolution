@@ -91,8 +91,14 @@ class coll_logo_Widget extends ComponentWidget
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
+				'logo_file_ID' => array(
+					'label' => T_('Image'),
+					'defaultvalue' => '',
+					'type' => 'fileselect',
+					'thumbnail_size' => 'fit-320x320',
+				),
 				'image_source' => array(
-					'label' => T_('Image source'),
+					'label' => T_('Fallback image source'),
 					'note' => '',
 					'type' => 'radio',
 					'options' => array(
@@ -102,8 +108,8 @@ class coll_logo_Widget extends ComponentWidget
 					'defaultvalue' => 'coll',
 				),
 				'logo_file' => array(
-					'label' => T_('Image filename'),
-					'note' => T_('Relative to the root of the selected source.'),
+					'label' => T_('Fallback image filename'),
+					'note' => T_('If no file was selected. Relative to the root of the selected source.'),
 					'defaultvalue' => 'logo.png',
 					'valid_pattern' => array( 'pattern'=>'~^[a-z0-9_\-/][a-z0-9_.\-/]*$~i',
 																		'error'=>T_('Invalid filename.') ),
@@ -199,8 +205,16 @@ class coll_logo_Widget extends ComponentWidget
 
 		// Get a widget setting to know how we should check a file:
 		$check_file = $this->disp_params['check_file'];
+		$file_ID = $this->disp_params['logo_file_ID'];
+		$FileCache = & get_FileCache();
+		$File = false;
 
-		if( ( $check_file == 'check' || $check_file === '1' ) && ! file_exists( $image_path.$this->disp_params['logo_file'] ) )
+		if( ! empty( $file_ID ) )
+		{
+			$File = & $FileCache->get_by_ID( $file_ID, false );
+		}
+
+		if( ( $check_file == 'check' || $check_file === '1' ) && ! $File && ! file_exists( $image_path.$this->disp_params['logo_file'] ) )
 		{ // Logo file doesn't exist, Exit here because widget setting requires this:
 			return true;
 		}
@@ -212,18 +226,25 @@ class coll_logo_Widget extends ComponentWidget
 
 		$title = '<a href="'.$Blog->get( 'url' ).'">';
 
-		if( $check_file == 'title' && ! file_exists( $image_path.$this->disp_params['logo_file'] ) )
-		{ // Logo file doesn't exist, Display a collection title because widget setting requires this:
-			$title .= $Blog->get( 'name' );
+		// Initialize the image tag for logo:
+		$image_attrs = '';
+		if( ! empty( $this->disp_params['width'] ) )
+		{ // Image width
+			$image_attrs .= ' width="'.intval( $this->disp_params['width'] ).'"';
 		}
-		else
-		{	// Initialize the image tag for logo:
+		if( ! empty( $this->disp_params['height'] ) )
+		{ // Image height
+			$image_attrs .= ' height="'.intval( $this->disp_params['height'] ).'"';
+		}
 
+		if( ! empty( $File ) )
+		{
 			// Initialize image attributes:
 			$image_attrs = array(
-					'src'   => $image_url.$this->disp_params['logo_file'],
-					'alt'   => empty( $this->disp_params['alt'] ) ? $Blog->dget( 'name', 'htmlattr' ) : $this->disp_params['alt'],
+					'src' => $File->get_url(),
+					'alt' => empty( $this->disp_params['alt'] ) ? $Blog->dget( 'name', 'htmlattr' ) : $this->disp_params['alt']
 				);
+
 			// Image width:
 			$image_attrs['style'] = 'width:'.( empty( $this->disp_params['width'] ) ? 'auto' : format_to_output( $this->disp_params['width'], 'htmlattr' ) ).';';
 			// Image height:
@@ -232,6 +253,29 @@ class coll_logo_Widget extends ComponentWidget
 			$image_attrs['style'] = preg_replace( '/(\d+);/', '$1px;', $image_attrs['style'] );
 
 			$title .= '<img'.get_field_attribs_as_string( $image_attrs ).' />';
+		}
+		else
+		{
+			if( $check_file == 'title' && ! file_exists( $image_path.$this->disp_params['logo_file'] ) )
+			{ // Logo file doesn't exist, Display a collection title because widget setting requires this:
+				$title .= $Blog->get( 'name' );
+			}
+			else
+			{
+				// Initialize image attributes:
+				$image_attrs = array(
+						'src'   => $image_url.$this->disp_params['logo_file'],
+						'alt'   => empty( $this->disp_params['alt'] ) ? $Blog->dget( 'name', 'htmlattr' ) : $this->disp_params['alt'],
+					);
+				// Image width:
+				$image_attrs['style'] = 'width:'.( empty( $this->disp_params['width'] ) ? 'auto' : format_to_output( $this->disp_params['width'], 'htmlattr' ) ).';';
+				// Image height:
+				$image_attrs['style'] .= 'height:'.( empty( $this->disp_params['height'] ) ? 'auto' : format_to_output( $this->disp_params['height'], 'htmlattr' ) ).';';
+				// If no unit is specified in a size, consider the unit to be px:
+				$image_attrs['style'] = preg_replace( '/(\d+);/', '$1px;', $image_attrs['style'] );
+
+				$title .= '<img'.get_field_attribs_as_string( $image_attrs ).' />';
+			}
 		}
 
 		$title .= '</a>';

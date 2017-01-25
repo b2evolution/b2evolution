@@ -30,6 +30,12 @@ param( 'plugin_ID', 'integer', true );
 param( 'method', 'string', '' );
 param( 'params', 'string', null ); // serialized
 
+if( $plugin_ID === -1 & $method == 'test_api' )
+{	// Use this case to test API from ctrl=system:
+	echo 'ok';
+	exit(0);
+}
+
 if( is_null( $params ) )
 {	// Use empty array by default if params are not sent by request:
 	$params = array();

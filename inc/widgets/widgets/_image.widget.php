@@ -91,8 +91,14 @@ class image_Widget extends ComponentWidget
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
+				'image_file_ID' => array(
+					'label' => T_('Image'),
+					'defaultvalue' => '',
+					'type' => 'fileselect',
+					'thumbnail_size' => 'fit-320x320',
+				),
 				'image_source' => array(
-					'label' => T_('Image source'),
+					'label' => T_('Fallback image source'),
 					'note' => '',
 					'type' => 'radio',
 					'options' => array(
@@ -102,12 +108,11 @@ class image_Widget extends ComponentWidget
 					'defaultvalue' => 'skin',
 				),
 				'image_file' => array(
-					'label' => T_('Image filename'),
-					'note' => T_('Relative to the root of the selected source.'),
+					'label' => T_('Fallback image filename'),
+					'note' => T_('If no file was selected. Relative to the root of the selected source.'),
 					'defaultvalue' => 'logo.png',
 					'valid_pattern' => array( 'pattern'=>'~^[a-z0-9_\-/][a-z0-9_.\-/]*$~i',
 																		'error'=>T_('Invalid filename.') ),
-					'size' => 128,
 				),
 				'size_begin_line' => array(
 					'type' => 'begin_line',
@@ -171,6 +176,15 @@ class image_Widget extends ComponentWidget
 	{
 		global $Collection, $Blog;
 
+		$file_ID = $this->disp_params['image_file_ID'];
+		$FileCache = & get_FileCache();
+		$File = false;
+
+		if( ! empty( $file_ID ) )
+		{
+			$File = & $FileCache->get_by_ID( $file_ID, false );
+		}
+
 		switch( $this->disp_params['image_source'] )
 		{
 			case 'skin':
@@ -202,12 +216,21 @@ class image_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_start'];
 
-		// Initialize image attributes:
-		$image_attrs = array(
+		if( ! empty( $File ) )
+		{
+			$image_attrs = array(
+				'src'   => $File->get_url(),
+				'alt'   => $this->disp_params['alt'],
+			);
+		}
+		else
+		{
+			$image_attrs = array(
 				'src'   => $image_url.$this->disp_params['image_file'],
 				'alt'   => $this->disp_params['alt'],
 			);
-		// Image width:
+		}
+		// Initialize image attributes:
 		$image_attrs['style'] = 'width:'.( empty( $this->disp_params['width'] ) ? 'auto' : format_to_output( $this->disp_params['width'], 'htmlattr' ) ).';';
 		// Image height:
 		$image_attrs['style'] .= 'height:'.( empty( $this->disp_params['height'] ) ? 'auto' : format_to_output( $this->disp_params['height'], 'htmlattr' ) ).';';

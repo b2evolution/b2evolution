@@ -14,5 +14,9 @@
 
 ### Update log
 
+#### v6.8.5-stable
+- Fix for background color customzation option
+- New color customzation options
+
 #### v6.8.0-aplha
 - LESS modules includes moved from skin style to generic b2evo CSS file

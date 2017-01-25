@@ -16,25 +16,28 @@
 // Initialize attachments block:
 jQuery( document ).ready( function()
 {
-	var height = jQuery( '#attachments_fieldset_table' ).height();
-	height = ( height > 320 ) ? 320 : ( height < 97 ? 97 : height );
-	jQuery( '#attachments_fieldset_wrapper' ).height( height );
+	if( jQuery( '#attachments_fieldset_table' ).length > 0 )
+	{	// Only if the attachments block exists on the loading page:
+		var height = jQuery( '#attachments_fieldset_table' ).height();
+		height = ( height > 320 ) ? 320 : ( height < 97 ? 97 : height );
+		jQuery( '#attachments_fieldset_wrapper' ).height( height );
 
-	jQuery( '#attachments_fieldset_wrapper' ).resizable(
-	{	// Make the attachments fieldset wrapper resizable:
-		minHeight: 80,
-		handles: 's',
-		resize: function( e, ui )
-		{	// Limit max height by table of attachments:
-			jQuery( '#attachments_fieldset_wrapper' ).resizable( 'option', 'maxHeight', jQuery( '#attachments_fieldset_table' ).height() );
-		}
-	} );
-	jQuery( document ).on( 'click', '#attachments_fieldset_wrapper .ui-resizable-handle', function()
-	{	// Increase attachments fieldset height on click to resizable handler:
-		var max_height = jQuery( '#attachments_fieldset_table' ).height();
-		var height = jQuery( '#attachments_fieldset_wrapper' ).height() + 80;
-		jQuery( '#attachments_fieldset_wrapper' ).css( 'height', height > max_height ? max_height : height );
-	} );
+		jQuery( '#attachments_fieldset_wrapper' ).resizable(
+		{	// Make the attachments fieldset wrapper resizable:
+			minHeight: 80,
+			handles: 's',
+			resize: function( e, ui )
+			{	// Limit max height by table of attachments:
+				jQuery( '#attachments_fieldset_wrapper' ).resizable( 'option', 'maxHeight', jQuery( '#attachments_fieldset_table' ).height() );
+			}
+		} );
+		jQuery( document ).on( 'click', '#attachments_fieldset_wrapper .ui-resizable-handle', function()
+		{	// Increase attachments fieldset height on click to resizable handler:
+			var max_height = jQuery( '#attachments_fieldset_table' ).height();
+			var height = jQuery( '#attachments_fieldset_wrapper' ).height() + 80;
+			jQuery( '#attachments_fieldset_wrapper' ).css( 'height', height > max_height ? max_height : height );
+		} );
+	}
 } );
 
 
@@ -46,7 +49,7 @@ function evo_link_fix_wrapper_height()
 {
 	var table_height = jQuery( '#attachments_fieldset_table' ).height();
 	var wrapper_height = jQuery( '#attachments_fieldset_wrapper' ).height();
-	if( wrapper_height > table_height )
+	if( wrapper_height != table_height )
 	{
 		jQuery( '#attachments_fieldset_wrapper' ).height( jQuery( '#attachments_fieldset_table' ).height() );
 	}
@@ -64,7 +67,7 @@ function evo_link_change_position( selectInput, url, crumb )
 {
 	var oThis = selectInput;
 	var new_position = selectInput.value;
-	jQuery.get( url + 'async.php?action=set_object_link_position&link_ID=' + selectInput.id.substr(17) + '&link_position=' + new_position + '&crumb_link=' + crumb, {
+	jQuery.get( url + 'anon_async.php?action=set_object_link_position&link_ID=' + selectInput.id.substr(17) + '&link_position=' + new_position + '&crumb_link=' + crumb, {
 	}, function(r, status) {
 		r = ajax_debug_clear( r );
 		if( r == "OK" ) {
@@ -147,7 +150,7 @@ function evo_link_delete( event_object, type, link_ID, action )
 			var b2evoCanvas = window.document.getElementById( 'itemform_post_content' );
 			if( b2evoCanvas != null )
 			{ // Canvas exists
-				var regexp = new RegExp( '\\\[(image|file|inline|video|audio):' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
+				var regexp = new RegExp( '\\\[(image|file|inline|video|audio|thumbnail):' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
 				textarea_str_replace( b2evoCanvas, regexp, '', window.document );
 			}
 		}
@@ -217,16 +220,14 @@ function evo_link_attach( type, object_ID, root, path )
 	function( data )
 	{
 		var table_obj = jQuery( '#attachments_fieldset_table table', window.parent.document );
-		if( table_obj.length > 0 && typeof( data.link ) != 'undefined' )
-		{	// Append new link to the attachments table:
-			table_obj.append( '<tr>' +
-					'<td class="firstcol shrinkwrap">' + data.link.preview + '</td>' +
-					'<td class="fm_filename">' + data.link.url + '</td>' +
-					'<td class="shrinkwrap link_id_cell">' + data.link.ID + '</td>' +
-					'<td class="shrinkwrap">' + data.link.actions + '</td>' +
-					'<td class="lastcol shrinkwrap">' + data.link.position + '</td>' +
-				'</tr>' );
-		}
+		var table_parent = table_obj.parent;
+		var results_obj = jQuery( data.list_content );
+		table_obj.replaceWith( jQuery( 'table', results_obj ) ).promise().done( function( e ) {
+			// Delay for a few milleseconds after content is loaded to get the correct height
+			setTimeout( function() {
+				window.parent.evo_link_fix_wrapper_height();
+			}, 10 );
+		});
 	} );
 
 	return false;

@@ -4640,7 +4640,7 @@ class Comment extends DataObject
 		}
 
 		// Comment status cannot be more than post status, restrict it:
-		$restricted_statuses = get_restricted_statuses( $item_Blog->ID, 'blog_comment!', 'edit', '', $item_restricted_status );
+		$restricted_statuses = get_restricted_statuses( $item_Blog->ID, 'blog_comment!', 'edit', '', $item_restricted_status, $this );
 
 		// Get all visibility statuses:
 		$visibility_statuses = get_visibility_statuses( '', $restricted_statuses );

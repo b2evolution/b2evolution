@@ -1047,6 +1047,73 @@ class Item extends ItemLight
 
 
 	/**
+	 * Link attachments from temporary object to new created Item
+	 */
+	function link_from_Request()
+	{
+		global $DB;
+
+		if( $this->ID == 0 )
+		{	// The item must be stored in DB:
+			return;
+		}
+
+		$temp_link_owner_ID = param( 'temp_link_owner_ID', 'integer', 0 );
+
+		$TemporaryIDCache = & get_TemporaryIDCache();
+		if( ! ( $TemporaryID = & $TemporaryIDCache->get_by_ID( $temp_link_owner_ID, false, false ) ) )
+		{	// No temporary object of attachments:
+			return;
+		}
+
+		if( $TemporaryID->type != 'item' )
+		{	// Wrong temporary object:
+			return;
+		}
+
+		// Load all links:
+		$LinkOwner = new LinkItem( new Item(), $TemporaryID->ID );
+		$LinkOwner->load_Links();
+
+		if( empty( $LinkOwner->Links ) )
+		{	// No links:
+			return;
+		}
+
+		// Change link owner from temporary to message object:
+		$DB->query( 'UPDATE T_links
+			  SET link_itm_ID = '.$this->ID.',
+			      link_tmp_ID = NULL
+			WHERE link_tmp_ID = '.$TemporaryID->ID );
+
+		// Move all temporary files to folder of new created message:
+		foreach( $LinkOwner->Links as $item_Link )
+		{
+			if( $item_File = & $item_Link->get_File() &&
+			    $item_FileRoot = & $item_File->get_FileRoot() )
+			{
+				if( ! file_exists( $item_FileRoot->ads_path.'quick-uploads/p'.$this->ID.'/' ) )
+				{	// Create if folder doesn't exist for files of new created message:
+					if( mkdir_r( $item_FileRoot->ads_path.'quick-uploads/p'.$this->ID.'/' ) )
+					{
+						$tmp_folder_path = $item_FileRoot->ads_path.'quick-uploads/tmp'.$TemporaryID->ID.'/';
+					}
+				}
+				$item_File->move_to( $item_FileRoot->type, $item_FileRoot->in_type_ID, 'quick-uploads/p'.$this->ID.'/'.$item_File->get_name() );
+			}
+		}
+
+		if( isset( $tmp_folder_path ) && file_exists( $tmp_folder_path ) )
+		{	// Remove temp folder from disk completely:
+			rmdir_r( $tmp_folder_path );
+		}
+
+		// Delete temporary object from DB:
+		$TemporaryID->dbdelete();
+	}
+
+
+	/**
 	 * Template function: display anchor for permalinks to refer to.
 	 */
 	function anchor()
@@ -1485,7 +1552,7 @@ class Item extends ItemLight
 	 */
 	function check_and_clear_inline_files( $content )
 	{
-		preg_match_all( '/\[(image|file):(\d+):?[^\]]*\]/i', $content, $inline_images );
+		preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):(\d+):?[^\]]*\]/i', $content, $inline_images );
 
 		if( empty( $inline_images[1] ) )
 		{ // There are no inline image placeholders in the post content
@@ -3076,7 +3143,17 @@ class Item extends ItemLight
 				'sql_select_add' => $params['links_sql_select'],
 				'sql_order_by'   => $params['links_sql_orderby']
 			);
-		$LinkOwner = new LinkItem( $this );
+
+		if( empty( $this->ID ) )
+		{	// Preview mode for new creating item:
+			$tmp_object_ID = param( 'temp_link_owner_ID', 'integer', 0 );
+		}
+		else
+		{	// Normal mode for existing Item in DB:
+			$tmp_object_ID = NULL;
+		}
+
+		$LinkOwner = new LinkItem( $this, $tmp_object_ID );
 		if( ! $LinkList = $LinkOwner->get_attachment_LinkList( 1000, $params['restrict_to_image_position'], NULL, $links_params ) )
 		{
 			return '';
@@ -5601,6 +5678,9 @@ class Item extends ItemLight
 
 		if( $result = parent::dbinsert() )
 		{ // We could insert the item object..
+
+			// Link attachments from temporary object to new created Item:
+			$this->link_from_Request();
 
 			// Let's handle the extracats:
 			$result = $this->insert_update_extracats( 'insert' );

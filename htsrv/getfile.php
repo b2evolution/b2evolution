@@ -69,7 +69,7 @@ if( ! $public_access_to_media )
 }
 
 // Load the other params:
-param( 'path', 'string', true );
+param( 'path', 'filepath', true );
 param( 'size', 'string', NULL ); // Can be used for images.
 param( 'size_x', 'integer', 1 ); // Ratio size, can be 1, 2 and etc.
 param( 'mtime', 'integer', 0 );  // used for unique URLs (that never expire).
@@ -77,15 +77,6 @@ param( 'mtime', 'integer', 0 );  // used for unique URLs (that never expire).
 if( $size_x != 1 && $size_x != 2 )
 { // Allow only 1x and 2x sizes, in order to avoid hack that creates many x versions
 	$size_x = 1;
-}
-
-// TODO: dh> this failed with filenames containing multiple dots!
-if ( false !== strpos( urldecode( $path ), '..' ) )
-// TODO: dh> fix this better. by adding is_relative_path()?
-// fp> the following doesn't look secure. I can't take the risk. What if the path ends with or is just '..' ? I don't want to allow this to go through.
-// if( preg_match( '~\.\.[/\\\]~', urldecode( $path ) ) )
-{
-	debug_die( 'Relative pathnames not allowed!' );
 }
 
 // Load fileroot info:

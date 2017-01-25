@@ -43,7 +43,6 @@ if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 { // If it exists in media folder
 	echo '<img src="'.$media_url.$bg_image.'" />';
 }
-echo '</div>';
 ?>
 
 
@@ -177,7 +176,7 @@ if( $Skin->is_visible_container( 'menu' ) )
 </div><!-- .row -->
 
 </div><!-- .container -->
-
+</div><!-- #bg_picture -->
 
 <!-- =================================== START OF SECONDARY AREA =================================== -->
 <section class="secondary_area"><!-- white background -->

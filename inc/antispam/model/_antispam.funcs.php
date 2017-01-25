@@ -641,6 +641,32 @@ function antispam_block_by_country( $country_ID, $assert = true )
 
 
 /**
+ * Block request by email address and its domain
+ */
+function antispam_block_by_email( $email_address )
+{
+	if( mail_is_blocked( $email_address ) )
+	{	// Email address is blocked completely
+		$log_message = sprintf( 'A request was blocked because of the email address \'%s\' is blocked.', $email_address );
+		exit_blocked_request( 'Email address', $log_message );
+		// WILL exit();
+	}
+
+	// Extract a domain from the email address:
+	$email_domain = preg_replace( '#^[^@]+@#', '', $email_address );
+
+	if( ! empty( $email_domain ) &&
+			$Domain = & get_Domain_by_subdomain( $email_domain ) &&
+			$Domain->get( 'status' ) == 'blocked' )
+	{	// The request from domain of the email address must be blocked:
+		$log_message = sprintf( 'A request was blocked because of the domain \'%s\' of the email address \'%s\' is blocked.', $Domain->get( 'name' ), $email_address );
+		exit_blocked_request( 'Domain of email address', $log_message );
+		// WILL exit();
+	}
+}
+
+
+/**
  * Check if we can move current user to suspect group
  *
  * @param integer|NULL User ID, NULL = $current_User
