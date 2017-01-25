@@ -35,6 +35,7 @@ function phpbb_tables_aliases( $phpbb_db_prefix )
 			'BB_privmsgs_to'   => $phpbb_db_prefix.'privmsgs_to',
 			'BB_sessions_keys' => $phpbb_db_prefix.'sessions_keys',
 			'BB_attachments'   => $phpbb_db_prefix.'attachments',
+			'BB_config'        => $phpbb_db_prefix.'config',
 		);
 
 	return $phpbb_db_aliases;
@@ -612,10 +613,8 @@ function phpbb_import_users()
 				unset( $phpbb_users[$p] ); // Unset already existing user from this array to exclude the updating of the fields and settings
 				$phpbb_users_count_updated++;
 
-				if( $path_avatars )
-				{	// Import user's avatar:
-					phpbb_import_avatar( $b2evo_user->user_ID, $path_avatars, $phpbb_user->user_avatar );
-				}
+				// Import user's avatar:
+				phpbb_import_avatar( $phpbb_user, $b2evo_user->user_ID, $path_avatars );
 
 				phpbb_log( sprintf( T_( 'The user #%s already exists with E-mail address "%s" in the b2evolution database -- Merging User "%s" with user "%s".' ), $phpbb_user->user_id, $phpbb_user->user_email, $user_login, $b2evo_user->user_login ), 'warning', ' ', '<br />' );
 				continue;
@@ -710,10 +709,8 @@ function phpbb_import_users()
 
 			$user_ID = mysqli_insert_id( $DB->dbhandle );
 
-			if( $path_avatars )
-			{	// Import user's avatar:
-				phpbb_import_avatar( $user_ID, $path_avatars, $phpbb_user->user_avatar );
-			}
+			// Import user's avatar:
+			phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars );
 
 			// Save new inserted ID of the user
 			$users_IDs[$phpbb_user->user_id] = $user_ID;
@@ -2216,6 +2213,34 @@ function phpbb_subforums_list( & $Form, $cat_id, $forum_parent_id = 0 )
 
 
 /**
+ * Get config value from phpBB DB
+ *
+ * @param string Config name
+ * @return string Config value
+ */
+function phpbb_get_config( $name )
+{
+	global $phpbb_DB, $phpbb_config;
+	
+	if( ! is_array( $phpbb_config ) )
+	{	// Initialize config array only first time:
+		$phpbb_config = array();
+	}
+
+	if( ! isset( $phpbb_config[ $name ] ) )
+	{	// Get value only first time and store in cache array:
+		$SQL = new SQL( 'Get phpBB config value of "'.$name.'" from DB' );
+		$SQL->SELECT( 'config_value' );
+		$SQL->FROM( 'BB_config' );
+		$SQL->WHERE( 'config_name = '.$phpbb_DB->quote( $name ) );
+		$phpbb_config[ $name ] = $phpbb_DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
+	}
+
+	return $phpbb_config[ $name ];
+}
+
+
+/**
  * Get a path of import files
  *
  * @param string Path var name: 'path_avatars', 'path_attachments'
@@ -2240,33 +2265,164 @@ function phpbb_get_import_path( $path_var_name )
 /**
  * Import user's avatar
  *
+ * @param object User (from phpBB)
  * @param integer User ID (from b2evo)
  * @param string Path avatars
- * @param string File name of user's avatar
  */
-function phpbb_import_avatar( $user_ID, $path_avatars, $user_avatar )
+function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 {
-	global $DB, $tableprefix;
+	global $DB, $tableprefix, $phpbb_version;
 
-	if( !empty( $user_avatar ) && file_exists( $path_avatars.$user_avatar ) )
-	{	// Import user's avatar
-		$FileRootCache = & get_FileRootCache();
-		$root_ID = FileRoot::gen_ID( 'user', $user_ID );
+	$user_avatar = $phpbb_user->user_avatar;
 
-		$imported_file_ID = copy_file( $path_avatars.$user_avatar, $root_ID, 'profile_pictures', false );
-		if( !empty( $imported_file_ID ) )
-		{	// Update user's avatar
-			mysqli_query( $DB->dbhandle, 'UPDATE '.$tableprefix.'users
-					  SET user_avatar_file_ID = '.$DB->quote( $imported_file_ID ).'
-					WHERE user_ID = '.$DB->quote( $user_ID ).'
-					  AND user_avatar_file_ID IS NULL' );
-			// Insert a link with new file
-			global $localtimenow;
-			mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'links
-				       ( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_usr_ID, link_file_ID, link_position, link_order )
-				VALUES ( '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $imported_file_ID ).', "aftermore", 1 )' );
+	if( empty( $user_avatar ) )
+	{	// User has no avatar, Don't try to import:
+		return;
+	}
+
+	if( empty( $path_avatars ) )
+	{	// Only count what missing avatars if the path is not correct:
+		phpbb_log( sprintf( T_( 'Impossible to copy avatar file of the user #%s(%s) because the source for avatars %s is wrong.' ),
+			$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.phpbb_get_var( 'path_avatars' ).'</code>' ), 'error', ' ', '<br />' );
+		phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
+		return;
+	}
+
+	if( $phpbb_version == 3 )
+	{	// phpBB v3:
+		if( preg_match( '#^https?://#', $phpbb_user->user_avatar ) )
+		{	// The avatar file is loaded from remoter url:
+			$avatar_file_type = 'url';
+			$avatar_file_url = $phpbb_user->user_avatar;
+		}
+		else
+		{	// The avatar file is located on the disk:
+			$avatar_file_type = 'file';
+			$avatar_extension = preg_replace( '#^[^\.]+(\.[a-z]+)$#i', '$1', $phpbb_user->user_avatar );
+			$avatar_file_name = phpbb_get_config( 'avatar_salt' ).'_'.$phpbb_user->user_id.$avatar_extension;
+			$avatar_file_path = $path_avatars.$avatar_file_name;
 		}
 	}
+	else
+	{	// phpBB v2:
+		$avatar_file_type = 'file';
+		$avatar_file_name = $phpbb_user->user_avatar;
+		$avatar_file_path = $path_avatars.$avatar_file_name;
+	}
+
+	if( $avatar_file_type == 'url' )
+	{	// Try to get a file from remote url:
+		$url_headers = get_headers( $avatar_file_url );
+		foreach( $url_headers as $url_header )
+		{
+			if( strpos( $url_header, 'Content-Type:' ) === 0 )
+			{
+				$url_type = str_replace( 'Content-Type: ', '', $url_header );
+				break;
+			}
+		}
+		if( empty( $url_type ) || ! in_array( $url_type, array( 'image/gif', 'image/jpeg', 'image/png' ) ) )
+		{	// Wrong image type of remote url:
+			phpbb_log( sprintf( T_( 'Impossible to get avatar file of the user #%s(%s) because wrong image type of the remote avatar file %s.' ),
+				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>' ), 'error', ' ', '<br />' );
+			// Update the count of missing avatars:
+			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
+			return;
+		}
+		switch( $url_type )
+		{
+			case 'image/gif':
+				$avatar_extension = 'gif';
+				break;
+			case 'image/jpeg':
+				$avatar_extension = 'jpg';
+				break;
+			case 'image/png':
+				$avatar_extension = 'png';
+				break;
+		}
+	}
+	else
+	{	// Check if the avatar file really exists on the disk:
+		if( ! file_exists( $avatar_file_path ) )
+		{	// Display an error if avatar file is not found on the disk:
+			phpbb_log( sprintf( T_( 'Avatar file of the user #%s(%s) is not found on %s.' ),
+				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_path.'</code>' ), 'error', ' ', '<br />' );
+			// Update the count of missing avatars:
+			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
+			return;
+		}
+	}
+
+	// Get File Root of user:
+	$FileRootCache = & get_FileRootCache();
+	$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $user_ID );
+
+	if( $avatar_file_type == 'url' )
+	{	// Create avatar file from remote url:
+		$avatar_file_content = file_get_contents( $avatar_file_url );
+		if( ! $avatar_file_content )
+		{	// Wrong avatar url:
+			phpbb_log( sprintf( T_( 'Impossible to load avatar file of the user #%s(%s) from the remote url %s.' ),
+				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>' ), 'error', ' ', '<br />' );
+			// Update the count of missing avatars:
+			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
+			return;
+		}
+		$avatar_file_name = phpbb_get_config( 'avatar_salt' ).'_'.$phpbb_user->user_id.'.'.$avatar_extension;
+		$user_File = new File( 'user', $user_ID, 'profile_pictures/'.$avatar_file_name );
+		if( ! $user_File->create() ||
+		    ! ( $avatar_file_handle = fopen( $user_File->_adfp_full_path, 'w' ) ) )
+		{	// Impossible to create new file:
+			phpbb_log( sprintf( T_( 'Impossible to create new avatar file of the user #%s(%s) from the remote url %s on %s.' ),
+				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>', '<code>'.$user_File->_adfp_full_path.'</code>' ), 'error', ' ', '<br />' );
+			// Update the count of missing avatars:
+			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
+			return;
+		}
+		// Write a content of remote avatar to local file on disk:
+		fwrite( $avatar_file_handle, $avatar_file_content );
+		fclose( $avatar_file_handle );
+
+		$imported_file_ID = $user_File->ID;
+
+		if( empty( $imported_file_ID ) )
+		{	// Display an error if there is some error on copying the avatar file:
+			phpbb_log( sprintf( T_( 'Impossible to save avatar file of the user #%s(%s) from the remote url %s in DB.' ),
+				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>' ), 'error', ' ', '<br />' );
+			// Update the count of missing avatars:
+			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
+			return;
+		}
+	}
+	else
+	{	// Copy avatar file to user media folder:
+		$imported_file_ID = copy_file( $avatar_file_path, $user_FileRoot->ID, 'profile_pictures', false );
+
+		if( empty( $imported_file_ID ) )
+		{	// Display an error if there is some error on copying the avatar file:
+			phpbb_log( sprintf( T_( 'Impossible to copy avatar file of the user #%s(%s) from %s to %s, please check file rights of the files and folders.' ),
+				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_path.'</code>', '<code>'.$user_FileRoot->ads_path.'</code>' ), 'error', ' ', '<br />' );
+			// Update the count of missing avatars:
+			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
+			return;
+		}
+	}
+
+	// Update user's avatar:
+	mysqli_query( $DB->dbhandle, 'UPDATE '.$tableprefix.'users
+				SET user_avatar_file_ID = '.$DB->quote( $imported_file_ID ).'
+			WHERE user_ID = '.$DB->quote( $user_ID ).'
+				AND user_avatar_file_ID IS NULL' );
+
+	// Insert a link with new file:
+	global $localtimenow;
+	mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'links
+					 ( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_usr_ID, link_file_ID, link_position, link_order )
+		VALUES ( '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $imported_file_ID ).', "aftermore", 1 )' );
+
+	// Update the count of imported avatars:
+	phpbb_set_var( 'avatars_count_imported', phpbb_get_var( 'avatars_count_imported' ) + 1 );
 }
 
 
