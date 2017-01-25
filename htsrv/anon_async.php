@@ -1371,6 +1371,7 @@ switch( $action )
 		{
 			$tag_type = param( 'tag_type', 'string', 'image' );
 			$link_ID = param( 'link_ID', 'integer', true );
+			$replace = 0;
 
 			$image_caption = NULL;
 			$image_class = NULL;
@@ -1384,6 +1385,7 @@ switch( $action )
 		{
 			$restrict_tag = true;
 			$short_tag = param( 'short_tag', 'string', true );
+			$replace = 1;
 
 			$parts = trim( $short_tag, '[]' );
 			$parts = explode( ':', $parts );

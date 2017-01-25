@@ -87,10 +87,12 @@ global $inline_class;
 				var img = jQuery( "#image_preview img" );
 				var tagType = jQuery( '.tab-content .tab-pane.active' ).attr( 'id' );
 
+				// Add class to text input
 				jQuery( 'div.tab-pane div.style_buttons button' ).click( function() {
 					return evo_image_add_class( this, jQuery( this ).text() );
 				} );
 
+				// Apply class to preview image
 				jQuery( "input[name$='_class']" ).on( 'change keydown', debounce( function() {
 					apply_image_class( jQuery( this ).val() );
 				}, 200 ) );
@@ -99,6 +101,29 @@ global $inline_class;
 						var checkbox = jQuery( this );
 						jQuery( 'input[name="' + tagType + '_caption"]' ).prop( 'disabled', checkbox.is( ':checked' ) );
 					});
+
+				// Update preview on tab change
+				jQuery( 'a[data-toggle="tab"]' ).on( 'shown.bs.tab', function( e ) {
+					var target = jQuery( e.target ).attr( 'href' );
+					apply_image_class( jQuery( 'div' + target + ' input[name$="_class"]' ).val() );
+					console.log( 'Applying style...' );
+				} );
+
+				<?php
+				// Apply existing classes
+				if( $image_class )
+				{
+					echo 'apply_image_class( "'.$image_class.'" );';
+				}
+				if( $thumbnail_class )
+				{
+					echo 'apply_image_class( "'.$thumbnail_class.'" );';
+				}
+				if( $inline_class )
+				{
+					echo 'apply_image_class( "'.$inline_class.'" );';
+				}
+				?>
 			} );
 
 			function apply_image_class( imageClasses )
@@ -169,10 +194,17 @@ global $inline_class;
 
 				if( classes )
 				{
-					options += ( options == '' ? '' : ':' ) + classes;
+					if( tagType == 'image' )
+					{
+						options += ':' + classes;
+					}
+					else
+					{
+						options += ( options == '' ? '' : ':' ) + classes;
+					}
 				}
 
-				window.parent.evo_link_insert_inline( tagType, linkID, options );
+				window.parent.evo_link_insert_inline( tagType, linkID, options, <?php echo $replace;?> );
 
 				closeModalWindow();
 

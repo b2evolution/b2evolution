@@ -40,6 +40,7 @@ class tinymce_plugin extends Plugin
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
+	var $blog_ID = NULL;
 
 	function PluginInit( & $params )
 	{
@@ -651,7 +652,7 @@ class tinymce_plugin extends Plugin
 		global $UserSettings;
 		global $ReqHost;
 
-		$tmce_plugins_array = array( 'image', 'importcss', 'link', 'pagebreak', 'morebreak', 'textcolor', 'media', 'nonbreaking', 'charmap', 'fullscreen', 'table', 'searchreplace', 'autocomplete' );
+		$tmce_plugins_array = array( 'image', 'importcss', 'link', 'pagebreak', 'morebreak', 'textcolor', 'media', 'nonbreaking', 'charmap', 'fullscreen', 'table', 'searchreplace', 'autocomplete', 'b2evo_shorttags' );
 
 		if( function_exists( 'enchant_broker_init' ) )
 		{ // Requires Enchant spelling library
@@ -716,6 +717,7 @@ class tinymce_plugin extends Plugin
 				'removeformat',
 				'nonbreaking charmap',
 				'image media',
+				'evo_inline',
 				'link unlink',
 				'fullscreen'
 			);
@@ -799,6 +801,7 @@ class tinymce_plugin extends Plugin
 
 		// Configuration: -- http://wiki.moxiecode.com/index.php/TinyMCE:Configuration
 		$init_options = array();
+		$init_options[] = 'blog_ID: '.( !empty($Blog) ? $Blog->ID : 'null' );
 		$init_options[] = 'selector: "textarea#'.$content_id.'"';
 		if( $this->Settings->get( 'use_gzip_compressor' ) )
 		{	// Load script to use gzip compressor:

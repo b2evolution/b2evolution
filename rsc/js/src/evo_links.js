@@ -93,24 +93,28 @@ function evo_link_change_position( selectInput, url, crumb )
  *
  * @param string Type: 'image', 'file', 'video'
  * @param integer File ID
- * @param string Caption text
+ * @param string Options text
  */
-function evo_link_insert_inline( type, link_ID, caption )
+function evo_link_insert_inline( type, link_ID, options, replace )
 {
+	if( replace == undefined )
+	{
+		replace = 0;
+	}
 
 	if( typeof( b2evoCanvas ) != 'undefined' )
 	{ // Canvas exists
 		var insert_tag = '[' + type + ':' + link_ID;
 
-		if( caption.length )
+		if( options.length )
 		{
-			insert_tag += ':' + caption;
+			insert_tag += ':' + options;
 		}
 
 		insert_tag += ']';
 
 		// Insert an image tag
-		textarea_wrap_selection( b2evoCanvas, insert_tag, '', 0, window.document );
+		textarea_wrap_selection( b2evoCanvas, insert_tag, '', replace, window.document );
 
 		var $position_selector = jQuery( '#display_position_' + link_ID );
 		if( $position_selector.length != 0 )

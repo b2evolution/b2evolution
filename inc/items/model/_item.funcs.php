@@ -3592,6 +3592,7 @@ function echo_image_insert_modal()
 			},
 			success: function(result)
 			{
+				result = ajax_debug_clear( result );
 				openModalWindow( result, '90%', '80%', true, evo_js_lang_edit_image, evo_js_lang_modal_action );
 			}
 		} );
