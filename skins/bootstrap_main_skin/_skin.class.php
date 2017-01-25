@@ -507,14 +507,6 @@ class bootstrap_main_Skin extends Skin
 			add_js_headline( '
 jQuery( document ).ready( function()
 {
-	jQuery( "#slide_button" ).click( function()
-	{
-		jQuery( "html, body, #skin_wrapper" ).animate(
-		{
-			scrollTop: jQuery( ".evo_container__front_page_secondary" ).offset().top
-		}, 1500 );
-	} );
-	
 // Scroll to Top
 // This skin needs to override the default scroll-top script because the `height: 100%` and `overflow: hidden` both exist on disp=front
 // ======================================================================== /

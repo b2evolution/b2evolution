@@ -35,7 +35,7 @@ siteskin_include( '_site_body_header.inc.php' );
 // Display a picture from skin setting as background image
 global $media_path, $media_url;
 $bg_image = $Skin->get_setting( 'front_bg_image' );
-echo '<div class="container-fluid"><div class="row"><div id="bg_picture">';
+echo '<div id="bg_picture">';
 if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 { // If it exists in media folder
 	echo '<img src="'.$media_url.$bg_image.'" />';
