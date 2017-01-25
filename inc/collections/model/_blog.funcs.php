@@ -2004,7 +2004,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 				'th' => T_('Actions'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
-				'td' => '%blog_row_actions( #blog_ID#, {Obj}, #sec_ID# )%',
+				'td' => '%blog_row_actions( {Obj}, #sec_ID# )%',
 			);
 		if( $params['grouped'] )
 		{	// Group actions:
@@ -2382,28 +2382,27 @@ function blog_row_setting( $blog_ID, $setting_name, $setting_value )
 /**
  * Get available actions for current blog
  *
- * @param integer Blog ID
  * @param object Blog
  * @param integer Section ID
  * @return string Action links
  */
-function blog_row_actions( $curr_blog_ID, $Blog, $sec_ID )
+function blog_row_actions( $Blog, $sec_ID )
 {
 	global $current_User, $admin_url;
 	$r = '';
 
-	if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
+	if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 	{	// If user can edit collection properties:
 		$r .= '<a href="'.$Blog->get( 'url' ).'" class="action_icon btn btn-info btn-xs" title="'.T_('View this collection').'">'.T_('View').'</a>';
-		$r .= '<a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog='.$curr_blog_ID.'" class="action_icon btn btn-primary btn-xs" title="'.T_('Manage this collection...').'">'.T_('Manage').'</a>';
+		$r .= '<a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog='.$Blog->ID.'" class="action_icon btn btn-primary btn-xs" title="'.T_('Manage this collection...').'">'.T_('Manage').'</a>';
 	}
 	if( $current_User->check_perm( 'blogs', 'create', false, $sec_ID ) )
 	{	// If user can create new collection in the section:
-		$r .= action_icon( T_('Duplicate this collection...'), 'copy', $admin_url.'?ctrl=collections&amp;action=copy&amp;blog='.$curr_blog_ID );
+		$r .= action_icon( T_('Duplicate this collection...'), 'copy', $admin_url.'?ctrl=collections&amp;action=copy&amp;blog='.$Blog->ID );
 	}
-	if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
+	if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 	{	// If user can delete the collection:
-		$r .= action_icon( T_('Delete this blog...'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete&amp;blog='.$curr_blog_ID.'&amp;'.url_crumb('collection').'&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) ) );
+		$r .= action_icon( T_('Delete this blog...'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete&amp;blog='.$Blog->ID.'&amp;'.url_crumb('collection').'&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) ) );
 	}
 
 	if( empty($r) )
