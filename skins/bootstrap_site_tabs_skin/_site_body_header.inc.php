@@ -12,22 +12,28 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $baseurl, $Settings, $Blog, $disp, $current_User, $site_Skin;
 
-if( $Settings->get( 'notification_logo' ) != '' )
-{
-	$site_title = $Settings->get( 'notification_long_name' ) != '' ? ' title="'.$Settings->get( 'notification_long_name' ).'"' : '';
-	$site_name_text = '<img src="'.$Settings->get( 'notification_logo' ).'" alt="'.$Settings->get( 'notification_short_name' ).'"'.$site_title.' />';
+$notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
+if( $notification_logo_file_ID > 0 &&
+    ( $FileCache = & get_FileCache() ) &&
+    ( $File = $FileCache->get_by_ID( $notification_logo_file_ID, false ) ) &&
+    $File->is_image() )
+{	// Display site logo image if the file exists in DB and it is an image:
+	$site_title = $Settings->get( 'notification_long_name' ) != '' ? ' title="'.$Settings->dget( 'notification_long_name', 'htmlattr' ).'"' : '';
+	$site_name_text = '<img src="'.$File->get_url().'" alt="'.$Settings->dget( 'notification_short_name', 'htmlattr' ).'"'.$site_title.' />';
 	$site_title_class = ' swhead_logo';
+	$site_has_logo_file = true;
 }
 else
-{
+{	// Display only short site name if the logo file cannot be used by some reason above:
 	$site_name_text = $Settings->get( 'notification_short_name' );
 	$site_title_class = '';
+	$site_has_logo_file = false;
 }
 ?>
 
 <div class="swhead_wrapper">
 
-		<?php if( $Settings->get( 'notification_logo' ) != '' ) { ?>
+		<?php if( $site_has_logo_file ) { ?>
 			<div class="swhead_sitename<?php echo $site_title_class; ?>">
 				<a href="<?php echo $baseurl; ?>"><?php echo $site_name_text; ?></a>
 			</div>
@@ -111,7 +117,7 @@ else
 
 				<ul class="nav nav-tabs pull-left">
 <?php
-				if( $Settings->get( 'notification_logo' ) == '' )
+				if( $site_has_logo_file )
 				{	// Display site name:
 ?>
 					<li class="swhead_sitename no_logo<?php echo $site_title_class; ?>">
