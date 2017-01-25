@@ -26,7 +26,7 @@ if( strpos( $action, 'new' ) !== false )
 { // Simulate tab to value 'new' for actions to create new blog
 	$tab = 'new';
 }
-if( ! in_array( $action, array( 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site' ) ) )
+if( ! in_array( $action, array( 'list', 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site' ) ) )
 {
 	if( valid_blog_requested() )
 	{
