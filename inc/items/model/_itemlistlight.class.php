@@ -400,7 +400,7 @@ class ItemListLight extends DataObjectList2
 		}					
 
 		// Get chapters/categories (and compile those values right away)
-		param_compile_cat_array( !is_null( $this->Blog ) ? $this->Blog->ID : 0,	$cat, $catsel );
+		param_compile_cat_array( ( is_null( $this->Blog ) ? 0 : $this->Blog->ID ), $this->default_filters['cat_modifier'], $this->default_filters['cat_array'] );
 
 		$this->filters['cat_array'] = get_param( 'cat_array' );
 		$this->filters['cat_modifier'] = get_param( 'cat_modifier' );

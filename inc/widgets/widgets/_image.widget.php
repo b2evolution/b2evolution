@@ -207,7 +207,7 @@ class image_Widget extends ComponentWidget
 				break;
 		}
 
-		if( $this->disp_params['check_file'] && ! file_exists( $image_path.$this->disp_params['image_file'] ) )
+		if( $this->disp_params['check_file'] && ( empty( $File ) || ! file_exists( $File->get_full_path() ) ) && ! file_exists( $image_path.$this->disp_params['image_file'] ) )
 		{ // Logo file doesn't exist, Exit here because of widget setting requires this
 			return true;
 		}
