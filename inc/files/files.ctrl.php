@@ -146,8 +146,8 @@ if( in_array( $action, array( 'move_copy', 'file_move', 'file_copy' ) ) )
 	memorize_param( 'action', 'string', '', $action );
 }
 
-if( ! empty( $action ) && substr( $fm_mode, 0, 5 ) != 'link_' )
-{	// The only modes which can tolerate simultaneous actions at this time are link_* modes (item, user...)
+if( ! empty( $action ) && substr( $fm_mode, 0, 5 ) != 'link_' && $fm_mode != 'file_select' )
+{	// The only modes which can tolerate simultaneous actions at this time are link_* modes (item, user...) and file_select
 	$fm_mode = '';
 }
 
