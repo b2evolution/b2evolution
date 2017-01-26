@@ -214,7 +214,7 @@ class coll_logo_Widget extends ComponentWidget
 			$File = & $FileCache->get_by_ID( $file_ID, false );
 		}
 
-		if( ( $check_file == 'check' || $check_file === '1' ) && ! $File && ! file_exists( $image_path.$this->disp_params['logo_file'] ) )
+		if( ( $check_file == 'check' || $check_file === '1' ) && ( empty( $File ) || ! file_exists( $File->get_full_path() ) ) && ! file_exists( $image_path.$this->disp_params['logo_file'] ) )
 		{ // Logo file doesn't exist, Exit here because widget setting requires this:
 			return true;
 		}
