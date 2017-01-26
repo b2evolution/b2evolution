@@ -46,10 +46,7 @@ $Form->begin_fieldset( T_('Report of users import') );
 
 	$Form->info( T_('Count of the updated users'), '<b>'.(int)phpbb_get_var( 'users_count_updated' ).'</b>' );
 
-	if( $phpbb_version == 3 )
-	{	// Only for phpBB3:
-		$Form->info( T_('Count of the imported / missing avatars'), intval( phpbb_get_var( 'avatars_count_imported' ) ).' / <b class="red">'.intval( phpbb_get_var( 'avatars_count_missing' ) ).'</b>' );
-	}
+	$Form->info( T_('Count of the imported / missing avatars'), intval( phpbb_get_var( 'avatars_count_imported' ) ).' / <b class="red">'.intval( phpbb_get_var( 'avatars_count_missing' ) ).'</b>' );
 
 	$GroupCache = & get_GroupCache();
 

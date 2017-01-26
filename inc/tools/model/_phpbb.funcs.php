@@ -418,8 +418,11 @@ function phpbb_import_users()
 		return; // Exit here if we cannot process this step
 	}
 
+	// Reset previous values:
 	phpbb_unset_var( 'users_count_imported' );
 	phpbb_unset_var( 'users_count_updated' );
+	phpbb_unset_var( 'avatars_count_imported' );
+	phpbb_unset_var( 'avatars_count_missing' );
 
 	phpbb_log( T_('Importing users...') );
 
@@ -2042,6 +2045,8 @@ function phpbb_clear_temporary_data()
 	phpbb_unset_var( 'messages_count_imported' );
 	phpbb_unset_var( 'attachments_count_imported' );
 	phpbb_unset_var( 'attachments_count_missing' );
+	phpbb_unset_var( 'avatars_count_imported' );
+	phpbb_unset_var( 'avatars_count_missing' );
 }
 
 
@@ -2268,6 +2273,7 @@ function phpbb_get_import_path( $path_var_name )
  * @param object User (from phpBB)
  * @param integer User ID (from b2evo)
  * @param string Path avatars
+ * @return boolean TRUE on successful importing or if user has no avatar, FALSE on error
  */
 function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 {
@@ -2277,7 +2283,7 @@ function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 
 	if( empty( $user_avatar ) )
 	{	// User has no avatar, Don't try to import:
-		return;
+		return true;
 	}
 
 	if( empty( $path_avatars ) )
@@ -2285,7 +2291,7 @@ function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 		phpbb_log( sprintf( T_( 'Impossible to copy avatar file of the user #%s(%s) because the source for avatars %s is wrong.' ),
 			$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.phpbb_get_var( 'path_avatars' ).'</code>' ), 'error', ' ', '<br />' );
 		phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
-		return;
+		return false;
 	}
 
 	if( $phpbb_version == 3 )
@@ -2327,7 +2333,7 @@ function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>' ), 'error', ' ', '<br />' );
 			// Update the count of missing avatars:
 			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
-			return;
+			return false;
 		}
 		switch( $url_type )
 		{
@@ -2350,7 +2356,7 @@ function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_path.'</code>' ), 'error', ' ', '<br />' );
 			// Update the count of missing avatars:
 			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
-			return;
+			return false;
 		}
 	}
 
@@ -2367,7 +2373,7 @@ function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>' ), 'error', ' ', '<br />' );
 			// Update the count of missing avatars:
 			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
-			return;
+			return false;
 		}
 		$avatar_file_name = phpbb_get_config( 'avatar_salt' ).'_'.$phpbb_user->user_id.'.'.$avatar_extension;
 		$user_File = new File( 'user', $user_ID, 'profile_pictures/'.$avatar_file_name );
@@ -2378,7 +2384,7 @@ function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>', '<code>'.$user_File->_adfp_full_path.'</code>' ), 'error', ' ', '<br />' );
 			// Update the count of missing avatars:
 			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
-			return;
+			return false;
 		}
 		// Write a content of remote avatar to local file on disk:
 		fwrite( $avatar_file_handle, $avatar_file_content );
@@ -2392,7 +2398,7 @@ function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>' ), 'error', ' ', '<br />' );
 			// Update the count of missing avatars:
 			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
-			return;
+			return false;
 		}
 	}
 	else
@@ -2405,24 +2411,38 @@ function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_path.'</code>', '<code>'.$user_FileRoot->ads_path.'</code>' ), 'error', ' ', '<br />' );
 			// Update the count of missing avatars:
 			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
-			return;
+			return false;
 		}
 	}
 
 	// Update user's avatar:
-	mysqli_query( $DB->dbhandle, 'UPDATE '.$tableprefix.'users
+	$result = mysqli_query( $DB->dbhandle, 'UPDATE '.$tableprefix.'users
 				SET user_avatar_file_ID = '.$DB->quote( $imported_file_ID ).'
 			WHERE user_ID = '.$DB->quote( $user_ID ).'
 				AND user_avatar_file_ID IS NULL' );
 
-	// Insert a link with new file:
-	global $localtimenow;
-	mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'links
-					 ( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_usr_ID, link_file_ID, link_position, link_order )
-		VALUES ( '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $imported_file_ID ).', "aftermore", 1 )' );
+	if( $result )
+	{	// Insert a link with new file:
+		global $localtimenow;
+		$result = mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'links
+						 ( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_usr_ID, link_file_ID, link_position, link_order )
+			VALUES ( '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $imported_file_ID ).', "aftermore", 1 )' );
+	}
 
-	// Update the count of imported avatars:
-	phpbb_set_var( 'avatars_count_imported', phpbb_get_var( 'avatars_count_imported' ) + 1 );
+	if( $result )
+	{	// Update the count of imported avatars:
+		phpbb_set_var( 'avatars_count_imported', phpbb_get_var( 'avatars_count_imported' ) + 1 );
+		return true;
+	}
+	else
+	{	// Some mysql error:
+		// Note: do NOT translate the string below, because such error must not occurs on correct DB working, so it is system error and only admin can solve this:
+		phpbb_log( sprintf( 'Error on DB storing record of the importing avatar file of the user #%s(%s) from %s (Error: %s).',
+			$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.( isset( $avatar_file_path ) ? $avatar_file_path : $avatar_file_url ).'</code>', '<code>'.mysqli_error( $DB->dbhandle ).'</code>' ), 'error', ' ', '<br />' );
+		// Update the count of missing avatars:
+		phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
+		return false;
+	}
 }
 
 
@@ -2433,12 +2453,18 @@ function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
  * @param string Attachments path
  * @param integer ID of topic, reply or private message (from phpBB DB)
  * @param integer ID of topic, reply or private message (from b2evolution DB)
+ * @return boolean TRUE on successful importing, FALSE on error
  */
 function phpbb_import_attachments( $target_type, $path_attachments, $target_ID, $new_object_ID )
 {
 	if( empty( $path_attachments ) )
 	{	// Only count what missing attachments if the path is not correct:
 		phpbb_count_missing_attachments( $target_ID );
+		// Display an error to inform user about missing attachments:
+		phpbb_log( sprintf( T_( 'Impossible to copy attachment of #%s because the source for attachments %s is wrong.' ),
+			$target_ID, '<code>'.phpbb_get_var( 'path_attachments' ).'</code>' ), 'error', ' ', '<br />' );
+		phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
+		return false;
 	}
 	else
 	{	// Do the import if the path is correct:
@@ -2447,7 +2473,7 @@ function phpbb_import_attachments( $target_type, $path_attachments, $target_ID, 
 		$attachments_insert_data = phpbb_get_attachments_insert_data( $target_type, $path_attachments, $target_ID, $new_object_ID );
 
 		// Insert the links in DB:
-		phpbb_insert_attachments( $target_type, $attachments_insert_data );
+		return phpbb_insert_attachments( $target_type, $attachments_insert_data );
 	}
 }
 
@@ -2483,6 +2509,7 @@ function phpbb_count_missing_attachments( $target_IDs )
  *
  * @param string Target type: 'itm', 'cmt', 'msg'
  * @param array|NULL Array of insert data or NULL to generate new
+ * @return boolean
  */
 function phpbb_insert_attachments( $target_type, $attachments_insert_data )
 {
@@ -2490,7 +2517,7 @@ function phpbb_insert_attachments( $target_type, $attachments_insert_data )
 
 	if( empty( $attachments_insert_data ) )
 	{	// Nothing to insert, Exit here:
-		return;
+		return true;
 	}
 
 	$attachments_count_imported = phpbb_get_var( 'attachments_count_imported' );
@@ -2502,17 +2529,22 @@ function phpbb_insert_attachments( $target_type, $attachments_insert_data )
 		VALUES '.implode( ', ', $attachments_insert_data ) );
 
 	if( $r )
-	{
+	{	// Increase a count of the imported attachments:
 		$attachments_count_imported += mysqli_affected_rows( $DB->dbhandle );
 	}
 	else
-	{
+	{	// Some mysql error:
 		$attachments_count_missing += count( $attachments_insert_data );
+		// Note: do NOT translate the string below, because such error must not occurs on correct DB working, so it is system error and only admin can solve this:
+		phpbb_log( sprintf( 'Error on DB storing record of the importing attachment of "%s" (Error: %s, Data: %s).',
+			$target_type, '<code>'.mysqli_error( $DB->dbhandle ).'</code>', '<code>'.implode( ', ', $attachments_insert_data ).'</code>' ), 'error', ' ', '<br />' );
 	}
 
 	// Update the count of imported/missing attachments:
 	phpbb_set_var( 'attachments_count_imported', $attachments_count_imported );
 	phpbb_set_var( 'attachments_count_missing', $attachments_count_missing );
+
+	return $r;
 }
 
 
@@ -2560,6 +2592,9 @@ function phpbb_get_attachments_insert_data( $target_type, $path_attachments, $ta
 			if( ! file_exists( $path_attachments.$attachment->real_filename ) )
 			{	// The file with real name doesn't exist too, Skip this attachment:
 				$attachments_count_missing++;
+				// Display an error to inform user about the missing attachment:
+				phpbb_log( sprintf( T_( 'Attachment of the object #%s(%s) is not found on %s or %s.' ),
+					$target_ID, $target_type, '<code>'.$path_attachments.$attachment->physical_filename.'</code>', '<code>'.$path_attachments.$attachment->real_filename.'</code>' ), 'error', ' ', '<br />' );
 				continue;
 			}
 			else
@@ -2571,35 +2606,59 @@ function phpbb_get_attachments_insert_data( $target_type, $path_attachments, $ta
 		if( ! $users_IDs[ (string) $attachment->poster_id ] )
 		{	// Wrong file author:
 			$attachments_count_missing++;
+			// Display an error to inform user about the missing attachment:
+			phpbb_log( sprintf( T_( 'Impossible to import attachment of the object #%s(%s) because file author could not be detected by id #%s.' ),
+				$target_ID, $target_type, $attachment->poster_id ), 'error', ' ', '<br />' );
 			continue;
 		}
 
 		$author_ID = $users_IDs[ (string) $attachment->poster_id ];
 
+		$FileRootCache = & get_FileRootCache();
+
 		if( $target_type == 'msg' )
 		{	// Get root for private messages:
-			$root_ID = FileRoot::gen_ID( 'user', $author_ID );
+			$object_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $author_ID );
 			$root_path = 'private_message/pm'.$new_object_ID;
 			$link_position = 'inline';
 		}
 		else
 		{	// Get root for topics and replies:
-			$root_ID = FileRoot::gen_ID( 'collection', phpbb_get_var( 'blog_ID' ) );
+			$object_FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', phpbb_get_var( 'blog_ID' ) );
 			$root_path = 'quick-uploads/'.( $target_type == 'itm' ? 'p' : 'c' ).$new_object_ID;
 			$link_position = 'aftermore';
 		}
 
-		if( ! @rename( $path_attachments.$attachment->physical_filename, $path_attachments.$attachment->real_filename ) )
+		// Try to rename file to real name because b2evo function copy_file() has a restriciton for not allowed extenssions:
+		if( $attachment->physical_filename != $attachment->real_filename &&
+		    ! @rename( $path_attachments.$attachment->physical_filename, $path_attachments.$attachment->real_filename ) )
 		{	// Impossible to rename file from phpBB format like "2_1df806e219313f4432b82040685b8ff1" to real file name with extension, Skip it:
 			$attachments_count_missing++;
+			// Display an error to inform user about the missing attachment:
+			phpbb_log( sprintf( T_( 'Impossible to rename attachment of the object #%s(%s) from physical file name %s to real %s.' ),
+				$target_ID, $target_type, '<code>'.$path_attachments.$attachment->physical_filename.'</code>', '<code>'.$path_attachments.$attachment->real_filename.'</code>' ), 'error', ' ', '<br />' );
 			continue;
 		}
 
 		// Copy a file from phpBB attachments folder to b2evolution media folder:
-		$imported_file_ID = copy_file( $path_attachments.$attachment->real_filename, $root_ID, $root_path, false );
+		$imported_file_ID = copy_file( $path_attachments.$attachment->real_filename, $object_FileRoot->ID, $root_path, false );
 		if( empty( $imported_file_ID ) )
 		{	// Impossible to copy the file:
 			$attachments_count_missing++;
+			// Display an error to inform user about the missing attachment:
+			phpbb_log( sprintf( T_( 'Impossible to copy attachment of the object #%s(%s) from %s to the folder %s, please check system log and file rights of the files and folders.' ),
+				$target_ID, $target_type, '<code>'.$path_attachments.$attachment->real_filename.'</code>', '<code>'.$object_FileRoot->ads_path.$root_path.'</code>' ), 'error', ' ', '<br />' );
+		}
+
+		if( $attachment->physical_filename != $attachment->real_filename )
+		{	// Rename file back from real name to physical name like 2_1888733359c9d121321b5cfbe93ba714,
+			// to avoid files missing because some files can have same real file names:
+			@rename( $path_attachments.$attachment->real_filename, $path_attachments.$attachment->physical_filename );
+		}
+
+		if( empty( $imported_file_ID ) )
+		{	// Skip this if file could not be copied,
+			// NOTE: Run this after back renaming to avoid file rewriting from another object:
 			continue;
 		}
 
