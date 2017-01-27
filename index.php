@@ -46,11 +46,6 @@ if( !init_requested_blog( false ) )
 # You could *force* a specific skin here with this setting:
 # $skin = 'basic';
 
-# This setting retricts posts to those published, thus hiding drafts.
-# You should not have to change this.
-# TODO: Check if we still need this and if it's even working (it's probably overidden anyways)
-$show_statuses = array();
-
 # Additionnaly, you can set other values (see URL params in the manual)...
 # $order = 'ASC'; // This for example would display the blog in chronological order...
 
