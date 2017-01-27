@@ -78,14 +78,21 @@ $Form->begin_fieldset( T_('Default collections').get_manual_link('default-collec
 
 	$Form->select_input_object( 'default_blog_ID', $Settings->get( 'default_blog_ID' ), $BlogCache, get_icon( 'coll_default' ).' '.T_('Default collection to display'), array(
 			'note' => T_('This collection will be displayed on index.php.').$create_new_blog_link,
-			'allow_none' => true,
-			'loop_object_method' => 'get_maxlen_name' ) );
+			'allow_none' => false,
+			'loop_object_method' => 'get_maxlen_name',
+			'prepend_options' => array(
+					0  => T_('None - display default page instead'),
+					-1 => T_('None - display back-office instead'),
+				)
+	) );
 
+	$BlogCache->none_option_text = T_('No info pages');
 	$Form->select_input_object( 'info_blog_ID', $Settings->get( 'info_blog_ID' ), $BlogCache, get_icon( 'coll_info' ).' '.T_('Collection for info pages'), array(
 		'note' => T_('The pages in this collection will be added to the site menu.').$create_new_blog_link,
 		'allow_none' => true,
 		'loop_object_method' => 'get_maxlen_name' ) );
 
+	$BlogCache->none_option_text = T_('Current collection');
 	$Form->select_input_object( 'login_blog_ID', $Settings->get( 'login_blog_ID' ), $BlogCache, get_icon( 'coll_login' ).' '.T_('Collection for login/registration'), array(
 		'note' => T_('This collection will be used for all login/registration functions.').$create_new_blog_link,
 		'allow_none' => true,
