@@ -1367,10 +1367,7 @@ class Plugins
 
 		if( empty( $setting_Blog ) )
 		{ // This should be impossible, but make sure $setting_Blog is set
-			global $Settings;
-			$default_blog = $Settings->get('default_blog_ID');
-			$BlogCache = & get_BlogCache();
-			$setting_Blog = $BlogCache->get_by_ID( $default_blog );
+			$setting_Blog = & get_setting_Blog( 'default_blog_ID' );
 		}
 
 		foreach( $renderer_Plugins as $loop_RendererPlugin )

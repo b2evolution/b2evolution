@@ -35,9 +35,15 @@ if( ! isset($collections_Module) )
 
 // initialize which blog should be displayed, and display default page if blog could not be initialized
 if( !init_requested_blog( false ) )
-{ // No specific blog to be displayed:
-	// we are going to display the default page:
-	require dirname(__FILE__).'/default.php';
+{	// No specific blog to be displayed:
+	if( $Settings->get( 'default_blog_ID' ) == -1 )
+	{	// we are going to display the admin page:
+		require dirname(__FILE__).'/admin.php';
+	}
+	else
+	{	// we are going to display the default page:
+		require dirname(__FILE__).'/default.php';
+	}
 	exit();
 }
 
