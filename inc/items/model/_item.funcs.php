@@ -521,7 +521,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
  */
 function get_postdata($postid)
 {
-	global $DB, $postdata, $show_statuses;
+	global $DB, $postdata;
 
 	if( !empty($postdata) && $postdata['ID'] == $postid )
 	{ // We are asking for postdata of current post in memory! (we're in the b2 loop)
