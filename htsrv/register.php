@@ -370,7 +370,7 @@ switch( $action )
 		}
 		$UserSettings->set( 'created_fromIPv4', ip2int( $Hit->IP ), $new_User->ID );
 		$user_domain = $Hit->get_remote_host( true );
-		$UserSettings->set( 'user_domain', $user_domain, $new_User->ID );
+		$UserSettings->set( 'user_registered_from_domain', $user_domain, $new_User->ID );
 		$UserSettings->set( 'user_browser', substr( $Hit->get_user_agent(), 0 , 200 ), $new_User->ID );
 		$UserSettings->dbupdate();
 

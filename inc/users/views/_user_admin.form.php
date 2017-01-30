@@ -411,7 +411,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 
 	$Form->info_field( T_('From Country'), $from_country, array( 'field_suffix' => $user_from_country_suffix ) );
 
-	$user_domain = $UserSettings->get( 'user_domain', $edited_User->ID );
+	$user_domain = $UserSettings->get( 'user_registered_from_domain', $edited_User->ID );
 	$user_ip_address = int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) );
 	user_domain_info_display( T_('From Domain'), 'domain_status', $user_domain, $user_ip_address, $Form );
 
@@ -426,6 +426,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 		$Form->info_field( '<b class="evo_label_inline">'.T_('Initial URI').': </b>', $UserSettings->get( 'initial_URI', $edited_User->ID ) );
 	$Form->end_line( NULL, 'info' );
 
+	$perm_stat_edit = $current_User->check_perm( 'stats', 'edit' );
 	$initial_referer = $UserSettings->get( 'initial_referer', $edited_User->ID );
 	$display_initial_referer = ( ! empty( $initial_referer ) && $current_User->check_perm( 'stats', 'list' ) );
 	$Form->begin_line( T_('Initial referer'), NULL, ( $display_initial_referer && $perm_stat_edit ? '' : 'info' ) );

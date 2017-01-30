@@ -573,7 +573,7 @@ class User extends DataObject
 
 					// Update status of user Domain in DB:
 					$edited_domain_status = param( 'edited_domain_status', 'string' );
-					$user_domain = $UserSettings->get( 'user_domain', $this->ID );
+					$user_domain = $UserSettings->get( 'user_registered_from_domain', $this->ID );
 					$Domain = & get_Domain_by_subdomain( $user_domain );
 					if( ! $Domain && $edited_domain_status != 'unknown' && ! empty( $user_domain ) )
 					{ // Domain doesn't exist in DB, Create new record
