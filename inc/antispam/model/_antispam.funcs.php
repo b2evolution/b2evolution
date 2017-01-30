@@ -732,7 +732,7 @@ function antispam_suspect_check( $user_ID = NULL, $check_trust_group = true )
  */
 function antispam_suspect_user_by_IP( $IP_address = '', $user_ID = NULL, $check_trust_group = true )
 {
-	global $DB, $Settings, $Timer;
+	global $DB, $Settings, $UserSettings, $Timer;
 
 	$Timer->start( 'suspect_user_by_IP' );
 
@@ -779,8 +779,8 @@ function antispam_suspect_user_by_IP( $IP_address = '', $user_ID = NULL, $check_
 
 	// Check by reverse DNS:
 	if( ! $move_user_to_suspect_group )
-	{	// If user has no IP address with suspect status
-		$reverse_dns = gethostbyaddr( $IP_address );
+	{	// Try to check by user domain if user has no IP address with suspect status:
+		$reverse_dns = $UserSettings->get( 'user_registered_from_domain', $User->ID );
 
 		if( empty( $reverse_dns ) || $reverse_dns == $IP_address )
 		{	// Exit here, because DNS could be found by IP address:

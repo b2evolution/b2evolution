@@ -411,7 +411,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 
 	$Form->info_field( T_('From Country'), $from_country, array( 'field_suffix' => $user_from_country_suffix ) );
 
-	$user_domain = $UserSettings->get( 'user_domain', $edited_User->ID );
+	$user_domain = $UserSettings->get( 'user_registered_from_domain', $edited_User->ID );
 	$user_ip_address = int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) );
 	user_domain_info_display( T_('From Domain'), 'domain_status', $user_domain, $user_ip_address, $Form );
 

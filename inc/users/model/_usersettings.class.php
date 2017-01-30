@@ -105,7 +105,7 @@ class UserSettings extends AbstractSettings
 		'new_thread_count' => 0, // How many new thread was created by this user TODAY!
 
 		'show_online' => 1,     // Show if user is online or not
-		'user_domain' => NULL,  // User domain
+		'user_registered_from_domain' => NULL, // Reverse DNS of IP address on user registration
 		'user_browser' => NULL, // User browser
 
 		'email_format' => 'auto', // Email format: auto | html | text

@@ -8131,6 +8131,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12160, 'Renaming user setting...' ) )
+	{	// part of 6.8.6-stable
+		$DB->query( 'UPDATE T_users__usersettings
+			  SET uset_name = "user_registered_from_domain"
+			WHERE uset_name = "user_domain"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
