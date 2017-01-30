@@ -485,7 +485,7 @@ if( $inskin && !empty( $Blog ) )
 }
 
 // Load jQuery library and functions to work with ajax response
-require_js( '#jquery#' );
+require_js( '#jquery#', 'rsc_url/ext' );
 require_js( 'ajax.js' );
 
 // Display reg form:

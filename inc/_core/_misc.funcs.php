@@ -2775,10 +2775,10 @@ function debug_info( $force = false, $force_clean = false )
 	{	// Display debug jslog once
 		global $rsc_url, $app_version_long;
 
-		require_js( '#jqueryUI#', 'rsc_url', false, true );
-		require_css( '#jqueryUI_css#', 'rsc_url', NULL, NULL, '#', true );
+		require_js( '#jqueryUI#', 'rsc_url/ext', false, true );
+		require_css( '#jqueryUI_css#', 'rsc_url/ext', NULL, NULL, '#', true );
 		require_js( 'debug_jslog.js', 'rsc_url', false, true );
-		require_js( 'ext/jquery/jquery.cookie.min.js', 'rsc_url', false, true );
+		require_js( 'jquery/jquery.cookie.min.js', 'rsc_url/ext', false, true );
 
 		$jslog_style_cookies = param_cookie( 'jslog_style', 'string' );
 		$jslog_styles = array();

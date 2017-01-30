@@ -155,7 +155,7 @@ class AdminUI_general extends Menu
 	 */
 	function init_templates()
 	{
-		require_js( '#jquery#', 'rsc_url' );
+		require_js( '#jquery#', 'rsc_url/ext' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
 
 		// Load general JS file:

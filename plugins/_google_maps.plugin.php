@@ -186,7 +186,7 @@ class google_maps_plugin extends Plugin
 
 		$params['Form']->switch_layout( 'linespan' );
 
-		require_js( '#jqueryUI#' );
+		require_js( '#jqueryUI#', 'blog/ext' );
 
 		$lat = $Item->get_setting('latitude');
 		$lng = $Item->get_setting('longitude');
@@ -826,7 +826,7 @@ function locate()
 	 */
 	function SkinBeginHtmlHead()
 	{
-		require_js( '#jquery#', 'blog' );
+		require_js( '#jquery#', 'blog/ext' );
 	}
 
 	function SkinTag( $params )

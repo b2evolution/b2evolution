@@ -46,7 +46,7 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 	init_bubbletip_js(); // Add jQuery bubbletip plugin
 	init_results_js(); // Add functions to work with Results tables
 
-	require_js( '#jqueryUI#' ); // Need to animate background, e.g. in function evoFadeBg()
+	require_js( '#jqueryUI#', 'rsc_url/ext' ); // Need to animate background, e.g. in function evoFadeBg()
 
 
 	global $UserSettings;

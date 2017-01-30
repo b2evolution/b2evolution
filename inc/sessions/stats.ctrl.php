@@ -380,7 +380,7 @@ else
 
 if( $tab == 'domains' )
 { // Load jquery UI to highlight cell on change domain type
-	require_js( '#jqueryUI#' );
+	require_js( '#jqueryUI#', 'rsc_url/ext' );
 }
 
 if( in_array( $tab , array( 'hits', 'other', 'referers' ) ) ||

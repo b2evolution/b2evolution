@@ -45,13 +45,13 @@ class AdminUI extends AdminUI_general
 		// This is included before controller specifc require_css() calls:
 		require_css( 'results.css', 'rsc_url' ); // Results/tables styles
 
-		require_js( '#jquery#', 'rsc_url' );
+		require_js( '#jquery#', 'rsc_url/ext' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
 
-		require_js( '#bootstrap#', 'rsc_url' );
-		require_css( '#bootstrap_css#', 'rsc_url' );
-		// require_css( '#bootstrap_theme_css#', 'rsc_url' );
-		require_js( '#bootstrap_typeahead#', 'rsc_url' );
+		require_js( '#bootstrap#', 'rsc_url/ext' );
+		require_css( '#bootstrap_css#', 'rsc_url/ext' );
+		// require_css( '#bootstrap_theme_css#', 'rsc_url/ext' );
+		require_js( '#bootstrap_typeahead#', 'rsc_url/ext' );
 
 		if( $debug )
 		{	// Use readable CSS:

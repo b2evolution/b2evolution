@@ -231,7 +231,7 @@ class widescroll_plugin extends Plugin
 			return;
 		}
 
-		require_js( '#jquery#', 'blog' );
+		require_js( '#jquery#', 'blog/ext' );
 		require_js( $this->get_plugin_url().'jquery.scrollwide.min.js', true );
 		require_css( $this->get_plugin_url().'jquery.scrollwide.css', true );
 	}

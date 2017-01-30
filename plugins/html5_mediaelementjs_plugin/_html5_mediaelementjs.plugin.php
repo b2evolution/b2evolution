@@ -46,10 +46,10 @@ class html5_mediaelementjs_plugin extends Plugin
 	{
 		global $Blog;
 
-		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
+		$relative_to = ( is_admin_page() ? 'rsc_url/ext' : 'blog/ext' );
 
 		require_css( '#mediaelement_css#', $relative_to );
-		require_js( '#jquery#', 'blog' );
+		require_js( '#jquery#', $relative_to );
 		require_js( '#mediaelement#', $relative_to );
 		$this->require_skin();
 

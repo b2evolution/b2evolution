@@ -97,8 +97,11 @@ class infodots_plugin extends Plugin
 
 		require_css( $this->get_plugin_url( true ).'infodots.css', $relative_to );
 
+		// Use 'rsc_url/ext' and 'blog/ext' instead:
+		$ext_relative_to = ( $relative_to == 'rsc_url' || $relative_to == 'blog' ) ? $relative_to.'/ext' : $relative_to;
+
 		// Bubbletip
-		require_js( '#jquery#', $relative_to );
+		require_js( '#jquery#', $ext_relative_to );
 		require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
 		require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 

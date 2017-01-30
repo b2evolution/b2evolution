@@ -43,7 +43,7 @@ $wrap_width = '380px';
   fp> TODO: find a javascript way to preload more stuff (like icons) WITHOUT delaying the browser autocomplete of the login & password fields
 	dh>
 	// include jquery JS:
-	require_js( '#jquery#' );
+	require_js( '#jquery#', 'rsc_url/ext' );
 
 	jQuery(function(){
 	 alert("Document is ready");

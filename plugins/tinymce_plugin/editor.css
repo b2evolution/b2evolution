@@ -36,8 +36,8 @@ pre {
 	height: 10px;
 	border-top: 1px dotted #666;
 	margin-top: 15px;
-	background: url("../../rsc/js/ext/tiny_mce/skins/lightgray/img/pagebreak.gif") no-repeat center;
+	background: url("../../rsc/ext/tiny_mce/skins/lightgray/img/pagebreak.gif") no-repeat center;
 }
 .mce-morebreak {
-	background-image: url("../../rsc/js/ext/tiny_mce/skins/lightgray/img/morebreak.gif");
+	background-image: url("../../rsc/ext/tiny_mce/skins/lightgray/img/morebreak.gif");
 }

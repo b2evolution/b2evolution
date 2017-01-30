@@ -55,7 +55,7 @@ class AdminUI extends AdminUI_general
 			require_css( 'ie9.css', 'rsc_url' );
 		}
 
-		require_js( '#jquery#', 'rsc_url' );
+		require_js( '#jquery#', 'rsc_url/ext' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
 
 		// Load general JS file:

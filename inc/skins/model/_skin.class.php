@@ -816,7 +816,7 @@ class Skin extends DataObject
 			{
 				case 'jquery':
 					// Include jQuery:
-					require_js( '#jquery#', 'blog' );
+					require_js( '#jquery#', 'blog/ext' );
 					break;
 
 				case 'font_awesome':
@@ -826,13 +826,13 @@ class Skin extends DataObject
 
 				case 'bootstrap':
 					// Include Bootstrap:
-					require_js( '#bootstrap#', 'blog' );
-					require_css( '#bootstrap_css#', 'blog' );
+					require_js( '#bootstrap#', 'blog/ext' );
+					require_css( '#bootstrap_css#', 'blog/ext' );
 					break;
 
 				case 'bootstrap_theme_css':
 					// Include the Bootstrap Theme CSS:
-					require_css( '#bootstrap_theme_css#', 'blog' );
+					require_css( '#bootstrap_theme_css#', 'blog/ext' );
 					break;
 
 				case 'bootstrap_evo_css':
@@ -937,7 +937,7 @@ class Skin extends DataObject
 
 					if( $Blog->get_setting( 'allow_rating_comment_helpfulness' ) )
 					{ // Load jquery UI to animate background color on change comment status or on vote:
-						require_js( '#jqueryUI#', 'blog' );
+						require_js( '#jqueryUI#', 'blog/ext' );
 					}
 					break;
 
@@ -945,8 +945,8 @@ class Skin extends DataObject
 					// Specific features for disp=users:
 
 					// Used to add new search field "Specific criteria":
-					require_js( '#jqueryUI#', 'blog' );
-					require_css( '#jqueryUI_css#', 'blog' );
+					require_js( '#jqueryUI#', 'blog/ext' );
+					require_css( '#jqueryUI_css#', 'blog/ext' );
 
 					// Require results.css to display thread query results in a table:
 					if( ! in_array( 'bootstrap', $features ) )
@@ -1046,18 +1046,18 @@ class Skin extends DataObject
 					init_userfields_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 
 					// Used to crop profile pictures:
-					require_js( '#jquery#', 'blog' );
-					require_js( '#jcrop#', 'blog' );
-					require_css( '#jcrop_css#', 'blog' );
+					require_js( '#jquery#', 'blog/ext' );
+					require_js( '#jcrop#', 'blog/ext' );
+					require_css( '#jcrop_css#', 'blog/ext' );
 					break;
 
 				case 'disp_avatar':
 					// Specific features for disp=avatar:
 
 					// Used to crop profile pictures:
-					require_js( '#jquery#', 'blog' );
-					require_js( '#jcrop#', 'blog' );
-					require_css( '#jcrop_css#', 'blog' );
+					require_js( '#jquery#', 'blog/ext' );
+					require_js( '#jcrop#', 'blog/ext' );
+					require_css( '#jcrop_css#', 'blog/ext' );
 					break;
 
 				case 'disp_edit':
