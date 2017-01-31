@@ -325,3 +325,29 @@ footer.row {
 .breadcrumb {
   margin-left: 0;
 }
+.maincategories_section .category-item,
+.subcategories_section .category-item {
+  background-image: url('dump_folder_for_dev/cat1.jpg');
+  background-position: center center;
+  background-size: cover;
+  border-radius: 4px;
+  display: block;
+  margin-bottom: 2em;
+  padding: 85px 10px;
+  text-align: center;
+}
+.maincategories_section .category-item a,
+.subcategories_section .category-item a {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 2px;
+  font-size: 18px;
+  padding: 13px 15px;
+}
+.evo_widget_articles_filter .panel-body {
+  padding-top: 0;
+}
+.evo_widget_articles_filter .panel-body h5 {
+  border-bottom: 1px solid #ddd;
+  font-weight: 700;
+  padding: 10px 15px 5px;
+}

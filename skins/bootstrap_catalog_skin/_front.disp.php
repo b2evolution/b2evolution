@@ -11,6 +11,7 @@
  *
  * @package evoskins
  */
+
 $params = array_merge( array(
 	'author_link_text'              => 'auto',
 	'featured_intro_before'         => '',
@@ -25,29 +26,46 @@ $params = array_merge( array(
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
 // --------------------------------- START OF CATEGORY LIST --------------------------------
-skin_widget( array(
-		// CODE for the widget:
-		'widget'              => 'coll_category_list',
-		
-		// Category items layout
-		'block_start'         => '<div class="evo_widget $wi_class$">',
-			'item_start' 	      => '<div class="category-item col-md-3">',
-			'item_end' 	 		  => '</div>',
-		'block_end'           => '</div>',
-		
-		'block_display_title' => true,
-		'level' 			  => 1, 	// Display only main categories
-		'option_all' 		  => false, // DO NOT display "All"
-	) );
+$ChapterCache = & get_ChapterCache();
+$chapters = $ChapterCache->get_chapters( $Blog->ID );
+
+if( count( $chapters ) > 0 )
+{ // If category is found
+
+echo '<section class="maincategories_section">';
+	echo '<h3 class="maincategories_section__title">' . T_( 'Categories' ) . '</h3>';
+	$section_is_started = false;
+	
+	echo '<div class="row">';
+	foreach( $chapters as $root_Chapter )
+	{ // Loop through categories:
+		echo '<div class="col-md-3">';
+		echo '<div class="category-item">';
+		echo '<a href="' . $root_Chapter->get_permanent_url() . '" class="rootcat rootcat_' . $root_Chapter->dget( 'ID' ) . '">' . $root_Chapter->dget( 'name' ) . '</a>';
+		echo '</div>';
+		echo '</div>';
+	} // End of categories loop.
+	echo '</div>';
+echo '</section>';
+}
 // ---------------------------------- END OF CATEGORY LIST ---------------------------------
 
+
+// ---------------------------------- START OF POSTS ----------------------------------
+
+echo '<h3>' . T_( 'Articles on sale' ) . '</h3>';
+echo '<section class="row">';
 while( mainlist_get_item() )
 { // For each blog post, do everything below up to the closing curly brace "}"
 	skin_include( '_item_block.inc.php', array_merge( array(
 			'content_mode' => 'excerpt', // 'auto' will auto select depending on $disp-detail
 		), $params ) );
-} // ---------------------------------- END OF POSTS ------------------------------------
+}
+echo '</section>';
+// ---------------------------------- END OF POSTS ------------------------------------
+
 
 ?>
 <div class="evo_container evo_container__front_page_secondary">

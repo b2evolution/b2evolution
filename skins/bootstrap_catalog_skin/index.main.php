@@ -300,6 +300,83 @@ siteskin_include( '_site_body_header.inc.php' );
 		<!-- =================================== START OF SIDEBAR =================================== -->
 		<div class="evo_container evo_container__sidebar">
 		<?php
+		
+		if( $disp == 'posts' )
+		{
+			global $cat;
+
+			// Get ID of single selected category:
+			$single_cat_ID = intval( $cat );
+			if( $single_cat_ID )
+			{
+			$ChapterCache = & get_ChapterCache();
+			$chapters = $ChapterCache->get_chapters( $Blog->ID, $single_cat_ID, true );
+
+				if( count( $chapters ) > 0 )
+				{ // If category is found
+
+					echo '<div class="panel panel-default evo_custom_widget">';
+					echo '<div class="panel-heading"><h4 class="panel-title">' . T_( 'Subcategories' ) . '</h4></div><div class="panel-body">';
+					$section_is_started = false;
+					
+					foreach( $chapters as $Chapter )
+					{ // Loop through categories:
+					
+						// Simple category with posts
+						$chapters_children = array( $Chapter );
+
+						if( ! $section_is_started )
+						{
+							$section_is_started = true;
+							echo '<ul>';
+						}
+
+						foreach( $chapters_children as $Chapter )
+						{ // Loop through categories:
+							echo '<li><a href="' . $Chapter->get_permanent_url() . '" class="subcat subcat_' . $Chapter->dget( 'ID' ) . '">' . $Chapter->dget( 'name' ) . '</a></li>';
+							
+							if( $Chapter->dget( 'description' ) != '' )
+							{
+								echo '<br /><span class="ft_desc">'.$Chapter->dget( 'description' ).'</span>';
+							}
+						}
+					} // End of categories loop.
+					if( $section_is_started )
+					{
+						echo '</ul>';
+					}
+					
+					echo '</div></div>';
+				}
+			}
+		}
+			?>
+			<div class="panel panel-default evo_custom_widget evo_widget_articles_filter">
+				<div class="panel-heading"><h4 class="panel-title">Catalog</h4></div>
+				<div class="panel-body">
+				
+					<div class="row"><h5>Categories</h5></div>
+					<input type="checkbox" id="cbox1" value="first_checkbox"> In real life<br />
+					<input type="checkbox" id="cbox2" value="second_checkbox"> On the web
+					
+					<div class="row"><h5>Size</h5></div>
+					<input type="checkbox" id="cbox1" value="first_checkbox"> S<br />
+					<input type="checkbox" id="cbox1" value="first_checkbox"> M<br />
+					<input type="checkbox" id="cbox2" value="second_checkbox"> L
+					
+					<div class="row"><h5>Color</h5></div>
+					<input type="checkbox" id="cbox1" value="first_checkbox"> Baige<br />
+					<input type="checkbox" id="cbox1" value="first_checkbox"> White<br />
+					<input type="checkbox" id="cbox1" value="first_checkbox"> Black<br />
+					<input type="checkbox" id="cbox2" value="second_checkbox"> Orange<br />
+					<input type="checkbox" id="cbox2" value="second_checkbox"> Blue<br />
+					<input type="checkbox" id="cbox2" value="second_checkbox"> Green<br />
+					<input type="checkbox" id="cbox2" value="second_checkbox"> Yellow
+					
+				</div>
+			</div>
+			<?php
+		
 			// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
 			// Display container contents:
 			skin_container( NT_('Sidebar'), array(
