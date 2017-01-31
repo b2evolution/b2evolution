@@ -132,6 +132,22 @@ siteskin_include( '_site_body_header.inc.php' );
 			// --------------------------------- END OF MESSAGES ---------------------------------
 		}
 		?>
+		
+		<?php
+			if( ! empty( $cat ) )
+			{ // Display breadcrumbs if some category is selected
+				skin_widget( array(
+						// CODE for the widget:
+						'widget' => 'breadcrumb_path',
+						// Optional display params
+						'block_start'      => '<nav><ol class="breadcrumb">',
+						'block_end'        => '</ol></nav>',
+						'separator'        => '',
+						'item_mask'        => '<li><a href="$url$">$title$</a></li>',
+						'item_active_mask' => '<li class="active">$title$</li>',
+					) );
+			}
+		?>
 
 		<?php
 			// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
@@ -153,6 +169,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'title_after'       => '</h2>',
 					'title_none'        => '',
 					'glue'              => ' - ',
+					'posts_text'        => '', // Do not display title on disp=posts
 					'title_single_disp' => false,
 					'title_page_disp'   => false,
 					'format'            => 'htmlbody',

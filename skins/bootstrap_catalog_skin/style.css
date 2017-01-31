@@ -293,6 +293,19 @@ footer.row {
   padding: 20px 0 10px 30px;
   vertical-align: middle;
 }
+.noimage_wrapper {
+  background-color: #efefef;
+  border-radius: 4px;
+  display: table;
+  vertical-align: middle;
+  text-align: center;
+}
+.noimage_wrapper > i {
+  display: table-cell;
+  font-size: 40px;
+  opacity: 0.2;
+  vertical-align: middle;
+}
 .evo_post__price {
   padding: 10px 0;
 }
@@ -308,4 +321,7 @@ footer.row {
 .edit-link-wrapper {
   padding: 10px 0;
   text-align: center;
+}
+.breadcrumb {
+  margin-left: 0;
 }

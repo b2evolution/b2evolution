@@ -44,36 +44,44 @@ $params = array_merge( array(
 	echo empty( $params['item_style'] ) ? '' : ' style="'.format_to_output( $params['item_style'], 'htmlattr' ).'"' ?>>
 
 	<header>
+	
+		<?php if( ! $Item->is_intro() ) : 
+		// Do not display "Sale" icon on Intro posts ?>
 		<div class="floatright price_note"><span class="note status_private" data-toggle="tooltip" data-placement="top" title="This article is on sale!"><span>Sale!</span></span></div>
-	<?php
+		<?php endif;
+		
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
 		
-		if( $Item->get_cover_image_url() )
-		{	// If current item has cover image
-				$Item->images( array(
-					'before_images'            => '<div class="evo_post_images">',
-					'before_image'             => '<div class="evo_post_images"><figure class="evo_image_block cover_image_wrapper">',
-					'before_image_legend'      => '<figcaption class="evo_image_legend">',
-					'after_image_legend'       => '</figcaption>',
-					'after_image'              => '</figure></div>',
-					'after_images'             => '</div>',
-					'image_class'              => 'img-responsive',
-					'image_size'               => 'crop-480x320',
-					'image_limit'              =>  1,
-					'image_link_to'            => 'original', // Can be 'original', 'single' or empty          <i class="fa fa-link" aria-hidden="true"></i>
+		if( ! $Item->is_intro() )
+		{
+			if( $Item->get_cover_image_url() )
+			{	// If current item has cover image
+					$Item->images( array(
+						'before_images'            => '<div class="evo_post_images">',
+						'before_image'             => '<div class="evo_post_images"><figure class="evo_image_block cover_image_wrapper">',
+						'before_image_legend'      => '<figcaption class="evo_image_legend">',
+						'after_image_legend'       => '</figcaption>',
+						'after_image'              => '</figure></div>',
+						'after_images'             => '</div>',
+						'image_class'              => 'img-responsive',
+						'image_size'               => 'crop-480x600',
+						'image_limit'              =>  1,
+						'image_link_to'            => 'original', // Can be 'original', 'single' or empty          <i class="fa fa-link" aria-hidden="true"></i>
 
-					// We DO NOT want to display galleries here, only one cover image
-					'gallery_image_limit'      => 0,
-					'gallery_colls'            => 0,
+						// We DO NOT want to display galleries here, only one cover image
+						'gallery_image_limit'      => 0,
+						'gallery_colls'            => 0,
 
-					// We want ONLY cover image to display here
-					'restrict_to_image_position' => 'cover',
-				) );
+						// We want ONLY cover image to display here
+						'restrict_to_image_position' => 'cover',
+					) );
+			}
+			else
+			{	// If current item does not have cover image
+				echo '<div class="noimage_wrapper" style="width:100%;height:234px"><i class="fa fa-file-image-o" aria-hidden="true"></i></div>';
+			}
 		}
-		else
-		{	// If current item does not have cover image
-			echo '<div class="noimage_wrapper" style="width:480px;height:320px;max-width:100%"></div>';
-		}
+
 
 		// ------- Title -------
 		if( $params['disp_title'] )
@@ -166,50 +174,51 @@ $params = array_merge( array(
 
 	<footer>
 	
+		<?php if( ! $Item->is_intro() ) : 
+		// Do not display "Sale" icon on Intro posts ?>
 		<div class="evo_post__price center"><span class="oldprice">19.99 $</span><span class="newprice">12.99 $</span></div>
-
-		<?php
-			if( ! $Item->is_intro() && ! $disp == 'front' ) // Do NOT apply tags, comments and feedback on intro posts
-			{
+		<?php endif;
+		
+		if( ! $Item->is_intro() && ! $disp == 'front' ) // Do NOT apply tags, comments and feedback on intro posts
+		{
 		?>
 
 		<nav class="post_comments_link">
 		<?php
 			// Link to comments, trackbacks, etc.:
 			$Item->feedback_link( array(
-							'type' => 'comments',
-							'link_before' => '',
-							'link_after' => '',
-							'link_text_zero' => '#',
-							'link_text_one' => '#',
-							'link_text_more' => '#',
-							'link_title' => '#',
-							// fp> WARNING: creates problem on home page: 'link_class' => 'btn btn-default btn-sm',
-							// But why do we even have a comment link on the home page ? (only when logged in)
-						) );
+				'type' => 'comments',
+				'link_before' => '',
+				'link_after' => '',
+				'link_text_zero' => '#',
+				'link_text_one' => '#',
+				'link_text_more' => '#',
+				'link_title' => '#',
+				// fp> WARNING: creates problem on home page: 'link_class' => 'btn btn-default btn-sm',
+				// But why do we even have a comment link on the home page ? (only when logged in)
+			) );
 
 			// Link to comments, trackbacks, etc.:
 			$Item->feedback_link( array(
-							'type' => 'trackbacks',
-							'link_before' => ' &bull; ',
-							'link_after' => '',
-							'link_text_zero' => '#',
-							'link_text_one' => '#',
-							'link_text_more' => '#',
-							'link_title' => '#',
-						) );
-		?>
-		</nav>
-		<?php } ?>
-	
-	<?php
+				'type' => 'trackbacks',
+				'link_before' => ' &bull; ',
+				'link_after' => '',
+				'link_text_zero' => '#',
+				'link_text_one' => '#',
+				'link_text_more' => '#',
+				'link_title' => '#',
+			) );
+			
+			// Link to edit 
 			$Item->edit_link( array( // Link to backoffice for editing
 				'before' => '<div class="edit-link-wrapper"><div class="'.button_class( 'group' ).'">',
 				'after'  => '</div></div>',
 				'text'   => get_icon( 'edit' ).' '.T_('Edit Article'),
 				'class'  => button_class( 'text' ),
 			) );
-	?>
+		?>
+		</nav>
+		<?php } ?>
 	</footer>
 
 	<?php

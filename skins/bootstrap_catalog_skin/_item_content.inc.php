@@ -264,7 +264,7 @@ switch( $content_mode )
 					) );
 			}
 
-			// Display CONTENT (at least the TEASER part):
+			/** FOR NOW CONTENT EXCLUDED ENTIRELY - MAKE CUSTOM OPTION FOR THIS TO APPEAR ON DISP=POSTS 
 			$Item->content_teaser( array(
 					'before'              => $params['before_content_teaser'],
 					'after'               => $params['after_content_teaser'],
@@ -288,7 +288,7 @@ switch( $content_mode )
 					'link_to'     => $params['more_link_to'],
 				) );
 
-			if( ! empty( $params['image_size'] ) && ( $more || $params['force_more'] ) && $Item->has_content_parts( $params ) /* only if not displayed all images already */ )
+			if( ! empty( $params['image_size'] ) && ( $more || $params['force_more'] ) && $Item->has_content_parts( $params ) )
 			{	// Display images that are linked "after more" to this post:
 				$Item->images( array(
 						'before'              => $params['before_images'],
@@ -317,6 +317,7 @@ switch( $content_mode )
 						'restrict_to_image_position' => 'aftermore',
 					) );
 			}
+			*/
 
 			// Display the "after more" part of the text: (part after "[teaserbreak]")
 			$Item->content_extension( array(
@@ -332,7 +333,8 @@ switch( $content_mode )
 					'image_link_to'       => $params['image_link_to'],
 					'force_more'          => $params['force_more'],
 				) );
-
+			
+			/**
 			// Links to post pages (for multipage posts):
 			$Item->page_links( array(
 					'before'      => $params['page_links_start'],
@@ -343,6 +345,7 @@ switch( $content_mode )
 					'pagelink'    => $params['page_links_pagelink'],
 					'url'         => $params['page_links_url'],
 				) );
+			*/
 
 			// Display Item footer text (text can be edited in Blog Settings):
 			$Item->footer( array(
