@@ -173,7 +173,7 @@ if( $edited_Poll->ID > 0 )
 			'th_class' => '',
 			'td_class' => 'nowrap',
 			'order'    => 'answers_percent',
-			'td'       => '$answers_percent$',
+			'td'       => '$answers_percent$%',
 		);
 
 	if( $perm_poll_edit )
