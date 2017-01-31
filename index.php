@@ -38,7 +38,8 @@ if( !init_requested_blog( false ) )
 {	// No specific blog to be displayed:
 	if( $Settings->get( 'default_blog_ID' ) == -1 )
 	{	// we are going to display the admin page:
-		require dirname(__FILE__).'/admin.php';
+		header_redirect( 'admin.php', 302 );
+		exit(0);
 	}
 	else
 	{	// we are going to display the default page:
