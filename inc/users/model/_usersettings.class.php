@@ -44,7 +44,6 @@ class UserSettings extends AbstractSettings
 		'pref_browse_tab' => 'full',
 
 		// Folding settings, 1 - Hide, 0 - Show
-		'fold_itemform_links' => 1,
 		'fold_itemform_custom_fields' => 1,
 		'fold_itemform_googlemap' => 1,
 		'fold_itemform_meta_cmnt' => 1,
@@ -52,7 +51,6 @@ class UserSettings extends AbstractSettings
 		'fold_itemform_comments' => 1,
 		'fold_itemform_goals' => 1,
 		'fold_itemform_notifications' => 1,
-		'fold_cmntform_links' => 1,
 		'fold_cmntform_datetime' => 1,
 		'fold_cmntform_html' => 1,
 		'fold_cmntform_info' => 1,
