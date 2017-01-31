@@ -196,7 +196,7 @@ class manual_Skin extends Skin
 		}
 
 		// Functions to switch between the width sizes
-		require_js( '#jquery#', 'blog/ext' );
+		require_js( '#jquery#', 'blog' );
 		require_js( 'widthswitcher.js', 'blog' );
 	}
 }

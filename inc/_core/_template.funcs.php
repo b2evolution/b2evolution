@@ -885,8 +885,8 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
  *
  * @param string File or Alias name
  * @param boolean|string 'relative' or true (relative to <base>),
- *                       'rsc_url' | 'rsc_url/ext' (relative to $rsc_url),
- *                       'blog' | 'blog/ext' (relative to current blog URL -- may be subdomain or custom domain)
+ *                       'rsc_url' (relative to $rsc_url),
+ *                       'blog' (relative to current blog URL -- may be subdomain or custom domain)
  * @param string 'js' or 'css' or 'build'
  * @return string URL
  * @param string version number to append at the end of requested url to avoid getting an old version from the cache
@@ -895,11 +895,6 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 {
 	global $library_local_urls, $library_cdn_urls, $use_cdns, $debug, $rsc_url;
 	global $Blog, $baseurl, $assets_baseurl, $ReqURL;
-
-	if( $relative_to == 'rsc_url/ext' || $relative_to == 'blog/ext' )
-	{	// Change subfolder to '/rsc/ext/':
-		$subfolder = 'ext';
-	}
 
 	// Check if we have a public CDN we want to use for this library file:
 	if( $use_cdns && ! empty( $library_cdn_urls[ $lib_file ] ) )
@@ -926,6 +921,13 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 		}
 	}
 
+	if( strpos( $lib_file, 'ext:' ) === 0 )
+	{	// This file must be loaded from subfolder '/rsc/ext/':
+		$subfolder = 'ext';
+		// Remove prefix 'ext:' from beginning of the file:
+		$lib_file = substr( $lib_file, 4 );
+	}
+
 	if( $relative_to === 'relative' || $relative_to === true )
 	{ // Make the file relative to current page <base>:
 		$lib_url = $lib_file;
@@ -934,7 +936,7 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 	{ // It's already an absolute url, keep it as is:
 		$lib_url = $lib_file;
 	}
-	elseif( ( $relative_to === 'blog' || $relative_to === 'blog/ext'  )&& ! empty( $Blog ) )
+	elseif( $relative_to === 'blog' && ! empty( $Blog ) )
 	{ // Get the file from $rsc_uri relative to the current blog's domain (may be a subdomain or a custom domain):
 		if( $assets_baseurl !== $baseurl )
 		{ // We are using a specific domain, don't try to load from blog specific domain
@@ -991,16 +993,14 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
 		return;
 	}
 
-	if( is_admin_page() && ( $relative_to == 'blog' || $relative_to == 'blog/ext' ) )
+	if( is_admin_page() && $relative_to == 'blog' )
 	{ // Make sure we never use resource url relative to any blog url in case of an admin page ( important in case of multi-domain installations )
-		$relative_to = ( $relative_to == 'blog' ? 'rsc_url' : 'rsc_url/ext' );
+		$relative_to = 'rsc_url';
 	}
 
 	if( in_array( $js_file, array( '#jqueryUI#', 'communication.js', 'functions.js' ) ) )
 	{ // Dependency : ensure jQuery is loaded
-		// Use 'rsc_url/ext' and 'blog/ext' instead:
-		$ext_relative_to = ( $relative_to == 'rsc_url' || $relative_to == 'blog' ) ? $relative_to.'/ext' : $relative_to;
-		require_js( '#jquery#', $ext_relative_to, $async, $output );
+		require_js( '#jquery#', $relative_to, $async, $output );
 	}
 
 	// Get library url of JS file by alias name
@@ -1132,9 +1132,6 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 {
 	static $helpers;
 
-	// Use 'rsc_url/ext' and 'blog/ext' instead:
-	$ext_relative_to = ( $relative_to == 'rsc_url' || $relative_to == 'blog' ) ? $relative_to.'/ext' : $relative_to;
-
 	if( empty( $helpers ) || !in_array( $helper, $helpers ) )
 	{ // Helper not already added, add the helper:
 
@@ -1143,7 +1140,7 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 			case 'helper' :
 				// main helper object required
 				global $debug;
-				require_js( '#jquery#', $ext_relative_to ); // dependency
+				require_js( '#jquery#', $relative_to ); // dependency
 				require_js( 'helper.js', $relative_to );
 				add_js_headline('jQuery(document).ready(function()
 				{
@@ -1215,7 +1212,7 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 					$colorbox_params_user = 'var b2evo_colorbox_params_user = '.$colorbox_no_voting_params;
 				}
 
-				require_js( '#jquery#', $ext_relative_to );
+				require_js( '#jquery#', $relative_to );
 				// Initialize the colorbox settings:
 				add_js_headline(
 					// General settings:
@@ -1357,10 +1354,7 @@ function init_ratings_js( $relative_to = 'blog', $force_init = false )
 	// fp> Note, the following test is good for $disp == 'single', not for 'posts'
 	if( $force_init || ( !empty($Item) && $Item->can_rate() ) )
 	{
-		// Use 'rsc_url/ext' and 'blog/ext' instead:
-		$ext_relative_to = ( $relative_to == 'rsc_url' || $relative_to == 'blog' ) ? $relative_to.'/ext' : $relative_to;
-
-		require_js( '#jquery#', $ext_relative_to ); // dependency
+		require_js( '#jquery#', $relative_to ); // dependency
 		require_js( 'jquery/jquery.raty.min.js', $relative_to );
 	}
 }
@@ -1379,10 +1373,7 @@ function init_bubbletip_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 		return;
 	}
 
-	// Use 'rsc_url/ext' and 'blog/ext' instead:
-	$ext_relative_to = ( $relative_to == 'rsc_url' || $relative_to == 'blog' ) ? $relative_to.'/ext' : $relative_to;
-
-	require_js( '#jquery#', $ext_relative_to );
+	require_js( '#jquery#', $relative_to );
 
 	switch( $library )
 	{
@@ -1410,12 +1401,9 @@ function init_bubbletip_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
  */
 function init_userfields_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 {
-	// Use 'rsc_url/ext' and 'blog/ext' instead:
-	$ext_relative_to = ( $relative_to == 'rsc_url' || $relative_to == 'blog' ) ? $relative_to.'/ext' : $relative_to;
-
 	// Load to autocomplete user fields with list type
-	require_js( '#jqueryUI#', $ext_relative_to );
-	require_css( '#jqueryUI_css#', $ext_relative_to );
+	require_js( '#jqueryUI#', $relative_to );
+	require_css( '#jqueryUI_css#', $relative_to );
 
 	switch( $library )
 	{
@@ -1443,10 +1431,7 @@ function init_userfields_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
  */
 function init_plugins_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 {
-	// Use 'rsc_url/ext' and 'blog/ext' instead:
-	$ext_relative_to = ( $relative_to == 'rsc_url' || $relative_to == 'blog' ) ? $relative_to.'/ext' : $relative_to;
-
-	require_js( '#jquery#', $ext_relative_to );
+	require_js( '#jquery#', $relative_to );
 
 	switch( $library )
 	{
@@ -1471,11 +1456,8 @@ function init_plugins_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
  */
 function init_datepicker_js( $relative_to = 'rsc_url' )
 {
-	// Use 'rsc_url/ext' and 'blog/ext' instead:
-	$ext_relative_to = ( $relative_to == 'rsc_url' || $relative_to == 'blog' ) ? $relative_to.'/ext' : $relative_to;
-
-	require_js( '#jqueryUI#', $ext_relative_to );
-	require_css( '#jqueryUI_css#', $ext_relative_to );
+	require_js( '#jqueryUI#', $relative_to );
+	require_css( '#jqueryUI_css#', $relative_to );
 
 	$datefmt = locale_datefmt();
 	$datefmt = str_replace( array( 'd', 'j', 'm', 'Y' ), array( 'dd', 'd', 'mm', 'yy' ), $datefmt );
@@ -1507,10 +1489,7 @@ function init_datepicker_js( $relative_to = 'rsc_url' )
  */
 function init_tokeninput_js( $relative_to = 'rsc_url' )
 {
-	// Use 'rsc_url/ext' and 'blog/ext' instead:
-	$ext_relative_to = ( $relative_to == 'rsc_url' || $relative_to == 'blog' ) ? $relative_to.'/ext' : $relative_to;
-
-	require_js( '#jquery#', $ext_relative_to ); // dependency
+	require_js( '#jquery#', $relative_to ); // dependency
 	require_js( 'jquery/jquery.tokeninput.js', $relative_to );
 	require_css( 'jquery/jquery.token-input-facebook.css', $relative_to );
 }
@@ -1521,10 +1500,7 @@ function init_tokeninput_js( $relative_to = 'rsc_url' )
  */
 function init_results_js( $relative_to = 'rsc_url' )
 {
-	// Use 'rsc_url/ext' and 'blog/ext' instead:
-	$ext_relative_to = ( $relative_to == 'rsc_url' || $relative_to == 'blog' ) ? $relative_to.'/ext' : $relative_to;
-
-	require_js( '#jquery#', $ext_relative_to ); // dependency
+	require_js( '#jquery#', $relative_to ); // dependency
 	require_js( 'results.js', $relative_to );
 }
 
@@ -1541,10 +1517,7 @@ function init_voting_comment_js( $relative_to = 'rsc_url' )
 		return false;
 	}
 
-	// Use 'rsc_url/ext' and 'blog/ext' instead:
-	$ext_relative_to = ( $relative_to == 'rsc_url' || $relative_to == 'blog' ) ? $relative_to.'/ext' : $relative_to;
-
-	require_js( '#jquery#', $ext_relative_to ); // dependency
+	require_js( '#jquery#', $relative_to ); // dependency
 	require_js( 'voting.js', $relative_to );
 	add_js_headline( '
 	jQuery( document ).ready( function()
@@ -1580,13 +1553,10 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
 	}
 	init_bubbletip_js( $relative_to, $tooltip_plugin );
 
-	// Use 'rsc_url/ext' and 'blog/ext' instead:
-	$ext_relative_to = ( $relative_to == 'rsc_url' || $relative_to == 'blog' ) ? $relative_to.'/ext' : $relative_to;
-
 	// Initialize farbastic colorpicker
-	require_js( '#jquery#', $ext_relative_to );
+	require_js( '#jquery#', $relative_to );
 	require_js( 'jquery/jquery.farbtastic.min.js', $relative_to );
-	require_css( 'ext/jquery/farbtastic/farbtastic.css', $relative_to );
+	require_css( 'ext:jquery/farbtastic/css/farbtastic.css', $relative_to );
 }
 
 
@@ -1600,10 +1570,7 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 {
 	global $blog;
 
-	// Use 'rsc_url/ext' and 'blog/ext' instead:
-	$ext_relative_to = ( $relative_to == 'rsc_url' || $relative_to == 'blog' ) ? $relative_to.'/ext' : $relative_to;
-
-	require_js( '#jquery#', $ext_relative_to ); // dependency
+	require_js( '#jquery#', $relative_to ); // dependency
 
 	switch( $library )
 	{
@@ -1649,8 +1616,8 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 			// fp> TODO: think about a way to bundle this with other JS on the page -- maybe always load hintbox in the backoffice
 			//     dh> Handle it via http://www.appelsiini.net/projects/lazyload ?
 			// dh> TODO: should probably also get ported to use jquery.ui.autocomplete (or its successor)
-			require_css( 'ext/jquery/jquery.hintbox.css', $relative_to );
-			require_js( 'ext/jquery/jquery.hintbox.min.js', $relative_to );
+			require_css( 'ext:jquery/hintbox/css/jquery.hintbox.css', $relative_to );
+			require_js( 'ext:jquery/hintbox/js/jquery.hintbox.min.js', $relative_to );
 			add_js_headline( 'jQuery( document ).on( "focus", "input.autocomplete_login", function()
 			{
 				var ajax_params = "";
@@ -1680,20 +1647,17 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
  */
 function init_jqplot_js( $relative_to = 'rsc_url' )
 {
-	// Use 'rsc_url/ext' and 'blog/ext' instead:
-	$ext_relative_to = ( $relative_to == 'rsc_url' || $relative_to == 'blog' ) ? $relative_to.'/ext' : $relative_to;
-
-	require_js( '#jquery#', $ext_relative_to ); // dependency
-	require_js( '#jqplot#', $ext_relative_to );
-	require_js( '#jqplot_barRenderer#', $ext_relative_to );
-	require_js( '#jqplot_canvasAxisTickRenderer#', $ext_relative_to );
-	require_js( '#jqplot_canvasTextRenderer#', $ext_relative_to );
-	require_js( '#jqplot_categoryAxisRenderer#', $ext_relative_to );
-	require_js( '#jqplot_enhancedLegendRenderer#', $ext_relative_to );
-	require_js( '#jqplot_highlighter#', $ext_relative_to );
-	require_js( '#jqplot_canvasOverlay#', $ext_relative_to );
-	require_js( '#jqplot_donutRenderer#', $ext_relative_to );
-	require_css( '#jqplot_css#', $ext_relative_to );
+	require_js( '#jquery#', $relative_to ); // dependency
+	require_js( '#jqplot#', $relative_to );
+	require_js( '#jqplot_barRenderer#', $relative_to );
+	require_js( '#jqplot_canvasAxisTickRenderer#', $relative_to );
+	require_js( '#jqplot_canvasTextRenderer#', $relative_to );
+	require_js( '#jqplot_categoryAxisRenderer#', $relative_to );
+	require_js( '#jqplot_enhancedLegendRenderer#', $relative_to );
+	require_js( '#jqplot_highlighter#', $relative_to );
+	require_js( '#jqplot_canvasOverlay#', $relative_to );
+	require_js( '#jqplot_donutRenderer#', $relative_to );
+	require_css( '#jqplot_css#', $relative_to );
 	require_css( 'jquery/jquery.jqplot.b2evo.css', $relative_to );
 }
 
@@ -3046,10 +3010,7 @@ function init_field_editor_js( $params = array() )
 			'relative_to'  => 'rsc_url',
 		), $params );
 
-	// Use 'rsc_url/ext' and 'blog/ext' instead:
-	$ext_relative_to = ( $params['relative_to'] == 'rsc_url' || $params['relative_to'] == 'blog' ) ? $params['relative_to'].'/ext' : $params['relative_to'];
-
-	require_js( '#jquery#', $ext_relative_to ); // dependency
+	require_js( '#jquery#', $params['relative_to'] ); // dependency
 
 	add_js_headline( 'jQuery( document ).on( "click", "[id^='.$params['field_prefix'].']", function()
 {
@@ -3145,10 +3106,7 @@ function init_autocomplete_usernames_js( $relative_to = 'rsc_url' )
 		}
 	}
 
-	// Use 'rsc_url/ext' and 'blog/ext' instead:
-	$ext_relative_to = ( $relative_to == 'rsc_url' || $relative_to == 'blog' ) ? $relative_to.'/ext' : $relative_to;
-
-	require_js( '#jquery#', $ext_relative_to );
+	require_js( '#jquery#', $relative_to );
 	require_js( 'build/textcomplete.bmin.js', $relative_to );
 	require_css( 'jquery/jquery.textcomplete.css', $relative_to );
 }

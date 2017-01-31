@@ -261,7 +261,7 @@ class bootstrap_forums_Skin extends Skin
 
 		if( in_array( $disp, array( 'single', 'page', 'comments' ) ) )
 		{ // Load jquery UI to animate background color on change comment status or on vote
-			require_js( '#jqueryUI#', 'blog/ext' );
+			require_js( '#jqueryUI#', 'blog' );
 		}
 	}
 

@@ -210,12 +210,12 @@ class forums_Skin extends Skin
 		}
 
 		// Functions to switch between the width sizes
-		require_js( '#jquery#', 'blog/ext' );
+		require_js( '#jquery#', 'blog' );
 		require_js( 'widthswitcher.js', 'blog' );
 
 		if( in_array( $disp, array( 'single', 'page', 'comments' ) ) )
 		{ // Load jquery UI to animate background color on change comment status or on vote
-			require_js( '#jqueryUI#', 'blog/ext' );
+			require_js( '#jqueryUI#', 'blog' );
 		}
 	}
 

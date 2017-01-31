@@ -225,7 +225,7 @@ class tinymce_plugin extends Plugin
 	 */
 	function get_tinymce_src_url()
 	{
-		$relative_to = ( is_admin_page() ? 'rsc_url/ext' : 'blog/ext' );
+		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
 
 		if( $this->Settings->get( 'use_gzip_compressor' ) )
 		{

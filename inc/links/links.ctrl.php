@@ -218,8 +218,8 @@ require_js( 'multiupload/fileuploader.js' );
 require_css( 'fileuploader.css' );
 if( $action == 'edit_links' )
 { // Load JS files to make the links table sortable:
-	require_js( '#jquery#', 'rsc_url/ext' );
-	require_js( 'ext/jquery/jquery.sortable.min.js' );
+	require_js( '#jquery#' );
+	require_js( 'ext:jquery/sortable/jquery.sortable.min.js' );
 }
 
 $AdminUI->disp_html_head();

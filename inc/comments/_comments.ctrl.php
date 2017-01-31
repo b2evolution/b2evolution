@@ -706,7 +706,7 @@ $AdminUI->set_path( 'collections', 'comments' );
 
 if( $tab3 == 'fullview' )
 { // Load jquery UI to animate background color on change comment status and to transfer a comment to recycle bin
-	require_js( '#jqueryUI#', 'rsc_url/ext' );
+	require_js( '#jqueryUI#' );
 }
 
 if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit', 'elevate' ) ) )

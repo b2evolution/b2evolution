@@ -62,7 +62,7 @@ else
 }
 
 // Load jquery UI to animate background color on change comment status and to transfer a comment to recycle bin
-require_js( '#jqueryUI#', 'rsc_url/ext' );
+require_js( '#jqueryUI#' );
 
 require_js( 'communication.js' ); // auto requires jQuery
 // Load the appropriate blog navigation styles (including calendar, comment forms...):
@@ -71,7 +71,7 @@ require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for 
 require_js_helper( 'colorbox' );
 
 // Include files to work with charts
-require_js( '#easypiechart#', 'rsc_url/ext' );
+require_js( '#easypiechart#' );
 require_css( 'jquery/jquery.easy-pie-chart.css' );
 
 if( empty( $blog ) )

@@ -593,7 +593,7 @@ if( $display_mode == 'normal' )
 	var cache_denied_icon_tag = \''.get_icon( 'block_cache_denied', 'imgtag', array( 'title' => T_( 'This widget could be cached but the block cache is OFF. Click to enable.' ) ) ).'\';
 
 	var b2evo_dispatcher_url = "'.$admin_url.'";' );
-	require_js( '#jqueryUI#', 'rsc_url/ext' ); // auto requires jQuery
+	require_js( '#jqueryUI#' ); // auto requires jQuery
 	require_js( 'communication.js' ); // auto requires jQuery
 	require_js( 'blog_widgets.js' );
 	require_css( 'blog_widgets.css' );

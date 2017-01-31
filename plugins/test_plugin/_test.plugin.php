@@ -412,7 +412,7 @@ class test_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead()
 	{
-		require_js( '#jquery#', 'blog/ext' );
+		require_js( '#jquery#', 'blog' );
 	}
 
 

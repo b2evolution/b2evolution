@@ -219,7 +219,7 @@ module.exports = function(grunt) {
 					banner: '/* This includes 4 files: jquery.colorbox.js, voting.js, jquery.touchswipe.js, colorbox.init.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/colorbox/jquery.colorbox.js', 'rsc/js/voting.js', 'rsc/js/jquery/jquery.touchswipe.js', 'rsc/js/colorbox/colorbox.init.js'],
+				src: ['rsc/js/colorbox/jquery.colorbox.js', 'rsc/js/voting.js', 'rsc/ext/jquery/touchswipe/jquery.touchswipe.js', 'rsc/js/colorbox/colorbox.init.js'],
 				dest: 'rsc/js/build/colorbox.bmin.js'
 			},
 			// Bubbletip

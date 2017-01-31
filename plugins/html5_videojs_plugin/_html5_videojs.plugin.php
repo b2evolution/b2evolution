@@ -46,7 +46,7 @@ class html5_videojs_plugin extends Plugin
 	{
 		global $Blog;
 
-		$relative_to = ( is_admin_page() ? 'rsc_url/ext' : 'blog/ext' );
+		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
 
 		require_css( '#videojs_css#', $relative_to );
 		require_js( '#videojs#', $relative_to );

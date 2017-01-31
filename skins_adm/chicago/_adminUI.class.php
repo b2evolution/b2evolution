@@ -48,18 +48,18 @@ class AdminUI extends AdminUI_general
 
 		if( $Hit->is_IE() ) // We can do this test because BackOffice is never page-cached
 		{ // CSS for IE
-			require_css( 'admin_global_ie.css', 'rsc_url' );
+			require_css( 'admin_global_ie.css' );
 		}
 		if( $Hit->is_IE( 9 ) ) // We can do this test because BackOffice is never page-cached
 		{ // CSS for IE9
-			require_css( 'ie9.css', 'rsc_url' );
+			require_css( 'ie9.css' );
 		}
 
-		require_js( '#jquery#', 'rsc_url/ext' );
-		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
+		require_js( '#jquery#' );
+		require_js( 'jquery/jquery.raty.min.js' );
 
 		// Load general JS file:
-		require_js( 'build/evo_backoffice.bmin.js', 'rsc_url' );
+		require_js( 'build/evo_backoffice.bmin.js' );
 
 		// Set css classes for messages
 		$Messages->set_params( array(

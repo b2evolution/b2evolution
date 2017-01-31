@@ -370,8 +370,8 @@ if( !$Messages->has_errors() )
 }
 
 // Used for autocomplete user fields in filter "Specific criteria" or to highlight user level cell on change
-require_js( '#jqueryUI#', 'rsc_url/ext' );
-require_css( '#jqueryUI_css#', 'rsc_url/ext' );
+require_js( '#jqueryUI#' );
+require_css( '#jqueryUI_css#' );
 
 // We might delegate to this action from above:
 /*if( $action == 'edit' )

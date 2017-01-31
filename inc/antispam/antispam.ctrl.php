@@ -534,7 +534,7 @@ if( $display_mode != 'js' )
 				require_js( 'jquery/jquery.jeditable.js' );
 			}
 			// Load jquery UI to highlight cell on change domain type
-			require_js( '#jqueryUI#', 'rsc_url/ext' );
+			require_js( '#jqueryUI#' );
 			// Used for edit form
 			$tab_from = 'antispam';
 			$blog = 0; // Don't restrict domains by blog ID on this controller
