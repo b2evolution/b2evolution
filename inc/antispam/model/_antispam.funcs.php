@@ -724,15 +724,15 @@ function antispam_suspect_check( $user_ID = NULL, $check_trust_group = true )
 
 
 /**
- * Move user to suspect group by IP address and reverse DNS
+ * Move user to suspect group by IP address
  *
- * @param string IP address
+ * @param string IP address, Empty value to use current IP address
  * @param integer|NULL User ID, NULL = $current_User
  * @param boolean TRUE to check if user is in trust group
  */
 function antispam_suspect_user_by_IP( $IP_address = '', $user_ID = NULL, $check_trust_group = true )
 {
-	global $DB, $Settings, $UserSettings, $Timer;
+	global $DB, $Settings, $Timer;
 
 	$Timer->start( 'suspect_user_by_IP' );
 
@@ -753,9 +753,6 @@ function antispam_suspect_user_by_IP( $IP_address = '', $user_ID = NULL, $check_
 		return;
 	}
 
-	// Flag to know if we must move the user to suspicious group:
-	$move_user_to_suspect_group = false;
-
 	if( empty( $IP_address ) && array_key_exists( 'REMOTE_ADDR', $_SERVER ) )
 	{
 		$IP_address = $_SERVER['REMOTE_ADDR'];
@@ -774,32 +771,6 @@ function antispam_suspect_user_by_IP( $IP_address = '', $user_ID = NULL, $check_
 
 	if( ! is_null( $ip_range_ID ) )
 	{	// Move the user to suspicious group because current IP address is suspected:
-		$move_user_to_suspect_group = true;
-	}
-
-	// Check by reverse DNS:
-	if( ! $move_user_to_suspect_group )
-	{	// Try to check by user domain if user has no IP address with suspect status:
-		$reverse_dns = $UserSettings->get( 'user_registered_from_domain', $User->ID );
-
-		if( empty( $reverse_dns ) || $reverse_dns == $IP_address )
-		{	// Exit here, because DNS could be found by IP address:
-			$Timer->stop( 'suspect_user_by_IP' );
-			return;
-		}
-
-		// Try to get a domain from DB by reverse DNS:
-		load_funcs('sessions/model/_hitlog.funcs.php');
-		$Domain = & get_Domain_by_subdomain( $reverse_dns );
-
-		if( $Domain && $Domain->get( 'status' ) == 'suspect' )
-		{	// Move the user to suspicious group because the reverse DNS has a suspect status:
-			$move_user_to_suspect_group = true;
-		}
-	}
-
-	if( $move_user_to_suspect_group )
-	{	// Do the moving of the user to suspicious group:
 		$GroupCache = & get_GroupCache();
 		if( $suspicious_Group = & $GroupCache->get_by_ID( intval( $Settings->get( 'antispam_suspicious_group' ) ), false, false ) )
 		{	// Group exists in DB and we can change user's group:
@@ -809,6 +780,62 @@ function antispam_suspect_user_by_IP( $IP_address = '', $user_ID = NULL, $check_
 	}
 
 	$Timer->stop( 'suspect_user_by_IP' );
+}
+
+
+/**
+ * Move user to suspect group by reverse DNS domain(that is generated from IP address on user's registration)
+ *
+ * @param integer|NULL User ID, NULL = $current_User
+ * @param boolean TRUE to check if user is in trust group
+ */
+function antispam_suspect_user_by_reverse_dns_domain( $user_ID = NULL, $check_trust_group = true )
+{
+	global $Settings, $UserSettings, $Timer;
+
+	$Timer->start( 'suspect_user_by_reverse_dns_domain' );
+
+	if( empty( $user_ID ) )
+	{	// If user_ID was not set, use the current_User:
+		global $current_User;
+		$User = $current_User;
+	}
+	else
+	{	// Get User by given ID:
+		$UserCache = & get_UserCache();
+		$User = $UserCache->get_by_ID( $user_ID, false, false );
+	}
+
+	if( ! antispam_suspect_check( $user_ID, $check_trust_group ) )
+	{	// Current user cannot be moved to suspect group:
+		$Timer->stop( 'suspect_user_by_reverse_dns_domain' );
+		return;
+	}
+
+	// Get user's reverse DNS domain that was generated from IP address on registration by function gethostbyaddr()
+	$reverse_dns_domain = $UserSettings->get( 'user_registered_from_domain', $User->ID );
+
+	if( empty( $reverse_dns_domain ) )
+	{	// Domain must be not empty:
+		$Timer->stop( 'suspect_user_by_reverse_dns_domain' );
+		return;
+	}
+
+	// Try to get a top existing domain of reverse DNS subdomain from DB:
+	load_funcs( 'sessions/model/_hitlog.funcs.php' );
+	$Domain = & get_Domain_by_subdomain( $reverse_dns_domain );
+
+	if( $Domain && $Domain->get( 'status' ) == 'suspect' )
+	{	// Move the user to suspicious group because the reverse DNS has a suspect status:
+		$GroupCache = & get_GroupCache();
+		if( $suspicious_Group = & $GroupCache->get_by_ID( intval( $Settings->get( 'antispam_suspicious_group' ) ), false, false ) )
+		{	// Group exists in DB and we can change user's group:
+			$User->set_Group( $suspicious_Group );
+			$User->dbupdate();
+		}
+	}
+
+	$Timer->stop( 'suspect_user_by_reverse_dns_domain' );
 }
 
 
