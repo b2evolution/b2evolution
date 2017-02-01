@@ -1658,7 +1658,6 @@ function init_jqplot_js( $relative_to = 'rsc_url' )
 	require_js( '#jqplot_canvasOverlay#', $relative_to );
 	require_js( '#jqplot_donutRenderer#', $relative_to );
 	require_css( '#jqplot_css#', $relative_to );
-	require_css( 'jquery/jquery.jqplot.b2evo.css', $relative_to );
 }
 
 

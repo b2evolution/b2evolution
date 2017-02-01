@@ -628,6 +628,39 @@ fieldset ul {
   color: #000;
   font-weight: normal;
 }
+div.jqplot-target {
+  color: #000;
+  font: 15px Arial, Helvetica, sans-serif;
+  font-weight: bold;
+}
+div.jqplot-target table.jqplot-table-legend {
+  padding: 0;
+  border-collapse: collapse;
+}
+div.jqplot-target table.jqplot-table-legend td.jqplot-table-legend {
+  padding: 2px 4px !important;
+  white-space: nowrap;
+  text-align: left;
+}
+div.jqplot-target table.jqplot-table-legend td.jqplot-table-legend.legend-text-highlighted {
+  background: #666;
+  color: #fff;
+}
+div.jqplot-target table.jqplot-table-legend td.jqplot-table-legend.jqplot-table-legend-swatch {
+  padding-right: 0 !important;
+}
+div.jqplot-target table.jqplot-table-legend td.jqplot-table-legend > div {
+  border: 1px solid #cccccc;
+  padding: 1px;
+}
+div.jqplot-target .jqplot-highlighter-tooltip,
+div.jqplot-target .jqplot-canvasOverlay-tooltip {
+  border: none;
+  background: none;
+  font-size: 13px;
+  white-space: nowrap;
+  padding: 1px;
+}
 #item_locations label {
   width: auto;
   float: right;
