@@ -36,6 +36,35 @@ $params = array_merge( array(
 		'image_class'                => 'img-responsive',
 		'image_size'                 => 'fit-1280x720',
 		'author_link_text'           => 'auto',
+		
+		// 'before_images'            => '<div class="col-lg-6"><div class="evo_post_images">',
+		// 'before_image'             => '<figure class="evo_image_block">',
+		// 'before_image_legend'      => '<figcaption class="evo_image_legend">',
+		// 'after_image_legend'       => '</figcaption>',
+		// 'after_image'              => '</figure>',
+		// 'after_images'             => '</div>',
+		// 'image_class'              => 'img-responsive',
+		// 'image_size'               => 'fit-1280x720',
+		// 'image_limit'              =>  1000,
+		// 'image_link_to'            => 'original', // Can be 'original', 'single' or empty
+		// 'excerpt_image_class'      => '',
+		// 'excerpt_image_size'       => 'fit-80x80',
+		// 'excerpt_image_limit'      => 0,
+		// 'excerpt_image_link_to'    => 'single',
+		// 'include_cover_images'     => false, // Set to true if you want cover images to appear with teaser images.
+
+		// 'before_gallery'           => '<div class="evo_post_gallery">',
+		// 'after_gallery'            => '</div></div>',
+		// 'gallery_table_start'      => '',
+		// 'gallery_table_end'        => '',
+		// 'gallery_row_start'        => '',
+		// 'gallery_row_end'          => '',
+		// 'gallery_cell_start'       => '<div class="evo_post_gallery__image">',
+		// 'gallery_cell_end'         => '</div>',
+		// 'gallery_image_size'       => 'crop-80x80',
+		// 'gallery_image_limit'      => 1000,
+		// 'gallery_colls'            => 5,
+		// 'gallery_order'            => '', // Can be 'ASC', 'DESC', 'RAND' or empty
 	), $params );
 
 /* Beginning of post display */ ?>
@@ -43,16 +72,135 @@ $params = array_merge( array(
 <article id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>"<?php
 	echo empty( $params['item_style'] ) ? '' : ' style="'.format_to_output( $params['item_style'], 'htmlattr' ).'"' ?>>
 
+<?php
+if( $disp == 'single' )
+{ ?>
+<nav>
+	<ol class="breadcrumb">
+		<li><a href="http://localhost/b2evolution-core-css/index.php/a/">Public Blog</a></li>
+		<li class="active">Fun</li>
+	</ol>
+</nav>
+<div class="row">
+	<div class="col-lg-6">
+		<?php
+			if( $Item->get_cover_image_url() )
+			{	// If current item has cover image
+					$Item->images( array(
+						'before_images'            => '<div class="evo_post_images">',
+						'before_image'             => '<div class="evo_post_images"><figure class="evo_image_block cover_image_wrapper">',
+						'before_image_legend'      => '<figcaption class="evo_image_legend">',
+						'after_image_legend'       => '</figcaption>',
+						'after_image'              => '</figure></div>',
+						'after_images'             => '</div>',
+						'image_class'              => 'img-responsive',
+						'image_size'               => 'fit-1280x720',
+						'image_limit'              =>  1,
+						'image_link_to'            => 'original', // Can be 'original', 'single' or empty          <i class="fa fa-link" aria-hidden="true"></i>
+
+						// We DO NOT want to display galleries here, only one cover image
+						'gallery_image_limit'      => 0,
+						'gallery_colls'            => 0,
+
+						// We want ONLY cover image to display here
+						'restrict_to_image_position' => 'cover',
+					) );
+			}
+		?>
+	</div>
+	<div class="col-lg-6">
+		<header>
+			<?php
+			// ------- Title -------
+			if( $params['disp_title'] )
+			{
+				echo $params['item_title_line_before'];
+				// POST TITLE:
+				$Item->title( array(
+						'before'    => $params['item_title_single_before'],
+						'after'     => $params['item_title_single_after'],
+						'link_type' => '#'
+					) );
+				$Item->edit_link( array( // Link to backoffice for editing
+					'before' => '<div class="'.button_class( 'group' ).'">',
+					'after'  => '</div>',
+					'text'   => get_icon( 'edit' ).' '.T_('Edit Article'),
+					'class'  => button_class( 'text' ),
+				) );
+				echo $params['item_title_line_after'];
+			}
+			?>
+			
+			<p><b>Condition:</b> New product</p>
+			<p>Section for short product description. Excerpt here maybe?</p>
+			<?php
+			
+				skin_widget( array(
+						// CODE for the widget:
+						'widget' => 'item_vote',
+						'before' => '<p>',
+						'after' => '</p>',
+					) );
+				
+				
+				$Item->tags( array(
+						'before'    => '<p class="small post_tags"> ' . T_( 'Tags' ) . ': ',
+						'after'     => '</p>',
+						'separator' => ' ',
+					) );
+			?>
+			<p class="evo_post__price"><b>Price:</b> <span class="oldprice">19.99 $</span><span class="newprice">12.99 $</span></p>
+		</header>
+	</div>
+	<div class="col-lg-12">		
+		<main>
+			<div class="panel panel-default single_item_details_wrapper">
+				<div class="panel-heading"><h4 class="panel-title">Data Sheet</h4></div>
+				<div class="panel-body">		
+
+					<section class="table table-hover">
+						<div class="detail_row">
+							<div class="col-lg-2 detail_title">Styles</div><div class="col-lg-10">Girly</div>
+						</div>
+						<div class="detail_row">
+							<div class="col-lg-2 detail_title">Composition</div><div class="col-lg-10">Cotton</div>
+						</div>
+						<div class="detail_row">
+							<div class="col-lg-2 detail_title">Properties</div><div class="col-lg-10">Colorful Dress</div>
+						</div>
+					</section>
+				
+				</div>
+			</div>
+			
+			<div class="panel panel-default single_item_details_wrapper">
+				<div class="panel-heading"><h4 class="panel-title">More Info</h4></div>
+				<div class="panel-body">
+
+					<section class="table table-hover">
+						<div class="panel-body">
+						<p>Here goes dinamic content widget, but probably without images?</p>
+						</div>
+					</section>
+				
+				</div>
+			</div>
+		</main>
+	</div>
+</div>
+<?php }
+		
+?>
 	<header>
 	
-		<?php if( ! $Item->is_intro() ) : 
+		<?php // if( ! $Item->is_intro() ) : 
 		// Do not display "Sale" icon on Intro posts ?>
-		<div class="floatright price_note"><span class="note status_private" data-toggle="tooltip" data-placement="top" title="This article is on sale!"><span>Sale!</span></span></div>
-		<?php endif;
+		<!-- <div class="floatright price_note"><span class="note status_private" data-toggle="tooltip" data-placement="top" title="This article is on sale!"><span>Sale!</span></span></div> -->
+		<?php // endif;
 		
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
 		
-		if( ! $Item->is_intro() )
+		if( ! $Item->is_intro() && $disp != 'single' )
 		{
 			if( $Item->get_cover_image_url() )
 			{	// If current item has cover image
@@ -78,7 +226,7 @@ $params = array_merge( array(
 			}
 			else
 			{	// If current item does not have cover image
-				echo '<div class="noimage_wrapper" style="width:100%;height:234px"><i class="fa fa-file-image-o" aria-hidden="true"></i></div>';
+				echo '<div class="noimage_wrapper"><i class="fa fa-file-image-o" aria-hidden="true"></i></div>';
 			}
 		}
 
@@ -172,6 +320,7 @@ $params = array_merge( array(
 	}
 	?>
 
+	<?php if( $disp != 'single' ) { ?> 
 	<footer>
 	
 		<?php if( ! $Item->is_intro() ) : 
@@ -179,7 +328,7 @@ $params = array_merge( array(
 		<div class="evo_post__price center"><span class="oldprice">19.99 $</span><span class="newprice">12.99 $</span></div>
 		<?php endif;
 		
-		if( ! $Item->is_intro() && ! $disp == 'front' ) // Do NOT apply tags, comments and feedback on intro posts
+		if( ! $Item->is_intro() && $disp == 'single' ) // Do NOT apply tags, comments and feedback on intro posts
 		{
 		?>
 
@@ -208,18 +357,21 @@ $params = array_merge( array(
 				'link_text_more' => '#',
 				'link_title' => '#',
 			) );
+		?>
+		</nav>
+		<?php }
 			
-			// Link to edit 
+			if( ! $Item->is_intro() && $disp != 'posts' ) :// Link to edit
 			$Item->edit_link( array( // Link to backoffice for editing
 				'before' => '<div class="edit-link-wrapper"><div class="'.button_class( 'group' ).'">',
 				'after'  => '</div></div>',
 				'text'   => get_icon( 'edit' ).' '.T_('Edit Article'),
 				'class'  => button_class( 'text' ),
 			) );
+			endif;
 		?>
-		</nav>
-		<?php } ?>
 	</footer>
+	<?php } ?>
 
 	<?php
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------

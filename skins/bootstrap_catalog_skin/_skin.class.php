@@ -573,6 +573,8 @@ class bootstrap_catalog_Skin extends Skin
 	 */
 	function get_post_columns_count()
 	{
+		global $disp;
+		if( $disp != 'single' ) {
 		switch( $this->get_setting( 'post_columns' ) )
 		{
 			case 'one_column':
@@ -580,12 +582,13 @@ class bootstrap_catalog_Skin extends Skin
 				return 'col-md-12';
 			case 'two_columns':
 				// Single Column Large
-				return 'col-md-6';
+				return 'col-md-6 col-xs-6';
 			case 'four_columns':
 				// Single Column Large
-				return 'col-md-3';
+				return 'col-md-3 col-xs-6';
 			default:
-				return 'col-md-4';
+				return 'col-md-4 col-xs-6';
+		}
 		}
 	}
 }

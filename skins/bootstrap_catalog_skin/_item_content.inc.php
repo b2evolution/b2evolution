@@ -264,7 +264,7 @@ switch( $content_mode )
 					) );
 			}
 
-			/** FOR NOW CONTENT EXCLUDED ENTIRELY - MAKE CUSTOM OPTION FOR THIS TO APPEAR ON DISP=POSTS 
+			if( $Item->is_intro() || $disp == 'single' ) {
 			$Item->content_teaser( array(
 					'before'              => $params['before_content_teaser'],
 					'after'               => $params['after_content_teaser'],
@@ -317,7 +317,7 @@ switch( $content_mode )
 						'restrict_to_image_position' => 'aftermore',
 					) );
 			}
-			*/
+			}
 
 			// Display the "after more" part of the text: (part after "[teaserbreak]")
 			$Item->content_extension( array(
