@@ -38,8 +38,13 @@ if( !init_requested_blog( false ) )
 {	// No specific blog to be displayed:
 	if( $Settings->get( 'default_blog_ID' ) == -1 )
 	{	// we are going to display the admin page:
-		header_redirect( 'admin.php', 302 );
-		exit(0);
+		if( ! is_logged_in() )
+		{	// user must be logged in and his/her account must be validated before access to admin:
+			$login_required = true;
+			$validate_required = true;
+			require $inc_path.'_init_login.inc.php';
+		}
+		require dirname(__FILE__).'/admin.php';
 	}
 	else
 	{	// we are going to display the default page:
