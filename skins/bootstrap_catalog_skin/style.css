@@ -271,6 +271,9 @@ div.log_container {
 .evo_image_block {
   margin: 0;
 }
+.disp_single .evo_image_block {
+  margin: 0 0 1em;
+}
 footer.row {
   margin-top: 20px;
 }

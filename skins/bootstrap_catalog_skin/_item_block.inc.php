@@ -200,7 +200,7 @@ if( $disp == 'single' )
 		
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
 		
-		if( ! $Item->is_intro() && $disp != 'single' )
+		if( ! $Item->is_intro() && ! in_array( $disp, array( 'single', 'page' ) ) )
 		{
 			if( $Item->get_cover_image_url() )
 			{	// If current item has cover image
@@ -320,20 +320,17 @@ if( $disp == 'single' )
 	}
 	?>
 
-	<?php if( $disp != 'single' ) { ?> 
+	<?php  if( ! in_array( $disp, array( 'single', 'page' ) ) ) { ?> 
 	<footer>
 	
-		<?php if( ! $Item->is_intro() ) : 
-		// Do not display "Sale" icon on Intro posts ?>
+		<?php if( ! $Item->is_intro() )
+		{ // Do not display "Sale" icon on Intro posts ?>
 		<div class="evo_post__price center"><span class="oldprice">19.99 $</span><span class="newprice">12.99 $</span></div>
-		<?php endif;
-		
-		if( ! $Item->is_intro() && $disp == 'single' ) // Do NOT apply tags, comments and feedback on intro posts
-		{
-		?>
+		<?php }	?>
 
-		<nav class="post_comments_link">
+		<!--<nav class="post_comments_link">
 		<?php
+		/*
 			// Link to comments, trackbacks, etc.:
 			$Item->feedback_link( array(
 				'type' => 'comments',
@@ -357,11 +354,11 @@ if( $disp == 'single' )
 				'link_text_more' => '#',
 				'link_title' => '#',
 			) );
+			*/
 		?>
-		</nav>
-		<?php }
-			
-			if( ! $Item->is_intro() && $disp != 'posts' ) :// Link to edit
+		</nav>-->
+		<?php			
+			if( ! $Item->is_intro() && $disp != 'posts' ) : // Link to edit
 			$Item->edit_link( array( // Link to backoffice for editing
 				'before' => '<div class="edit-link-wrapper"><div class="'.button_class( 'group' ).'">',
 				'after'  => '</div></div>',

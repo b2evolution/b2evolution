@@ -574,7 +574,7 @@ class bootstrap_catalog_Skin extends Skin
 	function get_post_columns_count()
 	{
 		global $disp;
-		if( $disp != 'single' ) {
+		if( ! in_array( $disp, array( 'single', 'page' ) ) ) {
 		switch( $this->get_setting( 'post_columns' ) )
 		{
 			case 'one_column':

@@ -193,7 +193,7 @@ switch( $content_mode )
 				) );
 		}
 
-		/** FOR NOW CONTENT EXCLUDED ENTIRELY - MAKE CUSTOM OPTION FOR THIS TO APPEAR ON DISP=FRONT ==================================================================== */
+		/** FOR NOW EXCERPT EXCLUDED ENTIRELY - MAKE CUSTOM OPTION FOR THIS TO APPEAR ON DISP=FRONT ==================================================================== */
 		// $Item->excerpt( array(
 			// 'before'              => $params['excerpt_before_text'],
 			// 'after'               => $params['excerpt_after_text'],
@@ -264,7 +264,7 @@ switch( $content_mode )
 					) );
 			}
 
-			if( $Item->is_intro() || $disp == 'single' ) {
+			if( $Item->is_intro() || in_array( $disp, array( 'single', 'page' ) ) ) {
 			$Item->content_teaser( array(
 					'before'              => $params['before_content_teaser'],
 					'after'               => $params['after_content_teaser'],
@@ -334,7 +334,6 @@ switch( $content_mode )
 					'force_more'          => $params['force_more'],
 				) );
 			
-			/**
 			// Links to post pages (for multipage posts):
 			$Item->page_links( array(
 					'before'      => $params['page_links_start'],
@@ -345,7 +344,6 @@ switch( $content_mode )
 					'pagelink'    => $params['page_links_pagelink'],
 					'url'         => $params['page_links_url'],
 				) );
-			*/
 
 			// Display Item footer text (text can be edited in Blog Settings):
 			$Item->footer( array(
