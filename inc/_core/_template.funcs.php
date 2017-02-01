@@ -921,11 +921,11 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 		}
 	}
 
-	if( strpos( $lib_file, 'ext:' ) === 0 )
-	{	// This file must be loaded from subfolder '/rsc/ext/':
-		$subfolder = 'ext';
+	if( strpos( $lib_file, 'ext:' ) === 0 || strpos( $lib_file, 'customized:' ) === 0 )
+	{	// This file must be loaded from subfolder '/rsc/ext/' or '/rsc/customized/' :
+		$subfolder = strpos( $lib_file, 'ext:' ) === 0 ? 'ext' : 'customized';
 		// Remove prefix 'ext:' from beginning of the file:
-		$lib_file = substr( $lib_file, 4 );
+		$lib_file = substr( $lib_file, strlen( $subfolder ) + 1 );
 	}
 
 	if( $relative_to === 'relative' || $relative_to === true )
@@ -1555,8 +1555,8 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
 
 	// Initialize farbastic colorpicker
 	require_js( '#jquery#', $relative_to );
-	require_js( 'jquery/jquery.farbtastic.min.js', $relative_to );
-	require_css( 'ext:jquery/farbtastic/css/farbtastic.css', $relative_to );
+	require_js( 'customized:jquery/farbtastic/js/jquery.farbtastic.min.js', $relative_to );
+	require_css( 'customized:jquery/farbtastic/css/farbtastic.css', $relative_to );
 }
 
 
