@@ -127,13 +127,12 @@ class bootstrap_main_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Image section')
 				),
-					'front_bg_image' => array(
+					'front_bg_image_file_ID' => array(
 						'label' => T_('Background image'),
-						'note' => T_('Set background image in Main Area section.'),
-						'defaultvalue' => 'shared/global/sunset/sunset.jpg',
-						'type' => 'text',
-						'size' => '50',
-						'allow_empty' => true,
+						'defaultvalue' => NULL,
+						'type' => 'fileselect',
+						'initialize_with' => 'shared/global/sunset/sunset.jpg',
+						'thumbnail_size' => 'fit-320x320'
 					),
 					'front_bg_color' => array(
 						'label' => T_('Background color'),
@@ -398,13 +397,18 @@ class bootstrap_main_Skin extends Skin
 
 		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) ) )
 		{
-			global $media_url, $media_path;
+			$FileCache = & get_FileCache();
 
-			$bg_image = $this->get_setting( 'front_bg_image' );
-			if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
-			{ // Custom body background image:
-				$custom_css .= '#bg_picture { background-image: url('.$media_url.$bg_image.") }\n";
-			} else
+			if( $this->get_setting( 'front_bg_image_file_ID' ) )
+			{
+				$bg_image_File = & $FileCache->get_by_ID( $this->get_setting( 'front_bg_image_file_ID' ) );
+			}
+
+			if( !empty( $bg_image_File ) && $bg_image_File->exists() )
+			{
+				$custom_css .= '#bg_picture { background-image: url('.$bg_image_File->get_url().") }\n";
+			}
+			else
 			{
 				$color = $this->get_setting( 'front_bg_color' );
 				$custom_css .= '#bg_picture { background: '.$color." }\n";
@@ -487,7 +491,7 @@ class bootstrap_main_Skin extends Skin
 				$custom_css .= 'section.secondary_area, .widget_core_org_members { color: '.$color." !important }\n";
 			}
 		}
-		
+
 
 		if( $color = $this->get_setting( 'bgimg_text_color' ) )
 		{	// Custom text color on background image:
@@ -501,7 +505,7 @@ class bootstrap_main_Skin extends Skin
 		{	// Custom link hover color on background image:
 			$custom_css .= '.evo_hasbgimg a:hover { color: '.$color." }\n";
 		}
-		
+
 		if( ! empty( $custom_css ) )
 		{
 			if( $disp == 'front' )

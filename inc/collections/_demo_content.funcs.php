@@ -129,7 +129,7 @@ function create_blog(
 		$owner_user_ID = 1,
 		$blog_allow_access = 'public' )
 {
-	global $default_locale, $install_test_features, $local_installation, $Plugins;
+	global $default_locale, $install_test_features, $local_installation, $Plugins, $Blog;
 
 	$Collection = $Blog = new Blog( NULL );
 
@@ -152,6 +152,11 @@ function create_blog(
 	$Blog->set( 'in_bloglist', $in_bloglist );
 	$Blog->set( 'owner_user_ID', $owner_user_ID );
 	$Blog->set_setting( 'normal_skin_ID', $blog_skin_ID );
+	$SkinCache = & get_SkinCache();
+	if( $selected_Skin = $SkinCache->get_by_ID( $blog_skin_ID ) )
+	{
+		$selected_Skin->add_init_files();
+	}
 	if( $local_installation )
 	{ // Turn off all ping plugins if the installation is local/test/intranet
 		$Blog->set_setting( 'ping_plugins', '' );

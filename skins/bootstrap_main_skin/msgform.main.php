@@ -41,12 +41,16 @@ siteskin_include( '_site_body_header.inc.php' );
 // ------------------------------- END OF SITE HEADER --------------------------------
 
 // Display a picture from skin setting as background image
-global $media_path, $media_url;
-$bg_image = $Skin->get_setting( 'front_bg_image' );
+$FileCache = & get_FileCache();
+$bg_File = NULL;
+if( $bg_File_ID = $Skin->get_setting( 'front_bg_image_file_ID' ) )
+{
+	$bg_File = & $FileCache->get_by_ID( $bg_File_ID );
+}
 echo '<div id="bg_picture">';
-if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
+if( $bg_File && $bg_File->exists() )
 { // If it exists in media folder
-	echo '<img src="'.$media_url.$bg_image.'" />';
+	echo '<img src="'.$bg_File->get_url().'" />';
 }
 echo '</div>';
 ?>
@@ -191,7 +195,7 @@ if( $Skin->is_visible_container( 'menu' ) )
 	<div class="row">
 
 		<footer class="col-md-12 center">
-	
+
 			<?php
 			if( $Skin->is_visible_container( 'footer' ) )
 			{ // Display 'Footer' widget container
@@ -207,7 +211,7 @@ if( $Skin->is_visible_container( 'menu' ) )
 			?>
 			</div>
 			<?php } ?>
-	
+
 			<p>
 			<?php
 				// Display footer text (text can be edited in Blog Settings):

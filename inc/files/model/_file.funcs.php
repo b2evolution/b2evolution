@@ -2935,4 +2935,23 @@ function get_root_path_by_abspath( $abspath )
 	// Data are not found correctly:
 	return false;
 }
+
+function & get_file_by_abspath( $abspath )
+{
+	$root_path = get_root_path_by_abspath( $abspath );
+	if( $root_path )
+	{
+		$root = explode( '_', $root_path['root'] );
+		$FileCache = & get_FileCache();
+		$File = & $FileCache->get_by_root_and_path( $root[0], $root[1], $root_path['path'].DIRECTORY_SEPARATOR.basename( $abspath ) );
+		if( $File->exists() )
+		{
+			$File->load_meta( true );
+			return $File;
+		}
+	}
+
+	$r = NULL;
+	return $r;
+}
 ?>
