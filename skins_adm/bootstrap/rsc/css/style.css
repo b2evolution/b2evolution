@@ -595,7 +595,36 @@ fieldset ul {
 .dashboard_comments_block .notes {
   margin-top: 1px;
 }
-.chart .label {
+.charts {
+  display: -ms-flexbox;
+  display: flex;
+  display: -webkit-flex;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+  -webkit-justify-content: space-around;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
+}
+.charts .chart {
+  position: relative;
+  text-align: center;
+  display: inline-block;
+  width: 75px;
+  margin: 5px;
+}
+.charts .chart canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.charts .chart .number {
+  height: 75px;
+  line-height: 75px;
+}
+.charts .chart .label {
+  font-size: 11px;
+  padding: 0;
   color: #000;
   font-weight: normal;
 }

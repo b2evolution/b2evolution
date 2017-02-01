@@ -72,7 +72,6 @@ require_js_helper( 'colorbox' );
 
 // Include files to work with charts
 require_js( '#easypiechart#' );
-require_css( 'jquery/jquery.easy-pie-chart.css' );
 
 if( empty( $blog ) )
 { // Init JS to quick edit an order of the blogs in the table cell by AJAX
