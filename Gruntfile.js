@@ -67,13 +67,19 @@ module.exports = function(grunt) {
 							'rsc/less/bootstrap-evoskins.less'			// Common styles for all bootstrap skins
 						],
 
+					// Back-office bootstrap skin styles:
+					'skins_adm/bootstrap/rsc/css/style.bundle.css': [
+							'skins_adm/bootstrap/rsc/css/style.less',
+							'rsc/less/inc/jquery.easy-pie-chart.inc.less',
+							'rsc/less/inc/jquery.jqplot.inc.less',
+						],
+
 					// Bootstrap skins
 					'skins/bootstrap_blog_skin/style.css':    'skins/bootstrap_blog_skin/style.less',
 					'skins/bootstrap_main_skin/style.css':    'skins/bootstrap_main_skin/style.less',
 					'skins/bootstrap_forums_skin/style.css':  'skins/bootstrap_forums_skin/style.less',
 					'skins/bootstrap_gallery_skin/style.css': 'skins/bootstrap_gallery_skin/style.less',
 					'skins/bootstrap_manual_skin/style.css':  'skins/bootstrap_manual_skin/style.less',
-					'skins_adm/bootstrap/rsc/css/style.css':  'skins_adm/bootstrap/rsc/css/style.less',
 
 					// Helper pages
 					'rsc/build/b2evo_helper_screens.css':    'rsc/less/b2evo_helper_screens.less',
@@ -167,6 +173,11 @@ module.exports = function(grunt) {
 				src: 'rsc/build/bootstrap-backoffice-b2evo_base.bundle.css',
 				dest: 'rsc/build/bootstrap-backoffice-b2evo_base.bmin.css',
 			},
+			backoffice_bootstrap_skin_style: {
+				nonull: true, // Display missing files
+				src: 'skins_adm/bootstrap/rsc/css/style.bundle.css',
+				dest: 'skins_adm/bootstrap/rsc/css/style.bmin.css',
+			},
 			bootstrap_skins: {
 				files: {
 					// Bootstrap skins
@@ -175,7 +186,6 @@ module.exports = function(grunt) {
 					'skins/bootstrap_forums_skin/style.min.css':  'skins/bootstrap_forums_skin/style.css',
 					'skins/bootstrap_gallery_skin/style.min.css': 'skins/bootstrap_gallery_skin/style.css',
 					'skins/bootstrap_manual_skin/style.min.css':  'skins/bootstrap_manual_skin/style.css',
-					'skins_adm/bootstrap/rsc/css/style.min.css':  'skins_adm/bootstrap/rsc/css/style.css',
 				}	
 			},
 			skin_evopress: {
