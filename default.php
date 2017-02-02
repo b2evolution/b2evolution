@@ -65,8 +65,8 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 		<title>b2evolution - Default Page</title>
 		<script type="text/javascript" src="rsc/js/ext/jquery.min.js"></script>
 		<!-- Bootstrap -->
-		<script type="text/javascript" src="rsc/js/ext/bootstrap/bootstrap.min.js"></script>
-		<link href="rsc/css/ext/bootstrap/bootstrap.min.css" rel="stylesheet">
+		<script type="text/javascript" src="rsc/ext/bootstrap/js/bootstrap.min.js"></script>
+		<link href="rsc/ext/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 		<link href="rsc/build/bootstrap-b2evo_base.bmin.css" rel="stylesheet">
 		<link href="rsc/build/b2evo_helper_screens.css" rel="stylesheet">
 		<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
