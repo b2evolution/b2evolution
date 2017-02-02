@@ -34,6 +34,7 @@ class User extends DataObject
 	var $login;
 	var $pass;
 	var $salt;
+	var $pass_driver;
 	var $firstname;
 	var $lastname;
 	var $nickname;
@@ -158,6 +159,12 @@ class User extends DataObject
 	var $is_collection_owner;
 
 	/**
+	 * Password driver
+	 * @var object
+	 */
+	var $PasswordDriver;
+
+	/**
 	 * Constructor
 	 *
 	 * @param object DB row
@@ -217,6 +224,7 @@ class User extends DataObject
 			$this->login = $db_row->user_login;
 			$this->pass = $db_row->user_pass;
 			$this->salt = $db_row->user_salt;
+			$this->pass_driver = $db_row->user_pass_driver;
 			$this->firstname = $db_row->user_firstname;
 			$this->lastname = $db_row->user_lastname;
 			$this->nickname = $db_row->user_nickname;
@@ -1087,16 +1095,14 @@ class User extends DataObject
 				else
 				{
 					if( $has_full_access && $this->ID != $current_User->ID )
-					{ // Admin is changing a password of other user, Check a password of current admin
-						$pass_to_check = $current_User->pass;
-						$current_user_salt = $current_User->salt;
+					{	// Admin is changing a password of other user, Check a password of current admin
+						$pass_User = $current_User;
 					}
 					else
-					{ // User is changing own pasword
-						$pass_to_check = $this->pass;
-						$current_user_salt = $this->salt;
+					{	// User is changing own password
+						$pass_User = $this;
 					}
-					if( $pass_to_check == md5( $current_user_salt.$current_user_pass, true ) )
+					if( $pass_User->check_password( $current_user_pass ) )
 					{
 						if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen'), $checkpwd_params ) )
 						{ // We can set password
@@ -2301,11 +2307,12 @@ class User extends DataObject
 	 */
 	function set_password( $raw_password )
 	{
-		// Generate new salt to save a password
-		$new_pass_salt = generate_random_key( 8 );
+		// Use first password driver from config array for new password updating:
+		$PasswordDriver = get_PasswordDriver();
 
-		$this->set( 'pass', md5( $new_pass_salt.$raw_password, true ) );
-		$this->set( 'salt', $new_pass_salt );
+		$this->set( 'pass', $PasswordDriver->hash( $raw_password ) );
+		$this->set( 'salt', $PasswordDriver->get_last_generated_salt() );
+		$this->set( 'pass_driver', $PasswordDriver->get_code() );
 	}
 
 
@@ -2426,18 +2433,22 @@ class User extends DataObject
   /**
 	 * Check password
 	 *
-	 * @param string password
-	 * @param boolean Is the password parameter already MD5()'ed?
+	 * @param string Password
+	 * @param boolean Is the password parameter already hashed?
 	 * @return boolean
 	 */
-	function check_password( $pass, $pass_is_md5 = false )
+	function check_password( $pass, $pass_is_hashed = false )
 	{
-		if( !$pass_is_md5 )
-		{
-			$pass = md5( $this->salt.$pass, true );
+		// Get password driver for this user:
+		$user_PasswordDriver = $this->get_PasswordDriver();
+
+		if( ! $user_PasswordDriver )
+		{	// Password driver cannot be detected for this user, so it cannot be checked:
+			return false;
 		}
 
-		return ( $pass == $this->pass );
+		// Check the requested password against the user's password hash:
+		return $user_PasswordDriver->check( $pass, $this->salt, $this->pass, $pass_is_hashed );
 	}
 
 
@@ -6766,6 +6777,22 @@ class User extends DataObject
 		}
 
 		return $this->flagged_items_count;
+	}
+
+
+	/**
+	 * Get password driver
+	 *
+	 * @return object|FALSE Password driver OR FALSE if password driver is not detected for this user
+	 */
+	function get_PasswordDriver()
+	{
+		if( $this->PasswordDriver === NULL )
+		{	// Initialize password driver:
+			$this->PasswordDriver = get_PasswordDriver( $this->pass_driver );
+		}
+
+		return $this->PasswordDriver;
 	}
 }
 

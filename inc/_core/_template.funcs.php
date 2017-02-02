@@ -2433,17 +2433,17 @@ function display_login_form( $params )
 	// check if should transmit hashed password
 	if( $params[ 'transmit_hashed_password' ] )
 	{ // used by JS-password encryption/hashing:
-		$pwd_salt = $Session->get('core.pwd_salt');
-		if( empty($pwd_salt) )
+		$pepper = $Session->get( 'core.pepper' );
+		if( empty( $pepper ) )
 		{ // Do not regenerate if already set because we want to reuse the previous salt on login screen reloads
 			// fp> Question: the comment implies that the salt is reset even on failed login attemps. Why that? I would only have reset it on successful login. Do experts recommend it this way?
 			// but if you kill the session you get a new salt anyway, so it's no big deal.
 			// At that point, why not reset the salt at every reload? (it may be good to keep it, but I think the reason should be documented here)
-			$pwd_salt = generate_random_key(64);
-			$Session->set( 'core.pwd_salt', $pwd_salt, 86400 /* expire in 1 day */ );
+			$pepper = generate_random_key(64);
+			$Session->set( 'core.pepper', $pepper, 86400 /* expire in 1 day */ );
 			$Session->dbsave(); // save now, in case there's an error later, and not saving it would prevent the user from logging in.
 		}
-		$Form->hidden( 'pwd_salt', $pwd_salt );
+		$Form->hidden( 'pepper', $pepper );
 		// Add container for the hashed password hidden inputs
 		echo '<div id="pwd_hashed_container"></div>'; // gets filled by JS
 	}
@@ -2549,7 +2549,7 @@ function display_login_js_handler( $params )
 		var get_widget_login_hidden_fields = <?php echo $params['get_widget_login_hidden_fields'] ? 'true' : 'false'; ?>;
 		var sessionid = '<?php echo $Session->ID; ?>';
 
-		if( !form.<?php echo $dummy_fields[ 'pwd' ]; ?> || !form.pwd_salt || typeof hex_sha1 == "undefined" && typeof hex_md5 == "undefined" ) {
+		if( !form.<?php echo $dummy_fields[ 'pwd' ]; ?> || !form.pepper || typeof hex_sha1 == "undefined" && typeof hex_md5 == "undefined" ) {
 			return true;
 		}
 
@@ -2575,16 +2575,19 @@ function display_login_js_handler( $params )
 
 				var raw_password = form.<?php echo $dummy_fields[ 'pwd' ]; ?>.value;
 				var salts = parsed_result['salts'];
+				var hash_algo = parsed_result['hash_algo'];
 
 				if( get_widget_login_hidden_fields )
 				{
 					form.crumb_loginform.value = parsed_result['crumb'];
-					form.pwd_salt.value = parsed_result['pwd_salt'];
+					form.pepper.value = parsed_result['pepper'];
 					sessionid = parsed_result['session_id'];
 				}
 
-				for( var index in salts ) {
-					var pwd_hashed = hex_sha1( hex_md5( salts[index] + raw_password ) + form.pwd_salt.value );
+				for( var index in salts )
+				{
+					var pwd_hashed = eval( hash_algo[ index ] );
+					pwd_hashed = hex_sha1( pwd_hashed + form.pepper.value );
 					pwd_container.append( '<input type="hidden" value="' + pwd_hashed + '" name="pwd_hashed[]">' );
 				}
 

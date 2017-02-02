@@ -697,6 +697,29 @@ $pwdchange_request_delay = 300; // 5 minutes
 
 
 /**
+ * Enabled password drivers.
+ * List what drivers must be enabled on your server.
+ * By default only first driver(which is support by server configuration) will be used to store new updated passwords in DB.
+ *
+ *   possible driver valuse:
+ *     - evo_salted
+ *     - bcrypt_2y
+ *     - bcrypt
+ *     - salted_md5
+ *     - phpass
+ *     - evo_md5 // Use this driver as last choice only.
+ */
+$enabled_password_drivers = array(
+		'evo_salted',
+		'bcrypt_2y',
+		'bcrypt',
+		'salted_md5',
+		'phpass',
+		'evo_md5', // Use this driver as last choice only.
+	);
+
+
+/**
  * Account activation reminder settings.
  * Each element of the array is given in seconds
  * Assume that the number of element in the array below is n then the following must be followed:
