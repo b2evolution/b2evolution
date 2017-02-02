@@ -54,6 +54,7 @@ switch( $action )
 		$phpbb_db_pass = param( 'db_pass', 'string', true );
 		$phpbb_db_prefix = param( 'db_prefix', 'string', '' );
 		$phpbb_path_avatars = param( 'path_avatars', 'string', '' );
+		$phpbb_path_attachments = param( 'path_attachments', 'string', '' );
 		$forum_blog_ID = param( 'forum_blog_ID', 'integer', 0 );
 
 		param_check_not_empty( 'db_host', T_('Please enter a database host!') );
@@ -99,6 +100,7 @@ switch( $action )
 		phpbb_set_var( 'db_config', $phpbb_db_config );
 		phpbb_set_var( 'blog_ID', $forum_blog_ID );
 		phpbb_set_var( 'path_avatars', $phpbb_path_avatars );
+		phpbb_set_var( 'path_attachments', $phpbb_path_attachments );
 
 		$step = 'groups';
 		break;
