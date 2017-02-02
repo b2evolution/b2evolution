@@ -230,7 +230,7 @@ class coll_logo_Widget extends ComponentWidget
 			$image_url = '';
 		}
 
-		if( $check_file != 'title' && empty( $image_url ) )
+		if( $check_file == 'check' && empty( $image_url ) )
 		{
 			return true;
 		}
