@@ -2318,12 +2318,22 @@ function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 
 	if( $avatar_file_type == 'url' )
 	{	// Try to get a file from remote url:
-		$url_headers = get_headers( $avatar_file_url );
+		$url_headers = @get_headers( $avatar_file_url );
+		if( $url_headers === false )
+		{	// Some server restriction to get files from remote server:
+			$last_error = error_get_last();
+			$last_error = empty( $last_error['message'] ) ? '' : ' '.sprintf( T_('Error: %s'), $last_error['message'] );
+			phpbb_log( sprintf( T_( 'Impossible to get avatar file of the user #%s(%s) because your server has a restriction to get avatar file from remote url %s.' ),
+				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>' ).$last_error, 'error', ' ', '<br />' );
+			// Update the count of missing avatars:
+			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
+			return false;
+		}
 		foreach( $url_headers as $url_header )
 		{
 			if( strpos( $url_header, 'Content-Type:' ) === 0 )
 			{
-				$url_type = str_replace( 'Content-Type: ', '', $url_header );
+				$url_type = trim( str_replace( 'Content-Type:', '', $url_header ) );
 				break;
 			}
 		}
