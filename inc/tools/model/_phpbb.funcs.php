@@ -2318,26 +2318,18 @@ function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 
 	if( $avatar_file_type == 'url' )
 	{	// Try to get a file from remote url:
-		$url_headers = @get_headers( $avatar_file_url );
-		if( $url_headers === false )
+		$avatar_file_content = fetch_remote_page( $avatar_file_url, $avatar_file_url_info );
+		if( $avatar_file_content === false )
 		{	// Some server restriction to get files from remote server:
-			$last_error = error_get_last();
-			$last_error = empty( $last_error['message'] ) ? '' : ' '.sprintf( T_('Error: %s'), $last_error['message'] );
+			$avatar_file_url_error = ' '.sprintf( T_('Error: %s'), $avatar_file_url_info['message'] )
+				.'; '.sprintf( T_('Status code: %s'), $avatar_file_url_info['status'] );
 			phpbb_log( sprintf( T_( 'Impossible to get avatar file of the user #%s(%s) because your server has a restriction to get avatar file from remote url %s.' ),
-				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>' ).$last_error, 'error', ' ', '<br />' );
+				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>' ).$avatar_file_url_error, 'error', ' ', '<br />' );
 			// Update the count of missing avatars:
 			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
 			return false;
 		}
-		foreach( $url_headers as $url_header )
-		{
-			if( strpos( $url_header, 'Content-Type:' ) === 0 )
-			{
-				$url_type = trim( str_replace( 'Content-Type:', '', $url_header ) );
-				break;
-			}
-		}
-		if( empty( $url_type ) || ! in_array( $url_type, array( 'image/gif', 'image/jpeg', 'image/png' ) ) )
+		if( empty( $avatar_file_url_info['mimetype'] ) || ! in_array( $avatar_file_url_info['mimetype'], array( 'image/gif', 'image/jpeg', 'image/png' ) ) )
 		{	// Wrong image type of remote url:
 			phpbb_log( sprintf( T_( 'Impossible to get avatar file of the user #%s(%s) because wrong image type of the remote avatar file %s.' ),
 				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>' ), 'error', ' ', '<br />' );
@@ -2345,7 +2337,7 @@ function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
 			return false;
 		}
-		switch( $url_type )
+		switch( $avatar_file_url_info['mimetype'] )
 		{
 			case 'image/gif':
 				$avatar_extension = 'gif';
@@ -2376,15 +2368,6 @@ function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 
 	if( $avatar_file_type == 'url' )
 	{	// Create avatar file from remote url:
-		$avatar_file_content = file_get_contents( $avatar_file_url );
-		if( ! $avatar_file_content )
-		{	// Wrong avatar url:
-			phpbb_log( sprintf( T_( 'Impossible to load avatar file of the user #%s(%s) from the remote url %s.' ),
-				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>' ), 'error', ' ', '<br />' );
-			// Update the count of missing avatars:
-			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
-			return false;
-		}
 		$avatar_file_name = phpbb_get_config( 'avatar_salt' ).'_'.$phpbb_user->user_id.'.'.$avatar_extension;
 		$user_File = new File( 'user', $user_ID, 'profile_pictures/'.$avatar_file_name );
 		if( ! $user_File->create() ||
