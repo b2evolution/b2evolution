@@ -730,8 +730,19 @@ if( $result && ! $result->faultCode() )
 }
 else
 {	// Some error on XML-RPC request:
-	init_system_check( $api_title, T_('Failed'), $api_url );
-	disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.').' <b>'.sprintf( T_( 'Error: %s' ), $result->faultString() ).'</b>' );
+	$xmlrpc_error_message = $result->faultString();
+	if( $xmlrpc_error_message == 'XML-RPC services are disabled on this system.' )
+	{	// Exception for this error:
+		$api_status_title = T_('Disabled');
+		$api_status_type = 'ok';
+	}
+	else
+	{	// Other errors:
+		$api_status_title = T_('Failed');
+		$api_status_type = 'warning';
+	}
+	init_system_check( $api_title, $api_status_title, $api_url );
+	disp_system_check( $api_status_type, T_('This API doesn\'t work properly on this server.').' <b>'.sprintf( T_( 'Error: %s' ), $xmlrpc_error_message ).'</b>' );
 }
 
 // AJAX anon_async.php:
