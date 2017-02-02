@@ -62,8 +62,8 @@ class Domain extends DataObject
 	function load_from_Request()
 	{
 		param_string_not_empty( 'dom_name', T_('Please enter domain name.') );
-		$dom_name = get_param( 'dom_name' );
-		$this->set( 'name', ltrim( $dom_name, '.' ) );
+		$dom_name = ltrim( get_param( 'dom_name' ), '.' );
+		$this->set( 'name', $dom_name );
 
 		$dom_status = param( 'dom_status', 'string', true );
 		$this->set( 'status', $dom_status, true );
