@@ -27,6 +27,11 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'/_main.inc.php';
 
+
+// Don't check new updates from b2evolution.net (@see b2evonet_get_updates()),
+// in order to don't break the response data:
+$allow_evo_stats = false;
+
 if( ! isset($GLOBALS['files_Module']) )
 {
 	debug_die( 'Files module is disabled or missing!' );
@@ -77,15 +82,6 @@ param( 'mtime', 'integer', 0 );  // used for unique URLs (that never expire).
 if( $size_x != 1 && $size_x != 2 )
 { // Allow only 1x and 2x sizes, in order to avoid hack that creates many x versions
 	$size_x = 1;
-}
-
-// TODO: dh> this failed with filenames containing multiple dots!
-if ( false !== strpos( urldecode( $path ), '..' ) )
-// TODO: dh> fix this better. by adding is_relative_path()?
-// fp> the following doesn't look secure. I can't take the risk. What if the path ends with or is just '..' ? I don't want to allow this to go through.
-// if( preg_match( '~\.\.[/\\\]~', urldecode( $path ) ) )
-{
-	debug_die( 'Relative pathnames not allowed!' );
 }
 
 // Load fileroot info:

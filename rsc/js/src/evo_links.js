@@ -16,25 +16,28 @@
 // Initialize attachments block:
 jQuery( document ).ready( function()
 {
-	var height = jQuery( '#attachments_fieldset_table' ).height();
-	height = ( height > 320 ) ? 320 : ( height < 97 ? 97 : height );
-	jQuery( '#attachments_fieldset_wrapper' ).height( height );
+	if( jQuery( '#attachments_fieldset_table' ).length > 0 )
+	{	// Only if the attachments block exists on the loading page:
+		var height = jQuery( '#attachments_fieldset_table' ).height();
+		height = ( height > 320 ) ? 320 : ( height < 97 ? 97 : height );
+		jQuery( '#attachments_fieldset_wrapper' ).height( height );
 
-	jQuery( '#attachments_fieldset_wrapper' ).resizable(
-	{	// Make the attachments fieldset wrapper resizable:
-		minHeight: 80,
-		handles: 's',
-		resize: function( e, ui )
-		{	// Limit max height by table of attachments:
-			jQuery( '#attachments_fieldset_wrapper' ).resizable( 'option', 'maxHeight', jQuery( '#attachments_fieldset_table' ).height() );
-		}
-	} );
-	jQuery( document ).on( 'click', '#attachments_fieldset_wrapper .ui-resizable-handle', function()
-	{	// Increase attachments fieldset height on click to resizable handler:
-		var max_height = jQuery( '#attachments_fieldset_table' ).height();
-		var height = jQuery( '#attachments_fieldset_wrapper' ).height() + 80;
-		jQuery( '#attachments_fieldset_wrapper' ).css( 'height', height > max_height ? max_height : height );
-	} );
+		jQuery( '#attachments_fieldset_wrapper' ).resizable(
+		{	// Make the attachments fieldset wrapper resizable:
+			minHeight: 80,
+			handles: 's',
+			resize: function( e, ui )
+			{	// Limit max height by table of attachments:
+				jQuery( '#attachments_fieldset_wrapper' ).resizable( 'option', 'maxHeight', jQuery( '#attachments_fieldset_table' ).height() );
+			}
+		} );
+		jQuery( document ).on( 'click', '#attachments_fieldset_wrapper .ui-resizable-handle', function()
+		{	// Increase attachments fieldset height on click to resizable handler:
+			var max_height = jQuery( '#attachments_fieldset_table' ).height();
+			var height = jQuery( '#attachments_fieldset_wrapper' ).height() + 80;
+			jQuery( '#attachments_fieldset_wrapper' ).css( 'height', height > max_height ? max_height : height );
+		} );
+	}
 } );
 
 

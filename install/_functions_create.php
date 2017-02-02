@@ -229,7 +229,7 @@ function create_default_data()
 		VALUES ( 1, 'login_multiple_sessions', '1' ),
 				( 1, 'enable_email', '1' ),
 				( 1, 'created_fromIPv4', '".ip2int( '127.0.0.1' )."' ),
-				( 1, 'user_domain', 'localhost' )" );
+				( 1, 'user_registered_from_domain', 'localhost' )" );
 	task_end();
 
 
@@ -480,26 +480,6 @@ function create_default_data()
 		VALUES ( '.$DB->quote( 'Default' ).', '.$DB->quote( '#999999' ).' )' );
 	task_end();
 
-
-	task_begin( 'Creating default polls... ' );
-	$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text )
-		VALUES ( 1, "What is your favorite b2evolution feature?" )' );
-	$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
-		VALUES ( 1, "Multiple blogs",          1 ),
-		       ( 1, "Photo Galleries",         2 ),
-		       ( 1, "Forums",                  3 ),
-		       ( 1, "Online Manuals",          4 ),
-		       ( 1, "Newsletters / E-mailing", 5 ),
-		       ( 1, "Easy Maintenance",        6 )' );
-	$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
-		VALUES ( 1, 5, 1 ),
-		       ( 1, 6, 2 ),
-		       ( 1, 7, 2 ),
-		       ( 1, 2, 2 ),
-		       ( 1, 3, 3 ),
-		       ( 1, 4, 3 ),
-		       ( 1, 1, 6 )' );
-	task_end();
 
 	// Update the progress bar status
 	update_install_progress_bar();
@@ -1542,6 +1522,28 @@ function create_demo_contents()
 	$DB->query( $query );
 	echo "OK.<br />\n";
 	*/
+
+
+	task_begin( 'Creating default polls... ' );
+	$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text )
+		VALUES ( 1, "What is your favorite b2evolution feature?" )' );
+	$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
+		VALUES ( 1, "Multiple blogs",          1 ),
+		       ( 1, "Photo Galleries",         2 ),
+		       ( 1, "Forums",                  3 ),
+		       ( 1, "Online Manuals",          4 ),
+		       ( 1, "Newsletters / E-mailing", 5 ),
+		       ( 1, "Easy Maintenance",        6 )' );
+	$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
+		VALUES ( 1, 5, 1 ),
+		       ( 1, 6, 2 ),
+		       ( 1, 7, 2 ),
+		       ( 1, 2, 2 ),
+		       ( 1, 3, 3 ),
+		       ( 1, 4, 3 ),
+		       ( 1, 1, 6 )' );
+	task_end();
+
 
 	// Allow all modules to create their own demo contents:
 	modules_call_method( 'create_demo_contents' );

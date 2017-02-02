@@ -1515,7 +1515,6 @@ input.btn-lg {
   margin: 0 1em 1em 0;
 }
 .evo_item_workflow_form .evo_item_workflow_form__fields {
-  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;
@@ -1631,9 +1630,14 @@ div#fileuploader_form {
 #attachments_fieldset_wrapper .table_scroll {
   position: relative;
 }
+#attachments_fieldset_wrapper div.results,
+#attachments_fieldset_wrapper div.table_scroll {
+  overflow: initial;
+}
 #attachments_fieldset_wrapper table tbody .dragged {
   opacity: 0.8;
   position: absolute;
+  z-index: 1000;
 }
 #attachments_fieldset_wrapper table tbody td {
   cursor: move;

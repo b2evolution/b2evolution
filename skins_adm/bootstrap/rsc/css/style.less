@@ -742,10 +742,14 @@ fieldset ul {
 		// Use this position to fix red triangle when attachment is dragged by mouse:
 		position: relative;
 	}
+	div.results, div.table_scroll {
+		overflow: initial;
+	}
 	table tbody {
 		.dragged {
 			opacity: 0.8;
 			position: absolute;
+			z-index: 1000;
 		}
 		td {
 			cursor: move;
@@ -1575,42 +1579,20 @@ table.diff {
 	}
 }
 
-.evo_poll__table {
-	margin-bottom: 14px;
+// Polls table:
+.evo_poll__percent_bar {
 	width: 100%;
-	td {
-		padding: 2px 10px 2px 0;
-		vertical-align: top;
-	}
-	tr td:last-child {
-		padding-right: 0;
-	}
-	input[type=radio], label {
-		margin: 0;
-	}
-	.evo_poll__percent_bar {
+	min-width: 40px;
+	padding-right: 6px;
+	> div {
 		width: 100%;
-		min-width: 40px;
-		padding-right: 6px;
+		vertical-align: middle;
+		display: inline-block;
 		> div {
-			width: 100%;
-			vertical-align: middle;
-			display: inline-block;
-			> div {
-				background: #ffcc66;
-				height: 12px;
-				min-width: 1px;
-			}
+			background: #ffcc66;
+			height: 12px;
+			min-width: 1px;
 		}
-	}
-	.evo_poll__selector {
-		width: 5px;
-	}
-	.evo_poll__title {
-		white-space: nowrap;
-	}
-	.evo_poll_percentage {
-		max-width: 50px;
 	}
 }
 

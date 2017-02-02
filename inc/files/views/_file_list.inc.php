@@ -89,7 +89,7 @@ $Form->begin_form();
 		}
 		else
 		{
-			echo action_icon( T_('Go to parent folder'), 'folder_parent', regenerate_url( 'path', 'path='.$fm_Filelist->_rds_list_path.'..' ) );
+			echo action_icon( T_('Go to parent folder'), 'folder_parent', regenerate_url( 'path', 'path='.rawurlencode( $fm_Filelist->_rds_list_path.'..' ) ) );
 		}
 		echo '</th>';
 
@@ -183,7 +183,7 @@ $Form->begin_form();
 		echo '<td class="checkbox firstcol">';
 		echo '<span name="surround_check" class="checkbox_surround_init">';
 		echo '<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"
-					name="fm_selected[]" value="'.rawurlencode($lFile->get_rdfp_rel_path()).'" id="cb_filename_'.$countFiles.'"';
+					name="fm_selected[]" value="'.format_to_output( $lFile->get_rdfp_rel_path(), 'formvalue' ).'" id="cb_filename_'.$countFiles.'"';
 		if( $checkall || $selected_Filelist->contains( $lFile ) )
 		{
 			echo ' checked="checked"';
@@ -339,7 +339,7 @@ $Form->begin_form();
 					$link_action = 'set_field';
 					$link_attribs['target'] = '_parent';
 					$link_attribs['class'] = 'action_icon select_file btn btn-primary btn-xs';
-					$link_attribs['onclick'] = 'return window.parent.file_select_add( select_field_name, \''.$sfile_root.'\', \''.$sfile_path.'\' );';
+					$link_attribs['onclick'] = 'return window.parent.file_select_add( \''.$field_name.'\', \''.$sfile_root.'\', \''.$sfile_path.'\' );';
 					echo action_icon( T_('Select file'), 'link',
 							regenerate_url( 'fm_selected', 'action=file_select&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
 							' '.T_('Select'), NULL, 5, $link_attribs );
@@ -488,7 +488,7 @@ $Form->begin_form();
 			}
 
 			echo action_icon( T_('Edit properties...'), 'properties', regenerate_url( 'fm_selected', 'action=edit_properties&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;'.url_crumb('file') ), NULL, NULL, NULL,
-							array( 'onclick' => 'return file_properties( \''.get_param( 'root' ).'\', \''.get_param( 'path' ).'\', \''.rawurlencode( $lFile->get_rdfp_rel_path() ).'\' )' ) );
+							array( 'onclick' => 'return file_properties( \''.get_param( 'root' ).'\', \''.get_param( 'path' ).'\', \''.$lFile->get_rdfp_rel_path().'\' )' ) );
 			echo action_icon( T_('Move'), 'file_move', regenerate_url( 'action,fm_selected,fm_sources_root', 'action=file_move&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
 			echo action_icon( T_('Copy'), 'file_copy', regenerate_url( 'action,fm_selected,fm_sources_root', 'action=file_copy&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
 			echo action_icon( T_('Delete'), 'file_delete', regenerate_url( 'fm_selected', 'action=delete&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;'.url_crumb('file') ) );
@@ -581,7 +581,7 @@ $Form->begin_form();
 				$link_action = 'set_field';
 				$link_attribs['target'] = '_parent';
 				$link_attribs['class'] = 'action_icon select_file btn btn-primary btn-xs';
-				$link_attribs['onclick'] = 'return window.parent.file_select_add( select_field_name, \''.$sfile_root.'\', \''.'$file_path$'.'\' );';
+				$link_attribs['onclick'] = 'return window.parent.file_select_add( \''.$field_name.'\', \''.$sfile_root.'\', \''.'$file_path$'.'\' );';
 				$icon_to_select_files = action_icon( T_('Select file'), 'link',
 						regenerate_url( 'fm_selected', 'action=file_select&amp;fm_selected[]='.'$file_path$'.'&amp;'.url_crumb('file') ),
 						' '.T_('Select'), NULL, 5, $link_attribs ).' ';
@@ -760,8 +760,6 @@ $Form->begin_form();
 		?>
 		<script type="text/javascript">
 			<!--
-			var select_field_name = '<?php echo $field_name;?>';
-
 			function js_act_on_selected()
 			{
 				// There may be an easier selector than below but couldn't make sense of it :(

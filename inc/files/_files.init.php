@@ -181,7 +181,7 @@ class files_Module extends Module
 	 */
 	function get_available_group_permissions()
 	{
-		global $current_User, $admin_url;
+		global $current_User, $admin_url, $Settings;
 
 		$filetypes_allowed_icon = get_icon( 'file_allowed' );
 		$filetypes_not_allowed_icon = get_icon( 'file_not_allowed' );
@@ -225,7 +225,8 @@ class files_Module extends Module
 						array( 'add', T_('Add/Upload') ),
 						array( 'edit', T_('Edit') ),
 					),
-				'perm_type' => 'radiobox',
+				// Show this perm group setting as radiobox ONLY if the shared dir is enabled by general settings:
+				'perm_type' => ( $Settings->get( 'fm_enable_roots_shared' ) ? 'radiobox' : 'hidden' ),
 				'field_lines' => false,
 				),
 			'perm_import_root' => array(

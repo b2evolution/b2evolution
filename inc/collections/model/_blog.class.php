@@ -2956,8 +2956,8 @@ class Blog extends DataObject
 		}
 
 		$set_default_blog_ID = isset( $Settings );
-		if( get_setting_Blog( 'default_blog_ID' ) )
-		{ // Don't set a default blog if it is already defined and the blog exists in DB
+		if( $Settings->get( 'default_blog_ID' ) == -1 || get_setting_Blog( 'default_blog_ID' ) )
+		{	// Don't set a default collection if it is already defined and the collection exists in DB OR back-office page is used for this:
 			$set_default_blog_ID = false;
 		}
 

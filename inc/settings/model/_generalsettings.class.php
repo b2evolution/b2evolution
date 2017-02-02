@@ -62,7 +62,7 @@ class GeneralSettings extends AbstractSettings
 		'notification_sender_name' => 'b2evo mailer', // notification emails will be sent with this sender name
 		'notification_short_name' => 'This site', // notification emails will use this as short site name
 		'notification_long_name' => '', // notification emails will use this as long site name
-		'notification_logo' => '', // notification emails will use this as url to site logo
+		'notification_logo_file_ID' => '', // notification emails will use this as url to site logo
 
 		'email_campaign_send_mode' => 'immediate', // Sending mode for campaign
 		'email_campaign_chunk_size' => 50, // Chunk size of emails to send a campaign at a time

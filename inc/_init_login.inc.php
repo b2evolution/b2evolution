@@ -82,12 +82,12 @@ $Debuglog->add( 'Login: login: '.var_export( htmlspecialchars( $login, ENT_COMPA
 $Debuglog->add( 'Login: pass: '.( empty( $pass ) ? '' : 'not' ).' empty', '_init_login' );
 
 // either 'login' (normal) or 'redirect_to_backoffice' may be set here. This also helps to display the login form again, if either login or pass were empty.
-$login_action = param_arrayindex( 'login_action' );
+$login_action_value = param_arrayindex( 'login_action' );
 
 if( ( $login != NULL ) && ( ! is_string( $login ) ) )
 { // Login must be string
 	$login = NULL;
-	if( ! empty( $login_action ) )
+	if( ! empty( $login_action_value ) )
 	{ // This was a login request with an invalid login parameter type, so it must be a doctored request
 		debug_die('The type of the received login parameter is invalid!');
 	}
@@ -95,7 +95,7 @@ if( ( $login != NULL ) && ( ! is_string( $login ) ) )
 if( ( $pass != NULL ) && ( ! is_string( $pass ) ) )
 { // Password must be string
 	$pass = NULL;
-	if( ! empty( $login_action ) )
+	if( ! empty( $login_action_value ) )
 	{ // This was a login request with an invalid pwd parameter type, so it must be a doctored request
 		debug_die('The type of the received password parameter is invalid!');
 	}
@@ -103,7 +103,7 @@ if( ( $pass != NULL ) && ( ! is_string( $pass ) ) )
 
 $UserCache = & get_UserCache();
 
-if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
+if( ! empty( $login_action_value ) || ( ! empty( $login ) && ! empty( $pass ) ) )
 { // User is trying to login right now
 
 	// Stop a request from the blocked IP addresses or Domains
@@ -439,7 +439,7 @@ if( check_user_status( 'can_be_validated' ) // user is logged in but not validat
 	}
 }
 // asimo> If login action is not empty and there was no login error, and action is not logut the we must log in
-if( !empty($login_action) && empty( $login_error ) && ( $action != 'logout' ) )
+if( ! empty( $login_action_value ) && empty( $login_error ) && ( $action != 'logout' ) )
 { // Trigger plugin event that allows the plugins to re-act on the login event:
 	// TODO: dh> these events should provide a flag "login_attempt_failed".
 	if( empty($current_User) )
@@ -450,7 +450,7 @@ if( !empty($login_action) && empty( $login_error ) && ( $action != 'logout' ) )
 	{
 		$Plugins->trigger_event( 'AfterLoginRegisteredUser', array() );
 
-		if( ! empty( $login_action ) )
+		if( ! empty( $login_action_value ) )
 		{ // We're coming from the Login form and need to redirect to the requested page:
 			$redirect_to = param( 'redirect_to', 'url', $baseurl );
 			if( empty( $redirect_to ) ||

@@ -566,6 +566,14 @@ jQuery( document ).ready( function()
 		itemPath: '> tbody',
 		itemSelector: 'tr',
 		placeholder: jQuery.parseHTML( '<tr class="placeholder"><td colspan="5"></td></tr>' ),
+		onMousedown: function( $item, _super, event )
+		{
+			if( ! event.target.nodeName.match( /^(a|img|select|span)$/i ) )
+			{	// Ignore a sort action when mouse is clicked on the tags <a>, <img>, <select> or <span>
+				event.preventDefault();
+				return true;
+			}
+		},
 		onDrop: function( $item, container, _super )
 		{
 			jQuery( '#attachments_fieldset_table table tr' ).removeClass( 'odd even' );

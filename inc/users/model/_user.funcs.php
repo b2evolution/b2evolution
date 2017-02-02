@@ -6133,4 +6133,56 @@ function validate_pwd_reset_session( $reqID, $forgetful_User )
 	return true;
 }
 
+
+/**
+ * Display form field with info about user domain
+ *
+ * @param string Field title
+ * @param string Field key
+ * @param string Domain name
+ * @param string IP address
+ * @param object Form
+ */
+function user_domain_info_display( $field_title, $field_key, $domain_name, $ip_address, & $Form )
+{
+	global $current_User, $admin_url, $UserSettings;
+
+	if( ! is_logged_in() )
+	{	// Only for logged in users:
+		return;
+	}
+
+	$domain_name_formatted = format_to_output( $domain_name );
+	$display_user_domain = ( ! empty( $domain_name ) && $current_User->check_perm( 'stats', 'list' ) );
+	$perm_stat_edit = $current_User->check_perm( 'stats', 'edit' );
+	if( $display_user_domain )
+	{	// Get Domain:
+		$DomainCache = & get_DomainCache();
+		if( $Domain = & get_Domain_by_subdomain( $domain_name ) && $perm_stat_edit )
+		{	// Set a link to edit a top existing domain:
+			$domain_name_formatted = preg_replace( '#('.preg_quote( trim( $Domain->get( 'name' ), '.' ) ).')$#i',
+				'<a href="'.$admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID.'">$1</a>',
+				$domain_name_formatted );
+		}
+	}
+	$Form->begin_line( $field_title, NULL, ( $display_user_domain && $perm_stat_edit ? '' : 'info' ) );
+		$Form->info_field( '', $domain_name_formatted.( ! empty( $ip_address ) ? ' <button class="btn btn-default" onclick="return get_whois_info(\''.$ip_address.'\');">'.get_icon( 'magnifier' ).'</button>' : '' ) );
+		if( $display_user_domain )
+		{	// Display status of Domain if current user has a permission:
+			$domain_status = $Domain ? $Domain->get( 'status' ) : 'unknown';
+			$domain_status_icon = '<div id="'.$field_key.'_icon" class="status_icon">'.stats_dom_status_icon( $domain_status ).'</div>';
+			if( $perm_stat_edit )
+			{	// User can edit Domain
+				// Link to create a new domain:
+				$domain_status_action = action_icon( sprintf( T_('Add domain %s'), $domain_name ), 'new', $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_new&amp;dom_name='.$domain_name.'&amp;dom_status='.$domain_status );
+				$Form->select_input_array( 'edited_'.$field_key, $domain_status, stats_dom_status_titles(), '<b class="evo_label_inline">'.T_( 'Status' ).': </b>'.$domain_status_icon, '', array( 'force_keys_as_values' => true, 'background_color' => stats_dom_status_colors(), 'field_suffix' => $domain_status_action ) );
+			}
+			else
+			{ // Only view status of Domain
+				$Form->info( '<b class="evo_label_inline">'.T_( 'Status' ).': </b>'.$domain_status_icon, stats_dom_status_title( $domain_status ) );
+			}
+		}
+	$Form->end_line( NULL, ( $display_user_domain && $perm_stat_edit ? '' : 'info' ) );
+}
+
 ?>

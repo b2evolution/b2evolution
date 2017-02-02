@@ -111,8 +111,11 @@ class image_Widget extends ComponentWidget
 					'label' => T_('Fallback image filename'),
 					'note' => T_('If no file was selected. Relative to the root of the selected source.'),
 					'defaultvalue' => 'logo.png',
-					'valid_pattern' => array( 'pattern'=>'~^[a-z0-9_\-/][a-z0-9_.\-/]*$~i',
-																		'error'=>T_('Invalid filename.') ),
+					'valid_pattern' => array( 'pattern'=>'~^$|^[a-z0-9_\-/][a-z0-9_.\-/]*$~i',
+											  'error'=>T_('Invalid filename.') ),
+					// the following is necessary to catch user input value of "<". Otherwise, "<" and succeeding characters
+					// will translate to an empty string and pass the regex pattern below
+					'type' => 'html_input',
 				),
 				'size_begin_line' => array(
 					'type' => 'begin_line',
@@ -207,7 +210,21 @@ class image_Widget extends ComponentWidget
 				break;
 		}
 
-		if( $this->disp_params['check_file'] && ! file_exists( $image_path.$this->disp_params['image_file'] ) )
+		if( ! empty( $File ) && file_exists( $File->get_full_path() ) )
+		{
+			$image_url = $File->get_url();
+		}
+		elseif( ! empty( $this->disp_params['image_file'] ) && file_exists( $image_path.$this->disp_params['image_file'] ) )
+		{
+			$image_url .= $this->disp_params['image_file'];
+		}
+		else
+		{
+			$image_url = '';
+		}
+
+
+		if( $this->disp_params['check_file'] && empty( $image_url ) )
 		{ // Logo file doesn't exist, Exit here because of widget setting requires this
 			return true;
 		}
@@ -216,20 +233,12 @@ class image_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_start'];
 
-		if( ! empty( $File ) )
-		{
-			$image_attrs = array(
-				'src'   => $File->get_url(),
-				'alt'   => $this->disp_params['alt'],
-			);
-		}
-		else
-		{
-			$image_attrs = array(
-				'src'   => $image_url.$this->disp_params['image_file'],
-				'alt'   => $this->disp_params['alt'],
-			);
-		}
+
+		$image_attrs = array(
+			'src'   => $image_url,
+			'alt'   => $this->disp_params['alt'],
+		);
+
 		// Initialize image attributes:
 		$image_attrs['style'] = 'width:'.( empty( $this->disp_params['width'] ) ? 'auto' : format_to_output( $this->disp_params['width'], 'htmlattr' ) ).';';
 		// Image height:

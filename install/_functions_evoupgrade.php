@@ -8109,6 +8109,36 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12155, 'Renaming notification logo setting...' ) )
+	{ // part of 6.8.5-stable
+		$notification_logo = $DB->get_var( 'SELECT set_value FROM T_settings WHERE set_name = "notification_logo"' );
+		if( !empty( $notification_logo ) )
+		{
+			if( is_numeric( $notification_logo ) )
+			{ // We have a numeric value, it's possible that this is already a file_ID.
+			  // Make sure that the integer is a valid file ID and an image file before setting it as the notification_logo_file_ID.
+				$notification_logo = intval( $notification_logo );
+				$file_type = $DB->get_var( 'SELECT file_type FROM T_files WHERE file_ID = '.$notification_logo );
+				if( $file_type && $file_type == 'image' )
+				{
+					$DB->query( 'INSERT INTO T_settings ( set_name, set_value ) VALUES ( "notification_logo_file_ID", '.$notification_logo.' )' );
+				}
+			}
+
+			// Remove previous notification logo setting
+			$DB->query( 'DELETE FROM T_settings WHERE set_name = "notification_logo"' );
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12160, 'Renaming user setting...' ) )
+	{	// part of 6.8.6-stable
+		$DB->query( 'UPDATE T_users__usersettings
+			  SET uset_name = "user_registered_from_domain"
+			WHERE uset_name = "user_domain"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

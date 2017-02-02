@@ -347,7 +347,7 @@ var downloadInterval = setInterval( function()
 						$robots_index = false;
 					}
 				}
-				elseif( array_diff( $active_filters, array( 'cat_array', 'cat_modifier', 'cat_focus', 'posts', 'page' ) ) == array() )
+				elseif( array_diff( $active_filters, array( 'cat_single', 'cat_array', 'cat_modifier', 'cat_focus', 'posts', 'page' ) ) == array() )
 				{ // This is a category page
 					$disp_detail = 'posts-cat';
 					$seo_page_type = 'Category page';

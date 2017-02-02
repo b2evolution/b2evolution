@@ -24,44 +24,6 @@ global $edited_Group;
 
 global $action;
 
-// asimo> this may belong to the pluggable permissions display
-// javascript to handle shared root permissions, when file permission was changed
-?>
-<script type="text/javascript">
-	function file_perm_changed()
-	{
-		var file_perm = jQuery( '[name="edited_grp_perm_files"]:checked' ).val();
-		if( file_perm == null )
-		{ // there is file perms radio
-			return;
-		}
-
-		switch( file_perm )
-		{
-		case "none":
-			jQuery('#edited_grp_perm_shared_root_radio_2').attr('disabled', 'disabled');
-			jQuery('#edited_grp_perm_shared_root_radio_3').attr('disabled', 'disabled');
-			jQuery('#edited_grp_perm_shared_root_radio_4').attr('disabled', 'disabled');
-			break;
-		case "view":
-			jQuery('#edited_grp_perm_shared_root_radio_2').removeAttr('disabled');
-			jQuery('#edited_grp_perm_shared_root_radio_3').attr('disabled', 'disabled');
-			jQuery('#edited_grp_perm_shared_root_radio_4').attr('disabled', 'disabled');
-			break;
-		case "add":
-			jQuery('#edited_grp_perm_shared_root_radio_2').removeAttr('disabled');
-			jQuery('#edited_grp_perm_shared_root_radio_3').removeAttr('disabled');
-			jQuery('#edited_grp_perm_shared_root_radio_4').attr('disabled', 'disabled');
-			break;
-		default:
-			jQuery('#edited_grp_perm_shared_root_radio_2').removeAttr('disabled');
-			jQuery('#edited_grp_perm_shared_root_radio_3').removeAttr('disabled');
-			jQuery('#edited_grp_perm_shared_root_radio_4').removeAttr('disabled');
-		}
-	}
-</script>
-<?php
-
 /**
  * Display pluggable permissions
  *
@@ -92,7 +54,7 @@ function display_pluggable_permissions( &$Form, $perm_block )
 					{
 						case 'checkbox':
 							$Form->checkbox_input( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name] == 'allowed', $perm['label'], array( 'input_suffix' => ' '.$perm['note'], 'value' => 'allowed' ) );
-						break;
+							break;
 
 						case 'radiobox':
 							if( ! isset( $perm['field_lines'] ) )
@@ -104,15 +66,19 @@ function display_pluggable_permissions( &$Form, $perm_block )
 								$perm['field_note'] = '';
 							}
 							$Form->radio( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name], $perm['options'], $perm['label'], $perm['field_lines'], $perm['field_note'] );
-						break;
+							break;
 
 						case 'info':
 							$Form->info( $perm['label'], $perm['info'] );
-						break;
+							break;
 
 						case 'text_input':
 							$Form->text_input( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name], 5, $perm['label'], $perm['note'], array( 'maxlength' => $perm['maxlength'] ) );
-						break;
+							break;
+
+						case 'hidden':
+							$Form->hidden( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name] );
+							break;
 					}
 				}
 			}
@@ -264,10 +230,48 @@ $Form->end_form();
 // set shared root permission availability, when form was loaded and when file perms was changed
 ?>
 <script type="text/javascript">
+<?php
+if( $Settings->get('fm_enable_roots_shared') )
+{	// asimo> this may belong to the pluggable permissions display
+	// javascript to handle shared root permissions, when file permission was changed:
+?>
+function file_perm_changed()
+{
+	var file_perm = jQuery( '[name="edited_grp_perm_files"]:checked' ).val();
+	if( file_perm == null )
+	{ // there is file perms radio
+		return;
+	}
+
+	switch( file_perm )
+	{
+	case "none":
+		jQuery('#edited_grp_perm_shared_root_radio_2').attr('disabled', 'disabled');
+		jQuery('#edited_grp_perm_shared_root_radio_3').attr('disabled', 'disabled');
+		jQuery('#edited_grp_perm_shared_root_radio_4').attr('disabled', 'disabled');
+		break;
+	case "view":
+		jQuery('#edited_grp_perm_shared_root_radio_2').removeAttr('disabled');
+		jQuery('#edited_grp_perm_shared_root_radio_3').attr('disabled', 'disabled');
+		jQuery('#edited_grp_perm_shared_root_radio_4').attr('disabled', 'disabled');
+		break;
+	case "add":
+		jQuery('#edited_grp_perm_shared_root_radio_2').removeAttr('disabled');
+		jQuery('#edited_grp_perm_shared_root_radio_3').removeAttr('disabled');
+		jQuery('#edited_grp_perm_shared_root_radio_4').attr('disabled', 'disabled');
+		break;
+	default:
+		jQuery('#edited_grp_perm_shared_root_radio_2').removeAttr('disabled');
+		jQuery('#edited_grp_perm_shared_root_radio_3').removeAttr('disabled');
+		jQuery('#edited_grp_perm_shared_root_radio_4').removeAttr('disabled');
+	}
+}
+
 file_perm_changed();
 jQuery( '[name="edited_grp_perm_files"]' ).click( function() {
 	file_perm_changed();
 } );
+<?php } ?>
 
 jQuery( 'input[name=edited_grp_perm_options]' ).click( function()
 {	// Show/Hide the children permissions of the Settings permission

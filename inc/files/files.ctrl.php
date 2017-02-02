@@ -146,8 +146,8 @@ if( in_array( $action, array( 'move_copy', 'file_move', 'file_copy' ) ) )
 	memorize_param( 'action', 'string', '', $action );
 }
 
-if( ! empty( $action ) && substr( $fm_mode, 0, 5 ) != 'link_' )
-{	// The only modes which can tolerate simultaneous actions at this time are link_* modes (item, user...)
+if( ! empty( $action ) && substr( $fm_mode, 0, 5 ) != 'link_' && $fm_mode != 'file_select' )
+{	// The only modes which can tolerate simultaneous actions at this time are link_* modes (item, user...) and file_select
 	$fm_mode = '';
 }
 
@@ -347,7 +347,7 @@ $selected_Filelist = new Filelist( $fm_FileRoot, $ads_list_path );
 
 foreach( $fm_selected as $l_source_path )
 {
-	$selected_Filelist->add_by_subpath( urldecode($l_source_path), true );
+	$selected_Filelist->add_by_subpath( $l_source_path, true );
 }
 
 
@@ -785,7 +785,7 @@ switch( $action )
 			$source_Filelist = new Filelist( $sources_Root );
 			foreach( $fm_selected as $l_source_path )
 			{
-				$source_Filelist->add_by_subpath( urldecode($l_source_path), true );
+				$source_Filelist->add_by_subpath( $l_source_path, true );
 			}
 		}
 
