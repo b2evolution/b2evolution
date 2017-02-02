@@ -78,12 +78,16 @@ function param_format( $value, $type = 'raw' )
 			return utf8_trim( $value );
 
 		case 'url':
-			// Decode url:
-			$value = urldecode( $value );
 			// strip out any html:
 			$value = utf8_trim( utf8_strip_tags( $value ) );
 			// Remove new line chars and double quote from url
 			return preg_replace( '~\r|\n|"~', '', $value );
+
+		case 'filepath':
+			// Fiel path must be a string:
+			$value = param_format( $value, 'string' );
+			// Replace windows backslashes:
+			return str_replace( '\\', '/', $value );
 
 		case 'boolean':
 			return (bool)$value;
@@ -118,12 +122,15 @@ function param_format( $value, $type = 'raw' )
  * - float, double
  * - string (strips (HTML-)Tags, trims whitespace)
  * - text like string but allows multiple lines
+ * - filepath like string but die execution if it contains unsecure string like "../"
  * - array (it may contains arbitrary array elements) NOTE: If there is one way to avoid and use some other array type then it should not be used
  * - array:integer (elements of array must be integer)
  * - array:string (strips (HTML-)Tags, trims whitespace of array's elements)
+ * - array:filepath (elements of array must be allowed file paths)
  * - array:/regexp/ (elements of array must match to the given regular expression) e.g. 'array:/^[a-z]*$/'
  * - array:array:integer (two dimensional array and the elements must be integers)
  * - array:array:string (strips (HTML-)Tags, trims whitespace of the two dimensional array's elements)
+ * - array:array:filepath (elements of array must be allowed file paths)
  * - html (does nothing, for now)
  * - raw (does nothing)
  * - '' (does nothing) -- DEPRECATED, use "raw" instead
@@ -289,6 +296,23 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as url', 'params' );
 				break;
 
+			case 'filepath':
+				if( ! is_scalar( $GLOBALS[$var] ) )
+				{	// This happens if someone uses "foo[]=x" where "foo" is expected as string
+					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
+				}
+
+				// Format param to valid value:
+				$GLOBALS[$var] = param_format( $GLOBALS[$var], 'filepath' );
+
+				if( ! is_safe_filepath( $GLOBALS[$var] ) )
+				{	// We cannot accept this unsecure file path:
+					bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
+				}
+
+				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as filepath', 'params' );
+				break;
+
 			case 'array:integer':
 			case 'array:array:integer':
 				// Set elements type to integer, and set the corresponding regular expression
@@ -296,19 +320,21 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				$elements_regexp = '/^(\+|-)?[0-9]+$/';
 			case 'array':
 			case 'array:string':
+			case 'array:filepath':
 			case 'array:regexp':
 			case 'array:array:string':
+			case 'array:array:filepath':
 				if( ! is_array( $GLOBALS[$var] ) )
 				{ // This param must be array
 					debug_die( 'param(-): <strong>'.$var.'</strong> is not array!' );
 				}
 
-				// Store current array in temp var for checking and preparing
+				// Store current array in temp var for checking and preparing:
 				$globals_var = $GLOBALS[$var];
-				// Check if the given array type is one dimensional array
-				$one_dimensional = ( ( $type == 'array' ) || ( $type == 'array:integer' ) || ( $type == 'array:string' ) || ( $type == 'array:regexp' ) );
-				// Check if the given array type should contains string elements
-				$contains_strings = ( ( $type == 'array:string' ) || ( $type == 'array:array:string' ) );
+				// Check if the given array type is one dimensional array:
+				$one_dimensional = ( ( $type == 'array' ) || ( $type == 'array:integer' ) || ( $type == 'array:string' ) || ( $type == 'array:filepath' ) || ( $type == 'array:regexp' ) );
+				// Check if the given array type should contains string elements:
+				$contains_strings = ( ( $type == 'array:string' ) || ( $type == 'array:array:string' ) || ( $type == 'array:filepath' ) || ( $type == 'array:array:filepath' ) );
 				if( $one_dimensional )
 				{ // Convert to a two dimensional array to handle one and two dimensional arrays the same way
 					$globals_var = array( $globals_var );
@@ -336,9 +362,20 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 						}
 
 						if( $contains_strings )
-						{ // Prepare string elements of array
-							// Format param to valid value:
-							$globals_var[$i][$j] = param_format( $var_value, 'string' );
+						{	// Prepare string elements of array:
+							if( $type == 'array:filepath' || $type == 'array:array:filepath' )
+							{	// Special verifying for file path params:
+								// Format param to valid file path value:
+								$globals_var[$i][$j] = param_format( $var_value, 'filepath' );
+								if( ! is_safe_filepath( $globals_var[$i][$j] ) )
+								{	// We cannot accept this unsecure file path:
+									bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
+								}
+							}
+							else
+							{	// Format param to valid string value:
+								$globals_var[$i][$j] = param_format( $var_value, 'string' );
+							}
 							continue;
 						}
 
@@ -1313,6 +1350,10 @@ function param_extend_list( $var, $var_ext_array, $save_prefix = true )
 /**
  * Compiles the cat array from $cat (recursive + optional modifiers) and $catsel[] (non recursive)
  * and keeps those values available for future reference (category widget)
+ *
+ * @param integer Colection ID to restrict chapters only from this collection
+ * @param integer Default category ID
+ * @param array Default categories IDs
  */
 function param_compile_cat_array( $restrict_to_blog = 0, $cat_default = NULL, $catsel_default = array() )
 {
@@ -2031,15 +2072,15 @@ function get_param_urlencoded($var, $value, $glue = '&amp;')
  */
 function is_regexp( $reg_exp, $includes_delim = false )
 {
-	$sPREVIOUSHANDLER = set_error_handler( '_trapError' );
+	set_error_handler( '_trapError' );
 	if( ! $includes_delim )
 	{
 		$reg_exp = '#'.str_replace( '#', '\#', $reg_exp ).'#';
 	}
 	preg_match( $reg_exp, '' );
-	restore_error_handler( $sPREVIOUSHANDLER );
+	restore_error_handler();
 
-	return !_traperror();
+	return !_trapError();
 }
 
 
@@ -2697,6 +2738,48 @@ function param_check_serialized_array( $param_name )
 	{	// Wrong data:
 		return false;
 	}
+}
+
+
+/**
+ * Check if the file path is safe
+ *
+ * @param string File path
+ * @return boolean
+ */
+function is_safe_filepath( $filepath )
+{
+	global $filemanager_allow_dotdot_in_filenames;
+
+	if( ! isset( $filemanager_allow_dotdot_in_filenames ) )
+	{	// This config var is required:
+		debug_die( 'The var <strong>$filemanager_allow_dotdot_in_filenames</strong> must be defined in config file.' );
+	}
+
+	if( empty( $filepath ) )
+	{	// Allow empty file path:
+		return true;
+	}
+
+	if( ! $filemanager_allow_dotdot_in_filenames &&
+	    strpos( $filepath, '..' ) !== false )
+	{	// Don't allow .. in file path because it is disable by config:
+		return false;
+	}
+
+	do
+	{	// Decode file path while it is possible:
+		$orig_filepath = $filepath;
+		$filepath = urldecode( $filepath );
+
+		if( strpos( $filepath, '../' ) !== false || strpos( $filepath, '..\\' ) !== false )
+		{	// Don't allow a traversal directory:
+			return false;
+		}
+	}
+	while( $filepath != $orig_filepath );
+
+	return true;
 }
 
 ?>

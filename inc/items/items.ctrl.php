@@ -236,7 +236,7 @@ switch( $action )
 
 		$FileRootCache = & get_FileRootCache();
 		// getting root
-		$root = param( 'root' );
+		$root = param( 'root', 'string' );
 
 		$fm_FileRoot = & $FileRootCache->get_by_ID( $root, true );
 
@@ -262,10 +262,10 @@ switch( $action )
 
 		load_class( 'files/model/_filelist.class.php', 'FileList' );
 		$selected_Filelist = new Filelist( $fm_FileRoot, false );
-		$fm_selected = param( "fm_selected" , "array" );
+		$fm_selected = param( 'fm_selected', 'array:filepath' );
 		foreach( $fm_selected as $l_source_path )
 		{
-			$selected_Filelist->add_by_subpath( urldecode($l_source_path), true );
+			$selected_Filelist->add_by_subpath( $l_source_path, true );
 		}
 		// make sure we have loaded metas for all files in selection!
 		$selected_Filelist->load_meta();

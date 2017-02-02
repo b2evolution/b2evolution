@@ -59,6 +59,7 @@ module.exports = function(grunt) {
 					'skins/green_bootstrap_theme/forum/style.css':  'skins/green_bootstrap_theme/forum/style.less',
 					'skins/green_bootstrap_theme/manual/style.css': 'skins/green_bootstrap_theme/manual/style.less',
 					'skins/bootstrap_blog_skin/style.css':    'skins/bootstrap_blog_skin/style.less',
+					'skins/bootstrap_catalog_skin/style.css':    'skins/bootstrap_catalog_skin/style.less',
 					'skins/bootstrap_main_skin/style.css':    'skins/bootstrap_main_skin/style.less',
 					'skins/bootstrap_forums_skin/style.css':  'skins/bootstrap_forums_skin/style.less',
 					'skins/bootstrap_gallery_legacy/style.css': 'skins/bootstrap_gallery_legacy/style.less',
@@ -160,6 +161,7 @@ module.exports = function(grunt) {
 					'skins/green_bootstrap_theme/forum/style.min.css':  'skins/green_bootstrap_theme/forum/style.css',
 					'skins/green_bootstrap_theme/manual/style.min.css': 'skins/green_bootstrap_theme/manual/style.css',
 					'skins/bootstrap_blog_skin/style.min.css':    'skins/bootstrap_blog_skin/style.css',
+					'skins/bootstrap_catalog_skin/style.min.css':    'skins/bootstrap_catalog_skin/style.css',
 					'skins/bootstrap_main_skin/style.min.css':    'skins/bootstrap_main_skin/style.css',
 					'skins/bootstrap_forums_skin/style.min.css':  'skins/bootstrap_forums_skin/style.css',
 					'skins/bootstrap_gallery_legacy/style.min.css': 'skins/bootstrap_gallery_legacy/style.css',
@@ -233,7 +235,7 @@ module.exports = function(grunt) {
 			// JS files that are used on front-office standard skins:
 			evo_frontoffice: {
 				options: {
-					banner: '/* This includes 8 files: src/evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js, ajax.js */\n'
+					banner: '/* This includes 9 files: src/evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js, src/evo_links.js, ajax.js */\n'
 				},
 				nonull: true, // Display missing files
 				src: ['rsc/js/src/evo_modal_window.js',
@@ -243,13 +245,14 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_contact_groups.js',
 							'rsc/js/src/evo_rest_api.js',
 							'rsc/js/src/evo_item_flag.js',
+							'rsc/js/src/evo_links.js',
 							'rsc/js/ajax.js'],
 				dest: 'rsc/js/build/evo_frontoffice.bmin.js'
 			},
 			// JS files that are used on front-office bootstrap skins:
 			evo_frontoffice_bootstrap: {
 				options: {
-					banner: '/* This includes 8 files: src/bootstrap-evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js, ajax.js */\n'
+					banner: '/* This includes 9 files: src/bootstrap-evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js, src/evo_links.js, ajax.js */\n'
 				},
 				nonull: true, // Display missing files
 				src: ['rsc/js/src/bootstrap-evo_modal_window.js',
@@ -259,6 +262,7 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_contact_groups.js',
 							'rsc/js/src/evo_rest_api.js',
 							'rsc/js/src/evo_item_flag.js',
+							'rsc/js/src/evo_links.js',
 							'rsc/js/ajax.js'],
 				dest: 'rsc/js/build/bootstrap-evo_frontoffice.bmin.js'
 			},

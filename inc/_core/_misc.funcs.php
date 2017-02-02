@@ -8150,10 +8150,13 @@ function render_inline_files( $content, $Object, $params = array() )
 	{	// There are inline tags in the content...
 
 		$rendered_tags = render_inline_tags( $Object, $inlines[0], $params );
-		foreach( $rendered_tags as $current_link_tag => $rendered_link_tag )
-		{
-			$content = str_replace( $current_link_tag, $rendered_link_tag, $content );
-		}
+		if( $rendered_tags )
+		{	// Do replacing if the object really contains inline attached tags:
+			foreach( $rendered_tags as $current_link_tag => $rendered_link_tag )
+			{
+				$content = str_replace( $current_link_tag, $rendered_link_tag, $content );
+			}
+		}	
 	}
 
 	return $content;
@@ -8201,7 +8204,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 		switch( $object_class )
 		{
 			case 'Item':
-				$LinkOwner = new LinkItem( $Object );
+				$LinkOwner = new LinkItem( $Object, $temp_link_owner_ID );
 				$prepare_plugin_event_name = 'PrepareForRenderItemAttachment';
 				$render_plugin_event_name = 'RenderItemAttachment';
 				break;

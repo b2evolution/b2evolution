@@ -108,6 +108,7 @@ $thumbnail_sizes = array(
 			'fit-160x120' => array( 'fit', 160, 120, 80 ),
 			'fit-128x128' => array( 'fit', 128, 128, 80 ),
 			'fit-80x80' => array( 'fit', 80, 80, 80 ),
+			'crop-480x600' => array( 'crop', 480, 600, 95 ),
 			'crop-480x320' => array( 'crop', 480, 320, 90 ),
 			'crop-256x256' => array( 'crop', 256, 256, 85 ),
 			'crop-192x192' => array( 'crop', 192, 192, 85 ),
@@ -654,6 +655,13 @@ $filename_max_length = 64;
  * The OS independent max length is 767, because that is what b2evolution can handle correctly.
  */
 $dirpath_max_length = ( ( ( strtoupper( substr( PHP_OS, 0, 3 ) ) ) === 'WIN' ) ? ( 247 - 35 /* the maximum additional path length because of the _evocache folder */ ) : 767 ) - $filename_max_length;
+
+
+/**
+ * Allow double dots in file names
+ * Use TRUE if you want to allow ".." in file and directory names like "..filename" or "dir..name"
+ */
+$filemanager_allow_dotdot_in_filenames = false;
 
 
 /**

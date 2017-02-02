@@ -33,18 +33,23 @@ if( file_exists( $emailskins_path.'_email_style.css' ) )
 <body<?php echo emailskin_style( 'body.email' ); ?>>
 <div class="email_wrap"<?php echo emailskin_style( 'div.email_wrap' ); ?>>
 <?php
-if( $Settings->get( 'notification_logo' ) != '' || $Settings->get( 'notification_long_name' ) != '' )
-{ // Display email header if logo or long site name are defined
+$notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
+if( $notification_logo_file_ID > 0 || $Settings->get( 'notification_long_name' ) != '' )
+{	// Display email header if logo or long site name are defined:
 ?>
 <div<?php echo emailskin_style( 'div.email_header' ); ?>>
 <?php
-if( $Settings->get( 'notification_logo' ) != '' )
-{ // Display site logo
+
+if( $notification_logo_file_ID > 0 &&
+    ( $FileCache = & get_FileCache() ) &&
+    ( $File = $FileCache->get_by_ID( $notification_logo_file_ID, false ) ) &&
+    $File->is_image() )
+{	// Display site logo image if the file exists in DB and it is an image:
 	$site_name = $Settings->get( 'notification_long_name' ) != '' ? $Settings->get( 'notification_long_name' ) : $Settings->get( 'notification_short_name' );
-	echo '<img src="'.$Settings->get( 'notification_logo' ).'" alt="'.$site_name.'" />';
+	echo '<img src="'.$File->get_url().'" alt="'.$site_name.'" />';
 }
 else
-{ // No logo, Display only long site name
+{	// Display only long site name if the logo file cannot be used by some reason above:
 	echo '<p'.emailskin_style( '.p+p.sitename' ).'>'.$Settings->get( 'notification_long_name' ).'</p>';
 }
 ?>

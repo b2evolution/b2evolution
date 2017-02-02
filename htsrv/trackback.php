@@ -33,6 +33,10 @@ $debug = false;
 // Do not append Debug JSlog to response!
 $debug_jslog = false;
 
+// Don't check new updates from b2evolution.net (@see b2evonet_get_updates()),
+// in order to don't break the response data:
+$allow_evo_stats = false;
+
 /**
  * Send a trackback response and exits.
  *

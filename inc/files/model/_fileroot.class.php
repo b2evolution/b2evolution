@@ -258,6 +258,26 @@ class FileRoot
 		debug_die( "Invalid root type" );
 	}
 
+
+	/**
+	 * Check if this file root contains a file/folder with given relative path
+	 *
+	 * @param string Subpath for file/folder, relative the associated root, including trailing slash (if directory)
+	 * @return boolean
+	 */
+	function contains( $rel_path )
+	{
+		// Convert a path from "/dir1/dir2/../dir3/file.txt" to "/dir1/dir3/file.txt":
+		$real_abs_path = get_canonical_path( $this->ads_path.$rel_path );
+
+		// Check if the given file/folder is realy contained in this root:
+		if( ! empty( $real_abs_path ) && strpos( $real_abs_path, $this->ads_path ) !== 0 )
+		{	// Deny access from another file root:
+			debug_die( 'Denied access to files from another root!' );
+		}
+
+		return true;
+	}
 }
 
 ?>

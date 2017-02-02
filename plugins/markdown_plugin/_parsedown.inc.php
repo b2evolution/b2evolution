@@ -29,6 +29,7 @@ Modifications by yura:
 	9. Don't apply <p> around list and already existing paragraph tags
 	10. Don't convert HTML entities inside <code> html tags because the "Escape code" plugin does this
 	11. Fix the missed empty lines in code blocks which are started and ended with ```
+	12. Ignore wrong URLs for links and images; Allow only which begin with http://, https:// or /
 */
 
 class Parsedown
@@ -100,7 +101,7 @@ class Parsedown
 
 		# Extracts link references.
 
-		if (preg_match_all('/^[ ]{0,3}\[(.+)\][ ]?:[ ]*\n?[ ]*(.+)$/m', $text, $matches, PREG_SET_ORDER))
+		if (preg_match_all('/^[ ]{0,3}\[(.+)\][ ]?:[ ]*\n?[ ]*((https?:\/\/|\/).+)$/m', $text, $matches, PREG_SET_ORDER))
 		{
 			foreach ($matches as $matches)
 			{
@@ -589,7 +590,7 @@ class Parsedown
 			if( strpos($text, '](') !== FALSE ) # inline
 			{
 				$text = str_replace( '&quot;', '"', $text ); // revert from html entity
-				if( preg_match_all( '/(!?)(\[((?:[^][]+|(?2))*)\])\(([^"]*?)( "([^"]+)")?\)/', $text, $matches, PREG_SET_ORDER ) )
+				if( preg_match_all( '/(!?)(\[((?:[^][]+|(?2))*)\])\((https?:\/\/|\/)([^"]*?)( "([^"]+)")?\)/', $text, $matches, PREG_SET_ORDER ) )
 				{
 					foreach ($matches as $matches)
 					{
@@ -597,7 +598,7 @@ class Parsedown
 						{
 							if( $this->parse_images )
 							{ // Parse images only if it is enabled
-								$element = '<img src="'.$matches[4].'" alt="'.$matches[3].'"'.( ! empty( $matches[6] ) ? ' title="'.$matches[6].'"' : '' ).'>';
+								$element = '<img src="'.$matches[4].$matches[5].'" alt="'.$matches[3].'"'.( ! empty( $matches[7] ) ? ' title="'.$matches[7].'"' : '' ).'>';
 							}
 						}
 						else
@@ -605,7 +606,7 @@ class Parsedown
 							if( $this->parse_links )
 							{ // Parse links only if it is enabled
 								$element_text = $this->parse_inline_elements($matches[3]);
-								$element = '<a href="'.$matches[4].'"'.( ! empty( $matches[6] ) ? ' title="'.$matches[6].'"' : '' ).'>'.$element_text.'</a>';
+								$element = '<a href="'.$matches[4].$matches[5].'"'.( ! empty( $matches[7] ) ? ' title="'.$matches[7].'"' : '' ).'>'.$element_text.'</a>';
 							}
 						}
 

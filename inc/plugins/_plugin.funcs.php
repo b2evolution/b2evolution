@@ -479,6 +479,18 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			$Form->color_input( $input_name, $set_value, $set_label, '', $params );
 			break;
 
+		case 'fileselect':
+			if( isset( $parmeta['size'] ) )
+			{
+				$params['max_file_num'] = $parmeta['size'];
+			}
+
+			$params['root'] = isset( $parmeta['root'] ) ? $parmeta['root'] : '';
+			$params['path'] = isset( $parmeta['path'] ) ? $parmeta['path'] : '';
+			$params['size_name'] = isset( $parmeta['thumbnail_size'] ) ? $parmeta['thumbnail_size'] : 'crop-64x64';
+			$Form->fileselect( $input_name, $set_value, $set_label, '', $params );
+			break;
+
 		default:
 			debug_die( 'Unsupported type ['.$parmeta['type'].'] from GetDefaultSettings()!' );
 	}

@@ -648,7 +648,7 @@ if( $inskin && use_in_skin_login() )
 		{ // redirect to inskin login page
 			$redirect = $Blog->get( 'loginurl', array( 'glue' => '&' ) );
 		}
-		$redirect = url_add_param( $redirect, 'redirect_to='.$redirect_to, '&' );
+		$redirect = url_add_param( $redirect, 'redirect_to='.rawurlencode( $redirect_to ), '&' );
 		header_redirect( $redirect );
 		// already exited here
 		exit(0);

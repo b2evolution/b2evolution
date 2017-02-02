@@ -124,6 +124,7 @@ class ItemListLight extends DataObjectList2
 				'ts_max' => $timestamp_max,
 				'ts_created_max' => NULL,
 				'coll_IDs' => NULL, // empty: current blog only; "*": all blogs; "1,2,3": blog IDs separated by comma; "-": current blog only and exclude the aggregated blogs
+				'cat_single' => NULL, 	// If we requested a "single category" page, ID of the top category
 				'cat_array' => array(),
 				'cat_modifier' => NULL,
 				'cat_focus' => 'wide',					// Search in extra categories, not just main cat
@@ -386,9 +387,20 @@ class ItemListLight extends DataObjectList2
 		/*
 		 * Blog & Chapters/categories restrictions:
 		 */
+		$cat = param( 'cat', '/^[*\-\|]?([0-9]+(,[0-9]+)*)?$/', $this->default_filters['cat_modifier'], true ); // List of cats to restrict to
+		$catsel = param( 'catsel', 'array:integer', $this->default_filters['cat_array'], true );  // Array of cats to restrict to
+
+		if( empty( $catsel ) && preg_match( '~^[0-9]+$~', $cat ) )
+		{	// We are on a single cat page: (equivalent to $disp_detail == 'posts-topcat')
+			// NOTE: we must have selected EXACTLY ONE CATEGORY through the cat parameter
+			// BUT: - this can resolve to including children
+			//      - selecting exactly one cat through catsel[] is NOT OK since not equivalent (will exclude children)
+			// Record this "single cat":
+			$this->filters['cat_single'] = $cat;
+		}					
+
 		// Get chapters/categories (and compile those values right away)
-		param_compile_cat_array( /* TODO: check $this->Blog->ID == 1 ? 0 :*/ !is_null( $this->Blog ) ? $this->Blog->ID : 0,
-								$this->default_filters['cat_modifier'], $this->default_filters['cat_array'] );
+		param_compile_cat_array( ( is_null( $this->Blog ) ? 0 : $this->Blog->ID ), $this->default_filters['cat_modifier'], $this->default_filters['cat_array'] );
 
 		$this->filters['cat_array'] = get_param( 'cat_array' );
 		$this->filters['cat_modifier'] = get_param( 'cat_modifier' );
@@ -923,6 +935,7 @@ class ItemListLight extends DataObjectList2
 				'category_text'       => T_('Category').': ',
 				'categories_text'     => T_('Categories').': ',
 				'categories_nor_text' => T_('All but '),
+				'categories_display'  => 'toplevel', 	// 'full' | 'toplevel'
 
 				'display_tag'         => true,
 				'tag_text'            => T_('Tag').': ',
@@ -1007,17 +1020,29 @@ class ItemListLight extends DataObjectList2
 		// CATEGORIES:
 		if( $params['display_category'] )
 		{
-			if( ! empty( $this->filters['cat_array'] ) )
+			$catlist = NULL;
+			if( $params['categories_display'] == 'toplevel' // We'd like to minimize display if possible
+				&& !empty($this->filters['cat_single']) )	// ... AND we are on a "single cat" page
+			{	// We want to show only the top cat (and not its children)
+				$catlist = array($this->filters['cat_single']);
+
+			}
+			elseif( ! empty( $this->filters['cat_array'] ) )
 			{ // We have requested specific categories...
+				$catlist = $this->filters['cat_array'];
+			}
+
+			if( !empty($catlist))
+			{	// We want to show some category names:
 				$cat_names = array();
 				$ChapterCache = & get_ChapterCache();
 				$catsel_param = get_param( 'catsel' );
-				foreach( $this->filters['cat_array'] as $cat_ID )
+				foreach( $catlist as $cat_ID )
 				{
 					if( ( $tmp_Chapter = & $ChapterCache->get_by_ID( $cat_ID, false ) ) !== false )
 					{ // It is almost never meaningful to die over an invalid cat when generating title
 						$cat_clear_url = regenerate_url( ( empty( $catsel_param ) ? 'cat=' : 'catsel=' ).$cat_ID );
-						if( $disp_detail == 'posts-subcat' || $disp_detail == 'posts-cat' )
+						if( $disp_detail == 'posts-topcat' || $disp_detail == 'posts-subcat' || $disp_detail == 'posts-cat' )
 						{ // Remove category url from $ReqPath when we use the cat url instead of cat ID
 							$cat_clear_url = str_replace( '/'.$tmp_Chapter->get_url_path(), '', $cat_clear_url );
 						}
