@@ -432,7 +432,7 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 			{	// fopen() returned false because it got a bad HTTP code:
 				$info['error'] = NT_( 'Invalid response' );
 				$info['status'] = $code;
-				return '';
+				return false;
 			}
 
 			$info['error'] = NT_( 'fopen() failed' );
