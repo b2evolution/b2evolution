@@ -6263,7 +6263,7 @@ function get_PasswordDriver( $driver_code = '' )
 			$driver_file_path = 'users/model/passwords/'.$drv_key.'.php';
 			if( file_exists( $inc_path.$driver_file_path ) )
 			{	// Class file exists on the disk
-				$driver_class_name = str_replace( '_', '', lcfirst( ucwords( $drv_key, '_' ) ) ).'PasswordDriver';
+				$driver_class_name = str_replace( ' ', '', lcfirst( ucwords( str_replace( '_', ' ', $drv_key ) ) ) ).'PasswordDriver';
 				// Load the class:
 				load_class( $driver_file_path, $driver_class_name );
 
