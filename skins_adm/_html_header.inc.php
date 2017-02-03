@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package admin
@@ -22,12 +22,16 @@ global $io_charset, $rsc_url, $UserSettings, $Debuglog, $Plugins;
 global $month, $month_abbrev, $weekday, $weekday_abbrev; /* for localized calendar */
 global $debug, $Hit;
 
+// Send the predefined cookies:
+evo_sendcookies();
+
 headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache the admin pages!
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $io_charset ?>" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<title><?php echo $this->get_html_title(); ?></title>
 	<?php
 	global $robots_index, $robots_follow;
@@ -35,11 +39,13 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 	$robots_follow = false;
 	robots_tag();
 
-	global $rsc_path, $rsc_url, $htsrv_url;
+	global $rsc_path, $rsc_url;
 
 	// var htsrv_url is used for AJAX callbacks
-	add_js_headline( "// Paths used by JS functions:
-		var htsrv_url = '$htsrv_url';
+	add_js_headline( "// Paths and vars are used by JS functions:
+		var htsrv_url = '".get_htsrv_url()."';
+		var restapi_url = '".get_restapi_url()."';
+		var b2evo_icons_type = '".get_param( 'b2evo_icons_type' )."';
 		var blog_id = '".param( 'blog', 'integer' )."';
 		var is_backoffice = true;" );
 

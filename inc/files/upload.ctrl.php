@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * (dh please re-add)
  *
  * {@internal Open Source relicensing agreement:
@@ -56,7 +56,7 @@ param( 'iframe_name', 'string', '', true );
 $action = param_action();
 
 // INIT params:
-if( param( 'root_and_path', 'string', '', false ) /* not memorized (default) */ && strpos( $root_and_path, '::' ) )
+if( param( 'root_and_path', 'filepath', '', false ) /* not memorized (default) */ && strpos( $root_and_path, '::' ) )
 { // root and path together: decode and override (used by "radio-click-dirtree")
 	list( $root, $path ) = explode( '::', $root_and_path, 2 );
 	// Memorize new root:
@@ -66,7 +66,7 @@ if( param( 'root_and_path', 'string', '', false ) /* not memorized (default) */ 
 else
 {
 	param( 'root', 'string', NULL, true ); // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
-	param( 'path', 'string', '', true );  // the path relative to the root dir
+	param( 'path', 'filepath', '', true );  // the path relative to the root dir
 	if( param( 'new_root', 'string', '' )
 		&& $new_root != $root )
 	{ // We have changed root in the select list
@@ -84,7 +84,7 @@ $fm_FileRoot = NULL;
 
 load_class( 'files/model/_filerootcache.class.php', 'FileRootCache' );
 
-$available_Roots = FileRootCache::get_available_FileRoots( get_param( 'root' ) );
+$available_Roots = FileRootCache::get_available_FileRoots( get_param( 'root' ), 'favorite' );
 
 if( ! empty( $root ) )
 { // We have requested a root folder by string:
@@ -227,7 +227,7 @@ $failedFiles = array();
  * Remember renamed files (and the messages)
  * @var array
  */
-param( 'renamedFiles', 'array:array:string', array(), true );
+param( 'renamedFiles', 'array:array:filepath', array(), true );
 $renamedMessages = array();
 
 // Process files we want to get from an URL:
@@ -369,7 +369,7 @@ if( ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
 					.'</ul>';
 			}
 
-			$Messages->add( $success_msg, 'success' );
+			$Messages->add_to_group( $success_msg, 'success', T_('Uploading files:') );
 		}
 	}
 
@@ -407,6 +407,9 @@ if( !isset($Blog) || $fm_FileRoot->type != 'collection' || $fm_FileRoot->in_type
 			$fm_FileRoot->name, $Blog->get('shortname') ) : '' );
 }
 $AdminUI->breadcrumbpath_add( /* TRANS: noun */ T_('Advanced Upload'), '?ctrl=upload&amp;blog=$blog$&amp;root='.$fm_FileRoot->ID );
+
+// Set an url for manual page:
+$AdminUI->set_page_manual_link( 'advanced-upload' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

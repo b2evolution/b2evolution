@@ -40,8 +40,6 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
 		}
 	}
 
-	var voting_bg_color = voting_layout.css( 'backgroundColor' );
-
 	if( load_form )
 	{
 		voting_layout.html( '<div class="loading">&nbsp;</div>' );
@@ -65,116 +63,85 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
 			return false;
 		} );
 
-		voting_layout.on( 'click', '#votingLike', function()
-		{ // Action for "Like" button
-			jQuery( this ).removeAttr( 'id' );
-			votingFadeIn( voting_layout, '#bcffb5' );
-			// Use action from hidden input form element
+		function send_voting_ajax_request( obj, vote_action, fadein_color, fadein_color2 )
+		{
+			// Use action from hidden input form element:
 			var voting_action_obj = voting_layout.find( '#voting_action' );
 			var ajax_action_url = voting_action_obj.length ? voting_action_obj.val() : action_url;
+
+			if( voting_layout.find( '#votingID' ).length > 0 )
+			{	// Add object ID to action URL:
+				ajax_action_url += '&vote_ID=' + voting_layout.find( '#votingID' ).val();
+			}
+			if( voting_layout.find( '#widgetID' ).length > 0 )
+			{	// Add widget ID to action URL:
+				ajax_action_url += '&widget_ID=' + voting_layout.find( '#widgetID' ).val();
+			}
+			if( voting_layout.find( '#skinID' ).length > 0 )
+			{	// Add skin ID to action URL:
+				ajax_action_url += '&skin_ID=' + voting_layout.find( '#skinID' ).val();
+			}
+
+			var voting_bg_color = voting_layout.css( 'backgroundColor' );
+
+			if( jQuery( obj ).is( ':checkbox' ) )
+			{	// Checkbox:
+				if( jQuery( obj ).is( ':checked' ) )
+				{	// Checked
+					ajax_action_url += '&checked=1';
+					votingFadeIn( voting_layout, fadein_color );
+				}
+				else
+				{	// Unchecked
+					ajax_action_url += '&checked=0';
+					votingFadeIn( voting_layout, fadein_color2 );
+				}
+			}
+			else
+			{	// "Like" button:
+				jQuery( obj ).removeAttr( 'id' );
+				votingFadeIn( voting_layout, fadein_color );
+			}
+
 			jQuery.ajax(
 			{ // Send AJAX request to vote
 				type: "POST",
-				url: ajax_action_url + '&vote_action=like&vote_ID=' + voting_layout.find( '#votingID' ).val(),
+				url: ajax_action_url + '&vote_action=' + vote_action,
 				success: function( result )
 				{
-					voting_layout.html( ajax_debug_clear( result ) );
-					update_colorbox_position();
+					if( ! jQuery( obj ).is( ':checkbox' ) )
+					{	// "Like" button:
+						voting_layout.html( ajax_debug_clear( result ) );
+						update_colorbox_position();
+					}
 					votingFadeIn( voting_layout, voting_bg_color );
 				}
 			} );
+		}
+
+		voting_layout.on( 'click', '#votingLike', function()
+		{	// Action for "Like" button:
+			send_voting_ajax_request( this, 'like', '#bcffb5' );
 		} );
 
 		voting_layout.on( 'click', '#votingNoopinion', function()
-		{ // Action for "No opinion" button
-			jQuery( this ).removeAttr( 'id' )
-			votingFadeIn( voting_layout, '#bbb' );
-			// Use action from hidden input form element
-			var voting_action_obj = voting_layout.find( '#voting_action' );
-			var ajax_action_url = voting_action_obj.length ? voting_action_obj.val() : action_url;
-			jQuery.ajax(
-			{ // Send AJAX request to vote
-				type: "POST",
-				url: ajax_action_url + '&vote_action=noopinion&vote_ID=' + voting_layout.find( '#votingID' ).val(),
-				success: function( result )
-				{
-					voting_layout.html( ajax_debug_clear( result ) );
-					update_colorbox_position();
-					votingFadeIn( voting_layout, voting_bg_color );
-				}
-			} );
+		{	// Action for "No opinion" button:
+			send_voting_ajax_request( this, 'noopinion', '#bbb' );
 		} );
 
 		voting_layout.on( 'click', '#votingDontlike', function()
-		{ // Action for "Don't like" button
-			jQuery( this ).removeAttr( 'id' )
-			votingFadeIn( voting_layout, '#ffc9c9' );
-			// Use action from hidden input form element
-			var voting_action_obj = voting_layout.find( '#voting_action' );
-			var ajax_action_url = voting_action_obj.length ? voting_action_obj.val() : action_url;
-			jQuery.ajax(
-			{ // Send AJAX request to vote
-				type: "POST",
-				url: ajax_action_url + '&vote_action=dontlike&vote_ID=' + voting_layout.find( '#votingID' ).val(),
-				success: function( result )
-				{
-					voting_layout.html( ajax_debug_clear( result ) );
-					update_colorbox_position();
-					votingFadeIn( voting_layout, voting_bg_color );
-				}
-			} );
+		{	// Action for "Don't like" button:
+			send_voting_ajax_request( this, 'dontlike', '#ffc9c9' );
 		} );
 
 		voting_layout.on( 'click', '#votingInappropriate', function()
-		{ // Action for "Inappropriate" checkbox
-			if( jQuery( this ).is( ':checked' ) )
-			{ // Checked
-				var checked = '1';
-				votingFadeIn( voting_layout, '#dcc' );
-			}
-			else
-			{	// Unchecked
-				var checked = '0';
-				votingFadeIn( voting_layout, '#bbb' );
-			}
-			// Use action from hidden input form element
-			var voting_action_obj = voting_layout.find( '#voting_action' );
-			var ajax_action_url = voting_action_obj.length ? voting_action_obj.val() : action_url;
-			jQuery.ajax(
-			{ // Send AJAX request to vote
-				type: "POST",
-				url: ajax_action_url + '&vote_action=inappropriate&checked=' + checked + '&vote_ID=' + voting_layout.find( '#votingID' ).val(),
-				success: function( result )
-				{
-					votingFadeIn( voting_layout, voting_bg_color );
-				}
-			} );
+		{	// Action for "Inappropriate" checkbox:
+			send_voting_ajax_request( this, 'inappropriate', '#dcc', '#bbb' );
 		} );
 
 		voting_layout.on( 'click', '#votingSpam', function()
-		{ // Action for "Spam" checkbox
-			if( jQuery( this ).is( ':checked' ) )
-			{ // Checked
-				var checked = '1';
-				votingFadeIn( voting_layout, '#dcc' );
-			}
-			else
-			{ // Unchecked
-				var checked = '0';
-				votingFadeIn( voting_layout, '#bbb' );
-			}
-			// Use action from hidden input form element
-			var voting_action_obj = voting_layout.find( '#voting_action' );
-			var ajax_action_url = voting_action_obj.length ? voting_action_obj.val() : action_url;
-			jQuery.ajax(
-			{ // Send AJAX request to vote
-				type: "POST",
-				url: ajax_action_url + '&vote_action=spam&checked=' + checked + '&vote_ID=' + voting_layout.find( '#votingID' ).val(),
-				success: function( result )
-				{
-					votingFadeIn( voting_layout, voting_bg_color );
-				}
-			} );
+		{	// Action for "Spam" checkbox:
+			send_voting_ajax_request( this, 'spam', '#dcc', '#bbb' );
 		} );
 
 		voting_layout.is_inited = true;

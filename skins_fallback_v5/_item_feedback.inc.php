@@ -13,7 +13,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -56,7 +56,7 @@ $params = array_merge( array(
 		'comment_error_end'    => '</div>',
 		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
 		'comment_image_size'   => 'fit-400x320',
-		'author_link_text'     => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+		'author_link_text'     => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 		'link_to'              => 'userurl>userpage',		    // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'form_title_start'     => '<h3>',
 		'form_title_end'       => '</h3>',
@@ -129,11 +129,14 @@ if( $Item->can_see_comments( true ) )
 		if( $Item->can_see_comments() )
 		{	// User can see a comments
 			$type_list[] = 'comment';
+			$Item->load_Blog();
+			$comment_inskin_statuses = explode( ',', $Item->Blog->get_setting( 'comment_inskin_statuses' ) );
+
 			if( !empty( $params['comments_title_text'] ) )
 			{
 				$disp_title[] = $params['comments_title_text'];
 			}
-			else if( $title = $Item->get_feedback_title( 'comments' ) )
+			else if( $title = $Item->get_feedback_title( 'comments', '#', '#', '#', $comment_inskin_statuses ) )
 			{
 				$disp_title[] = $title;
 			}
@@ -191,7 +194,7 @@ if( $Item->can_see_comments( true ) )
 	{
 		if( empty($disp_title) )
 		{	// No title yet
-			if( $title = $Item->get_feedback_title( 'feedbacks', '', T_('Feedback awaiting moderation'), T_('Feedback awaiting moderation'), array( 'review', 'draft' ), false ) )
+			if( $title = $Item->get_feedback_title( 'feedbacks', '', T_('Feedback awaiting moderation'), T_('Feedback awaiting moderation'), '#moderation#', false ) )
 			{ // We have some feedback awaiting moderation: we'll want to show that in the title
 				$disp_title[] = $title;
 			}
@@ -254,7 +257,7 @@ if( $Item->can_see_comments( true ) )
 			global $CommentReplies;
 			$CommentReplies = array();
 
-			if( $Comment = $Session->get('core.preview_Comment') )
+			if( $Comment = get_comment_from_session( 'preview' ) )
 			{	// Init PREVIEW comment
 				if( $Comment->item_ID == $Item->ID )
 				{
@@ -381,13 +384,13 @@ if( $params['disp_comment_form'] )
 // ----------- Register for item's comment notification -----------
 if( is_logged_in() && $Item->can_comment( NULL ) )
 {
-	global $DB, $htsrv_url;
+	global $DB;
 	global $UserSettings;
 
 	$not_subscribed = true;
 	$creator_User = $Item->get_creator_User();
 
-	if( $Blog->get_setting( 'allow_subscriptions' ) )
+	if( $Blog->get_setting( 'allow_comment_subscriptions' ) )
 	{
 		$sql = 'SELECT count( sub_user_ID ) FROM T_subscriptions
 					WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0';
@@ -416,11 +419,11 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 			if( get_user_isubscription( $current_User->ID, $Item->ID ) )
 			{
 				echo '<p>'.$notification_icon.' <span>'.$params['notification_text2'];
-				echo ' <a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></span></p>';
+				echo ' <a href="'.get_htsrv_url().'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></span></p>';
 			}
 			else
 			{
-				echo '<p>'.$notification_icon.' <span><a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'collections_isubs_update' ).'">'.$params['notification_text3'].'</a></span></p>';
+				echo '<p>'.$notification_icon.' <span><a href="'.get_htsrv_url().'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'collections_isubs_update' ).'">'.$params['notification_text3'].'</a></span></p>';
 			}
 		}
 

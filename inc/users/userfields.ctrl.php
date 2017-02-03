@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -55,7 +55,7 @@ switch( $action )
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_Userfield = duplicate( $edited_Userfield ); // PHP4/5 abstraction
+			$edited_Userfield = clone $edited_Userfield;
 			$edited_Userfield->ID = 0;
 		}
 		break;
@@ -246,6 +246,23 @@ $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of kee
 $AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
 $AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
 $AdminUI->breadcrumbpath_add( T_('User fields configuration'), '?ctrl=userfields' );
+
+// Set an url for manual page:
+switch( $action )
+{
+	case 'delete':
+	case 'new':
+	case 'create':
+	case 'create_new':
+	case 'create_copy':
+	case 'edit':
+	case 'update':
+		$AdminUI->set_page_manual_link( 'user-field-form' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'user-fields-list' );
+		break;
+}
 
 if( in_array( $action, array( 'delete', 'new', 'create', 'create_new', 'create_copy', 'edit', 'update' ) ) )
 { // Init JS for icon color field on the edit form

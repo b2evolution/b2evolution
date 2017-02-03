@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package xmlsrv
  */
@@ -28,8 +28,17 @@ if( isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] !== 'POST' )
 $_COOKIE = array();
 
 
+// Initialize config:
 require_once dirname(__FILE__).'/../conf/_config.php';
+
+/**
+ * @global boolean Is this an API request?
+ */
+$is_api_request = true;
+
+// Initialize main functions:
 require_once $inc_path.'_main.inc.php';
+
 load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 
 if( CANUSEXMLRPC !== TRUE || ! $Settings->get('general_xmlrpc') )
@@ -61,6 +70,7 @@ include_once $inc_path.'xmlrpc/apis/_b2.api.php';
 include_once $inc_path.'xmlrpc/apis/_metaweblog.api.php';
 include_once $inc_path.'xmlrpc/apis/_mt.api.php';
 include_once $inc_path.'xmlrpc/apis/_wordpress.api.php';
+include_once $inc_path.'xmlrpc/apis/_antispam.api.php';
 
 
 // fp> xmlrpc.php should actually only load the function/api/plugin to execute once it has been identified

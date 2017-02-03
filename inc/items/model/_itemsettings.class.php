@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -49,9 +49,9 @@ class ItemSettings extends AbstractSettings
 	/**
 	 * Constructor
 	 */
-	function ItemSettings()
+	function __construct()
 	{
-		parent::AbstractSettings( 'T_items__item_settings', array( 'iset_item_ID', 'iset_name' ), 'iset_value', 1 );
+		parent::__construct( 'T_items__item_settings', array( 'iset_item_ID', 'iset_name' ), 'iset_value', 1 );
 	}
 
 
@@ -62,16 +62,45 @@ class ItemSettings extends AbstractSettings
 	 * @access protected
 	 * @param string First column key
 	 * @param string Second column key
+	 * @param string NOT USED (provided for compatibility with parent class)
 	 * @return boolean
 	 */
-	function _load( $item_ID, $arg )
+	function _load( $item_ID = NULL, $arg = NULL, $arg3 = NULL )
 	{
-		if( empty( $item_ID ) )
+		if( empty( $item_ID ) || empty( $arg ) )
 		{
 			return false;
 		}
 
 		return parent::_load( $item_ID, $arg );
+	}
+
+
+	/**
+	 * Get a setting from the DB settings table.
+	 *
+	 * @uses get_default()
+	 * @param string First column key
+	 * @param string Second column key
+	 * @return string|false|NULL value as string on success; NULL if not found; false in case of error
+	 */
+	function get( $col_key1, $col_key2 )
+	{
+		return parent::getx( $col_key1, $col_key2 );
+	}
+
+
+	/**
+	 * Temporarily sets a setting ({@link dbupdate()} writes it to DB).
+	 *
+	 * @param string First column key
+	 * @param string Second column key
+	 * @param mixed Value
+	 * @return boolean true, if the value has been set, false if it has not changed.
+	 */
+	function set( $col_key1, $col_key2, $value )
+	{
+		return parent::setx( $col_key1, $col_key2, $value );
 	}
 }
 

@@ -10,7 +10,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $app_version, $disp, $Blog, $skin_links, $francois_links;
+global $app_version, $disp, $Collection, $Blog, $skin_links, $francois_links;
 
 // Use a login form for this page
 $template_name = '_login.disp.php';

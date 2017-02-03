@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_forums
@@ -40,7 +40,7 @@ if( ! is_array( $legend_icons ) )
 }
 
 // ------------------------------- START OF INTRO-FRONT POST -------------------------------
-if( $Item = get_featured_Item( 'front' ) )
+if( $Item = & get_featured_Item( 'front' ) )
 { // We have a intro-front post to display:
 ?>
 <div id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>">
@@ -57,7 +57,7 @@ if( $Item = get_featured_Item( 'front' ) )
 	if( $Item->status != 'published' )
 	{
 		$Item->format_status( array(
-				'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+				'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 			) );
 	}
 	$Item->title( array(
@@ -68,7 +68,7 @@ if( $Item = get_featured_Item( 'front' ) )
 		) );
 
 	// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-	skin_include( '_item_content.inc.php', $params );
+	skin_include( '_item_content.inc.php', array_merge( $params, array( 'Item' => $Item ) ) );
 	// Note: You can customize the default item content by copying the generic
 	// /skins/_item_content.inc.php file into the current skin folder.
 	// -------------------------- END OF POST CONTENT -------------------------
@@ -115,7 +115,7 @@ if( count( $chapters ) > 0 )
 			else
 			{ // Set icon for unlocked chapter
 				$chapter_icon = 'fa-folder big';
-				$chapter_icon_title = T_('No new posts');
+				$chapter_icon_title = T_('Forum (contains several topics)');
 				$legend_icons['forum_default'] = 1;
 			}
 ?>
@@ -151,9 +151,9 @@ if( count( $chapters ) > 0 )
 				<?php printf( T_('%s topics'), '<div><a href="'. $Chapter->get_permanent_url() .'">'.get_postcount_in_category( $Chapter->ID ).'</a></div>' ); ?>
 			</div>
 			<div class="ft_count second_of_class col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s replies'), '<div><a href="'. $Chapter->get_permanent_url() .'">'.get_commentcount_in_category( $Chapter->ID ).'</a></div>' ); ?></div>
-			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( 'D M j, Y H:i' ); ?></div>
+			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( locale_extdatefmt().' '.locale_shorttimefmt() ); ?></div>
 			<!-- Apply this on XS size -->
-			<div class="ft_date_shrinked col-xs-2"><?php echo $Chapter->get_last_touched_date( 'm/j/y' ); ?></div>
+			<div class="ft_date_shrinked col-xs-2"><?php echo $Chapter->get_last_touched_date( locale_datefmt() ); ?></div>
 		</article>
 <?php
 		}

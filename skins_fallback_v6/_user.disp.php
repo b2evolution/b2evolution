@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
 * @var Blog
 */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var GeneralSettings
  */
@@ -184,7 +184,11 @@ echo '<div class="profile_column_left">';
 	}
 
 	// Check if current user can edit other users from back-office:
-	$user_perms_edit = ( $is_logged_in && $current_User->check_perm( 'users', 'edit' ) && $current_User->check_status( 'can_access_admin' ) );
+	$user_perms_edit = ( $is_logged_in &&
+			$current_User->can_moderate_user( $User->ID ) &&
+			$current_User->check_status( 'can_access_admin' ) &&
+			$current_User->check_perm( 'admin', 'restricted' )
+		);
 
 	// - Message:
 	if( ! $is_logged_in || $current_User->ID != $User->ID )
@@ -217,7 +221,7 @@ echo '<div class="profile_column_left">';
 		}
 
 		$buttons['group'] = array();
-		$contact_block_url = get_samedomain_htsrv_url().'action.php?mname=messaging&amp;disp=contacts&amp;user_ID='.$user_ID.'&amp;redirect_to='.rawurlencode( regenerate_url() ).'&amp;'.url_crumb( 'messaging_contacts' );
+		$contact_block_url = get_htsrv_url().'action.php?mname=messaging&amp;disp=contacts&amp;user_ID='.$user_ID.'&amp;redirect_to='.rawurlencode( regenerate_url() ).'&amp;'.url_crumb( 'messaging_contacts' );
 		if( $is_contact === NULL || $is_contact === true )
 		{ // Display a button to block user
 			$buttons['group'][] = '<a href="'.$contact_block_url.'&action=block" class="btn btn-warning">'
@@ -261,7 +265,7 @@ echo '<div class="profile_column_left">';
 				.'<button type="button" class="btn btn-primary">'.$params['edit_user_admin_link_text'].'</button>'
 			.'</a>';
 
-		if( $current_User->ID != $User->ID )
+		if( $current_User->ID != $User->ID && $current_User->check_perm( 'users', 'edit' ) )
 		{ // - Delete in back-office:
 			$buttons['del'] = array();
 			$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
@@ -381,17 +385,24 @@ echo '<div class="profile_column_right">';
 
 	$profileForm->begin_fieldset( T_( 'Reputation' ) );
 
+		$profileForm->info( T_('Joined'), mysql2localedate( $User->datecreated ) );
+
+		if( $Blog->get_setting( 'userdir_lastseen' ) )
+		{	// Display last visit only if it is enabled by current collection:
+			$profileForm->info( T_('Last seen on'), get_lastseen_date( $User->get( 'lastseen_ts' ), $Blog->get_setting( 'userdir_lastseen_view' ), $Blog->get_setting( 'userdir_lastseen_cheat' ) ) );
+		}
+
 		$profileForm->info( T_('Number of posts'), $User->get_reputation_posts() );
 
-		$profileForm->info( T_('Comments'), $User->get_reputation_comments() );
+		$profileForm->info( T_('Comments'), '<span class="reputation_message">'.$User->get_reputation_comments().'</span>' );
 
-		$profileForm->info( T_('Photos'), $User->get_reputation_files( array( 'file_type' => 'image' ) ) );
+		$profileForm->info( T_('Photos'), '<span class="reputation_message">'.$User->get_reputation_files( array( 'file_type' => 'image' ) ).'</span>' );
 
-		$profileForm->info( T_('Audio'), $User->get_reputation_files( array( 'file_type' => 'audio' ) ) );
+		$profileForm->info( T_('Audio'), '<span class="reputation_message">'.$User->get_reputation_files( array( 'file_type' => 'audio' ) ).'</span>' );
 
-		$profileForm->info( T_('Other files'), $User->get_reputation_files( array( 'file_type' => 'other' ) ) );
+		$profileForm->info( T_('Other files'), '<span class="reputation_message">'.$User->get_reputation_files( array( 'file_type' => 'other' ) ).'</span>' );
 
-		$profileForm->info( T_('Spam fighter score'), $User->get_reputation_spam() );
+		$profileForm->info( T_('Spam fighter score'), '<span class="reputation_message">'.$User->get_reputation_spam().'</span>' );
 
 	$profileForm->end_fieldset();
 

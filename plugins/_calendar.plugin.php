@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -29,7 +29,7 @@ class calendar_plugin extends Plugin
 	var $name;
 	var $code = 'evo_Calr';
 	var $priority = 20;
-	var $version = '5.0.0';
+	var $version = '6.7.9';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'navigation';
@@ -63,7 +63,64 @@ class calendar_plugin extends Plugin
 	 */
 	function get_widget_param_definitions( $params )
 	{
+		// Initialize an array for the field "Post type":
+		$ItemTypeCache = & get_ItemTypeCache();
+		$ItemTypeCache->clear();
+		$ItemTypeCache->load_where( 'ityp_usage = "post"' );
+		$item_type_options = array(
+				'#' => T_('Default'),
+				''  => T_('All'),
+			);
+		foreach( $ItemTypeCache->cache as $ItemType )
+		{
+			$item_type_options[ $ItemType->ID ] = $ItemType->get_name();
+		}
+
 		$r = array(
+			'title' => array(
+				'label' => T_('Block title'),
+				'note' => T_('Title to display in your skin.'),
+				'size' => 60,
+				'defaultvalue' => '',
+			),
+			'title_link' => array(
+				'label' => T_('Link to blog'),
+				'note' => T_('Link the block title to the blog?'),
+				'type' => 'checkbox',
+				'defaultvalue' => false,
+			),
+			'item_visibility' => array(
+				'label' => T_('Item visibility'),
+				'note' => T_('What post statuses should be included in the list?'),
+				'type' => 'radio',
+				'field_lines' => true,
+				'options' => array(
+						array( 'public', T_('show public posts') ),
+						array( 'all', T_('show all posts the current user is allowed to see') ) ),
+				'defaultvalue' => 'all',
+			),
+			'item_type' => array(
+				'label' => T_('Exact post type'),
+				'note' => T_('What type of items do you want to list?'),
+				'type' => 'select',
+				'options' => $item_type_options,
+				'defaultvalue' => '#',
+			),
+			'blog_ID' => array(
+				'label' => T_( 'Collection' ),
+				'note' => T_( 'ID of the collection to use, leave empty for the current collection.' ),
+				'size' => 4,
+				'type' => 'integer',
+				'allow_empty' => true,
+			),
+			'cat_IDs' => array(
+				'label' => T_('Categories'),
+				'note' => T_('List category IDs separated by ,'),
+				'size' => 15,
+				'type' => 'text',
+				'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
+																	'error'   => T_('Invalid list of Category IDs.') ),
+			),
 			'displaycaption' => array(
 				'label' => T_('Display caption'),
 				'note' => T_('Display caption on top of calendar'),
@@ -98,6 +155,26 @@ class calendar_plugin extends Plugin
 			),
 		);
 		return $r;
+	}
+
+
+	/**
+	 * Get keys for block/widget caching
+	 *
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @param integer Widget ID
+	 * @return array of keys this widget depends on
+	 */
+	function get_widget_cache_keys( $widget_ID = 0 )
+	{
+		global $Collection, $Blog;
+
+		return array(
+				'wi_ID'        => $widget_ID, // Have the widget settings changed ?
+				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
+				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
+			);
 	}
 
 
@@ -139,30 +216,32 @@ class calendar_plugin extends Plugin
 	 *      - 'link_type' : 'canonic'|'context' (default: canonic)
 	 * @return boolean did we display?
 	 */
-	function SkinTag( $params )
+	function SkinTag( & $params )
 	{
 		// Prefix of the ItemList object
 		$itemlist_prefix = isset( $params['itemlist_prefix'] ) ? $params['itemlist_prefix'] : '';
 
 		global $month;
-		global $Blog, $cat_array, $cat_modifier;
+		global $Collection, $Blog, $cat_array, $cat_modifier;
 		global $show_statuses;
 		global $author, $assgn, $status, $types;
 		global ${$itemlist_prefix.'m'}, $w, $dstart;
 		global $s, $sentence, $exact;
-		global $posttypes_specialtypes;
 
 		/**
 		 * Default params:
 		 */
-		// This is what will enclose the block in the skin:
-		if(!isset($params['block_start'])) $params['block_start'] = '<div class="bSideItem">';
-		if(!isset($params['block_end'])) $params['block_end'] = "</div>\n";
-
-		// Title:
-		if(!isset($params['block_title_start'])) $params['block_title_start'] = '<h3>';
-		if(!isset($params['block_title_end'])) $params['block_title_end'] = '</h3>';
-		if(!isset($params['title'])) $params['title'] = '';
+		$params = array_merge( array(
+				// This is what will enclose the block in the skin:
+				'block_start'       => '<div class="bSideItem">',
+				'block_end'         => "</div>\n",
+				// This is what will enclose the title:
+				'block_title_start' => '<h3>',
+				'block_title_end'   => '</h3>',
+				// This is what will enclose the body:
+				'block_body_start'  => '',
+				'block_body_end'    => '',
+			), $params );
 
 
 		$Calendar = new Calendar( ${$itemlist_prefix.'m'}, $params );
@@ -207,22 +286,41 @@ class calendar_plugin extends Plugin
 		if( !empty($params['title']) )
 		{	// We want to display a title for the widget block:
 			echo $params['block_title_start'];
-			echo $params['title'];
+			if( $params[ 'title_link' ] )
+			{	// Set block title as link to current collection:
+				echo '<a href="'.$Blog->gen_blogurl().'" rel="nofollow">'.$params['title'].'</a>';
+			}
+			else
+			{	// Display a block title as simple text:
+				echo $params['title'];
+			}
 			echo $params['block_title_end'];
 		}
+
+		echo $params['block_body_start'];
 
 		// CONSTRUCT THE WHERE CLAUSE:
 
 		// - - Select a specific Item:
 		// $this->ItemQuery->where_ID( $p, $title );
 
+		// Set filter by collection:
+		$blog_ID = empty( $params['blog_ID'] ) ? NULL : $params['blog_ID'];
+
+
+		if( empty( $params['cat_IDs'] ) )
+		{	// Use default categories filter:
+			$filter_cat_array = ( $Calendar->link_type == 'context' ) ? $cat_array : array();
+		}
+		else
+		{	// Get categories filter from widget settings:
+			$filter_cat_array = sanitize_id_list( $params['cat_IDs'], true );
+		}
+
 		if( $Calendar->link_type == 'context' )
 		{	// We want to preserve the current context:
 			// * - - Restrict to selected blog/categories:
-			$Calendar->ItemQuery->where_chapter2( $Blog, $cat_array, $cat_modifier );
-
-			// * Restrict to the statuses we want to show:
-			$Calendar->ItemQuery->where_visibility( $show_statuses );
+			$Calendar->ItemQuery->where_chapter2( $Blog, $filter_cat_array, $cat_modifier, 'wide', $blog_ID );
 
 			// Restrict to selected authors:
 			$Calendar->ItemQuery->where_author( $author );
@@ -238,27 +336,52 @@ class calendar_plugin extends Plugin
 
 			// Keyword search stuff:
 			$Calendar->ItemQuery->where_keywords( $s, $sentence, $exact );
-
-			// Exclude pages and intros:
-			$Calendar->ItemQuery->where_types( $types );
 		}
 		else
 		{	// We want to preserve only the minimal context:
 			// * - - Restrict to selected blog/categories:
-			$Calendar->ItemQuery->where_chapter2( $Blog, array(), '' );
-
-			// * Restrict to the statuses we want to show:
-			$Calendar->ItemQuery->where_visibility( $show_statuses );
+			$Calendar->ItemQuery->where_chapter2( $Blog, $filter_cat_array, '', 'wide', $blog_ID );
 
 			// - - - + * * if a month is specified in the querystring, load that month:
 			$Calendar->ItemQuery->where_datestart( /* NO m */'', /* NO w */'', '', '', $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
+		}
 
-			// Exclude pages and intros and sidebar stuff:
-			$Calendar->ItemQuery->where_types( '-'.implode(',',$posttypes_specialtypes) );
+		if( isset( $params['item_visibility'] ) && $params['item_visibility'] == 'public' )
+		{	// Get only the public items:
+			$visibility_array = array( 'published' );
+		}
+		else
+		{	// Get the current selected status items:
+			$visibility_array = $show_statuses;
+		}
+		// * Restrict to the statuses we want to show:
+		$Calendar->ItemQuery->where_visibility( $visibility_array );
+
+		$item_types = $types;
+		if( isset( $params['item_type'] ) )
+		{
+			if( $params['item_type'] == '#' )
+			{	// Exclude pages and intros and sidebar stuff by default:
+				$item_types_usage = 'post';
+			}
+			elseif( $params['item_type'] != 'all' )
+			{	// Filter by one selected item type:
+				$item_types = $params['item_type'];
+			}
+		}
+		if( isset( $item_types_usage ) )
+		{	// Filter by item types usage:
+			$Calendar->ItemQuery->where_itemtype_usage( $item_types_usage );
+		}
+		else
+		{	// Filter by item types:
+			$Calendar->ItemQuery->where_types( $item_types );
 		}
 
 		// DISPLAY:
 		$Calendar->display( );
+
+		echo $params['block_body_end'];
 
 		echo $params['block_end'];
 
@@ -357,7 +480,7 @@ class Calendar
 	var $context_isolation;
 
 	var $params = array( );
-	
+
 	/**
 	 * Prefix of the ItemList object
 	 * @var string
@@ -374,7 +497,7 @@ class Calendar
 	 *      - 'min_timestamp' : Minimum unix timestamp the user can browse too or 'query' (Default: 2000-01-01)
 	 *      - 'max_timestamp' : Maximum unix timestamp the user can browse too or 'query' (Default: now + 1 year )
 	 */
-	function Calendar( $m = '', $params = array() )
+	function __construct( $m = '', $params = array() )
 	{
 		global $localtimenow;
 
@@ -434,7 +557,7 @@ class Calendar
 		$this->monthformat = 'F Y';
 		$this->linktomontharchive = true;  // month displayed as link to month' archive
 
-		$this->tablestart = '<table class="bCalendarTable" cellspacing="0" summary="Monthly calendar with links to each day\'s posts">'."\n";
+		$this->tablestart = '<table class="bCalendarTable" title="Monthly calendar with links to each day\'s posts">'."\n";
 		$this->tableend = '</table>';
 
 		$this->monthstart = '<caption>';
@@ -449,7 +572,7 @@ class Calendar
 
 		$this->headerrowstart = '<thead><tr class="bCalendarRow">' . "\n";
 		$this->headerrowend = "</tr></thead>\n";
-		$this->headercellstart = '<th class="bCalendarHeaderCell" abbr="[abbr]" scope="col" title="[abbr]">';	// please leave [abbr] there !
+		$this->headercellstart = '<th class="bCalendarHeaderCell" scope="col" title="[abbr]">';	// please leave [abbr] there !
 		$this->headercellend = "</th>\n";
 
 		$this->cellstart = '<td class="bCalendarCell">';
@@ -538,6 +661,7 @@ class Calendar
 													EXTRACT(DAY FROM '.$this->dbprefix.'datestart) AS myday
 									FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 										INNER JOIN T_categories ON postcat_cat_ID = cat_ID
+										LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID
 									WHERE EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) = \''.$this->year.'\'
 										AND EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) = \''.$this->month.'\'
 										'.$this->ItemQuery->get_where( ' AND ' ).'
@@ -590,6 +714,7 @@ class Calendar
 				SELECT COUNT(DISTINCT '.$this->dbIDname.') AS item_count, EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) AS mymonth
 				  FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
 				 INNER JOIN T_categories ON postcat_cat_ID = cat_ID
+				 LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID
 				 WHERE EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) = \''.$this->year.'\' '
 				       .$this->ItemQuery->get_where( ' AND ' ).'
 				 GROUP BY mymonth '.$this->ItemQuery->get_group_by( ', ' );
@@ -860,7 +985,7 @@ class Calendar
 		/**
 		 * @var Blog
 		 */
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $this->link_type == 'context' )
 		{	// We want to preserve context:

@@ -6,11 +6,14 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+
+global $comment_template_counter;
 
 // Default params:
 $params = array_merge( array(
@@ -32,7 +35,7 @@ $params = array_merge( array(
 		'comment_footer_before'  => '<footer class="panel-footer"><div class="text-muted small">',
 		'comment_footer_after'  => '</div></footer>',
 		'link_to'               => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
-		'author_link_text'      => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+		'author_link_text'      => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 		'before_image'          => '<figure class="evo_image_block">',
 		'before_image_legend'   => '<figcaption class="evo_image_legend">',
 		'after_image_legend'    => '</figcaption>',
@@ -41,6 +44,11 @@ $params = array_merge( array(
 		'image_class'           => 'img-responsive',
 		'Comment'               => NULL, // This object MUST be passed as a param!
 	), $params );
+
+if( ! isset( $comment_template_counter ) )
+{	// Initialize global comment counter:
+	$comment_template_counter = isset( $params['comment_number'] ) ? $params['comment_number'] : 1;
+}
 
 /**
  * @var Comment
@@ -70,6 +78,12 @@ echo $params['comment_title_before'];
 switch( $Comment->get( 'type' ) )
 {
 	case 'comment': // Display a comment:
+	case 'meta': // Display a meta comment:
+		if( $Comment->is_meta() )
+		{	// Meta comment:
+			echo '<span class="badge badge-info">'.$comment_template_counter.'</span> ';
+		}
+
 		if( empty($Comment->ID) )
 		{	// PREVIEW comment
 			echo '<span class="evo_comment_type_preview">'.T_('PREVIEW Comment from:').'</span> ';
@@ -128,7 +142,7 @@ switch( $Comment->get( 'type' ) )
 if( $Comment->status != 'published' )
 { // display status of comment (typically an angled banner in the top right corner):
 	$Comment->format_status( array(
-			'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+			'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 		) );
 }
 
@@ -167,4 +181,7 @@ $Comment->date(); echo ' @ '; $Comment->time( '#short_time' );
 echo $params['comment_footer_after'];
 
 echo $params['comment_end'];
+
+// Decrease a counter for meta comments:
+$comment_template_counter--;
 ?>

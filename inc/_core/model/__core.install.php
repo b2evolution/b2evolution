@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -33,6 +33,7 @@ $schema_queries = array(
 		"CREATE TABLE T_groups (
 			grp_ID                           int(11) NOT NULL auto_increment,
 			grp_name                         varchar(50) NOT NULL default '',
+			grp_usage                        ENUM('primary','secondary') COLLATE ascii_general_ci NOT NULL DEFAULT 'primary',
 			grp_level                        int unsigned DEFAULT 0 NOT NULL,
 			grp_perm_blogs                   enum('user','viewall','editall') COLLATE ascii_general_ci NOT NULL default 'user',
 			grp_perm_bypass_antispam         TINYINT(1) NOT NULL DEFAULT 0,
@@ -58,7 +59,7 @@ $schema_queries = array(
 	'T_settings' => array(
 		'Creating table for Settings',
 		"CREATE TABLE T_settings (
-			set_name VARCHAR(30) COLLATE ascii_general_ci NOT NULL,
+			set_name VARCHAR(50) COLLATE ascii_general_ci NOT NULL,
 			set_value VARCHAR(5000) NULL,
 			PRIMARY KEY ( set_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -76,8 +77,9 @@ $schema_queries = array(
 		"CREATE TABLE T_users (
 			user_ID int(11) unsigned NOT NULL auto_increment,
 			user_login varchar(20) NOT NULL,
-			user_pass BINARY(16) NOT NULL,
-			user_salt CHAR(8) NOT NULL default '',
+			user_pass VARCHAR(64) NOT NULL,
+			user_salt VARCHAR(32) NOT NULL default '',
+			user_pass_driver VARCHAR(16) NOT NULL default 'evo\$md5',
 			user_grp_ID int(4) NOT NULL default 1,
 			user_email varchar(255) COLLATE ascii_general_ci NOT NULL,
 			user_status enum( 'activated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'new' ) COLLATE ascii_general_ci NOT NULL default 'new',
@@ -122,7 +124,7 @@ $schema_queries = array(
 			ufdf_suggest    tinyint(1) NOT NULL DEFAULT 0,
 			ufdf_bubbletip  varchar(2000) NULL,
 			ufdf_icon_name  varchar(100) COLLATE ascii_general_ci NULL,
-			ufdf_code       varchar(20) COLLATE ascii_general_ci UNIQUE NOT NULL,
+			ufdf_code       varchar(20) COLLATE ascii_bin UNIQUE NOT NULL COMMENT 'Code MUST be lowercase ASCII only',
 			PRIMARY KEY (ufdf_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -154,18 +156,8 @@ $schema_queries = array(
 			urep_reporter_ID    int(11) unsigned NOT NULL,
 			urep_status         enum( 'fake', 'guidelines', 'harass', 'spam', 'other' ) COLLATE ascii_general_ci,
 			urep_info           varchar(240),
-			urep_datetime		datetime NOT NULL,
+			urep_datetime       datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY ( urep_target_user_ID, urep_reporter_ID )
-		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
-
-	'T_users__postreadstatus' => array(
-		'Creating table for User post read status',
-		"CREATE TABLE T_users__postreadstatus (
-			uprs_user_ID int(11) unsigned NOT NULL,
-			uprs_post_ID int(11) unsigned NOT NULL,
-			uprs_read_post_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-			uprs_read_comment_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-			PRIMARY KEY ( uprs_user_ID, uprs_post_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_users__invitation_code' => array(
@@ -175,7 +167,8 @@ $schema_queries = array(
 			ivc_code      varchar(32) COLLATE ascii_general_ci NOT NULL,
 			ivc_expire_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			ivc_source    varchar(30) NULL,
-			ivc_grp_ID    int(4) NOT NULL,
+			ivc_grp_ID    int(4) NULL,
+			ivc_level     int unsigned NULL,
 			PRIMARY KEY ( ivc_ID ),
 			UNIQUE ivc_code ( ivc_code )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -183,9 +176,12 @@ $schema_queries = array(
 	'T_users__organization' => array(
 		'Creating table for User organizations',
 		"CREATE TABLE T_users__organization (
-			org_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-			org_name VARCHAR(255) NOT NULL,
-			org_url  VARCHAR(2000) NULL,
+			org_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			org_owner_user_ID INT(11) UNSIGNED NOT NULL,
+			org_name          VARCHAR(255) NOT NULL,
+			org_url           VARCHAR(2000) NULL,
+			org_accept        ENUM( 'yes', 'owner', 'no' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'owner',
+			org_perm_role     ENUM( 'owner and member', 'owner' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'owner and member',
 			PRIMARY KEY ( org_ID ),
 			UNIQUE org_name ( org_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -198,6 +194,23 @@ $schema_queries = array(
 			uorg_accepted TINYINT(1) DEFAULT 0,
 			uorg_role     VARCHAR(255) NULL,
 			PRIMARY KEY ( uorg_user_ID, uorg_org_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_users__secondary_user_groups' => array(
+		'Creating table for secondary user groups',
+		"CREATE TABLE T_users__secondary_user_groups (
+			sug_user_ID INT(11) UNSIGNED NOT NULL,
+			sug_grp_ID  INT(11) UNSIGNED NOT NULL,
+			PRIMARY KEY ( sug_user_ID, sug_grp_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_users__profile_visits' => array(
+		'Crating table for profile visits',
+		"CREATE TABLE T_users__profile_visits (
+			upv_visited_user_ID INT(11) UNSIGNED NOT NULL,
+			upv_visitor_user_ID INT(11) UNSIGNED NOT NULL,
+			upv_last_visit_ts   TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			PRIMARY KEY ( upv_visited_user_ID, upv_visitor_user_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_i18n_original_string' => array(
@@ -226,8 +239,12 @@ $schema_queries = array(
 		"CREATE TABLE T_locales (
 			loc_locale varchar(20) NOT NULL default '',
 			loc_datefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'y-m-d',
+			loc_longdatefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'Y-m-d',
+			loc_extdatefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'Y M d',
+			loc_input_datefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'Y-m-d',
 			loc_timefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'H:i:s',
 			loc_shorttimefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'H:i',
+			loc_input_timefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'H:i:s',
 			loc_startofweek TINYINT UNSIGNED NOT NULL DEFAULT 1,
 			loc_name varchar(40) NOT NULL default '',
 			loc_messages varchar(20) NOT NULL default '',
@@ -238,14 +255,14 @@ $schema_queries = array(
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset COMMENT='saves available locales'
 		" ),
 
-	'T_antispam' => array(
+	'T_antispam__keyword' => array(
 		'Creating table for Antispam Blacklist',
-		"CREATE TABLE T_antispam (
-			aspm_ID bigint(11) NOT NULL auto_increment,
-			aspm_string varchar(80) NOT NULL,
-			aspm_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported',
-			PRIMARY KEY aspm_ID (aspm_ID),
-			UNIQUE aspm_string (aspm_string)
+		"CREATE TABLE T_antispam__keyword (
+			askw_ID bigint(11) NOT NULL auto_increment,
+			askw_string varchar(80) NOT NULL,
+			askw_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported',
+			PRIMARY KEY askw_ID (askw_ID),
+			UNIQUE askw_string (askw_string)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_antispam__iprange' => array(
@@ -265,7 +282,7 @@ $schema_queries = array(
 		'Creating user settings table',
 		"CREATE TABLE T_users__usersettings (
 			uset_user_ID INT(11) UNSIGNED NOT NULL,
-			uset_name    VARCHAR( 30 ) COLLATE ascii_general_ci NOT NULL,
+			uset_name    VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL,
 			uset_value   VARCHAR( 255 ) NULL,
 			PRIMARY KEY ( uset_user_ID, uset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -274,7 +291,7 @@ $schema_queries = array(
 		'Creating plugins table',
 		"CREATE TABLE T_plugins (
 			plug_ID              INT(11) UNSIGNED NOT NULL auto_increment,
-			plug_priority        TINYINT NOT NULL default 50,
+			plug_priority        TINYINT UNSIGNED NOT NULL default 50,
 			plug_classname       VARCHAR(40) COLLATE ascii_general_ci NOT NULL default '',
 			plug_code            VARCHAR(32) COLLATE ascii_general_ci NULL,
 			plug_version         VARCHAR(42) COLLATE ascii_general_ci NOT NULL default '0',
@@ -291,7 +308,7 @@ $schema_queries = array(
 		'Creating plugin settings table',
 		"CREATE TABLE T_pluginsettings (
 			pset_plug_ID INT(11) UNSIGNED NOT NULL,
-			pset_name VARCHAR( 30 ) COLLATE ascii_general_ci NOT NULL,
+			pset_name VARCHAR( 60 ) COLLATE ascii_general_ci NOT NULL,
 			pset_value TEXT NULL,
 			PRIMARY KEY ( pset_plug_ID, pset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -301,7 +318,7 @@ $schema_queries = array(
 		"CREATE TABLE T_pluginusersettings (
 			puset_plug_ID INT(11) UNSIGNED NOT NULL,
 			puset_user_ID INT(11) UNSIGNED NOT NULL,
-			puset_name VARCHAR( 30 ) COLLATE ascii_general_ci NOT NULL,
+			puset_name VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL,
 			puset_value TEXT NULL,
 			PRIMARY KEY ( puset_plug_ID, puset_user_ID, puset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -424,13 +441,13 @@ $schema_queries = array(
 		'Creating email log table',
 		"CREATE TABLE T_email__log (
 			emlog_ID        INT(10) UNSIGNED NOT NULL auto_increment,
-			emlog_timestamp TIMESTAMP NOT NULL,
+			emlog_timestamp TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			emlog_user_ID   INT(10) UNSIGNED DEFAULT NULL,
 			emlog_to        VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
-			emlog_result    ENUM( 'ok', 'error', 'blocked' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ok',
+			emlog_result    ENUM( 'ok', 'error', 'blocked', 'simulated' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ok',
 			emlog_subject   VARCHAR(255) DEFAULT NULL,
 			emlog_headers   TEXT DEFAULT NULL,
-			emlog_message   TEXT DEFAULT NULL,
+			emlog_message   MEDIUMTEXT DEFAULT NULL,
 			PRIMARY KEY     (emlog_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
@@ -440,7 +457,7 @@ $schema_queries = array(
 			emret_ID        INT(10) UNSIGNED NOT NULL auto_increment,
 			emret_address   VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
 			emret_errormsg  VARCHAR(255) DEFAULT NULL,
-			emret_timestamp TIMESTAMP NOT NULL,
+			emret_timestamp TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			emret_headers   TEXT DEFAULT NULL,
 			emret_message   TEXT DEFAULT NULL,
 			emret_errtype   CHAR(1) COLLATE ascii_general_ci NOT NULL DEFAULT 'U',
@@ -468,14 +485,18 @@ $schema_queries = array(
 	'T_email__campaign' => array(
 		'Creating email campaigns table',
 		"CREATE TABLE T_email__campaign (
-			ecmp_ID          INT NOT NULL AUTO_INCREMENT,
-			ecmp_date_ts     TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-			ecmp_name        VARCHAR(255) NOT NULL,
-			ecmp_email_title VARCHAR(255) NULL,
-			ecmp_email_html  TEXT NULL,
-			ecmp_email_text  TEXT NULL,
-			ecmp_sent_ts     TIMESTAMP NULL,
-			PRIMARY KEY      (ecmp_ID)
+			ecmp_ID              INT NOT NULL AUTO_INCREMENT,
+			ecmp_date_ts         TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			ecmp_name            VARCHAR(255) NOT NULL,
+			ecmp_email_title     VARCHAR(255) NULL,
+			ecmp_email_html      TEXT NULL,
+			ecmp_email_text      TEXT NULL,
+			ecmp_email_plaintext TEXT NULL,
+			ecmp_sent_ts         TIMESTAMP NULL,
+			ecmp_renderers       VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			ecmp_use_wysiwyg     TINYINT(1) NOT NULL DEFAULT 0,
+			ecmp_send_ctsk_ID    INT(10) UNSIGNED NULL DEFAULT NULL,
+			PRIMARY KEY          (ecmp_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
 	'T_email__campaign_send' => array(
@@ -491,7 +512,7 @@ $schema_queries = array(
 		'Creating system log table',
 		"CREATE TABLE T_syslog (
 			slg_ID        INT NOT NULL AUTO_INCREMENT,
-			slg_timestamp TIMESTAMP NOT NULL,
+			slg_timestamp TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			slg_user_ID   INT UNSIGNED NULL,
 			slg_type      ENUM('info', 'warning', 'error', 'critical_error') COLLATE ascii_general_ci NOT NULL DEFAULT 'info',
 			slg_origin    ENUM('core', 'plugin') COLLATE ascii_general_ci,
@@ -501,7 +522,7 @@ $schema_queries = array(
 			slg_message   VARCHAR(255) NOT NULL,
 			PRIMARY KEY   (slg_ID),
 			INDEX         slg_object (slg_object, slg_object_ID)
-		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" )
+		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 );
 
 ?>

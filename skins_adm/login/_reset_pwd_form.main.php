@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package htsrv
  */
@@ -25,7 +25,7 @@ $params = array(
 		'display_abandon_link'      => false,
 		'button_class'              => ' btn-lg',
 		'skin_form_params'          => $login_form_params,
-		'form_action'               => get_secure_htsrv_url().'login.php',
+		'form_action'               => get_htsrv_url( true ).'login.php',
 		'form_button_action'        => 'updatepwd',
 		'form_hidden_crumb'         => 'regform',
 		'check_User_from_Session'   => false,

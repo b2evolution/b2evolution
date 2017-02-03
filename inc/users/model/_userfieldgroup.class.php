@@ -5,19 +5,17 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
- *
- * @version _userfieldgroup.class.php,v 1.5 2009/09/16 18:11:51 fplanque Exp
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 
 /**
- * Userfield Class
+ * UserfieldGroup Class
  *
  * @package evocore
  */
@@ -31,19 +29,16 @@ class UserfieldGroup extends DataObject
 	 *
 	 * @param object Database row
 	 */
-	function UserfieldGroup( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_users__fieldgroups', 'ufgp_', 'ufgp_ID' );
+		parent::__construct( 'T_users__fieldgroups', 'ufgp_', 'ufgp_ID' );
 
 		if( $db_row != NULL )
 		{
 			$this->ID   = $db_row->ufgp_ID;
 			$this->name = $db_row->ufgp_name;
 			$this->order = $db_row->ufgp_order;
-		}
-		else
-		{	// Create a new user field group:
 		}
 	}
 
@@ -73,24 +68,13 @@ class UserfieldGroup extends DataObject
 		$this->set_from_Request( 'name' );
 
 		// Order
-		param_string_not_empty( 'ufgp_order', T_('Please enter an order number.') );
-		$this->set_from_Request( 'order' );
+		if( param( 'ufgp_order', 'integer' ) !== 0 ) // Allow zero value
+		{
+			param_check_not_empty( 'ufgp_order', T_('Please enter an order number.') );
+		}
+		$this->set( 'order', param( 'ufgp_order', 'integer' ) );
 
 		return ! param_errors_detected();
-	}
-
-
-	/**
-	 * Set param value
-	 *
-	 * By default, all values will be considered strings
-	 *
-	 * @param string parameter name
-	 * @param mixed parameter value
-	 */
-	function set( $parname, $parvalue )
-	{
-		$this->set_param( $parname, 'string', $parvalue );
 	}
 
 
@@ -103,31 +87,5 @@ class UserfieldGroup extends DataObject
 	{
 		return $this->name;
 	}
-
-
-	/**
-	 * Check existence of specified user field group ID in ufgp_ID unique field.
-	 *
-	 * @todo dh> Two returns here!!
-	 * @return int ID if user field group exists otherwise NULL/false
-	 */
-	function dbexists()
-	{
-		global $DB;
-
-		$sql = "SELECT $this->dbIDname
-						  FROM $this->dbtablename
-					   WHERE $this->dbIDname = $this->ID";
-
-		return $DB->get_var( $sql );
-
-		return parent::dbexists('ufgp_ID', $this->ID);
-	}
 }
-
-
-/*
- * _userfieldgroup.class.php,v
- *
- */
 ?>

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -145,6 +145,16 @@ switch( $action )
 $AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
 $AdminUI->breadcrumbpath_add( T_('Slugs'), $admin_url.'?ctrl=slugs' );
+
+// Set an url for manual page:
+if( $action == 'new' || $action == 'edit' )
+{
+	$AdminUI->set_page_manual_link( 'slug-form' );
+}
+else
+{
+	$AdminUI->set_page_manual_link( 'slugs-list' );
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

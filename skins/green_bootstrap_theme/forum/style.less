@@ -1,0 +1,1117 @@
+.border-radius (@radius: 4px) {
+	-webkit-border-radius: @radius;
+	-moz-border-radius: @radius;
+	-ms-border-radius: @radius;
+	-o-border-radius: @radius;
+	border-radius: @radius;
+}
+
+// Header
+.evo_container__page_top {
+	margin-top: 20px;
+	.ufld_icon_links {
+		text-align: right;
+	}
+}
+
+// Footer
+.evo_container__footer {
+	text-align: right;
+	color: #A1A9B7;
+	font-size: 13px;
+	font-weight: bold;
+	text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+}
+// Powered By image background
+.powered_by {
+	a {
+		img {
+			background-color: rgba(255,255,255,1);
+			border-radius: 4px;
+		}
+	}
+}
+
+// Same effect on every avatar (logged in, logged out)
+.evo_comment_avatar {
+	padding-left: 0px;
+	padding-right: 0px;
+	text-align: center !important;
+	float: left;
+	> span > img, > a > img {
+		border-radius: 50%;
+		float: none !important;
+		margin: 0px 0px 14px 0px !important;
+	}
+	a.user {
+		display: block;
+	}
+}
+.evo_comment_text {
+	padding-right: 0px;
+}
+
+// Breadcrumbs
+ol.breadcrumb {
+	margin-left: 0;
+	float: left;
+}
+
+// Status icons
+.fa.icon {
+	text-align: center;
+	background: #FFF;
+	border: 2px solid #306595;
+	.border-radius(50%);
+	width: 21px;
+	height: 21px;
+	line-height: 18px;
+	font-size: 12px;
+	&.big {
+		width: 28px;
+		height: 28px;
+		line-height: 25px;
+		font-size: 16px;
+	}
+}
+
+// Forums table list
+.forums_list {
+	//Disp=posts pagination
+	.comments_link__pagination {
+			text-align: center;
+		.post_button {
+			float: left;
+			vertical-align: top;
+		}
+		.pagination {
+			display: inline-block;
+			vertical-align: top;
+			margin: 0 auto;
+			margin-left: -76px;
+		}
+	}
+	box-shadow: none;
+	.panel-heading {
+		&:not(:first-child) {
+			border-top: 1px solid #ddd;
+			.border-radius(0);
+		}
+		h2 {
+			margin-top: 0;
+		}
+		.btn {
+			margin: -6px 0 0 6px;
+		}
+	}
+	&.panel>a+.table {
+		border-top:1px solid #ddd;
+	}
+	.meta_category a {
+		color: #535C66;
+		font-size: 14px;
+		font-weight: bold;
+		text-transform: uppercase;
+	}
+	.group_row {
+		width: 100%;
+		border-bottom: 1px solid #ddd;
+		padding: 8px 0px;
+		display: inline-block;
+		vertical-align: middle;
+		text-align: left;
+		&:nth-last-child(1) {
+			border-bottom: none;
+		}
+		&:hover {
+			background-color: #f5f5f5;
+		}
+	}
+	/* This is the row layout on disp=posts */
+	.posts_panel {
+		text-align: left;
+		.ft_title {
+			margin-left: 35px;
+			.fa {
+				margin: 0px 5px 0px 0px;
+			}
+			.small {
+				font-size: 90%;
+			}
+		}
+		.ft_author_info {
+			margin-left: 35px;
+			padding-top: 2px;
+			font-size: 90%;
+			color: #8b96a1;
+			display: inline-block;
+			white-space: normal !important;
+		}
+
+		.ft_date, .ft_workflow_info {
+			text-align: left;
+			img {
+				border-radius: 50%;
+			}
+			a.ft_author_avatar:hover {
+				background-color: transparent !important;
+			}
+			.last_mod_date {
+				white-space: normal;
+			}
+		}
+		.ft_count {
+			margin-top: 12px;
+		}
+		.ft_assigned {
+			img {
+				border-radius: 50%;
+			}
+		}
+	}
+	.ft_status {
+		width: 30px;
+		padding: 0px;
+		margin: 12px 15px 0px 0px;
+		float: left;
+	}
+	.ft_status_topic {
+		width: 30px;
+		padding: 0px;
+		//margin-top: 5px;
+		float: left;
+		.fa.fa-comments {
+			color: #000000;
+		}
+		.fa.fa-comments:hover {
+			color: inherit;
+		}
+	}
+	.ft_count {
+		margin-top: 5px;
+		font-size: 90%;
+		a, div {
+			font-size: 16px;
+		}
+	}
+	.ft_assigned {
+		font-size: 90%;
+		line-height: 16px;
+		margin-top: 3px;
+		div.ft_assigned_header {
+				margin-bottom: 5px;
+			}
+		span.user.anonymous, span.identity_link_username {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 100%;
+			display: inline-block;
+		}
+		.ft_assigned_info {
+			padding-left: 42px;
+		}
+	}
+
+	.ft_not_assigned {
+		font-size: 90%;
+		line-height: 16px;
+		margin-top: 3px;
+		div.ft_assigned_header {
+				margin-bottom: 5px;
+			}
+		span.user.anonymous, span.identity_link_username {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 100%;
+			display: inline-block;
+		}
+		.ft_assigned_info {
+			padding-left: 0px;
+		}
+	}
+
+
+	.ft_not_assigned {
+		font-size: 90%;
+		line-height: 16px;
+		margin-top: 13px;
+	}
+
+	.ft_date, .ft_workflow_info {
+		color: #8b96a1;
+		font-size: 90%;
+		line-height: 16px;
+		
+		div.ft_date_header {
+				margin-bottom: 5px;
+			}
+		span.user.anonymous, span.identity_link_username {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 100%;
+			display: inline-block;
+		}
+	}
+	// .ft_date margin is set separately because we handle the same CSS for both .ft_date and .ft_workflow_info, only margin is different
+	.ft_date {
+		margin-top: 17px;
+	}
+	// When Enabled "Workflow" option, we use .ft_workflow_info instead of .ft_date
+	.ft_workflow_info {
+		margin-top: 2px;
+	}
+	.ft_title >	a.forumlink {
+		font-size: 21px;
+	}
+	.ft_title a.topictitle {
+		font-size: 16px;
+		font-weight: bold;
+	}
+	.ft_desc, .ft_count {
+		text-align: center;
+		color: #8B96A1;
+	}
+	.ft_assigned_avatar {
+		float: left;
+		margin-right: 10px;
+		display: block;
+		.ft_assigned_avatar {
+			float: none;
+			margin-right: 0;
+		}
+	}
+	.ft_date {
+		text-align: center;
+		white-space: nowrap;
+	}
+	.ft_date_shrinked, .ft_date_shrinked_more {
+		display: none;
+		line-height: 16px;
+		margin-top: 3px;
+		div.ft_date_header {
+				margin-bottom: 5px;
+			}
+		span.user.anonymous, span.identity_link_username {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 100%;
+			display: inline-block;
+		}
+	}
+	.ft_author_avatar {
+		float: left;
+		margin-right: 10px;
+		display: block;
+		img {
+			.border-radius(3px);
+		}
+		.ft_author_avatar {
+			float: none;
+			margin-right: 0;
+		}
+	}
+	.ft_comment_response {
+		h3 {
+			margin: 0;
+		}
+	}
+	.ft_no_post {
+		padding: 8px;
+	}
+}
+// Comment form
+.forums_list.single_topic {
+	border: none;
+	.panel-heading {
+		.evo_comment_title {
+			display: inline;
+			a {
+			}
+			a.user:hover {
+				background: #f8e0e0 none repeat scroll 0 0;
+				border-radius: 2px;
+			}
+		}
+		.evo_comment_post_title {
+			font-size: 16px;
+			margin: 0px;
+			display: inline;
+		}
+	}
+}
+.evo_comment_title {
+	a.permalink {
+		color: #337ab7;
+		&:hover {
+			color: #23527c;
+		}
+	}
+}
+.bCommentAvatar {
+	border-radius: 50%;
+	float: left;
+	margin: 4px 10px 10px 0;
+}
+
+// Fix buttons for comment actions
+.btn-group>.btn.first-child {
+	border-top-left-radius: 3px !important;
+	border-bottom-left-radius: 3px !important;
+}
+
+// Important text-overflow class
+.ellipsis {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+// Overflow class
+.clearfix:after {
+	content:" ";
+	display: block;
+	height: 0;
+	clear: both;
+}
+
+// Legend table & list
+.legends {
+	text-align: center;
+	legend {
+		text-align: center;
+		border: none;
+		text-transform: uppercase;
+		font-variant: small-caps;
+		font-size: 82%;
+		margin-bottom: 10px;
+	}
+}
+.legend, .legend-item {
+	text-align: center;
+	div {
+		padding: 0 20px 0 5px;
+		display:inline-block;
+	}
+}
+.legend-item {
+	margin: 0px 5px 12px 5px;
+	display: inline-block;
+}
+ul.legend {
+	list-style: none;
+	border: none;
+	text-align: center;
+	padding: 0;
+	&.evo_posts.evo_forums {
+		margin: 0 auto 14px;
+	}
+	li {
+		list-style: none;
+		display: inline-block;
+		white-space: nowrap;
+		vertical-align: middle;
+		margin: 0px 5px 5px 5px;
+		span {
+			vertical-align: middle;
+		}
+		a {
+			text-decoration: none;
+			vertical-align: middle;
+			display: inline-block;
+		}
+	}
+	span.note {
+		float: none;
+	}
+}
+
+// Post navigation
+.pager {
+	margin: 0 0 15px 0;
+	padding-right: 0;
+}
+
+// Login/Register forms:
+.skin-form {
+	.panel-body {
+		.panel {
+			border: none;
+			box-shadow: none;
+		}
+		.panel-body {
+			padding: 0;
+		}
+	}
+	.fieldset {
+		margin: 0;
+		div.input {
+			margin: 0;
+		}
+	}
+	.control-buttons, div.input {
+		padding: 0;
+		width: 100%;
+		text-align: center;
+	}
+}
+.evo_panel__login, .evo_panel__lostpass, .evo_panel__register, .evo_panel__activation {
+	min-width: 290px;
+	margin: 1.5em auto auto;
+	.panel {
+		margin: 5px 0;
+	}
+	.panel-body {
+		padding-top: 20px;
+		padding-bottom: 0;
+	}
+}
+.evo_panel__login {
+	max-width: 400px;
+}
+.evo_panel__lostpass {
+	max-width: 480px;
+	#ffield_x label {
+		display: none;
+	}
+}
+.evo_panel__activation {
+	max-width: 530px;
+	#activateinfo_form .control-buttons{
+		text-align: left;
+	}
+}
+.evo_panel__register {
+	max-width: 580px;
+	.control-buttons{
+		text-align: left;
+	}
+	&.register-disabled {
+		width: 350px;
+	}
+	.form-control {
+		&#country, &#u {
+			width: 100%;
+		}
+	}
+}
+.evo_form__login_links {
+	padding: 0 5px;
+	font-size: 92%;
+}
+.evo_form__login {
+	fieldset {
+		margin-bottom: 20px;
+	}
+	.controls {
+		padding: 0;
+		margin: 0;
+		width: 100%;
+	}
+	.control-buttons {
+		margin-left: 0;
+	}
+	input.form-control[type=text], input.form-control[type=password] {
+		width: 100%;
+	}
+	.btn {
+		margin-top: 5px;
+	}
+}
+#login_form {
+	.control-buttons {
+		text-align: left;
+	}
+}
+.standard_login_link {
+	text-align: center;
+	margin: 3em 0 1ex 0;
+}
+.form_footer_notes {
+	margin-top: 0;
+}
+
+// Single topic view
+.single_page_title {
+	margin-bottom: 20px;
+	// We want shrinked author info to display only on super small sizes (check under <375px media query below)
+	.ft_author_info.shrinked {
+		display: none;
+	}
+}
+.single_topic {
+	.ft_post_info {
+		padding: 8px;
+	}
+	.votes_help_spam {
+		padding-top: 15px;
+		border-top: 1px solid #ddd;
+		margin-top: 15px;
+		div, span {
+			display: inline-block;
+			vertical-align: middle;
+		}
+	}
+	/* LATEST CHANGE
+	.evo_post__full {
+		padding-bottom: 15px;
+	}*/
+	.star_rating {
+		display: inline-block;
+		margin: 0 10px;
+	}
+	.evo_content_block {
+		width: 100%;
+		.panel-body {
+			.ft_avatar {
+				padding: 0px;
+				text-align: center;
+				/* @MILOS > Still testing to see if this is overrulled by: line 992
+				span > img.loadimg, a > img.loadimg {
+					border-radius: 50% !important;
+				}*/
+			}
+			.post_main {
+				padding-right: 0px;
+			}
+		}
+		span[class*="status_"] {
+			left: 15px;
+			top: -15px;
+		}
+	}
+	// Profile pictures
+	.ft_avatar {
+		> a {
+			position: relative;
+			&:before {
+			//	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2) inset;
+				content: "";
+				display: block;
+				height: 100%;
+				position: absolute;
+				width: 100%;
+			}
+		}
+		> a, > span, a > img {
+			display: inline-block;
+		}
+	}
+}
+body.round_avatars .single_topic .evo_content_block .ft_avatar {
+	> a:before, > a, > span, a > img {
+		.border-radius(50%);
+	}
+}
+
+// Voting panels
+.vote_spam {
+	float: left;
+	height: 22px;
+	line-height: 22px;
+	.action_icon {
+		margin: 0;
+	}
+}
+a.btn+.vote_spam {
+	margin-left: 5px;
+}
+.evo_voting_panel {
+	float: left;
+	margin-right: 10px;
+	height: 22px;
+	line-height: 22px;
+	span.fa {
+		line-height: 20px;
+	}
+}
+// A link to reply on comment:
+.comment_reply {
+	height: 22px;
+	line-height: 22px;
+	margin-right: 10px;
+}
+
+// Button to quote a reply/topic:
+.quote_button {
+	margin-right: 10px;
+}
+
+// Form elements on item edit page
+label.control-label[for=post_title] {
+	width: auto;
+}
+
+// Profile page
+.profile_avatar {
+	float: right;
+	padding: 10px;
+	margin-left: 10px;
+}
+
+// Recent topics button
+.btn_recent_topics {
+	margin: 0 0 20px 5px;
+}
+
+// Search form
+main .widget_core_coll_search_form {
+	float: right;
+	width: 40%;
+	min-width: 250px;
+	margin: 0 0 20px 5px;
+	div.compact_search_form input.search_field {
+		width: 100%;
+	}
+}
+
+aside .widget_core_coll_search_form {
+	div.compact_search_form input.search_field {
+		width: 100%;
+	}
+}
+
+// Search disp
+.extended_search_form {
+	width: 100%;
+	display: inline-block;
+	vertical-align: center;
+	text-align: center;
+	input {
+		text-align: left;
+		display: inline-block;
+	}
+	.SearchField {
+		width: 50%;
+	}
+	.search_submit {
+		margin-top: -2px;
+	}
+}
+.evo_search_navigation {
+	padding-bottom: 20px;
+	strong, a {
+		margin: 0px 3px;
+	}
+}
+.evo_search_list {
+	.evo_search_list__row {
+		padding: 15px 0;
+	}
+}
+
+// Low resolution layout *** MILOS ***
+// Responsive styles
+@media screen and (max-width: 1199px) {
+	.front_panel {
+		.ft_count {
+			margin-top: 5px;
+		}
+	}
+	.posts_panel {
+		.ft_count {
+			margin-top: 12px !important;
+		}
+	}
+}
+
+@media screen and (max-width: 991px) {
+	.front_panel {
+		.ft_count {
+			padding: 0px 7px;
+			margin-top: 5px;
+		}
+	}
+	.posts_panel {
+		.ft_status_topic {
+			vertical-align: top;
+			//margin-top: 5px;
+		}
+		.ft_title .floatright {
+			display: inline-block;
+			margin-left: 8px;
+		}
+	}
+	.forums_list .pagination {
+		float: right;
+		margin-left: 10px;
+	}
+}
+//@media screen and (min-width: 600px) and (max-width: 767px) {
+//	.ft_workflow_info {
+//		padding-left: 50px;
+//	}
+//}
+@media screen and (max-width: 767px) {
+	.ft_date {
+		display: none !important;
+	}
+	.ft_workflow_status_and_author {
+		padding-right: 0;
+	}
+	.ft_workflow_last_comment {
+		padding-left: 5px;
+	}
+	.ft_assigned {
+		margin-top: 4px;
+	}
+	.ft_date_shrinked {
+		display: inline-block !important;
+		text-align: center;
+		color: #8b96a1;
+		font-size: 90%;
+	}
+	.front_panel {
+		.ft_date_shrinked {
+			margin-top: 17px;
+		}
+	}
+	.posts_panel {
+		.ft_count {
+			margin: 0px;
+			text-align: left;
+			margin-top: 4px !important;
+			padding-left: 50px;
+			//padding-left: 5px;
+			div {
+				display: inline-block;
+				line-height: 22px;
+				// Using decimal size here because the other in-line div has 90% font-size of body (which is 14px)
+				// This div cannot have 90% because it already has declared 16px font-size and 90% of it doesn't have the same value
+				font-size: 12.6px;
+				a {
+					// In case there is at least one recent comment, it is a link, so we need to override 16px font-size here as well
+					font-size: 12.6px;
+				}
+			}
+		}
+		.ft_assigned {
+			margin-top: 4px;
+		}
+		.ft_date_shrinked {
+			text-align: left;
+			padding-left: 0px;
+			padding-right: 15px;
+			float: left;
+			margin-top: 4px;
+			line-height: 22px;
+			
+			span {
+				vertical-align: top;
+			}
+		}
+	}
+	.legend-item {
+		margin-bottom: 5px;
+	}
+	.evo_content_block {
+		.post_main {
+			padding: 15px 0px 0px 0px;
+		}
+		.panel-footer {
+			overflow: hidden;
+		}
+	}
+	.evo_comment {
+		.evo_comment_text {
+			padding-left: 0px;
+		}
+		.evo_comment .panel-footer .floatright {
+			a.btn {
+				margin-top: 3px;
+			}
+		}
+		.evo_comment_post_title {
+			display: block !important;
+		}
+	}
+	.vs_published {
+		.evo_comment_avatar {
+			margin-right: 15px;
+		}
+	}
+	.single_topic .evo_content_block .panel-body .ft_avatar {
+		float: left;
+		margin: 0px 15px 0px 0px;
+	}
+	blockquote {
+		display: inline-block;
+	}
+}
+@media screen and (max-width: 600px) {
+	.widget_core_coll_search_form {
+		width: 100%;
+	}
+	.table-hover .group_row {
+		width: 100%;
+		border-bottom: 1px solid #ddd;
+		padding: 8px 0px;
+		display: block !important;
+		vertical-align: middle;
+		text-align: left !important;
+		&:nth-last-child(1) {
+			border-bottom: none;
+		}
+		&:nth-child(even) {
+			background-color: #f5f5f5;
+		}
+		.ft_status__ft_title {
+			width: 100%;
+		}
+		.ft_status {
+			margin-right: 11px;
+			float: left;
+		}
+		.ft_count {
+			text-align: left;
+			margin-top: 4px !important;
+			//width: 80px;
+			padding-right: 5px;
+			div {
+				display: inline-block !important;
+			}
+			&.second_of_class {
+				padding-left: 0px;
+				margin-left: 0px;
+			}
+		}
+		.ft_not_assigned {
+			//padding-left: 0px;
+			margin-top: 13px;
+		}
+
+		.ft_assigned {
+			//padding-left: 0px;
+			margin-top: 4px;
+		}
+		.ft_date_shrinked {
+			text-align: right;
+			float: right;
+			margin-top: 8px;
+			// margin-left: 5px;
+		}
+	}
+	.front_panel {
+		.ft_count {
+			display: inline-block !important;
+			padding-left: 5px !important;
+			margin-left: 55px;
+			&:second_of_class {
+			margin-left: 0px !important;
+			}
+		}
+		.ft_assigned {
+			margin-top: 4px;
+		}
+		.ft_date_shrinked {
+			margin-top: 4px;
+			width: 80px;
+			padding-left: 0px;
+		}
+	}
+	.posts_panel {
+		.small {
+			display: none;
+		}
+		.ft_date_shrinked.item_list {
+			float: none;
+			text-align: left;
+			display: inline;
+			margin-top: 4px;
+		}
+	}
+	.evo_comment_avatar {
+		a img, span img {
+			margin-top: 5px !important;
+		}
+	}
+}
+@media screen and (max-width: 375px) {
+	.widget_core_coll_title h1 a, .forums_list.single_topic section.panel .panel-heading h2 a {
+		font-size: 92%;
+	}
+	.nav li a {
+		font-size: 92%;
+		padding: 10px 5px;
+	}
+	.page_title, .panel-heading h2 {
+		font-size: 170%;
+	}
+
+	.forums_list
+		img.ft_assigned_avatar {
+			display: none;
+		}
+
+	.ft_date_shrinked_more {
+		display: block !important;
+		text-align: right;
+		padding-right: 15px;
+		margin-top: 2px;
+		color: #8b96a1;
+		font-size: 80%;
+	}
+	.single_page_title {
+		.ft_author_info {
+			display: none;
+		}
+		.ft_author_info.shrinked {
+			display: block;
+		}
+	}
+	/* Disp front */
+	.front_panel {
+		.table-hover .group_row .ft_count {
+			width: 77px;
+				padding-left: 0px !important;
+				padding-right: 0px;
+			&.second_of_class {
+				padding-right: 0px !important;
+				margin-left: 5px;
+			}
+		}
+		.ft_date_shrinked {
+			width: 70px;
+		}
+	}
+	/* Disp posts */
+	.posts_panel {
+		.ft_status_topic {
+			vertical-align: top;
+			// margin-top: 8px;
+		}
+		.ft_count {
+			margin-top: 0px;
+			padding-left: 50px;
+			//padding-left: 0px;
+		}
+		.ft_assigned {
+			font-size: 90%;
+			.ft_assigned_info {
+				padding-left: 0;
+			}
+		}
+		.ft_date_shrinked.item_list {
+			font-size: 90%;
+			margin-top: 4px;
+		}
+		.ft_author_info {
+			display: none !important;
+		}
+	}
+	/* Disp Single */
+	.forums_list.single_topic section.panel {
+		.panel-body .pager {
+			display: none;
+		}
+	}
+
+	.evo_comment_avatar, .single_topic .evo_content_block .panel-body .ft_avatar {
+		margin-right: 0px !important;
+		a img, span img {
+			width: 65px;
+			height: 65px;
+			margin: 0px 15px 10px 0px !important;
+		}
+	}
+	.forums_list {
+		//Disp=posts pagination
+		.comments_link__pagination {
+				text-align: left;
+			.post_button {
+				float: none;
+				vertical-align: top;
+				margin-bottom: 15px;
+			}
+			.pagination {
+				float: none;
+				display: block;
+				vertical-align: top;
+				margin: 0px;
+			}
+		}
+	}
+}
+
+// POSTS PANEL BADGE FIX
+.posts_panel_title_wrapper {
+	width: 100%;
+	display: table;
+	table-layout: fixed;
+	.wrap {
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		word-break: break-all;
+		word-wrap: break-word;
+		.topictitle {
+			display: inline;
+			min-width: 200px;
+		}
+	}
+	.cell1 {
+		width: 100%;
+	}
+	.cell2 {
+			width: 80px;
+			text-align: right;
+		.floatright {
+			float: none !important;
+			display: inline;
+		}
+	}
+}
+.cell1, .cell2 {
+	display: table-cell;
+}
+
+// Comment-footer link TO TOP size FIX
+a.to_top {
+	font-size: 14px !important;
+	margin-right: 10px;
+	float: left;
+}
+
+// Positions on the action buttons near page titles
+.evo_post_title {
+	display: table;
+	h1 {
+		display: table-cell;
+		margin: 0;
+		padding: 20px 0 10px;
+	}
+	.btn-group {
+		display: table-cell;
+		padding: 20px 0 10px 30px;
+		vertical-align: middle;
+	}
+}
+
+//
+.popover img {
+	.border-radius !important;
+}
+.forums_list.front_panel {
+	border-bottom: 0px !important;
+	.table {
+		border-bottom: 1px solid #ddd;
+		&:nth-last-child(1) {
+			border-radius: 0px 0px 4px 4px;
+		}
+	}
+}
+.ft_avatar > a > img, .ft_avatar > span > img {
+	border-radius: 50% !important;
+}
+.evo_comment_avatar > a:hover {
+	background-color: transparent !important;
+}
+
+// Fix styles for message that appears instead of a button to post when user must activate account:
+.comments_link__pagination .alert {
+	margin: 0;
+	text-align: left;
+}

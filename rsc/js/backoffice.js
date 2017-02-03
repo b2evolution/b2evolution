@@ -96,7 +96,7 @@ function toggle_clickopen( id, hide, displayVisible )
  * Used only on BACK-office in the following files:
  *  - _misc_js.funcs.php
  *  - blog_widgets.js
- *  - links.js
+ *  - src/evo_links.js
  *
  * @param jQuery selector
  */
@@ -111,7 +111,7 @@ function evoFadeSuccess( selector )
  *
  * Used only in BACK-office in the following files:
  *  - _misc_js.funcs.php
- *  - links.js
+ *  - src/evo_links.js
  *
  * @param jQuery selector
  */
@@ -143,7 +143,7 @@ function evoFadeHighlight( selector )
  * Used only on BACK-office in the following files:
  *  - _misc_js.funcs.php
  *  - blog_widgets.js
- *  - links.js
+ *  - src/evo_links.js
  *  - _file_list.inc.php
  *
  * @param string|jQuery
@@ -323,4 +323,23 @@ function b2edit_type( msg, newaction, submit_action )
 	}
 
 	return b2edit_reload( document.getElementById( 'item_checkchanges' ), newaction, null, { action: submit_action }, reset );
+}
+
+
+/**
+ * Ask to submit the form after clicking on action button
+ *
+ * This is used to the button "Extract tags"
+ */
+function b2edit_confirm( msg, newaction, submit_action )
+{
+	if( typeof( bozo ) && bozo.nb_changes > 0 )
+	{	// Ask about saving of the changes in the form:
+		if( ! confirm( msg ) )
+		{
+			return false;
+		}
+	}
+
+	return b2edit_reload( document.getElementById( 'item_checkchanges' ), newaction, null, { action: submit_action }, false );
 }

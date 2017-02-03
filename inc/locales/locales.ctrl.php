@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -54,7 +54,8 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		param( 'newdefault_locale', 'string', true );
+		// If default locale has not been selected on form use default locale from config var $default_locale:
+		param( 'newdefault_locale', 'string', $default_locale );
 		$Settings->set( 'default_locale', $newdefault_locale );
 
 		if( ( ! $Messages->has_errors() ) && ( locale_updateDB() ) )
@@ -84,15 +85,66 @@ switch( $action )
 		param( 'newloc_name', 'string', true );
 		param( 'newloc_datefmt', 'string', true );
 		param_check_not_empty( 'newloc_datefmt', T_('Date format cannot be empty.') );
+		param( 'newloc_longdatefmt', 'string', '' );
+		param( 'newloc_extdatefmt', 'string', '' );
+		param( 'newloc_input_datefmt', 'string', '' );
 		param( 'newloc_timefmt', 'string', true );
 		param_check_not_empty( 'newloc_timefmt', T_('Time format cannot be empty.') );
 		param( 'newloc_shorttimefmt', 'string', true );
+		param( 'newloc_input_timefmt', 'string', '' );
 		param_check_not_empty( 'newloc_shorttimefmt', T_('Short time format cannot be empty.') );
 		param( 'newloc_startofweek', 'integer', 0 );
 		param( 'newloc_priority', 'integer', 1 );
 		param_check_range( 'newloc_priority', 1, 255, T_('Priority must be numeric (1-255).') );
 		param( 'newloc_messages', 'string', true );
 		param( 'newloc_transliteration_map', 'string', true );
+
+		if( empty( $newloc_longdatefmt ) )
+		{
+			$newloc_longdatefmt = str_replace( 'y', 'Y', $newloc_datefmt );
+		}
+
+		if( empty( $newloc_extdatefmt ) )
+		{
+			$newloc_extdatefmt = str_replace( 'm', 'M', $newloc_longdatefmt );
+			$newloc_extdatefmt = str_replace( array( '.', '-', '\\', '/' ), ' ', $newloc_extdatefmt );
+		}
+
+		$date_format_regex = '/[^dDjmnYy:\.,\-_\/\\\\ ]/';
+		$time_format_regex = '/[^gGhHisu:\-_\., \/\\\\ ]/';
+
+		if( empty( $newloc_input_datefmt ) )
+		{
+			if( preg_match( $date_format_regex, $newloc_datefmt ) )
+			{
+				$newloc_input_datefmt = 'Y-m-d';
+			}
+			else
+			{
+				$newloc_input_datefmt = $newloc_datefmt;
+			}
+		}
+		elseif( preg_match( $date_format_regex, $newloc_input_datefmt ) )
+		{
+			param_error( 'newloc_input_datefmt', T_('Invalid input date format.') );
+		}
+
+		if( empty( $newloc_input_timefmt ) )
+		{
+			if( preg_match( $time_format_regex, $newloc_timefmt ) )
+			{
+				$newloc_input_timefmt = 'H:i:s';
+			}
+			else
+			{
+				$newloc_input_timefmt = $newloc_timefmt;
+			}
+		}
+		elseif( preg_match( $time_format_regex, $newloc_input_timefmt ) )
+		{
+			param_error( 'newloc_input_timefmt', T_('Invalid input time format.') );
+		}
+
 
 		if( param_errors_detected() )
 		{ // Don't save locale if errors exist
@@ -126,13 +178,20 @@ switch( $action )
 				}
 
 				$query = "INSERT INTO T_locales
-									( loc_locale, loc_datefmt, loc_timefmt, loc_shorttimefmt, loc_startofweek, loc_name, loc_messages, loc_priority, loc_transliteration_map, loc_enabled )
+									( loc_locale, loc_datefmt, loc_longdatefmt, loc_extdatefmt, loc_input_datefmt, loc_timefmt, loc_shorttimefmt, loc_input_timefmt, loc_startofweek, loc_name, loc_messages, loc_priority, loc_transliteration_map, loc_enabled )
 									VALUES ( '$oldloc_locale',
 									'{$locales[$oldloc_locale]['datefmt']}',
-									'{$locales[$oldloc_locale]['timefmt']}', '{$locales[$oldloc_locale]['shorttimefmt']}',
+									'{$locales[$oldloc_locale]['longdatefmt']}',
+									'{$locales[$oldloc_locale]['extdatefmt']}',
+									'{$locales[$oldloc_locale]['input_datefmt']}',
+									'{$locales[$oldloc_locale]['timefmt']}',
+									'{$locales[$oldloc_locale]['shorttimefmt']}',
+									'{$locales[$oldloc_locale]['input_timefmt']}',
 									'{$locales[$oldloc_locale]['startofweek']}',
-									'{$locales[$oldloc_locale]['name']}', '{$locales[$oldloc_locale]['messages']}',
-									'{$locales[$oldloc_locale]['priority']}', '$transliteration_map'";
+									'{$locales[$oldloc_locale]['name']}',
+									'{$locales[$oldloc_locale]['messages']}',
+									'{$locales[$oldloc_locale]['priority']}',
+									'$transliteration_map'";
 				if( $oldloc_locale != $newloc_locale )
 				{ // disable old locale
 					$query .= ', 0 )';
@@ -148,11 +207,11 @@ switch( $action )
 		}
 
 		$query = 'REPLACE INTO T_locales
-							( loc_locale, loc_datefmt, loc_timefmt, loc_shorttimefmt, loc_startofweek, loc_name, loc_messages, loc_priority, loc_transliteration_map, loc_enabled )
-							VALUES ( '.$DB->quote( $newloc_locale ).', '.$DB->quote( $newloc_datefmt ).', '
-								.$DB->quote( $newloc_timefmt ).', '.$DB->quote( $newloc_shorttimefmt ).', '.$DB->quote( $newloc_startofweek ).', '.$DB->quote( $newloc_name ).', '
-								.$DB->quote( $newloc_messages ).', '.$DB->quote( $newloc_priority ).', '.$DB->quote( $newloc_transliteration_map ).', '
-								.$DB->quote( $newloc_enabled ).' )';
+							( loc_locale, loc_datefmt, loc_longdatefmt, loc_extdatefmt, loc_input_datefmt, loc_timefmt, loc_shorttimefmt, loc_input_timefmt,
+									loc_startofweek, loc_name, loc_messages, loc_priority, loc_transliteration_map, loc_enabled )
+							VALUES ( '.$DB->quote( $newloc_locale ).', '.$DB->quote( $newloc_datefmt ).', '.$DB->quote( $newloc_longdatefmt ).', '.$DB->quote( $newloc_extdatefmt ).', '.$DB->quote( $newloc_input_datefmt ).', '
+								.$DB->quote( $newloc_timefmt ).', '.$DB->quote( $newloc_shorttimefmt ).', '.$DB->quote( $newloc_input_timefmt ).', '.$DB->quote( $newloc_startofweek ).', '.$DB->quote( $newloc_name ).', '
+								.$DB->quote( $newloc_messages ).', '.$DB->quote( $newloc_priority ).', '.$DB->quote( $newloc_transliteration_map ).', '.$DB->quote( $newloc_enabled ).' )';
 		$q = $DB->query( $query );
 		$Messages->add( sprintf(T_('Saved locale &laquo;%s&raquo;.'), $newloc_locale), 'success' );
 
@@ -207,9 +266,18 @@ switch( $action )
 		// forget DB locales:
 		unset( $locales );
 
-		// delete everything from locales table
-		$q = $DB->query( 'DELETE FROM T_locales'
-			.( empty( $nofile_locales ) ? '' : ' WHERE loc_locale NOT IN ( '.$DB->quote( $nofile_locales ).' )' ) );
+		// Get all enabled locales before restoring:
+		$locale_SQL = new SQL();
+		$locale_SQL->SELECT( 'loc_locale' );
+		$locale_SQL->FROM( 'T_locales' );
+		$locale_SQL->WHERE( 'loc_enabled = 1' );
+		$enabled_locales = $DB->get_col( $locale_SQL->get(), 0, 'Get all enabled locales before restoring' );
+
+		// Delete locales that are not enabled and have no file currently:
+		$q = $DB->query( 'DELETE FROM T_locales
+			WHERE loc_enabled != 1'
+			.( empty( $nofile_locales ) ? '' : ' AND loc_locale NOT IN ( '.$DB->quote( $nofile_locales ).' )' ),
+			'Delete locales that are not enabled and have no file currently' );
 
 		if( ! isset( $locales[ $current_locale ] ) )
 		{ // activate default locale
@@ -229,10 +297,11 @@ switch( $action )
 		}
 
 		// Load all available locale defintions from locale folders:
+		$locales_loaded_form_disk = false; // Reset to FALSE in order to load all locales again, to use them in func below:
 		locales_load_available_defs();
 
-		// Reenable default locale
-		locale_insert_default();
+		// Restore default values of the enabled locales:
+		locale_restore_defaults( $enabled_locales );
 
 		$Messages->add( T_('Locale definitions reset to defaults. (<code>/conf/_locales.php</code>)'), 'success' );
 
@@ -412,9 +481,9 @@ switch( $action )
 				$lswitchwith_transliteration_map = is_array($locales[ $lswitchwith ]['transliteration_map']) ? base64_encode(serialize($locales[ $lswitchwith ]['transliteration_map'])) : '';
 				$edit_transliteration_map = is_array($locales[ $edit_locale ]['transliteration_map']) ? base64_encode(serialize($locales[ $edit_locale ]['transliteration_map'])) : '';
 
-				$query = "REPLACE INTO T_locales ( loc_locale, loc_datefmt, loc_timefmt, loc_shorttimefmt, loc_name, loc_messages, loc_priority, loc_transliteration_map, loc_enabled ) VALUES
-					( '$edit_locale', '{$locales[ $edit_locale ]['datefmt']}', '{$locales[ $edit_locale ]['timefmt']}', '{$locales[ $edit_locale ]['shorttimefmt']}', '{$locales[ $edit_locale ]['name']}', '{$locales[ $edit_locale ]['messages']}', '{$locales[ $edit_locale ]['priority']}', '$edit_transliteration_map', '{$locales[ $edit_locale ]['enabled']}'),
-					( '$lswitchwith', '{$locales[ $lswitchwith ]['datefmt']}', '{$locales[ $lswitchwith ]['timefmt']}', '{$locales[ $lswitchwith ]['shorttimefmt']}', '{$locales[ $lswitchwith ]['name']}', '{$locales[ $lswitchwith ]['messages']}', '{$locales[ $lswitchwith ]['priority']}', '$lswitchwith_transliteration_map', '{$locales[ $lswitchwith ]['enabled']}')";
+				$query = "REPLACE INTO T_locales ( loc_locale, loc_datefmt, loc_longdatefmt, loc_extdatefmt, loc_input_datefmt, loc_timefmt, loc_shorttimefmt, loc_input_timefmt, loc_name, loc_messages, loc_priority, loc_transliteration_map, loc_enabled ) VALUES
+					( '$edit_locale', '{$locales[ $edit_locale ]['datefmt']}', '{$locales[ $edit_locale ]['longdatefmt']}', '{$locales[ $edit_locale ]['extdatefmt']}', '{$locales[ $edit_locale ]['input_datefmt']}', '{$locales[ $edit_locale ]['timefmt']}', '{$locales[ $edit_locale ]['shorttimefmt']}', '{$locales[ $edit_locale ]['input_timefmt']}', '{$locales[ $edit_locale ]['name']}', '{$locales[ $edit_locale ]['messages']}', '{$locales[ $edit_locale ]['priority']}', '$edit_transliteration_map', '{$locales[ $edit_locale ]['enabled']}'),
+					( '$lswitchwith', '{$locales[ $lswitchwith ]['datefmt']}', '{$locales[ $lswitchwith ]['longdatefmt']}', '{$locales[ $lswitchwith ]['extdatefmt']}', '{$locales[ $lswitchwith ]['input_datefmt']}', '{$locales[ $lswitchwith ]['timefmt']}', '{$locales[ $lswitchwith ]['shorttimefmt']}', '{$locales[ $lswitchwith ]['input_timefmt']}', '{$locales[ $lswitchwith ]['name']}', '{$locales[ $lswitchwith ]['messages']}', '{$locales[ $lswitchwith ]['priority']}', '$lswitchwith_transliteration_map', '{$locales[ $lswitchwith ]['enabled']}')";
 				$q = $DB->query( $query );
 
 				$Messages->add( T_('Switched priorities.'), 'success' );
@@ -459,6 +528,16 @@ $AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
 		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
 $AdminUI->breadcrumbpath_add( T_('Regional'), $admin_url.'?ctrl=locales' );
 $AdminUI->breadcrumbpath_add( T_('Locales'), $admin_url.'?ctrl=locales' );
+
+// Set an url for manual page:
+if( $action == 'edit' )
+{
+	$AdminUI->set_page_manual_link( 'locale-form' );
+}
+else
+{
+	$AdminUI->set_page_manual_link( 'locales-tab' );
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

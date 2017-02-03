@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -51,11 +51,15 @@ $Form->begin_form( 'fform', $creating ?  T_('New goal') : T_('Goal') );
 
 	$Form->text_input( 'goal_temp_redir_url', $edited_Goal->temp_redir_url, 60, T_('Temporary Redirection URL'), '', array( 'maxlength' => 255, 'class' => 'large' ) );
 
-	$Form->date_input( 'goal_temp_start_date', is_int( $edited_Goal->temp_start_ts ) ? date2mysql( $edited_Goal->temp_start_ts ) : $edited_Goal->temp_start_ts, T_('Temporary Start Date') );
-	$Form->time_input( 'goal_temp_start_time', is_int( $edited_Goal->temp_start_ts ) ? date2mysql( $edited_Goal->temp_start_ts ) : $edited_Goal->temp_start_ts, T_('Temporary Start Time') );
+	$Form->begin_line( T_('Temporary Start Date'), 'goal_temp_start_date' );
+		$Form->date_input( 'goal_temp_start_date', is_int( $edited_Goal->temp_start_ts ) ? date2mysql( $edited_Goal->temp_start_ts ) : $edited_Goal->temp_start_ts, '' );
+		$Form->time_input( 'goal_temp_start_time', is_int( $edited_Goal->temp_start_ts ) ? date2mysql( $edited_Goal->temp_start_ts ) : $edited_Goal->temp_start_ts, T_('at') );
+	$Form->end_line();
 
-	$Form->date_input( 'goal_temp_end_date', is_int( $edited_Goal->temp_end_ts ) ? date2mysql( $edited_Goal->temp_end_ts ) : $edited_Goal->temp_end_ts, T_('Temporary End Date') );
-	$Form->time_input( 'goal_temp_end_time', is_int( $edited_Goal->temp_end_ts ) ? date2mysql( $edited_Goal->temp_end_ts ) : $edited_Goal->temp_end_ts, T_('Temporary End Time') );
+	$Form->begin_line( T_('Temporary End Date'), 'goal_temp_end_date' );
+		$Form->date_input( 'goal_temp_end_date', is_int( $edited_Goal->temp_end_ts ) ? date2mysql( $edited_Goal->temp_end_ts ) : $edited_Goal->temp_end_ts, '' );
+		$Form->time_input( 'goal_temp_end_time', is_int( $edited_Goal->temp_end_ts ) ? date2mysql( $edited_Goal->temp_end_ts ) : $edited_Goal->temp_end_ts, T_('at') );
+	$Form->end_line();
 
 	$Form->text_input( 'goal_default_value', $edited_Goal->default_value, 15, T_('Default value'), '' );
 

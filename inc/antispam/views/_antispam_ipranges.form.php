@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -27,7 +27,7 @@ $Form = new Form( NULL, 'iprange_checkchanges', 'post', 'compact' );
 
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,iprange_ID' ) );
 
-$Form->begin_form( 'fform', $creating ?  T_('New IP Range') : T_('IP Range') );
+$Form->begin_form( 'fform', ( $creating ?  T_('New IP Range') : T_('IP Range') ).get_manual_link( 'ip-range-editing' ) );
 
 	$Form->add_crumb( 'iprange' );
 	$Form->hidden( 'action',  $creating ? 'iprange_create' : 'iprange_update' );

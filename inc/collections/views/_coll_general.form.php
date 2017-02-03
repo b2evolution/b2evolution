@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -18,9 +18,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @var Blog
  */
 global $edited_Blog;
-
-
 global $action, $next_action, $blogtemplate, $blog, $tab, $admin_url, $locales;
+global $Settings;
 
 $Form = new Form();
 
@@ -32,6 +31,12 @@ if( $edited_Blog->ID == 0 )
 	$form_title = sprintf( T_('New "%s" collection'), $kind_title ).':';
 
 	$Form->global_icon( T_('Abort creating new collection'), 'close', $admin_url.'?ctrl=dashboard', ' '.sprintf( T_('Abort new "%s" collection'), $kind_title ), 3, 3 );
+}
+elseif( $action == 'copy' )
+{	// Copy collection form:
+	$form_title = sprintf( T_('Duplicate "%s" collection'), $edited_Blog->get( 'shortname' ) ).':';
+
+	$Form->global_icon( T_('Abort duplicating collection'), 'close', $admin_url.'?ctrl=dashboard', ' '.T_('Abort duplicating collection'), 3, 3 );
 }
 
 $Form->begin_form( 'fform', $form_title );
@@ -50,8 +55,42 @@ else
 	$Form->hidden( 'blog', $blog );
 }
 
+if( ! empty( $edited_Blog->confirmation ) )
+{	// Display a confirmation message:
+	$form_fieldset_begin = $Form->fieldset_begin;
+	$Form->fieldset_begin = str_replace( 'panel-default', 'panel-danger', $Form->fieldset_begin );
+	$Form->begin_fieldset( T_('Confirmation') );
 
-$Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type' ) );
+		echo '<h3 class="evo_confirm_delete__title">'.$edited_Blog->confirmation['title'].'</h3>';
+
+		if( ! empty( $edited_Blog->confirmation['messages'] ) )
+		{
+			echo '<div class="log_container delete_messages"><ul>';
+			foreach( $edited_Blog->confirmation['messages'] as $confirmation_message )
+			{
+				echo '<li>'.$confirmation_message.'</li>';
+			}
+			echo '</ul></div>';
+		}
+
+		echo '<p class="warning text-danger">'.T_('Do you confirm?').'</p>';
+		echo '<p class="warning text-danger">'.T_('THIS CANNOT BE UNDONE!').'</p>';
+
+		// Fake button to submit form by key "Enter" without autoconfirm this:
+		$Form->button_input( array(
+				'name'  => 'submit',
+				'style' => 'position:absolute;left:-10000px'
+			) );
+		// Real button to confirm:
+		$Form->button( array( 'submit', 'actionArray[update_confirm]', T_('I am sure!'), 'DeleteButton btn-danger' ) );
+		$Form->button( array( 'button', '', T_('CANCEL'), 'CancelButton', 'location.href="'.$admin_url.'?ctrl=coll_settings&tab=general&blog='.$edited_Blog->ID.'"' ) );
+
+	$Form->end_fieldset();
+	$Form->fieldset_begin = $form_fieldset_begin;
+}
+
+
+$Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type-panel' ) );
 	$collection_kinds = get_collection_kinds();
 	if( isset( $collection_kinds[ $edited_Blog->get( 'type' ) ] ) )
 	{ // Display type of this blog
@@ -60,23 +99,81 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type' 
 			.' &ndash; '
 			.$collection_kinds[ $edited_Blog->get( 'type' ) ]['desc']
 		.'</p>';
-		if( $edited_Blog->ID > 0 )
-		{
+		if( $edited_Blog->ID > 0 && $action != 'copy' )
+		{	// Display a link to change collection kind:
 			echo '<p><a href="'.$admin_url.'?ctrl=coll_settings&tab=general&action=type&blog='.$edited_Blog->ID.'">'
 					.T_('Change collection type / Reset')
 			.'</a></p>';
 		}
 	}
+	if( $edited_Blog->get( 'type' ) == 'main' )
+	{ // Only show when collection is of type 'Main'
+		$set_as_checked = 0;
+		switch( $action )
+		{
+			case 'edit':
+				$set_as_checked = 0;
+				break;
+
+			case 'new-name':
+			case 'create':
+				$set_as_checked = 1;
+				break;
+		}
+
+		$set_as_options = array();
+		if( ! $Settings->get( 'info_blog_ID' ) )
+		{
+			$set_as_options[] = array( 'set_as_info_blog', 1, T_('Collection for info pages'), param( 'set_as_info_blog', 'boolean', $set_as_checked ) );
+		}
+		if( ! $Settings->get( 'login_blog_ID' ) )
+		{
+			$set_as_options[] = array( 'set_as_login_blog', 1, T_('Collection for login/registration'), param( 'set_as_login_blog', 'boolean', $set_as_checked ) );
+		}
+		if( ! $Settings->get( 'msg_blog_ID' ) )
+		{
+			$set_as_options[] = array( 'set_as_msg_blog', 1, T_('Collection for profiles/messaging'), param( 'set_as_msg_blog', 'boolean', $set_as_checked ) );
+		}
+
+		if( $set_as_options )
+		{
+			$Form->checklist( $set_as_options, 'set_as_options', T_('Automatically set as') );
+		}
+	}
 $Form->end_fieldset();
 
+if( in_array( $action, array( 'create', 'new-name' ) ) && $ctrl = 'collections' )
+{ // Only show demo content option when creating a new collection
+	$Form->begin_fieldset( T_( 'Demo contents' ).get_manual_link( 'collection-demo-content' ) );
+		$Form->radio( 'create_demo_contents', param( 'create_demo_contents', 'integer', 1 ),
+					array(
+						array( 1, T_('Initialize this collection with some demo contents') ),
+						array( 0, T_('Create an empty collection') ),
+					), T_('New contents'), true );
+		if( $current_User->check_perm( 'orgs', 'create', false ) )
+		{ // Permission to create organizations
+			$Form->checkbox( 'create_demo_org', param( 'create_demo_org', 'integer', 1 ),
+					T_( 'Create demo organization' ), T_( 'Create a demo organization if none exists.' ) );
+		}
+
+		if( $current_User->check_perm( 'users', 'edit', false ) )
+		{ // Permission to edit users
+			$Form->checkbox( 'create_demo_users', param( 'create_demo_users', 'integer', 1 ),
+					T_( 'Create demo users' ), T_( 'Create demo users as comment authors.' ) );
+		}
+	$Form->end_fieldset();
+}
 
 $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_parameters' ), array( 'class'=>'fieldset clear' ) );
 
-	$Form->text( 'blog_name', $edited_Blog->dget( 'name', 'formvalue' ), 50, T_('Title'), T_('Will be displayed on top of the blog.'), 255 );
+	$name_chars_count = utf8_strlen( html_entity_decode( $edited_Blog->get( 'name' ) ) );
+	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Title'), T_('Will be displayed on top of the blog.')
+		.' ('.sprintf( T_('%s characters'), '<span id="blog_name_chars_count">'.$name_chars_count.'</span>' ).')', 255 );
 
-	$Form->text( 'blog_shortname', $edited_Blog->dget( 'shortname', 'formvalue' ), 15, T_('Short name'), T_('Will be used in selection menus and throughout the admin interface.'), 255 );
+	$Form->text( 'blog_shortname', $edited_Blog->get( 'shortname' ), 15, T_('Short name'), T_('Will be used in selection menus and throughout the admin interface.'), 255 );
 
-	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) ||
+	    $current_User->check_perm( 'blogs', 'create', false, $edited_Blog->sec_ID ) )
 	{ // Permission to edit advanced admin settings
 		$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('URL "filename"'),
 				sprintf( T_('"slug" used to uniquely identify this blog in URLs. Also used as <a %s>default media folder</a>.'),
@@ -86,6 +183,11 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 	{
 		$Form->info( T_('URL Name'), $edited_Blog->get( 'urlname' ), T_('Used to uniquely identify this blog in URLs.') /* Note: message voluntarily shorter than admin message */ );
 	}
+
+	// Section:
+	$SectionCache = & get_SectionCache();
+	$SectionCache->load_available( $edited_Blog->get( 'sec_ID' ) );
+	$Form->select_input_object( 'sec_ID', $edited_Blog->get( 'sec_ID' ), $SectionCache, T_('Section'), array( 'required' => true ) );
 
 $Form->end_fieldset();
 
@@ -123,6 +225,13 @@ $Form->begin_fieldset( T_('Language / locale').get_manual_link( 'coll-locale-set
 					array( 'post', T_('Always force to post locale') ),
 					array( 'blog', T_('Follow navigation locale') ),
 			), T_('Content Display'), true );
+
+		$Form->radio( 'blog_new_item_locale_source', $edited_Blog->get_setting( 'new_item_locale_source' ),
+				array(
+					array( 'use_coll', T_('Always use collection locale') ),
+					array( 'select_coll', T_('Allow select - use collection locale by default') ),
+					array( 'select_user', T_('Allow select - use user locale by default') ),
+			), T_('New Posts'), true );
 	}
 	else
 	{ // Only one locale
@@ -153,14 +262,26 @@ $Form->begin_fieldset( T_('Collection permissions').get_manual_link( 'collection
 		$Form->info( T_('Owner'), $owner_User->login, $owner_User->dget( 'fullname' ) );
 	}
 
+	$Form->radio( 'advanced_perms', $edited_Blog->get( 'advanced_perms' ),
+			array(
+				array( '0', T_('Simple permissions'), sprintf( T_('(the owner above has most permissions on this collection, except %s)'), get_admin_badge() ) ),
+				array( '1', T_('Advanced permissions'), sprintf( T_('(you can assign granular <a %s>user</a> and <a %s>group</a> permissions for this collection)'),
+										'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=perm&amp;blog='.$edited_Blog->ID.'"',
+										'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'"' ) ),
+		), T_('Permission management'), true );
+
 	$Form->radio( 'blog_allow_access', $edited_Blog->get_setting( 'allow_access' ),
 			array(
 				array( 'public', T_('Everyone (Public Blog)') ),
-				array( 'users', T_('Logged in users') ),
-				array( 'members', T_('Members') ),
+				array( 'users', T_('Community only (Logged-in users only)') ),
+				array( 'members',
+									'<span id="allow_access_members_advanced_title"'.( $edited_Blog->get( 'advanced_perms' ) ? '' : ' style="display:none"' ).'>'.T_('Members only').'</span>'.
+									'<span id="allow_access_members_simple_title"'.( $edited_Blog->get( 'advanced_perms' ) ? ' style="display:none"' : '' ).'>'.T_('Only the owner').'</span>',
+									'<span id="allow_access_members_advanced_note"'.( $edited_Blog->get( 'advanced_perms' ) ? '' : ' style="display:none"' ).'>'.sprintf( T_('(Assign membership in <a %s>user</a> and <a %s>group</a> permissions for this collection)'),
+										'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=perm&amp;blog='.$edited_Blog->ID.'"',
+										'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$edited_Blog->ID.'"' ).'</span>'.
+									'<span id="allow_access_members_simple_note"'.( $edited_Blog->get( 'advanced_perms' ) ? ' style="display:none"' : '' ).'>'.T_('(Private collection)').'</span>' ),
 		), T_('Allow access to'), true );
-
-	$Form->checkbox( 'advanced_perms', $edited_Blog->get( 'advanced_perms' ), T_('Use advanced perms'), T_('This will turn on the advanced User and Group permissions tabs for this blog.') );
 
 $Form->end_fieldset();
 
@@ -176,9 +297,6 @@ $Form->begin_fieldset( T_('Lists of collections').get_manual_link( 'collection-l
 											array( 'never', T_('Never') )
 										), T_('Show in front-office list'), true, T_('Select when you want this blog to appear in the list of blogs on this system.') );
 
-	$Form->checkbox( 'favorite', $edited_Blog->get( 'favorite' ),
-						T_( 'Show in back-office favorites' ), T_( 'Include in the quick blog selector at the top of the back office pages.' ) );
-
 $Form->end_fieldset();
 
 
@@ -191,8 +309,46 @@ $Form->begin_fieldset( T_('Description').get_manual_link( 'collection-descriptio
 $Form->end_fieldset();
 
 
-$Form->buttons( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
+$Form->buttons( array( array( 'submit', 'submit', ( $action == 'copy' ? sprintf( T_('Save and duplicate all settings from %s'), $edited_Blog->get( 'shortname' ) ) : T_('Save Changes!') ), 'SaveButton' ) ) );
 
 $Form->end_form();
 
 ?>
+<script type="text/javascript">
+
+function updateDemoContentInputs()
+{
+	if( jQuery( 'input[name=create_demo_contents]:checked' ).val() == '1' )
+	{
+		jQuery( 'input[name=create_demo_org], input[name=create_demo_users]' ).removeAttr( 'disabled' );
+	}
+	else
+	{
+		jQuery( 'input[name=create_demo_org], input[name=create_demo_users]' ).attr( 'disabled', true );
+	}
+}
+
+jQuery( 'input[name=create_demo_contents]' ).click( updateDemoContentInputs );
+jQuery( 'input[name=advanced_perms]' ).click( function()
+{	// Display a proper label for "Allow access to" depending on selected "Permission management":
+	if( jQuery( this ).val() == '1' )
+	{	// If advanced permissions are selected
+		jQuery( '#allow_access_members_simple_title, #allow_access_members_simple_note' ).hide();
+		jQuery( '#allow_access_members_advanced_title, #allow_access_members_advanced_note' ).show();
+	}
+	else
+	{	// If simple permissions are selected
+		jQuery( '#allow_access_members_simple_title, #allow_access_members_simple_note' ).show();
+		jQuery( '#allow_access_members_advanced_title, #allow_access_members_advanced_note' ).hide();
+	}
+} );
+
+
+updateDemoContentInputs();
+
+jQuery( '#blog_name' ).keyup( function()
+{	// Count characters of collection title(each html entity is counted as single char):
+	jQuery( '#blog_name_chars_count' ).html( jQuery( this ).val().replace( /&[^;\s]+;/g, '&' ).length );
+} );
+
+</script>

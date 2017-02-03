@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -30,10 +30,10 @@ class Currency extends DataObject
 	 *
 	 * @param object database row
 	 */
-	function Currency( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_regional__currency', 'curr_', 'curr_ID' );
+		parent::__construct( 'T_regional__currency', 'curr_', 'curr_ID' );
 
 		if( $db_row )
 		{
@@ -77,6 +77,17 @@ class Currency extends DataObject
 		param_check_regexp( 'curr_code', '#^[A-Za-z]{3}$#', T_('Currency code must be 3 letters.') );
 		$this->set_from_Request( 'code', 'curr_code', true  );
 
+		if( ! param_errors_detected() )
+		{	// Check currency code for duplicating:
+			$existing_curr_ID = $this->dbexists( 'curr_code', $this->get( 'code' ) );
+			if( $existing_curr_ID )
+			{	// We have a duplicate currency:
+				param_error( 'curr_code',
+					sprintf( T_('This currency already exists. Do you want to <a %s>edit the existing currency</a>?'),
+						'href="?ctrl=currencies&amp;action=edit&amp;curr_ID='.$existing_curr_ID.'"' ) );
+			}
+		}
+
 		return ! param_errors_detected();
 	}
 
@@ -103,17 +114,6 @@ class Currency extends DataObject
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
-	}
-
-
-	/**
-	 * Check existence of specified currency code in curr_code unique field.
-	 *
-	 * @return int ID if currency code exists otherwise NULL/false
-	 */
-	function dbexists()
-	{
-		return parent::dbexists('curr_code', $this->code);
 	}
 
 

@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -35,7 +35,7 @@ if( !empty($s) )
 // Create result set:
 $Results = new Results( $SQL->get(), 'ctry_', '-D' );
 
-$Results->title = T_('Countries').get_manual_link('countries_list');
+$Results->title = T_('Countries').get_manual_link('regional-countries-tab');
 
 /*
  * STATUS TD:
@@ -233,7 +233,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 		);
 
 	$Results->global_icon( T_('Create a new country ...'), 'new',
-				regenerate_url( 'ctrl,action', 'ctrl=countries&amp;action=new'), T_('New country').' &raquo;', 3, 4  );
+				regenerate_url( 'ctrl,action', 'ctrl=countries&amp;action=new'), T_('New country').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 $Results->display();
@@ -243,7 +243,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	// Print JS to edit a country status
 	echo_editable_column_js( array(
 		'column_selector' => '.country_status_edit',
-		'ajax_url'        => get_secure_htsrv_url().'async.php?action=country_status_edit&'.url_crumb( 'country' ),
+		'ajax_url'        => get_htsrv_url().'async.php?action=country_status_edit&'.url_crumb( 'country' ),
 		'options'         => ctry_status_titles(),
 		'new_field_name'  => 'new_status',
 		'ID_value'        => 'jQuery( this ).attr( "id" )',

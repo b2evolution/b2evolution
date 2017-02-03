@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -123,14 +123,14 @@ class ItemLight extends DataObject
 	 * @param string User ID field name
 	 * @param string User ID field name
 	 */
-	function ItemLight( $db_row = NULL, $dbtable = 'T_items__item', $dbprefix = 'post_', $dbIDname = 'post_ID', $objtype = 'ItemLight',
+	function __construct( $db_row = NULL, $dbtable = 'T_items__item', $dbprefix = 'post_', $dbIDname = 'post_ID', $objtype = 'ItemLight',
 	               $datecreated_field = '', $datemodified_field = 'datemodified',
 	               $creator_field = '', $lasteditor_field = '' )
 	{
 		global $localtimenow, $default_locale, $current_User;
 
 		// Call parent constructor:
-		parent::DataObject( $dbtable, $dbprefix, $dbIDname, $datecreated_field, $datemodified_field,
+		parent::__construct( $dbtable, $dbprefix, $dbIDname, $datecreated_field, $datemodified_field,
 												$creator_field, $lasteditor_field );
 
 		$this->objtype = $objtype;
@@ -191,7 +191,7 @@ class ItemLight extends DataObject
 				array( 'table'=>'T_items__item_settings', 'fk'=>'iset_item_ID', 'msg'=>T_('%d items settings') ),
 				array( 'table'=>'T_items__subscriptions', 'fk'=>'isub_item_ID', 'msg'=>T_('%d items subscriptions') ),
 				array( 'table'=>'T_items__prerendering', 'fk'=>'itpr_itm_ID', 'msg'=>T_('%d prerendered content') ),
-				array( 'table'=>'T_users__postreadstatus', 'fk'=>'uprs_post_ID', 'msg'=>T_('%d recordings of a post having been read') ),
+				array( 'table'=>'T_items__user_data', 'fk'=>'itud_item_ID', 'msg'=>T_('%d recordings of user data for a specific post') ),
 			);
 	}
 
@@ -216,16 +216,48 @@ class ItemLight extends DataObject
 
 
 	/**
+	 * Get the ItemType object for the Item.
+	 *
+	 * @return object ItemType
+	 */
+	function & get_ItemType()
+	{
+		if( empty( $this->ItemType ) )
+		{
+			$ItemTypeCache = & get_ItemTypeCache();
+			$this->ItemType = & $ItemTypeCache->get_by_ID( $this->ityp_ID, false, false );
+		}
+
+		return $this->ItemType;
+	}
+
+
+	/**
+	 * Get setting of the post type
+	 *
+	 * @param string Setting name
+	 * @return string Setting value
+	 */
+	function get_type_setting( $setting_name )
+	{
+		if( ! $this->get_ItemType() )
+		{ // Unknown post type
+			return false;
+		}
+
+		return $this->ItemType->get( $setting_name );
+	}
+
+
+	/**
 	 * Is this a Special post (Page, Intros, Sidebar, Advertisement)
 	 *
 	 * @return boolean
 	 */
 	function is_special()
 	{
-		global $posttypes_specialtypes;
-
-		// Check if this post type is between the special post types
-		return in_array( $this->ityp_ID, $posttypes_specialtypes );
+		// Check if this post type usage is NOT "post":
+		return ( $this->get_type_setting( 'usage' ) != 'post' );
 	}
 
 
@@ -236,7 +268,12 @@ class ItemLight extends DataObject
 	 */
 	function is_intro()
 	{
-		return ($this->ityp_ID >= 1400 && $this->ityp_ID <= 1600);
+		if( ! $this->get_ItemType() )
+		{	// Unknown post type:
+			return false;
+		}
+
+		return $this->ItemType->is_intro();
 	}
 
 
@@ -247,7 +284,7 @@ class ItemLight extends DataObject
 	 */
 	function is_featured()
 	{
-		return !( empty($this->featured) || $this->is_intro() );
+		return ! empty( $this->featured ) && ! $this->is_intro();
 	}
 
 
@@ -388,21 +425,39 @@ class ItemLight extends DataObject
 	 */
 	function get_permanent_url( $permalink_type = '', $blogurl = '', $glue = '&amp;' )
 	{
-		global $DB, $cacheweekly, $Settings, $posttypes_specialtypes, $posttypes_nopermanentURL, $posttypes_catpermanentURL;
+		global $DB, $cacheweekly, $Settings;
+
+		if( $ItemType = & $this->get_ItemType() )
+		{	// Get type usage of this item:
+			$item_type_usage = $ItemType->get( 'usage' );
+		}
+		else
+		{	// Use default item type usage:
+			$item_type_usage = 'post';
+		}
 
 		$this->get_Blog();
-		if( $this->Blog->get_setting( 'front_disp' ) == 'page' &&
-		    $this->Blog->get_setting( 'front_post_ID' ) == $this->ID )
-		{ // This item is used as front specific page on the blog's home
-			$permalink_type = 'none';
+
+		// Special Items types/usages will have special permalink types
+		if( ( $this->Blog->get_setting( 'front_disp' ) == 'page' &&
+		      $this->Blog->get_setting( 'front_post_ID' ) == $this->ID ) ||
+		    ( $this->Blog->get_setting( 'front_disp' ) == 'single' &&
+		      ( $first_mainlist_Item = & $this->Blog->get_first_mainlist_Item() ) &&
+		      $first_mainlist_Item->ID == $this->ID ) )
+		{ // This item is used as front specific page or as first post on the blog's home
+			$permalink_type = 'front';
 		}
-		elseif( in_array( $this->ityp_ID, $posttypes_specialtypes ) ) // page, intros, sidebar
+		elseif( $item_type_usage != 'post' ) // page, intros, sidebar and other not "post"
 		{	// This is not an "in stream" post:
-			if( in_array( $this->ityp_ID, $posttypes_nopermanentURL ) )
+			if( in_array( $item_type_usage, array( 'intro-front', 'intro-main' ) ) )
+			{	// This type of post is not allowed to have a permalink:
+				$permalink_type = 'front';
+			}
+			elseif( in_array( $item_type_usage, array( 'special' ) ) )
 			{	// This type of post is not allowed to have a permalink:
 				$permalink_type = 'none';
 			}
-			elseif( in_array( $this->ityp_ID, $posttypes_catpermanentURL ) )
+			elseif( in_array( $item_type_usage, array( 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all' ) ) )
 			{	// This post has a permanent URL as url to main chapter:
 				$permalink_type = 'cat';
 			}
@@ -426,9 +481,12 @@ class ItemLight extends DataObject
 			case 'subchap':
 				return $this->get_chapter_url( $blogurl, $glue );
 
+			case 'front':
+				// Link to collection front page:
+				return $this->Blog->gen_blogurl();
+
 			case 'none':
 				// This is a silent fallback when we try to permalink to an Item that cannot be addressed directly:
-				// Link to blog home:
 				return $this->Blog->gen_blogurl();
 
 			case 'cat':
@@ -672,7 +730,7 @@ class ItemLight extends DataObject
 
 			foreach( $categoryIDs as $cat_ID )
 			{
-				if( $Chapter = & $ChapterCache->get_by_ID( $cat_ID, false ) )
+				if( $Chapter = & $ChapterCache->get_by_ID( $cat_ID, false, false ) )
 				{
 					$chapters[] = $Chapter;
 				}
@@ -712,13 +770,13 @@ class ItemLight extends DataObject
 			}
 			if( empty( $this->main_Chapter ) )
 			{	// If we still don't have a valid Chapter, display clean error and die().
-				global $admin_url, $Blog, $blog;
+				global $admin_url, $Collection, $Blog, $blog;
 				if( empty( $Blog ) )
 				{
 					if( !empty( $blog ) )
 					{
 						$BlogCache = & get_BlogCache();
-						$Blog = & $BlogCache->get_by_ID( $blog, false );
+						$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false );
 					}
 				}
 
@@ -921,7 +979,7 @@ class ItemLight extends DataObject
 	 */
 	function locale_temp_switch()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( ! empty( $Blog ) && $Blog->get_setting( 'post_locale_source' ) == 'blog' )
 		{ // Use locale what current blog is using now
@@ -1074,7 +1132,7 @@ class ItemLight extends DataObject
 	 */
 	function get_permanent_link( $text = '#', $title = '#', $class = '', $target_blog = '', $post_navigation = '', $nav_target = NULL )
 	{
-		global $current_User, $Blog;
+		global $current_User, $Collection, $Blog;
 
 		switch( $text )
 		{
@@ -1169,7 +1227,7 @@ class ItemLight extends DataObject
 	 */
 	function get_title( $params = array() )
 	{
-		global $ReqURL, $Blog, $MainList;
+		global $ReqURL, $Collection, $Blog, $MainList;
 
 		// Set default post navigation
 		$def_post_navigation = empty( $Blog ) ? 'same_blog' : $Blog->get_setting( 'post_navigation' );
@@ -1199,7 +1257,7 @@ class ItemLight extends DataObject
 			$blogurl = $Blog->gen_blogurl();
 		}
 
-		$title = format_to_output( $this->$params['title_field'], $params['format'] );
+		$title = format_to_output( $this->{$params['title_field']}, $params['format'] );
 
 		if( $params['max_length'] != '' )
 		{	// Crop long title
@@ -1221,7 +1279,7 @@ class ItemLight extends DataObject
 			{	// We are on the single url already:
 				$params['link_type'] = 'none';
 			}
-			else if( $this->ityp_ID == 3000 )
+			else if( $this->get_type_setting( 'usage' ) == 'special' )
 			{	// tblue> This is a sidebar link, link to its "link to" URL by default:
 				$params['link_type'] = 'linkto_url';
 			}
@@ -1310,23 +1368,18 @@ class ItemLight extends DataObject
 
 
 	/**
-	 * Template function: get excerpt
+	 * Template tag: get excerpt
+	 * This light version does display only. It never tries to auto-generate the excerpt.
 	 *
-	 * @todo do we want excerpts in itemLight or not?
-	 *       dh> I'd say "no". I have added excerpt_autogenerated
-	 *           only to Item now. But makes sense in the same class.
-	 *           update_excerpt is also on in Item.
-	 *  fp> the issue is about display only. of course we don't want update code in ItemLight.
-	 *  The question is typically about being able to display excerpts in ItemLight list
-	 *  sitemaps, feed, recent posts, post widgets where the exceprt might be used as a title, etc.
+	 *  May be used in ItemLight lists such as sitemaps, feeds, recent posts, post widgets where the exceprt might be used as a title, etc.
 	 *
 	 * @param string filename to use to display more
 	 * @return string
 	 */
 	function get_excerpt( $format = 'htmlbody' )
 	{
-		// Character conversions
-		return format_to_output( $this->excerpt, $format );
+		// Character conversions + old DBs may have tags in excerpts, so we strip them:
+		return format_to_output( utf8_strip_tags( $this->excerpt ), $format );
 	}
 
 
@@ -1541,6 +1594,40 @@ class ItemLight extends DataObject
 		}
 
 		return $admin_url.'?ctrl=items'.$glue.'action=history'.$glue.'p='.$this->ID;
+	}
+
+
+	/**
+	 * Get the links to all chapters of this item
+	 *
+	 * @param array Params
+	 * @return string The chapter links
+	 */
+	function get_chapter_links( $params = array() )
+	{
+		$params = array_merge( array(
+				'separator' => ', ',
+			) );
+
+		// Get all item chapters:
+		$chapters = $this->get_Chapters();
+
+		if( empty( $chapters ) )
+		{	// No chapters for this item, Return empty string:
+			return '';
+		}
+
+		$chapter_links = '';
+		foreach( $chapters as $c => $Chapter )
+		{
+			$chapter_links .= '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get_path_name().'</a>';
+			if( $c < count( $chapters ) - 1 )
+			{	// Add separator between chapters:
+				$chapter_links .= $params['separator'];
+			}
+		}
+
+		return $chapter_links;
 	}
 }
 

@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.html.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $htsrv_url, $admin_url, $Blog;
+global $admin_url, $Collection, $Blog;
 
 // Default params:
 $params = array_merge( array(
@@ -26,15 +26,16 @@ $params = array_merge( array(
 		'author_name'    => '',
 		'notify_type'    => '',
 		'recipient_User' => NULL,
+		'is_new_comment' => true,
 	), $params );
 
 
 $Comment = $params['Comment'];
-$Blog = $params['Blog'];
+$Collection = $Blog = $params['Blog'];
 $Item = $params['Item'];
 $recipient_User = & $params['recipient_User'];
 
-$author_name = empty( $params['author_ID'] ) ? $params['author_name'] : get_user_colored_login_link( $params['author_name'], array( 'use_style' => true, 'protocol' => 'http:' ) );
+$author_name = empty( $params['author_ID'] ) ? $params['author_name'] : get_user_colored_login_link( $params['author_name'], array( 'use_style' => true, 'protocol' => 'http:', 'login_text' => 'name' ) );
 if( $params['notify_type'] == 'meta_comment' )
 { // Meta comment
 	$info_text = T_( '%s posted a new meta comment on %s in %s.' );
@@ -43,7 +44,7 @@ else
 { // Normal comment
 	$info_text = T_( '%s posted a new comment on %s in %s.' );
 }
-$notify_message = '<p'.emailskin_style( '.p' ).'>'.sprintf( $info_text, '<b>'.$author_name.'</b>', '<b>'.get_link_tag( $Item->get_permanent_url(), $Item->get('title'), '.a' ).'</b>', '<b>'.$Blog->get('shortname').'</b>' )."</p>\n";
+$notify_message = '<p'.emailskin_style( '.p' ).'>'.sprintf( $info_text, '<b>'.$author_name.'</b>', '<b>'.get_link_tag( $Item->get_permanent_url( '', '', '&' ), $Item->get( 'title' ), '.a' ).'</b>', '<b>'.$Blog->get('shortname').'</b>' )."</p>\n";
 
 if( $params['notify_full'] )
 { // Long format notification:
@@ -123,13 +124,13 @@ echo $notify_message;
 
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
 
-echo get_link_tag( $Comment->get_permanent_url(), T_( 'Read full comment' ), 'div.buttons a+a.button_green' )."\n";
+echo get_link_tag( $Comment->get_permanent_url( '&', '#comments' ), T_( 'Read full comment' ), 'div.buttons a+a.button_green' )."\n";
 
 if( $params['notify_type'] == 'moderator' )
 { // moderation email
 	if( ( $Blog->get_setting( 'comment_quick_moderation' ) != 'never' ) && ( !empty( $Comment->secret ) ) )
 	{ // quick moderation is permitted, and comment secret was set
-		echo get_link_tag( '$secret_content_start$'.$htsrv_url.'comment_review.php?cmt_ID='.$Comment->ID.'&secret='.$Comment->secret.'$secret_content_end$', T_('Quick moderation'), 'div.buttons a+a.button_yellow' )."\n";
+		echo get_link_tag( '$secret_content_start$'.get_htsrv_url().'comment_review.php?cmt_ID='.$Comment->ID.'&secret='.$Comment->secret.'$secret_content_end$', T_('Quick moderation'), 'div.buttons a+a.button_yellow' )."\n";
 	}
 	echo get_link_tag( $admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID, T_('Edit comment'), 'div.buttons a+a.button_gray' )."\n";
 }
@@ -143,16 +144,26 @@ switch( $params['notify_type'] )
 {
 	case 'moderator':
 		// moderation email
+		if( $params['is_new_comment'] )
+		{	// about new comment:
+			$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating new comments, click here' );
+			$unsubscribe_type = 'comment_moderator';
+		}
+		else
+		{	// about updated comment:
+			$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating updated comments, click here' );
+			$unsubscribe_type = 'comment_moderator_edit';
+		}
 		$params['unsubscribe_text'] = T_( 'You are a moderator of this blog and you are receiving notifications when a comment may need moderation.' ).'<br />'
-			.T_( 'If you don\'t want to receive any more notifications about comment moderation, click here' ).': '
-			.get_link_tag( $htsrv_url.'quick_unsubscribe.php?type=comment_moderator&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
+			.$unsubscribe_text.': '
+			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type='.$unsubscribe_type.'&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
 		break;
 
 	case 'blog_subscription':
 		// blog subscription
 		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on any post.' ).'<br />'
 			.T_( 'If you don\'t want to receive any more notifications on this blog, click here' ).': '
-			.get_link_tag( $htsrv_url.'quick_unsubscribe.php?type=coll_comment&coll_ID='.$Blog->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
+			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=coll_comment&coll_ID='.$Blog->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
 		// subscribers are not allowed to see comment author email
 		break;
 
@@ -160,7 +171,7 @@ switch( $params['notify_type'] )
 		// item subscription
 		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on this post.' ).'<br />'
 			.T_( 'If you don\'t want to receive any more notifications on this post, click here' ).': '
-			.get_link_tag( $htsrv_url.'quick_unsubscribe.php?type=post&post_ID='.$Item->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
+			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=post&post_ID='.$Item->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
 		// subscribers are not allowed to see comment author email
 		break;
 
@@ -168,14 +179,14 @@ switch( $params['notify_type'] )
 		// user is the creator of the post
 		$params['unsubscribe_text'] = T_( 'This is your post. You are receiving notifications when anyone comments on your posts.' ).'<br />'
 			.T_( 'If you don\'t want to receive any more notifications on your posts, click here' ).':'
-			.get_link_tag( $htsrv_url.'quick_unsubscribe.php?type=creator&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
+			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=creator&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
 		break;
 
 	case 'meta_comment':
 		// meta comment subscription
 		$params['unsubscribe_text'] = T_( 'You are receiving notifications when meta comment is added on this post.' ).'<br />'
 			.T_( 'If you don\'t want to receive any more notifications about meta comments, click here' ).': '
-			.get_link_tag( $htsrv_url.'quick_unsubscribe.php?type=meta_comment&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
+			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=meta_comment&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
 		break;
 }
 

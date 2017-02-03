@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -45,7 +45,7 @@ $FileRoot = & $FileRootCache->get_by_type_and_ID( 'import', '0', true );
 $import_perm_view = $current_User->check_perm( 'files', 'view', false, $FileRoot );
 if( $import_perm_view )
 { // Current user must has access to the import dir
-	if( $current_User->check_perm( 'files', 'edit', false, $FileRoot ) )
+	if( $current_User->check_perm( 'files', 'edit_allowed', false, $FileRoot ) )
 	{ // User has full access
 		$import_title = T_('Upload/Manage import files');
 	}
@@ -125,13 +125,13 @@ $Table->display_list_end();
 
 if( ! empty( $import_files ) )
 {
-	$Form->begin_fieldset( T_('Select a blog for import') );
+	$Form->begin_fieldset( T_('Destination collection') );
 
 	$BlogCache = & get_BlogCache();
 	$BlogCache->load_all( 'shortname,name', 'ASC' );
 	$BlogCache->none_option_text = '&nbsp;';
 
-	$Form->select_input_object( 'wp_blog_ID', param( 'wp_blog_ID', 'integer', 0 ), $BlogCache, T_('Blog for import'), array(
+	$Form->select_input_object( 'wp_blog_ID', param( 'wp_blog_ID', 'integer', 0 ), $BlogCache, T_('Destination collection'), array(
 			'note' => T_('This blog will be used for import.').' <a href="'.$admin_url.'?ctrl=collections&action=new">'.T_('Create new blog').' &raquo;</a>',
 			'allow_none' => true,
 			'required' => true,
@@ -190,7 +190,7 @@ function import_files_window()
 	jQuery.ajax(
 	{
 		type: 'POST',
-		url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+		url: '<?php echo get_htsrv_url(); ?>async.php',
 		data:
 		{
 			'action': 'import_files',

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 echo '<div class="panel panel-default">';
 
 echo '<div class="panel-heading">'
-			.'<h2 class="panel-title">'.T_('What kind of collection would you like to create?').get_manual_link('collection-type').'</h2>'
+			.'<h2 class="panel-title">'.T_('What kind of collection would you like to create?').get_manual_link('create-collection-select-type').'</h2>'
 		.'</div>';
 
 echo '<div class="panel-body">';
@@ -27,10 +27,11 @@ echo '<table class="coll_kind">';
 
 if( $blog_kinds = get_collection_kinds() )
 {
+	$coll_url_suffix = get_param( 'sec_ID' ) ? '&amp;sec_ID='.get_param( 'sec_ID' ) : '';
 	foreach( $blog_kinds as $kind => $info )
 	{
 		echo '<tr>';
-			echo '<td class="coll_kind"><a href="?ctrl=collections&amp;action=new-selskin&amp;kind='.$kind.'" class="btn '.( !empty($info['class']) ? $info['class'] : 'btn-default' ).'">'.$info['name'].' &raquo;</a></td>';
+			echo '<td class="coll_kind"><a href="?ctrl=collections&amp;action=new-selskin&amp;kind='.$kind.$coll_url_suffix.'" class="btn '.( !empty($info['class']) ? $info['class'] : 'btn-default' ).'">'.$info['name'].' &raquo;</a></td>';
 			echo '<td class="coll_kind__desc"><p>'.$info['desc'].'</p>';
 			if( !empty($info['note']) )
 			{

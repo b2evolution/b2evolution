@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -18,6 +18,11 @@
  */
 require_once dirname(__FILE__).'/../conf/_config.php';
 
+// Disable log in with HTTP basic authentication because we need some action even for anonymous users,
+// but it is impossible if wrong login was entered on "HTTP Basic Authentication" form.
+// (Used to correct work of action "get_user_salt")
+$disable_http_auth = true;
+
 require_once $inc_path.'_main.inc.php';
 
 load_funcs( '../inc/skins/_skin.funcs.php' );
@@ -26,6 +31,11 @@ global $skins_path, $ads_current_skin_path, $disp, $ctrl;
 param( 'action', 'string', '' );
 $item_ID = param( 'p', 'integer' );
 $blog_ID = param( 'blog', 'integer' );
+// Initialize this array in order to don't load JS files twice in they have been already loaded on parent page:
+$required_js = param( 'required_js', 'array:string', array(), false, true );
+
+// Send the predefined cookies:
+evo_sendcookies();
 
 // Make sure the async responses are never cached:
 header_nocache();
@@ -41,6 +51,10 @@ $debug = false;
 // Do not append Debug JSlog to response!
 $debug_jslog = false;
 
+// Don't check new updates from b2evolution.net (@see b2evonet_get_updates()),
+// in order to don't break the response data:
+$allow_evo_stats = false;
+
 // Init AJAX log
 $Ajaxlog = new Log();
 
@@ -54,7 +68,7 @@ switch( $action )
 		$ItemCache = & get_ItemCache();
 		$Item = $ItemCache->get_by_ID( $item_ID );
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog_ID );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 
 		locale_activate( $Blog->get('locale') );
 
@@ -82,7 +96,7 @@ switch( $action )
 		$post_id = NULL;
 		$comment_id = param( 'comment_id', 'integer', 0 );
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog_ID );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 
 		locale_activate( $Blog->get('locale') );
 
@@ -136,7 +150,7 @@ switch( $action )
 		if( $blog_ID > 0 )
 		{	// Get Blog if ID is set
 			$BlogCache = & get_BlogCache();
-			$Blog = $BlogCache->get_by_ID( $blog_ID );
+			$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 		}
 
 		if( $user_ID > 0 )
@@ -146,11 +160,37 @@ switch( $action )
 
 			$Ajaxlog->add( 'User: #'.$user_ID.' '.$User->login );
 
+			if( is_logged_in() &&
+			    $current_User->can_moderate_user( $User->ID ) &&
+			    $current_User->check_status( 'can_access_admin' ) &&
+			    $current_User->check_perm( 'admin', 'restricted' ) )
+			{	// Display the moderation buttons only if current user has a permission:
+				$moderation_buttons = '<p class="bubbletip_user__buttons">';
+				if( ! is_admin_page() )
+				{
+					$moderation_buttons .= '<a href="'.url_add_param( $admin_url, 'ctrl=user&amp;user_ID='.$User->ID ).'" class="btn btn-sm btn-block btn-primary">'
+							.T_('Edit in Back-Office').'</a>';
+				}
+				if( $current_User->ID != $User->ID && $current_User->check_perm( 'users', 'edit' ) )
+				{	// Display a button to delete a spammer only for other users and if current user can edit them:
+					$moderation_buttons .= '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) )
+								.'" class="btn btn-sm btn-block btn-danger">'
+							.T_('Delete Spammer')
+						.'</a>';
+				}
+				$moderation_buttons .= '</p>';
+			}
+			else
+			{	// No permission to moderate users:
+				$moderation_buttons = '';
+			}
+
 			echo '<div class="bubbletip_user">';
 
 			if( $User->check_status( 'is_closed' ) )
 			{ // display only info about closed accounts
 				echo T_( 'This account has been closed.' );
+				echo $moderation_buttons;
 				echo '</div>'; /* end of: <div class="bubbletip_user"> */
 				break;
 			}
@@ -182,6 +222,7 @@ switch( $action )
 
 			if( ! ( $Settings->get( 'allow_anonymous_user_profiles' ) || ( is_logged_in() && $current_User->check_perm( 'user', 'view', false, $User ) ) ) )
 			{ // User is not logged in and anonymous users may NOT view user profiles, or if current User has no permission to view additional information about the User
+				echo $moderation_buttons;
 				echo '</div>'; /* end of: <div class="bubbletip_user"> */
 				break;
 			}
@@ -260,6 +301,7 @@ switch( $action )
 				echo '</ul>';
 			}
 
+			echo $moderation_buttons;
 			echo '</div>'; /* end of: <div class="bubbletip_user"> */
 		}
 		else if( $comment_ID > 0 )
@@ -319,7 +361,7 @@ switch( $action )
 		else
 		{
 			$BlogCache = &get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
 			$skin_ID = $Blog->get_skin_ID();
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $skin_ID );
@@ -343,9 +385,15 @@ switch( $action )
 				break;
 			}
 
+			// Update a vote of the comment for current User:
 			$edited_Comment->set_vote( 'spam', param( 'vote', 'string' ) );
 			$edited_Comment->dbupdate();
-			$edited_Comment->vote_spam( '', '', '&amp;', true, true, array( 'display' => true ) );
+
+			// Display a panel for next spam voting:
+			$edited_Comment->vote_spam( '', '', '&amp;', true, true, array(
+					'display'            => true,
+					'button_group_class' => button_class( 'group' ).( is_admin_page() ? ' btn-group-sm' : '' ),
+				) );
 		}
 
 		break;
@@ -424,7 +472,7 @@ switch( $action )
 					if( ! empty( $blog_ID ) )
 					{ // If blog is defined we should check if we can display info about number of votes
 						$BlogCache = & get_BlogCache();
-						if( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) &&
+						if( ( $Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) ) &&
 						    $blog_skin_ID = $Blog->get_skin_ID() )
 						{
 							$LinkOwner = & $Link->get_LinkOwner();
@@ -477,6 +525,10 @@ switch( $action )
 							$field_value = 'yes';
 							break;
 
+						case 'noopinion':
+							$field_value = 'noopinion';
+							break;
+
 						case 'dontlike':
 							$field_value = 'no';
 							break;
@@ -495,7 +547,101 @@ switch( $action )
 					// We have EXITed already at this point!!
 				}
 
-				$Comment->vote_helpful( '', '', '&amp;', true, true );
+				if( param( 'skin_ID', 'integer', 0 ) > 0 )
+				{	// If request is from skin:
+					$SkinCache = & get_SkinCache();
+					$request_Skin = & $SkinCache->get_by_ID( get_param( 'skin_ID' ), false, false );
+					if( $request_Skin && method_exists( $request_Skin, 'display_comment_voting_panel' ) )
+					{	// Request skin to display a voting panel for item:
+						$request_Skin->display_comment_voting_panel( $Comment, array( 'display_wrapper' => false ) );
+						break 2;
+					}
+				}
+
+				$Comment->vote_helpful( '', '', '&amp;', true, true, array( 'display_wrapper' => false ) );
+				break;
+
+			case 'item':
+				// Vote on items:
+
+				$item_ID = intval( $vote_ID );
+				if( empty( $item_ID ) )
+				{	// No item ID
+					break 2;
+				}
+
+				$ItemCache = & get_ItemCache();
+				$Item = $ItemCache->get_by_ID( $item_ID, false );
+				if( ! $Item )
+				{	// Incorrect item ID:
+					break 2;
+				}
+
+				if( $current_User->ID == $Item->creator_user_ID )
+				{	// Do not allow users to vote on their own comments:
+					break 2;
+				}
+
+				$item_Blog = & $Item->get_Blog();
+
+				if( empty( $item_Blog ) || ! $item_Blog->get_setting( 'voting_positive' ) )
+				{	// If Users cannot vote:
+					break 2;
+				}
+
+				if( ! empty( $vote_action ) )
+				{	// Vote for the item:
+					switch( $vote_action )
+					{ // Set field value
+						case 'like':
+							$field_value = 'positive';
+							break;
+
+						case 'noopinion':
+							$field_value = 'neutral';
+							break;
+
+						case 'dontlike':
+							$field_value = 'negative';
+							break;
+					}
+
+					if( isset( $field_value ) )
+					{ // Update a vote of current user
+						$Item->set_vote( $field_value );
+						$Item->dbupdate();
+					}
+				}
+
+				if( ! empty( $redirect_to ) )
+				{	// Redirect to back page, It is used by browsers without JavaScript:
+					header_redirect( $redirect_to, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+				}
+
+				if( param( 'widget_ID', 'integer', 0 ) > 0 )
+				{	// If request is from widget:
+					$WidgetCache = & get_WidgetCache();
+					$item_Widget = & $WidgetCache->get_by_ID( get_param( 'widget_ID' ), false, false );
+					if( $item_Widget && $item_Widget->code == 'item_vote' )
+					{	// Request widget to display a voting panel for item:
+						$item_Widget->display_voting_panel( $Item, array( 'display_wrapper' => false ) );
+						break 2;
+					}
+				}
+				elseif( param( 'skin_ID', 'integer', 0 ) > 0 )
+				{	// If request is from skin:
+					$SkinCache = & get_SkinCache();
+					$request_Skin = & $SkinCache->get_by_ID( get_param( 'skin_ID' ), false, false );
+					if( $request_Skin && method_exists( $request_Skin, 'display_item_voting_panel' ) )
+					{	// Request skin to display a voting panel for item:
+						$request_Skin->display_item_voting_panel( $Item, array( 'display_wrapper' => false ) );
+						break 2;
+					}
+				}
+
+				// Display a voting panel for item:
+				$Item->display_voting_panel( array( 'display_wrapper' => false ) );
 				break;
 		}
 		break;
@@ -618,7 +764,7 @@ switch( $action )
 		else
 		{
 			$BlogCache = &get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
 			$skin_ID = $Blog->get_skin_ID();
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $skin_ID );
@@ -826,7 +972,7 @@ switch( $action )
 		else
 		{
 			$BlogCache = &get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
 			$skin_ID = $Blog->get_skin_ID();
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $skin_ID );
@@ -859,46 +1005,6 @@ switch( $action )
 		// Call the requested callback function to display the results
 		call_user_func( $callback_function, $params );
 		break;
-
-	case 'get_recipients':
-		// Get list of users by search word
-		// Used for jQuery Tokeninput plugin ( when creating new messaging Thread )
-
-		if( !is_logged_in() || !$current_User->check_perm( 'perm_messaging', 'reply' ) )
-		{	// Check permission: User is not allowed to view threads
-			exit(0);
-		}
-
-		if( check_create_thread_limit() )
-		{	// user has already reached his limit, don't allow to get a users list
-			exit(0);
-		}
-
-		param( 'term', 'string' );
-
-		// Clear users cache and load only possible recipients who need right now, but keep shadow
-		$where_condition = '( user_login LIKE '.$DB->quote( '%'.$term.'%' ).' ) AND ( user_ID != '.$DB->quote( $current_User->ID ).' )';
-		$UserCache = & get_UserCache();
-		$UserCache->clear( true );
-		$UserCache->load_where( $where_condition );
-
-		$result_users = array();
-		while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
-		{ // Iterate through UserCache
-			if( !$iterator_User->check_status( 'can_receive_pm' ) )
-			{ // this user is probably closed so don't show it
-				continue;
-			}
-			$result_users[] = array(
-				'id'       => $iterator_User->ID,
-				'title'    => $iterator_User->get( 'login' ),
-				'fullname' => $iterator_User->get( 'fullname' ),
-				'picture'  => $iterator_User->get_avatar_imgtag( 'crop-top-32x32' )
-			);
-		}
-
-		echo evo_json_encode( $result_users );
-		exit(0);
 
 	case 'set_comment_status':
 		// Used for quick moderation of comments in dashboard, item list full view, comment list and front-office screens
@@ -935,10 +1041,7 @@ switch( $action )
 				$result_success = $edited_Comment->dbupdate();
 				if( $result_success !== false )
 				{
-					if( $status == 'published' )
-					{
-						$edited_Comment->handle_notifications( false, $current_User->ID );
-					}
+					$edited_Comment->handle_notifications();
 				}
 			}
 		}
@@ -964,22 +1067,12 @@ switch( $action )
 			$item_ID = param( 'itemid', 'integer' );
 			$currentpage = param( 'currentpage', 'integer', 1 );
 
-			if( strlen($statuses) > 2 )
-			{
-				$statuses = substr( $statuses, 1, strlen($statuses) - 2 );
-			}
-			$status_list = explode( ',', $statuses );
-			if( $status_list == NULL )
-			{
-				$status_list = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
-			}
-
 			// In case of comments_fullview we must set a filterset name to be abble to restore filterset.
 			// If $moderation is not NULL, then this requests came from the comments_fullview
 			// TODO: asimo> This should be handled with a better solution
 			$filterset_name = ( $item_ID > 0 ) ? '' : 'fullview';
 
-			echo_item_comments( $blog, $item_ID, $status_list, $currentpage, $limit, array(), $filterset_name, $expiry_status );
+			echo_item_comments( $blog, $item_ID, $statuses, $currentpage, $limit, array(), $filterset_name, $expiry_status );
 		}
 		elseif( $request_from == 'front' )
 		{ // AJAX request goes from frontoffice
@@ -1009,7 +1102,8 @@ switch( $action )
 
 		$OrganizationCache = & get_OrganizationCache();
 		$OrganizationCache->clear();
-		$OrganizationCache->load_all();
+		// Load only organizations that allow to join members or own organizations of the current user:
+		$OrganizationCache->load_where( '( org_accept != "no" OR org_owner_user_ID = "'.$current_User->ID.'" )' );
 
 		$Form->output = false;
 		$Form->switch_layout( 'none' );
@@ -1032,36 +1126,75 @@ switch( $action )
 
 		break;
 
-	case 'autocomplete_usernames':
-		// Get usernames by first chars for autocomplete jQuery plugin & TinyMCE autocomplete plugin
-
-		$q = param( 'q', 'string', '' );
-
-		if( ! is_valid_login( $q ) || evo_strlen( $q ) < 4 )
-		{ // Restrict a wrong request
-			debug_die( 'Wrong request' );
+	case 'change_user_org_status':
+		// Used in the identity user form to change an accept status of organization by Admin users
+		if( ! is_logged_in() )
+		{ // User must be logged in
+			break;
 		}
-		// Add backslash for special char of sql operator LIKE
-		$q = str_replace( '_', '\_', $q );
 
-		if( utf8_strlen( $q ) == 0 )
-		{ // Don't search logins with empty request
-			$usernames = array();
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'userorg' );
+
+		/**
+		 * This string is value of "rel" attibute of span icon element
+		 * The format of this string is: 'org_status_y_1_2' or 'org_status_n_1_2', where:
+		 *     'y' - organization was accepted by admin,
+		 *     'n' - not accepted
+		 *     '1' - this number is ID of organization - uorg_org_ID from the DB table T_users__user_org
+		 *     '2' - this number is ID of user - uorg_user_ID from the DB table T_users
+		 */
+		$status = explode( '_', param( 'status', 'string' ) );
+
+		// ID of organization
+		$org_ID = isset( $status[3] ) ? intval( $status[3] ) : 0;
+
+		// ID of organization
+		$user_ID = isset( $status[4] ) ? intval( $status[4] ) : 0;
+
+		// Get organization by ID:
+		$OrganizationCache = & get_OrganizationCache();
+		$user_Organization = & $OrganizationCache->get_by_ID( $org_ID, false, false );
+
+		if( count( $status ) != 5 || ( $status[2] != 'y' && $status[2] != 'n' ) || $org_ID == 0 || ! $user_Organization )
+		{ // Incorrect format of status param
+			$Ajaxlog->add( /* DEBUG: do not translate */ 'Incorrect request to accept organization!', 'error' );
+			break;
+		}
+
+		// Check permission:
+		$current_User->check_perm( 'orgs', 'edit', true, $user_Organization );
+
+		// Use the glyph or font-awesome icons if it is defined by skin
+		param( 'b2evo_icons_type', 'string', '' );
+
+		if( $status[2] == 'y' )
+		{ // Status will be change to "Not accepted"
+			$org_is_accepted = false;
 		}
 		else
-		{
-			$SQL = new SQL();
-			$SQL->SELECT( 'user_login' );
-			$SQL->FROM( 'T_users' );
-			$SQL->WHERE( 'user_login LIKE '.$DB->quote( $q.'%' ) );
-			$SQL->WHERE_and( 'user_status = "activated" OR user_status = "autoactivated"' );
-			$SQL->ORDER_BY( 'user_login' );
-			$usernames = $DB->get_col( $SQL->get() );
+		{ // Status will be change to "Accepted"
+			$org_is_accepted = true;
 		}
 
-		echo evo_json_encode( $usernames );
+		// Change an accept status of organization for edited user
+		$DB->query( 'UPDATE T_users__user_org
+			  SET uorg_accepted = '.$DB->quote( $org_is_accepted ? 1 : 0 ).'
+			WHERE uorg_user_ID = '.$DB->quote( $user_ID ).'
+			  AND uorg_org_ID = '.$DB->quote( $org_ID ) );
 
-		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
+		$accept_icon_params = array( 'style' => 'cursor: pointer;', 'rel' => 'org_status_'.( $org_is_accepted ? 'y' : 'n' ).'_'.$org_ID.'_'.$user_ID );
+		if( $org_is_accepted )
+		{ // Organization is accepted by admin
+			$accept_icon = get_icon( 'allowback', 'imgtag', array_merge( array( 'title' => T_('Accepted') ), $accept_icon_params ) );
+		}
+		else
+		{ // Organization is not accepted by admin yet
+			$accept_icon = get_icon( 'bullet_red', 'imgtag', array_merge( array( 'title' => T_('Not accepted') ), $accept_icon_params ) );
+		}
+
+		// Display icon with new status
+		echo $accept_icon;
 
 		break;
 
@@ -1081,89 +1214,57 @@ switch( $action )
 		$result = array();
 
 		if( $get_widget_login_hidden_fields )
-		{ // Get the loginform crumb, the password encryption salt, and the Session ID for the widget login form
-			$pwd_salt = $Session->get('core.pwd_salt');
-			if( empty($pwd_salt) )
-			{ // Session salt is not generated yet, needs to generate
-				$pwd_salt = generate_random_key(64);
-				$Session->set( 'core.pwd_salt', $pwd_salt, 86400 /* expire in 1 day */ );
+		{	// Get the loginform crumb, the password encryption salt, and the Session ID for the widget login form:
+			$pepper = $Session->get( 'core.pepper' );
+			if( empty( $pepper ) )
+			{	// Session salt is not generated yet, needs to generate:
+				$pepper = generate_random_key(64);
+				$Session->set( 'core.pepper', $pepper, 86400 /* expire in 1 day */ );
 				$Session->dbsave(); // save now, in case there's an error later, and not saving it would prevent the user from logging in.
 			}
 			$result['crumb'] = get_crumb( 'loginform' );
-			$result['pwd_salt'] = $pwd_salt;
+			$result['pepper'] = $pepper;
 			$result['session_id'] = $Session->ID;
 		}
 
 		$login = param( $dummy_fields[ 'login' ], 'string', '' );
 		$check_field = is_email( $login ) ? 'user_email' : 'user_login';
 
-		// Get the most recently used 3 users with matching email address
-		$salts = $DB->get_col('SELECT user_salt FROM T_users
+		// Get the most recently used 3 users with matching email address:
+		$salts = $DB->get_results( 'SELECT user_salt, user_pass_driver FROM T_users
 						WHERE '.$check_field.' = '.$DB->quote( utf8_strtolower( $login ) ).'
 						ORDER BY user_lastseen_ts DESC, user_status ASC
-						LIMIT 3' );
+						LIMIT 3', ARRAY_A );
 
-		// Make sure to return at least one salt, to make it unable to guess if user exists with the given login
+		// Make sure to return at least one hashed password, to make it unable to guess if user exists with the given login
 		if( empty( $salts ) )
 		{ // User with the given login was not found add one random salt value
-			$salts[] = generate_random_key( 8 );
+			$salts[] = array(
+					'user_salt'        => generate_random_key( 8 ),
+					'user_pass_driver' => 'evo$salted',
+				);
 		}
-		$result['salts'] = $salts;
+
+		$result['salts'] = array();
+		$result['hash_algo'] = array();
+		foreach( $salts as $salt )
+		{
+			// Get password driver by code:
+			$user_PasswordDriver = get_PasswordDriver( $salt['user_pass_driver'] );
+
+			if( ! $user_PasswordDriver )
+			{	// Skip this user because he has an unknown password driver:
+				continue;
+			}
+
+			$result['salts'][] = $salt['user_salt'];
+			$result['hash_algo'][] = $user_PasswordDriver->get_javascript_hash_code( 'raw_password', 'salts[index]' );
+		}
 
 		echo evo_json_encode( $result );
 
 		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
 		break;
-
-	case 'get_tags':
-		// Get list of item tags, where $term is part of the tag name (sorted)
-		// To be used for Tag autocompletion
-
-		// Crumb check and permission check are not required because this won't modify anything and it returns public info
-
-		$term = param( 'term', 'string' );
-
-		if( substr( $term, 0, 1 ) == '-' )
-		{ // Prevent chars '-' in first position
-			$term = preg_replace( '/^-+/', '', $term );
-		}
-
-		$term_is_new_tag = true;
-
-		if( ! empty( $term ) )
-		{ // Find tags in DB only when term is not empty
-			$tags = $DB->get_results( '
-				SELECT tag_name AS id, tag_name AS title
-				  FROM T_items__tag
-				 WHERE tag_name LIKE '.$DB->quote('%'.$term.'%').' COLLATE utf8_general_ci
-				 ORDER BY tag_name', ARRAY_A );
-			/* Yura: Here I added "COLLATE utf8_general_ci" because:
-			 * It allows to match "testA" with "testa", and otherwise "testa" with "testA".
-			 * It also allows to find "ee" when we type in "éè".
-			 * BUT it does NOT allow to find "éè" when we type in "ee".
-			 */
-
-			// Check if current term is not an existing tag
-			foreach( $tags as $tag )
-			{
-				/* Yura: I have added "utf8_strtolower()" below in condition in order to:
-				 * When we enter new tag 'testA' and the tag 'testa' already exists
-				 * then we suggest only 'testa' instead of 'testA'.
-				 */
-				if( utf8_strtolower( $tag['title'] ) == utf8_strtolower( $term ) )
-				{ // Current term is an existing tag
-					$term_is_new_tag = false;
-				}
-			}
-		}
-
-		if( $term_is_new_tag && ! empty( $term ) )
-		{ // Add current term in the beginning of the tags list
-			array_unshift( $tags, array( 'id' => $term, 'title' => $term ) );
-		}
-
-		echo evo_json_encode( $tags );
-		exit(0);
 
 	case 'crop':
 		// Get form to crop profile picture
@@ -1181,13 +1282,13 @@ switch( $action )
 		}
 
 		$BlogCache = &get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
 		$skin_ID = $Blog->get_skin_ID();
 		$SkinCache = & get_SkinCache();
 		$Skin = & $SkinCache->get_by_ID( $skin_ID );
 
 		$display_mode = 'js';
-		$form_action = get_secure_htsrv_url().'profile_update.php';
+		$form_action = get_htsrv_url().'profile_update.php';
 
 		$window_width = param( 'window_width', 'integer' );
 		$window_height = param( 'window_height', 'integer' );
@@ -1222,14 +1323,14 @@ switch( $action )
 		else
 		{ // Load Blog skin
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
 			$skin_ID = $Blog->get_skin_ID();
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $skin_ID );
 		}
 
 		$display_mode = 'js';
-		$form_action = get_secure_htsrv_url().'profile_update.php';
+		$form_action = get_htsrv_url().'profile_update.php';
 
 		require $inc_path.'users/views/_user_report.form.php';
 		break;
@@ -1263,16 +1364,161 @@ switch( $action )
 		else
 		{ // Load Blog skin
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
 			$skin_ID = $Blog->get_skin_ID();
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $skin_ID );
 		}
 
 		$display_mode = 'js';
-		$form_action = get_secure_htsrv_url().'profile_update.php';
+		$form_action = get_htsrv_url().'profile_update.php';
 
 		require $inc_path.'users/views/_user_groups.form.php';
+		break;
+
+	case 'set_object_link_position':
+		// Change a position of a link on the edit item screen (fieldset "Images & Attachments")
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'link' );
+
+		// Check item/comment edit permission below after we have the $LinkOwner object ( we call LinkOwner->check_perm ... )
+
+		param('link_ID', 'integer', true);
+		param('link_position', 'string', true);
+
+		// Don't display the inline position reminder again until the user logs out or loses the session cookie
+		if( $link_position == 'inline' )
+		{
+			$Session->set( 'display_inline_reminder', 'false' );
+		}
+
+		$LinkCache = & get_LinkCache();
+		if( ( $Link = & $LinkCache->get_by_ID( $link_ID ) ) === false )
+		{	// Bad request with incorrect link ID
+			echo '';
+			exit(0);
+		}
+		$LinkOwner = & $Link->get_LinkOwner();
+
+		// Check permission:
+		$LinkOwner->check_perm( 'edit', true );
+
+		if( $Link->set( 'position', $link_position ) && $Link->dbupdate() )
+		{ // update was successful
+			echo 'OK';
+
+			// Update last touched date of Owners
+			$LinkOwner->update_last_touched_date();
+
+			if( $link_position == 'cover' && $LinkOwner->type == 'item' )
+			{ // Position "Cover" can be used only by one link
+			  // Replace previous position with "Inline"
+				$DB->query( 'UPDATE T_links
+						SET link_position = "aftermore"
+					WHERE link_ID != '.$DB->quote( $link_ID ).'
+						AND link_itm_ID = '.$DB->quote( $LinkOwner->Item->ID ).'
+						AND link_position = "cover"' );
+			}
+		}
+		else
+		{ // return the current value on failure
+			echo $Link->get( 'position' );
+		}
+		break;
+
+	case 'update_links_order':
+		// Update the order of all links at one time:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'link' );
+
+		$link_IDs = param( 'links', 'string' );
+
+		if( empty( $link_IDs ) )
+		{ // No links to update, wrong request, exit here:
+			break;
+		}
+
+		$link_IDs = explode( ',', $link_IDs );
+
+		// Check permission by first link:
+		$LinkCache = & get_LinkCache();
+		if( ( $Link = & $LinkCache->get_by_ID( $link_IDs[0] ) ) === false )
+		{ // Bad request with incorrect link ID
+			exit(0);
+		}
+		$LinkOwner = & $Link->get_LinkOwner();
+		// Check permission:
+		$LinkOwner->check_perm( 'edit', true );
+
+		$DB->begin( 'SERIALIZABLE' );
+
+		// Get max order value of the links:
+		$max_link_order = intval( $DB->get_var( 'SELECT MAX( link_order )
+			 FROM T_links
+			WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' ) );
+
+		// Initialize parts of sql queries to update the links order:
+		$fake_sql_update_strings = '';
+		$real_sql_update_strings = '';
+		$real_link_order = 0;
+		foreach( $link_IDs as $link_ID )
+		{
+			$max_link_order++;
+			$fake_sql_update_strings .= ' WHEN link_ID = '.$DB->quote( $link_ID ).' THEN '.$max_link_order;
+			$real_link_order++;
+			$real_sql_update_strings .= ' WHEN link_ID = '.$DB->quote( $link_ID ).' THEN '.$real_link_order;
+		}
+
+		// Do firstly fake ordering start with max order, to avoid duplicate entry error:
+		$DB->query( 'UPDATE T_links
+			  SET link_order = CASE '.$fake_sql_update_strings.' ELSE link_order END
+			WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' );
+		// Do real ordering start with number 1:
+		$DB->query( 'UPDATE T_links
+			  SET link_order = CASE '.$real_sql_update_strings.' ELSE link_order END
+			WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' );
+
+		$DB->commit();
+		break;
+
+	case 'test_api':
+		// Spec action to test API from ctrl=system:
+		echo 'ok';
+		break;
+
+	case 'get_file_select_item':
+		$field_params = param( 'params', 'array', true );
+		$field_name = param( 'field_name', 'string', true );
+		$root = param( 'root', 'string', true );
+		$file_path = param( 'path', 'string', true );
+
+		$FileCache = & get_FileCache();
+		list( $root_type, $root_in_type_ID ) = explode( '_', $root, 2 );
+		if( ! ( $current_File = $FileCache->get_by_root_and_path( $root_type, $root_in_type_ID, $file_path ) ) )
+		{	// No file:
+			debug_die( 'No such file' );
+			// Exit here.
+		}
+
+		if( ! $current_File->is_image() )
+		{
+			debug_die( 'Incorrect file type for '.$field_name );
+		}
+
+		// decode params with HTML tags
+		$field_params['field_item_start'] = base64_decode( $field_params['field_item_start'] );
+		$field_params['field_item_end'] = base64_decode( $field_params['field_item_end'] );
+
+		$current_File->load_meta( true ); // erhsatingin > can we force create file meta in DB here or should this whole thing require login?
+		$r = file_select_item( $current_File->ID, $field_params );
+
+		echo json_encode( array(
+				'fieldName' => $field_name,
+				'fieldValue' => $current_File->ID,
+				'item' => base64_encode( $r )
+			) );
 		break;
 
 	default:
@@ -1292,6 +1538,7 @@ if( $current_debug || $current_debug_jslog )
 						), 'ul', 'jslog' );
 }
 
+// Add ajax response end comment:
 echo '<!-- Ajax response end -->';
 
 exit(0);

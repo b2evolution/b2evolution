@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -27,10 +27,10 @@ class content_hierarchy_Widget extends ComponentWidget
 	/**
 	 * Constructor
 	 */
-	function content_hierarchy_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'content_hierarchy' );
+		parent::__construct( $db_row, 'core', 'content_hierarchy' );
 	}
 
 
@@ -124,14 +124,14 @@ class content_hierarchy_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Item;
+		global $Item, $disp;
 
 		$this->init_display( $params );
 
 		echo $this->disp_params['block_start'];
 
-		if( !empty( $Item ) )
-		{ // Set selected Item in the params
+		if( ( $disp == 'single' || $disp == 'page' ) && ! empty( $Item ) )
+		{	// Set selected Item in the params ONLY if we really view item page:
 			$params['selected_item_ID'] = $Item->ID;
 		}
 
@@ -326,8 +326,14 @@ class content_hierarchy_Widget extends ComponentWidget
 			$display_params['after'] = '</i>';
 		}
 
-		// Display a permanent link to post
+		// Display a permanent link to post:
 		$r .= $Item->get_title( $display_params );
+
+		// Flag:
+		$r .= $Item->get_flag( array(
+				'before'       => ' ',
+				'only_flagged' => true,
+			) );
 
 		$r .= $params['item_end'];
 		return $r;

@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -32,10 +32,10 @@ class Subregion extends DataObject
 	 *
 	 * @param object database row
 	 */
-	function Subregion( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_regional__subregion', 'subrg_', 'subrg_ID' );
+		parent::__construct( 'T_regional__subregion', 'subrg_', 'subrg_ID' );
 
 		if( $db_row )
 		{
@@ -100,6 +100,17 @@ class Subregion extends DataObject
 		param_check_regexp( 'subrg_code', '#^[A-Za-z0-9]{1,6}$#', T_('Sub-region code must be from 1 to 6 letters.') );
 		$this->set_from_Request( 'code', 'subrg_code' );
 
+		if( ! param_errors_detected() )
+		{	// Check sub-region code for duplicating:
+			$existing_subrg_ID = $this->dbexists( array( 'subrg_rgn_ID', 'subrg_code' ), array( $this->get( 'rgn_ID' ), $this->get( 'code' ) ) );
+			if( $existing_subrg_ID )
+			{	// We have a duplicate sub-region:
+				param_error( 'subrg_code',
+					sprintf( T_('This sub-region already exists. Do you want to <a %s>edit the existing sub-region</a>?'),
+						'href="?ctrl=subregions&amp;action=edit&amp;subrg_ID='.$existing_subrg_ID.'"' ) );
+			}
+		}
+
 		return ! param_errors_detected();
 	}
 
@@ -136,20 +147,6 @@ class Subregion extends DataObject
 	function get_name()
 	{
 		return $this->name;
-	}
-
-
-	/**
-	 * Check existence of specified sub-region code in subrg_code unique field.
-	 *
-	 * @return int ID if region + sub-region code exist otherwise NULL/false
-	 */
-	function dbexists()
-	{
-		return parent::dbexists(
-				array( 'subrg_rgn_ID', 'subrg_code' ),
-				array( $this->rgn_ID, $this->code )
-			);
 	}
 }
 

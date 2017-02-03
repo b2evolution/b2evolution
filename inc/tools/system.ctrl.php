@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package admin
@@ -31,6 +31,8 @@ $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of kee
 $AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
 $AdminUI->breadcrumbpath_add( T_('Status'), $admin_url.'?ctrl=system' );
 
+// Set an url for manual page:
+$AdminUI->set_page_manual_link( 'system-status-tab' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -41,16 +43,17 @@ $AdminUI->disp_body_top();
 // Begin payload block:
 $AdminUI->disp_payload_begin();
 
-function init_system_check( $name, $value )
+function init_system_check( $name, $value, $info = '' )
 {
-	global $syscheck_name, $syscheck_value;
+	global $syscheck_name, $syscheck_value, $syscheck_info;
 	$syscheck_name = $name;
 	$syscheck_value = $value;
+	$syscheck_info = $info;
 }
 
 function disp_system_check( $condition, $message = '' )
 {
-	global $syscheck_name, $syscheck_value;
+	global $syscheck_name, $syscheck_value, $syscheck_info;
 	echo '<div class="system_check">';
 	echo '<div class="system_check_name">';
 	echo $syscheck_name;
@@ -58,6 +61,7 @@ function disp_system_check( $condition, $message = '' )
 	echo '<div class="system_check_value_'.$condition.'">';
 	echo $syscheck_value;
 	echo '&nbsp;</div>';
+	echo $syscheck_info;
 	if( !empty( $message ) )
 	{
 		echo '<div class="system_check_message_'.$condition.'">';
@@ -65,6 +69,29 @@ function disp_system_check( $condition, $message = '' )
 		echo '</div>';
 	}
 	echo '</div>';
+}
+
+
+/**
+ * Check API url
+ *
+ * @param string Title
+ * @param string Url
+ */
+function system_check_api_url( $title, $url )
+{
+	$ajax_response = fetch_remote_page( $url, $info );
+	if( $ajax_response !== false )
+	{	// Response is correct data:
+		init_system_check( $title, 'OK', $url );
+		disp_system_check( 'ok' );
+	}
+	else
+	{	// Response is not correct data:
+		init_system_check( $title, T_('Failed'), $url );
+		disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.' )
+			.' <b>'.sprintf( T_('Error: %s'), $info['error'] ).'; '.sprintf( T_('Status code: %s'), $info['status'] ).'</b>' );
+	}
 }
 
 $facilitate_exploits = '<p>'.T_('When enabled, this feature is known to facilitate hacking exploits in any PHP application.')."</p>\n<p>"
@@ -93,11 +120,11 @@ if( b2evonet_get_updates( true ) !== NULL )
 	 * @var AbstractSettings
 	 */
 	global $global_Cache;
-	$version_status_msg = $global_Cache->get( 'version_status_msg' );
+	$version_status_msg = $global_Cache->getx( 'version_status_msg' );
 	if( !empty($version_status_msg) )
 	{	// We have managed to get updates (right now or in the past):
 		$msg = '<p>'.$version_status_msg.'</p>';
-		$extra_msg = $global_Cache->get( 'extra_msg' );
+		$extra_msg = $global_Cache->getx( 'extra_msg' );
 		if( !empty($extra_msg) )
 		{
 			$msg .= '<p>'.$extra_msg.'</p>';
@@ -117,7 +144,7 @@ $block_item_Widget = new Widget( 'block_item' );
 /**
  * b2evolution
  */
-$block_item_Widget->title = 'b2evolution';
+$block_item_Widget->title = 'b2evolution'.get_manual_link( 'system-status-tab' );
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
 // Instance name:
@@ -129,7 +156,7 @@ $app_timestamp = mysql2timestamp( $app_date );
 init_system_check( T_( 'b2evolution version' ), sprintf( /* TRANS: First %s: App version, second %s: release date */ T_( '%s released on %s' ), $app_version, date_i18n( locale_datefmt(), $app_timestamp ) ) );
 if( ! empty($msg) )
 {
-	switch( $global_Cache->get( 'version_status_color' ) )
+	switch( $global_Cache->getx( 'version_status_color' ) )
 	{
 		case 'green':
 			disp_system_check( 'ok', $msg );
@@ -174,6 +201,26 @@ if( $mediadir_status == 'error' )
 init_system_check( T_( 'Media directory' ), $mediadir_msg.' - '.$media_path );
 disp_system_check( $mediadir_status, $mediadir_long );
 
+// .htaccess
+$htaccess_path = $basepath.'.htaccess';
+$sample_htaccess_path = $basepath.'sample.htaccess';
+init_system_check( '.htaccess', $htaccess_path );
+if( ! file_exists( $htaccess_path ) )
+{	// No .htaccess
+	disp_system_check( 'error', T_('Error').': '.sprintf( T_('%s has not been found.'), '<code>.htaccess</code>' ) );
+}
+elseif( ! file_exists( $sample_htaccess_path ) )
+{	// No sample.htaccess
+	disp_system_check( 'warning', T_('Warning').': '.sprintf( T_('%s has not been found.'), '<code>sample.htaccess</code>' ) );
+}
+elseif( trim( file_get_contents( $htaccess_path ) ) != trim( file_get_contents( $sample_htaccess_path ) ) )
+{	// Different .htaccess
+	disp_system_check( 'warning', T_('Warning').': '.sprintf( T_('%s differs from %s'), '<code>.htaccess</code>', '<code>sample.htaccess</code>' ) );
+}
+else
+{	// All OK
+	disp_system_check( 'ok', sprintf( T_('%s is identical to %s'), '<code>.htaccess</code>', '<code>sample.htaccess</code>' ) );
+}
 
 // /install/ folder deleted?
 init_system_check( T_( 'Install folder' ), $system_stats['install_removed'] ?  T_('Deleted') : T_('Not deleted').' - '.$basepath.$install_subdir );
@@ -466,7 +513,7 @@ if( empty( $max_execution_time ) )
 }
 else
 {	// Time is limited, can we request more?:
-	$can_force_time = ini_set( 'max_execution_time', 600 ); // Try to force max_execution_time to 10 minutes
+	$can_force_time = @ini_set( 'max_execution_time', 600 ); // Try to force max_execution_time to 10 minutes
 
 	if( $can_force_time !== false )
 	{
@@ -529,7 +576,19 @@ $opcode_cache = get_active_opcode_cache();
 init_system_check( 'PHP opcode cache', $opcode_cache );
 if( $opcode_cache == 'none' )
 {
-	disp_system_check( 'warning', T_( 'Using an opcode cache allows all your PHP scripts to run faster by caching a "compiled" (opcode) version of the scripts instead of recompiling everything at every page load. Several opcode caches are available. We recommend APC.' ) );
+	disp_system_check( 'warning', T_( 'Using an opcode cache allows all your PHP scripts to run faster by caching a "compiled" (opcode) version of the scripts instead of recompiling everything at every page load. Several opcode caches are available. We recommend APC (which is included with PHP starting from PHP 7).' ) );
+}
+else
+{
+	disp_system_check( 'ok' );
+}
+
+// User cache
+$user_cache = get_active_user_cache();
+init_system_check( 'PHP user cache', $user_cache );
+if( $user_cache == 'none' )
+{
+	disp_system_check( 'warning', T_( 'Using an user cache allows b2evolution to store some cached data (Block Cache) in memory instead of regenerated the blocks at each page load. Several user caches are available. We recommend APCu (which needs to be enabled separately from APC, starting from PHP 7).' ) );
 }
 else
 {
@@ -625,6 +684,91 @@ else
 	}
 	// pre_dump( $gd_info );
 }
+$block_item_Widget->disp_template_raw( 'block_end' );
+
+
+
+/*
+ * API
+ */
+$block_item_Widget->title = T_('APIs');
+$block_item_Widget->disp_template_replaced( 'block_start' );
+
+// REST API:
+$api_title = 'REST API';
+$api_url = $baseurl.'api/v6/collections';
+$json_response = fetch_remote_page( $api_url, $api_info );
+$api_result = false;
+if( $json_response !== false )
+{	// Try to decode REST API json data:
+	json_decode( $json_response );
+	$api_result = ( json_last_error() === JSON_ERROR_NONE );
+}
+if( $api_result )
+{	// Response is correct json data:
+	init_system_check( $api_title, 'OK', $api_url );
+	disp_system_check( 'ok' );
+}
+else
+{	// Response is not json data:
+	if( ! empty( $api_info['error'] ) )
+	{	// Display error message from function fetch_remote_page():
+		$api_error = ' <b>'.sprintf( T_('Error: %s'), $info['error'] ).'; '.sprintf( T_('Status code: %s'), $info['status'] ).'</b>';
+	}
+	else
+	{	// Display error message from other places:
+		$api_error = error_get_last();
+		$api_error = ( isset( $api_error['message'] ) ? ' <b>'.sprintf( T_( 'Error: %s' ), $api_error['message'] ).'</b>' : '' );
+	}
+	init_system_check( $api_title, T_('Failed'), $api_url );
+	disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.' )
+		.' '.sprintf( T_('Probably you should update a file %s to the latest version or check permissions to use this file.'), '<code>.htaccess</code>' )
+		.$api_error );
+}
+
+// XML-RPC:
+$api_title = 'XML-RPC';
+$api_file = 'xmlrpc.php';
+$api_url = $baseurl.$api_file;
+load_funcs( 'xmlrpc/model/_xmlrpc.funcs.php' );
+$url_data = parse_url( $api_url );
+$client = new xmlrpc_client( $api_file, $url_data['host'], ( isset( $url_data['port'] ) ? $url_data['port'] : '' ) );
+$message = new xmlrpcmsg( 'system.listMethods' );
+$result = $client->send( $message );
+if( $result && ! $result->faultCode() )
+{	// XML-RPC request is successful:
+	init_system_check( $api_title, 'OK', $api_url );
+	disp_system_check( 'ok' );
+}
+else
+{	// Some error on XML-RPC request:
+	$xmlrpc_error_message = $result->faultString();
+	if( $xmlrpc_error_message == 'XML-RPC services are disabled on this system.' )
+	{	// Exception for this error:
+		$api_status_title = T_('Disabled');
+		$api_status_type = 'ok';
+	}
+	else
+	{	// Other errors:
+		$api_status_title = T_('Failed');
+		$api_status_type = 'warning';
+	}
+	init_system_check( $api_title, $api_status_title, $api_url );
+	disp_system_check( $api_status_type, T_('This API doesn\'t work properly on this server.').' <b>'.sprintf( T_( 'Error: %s' ), $xmlrpc_error_message ).'</b>' );
+}
+
+// AJAX anon_async.php:
+system_check_api_url( 'AJAX anon_async.php', $htsrv_url.'anon_async.php?action=test_api' );
+
+// AJAX async.php:
+system_check_api_url( 'AJAX async.php', $htsrv_url.'async.php?action=test_api' );
+
+// AJAX action.php:
+system_check_api_url( 'AJAX action.php', $htsrv_url.'action.php?mname=test_api' );
+
+// AJAX call_plugin.php:
+system_check_api_url( 'AJAX call_plugin.php', $htsrv_url.'call_plugin.php?plugin_ID=-1&method=test_api' );
+
 $block_item_Widget->disp_template_raw( 'block_end' );
 
 

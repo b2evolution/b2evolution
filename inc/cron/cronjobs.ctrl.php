@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -207,6 +207,24 @@ switch( $action )
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
 $AdminUI->breadcrumbpath_add( T_('Scheduler'), $admin_url.'?ctrl=crontab' );
+
+// Set an url for manual page:
+switch( $action )
+{
+	case 'new':
+	case 'create':
+	case 'edit':
+	case 'update':
+	case 'copy':
+		$AdminUI->set_page_manual_link( 'scheduled-job-form' );
+		break;
+	case 'view':
+		$AdminUI->set_page_manual_link( 'scheduled-job-info' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'scheduled-jobs-list' );
+		break;
+}
 
 if( in_array( $action, array( 'new', 'create', 'edit', 'update', 'copy', 'list' ) ) )
 { // Initialize date picker for cronjob.form.php

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package evocore
@@ -167,6 +167,9 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 	{ // Search for blocked keywords:
 		if( $block = antispam_check($url) )
 		{
+			// Log into system log
+			syslog_insert( sprintf( 'Antispam: URL "%s" not allowed. The URL contains blacklisted word "%s".', htmlspecialchars($url), $block ), 'error' );
+
 			return $verbose
 				? sprintf( T_('URL "%s" not allowed: blacklisted word "%s".'), htmlspecialchars($url), $block )
 				: T_('URL not allowed');
@@ -290,6 +293,8 @@ function _http_wrapper_last_status( & $headers )
  */
 function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL )
 {
+	global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
+
 	$info = array(
 		'error' => '',
 		'status' => NULL,
@@ -309,6 +314,15 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, $timeout );
 		curl_setopt( $ch, CURLOPT_TIMEOUT, $timeout );
+
+		// Set proxy:
+		if( !empty($outgoing_proxy_hostname) )
+		{
+			curl_setopt( $ch, CURLOPT_PROXY, $outgoing_proxy_hostname );
+			curl_setopt( $ch, CURLOPT_PROXYPORT, $outgoing_proxy_port );
+			curl_setopt( $ch, CURLOPT_PROXYUSERPWD, $outgoing_proxy_username.':'.$outgoing_proxy_password );
+		}
+
 		@curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, true ); // made silent due to possible errors with safe_mode/open_basedir(?)
 		curl_setopt( $ch, CURLOPT_MAXREDIRS, 3 );
 		$r = curl_exec( $ch );
@@ -418,7 +432,7 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 			{	// fopen() returned false because it got a bad HTTP code:
 				$info['error'] = NT_( 'Invalid response' );
 				$info['status'] = $code;
-				return '';
+				return false;
 			}
 
 			$info['error'] = NT_( 'fopen() failed' );
@@ -696,7 +710,7 @@ function url_absolute( $url, $base = NULL )
 
 	if( empty($base) )
 	{	// Detect current page base
-		global $Blog, $ReqHost, $base_tag_set, $baseurl;
+		global $Collection, $Blog, $ReqHost, $base_tag_set, $baseurl;
 
 		if( $base_tag_set )
 		{	// <base> tag is set
@@ -798,10 +812,20 @@ function is_absolute_url( $url )
  * while others use uppercase (lighttpd).
  * @return boolean
  */
-function is_same_url( $a, $b )
+function is_same_url( $a, $b, $ignore_http_protocol = FALSE )
 {
 	$a = preg_replace_callback('~%[0-9A-F]{2}~', create_function('$m', 'return strtolower($m[0]);'), $a);
 	$b = preg_replace_callback('~%[0-9A-F]{2}~', create_function('$m', 'return strtolower($m[0]);'), $b);
+
+	if( $ignore_http_protocol )
+	{
+		$re = "/^https?\:\/\/(.*)/i";
+		$subst = "$1";
+
+		$a = preg_replace( $re, $subst, $a );
+		$b = preg_replace( $re, $subst, $b );
+	}
+
 	return $a == $b;
 }
 
@@ -870,7 +894,7 @@ function idna_decode( $url )
  */
 function get_dispctrl_url( $dispctrl, $params = '' )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( $params != '' )
 	{
@@ -922,7 +946,7 @@ function get_link_tag( $url, $text = '', $class = '', $max_url_length = 50 )
 		}
 	}
 
-	$link_attrs = array( 'href' => $url );
+	$link_attrs = array( 'href' => str_replace( '&amp;', '&', $url ) );
 
 	if( ! empty( $class ) )
 	{

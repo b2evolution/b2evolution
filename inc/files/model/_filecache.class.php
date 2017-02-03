@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -32,9 +32,9 @@ class FileCache extends DataObjectCache
 	/**
 	 * Constructor
 	 */
-	function FileCache()
+	function __construct()
 	{
-		parent::DataObjectCache( 'File', false, 'T_files', 'file_', 'file_ID' );
+		parent::__construct( 'File', false, 'T_files', 'file_', 'file_ID' );
 	}
 
 
@@ -109,7 +109,7 @@ class FileCache extends DataObjectCache
 		global $Debuglog, $cache_File;
 
 		if( is_windows() )
-		{
+		{	// We probably don't need the windows backslashes replacing any more but leave it for safety because it doesn't hurt:
 			$rel_path = strtolower( str_replace( '\\', '/', $rel_path ) );
 		}
 

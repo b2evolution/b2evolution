@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -272,7 +272,7 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 						);
 
 	$Results->global_icon( T_('Create a new user field...'), 'new',
-				'?ctrl=userfields&action=new', T_('New user field').' &raquo;', 3, 4 );
+				'?ctrl=userfields&action=new', T_('New user field').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 	$Results->global_icon( T_('Create a new user field group...'), 'new',
 				'?ctrl=userfieldsgroups&action=new', T_('New user field group').' &raquo;', 3, 4 );
 }

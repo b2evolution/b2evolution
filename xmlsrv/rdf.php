@@ -10,7 +10,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package xmlsrv
  */
@@ -21,10 +21,6 @@ $resolve_extra_path = false;	// We don't want extra path resolution on this page
 
 # Let's force the use of the RSS skin:
 $tempskin = '_rdf';
-
-# This setting retricts posts to those published, thus hiding drafts.
-# You should not have to change this.
-$show_statuses = array();
 
 /**
  * That's it, now let b2evolution do the rest! :)

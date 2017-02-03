@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.html.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url, $htsrv_url;
+global $admin_url;
 
 // Default params:
 $params = array_merge( array(
@@ -33,7 +33,7 @@ if( empty( $params['closed_by_admin'] ) )
 }
 else
 { // Admin closed current user account
-	printf( T_('A user account was closed %s days after creation by %s'), $params['days_count'], get_user_colored_login_link( $params['closed_by_admin'], array( 'use_style' => true, 'protocol' => 'http:' ) ) );
+	printf( T_('A user account was closed %s days after creation by %s'), $params['days_count'], get_user_colored_login_link( $params['closed_by_admin'], array( 'use_style' => true, 'protocol' => 'http:', 'login_text' => 'name' ) ) );
 }
 echo "</p>\n";
 
@@ -68,7 +68,7 @@ echo "</div>\n";
 
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notification when an account was closed, click here:' )
-			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=account_closed&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
+			.' <a href="'.get_htsrv_url().'quick_unsubscribe.php?type=account_closed&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
 			.T_('instant unsubscribe').'</a>.';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------

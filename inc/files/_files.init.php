@@ -4,7 +4,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -13,7 +13,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for files module to function properly
  */
-$required_php_version[ 'files' ] = '5.0';
+$required_php_version[ 'files' ] = '5.2';
 
 /**
  * Minimum MYSQL version required for files module to function properly
@@ -153,8 +153,8 @@ class files_Module extends Module
 				$permshared = 'add';
 				$permimport = 'none';
 				break;
-			case 3: // Trusted Users (group ID 3) have permission by default:
-				$permfiles = 'view';
+			case 3: // Editors (group ID 3) have permission by default:
+				$permfiles = 'edit_allowed';
 				$permshared = 'view';
 				$permimport = 'none';
 				break;
@@ -181,15 +181,14 @@ class files_Module extends Module
 	 */
 	function get_available_group_permissions()
 	{
-		global $current_User;
-		// fp> todo perm check
-		$filetypes_linkstart = '<a href="?ctrl=filetypes" title="'.T_('Edit locked file types...').'">';
-		$filetypes_linkend = '</a>';
-		$filetypes_allowed = '';
-		$filetypes_not_allowed = '';
-		if( isset( $current_User ) && $current_User->check_perm( 'options', 'edit' ) ) {
-			$filetypes_allowed = $filetypes_linkstart.get_icon('file_allowed').$filetypes_linkend;
-			$filetypes_not_allowed = $filetypes_linkstart.get_icon('file_not_allowed').$filetypes_linkend;
+		global $current_User, $admin_url, $Settings;
+
+		$filetypes_allowed_icon = get_icon( 'file_allowed' );
+		$filetypes_not_allowed_icon = get_icon( 'file_not_allowed' );
+		if( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) )
+		{ // Set the links to icons if current user has a permission to edit the file types:
+			$filetypes_allowed_icon = '<a href="'.$admin_url.'?ctrl=filetypes" title="'.format_to_output( T_('Edit unlocked file types...'), 'htmlattr' ).'">'.$filetypes_allowed_icon.'</a>';
+			$filetypes_not_allowed_icon = '<a href="'.$admin_url.'?ctrl=filetypes" title="'.format_to_output( T_('Edit locked file types...'), 'htmlattr' ).'">'.$filetypes_not_allowed_icon.'</a>';
 		}
 		// 'label' is used in the group form as label for radio buttons group
 		// 'user_func' is used to check user permission. This function should be defined in module initializer.
@@ -205,14 +204,14 @@ class files_Module extends Module
 				'options'  => array(
 						// format: array( radio_button_value, radio_button_label, radio_button_note )
 						array( 'none', T_('No Access') ),
-						array( 'view', T_('View files for all allowed roots') ),
-						array( 'add', T_('Add/Upload files to allowed roots') ),
-						array( 'edit', sprintf( T_('Edit %sunlocked files'), $filetypes_linkstart.get_icon('file_allowed').$filetypes_linkend ) ),
-						array( 'all', sprintf( T_('Edit all files, including %slocked ones'), $filetypes_linkstart.get_icon('file_not_allowed').$filetypes_linkend ), T_('Needed for editing PHP files in skins.') ),
+						array( 'view', T_('View files for all allowed roots'), T_('You can allow specific collection roots in each collection\'s advanced user/group permissions.') ),
+						array( 'add', T_('Add/Upload files to allowed roots'), sprintf( T_('Only %sunlocked file types can be uploaded.'), $filetypes_allowed_icon ) ),
+						array( 'edit_allowed', T_('Edit files in allowed roots'), sprintf( T_('Only %sunlocked file types can be edited.'), $filetypes_allowed_icon ) ),
+						array( 'edit', sprintf( T_('Edit %sunlocked files in all roots'), $filetypes_allowed_icon ) ),
+						array( 'all', sprintf( T_('Edit all files, including %slocked ones, in all roots'), $filetypes_not_allowed_icon ), T_('Needed for editing PHP files in skins.') ),
 					),
 				'perm_type' => 'radiobox',
 				'field_lines' => true,
-				'field_note' => T_('This setting will further restrict any media file permissions on specific blogs.'),
 				),
 			'perm_shared_root' => array(
 				'label' => T_('Access to shared root'),
@@ -226,7 +225,8 @@ class files_Module extends Module
 						array( 'add', T_('Add/Upload') ),
 						array( 'edit', T_('Edit') ),
 					),
-				'perm_type' => 'radiobox',
+				// Show this perm group setting as radiobox ONLY if the shared dir is enabled by general settings:
+				'perm_type' => ( $Settings->get( 'fm_enable_roots_shared' ) ? 'radiobox' : 'hidden' ),
 				'field_lines' => false,
 				),
 			'perm_import_root' => array(
@@ -286,7 +286,15 @@ class files_Module extends Module
 
 			case 'edit':
 				// User can ask for normal edit perm...
-				if( $permlevel == 'edit' )
+				if( $permlevel == 'edit' || $permlevel == 'edit_allowed' )
+				{
+					$perm = true;
+					break;
+				}
+
+			case 'edit_allowed':
+				// User can ask for edit allowed roots perm...
+				if( $permlevel == 'edit_allowed' )
 				{
 					$perm = true;
 					break;
@@ -309,14 +317,22 @@ class files_Module extends Module
 				}
 		}
 
-		if( $perm && isset( $permtarget ) && ( is_a( $permtarget, 'FileRoot' ) ) )
+		if( $perm && isset( $permtarget ) && ( $permtarget instanceof FileRoot ) )
 		{
 			global $current_User;
 			switch( $permtarget->type )
 			{
 				case 'shared':
+					if( $permlevel == 'edit_allowed' )
+					{	// We have no perm level 'edit_allowed' for this root type, Use 'edit' instead:
+						$permlevel = 'edit';
+					}
 					return $current_User->check_perm( 'shared_root', $permlevel );
 				case 'import':
+					if( $permlevel == 'edit_allowed' )
+					{	// We have no perm level 'edit_allowed' for this root type, Use 'edit' instead:
+						$permlevel = 'edit';
+					}
 					return $current_User->check_perm( 'import_root', $permlevel );
 				case 'user':
 					if( $current_User->check_perm( 'users', 'moderate' ) && $current_User->check_perm( 'files', 'all' ) )
@@ -326,6 +342,26 @@ class files_Module extends Module
 					else
 					{ // Allow user to see only own file root
 						return $permtarget->in_type_ID == $current_User->ID;
+					}
+				case 'collection':
+					if( $permvalue != 'edit' && $permvalue != 'all' )
+					{	// Check specific blog perms:
+						if( $current_User->check_perm_blogowner( $permtarget->in_type_ID ) )
+						{	// Collection owner has all permissions for files root:
+							$perm = true;
+							return $perm;
+						}
+						if( $current_User->check_perm( 'blogs', $permlevel ) )
+						{	// If current user has access to view or edit all collections:
+							$perm = true;
+							return $perm;
+						}
+						$perm = $current_User->check_perm_blogusers( 'files', $permlevel, $permtarget->in_type_ID );
+						if( ! $perm )
+						{	// Check primary and secondary groups for permissions for this specific collection:
+							$perm = $current_User->check_perm_bloggroups( 'files', $permlevel, $permtarget->in_type_ID );
+						}
+						return $perm;
 					}
 			}
 		}
@@ -422,7 +458,7 @@ class files_Module extends Module
 		global $topleft_Menu;
 		global $current_User;
 		global $admin_url;
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $current_User->check_perm( 'admin', 'standard' ) )
 		{
@@ -472,7 +508,7 @@ class files_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		global $Settings;
 		/**
 		 * @var AdminUI_general

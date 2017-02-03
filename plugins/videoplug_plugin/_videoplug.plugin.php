@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -25,7 +25,7 @@ class videoplug_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '5.0.0';
+	var $version = '6.7.9';
 	var $number_of_installs = 1;
 
 
@@ -56,25 +56,30 @@ class videoplug_plugin extends Plugin
 		$search_list = array(
 				'#\[video:youtube:(.+?)]#',     // Youtube
 				'#\[video:dailymotion:(.+?)]#', // Dailymotion
+				'#\[video:vimeo:(.+?)]#',       // vimeo // blueyed> TODO: might want to use oEmbed (to get title etc separately and display it below video): http://vimeo.com/api/docs/oembed
+				// Unavailable services. Keep them for backwards compatibility
 				'#\[video:google:(.+?)]#',      // Google video
 				'#\[video:livevideo:(.+?)]#',   // LiveVideo
 				'#\[video:ifilm:(.+?)]#',       // iFilm
-				'#\[video:vimeo:(.+?)]#',       // vimeo // blueyed> TODO: might want to use oEmbed (to get title etc separately and display it below video): http://vimeo.com/api/docs/oembed
+
 			);
 		$replace_list = array(
-				'<div class="videoblock"><object data="http://www.youtube.com/v/\\1" type="application/x-shockwave-flash" wmode="transparent" width="425" height="350"><param name="movie" value="http://www.youtube.com/v/\\1"></param><param name="wmode" value="transparent"></param></object></div>',
-				'<div class="videoblock"><object data="http://www.dailymotion.com/swf/\\1" type="application/x-shockwave-flash" width="425" height="335" allowfullscreen="true"><param name="movie" value="http://www.dailymotion.com/swf/\\1"></param><param name="allowfullscreen" value="true"></param></object></div>',
-				'<div class="videoblock"><embed style="width:400px; height:326px;" id="VideoPlayback" type="application/x-shockwave-flash" src="http://video.google.com/googleplayer.swf?docId=\\1&hl=en" flashvars=""></embed></div>',
-				'<div class="videoblock"><object src="http://www.livevideo.com/flvplayer/embed/\\1" type="application/x-shockwave-flash" wmode="transparent" width="425" height="350"><param name="movie" value="http://www.livevideo.com/flvplayer/embed/\\1"></param><param name="wmode" value="transparent"></param></object></div>',
-				'<div class="videoblock"><embed width="425" height="350" src="http://www.ifilm.com/efp" quality="high" bgcolor="000000" name="efp" align="middle" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="flvbaseclip=\\1"> </embed></div>',
-				'<div class="videoblock"><object data="http://vimeo.com/moogaloop.swf?clip_id=$1&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" width="400" height="225" type="application/x-shockwave-flash">	<param name="allowfullscreen" value="true" />	<param name="allowscriptaccess" value="always" />	<param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=$1&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /></object></div>',
+				'<div class="videoblock"><iframe id="ytplayer" type="text/html" width="425" height="350" src="//www.youtube.com/embed/\\1" allowfullscreen="allowfullscreen" frameborder="0"></iframe></div>',
+				'<div class="videoblock"><iframe src="//www.dailymotion.com/embed/video/\\1" width="425" height="335" frameborder="0" allowfullscreen></iframe></div>',
+				'<div class="videoblock"><iframe src="//player.vimeo.com/video/$1" width="400" height="225" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>',
+				// Unavailable services. Keep them for backwards compatibility
+				'<div class="videoblock">The Google video service is not available anymore.</div>',
+				'<div class="videoblock">The Live Video service is not available anymore.</div>',
+				'<div class="videoblock">The iFilm video service is not available anymore.</div>',
 			);
+
+		// Move short tag outside of paragraph
+		$content = move_short_tags( $content, '/\[video:(youtube|dailymotion|vimeo):?[^\[\]]*\]/i' );
 
 		$content = replace_content_outcode( $search_list, $replace_list, $content );
 
 		return true;
 	}
-
 
 
 	/**
@@ -87,8 +92,11 @@ class videoplug_plugin extends Plugin
 		return $this->RenderItemAsHtml( $params );
 	}
 
+
 	/**
-	 * Display a toolbar in admin.
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
@@ -96,37 +104,121 @@ class videoplug_plugin extends Plugin
 	function AdminDisplayToolbar( & $params )
 	{
 		if( !empty( $params['Item'] ) )
-		{	// Item is set, get Blog from post
+		{	// Item is set, get Blog from post:
 			$edited_Item = & $params['Item'];
-			$Blog = & $edited_Item->get_Blog();
+			$Collection = $Blog = & $edited_Item->get_Blog();
+		}
+
+		if( empty( $Blog ) )
+		{	// Item is not set, try global Blog:
+			global $Collection, $Blog;
+			if( empty( $Blog ) )
+			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available:
+				return false;
+			}
+		}
+
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $Blog );
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
+		{	// Plugin is not enabled for current case, so don't display a toolbar:
+			return false;
+		}
+
+		return $this->DisplayCodeToolbar( $params );
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for message.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayMessageToolbar( & $params )
+	{
+		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{
+			return $this->DisplayCodeToolbar( $params );
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{
+			return $this->DisplayCodeToolbar( $params );
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars on comment form.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCommentToolbar( & $params )
+	{
+		$Comment = & $params['Comment'];
+		if( $Comment )
+		{	// Get a post of the comment:
+			if( $comment_Item = & $Comment->get_Item() )
+			{
+				$Collection = $Blog = & $comment_Item->get_Blog();
+			}
 		}
 
 		if( empty( $Blog ) )
 		{	// Item is not set, try global Blog
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available
 				return false;
 			}
 		}
 
-		$coll_setting_name = ( $params['target_type'] == 'Comment' ) ? 'coll_apply_comment_rendering' : 'coll_apply_rendering';
-		$apply_rendering = $this->get_coll_setting( $coll_setting_name, $Blog );
-		if( empty( $apply_rendering ) || $apply_rendering == 'never' || $params['edit_layout'] == 'inskin' )
-		{ // This is too complex for inskin mode, don't display it:
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog );
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
+		{	// Plugin is not enabled for current case, so don't display a toolbar:
 			return false;
 		}
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
+		return $this->DisplayCodeToolbar( $params );
+	}
+
+
+	/**
+	 * Display a code toolbar
+	 *
+	 * @param array Params
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCodeToolbar( $params = array() )
+	{
+		$params = array_merge( array(
+				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
+			), $params );
+
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 
 		echo $this->get_template( 'toolbar_title_before' ).T_('Video').': '.$this->get_template( 'toolbar_title_after' );
 		echo $this->get_template( 'toolbar_group_before' );
-		echo '<input type="button" id="video_youtube" title="'.T_('Insert Youtube video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|youtube" value="YouTube" />';
-		echo '<input type="button" id="video_google" title="'.T_('Insert Google video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|google" value="Google video" />';
-		echo '<input type="button" id="video_dailymotion" title="'.T_('Insert DailyMotion video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|dailymotion" value="DailyMotion" />';
-		echo '<input type="button" id="video_livevideo" title="'.T_('Insert LiveVideo video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|livevideo" value="LiveVideo" />';
-		echo '<input type="button" id="video_ifilm" title="'.T_('Insert iFilm video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|ifilm" value="iFilm" />';
-		echo '<input type="button" id="video_vimeo" title="'.T_('Insert vimeo video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|vimeo" value="vimeo" />';
+		echo '<input type="button" id="video_youtube" title="'.T_('Insert Youtube video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|youtube|'.$params['js_prefix'].'" value="YouTube" />';
+		echo '<input type="button" id="video_vimeo" title="'.T_('Insert vimeo video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|vimeo|'.$params['js_prefix'].'" value="Vimeo" />';
+		echo '<input type="button" id="video_dailymotion" title="'.T_('Insert DailyMotion video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|dailymotion|'.$params['js_prefix'].'" value="DailyMotion" />';
 		echo $this->get_template( 'toolbar_group_after' );
 
 		echo $this->get_template( 'toolbar_after' );
@@ -136,59 +228,72 @@ class videoplug_plugin extends Plugin
 
 		?><script type="text/javascript">
 			//<![CDATA[
-			function videotag( tag )
+			function videotag( tag, prefix )
 			{
 				while( 1 )
 				{
-					var valid_video_ID = false;
-					var p = '<?php echo TS_('Enter video ID from %s:') ?>';
+					var p = '<?php echo TS_('Copy/paste the URL or the ID of your video from %s:') ?>';
 					var video_ID = prompt( p.replace( /%s/, tag ), '' );
 					if( ! video_ID )
 					{
 						return;
 					}
 
-					// Validate Video ID:
-					// TODO: verify validation / add for others..
+					// Validate Video ID or URL:
+					var regexp_ID = false;
+					var regexp_URL = false;
 					switch( tag )
 					{
-						case 'google':
-							if( video_ID.match( /^[0-9-]+$/ ) )
-							{ // valid
-								valid_video_ID = true;
-							}
-							break;
-
 						case 'youtube':
 							// Allow HD video code with ?hd=1 at the end
-							if( video_ID.match( /^[a-z0-9_?=-]+$/i ) )
-							{ // valid
-								valid_video_ID = true;
-							}
+							regexp_ID = /^[a-z0-9_?=-]+$/i;
+							regexp_URL = /^.+(video\/|\/watch\?v=|embed\/|\/)([a-z0-9_?=-]+)$/i;
+							break;
+
+						case 'dailymotion':
+							regexp_ID = /^[a-z0-9]+$/i;
+							regexp_URL = /^(.+\/video\/)?([a-z0-9]+)(_[a-z0-9_-]+)?$/i;
 							break;
 
 						case 'vimeo':
-							if( video_ID.match( /^\d+$/ ) )
-							{ // valid
-								valid_video_ID = true;
-							}
+							regexp_ID = /^\d+$/;
+							regexp_URL = /^(.+\/)?(\d+)$/;
 							break;
 
 						default:
-							valid_video_ID = true;
+							// Don't allow unknown video:
 							break;
 					}
 
-					if( valid_video_ID )
-					{
-						break;
+					if( regexp_ID && regexp_URL )
+					{	// Check the entered data by regexp:
+						if( video_ID.match( regexp_ID ) )
+						{	// Valid video ID
+							break;
+						}
+						else if( video_ID.match( /^https?:\/\// ) )
+						{	// If this is URL, Check to correct format:
+							if( video_ID.match( regexp_URL ) )
+							{	// Valid video URL
+								// Extract ID from URL:
+								video_ID = video_ID.replace( regexp_URL, '$2' );
+								break;
+							}
+							else
+							{	// Display error when URL doesn't match:
+								alert( '<?php echo TS_('The URL you provided could not be recognized.'); ?>' );
+								continue;
+							}
+						}
 					}
-					alert( '<?php echo TS_('The video ID is invalid.'); ?>' );
+
+					// Display error of wrong entered data:
+					alert( '<?php echo TS_('The URL or video ID is invalid.'); ?>' );
 				}
 
 				tag = '[video:'+tag+':'+video_ID+']';
 
-				textarea_wrap_selection( b2evoCanvas, tag, '', 1 );
+				textarea_wrap_selection( window[ ( prefix ? prefix : '' ) + 'b2evoCanvas' ], tag, '', 1 );
 			}
 			//]]>
 		</script><?php

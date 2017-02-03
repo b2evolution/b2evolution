@@ -48,7 +48,7 @@ if( $is_cli )
 			global $baseurl;
 			$ReqHost = $baseurl;
 		}
-		$secure_htsrv_url = get_secure_htsrv_url();
+		$secure_htsrv_url = get_htsrv_url( true );
 	}
 
 	// Load required functions ( we need to load here, because in CLI mode it is not loaded )
@@ -115,6 +115,7 @@ else
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 	<html>
 	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<title>Cron exec</title>
 		<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 	</head>

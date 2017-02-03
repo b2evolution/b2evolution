@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -21,7 +21,7 @@ $Form->add_crumb( 'campaign' );
 $Form->hidden( 'ctrl', 'campaigns' );
 $Form->hidden( 'action', 'add' );
 
-$Form->begin_fieldset( T_('New campaign') );
+$Form->begin_fieldset( T_('New campaign').get_manual_link( 'creating-an-email-campaign' ) );
 	$Form->text_input( 'ecmp_name', '', 60, T_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
 $Form->end_fieldset();
 

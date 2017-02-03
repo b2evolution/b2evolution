@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -35,8 +35,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $set_target = NULL, $use_value = NULL )
 {
 	global $debug;
-	global $htsrv_url;
 	static $has_array_type;
+
+	if( ! is_array( $parmeta ) )
+	{	// Must be array:
+		return;
+	}
 
 	if( ! empty($parmeta['no_edit']) )
 	{ // this setting is not editable
@@ -58,7 +62,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	// Passthrough some attributes to elements:
 	foreach( $parmeta as $k => $v )
 	{
-		if( in_array( $k, array( 'id', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect', 'cols', 'rows', 'maxlength' ) ) )
+		if( in_array( $k, array( 'id', 'class', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect', 'cols', 'rows', 'maxlength' ) ) )
 		{
 			$params[$k] = $v;
 		}
@@ -172,6 +176,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$error_value = NULL;
 				break;
 
+			case 'EmailSettings':
+				$set_value = $Obj->get_email_setting( $parname );
+				$error_value = NULL;
+				break;
+
 			case 'Skin':
 				$set_value = $Obj->get_setting( $parname );
 				$error_value = NULL;
@@ -185,22 +194,24 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			case 'UserSettings':
 				// NOTE: this assumes we come here only on recursion or with $use_value set..!
 				$set_value = $Obj->UserSettings->get( $parname, $set_target->ID );
-				$error_value = $Obj->PluginUserSettingsValidateSet( $tmp_params = array(
+				$tmp_params = array(
 					'name' => $parname,
 					'value' => & $set_value,
 					'meta' => $parmeta,
 					'User' => $set_target,
-					'action' => 'display' ) );
+					'action' => 'display' );
+				$error_value = $Obj->PluginUserSettingsValidateSet( $tmp_params );
 				break;
 
 			case 'Settings':
 				// NOTE: this assumes we come here only on recursion or with $use_value set..!
 				$set_value = $Obj->Settings->get( $parname );
-				$error_value = $Obj->PluginSettingsValidateSet( $tmp_params = array(
-					'name' => $parname,
-					'value' => & $set_value,
-					'meta' => $parmeta,
-					'action' => 'display' ) );
+				$tmp_params = array(
+					'name'   => $parname,
+					'value'  => & $set_value,
+					'meta'   => $parmeta,
+					'action' => 'display' );
+				$error_value = $Obj->PluginSettingsValidateSet( $tmp_params );
 				break;
 
 			default:
@@ -253,7 +264,13 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$meta_option_checked = $set_value === NULL ?
 					/* default value */ $meta_option[2] :
 					/* saved value */   ! empty( $set_value[ $meta_option[0] ] );
-				$options[] = array( $input_name.'['.$meta_option[0].']', 1, $meta_option[1], $meta_option_checked );
+
+				$meta_option_disabled = isset( $meta_option[4] ) ? $meta_option[4] : NULL;
+				$meta_option_note = isset( $meta_option[5] ) ? $meta_option[5] : NULL;
+				$meta_option_class = isset( $meta_option[6] ) ? $meta_option[6] : NULL;
+				$meta_option_hidden = isset( $meta_option[7] ) ? $meta_option[7] : NULL;
+				$meta_option_label_attribs = isset( $meta_option[8] ) ? $meta_option[8] : NULL;
+				$options[] = array( $input_name.'['.$meta_option[0].']', 1, $meta_option[1], $meta_option_checked, $meta_option_disabled, $meta_option_note, $meta_option_class, $meta_option_hidden, $meta_option_label_attribs );
 			}
 			$Form->checklist( $options, $input_name, $set_label, false, false, $params );
 			break;
@@ -300,6 +317,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			break;
 
 		case 'array':
+		case 'array:integer':
+		case 'array:array:integer':
+		case 'array:string':
+		case 'array:array:string':
+		case 'array:regexp':
 			$has_array_type = true;
 
 			// Always use 'fieldset' layout to display it the same way from normal and ajax calls
@@ -338,19 +360,19 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 					$remove_action = '';
 					if( ! isset($parmeta['min_count']) || count($set_value) > $parmeta['min_count'] )
 					{ // provide icon to remove this set
-						$remove_action = action_icon(
-								T_('Delete set!'),
-								'delete',
+						$remove_action = '<span class="pull-right">'.action_icon(
+								T_('Remove'),
+								'minus',
 								regenerate_url( 'action', array('action=del_settings_set&amp;set_path='.$parname.'['.$k.']'.( $set_type == 'UserSettings' ? '&amp;user_ID='.$user_ID : '' ), 'plugin_ID='.$Obj->ID) ),
-								'',
-								5, 0, /* icon/text prio */
+								T_('Remove'),
+								5, 3, /* icon/text prio */
 								// attach onclick event to remove the whole fieldset:
 								array(
 									'onclick' => "
 										jQuery('#".$parname.'_'.$k_nb."').remove();
 										return false;",
 									)
-								);
+								).'</span>';
 					}
 					$Form->begin_fieldset( '#'.$k_nb.$remove_action, array( 'class' => 'bordered', 'id' => $parname.'_'.$k_nb ) );
 
@@ -387,14 +409,14 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				echo '<div id="'.$parname.'_add_new">';
 				echo action_icon(
 					sprintf( T_('Add a new set of &laquo;%s&raquo;'), $set_label),
-					'new',
+					'add',
 					regenerate_url( 'action', array('action=add_settings_set', 'set_path='.$set_path.( $set_type == 'UserSettings' ? '&amp;user_ID='.get_param('user_ID') : '' ), 'plugin_ID='.$Obj->ID) ),
-					T_('New set'),
-					5, 1, /* icon/text prio */
+					T_('Add'),
+					5, 3, /* icon/text prio */
 					// Replace the 'add new' action icon div with a new set of setting and a new 'add new' action icon div
 					array('onclick'=>"
 						var oThis = this;
-						jQuery.get('{$htsrv_url}async.php', {
+						jQuery.get('".get_htsrv_url()."async.php', {
 								action: 'add_plugin_sett_set',
 								plugin_ID: '{$Obj->ID}',
 								set_type: '$set_type',
@@ -455,6 +477,18 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 		case 'color':
 			$Form->color_input( $input_name, $set_value, $set_label, '', $params );
+			break;
+
+		case 'fileselect':
+			if( isset( $parmeta['size'] ) )
+			{
+				$params['max_file_num'] = $parmeta['size'];
+			}
+
+			$params['root'] = isset( $parmeta['root'] ) ? $parmeta['root'] : '';
+			$params['path'] = isset( $parmeta['path'] ) ? $parmeta['path'] : '';
+			$params['size_name'] = isset( $parmeta['thumbnail_size'] ) ? $parmeta['thumbnail_size'] : 'crop-64x64';
+			$Form->fileselect( $input_name, $set_value, $set_label, '', $params );
 			break;
 
 		default:
@@ -526,7 +560,7 @@ function _set_setting_by_path( & $Plugin, $set_type, $path, $init_value = array(
 			}
 			else
 			{
-				if( isset($v['type']) && $v['type'] == 'array' )
+				if( isset($v['type']) && strpos( $v['type'], 'array' ) === 0 )
 				{
 					$set_node[$k] = array();
 				}
@@ -583,7 +617,8 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
 
 	// meta info for this setting:
 	$method = 'GetDefault'.$set_type; // GetDefaultSettings or GetDefaultUserSettings
-	$defaults = $Plugin->$method( $tmp_params = array('for_editing'=>true) );
+	$tmp_params = array( 'for_editing' => true );
+	$defaults = $Plugin->$method( $tmp_params );
 	if( ! isset($defaults[ $set_name ]) )
 	{
 		//debug_die( 'Invalid setting ('.$set_name.') - no meta data!' );
@@ -669,6 +704,11 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
  */
 function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type, $set_target = NULL, $set_value = NULL )
 {
+	if( ! is_array( $parmeta ) )
+	{	// Must be array:
+		return;
+	}
+
 	if( isset($parmeta['layout']) )
 	{ // a layout "setting"
 		return;
@@ -691,6 +731,11 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 		switch( $parmeta['type'] )
 		{
 			case 'array':
+			case 'array:integer':
+			case 'array:array:integer':
+			case 'array:string':
+			case 'array:array:string':
+			case 'array:regexp':
 				// this settings has a type
 				$l_param_type = $parmeta['type'];
 				break;
@@ -723,7 +768,7 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 		$l_value = $set_value;
 	}
 
-	if( isset($parmeta['type']) && $parmeta['type'] == 'array' )
+	if( isset($parmeta['type']) && strpos( $parmeta['type'], 'array' ) === 0 )
 	{ // make keys (__key__) in arrays unique and remove them
 		handle_array_keys_in_plugin_settings($l_value);
 	}
@@ -753,12 +798,13 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 
 		case 'UserSettings':
 			// Plugin User settings:
-			$error_value = $Obj->PluginUserSettingsValidateSet( $dummy = array(
+			$dummy = array(
 				'name' => $parname,
 				'value' => & $l_value,
 				'meta' => $parmeta,
 				'User' => $set_target,
-				'action' => 'set' ) );
+				'action' => 'set' );
+			$error_value = $Obj->PluginUserSettingsValidateSet( $dummy );
 			// Update the param value, because a plugin might have changed it (through reference):
 			$GLOBALS['edit_plugin_'.$Obj->ID.'_set_'.$parname] = $l_value;
 
@@ -770,17 +816,33 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 
 		case 'Settings':
 			// Plugin global settings:
-			$error_value = $Obj->PluginSettingsValidateSet( $dummy = array(
-				'name' => $parname,
-				'value' => & $l_value,
-				'meta' => $parmeta,
-				'action' => 'set' ) );
+		case 'MsgSettings':
+			// Plugin messages settings:
+		case 'EmailSettings':
+			// Plugin emails settings:
+			$dummy = array(
+				'name'   => $parname,
+				'value'  => & $l_value,
+				'meta'   => $parmeta,
+				'action' => 'set' );
+			$error_value = $Obj->PluginSettingsValidateSet( $dummy );
 			// Update the param value, because a plugin might have changed it (through reference):
 			$GLOBALS['edit_plugin_'.$Obj->ID.'_set_'.$parname] = $l_value;
 
 			if( empty( $error_value ) )
-			{
-				$Obj->Settings->set( $parname, $l_value );
+			{	// Set new value:
+				if( $set_type == 'MsgSettings' && $parname != 'msg_apply_rendering' )
+				{	// Use prefix 'msg_' for all message settings except of "msg_apply_rendering":
+					$Obj->Settings->set( 'msg_'.$parname, $l_value );
+				}
+				elseif( $set_type == 'EmailSettings' && $parname != 'email_apply_rendering' )
+				{	// Use prefix 'email_' for all message settings except of "email_apply_rendering":
+					$Obj->Settings->set( 'email_'.$parname, $l_value );
+				}
+				else
+				{	// Global settings:
+					$Obj->Settings->set( $parname, $l_value );
+				}
 			}
 			break;
 
@@ -807,6 +869,11 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 function autoform_validate_param_value( $param_name, $value, $meta )
 {
 	global $Messages;
+
+	if( ! is_array( $meta ) )
+	{	// Must be array:
+		return;
+	}
 
 	if( is_array($value) && isset($meta['entries']) )
 	{
@@ -908,9 +975,27 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 					$check_options = array($check_options);
 				}
 
-				foreach($check_options as $v)
+				// Get all possible values for the select element:
+				$meta_options = array();
+				foreach( $meta['options'] as $meta_option_key => $meta_option_value )
 				{
-					if( ! in_array( $v, array_keys($meta['options']) ) )
+					if( is_array( $meta_option_value ) )
+					{	// It is a grouped options:
+						foreach( $meta_option_value as $meta_group_option_key => $meta_group_option_value )
+						{
+							$meta_options[] = $meta_group_option_key;
+						}
+					}
+					else
+					{	// Single option:
+						$meta_options[] = $meta_option_key;
+					}
+				}
+
+				// Check if the selected values can be used for the select element:
+				foreach( $check_options as $v )
+				{
+					if( ! in_array( $v, $meta_options ) )
 					{
 						param_error( $param_name, sprintf( T_('Invalid option &laquo;%s&raquo;.'), $v ) );
 						return false;

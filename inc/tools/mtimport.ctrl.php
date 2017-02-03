@@ -18,7 +18,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Credits go to the WordPress team (@link http://wordpress.org), where I got the basic
  * import-mt.php script with most of the core functions. Thank you!
@@ -64,7 +64,7 @@ if( function_exists( 'set_magic_quotes_runtime' ) )
 }
 else
 {
-	ini_set( 'magic_quotes_runtime', 0 );
+	@ini_set( 'magic_quotes_runtime', 0 );
 }
 
 // TODO: $io_charset !!
@@ -72,6 +72,7 @@ $head = <<<EOB
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<title>b2evolution &rsaquo; Import from Movable Type</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 	<link href="{$adminskins_url}legacy/rsc/css/variation.css" rel="stylesheet" type="text/css" title="Variation" />

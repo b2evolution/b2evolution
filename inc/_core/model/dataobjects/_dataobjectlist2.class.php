@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -36,7 +36,7 @@ class FilteredResults extends Results
 	* 
 	* @param string Filterset name
 	*/
-	function FilteredResults( $filterset_name )
+	function __construct( $filterset_name )
 	{
 		$this->filterset_name = $filterset_name;
 	}
@@ -252,11 +252,11 @@ class DataObjectList2 extends FilteredResults
 	 * @param string prefix to differentiate page/order params when multiple Results appear on same page
 	 * @param string default ordering of columns (special syntax)
 	 */
-	function DataObjectList2( & $Cache, $limit = null, $param_prefix = '', $default_order = NULL )
+	function __construct( & $Cache, $limit = null, $param_prefix = '', $default_order = NULL )
 	{
 		// WARNING: we are not passing any SQL query to the Results object
 		// This will make the Results object behave a little bit differently than usual:
-		parent::Results( NULL, $param_prefix, $default_order, $limit, NULL, false );
+		Results::__construct( NULL, $param_prefix, $default_order, $limit, NULL, false );
 
 		// The list objects will also be cached in this cache.
 		// The Cache object may also be useful to get table information for the Items.

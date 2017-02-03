@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -22,7 +22,7 @@ class widescroll_plugin extends Plugin
 	var $code = 'evo_widescroll';
 	var $name = 'Wide scroll';
 	var $priority = 100;
-	var $version = '5.0.0';
+	var $version = '6.7.9';
 	var $group = 'rendering';
 	var $number_of_installs = 1;
 
@@ -44,17 +44,32 @@ class widescroll_plugin extends Plugin
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
-		$default_params = array_merge( $params, array( 'default_comment_rendering' => 'never' ) );
-		return parent::get_coll_setting_definitions( $default_params );
+		$default_params = array(
+				'default_comment_rendering' => 'never'
+			);
+
+		if( isset( $params['blog_type'] ) )
+		{	// Set the default settings depending on collection type:
+			switch( $params['blog_type'] )
+			{
+				case 'forum':
+				case 'manual':
+					$default_params['default_post_rendering'] = 'never';
+					break;
+			}
+		}
+
+		$tmp_params = array_merge( $params, $default_params );
+		return parent::get_coll_setting_definitions( $tmp_params );
 	}
 
 
 	/**
 	 * Display Toolbar
 	 *
-	 * @param object Blog
+	 * @param array Params
 	 */
-	function DisplayCodeToolbar( $Blog = NULL )
+	function DisplayCodeToolbar( $params = array() )
 	{
 		global $Hit;
 
@@ -63,18 +78,9 @@ class widescroll_plugin extends Plugin
 			return false;
 		}
 
-		if( empty( $Blog ) )
-		{ // TODO: We should decide how to handle these settings for Message
-			$text_styles_enabled = true;
-			$links_enabled = true;
-			$images_enabled = true;
-		}
-		else
-		{ // Get plugin setting values depending on Blog
-			$text_styles_enabled = $this->get_coll_setting( 'text_styles', $Blog );
-			$links_enabled = $this->get_coll_setting( 'links', $Blog );
-			$images_enabled = $this->get_coll_setting( 'images', $Blog );
-		}
+		$params = array_merge( array(
+				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
+			), $params );
 
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
@@ -98,17 +104,19 @@ class widescroll_plugin extends Plugin
 				'<?php echo TS_('Teaser break') ?>', ''
 			);
 
-		function widescroll_toolbar( title )
+		function widescroll_toolbar( title, prefix )
 		{
-			document.write( '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>' );
-			document.write( '<?php echo $this->get_template( 'toolbar_group_before' ); ?>' );
+			var r = '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>'
+				+ '<?php echo $this->get_template( 'toolbar_group_before' ); ?>';
 			for( var i = 0; i < widescroll_buttons.length; i++ )
 			{
 				var button = widescroll_buttons[i];
-				document.write( '<input type="button" id="' + button.id + '" title="' + button.title + '"'
-					+ ( typeof( button.style ) != 'undefined' ? ' style="' + button.style + '"' : '' ) + ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="widescroll_insert_tag|b2evoCanvas|'+i+'" value="' + button.text + '" />' );
+				r += '<input type="button" id="' + button.id + '" title="' + button.title + '"'
+					+ ( typeof( button.style ) != 'undefined' ? ' style="' + button.style + '"' : '' ) + ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="widescroll_insert_tag|' + prefix + 'b2evoCanvas|'+i+'" value="' + button.text + '" />';
 			}
-			document.write( '<?php echo $this->get_template( 'toolbar_group_after' ); ?>' );
+			r += '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
+
+			jQuery( '.' + prefix + '<?php echo $this->code ?>_toolbar' ).html( r );
 		}
 
 		function widescroll_insert_tag( canvas_field, i )
@@ -123,16 +131,18 @@ class widescroll_plugin extends Plugin
 		//]]>
 		</script><?php
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
-		?><script type="text/javascript">widescroll_toolbar( '<?php echo TS_('Wide scroll:'); ?> ' );</script><?php
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
+		?><script type="text/javascript">widescroll_toolbar( '<?php echo TS_('Wide scroll:'); ?>', '<?php echo $params['js_prefix']; ?>' );</script><?php
 
 		return true;
 	}
 
 
 	/**
-	 * Display a toolbar
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @todo dh> This seems to be a lot of Javascript. Please try exporting it in a
 	 *       (dynamically created) .js src file. Then we could use cache headers
@@ -142,43 +152,51 @@ class widescroll_plugin extends Plugin
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
+		$allow_HTML = false;
+
 		if( ! empty( $params['Item'] ) )
 		{ // Item is set, get Blog from post
 			$edited_Item = & $params['Item'];
-			$Blog = & $edited_Item->get_Blog();
+			$Collection = $Blog = & $edited_Item->get_Blog();
+			// We editing an Item, Check if HTML is allowed for the post type:
+			$allow_HTML = $edited_Item->get_type_setting( 'allow_html' );
 		}
 
 		if( empty( $Blog ) )
 		{ // Item is not set, try global Blog
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{ // We can't get a Blog, this way "apply_rendering" plugin collection setting is not available
 				return false;
 			}
 		}
 
-		$coll_setting_name = ( $params['target_type'] == 'Comment' ) ? 'coll_apply_comment_rendering' : 'coll_apply_rendering';
-		$apply_rendering = $this->get_coll_setting( $coll_setting_name, $Blog );
+		if( ! $allow_HTML )
+		{	// Only when HTML is allowed in post
+			return false;
+		}
+
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $Blog );
 		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
 		{ // Plugin is not enabled for current case, so don't display a toolbar:
 			return false;
 		}
 
 		// Append css styles for tinymce editor area
-		global $tinymce_content_css;
+		global $tinymce_content_css, $app_version_long;
 		if( empty( $tinymce_content_css ) )
 		{ // Initialize first time
 			$tinymce_content_css = array();
 		}
-		$tinymce_content_css[] = get_require_url( $this->get_plugin_url().'tinymce_editor.css', true, 'css' );
+		$tinymce_content_css[] = get_require_url( $this->get_plugin_url().'tinymce_editor.css', true, 'css', $this->version.'+'.$app_version_long );
 
 		// Print toolbar on screen
-		return $this->DisplayCodeToolbar( $Blog );
+		return $this->DisplayCodeToolbar( $params );
 	}
 
 
 	/**
-	 * Event handler: Called when displaying editor toolbars.
+	 * Event handler: Called when displaying editor toolbars on comment form.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
@@ -191,17 +209,22 @@ class widescroll_plugin extends Plugin
 			if( !empty( $Comment->item_ID ) )
 			{
 				$comment_Item = & $Comment->get_Item();
-				$Blog = & $comment_Item->get_Blog();
+				$Collection = $Blog = & $comment_Item->get_Blog();
 			}
 		}
 
 		if( empty( $Blog ) )
 		{ // Comment is not set, try global Blog
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{ // We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available
 				return false;
 			}
+		}
+
+		if( ! $Blog->get_setting( 'allow_html_comment' ) )
+		{	// Only when HTML is allowed in comment
+			return false;
 		}
 
 		$apply_rendering = $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog );
@@ -211,29 +234,95 @@ class widescroll_plugin extends Plugin
 		}
 
 		// Print toolbar on screen
-		return $this->DisplayCodeToolbar( $Blog );
+		return $this->DisplayCodeToolbar( $params );
 	}
 
 
 	/**
-	 * Spits out the styles used
+	 * Event handler: Called when displaying editor toolbars.
 	 *
-	 * @see Plugin::SkinBeginHtmlHead()
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
 	 */
-	function SkinBeginHtmlHead()
+	function DisplayMessageToolbar( & $params )
 	{
-		global $Blog;
+		global $Settings;
+
+		if( ! $Settings->get( 'allow_html_message' ) )
+		{	// Only when HTML is allowed in messages
+			return false;
+		}
+
+		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
+		{	// Plugin is not enabled for current case, so don't display a toolbar:
+			return false;
+		}
+
+		// Print toolbar on screen:
+		return $this->DisplayCodeToolbar( $params );
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
+		{	// Plugin is not enabled for current case, so don't display a toolbar:
+			return false;
+		}
+
+		// Print toolbar on screen:
+		return $this->DisplayCodeToolbar( $params );
+	}
+
+
+	/**
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinBeginHtmlHead( & $params )
+	{
+		global $Collection, $Blog;
 
 		if( ! isset( $Blog ) || (
-		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' && 
+		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
 		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
 		{ // Don't load css/js files when plugin is not enabled
 			return;
 		}
 
 		require_js( '#jquery#', 'blog' );
-		require_js( $this->get_plugin_url().'jquery.scrollwide.min.js', true );
-		require_css( $this->get_plugin_url().'jquery.scrollwide.css', true );
+		$this->require_js( 'jquery.scrollwide.min.js' );
+		$this->require_css( 'jquery.scrollwide.css' );
+	}
+
+
+	/**
+	 * Event handler: Called when ending the admin html head section.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
+	 */
+	function AdminEndHtmlHead( & $params )
+	{
+		global $ctrl;
+
+		if( $ctrl == 'campaigns' && get_param( 'tab' ) == 'send' && $this->get_email_setting( 'email_apply_rendering' ) )
+		{	// Load this only on form to preview email campaign:
+			require_js( '#jquery#', 'blog' );
+			$this->require_js( 'jquery.scrollwide.min.js' );
+			$this->require_css( 'jquery.scrollwide.css' );
+		}
 	}
 
 

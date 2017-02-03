@@ -38,10 +38,10 @@ class Goal extends DataObject
 	 *
 	 * @param object Database row
 	 */
-	function Goal( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_track__goal', 'goal_', 'goal_ID' );
+		parent::__construct( 'T_track__goal', 'goal_', 'goal_ID' );
 
 		if( $db_row )
 		{
@@ -128,10 +128,11 @@ class Goal extends DataObject
 		$this->set_string_from_param( 'key', true );
 
 		// Temporary Redirection URL:
-		$this->set_string_from_param( 'temp_redir_url' );
+		param( 'goal_temp_redir_url', 'url' );
+		$this->set_from_Request( 'temp_redir_url' );
 
 		// Normal Redirection URL:
-		param( 'goal_redir_url', 'string' );
+		param( 'goal_redir_url', 'url' );
 		if( $this->get( 'temp_redir_url' ) != '' )
 		{ // Normal Redirection URL is required when Temporary Redirection URL is not empty
 			param_check_not_empty( 'goal_redir_url', T_('Please enter Normal Redirection URL.') );
@@ -188,6 +189,18 @@ class Goal extends DataObject
 		param( 'goal_notes', 'text' );
 		$this->set_from_Request( 'notes', 'goal_notes' );
 
+		if( ! param_errors_detected() )
+		{	// Check goal key for duplicating:
+			$existing_goal_ID = $this->dbexists( 'goal_key', $this->get( 'key' ) );
+			if( $existing_goal_ID )
+			{	// We have a duplicate goal:
+				global $Collection, $Blog;
+				param_error( 'goal_key',
+					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
+						'href="?ctrl=goals&amp;action=edit'.( isset( $Blog ) ? '&amp;blog='.$Blog->ID : '' ).'&amp;goal_ID='.$existing_goal_ID.'"' ) );
+			}
+		}
+
 		return ! param_errors_detected();
 	}
 
@@ -224,17 +237,6 @@ class Goal extends DataObject
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
-	}
-
-
-	/**
-	 * Check existence of specified goal in goal_key unique field.
-	 *
-	 * @return int ID if goal exists otherwise NULL/false
-	 */
-	function dbexists()
-	{
-		return parent::dbexists('goal_key', $this->key);
 	}
 
 

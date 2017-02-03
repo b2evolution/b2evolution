@@ -33,17 +33,6 @@ function get_icon_info( $name )
 			'xy' => array( 0, 0 )
 		);
 
-		case 'switch-to-admin': return array(
-			'alt'  => /* TRANS: short for "Switch to _A_dmin" */ T_('Adm'),
-			'size' => array( 13, 14 ),
-			'xy' => array( 32, 0 )
-		);
-		case 'switch-to-blog': return array(
-			'alt'  => /* TRANS: short for "Switch to _B_log" */ T_('Blg'),
-			'size' => array( 13, 14 ),
-			'xy' => array( 48, 0 )
-		);
-
 		case 'folder': return array( // icon for folders
 			'alt'  => T_('Folder'),
 			'size' => array( 16, 15 ),
@@ -56,12 +45,13 @@ function get_icon_info( $name )
 			'size' => array( 16, 16 ),
 			'xy' => array( 16, 16 ),
 			'glyph' => 'file',
-			'fa' => 'file'
+			'fa' => 'file-o'
 		);
 		case 'file_empty': return array(    // empty file
 			'alt'  => T_('Empty file'),
 			'size' => array( 16, 16 ),
 			'xy' => array( 32, 16 ),
+			'glyph' => 'file',
 			'fa' => 'file-o'
 		);
 		case 'folder_parent': return array( // go to parent directory
@@ -82,7 +72,7 @@ function get_icon_info( $name )
 			'size' => array( 16, 16 ),
 			'xy' => array( 112, 16 ),
 			'glyph' => 'circle-arrow-right',
-			'fa' => 'clipboard'
+			'fa' => 'arrow-right'
 		);
 		case 'file_delete': return array(   // delete a file/folder
 			'alt'  => T_('Del'),
@@ -112,22 +102,30 @@ function get_icon_info( $name )
 		case 'sort_desc_on': return array(
 			'alt'  => T_('Descending order'),
 			'size' => array( 12, 11 ),
-			'xy' => array( 64, 208 )
+			'xy' => array( 64, 208 ),
+			'fa' => 'caret-down',
+			'color' => '#000'
 		);
 		case 'sort_asc_on': return array(
 			'alt'  => T_('Ascending order'),
 			'size' => array( 12, 11 ),
-			'xy' => array( 80, 208 )
+			'xy' => array( 80, 208 ),
+			'fa' => 'caret-up',
+			'color' => '#000'
 		);
 		case 'sort_desc_off': return array(
 			'alt'  => T_('Descending order'),
 			'size' => array( 12, 11 ),
-			'xy' => array( 96, 208 )
+			'xy' => array( 96, 208 ),
+			'fa' => 'caret-down',
+			'color' => '#999'
 		);
 		case 'sort_asc_off': return array(
 			'alt'  => T_('Ascending order'),
 			'size' => array( 12, 11 ),
-			'xy' => array( 112, 208 )
+			'xy' => array( 112, 208 ),
+			'fa' => 'caret-up',
+			'color' => '#999'
 		);
 
 		case 'window_new': return array(    // open in a new window
@@ -150,7 +148,7 @@ function get_icon_info( $name )
 			'alt'  => '',
 			'size' => array( 16, 16 ),
 			'xy' => array( 32, 48 ),
-			'fa' => 'file-text'
+			'fa' => 'file-text-o'
 		);
 		case 'file_www': return array(
 			'ext'  => '\.html?',
@@ -205,7 +203,8 @@ function get_icon_info( $name )
 			'ext'  => '\.(pgp|gpg)',
 			'alt'  => '',
 			'size' => array( 16, 16 ),
-			'xy' => array( 144, 32 )
+			'xy' => array( 144, 32 ),
+			'fa' => 'file-text-o'
 		);
 		case 'file_tar': return array(
 			'ext'  => '\.tar',
@@ -326,11 +325,6 @@ function get_icon_info( $name )
 			'glyph' => 'download-alt',
 			'fa' => 'download'
 		);
-		case 'arrow-down-green': return array(
-			'alt'  => T_('Download'),
-			'size' => array( 24, 24 ),
-			'xy' => array( 96, 272 )
-		);
 
 
 		case 'warning': return array( // TODO: not really transparent at its borders
@@ -404,6 +398,14 @@ function get_icon_info( $name )
 			'xy' => array( 0, 0 ),
 			'glyph' => 'user',
 			'fa' => 'users'
+		);
+		case 'user': return array(
+			'rollover' => true,
+			'alt' => T_('User'),
+			'size' => array( 0 ,0 ),
+			'xy' => array( 0, 0 ),
+			'glyph' => 'user',
+			'fa' => 'user'
 		);
 		case 'copy': return array(
 			'alt'  => T_('Copy'),
@@ -488,6 +490,13 @@ function get_icon_info( $name )
 			'fa' => 'times-circle',
 			'color' => '#F00',
 		);
+		case 'cleanup': return array(
+			'alt'  => T_('Cleanup'),
+			'size' => array( 15, 15 ),
+			'xy' => array( 128, 64 ),
+			'glyph' => 'wrench',
+			'fa' => 'wrench'
+		);
 		case 'xross': return array(	// Do NOT use for actions. Use only to indicate Mismatch
 			'alt' => 'x',
 			'size' => array( 13, 13 ),
@@ -533,6 +542,13 @@ function get_icon_info( $name )
 			'xy' => array( 32, 192 ),
 			'fa' => 'circle',
 			'color' => '#00F'
+		);
+		case 'bullet_light_blue': return array(
+			'alt'  => '&bull;',
+			'size' => array( 9, 9 ),
+			'xy' => array( 32, 192 ),
+			'fa' => 'circle',
+			'color' => '#5bc0de'
 		);
 		case 'bullet_red': return array(
 			'alt'  => '&bull;',
@@ -629,12 +645,6 @@ function get_icon_info( $name )
 			'glyph' => 'resize-full',
 			'fa' => 'unlink',
 			'color' => '#F00',
-		);
-
-		case 'parent_childto_arrow': return array(
-			'alt'  => '+',
-			'size' => array( 14, 16 ),
-			'xy' => array( 16, 128 )
 		);
 
 		case 'help': return array(
@@ -839,26 +849,6 @@ function get_icon_info( $name )
 			'fa' => 'arrow-up',
 			'color' => '#303030'
 		);
-		case 'arrow_left_white': return array(
-			'alt'  => T_('Previous'),
-			'size' => array( 10, 14 ),
-			'xy' => array( 128, 256 )
-		);
-		case 'arrow_right_white': return array(
-			'alt'  => T_('Next'),
-			'size' => array( 10, 14 ),
-			'xy' => array( 144, 256 )
-		);
-		case 'arrow_left_grey': return array(
-			'alt'  => T_('Previous'),
-			'size' => array( 10, 14 ),
-			'xy' => array( 128, 224 )
-		);
-		case 'arrow_right_grey': return array(
-			'alt'  => T_('Next'),
-			'size' => array( 10, 14 ),
-			'xy' => array( 144, 224 )
-		);
 
 		case 'check_all': return array(
 			'alt'  => T_('Check all'),
@@ -883,7 +873,7 @@ function get_icon_info( $name )
 			'fa' => 'filter'
 		);
 		case 'reset_filters': return array(
-			'alt'  => T_('Reset all filters'),
+			'alt'  => T_('Reset all filters!'),
 			'size' => array( 16, 16 ),
 			'xy' => array( 144, 112 ),
 			'glyph' => 'filter',
@@ -903,15 +893,16 @@ function get_icon_info( $name )
 			'size' => array( 13, 13 ),
 			'xy' => array( 112, 128 ),
 			'glyph' => 'ban-circle',
-			'fa' => 'ban',
+			'fa' => 'ban fa-x-rollover-grey',
 			'color' => '#C00'
 		);
 		case 'ban_disabled': return array(
+			'rollover' => true,
 			'alt'  => T_('Ban'),
 			'size' => array( 13, 13 ),
 			'xy' => array( 96, 128 ),
 			'glyph' => 'ban-circle',
-			'fa' => 'ban',
+			'fa' => 'ban fa-x-rollover-red',
 			'color' => '#7e7e7e'
 		);
 		case 'play': return array( // used to write an e-mail, visit site or contact through IM
@@ -949,42 +940,42 @@ function get_icon_info( $name )
 		);
 
 		case 'vote_spam': return array(
-			'alt'  => T_('Mark this comment as spam!'),
+			'alt'  => T_('Cast a spam vote!'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 16, 144 ),
 			'fa' => 'thumbs-o-down',
 			'color' => '#C00'
 		);
 		case 'vote_spam_disabled': return array(
-			'alt'  => T_('Mark this comment as spam!'),
+			'alt'  => T_('Cast a spam vote!'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 0, 144 ),
 			'fa' => 'thumbs-o-down fa-x-rollover-red',
 			'color' => '#333'
 		);
 		case 'vote_notsure': return array(
-			'alt'  => T_('Mark this comment as not sure!'),
+			'alt'  => T_('Cast a "not sure" vote!'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 48, 144 ),
 			'fa' => 'question-circle',
 			'color' => '#000'
 		);
 		case 'vote_notsure_disabled': return array(
-			'alt'  => T_('Mark this comment as not sure!'),
+			'alt'  => T_('Cast a "not sure" vote!'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 32, 144 ),
 			'fa' => 'question-circle fa-x-rollover-black',
 			'color' => '#666'
 		);
 		case 'vote_ok': return array(
-			'alt'  => T_('Mark this comment as OK!'),
+			'alt'  => T_('Cast an OK vote!'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 80, 144 ),
 			'fa' => 'thumbs-o-up',
 			'color' => '#0C0'
 		);
 		case 'vote_ok_disabled': return array(
-			'alt'  => T_('Mark this comment as OK!'),
+			'alt'  => T_('Cast an OK vote!'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 64, 144 ),
 			'fa' => 'thumbs-o-up fa-x-rollover-green',
@@ -996,15 +987,16 @@ function get_icon_info( $name )
 			'size' => array( 15, 15 ),
 			'xy' => array( 112, 144 ),
 			'glyph' => 'thumbs-up',
-			'fa' => 'thumbs-up',
+			'fa' => 'thumbs-up fa-x-rollover-grey',
 			'color' => '#0C0'
 		);
 		case 'thumb_up_disabled': return array(
+			'rollover' => true,
 			'alt'  => T_('Thumb Up'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 96, 144 ),
 			'glyph' => 'thumbs-up',
-			'fa' => 'thumbs-up',
+			'fa' => 'thumbs-up fa-x-rollover-green',
 			'color' => '#7f7f7f'
 		);
 		case 'thumb_down': return array(
@@ -1012,27 +1004,35 @@ function get_icon_info( $name )
 			'size' => array( 15, 15 ),
 			'xy' => array( 144, 144 ),
 			'glyph' => 'thumbs-down',
-			'fa' => 'thumbs-down',
+			'fa' => 'thumbs-down fa-x-rollover-grey',
 			'color' => '#ee2a2a'
 		);
 		case 'thumb_down_disabled': return array(
+			'rollover' => true,
 			'alt'  => T_('Thumb Down'),
 			'size' => array( 15, 15 ),
 			'xy' => array( 128, 144 ),
 			'glyph' => 'thumbs-down',
-			'fa' => 'thumbs-down',
+			'fa' => 'thumbs-down fa-x-rollover-red-light',
 			'color' => '#7f7f7f'
 		);
 
-		case 'login': return array(
-			'alt'  => T_('Login'),
-			'size' => array( 24, 24 ),
-			'xy' => array( 0, 272 )
+		case 'flag_on': return array(
+			'rollover' => true,
+			'alt'  => '',
+			'size' => array( 16, 16 ),
+			'xy' => array( 0, 208 ),
+			'glyph' => 'flag',
+			'fa' => 'flag fa-x--hover',
+			'color' => '#FAA72D'
 		);
-		case 'register': return array(
-			'alt'  => T_('Register'),
-			'size' => array( 24, 24 ),
-			'xy' => array( 0, 296 )
+		case 'flag_off': return array(
+			'alt'  => '',
+			'size' => array( 16, 16 ),
+			'xy' => array( 16, 208 ),
+			'glyph' => 'flag',
+			'fa' => 'flag-o fa-x--hover',
+			'color' => '#7f7f7f'
 		);
 
 		case 'magnifier': return array(
@@ -1048,8 +1048,35 @@ function get_icon_info( $name )
 			'size' => array( 16, 16 ),
 			'xy' => array( 32, 224 ),
 			'glyph' => 'plus-sign',
-			'fa' => 'plus-circle'
+			'fa' => 'plus-circle',
+			'color' => '#0c0'
 		);
+		case 'add__yellow': return array(
+			'alt'  => T_('Add'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 32, 224 ),
+			'glyph' => 'plus-sign',
+			'fa' => 'plus-circle',
+			'color' => '#fc0'
+		);
+		case 'add__blue': return array(
+			'alt'  => T_('Add'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 32, 224 ),
+			'glyph' => 'plus-sign',
+			'fa' => 'plus-circle',
+			'color' => '#337ab7'
+		);
+
+		case 'add__yellow': return array(
+			'alt'  => T_('Add'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 32, 224 ),
+			'glyph' => 'plus-sign',
+			'fa' => 'plus-circle',
+			'color' => '#fc0'
+		);
+
 		case 'minus': return array(
 			'alt'  => T_('Remove'),
 			'size' => array( 16, 16 ),
@@ -1099,17 +1126,6 @@ function get_icon_info( $name )
 			'fa' => 'envelope-square'
 		);
 
-		case 'width_increase': return array(
-			'alt'  => T_('Increase width'),
-			'size' => array( 32, 32 ),
-			'xy' => array( 0, 240 )
-		);
-		case 'width_decrease': return array(
-			'alt'  => T_('Decrease width'),
-			'size' => array( 32, 32 ),
-			'xy' => array( 32, 240 )
-		);
-
 		case 'post': return array(
 			'alt'  => T_('Post'),
 			'size' => array( 15, 15 ),
@@ -1121,14 +1137,9 @@ function get_icon_info( $name )
 		case 'stop': return array(
 			'alt'  => T_('Stop'),
 			'size' => array( 16, 16 ),
-			'xy' => array( 64, 128 )
-		);
-
-		case 'arrow-btn': return array(
-			'alt'  => T_('More info'),
-			'size' => array( 8, 12 ),
-			'xy' => array( 128, 160 ),
-			'rollover' => true,
+			'xy' => array( 64, 128 ),
+			'fa' => 'hand-paper-o',
+			'color' => '#C00'
 		);
 
 		case 'lightning': return array(

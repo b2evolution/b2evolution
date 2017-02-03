@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -32,6 +32,14 @@ $activate_collection_toolbar = true;
 // Do we have permission to view all stats (aggregated stats) ?
 $perm_view_all = $current_User->check_perm( 'stats', 'view' );
 
+// Section ID:
+param( 'sec_ID', 'integer', 0, true );
+if( ! $perm_view_all && ! $current_User->check_perm( 'section', 'view', false, $sec_ID ) )
+{
+	forget_param( 'sec_ID' );
+	unset( $sec_ID );
+}
+
 // We set the default to -1 so that blog=0 will make its way into regenerate_url()s whenever watching global stats.
 memorize_param( 'blog', 'integer', -1 );
 
@@ -52,11 +60,11 @@ if( $tab == 'domains' && $current_User->check_perm( 'stats', 'edit' ) )
 	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 }
 
-if( $blog == 0 )
+if( ( $blog == 0 && empty( $sec_ID ) ) || ! $current_User->check_perm( 'stats', 'list', false, $blog ) )
 {
 	if( ! $perm_view_all && isset( $collections_Module ) )
 	{ // Find a blog we can view stats for:
-		if( ! $selected = autoselect_blog( 'stats', 'view' ) )
+		if( ! $selected = autoselect_blog( 'stats', 'list' ) )
 		{ // No blog could be selected
 			$Messages->add( T_('Sorry, there is no blog you have permission to view stats for.'), 'error' );
 			$action = 'nil';
@@ -64,7 +72,7 @@ if( $blog == 0 )
 		elseif( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
 		{ // Selected a new blog:
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 		}
 	}
 }
@@ -89,7 +97,7 @@ switch( $action )
 	case 'prune': // PRUNE hits for a certain date
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'stats' );
-		
+
 		// Check permission:
 		$current_User->check_perm( 'stats', 'edit', true );
 
@@ -161,6 +169,7 @@ switch( $action )
 			load_class( 'sessions/model/_domain.class.php', 'Domain' );
 			$edited_Domain = new Domain();
 			$edited_Domain->set( 'name', param( 'dom_name', 'string', '' ) );
+			$edited_Domain->set( 'type', param( 'dom_type', 'string', 'unknown' ) );
 			$edited_Domain->set( 'status', param( 'dom_status', 'string', 'unknown' ) );
 		}
 		else
@@ -203,11 +212,14 @@ switch( $action )
 		}
 
 		// load data from request
+		$DB->begin();
 		if( $edited_Domain->load_from_Request() )
 		{ // We could load data from form without errors:
-			// Insert in DB:
+			$is_creating = ( $edited_Domain->ID == 0 );
+			// Insert/Update in DB:
 			$edited_Domain->dbsave();
-			$Messages->add( T_('New domain created.'), 'success' );
+			$DB->commit();
+			$Messages->add( $is_creating ? T_('New domain created.') : T_('Domain has been updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			if( $tab_from == 'antispam' )
@@ -221,7 +233,80 @@ switch( $action )
 			header_redirect( $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
+		else
+		{
+			$DB->rollback();
+		}
 		$action = 'domain_new';
+		break;
+
+	case 'domain_delete':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'domain' );
+
+		// Check permission:
+		$current_User->check_perm( 'stats', 'edit', true );
+
+		param( 'dom_ID', 'integer', 0, true );
+		$DomainCache = & get_DomainCache();
+		$edited_Domain = & $DomainCache->get_by_ID( $dom_ID, false );
+
+		if( param( 'confirm', 'integer', 0 ) )
+		{
+			if( $edited_Domain === false )
+			{ // We could not find the goal to edit:
+				unset( $edited_Domain );
+				forget_param( 'dom_ID' );
+				$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Domain') ), 'error' );
+			}
+
+			// Delete from DB:
+			$edited_Domain->dbdelete();
+
+			$Messages->add( T_('Domain has been deleted.'), 'success' );
+
+			header_redirect( $admin_url.'?ctrl=stats&tab=domains&tab3='.$tab3.'&blog='.$blog );
+		}
+		break;
+
+	case 'aggregate':
+		// Aggregate the hits and sessions:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'aggregate' );
+
+		// Check permission:
+		$current_User->check_perm( 'stats', 'edit', true );
+
+		// Do the aggregations:
+		Hitlist::aggregate_hits();
+		Hitlist::aggregate_sessions();
+
+		$Messages->add( T_('The hits have been aggregated.'), 'success' );
+
+		// Redirect to referer page:
+		header_redirect( $admin_url.'?ctrl=stats&tab='.$tab.'&tab3='.$tab3.'&blog='.$blog, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
+
+	case 'filter_aggregated':
+		// Filter the aggregated data by date:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'aggfilter' );
+
+		// Save the filter data in settings of current user:
+		$UserSettings->set( 'agg_period', param( 'agg_period', 'string' ) );
+		if( $agg_period == 'specific_month' )
+		{
+			$UserSettings->set( 'agg_month', param( 'agg_month', 'integer' ) );
+			$UserSettings->set( 'agg_year', param( 'agg_year', 'integer' ) );
+		}
+		$UserSettings->dbupdate();
+
+		// Redirect to referer page:
+		header_redirect( $admin_url.'?ctrl=stats&tab='.$tab.'&tab3='.$tab3.'&blog='.$blog, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 		break;
 }
 
@@ -230,11 +315,12 @@ if( isset($collections_Module) && $tab_from != 'antispam' )
 	if( $perm_view_all )
 	{
 		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ), T_('All'),
-						$admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0' );
+						$admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0', NULL, false, true );
 	}
 	else
 	{	// No permission to view aggregated stats:
-		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ) );
+		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ), NULL,
+						'', NULL, false, true );
 	}
 }
 
@@ -249,6 +335,12 @@ if( isset( $tab_real ) )
 switch( $tab )
 {
 	case 'summary':
+		param( 'hits_summary_mode', 'string' );
+		if( ! empty( $hits_summary_mode ) )
+		{	// Save a selected mode of hits summary data in session variable:
+			$Session->set( 'hits_summary_mode', $hits_summary_mode );
+		}
+
 		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('Summary'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 		if( empty($tab3) )
@@ -259,18 +351,37 @@ switch( $tab )
 		{
 			case 'global':
 				$AdminUI->breadcrumbpath_add( T_('All'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'global-hits-summary' );
 				break;
 
 			case 'browser':
 				$AdminUI->breadcrumbpath_add( T_('Browsers'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'browser-hits-summary' );
+				break;
+
+			case 'api':
+				$AdminUI->breadcrumbpath_add( T_('API'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'api-hits-summary' );
 				break;
 
 			case 'robot':
 				$AdminUI->breadcrumbpath_add( T_('Robots'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'robots-hits-summary' );
 				break;
 
 			case 'feed':
 				$AdminUI->breadcrumbpath_add( T_('RSS/Atom'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'feed-hits-summary' );
 				break;
 		}
 		// Init jqPlot charts
@@ -280,16 +391,25 @@ switch( $tab )
 	case 'other':
 		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('Direct hits'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'direct-b-hits' );
 		break;
 
 	case 'hits':
 		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('All Hits'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'recent-hits-list' );
 		break;
 
 	case 'referers':
 		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('Referred by other sites'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'referred-b-hits' );
 		break;
 
 	case 'refsearches':
@@ -303,16 +423,25 @@ switch( $tab )
 		{
 			case 'hits':
 				// $AdminUI->breadcrumbpath_add( T_('Latest'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'search-browser-hits-tab' );
 				break;
 
 			case 'keywords':
 				$AdminUI->breadcrumbpath_add( T_('Searched keywords'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'search-browser-keywords-tab' );
 				break;
 
 			case 'topengines':
 				$AdminUI->breadcrumbpath_add( T_('Top search engines'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'search-browser-top-engines-tab' );
 				break;
-				
+
 		}
 		break;
 
@@ -320,6 +449,9 @@ switch( $tab )
 		$AdminUI->breadcrumbpath_add( T_('IPs'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 		$AdminUI->breadcrumbpath_add( T_('Top IPs'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 		$tab3 = 'top';
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'top-ips' );
 		break;
 
 	case 'domains':
@@ -343,6 +475,9 @@ switch( $tab )
 				$AdminUI->breadcrumbpath_add( T_('All referrers'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
 				break;
 		}
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'referring-domains-tab' );
 		break;
 
 	case 'goals':
@@ -358,6 +493,9 @@ switch( $tab )
 
 	case 'settings':
 		$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'hit-logging' );
 		break;
 
 }
@@ -411,6 +549,10 @@ switch( $AdminUI->get_path(1) )
 				$AdminUI->disp_view( 'sessions/views/_stats_browserhits.view.php' );
 				break;
 
+			case 'api':
+				$AdminUI->disp_view( 'sessions/views/_stats_api.view.php' );
+				break;
+
 			case 'robot':
 				$AdminUI->disp_view( 'sessions/views/_stats_robots.view.php' );
 				break;
@@ -461,6 +603,12 @@ switch( $AdminUI->get_path(1) )
 		// Display VIEW for domains:
 		switch( $action )
 		{
+			case 'domain_delete':
+				// We need to ask for confirmation:
+				$edited_Domain->confirm_delete(
+					sprintf( T_('Delete domain &laquo;%s&raquo;?'), $edited_Domain->dget( 'name' ) ),
+					'domain', $action, get_memorized( 'action' ) );
+				/* no break */
 			case 'domain_new':
 			case 'domain_edit':
 				if( isset( $edited_Domain ) )

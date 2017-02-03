@@ -4,7 +4,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -20,7 +20,7 @@ $default_ctrl = 'dashboard';
 /**
  * Minimum PHP version required for collections module to function properly
  */
-$required_php_version[ 'collections' ] = '5.0';
+$required_php_version[ 'collections' ] = '5.2';
 
 /**
  * Minimum MYSQL version required for collections module to function properly
@@ -39,7 +39,9 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_categories'               => $tableprefix.'categories',
 		'T_coll_group_perms'         => $tableprefix.'bloggroups',
 		'T_coll_user_perms'          => $tableprefix.'blogusers',
+		'T_coll_user_favs'           => $tableprefix.'coll_favs',
 		'T_coll_settings'            => $tableprefix.'coll_settings',
+		'T_section'                  => $tableprefix.'section',
 		'T_comments'                 => $tableprefix.'comments',
 		'T_comments__votes'          => $tableprefix.'comments__votes',
 		'T_comments__prerendering'   => $tableprefix.'comments__prerendering',
@@ -48,12 +50,15 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_items__itemtag'           => $tableprefix.'items__itemtag',
 		'T_items__prerendering'      => $tableprefix.'items__prerendering',
 		'T_items__status'            => $tableprefix.'items__status',
+		'T_items__subscriptions'     => $tableprefix.'items__subscriptions',
 		'T_items__tag'               => $tableprefix.'items__tag',
 		'T_items__type'              => $tableprefix.'items__type',
 		'T_items__type_custom_field' => $tableprefix.'items__type_custom_field',
 		'T_items__type_coll'         => $tableprefix.'items__type_coll',
-		'T_items__subscriptions'     => $tableprefix.'items__subscriptions',
+		'T_items__user_data'         => $tableprefix.'items__user_data',
 		'T_items__version'           => $tableprefix.'items__version',
+		'T_items__votes'             => $tableprefix.'items__votes',
+		'T_items__status_type'       => $tableprefix.'items__status_type',
 		'T_links'                    => $tableprefix.'links',
 		'T_links__vote'              => $tableprefix.'links__vote',
 		'T_postcats'                 => $tableprefix.'postcats',
@@ -61,6 +66,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_skins__skin'              => $tableprefix.'skins__skin',
 		'T_subscriptions'            => $tableprefix.'subscriptions',
 		'T_widget'                   => $tableprefix.'widget',
+		'T_temporary_ID'             => $tableprefix.'temporary_ID',
 	) );
 
 /**
@@ -114,6 +120,26 @@ function & get_BlogCache( $order_by = 'blog_order' )
 	}
 
 	return $BlogCache;
+}
+
+
+/**
+ * Get the SectionCache
+ *
+ * @return SectionCache
+ */
+function & get_SectionCache()
+{
+	global $SectionCache;
+
+	if( ! isset( $SectionCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'collections/model/_section.class.php', 'Section' );
+		load_class( 'collections/model/_sectioncache.class.php', 'SectionCache' );
+		$SectionCache = new SectionCache(); // COPY (FUNC)
+	}
+
+	return $SectionCache;
 }
 
 
@@ -212,12 +238,12 @@ function & get_ItemTagsCache()
  */
 function & get_ItemStatusCache()
 {
-	global $Plugins;
 	global $ItemStatusCache;
 
 	if( ! isset( $ItemStatusCache ) )
 	{	// Cache doesn't exist yet:
-		$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_items__status\', \'pst_\', \'pst_ID\', NULL, \'\', NT_(\'No status\') )' );
+		load_class( 'items/model/_itemstatus.class.php', 'ItemStatus' );
+		$ItemStatusCache = new DataObjectCache( 'ItemStatus', false, 'T_items__status', 'pst_', 'pst_ID', 'pst_name', 'pst_name', NT_('No status') );
 	}
 
 	return $ItemStatusCache;
@@ -314,6 +340,26 @@ function & get_LinkCache()
 
 	return $LinkCache;
 }
+
+
+/**
+ * Get the TemporaryIDCache
+ *
+ * @return TemporaryIDCache
+ */
+function & get_TemporaryIDCache()
+{
+	global $TemporaryIDCache;
+
+	if( ! isset( $TemporaryIDCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'links/model/_temporaryid.class.php', 'TemporaryID' );
+		$TemporaryIDCache = new DataObjectCache( 'TemporaryID', false, 'T_temporary_ID', 'tmp_', 'tmp_ID', 'tmp_ID', 'tmp_ID' );
+	}
+
+	return $TemporaryIDCache;
+}
+
 
 /**
  * Get the SkinCache
@@ -415,25 +461,34 @@ class collections_Module extends Module
 	 */
 	function get_default_group_permissions( $grp_ID )
 	{
+		$SectionCache = & get_SectionCache();
+		$SectionCache->load_all();
+
 		switch( $grp_ID )
 		{
 			case 1:		// Administrators (group ID 1) have permission by default:
 				$permapi = 'always'; // Can use APIs
 				$permcreateblog = 'allowed'; // Creating new blogs
 				$permgetblog = 'denied'; // Automatically add a new blog to the new users
+				$permmaxcreateblognum = '';
+				$permallowedsections = implode( ',', array_keys( $SectionCache->get_option_array() ) );
 				break;
 
 			case 2:		// Moderators (group ID 2) have permission by default:
 				$permapi = 'always';
 				$permcreateblog = 'allowed';
 				$permgetblog = 'denied';
+				$permmaxcreateblognum = '';
+				$permallowedsections = implode( ',', array_keys( $SectionCache->get_option_array( array( 1 ) ) ) );
 				break;
 
-			case 3:		// Trusted Users (group ID 3) have permission by default:
+			case 3:		// Editors (group ID 3) have permission by default:
 			case 4: 	// Normal Users (group ID 4) have permission by default:
 				$permapi = 'always';
 				$permcreateblog = 'denied';
 				$permgetblog = 'denied';
+				$permmaxcreateblognum = '';
+				$permallowedsections = implode( ',', array_keys( $SectionCache->get_option_array( array( 1 ) ) ) );
 				break;
 
 			default:
@@ -441,12 +496,28 @@ class collections_Module extends Module
 				$permapi = 'never';
 				$permcreateblog = 'denied';
 				$permgetblog = 'denied';
+				$permmaxcreateblognum = '';
+				$permallowedsections = implode( ',', array_keys( $SectionCache->get_option_array( array( 1 ) ) ) );
 				break;
 		}
 
 		// We can return as many default permissions as we want:
 		// e.g. array ( permission_name => permission_value, ... , ... )
-		return $permissions = array( 'perm_api' => $permapi, 'perm_createblog' => $permcreateblog, 'perm_getblog' => $permgetblog );
+		$permissions = array(
+				'perm_api' => $permapi,
+				'perm_createblog' => $permcreateblog,
+				'perm_getblog' => $permgetblog,
+				'perm_default_sec_ID' => 3,
+				);
+
+		if( ! empty( $permallowedsections ) )
+		{	// Set this default setting only when at least one is detected, to avoid empty on install when groups are created before sections:
+			$permissions['perm_allowed_sections'] = $permallowedsections;
+		}
+
+		$permissions['perm_max_createblog_num'] = $permmaxcreateblognum;
+
+		return $permissions;
 	}
 
 
@@ -457,6 +528,9 @@ class collections_Module extends Module
 	 */
 	function get_available_group_permissions()
 	{
+		$SectionCache = & get_SectionCache();
+		$SectionCache->load_all();
+
 		// 'label' is used in the group form as label for radio buttons group
 		// 'user_func' function used to check user permission. This function should be defined in Module.
 		// 'group_func' function used to check group permission. This function should be defined in Module.
@@ -480,7 +554,7 @@ class collections_Module extends Module
 				'group_func' => 'check_createblog_group_perm',
 				'perm_block' => 'blogging',
 				'perm_type' => 'checkbox',
-				'note' => T_( 'Users can create new blogs for themselves'),
+				'note' => T_( 'Users can create new collections for themselves (in any Section they own, or at a minimum, in the Section specified below)'),
 				),
 			'perm_getblog' => array(
 				'label' => '',
@@ -488,7 +562,34 @@ class collections_Module extends Module
 				'group_func' => 'check_getblog_group_perm',
 				'perm_block' => 'blogging',
 				'perm_type' => 'checkbox',
-				'note' => T_( 'New users automatically get a new blog'),
+				'note' => T_('New users automatically get a new collection (in the Section specified below)'),
+				),
+			'perm_default_sec_ID' => array(
+				'label' => T_('Default Kind for new Collections'),
+				'user_func'  => 'check_default_sec_user_perm',
+				'group_func' => 'check_default_sec_group_perm',
+				'perm_block' => 'blogging',
+				'perm_type' => 'select_object',
+				'object_cache' => $SectionCache,
+				'note' => '',
+				),
+			'perm_allowed_sections' => array(
+				'label'      => T_('Allowed kind of collections'),
+				'user_func'  => 'check_allowed_sections_user_perm',
+				'group_func' => 'check_allowed_sections_group_perm',
+				'perm_block' => 'blogging',
+				'perm_type'  => 'checklist',
+				'options'    => $SectionCache->get_checklist_options( 'edited_grp_perm_allowed_sections' ),
+				'note'       => '',
+				),
+			'perm_max_createblog_num' => array(
+				'label' => T_('Maximum collections'),
+				'user_func' => 'check_createblog_user_perm',
+				'group_funct' => 'check_createblog_group_perm',
+				'perm_block' => 'blogging',
+				'perm_type' => 'text_input',
+				'maxlength' => 2,
+				'note' => T_('Users will not be able to create collections if they already own the maximum number of collections (or more).'),
 				),
 			);
 		return $permissions;
@@ -565,7 +666,7 @@ class collections_Module extends Module
 		global $topleft_Menu, $topright_Menu;
 		global $current_User;
 		global $home_url, $admin_url, $debug, $seo_page_type, $robots_index;
-		global $Blog, $blog;
+		global $Collection, $Blog, $blog;
 
 		global $Settings;
 
@@ -616,7 +717,7 @@ class collections_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		global $Settings;
 		/**
 		 * @var AdminUI_general
@@ -647,6 +748,23 @@ class collections_Module extends Module
 					'text' => T_('Site Settings'),
 					'href' => $admin_url.'?ctrl=collections&amp;tab=site_settings'
 				);
+				if( $Settings->get( 'site_skins_enabled' ) )
+				{	// Display tab of site skin only when it is enabled:
+					$site_menu['entries']['skin'] = array(
+						'text' => T_('Site skin'),
+						'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin',
+						'entries' => array(
+							'site_skin' => array(
+								'text' => T_('Skins for this site'),
+								'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin'
+							),
+							'manage_skins' => array(
+								'text' => T_('Manage skins'),
+								'href' => $admin_url.'?ctrl=skins&amp;tab=site_skin'
+							),
+						),
+					);
+				}
 			}
 			if( $current_User->check_perm( 'slugs', 'view' ) )
 			{ // User has an access to view slugs
@@ -673,7 +791,7 @@ class collections_Module extends Module
 					'site' => $site_menu,
 					'collections' => array(
 						'text' => T_('Collections'),
-						'href' => $admin_url.'?ctrl=dashboard&blog='.$working_blog
+						'href' => $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$working_blog
 					)
 				)
 			);
@@ -700,7 +818,7 @@ class collections_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		/**
 		 * @var AdminUI_general
 		 */
@@ -716,11 +834,11 @@ class collections_Module extends Module
 		$collection_menu_entries = array(
 				'dashboard' => array(
 					'text' => T_('Collection Dashboard'),
-					'href' => $admin_url.'?ctrl=dashboard&amp;blog='.$blog,
+					'href' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog='.$blog,
 					'order' => 'group_last' ),
 			);
 
-		$perm_comments = $current_User->check_perm( 'blog_comments', 'edit', false, $blog );
+		$perm_comments = $current_User->check_perm( 'blog_comments', 'view', false, $blog );
 		$perm_cats = $current_User->check_perm( 'blog_cats', '', false, $blog );
 
 		// Posts
@@ -730,14 +848,17 @@ class collections_Module extends Module
 			);
 		$last_group_menu_entry = 'posts';
 
-		if( $perm_comments )
-		{ // User has permission to edit published, draft or deprecated comments (at least one kind)
+		if( $perm_comments || $current_User->check_perm( 'meta_comment', 'view', false, $blog ) )
+		{	// Initialize comments menu tab if user can view normal or meta comments of the collection:
 			$collection_menu_entries['comments'] = array(
 					'text' => T_('Comments'),
-					'href' => $admin_url.'?ctrl=comments&amp;blog='.$blog.'&amp;filter=restore',
+					'href' => $admin_url.'?ctrl=comments&amp;blog='.$blog.'&amp;filter=restore'
+						// Set url to meta comments page if user has a perm to view only meta comments:
+						.( $perm_comments ? '' : '&amp;tab3=meta' ),
 				);
 			$last_group_menu_entry = 'comments';
 		}
+
 		if( $perm_cats )
 		{ // Categories
 			$collection_menu_entries['categories'] = array(
@@ -774,6 +895,9 @@ class collections_Module extends Module
 							'comments' => array(
 								'text' => T_('Comments'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=comments&amp;blog='.$blog ),
+							'userdir' => array(
+								'text' => T_('User directory'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=userdir&amp;blog='.$blog ),
 							'other' => array(
 								'text' => T_('Other displays'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=other&amp;blog='.$blog ),
@@ -783,18 +907,15 @@ class collections_Module extends Module
 						),
 					),
 					'skin' => array(
-						'text' => T_('Skins'),
+						'text' => T_('Skin'),
 						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog,
 						'entries' => array(
-							'current_skin' => array(
+							'coll_skin' => array(
 								'text' => T_('Skins for this blog'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog
 							)
 						),
 					),
-					'plugin_settings' => array(
-						'text' => T_('Plugins'),
-						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugin_settings&amp;blog='.$blog, ),
 					'widgets' => array(
 						'text' => T_('Widgets'),
 						'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog,
@@ -812,6 +933,9 @@ class collections_Module extends Module
 							'seo' => array(
 								'text' => T_('SEO'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=seo&amp;blog='.$blog, ),
+							'plugins' => array(
+								'text' => T_('Plugins'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugins&amp;blog='.$blog, ),
 						),
 					),
 				) );
@@ -886,7 +1010,7 @@ class collections_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		/**
 		 * @var AdminUI_general
 		 */
@@ -945,13 +1069,19 @@ class collections_Module extends Module
 				'name'   => T_('Send notifications about new comment on &laquo;%s&raquo;'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_comment_notifications.job.php',
-				'params' => NULL, // 'comment_ID', 'except_moderators'
+				'params' => NULL, // 'comment_ID', 'executed_by_userid', 'is_new_comment', 'already_notified_user_IDs', 'force_members', 'force_community'
 			),
 			'send-post-notifications' => array( // not user schedulable
 				'name'   => T_('Send notifications for &laquo;%s&raquo;'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_post_notifications.job.php',
-				'params' => NULL, // 'item_ID'
+				'params' => NULL, // 'item_ID', 'executed_by_userid', 'is_new_item', 'already_notified_user_IDs', 'force_members', 'force_community', 'force_pings'
+			),
+			'send-email-campaign' => array( // not user schedulable
+				'name'   => T_('Send a chunk of %s emails for the campaign "%s"'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_email_campaign.job.php',
+				'params' => NULL, // 'ecmp_ID'
 			),
 			'send-unmoderated-comments-reminders' => array(
 				'name'   => T_('Send reminders about comments awaiting moderation'),
@@ -965,6 +1095,12 @@ class collections_Module extends Module
 				'ctrl'   => 'cron/jobs/_post_moderation_reminder.job.php',
 				'params' => NULL,
 			),
+			'monthly-alert-old-contents' => array(
+				'name'   => T_('Monthly alert on old contents'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_monthly_alert_old_contents.job.php',
+				'params' => NULL,
+			),
 		);
 	}
 
@@ -975,7 +1111,7 @@ class collections_Module extends Module
 	function handle_htsrv_action()
 	{
 		global $demo_mode, $current_User, $DB, $Session, $Messages;
-		global $UserSettings, $samedomain_htsrv_url;
+		global $UserSettings;
 
 		if( !is_logged_in() )
 		{ // user must be logged in
@@ -1009,11 +1145,19 @@ class collections_Module extends Module
 				$linked_File = & $edited_Link->get_File();
 
 				// Load the blog we're in:
-				$Blog = & $LinkOwner->get_Blog();
+				$Collection = $Blog = & $LinkOwner->get_Blog();
 				set_working_blog( $Blog->ID );
 
 				// Check permission:
 				$LinkOwner->check_perm( 'edit', true );
+
+				if( $current_User->check_perm( 'files', 'edit' ) )
+				{	// If current User has permission to edit/delete files:
+					// Get number of objects where this file is attached to:
+					// TODO: attila>this must be handled with a different function
+					$file_links = get_file_links( $linked_File->ID, array( 'separator' => '<br />' ) );
+					$links_count = ( strlen( $file_links ) > 0 ) ? substr_count( $file_links, '<br />' ) + 1 : 0;
+				}
 
 				$confirmed = param( 'confirmed', 'integer', 0 );
 				if( $confirmed )
@@ -1029,10 +1173,7 @@ class collections_Module extends Module
 					if( $current_User->check_perm( 'files', 'edit' ) )
 					{ // current User has permission to edit/delete files
 						$file_name = $linked_File->get_name();
-						// Get number of objects where this file is attahced to
-						// TODO: attila>this must be handled with a different function
-						$file_links = get_file_links( $linked_File->ID, array( 'separator' => '<br />' ) );
-						$links_count = ( strlen( $file_links ) > 0 ) ? substr_count( $file_links, '<br />' ) + 1 : 0;
+						$links_count--;
 						if( $links_count > 0 )
 						{ // File is linked to other objects
 							$Messages->add( sprintf( T_('File %s is still linked to %d other objects'), $file_name, $links_count ), 'note' );
@@ -1052,15 +1193,80 @@ class collections_Module extends Module
 				}
 				else
 				{ // Display confirm unlink/delete message
-					$delete_url = $samedomain_htsrv_url.'action.php?mname=collections&action=unlink&link_ID='.$edited_Link->ID.'&confirmed=1&crumb_collections_unlink='.get_crumb( 'collections_unlink' );
+					$delete_url = get_htsrv_url().'action.php?mname=collections&action=unlink&link_ID='.$edited_Link->ID.'&confirmed=1&crumb_collections_unlink='.get_crumb( 'collections_unlink' );
 					$ok_button = '<a href="'.$delete_url.'" class="btn btn-danger">'.T_('I am sure!').'</a>';
 					$cancel_button = '<a href="'.$redirect_to.'" class="btn btn-default">'.T_('CANCEL').'</a>';
-					$msg = sprintf( T_( 'You are about to unlink and delete the attached file from %s path.' ), $linked_File->get_root_and_rel_path() );
+					if( isset( $links_count ) && $links_count == 1 )
+					{	// If the file will be deleted after confirmation:
+						$msg = sprintf( T_( 'You are about to unlink and delete the attached file from %s path.' ), $linked_File->get_root_and_rel_path() );
+					}
+					else
+					{	// If the file will be only unlinked after confirmation because it is also attached to other objects:
+						$msg = sprintf( T_( 'You are about to unlink the attached file %s.' ), $linked_File->get_root_and_rel_path() );
+					}
 					$msg .= '<br />'.T_( 'This CANNOT be undone!').'<br />'.T_( 'Are you sure?' ).'<br /><br />'.$ok_button."\t".$cancel_button;
 					$Messages->add( $msg, 'error' );
 				}
 				header_redirect( $redirect_to );
 				break;
+
+			case 'subs_update':
+				// Subscribe/Unsubscribe user on the selected collection
+
+				if( $demo_mode && ( $current_User->ID <= 3 ) )
+				{ // don't allow default users profile change on demo mode
+					bad_request_die( 'Demo mode: you can\'t edit the admin and demo users profile!<br />[<a href="javascript:history.go(-1)">'
+								. T_('Back to profile') . '</a>]' );
+				}
+
+				// Get params
+				$blog = param( 'subscribe_blog', 'integer', true );
+				$notify_items = param( 'sub_items', 'integer', NULL );
+				$notify_comments = param( 'sub_comments', 'integer', NULL );
+
+				if( ( $notify_items < 0 ) || ( $notify_items > 1 ) || ( $notify_comments < 0 ) || ( $notify_comments > 1 ) )
+				{ // Invalid notify param. It should be 0 for unsubscribe and 1 for subscribe.
+					$Messages->add( 'Invalid params!', 'error' );
+				}
+
+				if( ! is_email( $current_User->get( 'email' ) ) )
+				{ // user doesn't have a valid email address
+					$Messages->add( T_( 'Your email address is invalid. Please set your email address first.' ), 'error' );
+				}
+
+				if( $Messages->has_errors() )
+				{ // errors detected
+					header_redirect();
+					// already exited here
+				}
+
+				if( set_user_subscription( $current_User->ID, $blog, $notify_items, $notify_comments ) )
+				{
+					if( $notify_items === 0 )
+					{
+						$Messages->add( T_( 'You have successfully unsubscribed to new posts notifications.' ), 'success' );
+					}
+					elseif( $notify_items === 1 )
+					{
+						$Messages->add( T_( 'You have successfully subscribed to new posts notifications.' ), 'success' );
+					}
+
+					if( $notify_comments === 0 )
+					{
+						$Messages->add( T_( 'You have successfully unsubscribed to new comments notifications.' ), 'success' );
+					}
+					elseif( $notify_comments === 1 )
+					{
+						$Messages->add( T_( 'You have successfully subscribed to new comments notifications.' ), 'success' );
+					}
+				}
+				else
+				{
+					$Messages->add( T_( 'Could not subscribe to notifications.' ), 'error' );
+				}
+
+				header_redirect();
+				break; // already exited here
 
 			case 'isubs_update':
 				// Subscribe/Unsubscribe user on the selected item

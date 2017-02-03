@@ -1,4 +1,4 @@
-/* http://prismjs.com/download.html?themes=prism&languages=markup+css+clike+javascript+php+sql&plugins=line-numbers+show-language */
+/* http://prismjs.com/download.html?themes=prism&languages=markup+css+clike+javascript+apacheconf+php+sql&plugins=line-numbers+show-language */
 /**
  * prism.js default theme for JavaScript, CSS and HTML
  * Based on dabblet (http://dabblet.com)
@@ -9,12 +9,13 @@ code[class*="language-"],
 pre[class*="language-"] {
 	color: black;
 	text-shadow: 0 1px white;
-	font-family: Consolas, Monaco, 'Andale Mono', monospace;
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 	direction: ltr;
 	text-align: left;
 	white-space: pre;
 	word-spacing: normal;
 	word-break: normal;
+	word-wrap: normal;
 	line-height: 1.5;
 
 	-moz-tab-size: 4;
@@ -62,6 +63,7 @@ pre[class*="language-"] {
 :not(pre) > code[class*="language-"] {
 	padding: .1em;
 	border-radius: .3em;
+	white-space: normal;
 }
 
 .token.comment,
@@ -123,8 +125,12 @@ pre[class*="language-"] {
 	color: #e90;
 }
 
-.token.important {
+.token.important,
+.token.bold {
 	font-weight: bold;
+}
+.token.italic {
+	font-style: italic;
 }
 
 .token.entity {
@@ -171,51 +177,45 @@ pre.line-numbers > code {
 			padding-right: 0.8em;
 			text-align: right;
 		}
-pre[class*='language-'] {
+div.prism-show-language {
 	position: relative;
 }
-pre[class*='language-'] > code[data-language] {
-	overflow: scroll;
-	max-height: 28em;
-	display: block;
-}
-pre[class*='language-'] > code[data-language]::before {
-	content: attr(data-language);
+
+div.prism-show-language > div.prism-show-language-label {
 	color: black;
 	background-color: #CFCFCF;
 	display: inline-block;
 	position: absolute;
+	bottom: auto;
+	left: auto;
 	top: 0;
 	right: 0;
+	width: auto;
+	height: auto;
 	font-size: 0.9em;
 	border-radius: 0 0 0 5px;
 	padding: 0 0.5em;
 	text-shadow: none;
+	z-index: 1;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+	-webkit-transform: none;
+	-moz-transform: none;
+	-ms-transform: none;
+	-o-transform: none;
+	transform: none;
 }
 
 /* Custom b2evo styles */
-code[class*="language-"],
 pre[class*="language-"] {
-	white-space: pre;
-}
-pre[class*="language-"] {
+	max-height: 28em;
 	padding-top: 0;
-	padding-right: 0;
 	padding-bottom: 0;
 }
-pre[class*='language-'] > code[data-language] {
-	overflow: auto;
-	line-height: 15px;
+pre[class*="language-"] code[class*="language-"] {
+	display: block;
 }
-pre.line-numbers {
-	overflow: hidden;
-	padding-left: 3.3em;
-	width: 100%;
-	box-sizing: border-box;
-}
-pre.line-numbers > code {
-	position: static;
-}
-.line-numbers .line-numbers-rows {
-	left: 0;
+.prism-show-language {
+	margin-top: .5em;
 }

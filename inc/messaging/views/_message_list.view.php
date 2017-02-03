@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher, $action, $current_User, $Blog, $perm_abuse_management, $Plugins, $edited_Message;
+global $dispatcher, $action, $current_User, $Collection, $Blog, $perm_abuse_management, $Plugins, $edited_Message;
 
 // in front office there is no function call, $edited_Thread is available
 if( !isset( $edited_Thread ) )
@@ -50,13 +50,15 @@ $params = array_merge( array(
 	'skin_form_params'          => array(),
 	'display_navigation'        => false,
 	'display_title'             => false,
-	'messages_list_start'       => '',
-	'messages_list_end'         => '',
+	'messages_list_start'       => is_admin_page() ? '<div class="evo_private_messages_list">' : '',
+	'messages_list_end'         => is_admin_page() ? '</div>' : '',
 	'messages_list_title'       => $edited_Thread->title,
-	'messages_list_title_start' => '<div class="panel-heading"><h2>',
+	'messages_list_title_start' => '<div class="panel-heading"><h2 class="panel-title">',
 	'messages_list_title_end'   => '</h2></div>',
 	'messages_list_form_start'  => '<div class="panel panel-default">',
 	'messages_list_form_end'    => '</div>',
+	'messages_list_body_start'  => '<div class="panel-body">',
+	'messages_list_body_end'    => '</div>',
 	), $params );
 
 echo $params['messages_list_start'];
@@ -72,10 +74,9 @@ if( $params['display_navigation'] )
 	.'</div>';
 }
 
-echo $params['messages_list_form_start'];
 if( $params['display_title'] )
-{ // Display title
-	echo $params['messages_list_title_start'].$edited_Thread->title.$params['messages_list_title_end'];
+{	// Display title:
+	echo '<h2>'.sprintf( T_('Conversation: %s'), $edited_Thread->title ).'</h2>';
 }
 
 // load Thread recipients
@@ -151,12 +152,6 @@ if( $action == 'preview' )
 { // Init PREVIEW message
 	global $localtimenow;
 
-	foreach( $recipient_status_list as $row )
-	{ // To make the unread status for each recipient
-		$read_status_list[ $row->user_ID ] = -1;
-		$leave_status_list[ $row->user_ID ] = 0;
-	}
-
 	$count_SQL->SELECT( 'COUNT(*) + 1' );
 
 	$select_sql = '(
@@ -165,7 +160,7 @@ if( $action == 'preview' )
 		'.$current_User->ID.' AS msg_user_ID, '.$DB->quote( $current_User->login ).' AS msg_author,
 		'.$DB->quote( $current_User->firstname ).' AS msg_firstname, '.$DB->quote( $current_User->lastname ).' AS msg_lastname,
 		'.$DB->quote( $current_User->avatar_file_ID ).' AS msg_user_avatar_ID,
-		'.$DB->quote( '<b>'.T_('PREVIEW').':</b><br /> '.$edited_Message->get_prerendered_content() ).' AS msg_text, '.$DB->quote( $edited_Message->renderers ).' AS msg_renderers,
+		'.$DB->quote( $edited_Message->text ).' AS msg_text, '.$DB->quote( $edited_Message->renderers ).' AS msg_renderers,
 		'.$DB->quote( $edited_Thread->title ).' AS thread_title
 	)
 	UNION
@@ -178,7 +173,7 @@ $Results = new Results( $select_sql, 'msg_', '', 0, $count_SQL->get() );
 
 $Results->Cache = & get_MessageCache();
 
-$Results->title = $params['messages_list_title'];
+$Results->title = $params['messages_list_title'].( is_admin_page() ? get_manual_link( 'messages-thread-list' ) : '' );
 
 if( is_admin_page() )
 {
@@ -218,7 +213,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Message'),
 		'td_class' => 'left top message_text',
-		'td' => '%col_msg_format_text( #msg_ID#, #msg_text# )%',
+		'td' => '@get_content()@@get_images()@@get_files()@',
 	);
 /**
  * Read?:
@@ -271,6 +266,21 @@ if( $is_recipient )
 	}
 	else
 	{ // Current user is still part of this conversation, should be able to reply
+		echo $params['messages_list_form_start'];
+
+		$form_title = sprintf( T_('Reply to: %s'), get_avatar_imgtags( $available_recipients, true, true, 'crop-top-15x15', 'avatar_before_login mb1' ) );
+		if( is_admin_page() )
+		{
+			$form_title .= get_manual_link( 'messages-reply-to-thread' );
+		}
+
+		if( ! is_admin_page() )
+		{
+			echo $params['messages_list_title_start'].$form_title.$params['messages_list_title_end'];
+		}
+
+		echo $params['messages_list_body_start'];
+
 		$Form = new Form( $params[ 'form_action' ], $params[ 'form_name' ], 'post', $params[ 'form_layout' ] );
 
 		if( ! is_admin_page() )
@@ -280,7 +290,7 @@ if( $is_recipient )
 
 		$Form->switch_template_parts( $params['skin_form_params'] );
 
-		$Form->begin_form( $params['form_class_msg'], '' );
+		$Form->begin_form( $params['form_class_msg'], is_admin_page() ? $form_title : '' );
 
 			$Form->add_crumb( 'messaging_messages' );
 			if( $perm_abuse_management )
@@ -290,7 +300,7 @@ if( $is_recipient )
 			$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 			$Form->hidden( 'redirect_to', $params[ 'redirect_to' ] );
 
-			$Form->info_field(T_('Reply to'), get_avatar_imgtags( $available_recipients, true, true, 'crop-top-15x15', 'avatar_before_login mb1' ), array('required'=>true));
+			//$Form->info_field(T_('Reply to'), get_avatar_imgtags( $available_recipients, true, true, 'crop-top-15x15', 'avatar_before_login mb1' ), array('required'=>true));
 
 			if( !empty( $closed_recipients ) )
 			{
@@ -323,14 +333,27 @@ if( $is_recipient )
 				$Form->info( T_('Text Renderers'), $message_renderer_checkboxes );
 			}
 
+			// ####################### ATTACHMENTS/LINKS #########################
+			if( is_admin_page() && $current_User->check_perm( 'files', 'view' ) )
+			{	// If current user has a permission to view the files AND it is back-office:
+				load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
+				// Initialize this object as global because this is used in many link functions:
+				global $LinkOwner;
+				$LinkOwner = new LinkMessage( $edited_Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
+				// Display attachments fieldset:
+				display_attachments_fieldset( $Form, $LinkOwner );
+			}
+
 		$Form->end_form( array(
 				array( 'submit', 'actionArray[preview]', T_('Preview'), 'SaveButton btn-info' ),
 				array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' )
 			) );
+
+		echo $params['messages_list_body_end'];
+
+		echo $params['messages_list_form_end'];
 	}
 }
-
-echo $params['messages_list_form_end'];
 
 // Display Leave or Close conversation action if they are available
 if( $is_recipient && empty( $leave_msg_ID ) && ( count( $available_recipients ) > 0 ) )
@@ -363,11 +386,10 @@ if( $is_recipient && empty( $leave_msg_ID ) && ( count( $available_recipients ) 
 		$close_and_block_url = url_add_param( $params[ 'form_action' ], 'disp=threads&thrd_ID='.$edited_Thread->ID.'&action=close_and_block&block_ID='.$recipient_ID.'&redirect_to='.rawurlencode( url_add_param( $Blog->gen_blogurl(), 'disp=threads', '&' ) ).'&'.url_crumb( 'messaging_threads' ) );
 	}
 	echo '<p>';
-	echo '<a href="'.$leave_url.'" onclick="return confirm( \''.$confirm_leave_text.'\' );">'.$leave_text.'</a>';
+	echo '<a href="'.$leave_url.'" onclick="return confirm( \''.$confirm_leave_text.'\' );" class="btn btn-default btn-sm">'.$leave_text.'</a>';
 	if( $leave_action == 'close' )
 	{ // user want's to close this conversation ( there is only one recipient )
-		echo '<br />';
-		echo '<a href="'.$close_and_block_url.'" onclick="return confirm( \''.$confirm_block_text.'\' );">'.$block_text.'</a>';
+		echo ' <a href="'.$close_and_block_url.'" onclick="return confirm( \''.$confirm_block_text.'\' );" class="btn btn-default btn-sm">'.$block_text.'</a>';
 	}
 	echo '</p>';
 	echo '</div>';
@@ -384,6 +406,9 @@ if( $action == 'preview' )
 // Disable rollover effect on table rows
 $Results->display_init( $display_params );
 $display_params['list_start'] = str_replace( 'class="grouped', 'class="grouped nohover', $Results->params['list_start'] );
+
+// Disable highlight on hover
+$display_params['list_start'] = str_replace( 'table-hover', '', $Results->params['list_start'] );
 
 // Dispaly message list
 $Results->display( $display_params );

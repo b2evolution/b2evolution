@@ -53,7 +53,7 @@ $evo_charset = 'utf-8'; // Set utf-8 because we started to use utf-8 internally 
 if( version_compare( phpversion(), '5.6', '>=' ) )
 {	// In case of php version greater than 5.6 set the default charset to UTF-8
 	// All other charsets ( inconv, mbstring and php internal functions ) default value is based on the 'default_charset'
-	ini_set( 'default_charset', 'UTF-8' );
+	@ini_set( 'default_charset', 'UTF-8' );
 }
 
 
@@ -132,8 +132,12 @@ $locales['en-US'] = array(
 		'name' => NT_('English (US) utf-8'),
 		'charset' => 'utf-8',
 		'datefmt' => 'm/d/y',
+		'longdatefmt' => 'm/d/Y',
+		'extdatefmt' => 'M d Y',
+		'input_datefmt' => 'm/d/y',
 		'timefmt' => 'h:i:s a',
 		'shorttimefmt' => 'h:i a',
+		'input_timefmt' => 'H:i:s',
 		'startofweek' => 0,
 		'messages' => 'en_US',
 		'enabled' => false,	// We need this line to prevent notices iin locales conf screen and user profile screen.

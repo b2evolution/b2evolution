@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -116,12 +116,14 @@ if( isset( $mct_blocked ) )
 	// Redirect so that a reload doesn't write to the DB twice:
 	header_redirect( regenerate_url( '', '', '', '&' ), 303 ); // Will EXIT
 	// We have EXITed already at this point!!
-	break;
 }
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('Messages'), '?ctrl=threads' );
 $AdminUI->breadcrumbpath_add( T_('Contacts'), '?ctrl=contacts' );
+
+// Set an url for manual page:
+$AdminUI->set_page_manual_link( 'contacts-list' );
 
 // Display messages depending on user email status
 display_user_email_status_message();

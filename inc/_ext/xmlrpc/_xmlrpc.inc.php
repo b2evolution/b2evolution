@@ -874,7 +874,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		* @param integer $port the port the server is listening on, defaults to 80 or 443 depending on protocol used
 		* @param string $method the http protocol variant: defaults to 'http', 'https' and 'http11' can be used if CURL is installed
 		*/
-		function xmlrpc_client($path, $server='', $port='', $method='')
+		function __construct($path, $server='', $port='', $method='')
 		{
 			// allow user to specify all params in $path
 			if($server == '' and $port == '' and $method == '')
@@ -1746,7 +1746,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 					}
 					else
 					{
-						if (is_a($results, 'xmlrpcresp'))
+						if ($results instanceof xmlrpcresp)
 						{
 							$result = $results;
 						}
@@ -1950,7 +1950,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		* NB: as of now we do not do it, since it might be either an xmlrpcval or a plain
 		* php val, or a complete xml chunk, depending on usage of xmlrpc_client::send() inside which creator is called...
 		*/
-		function xmlrpcresp($val, $fcode = 0, $fstr = '', $valtyp='')
+		function __construct($val, $fcode = 0, $fstr = '', $valtyp='')
 		{
 			if($fcode != 0)
 			{
@@ -1966,7 +1966,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				if ($valtyp == '')
 				{
 					// user did not declare type of response value: try to guess it
-					if (is_object($this->val) && is_a($this->val, 'xmlrpcval'))
+					if (is_object($this->val) && $this->val instanceof xmlrpcval)
 					{
 						$this->valtyp = 'xmlrpcvals';
 					}
@@ -2059,7 +2059,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 			}
 			else
 			{
-				if(!is_object($this->val) || !is_a($this->val, 'xmlrpcval'))
+				if(!is_object($this->val) || !($this->val instanceof xmlrpcval))
 				{
 					if (is_string($this->val) && $this->valtyp == 'xml')
 					{
@@ -2098,7 +2098,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 		* @param string $meth the name of the method to invoke
 		* @param array $pars array of parameters to be paased to the method (xmlrpcval objects)
 		*/
-		function xmlrpcmsg($meth, $pars=0)
+		function __construct($meth, $pars=0)
 		{
 			$this->methodname=$meth;
 			if(is_array($pars) && count($pars)>0)
@@ -2198,7 +2198,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 		function addParam($par)
 		{
 			// add check: do not add to self params which are not xmlrpcvals
-			if(is_object($par) && is_a($par, 'xmlrpcval'))
+			if(is_object($par) && $par instanceof xmlrpcval)
 			{
 				$this->params[]=$par;
 				return true;
@@ -2723,7 +2723,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 		* @param mixed $val
 		* @param string $type any valid xmlrpc type name (lowercase). If null, 'string' is assumed
 		*/
-		function xmlrpcval($val=-1, $type='')
+		function __construct($val=-1, $type='')
 		{
 			/// @todo: optimization creep - do not call addXX, do it all inline.
 			/// downside: booleans will not be coerced anymore
@@ -2968,7 +2968,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 							{
 								$rs.="<${typ}>${val}</${typ}>";
 							}
-							else if(is_a($val, 'DateTime'))
+							else if($val instanceof DateTime)
 							{
 								$rs.="<${typ}>".$val->format('Ymd\TH:i:s')."</${typ}>";
 							}
@@ -3333,7 +3333,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 						$result->setTimestamp($out);
 						return $result;
 					}
-					elseif (is_a($out, 'Datetime'))
+					elseif ($out instanceof Datetime)
 					{
 						return $out;
 					}
@@ -3463,11 +3463,11 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 				}
 				break;
 			case 'object':
-				if(is_a($php_val, 'xmlrpcval'))
+				if($php_val instanceof xmlrpcval)
 				{
 					$xmlrpc_val = $php_val;
 				}
-				else if(is_a($php_val, 'DateTime'))
+				else if($php_val instanceof DateTime)
 				{
 					$xmlrpc_val = new xmlrpcval($php_val->format('Ymd\TH:i:s'), $GLOBALS['xmlrpcStruct']);
 				}

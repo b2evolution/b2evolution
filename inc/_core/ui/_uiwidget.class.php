@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -56,7 +56,7 @@ class Widget
 	 *
 	 * @param string template name to get from $AdminUI
 	 */
-	function Widget( $ui_template = NULL )
+	function __construct( $ui_template = NULL )
 	{
 		global $AdminUI;
 
@@ -81,7 +81,9 @@ class Widget
 	function global_icon( $title, $icon, $url, $word = '', $icon_weight = 3, $word_weight = 2, $link_attribs = array(), $group = NULL )
 	{
 		$link_attribs = array_merge( array(
-				'class' => 'action_icon'
+				'class'  => 'action_icon',
+				'before' => '',
+				'after'  => '',
 			), $link_attribs );
 
 		$this->global_icons[] = array(
@@ -246,8 +248,12 @@ class Widget
 			}
 			else
 			{ // Separated icon
-				$icons[] = action_icon( $icon_params['title'], $icon_params['icon'], $icon_params['url'], $icon_params['word'],
-						$icon_params['icon_weight'], $icon_params['word_weight'], $icon_params['link_attribs'] );
+				$before = $icon_params['link_attribs']['before'];
+				$after = $icon_params['link_attribs']['after'];
+				unset( $icon_params['link_attribs']['before'] );
+				unset( $icon_params['link_attribs']['after'] );
+				$icons[] = $before.action_icon( $icon_params['title'], $icon_params['icon'], $icon_params['url'], $icon_params['word'],
+							$icon_params['icon_weight'], $icon_params['word_weight'], $icon_params['link_attribs'] ).$after;
 			}
 		}
 
@@ -341,9 +347,9 @@ class Table extends Widget
 	 * @param string template name to get from $AdminUI
 	 * @param string prefix to differentiate page/order/filter params
 	 */
-	function Table( $ui_template = NULL, $param_prefix = '' )
+	function __construct( $ui_template = NULL, $param_prefix = '' )
 	{
-		parent::Widget( $ui_template );
+		parent::__construct( $ui_template );
 
 		$this->param_prefix = $param_prefix;
 
@@ -1014,8 +1020,9 @@ class Table extends Widget
 	 * Start a column (data).
 	 *
 	 * @param array Additional attributes for the <td> tag (attr_name => attr_value).
+	 * @param object|NULL Current row data (The var $row is requested inside of $this->parse_col_content() )
 	 */
-	function display_col_start( $extra_attr = array() )
+	function display_col_start( $extra_attr = array(), $row = NULL )
 	{
 		// Get colum definitions for current column:
 		$col = $this->cols[$this->displayed_cols_count];
@@ -1056,6 +1063,42 @@ class Table extends Widget
 			$output = $this->params['col_start'];
 			// Replace the "class_attrib" in the total col start param by the td column class
 			$output = str_replace( '$class_attrib$', 'class="'.$class.'"', $output );
+		}
+
+		if( isset( $col['td_colspan'] ) )
+		{	// Initialize colspan attribute:
+			if( method_exists( $this, 'parse_col_content' ) )
+			{
+				$colspan = $this->parse_col_content( $col['td_colspan'] );
+				$colspan = eval( "return '$colspan';" );
+			}
+			else
+			{
+				$colspan = $col['td_colspan'];
+			}
+			if( $colspan < 0 )
+			{	// We want to substract columns from the total count:
+				$colspan = $this->nb_cols + $colspan;
+			}
+			elseif( $colspan == 0 )
+			{	// Use a count of columns:
+				$colspan = $this->nb_cols;
+			}
+			$colspan = intval( $colspan );
+			if( $colspan === 1 )
+			{	// Don't create attribute "colspan" with value "1":
+				$output = str_replace( '$colspan_attrib$', '', $output );
+			}
+			else
+			{
+				$output = str_replace( '$colspan_attrib$', 'colspan="'.$colspan.'"', $output );
+				// Store current colspan value in order to skip next columns:
+				$this->current_colspan = $colspan;
+			}
+		}
+		else
+		{	// Remove non-HTML attrib:
+			$output = str_replace( '$colspan_attrib$', '', $output );
 		}
 
 		// Custom attributes:
@@ -1129,9 +1172,9 @@ class Table extends Widget
 		// Make variable substitution for RAWS:
 		while (preg_match('!\# (\w+) \#!ix', $content, $matchesarray))
 		{ // Replace all matches to the content of the current row's cell. That means that several variables can be inserted to the class.
-			if (! empty($this->rows[$this->current_idx]->$matchesarray[1]))
+			if (! empty($this->rows[$this->current_idx]->{$matchesarray[1]}))
 			{
-				$content = str_replace($matchesarray[0],$this->rows[$this->current_idx]->$matchesarray[1] , $content);
+				$content = str_replace($matchesarray[0],$this->rows[$this->current_idx]->{$matchesarray[1]} , $content);
 			}
 			else
 			{

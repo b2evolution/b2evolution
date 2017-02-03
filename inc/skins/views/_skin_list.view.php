@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -48,15 +48,48 @@ else
 }
 
 $Results->cols[] = array(
-						'th' => T_('Skin type'),
-						'order' => 'skin_type',
+						'th' => T_('Version'),
 						'td_class' => 'center',
+						'td' => '%get_skin_version( #skin_ID# )%'
+					);
+
+function skin_col_provide_type( $Skin, $type )
+{
+	// Check if the Skin is provided for site or collection:
+	$is_type_provided = ( $type == 'site' ) ? $Skin->provides_site_skin() : $Skin->provides_collection_skin();
+
+	// Display black dot icon only when the Skin can be used for the requested type:
+	return $is_type_provided ? get_icon( 'bullet_full', 'imgtag', array( 'title' => '' ) ) : '&nbsp;';
+}
+$Results->cols[] = array(
+						'th_group' => T_('Skin type'),
+						'th' => T_('Site'),
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap',
+						'td' => '%skin_col_provide_type( {Obj}, "site" )%',
+					);
+
+$Results->cols[] = array(
+						'th_group' => T_('Skin type'),
+						'th' => T_('Coll.'),
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap',
+						'td' => '%skin_col_provide_type( {Obj}, "coll" )%',
+					);
+
+$Results->cols[] = array(
+						'th_group' => T_('Skin type'),
+						'th' => T_('Format'),
+						'th_class' => 'shrinkwrap',
+						'order' => 'skin_type',
+						'td_class' => 'shrinkwrap',
 						'td' => '$skin_type$',
 					);
 
 $Results->cols[] = array(
-						'th' => T_('Blogs'),
+						'th' => T_('Collections'),
 						'order' => 'nb_blogs',
+						'default_dir' => 'D',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'center',
 						'td' => '~conditional( (#nb_blogs# > 0), #nb_blogs#, \'&nbsp;\' )~',
@@ -70,6 +103,12 @@ $Results->cols[] = array(
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
+	global $Settings;
+	$site_skin_IDs = array(
+		intval( $Settings->get( 'normal_skin_ID' ) ),
+		intval( $Settings->get( 'mobile_skin_ID' ) ),
+		intval( $Settings->get( 'tablet_skin_ID' ) ),
+	);
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
 							'th_class' => 'shrinkwrap',
@@ -78,7 +117,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=edit\')%' )
 	                    .action_icon( TS_('Reload containers!'), 'reload',
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=reload&amp;'.url_crumb('skin').'\')%' )
-											.'~conditional( #nb_blogs# < 1, \''
+											.'~conditional( #nb_blogs# < 1 && ! in_array( #skin_ID#, array( '.implode( ',', $site_skin_IDs ).' ) ), \''
 											.action_icon( TS_('Uninstall this skin!'), 'delete',
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=delete&amp;'.url_crumb('skin').'\')%' ).'\', \''
 	                        .get_icon( 'delete', 'noimg' ).'\' )~',

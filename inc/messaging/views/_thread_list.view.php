@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -15,8 +15,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $current_User;
-global $unread_messages_count;
-global $DB, $Blog;
+global $DB, $Collection, $Blog;
 global $perm_abuse_management; // TRUE if we go from Abuse Management
 
 if( !isset( $display_params ) )
@@ -41,7 +40,7 @@ $Results->Cache = & get_ThreadCache();
 $Results->title = T_('Conversations list');
 if( is_admin_page() )
 {
-	$Results->title .= get_manual_link( 'messaging' );
+	$Results->title .= get_manual_link( 'conversations-list' );
 }
 
 /**
@@ -85,7 +84,7 @@ threads_results( $Results, array_merge( array(
 if( ! $perm_abuse_management )
 { // Show link to create a new conversation
 	$Results->global_icon( T_('See My Contacts'), 'contacts', get_dispctrl_url( 'contacts' ), T_('See My Contacts').' ', 3, 4 );
-	$Results->global_icon( T_('Create a new conversation...'), 'compose_new', get_dispctrl_url( 'threads', 'action=new' ), T_('Compose new').' &raquo;', 3, 4 );
+	$Results->global_icon( T_('Create a new conversation...'), 'compose_new', get_dispctrl_url( 'threads', 'action=new' ), T_('Compose new').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 $Results->display( $display_params );

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -26,7 +26,7 @@ function hits_results( & $Results, $params = array() )
 			'default_order' => '--D'
 		), $params );
 
-	global $blog, $Session, $sess_ID;
+	global $blog, $sec_ID, $Session, $sess_ID;
 	global $preset_results_title, $preset_referer_type, $preset_filter_all_url;
 	global $hide_columns, $admin_url;
 
@@ -37,13 +37,17 @@ function hits_results( & $Results, $params = array() )
 	$param_prefix = 'results_'.$Results->param_prefix;
 	$tab = get_param( 'tab' );
 
+	// Initialize params to filter by selected collection and/or group:
+	$section_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
+	$section_params .= empty( $sec_ID ) ? '' : '&amp;sec_ID='.$sec_ID;
+
 	$filter_presets = array();
-	$filter_presets['all'] = array( T_('All'), isset( $preset_filter_all_url ) ? $preset_filter_all_url : $admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;blog='.$blog.'&amp;'.$param_prefix.'order='.$params['default_order'] );
+	$filter_presets['all'] = array( T_('All'), isset( $preset_filter_all_url ) ? $preset_filter_all_url : $admin_url.'?ctrl=stats&amp;tab='.$tab.$section_params.'&amp;'.$param_prefix.'order='.$params['default_order'] );
 	if( !isset( $preset_referer_type ) )
 	{	// Show these presets only when referer type is not set
-		$filter_presets['all_but_curr'] = array( T_('All but current session'), $admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;blog='.$blog.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1&amp;'.$param_prefix.'order='.$params['default_order'] );
-		$filter_presets['direct_hits'] = array( T_('Direct hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.'&amp;blog='.$blog.'&amp;referer_type=direct&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
-		$filter_presets['refered_hits'] = array( T_('Refered hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.'&amp;blog='.$blog.'&amp;referer_type=referer&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
+		$filter_presets['all_but_curr'] = array( T_('All but current session'), $admin_url.'?ctrl=stats&amp;tab='.$tab.$section_params.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1&amp;'.$param_prefix.'order='.$params['default_order'] );
+		$filter_presets['direct_hits'] = array( T_('Direct hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.$section_params.'&amp;referer_type=direct&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
+		$filter_presets['refered_hits'] = array( T_('Refered hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.$section_params.'&amp;referer_type=referer&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
 	}
 
 	$Results->filter_area = array(
@@ -80,7 +84,7 @@ function hits_results( & $Results, $params = array() )
 			'order' => 'hit_ID',
 			'default_dir' => 'D',
 			'td_class' => 'timestamp compact_data',
-			'td' => '%mysql2localedatetime_spans( #hit_datetime#, "M-d" )%',
+			'td' => '%mysql2localedatetime_spans( #hit_datetime# )%',
 		);
 
 	$Results->cols[] = array(
@@ -147,7 +151,7 @@ function hits_results( & $Results, $params = array() )
 		);
 
 	$Results->cols[] = array(
-			'th' => T_('Blog'),
+			'th' => T_('Collection'),
 			'order' => 'hit_coll_ID',
 			'td' => '$blog_shortname$',
 			'td_class' => 'compact_data'
@@ -172,6 +176,16 @@ function hits_results( & $Results, $params = array() )
 			'order' => 'hit_response_code',
 			'td' => '$hit_response_code$',
 			'td_class' => '%hit_response_code_class( #hit_response_code# )% shrinkwrap compact_data'
+		);
+	$Results->cols[] = array(
+			'th' => T_('HTTP meth'),
+			'order' => 'hit_method',
+			'td' => '$hit_method$',
+			'td_class' => 'shrinkwrap compact_data',
+			'extra' => array(
+					'style' => '%hit_method_style( "#hit_method#" )%',
+					'format_to_output'=> false
+				)
 		);
 
 	$Results->cols[] = array(
@@ -211,7 +225,7 @@ function filter_hits( & $Form )
 
 	$Form->date_input( 'datestartinput', $datestart, T_( 'From date' ) );
 	$Form->date_input( 'datestopinput', $datestop, T_( 'To date' ) );
-	
+
 	if( !isset( $preset_agent_type ) )
 	{
 		$Form->select_input_array( 'agent_type', get_param( 'agent_type' ), $agent_type_array, T_( 'Agent type' ), '', array( 'force_keys_as_values' => true, 'background_color' => $agent_type_color ) );
@@ -331,10 +345,17 @@ function stat_session_login( $login )
  * @param string session ID
  * @param string link text
  */
-function stat_session_hits( $sess_ID,  $link_text )
+function stat_session_hits( $sess_ID, $link_text )
 {
-	global $blog;
-	return '<strong><a href="?ctrl=stats&tab='.get_param( 'tab' ).'&colselect_submit=Filter+list&sess_ID='.$sess_ID.'&remote_IP=&blog='.$blog.'">'.$link_text.'</a></strong>';
+	global $blog, $admin_url;
+
+	$tab = get_param( 'tab' );
+	if( empty( $tab ) )
+	{
+		$tab = 'hits';
+	}
+
+	return '<strong><a href="'.$admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;sess_ID='.$sess_ID.'&amp;blog='.$blog.'">'.$link_text.'</a></strong>';
 }
 
 
@@ -608,5 +629,29 @@ function hit_iprange_status_color( $IP_address )
 	}
 
 	return aipr_status_color( $ip_range_status );
+}
+
+
+/**
+ * Get style for hit method cell
+ *
+ * @param string Hit request method
+ * @return string Method style
+ */
+function hit_method_style( $hit_method )
+{
+	global $hit_method_color;
+
+	// Purple color for non traditional methods:
+	$color = '551A8B';
+
+	if( isset( $hit_method_color[ $hit_method ] ) )
+	{	// Get background color from config array:
+		$color = $hit_method_color[ $hit_method ];
+	}
+
+	$style = 'color: #'.$color;
+
+	return $style;
 }
 ?>

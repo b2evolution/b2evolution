@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -29,7 +29,7 @@ $Form = new Form( NULL, 'country_checkchanges', 'post', 'compact' );
 $Form->global_icon( T_('Delete this country!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('country') ) );
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', $creating ?  T_('New country') : T_('Country') );
+$Form->begin_form( 'fform', ( $creating ?  T_('New country') : T_('Country') ).get_manual_link( 'countries-editing' ) );
 
 	$Form->add_crumb( 'country' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',ctry_ID' : '' ) ) ); // (this allows to come back to the right list order & page)

@@ -17,7 +17,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004 by Justin Vincent - {@link http://php.justinvincent.com}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
@@ -346,12 +346,12 @@ class DB
 			{
 				$mysql_ext_file = is_windows() ? 'php_mysqli.dll' : 'mysqli.so';
 				$php_errormsg = null;
-				$old_track_errors = ini_set('track_errors', 1);
-				$old_html_errors = ini_set('html_errors', 0);
+				$old_track_errors = @ini_set('track_errors', 1);
+				$old_html_errors = @ini_set('html_errors', 0);
 				@dl( $mysql_ext_file );
 				$error_msg = $php_errormsg;
-				if( $old_track_errors !== false ) ini_set('track_errors', $old_track_errors);
-				if( $old_html_errors !== false ) ini_set('html_errors', $old_html_errors);
+				if( $old_track_errors !== false ) @ini_set('track_errors', $old_track_errors);
+				if( $old_html_errors !== false ) @ini_set('html_errors', $old_html_errors);
 			}
 			else
 			{
@@ -376,8 +376,8 @@ class DB
 			// mysqli::$connect_error is tied to an established connection
 			// if the connection fails we need a different method to get the error message
 			$php_errormsg = null;
-			$old_track_errors = ini_set('track_errors', 1);
-			$old_html_errors = ini_set('html_errors', 0);
+			$old_track_errors = @ini_set('track_errors', 1);
+			$old_html_errors = @ini_set('html_errors', 0);
 			$this->dbhandle = mysqli_init();
 			@mysqli_real_connect($this->dbhandle,
 				/* Persistent connections are only available in PHP 5.3+ */
@@ -386,8 +386,8 @@ class DB
 				'', ini_get('mysqli.default_port'), ini_get('mysqli.default_socket'),
 				$client_flags );
 			$mysql_error = $php_errormsg;
-			if( $old_track_errors !== false ) ini_set('track_errors', $old_track_errors);
-			if( $old_html_errors !== false ) ini_set('html_errors', $old_html_errors);
+			if( $old_track_errors !== false ) @ini_set('track_errors', $old_track_errors);
+			if( $old_html_errors !== false ) @ini_set('html_errors', $old_html_errors);
 		}
 
 		if( 0 != $this->dbhandle->connect_errno )
@@ -434,15 +434,8 @@ class DB
 			// echo count($this->dbaliases);
 		}
 
-		if( $debug )
-		{ // Force MySQL strict mode
-			// TRADITIONAL mode is only available to mysql > 5.0.2
-			$mysql_version = $this->get_version( 'we do this in DEBUG mode only' );
-			if( version_compare( $mysql_version, '5.0.2' ) > 0 )
-			{
-				$this->query( 'SET sql_mode = "TRADITIONAL"', 'we do this in DEBUG mode only' );
-			}
-		}
+		// Force MySQL strict mode
+		$this->query( 'SET sql_mode = "TRADITIONAL"', 'Force MySQL "strict" mode (and make sure server is not configured with a weird incompatible mode)' );
 
 		if( $this->debug_profile_queries )
 		{
@@ -514,7 +507,7 @@ class DB
 			{
 				$r .= $this->quote($elt).',';
 			}
-			return substr( $r, 0, -1 );
+			return substr( $r, 0, -1 );  // remove last ,
 		}
 		else
 		{
@@ -1282,6 +1275,7 @@ class DB
 
 		if( $html )
 		{ // poor man's indent
+			$sql = htmlspecialchars( $sql );
 			$sql = preg_replace_callback("~^(\s+)~m", create_function('$m', 'return str_replace(" ", "&nbsp;", $m[1]);'), $sql);
 			$sql = nl2br($sql);
 		}
@@ -1326,7 +1320,8 @@ class DB
 
 		if( $html )
 		{ // Javascript function to toggle DIVs (EXPLAIN, results, backtraces).
-			require_js( 'debug.js', 'rsc_url', false, true );
+			$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
+			require_js( 'debug.js', $relative_to, false, true );
 		}
 
 		foreach( $this->queries as $i => $query )
@@ -1542,7 +1537,7 @@ class DB
 
 
 	/**
-	 * BEGIN A TRANSCATION
+	 * BEGIN A TRANSACTION
 	 *
 	 * Note:  By default, MySQL runs with autocommit mode enabled.
 	 * This means that as soon as you execute a statement that updates (modifies)

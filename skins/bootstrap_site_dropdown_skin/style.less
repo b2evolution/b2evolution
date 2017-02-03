@@ -1,0 +1,129 @@
+/*
+ * Styles for Site skin "bootstrap_site_navbar_skin"
+ */
+
+.bootstrap_site_navbar_header {
+	.navbar {
+		margin-bottom: 0;
+		.navbar-collapse {
+			padding: 0;
+			.nav {
+				margin: 0;
+				.login {
+					padding-top: 4px;
+					padding-bottom: 4px;
+					line-height: 32px;
+					img {
+						margin-right: 5px;
+						border-radius: 4px;
+					}
+				}
+				
+				li {
+					// a:hover + .dropdown-menu, .dropdown-menu:hover {
+						// display: block;
+					// }
+					.dropdown-menu {
+						border-radius: 0;
+						padding: 0;
+						& > .active > a,
+						& > .active > a:focus,
+						& > .active > a:hover {
+							background-color: #eee;
+						}
+						li a {
+							padding: 10px 20px;
+							color: #555;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	.level2 ul.nav.nav-pills {
+		margin: 15px 0;
+	}
+}
+// Everything bigger than bootstrap-xs
+@media (min-width: 768px) {
+	.bootstrap_site_navbar_header {
+		.navbar {
+			// Logout/log in button goes to the far right of the navbar
+			.container-fluid.level1 {
+				padding-right: 0;
+			}
+			.navbar-collapse {
+				.nav {
+					&.navbar-left {
+						margin-right: 15px;
+					}
+					&.navbar-right {
+						.login {
+							padding-top: 9px;
+							padding-bottom: 9px;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+// Bootstrap-xs
+@media (max-width: 768px) {
+	.bootstrap_site_navbar_header {
+		.navbar {
+			.navbar-collapse {
+				.nav li {
+					.dropdown-menu {
+						background-color: #f8f8f8;
+						li a {
+							padding: 10px 15px 10px 30px;
+							width: 100%;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+.bootstrap_site_navbar_footer {
+	background-color: #f5f5f5;
+	p {
+		margin: 20px 0;
+	}
+}
+
+// Slide top button
+.btn.slide-top {
+	opacity: 0;
+	visibility: hidden;
+	float: right;
+	font-size: 20px;
+	position: fixed;
+	padding: 2px 13px;
+	right: 8px;
+	top: 8px;
+	transition: all 0.3s;
+	z-index: 9999;
+	&.slide-top-visible {
+		opacity: 1;
+		visibility: visible;
+	}
+	&.logged_in_margin_top {
+		top: 35px;
+	}
+}
+
+// We need these media queries for controlling margin-top on slide-top button when on devices
+@media only screen and (max-device-width: 1024px) {
+	.btn.slide-top.logged_in_margin_top {
+		top: 8px;
+	}
+}
+@media (min-width: 768px) and (max-width: 991px) and (min-device-width: 1024px) {
+	.btn.slide-top.logged_in_margin_top {
+		top: 35px;
+	}
+}

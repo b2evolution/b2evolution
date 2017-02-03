@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -67,7 +67,7 @@ class FileRoot
 	 * @param integer ID of the user, the group or the collection the file belongs to...
 	 * @param boolean Create the directory, if it does not exist yet?
 	 */
-	function FileRoot( $root_type, $root_in_type_ID, $create = true )
+	function __construct( $root_type, $root_in_type_ID, $create = true )
 	{
 		/**
 		 * @var User
@@ -75,7 +75,7 @@ class FileRoot
 		global $current_User;
 		global $Messages;
 		global $Settings, $Debuglog;
-		global $Blog;
+		global $Collection, $Blog;
 
 		// Store type:
 		$this->type = $root_type;
@@ -99,7 +99,7 @@ class FileRoot
 
 			case 'collection':
 				$BlogCache = & get_BlogCache();
-				if( ! $Blog = & $BlogCache->get_by_ID( $root_in_type_ID, false, false ) )
+				if( ! ( $Collection = $Blog = & $BlogCache->get_by_ID( $root_in_type_ID, false, false ) ) )
 				{	// Blog not found
 					return false;
 				}
@@ -189,6 +189,26 @@ class FileRoot
 					$this->ads_url = $media_url.$rds_import_subdir;
 				}
 				return;
+
+			case 'emailcampaign':
+				// Email campaign dir
+				global $media_path, $media_url;
+				$rds_emailcampaign_subdir = 'emailcampaign/';
+				$ads_emailcampaign_dir = $media_path.$rds_emailcampaign_subdir;
+				if( ! mkdir_r( $ads_emailcampaign_dir ) )
+				{
+					if( is_admin_page() )
+					{	// Only display error on back-office side:
+						$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be created.'), $rds_emailcampaign_subdir ).get_manual_link( 'directory_creation_error' ), 'error' );
+					}
+				}
+				else
+				{
+					$this->name = T_('Email campaigns');
+					$this->ads_path = $media_path.$rds_emailcampaign_subdir;
+					$this->ads_url = $media_url.$rds_emailcampaign_subdir;
+				}
+				return;
 		}
 
 		debug_die( "Invalid root type" );
@@ -203,7 +223,7 @@ class FileRoot
 				return NT_('User roots');
 
 			case 'collection':
-				return NT_('Blog roots');
+				return NT_('Collection roots');
 
 			default:
 				return NT_('Special roots');
@@ -231,12 +251,33 @@ class FileRoot
 			case 'collection':
 			case 'skins':
 			case 'import':
+			case 'emailcampaign':
 				return $root_type.'_'.$root_in_type_ID;
 		}
 
 		debug_die( "Invalid root type" );
 	}
 
+
+	/**
+	 * Check if this file root contains a file/folder with given relative path
+	 *
+	 * @param string Subpath for file/folder, relative the associated root, including trailing slash (if directory)
+	 * @return boolean
+	 */
+	function contains( $rel_path )
+	{
+		// Convert a path from "/dir1/dir2/../dir3/file.txt" to "/dir1/dir3/file.txt":
+		$real_abs_path = get_canonical_path( $this->ads_path.$rel_path );
+
+		// Check if the given file/folder is realy contained in this root:
+		if( ! empty( $real_abs_path ) && strpos( $real_abs_path, $this->ads_path ) !== 0 )
+		{	// Deny access from another file root:
+			debug_die( 'Denied access to files from another root!' );
+		}
+
+		return true;
+	}
 }
 
 ?>

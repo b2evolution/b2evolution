@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -90,6 +90,9 @@ $AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
 		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
 $AdminUI->breadcrumbpath_add( T_('Regional'), $admin_url.'?ctrl=locales' );
 $AdminUI->breadcrumbpath_add( T_('Time'), $admin_url.'?ctrl=time' );
+
+// Set an url for manual page:
+$AdminUI->set_page_manual_link( 'regional-time-tab' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

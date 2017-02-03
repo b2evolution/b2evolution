@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -23,7 +23,7 @@ $Form->begin_form( 'fform', sprintf( T_('Mail log ID#%s'), $MailLog->emlog_ID ) 
 
 $Form->info( T_('Result'), emlog_result_info( $MailLog->emlog_result ) );
 
-$Form->info( T_('Date'), mysql2localedatetime_spans( $MailLog->emlog_timestamp, 'Y-m-d', 'H:i:sP' ) );
+$Form->info( T_('Date'), mysql2localedatetime_spans( $MailLog->emlog_timestamp ) );
 
 $deleted_user_note = '';
 if( $MailLog->emlog_user_ID > 0 )

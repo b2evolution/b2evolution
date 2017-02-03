@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -62,6 +62,45 @@ class LinkCache extends DataObjectCache
 	var $loaded_cache_user = array();
 
 	/**
+	 * Cache for email campaigns -> array of object references
+	 * @access private
+	 * @var array
+	 */
+	var $cache_emailcampaign = array();
+
+	/**
+	 * @access private
+	 * @var array Remember full loads
+	 */
+	var $loaded_cache_emailcampaign = array();
+
+	/**
+	 * Cache for messages -> array of object references
+	 * @access private
+	 * @var array
+	 */
+	var $cache_message = array();
+
+	/**
+	 * @access private
+	 * @var array Remember full loads
+	 */
+	var $loaded_cache_message = array();
+
+	/**
+	 * Cache for temporary objects -> array of object references
+	 * @access private
+	 * @var array
+	 */
+	var $cache_temporary = array();
+
+	/**
+	 * @access private
+	 * @var array Remember full loads
+	 */
+	var $loaded_cache_temporary = array();
+
+	/**
 	 * Cache for file -> array of object references
 	 * @access private
 	 * @var array
@@ -77,9 +116,9 @@ class LinkCache extends DataObjectCache
 	/**
 	 * Constructor
 	 */
-	function LinkCache()
+	function __construct()
 	{
-		parent::DataObjectCache( 'Link', false, 'T_links', 'link_', 'link_ID' );
+		parent::__construct( 'Link', false, 'T_links', 'link_', 'link_ID' );
 	}
 
 
@@ -90,7 +129,7 @@ class LinkCache extends DataObjectCache
 	 * @param string Type of cached object ( '' - empty value to cache depend on link owner type, 'file' - to cache file )
 	 * @return boolean TRUE on success
 	 */
-	function add( & $Obj, $cache_type = '' )
+	function add( $Obj, $cache_type = '' )
 	{
 		if( ( !isset($Obj->ID) ) || ( $Obj->ID == 0 ) )
 		{ // The object is not cachable, becuase it has no valid ID
@@ -98,10 +137,10 @@ class LinkCache extends DataObjectCache
 		}
 
 		// If the object wasn't already cached and is valid:
-		$this->cache[$Obj->ID] = & $Obj;
+		$this->cache[$Obj->ID] = $Obj;
 		if( $cache_type == 'file' )
 		{ // Cache by File ID
-			$this->cache_file[$Obj->file_ID][$Obj->ID] = & $Obj;
+			$this->cache_file[$Obj->file_ID][$Obj->ID] = $Obj;
 			return true;
 		}
 
@@ -116,15 +155,27 @@ class LinkCache extends DataObjectCache
 		switch( $LinkOwner->type )
 		{
 			case 'item': // cache indexed by Item ID
-				$this->cache_item[$link_object_ID][$Obj->ID] = & $Obj;
+				$this->cache_item[$link_object_ID][$Obj->ID] = $Obj;
 				break;
 
 			case 'comment': // cache indexed by Comment ID
-				$this->cache_comment[$link_object_ID][$Obj->ID] = & $Obj;
+				$this->cache_comment[$link_object_ID][$Obj->ID] = $Obj;
 				break;
 
 			case 'user': // cache indexed by User ID
-				$this->cache_user[$link_object_ID][$Obj->ID] = & $Obj;
+				$this->cache_user[$link_object_ID][$Obj->ID] = $Obj;
+				break;
+
+			case 'emailcampaign': // cache indexed by EmailCampaign ID
+				$this->cache_emailcampaign[$link_object_ID][$Obj->ID] = & $Obj;
+				break;
+
+			case 'message': // cache indexed by Message ID
+				$this->cache_message[$link_object_ID][$Obj->ID] = & $Obj;
+				break;
+
+			case 'temporary': // cache indexed by Temporary ID
+				$this->cache_temporary[$link_object_ID][$Obj->ID] = & $Obj;
 				break;
 
 			default:
@@ -186,6 +237,30 @@ class LinkCache extends DataObjectCache
 				if( isset( $this->cache_user[$link_object_ID][$Obj->ID] ) )
 				{
 					unset( $this->cache_user[$link_object_ID][$Obj->ID] );
+					return true;
+				}
+				break;
+
+			case 'emailcampaign':
+				if( isset( $this->cache_emailcampaign[$link_object_ID][$Obj->ID] ) )
+				{
+					unset( $this->cache_emailcampaign[$link_object_ID][$Obj->ID] );
+					return true;
+				}
+				break;
+
+			case 'message':
+				if( isset( $this->cache_message[$link_object_ID][$Obj->ID] ) )
+				{
+					unset( $this->cache_message[$link_object_ID][$Obj->ID] );
+					return true;
+				}
+				break;
+
+			case 'temporary':
+				if( isset( $this->cache_temporary[$link_object_ID][$Obj->ID] ) )
+				{
+					unset( $this->cache_temporary[$link_object_ID][$Obj->ID] );
 					return true;
 				}
 				break;
@@ -254,6 +329,57 @@ class LinkCache extends DataObjectCache
 
 
 	/**
+	 * Returns links for a given Email Campaign
+	 *
+	 * Loads if necessary
+	 *
+	 * @param integer Email campaign ID to load links for
+	 * @return array of refs to Link objects
+	 */
+	function & get_by_emailcampaign_ID( $emailcampaign_ID )
+	{
+		// Make sure links are loaded:
+		$this->load_by_emailcampaign_ID( $emailcampaign_ID );
+
+		return $this->cache_emailcampaign[ $emailcampaign_ID ];
+	}
+
+
+	/**
+	 * Returns links for a given Message
+	 *
+	 * Loads if necessary
+	 *
+	 * @param integer Message ID to load links for
+	 * @return array of refs to Link objects
+	 */
+	function & get_by_message_ID( $message_ID )
+	{
+		// Make sure links are loaded:
+		$this->load_by_message_ID( $message_ID );
+
+		return $this->cache_message[ $message_ID ];
+	}
+
+
+	/**
+	 * Returns links for a given temporary object
+	 *
+	 * Loads if necessary
+	 *
+	 * @param integer Temporary ID to load links for
+	 * @return array of refs to Link objects
+	 */
+	function & get_by_temporary_ID( $temporary_ID )
+	{
+		// Make sure links are loaded:
+		$this->load_by_temporary_ID( $temporary_ID );
+
+		return $this->cache_temporary[ $temporary_ID ];
+	}
+
+
+	/**
 	 * Returns links for a given File
 	 *
 	 * Loads if necessary
@@ -274,12 +400,13 @@ class LinkCache extends DataObjectCache
 	 * Load a set of Links by the given link type into the cache.
 	 *
 	 * @param SQL SQL object
+	 * @param string Cache type
 	 */
 	function load_type_by_sql( $SQL, $cache_type )
 	{
 		global $DB;
 
-		$links = $DB->get_results( $SQL->get() );
+		$links = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
 
 		// Load linked files into the FileCache
 		$this->load_linked_files( $links );
@@ -333,7 +460,7 @@ class LinkCache extends DataObjectCache
 
 			$Debuglog->add( "Loading <strong>$this->objtype(Item #$item_ID)</strong> into cache", 'dataobjects' );
 
-			$SQL = new SQL( 'Get the links by item ID' );
+			$SQL = new SQL( 'Get the links by item ID #'.$item_ID );
 			$SQL->SELECT( '*' );
 			$SQL->FROM( 'T_links' );
 			$SQL->WHERE( 'link_itm_ID  = '.$DB->quote( $item_ID ) );
@@ -369,7 +496,7 @@ class LinkCache extends DataObjectCache
 
 		$Debuglog->add( "Loading <strong>$this->objtype(Comment #$comment_ID)</strong> into cache", 'dataobjects' );
 
-		$SQL = new SQL( 'Get the links by comment ID' );
+		$SQL = new SQL( 'Get the links by comment ID #'.$comment_ID );
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_cmt_ID  = '.$DB->quote( $comment_ID ) );
@@ -402,13 +529,112 @@ class LinkCache extends DataObjectCache
 
 		$Debuglog->add( "Loading <strong>$this->objtype(User #$user_ID)</strong> into cache", 'dataobjects' );
 
-		$SQL = new SQL( 'Get the links by user ID' );
+		$SQL = new SQL( 'Get the links by user ID #'.$user_ID );
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_usr_ID  = '.$DB->quote( $user_ID ) );
 		$SQL->ORDER_BY( 'link_file_ID' );
 
 		$this->load_type_by_sql( $SQL, 'user' );
+
+		return true;
+	}
+
+
+	/**
+	 * Load links for a given Email Campaign
+	 *
+	 * @param integer Email campaign ID to load links for
+	 */
+	function load_by_emailcampaign_ID( $emailcampaign_ID )
+	{
+		global $DB, $Debuglog;
+
+		if( isset( $this->loaded_cache_emailcampaign[ $emailcampaign_ID ] ) )
+		{
+			$Debuglog->add( "Already loaded <strong>$this->objtype(EmailCampaign #$emailcampaign_ID)</strong> into cache", 'dataobjects' );
+			return false;
+		}
+
+		// Remember this special load:
+		$this->cache_emailcampaign[ $emailcampaign_ID ] = array();
+		$this->loaded_cache_emailcampaign[ $emailcampaign_ID ] = true;
+
+		$Debuglog->add( "Loading <strong>$this->objtype(EmailCampaign #$emailcampaign_ID)</strong> into cache", 'dataobjects' );
+
+		$SQL = new SQL( 'Get the links by email campaign ID #'.$emailcampaign_ID );
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_links' );
+		$SQL->WHERE( 'link_ecmp_ID  = '.$DB->quote( $emailcampaign_ID ) );
+		$SQL->ORDER_BY( 'link_file_ID' );
+
+		$this->load_type_by_sql( $SQL, 'emailcampaign' );
+
+		return true;
+	}
+
+
+	/**
+	 * Load links for a given Email Campaign
+	 *
+	 * @param integer Message ID to load links for
+	 */
+	function load_by_message_ID( $message_ID )
+	{
+		global $DB, $Debuglog;
+
+		if( isset( $this->loaded_cache_message[ $message_ID ] ) )
+		{
+			$Debuglog->add( "Already loaded <strong>$this->objtype(Message #$message_ID)</strong> into cache", 'dataobjects' );
+			return false;
+		}
+
+		// Remember this special load:
+		$this->cache_message[ $message_ID ] = array();
+		$this->loaded_cache_message[ $message_ID ] = true;
+
+		$Debuglog->add( "Loading <strong>$this->objtype(Message #$message_ID)</strong> into cache", 'dataobjects' );
+
+		$SQL = new SQL( 'Get the links by message ID #'.$message_ID );
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_links' );
+		$SQL->WHERE( 'link_msg_ID  = '.$DB->quote( $message_ID ) );
+		$SQL->ORDER_BY( 'link_file_ID' );
+
+		$this->load_type_by_sql( $SQL, 'message' );
+
+		return true;
+	}
+
+
+	/**
+	 * Load links for a given Temporary ID object
+	 *
+	 * @param integer Temporary ID to load links for
+	 */
+	function load_by_temporary_ID( $temporary_ID )
+	{
+		global $DB, $Debuglog;
+
+		if( isset( $this->loaded_cache_temporary[ $temporary_ID ] ) )
+		{
+			$Debuglog->add( "Already loaded <strong>$this->objtype(Temporary #$temporary_ID)</strong> into cache", 'dataobjects' );
+			return false;
+		}
+
+		// Remember this special load:
+		$this->cache_temporary[ $temporary_ID ] = array();
+		$this->loaded_cache_temporary[ $temporary_ID ] = true;
+
+		$Debuglog->add( "Loading <strong>$this->objtype(Temporary #$temporary_ID)</strong> into cache", 'dataobjects' );
+
+		$SQL = new SQL( 'Get the links by temporary ID #'.$temporary_ID );
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_links' );
+		$SQL->WHERE( 'link_tmp_ID  = '.$DB->quote( $temporary_ID ) );
+		$SQL->ORDER_BY( 'link_file_ID' );
+
+		$this->load_type_by_sql( $SQL, 'temporary' );
 
 		return true;
 	}
@@ -425,6 +651,11 @@ class LinkCache extends DataObjectCache
 	{
 		global $DB, $Debuglog;
 
+		if( empty( $itemIDarray ) )
+		{	// Nothing to load:
+			return false;
+		}
+
 		$item_list = implode( ',', $itemIDarray );
 
 		$Debuglog->add( "Loading <strong>$this->objtype(Items #$item_list)</strong> into cache", 'dataobjects' );
@@ -436,7 +667,7 @@ class LinkCache extends DataObjectCache
 			$this->loaded_cache_item[$item_ID] = true;
 		}
 
-		$SQL = new SQL( 'Get the links by item IDs' );
+		$SQL = new SQL( 'Get the links by item IDs: '.$item_list );
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_itm_ID IN ('.$item_list.')' );
@@ -445,6 +676,42 @@ class LinkCache extends DataObjectCache
 		$this->load_type_by_sql( $SQL, 'item' );
 
 		return true;
+	}
+
+
+	/**
+	 * Load links for a given Comment list
+	 *
+	 * @todo cache Link targets before letting the Link constructor handle it
+	 *
+	 * @param array Comment IDs to load links for
+	 */
+	function load_by_comment_list( $comment_IDs )
+	{
+		global $DB, $Debuglog;
+
+		if( empty( $comment_IDs ) )
+		{	// Nothing to load:
+			return;
+		}
+
+		$comment_list = implode( ',', $comment_IDs );
+
+		$Debuglog->add( "Loading <strong>$this->objtype(Comments #$comment_list)</strong> into cache", 'dataobjects' );
+
+		foreach( $comment_IDs as $comment_ID )
+		{ // Remember this special load for each comment in list:
+			$this->cache_comment[ $comment_ID ] = array();
+			$this->loaded_cache_comment[ $comment_ID ] = true;
+		}
+
+		$SQL = new SQL( 'Get the links by comment IDs: '.$comment_list );
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_links' );
+		$SQL->WHERE( 'link_cmt_ID IN ( '.$comment_list.' )' );
+		$SQL->ORDER_BY( 'link_ID' );
+
+		$this->load_type_by_sql( $SQL, 'comment' );
 	}
 
 
@@ -469,7 +736,7 @@ class LinkCache extends DataObjectCache
 
 		$Debuglog->add( "Loading <strong>$this->objtype(File #$file_ID)</strong> into cache", 'dataobjects' );
 
-		$SQL = new SQL( 'Get the links by file ID' );
+		$SQL = new SQL( 'Get the links by file ID #'.$file_ID );
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_file_ID = '.$DB->quote( $file_ID ) );
@@ -518,7 +785,7 @@ class LinkCache extends DataObjectCache
 	 * Clear the cache **extensively**
 	 *
 	 * @param boolean Keep copy of cache in case we try to re instantiate previous object
-	 * @param string What to clear: 'all', 'user', 'item', 'comment', 'file'
+	 * @param string What to clear: 'all', 'user', 'item', 'comment', 'emailcampaign', 'message', 'file'
 	 * @param integer ID of the clearing object
 	 */
 	function clear( $keep_shadow = false, $object = 'all', $object_ID = 0 )
@@ -535,6 +802,8 @@ class LinkCache extends DataObjectCache
 				$this->loaded_cache_comment = array();
 				$this->cache_user = array();
 				$this->loaded_cache_user = array();
+				$this->loaded_cache_emailcampaign = array();
+				$this->loaded_cache_message = array();
 				$this->cache_file = array();
 				$this->loaded_cache_file = array();
 				break;
@@ -542,6 +811,9 @@ class LinkCache extends DataObjectCache
 			case 'item':
 			case 'comment':
 			case 'user':
+			case 'emailcampaign':
+			case 'message':
+			case 'temporary':
 			case 'file':
 				// Clear only the selected type of objects
 				if( empty( $object_ID ) )

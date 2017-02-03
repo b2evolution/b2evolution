@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var ItemList2
  */
@@ -33,7 +33,7 @@ $Form = new Form();
 $redirect_to = regenerate_url( 'action', '', '', '&' );
 $Form->global_icon( T_('Cancel editing!'), 'close', $redirect_to, 4, 2 );
 
-$Form->begin_form( 'fform', T_('Mass edit the current post list') );
+$Form->begin_form( 'fform', T_('Mass edit the current post list').get_manual_link( 'mass-edit-screen' ) );
 
 // hidden params
 $Form->add_crumb( 'item' );

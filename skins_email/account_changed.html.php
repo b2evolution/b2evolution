@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.html.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url, $htsrv_url, $current_User;
+global $admin_url, $current_User;
 
 // Default params:
 $params = array_merge( array(
@@ -25,7 +25,7 @@ $params = array_merge( array(
 	), $params );
 
 
-echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_('There have been significant changes on this user profile made by %s'), '<b>'.$current_User->get( 'login' ).'</b>' ).':</p>'."\n";
+echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_('There have been significant changes on this user profile made by %s'), '<b>'.$current_User->get_username().'</b>' ).':</p>'."\n";
 
 echo '<table'.emailskin_style( 'table.email_table.bordered' ).' cellspacing="0">'."\n";
 echo '<thead><tr><th'.emailskin_style( 'table.email_table.bordered thead th' ).'>'.T_('Field').'</th>'
@@ -68,14 +68,14 @@ if( $User = & $UserCache->get_by_ID( $params['user_ID'], false, false ) )
 	if( $params['avatar_changed'] )
 	{ // If profile pictre has been changed
 		echo '<p'.emailskin_style( '.p' ).'>'.T_('The main profile picture was changed to:').'</p>'."\n";
-		echo '<p'.emailskin_style( '.p' ).'>'.$User->get_avatar_File()->get_tag( '', '', '', '', 'fit-320x320' ).'</p>'."\n";
+		echo '<p'.emailskin_style( '.p' ).'>'.$User->get_avatar_File()->get_tag( '', '', '', '', 'fit-320x320','original', '', '', '', '', '', '#', '', 1, 'none' ).'</p>'."\n";
 	}
 	elseif( $params['new_avatar_upload'] )
 	{ // Display the newly uploaded file only if it was not set as main profile picture
 		echo '<p'.emailskin_style( '.p' ).'>'.T_('A new profile picture file was uploaded:').'</p>'."\n";
-		echo '<p'.emailskin_style( '.p' ).'>'.$new_File->get_tag( '', '', '', '', 'fit-320x320' ).'</p>'."\n";
+		echo '<p'.emailskin_style( '.p' ).'>'.$new_File->get_tag( '', '', '', '', 'fit-320x320','original', '', '', '', '', '', '#', '', 1, 'none' ).'</p>'."\n";
 	}
-	// Display warning message about duplicated files 
+	// Display warning message about duplicated files
 	echo $duplicated_files_message;
 
 	// User's pictures:
@@ -103,7 +103,7 @@ echo "</div>\n";
 
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notifications about user changes, click here:' )
-			.' <a href="'.$htsrv_url.'quick_unsubscribe.php?type=account_changed&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
+			.' <a href="'.get_htsrv_url().'quick_unsubscribe.php?type=account_changed&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
 			.T_('instant unsubscribe').'</a>.';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------

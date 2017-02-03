@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage basic
@@ -37,11 +37,11 @@ $comment_reply_ID = param( 'reply_ID', 'integer', 0 );
 		$comment_author_url = $Comment->author_url;
 		$comment_text = $Comment->content;
 	}
-	$redirect = htmlspecialchars(url_rel_to_same_host(regenerate_url('','','','&'), $htsrv_url));
+	$redirect = htmlspecialchars( url_rel_to_same_host( regenerate_url( '', '', '', '&' ), get_htsrv_url() ) );
 ?>
 
 <!-- form to add a comment -->
-<form action="<?php echo $htsrv_url ?>comment_post.php" method="post" id="bComment_form_id_<?php echo $Item->ID ?>">
+<form action="<?php echo get_htsrv_url() ?>comment_post.php" method="post" id="bComment_form_id_<?php echo $Item->ID ?>">
 
 	<input type="hidden" name="comment_item_ID" value="<?php echo $Item->ID() ?>" />
 	<input type="hidden" name="redirect_to" value="<?php echo $Item->get_feedback_url( $disp == 'feedback-popup', '&' ) ?>" />
@@ -61,7 +61,7 @@ $comment_reply_ID = param( 'reply_ID', 'integer', 0 );
 		<tr valign="top" bgcolor="#eeeeee">
 			<td align="right"><strong><?php echo T_('User') ?>:</strong></td>
 			<td align="left">
-				<strong><?php echo $current_User->get_identity_link( array( 'link_text' => 'preferredname' ) )?></strong>
+				<strong><?php echo $current_User->get_identity_link( array( 'link_text' => 'auto' ) )?></strong>
 				<?php user_profile_link( ' [', ']', T_('Edit profile') ) ?>
 				</td>
 		</tr>

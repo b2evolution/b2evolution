@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -103,6 +103,8 @@ $AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
 $AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
 $AdminUI->breadcrumbpath_add( T_('Display'), '?ctrl=display' );
 
+// Set an url for manual page:
+$AdminUI->set_page_manual_link( 'user-settings-display-tab' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

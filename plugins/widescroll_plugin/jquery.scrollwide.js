@@ -192,7 +192,7 @@
 		scroll_control_obj.css( { // Set position and sizes for new created scroll control element
 			position: 'absolute',
 			left: control_css_left,
-			top: 0,
+			top: obj.position().top,
 			width: options.width,
 			height: obj.outerHeight() - 2
 		} );

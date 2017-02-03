@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -33,7 +33,7 @@ class ping_b2evonet_plugin extends Plugin
 	 */
 	var $code = 'ping_b2evonet';
 	var $priority = 50;
-	var $version = '5.0.0';
+	var $version = '6.7.9';
 	var $author = 'The b2evo Group';
 
 	/*
@@ -64,14 +64,21 @@ class ping_b2evonet_plugin extends Plugin
 	{
 		global $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri;
 		global $debug, $baseurl, $instance_name, $evo_charset;
+		global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
 
-    /**
+		/**
 		 * @var Blog
 		 */
 		$item_Blog = $params['Item']->get_Blog();
 
 		$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port);
 		$client->debug = ( $debug == 2 );
+
+		// Set proxy for outgoing connections:
+		if( ! empty( $outgoing_proxy_hostname ) )
+		{
+			$client->setProxy( $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password );
+		}
 
 		$message = new xmlrpcmsg( 'b2evo.ping', array(
 				new xmlrpcval($item_Blog->ID),    // id

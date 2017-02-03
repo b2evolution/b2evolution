@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package htsrv
@@ -27,9 +27,23 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'/_main.inc.php';
 
+
+// Don't check new updates from b2evolution.net (@see b2evonet_get_updates()),
+// in order to don't break the response data:
+$allow_evo_stats = false;
+
 if( ! isset($GLOBALS['files_Module']) )
 {
 	debug_die( 'Files module is disabled or missing!' );
+}
+
+if( param( 'abspath', 'string', NULL ) !== NULL )
+{	// If absolute path is requested then try to decode it to root and relative path:
+	if( $decoded_data = get_root_path_by_abspath( $abspath ) )
+	{	// Root and path are decoded, Use them:
+		set_param( 'root', $decoded_data['root'] );
+		set_param( 'path', $decoded_data['path'] );
+	}
 }
 
 // We need this param early to check blog perms, if possible
@@ -60,7 +74,7 @@ if( ! $public_access_to_media )
 }
 
 // Load the other params:
-param( 'path', 'string', true );
+param( 'path', 'filepath', true );
 param( 'size', 'string', NULL ); // Can be used for images.
 param( 'size_x', 'integer', 1 ); // Ratio size, can be 1, 2 and etc.
 param( 'mtime', 'integer', 0 );  // used for unique URLs (that never expire).
@@ -68,15 +82,6 @@ param( 'mtime', 'integer', 0 );  // used for unique URLs (that never expire).
 if( $size_x != 1 && $size_x != 2 )
 { // Allow only 1x and 2x sizes, in order to avoid hack that creates many x versions
 	$size_x = 1;
-}
-
-// TODO: dh> this failed with filenames containing multiple dots!
-if ( false !== strpos( urldecode( $path ), '..' ) )
-// TODO: dh> fix this better. by adding is_relative_path()?
-// fp> the following doesn't look secure. I can't take the risk. What if the path ends with or is just '..' ? I don't want to allow this to go through.
-// if( preg_match( '~\.\.[/\\\]~', urldecode( $path ) ) )
-{
-	debug_die( 'Relative pathnames not allowed!' );
 }
 
 // Load fileroot info:

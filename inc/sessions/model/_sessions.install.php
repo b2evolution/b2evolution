@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -49,6 +49,7 @@ $schema_queries['T_basedomains'] = array(
 			dom_name   VARCHAR(250)  COLLATE utf8_bin NOT NULL DEFAULT '',
 			dom_status ENUM('unknown','trusted','suspect','blocked') COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
 			dom_type   ENUM('unknown','normal','searcheng','aggregator','email') COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
+			dom_comment VARCHAR(255) DEFAULT NULL,
 			PRIMARY KEY     (dom_ID),
 			UNIQUE dom_type_name (dom_type, dom_name)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
@@ -75,7 +76,7 @@ $schema_queries['T_hitlog'] = array(
 			hit_disp              VARCHAR(30) DEFAULT NULL,
 			hit_ctrl              VARCHAR(30) COLLATE ascii_general_ci DEFAULT NULL,
 			hit_action            VARCHAR(30) DEFAULT NULL,
-			hit_type              ENUM('standard','rss','admin','ajax', 'service') COLLATE ascii_general_ci DEFAULT 'standard' NOT NULL,
+			hit_type              ENUM('standard','rss','admin','ajax', 'service', 'api') COLLATE ascii_general_ci DEFAULT 'standard' NOT NULL,
 			hit_referer_type      ENUM('search','special','spam','referer','direct','self') COLLATE ascii_general_ci NOT NULL,
 			hit_referer           VARCHAR(250) DEFAULT NULL,
 			hit_referer_dom_ID    INT UNSIGNED DEFAULT NULL,
@@ -87,6 +88,7 @@ $schema_queries['T_hitlog'] = array(
 			hit_agent_type        ENUM('robot','browser','unknown') COLLATE ascii_general_ci DEFAULT 'unknown' NOT NULL,
 			hit_agent_ID          SMALLINT UNSIGNED NULL DEFAULT NULL,
 			hit_response_code     SMALLINT DEFAULT NULL,
+			hit_method            ENUM('unknown','GET','POST','PUT','PATCH','DELETE','COPY','HEAD','OPTIONS','LINK','UNLINK','PURGE','LOCK','UNLOCK','PROPFIND','VIEW') COLLATE ascii_general_ci DEFAULT 'unknown' NOT NULL,
 			PRIMARY KEY              ( hit_ID ),
 			INDEX hit_coll_ID        ( hit_coll_ID ),
 			INDEX hit_uri            ( hit_uri ),
@@ -108,6 +110,32 @@ $schema_queries['T_hitlog'] = array(
 		//     MAYBE a 2 step process would make sense?
 		//      1) write to MyISAM and cron every x minutes to replicate to indexed table
 		//      2) consolidate once a day
+
+$schema_queries['T_hits__aggregate'] = array(
+		'Creating table for Hits aggregations',
+		"CREATE TABLE T_hits__aggregate (
+			hagg_ID           INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			hagg_date         DATE NOT NULL DEFAULT '2000-01-01',
+			hagg_coll_ID      INT(11) UNSIGNED NULL DEFAULT NULL,
+			hagg_type         ENUM('standard','rss','admin','ajax', 'service', 'api') COLLATE ascii_general_ci DEFAULT 'standard' NOT NULL,
+			hagg_referer_type ENUM('search','special','spam','referer','direct','self') COLLATE ascii_general_ci NOT NULL,
+			hagg_agent_type   ENUM('robot','browser','unknown') COLLATE ascii_general_ci DEFAULT 'unknown' NOT NULL,
+			hagg_count        INT(11) UNSIGNED NOT NULL,
+			PRIMARY KEY       (hagg_ID),
+			UNIQUE            hagg_date_coll_ID_types (hagg_date, hagg_coll_ID, hagg_type, hagg_referer_type, hagg_agent_type)
+		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
+
+$schema_queries['T_hits__aggregate_sessions'] = array(
+		'Creating table for aggregations of hit sessions',
+		"CREATE TABLE T_hits__aggregate_sessions (
+			hags_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			hags_date          DATE NOT NULL DEFAULT '2000-01-01',
+			hags_coll_ID       INT(11) UNSIGNED NULL DEFAULT NULL,
+			hags_count_browser INT(11) UNSIGNED NOT NULL DEFAULT 0,
+			hags_count_api     INT(11) UNSIGNED NOT NULL DEFAULT 0,
+			PRIMARY KEY        (hags_ID),
+			UNIQUE             hags_date_coll_ID (hags_date, hags_coll_ID)
+		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
 
 $schema_queries['T_track__goal'] = array(
 		'Creating goals table',

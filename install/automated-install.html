@@ -1,11 +1,14 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<title>b2evolution Automated Install</title>
 </head>
 <body>
 	<h1>b2evolution Automated Install/Upgrade</h1>
 	<p>Updated for version 6.6+</p>
+	<p>See <a href="http://b2evolution.net/man/automated-install">the online manual</a> for additional information.</p>
+
 	<h2>Purpose</h2>
 	<p>This document describes how you can most easily automate the installation of <a href="http://b2evolution.net/">b2evolution</a> on a hosting account.</p>
 	<p>This document also addresses automated upgrade of b2evolution.</p>
@@ -39,7 +42,7 @@
 	<h2>3. Run the install script</h2>
 	<p>At this point you can call b2evolution's install script through an HTTP GET request (wget, cURL, etc..) of this form:</p>
 	<pre>http://example.com/install/index.php?locale=en-US&amp;action=newdb&amp;create_sample_contents=all</pre>
-	
+
 	<h3>Use this form to generate an automated install test URL:</h3>
 	<form action="index.php" method="get" style="background-color:#ddd">
 		<input type="hidden" name="action" value="newdb" />
@@ -75,6 +78,10 @@
 				<label>MySQL Host/Server:</label>
 				<input type="text" name="db_host" value="localhost" />
 			</p>
+			<p>
+				<label>MySQL Table prefix:</label>
+				<input type="text" name="db_tableprefix" value="evo_" />
+			</p>
 		</fieldset>
 		<fieldset>
 			<legend>Admin Account</legend>
@@ -89,6 +96,17 @@
 			<p>
 				<label>E-mail:</label>
 				<input type="text" name="admin_email" value="postmaster@localhost" />
+			</p>
+		</fieldset>
+		<fieldset>
+			<legend>Technical options</legend>
+			<p>
+				<label>.htaccess handling:</label>
+				<select name="htaccess">
+					<option value="test">Test if supported &amp; install if no .htaccess found</option>
+					<option value="force">Force writing/updating .htaccess to latest version</option>
+					<option value="skip">Don't try to install .htaccess</option>
+				</select>
 			</p>
 		</fieldset>
 		<p>
@@ -119,6 +137,7 @@
 		<li>&lt;evo:error&gt;The DB schema has been changed since confirmation.&lt;/evo:error&gt;</li>
 		<li>&lt;evo:error&gt;b2evolution cannot be installed, because of the following errors:&lt;/evo:error&gt;</li>
 		<li>&lt;evo:error&gt;It seems that the database config settings you entered don't work. Please check them carefully and try again...&lt;/evo:error&gt;</li>
+		<li>&lt;evo:error&gt;You must pass db_config params or create a &lt;code&gt;/conf/_basic_config.php&lt;/code&gt; file before calling the installer.&lt;/evo:error&gt;</li>
 		<li>&lt;evo:error&gt;Could not load original conf file [/conf/_basic_config.php]. Is it missing?&lt;/evo:error&gt;</li>
 		<li>&lt;evo:error&gt;No default time zone is set. Please open PHP.ini and set the value of 'date.timezone' (Example: date.timezone = Europe/Paris) or open /conf/_advanced.php and set the value of $date_default_timezone (Example: $date_default_timezone = 'Europe/Paris';)&lt;/evo:error&gt;</li>
 		<li>&lt;evo:error&gt;ERROR: Impossible to connect to Database.&lt;/evo:error&gt;</li>
@@ -191,6 +210,17 @@
 				<label>Display:</label>
 				<label><input type="radio" name="display" value="normal" /> Normal</label>
 				<label><input type="radio" name="display" value="compact" checked="checked" /> Compact</label>
+			</p>
+		</fieldset>
+		<fieldset>
+			<legend>Technical options</legend>
+			<p>
+				<label>.htaccess handling:</label>
+				<select name="htaccess">
+					<option value="test">Test if supported &amp; install if no .htaccess found</option>
+					<option value="force">Force writing/updating .htaccess to latest version</option>
+					<option value="skip">Don't try to install .htaccess</option>
+				</select>
 			</p>
 		</fieldset>
 		<p>

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
@@ -154,7 +154,8 @@ function display_base_config_recap()
  */
 function install_newdb()
 {
-	global $new_db_version, $admin_url, $baseurl, $install_login, $random_password, $create_sample_contents;
+	global $new_db_version, $admin_url, $baseurl, $install_login, $random_password;
+	global $create_sample_contents, $create_sample_organization, $create_demo_users;
 
 	/*
 	 * -----------------------------------------------------------------------------------
@@ -165,11 +166,11 @@ function install_newdb()
 
 	if( $old_db_version = get_db_version() )
 	{
-		echo '<p class="text-warning"><strong><evo:warning>'.T_('OOPS! It seems b2evolution is already installed!').'</evo:warning></strong></p>';
+		echo get_install_format_text( '<p class="text-warning"><strong><evo:warning>'.T_('OOPS! It seems b2evolution is already installed!').'</evo:warning></strong></p>', 'p' );
 
 		if( $old_db_version < $new_db_version )
 		{
-			echo '<p>'.sprintf( T_('Would you like to <a %s>upgrade your existing installation now</a>?'), 'href="?action=evoupgrade"' ).'</p>';
+			echo get_install_format_text( '<p>'.sprintf( T_('Would you like to <a %s>upgrade your existing installation now</a>?'), 'href="?action=evoupgrade"' ).'</p>', 'p' );
 		}
 
 		return;
@@ -183,22 +184,67 @@ function install_newdb()
 	 */
 	$local_installation = param( 'local_installation', 'integer', ( $create_sample_contents == 'all' ? intval( check_local_installation() ) : 0 ) );
 
-	echo '<h2>'.T_('Creating b2evolution tables...').'</h2>';
+	echo get_install_format_text( '<h2>'.T_('Creating b2evolution tables...').'</h2>', 'h2' );
 	evo_flush();
 	create_tables();
 
 	// Update the progress bar status
 	update_install_progress_bar();
 
-	echo '<h2>'.T_('Creating minimum default data...').'</h2>';
+	// Create default data
+	echo get_install_format_text( '<h2>'.T_('Creating minimum default data...').'</h2>', 'h2' );
 	evo_flush();
 	create_default_data();
 
+
+	if( $create_sample_organization || $create_demo_users )
+	{
+		echo get_install_format_text( '<h2>'.T_('Creating sample organization and users...').'</h2>', 'h2' );
+		evo_flush();
+
+		// Create sample organization if selected
+		if( $create_sample_organization )
+		{
+			create_sample_organization();
+		}
+
+		// Create demo users if selected
+		if( $create_demo_users )
+		{
+			global $Settings;
+
+			// We're gonna need some environment in order to create the demo contents...
+			load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
+			load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
+			/**
+			* @var GeneralSettings
+			*/
+			$Settings = new GeneralSettings();
+
+			/**
+			* @var UserCache
+			*/
+			$UserCache = & get_UserCache();
+			// Create $current_User object.
+			// (Assigning by reference does not work with "global" keyword (PHP 5.2.8))
+			$GLOBALS['current_User'] = & $UserCache->get_by_ID( 1 );
+
+			create_demo_users();
+		}
+	}
+
+	// We need to have at least one section because it is a required field for collection:
+	global $DB;
+	task_begin( 'Creating default section... ' );
+	$DB->query( 'INSERT INTO T_section ( sec_ID, sec_name, sec_order, sec_owner_user_ID )
+		VALUES ( 1, "No Section", 1, 1 )' );
+	task_end();
+
 	if( $create_sample_contents )
 	{
-		global $Settings, $test_install_all_features;
+		global $Settings, $install_test_features;
 
-		echo '<h2>'.T_('Installing sample contents...').'</h2>';
+		echo get_install_format_text( '<h2>'.T_('Installing sample contents...').'</h2>', 'h2' );
 		evo_flush();
 
 		// We're gonna need some environment in order to create the demo contents...
@@ -220,23 +266,30 @@ function install_newdb()
 		create_demo_contents();
 	}
 
+	evo_flush();
+	create_default_email_campaigns();
+
 	// Update the progress bar status
 	update_install_progress_bar();
 
 	track_step( 'install-success' );
 
 	$install_result_title = T_('Installation successful!');
-	$install_result_body = '<p><strong>'
-		.sprintf( T_('Now you can <a %s>log in</a> with the following credentials:'), 'href="'.$admin_url.'"' )
-		.'</strong></p>'
-		.'<table>'
-			.'<tr><td>'.T_( 'Login' ).': &nbsp;</td><td><strong><evo:login>'.( isset( $install_login ) ? $install_login : 'admin' ).'</evo:login></strong></td></tr>'
-			.'<tr><td>'.T_( 'Password' ).': &nbsp;</td><td><strong><evo:password>'.$random_password.'</evo:password></strong></td></tr>'
-		.'</table>'
-		.'<br /><p>'.T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.').'</p>';
+	$install_result_body = get_install_format_text(
+		'<p><strong>'
+			.sprintf( T_('Now you can <a %s>log in</a> with the following credentials:'), 'href="'.$admin_url.'"' )
+		.'</strong></p>', 'p' )
+		.get_install_format_text(
+		'<table>'
+			.'<tr><td>'.T_( 'Login' ).': &nbsp;</td><td><strong><evo:login>'.( isset( $install_login ) ? $install_login : 'admin' ).'</evo:login></strong></td></tr>', 'br' )
+		.get_install_format_text(
+			'<tr><td>'.T_( 'Password' ).': &nbsp;</td><td><strong><evo:password>'.$random_password.'</evo:password></strong></td></tr>'
+		.'</table>', 'br' )
+		.get_install_format_text(
+		'<br /><p>'.T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.').'</p>', 'p' );
 
 	// Display installation data and instructions
-	echo '<h2>'.$install_result_title.'</h2>';
+	echo get_install_format_text( '<h2>'.$install_result_title.'</h2>', 'h2' );
 	echo $install_result_body;
 
 	// Modal window with installation data and instructions
@@ -250,7 +303,7 @@ function install_newdb()
  */
 function task_begin( $title )
 {
-	echo $title."\n";
+	echo get_install_format_text( $title."\n" );
 	evo_flush();
 }
 
@@ -261,7 +314,7 @@ function task_begin( $title )
  */
 function task_end( $message = 'OK.' )
 {
-	echo $message."<br />\n";
+	echo get_install_format_text( $message."<br />\n", 'br' );
 }
 
 
@@ -415,52 +468,56 @@ function create_default_locales()
 function create_default_settings( $override = array() )
 {
 	global $DB, $new_db_version, $default_locale;
-	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users, $Group_Suspect, $Group_Spam;
-	global $test_install_all_features, $create_sample_contents, $install_site_color, $local_installation;
+	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $spam_Group;
+	global $install_test_features, $create_sample_contents, $install_site_color, $local_installation;
+	global $create_sample_organization, $create_demo_users;
 
 	$defaults = array(
 		'db_version' => $new_db_version,
 		'default_locale' => $default_locale,
-		'newusers_grp_ID' => $Group_Users->ID,
+		'newusers_grp_ID' => $users_Group->ID,
 		'evocache_foldername' => '_evocache',
 		'newusers_canregister' => 'yes',
 		'registration_is_public' => 1,
 		'quick_registration' => 1,
 	);
-	if( $test_install_all_features )
+	if( $install_test_features )
 	{
 		$defaults['gender_colored'] = 1;
+		echo_install_log( 'TEST FEATURE: Enabling colored gender usernames by default' );
 		$defaults['registration_require_country'] = 1;
 		$defaults['registration_require_gender'] = 'required';
+		echo_install_log( 'TEST FEATURE: Making country and gender required on registration' );
 		$defaults['location_country'] = 'required';
 		$defaults['location_region'] = 'required';
 		$defaults['location_subregion'] = 'required';
 		$defaults['location_city'] = 'required';
+		echo_install_log( 'TEST FEATURE: Making country, region, sub-region and city required by default' );
 	}
 	if( !empty( $install_site_color ) )
 	{ // Set default site color
 		$defaults['site_color'] = $install_site_color;
 	}
-	if( !empty( $Group_Suspect ) )
+	if( !empty( $suspect_Group ) )
 	{ // Set default antispam suspicious group
-		$defaults['antispam_suspicious_group'] = $Group_Suspect->ID;
+		$defaults['antispam_suspicious_group'] = $suspect_Group->ID;
 	}
 	$antispam_trust_groups = array();
-	if( !empty( $Group_Admins ) )
+	if( !empty( $admins_Group ) )
 	{
-		$antispam_trust_groups[] = $Group_Admins->ID;
+		$antispam_trust_groups[] = $admins_Group->ID;
 	}
-	if( !empty( $Group_Privileged ) )
+	if( !empty( $moderators_Group ) )
 	{
-		$antispam_trust_groups[] = $Group_Privileged->ID;
+		$antispam_trust_groups[] = $moderators_Group->ID;
 	}
-	if( !empty( $Group_Bloggers ) )
+	if( !empty( $editors_Group ) )
 	{
-		$antispam_trust_groups[] = $Group_Bloggers->ID;
+		$antispam_trust_groups[] = $editors_Group->ID;
 	}
-	if( !empty( $Group_Spam ) )
+	if( !empty( $spam_Group ) )
 	{
-		$antispam_trust_groups[] = $Group_Spam->ID;
+		$antispam_trust_groups[] = $spam_Group->ID;
 	}
 	if( count( $antispam_trust_groups ) > 0 )
 	{ // Set default antispam trust group
@@ -505,11 +562,12 @@ function install_basic_skins( $install_mobile_skins = true )
 
 	task_begin( 'Installing default skins... ' );
 
-	// Note: Skin #1 will we used by Home
-	skin_install( 'bootstrap_main_skin' );
-
-	// Note: Skin #2 will we used by Blog A and Blog B
+	// Note: Skin #1 will we used by Blog A and Blog B
+	// Install this skin firstly in order to use it by default for all collections with wrong skin ID on upgrade process:
 	skin_install( 'bootstrap_blog_skin' );
+
+	// Note: Skin #2 will we used by Home
+	skin_install( 'bootstrap_main_skin' );
 
 	// Note: Skin #3 will we used by Photos
 	skin_install( 'bootstrap_gallery_skin' );
@@ -520,22 +578,35 @@ function install_basic_skins( $install_mobile_skins = true )
 	// Note: Skin #5 will we used by Manual
 	skin_install( 'bootstrap_manual_skin' );
 
-	skin_install( 'asevo' );
-	skin_install( 'dating_mood' );
-	skin_install( 'evocamp' );
-	skin_install( 'evopress' );
-	skin_install( 'forums' );
-	skin_install( 'manual' );
-	skin_install( 'photoalbums' );
-	skin_install( 'photoblog' );
-	skin_install( 'pixelgreen' );
-	skin_install( 'pureforums' );
+	// skin_install( 'asevo' );
+	// skin_install( 'dating_mood' );
+	// skin_install( 'evopress' );
+	// skin_install( 'photoalbums' );
+	// skin_install( 'photoblog' );
+	// skin_install( 'pureforums' );
 	if( $install_mobile_skins )
 	{
 		skin_install( 'touch' );
 	}
 	skin_install( '_atom' );
 	skin_install( '_rss2' );
+
+	// Install default site skin:
+	$default_site_Skin = skin_install( 'default_site_skin' );
+	if( $default_site_Skin && $default_site_Skin->ID > 0 )
+	{	// Use the installed skin as default for site:
+		global $Settings;
+		if( empty( $Settings ) )
+		{	// Initialize general settings:
+			load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
+			$Settings = new GeneralSettings();
+		}
+		$Settings->set( 'normal_skin_ID', $default_site_Skin->ID );
+		$Settings->dbupdate();
+	}
+
+	skin_install( 'bootstrap_site_navbar_skin' );
+	skin_install( 'bootstrap_site_tabs_skin' );
 
 	task_end();
 }
@@ -560,7 +631,7 @@ function install_basic_plugins( $old_db_version = 0 )
 	/**
 	 * @var Plugins_admin
 	 */
-	global $Plugins_admin, $test_install_all_features;
+	global $Plugins_admin, $install_test_features;
 
 	$Plugins_admin = & get_Plugins_admin();
 
@@ -585,8 +656,9 @@ function install_basic_plugins( $old_db_version = 0 )
 
 	if( $old_db_version < 9290 )
 	{
-		if( $test_install_all_features )
+		if( $install_test_features )
 		{
+			echo_install_log( 'TEST FEATURE: Installing plugin "Smilies"' );
 			install_plugin( 'smilies_plugin' );
 		}
 		install_plugin( 'videoplug_plugin' );
@@ -612,15 +684,16 @@ function install_basic_plugins( $old_db_version = 0 )
 	{ // Upgrade to 5.0.0
 		install_plugin( 'flowplayer_plugin' );
 
-		if( $test_install_all_features )
+		if( $install_test_features )
 		{
+			echo_install_log( 'TEST FEATURE: Installing plugin "Google Maps"' );
 			install_plugin( 'google_maps_plugin' );
 		}
 	}
 
 	if( $old_db_version < 11000 )
 	{ // Upgrade to 5.0.0-alpha-4
-		if( $test_install_all_features )
+		if( $install_test_features )
 		{
 			$captcha_qstn_plugin_settings = array(
 					'questions' => T_('What is the color of the sky? blue|grey|gray|dark')."\r\n".
@@ -628,6 +701,7 @@ function install_basic_plugins( $old_db_version = 0 )
 												 T_('What color is a carrot? orange|yellow')."\r\n".
 												 T_('What color is a tomato? red')
 				);
+			echo_install_log( 'TEST FEATURE: Creating sample questions for plugin "Captcha questions"' );
 		}
 		else
 		{
@@ -644,21 +718,45 @@ function install_basic_plugins( $old_db_version = 0 )
 		// files
 		install_plugin( 'html5_mediaelementjs_plugin' );
 		install_plugin( 'html5_videojs_plugin' );
-		install_plugin( 'watermark_plugin', $test_install_all_features );
+		install_plugin( 'watermark_plugin', $install_test_features );
+		if( $install_test_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "Watermark"' );
+		}
 		// ping
 		install_plugin( 'generic_ping_plugin' );
 		// rendering
 		install_plugin( 'escapecode_plugin' );
-		install_plugin( 'bbcode_plugin', $test_install_all_features );
-		install_plugin( 'star_plugin', $test_install_all_features );
-		install_plugin( 'prism_plugin', $test_install_all_features );
-		install_plugin( 'code_highlight_plugin', $test_install_all_features );
+		install_plugin( 'bbcode_plugin', $install_test_features );
+		if( $install_test_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "BB code"' );
+		}
+		install_plugin( 'star_plugin', $install_test_features );
+		if( $install_test_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "Star renderer"' );
+		}
+		install_plugin( 'prism_plugin', $install_test_features );
+		if( $install_test_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "Prism"' );
+		}
+		install_plugin( 'code_highlight_plugin', $install_test_features );
+		if( $install_test_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "Code highlight"' );
+		}
 		install_plugin( 'gmcode_plugin' );
 		install_plugin( 'wacko_plugin' );
-		install_plugin( 'wikilinks_plugin' );
+		install_plugin( 'shortlinks_plugin' );
 		install_plugin( 'wikitables_plugin' );
 		install_plugin( 'markdown_plugin' );
-		install_plugin( 'infodots_plugin', $test_install_all_features );
+		install_plugin( 'infodots_plugin', $install_test_features );
+		if( $install_test_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "Info dots renderer"' );
+		}
 		install_plugin( 'widescroll_plugin' );
 		// widget
 		install_plugin( 'facebook_plugin' );
@@ -674,7 +772,17 @@ function install_basic_plugins( $old_db_version = 0 )
 
 	if( $old_db_version < 11490 )
 	{ // Upgrade to 6.7.1-stable
-		install_plugin( 'adjust_headings_plugin', $test_install_all_features );
+		install_plugin( 'adjust_headings_plugin', $install_test_features );
+		if( $install_test_features )
+		{
+			echo_install_log( 'TEST FEATURE: Activating plugin "Adjust headings"' );
+		}
+		install_plugin( 'cookie_consent_plugin', false );
+	}
+
+	if( $old_db_version < 11730 )
+	{
+		install_plugin( 'custom_tags_plugin', true );
 	}
 }
 
@@ -696,9 +804,9 @@ function install_plugin( $plugin, $activate = true, $settings = array() )
 
 	task_begin( 'Installing plugin: '.$plugin.'... ' );
 	$edit_Plugin = & $Plugins_admin->install( $plugin, 'broken' ); // "broken" by default, gets adjusted later
-	if( ! is_a( $edit_Plugin, 'Plugin' ) )
+	if( ! ( $edit_Plugin instanceof Plugin ) )
 	{ // Broken plugin
-		echo '<span class="text-danger"><evo:error>'.$edit_Plugin.'</evo:error></span><br />'."\n";
+		echo get_install_format_text( '<span class="text-danger"><evo:error>'.$edit_Plugin.'</evo:error></span><br />'."\n", 'br' );
 		return false;
 	}
 
@@ -719,7 +827,7 @@ function install_plugin( $plugin, $activate = true, $settings = array() )
 		$enable_return = $edit_Plugin->BeforeEnable();
 		if( $enable_return !== true )
 		{ // Warning on enable a plugin
-			echo '<span class="text-warning"><evo:warning>'.$enable_return.'</evo:warning></span><br />'."\n";
+			echo get_install_format_text( '<span class="text-warning"><evo:warning>'.$enable_return.'</evo:warning></span><br />'."\n", 'br' );
 
 			// Set plugin status to "needs_config" to mark the plugin as incomplete for using:
 			$Plugins_admin->set_Plugin_status( $edit_Plugin, 'needs_config' );
@@ -964,38 +1072,44 @@ function create_relations()
 /**
  * Install htaccess: Check if it works with the webserver, then install it for real.
  *
+ * @param boolean are we upgrading (vs installing)?
+ * @param boolean Force copying htaccess
  * @return boolean TRUE if no errors
  */
-function install_htaccess( $upgrade = false )
+function install_htaccess( $upgrade = false, $force_htaccess = false )
 {
-	echo '<p>'.T_('Preparing to install <code>/.htaccess</code> in the base folder...').' ';
+	echo get_install_format_text( '<p>'.T_('Preparing to install <code>/.htaccess</code> in the base folder...').' (Force='.($force_htaccess?'yes':'no').')<br />', 'p-start-br' );
 
-	$server = isset( $_SERVER['SERVER_SOFTWARE'] ) ? $_SERVER['SERVER_SOFTWARE'] : '';
-	if( ! empty( $server ) && preg_match( '~(Nginx|Lighttpd|Microsoft-IIS)~i', $server ) )
-	{ // Skip installation if this is not an Apache server
-		echo '<br /><b class="text-warning"><evo:warning>'.T_('.htaccess is not needed because your web server is not Apache. WARNING: you will need to configure your web server manually.').'</evo:warning></b></p>';
-		return true;
+	if( ! $force_htaccess )
+	{	// Check if we run apache...
+		$server = isset( $_SERVER['SERVER_SOFTWARE'] ) ? $_SERVER['SERVER_SOFTWARE'] : '';
+		if( ! empty( $server ) && preg_match( '~(Nginx|Lighttpd|Microsoft-IIS)~i', $server ) )
+		{ // Skip installation if this is not an Apache server
+			echo get_install_format_text( '<br /><b class="text-warning"><evo:warning>'.T_('.htaccess is not needed because your web server is not Apache. WARNING: you will need to configure your web server manually.').'</evo:warning></b></p>', 'p-end' );
+			return true;
+		}
 	}
 
-	$error_message = do_install_htaccess( $upgrade );
+	$error_message = do_install_htaccess( $upgrade, $force_htaccess );
 
 	if( $error_message )
 	{
+
+		echo get_install_format_text( '<span class="text-danger"><evo:error>'.T_('ERROR!').'<br /><b>'.$error_message.'</b></evo:error></span>' );
+
+		// Do we want to ignore the error?
 		$htignore = param( 'htignore', 'integer', 0 );
-
-		echo '<span class="text-danger"><evo:error>'.T_('ERROR!').'<br/><b>'.$error_message.'</b></evo:error></span>';
-
 		if( $htignore )
-		{ // Ignore errors with .htaccess file
+		{ // Ignore error with .htaccess file and continue install...
 			return true;
 		}
 		else
 		{ // Some errors are existing with .htaccess file, Display a link to ignore the errors and continue instalation
-			echo '<ul class="pager"><li><a href="'.$_SERVER['REQUEST_URI'].'&htignore=1" style="font-size:150%;font-weight:bold;">'.T_('Continue installation').' <span aria-hidden="true">&rarr;</span></a></li></ul>';
+			echo get_install_format_text( '<ul class="pager"><li><a href="'.( isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '' ).'&htignore=1" style="font-size:150%;font-weight:bold;">'.T_('Continue installation').' <span aria-hidden="true">&rarr;</span></a></li></ul>', 'li' );
 			return false;
 		}
 	}
-	echo '</p>';
+	echo get_install_format_text( '</p>', 'p-end' );
 
 	return true;
 }
@@ -1005,40 +1119,13 @@ function install_htaccess( $upgrade = false )
  * This will verify that the provided sample.htaccess does not crash apache in a test folder before installing it for real.
  *
  * @param boolean are we upgrading (vs installing)?
+ * @param boolean Force copying htaccess
  * @return mixed
  */
-function do_install_htaccess( $upgrade = false )
+function do_install_htaccess( $upgrade = false, $force_htaccess = false )
 {
 	global $baseurl;
 	global $basepath;
-
-	if( @file_exists( $basepath.'.htaccess' ) )
-	{
-		if( $upgrade )
-		{
-			echo '<span class="text-warning"><evo:warning>'.T_('Already installed.').'</evo:warning></span>';
-			return ''; // all is well :)
-		}
-
-		if( @file_exists( $basepath.'sample.htaccess' ) )
-		{
-			$content_htaccess = trim( file_get_contents( $basepath.'.htaccess' ) );
-			$content_sample_htaccess = trim( file_get_contents( $basepath.'sample.htaccess' ) );
-
-			if( $content_htaccess != $content_sample_htaccess )
-			{ // The .htaccess file has content that different from a sample file
-				echo '<p class="text-danger"><evo:error>'.T_('There is already a file called .htaccess at the blog root. If you don\'t specifically need this file, it is recommended that you delete it or rename it to old.htaccess before you continue. This will allow b2evolution to create a new .htaccess file that is optimized for best results.').'</evo:error></p>';
-				echo T_('Here are the contents of the current .htaccess file:');
-				echo '<div style="overflow:auto"><pre>'.htmlspecialchars( $content_htaccess ).'</pre></div><br />';
-				return sprintf( T_('Again, we recommend you remove this file before continuing. If you chose to keep it, b2evolution will probably still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="'.get_manual_url( 'htaccess-file' ).'" target="_blank"' );
-			}
-			else
-			{
-				echo '<span class="text-warning"><evo:warning>'.T_('Already installed.').'</evo:warning></span>';
-				return '';
-			}
-		}
-	}
 
 	// Make sure we have a sample file to start with:
 	if( ! @file_exists( $basepath.'sample.htaccess' ) )
@@ -1046,22 +1133,58 @@ function do_install_htaccess( $upgrade = false )
 		return T_('Cannot find file [ sample.htaccess ] in your base url folder.');
 	}
 
-	// Try to copy that file to the test folder:
-	if( ! @copy( $basepath.'sample.htaccess', $basepath.'install/test/.htaccess' ) )
-	{
-		return T_('Failed to copy files!');
-	}
+	if( !$force_htaccess )
+	{ // We're not forcing install, we want to check if it's supported:
 
-	// Make sure .htaccess does not crash in the test folder:
-	load_funcs('_core/_url.funcs.php');
-	$info = array();
-	if( ! $remote_page = fetch_remote_page( $baseurl.'install/test/', $info ) )
-	{
-		return $info['error'];
-	}
-	if( substr( $remote_page, 0, 16 ) != 'Test successful.' )
-	{
-		return sprintf( T_('%s was not found as expected.'), $baseurl.'install/test/index.html' );
+		if( @file_exists( $basepath.'.htaccess' ) )
+		{
+			if( @file_exists( $basepath.'sample.htaccess' ) )
+			{
+				$content_htaccess = trim( file_get_contents( $basepath.'.htaccess' ) );
+				$content_sample_htaccess = trim( file_get_contents( $basepath.'sample.htaccess' ) );
+
+				if( $content_htaccess != $content_sample_htaccess )
+				{ // The .htaccess file has content that different from a sample file
+					if( $upgrade )
+					{
+						echo get_install_format_text( '<span class="text-warning"><evo:warning>'.T_('<code>.htaccess</code> is already installed BUT DOES NOT match <code>sample.htaccess</code>. Please check the differences manually.').'</evo:warning></span>' );
+						return '';
+					}
+					else
+					{
+						echo get_install_format_text( '<p class="text-danger"><evo:error>'.T_('There is already a file called .htaccess at the blog root. If you don\'t specifically need this file, it is recommended that you delete it or rename it to old.htaccess before you continue. This will allow b2evolution to create a new .htaccess file that is optimized for best results.').'</evo:error></p>', 'p' );
+						echo T_('Here are the contents of the current .htaccess file:');
+						echo get_install_format_text( '<div style="overflow:auto"><pre>'.htmlspecialchars( $content_htaccess ).'</pre></div><br />', 'code' );
+						return get_install_format_text( sprintf( T_('Again, we recommend you remove this file before continuing. If you chose to keep it, b2evolution will probably still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="'.get_manual_url( 'htaccess-file' ).'" target="_blank"' ) );
+					}
+				}
+				else
+				{	// Installed file is the same as recommended:
+					echo get_install_format_text( '<span class="text-info">'.T_('<code>.htaccess</code> is already installed and matches <code>sample.htaccess</code>.').'</span>' );
+					return '';
+				}
+			}
+		}
+
+		// Try to copy that file to the test folder:
+		if( ! @copy( $basepath.'sample.htaccess', $basepath.'install/test/.htaccess' ) )
+		{
+			return T_('Failed to copy sample.htaccess to test folder!');
+		}
+
+		// Make sure .htaccess does not crash in the test folder:
+		load_funcs('_core/_url.funcs.php');
+		$fetch_test_url = $baseurl.'install/test/';
+		$info = array();
+		echo get_install_format_text( T_('Verifying .htaccess support works by fetching:').' <code>'.$fetch_test_url.'</code>... ' );
+		if( ! $remote_page = fetch_remote_page( $fetch_test_url, $info ) )
+		{
+			return $info['error'];
+		}
+		if( substr( $remote_page, 0, 16 ) != 'Test successful.' )
+		{
+			return sprintf( T_('%s was not found as expected.'), $baseurl.'install/test/index.html' );
+		}
 	}
 
 	// Now we consider it's safe, copy .htaccess to its real location:
@@ -1070,7 +1193,7 @@ function do_install_htaccess( $upgrade = false )
 		return T_('Test was successful, but failed to copy .htaccess into baseurl directory!');
 	}
 
-	echo '<span class="text-success"><evo:success>'.T_('Installation successful!').'</evo:success></span>';
+	echo get_install_format_text( '<span class="text-success"><evo:success>'.T_('.htaccess installation successful!').'</evo:success></span>' );
 	return '';
 }
 
@@ -1085,9 +1208,7 @@ function do_install_htaccess( $upgrade = false )
 function get_antispam_query()
 {
 	//used base64_encode() for getting this code
-	$r = base64_decode('SU5TRVJUIElOVE8gVF9hbnRpc3BhbShhc3BtX3N0cmluZykgVkFMVUVTICgnb25saW5lLWNhc2lubycpLCAoJ3BlbmlzLWVubGFyZ2VtZW50JyksICgnb3JkZXItdmlhZ3JhJyksICgnb3JkZXItcGhlbnRlcm1pbmUnKSwgKCdvcmRlci14ZW5pY2FsJyksICgnb3JkZXItcHJvcGhlY2lhJyksICgnc2V4eS1saW5nZXJpZScpLCAoJy1wb3JuLScpLCAoJy1hZHVsdC0nKSwgKCctdGl0cy0nKSwgKCdidXktcGhlbnRlcm1pbmUnKSwgKCdvcmRlci1jaGVhcC1waWxscycpLCAoJ2J1eS14ZW5hZHJpbmUnKSwgKCdwYXJpcy1oaWx0b24nKSwgKCdwYXJpc2hpbHRvbicpLCAoJ2NhbWdpcmxzJyksICgnYWR1bHQtbW9kZWxzJyk=');
-	// pre_dump($r);
-	return $r;
+	return base64_decode('SU5TRVJUIElOVE8gVF9hbnRpc3BhbV9fa2V5d29yZCAoIGFza3dfc3RyaW5nICkgVkFMVUVTICgnb25saW5lLWNhc2lubycpLCAoJ3BlbmlzLWVubGFyZ2VtZW50JyksICgnb3JkZXItdmlhZ3JhJyksICgnb3JkZXItcGhlbnRlcm1pbmUnKSwgKCdvcmRlci14ZW5pY2FsJyksICgnb3JkZXItcHJvcGhlY2lhJyksICgnc2V4eS1saW5nZXJpZScpLCAoJy1wb3JuLScpLCAoJy1hZHVsdC0nKSwgKCctdGl0cy0nKSwgKCdidXktcGhlbnRlcm1pbmUnKSwgKCdvcmRlci1jaGVhcC1waWxscycpLCAoJ2J1eS14ZW5hZHJpbmUnKSwgKCdwYXJpcy1oaWx0b24nKSwgKCdwYXJpc2hpbHRvbicpLCAoJ2NhbWdpcmxzJyksICgnYWR1bHQtbW9kZWxzJyk=');
 }
 
 /**
@@ -1095,6 +1216,13 @@ function get_antispam_query()
  */
 function track_step( $current_step )
 {
+	global $display;
+
+	if( ! empty( $display ) && $display == 'cli' )
+	{	// Don't display HTML on CLI mode:
+		return;
+	}
+
 	// echo 'Tracking '.$current_step;
 	echo '<div style="display:none">'
 			.'<img src="http://b2evolution.net/htsrv/track.php?key='.$current_step.'" alt="" />'
@@ -1109,9 +1237,9 @@ function display_install_back_link()
 {
 	global $default_locale;
 
-	echo '<ul class="pager">'
+	echo get_install_format_text( '<ul class="pager">'
 			.'<li class="previous"><a href="index.php?locale='.$default_locale.'"><span aria-hidden="true">&larr;</span> '.T_('Back to install menu').'</a></li>'
-		.'</ul>';
+		.'</ul>', 'p' );
 }
 
 
@@ -1217,12 +1345,13 @@ function update_install_progress_bar()
  */
 function get_install_steps_count()
 {
-	global $config_test_install_all_features, $allow_evodb_reset;
+	global $allow_install_test_features, $allow_evodb_reset;
+	global $create_sample_organization;
 
 	$steps = 0;
 
 	// After Deleting b2evolution tables:
-	if( $config_test_install_all_features && $allow_evodb_reset )
+	if( $allow_evodb_reset >= 2 || ( $allow_install_test_features && $allow_evodb_reset >= 1 ) )
 	{ // Allow to quick delete before new installation only when these two settings are enabled in config files
 		$delete_contents = param( 'delete_contents', 'integer', 0 );
 
@@ -1244,6 +1373,12 @@ function get_install_steps_count()
 	// Before install default skins:
 	$steps++;
 
+	// Creating sample organization:
+	if( $create_sample_organization )
+	{
+		$steps++;
+	}
+
 	// Installing sample contents:
 	$create_sample_contents = param( 'create_sample_contents', 'string', '' );
 
@@ -1260,6 +1395,7 @@ function get_install_steps_count()
 			$install_collection_photos = 1;
 			$install_collection_forums = 1;
 			$install_collection_manual = 1;
+			$install_collection_tracker = 1;
 		}
 		else
 		{ // Array contains which collections should be installed
@@ -1270,6 +1406,7 @@ function get_install_steps_count()
 			$install_collection_photos = in_array( 'photos', $collections );
 			$install_collection_forums = in_array( 'forums', $collections );
 			$install_collection_manual = in_array( 'manual', $collections );
+			$install_collection_tracker = in_array( 'group', $collections );
 		}
 
 		if( $install_collection_home )
@@ -1294,6 +1431,11 @@ function get_install_steps_count()
 		}
 		if( $install_collection_manual )
 		{ // After installing of the blog "Manual"
+			$steps++;
+		}
+
+		if( $install_collection_tracker )
+		{ // After installing of the blog "Tracker"
 			$steps++;
 		}
 	}
@@ -1325,17 +1467,20 @@ function get_upgrade_steps_count()
 	// Calculate the upgrade blocks:
 	$old_db_version = get_db_version();
 	if( $new_db_version > $old_db_version )
-	{ // Only when DB must be updated
+	{	// Only when DB must be updated really:
 		$upgrade_file_name = dirname( __FILE__ ).'/_functions_evoupgrade.php';
 		if( @file_exists( $upgrade_file_name ) )
-		{ // If file exists we can parse to know how much the upgrade blocks will be executed
+		{	// If file exists we can parse to know how much the upgrade blocks will be executed:
 			$upgrade_file_content = file_get_contents( $upgrade_file_name );
-			if( preg_match_all( '#if\(\s*\$old_db_version\s*<\s*(\d+)\s*\)#i', $upgrade_file_content, $version_matches ) )
+			// Find DB versions in the upgrade blocks like:
+			//      if( $old_db_version < 11430 )
+			//      if( upg_task_start( 11440, 'Upgrading base domains table...' ) )
+			if( preg_match_all( '#if\(\s*(\$old_db_version\s*<|upg_task_start\()\s*(\d+)#i', $upgrade_file_content, $version_matches ) )
 			{
-				foreach( $version_matches[1] as $version )
+				foreach( $version_matches[2] as $version )
 				{
 					if( $old_db_version < $version && $new_db_version != $old_db_version )
-					{ // Only these blocks will be executed
+					{	// Only these new blocks will be executed:
 						$steps++;
 					}
 				}
@@ -1410,7 +1555,7 @@ function display_install_messages( $messages, $type = 'error' )
 		$r .= '<div class="alert alert-'.$type.'" role="alert">'.$before_message.$message.$after_message.'</div>'."\n";
 	}
 
-	echo $r;
+	echo get_install_format_text($r);
 }
 
 
@@ -1500,23 +1645,11 @@ function check_local_installation()
 	global $basehost;
 
 	return php_sapi_name() != 'cli' && // NOT php CLI mode
-		( $basehost == 'localhost' ||
-			( isset( $_SERVER['SERVER_ADDR'] ) && (
-				$_SERVER['SERVER_ADDR'] == '127.0.0.1' ||
-				$_SERVER['SERVER_ADDR'] == '::1' ) // IPv6 address of 127.0.0.1
-			) ||
-			( isset( $_SERVER['REMOTE_ADDR'] ) && (
-				$_SERVER['REMOTE_ADDR'] == '127.0.0.1' ||
-				$_SERVER['REMOTE_ADDR'] == '::1' )
-			) ||
-			( isset( $_SERVER['HTTP_HOST'] ) && (
-				$_SERVER['HTTP_HOST'] == '127.0.0.1' ||
-				$_SERVER['HTTP_HOST'] == '::1' )
-			) ||
-			( isset( $_SERVER['SERVER_NAME'] ) && (
-				$_SERVER['SERVER_NAME'] == '127.0.0.1' ||
-				$_SERVER['SERVER_NAME'] == '::1' )
-			)
+		( $basehost == 'localhost'
+			|| ( isset( $_SERVER['SERVER_ADDR'] ) && ( $_SERVER['SERVER_ADDR'] == '127.0.0.1' || $_SERVER['SERVER_ADDR'] == '::1' ) ) // IPv6 address of 127.0.0.1
+			|| ( isset( $_SERVER['REMOTE_ADDR'] ) && ( $_SERVER['REMOTE_ADDR'] == '127.0.0.1' || $_SERVER['REMOTE_ADDR'] == '::1' ) )
+			|| ( isset( $_SERVER['HTTP_HOST'] ) && ( $_SERVER['HTTP_HOST'] == '127.0.0.1' || $_SERVER['HTTP_HOST'] == '::1' ) )
+			|| ( isset( $_SERVER['SERVER_NAME'] ) && ( $_SERVER['SERVER_NAME'] == '127.0.0.1' || $_SERVER['SERVER_NAME'] == '::1' ) )
 		);
 }
 
@@ -1571,7 +1704,7 @@ function display_install_result_window( $title, $body )
  */
 function check_quick_install_request()
 {
-	global $config_is_done, $db_config, $install_login, $install_password, $Messages;
+	global $config_is_done, $db_config, $conf_path, $install_login, $install_password, $Messages;
 
 	$admin_login = param( 'admin_login', 'string', '' );
 	$admin_password = param( 'admin_password', 'string', '' );
@@ -1603,6 +1736,7 @@ function check_quick_install_request()
 	$db_password = param( 'db_password', 'raw', '' );
 	$db_name = param( 'db_name', 'string', '' );
 	$db_host = param( 'db_host', 'string', '' );
+	$db_tableprefix = param( 'db_tableprefix', 'string', '' );
 
 	// Admin e-mail:
 	global $admin_email;
@@ -1610,7 +1744,8 @@ function check_quick_install_request()
 	$conf_admin_email = param( 'admin_email', 'string', '', false, true );
 
 	if( ! empty( $conf_admin_email ) ||
-	    ! empty( $db_user ) || ! empty( $db_password ) || ! empty( $db_name ) || ! empty( $db_host ) )
+	    ! empty( $db_user ) || ! empty( $db_password ) || ! empty( $db_name ) || ! empty( $db_host ) ||
+	    ! empty( $db_tableprefix ) )
 	{ // Try to update basic config file ONLY when at least one of these params are defined
 
 		if( empty( $conf_admin_email ) || ! param_check_email( 'admin_email' ) )
@@ -1619,7 +1754,7 @@ function check_quick_install_request()
 		}
 
 		// Base URL:
-		global $baseurl, $admin_url, $dispatcher;
+		global $baseurl, $admin_url, $dispatcher, $tableprefix;
 		$baseurl = param( 'baseurl', 'string', '', false, true );
 		if( empty( $baseurl ) || ! preg_match( '~https?://~', $baseurl ) )
 		{ // Try to autogenerate base url if it is empty or wrong from request:
@@ -1634,12 +1769,16 @@ function check_quick_install_request()
 		// Update $admin_url to new value because it depends on $baseurl:
 		$admin_url = $baseurl.$dispatcher;
 
+		// Update $tableprefix to new from request:
+		$tableprefix = $db_tableprefix;
+
 		// Try to create basic config file:
 		$basic_config_params = array(
 				'db_user'        => $db_user,
 				'db_password'    => $db_password,
 				'db_name'        => $db_name,
 				'db_host'        => $db_host,
+				'db_tableprefix' => $db_tableprefix,
 				'baseurl'        => $baseurl,
 				'admin_email'    => $conf_admin_email,
 				'print_messages' => false,
@@ -1654,9 +1793,19 @@ function check_quick_install_request()
 			$db_config['host'] = $db_host;
 		}
 		else
-		{ // Failed on createing of basic config file
+		{ // Failed on creation of basic config file
 			return false;
 		}
+	}
+	elseif( ! file_exists( $conf_path.'_basic_config.php' ) )
+	{
+		global $basic_config_file_result_messages;
+
+		ob_start();
+		display_install_messages( T_('You must pass db_config params or create a <code>/conf/_basic_config.php</code> file before calling the installer.') );
+
+		$basic_config_file_result_messages = ob_get_clean();
+		return false;
 	}
 
 	// Revert config admin email to original value:
@@ -1678,14 +1827,15 @@ function update_basic_config_file( $params = array() )
 	global $DB, $db_config, $evo_charset, $conf_path, $default_locale;
 
 	// These global params should be rewritten by this function on success result
-	global $tableprefix, $baseurl, $admin_email, $config_is_done, $action;
+	global $baseurl, $admin_email, $config_is_done, $action;
 
 	$params = array_merge( array(
+			'create_db'      => 0,
 			'db_user'        => '',
 			'db_password'    => '',
 			'db_name'        => '',
 			'db_host'        => '',
-			'db_tableprefix' => $tableprefix,
+			'db_tableprefix' => '',
 			'baseurl'        => '',
 			'admin_email'    => '',
 			'print_messages' => true, // TRUE - to print out all messages on screen, FALSE - to return
@@ -1699,18 +1849,30 @@ function update_basic_config_file( $params = array() )
 		global $basic_config_file_result_messages;
 	}
 
-	// Connect to DB:
+	// Connect to DB host (without selecting DB because we should maybe create this by request):
 	$DB = new DB( array(
 			'user'     => $params['db_user'],
 			'password' => $params['db_password'],
-			'name'     => $params['db_name'],
 			'host'     => $params['db_host'],
 			'aliases'          => $db_config['aliases'],
-			'use_transactions' => $db_config['use_transactions'],
-			'table_options'    => $db_config['table_options'],
 			'connection_charset' => empty( $db_config['connection_charset'] ) ? DB::php_to_mysql_charmap( $evo_charset ) : $db_config['connection_charset'],
 			'halt_on_error'      => false
 		) );
+
+	if( $params['create_db'] )
+	{	// Try to create DB if it doesn't exist yet:
+		$DB->query( 'CREATE DATABASE IF NOT EXISTS `'.$params['db_name'].'`
+			CHARACTER SET '.$DB->connection_charset );
+		if( $DB->error )
+		{
+			display_install_messages( sprintf( T_('You don\'t seem to have permission to create this new database on "%s" (%s).'), $params['db_host'], $DB->last_error ) );
+			$action = 'start';
+			return true;
+		}
+	}
+
+	// Select DB:
+	$DB->select( $params['db_name'] );
 
 	if( $DB->error )
 	{ // restart conf
@@ -1826,5 +1988,17 @@ function update_basic_config_file( $params = array() )
 	}
 
 	return true;
+}
+
+
+/**
+ * Print out log text on screen
+ *
+ * @param string Log text
+ * @param string Log type: 'warning', 'note', 'success', 'danger'
+ */
+function echo_install_log( $text, $type = 'warning' )
+{
+	echo '<p class="alert alert-'.$type.'">'.$text.'</p>';
 }
 ?>

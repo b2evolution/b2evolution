@@ -793,60 +793,62 @@
 				if (settings.h) {
 					photo.style.marginTop = Math.max(settings.h - photo.height, 0) / 2 + 'px';
 				}
-				
-				if ($related[1] && (index < $related.length - 1 || settings.loop))
-				{
-					// Clear classes from previous image
-					jQuery( photo ).removeClass( 'zoomin zoomout' );
 
-					var photo_is_zoomed = false;
-					var photo_width = 0;
-					var photo_height = 0;
-					var photo_is_big = photo.naturalWidth > photo.width * 1.1 || photo.naturalHeight > photo.height * 1.1;
-					if( photo_is_big )
-					{ // If photo is big - make a specific cursor over photo
-						photo.className = photo.className + ' zoomin';
-					}
+				// Clear classes from previous image
+				jQuery( photo ).removeClass( 'zoomin zoomout' );
+
+				colorbox_is_zoomed = false;
+				var photo_width = 0;
+				var photo_height = 0;
+				var photo_is_big = photo.naturalWidth > photo.width * 1.1 || photo.naturalHeight > photo.height * 1.1;
+				if( photo_is_big )
+				{ // If photo is big - make a specific cursor over photo
+					photo.className = photo.className + ' zoomin';
+				}
+				if( ! photo_is_big && $related[1] && ( index < $related.length - 1 || settings.loop ) )
+				{	// Use a click event to display next photo only when Photo is small and we have at least two photos:
 					photo.onclick = function( e )
 					{
-						if( ! photo_is_big )
-						{ // Photo is small - Use a click event to display next photo
-							publicMethod.next();
-						}
-					};
-					if( photo_is_big )
-					{ // Photo is big - Use a click event to zoom a photo
-						jQuery( photo ).bind( 'click dblclick', function( e )
-						{
-							if( photo_is_zoomed )
-							{ // Zoom out a photo to window size
-								photo.className = photo.className.replace( /zoomout/, '' );
-								photo.width = photo_width;
-								photo.height = photo_height;
-							}
-							else
-							{ // Zoom in a photo to real size
-								var this_offset = jQuery( this ).offset();
-								var pecentX = ( e.pageX - this_offset.left ) / jQuery( this ).width();
-								var pecentY = ( e.pageY - this_offset.top ) / jQuery( this ).height();
-
-								photo.className = photo.className + ' zoomout';
-								photo_width = photo.width;
-								photo_height = photo.height;
-								photo.removeAttribute( 'width' );
-								photo.removeAttribute( 'height' );
-
-								// Scroll image to mouse pointer
-								var this_parent = jQuery( this ).parent()[0];
-								jQuery( this ).parent()
-									.scrollLeft( pecentX * ( this_parent.scrollWidth - this_parent.clientWidth ) )
-									.scrollTop( pecentY * ( this_parent.scrollHeight - this_parent.clientHeight ) );
-							}
-							photo_is_zoomed = photo_is_zoomed ? false : true;
-						} );
+						publicMethod.next();
 					}
 				}
-				
+				if( photo_is_big )
+				{ // Photo is big - Use a click event to zoom a photo
+					jQuery( photo ).bind( 'click dblclick', function( event, touch_event )
+					{
+						if( colorbox_is_zoomed )
+						{ // Zoom out a photo to window size
+							photo.className = photo.className.replace( /zoomout/, '' );
+							photo.width = photo_width;
+							photo.height = photo_height;
+							// Reset image position and scrolling to top/left corner:
+							jQuery( this ).parent().scrollLeft( 0 ).scrollTop( 0 );
+							jQuery( this ).css( { 'position': 'relative', 'top': '0', 'left': '0' } );
+						}
+						else
+						{ // Zoom in a photo to real size
+							var this_offset = jQuery( this ).offset();
+							var pageX = typeof( event.pageX ) != 'undefined' ? event.pageX : touch_event.originalEvent.touches[0].pageX;
+							var pageY = typeof( event.pageY ) != 'undefined' ? event.pageY : touch_event.originalEvent.touches[0].pageY;
+							var pecentX = ( pageX - this_offset.left ) / jQuery( this ).width();
+							var pecentY = ( pageY - this_offset.top ) / jQuery( this ).height();
+
+							photo.className = photo.className + ' zoomout';
+							photo_width = photo.width;
+							photo_height = photo.height;
+							photo.removeAttribute( 'width' );
+							photo.removeAttribute( 'height' );
+
+							// Scroll image to mouse pointer
+							var this_parent = jQuery( this ).parent()[0];
+							jQuery( this ).parent()
+								.scrollLeft( pecentX * ( this_parent.scrollWidth - this_parent.clientWidth ) )
+								.scrollTop( pecentY * ( this_parent.scrollHeight - this_parent.clientHeight ) );
+						}
+						colorbox_is_zoomed = colorbox_is_zoomed ? false : true;
+					} );
+				}
+
 				if (isIE) {
 					photo.style.msInterpolationMode = 'bicubic';
 				}
@@ -947,14 +949,14 @@ jQuery.event.special.dblclick = {
 	{
 		var elem = this,
 			$elem = jQuery( elem );
-		$elem.bind( 'touchend.dblclick', jQuery.event.special.dblclick.handler );
+		$elem.bind( 'touchstart.dblclick', jQuery.event.special.dblclick.handler );
 	},
 
 	teardown: function( namespaces )
 	{
 		var elem = this,
 			$elem = jQuery( elem );
-		$elem.unbind( 'touchend.dblclick' );
+		$elem.unbind( 'touchstart.dblclick' );
 	},
 
 	handler: function( event )
@@ -968,7 +970,7 @@ jQuery.event.special.dblclick = {
 		if( delta > 20 && delta < 500 )
 		{
 			$elem.data( 'lastTouch', 0 );
-			$elem.trigger( 'dblclick' );
+			$elem.trigger( 'dblclick', event );
 		} else
 		{
 			$elem.data( 'lastTouch', now );

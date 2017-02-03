@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -51,7 +51,7 @@ $Table->display_head();
 // BODY START:
 $Table->display_body_start();
 
-if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_admin_no_DB' ) )
+if( empty($AvailablePlugins) || ! ( $AvailablePlugins instanceof Plugins_admin_no_DB ) )
 { // (may have been instantiated for action 'info')
 	load_class( 'plugins/model/_plugins_admin_no_db.class.php', 'Plugins_admin_no_DB' );
 	$AvailablePlugins = new Plugins_admin_no_DB(); // do not load registered plugins/events from DB

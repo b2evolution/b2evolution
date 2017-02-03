@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2007 by Yabba/Scott - {@link http://astonishme.co.uk/contact/}.
  *
  * @package plugins
@@ -45,7 +45,7 @@ class am_xml_highlighter
 	 * @param object $parent
 	 * @return object am_xml_highlighter
 	 */
-	function am_xml_highlighter( & $parent )
+	function __construct( & $parent )
 	{
 		$this->parent = & $parent;
 		return $this;

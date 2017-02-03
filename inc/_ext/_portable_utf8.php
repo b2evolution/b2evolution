@@ -518,22 +518,8 @@ function utf8_substr( $str, $start = 0, $length = NULL )
 	//iconv and mbstring are not tolerant to invalid encoding
 	//further, their behaviour is inconsistant with that of PHP's substr
 
-	if( iconv_loaded() )
-	{
-		$str = utf8_clean( $str );
-
-		if( $length === NULL )
-		{
-			// fplanque> The following produces an insane number on Mac OS X and then iconv_substr() will fail.
-			$length = PHP_INT_MAX;
-			// echo "PHP_INT_MAX=$length<br>\n";
-			// Conservative approach:
-			$length = strlen( $str ); // Gives a byte count but that's ok as logn as it >= char length
-		// Note: using 2^32 as a fixed value here will also bug! 2^32-1 will bug differently, etc.
-		}
-
-		return iconv_substr( $str, $start, $length, 'UTF-8' );
-	}
+	// Try to use mbstring functions firstly before iconv functions, because
+	// iconv_substr() can reproduces an error noticing about illegal character in input string
 
 	if( mbstring_loaded() )
 	{
@@ -550,6 +536,23 @@ function utf8_substr( $str, $start = 0, $length = NULL )
 		}
 
 		return mb_substr( $str, $start, $length, 'UTF-8' );
+	}
+
+	if( iconv_loaded() )
+	{
+		$str = utf8_clean( $str );
+
+		if( $length === NULL )
+		{
+			// fplanque> The following produces an insane number on Mac OS X and then iconv_substr() will fail.
+			$length = PHP_INT_MAX;
+			// echo "PHP_INT_MAX=$length<br>\n";
+			// Conservative approach:
+			$length = strlen( $str ); // Gives a byte count but that's ok as logn as it >= char length
+			// Note: using 2^32 as a fixed value here will also bug! 2^32-1 will bug differently, etc.
+		}
+
+		return iconv_substr( $str, $start, $length, 'UTF-8' );
 	}
 
 	//Fallback

@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -70,7 +70,7 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Username display options').get_manual_link('user-username-display-options') );
 
 	$Form->radio( 'username_display', $Settings->get( 'username_display' ),
-		array( array( 'login', T_('Usernames/Logins'), T_('Secure options') ),
+		array( array( 'login', T_('Usernames/Logins'), T_('Most secure option') ),
 					array( 'name', T_('Friendly names (Nickname or Firstname if available)'), T_('WARNING: this may allow users to fake their identity') ),
 		), T_('What to display'), true );
 

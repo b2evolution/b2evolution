@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -37,7 +37,7 @@ if( $selected = autoselect_blog( 'blog_properties', 'edit' ) ) // Includes perm 
 		/**
 		 * @var Blog
 		 */
-		$Blog = & $BlogCache->get_by_ID( $blog );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 	}
 
 	/**
@@ -121,7 +121,7 @@ switch( $action )
 		/**
 		* @var Blog
 		*/
-		$Blog = & $BlogCache->get_by_ID( $blog );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
 		break;
 
@@ -279,9 +279,15 @@ switch( $action )
 					send_javascript_message( $methods, true );
 					break;
 			}
-			$action = 'list';
-			$Session->set( 'fadeout_id', $edited_ComponentWidget->ID );
-			header_redirect( '?ctrl=widgets&blog='.$Blog->ID, 303 );
+			if( $action == 'update_edit' )
+			{	// Stay on edit widget form:
+				header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&action=edit&wi_ID='.$edited_ComponentWidget->ID, 303 );
+			}
+			else
+			{	// Redirect to widgets list:
+				$Session->set( 'fadeout_id', $edited_ComponentWidget->ID );
+				header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
+			}
 		}
 		elseif( $display_mode == 'js' )
 		{ // send errors back as js
@@ -594,13 +600,14 @@ if( $display_mode == 'normal' )
 
 	var b2evo_dispatcher_url = "'.$admin_url.'";' );
 	require_js( '#jqueryUI#' ); // auto requires jQuery
-	require_js( 'communication.js' ); // auto requires jQuery
-	require_js( 'blog_widgets.js' );
 	require_css( 'blog_widgets.css' );
 
 
-	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=dashboard&amp;blog=$blog$' ) );
+	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
 	$AdminUI->breadcrumbpath_add( T_('Widgets'), $admin_url.'?ctrl=widgets&amp;blog=$blog$' );
+
+	// Set an url for manual page:
+	$AdminUI->set_page_manual_link( 'widget-settings' );
 
 	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 	$AdminUI->disp_html_head();
@@ -641,7 +648,7 @@ switch( $action )
 				// Display VIEW:
 				$AdminUI->disp_view( 'widgets/views/_widget.form.php' );
 				$output = ob_get_clean();
-				send_javascript_message( array( 'widgetSettings' => $output ) );
+				send_javascript_message( array( 'widgetSettings' => array( $output, $edited_ComponentWidget->get( 'type' ), $edited_ComponentWidget->get( 'code' ) ) ) );
 				break;
 
 			case 'normal' :

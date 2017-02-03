@@ -16,7 +16,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( version_compare( $app_version, '6.4' ) < 0 )
+if( evo_version_compare( $app_version, '6.4' ) < 0 )
 { // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.
 	die( 'This skin is designed for b2evolution 6.4 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
@@ -50,7 +50,6 @@ if( $is_pictured_page )
 	{ // If it exists in media folder
 		echo '<img src="'.$media_url.$bg_image.'" />';
 	}
-	echo '</div>';
 }
 ?>
 
@@ -128,7 +127,6 @@ if( $is_pictured_page )
 
 </nav><!-- .row -->
 
-
 <div class="row">
 
 	<div class="col-md-12">
@@ -187,23 +185,35 @@ if( $is_pictured_page )
 		<?php
 		// Go Grab the featured post:
 		if( ! in_array( $disp, array( 'single', 'page' ) ) && $Item = & get_featured_Item() )
-		{ // We have a featured/intro post to display:
+		{	// We have a featured/intro post to display:
+			$intro_item_style = '';
+			$LinkOwner = new LinkItem( $Item );
+			$LinkList = $LinkOwner->get_attachment_LinkList( 1, 'cover' );
+			if( ! empty( $LinkList ) &&
+					$Link = & $LinkList->get_next() &&
+					$File = & $Link->get_File() &&
+					$File->exists() &&
+					$File->is_image() )
+			{	// Use cover image of intro-post as background:
+				$intro_item_style = 'background-image: url("'.$File->get_url().'")';
+			}
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-			echo '<div class="panel panel-default"><div class="panel-body">';
 			skin_include( '_item_block.inc.php', array(
 					'feature_block' => true,
-					'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
-					'intro_mode'   => 'normal',	// Intro posts will be displayed in normal mode
+					'content_mode'  => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
+					'intro_mode'    => 'normal',	// Intro posts will be displayed in normal mode
+					'item_class'    => ($Item->is_intro() ? 'well evo_intro_post' : 'well evo_featured_post').( empty( $intro_item_style ) ? '' : ' evo_hasbgimg' ),
+					'item_style'    => $intro_item_style,
+					'Item'          => $Item,
 				) );
-			echo '</div></div>';
 			// ----------------------------END ITEM BLOCK  ----------------------------
 		}
 		?>
-
+		
 		<?php
 			// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
 			skin_include( '$disp$', array(
-					'author_link_text' => 'preferredname',
+					'author_link_text' => 'auto',
 					// Profile tabs to switch between user edit forms
 					'profile_tabs' => array(
 						'block_start'         => '<nav><ul class="nav nav-tabs profile_tabs">',
@@ -217,9 +227,11 @@ if( $is_pictured_page )
 					'pagination' => array(
 						'block_start'           => '<div class="center"><ul class="pagination">',
 						'block_end'             => '</ul></div>',
-						'page_current_template' => '<span><b>$page_num$</b></span>',
+						'page_current_template' => '<span>$page_num$</span>',
 						'page_item_before'      => '<li>',
 						'page_item_after'       => '</li>',
+						'page_item_current_before' => '<li class="active">',
+						'page_item_current_after'  => '</li>',
 						'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
 						'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 					),
@@ -280,7 +292,7 @@ if( $is_pictured_page )
 </div><!-- .row -->
 
 </div><!-- .container -->
-
+</div><!-- #bg_picture -->
 
 <!-- =================================== START OF SECONDARY AREA =================================== -->
 <section class="secondary_area"><!-- white background -->

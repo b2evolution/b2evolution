@@ -38,6 +38,12 @@ $Form->begin_fieldset( T_('Session Settings').get_manual_link('session-settings'
 						array( 'minutes_step' => 1, 'required' => true, 'note' => T_( 'If the user stays inactive for this long, we will no longer display him as "online" and we will start sending him email notifications when things happen while he is away.' ) ) );
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Visit Tracking').get_manual_link('visit-tracking') );
+
+	$Form->checkbox_input( 'enable_visit_tracking', $Settings->get( 'enable_visit_tracking', false ), T_('Enable visit tracking'), array( 'note' => T_('Check this to enable "Who visited my profle?"') ) );
+
+$Form->end_fieldset();
+
 $Form->begin_fieldset( T_('User latitude').get_manual_link('user-profile-latitude-settings') );
 
 	$Form->checkbox_input( 'allow_avatars', $Settings->get( 'allow_avatars', true ), T_('Allow profile pictures'), array( 'note'=>T_('Allow users to upload profile pictures.') ) );
@@ -53,9 +59,9 @@ $Form->begin_fieldset( T_('User latitude').get_manual_link('user-profile-latitud
 
 	$Form->radio( 'uset_nickname_editing', $Settings->get( 'nickname_editing' ), $name_editing_options, T_('Nickname'), true );
 
-	$Form->radio( 'uset_firstname_editing', $Settings->get( 'firstname_editing' ), $name_editing_options, T_('Fistname'), true );
+	$Form->radio( 'uset_firstname_editing', $Settings->get( 'firstname_editing' ), $name_editing_options, T_('First name'), true );
 
-	$Form->radio( 'uset_lastname_editing', $Settings->get( 'lastname_editing' ), $name_editing_options, T_('Lastname'), true );
+	$Form->radio( 'uset_lastname_editing', $Settings->get( 'lastname_editing' ), $name_editing_options, T_('Last name'), true );
 
 	$location_options = array(
 			array( 'optional', T_('Optional') ),

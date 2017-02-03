@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evocore
  */
@@ -30,7 +30,7 @@ if( $ajax_form_enabled )
 	$Form->hidden( 'login_action', array( 'login' => 'login' ) );
 }
 $Form->hidden( 'crumb_loginform', '' );
-$Form->hidden( 'pwd_salt', '' );
+$Form->hidden( 'pepper', '' );
 $Form->hidden( 'source', $source );
 $Form->hidden( 'inskin', true );
 $Form->hidden( 'redirect_to', $redirect_to );

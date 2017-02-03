@@ -7,15 +7,14 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_manual
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $cat;
-global $posttypes_specialtypes;
+global $Item, $Collection, $Blog, $app_version;
 
 // Default params:
 $params = array_merge( array(
@@ -29,27 +28,6 @@ $params = array_merge( array(
 		'disp_comment_form' => true,
 		'item_link_type'    => 'post',
 	), $params );
-
-if( $disp == 'single' )
-{ // Display the breadcrumb path
-	if( empty( $cat ) )
-	{ // Set a category as main of current Item
-		$cat = $Item->main_cat_ID;
-
-		// Display the breadcrumbs only when global $cat is empty before line above
-		// Otherwise it is already displayed in header file
-		skin_widget( array(
-				// CODE for the widget:
-				'widget' => 'breadcrumb_path',
-				// Optional display params
-				'block_start'      => '<ol class="breadcrumb">',
-				'block_end'        => '</ol>',
-				'separator'        => '',
-				'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-				'item_active_mask' => '<li class="active">$title$</li>',
-			) );
-	}
-}
 ?>
 
 <div id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>">
@@ -77,13 +55,21 @@ if( $disp == 'single' )
 			) );*/
 		// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 
-	$action_links = $Item->get_edit_link( array( // Link to backoffice for editing
+	// Link for editing:
+	$action_links = $Item->get_edit_link( array(
 			'before' => '',
 			'after'  => '',
 			'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
 			'class'  => button_class( 'text' ),
 		) );
-	if( $Item->is_intro() && $Item->ityp_ID > 1500 )
+	// Link for duplicating:
+	$action_links .= $Item->get_copy_link( array(
+			'before' => '',
+			'after'  => '',
+			'text'   => '#icon#',
+			'class'  => button_class(),
+		) );
+	if( $Item->is_intro() )
 	{ // Link to edit category
 		$ItemChapter = & $Item->get_main_Chapter();
 		if( !empty( $ItemChapter ) )
@@ -95,21 +81,70 @@ if( $disp == 'single' )
 				) );
 		}
 	}
+	if( ! empty( $action_links ) )
+	{	// Group all action icons:
+		$action_links = '<div class="'.button_class( 'group' ).'">'.$action_links.'</div>';
+	}
+
 	if( $Item->status != 'published' )
 	{
 		$Item->format_status( array(
-				'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+				'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 			) );
 	}
 	$Item->title( array(
 			'link_type'  => $params['item_link_type'],
 			'before'     => '<div class="evo_post_title"><h1>',
-			'after'      => '</h1><div class="'.button_class( 'group' ).'">'.$action_links.'</div></div>',
+			'after'      => '</h1>'.$action_links.'</div>',
 			'nav_target' => false,
 		) );
 	?>
 
 	<?php
+	if( $disp == 'single' )
+	{
+		?>
+		<div class="evo_container evo_container__item_single">
+		<?php
+		// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
+		// Display container contents:
+		skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+			'widget_context' => 'item',	// Signal that we are displaying within an Item
+			// The following (optional) params will be used as defaults for widgets included in this container:
+			// This will enclose each widget in a block:
+			'block_start' => '<div class="$wi_class$">',
+			'block_end' => '</div>',
+			// This will enclose the title of each widget:
+			'block_title_start' => '<h3>',
+			'block_title_end' => '</h3>',
+			// Template params for "Item Tags" widget
+			'widget_item_tags_before'    => '<nav class="small post_tags text-muted">',
+			'widget_item_tags_after'     => '</nav>',
+			'widget_item_tags_separator' => ', ',
+			// Template params for "Small Print" widget
+			'widget_item_small_print_before'         => '<p class="small text-muted">',
+			'widget_item_small_print_after'          => '</p>',
+			'widget_item_small_print_display_author' => false,
+			// Params for skin file "_item_content.inc.php"
+			'widget_item_content_params' => $params,
+			// Template params for "Item Attachments" widget:
+			'widget_item_attachments_params' => array(
+					'limit_attach'       => 1000,
+					'before'             => '<div class="evo_post_attachments"><h3>'.T_('Attachments').':</h3><ul class="evo_files">',
+					'after'              => '</ul></div>',
+					'before_attach'      => '<li class="evo_file">',
+					'after_attach'       => '</li>',
+					'before_attach_size' => ' <span class="evo_file_size">(',
+					'after_attach_size'  => ')</span>',
+				),
+		) );
+		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
+		?>
+		</div>
+		<?php
+	}
+	else
+	{
 		// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 		skin_include( '_item_content.inc.php', $params );
 		// Note: You can customize the default item content by copying the generic
@@ -127,10 +162,15 @@ if( $disp == 'single' )
 				) );
 
 			echo '<p class="small text-muted">';
+			$Item->author( array(
+					'before'    => T_('Created by '),
+					'after'     => ' &bull; ',
+					'link_text' => 'auto',
+				) );
 			$Item->lastedit_user( array(
 					'before'    => T_('Last edit by '),
-					'after'     => T_(' on ').$Item->get_mod_date( 'F jS, Y' ),
-					'link_text' => 'name',
+					'after'     => T_(' on ').$Item->get_mod_date( locale_extdatefmt() ),
+					'link_text' => 'auto',
 				) );
 			'</p>';
 			echo $Item->get_history_link( array(
@@ -138,17 +178,39 @@ if( $disp == 'single' )
 					'link_text' => T_('View history')
 				) );
 		}
+	}
 	?>
 
 	<?php
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array_merge( $params, array(
-				'before_section_title' => '<h3 class="comments_list_title">',
+				'before_section_title' => '<h3 class="evo_comment__list_title">',
 				'after_section_title'  => '</h3>',
 			) ) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
 		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
+	?>
+
+	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
+		// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
+		skin_include( '_item_workflow.inc.php' );
+		// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
+	}
+	?>
+
+	<?php
+	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
+	{	// We are running at least b2evo 6.7, so we can include this file:
+		// ------------------ META COMMENTS INCLUDED HERE ------------------
+		skin_include( '_item_meta_comments.inc.php', array(
+				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
+				'comment_end'           => '</article>',
+			) );
+		// ---------------------- END OF META COMMENTS ---------------------
+	}
 	?>
 
 	<?php

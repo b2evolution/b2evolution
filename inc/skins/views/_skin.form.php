@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -32,35 +32,80 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 	$Form->hidden_ctrl();
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'skin_ID', $edited_Skin->ID );
+	$Form->hidden( 'tab', get_param( 'tab' ) );
 
-	$Form->begin_fieldset( T_('Skin properties') );
+	$Form->begin_fieldset( T_('Skin properties').get_manual_link( 'skin-system-settings' ) );
 
-		Skin::disp_skinshot( $edited_Skin->folder, $edited_Skin->name );
+		echo '<div class="skin_settings well">';
+			$disp_params = array( 'skinshot_class' => 'coll_settings_skinshot' );
+			Skin::disp_skinshot( $edited_Skin->folder, $edited_Skin->name, $disp_params );
 
-		$Form->text_input( 'skin_name', $edited_Skin->name, 32, T_('Skin name'), T_('As seen by blog owners'), array( 'required'=>true ) );
+			// Skin name
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Skin name').':</label>';
+				echo '<span>'.$edited_Skin->name.'</span>';
+			echo '</div>';
 
-		$Form->radio( 'skin_type',
-									$edited_Skin->type,
-									 array(
-													array( 'normal', T_( 'Normal' ), T_( 'Normal skin for general browsing' ) ),
-													array( 'mobile', T_( 'Mobile' ), T_( 'Mobile skin for mobile phones browsers' ) ),
-													array( 'tablet', T_( 'Tablet' ), T_( 'Tablet skin for tablet browsers' ) ),
-													array( 'feed', T_( 'XML Feed' ), T_( 'Special system skin for XML feeds like RSS and Atom' ) ),
-													array( 'sitemap', T_( 'XML Sitemap' ), T_( 'Special system skin for XML sitemaps' ) ),
-												),
-										T_( 'Skin type' ),
-										true // separate lines
-								 );
 
-		if( $skin_containers = $edited_Skin->get_containers() )
-		{
-			$container_ul = '<ul><li>'.implode( '</li><li>', $skin_containers ).'</li></ul>';
-		}
-		else
-		{
-			$container_ul = '-';
-		}
-		$Form->info( T_('Containers'), $container_ul );
+			// Skin version
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Skin version').':</label>';
+				echo '<span>'.( isset( $edited_Skin->version ) ? $edited_Skin->version : 'unknown' ).'</span>';
+			echo '</div>';
+
+			// Site Skin:
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Site Skin').':</label>';
+				echo '<span>'.( $edited_Skin->provides_site_skin() ? T_('Yes') : T_('No') ).'</span>';
+			echo '</div>';
+
+			// Collection Skin:
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Collection Skin').':</label>';
+				echo '<span>'.( $edited_Skin->provides_collection_skin() ? T_('Yes') : T_('No') ).'</span>';
+			echo '</div>';
+
+			// Skin format:
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Skin format').':</label>';
+				echo '<span>'.$edited_Skin->type.'</span>';
+			echo '</div>';
+
+			// Containers
+			if( $skin_containers = $edited_Skin->get_containers() )
+			{
+				$container_ul = '<ul><li>'.implode( '</li><li>', $skin_containers ).'</li></ul>';
+			}
+			else
+			{
+				$container_ul = '-';
+			}
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Containers').':</label>';
+				echo '<span>'.$container_ul.'</span>';
+			echo '</div>';
+
+		echo '</div>';
+		echo '<div class="skin_settings_form">';
+			$Form->begin_fieldset( T_('System Settings for this skin').get_manual_link( 'skin-system-settings' ) );
+
+			$Form->text_input( 'skin_name', $edited_Skin->name, 32, T_('Skin name'), T_('As seen by blog owners'), array( 'required'=>true ) );
+
+			$Form->radio( 'skin_type',
+										$edited_Skin->type,
+										 array(
+														array( 'normal', T_( 'Normal' ), T_( 'Normal skin for general browsing' ) ),
+														array( 'mobile', T_( 'Mobile' ), T_( 'Mobile skin for mobile phones browsers' ) ),
+														array( 'tablet', T_( 'Tablet' ), T_( 'Tablet skin for tablet browsers' ) ),
+														array( 'feed', T_( 'XML Feed' ), T_( 'Special system skin for XML feeds like RSS and Atom' ) ),
+														array( 'sitemap', T_( 'XML Sitemap' ), T_( 'Special system skin for XML sitemaps' ) ),
+													),
+											T_( 'Skin type' ),
+											true // separate lines
+									 );
+			$Form->end_fieldset();
+
+		echo '</div>';
 
 	$Form->end_fieldset();
 

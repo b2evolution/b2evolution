@@ -344,24 +344,24 @@ class mime_parser_class
 
 	/* Private functions */
 
-	Function SetError($error)
+	function SetError($error)
 	{
 		$this->error = $error;
 		return(0);
 	}
 
-	Function SetErrorWithContact($error)
+	function SetErrorWithContact($error)
 	{
 		return($this->SetError($error.'. Please contact the author Manuel Lemos <mlemos@acm.org> and send a copy of this message to let him add support for this kind of messages'));
 	}
 
-	Function SetPositionedError($error, $position)
+	function SetPositionedError($error, $position)
 	{
 		$this->error_position = $position;
 		return($this->SetError($error));
 	}
 
-	Function SetPositionedWarning($error, $position)
+	function SetPositionedWarning($error, $position)
 	{
 		if(!$this->ignore_syntax_errors)
 			return($this->SetPositionedError($error, $position));
@@ -369,7 +369,7 @@ class mime_parser_class
 		return(1);
 	}
 
-	Function SetPHPError($error, &$php_error_message)
+	function SetPHPError($error, &$php_error_message)
 	{
 		if(IsSet($php_error_message)
 		&& strlen($php_error_message))
@@ -377,7 +377,7 @@ class mime_parser_class
 		return($this->SetError($error));
 	}
 
-	Function ResetParserState()
+	function ResetParserState()
 	{
 		$this->error='';
 		$this->error_position = -1;
@@ -402,7 +402,7 @@ class mime_parser_class
 		$this->last_carriage_return = 0;
 	}
 
-	Function Tokenize($string,$separator="")
+	function Tokenize($string,$separator="")
 	{
 		if(!strcmp($separator,""))
 		{
@@ -426,7 +426,7 @@ class mime_parser_class
 		}
 	}
 
-	Function ParseStructuredHeader($value, &$type, &$parameters, &$character_sets, &$languages)
+	function ParseStructuredHeader($value, &$type, &$parameters, &$character_sets, &$languages)
 	{
 		$type = strtolower(trim($this->Tokenize($value, ';')));
 		$p = trim($this->Tokenize(''));
@@ -468,7 +468,7 @@ class mime_parser_class
 		}
 	}
 
-	Function FindStringLineBreak($string, $position, &$break, &$line_break)
+	function FindStringLineBreak($string, $position, &$break, &$line_break)
 	{
 		if(GetType($line_break=strpos($string, $break="\r", $position))=='integer')
 		{
@@ -492,7 +492,7 @@ class mime_parser_class
 		return(GetType($line_break=strpos($string, $break="\n", $position))=='integer');
 	}
 
-	Function FindLineBreak($position, &$break, &$line_break)
+	function FindLineBreak($position, &$break, &$line_break)
 	{
 		if(GetType($line_break=strpos($this->buffer, $break="\r", $position))=='integer')
 		{
@@ -513,7 +513,7 @@ class mime_parser_class
 		return(GetType($line_break=strpos($this->buffer, $break="\n", $position))=='integer');
 	}
 
-	Function FindBodyLineBreak($position, &$break, &$line_break)
+	function FindBodyLineBreak($position, &$break, &$line_break)
 	{
 		if(GetType($line_break=strpos($this->body_buffer, $break="\r", $position))=='integer')
 		{
@@ -534,7 +534,7 @@ class mime_parser_class
 		return(GetType($line_break=strpos($this->body_buffer, $break="\n", $position))=='integer');
 	}
 
-	Function ParseHeaderString($body, &$position, &$headers)
+	function ParseHeaderString($body, &$position, &$headers)
 	{
 		$l = strlen($body);
 		$headers = array();
@@ -557,7 +557,7 @@ class mime_parser_class
 		}
 	}
 
-	Function ParsePart($end, &$part, &$need_more_data)
+	function ParsePart($end, &$part, &$need_more_data)
 	{
 		$need_more_data = 0;
 		switch($this->state)
@@ -838,7 +838,7 @@ class mime_parser_class
 		return(1);
 	}
 
-	Function QueueBodyParts()
+	function QueueBodyParts()
 	{
 		for(;;)
 		{
@@ -852,7 +852,7 @@ class mime_parser_class
 		}
 	}
 
-	Function ParseParameters($value, &$first, &$parameters, $return)
+	function ParseParameters($value, &$first, &$parameters, $return)
 	{
 		$first = strtolower(trim(strtok($value, ';')));
 		$values = trim(strtok(''));
@@ -875,7 +875,7 @@ class mime_parser_class
 		return($return_value);
 	}
 
-	Function ParseBody($data, $end, $offset)
+	function ParseBody($data, $end, $offset)
 	{
 		$success = $this->body_parser->Parse($data, $end);
 		$tw = count($this->body_parser->warnings);
@@ -893,7 +893,7 @@ class mime_parser_class
 		return(1);
 	}
 
-	Function DecodePart($part)
+	function DecodePart($part)
 	{
 		switch($part['Type'])
 		{
@@ -1328,7 +1328,7 @@ class mime_parser_class
 		return(1);
 	}
 
-	Function DecodeStream($parameters, $position, &$end_of_message, &$decoded)
+	function DecodeStream($parameters, $position, &$end_of_message, &$decoded)
 	{
 		$this->message_position = $position;
 		$end_of_message = 1;
@@ -1588,14 +1588,14 @@ class mime_parser_class
 
 	/* Public functions */
 
-	Function GetPartFileName($decoded, &$filename)
+	function GetPartFileName($decoded, &$filename)
 	{
 		if(IsSet($decoded['FileName']))
 			$filename = basename($decoded['FileName']);
 		return(1);
 	}
 
-	Function Parse($data, $end)
+	function Parse($data, $end)
 	{
 		if(strlen($this->error))
 			return(0);
@@ -1664,7 +1664,7 @@ class mime_parser_class
 		return(1);
 	}
 
-	Function ParseFile($file)
+	function ParseFile($file)
 	{
 		if(strlen($this->error))
 			return(0);
@@ -1689,7 +1689,7 @@ class mime_parser_class
 		return(1);
 	}
 
-	Function GetPart(&$part, &$end)
+	function GetPart(&$part, &$end)
 	{
 		$end = ($this->part_position >= count($this->parts));
 		if($end)
@@ -1868,7 +1868,7 @@ class mime_parser_class
 		<do>
 {/metadocument}
 */
-	Function Decode($parameters, &$decoded)
+	function Decode($parameters, &$decoded)
 	{
 		if(IsSet($parameters['File']))
 		{
@@ -1939,7 +1939,7 @@ class mime_parser_class
 {/metadocument}
 */
 
-	Function CopyAddresses($message, &$results, $header)
+	function CopyAddresses($message, &$results, $header)
 	{
 		if(!IsSet($message['Headers'][$header]))
 			return;
@@ -1971,7 +1971,7 @@ class mime_parser_class
 			$results[ucfirst(substr($header, 0, strlen($header) -1))] = $addresses;
 	}
 
-	Function ReadMessageBody($message, &$body, $prefix)
+	function ReadMessageBody($message, &$body, $prefix)
 	{
 		if(IsSet($message[$prefix]))
 			$body = $message[$prefix];
@@ -2138,7 +2138,7 @@ class mime_parser_class
 		<do>
 {/metadocument}
 */
-	Function Analyze($message, &$results)
+	function Analyze($message, &$results)
 	{
 		$results = array();
 		if(!IsSet($message['Headers']['content-type:']))
@@ -2526,7 +2526,7 @@ class mime_parser_class
 		<do>
 {/metadocument}
 */
-	Function GetPositionLine($position, &$line, &$column)
+	function GetPositionLine($position, &$line, &$column)
 	{
 		if(!$this->track_lines)
 			return($this->SetPositionedError('line positions are not being tracked', $position));

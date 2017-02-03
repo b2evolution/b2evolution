@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -21,7 +21,7 @@ class escapecode_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '5.0.0';
+	var $version = '6.7.9';
 	var $number_of_installs = 1;
 
 
@@ -58,8 +58,15 @@ class escapecode_plugin extends Plugin
 	 */
 	function FilterItemContents( & $params )
 	{
-		$content = & $params['content'];
-		$content = $this->escape_code( $content );
+		if( $params['object_type'] == 'Item' && ! empty( $params['object'] ) )
+		{
+			$Item = & $params['object'];
+			if( $Item->get_type_setting( 'allow_html' ) )
+			{	// Do escape html entities only when html is allowed for content:
+				$content = & $params['content'];
+				$content = $this->escape_code( $content );
+			}
+		}
 
 		return true;
 	}
@@ -104,6 +111,20 @@ class escapecode_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Called before at the beginning, if an email form gets sent (and received).
+	 */
+	function EmailFormSent( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( $this->is_renderer_enabled( $apply_rendering, $params['renderers'] ) )
+		{ // Do escape html entities only when html is allowed for content and plugin is enabled
+			$content = & $params['content'];
+			$content = $this->escape_code( $content );
+		}
+	}
+
+
+	/**
 	 * Perform rendering
 	 *
 	 * @see Plugin::RenderItemAsHtml()
@@ -137,6 +158,11 @@ class escapecode_plugin extends Plugin
 		if( strpos( $content, '<code' ) !== false )
 		{ // At least one tag <code> exists in the content, Do escape the html entities:
 			$content = preg_replace_callback( '#(<code[^>]*>)([\s\S]+?)(</code>)#is', array( $this, $callback_function ), $content );
+		}
+
+		if( strpos( $content, '`' ) !== false )
+		{ // String of codespan from markdown, Do escape the html entities:
+			$content = preg_replace_callback( '#(`)([^`\n]+)(`)#i', array( $this, $callback_function ), $content );
 		}
 
 		if( strpos( $content, '```' ) !== false )

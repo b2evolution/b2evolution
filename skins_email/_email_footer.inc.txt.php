@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -28,7 +28,7 @@ echo sprintf( T_( 'Your login on %s is: $login$' ), $Settings->get( 'notificatio
 echo "\n\n";
 
 echo T_( 'Too many emails?' )."\n";
-echo sprintf( T_('To edit your email notification preferences, click here: %s'), get_notifications_url( '&amp;', $recipient_user_ID ) );
+echo sprintf( T_('To edit your email notification preferences, click here: %s'), get_notifications_url( '&', $recipient_user_ID ) );
 if( !empty( $params['unsubscribe_text'] ) )
 { // Display the unsubscribe message with link
 	echo "\n".$params['unsubscribe_text'];

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package htsrv
  */
@@ -96,6 +96,9 @@ if( empty( $use_form_links ) )
 	$login_form_params['formstart'] = str_replace( '$form_links$', '', $login_form_params['formstart'] );
 }
 
+// Send the predefined cookies:
+evo_sendcookies();
+
 headers_content_mightcache( 'text/html', 0 );		// NEVER cache the login pages!
 
 $wrap_styles = array();
@@ -108,9 +111,10 @@ if( isset( $wrap_width ) )
 <!DOCTYPE html>
 <html lang="<?php locale_lang() ?>">
 <head>
+	<meta name="viewport" content="width = 600" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<title><?php echo $page_title ?></title>
 	<meta name="ROBOTS" content="NOINDEX" />
-	<meta name="viewport" content="width = 600" />
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 </head>
 <body>

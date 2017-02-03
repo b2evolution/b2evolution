@@ -9,6 +9,7 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+
 /**
  * Display debugging informations?
  *
@@ -34,16 +35,9 @@ $debug_jslog = 'pwd';
  */
 $debug_pwd = '';
 
-// Most of the time you'll want to see all errors, including notices:
-// b2evo should run without any notices! (plugins too!)
-if( version_compare( phpversion(), '5.3', '>=' ) )
-{	// sam2kb> Disable E_STRICT messages on PHP > 5.3, there are numerous E_STRICT warnings displayed throughout the app
-	error_reporting( E_ALL & ~E_STRICT );
-}
-else
-{
-	error_reporting( E_ALL );
-}
+// Most of the time you'll want to see all errors, including notices, to alert you on potential issues:
+// b2evo should run without any notices! (same for plugins!)
+error_reporting( E_ALL | E_STRICT );
 /**
  * Do we want to display errors, even when not in debug mode?
  *
@@ -64,9 +58,9 @@ $dev_menu = 0;
 
 
 // If you get blank pages or missing thumbnail images, PHP may be crashing because it doesn't have enough memory.
-// The default is 8 MB (in PHP < 5.2) and 128 MB (in PHP > 5.2)
+// The default is 128 MB (in PHP > 5.2)
 // Try uncommmenting the following line:
-// ini_set( 'memory_limit', '128M' );
+// @ini_set( 'memory_limit', '128M' );
 
 
 /**
@@ -84,17 +78,20 @@ $log_app_errors = 1;
 
 
 /**
- * Allows to force a timezone if PHP>=5.1
+ * Allows to force the timezone used by PHP (in case it's not properly configured in php.ini)
  * See: http://b2evolution.net/man/date_default_timezone-forcing-a-timezone
  */
 $date_default_timezone = '';
 
+
 /**
- * Thumbnail size definitions.
+ * Thumbnail/Image sizes
  *
- * NOTE: this gets used for general resizing, too. E.g. in the coll_avatar_Widget.
+ * This is used for resizing images to various sizes
  *
- * type, width, height, quality, percent of blur effect
+ * For each size: name => array( type, width, height, quality, percent of blur effect )
+ *
+ * @global array
  */
 $thumbnail_sizes = array(
 			'fit-1280x720' => array( 'fit', 1280, 720, 85 ),
@@ -122,6 +119,7 @@ $thumbnail_sizes = array(
 			'crop-15x15' => array( 'crop', 15, 15, 85 ),
 			'crop-top-320x320-blur-8' => array( 'crop-top', 320, 320, 80, 8 ),
 			'crop-top-320x320' => array( 'crop-top', 320, 320, 85 ),
+			'crop-top-200x200' => array( 'crop-top', 200, 200, 85 ),
 			'crop-top-160x160' => array( 'crop-top', 160, 160, 85 ),
 			'crop-top-80x80' => array( 'crop-top', 80, 80, 85 ),
 			'crop-top-64x64' => array( 'crop-top', 64, 64, 85 ),
@@ -136,6 +134,7 @@ $thumbnail_sizes = array(
  *  - Do not allow update of files in the file manager
  *  - Do not allow changes to the 'demouser' and 'admin' account/group
  *  - Blog media directories can only be configured to be inside of {@link $media_path}
+ *
  * @global boolean Default: false
  */
 $demo_mode = false;
@@ -146,7 +145,7 @@ $demo_mode = false;
  *
  * @global boolean
  */
-$test_install_all_features = false;
+$allow_install_test_features = false;
 
 
 /**
@@ -158,52 +157,33 @@ $home_url = $baseurl;
 
 
 /**
- * Comments: Set this to 1 to require e-mail and name, or 0 to allow comments
- * without e-mail/name.
- * @global boolean $require_name_email
- */
-$require_name_email = 1;
-
-/**
- * Minimum interval (in seconds) between consecutive comments from same IP.
- * @global int $minimum_comment_interval
- */
-$minimum_comment_interval = 30;
-
-
-/**
- * Check antispam blacklist for private messages.
- *
- * Do you want to check the antispam blocklist when a message form is submitted?
- *
- * @global boolean $antispam_on_message_form
- */
-$antispam_on_message_form = 1;
-
-
-/**
  * By default images get copied into b2evo cache without resampling if they are smaller
  * than requested thumbnails.
  *
- * Althought, if you want to use the BeforeThumbCreate event (Watermark plugin),
- * this should be set to 'true' in order to process smaller images.
+ * If you want to use the BeforeThumbCreate event (Watermark plugin), this should be set to 'true'
+ * to make sure that smaller images are also processed.
  *
  * @global boolean Default: false
  */
 $resample_all_images = false;
 
 
-// Get hostname out of baseurl
+// Decompose the baseurl
 // YOU SHOULD NOT EDIT THIS unless you know what you're doing
-if( preg_match( '#^(https?://(.+?)(:(.+?))?)(/.*)$#', $baseurl, $matches ) )
+if( preg_match( '#^((https?)://(www\.)?(.+?)(:.+?)?)(/.*)$#', $baseurl, $matches ) )
 {
 	$baseurlroot = $matches[1]; // no ending slash!
 	// echo "baseurlroot=$baseurlroot <br />";
-	$basehost = $matches[2];
+
+	$baseprotocol = $matches[2];
+
+	$basehost = $matches[4]; // Will NEVER include "www." at the beginning.
 	// echo "basehost=$basehost <br />";
-	$baseport =  $matches[4];
+
+	$baseport =  $matches[5]; // Will start with ":" if a port is specified.
 	// echo "baseport=$baseport <br />";
-	$basesubpath =  $matches[5];
+
+	$basesubpath =  $matches[6];
 	// echo "basesubpath=$basesubpath <br />";
 }
 else
@@ -213,27 +193,11 @@ else
 
 
 /**
- * Base domain of b2evolution.
- *
- * By default we try to extract it automagically from $basehost (itself extracted from $baseurl)
- * But you may need to adjust this manually.
- *
- * @todo does anyone have a clean way of handling stuff like .co.uk ?
- *
- * @global string
- */
-$basedomain = preg_replace( '/^( .* \. )? (.+? \. .+? )$/xi', '$2', $basehost );
-
-
-/**
  * Short name of this system (will be used for cookies and notification emails).
  *
- * Change this only if you install mutliple b2evolutions on the same website.
+ * Change this only if you install mutliple b2evolution instances on the same server or same domain.
  *
- * WARNING: don't play with this or you'll have tons of cookies sent away and your
- * readers surely will complain about it!
- *
- * You can change the notification email address alone a few lines below.
+ * WARNING: don't play with this or you'll have tons of cookies sent away and your users will have issues!
  *
  * @global string Default: 'b2evo'
  */
@@ -253,7 +217,7 @@ $db_config['show_errors'] = true;
 /**
  * Halt on MySQL errors? (default: true)
  *
- * Setting this to false is not recommended,
+ * Setting this to false is NOT recommended,
  */
 $db_config['halt_on_error'] = true;
 
@@ -269,13 +233,13 @@ $db_config['table_options'] = ''; 	// Low ranking MySQL hosting compatibility De
 /**
  * Use transactions in DB?
  *
- * You need to use InnoDB in order to enable this.
+ * b2evolution REQUIRES transactions to function properly. This also means InnoDB is required.
  */
 $db_config['use_transactions'] = true;
 
 
 /**
- * Display elements that are different on each request (Page processing time, ..)
+ * When debugging obhandler functions, we may need to stop polluting the output with debug info.
  *
  * Set this to true to prevent displaying minor changing elements (like time) in order not to have artificial content changes
  *
@@ -287,9 +251,11 @@ $obhandler_debug = false;
 // ** Cookies **
 
 /**
- * This is the path that will be associated to cookies.
+ * This is the path that will be associated with cookies.
  *
  * That means cookies set by this b2evo install won't be seen outside of this path on the domain below.
+ *
+ * This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function get_cookie_path()
  *
  * @global string Default: preg_replace( '#https?://[^/]+#', '', $baseurl )
  */
@@ -300,52 +266,53 @@ $cookie_path = preg_replace( '#https?://[^/]+#', '', $baseurl );
  *
  * That means cookies set by this b2evo install won't be seen outside of this domain.
  *
- * We'll take {@link $basehost} by default (the leading dot includes subdomains), but
- * when there's no dot in it, at least Firefox will not set the cookie. The best
- * example for having no dot in the host name is 'localhost', but it's the case for
- * host names in an intranet also.
+ * This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function get_cookie_domain()
+ *
+ * We'll take {@link $basehost} by default (the leading dot includes subdomains), but if there is no dot in it, at least (old?) Firefox will not set the cookie.
+ * The most common example for having no dot in the host name is 'localhost', but it's the case for host names in an intranet also.
  *
  * Note: ".domain.com" cookies will be sent to sub.domain.com too.
  * But, see http://www.faqs.org/rfcs/rfc2965:
- *	"If multiple cookies satisfy the criteria above, they are ordered in
- *	the Cookie header such that those with more specific Path attributes
- *	precede those with less specific.  Ordering with respect to other
- *	attributes (e.g., Domain) is unspecified."
+ *	"If multiple cookies satisfy the criteria above, they are ordered in the Cookie header such that those with more specific Path attributes
+ *	precede those with less specific. Ordering with respect to other attributes (e.g., Domain) is unspecified."
  *
- * @global string Default: ( strpos($basehost, '.') ) ? '.'. $basehost : '';
+ * @global string
  */
 if( strpos($basehost, '.') === false )
-{	// localhost or windows machine name:
+{	// "localhost" or windows machine name:
 	$cookie_domain = '';
 }
+else
+{
+	$cookie_domain = $basehost;
+}
+
+/* The following is no longer needed because we already strip away "www." from $basehost, so now in all cases the cookie domain should just be the base domain
+
 elseif( preg_match( '~^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$~i', $basehost ) )
 {	// The basehost is an IP address, use the basehost as it is:
 	$cookie_domain = $basehost;
 }
 else
-{	// Keep the part of the basehost after the www. :
-	$cookie_domain = preg_replace( '/^(www\. )? (.+)$/xi', '.$2', $basehost );
-
-	// When hosting multiple domains (not just subdomains) on a single instance of b2evo,
-	// you may want to try this:
-	// $cookie_domain = '.'.$_SERVER['HTTP_HOST'];
-	// or this: -- Have a cookie domain of 2 levels only, base on current basehost.
-	// $cookie_domain = preg_replace( '/^( .* \. )? (.+? \. .+? )$/xi', '.$2', $basehost );
-	// fp> pb with domains like .co.uk !?
+{
+	// Keep the part of the basehost after the www. :
+	//	$cookie_domain = preg_replace( '/^(www\. )? (.+)$/xi', '.$2', $basehost );
 }
+*/
 
-// echo $cookie_domain;
-
-/**#@+
- * Names for cookies.
+/**
+ * Name used for session cookies.
  */
-// The following remember the comment meta data for non registered users:
+$cookie_session = 'session_'.$instance_name;
+
+/**
+ * Names used for other cookies.
+ *
+ * The following remember the comment meta data for non registered users:
+ */
 $cookie_name    = 'cookie'.$instance_name.'name';
 $cookie_email   = 'cookie'.$instance_name.'email';
 $cookie_url     = 'cookie'.$instance_name.'url';
-// The following handles the session:
-$cookie_session = str_replace( '.', '_', 'session_'.$instance_name.'_'.$cookie_domain );
-/**#@-*/
 
 /**
  * Expiration for comment meta data cookies.
@@ -378,6 +345,7 @@ $cookie_expired = time() - 86400;
  * @global int $crumb_expires
  */
 $crumb_expires = 7200;
+
 
 /**
  * Page cache expiration time
@@ -456,6 +424,8 @@ $misc_inc_path = $inc_path.'_misc/';	   	// You should not need to change this
  * Note: This folder NEEDS to by accessible through HTTP.
  *
  * @global string $htsrv_subdir
+ * @global string $htsrv_path
+ * @global string $htsrv_url This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function get_htsrv_url( false )
  */
 $htsrv_subdir = 'htsrv/';                // Subdirectory relative to base
 $htsrv_path = $basepath.$htsrv_subdir;   // You should not need to change this
@@ -468,7 +438,7 @@ $htsrv_url = $baseurl.$htsrv_subdir;     // You should not need to change this
  * SSL for login, registration and profile updates (where passwords are
  * involved), but not for the whole htsrv scripts.
  *
- * @global string
+ * @global string $htsrv_url_sensitive This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function get_htsrv_url( true )
  */
 $htsrv_url_sensitive = $htsrv_url;
 
@@ -480,11 +450,23 @@ $xmlsrv_subdir = 'xmlsrv/';              // Subdirectory relative to base
 $xmlsrv_url = $baseurl.$xmlsrv_subdir;   // You should not need to change this
 
 /**
+ * URL of the REST API.
+ *
+ * @global string $restapi_script
+ * @global string $restapi_url This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function get_restapi_url()
+ */
+$restapi_script = 'rest.php?api_version=1&api_request='; // You should not need to change this
+$restapi_url = $htsrv_url.$restapi_script; // You should not need to change this
+
+/**
  * Location of the RSC folder.
  *
  * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
  *
  * @global string $rsc_subdir
+ * @global string $rsc_path
+ * @global string $rsc_url This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function Blog->get_local_rsc_url()
+ * @global string $rsc_uri
  */
 $rsc_subdir = 'rsc/';                    // Subdirectory relative to base
 $rsc_path = $basepath.$rsc_subdir;       // You should not need to change this
@@ -497,21 +479,12 @@ $rsc_uri = $basesubpath.$rsc_subdir;
  * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
  *
  * @global string $skins_subdir
+ * @global string $skins_path
+ * @global string $skins_url This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function Blog->get_local_skins_url()
  */
 $skins_subdir = 'skins/';                // Subdirectory relative to base
 $skins_path = $basepath.$skins_subdir;   // You should not need to change this
 $skins_url = $assets_baseurl.$skins_subdir;     // You should not need to change this
-
-/**
- * Location of the site skins folder.
- *
- * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
- *
- * @global string $siteskins_subdir
- */
-$siteskins_subdir = 'skins_site/';       		    // Subdirectory relative to base
-$siteskins_path = $basepath.$siteskins_subdir;  // You should not need to change this
-$siteskins_url = $assets_baseurl.$siteskins_subdir;    // You should not need to change this
 
 /**
  * Location of the email skins folder.
@@ -559,6 +532,8 @@ $locales_path = $basepath.$locales_subdir;  // You should not need to change thi
  * Exact requirements depend on installed plugins.
  *
  * @global string $plugins_subdir
+ * @global string $plugins_path
+ * @global string $plugins_url This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function Blog->get_local_plugins_url()
  */
 $plugins_subdir = 'plugins/';            // Subdirectory relative to base
 $plugins_path = $basepath.$plugins_subdir;  // You should not need to change this
@@ -600,6 +575,8 @@ $cache_path = $basepath.$cache_subdir; // You should not need to change this
  * Exact requirements depend on $public_access_to_media .
  *
  * @global string $media_subdir
+ * @global string $media_path
+ * @global string $media_url This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function Blog->get_local_media_url()
  */
 $media_subdir = 'media/';                   // Subdirectory relative to base
 $media_path = $basepath.$media_subdir;      // You should not need to change this
@@ -680,6 +657,13 @@ $dirpath_max_length = ( ( ( strtoupper( substr( PHP_OS, 0, 3 ) ) ) === 'WIN' ) ?
 
 
 /**
+ * Allow double dots in file names
+ * Use TRUE if you want to allow ".." in file and directory names like "..filename" or "dir..name"
+ */
+$filemanager_allow_dotdot_in_filenames = false;
+
+
+/**
  * XMLRPC logging. Set this to 1 to log XMLRPC calls received by this server (into /xmlsrv/xmlrpc.log).
  *
  * Default: 0
@@ -699,6 +683,29 @@ $cron_timeout_delay = 1800; // 30 minutes
  * Password change request delay in seconds. Only one email can be requested for one login or email address in each x seconds defined below.
  */
 $pwdchange_request_delay = 300; // 5 minutes
+
+
+/**
+ * Enabled password drivers.
+ * List what drivers must be enabled on your server.
+ * By default only first driver(which is support by server configuration) will be used to store new updated passwords in DB.
+ *
+ *   possible driver valuse:
+ *     - evo_salted
+ *     - bcrypt_2y
+ *     - bcrypt
+ *     - salted_md5
+ *     - phpass
+ *     - evo_md5 // Use this driver as last choice only.
+ */
+$enabled_password_drivers = array(
+		'evo_salted',
+		'bcrypt_2y',
+		'bcrypt',
+		'salted_md5',
+		'phpass',
+		'evo_md5', // Use this driver as last choice only.
+	);
 
 
 /**
@@ -816,31 +823,29 @@ $failed_logins_lockout = 600; // 10 minutes
  *
  * Possible values:
  *  - 'always' : Always allow redirects to a different domain
- *  - 'all_collections_and_redirected_posts' ( Default ): Allow redirects to all collection domains or redirect of posts with redirected status
+ *  - 'all_collections_and_redirected_posts' ( Default ): Allow redirects to all collection domains, ALL SUB-DOMAINS of $basehost or redirects of posts with redirected status
  *  - 'only_redirected_posts' : Allow redirects to a different domain only in case of posts with redirected status
- *  - 'never' : Force redirects to the current domain in all case, and never allow redirects to a different domain
+ *  - 'never' : Force redirects to the same domain in all of the cases, and never allow redirect to a different domain
  */
 $allow_redirects_to_different_domain = 'all_collections_and_redirected_posts';
 
 
 /**
- * Additional params you may want to pass to sendmail when sending emails
- * For setting the return-path, some Linux servers will require -r, others will require -f.
- * Allowed placeholders: $from-address$ , $return-address$
- *
- * @global string $sendmail_additional_params
+ * Turn this on to simulate email sends instead of really sending them through SMTP.
+ * This is useful if you are debugging a production database on a development machine.
+ * It will prevent from sending test notifications to real user accounts.
+ * You will still be able to see the emails that would have been sent through the Emails > Sent tab in the back-office.
  */
-$sendmail_additional_params = '-r $return-address$';
+$email_send_simulate_only = false;
 
 
 /**
- * Would you like to use CDNs as definied in the array $library_cdn_urls below 
+ * Would you like to use CDNs as definied in the array $library_cdn_urls below
  * or do you prefer to load all files from the local source as defined in the array $library_local_urls below?
  *
  * @global boolean $use_cdns
  */
-$use_cdns = true;
-
+$use_cdns = false;		// Use false by default so b2evo works on intranets, local tests on laptops and in countries with firewalls...
 
 /**
  * Which CDN do you want to use for loading common libraries?
@@ -848,9 +853,11 @@ $use_cdns = true;
  * If you don't want to use a CDN and want to use the local version, comment out the line.
  * Each line starts with the js or css alias.
  * The first string is the production (minified URL), the second is the development URL (optional).
+ * By default, only the most trusted CDNs are enabled while the other ones are commented out.
  */
 $library_cdn_urls = array(
 		'#jquery#' => array( '//code.jquery.com/jquery-1.11.1.min.js', '//code.jquery.com/jquery-1.11.1.js' ),
+		// jqueryUI is commented out because b2evo uses only a subset... ?
 		//'#jqueryUI#' => array( '//code.jquery.com/ui/1.10.4/jquery-ui.min.js', '//code.jquery.com/ui/1.10.4/jquery-ui.js' ),
 		//'#jqueryUI_css#' => array( '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.min.css', '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css' ),
 		'#bootstrap#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js', '//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.js' ),
@@ -874,12 +881,14 @@ $library_cdn_urls = array(
 			'#jqplot_canvasOverlay#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.canvasOverlay.min.js' ),
 			'#jqplot_donutRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.donutRenderer.min.js' ),
 			'#jqplot_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/jquery.jqplot.min.css' ),*/
-		//'#tinymce#' => array( '//tinymce.cachefly.net/4.1/tinymce.min.js' ),
+		//'#tinymce#' => array( '//cdn.tinymce.com/4/tinymce.min.js' ),
+		//'#tinymce_jquery#' => array( '//cdn.tinymce.com/4/jquery.tinymce.min.js' ),
 		//'#flowplayer#' => array( '//releases.flowplayer.org/5.4.4/flowplayer.min.js', '//releases.flowplayer.org/5.4.4/flowplayer.js' ),
 		//'#mediaelement#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/js/mediaelement-and-player.min.js', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/js/mediaelement-and-player.js' ),
 		//'#mediaelement_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.min.css', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.css' ),
-		//'#videojs#' => array( 'http://vjs.zencdn.net/c/video.js' ),
-		//'#videojs_css#' => array( 'http://vjs.zencdn.net/c/video-js.css' ),
+		//'#videojs#' => array( 'http://vjs.zencdn.net/4.2.0/video.js' ),
+		//'#videojs_css#' => array( 'http://vjs.zencdn.net/4.2.0/video-js.css' ),
+		'#fontawesome#' => array('//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css', '//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css'),
 	);
 
 /**
@@ -894,7 +903,7 @@ $library_local_urls = array(
 		'#jqueryUI_css#' => array( 'ext:jquery/ui/smoothness/jquery-ui.b2evo.min.css', 'ext:jquery/ui/smoothness/jquery-ui.b2evo.css' ),
 # Uncomment the following lines if your plugins need more jQueryUI features than the ones loaded by b2evo:
 #		'#jqueryUI#' => array( 'ext:jquery/ui/js/jquery.ui.all.min.js', 'ext:jquery/ui/js/jquery.ui.all.js' ),
-#		'#jqueryUI_css#' => array( 'ext:jquery/ui/smoothness/jquery-ui.css' ),
+#		'#jqueryUI_css#' => array( 'ext:jquery/ui/smoothness/jquery-ui.min.css', 'ext:jquery/ui/smoothness/jquery-ui.css' ),
 		'#bootstrap#' => array( 'ext:bootstrap/js/bootstrap.min.js', 'ext:bootstrap/js/bootstrap.js' ),
 		'#bootstrap_css#' => array( 'ext:bootstrap/css/bootstrap.min.css', 'ext:bootstrap/css/bootstrap.css' ),
 		'#bootstrap_theme_css#' => array( 'ext:bootstrap/css/bootstrap-theme.min.css', 'ext:bootstrap/css/bootstrap-theme.css' ),
@@ -913,7 +922,7 @@ $library_local_urls = array(
 		'#jqplot_donutRenderer#' => array( 'ext:jquery/jqplot/js/jqplot.donutRenderer.min.js' ),
 		'#jqplot_css#' => array( 'ext:jquery/jqplot/css/jquery.jqplot.min.css', 'ext:jquery/jqplot/css/jquery.jqplot.css' ),
 		'#tinymce#' => array( 'ext:tiny_mce/tinymce.min.js' ),
-		'#tinymce_gzip#' => array( 'ext:tiny_mce/tinymce.gzip.js' ),
+		'#tinymce_jquery#' => array( 'tiny_mce/jquery.tinymce.min.js' ),
 		'#flowplayer#' => array( 'ext:flowplayer/flowplayer.min.js', 'ext:flowplayer/flowplayer.js' ),
 		'#mediaelement#' => array( 'ext:mediaelement/js/mediaelement-and-player.min.js', 'ext:mediaelement/js/mediaelement-and-player.js' ),
 		'#mediaelement_css#' => array( 'ext:mediaelement/css/mediaelementplayer.min.css', 'ext:mediaelement/css/mediaelementplayer.css' ),
@@ -921,7 +930,34 @@ $library_local_urls = array(
 		'#videojs_css#' => array( 'ext:videojs/css/video-js.min.css', 'ext:videojs/css/video-js.css' ),
 		'#jcrop#' => array( 'ext:jquery/jcrop/js/jquery.jcrop.min.js', 'ext:jquery/jcrop/js/jquery.jcrop.js' ),
 		'#jcrop_css#' => array( 'ext:jquery/jcrop/css/jquery.jcrop.min.css', 'ext:jquery/jcrop/css/jquery.jcrop.css' ),
+		'#fontawesome#' => array( 'font-awesome.min.css', 'font-awesome.min.css' ),
 	);
+
+
+/**
+ * Allow to send outbound pings on localhost
+ */
+$allow_post_pings_on_localhost = false;
+
+
+/**
+ * Proxy configuration for all outgoing connections (like pinging b2evolution.net or twitter, etc...)
+ * Leave empty if you don't want to use a proxy.
+ */
+$outgoing_proxy_hostname = '';
+$outgoing_proxy_port = '';
+$outgoing_proxy_username = '';
+$outgoing_proxy_password = '';
+
+
+/**
+ * Check for old browsers like IE and display info message.
+ * Set to false if you don't want this check and never inform users if they use an old browser.
+ * Note: new default is false because it's easy to annoy IE users with that and they wan't do anything about their enterprise settings that makes them advertsie an older IE than they really have
+ *       On our end though we'll send an 'IE-Edge' header and it will make the IE on the other end behva ethe best it can...
+ */
+$check_browser_version = false;
+
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
 $evonetsrv_host = 'rpc.b2evo.net';
@@ -931,6 +967,14 @@ $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
 $antispamsrv_host = 'antispam.b2evo.net';
 $antispamsrv_port = 80;
 $antispamsrv_uri = '/evonetsrv/xmlrpc.php';
+// For local testing, use something like:
+// $antispamsrv_uri = '/.../xmlsrv/xmlrpc.php';
+$antispamsrv_tos_url = 'http://b2evolution.net/about/terms.html';
+
+/**
+ * Set TRUE if THIS server should be used as central antispam server
+ */
+$enable_blacklist_server_API = false;
 
 // This is for plugins to add CS files to the TinyMCE editor window:
 $tinymce_content_css = array();

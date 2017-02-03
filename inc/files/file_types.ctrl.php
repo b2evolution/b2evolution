@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package admin
@@ -193,6 +193,22 @@ $AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('Files'), '?ctrl=files&amp;blog=$blog$' );
 $AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=fileset' );
 $AdminUI->breadcrumbpath_add( T_('File types'), '?ctrl=filetypes' );
+
+// Set an url for manual page:
+switch( $action )
+{
+	case 'delete':
+	case 'new':
+	case 'copy':
+	case 'create':
+	case 'edit':
+	case 'update':
+		$AdminUI->set_page_manual_link( 'file-type-editing' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'file-types' );
+		break;
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

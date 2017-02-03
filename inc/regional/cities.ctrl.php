@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -133,7 +133,7 @@ switch( $action )
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_City = duplicate( $edited_City ); // PHP4/5 abstraction
+			$edited_City = clone $edited_City;
 			$edited_City->ID = 0;
 		}
 		break;
@@ -309,6 +309,25 @@ $AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
 $AdminUI->breadcrumbpath_add( T_('Regional'), $admin_url.'?ctrl=locales' );
 $AdminUI->breadcrumbpath_add( T_('Cities'), $admin_url.'?ctrl=cities' );
 
+// Set an url for manual page:
+switch( $action )
+{
+	case 'delete':
+	case 'new':
+	case 'create':
+	case 'create_new':
+	case 'create_copy':
+	case 'edit':
+	case 'update':
+		$AdminUI->set_page_manual_link( 'cities-editing' );
+		break;
+	case 'csv':
+		$AdminUI->set_page_manual_link( 'cities-import' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'cities-list' );
+		break;
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

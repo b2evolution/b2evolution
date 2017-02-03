@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -27,10 +27,10 @@ class coll_page_list_Widget extends coll_item_list_Widget
 	/**
 	 * Constructor
 	 */
-	function coll_page_list_Widget( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'coll_page_list' );
+		ComponentWidget::__construct( $db_row, 'core', 'coll_page_list' );
 	}
 
 
@@ -42,22 +42,48 @@ class coll_page_list_Widget extends coll_item_list_Widget
 	 */
 	function get_param_definitions( $params )
 	{
+		$ItemTypeCache = & get_ItemTypeCache();
+		$ItemTypeCache->clear();
+		$ItemTypeCache->load_where( 'ityp_usage = "page"' ); // Load only page item types
+		$item_type_cache_load_all = $ItemTypeCache->load_all; // Save original value
+		$ItemTypeCache->load_all = false; // Force to don't load all item types in get_option_array() below
+		$page_item_type_options =
+			array(
+				''  => T_('All'),
+			) + $ItemTypeCache->get_option_array();
+		// Revert back to original value:
+		$ItemTypeCache->load_all = $item_type_cache_load_all;
+
 		// This is derived from coll_post_list_Widget, so we DO NOT ADD ANY param here!
 		$r = parent::get_param_definitions( $params );
 		// We only change the defaults and hide some params.
 		$r['title']['defaultvalue'] = T_('Pages');
 		$r['title_link']['no_edit'] = true;
-		$r['item_type']['no_edit'] = true;
+		$r['item_type_usage']['no_edit'] = true;
+		$r['featured']['no_edit'] = true;
 		$r['follow_mainlist']['no_edit'] = true;
 		$r['blog_ID']['no_edit'] = true;
 		$r['blog_ID']['defaultvalue'] = '-'; // Display the pages only of the current blog and exclude the aggregated blogs
 		$r['cat_IDs']['no_edit'] = true;
+		$r['item_group_by']['no_edit'] = true;
 		$r['item_title_link_type']['no_edit'] = true;
-		$r['disp_excerpt']['no_edit'] = true;
-		$r['disp_teaser']['no_edit'] = true;
+		$r['disp_first_image']['no_edit'] = true;
+		$r['disp_first_image']['defaultvalue'] = 'special';
+		$r['item_pic_link_type']['no_edit'] = true;
+		// $r['disp_excerpt']['no_edit'] = true;
+		// $r['disp_teaser']['no_edit'] = true;
 		$r['disp_teaser_maxwords']['no_edit'] = true;
 		$r['widget_css_class']['no_edit'] = true;
 		$r['widget_ID']['no_edit'] = true;
+
+		// Allow to select what page item type to display:
+		$r['item_type'] = array(
+				'label' => T_('Exact post type'),
+				'note' => T_('What type of items do you want to list?'),
+				'type' => 'select',
+				'options' => $page_item_type_options,
+				'defaultvalue' => '',
+			);
 
 		return $r;
 	}
@@ -109,7 +135,7 @@ class coll_page_list_Widget extends coll_item_list_Widget
 	function init_display( $params )
 	{
 		// Force some params (because this is a simplified widget):
-		$params['item_type'] = '1000';	// Use post types 1000 (pages) only
+		$params['item_type_usage'] = 'page';	// Use post types usage "page" only
 
 		parent::init_display( $params );
 	}

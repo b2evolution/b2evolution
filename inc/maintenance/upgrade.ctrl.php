@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -49,10 +49,16 @@ $AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
 if( $tab == 'svn' )
 {
 	$AdminUI->breadcrumbpath_add( T_('Upgrade from SVN'), $admin_url.'?ctrl=upgrade&amp;tab='.$tab );
+
+	// Set an url for manual page:
+	$AdminUI->set_page_manual_link( 'upgrade-from-svn' );
 }
 else
 {
 	$AdminUI->breadcrumbpath_add( T_('Auto Upgrade'), $admin_url.'?ctrl=upgrade' );
+
+	// Set an url for manual page:
+	$AdminUI->set_page_manual_link( 'auto-upgrade' );
 }
 
 
@@ -100,11 +106,11 @@ switch( $action )
 			global $global_Cache;
 
 			// Display the current version info for now. We may remove this in the future.
-			$version_status_msg = $global_Cache->get( 'version_status_msg' );
+			$version_status_msg = $global_Cache->getx( 'version_status_msg' );
 			if( !empty($version_status_msg) )
 			{	// We have managed to get updates (right now or in the past):
 				echo '<p>'.$version_status_msg.'</p>';
-				$extra_msg = $global_Cache->get( 'extra_msg' );
+				$extra_msg = $global_Cache->getx( 'extra_msg' );
 				if( !empty($extra_msg) )
 				{
 					echo '<p>'.$extra_msg.'</p>';
@@ -115,7 +121,7 @@ switch( $action )
 			unset( $block_item_Widget );
 
 			// Extract array of info about available update:
-			$updates = $global_Cache->get( 'updates' );
+			$updates = $global_Cache->getx( 'updates' );
 
 			$action = 'start';
 			$AdminUI->disp_view( 'maintenance/views/_upgrade.form.php' );
@@ -168,7 +174,7 @@ switch( $action )
 			$Messages->display();
 
 			// Extract array of info about available update:
-			$updates = $global_Cache->get( 'updates' );
+			$updates = $global_Cache->getx( 'updates' );
 
 			$action = 'start';
 			$AdminUI->disp_view( 'maintenance/views/_upgrade.form.php' );
@@ -308,7 +314,7 @@ switch( $action )
 			{
 				echo '</p>';
 				// Additional check
-				@rmdir_r( $upgrade_dir );
+				rmdir_r( $upgrade_dir );
 			}
 		}
 
@@ -356,7 +362,7 @@ switch( $action )
 		}
 		else
 		{ // Old/Same version
-			echo '<div class="action_messages"><div class="log_error" style="text-align:center;font-weight:bold">'.$new_version_status.'</div></div>';
+			echo '<div class="alert '.( $new_version_status['error'] == 'old' ? 'alert-danger' : 'alert-warning' ).'">'.$new_version_status['message'].'</div>';
 		}
 
 		echo '<p>'
@@ -367,7 +373,7 @@ switch( $action )
 				.'<li>'.T_( 'A backup will be performed' ).'</li>'
 				.'<li>'.T_( 'The upgrade will be applied' ).'</li>'
 				.'<li>'.T_( 'The install script of the new version will be called' ).'</li>'
-				.'<li>'.sprintf( T_( 'The cleanup rules from %s will be applied' ), '<b>upgrade_policy.conf</b>' ).'</li>'
+				.'<li>'.sprintf( T_( 'The cleanup rules from %s will be applied' ), '<code>'.get_upgrade_config_file_name().'</code>' ).'</li>'
 				.'<li>'.T_( 'The site will switch to normal mode again at the end of the install script.' ).'</li>'
 			.'</ul></p>';
 

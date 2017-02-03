@@ -72,7 +72,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 		<description></description>
 		<language><?php $Blog->disp( 'locale', 'xml' ) ?></language>
 		<docs>http://backend.userland.com/rss092</docs>
-		<?php while( $Comment = & $CommentList->get_next( false ) )
+		<?php while( $Comment = & $CommentList->get_next() )
 		{ // Loop through comments:
 			// Load comment's Item:
 			$Comment->get_Item();

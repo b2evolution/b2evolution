@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -45,7 +45,7 @@ skin_widget( array(
 	) );
 // ------------------------- END OF SEARCH FORM WIDGET -------------------------
 
-// Display the search result
+// Perform search (after having displayed the first part of the page) & display results:
 search_result_block( array(
 		'pagination'        => $params['pagination'],
 		'use_editor'        => $params['search_use_editor'],

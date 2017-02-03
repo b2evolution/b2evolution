@@ -6,7 +6,41 @@
  * Override this with style.css in your skin folder.
  */
 
+// ----- WIDGETS -----
+
+// About Author widget:
+@import "_about_author_widget.module.less";
+
+// Universal item list widget & Recent posts widget:
+@import "_universal_item_list_widget.module.less";
+
+// Media Index widget:
+@import "_coll_media_index_widget.module.less";
+
+// User Avatars (User List) widget:
+@import "_user_avatars_widget.module.less";
+
+// Organization Members widget:
+@import "_org_members_widget.module.less";
+
+
+// ----- PLUGINS -----
+
+// CSS overrides for "HTML 5 VideoJS Player" plugin:
+@import "inc/video-js-overrides.inc.less";
+
+
+// -----
+
+
+// Rating Summary for all comments of the selected post on disp=single:
 @import "inc/star_rating.inc.less";
+
+
+
+*[class^="listnav_distance_"], *[class*=" listnav_distance_"] {
+	display: none;
+}
 
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
@@ -402,6 +436,10 @@ div.tabs div.selected a {
 .action_icon {
 	margin: 0 2px;
 	font-weight: bold;
+	// Fix alignment for flag buttons:
+	&.evo_post_flag_btn {
+		margin-left: 0;
+	}
 }
 .title_action_icons {
 	float: right;
@@ -633,7 +671,8 @@ div.item_location {
 }
 
 // Not published comments display
-#styled_content_block span[class*=status_] {
+#styled_content_block span[class*=status_],
+.evo_content_block span[class*=status_] {
 	background: transparent;
 	width: 75px;
 	height: 75px;
@@ -680,10 +719,11 @@ div.item_location {
 }
 .note.status_meta span {
 	color: #fff;
-	background-color: #5133ab;
+	background-color: #5bc0de;
 }
 
-#styled_content_block span[class*=status_] span {
+#styled_content_block span[class*=status_] span,
+.evo_content_block span[class*=status_] span {
 	display: block;
 	width: 120px;
 	text-align: center;
@@ -712,7 +752,8 @@ div.results span[class*=status_] span {
 
 @fix-IE8-media-screen: ~"\0screen";
 @media @fix-IE8-media-screen {/* IE8 */
-	#styled_content_block span[class*=status_] span {
+	#styled_content_block span[class*=status_] span,
+	.evo_content_block span[class*=status_] span {
 		top: -15px;
 		left: -2px;
 	}
@@ -752,7 +793,8 @@ div.results span[class*=status_] span {
 // It is used for example on forums skins where we use AJAX to change a comment status.
 //     On AJAX success result we change only a visibility of the status banners and buttons
 //     and we do NOT reload a comment content
-#styled_content_block {
+#styled_content_block,
+.evo_content_block {
 	.vs_published,
 	.vs_community,
 	.vs_protected,
@@ -883,4 +925,84 @@ input.btn-lg {
 .bComment .other_profile_pictures div.avatartag {
 	float: none;
 	display: inline-block;
+}
+
+// Standard style for all tables of content:
+.evo_content_block table {
+	border-spacing: 0;
+	border-collapse: collapse;
+	margin: 1em 0;
+	th {
+		border: 1px solid #ddd;
+		padding: 8px;
+		background-color: #eee;
+	}
+	td {
+		border: 1px solid #ddd;
+		padding: 8px;
+		vertical-align: top;
+	}
+}
+
+.evo_content_block table.evo_poll__table {
+	border-spacing: 0;
+	border-collapse: collapse;
+	margin: 1em 0;
+	th {
+		padding: 2px 10px 2px 0;
+		background-color: #eee;
+	}
+	td {
+		padding: 2px 10px 2px 0;
+		vertical-align: top;
+	}
+}
+
+// Images gallery:
+.evo_post_gallery__image {
+	display: inline-block;
+	margin: 0 1ex 1ex 0;
+}
+
+// Poll table:
+.evo_poll__table {
+	margin-bottom: 14px;
+	width: 100%;
+	td {
+		padding: 2px 10px 2px 0;
+		vertical-align: top;
+	}
+	tr td:last-child {
+		padding-right: 0;
+	}
+	input[type=radio], label {
+		margin: 0;
+	}
+	.evo_poll__percent_bar {
+		width: 100%;
+		min-width: 40px;
+		padding-right: 6px;
+		> div {
+			width: 100%;
+			vertical-align: middle;
+			display: inline-block;
+			> div {
+				background: #ffcc66;
+				height: 12px;
+				min-width: 1px;
+			}
+		}
+	}
+	.evo_poll__selector {
+		width: 5px;
+	}
+	.evo_poll__title {
+		white-space: nowrap;
+	}
+	.evo_poll_percentage {
+		max-width: 50px;
+	}
+}
+.evo_container__sidebar .evo_poll__title {
+	white-space: normal;
 }

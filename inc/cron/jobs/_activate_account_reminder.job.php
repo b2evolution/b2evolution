@@ -8,7 +8,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $DB, $UserSettings, $Settings;
 
-global $servertimenow, $baseurl, $secure_htsrv_url, $activate_account_reminder_config, $activate_account_reminder_threshold;
+global $servertimenow, $baseurl, $activate_account_reminder_config, $activate_account_reminder_threshold;
 
 if( $Settings->get( 'validation_process' ) != 'easy' )
 {

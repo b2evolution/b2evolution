@@ -10,7 +10,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( version_compare( $app_version, '6.4' ) < 0 )
+if( evo_version_compare( $app_version, '6.4' ) < 0 )
 { // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.
 	die( 'This skin is designed for b2evolution 6.4 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
@@ -40,12 +40,10 @@ if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 { // If it exists in media folder
 	echo '<img src="'.$media_url.$bg_image.'" />';
 }
-echo '</div>';
+
 ?>
 
-
 <div class="container main_page_wrapper">
-
 
 <div class="row">
 
@@ -112,8 +110,9 @@ echo '</div>';
 			echo '<div class="panel panel-default"><div class="panel-body">';
 			skin_include( '_item_block.inc.php', array(
 					'feature_block' => true,
-					'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
-					'intro_mode'   => 'normal',	// Intro posts will be displayed in normal mode
+					'content_mode'  => 'auto',		// 'auto' will auto select depending on $disp-detail
+					'intro_mode'    => 'normal',	// Intro posts will be displayed in normal mode
+					'Item'          => $Item,
 				) );
 			echo '</div></div>';
 			// ----------------------------END ITEM BLOCK  ----------------------------
@@ -123,7 +122,7 @@ echo '</div>';
 		<?php
 			// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
 			skin_include( '$disp$', array(
-					'author_link_text' => 'preferredname',
+					'author_link_text' => 'auto',
 					// Profile tabs to switch between user edit forms
 					'profile_tabs' => array(
 						'block_start'         => '<nav><ul class="nav nav-tabs profile_tabs">',
@@ -137,9 +136,11 @@ echo '</div>';
 					'pagination' => array(
 						'block_start'           => '<div class="center"><ul class="pagination">',
 						'block_end'             => '</ul></div>',
-						'page_current_template' => '<span><b>$page_num$</b></span>',
+						'page_current_template' => '<span>$page_num$</span>',
 						'page_item_before'      => '<li>',
 						'page_item_after'       => '</li>',
+						'page_item_current_before' => '<li class="active">',
+						'page_item_current_after'  => '</li>',
 						'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
 						'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 					),
@@ -202,13 +203,16 @@ echo '</div>';
 
 	</div><!-- .col -->
 
+	<!-- "Slide down" button -->
+	<div class="slide_button_wrap"><a href="#" id="slide_button"><i class="fa fa-angle-down" ></i></a></div>
+
 </div><!-- .row -->
 
 </div><!-- .container -->
-
+</div><!-- #bg_picture -->
 
 <!-- =================================== START OF SECONDARY AREA =================================== -->
-<section class="secondary_area"><!-- white background -->
+<section class="secondary_area" id="slide_destination"><!-- white background, ID is used to slide here from "slide_button" -->
 <div class="container">
 
 	<div class="row">
@@ -300,11 +304,22 @@ echo '</div>';
 
 	</div><!-- .row -->
 
-
 </div><!-- .container -->
 
 </section><!-- .secondary_area -->
 
+<script>
+// Scroll Down to content
+// ======================================================================== /	
+$slide_down = $( "#slide_button" );
+// Smooth scroll to top
+$slide_down.on( "click", function(event) {
+	event.preventDefault();
+	$( "body, html, #skin_wrapper" ).animate({
+		scrollTop: $("#slide_destination").offset().top +26
+	}, 1000);
+});
+</script>
 
 <?php
 // ---------------------------- SITE FOOTER INCLUDED HERE ----------------------------

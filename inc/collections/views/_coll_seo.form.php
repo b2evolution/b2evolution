@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  *
@@ -54,7 +54,7 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'seo' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
-$Form->begin_fieldset( T_('Main page / post list').get_manual_link('main_page_seo') );
+$Form->begin_fieldset( T_('Browsing posts pages').' <span class="text-muted">(disp=posts)</span>'.get_manual_link('main_page_seo') );
 	$Form->checkbox( 'default_noindex', $edited_Blog->get_setting( 'default_noindex' ), T_('Default blog page'), T_('META NOINDEX') );
 	$Form->checklist( array(
 		array( 'canonical_homepage', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_homepage' ) ),
@@ -74,9 +74,9 @@ $Form->begin_fieldset( T_('Main page / post list').get_manual_link('main_page_se
 
 	$Form->radio( 'main_content', $edited_Blog->get_setting('main_content'),
 		array(
-				array( 'excerpt', T_('Post excerpts') ),
-				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
-				array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
+				array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
+				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
+				array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
 			), T_('Post contents'), true );
 
  	$Form->radio( 'permalinks', $edited_Blog->get_setting('permalinks'), array(
@@ -123,7 +123,10 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 			T_('Meta Keywords'), T_('When no meta keywords are provided for an item, use tags instead.') );
 
 	$Form->checkbox( 'tags_open_graph', $edited_Blog->get_setting( 'tags_open_graph' ),
-			T_('Open Graph'), T_('Include open graph tags like og:image and og:type.') );
+			T_('Open Graph'), T_('Open Graph tags (og:title, og:url, og:description, og:type and og:image)') );
+
+	$Form->checkbox( 'tags_twitter_card', $edited_Blog->get_setting( 'tags_twitter_card' ),
+			T_('Twitter Card'), T_('Include Twitter Summary card') );
 
 $Form->end_fieldset();
 
@@ -147,9 +150,9 @@ $Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive_pages_s
 
 	$Form->radio( 'archive_content', $edited_Blog->get_setting('archive_content'),
 		array(
-				array( 'excerpt', T_('Post excerpts') ),
-				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
-				array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
+				array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
+				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
+				array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
 			), T_('Post contents'), true );
 
 	$Form->text( 'archive_posts_per_page', $edited_Blog->get_setting('archive_posts_per_page'), 4, T_('Posts per page'),
@@ -196,9 +199,9 @@ $Form->begin_fieldset( T_('Category pages').get_manual_link('category_pages_seo'
 
 	$Form->radio( 'chapter_content', $edited_Blog->get_setting('chapter_content'),
 		array(
-				array( 'excerpt', T_('Post excerpts') ),
-				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
-				array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
+				array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
+				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
+				array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
 			), T_('Post contents'), true );
 
 	$Form->text( 'chapter_posts_per_page', $edited_Blog->get_setting('chapter_posts_per_page'), 4, T_('Posts per page'),
@@ -244,9 +247,9 @@ $Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo'), array('
 
 	$Form->radio( 'tag_content', $edited_Blog->get_setting('tag_content'),
 		array(
-				array( 'excerpt', T_('Post excerpts') ),
-				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
-				array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
+				array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
+				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
+				array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
 			), T_('Post contents'), true );
 
 	$Form->text( 'tag_posts_per_page', $edited_Blog->get_setting('tag_posts_per_page'), 4, T_('Posts per page'),
@@ -296,9 +299,9 @@ $Form->begin_fieldset( T_('Other filtered pages').get_manual_link('other_filtere
 
 	$Form->radio( 'filtered_content', $edited_Blog->get_setting('filtered_content'),
 		array(
-				array( 'excerpt', T_('Post excerpts') ),
-				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")') ),
-				array( 'full', T_('Full post contents (including after "[teaserbreak]")') ),
+				array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
+				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
+				array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
 			), T_('Post contents'), true );
 $Form->end_fieldset();
 

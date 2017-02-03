@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  * @author blueyed: Daniel HAHLER
@@ -48,7 +48,8 @@ if( ! empty($tab) )
 		}
 		else
 		{
-			$Plugins->call_method_if_active( $tab_plugin_ID, 'AdminTabAction', $params = array() );
+			$plugin_params = array();
+			$Plugins->call_method_if_active( $tab_plugin_ID, 'AdminTabAction', $plugin_params );
 		}
 	}
 	else
@@ -148,6 +149,32 @@ if( empty($tab) )
 			Hitlist::dbprune(); // will prune once per day, according to Settings
 			break;
 
+		case 'create_sample_collections':
+			// Create sample collections:
+			$num_collections = param( 'num_collections', 'integer', 0 );
+
+			$perm_management = param( 'perm_management', 'array:string' );
+			if( empty( $perm_management ) )
+			{	// At least one option must be selected:
+				$Messages->add( sprintf( T_('Please selected at least one option of the setting "%s".'), T_('Permission management') ), 'error' );
+			}
+
+			$allow_access = param( 'allow_access', 'array:string' );
+			if( empty( $allow_access ) )
+			{	// At least one option must be selected:
+				$Messages->add( sprintf( T_('Please selected at least one option of the setting "%s".'), T_('Allow access to') ), 'error' );
+			}
+
+			if( param_errors_detected() )
+			{	// If some param errors then stop a creating and display a form to correct:
+				$action = 'show_create_collections';
+				break;
+			}
+
+			// Execute a creating of collections inside template in order to see a process:
+			$template_action = 'create_sample_collections';
+			break;
+
 		case 'create_sample_comments':
 			$blog_ID = param( 'blog_ID', 'string', 0 );
 			$num_comments = param( 'num_comments', 'string', 0 );
@@ -202,10 +229,22 @@ if( empty($tab) )
 
 		case 'create_sample_users':
 			$num_users = param( 'num_users', 'string', 0 );
-			$group_ID = param( 'group_ID', 'string', 0 );
+			param_check_number( 'num_users', T_('"How many users" field must be a number'), true );
 
-			if( ! param_check_number( 'num_users', T_('"How many users" field must be a number'), true ) )
-			{ // param errors
+			$user_groups = param( 'user_groups', 'array:integer' );
+			if( empty( $user_groups ) )
+			{	// At least one option must be selected:
+				$Messages->add( sprintf( T_('Please selected at least one option of the setting "%s".'), T_('Create new users in') ), 'error' );
+			}
+
+			$advanced_user_perms = param( 'advanced_user_perms', 'array:string' );
+			if( empty( $advanced_user_perms ) )
+			{	// At least one option must be selected:
+				$Messages->add( sprintf( T_('Please selected at least one option of the setting "%s".'), T_('Advanced user perms to grant on existing collections with advanced perms') ), 'error' );
+			}
+
+			if( param_errors_detected() )
+			{	// If some param errors then stop a creating and display a form to correct:
 				$action = 'show_create_users';
 				break;
 			}
@@ -225,6 +264,28 @@ if( empty($tab) )
 			// Convert item content separators to new format
 			// Execute these actions inside template in order to see the process
 			$template_action = $action;
+			break;
+
+		case 'delete_item_versions':
+			param( 'confirmed', 'integer', 0 );
+
+			if( $confirmed )
+			{
+				$count = $DB->get_var( 'SELECT COUNT(*) FROM T_items__version' );
+				$DB->query( 'TRUNCATE TABLE T_items__version' );
+				if( $count > 0 )
+				{
+					$Messages->add( sprintf( T_('Cleared %d records from the item versions table.'), $count ) );
+				}
+				else
+				{
+					$Messages->add( sprintf( T_('Item versions table already empty.'), $count ), 'note' );
+				}
+			}
+			else
+			{
+				$action ='show_delete_item_versions';
+			}
 			break;
 
 		case 'del_obsolete_tags':
@@ -336,15 +397,24 @@ switch( $tab3 )
 {
 	case 'import':
 		$AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=tools&amp;tab3=import' );
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'import-tab' );
 		break;
 
 	case 'test':
 		$AdminUI->breadcrumbpath_add( T_('Testing'), $admin_url.'?ctrl=tools&amp;tab3=import' );
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'testing-tools' );
 		break;
 
 	case 'tools':
 	default:
 		$AdminUI->breadcrumbpath_add( T_('Tools'), $admin_url.'?ctrl=tools' );
+
+		// Set an url for manual page:
+		$AdminUI->set_page_manual_link( 'tools-tab' );
 		break;
 }
 
@@ -369,6 +439,10 @@ if( empty($tab) )
 
 		case 'find_broken_slugs':
 			$AdminUI->disp_view( 'tools/views/_broken_slugs.view.php' );
+			break;
+
+		case 'show_create_collections':
+			$AdminUI->disp_view( 'tools/views/_create_collections.form.php' );
 			break;
 
 		case 'show_create_comments':
@@ -397,6 +471,11 @@ if( empty($tab) )
 			$threads_count = $users_count * $users_count - $users_count + 1;
 
 			$AdminUI->disp_view( 'tools/views/_create_messages.form.php' );
+			break;
+
+		case 'show_delete_item_versions':
+			$AdminUI->disp_view( 'tools/views/_delete_item_versions.form.php' );
+			$AdminUI->disp_view( 'tools/views/_misc_tools.view.php' );
 			break;
 
 
@@ -435,7 +514,8 @@ elseif( $tab_Plugin )
 	</div>
 
 	<?php
-	$Plugins->call_method_if_active( $tab_plugin_ID, 'AdminTabPayload', $params = array() );
+	$plugin_params = array();
+	$Plugins->call_method_if_active( $tab_plugin_ID, 'AdminTabPayload', $plugin_params );
 }
 
 

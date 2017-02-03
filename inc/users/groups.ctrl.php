@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -19,7 +19,8 @@ global $AdminUI;
 
 $AdminUI->set_path( 'users', 'groups' );
 
-param_action('list');
+param_action( 'list' );
+param( 'tab', 'string', '', true );
 
 param( 'grp_ID', 'integer', NULL );		// Note: should NOT be memorized:    -- " --
 
@@ -77,7 +78,7 @@ if( $grp_ID !== NULL )
 		}
 	}
 
-	if( $action != 'view' && $action != 'list' )
+	if( $action != 'view' && $action != 'list' && $action != 'filter' )
 	{ // check edit permissions
 		if( !$current_User->check_perm( 'users', 'edit' ) )
 		{
@@ -98,6 +99,7 @@ switch ( $action )
 		// We want to create a new group:
 		if( isset( $edited_Group ) )
 		{ // We want to use a template
+			$edited_Group->get_GroupSettings(); // Load all group settings
 			$new_Group = $edited_Group; // Copy !
 			$new_Group->set( 'ID', 0 );
 			$edited_Group = & $new_Group;
@@ -158,6 +160,29 @@ switch ( $action )
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( '?ctrl=groups', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
+
+
+	case 'update_perms':
+		// Update permissions of the edited group for collections:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'group' );
+
+		if( empty( $edited_Group ) || ! is_object( $edited_Group ) || $edited_Group->ID == 0 )
+		{
+			$Messages->add( 'No group set!' ); // Needs no translation, should be prevented by UI.
+			$action = 'list';
+			break;
+		}
+
+		// Update group permissions for each colleciton:
+		blog_update_perms( $edited_Group->ID, 'coll' );
+		$Messages->add( T_('The blog permissions have been updated'), 'success' );
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $admin_url.'?ctrl=groups&action=edit&tab=collection&grp_ID='.$edited_Group->ID, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
@@ -230,6 +255,52 @@ if( $action == 'list' && $current_User->check_perm( 'users', 'edit', false ) )
 	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 }
 
+// Set an url for manual page:
+switch( $action )
+{
+	case 'new':
+		$AdminUI->set_page_manual_link( 'editing-user-groups' );
+		break;
+
+	case 'edit':
+	case 'filter':
+		if( $edited_Group->ID > 0 )
+		{	// Add menu level 3 entries:
+			$AdminUI->add_menu_entries( array( 'users', 'groups' ), array(
+					'general' => array(
+						'text' => T_('General Permissions'),
+						'href' => $admin_url.'?ctrl=groups&amp;action=edit&amp;tab=general&amp;grp_ID='.$edited_Group->ID ),
+					'collection' => array(
+						'text' => T_('Collection Permissions'),
+						'href' => $admin_url.'?ctrl=groups&amp;action=edit&amp;tab=collection&amp;grp_ID='.$edited_Group->ID ),
+				) );
+		}
+
+		switch( $tab )
+		{
+			case 'collection':
+				// Collection Permissions:
+				$AdminUI->set_page_manual_link( 'group-collection-permissions' );
+				$AdminUI->set_path( 'users', 'groups', 'collection' );
+				// Memorize group ID to sort permissions table:
+				memorize_param( 'grp_ID', 'integer', true );
+				// Memorize action to filter permissions table:
+				memorize_param( 'action', 'string', true );
+				// Load JavaScript to toggle checkboxes:
+				require_js( 'collectionperms.js', 'rsc_url' );
+				break;
+			default:
+				// General Permissions:
+				$AdminUI->set_page_manual_link( 'editing-user-groups' );
+				$AdminUI->set_path( 'users', 'groups', 'general' );
+				break;
+		}
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'user-groups' );
+		break;
+}
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -243,8 +314,22 @@ $AdminUI->disp_payload_begin();
 switch( $action )
 {
 	case 'new':
-	case 'edit':
 		$AdminUI->disp_view( 'users/views/_group.form.php' );
+		break;
+	case 'edit':
+	case 'filter':
+		switch( $tab )
+		{
+			case 'collection':
+				// Collection Permissions:
+				load_funcs( 'collections/views/_coll_perm_view.funcs.php' );
+				$AdminUI->disp_view( 'users/views/_group_coll_perm.form.php' );
+				break;
+			default:
+				// General Permissions:
+				$AdminUI->disp_view( 'users/views/_group.form.php' );
+				break;
+		}
 		break;
 	case 'nil':
 		// Do nothing

@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -148,7 +148,7 @@ switch( $action )
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_Country = duplicate( $edited_Country ); // PHP4/5 abstraction
+			$edited_Country = clone $edited_Country;
 			$edited_Country->ID = 0;
 		}
 		break;
@@ -178,43 +178,27 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Insert in DB:
-			$DB->begin();
-			$q = $edited_Country->dbexists();
-			if($q)
-			{	// We have a duplicate entry:
+			$edited_Country->dbinsert();
+			$Messages->add( T_('New country created.'), 'success' );
 
-				param_error( 'ctry_code',
-					sprintf( T_('This country already exists. Do you want to <a %s>edit the existing country</a>?'),
-						'href="?ctrl=countries&amp;action=edit&amp;ctry_ID='.$q.'"' ) );
-			}
-			else
+			// What next?
+			switch( $action )
 			{
-				$edited_Country->dbinsert();
-				$Messages->add( T_('New country created.'), 'success' );
-			}
-			$DB->commit();
-
-			if( empty($q) )
-			{	// What next?
-
-				switch( $action )
-				{
-					case 'create_copy':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=countries&action=new&ctry_ID='.$edited_Country->ID, 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create_new':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=countries&action=new', 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=countries', 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-				}
+				case 'create_copy':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=countries&action=new&ctry_ID='.$edited_Country->ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create_new':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=countries&action=new', 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=countries', 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
 			}
 		}
 		break;
@@ -236,26 +220,12 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Update in DB:
-			$DB->begin();
-			$q = $edited_Country->dbexists();
-			if($q)
-			{ 	// We have a duplicate entry:
-				param_error( 'ctry_code',
-					sprintf( T_('This country already exists. Do you want to <a %s>edit the existing country</a>?'),
-						'href="?ctrl=countries&amp;action=edit&amp;ctry_ID='.$q.'"' ) );
-			}
-			else
-			{
-				$edited_Country->dbupdate();
-				$Messages->add( T_('Country updated.'), 'success' );
-			}
-			$DB->commit();
+			$edited_Country->dbupdate();
+			$Messages->add( T_('Country updated.'), 'success' );
 
-			if( empty($q) )
-			{	// If no error, Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( '?ctrl=countries', 303 ); // Will EXIT
-				// We have EXITed already at this point!!
-			}
+			// If no error, Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=countries', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
 		break;
 
@@ -304,6 +274,22 @@ $AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
 $AdminUI->breadcrumbpath_add( T_('Regional'), $admin_url.'?ctrl=locales' );
 $AdminUI->breadcrumbpath_add( T_('Countries'), $admin_url.'?ctrl=countries' );
 
+// Set an url for manual page:
+switch( $action )
+{
+	case 'delete':
+	case 'new':
+	case 'create':
+	case 'create_new':
+	case 'create_copy':
+	case 'edit':
+	case 'update':
+		$AdminUI->set_page_manual_link( 'countries-editing' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'regional-countries-tab' );
+		break;
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

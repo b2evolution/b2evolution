@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
 
-global $blog, $admin_url, $rsc_url;
+global $blog, $sec_ID, $admin_url, $rsc_url;
 
 
 // TOP REFERRING SEARCH ENGINES
@@ -29,7 +29,7 @@ global $blog, $admin_url, $rsc_url;
 
 <?php
 global $res_stats, $row_stats;
-refererList(20,'global',0,0,"'search'",'dom_name',$blog,true);
+refererList( 20, 'global', 0, 0, "'search'", 'dom_name', $blog, true, false, $sec_ID );
 if( count( $res_stats ) )
 {
 	?>

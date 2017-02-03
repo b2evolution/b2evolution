@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  * @author fplanque: Francois PLANQUE.
@@ -68,6 +68,9 @@ $AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
 $AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
 $AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=tools&amp;tab3=import' );
 $AdminUI->breadcrumbpath_add( T_('WordPress XML Importer'), $admin_url.'?ctrl=wpimportxml' );
+
+// Set an url for manual page:
+$AdminUI->set_page_manual_link( 'wordpress-import' );
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -128,24 +128,14 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 		$modes['info']['onclick'] = "return b2edit_reload( document.getElementById('campaign_form'), '$url', 'undefined', {tab:'info'} );";
 	}
 
-	$url = $edit_url.$glue.'tab=html';
-	$modes['html'] = array(
-		'text' => T_('HTML message'),
+	$url = $edit_url.$glue.'tab=compose';
+	$modes['compose'] = array(
+		'text' => T_('Compose'),
 		'href' => $url
 	);
 	if( $current_User->check_perm( 'emails', 'edit' ) )
 	{ // User must has a permission to edit emails
-		$modes['html']['onclick'] = "return b2edit_reload( document.getElementById('campaign_form'), '$url', 'undefined', {tab:'html'} );";
-	}
-
-	$url = $edit_url.$glue.'tab=text';
-	$modes['text'] = array(
-		'text' => T_('Plain-text message'),
-		'href' => $url
-	);
-	if( $current_User->check_perm( 'emails', 'edit' ) )
-	{ // User must has a permission to edit emails
-		$modes['text']['onclick'] = "return b2edit_reload( document.getElementById('campaign_form'), '$url', 'undefined', {tab:'text'} );";
+		$modes['compose']['onclick'] = "return b2edit_reload( document.getElementById('campaign_form'), '$url', 'undefined', {tab:'compose'} );";
 	}
 
 	$url = $edit_url.$glue.'tab=send';
@@ -165,7 +155,7 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 /**
  * Get URL for current/next tab of edit campaign view
  *
- * @param string Current tab: 'info', 'html', 'text', 'send'
+ * @param string Current tab: 'info', 'compose', 'send'
  * @param integer Campaign ID
  * @param string Type of tab: 'current', 'next'
  * @param string Glue

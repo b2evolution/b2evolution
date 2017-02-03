@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -30,6 +30,14 @@ $activate_collection_toolbar = true;
 // Do we have permission to view all stats (aggregated stats) ?
 $perm_view_all = $current_User->check_perm( 'stats', 'view' );
 
+// Section ID:
+param( 'sec_ID', 'integer', 0, true );
+if( ! $perm_view_all && ! $current_User->check_perm( 'section', 'view', false, $sec_ID ) )
+{
+	forget_param( 'sec_ID' );
+	unset( $sec_ID );
+}
+
 $tab3 = param( 'tab3', 'string', 'goals', true );
 $AdminUI->set_path( 'stats', 'goals', $tab3 );
 
@@ -37,12 +45,13 @@ if( isset( $collections_Module ) )
 { // Display list of blogs:
 	if( $perm_view_all )
 	{
-		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => 'summary', 'tab3' => 'global' ), T_('All'),
-						$admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog=0' );
+		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'goals' ), T_('All'),
+						$admin_url.'?ctrl=goals&amp;blog=0', NULL, false, true );
 	}
 	else
 	{ // No permission to view aggregated stats:
-		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => 'summary', 'tab3' => $tab3 ) );
+		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'goals' ), NULL,
+						'', NULL, false, true );
 	}
 }
 
@@ -60,7 +69,7 @@ if( $blog == 0 )
 		elseif( set_working_blog( $selected ) ) // set $blog & memorize in user prefs
 		{ // Selected a new blog:
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 		}
 	}
 }
@@ -106,7 +115,7 @@ switch( $action )
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_Goal = duplicate( $edited_Goal ); // PHP4/5 abstraction
+			$edited_Goal = clone $edited_Goal;
 			$edited_Goal->ID = 0;
 		}
 		break;
@@ -138,42 +147,27 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Insert in DB:
-			$DB->begin();
-			$q = $edited_Goal->dbexists();
-			if($q)
-			{	// We have a duplicate entry:
+			$edited_Goal->dbinsert();
+			$Messages->add( T_('New goal created.'), 'success' );
 
-				param_error( 'goal_key',
-					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
-						'href="?ctrl=goals&amp;action=edit&amp;blog='.$Blog->ID.'&amp;goal_ID='.$q.'"' ) );
-			}
-			else
+			// What next?
+			switch( $action )
 			{
-				$edited_Goal->dbinsert();
-				$Messages->add( T_('New goal created.'), 'success' );
-			}
-			$DB->commit();
-
-			if( empty($q) )
-			{	// What next?
-				switch( $action )
-				{
-					case 'create_copy':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=goals&action=new&blog='.$Blog->ID.'&goal_ID='.$edited_Goal->ID, 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create_new':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=goals&action=new&blog='.$Blog->ID, 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=goals&blog='.$Blog->ID, 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-				}
+				case 'create_copy':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=goals&action=new'.( isset( $Blog ) ? '&blog='.$Blog->ID : '' ).'&goal_ID='.$edited_Goal->ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create_new':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=goals&action=new'.( isset( $Blog ) ? '&blog='.$Blog->ID : '' ), 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=goals'.( isset( $Blog ) ? '&blog='.$Blog->ID : '' ), 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
 			}
 		}
 		break;
@@ -195,29 +189,13 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Update in DB:
-			$DB->begin();
-			$q = $edited_Goal->dbexists();
-			if($q)
-			{	// We have a duplicate entry:
+			$edited_Goal->dbupdate();
+			$Messages->add( T_('Goal updated.'), 'success' );
 
-				param_error( 'goal_key',
-					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
-						'href="?ctrl=goals&amp;action=edit&amp;blog='.$Blog->ID.'&amp;goal_ID='.$q.'"' ) );
-			}
-			else
-			{
-				$edited_Goal->dbupdate();
-				$Messages->add( T_('Goal updated.'), 'success' );
-			}
-			$DB->commit();
-
-			if( empty($q) )
-			{
-				$action = 'list';
-				// Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( '?ctrl=goals&blog='.$Blog->ID, 303 ); // Will EXIT
-				// We have EXITed already at this point!!
-			}
+			$action = 'list';
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=goals'.( isset( $Blog ) ? '&blog='.$Blog->ID : '' ), 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
 
 
@@ -269,7 +247,7 @@ switch( $action )
 		}
 		else
 		{ // Duplicate object in order no to mess with the cache:
-			$edited_GoalCategory = duplicate( $edited_GoalCategory ); // PHP4/5 abstraction
+			$edited_GoalCategory = clone $edited_GoalCategory;
 			$edited_GoalCategory->ID = 0;
 		}
 		break;

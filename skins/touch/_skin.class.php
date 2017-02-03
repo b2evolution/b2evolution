@@ -17,6 +17,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class touch_Skin extends Skin
 {
+	/**
+	 * Skin version
+	 * @var string
+	 */
+	var $version = '6.7.9';
+
   /**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.
@@ -128,7 +134,7 @@ class touch_Skin extends Skin
 		parent::display_init();		// We pass NO params. This gives up the default Skins API v5 behavior.
 
 		add_js_headline( 'var touch_skin_switch_confirm_text = "'.TS_( 'Switch to regular view? \n \n You can switch back again in the footer.' ).'";' );
-		require_js( 'js/core.js', 'relative' );
+		$this->require_js( 'js/core.js' );
 		require_js( 'navigation.js', 'blog' );
 	}
 

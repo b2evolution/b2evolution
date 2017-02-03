@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage touch
@@ -74,7 +74,7 @@ $params = array_merge( array(
 	?>
 
 	<div class="post-author">
-		<span class="lead">By</span> <?php $Item->author( array( 'link_text' => 'preferredname' ) ) ?><br />
+		<span class="lead">By</span> <?php $Item->author( array( 'link_text' => 'auto' ) ) ?><br />
 
 	<?php
 		if( ! $Item->is_intro() )

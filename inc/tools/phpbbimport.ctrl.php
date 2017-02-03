@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  * @author fplanque: Francois PLANQUE.
@@ -14,6 +14,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_funcs( 'tools/model/_phpbb.funcs.php' );
 
 param( 'action', 'string' );
+$phpbb_version = param( 'ver', 'integer', 2 );
+$phpbb_tool_title = ( $phpbb_version == 3 ? T_('phpBB 3 Importer') : T_('phpBB Importer') );
 
 if( !empty( $action ) )
 {	// Try to obtain some serious time to do some serious processing (15 minutes)
@@ -52,6 +54,7 @@ switch( $action )
 		$phpbb_db_pass = param( 'db_pass', 'string', true );
 		$phpbb_db_prefix = param( 'db_prefix', 'string', '' );
 		$phpbb_path_avatars = param( 'path_avatars', 'string', '' );
+		$phpbb_path_attachments = param( 'path_attachments', 'string', '' );
 		$forum_blog_ID = param( 'forum_blog_ID', 'integer', 0 );
 
 		param_check_not_empty( 'db_host', T_('Please enter a database host!') );
@@ -97,6 +100,7 @@ switch( $action )
 		phpbb_set_var( 'db_config', $phpbb_db_config );
 		phpbb_set_var( 'blog_ID', $forum_blog_ID );
 		phpbb_set_var( 'path_avatars', $phpbb_path_avatars );
+		phpbb_set_var( 'path_attachments', $phpbb_path_attachments );
 
 		$step = 'groups';
 		break;
@@ -155,7 +159,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'phpbb' );
 
 		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( phpbb_get_var( 'blog_ID' ) );
+		$Collection = $Blog = & $BlogCache->get_by_ID( phpbb_get_var( 'blog_ID' ) );
 
 		phpbb_clear_temporary_data();
 
@@ -173,6 +177,9 @@ $AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
 $AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
 $AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=tools&amp;tab3=import' );
 $AdminUI->breadcrumbpath_add( T_('phpBB Importer'), $admin_url.'?ctrl=phpbbimport' );
+
+// Set an url for manual page:
+$AdminUI->set_page_manual_link( 'phpbb-import' );
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 
 global $blog;
 
@@ -58,7 +58,7 @@ function display_subtype( $link_ID )
 {
 	global $LinkOwner, $current_File;
 
-	$Link = & $LinkOwner->get_link_by_link_ID( $link_ID );
+	$Link = $LinkOwner->get_link_by_link_ID( $link_ID );
 	// Instantiate a File object for this line
 	$current_File = $Link->get_File();
 
@@ -119,7 +119,7 @@ $Results->cols[] = array(
 					);
 
 
-if( $current_User->check_perm( 'files', 'view', false, $blog ) )
+if( $current_User->check_perm( 'files', 'view' ) )
 {
 	function file_actions( $link_ID )
 	{
@@ -155,7 +155,7 @@ if( $current_User->check_perm( 'files', 'view', false, $blog ) )
 						);
 }
 
-if( $current_User->check_perm( 'files', 'view', false, $blog )
+if( $current_User->check_perm( 'files', 'view' )
 	&& $LinkOwner->check_perm( 'edit' ) )
 {	// Check that we have permission to edit LinkOwner object:
 	$Results->global_icon( T_('Link a file...'), 'link', url_add_param( $Blog->get_filemanager_link(),

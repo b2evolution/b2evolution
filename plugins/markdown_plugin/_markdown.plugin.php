@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  * @ignore
@@ -22,7 +22,7 @@ class markdown_plugin extends Plugin
 	var $code = 'b2evMark';
 	var $name = 'Markdown';
 	var $priority = 20;
-	var $version = '5.0.0';
+	var $version = '6.7.9';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -53,6 +53,38 @@ class markdown_plugin extends Plugin
 
 
 	/**
+	 * Define here default custom settings that are to be made available
+	 *     in the backoffice for collections, private messages and newsletters.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_custom_setting_definitions()}.
+	 */
+	function get_custom_setting_definitions( & $params )
+	{
+		return array(
+			'links' => array(
+					'label' => T_( 'Links' ),
+					'type' => 'checkbox',
+					'note' => T_( 'Detect and convert markdown link markup.' ),
+					'defaultvalue' => 0,
+				),
+			'images' => array(
+					'label' => T_( 'Images' ),
+					'type' => 'checkbox',
+					'note' => T_( 'Detect and convert markdown image markup.' ),
+					'defaultvalue' => 0,
+				),
+			'text_styles' => array(
+					'label' => T_( 'Italic & Bold styles' ),
+					'type' => 'checkbox',
+					'note' => T_( 'Detect and convert markdown italics and bold markup.' ),
+					'defaultvalue' => 0,
+				),
+		);
+	}
+
+
+	/**
 	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
 	 * @param array Associative array of parameters.
@@ -62,31 +94,10 @@ class markdown_plugin extends Plugin
 	{
 		$default_params = array_merge( $params, array(
 				'default_comment_rendering' => 'never',
-				'default_post_rendering' => 'opt-in'
+				'default_post_rendering' => 'opt-out'
 			) );
 
-		return array_merge( parent::get_coll_setting_definitions( $default_params ),
-			array(
-				'links' => array(
-						'label' => T_( 'Links' ),
-						'type' => 'checkbox',
-						'note' => T_( 'Detect and convert markdown link markup.' ),
-						'defaultvalue' => 0,
-					),
-				'images' => array(
-						'label' => T_( 'Images' ),
-						'type' => 'checkbox',
-						'note' => T_( 'Detect and convert markdown image markup.' ),
-						'defaultvalue' => 0,
-					),
-				'text_styles' => array(
-						'label' => T_( 'Italic & Bold styles' ),
-						'type' => 'checkbox',
-						'note' => T_( 'Detect and convert markdown italics and bold markup.' ),
-						'defaultvalue' => 0,
-					),
-			)
-		);
+		return parent::get_coll_setting_definitions( $default_params );
 	}
 
 
@@ -99,8 +110,22 @@ class markdown_plugin extends Plugin
 	function get_msg_setting_definitions( & $params )
 	{
 		// set params to allow rendering for messages by default
-		$default_params = array_merge( $params, array( 'default_msg_rendering' => 'opt-in' ) );
+		$default_params = array_merge( $params, array( 'default_msg_rendering' => 'opt-out' ) );
 		return parent::get_msg_setting_definitions( $default_params );
+	}
+
+
+	/**
+	 * Define here default email settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_email_setting_definitions( & $params )
+	{
+		// set params to allow rendering for messages by default
+		$default_params = array_merge( $params, array( 'default_email_rendering' => 'opt-out' ) );
+		return parent::get_email_setting_definitions( $default_params );
 	}
 
 
@@ -134,10 +159,16 @@ class markdown_plugin extends Plugin
 			$images_enabled = $this->get_coll_setting( 'images', $item_Blog );
 		}
 		elseif( ! empty( $params['Message'] ) )
-		{ // We are rendering Message now, Use FALSE by default because we don't have the settings
-			$text_styles_enabled = false;
-			$links_enabled = false;
-			$images_enabled = false;
+		{	// We are rendering Message now:
+			$text_styles_enabled = $this->get_msg_setting( 'text_styles' );
+			$links_enabled = $this->get_msg_setting( 'links' );
+			$images_enabled = $this->get_msg_setting( 'images' );
+		}
+		elseif( ! empty( $params['EmailCampaign'] ) )
+		{	// We are rendering EmailCampaign now:
+			$text_styles_enabled = $this->get_email_setting( 'text_styles' );
+			$links_enabled = $this->get_email_setting( 'links' );
+			$images_enabled = $this->get_email_setting( 'images' );
 		}
 		else
 		{ // Unknown call, Don't render this case
@@ -188,17 +219,18 @@ class markdown_plugin extends Plugin
 		{
 			case 'forum':
 			case 'manual':
-				$params['Blog']->set_setting( 'plugin'.$this->ID.'_coll_apply_rendering', 'opt-out' );
+				$params['Blog']->set_setting( 'plugin'.$this->ID.'_coll_apply_comment_rendering', 'opt-out' );
 				$params['Blog']->set_setting( 'plugin'.$this->ID.'_images', '1' );
 				$params['Blog']->set_setting( 'plugin'.$this->ID.'_links', '1' );
-				$params['Blog']->set_setting( 'plugin'.$this->ID.'_text_styles', '1' );
 				break;
 		}
 	}
 
 
 	/**
-	 * Display a toolbar
+	 * Event handler: Called when displaying editor toolbars on post/item form.
+	 *
+	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
 	 *
 	 * @todo dh> This seems to be a lot of Javascript. Please try exporting it in a
 	 *       (dynamically created) .js src file. Then we could use cache headers
@@ -211,32 +243,31 @@ class markdown_plugin extends Plugin
 		if( ! empty( $params['Item'] ) )
 		{ // Item is set, get Blog from post
 			$edited_Item = & $params['Item'];
-			$Blog = & $edited_Item->get_Blog();
+			$Collection = $Blog = & $edited_Item->get_Blog();
 		}
 
 		if( empty( $Blog ) )
 		{ // Item is not set, try global Blog
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{ // We can't get a Blog, this way "apply_rendering" plugin collection setting is not available
 				return false;
 			}
 		}
 
-		$coll_setting_name = ( $params['target_type'] == 'Comment' ) ? 'coll_apply_comment_rendering' : 'coll_apply_rendering';
-		$apply_rendering = $this->get_coll_setting( $coll_setting_name, $Blog );
+		$apply_rendering = $this->get_coll_setting( 'coll_apply_rendering', $Blog );
 		if( empty( $apply_rendering ) || $apply_rendering == 'never' )
-		{ // Plugin is not enabled for current case, so don't display a toolbar:
+		{	// Plugin is not enabled for current case, so don't display a toolbar:
 			return false;
 		}
 
 		// Print toolbar on screen
-		return $this->DisplayCodeToolbar( $Blog );
+		return $this->DisplayCodeToolbar( 'coll', $Blog, $params );
 	}
 
 
 	/**
-	 * Event handler: Called when displaying editor toolbars.
+	 * Event handler: Called when displaying editor toolbars on comment form.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
@@ -249,13 +280,13 @@ class markdown_plugin extends Plugin
 			if( !empty( $Comment->item_ID ) )
 			{
 				$comment_Item = & $Comment->get_Item();
-				$Blog = & $comment_Item->get_Blog();
+				$Collection = $Blog = & $comment_Item->get_Blog();
 			}
 		}
 
 		if( empty( $Blog ) )
 		{ // Comment is not set, try global Blog
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{ // We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available
 				return false;
@@ -269,7 +300,7 @@ class markdown_plugin extends Plugin
 		}
 
 		// Print toolbar on screen
-		return $this->DisplayCodeToolbar( $Blog );
+		return $this->DisplayCodeToolbar( 'coll', $Blog, $params );
 	}
 
 
@@ -284,7 +315,24 @@ class markdown_plugin extends Plugin
 		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{ // Print toolbar on screen
-			return $this->DisplayCodeToolbar( NULL, $params );
+			return $this->DisplayCodeToolbar( 'msg', NULL, $params );
+		}
+		return false;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{	// Print toolbar on screen:
+			return $this->DisplayCodeToolbar( 'email', NULL, $params );
 		}
 		return false;
 	}
@@ -293,9 +341,11 @@ class markdown_plugin extends Plugin
 	/**
 	 * Display Toolbar
 	 *
+	 * @param string Setting type: 'coll', 'msg', 'email'
 	 * @param object Blog
+	 * @param array Params
 	 */
-	function DisplayCodeToolbar( $Blog = NULL, $params = array() )
+	function DisplayCodeToolbar( $type = 'coll', $Blog = NULL, $params = array() )
 	{
 		global $Hit;
 
@@ -304,17 +354,32 @@ class markdown_plugin extends Plugin
 			return false;
 		}
 
-		if( empty( $Blog ) )
-		{ // Use FALSE by default because we don't have the settings for Message
-			$text_styles_enabled = false;
-			$links_enabled = false;
-			$images_enabled = false;
-		}
-		else
-		{ // Get plugin setting values depending on Blog
-			$text_styles_enabled = $this->get_coll_setting( 'text_styles', $Blog );
-			$links_enabled = $this->get_coll_setting( 'links', $Blog );
-			$images_enabled = $this->get_coll_setting( 'images', $Blog );
+		$params = array_merge( array(
+				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
+			), $params );
+
+		switch( $type )
+		{
+			case 'msg':
+				// Get plugin setting values for messages:
+				$text_styles_enabled = $this->get_msg_setting( 'text_styles' );
+				$links_enabled = $this->get_msg_setting( 'links' );
+				$images_enabled = $this->get_msg_setting( 'images' );
+				break;
+
+			case 'email':
+				// Get plugin setting values for emails:
+				$text_styles_enabled = $this->get_email_setting( 'text_styles' );
+				$links_enabled = $this->get_email_setting( 'links' );
+				$images_enabled = $this->get_email_setting( 'images' );
+				break;
+
+			default:
+				// Get plugin setting values for current collection:
+				$text_styles_enabled = $this->get_coll_setting( 'text_styles', $Blog );
+				$links_enabled = $this->get_coll_setting( 'links', $Blog );
+				$images_enabled = $this->get_coll_setting( 'images', $Blog );
+				break;
 		}
 
 		// Load js to work with textarea
@@ -322,8 +387,8 @@ class markdown_plugin extends Plugin
 
 		?><script type="text/javascript">
 		//<![CDATA[
-		var markdown_btns = new Array();
-		var markdown_open_tags = new Array();
+		var <?php echo $params['js_prefix']; ?>markdown_btns = new Array();
+		var <?php echo $params['js_prefix']; ?>markdown_open_tags = new Array();
 
 		function markdown_btn( id, text, title, tag_start, tag_end, style, open, grp_pos )
 		{
@@ -340,13 +405,13 @@ class markdown_plugin extends Plugin
 <?php
 	if( $text_styles_enabled )
 	{ // Show thess buttons only when plugin setting "Italic & Bold styles" is enabled ?>
-		markdown_btns[markdown_btns.length] = new markdown_btn(
-				'mrkdwn_bold','bold', '<?php echo TS_('Bold') ?>',
+		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
+				'<?php echo $params['js_prefix']; ?>mrkdwn_bold','bold', '<?php echo TS_('Bold') ?>',
 				'**','**',
 				'font-weight:bold'
 			);
-		markdown_btns[markdown_btns.length] = new markdown_btn(
-				'mrkdwn_italic','italic', '<?php echo TS_('Italic') ?>',
+		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
+				'<?php echo $params['js_prefix']; ?>mrkdwn_italic','italic', '<?php echo TS_('Italic') ?>',
 				'*','*',
 				'font-style:italic', -1, 'last'
 			);
@@ -355,8 +420,8 @@ class markdown_plugin extends Plugin
 
 	if( $links_enabled )
 	{ // Show this button only when plugin setting "Links" is enabled ?>
-		markdown_btns[markdown_btns.length] = new markdown_btn(
-				'mrkdwn_link', 'link','<?php echo TS_('Link') ?>',
+		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
+				'<?php echo $params['js_prefix']; ?>mrkdwn_link', 'link','<?php echo TS_('Link') ?>',
 				'','',
 				'text-decoration:underline', -1<?php echo ! $images_enabled ? ', \'last\'' : '' ?>
 			);
@@ -365,136 +430,139 @@ class markdown_plugin extends Plugin
 
 	if( $images_enabled )
 	{ // Show this button only when plugin setting "Images" is enabled ?>
-		markdown_btns[markdown_btns.length] = new markdown_btn(
-				'mrkdwn_img', 'img','<?php echo TS_('Image') ?>',
+		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
+				'<?php echo $params['js_prefix']; ?>mrkdwn_img', 'img','<?php echo TS_('Image') ?>',
 				'','',
 				'', -1, 'last'
 			);
 <?php
 	} ?>
 
-		markdown_btns[markdown_btns.length] = new markdown_btn(
-				'mrkdwn_h1','H1', '<?php echo TS_('Header 1') ?>',
+		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
+				'<?php echo $params['js_prefix']; ?>mrkdwn_h1','H1', '<?php echo TS_('Header 1') ?>',
 				'\n# ','',
 				'', -1
 			);
-		markdown_btns[markdown_btns.length] = new markdown_btn(
-				'mrkdwn_h1','H2', '<?php echo TS_('Header 2') ?>',
+		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
+				'<?php echo $params['js_prefix']; ?>mrkdwn_h1','H2', '<?php echo TS_('Header 2') ?>',
 				'\n## ','',
 				'', -1
 			);
-		markdown_btns[markdown_btns.length] = new markdown_btn(
-				'mrkdwn_h1','H3', '<?php echo TS_('Header 3') ?>',
+		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
+				'<?php echo $params['js_prefix']; ?>mrkdwn_h1','H3', '<?php echo TS_('Header 3') ?>',
 				'\n### ','',
 				'', -1
 			);
-		markdown_btns[markdown_btns.length] = new markdown_btn(
-				'mrkdwn_h1','H4', '<?php echo TS_('Header 4') ?>',
+		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
+				'<?php echo $params['js_prefix']; ?>mrkdwn_h1','H4', '<?php echo TS_('Header 4') ?>',
 				'\n#### ','',
 				'', -1
 			);
-		markdown_btns[markdown_btns.length] = new markdown_btn(
-				'mrkdwn_h1','H5', '<?php echo TS_('Header 5') ?>',
+		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
+				'<?php echo $params['js_prefix']; ?>mrkdwn_h1','H5', '<?php echo TS_('Header 5') ?>',
 				'\n##### ','',
 				'', -1
 			);
-		markdown_btns[markdown_btns.length] = new markdown_btn(
-				'mrkdwn_h1','H6', '<?php echo TS_('Header 6') ?>',
+		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
+				'<?php echo $params['js_prefix']; ?>mrkdwn_h1','H6', '<?php echo TS_('Header 6') ?>',
 				'\n###### ','',
 				'', -1, 'last'
 			);
 
-		markdown_btns[markdown_btns.length] = new markdown_btn(
-				'mrkdwn_li','li', '<?php echo TS_('Unordered list item') ?>',
+		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
+				'<?php echo $params['js_prefix']; ?>mrkdwn_li','li', '<?php echo TS_('Unordered list item') ?>',
 				'\n* ','',
 				'', -1
 			);
-		markdown_btns[markdown_btns.length] = new markdown_btn(
-				'mrkdwn_ol','ol', '<?php echo TS_('Ordered list item') ?>',
+		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
+				'<?php echo $params['js_prefix']; ?>mrkdwn_ol','ol', '<?php echo TS_('Ordered list item') ?>',
 				'\n1. ','',
 				'', -1
 			);
-		markdown_btns[markdown_btns.length] = new markdown_btn(
-				'mrkdwn_li','blockquote', '<?php echo TS_('Blockquote') ?>',
+		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
+				'<?php echo $params['js_prefix']; ?>mrkdwn_li','blockquote', '<?php echo TS_('Blockquote') ?>',
 				'\n> ','',
 				'', -1, 'last'
 			);
 
-		markdown_btns[markdown_btns.length] = new markdown_btn(
-				'mrkdwn_codespan','codespan', '<?php echo TS_('Codespan') ?>',
+		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
+				'<?php echo $params['js_prefix']; ?>mrkdwn_codespan','codespan', '<?php echo TS_('Codespan') ?>',
 				'`','`',
 				'', -1
 			);
-		markdown_btns[markdown_btns.length] = new markdown_btn(
-				'mrkdwn_preblock','preblock', '<?php echo TS_('Preformatted code block') ?>',
+		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
+				'<?php echo $params['js_prefix']; ?>mrkdwn_preblock','preblock', '<?php echo TS_('Preformatted code block') ?>',
 				'\n\t','',
 				'', -1, 'last'
 			);
-		markdown_btns[markdown_btns.length] = new markdown_btn(
-				'mrkdwn_codeblock','codeblock', '<?php echo TS_('Highlighted code block') ?>',
+		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
+				'<?php echo $params['js_prefix']; ?>mrkdwn_codeblock','codeblock', '<?php echo TS_('Highlighted code block') ?>',
 				'\n```\n','\n```\n',
 				'', -1, 'last'
 			);
 
-		markdown_btns[markdown_btns.length] = new markdown_btn(
-				'mrkdwn_hr','hr', '<?php echo TS_('Horizontal Rule') ?>',
+		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
+				'<?php echo $params['js_prefix']; ?>mrkdwn_hr','hr', '<?php echo TS_('Horizontal Rule') ?>',
 				'\n---\n','',
 				'', -1
 			);
-		markdown_btns[markdown_btns.length] = new markdown_btn(
-				'mrkdwn_br','<br>', '<?php echo TS_('Line Break') ?>',
+		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
+				'<?php echo $params['js_prefix']; ?>mrkdwn_br','<br>', '<?php echo TS_('Line Break') ?>',
 				'  \n','',
 				'', -1
 			);
 
-		function markdown_show_btn( button, i )
+		function <?php echo $params['js_prefix']; ?>markdown_get_btn( button, i )
 		{
-			if( button.id == 'mrkdwn_img' )
+			var r = '';
+			if( button.id == '<?php echo $params['js_prefix']; ?>mrkdwn_img' )
 			{ // Image
-				document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.title
-						+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="markdown_insert_lnkimg|b2evoCanvas|img" value="' + button.text + '" />');
+				r += '<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.title
+					+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $params['js_prefix']; ?>markdown_insert_lnkimg|<?php echo $params['js_prefix']; ?>b2evoCanvas|img" value="' + button.text + '" />';
 			}
-			else if( button.id == 'mrkdwn_link' )
+			else if( button.id == '<?php echo $params['js_prefix']; ?>mrkdwn_link' )
 			{ // Link
-				document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.title
-						+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="markdown_insert_lnkimg|b2evoCanvas" value="' + button.text + '" />');
+				r += '<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.title
+					+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $params['js_prefix']; ?>markdown_insert_lnkimg|<?php echo $params['js_prefix']; ?>b2evoCanvas" value="' + button.text + '" />';
 			}
 			else
 			{ // Normal buttons:
-				document.write('<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.title
-						+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="markdown_insert_tag|b2evoCanvas|'+i+'" value="' + button.text + '" />');
+				r += '<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.title
+					+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $params['js_prefix']; ?>markdown_insert_tag|<?php echo $params['js_prefix']; ?>b2evoCanvas|'+i+'" value="' + button.text + '" />';
 			}
+
+			return r;
 		}
 
 		// Memorize a new open tag
-		function markdown_add_tag( button )
+		function <?php echo $params['js_prefix']; ?>markdown_add_tag( button )
 		{
-			if( markdown_btns[button].tag_end != '' )
+			if( <?php echo $params['js_prefix']; ?>markdown_btns[button].tag_end != '' )
 			{
-				markdown_open_tags[markdown_open_tags.length] = button;
-				document.getElementById( markdown_btns[button].id ).value = '/' + document.getElementById( markdown_btns[button].id ).value;
+				<?php echo $params['js_prefix']; ?>markdown_open_tags[<?php echo $params['js_prefix']; ?>markdown_open_tags.length] = button;
+				document.getElementById( <?php echo $params['js_prefix']; ?>markdown_btns[button].id ).value = '/' + document.getElementById( <?php echo $params['js_prefix']; ?>markdown_btns[button].id ).value;
 			}
 		}
 
 		// Forget about an open tag
-		function markdown_remove_tag( button )
+		function <?php echo $params['js_prefix']; ?>markdown_remove_tag( button )
 		{
-			for( i = 0; i < markdown_open_tags.length; i++ )
+			for( i = 0; i < <?php echo $params['js_prefix']; ?>markdown_open_tags.length; i++ )
 			{
-				if( markdown_open_tags[i] == button )
+				if( <?php echo $params['js_prefix']; ?>markdown_open_tags[i] == button )
 				{
-					markdown_open_tags.splice( i, 1 );
-					document.getElementById( markdown_btns[button].id ).value = document.getElementById( markdown_btns[button].id ).value.replace( '/', '' );
+					<?php echo $params['js_prefix']; ?>markdown_open_tags.splice( i, 1 );
+					document.getElementById( <?php echo $params['js_prefix']; ?>markdown_btns[button].id ).value = document.getElementById( <?php echo $params['js_prefix']; ?>markdown_btns[button].id ).value.replace( '/', '' );
 				}
 			}
 		}
 
-		function markdown_check_open_tags( button )
+		function <?php echo $params['js_prefix']; ?>markdown_check_open_tags( button )
 		{
 			var tag = 0;
-			for( i = 0; i < markdown_open_tags.length; i++ )
+			for( i = 0; i < <?php echo $params['js_prefix']; ?>markdown_open_tags.length; i++ )
 			{
-				if( markdown_open_tags[i] == button )
+				if( <?php echo $params['js_prefix']; ?>markdown_open_tags[i] == button )
 				{
 					tag++;
 				}
@@ -510,33 +578,35 @@ class markdown_plugin extends Plugin
 			}
 		}
 
-		function markdown_close_all_tags()
+		function <?php echo $params['js_prefix']; ?>markdown_close_all_tags()
 		{
-			var count = markdown_open_tags.length;
+			var count = <?php echo $params['js_prefix']; ?>markdown_open_tags.length;
 			for( o = 0; o < count; o++ )
 			{
-				markdown_insert_tag( b2evoCanvas, markdown_open_tags[markdown_open_tags.length - 1] );
+				<?php echo $params['js_prefix']; ?>markdown_insert_tag( <?php echo $params['js_prefix']; ?>b2evoCanvas, <?php echo $params['js_prefix']; ?>markdown_open_tags[<?php echo $params['js_prefix']; ?>markdown_open_tags.length - 1] );
 			}
 		}
 
-		function markdown_toolbar( title )
+		function <?php echo $params['js_prefix']; ?>markdown_toolbar( title )
 		{
-			document.write( '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>' );
-			document.write( '<?php echo $this->get_template( 'toolbar_group_before' ); ?>' );
-			for( var i = 0; i < markdown_btns.length; i++ )
+			var r = '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>'
+				+ '<?php echo $this->get_template( 'toolbar_group_before' ); ?>';
+			for( var i = 0; i < <?php echo $params['js_prefix']; ?>markdown_btns.length; i++ )
 			{
-				markdown_show_btn( markdown_btns[i], i );
-				if( markdown_btns[i].grp_pos == 'last' && i > 0 && i < markdown_btns.length - 1 )
+				r += <?php echo $params['js_prefix']; ?>markdown_get_btn( <?php echo $params['js_prefix']; ?>markdown_btns[i], i );
+				if( <?php echo $params['js_prefix']; ?>markdown_btns[i].grp_pos == 'last' && i > 0 && i < <?php echo $params['js_prefix']; ?>markdown_btns.length - 1 )
 				{ // Separator between groups
-					document.write( '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>' );
+					r += '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>';
 				}
 			}
-			document.write( '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>' );
-			document.write( '<input type="button" id="mrkdwn_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="markdown_close_all_tags" title="<?php echo format_to_output( T_('Close all tags'), 'htmlattr' ); ?>" value="X" />' );
-			document.write( '<?php echo $this->get_template( 'toolbar_group_after' ); ?>' );
+			r += '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>'
+				+ '<input type="button" id="<?php echo $params['js_prefix']; ?>mrkdwn_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $params['js_prefix']; ?>markdown_close_all_tags" title="<?php echo format_to_output( TS_('Close all tags'), 'htmlattr' ); ?>" value="X" />'
+				+ '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
+
+			jQuery( '.<?php echo $params['js_prefix'].$this->code ?>_toolbar' ).html( r );
 		}
 
-		function markdown_insert_tag( field, i )
+		function <?php echo $params['js_prefix']; ?>markdown_insert_tag( field, i )
 		{
 			// we need to know if something is selected.
 			// First, ask plugins, then try IE and Mozilla.
@@ -564,19 +634,19 @@ class markdown_plugin extends Plugin
 
 			if( sel_text )
 			{ // some text selected
-				textarea_wrap_selection( field, markdown_btns[i].tag_start, markdown_btns[i].tag_end, 0 );
+				textarea_wrap_selection( field, <?php echo $params['js_prefix']; ?>markdown_btns[i].tag_start, <?php echo $params['js_prefix']; ?>markdown_btns[i].tag_end, 0 );
 			}
 			else
 			{
-				if( !markdown_check_open_tags(i) || markdown_btns[i].tag_end == '' )
+				if( !<?php echo $params['js_prefix']; ?>markdown_check_open_tags(i) || <?php echo $params['js_prefix']; ?>markdown_btns[i].tag_end == '' )
 				{
-					textarea_wrap_selection( field, markdown_btns[i].tag_start, '', 0 );
-					markdown_add_tag(i);
+					textarea_wrap_selection( field, <?php echo $params['js_prefix']; ?>markdown_btns[i].tag_start, '', 0 );
+					<?php echo $params['js_prefix']; ?>markdown_add_tag(i);
 				}
 				else
 				{
-					textarea_wrap_selection( field, '', markdown_btns[i].tag_end, 0 );
-					markdown_remove_tag(i);
+					textarea_wrap_selection( field, '', <?php echo $params['js_prefix']; ?>markdown_btns[i].tag_end, 0 );
+					<?php echo $params['js_prefix']; ?>markdown_remove_tag(i);
 				}
 			}
 			if( focus_when_finished )
@@ -586,7 +656,7 @@ class markdown_plugin extends Plugin
 		}
 
 
-		function markdown_insert_lnkimg( field, type )
+		function <?php echo $params['js_prefix']; ?>markdown_insert_lnkimg( field, type )
 		{
 			var url = prompt( '<?php echo TS_('URL') ?>:', 'http://' );
 			if( url )
@@ -609,9 +679,9 @@ class markdown_plugin extends Plugin
 		//]]>
 		</script><?php
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
-		?><script type="text/javascript">markdown_toolbar( '<?php echo T_('Markdown').': '; ?>' );</script><?php
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
+		?><script type="text/javascript"><?php echo $params['js_prefix']; ?>markdown_toolbar( '<?php echo TS_('Markdown').': '; ?>' );</script><?php
 
 		return true;
 	}

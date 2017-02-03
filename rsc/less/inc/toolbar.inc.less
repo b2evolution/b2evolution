@@ -8,7 +8,6 @@
 @evobar-border-color: #aeaeae;
 div#evo_toolbar {
 	background-color: @evobar-bg-color;
-	color: ButtonText;
 	border-bottom: 1px solid @evobar-border-color;
 	text-align: left;
 	margin: 0;
@@ -41,6 +40,12 @@ div#evo_toolbar {
 	}
 	.actions_right {
 		float: right;
+	}
+}
+// Hide "Dev" button when <480px width
+@media (max-width: 479px) {
+	div#evo_toolbar .actions_right .debug_dev_button {
+		display: none;
 	}
 }
 .evobar-menu, .evobar-menu * {

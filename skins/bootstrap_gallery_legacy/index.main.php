@@ -11,10 +11,12 @@
  * @subpackage bootstrap_gallery_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
-if( version_compare( $app_version, '6.4' ) < 0 )
+
+if( evo_version_compare( $app_version, '6.4' ) < 0 )
 { // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.
 	die( 'This skin is designed for b2evolution 6.4 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
+
 global $Skin;
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
@@ -61,7 +63,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		<?php
 			skin_widget( array(
 				// CODE for the widget:
-				'widget' => 'member_count',
+				'widget' => 'coll_member_count',
 				// Optional display params
 				'before' => '(',
 				'after'  => ')',
@@ -161,7 +163,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
 			skin_include( '$disp$', array(
 					'mediaidx_thumb_size'  => $Skin->get_setting( 'mediaidx_thumb_size' ),
-					'author_link_text'     => 'preferredname',
+					'author_link_text'     => 'auto',
 					'item_class'           => 'evo_post evo_content_block',
 					'item_type_class'      => 'evo_post__ptyp_',
 					'item_status_class'    => 'evo_post__',

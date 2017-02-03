@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin-skin
@@ -40,10 +40,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function init_templates()
 	{
-		global $Messages, $debug;
-
-		// This is included before controller specifc require_css() calls:
-		require_css( 'results.css' ); // Results/tables styles
+		global $Messages, $debug, $Hit, $check_browser_version;
 
 		require_js( '#jquery#' );
 		require_js( 'jquery/jquery.raty.min.js' );
@@ -52,6 +49,9 @@ class AdminUI extends AdminUI_general
 		require_css( '#bootstrap_css#' );
 		// require_css( '#bootstrap_theme_css#' );
 		require_js( '#bootstrap_typeahead#' );
+
+		// JS to init Bootstrap tooltips (E.g. on badges with title "Admin"):
+		add_js_headline( 'jQuery( function () { jQuery( \'[data-toggle="tooltip"]\' ).tooltip() } )' );
 
 		if( $debug )
 		{	// Use readable CSS:
@@ -64,7 +64,7 @@ class AdminUI extends AdminUI_general
 		{	// Use minified CSS:
 			require_css( 'bootstrap-backoffice-b2evo_base.bmin.css', 'rsc_url' ); // Concatenation + Minifaction of the above
 		}
-		
+
 		// Make sure standard CSS is called ahead of custom CSS generated below:
 		if( $debug )
 		{	// Use readable CSS:
@@ -90,6 +90,15 @@ class AdminUI extends AdminUI_general
 
 		// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
 		init_fontawesome_icons( 'fontawesome-glyphicons' );
+
+		if( $check_browser_version && $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
+		{	// Display info message if browser IE < 9 version and it is allowed by config var:
+			$Messages->add( T_('Your web browser is too old. For this site to work correctly, we recommend you use a more recent browser.'), 'note' );
+			if( $debug )
+			{
+				$Messages->add( 'User Agent: '.$Hit->get_user_agent(), 'note' );
+			}
+		}
 	}
 
 
@@ -130,7 +139,7 @@ class AdminUI extends AdminUI_general
 							 <span class="icon-bar"></span>
 						</button>
 						<a class="navbar-brand" href="'.$admin_url.'?ctrl=dashboard"'
-								.( $Settings->get( 'site_color' ) != '' ? 'style="color:'.$Settings->get( 'site_color' ).'"' : '' ).'>'
+								.( $Settings->get( 'site_color' ) != '' ? ' style="color:'.$Settings->get( 'site_color' ).'"' : '' ).'>'
 							.$Settings->get( 'site_code' )
 						.'</a>
 				 </div>
@@ -228,20 +237,7 @@ class AdminUI extends AdminUI_general
 	{
 		global $app_footer_text, $copyright_text;
 
-		global $Hit;
-
-		$r = '';
-
-		if( $Hit->is_winIE() && $Hit->is_IE( 9, '<=' ) )  // We can do this test because BackOffice is never page-cached
-		{ // Warning for IE 9 and less
-			$r .= '<div class="container-fluid"><div class="alert alert-danger" role="alert">'
-				.T_('WARNING: Old versions of Internet Explorer may not able to display this admin skin properly. We strongly recommend you upgrade to IE 11, Firefox or Chrome.')
-				.'</div></div>';
-		}
-
-		$r .= '<footer class="footer"><div class="container"><p class="text-muted text-center">'.$app_footer_text.' &ndash; '.$copyright_text."</p></div></footer>\n\n";
-
-		return $r;
+		return '<footer class="footer"><div class="container"><p class="text-muted text-center">'.$app_footer_text.' &ndash; '.$copyright_text."</p></div></footer>\n\n";
 	}
 
 
@@ -312,7 +308,7 @@ class AdminUI extends AdminUI_general
 				// Template for a list of Collections (Blogs)
 				return array(
 						'before' => '<div class="container-fluid coll-selector"><nav><div class="btn-group">',
-						'after' => '</div>$button_add_blog$</nav></div>',
+						'after' => '</div>$button_add_blog$$collection_groups$</nav></div>',
 						'select_start' => '<div class="btn-group" role="group">',
 						'select_end' => '</div>',
 						'buttons_start' => '',
@@ -324,8 +320,9 @@ class AdminUI extends AdminUI_general
 					);
 
 			case 'Results':
+			case 'compact_results':
 				// Results list:
-				return array(
+				$results_template = array(
 					'page_url' => '', // All generated links will refer to the current page
 					'before' => '<div class="results panel panel-default">',
 					'content_start' => '<div id="$prefix$ajax_content">',
@@ -368,9 +365,9 @@ class AdminUI extends AdminUI_general
 							'line_start_odd' => '<tr class="odd">'."\n",
 							'line_start_last' => '<tr class="even lastline">'."\n",
 							'line_start_odd_last' => '<tr class="odd lastline">'."\n",
-								'col_start' => '<td $class_attrib$>',
-								'col_start_first' => '<td class="firstcol $class$">',
-								'col_start_last' => '<td class="lastcol $class$">',
+								'col_start' => '<td $class_attrib$ $colspan_attrib$>',
+								'col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+								'col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
 								'col_end' => "</td>\n",
 							'line_end' => "</tr>\n\n",
 							'grp_line_start' => '<tr class="group">'."\n",
@@ -419,6 +416,18 @@ class AdminUI extends AdminUI_general
 				'after' => '</div>',
 				'sort_type' => 'basic'
 				);
+				if( $name == 'compact_results' )
+				{	// Use a little different template for compact results table:
+					$results_template = array_merge( $results_template, array(
+							'before' => '<div class="results">',
+							'head_title' => '',
+							'no_results_start' => '<div class="table_scroll">'."\n"
+																		.'<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0"><tbody>'."\n",
+							'no_results_end'   => '<tr class="lastline noresults"><td class="firstcol lastcol">$no_results$</td></tr>'
+																		.'</tbody></table></div>'."\n\n",
+						) );
+				}
+				return $results_template;
 
 			case 'blockspan_form':
 				// Form settings for filter area:
@@ -442,7 +451,7 @@ class AdminUI extends AdminUI_general
 					'inputend'       => "\n",
 					'infostart'      => '<div class="form-control-static">',
 					'infoend'        => "</div>\n",
-					'buttonsstart'   => '<div class="panel-footer control-buttons"><div class="col-sm-offset-2 col-sm-10">',
+					'buttonsstart'   => '<div class="panel-footer control-buttons"><div class="col-sm-offset-3 col-sm-9">',
 					'buttonsend'     => '</div></div>'."\n\n",
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
@@ -483,15 +492,15 @@ class AdminUI extends AdminUI_general
 					'fieldset_end'   => '</div></div></fieldset></div>'."\n",
 					'fieldstart'     => '<div class="form-group" $ID$>'."\n",
 					'fieldend'       => "</div>\n\n",
-					'labelclass'     => 'control-label col-sm-2',
+					'labelclass'     => 'control-label col-sm-3',
 					'labelstart'     => '',
 					'labelend'       => "\n",
-					'labelempty'     => '<label class="control-label col-sm-2"></label>',
-					'inputstart'     => '<div class="controls col-sm-10">',
+					'labelempty'     => '<label class="control-label col-sm-3"></label>',
+					'inputstart'     => '<div class="controls col-sm-9">',
 					'inputend'       => "</div>\n",
-					'infostart'      => '<div class="controls col-sm-10"><div class="form-control-static">',
+					'infostart'      => '<div class="controls col-sm-9"><div class="form-control-static">',
 					'infoend'        => "</div></div>\n",
-					'buttonsstart'   => '<div class="panel-footer control-buttons"><div class="col-sm-offset-2 col-sm-10">',
+					'buttonsstart'   => '<div class="panel-footer control-buttons"><div class="col-sm-offset-3 col-sm-9">',
 					'buttonsend'     => '</div></div>'."\n\n",
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
@@ -499,7 +508,7 @@ class AdminUI extends AdminUI_general
 					// Additional params depending on field type:
 					// - checkbox
 					'inputclass_checkbox'    => '',
-					'inputstart_checkbox'    => '<div class="controls col-sm-10"><div class="checkbox"><label>',
+					'inputstart_checkbox'    => '<div class="controls col-sm-9"><div class="checkbox"><label>',
 					'inputend_checkbox'      => "</label></div></div>\n",
 					'checkbox_newline_start' => '<div class="checkbox">',
 					'checkbox_newline_end'   => "</div>\n",
@@ -530,15 +539,15 @@ class AdminUI extends AdminUI_general
 					'fieldset_end'   => '</div></div></fieldset></div>'."\n",
 					'fieldstart'     => '<div class="form-group" $ID$>'."\n",
 					'fieldend'       => "</div>\n\n",
-					'labelclass'     => 'control-label col-sm-2',
+					'labelclass'     => 'control-label col-sm-3',
 					'labelstart'     => '',
 					'labelend'       => "\n",
-					'labelempty'     => '<label class="control-label col-sm-2"></label>',
-					'inputstart'     => '<div class="controls col-sm-10">',
+					'labelempty'     => '<label class="control-label col-sm-3"></label>',
+					'inputstart'     => '<div class="controls col-sm-9">',
 					'inputend'       => "</div>\n",
-					'infostart'      => '<div class="controls col-sm-10"><div class="form-control-static">',
+					'infostart'      => '<div class="controls col-sm-9"><div class="form-control-static">',
 					'infoend'        => "</div></div>\n",
-					'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-2 col-sm-10">',
+					'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-3 col-sm-9">',
 					'buttonsend'     => "</div></div>\n\n",
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
@@ -546,7 +555,7 @@ class AdminUI extends AdminUI_general
 					// Additional params depending on field type:
 					// - checkbox
 					'inputclass_checkbox'    => '',
-					'inputstart_checkbox'    => '<div class="controls col-sm-10"><div class="checkbox"><label>',
+					'inputstart_checkbox'    => '<div class="controls col-sm-9"><div class="checkbox"><label>',
 					'inputend_checkbox'      => "</label></div></div>\n",
 					'checkbox_newline_start' => '<div class="checkbox">',
 					'checkbox_newline_end'   => "</div>\n",
@@ -622,7 +631,7 @@ class AdminUI extends AdminUI_general
 			case 'block_item':
 			case 'dash_item':
 				return array(
-					'block_start' => '<div class="panel panel-default evo_content_block" id="styled_content_block"><div class="panel-heading"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div><div class="panel-body">',
+					'block_start' => '<div class="panel panel-default evo_content_block"><div class="panel-heading"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div><div class="panel-body">',
 					'block_end'   => '</div></div>',
 					'global_icons_class' => 'btn btn-default btn-sm',
 				);
@@ -658,6 +667,7 @@ class AdminUI extends AdminUI_general
 					'text_primary' => 'btn btn-primary',
 					'text_success' => 'btn btn-success',
 					'text_danger'  => 'btn btn-danger',
+					'text_warning' => 'btn btn-warning',
 					'group'        => 'btn-group',
 				);
 
@@ -774,13 +784,12 @@ class AdminUI extends AdminUI_general
 		$buttons = '';
 		$select_options = '';
 		$not_favorite_blogs = false;
-
 		foreach( $blog_array as $l_blog_ID )
 		{ // Loop through all blogs that match the requested permission:
 
 			$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
 
-			if( $l_Blog->get( 'favorite' ) || $l_blog_ID == $blog )
+			if( $l_Blog->favorite() || $l_blog_ID == $blog )
 			{ // If blog is favorute OR current blog, Add blog as a button:
 				$buttons .= $template[ $l_blog_ID == $blog ? 'beforeEachSel' : 'beforeEach' ];
 
@@ -804,7 +813,7 @@ class AdminUI extends AdminUI_general
 				}
 			}
 
-			if( !$l_Blog->get( 'favorite' ) )
+			if( !$l_Blog->favorite() )
 			{ // If blog is not favorute, Add it into the select list:
 				$not_favorite_blogs = true;
 				$select_options .= '<li>';
@@ -821,13 +830,23 @@ class AdminUI extends AdminUI_general
 
 		$r .= $title;
 
+		if( $this->coll_list_disp_sections )
+		{	// Check if filter by section is used currently:
+			$sec_ID = param( 'sec_ID', 'integer', 0 );
+			if( ! is_logged_in() || ! ( $current_User->check_perm( 'stats', 'view' ) || $current_User->check_perm( 'section', 'view', false, $sec_ID ) ) )
+			{
+				$sec_ID = 0;
+				set_param( 'sec_ID', 0 );
+			}
+		}
+
 		if( !empty( $this->coll_list_all_title ) )
 		{ // We want to add an "all" button
-			$r .= $template[ $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
+			$r .= $template[ empty( $sec_ID ) && $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
 			$r .= '<a href="'.$this->coll_list_all_url
-						.'" class="btn btn-default'.( $blog == 0 ? ' active' : '' ).'">'
+						.'" class="btn btn-default'.( empty( $sec_ID ) && $blog == 0 ? ' active' : '' ).'">'
 						.$this->coll_list_all_title.'</a> ';
-			$r .= $template[ $blog == 0 ? 'afterEachSel' : 'afterEach' ];
+			$r .= $template[ empty( $sec_ID ) && $blog == 0 ? 'afterEachSel' : 'afterEach' ];
 		}
 
 		$r .= $template['buttons_start'];
@@ -846,17 +865,44 @@ class AdminUI extends AdminUI_general
 				.$template['select_end'];
 		}
 
-		// Button to add new collection
-		if( is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
-		{ // Display a button to add new collection if current user has a permission
+		// Button to add new collection:
+		if( $this->coll_list_disp_add && is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
+		{	// Display a button to add new collection if it is requested and current user has a permission
 			$button_add_blog = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new" class="btn btn-default" title="'.T_('New Collection').'"><span class="fa fa-plus"></span></a>';
 		}
 		else
-		{ // No permission to add new collection
+		{	// No request or permission to add new collection:
 			$button_add_blog = '';
 		}
 
-		$r .= str_replace( '$button_add_blog$', $button_add_blog, $template['after'] );
+		// Sections:
+		if( $this->coll_list_disp_sections )
+		{
+			$collection_groups = '';
+
+			$SectionCache = & get_SectionCache();
+			$SectionCache->load_available();
+
+			foreach( $SectionCache->cache as $Section )
+			{	// Loop through all sections that match the requested permission:
+				$collection_groups .= ( $Section->ID == $sec_ID ) ? $template['beforeEachSel'] : $template['beforeEach'];
+
+				$collection_groups .= '<a href="'.$url_params.'blog=0&amp;sec_ID='.$Section->ID
+					.'" class="btn btn-default'.( $Section->ID == $sec_ID ? ' active' : '' ).'">'
+						.$Section->dget( 'name', 'htmlbody' )
+					.'</a> ';
+
+				$collection_groups .= ( $Section->ID == $sec_ID ) ? $template['afterEachSel'] : $template['afterEach'];
+			}
+
+			$collection_groups = empty( $collection_groups ) ? '' : '<div class="btn-group">'.$collection_groups.'</div>';
+		}
+		else
+		{
+			$collection_groups = '';
+		}
+
+		$r .= str_replace( array( '$button_add_blog$', '$collection_groups$' ), array( $button_add_blog, $collection_groups ), $template['after'] );
 
 		return $r;
 	}

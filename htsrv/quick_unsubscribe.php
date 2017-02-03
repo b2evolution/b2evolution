@@ -19,6 +19,7 @@ $edited_User = $UserCache->get_by_ID( $user_ID, false, false );
 ?>
 <html>
 	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<title><?php echo T_( 'Quick unsubscribe' ) ?></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	</head>
@@ -83,8 +84,20 @@ $edited_User = $UserCache->get_by_ID( $user_ID, false, false );
 
 			case 'comment_moderator':
 			case 'moderator': // Note: This was not chaned to 'comment_moderator' to make sure old emails unsubscribe link are also work
-				// unsubscribe from new comment may need moderation notifications
+				// unsubscribe from new comment may need moderation notifications:
 				$UserSettings->set( 'notify_comment_moderation', '0', $edited_User->ID );
+				$UserSettings->dbupdate();
+				break;
+
+			case 'comment_moderator_edit':
+				// unsubscribe from updated comment may need moderation notifications:
+				$UserSettings->set( 'notify_edit_cmt_moderation', '0', $edited_User->ID );
+				$UserSettings->dbupdate();
+				break;
+
+			case 'comment_moderator_spam':
+				// unsubscribe from spam comment may need moderation notifications:
+				$UserSettings->set( 'notify_spam_cmt_moderation', '0', $edited_User->ID );
 				$UserSettings->dbupdate();
 				break;
 
@@ -94,9 +107,21 @@ $edited_User = $UserCache->get_by_ID( $user_ID, false, false );
 				$UserSettings->dbupdate();
 				break;
 
+			case 'pst_stale_alert':
+				// unsubscribe from stale posts alert notifications:
+				$UserSettings->set( 'send_pst_stale_alert', '0', $edited_User->ID );
+				$UserSettings->dbupdate();
+				break;
+
 			case 'post_moderator':
-				// unsubscribe from post moderation notifications
+				// unsubscribe from new post moderation notifications:
 				$UserSettings->set( 'notify_post_moderation', '0', $edited_User->ID );
+				$UserSettings->dbupdate();
+				break;
+
+			case 'post_moderator_edit':
+				// unsubscribe from updated post moderation notifications:
+				$UserSettings->set( 'notify_edit_pst_moderation', '0', $edited_User->ID );
 				$UserSettings->dbupdate();
 				break;
 

@@ -14,8 +14,10 @@ html, body {
 	overflow-x: hidden !important;
 }
 
-// CSS to show containers, widgets and includes: 
+// CSS to show containers, widgets and includes:
 @import "_dev-blocks.module.less";
+// Styles for results table on AJAX data loading:
+@import "_results_ajax_loading.module.less";
 
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
@@ -43,7 +45,6 @@ a[rel~=nofollow]:not([class~=btn]):hover {
 
 // Image styles:
 img.loadimg {
-	display: inline-block;
 	min-width: 64px;
 	min-height: 64px;
 	background: url(../img/ajax-loader/fff.gif) no-repeat center;
@@ -54,7 +55,24 @@ figure {
 .evo_image_block {
 	// WARNING: this will screw out backoffice layout (fulltext edit screen)
 	text-align: center;
+	.img-responsive {
+		display: inline-block;
+	}
 }
+
+// Definitions for [thumbnail:123] tag:
+.evo_thumbnail {
+  max-width: 100%;
+}
+.evo_thumbnail__left {
+  float: left;
+  margin: 0 4px 4px 0;
+}
+.evo_thumbnail__right {
+  float: right;
+  margin: 0 0 4px 4px;
+}
+
 // Used to limit max width of the replied comments,
 // because width of the replied comment can be very small
 // (Each level of the replied comments has additional 20px margin left)
@@ -257,8 +275,6 @@ form {
 .preview_cropped_image {
 	display: inline-block;
 	overflow: hidden;
-	margin-bottom: 10px;
-	margin-right: 10px;
 	box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.25);
 }
 .preview_cropped_image.circle {
@@ -270,27 +286,23 @@ form {
 .crop_button.top {
 	display: none;
 }
-#image_crop_block.short_width > div { display: block; }
-#image_crop_block.short_width .preview_cropped_images { text-align: left; width: auto; }
-#image_crop_block.short_width .preview_cropped_image { margin-right: 10px; }
-@media only screen and (max-width: 900px) {
-	#fieldset_wrapper_image_crop fieldset{ padding: 0 !important; }
-	//#target_cropped_image{ margin-right: 0; }
-	#image_crop_block > div { display: inline-block; }
-	#overlay_page .preview_cropped_images,
-	.preview_cropped_images { text-align: left !important; width: auto !important; display: inline-block; }
-	.preview_cropped_image { margin-right: 10px; }
-	.crop_button.top { display: block; }
-	.crop_button.bottom { display: none; }
-	#image_crop legend{ padding: 10px; box-sizing: border-box; }
-}
+
 // Fix to hide radio button
 .jcrop-keymgr {
 	visibility: hidden;
 }
+// Fix image cropping, because max-width:100% of main img style breaks this:
+#user_crop_workarea, .preview_cropped_image {
+	img {
+		max-width: none;
+	}
+}
 // ---------------- //
 
 // Form styles:
+.evo_label_inline {
+	margin-left: 2ex;
+}
 // Used for action icons
 div.right_icons,
 div.fieldset_icons {
@@ -359,12 +371,46 @@ label.radiooption {
 }
 // ---------------- //
 
+// File Select custom control
+.file_select_wrapper {
+	display: flex;
+	flex-flow: row wrap;
+	align-items: flex-start;
+
+	.file_select_item {
+		//display: block;
+		//float: left;
+		display: flex;
+		flex-flow: row wrap;
+		margin-right: 8px;
+		text-align: center;
+
+		.item_actions {
+			display: flex;
+			flex-shrink: 1;
+			flex-flow: column wrap;
+			justify-content: flex-start;
+			align-content: center;
+			justify-content: center;
+			text-align: left;
+			margin-left: 8px;
+		}
+	}
+}
+// ---------------- //
+
 // Messages:
 div.log_container, div.action_messages {
 	ul, ol, li {
 		list-style: none;
 		margin: 0;
 		padding-left: 0;
+	}
+	ul.message_group {
+		li {
+			margin-left: 25px;
+			list-style: disc;
+		}
 	}
 }
 // ---------------- //
@@ -436,7 +482,7 @@ table.widget_grid .note {
 // ---------------- //
 
 
-// Disp=user style fixes
+// Table style fixes:
 .table_scroll table.table tr td {
 	vertical-align: middle;
 	&.firstcol.shrinkwrap {
@@ -446,12 +492,25 @@ table.widget_grid .note {
 		}
 	}
 }
+// Align top all cells of messages table:
+.evo_private_messages_list .table_scroll table.table tr td {
+	vertical-align: top;
+}
+// Space between user avatars in threads table:
+table.table td.thread_with {
+	img {
+		margin-bottom: 5px;
+	}
+	> span:last-child img {
+		margin-bottom: 0;
+	}
+}
 // ---------------- //
 
 
 // User links widget
 .ufld_icon_links {
-	text-align: center; 
+	text-align: center;
 	// milos> Already styled with 'text-align: right;' in Starter style.less (line 7)
 	// fp> I put this back because you say 'already'. It's not 'already'. starter/style.less comes after this basic style. If we want to remove this we have to know that this style is overriden by ALL boostrap skins.
 	a {
@@ -459,3 +518,100 @@ table.widget_grid .note {
 	}
 }
 // --------------- //
+
+
+// Hides pager elements with active_distance > 1 on small devices
+
+// this will hide pseudo prev_list and pseudo next_list links by default
+li[class^="listnav_distance_"], li[class*=" listnav_distance_"] {
+	display: none;
+}
+
+// Do the following the screen is greater than or equal to 320px
+@media only screen and (min-width: 320px) {
+	// hide all active distance first
+	li[class^="active_distance_"], li[class*=" active_distance_"] {
+		display: none;
+	}
+
+	// hide previous and next
+	li.listnav_prev, li.listnav_next {
+		display: none;
+	}
+
+	// hide previous list and next list
+	li.listnav_prev_list, li.listnav_next_list {
+		display: none;
+	}
+
+	// round the corners of the first and last page
+	li.listnav_first > a {
+		border-top-left-radius: 4px;
+		border-bottom-left-radius: 4px;
+	}
+
+	li.listnav_last > a {
+		border-top-right-radius: 4px;
+		border-bottom-right-radius: 4px;
+	}
+
+	// show only active distance 1
+	li[class="active_distance_1"] {
+		display: inline;
+	}
+
+	// show pseudo previous/next list 1
+	li[class="listnav_distance_1"] {
+		display: inline;
+	}
+}
+
+@media only screen and (min-width: 480px) {
+	// show active distance 2
+	li[class="active_distance_2"] {
+		display: inline;
+	}
+
+	// hide pseudo previous/next 1...
+	li[class="listnav_distance_1"] {
+		display: none;
+	}
+
+	// ...and show next pseudo previous/next list 2
+	li[class="listnav_distance_2"] {
+		display: inline;
+	}
+}
+
+@media only screen and (min-width: 768px) {
+	// show all active distance
+	li[class^="active_distance_"], li[class*=" active_distance_"] {
+		display: inline;
+	}
+
+	// hide all pseudo previous/next lists
+	li[class^="listnav_distance_"], li[class*=" listnav_distance_"] {
+		display: none;
+	}
+
+	// show previous/next list pages
+	li.listnav_prev_list, li.listnav_next_list {
+		display: inline;
+	}
+}
+
+@media only screen and (min-width: 992px) {
+	// show previous/next pages
+	li.listnav_prev, li.listnav_next {
+		display: inline;
+	}
+
+	// remove round corners on the first and last page
+	li.listnav_first > a {
+		border-radius: 0;
+	}
+
+	li.listnav_last > a {
+		border-radius: 0;
+	}
+}

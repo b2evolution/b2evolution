@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var CommentList
  */
@@ -35,7 +35,7 @@ display_comment_mass_delete( $CommentList );
 // Display title depending on selection params:
 echo $CommentList->get_filter_title( '<h2 class="page-title">', '</h2>', '<br />', NULL, 'htmlbody' );
 
-$CommentList->title = T_('Comment List');
+$CommentList->title = T_('Comment List').get_manual_link( 'comments-tab' );
 
 if( $CommentList->is_filtered() )
 {	// List is filtered, offer option to reset filters:

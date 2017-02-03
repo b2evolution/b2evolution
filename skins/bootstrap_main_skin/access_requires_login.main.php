@@ -11,9 +11,9 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $app_version, $disp, $Blog;
+global $app_version, $disp, $Collection, $Blog;
 
-if( version_compare( $app_version, '6.4' ) < 0 )
+if( evo_version_compare( $app_version, '6.4' ) < 0 )
 { // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.
 	die( 'This skin is designed for b2evolution 6.4 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
@@ -43,7 +43,6 @@ if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 { // If it exists in media folder
 	echo '<img src="'.$media_url.$bg_image.'" />';
 }
-echo '</div>';
 ?>
 
 
@@ -177,7 +176,7 @@ if( $Skin->is_visible_container( 'menu' ) )
 </div><!-- .row -->
 
 </div><!-- .container -->
-
+</div><!-- #bg_picture -->
 
 <!-- =================================== START OF SECONDARY AREA =================================== -->
 <section class="secondary_area"><!-- white background -->

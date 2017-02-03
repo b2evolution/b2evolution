@@ -1481,7 +1481,7 @@ form.search {
 }
 
 /* Rating Summary */
-table.ratings_table {
+.ratings_table {
 	background-color: #fff;
 	padding: 10px;
 	margin: 10px;
@@ -1606,7 +1606,7 @@ fieldset#ffield_g textarea {
 
 
 /* Not published comments display */
-#styled_content_block span[class*=status_] {
+.evo_content_block span[class*=status_] {
 	background: transparent;
 	width: 75px;
 	height: 75px;
@@ -1650,7 +1650,7 @@ fieldset#ffield_g textarea {
 	background-color: #663399;
 }
 
-#styled_content_block span[class*=status_] span {
+.evo_content_block span[class*=status_] span {
 	display: block;
 	width: 120px;
 	text-align: center;
@@ -1667,7 +1667,7 @@ fieldset#ffield_g textarea {
 }
 
 @media \0screen {/* IE8 */
-	#styled_content_block span[class*=status_] span {
+	.evo_content_block span[class*=status_] span {
 		top: -15px;
 		left: -2px;
 	}

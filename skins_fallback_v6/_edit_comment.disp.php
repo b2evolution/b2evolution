@@ -9,14 +9,14 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $edited_Comment, $comment_Item, $comment_content;
-global $display_params, $admin_url, $samedomain_htsrv_url, $dummy_fields;
+global $Collection, $Blog, $edited_Comment, $comment_Item, $comment_content;
+global $display_params, $admin_url, $dummy_fields;
 
 if( empty( $comment_Item ) )
 {
@@ -48,13 +48,20 @@ $Form->begin_form( 'evo_comment' );
 		$Form->hidden( 'comment_issue_time', substr( $edited_Comment->get( 'date' ), 11 ) );
 	}
 
-	$Form->begin_fieldset( get_request_title( array_merge( array(
+	$Form->output = false;
+	$edit_links = $Form->begin_fieldset( get_request_title( array_merge( array(
 			'edit_links_template' => array(
 				'before'              => '<span class="pull-right">',
 				'after'               => '</span>',
 				'advanced_link_class' => 'btn btn-info btn-sm',
 				'close_link_class'    => 'btn btn-default btn-sm',
 			) ), $params ) ) );
+	$Form->output = true;
+	$advanced_edit_text = T_('Advanced editing');
+	$edit_links = preg_replace( '/ '.$advanced_edit_text.'/', '<span class="hidden-xs">$0</span>', $edit_links );
+	$cancel_text = T_('Cancel editing');
+	$edit_links = preg_replace( '/ '.$cancel_text.'/', '<span class="hidden-xs">$0</span>', $edit_links );
+	echo $edit_links;
 
 	$Form->info( T_('In response to'), $comment_Item->get_title() );
 
@@ -85,11 +92,7 @@ $Form->begin_form( 'evo_comment' );
 	ob_start();
 	echo '<div class="comment_toolbars">';
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'AdminDisplayToolbar', array(
-			'target_type' => 'Comment',
-			'edit_layout' => NULL,
-			'Comment' => $edited_Comment,
-		) );
+	$Plugins->trigger_event( 'DisplayCommentToolbar', array( 'Comment' => & $edited_Comment, 'Item' => & $comment_Item ) );
 	echo '</div>';
 	$comment_toolbar = ob_get_clean();
 
@@ -122,8 +125,11 @@ $Form->begin_form( 'evo_comment' );
 	{ // there are attachments to display
 		if( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) )
 		{
-			$Form->begin_fieldset( T_('Attachments') );
-			display_attachments( $LinkOwner );
+			$Form->begin_fieldset( T_('Attachments'), array( 'id' => 'comment_attachments' ) );
+			display_attachments( $LinkOwner, array(
+						'block_start' => '<div class="attachment_list results">',
+						'table_start' => '<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0" cellpadding="0">',
+					)  );
 			$Form->end_fieldset();
 		}
 		else

@@ -8,7 +8,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $AdminUI;
 
 param( 'user_tab', 'string', '', true );
-if( empty($user_tab) )
+if( empty( $user_tab ) )
 {
 	$user_tab = 'profile';
 }
@@ -49,14 +49,14 @@ if( $user_profile_only )
 
 $UserCache = & get_UserCache();
 
-if( ! is_null($user_ID) )
+if( ! is_null( $user_ID ) )
 { // User selected
 	if( $action == 'update' && $user_ID == 0 )
 	{ // we create a new user
 		$edited_User = new User();
 		$edited_User->set_datecreated( $localtimenow );
 	}
-	elseif( ($edited_User = & $UserCache->get_by_ID( $user_ID, false )) === false )
+	elseif( ( $edited_User = & $UserCache->get_by_ID( $user_ID, false ) ) === false )
 	{	// We could not find the User to edit:
 		unset( $edited_User );
 		forget_param( 'user_ID' );
@@ -86,6 +86,11 @@ if( ! is_null($user_ID) )
 			{
 				$action = 'view';
 			}
+		}
+		elseif( $user_tab == 'visits' && $Settings->get( 'enable_visit_tracking' ) != 1 )
+		{
+			$Messages->add( T_('Visit tracking is not enabled.') );
+			header_redirect( '?ctrl=users&user_tab=profile&user_ID='.$current_User->ID, 403 );
 		}
 	}
 }
@@ -356,6 +361,8 @@ if( !$Messages->has_errors() )
 
 			if( param( 'advanced_form', 'boolean', false ) )
 			{
+				/*
+				 * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
 				$current_admin_skin = param( 'current_admin_skin', 'string' );
 				if( ( $current_admin_skin == $UserSettings->get( 'admin_skin', $current_User->ID ) ) &&
 					( $current_admin_skin == $UserSettings->get( 'admin_skin', $edited_User->ID ) ) )
@@ -363,6 +370,7 @@ if( !$Messages->has_errors() )
 					// edited user admin skin is the same as current user admin skin
 					$AdminUI->set_skin_settings( $edited_User->ID );
 				}
+				 */
 
 				if( $UserSettings->dbupdate() )
 				{
@@ -376,7 +384,8 @@ if( !$Messages->has_errors() )
 				$Plugins->restart();
 				while( $loop_Plugin = & $Plugins->get_next() )
 				{
-					$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) );
+					$tmp_params = array( 'for_editing' => true );
+					$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params );
 					if( empty($pluginusersettings) )
 					{
 						continue;
@@ -389,8 +398,8 @@ if( !$Messages->has_errors() )
 					}
 
 					// Let the plugin handle custom fields:
-					$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array(
-						'User' => & $edited_User, 'action' => 'save' ) );
+					$tmp_params = array( 'User' => & $edited_User, 'action' => 'save' );
+					$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params );
 
 					if( $ok_to_update === false )
 					{
@@ -466,7 +475,8 @@ if( !$Messages->has_errors() )
 			$Plugins->restart();
 			while( $loop_Plugin = & $Plugins->get_next() )
 			{
-				$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) );
+				$tmp_params = array( 'for_editing' => true );
+				$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params );
 
 				if( empty($pluginusersettings) )
 				{
@@ -484,8 +494,8 @@ if( !$Messages->has_errors() )
 				}
 
 				// Let the plugin handle custom fields:
-				$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array(
-					'User' => & $edited_User, 'action' => 'reset' ) );
+				$tmp_params = array( 'User' => & $edited_User, 'action' => 'reset' );
+				$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params );
 
 				if( $ok_to_update === false )
 				{
@@ -756,38 +766,78 @@ if( $display_mode != 'js')
 			init_userfields_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 			require_js( '#jcrop#' );
 			require_css( '#jcrop_css#' );
+
+			// Set an url for manual page:
+			if( $action == 'new' )
+			{
+				$AdminUI->set_page_manual_link( 'user-edit' );
+			}
+			else
+			{
+				$AdminUI->set_page_manual_link( 'user-profile-tab' );
+			}
 			break;
 		case 'avatar':
 			if( isset($GLOBALS['files_Module']) )
 			{
 				$AdminUI->breadcrumbpath_add( T_('Profile picture'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'user-profile-picture-tab' );
 			}
 			require_js( '#jcrop#' );
 			require_css( '#jcrop_css#' );
 			break;
 		case 'pwdchange':
 			$AdminUI->breadcrumbpath_add( T_('Change password'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'user-password-tab' );
 			break;
 		case 'userprefs':
 			$AdminUI->breadcrumbpath_add( T_('Preferences'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'user-preferences-tab' );
 			break;
 		case 'subs':
 			$AdminUI->breadcrumbpath_add( T_('Notifications'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'user-notifications-tab' );
+			break;
+		case 'visits':
+			$AdminUI->breadcrumbpath_add( T_('Visits'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'profile-visits-tab' );
 			break;
 		case 'advanced':
 			$AdminUI->breadcrumbpath_add( T_('Advanced'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'user-advanced-tab' );
 			break;
 		case 'admin':
 			$AdminUI->breadcrumbpath_add( T_('Admin'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 			load_funcs( 'tools/model/_email.funcs.php' );
 			load_funcs( 'sessions/model/_hitlog.funcs.php' );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'user-admin-tab' );
 			break;
 		case 'sessions':
 			$AdminUI->breadcrumbpath_add( T_('Sessions'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'user-sessions-tab' );
 			break;
 		case 'activity':
 			$AdminUI->breadcrumbpath_add( $current_User->ID == $edited_User->ID ? T_('My Activity') : T_('User Activity'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 			require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'user-activity-tab' );
 			break;
 	}
 
@@ -859,6 +909,12 @@ switch( $action )
 				// Display user subscriptions form:
 				$AdminUI->disp_payload_begin();
 				$AdminUI->disp_view( 'users/views/_user_subscriptions.form.php' );
+				$AdminUI->disp_payload_end();
+				break;
+			case 'visits':
+				// Display profile visits view
+				$AdminUI->disp_payload_begin();
+				$AdminUI->disp_view( 'users/views/_user_profile_visits.view.php' );
 				$AdminUI->disp_payload_end();
 				break;
 			case 'advanced':
@@ -985,6 +1041,9 @@ switch( $action )
 				}
 				$image_width = param( 'image_width', 'integer' );
 				$image_height = param( 'image_height', 'integer' );
+				$aspect_ratio = param( 'aspect_ratio', 'double' );
+				$content_width = param( 'content_width', 'integer' );
+				$content_height = param( 'content_height', 'integer' );
 				$AdminUI->disp_view( 'users/views/_user_crop.form.php' );
 				if( $display_mode != 'js')
 				{

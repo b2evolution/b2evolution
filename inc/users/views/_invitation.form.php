@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -41,16 +41,22 @@ $Form->begin_form( 'fform', ( $creating ? T_('New invitation code') : T_('Invita
 
 	$Form->hiddens_by_key( get_memorized( 'action' ) ); // (this allows to come back to the right list order & page)
 
-	$GroupCache = & get_GroupCache();
-	$Form->select_input_object( 'ivc_grp_ID', $edited_Invitation->grp_ID, $GroupCache, T_('Group'), array( 'required' => true ) );
+	$Form->text_input( 'ivc_code', $edited_Invitation->code, 32, T_('Invitation code'), T_('Must be from 3 to 32 letters, digits or signs "-", "_".'), array( 'required' => true ) );
 
-	$Form->text_input( 'ivc_code', $edited_Invitation->code, 32, T_('Code'), T_('Must be from 3 to 32 letters, digits or signs "-", "_".'), array( 'required' => true ) );
+	$Form->begin_line( T_('Expires'), 'ivc_expire_date', '', array( 'required' => true ) );
 
-	$Form->date_input( 'ivc_expire_date', date2mysql( $edited_Invitation->expire_ts ), T_('Expire date'), array( 'required' => true ) );
+		$Form->date_input( 'ivc_expire_date', $edited_Invitation->expire_ts, '' );
 
-	$Form->time_input( 'ivc_expire_time', date2mysql( $edited_Invitation->expire_ts ), T_('Expire time'), array( 'required' => true ) );
+		$Form->time_input( 'ivc_expire_time', $edited_Invitation->expire_ts, T_('at') );
 
-	$Form->text_input( 'ivc_source', $edited_Invitation->source, 32, T_('Source'), '', array( 'maxlength' => 30 ) );
+	$Form->end_line();
+
+	$GroupCache = & get_GroupCache( true, '('.T_('Default group').')' );
+	$Form->select_input_object( 'ivc_grp_ID', $edited_Invitation->grp_ID, $GroupCache, T_('Assign to Group'), array( 'allow_none' => true ) );
+
+	$Form->text_input( 'ivc_level', $edited_Invitation->level, 32, T_('Assign level'), '', array( 'maxlength' => 2 ) );
+
+	$Form->text_input( 'ivc_source', $edited_Invitation->source, 32, T_('Assign source'), '', array( 'maxlength' => 30 ) );
 
 if( $creating )
 {

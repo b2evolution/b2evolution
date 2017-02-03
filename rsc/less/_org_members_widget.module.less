@@ -1,0 +1,75 @@
+// Organization Members widget:
+
+// Default values
+@widget_core_org_members-color: #333;
+@widget_core_org_members-user-link-color: #000;
+@widget_core_org_members-user-link-hover-color: #23527c;
+
+.widget_core_org_members {
+	margin: 5em 0 30px;
+	color: @widget_core_org_members-color;
+	div.widget_rwd_content {
+		text-align: center;
+		margin-top: 20px;
+		margin-bottom: 30px;
+	}
+	img {
+		display: inline-block;
+	}
+	h3.evo_user_name {
+		margin-top: 10px;
+		margin-bottom: 0;
+	}
+	div.evo_org_role {
+		margin-top: 10px;
+		margin-bottom: 0;
+		min-height: 25px;
+		font-size: 18px;
+	}
+	a.user_link {
+		color: @widget_core_org_members-user-link-color;
+		&:hover {
+			color: @widget_core_org_members-user-link-hover-color;
+		}
+	}
+	div.ufld_icon_links {
+		margin-top: 10px;
+		min-height: 44px;
+	}
+	p.user_field {
+		margin-top: 10px;
+		line-height: 1.5;
+		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		// These default properties can be changed by param "Lines of extra info" of the widget "Organization Members":
+		-webkit-line-clamp: 2;
+		height: 3em; // = ( -webkit-line-clamp ) * ( line-height )
+	}
+	
+	// RWD Blocks Layout
+	.widget_rwd_blocks {
+		width: 100%;
+	}
+	
+	// List Layout
+	&.evo_layout_list {
+		ul li div.ufld_icon_links {
+			text-align: left;
+		}
+	}
+}
+
+// Responsive layout
+@media (max-width: 640px) {
+	body.pictured .front_main_content .ufld_icon_links a {
+		width: 45px;
+		height: 45px;
+		margin: 5px;
+		.fa {
+			font-size: 20px;
+			line-height: 45px;
+		}
+	}
+}

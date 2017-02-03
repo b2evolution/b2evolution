@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -27,11 +27,14 @@ class LinkItem extends LinkOwner
 
 	/**
 	 * Constructor
+	 *
+	 * @param object Item
+	 * @param integer ID of temporary object from table T_temporary_ID (used for uploads on new items)
 	 */
-	function LinkItem( $Item )
+	function __construct( $Item, $tmp_ID = NULL )
 	{
 		// call parent contsructor
-		parent::LinkOwner( $Item, 'item' );
+		parent::__construct( $Item, 'item', 'itm_ID', $tmp_ID );
 		$this->Item = & $this->link_Object;
 
 		$this->_trans = array(
@@ -56,7 +59,15 @@ class LinkItem extends LinkOwner
 	function check_perm( $permlevel, $assert = false )
 	{
 		global $current_User;
-		return $current_User->check_perm( 'item_post!CURSTATUS', $permlevel, $assert, $this->Item );
+
+		if( $this->is_temp() )
+		{	// Check permission for new creating item:
+			return $current_User->check_perm( 'blog_post_statuses', 'edit', false, $this->link_Object->tmp_coll_ID );
+		}
+		else
+		{	// Check permission for existing item in DB:
+			return $current_User->check_perm( 'item_post!CURSTATUS', $permlevel, $assert, $this->Item );
+		}
 	}
 
 	/**
@@ -67,7 +78,17 @@ class LinkItem extends LinkOwner
 	 */
 	function get_positions( $file_ID = NULL )
 	{
-		$positions = array(
+		$positions = array();
+
+		$FileCache = & get_FileCache();
+		$File = $FileCache->get_by_ID( $file_ID, false, false );
+		if( $File && $File->is_image() )
+		{ // Only images can have this position
+			// TRANS: Noun - we're talking about a cover image i-e: an image that used as cover for a post
+			$positions['cover'] = T_('Cover');
+		}
+
+		$positions = array_merge( $positions, array(
 				// TRANS: Noun - we're talking about a teaser image i-e: an image that appears before content
 				'teaser'     => T_('Teaser'),
 				// TRANS: Noun - we're talking about a teaser image i-e: an image that appears before content and with image url linked to permalink
@@ -77,17 +98,16 @@ class LinkItem extends LinkOwner
 				// TRANS: Noun - we're talking about a footer image i-e: an image that appears after "more" content separator
 				'aftermore'  => T_('After "more"'),
 				// TRANS: noun - we're talking about an inline image i-e: an image that appears in the middle of some text
-				'inline'     => T_('Inline'),
-				// TRANS: Noun - we're talking about a fallback image i-e: an image that used as fallback for video file
-				'fallback'   => T_('Fallback'),
-			);
+				'inline'     => T_('Inline')
+			) );
 
-		$FileCache = & get_FileCache();
-		if( ( $File = $FileCache->get_by_ID( $file_ID, false, false ) ) && $File->is_image() )
+		if( $File && $File->is_image() )
 		{ // Only images can have this position
-			// TRANS: Noun - we're talking about a cover image i-e: an image that used as cover for a post
-			$positions['cover'] = T_('Cover');
+			// TRANS: Noun - we're talking about a fallback image i-e: an image that used as fallback for video file
+			$positions['fallback'] = T_('Fallback');
 		}
+
+		$positions['attachment'] = T_('Attachment');
 
 		return $positions;
 	}
@@ -134,7 +154,14 @@ class LinkItem extends LinkOwner
 		if( is_null( $this->Links ) )
 		{ // Links have not been loaded yet:
 			$LinkCache = & get_LinkCache();
-			$this->Links = $LinkCache->get_by_item_ID( $this->Item->ID );
+			if( $this->is_temp() )
+			{
+				$this->Links = $LinkCache->get_by_temporary_ID( $this->get_ID() );
+			}
+			else
+			{
+				$this->Links = $LinkCache->get_by_item_ID( $this->Item->ID );
+			}
 		}
 	}
 
@@ -155,22 +182,25 @@ class LinkItem extends LinkOwner
 		}
 
 		$edited_Link = new Link();
-		$edited_Link->set( 'itm_ID', $this->Item->ID );
+		$edited_Link->set( $this->get_ID_field_name(), $this->get_ID() );
 		$edited_Link->set( 'file_ID', $file_ID );
 		$edited_Link->set( 'position', $position );
 		$edited_Link->set( 'order', $order );
 		if( $edited_Link->dbinsert() )
 		{
-			// New link was added to the item, invalidate blog's media BlockCache
-			BlockCache::invalidate_key( 'media_coll_ID', $this->Item->get_blog_ID() );
+			if( ! $this->is_temp() )
+			{	// New link was added to the item, invalidate blog's media BlockCache:
+				BlockCache::invalidate_key( 'media_coll_ID', $this->Item->get_blog_ID() );
+			}
 
 			$FileCache = & get_FileCache();
 			$File = $FileCache->get_by_ID( $file_ID, false, false );
 			$file_name = empty( $File ) ? '' : $File->get_name();
-			syslog_insert( sprintf( 'File %s was linked to %s with ID=%s', '<b>'.$file_name.'</b>', $this->type, $this->link_Object->ID ), 'info', 'file', $file_ID );
+			$file_dir = $File->dir_or_file();
+			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s',  ucfirst( $file_dir ), '[['.$file_name.']]', $this->type, $this->get_ID() ), 'info', 'file', $file_ID );
 
-			if( $update_owner )
-			{ // Update last touched date of the Item
+			if( ! $this->is_temp() && $update_owner )
+			{	// Update last touched date of the Item:
 				$this->update_last_touched_date();
 			}
 
@@ -191,16 +221,20 @@ class LinkItem extends LinkOwner
 	{
 		if( is_null( $this->Blog ) )
 		{
-			$this->Blog = & $this->Item->get_Blog();
+			$Item = $this->Item;
+			if( $Item->ID == 0 )
+			{	// This is a request of new creating Item (for example, preview mode),
+				// We should use current collection, because new Item has no category ID yet here to load Collection:
+				global $Blog;
+				$this->Blog = $Blog;
+			}
+			else
+			{	// Use Collection of the existing Item:
+				$this->Blog = & $this->Item->get_Blog();
+			}
 		}
 	}
 
-	/**
-	 * Get where condition for select query to get Item links
-	 */
-	function get_where_condition() {
-		return 'link_itm_ID = '.$this->Item->ID;
-	}
 
 	/**
 	 * Get Item parameter
@@ -219,11 +253,36 @@ class LinkItem extends LinkOwner
 
 	/**
 	 * Get Item edit url
+	 *
+	 * @return string URL
 	 */
 	function get_edit_url()
 	{
-		$this->load_Blog();
-		return '?ctrl=items&amp;blog='.$this->Blog->ID.'&amp;action=edit&amp;p='.$this->Item->ID;
+		if( is_admin_page() )
+		{	// Back-office:
+			global $admin_url;
+			if( $this->is_temp() )
+			{	// New creating Item:
+				return $admin_url.'?ctrl=items&amp;blog='.$this->link_Object->tmp_coll_ID.'&amp;action=new';
+			}
+			else
+			{	// The edited Item:
+				$this->load_Blog();
+				return $admin_url.'?ctrl=items&amp;blog='.$this->Blog->ID.'&amp;action=edit&amp;p='.$this->Item->ID;
+			}
+		}
+		else
+		{	// Front-office:
+			global $Blog;
+			if( $this->is_temp() )
+			{	// New creating Item:
+				return url_add_param( $Blog->get( 'url' ), 'disp=edit' );
+			}
+			else
+			{	// The edited Item:
+				return url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;p='.$this->Item->ID );
+			}
+		}
 	}
 
 	/**
@@ -231,8 +290,31 @@ class LinkItem extends LinkOwner
 	 */
 	function get_view_url()
 	{
-		$this->load_Blog();
-		return '?ctrl=items&amp;blog='.$this->Blog->ID.'&amp;p='.$this->Item->ID;
+		if( is_admin_page() )
+		{	// Back-office:
+			global $admin_url;
+			if( $this->is_temp() )
+			{	// New creating Item:
+				return $admin_url.'?ctrl=items&amp;blog='.$this->link_Object->tmp_coll_ID.'&amp;action=new';
+			}
+			else
+			{	// The edited Item:
+				$this->load_Blog();
+				return $admin_url.'?ctrl=items&amp;blog='.$this->Blog->ID.'&amp;p='.$this->Item->ID;
+			}
+		}
+		else
+		{	// Front-office:
+			global $Blog;
+			if( $this->is_temp() )
+			{	// New creating Item:
+				return url_add_param( $Blog->get( 'url' ), 'disp=edit' );
+			}
+			else
+			{	// The edited Item:
+				return url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;p='.$this->Item->ID );
+			}
+		}
 	}
 
 
@@ -241,7 +323,7 @@ class LinkItem extends LinkOwner
 	 */
 	function update_last_touched_date()
 	{
-		if( !empty( $this->Item ) )
+		if( ! empty( $this->Item ) && ! $this->is_temp() )
 		{	// Update Item if it exists
 			$this->Item->update_last_touched_date();
 		}
@@ -261,7 +343,7 @@ class LinkItem extends LinkOwner
 
 		if( ! empty( $link_ID ) )
 		{ // Find inline image placeholders if link ID is defined
-			preg_match_all( '/\[(image|file|inline):'.$link_ID.':?[^\]]*\]/i', $this->Item->content, $inline_images );
+			preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):'.$link_ID.':?[^\]]*\]/i', $this->Item->content, $inline_images );
 			if( ! empty( $inline_images[0] ) )
 			{ // There are inline image placeholders in the post content
 				$this->Item->set( 'content', str_replace( $inline_images[0], '', $this->Item->content ) );
@@ -270,8 +352,10 @@ class LinkItem extends LinkOwner
 			}
 		}
 
-		// Update last touched date of the Item
-		$this->update_last_touched_date();
+		if( ! $this->is_temp() )
+		{	// Update last touched date of the Item
+			$this->update_last_touched_date();
+		}
 	}
 }
 

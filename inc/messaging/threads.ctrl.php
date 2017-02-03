@@ -78,8 +78,8 @@ switch( $action )
 		}
 		else
 		{	// Duplicate object in order no to mess with the cache:
-			$edited_Thread = duplicate( $edited_Message->Thread ); // PHP4/5 abstraction
-			$edited_Message = duplicate( $edited_Message ); // PHP4/5 abstraction
+			$edited_Thread = clone $edited_Message->Thread;
+			$edited_Message = clone $edited_Message; // PHP4/5 abstraction
 			$edited_Message->ID = 0;
 		}
 		$edited_Message->Thread = & $edited_Thread;
@@ -180,6 +180,28 @@ init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('Messages'), '?ctrl=threads' );
 $AdminUI->breadcrumbpath_add( T_('Conversations'), '?ctrl=threads' );
+
+// Set an url for manual page:
+switch( $action )
+{
+	case 'new':
+	case 'create':
+	case 'preview':
+		$AdminUI->set_page_manual_link( 'messages-new-thread' );
+
+		// Require colorbox js:
+		require_js_helper( 'colorbox' );
+		// Require File Uploader js and css:
+		require_js( 'multiupload/fileuploader.js' );
+		require_css( 'fileuploader.css' );
+		// Load JS files to make the links table sortable:
+		require_js( '#jquery#' );
+		require_js( 'jquery/jquery.sortable.min.js' );
+		break;
+	default:
+		$AdminUI->set_page_manual_link( 'conversations-list' );
+		break;
+}
 
 // Display messages depending on user email status
 display_user_email_status_message();

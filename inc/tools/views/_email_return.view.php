@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -68,7 +68,7 @@ if( !empty( $email ) )
 
 $Results = new Results( $SQL->get(), 'emret_', 'D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
-$Results->title = T_('Returned emails');
+$Results->title = T_('Returned emails').get_manual_link( 'email-returned' );
 
 /**
  * Callback to add filters on top of the result set
@@ -104,7 +104,7 @@ $Results->cols[] = array(
 		'default_dir' => 'D',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'timestamp compact_data',
-		'td' => '%mysql2localedatetime_spans( #emret_timestamp#, "M-d" )%',
+		'td' => '%mysql2localedatetime_spans( #emret_timestamp# )%',
 	);
 
 function emret_address_col( $emret_address )

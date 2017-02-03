@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -29,7 +29,7 @@ function trackbacks( $post_trackbacks, $Item )
 	$excerpt = $Item->get_excerpt();
 
 	$Messages->add( T_('Excerpt sent in trackbacks:').' '.$excerpt, 'note' );
-	$trackback_urls = split('( )+', $post_trackbacks,10);		// fplanque: ;
+	$trackback_urls = preg_split( '/( )+/', $post_trackbacks, 10 );		// fplanque: ;
 	foreach($trackback_urls as $tb_url)
 	{ // trackback each url:
 		$tb_url = trim($tb_url);
@@ -53,7 +53,7 @@ function trackback(
 	$ID,
 	$url ) // post ID
 {
-	global $app_name, $app_version, $Blog, $Messages;
+	global $app_name, $app_version, $Collection, $Blog, $Messages;
 
 	$trackback_message = T_('Sending trackback to:').' '.htmlspecialchars($trackback_url).' ';
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  *
@@ -39,6 +39,7 @@ $Form->begin_fieldset( T_('Front page').get_manual_link('collection-front-page-s
 			array( 'comments', T_('Latest Comments') ),
 			array( 'arcdir',   T_('Archive Directory') ),
 			array( 'catdir',   T_('Category Directory') ),
+			array( 'tags',     T_('Tags') ),
 			array( 'help',     T_('Help') ),
 			array( 'mediaidx', T_('Photo Index') ),
 			array( 'msgform',  T_('Sending a message') ),
@@ -48,6 +49,9 @@ $Form->begin_fieldset( T_('Front page').get_manual_link('collection-front-page-s
 			array( 'search',   T_('Search') ),
 			array( 'sitemap',  T_('Site Map') ),
 			array( 'users',    T_('Users') ),
+			array( 'terms',    T_('Terms & Conditions') ),
+			array( 'flagged',  T_('Flagged Items') ),
+			array( 'single',   T_('First post') ),
 			array( 'page',     T_('A specific page') ),
 		);
 	foreach( $front_disp_options as $i => $option )

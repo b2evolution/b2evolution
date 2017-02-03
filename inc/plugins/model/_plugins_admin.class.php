@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package plugins
@@ -89,7 +89,7 @@ class Plugins_admin extends Plugins
 				'AdminAfterPageFooter' => 'This gets called after the backoffice HTML footer has been displayed.',
 				'AdminDisplayEditorButton' => 'Display action buttons on the edit screens in the back-office',
 				'DisplayEditorButton' => 'Display action buttons on the edit screen in the front-office',
-				'AdminDisplayToolbar' => 'Display a toolbar on the edit screens',
+				'AdminDisplayToolbar' => 'Display a toolbar on the post/item form',
 				'AdminDisplayCommentFormFieldset' => 'Display form fieldsets on the backoffice comment editing form',
 				'AdminDisplayItemFormFieldset' => 'Display form fieldsets on the backoffice item editing screen(s)',
 				'DisplayItemFormFieldset' => 'Display form fieldsets on the frontoffice item editing screen(s)',
@@ -106,6 +106,9 @@ class Plugins_admin extends Plugins
 				'AdminBeforeItemEditDelete' => 'This gets called before an existing item gets deleted from the backoffice.',
 
 				'AdminBeginPayload' => 'This gets called before the main payload in the backoffice is displayed.',
+
+				'WidgetBeginSettingsForm' => 'This gets called at the beginning of the "Edit wdiget" form on back-office.',
+				'WidgetEndSettingsForm' => 'This gets called at the end of the "Edit wdiget" form on back-office.',
 
 				'CacheObjects' => 'Cache data objects.',
 				'CachePageContent' => 'Cache page content.',
@@ -140,8 +143,17 @@ class Plugins_admin extends Plugins
 				'RenderItemAsHtml' => 'Renders content when generated as HTML.',
 				'RenderItemAsXml' => 'Renders content when generated as XML.',
 				'RenderItemAsText' => 'Renders content when generated as plain text.',
+				'PrepareForRenderItemAttachment' => 'Prepare to render item attachment.',
 				'RenderItemAttachment' => 'Renders item attachment.',
+				'PrepareForRenderCommentAttachment' => 'Prepare to render comment attachment.',
 				'RenderCommentAttachment' => 'Renders comment attachment.',
+				'RenderMessageAsHtml' => 'Renders message content when generated as HTML.',
+				'PrepareForRenderMessageAttachment' => 'Prepare to render message attachment.',
+				'RenderMessageAttachment' => 'Renders message attachment.',
+				'RenderEmailAsHtml' => 'Renders email content when generated as HTML.',
+				'PrepareForRenderEmailAttachment' => 'Prepare to render email campaign attachment.',
+				'RenderEmailAttachment' => 'Renders email campaign attachment.',
+				'RenderURL' => 'Renders file by URL.',
 
 
 				// fp> rename to "DispRender"
@@ -157,6 +169,9 @@ class Plugins_admin extends Plugins
 				'FilterCommentContent' => 'Filters the content of a comment.',
 
 				'FilterMsgContent' => 'Filters the content of a message.',
+				'FilterEmailContent' => 'Filters the content of an email.',
+
+				'EmailFormSent' => 'Called when the email form has been submitted.',
 
 				'AfterUserDelete' => 'This gets called after an user has been deleted from the database.',
 				'AfterUserInsert' => 'This gets called after an user has been inserted into the database.',
@@ -177,12 +192,13 @@ class Plugins_admin extends Plugins
 				'BeforeThumbCreate' => 'This gets called before an image thumbnail gets created.',
 				'AfterFileUpload' => 'Called before an uploaded file gets saved on server.',
 
-				'DisplayCommentToolbar' => 'Display a toolbar on the public feedback form',
+				'DisplayCommentToolbar' => 'Display a toolbar on the feedback/comment form',
 				'DisplayCommentFormButton' => 'Called in the submit button section of the frontend comment form.',
 				'DisplayCommentFormFieldset' => 'Called at the end of the frontend comment form.',
 				'DisplayMessageToolbar' => 'Display a toolbar on the message form',
 				'DisplayMessageFormButton' => 'Called in the submit button section of the frontend message form.',
 				'DisplayMessageFormFieldset' => 'Called at the end of the frontend message form.',
+				'DisplayEmailToolbar' => 'Display a toolbar on the email form',
 				'DisplayLoginFormFieldset' => 'Called when displaying the "Login" form.',
 				'DisplayRegisterFormBefore' => 'Called when displaying the "Register" form.',
 				'DisplayRegisterFormFieldset' => 'Called when displaying the "Register" form.',
@@ -230,8 +246,11 @@ class Plugins_admin extends Plugins
 				'BeforeBlogDisplay' => 'Gets called before a (part of the blog) gets displayed.',
 				'InitMainList' => 'Initializes the MainList object. Use this method to create your own MainList, see init_MainList()',
 				'SkinBeginHtmlHead' => 'Gets called at the top of the HTML HEAD section in a skin.',
+				'SkinEndHtmlHead' => 'Gets called at the end of the HTML HEAD section in a skin.',
+				'SkinBeginHtmlBody' => 'Gets called at the top of the skin\'s HTML BODY section.',
 				'SkinEndHtmlBody' => 'Gets called at the end of the skin\'s HTML BODY section.',
 				'DisplayTrackbackAddr' => 'Called to display the trackback URL for an item.',
+				'BeforeSkinWrapper' => 'Gets called before skin wrapper.',
 
 				'GetCronJobs' => 'Gets a list of implemented cron jobs.',
 				'GetProvidedSkins' => 'Get a list of "skins" handled by the plugin.',
@@ -410,7 +429,7 @@ class Plugins_admin extends Plugins
 					'always' => 'always',
 					'opt-out' => 'opt-out',
 					'opt-in' => 'opt-in',
-					'lazy' => 'automatic', // The plugin will automatically deside to use rendering or not
+					'lazy' => 'automatic', // The plugin will automatically decide to use rendering or not
 					'never' => 'never',
 				);
 		}
@@ -445,6 +464,7 @@ class Plugins_admin extends Plugins
 		{ // All Plugin from 'rendering' groups handle the FilterCommentContent
 			$plugin_class_methods[] = 'FilterCommentContent';
 			$plugin_class_methods[] = 'FilterMsgContent';
+			$plugin_class_methods[] = 'FilterEmailContent';
 		}
 
 		if( ! function_exists('token_get_all') )
@@ -1042,7 +1062,6 @@ class Plugins_admin extends Plugins
 				$DB->query( 'DELETE FROM T_items__prerendering WHERE 1=1' );
 				$ItemCache = & get_ItemCache();
 				$ItemCache->clear();
-				break;
 			}
 
 			return true;
@@ -1066,9 +1085,9 @@ class Plugins_admin extends Plugins
 	{
 		global $DB;
 
-		if( ! preg_match( '~^1?\d?\d$~', $priority ) ) // using preg_match() to catch floating numbers
+		if( ! preg_match( '~^[12]?\d?\d$~', $priority ) ) // using preg_match() to catch floating numbers
 		{
-			debug_die( 'Plugin priority must be numeric (0-100).' );
+			debug_die( 'Plugin priority must be numeric (0-255).' );
 		}
 
 		$Plugin = & $this->get_by_ID($plugin_ID);
@@ -1394,7 +1413,7 @@ class Plugins_admin extends Plugins
 								usort( $clean_versions, 'version_compare' );
 								$clean_oldest_enabled = array_shift($clean_versions);
 
-								if( version_compare( $clean_oldest_enabled, $clean_req_ver, '<' ) )
+								if( evo_version_compare( $clean_oldest_enabled, $clean_req_ver, '<' ) )
 								{ // at least one instance of the installed plugins is not the current version
 									$msgs['error'][] = sprintf( T_( 'The plugin requires at least version %s of the plugin %s, but you have %s.' ), $plugin_req[1], $plugin_req[0], $clean_oldest_enabled );
 								}
@@ -1426,7 +1445,7 @@ class Plugins_admin extends Plugins
 
 					case 'app_min':
 						// min b2evo version:
-						if( ! version_compare( $app_version, $type_params, '>=' ) )
+						if( ! evo_version_compare( $app_version, $type_params, '>=' ) )
 						{
 							if( $class == 'recommends' )
 							{
@@ -1483,7 +1502,7 @@ class Plugins_admin extends Plugins
 		if( !isset( $params['object_Blog'] ) &&
 		    ( !isset( $params['object_type'] ) || ( isset( $params['object_type'] ) && $params['object_type'] != 'Message' ) ) )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{
 				return false;

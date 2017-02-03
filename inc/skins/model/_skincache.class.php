@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  *
@@ -40,9 +40,9 @@ class SkinCache extends DataObjectCache
 	/**
 	 * Constructor
 	 */
-	function SkinCache()
+	function __construct()
 	{
-		parent::DataObjectCache( 'Skin', false, 'T_skins__skin', 'skin_', 'skin_ID', 'skin_name', NULL,
+		parent::__construct( 'Skin', false, 'T_skins__skin', 'skin_', 'skin_ID', 'skin_name', NULL,
 			/* TRANS: "None" select option */ NT_('No skin') );
 	}
 
@@ -50,12 +50,12 @@ class SkinCache extends DataObjectCache
 	/**
 	 * Add object to cache, handling our own indices.
 	 *
-	 * @param Skin
+	 * @param object Skin object
 	 * @return boolean True on add, false if already existing.
 	 */
-	function add( & $Skin )
+	function add( $Skin )
 	{
-		$this->cache_by_folder[ $Skin->folder ] = & $Skin;
+		$this->cache_by_folder[ $Skin->folder ] = $Skin;
 
 		return parent::add( $Skin );
 	}

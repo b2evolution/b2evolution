@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -40,7 +40,7 @@ $Form->begin_form( 'fform', T_('Scheduled job') );
 
 	$Form->end_fieldset();
 
-	$Form->begin_fieldset( T_('Execution details').get_manual_link('scheduler_execution_info') );
+	$Form->begin_fieldset( T_('Execution details').get_manual_link('scheduled-job-execution-details') );
 
 		if( empty( $cjob_row->clog_status ) )
 		{
@@ -49,7 +49,7 @@ $Form->begin_form( 'fform', T_('Scheduled job') );
 		else
 		{
 			$duration_seconds = strtotime( $cjob_row->clog_realstop_datetime ) - strtotime( $cjob_row->clog_realstart_datetime );
-			$duration_icon = ( $duration_seconds > 60 ) ? ' '.get_icon( 'warning_yellow', 'imgtag', array( 'title' => T_('Execution time is more than 60 seconds!') ) ) : '';
+			$duration_icon = ( $duration_seconds > 60 ) ? ' '.get_icon( 'warning_yellow', 'imgtag', array( 'title' => T_('This job took more than 60 seconds to execute!') ) ) : '';
 
 			$Form->info( T_('Status'), '<span style="background-color:'.cron_status_color ( $cjob_row->clog_status ).';padding:0 5px;">'.$cjob_row->clog_status.'</span>'.$duration_icon );
 			$Form->info( T_('Real start time'), mysql2localedatetime( $cjob_row->clog_realstart_datetime ) );

@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2009-2015 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2009-2016 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * @package evocore
@@ -45,10 +45,10 @@ class Userfield extends DataObject
 	 *
 	 * @param object Database row
 	 */
-	function Userfield( $db_row = NULL )
+	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::DataObject( 'T_users__fielddefs', 'ufdf_', 'ufdf_ID' );
+		parent::__construct( 'T_users__fielddefs', 'ufdf_', 'ufdf_ID' );
 
 		// Allow inseting specific IDs
 		$this->allow_ID_insert = true;
@@ -72,11 +72,24 @@ class Userfield extends DataObject
 
 
 	/**
+	 * Get delete cascade settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_cascades()
+	{
+		return array(
+				array( 'table' => 'T_users__fields', 'fk' => 'uf_ufdf_ID', 'msg' => T_('%d user fields') ),
+			);
+	}
+
+
+	/**
 	 * Returns array of possible user field types
 	 *
 	 * @return array
 	 */
-	function get_types()
+	static function get_types()
 	{
 		return array(
 			'email'  => T_('Email address'),
@@ -175,6 +188,7 @@ class Userfield extends DataObject
 		// Code
 		$code = param( 'ufdf_code', 'string' );
 		param_check_not_empty( 'ufdf_code', T_('Please provide a code to uniquely identify this field.') );
+		// Code MUST be lowercase ASCII only:
 		param_check_regexp( 'ufdf_code', '#^[a-z0-9_]{1,20}$#', T_('The field code must contain only lowercase letters, digits or the "_" sign. 20 characters max.') );
 		$this->set_from_Request( 'code' );
 
