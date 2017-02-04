@@ -12,14 +12,18 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $baseurl, $Settings, $Blog, $disp, $current_User, $site_Skin;
 
-if( $Settings->get( 'notification_logo' ) != '' )
-{
-	$site_title = $Settings->get( 'notification_long_name' ) != '' ? ' title="'.$Settings->get( 'notification_long_name' ).'"' : '';
-	$site_name_text = '<img src="'.$Settings->get( 'notification_logo' ).'" alt="'.$Settings->get( 'notification_short_name' ).'"'.$site_title.' />';
+$notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
+if( $notification_logo_file_ID > 0 &&
+    ( $FileCache = & get_FileCache() ) &&
+    ( $File = $FileCache->get_by_ID( $notification_logo_file_ID, false ) ) &&
+    $File->is_image() )
+{	// Display site logo image if the file exists in DB and it is an image:
+	$site_title = $Settings->get( 'notification_long_name' ) != '' ? ' title="'.$Settings->dget( 'notification_long_name', 'htmlattr' ).'"' : '';
+	$site_name_text = '<img src="'.$File->get_url().'" alt="'.$Settings->dget( 'notification_short_name', 'htmlattr' ).'"'.$site_title.' />';
 	$site_title_class = ' navbar-header-with-logo';
 }
 else
-{
+{	// Display only short site name if the logo file cannot be used by some reason above:
 	$site_name_text = $Settings->get( 'notification_short_name' );
 	$site_title_class = '';
 }
@@ -261,10 +265,9 @@ if( $site_Skin->get_setting( 'grouping' ) &&
 
 </div><?php // END OF <div class="bootstrap_site_header"> ?>
 
-<a href="#" class="btn btn-primary slide-top <?php if (is_logged_in()) {echo 'logged_in_margin_top';} ?>"><i class="fa fa-angle-double-up"></i></a>
+<a href="#" class="btn btn-primary slide-top<?php echo ( is_logged_in() ? ' logged_in_margin_top' : '' ); ?>"><i class="fa fa-angle-double-up"></i></a>
 
 <script type="text/javascript">
-
 	// Scroll to Top
 	// ======================================================================== /
 	// browser window scroll ( in pixels ) after which the "scroll to top" link is show
@@ -274,18 +277,21 @@ if( $site_Skin->get_setting( 'grouping' ) &&
 	// duration of the top scrolling animatiion (in ms)
 	scroll_top_duration = 700,
 	// grab the "back to top" link
-	$slide_top = $( '.slide-top' );
+	$slide_top = jQuery( '.slide-top' );
 	
 	// hide or show the "scroll to top" link
-	$(window).scroll( function() {
-		( $(this).scrollTop() > offset ) ? $slide_top.addClass('slide-top-visible') : $slide_top.removeClass('slide-top-visible');
-    });
+	jQuery( window ).scroll( function()
+	{
+		( jQuery( this ).scrollTop() > offset ) ? $slide_top.addClass( 'slide-top-visible' ) : $slide_top.removeClass( 'slide-top-visible' );
+	});
 
 	// Smooth scroll to top
-	$slide_top.on( 'click', function(event) {
+	$slide_top.on( 'click', function(event)
+	{
 		event.preventDefault();
-		$( 'body, html' ).animate({
+		jQuery( 'body, html' ).animate(
+		{
 			scrollTop: 0,
 		}, scroll_top_duration );
-    });
+	} );
 </script>
