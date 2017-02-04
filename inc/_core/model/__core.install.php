@@ -77,8 +77,9 @@ $schema_queries = array(
 		"CREATE TABLE T_users (
 			user_ID int(11) unsigned NOT NULL auto_increment,
 			user_login varchar(20) NOT NULL,
-			user_pass BINARY(16) NOT NULL,
-			user_salt CHAR(8) NOT NULL default '',
+			user_pass VARCHAR(64) NOT NULL,
+			user_salt VARCHAR(32) NOT NULL default '',
+			user_pass_driver VARCHAR(16) NOT NULL default 'evo\$md5',
 			user_grp_ID int(4) NOT NULL default 1,
 			user_email varchar(255) COLLATE ascii_general_ci NOT NULL,
 			user_status enum( 'activated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'new' ) COLLATE ascii_general_ci NOT NULL default 'new',

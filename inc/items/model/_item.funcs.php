@@ -4656,19 +4656,8 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 	}
 	$r .= '</strong></td>';
 
-	// Category image
-	$file_ID = $Chapter->get( 'image_file_ID' );
-	$cat_thumb = '';
-	if( $file_ID )
-	{
-		$FileCache = & get_FileCache();
-		$cat_image_File = & $FileCache->get_by_ID( $file_ID, false, false );
-		if( $cat_image_File )
-		{
-			$cat_thumb = $cat_image_File->get_thumb_imgtag( 'crop-48x48' );
-		}
-	}
-	$r .= '<td>'.$cat_thumb.'</td>';
+	// Category image:
+	$r .= '<td>'.$Chapter->get_image_tag().'</td>';
 
 	// URL "slug"
 	$r .= '<td><a href="'.htmlspecialchars($Chapter->get_permanent_url()).'">'.$Chapter->dget('urlname').'</a></td>';
@@ -4774,20 +4763,9 @@ function manual_display_post_row( $Item, $level, $params = array() )
 
 	// Category image
 	$cat_thumb = '';
-	$ChapterCache = & get_ChapterCache();
-	if( $Item->main_cat_ID && ( $Chapter = & $ChapterCache->get_by_ID( $Item->main_cat_ID, false, false ) ) )
-	{
-		$file_ID = $Chapter->get( 'image_file_ID' );
-
-		if( $file_ID )
-		{
-			$FileCache = & get_FileCache();
-			$cat_image_File = & $FileCache->get_by_ID( $file_ID, false, false );
-			if( $cat_image_File )
-			{
-				$cat_thumb = $cat_image_File->get_thumb_imgtag( 'crop-48x48' );
-			}
-		}
+	if( $main_item_Chapter = & $Item->get_main_Chapter() )
+	{	// Get image tag of main chapter of the Item:
+		$cat_thumb = $main_item_Chapter->get_image_tag();
 	}
 	$r .= '<td>'.$cat_thumb.'</td>';
 

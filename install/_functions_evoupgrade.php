@@ -8138,6 +8138,30 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12165, 'Upgrade table of users...' ) )
+	{	// part of 6.9.0-beta
+		db_add_col( 'T_users', 'user_pass_driver', 'VARCHAR(16) NOT NULL default "evo$md5" AFTER user_salt' );
+		$DB->query( 'UPDATE T_users
+			  SET user_pass_driver = "evo$salted"
+			WHERE user_salt != ""' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12170, 'Updating users pass storage...' ) )
+	{	// part of 6.9.0-beta
+		$DB->query( 'ALTER TABLE T_users MODIFY COLUMN user_pass VARBINARY(32)' );
+		$DB->query( 'UPDATE T_users SET user_pass = LOWER( HEX( user_pass ) )' );
+		$DB->query( 'ALTER TABLE T_users MODIFY COLUMN user_pass VARCHAR(64) NOT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12175, 'Upgrade table of users...' ) )
+	{	// part of 6.9.0-beta
+		$DB->query( 'ALTER TABLE T_users
+			MODIFY user_salt VARCHAR(32) NOT NULL default ""' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 6.8.0-alpha
 		db_create_table( 'T_section', '
