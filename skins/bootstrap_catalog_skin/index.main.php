@@ -320,14 +320,16 @@ siteskin_include( '_site_body_header.inc.php' );
 					
 					<div class="btn-group"><button class="btn btn-primary">Filter</button></div>
 					
-					<!--<div class="row"><h5>Color</h5></div>
+					<!--
+					<div class="row"><h5>Color</h5></div>
 					<input type="checkbox" id="cbox1" value="first_checkbox"> Baige<br />
 					<input type="checkbox" id="cbox1" value="first_checkbox"> White<br />
 					<input type="checkbox" id="cbox1" value="first_checkbox"> Black<br />
 					<input type="checkbox" id="cbox2" value="second_checkbox"> Orange<br />
 					<input type="checkbox" id="cbox2" value="second_checkbox"> Blue<br />
 					<input type="checkbox" id="cbox2" value="second_checkbox"> Green<br />
-					<input type="checkbox" id="cbox2" value="second_checkbox"> Yellow-->
+					<input type="checkbox" id="cbox2" value="second_checkbox"> Yellow
+					-->
 					
 				</div>
 			</div>

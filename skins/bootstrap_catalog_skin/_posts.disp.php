@@ -64,7 +64,7 @@ $chapters = $ChapterCache->get_chapters( $Blog->ID, $single_cat_ID, true );
 
 			foreach( $chapters_children as $Chapter )
 			{ // Loop through categories:
-				echo '<div class="category-item-wrapper col-md-3 col-xs-6">';
+				echo '<div class="category-item-wrapper col-xs-6 col-md-4 col-lg-3">';
 				echo '<a href="' . $Chapter->get_permanent_url() . '"><div class="category-item">';
 				echo '<div class="subcat subcat_' . $Chapter->dget( 'ID' ) . '">' . $Chapter->dget( 'name' ) . '</div>';
 				echo '</div></a>';
@@ -109,7 +109,7 @@ while( mainlist_get_item() )
 	// ----------------------------END ITEM BLOCK  ----------------------------
 
 }
-echo '<//section><div class="clearfix"></div>';
+echo '</section><div class="clearfix"></div>';
  // ---------------------------------- END OF POSTS ------------------------------------
 
 // -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------

@@ -82,7 +82,7 @@ if( $disp == 'single' )
 	</ol>
 </nav>
 <div class="row">
-	<div class="col-lg-6">
+	<div class="col-sm-6">
 		<?php
 			if( $Item->get_cover_image_url() )
 			{	// If current item has cover image
@@ -99,16 +99,18 @@ if( $disp == 'single' )
 						'image_link_to'            => 'original', // Can be 'original', 'single' or empty          <i class="fa fa-link" aria-hidden="true"></i>
 
 						// We DO NOT want to display galleries here, only one cover image
-						'gallery_image_limit'      => 0,
-						'gallery_colls'            => 0,
+						'gallery_image_limit'      => 1000,
+						'gallery_colls'            => 1000,
 
 						// We want ONLY cover image to display here
-						'restrict_to_image_position' => 'cover',
+						// 'restrict_to_image_position' => 'cover',
 					) );
+			} else {	// If current item does not have cover image
+				echo '<div class="noimage_wrapper"><i class="fa fa-file-image-o" aria-hidden="true"></i></div>';
 			}
 		?>
 	</div>
-	<div class="col-lg-6">
+	<div class="col-sm-6">
 		<header>
 			<?php
 			// ------- Title -------
@@ -124,7 +126,7 @@ if( $disp == 'single' )
 				$Item->edit_link( array( // Link to backoffice for editing
 					'before' => '<div class="'.button_class( 'group' ).'">',
 					'after'  => '</div>',
-					'text'   => get_icon( 'edit' ).' '.T_('Edit Article'),
+					'text'   => get_icon( 'edit' ).' '.T_('Edit'),
 					'class'  => button_class( 'text' ),
 				) );
 				echo $params['item_title_line_after'];
@@ -149,43 +151,56 @@ if( $disp == 'single' )
 						'separator' => ' ',
 					) );
 			?>
-			<p class="evo_post__price"><b>Price:</b> <span class="oldprice">19.99 $</span><span class="newprice">12.99 $</span></p>
+			<p class="evo_post__price"><b>Price:</b> <span class="regularprice">24.99 $</span><span class="oldprice">19.99 $</span><span class="newprice">12.99 $</span></p>
 		</header>
-	</div>
-	<div class="col-lg-12">		
-		<main>
+	</div><div class="clearfix"></div>
+	<div class="col-md-12">
 			<div class="panel panel-default single_item_details_wrapper">
 				<div class="panel-heading"><h4 class="panel-title">Data Sheet</h4></div>
-				<div class="panel-body">		
+				<!--<div class="panel-body">-->
+				
+					<table class="table table-hover">
+						<tr>
+							<th>Styles</th>
+							<td>Girly</td>
+						</tr>
+						<tr>
+							<th>Composition</th>
+							<td>Cotton</td>
+						</tr>
+						<tr>
+							<th>Properties</th>
+							<td>Colorful Dress</td>
+						</tr>
+					</table>
 
+					<!--
 					<section class="table table-hover">
 						<div class="detail_row">
-							<div class="col-lg-2 detail_title">Styles</div><div class="col-lg-10">Girly</div>
+							<div class="col-xs-5 col-sm-3 col-md-3 col-lg-2 detail_title">Styles</div><div class="col-xs-7 col-sm-9 col-md-9 col-lg-10">Girly</div>
 						</div>
 						<div class="detail_row">
-							<div class="col-lg-2 detail_title">Composition</div><div class="col-lg-10">Cotton</div>
+							<div class="col-xs-5 col-sm-3 col-md-3 col-lg-2 detail_title">Composition</div><div class="col-xs-7 col-sm-9 col-md-9 col-lg-10">Cotton</div>
 						</div>
 						<div class="detail_row">
-							<div class="col-lg-2 detail_title">Properties</div><div class="col-lg-10">Colorful Dress</div>
+							<div class="col-xs-5 col-sm-3 col-md-3 col-lg-2 detail_title">Properties</div><div class="col-xs-7 col-sm-9 col-md-9 col-lg-10">Colorful Dress</div>
 						</div>
 					</section>
+					-->
 				
-				</div>
+				<!--</div>-->
 			</div>
 			
 			<div class="panel panel-default single_item_details_wrapper">
 				<div class="panel-heading"><h4 class="panel-title">More Info</h4></div>
 				<div class="panel-body">
 
-					<section class="table table-hover">
 						<div class="panel-body">
 						<p>Here goes dinamic content widget, but probably without images?</p>
 						</div>
-					</section>
 				
 				</div>
 			</div>
-		</main>
 	</div>
 </div>
 <?php }
@@ -193,10 +208,11 @@ if( $disp == 'single' )
 ?>
 	<header>
 	
-		<?php // if( ! $Item->is_intro() ) : 
+		<?php
+		if( ! $Item->is_intro() ) : 
 		// Do not display "Sale" icon on Intro posts ?>
-		<!-- <div class="floatright price_note"><span class="note status_private" data-toggle="tooltip" data-placement="top" title="This article is on sale!"><span>Sale!</span></span></div> -->
-		<?php // endif;
+		<div class="floatright price_note"><span class="note status_private" data-toggle="tooltip" data-placement="top" title="This article is on sale!"><span>Sale!</span></span></div>
+		<?php endif;
 		
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
 		
@@ -236,7 +252,7 @@ if( $disp == 'single' )
 		{
 			echo $params['item_title_line_before'];
 
-			if( $disp == 'single' || $disp == 'page' )
+			if( $disp == 'page' )
 			{
 				$title_before = $params['item_title_single_before'];
 				$title_after = $params['item_title_single_after'];
@@ -247,25 +263,42 @@ if( $disp == 'single' )
 				$title_after = $params['item_title_after'];
 			}
 
-			// POST TITLE:
-			$Item->title( array(
-					'before'    => $title_before,
-					'after'     => $title_after,
-					'link_type' => '#'
-				) );
+			if( $disp != 'single' && $disp != 'posts' )
+			{
+				// POST TITLE:
+				$Item->title( array(
+						'before'    => $title_before,
+						'after'     => $title_after,
+						'link_type' => '#'
+					) );
 
-			// EDIT LINK:
-			if( $Item->is_intro() )
-			{ // Display edit link only for intro posts, because for all other posts the link is displayed on the info line.
+				// EDIT LINK
 				$Item->edit_link( array(
-							'before' => '<div class="'.button_class( 'group' ).'">',
-							'after'  => '</div>',
-							'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
-							'class'  => button_class( 'text' ),
-						) );
-			}
+						'before' => '<div class="'.button_class( 'group' ).'">',
+						'after'  => '</div>',
+						'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : get_icon( 'edit' ).' '.T_('Edit'),
+						'class'  => button_class( 'text' ),
+					) );
 
 			echo $params['item_title_line_after'];
+			}
+			else {
+				// POST TITLE:
+				$Item->title( array(
+						'before'    => $title_before,
+						'link_type' => '#'
+					) );
+
+				// EDIT LINK
+				$Item->edit_link( array(
+						'before' => '<div class="'.button_class( 'group' ).'">',
+						'after'  => '</div>',
+						'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : get_icon( 'edit' ).' '.T_('Edit'),
+						'class'  => button_class( 'text' ),
+					) );
+
+			echo $title_after . $params['item_title_line_after'];
+			}
 		}
 	?>
 	</header>
@@ -325,7 +358,7 @@ if( $disp == 'single' )
 	
 		<?php if( ! $Item->is_intro() )
 		{ // Do not display "Sale" icon on Intro posts ?>
-		<div class="evo_post__price center"><span class="oldprice">19.99 $</span><span class="newprice">12.99 $</span></div>
+		<div class="evo_post__price center"><span class="regularprice">24.99 $</span><span class="oldprice">19.99 $</span><span class="newprice">12.99 $</span></div>
 		<?php }	?>
 
 		<!--<nav class="post_comments_link">
@@ -358,14 +391,14 @@ if( $disp == 'single' )
 		?>
 		</nav>-->
 		<?php			
-			if( ! $Item->is_intro() && $disp != 'posts' ) : // Link to edit
-			$Item->edit_link( array( // Link to backoffice for editing
-				'before' => '<div class="edit-link-wrapper"><div class="'.button_class( 'group' ).'">',
-				'after'  => '</div></div>',
-				'text'   => get_icon( 'edit' ).' '.T_('Edit Article'),
-				'class'  => button_class( 'text' ),
-			) );
-			endif;
+			// if( ! $Item->is_intro() && $disp != 'posts' ) : // Link to edit
+			// $Item->edit_link( array( // Link to backoffice for editing
+				// 'before' => '<div class="edit-link-wrapper"><div class="'.button_class( 'group' ).'">',
+				// 'after'  => '</div></div>',
+				// 'text'   => get_icon( 'edit' ).' '.T_('Edit'),
+				// 'class'  => button_class( 'text' ),
+			// ) );
+			// endif;
 		?>
 	</footer>
 	<?php } ?>

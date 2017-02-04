@@ -179,6 +179,7 @@ textarea.message_text {
 		}
 	}
 }
+
 .evo_hasbgimg {
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -326,14 +327,30 @@ footer.row {
 // =====================================================================
 
 .price_note {
+	display: none;
     position: absolute;
-    right: 14px;
-	top: -1px;
+    right: 16px;
+    top: 0px;
     z-index: 1;
 	& > span > span {
 		box-shadow: 0px 0px 20px -9px rgba(0,0,0,0.75);
 	}
 }
+// TEMPORARY STYLE FOR TESTING
+main .row .evo_content_block:nth-child(3) {
+	.evo_post__price {
+		.oldprice, .newprice {
+			display: inline !important;
+		}
+		.regularprice {
+			display: none !important;
+		}
+	}
+	.price_note {
+		display: block !important;
+	}
+}
+
 // Positions on the action buttons near page titles
 .jumbotron .evo_post_title {
 	h2, h2 > a {
@@ -348,13 +365,35 @@ footer.row {
 		display: table-cell;
 	}
 }
-.disp_single .evo_post_title {
-	margin-bottom: 20px;
-	h1 {
-		display: table-cell;
+.disp_front .evo_post_title {
+	> h2 > div {
+		display: inline-block;
+		padding: 0 0 0 7px;
+		margin-top: -2px;
+		a {
+			font-size: 13px;
+		}
 	}
-	.btn-group {
-		padding: 10px 0 0 15px;
+}
+.disp_single, .disp_page {
+	.evo_post_title {
+		margin-bottom: 20px;
+		h1 {
+			display: table-cell;
+		}
+		.btn-group {
+			padding: 10px 0 0 15px;
+		}
+	}
+}
+.disp_posts .evo_post_title {
+	h2 .btn-group {
+		display: inline-block;
+		margin-top: -2px;
+		padding: 0 0 0 7px;
+		a {
+			font-size: 13px;
+		}
 	}
 }
 .evo_post_title {
@@ -371,6 +410,9 @@ footer.row {
 		padding: 20px 0 10px 30px;
 		vertical-align: middle;
 	}
+}
+.disp_page .evo_post_title h1 .btn-group {
+	display: inline-block;
 }
 .noimage_wrapper {
 	background-color: #efefef;
@@ -389,12 +431,18 @@ footer.row {
 }
 .evo_post__price {
     padding: 10px 0;
+	.regularprice {
+		color: #666;
+		font-size: 18px;
+	}
 	.oldprice {
 		color: #666;
+		display: none;
 		text-decoration: line-through;
 	}
 	.newprice {
 		color: #DC143C;
+		display: none;
 		font-size: 18px;
 		margin-left: 8px;
 	}
@@ -439,7 +487,7 @@ footer.row {
 			width: 100%;
 		}
 	}
-	.disp_posts .evo_content_block {
+	.evo_content_block {
 		width: 100%;
 	}
 }
@@ -456,29 +504,52 @@ footer.row {
 		}
 	}
 }
-.single_item_details_wrapper {
+.panel.single_item_details_wrapper {
 	margin-top: 20px;
 	& > .panel-body {
 		padding: 0;
 	}
 	
-	.table {
+	& > .table {
 		margin: 0;
-		.detail_row {
-			& > div {
-				border-bottom: 1px solid #ddd;
-				padding: 15px;
+		tbody tr {
+			th, td {
+				vertical-align: middle;
+				padding: 15px 10px;
+				word-break: break-word;
 			}
-			&:last-child {
-				& > div {
-					border-bottom: none;
-				}
+			td {
+				border-right: 0;
 			}
-			
-			.detail_title {
-				border-right: 1px solid #ddd;
-				font-weight: 700;
+			th {
+				background-color: transparent;
+				border-left: 0;
+				border-bottom: 0;
+				width: 160px;
+			}
+			&:last-child td {
+				border-bottom: 0;
 			}
 		}
 	}
+	
+	// .table {
+		// margin: 0;
+		// .detail_row {
+			// & > div {
+				// border-bottom: 1px solid #ddd;
+				// padding: 15px;
+			// }
+			// &:last-child {
+				// & > div {
+					// border-bottom: none;
+				// }
+			// }
+			
+			// .detail_title {
+				// border-right: 1px solid #ddd;
+				// font-weight: 700;
+			// }
+		// }
+	// }
 }
