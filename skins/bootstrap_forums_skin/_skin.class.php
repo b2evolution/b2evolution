@@ -74,7 +74,9 @@ class bootstrap_forums_Skin extends Skin
 	 * Get the container codes of the skin main containers
 	 *
 	 * This should NOT be protected. It should be used INSTEAD of file parsing.
-	 * File parsing should only be used if this function is not defined
+	 * File parsing should only be used if this function is not defined (which will be the case for older v6- skins)
+	 *
+	 * @todo maybe define a default implementation that returns NULL
 	 *
 	 * @return array
 	 */
