@@ -1330,7 +1330,7 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				// TODO: translation strings for colorbox buttons
 
 				require_js( 'build/colorbox.bmin.js', $relative_to, true );
-				require_css( 'colorbox/colorbox.css', $relative_to );
+				require_css( 'customized:jquery/colorbox/css/colorbox.css', $relative_to );
 				break;
 		}
 		// add to list of loaded helpers
@@ -1454,7 +1454,7 @@ function init_ratings_js( $relative_to = 'blog', $force_init = false )
 	if( $force_init || ( !empty($Item) && $Item->can_rate() ) )
 	{
 		require_js( '#jquery#', $relative_to ); // dependency
-		require_js( 'jquery/jquery.raty.min.js', $relative_to );
+		require_js( 'customized:jquery/raty/js/jquery.raty.min.js', $relative_to );
 	}
 }
 
@@ -1484,9 +1484,9 @@ function init_bubbletip_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
-			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
+			require_js( 'customized:jquery/bubbletip/js/jquery.bubbletip.min.js', $relative_to );
 			require_js( 'build/bubbletip.bmin.js', $relative_to, true );
-			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
+			require_css( 'customized:jquery/bubbletip/css/jquery.bubbletip.css', $relative_to );
 			break;
 	}
 }
@@ -1514,9 +1514,9 @@ function init_userfields_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
-			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
+			require_js( 'customized:jquery/bubbletip/js/jquery.bubbletip.min.js', $relative_to );
 			require_js( 'build/bubbletip.bmin.js', $relative_to, true );
-			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
+			require_css( 'customized:jquery/bubbletip/css/jquery.bubbletip.css', $relative_to );
 			break;
 	}
 }
@@ -1542,9 +1542,9 @@ function init_plugins_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
-			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
+			require_js( 'customized:jquery/bubbletip/js/jquery.bubbletip.min.js', $relative_to );
 			require_js( 'build/bubbletip.bmin.js', $relative_to, true );
-			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
+			require_css( 'customized:jquery/bubbletip/css/jquery.bubbletip.css', $relative_to );
 			break;
 	}
 }
@@ -1590,8 +1590,8 @@ function init_datepicker_js( $relative_to = 'rsc_url' )
 function init_tokeninput_js( $relative_to = 'rsc_url' )
 {
 	require_js( '#jquery#', $relative_to ); // dependency
-	require_js( 'jquery/jquery.tokeninput.js', $relative_to );
-	require_css( 'jquery/jquery.token-input-facebook.css', $relative_to );
+	require_js( 'customized:jquery/tokeninput/js/jquery.tokeninput.js', $relative_to );
+	require_css( 'customized:jquery/tokeninput/css/jquery.token-input-facebook.css', $relative_to );
 }
 
 
@@ -3318,7 +3318,7 @@ function init_autocomplete_usernames_js( $relative_to = 'rsc_url' )
 
 	require_js( '#jquery#', $relative_to );
 	require_js( 'build/textcomplete.bmin.js', $relative_to );
-	require_css( 'jquery/jquery.textcomplete.css', $relative_to );
+	require_css( 'customized:jquery/textcomplete/css/jquery.textcomplete.css', $relative_to );
 }
 
 

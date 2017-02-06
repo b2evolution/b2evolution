@@ -475,7 +475,7 @@ switch( $tab )
 		if( !isset( $edited_EmailAddress ) )
 		{ // List page with email addresses
 			// Init js to edit status field
-			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+			require_js( 'customized:jquery/jeditable/jquery.jeditable.js' );
 		}
 
 		// Set an url for manual page:

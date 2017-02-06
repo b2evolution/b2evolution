@@ -252,7 +252,7 @@ if( !empty( $edited_Group ) )
 }
 if( $action == 'list' && $current_User->check_perm( 'users', 'edit', false ) )
 { // Include to edit group level
-	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+	require_js( 'customized:jquery/jeditable/jquery.jeditable.js' );
 }
 
 // Set an url for manual page:

@@ -227,7 +227,7 @@ switch( $tab )
 		if( empty( $action ) && $current_User->check_perm( 'centralantispam', 'edit' ) )
 		{	// Load JS to edit keyword status from list:
 			require_js( '#jquery#', 'rsc_url' );
-			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+			require_js( 'customized:jquery/jeditable/jquery.jeditable.js' );
 		}
 		break;
 
@@ -236,7 +236,7 @@ switch( $tab )
 		if( empty( $action ) && $current_User->check_perm( 'centralantispam', 'edit' ) )
 		{	// Load JS to edit source status from list:
 			require_js( '#jquery#', 'rsc_url' );
-			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+			require_js( 'customized:jquery/jeditable/jquery.jeditable.js' );
 		}
 		break;
 }

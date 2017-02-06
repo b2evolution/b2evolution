@@ -411,7 +411,7 @@ else
 	$AdminUI->top_block = get_user_quick_search_form();
 	if( $current_User->check_perm( 'users', 'moderate', false ) )
 	{	// Include to edit user level
-		require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+		require_js( 'customized:jquery/jeditable/jquery.jeditable.js' );
 	}
 	load_funcs( 'regional/model/_regional.funcs.php' );
 

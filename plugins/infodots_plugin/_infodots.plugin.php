@@ -103,8 +103,8 @@ class infodots_plugin extends Plugin
 
 		// Bubbletip
 		require_js( '#jquery#', 'blog' );
-		require_js( 'jquery/jquery.bubbletip.min.js', 'blog' );
-		require_css( 'jquery/jquery.bubbletip.css', 'blog' );
+		require_js( 'customized:jquery/bubbletip/js/jquery.bubbletip.min.js', 'blog' );
+		require_css( 'customized:jquery/bubbletip/css/jquery.bubbletip.css', 'blog' );
 
 		add_js_headline( 'jQuery( document ).ready( function()
 {

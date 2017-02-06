@@ -208,7 +208,7 @@ module.exports = function(grunt) {
 					banner: '/* This includes 4 files: jquery.colorbox.js, voting.js, jquery.touchswipe.js, colorbox.init.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/colorbox/jquery.colorbox.js', 'rsc/js/voting.js', 'rsc/ext/jquery/touchswipe/jquery.touchswipe.js', 'rsc/js/colorbox/colorbox.init.js'],
+				src: ['rsc/customized/jquery/colorbox/js/jquery.colorbox.js', 'rsc/js/voting.js', 'rsc/ext/jquery/touchswipe/jquery.touchswipe.js', 'rsc/js/colorbox.init.js'],
 				dest: 'rsc/js/build/colorbox.bmin.js'
 			},
 			// Bubbletip
@@ -237,7 +237,7 @@ module.exports = function(grunt) {
 					banner: '/* This includes 2 files: jquery.textcomplete.js, textcomplete.init.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/jquery/jquery.textcomplete.js', 'rsc/js/textcomplete.init.js'],
+				src: ['rsc/customized/jquery/textcomplete/js/jquery.textcomplete.js', 'rsc/js/textcomplete.init.js'],
 				dest: 'rsc/js/build/textcomplete.bmin.js'
 			},
 			// JS files that are used on front-office standard skins:

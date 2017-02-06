@@ -57,7 +57,7 @@ param( 'action', 'string' );
 
 if( $tab == 'domains' && $current_User->check_perm( 'stats', 'edit' ) )
 {
-	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+	require_js( 'customized:jquery/jeditable/jquery.jeditable.js' );
 }
 
 if( ( $blog == 0 && empty( $sec_ID ) ) || ! $current_User->check_perm( 'stats', 'list', false, $blog ) )
