@@ -109,7 +109,7 @@ body.pictured div#debug_info.debug {
   background-size: cover;
   background-position: center center;
 }
-#bg_picture img {
+#bg_picture > img {
   display: none;
   width: 100%;
 }
@@ -130,7 +130,7 @@ body.pictured div#debug_info.debug {
     height: auto;
     min-height: auto;
   }
-  body.disp_front #bg_picture img {
+  body.disp_front #bg_picture > img {
     display: block;
   }
   body.disp_front div.front_main_area {
