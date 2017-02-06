@@ -117,7 +117,7 @@ class bootstrap_catalog_Skin extends Skin
 					'layout' => array(
 						'label' => T_('Layout'),
 						'note' => T_('Select skin layout.'),
-						'defaultvalue' => 'right_sidebar',
+						'defaultvalue' => 'left_sidebar',
 						'options' => array(
 								'single_column'              => T_('Single Column Large'),
 								'single_column_normal'       => T_('Single Column'),

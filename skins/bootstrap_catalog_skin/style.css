@@ -280,7 +280,7 @@ footer.row {
 .price_note {
   display: none;
   position: absolute;
-  right: 16px;
+  right: 15px;
   top: 0px;
   z-index: 1;
 }
@@ -359,7 +359,6 @@ main .row .evo_content_block:nth-child(3) .price_note {
   background-color: #efefef;
   border-radius: 4px;
   display: table;
-  height: 234px;
   vertical-align: middle;
   text-align: center;
   width: 100%;
@@ -419,8 +418,6 @@ main .row .evo_content_block:nth-child(3) .price_note {
   text-overflow: ellipsis;
 }
 .subcategories_section {
-  border-top: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
   margin-bottom: 2em;
 }
 @media (max-width: 500px) {
@@ -436,12 +433,16 @@ main .row .evo_content_block:nth-child(3) .price_note {
   padding-top: 0;
 }
 .evo_widget_articles_filter .panel-body h5 {
-  border-bottom: 1px solid #ddd;
+  border-top: 1px solid #ddd;
   font-weight: 700;
-  padding: 10px 15px 5px;
+  padding: 15px 15px 0;
+}
+.evo_widget_articles_filter .panel-body .row:first-child h5 {
+  border-top: 0;
+  margin-top: 0;
 }
 .evo_widget_articles_filter .panel-body button {
-  margin-top: 10px;
+  margin-top: 20px;
 }
 .panel.single_item_details_wrapper {
   margin-top: 20px;

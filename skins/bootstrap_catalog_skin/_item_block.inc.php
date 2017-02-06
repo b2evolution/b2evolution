@@ -242,7 +242,8 @@ if( $disp == 'single' )
 			}
 			else
 			{	// If current item does not have cover image
-				echo '<div class="noimage_wrapper"><i class="fa fa-file-image-o" aria-hidden="true"></i></div>';
+				echo '<figure class="evo_image_block"><img src="no-image.jpg"></figure>';
+				// echo '<div class="noimage_wrapper"><i class="fa fa-file-image-o" aria-hidden="true"></i></div>';
 			}
 		}
 
