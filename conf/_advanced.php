@@ -930,7 +930,7 @@ $library_local_urls = array(
 		'#videojs_css#' => array( 'ext:videojs/css/video-js.min.css', 'ext:videojs/css/video-js.css' ),
 		'#jcrop#' => array( 'ext:jquery/jcrop/js/jquery.jcrop.min.js', 'ext:jquery/jcrop/js/jquery.jcrop.js' ),
 		'#jcrop_css#' => array( 'ext:jquery/jcrop/css/jquery.jcrop.min.css', 'ext:jquery/jcrop/css/jquery.jcrop.css' ),
-		'#fontawesome#' => array( 'font-awesome.min.css', 'font-awesome.min.css' ),
+		'#fontawesome#' => array( 'ext:font-awesome/css/font-awesome.min.css' ),
 	);
 
 
