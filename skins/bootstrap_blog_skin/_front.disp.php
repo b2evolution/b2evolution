@@ -65,4 +65,3 @@ skin_container( NT_('Front Page Secondary Area'), array(
 // --------------------- END OF "Front Page Secondary Area" CONTAINER -----------------------
 ?>
 </div>
-
