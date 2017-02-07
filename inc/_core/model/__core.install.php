@@ -102,7 +102,7 @@ $schema_queries = array(
 			user_source varchar(30) NULL,
 			user_created_datetime datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
 			user_lastseen_ts timestamp NULL,
-			user_email_dom_ID int(10) unsigned NULL,
+			user_email_dom_ID int(10) unsigned NULL COMMENT 'Used for email statistics',
 			user_profileupdate_date date NOT NULL DEFAULT '2000-01-01',
 			PRIMARY KEY user_ID (user_ID),
 			UNIQUE user_login (user_login),

@@ -124,7 +124,7 @@ class image_Widget extends ComponentWidget
 					'width' => array(
 						'label' => T_('Image width'),
 						'note' => '',
-						'defaultvalue' => '300px',
+						'defaultvalue' => '',
 						'allow_empty' => true,
 						'size' => 4,
 						'hide_label' => true,
