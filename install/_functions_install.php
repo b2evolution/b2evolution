@@ -824,35 +824,21 @@ function install_plugin( $plugin, $activate = true, $settings = array() )
 
 
 /**
- * Install basic widgets.
+ * Installing default widgets for all collections
  */
-function install_basic_widgets( $old_db_version = 0 )
+function install_basic_widgets()
 {
-	/**
-	* @var DB
-	*/
-	global $DB;
+	// Load all collections:
+	$BlogCache = & get_BlogCache();
+	$BlogCache->load_all();
 
-	load_funcs( 'widgets/_widgets.funcs.php' );
-
-	if( $old_db_version < 11010 )
+	foreach( $BlogCache->cache as $Blog )
 	{
-		$blog_ids = $DB->get_assoc( 'SELECT blog_ID, "std" FROM T_blogs' );
-	}
-	else
-	{
-		$blog_ids = $DB->get_assoc( 'SELECT blog_ID, blog_type FROM T_blogs' );
-	}
-
-	foreach( $blog_ids as $blog_id => $blog_type )
-	{
-		task_begin( 'Installing default widgets for blog #'.$blog_id.'... ' );
-		insert_basic_widgets( $blog_id, true, $blog_type );
+		task_begin( 'Installing default widgets for collection #'.$Blog->ID.'... ' );
+		$Blog->setup_default_widgets();
 		task_end();
 	}
-
 }
-
 
 
 function advanced_properties()

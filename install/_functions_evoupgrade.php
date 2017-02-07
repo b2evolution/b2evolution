@@ -2049,8 +2049,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			*/
 			global $DB;
 
-			load_funcs( 'widgets/_widgets.funcs.php' );
-
 			$blog_ids = $DB->get_assoc( 'SELECT blog_ID, "std" FROM T_blogs' );
 
 			foreach( $blog_ids as $blog_id => $blog_type )

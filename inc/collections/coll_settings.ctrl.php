@@ -324,8 +324,7 @@ switch( $action )
 				WHERE cset_coll_ID = '.$DB->quote( $edited_Blog->ID ).'
 				AND ( cset_name LIKE "skin%" OR cset_name LIKE "plugin%" )' );
 			// ADD DEFAULT WIDGETS:
-			load_funcs( 'widgets/_widgets.funcs.php' );
-			insert_basic_widgets( $edited_Blog->ID, false, $type );
+			$edited_Blog->setup_default_widgets();
 		}
 
 		$edited_Blog->init_by_kind( $type, $edited_Blog->get( 'name' ), $edited_Blog->get( 'shortname' ), $edited_Blog->get( 'urlname' ) );

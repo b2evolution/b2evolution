@@ -506,7 +506,7 @@ class Skin extends DataObject
 		$declared_widgets['Mobile: Navigation Menu'][] = array( 'menu_link', 'core', 30, array( 'link_type' => 'home' ) );
 		if( $kind == 'forum' )
 		{ // Add menu with User Directory
-			$declared_widgets['Mobile: Navigation Menu'][] = array(, 'menu_link', 'core', 40, array( 'link_type' => 'users' ) );
+			$declared_widgets['Mobile: Navigation Menu'][] = array( 'menu_link', 'core', 40, array( 'link_type' => 'users' ) );
 		}
 
 

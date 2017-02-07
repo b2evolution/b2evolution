@@ -1342,7 +1342,7 @@ function create_demo_users()
  */
 function create_demo_contents()
 {
-	global $baseurl, $admin_url, $new_db_version;
+	global $baseurl, $admin_url;
 	global $random_password, $query;
 	global $timestamp, $admin_email;
 	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $blogb_Group;
@@ -1551,7 +1551,8 @@ function create_demo_contents()
 	// Set default locations for each post in test mode installation
 	create_default_posts_location();
 
-	install_basic_widgets( $new_db_version );
+	// Installing default widgets for all collections:
+	install_basic_widgets();
 
 	load_funcs( 'tools/model/_system.funcs.php' );
 	system_init_caches( true, true ); // Outputs messages
