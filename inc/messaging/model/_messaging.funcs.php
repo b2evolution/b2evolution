@@ -467,19 +467,19 @@ function get_thread_recipient_status_icons( $thread_ID, $status )
 	{
 		case 'read':
 			// Get "READ" recipients:
-			$sql_title = 'Get recipients which already READ thread #'.$thread_ID;
+			$sql_title = 'Get list of users who read the last message in the thread #'.$thread_ID;
 			$sql_status_condition = 'tsr.tsta_thread_leave_msg_ID IS NULL AND tsr.tsta_first_unread_msg_ID IS NULL';
 			$imgtag_status = true;
 			break;
 		case 'unread':
 			// Get "UNREAD" recipients:
-			$sql_title = 'Get recipients which still DON\'T READ thread #'.$thread_ID;
+			$sql_title = 'Get list of users who have not read the last message in the thread #'.$thread_ID;
 			$sql_status_condition = 'tsr.tsta_thread_leave_msg_ID IS NULL AND tsr.tsta_first_unread_msg_ID IS NOT NULL';
 			$imgtag_status = false;
 			break;
 		case 'left':
 			// Get "LEFT" recipients:
-			$sql_title = 'Get recipients which LEFT thread #'.$thread_ID;
+			$sql_title = 'Get list of users who left the thread #'.$thread_ID;
 			$sql_status_condition = 'tsr.tsta_thread_leave_msg_ID IS NOT NULL';
 			$imgtag_status = 'left';
 			break;
