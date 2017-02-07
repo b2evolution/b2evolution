@@ -828,6 +828,8 @@ function install_plugin( $plugin, $activate = true, $settings = array() )
  */
 function install_basic_widgets()
 {
+	global $install_test_features, $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
+
 	// Load all collections:
 	$BlogCache = & get_BlogCache();
 	$BlogCache->load_all();
@@ -835,7 +837,15 @@ function install_basic_widgets()
 	foreach( $BlogCache->cache as $Blog )
 	{
 		task_begin( 'Installing default widgets for collection #'.$Blog->ID.'... ' );
-		$Blog->setup_default_widgets();
+		$Blog->setup_default_widgets( array(
+				'coll_home_ID'          => $blog_home_ID,
+				'coll_photoblog_ID'     => $blog_photoblog_ID,
+				'init_as_home'          => ( $blog_home_ID == $Blog->ID ),
+				'init_as_blog_a'        => ( $blog_a_ID == $Blog->ID ),
+				'init_as_blog_b'        => ( $blog_b_ID == $Blog->ID ),
+				'init_as_events'        => ( $events_blog_ID == $Blog->ID ),
+				'install_test_features' => $install_test_features,
+			) );
 		task_end();
 	}
 }
