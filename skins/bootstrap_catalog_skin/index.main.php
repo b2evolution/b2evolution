@@ -304,16 +304,16 @@ siteskin_include( '_site_body_header.inc.php' );
 				<div class="panel-heading"><h4 class="panel-title">Browse Catalog</h4></div>
 				<div class="panel-body">
 				
-					<div class="row"><h5>Categories</h5></div>
+					<h5>Categories</h5>
 					<input type="checkbox" id="cbox1" value="first_checkbox"> In real life<br />
 					<input type="checkbox" id="cbox2" value="second_checkbox"> On the web
 					
-					<div class="row"><h5>Size</h5></div>
+					<h5>Size</h5>
 					<input type="checkbox" id="cbox1" value="first_checkbox"> S<br />
 					<input type="checkbox" id="cbox1" value="first_checkbox"> M<br />
 					<input type="checkbox" id="cbox2" value="second_checkbox"> L
 					
-					<div class="row"><h5>Compositions</h5></div>
+					<h5>Compositions</h5>
 					<input type="checkbox" id="cbox1" value="first_checkbox"> Cotton<br />
 					<input type="checkbox" id="cbox1" value="first_checkbox"> Polyester<br />
 					<input type="checkbox" id="cbox2" value="second_checkbox"> Viscose<br />
