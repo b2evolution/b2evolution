@@ -4962,14 +4962,13 @@ class Blog extends DataObject
 			foreach( $widgets_data as $widget )
 			{
 				// Initialize default values:
-				$wi_params = isset( $widget[1] ) ? $widget[1] : NULL;
+				$wi_params = isset( $widget[2] ) ? $widget[2] : NULL;
 				if( is_array( $wi_params ) )
 				{	// Array must be serialized:
 					$wi_params = serialize( $wi_params );
 				}
-				$wi_enabled = isset( $widget[2] ) ? $widget[2] : 1;
-				$wi_type = isset( $widget[3] ) ? $widget[3] : 'core';
-				$wi_order = isset( $widget[4] ) ? $widget[4] : $wi_auto_order;
+				$wi_enabled = isset( $widget[4] ) ? $widget[4] : 1;
+				$wi_order = ( isset( $widget[3] ) && $widget[3] !== NULL ) ? $widget[3] : $wi_auto_order;
 
 				// SQL data of widget record for INSERT query:
 				$widget_insert_records[] = '( '
@@ -4977,11 +4976,11 @@ class Blog extends DataObject
 					.$DB->quote( $container_name ).', ' // Container name
 					.$DB->quote( $wi_order ).', ' // Widget order inside container
 					.$DB->quote( $wi_enabled ).', ' // Enabled?
-					.$DB->quote( $wi_type ).', ' // Type: 'core', 'plugin'
-					.$DB->quote( $widget[0] ).', ' // Code
+					.$DB->quote( $widget[0] ).', ' // Type: 'core', 'plugin'
+					.$DB->quote( $widget[1] ).', ' // Code
 					.$DB->quote( $wi_params ).' )'; // Additional params
 
-				$wi_auto_order++;
+				$wi_auto_order = $wi_order + 1;
 			}
 		}
 

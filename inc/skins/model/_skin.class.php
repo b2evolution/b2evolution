@@ -223,11 +223,11 @@ class Skin extends DataObject
 	 * @return array Array of default widgets:
 	 *               - Key - Container name, 
 	 *               - Value - array of widgets:
-	 *                         0 - Code
-	 *                         1 - Params: Array with params: Key - param code, Value - param value; NULL - for default params
-	 *                         2 - Enabled? 1 or 0. Default = 1
-	 *                         3 - Type: 'core', 'plugin'. Default = 'core'
-	 *                         4 - Order. Default is started from 1 and incremented inside container
+	 *                         0 - Type: 'core', 'plugin'.
+	 *                         1 - Code.
+	 *                         2 - Params: Array with params: Key - param code, Value - param value; NULL - for default params. (Default = NULL)
+	 *                         3 - Order. (Default is started from 1 and incremented inside container)
+	 *                         4 - Enabled? 1 or 0. (Default = 1)
 	 */
 	function get_default_widgets( $coll_kind, $context = array() )
 	{
@@ -244,61 +244,61 @@ class Skin extends DataObject
 		$declared_widgets = array();
 
 		// HEADER:
-		$declared_widgets['Header'][] = array( 'coll_title' );
-		$declared_widgets['Header'][] = array( 'coll_tagline' );
+		$declared_widgets['Header'][] = array( 'core', 'coll_title' );
+		$declared_widgets['Header'][] = array( 'core', 'coll_tagline' );
 
 
 		// MENU:
 		if( $coll_kind != 'main' )
 		{	// Don't add widgets to Menu container for Main collections:
 			// Home page
-			$declared_widgets['Menu'][] = array( 'menu_link', array( 'link_type' => 'home' ) );
+			$declared_widgets['Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'home' ) );
 			if( $context['init_as_blog_b'] )
 			{	// Recent Posts
-				$declared_widgets['Menu'][] = array( 'menu_link', array( 'link_type' => 'recentposts', 'link_text' => T_('News') ) );
+				$declared_widgets['Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'recentposts', 'link_text' => T_('News') ) );
 			}
 			if( $coll_kind == 'forum' )
 			{	// Latest Topics and Replies ONLY for forum
-				$declared_widgets['Menu'][] = array( 'menu_link', array( 'link_type' => 'recentposts', 'link_text' => T_('Latest topics') ) );
-				$declared_widgets['Menu'][] = array( 'menu_link', array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest replies') ) );
+				$declared_widgets['Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'recentposts', 'link_text' => T_('Latest topics') ) );
+				$declared_widgets['Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest replies') ) );
 			}
 			if( $coll_kind == 'manual' )
 			{	// Latest Topics and Replies ONLY for forum
-				$declared_widgets['Menu'][] = array( 'menu_link', array( 'link_type' => 'recentposts', 'link_text' => T_('Latest pages') ) );
-				$declared_widgets['Menu'][] = array( 'menu_link', array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest comments') ) );
+				$declared_widgets['Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'recentposts', 'link_text' => T_('Latest pages') ) );
+				$declared_widgets['Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest comments') ) );
 			}
 			if( $coll_kind == 'forum' || $coll_kind == 'manual' )
 			{	// Add menu with flagged items:
-				$declared_widgets['Menu'][] = array( 'flag_menu_link', array( 'link_text' => ( $coll_kind == 'forum' ) ? T_('Flagged topics') : T_('Flagged pages') ) );
+				$declared_widgets['Menu'][] = array( 'core', 'flag_menu_link', array( 'link_text' => ( $coll_kind == 'forum' ) ? T_('Flagged topics') : T_('Flagged pages') ) );
 			}
 			if( $coll_kind == 'photo' )
 			{	// Add menu with Photo index
-				$declared_widgets['Menu'][] = array( 'menu_link', array( 'link_type' => 'mediaidx', 'link_text' => T_('Index') ) );
+				$declared_widgets['Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'mediaidx', 'link_text' => T_('Index') ) );
 			}
 			if( $coll_kind == 'forum' )
 			{	// Add menu with User Directory
-				$declared_widgets['Menu'][] = array( 'menu_link', array( 'link_type' => 'users' ) );
+				$declared_widgets['Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'users' ) );
 			}
 			// Pages list:
-			$declared_widgets['Menu'][] = array( 'coll_page_list' );
+			$declared_widgets['Menu'][] = array( 'core', 'coll_page_list' );
 			if( $coll_kind == 'forum' )
 			{ // My Profile
-				$declared_widgets['Menu'][] = array( 'menu_link', array( 'link_type' => 'myprofile' ), 0 );
+				$declared_widgets['Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'myprofile' ), NULL, 0 );
 			}
 			if( $coll_kind == 'std' )
 			{	// Categories
-				$declared_widgets['Menu'][] = array( 'menu_link', array( 'link_type' => 'catdir' ) );
+				$declared_widgets['Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'catdir' ) );
 				// Archives
-				$declared_widgets['Menu'][] = array( 'menu_link', array( 'link_type' => 'arcdir' ) );
+				$declared_widgets['Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'arcdir' ) );
 				// Latest comments
-				$declared_widgets['Menu'][] = array( 'menu_link', array( 'link_type' => 'latestcomments' ) );
+				$declared_widgets['Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'latestcomments' ) );
 			}
-			$declared_widgets['Menu'][] = array( 'msg_menu_link', array( 'link_type' => 'messages' ), 0 );
-			$declared_widgets['Menu'][] = array( 'msg_menu_link', array( 'link_type' => 'contacts', 'show_badge' => 0 ), 0 );
-			$declared_widgets['Menu'][] = array( 'menu_link', array( 'link_type' => 'login' ), 0 );
+			$declared_widgets['Menu'][] = array( 'core', 'msg_menu_link', array( 'link_type' => 'messages' ), NULL, 0 );
+			$declared_widgets['Menu'][] = array( 'core', 'msg_menu_link', array( 'link_type' => 'contacts', 'show_badge' => 0 ), NULL, 0 );
+			$declared_widgets['Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'login' ), NULL, 0 );
 			if( $coll_kind == 'forum' )
 			{	// Register
-				$declared_widgets['Menu'][] = array( 'menu_link', array( 'link_type' => 'register' ) );
+				$declared_widgets['Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'register' ) );
 			}
 		}
 
@@ -306,54 +306,54 @@ class Skin extends DataObject
 		if( in_array( $coll_kind, array( 'forum', 'group' ) ) )
 		{
 // fp> TODO: replace serialized string with array:
-			$declared_widgets['Item Single Header'][] = array( 'item_info_line', 'a:14:{s:5:"title";s:0:"";s:9:"flag_icon";i:1;s:14:"permalink_icon";i:0;s:13:"before_author";s:10:"started_by";s:11:"date_format";s:8:"extended";s:9:"post_time";i:1;s:12:"last_touched";i:1;s:8:"category";i:0;s:9:"edit_link";i:0;s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;s:11:"time_format";s:4:"none";s:12:"display_date";s:12:"date_created";}' );
-			$declared_widgets['Item Single Header'][] = array( 'item_tags' );
-			$declared_widgets['Item Single Header'][] = array( 'item_seen_by' );
+			$declared_widgets['Item Single Header'][] = array( 'core', 'item_info_line', 'a:14:{s:5:"title";s:0:"";s:9:"flag_icon";i:1;s:14:"permalink_icon";i:0;s:13:"before_author";s:10:"started_by";s:11:"date_format";s:8:"extended";s:9:"post_time";i:1;s:12:"last_touched";i:1;s:8:"category";i:0;s:9:"edit_link";i:0;s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;s:11:"time_format";s:4:"none";s:12:"display_date";s:12:"date_created";}' );
+			$declared_widgets['Item Single Header'][] = array( 'core', 'item_tags' );
+			$declared_widgets['Item Single Header'][] = array( 'core', 'item_seen_by' );
 		}
 		else
 		{
-			$declared_widgets['Item Single Header'][] = array( 'item_info_line');
+			$declared_widgets['Item Single Header'][] = array( 'core', 'item_info_line');
 		}
 
 		/* Item Single */
-		$declared_widgets['Item Single'][] = array( 'item_content' );
-		$declared_widgets['Item Single'][] = array( 'item_attachments' );
+		$declared_widgets['Item Single'][] = array( 'core', 'item_content' );
+		$declared_widgets['Item Single'][] = array( 'core', 'item_attachments' );
 		if( ! $context['init_as_blog_a'] && ! $context['init_as_events'] && ! in_array( $coll_kind, array( 'forum', 'group' ) ) )
 		{ // Item Tags
-			$declared_widgets['Item Single'][] = array( 'item_tags' );
+			$declared_widgets['Item Single'][] = array( 'core', 'item_tags' );
 		}
 		if( $context['init_as_blog_b'] )
 		{ // About Author
-			$declared_widgets['Item Single'][] = array( 'item_about_author' );
+			$declared_widgets['Item Single'][] = array( 'core', 'item_about_author' );
 		}
 		if( ( $context['init_as_blog_a'] || $context['init_as_events'] ) && $context['install_test_features'] )
 		{ // Google Maps
-			$declared_widgets['Item Single'][] = array( 'evo_Gmaps', NULL, 1, 'plugin' );
+			$declared_widgets['Item Single'][] = array( 'plugin', 'evo_Gmaps' );
 		}
 		if( $context['init_as_blog_a'] || $coll_kind == 'manual' )
 		{ // Small Print
-			$declared_widgets['Item Single'][] = array( 'item_small_print', array( 'format' => ( $context['init_as_blog_a'] ? 'standard' : 'revision' ) ) );
+			$declared_widgets['Item Single'][] = array( 'core', 'item_small_print', array( 'format' => ( $context['init_as_blog_a'] ? 'standard' : 'revision' ) ) );
 		}
 		if( ! in_array( $coll_kind, array( 'forum', 'group' ) ) )
 		{ // Seen by
-			$declared_widgets['Item Single'][] = array( 'item_seen_by' );
+			$declared_widgets['Item Single'][] = array( 'core', 'item_seen_by' );
 		}
 		if( $coll_kind != 'forum' )
 		{	// Item voting panel:
-			$declared_widgets['Item Single'][] = array( 'item_vote' );
+			$declared_widgets['Item Single'][] = array( 'core', 'item_vote' );
 		}
 
 
 		/* Sidebar Single */
 		if( $coll_kind == 'forum' )
 		{
-			$declared_widgets['Sidebar Single'][] = array( 'coll_related_post_list' );
+			$declared_widgets['Sidebar Single'][] = array( 'core', 'coll_related_post_list' );
 		}
 
 
 		/* Page Top */
 // fp> TODO: replace serialized string with array:
-		$declared_widgets['Page Top'][] = array( 'social_links', 'a:19:{s:5:"title";s:0:"";s:5:"link1";s:2:"15";s:10:"link1_href";s:32:"https://twitter.com/b2evolution/";s:5:"link2";s:2:"16";s:10:"link2_href";s:36:"https://www.facebook.com/b2evolution";s:5:"link3";s:2:"17";s:10:"link3_href";s:42:"https://plus.google.com/+b2evolution/posts";s:5:"link4";s:2:"18";s:10:"link4_href";s:48:"https://www.linkedin.com/company/b2evolution-net";s:5:"link5";s:2:"19";s:10:"link5_href";s:42:"https://github.com/b2evolution/b2evolution";s:5:"link6";s:0:"";s:10:"link6_href";s:0:"";s:5:"link7";s:0:"";s:10:"link7_href";s:0:"";s:11:"icon_colors";a:1:{s:7:"hoverbg";s:1:"1";}s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;}' );
+		$declared_widgets['Page Top'][] = array( 'core', 'social_links', 'a:19:{s:5:"title";s:0:"";s:5:"link1";s:2:"15";s:10:"link1_href";s:32:"https://twitter.com/b2evolution/";s:5:"link2";s:2:"16";s:10:"link2_href";s:36:"https://www.facebook.com/b2evolution";s:5:"link3";s:2:"17";s:10:"link3_href";s:42:"https://plus.google.com/+b2evolution/posts";s:5:"link4";s:2:"18";s:10:"link4_href";s:48:"https://www.linkedin.com/company/b2evolution-net";s:5:"link5";s:2:"19";s:10:"link5_href";s:42:"https://github.com/b2evolution/b2evolution";s:5:"link6";s:0:"";s:10:"link6_href";s:0:"";s:5:"link7";s:0:"";s:10:"link7_href";s:0:"";s:11:"icon_colors";a:1:{s:7:"hoverbg";s:1:"1";}s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;}' );
 
 
 		$default_blog_param = 's:7:"blog_ID";s:0:"";';
@@ -365,8 +365,8 @@ class Skin extends DataObject
 		/* Sidebar */
 		if( $coll_kind == 'manual' )
 		{
-			$declared_widgets['Sidebar'][] = array( 'coll_search_form', array( 'title' => T_('Search this manual:') ) );
-			$declared_widgets['Sidebar'][] = array( 'content_hierarchy' );
+			$declared_widgets['Sidebar'][] = array( 'core', 'coll_search_form', array( 'title' => T_('Search this manual:') ) );
+			$declared_widgets['Sidebar'][] = array( 'core', 'content_hierarchy' );
 		}
 		else
 		{
@@ -374,26 +374,26 @@ class Skin extends DataObject
 			{
 				if( $coll_kind != 'forum' && $coll_kind != 'manual' )
 				{ // Current filters widget
-					$declared_widgets['Sidebar'][] = array( 'coll_current_filters' );
+					$declared_widgets['Sidebar'][] = array( 'core', 'coll_current_filters' );
 				}
 				// User login widget
-				$declared_widgets['Sidebar'][] = array( 'user_login' );
+				$declared_widgets['Sidebar'][] = array( 'core', 'user_login' );
 			}
 			if( $coll_kind != 'forum' )
 			{ // Don't install these Sidebar widgets for blog 'Forums'
-				$declared_widgets['Sidebar'][] = array( 'coll_avatar' );
+				$declared_widgets['Sidebar'][] = array( 'core', 'coll_avatar' );
 				if( ! $context['init_as_blog_a'] && ! $context['init_as_home'] )
 				{
-					$declared_widgets['Sidebar'][] = array( 'evo_Calr', NULL, 1, 'plugin' );
+					$declared_widgets['Sidebar'][] = array( 'plugin', 'evo_Calr' );
 				}
-				$declared_widgets['Sidebar'][] = array( 'coll_longdesc', array( 'title' => '$title$' ) );
-				$declared_widgets['Sidebar'][] = array( 'coll_search_form' );
-				$declared_widgets['Sidebar'][] = array( 'coll_category_list' );
+				$declared_widgets['Sidebar'][] = array( 'core', 'coll_longdesc', array( 'title' => '$title$' ) );
+				$declared_widgets['Sidebar'][] = array( 'core', 'coll_search_form' );
+				$declared_widgets['Sidebar'][] = array( 'core', 'coll_category_list' );
 
 				if( $context['init_as_home'] )
 				{ // Advertisements, Install only for blog #1 home blog
 					$advertisement_type_ID = $DB->get_var( 'SELECT ityp_ID FROM T_items__type WHERE ityp_name = "Advertisement"' );
-					$declared_widgets['Sidebar'][] = array( 'coll_item_list', array(
+					$declared_widgets['Sidebar'][] = array( 'core', 'coll_item_list', array(
 							'title' => 'Advertisement (Demo)',
 							'item_type' => empty( $advertisement_type_ID ) ? '#' : $advertisement_type_ID,
 							'blog_ID' => $blog_id,
@@ -409,12 +409,12 @@ class Skin extends DataObject
 
 				if( ! $context['init_as_blog_b'] )
 				{
-					$declared_widgets['Sidebar'][] = array( 'coll_media_index', 'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";'.$default_blog_param.'s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
+					$declared_widgets['Sidebar'][] = array( 'core', 'coll_media_index', 'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";'.$default_blog_param.'s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
 				}
 				if( ! empty( $context['coll_home_ID'] ) && ( $context['init_as_blog_a'] || $context['init_as_blog_b'] ) )
 				{
 					$sidebar_type_ID = $DB->get_var( 'SELECT ityp_ID FROM T_items__type WHERE ityp_name = "Sidebar link"' );
-					$declared_widgets['Sidebar'][] = array( 'coll_item_list', array(
+					$declared_widgets['Sidebar'][] = array( 'core', 'coll_item_list', array(
 							'blog_ID'              => $context['coll_home_ID'],
 							'item_type'            => empty( $sidebar_type_ID ) ? '#' : $sidebar_type_ID,
 							'title'                => 'Linkblog',
@@ -426,37 +426,37 @@ class Skin extends DataObject
 			}
 			if( $coll_kind == 'forum' )
 			{
-				$declared_widgets['Sidebar'][] = array( 'user_avatars', 'a:13:{s:5:"title";s:17:"Most Active Users";s:10:"thumb_size";s:14:"crop-top-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"6";s:9:"bubbletip";i:1;s:8:"order_by";s:8:"numposts";s:5:"style";s:6:"simple";s:6:"gender";s:3:"any";s:8:"location";s:3:"any";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;}' );
+				$declared_widgets['Sidebar'][] = array( 'core', 'user_avatars', 'a:13:{s:5:"title";s:17:"Most Active Users";s:10:"thumb_size";s:14:"crop-top-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"6";s:9:"bubbletip";i:1;s:8:"order_by";s:8:"numposts";s:5:"style";s:6:"simple";s:6:"gender";s:3:"any";s:8:"location";s:3:"any";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;}' );
 			}
-			$declared_widgets['Sidebar'][] = array( 'coll_xml_feeds' );
-			$declared_widgets['Sidebar'][] = array( 'mobile_skin_switcher' );
+			$declared_widgets['Sidebar'][] = array( 'core', 'coll_xml_feeds' );
+			$declared_widgets['Sidebar'][] = array( 'core', 'mobile_skin_switcher' );
 		}
 
 
 		/* Sidebar 2 */
 		if( $coll_kind != 'forum' )
 		{
-			$declared_widgets['Sidebar 2'][] = array( 'coll_post_list' );
+			$declared_widgets['Sidebar 2'][] = array( 'core', 'coll_post_list' );
 			if( $context['init_as_blog_b'] )
 			{
-				$declared_widgets['Sidebar 2'][] = array( 'coll_item_list', array(
+				$declared_widgets['Sidebar 2'][] = array( 'core', 'coll_item_list', array(
 						'title'                => 'Sidebar links',
 						'order_by'             => 'RAND',
 						'item_title_link_type' => 'auto',
 						'item_type_usage'      => 'special',
 					) );
 			}
-			$declared_widgets['Sidebar 2'][] = array( 'coll_comment_list' );
-			$declared_widgets['Sidebar 2'][] = array( 'coll_media_index', 'a:11:{s:5:"title";s:13:"Recent photos";s:10:"thumb_size";s:10:"crop-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"3";s:5:"limit";s:1:"9";s:8:"order_by";s:9:"datestart";s:9:"order_dir";s:4:"DESC";'.$default_blog_param.'s:11:"widget_name";s:11:"Photo index";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
-			$declared_widgets['Sidebar 2'][] = array( 'free_html', 'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:162:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
+			$declared_widgets['Sidebar 2'][] = array( 'core', 'coll_comment_list' );
+			$declared_widgets['Sidebar 2'][] = array( 'core', 'coll_media_index', 'a:11:{s:5:"title";s:13:"Recent photos";s:10:"thumb_size";s:10:"crop-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"3";s:5:"limit";s:1:"9";s:8:"order_by";s:9:"datestart";s:9:"order_dir";s:4:"DESC";'.$default_blog_param.'s:11:"widget_name";s:11:"Photo index";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
+			$declared_widgets['Sidebar 2'][] = array( 'core', 'free_html', 'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:162:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
 		}
 
 
 		/* Front Page Main Area */
 		if( $coll_kind == 'main' )
 		{ // Display blog title and tagline for main blogs
-			$declared_widgets['Front Page Main Area'][] = array( 'coll_title' );
-			$declared_widgets['Front Page Main Area'][] = array( 'coll_tagline' );
+			$declared_widgets['Front Page Main Area'][] = array( 'core', 'coll_title' );
+			$declared_widgets['Front Page Main Area'][] = array( 'core', 'coll_tagline' );
 		}
 
 
@@ -468,11 +468,11 @@ class Skin extends DataObject
 		{
 			$featured_intro_params = NULL;
 		}
-		$declared_widgets['Front Page Main Area'][] = array( 'coll_featured_intro', $featured_intro_params );
+		$declared_widgets['Front Page Main Area'][] = array( 'core', 'coll_featured_intro', $featured_intro_params );
 
 		if( $coll_kind == 'main' )
 		{ // Add user links widget only for main kind blogs
-			$declared_widgets['Front Page Main Area'][] = array( 'user_links' );
+			$declared_widgets['Front Page Main Area'][] = array( 'core', 'user_links' );
 		}
 
 		if( $coll_kind == 'main' )
@@ -488,55 +488,55 @@ class Skin extends DataObject
 		{
 			$post_list_params = NULL;
 		}
-		$declared_widgets['Front Page Main Area'][] = array( 'coll_featured_posts', $post_list_params );
+		$declared_widgets['Front Page Main Area'][] = array( 'core', 'coll_featured_posts', $post_list_params );
 
-		$declared_widgets['Front Page Main Area'][] = array( 'coll_post_list', array( 'title' => T_('More Posts'), 'featured' => 'other' ) );
+		$declared_widgets['Front Page Main Area'][] = array( 'core', 'coll_post_list', array( 'title' => T_('More Posts'), 'featured' => 'other' ) );
 
 		if( $coll_kind != 'main' )
 		{ // Don't install the "Recent Commnets" widget for Main blogs
-			$declared_widgets['Front Page Main Area'][] = array( 'coll_comment_list' );
+			$declared_widgets['Front Page Main Area'][] = array( 'core', 'coll_comment_list' );
 		}
 
 		if( $context['init_as_blog_b'] )
 		{	// Install widget "Poll" only for Blog B on install:
-			$declared_widgets['Front Page Main Area'][] = array( 'poll', array( 'poll_ID' => 1 ) );
+			$declared_widgets['Front Page Main Area'][] = array( 'core', 'poll', array( 'poll_ID' => 1 ) );
 		}
 
 
 		/* Front Page Secondary Area */
 		if( $coll_kind == 'main' )
 		{	// Install the "Organization Members" widget only for Main collections:
-			$declared_widgets['Front Page Secondary Area'][] = array( 'org_members' );
+			$declared_widgets['Front Page Secondary Area'][] = array( 'core', 'org_members' );
 		}
-		$declared_widgets['Front Page Secondary Area'][] = array( 'coll_flagged_list' );
+		$declared_widgets['Front Page Secondary Area'][] = array( 'core', 'coll_flagged_list' );
 
 
 		/* 404 Page */
-		$declared_widgets['404 Page'][] = array( 'page_404_not_found' );
-		$declared_widgets['404 Page'][] = array( 'coll_search_form' );
-		$declared_widgets['404 Page'][] = array( 'coll_tag_cloud' );
+		$declared_widgets['404 Page'][] = array( 'core', 'page_404_not_found' );
+		$declared_widgets['404 Page'][] = array( 'core', 'coll_search_form' );
+		$declared_widgets['404 Page'][] = array( 'core', 'coll_tag_cloud' );
 
 
 		/* Mobile Footer */
-		$declared_widgets['Mobile: Footer'][] = array( 'coll_longdesc' );
-		$declared_widgets['Mobile: Footer'][] = array( 'mobile_skin_switcher' );
+		$declared_widgets['Mobile: Footer'][] = array( 'core', 'coll_longdesc' );
+		$declared_widgets['Mobile: Footer'][] = array( 'core', 'mobile_skin_switcher' );
 
 
 		/* Mobile Navigation Menu */
-		$declared_widgets['Mobile: Navigation Menu'][] = array( 'coll_page_list' );
-		$declared_widgets['Mobile: Navigation Menu'][] = array( 'menu_link', array( 'link_type' => 'ownercontact' ) );
-		$declared_widgets['Mobile: Navigation Menu'][] = array( 'menu_link', array( 'link_type' => 'home' ) );
+		$declared_widgets['Mobile: Navigation Menu'][] = array( 'core', 'coll_page_list' );
+		$declared_widgets['Mobile: Navigation Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'ownercontact' ) );
+		$declared_widgets['Mobile: Navigation Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'home' ) );
 		if( $coll_kind == 'forum' )
 		{ // Add menu with User Directory
-			$declared_widgets['Mobile: Navigation Menu'][] = array( 'menu_link', array( 'link_type' => 'users' ) );
+			$declared_widgets['Mobile: Navigation Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'users' ) );
 		}
 
 
 		/* Mobile Tools Menu */
-		$declared_widgets['Mobile: Tools Menu'][] = array( 'menu_link', array( 'link_type' => 'login' ) );
-		$declared_widgets['Mobile: Tools Menu'][] = array( 'msg_menu_link', array( 'link_type' => 'messages' ) );
-		$declared_widgets['Mobile: Tools Menu'][] = array( 'msg_menu_link', array( 'link_type' => 'contacts', 'show_badge' => 0 ) );
-		$declared_widgets['Mobile: Tools Menu'][] = array( 'menu_link', array( 'link_type' => 'logout' ) );
+		$declared_widgets['Mobile: Tools Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'login' ) );
+		$declared_widgets['Mobile: Tools Menu'][] = array( 'core', 'msg_menu_link', array( 'link_type' => 'messages' ) );
+		$declared_widgets['Mobile: Tools Menu'][] = array( 'core', 'msg_menu_link', array( 'link_type' => 'contacts', 'show_badge' => 0 ) );
+		$declared_widgets['Mobile: Tools Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'logout' ) );
 
 
 		return $declared_widgets;
