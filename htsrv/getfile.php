@@ -39,7 +39,7 @@ if( ! isset($GLOBALS['files_Module']) )
 
 if( param( 'abspath', 'string', NULL ) !== NULL )
 {	// If absolute path is requested then try to decode it to root and relative path:
-	if( $decoded_data = get_root_path_by_abspath( $abspath ) )
+	if( $decoded_data = get_root_path_by_abspath( $abspath, true ) )
 	{	// Root and path are decoded, Use them:
 		set_param( 'root', $decoded_data['root'] );
 		set_param( 'path', $decoded_data['path'] );
