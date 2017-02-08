@@ -403,11 +403,11 @@ class bootstrap_main_Skin extends Skin
 			$bg_image = $this->get_setting( 'front_bg_image' );
 			if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 			{ // Custom body background image:
-				$custom_css .= '#bg_picture { background-image: url('.$media_url.$bg_image.") }\n";
+				$custom_css .= '.evo_pictured_layout { background-image: url('.$media_url.$bg_image.") }\n";
 			} else
 			{
 				$color = $this->get_setting( 'front_bg_color' );
-				$custom_css .= '#bg_picture { background: '.$color." }\n";
+				$custom_css .= '.evo_pictured_layout { background: '.$color." }\n";
 			}
 
 			if( $color = $this->get_setting( 'pict_title_color' ) )
