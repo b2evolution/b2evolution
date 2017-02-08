@@ -231,6 +231,8 @@ class Skin extends DataObject
 	 */
 	function get_default_widgets( $coll_kind, $context = array() )
 	{
+		global $DB;
+
 		$context = array_merge( array(
 				'coll_home_ID'          => NULL,
 				'coll_photoblog_ID'     => NULL,
@@ -305,8 +307,13 @@ class Skin extends DataObject
 		/* Item Single Header */
 		if( in_array( $coll_kind, array( 'forum', 'group' ) ) )
 		{
-// fp> TODO: replace serialized string with array:
-			$declared_widgets['Item Single Header'][] = array( 'core', 'item_info_line', 'a:14:{s:5:"title";s:0:"";s:9:"flag_icon";i:1;s:14:"permalink_icon";i:0;s:13:"before_author";s:10:"started_by";s:11:"date_format";s:8:"extended";s:9:"post_time";i:1;s:12:"last_touched";i:1;s:8:"category";i:0;s:9:"edit_link";i:0;s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;s:11:"time_format";s:4:"none";s:12:"display_date";s:12:"date_created";}' );
+			$declared_widgets['Item Single Header'][] = array( 'core', 'item_info_line', array(
+					'permalink_icon' => 0,
+					'before_author'  => 'started_by',
+					'last_touched'   => 1,
+					'category'       => 0,
+					'edit_link'      => 0,
+				) );
 			$declared_widgets['Item Single Header'][] = array( 'core', 'item_tags' );
 			$declared_widgets['Item Single Header'][] = array( 'core', 'item_seen_by' );
 		}
@@ -352,9 +359,29 @@ class Skin extends DataObject
 
 
 		/* Page Top */
-// fp> TODO: replace serialized string with array:
-		$declared_widgets['Page Top'][] = array( 'core', 'social_links', 'a:19:{s:5:"title";s:0:"";s:5:"link1";s:2:"15";s:10:"link1_href";s:32:"https://twitter.com/b2evolution/";s:5:"link2";s:2:"16";s:10:"link2_href";s:36:"https://www.facebook.com/b2evolution";s:5:"link3";s:2:"17";s:10:"link3_href";s:42:"https://plus.google.com/+b2evolution/posts";s:5:"link4";s:2:"18";s:10:"link4_href";s:48:"https://www.linkedin.com/company/b2evolution-net";s:5:"link5";s:2:"19";s:10:"link5_href";s:42:"https://github.com/b2evolution/b2evolution";s:5:"link6";s:0:"";s:10:"link6_href";s:0:"";s:5:"link7";s:0:"";s:10:"link7_href";s:0:"";s:11:"icon_colors";a:1:{s:7:"hoverbg";s:1:"1";}s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;}' );
-
+		$social_default_links = array(
+				'twitter'    => 'https://twitter.com/b2evolution/',
+				'facebook'   => 'https://www.facebook.com/b2evolution',
+				'googleplus' => 'https://plus.google.com/+b2evolution/posts',
+				'linkedin'   => 'https://www.linkedin.com/company/b2evolution-net',
+				'github'     => 'https://github.com/b2evolution/b2evolution',
+			);
+		$social_fields_SQL = new SQL( 'Get user fields to create default social links widget' );
+		$social_fields_SQL->SELECT( 'ufdf_code, ufdf_ID' );
+		$social_fields_SQL->FROM( 'T_users__fielddefs' );
+		$social_fields_SQL->WHERE( 'ufdf_type = "url"' );
+		$social_fields_SQL->WHERE_and( 'ufdf_icon_name IS NOT NULL' );
+		$social_fields_SQL->WHERE_and( 'ufdf_code IN ( "twitter", "facebook", "googleplus", "linkedin", "github" )' );
+		$social_fields = $DB->get_assoc( $social_fields_SQL->get(), $social_fields_SQL->title );
+		$social_link_params = array();
+		$social_link_index = 1;
+		foreach( $social_fields as $social_field_code => $social_field_ID )
+		{
+			$social_link_params['link'.$social_link_index] = $social_field_ID;
+			$social_link_params['link'.$social_link_index.'_href'] = $social_default_links[ $social_field_code ];
+			$social_link_index++;
+		}
+		$declared_widgets['Page Top'][] = array( 'core', 'social_links', $social_link_params );
 
 		$default_blog_param = 's:7:"blog_ID";s:0:"";';
 		if( ! empty( $context['coll_photoblog_ID'] ) )
@@ -409,7 +436,17 @@ class Skin extends DataObject
 
 				if( ! $context['init_as_blog_b'] )
 				{
-					$declared_widgets['Sidebar'][] = array( 'core', 'coll_media_index', 'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";'.$default_blog_param.'s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
+					$declared_widgets['Sidebar'][] = array( 'core', 'coll_media_index', array(
+							'title'        => 'Random photo',
+							'thumb_size'   => 'fit-160x120',
+							'thumb_layout' => 'grid',
+							'grid_nb_cols' => 1,
+							'limit'        => 1,
+							'order_by'     => 'RAND',
+							'order_dir'    => 'ASC',
+							// In the case of initial install, we grab photos out of the photoblog:
+							'blog_ID'      => ( empty( $context['coll_photoblog_ID'] ) ? '' : intval( $context['coll_photoblog_ID'] ) ),
+						) );
 				}
 				if( ! empty( $context['coll_home_ID'] ) && ( $context['init_as_blog_a'] || $context['init_as_blog_b'] ) )
 				{
@@ -426,7 +463,11 @@ class Skin extends DataObject
 			}
 			if( $coll_kind == 'forum' )
 			{
-				$declared_widgets['Sidebar'][] = array( 'core', 'user_avatars', 'a:13:{s:5:"title";s:17:"Most Active Users";s:10:"thumb_size";s:14:"crop-top-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"6";s:9:"bubbletip";i:1;s:8:"order_by";s:8:"numposts";s:5:"style";s:6:"simple";s:6:"gender";s:3:"any";s:8:"location";s:3:"any";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;}' );
+				$declared_widgets['Sidebar'][] = array( 'core', 'user_avatars', array(
+						'title' => 'Most Active Users',
+						'limit' => 6,
+						'order_by' => 'numposts',
+					) );
 			}
 			$declared_widgets['Sidebar'][] = array( 'core', 'coll_xml_feeds' );
 			$declared_widgets['Sidebar'][] = array( 'core', 'mobile_skin_switcher' );
@@ -447,8 +488,16 @@ class Skin extends DataObject
 					) );
 			}
 			$declared_widgets['Sidebar 2'][] = array( 'core', 'coll_comment_list' );
-			$declared_widgets['Sidebar 2'][] = array( 'core', 'coll_media_index', 'a:11:{s:5:"title";s:13:"Recent photos";s:10:"thumb_size";s:10:"crop-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"3";s:5:"limit";s:1:"9";s:8:"order_by";s:9:"datestart";s:9:"order_dir";s:4:"DESC";'.$default_blog_param.'s:11:"widget_name";s:11:"Photo index";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
-			$declared_widgets['Sidebar 2'][] = array( 'core', 'free_html', 'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:162:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
+			$declared_widgets['Sidebar 2'][] = array( 'core', 'coll_media_index', array(
+					'grid_nb_cols' => 3,
+					'limit'        => 9,
+					// In the case of initial install, we grab photos out of the photoblog:
+					'blog_ID'      => ( empty( $context['coll_photoblog_ID'] ) ? '' : intval( $context['coll_photoblog_ID'] ) ),
+				) );
+			$declared_widgets['Sidebar 2'][] = array( 'core', 'free_html', array(
+					'title'   => 'Sidebar 2',
+					'content' => 'This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".',
+				) );
 		}
 
 
