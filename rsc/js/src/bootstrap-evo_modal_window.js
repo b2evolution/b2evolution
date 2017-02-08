@@ -24,7 +24,8 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 	var style_height = ( typeof( height ) == 'undefined' || height == 0 || height == '' ) ? '': 'height:' + height;
 	var style_height_fixed = style_height.match( /%$/i ) ? ' style="height:100%;overflow:hidden;"' : '';
 	var style_body_height = height.match( /px/i ) ? ' style="min-height:' + ( height.replace( 'px', '' ) - 157 ) + 'px"' : '';
-	var use_buttons = ( typeof( buttons ) == 'undefined' || buttons != false );
+	var use_buttons = ( typeof( buttons ) == 'undefined' || buttons !== false );
+	var button_form = 'form';
 
 	if( typeof( buttons ) != 'undefined' && buttons != '' )
 	{
@@ -38,7 +39,6 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 		{ // Standard button to submit a single form
 			var button_title = buttons;
 			var button_class = 'btn-primary';
-			var button_form = 'form';
 		}
 	}
 
@@ -168,14 +168,17 @@ function prepareModalWindow( modal_document, button_form, use_buttons, keep_pane
 		} );
 	}
 
+	// Move all buttons to the footer:
+	var link_buttons = '';
 	jQuery( button_form + ' a.btn', modal_document ).each( function()
-	{ // Move all buttons to the footer
-		jQuery( '#modal_window .modal-footer' ).prepend( '<a href=' + jQuery( this ).attr( 'href' ) + '>' +
+	{
+		link_buttons += '<a href=' + jQuery( this ).attr( 'href' ) + '>' +
 			'<button type="button" class="' + jQuery( this ).attr( 'class' ) + '">' +
 			jQuery( this ).html() +
-			'</button></a>' );
+			'</button></a> ';
 		jQuery( this ).remove();
 	} );
+	jQuery( '#modal_window .modal-footer' ).prepend( link_buttons );
 
 	if( jQuery( button_form + ' #current_modal_title', modal_document ).length > 0 )
 	{ // Change window title

@@ -4921,9 +4921,10 @@ class Blog extends DataObject
 	/**
 	 * Setup default widgets for this collection
 	 *
+	 * @param string Skin type: 'normal', 'tablet', 'mobile'
 	 * @param array Context
 	 */
-	function setup_default_widgets( $context = array() )
+	function setup_default_widgets( $skin_type = 'normal', $context = array() )
 	{
 		global $DB, $install_test_features;
 
@@ -4932,7 +4933,11 @@ class Blog extends DataObject
 			return;
 		}
 
-		$coll_skin_ID = $this->get_skin_ID( 'normal' );
+		$coll_skin_ID = $this->get_skin_ID( $skin_type );
+		if( empty( $coll_skin_ID ) && ( $skin_type == 'tablet' || $skin_type == 'mobile' ) )
+		{	// Try to get normal skin because tablet/normal skin is used as normal:
+			$coll_skin_ID = $this->get_skin_ID( 'normal' );
+		}
 		$SkinCache = & get_SkinCache();
 		if( ! ( $coll_Skin = & $SkinCache->get_by_ID( $coll_skin_ID, false, false ) ) )
 		{	// This collection must has a correct skin:
@@ -4989,6 +4994,28 @@ class Blog extends DataObject
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
 								 .'VALUES '.implode( ', ', $widget_insert_records ) );
 		}
+	}
+
+
+	/**
+	 * Reset widgets for this collection
+	 *
+	 * @param string Skin type: 'normal', 'tablet', 'mobile'
+	 */
+	function reset_widgets( $skin_type = 'normal' )
+	{
+		if( empty( $this->ID ) )
+		{	// This function should be called only for created collection:
+			return;
+		}
+
+		global $DB;
+
+		// Remove previous widgets:
+		$DB->query( 'DELETE FROM T_widget WHERE wi_coll_ID = '.$DB->quote( $this->ID ) );
+
+		// Add default widgets:
+		$this->setup_default_widgets( $skin_type );
 	}
 }
 

@@ -960,20 +960,22 @@ class Skin extends DataObject
 				'highlighted'     => false,
 			), $disp_params );
 
-		if( isset( $disp_params[ 'select_url' ] ) )
-		{
-			$skin_url = $disp_params[ 'select_url' ];
-			$select_a_begin = '<a href="'.$disp_params[ 'select_url' ].'" title="'.T_('Select this skin!').'">';
+		if( isset( $disp_params['select_url'] ) )
+		{	// Initialize params for link to SELECT new skin for collection:
+			$skin_url = $disp_params['select_url'];
+			$select_a_begin = '<a href="'.format_to_output( $disp_params['select_url'], 'htmlattr' ).'"'
+					.( isset( $disp_params['onclick'] ) ? ' onclick="'.format_to_output( $disp_params['onclick'] , 'htmlattr' ).'"' : '' )
+					.' title="'.format_to_output( T_('Select this skin!'), 'htmlattr' ).'">';
 			$select_a_end = '</a>';
 		}
-		elseif( isset( $disp_params[ 'function_url' ] ) )
-		{
-			$skin_url = $disp_params[ 'function_url' ];
+		elseif( isset( $disp_params['function_url'] ) )
+		{	// Initialize params for link to INSTALL new skin and probably select this automatically for collection:
+			$skin_url = $disp_params['function_url'];
 			$select_a_begin = '<a href="'.$disp_params[ 'function_url' ].'" title="'.T_('Install NOW!').'">';
 			$select_a_end = '</a>';
 		}
 		else
-		{
+		{	// No link:
 			$skin_url = '';
 			$select_a_begin = '';
 			$select_a_end = '';

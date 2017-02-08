@@ -83,14 +83,12 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 
 	if( $display_same_as_normal )
 	{
-		$skinshot_title = T_('Same as normal skin');
-		$select_url = '?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID=0&amp;'.url_crumb('collection');
-		$disp_params = array(
-			'function'     => 'select',
-			'selected'     => $current_skin_ID == '0',
-			'select_url'   => $select_url,
-		);
-		Skin::disp_skinshot( $skinshot_title, $skinshot_title, $disp_params );
+		Skin::disp_skinshot( T_('Same as normal skin'), T_('Same as normal skin'), array(
+				'function'   => 'select',
+				'selected'   => ( $current_skin_ID == '0' ),
+				'select_url' => $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID=0&amp;'.url_crumb('collection'),
+				'onclick'    => 'return confirm_skin_selection( this )',
+			) );
 	}
 
 	$fadeout_array = $Session->get( 'fadeout_array' );
@@ -99,25 +97,17 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 	{
 		foreach( $skins['yes'] as $skin )
 		{
-			$selected = ( $current_skin_ID == $skin->ID );
-			$blog_skin_param = $skin_type.'_skin_ID=';
-			$select_url = '?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$blog_skin_param.$skin->ID.'&amp;'.url_crumb('collection');
-			$preview_url = url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode($skin->folder) );
-
-			$disp_params = array(
-				'function'     => 'select',
-				'selected'     => $selected,
-				'select_url'   => $select_url,
-				'function_url' => $preview_url,
-				'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $skin->ID, $fadeout_array['skin_ID'] ) ),
-			);
 			// Display skinshot:
-			Skin::disp_skinshot( $skin->folder, $skin->name, $disp_params );
+			Skin::disp_skinshot( $skin->folder, $skin->name, array(
+					'function'     => 'select',
+					'selected'     => ( $current_skin_ID == $skin->ID ),
+					'select_url'   => $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID='.$skin->ID.'&amp;'.url_crumb( 'collection' ),
+					'onclick'      => 'return confirm_skin_selection( this )',
+					'function_url' => url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode( $skin->folder ) ),
+					'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $skin->ID, $fadeout_array['skin_ID'] ) ),
+				) );
 		}
 	}
-
-	// Flush fadeout
-	$Session->delete( 'fadeout_array');
 
 	echo '<div class="clear"></div>';
 	echo '</div>';
@@ -137,24 +127,16 @@ if( isset( $skins['partial'] ) )
 
 		foreach( $skins['partial'] as $skin )
 		{
-			$selected = ( $current_skin_ID == $skin->ID );
-			$blog_skin_param = $skin_type.'_skin_ID=';
-			$select_url = '?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$blog_skin_param.$skin->ID.'&amp;'.url_crumb('collection');
-			$preview_url = url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode($skin->folder) );
-
-			$disp_params = array(
-				'function'     => 'select',
-				'selected'     => $selected,
-				'select_url'   => $select_url,
-				'function_url' => $preview_url,
-				'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $skin->ID, $fadeout_array['skin_ID'] ) ),
-			);
 			// Display skinshot:
-			Skin::disp_skinshot( $skin->folder, $skin->name, $disp_params );
+			Skin::disp_skinshot( $skin->folder, $skin->name, array(
+					'function'     => 'select',
+					'selected'     => ( $current_skin_ID == $skin->ID ),
+					'select_url'   => $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID='.$skin->ID.'&amp;'.url_crumb( 'collection' ),
+					'onclick'      => 'return confirm_skin_selection( this )',
+					'function_url' => url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode( $skin->folder ) ),
+					'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $skin->ID, $fadeout_array['skin_ID'] ) ),
+				) );
 		}
-
-		// Flush fadeout
-		$Session->delete( 'fadeout_array');
 
 		echo '<div class="clear"></div>';
 		echo '</div>';
@@ -173,27 +155,60 @@ if( isset( $skins['maybe'] ) )
 
 		foreach( $skins['maybe'] as $skin )
 		{
-			$selected = ( $current_skin_ID == $skin->ID );
-			$blog_skin_param = $skin_type.'_skin_ID=';
-			$select_url = '?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$blog_skin_param.$skin->ID.'&amp;'.url_crumb('collection');
-			$preview_url = url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode($skin->folder) );
-
-			$disp_params = array(
-				'function'     => 'select',
-				'selected'     => $selected,
-				'select_url'   => $select_url,
-				'function_url' => $preview_url,
-				'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $skin->ID, $fadeout_array['skin_ID'] ) ),
-			);
 			// Display skinshot:
-			Skin::disp_skinshot( $skin->folder, $skin->name, $disp_params );
+			Skin::disp_skinshot( $skin->folder, $skin->name, array(
+					'function'     => 'select',
+					'selected'     => ( $current_skin_ID == $skin->ID ),
+					'select_url'   => $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID='.$skin->ID.'&amp;'.url_crumb( 'collection' ),
+					'onclick'      => 'return confirm_skin_selection( this )',
+					'function_url' => url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode( $skin->folder ) ),
+					'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $skin->ID, $fadeout_array['skin_ID'] ) ),
+				) );
 		}
-
-		// Flush fadeout
-		$Session->delete( 'fadeout_array');
 
 		echo '<div class="clear"></div>';
 		echo '</div>';
 	$block_item_Widget->disp_template_replaced( 'block_end' );
 }
+
+// Flush fadeout
+$Session->delete( 'fadeout_array');
+
+// Initialize JavaScript to build and open window:
+echo_modalwindow_js();
+
+switch( $skin_type )
+{
+	case 'normal':
+		$modal_window_title = TS_('You are about to change the Normal skin of your collection. Do you want to reset the widgets to what the new skin recommends?');
+		$modal_reset_button_class = 'btn-danger';
+		$modal_keep_button_class = 'btn-default';
+		break;
+	case 'mobile':
+		$modal_window_title = TS_('You are about to change the Mobile skin of your collection. Do you want to reset the widgets to what the new skin recommends?');
+		$modal_reset_button_class = 'btn-default btn-danger-hover';
+		$modal_keep_button_class = 'btn-primary';
+		break;
+	case 'tablet':
+		$modal_window_title = TS_('You are about to change the Tablet skin of your collection. Do you want to reset the widgets to what the new skin recommends?');
+		$modal_reset_button_class = 'btn-default btn-danger-hover';
+		$modal_keep_button_class = 'btn-primary';
+		break;
+}
 ?>
+<script type="text/javascript">
+function confirm_skin_selection( link_obj )
+{
+	var keep_url = jQuery( link_obj ).attr( 'href' );
+	var reset_url = keep_url + '&reset_widgets=1';
+
+	openModalWindow( '<p><?php echo $modal_window_title; ?></p>'
+		+ '<form>'
+		+ '<a href="' + reset_url + '" class="btn <?php echo $modal_reset_button_class; ?>"><?php echo TS_('Reset widgets'); ?></a>'
+		+ '<a href="' + keep_url + '" class="btn <?php echo $modal_keep_button_class; ?>"><?php echo TS_('Keep existing widgets'); ?></a>'
+		+ '</form>',
+		'500px', '', true,
+		'<span class="text-danger"><?php echo TS_('WARNING');?></span>', '', true );
+	return false;
+}
+</script>

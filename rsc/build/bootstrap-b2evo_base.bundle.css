@@ -3472,6 +3472,11 @@ ol {
 .btn.btn-danger .fa {
   color: #FFF !important;
 }
+.btn.btn-danger-hover:hover {
+  color: #fff;
+  background-color: #c9302c;
+  border-color: #ac2925;
+}
 .btn.active[disabled] {
   opacity: 1;
   color: #333;

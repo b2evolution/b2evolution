@@ -837,7 +837,7 @@ function install_basic_widgets()
 	foreach( $BlogCache->cache as $Blog )
 	{
 		task_begin( 'Installing default widgets for collection #'.$Blog->ID.'... ' );
-		$Blog->setup_default_widgets( array(
+		$Blog->setup_default_widgets( 'normal', array(
 				'coll_home_ID'          => $blog_home_ID,
 				'coll_photoblog_ID'     => $blog_photoblog_ID,
 				'init_as_home'          => ( $blog_home_ID == $Blog->ID ),
