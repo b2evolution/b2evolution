@@ -35,13 +35,14 @@ siteskin_include( '_site_body_header.inc.php' );
 // Display a picture from skin setting as background image
 global $media_path, $media_url;
 $bg_image = $Skin->get_setting( 'front_bg_image' );
-echo '<div id="bg_picture">';
+echo '<div class="evo_pictured_layout">';
 if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 { // If it exists in media folder
-	echo '<img src="'.$media_url.$bg_image.'" />';
+	echo '<img class="evo_pictured__image" src="'.$media_url.$bg_image.'" />';
 }
 
 ?>
+
 
 <div class="container main_page_wrapper">
 
@@ -209,7 +210,9 @@ if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 </div><!-- .row -->
 
 </div><!-- .container -->
-</div><!-- #bg_picture -->
+
+</div><!-- .evo_pictured_layout -->
+
 
 <!-- =================================== START OF SECONDARY AREA =================================== -->
 <section class="secondary_area" id="slide_destination"><!-- white background, ID is used to slide here from "slide_button" -->
@@ -242,6 +245,17 @@ if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 				// Display container and contents:
 				skin_container( NT_('Footer'), array(
 						// The following params will be used as defaults for widgets included in this container:
+						'block_start'         => '<span class="evo_widget $wi_class$">',
+						'block_end'           => '</span> ',
+						'block_display_title' => false,
+						'list_start'          => '',
+						'list_end'            => '',
+						'item_start'          => '',
+						'item_end'            => '',
+						'item_selected_start' => '',
+						'item_selected_end'   => '',
+						'link_default_class'  => 'btn btn-default btn-sm',
+						'link_selected_class' => 'btn btn-default btn-sm active',
 					) );
 				// ----------------------------- END OF "Footer" CONTAINER -----------------------------
 			?>
