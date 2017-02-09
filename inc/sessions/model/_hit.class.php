@@ -133,7 +133,7 @@ class Hit
 	/**
 	 * The user's remote host.
 	 * Use {@link get_remote_host()} to access it (lazy filled).
-	 * @var string
+	 * @var array 0 - value from $_SERVER['REMOTE_HOST'], 1 - value from gethostbyaddr( $this->IP )
 	 * @access protected
 	 */
 	var $_remoteHost;
@@ -295,7 +295,7 @@ class Hit
 			$Debuglog->add( 'Hit: IP: '.$this->IP, 'request' );
 			$Debuglog->add( 'Hit: UserAgent: '.$this->get_user_agent(), 'request' );
 			$Debuglog->add( 'Hit: Referer: '.var_export($this->referer, true).'; type='.$this->referer_type, 'request' );
-			$Debuglog->add( 'Hit: Remote Host: '.$this->get_remote_host( false ), 'request' );
+			$Debuglog->add( 'Hit: Remote Host(NO nslookup): '.$this->get_remote_host( false ), 'request' );
 		}
 	}
 
@@ -1182,39 +1182,49 @@ class Hit
 
 
 	/**
-	 * Get the remote hostname.
+	 * Get the remote hostname
 	 *
+	 * @param boolean Allow to get domain by IP address
 	 * @return string
 	 */
-	function get_remote_host( $allow_nslookup = false )
+	function get_remote_host( $allow_nslookup_by_IP = false )
 	{
 		global $Timer;
 
 		$Timer->resume( 'Hit::get_remote_host' );
 
-		if( is_null($this->_remoteHost) )
-		{
-			if( isset( $_SERVER['REMOTE_HOST'] ) )
-			{
-				$this->_remoteHost = $_SERVER['REMOTE_HOST'];
+		if( ! isset( $this->_remoteHost ) )
+		{	// Initialize array:
+			$this->_remoteHost = array();
+		}
+
+		// 0 - $_SERVER['REMOTE_HOST']
+		// 1 - gethostbyaddr( $this->IP )
+		$host_type = intval( $allow_nslookup_by_IP );
+
+		if( ! isset( $this->_remoteHost[ $host_type ] ) )
+		{	// Initialize remote host only first time:
+			if( ! empty( $_SERVER['REMOTE_HOST'] ) )
+			{	// Use this(The reverse dns lookup is based off the REMOTE_ADDR of the user) ONLY if it is NOT empty:
+				$this->_remoteHost[ $host_type ] = $_SERVER['REMOTE_HOST'];
 			}
-			elseif( $allow_nslookup )
-			{ // We allowed reverse DNS lookup:
+			elseif( $allow_nslookup_by_IP )
+			{	// We allowed reverse DNS lookup:
 				// This can be terribly time consuming (4/5 seconds!) when there is no reverse dns available!
 				// This is the case on many intranets and many users' first time installs!!!
 				// Some people end up considering evocore is very slow just because of this line!
 				// This cannot be enabled by default.
-				$this->_remoteHost = @gethostbyaddr($this->IP);
+				$this->_remoteHost[ $host_type ] = @gethostbyaddr( $this->IP );
 			}
 			else
 			{
-				$this->_remoteHost = '';
+				$this->_remoteHost[ $host_type ] = '';
 			}
 		}
 
 		$Timer->pause( 'Hit::get_remote_host' );
 
-		return $this->_remoteHost;
+		return $this->_remoteHost[ $host_type ];
 	}
 
 

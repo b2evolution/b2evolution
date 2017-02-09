@@ -2363,14 +2363,21 @@ class Form extends Widget
 			$field_object_callback = 'get_option_list';
 		}
 
+		$field_options = '';
+		if( isset( $field_params['prepend_options'] ) )
+		{	// Prepend additional options before cached object (Used to use several none options):
+			$field_options .= $this->get_select_options_string( $field_params['prepend_options'], $field_value, true );
+			unset( $field_params['prepend_options'] );
+		}
+
 		if( isset($field_params['loop_object_method']) )
 		{
-			$field_options = $field_object->$field_object_callback( $field_value, $allow_none, $field_params['loop_object_method'] );
+			$field_options .= $field_object->$field_object_callback( $field_value, $allow_none, $field_params['loop_object_method'] );
 			unset( $field_params['loop_object_method'] );
 		}
 		else
 		{
-			$field_options = $field_object->$field_object_callback( $field_value, $allow_none );
+			$field_options .= $field_object->$field_object_callback( $field_value, $allow_none );
 		}
 
 		if( isset($field_params['note']) )

@@ -229,7 +229,7 @@ function create_default_data()
 		VALUES ( 1, 'login_multiple_sessions', '1' ),
 				( 1, 'enable_email', '1' ),
 				( 1, 'created_fromIPv4', '".ip2int( '127.0.0.1' )."' ),
-				( 1, 'user_domain', 'localhost' )" );
+				( 1, 'user_registered_from_domain', 'localhost' )" );
 	task_end();
 
 

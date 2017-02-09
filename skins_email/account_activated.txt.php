@@ -51,7 +51,7 @@ if( $activated_User->reg_ctry_ID > 0 )
 	echo T_('Registration Country').": ".$reg_Country->get_name()."\n";
 }
 
-$user_domain = $UserSettings->get( 'user_domain', $activated_User->ID );
+$user_domain = $UserSettings->get( 'user_registered_from_domain', $activated_User->ID );
 if( ! empty( $user_domain ) )
 {	// Get user domain status if domain field is defined:
 	load_funcs( 'sessions/model/_hitlog.funcs.php' );

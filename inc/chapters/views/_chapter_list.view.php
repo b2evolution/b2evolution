@@ -80,19 +80,8 @@ function cat_line( $Chapter, $level )
 	}
 	$r .= '<td class="center">'.$makedef_icon.'</td>';
 
-	// Image
-	$file_ID = $Chapter->get( 'image_file_ID' );
-	$cat_thumb = '';
-	if( $file_ID )
-	{
-		$FileCache = & get_FileCache();
-		$cat_image_File = & $FileCache->get_by_ID( $file_ID, false, false );
-		if( $cat_image_File )
-		{
-			$cat_thumb = $cat_image_File->get_thumb_imgtag( 'crop-48x48' );
-		}
-	}
-	$r .= '<td>'.$cat_thumb.'</td>';
+	// Image:
+	$r .= '<td>'.$Chapter->get_image_tag().'</td>';
 
 	// Name
 	if( $permission_to_edit )

@@ -7014,6 +7014,22 @@ if( !function_exists( 'array_walk_recursive' ) )
 
 
 /**
+ * Provide hex2bin for older versions of PHP (< 5.4)
+ *
+ * Decodes a hexadecimally encoded binary string
+ * @param string Hexadecimal representation of data
+ * @return string The binary representation of the given data or FALSE on failure
+ */
+if( !function_exists( 'hex2bin' ) )
+{
+	function hex2bin( $hex )
+	{
+		return pack( 'H*', $hex );
+	}
+}
+
+
+/**
  * Save text data to file, create target file if it doesn't exist
  *
  * @param string data to be written

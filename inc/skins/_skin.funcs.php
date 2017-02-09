@@ -347,7 +347,7 @@ var downloadInterval = setInterval( function()
 						$robots_index = false;
 					}
 				}
-				elseif( array_diff( $active_filters, array( 'cat_array', 'cat_modifier', 'cat_focus', 'posts', 'page' ) ) == array() )
+				elseif( array_diff( $active_filters, array( 'cat_single', 'cat_array', 'cat_modifier', 'cat_focus', 'posts', 'page' ) ) == array() )
 				{ // This is a category page
 					$disp_detail = 'posts-cat';
 					$seo_page_type = 'Category page';
@@ -2212,7 +2212,9 @@ function skin_opengraph_tags()
 		}
 
 		$LinkOwner = new LinkItem( $Item );
-		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000 ) )
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, NULL, 'image', array(
+				'sql_select_add' => ', CASE link_position WHEN "cover" THEN 1 WHEN ( "teaser" OR "teaserperm" OR "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
+				'sql_order_by' => 'link_priority ASC, link_order ASC' ) ) )
 		{ // Item has no linked files
 			while( $Link = & $LinkList->get_next() )
 			{
@@ -2275,7 +2277,9 @@ function skin_twitter_tags()
 		}
 
 		$LinkOwner = new LinkItem( $Item );
-		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser', 'image', array( 'sql_order_by' => 'link_position ASC' ) ) )
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, NULL, 'image', array(
+				'sql_select_add' => ', CASE link_position WHEN "cover" THEN 1 WHEN ( "teaser" OR "teaserperm" OR "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
+				'sql_order_by' => 'link_priority ASC, link_order ASC' ) ) )
 		{ // Item has no linked files
 			while( $Link = & $LinkList->get_next() )
 			{

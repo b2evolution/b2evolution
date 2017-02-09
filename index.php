@@ -35,9 +35,21 @@ if( ! isset($collections_Module) )
 
 // initialize which blog should be displayed, and display default page if blog could not be initialized
 if( !init_requested_blog( false ) )
-{ // No specific blog to be displayed:
-	// we are going to display the default page:
-	require dirname(__FILE__).'/default.php';
+{	// No specific blog to be displayed:
+	if( $Settings->get( 'default_blog_ID' ) == -1 )
+	{	// we are going to display the admin page:
+		if( ! is_logged_in() )
+		{	// user must be logged in and his/her account must be validated before access to admin:
+			$login_required = true;
+			$validate_required = true;
+			require $inc_path.'_init_login.inc.php';
+		}
+		require dirname(__FILE__).'/admin.php';
+	}
+	else
+	{	// we are going to display the default page:
+		require dirname(__FILE__).'/default.php';
+	}
 	exit();
 }
 
@@ -45,11 +57,6 @@ if( !init_requested_blog( false ) )
 
 # You could *force* a specific skin here with this setting:
 # $skin = 'basic';
-
-# This setting retricts posts to those published, thus hiding drafts.
-# You should not have to change this.
-# TODO: Check if we still need this and if it's even working (it's probably overidden anyways)
-$show_statuses = array();
 
 # Additionnaly, you can set other values (see URL params in the manual)...
 # $order = 'ASC'; // This for example would display the blog in chronological order...

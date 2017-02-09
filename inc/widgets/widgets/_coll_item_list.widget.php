@@ -920,24 +920,25 @@ class coll_item_list_Widget extends ComponentWidget
 
 		$display_placeholder = true;
 		if( ! empty( $images ) )
-		{ // Print out images only when at least one exists
+		{	// Print out images only when at least one exists:
 			echo $params['before'];
 			echo $images;
 			echo $params['after'];
 			$display_placeholder = false;
 		}
 		elseif( $params['limit'] == 1 )
-		{ // First picture is empty, fallback to category picture
-			$main_Chapter = $disp_Item->get_main_Chapter();
-			$file_ID = $main_Chapter->get( 'image_file_ID' );
-			if( $file_ID )
-			{
-				$FileCache = & get_FileCache();
-				if( ( $File = $FileCache->get_by_ID( $main_Chapter->get( 'image_file_ID' ) ) ) && $File->is_image() )
-				{
-					echo $params['before'];
-					echo $File->get_tag( '', '', '', '', $this->disp_params['thumb_size'], $pic_url );
-					echo $params['after'];
+		{	// First picture is empty, fallback to category picture:
+			if( $main_Chapter = & $disp_Item->get_main_Chapter() )
+			{	// If item has a main chapter:
+				$main_chapter_image_tag = $main_Chapter->get_image_tag( array(
+						'before'  => $params['before'],
+						'after'   => $params['after'],
+						'size'    => $this->disp_params['thumb_size'],
+						'link_to' => $pic_url,
+					) );
+				if( ! empty( $main_chapter_image_tag ) )
+				{	// If main chapter has a correct image file:
+					echo $main_chapter_image_tag;
 					$display_placeholder = false;
 				}
 			}
