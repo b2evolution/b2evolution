@@ -42,7 +42,7 @@ if( $bg_File_ID = $Skin->get_setting( 'front_bg_image_file_ID' ) )
 {
 	$bg_File = & $FileCache->get_by_ID( $bg_File_ID );
 }
-echo '<div id="bg_picture">';
+echo '<div class="evo_pictured_layout">';
 if( $bg_File && $bg_File->exists() )
 { // If it exists in media folder
 	echo '<img class="evo_pictured__image" src="'.$bg_File->get_url().'" />';

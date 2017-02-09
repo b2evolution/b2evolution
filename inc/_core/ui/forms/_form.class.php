@@ -3715,7 +3715,7 @@ class Form extends Widget
 
 			if( ! isset( $field_value ) && ! empty( $field_params['initialize_with'] ) )
 			{
-				if( $initial_File = & get_file_by_abspath( $field_params['initialize_with'] ) )
+				if( $initial_File = & get_file_by_abspath( $field_params['initialize_with'], true ) )
 				{
 					$field_value = $initial_File->ID;
 				}

@@ -572,7 +572,7 @@ class Skin extends DataObject
 		{
 			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'fileselect' )
 			{
-				if( $this->get_setting( $parname ) === NULL && isset( $parmeta['initialize_with'] ) && $init_File = & get_file_by_abspath( $parmeta['initialize_with'] ) )
+				if( $this->get_setting( $parname ) === NULL && isset( $parmeta['initialize_with'] ) && $init_File = & get_file_by_abspath( $parmeta['initialize_with'], true ) )
 				{ // Only use initial value if the parameter is not yet set, empty string value should remain empty
 					$this->set_setting( $parname, $init_File->ID );
 				}

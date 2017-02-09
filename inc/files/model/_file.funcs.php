@@ -2894,6 +2894,12 @@ function get_root_path_by_abspath( $abspath, $is_cache_path = false )
 			}
 			break;
 
+		case 'skins':
+			// Skins dir:
+			$root = FileRoot::gen_ID( 'skins', 0 );
+			$start_relpath = 1;
+			break;
+
 		case 'shared':
 			// Shared media dir:
 			$root = FileRoot::gen_ID( 'shared', 0 );
@@ -2946,18 +2952,20 @@ function get_root_path_by_abspath( $abspath, $is_cache_path = false )
 	return false;
 }
 
-function & get_file_by_abspath( $abspath )
+function & get_file_by_abspath( $abspath, $force_create_meta = false )
 {
 	$root_path = get_root_path_by_abspath( $abspath );
 	if( $root_path )
 	{
-		$root = explode( '_', $root_path['root'] );
-		$FileCache = & get_FileCache();
-		$File = & $FileCache->get_by_root_and_path( $root[0], $root[1], $root_path['path'].DIRECTORY_SEPARATOR.basename( $abspath ) );
-		if( $File->exists() )
+		$FileRootCache = & get_FileRootCache();
+		if( $FileRoot = $FileRootCache->get_by_ID( $root_path['root'] ) )
 		{
-			$File->load_meta( true );
-			return $File;
+			$FileCache = & get_FileCache();
+			if( $File = & $FileCache->get_by_root_and_path( $FileRoot->type, $FileRoot->in_type_ID, $root_path['path'] ) && $File->exists() )
+			{
+				$File->load_meta( $force_create_meta );
+				return $File;
+			}
 		}
 	}
 
