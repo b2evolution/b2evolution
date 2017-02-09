@@ -1454,7 +1454,7 @@ function init_ratings_js( $relative_to = 'blog', $force_init = false )
 	if( $force_init || ( !empty($Item) && $Item->can_rate() ) )
 	{
 		require_js( '#jquery#', $relative_to ); // dependency
-		require_js( 'customized:jquery/raty/js/jquery.raty.min.js', $relative_to );
+		require_js( 'customized:jquery/raty/jquery.raty.min.js', $relative_to );
 	}
 }
 

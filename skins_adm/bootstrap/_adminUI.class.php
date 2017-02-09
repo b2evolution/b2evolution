@@ -43,7 +43,7 @@ class AdminUI extends AdminUI_general
 		global $Messages, $debug, $Hit, $check_browser_version;
 
 		require_js( '#jquery#' );
-		require_js( 'customized:jquery/raty/js/jquery.raty.min.js' );
+		require_js( 'customized:jquery/raty/jquery.raty.min.js' );
 
 		require_js( '#bootstrap#' );
 		require_css( '#bootstrap_css#' );

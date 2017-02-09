@@ -1813,11 +1813,11 @@ if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action,
 	// Require colorbox js:
 	require_js_helper( 'colorbox' );
 	// Require File Uploader js and css:
-	require_js( 'multiupload/fileuploader.js' );
-	require_css( 'fileuploader.css' );
+	require_js( 'customized:fileuploader/js/fileuploader.js' );
+	require_css( 'customized:fileuploader/css/fileuploader.css' );
 	// Load JS files to make the links table sortable:
 	require_js( '#jquery#' );
-	require_js( 'jquery/jquery.sortable.min.js' );
+	require_js( 'ext:jquery/sortable/jquery.sortable.min.js' );
 }
 
 if( in_array( $action, array( 'new', 'copy', 'create_edit', 'create_link', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish', 'extract_tags' ) ) )

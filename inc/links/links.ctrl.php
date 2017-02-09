@@ -282,8 +282,8 @@ switch( $action )
 // require colorbox js
 require_js_helper( 'colorbox' );
 // require File Uploader js and css
-require_js( 'multiupload/fileuploader.js' );
-require_css( 'fileuploader.css' );
+require_js( 'customized:fileuploader/js/fileuploader.js' );
+require_css( 'customized:fileuploader/css/fileuploader.css' );
 if( $action == 'edit_links' )
 { // Load JS files to make the links table sortable:
 	require_js( '#jquery#' );
