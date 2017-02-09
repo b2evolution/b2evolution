@@ -405,13 +405,13 @@ class bootstrap_main_Skin extends Skin
 			}
 
 			if( !empty( $bg_image_File ) && $bg_image_File->exists() )
-			{
-				$custom_css .= '#bg_picture { background-image: url('.$bg_image_File->get_url().") }\n";
+			{ // Custom body background image:
+				$custom_css .= '.evo_pictured_layout { background-image: url('.$bg_image_File->get_url().") }\n";
 			}
 			else
 			{
 				$color = $this->get_setting( 'front_bg_color' );
-				$custom_css .= '#bg_picture { background: '.$color." }\n";
+				$custom_css .= '.evo_pictured_layout { background: '.$color." }\n";
 			}
 
 			if( $color = $this->get_setting( 'pict_title_color' ) )

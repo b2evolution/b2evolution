@@ -38,20 +38,6 @@ skin_include( '_html_header.inc.php' );
 // If site headers are enabled, they will be included here:
 siteskin_include( '_site_body_header.inc.php' );
 // ------------------------------- END OF SITE HEADER --------------------------------
-
-// Display a picture from skin setting as background image
-$FileCache = & get_FileCache();
-$bg_File = NULL;
-if( $bg_File_ID = $Skin->get_setting( 'front_bg_image_file_ID' ) )
-{
-	$bg_File = & $FileCache->get_by_ID( $bg_File_ID );
-}
-echo '<div id="bg_picture">';
-if( $bg_File && $bg_File->exists() )
-{ // If it exists in media folder
-	echo '<img src="'.$bg_File->get_url().'" />';
-}
-echo '</div>';
 ?>
 
 
@@ -205,6 +191,17 @@ if( $Skin->is_visible_container( 'menu' ) )
 				// Display container and contents:
 				skin_container( NT_('Footer'), array(
 						// The following params will be used as defaults for widgets included in this container:
+						'block_start'         => '<span class="evo_widget $wi_class$">',
+						'block_end'           => '</span> ',
+						'block_display_title' => false,
+						'list_start'          => '',
+						'list_end'            => '',
+						'item_start'          => '',
+						'item_end'            => '',
+						'item_selected_start' => '',
+						'item_selected_end'   => '',
+						'link_default_class'  => 'btn btn-default btn-sm',
+						'link_selected_class' => 'btn btn-default btn-sm active',
 					) );
 				// ----------------------------- END OF "Footer" CONTAINER -----------------------------
 			?>
@@ -267,7 +264,6 @@ if( $Skin->is_visible_container( 'menu' ) )
 		</footer><!-- .col -->
 
 	</div><!-- .row -->
-
 
 </div><!-- .container -->
 
