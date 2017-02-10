@@ -81,6 +81,11 @@ function & get_link_owner( $link_type, $object_ID )
 					load_class( 'items/model/_item.class.php', 'Item' );
 					$LinkOwner = new LinkItem( new Item(), $object_ID );
 					break;
+
+				case 'comment':
+					load_class( 'comments/model/_comment.class.php', 'Comment' );
+					$LinkOwner = new LinkComment( new Comment(), $object_ID );
+					break;
 			}
 			$LinkOwner->tmp_ID = $object_ID;
 			$LinkOwner->type = 'temporary';
@@ -111,9 +116,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 		return;
 	}
 
-	if( ! is_logged_in()
-	    || ! $current_User->check_perm( 'files', 'view' )
-	    || ! $LinkOwner->check_perm( 'edit', false ) )
+	if( ( is_logged_in() && ! $LinkOwner->check_perm( 'edit', false ) ) )
 	{	// Current user has no perm to view files:
 		return;
 	}
@@ -127,7 +130,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 			break;
 
 		case 'comment':
-			$window_title = format_to_js( sprintf( T_('Attach files to comment #%s'), $LinkOwner->Comment->ID ) );
+			$window_title = $LinkOwner->is_temp() ? '' : format_to_js( sprintf( T_('Attach files to comment #%s'), $LinkOwner->Comment->ID ) );
 			$form_id = 'cmntform_links';
 			break;
 
@@ -172,7 +175,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 		$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' );
 	}
 
-	if( $current_User->check_perm( 'admin', 'restricted' ) )
+	if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_perm( 'files', 'view' ) )
 	{	// Check if current user has a permission to back-office files manager:
 		$attach_files_url = $admin_url.'?ctrl=files&amp;fm_mode=link_object&amp;link_type='.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).( $LinkOwner->type != 'message' ? '&amp;link_object_ID='.$LinkOwner->get_ID() : '' );
 		if( $linkowner_FileList = $LinkOwner->get_attachment_FileList( 1 ) )
@@ -199,7 +202,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 			.action_icon( T_('Refresh'), 'refresh', $LinkOwner->get_edit_url(),
 				T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\' )' ) )
 
-			.action_icon( T_('Sort'), 'ascending', ( is_admin_page() || $current_User->check_perm( 'admin', 'restricted' ) )
+			.action_icon( T_('Sort'), 'ascending', ( is_admin_page() || ( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) ) )
 				? $admin_url.'?ctrl=links&amp;action=sort_links&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;'.url_crumb( 'link' )
 				: $LinkOwner->get_edit_url().'#',
 				T_('Sort'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'sort\' )' ) )
@@ -878,5 +881,38 @@ function sort_links_by_filename( $a, $b )
 	}
 
 	return $r;
+}
+
+
+function link_add_iframe( $link_destination )
+{
+	global $LinkOwner, $current_File, $iframe_name, $link_type;
+	$link_owner_ID = $LinkOwner->get_ID();
+
+	if( $current_File->is_dir() && isset( $iframe_name ) )
+	{
+		$root = $current_File->get_FileRoot()->ID;
+		$path = $current_File->get_rdfp_rel_path();
+
+		// this could be made more robust
+		$link_destination = str_replace( '<a ', "<a onclick=\"return link_attachment_window( '${link_type}', '${link_owner_ID}', '${root}', '${path}' );\" ", $link_destination );
+	}
+
+	return $link_destination;
+}
+
+
+/*
+ * Sub Type column
+ */
+function display_subtype( $link_ID )
+{
+	global $LinkOwner, $current_File;
+
+	$Link = $LinkOwner->get_link_by_link_ID( $link_ID );
+	// Instantiate a File object for this line
+	$current_File = $Link->get_File();
+
+	return $Link->get_preview_thumb();
 }
 ?>

@@ -27,10 +27,13 @@ class LinkComment extends LinkOwner
 
 	/**
 	 * Constructor
+	 *
+	 * @param object Comment
+	 * @param integer ID of temporary object from table T_temporary_ID (used for uploads on new comments)
 	 */
-	function __construct( $edited_Comment )
+	function __construct( $Comment, $tmp_ID = NULL )
 	{
-		parent::__construct( $edited_Comment, 'comment', 'cmt_ID' );
+		parent::__construct( $Comment, 'comment', 'cmt_ID', $tmp_ID );
 		$this->Comment = & $this->link_Object;
 
 		$this->_trans = array(
@@ -56,11 +59,16 @@ class LinkComment extends LinkOwner
 	{
 		global $current_User;
 
-		$this->load_Blog();
-		$comment_Item = $this->Comment->get_Item();
-
-		return ( $this->Comment->is_meta() && $current_User->check_perm( 'meta_comment', $permlevel, $assert, $this->Comment ) )
-			|| $current_User->check_perm( 'blog_comments', $permlevel, $assert, $this->Blog->ID );
+		if( $this->is_temp() )
+		{	// Check permission for new creating comment:
+			return $current_User->check_perm( 'blog_comments', $permlevel, $assert, $this->link_Object->tmp_coll_ID );
+		}
+		else
+		{	// Check permission for existing comment in DB:
+			$this->load_Blog();
+			return ( $this->Comment->is_meta() && $current_User->check_perm( 'meta_comment', $permlevel, $assert, $this->Comment ) )
+				|| $current_User->check_perm( 'blog_comments', $permlevel, $assert, $this->Blog->ID );
+		}
 	}
 
 	/**
@@ -85,7 +93,14 @@ class LinkComment extends LinkOwner
 		if( is_null( $this->Links ) )
 		{ // Links have not been loaded yet:
 			$LinkCache = & get_LinkCache();
-			$this->Links = $LinkCache->get_by_comment_ID( $this->Comment->ID );
+			if( $this->is_temp() )
+			{
+				$this->Links = $LinkCache->get_by_temporary_ID( $this->get_ID() );
+			}
+			else
+			{
+				$this->Links = $LinkCache->get_by_comment_ID( $this->Comment->ID );
+			}
 		}
 	}
 
@@ -106,7 +121,7 @@ class LinkComment extends LinkOwner
 		}
 
 		$edited_Link = new Link();
-		$edited_Link->set( 'cmt_ID', $this->Comment->ID );
+		$edited_Link->set( $this->get_ID_field_name(), $this->get_ID() );
 		$edited_Link->set( 'file_ID', $file_ID );
 		$edited_Link->set( 'position', $position );
 		$edited_Link->set( 'order', $order );
@@ -118,10 +133,14 @@ class LinkComment extends LinkOwner
 			$file_dir = $File->dir_or_file();
 			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s', ucfirst( $file_dir ), '[['.$file_name.']]', $this->type, $this->get_ID() ), 'info', 'file', $file_ID );
 
-			if( $update_owner )
-			{ // Update last touched date of the Comment & Item
+			if( ! $this->is_temp() && $update_owner )
+			{	// Update last touched date of the Comment & Item
 				$this->update_last_touched_date();
 			}
+
+			// Reset the Links
+			$this->Links = NULL;
+			$this->load_Links();
 
 			return $edited_Link->ID;
 		}
@@ -136,8 +155,17 @@ class LinkComment extends LinkOwner
 	{
 		if( is_null( $this->Blog ) )
 		{
-			$comment_Item = $this->Comment->get_Item();
-			$this->Blog = & $comment_Item->get_Blog();
+			if( $this->Comment->ID == 0 )
+			{	// This is a request of new creating Comment (for example, preview mode),
+				// We should use current collection, because new Comment has no item ID yet here to load Collection:
+				global $Blog;
+				$this->Blog = $Blog;
+			}
+			else
+			{	// Use Collection of the existing Comment:
+				$comment_Item = $this->Comment->get_Item();
+				$this->Blog = & $comment_Item->get_Blog();
+			}
 		}
 	}
 
@@ -164,8 +192,33 @@ class LinkComment extends LinkOwner
 	 */
 	function get_edit_url()
 	{
-		$this->load_Blog();
-		return '?ctrl=comments&amp;blog='.$this->Blog->ID.'&amp;action=edit&amp;comment_ID='.$this->Comment->ID;
+		if( is_admin_page() )
+		{	// Back-office:
+			global $admin_url;
+			if( $this->is_temp() )
+			{	// New creating Comment:
+				global $Item;
+				return isset( $Item ) ? $admin_url.'?ctrl=items&amp;blog='.$this->link_Object->tmp_coll_ID.'&amp;p='.$Item->ID.'#form_p'.$Item->ID : '';
+			}
+			else
+			{	// The edited Comment:
+				$this->load_Blog();
+				return $admin_url.'?ctrl=comments&amp;blog='.$this->Blog->ID.'&amp;action=edit&amp;comment_ID='.$this->Comment->ID;
+			}
+		}
+		else
+		{	// Front-office:
+			global $Blog;
+			if( $this->is_temp() )
+			{	// New creating Comment:
+				global $Item;
+				return isset( $Item ) ? $Item->get_permanent_url().'#evo_comment_form_id_'.$Item->ID : '';
+			}
+			else
+			{	// The edited Comment:
+				return url_add_param( $Blog->get( 'url' ), 'disp=edit_comment&amp;c='.$this->Comment->ID );
+			}
+		}
 	}
 
 	/**

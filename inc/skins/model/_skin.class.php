@@ -1007,6 +1007,13 @@ class Skin extends DataObject
 						init_autocomplete_login_js( 'blog', $this->get_template( 'autocomplete_plugin' ) );
 						init_datepicker_js( 'blog' );
 					}
+
+					// Require File Uploader js and css:
+					require_js( 'multiupload/fileuploader.js', 'blog' );
+					require_css( 'fileuploader.css', 'blog' );
+					// Load JS files to make the links table sortable:
+					require_js( '#jquery#' );
+					require_js( 'jquery/jquery.sortable.min.js' );
 					break;
 
 				case 'disp_users':

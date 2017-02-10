@@ -3164,6 +3164,14 @@ input.btn-lg {
 .evo_form__comment .bg-warning {
   margin: 0px !important;
 }
+.evo_form__comment #cmntform_links .panel {
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.evo_form__comment #cmntform_links table {
+  margin: 0;
+}
 .form-horizontal .form-group,
 .form-horizontal .custom_content {
   margin-left: 0;

@@ -41,38 +41,6 @@ $Results = new Results( $SQL->get(), '', '', 1000 );
 
 $Results->title = T_('Attachments');
 
-
-function link_add_iframe( $link_destination )
-{
-	global $LinkOwner, $current_File, $iframe_name, $link_type;
-	$link_owner_ID = $LinkOwner->get_ID();
-
-	if( $current_File->is_dir() && isset( $iframe_name ) )
-	{
-		$root = $current_File->get_FileRoot()->ID;
-		$path = $current_File->get_rdfp_rel_path();
-
-		// this could be made more robust
-		$link_destination = str_replace( '<a ', "<a onclick=\"return link_attachment_window( '${link_type}', '${link_owner_ID}', '${root}', '${path}' );\" ", $link_destination );
-	}
-
-	return $link_destination;
-}
-
-
-/*
- * Sub Type column
- */
-function display_subtype( $link_ID )
-{
-	global $LinkOwner, $current_File;
-
-	$Link = $LinkOwner->get_link_by_link_ID( $link_ID );
-	// Instantiate a File object for this line
-	$current_File = $Link->get_File();
-
-	return $Link->get_preview_thumb();
-}
 $Results->cols[] = array(
 						'th' => T_('Icon/Type'),
 						'td_class' => 'shrinkwrap',
@@ -92,7 +60,7 @@ $Results->cols[] = array(
 						'td_class' => 'shrinkwrap link_id_cell',
 					);
 
-if( $current_User->check_perm( 'files', 'view' ) )
+if( is_logged_in() && $current_User->check_perm( 'files', 'view' ) )
 {
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
@@ -146,8 +114,8 @@ switch( $link_owner_type )
 		break;
 
 	case 'comment':
-		$upload_fileroot = FileRoot::gen_ID( 'collection', $Blog->ID );
-		$upload_path = '/quick-uploads/c'.$LinkOwner->get_ID().'/';
+		$upload_fileroot = FileRoot::gen_ID( 'collection', ( $LinkOwner->is_temp() ? $LinkOwner->link_Object->tmp_coll_ID : $Blog->ID ) );
+		$upload_path = '/quick-uploads/'.( $LinkOwner->is_temp() ? 'tmp' : 'c' ).$LinkOwner->get_ID().'/';
 		break;
 
 	case 'emailcampaign':

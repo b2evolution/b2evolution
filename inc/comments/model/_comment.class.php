@@ -4310,7 +4310,11 @@ class Comment extends DataObject
 		$dbchanges = $this->dbchanges;
 
 		if( $r = parent::dbinsert() )
-		{
+		{	// The comment object could be inserted
+
+			// Link attachments from temporary object to new created Comment:
+			$this->link_from_Request();
+
 			if( $this->is_published() )
 			{ // Update last touched date of item if comment is created in published status
 				$this->update_last_touched_date();
@@ -4780,6 +4784,73 @@ class Comment extends DataObject
 		$Item = & $this->get_Item();
 
 		return can_be_displayed_with_status( $this->get( 'status' ), 'comment', $Item->get_blog_ID(), $this->author_user_ID );
+	}
+
+
+	/**
+	 * Link attachments from temporary object to new created Comment
+	 */
+	function link_from_Request()
+	{
+		global $DB;
+
+		if( $this->ID == 0 )
+		{	// The comment must be stored in DB:
+			return;
+		}
+
+		$temp_link_owner_ID = param( 'temp_link_owner_ID', 'integer', 0 );
+
+		$TemporaryIDCache = & get_TemporaryIDCache();
+		if( ! ( $TemporaryID = & $TemporaryIDCache->get_by_ID( $temp_link_owner_ID, false, false ) ) )
+		{	// No temporary object of attachments:
+			return;
+		}
+
+		if( $TemporaryID->type != 'comment' )
+		{	// Wrong temporary object:
+			return;
+		}
+
+		// Load all links:
+		$LinkOwner = new LinkComment( new Comment(), $TemporaryID->ID );
+		$LinkOwner->load_Links();
+
+		if( empty( $LinkOwner->Links ) )
+		{	// No links:
+			return;
+		}
+
+		// Change link owner from temporary to comment object:
+		$DB->query( 'UPDATE T_links
+			  SET link_cmt_ID = '.$this->ID.',
+			      link_tmp_ID = NULL
+			WHERE link_tmp_ID = '.$TemporaryID->ID );
+
+		// Move all temporary files to folder of new created comment:
+		foreach( $LinkOwner->Links as $comment_Link )
+		{
+			if( $comment_File = & $comment_Link->get_File() &&
+			    $comment_FileRoot = & $comment_File->get_FileRoot() )
+			{
+				if( ! file_exists( $comment_FileRoot->ads_path.'quick-uploads/c'.$this->ID.'/' ) )
+				{	// Create if folder doesn't exist for files of new created comment:
+					if( mkdir_r( $comment_FileRoot->ads_path.'quick-uploads/c'.$this->ID.'/' ) )
+					{
+						$tmp_folder_path = $comment_FileRoot->ads_path.'quick-uploads/tmp'.$TemporaryID->ID.'/';
+					}
+				}
+				$comment_File->move_to( $comment_FileRoot->type, $comment_FileRoot->in_type_ID, 'quick-uploads/c'.$this->ID.'/'.$comment_File->get_name() );
+			}
+		}
+
+		if( isset( $tmp_folder_path ) && file_exists( $tmp_folder_path ) )
+		{	// Remove temp folder from disk completely:
+			rmdir_r( $tmp_folder_path );
+		}
+
+		// Delete temporary object from DB:
+		$TemporaryID->dbdelete();
 	}
 }
 

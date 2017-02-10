@@ -369,11 +369,18 @@ if( $upload )
 						break;
 
 					case 'comment':
-						// Get LinkOwner object of the Comment
-						$CommentCache = & get_CommentCache();
-						if( $linked_Comment = & $CommentCache->get_by_ID( $link_owner_ID, false, false ) )
-						{
-							$LinkOwner = new LinkComment( $linked_Comment );
+						if( $link_owner_is_temp )
+						{	// Get LinkOwner object of the Temporary ID for new creating Comment:
+							load_class( 'comments/model/_comment.class.php', 'Comment' );
+							$LinkOwner = new LinkComment( new Comment(), $link_owner_ID );
+						}
+						else
+						{	// Get LinkOwner object of the Comment
+							$CommentCache = & get_CommentCache();
+							if( $linked_Comment = & $CommentCache->get_by_ID( $link_owner_ID, false, false ) )
+							{
+								$LinkOwner = new LinkComment( $linked_Comment );
+							}
 						}
 						break;
 
