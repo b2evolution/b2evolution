@@ -1333,6 +1333,14 @@ function get_icon_info( $name )
 			'glyph' => 'list',
 			'fa' => 'list',
 		);
+
+		case 'asterisk': return array(
+			'alt' => '',
+			'size' => array( 0, 0 ),
+			'xy' => array( 0, 0 ),
+			'glyph' => 'asterisk',
+			'fa' => 'asterisk'
+		);
 	}
 }
 ?>

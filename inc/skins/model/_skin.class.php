@@ -673,13 +673,8 @@ class Skin extends DataObject
 		}
 
 		// Display skinshot:
-		echo '<div class="'.$disp_params['skinshot_class'].( $disp_params['highlighted'] ? ' evo_highlight' : '' ).'">';
-		echo '<div class="skinshot_placeholder';
-		if( $disp_params[ 'selected' ] )
-		{
-			echo ' current';
-		}
-		echo '">';
+		echo '<div class="'.$disp_params['skinshot_class'].( $disp_params['selected'] ? ' skinshot_current' : '' ).( $disp_params['highlighted'] ? ' evo_highlight' : '' ).'">';
+		echo '<div class="skinshot_placeholder">';
 		if( file_exists( $skins_path.$skin_folder.'/skinshot.png' ) )
 		{
 			echo $select_a_begin;

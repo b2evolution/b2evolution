@@ -96,8 +96,7 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 	}
 
 	if( $display_same_as_normal )
-	{
-		$skinshot_title = T_('Same as standard skin');
+	{	// A link to select the same skin as normal for tablet and mobile skins:
 		if( $is_collection_skin )
 		{	// Collection skin:
 			$select_url = $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID=0&amp;'.url_crumb( 'collection' );
@@ -106,13 +105,10 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 		{	// Site skin:
 			$select_url = $admin_url.'?ctrl=collections&amp;tab=site_skin&amp;action=update_site_skin&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID=0&amp;'.url_crumb( 'siteskin' );
 		}
-		$disp_params = array(
-			'function'     => 'select',
-			'selected'     => $current_skin_ID == '0',
-			'select_url'   => $select_url,
-			'same_skin'    => true,
-		);
-		Skin::disp_skinshot( $skinshot_title, $skinshot_title, $disp_params );
+		echo '<a href="'.$select_url.'" class="skinshot skinshot_new'.( empty( $current_skin_ID ) ? ' skinshot_current' : '' ).'">'
+				.get_icon( 'asterisk' )
+				.T_('Same as standard skin')
+			.'</a>';
 	}
 
 	$fadeout_array = $Session->get( 'fadeout_array' );
