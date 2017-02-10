@@ -82,13 +82,11 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 	}
 
 	if( $display_same_as_normal )
-	{
-		Skin::disp_skinshot( T_('Same as normal skin'), T_('Same as normal skin'), array(
-				'function'   => 'select',
-				'selected'   => ( $current_skin_ID == '0' ),
-				'select_url' => $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID=0&amp;'.url_crumb('collection'),
-				'onclick'    => 'return confirm_skin_selection( this )',
-			) );
+	{	// A link to select the same skin as normal for tablet and mobile skins:
+		echo '<a href="'.$admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID=0&amp;'.url_crumb( 'collection' ).'" class="skinshot skinshot_new'.( $current_skin_ID == '0' ? ' skinshot_current' : '' ).'">'
+				.get_icon( 'asterisk' )
+				.T_('Same as normal skin')
+			.'</a>';
 	}
 
 	$fadeout_array = $Session->get( 'fadeout_array' );

@@ -4934,10 +4934,6 @@ class Blog extends DataObject
 		}
 
 		$coll_skin_ID = $this->get_skin_ID( $skin_type );
-		if( empty( $coll_skin_ID ) && ( $skin_type == 'tablet' || $skin_type == 'mobile' ) )
-		{	// Try to get normal skin because tablet/normal skin is used as normal:
-			$coll_skin_ID = $this->get_skin_ID( 'normal' );
-		}
 		$SkinCache = & get_SkinCache();
 		if( ! ( $coll_Skin = & $SkinCache->get_by_ID( $coll_skin_ID, false, false ) ) )
 		{	// This collection must has a correct skin:

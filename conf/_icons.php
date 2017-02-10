@@ -1244,6 +1244,14 @@ function get_icon_info( $name )
 			'fa' => 'comments',
 			'color' => '#F90'
 		);
+
+		case 'asterisk': return array(
+			'alt' => '',
+			'size' => array( 0, 0 ),
+			'xy' => array( 0, 0 ),
+			'glyph' => 'asterisk',
+			'fa' => 'asterisk'
+		);
 	}
 }
 ?>
