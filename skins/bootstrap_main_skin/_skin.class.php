@@ -401,7 +401,7 @@ class bootstrap_main_Skin extends Skin
 
 			if( $this->get_setting( 'front_bg_image_file_ID' ) )
 			{
-				$bg_image_File = & $FileCache->get_by_ID( $this->get_setting( 'front_bg_image_file_ID' ) );
+				$bg_image_File = & $FileCache->get_by_ID( $this->get_setting( 'front_bg_image_file_ID' ), false, false );
 			}
 
 			if( !empty( $bg_image_File ) && $bg_image_File->exists() )

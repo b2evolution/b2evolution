@@ -47,7 +47,7 @@ if( $is_pictured_page )
 	$bg_File = NULL;
 	if( $bg_File_ID = $Skin->get_setting( 'front_bg_image_file_ID' ) )
 	{
-		$bg_File = & $FileCache->get_by_ID( $bg_File_ID );
+		$bg_File = & $FileCache->get_by_ID( $bg_File_ID, false, false );
 	}
 	echo '<div class="evo_pictured_layout">';
 	if( $bg_File && $bg_File->exists() )
