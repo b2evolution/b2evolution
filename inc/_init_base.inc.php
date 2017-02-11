@@ -21,7 +21,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * @global boolean Are we running on Command Line Interface instead of a web request?
  */
-$is_cli = empty($_SERVER['SERVER_SOFTWARE']) ? true : false;
+$is_cli = 'cli' == PHP_SAPI;
 $is_web = ! $is_cli;
 // echo ($is_cli ? 'cli' : 'web' );
 
