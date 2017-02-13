@@ -205,7 +205,7 @@ class twitter_plugin extends Plugin
 
 			if( ! empty( $oauth_info['token'] ) && isset( $oauth_info['contact'] ) )
 			{
-				echo '<meta property="twitter:creator" content="@'.$oauth_info['contact'].'" />'."\n";
+				echo '<meta property="twitter:site" content="@'.$oauth_info['contact'].'" />'."\n";
 			}
 			else
 			{
