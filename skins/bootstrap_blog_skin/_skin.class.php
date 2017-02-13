@@ -101,6 +101,246 @@ class bootstrap_blog_Skin extends Skin
 
 
 	/**
+	 * Get the declarations of the widgets that the skin wants to use.
+	 *
+	 * The skin class defines a default set of widgets to used. Skins should override this.
+	 *
+	 * @param string Collection kind: 'std', 'main', 'photo', 'group', 'forum', 'manual'
+	 * @param array Additional params. Example value 'init_as_blog_b' => true
+	 * @return array Array of default widgets:
+	 *               - Key - Container name, 
+	 *               - Value - array of widgets:
+	 *                         0 - Type: 'core', 'plugin'.
+	 *                         1 - Code.
+	 *                         2 - Params: Array with params: Key - param code, Value - param value; NULL - for default params. (Default = NULL)
+	 *                         3 - Order. (Default is started from 1 and incremented inside container)
+	 *                         4 - Enabled? 1 or 0. (Default = 1)
+	 */
+	function get_default_widgets( $coll_kind, $context = array() )
+	{
+		global $DB;
+
+		$context = array_merge( array(
+				'coll_home_ID'          => NULL,
+				'coll_photoblog_ID'     => NULL,
+				'init_as_home'          => false,
+				'init_as_blog_a'        => false,
+				'init_as_blog_b'        => false,
+				'init_as_events'        => false,
+				'install_test_features' => false,
+			), $context );
+
+		$declared_widgets = array();
+
+		// HEADER:
+		$declared_widgets['Header'][] = array( 'core', 'coll_title' );
+		$declared_widgets['Header'][] = array( 'core', 'coll_tagline' );
+
+
+		// MENU:
+		// Home page
+		$declared_widgets['Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'home' ) );
+		if( $context['init_as_blog_b'] )
+		{	// Recent Posts
+			$declared_widgets['Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'recentposts', 'link_text' => T_('News') ) );
+		}
+		// Pages list:
+		$declared_widgets['Menu'][] = array( 'core', 'coll_page_list' );
+		// Categories
+		$declared_widgets['Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'catdir' ) );
+		// Archives
+		$declared_widgets['Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'arcdir' ) );
+		// Latest comments
+		$declared_widgets['Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'latestcomments' ) );
+		$declared_widgets['Menu'][] = array( 'core', 'msg_menu_link', array( 'link_type' => 'messages' ), NULL, 0 );
+		$declared_widgets['Menu'][] = array( 'core', 'msg_menu_link', array( 'link_type' => 'contacts', 'show_badge' => 0 ), NULL, 0 );
+		$declared_widgets['Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'login' ), NULL, 0 );
+
+
+		/* Item Single Header */
+		$declared_widgets['Item Single Header'][] = array( 'core', 'item_info_line');
+
+
+		/* Item Single */
+		$declared_widgets['Item Single'][] = array( 'core', 'item_content' );
+		$declared_widgets['Item Single'][] = array( 'core', 'item_attachments' );
+		if( ! $context['init_as_blog_a'] && ! $context['init_as_events'] )
+		{ // Item Tags
+			$declared_widgets['Item Single'][] = array( 'core', 'item_tags' );
+		}
+		if( $context['init_as_blog_b'] )
+		{ // About Author
+			$declared_widgets['Item Single'][] = array( 'core', 'item_about_author' );
+		}
+		if( ( $context['init_as_blog_a'] || $context['init_as_events'] ) && $context['install_test_features'] )
+		{ // Google Maps
+			$declared_widgets['Item Single'][] = array( 'plugin', 'evo_Gmaps' );
+		}
+		if( $context['init_as_blog_a'] )
+		{ // Small Print
+			$declared_widgets['Item Single'][] = array( 'core', 'item_small_print', array( 'format' => ( $context['init_as_blog_a'] ? 'standard' : 'revision' ) ) );
+		}
+		// Seen by
+		$declared_widgets['Item Single'][] = array( 'core', 'item_seen_by' );
+		// Item voting panel:
+		$declared_widgets['Item Single'][] = array( 'core', 'item_vote' );
+
+
+		/* Page Top */
+		$social_default_links = array(
+				'twitter'    => 'https://twitter.com/b2evolution/',
+				'facebook'   => 'https://www.facebook.com/b2evolution',
+				'googleplus' => 'https://plus.google.com/+b2evolution/posts',
+				'linkedin'   => 'https://www.linkedin.com/company/b2evolution-net',
+				'github'     => 'https://github.com/b2evolution/b2evolution',
+			);
+		$social_fields_SQL = new SQL( 'Get user fields to create default social links widget' );
+		$social_fields_SQL->SELECT( 'ufdf_code, ufdf_ID' );
+		$social_fields_SQL->FROM( 'T_users__fielddefs' );
+		$social_fields_SQL->WHERE( 'ufdf_type = "url"' );
+		$social_fields_SQL->WHERE_and( 'ufdf_icon_name IS NOT NULL' );
+		$social_fields_SQL->WHERE_and( 'ufdf_code IN ( "twitter", "facebook", "googleplus", "linkedin", "github" )' );
+		$social_fields = $DB->get_assoc( $social_fields_SQL->get(), $social_fields_SQL->title );
+		$social_link_params = array();
+		$social_link_index = 1;
+		foreach( $social_fields as $social_field_code => $social_field_ID )
+		{
+			$social_link_params['link'.$social_link_index] = $social_field_ID;
+			$social_link_params['link'.$social_link_index.'_href'] = $social_default_links[ $social_field_code ];
+			$social_link_index++;
+		}
+		$declared_widgets['Page Top'][] = array( 'core', 'social_links', $social_link_params );
+
+		$default_blog_param = 's:7:"blog_ID";s:0:"";';
+		if( ! empty( $context['coll_photoblog_ID'] ) )
+		{ // In the case of initial install, we grab photos out of the photoblog (Blog #4)
+			$default_blog_param = 's:7:"blog_ID";s:1:"'.intval( $context['coll_photoblog_ID'] ).'";';
+		}
+
+		/* Sidebar */
+		if( $context['install_test_features'] )
+		{
+			// Current filters widget
+			$declared_widgets['Sidebar'][] = array( 'core', 'coll_current_filters' );
+			// User login widget
+			$declared_widgets['Sidebar'][] = array( 'core', 'user_login' );
+		}
+
+// Specifically disabled to test this feature:		$declared_widgets['Sidebar'][] = array( 'core', 'coll_avatar' );
+		if( ! $context['init_as_blog_a'] )
+		{
+			$declared_widgets['Sidebar'][] = array( 'plugin', 'evo_Calr' );
+		}
+		$declared_widgets['Sidebar'][] = array( 'core', 'coll_longdesc', array( 'title' => '$title$' ) );
+		$declared_widgets['Sidebar'][] = array( 'core', 'coll_search_form' );
+		$declared_widgets['Sidebar'][] = array( 'core', 'coll_category_list' );
+
+
+		if( ! $context['init_as_blog_b'] )
+		{
+			$declared_widgets['Sidebar'][] = array( 'core', 'coll_media_index', array(
+					'title'        => 'Random photo',
+					'thumb_size'   => 'fit-160x120',
+					'thumb_layout' => 'grid',
+					'grid_nb_cols' => 1,
+					'limit'        => 1,
+					'order_by'     => 'RAND',
+					'order_dir'    => 'ASC',
+					// In the case of initial install, we grab photos out of the photoblog:
+					'blog_ID'      => ( empty( $context['coll_photoblog_ID'] ) ? '' : intval( $context['coll_photoblog_ID'] ) ),
+				) );
+		}
+		if( ! empty( $context['coll_home_ID'] ) && ( $context['init_as_blog_a'] || $context['init_as_blog_b'] ) )
+		{
+			$sidebar_type_ID = $DB->get_var( 'SELECT ityp_ID FROM T_items__type WHERE ityp_name = "Sidebar link"' );
+			$declared_widgets['Sidebar'][] = array( 'core', 'coll_item_list', array(
+					'blog_ID'              => $context['coll_home_ID'],
+					'item_type'            => empty( $sidebar_type_ID ) ? '#' : $sidebar_type_ID,
+					'title'                => 'Linkblog',
+					'item_group_by'        => 'chapter',
+					'item_title_link_type' => 'auto',
+					'item_type_usage'      => 'special',
+				) );
+		}
+
+
+		$declared_widgets['Sidebar'][] = array( 'core', 'coll_xml_feeds' );
+		$declared_widgets['Sidebar'][] = array( 'core', 'mobile_skin_switcher' );
+
+
+
+		/* Sidebar 2 */
+		$declared_widgets['Sidebar 2'][] = array( 'core', 'coll_post_list' );
+		if( $context['init_as_blog_b'] )
+		{
+			$declared_widgets['Sidebar 2'][] = array( 'core', 'coll_item_list', array(
+					'title'                => 'Sidebar links',
+					'order_by'             => 'RAND',
+					'item_title_link_type' => 'auto',
+					'item_type_usage'      => 'special',
+				) );
+		}
+		$declared_widgets['Sidebar 2'][] = array( 'core', 'coll_comment_list' );
+		$declared_widgets['Sidebar 2'][] = array( 'core', 'coll_media_index', array(
+				'grid_nb_cols' => 3,
+				'limit'        => 9,
+				// In the case of initial install, we grab photos out of the photoblog:
+				'blog_ID'      => ( empty( $context['coll_photoblog_ID'] ) ? '' : intval( $context['coll_photoblog_ID'] ) ),
+			) );
+		$declared_widgets['Sidebar 2'][] = array( 'core', 'free_html', array(
+				'title'   => 'Sidebar 2',
+				'content' => 'This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".',
+			) );
+
+
+		/* Front Page Main Area */
+		$declared_widgets['Front Page Main Area'][] = array( 'core', 'coll_featured_intro', NULL );
+		$declared_widgets['Front Page Main Area'][] = array( 'core', 'coll_featured_posts', NULL );
+		$declared_widgets['Front Page Main Area'][] = array( 'core', 'coll_post_list', array( 'title' => T_('More Posts'), 'featured' => 'other' ) );
+		$declared_widgets['Front Page Main Area'][] = array( 'core', 'coll_comment_list' );
+		if( $context['init_as_blog_b'] )
+		{	// Install widget "Poll" only for Blog B on install:
+			$declared_widgets['Front Page Main Area'][] = array( 'core', 'poll', array( 'poll_ID' => 1 ) );
+		}
+
+
+		/* Front Page Secondary Area */
+		$declared_widgets['Front Page Secondary Area'][] = array( 'core', 'coll_flagged_list' );
+
+
+		/* 404 Page */
+		$declared_widgets['404 Page'][] = array( 'core', 'page_404_not_found' );
+		$declared_widgets['404 Page'][] = array( 'core', 'coll_search_form' );
+		$declared_widgets['404 Page'][] = array( 'core', 'coll_tag_cloud' );
+
+
+		/* Mobile Footer */
+		$declared_widgets['Mobile: Footer'][] = array( 'core', 'coll_longdesc' );
+		$declared_widgets['Mobile: Footer'][] = array( 'core', 'mobile_skin_switcher' );
+
+
+		/* Mobile Navigation Menu */
+		$declared_widgets['Mobile: Navigation Menu'][] = array( 'core', 'coll_page_list' );
+		$declared_widgets['Mobile: Navigation Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'ownercontact' ) );
+		$declared_widgets['Mobile: Navigation Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'home' ) );
+		if( $coll_kind == 'forum' )
+		{ // Add menu with User Directory
+			$declared_widgets['Mobile: Navigation Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'users' ) );
+		}
+
+
+		/* Mobile Tools Menu */
+		$declared_widgets['Mobile: Tools Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'login' ) );
+		$declared_widgets['Mobile: Tools Menu'][] = array( 'core', 'msg_menu_link', array( 'link_type' => 'messages' ) );
+		$declared_widgets['Mobile: Tools Menu'][] = array( 'core', 'msg_menu_link', array( 'link_type' => 'contacts', 'show_badge' => 0 ) );
+		$declared_widgets['Mobile: Tools Menu'][] = array( 'core', 'menu_link', array( 'link_type' => 'logout' ) );
+
+
+		return $declared_widgets;
+	}
+
+
+	/**
 	 * Get definitions for editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()
