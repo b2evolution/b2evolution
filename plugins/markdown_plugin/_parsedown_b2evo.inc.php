@@ -80,7 +80,16 @@ class ParsedownB2evo extends ParsedownExtra
 	{
 		if( $this->b2evo_parse_links )
 		{	// Allow to parse inline links:
-			return parent::inlineLink( $Excerpt );
+			$link_data = parent::inlineLink( $Excerpt );
+			if( is_array( $link_data ) && isset( $link_data['element']['attributes']['href'] ) &&
+			    preg_match( '/^(https?:\/\/|\/)/i', $link_data['element']['attributes']['href'] ) )
+			{	// Allow link ONLY with URL which starts with "http://", "https://" or "/":
+				return $link_data;
+			}
+			else
+			{	// Deny wrong URL, because it may contains vulnerability code like "javascript:alert()":
+				return;
+			}
 		}
 		else
 		{	// Don't parse inline links:
