@@ -2855,10 +2855,16 @@ function echo_file_properties()
  * @param boolean TRUE - to extract data from cache path like 'blogs/home/_evocache/image.jpg/fit-80x80.jpg'
  * @return boolean|array FALSE - if root and path are not detected, Array with keys 'root' and 'path'
  *
- * Example:
+ * Examples:
  * get_root_path_by_abspath( 'shared/global/sunset/sunset.jpg' ) => array( root => 'shared_0', path => 'sunset/sunset.jpg' )
  * get_root_path_by_abspath( 'users/admin/admin.jpg' ) => array( root => 'user_1', path => 'admin.jpg' )
  * get_root_path_by_abspath( 'blogs/home/backgrounds/background1.jpg' ) => array( root => 'collection_1', path => 'backgrounds/background1.jpg' )
+ * get_root_path_by_abspath( 'skins/bootstrap_main_skin/skinshot.png' ) => array( root => 'skins_0', path => 'bootstrap_main_skin/skinshot.png' )
+ * - for cache paths (used to restored missing cached images which are loaded with old url):
+ * get_root_path_by_abspath( 'shared/global/sunset/_evocache/sunset.jpg/fit-80x80.jpg?mtime=1486119491', true ) => array( root => 'shared_0', path => 'sunset/sunset.jpg' )
+ * get_root_path_by_abspath( 'users/admin/_evocache/admin.jpg/crop-top-320x320.jpg?mtime=1486119491', true ) => array( root => 'user_1', path => 'admin.jpg' )
+ * get_root_path_by_abspath( 'blogs/home/_evocache/image.jpg/fit-80x80.jpg?mtime=1486969646', true ) => array( root => 'collection_1', path => 'image.jpg' )
+ * get_root_path_by_abspath( 'skins/bootstrap_main_skin/_evocache/skinshot.png/fit-80x80.png?mtime=1486969005', true ) => array( root => 'skins_0', path => 'bootstrap_main_skin/skinshot.png' )
  *
  */
 function get_root_path_by_abspath( $abspath, $is_cache_path = false )
