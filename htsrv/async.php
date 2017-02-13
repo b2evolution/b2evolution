@@ -108,12 +108,34 @@ switch( $action )
 		$winfo = '<pre style="height: '.( $window_height - 200 ).'px; overflow: auto;">';
 		if( ! empty( $result['rawdata'] ) )
 		{
-			// Highlight lines starting with orgname: or org-name: (case insensitive)
 			for( $i = 0; $i < count( $result['rawdata'] ); $i++ )
 			{
+				// Highlight lines starting with orgname: or org-name: (case insensitive)
 				if( preg_match( '/^(orgname:|org-name:|descr:)/i', $result['rawdata'][$i] ) )
 				{
 					$result['rawdata'][$i] = '<span style="font-weight: bold; background-color: yellow;">'.$result['rawdata'][$i].'</span>';
+				}
+
+				if( preg_match_all( '#[-a-zA-Z0-9@:%_\+.~\#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~\#?&//=;]*)?#si', $result['rawdata'][$i], $matches ) )
+				{
+					foreach( $matches as $match )
+					{
+						if( filter_var( $match[0], FILTER_VALIDATE_EMAIL ) )
+						{ // check if valid email
+							$href_string = 'mailto://'.$match[0];
+							$result['rawdata'][$i] = str_replace( $match[0], '<a href="'.$href_string.'" target="_blank">'.$match[0].'</a>', $result['rawdata'][$i] );
+						}
+						else
+						{ // check if valid URL
+							$href_string = ( ! preg_match( '#^(ht|f)tps?://#', $match[0] ) ) // check if protocol not present
+									? 'http://' . $match[0] // temporarily add one
+									: $match[0]; // use current
+							if( filter_var( $href_string, FILTER_VALIDATE_URL ) )
+							{
+								$result['rawdata'][$i] = str_replace( $match[0], '<a href="'.$href_string.'" target="_blank">'.$match[0].'</a>', $result['rawdata'][$i] );
+							}
+						}
+					}
 				}
 			}
 			$winfo .= format_to_output( implode( $result['rawdata'], "\n" ) );
