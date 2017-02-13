@@ -2,7 +2,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $current_User, $Session, $admin_url, $status_list, $CommentList, $b2evo_icons_type;
+global $Collection, $Blog, $current_User, $Session, $admin_url, $status_list, $CommentList, $b2evo_icons_type;
 
 // Require this file because function evoAlert() is used here
 require_js( 'functions.js', 'blog', false, true );
@@ -74,7 +74,7 @@ function delete_comment_url( comment_id )
 
 	jQuery.ajax({
 		type: 'POST',
-		url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+		url: '<?php echo get_htsrv_url(); ?>async.php',
 		data:
 		{ 'blogid': '<?php echo $Blog->ID; ?>',
 			'commentid': comment_id,
@@ -114,7 +114,7 @@ function setCommentStatus( id, status, request_from, redirect_to )
 
 	jQuery.ajax({
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 	data:
 		{ 'blogid': '<?php echo $Blog->ID; ?>',
 			'commentid': id,
@@ -197,7 +197,7 @@ function setCommentVote( id, type, vote )
 
 	jQuery.ajax({
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 	data:
 		{ 'blog': '<?php echo $Blog->ID; ?>',
 			'commentid': id,
@@ -247,7 +247,7 @@ function edit_comment( action, comment_ID )
 	jQuery.ajax(
 	{
 		type: 'POST',
-		url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+		url: '<?php echo get_htsrv_url(); ?>async.php',
 		data:
 		{
 			'commentid': comment_ID,
@@ -302,7 +302,7 @@ function deleteComment( commentId, request_from, comment_type )
 		{ // Load and display a link to recycle bin
 			jQuery.ajax({
 			type: 'POST',
-			url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+			url: '<?php echo get_htsrv_url(); ?>async.php',
 			data:
 				{ 'action': 'get_opentrash_link',
 					'blog': '<?php echo $Blog->ID; ?>',
@@ -318,7 +318,7 @@ function deleteComment( commentId, request_from, comment_type )
 
 	jQuery.ajax({
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+	url: '<?php echo get_htsrv_url(); ?>async.php',
 	data:
 		{ 'blogid': '<?php echo $Blog->ID; ?>',
 			'commentid': commentId,
@@ -369,6 +369,16 @@ function ban_url( authorurl )
 			'90%', '', true,
 			'<?php echo TS_('Confirm ban & delete'); ?>',
 			[ '<?php echo TS_('Perform selected operations'); ?>', 'btn-danger', '#antispam_ban' ], true, false, 'modal_window_frame_ban' );
+
+	var submitButton = jQuery( '.modal-footer button:submit' ).not( '[data-dismiss=modal]' );
+	submitButton.on( 'click', function() { addSpinner( this ) } );
+	jQuery( '#modal_window_frame_ban' ).on( 'load', function() {
+		if( submitButton.hasClass( 'btn-spinner' ) )
+		{
+			submitButton.removeClass( 'btn-spinner' );
+			submitButton.css( 'width', '-=24px' );
+		}
+	});
 }
 
 // Refresh comments on dashboard after ban url -> delete comment
@@ -471,7 +481,7 @@ function refreshComments( request_from )
 
 	jQuery.ajax({
 		type: 'POST',
-		url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+		url: '<?php echo get_htsrv_url(); ?>async.php',
 		data:
 			{ 'blogid': '<?php echo $Blog->ID; ?>',
 				'action': 'refresh_comments',
@@ -535,16 +545,16 @@ function get_limit()
 
 function get_show_statuses()
 {
-	if( jQuery('#only_draft') && jQuery('#only_draft').is(':checked') )
+	if( jQuery('#only_moderation') && jQuery('#only_moderation').is(':checked') )
 	{
-		return '(draft)';
+		return '#only_moderation#';
 	}
-	else if( jQuery('#only_published') && jQuery('#only_published').is(':checked') )
+	else if( jQuery('#only_valid') && jQuery('#only_valid').is(':checked') )
 	{
-		return '(published)';
+		return '#only_valid#';
 	}
 
-	return '(published,community,protected,private,review,draft,deprecated)';
+	return '#all#';
 }
 
 function get_expiry_status()
@@ -589,7 +599,7 @@ function refresh_item_comments( item_id, currentpage, comment_type )
 
 	jQuery.ajax({
 		type: 'POST',
-		url: '<?php echo get_samedomain_htsrv_url(); ?>async.php',
+		url: '<?php echo get_htsrv_url(); ?>async.php',
 		data:
 			{ 'blogid': '<?php echo $Blog->ID; ?>',
 				'action': 'refresh_comments',

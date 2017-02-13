@@ -213,3 +213,9 @@ pre[class*="language-"] {
 	padding-top: 0;
 	padding-bottom: 0;
 }
+pre[class*="language-"] code[class*="language-"] {
+	display: block;
+}
+.prism-show-language {
+	margin-top: .5em;
+}

@@ -57,7 +57,23 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 					'<h4 class="modal-title">' + title + '</h4>' +
 				'</div>';
 		}
-		modal_html += '<div class="modal-body"' + style_height_fixed + style_body_height + '>' + body_html + '</div>';
+		modal_html += '<div class="modal-body"' + style_height_fixed + style_body_height + '>' + body_html;
+
+		if( iframe_id )
+		{
+			var iframe = jQuery( '#' + iframe_id );
+			modal_html += '<script>'
+					+ 'jQuery( document ).ready( function() {'
+					+ 'var iframe = jQuery( \'#' + iframe_id + '\' );'
+					+ 'iframe.on( \'load\', function() {'
+					+			'iframe.closest( \'.modal-body\' ).find( \'span.loader_img\' ).remove();'
+					+			'setModalIFrameUnload( \'' + iframe_id + '\' );'
+					+		'});'
+					+ '});'
+					+ '</script>';
+		}
+
+		modal_html += '</div>';
 
 		if( use_buttons )
 		{
@@ -182,4 +198,15 @@ function closeModalWindow( document_obj )
 	jQuery( '#modal_window', document_obj ).remove();
 
 	return false;
+}
+
+function setModalIFrameUnload( iframe_id )
+{
+	var iframe = jQuery( '#' + iframe_id );
+	iframe[0].contentWindow.onunload = function()
+		{
+			var modal_body = iframe.closest( '.modal-body' );
+			var spinner = jQuery( '<span class="loader_img absolute_center" title="' + evo_js_lang_loading + '"></span>' );
+			jQuery( modal_body ).prepend( spinner );
+		}
 }

@@ -50,10 +50,10 @@ class BlogCache extends DataObjectCache
 	/**
 	 * Add object to cache, handling our own indices.
 	 *
-	 * @param Blog
+	 * @param object Collection object
 	 * @return boolean True on add, false if already existing.
 	 */
-	function add( & $Blog )
+	function add( $Blog )
 	{
 		if( ! empty($Blog->siteurl) && preg_match( '~^https?://~', $Blog->siteurl ) )
 		{ // absolute siteurl
@@ -81,7 +81,7 @@ class BlogCache extends DataObjectCache
 	 */
 	function & get_by_url( $req_url, $halt_on_error = true )
 	{
-		global $DB, $Debuglog, $baseurl, $basedomain;
+		global $DB, $Debuglog, $baseurl, $basehost, $baseport;
 
 		foreach( array_keys($this->cache_siteurl_abs) as $siteurl_abs )
 		{
@@ -99,10 +99,10 @@ class BlogCache extends DataObjectCache
 		$sql = 'SELECT *
 			  FROM T_blogs
 			 WHERE ( blog_access_type = "absolute"
-			         AND ( '.$DB->quote('http'.$req_url_wo_proto).' LIKE CONCAT( blog_siteurl, "%" )
-		                 OR '.$DB->quote('https'.$req_url_wo_proto).' LIKE CONCAT( blog_siteurl, "%" ) ) )
+			         AND ( '.$DB->quote( 'http'.$req_url_wo_proto ).' LIKE CONCAT( blog_siteurl, "%" )
+		                 OR '.$DB->quote( 'https'.$req_url_wo_proto ).' LIKE CONCAT( blog_siteurl, "%" ) ) )
 			    OR ( blog_access_type = "subdom"
-			         AND '.$DB->quote($req_url_wo_proto).' LIKE CONCAT( "://", blog_urlname, ".'.$basedomain.'/%" ) )';
+			         AND '.$DB->quote( $req_url_wo_proto ).' LIKE CONCAT( "://", blog_urlname, ".'.$basehost.$baseport.'/%" ) )';
 
 		// Match stubs like "http://base/url/STUB?param=1" on $baseurl
 		/*
@@ -122,7 +122,7 @@ class BlogCache extends DataObjectCache
 			return $r; // we return by reference!
 		}
 
-		$Blog = new Blog( $row );
+		$Collection = $Blog = new Blog( $row );
 		$this->add( $Blog );
 
 		return $Blog;
@@ -162,7 +162,7 @@ class BlogCache extends DataObjectCache
 			return $r;
 		}
 
-		$Blog = new Blog( $row );
+		$Collection = $Blog = new Blog( $row );
 		$this->add( $Blog );
 
 		return $Blog;
@@ -253,8 +253,23 @@ class BlogCache extends DataObjectCache
 			// Allow the collections that available for members:
 			global $current_User;
 			$sql_where .= ' OR ( blog_in_bloglist = "member" AND (
-					( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND bloguser_user_ID = '.$current_User->ID.' ) OR
-					( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND bloggroup_group_ID = '.$current_User->grp_ID.' )
+					( SELECT grp_ID
+					    FROM T_groups
+					   WHERE grp_ID = '.$current_User->grp_ID.'
+					     AND grp_perm_blogs IN ( "viewall", "editall" ) ) OR
+					( SELECT bloguser_user_ID
+					    FROM T_coll_user_perms
+					   WHERE bloguser_blog_ID = blog_ID
+					     AND bloguser_ismember = 1
+					     AND bloguser_user_ID = '.$current_User->ID.' ) OR
+					( SELECT bloggroup_group_ID
+					    FROM T_coll_group_perms
+					   WHERE bloggroup_blog_ID = blog_ID
+					     AND bloggroup_ismember = 1
+					     AND ( bloggroup_group_ID = '.$current_User->grp_ID.'
+					           OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$current_User->ID.' ) )
+					  LIMIT 1
+					)
 				) )';
 		}
 		$SQL->WHERE( '( '.$sql_where.' )' );
@@ -352,7 +367,9 @@ class BlogCache extends DataObjectCache
 
 		$Group = $for_User->Group;
 		// First check if we have a global access perm:
- 		if( $Group->check_perm( 'blogs', $permlevel ) )
+		if( $Group->check_perm( 'blogs', $permlevel ) ||
+		    ( $permname == 'blog_media_browse' && $Group->check_perm( 'files', 'edit' ) ) ||
+		    ( $permname == 'stats' && $Group->check_perm( 'stats', 'view' ) ) )
 		{ // If group grants a global permission:
 			$this->clear();
 			if( isset( $sql_filter ) )
@@ -371,12 +388,14 @@ class BlogCache extends DataObjectCache
 		// Note: We only JOIN in the advanced perms if any given blog has them enabled,
 		// otherwise they are ignored!
 		$sql = 'SELECT DISTINCT T_blogs.*
-		          FROM T_blogs LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0
-		          																				AND blog_ID = bloguser_blog_ID
-		          																				AND bloguser_user_ID = '.$user_ID.' )
-		          		 LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0
-		          																	AND blog_ID = bloggroup_blog_ID
-		          																	AND bloggroup_group_ID = '.$Group->ID.' )';
+			FROM T_blogs
+			LEFT JOIN T_coll_user_perms ON ( blog_advanced_perms <> 0
+			      AND blog_ID = bloguser_blog_ID
+			      AND bloguser_user_ID = '.$user_ID.' )
+			LEFT JOIN T_coll_group_perms ON ( blog_advanced_perms <> 0
+			      AND blog_ID = bloggroup_blog_ID
+			      AND ( bloggroup_group_ID = '.$Group->ID.'
+			            OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$user_ID.' ) ) )';
 
 		if( isset( $sql_filter ) )
 		{	// Filter collections:
@@ -405,11 +424,14 @@ class BlogCache extends DataObjectCache
 			case 'blog_comments':
 				// user needs to have permission for at least one kind of comments
 				$sql .= "OR bloguser_perm_cmtstatuses <> ''
-						OR bloggroup_perm_cmtstatuses <> ''";
+						OR bloggroup_perm_cmtstatuses <> ''
+						OR bloguser_perm_meta_comment = 1
+						OR bloggroup_perm_meta_comment = 1";
 				break;
 
 			case 'stats':
-				$permname = 'blog_properties';	// TEMP
+				$permname = 'blog_analytics';
+			case 'blog_analytics':
 			case 'blog_cats':
 			case 'blog_properties':
 			case 'blog_admin':
@@ -437,6 +459,109 @@ class BlogCache extends DataObjectCache
 		}
 
 		return $DB->get_col( NULL, 0 );
+	}
+
+
+	/**
+	 * Load into the cache a list of collections which have the enabled settings to subscribe on new posts or comments
+	 *
+	 * @param object User, Restrict public collections which available only for the User
+	 * @param array IDs of collections which should be exluded from list
+	 * @param string Order By
+	 * @param string Order Direction
+	 * @return array of IDs
+	 */
+	function load_subscription_colls( $User, $exclude_coll_IDs = NULL, $order_by = '', $order_dir = '' )
+	{
+		global $DB, $Settings, $Debuglog;
+
+		$Debuglog->add( 'Loading <strong>'.$this->objtype.'(subscription collections)</strong> into cache', 'dataobjects' );
+
+		if( $order_by == '' )
+		{	// Use default value from settings:
+			$order_by = $Settings->get( 'blogs_order_by' );
+		}
+
+		if( $order_dir == '' )
+		{	// Use default value from settings:
+			$order_dir = $Settings->get( 'blogs_order_dir' );
+		}
+
+		load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
+		$CollectionSettings = new CollectionSettings();
+
+		$blog_cache_SQL = $this->get_SQL_object();
+
+		$blog_cache_SQL->title = 'Get the '.$this->objtype.'(subscription collections) rows to load the objects into the cache by '.get_class().'->'.__FUNCTION__.'()';
+
+		// Initialize subquery to get all collections which allow subscription for new ITEMS/POSTS:
+		if( $CollectionSettings->get_default( 'allow_subscriptions' ) == 0 )
+		{	// If default setting disables to subscribe for new ITEMS/POSTS, we should get only the collections which allow the subsriptions:
+			$sql_operator = 'IN';
+			$sql_value = '1';
+		}
+		else
+		{	// If default setting enables to subscribe for new ITEMS/POSTS, we should exclude the collections which don't allow the subsriptions:
+			$sql_operator = 'NOT IN';
+			$sql_value = '0';
+		}
+		$allow_item_subscriptions_sql = 'blog_ID '.$sql_operator.' (
+					SELECT cset_coll_ID
+					  FROM T_coll_settings
+					 WHERE cset_name = "allow_subscriptions"
+					   AND cset_value = '.$sql_value.'
+				)';
+		// Initialize subquery to get all collections which allow subscription for new COMMENTS:
+		if( $CollectionSettings->get_default( 'allow_comment_subscriptions' ) == 0 )
+		{	// If default setting disables to subscribe for new COMMENTS, we should get only the collections which allow the subsriptions:
+			$sql_operator = 'IN';
+			$sql_value = '1';
+		}
+		else
+		{	// If default setting enables to subscribe for new COMMENTS, we should exclude the collections which don't allow the subsriptions:
+			$sql_operator = 'NOT IN';
+			$sql_value = '0';
+		}
+		$allow_comment_subscriptions_sql = 'blog_ID '.$sql_operator.' (
+				SELECT cset_coll_ID
+				  FROM T_coll_settings
+				 WHERE cset_name = "allow_comment_subscriptions"
+				   AND cset_value = '.$sql_value.'
+			)';
+
+		// Get collections which which allow subscription for new items/posts OR comments:
+		$blog_cache_SQL->WHERE_and( $allow_item_subscriptions_sql.' OR '.$allow_comment_subscriptions_sql );
+
+		if( $Settings->get( 'subscribe_new_blogs' ) == 'public' )
+		{	// If a subscribing is available only for the public collections:
+			$blog_cache_SQL->WHERE_and( '( blog_ID NOT IN ( SELECT cset_coll_ID FROM evo_coll_settings WHERE cset_name = "allow_access" AND cset_value = "members" ) ) OR
+				( blog_ID IN ( SELECT cset_coll_ID FROM evo_coll_settings WHERE cset_name = "allow_access" AND cset_value = "members" ) AND (
+					( SELECT bloguser_user_ID
+					    FROM T_coll_user_perms
+					   WHERE bloguser_blog_ID = blog_ID
+					     AND bloguser_ismember = 1
+					     AND bloguser_user_ID = '.$User->ID.' ) OR
+					( SELECT bloggroup_group_ID
+					    FROM T_coll_group_perms
+					   WHERE bloggroup_blog_ID = blog_ID
+					     AND bloggroup_ismember = 1
+					     AND ( bloggroup_group_ID = '.$User->grp_ID.'
+					           OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$User->ID.' ) )
+					  LIMIT 1
+					)
+				) )' );
+		}
+
+		if( ! empty( $exclude_coll_IDs ) )
+		{	// Exclude the collections from the list (for example, if user already is subscribed on them):
+			$blog_cache_SQL->WHERE_and( 'blog_ID NOT IN ( '.$DB->quote( $exclude_coll_IDs ).' )' );
+		}
+
+		$blog_cache_SQL->ORDER_BY( gen_order_clause( $order_by, $order_dir, $this->dbprefix, $this->dbIDname ) );
+
+		$this->load_by_sql( $blog_cache_SQL );
+
+		return array_keys( $this->cache );
 	}
 
 

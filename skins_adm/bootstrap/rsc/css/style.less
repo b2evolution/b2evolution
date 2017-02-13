@@ -77,7 +77,7 @@ div.status_icon {
 // Action icons
 .action_icon, .widget_actions a, .no_icon {
 	font-weight: bold;
-	margin: 0 2px;
+	margin: 2px;
 }
 // Remove spaces between the spam voting buttons
 .btn-group .action_icon {
@@ -232,38 +232,22 @@ div.delete_messages ul {
 /*
  * Browse pages of items and comments ( ?ctrl=items and ?ctrl=comments - full views )
  */
-div.bPost {
+.evo_post {
 	clear: both;
 	margin: 0 0 1ex;
 	padding: 0;
-	border: 1px solid #CCC;
-	.border-radius;
 	overflow: hidden; /* to normal view of border-radius */
+	.evo_post__tags {
+		border-top: 1px solid #ddd;
+	}
+	.panel-body h3 {
+		margin: 8px 0;
+	}
 }
-.bSmallHead {
-	background-color: #F5F5F5;
-	border-bottom: 1px solid #CCC;
-	color: #666666;
-	font-size: 85%;
-	margin: 0;
-	padding: 1ex;
-}
-.bSmallHeadRight {
-	 float: right;
-	 text-align: right;
-	 padding-left: 1em; /* do not pad on text in .bSmallHead */
-}
-.bSmallPrint {
-	border-top: 1px solid #becdd6;
-	font-size: 85%;
-	padding: 1ex;
-	color: #929292;
-}
-.bContent {
-	padding: 1ex;
-}
-.bCommentContent, .bFeedback {
-	margin: 1ex;
+.evo_post, .evo_comment {
+	.panel-heading, .panel-body, .panel-footer {
+		padding: 1ex;
+	}
 }
 .evo_comments_container {
 	border: none;
@@ -276,16 +260,17 @@ div.bPost {
 	}
 	&.evo_comments_container__full_list {
 		border: none;
-		div.bComment {
+		.evo_comment {
 			margin-left: 0;
 			margin-right: 0;
 		}
 	}
 }
-.bFeedback {
+.evo_post__comments {
+	margin: 1ex;
 	.evo_comments_container {
 		border: none;
-		div.bComment {
+		.evo_comment {
 			margin-left: 0;
 			margin-right: 0;
 		}
@@ -301,20 +286,20 @@ div.bPost {
 		background: #F5F5F5;
 		border: none;
 	}
-	.bComment.form-horizontal {
+	.evo_form__comment.form-horizontal {
 		margin: 0;
 		padding: 1ex;
 		border: 1px solid #ddd;
 		.border-radius;
 		&.evo_form__comment_meta {
-			border: 2px solid #5133ab;
-			background-color: #f7f4ff;
+			border: 2px solid #5bc0de;
+			background-color: #d9edf7;
 		}
 		.form_info {
 			display: block;
 			text-align: center;
 			padding: 10px;
-			color: #5133ab;
+			color: #5bc0de;
 		}
 	}
 }
@@ -339,43 +324,41 @@ div.bPost {
 }
 
 .evo_comments_container {
-	div.bComment {
+	.evo_comment {
 		overflow: hidden;
 		padding: 0;
 		margin: 1ex;
-		border: 1px solid #ddd;
-		.border-radius;
 		> p {
 			margin: 0;
 		}
-		&.bCommentdraft {
+		&.evo_comment__status_draft {
 			border: 1px solid #fc3;
 			background-color: #ffb;
 		}
-		&.bCommentdeprecated {
+		&.evo_comment__status_deprecated {
 			border: 1px solid #000;
 			background-color: #eee;
 			color: #888;
 		}
-		&.bCommentmeta {
-			border: 2px solid #5133ab;
-			.bSmallHead, .CommentActionsArea {
-				background-color: #f7f4ff;
-				border-bottom: 1px solid #5133ab;
+		&.evo_comment__status_meta {
+			border: 2px solid #5bc0de;
+			.panel-heading, .panel-footer {
+				background-color: #d9edf7;
+				border-bottom: 1px solid #5bc0de;
 			}
-			.CommentActionsArea {
-				border-top: 1px solid #5133ab;
+			.panel-footer {
+				border-top: 1px solid #5bc0de;
 				border-bottom: none;
 			}
 		}
-		&.bCommenttrash {
+		&.evo_comment__status_trash {
 			border: 1px solid #f66;
 			background-color: #fcc;
-			.bSmallHead {
+			.panel-heading {
 				border-bottom: 1px solid #f66;
 				background-color: #faa;
 			}
-			.CommentActionsArea {
+			.panel-footer {
 				border-top: 1px solid #f66;
 				background-color: #faa;
 			}
@@ -388,21 +371,14 @@ div.bPost {
 #fieldset_wrapper_itemform_meta_cmnt .evo_comments_container {
 	border: none;
 	margin: 0;
-	div.bComment {
+	.evo_comment {
 		margin: 0 0 1ex 0;
 		&:not([class*=meta]) {
 			border: none;
 		}
 	}
 }
-div.PostActionsArea, div.CommentActionsArea {
-	background-color: #F5F5F5;
-	border-top: 1px solid #CCC;
-	clear: both;
-	margin: 0;
-	padding: 1ex;
-}
-.bPostAttachments {
+.evo_post__attachments {
 	margin: 1ex;
 }
 .feedback-tabs {
@@ -415,7 +391,7 @@ div.PostActionsArea, div.CommentActionsArea {
 .vote_spam {
 	float: left;
 	padding-left: 10px;
-	line-height: 33px;
+	line-height: 34px;
 	a.action_icon {
 		font-size: inherit;
 		.icon {
@@ -429,58 +405,65 @@ div.PostActionsArea, div.CommentActionsArea {
 		font-size: 12px;
 	}
 }
+.comment_reply {
+	float: left;
+	display: inline-block;
+	margin-left: 10px;
+	line-height: 34px;
+}
 // Status banner
 .evo_content_block span[class*="status_"] {
 	left: 8px;
 	top: -8px;
 }
 // The colored blocks for special post statuses
-div.bPostcommunity {
+.evo_post__status_community {
 	border: 1px solid #2E8BB9;
-	> div.bSmallHead {
+	> .panel-heading {
 		border-bottom: inherit;
 	}
-	> .PostActionsArea {
+	> .panel-footer {
 		border-top: inherit;
 	}
 }
-div.bPostprotected {
+.evo_post__status_protected {
 	border: 1px solid #fc9;
-	> div.bSmallHead {
+	> .panel-heading {
 		border-bottom: inherit;
 	}
-	> .PostActionsArea {
+	> .panel-footer {
 		border-top: inherit;
 	}
 }
-div.bPostreview {
+.evo_post__status_review {
 	border: 1px solid #CC0099;
-	> div.bSmallHead {
+	> .panel-heading {
 		border-bottom: inherit;
 	}
-	> .PostActionsArea {
+	> .panel-footer {
 		border-top: inherit;
 	}
 }
-div.bPostprivate {
+.evo_post__status_private {
 	border: 1px solid #f99;
-	> div.bSmallHead {
+	> .panel-heading {
 		border-bottom: inherit;
 	}
-	> .PostActionsArea {
+	> .panel-footer {
 		border-top: inherit;
 	}
 }
-div.bPostdraft, div.bCommentdraft {
+.evo_post__status_draft, .evo_comment__status_draft {
 	border: 1px solid #fc3;
-	> .bContent {
+	> .panel-body {
 		background-color: #ffb;
 	}
-	.bSmallHead {
+	.panel-heading {
 		border-bottom: 1px solid #fc3;
 		background-color: #ff9;
 	}
-	.CommentActionsArea, .PostActionsArea {
+	.panel-footer {
+		border-top: 1px solid #fc3;
 		background-color: #ff9;
 	}
 	span.bStatus {
@@ -492,30 +475,30 @@ div.bPostdraft, div.bCommentdraft {
 		background-color: #FFCC33;
 	}
 }
-div.bPostdeprecated, div.bCommentdeprecated {
+.evo_post__status_deprecated, .evo_comment__status_deprecated {
 	border: 1px solid #000;
-	> .bContent {
+	> .panel-body {
 		background-color: #eee;
 	}
-	> div.bSmallHead {
+	> .panel-heading {
 		border-bottom: inherit;
 		background-color: #ccc;
 	}
-	> .PostActionsArea, .CommentActionsArea {
+	> .panel-footer {
 		border-top: inherit;
 		background-color: #ccc;
 	}
 }
-div.bPostredirected {
+.evo_post__status_redirected {
 	border: 1px solid #639;
-	> .bContent {
+	> .panel-body {
 		background-color: #dcf;
 	}
-	> div.bSmallHead {
+	> .panel-heading {
 		border-bottom: inherit;
 		background-color: #c0b0e0;
 	}
-	> .PostActionsArea {
+	> .panel-footer {
 		border-top: inherit;
 		background-color: #c0b0e0;
 	}
@@ -574,9 +557,6 @@ fieldset ul {
 .browse_side_item ul.typeahead {
 	margin: 0;
 	padding: 0;
-}
-.bContent h3 {
-	margin: 8px 0;
 }
 
 // Dashboard
@@ -647,7 +627,7 @@ fieldset ul {
 }
 .dashboard_comments_block__meta {
 	.panel-body {
-		background-color: #f7f4ff;
+		background-color: #d9edf7;
 	}
 }
 // Charts on dashboard
@@ -675,14 +655,14 @@ fieldset ul {
 	}
 }
 #itemform_extra {
-	input {
+	input:not( #item_issue_date ) {
 		max-width: 80px;
 	}
 	> div.fieldset > label {
 		display: block;
 	}
 }
-#itemform_adv_props {
+#itemform_adv_props, #itemform_custom_fields {
 	div.tile, div.controls {
 		width: 100%;
 	}
@@ -698,6 +678,8 @@ fieldset ul {
 		font-weight: normal;
 		display: block;
 	}
+}
+#itemform_adv_props {
 	ul.token-input-list-facebook {
 		width: 100%;
 		max-width: 100%;
@@ -717,7 +699,7 @@ fieldset ul {
 		display: inline-block;
 	}
 }
-#itemform_links, #cmntform_links {
+#itemform_links, #cmntform_links, #ecmpform_links, #msgform_links {
 	.panel {
 		overflow: hidden;
 	}
@@ -725,19 +707,25 @@ fieldset ul {
 		padding: 0;
 	}
 }
+#msgform_links {
+	margin-bottom: 20px;
+}
 #itemform_goals td {
 	padding-bottom: 2px;
 }
 
 // Attachments / links
-#attachmentframe_wrapper {
+#attachments_fieldset_wrapper {
 	width: 100%;
 	height: 160px;
 	position: relative;
-	overflow: hidden;
 	padding-bottom: 6px;
 	box-sizing: content-box;
- .ui-resizable-s {
+	#attachments_fieldset_block {
+		overflow: auto;
+		height: 100%;
+	}
+	.ui-resizable-s {
 		background: #c0c0c0;
 		height: 6px;
 		bottom: 0;
@@ -750,12 +738,22 @@ fieldset ul {
 			display: block;
 		}
 	}
-	#attachmentframe_disabler {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
+	.table_scroll {
+		// Use this position to fix red triangle when attachment is dragged by mouse:
+		position: relative;
+	}
+	div.results, div.table_scroll {
+		overflow: initial;
+	}
+	table tbody {
+		.dragged {
+			opacity: 0.8;
+			position: absolute;
+			z-index: 1000;
+		}
+		td {
+			cursor: move;
+		}
 	}
 }
 #filelist_tbody {
@@ -914,7 +912,12 @@ tr#fileuploader_form td {
 }
 
 h2.user_title {
+	margin-top: 0;
 	margin-bottom: 18px;
+}
+
+h2.user_title::first-line {
+	line-height: 52px;
 }
 
 // phpBB importer
@@ -1051,7 +1054,7 @@ table.table {
 	tbody tr.group td {
 		background: lighten( #e8e8e8, 3%);
 		color: #848484;
-		a:not(.label) {
+		a:not(.label):not(.btn):not(.user) {
 			color: #337ab7;
 		}
 	}
@@ -1213,9 +1216,19 @@ div.level2 {
 nav.level1 {
 	z-index: 1;
 }
-div.level3 nav .nav>li>a {
-	padding: 4px 10px;
-	font-size: 92%;
+div.level3 nav .nav > li {
+	> a {
+		padding: 4px 10px;
+		font-size: 92%;
+		background-color: #f6f6f6;
+	}
+	&.active a,
+	&.active a:hover,
+	&.active a:focus {
+		background-color: #337ab7;
+	}
+	margin-right: 3px;
+	margin-bottom: 3px;
 }
 .user_header_content {
 	div.level3 {
@@ -1224,6 +1237,10 @@ div.level3 nav .nav>li>a {
 	.user_title .login {
 		margin-left: 10px;
 	}
+}
+
+div.level3 nav .nav > li + li {
+	margin-left: 0px;
 }
 
 // Footer
@@ -1306,7 +1323,7 @@ div.level3 nav .nav>li>a {
 	.border-radius;
 	padding: 5px;
 	float: left;
-	margin: 15px;
+	margin: 5px;
 	.skinshot_placeholder {
 		width: 240px;
 		height: 180px;
@@ -1324,6 +1341,14 @@ div.level3 nav .nav>li>a {
 	}
 	.legend {
 		margin: 0 1ex;
+		width: 240px;
+		height: 50px;
+		overflow: hidden;
+		label {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
 	}
 }
 .coll_settings_skinshot {
@@ -1331,12 +1356,6 @@ div.level3 nav .nav>li>a {
 		padding: 0;
 		float: none;
 		margin: -1ex -1ex 1ex -1ex;
-	}
-}
-.skin_selector_block {
-	margin: -15px 0 0 -15px;
-	.skinshot {
-		margin: 15px 0 0 15px;
 	}
 }
 .skinshot_new {
@@ -1434,8 +1453,9 @@ form#thread_checkchanges ul.token-input-list-facebook {
 	}
 }
 
-// Input field to edit order in table column by ajax
-input[name=new_cat_order] {
+// Input field to edit item/cat order in table column by ajax
+input[name=new_cat_order],
+input[name=new_item_order] {
 	width: 100%;
 }
 
@@ -1559,42 +1579,20 @@ table.diff {
 	}
 }
 
-.evo_poll__table {
-	margin-bottom: 14px;
+// Polls table:
+.evo_poll__percent_bar {
 	width: 100%;
-	td {
-		padding: 2px 10px 2px 0;
-		vertical-align: top;
-	}
-	tr td:last-child {
-		padding-right: 0;
-	}
-	input[type=radio], label {
-		margin: 0;
-	}
-	.evo_poll__percent_bar {
+	min-width: 40px;
+	padding-right: 6px;
+	> div {
 		width: 100%;
-		min-width: 40px;
-		padding-right: 6px;
+		vertical-align: middle;
+		display: inline-block;
 		> div {
-			width: 100%;
-			vertical-align: middle;
-			display: inline-block;
-			> div {
-				background: #ffcc66;
-				height: 12px;
-				min-width: 1px;
-			}
+			background: #ffcc66;
+			height: 12px;
+			min-width: 1px;
 		}
-	}
-	.evo_poll__selector {
-		width: 5px;
-	}
-	.evo_poll__title {
-		white-space: nowrap;
-	}
-	.evo_poll_percentage {
-		max-width: 50px;
 	}
 }
 
@@ -1637,4 +1635,18 @@ table.diff {
 }
 .evo_checkbox_status__meta {
 	background-color: @status_color_meta;
+}
+
+// Aggregate filter form:
+.evo_aggregate_filter {
+	white-space: nowrap;
+	label {
+		padding-top: 5px;
+		padding-right: 5px;
+		width: auto;
+	}
+	select {
+		display: inline;
+		width: auto;
+	}
 }

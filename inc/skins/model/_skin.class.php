@@ -94,6 +94,8 @@ class Skin extends DataObject
 						'and_condition' => '( cset_name = "normal_skin_ID" OR cset_name = "mobile_skin_ID" OR cset_name = "tablet_skin_ID" )' ),
 				array( 'table'=>'T_settings', 'fk'=>'set_value', 'msg'=>T_('This skin is set as default skin.'),
 						'and_condition' => '( set_name = "def_normal_skin_ID" OR set_name = "def_mobile_skin_ID" OR set_name = "def_tablet_skin_ID" )' ),
+				array( 'table'=>'T_settings', 'fk'=>'set_value', 'msg'=>T_('The site is using this skin.'),
+						'and_condition' => '( set_name = "normal_skin_ID" OR set_name = "mobile_skin_ID" OR set_name = "tablet_skin_ID" )' ),
 			);
 	}
 
@@ -132,11 +134,31 @@ class Skin extends DataObject
 
 
 	/**
-	 * Get default type for the skin.
+	 * Get default type/format for the skin.
+	 *
+	 * Possible values are normal, tablet, phone, feed, sitemap.
 	 */
 	function get_default_type()
 	{
 		return (substr($this->folder,0,1) == '_' ? 'feed' : 'normal');
+	}
+
+
+	/**
+	 * Does this skin providesnormal (collection) skin functionality?
+	 */
+	function provides_collection_skin()
+	{
+		return true;	// If the skin doesn't override this, it will be a collection skin.
+	}
+
+
+	/**
+	 * Does this skin provide site-skin functionality?
+	 */
+	function provides_site_skin()
+	{
+		return false;	// If the skin doesn't override this, it will NOT be a site skin.
 	}
 
 
@@ -162,6 +184,52 @@ class Skin extends DataObject
 
 
 	/**
+	 * Get supported collection kinds.
+	 *
+	 * This should be overloaded in skins.
+	 *
+	 * For each kind the answer could be:
+	 * - 'yes' : this skin does support that collection kind (the result will be was is expected)
+	 * - 'partial' : this skin is not a primary choice for this collection kind (but still produces an output that makes sense)
+	 * - 'maybe' : this skin has not been tested with this collection kind
+	 * - 'no' : this skin does not support that collection kind (the result would not be what is expected)
+	 * There may be more possible answers in the future...
+	 */
+	public function get_supported_coll_kinds()
+	{
+		$supported_kinds = array(
+				'main' => 'maybe',
+				'std' => 'maybe',		// Blog
+				'photo' => 'maybe',
+				'forum' => 'no',
+				'manual' => 'no',
+				'group' => 'maybe',  // Tracker
+				// Any kind that is not listed should be considered as "maybe" supported
+			);
+
+		return $supported_kinds;
+	}
+
+
+	final public function supports_coll_kind( $kind )
+	{
+		if( ! $this->provides_collection_skin() )
+		{
+			return 'no';
+		}
+
+		$supported_kinds = $this->get_supported_coll_kinds();
+
+		if( isset($supported_kinds[$kind]) )
+		{
+			return $supported_kinds[$kind];
+		}
+
+		// When the skin doesn't say... consider it a "maybe":
+		return 'maybe';
+	}
+
+	/*
 	 * What CSS framework does has this skin been designed with?
 	 *
 	 * This may impact default markup returned by Skin::get_template() for example
@@ -170,7 +238,6 @@ class Skin extends DataObject
 	{
 		return '';	// Other possibilities: 'bootstrap', 'foundation'... (maybe 'bootstrap4' later...)
 	}
-
 
 
 	/**
@@ -230,7 +297,7 @@ class Skin extends DataObject
 		 * Blog currently displayed
 		 * @var Blog
 		 */
-		global $Blog;
+		global $Collection, $Blog;
 		global $admin_url, $rsc_url;
 		global $Timer, $Session;
 
@@ -330,14 +397,14 @@ class Skin extends DataObject
 
 			if( ! is_readable( $af_main_path ) )
 			{ // Cannot open PHP file:
-				$Messages->add( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error' );
+				$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error', T_('File read error:') );
 				continue;
 			}
 
 			$file_contents = @file_get_contents( $af_main_path );
 			if( ! is_string( $file_contents ) )
 			{ // Cannot get contents:
-				$Messages->add( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error' );
+				$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error', T_('File read error:') );
 				continue;
 			}
 
@@ -374,7 +441,7 @@ class Skin extends DataObject
 
 			if( $c )
 			{
-				$Messages->add( sprintf( T_('%d containers have been found in skin template &laquo;%s&raquo;.'), $c, $rf_main_subpath ), 'success' );
+				$Messages->add_to_group( sprintf( T_('%d containers have been found in skin template &laquo;%s&raquo;.'), $c, $rf_main_subpath ), 'success', sprintf( T_('Containers found in skin "%s":'), $folder ) );
 			}
 		}
 
@@ -562,7 +629,6 @@ class Skin extends DataObject
 
 		// Display skinshot:
 		echo '<div class="'.$disp_params['skinshot_class'].'"'.( $disp_params['highlighted'] ? ' id="fadeout-'.$skin_folder : '' ).'">';
-		echo '<div class="skinshot">';
 		echo '<div class="skinshot_placeholder';
 		if( $disp_params[ 'selected' ] )
 		{
@@ -592,7 +658,7 @@ class Skin extends DataObject
 			echo '<div class="skinshot_noshot">'.T_('No skinshot available for').'</div>';
 			echo '<div class="skinshot_name">'.$select_a_begin.$skin_folder.$select_a_end.'</div>';
 		}
-		echo '</div></div>';
+		echo '</div>';
 
 		//
 		echo '<div class="legend">';
@@ -623,7 +689,7 @@ class Skin extends DataObject
 							echo '<a href="'.$skin_url.'" title="'.T_('Install NOW!').'">';
 							echo T_('Install NOW!').'</a>';
 						}
-						if( empty( $kind ) && get_param( 'tab' ) != 'current_skin' )
+						if( empty( $kind ) && get_param( 'tab' ) != 'coll_skin' && get_param( 'tab' ) != 'site_skin' )
 						{	// Don't display the checkbox on new collection creating form and when we install one skin for the selected collection:
 							$skin_name_before = '<label><input type="checkbox" name="skin_folders[]" value="'.$skin_name.'" /> ';
 							$skin_name_after = '</label>';
@@ -671,7 +737,17 @@ class Skin extends DataObject
 	 */
 	function get_param_definitions( $params )
 	{
+		global $Blog;
+
 		$r = array();
+
+		// Skin v7 definitions for kind of current collection:
+		if( $this->get_api_version() == 7 && method_exists( $this, 'get_param_definitions_'.$Blog->get( 'type' ) ) )
+		{	// If skin has declared the method for collection kind:
+			$coll_kind_param_definitions = call_user_func( array( $this, 'get_param_definitions_'.$Blog->get( 'type' ) ), $params );
+
+			$r = array_merge( $coll_kind_param_definitions, $r );
+		}
 
 		return $r;
 	}
@@ -685,15 +761,23 @@ class Skin extends DataObject
 	 */
 	function get_setting( $parname )
 	{
-		/**
-		 * @var Blog
-		 */
-		global $Blog;
+		global $Collection, $Blog, $Settings;
 
-		// Name of the setting in the blog settings:
-		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
+		// Name of the setting in the settings:
+		$setting_name = 'skin'.$this->ID.'_'.$parname;
 
-		$value = $Blog->get_setting( $blog_setting_name );
+		if( isset( $Blog ) && $this->provides_collection_skin() )
+		{	// Get skin settings of the current collection only if skin is provided for collections:
+			$value = $Blog->get_setting( $setting_name );
+		}
+		elseif( $this->provides_site_skin() )
+		{	// Get skin settings of the site only if skin is provided for site:
+			$value = $Settings->get( $setting_name );
+		}
+		else
+		{
+			$value = NULL;
+		}
 
 		if( ! is_null( $value ) )
 		{	// We have a value for this param:
@@ -766,22 +850,26 @@ class Skin extends DataObject
 
 
 	/**
-	 * Set a skin specific param value for current Blog
+	 * Set a skin specific param value for current Blog or Site
 	 *
 	 * @param string parameter name
 	 * @param mixed parameter value
 	 */
 	function set_setting( $parname, $parvalue )
 	{
-		/**
-		 * @var Blog
-		 */
-		global $Blog;
+		global $Collection, $Blog, $Settings;
 
-		// Name of the setting in the blog settings:
-		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
+		// Name of the setting in the settings:
+		$setting_name = 'skin'.$this->ID.'_'.$parname;
 
-		$Blog->set_setting( $blog_setting_name, $parvalue );
+		if( isset( $Blog ) )
+		{	// Set collection skin setting:
+			$Blog->set_setting( $setting_name, $parvalue );
+		}
+		else
+		{ // Set site skin setting:
+			$Settings->set( $setting_name, $parvalue );
+		}
 	}
 
 
@@ -790,12 +878,16 @@ class Skin extends DataObject
 	 */
 	function dbupdate_settings()
 	{
-		/**
-		 * @var Blog
-		 */
-		global $Blog;
+		global $Collection, $Blog, $Settings;
 
-		$Blog->dbupdate();
+		if( isset( $Blog ) )
+		{	// Update collection skin settings:
+			$Blog->dbupdate();
+		}
+		else
+		{	// Update site skin settings:
+			$Settings->dbupdate();
+		}
 	}
 
 
@@ -813,7 +905,7 @@ class Skin extends DataObject
 	 */
 	function display_init( /*optional: $features = array() */ )
 	{
-		global $debug, $Messages, $disp, $UserSettings;
+		global $debug, $Messages, $disp, $UserSettings, $Blog;
 
 		// We get the optional arg this way for PHP7 comaptibility:
 		@list( $features ) = func_get_args();
@@ -844,7 +936,7 @@ class Skin extends DataObject
 
 				case 'font_awesome':
 					// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
-					init_fontawesome_icons( 'fontawesome-glyphicons' );
+					init_fontawesome_icons( 'fontawesome-glyphicons', 'blog' );
 					break;
 
 				case 'bootstrap':
@@ -913,13 +1005,29 @@ class Skin extends DataObject
 					// You should make sure this is called ahead of any custom generated CSS.
 					if( $this->use_min_css == false
 						|| $debug
-						|| ( $this->use_min_css == 'check' && !file_exists(dirname(__FILE__).'/style.min.css' ) ) )
+						|| ( $this->use_min_css == 'check' && ! file_exists( $this->get_path().'style.min.css' ) ) )
 					{	// Use readable CSS:
-						require_css( 'style.css', 'relative' );	// Relative to <base> tag (current skin folder)
+						$this->require_css( 'style.css' );
 					}
 					else
 					{	// Use minified CSS:
-						require_css( 'style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
+						$this->require_css( 'style.min.css' );
+					}
+
+					if( $this->get_api_version() == 7 )
+					{	// Get skin css file from folder of collection kind:
+						$skin_css_folder = $Blog->get( 'type' ).'/';
+						if( file_exists( $this->get_path().$skin_css_folder.'style.css' ) && 
+							( $this->use_min_css == false
+							|| $debug
+							|| ( $this->use_min_css == 'check' && ! file_exists( $this->get_path().$skin_css_folder.'style.min.css' ) ) ) )
+						{	// Use readable CSS:
+							$this->require_css( $skin_css_folder.'style.css' );
+						}
+						elseif( file_exists( $this->get_path().$skin_css_folder.'style.min.css' ) )
+						{	// Use minified CSS:
+							$this->require_css( $skin_css_folder.'style.min.css' );
+						}
 					}
 					break;
 
@@ -941,13 +1049,13 @@ class Skin extends DataObject
 				case 'disp_page':
 					// Specific features for disp=page:
 
-					global $Blog, $current_User;
-
-					// Used to init functions for AJAX forms to add a comment:
-					init_ajax_forms( 'blog' );
+					global $Collection, $Blog, $current_User;
 
 					// Used to set rating for a new comment:
 					init_ratings_js( 'blog' );
+
+					// Used to vote on an item:
+					init_voting_item_js( 'blog' );
 
 					// Used to vote on the comments:
 					init_voting_comment_js( 'blog' );
@@ -1062,12 +1170,12 @@ class Skin extends DataObject
 					break;
 
 				case 'disp_login':
-					// Specific features for disp=threads:
+				case 'disp_access_requires_login':
+					// Specific features for disp=login and disp=access_requires_login:
 
 					global $Settings, $Plugins;
 
-					$transmit_hashed_password = (bool)$Settings->get( 'js_passwd_hashing' ) && !(bool)$Plugins->trigger_event_first_true( 'LoginAttemptNeedsRawPassword' );
-					if( $transmit_hashed_password )
+					if( can_use_hashed_password() )
 					{ // Include JS for client-side password hashing:
 						require_js( 'build/sha1_md5.bmin.js', 'blog' );
 					}
@@ -1151,6 +1259,13 @@ class Skin extends DataObject
 					{	// Only if user wants this:
 						require_js( 'bozo_validator.js', 'blog' );
 					}
+
+					// Require File Uploader js and css:
+					require_js( 'multiupload/fileuploader.js', 'blog' );
+					require_css( 'fileuploader.css', 'blog' );
+					// Load JS files to make the links table sortable:
+					require_js( '#jquery#' );
+					require_js( 'jquery/jquery.sortable.min.js' );
 					break;
 
 				case 'disp_edit_comment':
@@ -1209,6 +1324,27 @@ class Skin extends DataObject
 		{ // Standard skin
 			require_js( 'build/evo_frontoffice.bmin.js', 'blog' );
 		}
+
+		// Skin v7 specific initializations for kind of current collection:
+		if( $this->get_api_version() == 7 && method_exists( $this, 'display_init_'.$Blog->get( 'type' ) ) )
+		{	// If skin has declared the method for collection kind:
+			call_user_func( array( $this, 'display_init_'.$Blog->get( 'type' ) ) );
+		}
+	}
+
+
+	/**
+	 * Get ready for displaying the site skin.
+	 *
+	 * This method may register some CSS or JS.
+	 * The default implementation can register a few common things that you may request in the $features param.
+	 * This is where you'd specify you want to use BOOTSTRAP, etc.
+	 *
+	 * If this doesn't do what you need you may add functions like the following to your skin's siteskin_init():
+	 * require_js() , require_css() , add_js_headline()
+	 */
+	function siteskin_init()
+	{
 	}
 
 
@@ -1272,8 +1408,9 @@ class Skin extends DataObject
 				switch( $name )
 				{
 					case 'Results':
+					case 'compact_results':
 						// Results list (Used to view the lists of the users, messages, contacts and etc.):
-						return array(
+						$results_template = array(
 							'page_url' => '', // All generated links will refer to the current page
 							'before' => '<div class="results panel panel-default">',
 							'content_start' => '<div id="$prefix$ajax_content">',
@@ -1316,9 +1453,9 @@ class Skin extends DataObject
 									'line_start_odd' => '<tr class="odd">'."\n",
 									'line_start_last' => '<tr class="even lastline">'."\n",
 									'line_start_odd_last' => '<tr class="odd lastline">'."\n",
-										'col_start' => '<td $class_attrib$>',
-										'col_start_first' => '<td class="firstcol $class$">',
-										'col_start_last' => '<td class="lastcol $class$">',
+										'col_start' => '<td $class_attrib$ $colspan_attrib$>',
+										'col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+										'col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
 										'col_end' => "</td>\n",
 									'line_end' => "</tr>\n\n",
 									'grp_line_start' => '<tr class="group">'."\n",
@@ -1367,6 +1504,18 @@ class Skin extends DataObject
 							'after' => '</div>',
 							'sort_type' => 'basic'
 						);
+						if( $name == 'compact_results' )
+						{	// Use a little different template for compact results table:
+							$results_template = array_merge( $results_template, array(
+									'before' => '<div class="results">',
+									'head_title' => '',
+									'no_results_start' => '<div class="table_scroll">'."\n"
+																				.'<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0"><tbody>'."\n",
+									'no_results_end'   => '<tr class="lastline noresults"><td class="firstcol lastcol">$no_results$</td></tr>'
+																				.'</tbody></table></div>'."\n\n",
+								) );
+						}
+						return $results_template;
 
 					case 'blockspan_form':
 						// Form settings for filter area:
@@ -1612,6 +1761,7 @@ class Skin extends DataObject
 		switch( $name )
 		{
 			case 'Results':
+			case 'compact_results':
 				// Results list:
 				return array(
 					'page_url' => '', // All generated links will refer to the current page
@@ -1651,9 +1801,9 @@ class Skin extends DataObject
 							'line_start_odd' => '<tr class="odd">'."\n",
 							'line_start_last' => '<tr class="even lastline">'."\n",
 							'line_start_odd_last' => '<tr class="odd lastline">'."\n",
-								'col_start' => '<td $class_attrib$>',
-								'col_start_first' => '<td class="firstcol $class$">',
-								'col_start_last' => '<td class="lastcol $class$">',
+								'col_start' => '<td $class_attrib$ $colspan_attrib$>',
+								'col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+								'col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
 								'col_end' => "</td>\n",
 							'line_end' => "</tr>\n\n",
 							'grp_line_start' => '<tr class="group">'."\n",
@@ -1744,6 +1894,34 @@ class Skin extends DataObject
 		}
 
 		return array();
+	}
+
+
+	/**
+	 * Memorize that a specific css that file will be required by the current page.
+	 * @see require_css() for full documentation,
+	 * this function is used to add unique version number for each skin
+	 *
+	 * @param string Name of CSS file relative to <base> tag (current skin folder)
+	 */
+	function require_css( $css_file )
+	{
+		global $app_version_long;
+		require_css( $css_file, 'relative', NULL, NULL, $this->folder.'+'.$this->version.'+'.$app_version_long );
+	}
+
+
+	/**
+	 * Memorize that a specific javascript file will be required by the current page.
+	 * @see require_js() for full documentation,
+	 * this function is used to add unique version number for each skin
+	 *
+	 * @param string Name of JavaScript file relative to <base> tag (current skin folder)
+	 */
+	function require_js( $js_file )
+	{
+		global $app_version_long;
+		require_js( $js_file, 'relative', false, false, $this->folder.'+'.$this->version.'+'.$app_version_long );
 	}
 }
 

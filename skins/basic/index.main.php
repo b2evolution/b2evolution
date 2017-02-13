@@ -21,11 +21,6 @@ if( evo_version_compare( $app_version, '2.4.1' ) < 0 )
 // Do inits depending on current $disp:
 skin_init( $disp );
 
-require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
-
-// The following is temporary and should be moved to some SiteSkin class
-siteskin_init();
-
 // ----------------------------- HEADER BEGINS HERE ------------------------------
 ?>
 <html>
@@ -42,10 +37,14 @@ siteskin_init();
 	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
 	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
 	<?php include_headlines() ?>
+	<?php $Plugins->trigger_event( 'SkinEndHtmlHead' ); ?>
 </head>
 <body>
 <?php
 // -------------------------------- END OF HEADER --------------------------------
+$Blog->disp_setting( 'body_includes', 'raw' );
+
+$Plugins->trigger_event( 'SkinBeginHtmlBody' );
 
 
 // ---------------------------- SITE HEADER INCLUDED HERE ----------------------------
@@ -185,6 +184,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
 					// Display container contents:
 					skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+						'widget_context' => 'item',	// Signal that we are displaying within an Item
 						// The following (optional) params will be used as defaults for widgets included in this container:
 						// This will enclose each widget in a block:
 						'block_start' => '<div class="$wi_class$">',
@@ -328,6 +328,13 @@ siteskin_include( '_site_body_header.inc.php' );
 		// If site footers are enabled, they will be included here:
 		siteskin_include( '_site_body_footer.inc.php' );
 		// ------------------------------- END OF SITE FOOTER --------------------------------
+
+		modules_call_method( 'SkinEndHtmlBody' );
+
+		// SkinEndHtmlBody hook -- could be used e.g. by a google_analytics plugin to add the javascript snippet here:
+		$Plugins->trigger_event( 'SkinEndHtmlBody' );
+
+		$Blog->disp_setting( 'footer_includes', 'raw' );
 
 		$Hit->log();  // log the hit on this page
 		debug_info();	// output debug info if requested

@@ -35,17 +35,16 @@ siteskin_include( '_site_body_header.inc.php' );
 // Display a picture from skin setting as background image
 global $media_path, $media_url;
 $bg_image = $Skin->get_setting( 'front_bg_image' );
-echo '<div id="bg_picture">';
+echo '<div class="evo_pictured_layout">';
 if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 { // If it exists in media folder
-	echo '<img src="'.$media_url.$bg_image.'" />';
+	echo '<img class="evo_pictured__image" src="'.$media_url.$bg_image.'" />';
 }
-echo '</div>';
+
 ?>
 
 
 <div class="container main_page_wrapper">
-
 
 <div class="row">
 
@@ -112,8 +111,9 @@ echo '</div>';
 			echo '<div class="panel panel-default"><div class="panel-body">';
 			skin_include( '_item_block.inc.php', array(
 					'feature_block' => true,
-					'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
-					'intro_mode'   => 'normal',	// Intro posts will be displayed in normal mode
+					'content_mode'  => 'auto',		// 'auto' will auto select depending on $disp-detail
+					'intro_mode'    => 'normal',	// Intro posts will be displayed in normal mode
+					'Item'          => $Item,
 				) );
 			echo '</div></div>';
 			// ----------------------------END ITEM BLOCK  ----------------------------
@@ -204,13 +204,18 @@ echo '</div>';
 
 	</div><!-- .col -->
 
+	<!-- "Slide down" button -->
+	<div class="slide_button_wrap"><a href="#" id="slide_button"><i class="fa fa-angle-down" ></i></a></div>
+
 </div><!-- .row -->
 
 </div><!-- .container -->
 
+</div><!-- .evo_pictured_layout -->
+
 
 <!-- =================================== START OF SECONDARY AREA =================================== -->
-<section class="secondary_area"><!-- white background -->
+<section class="secondary_area" id="slide_destination"><!-- white background, ID is used to slide here from "slide_button" -->
 <div class="container">
 
 	<div class="row">
@@ -240,6 +245,17 @@ echo '</div>';
 				// Display container and contents:
 				skin_container( NT_('Footer'), array(
 						// The following params will be used as defaults for widgets included in this container:
+						'block_start'         => '<span class="evo_widget $wi_class$">',
+						'block_end'           => '</span> ',
+						'block_display_title' => false,
+						'list_start'          => '',
+						'list_end'            => '',
+						'item_start'          => '',
+						'item_end'            => '',
+						'item_selected_start' => '',
+						'item_selected_end'   => '',
+						'link_default_class'  => 'btn btn-default btn-sm',
+						'link_selected_class' => 'btn btn-default btn-sm active',
 					) );
 				// ----------------------------- END OF "Footer" CONTAINER -----------------------------
 			?>
@@ -302,11 +318,22 @@ echo '</div>';
 
 	</div><!-- .row -->
 
-
 </div><!-- .container -->
 
 </section><!-- .secondary_area -->
 
+<script>
+// Scroll Down to content
+// ======================================================================== /	
+$slide_down = $( "#slide_button" );
+// Smooth scroll to top
+$slide_down.on( "click", function(event) {
+	event.preventDefault();
+	$( "body, html, #skin_wrapper" ).animate({
+		scrollTop: $("#slide_destination").offset().top +26
+	}, 1000);
+});
+</script>
 
 <?php
 // ---------------------------- SITE FOOTER INCLUDED HERE ----------------------------

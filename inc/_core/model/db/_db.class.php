@@ -1320,7 +1320,8 @@ class DB
 
 		if( $html )
 		{ // Javascript function to toggle DIVs (EXPLAIN, results, backtraces).
-			require_js( 'debug.js', 'rsc_url', false, true );
+			$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
+			require_js( 'debug.js', $relative_to, false, true );
 		}
 
 		foreach( $this->queries as $i => $query )
@@ -1536,7 +1537,7 @@ class DB
 
 
 	/**
-	 * BEGIN A TRANSCATION
+	 * BEGIN A TRANSACTION
 	 *
 	 * Note:  By default, MySQL runs with autocommit mode enabled.
 	 * This means that as soon as you execute a statement that updates (modifies)

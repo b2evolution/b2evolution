@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $rsc_url;
+global $blog, $sec_ID, $admin_url, $rsc_url;
 global $Session;
 
 $perm_options_edit = $current_User->check_perm( 'options', 'edit', false );
@@ -77,6 +77,11 @@ $Results->Cache = & get_GoalCache();
 
 $Results->title = T_('Goals').get_manual_link( 'goal-settings' );
 
+
+// Initialize params to filter by selected collection and/or group:
+$section_params = empty( $blog ) ? '' : '&blog='.$blog;
+$section_params .= empty( $sec_ID ) ? '' : '&sec_ID='.$sec_ID;
+
 /**
  * Callback to add filters on top of the result set
  *
@@ -95,8 +100,8 @@ $Results->filter_area = array(
 	'callback' => 'filter_goals',
 	'url_ignore' => 'results_goals_page,final',
 	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=goals&amp;blog='.$blog.'&amp;final=0&amp;s=&amp;cat=0' ),
-		'final' => array( T_('Final'), '?ctrl=goals&amp;blog='.$blog.'&amp;final=1' ),
+		'all' => array( T_('All'), '?ctrl=goals'.$section_params.'&amp;final=0&amp;s=&amp;cat=0' ),
+		'final' => array( T_('Final'), '?ctrl=goals'.$section_params.'&amp;final=1' ),
 		)
 	);
 

@@ -54,7 +54,7 @@ else
 			/**
 			* @var Blog
 			*/
-			$Blog = & $BlogCache->get_by_ID( $blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 		}
 
 		/**
@@ -102,6 +102,7 @@ else
 switch( $action )
 {
 	case 'update':
+	case 'update_confirm':
 		// Update DB:
 
 		// Check that this action request is not a CSRF hacked request:
@@ -117,6 +118,26 @@ switch( $action )
 			case 'urls':
 				if( $edited_Blog->load_from_Request( array() ) )
 				{ // Commit update to the DB:
+					global $Settings;
+
+					param( 'set_as_info_blog', 'boolean' );
+					param( 'set_as_login_blog', 'boolean' );
+					param( 'set_as_msg_blog', 'boolean' );
+
+					if( $set_as_info_blog && ! $Settings->get( 'info_blog_ID' ) )
+					{
+						$Settings->set( 'info_blog_ID', $edited_Blog->ID );
+					}
+					if( $set_as_login_blog && ! $Settings->get( 'login_blog_ID' ) )
+					{
+						$Settings->set( 'login_blog_ID', $edited_Blog->ID );
+					}
+					if( $set_as_msg_blog && ! $Settings->get( 'mgs_blog_ID' ) )
+					{
+						$Settings->set( 'msg_blog_ID', $edited_Blog->ID );
+					}
+					$Settings->dbupdate();
+
 					$edited_Blog->dbupdate();
 					$Messages->add( T_('The blog settings have been updated'), 'success' );
 					// Redirect so that a reload doesn't write to the DB twice:
@@ -187,13 +208,24 @@ switch( $action )
 				}
 				break;
 
-			case 'renderers':
+			case 'plugins':
+				$plugin_group = param( 'plugin_group', 'string', NULL );
+				if( isset( $plugin_group ) )
+				{
+					$update_redirect_url .= '&plugin_group='.$plugin_group;
+				}
+
 				// Update Plugin params/Settings
 				load_funcs('plugins/_plugin.funcs.php');
 
 				$Plugins->restart();
 				while( $loop_Plugin = & $Plugins->get_next() )
 				{
+					if( $loop_Plugin->group != $plugin_group )
+					{
+						continue;
+					}
+
 					$tmp_params = array( 'for_editing' => true );
 					$pluginsettings = $loop_Plugin->get_coll_setting_definitions( $tmp_params );
 					if( empty($pluginsettings) )
@@ -372,7 +404,7 @@ if( $action == 'dashboard' )
 	if( ! $current_User->check_perm( 'blog_ismember', 'view', false, $blog ) )
 	{ // We don't have permission for the requested blog (may happen if we come to admin from a link on a different blog)
 		set_working_blog( 0 );
-		unset( $Blog );
+		unset( $Blog, $Collection );
 	}
 
 	$AdminUI->set_path( 'collections', 'dashboard' );
@@ -392,7 +424,6 @@ if( $action == 'dashboard' )
 	// Load jquery UI to animate background color on change comment status and to transfer a comment to recycle bin
 	require_js( '#jqueryUI#' );
 
-	require_js( 'communication.js' ); // auto requires jQuery
 	// Load the appropriate blog navigation styles (including calendar, comment forms...):
 	require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
 	// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
@@ -470,6 +501,7 @@ if( $action == 'dashboard' )
 
 		// Check if we have comments and posts to moderate
 		$have_comments_to_moderate = $user_perm_moderate_cmt && $CommentList->result_num_rows;
+
 		$Timer->pause( 'Panel: Comments Awaiting Moderation' );
 
 		// Posts for Moderation
@@ -485,6 +517,7 @@ if( $action == 'dashboard' )
 		}
 		$posts_awaiting_moderation_content = ob_get_contents();
 		ob_clean();
+
 		$Timer->pause( 'Panel: Posts Awaiting Moderation' );
 
 		// Check if we have posts that $blog_moderation
@@ -550,6 +583,7 @@ if( $action == 'dashboard' )
 			echo '</div>';
 		}
 		echo '</div><!-- End of Block Group 1 -->';
+
 		$Timer->stop( 'Panel: Collection Metrics' );
 		evo_flush();
 
@@ -612,6 +646,7 @@ if( $action == 'dashboard' )
 			echo '<div style="min-height: 100px;" class="hidden-xs hidden-sm hidden-md"></div>';
 			echo '</div><!-- End of Block Group 2 -->';
 		}
+
 		evo_flush();
 
 		// Block Group 3
@@ -625,8 +660,8 @@ if( $action == 'dashboard' )
 			echo '<div class="col-xs-12 col-sm-12 col-md-9 col-md-pull-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '2' : '0' ).' col-lg-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '6' : '9' ).' col-lg-pull-0 coll-dashboard-block-3">';
 		}
 
-		if( $current_User->check_perm( 'meta_comment', 'blog', false, $Blog ) )
-		{
+		if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+		{	// If user has a perm to view meta comments of the collection:
 
 			// Latest Meta Comments Block
 			$Timer->start( 'Panel: Latest Meta Comments' );
@@ -688,6 +723,7 @@ if( $action == 'dashboard' )
 		}
 
 		$Timer->start( 'Panel: Recently Edited Post' );
+
 		// Recently Edited Posts Block
 		// Create empty List:
 		$ItemList = new ItemList2( $Blog, NULL, NULL );
@@ -715,7 +751,7 @@ if( $action == 'dashboard' )
 			}
 			echo '<div class="items_container evo_content_block">';
 
-			$block_item_Widget->title = T_('Recently edited').get_manual_link( 'dashboard-recently-edited-posts' );
+			$block_item_Widget->title = T_('Recently edited posts').get_manual_link( 'dashboard-recently-edited-posts' );
 			$block_item_Widget->disp_template_replaced( 'block_start' );
 
 			while( $Item = & $ItemList->get_item() )
@@ -733,7 +769,7 @@ if( $action == 'dashboard' )
 		NEW:
 		*/
 				$Item->format_status( array(
-						'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+						'template' => '<div class="floatright"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 					) );
 
 				echo '<div class="dashboard_float_actions">';
@@ -781,7 +817,7 @@ if( $action == 'dashboard' )
 				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$item_title.'</a>';
 				echo '</h3>';
 
-				echo htmlspecialchars( $Item->get_content_excerpt( 150 ), NULL, $evo_charset );
+				echo $Item->get( 'excerpt' );
 
 				echo '</div>';
 
@@ -963,7 +999,7 @@ else
 			break;
 
 		case 'skin':
-			$AdminUI->set_path( 'collections', 'skin', 'current_skin' );
+			$AdminUI->set_path( 'collections', 'skin', 'coll_skin' );
 			$AdminUI->breadcrumbpath_add( T_('Skin'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			if( $skinpage == 'selection' )
 			{
@@ -991,11 +1027,13 @@ else
 			$AdminUI->set_page_manual_link( 'seo-settings' );
 			break;
 
-		case 'renderers':
+		case 'plugins':
 			$AdminUI->set_path( 'collections', 'settings', $tab );
 			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 			$AdminUI->breadcrumbpath_add( T_('Plugins'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			$AdminUI->set_page_manual_link( 'blog-plugin-settings' );
+			// Initialize JS for color picker field on the edit plugin settings form:
+			init_colorpicker_js();
 			break;
 
 		case 'advanced':
@@ -1011,6 +1049,8 @@ else
 			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 			$AdminUI->breadcrumbpath_add( T_('User permissions'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			$AdminUI->set_page_manual_link( 'advanced-user-permissions' );
+			// Load JavaScript to toggle checkboxes:
+			require_js( 'collectionperms.js', 'rsc_url' );
 			break;
 
 		case 'permgroup':
@@ -1019,6 +1059,8 @@ else
 			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 			$AdminUI->breadcrumbpath_add( T_('Group permissions'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			$AdminUI->set_page_manual_link( 'advanced-group-permissions' );
+			// Load JavaScript to toggle checkboxes:
+			require_js( 'collectionperms.js', 'rsc_url' );
 			break;
 	}
 
@@ -1092,7 +1134,7 @@ else
 				case 'seo':
 					$AdminUI->disp_view( 'collections/views/_coll_seo.form.php' );
 					break;
-				case 'renderers':
+				case 'plugins':
 					$AdminUI->disp_view( 'collections/views/_coll_plugin_settings.form.php' );
 					break;
 				case 'advanced':

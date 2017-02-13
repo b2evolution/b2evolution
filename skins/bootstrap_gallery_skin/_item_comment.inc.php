@@ -142,7 +142,7 @@ switch( $Comment->get( 'type' ) )
 if( $Comment->status != 'published' )
 { // display status of comment (typically an angled banner in the top right corner):
 	$Comment->format_status( array(
-			'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+			'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 		) );
 }
 

@@ -58,15 +58,18 @@ function add_basic_widget( $blog_ID, $container_name, $code, $type, $order, $par
 
 
 /**
- * Insert the widgets for the blog
+ * Insert the basic widgets for a collection
  *
  * @param integer should never be 0
  * @param boolean should be true only when it's called after initial install
+ * fp> TODO: $initial_install is used to know if we want to trust globals like $blog_photoblog_ID and $blog_forums_ID. We don't want that. 
+ *           We should pass a $context array with values like 'photo_source_coll_ID' => 4. 
+ *           Also, checking $blog_forums_ID is unnecessary complexity. We can check the colleciton kind == forum
  * @param string Kind of blog ( 'std', 'photo', 'group', 'forum' )
  */
 function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 {
-	global $DB, $test_install_all_features, $basic_widgets_insert_sql_rows;
+	global $DB, $install_test_features, $basic_widgets_insert_sql_rows;
 
 	// Initialize this array first time and clear after previous call of this function
 	$basic_widgets_insert_sql_rows = array();
@@ -112,6 +115,10 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 13, array( 'link_type' => 'recentposts', 'link_text' => T_('Latest pages') ) );
 			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 15, array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest comments') ) );
 		}
+		if( $kind == 'forum' || $kind == 'manual' )
+		{	// Add menu with flagged items:
+			add_basic_widget( $blog_id, 'Menu', 'flag_menu_link', 'core', 17, array( 'link_text' => ( $kind == 'forum' ) ? T_('Flagged topics') : T_('Flagged pages') ) );
+		}
 		if( $kind == 'photo' )
 		{ // Add menu with Photo index
 			add_basic_widget( $blog_id, 'Menu', 'menu_link', 'core', 18, array( 'link_type' => 'mediaidx', 'link_text' => T_('Index') ) );
@@ -143,10 +150,22 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		}
 	}
 
+	/* Item Single Header */
+	if( in_array( $kind, array( 'forum', 'group' ) ) )
+	{
+		add_basic_widget( $blog_id, 'Item Single Header', 'item_info_line', 'core', 10, 'a:14:{s:5:"title";s:0:"";s:9:"flag_icon";i:1;s:14:"permalink_icon";i:0;s:13:"before_author";s:10:"started_by";s:11:"date_format";s:8:"extended";s:9:"post_time";i:1;s:12:"last_touched";i:1;s:8:"category";i:0;s:9:"edit_link";i:0;s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;s:11:"time_format";s:4:"none";s:12:"display_date";s:12:"date_created";}' );
+		add_basic_widget( $blog_id, 'Item Single Header', 'item_tags', 'core', 20 );
+		add_basic_widget( $blog_id, 'Item Single Header', 'item_seen_by', 'core', 30 );
+	}
+	else
+	{
+		add_basic_widget( $blog_id, 'Item Single Header', 'item_info_line', 'core', 10 );
+	}
 
 	/* Item Single */
 	add_basic_widget( $blog_id, 'Item Single', 'item_content', 'core', 10 );
-	if( $blog_id != $blog_a_ID && $kind != 'forum' && ( empty( $events_blog_ID ) || $blog_id != $events_blog_ID ) )
+	add_basic_widget( $blog_id, 'Item Single', 'item_attachments', 'core', 15 );
+	if( $blog_id != $blog_a_ID && ( empty( $events_blog_ID ) || $blog_id != $events_blog_ID ) && ! in_array( $kind, array( 'forum', 'group' ) ) )
 	{ // Item Tags
 		add_basic_widget( $blog_id, 'Item Single', 'item_tags', 'core', 20 );
 	}
@@ -154,7 +173,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	{ // About Author
 		add_basic_widget( $blog_id, 'Item Single', 'item_about_author', 'core', 25 );
 	}
-	if( ( $blog_id == $blog_a_ID || ( ! empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && $test_install_all_features )
+	if( ( $blog_id == $blog_a_ID || ( ! empty( $events_blog_ID ) && $blog_id == $events_blog_ID ) ) && $install_test_features )
 	{ // Google Maps
 		add_basic_widget( $blog_id, 'Item Single', 'evo_Gmaps', 'plugin', 30 );
 	}
@@ -162,10 +181,14 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	{ // Small Print
 		add_basic_widget( $blog_id, 'Item Single', 'item_small_print', 'core', 40, array( 'format' => ( $blog_id == $blog_a_ID ? 'standard' : 'revision' ) ) );
 	}
-	// Seen by
-	add_basic_widget( $blog_id, 'Item Single', 'item_seen_by', 'core', 50, NULL,
-		// Disable this widget for "forum" collections by default:
-		$kind == 'forum' ? 0 : 1 );
+	if( ! in_array( $kind, array( 'forum', 'group' ) ) )
+	{ // Seen by
+		add_basic_widget( $blog_id, 'Item Single', 'item_seen_by', 'core', 50 );
+	}
+	if( $kind != 'forum' )
+	{	// Item voting panel:
+		add_basic_widget( $blog_id, 'Item Single', 'item_vote', 'core', 60 );
+	}
 
 
 	/* Sidebar Single */
@@ -176,7 +199,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 
 	/* Page Top */
-	add_basic_widget( $blog_id, 'Page Top', 'user_links', 'core', 10 );
+	add_basic_widget( $blog_id, 'Page Top', 'social_links', 'core', 10, 'a:19:{s:5:"title";s:0:"";s:5:"link1";s:2:"15";s:10:"link1_href";s:32:"https://twitter.com/b2evolution/";s:5:"link2";s:2:"16";s:10:"link2_href";s:36:"https://www.facebook.com/b2evolution";s:5:"link3";s:2:"17";s:10:"link3_href";s:42:"https://plus.google.com/+b2evolution/posts";s:5:"link4";s:2:"18";s:10:"link4_href";s:48:"https://www.linkedin.com/company/b2evolution-net";s:5:"link5";s:2:"19";s:10:"link5_href";s:42:"https://github.com/b2evolution/b2evolution";s:5:"link6";s:0:"";s:10:"link6_href";s:0:"";s:5:"link7";s:0:"";s:10:"link7_href";s:0:"";s:11:"icon_colors";a:1:{s:7:"hoverbg";s:1:"1";}s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;}' );
 
 
 	/* Sidebar */
@@ -188,7 +211,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	}
 	else
 	{
-		if( $test_install_all_features )
+		if( $install_test_features )
 		{
 			if( $kind != 'forum' && $kind != 'manual' )
 			{ // Current filters widget
@@ -242,25 +265,32 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 					) );
 			}
 		}
+		if( $kind == 'forum' )
+		{
+			add_basic_widget( $blog_id, 'Sidebar', 'user_avatars', 'core', 90, 'a:13:{s:5:"title";s:17:"Most Active Users";s:10:"thumb_size";s:14:"crop-top-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"6";s:9:"bubbletip";i:1;s:8:"order_by";s:8:"numposts";s:5:"style";s:6:"simple";s:6:"gender";s:3:"any";s:8:"location";s:3:"any";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;}' );
+		}
 		add_basic_widget( $blog_id, 'Sidebar', 'coll_xml_feeds', 'core', 100 );
 		add_basic_widget( $blog_id, 'Sidebar', 'mobile_skin_switcher', 'core', 110 );
 	}
 
 
 	/* Sidebar 2 */
-	add_basic_widget( $blog_id, 'Sidebar 2', 'coll_post_list', 'core', 1 );
-	if( $blog_id == $blog_b_ID )
+	if( $kind != 'forum' )
 	{
-		add_basic_widget( $blog_id, 'Sidebar 2', 'coll_item_list', 'core', 5, array(
-				'title'                => 'Sidebar links',
-				'order_by'             => 'RAND',
-				'item_title_link_type' => 'auto',
-				'item_type_usage'      => 'special',
-			) );
+		add_basic_widget( $blog_id, 'Sidebar 2', 'coll_post_list', 'core', 1 );
+		if( $blog_id == $blog_b_ID )
+		{
+			add_basic_widget( $blog_id, 'Sidebar 2', 'coll_item_list', 'core', 5, array(
+					'title'                => 'Sidebar links',
+					'order_by'             => 'RAND',
+					'item_title_link_type' => 'auto',
+					'item_type_usage'      => 'special',
+				) );
+		}
+		add_basic_widget( $blog_id, 'Sidebar 2', 'coll_comment_list', 'core', 10 );
+		add_basic_widget( $blog_id, 'Sidebar 2', 'coll_media_index', 'core', 15, 'a:11:{s:5:"title";s:13:"Recent photos";s:10:"thumb_size";s:10:"crop-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"3";s:5:"limit";s:1:"9";s:8:"order_by";s:9:"datestart";s:9:"order_dir";s:4:"DESC";'.$default_blog_param.'s:11:"widget_name";s:11:"Photo index";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
+		add_basic_widget( $blog_id, 'Sidebar 2', 'free_html', 'core', 20, 'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:162:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
 	}
-	add_basic_widget( $blog_id, 'Sidebar 2', 'coll_comment_list', 'core', 10 );
-	add_basic_widget( $blog_id, 'Sidebar 2', 'coll_media_index', 'core', 15, 'a:11:{s:5:"title";s:13:"Recent photos";s:10:"thumb_size";s:10:"crop-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"3";s:5:"limit";s:1:"9";s:8:"order_by";s:9:"datestart";s:9:"order_dir";s:4:"DESC";'.$default_blog_param.'s:11:"widget_name";s:11:"Photo index";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
-	add_basic_widget( $blog_id, 'Sidebar 2', 'free_html', 'core', 20, 'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:162:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
 
 
 	/* Front Page Main Area */
@@ -269,31 +299,45 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_title', 'core', 1 );
 		add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_tagline', 'core', 2 );
 	}
-	$featured_intro_params = NULL;
+
+
 	if( $kind == 'main' )
 	{ // Hide a title of the front intro post
 		$featured_intro_params = array( 'disp_title' => 0 );
 	}
+	else
+	{
+		$featured_intro_params = NULL;
+	}
 	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_featured_intro', 'core', 10, $featured_intro_params );
+
 	if( $kind == 'main' )
 	{ // Add user links widget only for main kind blogs
 		add_basic_widget( $blog_id, 'Front Page Main Area', 'user_links', 'core', 15 );
 	}
-	$post_list_params = NULL;
+
 	if( $kind == 'main' )
 	{ // Display the posts from all other blogs if it is allowed by blogs setting "Collections to aggregate"
 		$post_list_params = array(
 				'blog_ID'          => '',
 				'limit'            => 5,
-				'attached_pics'    => 'first',
-				'disp_first_image' => 'special',
+				'layout'           => 'list',
+				'thumb_size'       => 'crop-80x80',
 			);
 	}
-	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_post_list', 'core', 20, $post_list_params );
+	else
+	{
+		$post_list_params = NULL;
+	}
+	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_featured_posts', 'core', 20, $post_list_params );
+
+	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_post_list', 'core', 25, array( 'title' => T_('More Posts'), 'featured' => 'other' ) );
+
 	if( $kind != 'main' )
 	{ // Don't install the "Recent Commnets" widget for Main blogs
 		add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_comment_list', 'core', 30 );
 	}
+
 	if( $blog_id == $blog_b_ID )
 	{	// Install widget "Poll" only for Blog B on install:
 		add_basic_widget( $blog_id, 'Front Page Main Area', 'poll', 'core', 40, array( 'poll_ID' => 1 ) );
@@ -301,7 +345,17 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 
 	/* Front Page Secondary Area */
-	add_basic_widget( $blog_id, 'Front Page Secondary Area', 'org_members', 'core', 10 );
+	if( $kind == 'main' )
+	{	// Install the "Organization Members" widget only for Main collections:
+		add_basic_widget( $blog_id, 'Front Page Secondary Area', 'org_members', 'core', 10 );
+	}
+	add_basic_widget( $blog_id, 'Front Page Secondary Area', 'coll_flagged_list', 'core', 20 );
+
+
+	/* 404 Page */
+	add_basic_widget( $blog_id, '404 Page', 'page_404_not_found', 'core', 10 );
+	add_basic_widget( $blog_id, '404 Page', 'coll_search_form', 'core', 20 );
+	add_basic_widget( $blog_id, '404 Page', 'coll_tag_cloud', 'core', 30 );
 
 
 	/* Mobile Footer */

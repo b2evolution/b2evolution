@@ -21,11 +21,11 @@ global $Comment;
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var CommentList
  */
-global $CommentList, $show_statuses;
+global $CommentList;
 
 global $current_User, $admin_url, $tab3;
 
@@ -52,7 +52,7 @@ if( check_comment_mass_delete( $CommentList ) )
 
 $emptytrash_link = '';
 // Display recycle bin placeholder, because users may have rights to recycle particular comments
-$opentrash_link = '<span id="recycle_bin" class="floatright"></span>';
+$opentrash_link = '<span id="recycle_bin" class="pull-right"></span>';
 if( $tab3 != 'meta' && $current_User->check_perm( 'blogs', 'editall' ) )
 {
 	if( $CommentList->is_trashfilter() )

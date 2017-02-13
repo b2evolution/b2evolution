@@ -343,8 +343,11 @@ class DataObjectCache
 
 	/**
 	 * Add a dataobject to the cache
+	 *
+	 * @param object Object to add in cache
+	 * @return boolean TRUE on adding, FALSE on wrong object or if it is already in cache
 	 */
-	function add( & $Obj )
+	function add( $Obj )
 	{
 		global $Debuglog;
 
@@ -364,9 +367,9 @@ class DataObjectCache
 
 		// If the object is valid and not already cached:
 		// Add object to cache:
-		$this->cache[$Obj->ID] = & $Obj;
+		$this->cache[$Obj->ID] = $Obj;
 		// Add a reference in the object list:
-		$this->DataObject_array[] = & $Obj;
+		$this->DataObject_array[] = $Obj;
 		// Add the ID to the list of IDs
 		$this->ID_array[] = $Obj->ID;
 
@@ -896,6 +899,28 @@ class DataObjectCache
 		return $r;
 	}
 
+
+	/**
+	 * Returns option array for Form->cheklist()
+	 *
+	 * Load the cache if necessary
+	 *
+	 * @param string Field name
+	 * @param array IDs to ignore.
+	 * @return array Options
+	 */
+	function get_checklist_options( $field_name, $ignore_IDs = array() )
+	{
+		$options = array();
+
+		$names = $this->get_option_array( $ignore_IDs );
+		foreach( $names as $ID => $name )
+		{
+			$options[] = array( $field_name.'[]', $ID, $name, 0 );
+		}
+
+		return $options;
+	}
 
 
 	/**

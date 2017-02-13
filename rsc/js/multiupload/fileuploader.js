@@ -592,13 +592,12 @@ qq.FileUploaderBasic.prototype = {
 		return false;
 	},
 	_formatSize: function(bytes){
-		var i = -1;
-		do {
+		for( var i = 0; bytes > 1024; i++ )
+		{
 			bytes = bytes / 1024;
-			i++;
-		} while (bytes > 99);
+		}
 
-		return Math.max(bytes, 0.1).toFixed(1) + ' ' + ['KB', 'MB', 'GB', 'TB', 'PB', 'EB'][i];
+		return bytes.toFixed( Math.max( 0, ( 1 - Math.floor( Math.log( bytes ) / Math.log( 10 ) ) ) ) ) + ' ' + ['B.', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'][i];
 	}
 };
 
@@ -829,8 +828,17 @@ qq.extend(qq.FileUploader.prototype, {
 				qq.preventDefault(e);
 
 				var item = target.parentNode;
-				self._handler.cancel(item.qqFileId);
-				qq.remove(item);
+				if( typeof( item.qqFileId ) != 'undefined' )
+				{
+					self._handler.cancel(item.qqFileId);
+					qq.remove(item);
+				}
+				else
+				{
+					item = jQuery( target ).closest( 'tr' );
+					self._handler.cancel( item.attr( 'rel' ).replace( 'file_upload_', '' ) );
+					qq.remove( item.get(0) );
+				}
 			}
 		});
 	}

@@ -59,7 +59,7 @@ if( !$current_User->check_status( 'can_access_admin' ) )
 {
 	if( $current_User->check_status( 'can_be_validated' ) )
 	{ // redirect back to the login page
-		$action = 'req_validatemail';
+		$action = 'req_activate_email';
 		require $htsrv_path.'login.php';
 	}
 	else
@@ -81,14 +81,14 @@ if( isset($collections_Module) )
 	$user_selected_blog = (int)$UserSettings->get('selected_blog');
 	$BlogCache = & get_BlogCache();
 	if( param( 'blog', 'integer', NULL, true ) === NULL      // We got no explicit blog choice (not even '0' for 'no blog'):
-		|| ($blog > 0 && ! ($Blog = & $BlogCache->get_by_ID( $blog, false, false )) )) // or we requested a nonexistent blog
+		|| ( $blog > 0 && ! ( $Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false ) ) ) ) // or we requested a nonexistent blog
 	{ // Try the memorized blog from the previous action:
 		$blog = $user_selected_blog;
-		if( ! ( $Blog = & $BlogCache->get_by_ID( $blog, false, false ) ) )
+		if( ! ( $Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false ) ) )
 		{ // That one doesn't exist either...
 			$blog = 0;
 			// Unset $Blog because otherwise isset( $Blog ) returns true and it may cause issues later
-			unset( $Blog );
+			unset( $Blog, $Collection );
 		}
 	}
 	elseif( $blog != $user_selected_blog )

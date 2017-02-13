@@ -43,7 +43,7 @@ $Comment = & $params['Comment'];
 	if( $Skin->enabled_status_banner( $Comment->status ) && $Comment->ID > 0 )
 	{ // Don't display status for previewed comments
 		$Comment->format_status( array(
-				'template' => '<div class="comment_status floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+				'template' => '<div class="comment_status floatright"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 			) );
 	}
 ?>

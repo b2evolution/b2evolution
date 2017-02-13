@@ -30,7 +30,7 @@ if( $ajax_form_enabled )
 	$Form->hidden( 'login_action', array( 'login' => 'login' ) );
 }
 $Form->hidden( 'crumb_loginform', '' );
-$Form->hidden( 'pwd_salt', '' );
+$Form->hidden( 'pepper', '' );
 $Form->hidden( 'source', $source );
 $Form->hidden( 'inskin', true );
 $Form->hidden( 'redirect_to', $redirect_to );

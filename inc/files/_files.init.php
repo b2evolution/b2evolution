@@ -13,7 +13,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for files module to function properly
  */
-$required_php_version[ 'files' ] = '5.0';
+$required_php_version[ 'files' ] = '5.2';
 
 /**
  * Minimum MYSQL version required for files module to function properly
@@ -181,7 +181,7 @@ class files_Module extends Module
 	 */
 	function get_available_group_permissions()
 	{
-		global $current_User, $admin_url;
+		global $current_User, $admin_url, $Settings;
 
 		$filetypes_allowed_icon = get_icon( 'file_allowed' );
 		$filetypes_not_allowed_icon = get_icon( 'file_not_allowed' );
@@ -225,7 +225,8 @@ class files_Module extends Module
 						array( 'add', T_('Add/Upload') ),
 						array( 'edit', T_('Edit') ),
 					),
-				'perm_type' => 'radiobox',
+				// Show this perm group setting as radiobox ONLY if the shared dir is enabled by general settings:
+				'perm_type' => ( $Settings->get( 'fm_enable_roots_shared' ) ? 'radiobox' : 'hidden' ),
 				'field_lines' => false,
 				),
 			'perm_import_root' => array(
@@ -350,10 +351,15 @@ class files_Module extends Module
 							$perm = true;
 							return $perm;
 						}
+						if( $current_User->check_perm( 'blogs', $permlevel ) )
+						{	// If current user has access to view or edit all collections:
+							$perm = true;
+							return $perm;
+						}
 						$perm = $current_User->check_perm_blogusers( 'files', $permlevel, $permtarget->in_type_ID );
-						if ( ! $perm )
-						{ // Check groups for permissions for this specific blog:
-							$perm = $current_User->Group->check_perm_bloggroups( 'files', $permlevel, $permtarget->in_type_ID );
+						if( ! $perm )
+						{	// Check primary and secondary groups for permissions for this specific collection:
+							$perm = $current_User->check_perm_bloggroups( 'files', $permlevel, $permtarget->in_type_ID );
 						}
 						return $perm;
 					}
@@ -452,7 +458,7 @@ class files_Module extends Module
 		global $topleft_Menu;
 		global $current_User;
 		global $admin_url;
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $current_User->check_perm( 'admin', 'standard' ) )
 		{
@@ -502,7 +508,7 @@ class files_Module extends Module
 		 * @var User
 		 */
 		global $current_User;
-		global $Blog;
+		global $Collection, $Blog;
 		global $Settings;
 		/**
 		 * @var AdminUI_general

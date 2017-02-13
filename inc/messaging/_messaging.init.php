@@ -17,7 +17,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for messaging module to function properly
  */
-$required_php_version[ 'messaging' ] = '5.0';
+$required_php_version[ 'messaging' ] = '5.2';
 
 /**
  * Minimum MYSQL version required for messaging module to function properly
@@ -150,8 +150,8 @@ class messaging_Module extends Module
 		switch( $grp_ID )
 		{
 			case 1: // Administrators group ID equals 1
-				global $test_install_all_features;
-				$perm_messaging = $test_install_all_features ? 'abuse' : 'delete';
+				global $install_test_features;
+				$perm_messaging = ! empty( $install_test_features ) ? 'abuse' : 'delete';
 				$max_new_threads = ''; // empty = no limit
 				break;
 			case 2: // Moderators group equals 2
@@ -437,7 +437,7 @@ class messaging_Module extends Module
 	 */
 	function handle_htsrv_action()
 	{
-		global $current_User, $Blog, $Session, $Messages, $samedomain_htsrv_url;
+		global $current_User, $Collection, $Blog, $Session, $Messages;
 
 		// Init objects we want to work on.
 		$action = param_action( true, true );
@@ -479,7 +479,7 @@ class messaging_Module extends Module
 			{ // Thread doesn't exists with this ID
 				unset( $edited_Thread );
 				forget_param( 'thrd_ID' );
-				$Messages->add( T_('The requested thread does not exist any longer.'), 'error' );
+				$Messages->add( T_('The private conversation you are trying to access does not exist any longer.'), 'error' );
 				$action = 'nil';
 			}
 		}
@@ -542,7 +542,7 @@ class messaging_Module extends Module
 						}
 						else
 						{
-							$delete_url = $samedomain_htsrv_url.'action.php?mname=messaging&thrd_ID='.$edited_Thread->ID.'&action=delete&confirmed=1&redirect_to='.$redirect_to.'&'.url_crumb( 'messaging_threads' );
+							$delete_url = get_htsrv_url().'action.php?mname=messaging&thrd_ID='.$edited_Thread->ID.'&action=delete&confirmed=1&redirect_to='.rawurlencode( $redirect_to ).'&'.url_crumb( 'messaging_threads' );
 							$ok_button = '<a href="'.$delete_url.'" class="btn btn-danger">'.T_( 'I am sure!' ).'</a>';
 							$cancel_button = '<a href="'.$redirect_to.'" class="btn btn-default">CANCEL</a>';
 							$msg = sprintf( T_( 'You are about to delete all messages in the conversation &laquo;%s&raquo;.' ), $edited_Thread->dget('title') );
@@ -648,7 +648,7 @@ class messaging_Module extends Module
 						}
 						else
 						{
-							$delete_url = $samedomain_htsrv_url.'action.php?mname=messaging&disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete&confirmed=1';
+							$delete_url = get_htsrv_url().'action.php?mname=messaging&disp=messages&thrd_ID='.$thrd_ID.'&msg_ID='.$msg_ID.'&action=delete&confirmed=1';
 							if( ! empty( $Blog ) )
 							{ // Add blog ID to correctly redirect after deleting:
 								$delete_url .= '&blog='.$Blog->ID;

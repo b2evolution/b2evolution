@@ -133,7 +133,7 @@ class Hit
 	/**
 	 * The user's remote host.
 	 * Use {@link get_remote_host()} to access it (lazy filled).
-	 * @var string
+	 * @var array 0 - value from $_SERVER['REMOTE_HOST'], 1 - value from gethostbyaddr( $this->IP )
 	 * @access protected
 	 */
 	var $_remoteHost;
@@ -295,7 +295,7 @@ class Hit
 			$Debuglog->add( 'Hit: IP: '.$this->IP, 'request' );
 			$Debuglog->add( 'Hit: UserAgent: '.$this->get_user_agent(), 'request' );
 			$Debuglog->add( 'Hit: Referer: '.var_export($this->referer, true).'; type='.$this->referer_type, 'request' );
-			$Debuglog->add( 'Hit: Remote Host: '.$this->get_remote_host( false ), 'request' );
+			$Debuglog->add( 'Hit: Remote Host(NO nslookup): '.$this->get_remote_host( false ), 'request' );
 		}
 	}
 
@@ -362,7 +362,7 @@ class Hit
 	{
 		global $Debuglog, $debug;
 		global $self_referer_list, $SpecialList;  // used to detect $referer_type
-		global $skins_path, $siteskins_path;
+		global $skins_path;
 		global $Settings;
 
 		if( isset($referer) )
@@ -458,7 +458,8 @@ class Hit
 
 			if( $Settings->get('antispam_block_spam_referers') )
 			{ // In order to preserve server resources, we're going to stop processing immediatly (no logging)!!
-				require $siteskins_path.'_403_referer_spam.main.php';	// error & exit
+				siteskin_init();
+				siteskin_include( '_403_referer_spam.main.php' ); // error
 				exit(0); // just in case.
 				// THIS IS THE END!!
 			}
@@ -811,7 +812,7 @@ class Hit
 	 */
 	function record_the_hit( $delayed = false )
 	{
-		global $DB, $Session, $ReqURI, $Blog, $blog, $localtimenow, $Debuglog, $disp, $ctrl, $http_response_code;
+		global $DB, $Session, $ReqURI, $Collection, $Blog, $blog, $localtimenow, $Debuglog, $disp, $ctrl, $http_response_code;
 
 		// To log current display and controller the global variables $disp and $ctrl are used. They can be setup while calling of some controller
 		// or while forming a page. In case if these variables aren't setup, NULL is recorded to the DB.
@@ -1182,39 +1183,49 @@ class Hit
 
 
 	/**
-	 * Get the remote hostname.
+	 * Get the remote hostname
 	 *
+	 * @param boolean Allow to get domain by IP address
 	 * @return string
 	 */
-	function get_remote_host( $allow_nslookup = false )
+	function get_remote_host( $allow_nslookup_by_IP = false )
 	{
 		global $Timer;
 
 		$Timer->resume( 'Hit::get_remote_host' );
 
-		if( is_null($this->_remoteHost) )
-		{
-			if( isset( $_SERVER['REMOTE_HOST'] ) )
-			{
-				$this->_remoteHost = $_SERVER['REMOTE_HOST'];
+		if( ! isset( $this->_remoteHost ) )
+		{	// Initialize array:
+			$this->_remoteHost = array();
+		}
+
+		// 0 - $_SERVER['REMOTE_HOST']
+		// 1 - gethostbyaddr( $this->IP )
+		$host_type = intval( $allow_nslookup_by_IP );
+
+		if( ! isset( $this->_remoteHost[ $host_type ] ) )
+		{	// Initialize remote host only first time:
+			if( ! empty( $_SERVER['REMOTE_HOST'] ) )
+			{	// Use this(The reverse dns lookup is based off the REMOTE_ADDR of the user) ONLY if it is NOT empty:
+				$this->_remoteHost[ $host_type ] = $_SERVER['REMOTE_HOST'];
 			}
-			elseif( $allow_nslookup )
-			{ // We allowed reverse DNS lookup:
+			elseif( $allow_nslookup_by_IP )
+			{	// We allowed reverse DNS lookup:
 				// This can be terribly time consuming (4/5 seconds!) when there is no reverse dns available!
 				// This is the case on many intranets and many users' first time installs!!!
 				// Some people end up considering evocore is very slow just because of this line!
 				// This cannot be enabled by default.
-				$this->_remoteHost = @gethostbyaddr($this->IP);
+				$this->_remoteHost[ $host_type ] = @gethostbyaddr( $this->IP );
 			}
 			else
 			{
-				$this->_remoteHost = '';
+				$this->_remoteHost[ $host_type ] = '';
 			}
 		}
 
 		$Timer->pause( 'Hit::get_remote_host' );
 
-		return $this->_remoteHost;
+		return $this->_remoteHost[ $host_type ];
 	}
 
 
@@ -1429,7 +1440,7 @@ class Hit
 		// Parse referer
 		$pu = @parse_url($referer);
 
-		if( ! isset($pu['query']) || ! isset($pu['host']) )
+		if( ! isset( $pu['host'] ) )
 		{
 			return false;
 		}
@@ -1563,7 +1574,7 @@ class Hit
 			$key = trim(urldecode(implode(' ', $keys)));
 		}
 
-		if( empty($key) )
+		if( empty( $key ) && ! empty( $keyword_param ) )
 		{	// we haven't extracted a search key with the special cases above...
 			foreach( $keyword_param as $param )
 			{
@@ -1588,12 +1599,14 @@ class Hit
 
 		$key_param_in_query = false;
 		if( empty( $key ) && ! empty( $keyword_param ) )
-		{ // Check if empty key param exists in query, e.g. "/search?q=&other_param=text"
+		{	// Check if empty key param exists in query, e.g. "/search?q=&other_param=text"
+			// OR search engine supports urls without query param like Google:
 			foreach( $keyword_param as $k_param )
 			{
-				if( strpos( $query, '&'.$k_param.'=' ) !== false || strpos( $query, $k_param.'=' ) === 0 )
-				{ // Key param with empty value exists in query, We can decide this referer url as from search engine
+				if( $k_param === NULL || strpos( $query, '&'.$k_param.'=' ) !== false || strpos( $query, $k_param.'=' ) === 0 )
+				{	// Search engine supports urls without param OR Key param with empty value exists in query, We can decide this referer url as from search engine:
 					$key_param_in_query = true;
+					break;
 				}
 			}
 		}

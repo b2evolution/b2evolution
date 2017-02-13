@@ -37,12 +37,13 @@ $Form->begin_form( 'fform', T_('Display settings').get_manual_link('file-manager
 		$Form->checkbox( 'option_showtypes', $UserSettings->get('fm_showtypes'), T_('File type'), T_('Based on file extension') );
 		$Form->radio_input( 'option_showdate', $UserSettings->get('fm_showdate'), array(
 				array( 'value'=>'no', 'label'=>T_('No') ),
-				array( 'value'=>'compact', 'label'=>T_('Compact format') ),
+				array( 'value'=>'compact', 'label'=>T_('Smart date format') ),
 				array( 'value'=>'long', 'label'=>T_('Long format') ) ), T_('Last change') );
 		$Form->checkbox( 'option_showfsperms', $UserSettings->get('fm_showfsperms'), T_('File permissions'), T_('Unix file permissions') );
 		$Form->checkbox( 'option_permlikelsl', $UserSettings->get('fm_permlikelsl'), '', T_('Check to display file permissions like "rwxr-xr-x" rather than short form') );
 		$Form->checkbox( 'option_showfsowner', $UserSettings->get('fm_showfsowner'), T_('File Owner'), T_('Unix file owner') );
 		$Form->checkbox( 'option_showfsgroup', $UserSettings->get('fm_showfsgroup'), T_('File Group'), T_('Unix file group') );
+		$Form->checkbox( 'option_showcreator', $UserSettings->get('fm_showcreator'), T_('Added by'), T_('File creator') );
 		$Form->checkbox( 'option_showdownload', $UserSettings->get('fm_showdownload'), T_('Download Count'), T_('Number of times the file has been downloaded through disp=download') );
 	$Form->end_fieldset();
 

@@ -11,7 +11,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $app_version, $disp, $Blog;
+global $app_version, $disp, $Collection, $Blog;
 
 if( evo_version_compare( $app_version, '6.4' ) < 0 )
 { // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.
@@ -38,12 +38,12 @@ siteskin_include( '_site_body_header.inc.php' );
 // Display a picture from skin setting as background image
 global $media_path, $media_url;
 $bg_image = $Skin->get_setting( 'front_bg_image' );
-echo '<div id="bg_picture">';
+echo '<div class="evo_pictured_layout">';
 if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 { // If it exists in media folder
-	echo '<img src="'.$media_url.$bg_image.'" />';
+	echo '<img class="evo_pictured__image" src="'.$media_url.$bg_image.'" />';
 }
-echo '</div>';
+
 ?>
 
 
@@ -178,6 +178,8 @@ if( $Skin->is_visible_container( 'menu' ) )
 
 </div><!-- .container -->
 
+</div><!-- .evo_pictured_layout -->
+
 
 <!-- =================================== START OF SECONDARY AREA =================================== -->
 <section class="secondary_area"><!-- white background -->
@@ -197,6 +199,17 @@ if( $Skin->is_visible_container( 'menu' ) )
 				// Display container and contents:
 				skin_container( NT_('Footer'), array(
 						// The following params will be used as defaults for widgets included in this container:
+						'block_start'         => '<span class="evo_widget $wi_class$">',
+						'block_end'           => '</span> ',
+						'block_display_title' => false,
+						'list_start'          => '',
+						'list_end'            => '',
+						'item_start'          => '',
+						'item_end'            => '',
+						'item_selected_start' => '',
+						'item_selected_end'   => '',
+						'link_default_class'  => 'btn btn-default btn-sm',
+						'link_selected_class' => 'btn btn-default btn-sm active',
 					) );
 				// ----------------------------- END OF "Footer" CONTAINER -----------------------------
 			?>
@@ -260,10 +273,11 @@ if( $Skin->is_visible_container( 'menu' ) )
 
 	</div><!-- .row -->
 
-
 </div><!-- .container -->
 
 </section><!-- .secondary_area -->
+
+</div><!-- .evo_pictured_layout -->
 
 
 <?php

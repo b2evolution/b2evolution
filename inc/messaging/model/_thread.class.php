@@ -191,7 +191,7 @@ class Thread extends DataObject
 	{
 		global $thrd_recipients, $thrd_recipients_array;
 
-		// Resipients
+		// Recipients
 		$this->set_string_from_param( 'recipients', empty( $thrd_recipients_array ) ? true : false );
 
 		// Title

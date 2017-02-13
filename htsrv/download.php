@@ -21,6 +21,11 @@ require_once dirname(__FILE__).'/../conf/_config.php';
  */
 require_once $inc_path.'_main.inc.php';
 
+
+// Don't check new updates from b2evolution.net (@see b2evonet_get_updates()),
+// in order to don't break the response data:
+$allow_evo_stats = false;
+
 /* ------------ Insert a goal hit in DB ------------ */
 param( 'key', 'string', '' );
 if( ! empty( $key ) )
@@ -45,8 +50,10 @@ if( ! (
 	) )
 { // Bad request, Display "404 not found" page
 	load_funcs( 'skins/_skin.funcs.php' );
-	require $siteskins_path.'_404_not_found.main.php'; // error & exit
+	siteskin_init();
+	siteskin_include( '_404_not_found.main.php' ); // error
 	exit(0);
+	// EXIT.
 }
 
 apm_log_custom_param( 'FilePath', $download_File->get_full_path() );

@@ -20,7 +20,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $Settings;
 
-global $Plugins;
+global $Plugins, $antispamsrv_tos_url;
 
 
 $Form = new Form( NULL, 'antispam_checkchanges' );
@@ -40,11 +40,13 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Misc').get_manual_link('antispam-settings-misc') );
+	$Form->checkbox( 'antispam_block_contact_form', $Settings->get( 'antispam_block_contact_form' ),
+		T_('Block spam on contact form'), T_('Check to use the antispam blacklist on contact form submissions') );
 	$Form->checkbox( 'antispam_block_spam_referers', $Settings->get('antispam_block_spam_referers'),
 		T_('Block spam referers'), T_('If a referrer has been detected as spam, should we block the request with a "403 Forbidden" page?') );
 	$Form->checkbox( 'antispam_report_to_central', $Settings->get('antispam_report_to_central'),
 		T_('Report to central blacklist'), T_('When banning a keyword, offer an option to report to the central blacklist.')
-		.' [<a href="http://b2evolution.net/about/terms.html">'.T_('Terms of service').'</a>]' );
+		.' [<a href="'.$antispamsrv_tos_url.'">'.T_('Terms of service').'</a>]' );
 $Form->end_fieldset();
 
 

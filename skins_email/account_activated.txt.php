@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.txt.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $Settings, $UserSettings, $admin_url, $htsrv_url;
+global $Settings, $UserSettings, $admin_url;
 
 // Default params:
 $params = array_merge( array(
@@ -37,9 +37,40 @@ echo "\n\n";
 echo T_('Login').": ".$activated_User->login."\n";
 echo T_('Email').": ".$activated_User->email."\n";
 
-if( $activated_User->firstname != '' )
+$fullname = $activated_User->get( 'fullname' );
+if( $fullname != '' )
 {	// First name is defined
-	echo T_('First name').": ".$activated_User->firstname."\n";
+	echo T_('Full name').": ".$fullname."\n";
+}
+
+if( $activated_User->reg_ctry_ID > 0 )
+{	// Country field is defined
+	load_class( 'regional/model/_country.class.php', 'Country' );
+	$CountryCache = & get_CountryCache();
+	$reg_Country = $CountryCache->get_by_ID( $activated_User->reg_ctry_ID );
+	echo T_('Registration Country').": ".$reg_Country->get_name()."\n";
+}
+
+$user_domain = $UserSettings->get( 'user_registered_from_domain', $activated_User->ID );
+if( ! empty( $user_domain ) )
+{	// Get user domain status if domain field is defined:
+	load_funcs( 'sessions/model/_hitlog.funcs.php' );
+	$DomainCache = & get_DomainCache();
+	$Domain = & get_Domain_by_subdomain( $user_domain );
+	$dom_status_titles = stats_dom_status_titles();
+	$dom_status = $dom_status_titles[ $Domain ? $Domain->get( 'status' ) : 'unknown' ];
+	echo T_('Registration Domain').": ".$user_domain.' ('.$dom_status.')'."\n";
+}
+
+if( $activated_User->ctry_ID > 0 )
+{	// Country field is defined
+	load_class( 'regional/model/_country.class.php', 'Country' );
+	echo T_('Profile Country').": ".$activated_User->get_country_name()."\n";
+}
+
+if( !empty( $activated_User->source ) )
+{	// Source is defined
+	echo T_('Registration Source').": ".$activated_User->source."\n";
 }
 
 if( $activated_User->gender == 'M' )
@@ -57,11 +88,6 @@ if( $Settings->get( 'registration_ask_locale' ) && $activated_User->locale != ''
 	echo T_('Locale').": ".$locales[$activated_User->locale]['name']."\n";
 }
 
-if( !empty( $activated_User->source ) )
-{	// Source is defined
-	echo T_('Registration Source').": ".$activated_User->source."\n";
-}
-
 $registration_trigger_url = $UserSettings->get( 'registration_trigger_url', $activated_User->ID );
 if( !empty( $registration_trigger_url ) )
 {	// Trigger page
@@ -73,12 +99,6 @@ if( !empty( $initial_blog_ID ) )
 {	// Hit info
 	echo T_('Initial page').": ".T_('Blog')." ".$UserSettings->get( 'initial_blog_ID', $activated_User->ID )." - ".$UserSettings->get( 'initial_URI', $activated_User->ID )."\n";
 	echo T_('Initial referer').": ".$UserSettings->get( 'initial_referer', $activated_User->ID )."\n";
-}
-
-if( $activated_User->ctry_ID > 0 )
-{	// Country field is defined
-	load_class( 'regional/model/_country.class.php', 'Country' );
-	echo T_('Registration Country').": ".$activated_User->get_country_name()."\n";
 }
 
 echo "\n";
@@ -103,7 +123,7 @@ echo T_('Recent registrations').': '.$admin_url.'?ctrl=users&action=show_recent'
 
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notification when an account was activated by email, click here:' ).' '.
-		$htsrv_url.'quick_unsubscribe.php?type=account_activated&user_ID=$user_ID$&key=$unsubscribe_key$';
+		get_htsrv_url().'quick_unsubscribe.php?type=account_activated&user_ID=$user_ID$&key=$unsubscribe_key$';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.txt.php', $params );

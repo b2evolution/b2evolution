@@ -28,11 +28,7 @@ $params = array_merge( array(
 	'body_class'    => NULL,
 ), $params );
 
-// The following is temporary and should be moved to some SiteSkin class
-siteskin_init();
-
 init_bubbletip_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) ); // Add jQuery bubbletip plugin
-require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 // CSS for IE9. NOTE: Don't use php checking here because of page caching!
 add_headline( '<!--[if IE 9 ]>' );
 require_css( 'ie9.css', 'blog' );
@@ -64,18 +60,19 @@ echo $params['html_tag'];
 	<?php skin_description_tag(); ?>
 	<?php skin_keywords_tag(); ?>
 	<?php skin_opengraph_tags(); ?>
+	<?php skin_twitter_tags(); ?>
 	<?php robots_tag(); ?>
 	<?php
-	global $htsrv_url, $restapi_url;
 	$js_blog_id = "";
 	if( ! empty( $Blog ) )
 	{ // Set global js var "blog_id"
 		$js_blog_id = "\r\n		var blog_id = '".$Blog->ID."';";
 	}
 
-	add_js_headline( "// Paths used by JS functions:
-		var htsrv_url = '".get_samedomain_htsrv_url()."';
-		var restapi_url = '".$restapi_url."';"
+	add_js_headline( "// Paths and vars are used by JS functions:
+		var htsrv_url = '".get_htsrv_url()."';
+		var restapi_url = '".get_restapi_url()."';
+		var b2evo_icons_type = '".get_param( 'b2evo_icons_type' )."';"
 		.$js_blog_id );
 
 	// Meta tag with generator info (Please leave this for stats)
@@ -96,12 +93,15 @@ echo $params['html_tag'];
 		$Blog->disp( 'user_css', 'raw');
 		$Blog->disp_setting( 'head_includes', 'raw');
 	?>
+	<?php $Plugins->trigger_event( 'SkinEndHtmlHead' ); ?>
 </head>
 
 <body<?php skin_body_attrs( array( 'class' => $params['body_class'] ) ); ?>>
 
 <?php
-$Blog->disp_setting( 'body_includes', 'raw');
+$Blog->disp_setting( 'body_includes', 'raw' );
+
+$Plugins->trigger_event( 'SkinBeginHtmlBody' );
 
 // ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
 require skin_fallback_path( '_toolbar.inc.php' );

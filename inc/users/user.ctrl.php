@@ -87,6 +87,11 @@ if( ! is_null( $user_ID ) )
 				$action = 'view';
 			}
 		}
+		elseif( $user_tab == 'visits' && $Settings->get( 'enable_visit_tracking' ) != 1 )
+		{
+			$Messages->add( T_('Visit tracking is not enabled.') );
+			header_redirect( '?ctrl=users&user_tab=profile&user_ID='.$current_User->ID, 403 );
+		}
 	}
 }
 elseif( $action != 'new' )
@@ -801,6 +806,12 @@ if( $display_mode != 'js')
 			// Set an url for manual page:
 			$AdminUI->set_page_manual_link( 'user-notifications-tab' );
 			break;
+		case 'visits':
+			$AdminUI->breadcrumbpath_add( T_('Visits'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'profile-visits-tab' );
+			break;
 		case 'advanced':
 			$AdminUI->breadcrumbpath_add( T_('Advanced'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 
@@ -898,6 +909,12 @@ switch( $action )
 				// Display user subscriptions form:
 				$AdminUI->disp_payload_begin();
 				$AdminUI->disp_view( 'users/views/_user_subscriptions.form.php' );
+				$AdminUI->disp_payload_end();
+				break;
+			case 'visits':
+				// Display profile visits view
+				$AdminUI->disp_payload_begin();
+				$AdminUI->disp_view( 'users/views/_user_profile_visits.view.php' );
 				$AdminUI->disp_payload_end();
 				break;
 			case 'advanced':

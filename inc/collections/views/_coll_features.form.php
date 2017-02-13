@@ -18,8 +18,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $edited_Blog, $AdminUI;
-
+global $edited_Blog, $AdminUI, $Settings;
+$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
 $Form = new Form( NULL, 'coll_features_checkchanges' );
 
@@ -43,6 +43,21 @@ $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
 													array( 'posts', T_('posts') ),
 												), '' );
 	$Form->end_line( T_('per page') );
+
+	$Form->checkbox( 'disp_featured_above_list', $edited_Blog->get_setting( 'disp_featured_above_list' ), T_('Featured post above list'), T_('Check to display a featured post above the list (as long as no Intro post is displayed).') );
+
+	$ItemTypeCache = & get_ItemTypeCache();
+	$enabled_item_types = $edited_Blog->get_enabled_item_types( 'post' );
+	$show_post_types_options = array();
+	$show_post_types_values = explode( ',', $edited_Blog->get_setting( 'show_post_types' ) );
+	foreach( $enabled_item_types as $enabled_item_type_ID )
+	{
+		if( ( $enabled_ItemType = & $ItemTypeCache->get_by_ID( $enabled_item_type_ID, false, false ) ) )
+		{
+			$show_post_types_options[] = array( 'show_post_types[]', $enabled_item_type_ID, $enabled_ItemType->get_name(), ! in_array( $enabled_item_type_ID, $show_post_types_values ) );
+		}
+	}
+	$Form->checklist( $show_post_types_options, '', T_('Show post types') );
 
 	$Form->output = false;
 	$Form->switch_layout( 'none' );
@@ -84,7 +99,7 @@ $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_setting
 		array( array( 'no', T_( 'No' ), T_( 'Check this to view list of the posts.' ) ),
 			array( 'blog', T_( 'View home page' ), T_( 'Check this to automatically view the blog after publishing a post.' ) ),
 			array( 'post', T_( 'View new post' ), T_( 'Check this to automatically view the post page.' ) ), ),
-			T_( 'View blog after publishing' ), true );
+			T_( 'View blog after creating' ), true );
 
 	$Form->radio( 'editing_goto_blog', $edited_Blog->get_setting( 'editing_goto_blog' ),
 		array( array( 'no', T_( 'No' ), T_( 'Check this to view list of the posts.' ) ),
@@ -104,6 +119,15 @@ $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_setting
 			array( 'no_cat_post', T_('Don\'t allow category selections'), T_('(Main cat will be assigned automatically)') ) ),
 			T_('Post category options'), true );
 
+	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+	{	// Permission to edit advanced admin settings:
+		$Form->checklist( array(
+				array( 'in_skin_editing', 1, T_('Allow posting/editing from the Front-Office').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing' ) ),
+				array( 'in_skin_editing_renderers', 1, T_('Allow Text Renderers selection in Front-Office edit screen').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing_renderers' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) ),
+				array( 'in_skin_editing_category', 1, T_('Allow Category selection in Front-Office edit screen').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing_category' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) ),
+			), 'front_office_posting', T_('Front-Office posting') );
+	}
+
 	$Form->radio( 'post_navigation', $edited_Blog->get_setting('post_navigation'),
 		array( array( 'same_blog', T_('same blog') ),
 			array( 'same_category', T_('same category') ),
@@ -113,7 +137,21 @@ $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_setting
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Post moderation') . get_manual_link('post-moderation') );
+
+$Form->begin_fieldset( T_('Voting options').get_manual_link( 'item-voting-options' ), array( 'id' => 'voting_options' ) );
+
+	$voting_disabled = ! $edited_Blog->get_setting( 'voting_positive' );
+
+	$Form->checkbox( 'voting_positive', $edited_Blog->get_setting( 'voting_positive' ), T_('Allow Positive vote'), get_icon( 'thumb_up', 'imgtag', array( 'title' => T_('Allow Positive vote') ) ) );
+
+	$Form->checkbox( 'voting_neutral', $edited_Blog->get_setting( 'voting_neutral' ), T_('Allow Neutral vote'), get_icon( 'ban', 'imgtag', array( 'title' => T_('Allow Neutral vote') ) ), '', 1, $voting_disabled );
+
+	$Form->checkbox( 'voting_negative', $edited_Blog->get_setting( 'voting_negative' ), T_('Allow Negative vote'), get_icon( 'thumb_down', 'imgtag', array( 'title' => T_('Allow Negative vote') ) ), '', 1, $voting_disabled );
+
+$Form->end_fieldset();
+
+
+$Form->begin_fieldset( T_('Post moderation').get_manual_link( 'post-moderation' ) );
 
 	// Get max allowed visibility status:
 	$max_allowed_status = get_highest_publish_status( 'comment', $edited_Blog->ID, false );
@@ -172,9 +210,15 @@ $Form->begin_fieldset( T_('Post moderation') . get_manual_link('post-moderation'
 				'', // Note
 				'', // Class
 				$status_is_hidden, // Hidden field instead of checkbox?
+				array(
+					'data-toggle' => 'tooltip',
+					'data-placement' => 'top',
+					'title' => get_status_tooltip_title( $status ) )
 			);
 	}
 	$Form->checklist( $checklist_options, 'post_moderation_statuses', T_('"Require moderation" statuses'), false, false, array( 'note' => T_('Posts with the selected statuses will be considered to require moderation. They will trigger "moderation required" notifications and will appear as such on the collection dashboard.') ) );
+
+	$Form->text_input( 'old_content_alert', $edited_Blog->get_setting( 'old_content_alert' ), 2, T_('Old content alert'), T_('Posts that have not been updated within the set delay will be reported to content moderators. Leave empty if you don\'t want such alerts.'), array( 'input_suffix' => ' '.T_('months').'.' ) );
 
 $Form->end_fieldset();
 
@@ -208,6 +252,41 @@ $Form->begin_fieldset( T_('RSS/Atom feeds').get_manual_link('item-feeds-features
 	}
 $Form->end_fieldset();
 
+if( $notifications_mode != 'off' )
+{
+	$Form->begin_fieldset( T_('Subscriptions').get_manual_link( 'item-subscriptions' ) );
+		$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post.') );
+		$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
+	$Form->end_fieldset();
+}
+
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>
+<script type="text/javascript">
+jQuery( 'input[name=in_skin_editing]' ).click( function()
+{
+	if( jQuery( this ).is( ':checked' ) )
+	{
+		jQuery( 'input[name=in_skin_editing_renderers]' ).removeAttr( 'disabled' );
+		jQuery( 'input[name=in_skin_editing_category]' ).removeAttr( 'disabled' );
+	}
+	else
+	{
+		jQuery( 'input[name=in_skin_editing_renderers]' ).attr( 'disabled', 'disabled' );
+		jQuery( 'input[name=in_skin_editing_category]' ).attr( 'disabled', 'disabled' );
+	}
+} );
+
+jQuery( '#voting_positive' ).click( function()
+{
+	if( jQuery( this ).is( ':checked' ) )
+	{
+		jQuery( '#voting_neutral, #voting_negative' ).removeAttr( 'disabled' );
+	}
+	else
+	{
+		jQuery( '#voting_neutral, #voting_negative' ).attr( 'disabled', 'disabled' ).removeAttr( 'checked' );
+	}
+} );
+</script>

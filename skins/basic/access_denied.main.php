@@ -11,7 +11,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $app_version, $disp, $Blog, $Plugins, $Hit;
+global $app_version, $disp, $Collection, $Blog, $Plugins, $Hit;
 
 if( evo_version_compare( $app_version, '2.4.1' ) < 0 )
 { // Older 2.x skins work on newer 2.x b2evo versions, but newer 2.x skins may not work on older 2.x b2evo versions.
@@ -21,9 +21,6 @@ if( evo_version_compare( $app_version, '2.4.1' ) < 0 )
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
 skin_init( $disp );
-
-// The following is temporary and should be moved to some SiteSkin class
-siteskin_init();
 
 // ----------------------------- HEADER BEGINS HERE ------------------------------
 ?>
@@ -41,10 +38,14 @@ siteskin_init();
 	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
 	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
 	<?php include_headlines() ?>
+	<?php $Plugins->trigger_event( 'SkinEndHtmlHead' ); ?>
 </head>
 <body>
 <?php
 // -------------------------------- END OF HEADER --------------------------------
+$Blog->disp_setting( 'body_includes', 'raw' );
+
+$Plugins->trigger_event( 'SkinBeginHtmlBody' );
 
 
 // ---------------------------- SITE HEADER INCLUDED HERE ----------------------------
@@ -161,6 +162,13 @@ siteskin_include( '_site_body_header.inc.php' );
 		// If site footers are enabled, they will be included here:
 		siteskin_include( '_site_body_footer.inc.php' );
 		// ------------------------------- END OF SITE FOOTER --------------------------------
+
+		modules_call_method( 'SkinEndHtmlBody' );
+
+		// SkinEndHtmlBody hook -- could be used e.g. by a google_analytics plugin to add the javascript snippet here:
+		$Plugins->trigger_event( 'SkinEndHtmlBody' );
+
+		$Blog->disp_setting( 'footer_includes', 'raw' );
 
 		$Hit->log();  // log the hit on this page
 		debug_info();	// output debug info if requested

@@ -15,7 +15,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $Item;
+global $Collection, $Blog, $Item;
 
 // Default params:
 $params = array_merge( array(
@@ -73,10 +73,11 @@ if( ! empty( $chapters ) )
 						'after_image'                => '</figure>',
 						'after_images'               => '</div>',
 						'image_class'                => 'img-responsive',
-						'image_size'         	     => $Skin->get_setting( 'posts_thumb_size' ),
-						'image_link_to'      	     => 'single',
-						'image_desc'         	     => '',
-						'limit'                      => 1,
+						'image_size'                 => $Skin->get_setting( 'posts_thumb_size' ),
+						'image_link_to'              => 'single',
+						'image_desc'                 => '',
+						'gallery_image_limit'        => 0, // Don't use images from attached folders.
+						'limit'                      => 1, // Get only first attached image depending on position priority, see param below:
 						'restrict_to_image_position' => 'cover,teaser,aftermore,inline',
 						'get_rendered_attachments'   => false,
 						// Sort the attachments to get firstly "Cover", then "Teaser", and "After more" as last order
@@ -97,14 +98,14 @@ if( ! empty( $chapters ) )
 				{ // No images, but some attachments(e.g. videos) are rendered by plugins
 					$item_first_image = $Item->get_permanent_link( '<b>'.T_('Click to see contents').'</b>', '#', 'album_nopic' );
 				}
-				
+
 				// Print first image
 				echo $item_first_image;
-				
+
 				// Wrap post without image in borders
 				echo '<section class="evo_post__full panel panel-default">';
 				echo '<div class="evo_post__full_text panel-body">';
-				
+
 				// Display a title
 				echo $Item->get_title( array(
 						'before' => '<header><div class="evo_post_title"><h3>',
@@ -112,14 +113,14 @@ if( ! empty( $chapters ) )
 						) );
 				// Restore previous locale (Blog locale)
 				locale_restore_previous();
-				
+
 				// Subtitle info
 				echo '<div class="small text-muted">';
-		
+
 				if( $Item->status != 'published' )
 				{
 					$Item->format_status( array(
-							'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+							'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 						) );
 				}
 				// Permalink:
@@ -131,7 +132,7 @@ if( ! empty( $chapters ) )
 				$Item->issue_time( array(
 						'before'      => ' '.T_('posted on '),
 						'after'       => ' ',
-						'time_format' => 'M j, Y',
+						'time_format' => locale_extdatefmt(),
 					) );
 
 				// Author
@@ -143,7 +144,7 @@ if( ! empty( $chapters ) )
 
 				// Categories
 				$Item->categories( array(
-					'before'          => T_('in').' ',
+					'before'          => /* TRANS: category name(s) */ T_('in').' ',
 					'after'           => ' ',
 					'include_main'    => true,
 					'include_other'   => true,
@@ -156,7 +157,7 @@ if( ! empty( $chapters ) )
 					'before'    => ' &bull; ',
 					'after'     => '',
 				) );
-				
+
 				echo '</div></header>';
 
 				// We want excerpt here - shrinked post
@@ -169,12 +170,7 @@ if( ! empty( $chapters ) )
 				<footer>
 					<?php // FOOTER OF THE POST
 						if( ! $Item->is_intro() ) // Do NOT apply tags, comments and feedback on intro posts
-						{ // List all tags attached to this post:
-							$Item->tags( array(
-									'before'    => '<nav class="small post_tags">',
-									'after'     => '</nav>',
-									'separator' => ' ',
-								) );
+						{
 					?>
 
 					<nav>

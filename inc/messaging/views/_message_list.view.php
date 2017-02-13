@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher, $action, $current_User, $Blog, $perm_abuse_management, $Plugins, $edited_Message;
+global $dispatcher, $action, $current_User, $Collection, $Blog, $perm_abuse_management, $Plugins, $edited_Message;
 
 // in front office there is no function call, $edited_Thread is available
 if( !isset( $edited_Thread ) )
@@ -293,7 +293,7 @@ $Results->grp_cols[] = array(
  */
 $Results->cols[] = array(
 		'th' => '',
-		'td_class' => 'shrinkwrap',
+		'td_class' => '',
 		'td' => '%col_msg_author_avatar( #msg_author# )%'
 	);
 
@@ -303,7 +303,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => '',
 		'td' => '<p>%get_user_identity_link( "", #msg_user_ID#, "profile", "auto" )%</p>'
-			.'%col_msg_format_text( #msg_ID#, #msg_text# )%',
+			.'@get_content()@@get_images()@@get_files()@',
 	);
 
 /**
@@ -451,6 +451,17 @@ if( $is_recipient )
 					#message_options_block{ display:block !important; }
 					#message_options_button{ display: none; }
 				</style></noscript>';
+		}
+
+		// ####################### ATTACHMENTS/LINKS #########################
+		if( is_admin_page() && $current_User->check_perm( 'files', 'view' ) )
+		{	// If current user has a permission to view the files AND it is back-office:
+			load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
+			// Initialize this object as global because this is used in many link functions:
+			global $LinkOwner;
+			$LinkOwner = new LinkMessage( $edited_Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
+			// Display attachments fieldset:
+			display_attachments_fieldset( $Form, $LinkOwner );
 		}
 
 		$Form->end_form();

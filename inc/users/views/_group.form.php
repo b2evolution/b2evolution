@@ -24,44 +24,6 @@ global $edited_Group;
 
 global $action;
 
-// asimo> this may belong to the pluggable permissions display
-// javascript to handle shared root permissions, when file permission was changed
-?>
-<script type="text/javascript">
-	function file_perm_changed()
-	{
-		var file_perm = jQuery( '[name="edited_grp_perm_files"]:checked' ).val();
-		if( file_perm == null )
-		{ // there is file perms radio
-			return;
-		}
-
-		switch( file_perm )
-		{
-		case "none":
-			jQuery('#edited_grp_perm_shared_root_radio_2').attr('disabled', 'disabled');
-			jQuery('#edited_grp_perm_shared_root_radio_3').attr('disabled', 'disabled');
-			jQuery('#edited_grp_perm_shared_root_radio_4').attr('disabled', 'disabled');
-			break;
-		case "view":
-			jQuery('#edited_grp_perm_shared_root_radio_2').removeAttr('disabled');
-			jQuery('#edited_grp_perm_shared_root_radio_3').attr('disabled', 'disabled');
-			jQuery('#edited_grp_perm_shared_root_radio_4').attr('disabled', 'disabled');
-			break;
-		case "add":
-			jQuery('#edited_grp_perm_shared_root_radio_2').removeAttr('disabled');
-			jQuery('#edited_grp_perm_shared_root_radio_3').removeAttr('disabled');
-			jQuery('#edited_grp_perm_shared_root_radio_4').attr('disabled', 'disabled');
-			break;
-		default:
-			jQuery('#edited_grp_perm_shared_root_radio_2').removeAttr('disabled');
-			jQuery('#edited_grp_perm_shared_root_radio_3').removeAttr('disabled');
-			jQuery('#edited_grp_perm_shared_root_radio_4').removeAttr('disabled');
-		}
-	}
-</script>
-<?php
-
 /**
  * Display pluggable permissions
  *
@@ -92,6 +54,21 @@ function display_pluggable_permissions( &$Form, $perm_block )
 					{
 						case 'checkbox':
 							$Form->checkbox_input( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name] == 'allowed', $perm['label'], array( 'input_suffix' => ' '.$perm['note'], 'value' => 'allowed' ) );
+							break;
+
+						case 'checklist':
+							$checklist_values = explode( ',', $GroupSettings->permission_values[$perm_name] );
+							if( ! empty( $checklist_values ) )
+							{	// If at least one option is selected:
+								foreach( $perm['options'] as $o => $checklist_option )
+								{
+									if( in_array( $checklist_option[1], $checklist_values ) )
+									{	// This option is selected for the group:
+										$perm['options'][ $o ][3] = 1;
+									}
+								}
+							}
+							$Form->checklist( $perm['options'], 'edited_grp_'.$perm_name, $perm['label'], false, false, array( 'note' => $perm['note'] ) );
 						break;
 
 						case 'radiobox':
@@ -104,15 +81,23 @@ function display_pluggable_permissions( &$Form, $perm_block )
 								$perm['field_note'] = '';
 							}
 							$Form->radio( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name], $perm['options'], $perm['label'], $perm['field_lines'], $perm['field_note'] );
-						break;
+							break;
 
 						case 'info':
 							$Form->info( $perm['label'], $perm['info'] );
-						break;
+							break;
 
 						case 'text_input':
 							$Form->text_input( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name], 5, $perm['label'], $perm['note'], array( 'maxlength' => $perm['maxlength'] ) );
-						break;
+							break;
+
+						case 'select_object':
+							$Form->select_input_object( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name], $perm['object_cache'], $perm['label'] );
+							break;
+
+						case 'hidden':
+							$Form->hidden( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name] );
+							break;
 					}
 				}
 			}
@@ -154,14 +139,12 @@ $Form->begin_fieldset( T_('General').get_manual_link('group_properties_general')
 	$Form->radio( 'edited_grp_usage', $edited_Group->get( 'usage' ), array(
 			array(
 					'primary',
-					// TRANS: Type: Primary Group, Secondary Group
-					sprintf( T_('%s Group'), get_admin_badge( 'group', '#', '#', '#', 'primary' ) ),
+					sprintf( T_('<span %s>Primary</span> Group'), 'class="label label-primary"' ),
 					T_('General use case')
 				),
 			array(
 					'secondary',
-					// TRANS: Type: Primary Group, Secondary Group
-					sprintf( T_('%s Group'), get_admin_badge( 'group', '#', '#', '#', 'secondary' ) ),
+					sprintf( T_('<span %s>Secondary</span> Group'), 'class="label label-info"' ),
 					T_('Use if you need multiple groups per users')
 				)
 		), T_('Group usage'), true );
@@ -182,10 +165,10 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Blogging permissions').get_manual_link('group_properties_blogging'), array( 'id' => 'blogging', 'style' => $primary_panels_style ) );
 
 	$Form->radio( 'edited_grp_perm_blogs', $edited_Group->get('perm_blogs'),
-			array(  array( 'user', T_('Depending on each blog\'s permissions') ),
-							array( 'viewall', T_('View all blogs') ),
-							array( 'editall', T_('Full Access').get_admin_badge( 'coll', '#', '#', T_('Select to give Collection Admin permission') ) )
-						), T_('Collections'), false );
+			array(  array( 'user', T_('Users can only see Collections they have access to and the Sections these collections belong to + all Collections in the Sections they own.') ),
+							array( 'viewall', T_('View all: User can see all Sections and call Collections (with no additional edit permissions as above)') ),
+							array( 'editall', sprintf( T_('Full Access %s: Users can edit all Sections and Collections, create and delete Collections in any Section, create new Sections and delete empty Sections.'), get_admin_badge( 'coll', '#', T_('Site Admin'), T_('Select to give Collection Admin permission') ) ) )
+						), T_('Collections & Site Sections'), true );
 
 	$Form->radio( 'perm_xhtmlvalidation', $edited_Group->get('perm_xhtmlvalidation'),
 			array(  array( 'always', T_('Force valid XHTML + strong security'),
@@ -227,7 +210,7 @@ $Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_prope
 							array( 'user', T_('View stats for specific blogs'), T_('Based on each blog\'s edit permissions') ), // fp> dirty hack, I'll tie this to blog edit perm for now
 							array( 'view', T_('View stats for all blogs') ),
 							array( 'edit', T_('Full Access'), T_('Includes deleting/reassigning of stats') )
-						), T_('Stats'), true );
+						), T_('Analytics'), true );
 
 	// Display pluggable permissions:
 	display_pluggable_permissions( $Form, 'additional' );
@@ -266,10 +249,48 @@ $Form->end_form();
 // set shared root permission availability, when form was loaded and when file perms was changed
 ?>
 <script type="text/javascript">
+<?php
+if( $Settings->get('fm_enable_roots_shared') )
+{	// asimo> this may belong to the pluggable permissions display
+	// javascript to handle shared root permissions, when file permission was changed:
+?>
+function file_perm_changed()
+{
+	var file_perm = jQuery( '[name="edited_grp_perm_files"]:checked' ).val();
+	if( file_perm == null )
+	{ // there is file perms radio
+		return;
+	}
+
+	switch( file_perm )
+	{
+	case "none":
+		jQuery('#edited_grp_perm_shared_root_radio_2').attr('disabled', 'disabled');
+		jQuery('#edited_grp_perm_shared_root_radio_3').attr('disabled', 'disabled');
+		jQuery('#edited_grp_perm_shared_root_radio_4').attr('disabled', 'disabled');
+		break;
+	case "view":
+		jQuery('#edited_grp_perm_shared_root_radio_2').removeAttr('disabled');
+		jQuery('#edited_grp_perm_shared_root_radio_3').attr('disabled', 'disabled');
+		jQuery('#edited_grp_perm_shared_root_radio_4').attr('disabled', 'disabled');
+		break;
+	case "add":
+		jQuery('#edited_grp_perm_shared_root_radio_2').removeAttr('disabled');
+		jQuery('#edited_grp_perm_shared_root_radio_3').removeAttr('disabled');
+		jQuery('#edited_grp_perm_shared_root_radio_4').attr('disabled', 'disabled');
+		break;
+	default:
+		jQuery('#edited_grp_perm_shared_root_radio_2').removeAttr('disabled');
+		jQuery('#edited_grp_perm_shared_root_radio_3').removeAttr('disabled');
+		jQuery('#edited_grp_perm_shared_root_radio_4').removeAttr('disabled');
+	}
+}
+
 file_perm_changed();
 jQuery( '[name="edited_grp_perm_files"]' ).click( function() {
 	file_perm_changed();
 } );
+<?php } ?>
 
 jQuery( 'input[name=edited_grp_perm_options]' ).click( function()
 {	// Show/Hide the children permissions of the Settings permission
@@ -297,4 +318,21 @@ jQuery( 'input[name=edited_grp_usage]' ).click( function()
 		jQuery( 'fieldset', primary_field_ids ).hide();
 	}
 } );
+
+function set_activity_default_section()
+{
+	if( jQuery( 'input[name=edited_grp_perm_createblog], input[name=edited_grp_perm_getblog]' ).is( ':checked' ) )
+	{	// Enable if at least one checkbox is checked:
+		jQuery( 'select[name=edited_grp_perm_default_sec_ID]' ).removeAttr( 'disabled' );
+	}
+	else
+	{	// Disable otherwise:
+		jQuery( 'select[name=edited_grp_perm_default_sec_ID]' ).attr( 'disabled', 'disabled' );
+	}
+}
+jQuery( 'input[name=edited_grp_perm_createblog], input[name=edited_grp_perm_getblog]' ).click( function()
+{	// Enable/Disable setting "Default Section" depending on checkboxes of "Creating new blogs":
+	set_activity_default_section();
+} );
+set_activity_default_section();
 </script>

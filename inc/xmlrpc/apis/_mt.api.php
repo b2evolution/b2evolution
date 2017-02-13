@@ -95,7 +95,7 @@ function mt_setPostCategories($m)
 	}
 
 	// Check if category exists and can be used:
-	$Blog = & $edited_Item->get_Blog();
+	$Collection = $Blog = & $edited_Item->get_Blog();
 	if( ! xmlrpcs_check_cats( $category, $Blog, $categories ) )
 	{	// Error:
 		return xmlrpcs_resperror();

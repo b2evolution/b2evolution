@@ -26,7 +26,7 @@ function hits_results( & $Results, $params = array() )
 			'default_order' => '--D'
 		), $params );
 
-	global $blog, $Session, $sess_ID;
+	global $blog, $sec_ID, $Session, $sess_ID;
 	global $preset_results_title, $preset_referer_type, $preset_filter_all_url;
 	global $hide_columns, $admin_url;
 
@@ -37,13 +37,17 @@ function hits_results( & $Results, $params = array() )
 	$param_prefix = 'results_'.$Results->param_prefix;
 	$tab = get_param( 'tab' );
 
+	// Initialize params to filter by selected collection and/or group:
+	$section_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
+	$section_params .= empty( $sec_ID ) ? '' : '&amp;sec_ID='.$sec_ID;
+
 	$filter_presets = array();
-	$filter_presets['all'] = array( T_('All'), isset( $preset_filter_all_url ) ? $preset_filter_all_url : $admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;blog='.$blog.'&amp;'.$param_prefix.'order='.$params['default_order'] );
+	$filter_presets['all'] = array( T_('All'), isset( $preset_filter_all_url ) ? $preset_filter_all_url : $admin_url.'?ctrl=stats&amp;tab='.$tab.$section_params.'&amp;'.$param_prefix.'order='.$params['default_order'] );
 	if( !isset( $preset_referer_type ) )
 	{	// Show these presets only when referer type is not set
-		$filter_presets['all_but_curr'] = array( T_('All but current session'), $admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;blog='.$blog.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1&amp;'.$param_prefix.'order='.$params['default_order'] );
-		$filter_presets['direct_hits'] = array( T_('Direct hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.'&amp;blog='.$blog.'&amp;referer_type=direct&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
-		$filter_presets['refered_hits'] = array( T_('Refered hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.'&amp;blog='.$blog.'&amp;referer_type=referer&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
+		$filter_presets['all_but_curr'] = array( T_('All but current session'), $admin_url.'?ctrl=stats&amp;tab='.$tab.$section_params.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1&amp;'.$param_prefix.'order='.$params['default_order'] );
+		$filter_presets['direct_hits'] = array( T_('Direct hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.$section_params.'&amp;referer_type=direct&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
+		$filter_presets['refered_hits'] = array( T_('Refered hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.$section_params.'&amp;referer_type=referer&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
 	}
 
 	$Results->filter_area = array(
@@ -80,7 +84,7 @@ function hits_results( & $Results, $params = array() )
 			'order' => 'hit_ID',
 			'default_dir' => 'D',
 			'td_class' => 'timestamp compact_data',
-			'td' => '%mysql2localedatetime_spans( #hit_datetime#, "M-d" )%',
+			'td' => '%mysql2localedatetime_spans( #hit_datetime# )%',
 		);
 
 	$Results->cols[] = array(
@@ -221,7 +225,7 @@ function filter_hits( & $Form )
 
 	$Form->date_input( 'datestartinput', $datestart, T_( 'From date' ) );
 	$Form->date_input( 'datestopinput', $datestop, T_( 'To date' ) );
-	
+
 	if( !isset( $preset_agent_type ) )
 	{
 		$Form->select_input_array( 'agent_type', get_param( 'agent_type' ), $agent_type_array, T_( 'Agent type' ), '', array( 'force_keys_as_values' => true, 'background_color' => $agent_type_color ) );

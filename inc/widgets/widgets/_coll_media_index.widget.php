@@ -43,7 +43,7 @@ class coll_media_index_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		load_funcs( 'files/model/_image.funcs.php' );
 
@@ -92,29 +92,36 @@ class coll_media_index_Widget extends ComponentWidget
 				'note' => T_('How to lay out the thumbnails'),
 				'type' => 'select',
 				'options' => array(
-						'grid' => T_('Grid'),
+						'rwd'  => T_('RWD Blocks'),
+						'flow' => T_('Flowing Blocks'),
 						'list' => T_('List'),
-						'flow' => T_('Flowing Blocks')
+						'grid' => T_('Table'),
 					),
 				'defaultvalue' => 'flow',
 			),
-			'disp_image_title' => array(
-				'label' => T_( 'Display image title' ),
-				'note' => T_( 'Check this to display image title. This falls back to post title if image title is not set.' ),
-				'type' => 'checkbox',
-				'defaultvalue' => false,
-			),
-			'grid_nb_cols' => array(
-				'label' => T_( 'Columns' ),
-				'note' => T_( 'Number of columns in grid mode.' ),
-				'size' => 4,
-				'defaultvalue' => 2,
+			'rwd_block_class' => array(
+				'label' => T_('RWD block class'),
+				'note' => T_('Specify the responsive column classes you want to use.'),
+				'size' => 60,
+				'defaultvalue' => 'col-lg-3 col-md-4 col-sm-6 col-xs-12',
 			),
 			'limit' => array(
 				'label' => T_( 'Max items' ),
 				'note' => T_( 'Maximum number of items to display.' ),
 				'size' => 4,
 				'defaultvalue' => 3,
+			),
+			'grid_nb_cols' => array(
+				'label' => T_( 'Columns' ),
+				'note' => T_( 'Number of columns in Table mode.' ),
+				'size' => 4,
+				'defaultvalue' => 2,
+			),
+			'disp_image_title' => array(
+				'label' => T_( 'Display image title' ),
+				'note' => T_( 'Check this to display image title. This falls back to post title if image title is not set.' ),
+				'type' => 'checkbox',
+				'defaultvalue' => false,
 			),
 			'order_by' => array(
 				'label' => T_('Order by'),
@@ -205,7 +212,7 @@ class coll_media_index_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $localtimenow, $DB, $Blog;
+		global $localtimenow, $DB, $Collection, $Blog;
 
 		$this->init_display( $params );
 
@@ -234,7 +241,7 @@ class coll_media_index_Widget extends ComponentWidget
 		// Note: We use ItemQuery to get attachments from all posts which should be visible ( even in case of aggregate blogs )
 		$ItemQuery = new ItemQuery( $ItemCache->dbtablename, $ItemCache->dbprefix, $ItemCache->dbIDname );
 		$ItemQuery->SELECT( 'post_ID, post_datestart, post_datemodified, post_main_cat_ID, post_urltitle, post_canonical_slug_ID,
-									post_tiny_slug_ID, post_ityp_ID, post_title, post_excerpt, post_url, file_ID, file_type,
+									post_tiny_slug_ID, post_ityp_ID, post_title, post_excerpt, post_url, file_ID, file_creator_user_ID, file_type,
 									file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash' );
 		$ItemQuery->FROM_add( 'INNER JOIN T_links ON post_ID = link_itm_ID' );
 		$ItemQuery->FROM_add( 'INNER JOIN T_files ON link_file_ID = file_ID' );
@@ -272,7 +279,6 @@ class coll_media_index_Widget extends ComponentWidget
 
 		$layout = $this->disp_params['thumb_layout'];
 
-		$nb_cols = $this->disp_params['grid_nb_cols'];
 		$count = 0;
 		$r = '';
 		/**
@@ -292,22 +298,7 @@ class coll_media_index_Widget extends ComponentWidget
 				continue;
 			}
 
-			if( $layout == 'grid' )
-			{ // Grid layout
-				if( $count % $nb_cols == 0 )
-				{
-					$r .= $this->disp_params['grid_colstart'];
-				}
-				$r .= $this->disp_params['grid_cellstart'];
-			}
-			elseif( $layout == 'flow' )
-			{ // Flow block layout
-				$r .= $this->disp_params['flow_block_start'];
-			}
-			else
-			{ // List layout
-				$r .= $this->disp_params['item_start'];
-			}
+			$r .= $this->get_layout_item_start( $count );
 
 			// 1/ Hack a dirty permalink( will redirect to canonical):
 			// $link = url_add_param( $Blog->get('url'), 'p='.$post_ID );
@@ -333,22 +324,7 @@ class coll_media_index_Widget extends ComponentWidget
 
 			++$count;
 
-			if( $layout == 'grid' )
-			{ // Grid layout
-				$r .= $this->disp_params['grid_cellend'];
-				if( $count % $nb_cols == 0 )
-				{
-					$r .= $this->disp_params['grid_colend'];
-				}
-			}
-			elseif( $layout == 'flow' )
-			{ // Flow block layout
-				$r .= $this->disp_params['flow_block_end'];
-			}
-			else
-			{ // List layout
-				$r .= $this->disp_params['item_end'];
-			}
+			$r .= $this->get_layout_item_end( $count );
 		}
 
 		// Exit if no files found
@@ -361,38 +337,11 @@ class coll_media_index_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		if( $layout == 'grid' )
-		{ // Grid layout
-			echo $this->disp_params['grid_start'];
-		}
-		elseif( $layout == 'flow' )
-		{ // Flow block layout
-			echo $this->disp_params['flow_start'];
-		}
-		else
-		{ // List layout
-			echo $this->disp_params['list_start'];
-		}
+		echo $this->get_layout_start();
 
 		echo $r;
 
-		if( $layout == 'grid' )
-		{ // Grid layout
-			if( $count && ( $count % $nb_cols != 0 ) )
-			{
-				echo $this->disp_params['grid_colend'];
-			}
-
-			echo $this->disp_params['grid_end'];
-		}
-		elseif( $layout == 'flow' )
-		{ // Flow block layout
-			echo $this->disp_params['flow_end'];
-		}
-		else
-		{ // List layout
-			echo $this->disp_params['list_end'];
-		}
+		echo $this->get_layout_end( $count );
 
 		echo $this->disp_params['block_body_end'];
 
@@ -409,7 +358,7 @@ class coll_media_index_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$blog_ID = intval( $this->disp_params['blog_ID'] );
 		if( empty( $blog_ID ) )

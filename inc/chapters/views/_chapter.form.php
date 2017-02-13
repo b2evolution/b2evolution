@@ -28,7 +28,7 @@ global $Settings, $action, $subset_ID;
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
 
-$Form = new Form( NULL, 'form' );
+$Form = new Form( NULL, 'form_checkchanges' );
 
 $close_url = get_chapter_redirect_url( get_param( 'redirect_page' ), $edited_Chapter->parent_ID, $edited_Chapter->ID );
 $Form->global_icon( T_('Cancel editing!'), 'close', $close_url );
@@ -57,6 +57,9 @@ $Form->begin_fieldset( T_('Properties').get_manual_link( 'categories-tab' ) );
 
 	$Form->text_input( 'cat_urlname', $edited_Chapter->urlname, 40, T_('URL "slug"'), T_('Used for clean URLs. Must be unique.'), array( 'maxlength' => 255 ) );
 
+	$field_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select category image'), 'size_name' => 'fit-320x320' );
+	$Form->fileselect( 'cat_image_file_ID', $edited_Chapter->get( 'image_file_ID' ), T_('Category image'), NULL, $field_params );
+
 	$Form->text_input( 'cat_description', $edited_Chapter->description, 40, T_('Description'), T_('May be used as a title tag and/or meta description.'), array( 'maxlength' => 255 ) );
 
 	$parent_cat_order = $edited_Chapter->get_parent_subcat_ordering();
@@ -74,6 +77,7 @@ $Form->begin_fieldset( T_('Properties').get_manual_link( 'categories-tab' ) );
 	$Form->checkbox_input( 'cat_meta', $edited_Chapter->meta, T_('Meta category'), array( 'note' => T_('If you check this box you will not be able to put any posts into this category.') ) );
 
 	$Form->checkbox_input( 'cat_lock', $edited_Chapter->lock, T_('Locked category'), array( 'note' => T_('Check this to lock all posts under this category. (Note: for posts with multiple categories, the post is only locked if *all* its categories are locked.)') ) );
+
 
 $Form->end_fieldset();
 

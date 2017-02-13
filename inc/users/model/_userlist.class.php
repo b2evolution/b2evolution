@@ -345,20 +345,20 @@ class UserList extends DataObjectList2
 		$gender_other = param( 'gender_other', 'boolean', strpos( $this->default_filters['gender'], 'O' ), true );
 		if( $gender_men || $gender_women || $gender_other )
 		{
-			if( $gender_men ) 
+			if( $gender_men )
 			{
 				$this->filters['gender'] = 'M';
 			}
-			if( $gender_women ) 
+			if( $gender_women )
 			{
 				$this->filters['gender'] .= 'F';
 			}
-			if( $gender_other ) 
+			if( $gender_other )
 			{
 				$this->filters['gender'] .= 'O';
 			}
 		}
-		
+
 		/*
 		 * Restrict by status
 		 */
@@ -527,6 +527,10 @@ class UserList extends DataObjectList2
 			$org_ID = isset( $this->query_params['where_org_ID'] ) ? $this->query_params['where_org_ID'] : $this->filters['org'];
 			$this->UserQuery->where_organization( $org_ID );
 		}
+		if( isset( $this->query_params['where_viewed_user'] ) )
+		{ // Filter by user profile viewed
+			$this->UserQuery->where_viewed_user( $this->query_params['where_viewed_user'] );
+		}
 		if( ! is_logged_in() )
 		{ // Restrict users by group level for anonymous users
 			global $Settings;
@@ -546,10 +550,10 @@ class UserList extends DataObjectList2
 
 	/**
 	 * Run Query: GET DATA ROWS *** HEAVY ***
-	 * 
+	 *
 	 * We need this query() stub in order to call it from restart() and still
 	 * let derivative classes override it
-	 * 
+	 *
 	 * @deprecated Use new function run_query()
 	 */
 	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
@@ -583,6 +587,7 @@ class UserList extends DataObjectList2
 		// *** STEP 1 ***
 		$user_IDs = isset( $this->filters['users'] ) ? $this->filters['users'] : array();
 		if( $this->refresh_query || // Some filters are changed
+			$this->page == 1 || // Always run query on the first page
 		    $localtimenow - $Session->get( $this->filterset_name.'_refresh_time' ) > 7200 ) // Time has passed ( 2 hours )
 		{	// We should create new list of user IDs
 			global $Timer;
@@ -597,6 +602,10 @@ class UserList extends DataObjectList2
 			if( !empty( $this->filters['reported'] ) && $this->filters['reported'] )
 			{	// Filter is set to 'Reported users'
 				$step1_SQL->SELECT_add( ', COUNT( DISTINCT urep_reporter_ID ) AS user_rep' );
+			}
+			if( ! empty( $this->query_params['join_sec_groups'] ) )
+			{	// Initialize count of secondary groups (used on order by this field):
+				$step1_SQL->SELECT_add( ', COUNT( DISTINCT sug_count.sug_grp_ID ) AS secondary_groups_count' );
 			}
 			$step1_SQL->FROM( $this->UserQuery->get_from( '' ) );
 			$step1_SQL->WHERE( $this->UserQuery->get_where( '' ) );
@@ -763,7 +772,7 @@ class UserList extends DataObjectList2
 		$user_key = array_search( $user_ID, $users_list );
 		if( is_int( $user_key ) )
 		{	// Selected user is located in this list
-			global $Blog;
+			global $Collection, $Blog;
 			++$user_key;
 			$page = ceil( $user_key / $this->limit );
 			$page_param = '';
@@ -868,8 +877,12 @@ class UserList extends DataObjectList2
 			$this->filters = array_merge( $this->default_filters, $this->filters );
 		}
 		else
-		{ // Reset the filters
-			$this->filters = array();
+		{	// Reset the filters:
+			$this->filters = $this->default_filters;
+			// We want to reset the memorized filterset:
+			$Session->delete( $this->filterset_name );
+			// Memorize global variables:
+			$this->set_filters( array() );
 		}
 
 		// Rewrite a previous order to new value

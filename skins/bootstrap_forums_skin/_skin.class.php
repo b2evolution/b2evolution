@@ -18,6 +18,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class bootstrap_forums_Skin extends Skin
 {
 	/**
+	 * Skin version
+	 * @var string
+	 */
+	var $version = '6.9.0';
+
+	/**
 	 * Do we want to use style.min.css instead of style.css ?
 	 */
 	var $use_min_css = true;  // true|false|'check' Set this to true for better optimization
@@ -54,6 +60,34 @@ class bootstrap_forums_Skin extends Skin
 
 
 	/**
+	 * Get supported collection kinds.
+	 *
+	 * This should be overloaded in skins.
+	 *
+	 * For each kind the answer could be:
+	 * - 'yes' : this skin does support that collection kind (the result will be was is expected)
+	 * - 'partial' : this skin is not a primary choice for this collection kind (but still produces an output that makes sense)
+	 * - 'maybe' : this skin has not been tested with this collection kind
+	 * - 'no' : this skin does not support that collection kind (the result would not be what is expected)
+	 * There may be more possible answers in the future...
+	 */
+	public function get_supported_coll_kinds()
+	{
+		$supported_kinds = array(
+				'main' => 'maybe',
+				'std' => 'no',		// Blog
+				'photo' => 'no',
+				'forum' => 'yes',
+				'manual' => 'no',
+				'group' => 'partial',  // Tracker
+				// Any kind that is not listed should be considered as "maybe" supported
+			);
+
+		return $supported_kinds;
+	}
+
+
+	/*
 	 * What CSS framework does has this skin been designed with?
 	 *
 	 * This may impact default markup returned by Skin::get_template() for example
@@ -79,7 +113,7 @@ class bootstrap_forums_Skin extends Skin
 				),
 					'layout_general' => array(
 						'label' => T_('General Layout'),
-						'note' => '',
+						'note' => T_('Select global skin layout.'),
 						'defaultvalue' => 'no_sidebar',
 						'options' => array(
 								'no_sidebar'    => T_('No Sidebar'),
@@ -90,7 +124,7 @@ class bootstrap_forums_Skin extends Skin
 					),
 					'layout_single' => array(
 						'label' => T_('Single Thread Layout'),
-						'note' => '',
+						'note' => T_('Select skin layout for single threads') . ' (disp=single).',
 						'defaultvalue' => 'no_sidebar',
 						'options' => array(
 								'no_sidebar'    => T_('No Sidebar'),
@@ -101,9 +135,10 @@ class bootstrap_forums_Skin extends Skin
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px',
+						'note' => 'px. ' . T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
+						'size' => '7',
 						'allow_empty' => true,
 					),
 				'section_layout_end' => array(
@@ -120,6 +155,17 @@ class bootstrap_forums_Skin extends Skin
 						'defaultvalue' => 1,
 						'type' => 'checkbox',
 					),
+				   'workflow_display_mode' => array(
+					  'label'    => T_('Workflow column'),
+					  'note'     => '',
+					  'type'     => 'radio',
+					  'field_lines' => true,
+					  'options'  => array(
+						 array( 'status_and_author', T_('Display Status & Item Author') ),
+						 array( 'assignee_and_status', T_('Display Assignee (with Priority color coding) & Status') ),
+					  ),
+					  'defaultvalue' => 'status_and_author',
+				   ),
 				'section_forum_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -257,7 +303,7 @@ class bootstrap_forums_Skin extends Skin
 							array( 'page_top', sprintf( T_('"%s" container'), NT_('Page Top') ),  1 ),
 							array( 'menu',     sprintf( T_('"%s" container'), NT_('Menu') ),      0 ),
 							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ) ),
-						),
+					),
 				'section_access_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -313,6 +359,14 @@ class bootstrap_forums_Skin extends Skin
 			require_js( '#jqueryUI#', 'blog' );
 		}
 
+		if( in_array( $disp, array( 'single', 'page' ) ) )
+		{	// Init JS to autcomplete the user logins
+			require_js( '#bootstrap_typeahead#', 'blog' );
+			init_autocomplete_login_js( 'blog', 'typeahead' );
+			// Initialize date picker for _item_expert.form.php
+			init_datepicker_js( 'blog' );
+		}
+
 		// Add custom CSS:
 		$custom_css = '';
 
@@ -323,9 +377,14 @@ class bootstrap_forums_Skin extends Skin
 			$custom_css = "@media screen and (min-width: 1200px) {
 				.forums_list .ft_date {
 					white-space: normal;
-					margin-top: 11px;
+					margin-top: 3px;
 				}
-				.disp_single .single_topic .evo_content_block .panel-body .evo_post__full, .disp_single .evo_comment .panel-body .evo_comment_text p, .disp_single .post_tags {
+				.disp_single .single_topic .evo_content_block .panel-body .evo_post__full,
+				.disp_single .evo_comment .panel-body .evo_comment_text p,
+				.disp_single .post_tags,
+				.disp_single .evo_voting_panel,
+				.disp_single .evo_seen_by
+				{
 					padding-left: 15px;
 				}
 				\n
@@ -366,7 +425,7 @@ class bootstrap_forums_Skin extends Skin
 	 */
 	function get_post_button( $chapter_ID, $Item = NULL, $params = array() )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$params = array_merge( array(
 				'group_class'  => '',
@@ -449,7 +508,7 @@ class bootstrap_forums_Skin extends Skin
 	 */
 	function is_visible_container( $container_key )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $Blog->has_access() )
 		{	// If current user has an access to this collection then don't restrict containers:
@@ -549,7 +608,7 @@ class bootstrap_forums_Skin extends Skin
 	 */
 	function display_button_recent_topics()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( ! is_logged_in() || ! $Blog->get_setting( 'track_unread_content' ) )
 		{	// For not logged in users AND if the tracking of unread content is turned off for the collection
@@ -571,15 +630,15 @@ class bootstrap_forums_Skin extends Skin
 			$unread_posts_SQL = new SQL();
 			$unread_posts_SQL->SELECT( 'COUNT( post_ID )' );
 			$unread_posts_SQL->FROM( 'T_items__item' );
-			$unread_posts_SQL->FROM_add( 'LEFT JOIN T_users__postreadstatus ON post_ID = uprs_post_ID AND uprs_user_ID = '.$DB->quote( $current_User->ID ) );
+			$unread_posts_SQL->FROM_add( 'LEFT JOIN T_items__user_data ON post_ID = itud_item_ID AND itud_user_ID = '.$DB->quote( $current_User->ID ) );
 			$unread_posts_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
 			$unread_posts_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
 			$unread_posts_SQL->WHERE( $ItemList2->ItemQuery->get_where( '' ) );
 			$unread_posts_SQL->WHERE_and( 'post_last_touched_ts > '.$DB->quote( date2mysql( $localtimenow - 30 * 86400 ) ) );
 			// In theory, it would be more safe to use this comparison:
-			// $unread_posts_SQL->WHERE_and( 'uprs_post_ID IS NULL OR uprs_read_post_ts <= post_last_touched_ts' );
+			// $unread_posts_SQL->WHERE_and( 'itud_item_ID IS NULL OR itud_read_item_ts <= post_last_touched_ts' );
 			// But until we have milli- or micro-second precision on timestamps, we decided it was a better trade-off to never see our own edits as unread. So we use:
-			$unread_posts_SQL->WHERE_and( 'uprs_post_ID IS NULL OR uprs_read_post_ts < post_last_touched_ts' );
+			$unread_posts_SQL->WHERE_and( 'itud_item_ID IS NULL OR itud_read_item_ts < post_last_touched_ts' );
 
 			// Execute a query with to know if current user has new data to view:
 			$unread_posts_count = $DB->get_var( $unread_posts_SQL->get(), 0, NULL, 'Get a count of the unread topics for current user' );
@@ -618,6 +677,43 @@ class bootstrap_forums_Skin extends Skin
 				// Delegate to parent class:
 				return parent::get_template( $name );
 		}
+	}
+
+
+	/**
+	 * Display a panel with voting buttons for item
+	 *
+	 * @param object Item
+	 * @param array Params
+	 */
+	function display_item_voting_panel( $Item, $params = array() )
+	{
+		skin_widget( array_merge( array(
+				// CODE for the widget:
+				'widget'      => 'item_vote',
+				// Optional display params
+				'Item'        => $Item,
+				'block_start' => '',
+				'block_end'   => '',
+				'skin_ID'     => $this->ID,
+			), $params ) );
+	}
+
+
+	/**
+	 * Display a panel with voting buttons for item
+	 *
+	 * @param object Comment
+	 * @param array Params
+	 */
+	function display_comment_voting_panel( $Comment, $params = array() )
+	{
+		$Comment->vote_helpful( '', '', '&amp;', true, true, array_merge( array(
+				'before_title'          => '',
+				'helpful_text'          => T_('Is this reply helpful?'),
+				'class'                 => 'vote_helpful',
+				'skin_ID'               => $this->ID,
+			), $params ) );
 	}
 }
 

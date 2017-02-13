@@ -49,10 +49,12 @@ $BlogCache = & get_BlogCache();
 /**
  * @var Blog
  */
-$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 if( empty( $Blog ) )
 {
-	require $siteskins_path.'_404_blog_not_found.main.php'; // error & exit
+	siteskin_init();
+	siteskin_include( '_404_blog_not_found.main.php' ); // error
+	exit(0);
 	// EXIT.
 }
 
@@ -109,7 +111,7 @@ if( init_charsets( $current_charset ) )
 	// Reload Blog(s) (for encoding of name, tagline etc):
 	$BlogCache->clear();
 
-	$Blog = & $BlogCache->get_by_ID( $blog );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 	if( is_logged_in() )
 	{ // We also need to reload the current User with the new final charset
 		$UserCache = & get_UserCache();
@@ -512,7 +514,9 @@ unset( $catsel );
  */
 if( $stats || $disp == 'stats' )
 {	// This used to be a spamfest...
-	require $siteskins_path.'_410_stats_gone.main.php'; // error & exit
+	siteskin_init();
+	siteskin_include( '_410_stats_gone.main.php' ); // error
+	exit(0);
 	// EXIT.
 }
 elseif( !empty($preview) )
@@ -520,6 +524,11 @@ elseif( !empty($preview) )
 	$disp = 'single';
 	// Consider this as an admin hit!
 	$Hit->hit_type = 'admin';
+}
+elseif( ( $disp == 'visits' ) && ( ( $Settings->get( 'enable_visit_tracking' ) != 1 ) || ! is_logged_in() ) )
+{ // Check if visit tracking is enabled and the user is logged in before allowing profile visit display
+	$disp = '403';
+	$disp_detail = '403-visit-tracking-disabled';
 }
 elseif( $disp == '-' && !empty($Item) )
 { // We have not requested a specific disp but we have identified a specific post to be displayed
@@ -561,7 +570,7 @@ elseif( $disp == '-' )
 			|| $Blog->get_setting( 'relcanonical_homepage' ) )
 	{ // Check if the URL was canonical:
 		$canonical_url = $Blog->gen_blogurl();
-		if( ! is_same_url($ReqURL, $canonical_url) )
+		if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
 		{	// We are not on the canonicial blog url:
 			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
 			{	// REDIRECT TO THE CANONICAL URL:
@@ -612,11 +621,17 @@ elseif( ( ( $disp == 'page' ) || ( $disp == 'single' ) ) && empty( $Item ) )
 	$disp_detail = '404-post_not_found';
 }
 
+param( 'user_ID', 'integer', NULL );
+if( ( $disp == 'user' ) && isset( $user_ID ) && isset( $current_User ) && ( $user_ID != $current_User->ID ) && ( $Settings->get( 'enable_visit_tracking') == 1 ) )
+{ // add or increment to user profile visit
+	add_user_profile_visit( $user_ID, $current_User->ID );
+}
+
 
 if( $disp == 'terms' )
 {	// Display a page of terms & conditions:
 	$terms_item_ID = intval( $Settings->get( 'site_terms' ) );
-	if( $terms_item_ID  > 0 )
+	if( $Settings->get( 'site_terms_enabled' ) && $terms_item_ID  > 0 )
 	{	// Only if item ID is defined for terms page:
 		set_param( 'p', $terms_item_ID );
 		$c = 0; // Don't display comments
@@ -637,6 +652,7 @@ if( $disp == 'terms' )
 // Check if terms & conditions should be accepted by current user:
 if( is_logged_in() && // Only for logged in users
     ! in_array( $disp, array( 'terms', 'help', 'msgform', 'activateinfo' ) ) && // Allow these pages
+    $Settings->get( 'site_terms_enabled' ) && // Terms must be enabled
     ! $UserSettings->get( 'terms_accepted', $current_User->ID ) ) // If it was not accepted yet
 {	// Current user didn't accept the terms yet:
 
@@ -656,6 +672,7 @@ if( is_logged_in() && // Only for logged in users
 		// EXIT HERE
 	}
 }
+
 
 
 /*
@@ -841,7 +858,13 @@ if( !empty( $skin ) )
 			{ // Get template name for the current Item if it is defined by its Item Type:
 				$disp_handler_custom = $ItemType->get( 'template_name' ).'.main.php';
 
-				if( file_exists( $disp_handler = $ads_current_skin_path.$disp_handler_custom ) )
+				
+				if( $Skin->get_api_version() == 7 && file_exists( $disp_handler = $ads_current_skin_path.$Blog->get( 'type' ).'/'.$disp_handler_custom ) )
+				{ // Custom template is found in skin folder for current collection kind:
+					$disp_handler_custom_found = true;
+					$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (custom for item type and collection kind)', 'skins' );
+				}
+				elseif( file_exists( $disp_handler = $ads_current_skin_path.$disp_handler_custom ) )
 				{ // Custom template is found in skin folder:
 					$disp_handler_custom_found = true;
 					$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (custom for item type)', 'skins' );
@@ -856,20 +879,35 @@ if( !empty( $skin ) )
 			{ // Set $disp_handler only if it is not defined above:
 				if( ! empty( $disp_handlers[ $disp ] ) )
 				{
-					if( file_exists( $disp_handler = $ads_current_skin_path.$disp_handlers[ $disp ] ) )
-					{ // The current skin has a customized page handler for this disp:
+					if( $Skin->get_api_version() == 7 && file_exists( $disp_handler = $ads_current_skin_path.$Blog->get( 'type' ).'/'.$disp_handlers[ $disp ] ) )
+					{	// The current skin has a customized page handler for this disp and current collection kind:
+						$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (custom to this theme and collection kind)', 'skins' );
+					}
+					elseif( file_exists( $disp_handler = $ads_current_skin_path.$disp_handlers[ $disp ] ) )
+					{	// The current skin has a customized page handler for this disp:
 						$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (custom to this skin)', 'skins' );
 					}
+					elseif( $Skin->get_api_version() == 7 && file_exists( $disp_handler = $ads_current_skin_path.$Blog->get( 'type' ).'/index.main.php' ) )
+					{	// Fallback to the default "index" handler from the current skin dir for current collection kind:
+						$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (default handler for collection kind)', 'skins' );
+					}
 					else
-					{ // Fallback to the default "index" handler from the current skin dir:
+					{	// Fallback to the default "index" handler from the current skin dir:
 						$disp_handler = $ads_current_skin_path.'index.main.php';
 						$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (default handler)', 'skins' );
 					}
 				}
 				else
-				{ // Use the default handler from the skins dir:
-					$disp_handler = $ads_current_skin_path.'index.main.php';
-					$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (default index handler)', 'skins' );
+				{	// Use the default handler from the skins dir:
+					if( $Skin->get_api_version() == 7 && file_exists( $disp_handler = $ads_current_skin_path.$Blog->get( 'type' ).'/index.main.php' ) )
+					{	// For current collection kind:
+						$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (default handler for collection kind)', 'skins' );
+					}
+					else
+					{	// For all other kinds:
+						$disp_handler = $ads_current_skin_path.'index.main.php';
+						$Debuglog->add('blog_main: include '.rel_path_to_base( $disp_handler ).' (default index handler)', 'skins' );
+					}
 				}
 			}
 

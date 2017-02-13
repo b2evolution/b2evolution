@@ -53,7 +53,7 @@ function trackback(
 	$ID,
 	$url ) // post ID
 {
-	global $app_name, $app_version, $Blog, $Messages;
+	global $app_name, $app_version, $Collection, $Blog, $Messages;
 
 	$trackback_message = T_('Sending trackback to:').' '.htmlspecialchars($trackback_url).' ';
 

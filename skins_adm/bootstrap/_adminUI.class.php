@@ -139,7 +139,7 @@ class AdminUI extends AdminUI_general
 							 <span class="icon-bar"></span>
 						</button>
 						<a class="navbar-brand" href="'.$admin_url.'?ctrl=dashboard"'
-								.( $Settings->get( 'site_color' ) != '' ? 'style="color:'.$Settings->get( 'site_color' ).'"' : '' ).'>'
+								.( $Settings->get( 'site_color' ) != '' ? ' style="color:'.$Settings->get( 'site_color' ).'"' : '' ).'>'
 							.$Settings->get( 'site_code' )
 						.'</a>
 				 </div>
@@ -308,7 +308,7 @@ class AdminUI extends AdminUI_general
 				// Template for a list of Collections (Blogs)
 				return array(
 						'before' => '<div class="container-fluid coll-selector"><nav><div class="btn-group">',
-						'after' => '</div>$button_add_blog$</nav></div>',
+						'after' => '</div>$button_add_blog$$collection_groups$</nav></div>',
 						'select_start' => '<div class="btn-group" role="group">',
 						'select_end' => '</div>',
 						'buttons_start' => '',
@@ -365,9 +365,9 @@ class AdminUI extends AdminUI_general
 							'line_start_odd' => '<tr class="odd">'."\n",
 							'line_start_last' => '<tr class="even lastline">'."\n",
 							'line_start_odd_last' => '<tr class="odd lastline">'."\n",
-								'col_start' => '<td $class_attrib$>',
-								'col_start_first' => '<td class="firstcol $class$">',
-								'col_start_last' => '<td class="lastcol $class$">',
+								'col_start' => '<td $class_attrib$ $colspan_attrib$>',
+								'col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+								'col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
 								'col_end' => "</td>\n",
 							'line_end' => "</tr>\n\n",
 							'grp_line_start' => '<tr class="group">'."\n",
@@ -428,18 +428,6 @@ class AdminUI extends AdminUI_general
 						) );
 				}
 				return $results_template;
-
-			case 'compact_results':
-				// Compact Results list:
-				return array_merge( $this->get_template( 'Results' ), array(
-						'before'           => '<div class="results results_compact panel panel-default">',
-						'header_text'      => '',
-						'head_title'       => '',
-						'no_results_start' => '<div class="table_scroll">'."\n"
-								.'<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0"><tbody>'."\n\n",
-						'no_results_end'   => '<tr class="lastline noresults"><td class="firstcol lastcol">$no_results$</td></tr>'
-								.'</tbody></table></div>'."\n\n",
-					) );
 
 			case 'blockspan_form':
 				// Form settings for filter area:
@@ -679,6 +667,7 @@ class AdminUI extends AdminUI_general
 					'text_primary' => 'btn btn-primary',
 					'text_success' => 'btn btn-success',
 					'text_danger'  => 'btn btn-danger',
+					'text_warning' => 'btn btn-warning',
 					'group'        => 'btn-group',
 				);
 
@@ -795,7 +784,6 @@ class AdminUI extends AdminUI_general
 		$buttons = '';
 		$select_options = '';
 		$not_favorite_blogs = false;
-
 		foreach( $blog_array as $l_blog_ID )
 		{ // Loop through all blogs that match the requested permission:
 
@@ -842,13 +830,23 @@ class AdminUI extends AdminUI_general
 
 		$r .= $title;
 
+		if( $this->coll_list_disp_sections )
+		{	// Check if filter by section is used currently:
+			$sec_ID = param( 'sec_ID', 'integer', 0 );
+			if( ! is_logged_in() || ! ( $current_User->check_perm( 'stats', 'view' ) || $current_User->check_perm( 'section', 'view', false, $sec_ID ) ) )
+			{
+				$sec_ID = 0;
+				set_param( 'sec_ID', 0 );
+			}
+		}
+
 		if( !empty( $this->coll_list_all_title ) )
 		{ // We want to add an "all" button
-			$r .= $template[ $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
+			$r .= $template[ empty( $sec_ID ) && $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
 			$r .= '<a href="'.$this->coll_list_all_url
-						.'" class="btn btn-default'.( $blog == 0 ? ' active' : '' ).'">'
+						.'" class="btn btn-default'.( empty( $sec_ID ) && $blog == 0 ? ' active' : '' ).'">'
 						.$this->coll_list_all_title.'</a> ';
-			$r .= $template[ $blog == 0 ? 'afterEachSel' : 'afterEach' ];
+			$r .= $template[ empty( $sec_ID ) && $blog == 0 ? 'afterEachSel' : 'afterEach' ];
 		}
 
 		$r .= $template['buttons_start'];
@@ -867,17 +865,44 @@ class AdminUI extends AdminUI_general
 				.$template['select_end'];
 		}
 
-		// Button to add new collection
-		if( is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
-		{ // Display a button to add new collection if current user has a permission
+		// Button to add new collection:
+		if( $this->coll_list_disp_add && is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
+		{	// Display a button to add new collection if it is requested and current user has a permission
 			$button_add_blog = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new" class="btn btn-default" title="'.T_('New Collection').'"><span class="fa fa-plus"></span></a>';
 		}
 		else
-		{ // No permission to add new collection
+		{	// No request or permission to add new collection:
 			$button_add_blog = '';
 		}
 
-		$r .= str_replace( '$button_add_blog$', $button_add_blog, $template['after'] );
+		// Sections:
+		if( $this->coll_list_disp_sections )
+		{
+			$collection_groups = '';
+
+			$SectionCache = & get_SectionCache();
+			$SectionCache->load_available();
+
+			foreach( $SectionCache->cache as $Section )
+			{	// Loop through all sections that match the requested permission:
+				$collection_groups .= ( $Section->ID == $sec_ID ) ? $template['beforeEachSel'] : $template['beforeEach'];
+
+				$collection_groups .= '<a href="'.$url_params.'blog=0&amp;sec_ID='.$Section->ID
+					.'" class="btn btn-default'.( $Section->ID == $sec_ID ? ' active' : '' ).'">'
+						.$Section->dget( 'name', 'htmlbody' )
+					.'</a> ';
+
+				$collection_groups .= ( $Section->ID == $sec_ID ) ? $template['afterEachSel'] : $template['afterEach'];
+			}
+
+			$collection_groups = empty( $collection_groups ) ? '' : '<div class="btn-group">'.$collection_groups.'</div>';
+		}
+		else
+		{
+			$collection_groups = '';
+		}
+
+		$r .= str_replace( array( '$button_add_blog$', '$collection_groups$' ), array( $button_add_blog, $collection_groups ), $template['after'] );
 
 		return $r;
 	}

@@ -74,12 +74,12 @@ class Plugin
 	 * This can be used by other plugins when requiring your plugin
 	 * through {@link Plugin::GetDependencies()}.
 	 *
-	 * By increasing it you can request a call of {@link GetDbLayout()} upon instantiating.
+	 * By increasing it, you can request a call of {@link GetDbLayout()} upon instantiating.
 	 * If there are DB layout changes to be made, the plugin gets changed to status "needs_config".
 	 *
 	 * @var string
 	 */
-	var $version = '0';
+	var $version = '0.0.1';
 
 	/**
 	 * Plugin author.
@@ -255,11 +255,11 @@ class Plugin
 
 	/**
 	 * Plugin URL
-	 * This gets lazy-filled with both 'abs' and 'rel' URLs by {@link get_plugin_url()}.
+	 * This gets lazy-filled URL by {@link get_plugin_url()}.
 	 *
-	 * @var array
+	 * @var string
 	 */
-	private $_plugin_url = array();
+	private $_plugin_url;
 
 	/**
 	 * Plugin template
@@ -302,7 +302,7 @@ class Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		// NOTE: the code below is just to handle stuff that has been deprecated since b2evolution 1.9. 
+		// NOTE: the code below is just to handle stuff that has been deprecated since b2evolution 1.9.
 		// You DON'T NEED to include this, if you override this method.
 
 		if( is_null($this->short_desc) )
@@ -353,7 +353,7 @@ class Plugin
 		}
 		else
 		{ // Get plugin template from frontoffice skin
-			global $Blog;
+			global $Collection, $Blog;
 			if( ! empty( $Blog ) )
 			{
 				$skin_ID = $Blog->get_skin_ID();
@@ -445,10 +445,15 @@ class Plugin
 	 *              as "legend" tag with types "array" and "fieldset".
 	 * 'defaultvalue': Default value for the setting, defaults to '' (empty string)
 	 * 'type', which can be:
-	 *     'text' (default): a simple string
+	 *     'text' (default): an input field to enter a string
+	 *     'string': static text to print out on plugin settings edit form the 'label' of a param
+	 *     'begin_line': start a group of several params in one by <code>$Form->begin_line( param[label] );</code> (Use together with end_line)
+	 *     'end_line': start a group of several params in one by <code>$Form->end_line( param[label] );</code> (Use together with begin_line)
 	 *     'password': like text, but hidden during input
 	 *     'html_input' : like text, but allows html
-	 *     'checkbox': either 0 or 1
+	 *     'checkbox': a checkbox field to set values either 0 or 1
+	 *     'checklist': a field or several checkboxes, you must set 'options' for it:
+	 *         'options': an array of options ( 'name', 'value' ), see {@link Form::checklist()}.
 	 *     'integer': a number (no float, can have leading "+" or "-") (like 'text' for input, but gets validated when submitting)
 	 *     'float': a floating number (can have leading "+" or "-", e.g. "+1", "-0.05") (like 'text' for input, but gets validated when submitting)
 	 *     'textarea': several lines of input. The following can be set for this type:
@@ -460,19 +465,32 @@ class Plugin
 	 *     'select_blog': a drop down field, providing all existing blogs (Blog ID is the value or "" if "allow_none" is true) (WARNING: does not scale - not recommended)
 	 *     'select_group': a drop down field, providing all existing groups (Group ID is the value or "" if "allow_none" is true)
 	 *     'select_user': a drop down field, providing all existing groups (User ID is the value or "" if "allow_none" is true) (WARNING: does not scale - not recommended)
-	 *     'array': a subset of settings. The value gets automagically (un)serialized through get() and set().
-	 *         The following keys apply to this type:
+	 *     'radio' : radio select (options on same line by default)
+	 *          'field_lines' : set to true to have options on separate line
+	 *     'array': a subset of settings without type forcing or checking
+	 *                 for sub-entries involved (e.g., if you have an entry of type "integer", you could get
+	 *                 a non-numeric string there). NOTE: VERY UNSAFE!
+	 *     'array:integer': a subset of settings with type forcing to integer
+	 *     'array:array:integer':  a subset of settings with type forcing to integer
+	 *     'array:string': a subset of settings with type forcing to string
+	 *     'array:array:string': a subset of settings with type forcing to string
+	 *     'array:regexp': a subset of settings with type forcing by regexp
+	 *         The value gets automagically (un)serialized through get() and set().
+	 *         The following keys apply to these types:
 	 *        'entries': an array with meta information about sub-settings
 	 *             (which can be everything from the top-level, except: "valid_pattern", "valid_range").
-	 *             Note: currently there's no type forcing or checking
-	 *                 for sub-entries involved (e.g., if you have an entry of type "integer", you could get
-	 *                 a non-numeric string there).
-	 *         fp> TODO: !!!! very unsafe
 	 *        'key': defines the key to use for each entry. This may be a text input for example
 	 *              (with label, note etc). (optional, default is numeric keys, which are not editable)
-	 *       'max_count': maximum count of sets (optional, default is no restriction)
-	 *       'min_count': minimum count of sets (optional, default is no restriction)
+	 *        'max_count': maximum count of sets (optional, default is no restriction)
+	 *        'min_count': minimum count of sets (optional, default is no restriction)
+	 *	   'fileselect': opens a modal window to select file. The following can be set for this type:
+	 *        'root': default root
+	 *		  'path': default path
+	 *        'thumbnail_size': thumbnail size
+	 *     'info': a form info field with label and info text see {@link Form::info()}; you must set 'info' for text.
+	 *     'color': a form color picker field, use 'defaultvalue' in format '#FFFFFF'
 	 * 'note' (gets displayed as a note to the param field),
+	 * 'info': Text for param with type 'info'
 	 * 'size': Size of the HTML input field (applies to types 'text', 'password' and 'integer'; defaults to 15)
 	 * 'maxlength': maxlength attribute for the input field (See 'size' above; defaults to no limit)
 	 * 'disabled': if true, it adds a 'disabled="disabled"' html attribute to the element and the value cannot be changed
@@ -574,38 +592,66 @@ class Plugin
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
-		if( $this->group != 'rendering' )
+		$default_settings = array();
+
+		// Set default collection plugin settings depending on group:
+		switch( $this->group )
 		{
-			return array();
+			case 'rendering':
+				// Renderer plugins:
+				$render_note = '';
+				if( empty( $this->code ) )
+				{
+					$render_note .= T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
+				}
+				$admin_Plugins = & get_Plugins_admin();
+				$rendering_options = $admin_Plugins->get_apply_rendering_values( true );
+				$default_post_rendering = ( isset( $params['default_post_rendering'] ) && in_array( $params['default_post_rendering'], $rendering_options ) ) ? $params['default_post_rendering'] : 'opt-out';
+				$default_comment_rendering = ( isset( $params['default_comment_rendering'] ) && in_array( $params['default_comment_rendering'], $rendering_options ) ) ? $params['default_comment_rendering'] : 'never';
+				$default_settings = array(
+					'coll_apply_rendering' => array(
+							'label'        => T_('Apply rendering to posts'),
+							'type'         => 'select',
+							'options'      => $rendering_options,
+							'defaultvalue' => $default_post_rendering,
+							'note'         => $render_note,
+						),
+					'coll_apply_comment_rendering' => array(
+							'label'        => T_('Apply rendering to comments'),
+							'type'         => 'select',
+							'options'      => $rendering_options,
+							'defaultvalue' => $default_comment_rendering,
+							'note'         => $render_note,
+						),
+					);
+				break;
+
+			case 'editor':
+				// Editor plugins:
+				$default_post_using = isset( $params['default_post_using'] ) ? $params['default_post_using'] : 1;
+				if( $default_post_using != 'disabled' )
+				{
+					$default_settings['coll_use_for_posts'] = array(
+							'label'        => T_('Use for posts'),
+							'type'         => 'checkbox',
+							'defaultvalue' => $default_post_using,
+							'note'         => '',
+						);
+				}
+				$default_comment_using = isset( $params['default_comment_using'] ) ? $params['default_comment_using'] : 1;
+				if( $default_comment_using != 'disabled' )
+				{
+					$default_settings['coll_use_for_comments'] = array(
+							'label'        => T_('Use for comments'),
+							'type'         => 'checkbox',
+							'defaultvalue' => $default_comment_using,
+							'note'         => '',
+						);
+				}
+				break;
 		}
 
-		$render_note = '';
-		if( empty( $this->code ) )
-		{
-			$render_note .= T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
-		}
-		$admin_Plugins = & get_Plugins_admin();
-		$rendering_options = $admin_Plugins->get_apply_rendering_values( true );
-		$default_post_rendering = ( isset( $params['default_post_rendering'] ) && in_array( $params['default_post_rendering'], $rendering_options ) ) ? $params['default_post_rendering'] : 'opt-out';
-		$default_comment_rendering = ( isset( $params['default_comment_rendering'] ) && in_array( $params['default_comment_rendering'], $rendering_options ) ) ? $params['default_comment_rendering'] : 'never';
-		$r = array(
-			'coll_apply_rendering' => array(
-					'label' => T_('Apply rendering to posts'),
-					'type' => 'select',
-					'options' => $rendering_options,
-					'defaultvalue' => $default_post_rendering,
-					'note' => $render_note,
-				),
-			'coll_apply_comment_rendering' => array(
-					'label' => T_('Apply rendering to comments'),
-					'type' => 'select',
-					'options' => $rendering_options,
-					'defaultvalue' => $default_comment_rendering,
-					'note' => $render_note,
-				),
-			);
-
-		return array_merge( $r, $this->get_custom_setting_definitions( $params ) );
+		return array_merge( $default_settings, $this->get_custom_setting_definitions( $params ) );
 	}
 
 
@@ -622,7 +668,7 @@ class Plugin
 	{
 		if( $this->group != 'rendering' )
 		{
-			return array();
+			return $this->get_custom_setting_definitions( $params );
 		}
 
 		$render_note = '';
@@ -660,7 +706,7 @@ class Plugin
 	{
 		if( $this->group != 'rendering' )
 		{
-			return array();
+			return $this->get_custom_setting_definitions( $params );
 		}
 
 		$render_note = '';
@@ -923,13 +969,13 @@ class Plugin
 	/**
 	 * Event handler: Called when displaying editor buttons (in back-office).
 	 *
-	 * This method, if implemented, should output the buttons (probably as html INPUT elements) 
+	 * This method, if implemented, should output the buttons (probably as html INPUT elements)
 	 * and return true, if button(s) have been displayed.
 	 *
 	 * You should provide an unique html ID with each button.
 	 *
 	 * @param array Associative array of parameters.
-	 *   - 'target_type': either 'Comment' or 'Item'.
+	 *   - 'target_type': either 'Comment' or 'Item' or 'EmailCampaign'.
 	 *   - 'edit_layout': "inskin", "expert", etc. (users, hackers, plugins, etc. may create their own layouts in addition to these)
 	 *                    NOTE: Please respect the "inskin" mode, which should display only the most simple things!
 	 * @return boolean did we display a button?
@@ -1030,6 +1076,34 @@ class Plugin
 	{
 	}
 
+
+	/**
+	 * Event handler: Called at the beginning of the "Edit wdiget" form on back-office.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the {@link Form} object (by reference)
+	 *   - 'ComponentWidget': the Widget which gets edited (by reference)
+	 * @return boolean did we display something?
+	 */
+	function WidgetBeginSettingsForm( & $params )
+	{
+		return false; // Do nothing by default.
+	}
+
+
+	/**
+	 * Event handler: Called at the end of the "Edit wdiget" form on back-office.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the {@link Form} object (by reference)
+	 *   - 'ComponentWidget': the Widget which gets edited (by reference)
+	 * @return boolean did we display something?
+	 */
+	function WidgetEndSettingsForm( & $params )
+	{
+		return false; // Do nothing by default.
+	}
+
 	// }}}
 
 
@@ -1083,9 +1157,35 @@ class Plugin
 
 
 	/**
+	 * Event handler: Called at the end of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinEndHtmlHead( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called at the beginning of the skin's HTML BODY section.
+	 *
+	 * Use this to add any HTML snippet at the beginning of the generated page.
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinBeginHtmlBody( & $params )
+	{
+	}
+
+
+	/**
 	 * Event handler: Called at the end of the skin's HTML BODY section.
 	 *
 	 * Use this to add any HTML snippet at the end of the generated page.
+	 *
+	 * @param array Associative array of parameters
 	 */
 	function SkinEndHtmlBody( & $params )
 	{
@@ -1096,6 +1196,8 @@ class Plugin
 	 * Event handler: Gets called before skin wrapper.
 	 *
 	 * Use this to add any HTML code before skin wrapper and after evo toolbar.
+	 *
+	 * @param array Associative array of parameters
 	 */
 	function BeforeSkinWrapper( & $params )
 	{
@@ -1309,7 +1411,7 @@ class Plugin
 	 * Event handler: Defines blog kinds, their names and description.
 	 * Define blog settings in {@link Plugin::InitCollectionKinds()} method of your plugin.
 	 *
-	 * Note: You can change default blog kinds $params['default_kinds'] (which get passed by reference).
+	 * Note: You can change default blog kinds $params['kinds'] (which get passed by reference).
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'kinds': dafault blog kinds (by reference)
@@ -1367,6 +1469,40 @@ class Plugin
 
 
 	/**
+	 * Event handler: Called prepare params before rendering attachments of item contents.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'Item': the {@link Item} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function PrepareForRenderItemAttachment( & $params )
+	{
+		return false; // Do nothing by default.
+	}
+
+
+	/**
+	 * Event handler: Called when rendering attachments of item contents.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'Item': the {@link Item} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function RenderItemAttachment( & $params )
+	{
+		return false; // Do nothing by default.
+	}
+
+
+	/**
 	 * Event handler: Called when rendering item/post contents as XML.
 	 *
 	 * Should this plugin apply to XML?
@@ -1402,7 +1538,7 @@ class Plugin
 	 *   - 'view_type': What part of a post are we displaying: 'teaser', 'extension' or 'full'
 	 * @return boolean Have we changed something?
 	 */
-	function RenderItemAsText()
+	function RenderItemAsText( & $params )
 	{
 		return false;		// Do nothing by default.
 	}
@@ -1706,7 +1842,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called at the end of the "Edit comment" form.
+	 * Event handler: Called at the end of the "Edit comment" form on back-office.
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Form': the {@link Form} object (by reference)
@@ -1721,7 +1857,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called at the end of the frontend comment form.
+	 * Event handler: Called at the end of the front-office comment form.
 	 *
 	 * You might want to use this to inject antispam payload to use in
 	 * in {@link GetSpamKarmaForComment()} or modify the Comment according
@@ -1739,7 +1875,7 @@ class Plugin
 
 	/**
 	 * Event handler: Called in the submit button section of the
-	 * frontend comment form.
+	 * front-office comment form.
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Form': the comment form generating object
@@ -1977,7 +2113,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called at the end of the frontend message form, which
+	 * Event handler: Called at the end of the front-office message form, which
 	 * allows to send an email to a user/commentator.
 	 *
 	 * You might want to use this to inject antispam payload to use in
@@ -1996,7 +2132,7 @@ class Plugin
 
 	/**
 	 * Event handler: Called in the submit button section of the
-	 * frontend message form.
+	 * front-office message form.
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Form': the comment form generating object
@@ -2098,6 +2234,41 @@ class Plugin
 		return $this->RenderItemAsHtml( $params );
 	}
 
+
+	/**
+	 * Event handler: Called prepare params before rendering attachments of message contents.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'Message': the {@link Message} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function PrepareForRenderMessageAttachment( & $params )
+	{
+		return false; // Do nothing by default.
+	}
+
+
+	/**
+	 * Event handler: Called when rendering attachments of message contents.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'Message': the {@link Message} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function RenderMessageAttachment( & $params )
+	{
+		// Use this render by default temporarily:
+		return $this->RenderItemAttachment( $params );
+	}
+
 	// }}}
 
 
@@ -2151,20 +2322,54 @@ class Plugin
 	 * Event handler: Called when rendering email contents as HTML. (CACHED)
 	 *
 	 * The rendered content will be *cached* and the cached content will be reused on subsequent displays.
-	 * Use {@link DisplayContentAsHtml()} instead if you want to do rendering at display time.
 	 *
 	 * Note: You have to change $params['data'] (which gets passed by reference).
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
-	 *   - 'EmailCampaign': the {@link Item} object which gets rendered.
+	 *   - 'EmailCampaign': the {@link EmailCampaign} object which gets rendered.
 	 * @return boolean Have we changed something?
 	 */
 	function RenderEmailAsHtml( & $params )
 	{
 		// Use this render by default temporarily
 		return $this->RenderItemAsHtml( $params );
+	}
+
+
+	/**
+	 * Event handler: Called prepare params before rendering attachments of email campaign contents.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'EmailCampaign': the {@link EmailCampaign} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function PrepareForRenderEmailAttachment( & $params )
+	{
+		return false; // Do nothing by default.
+	}
+
+
+	/**
+	 * Event handler: Called when rendering attachments of email campaign contents.
+	 *
+	 * Note: You have to change $params['data'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'data': the data (by reference). You probably want to modify this.
+	 *   - 'format': see {@link format_to_output()}. Only 'htmlbody' and 'entityencoded' will arrive here.
+	 *   - 'EmailCampaign': the {@link EmailCampaign} object which gets rendered.
+	 * @return boolean Have we changed something?
+	 */
+	function RenderEmailAttachment( & $params )
+	{
+		// Use this render by default temporarily
+		return $this->RenderItemAttachment( $params );
 	}
 
 	// }}}
@@ -2406,7 +2611,7 @@ class Plugin
 
 	// PluginEmailSettings {{{
 	/**
-	 * Event handler: Called as action just before updating plugin's messages settings.
+	 * Event handler: Called as action just before updating plugin's email campaign settings.
 	 *
 	 * Use this to add notes/errors through {@link Plugin::msg()} or to process saved settings.
 	 */
@@ -2648,9 +2853,9 @@ class Plugin
 	 *   - 'Form': the user profile form generating object (by reference)
 	 *   - 'User': the edited user object (by reference)
 	 *   - 'edit_layout':
-	 *			"public" - public frontend user profile form (info only),
-	 *			"private" - private frontend user profile form (editable),
-	 *   - 'is_admin_page': (boolean) indicates whether we are in frontend or backoffice
+	 *			"public" - public front-office user profile form (info only),
+	 *			"private" - private front-office user profile form (editable),
+	 *   - 'is_admin_page': (boolean) indicates whether we are in front-office or back-office
 	 */
 	function DisplayProfileFormFieldset( & $params )
 	{
@@ -3042,28 +3247,32 @@ class Plugin
 	 * @param string Get absolute URL? (or make it relative to $ReqHost)
 	 * @return string
 	 */
-	function get_plugin_url( $abs = false )
+	function get_plugin_url( $dummy = false )
 	{
-		global $ReqHost, $plugins_url, $plugins_path;
+		global $ReqHost, $plugins_url, $plugins_path, $Collection, $Blog;
 
-		$key = $abs ? 'abs' : 'rel';
+		if( empty( $this->_plugin_url ) )
+		{	// Initialize plugin URL only first time request:
 
-		if( empty($this->_plugin_url) )
-		{
-			// Get sub-path below $plugins_path, if any
-			$sub_path = preg_replace( ':^'.preg_quote($plugins_path, ':').':', '', dirname($this->classfile_path).'/' );
+			// Get sub-path below $plugins_path, if any:
+			$sub_path = preg_replace( ':^'.preg_quote( $plugins_path, ':' ).':', '', dirname( $this->classfile_path ).'/' );
 
-			$r = $plugins_url.$sub_path;
+			if( is_admin_page() || empty( $Blog ) )
+			{	// Get plugin url for nack-office and when collection is not viewed now:
+				$r = $plugins_url.$sub_path;
+			}
+			else
+			{	// Get plugin url depending on collection setting:
+				$r = $Blog->get_local_plugins_url().$sub_path;
+			}
 
-			// Use the same protocol as with current host (so includes from within https do not fail when on http)
-			$r = url_same_protocol($r);
+			// Use the same protocol as with current host (so includes from within https do not fail when on http):
+			$r = url_same_protocol( $r );
 
-			$this->_plugin_url = array(
-					'abs' => $r, // absolute
-					'rel' => url_rel_to_same_host($r, $ReqHost), // relative to current host
-				);
+			$this->_plugin_url = $r;
 		}
-		return $this->_plugin_url[$key];
+
+		return $this->_plugin_url;
 	}
 
 
@@ -3120,10 +3329,9 @@ class Plugin
 	 */
 	function get_htsrv_url( $method, $params = array(), $glue = '&amp;', $abs = false )
 	{
-		global $htsrv_url, $htsrv_url_sensitive;
-		global $ReqHost, $Blog;
+		global $ReqHost;
 
-		$base = substr($ReqHost, 0, 6) == 'https:' ? $htsrv_url_sensitive : $htsrv_url;
+		$base = substr( $ReqHost, 0, 6 ) == 'https:' ? get_htsrv_url( true ) : get_htsrv_url();
 
 		if( ! $abs && strpos( $base, $ReqHost ) === 0 )
 		{ // cut off $ReqHost if the resulting URL starts with it:
@@ -3683,12 +3891,12 @@ class Plugin
 
 		if( empty( $blog ) )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 		}
 		else
 		{
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 		}
 
 		// Name of the setting in the blog settings:
@@ -3711,12 +3919,12 @@ class Plugin
 
 		if( empty( $blog ) )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 		}
 		else
 		{
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 		}
 
 		// Name of the setting in the blog settings:
@@ -3849,6 +4057,35 @@ class Plugin
 	 */
 	function GetAdditionalColumnsTable( & $params  )
 	{
+	}
+
+
+	/**
+	 * Memorize that a specific css that file will be required by the current page.
+	 * @see require_css() for full documentation,
+	 * this function is used to add unique version number for each plugin
+	 *
+	 * @param string Name of CSS file relative to current plugin folder
+	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 */
+	function require_css( $css_file, $output = false )
+	{
+		global $app_version_long;
+		require_css( $this->get_plugin_url().$css_file, 'relative', NULL, NULL, $this->version.'+'.$app_version_long, $output );
+	}
+
+
+	/**
+	 * Memorize that a specific javascript file will be required by the current page.
+	 * @see require_js() for full documentation,
+	 * this function is used to add unique version number for each plugin
+	 *
+	 * @param string Name of JavaScript file relative to plugin folder
+	 */
+	function require_js( $js_file )
+	{
+		global $app_version_long;
+		require_js( $this->get_plugin_url().$js_file, 'relative', false, false, $this->version.'+'.$app_version_long );
 	}
 }
 

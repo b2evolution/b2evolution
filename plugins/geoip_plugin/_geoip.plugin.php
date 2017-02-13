@@ -34,7 +34,7 @@ class geoip_plugin extends Plugin
 	var $name = 'GeoIP';
 	var $code = 'evo_GeoIP';
 	var $priority = 45;
-	var $version = '5.0.0';
+	var $version = '6.7.9';
 	var $author = 'The b2evo Group';
 	var $group = 'antispam';
 
@@ -94,13 +94,13 @@ class geoip_plugin extends Plugin
 
 		if( file_exists( $this->geoip_file_path ) )
 		{
-			$datfile_info = sprintf( T_('Last updated on %s'), date( locale_datefmt().' '.locale_timefmt(), filemtime( $this->geoip_file_path ) ) );
+			$datfile_info = sprintf( T_('Last updated on %s'), date( locale_datetimefmt(), filemtime( $this->geoip_file_path ) ) );
 		}
 		else
 		{
-			$datfile_info = '<span class="error">'.T_('Not found').'</span>';
+			$datfile_info = '<span class="error text-danger">'.T_('Not found').'</span>';
 		}
-		$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip">'.T_('Download update now!').'</a>';
+		$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip" class="btn btn-xs btn-warning">'.T_('Download update now!').'</a>';
 
 		return array(
 			'datfile' => array(
@@ -185,12 +185,12 @@ class geoip_plugin extends Plugin
 		$user_update_sql = '';
 		if( $this->Settings->get( 'force_account_creation' ) )
 		{	// Force country to the country detected by GeoIP
-			$user_update_sql = ', user_ctry_ID = '.$DB->quote( $Country->ID );
+			$User->set( 'ctry_ID', $Country->ID );
 		}
-		$DB->query( 'UPDATE T_users
-				  SET user_reg_ctry_ID = '.$DB->quote( $Country->ID ).
-				  $user_update_sql.'
-				WHERE user_ID = '.$DB->quote( $User->ID ) );
+
+		// Update user registration country
+		$User->set( 'reg_ctry_ID', $Country->ID );
+		$User->dbupdate();
 
 		// Move user to suspect group by Country ID
 		antispam_suspect_user_by_country( $Country->ID, $User->ID );
@@ -686,9 +686,24 @@ jQuery( document ).ready( function()
 				echo '<p>'.T_('This tool finds all users that do not have a registration country yet and then assigns them a registration country based on their registration IP.').
 						   get_manual_link('geoip-plugin').'</p>';
 
+				echo '<p>';
 				$Form->button( array(
 						'value' => T_('Find Registration Country for all Users NOW!')
 					) );
+				echo '</p>';
+
+				global $admin_url;
+				if( file_exists( $this->geoip_file_path ) )
+				{
+					$datfile_info = sprintf( T_('Last updated on %s'), date( locale_datetimefmt(), filemtime( $this->geoip_file_path ) ) );
+				}
+				else
+				{
+					$datfile_info = '<span class="error text-danger">'.T_('Not found').'</span>';
+				}
+				$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip" class="btn btn-warning">'.T_('Download update now!').'</a>';
+				echo '<p><b>GeoIP.dat:</b> '.$datfile_info.'</p>';
+
 
 				if( !empty( $this->text_from_AdminTabAction ) )
 				{	// Display a report of executed action
@@ -882,7 +897,7 @@ function geoip_get_country_by_IP( $IP )
 			$IP = int2ip( $IP );
 		}
 
-		if( $Country = & $geoip_Plugin->get_country_by_IP( $IP ) )
+		if( $Country = $geoip_Plugin->get_country_by_IP( $IP ) )
 		{ // Get country flag + name
 			load_funcs( 'regional/model/_regional.funcs.php' );
 			$country = country_flag( $Country->get( 'code' ), $Country->get_name(), 'w16px', 'flag', '', false ).

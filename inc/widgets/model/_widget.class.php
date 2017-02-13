@@ -319,9 +319,12 @@ class ComponentWidget extends DataObject
 
 		if( ! isset( $r['allow_blockcache'] ) )
 		{
+			$widget_Blog = & $this->get_Blog();
 			$r['allow_blockcache'] = array(
 					'label' => T_( 'Allow caching' ),
-					'note' => T_( 'Uncheck to prevent this widget from ever being cached in the block cache. (The whole page may still be cached.) This is only needed when a widget is poorly handling caching and cache keys.' ),
+					'note' => ( $widget_Blog && $widget_Blog->get_setting( 'cache_enabled_widgets' ) ) ?
+							T_('Uncheck to prevent this widget from ever being cached in the block cache. (The whole page may still be cached.) This is only needed when a widget is poorly handling caching and cache keys.') :
+							T_('Block caching is disabled for this collection.'),
 					'type' => 'checkbox',
 					'defaultvalue' => true,
 				);
@@ -454,6 +457,7 @@ class ComponentWidget extends DataObject
 		// Merge basic defaults < widget defaults < container params < DB params
 		// note: when called with skin_widget it falls back to basic defaults < widget defaults < calltime params < array()
 		$params = array_merge( array(
+					'widget_context' => 'general',		// general | item
 					'block_start' => '<div class="evo_widget widget $wi_class$">',
 					'block_end' => '</div>',
 					'block_display_title' => true,
@@ -478,18 +482,21 @@ class ComponentWidget extends DataObject
 					'item_selected_end' => '</li>',
 					'item_selected_text' => '%s',
 					'grid_start' => '<table cellspacing="1" class="widget_grid">',
+						'grid_colstart' => '<tr>',
+							'grid_cellstart' => '<td>',
+							'grid_cellend' => '</td>',
+						'grid_colend' => '</tr>',
 					'grid_end' => '</table>',
 					'grid_nb_cols' => 2,
-					'grid_colstart' => '<tr>',
-					'grid_colend' => '</tr>',
-					'grid_cellstart' => '<td>',
-					'grid_cellend' => '</td>',
 					'flow_start' => '<div class="widget_flow_blocks">',
+						'flow_block_start' => '<div>',
+						'flow_block_end' => '</div>',
 					'flow_end' => '</div>',
-					'flow_block_start' => '<div>',
-					'flow_block_end' => '</div>',
+					'rwd_start' => '<div class="widget_rwd_blocks row">',
+						'rwd_block_start' => '<div class="$wi_rwd_block_class$"><div class="widget_rwd_content clearfix">',
+						'rwd_block_end' => '</div></div>',
+					'rwd_end' => '</div>',
 					'thumb_size' => 'crop-80x80',
-					// 'thumb_size' => 'fit-160x120',
 					'link_type' => 'canonic',		// 'canonic' | 'context' (context will regenrate URL injecting/replacing a single filter)
 					'item_selected_text_start' => '',
 					'item_selected_text_end' => '',
@@ -497,8 +504,6 @@ class ComponentWidget extends DataObject
 					'group_end' => '</ul>',
 					'group_item_start' => '<li>',
 					'group_item_end' => '</li>',
-					'group_item_selected_start' => '<li class="selected">',
-					'group_item_selected_end' => '</li>',
 					'notes_start' => '<div class="notes">',
 					'notes_end' => '</div>',
 					'tag_cloud_start' => '<p class="tag_cloud">',
@@ -508,11 +513,32 @@ class ComponentWidget extends DataObject
 
 
 		// Customize params to the current widget:
-		// add additional css classes if required
+
+		// Add additional css classes if required:
 		$widget_css_class = 'widget_'.$this->type.'_'.$this->code.( empty( $params[ 'widget_css_class' ] ) ? '' : ' '.$params[ 'widget_css_class' ] );
-		// add custom id if required, default to generic id for validation purposes
+
+		// Set additional css class depending on layout:
+		$layout = isset( $params['layout'] ) ? $params['layout'] : ( isset( $params['thumb_layout'] ) ? $params['thumb_layout'] : NULL );
+		switch( $layout )
+		{
+			case 'rwd':
+				$widget_css_class .= ' evo_layout_rwd';
+				break;
+			case 'flow':
+				$widget_css_class .= ' evo_layout_flow';
+				break;
+			case 'list':
+				$widget_css_class .= ' evo_layout_list';
+				break;
+			case 'grid':
+				$widget_css_class .= ' evo_layout_grid';
+				break;
+		}
+
+		// Add custom id if required, default to generic id for validation purposes:
 		$widget_ID = ( !empty($params[ 'widget_ID' ]) ? $params[ 'widget_ID' ] : 'widget_'.$this->type.'_'.$this->code.'_'.$this->ID );
-		// replace the values
+
+		// Replace the values:
 		$this->disp_params = str_replace( array( '$wi_ID$', '$wi_class$' ), array( $widget_ID, $widget_css_class ), $params );
 	}
 
@@ -545,7 +571,7 @@ class ComponentWidget extends DataObject
 	 */
 	function display( $params )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 		global $Plugins;
 		global $rsc_url;
 
@@ -555,6 +581,8 @@ class ComponentWidget extends DataObject
 		switch( $this->type )
 		{
 			case 'plugin':
+				// Set widget ID param to make it available in plugin function SkinTag():
+				$this->disp_params['wi_ID'] = $this->ID;
 				// Call plugin (will return false if Plugin is not enabled):
 				if( $Plugins->call_by_code( $this->code, $this->disp_params ) )
 				{
@@ -578,7 +606,7 @@ class ComponentWidget extends DataObject
 	 */
 	function display_with_cache( $params, $keys = array() )
 	{
-		global $Blog, $Timer, $debug, $admin_url, $Session;
+		global $Collection, $Blog, $Timer, $debug, $admin_url, $Session;
 
 		$this->init_display( $params );
 
@@ -669,7 +697,7 @@ class ComponentWidget extends DataObject
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $this->type == 'plugin' && $this->get_Plugin() )
 		{	// Get widget cache keys from plugin:
@@ -704,8 +732,8 @@ class ComponentWidget extends DataObject
 			if( $check_blog_restriction )
 			{ // Check blog restriction for widget caching
 				$widget_Blog = & $this->get_Blog();
-				if( ! $widget_Blog->get_setting( 'cache_enabled_widgets' ) )
-				{ // Widget/block cache is not allowed by blog setting
+				if( $widget_Blog && ! $widget_Blog->get_setting( 'cache_enabled_widgets' ) )
+				{	// Widget/block cache is not allowed by collection setting:
 					return 'denied';
 				}
 			}
@@ -760,7 +788,7 @@ class ComponentWidget extends DataObject
 		/**
 		 * @var Blog
 		 */
-		global $Blog, $baseurl;
+		global $Collection, $Blog, $baseurl;
 
 		echo $this->disp_params['block_start'];
 
@@ -912,10 +940,189 @@ class ComponentWidget extends DataObject
 		if( $this->Blog === NULL )
 		{ // Get blog only first time
 			$BlogCache = & get_BlogCache();
-			$this->Blog = & $BlogCache->get_by_ID( $this->coll_ID );
+			$this->Blog = & $BlogCache->get_by_ID( $this->coll_ID, false, false );
 		}
 
 		return $this->Blog;
+	}
+
+
+	/**
+	 * Get current layout
+	 *
+	 * @return string|NULL Widget layout | NULL - if widget has no layout setting
+	 */
+	function get_layout()
+	{
+		if( isset( $this->disp_params['layout'] ) )
+		{
+			return $this->disp_params['layout'];
+		}
+
+		if( isset( $this->disp_params['thumb_layout'] ) )
+		{
+			return $this->disp_params['thumb_layout'];
+		}
+
+		return NULL;
+	}
+
+
+	/**
+	 * Get start of layout
+	 *
+	 * @return string
+	 */
+	function get_layout_start()
+	{
+		switch( $this->get_layout() )
+		{
+			case 'grid':
+				// Grid / Table layout:
+				return $this->disp_params['grid_start'];
+
+			case 'flow':
+				// Flow block layout:
+				return $this->disp_params['flow_start'];
+
+			case 'rwd':
+				// RWD block layout:
+				return $this->disp_params['rwd_start'];
+
+			default:
+				// List layout:
+				return $this->disp_params['list_start'];
+		}
+	}
+
+
+	/**
+	 * Get end of layout
+	 *
+	 * @param integer Cell index (used for grid/table layout)
+	 * @return string
+	 */
+	function get_layout_end( $cell_index = 0 )
+	{
+		switch( $this->get_layout() )
+		{
+			case 'grid':
+				// Grid / Table layout:
+				$r = '';
+				$nb_cols = isset( $this->disp_params['grid_nb_cols'] ) ? $this->disp_params['grid_nb_cols'] : 1;
+				if( $cell_index && ( $cell_index % $nb_cols != 0 ) )
+				{
+					$r .= $this->disp_params['grid_colend'];
+				}
+				$r .= $this->disp_params['grid_end'];
+				return $r;
+
+			case 'flow':
+				// Flow block layout:
+				return $this->disp_params['flow_end'];
+
+			case 'rwd':
+				// RWD block layout:
+				return $this->disp_params['rwd_end'];
+
+			default:
+				// List layout:
+				return $this->disp_params['list_end'];
+		}
+	}
+
+
+	/**
+	 * Get item start of layout
+	 *
+	 * @param integer Cell index (used for grid/table layout)
+	 * @param boolean TRUE if current item/cell is selected
+	 * @param string Prefix for param
+	 * @return string
+	 */
+	function get_layout_item_start( $cell_index = 0, $is_selected = false, $disp_param_prefix = '' )
+	{
+		switch( $this->get_layout() )
+		{
+			case 'grid':
+				// Grid / Table layout:
+				$r = '';
+				$nb_cols = isset( $this->disp_params['grid_nb_cols'] ) ? $this->disp_params['grid_nb_cols'] : 1;
+				if( $cell_index % $nb_cols == 0 )
+				{
+					$r .= $this->disp_params['grid_colstart'];
+				}
+				$r .= $this->disp_params['grid_cellstart'];
+				return $r;
+
+			case 'flow':
+				// Flow block layout:
+				return $this->disp_params['flow_block_start'];
+
+			case 'rwd':
+				// RWD block layout:
+				$r = $this->disp_params['rwd_block_start'];
+				if( isset( $this->disp_params['rwd_block_class'] ) )
+				{	// Replace css class of RWD block with value from widget setting:
+					$r = str_replace( '$wi_rwd_block_class$', $this->disp_params['rwd_block_class'], $r );
+				}
+				return $r;
+
+			default:
+				// List layout:
+				if( $is_selected )
+				{
+					return $this->disp_params[$disp_param_prefix.'item_selected_start'];
+				}
+				else
+				{
+					return $this->disp_params[$disp_param_prefix.'item_start'];
+				}
+		}
+	}
+
+
+	/**
+	 * Get item end of layout
+	 *
+	 * @param integer Cell index (used for grid/table layout)
+	 * @param boolean TRUE if current item/cell is selected
+	 * @param string Prefix for param
+	 * @return string
+	 */
+	function get_layout_item_end( $cell_index = 0, $is_selected = false, $disp_param_prefix = '' )
+	{
+		switch( $this->get_layout() )
+		{
+			case 'grid':
+				// Grid / Table layout:
+				$r = $this->disp_params['grid_cellend'];
+				$nb_cols = isset( $this->disp_params['grid_nb_cols'] ) ? $this->disp_params['grid_nb_cols'] : 1;
+				if( $cell_index % $nb_cols == 0 )
+				{
+					$r .= $this->disp_params['grid_colend'];
+				}
+				return $r;
+
+			case 'flow':
+				// Flow block layout:
+				return $this->disp_params['flow_block_end'];
+
+			case 'rwd':
+				// RWD block layout:
+				return $this->disp_params['rwd_block_end'];
+
+			default:
+				// List layout:
+				if( $is_selected )
+				{
+					return $this->disp_params[$disp_param_prefix.'item_selected_end'];
+				}
+				else
+				{
+					return $this->disp_params[$disp_param_prefix.'item_end'];
+				}
+		}
 	}
 }
 ?>

@@ -1,0 +1,71 @@
+/*
+ * Styles for Site skin "bootstrap_site_navbar_skin"
+ */
+.bootstrap_site_navbar_header .navbar {
+  margin-bottom: 0;
+}
+.bootstrap_site_navbar_header .navbar .navbar-collapse {
+  padding: 0;
+}
+.bootstrap_site_navbar_header .navbar .navbar-collapse .nav {
+  margin: 0;
+}
+.bootstrap_site_navbar_header .navbar .navbar-collapse .nav .login {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  line-height: 32px;
+}
+.bootstrap_site_navbar_header .navbar .navbar-collapse .nav .login img {
+  margin-right: 5px;
+  border-radius: 4px;
+}
+.bootstrap_site_navbar_header .level2 ul.nav.nav-pills {
+  margin: 15px 0;
+}
+@media (min-width: 768px) {
+  .bootstrap_site_navbar_header .navbar .container-fluid.level1 {
+    padding-right: 0;
+  }
+  .bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-left {
+    margin-right: 15px;
+  }
+  .bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-right .login {
+    padding-top: 9px;
+    padding-bottom: 9px;
+  }
+}
+.bootstrap_site_navbar_footer {
+  background-color: #f5f5f5;
+}
+.bootstrap_site_navbar_footer p {
+  margin: 20px 0;
+}
+.btn.slide-top {
+  opacity: 0;
+  visibility: hidden;
+  float: right;
+  font-size: 20px;
+  position: fixed;
+  padding: 2px 13px;
+  right: 8px;
+  top: 8px;
+  transition: all 0.3s;
+  z-index: 9999;
+}
+.btn.slide-top.slide-top-visible {
+  opacity: 1;
+  visibility: visible;
+}
+.btn.slide-top.logged_in_margin_top {
+  top: 35px;
+}
+@media only screen and (max-device-width: 1024px) {
+  .btn.slide-top.logged_in_margin_top {
+    top: 8px;
+  }
+}
+@media (min-width: 768px) and (max-width: 991px) and (min-device-width: 1024px) {
+  .btn.slide-top.logged_in_margin_top {
+    top: 35px;
+  }
+}

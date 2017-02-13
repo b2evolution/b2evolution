@@ -33,6 +33,10 @@ $debug = false;
 // Do not append Debug JSlog to response!
 $debug_jslog = false;
 
+// Don't check new updates from b2evolution.net (@see b2evonet_get_updates()),
+// in order to don't break the response data:
+$allow_evo_stats = false;
+
 /**
  * Send a trackback response and exits.
  *
@@ -90,7 +94,7 @@ if( !( $commented_Item = & $ItemCache->get_by_ID( $tb_id, false ) ) )
 	trackback_response( 1, 'Sorry, the requested post doesn\'t exist.' ); // exits
 }
 
-if( !( $Blog = & $commented_Item->get_Blog() ) )
+if( !( $Collection = $Blog = & $commented_Item->get_Blog() ) )
 {
 	trackback_response( 1, 'Sorry, could not get the post\'s weblog.' ); // exits
 }
@@ -111,7 +115,7 @@ if( $commented_Item->comment_status != 'open' )
 // CHECK content
 if( $error = validate_url( $url, 'commenting' ) )
 {
-	$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
+	$Messages->add_to_group( T_('Supplied URL is invalid: ').$error, 'error', T_('Validation errors:') );
 }
 
 if( $Messages->has_errors() )
@@ -139,7 +143,7 @@ $comment .= $excerpt;
 $comment = format_to_post( $comment, 1 ); // includes antispam
 if( empty($comment) )
 { // comment should not be empty!
-	$Messages->add( T_('Please do not send empty comment'), 'error' );
+	$Messages->add_to_group( T_('Please do not send empty comment'), 'error', T_('Validation errors:') );
 }
 
 

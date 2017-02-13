@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
 
-global $blog, $admin_url, $rsc_url, $current_User, $UserSettings, $tab3;
+global $blog, $sec_ID, $admin_url, $rsc_url, $current_User, $UserSettings, $tab3;
 
 global $dname, $dtyp_normal, $dtyp_searcheng, $dtyp_aggregator, $dtyp_email, $dtyp_unknown;
 
@@ -47,13 +47,14 @@ if( empty( $blog ) )
 }
 else
 { // Page title for selected blog domains
-	global $Blog;
+	global $Collection, $Blog;
 	$page_title = sprintf( T_('Referring domains for collection %s'), $Blog->get( 'shortname' ) );
 }
 
 echo '<h2 class="page-title">'.$page_title.'</h2>';
 
 $SQL = new SQL();
+$list_is_filtered = false;
 
 $selected_agnt_types = array();
 if( $dtyp_normal ) $selected_agnt_types[] = "'normal'";
@@ -62,10 +63,12 @@ if( $dtyp_aggregator ) $selected_agnt_types[] = "'aggregator'";
 if( $dtyp_email ) $selected_agnt_types[] = "'email'";
 if( $dtyp_unknown ) $selected_agnt_types[] = "'unknown'";
 $SQL->WHERE( 'dom_type IN ( ' . implode( ', ', $selected_agnt_types ) . ' )' );
+if( count( $selected_agnt_types ) != 5 ) $list_is_filtered = true;
 
 if( ! empty( $dname ) )
 {
 	$SQL->WHERE( 'dom_name LIKE '.$DB->quote( '%'.$dname.'%' ) );
+	$list_is_filtered = true;
 }
 
 // Exclude hits of type "self" and "admin":
@@ -73,16 +76,22 @@ if( ! empty( $dname ) )
 //$where_clause .= ' AND hit_referer_type NOT IN ( "self", "admin" )';
 
 if( ! empty( $blog ) )
-{
+{	// Filter by collection:
 	$SQL->WHERE_and( 'hit_coll_ID = '.$blog.' OR hit_coll_ID IS NULL' );
 }
 
 $SQL->FROM( 'T_basedomains LEFT OUTER JOIN T_hitlog ON dom_ID = hit_referer_dom_ID' );
 
+if( ! empty( $sec_ID ) )
+{	// Filter by section:
+	$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+	$SQL->WHERE_and( 'blog_sec_ID = '.$sec_ID );
+}
+
 if( $tab3 == 'top' )
 { // Calculate the counts only for "top" tab
 	$SQL->SELECT( 'SQL_NO_CACHE COUNT( hit_ID ) AS hit_count' );
-	$total_hit_count = $DB->get_var( $SQL->get(), 0, 0, 'Get total hit count - referred hits only' );	
+	$total_hit_count = $DB->get_var( $SQL->get(), 0, 0, 'Get total hit count - referred hits only' );
 
 	$sql_select = ', COUNT( hit_ID ) AS hit_count';
 }
@@ -92,7 +101,7 @@ else
 }
 
 // Create result set:
-$SQL->SELECT( 'SQL_NO_CACHE dom_name, dom_status, dom_type'.$sql_select );
+$SQL->SELECT( 'SQL_NO_CACHE dom_ID, dom_name, dom_comment, dom_status, dom_type'.$sql_select );
 $SQL->GROUP_BY( 'dom_ID' );
 
 $count_SQL = new SQL();
@@ -101,6 +110,11 @@ $count_SQL->FROM( $SQL->get_from( '' ) );
 $count_SQL->WHERE( $SQL->get_where( '' ) );
 
 $Results = new Results( $SQL->get(), 'refdom_', '---D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
+
+if( $list_is_filtered )
+{ // List is filtered, offer option to reset filters:
+	$Results->global_icon( T_('Reset all filters!'), 'reset_filters', $admin_url.'?ctrl=stats&amp;tab=domains&amp;tab3='.$tab3.( empty( $blog ) ? '' : '&amp;blog='.$blog ), T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
+}
 
 if( $current_User->check_perm( 'stats', 'edit' ) )
 { // Current user has a permission to create new domain
@@ -132,7 +146,12 @@ if( get_param( 'ctrl' ) == 'antispam' )
 }
 else
 { // Default url for stats controller
-	$current_url = $admin_url.'?ctrl=stats&amp;tab=domains&amp;tab3='.$tab3.'&amp;blog='.$blog;
+
+	// Initialize params to filter by selected collection and/or group:
+	$section_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
+	$section_params .= empty( $sec_ID ) ? '' : '&amp;sec_ID='.$sec_ID;
+
+	$current_url = $admin_url.'?ctrl=stats&amp;tab=domains&amp;tab3='.$tab3.$section_params;
 }
 
 $Results->filter_area = array(
@@ -157,6 +176,11 @@ $Results->cols[] = array(
 						'td' => '$dom_name$',
 						'total' => '<strong>'.T_('Global total').'</strong>',
 					);
+
+$Results->cols[] = array(
+		'th' => T_('Comment'),
+		'td' => '$dom_comment$'
+	);
 
 $Results->cols[] = array(
 		'th' => T_('Type'),
@@ -200,6 +224,27 @@ if( $tab3 == 'top' )
 					);
 }
 
+if( $current_User->check_perm( 'stats', 'edit' ) )
+{
+	$Results->cols[] = array(
+			'th' => T_('Actions'),
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'shrinkwrap',
+			'td' => '%dom_row_actions( #dom_ID# )%'
+		);
+}
+
+function dom_row_actions( $dom_ID )
+{
+	global $admin_url, $tab3;
+
+	$r = '';
+	$r .= action_icon( T_('Edit this domain'), 'edit', $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$dom_ID.'&amp;tab3='.$tab3 );
+	$r .= action_icon( T_('Delete this domain'), 'delete', $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_delete&amp;dom_ID='.$dom_ID.'&amp;tab3='.$tab3.'&amp;'.url_crumb( 'domain' ) );
+
+	return $r;
+}
+
 // Display results:
 $Results->display();
 
@@ -208,7 +253,7 @@ if( $current_User->check_perm( 'stats', 'edit' ) )
 	// Print JS to edit a domain type
 	echo_editable_column_js( array(
 		'column_selector' => '.dom_type_edit',
-		'ajax_url'        => get_secure_htsrv_url().'async.php?action=dom_type_edit&'.url_crumb( 'domtype' ),
+		'ajax_url'        => get_htsrv_url().'async.php?action=dom_type_edit&'.url_crumb( 'domtype' ),
 		'options'         => stats_dom_type_titles( true ),
 		'new_field_name'  => 'new_dom_type',
 		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',
@@ -217,7 +262,7 @@ if( $current_User->check_perm( 'stats', 'edit' ) )
 	// Print JS to edit a domain status
 	echo_editable_column_js( array(
 		'column_selector' => '.dom_status_edit',
-		'ajax_url'        => get_secure_htsrv_url().'async.php?action=dom_status_edit&'.url_crumb( 'domstatus' ),
+		'ajax_url'        => get_htsrv_url().'async.php?action=dom_status_edit&'.url_crumb( 'domstatus' ),
 		'options'         => stats_dom_status_titles( true ),
 		'new_field_name'  => 'new_dom_status',
 		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',

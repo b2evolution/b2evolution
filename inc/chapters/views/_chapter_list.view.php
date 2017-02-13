@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 
 global $Settings;
 
@@ -79,6 +79,9 @@ function cat_line( $Chapter, $level )
 		$makedef_icon = '<a href="'.$makedef_url.'" title="'.$makedef_title.'">'.get_icon( 'disabled', 'imgtag', array( 'title' => $makedef_title ) ).'</a>';
 	}
 	$r .= '<td class="center">'.$makedef_icon.'</td>';
+
+	// Image:
+	$r .= '<td>'.$Chapter->get_image_tag().'</td>';
 
 	// Name
 	if( $permission_to_edit )
@@ -236,6 +239,10 @@ $Table->cols[] = array(
 						'th_class' => 'shrinkwrap',
 					);
 $Table->cols[] = array(
+						'th' => T_('Image'),
+						'th_class' => 'shrinkwrap',
+					);
+$Table->cols[] = array(
 						'th' => T_('Name'),
 					);
 $Table->cols[] = array(
@@ -343,7 +350,7 @@ $Session->delete( 'fadeout_array');
 // Print JS to edit order of the chapters inline
 echo_editable_column_js( array(
 	'column_selector' => '.cat_order_edit',
-	'ajax_url'        => get_secure_htsrv_url().'async.php?action=cat_order_edit&blogid='.$Blog->ID.'&'.url_crumb( 'catorder' ),
+	'ajax_url'        => get_htsrv_url().'async.php?action=cat_order_edit&blogid='.$Blog->ID.'&'.url_crumb( 'catorder' ),
 	'new_field_name'  => 'new_cat_order',
 	'ID_value'        => 'jQuery( this ).attr( "rel" )',
 	'ID_name'         => 'cat_ID',

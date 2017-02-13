@@ -60,10 +60,17 @@ class LinkOwner
 	var $_trans = NULL;
 
 	/**
+	 * Name of ID field in DB without prefix 'link_'
+	 *
+	 * @var string
+	 */
+	var $ID_field_name;
+
+
+	/**
 	 * Abstract methods that needs to be overriden in every subclass
 	 *
 	 * function check_perm( $perm_name, $assert = false ); // check link owner object ( item, comment, ... ) edit/view permission
-	 * function get_where_condition(); // get where condition for select query to get link owner links
 	 * function get_positions(); // get all positions where link can be displayed ( 'teaser', 'aftermore' )
 	 * function get_edit_url(); // get link owner edit url
 	 * function get_view_url(); // get link owner view url
@@ -79,12 +86,53 @@ class LinkOwner
 	 *
 	 * @param object the link owner object
 	 * @param string the link type ( item, comment, ... )
+	 * @param string Name of ID field ( itm_ID, cmt_ID, usr_ID, ecmp_ID, msg_ID )
+	 * @param integer ID of temporary object
 	 */
-	function __construct( $link_Object, $type )
+	function __construct( $link_Object, $type, $ID_field_name, $tmp_ID = NULL )
+	{
+		$this->ID_field_name = $ID_field_name;
+		$this->type = $type;
+		$this->set_object( $link_Object, $tmp_ID );
+	}
+
+
+	/**
+	 * Set object of this link owner
+	 * If object is creating currently then new temporary object will be used instead
+	 *
+	 * @param object Object
+	 */
+	function set_object( $link_Object, $tmp_ID = NULL )
 	{
 		$this->link_Object = $link_Object;
-		$this->type = $type;
+
+		if( empty( $link_Object ) || empty( $link_Object->ID ) )
+		{	// The object is creating currently, we should use a temporary object:
+			if( $tmp_ID )
+			{	// Get already created temporary object:
+				$TemporaryIDCache = & get_TemporaryIDCache();
+				$tmp_link_Object = & $TemporaryIDCache->get_by_ID( $tmp_ID, false, false );
+			}
+			else
+			{	// Create new temporary object:
+				global $blog;
+				$tmp_link_Object = new TemporaryID();
+				$tmp_link_Object->set( 'type', $this->type );
+				if( ! empty( $blog ) )
+				{
+					$tmp_link_Object->set( 'coll_ID', $blog );
+				}
+				$tmp_link_Object->dbinsert();
+			}
+
+			// Mark this link owner is using a temporary object:
+			$this->link_Object->tmp_ID = $tmp_link_Object->ID;
+			$this->link_Object->tmp_coll_ID = $tmp_link_Object->get( 'coll_ID' );
+			$this->link_Object->type = $tmp_link_Object->get( 'type' );
+		}
 	}
+
 
 	/**
 	 * Get all links
@@ -176,6 +224,18 @@ class LinkOwner
 		return $this->Blog;
 	}
 
+
+	/**
+	 * Get where condition for select query to get owner links
+	 *
+	 * @return string
+	 */
+	function get_where_condition()
+	{
+		return 'link_'.$this->get_ID_field_name().' = '.$this->get_ID();
+	}
+
+
 	/**
 	 * Get SQL query to select all links attached to this owner
 	 *
@@ -199,7 +259,7 @@ class LinkOwner
 		}
 
 		// Set links query. Note: Use inner join to make sure that result contains only existing files!
-		$SQL->SELECT( 'link_ID, link_ltype_ID, link_position, link_cmt_ID, link_itm_ID, file_ID, file_type, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash' );
+		$SQL->SELECT( 'link_ID, link_ltype_ID, link_position, link_cmt_ID, link_itm_ID, file_ID, file_creator_user_ID, file_type, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash' );
 		$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
 		$SQL->WHERE( $this->get_where_condition() );
 		$SQL->ORDER_BY( $order_by );
@@ -207,13 +267,36 @@ class LinkOwner
 		return $SQL;
 	}
 
+
+	/**
+	 * Check if current link owner is used as temporary for new creating object
+	 *
+	 * @return boolean TRUE if link owner is temporary
+	 */
+	function is_temp()
+	{
+		return ! empty( $this->link_Object->tmp_ID );
+	}
+
 	/**
 	 * Get link owner object ID
 	 */
 	function get_ID()
 	{
-		return $this->link_Object->ID;
+		return $this->is_temp() ? $this->link_Object->tmp_ID : $this->link_Object->ID;
 	}
+
+
+	/**
+	 * Get link owner object ID field name
+	 *
+	 * @return string
+	 */
+	function get_ID_field_name()
+	{
+		return $this->is_temp() ? 'tmp_ID' : $this->ID_field_name;
+	}
+
 
 	/**
 	 * Get link owner object parameter
@@ -282,7 +365,7 @@ class LinkOwner
 		$FileList = new DataObjectList2( $FileCache ); // IN FUNC
 
 		$SQL = new SQL();
-		$SQL->SELECT( 'file_ID, file_type, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash, link_ID' );
+		$SQL->SELECT( 'file_ID, file_creator_user_ID, file_type, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash, link_ID' );
 		$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
 		$SQL->WHERE( $this->get_where_condition() );
 		if( !empty($position) )
@@ -409,6 +492,29 @@ class LinkOwner
 	{
 		// Update last touched date of the Owner
 		$this->update_last_touched_date();
+	}
+
+
+	/**
+	 * Get last order number of this Link Owner
+	 *
+	 * @return integer
+	 */
+	function get_last_order()
+	{
+		global $DB;
+
+		if( $this->get_ID() == 0 )
+		{
+			return 0;
+		}
+
+		$SQL = new SQL( 'Get last order number of the Link Owner ( '.$this->type.', #'.$this->get_ID().' )' );
+		$SQL->SELECT( 'MAX( link_order )' );
+		$SQL->FROM( 'T_links' );
+		$SQL->WHERE( 'link_'.$this->ID_field_name.' = '.$this->get_ID() );
+
+		return intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
 	}
 }
 

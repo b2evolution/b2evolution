@@ -22,7 +22,7 @@ global $AdminUI;
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 
 global $current_User;
 
@@ -67,7 +67,7 @@ $Form->begin_form( '' );
 
 	if( $tab3 != 'meta' )
 	{ // These filters only for normal comments:
-		echo '<fieldset class="clear">';
+		echo '<fieldset class="clearfix">';
 		echo '<legend>'.T_('Comments to show').'</legend>';
 
 		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!' ), array( 'redirected' ) );
@@ -91,7 +91,7 @@ $Form->begin_form( '' );
 		echo '</fieldset>';
 	}
 
-	echo '<fieldset class="clear">';
+	echo '<fieldset class="clearfix">';
 	echo '<legend>'.T_('Title / Text contains').'</legend>';
 
 	echo $Form->inputstart;
