@@ -100,7 +100,7 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 					'function'     => 'select',
 					'selected'     => ( $current_skin_ID == $skin->ID ),
 					'select_url'   => $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID='.$skin->ID.'&amp;'.url_crumb( 'collection' ),
-					'onclick'      => 'return confirm_skin_selection( this )',
+					'onclick'      => 'return confirm_skin_selection( this, "'.$skin->type.'" )',
 					'function_url' => url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode( $skin->folder ) ),
 					'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $skin->ID, $fadeout_array['skin_ID'] ) ),
 				) );
@@ -130,7 +130,7 @@ if( isset( $skins['partial'] ) )
 					'function'     => 'select',
 					'selected'     => ( $current_skin_ID == $skin->ID ),
 					'select_url'   => $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID='.$skin->ID.'&amp;'.url_crumb( 'collection' ),
-					'onclick'      => 'return confirm_skin_selection( this )',
+					'onclick'      => 'return confirm_skin_selection( this, "'.$skin->type.'" )',
 					'function_url' => url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode( $skin->folder ) ),
 					'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $skin->ID, $fadeout_array['skin_ID'] ) ),
 				) );
@@ -158,7 +158,7 @@ if( isset( $skins['maybe'] ) )
 					'function'     => 'select',
 					'selected'     => ( $current_skin_ID == $skin->ID ),
 					'select_url'   => $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID='.$skin->ID.'&amp;'.url_crumb( 'collection' ),
-					'onclick'      => 'return confirm_skin_selection( this )',
+					'onclick'      => 'return confirm_skin_selection( this, "'.$skin->type.'" )',
 					'function_url' => url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode( $skin->folder ) ),
 					'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $skin->ID, $fadeout_array['skin_ID'] ) ),
 				) );
@@ -172,41 +172,6 @@ if( isset( $skins['maybe'] ) )
 // Flush fadeout
 $Session->delete( 'fadeout_array');
 
-// Initialize JavaScript to build and open window:
-echo_modalwindow_js();
-
-switch( $skin_type )
-{
-	case 'normal':
-		$modal_window_title = TS_('You are about to change the Normal skin of your collection. Do you want to reset the widgets to what the new skin recommends?');
-		$modal_reset_button_class = 'btn-danger';
-		$modal_keep_button_class = 'btn-default';
-		break;
-	case 'mobile':
-		$modal_window_title = TS_('You are about to change the Mobile skin of your collection. Do you want to reset the widgets to what the new skin recommends?');
-		$modal_reset_button_class = 'btn-default btn-danger-hover';
-		$modal_keep_button_class = 'btn-primary';
-		break;
-	case 'tablet':
-		$modal_window_title = TS_('You are about to change the Tablet skin of your collection. Do you want to reset the widgets to what the new skin recommends?');
-		$modal_reset_button_class = 'btn-default btn-danger-hover';
-		$modal_keep_button_class = 'btn-primary';
-		break;
-}
+// JavaScript code to confirm skin selection:
+echo_confirm_skin_selection_js( $skin_type );
 ?>
-<script type="text/javascript">
-function confirm_skin_selection( link_obj )
-{
-	var keep_url = jQuery( link_obj ).attr( 'href' );
-	var reset_url = keep_url + '&reset_widgets=1';
-
-	openModalWindow( '<p><?php echo $modal_window_title; ?></p>'
-		+ '<form>'
-		+ '<a href="' + reset_url + '" class="btn <?php echo $modal_reset_button_class; ?>"><?php echo TS_('Reset widgets'); ?></a>'
-		+ '<a href="' + keep_url + '" class="btn <?php echo $modal_keep_button_class; ?>"><?php echo TS_('Keep existing widgets'); ?></a>'
-		+ '</form>',
-		'500px', '', true,
-		'<span class="text-danger"><?php echo TS_('WARNING');?></span>', '', true );
-	return false;
-}
-</script>

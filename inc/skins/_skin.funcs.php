@@ -2743,6 +2743,12 @@ function skin_body_attrs( $params = array() )
 }
 
 
+/**
+ * Get skin version by ID
+ *
+ * @param integer Skin ID
+ * @return string Skin version
+ */
 function get_skin_version( $skin_ID )
 {
 	$SkinCache = & get_SkinCache();
@@ -2754,5 +2760,58 @@ function get_skin_version( $skin_ID )
 	}
 
 	return 'unknown';
+}
+
+
+/**
+ * Output JavaScript code to confirm skin selection
+ */
+function echo_confirm_skin_selection_js()
+{
+	// Initialize JavaScript to build and open modal window:
+	echo_modalwindow_js();
+?>
+<script type="text/javascript">
+function confirm_skin_selection( link_obj, skin_type )
+{
+	var keep_url = jQuery( link_obj ).attr( 'href' );
+	var reset_url = keep_url + '&reset_widgets=1';
+	var modal_window_title = '';
+	var modal_reset_button_class = 'btn-default btn-danger-hover';
+	var modal_keep_button_class = 'btn-primary';
+
+	switch( skin_type )
+	{
+		case 'mobile':
+			modal_window_title = '<?php echo TS_('You are about to change the Mobile skin of your collection. Do you want to reset the widgets to what the new skin recommends?'); ?>';
+			break;
+		case 'tablet':
+			modal_window_title = '<?php echo TS_('You are about to change the Tablet skin of your collection. Do you want to reset the widgets to what the new skin recommends?'); ?>';
+			break;
+		case 'feed':
+			modal_window_title = '<?php echo TS_('You are about to change the Feed skin of your collection. Do you want to reset the widgets to what the new skin recommends?'); ?>';
+			break;
+		case 'sitemap':
+			modal_window_title = '<?php echo TS_('You are about to change the Sitemap skin of your collection. Do you want to reset the widgets to what the new skin recommends?'); ?>';
+			break;
+		case 'normal':
+		default:
+			modal_window_title = '<?php echo TS_('You are about to change the Normal skin of your collection. Do you want to reset the widgets to what the new skin recommends?'); ?>';
+			modal_reset_button_class = 'btn-danger';
+			modal_keep_button_class = 'btn-default';
+			break;
+	}
+
+	openModalWindow( '<p>' + modal_window_title + '</p>'
+		+ '<form>'
+		+ '<a href="' + reset_url + '" class="btn ' + modal_reset_button_class + '"><?php echo TS_('Reset widgets'); ?></a>'
+		+ '<a href="' + keep_url + '" class="btn ' + modal_keep_button_class + '"><?php echo TS_('Keep existing widgets'); ?></a>'
+		+ '</form>',
+		'500px', '', true,
+		'<span class="text-danger"><?php echo TS_('WARNING');?></span>', '', true );
+	return false;
+}
+</script>
+<?php
 }
 ?>

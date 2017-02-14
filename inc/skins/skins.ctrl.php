@@ -80,6 +80,11 @@ switch( $action )
 			$edited_Blog->set_setting( $edited_Skin->type.'_skin_ID', $edited_Skin->ID );
 			$edited_Blog->dbupdate();
 
+			if( param( 'reset_widgets', 'integer', 0 ) )
+			{	// Reset previous widgets with new from skin default widget declarations:
+				$edited_Blog->reset_widgets( $edited_Skin->type );
+			}
+
 			$Messages->add( T_('The blog skin has been changed.')
 								.' <a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$edited_Blog->ID.'">'.T_('Edit...').'</a>', 'success' );
 			if( ( !$Session->is_mobile_session() && !$Session->is_tablet_session() && $edited_Skin->type == 'normal' ) ||

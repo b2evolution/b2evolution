@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $skins_path, $admin_url, $redirect_to, $action, $kind, $blog;
+global $skins_path, $admin_url, $redirect_to, $action, $kind, $blog, $tab;
 
 $skin_type = param( 'skin_type', 'string', '' );
 $collection_kind = param( 'collection_kind', 'string', NULL );
@@ -208,6 +208,7 @@ foreach( $skin_folders as $skin_folder )
 			                     .'&amp;skin_folder='.rawurlencode( $skin_folder )
 			                     .'&amp;redirect_to='.rawurlencode( $redirect_to_after_install )
 			                     .'&amp;'.url_crumb( 'skin' ),
+			'onclick'         => ( $tab == 'current_skin' ? 'return confirm_skin_selection( this, "'.$folder_Skin->type.'" )' : '' ),
 			'skin_compatible' => $skin_compatible,
 		);
 	}
@@ -236,6 +237,11 @@ else
 $Form->end_form( $form_buttons );
 
 $block_item_Widget->disp_template_replaced( 'block_end' );
+
+if( $tab == 'current_skin' )
+{	// JavaScript code to confirm skin selection:
+	echo_confirm_skin_selection_js();
+}
 
 ?>
 <script type="text/javascript">

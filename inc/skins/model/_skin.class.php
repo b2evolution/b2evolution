@@ -383,12 +383,6 @@ class Skin extends DataObject
 		}
 		$declared_widgets['Page Top'][] = array( 'core', 'social_links', $social_link_params );
 
-		$default_blog_param = 's:7:"blog_ID";s:0:"";';
-		if( ! empty( $context['coll_photoblog_ID'] ) )
-		{ // In the case of initial install, we grab photos out of the photoblog (Blog #4)
-			$default_blog_param = 's:7:"blog_ID";s:1:"'.intval( $context['coll_photoblog_ID'] ).'";';
-		}
-
 		/* Sidebar */
 		if( $coll_kind == 'manual' )
 		{
@@ -971,7 +965,9 @@ class Skin extends DataObject
 		elseif( isset( $disp_params['function_url'] ) )
 		{	// Initialize params for link to INSTALL new skin and probably select this automatically for collection:
 			$skin_url = $disp_params['function_url'];
-			$select_a_begin = '<a href="'.$disp_params[ 'function_url' ].'" title="'.T_('Install NOW!').'">';
+			$select_a_begin = '<a href="'.$disp_params['function_url'].'"'
+				.( isset( $disp_params['onclick'] ) ? ' onclick="'.format_to_output( $disp_params['onclick'] , 'htmlattr' ).'"' : '' )
+				.' title="'.format_to_output( T_('Install NOW!'), 'htmlattr' ).'">';
 			$select_a_end = '</a>';
 		}
 		else
