@@ -73,17 +73,8 @@ else
 
 	memorize_param( 'blog', 'integer', -1 );	// Needed when generating static page for example
 
+	param( 'skin_type', 'string', 'normal' );
 	param( 'skinpage', 'string', '' );
-	if( $tab == 'skin' && $skinpage != 'selection' )	// If not screen selection => screen settings
-	{
-		$SkinCache = & get_SkinCache();
-		/**
-		* @var Skin
-		*/
-		$normal_Skin = & $SkinCache->get_by_ID( $Blog->get_setting( 'normal_skin_ID' ) );
-		$mobile_Skin = & $SkinCache->get_by_ID( $Blog->get_setting( 'mobile_skin_ID' ) );
-		$tablet_Skin = & $SkinCache->get_by_ID( $Blog->get_setting( 'tablet_skin_ID' ) );
-	}
 
 	if( ( $tab == 'perm' || $tab == 'permgroup' )
 		&& ( empty($blog) || ! $Blog->advanced_perms ) )
@@ -172,7 +163,7 @@ switch( $action )
 
 			case 'skin':
 				if( $skinpage == 'selection' )
-				{
+				{	// Set new skin for the collection:
 					if( $edited_Blog->load_from_Request( array() ) )
 					{ // Commit update to the DB:
 						$edited_Blog->dbupdate();
@@ -185,25 +176,39 @@ switch( $action )
 							header_redirect( $edited_Blog->gen_blogurl() );
 						}
 						else
-						{	// Redirect to admin skins page if we change the skin for another device type
-							header_redirect( $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID );
+						{	// Redirect to admin skins page if we change the skin for another device type:
+							$skin_type = ( param( 'mobile_skin_ID' ) !== NULL ? 'mobile' : ( param( 'tablet_skin_ID' ) !== NULL ? 'tablet' : 'normal' ) );
+							header_redirect( $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&skin_type='.$skin_type );
 						}
 					}
 				}
 				else
-				{ // Update params/Settings
-					$normal_Skin->load_params_from_Request();
-					$mobile_Skin->load_params_from_Request();
-					$tablet_Skin->load_params_from_Request();
+				{	// Update skin params/settings of the collection:
+					if( ! in_array( $skin_type, array( 'normal', 'mobile', 'tablet' ) ) )
+					{
+						debug_die( 'Wrong skin type: '.$skin_type );
+					}
+
+					$SkinCache = & get_SkinCache();
+
+					// Get skin by selected type:
+					$skin_ID = $Blog->get_setting( $skin_type.'_skin_ID', ( $skin_type != 'normal' ) );
+					$edited_Skin = & $SkinCache->get_by_ID( $skin_ID, false, false );
+
+					if( ! $edited_Skin )
+					{	// Redirect to don't try update empty skin params:
+						header_redirect( $update_redirect_url.'&skin_type='.$skin_type, 303 ); // Will EXIT
+					}
+
+					// Load skin params from request:
+					$edited_Skin->load_params_from_Request();
 
 					if(	! param_errors_detected() )
 					{	// Update settings:
-						$normal_Skin->dbupdate_settings();
-						$mobile_Skin->dbupdate_settings();
-						$tablet_Skin->dbupdate_settings();
+						$edited_Skin->dbupdate_settings();
 						$Messages->add( T_('Skin settings have been updated'), 'success' );
 						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( $update_redirect_url, 303 ); // Will EXIT
+						header_redirect( $update_redirect_url.'&skin_type='.$skin_type, 303 ); // Will EXIT
 					}
 				}
 				break;
@@ -999,7 +1004,7 @@ else
 			break;
 
 		case 'skin':
-			$AdminUI->set_path( 'collections', 'skin', 'current_skin' );
+			$AdminUI->set_path( 'collections', 'skin', 'skin_'.$skin_type );
 			$AdminUI->breadcrumbpath_add( T_('Skin'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			if( $skinpage == 'selection' )
 			{
@@ -1008,7 +1013,7 @@ else
 			else
 			{
 				init_colorpicker_js();
-				$AdminUI->breadcrumbpath_add( T_('Skins for this blog'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+				$AdminUI->breadcrumbpath_add( T_('Default'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			}
 			$AdminUI->set_page_manual_link( 'skins-for-this-blog' );
 			break;

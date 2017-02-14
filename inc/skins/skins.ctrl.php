@@ -90,7 +90,8 @@ switch( $action )
 			}
 			else
 			{	// Redirect to admin skins page if we change the skin for another device type:
-				header_redirect( $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID );
+				$skin_type = in_array( $edited_Skin->type, array( 'normal', 'mobile', 'tablet' ) ) ? $edited_Skin->type : 'normal';
+				header_redirect( $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&skin_type='.$skin_type );
 			}
 		}
 		else
@@ -243,14 +244,18 @@ switch( $action )
 		param( 'blog', 'integer', true );
 
 		// At some point we may want to remove skin settings from all blogs
-		$DB->query('DELETE FROM T_coll_settings
-								 WHERE cset_coll_ID = '.$DB->quote($blog).'
-								 			 AND cset_name REGEXP "^skin'.$skin_ID.'_"');
+		$DB->query( 'DELETE FROM T_coll_settings
+			WHERE cset_coll_ID = '.$DB->quote( $blog ).'
+			  AND cset_name REGEXP "^skin'.$skin_ID.'_"' );
 
 		$Messages->add( T_('Skin params have been reset to defaults.'), 'success' );
 
+		$SkinCache = & get_SkinCache();
+		$reseted_Skin = & $SkinCache->get_by_ID( $skin_ID, false, false );
+		$skin_type = ( $reseted_Skin && in_array( $reseted_Skin->get( 'type' ), array( 'normal', 'mobile', 'tablet' ) ) ) ? $reseted_Skin->get( 'type' ) : 'normal';
+
 		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( '?ctrl=coll_settings&tab=skin&blog='.$blog, 303 ); // Will EXIT
+		header_redirect( '?ctrl=coll_settings&tab=skin&blog='.$blog.'&skin_type='.$skin_type, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 }
@@ -280,7 +285,7 @@ else
 
 	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
 	$AdminUI->breadcrumbpath_add( T_('Skin'), $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog=$blog$' );
-	$AdminUI->breadcrumbpath_add( T_('Skins for this blog'), $admin_url.'?ctrl=skins' );
+	$AdminUI->breadcrumbpath_add( T_('Default'), $admin_url.'?ctrl=skins' );
 }
 
 // Set an url for manual page:
