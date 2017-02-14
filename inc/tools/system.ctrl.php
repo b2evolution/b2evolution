@@ -80,7 +80,7 @@ function disp_system_check( $condition, $message = '' )
  */
 function system_check_api_url( $title, $url )
 {
-	$ajax_response = @file_get_contents( $url );
+	$ajax_response = fetch_remote_page( $url, $info );
 	if( $ajax_response !== false )
 	{	// Response is correct data:
 		init_system_check( $title, 'OK', $url );
@@ -88,10 +88,9 @@ function system_check_api_url( $title, $url )
 	}
 	else
 	{	// Response is not correct data:
-		$last_error = error_get_last();
 		init_system_check( $title, T_('Failed'), $url );
 		disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.' )
-			.( isset( $last_error['message'] ) ? ' <b>'.sprintf( T_( 'Error: %s' ), $last_error['message'] ).'</b>' : '' ) );
+			.' <b>'.sprintf( T_('Error: %s'), $info['error'] ).'; '.sprintf( T_('Status code: %s'), $info['status'] ).'</b>' );
 	}
 }
 
@@ -698,20 +697,33 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 // REST API:
 $api_title = 'REST API';
 $api_url = $baseurl.'api/v6/collections';
-$json_response = @file_get_contents( $api_url );
-json_decode( $json_response );
-if( json_last_error() === JSON_ERROR_NONE )
+$json_response = fetch_remote_page( $api_url, $api_info );
+$api_result = false;
+if( $json_response !== false )
+{	// Try to decode REST API json data:
+	json_decode( $json_response );
+	$api_result = ( json_last_error() === JSON_ERROR_NONE );
+}
+if( $api_result )
 {	// Response is correct json data:
 	init_system_check( $api_title, 'OK', $api_url );
 	disp_system_check( 'ok' );
 }
 else
 {	// Response is not json data:
-	$last_error = error_get_last();
+	if( ! empty( $api_info['error'] ) )
+	{	// Display error message from function fetch_remote_page():
+		$api_error = ' <b>'.sprintf( T_('Error: %s'), $info['error'] ).'; '.sprintf( T_('Status code: %s'), $info['status'] ).'</b>';
+	}
+	else
+	{	// Display error message from other places:
+		$api_error = error_get_last();
+		$api_error = ( isset( $api_error['message'] ) ? ' <b>'.sprintf( T_( 'Error: %s' ), $api_error['message'] ).'</b>' : '' );
+	}
 	init_system_check( $api_title, T_('Failed'), $api_url );
 	disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.' )
 		.' '.sprintf( T_('Probably you should update a file %s to the latest version or check permissions to use this file.'), '<code>.htaccess</code>' )
-		.( isset( $last_error['message'] ) ? ' <b>'.sprintf( T_( 'Error: %s' ), $last_error['message'] ).'</b>' : '' ) );
+		.$api_error );
 }
 
 // XML-RPC:
@@ -730,8 +742,19 @@ if( $result && ! $result->faultCode() )
 }
 else
 {	// Some error on XML-RPC request:
-	init_system_check( $api_title, T_('Failed'), $api_url );
-	disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.').' <b>'.sprintf( T_( 'Error: %s' ), $result->faultString() ).'</b>' );
+	$xmlrpc_error_message = $result->faultString();
+	if( $xmlrpc_error_message == 'XML-RPC services are disabled on this system.' )
+	{	// Exception for this error:
+		$api_status_title = T_('Disabled');
+		$api_status_type = 'ok';
+	}
+	else
+	{	// Other errors:
+		$api_status_title = T_('Failed');
+		$api_status_type = 'warning';
+	}
+	init_system_check( $api_title, $api_status_title, $api_url );
+	disp_system_check( $api_status_type, T_('This API doesn\'t work properly on this server.').' <b>'.sprintf( T_( 'Error: %s' ), $xmlrpc_error_message ).'</b>' );
 }
 
 // AJAX anon_async.php:

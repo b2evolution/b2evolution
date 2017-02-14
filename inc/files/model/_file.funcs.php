@@ -1710,10 +1710,12 @@ function prepare_uploaded_image( $File, $mimetype )
 function report_user_upload( $File )
 {
 	global $current_User;
+
 	load_funcs( 'files/model/_file.funcs.php' );
 
-	syslog_insert( sprintf( 'User %s has uploaded the file %s -- Size: %s',
-			$current_User->login, '[['.$File->get_full_path().']]', bytesreadable( $File->get_size(), false ) ), 'info', 'file', $File->ID );
+	syslog_insert( sprintf( '%s has uploaded the file %s -- Size: %s',
+		( is_logged_in() ? 'User #'.$current_User->ID.'([['.$current_User->login.']])' : 'Anonymous user' ),
+		'[['.$File->get_full_path().']]', bytesreadable( $File->get_size(), false ) ), 'info', 'file', $File->ID );
 }
 
 
@@ -2852,9 +2854,10 @@ function echo_file_properties()
  * Get root and relative file path by absolute path
  *
  * @param string Absolute path
+ * @param boolean TRUE - to extract data from cache path like 'blogs/home/_evocache/image.jpg/fit-80x80.jpg'
  * @return boolean|array FALSE - if root and path are not detected, Array with keys 'root' and 'path'
  */
-function get_root_path_by_abspath( $abspath )
+function get_root_path_by_abspath( $abspath, $is_cache_path = false )
 {
 	if( empty( $abspath ) )
 	{	// If absolute path is empty do NOT try to decode it:
@@ -2914,13 +2917,16 @@ function get_root_path_by_abspath( $abspath )
 	{	// Get relative path only if root is detected:
 		$relpath = '';
 		$abspath_length = count( $abspath );
-		for( $f = $start_relpath; $f < $abspath_length - 1; $f++ )
+		// For cache path like 'blogs/home/_evocache/image.jpg/fit-80x80.jpg' exclude the last because it is a not path part and just a size info:
+		$last_path_index = ( $is_cache_path ? $abspath_length - 1 : $abspath_length );
+
+		for( $f = $start_relpath; $f < $last_path_index; $f++ )
 		{
-			if( $f == $abspath_length - 3 )
-			{	// Skip this because it is a evocache folder:
+			if( $is_cache_path && $f == $abspath_length - 3 )
+			{	// Skip this because it is a evocache folder in the abspath like 'blogs/home/_evocache/image.jpg/fit-80x80.jpg':
 				continue;
 			}
-			$relpath .= $abspath[ $f ].( $f < $abspath_length - 2 ? DIRECTORY_SEPARATOR : '' );
+			$relpath .= $abspath[ $f ].( $f < $last_path_index - 1 ? DIRECTORY_SEPARATOR : '' );
 		}
 
 		if( ! empty( $relpath ) )
