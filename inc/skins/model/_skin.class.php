@@ -359,29 +359,18 @@ class Skin extends DataObject
 
 
 		/* Page Top */
-		$social_default_links = array(
-				'twitter'    => 'https://twitter.com/b2evolution/',
-				'facebook'   => 'https://www.facebook.com/b2evolution',
-				'googleplus' => 'https://plus.google.com/+b2evolution/posts',
-				'linkedin'   => 'https://www.linkedin.com/company/b2evolution-net',
-				'github'     => 'https://github.com/b2evolution/b2evolution',
-			);
-		$social_fields_SQL = new SQL( 'Get user fields to create default social links widget' );
-		$social_fields_SQL->SELECT( 'ufdf_code, ufdf_ID' );
-		$social_fields_SQL->FROM( 'T_users__fielddefs' );
-		$social_fields_SQL->WHERE( 'ufdf_type = "url"' );
-		$social_fields_SQL->WHERE_and( 'ufdf_icon_name IS NOT NULL' );
-		$social_fields_SQL->WHERE_and( 'ufdf_code IN ( "twitter", "facebook", "googleplus", "linkedin", "github" )' );
-		$social_fields = $DB->get_assoc( $social_fields_SQL->get(), $social_fields_SQL->title );
-		$social_link_params = array();
-		$social_link_index = 1;
-		foreach( $social_fields as $social_field_code => $social_field_ID )
-		{
-			$social_link_params['link'.$social_link_index] = $social_field_ID;
-			$social_link_params['link'.$social_link_index.'_href'] = $social_default_links[ $social_field_code ];
-			$social_link_index++;
-		}
-		$declared_widgets['Page Top'][] = array( 'core', 'social_links', $social_link_params );
+		$declared_widgets['Page Top'][] = array( 'core', 'social_links', array(
+				'link1'      => 'twitter',
+				'link1_href' => 'https://twitter.com/b2evolution/',
+				'link2'      => 'facebook',
+				'link2_href' => 'https://www.facebook.com/b2evolution',
+				'link3'      => 'googleplus',
+				'link3_href' => 'https://plus.google.com/+b2evolution/posts',
+				'link4'      => 'linkedin',
+				'link4_href' => 'https://www.linkedin.com/company/b2evolution-net',
+				'link5'      => 'github',
+				'link5_href' => 'https://github.com/b2evolution/b2evolution',
+			) );
 
 		/* Sidebar */
 		if( $coll_kind == 'manual' )

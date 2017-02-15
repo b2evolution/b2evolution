@@ -224,8 +224,8 @@ class social_links_Widget extends ComponentWidget
 			{
 				if( $this->disp_params['link'.$i] && $this->disp_params['link'.$i.'_href'] )
 				{
-					$r .= '<a href="'.$this->disp_params['link'.$i.'_href'].'"'.( empty( $icon_colors_classes ) ? '' : ' class="ufld_'.$social_fields[$this->disp_params['link'.$i]]->ufdf_code.$icon_colors_classes.'"' ).'>'
-									.'<span class="'.$social_fields[$this->disp_params['link'.$i]]->ufdf_icon_name.'"></span>'
+					$r .= '<a href="'.$this->disp_params['link'.$i.'_href'].'"'.( empty( $icon_colors_classes ) ? '' : ' class="ufld_'.$this->disp_params['link'.$i].$icon_colors_classes.'"' ).'>'
+									.'<span class="'.$social_fields[ $this->disp_params['link'.$i] ].'"></span>'
 								.'</a>';
 				}
 			}
@@ -253,55 +253,58 @@ class social_links_Widget extends ComponentWidget
 	}
 
 
+	/**
+	 * Get available social fields
+	 *
+	 * @return array Key is field definition code, Value is field definition name
+	 */
 	function get_available_social_fields()
 	{
 		global $DB;
 
-		$social_fields = $DB->get_results('
-				SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_code, ufdf_name, ufdf_icon_name, "" AS uf_varchar, ufdf_required,
-						ufdf_options, ufdf_suggest, ufdf_duplicated, ufgp_ID, ufgp_name
-				FROM T_users__fielddefs
-				LEFT JOIN T_users__fieldgroups ON ufdf_ufgp_ID = ufgp_ID
-				WHERE ufdf_type = "url" AND ufdf_icon_name IS NOT NULL' );
+		$SQL = new SQL( 'Get user field definitions for widget "Social links"' );
+		$SQL->SELECT( 'ufdf_code, ufdf_name' );
+		$SQL->FROM( 'T_users__fielddefs' );
+		$SQL->WHERE( 'ufdf_type = "url"' );
+		$SQL->WHERE_and( 'ufdf_icon_name IS NOT NULL' );
 
-		$r = array( '' => 'None' );
+		$available_social_fields = array( '' => 'None' );
+		$available_social_fields += $DB->get_assoc( $SQL->get(), $SQL->title );
 
-		foreach( $social_fields as $field )
-		{
-			$r[$field->ufdf_ID] = $field->ufdf_name;
-		}
-
-		return $r;
+		return $available_social_fields;
 	}
 
+
+	/**
+	 * Get selected social fields
+	 *
+	 * @return array Key is field definition code, Value is field definition name
+	 */
 	function get_selected_social_fields()
 	{
 		global $DB;
 
-		$field_IDs = array();
+		$field_codes = array();
 		for( $i = 1; $i <= 7; $i++ )
 		{
 			if( $this->disp_params['link'.$i] )
 			{
-				$field_IDs[] = $this->disp_params['link'.$i];
+				$field_codes[] = $this->disp_params['link'.$i];
 			}
 		}
 
-		$r = array();
-		if( $field_IDs )
-		{
-			$social_fields = $DB->get_results('
-					SELECT ufdf_ID, ufdf_icon_name, ufdf_code
-					FROM T_users__fielddefs
-					WHERE ufdf_ID IN ('.implode(',', $field_IDs ).')' );
+		$selected_social_fields = array();
 
-			foreach( $social_fields AS $field )
-			{
-				$r[$field->ufdf_ID] = $field;
-			}
+		if( count( $field_codes ) )
+		{	// If at least one field is seleted in widget params:
+			$SQL = new SQL( 'Get user fields which are selected in params of the widget "Social links"' );
+			$SQL->SELECT( 'ufdf_code, ufdf_icon_name' );
+			$SQL->FROM( 'T_users__fielddefs' );
+			$SQL->WHERE( 'ufdf_code IN ( '.$DB->quote( $field_codes ).' )' );
+			$selected_social_fields = $DB->get_assoc( $SQL->get(), $SQL->title );
 		}
 
-		return $r;
+		return $selected_social_fields;
 	}
 
 	/**
