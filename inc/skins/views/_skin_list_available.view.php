@@ -50,14 +50,10 @@ if( get_param( 'tab' ) == 'current_skin' )
 		case 'tablet':
 			$skin_type_title = /* TRANS: Skin type name */ T_('Tablet');
 			break;
-		case 'feed':
-			$skin_type_title = /* TRANS: Skin type name */ T_('Feed');
-			break;
-		case 'sitemap':
-			$skin_type_title = /* TRANS: Skin type name */ T_('Sitemap');
-			break;
 		default:
 			$skin_type_title = '';
+			// Reset skin type to "all" from wrong types(like feed and sitemap) because they are not allowed for colleciton skin selection:
+			$skin_type = '';
 			break;
 	}
 	$block_title = sprintf( T_('Install a new %s skin for %s:'), $skin_type_title, $Blog->get( 'name' ) );
@@ -84,14 +80,18 @@ $Form->hidden( 'redirect_to', $redirect_to );
 $Form->hidden( 'kind', get_param( 'kind' ) );
 $Form->hidden( 'tab', get_param( 'tab' ) );
 $Form->begin_form( 'skin_selector_filters' );
-$Form->select_input_array( 'skin_type', $skin_type, array(
+$skin_type_options = array(
 		''        => T_('All skins'),
 		'normal'  => T_('Normal skins'),
 		'mobile'  => T_('Mobile skins'),
 		'tablet'  => T_('Tablet skins'),
-		'feed'    => T_('Feed skins'),
-		'sitemap' => T_('Sitemap skins'),
-	), T_('Skin type'), '', array(
+	);
+if( get_param( 'tab' ) != 'current_skin' )
+{	// Allow install feed and sitemap skins only on normal mode and don't allow when we select new skin for collection:
+	$skin_type_options['feed'] = T_('Feed skins');
+	$skin_type_options['sitemap'] = T_('Sitemap skins');
+}
+$Form->select_input_array( 'skin_type', $skin_type, $skin_type_options, T_('Skin type'), '', array(
 		'force_keys_as_values' => true,
 		'onchange' => 'this.form.submit()'
 	) );
@@ -185,12 +185,17 @@ foreach( $skin_folders as $skin_folder )
 	else
 	{	// Skin class seems fine...
 		if( $kind != '' && $folder_Skin->supports_coll_kind( $kind ) != 'yes' )
-		{ // Filter skin by support for collection type
+		{	// Filter skin by support for collection type
 			continue;
 		}
 
 		if( ! empty( $skin_type ) && $folder_Skin->type != $skin_type )
-		{ // Filter skin by selected type:
+		{	// Filter skin by selected type:
+			continue;
+		}
+
+		if( get_param( 'tab' ) == 'current_skin' && in_array( $folder_Skin->type, array( 'feed', 'sitemap' ) ) )
+		{	// Don't allow install feed and sitemap skins on collection tab because they cannot be used for collection:
 			continue;
 		}
 

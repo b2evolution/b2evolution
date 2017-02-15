@@ -2788,12 +2788,6 @@ function confirm_skin_selection( link_obj, skin_type )
 		case 'tablet':
 			modal_window_title = '<?php echo TS_('You are about to change the Tablet skin of your collection. Do you want to reset the widgets to what the new skin recommends?'); ?>';
 			break;
-		case 'feed':
-			modal_window_title = '<?php echo TS_('You are about to change the Feed skin of your collection. Do you want to reset the widgets to what the new skin recommends?'); ?>';
-			break;
-		case 'sitemap':
-			modal_window_title = '<?php echo TS_('You are about to change the Sitemap skin of your collection. Do you want to reset the widgets to what the new skin recommends?'); ?>';
-			break;
 		case 'normal':
 		default:
 			modal_window_title = '<?php echo TS_('You are about to change the Normal skin of your collection. Do you want to reset the widgets to what the new skin recommends?'); ?>';
