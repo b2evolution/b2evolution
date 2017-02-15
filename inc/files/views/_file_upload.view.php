@@ -92,7 +92,7 @@ global $fm_FileRoot;
 		var uploadfiles = document.getElementById("uploadfileinputs");
 		var newLI = document.createElement("li");
 		var closeLink = document.createElement("a");
-		closeLink.innerHTML = '<?php echo get_icon( 'close' ); ?>';
+		closeLink.innerHTML = '<?php echo format_to_js( get_icon( 'close' ) ); ?>';
 		closeLink.className = 'btn btn-default pull-right';
 		var closeImage = jQuery( closeLink ).children( 'span' );
 
