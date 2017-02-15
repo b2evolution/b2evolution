@@ -166,7 +166,7 @@ if( $can_crop )
 
 <script type="text/javascript">
 	var jcrop_api;
-	var image_url = '<?php echo $cropped_File->get_url(); ?>';
+	var image_url = '<?php echo format_to_js( $cropped_File->get_url() ); ?>';
 	var gutter = 10;
 	var padding = 0;
 	var content_height = <?php echo $content_height;?>;

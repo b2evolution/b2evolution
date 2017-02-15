@@ -505,7 +505,7 @@ var user_status_icons = new Array;
 foreach( $user_status_icons as $status => $icon )
 {	// Init js array with user status icons
 ?>
-user_status_icons['<?php echo $status; ?>'] = '<?php echo $icon; ?>';
+user_status_icons['<?php echo $status; ?>'] = '<?php echo format_to_js( $icon ); ?>';
 <?php } ?>
 
 jQuery( '#edited_user_status' ).change( function()
@@ -544,7 +544,7 @@ $email_status_icons = emadr_get_status_icons();
 foreach( $email_status_icons as $status => $icon )
 {	// Init js array with email status icons
 ?>
-email_status_icons['<?php echo $status; ?>'] = '<?php echo $icon; ?>';
+email_status_icons['<?php echo $status; ?>'] = '<?php echo format_to_js( $icon ); ?>';
 <?php } ?>
 
 jQuery( '#edited_email_status' ).change( function()
@@ -559,7 +559,7 @@ jQuery( '#edited_email_status' ).change( function()
 	}
 } );
 
-var current_email = '<?php echo $edited_User->get( 'email' ); ?>';
+var current_email = '<?php echo format_to_js( $edited_User->get( 'email' ) ); ?>';
 jQuery( 'input#edited_user_email' ).keyup( function()
 {	// Disable/Enable to select email status when email address is changed
 	if( current_email != jQuery( this ).val() )
@@ -594,7 +594,7 @@ $iprange_status_icons = aipr_status_icons();
 foreach( $iprange_status_icons as $status => $icon )
 { // Init js array with IP range status icons
 ?>
-iprange_status_icons['<?php echo $status; ?>'] = '<?php echo $icon; ?>';
+iprange_status_icons['<?php echo $status; ?>'] = '<?php echo format_to_js( $icon ); ?>';
 <?php } ?>
 
 jQuery( '#edited_iprange_status' ).change( function()
@@ -620,7 +620,7 @@ $domain_status_icons = stats_dom_status_icons();
 foreach( $domain_status_icons as $status => $icon )
 { // Init js array with Domain status icons
 ?>
-domain_status_icons['<?php echo $status; ?>'] = '<?php echo $icon; ?>';
+domain_status_icons['<?php echo $status; ?>'] = '<?php echo format_to_js( $icon ); ?>';
 <?php } ?>
 
 jQuery( '#edited_domain_status, #edited_initial_referer_status, #edited_email_domain_status' ).change( function()

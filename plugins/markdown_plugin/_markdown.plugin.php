@@ -589,19 +589,19 @@ class markdown_plugin extends Plugin
 
 		function <?php echo $params['js_prefix']; ?>markdown_toolbar( title )
 		{
-			var r = '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>'
-				+ '<?php echo $this->get_template( 'toolbar_group_before' ); ?>';
+			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>' + title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
+				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>';
 			for( var i = 0; i < <?php echo $params['js_prefix']; ?>markdown_btns.length; i++ )
 			{
 				r += <?php echo $params['js_prefix']; ?>markdown_get_btn( <?php echo $params['js_prefix']; ?>markdown_btns[i], i );
 				if( <?php echo $params['js_prefix']; ?>markdown_btns[i].grp_pos == 'last' && i > 0 && i < <?php echo $params['js_prefix']; ?>markdown_btns.length - 1 )
 				{ // Separator between groups
-					r += '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>';
+					r += '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ) ); ?>';
 				}
 			}
-			r += '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>'
+			r += '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ) ); ?>'
 				+ '<input type="button" id="<?php echo $params['js_prefix']; ?>mrkdwn_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $params['js_prefix']; ?>markdown_close_all_tags" title="<?php echo format_to_output( TS_('Close all tags'), 'htmlattr' ); ?>" value="X" />'
-				+ '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
+				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
 
 			jQuery( '.<?php echo $params['js_prefix'].$this->code ?>_toolbar' ).html( r );
 		}
