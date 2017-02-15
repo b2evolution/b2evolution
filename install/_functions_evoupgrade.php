@@ -8218,6 +8218,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12185, 'Updating group permissions...' ) )
+	{ // part of 6.9.0-beta
+		$DB->query( 'UPDATE T_groups__groupsettings
+				SET gset_name = "perm_skins_root",
+						gset_value = CASE gset_value WHEN "allowed" THEN "edit" ELSE "none" END
+				WHERE gset_name = "perm_templates"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
