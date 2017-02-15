@@ -122,8 +122,8 @@ switch( $action )
 					{
 						if( filter_var( $match[0], FILTER_VALIDATE_EMAIL ) )
 						{ // check if valid email
-							$href_string = 'mailto://'.$match[0];
-							$result['rawdata'][$i] = str_replace( $match[0], '<a href="'.$href_string.'" target="_blank">'.$match[0].'</a>', $result['rawdata'][$i] );
+							$href_string = 'mailto:'.$match[0];
+							$result['rawdata'][$i] = str_replace( $match[0], '<a href="'.$href_string.'">'.$match[0].'</a>', $result['rawdata'][$i] );
 						}
 						else
 						{ // check if valid URL
