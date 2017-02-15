@@ -701,8 +701,8 @@ $json_response = fetch_remote_page( $api_url, $api_info );
 $api_result = false;
 if( $json_response !== false )
 {	// Try to decode REST API json data:
-	json_decode( $json_response );
-	$api_result = ( json_last_error() === JSON_ERROR_NONE );
+	$decoded_response = @json_decode( $json_response );
+	$api_result = ! empty( $decoded_response );
 }
 if( $api_result )
 {	// Response is correct json data:
