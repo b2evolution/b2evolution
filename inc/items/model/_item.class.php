@@ -8119,9 +8119,9 @@ class Item extends ItemLight
 		}
 
 		// In theory, it would be more safe to use this comparison:
-		// if( $read_date > $this->last_touched_ts )
+		// if( $read_date > $this->contents_last_updated_ts )
 		// But until we have milli- or micro-second precision on timestamps, we decided it was a better trade-off to never see our own edits as unread. So we use:
-		if( $read_date >= $this->last_touched_ts )
+		if( $read_date >= $this->contents_last_updated_ts )
 		{	// This post was read by current user
 			return 'read';
 		}
