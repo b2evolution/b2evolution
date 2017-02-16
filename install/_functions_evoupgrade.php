@@ -8218,6 +8218,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12185, 'Upgrading posts table...' ) )
+	{	// part of 6.9.0-beta
+		db_add_col( 'T_items__item', 'post_contents_last_updated_ts', 'TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\' AFTER post_last_touched_ts' );
+		$DB->query( 'UPDATE T_items__item
+			SET post_contents_last_updated_ts = post_last_touched_ts' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

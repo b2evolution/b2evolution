@@ -484,14 +484,25 @@ class LinkOwner
 
 
 	/**
+	 * Update owner contents_last_updated_ts if exists
+	 * This must be override in the subclasses if the owner object has contents_last_updated_ts field
+	 */
+	function update_contents_last_updated_ts()
+	{
+		return;
+	}
+
+
+	/**
 	 * This function is called after when some file was unlinked from owner
 	 *
 	 * @param integer Link ID
 	 */
 	function after_unlink_action( $link_ID = 0 )
 	{
-		// Update last touched date of the Owner
+		// Update last touched date content last updated date of the Owner:
 		$this->update_last_touched_date();
+		$this->update_contents_last_updated_ts();
 	}
 
 

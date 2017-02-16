@@ -67,6 +67,13 @@ class Item extends ItemLight
 	 */
 	var $last_touched_ts;
 
+	/**
+	 * Date when contents were updated for this Item last time (timestamp)
+	 * @see Item::update_last_touched_date()
+	 * @var integer
+	 */
+	var $contents_last_updated_ts;
+
 
 	/**
 	 * The latest Comment on this Item (lazy-filled).
@@ -5665,6 +5672,7 @@ class Item extends ItemLight
 		}
 
 		$this->set_last_touched_ts();
+		$this->set_contents_last_updated_ts();
 
 		// Check which locale we can use for this item:
 		$item_Blog = & $this->get_Blog();
@@ -5777,6 +5785,7 @@ class Item extends ItemLight
 		global $DB, $localtimenow;
 
 		$this->set_param( 'last_touched_ts', 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
+		$this->set_param( 'contents_last_updated_ts', 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
 
 		$DB->begin( 'SERIALIZABLE' );
 
@@ -5915,9 +5924,30 @@ class Item extends ItemLight
 			$db_changed = true;
 		}
 
-		if( $auto_track_modification && ( count( $dbchanges ) > 0 ) && ( !isset( $dbchanges['last_touched_ts'] ) ) )
-		{ // Update last_touched_ts field only if it wasn't updated yet and the datemodified will be updated for sure.
-			$this->set_last_touched_ts();
+		if( $auto_track_modification && ( count( $dbchanges ) > 0 ) )
+		{
+			if( ! isset( $dbchanges['last_touched_ts'] ) )
+			{	// Update last_touched_ts field only if it wasn't updated yet and the datemodified will be updated for sure:
+				$this->set_last_touched_ts();
+			}
+			if( ! isset( $dbchanges['contents_last_updated_ts'] ) &&
+			  ( isset( $dbchanges['post_title'] ) ||
+			    isset( $dbchanges['post_content'] ) ||
+			    isset( $dbchanges['post_renderers'] ) ||
+			    isset( $dbchanges['post_urltitle'] ) ||
+			    isset( $dbchanges['post_url'] ) ||
+			    isset( $dbchanges['post_excerpt'] ) ||
+			    isset( $dbchanges['post_ctry_ID'] ) ||
+			    isset( $dbchanges['post_rgn_ID'] ) ||
+			    isset( $dbchanges['post_subrg_ID'] ) ||
+			    isset( $dbchanges['post_city_ID'] ) ||
+			    isset( $dbchanges['post_parent_ID'] ) ||
+			    isset( $dbchanges['post_main_cat_ID'] ) ||
+			    ! empty( $this->dbchanges_flags['extra_cat_IDs'] ) ||
+			    ! empty( $this->dbchanges_flags['tags'] ) ) )
+			{	// If at least one of those fields has been updated then it means a content of this item has been updated:
+				$this->set_contents_last_updated_ts();
+			}
 		}
 
 		$parent_update = $this->dbupdate_worker( $auto_track_modification );
@@ -7867,25 +7897,41 @@ class Item extends ItemLight
 	}
 
 
+	/**
+	 * Set field last_touched_ts
+	 */
 	function set_last_touched_ts()
 	{
-		global $localtimenow, $current_User;
+		global $localtimenow;
 
 		if( is_logged_in() )
 		{
 			$this->load_content_read_status();
 		}
+
 		$this->set_param( 'last_touched_ts', 'date', date2mysql( $localtimenow ) );
 	}
 
 
 	/**
-	 * Update field last_touched_ts
+	 * Set field contents_last_updated_ts
+	 */
+	function set_contents_last_updated_ts()
+	{
+		global $localtimenow;
+
+		$this->set_param( 'contents_last_updated_ts', 'date', date2mysql( $localtimenow ) );
+	}
+
+
+	/**
+	 * Update field last_touched_ts and parent categories
 	 *
 	 * @param boolean Use transaction
-	 * @param boolean Use FALSE to update only the categories
+	 * @param boolean Use TRUE to update item field last_touched_ts
+	 * @param boolean Use TRUE to update item field contents_last_updated_ts
 	 */
-	function update_last_touched_date( $use_transaction = true, $update_item_date = true )
+	function update_last_touched_date( $use_transaction = true, $update_last_touched_ts = true, $update_contents_last_updated_ts = false )
 	{
 		if( $use_transaction )
 		{
@@ -7893,9 +7939,16 @@ class Item extends ItemLight
 			$DB->begin();
 		}
 
-		if( $update_item_date )
-		{
-			$this->set_last_touched_ts();
+		if( $update_last_touched_ts || $update_contents_last_updated_ts )
+		{	// If at least one date field should be updated
+			if( $update_last_touched_ts )
+			{	// Update field last_touched_ts:
+				$this->set_last_touched_ts();
+			}
+			if( $update_contents_last_updated_ts )
+			{	// Update field contents_last_updated_ts:
+				$this->set_contents_last_updated_ts();
+			}
 			$this->dbupdate( false, false, false );
 		}
 

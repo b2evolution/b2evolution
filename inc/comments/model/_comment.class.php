@@ -4228,8 +4228,8 @@ class Comment extends DataObject
 				$ItemCache = & get_ItemCache();
 				$ItemCache->clear();
 				if( $previous_Item = & $ItemCache->get_by_ID( $this->previous_item_ID, false, false ) )
-				{ // Update last touched date of previous item
-					$previous_Item->update_last_touched_date( false );
+				{	// Update last touched date of previous item:
+					$previous_Item->update_last_touched_date( false, true, true );
 				}
 				// Also update new post
 				$update_item_last_touched_date = true;
@@ -4244,7 +4244,7 @@ class Comment extends DataObject
 				}
 			}
 
-			$this->update_last_touched_date( $update_item_last_touched_date );
+			$this->update_last_touched_date( $update_item_last_touched_date, $update_item_last_touched_date );
 
 			$DB->commit();
 
@@ -4313,7 +4313,7 @@ class Comment extends DataObject
 		{
 			if( $this->is_published() )
 			{ // Update last touched date of item if comment is created in published status
-				$this->update_last_touched_date();
+				$this->update_last_touched_date( true, true );
 			}
 			$Plugins->trigger_event( 'AfterCommentInsert', $params = array( 'Comment' => & $this, 'dbchanges' => $dbchanges ) );
 		}
@@ -4374,8 +4374,8 @@ class Comment extends DataObject
 		if( $r )
 		{
 			if( $was_published )
-			{ // Update last touched date of item if a published comment was deleted
-				$this->update_last_touched_date();
+			{	// Update last touched date and content last updated date of item if a published comment was deleted:
+				$this->update_last_touched_date( true, true );
 			}
 			if( $use_transaction )
 			{
@@ -4515,8 +4515,9 @@ class Comment extends DataObject
 	 * Update field last_touched_ts
 	 *
 	 * @param boolean update comment's post last touched ts as well or not
+	 * @param boolean Use TRUE to update field contents_last_updated_ts of the comment's item
 	 */
-	function update_last_touched_date( $update_item_date = true )
+	function update_last_touched_date( $update_item_last_touched_ts = true, $update_item_contents_last_updated_ts = false )
 	{
 		global $localtimenow, $current_User;
 
@@ -4540,9 +4541,9 @@ class Comment extends DataObject
 			$this->dbupdate();
 		}
 
-		if( $update_item_date )
-		{ // Update last touched data of the Item
-			$comment_Item->update_last_touched_date();
+		if( $update_item_last_touched_ts || $update_item_contents_last_updated_ts )
+		{	// Update last touched timestamp or content last update timestamp of the Item:
+			$comment_Item->update_last_touched_date( true, $update_item_last_touched_ts, $update_item_contents_last_updated_ts );
 		}
 	}
 
