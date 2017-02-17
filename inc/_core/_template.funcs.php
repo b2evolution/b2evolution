@@ -3318,7 +3318,6 @@ function init_autocomplete_usernames_js( $relative_to = 'rsc_url' )
 
 	require_js( '#jquery#', $relative_to );
 	require_js( 'build/textcomplete.bmin.js', $relative_to );
-	require_css( 'customized:jquery/textcomplete/css/jquery.textcomplete.css', $relative_to );
 }
 
 
