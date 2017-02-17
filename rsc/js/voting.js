@@ -228,7 +228,7 @@ function votingAdjust()
 	// reset
 	voting_wrapper.removeClass( 'compact' );
 
-	if( w <= ( voting_title.width() + voting_buttons.width() + voting_others.width() ) )
+	if( w <= 700 )
 	{ // voting button, title and others will not fit in 1 line
 		voting_wrapper.addClass( 'compact' );
 	}

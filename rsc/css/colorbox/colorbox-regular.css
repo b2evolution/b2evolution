@@ -109,7 +109,7 @@
   border: 1px solid #ccc;
 }
 #cboxLoadedContent {
-  margin-bottom: 50px;
+  margin-bottom: 30px;
 }
 #cboxTitle {
   position: absolute;
@@ -127,7 +127,6 @@
   position: absolute;
   bottom: 0;
   width: 100%;
-  min-height: 50px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -285,7 +284,7 @@
   display: inline-block;
   min-width: 50px;
   text-align: center;
-  margin: 3px 0 0;
+  margin: 0;
   white-space: nowrap;
 }
 #cboxVoting .voting_wrapper div.vote_title {
@@ -315,6 +314,7 @@
 }
 #cboxVoting .voting_wrapper.compact div.vote_title {
   text-align: center;
+  margin-top: 0;
 }
 #cboxVoting div.vote_title {
   display: inline-block;

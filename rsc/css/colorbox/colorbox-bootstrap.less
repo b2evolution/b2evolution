@@ -78,7 +78,7 @@
 	background: rgba( 25, 25, 25, 0.85 );
 }
 #colorbox, #colorbox * {
-	font: 11px Verdana, Arial, Sans-Serif;
+	//font: 11px Verdana, Arial, Sans-Serif;
 	font-weight: normal;
 	color: #000;
 }
@@ -97,7 +97,7 @@
 	border: 1px solid #ccc;
 }
 #cboxLoadedContent {
-	margin-bottom: 76px;
+	margin-bottom: 50px;
 }
 #cboxTitle {
 	position: absolute;
@@ -115,7 +115,6 @@
 	position: absolute;
 	bottom: 0;
 	width: 100%;
-	min-height: 76px;
 	display: flex;
 	flex-direction: row;
 	flex-wrap: nowrap;
@@ -123,9 +122,10 @@
 	align-items: center;
 }
 #cboxCurrent {
-	width: 80px;
+	margin: 0 5px;
 	color: #949494;
 	text-align: center;
+	white-space: nowrap;
 }
 #cboxSlideshow {
 	position: absolute;
@@ -161,12 +161,16 @@
 	//left: 0;
 	&:before {
 		content: "\f190";
+		text-align: center;
+		display: block;
 	}
 }
 #cboxNext {
 	//right: 0;
 	&:before {
 		content: "\f18e";
+		text-align: center;
+		display: block;
 	}
 }
 #cboxClose {
@@ -252,7 +256,7 @@
 			display: inline-block;
 			width: 160px;
 			text-align: center;
-			margin: 3px 0 0;
+			margin: 0;
 			white-space: nowrap;
 			.voting_btn {
 				border: 1px solid #adadad;
@@ -294,10 +298,14 @@
 			}
 			div.vote_title {
 				text-align: center;
+				margin-top: 0;
 			}
 		}
 	}
-	#votingLike, #votingNoopinion, #votingDontlike, span.fa.voted {
+	a.action_icon {
+		 font-size: 24px;
+	}
+	#votingLike, #votingNoopinion, #votingDontlike, span.voting_btn {
 		font-size: 24px;
 		display: inline-block;
 		vertical-align: middle;

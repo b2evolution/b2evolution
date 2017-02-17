@@ -100,6 +100,7 @@
 	prevSettings,
 	interfaceHeight,
 	interfaceWidth,
+	defaultLoadedHeight,
 	loadedHeight,
 	loadedWidth,
 	element,
@@ -357,6 +358,8 @@
 		loadedHeight = $loaded.outerHeight(true);
 		loadedWidth = $loaded.outerWidth(true);
 
+		defaultLoadedHeight = loadedHeight;
+
 		// Setting padding to remove the need to do size conversions during the animation step.
 		$box.css({"padding-bottom": interfaceHeight, "padding-right": interfaceWidth}).hide();
 
@@ -414,6 +417,23 @@
 	publicMethod.position = function (speed, loadedCallback) {
 		var w = ( prevSettings.pw == undefined || settings.w > prevSettings.pw ) ? settings.w : prevSettings.pw;
 		var h = ( prevSettings.ph == undefined || settings.h > prevSettings.ph ) ? settings.h : prevSettings.ph;
+
+		var voting_wrapper = $('#colorbox div.voting_wrapper');
+		var baseHeight = $close.height() + 6;
+		var bottomMargin = parseInt( $content.css( 'border-bottom' ) );
+
+		$infoBar.css({ 'minHeight': ( baseHeight  ) + 'px' });
+
+		if( w <= 700 && $voting.is(':visible') )
+		{ // voting button, title and others will not fit in 1 line
+			voting_wrapper.addClass( 'compact' );
+			loadedHeight = ( defaultLoadedHeight * 2 ) - 3;
+		}
+		else
+		{
+			voting_wrapper.removeClass( 'compact' );
+			loadedHeight = defaultLoadedHeight + 4;
+		}
 
 		var top = 0, left = 0;
 
@@ -913,11 +933,6 @@
 	publicMethod.resizeVoting = function() {
 
 		var voting_wrapper = $('#colorbox div.voting_wrapper');
-		var voting_title = $('#colorbox div.vote_title');
-		var voting_buttons = $('#colorbox div.voting_wrapper > div.btn-group');
-		var voting_others = $('#colorbox div.vote_others');
-		var voting_separator = $('#colorbox .separator');
-
 		var w = $wrap.parent().width();
 		if( w <= 480 )
 		{
@@ -928,14 +943,18 @@
 			$current.show();
 		}
 
-		// reset
-		voting_wrapper.removeClass( 'compact' );
+		$infoBar.css({ 'minHeight': baseHeight + 'px' });
 
-		if( w <= ( voting_title.width() + voting_buttons.width() + voting_others.width() ) )
+		if( w <= 700 && $voting.is(':visible') )
 		{ // voting button, title and others will not fit in 1 line
 			voting_wrapper.addClass( 'compact' );
+			loadedHeight = ( defaultLoadedHeight * 2 ) - 3;
 		}
-
+		else
+		{
+			voting_wrapper.removeClass( 'compact' );
+			loadedHeight = defaultLoadedHeight + 4;
+		}
 	};
 
 	// A method for fetching the current element ColorBox is referencing.
