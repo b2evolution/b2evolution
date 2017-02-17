@@ -5933,18 +5933,7 @@ class Item extends ItemLight
 			if( ! isset( $dbchanges['contents_last_updated_ts'] ) &&
 			  ( isset( $dbchanges['post_title'] ) ||
 			    isset( $dbchanges['post_content'] ) ||
-			    isset( $dbchanges['post_renderers'] ) ||
-			    isset( $dbchanges['post_urltitle'] ) ||
-			    isset( $dbchanges['post_url'] ) ||
-			    isset( $dbchanges['post_excerpt'] ) ||
-			    isset( $dbchanges['post_ctry_ID'] ) ||
-			    isset( $dbchanges['post_rgn_ID'] ) ||
-			    isset( $dbchanges['post_subrg_ID'] ) ||
-			    isset( $dbchanges['post_city_ID'] ) ||
-			    isset( $dbchanges['post_parent_ID'] ) ||
-			    isset( $dbchanges['post_main_cat_ID'] ) ||
-			    ! empty( $this->dbchanges_flags['extra_cat_IDs'] ) ||
-			    ! empty( $this->dbchanges_flags['tags'] ) ) )
+			    isset( $dbchanges['post_url'] ) ) )
 			{	// If at least one of those fields has been updated then it means a content of this item has been updated:
 				$this->set_contents_last_updated_ts();
 			}
