@@ -56,8 +56,6 @@ else
 	$tab = '';
 }
 
-param( 'skin_type', 'string', 'normal' );
-
 $action = param_action( 'list' );
 param( 'display_mode', 'string', 'normal' );
 $display_mode = ( in_array( $display_mode, array( 'js', 'normal' ) ) ? $display_mode : 'normal' );
@@ -154,7 +152,7 @@ switch( $display_mode )
 }
 
 // Get Skin used by current Blog:
-$blog_normal_skin_ID = $Blog->get_setting( $skin_type.'_skin_ID' );
+$blog_normal_skin_ID = $Blog->get_setting( 'normal_skin_ID' );
 $SkinCache = & get_SkinCache();
 $Skin = & $SkinCache->get_by_ID( $blog_normal_skin_ID );
 // Make sure containers are loaded for that skin:
@@ -569,7 +567,7 @@ if( $display_mode == 'normal' )
 	 */
 	$AdminUI->set_coll_list_params( 'blog_properties', 'edit', array( 'ctrl' => 'widgets' ) );
 
-	$AdminUI->set_path( 'collections', 'widgets', 'skin_'.$skin_type );
+	$AdminUI->set_path( 'collections', 'widgets' );
 
 	// We should activate toolbar menu items for this controller and mode
 	$activate_collection_toolbar = true;

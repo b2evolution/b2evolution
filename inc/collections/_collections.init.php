@@ -852,20 +852,6 @@ class collections_Module extends Module
 					'widgets' => array(
 						'text' => T_('Widgets'),
 						'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog,
-						'entries' => array(
-							'skin_normal' => array(
-								'text' => T_('Default'),
-								'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog
-							),
-							'skin_mobile' => array(
-								'text' => T_('Phone'),
-								'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog.'&amp;skin_type=mobile'
-							),
-							'skin_tablet' => array(
-								'text' => T_('Tablet'),
-								'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog.'&amp;skin_type=tablet'
-							)
-						),
 						'order' => 'group_last', ),
 					'settings' => array(
 						'text' => T_('Settings'),
