@@ -103,6 +103,7 @@
 	defaultLoadedHeight,
 	loadedHeight,
 	loadedWidth,
+	infobarHeight,
 	element,
 	index,
 	photo,
@@ -359,6 +360,7 @@
 		loadedWidth = $loaded.outerWidth(true);
 
 		defaultLoadedHeight = loadedHeight;
+		infobarHeight = $close.height() + 4;
 
 		// Setting padding to remove the need to do size conversions during the animation step.
 		$box.css({"padding-bottom": interfaceHeight, "padding-right": interfaceWidth}).hide();
@@ -419,10 +421,9 @@
 		var h = ( prevSettings.ph == undefined || settings.h > prevSettings.ph ) ? settings.h : prevSettings.ph;
 
 		var voting_wrapper = $('#colorbox div.voting_wrapper');
-		var baseHeight = $close.height() + 6;
 		var bottomMargin = parseInt( $content.css( 'border-bottom' ) );
 
-		$infoBar.css({ 'minHeight': ( baseHeight  ) + 'px' });
+		$infoBar.css({ 'minHeight': infobarHeight + 'px' });
 
 		if( w <= 700 && $voting.is(':visible') )
 		{ // voting button, title and others will not fit in 1 line
@@ -432,7 +433,7 @@
 		else
 		{
 			voting_wrapper.removeClass( 'compact' );
-			loadedHeight = defaultLoadedHeight + 4;
+			loadedHeight = defaultLoadedHeight;
 		}
 
 		var top = 0, left = 0;
@@ -943,7 +944,7 @@
 			$current.show();
 		}
 
-		$infoBar.css({ 'minHeight': baseHeight + 'px' });
+		$infoBar.css({ 'minHeight': infobarHeight + 'px' });
 
 		if( w <= 700 && $voting.is(':visible') )
 		{ // voting button, title and others will not fit in 1 line
@@ -953,7 +954,7 @@
 		else
 		{
 			voting_wrapper.removeClass( 'compact' );
-			loadedHeight = defaultLoadedHeight + 4;
+			loadedHeight = defaultLoadedHeight;
 		}
 	};
 
