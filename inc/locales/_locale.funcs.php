@@ -120,7 +120,7 @@ if( isset( $use_l10n ) && $use_l10n )
 			if( file_exists($path) && is_readable($path) )
 			{
 				$Debuglog->add( 'T_: Loading file: '.$path, 'locale' );
-				include_once $path;
+				include $path;
 			}
 			else
 			{
