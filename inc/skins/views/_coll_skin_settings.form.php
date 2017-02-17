@@ -54,7 +54,7 @@ $Form->begin_form( 'fform' );
 	if( $skin_ID && $current_User->check_perm( 'options', 'view' ) )
 	{	// Display "Reset params" button only when skin ID has a real value ( when $skin_ID = 0 means it must be the same as the normal skin value ):
 		$fieldset_title_links .= action_icon( T_('Reset params'), 'reload',
-				regenerate_url( 'action', 'ctrl=skins&amp;skin_ID='.$skin_ID.'&amp;blog='.$Blog->ID.'&amp;action=reset&amp;'.url_crumb( 'skin' ) ),
+				regenerate_url( 'action', 'ctrl=skins&amp;skin_ID='.$skin_ID.'&amp;skin_type='.$skin_type.'&amp;blog='.$Blog->ID.'&amp;action=reset&amp;'.url_crumb( 'skin' ) ),
 				' '.T_('Reset params'), 3, 4, array(
 					'class'   => 'action_icon btn btn-default btn-sm',
 					'onclick' => 'return confirm( \''.TS_( 'This will reset all the params to the defaults recommended by the skin.\nYou will lose your custom settings.\nAre you sure?' ).'\' )',

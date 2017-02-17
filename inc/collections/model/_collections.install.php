@@ -28,7 +28,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_skins__skin (
 				skin_ID      int(10) unsigned NOT NULL auto_increment,
 				skin_name    varchar(32) NOT NULL,
-				skin_type    enum('normal','feed','sitemap','mobile','tablet') COLLATE ascii_general_ci NOT NULL default 'normal',
+				skin_type    enum('normal','feed','sitemap','mobile','tablet','rwd') COLLATE ascii_general_ci NOT NULL default 'normal',
 				skin_folder  varchar(32) NOT NULL,
 				PRIMARY KEY skin_ID (skin_ID),
 				UNIQUE skin_folder( skin_folder ),

@@ -8218,6 +8218,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12185, 'Upgrade skins table...' ) )
+	{	// part of 6.9.0-beta
+		$DB->query( 'ALTER TABLE T_skins__skin
+			MODIFY skin_type enum("normal","feed","sitemap","mobile","tablet","rwd") COLLATE ascii_general_ci NOT NULL default "normal"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

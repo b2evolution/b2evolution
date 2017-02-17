@@ -177,7 +177,7 @@ switch( $action )
 						}
 						else
 						{	// Redirect to admin skins page if we change the skin for another device type:
-							$skin_type = ( param( 'mobile_skin_ID' ) !== NULL ? 'mobile' : ( param( 'tablet_skin_ID' ) !== NULL ? 'tablet' : 'normal' ) );
+							$skin_type = ( get_param( 'mobile_skin_ID' ) !== NULL ? 'mobile' : ( get_param( 'tablet_skin_ID' ) !== NULL ? 'tablet' : 'normal' ) );
 							header_redirect( $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&skin_type='.$skin_type );
 						}
 					}
