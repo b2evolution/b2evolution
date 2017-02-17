@@ -2818,6 +2818,42 @@ div.widget_core_user_avatars.evo_layout_rwd img {
   bottom: 0;
   margin: auto;
 }
+.textcomplete-dropdown {
+  border: 1px solid #ddd;
+  background-color: #fff;
+  text-align: left;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.textcomplete-dropdown mark {
+  background: none;
+}
+.textcomplete-dropdown li {
+  border-top: 1px solid #ddd;
+  padding: 2px 5px;
+  margin: 0;
+}
+.textcomplete-dropdown li:first-child {
+  border-top: none;
+}
+.textcomplete-dropdown li a {
+  color: #000;
+}
+.textcomplete-dropdown li:hover,
+.textcomplete-dropdown li:hover a,
+.textcomplete-dropdown li:hover mark,
+.textcomplete-dropdown li.active,
+.textcomplete-dropdown li.active a,
+.textcomplete-dropdown li.active mark {
+  color: #fff;
+  background-color: #3b5998;
+  text-decoration: none;
+  cursor: pointer;
+}
+.autocomplete_usernames {
+  display: block;
+}
 .ratings_table {
   margin: 0 10px 10px 0;
   display: inline-block;
