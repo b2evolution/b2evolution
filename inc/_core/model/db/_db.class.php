@@ -513,7 +513,7 @@ class DB
 	 */
 	function select($db)
 	{
-		if( !$this->dbhandle->select_db($db) )
+		if( !@$this->dbhandle->select_db($db) )
 		{
 			$this->print_error( 'Error selecting database ['.$db.']!', '
 				<ol>
