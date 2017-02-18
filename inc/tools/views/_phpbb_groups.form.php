@@ -15,7 +15,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $phpbb_db_config, $dispatcher, $phpbb_tool_title;
+global $phpbb_db_config, $dispatcher, $phpbb_tool_title, $phpbb_version;
 
 phpbb_display_steps( 2 );
 
@@ -51,6 +51,18 @@ $Form->begin_fieldset( T_('Access information for database of phpBB forum') );
 		$path_avatars_note = T_('This folder does not exist');
 	}
 	$Form->info( T_('Source for avatars'), $path_avatars, $path_avatars_note );
+
+	if( $phpbb_version == 3 )
+	{	// Only for phpBB3:
+		$path_attachments = phpbb_get_var( 'path_attachments' );
+		$path_attachments_note = '';
+		if( ! empty( $path_attachments ) && ! file_exists( $path_attachments ) )
+		{	// Path attachments is incorrect
+			$path_attachments = '<b class="red">'.$path_attachments.'</b>';
+			$path_attachments_note = T_('This folder does not exist');
+		}
+		$Form->info( T_('Source for attachments'), $path_attachments, $path_attachments_note );
+	}
 
 	$BlogCache = & get_BlogCache();
 	if( $phpbbBlog = & $BlogCache->get_by_ID( phpbb_get_var( 'blog_ID' ) ) )

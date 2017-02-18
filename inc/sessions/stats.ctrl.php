@@ -253,9 +253,10 @@ switch( $action )
 			}
 
 			// Delete from DB:
-			$edited_Domain->dbdelete();
-
-			$Messages->add( T_('Domain has been deleted.'), 'success' );
+			if( $edited_Domain->dbdelete() )
+			{
+				$Messages->add( T_('Domain has been deleted.'), 'success' );
+			}
 
 			header_redirect( $admin_url.'?ctrl=stats&tab=domains&tab3='.$tab3.'&blog='.$blog );
 		}

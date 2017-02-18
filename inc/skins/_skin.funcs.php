@@ -2305,6 +2305,19 @@ function skin_twitter_tags()
 			}
 		}
 
+		// Get author's Twitter username
+		if( $creator_User = & $Item->get_creator_User() )
+		{
+			if( $twitter_links = $creator_User->userfield_values_by_code( 'twitter' ) )
+			{
+				preg_match( '/https?:\/\/(www\.)?twitter\.com\/(#!\/)?@?([^\/\?]*)/', $twitter_links[0], $matches );
+				if( isset( $matches[3] ) )
+				{
+					echo '<meta property="twitter:creator" content="@'.$matches[3].'" />'."\n";
+				}
+			}
+		}
+
 		echo '<meta property="twitter:card" content="summary" />'."\n";
 		echo '<meta property="twitter:title" content="'.format_to_output( $Item->get( 'title' ), 'htmlattr' )."\" />\n";
 		echo '<meta property="twitter:description" content="'.format_to_output( $Item->get_excerpt2(), 'htmlattr' )."\" />\n";

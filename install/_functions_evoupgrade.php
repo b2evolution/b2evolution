@@ -8139,6 +8139,85 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12165, 'Upgrade table of users...' ) )
+	{	// part of 6.9.0-beta
+		db_add_col( 'T_users', 'user_pass_driver', 'VARCHAR(16) NOT NULL default "evo$md5" AFTER user_salt' );
+		$DB->query( 'UPDATE T_users
+			  SET user_pass_driver = "evo$salted"
+			WHERE user_salt != ""' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12170, 'Updating users pass storage...' ) )
+	{	// part of 6.9.0-beta
+		$DB->query( 'ALTER TABLE T_users MODIFY COLUMN user_pass VARBINARY(32)' );
+		$DB->query( 'UPDATE T_users SET user_pass = LOWER( HEX( user_pass ) )' );
+		$DB->query( 'ALTER TABLE T_users MODIFY COLUMN user_pass VARCHAR(64) NOT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12175, 'Upgrade table of users...' ) )
+	{	// part of 6.9.0-beta
+		$DB->query( 'ALTER TABLE T_users
+			MODIFY user_salt VARCHAR(32) NOT NULL default ""' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12180, 'Updating base domains table...' ) )
+	{ // part of 6.9.0-beta
+		$sql = 'SHOW INDEX FROM T_basedomains WHERE KEY_NAME = "dom_type_name"';
+		$indexes = $DB->get_results( $sql, ARRAY_A );
+		if( $DB->num_rows > 0 )
+		{
+			$DB->query( 'ALTER TABLE T_basedomains DROP INDEX dom_type_name' );
+		}
+
+		// update user email domains IDs that will deleted to use related domain IDs that will be retained
+		$DB->query( 'UPDATE T_users a
+				LEFT JOIN (
+					SELECT a.dom_ID, b.dom_ID AS subst_dom_ID
+					FROM T_basedomains a
+					LEFT JOIN T_basedomains b
+						ON a.dom_name = b.dom_name
+							AND ( CASE a.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END ) > ( CASE b.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END )
+					WHERE NOT b.dom_ID IS NULL
+				) c
+					ON c.dom_ID = a.user_email_dom_ID
+				SET a.user_email_dom_ID = c.subst_dom_ID
+				WHERE
+					NOT c.dom_ID IS NULL' );
+
+		// update hitlist log
+		$DB->query( 'UPDATE T_hitlog a
+				LEFT JOIN (
+					SELECT a.dom_ID, b.dom_ID AS subst_dom_ID
+					FROM T_basedomains a
+					LEFT JOIN T_basedomains b
+						ON a.dom_name = b.dom_name
+							AND ( CASE a.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END ) > ( CASE b.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END )
+					WHERE NOT b.dom_ID IS NULL
+				) c
+					ON c.dom_ID = a.hit_referer_dom_ID
+				SET a.hit_referer_dom_ID = c.subst_dom_ID
+				WHERE
+					NOT c.dom_ID IS NULL' );
+
+		// delete duplicate entries, order by status: blocked > suspect > unknown > trusted, keep the first one
+		$DB->query( 'DELETE a
+				FROM T_basedomains a
+				LEFT JOIN T_basedomains b
+					ON a.dom_name = b.dom_name
+						AND ( CASE a.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END ) > ( CASE b.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END )
+				WHERE NOT b.dom_ID IS NULL;' );
+
+		// Add index
+		$DB->query( 'ALTER TABLE T_basedomains ADD UNIQUE INDEX `dom_name` (`dom_name`)' );
+
+		// add comment to user_email_dom_ID
+		$DB->query( 'ALTER TABLE T_users MODIFY user_email_dom_ID int(10) unsigned NULL COMMENT "Used for email statistics"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
