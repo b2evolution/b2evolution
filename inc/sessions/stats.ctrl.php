@@ -89,7 +89,7 @@ switch( $action )
 	case 'prune': // PRUNE hits for a certain date
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'stats' );
-		
+
 		// Check permission:
 		$current_User->check_perm( 'stats', 'edit', true );
 
@@ -204,11 +204,13 @@ switch( $action )
 		}
 
 		// load data from request
+		$DB->begin();
 		if( $edited_Domain->load_from_Request() )
 		{ // We could load data from form without errors:
 			$is_creating = ( $edited_Domain->ID == 0 );
 			// Insert/Update in DB:
 			$edited_Domain->dbsave();
+			$DB->commit();
 			$Messages->add( $is_creating ? T_('New domain created.') : T_('Domain has been updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
@@ -223,7 +225,40 @@ switch( $action )
 			header_redirect( $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
+		else
+		{
+			$DB->rollback();
+		}
 		$action = 'domain_new';
+		break;
+
+	case 'domain_delete':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'domain' );
+
+		// Check permission:
+		$current_User->check_perm( 'stats', 'edit', true );
+
+		param( 'dom_ID', 'integer', 0, true );
+		$DomainCache = & get_DomainCache();
+		$edited_Domain = & $DomainCache->get_by_ID( $dom_ID, false );
+
+		if( param( 'confirm', 'integer', 0 ) )
+		{
+			if( $edited_Domain === false )
+			{ // We could not find the goal to edit:
+				unset( $edited_Domain );
+				forget_param( 'dom_ID' );
+				$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Domain') ), 'error' );
+			}
+
+			// Delete from DB:
+			$edited_Domain->dbdelete();
+
+			$Messages->add( T_('Domain has been deleted.'), 'success' );
+
+			header_redirect( $admin_url.'?ctrl=stats&tab=domains&tab3='.$tab3.'&blog='.$blog );
+		}
 		break;
 
 	case 'aggregate':
@@ -397,7 +432,7 @@ switch( $tab )
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'search-browser-top-engines-tab' );
 				break;
-				
+
 		}
 		break;
 
@@ -559,6 +594,12 @@ switch( $AdminUI->get_path(1) )
 		// Display VIEW for domains:
 		switch( $action )
 		{
+			case 'domain_delete':
+				// We need to ask for confirmation:
+				$edited_Domain->confirm_delete(
+					sprintf( T_('Delete domain &laquo;%s&raquo;?'), $edited_Domain->dget( 'name' ) ),
+					'domain', $action, get_memorized( 'action' ) );
+				/* no break */
 			case 'domain_new':
 			case 'domain_edit':
 				if( isset( $edited_Domain ) )

@@ -21,7 +21,7 @@ class bootstrap_blog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.8.3';
+	var $version = '6.8.7';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -205,6 +205,36 @@ class bootstrap_blog_Skin extends Skin
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
+					'current_tab_bg_color' => array(
+						'label' => T_('Current tab background color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),
+					'hover_tab_bg_color' => array(
+						'label' => T_('Hovered tab background color'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#eee',
+						'type' => 'color',
+					),
+					'panel_bg_color' => array(
+						'label' => T_('Panel background color'),
+						'note' => T_('Choose background color for function panels and widgets.'),
+						'defaultvalue' => '#ffffff',
+						'type' => 'color',
+					),
+					'panel_border_color' => array(
+						'label' => T_('Panel border color'),
+						'note' => T_('Choose border color for function panels and widgets.'),
+						'defaultvalue' => '#ddd',
+						'type' => 'color',
+					),
+					'panel_heading_bg_color' => array(
+						'label' => T_('Panel heading background color'),
+						'note' => T_('Choose background color for function panels and widgets.'),
+						'defaultvalue' => '#f5f5f5',
+						'type' => 'color',
+					),
 				'section_color_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -379,6 +409,34 @@ class bootstrap_blog_Skin extends Skin
 		if( $color = $this->get_setting( 'current_tab_text_color' ) )
 		{ // Custom current tab text color:
 			$custom_css .= 'ul.nav.nav-tabs li a.selected { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'current_tab_bg_color' ) )
+		{ // Custom current tab background color:
+			$custom_css .= 'ul.nav.nav-tabs li a.selected { background-color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'hover_tab_bg_color' ) )
+		{ // Custom hovered tab background text color:
+			$custom_css .= 'ul.nav.nav-tabs li a.default:hover { background-color: '.$color."; border-top-color: $color; border-left-color: $color; border-right-color: $color }\n";
+		}
+		if( $color = $this->get_setting( 'panel_bg_color' ) )
+		{ // Panel background text color:
+			$custom_css .= '.panel, .pagination>li>a { background-color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'panel_border_color' ) )
+		{ // Panel border color:
+			$custom_css .= '
+			.pagination li a, .pagination>li>a:focus, .pagination>li>a:hover, .pagination>li>span:focus, .pagination>li>span:hover,
+			.nav-tabs,
+			.panel-default, .panel .panel-footer,
+			.panel .table, .panel .table th, .table-bordered>tbody>tr>td, .table-bordered>tbody>tr>th, .table-bordered>tfoot>tr>td, .table-bordered>tfoot>tr>th, .table-bordered>thead>tr>td, .table-bordered>thead>tr>th
+			{ border-color: '.$color." }\n";
+			$custom_css .= '.panel .panel-heading { border-color: '.$color."; background-color: $color }\n";
+			$custom_css .= '.nav-tabs>li>a:hover { border-bottom: 1px solid '.$color." }\n";
+			$custom_css .= '.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover { border-top-color: '.$color."; border-left-color: $color; border-right-color: $color }\n";
+		}
+		if( $color = $this->get_setting( 'panel_heading_bg_color' ) )
+		{ // Panel border color:
+			$custom_css .= '.panel .panel-heading, .panel .panel-footer { background-color: '.$color." }\n";
 		}
 
 		// Limit images by max height:

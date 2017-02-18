@@ -411,7 +411,7 @@ function no_leading_slash( $path )
  */
 function get_canonical_path( $ads_path )
 {
-	// Remove windows backslashes:
+	// We probably don't need the windows backslashes replacing any more but leave it for safety because it doesn't hurt:
 	$ads_path = str_replace( '\\', '/', $ads_path );
 
 	$is_absolute = is_absolute_pathname($ads_path);
@@ -894,7 +894,7 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 		}
 
 		// Folder Icon + Name:
-		$url = regenerate_url( 'root,path', 'root='.$Root->ID.'&amp;path='.$rds_rel_path );
+		$url = regenerate_url( 'root,path', 'root='.$Root->ID.'&amp;path='.rawurlencode( $rds_rel_path ) );
 		$label = action_icon( T_('Open this directory in the file manager'), 'folder', $url )
 			.'<a href="'.$url.'"
 			title="'.T_('Open this directory in the file manager').'">'
@@ -1710,10 +1710,12 @@ function prepare_uploaded_image( $File, $mimetype )
 function report_user_upload( $File )
 {
 	global $current_User;
+
 	load_funcs( 'files/model/_file.funcs.php' );
 
-	syslog_insert( sprintf( 'User %s has uploaded the file %s -- Size: %s',
-			$current_User->login, '[['.$File->get_full_path().']]', bytesreadable( $File->get_size(), false ) ), 'info', 'file', $File->ID );
+	syslog_insert( sprintf( '%s has uploaded the file %s -- Size: %s',
+		( is_logged_in() ? 'User #'.$current_User->ID.'([['.$current_User->login.']])' : 'Anonymous user' ),
+		'[['.$File->get_full_path().']]', bytesreadable( $File->get_size(), false ) ), 'info', 'file', $File->ID );
 }
 
 
@@ -1991,7 +1993,7 @@ function get_available_filetype_icons()
  */
 function copy_file( $file_path, $root_ID, $path, $check_perms = true )
 {
-	global $current_User;
+	global $current_User, $force_upload_forbiddenext;
 
 	$FileRootCache = & get_FileRootCache();
 	$fm_FileRoot = & $FileRootCache->get_by_ID($root_ID, true);
@@ -2249,6 +2251,7 @@ function display_dragdrop_upload_button( $params = array() )
 			'conflict_file_format'   => 'simple', // 'simple' - file name text, 'full_path_link' - a link with text as full file path
 			'resize_frame'           => false, // Resize frame on upload new image
 			'table_headers'          => '', // Use this html text as table headers when first file is loaded
+			'filename_select'        => '', // Append this text before file name on success uploading of new file
 		), $params );
 
 	$FileRootCache = & get_FileRootCache();
@@ -2266,7 +2269,7 @@ function display_dragdrop_upload_button( $params = array() )
 
 	echo $params['before'];
 
-	if( $params['LinkOwner'] !== NULL && $params['LinkOwner']->is_temp )
+	if( $params['LinkOwner'] !== NULL && $params['LinkOwner']->is_temp() )
 	{	// Use this field to know a form is submitted with temporary link owner(when object is creating and still doesn't exist in DB):
 		echo '<input type="hidden" name="temp_link_owner_ID" value="'.$params['LinkOwner']->get_ID().'" />';
 	}
@@ -2303,8 +2306,7 @@ function display_dragdrop_upload_button( $params = array() )
 		<?php
 		if( $params['LinkOwner'] !== NULL )
 		{	// Add params to link a file right after uploading:
-			$link_owner_type = $params['LinkOwner']->type;
-			echo 'url += "&link_owner='.$link_owner_type.'_'.$params['LinkOwner']->get_ID().'"';
+			echo 'url += "&link_owner='.$params['LinkOwner']->type.'_'.$params['LinkOwner']->get_ID().'_'.intval( $params['LinkOwner']->is_temp() ).'"';
 		}
 		?>
 
@@ -2318,7 +2320,7 @@ function display_dragdrop_upload_button( $params = array() )
 				additional_dropzone: '<?php echo $params['additional_dropzone']; ?>',
 				action: url,
 				sizeLimit: <?php echo ( $Settings->get( 'upload_maxkb' ) * 1024 ); ?>,
-				debug: true,
+				debug: false,
 				messages: {
 					typeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} has an invalid extension. Only {extensions} are allowed.'); ?>',
 					sizeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} cannot be uploaded because it is too large ({fileSize}). The maximum allowed upload size is {sizeLimit}.'); ?>',
@@ -2389,9 +2391,22 @@ function display_dragdrop_upload_button( $params = array() )
 						var table_view = typeof( responseJSON.success.link_ID ) != 'undefined' ? 'link' : 'file';
 
 						var filename_before = '<?php echo str_replace( "'", "\'", $params['filename_before'] ); ?>';
+						var filename_select = '<?php echo str_replace( "'", "\'", $params['filename_select'] ); ?>';
 						if( filename_before != '' )
 						{
 							filename_before = filename_before.replace( '$file_path$', decodeURIComponent( responseJSON.success.path ) );
+						}
+
+						if( filename_select != '' )
+						{
+							if( responseJSON.success.filetype == 'image' )
+							{
+								filename_select = filename_select.replace( '$file_path$', decodeURIComponent( responseJSON.success.path ) );
+							}
+							else
+							{
+								filename_select = '';
+							}
 						}
 
 						var warning = '';
@@ -2416,7 +2431,7 @@ function display_dragdrop_upload_button( $params = array() )
 							this_row.find( '.qq-upload-status' ).html( '' );
 							<?php } ?>
 							this_row.find( '.qq-upload-image' ).html( text );
-							this_row.find( '.qq-upload-file' ).html( filename_before
+							this_row.find( '.qq-upload-file' ).html( filename_before + filename_select
 								+ '<input type="hidden" value="' + responseJSON.success.newpath + '" />'
 								+ '<span class="fname">' + file_name + '</span>' + warning );
 						}
@@ -2839,9 +2854,10 @@ function echo_file_properties()
  * Get root and relative file path by absolute path
  *
  * @param string Absolute path
+ * @param boolean TRUE - to extract data from cache path like 'blogs/home/_evocache/image.jpg/fit-80x80.jpg'
  * @return boolean|array FALSE - if root and path are not detected, Array with keys 'root' and 'path'
  */
-function get_root_path_by_abspath( $abspath )
+function get_root_path_by_abspath( $abspath, $is_cache_path = false )
 {
 	if( empty( $abspath ) )
 	{	// If absolute path is empty do NOT try to decode it:
@@ -2901,13 +2917,16 @@ function get_root_path_by_abspath( $abspath )
 	{	// Get relative path only if root is detected:
 		$relpath = '';
 		$abspath_length = count( $abspath );
-		for( $f = $start_relpath; $f < $abspath_length - 1; $f++ )
+		// For cache path like 'blogs/home/_evocache/image.jpg/fit-80x80.jpg' exclude the last because it is a not path part and just a size info:
+		$last_path_index = ( $is_cache_path ? $abspath_length - 1 : $abspath_length );
+
+		for( $f = $start_relpath; $f < $last_path_index; $f++ )
 		{
-			if( $f == $abspath_length - 3 )
-			{	// Skip this because it is a evocache folder:
+			if( $is_cache_path && $f == $abspath_length - 3 )
+			{	// Skip this because it is a evocache folder in the abspath like 'blogs/home/_evocache/image.jpg/fit-80x80.jpg':
 				continue;
 			}
-			$relpath .= $abspath[ $f ].( $f < $abspath_length - 2 ? DIRECTORY_SEPARATOR : '' );
+			$relpath .= $abspath[ $f ].( $f < $last_path_index - 1 ? DIRECTORY_SEPARATOR : '' );
 		}
 
 		if( ! empty( $relpath ) )

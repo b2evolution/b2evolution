@@ -91,8 +91,14 @@ class image_Widget extends ComponentWidget
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
+				'image_file_ID' => array(
+					'label' => T_('Image'),
+					'defaultvalue' => '',
+					'type' => 'fileselect',
+					'thumbnail_size' => 'fit-320x320',
+				),
 				'image_source' => array(
-					'label' => T_('Image source'),
+					'label' => T_('Fallback image source'),
 					'note' => '',
 					'type' => 'radio',
 					'options' => array(
@@ -102,12 +108,14 @@ class image_Widget extends ComponentWidget
 					'defaultvalue' => 'skin',
 				),
 				'image_file' => array(
-					'label' => T_('Image filename'),
-					'note' => T_('Relative to the root of the selected source.'),
+					'label' => T_('Fallback image filename'),
+					'note' => T_('If no file was selected. Relative to the root of the selected source.'),
 					'defaultvalue' => 'logo.png',
-					'valid_pattern' => array( 'pattern'=>'~^[a-z0-9_\-/][a-z0-9_.\-/]*$~i',
-																		'error'=>T_('Invalid filename.') ),
-					'size' => 128,
+					'valid_pattern' => array( 'pattern'=>'~^$|^[a-z0-9_\-/][a-z0-9_.\-/]*$~i',
+											  'error'=>T_('Invalid filename.') ),
+					// the following is necessary to catch user input value of "<". Otherwise, "<" and succeeding characters
+					// will translate to an empty string and pass the regex pattern below
+					'type' => 'html_input',
 				),
 				'size_begin_line' => array(
 					'type' => 'begin_line',
@@ -116,7 +124,7 @@ class image_Widget extends ComponentWidget
 					'width' => array(
 						'label' => T_('Image width'),
 						'note' => '',
-						'defaultvalue' => '300px',
+						'defaultvalue' => '',
 						'allow_empty' => true,
 						'size' => 4,
 						'hide_label' => true,
@@ -171,6 +179,15 @@ class image_Widget extends ComponentWidget
 	{
 		global $Collection, $Blog;
 
+		$file_ID = $this->disp_params['image_file_ID'];
+		$FileCache = & get_FileCache();
+		$File = false;
+
+		if( ! empty( $file_ID ) )
+		{
+			$File = & $FileCache->get_by_ID( $file_ID, false );
+		}
+
 		switch( $this->disp_params['image_source'] )
 		{
 			case 'skin':
@@ -193,7 +210,21 @@ class image_Widget extends ComponentWidget
 				break;
 		}
 
-		if( $this->disp_params['check_file'] && ! file_exists( $image_path.$this->disp_params['image_file'] ) )
+		if( ! empty( $File ) && file_exists( $File->get_full_path() ) )
+		{
+			$image_url = $File->get_url();
+		}
+		elseif( ! empty( $this->disp_params['image_file'] ) && file_exists( $image_path.$this->disp_params['image_file'] ) )
+		{
+			$image_url .= $this->disp_params['image_file'];
+		}
+		else
+		{
+			$image_url = '';
+		}
+
+
+		if( $this->disp_params['check_file'] && empty( $image_url ) )
 		{ // Logo file doesn't exist, Exit here because of widget setting requires this
 			return true;
 		}
@@ -202,12 +233,13 @@ class image_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_start'];
 
-		// Initialize image attributes:
+
 		$image_attrs = array(
-				'src'   => $image_url.$this->disp_params['image_file'],
-				'alt'   => $this->disp_params['alt'],
-			);
-		// Image width:
+			'src'   => $image_url,
+			'alt'   => $this->disp_params['alt'],
+		);
+
+		// Initialize image attributes:
 		$image_attrs['style'] = 'width:'.( empty( $this->disp_params['width'] ) ? 'auto' : format_to_output( $this->disp_params['width'], 'htmlattr' ) ).';';
 		// Image height:
 		$image_attrs['style'] .= 'height:'.( empty( $this->disp_params['height'] ) ? 'auto' : format_to_output( $this->disp_params['height'], 'htmlattr' ) ).';';

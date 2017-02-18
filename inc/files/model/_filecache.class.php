@@ -109,7 +109,7 @@ class FileCache extends DataObjectCache
 		global $Debuglog, $cache_File;
 
 		if( is_windows() )
-		{
+		{	// We probably don't need the windows backslashes replacing any more but leave it for safety because it doesn't hurt:
 			$rel_path = strtolower( str_replace( '\\', '/', $rel_path ) );
 		}
 

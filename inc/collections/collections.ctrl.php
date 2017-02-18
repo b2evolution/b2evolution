@@ -26,7 +26,7 @@ if( strpos( $action, 'new' ) !== false )
 { // Simulate tab to value 'new' for actions to create new blog
 	$tab = 'new';
 }
-if( ! in_array( $action, array( 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site' ) ) )
+if( ! in_array( $action, array( 'list', 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site' ) ) )
 {
 	if( valid_blog_requested() )
 	{
@@ -346,10 +346,9 @@ switch( $action )
 		// Site long name
 		$Settings->set( 'notification_long_name', param( 'notification_long_name', 'string', '' ) );
 
-		// Small site logo url
-		param( 'notification_logo', 'url', '' );
-		param_check_url( 'notification_logo', 'http-https' );
-		$Settings->set( 'notification_logo', get_param( 'notification_logo' ) );
+		// Small site logo
+		param( 'notification_logo_file_ID', 'integer', NULL );
+		$Settings->set( 'notification_logo_file_ID', get_param( 'notification_logo_file_ID' ) );
 
 		// Site footer text
 		$Settings->set( 'site_footer_text', param( 'site_footer_text', 'string', '' ) );

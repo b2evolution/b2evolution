@@ -708,9 +708,14 @@ fieldset ul {
 #attachments_fieldset_wrapper .table_scroll {
   position: relative;
 }
+#attachments_fieldset_wrapper div.results,
+#attachments_fieldset_wrapper div.table_scroll {
+  overflow: initial;
+}
 #attachments_fieldset_wrapper table tbody .dragged {
   opacity: 0.8;
   position: absolute;
+  z-index: 1000;
 }
 #attachments_fieldset_wrapper table tbody td {
   cursor: move;
@@ -872,7 +877,6 @@ h2.user_title::first-line {
   font-weight: normal;
   color: #999;
   margin: 40px 0 30px;
-  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;
@@ -1443,44 +1447,20 @@ table.diff td.diff-title-addedline {
   margin: 0 0 10px 25px;
   list-style: disc;
 }
-.evo_poll__table {
-  margin-bottom: 14px;
-  width: 100%;
-}
-.evo_poll__table td {
-  padding: 2px 10px 2px 0;
-  vertical-align: top;
-}
-.evo_poll__table tr td:last-child {
-  padding-right: 0;
-}
-.evo_poll__table input[type=radio],
-.evo_poll__table label {
-  margin: 0;
-}
-.evo_poll__table .evo_poll__percent_bar {
+.evo_poll__percent_bar {
   width: 100%;
   min-width: 40px;
   padding-right: 6px;
 }
-.evo_poll__table .evo_poll__percent_bar > div {
+.evo_poll__percent_bar > div {
   width: 100%;
   vertical-align: middle;
   display: inline-block;
 }
-.evo_poll__table .evo_poll__percent_bar > div > div {
+.evo_poll__percent_bar > div > div {
   background: #ffcc66;
   height: 12px;
   min-width: 1px;
-}
-.evo_poll__table .evo_poll__selector {
-  width: 5px;
-}
-.evo_poll__table .evo_poll__title {
-  white-space: nowrap;
-}
-.evo_poll__table .evo_poll_percentage {
-  max-width: 50px;
 }
 .status_color_draft {
   color: #ffff99;

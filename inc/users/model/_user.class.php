@@ -556,9 +556,24 @@ class User extends DataObject
 
 					load_funcs('sessions/model/_hitlog.funcs.php');
 
-					// Update status of Domain in DB
+					// Update status of email Domain in DB:
+					$edited_email_domain_status = param( 'edited_email_domain_status', 'string' );
+					$email_domain = $this->get_email_domain();
+					$Domain = & get_Domain_by_subdomain( $email_domain );
+					if( ! $Domain && $edited_email_domain_status != 'unknown' && ! empty( $email_domain ) )
+					{	// Domain doesn't exist in DB, Create new record:
+						$Domain = new Domain();
+						$Domain->set( 'name', $email_domain );
+					}
+					if( $Domain )
+					{	// Save status of Domain:
+						$Domain->set( 'status', $edited_email_domain_status, true );
+						$Domain->dbsave();
+					}
+
+					// Update status of user Domain in DB:
 					$edited_domain_status = param( 'edited_domain_status', 'string' );
-					$user_domain = $UserSettings->get( 'user_domain', $this->ID );
+					$user_domain = $UserSettings->get( 'user_registered_from_domain', $this->ID );
 					$Domain = & get_Domain_by_subdomain( $user_domain );
 					if( ! $Domain && $edited_domain_status != 'unknown' && ! empty( $user_domain ) )
 					{ // Domain doesn't exist in DB, Create new record
@@ -1231,6 +1246,7 @@ class User extends DataObject
 					$UserSettings->set( 'notify_post_moderation', param( 'edited_user_notify_post_moderation', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'notify_edit_pst_moderation', param( 'edited_user_notify_edit_pst_moderation', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'send_pst_moderation_reminder', param( 'edited_user_send_pst_moderation_reminder', 'integer', 0 ), $this->ID );
+					$UserSettings->set( 'send_pst_stale_alert', param( 'edited_user_send_pst_stale_alert', 'integer', 0 ), $this->ID );
 				}
 				if( $this->grp_ID == 1 )
 				{
@@ -6206,6 +6222,18 @@ class User extends DataObject
 		{ // There is no email address in the DB table
 			return 'unknown';
 		}
+	}
+
+
+	/**
+	 * Get domain of user email
+	 *
+	 * @return string Domain
+	 */
+	function get_email_domain()
+	{
+		// Extract domain from email address:
+		return preg_replace( '#^[^@]+@#', '', $this->get( 'email' ) );
 	}
 
 

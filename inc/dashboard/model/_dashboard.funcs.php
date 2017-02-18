@@ -38,6 +38,11 @@ function b2evonet_get_updates( $force_short_delay = false )
 		return NULL;
 	}
 
+	if( $Settings->get( 'evonet_last_error' ) > $servertimenow - 5400 )
+	{	// The previous error was less than 90 minutes ago, skip this:
+		return false;
+	}
+
 	if( $debug == 2 )
 	{
 		$update_every = 8;
@@ -192,6 +197,11 @@ function b2evonet_get_updates( $force_short_delay = false )
 			$Messages->add( T_('Invalid updates received'), 'error' );
 		}
 	}
+
+	// Response is an error,
+	// Save current server time of this error to don't repeat it during 90 minutes:
+	$Settings->set( 'evonet_last_error', $servertimenow );
+	$Settings->dbupdate();
 
 	$Timer->pause('evonet: check for updates');
 	return false;

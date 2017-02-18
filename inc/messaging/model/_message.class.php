@@ -228,7 +228,7 @@ class Message extends DataObject
 		}
 
 		// Load all links:
-		$LinkOwner = new LinkMessage( NULL, $TemporaryID->ID );
+		$LinkOwner = new LinkMessage( new Message(), $TemporaryID->ID );
 		$LinkOwner->load_Links();
 
 		if( empty( $LinkOwner->Links ) )

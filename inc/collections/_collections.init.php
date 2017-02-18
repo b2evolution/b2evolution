@@ -1020,6 +1020,12 @@ class collections_Module extends Module
 				'ctrl'   => 'cron/jobs/_post_moderation_reminder.job.php',
 				'params' => NULL,
 			),
+			'monthly-alert-old-contents' => array(
+				'name'   => T_('Monthly alert on old contents'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_monthly_alert_old_contents.job.php',
+				'params' => NULL,
+			),
 		);
 	}
 

@@ -34,7 +34,7 @@ var bozo = {
 			// Hook "click" event for reset elements:
 			.find("input[type=reset]:not([class$=_nocheckchanges])").click(bozo.reset_changes).end()
 			// Hook "change" and "keypress" event for all others:
-			.find("input[type=text], input[type=password], input[type=radio], input[type=checkbox], input[type=file], textarea")
+			.find("input[type=text], input[type=password], input[type=radio], input[type=checkbox], input[type=file], input[type=hidden], textarea")
 				.not("[class$=_nocheckchanges]")
 					.bind("change", bozo.change)
 					.bind("keypress", bozo.change);

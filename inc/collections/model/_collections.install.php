@@ -108,6 +108,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			cat_name            varchar(255) NOT NULL,
 			cat_urlname         varchar(255) COLLATE ascii_general_ci NOT NULL,
 			cat_blog_ID         int(10) unsigned NOT NULL default 2,
+			cat_image_file_ID   int(10) unsigned NULL,
 			cat_description     varchar(255) NULL DEFAULT NULL,
 			cat_order           int(11) NULL DEFAULT NULL,
 			cat_subcat_ordering enum('parent', 'alpha', 'manual') COLLATE ascii_general_ci NULL DEFAULT NULL,
@@ -514,10 +515,11 @@ $schema_queries = array_merge( $schema_queries, array(
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_temporary_ID' => array(
-		'Creating table for temporary ID',
+		'Creating table for temporary IDs (used for uploads on new posts or messages)',
 		"CREATE TABLE T_temporary_ID (
-			tmp_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-			tmp_type VARCHAR(32) COLLATE ascii_general_ci NOT NULL,
+			tmp_ID      INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			tmp_type    VARCHAR(32) COLLATE ascii_general_ci NOT NULL,
+			tmp_coll_ID INT(11) UNSIGNED NULL,
 			PRIMARY KEY (tmp_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 

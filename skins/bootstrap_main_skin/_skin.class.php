@@ -21,7 +21,7 @@ class bootstrap_main_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.8.3';
+	var $version = '6.8.7';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -132,14 +132,21 @@ class bootstrap_main_Skin extends Skin
 						'note' => T_('Set background image in Main Area section.'),
 						'defaultvalue' => 'shared/global/sunset/sunset.jpg',
 						'type' => 'text',
-						'size' => '50'
+						'size' => '50',
+						'allow_empty' => true,
+					),
+					'front_bg_color' => array(
+						'label' => T_('Background color'),
+						'note' => T_('This color will be used if Background image is not set or does not exist.'),
+						'defaultvalue' => '#333333',
+						'type' => 'color',
 					),
 				'1_end' => array(
 					'layout' => 'end_fieldset',
 				),
 				'2_start' => array(
 					'layout' => 'begin_fieldset',
-					'label'  => T_('Front Page Main Area Overlay')
+					'label'  => T_('Front Page Main Area Settings')
 				),
 					'front_width' => array(
 						'label' => T_('Width'),
@@ -158,7 +165,7 @@ class bootstrap_main_Skin extends Skin
 							),
 						'type' => 'select',
 					),
-					'front_bg_color' => array(
+					'front_bg_cont_color' => array(
 						'label' => T_('Background color'),
 						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#000000',
@@ -211,8 +218,14 @@ class bootstrap_main_Skin extends Skin
 				),
 				'3_start' => array(
 					'layout' => 'begin_fieldset',
-					'label'  => T_('Front Page Secondary Area Overlay')
+					'label'  => T_('Front Page Secondary Area Settings')
 				),
+					'secondary_bg_color' => array(
+						'label' => T_('Background color'),
+						'note' => T_('Click to select a color.'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),
 					'secondary_text_color' => array(
 						'label' => T_('Text color'),
 						'note' => T_('Click to select a color.'),
@@ -220,6 +233,31 @@ class bootstrap_main_Skin extends Skin
 						'type' => 'color',
 					),
 				'3_end' => array(
+					'layout' => 'end_fieldset',
+				),
+				'4_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Featured posts Settings')
+				),
+					'bgimg_text_color' => array(
+						'label' => T_('Text color on background image'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),
+					'bgimg_link_color' => array(
+						'label' => T_('Link color on background image'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#6cb2ef',
+						'type' => 'color',
+					),
+					'bgimg_hover_link_color' => array(
+						'label' => T_('Hover link color on background image'),
+						'note' => T_('E-g: #00ff00 for green'),
+						'defaultvalue' => '#6cb2ef',
+						'type' => 'color',
+					),
+				'4_end' => array(
 					'layout' => 'end_fieldset',
 				),
 				'section_colorbox_start' => array(
@@ -355,17 +393,21 @@ class bootstrap_main_Skin extends Skin
 			add_css_headline( '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }' );
 		}
 
+		// Add custom CSS:
+		$custom_css = '';
+
 		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) ) )
 		{
 			global $media_url, $media_path;
 
-			// Add custom CSS:
-			$custom_css = '';
-
 			$bg_image = $this->get_setting( 'front_bg_image' );
 			if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 			{ // Custom body background image:
-				$custom_css .= '#bg_picture { background-image: url('.$media_url.$bg_image.") }\n";
+				$custom_css .= '.evo_pictured_layout { background-image: url('.$media_url.$bg_image.") }\n";
+			} else
+			{
+				$color = $this->get_setting( 'front_bg_color' );
+				$custom_css .= '.evo_pictured_layout { background: '.$color." }\n";
 			}
 
 			if( $color = $this->get_setting( 'pict_title_color' ) )
@@ -378,7 +420,7 @@ class bootstrap_main_Skin extends Skin
 				$custom_css .= 'body.pictured .main_page_wrapper .text-muted { color: '.$color." }\n";
 			}
 
-			if( $color = $this->get_setting( 'front_bg_color' ) )
+			if( $color = $this->get_setting( 'front_bg_cont_color' ) )
 			{ // Custom body background color:
 				$color_transparency = floatval( $this->get_setting( 'front_bg_opacity' ) / 100 );
 				$color = substr( $color, 1 );
@@ -436,44 +478,46 @@ class bootstrap_main_Skin extends Skin
 				}
 			}
 
+			if( $color = $this->get_setting( 'secondary_bg_color' ) )
+			{ // Custom text color on secondary area:
+				$custom_css .= 'section.secondary_area { background-color: '.$color." }\n";
+			}
 			if( $color = $this->get_setting( 'secondary_text_color' ) )
 			{ // Custom text color on secondary area:
 				$custom_css .= 'section.secondary_area, .widget_core_org_members { color: '.$color." !important }\n";
 			}
-
-			if( ! empty( $custom_css ) )
-			{
-				if( $disp == 'front' )
-				{ // Use standard bootstrap style on width <= 640px only for disp=front
-					$custom_css = '@media only screen and (min-width: 641px)
-						{
-							'.$custom_css.'
-						}';
-				}
-				$custom_css = '<style type="text/css">
-	<!--
-		'.$custom_css.'
-	-->
-	</style>';
-				add_headline( $custom_css );
-			}
 		}
+		
 
-		if( $disp == 'front' )
-		{ // Initialize script to scroll down to widget container with users team:
-			add_js_headline( '
-jQuery( document ).ready( function()
-{
-	jQuery( "#slide_button" ).click( function()
-	{
-		jQuery( "html, body, #skin_wrapper" ).animate(
+		if( $color = $this->get_setting( 'bgimg_text_color' ) )
+		{	// Custom text color on background image:
+			$custom_css .= '.evo_hasbgimg { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'bgimg_link_color' ) )
+		{	// Custom link color on background image:
+			$custom_css .= '.evo_hasbgimg a { color: '.$color." }\n";
+		}
+		if( $color = $this->get_setting( 'bgimg_hover_link_color' ) )
+		{	// Custom link hover color on background image:
+			$custom_css .= '.evo_hasbgimg a:hover { color: '.$color." }\n";
+		}
+		
+		if( ! empty( $custom_css ) )
 		{
-			scrollTop: jQuery( ".evo_container__front_page_secondary" ).offset().top
-		}, 1500 );
-	} );
-} );' );
+			if( $disp == 'front' )
+			{ // Use standard bootstrap style on width <= 640px only for disp=front
+				$custom_css = '@media only screen and (min-width: 641px)
+					{
+						'.$custom_css.'
+					}';
+			}
+			$custom_css = '<style type="text/css">
+<!--
+'.$custom_css.'
+-->
+</style>';
+		add_headline( $custom_css );
 		}
-
 	}
 
 

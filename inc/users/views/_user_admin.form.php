@@ -158,6 +158,8 @@ $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 		}
 	$Form->end_line();
 
+	user_domain_info_display( T_('Email Domain'), 'email_domain_status', $edited_User->get_email_domain(), '', $Form );
+
 	global $UserSettings;
 
 	// Display notification sender email adderss setting
@@ -409,38 +411,9 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 
 	$Form->info_field( T_('From Country'), $from_country, array( 'field_suffix' => $user_from_country_suffix ) );
 
-	$user_domain = $UserSettings->get( 'user_domain', $edited_User->ID );
-	$user_domain_formatted = format_to_output( $user_domain );
-	$display_user_domain = ( ! empty( $user_domain ) && $current_User->check_perm( 'stats', 'list' ) );
-	$perm_stat_edit = $current_User->check_perm( 'stats', 'edit' );
-	if( $display_user_domain )
-	{	// Get Domain:
-		$DomainCache = & get_DomainCache();
-		if( $Domain = & get_Domain_by_subdomain( $user_domain ) && $perm_stat_edit )
-		{	// Set a link to edit a top existing domain:
-			$user_domain_formatted = preg_replace( '#('.preg_quote( trim( $Domain->get( 'name' ), '.' ) ).')$#i',
-				'<a href="'.$admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID.'">$1</a>',
-				$user_domain_formatted );
-		}
-	}
-	$Form->begin_line( T_('From Domain'), NULL, ( $display_user_domain && $perm_stat_edit ? '' : 'info' ) );
-		$Form->info_field( '', $user_domain_formatted.' '.action_icon( NULL, 'magnifier', '', NULL, NULL, NULL, array( 'onclick' => 'return get_whois_info(\''.int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) ).'\');' ), array( 'alt' => 'View Whois info' ) ) );
-		if( $display_user_domain )
-		{	// Display status of Domain if current user has a permission:
-			$domain_status = $Domain ? $Domain->get( 'status' ) : 'unknown';
-			$domain_status_icon = '<div id="domain_status_icon" class="status_icon">'.stats_dom_status_icon( $domain_status ).'</div>';
-			if( $perm_stat_edit )
-			{ // User can edit Domain
-				// Link to create a new domain
-				$domain_status_action = action_icon( sprintf( T_('Add domain %s'), $user_domain ), 'new', $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_new&amp;dom_name='.$user_domain.'&amp;dom_status='.$domain_status );
-				$Form->select_input_array( 'edited_domain_status', $domain_status, stats_dom_status_titles(), '<b class="evo_label_inline">'.T_( 'Status' ).': </b>'.$domain_status_icon, '', array( 'force_keys_as_values' => true, 'background_color' => stats_dom_status_colors(), 'field_suffix' => $domain_status_action ) );
-			}
-			else
-			{ // Only view status of Domain
-				$Form->info( '<b class="evo_label_inline">'.T_( 'Status' ).': </b>'.$domain_status_icon, stats_dom_status_title( $domain_status ) );
-			}
-		}
-	$Form->end_line( NULL, ( $display_user_domain && $perm_stat_edit ? '' : 'info' ) );
+	$user_domain = $UserSettings->get( 'user_registered_from_domain', $edited_User->ID );
+	$user_ip_address = int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) );
+	user_domain_info_display( T_('From Domain'), 'domain_status', $user_domain, $user_ip_address, $Form );
 
 	$Form->info_field( T_('With Browser'), format_to_output( $UserSettings->get( 'user_browser', $edited_User->ID ) ) );
 
@@ -453,6 +426,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 		$Form->info_field( '<b class="evo_label_inline">'.T_('Initial URI').': </b>', $UserSettings->get( 'initial_URI', $edited_User->ID ) );
 	$Form->end_line( NULL, 'info' );
 
+	$perm_stat_edit = $current_User->check_perm( 'stats', 'edit' );
 	$initial_referer = $UserSettings->get( 'initial_referer', $edited_User->ID );
 	$display_initial_referer = ( ! empty( $initial_referer ) && $current_User->check_perm( 'stats', 'list' ) );
 	$Form->begin_line( T_('Initial referer'), NULL, ( $display_initial_referer && $perm_stat_edit ? '' : 'info' ) );
@@ -649,7 +623,7 @@ foreach( $domain_status_icons as $status => $icon )
 domain_status_icons['<?php echo $status; ?>'] = '<?php echo $icon; ?>';
 <?php } ?>
 
-jQuery( '#edited_domain_status, #edited_initial_referer_status' ).change( function()
+jQuery( '#edited_domain_status, #edited_initial_referer_status, #edited_email_domain_status' ).change( function()
 { // Change icon of the domain status
 	if( typeof domain_status_icons[ jQuery( this ).val() ] != 'undefined' )
 	{
@@ -683,7 +657,11 @@ function get_whois_info( ip_address )
 		},
 		success: function( result )
 		{
-			openModalWindow( result, '90%', modal_height + 'px', true, 'WHOIS - ' + ip_address, true );
+			if( ajax_response_is_correct( result ) )
+			{
+				result = ajax_debug_clear( result );
+				openModalWindow( result, '90%', modal_height + 'px', true, 'WHOIS - ' + ip_address, true );
+			}
 		}
 	} );
 

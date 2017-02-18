@@ -1196,6 +1196,7 @@ function get_visibility_statuses( $format = '', $exclude = array('trash'), $chec
 					'draft'      => is_admin_page() ? T_('This is a draft.') : T_('This is a draft and is visible only by the owner/author of the post and collection administrators.'),
 					'deprecated' => T_('This is deprecated and visible in the Back-Office only.'),
 					'redirected' => T_('This will redirect to another page when accessed from the Front-Office.'),
+					'trash'      => T_('This is a recycled.'),
 				);
 			break;
 
@@ -1340,9 +1341,10 @@ function compare_visibility_status( $first_status, $second_status )
  * @param string permlevel: 'view'/'edit' depending on where we would like to use it
  * @param string Status; Don't restrict this status by max allowed status, for example, if it is already used for the post/comment
  * @param string Restrict max collection allowed status by this. Used for example to restrict a comment status with its post status
+ * @param object Permission object: Item or Comment
  * @return array of restricted statuses
  */
-function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow_status = '', $restrict_max_allowed_status = '' )
+function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow_status = '', $restrict_max_allowed_status = '', $perm_target = NULL )
 {
 	global $current_User;
 
@@ -1377,8 +1379,8 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow
 		$result[] = 'redirected';
 	}
 
-	// 'trash' status is allowed only in case of comments, and only if user has global editall permission
-	if( $prefix == 'blog_comment!' && ! ( is_logged_in() && $current_User->check_perm( 'blogs', 'editall', false ) ) )
+	// 'trash' status is allowed only in case of comments, and only if user has a permission to delete a comment from the given collection
+	if( $prefix == 'blog_comment!' && ! ( is_logged_in() && ! empty( $perm_target ) && $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $perm_target ) ) )
 	{ // not allowed
 		$result[] = 'trash';
 	}
@@ -1408,7 +1410,7 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow
 
 function get_status_tooltip_title( $status )
 {
-	$visibility_statuses = get_visibility_statuses( 'tooltip-titles' );
+	$visibility_statuses = get_visibility_statuses( 'tooltip-titles', array() );
 
 	if( isset( $visibility_statuses[$status] ) )
 	{
@@ -1913,7 +1915,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 				'th' => T_('Actions'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
-				'td' => '%blog_row_actions( #blog_ID#, {Obj} )%',
+				'td' => '%blog_row_actions( {Obj} )%',
 			);
 	}
 }
@@ -2233,20 +2235,20 @@ function blog_row_setting( $blog_ID, $setting_name, $setting_value )
 /**
  * Get available actions for current blog
  *
- * @param integer Blog ID
+ * @param object Blog
  * @return string Action links
  */
-function blog_row_actions( $curr_blog_ID, $Blog )
+function blog_row_actions( $Blog )
 {
 	global $current_User, $admin_url;
 	$r = '';
 
-	if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
+	if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 	{
 		$r .= '<a href="'.$Blog->get( 'url' ).'" class="action_icon btn btn-info btn-xs" title="'.T_('View this collection').'">'.T_('View').'</a>';
-		$r .= '<a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog='.$curr_blog_ID.'" class="action_icon btn btn-primary btn-xs" title="'.T_('Manage this collection...').'">'.T_('Manage').'</a>';
-		$r .= action_icon( T_('Duplicate this collection...'), 'copy', $admin_url.'?ctrl=collections&amp;action=copy&amp;blog='.$curr_blog_ID );
-		$r .= action_icon( T_('Delete this blog...'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete&amp;blog='.$curr_blog_ID.'&amp;'.url_crumb('collection').'&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) ) );
+		$r .= '<a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog='.$Blog->ID.'" class="action_icon btn btn-primary btn-xs" title="'.T_('Manage this collection...').'">'.T_('Manage').'</a>';
+		$r .= action_icon( T_('Duplicate this collection...'), 'copy', $admin_url.'?ctrl=collections&amp;action=copy&amp;blog='.$Blog->ID );
+		$r .= action_icon( T_('Delete this blog...'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete&amp;blog='.$Blog->ID.'&amp;'.url_crumb('collection').'&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) ) );
 	}
 
 	if( empty($r) )

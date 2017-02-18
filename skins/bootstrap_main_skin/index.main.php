@@ -45,12 +45,11 @@ if( $is_pictured_page )
 { // Display a picture from skin setting as background image
 	global $media_path, $media_url;
 	$bg_image = $Skin->get_setting( 'front_bg_image' );
-	echo '<div id="bg_picture">';
+	echo '<div class="evo_pictured_layout">';
 	if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 	{ // If it exists in media folder
-		echo '<img src="'.$media_url.$bg_image.'" />';
+		echo '<img class="evo_pictured__image" src="'.$media_url.$bg_image.'" />';
 	}
-	echo '</div>';
 }
 ?>
 
@@ -128,7 +127,6 @@ if( $is_pictured_page )
 
 </nav><!-- .row -->
 
-
 <div class="row">
 
 	<div class="col-md-12">
@@ -187,20 +185,31 @@ if( $is_pictured_page )
 		<?php
 		// Go Grab the featured post:
 		if( ! in_array( $disp, array( 'single', 'page' ) ) && $Item = & get_featured_Item() )
-		{ // We have a featured/intro post to display:
+		{	// We have a featured/intro post to display:
+			$intro_item_style = '';
+			$LinkOwner = new LinkItem( $Item );
+			$LinkList = $LinkOwner->get_attachment_LinkList( 1, 'cover' );
+			if( ! empty( $LinkList ) &&
+					$Link = & $LinkList->get_next() &&
+					$File = & $Link->get_File() &&
+					$File->exists() &&
+					$File->is_image() )
+			{	// Use cover image of intro-post as background:
+				$intro_item_style = 'background-image: url("'.$File->get_url().'")';
+			}
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-			echo '<div class="panel panel-default"><div class="panel-body">';
 			skin_include( '_item_block.inc.php', array(
 					'feature_block' => true,
-					'content_mode'  => 'auto',		// 'auto' will auto select depending on $disp-detail
+					'content_mode'  => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
 					'intro_mode'    => 'normal',	// Intro posts will be displayed in normal mode
+					'item_class'    => ($Item->is_intro() ? 'well evo_intro_post' : 'well evo_featured_post').( empty( $intro_item_style ) ? '' : ' evo_hasbgimg' ),
+					'item_style'    => $intro_item_style,
 					'Item'          => $Item,
 				) );
-			echo '</div></div>';
 			// ----------------------------END ITEM BLOCK  ----------------------------
 		}
 		?>
-
+		
 		<?php
 			// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
 			skin_include( '$disp$', array(
@@ -283,6 +292,8 @@ if( $is_pictured_page )
 </div><!-- .row -->
 
 </div><!-- .container -->
+
+<?php if( $is_pictured_page ) {	echo '</div><!-- .evo_pictured_layout -->'; } ?>
 
 
 <!-- =================================== START OF SECONDARY AREA =================================== -->

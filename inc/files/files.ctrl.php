@@ -49,7 +49,7 @@ $AdminUI->set_path( 'files', 'browse' );
 param( 'ajax_request', 'integer', 0, true );
 
 // INIT params:
-if( param( 'root_and_path', 'string', '', false ) /* not memorized (default) */ && strpos( $root_and_path, '::' ) )
+if( param( 'root_and_path', 'filepath', '', false ) /* not memorized (default) */ && strpos( $root_and_path, '::' ) )
 { // root and path together: decode and override (used by "radio-click-dirtree")
 	list( $root, $path ) = explode( '::', $root_and_path, 2 );
 	// Memorize new root:
@@ -59,7 +59,7 @@ if( param( 'root_and_path', 'string', '', false ) /* not memorized (default) */ 
 else
 {
 	param( 'root', 'string', NULL, true ); // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
-	param( 'path', 'string', '/', true );  // the path relative to the root dir
+	param( 'path', 'filepath', '/', true );  // the path relative to the root dir
 	if( param( 'new_root', 'string', '' )
 		&& $new_root != $root )
 	{ // We have changed root in the select list
@@ -146,8 +146,8 @@ if( in_array( $action, array( 'move_copy', 'file_move', 'file_copy' ) ) )
 	memorize_param( 'action', 'string', '', $action );
 }
 
-if( ! empty( $action ) && substr( $fm_mode, 0, 5 ) != 'link_' )
-{	// The only modes which can tolerate simultaneous actions at this time are link_* modes (item, user...)
+if( ! empty( $action ) && substr( $fm_mode, 0, 5 ) != 'link_' && $fm_mode != 'file_select' )
+{	// The only modes which can tolerate simultaneous actions at this time are link_* modes (item, user...) and file_select
 	$fm_mode = '';
 }
 
@@ -157,6 +157,7 @@ param( 'linkdata', 'string', '', true );
 
 // Name of the iframe we want some actions to come back to:
 param( 'iframe_name', 'string', '', true );
+param( 'field_name', 'string', '', true );
 
 // Get root:
 $ads_list_path = false; // false by default, gets set if we have a valid root
@@ -335,7 +336,7 @@ $Debuglog->add( 'path: '.var_export( $path, true ), 'files' );
  *
  * @global array
  */
-$fm_selected = param( 'fm_selected', 'array:string', array(), true );
+$fm_selected = param( 'fm_selected', 'array:filepath', array(), true );
 $Debuglog->add( count($fm_selected).' selected files/directories', 'files' );
 /**
  * The selected files (must be within current fileroot)
@@ -344,15 +345,9 @@ $Debuglog->add( count($fm_selected).' selected files/directories', 'files' );
  */
 $selected_Filelist = new Filelist( $fm_FileRoot, $ads_list_path );
 
-// Prevent directory traversal using '..'
-$re = '/\/?\.\.\/+/';
 foreach( $fm_selected as $l_source_path )
 {
-	if( preg_match( $re, $l_source_path ) )
-	{
-		debug_die( 'Invalid fm_selected parameter value' );
-	}
-	$selected_Filelist->add_by_subpath( urldecode($l_source_path), true );
+	$selected_Filelist->add_by_subpath( $l_source_path, true );
 }
 
 
@@ -790,7 +785,7 @@ switch( $action )
 			$source_Filelist = new Filelist( $sources_Root );
 			foreach( $fm_selected as $l_source_path )
 			{
-				$source_Filelist->add_by_subpath( urldecode($l_source_path), true );
+				$source_Filelist->add_by_subpath( $l_source_path, true );
 			}
 		}
 
@@ -802,7 +797,7 @@ switch( $action )
 		}
 
 		param( 'confirmed', 'integer', 0 );
-		param( 'new_names', 'array:string', array() );
+		param( 'new_names', 'array:filepath', array() );
 
 		// Check params for each file to rename:
 		while( $loop_src_File = & $source_Filelist->get_next() )
@@ -843,14 +838,14 @@ switch( $action )
 						if( $new_name == $old_name )
 						{ // Name has not changed...
 							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; has not been renamed'), $old_name ), 'note', T_('Renaming files:') );
-							continue;
+							continue 2;
 						}
 						// Perform rename:
 						if( ! $loop_src_File->rename_to( $new_name ) )
 						{
 							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
 								$old_name, $new_name ), 'error', T_('Renaming files') );
-							continue;
+							continue 2;
 						}
 
 						$success_message = sprintf( T_('&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;'), $old_name, $new_name );
@@ -865,7 +860,7 @@ switch( $action )
 						if( $old_path == $new_path && $loop_src_File->_FileRoot->ID == $selected_Filelist->_FileRoot->ID )
 						{ // File path has not changed...
 							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; has not been copied'), $old_path ), 'note', T_('Copying files:') );
-							continue;
+							continue 2;
 						}
 
 						// Get a pointer on dest file
@@ -875,8 +870,12 @@ switch( $action )
 						if( ! $loop_src_File->copy_to( $dest_File ) )
 						{ // failed
 							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; could not be copied to &laquo;%s&raquo;'), $old_path, $new_path ), 'error', T_('Copying files:') );
-							continue;
+							continue 2;
 						}
+
+						// Use new file instead of source to update all file properties especially file root:
+						// (to avoid debug die when file is moved to another root, @see Filelist::add())
+						$loop_src_File = $dest_File;
 
 						$success_message = sprintf( T_('&laquo;%s&raquo; has been successfully copied to &laquo;%s&raquo;'), $old_path, $new_path );
 						$success_title = T_('Copying files:');
@@ -890,14 +889,14 @@ switch( $action )
 						if( $old_path == $new_path && $loop_src_File->_FileRoot->ID == $selected_Filelist->_FileRoot->ID )
 						{ // File path has not changed...
 							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; has not been moved'), $old_path ), 'note', T_('Moving files:') );
-							continue;
+							continue 2;
 						}
 
 						// Perform move:
 						if( ! $loop_src_File->move_to( $selected_Filelist->get_root_type(), $selected_Filelist->get_root_ID(), $new_path ) )
 						{ // failed
 							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; could not be moved to &laquo;%s&raquo;'), $old_path, $new_path ), 'error', T_('Moving files:') );
-							continue;
+							continue 2;
 						}
 
 						$success_message = sprintf( T_('&laquo;%s&raquo; has been successfully moved to &laquo;%s&raquo;'), $old_path, $new_path );

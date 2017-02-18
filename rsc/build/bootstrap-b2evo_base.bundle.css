@@ -1475,6 +1475,27 @@ textarea.form_textarea_input {
 label.radiooption {
   margin-right: 1em;
 }
+.file_select_wrapper {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-start;
+}
+.file_select_wrapper .file_select_item {
+  display: flex;
+  flex-flow: row wrap;
+  margin-right: 8px;
+  text-align: center;
+}
+.file_select_wrapper .file_select_item .item_actions {
+  display: flex;
+  flex-shrink: 1;
+  flex-flow: column wrap;
+  justify-content: flex-start;
+  align-content: center;
+  justify-content: center;
+  text-align: left;
+  margin-left: 8px;
+}
 div.log_container ul,
 div.action_messages ul,
 div.log_container ol,
@@ -3257,6 +3278,76 @@ input.btn-lg {
 }
 .evo_container__sidebar .evo_poll__title {
   white-space: normal;
+}
+#itemform_links .panel-body {
+  padding: 0;
+}
+div.qq-upload-button,
+div.qq-upload-drop-area,
+div.qq-upload-drop-area-active {
+  border: 2px dashed #fff;
+  background: #5bc0de;
+  -webkit-border-radius: 9px;
+  -moz-border-radius: 9px;
+  -ms-border-radius: 9px;
+  -o-border-radius: 9px;
+  border-radius: 9px;
+}
+div.qq-upload-button-hover,
+div.qq-upload-drop-area,
+div.qq-upload-drop-area-active {
+  background: #5cb85c;
+}
+ul.qq-upload-list {
+  margin: 0;
+}
+div#fileuploader_form {
+  padding: 5px;
+  height: 65px;
+  background: #f5f5f5;
+}
+#attachments_fieldset_wrapper {
+  width: 100%;
+  height: 160px;
+  position: relative;
+  padding-bottom: 6px;
+  box-sizing: content-box;
+}
+#attachments_fieldset_wrapper #attachments_fieldset_block {
+  overflow: auto;
+  height: 100%;
+}
+#attachments_fieldset_wrapper .ui-resizable-s {
+  background: #c0c0c0;
+  height: 6px;
+  bottom: 0;
+}
+#attachments_fieldset_wrapper .ui-resizable-s:after {
+  content: "...";
+  font-size: 10px;
+  top: -7px;
+  position: relative;
+  text-align: center;
+  display: block;
+}
+#attachments_fieldset_wrapper .table_scroll {
+  position: relative;
+}
+#attachments_fieldset_wrapper div.results,
+#attachments_fieldset_wrapper div.table_scroll {
+  overflow: initial;
+}
+#attachments_fieldset_wrapper table tbody .dragged {
+  opacity: 0.8;
+  position: absolute;
+  z-index: 1000;
+}
+#attachments_fieldset_wrapper table tbody td {
+  cursor: move;
+}
+#filelist_tbody tr:first-child .action_icon_link_move_up,
+#filelist_tbody tr:last-child .action_icon_link_move_down {
+  visibility: hidden;
 }
 
 /**

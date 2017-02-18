@@ -3013,12 +3013,12 @@ class Comment extends DataObject
 				break;
 
 			case 'meta': // Display a meta comment:
-				$type = T_('Meta comment');
+				$href = '';
 				if( $params['linked_type'] )
 				{	// Make a comment type as link to permanent url:
-					$type = '<a href="'.$this->get_permanent_url().'">'.$type.'</a>';
+					$href = 'href="'.$this->get_permanent_url().'"';
 				}
-				return sprintf( T_('%s from %s'), $type, $author );
+				return sprintf( T_('<a %s>Meta comment</a> from %s'), $href, $author );
 		}
 
 		return sprintf( $s, $author );
@@ -4640,7 +4640,7 @@ class Comment extends DataObject
 		}
 
 		// Comment status cannot be more than post status, restrict it:
-		$restricted_statuses = get_restricted_statuses( $item_Blog->ID, 'blog_comment!', 'edit', '', $item_restricted_status );
+		$restricted_statuses = get_restricted_statuses( $item_Blog->ID, 'blog_comment!', 'edit', '', $item_restricted_status, $this );
 
 		// Get all visibility statuses:
 		$visibility_statuses = get_visibility_statuses( '', $restricted_statuses );

@@ -21,7 +21,7 @@ class bootstrap_gallery_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.8.3';
+	var $version = '6.8.7';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -386,7 +386,7 @@ class bootstrap_gallery_Skin extends Skin
 		}
 		if( ! empty( $custom_styles ) )
 		{
-			$custom_css .= '	body { '.implode( ';', $custom_styles )." }\n";
+			$custom_css .= 'body { '.implode( ';', $custom_styles )." }\n";
 		}
 
 		global $thumbnail_sizes;

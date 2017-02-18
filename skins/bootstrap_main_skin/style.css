@@ -7,14 +7,30 @@
 .evo_container__page_top .ufld_icon_links {
   text-align: right;
 }
-div.widget_core_coll_tagline {
-  margin-bottom: 30px;
+.evo_container__front_page_primary {
+  padding-bottom: 30px;
+}
+.evo_container__front_page_primary .evo_widget {
+  margin-top: 30px;
+}
+.evo_container__front_page_primary .evo_widget div,
+.evo_container__front_page_primary .evo_widget h1,
+.evo_container__front_page_primary .evo_widget h2,
+.evo_container__front_page_primary .evo_widget p {
+  margin-top: 0;
+}
+.evo_container__front_page_primary .evo_widget div > p:last-child,
+.evo_container__front_page_primary .evo_widget:last-child > h2,
+.evo_container__front_page_primary .evo_widget:last-child > ul,
+.evo_container__front_page_primary .evo_widget > ul li:last-child {
+  margin-bottom: 0 !important;
 }
 .evo_container__front_page_secondary {
   padding-top: 30px;
 }
 .secondary_area {
-  background-color: #FFF;
+  position: relative;
+  z-index: 1;
   width: 100%;
 }
 .secondary_area p {
@@ -30,6 +46,7 @@ html {
   height: 100%;
 }
 body {
+  overflow-x: visible !important;
   -webkit-font-smoothing: subpixel-antialiased;
 }
 div.front_main_area {
@@ -81,19 +98,18 @@ body.pictured div#debug_info.debug {
   position: absolute;
   top: 100%;
 }
-#bg_picture {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
+.evo_pictured_layout {
+  display: table;
   height: 100%;
+  min-height: 100%;
+  min-width: 100%;
+  position: relative;
+  width: 100%;
+  background-attachment: fixed;
   background-size: cover;
   background-position: center center;
-  z-index: -999999;
 }
-#bg_picture img {
+.evo_pictured_layout > .evo_pictured__image {
   display: none;
   width: 100%;
 }
@@ -101,11 +117,12 @@ body.pictured div#debug_info.debug {
   body.disp_front .sitewide_header {
     margin-bottom: 0;
   }
-  body.disp_front #bg_picture {
+  body.disp_front .evo_pictured_layout {
     position: relative;
     height: auto;
+    min-height: auto;
   }
-  body.disp_front #bg_picture img {
+  body.disp_front .evo_pictured_layout > .evo_pictured__image {
     display: block;
   }
   body.disp_front div.front_main_area {
@@ -243,6 +260,11 @@ textarea.message_text {
 .evo_post .small.text-muted a,
 .evo_post .small.text-muted a .glyphicon {
   color: inherit;
+}
+.evo_hasbgimg {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
 div.bSideItem {
   background: #F7F5FA;
@@ -424,6 +446,7 @@ body.pictured .secondary_area .widget_core_org_members a.user_link:hover {
   position: fixed;
   bottom: 20px;
   left: 50%;
+  line-height: 1em;
 }
 .slide_button_wrap #slide_button {
   display: inline-block;
@@ -431,8 +454,7 @@ body.pictured .secondary_area .widget_core_org_members a.user_link:hover {
   color: #ffffff;
   text-align: center;
   opacity: 0.5;
-  -webkit-transition: 0.1s all;
-          transition: 0.1s all;
+  transition: 0.1s all;
   position: relative;
   left: -50%;
 }

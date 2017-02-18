@@ -15,14 +15,18 @@ global $baseurl, $Settings;
 <nav class="sitewide_header">
 
 <?php
-if( $Settings->get( 'notification_logo' ) != '' )
-{
+$notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
+if( $notification_logo_file_ID > 0 &&
+    ( $FileCache = & get_FileCache() ) &&
+    ( $File = $FileCache->get_by_ID( $notification_logo_file_ID, false ) ) &&
+    $File->is_image() )
+{	// Display site logo image if the file exists in DB and it is an image:
 	$site_title = $Settings->get( 'notification_long_name' ) != '' ? ' title="'.$Settings->dget( 'notification_long_name', 'htmlattr' ).'"' : '';
-	$site_name_text = '<img src="'.$Settings->get( 'notification_logo' ).'" alt="'.$Settings->dget( 'notification_short_name', 'htmlattr' ).'"'.$site_title.' />';
+	$site_name_text = '<img src="'.$File->get_url().'" alt="'.$Settings->dget( 'notification_short_name', 'htmlattr' ).'"'.$site_title.' />';
 	$site_title_class = ' swhead_logo';
 }
 else
-{
+{	// Display only short site name if the logo file cannot be used by some reason above:
 	$site_name_text = $Settings->get( 'notification_short_name' );
 	$site_title_class = '';
 }

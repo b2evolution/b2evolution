@@ -106,6 +106,9 @@ switch( $action )
 		// Stop a request from the blocked IP addresses or Domains
 		antispam_block_request();
 
+		// Stop a request from the blocked email address or its domain:
+		antispam_block_by_email( $email );
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'regform' );
 
@@ -367,7 +370,7 @@ switch( $action )
 		}
 		$UserSettings->set( 'created_fromIPv4', ip2int( $Hit->IP ), $new_User->ID );
 		$user_domain = $Hit->get_remote_host( true );
-		$UserSettings->set( 'user_domain', $user_domain, $new_User->ID );
+		$UserSettings->set( 'user_registered_from_domain', $user_domain, $new_User->ID );
 		$UserSettings->set( 'user_browser', substr( $Hit->get_user_agent(), 0 , 200 ), $new_User->ID );
 		$UserSettings->dbupdate();
 
@@ -407,8 +410,10 @@ switch( $action )
 		send_admin_notification( NT_('New user registration'), 'account_new', $email_template_params );
 
 		$Plugins->trigger_event( 'AfterUserRegistration', array( 'User' => & $new_User ) );
-		// Move user to suspect group by IP address. Make this move even if during the registration it was added to a trusted group.
+		// Move user to suspect group by IP address and reverse DNS domain:
+		// Make this move even if during the registration it was added to a trusted group:
 		antispam_suspect_user_by_IP( '', $new_User->ID, false );
+		antispam_suspect_user_by_reverse_dns_domain( $new_User->ID, false );
 
 		if( $Settings->get('newusers_mustvalidate') )
 		{ // We want that the user validates his email address:

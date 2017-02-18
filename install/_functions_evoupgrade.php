@@ -7795,7 +7795,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12070, 'Create table for temporary ID...' ) )
+	if( upg_task_start( 12070, 'Create table for temporary IDs...' ) )
 	{	// part of 6.8.0-alpha
 		db_create_table( 'T_temporary_ID', '
 			tmp_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -8089,10 +8089,53 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12140, 'Updating file types table...' ) )
-	{ // part of 6.7.10-stable moved here so it also applies to 6.8.3 -> 6.8.4 upgrades
+	{	// part of 6.7.10-stable moved here so it also applies to 6.8.3 -> 6.8.4 upgrades
 		$DB->query( 'UPDATE T_filetypes
 				SET ftyp_allowed = "admin"
 			WHERE ftyp_extensions REGEXP "[[:<:]]swf[[:>:]]"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12145, 'Upgrade Temporary IDs table...' ) )
+	{	// part of 6.8.4-stable
+		$DB->query( 'ALTER TABLE T_temporary_ID
+			ADD tmp_coll_ID INT(11) UNSIGNED NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12150, 'Upgrade categories table...' ) )
+	{	// part of 6.8.4-alpha
+		db_add_col( 'T_categories', 'cat_image_file_ID', 'int(10) unsigned  NULL AFTER cat_blog_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12155, 'Renaming notification logo setting...' ) )
+	{ // part of 6.8.5-stable
+		$notification_logo = $DB->get_var( 'SELECT set_value FROM T_settings WHERE set_name = "notification_logo"' );
+		if( !empty( $notification_logo ) )
+		{
+			if( is_numeric( $notification_logo ) )
+			{ // We have a numeric value, it's possible that this is already a file_ID.
+			  // Make sure that the integer is a valid file ID and an image file before setting it as the notification_logo_file_ID.
+				$notification_logo = intval( $notification_logo );
+				$file_type = $DB->get_var( 'SELECT file_type FROM T_files WHERE file_ID = '.$notification_logo );
+				if( $file_type && $file_type == 'image' )
+				{
+					$DB->query( 'INSERT INTO T_settings ( set_name, set_value ) VALUES ( "notification_logo_file_ID", '.$notification_logo.' )' );
+				}
+			}
+
+			// Remove previous notification logo setting
+			$DB->query( 'DELETE FROM T_settings WHERE set_name = "notification_logo"' );
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12160, 'Renaming user setting...' ) )
+	{	// part of 6.8.6-stable
+		$DB->query( 'UPDATE T_users__usersettings
+			  SET uset_name = "user_registered_from_domain"
+			WHERE uset_name = "user_domain"' );
 		upg_task_end();
 	}
 

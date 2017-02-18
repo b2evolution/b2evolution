@@ -25,10 +25,6 @@ $tempskin = '_atom';
 # Inside that skin, let's force the use of the lastcomments display:
 $disp = 'comments';
 
-# This setting retricts posts to those published, thus hiding drafts.
-# You should not have to change this.
-$show_statuses = array();
-
 /**
  * That's it, now let b2evolution do the rest! :)
  */
