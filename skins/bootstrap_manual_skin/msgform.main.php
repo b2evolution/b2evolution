@@ -48,7 +48,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
 		<?php
-		if( $Skin->is_visible_container( 'page_top' ) )
+		if( $Skin->show_container_when_access_denied( 'page_top' ) )
 		{ // Display 'Page Top' widget container
 		?>
 		<div class="evo_container evo_container__page_top">
@@ -73,7 +73,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
 		<?php
-		if( $Skin->is_visible_container( 'header' ) )
+		if( $Skin->show_container_when_access_denied( 'header' ) )
 		{ // Display 'Header' widget container
 		?>
 		<div class="evo_container evo_container__header">
@@ -96,7 +96,7 @@ siteskin_include( '_site_body_header.inc.php' );
 </header><!-- .row -->
 
 <?php
-if( $Skin->is_visible_container( 'menu' ) )
+if( $Skin->show_container_when_access_denied( 'menu' ) )
 { // Display this widget container only when it is not disabled
 ?>
 <nav class="row">
@@ -211,7 +211,7 @@ skin_include( '$disp$' );
 			<div id="evo_container__sidebar">
 
 				<?php
-				if( $Skin->is_visible_container( 'sidebar' ) )
+				if( $Skin->show_container_when_access_denied( 'sidebar' ) )
 				{ // Display 'Sidebar' widget container
 				?>
 				<div class="evo_container evo_container__sidebar">
@@ -253,7 +253,7 @@ skin_include( '$disp$' );
 				<?php } ?>
 
 				<?php
-				if( $Skin->is_visible_container( 'sidebar2' ) )
+				if( $Skin->show_container_when_access_denied( 'sidebar2' ) )
 				{ // Display 'Sidebar 2' widget container
 				?>
 				<div class="evo_container evo_container__sidebar2">
@@ -320,7 +320,7 @@ skin_include( '$disp$' );
 	<div class="col-md-12 center">
 
 		<?php
-		if( $Skin->is_visible_container( 'footer' ) )
+		if( $Skin->show_container_when_access_denied( 'footer' ) )
 		{ // Display 'Footer' widget container
 		?>
 		<div class="evo_container evo_container__footer">

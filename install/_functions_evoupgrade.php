@@ -8138,7 +8138,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12165, 'Upgrade table of users...' ) )
+	if( upg_task_start( 12165, 'Updating attachment positions...' ) )
+	{	// part of 6.8.7-stable
+		$DB->query( 'UPDATE T_links
+			INNER JOIN T_files ON file_ID = link_file_ID AND file_type != "image"
+			  SET link_position = "attachment"
+			WHERE link_position != "attachment"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13000, 'Upgrade table of users...' ) )
 	{	// part of 6.9.0-beta
 		db_add_col( 'T_users', 'user_pass_driver', 'VARCHAR(16) NOT NULL default "evo$md5" AFTER user_salt' );
 		$DB->query( 'UPDATE T_users
@@ -8147,7 +8156,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12170, 'Updating users pass storage...' ) )
+	if( upg_task_start( 13005, 'Updating users pass storage...' ) )
 	{	// part of 6.9.0-beta
 		$DB->query( 'ALTER TABLE T_users MODIFY COLUMN user_pass VARBINARY(32)' );
 		$DB->query( 'UPDATE T_users SET user_pass = LOWER( HEX( user_pass ) )' );
@@ -8155,14 +8164,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12175, 'Upgrade table of users...' ) )
+	if( upg_task_start( 13010, 'Upgrade table of users...' ) )
 	{	// part of 6.9.0-beta
 		$DB->query( 'ALTER TABLE T_users
 			MODIFY user_salt VARCHAR(32) NOT NULL default ""' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12180, 'Updating base domains table...' ) )
+	if( upg_task_start( 13015, 'Updating base domains table...' ) )
 	{ // part of 6.9.0-beta
 		$sql = 'SHOW INDEX FROM T_basedomains WHERE KEY_NAME = "dom_type_name"';
 		$indexes = $DB->get_results( $sql, ARRAY_A );
@@ -8217,7 +8226,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13000, 'Creating sections table...' ) )
+	if( upg_task_start( 13020, 'Upgrading posts table...' ) )
+	{	// part of 6.9.0-beta
+		db_add_col( 'T_items__item', 'post_contents_last_updated_ts', 'TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\' AFTER post_last_touched_ts' );
+		$DB->query( 'UPDATE T_items__item
+			SET post_contents_last_updated_ts = post_last_touched_ts' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14000, 'Creating sections table...' ) )
 	{	// part of 6.8.0-alpha
 		db_create_table( 'T_section', '
 				sec_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -8228,13 +8245,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13005, 'Upgrading collections table...' ) )
+	if( upg_task_start( 14005, 'Upgrading collections table...' ) )
 	{	// part of 6.8.0-alpha
 		db_add_col( 'T_blogs', 'blog_sec_ID', 'INT(11) UNSIGNED NOT NULL DEFAULT 1' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13010, 'Create default section...' ) )
+	if( upg_task_start( 14010, 'Create default section...' ) )
 	{	// part of 6.8.0-alpha
 		$DB->query( 'INSERT INTO T_section ( sec_ID, sec_name, sec_order, sec_owner_user_ID )
 			VALUES ( 1, "No Section", 1, 1 )' );
@@ -8248,14 +8265,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13015, 'Upgrading general settings table...' ) )
+	if( upg_task_start( 14015, 'Upgrading general settings table...' ) )
 	{	// part of 6.8.0-alpha
 		$DB->query( 'ALTER TABLE T_settings
 			MODIFY set_name VARCHAR(50) COLLATE ascii_general_ci NOT NULL' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13020, 'Install default site skin...' ) )
+	if( upg_task_start( 14020, 'Install default site skin...' ) )
 	{	// part of 6.8.0-alpha
 		load_funcs( 'skins/_skin.funcs.php' );
 		$SkinCache = & get_SkinCache();

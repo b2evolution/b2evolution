@@ -1314,8 +1314,10 @@ class Comment extends DataObject
 	/**
 	 * Display author url, delete icon and ban icon if user has proper rights
 	 *
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 * @param boolean true to use ajax button
 	 * @param boolean true to check user permission to edit this comment and antispam screen
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 */
 	function author_url_with_actions( $redirect_to = NULL, $ajax_button = false, $check_perms = true, $save_context = true )
 	{
@@ -1326,7 +1328,7 @@ class Comment extends DataObject
 			{ // Author is anonymous user and we have permission to edit this comment...
 				if( $redirect_to == NULL )
 				{
-					$redirect_to = rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
+					$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 				}
 				$this->deleteurl_link( $redirect_to, $ajax_button, false, '&amp;', $save_context );
 				$this->banurl_link( $redirect_to, $ajax_button, true, '&amp;', $save_context );
@@ -1373,8 +1375,8 @@ class Comment extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 * @param string Glue string for url params
-	 * @param boolean TRUE - to save context(memorized params)
-	 * @param string Redirect url
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 * @return boolean
 	 */
 	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $redirect_to = NULL )
@@ -1408,15 +1410,12 @@ class Comment extends DataObject
 			echo '<a href="'.$admin_url.'?ctrl=comments'.$glue.'blog='.$item_Blog->ID.$glue.'action=edit'.$glue.'comment_ID='.$this->ID;
 		}
 		if( $save_context )
-		{
-			if( $redirect_to != NULL )
-			{
-				echo $glue.'redirect_to='.$redirect_to;
+		{	// Use a param to redirect after action:
+			if( $redirect_to === NULL )
+			{	// Get current url for redirect:
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			else
-			{
-				echo $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
-			}
+			echo $glue.'redirect_to='.rawurlencode( $redirect_to );
 		}
 		echo '" title="'.$title.'"';
 		echo empty( $class ) ? '' : ' class="'.$class.'"';
@@ -1433,9 +1432,12 @@ class Comment extends DataObject
 
 	/**
 	 * Display delete icon for deleting author_url if user has proper rights
+	 *
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 * @param boolean true if create ajax button
 	 * @param boolean true if need permission check, because it wasn't checked before
-	 * @param glue between url params
+	 * @param string glue between url params
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @return link on success, false otherwise
 	 */
 	function deleteurl_link( $redirect_to, $ajax_button = false, $check_perm = true, $glue = '&amp;', $save_context = true )
@@ -1450,19 +1452,19 @@ class Comment extends DataObject
 		}
 
 		if( $save_context )
-		{
-			if( $redirect_to == NULL )
-			{
-				$redirect_to = rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
+		{	// Use a param to redirect after action:
+			if( $redirect_to === NULL )
+			{	// Get current url for redirect:
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			$redirect_to = $glue.'redirect_to='.$redirect_to;
+			$redirect_to = $glue.'redirect_to='.rawurlencode( $redirect_to );
 		}
 		else
-		{
+		{	// Don't allow a redirect after action:
 			$redirect_to = '';
 		}
 
-		$delete_url = $admin_url.'?ctrl=comments&amp;action=delete_url&amp;comment_ID='.$this->ID.'&amp;'.url_crumb('comment').$redirect_to;
+		$delete_url = $admin_url.'?ctrl=comments'.$glue.'action=delete_url'.$glue.'comment_ID='.$this->ID.$glue.url_crumb( 'comment' ).$redirect_to;
 		if( $ajax_button )
 		{
 			echo ' <a href="'.$delete_url.'" onclick="delete_comment_url('.$this->ID.'); return false;">'.get_icon( 'remove' ).'</a>';
@@ -1477,9 +1479,11 @@ class Comment extends DataObject
 	/**
 	 * Display ban icon, which goes to the antispam screen with keyword=author_url
 	 *
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 * @param boolean true if create ajax button
 	 * @param boolean true if need permission check, because it wasn't check before
-	 * @param glue between url params
+	 * @param string glue between url params
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @return link on success, false otherwise
 	 */
 	function banurl_link( $redirect_to, $ajax_button = false, $check_perm = true, $glue = '&amp;', $save_context = true )
@@ -1496,21 +1500,21 @@ class Comment extends DataObject
 		}
 
 		if( $save_context )
-		{
-			if( $redirect_to == NULL )
-			{
-				$redirect_to = rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
+		{	// Use a param to redirect after action:
+			if( $redirect_to === NULL )
+			{	// Get current url for redirect:
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			$redirect_to = $glue.'redirect_to='.$redirect_to;
+			$redirect_to = $glue.'redirect_to='.rawurlencode( $redirect_to );
 		}
 		else
-		{
+		{	// Don't allow a redirect after action:
 			$redirect_to = '';
 		}
 
 		// TODO: really ban the base domain! - not by keyword
 		$ban_domain = get_ban_domain( $this->get_author_url() );
-		$ban_url = $admin_url.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( $ban_domain ).$redirect_to.'&amp;'.url_crumb('antispam');
+		$ban_url = $admin_url.'?ctrl=antispam'.$glue.'action=ban'.$glue.'keyword='.rawurlencode( $ban_domain ).$redirect_to.$glue.url_crumb( 'antispam' );
 
 		if( $ajax_button )
 		{
@@ -1533,10 +1537,10 @@ class Comment extends DataObject
 	 * @param string class name
 	 * @param boolean true to make this a button instead of a link
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
 	 * @param string confirmation text
-	 * @param string Redirect url
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 */
 	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $button = false, $glue = '&amp;', $save_context = true, $ajax_button = false, $confirm_text = '#', $redirect_to = NULL )
 	{
@@ -1571,15 +1575,12 @@ class Comment extends DataObject
 
 		$url = $admin_url.'?ctrl=comments'.$glue.'action=delete'.$glue.'comment_ID='.$this->ID.$glue.url_crumb('comment');
 		if( $save_context )
-		{
-			if( $redirect_to != NULL )
-			{
-				$url .= $glue.'redirect_to='.$redirect_to;
+		{	// Use a param to redirect after action:
+			if( $redirect_to === NULL )
+			{	// Get current url for redirect:
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			else
-			{
-				$url .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
-			}
+			$url .= $glue.'redirect_to='.rawurlencode( $redirect_to );
 		}
 
 		echo $before;
@@ -1636,8 +1637,10 @@ class Comment extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
+	 * @return string A link to deprecate this comment
 	 */
 	function get_deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
@@ -1693,7 +1696,7 @@ class Comment extends DataObject
 	 * @param string a vote value
 	 * @param string class name
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
 	 * @param array Params
 	 */
@@ -1770,7 +1773,7 @@ class Comment extends DataObject
 
 		$r = '<a href="'.$admin_url.'?ctrl=comments'.$glue.'action='.$vote_type.$glue.'value='.$vote_value.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
 		if( $save_context )
-		{
+		{	// Use a param to redirect after action:
 			$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
 		}
 		$r .= '"';
@@ -1795,8 +1798,9 @@ class Comment extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 */
 	function deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
@@ -1819,7 +1823,7 @@ class Comment extends DataObject
 	 * @param string to display before link
 	 * @param string to display after link
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
 	 * @param array Params
 	 */
@@ -1898,7 +1902,7 @@ class Comment extends DataObject
 	 * @param string to display before link
 	 * @param string to display after link
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
 	 * @param array Params
 	 */
@@ -2054,8 +2058,9 @@ class Comment extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 */
 	function get_publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
@@ -2078,24 +2083,17 @@ class Comment extends DataObject
 		$r = $before;
 		$r .= '<a href="'.$admin_url.'?ctrl=comments'.$glue.'action=publish'.$glue.'publish_status='.$publish_status.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
 		if( $save_context )
-		{
-			if( $redirect_to != NULL )
-			{
-				$r .= $glue.'redirect_to='.$redirect_to;
+		{	// Use a param to redirect after action:
+			if( $redirect_to === NULL )
+			{	// Get current url for redirect:
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			else
-			{
-				$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
-			}
+			$r .= $glue.'redirect_to='.rawurlencode( $redirect_to );
 		}
 		$r .= '"';
 
 		if( $ajax_button )
-		{
-			if( $save_context && ( $redirect_to == NULL ) )
-			{
-				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
-			}
+		{	// This is AJAX button:
 			$r .= ' onclick="setCommentStatus('.$this->ID.', \''.$publish_status.'\', \''.request_from().'\', \''.$redirect_to.'\'); return false;"';
 		}
 
@@ -2120,6 +2118,7 @@ class Comment extends DataObject
 	{
 		global $admin_url;
 
+		// Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside:
 		$redirect_to = $params['redirect_to'];
 		$new_status = $params['status'];
 		$action = $params['action'];
@@ -2129,24 +2128,17 @@ class Comment extends DataObject
 		$r = $params['before'];
 		$r .= '<a href="'.$admin_url.'?ctrl=comments'.$glue.'action='.$action.$glue.$status_param.'='.$new_status.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
 		if( $params['save_context'] )
-		{
-			if( $redirect_to != NULL )
-			{
-				$r .= $glue.'redirect_to='.$redirect_to;
+		{	// Allow to redirect after action:
+			if( $redirect_to === NULL )
+			{	// Use current url to redirect ater action:
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			else
-			{
-				$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
-			}
+			$r .= $glue.'redirect_to='.rawurlencode( $redirect_to );
 		}
 		$r .= '"';
 
 		if( $params['ajax_button'] )
-		{
-			if( $params['save_context'] && ( $redirect_to == NULL ) )
-			{
-				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
-			}
+		{	// This is AJAX button:
 			$comment_type = $this->is_meta() ? 'meta' : 'feedback';
 			$r .= ' onclick="setCommentStatus('.$this->ID.', \''.$new_status.'\', \''.request_from().'\', \''.$redirect_to.'\' ); return false;"';
 		}
@@ -2171,8 +2163,9 @@ class Comment extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 * @return boolean TRUE - if the publish link is available
 	 */
 	function publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
@@ -4228,8 +4221,8 @@ class Comment extends DataObject
 				$ItemCache = & get_ItemCache();
 				$ItemCache->clear();
 				if( $previous_Item = & $ItemCache->get_by_ID( $this->previous_item_ID, false, false ) )
-				{ // Update last touched date of previous item
-					$previous_Item->update_last_touched_date( false );
+				{	// Update last touched date of previous item:
+					$previous_Item->update_last_touched_date( false, true, true );
 				}
 				// Also update new post
 				$update_item_last_touched_date = true;
@@ -4244,7 +4237,7 @@ class Comment extends DataObject
 				}
 			}
 
-			$this->update_last_touched_date( $update_item_last_touched_date );
+			$this->update_last_touched_date( $update_item_last_touched_date, $update_item_last_touched_date );
 
 			$DB->commit();
 
@@ -4313,7 +4306,7 @@ class Comment extends DataObject
 		{
 			if( $this->is_published() )
 			{ // Update last touched date of item if comment is created in published status
-				$this->update_last_touched_date();
+				$this->update_last_touched_date( true, true );
 			}
 			$Plugins->trigger_event( 'AfterCommentInsert', $params = array( 'Comment' => & $this, 'dbchanges' => $dbchanges ) );
 		}
@@ -4374,8 +4367,8 @@ class Comment extends DataObject
 		if( $r )
 		{
 			if( $was_published )
-			{ // Update last touched date of item if a published comment was deleted
-				$this->update_last_touched_date();
+			{	// Update last touched date and content last updated date of item if a published comment was deleted:
+				$this->update_last_touched_date( true, true );
 			}
 			if( $use_transaction )
 			{
@@ -4515,8 +4508,9 @@ class Comment extends DataObject
 	 * Update field last_touched_ts
 	 *
 	 * @param boolean update comment's post last touched ts as well or not
+	 * @param boolean Use TRUE to update field contents_last_updated_ts of the comment's item
 	 */
-	function update_last_touched_date( $update_item_date = true )
+	function update_last_touched_date( $update_item_last_touched_ts = true, $update_item_contents_last_updated_ts = false )
 	{
 		global $localtimenow, $current_User;
 
@@ -4540,9 +4534,9 @@ class Comment extends DataObject
 			$this->dbupdate();
 		}
 
-		if( $update_item_date )
-		{ // Update last touched data of the Item
-			$comment_Item->update_last_touched_date();
+		if( $update_item_last_touched_ts || $update_item_contents_last_updated_ts )
+		{	// Update last touched timestamp or content last update timestamp of the Item:
+			$comment_Item->update_last_touched_date( true, $update_item_last_touched_ts, $update_item_contents_last_updated_ts );
 		}
 	}
 

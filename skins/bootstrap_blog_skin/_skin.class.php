@@ -518,12 +518,12 @@ class bootstrap_blog_Skin extends Skin
 
 
 	/**
-	 * Check if we can display a widget container
+	 * Check if we can display a widget container when access is denied to collection by current user
 	 *
 	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
 	 * @return boolean TRUE to display
 	 */
-	function is_visible_container( $container_key )
+	function show_container_when_access_denied( $container_key )
 	{
 		global $Collection, $Blog;
 
@@ -556,7 +556,7 @@ class bootstrap_blog_Skin extends Skin
 
 		if( $check_containers )
 		{ // Check if at least one sidebar container is visible
-			return ( $this->is_visible_container( 'sidebar' ) ||  $this->is_visible_container( 'sidebar2' ) );
+			return ( $this->show_container_when_access_denied( 'sidebar' ) ||  $this->show_container_when_access_denied( 'sidebar2' ) );
 		}
 		else
 		{ // We should not check the visibility of the sidebar containers for this case
