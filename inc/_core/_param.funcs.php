@@ -78,14 +78,6 @@ function param_format( $value, $type = 'raw' )
 			return utf8_trim( $value );
 
 		case 'url':
-			// Decode url:
-			// NOTE: PHP automatically decodes all _GET params!!!
-			// But sometimes we have the double encoded params, for example,
-			// jQuery ajax function automatically encodes all params
-			// (even if they already are encoded by PHP script).
-			// So here we may have the double encoded params, and to avoid wrong data
-			// we should do such double decoding to get an original value:
-			$value = urldecode( $value );
 			// strip out any html:
 			$value = utf8_trim( utf8_strip_tags( $value ) );
 			// Remove new line chars and double quote from url

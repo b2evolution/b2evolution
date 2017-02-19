@@ -2849,7 +2849,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
  * Display a comment corresponding the given comment id
  *
  * @param object Comment object
- * @param string where to redirect after comment edit
+ * @param string where to redirect after comment edit. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
  * @param boolean true to set the new redirect param, false otherwise
  * @param integer Comment index in the current list, FALSE - to don't display a comment index
  * @param integer A reply level (Used on mode "Threaded comments" to shift a comment block to right)
