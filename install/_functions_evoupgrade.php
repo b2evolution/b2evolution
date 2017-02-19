@@ -8127,6 +8127,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 			// Remove previous notification logo setting
 			$DB->query( 'DELETE FROM T_settings WHERE set_name = "notification_logo"' );
+		}
 		upg_task_end();
 	}
 
