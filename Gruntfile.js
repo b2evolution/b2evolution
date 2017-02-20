@@ -237,7 +237,7 @@ module.exports = function(grunt) {
 					banner: '/* This includes 2 files: jquery.textcomplete.js, textcomplete.init.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/customized/jquery/textcomplete/js/jquery.textcomplete.js', 'rsc/js/textcomplete.init.js'],
+				src: ['rsc/ext/jquery/textcomplete/jquery.textcomplete.js', 'rsc/js/textcomplete.init.js'],
 				dest: 'rsc/js/build/textcomplete.bmin.js'
 			},
 			// JS files that are used on front-office standard skins:
