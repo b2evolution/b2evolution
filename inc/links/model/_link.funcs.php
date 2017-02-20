@@ -541,7 +541,7 @@ jQuery( document ).on( 'change', 'select[id^=display_position_]', {
 {
 	if( this.value == 'inline' && displayInlineReminder && !deferInlineReminder )
 	{ // Display inline position reminder
-		alert( '<?php echo T_('You can use the (+) icons to change the position to inline and automatically insert a short tag at the current cursor position.');?>' );
+		alert( '<?php echo TS_('You can use the (+) icons to change the position to inline and automatically insert a short tag at the current cursor position.');?>' );
 		displayInlineReminder = false;
 	}
 	evo_link_change_position( this, event.data.url, event.data.crumb );

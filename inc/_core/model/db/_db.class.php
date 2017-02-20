@@ -150,7 +150,7 @@ class DB
 	 * Which transaction isolation level should be used?
 	 *
 	 * Possible values in case of MySQL: REPEATABLE READ | READ COMMITTED | READ UNCOMMITTED | SERIALIZABLE
-	 * Default value is REPEATABLE READ
+	 * Defailt value is REPEATABLE READ
 	 */
 	var $transaction_isolation_level = 'REPEATABLE READ';
 
@@ -360,10 +360,11 @@ class DB
 			$this->log_queries = (bool)$debug;
 		}
 
-		$mysql_ext_file = is_windows() ? 'php_mysqli.dll' : 'mysqli.so';
+		if( ! extension_loaded('mysqli') )
 		{ // The mysql extension is not loaded, try to dynamically load it:
 			if( function_exists('dl') )
 			{
+				$mysql_ext_file = is_windows() ? 'php_mysqli.dll' : 'mysqli.so';
 				$php_errormsg = null;
 				$old_track_errors = @ini_set('track_errors', 1);
 				$old_html_errors = @ini_set('html_errors', 0);
@@ -390,7 +391,8 @@ class DB
 		$socket = isset( $params['socket'] ) ? $params['socket'] : ini_get('mysqli.default_socket');
 		$client_flags = isset( $params['client_flags'] ) ? $params['client_flags'] : 0;
 
-		$this->use_persistent = isset($params['use_persistent']) ? $params['use_persistent'] : FALSE;
+		/* Persistent connections are only available in PHP 5.3+ */
+		$this->use_persistent = isset($params['use_persistent']) ? $params['use_persistent'] : version_compare(PHP_VERSION, '5.3', '>=');
 
 		if( ! $this->dbhandle )
 		{ // Connect to the Database:
@@ -1335,7 +1337,7 @@ class DB
 		if( $html )
 		{ // poor man's indent
 			$sql = htmlspecialchars( $sql );
-			$sql = preg_replace_callback("~^(\s+)~m", create_function('$m', 'return str_replace(" ", "&#160;", $m[1]);'), $sql);
+			$sql = preg_replace_callback("~^(\s+)~m", create_function('$m', 'return str_replace(" ", "&nbsp;", $m[1]);'), $sql);
 			$sql = nl2br($sql);
 		}
 		return $sql;

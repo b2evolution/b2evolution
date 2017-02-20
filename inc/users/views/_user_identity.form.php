@@ -651,7 +651,7 @@ $Form->end_form();
 
 		if( field_id == '' )
 		{	// Mark select element of field types as error
-			field_type_error( '<?php echo T_('Please select a field type.'); ?>' );
+			field_type_error( '<?php echo TS_('Please select a field type.'); ?>' );
 			// We should to stop the ajax request without field_id
 			return false;
 		}

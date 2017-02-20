@@ -335,15 +335,15 @@ function add_new_custom_field( type, title, title_size )
 	var count_custom = jQuery( 'input[name=count_custom_' + type + ']' ).attr( 'value' );
 	count_custom++;
 	var custom_ID = guidGenerator();
-	jQuery( '#custom_' + type + '_field_list' ).append( '<?php echo str_replace( array( '$ID$', "\n" ), array( 'ffield_custom_\' + type + \'_\' + count_custom + \'', '' ), $Form->fieldstart ); ?>' +
+	jQuery( '#custom_' + type + '_field_list' ).append( '<?php echo str_replace( array( '$ID$' ), array( 'ffield_custom_\' + type + \'_\' + count_custom + \'' ), format_to_js( $Form->fieldstart ) ); ?>' +
 			'<input type="hidden" name="custom_' + type + '_ID' + count_custom + '" value="' + custom_ID + '" />' +
 			'<input type="hidden" name="custom_' + type + '_new' + count_custom + '" value="1" />' +
-			'<?php echo $Form->labelstart; ?><label for="custom_' + type + '_' + count_custom + '"<?php echo empty( $Form->labelclass ) ? '' : ' class="'.$Form->labelclass.'"'; ?>>' + title + ':</label><?php echo str_replace( "\n", '', $Form->labelend ); ?>' +
-			'<?php echo $Form->inputstart; ?>' +
+			'<?php echo format_to_js( $Form->labelstart ); ?><label for="custom_' + type + '_' + count_custom + '"<?php echo empty( $Form->labelclass ) ? '' : ' class="'.$Form->labelclass.'"'; ?>>' + title + ':</label><?php echo format_to_js( $Form->labelend ); ?>' +
+			'<?php echo format_to_js( $Form->inputstart ); ?>' +
 				'<?php echo TS_('Title'); ?> <input type="text" id="custom_' + type + '_' + count_custom + '" name="custom_' + type + '_' + count_custom + '" class="form_text_input form-control new_custom_field_title" maxlength="255" size="' + title_size + '" />' +
 				' <?php echo TS_('Name'); ?> <input type="text" name="custom_' + type + '_fname' + count_custom + '" value="" class="form_text_input form-control custom_field_name" maxlength="255" />' +
 				' <?php echo TS_('Order'); ?> <input type="text" name="custom_' + type + '_order' + count_custom + '" value="" class="form_text_input form-control custom_field_order" maxlength="11" size="3" />' +
-			'<?php echo str_replace( "\n", '', $Form->inputend.$Form->fieldend ); ?>' );
+			'<?php echo format_to_js( $Form->inputend.$Form->fieldend ); ?>' );
 	jQuery( 'input[name=count_custom_' + type + ']' ).attr( 'value', count_custom );
 }
 

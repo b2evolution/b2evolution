@@ -5896,17 +5896,18 @@ function format_to_js( $unformatted )
 function get_available_sort_options()
 {
 	return array(
-		'datestart'       => T_('Date issued (Default)'),
-		'order'           => T_('Order (as explicitly specified)'),
-		//'datedeadline' => T_('Deadline'),
-		'title'           => T_('Title'),
-		'datecreated'     => T_('Date created'),
-		'datemodified'    => T_('Date last modified'),
-		'last_touched_ts' => T_('Date last touched'),
-		'urltitle'        => T_('URL "filename"'),
-		'priority'        => T_('Priority'),
-		'numviews'        => T_('Number of members who have viewed the post (If tracking enabled)'),
-		'RAND'            => T_('Random order!'),
+		'datestart'                => T_('Date issued (Default)'),
+		'order'                    => T_('Order (as explicitly specified)'),
+		//'datedeadline'           => T_('Deadline'),
+		'title'                    => T_('Title'),
+		'datecreated'              => T_('Date created'),
+		'datemodified'             => T_('Date last modified'),
+		'last_touched_ts'          => T_('Date last touched'),
+		'contents_last_updated_ts' => T_('Contents last updated'),
+		'urltitle'                 => T_('URL "filename"'),
+		'priority'                 => T_('Priority'),
+		'numviews'                 => T_('Number of members who have viewed the post (If tracking enabled)'),
+		'RAND'                     => T_('Random order!'),
 	);
 }
 

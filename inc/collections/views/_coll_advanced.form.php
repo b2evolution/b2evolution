@@ -256,10 +256,10 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveBut
 		switch( jQuery( 'input[name=blog_media_location]:checked' ).val() )
 		{
 			case 'default':
-				url_preview = '<?php echo $edited_Blog->get_local_media_url().'blogs/'.$edited_Blog->urlname.'/'; ?>';
+				url_preview = '<?php echo format_to_js( $edited_Blog->get_local_media_url().'blogs/'.$edited_Blog->urlname.'/' ); ?>';
 				break;
 			case 'subdir':
-				url_preview = '<?php echo $edited_Blog->get_local_media_url(); ?>' + jQuery( 'input[name=blog_media_subdir]' ).val();
+				url_preview = '<?php echo format_to_js( $edited_Blog->get_local_media_url() ); ?>' + jQuery( 'input[name=blog_media_subdir]' ).val();
 				break;
 			case 'custom':
 				url_preview = jQuery( 'input[name=blog_media_url]' ).val();

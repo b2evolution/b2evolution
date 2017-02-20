@@ -8139,7 +8139,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12165, 'Upgrade table of users...' ) )
+	if( upg_task_start( 12165, 'Updating attachment positions...' ) )
+	{	// part of 6.8.7-stable
+		$DB->query( 'UPDATE T_links
+			INNER JOIN T_files ON file_ID = link_file_ID AND file_type != "image"
+			  SET link_position = "attachment"
+			WHERE link_position != "attachment"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13000, 'Upgrade table of users...' ) )
 	{	// part of 6.9.0-beta
 		db_add_col( 'T_users', 'user_pass_driver', 'VARCHAR(16) NOT NULL default "evo$md5" AFTER user_salt' );
 		$DB->query( 'UPDATE T_users
@@ -8148,7 +8157,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12170, 'Updating users pass storage...' ) )
+	if( upg_task_start( 13005, 'Updating users pass storage...' ) )
 	{	// part of 6.9.0-beta
 		$DB->query( 'ALTER TABLE T_users MODIFY COLUMN user_pass VARBINARY(32)' );
 		$DB->query( 'UPDATE T_users SET user_pass = LOWER( HEX( user_pass ) )' );
@@ -8156,14 +8165,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12175, 'Upgrade table of users...' ) )
+	if( upg_task_start( 13010, 'Upgrade table of users...' ) )
 	{	// part of 6.9.0-beta
 		$DB->query( 'ALTER TABLE T_users
 			MODIFY user_salt VARCHAR(32) NOT NULL default ""' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12180, 'Updating base domains table...' ) )
+	if( upg_task_start( 13015, 'Updating base domains table...' ) )
 	{ // part of 6.9.0-beta
 		$sql = 'SHOW INDEX FROM T_basedomains WHERE KEY_NAME = "dom_type_name"';
 		$indexes = $DB->get_results( $sql, ARRAY_A );
@@ -8215,6 +8224,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		// add comment to user_email_dom_ID
 		$DB->query( 'ALTER TABLE T_users MODIFY user_email_dom_ID int(10) unsigned NULL COMMENT "Used for email statistics"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13020, 'Upgrading posts table...' ) )
+	{	// part of 6.9.0-beta
+		db_add_col( 'T_items__item', 'post_contents_last_updated_ts', 'TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\' AFTER post_last_touched_ts' );
+		$DB->query( 'UPDATE T_items__item
+			SET post_contents_last_updated_ts = post_last_touched_ts' );
 		upg_task_end();
 	}
 

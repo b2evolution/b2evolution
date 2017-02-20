@@ -23,11 +23,11 @@ function toggleFavorite( obj, coll_urlname )
 				switch( parseInt( data.setting ) )
 				{
 					case 1:
-						me.html( '<?php echo get_icon( 'star_on', 'imgtag', array( 'class' => 'coll-fav' ) );?>' );
+						me.html( '<?php echo format_to_js( get_icon( 'star_on', 'imgtag', array( 'class' => 'coll-fav' ) ) );?>' );
 						break;
 
 					default:
-						me.html( '<?php echo get_icon( 'star_off', 'imgtag', array( 'class' => 'coll-fav' ) );?>' );
+						me.html( '<?php echo format_to_js( get_icon( 'star_off', 'imgtag', array( 'class' => 'coll-fav' ) ) );?>' );
 				}
 			}
 			else

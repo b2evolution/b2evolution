@@ -111,15 +111,15 @@ class shortcodes_plugin extends Plugin
 
 		function shortcodes_toolbar( title )
 		{
-			var r = '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>'
-				+ '<?php echo $this->get_template( 'toolbar_group_before' ); ?>';
+			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>' + title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
+				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>';
 			for( var i = 0; i < shortcodes_buttons.length; i++ )
 			{
 				var button = shortcodes_buttons[i];
 				r += '<input type="button" id="' + button.id + '" title="' + button.title + '"'
 					+ ( typeof( button.style ) != 'undefined' ? ' style="' + button.style + '"' : '' ) + ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="shortcodes_insert_tag|b2evoCanvas|'+i+'" value="' + button.text + '" />';
 			}
-			r += '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
+			r += '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
 
 			jQuery( '.<?php echo $this->code ?>_toolbar' ).html( r );
 		}

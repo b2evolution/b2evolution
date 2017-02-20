@@ -200,8 +200,9 @@ class LinkItem extends LinkOwner
 			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s',  ucfirst( $file_dir ), '[['.$file_name.']]', $this->type, $this->get_ID() ), 'info', 'file', $file_ID );
 
 			if( ! $this->is_temp() && $update_owner )
-			{	// Update last touched date of the Item:
+			{	// Update last touched date and content last updated date of the Item:
 				$this->update_last_touched_date();
+				$this->update_contents_last_updated_ts();
 			}
 
 			// Reset the Links
@@ -329,6 +330,19 @@ class LinkItem extends LinkOwner
 		}
 	}
 
+
+	/**
+	 * Update field contents_last_updated_ts of Item
+	 */
+	function update_contents_last_updated_ts()
+	{
+		if( ! empty( $this->Item ) && ! $this->is_temp() )
+		{	// Update Item if it exists:
+			$this->Item->update_last_touched_date( true, false, true );
+		}
+	}
+
+
 	/**
 	 * This function is called after when some file was unlinked from item
 	 *
@@ -353,8 +367,9 @@ class LinkItem extends LinkOwner
 		}
 
 		if( ! $this->is_temp() )
-		{	// Update last touched date of the Item
+		{	// Update last touched date and content last updated date of the Item:
 			$this->update_last_touched_date();
+			$this->update_contents_last_updated_ts();
 		}
 	}
 }
