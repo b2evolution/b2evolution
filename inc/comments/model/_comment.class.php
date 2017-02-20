@@ -194,6 +194,13 @@ class Comment extends DataObject
 	 */
 	var $last_touched_ts;
 
+
+	/**
+	 * ID of TemporaryID object, used to attach file to new creating comment
+	 * @var integer
+	 */
+	var $temp_link_owner_ID = NULL;
+
 	/**
 	 * Constructor
 	 */
@@ -2741,21 +2748,34 @@ class Comment extends DataObject
 
 		if( $show_attachments )
 		{
-			if( empty( $this->ID ) && isset( $this->checked_attachments ) )
-			{ // PREVIEW
-				$attachment_ids = explode( ',', $this->checked_attachments );
-				$FileCache = & get_FileCache();
-				foreach( $attachment_ids as $ID )
-				{
-					$File = $FileCache->get_by_ID( $ID, false, false );
-					if( $File != NULL )
+			if( empty( $this->ID ) )
+			{	// PREVIEW mode, this comment is not stored in DB yet:
+				if( ! empty( $this->temp_link_owner_ID ) )
+				{	// This method is used to attach several files by quick uploader JS button:
+					$TemporaryIDCache = & get_TemporaryIDCache();
+					if( ( $TemporaryID = & $TemporaryIDCache->get_by_ID( $this->temp_link_owner_ID, false, false ) ) &&
+					    $TemporaryID->type == 'comment' )
+					{	// Get all links of the temporary object which is used for new creating comment:
+						$LinkOwner = new LinkComment( new Comment(), $TemporaryID->ID );
+						$attachments = & $LinkOwner->get_Links();
+					}
+				}
+				elseif( isset( $this->checked_attachments ) )
+				{	// This method is used to attach file per one from submit with standard file input element:
+					$attachment_ids = explode( ',', $this->checked_attachments );
+					$FileCache = & get_FileCache();
+					foreach( $attachment_ids as $ID )
 					{
-						$attachments[] = $File;
+						$File = $FileCache->get_by_ID( $ID, false, false );
+						if( $File != NULL )
+						{
+							$attachments[] = $File;
+						}
 					}
 				}
 			}
 			else
-			{ // Get all Links
+			{	// Get all Links of this comment from DB:
 				$LinkOwner = new LinkComment( $this );
 				$attachments = & $LinkOwner->get_Links();
 			}
@@ -2765,15 +2785,16 @@ class Comment extends DataObject
 		$images_below_content = '';
 		foreach( $attachments as $index => $attachment )
 		{
-			if( ! empty( $this->ID ) )
-			{ // Normal mode when comment exists in DB (NOT PREVIEW mode)
+			if( ! empty( $this->ID ) || ! empty( $this->temp_link_owner_ID ) )
+			{	// Normal mode when comment exists in DB (NOT PREVIEW mode)
+				// OR PREVIEW mode where we can upload several files to temp object:
 				$Link = $attachment;
 				$link_position = $Link->get( 'position' );
 				$params['Link'] = $Link;
 				$attachment = $attachment->get_File();
 			}
 			else
-			{ // Set default position for preview files
+			{	// Set default position for preview files:
 				$link_position = 'aftermore';
 			}
 

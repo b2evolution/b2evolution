@@ -415,6 +415,7 @@ if( $action == 'preview' )
 	$Comment->set( 'original_content', html_entity_decode( $original_comment ) ); // used in the textarea input field again
 	$Comment->set( 'preview_attachments', $preview_attachments ); // memorize attachments
 	$Comment->set( 'checked_attachments', $checked_attachments ); // memorize checked attachments
+	$Comment->set( 'temp_link_owner_ID', param( 'temp_link_owner_ID', 'integer', NULL ) );
 	$Comment->set( 'email_is_detected', $comments_email_is_detected ); // used to change a style of the comment
 	// Set Comment Item object to NULL, so this way the Item object won't be serialized, but the item_ID is still set
 	$Comment->Item = NULL;

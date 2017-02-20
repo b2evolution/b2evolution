@@ -415,7 +415,7 @@ function validateCommentForm(form)
 			load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
 			// Initialize this object as global because this is used in many link functions:
 			global $LinkOwner;
-			$LinkOwner = new LinkComment( $Comment, param( 'temp_link_owner_ID', 'integer', 0 ) );
+			$LinkOwner = new LinkComment( $Comment, $Comment->temp_link_owner_ID );
 			// Display attachments fieldset:
 			display_attachments_fieldset( $Form, $LinkOwner );
 		}

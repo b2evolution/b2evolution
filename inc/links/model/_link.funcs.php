@@ -228,8 +228,11 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 
 	$Form->end_fieldset();
 
-	// Initialize JavaScript to build and open window:
-	echo_modalwindow_js();
+	if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_perm( 'files', 'view' ) )
+	{	// Check if current user has a permission to back-office files manager:
+
+		// Initialize JavaScript to build and open window:
+		echo_modalwindow_js();
 ?>
 <script type="text/javascript">
 function link_attachment_window( link_owner_type, link_owner_ID, root, path, fm_highlight )
@@ -259,6 +262,7 @@ function link_attachment_window( link_owner_type, link_owner_ID, root, path, fm_
 }
 </script>
 <?php
+	}
 }
 
 
