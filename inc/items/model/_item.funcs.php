@@ -1875,7 +1875,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 		{ // Use dropdown for bootstrap skin
 			$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
 			$Form->hidden( 'post_status', $edited_Item->status );
-			echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="top" data-container="body" title="'.get_status_tooltip_title( $edited_Item->status ).'">';
+			echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="left" data-container="body" title="'.get_status_tooltip_title( $edited_Item->status ).'">';
 			echo '<button type="button" class="btn btn-status-'.$edited_Item->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
 							.'<span>'.$status_options[ $edited_Item->status ].'</span>'
 						.' <span class="caret"></span></button>';
