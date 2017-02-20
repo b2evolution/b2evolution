@@ -116,6 +116,7 @@ switch( $action )
 					$result['rawdata'][$i] = '<span style="font-weight: bold; background-color: yellow;">'.$result['rawdata'][$i].'</span>';
 				}
 
+				// Make URLs and emails clickable
 				if( preg_match_all( '#[-a-zA-Z0-9@:%_\+.~\#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~\#?&//=;]*)?#si', $result['rawdata'][$i], $matches ) )
 				{
 					foreach( $matches as $match )
@@ -135,6 +136,37 @@ switch( $action )
 								$result['rawdata'][$i] = str_replace( $match[0], '<a href="'.$href_string.'" target="_blank">'.$match[0].'</a>', $result['rawdata'][$i] );
 							}
 						}
+					}
+				}
+
+				// Make IP ranges clickable
+				if( $current_User->check_perm( 'options', 'view' ) && $current_User->check_perm( 'spamblacklist', 'view' ) &&
+						preg_match_all( '#(?<=\:)(\s*)(\b(?:(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\.){3}(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\s?-\s?(?:(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\.){3}(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\b)#', $result['rawdata'][$i], $matches ) )
+				{
+					if( $current_User->check_perm( 'spamblacklist', 'view' ) )
+					{
+						$aipr_status_titles = aipr_status_titles();
+						$IPRangeCache = & get_IPRangeCache();
+						if( $IPRange = & $IPRangeCache->get_by_ip( $query ) )
+						{ // IP range exists in DB
+							$iprange_status = $IPRange->get( 'status' );
+						}
+						else
+						{ // There is no IP range in DB
+							$iprange_status = '';
+						}
+					}
+
+					if( $IPRange )
+					{
+						if( $current_User->check_perm( 'options', 'view' ) && $current_User->check_perm( 'spamblacklist', 'view' ) )
+						{
+							$result['rawdata'][$i] = str_replace( $matches[2][0],  '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_edit&amp;iprange_ID='.$IPRange->ID.'">'.$matches[2][0].'</a> <div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( $iprange_status ).'</div>'.$aipr_status_titles[$iprange_status], $result['rawdata'][$i] );
+						}
+					}
+					else
+					{
+						$result['rawdata'][$i] = str_replace( $matches[2][0],  '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_new&amp;ip='.$query.'">'.$matches[2][0].'</a> <div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( $iprange_status ).'</div>'.$aipr_status_titles[$iprange_status], $result['rawdata'][$i] );
 					}
 				}
 			}
