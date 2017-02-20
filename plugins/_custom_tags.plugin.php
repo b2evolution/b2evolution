@@ -561,15 +561,15 @@ class custom_tags_plugin extends Plugin
 
 		<?php echo $js_code_prefix;?>_tagToolbar = function()
 		{
-			var tagcode_toolbar = '<?php echo $this->get_template( 'toolbar_title_before' ).$this->toolbar_label.' '.$this->get_template( 'toolbar_title_after' ); ?>';
-			tagcode_toolbar += '<?php echo $this->get_template( 'toolbar_group_before' ); ?>';
+			var tagcode_toolbar = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ).$this->toolbar_label.' '.$this->get_template( 'toolbar_title_after' ) ); ?>';
+			tagcode_toolbar += '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>';
 			for( var i = 0; i < <?php echo $js_code_prefix;?>_tagButtons.length; i++ )
 			{
 				tagcode_toolbar += <?php echo $js_code_prefix;?>_tagGetButton( <?php echo $js_code_prefix;?>_tagButtons[i], i );
 			}
-			tagcode_toolbar += '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>';
-			tagcode_toolbar += '<input type="button" id="tag_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $js_code_prefix;?>_tagCloseAllTags" title="<?php echo T_('Close all tags') ?>" value="X" />';
-			tagcode_toolbar += '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
+			tagcode_toolbar += '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ) ); ?>';
+			tagcode_toolbar += '<input type="button" id="tag_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $js_code_prefix;?>_tagCloseAllTags" title="<?php echo TS_('Close all tags') ?>" value="X" />';
+			tagcode_toolbar += '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
 			jQuery( '.<?php echo $js_code_prefix; ?>_toolbar' ).html( tagcode_toolbar );
 		}
 

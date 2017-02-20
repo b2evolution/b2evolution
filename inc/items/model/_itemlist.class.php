@@ -816,6 +816,7 @@ class ItemList2 extends ItemListLight
 			case 'datecreated':
 			case 'datemodified':
 			case 'last_touched_ts':
+			case 'contents_last_updated_ts':
 			case 'urltitle':
 			case 'priority':
 				$next_Query->WHERE_and( $this->Cache->dbprefix.$orderby_array[0]
