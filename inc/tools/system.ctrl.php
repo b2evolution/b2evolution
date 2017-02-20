@@ -713,7 +713,7 @@ else
 {	// Response is not json data:
 	if( ! empty( $api_info['error'] ) )
 	{	// Display error message from function fetch_remote_page():
-		$api_error = ' <b>'.sprintf( T_('Error: %s'), $info['error'] ).'; '.sprintf( T_('Status code: %s'), $info['status'] ).'</b>';
+		$api_error = ' <b>'.sprintf( T_('Error: %s'), $api_info['error'] ).'; '.sprintf( T_('Status code: %s'), $api_info['status'] ).'</b>';
 	}
 	else
 	{	// Display error message from other places:
@@ -722,7 +722,7 @@ else
 	}
 	init_system_check( $api_title, T_('Failed'), $api_url );
 	disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.' )
-		.' '.sprintf( T_('Probably you should update a file %s to the latest version or check permissions to use this file.'), '<code>.htaccess</code>' )
+		.' '.T_('You should probably update your <code>.htaccess</code> file to the latest version and check the file permissions of this file.')
 		.$api_error );
 }
 
