@@ -242,6 +242,10 @@ span.fa {
 a.action_icon span.fa {
   margin-right: 2px;
 }
+span.fa.action_icon.empty_placeholder {
+  margin-right: 4px;
+  visibility: hidden;
+}
 a.roundbutton .fa,
 a.roundbutton:hover .fa,
 a.roundbutton_text .fa,
@@ -663,6 +667,16 @@ div.filters .filter_item div {
 }
 .evo_comment__meta .panel-footer {
   border-top: 1px solid #5bc0de;
+  background-color: #d9edf7;
+}
+.panel-meta {
+  border: 2px solid #5bc0de;
+}
+.panel-meta .panel-heading {
+  border-bottom: 1px solid #5bc0de;
+  background-color: #d9edf7;
+}
+.panel-meta .panel-body {
   background-color: #d9edf7;
 }
 .evo_voting_panel > span.fa {
@@ -1395,6 +1409,10 @@ form div.avatartag a {
 .jcrop-keymgr {
   visibility: hidden;
 }
+#user_crop_workarea img,
+.preview_cropped_image img {
+  max-width: none;
+}
 .evo_label_inline {
   margin-left: 2ex;
 }
@@ -1457,6 +1475,27 @@ textarea.form_textarea_input {
 label.radiooption {
   margin-right: 1em;
 }
+.file_select_wrapper {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-start;
+}
+.file_select_wrapper .file_select_item {
+  display: flex;
+  flex-flow: row wrap;
+  margin-right: 8px;
+  text-align: center;
+}
+.file_select_wrapper .file_select_item .item_actions {
+  display: flex;
+  flex-shrink: 1;
+  flex-flow: column wrap;
+  justify-content: flex-start;
+  align-content: center;
+  justify-content: center;
+  text-align: left;
+  margin-left: 8px;
+}
 div.log_container ul,
 div.action_messages ul,
 div.log_container ol,
@@ -1466,6 +1505,11 @@ div.action_messages li {
   list-style: none;
   margin: 0;
   padding-left: 0;
+}
+div.log_container ul.message_group li,
+div.action_messages ul.message_group li {
+  margin-left: 25px;
+  list-style: disc;
 }
 div.skin_error {
   border: 2px dotted #d99;
@@ -1543,6 +1587,12 @@ table.widget_grid div {
 }
 .evo_private_messages_list .table_scroll table.table tr td {
   vertical-align: top;
+}
+table.table td.thread_with img {
+  margin-bottom: 5px;
+}
+table.table td.thread_with > span:last-child img {
+  margin-bottom: 0;
 }
 .ufld_icon_links {
   text-align: center;
@@ -2324,6 +2374,9 @@ div.average_rating .star_rating {
 .rating_recap div {
   float: left;
   padding-right: 10px;
+}
+.evo_container__footer {
+  margin-bottom: 10px;
 }
 main .well {
   padding: 15px 15px 25px 15px;
@@ -3229,6 +3282,76 @@ input.btn-lg {
 .evo_container__sidebar .evo_poll__title {
   white-space: normal;
 }
+#itemform_links .panel-body {
+  padding: 0;
+}
+div.qq-upload-button,
+div.qq-upload-drop-area,
+div.qq-upload-drop-area-active {
+  border: 2px dashed #fff;
+  background: #5bc0de;
+  -webkit-border-radius: 9px;
+  -moz-border-radius: 9px;
+  -ms-border-radius: 9px;
+  -o-border-radius: 9px;
+  border-radius: 9px;
+}
+div.qq-upload-button-hover,
+div.qq-upload-drop-area,
+div.qq-upload-drop-area-active {
+  background: #5cb85c;
+}
+ul.qq-upload-list {
+  margin: 0;
+}
+div#fileuploader_form {
+  padding: 5px;
+  height: 65px;
+  background: #f5f5f5;
+}
+#attachments_fieldset_wrapper {
+  width: 100%;
+  height: 160px;
+  position: relative;
+  padding-bottom: 6px;
+  box-sizing: content-box;
+}
+#attachments_fieldset_wrapper #attachments_fieldset_block {
+  overflow: auto;
+  height: 100%;
+}
+#attachments_fieldset_wrapper .ui-resizable-s {
+  background: #c0c0c0;
+  height: 6px;
+  bottom: 0;
+}
+#attachments_fieldset_wrapper .ui-resizable-s:after {
+  content: "...";
+  font-size: 10px;
+  top: -7px;
+  position: relative;
+  text-align: center;
+  display: block;
+}
+#attachments_fieldset_wrapper .table_scroll {
+  position: relative;
+}
+#attachments_fieldset_wrapper div.results,
+#attachments_fieldset_wrapper div.table_scroll {
+  overflow: initial;
+}
+#attachments_fieldset_wrapper table tbody .dragged {
+  opacity: 0.8;
+  position: absolute;
+  z-index: 1000;
+}
+#attachments_fieldset_wrapper table tbody td {
+  cursor: move;
+}
+#filelist_tbody tr:first-child .action_icon_link_move_up,
+#filelist_tbody tr:last-child .action_icon_link_move_down {
+  visibility: hidden;
+}
 
 /**
  * item_base.css 
@@ -3311,6 +3434,30 @@ span.NonExistentWikiWord {
   div.radio:last-of-type,
   div.checkbox:last-of-type {
     padding-bottom: 7px;
+  }
+  .text-left-sm {
+    text-align: left;
+  }
+  .text-right-sm {
+    text-align: right;
+  }
+}
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+  .text-left-md {
+    text-align: left;
+  }
+  .text-right-md {
+    text-align: right;
+  }
+}
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  .text-left-lg {
+    text-align: left;
+  }
+  .text-right-lg {
+    text-align: right;
   }
 }
 .glyphicon {
@@ -3483,8 +3630,8 @@ a.btn.action_icon.hoverlink {
   display: inline-block;
   margin: 0 0 2px;
 }
-.form-horizontal #itemform_extra .form-group input[type=text],
-.form-horizontal #itemform_edit_timestamp .form-group input[type=text] {
+.form-horizontal #itemform_extra .form-group input[type=text]:not( #item_issue_date ),
+.form-horizontal #itemform_edit_timestamp .form-group input[type=text]:not( #item_issue_date ) {
   max-width: 85px;
 }
 .form-horizontal #itemform_extra td,
@@ -3665,6 +3812,9 @@ div.results tr.placeholder td {
 div.results tr.placeholder + tr:not( :nth-child(2)):not(.dragged) > td,
 div.results tr.dragged + tr:not( :nth-child(2)):not(.dragged) > td {
   border-top: none;
+}
+div.results img {
+  max-width: none;
 }
 div.filters {
   margin-bottom: 0;
@@ -4088,4 +4238,10 @@ div.message_toolbars {
   div.coll-dashboard-block-3 {
     float: right;
   }
+}
+.btn-spinner {
+  background-image: url(../img/ajax-loader/000.gif);
+  background-size: 14px 14px;
+  background-repeat: no-repeat;
+  background-position: left 5px center;
 }

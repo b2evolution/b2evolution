@@ -80,6 +80,9 @@ function cat_line( $Chapter, $level )
 	}
 	$r .= '<td class="center">'.$makedef_icon.'</td>';
 
+	// Image:
+	$r .= '<td>'.$Chapter->get_image_tag().'</td>';
+
 	// Name
 	if( $permission_to_edit )
 	{	// We have permission permission to edit:
@@ -233,6 +236,10 @@ $Table->cols[] = array(
 					);
 $Table->cols[] = array(
 						'th' => T_('Default'),
+						'th_class' => 'shrinkwrap',
+					);
+$Table->cols[] = array(
+						'th' => T_('Image'),
 						'th_class' => 'shrinkwrap',
 					);
 $Table->cols[] = array(

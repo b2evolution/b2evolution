@@ -18,13 +18,13 @@ global $skins_path, $admin_url, $redirect_to, $action, $kind, $blog;
 $skin_type = param( 'skin_type', 'string', '' );
 $collection_kind = param( 'collection_kind', 'string', NULL );
 
-if( isset( $collection_kind ) )
-{ // Collection kind was changed, use this value instead of previous kind value
+if( $collection_kind !== NULL )
+{	// Collection kind was changed, use this value instead of previous kind value:
 	$kind = $collection_kind;
 }
 else
 {
-	$kind = param( 'kind', 'string', '' );
+	$kind = param( 'kind', 'string', NULL );
 }
 
 /**
@@ -97,8 +97,8 @@ $Form->select_input_array( 'skin_type', $skin_type, array(
 	) );
 echo ' &nbsp;';
 
-if( ! $kind && isset( $Blog ) )
-{ // Kind not specified, use Blog type instead
+if( $kind === NULL && isset( $Blog ) )
+{	// Kind is not specified, use type of current collection instead:
 	$kind = $Blog->type;
 }
 

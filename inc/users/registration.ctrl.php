@@ -47,6 +47,7 @@ switch ( $action )
 		param( 'notify_published_comments', 'integer', 0 );
 		param( 'notify_comment_moderation', 'integer', 0 );
 		param( 'notify_edit_cmt_moderation', 'integer', 0 );
+		param( 'notify_spam_cmt_moderation', 'integer', 0 );
 		param( 'notify_meta_comments', 'integer', 0 );
 		param( 'notify_post_moderation', 'integer', 0 );
 		param( 'notify_edit_pst_moderation', 'integer', 0 );
@@ -65,14 +66,14 @@ switch ( $action )
 		$after_email_validation = param( 'after_email_validation', 'string', 'return_to_original' );
 		if( $after_email_validation != 'return_to_original' )
 		{
-			$after_email_validation = param( 'specific_after_validation_url', 'string', NULL );
+			$after_email_validation = param( 'specific_after_validation_url', 'url', NULL );
 			param_check_url( 'specific_after_validation_url', 'http-https' );
 		}
 
 		$after_registration = param( 'after_registration', 'string', 'return_to_original' );
 		if( $after_registration != 'return_to_original' )
 		{
-			$after_registration = param( 'specific_after_registration_url', 'string', NULL );
+			$after_registration = param( 'specific_after_registration_url', 'url', NULL );
 			param_check_url( 'specific_after_registration_url', 'http-https' );
 		}
 
@@ -125,6 +126,7 @@ switch ( $action )
 					 array( 'def_notify_published_comments', $notify_published_comments ),
 					 array( 'def_notify_comment_moderation', $notify_comment_moderation ),
 					 array( 'def_notify_edit_cmt_moderation', $notify_edit_cmt_moderation ),
+					 array( 'def_notify_spam_cmt_moderation', $notify_spam_cmt_moderation ),
 					 array( 'def_notify_meta_comments', $notify_meta_comments ),
 					 array( 'def_notify_post_moderation', $notify_post_moderation ),
 					 array( 'def_notify_edit_pst_moderation', $notify_edit_pst_moderation ),

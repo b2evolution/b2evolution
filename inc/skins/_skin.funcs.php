@@ -347,7 +347,7 @@ var downloadInterval = setInterval( function()
 						$robots_index = false;
 					}
 				}
-				elseif( array_diff( $active_filters, array( 'cat_array', 'cat_modifier', 'cat_focus', 'posts', 'page' ) ) == array() )
+				elseif( array_diff( $active_filters, array( 'cat_single', 'cat_array', 'cat_modifier', 'cat_focus', 'posts', 'page' ) ) == array() )
 				{ // This is a category page
 					$disp_detail = 'posts-cat';
 					$seo_page_type = 'Category page';
@@ -364,7 +364,7 @@ var downloadInterval = setInterval( function()
 						//      - selecting exactly one cat through catsel[] is NOT OK since not equivalent (will exclude children)
 
 						// echo 'SINGLE CAT PAGE';
-						// fp> add this?: $disp_detail = 'posts-topcat';  // may become 'posts-subcat' below.
+						$disp_detail = 'posts-topcat';  // may become 'posts-subcat' below.
 
 						if( ( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
 							|| $Blog->get_setting( 'relcanonical_cat_urls' ) )
@@ -554,16 +554,12 @@ var downloadInterval = setInterval( function()
 			elseif( !empty( $comment_id ) )
 			{ // comment id is set, try to get comment author user
 				$CommentCache = & get_CommentCache();
-				$Comment = $CommentCache->get_by_ID( $comment_id, false );
-
-				if( $Comment = $CommentCache->get_by_ID( $comment_id, false ) )
+				if( $Comment = & $CommentCache->get_by_ID( $comment_id, false ) )
 				{
 					$recipient_User = & $Comment->get_author_User();
 					if( empty( $recipient_User ) && ( $Comment->allow_msgform ) && ( is_email( $Comment->get_author_email() ) ) )
 					{ // set allow message form to email because comment author (not registered) accepts email
 						$allow_msgform = 'email';
-						param( 'recipient_address', 'string', $Comment->get_author_email() );
-						param( 'recipient_name', 'string', $Comment->get_author_name() );
 					}
 				}
 			}
@@ -645,6 +641,7 @@ var downloadInterval = setInterval( function()
 					$recipients_selected = array( array(
 							'id'    => $recipient_User->ID,
 							'login' => $recipient_User->login,
+							'fullname' => $recipient_User->get_username()
 						) );
 
 					init_tokeninput_js( 'blog' );
@@ -1210,15 +1207,15 @@ var downloadInterval = setInterval( function()
 				$after_email_validation = $Settings->get( 'after_email_validation' );
 				if( $after_email_validation == 'return_to_original' )
 				{ // we want to return to original page after account activation
-					// check if Session 'validatemail.redirect_to' param is still set
-					$redirect_to = $Session->get( 'core.validatemail.redirect_to' );
+					// check if Session 'activateacc.redirect_to' param is still set
+					$redirect_to = $Session->get( 'core.activateacc.redirect_to' );
 					if( empty( $redirect_to ) )
 					{ // Session param is empty try to get general redirect_to param
 						$redirect_to = param( 'redirect_to', 'url', '' );
 					}
 					else
 					{ // cleanup validateemail.redirect_to param from session
-						$Session->delete('core.validatemail.redirect_to');
+						$Session->delete('core.activateacc.redirect_to');
 					}
 				}
 				else
@@ -1713,6 +1710,11 @@ function skin_include( $template_name, $params = array() )
 	$timer_name = 'skin_include('.$template_name.')';
 	$Timer->resume( $timer_name );
 
+	if( ! empty( $params['Item'] ) )
+	{	// Get Item from params:
+		$Item = $params['Item'];
+	}
+
 	if( $template_name == '$disp$' )
 	{ // This is a special case.
 		// We are going to include a template based on $disp:
@@ -2111,7 +2113,7 @@ function skin_description_tag()
 			$r = $Blog->get( 'shortdesc' );
 		}
 	}
-	elseif( $disp_detail == 'posts-cat' || $disp_detail == 'posts-subcat' )
+	elseif( $disp_detail == 'posts-cat' || $disp_detail == 'posts-topcat' || $disp_detail == 'posts-subcat' )
 	{
 		if( $Blog->get_setting( 'categories_meta_description' ) && ( ! empty( $Chapter ) ) )
 		{
@@ -2210,7 +2212,9 @@ function skin_opengraph_tags()
 		}
 
 		$LinkOwner = new LinkItem( $Item );
-		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000 ) )
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, NULL, 'image', array(
+				'sql_select_add' => ', CASE link_position WHEN "cover" THEN 1 WHEN ( "teaser" OR "teaserperm" OR "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
+				'sql_order_by' => 'link_priority ASC, link_order ASC' ) ) )
 		{ // Item has no linked files
 			while( $Link = & $LinkList->get_next() )
 			{
@@ -2273,7 +2277,9 @@ function skin_twitter_tags()
 		}
 
 		$LinkOwner = new LinkItem( $Item );
-		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser', 'image', array( 'sql_order_by' => 'link_position ASC' ) ) )
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, NULL, 'image', array(
+				'sql_select_add' => ', CASE link_position WHEN "cover" THEN 1 WHEN ( "teaser" OR "teaserperm" OR "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
+				'sql_order_by' => 'link_priority ASC, link_order ASC' ) ) )
 		{ // Item has no linked files
 			while( $Link = & $LinkList->get_next() )
 			{
@@ -2295,6 +2301,19 @@ function skin_twitter_tags()
 				{ // Use only image files for og:image tag
 					$twitter_image = $File->get_url();
 					break;
+				}
+			}
+		}
+
+		// Get author's Twitter username
+		if( $creator_User = & $Item->get_creator_User() )
+		{
+			if( $twitter_links = $creator_User->userfield_values_by_code( 'twitter' ) )
+			{
+				preg_match( '/https?:\/\/(www\.)?twitter\.com\/(#!\/)?@?([^\/\?]*)/', $twitter_links[0], $matches );
+				if( isset( $matches[3] ) )
+				{
+					echo '<meta property="twitter:creator" content="@'.$matches[3].'" />'."\n";
 				}
 			}
 		}

@@ -149,6 +149,9 @@ textarea.message_text {
 .evo_form__comment .form-group .controls .form-control-static {
   text-align: left;
 }
+.evo_post_comment_notification a {
+  white-space: normal;
+}
 .evo_post {
   margin-bottom: 2em;
 }
@@ -573,6 +576,11 @@ div.evo_image_index div:hover {
 }
 .label {
   font-size: 14px !important;
+}
+.panel,
+.avatar_main_frame,
+.pagination li a {
+  background-color: transparent;
 }
 .powered_by a img {
   background-color: #ffffff;

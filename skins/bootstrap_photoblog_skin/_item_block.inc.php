@@ -126,7 +126,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			if( $Item->status != 'published' )
 			{
 				$Item->format_status( array(
-						'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+						'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 					) );
 			}
 			// Permalink:
@@ -138,7 +138,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			$Item->issue_time( array(
 					'before'      => ' '.T_('posted on '),
 					'after'       => ' ',
-					'time_format' => 'M j, Y',
+					'time_format' => locale_extdatefmt(),
 				) );
 
 			// Author
@@ -190,6 +190,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			// Template params for "Item Tags" widget
 			'widget_item_tags_before'    => '<nav class="small post_tags">',
 			'widget_item_tags_after'     => '</nav>',
+			'widget_item_tags_separator' => ' ',
 			// Params for skin file "_item_content.inc.php"
 			'widget_item_content_params' => $params,
 			// Template params for "Item Attachments" widget:
@@ -223,7 +224,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	</div> <!-- ../content_end_full_text -->
 
 		<?php
-			if( ! $Item->is_intro() ) // Do NOT apply tags, comments and feedback on intro posts
+			if( ! $Item->is_intro() && $disp == 'posts' ) // Do NOT apply tags, comments and feedback on intro posts
 			{ // List all tags attached to this post:
 				echo '<footer>';
 		?>

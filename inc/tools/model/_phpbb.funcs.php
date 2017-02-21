@@ -23,6 +23,7 @@ function phpbb_tables_aliases( $phpbb_db_prefix )
 {
 	$phpbb_db_aliases = array(
 			'BB_users'         => $phpbb_db_prefix.'users',
+			'BB_user_fields'   => $phpbb_db_prefix.'profile_fields_data',
 			'BB_ranks'         => $phpbb_db_prefix.'ranks',
 			'BB_categories'    => $phpbb_db_prefix.'categories',
 			'BB_forums'        => $phpbb_db_prefix.'forums',
@@ -31,7 +32,10 @@ function phpbb_tables_aliases( $phpbb_db_prefix )
 			'BB_posts_text'    => $phpbb_db_prefix.'posts_text',
 			'BB_privmsgs'      => $phpbb_db_prefix.'privmsgs',
 			'BB_privmsgs_text' => $phpbb_db_prefix.'privmsgs_text',
+			'BB_privmsgs_to'   => $phpbb_db_prefix.'privmsgs_to',
 			'BB_sessions_keys' => $phpbb_db_prefix.'sessions_keys',
+			'BB_attachments'   => $phpbb_db_prefix.'attachments',
+			'BB_config'        => $phpbb_db_prefix.'config',
 		);
 
 	return $phpbb_db_aliases;
@@ -121,7 +125,7 @@ function phpbb_log( $message, $type = 'message', $nl = '<br />', $bl = '' )
  */
 function phpbb_get_var( $name )
 {
-	global $Session;
+	global $Session, $phpbb_version;
 
 	switch( $name )
 	{
@@ -130,12 +134,17 @@ function phpbb_get_var( $name )
 			$default_value = $media_path.'import/avatars';
 			break;
 
+		case 'path_attachments':
+			global $media_path;
+			$default_value = $media_path.'import/attachments';
+			break;
+
 		default:
 			$default_value = NULL;
 			break;
 	}
 
-	return $Session->get( 'phpbb.'.$name, $default_value );
+	return $Session->get( 'phpbb'.$phpbb_version.'.'.$name, $default_value );
 }
 
 
@@ -148,9 +157,9 @@ function phpbb_get_var( $name )
  */
 function phpbb_set_var( $name, $value, $immediate_save = false )
 {
-	global $Session;
+	global $Session, $phpbb_version;
 
-	$Session->set( 'phpbb.'.$name, $value );
+	$Session->set( 'phpbb'.$phpbb_version.'.'.$name, $value );
 	if( $immediate_save )
 	{
 		$Session->dbsave();
@@ -165,9 +174,9 @@ function phpbb_set_var( $name, $value, $immediate_save = false )
  */
 function phpbb_unset_var( $name )
 {
-	global $Session;
+	global $Session, $phpbb_version;
 
-	$Session->delete( 'phpbb.'.$name );
+	$Session->delete( 'phpbb'.$phpbb_version.'.'.$name );
 }
 
 
@@ -251,7 +260,7 @@ function phpbb_table_insert_links( $table_name, $links )
 
 	if( count( $links_data ) > 0 )
 	{	// Insert the rest records
-			mysql_query( $DB->dbhandle, 'INSERT INTO '.phpbb_table_name( $table_name ).' ( phpbb_ID, b2evo_ID )
+			mysqli_query( $DB->dbhandle, 'INSERT INTO '.phpbb_table_name( $table_name ).' ( phpbb_ID, b2evo_ID )
 					VALUES '.implode( ', ', $links_data ) );
 	}
 }
@@ -337,8 +346,8 @@ function phpbb_rank_info( $rank_ID, $get_only_count = false )
 		$SQL = new SQL();
 		$SQL->SELECT( 'rank_id, COUNT( user_id ) AS cnt' );
 		$SQL->FROM( 'BB_users' );
-		$SQL->FROM_add( 'INNER JOIN BB_ranks ON user_rank = rank_id' );
-		$SQL->WHERE( 'user_id IN ( SELECT poster_id FROM phpbb_posts WHERE poster_id = user_id )' );
+		$SQL->FROM_add( 'LEFT JOIN BB_ranks ON user_rank = rank_id' );
+		//$SQL->WHERE( 'user_id IN ( SELECT poster_id FROM phpbb_posts WHERE poster_id = user_id )' );
 		$SQL->GROUP_BY( 'user_rank' );
 		$rank_users_count = $phpbb_DB->get_assoc( $SQL->get() );
 	}
@@ -402,15 +411,18 @@ function b2evo_groups()
  */
 function phpbb_import_users()
 {
-	global $DB, $phpbb_DB, $tableprefix;
+	global $DB, $phpbb_DB, $tableprefix, $phpbb_version;
 
 	if( !phpbb_check_step( 'users' ) )
 	{	// Check current step
 		return; // Exit here if we cannot process this step
 	}
 
+	// Reset previous values:
 	phpbb_unset_var( 'users_count_imported' );
 	phpbb_unset_var( 'users_count_updated' );
+	phpbb_unset_var( 'avatars_count_imported' );
+	phpbb_unset_var( 'avatars_count_missing' );
 
 	phpbb_log( T_('Importing users...') );
 
@@ -479,9 +491,37 @@ function phpbb_import_users()
 
 	// Init SQL to get the users
 	$users_SQL = $phpbb_users_SQL;
-	$users_SQL->SELECT( 'u.user_id, u.user_active, u.username, u.user_password, u.user_email, u.user_lang, u.user_level, u.user_regdate,
+	if( $phpbb_version == 3 )
+	{	// phpBB v3:
+
+		// Detect what user fields exist in phpBB database:
+		$db_user_fields = $phpbb_DB->get_col( 'SHOW COLUMNS FROM BB_user_fields' );
+		$sel_fields = array( 'icq', 'website', 'aim', 'yim', 'msnm', 'interests', 'facebook', 'googleplus', 'location', 'skype', 'twitter', 'yahoo', 'youtube', 'aol' );
+		foreach( $sel_fields as $s => $sel_field_key )
+		{
+			if( in_array( 'pf_phpbb_'.$sel_field_key, $db_user_fields ) )
+			{	// Try to get a value if user field exists:
+				$sel_fields[ $sel_field_key ] = 'uf.pf_phpbb_'.$sel_field_key;
+			}
+			else
+			{	// Select empty value if field isn't detected in DB:
+				$sel_fields[ $sel_field_key ] = '""';
+			}
+			$sel_fields[ $sel_field_key ] .= ' AS user_'.$sel_field_key;
+			unset( $sel_fields[ $s ] );
+		}
+
+		$users_SQL->SELECT( 'u.user_id, u.user_inactive_reason, u.username, u.user_password, u.user_email, u.user_lang, u.user_regdate,
+							 '.implode( ', ', $sel_fields ).', u.user_rank,
+							 u.user_allow_viewonline, u.user_notify_pm, u.user_avatar' );
+		$users_SQL->FROM_add( 'LEFT JOIN BB_user_fields uf ON uf.user_id = u.user_id' );
+	}
+	else
+	{	// phpBB v2:
+		$users_SQL->SELECT( 'u.user_id, u.user_active, u.username, u.user_password, u.user_email, u.user_lang, u.user_level, u.user_regdate,
 							 u.user_icq, u.user_website, u.user_aim, u.user_yim, u.user_msnm, u.user_interests, u.user_rank,
 							 u.user_allow_viewonline, u.user_notify_pm, u.user_avatar' );
+	}
 	$users_SQL->GROUP_BY( 'u.user_id' );
 
 	// Get all users IPs in one sql query
@@ -491,17 +531,8 @@ function phpbb_import_users()
 	$users_ips_SQL->ORDER_BY( 'last_login DESC' );
 	$users_ips = $phpbb_DB->get_assoc( $users_ips_SQL->get() );
 
-	// Prepare to import avatars
-	$do_import_avatars = false;
-	$path_avatars = phpbb_get_var( 'path_avatars' );
-	if( !empty( $path_avatars ) )
-	{
-		$path_avatars = preg_replace( '/(\/|\\\\)$/i', '', $path_avatars).'/';
-		if( !empty( $path_avatars ) && file_exists( $path_avatars ) && is_dir( $path_avatars ) )
-		{	// Folder with avatars is correct, we can import avatars
-			$do_import_avatars = true;
-		}
-	}
+	// Get a path where we should import avatars from:
+	$path_avatars = phpbb_get_import_path( 'path_avatars' );
 
 	$page = 0;
 	$page_size = 1000;
@@ -536,8 +567,12 @@ function phpbb_import_users()
 			}
 			else
 			{	// Replace unauthorized chars from username
-				$user_login = preg_replace( '/([^a-z0-9_])/i', '_', $phpbb_user->username );
+				$user_login = preg_replace( '/([^a-z0-9_]+)/i', '_', $phpbb_user->username );
 				$user_login = utf8_substr( utf8_strtolower( $user_login ), 0, 20 );
+				if( $user_login == '_' )
+				{	// If all username chars are unauthorized
+					$user_login = 'user_1';
+				}
 			}
 
 			$user_has_duplicated_email = false;
@@ -581,10 +616,8 @@ function phpbb_import_users()
 				unset( $phpbb_users[$p] ); // Unset already existing user from this array to exclude the updating of the fields and settings
 				$phpbb_users_count_updated++;
 
-				if( $do_import_avatars )
-				{	// Import user's avatar
-					phpbb_import_avatar( $b2evo_user->user_ID, $path_avatars, $phpbb_user->user_avatar );
-				}
+				// Import user's avatar:
+				phpbb_import_avatar( $phpbb_user, $b2evo_user->user_ID, $path_avatars );
 
 				phpbb_log( sprintf( T_( 'The user #%s already exists with E-mail address "%s" in the b2evolution database -- Merging User "%s" with user "%s".' ), $phpbb_user->user_id, $phpbb_user->user_email, $user_login, $b2evo_user->user_login ), 'warning', ' ', '<br />' );
 				continue;
@@ -593,6 +626,7 @@ function phpbb_import_users()
 			// Check if this user already exists with same login in b2evo DB
 			$user_login_number = 0;
 			$next_login = $user_login;
+			$user_login_mask = preg_replace( '#\d+$#', '', $user_login );
 			do
 			{
 				$SQL = new SQL();
@@ -601,7 +635,7 @@ function phpbb_import_users()
 				$SQL->WHERE( 'user_login = '.$DB->quote( $next_login ) );
 				if( $b2evo_user_ID = $DB->get_var( $SQL->get() ) )
 				{	// Duplicated user login, Change to next login by increasing the number at the end
-					$next_login = $user_login.( ++$user_login_number );
+					$next_login = $user_login_mask.( ++$user_login_number );
 				}
 			}
 			while( $b2evo_user_ID );
@@ -618,14 +652,37 @@ function phpbb_import_users()
 
 			$user_data = array(
 					'user_login'              => $user_login,
-					'user_pass'               => $phpbb_user->user_password,
 					'user_email'              => $phpbb_user->user_email,
-					'user_level'              => $phpbb_user->user_level,
-					'user_status'             => $phpbb_user->user_active == '1' ? 'autoactivated' : 'closed',
 					'user_created_datetime'   => date( 'Y-m-d H:i:s', $phpbb_user->user_regdate ),
 					'user_profileupdate_date' => date( 'Y-m-d', $phpbb_user->user_regdate ),
 					'user_locale'             => 'en-US'
 				);
+			if( $phpbb_version == 3 )
+			{	// phpBB v3:
+				if( preg_match( '/^(\$[^\$]+)(\$[^\$]+)*\$([^\$]+)$/', $phpbb_user->user_password, $password_data ) )
+				{	// Save password value and password driver code in two separate fields:
+					$user_data['user_pass_driver'] = 'bb'.$password_data[1];
+					if( $user_PasswordDriver = get_PasswordDriver( $user_data['user_pass_driver'] ) )
+					{
+						$user_data['user_salt'] = $user_PasswordDriver->extract_salt( $phpbb_user->user_password );
+						$user_data['user_pass'] = $user_PasswordDriver->clear_hash( $phpbb_user->user_password );
+					}
+				}
+				if( ! isset( $user_data['user_pass'] ) )
+				{	// Unknown password format:
+					$user_data['user_pass'] = '';
+					$user_data['user_pass_driver'] = 'evo$salted';
+				}
+				$user_data['user_level'] = 0;
+				$user_data['user_status'] = $phpbb_user->user_inactive_reason == '0' ? 'autoactivated' : 'closed';
+			}
+			else
+			{	// phpBB v2:
+				$user_data['user_pass'] = $phpbb_user->user_password;
+				$user_data['user_pass_driver'] = 'evo$md5';
+				$user_data['user_level'] = $phpbb_user->user_level;
+				$user_data['user_status'] = $phpbb_user->user_active == '1' ? 'autoactivated' : 'closed';
+			}
 
 			if( !empty( $phpbb_user->user_rank ) && !empty( $phpbb_ranks[ $phpbb_user->user_rank ] ) )
 			{	// Define the user's group
@@ -655,10 +712,8 @@ function phpbb_import_users()
 
 			$user_ID = mysqli_insert_id( $DB->dbhandle );
 
-			if( $do_import_avatars )
-			{	// Import user's avatar
-				phpbb_import_avatar( $user_ID, $path_avatars, $phpbb_user->user_avatar );
-			}
+			// Import user's avatar:
+			phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars );
 
 			// Save new inserted ID of the user
 			$users_IDs[$phpbb_user->user_id] = $user_ID;
@@ -722,6 +777,14 @@ function phpbb_import_user_fields( $phpbb_user, $b2evo_user_ID )
 		'msnm'      => 'MSN/Live IM',
 		'occ'       => 'Role',
 		'interests' => 'I like',
+		'facebook'  => 'Facebook',
+		'googleplus'=> 'Google Plus',
+		'location'  => 'Main address',
+		'skype'     => 'Skype',
+		'twitter'   => 'Twitter',
+		'yahoo'     => 'Yahoo IM',
+		'youtube'   => 'YouTube',
+		'aol'       => 'AOL AIM',
 	);
 
 	$fields_types_IDs = array();
@@ -751,6 +814,10 @@ function phpbb_import_user_fields( $phpbb_user, $b2evo_user_ID )
 	$import_data = array();
 	foreach( $fields_types_IDs as $field_type => $field_ID )
 	{
+		if( ! isset( $phpbb_user->{'user_'.$field_type} ) )
+		{	// Skip this user field because the given phpBB DB doesn't contain it:
+			continue;
+		}
 		$field_value = trim( $phpbb_user->{'user_'.$field_type} );
 		if( $field_type == 'rank' )
 		{	// If field is "rank" we should get the value from table "phpbb_ranks" by rank_ID
@@ -914,7 +981,7 @@ function phpbb_import_invalid_user( $phpbb_user_ID, & $users_IDs, $phpbb_usernam
  */
 function phpbb_import_forums()
 {
-	global $DB, $phpbb_DB;
+	global $DB, $phpbb_DB, $phpbb_version;
 
 	if( !phpbb_check_step( 'forums' ) )
 	{	// Check current step
@@ -937,35 +1004,57 @@ function phpbb_import_forums()
 	$import_categories = phpbb_get_var( 'import_categories' );
 	$import_forums = phpbb_get_var( 'import_forums' );
 
-	// Get the categories from phpbb database
-	$cat_SQL = new SQL();
-	$cat_SQL->SELECT( 'cat_id AS forum_id, cat_title AS forum_name, "" AS forum_desc, cat_order AS forum_order, NULL AS forum_parent, cat_order AS forum_order, 1 AS forum_meta, 0 AS cat_id, 0 AS forum_lock' );
-	$cat_SQL->FROM( 'BB_categories' );
-	if( !empty( $import_categories ) )
-	{	// Select only these categories
-		$cat_SQL->WHERE( 'cat_id IN ( '.$phpbb_DB->quote( $import_categories ).' )' );
+	// Get the categories and forums from phpbb database:
+	if( $phpbb_version == 3 )
+	{	// pnpBB v3:
+		$import_forums = array_merge( $import_forums, $import_categories );
+		if( empty( $import_forums ) )
+		{	// No selected forums to import
+			$phpbb_forums = array();
+		}
+		else
+		{	// Get the forums from phpbb database:
+			$forum_SQL = new SQL();
+			$forum_SQL->SELECT( 'f.forum_id, f.forum_name, f.forum_desc, f.right_id AS forum_order, f.parent_id AS forum_parent, IF( f.parent_id > 0, 0, 1 ) AS forum_meta, f.parent_id AS cat_id, forum_status AS forum_lock' );
+			$forum_SQL->FROM( 'BB_forums f' );
+			$forum_SQL->ORDER_BY( 'f.right_id' );
+			$forum_SQL->WHERE( 'forum_id IN ( '.$phpbb_DB->quote( $import_forums ).' )' );
+			$phpbb_forums = $phpbb_DB->get_results( $forum_SQL->get() );
+		}
 	}
 	else
-	{	// If no categories to import
-		$cat_SQL->WHERE( 'cat_id = -1' );
-	}
+	{	// pnpBB v2:
 
-	// Get the forums from phpbb database
-	$forum_SQL = new SQL();
-	$forum_SQL->SELECT( 'f.forum_id, f.forum_name, f.forum_desc, f.forum_order, f.forum_parent, f.forum_order, 0 AS forum_meta, f.cat_id, forum_status AS forum_lock' );
-	$forum_SQL->FROM( 'BB_forums f' );
-	$forum_SQL->FROM_add( 'LEFT JOIN BB_categories c ON f.cat_id = c.cat_id' );
-	$forum_SQL->ORDER_BY( 'c.cat_order, f.forum_order' );
-	if( !empty( $import_forums ) )
-	{	// Select only these forums
-		$forum_SQL->WHERE( 'forum_id IN ( '.$phpbb_DB->quote( $import_forums ).' )' );
-	}
-	else
-	{	// If no forums to import
-		$forum_SQL->WHERE( 'forum_id = -1' );
-	}
+		// Get the categories from phpbb database:
+		$cat_SQL = new SQL();
+		$cat_SQL->SELECT( 'cat_id AS forum_id, cat_title AS forum_name, "" AS forum_desc, cat_order AS forum_order, NULL AS forum_parent, 1 AS forum_meta, 0 AS cat_id, 0 AS forum_lock' );
+		$cat_SQL->FROM( 'BB_categories' );
+		if( !empty( $import_categories ) )
+		{	// Select only these categories
+			$cat_SQL->WHERE( 'cat_id IN ( '.$phpbb_DB->quote( $import_categories ).' )' );
+		}
+		else
+		{	// If no categories to import
+			$cat_SQL->WHERE( 'cat_id = -1' );
+		}
 
-	$phpbb_forums = $phpbb_DB->get_results( '('.$cat_SQL->get().') UNION ('.$forum_SQL->get().')' );
+		// Get the forums from phpbb database:
+		$forum_SQL = new SQL();
+		$forum_SQL->SELECT( 'f.forum_id, f.forum_name, f.forum_desc, f.forum_order, f.forum_parent, 0 AS forum_meta, f.cat_id, forum_status AS forum_lock' );
+		$forum_SQL->FROM( 'BB_forums f' );
+		$forum_SQL->FROM_add( 'LEFT JOIN BB_categories c ON f.cat_id = c.cat_id' );
+		$forum_SQL->ORDER_BY( 'c.cat_order, f.forum_order' );
+		if( !empty( $import_forums ) )
+		{	// Select only these forums
+			$forum_SQL->WHERE( 'forum_id IN ( '.$phpbb_DB->quote( $import_forums ).' )' );
+		}
+		else
+		{	// If no forums to import
+			$forum_SQL->WHERE( 'forum_id = -1' );
+		}
+
+		$phpbb_forums = $phpbb_DB->get_results( '('.$cat_SQL->get().') UNION ('.$forum_SQL->get().')' );
+	}
 
 	if( count( $phpbb_forums ) > 0 )
 	{
@@ -1007,13 +1096,13 @@ function phpbb_import_forums()
 			$forums_IDs[$phpbb_forum->forum_id] = $DB->insert_id;
 		}
 
-		if( isset( $phpbb_forum->forum_parent ) && $phpbb_forum->forum_parent > 0 )
-		{	// Save parent ID to update it in the next step
-			$forums_parents[$phpbb_forum->forum_id] = $phpbb_forum->forum_parent;
-		}
-		else if( isset( $phpbb_forum->cat_id ) && $phpbb_forum->cat_id > 0 )
+		if( isset( $phpbb_forum->cat_id ) && $phpbb_forum->cat_id > 0 )
 		{	// First level forum has category as parent
 			$forums_parents[$phpbb_forum->forum_id] = 'cat_'.$phpbb_forum->cat_id;
+		}
+		elseif( isset( $phpbb_forum->forum_parent ) && $phpbb_forum->forum_parent > 0 )
+		{	// Save parent ID to update it in the next step
+			$forums_parents[$phpbb_forum->forum_id] = $phpbb_forum->forum_parent;
 		}
 
 		phpbb_log( sprintf( T_('The forum "%s" is imported.'), $phpbb_forum->forum_name ) );
@@ -1055,8 +1144,7 @@ function phpbb_unique_urlname( $source, $table, $field )
 	global $DB;
 
 	// Replace special chars/umlauts, if we can convert charsets:
-	load_funcs( 'locales/_charset.funcs.php' );
-	$url_name = strtolower( replace_special_chars( $source ) );
+	$url_name = utf8_url_slug( $source, -1, true );
 
 	$url_number = 1;
 	$url_name_correct = $url_name;
@@ -1066,14 +1154,14 @@ function phpbb_unique_urlname( $source, $table, $field )
 		$SQL->SELECT( $field );
 		$SQL->FROM( $table );
 		$SQL->WHERE( $field.' = '.$DB->quote( $url_name_correct ) );
-		$category = $DB->get_var( $SQL->get() );
-		if( $category )
-		{	// Category already exists with such url name; Change it
+		$row = $DB->get_var( $SQL->get() );
+		if( $row )
+		{	// Row already exists with such field; Make it unique:
 			$url_name_correct = $url_name.'-'.$url_number;
 			$url_number++;
 		}
 	}
-	while( !empty( $category ) );
+	while( !empty( $row ) );
 
 	return $url_name_correct;
 }
@@ -1084,7 +1172,7 @@ function phpbb_unique_urlname( $source, $table, $field )
  */
 function phpbb_import_topics()
 {
-	global $DB, $phpbb_DB, $tableprefix;
+	global $DB, $phpbb_DB, $tableprefix, $phpbb_version;
 
 	if( !phpbb_check_step( 'topics' ) )
 	{	// Check current step
@@ -1092,6 +1180,10 @@ function phpbb_import_topics()
 	}
 
 	$import_forums = phpbb_get_var( 'import_forums' );
+
+	// Reset previous values:
+	phpbb_unset_var( 'attachments_count_imported' );
+	phpbb_unset_var( 'attachments_count_missing' );
 
 	phpbb_log( T_('Importing topics...') );
 
@@ -1108,7 +1200,10 @@ function phpbb_import_topics()
 	$SQL = new SQL();
 	$SQL->FROM( 'BB_topics t' );
 	$SQL->FROM_add( 'INNER JOIN BB_posts p ON t.topic_first_post_id = p.post_id' );
-	$SQL->FROM_add( 'INNER JOIN BB_posts_text pt ON p.post_id = pt.post_id' );
+	if( $phpbb_version == 2 )
+	{	// pnpBB v2:
+		$SQL->FROM_add( 'INNER JOIN BB_posts_text pt ON p.post_id = pt.post_id' );
+	}
 	$SQL->WHERE( 't.topic_status != 2' ); // Don't select MOVIED topics
 	if( !empty( $import_forums ) )
 	{	// Select the topics only from these forums
@@ -1134,6 +1229,9 @@ function phpbb_import_topics()
 		$DB->commit();
 		return; // Exit here
 	}
+
+	// Get a path where we should import topic attachments from:
+	$path_attachments = phpbb_get_import_path( 'path_attachments' );
 
 	$forums_IDs = phpbb_table_get_links( 'forums' );
 	$users_IDs = phpbb_table_get_links( 'users' );
@@ -1165,8 +1263,16 @@ function phpbb_import_topics()
 
 	// Init SQL to get the topics
 	$topics_SQL = $SQL;
-	$topics_SQL->SELECT( 't.topic_id, t.forum_id, t.topic_time, t.topic_poster, t.topic_title, t.topic_status, t.topic_type, t.topic_first_post_id,
-		pt.post_text, pt.bbcode_uid, p.post_username' );
+	if( $phpbb_version == 3 )
+	{	// pnpBB v3:
+		$topics_SQL->SELECT( 't.topic_id, t.forum_id, t.topic_time, t.topic_poster, t.topic_title,
+			t.topic_status, t.topic_type, t.topic_first_post_id, p.post_id, p.post_text, p.bbcode_uid, p.post_username' );
+	}
+	else
+	{	// pnpBB v2:
+		$topics_SQL->SELECT( 't.topic_id, t.forum_id, t.topic_time, t.topic_poster, t.topic_title,
+			t.topic_status, t.topic_type, t.topic_first_post_id, p.post_id, pt.post_text, pt.bbcode_uid, p.post_username' );
+	}
 	$topics_SQL->ORDER_BY( 't.topic_id' );
 
 	$page = 0;
@@ -1200,10 +1306,10 @@ function phpbb_import_topics()
 
 			$author_ID = $users_IDs[ (string) $phpbb_topic->topic_poster ];
 			$forum_ID = $forums_IDs[ (string) $phpbb_topic->forum_id ];
-			//$canonical_slug = phpbb_unique_urlname( 'topic-'.$phpbb_topic->topic_id, 'T_slug', 'slug_title' );
-			$canonical_slug = 'topic-'.$phpbb_topic->topic_id;
-			//$second_slug = phpbb_unique_urlname( 'forumpost-'.$phpbb_topic->topic_first_post_id, 'T_slug', 'slug_title' );
-			$second_slug = 'forumpost-'.$phpbb_topic->topic_first_post_id;
+			$canonical_slug = phpbb_unique_urlname( 'topic-'.$phpbb_topic->topic_id, 'T_slug', 'slug_title' );
+			//$canonical_slug = 'topic-'.$phpbb_topic->topic_id;
+			$second_slug = phpbb_unique_urlname( 'forumpost-'.$phpbb_topic->topic_first_post_id, 'T_slug', 'slug_title' );
+			//$second_slug = 'forumpost-'.$phpbb_topic->topic_first_post_id;
 			$post_content = phpbb_decode_bbcode( $phpbb_topic->post_text, $phpbb_topic->bbcode_uid );
 			$topic_time = date( 'Y-m-d H:i:s', $phpbb_topic->topic_time );
 
@@ -1270,6 +1376,11 @@ function phpbb_import_topics()
 					  SET post_canonical_slug_ID = '.$DB->quote( $canonical_slug_ID )/*.', post_tiny_slug_ID = '.$DB->quote( $tiny_slug_ID )*/.'
 					WHERE post_ID = '.$DB->quote( $item_ID ) );
 
+			if( $path_attachments )
+			{	// Import attachments of this topic:
+				phpbb_import_attachments( 'itm', $path_attachments, $phpbb_topic->post_id, $item_ID );
+			}
+
 			$phpbb_topics_count_imported++;
 
 			if( $phpbb_topics_count_imported % 100 == 0 )
@@ -1285,6 +1396,11 @@ function phpbb_import_topics()
 	// Add temporary table to store the links between topics's IDs from phpbb and b2evo tables
 	phpbb_table_add( 'topics' );
 	phpbb_table_insert_links( 'topics', $topics_IDs );
+
+	if( empty( $path_attachments ) )
+	{	// Count missing attachments of the imported topics if the path is not correct:
+		phpbb_count_missing_attachments( array_keys( $topics_IDs ) );
+	}
 
 	$DB->commit();
 
@@ -1403,7 +1519,7 @@ function phpbb_decode_bbcode( $string, $bbcode_uid )
  */
 function phpbb_import_replies()
 {
-	global $DB, $phpbb_DB, $tableprefix;
+	global $DB, $phpbb_DB, $tableprefix, $phpbb_version;
 
 	if( !phpbb_check_step( 'replies' ) )
 	{	// Check current step
@@ -1422,7 +1538,10 @@ function phpbb_import_replies()
 	// Init SQL to get the replies data and the count of the replies
 	$SQL = new SQL();
 	$SQL->FROM( 'BB_posts p' );
-	$SQL->FROM_add( 'LEFT JOIN BB_posts_text pt ON p.post_id = pt.post_id' );
+	if( $phpbb_version == 2 )
+	{	// pnpBB v2:
+		$SQL->FROM_add( 'LEFT JOIN BB_posts_text pt ON p.post_id = pt.post_id' );
+	}
 	//$SQL->FROM_add( 'LEFT JOIN BB_topics t ON p.post_id = t.topic_first_post_id' );
 	//$SQL->WHERE( 't.topic_id IS NULL' );
 	if( !empty( $import_forums ) )
@@ -1454,16 +1573,6 @@ function phpbb_import_replies()
 	$users_IDs = phpbb_table_get_links( 'users' );
 	$topics_IDs = phpbb_table_get_links( 'topics' );
 
-	$comment_fields = array(
-			'comment_item_ID',
-			'comment_author_user_ID',
-			'comment_date',
-			'comment_author_IP',
-			'comment_author',
-			'comment_content',
-			'comment_renderers',
-		);
-
 	phpbb_log( T_('Start importing <b>replies</b> as <b>comments</b> into the b2evolution database...'), 'message', '' );
 
 	$BlogCache = & get_BlogCache();
@@ -1472,7 +1581,14 @@ function phpbb_import_replies()
 
 	// Init SQL to get the replies from phpbb database
 	$SQL = $SQL;
-	$SQL->SELECT( 'p.post_id, p.topic_id, p.post_time, p.post_edit_time, p.poster_id, p.poster_ip, p.post_username, pt.post_text, pt.bbcode_uid' );
+	if( $phpbb_version == 3 )
+	{	// pnpBB v3:
+		$SQL->SELECT( 'p.post_id, p.topic_id, p.post_time, p.post_edit_time, p.poster_id, p.poster_ip, p.post_username, p.post_text, p.bbcode_uid' );
+	}
+	else
+	{	// pnpBB v2:
+		$SQL->SELECT( 'p.post_id, p.topic_id, p.post_time, p.post_edit_time, p.poster_id, p.poster_ip, p.post_username, pt.post_text, pt.bbcode_uid' );
+	}
 	$SQL->ORDER_BY( 'p.post_id' );
 
 	$page = 0;
@@ -1480,6 +1596,7 @@ function phpbb_import_replies()
 	$phpbb_replies_count_imported = 0;
 	$comments_import_data = array();
 	$comments_slugs_import_data = array();
+	$replies_IDs = array();
 	do
 	{	// Split by page to optimize process
 		// It gives to save the memory rather than if we get all replies by one query without LIMIT clause
@@ -1532,26 +1649,20 @@ function phpbb_import_replies()
 				'comment_author'         => $author_name,
 				'comment_content'        => $DB->quote( phpbb_decode_bbcode( $phpbb_reply->post_text, $phpbb_reply->bbcode_uid ) ),
 				'comment_renderers'      => $DB->quote( 'b2evBBco.b2evALnk.b2WPAutP.evo_code' ),
+				'comment_status'         => $DB->quote( 'published' ),
 			);
 
-			$comments_import_data[] = '( '.implode( ', ', $comment_data ).' )';
+			$replies_IDs[] = $phpbb_reply->post_id;
+
+			$comments_import_data[ $phpbb_reply->post_id ] = '( '.implode( ', ', $comment_data ).' )';
 
 			$comments_slugs_import_data[] = '( '.$DB->quote( 'forumpost-'.$phpbb_reply->post_id ).', '.$DB->quote( 'item' ).', '.$DB->quote( $topics_IDs[ (string) $phpbb_reply->topic_id ] ).' )';
 
 			if( count( $comments_import_data ) == 100 )
-			{	// Insert the 100 comments in one query
-				// *** EXECUTE QUERY TO INSERT NEW COMMENTS *** //
-				$comment_insert_result = mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'comments ( '.implode( ', ', $comment_fields ).' )
-						VALUES '.implode( ', ', $comments_import_data ) );
-				if( !$comment_insert_result )
-				{	// Some errors
-					phpbb_log( '<br />'.sprintf( T_( 'MySQL error: %s.' ) , mysqli_error( $DB->dbhandle ) ), 'error', ' ' );
-				}
+			{	// Insert the 100 comments in one query:
+				phpbb_insert_comments( $comments_import_data, $comments_slugs_import_data );
+				// Clear arrays for next portion:
 				$comments_import_data = array();
-
-				// Insert the slugs for the replies
-				mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'slug ( slug_title, slug_type, slug_itm_ID )
-						VALUES '.implode( ', ', $comments_slugs_import_data ) );
 				$comments_slugs_import_data = array();
 			}
 
@@ -1568,23 +1679,67 @@ function phpbb_import_replies()
 	while( count( $phpbb_replies ) > 0 );
 
 	if( count( $comments_import_data ) > 0 )
-	{	// Insert the rest comments
-		// *** EXECUTE QUERY TO INSERT NEW COMMENTS *** //
-		$comment_insert_result = mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'comments ( '.implode( ', ', $comment_fields ).' )
-				VALUES '.implode( ', ', $comments_import_data ) );
-		if( !$comment_insert_result )
-		{	// Some errors
-			phpbb_log( sprintf( T_( 'MySQL error: %s.' ) , mysqli_error( $DB->dbhandle ) ), 'error', ' ', '<br />' );
-		}
+	{	// Insert the rest comments:
+		phpbb_insert_comments( $comments_import_data, $comments_slugs_import_data );
+	}
 
-		// Insert the slugs for the replies
-		mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'slug ( slug_title, slug_type, slug_itm_ID )
-				VALUES '.implode( ', ', $comments_slugs_import_data ) );
+	// Get a path where we should import the reply attachments from:
+	$path_attachments = phpbb_get_import_path( 'path_attachments' );
+
+	if( empty( $path_attachments ) )
+	{	// Count missing attachments of the imported replies if the path is not correct:
+		phpbb_count_missing_attachments( $replies_IDs );
 	}
 
 	$DB->commit();
 
 	phpbb_set_var( 'replies_count_imported', $phpbb_replies_count_imported );
+}
+
+
+/**
+ * Insert comments in DB
+ *
+ * @param array Query data for the comments table
+ * @param array Query data for slugs of the comments
+ */
+function phpbb_insert_comments( $comments_import_data, $comments_slugs_import_data )
+{
+	global $DB, $tableprefix;
+
+	$comment_insert_result = mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'comments
+			( comment_item_ID, comment_author_user_ID, comment_date, comment_author_IP, comment_author, comment_content, comment_renderers, comment_status )
+			VALUES '.implode( ', ', $comments_import_data ) );
+
+	if( ! $comment_insert_result )
+	{	// Some errors
+		phpbb_log( '<br />'.sprintf( T_( 'MySQL error: %s.' ) , mysqli_error( $DB->dbhandle ) ), 'error', ' ' );
+	}
+	else
+	{
+		// Get a path where we should import the reply attachments from:
+		$path_attachments = phpbb_get_import_path( 'path_attachments' );
+
+		if( $path_attachments )
+		{	// If attachments should be inserted
+			// Get IDs of the last 100 inserted comments in single query above:
+			$last_inserted_comment_IDs = phpbb_get_last_inserted_IDs( $tableprefix.'comments', 'comment_ID', count( $comments_import_data ) );
+
+			$attachments_insert_queries = array();
+			$c = 0;
+			foreach( $comments_import_data as $reply_ID => $insert_data )
+			{	// Import attachments of the last 100 replies:
+				$attachments_insert_queries = array_merge( $attachments_insert_queries, phpbb_get_attachments_insert_data( 'cmt', $path_attachments, $reply_ID, $last_inserted_comment_IDs[ $c ] ) );
+				$c++;
+			}
+			// Insert the links of all 100 comments in single query:
+			phpbb_insert_attachments( 'cmt', $attachments_insert_queries );
+		}
+	}
+
+	// Insert the slugs for the replies
+	mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'slug ( slug_title, slug_type, slug_itm_ID )
+			VALUES '.implode( ', ', $comments_slugs_import_data ) );
 }
 
 /**
@@ -1596,7 +1751,7 @@ function phpbb_import_replies()
 function phpbb_decode_ip( $int_ip )
 {
 	$hexipbang = explode( '.', chunk_split( $int_ip, 2, '.' ) );
-	return hexdec( $hexipbang[0] ).'.'.hexdec( $hexipbang[1] ).'.'.hexdec( $hexipbang[2] ).'.'.hexdec( $hexipbang[3] );
+	return count( $hexipbang ) == 4 ? hexdec( $hexipbang[0] ).'.'.hexdec( $hexipbang[1] ).'.'.hexdec( $hexipbang[2] ).'.'.hexdec( $hexipbang[3] ) : '';
 }
 
 
@@ -1640,7 +1795,7 @@ function phpbb_post_is_topic( $post_id )
  */
 function phpbb_import_messages()
 {
-	global $DB, $phpbb_DB, $tableprefix;
+	global $DB, $phpbb_DB, $tableprefix, $phpbb_version;
 
 	if( !phpbb_check_step( 'messages' ) )
 	{	// Check current step
@@ -1657,11 +1812,25 @@ function phpbb_import_messages()
 	// Init SQL to get the messages data and the count of the messages
 	$SQL = new SQL();
 	$SQL->FROM( 'BB_privmsgs m' );
-	$SQL->FROM_add( 'LEFT JOIN BB_privmsgs_text mt ON m.privmsgs_id = mt.privmsgs_text_id' );
+	if( $phpbb_version == 3 )
+	{	// pnpBB v3:
+		$SQL->FROM_add( 'INNER JOIN BB_privmsgs_to mt ON m.msg_id = mt.msg_id' );
+	}
+	else
+	{	// pnpBB v2:
+		$SQL->FROM_add( 'INNER JOIN BB_privmsgs_text mt ON m.privmsgs_id = mt.privmsgs_text_id' );
+	}
 
 	// Get the count of the messages
 	$count_SQL = $SQL;
-	$count_SQL->SELECT( 'COUNT( m.privmsgs_id )' );
+	if( $phpbb_version == 3 )
+	{	// pnpBB v3:
+		$count_SQL->SELECT( 'COUNT( DISTINCT m.msg_id )' );
+	}
+	else
+	{	// pnpBB v2:
+		$count_SQL->SELECT( 'COUNT( DISTINCT m.privmsgs_id )' );
+	}
 	$phpbb_messages_count = $phpbb_DB->get_var( $count_SQL->get() );
 
 	if( $phpbb_messages_count > 0 )
@@ -1679,11 +1848,21 @@ function phpbb_import_messages()
 
 	phpbb_log( T_('Start importing <b>private messages</b> into the b2evolution database...'), 'message', '' );
 
-	// Init SQL to get the messages from phpbb database
-	$SQL->SELECT( 'm.privmsgs_id, m.privmsgs_subject, mt.privmsgs_text, m.privmsgs_date, m.privmsgs_from_userid, m.privmsgs_to_userid, mt.privmsgs_bbcode_uid' );
-	$SQL->WHERE( 'm.privmsgs_subject NOT LIKE \'Re: %\' ' );
-	$SQL->ORDER_BY( 'm.privmsgs_date' );
-	$SQL->GROUP_BY( 'm.privmsgs_from_userid, m.privmsgs_to_userid, m.privmsgs_date' );
+	// Init SQL to get the messages from phpbb database:
+	if( $phpbb_version == 3 )
+	{	// pnpBB v3:
+		$SQL->SELECT( 'm.msg_id AS id, m.message_subject AS subject, m.message_text AS text, m.message_time AS time, m.author_id AS from_user_id, mt.user_id AS to_user_id, m.bbcode_uid' );
+		$SQL->WHERE( 'm.message_subject NOT LIKE \'Re: %\' ' );
+		$SQL->ORDER_BY( 'm.message_time' );
+		$SQL->GROUP_BY( 'm.author_id, mt.user_id, m.message_time' );
+	}
+	else
+	{	// pnpBB v2:
+		$SQL->SELECT( 'm.privmsgs_id AS id, m.privmsgs_subject AS subject, mt.privmsgs_text AS text, m.privmsgs_date AS time, m.privmsgs_from_userid AS from_user_id, m.privmsgs_to_userid AS to_user_id, mt.privmsgs_bbcode_uid AS bbcode_uid' );
+		$SQL->WHERE( 'm.privmsgs_subject NOT LIKE \'Re: %\' ' );
+		$SQL->ORDER_BY( 'm.privmsgs_date' );
+		$SQL->GROUP_BY( 'm.privmsgs_from_userid, m.privmsgs_to_userid, m.privmsgs_date' );
+	}
 
 	$page = 0;
 	$page_size = 100;
@@ -1699,26 +1878,26 @@ function phpbb_import_messages()
 
 		foreach( $phpbb_messages as $message )
 		{
-			if( !isset( $users_IDs[ (string) $message->privmsgs_from_userid ] ) )
+			if( !isset( $users_IDs[ (string) $message->from_user_id ] ) )
 			{	// The message has the incorrect user's ID by some reason
-				/*if( !phpbb_import_invalid_user( $message->privmsgs_from_userid, $users_IDs ) )
+				/*if( !phpbb_import_invalid_user( $message->from_user_id, $users_IDs ) )
 				{	// We cannot create invalid user
-					phpbb_log( sprintf( '<br />'.T_('Skipped message: %s. Incorrect user ID: %s. <b>Content:</b> %s'), $message->privmsgs_id, $message->privmsgs_from_userid, substr( $message->privmsgs_subject, 0, 250 ).' ...' ), 'error' );
+					phpbb_log( sprintf( '<br />'.T_('Skipped message: %s. Incorrect user ID: %s. <b>Content:</b> %s'), $message->id, $message->from_user_id, substr( $message->subject, 0, 250 ).' ...' ), 'error' );
 					continue;
 				}*/
 				$phpbb_missing_users++;
-				//phpbb_log( sprintf( '<br />'.T_('Skipped message: %s. Incorrect sender user ID: %s. <b>Content:</b> %s'), $message->privmsgs_id, $message->privmsgs_from_userid, substr( $message->privmsgs_subject, 0, 250 ).' ...' ), 'error', ' ' );
+				//phpbb_log( sprintf( '<br />'.T_('Skipped message: %s. Incorrect sender user ID: %s. <b>Content:</b> %s'), $message->id, $message->from_user_id, substr( $message->subject, 0, 250 ).' ...' ), 'error', ' ' );
 				continue;
 			}
-			if( !isset( $users_IDs[ (string) $message->privmsgs_to_userid ] ) )
+			if( !isset( $users_IDs[ (string) $message->to_user_id ] ) )
 			{	// The message has the incorrect user's ID by some reason
 				$phpbb_missing_users++;
-				//phpbb_log( sprintf( '<br />'.T_('Skipped message: %s. Incorrect reciever user ID: %s. <b>Content:</b> %s'), $message->privmsgs_id, $message->privmsgs_to_userid, substr( $message->privmsgs_subject, 0, 250 ).' ...' ), 'error', ' ' );
+				//phpbb_log( sprintf( '<br />'.T_('Skipped message: %s. Incorrect reciever user ID: %s. <b>Content:</b> %s'), $message->id, $message->to_user_id, substr( $message->subject, 0, 250 ).' ...' ), 'error', ' ' );
 				continue;
 			}
 
 			mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'messaging__thread ( thrd_title, thrd_datemodified )
-					VALUES ( '.$DB->quote( $message->privmsgs_subject ).', '.$DB->quote( date( 'Y-m-d H:i:s', $message->privmsgs_date ) ).' )' );
+					VALUES ( '.$DB->quote( $message->subject ).', '.$DB->quote( date( 'Y-m-d H:i:s', $message->time ) ).' )' );
 
 			$thread_ID = mysqli_insert_id( $DB->dbhandle );
 
@@ -1753,17 +1932,34 @@ function phpbb_import_messages()
  */
 function phpbb_import_messages_texts( $thread_ID, $message )
 {
-	global $DB, $phpbb_DB, $tableprefix;
+	global $DB, $phpbb_DB, $tableprefix, $phpbb_version;
+
+	// Get a path where we should import the message attachments from:
+	$path_attachments = phpbb_get_import_path( 'path_attachments' );
 
 	$SQL = new SQL();
-	$SQL->SELECT( 'm.privmsgs_subject, mt.privmsgs_text, m.privmsgs_date, m.privmsgs_from_userid, m.privmsgs_to_userid, mt.privmsgs_bbcode_uid' );
-	$SQL->FROM( 'BB_privmsgs m' );
-	$SQL->FROM_add( 'LEFT JOIN BB_privmsgs_text mt ON m.privmsgs_id = mt.privmsgs_text_id' );
-	$SQL->WHERE( 'm.privmsgs_subject = '.$DB->quote( 'Re: '.$message->privmsgs_subject ) );
-	$SQL->WHERE_and( 'm.privmsgs_from_userid IN ( '.$DB->quote( $message->privmsgs_from_userid ).', '.$DB->quote( $message->privmsgs_to_userid ).' )' );
-	$SQL->WHERE_and( 'm.privmsgs_to_userid IN ( '.$DB->quote( $message->privmsgs_from_userid ).', '.$DB->quote( $message->privmsgs_to_userid ).' )' );
-	$SQL->ORDER_BY( 'm.privmsgs_date' );
-	$SQL->GROUP_BY( 'm.privmsgs_from_userid, m.privmsgs_to_userid, m.privmsgs_date' );
+	if( $phpbb_version == 3 )
+	{	// pnpBB v3:
+		$SQL->SELECT( 'm.msg_id AS id, m.message_subject AS subject, m.message_text AS text, m.message_time AS time, m.author_id AS from_user_id, mt.user_id AS to_user_id, m.bbcode_uid' );
+		$SQL->FROM( 'BB_privmsgs m' );
+		$SQL->FROM_add( 'INNER JOIN BB_privmsgs_to mt ON m.msg_id = mt.msg_id' );
+		$SQL->WHERE( 'm.message_subject = '.$DB->quote( 'Re: '.$message->subject ) );
+		$SQL->WHERE_and( 'm.author_id IN ( '.$DB->quote( $message->from_user_id ).', '.$DB->quote( $message->to_user_id ).' )' );
+		$SQL->WHERE_and( 'mt.user_id IN ( '.$DB->quote( $message->from_user_id ).', '.$DB->quote( $message->to_user_id ).' )' );
+		$SQL->ORDER_BY( 'm.message_time' );
+		$SQL->GROUP_BY( 'm.author_id, mt.user_id, m.message_time' );
+	}
+	else
+	{	// pnpBB v2:
+		$SQL->SELECT( 'm.privmsgs_id AS id, m.privmsgs_subject AS subject, mt.privmsgs_text AS text, m.privmsgs_date AS time, m.privmsgs_from_userid AS from_user_id, m.privmsgs_to_userid AS to_user_id, mt.privmsgs_bbcode_uid AS bbcode_uid' );
+		$SQL->FROM( 'BB_privmsgs m' );
+		$SQL->FROM_add( 'INNER JOIN BB_privmsgs_text mt ON m.privmsgs_id = mt.privmsgs_text_id' );
+		$SQL->WHERE( 'm.privmsgs_subject = '.$DB->quote( 'Re: '.$message->subject ) );
+		$SQL->WHERE_and( 'm.privmsgs_from_userid IN ( '.$DB->quote( $message->from_user_id ).', '.$DB->quote( $message->to_user_id ).' )' );
+		$SQL->WHERE_and( 'm.privmsgs_to_userid IN ( '.$DB->quote( $message->from_user_id ).', '.$DB->quote( $message->to_user_id ).' )' );
+		$SQL->ORDER_BY( 'm.privmsgs_date' );
+		$SQL->GROUP_BY( 'm.privmsgs_from_userid, m.privmsgs_to_userid, m.privmsgs_date' );
+	}
 	$phpbb_messages = $phpbb_DB->get_results( $SQL->get() );
 
 	$phpbb_messages = array_merge( $phpbb_messages, array( $message ) );
@@ -1774,26 +1970,26 @@ function phpbb_import_messages_texts( $thread_ID, $message )
 	$threadstatus_import_data = array();
 	foreach( $phpbb_messages as $message )
 	{
-		if( !isset( $users_IDs[ $message->privmsgs_from_userid ] ) || !isset( $users_IDs[ $message->privmsgs_to_userid ] ) )
+		if( !isset( $users_IDs[ $message->from_user_id ] ) || !isset( $users_IDs[ $message->to_user_id ] ) )
 		{	// No users
 			continue;
 		}
 
-		$message_import_data[] = '( '.
-				$DB->quote( $users_IDs[ $message->privmsgs_from_userid ] ).', '.
-				$DB->quote( date( 'Y-m-d H:i:s', $message->privmsgs_date ) ).', '.
+		$message_import_data[ $message->id ] = '( '.
+				$DB->quote( $users_IDs[ $message->from_user_id ] ).', '.
+				$DB->quote( date( 'Y-m-d H:i:s', $message->time ) ).', '.
 				$DB->quote( $thread_ID ).', '.
-				$DB->quote( phpbb_decode_bbcode( $message->privmsgs_text, $message->privmsgs_bbcode_uid ) ).', '.
+				$DB->quote( phpbb_decode_bbcode( $message->text, $message->bbcode_uid ) ).', '.
 				'\'default\''.
 			' )';
-		$threadstatus_import_data[ $message->privmsgs_to_userid ] = '( '.
+		$threadstatus_import_data[ $message->to_user_id ] = '( '.
 				$DB->quote( $thread_ID ).', '.
-				$DB->quote( $users_IDs[ $message->privmsgs_to_userid ] ).', '.
+				$DB->quote( $users_IDs[ $message->to_user_id ] ).', '.
 				'NULL'.
 			' )';
-		$threadstatus_import_data[ $message->privmsgs_from_userid ] = '( '.
+		$threadstatus_import_data[ $message->from_user_id ] = '( '.
 				$DB->quote( $thread_ID ).', '.
-				$DB->quote( $users_IDs[ $message->privmsgs_from_userid ] ).', '.
+				$DB->quote( $users_IDs[ $message->from_user_id ] ).', '.
 				'NULL'.
 			' )';
 	}
@@ -1801,7 +1997,26 @@ function phpbb_import_messages_texts( $thread_ID, $message )
 	mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'messaging__message ( msg_author_user_ID, msg_datetime, msg_thread_ID, msg_text, msg_renderers )
 			VALUES '.implode( ', ', $message_import_data ) );
 
-	mysql_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'messaging__threadstatus ( tsta_thread_ID, tsta_user_ID, tsta_first_unread_msg_ID )
+	$msg_ID = mysqli_insert_id( $DB->dbhandle );
+
+	if( $path_attachments )
+	{	// If attachments should be inserted
+		// Get IDs of the last inserted messages in single query above:
+		$last_inserted_msg_IDs = phpbb_get_last_inserted_IDs( $tableprefix.'messaging__message', 'msg_ID', count( $message_import_data ) );
+
+		$m = 0;
+		foreach( $message_import_data as $message_id => $insert_data )
+		{	// Import attachments of the inserted private message:
+			phpbb_import_attachments( 'msg', $path_attachments, $message_id, $last_inserted_msg_IDs[ $m ] );
+			$m++;
+		}
+	}
+	else
+	{	// Count missing attachments of the imported messages if the path is not correct:
+		phpbb_count_missing_attachments( array_keys( $message_import_data ) );
+	}
+
+	mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'messaging__threadstatus ( tsta_thread_ID, tsta_user_ID, tsta_first_unread_msg_ID )
 			VALUES '.implode( ', ', $threadstatus_import_data ) );
 
 	return count( $message_import_data );
@@ -1828,6 +2043,10 @@ function phpbb_clear_temporary_data()
 	phpbb_unset_var( 'topics_count_imported' );
 	phpbb_unset_var( 'replies_count_imported' );
 	phpbb_unset_var( 'messages_count_imported' );
+	phpbb_unset_var( 'attachments_count_imported' );
+	phpbb_unset_var( 'attachments_count_missing' );
+	phpbb_unset_var( 'avatars_count_imported' );
+	phpbb_unset_var( 'avatars_count_missing' );
 }
 
 
@@ -1838,23 +2057,33 @@ function phpbb_clear_temporary_data()
  */
 function phpbb_forums_list( & $Form )
 {
-	global $phpbb_DB, $phpbb_subforums_list_level;
+	global $phpbb_DB, $phpbb_subforums_list_level, $phpbb_version;
 
 	$phpbb_DB->begin();
 
-	// Get the categories from phpbb database
-	$cats_SQL = new SQL();
-	$cats_SQL->SELECT( 'cat_id, cat_title' );
-	$cats_SQL->FROM( 'BB_categories' );
-	$cats_SQL->ORDER_BY( 'cat_order' );
+	// Get the categories from phpbb database:
+	if( $phpbb_version == 3 )
+	{	// pnpBB v3:
+		$cats_SQL = new SQL();
+		$cats_SQL->SELECT( 'forum_id AS cat_id, forum_name AS cat_title' );
+		$cats_SQL->FROM( 'BB_forums' );
+		$cats_SQL->WHERE( 'parent_id = 0' );
+		$cats_SQL->ORDER_BY( 'right_id' );
+	}
+	else
+	{	// pnpBB v2:
+		$cats_SQL = new SQL();
+		$cats_SQL->SELECT( 'cat_id, cat_title' );
+		$cats_SQL->FROM( 'BB_categories' );
+		$cats_SQL->ORDER_BY( 'cat_order' );
+	}
 	$categories = $phpbb_DB->get_results( $cats_SQL->get() );
 
 	$import_categories = phpbb_get_var( 'import_categories' );
 	foreach( $categories as $category )
 	{
 		$Form->checkbox_input( 'phpbb_categories[]', !is_array( $import_categories ) || in_array( $category->cat_id, $import_categories ), '', array(
-				'input_prefix' => '<label>',
-				'input_suffix' => ' '.$category->cat_title.'</label>',
+				'input_suffix' => $category->cat_title,
 				'value' => $category->cat_id
 			) );
 
@@ -1918,27 +2147,47 @@ function phpbb_forums_list( & $Form )
  */
 function phpbb_subforums_list( & $Form, $cat_id, $forum_parent_id = 0 )
 {
-	global $phpbb_DB, $phpbb_subforums_list_level;
+	global $phpbb_DB, $phpbb_subforums_list_level, $phpbb_version;
 
-	// Get the forums from phpbb database
+	// Get the forums from phpbb database:
 	$forums_SQL = new SQL();
 	$forums_SQL->SELECT( 'f.forum_id, f.forum_name' );
 	$forums_SQL->FROM( 'BB_forums f' );
-	$forums_SQL->FROM_add( 'LEFT JOIN BB_categories c ON f.cat_id = c.cat_id' );
-	if( $cat_id > 0 )
-	{	// Get all top forums of the category
-		$forums_SQL->WHERE( 'f.cat_id = '.$phpbb_DB->quote( $cat_id ) );
-		$forums_SQL->WHERE_AND( 'f.forum_parent = 0' );
-	}
-	elseif( $forum_parent_id > 0 )
-	{	// Get subforums
-		$forums_SQL->WHERE( 'f.forum_parent = '.$phpbb_DB->quote( $forum_parent_id ) );
+	if( $phpbb_version == 3 )
+	{	// pnpBB v3:
+		$forums_SQL->FROM_add( 'LEFT JOIN BB_forums f2 ON f.parent_id = f2.forum_id' );
+		if( $cat_id > 0 )
+		{	// Get all top forums of the category:
+			$forums_SQL->WHERE( 'f.parent_id = '.$phpbb_DB->quote( $cat_id ) );
+		}
+		elseif( $forum_parent_id > 0 )
+		{	// Get subforums:
+			$forums_SQL->WHERE( 'f.parent_id = '.$phpbb_DB->quote( $forum_parent_id ) );
+		}
+		else
+		{	// Wrong a call of this function
+			return;
+		}
+		$forums_SQL->ORDER_BY( 'f2.right_id, f.right_id' );
 	}
 	else
-	{	// Wrong a call of this function
-		return;
+	{	// pnpBB v2:
+		$forums_SQL->FROM_add( 'LEFT JOIN BB_categories c ON f.cat_id = c.cat_id' );
+		if( $cat_id > 0 )
+		{	// Get all top forums of the category:
+			$forums_SQL->WHERE( 'f.cat_id = '.$phpbb_DB->quote( $cat_id ) );
+			$forums_SQL->WHERE_AND( 'f.forum_parent = 0' );
+		}
+		elseif( $forum_parent_id > 0 )
+		{	// Get subforums:
+			$forums_SQL->WHERE( 'f.forum_parent = '.$phpbb_DB->quote( $forum_parent_id ) );
+		}
+		else
+		{	// Wrong a call of this function
+			return;
+		}
+		$forums_SQL->ORDER_BY( 'c.cat_order, f.forum_order' );
 	}
-	$forums_SQL->ORDER_BY( 'c.cat_order, f.forum_order' );
 	$forums = $phpbb_DB->get_results( $forums_SQL->get() );
 
 	if( count( $forums ) == 0 )
@@ -1955,10 +2204,9 @@ function phpbb_subforums_list( & $Form, $cat_id, $forum_parent_id = 0 )
 	foreach( $forums as $forum )
 	{	// Display forums
 		$Form->checkbox_input( 'phpbb_forums[]', !is_array( $import_forums ) || in_array( $forum->forum_id, $import_forums ), '', array(
-				'input_prefix' => '<label>',
-				'input_suffix' => ' '.$forum->forum_name.'</label>',
+				'input_prefix' => '<span style="margin-left:'.( $phpbb_subforums_list_level * 20 ).'px">',
+				'input_suffix' => ' '.$forum->forum_name.'</span>',
 				'value' => $forum->forum_id,
-				'style' => 'margin-left:'.( $phpbb_subforums_list_level * 20 ).'px',
 			) );
 		phpbb_subforums_list( $Form, 0, $forum->forum_id );
 	}
@@ -1970,35 +2218,452 @@ function phpbb_subforums_list( & $Form, $cat_id, $forum_parent_id = 0 )
 
 
 /**
+ * Get config value from phpBB DB
+ *
+ * @param string Config name
+ * @return string Config value
+ */
+function phpbb_get_config( $name )
+{
+	global $phpbb_DB, $phpbb_config;
+	
+	if( ! is_array( $phpbb_config ) )
+	{	// Initialize config array only first time:
+		$phpbb_config = array();
+	}
+
+	if( ! isset( $phpbb_config[ $name ] ) )
+	{	// Get value only first time and store in cache array:
+		$SQL = new SQL( 'Get phpBB config value of "'.$name.'" from DB' );
+		$SQL->SELECT( 'config_value' );
+		$SQL->FROM( 'BB_config' );
+		$SQL->WHERE( 'config_name = '.$phpbb_DB->quote( $name ) );
+		$phpbb_config[ $name ] = $phpbb_DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
+	}
+
+	return $phpbb_config[ $name ];
+}
+
+
+/**
+ * Get a path of import files
+ *
+ * @param string Path var name: 'path_avatars', 'path_attachments'
+ */
+function phpbb_get_import_path( $path_var_name )
+{
+	$path_avatars = phpbb_get_var( $path_var_name );
+
+	if( ! empty( $path_avatars ) )
+	{
+		$path_avatars = preg_replace( '/(\/|\\\\)$/i', '', $path_avatars ).'/';
+		if( ! empty( $path_avatars ) && file_exists( $path_avatars ) && is_dir( $path_avatars ) )
+		{	// Folder with files is correct, we can import them:
+			return $path_avatars;
+		}
+	}
+
+	return false;
+}
+
+
+/**
  * Import user's avatar
  *
+ * @param object User (from phpBB)
  * @param integer User ID (from b2evo)
  * @param string Path avatars
- * @param string File name of user's avatar
+ * @return boolean TRUE on successful importing or if user has no avatar, FALSE on error
  */
-function phpbb_import_avatar( $user_ID, $path_avatars, $user_avatar )
+function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
+{
+	global $DB, $tableprefix, $phpbb_version;
+
+	$user_avatar = $phpbb_user->user_avatar;
+
+	if( empty( $user_avatar ) )
+	{	// User has no avatar, Don't try to import:
+		return true;
+	}
+
+	if( empty( $path_avatars ) )
+	{	// Only count what missing avatars if the path is not correct:
+		phpbb_log( sprintf( T_( 'Impossible to copy avatar file of the user #%s(%s) because the source for avatars %s is wrong.' ),
+			$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.phpbb_get_var( 'path_avatars' ).'</code>' ), 'error', ' ', '<br />' );
+		phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
+		return false;
+	}
+
+	if( $phpbb_version == 3 )
+	{	// phpBB v3:
+		if( preg_match( '#^https?://#', $phpbb_user->user_avatar ) )
+		{	// The avatar file is loaded from remoter url:
+			$avatar_file_type = 'url';
+			$avatar_file_url = $phpbb_user->user_avatar;
+		}
+		else
+		{	// The avatar file is located on the disk:
+			$avatar_file_type = 'file';
+			$avatar_extension = preg_replace( '#^[^\.]+(\.[a-z]+)$#i', '$1', $phpbb_user->user_avatar );
+			$avatar_file_name = phpbb_get_config( 'avatar_salt' ).'_'.$phpbb_user->user_id.$avatar_extension;
+			$avatar_file_path = $path_avatars.$avatar_file_name;
+		}
+	}
+	else
+	{	// phpBB v2:
+		$avatar_file_type = 'file';
+		$avatar_file_name = $phpbb_user->user_avatar;
+		$avatar_file_path = $path_avatars.$avatar_file_name;
+	}
+
+	if( $avatar_file_type == 'url' )
+	{	// Try to get a file from remote url:
+		$avatar_file_content = fetch_remote_page( $avatar_file_url, $avatar_file_url_info );
+		if( $avatar_file_content === false )
+		{	// Some server restriction to get files from remote server:
+			$avatar_file_url_error = ' '.sprintf( T_('Error: %s'), $avatar_file_url_info['message'] )
+				.'; '.sprintf( T_('Status code: %s'), $avatar_file_url_info['status'] );
+			phpbb_log( sprintf( T_( 'Impossible to get avatar file of the user #%s(%s) because your server has a restriction to get avatar file from remote url %s.' ),
+				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>' ).$avatar_file_url_error, 'error', ' ', '<br />' );
+			// Update the count of missing avatars:
+			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
+			return false;
+		}
+		if( empty( $avatar_file_url_info['mimetype'] ) || ! in_array( $avatar_file_url_info['mimetype'], array( 'image/gif', 'image/jpeg', 'image/png' ) ) )
+		{	// Wrong image type of remote url:
+			phpbb_log( sprintf( T_( 'Impossible to get avatar file of the user #%s(%s) because wrong image type of the remote avatar file %s.' ),
+				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>' ), 'error', ' ', '<br />' );
+			// Update the count of missing avatars:
+			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
+			return false;
+		}
+		switch( $avatar_file_url_info['mimetype'] )
+		{
+			case 'image/gif':
+				$avatar_extension = 'gif';
+				break;
+			case 'image/jpeg':
+				$avatar_extension = 'jpg';
+				break;
+			case 'image/png':
+				$avatar_extension = 'png';
+				break;
+		}
+	}
+	else
+	{	// Check if the avatar file really exists on the disk:
+		if( ! file_exists( $avatar_file_path ) )
+		{	// Display an error if avatar file is not found on the disk:
+			phpbb_log( sprintf( T_( 'Avatar file of the user #%s(%s) is not found on %s.' ),
+				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_path.'</code>' ), 'error', ' ', '<br />' );
+			// Update the count of missing avatars:
+			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
+			return false;
+		}
+	}
+
+	// Get File Root of user:
+	$FileRootCache = & get_FileRootCache();
+	$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $user_ID );
+
+	if( $avatar_file_type == 'url' )
+	{	// Create avatar file from remote url:
+		$avatar_file_name = phpbb_get_config( 'avatar_salt' ).'_'.$phpbb_user->user_id.'.'.$avatar_extension;
+		$user_File = new File( 'user', $user_ID, 'profile_pictures/'.$avatar_file_name );
+		if( ! $user_File->create() ||
+		    ! ( $avatar_file_handle = fopen( $user_File->_adfp_full_path, 'w' ) ) )
+		{	// Impossible to create new file:
+			phpbb_log( sprintf( T_( 'Impossible to create new avatar file of the user #%s(%s) from the remote url %s on %s.' ),
+				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>', '<code>'.$user_File->_adfp_full_path.'</code>' ), 'error', ' ', '<br />' );
+			// Update the count of missing avatars:
+			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
+			return false;
+		}
+		// Write a content of remote avatar to local file on disk:
+		fwrite( $avatar_file_handle, $avatar_file_content );
+		fclose( $avatar_file_handle );
+
+		$imported_file_ID = $user_File->ID;
+
+		if( empty( $imported_file_ID ) )
+		{	// Display an error if there is some error on copying the avatar file:
+			phpbb_log( sprintf( T_( 'Impossible to save avatar file of the user #%s(%s) from the remote url %s in DB.' ),
+				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>' ), 'error', ' ', '<br />' );
+			// Update the count of missing avatars:
+			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
+			return false;
+		}
+	}
+	else
+	{	// Copy avatar file to user media folder:
+		$imported_file_ID = copy_file( $avatar_file_path, $user_FileRoot->ID, 'profile_pictures', false );
+
+		if( empty( $imported_file_ID ) )
+		{	// Display an error if there is some error on copying the avatar file:
+			phpbb_log( sprintf( T_( 'Impossible to copy avatar file of the user #%s(%s) from %s to %s, please check file rights of the files and folders.' ),
+				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_path.'</code>', '<code>'.$user_FileRoot->ads_path.'</code>' ), 'error', ' ', '<br />' );
+			// Update the count of missing avatars:
+			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
+			return false;
+		}
+	}
+
+	// Update user's avatar:
+	$result = mysqli_query( $DB->dbhandle, 'UPDATE '.$tableprefix.'users
+				SET user_avatar_file_ID = '.$DB->quote( $imported_file_ID ).'
+			WHERE user_ID = '.$DB->quote( $user_ID ).'
+				AND user_avatar_file_ID IS NULL' );
+
+	if( $result )
+	{	// Insert a link with new file:
+		global $localtimenow;
+		$result = mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'links
+						 ( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_usr_ID, link_file_ID, link_position, link_order )
+			VALUES ( '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $imported_file_ID ).', "aftermore", 1 )' );
+	}
+
+	if( $result )
+	{	// Update the count of imported avatars:
+		phpbb_set_var( 'avatars_count_imported', phpbb_get_var( 'avatars_count_imported' ) + 1 );
+		return true;
+	}
+	else
+	{	// Some mysql error:
+		// Note: do NOT translate the string below, because such error must not occurs on correct DB working, so it is system error and only admin can solve this:
+		phpbb_log( sprintf( 'Error on DB storing record of the importing avatar file of the user #%s(%s) from %s (Error: %s).',
+			$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.( isset( $avatar_file_path ) ? $avatar_file_path : $avatar_file_url ).'</code>', '<code>'.mysqli_error( $DB->dbhandle ).'</code>' ), 'error', ' ', '<br />' );
+		// Update the count of missing avatars:
+		phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
+		return false;
+	}
+}
+
+
+/**
+ * Import attachments of topic, reply or private message
+ *
+ * @param string Target type: 'itm', 'cmt', 'msg'
+ * @param string Attachments path
+ * @param integer ID of topic, reply or private message (from phpBB DB)
+ * @param integer ID of topic, reply or private message (from b2evolution DB)
+ * @return boolean TRUE on successful importing, FALSE on error
+ */
+function phpbb_import_attachments( $target_type, $path_attachments, $target_ID, $new_object_ID )
+{
+	if( empty( $path_attachments ) )
+	{	// Only count what missing attachments if the path is not correct:
+		phpbb_count_missing_attachments( $target_ID );
+		// Display an error to inform user about missing attachments:
+		phpbb_log( sprintf( T_( 'Impossible to copy attachment of #%s because the source for attachments %s is wrong.' ),
+			$target_ID, '<code>'.phpbb_get_var( 'path_attachments' ).'</code>' ), 'error', ' ', '<br />' );
+		phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
+		return false;
+	}
+	else
+	{	// Do the import if the path is correct:
+
+		// Generate new data of insert query:
+		$attachments_insert_data = phpbb_get_attachments_insert_data( $target_type, $path_attachments, $target_ID, $new_object_ID );
+
+		// Insert the links in DB:
+		return phpbb_insert_attachments( $target_type, $attachments_insert_data );
+	}
+}
+
+
+/**
+ * Count the missing attachments of topic, reply or private message
+ *
+ * @param array IDs of topic, reply or private message (from phpBB DB)
+ */
+function phpbb_count_missing_attachments( $target_IDs )
+{
+	global $phpbb_DB;
+
+	if( empty( $target_IDs ) )
+	{	// No targets, Don't count:
+		return;
+	}
+
+	$attachments_count_missing = phpbb_get_var( 'attachments_count_missing' );
+
+	// Get how much attachments have the targets:
+	$targets_missing_count = $phpbb_DB->get_var( 'SELECT COUNT( attach_id )
+		 FROM BB_attachments
+		WHERE post_msg_id IN ( '.$phpbb_DB->quote( $target_IDs ).' )' );
+
+	// Update the count of imported/missing attachments:
+	phpbb_set_var( 'attachments_count_missing', $attachments_count_missing + $targets_missing_count );
+}
+
+
+/**
+ * Insert attachments of topic, reply or private message
+ *
+ * @param string Target type: 'itm', 'cmt', 'msg'
+ * @param array|NULL Array of insert data or NULL to generate new
+ * @return boolean
+ */
+function phpbb_insert_attachments( $target_type, $attachments_insert_data )
 {
 	global $DB, $tableprefix;
 
-	if( !empty( $user_avatar ) && file_exists( $path_avatars.$user_avatar ) )
-	{	// Import user's avatar
-		$FileRootCache = & get_FileRootCache();
-		$root_ID = FileRoot::gen_ID( 'user', $user_ID );
-
-		$imported_file_ID = copy_file( $path_avatars.$user_avatar, $root_ID, 'profile_pictures', false );
-		if( !empty( $imported_file_ID ) )
-		{	// Update user's avatar
-			mysqli_query( $DB->dbhandle, 'UPDATE '.$tableprefix.'users
-					  SET user_avatar_file_ID = '.$DB->quote( $imported_file_ID ).'
-					WHERE user_ID = '.$DB->quote( $user_ID ).'
-					  AND user_avatar_file_ID IS NULL' );
-			// Insert a link with new file
-			global $localtimenow;
-			mysql_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'links
-				       ( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_usr_ID, link_file_ID )
-				VALUES ( '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $imported_file_ID ).' )' );
-		}
+	if( empty( $attachments_insert_data ) )
+	{	// Nothing to insert, Exit here:
+		return true;
 	}
+
+	$attachments_count_imported = phpbb_get_var( 'attachments_count_imported' );
+	$attachments_count_missing = phpbb_get_var( 'attachments_count_missing' );
+
+	// Execute a query to insert the links:
+	$r = mysqli_query( $DB->dbhandle, 'INSERT INTO '.$tableprefix.'links
+					 ( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_'.$target_type.'_ID, link_file_ID, link_position, link_order )
+		VALUES '.implode( ', ', $attachments_insert_data ) );
+
+	if( $r )
+	{	// Increase a count of the imported attachments:
+		$attachments_count_imported += mysqli_affected_rows( $DB->dbhandle );
+	}
+	else
+	{	// Some mysql error:
+		$attachments_count_missing += count( $attachments_insert_data );
+		// Note: do NOT translate the string below, because such error must not occurs on correct DB working, so it is system error and only admin can solve this:
+		phpbb_log( sprintf( 'Error on DB storing record of the importing attachment of "%s" (Error: %s, Data: %s).',
+			$target_type, '<code>'.mysqli_error( $DB->dbhandle ).'</code>', '<code>'.implode( ', ', $attachments_insert_data ).'</code>' ), 'error', ' ', '<br />' );
+	}
+
+	// Update the count of imported/missing attachments:
+	phpbb_set_var( 'attachments_count_imported', $attachments_count_imported );
+	phpbb_set_var( 'attachments_count_missing', $attachments_count_missing );
+
+	return $r;
+}
+
+
+/**
+ * Get data for an insert SQL query statement of attachments of topic, reply or private message
+ *
+ * @param string Target type: 'itm', 'cmt', 'msg'
+ * @param string Attachments path
+ * @param integer ID of topic, reply or private message (from phpBB DB)
+ * @param integer ID of topic, reply or private message (from b2evolution DB)
+ * @return array
+ */
+function phpbb_get_attachments_insert_data( $target_type, $path_attachments, $target_ID, $new_object_ID )
+{
+	global $DB, $phpbb_DB, $tableprefix, $phpbb_version, $localtimenow;
+
+	if( $phpbb_version != 3 )
+	{	// This function is only for phpBB3:
+		return array();
+	}
+
+	$attachments = $phpbb_DB->get_results( 'SELECT poster_id, physical_filename, real_filename
+		 FROM BB_attachments
+		WHERE post_msg_id = '.$phpbb_DB->quote( $target_ID ) );
+
+	if( empty( $attachments ) )
+	{	// This target has no attachment:
+		return array();
+	}
+
+	$users_IDs = phpbb_table_get_links( 'users' );
+
+	$FileRootCache = & get_FileRootCache();
+	$FileCache = & get_FileCache();
+
+	$attachments_count_missing = phpbb_get_var( 'attachments_count_missing' );
+
+	$attachments_insert_data = array();
+
+	$link_order = 1;
+	foreach( $attachments as $attachment )
+	{
+		if( ! file_exists( $path_attachments.$attachment->physical_filename ) )
+		{	// If physical file(like "2_1888733359c9d121321b5cfbe93ba714") doesn't exist then try to use file with real name(like "image.jpg")
+			if( ! file_exists( $path_attachments.$attachment->real_filename ) )
+			{	// The file with real name doesn't exist too, Skip this attachment:
+				$attachments_count_missing++;
+				// Display an error to inform user about the missing attachment:
+				phpbb_log( sprintf( T_( 'Attachment of the object #%s(%s) is not found on %s or %s.' ),
+					$target_ID, $target_type, '<code>'.$path_attachments.$attachment->physical_filename.'</code>', '<code>'.$path_attachments.$attachment->real_filename.'</code>' ), 'error', ' ', '<br />' );
+				continue;
+			}
+			else
+			{	// Use file with real name instead of physical:
+				$attachment->physical_filename = $attachment->real_filename;
+			}
+		}
+
+		if( ! $users_IDs[ (string) $attachment->poster_id ] )
+		{	// Wrong file author:
+			$attachments_count_missing++;
+			// Display an error to inform user about the missing attachment:
+			phpbb_log( sprintf( T_( 'Impossible to import attachment of the object #%s(%s) because file author could not be detected by id #%s.' ),
+				$target_ID, $target_type, $attachment->poster_id ), 'error', ' ', '<br />' );
+			continue;
+		}
+
+		$author_ID = $users_IDs[ (string) $attachment->poster_id ];
+
+		$FileRootCache = & get_FileRootCache();
+
+		if( $target_type == 'msg' )
+		{	// Get root for private messages:
+			$object_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $author_ID );
+			$root_path = 'private_message/pm'.$new_object_ID;
+			$link_position = 'inline';
+		}
+		else
+		{	// Get root for topics and replies:
+			$object_FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', phpbb_get_var( 'blog_ID' ) );
+			$root_path = 'quick-uploads/'.( $target_type == 'itm' ? 'p' : 'c' ).$new_object_ID;
+			$link_position = 'aftermore';
+		}
+
+		// Try to rename file to real name because b2evo function copy_file() has a restriciton for not allowed extenssions:
+		if( $attachment->physical_filename != $attachment->real_filename &&
+		    ! @rename( $path_attachments.$attachment->physical_filename, $path_attachments.$attachment->real_filename ) )
+		{	// Impossible to rename file from phpBB format like "2_1df806e219313f4432b82040685b8ff1" to real file name with extension, Skip it:
+			$attachments_count_missing++;
+			// Display an error to inform user about the missing attachment:
+			phpbb_log( sprintf( T_( 'Impossible to rename attachment of the object #%s(%s) from physical file name %s to real %s.' ),
+				$target_ID, $target_type, '<code>'.$path_attachments.$attachment->physical_filename.'</code>', '<code>'.$path_attachments.$attachment->real_filename.'</code>' ), 'error', ' ', '<br />' );
+			continue;
+		}
+
+		// Copy a file from phpBB attachments folder to b2evolution media folder:
+		$imported_file_ID = copy_file( $path_attachments.$attachment->real_filename, $object_FileRoot->ID, $root_path, false );
+		if( empty( $imported_file_ID ) )
+		{	// Impossible to copy the file:
+			$attachments_count_missing++;
+			// Display an error to inform user about the missing attachment:
+			phpbb_log( sprintf( T_( 'Impossible to copy attachment of the object #%s(%s) from %s to the folder %s, please check system log and file rights of the files and folders.' ),
+				$target_ID, $target_type, '<code>'.$path_attachments.$attachment->real_filename.'</code>', '<code>'.$object_FileRoot->ads_path.$root_path.'</code>' ), 'error', ' ', '<br />' );
+		}
+
+		if( $attachment->physical_filename != $attachment->real_filename )
+		{	// Rename file back from real name to physical name like 2_1888733359c9d121321b5cfbe93ba714,
+			// to avoid files missing because some files can have same real file names:
+			@rename( $path_attachments.$attachment->real_filename, $path_attachments.$attachment->physical_filename );
+		}
+
+		if( empty( $imported_file_ID ) )
+		{	// Skip this if file could not be copied,
+			// NOTE: Run this after back renaming to avoid file rewriting from another object:
+			continue;
+		}
+
+		// Initialize a part for VALUES of SQL query to insert a link with new file,
+		// For SQL "INSERT INTO links ( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_'.$target_type.'_ID, link_file_ID, link_position, link_order )":
+		$attachments_insert_data[] = '( '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ).', '.$DB->quote( $author_ID ).', '.$DB->quote( $author_ID ).', '.$DB->quote( $new_object_ID ).', '.$DB->quote( $imported_file_ID ).', "'.$link_position.'", '.( $link_order++ ).' )';
+	}
+
+	// Update the count of missing attachments:
+	phpbb_set_var( 'attachments_count_missing', $attachments_count_missing );
+
+	return $attachments_insert_data;
 }
 
 
@@ -2033,14 +2698,14 @@ function phpbb_check_step( $step_name )
 	else if( empty( $steps_levels[ $current_step ] ) )
 	{	// Invalid current step name!
 		return false;
-	}
+	}/*
 	else if( $steps_levels[ $step_name ] <= $steps_levels[ $current_step ] )
 	{	// User tries open previous step that already been processed
 		phpbb_log( T_('This import step has already been processed.'), 'error', ' ' );
 		// Continue button
 		// echo '<input type="submit" class="SaveButton" value="'.( $steps_levels[ $step_name ] < max( $steps_levels ) ? T_('Continue!') : T_('Go to Forum') ).'" name="submit" />';
 		return false;
-	}
+	}*/
 
 	// Save step name in the Sessions
 	phpbb_set_var( 'current_step', $step_name, true );
@@ -2068,5 +2733,28 @@ function phpbb_display_steps( $current_step )
 		);
 
 	echo get_tool_steps( $steps, $current_step );
+}
+
+
+/**
+ * Get last inserted IDs
+ *
+ * @param string Table name
+ * @param string ID field name
+ * @param integer Number of last records
+ * @return array
+ */
+function phpbb_get_last_inserted_IDs( $table_name, $ID_field_name, $limit )
+{
+	global $DB;
+
+	$SQL = new SQL( 'Get IDs of last '.$limit.' inserted records in the table '.$table_name );
+	$SQL->SELECT( $ID_field_name );
+	$SQL->FROM( $table_name );
+	$SQL->ORDER_BY( $ID_field_name.' DESC' );
+	$SQL->LIMIT( $limit );
+	$last_inserted_IDs = $DB->get_col( $SQL->get(), 0, $SQL->title );
+
+	return array_reverse( $last_inserted_IDs );
 }
 ?>

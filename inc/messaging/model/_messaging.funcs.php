@@ -451,61 +451,63 @@ function get_message_params_from_session()
 
 
 /**
- * Get threads recipients SQL
+ * Get status icons to get what recipients read, unread and left the thread
  *
  * @param integer Thread ID
- * @return SQL object
+ * @param string Status: 'read', 'unread', 'left'
+ * @return string HTML code of the status icons
  */
-function get_threads_recipients_sql( $thread_ID = 0 )
+function get_thread_recipient_status_icons( $thread_ID, $status )
 {
-	global $perm_abuse_management, $current_User;
+	global $DB, $perm_abuse_management, $current_User;
 
-	$read_user_sql_limit = '';
-	$unread_user_sql_limit = '';
-	$left_user_sql_limit = '';
+	$result = '';
+
+	switch( $status )
+	{
+		case 'read':
+			// Get "READ" recipients:
+			$sql_title = 'Get list of users who read the last message in the thread #'.$thread_ID;
+			$sql_status_condition = 'tsr.tsta_thread_leave_msg_ID IS NULL AND tsr.tsta_first_unread_msg_ID IS NULL';
+			$imgtag_status = true;
+			break;
+		case 'unread':
+			// Get "UNREAD" recipients:
+			$sql_title = 'Get list of users who have not read the last message in the thread #'.$thread_ID;
+			$sql_status_condition = 'tsr.tsta_thread_leave_msg_ID IS NULL AND tsr.tsta_first_unread_msg_ID IS NOT NULL';
+			$imgtag_status = false;
+			break;
+		case 'left':
+			// Get "LEFT" recipients:
+			$sql_title = 'Get list of users who left the thread #'.$thread_ID;
+			$sql_status_condition = 'tsr.tsta_thread_leave_msg_ID IS NOT NULL';
+			$imgtag_status = 'left';
+			break;
+		default:
+			// Die on wrong request:
+			die( 'Wrong status for get_thread_recipient_status_icons()' );
+	}
+
+	$SQL = new SQL( $sql_title );
+	$SQL->SELECT( 'DISTINCT user_login' );
+	$SQL->FROM( 'T_messaging__threadstatus ts' );
+	$SQL->FROM_add( 'INNER JOIN T_messaging__threadstatus tsr ON ts.tsta_thread_ID = tsr.tsta_thread_ID AND '.$sql_status_condition );
+	$SQL->WHERE( 'ts.tsta_thread_ID = '.$thread_ID );
+	$SQL->FROM_add( 'INNER JOIN T_users ON tsr.tsta_user_ID = user_ID' );
 	if( ! $perm_abuse_management )
-	{	// Non abuse management
-		$read_user_sql_limit = ' AND ur.user_ID <> '.$current_User->ID;
-		$unread_user_sql_limit = ' AND uu.user_ID <> '.$current_User->ID;
-		$left_user_sql_limit = ' AND ul.user_ID <> '.$current_User->ID;
+	{	// If non abuse management
+		// Exclude current user from list:
+		$SQL->FROM_add( 'AND user_ID <> '.$current_User->ID );
+		// Get messages only of current user:
+		$SQL->WHERE_and( 'ts.tsta_user_ID = '.$current_User->ID );
+	}
+	$user_logins = $DB->get_col( $SQL->get(), 0, $SQL->title );
+	if( ! empty( $user_logins ) )
+	{	// Display status icons if at least one user is found for the requested status:
+		$result .= get_avatar_imgtags( $user_logins, false, false, 'crop-top-15x15', '', '', $imgtag_status, false );
 	}
 
-	$recipients_SQL = new SQL();
-
-	$recipients_SQL->SELECT( 'ts.tsta_thread_ID AS thr_ID,
-								GROUP_CONCAT(DISTINCT ur.user_login ORDER BY ur.user_login SEPARATOR \', \') AS thr_read,
-								GROUP_CONCAT(DISTINCT uu.user_login ORDER BY uu.user_login SEPARATOR \', \') AS thr_unread,
-								GROUP_CONCAT(DISTINCT ul.user_login ORDER BY ul.user_login SEPARATOR \', \') AS thr_left' );
-
-	$recipients_SQL->FROM( 'T_messaging__threadstatus ts
-								LEFT OUTER JOIN T_messaging__threadstatus tsr
-									ON ts.tsta_thread_ID = tsr.tsta_thread_ID AND tsr.tsta_first_unread_msg_ID IS NULL
-										AND tsr.tsta_thread_leave_msg_ID IS NULL
-								LEFT OUTER JOIN T_users ur
-									ON tsr.tsta_user_ID = ur.user_ID'.$read_user_sql_limit.'
-								LEFT OUTER JOIN T_messaging__threadstatus tsu
-									ON ts.tsta_thread_ID = tsu.tsta_thread_ID AND tsu.tsta_first_unread_msg_ID IS NOT NULL
-										AND tsu.tsta_thread_leave_msg_ID IS NULL
-								LEFT OUTER JOIN T_users uu
-									ON tsu.tsta_user_ID = uu.user_ID'.$unread_user_sql_limit.'
-								LEFT OUTER JOIN T_messaging__threadstatus tsl
-									ON ts.tsta_thread_ID = tsl.tsta_thread_ID AND tsl.tsta_thread_leave_msg_ID IS NOT NULL
-								LEFT OUTER JOIN T_users ul
-									ON tsl.tsta_user_ID = ul.user_ID'.$left_user_sql_limit );
-
-	if( $thread_ID > 0 )
-	{	// Limit with thread ID
-		$recipients_SQL->WHERE( 'ts.tsta_thread_ID = '.$thread_ID );
-	}
-
-	if( ! $perm_abuse_management )
-	{	// Get a messages only of current user
-		$recipients_SQL->WHERE_and( 'ts.tsta_user_ID ='.$current_User->ID );
-	}
-
-	$recipients_SQL->GROUP_BY( 'ts.tsta_thread_ID' );
-
-	return $recipients_SQL;
+	return $result;
 }
 
 
@@ -2211,40 +2213,26 @@ function col_thread_date( $date, $show_only_date )
  */
 function col_thread_read_by( $thread_ID )
 {
-	global $DB;
+	// Get "READ" recipients:
+	$result = get_thread_recipient_status_icons( $thread_ID, 'read' );
 
-	// Select read/unread users for this thread
-	$recipients_SQL = get_threads_recipients_sql( $thread_ID );
+	if( ! empty( $result ) )
+	{	// Separator
+		$result .= '<br />';
+	}
+	
+	// Get "UNREAD" recipients:
+	$result .= get_thread_recipient_status_icons( $thread_ID, 'unread' );
 
-	$read_by = '';
-
-	if( $row = $DB->get_row( $recipients_SQL->get() ) )
-	{
-		if( !empty( $row->thr_read ) )
-		{
-			$read_by .= get_avatar_imgtags( $row->thr_read, false, false, 'crop-top-15x15', '', '', true, false );
-		}
-
-		if( !empty( $row->thr_unread ) )
-		{
-			if( !empty( $read_by ) )
-			{
-				$read_by .= '<br />';
-			}
-			$read_by .= get_avatar_imgtags( $row->thr_unread, false, false, 'crop-top-15x15', '', '', false, false );
-		}
-
-		if( !empty( $row->thr_left ) )
-		{
-			if( !empty( $read_by ) )
-			{
-				$read_by .= '<br />';
-			}
-			$read_by .= get_avatar_imgtags( $row->thr_left, false, false, 'crop-top-15x15', '', '', 'left', false );
-		}
+	if( ! empty( $result ) )
+	{	// Separator
+		$result .= '<br />';
 	}
 
-	return $read_by;
+	// Get "LEFT" recipients:
+	$result .= get_thread_recipient_status_icons( $thread_ID, 'left' );
+
+	return $result;
 }
 
 
@@ -2265,7 +2253,7 @@ function col_thread_delete_action( $thread_ID )
 	}
 	else
 	{
-		$redirect_to = get_dispctrl_url( 'threads' );
+		$redirect_to = rawurlencode( get_dispctrl_url( 'threads' ) );
 		return action_icon( T_( 'Delete'), 'delete', get_htsrv_url().'action.php?mname=messaging&thrd_ID='.$thread_ID.'&action=delete&redirect_to='.$redirect_to.'&'.url_crumb( 'messaging_threads' ) );
 	}
 }

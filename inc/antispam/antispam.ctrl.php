@@ -105,7 +105,7 @@ switch( $action )
 												WHERE hit_referer LIKE '.$DB->quote( '%'.$keyword.'%' ),
 												'Delete all banned hit-log entries' );
 
-			$Messages->add( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success' );
+			$Messages->add_to_group( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success', T_('Banning keyword:') );
 		}
 
 		if( $delcomments )
@@ -115,7 +115,7 @@ switch( $action )
 							OR comment_author_email LIKE '.$DB->quote( '%'.utf8_strtolower( $keyword ).'%' ).'
 							OR comment_author_url LIKE '.$DB->quote( '%'.$keyword.'%' ).'
 							OR comment_content LIKE '.$DB->quote( '%'.$keyword.'%' ).')';
-			// asimo> we don't need transaction here 
+			// asimo> we don't need transaction here
 			$query = 'SELECT comment_ID FROM T_comments
 							WHERE '.$keyword_cond.$del_condition;
 			$deleted_ids = $DB->get_col( $query, 0, 'Get comment ids awaiting for delete' );
@@ -125,14 +125,14 @@ switch( $action )
 			// Delete all comments data from DB
 			Comment::db_delete_where( 'Comment', $keyword_cond.$del_condition );
 
-			$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success' );
+			$Messages->add_to_group( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success', T_('Banning keyword:') );
 		}
 
 		if( $blacklist_locally )
 		{ // Local blacklist:
 			if( antispam_create( $keyword ) )
 			{ // Success
-				$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), htmlspecialchars( $keyword ) ), 'success' );
+				$Messages->add_to_group( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), htmlspecialchars( $keyword ) ), 'success', T_('Banning keyword:') );
 			}
 			else
 			{ // Failed

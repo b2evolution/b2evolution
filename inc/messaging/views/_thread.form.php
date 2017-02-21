@@ -21,7 +21,7 @@ global $edited_Message;
 global $edited_Thread;
 global $creating_success;
 
-global $DB, $action, $Plugins;
+global $DB, $action, $Plugins, $Settings;
 
 global $Collection, $Blog;
 
@@ -124,12 +124,13 @@ if( !empty( $message_renderer_checkboxes ) )
 }
 
 // ####################### ATTACHMENTS/LINKS #########################
-if( is_admin_page() && isset( $GLOBALS['files_Module'] )
-	&& $current_User->check_perm( 'files', 'view' ) )
-{	// Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files:
+if( is_admin_page() && $current_User->check_perm( 'files', 'view' ) )
+{	// If current user has a permission to view the files AND it is back-office:
 	load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
-	global $LinkOwner; // Initialize this object as global because this is used in many link functions
+	// Initialize this object as global because this is used in many link functions:
+	global $LinkOwner;
 	$LinkOwner = new LinkMessage( $edited_Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
+	// Display attachments fieldset:
 	display_attachments_fieldset( $Form, $LinkOwner );
 }
 
@@ -140,7 +141,8 @@ if( !empty( $thrd_recipients_array ) )
 	{
 		$recipients_selected[] = array(
 			'id'    => $recipient_ID,
-			'login' => $thrd_recipients_array['login'][$rnum]
+			'login' => $thrd_recipients_array['login'][$rnum],
+			'fullname' => $thrd_recipients_array['fullname'][$rnum]
 		);
 	}
 }
@@ -175,7 +177,7 @@ jQuery( '#thrd_recipients' ).tokenInput(
 		tokenFormatter: function( user )
 		{
 			return '<li>' +
-					user.login +
+					<?php echo $Settings->get( 'username_display' ) == 'name' ? 'user.fullname' : 'user.login';?> +
 					'<input type="hidden" name="thrd_recipients_array[id][]" value="' + user.id + '" />' +
 					'<input type="hidden" name="thrd_recipients_array[login][]" value="' + user.login + '" />' +
 				'</li>';

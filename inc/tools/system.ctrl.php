@@ -43,16 +43,17 @@ $AdminUI->disp_body_top();
 // Begin payload block:
 $AdminUI->disp_payload_begin();
 
-function init_system_check( $name, $value )
+function init_system_check( $name, $value, $info = '' )
 {
-	global $syscheck_name, $syscheck_value;
+	global $syscheck_name, $syscheck_value, $syscheck_info;
 	$syscheck_name = $name;
 	$syscheck_value = $value;
+	$syscheck_info = $info;
 }
 
 function disp_system_check( $condition, $message = '' )
 {
-	global $syscheck_name, $syscheck_value;
+	global $syscheck_name, $syscheck_value, $syscheck_info;
 	echo '<div class="system_check">';
 	echo '<div class="system_check_name">';
 	echo $syscheck_name;
@@ -60,6 +61,7 @@ function disp_system_check( $condition, $message = '' )
 	echo '<div class="system_check_value_'.$condition.'">';
 	echo $syscheck_value;
 	echo '&nbsp;</div>';
+	echo $syscheck_info;
 	if( !empty( $message ) )
 	{
 		echo '<div class="system_check_message_'.$condition.'">';
@@ -67,6 +69,29 @@ function disp_system_check( $condition, $message = '' )
 		echo '</div>';
 	}
 	echo '</div>';
+}
+
+
+/**
+ * Check API url
+ *
+ * @param string Title
+ * @param string Url
+ */
+function system_check_api_url( $title, $url )
+{
+	$ajax_response = fetch_remote_page( $url, $info );
+	if( $ajax_response !== false )
+	{	// Response is correct data:
+		init_system_check( $title, 'OK', $url );
+		disp_system_check( 'ok' );
+	}
+	else
+	{	// Response is not correct data:
+		init_system_check( $title, T_('Failed'), $url );
+		disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.' )
+			.' <b>'.sprintf( T_('Error: %s'), $info['error'] ).'; '.sprintf( T_('Status code: %s'), $info['status'] ).'</b>' );
+	}
 }
 
 $facilitate_exploits = '<p>'.T_('When enabled, this feature is known to facilitate hacking exploits in any PHP application.')."</p>\n<p>"
@@ -176,6 +201,26 @@ if( $mediadir_status == 'error' )
 init_system_check( T_( 'Media directory' ), $mediadir_msg.' - '.$media_path );
 disp_system_check( $mediadir_status, $mediadir_long );
 
+// .htaccess
+$htaccess_path = $basepath.'.htaccess';
+$sample_htaccess_path = $basepath.'sample.htaccess';
+init_system_check( '.htaccess', $htaccess_path );
+if( ! file_exists( $htaccess_path ) )
+{	// No .htaccess
+	disp_system_check( 'error', T_('Error').': '.sprintf( T_('%s has not been found.'), '<code>.htaccess</code>' ) );
+}
+elseif( ! file_exists( $sample_htaccess_path ) )
+{	// No sample.htaccess
+	disp_system_check( 'warning', T_('Warning').': '.sprintf( T_('%s has not been found.'), '<code>sample.htaccess</code>' ) );
+}
+elseif( trim( file_get_contents( $htaccess_path ) ) != trim( file_get_contents( $sample_htaccess_path ) ) )
+{	// Different .htaccess
+	disp_system_check( 'warning', T_('Warning').': '.sprintf( T_('%s differs from %s'), '<code>.htaccess</code>', '<code>sample.htaccess</code>' ) );
+}
+else
+{	// All OK
+	disp_system_check( 'ok', sprintf( T_('%s is identical to %s'), '<code>.htaccess</code>', '<code>sample.htaccess</code>' ) );
+}
 
 // /install/ folder deleted?
 init_system_check( T_( 'Install folder' ), $system_stats['install_removed'] ?  T_('Deleted') : T_('Not deleted').' - '.$basepath.$install_subdir );
@@ -639,6 +684,91 @@ else
 	}
 	// pre_dump( $gd_info );
 }
+$block_item_Widget->disp_template_raw( 'block_end' );
+
+
+
+/*
+ * API
+ */
+$block_item_Widget->title = T_('APIs');
+$block_item_Widget->disp_template_replaced( 'block_start' );
+
+// REST API:
+$api_title = 'REST API';
+$api_url = $baseurl.'api/v6/collections';
+$json_response = fetch_remote_page( $api_url, $api_info );
+$api_result = false;
+if( $json_response !== false )
+{	// Try to decode REST API json data:
+	$decoded_response = @json_decode( $json_response );
+	$api_result = ! empty( $decoded_response );
+}
+if( $api_result )
+{	// Response is correct json data:
+	init_system_check( $api_title, 'OK', $api_url );
+	disp_system_check( 'ok' );
+}
+else
+{	// Response is not json data:
+	if( ! empty( $api_info['error'] ) )
+	{	// Display error message from function fetch_remote_page():
+		$api_error = ' <b>'.sprintf( T_('Error: %s'), $api_info['error'] ).'; '.sprintf( T_('Status code: %s'), $api_info['status'] ).'</b>';
+	}
+	else
+	{	// Display error message from other places:
+		$api_error = error_get_last();
+		$api_error = ( isset( $api_error['message'] ) ? ' <b>'.sprintf( T_( 'Error: %s' ), $api_error['message'] ).'</b>' : '' );
+	}
+	init_system_check( $api_title, T_('Failed'), $api_url );
+	disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.' )
+		.' '.T_('You should probably update your <code>.htaccess</code> file to the latest version and check the file permissions of this file.')
+		.$api_error );
+}
+
+// XML-RPC:
+$api_title = 'XML-RPC';
+$api_file = 'xmlrpc.php';
+$api_url = $baseurl.$api_file;
+load_funcs( 'xmlrpc/model/_xmlrpc.funcs.php' );
+$url_data = parse_url( $api_url );
+$client = new xmlrpc_client( $api_file, $url_data['host'], ( isset( $url_data['port'] ) ? $url_data['port'] : '' ) );
+$message = new xmlrpcmsg( 'system.listMethods' );
+$result = $client->send( $message );
+if( $result && ! $result->faultCode() )
+{	// XML-RPC request is successful:
+	init_system_check( $api_title, 'OK', $api_url );
+	disp_system_check( 'ok' );
+}
+else
+{	// Some error on XML-RPC request:
+	$xmlrpc_error_message = $result->faultString();
+	if( $xmlrpc_error_message == 'XML-RPC services are disabled on this system.' )
+	{	// Exception for this error:
+		$api_status_title = T_('Disabled');
+		$api_status_type = 'ok';
+	}
+	else
+	{	// Other errors:
+		$api_status_title = T_('Failed');
+		$api_status_type = 'warning';
+	}
+	init_system_check( $api_title, $api_status_title, $api_url );
+	disp_system_check( $api_status_type, T_('This API doesn\'t work properly on this server.').' <b>'.sprintf( T_( 'Error: %s' ), $xmlrpc_error_message ).'</b>' );
+}
+
+// AJAX anon_async.php:
+system_check_api_url( 'AJAX anon_async.php', $htsrv_url.'anon_async.php?action=test_api' );
+
+// AJAX async.php:
+system_check_api_url( 'AJAX async.php', $htsrv_url.'async.php?action=test_api' );
+
+// AJAX action.php:
+system_check_api_url( 'AJAX action.php', $htsrv_url.'action.php?mname=test_api' );
+
+// AJAX call_plugin.php:
+system_check_api_url( 'AJAX call_plugin.php', $htsrv_url.'call_plugin.php?plugin_ID=-1&method=test_api' );
+
 $block_item_Widget->disp_template_raw( 'block_end' );
 
 

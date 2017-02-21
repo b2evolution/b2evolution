@@ -218,8 +218,9 @@ class coll_item_list_Widget extends ComponentWidget
 					'type' => 'radio',
 					'options' => array(
 							array( 'none', T_('None') ),
-							array( 'first', T_('Display first picture') ),
-							array( 'all', T_('Display all pictures') ) ),
+							array( 'category', T_('Display main category picture' ) ),
+							array( 'first', T_('Display first post picture') ),
+							array( 'all', T_('Display all post pictures') ) ),
 					'defaultvalue' => 'none',
 				),
 				'disp_first_image' => array(
@@ -799,9 +800,10 @@ class coll_item_list_Widget extends ComponentWidget
 		}
 
 		if( $this->disp_params['attached_pics'] == 'all' ||
-		   ( $this->disp_params['attached_pics'] == 'first' && $this->disp_params['disp_first_image'] == 'normal' ) )
+		   ( $this->disp_params['attached_pics'] == 'first' && $this->disp_params['disp_first_image'] == 'normal' ) ||
+			 ( $this->disp_params['attached_pics'] == 'category' && $this->disp_params['disp_first_image'] == 'normal' ) )
 		{ // Display attached pictures
-			if( $this->disp_params['attached_pics'] == 'first' )
+			if( $this->disp_params['attached_pics'] == 'first' || $this->disp_params['attached_pics'] == 'category' )
 			{	// Display only one first image:
 				$picture_limit = 1;
 			}
@@ -865,61 +867,84 @@ class coll_item_list_Widget extends ComponentWidget
 			);
 
 		$disp_Item = & $params['Item'];
+		switch( $this->disp_params[ 'item_pic_link_type' ] )
+		{	// Set url for picture link
+			case 'none':
+				$pic_url = NULL;
+				break;
 
-		// Get list of ALL attached files:
-		$LinkOwner = new LinkItem( $disp_Item );
+			case 'permalink':
+				$pic_url = $disp_Item->get_permanent_url();
+				break;
 
-		$images = '';
+			case 'linkto_url':
+				$pic_url = $disp_Item->url;
+				break;
 
-		if( $LinkList = $LinkOwner->get_attachment_LinkList( $params['limit'], $params['restrict_to_image_position'], 'image', $links_params ) )
-		{	// Get list of attached files
-			$image_num = 1;
-			while( $Link = & $LinkList->get_next() )
-			{
-				if( ( $File = & $Link->get_File() ) && $File->is_image() )
-				{	// Get only images
-					if( $image_num < $params['start'] )
-					{ // Skip these first images
+			case 'auto':
+			default:
+				$pic_url = ( empty( $disp_Item->url ) ? $disp_Item->get_permanent_url() : $disp_Item->url );
+				break;
+		}
+
+		if( $this->disp_params['attached_pics'] != 'category' )
+		{
+			// Get list of ALL attached files:
+			$LinkOwner = new LinkItem( $disp_Item );
+
+			$images = '';
+
+			if( $LinkList = $LinkOwner->get_attachment_LinkList( $params['limit'], $params['restrict_to_image_position'], 'image', $links_params ) )
+			{	// Get list of attached files
+				$image_num = 1;
+				while( $Link = & $LinkList->get_next() )
+				{
+					if( ( $File = & $Link->get_File() ) && $File->is_image() )
+					{	// Get only images
+						if( $image_num < $params['start'] )
+						{ // Skip these first images
+							$image_num++;
+							continue;
+						}
+
+						// Print attached picture
+						$images .= $File->get_tag( '', '', '', '', $this->disp_params['thumb_size'], $pic_url );
+
+						$content_is_displayed = true;
+
 						$image_num++;
-						continue;
 					}
-					switch( $this->disp_params[ 'item_pic_link_type' ] )
-					{	// Set url for picture link
-						case 'none':
-							$pic_url = NULL;
-							break;
-
-						case 'permalink':
-							$pic_url = $disp_Item->get_permanent_url();
-							break;
-
-						case 'linkto_url':
-							$pic_url = $disp_Item->url;
-							break;
-
-						case 'auto':
-						default:
-							$pic_url = ( empty( $disp_Item->url ) ? $disp_Item->get_permanent_url() : $disp_Item->url );
-							break;
-					}
-
-					// Print attached picture
-					$images .= $File->get_tag( '', '', '', '', $this->disp_params['thumb_size'], $pic_url );
-
-					$content_is_displayed = true;
-
-					$image_num++;
 				}
 			}
 		}
 
+		$display_placeholder = true;
 		if( ! empty( $images ) )
-		{ // Print out images only when at least one exists
+		{	// Print out images only when at least one exists:
 			echo $params['before'];
 			echo $images;
 			echo $params['after'];
+			$display_placeholder = false;
 		}
-		else
+		elseif( $params['limit'] == 1 )
+		{	// First picture is empty, fallback to category picture:
+			if( $main_Chapter = & $disp_Item->get_main_Chapter() )
+			{	// If item has a main chapter:
+				$main_chapter_image_tag = $main_Chapter->get_image_tag( array(
+						'before'  => $params['before'],
+						'after'   => $params['after'],
+						'size'    => $this->disp_params['thumb_size'],
+						'link_to' => $pic_url,
+					) );
+				if( ! empty( $main_chapter_image_tag ) )
+				{	// If main chapter has a correct image file:
+					echo $main_chapter_image_tag;
+					$display_placeholder = false;
+				}
+			}
+		}
+
+		if( $display_placeholder )
 		{	// Display placeholder if no images:
 			// Replace mask $item_permaurl$ with the item permanent URL:
 			echo str_replace( '$item_permaurl$', $disp_Item->get_permanent_url(), $params['placeholder'] );

@@ -119,7 +119,7 @@ switch( $Comment->get( 'type' ) )
 			) );
 
 		echo ' <span class="text-muted">';
-		$Comment->date( 'M j, Y H:i' );
+		$Comment->date( locale_extdatefmt().' '.locale_shorttimefmt() );
 		echo '</span>';
 
 		// Post title
@@ -177,7 +177,7 @@ switch( $Comment->get( 'type' ) )
 			) );
 
 		echo ' <span class="text-muted">';
-		$Comment->date( 'M j, Y H:i' );
+		$Comment->date( locale_extdatefmt().' '.locale_shorttimefmt() );
 		echo '</span>';
 
 		if( ! $Comment->get_author_User() )
@@ -216,7 +216,7 @@ if( $Skin->enabled_status_banner( $Comment->status ) && $Comment->ID > 0 )
 { // Don't display status for previewed comments
 		echo '<div class="cell2">';
 		$Comment->format_statuses( array(
-				'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+				'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 			) );
 		echo '</div>';
 		$legend_statuses[] = $Comment->status;
@@ -253,7 +253,7 @@ echo $params['comment_body_after'];
 /* ======================== START OF COMMENT FOOTER ======================== */
 ?>
 <div class="panel-footer small clearfix">
-		<a href="<?php
+	<a href="<?php
 		if( $disp == 'comments' )
 		{	// We are displaying a comment in the Latest comments page:
 			echo $Blog->get('lastcommentsurl');
@@ -290,10 +290,13 @@ echo $params['comment_body_after'];
 	// Display Spam Voting system
 	$Comment->vote_spam( '', '', '&amp;', true, true );
 
-	echo '<div class="pull-right">';
-		$comment_redirect_url = rawurlencode( $Comment->get_permanent_url() );
-		$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), button_class( 'text' ), '&amp;', true, $comment_redirect_url ); /* Link for editing */
-		echo ' <span class="'.button_class( 'group' ).'">';
+	echo '<span class="pull-left">';
+		$comment_redirect_url = $Comment->get_permanent_url();
+		$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), button_class( 'text' ).' comment_edit_btn', '&amp;', true, $comment_redirect_url ); /* Link for editing */
+	echo '</span>';
+	echo '<div class="action_btn_group">';
+		$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), button_class( 'text' ).' comment_edit_btn', '&amp;', true, $comment_redirect_url ); /* Link for editing */
+		echo '<span class="'.button_class( 'group' ).'">';
 		$delete_button_is_displayed = is_logged_in() && $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $Comment );
 		$Comment->moderation_links( array(
 				'ajax_button' => true,
@@ -301,11 +304,11 @@ echo $params['comment_body_after'];
 				'redirect_to' => $comment_redirect_url,
 				'detect_last' => !$delete_button_is_displayed,
 			) );
-		$Comment->delete_link( '', '', '#', T_('Delete this reply'), button_class( 'text' ), false, '&amp;', true, false, '#', rawurlencode( $commented_Item->get_permanent_url() ) ); /* Link to backoffice for deleting */
+		$Comment->delete_link( '', '', '#', T_('Delete this reply'), button_class( 'text' ), false, '&amp;', true, false, '#', $commented_Item->get_permanent_url() ); /* Link to backoffice for deleting */
 
 		echo '</span>';
 	echo '</div>';
-?>
+	?>
 </div>
 
 <?php echo $params['comment_end'];

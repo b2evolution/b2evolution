@@ -291,6 +291,12 @@ form {
 .jcrop-keymgr {
 	visibility: hidden;
 }
+// Fix image cropping, because max-width:100% of main img style breaks this:
+#user_crop_workarea, .preview_cropped_image {
+	img {
+		max-width: none;
+	}
+}
 // ---------------- //
 
 // Form styles:
@@ -365,12 +371,46 @@ label.radiooption {
 }
 // ---------------- //
 
+// File Select custom control
+.file_select_wrapper {
+	display: flex;
+	flex-flow: row wrap;
+	align-items: flex-start;
+
+	.file_select_item {
+		//display: block;
+		//float: left;
+		display: flex;
+		flex-flow: row wrap;
+		margin-right: 8px;
+		text-align: center;
+
+		.item_actions {
+			display: flex;
+			flex-shrink: 1;
+			flex-flow: column wrap;
+			justify-content: flex-start;
+			align-content: center;
+			justify-content: center;
+			text-align: left;
+			margin-left: 8px;
+		}
+	}
+}
+// ---------------- //
+
 // Messages:
 div.log_container, div.action_messages {
 	ul, ol, li {
 		list-style: none;
 		margin: 0;
 		padding-left: 0;
+	}
+	ul.message_group {
+		li {
+			margin-left: 25px;
+			list-style: disc;
+		}
 	}
 }
 // ---------------- //
@@ -455,6 +495,15 @@ table.widget_grid .note {
 // Align top all cells of messages table:
 .evo_private_messages_list .table_scroll table.table tr td {
 	vertical-align: top;
+}
+// Space between user avatars in threads table:
+table.table td.thread_with {
+	img {
+		margin-bottom: 5px;
+	}
+	> span:last-child img {
+		margin-bottom: 0;
+	}
 }
 // ---------------- //
 

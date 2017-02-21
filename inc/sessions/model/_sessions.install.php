@@ -51,7 +51,7 @@ $schema_queries['T_basedomains'] = array(
 			dom_type   ENUM('unknown','normal','searcheng','aggregator','email') COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
 			dom_comment VARCHAR(255) DEFAULT NULL,
 			PRIMARY KEY     (dom_ID),
-			UNIQUE dom_type_name (dom_type, dom_name)
+			UNIQUE dom_name ( dom_name)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
 
 $schema_queries['T_track__keyphrase'] = array(

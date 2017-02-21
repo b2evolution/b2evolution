@@ -34,7 +34,7 @@ class google_maps_plugin extends Plugin
 	var $name = 'Google Maps';
 	var $code = 'evo_Gmaps';
 	var $priority = 50;
-	var $version = '6.7.7';
+	var $version = '6.7.9';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -400,7 +400,7 @@ class google_maps_plugin extends Plugin
 			?>
 
 			var geocoder = new google.maps.Geocoder();
-			geocoder.geocode( {'address': '<?php echo $search_location; ?>'}, function(results, status)
+			geocoder.geocode( {'address': '<?php echo format_to_js( $search_location ); ?>'}, function(results, status)
 			{
 				if (status == google.maps.GeocoderStatus.OK)
 				{
@@ -468,6 +468,29 @@ class google_maps_plugin extends Plugin
 
 	var geocoder = new google.maps.Geocoder();
 	var geo_region = null;
+
+	// If the map is initially hidden, we will need to trigger the resize event of the map when it is initially shown,
+	// otherwise the map display will be empty for quite a while.
+	var mapEl = jQuery( '#map_canvas' );
+
+	if( mapEl.not(':visible') )
+	{ // map is hidden in folded fieldset
+		var target = document.getElementById( 'itemform_googlemap' ).parentElement; // this is the element that we need to observe
+		var config = { attributes: true };
+		var observer = new MutationObserver( function( mutations )
+			{
+				mutations.forEach( function( mutation )
+					{
+						if( mapEl.is( ':visible' ) )
+						{ // map is now visible
+							google.maps.event.trigger( map, 'resize' );
+							observer.disconnect(); // we only need to do this once so we can stop observing
+						}
+					} );
+			} );
+
+		observer.observe( target, config );
+	}
 
 	function set_region(region_code)
 	{

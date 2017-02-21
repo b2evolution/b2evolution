@@ -190,14 +190,26 @@ $Form->begin_form( 'inskin', '', $form_params );
 			$disp_edit_categories = false;
 		}
 	}
+	if( $disp_edit_categories && get_post_cat_setting( $Blog->ID ) < 1 )
+	{	// Categories block is hidden when main category is assigned automatically:
+		$disp_edit_categories = false;
+	}
 
-	$Form->begin_fieldset( get_request_title( array_merge( array(
+	$Form->output = false;
+	$edit_links = $Form->begin_fieldset( get_request_title( array_merge( array(
 			'edit_links_template' => array(
 				'before'              => '<span class="pull-right">',
 				'after'               => '</span>',
 				'advanced_link_class' => 'btn btn-info btn-sm',
 				'close_link_class'    => 'btn btn-default btn-sm',
 			) ), $params ) ) );
+	$Form->output = true;
+	$advanced_edit_text = T_('Advanced editing');
+	$edit_links = preg_replace( '/ '.$advanced_edit_text.'/', '<span class="hidden-xs">$0</span>', $edit_links );
+	$cancel_text = T_('Cancel editing');
+	$edit_links = preg_replace( '/ '.$cancel_text.'/', '<span class="hidden-xs">$0</span>', $edit_links );
+	echo $edit_links;
+
 
 	// ############################ POST CONTENTS #############################
 	// Title input:
@@ -364,50 +376,16 @@ else
 	}
 }
 
-if( $edited_Item->get_type_setting( 'allow_attachments' ) )
-{ // ####################### ATTACHMENTS FIELDSETS #########################
-	global $advanced_edit_link;
-	$perm_view_files = $current_User->check_perm( 'files', 'view' );
-	if( $perm_view_files && $current_User->check_perm( 'admin', 'restricted' ) )
-	{	// If current user has a permission to attach files to the edited Item from back-office:
-		$advanced_edit_link_params = ' href="'.$advanced_edit_link['href'].'" onclick="'.$advanced_edit_link['onclick'].'"';
-		echo '<div class="well center">';
-		if( $creating )
-		{	// New post
-			echo sprintf( T_('If you need to attach files, please use <a %s>Advanced Edit</a>.'), $advanced_edit_link_params );
-		}
-		else
-		{	// Edit post
-			echo sprintf( T_('If you need to attach additional files, please use <a %s>Advanced Edit</a>.'), $advanced_edit_link_params );
-		}
-		echo '</div>';
-	}
-	elseif( $edited_Item->can_attach() )
-	{	// If current user can attach files to comments of the edited Item
-		echo '<div class="well center">';
-		if( $creating )
-		{	// New post
-			echo T_('If you need to attach files, please add a comment right after you post this.');
-		}
-		else
-		{	// Edit post
-			echo T_('If you need to attach additional files, please add a comment right after you edit this.');
-		}
-		echo '</div>';
-	}
-	if( $perm_view_files )
-	{	// If current user has a permission to view files
-		$LinkOwner = new LinkItem( $edited_Item );
-		if( $LinkOwner->count_links() )
-		{	// Display the attached files:
-			$Form->begin_fieldset( T_('Attachments'), array( 'id' => 'post_attachments' ) );
-				display_attachments( $LinkOwner, array(
-						'block_start' => '<div class="attachment_list results">',
-						'table_start' => '<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0" cellpadding="0">',
-					) );
-			$Form->end_fieldset();
-		}
-	}
+// ####################### ATTACHMENTS/LINKS #########################
+if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
+    $current_User->check_perm( 'files', 'view', false ) )
+{	// If current user has a permission to view the files AND attachments are allowed for the item type:
+	load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
+	// Initialize this object as global because this is used in many link functions:
+	global $LinkOwner;
+	$LinkOwner = new LinkItem( $edited_Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
+	// Display attachments fieldset:
+	display_attachments_fieldset( $Form, $LinkOwner );
 }
 
 // ####################### PLUGIN FIELDSETS #########################

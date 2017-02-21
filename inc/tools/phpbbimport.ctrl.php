@@ -14,6 +14,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_funcs( 'tools/model/_phpbb.funcs.php' );
 
 param( 'action', 'string' );
+$phpbb_version = param( 'ver', 'integer', 2 );
+$phpbb_tool_title = ( $phpbb_version == 3 ? T_('phpBB 3 Importer') : T_('phpBB Importer') );
 
 if( !empty( $action ) )
 {	// Try to obtain some serious time to do some serious processing (15 minutes)
@@ -52,6 +54,7 @@ switch( $action )
 		$phpbb_db_pass = param( 'db_pass', 'string', true );
 		$phpbb_db_prefix = param( 'db_prefix', 'string', '' );
 		$phpbb_path_avatars = param( 'path_avatars', 'string', '' );
+		$phpbb_path_attachments = param( 'path_attachments', 'string', '' );
 		$forum_blog_ID = param( 'forum_blog_ID', 'integer', 0 );
 
 		param_check_not_empty( 'db_host', T_('Please enter a database host!') );
@@ -97,6 +100,7 @@ switch( $action )
 		phpbb_set_var( 'db_config', $phpbb_db_config );
 		phpbb_set_var( 'blog_ID', $forum_blog_ID );
 		phpbb_set_var( 'path_avatars', $phpbb_path_avatars );
+		phpbb_set_var( 'path_attachments', $phpbb_path_attachments );
 
 		$step = 'groups';
 		break;

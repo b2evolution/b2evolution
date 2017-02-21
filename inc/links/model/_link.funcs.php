@@ -74,11 +74,16 @@ function & get_link_owner( $link_type, $object_ID )
 			switch( $TemporaryID->get( 'type' ) )
 			{
 				case 'message':
-					$LinkOwner = new LinkMessage( NULL, $object_ID );
+					$LinkOwner = new LinkMessage( new Message(), $object_ID );
+					break;
+
+				case 'item':
+					load_class( 'items/model/_item.class.php', 'Item' );
+					$LinkOwner = new LinkItem( new Item(), $object_ID );
 					break;
 			}
+			$LinkOwner->tmp_ID = $object_ID;
 			$LinkOwner->type = 'temporary';
-			$LinkOwner->is_temp = true;
 			break;
 
 		default:
@@ -98,16 +103,18 @@ function & get_link_owner( $link_type, $object_ID )
  */
 function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false, $fold = false )
 {
-	global $admin_url, $AdminUI;
+	global $admin_url, $inc_path;
 	global $current_User, $action;
 
-	if( $LinkOwner->type == 'item' && ! $LinkOwner->is_temp && ! $LinkOwner->Item->get_type_setting( 'allow_attachments' ) )
-	{ // Attachments are not allowed for current post type
+	if( ! isset( $GLOBALS[ 'files_Module' ] ) )
+	{	// Files module is not enabled:
 		return;
 	}
 
-	if( ! isset( $GLOBALS[ 'files_Module' ] ) )
-	{
+	if( ! is_logged_in()
+	    || ! $current_User->check_perm( 'files', 'view' )
+	    || ! $LinkOwner->check_perm( 'edit', false ) )
+	{	// Current user has no perm to view files:
 		return;
 	}
 
@@ -115,7 +122,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 	switch( $LinkOwner->type )
 	{
 		case 'item':
-			$window_title = $LinkOwner->is_temp ? '' : format_to_js( sprintf( T_('Attach files to "%s"'), $LinkOwner->Item->get( 'title' ) ) );
+			$window_title = $LinkOwner->is_temp() ? '' : format_to_js( sprintf( T_('Attach files to "%s"'), $LinkOwner->Item->get( 'title' ) ) );
 			$form_id = 'itemform_links';
 			break;
 
@@ -160,12 +167,14 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 		return;
 	}
 
-	$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' );
+	if( is_admin_page() )
+	{	// Display a link to manual page only on back-office:
+		$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' );
+	}
 
-	if( $current_User->check_perm( 'files', 'view' )
-		&& $LinkOwner->check_perm( 'edit', false ) )
-	{ // Check that we have permission to edit owner:
-		$attach_files_url = $admin_url.'?ctrl=files&amp;fm_mode=link_object&amp;link_type='.$LinkOwner->type.( $LinkOwner->type != 'message' ? '&amp;link_object_ID='.$LinkOwner->get_ID() : '' );
+	if( $current_User->check_perm( 'admin', 'restricted' ) )
+	{	// Check if current user has a permission to back-office files manager:
+		$attach_files_url = $admin_url.'?ctrl=files&amp;fm_mode=link_object&amp;link_type='.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).( $LinkOwner->type != 'message' ? '&amp;link_object_ID='.$LinkOwner->get_ID() : '' );
 		if( $linkowner_FileList = $LinkOwner->get_attachment_FileList( 1 ) )
 		{	// Get first file of the Link Owner:
 			$linkowner_File = & $linkowner_FileList->get_next();
@@ -179,7 +188,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 		$fieldset_title .= ' - '
 			.action_icon( T_('Attach existing files'), 'folder', $attach_files_url,
 				T_('Attach existing files'), 3, 4,
-				array( 'onclick' => 'return link_attachment_window( \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\' )' ) )
+				array( 'onclick' => 'return link_attachment_window( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\' )' ) )
 			.action_icon( T_('Attach existing files'), 'permalink', $attach_files_url,
 				T_('Attach existing files'), 1, 0,
 				array( 'target' => '_blank' ) );
@@ -188,11 +197,12 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 	$fieldset_title .= '<span class="floatright">&nbsp;'
 
 			.action_icon( T_('Refresh'), 'refresh', $LinkOwner->get_edit_url(),
-				T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\' )' ) )
+				T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\' )' ) )
 
-			.action_icon( T_('Sort'), 'ascending', $admin_url
-				.'?ctrl=links&amp;action=sort_links&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;'.url_crumb( 'link' ),
-				T_('Sort'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\', \'sort\' )' ) )
+			.action_icon( T_('Sort'), 'ascending', ( is_admin_page() || $current_User->check_perm( 'admin', 'restricted' ) )
+				? $admin_url.'?ctrl=links&amp;action=sort_links&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;'.url_crumb( 'link' )
+				: $LinkOwner->get_edit_url().'#',
+				T_('Sort'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'sort\' )' ) )
 
 		.'</span>';
 
@@ -208,7 +218,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 	echo '<div id="attachments_fieldset_wrapper">';
 		echo '<div id="attachments_fieldset_block">';
 			echo '<div id="attachments_fieldset_table">';
-				$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+				require $inc_path.'links/views/_link_list.view.php';
 			echo '</div>';
 		echo '</div>';
 	echo '</div>';
@@ -416,13 +426,18 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 					.get_icon( 'permalink', 'imgtag', array( 'title' => $title ) ).'</a> ';
 	}
 
-	// Delete link.
+	// Unlink/Delete icons:
 	if( $LinkOwner->check_perm( 'edit' ) )
-	{ // Check that we have permission to edit LinkOwner object:
+	{	// If current user has a permission to edit LinkOwner object
+		// Unlink icon:
+		$r .= action_icon( T_('Delete this link!'), 'unlink',
+					$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=unlink'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
+					array( 'onclick' => 'return evo_link_delete( this, \''.$LinkOwner->type.'\', '.$link_ID.', \'unlink\' )' ) );
+		// Delete icon:
 		$LinkCache = & get_LinkCache();
 		$Link = & $LinkCache->get_by_ID( $link_ID, false, false );
-		if( $Link && $Link->can_be_file_deleted() )
-		{	// If current user has a permission to delete a file completely
+		if( ! $current_File->is_dir() && $Link && $Link->can_be_file_deleted() )
+		{	// If current user has a permission to delete a file(not folder) completely
 			$File = & $Link->get_File();
 			$r .= action_icon( T_('Delete this file!'), 'delete',
 						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=delete'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
@@ -431,15 +446,31 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 								.'\' ) && evo_link_delete( this, \''.$LinkOwner->type.'\', '.$link_ID.', \'delete\' )' ) );
 		}
 		else
-		{	// If current user can only unlink
-			$r .= action_icon( T_('Delete this link!'), 'unlink',
-						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=unlink'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
-						array( 'onclick' => 'return evo_link_delete( this, \''.$LinkOwner->type.'\', '.$link_ID.', \'unlink\' )' ) );
+		{	// If current user can only unlink the attachment (probably it is linked to several objects)
+			$r .= get_icon( 'delete', 'imgtag', array( 'class' => 'action_icon empty_placeholder' ) );
 		}
 	}
 
-	if( in_array( $link_type, array( 'item', 'emailcampaign', 'message' ) ) && $current_File )
-	{ // Display icon to insert image|video|audio into post inline
+	return $r;
+}
+
+
+/**
+ * Display link position edit action
+ *
+ * @param $row
+ */
+function display_link_position( & $row )
+{
+	global $LinkOwner, $blog;
+	global $current_File;
+
+	$r = '<select id="display_position_'.$row->link_ID.'">'
+			.Form::get_select_options_string( $LinkOwner->get_positions( $row->file_ID ), $row->link_position, true)
+		.'</select>';
+
+	if( $current_File )
+	{ // Display icon to insert image|video into post inline
 		$type = $current_File->get_file_type();
 
 		// valid file types: audio, video, image, other. See @link File::set_file_type()
@@ -458,29 +489,27 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 				$type = 'file';
 				break;
 		}
-		$r .= ' '.get_icon( 'add', 'imgtag', array(
-				'title'   => sprintf( T_('Insert %s into the post'), $type ),
-				'onclick' => 'evo_item_image_insert( '.$blog.', \'image\', '.$link_ID.' )',
-				'style'   => 'cursor:default;'
-			) );
+
+		if( $type == 'image' )
+		{
+			$r .= ' '.get_icon( 'add', 'imgtag', array(
+					'title'   => sprintf( T_('Insert %s into the post'), $type ),
+					'onclick' => 'evo_item_image_insert( '.$blog.', \'image\', '.$row->link_ID.' )',
+					'style'   => 'cursor:default;'
+				) );
+		}
+
+
+		if( $type == 'audio' || $type == 'video'  || $type == 'file' )
+		{
+			$r .= ' '.get_icon( 'add__blue', 'imgtag', array(
+						'title'   => sprintf( T_('Insert %s tag into the post'), '['.$type.':]' ),
+						'onclick' => 'evo_link_insert_inline( \''.$type.'\', '.$row->link_ID.', \'\' )',
+						'style'   => 'cursor:default;'
+					) );
+		}
+
 	}
-
-	return $r;
-}
-
-
-/**
- * Display link position edit action
- *
- * @param $row
- */
-function display_link_position( & $row )
-{
-	global $LinkOwner;
-
-	$r = '<select id="display_position_'.$row->link_ID.'">'
-			.Form::get_select_options_string( $LinkOwner->get_positions( $row->file_ID ), $row->link_position, true)
-		.'</select>';
 
 	return str_replace( array( "\r", "\n" ), '', $r );
 }
@@ -491,13 +520,22 @@ function display_link_position( & $row )
  */
 function echo_link_position_js()
 {
+	global $Session;
 ?>
 <script type="text/javascript">
+var displayInlineReminder = <?php echo $Session->get( 'display_inline_reminder', 'true' );?>;
+var deferInlineReminder = false;
+
 jQuery( document ).on( 'change', 'select[id^=display_position_]', {
 		url:   '<?php echo get_htsrv_url(); ?>',
-		crumb: '<?php echo get_crumb( 'link' ); ?>'
+		crumb: '<?php echo get_crumb( 'link' ); ?>',
 }, function( event )
 {
+	if( this.value == 'inline' && displayInlineReminder && !deferInlineReminder )
+	{ // Display inline position reminder
+		alert( '<?php echo TS_('You can use the (+) icons to change the position to inline and automatically insert a short tag at the current cursor position.');?>' );
+		displayInlineReminder = false;
+	}
 	evo_link_change_position( this, event.data.url, event.data.crumb );
 } );
 </script>
@@ -520,6 +558,14 @@ jQuery( document ).ready( function()
 		itemPath: '> tbody',
 		itemSelector: 'tr',
 		placeholder: jQuery.parseHTML( '<tr class="placeholder"><td colspan="5"></td></tr>' ),
+		onMousedown: function( $item, _super, event )
+		{
+			if( ! event.target.nodeName.match( /^(a|img|select|span)$/i ) )
+			{	// Ignore a sort action when mouse is clicked on the tags <a>, <img>, <select> or <span>
+				event.preventDefault();
+				return true;
+			}
+		},
 		onDrop: function( $item, container, _super )
 		{
 			jQuery( '#attachments_fieldset_table table tr' ).removeClass( 'odd even' );
@@ -539,7 +585,7 @@ jQuery( document ).ready( function()
 
 			jQuery.ajax(
 			{
-				url: '<?php echo get_htsrv_url(); ?>async.php',
+				url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 				type: 'POST',
 				data:
 				{

@@ -84,10 +84,10 @@ if( !$user_profile_only )
 $is_admin_page = is_admin_page();
 if( $is_admin_page )
 {
-	$form_text_title = T_( 'Edit notifications' ).get_manual_link( 'user-notifications-tab' ); // used for js confirmation message on leave the changed form
+	$form_text_title = '<span class="nowrap">'.T_( 'Edit notifications' ).'</span>'.get_manual_link( 'user-notifications-tab' ); // used for js confirmation message on leave the changed form
 	$form_title = get_usertab_header( $edited_User, 'subs', $form_text_title );
 	$form_class = 'fform';
-	$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
+	$Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
 	$checklist_params = array();
 }
 else
@@ -399,6 +399,7 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 	{	// edited user has permission to edit other than his own comments at least in one status in one collection:
 		$notify_options[] = array( 'edited_user_notify_cmt_moderation', 1, T_('a comment is posted and I have permissions to moderate it.'), $UserSettings->get( 'notify_comment_moderation', $edited_User->ID ), $disabled );
 		$notify_options[] = array( 'edited_user_notify_edit_cmt_moderation', 1, T_('a comment is modified and I have permissions to moderate it.'), $UserSettings->get( 'notify_edit_cmt_moderation', $edited_User->ID ), $disabled );
+		$notify_options[] = array( 'edited_user_notify_spam_cmt_moderation', 1, T_('a comment is reported as spam and I have permissions to moderate it.'), $UserSettings->get( 'notify_spam_cmt_moderation', $edited_User->ID ), $disabled );
 	}
 	if( $edited_User->check_perm( 'admin', 'restricted', false ) )
 	{ // edited user has a permission to back-office
@@ -413,6 +414,7 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 		$notify_options[] = array( 'edited_user_notify_post_moderation', 1, T_('a post is created and I have permissions to moderate it.'), $UserSettings->get( 'notify_post_moderation', $edited_User->ID ), $disabled );
 		$notify_options[] = array( 'edited_user_notify_edit_pst_moderation', 1, T_('a post is modified and I have permissions to moderate it.'), $UserSettings->get( 'notify_edit_pst_moderation', $edited_User->ID ), $disabled );
 		$notify_options[] = array( 'edited_user_send_pst_moderation_reminder', 1, sprintf( T_('posts are awaiting moderation for more than %s.'), seconds_to_period( $post_moderation_reminder_threshold ) ), $UserSettings->get( 'send_pst_moderation_reminder', $edited_User->ID ), $disabled );
+		$notify_options[] = array( 'edited_user_send_pst_stale_alert', 1, T_('there are stale posts and I have permission to moderate them.'), $UserSettings->get( 'send_pst_stale_alert', $edited_User->ID ), $disabled );
 	}
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{ // current User is an administrator

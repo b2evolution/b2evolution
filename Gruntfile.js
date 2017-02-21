@@ -120,7 +120,7 @@ module.exports = function(grunt) {
 			 */
 			// Login screen:
 			sha1_md5: {
-				src: ['rsc/js/src/sha1.js', 'rsc/js/src/md5.js'],
+				src: ['rsc/js/src/sha1.js', 'rsc/js/src/md5.js', 'rsc/js/src/twin-bcrypt.js'],
 				dest: 'rsc/js/build/sha1_md5.bundle.js',
 			},
 		},
@@ -219,7 +219,7 @@ module.exports = function(grunt) {
 			// JS files that are used on front-office standard skins:
 			evo_frontoffice: {
 				options: {
-					banner: '/* This includes 8 files: src/evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js, ajax.js */\n'
+					banner: '/* This includes 9 files: src/evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js, src/evo_links.js, ajax.js */\n'
 				},
 				nonull: true, // Display missing files
 				src: ['rsc/js/src/evo_modal_window.js',
@@ -229,13 +229,14 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_contact_groups.js',
 							'rsc/js/src/evo_rest_api.js',
 							'rsc/js/src/evo_item_flag.js',
+							'rsc/js/src/evo_links.js',
 							'rsc/js/ajax.js'],
 				dest: 'rsc/js/build/evo_frontoffice.bmin.js'
 			},
 			// JS files that are used on front-office bootstrap skins:
 			evo_frontoffice_bootstrap: {
 				options: {
-					banner: '/* This includes 8 files: src/bootstrap-evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js, ajax.js */\n'
+					banner: '/* This includes 9 files: src/bootstrap-evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js, src/evo_links.js, ajax.js */\n'
 				},
 				nonull: true, // Display missing files
 				src: ['rsc/js/src/bootstrap-evo_modal_window.js',
@@ -245,6 +246,7 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_contact_groups.js',
 							'rsc/js/src/evo_rest_api.js',
 							'rsc/js/src/evo_item_flag.js',
+							'rsc/js/src/evo_links.js',
 							'rsc/js/ajax.js'],
 				dest: 'rsc/js/build/bootstrap-evo_frontoffice.bmin.js'
 			},
@@ -263,6 +265,7 @@ module.exports = function(grunt) {
 							'rsc/js/extracats.js',
 							'rsc/js/dynamic_select.js',
 							'rsc/js/backoffice.js',
+							'rsc/js/blog_widgets.js',
 							'rsc/js/src/evo_modal_window.js',
 							'rsc/js/src/evo_images.js',
 							'rsc/js/src/evo_user_crop.js',
@@ -288,6 +291,7 @@ module.exports = function(grunt) {
 							'rsc/js/extracats.js',
 							'rsc/js/dynamic_select.js',
 							'rsc/js/backoffice.js',
+							'rsc/js/blog_widgets.js',
 							'rsc/js/src/bootstrap-evo_modal_window.js',
 							'rsc/js/src/evo_images.js',
 							'rsc/js/src/evo_user_crop.js',

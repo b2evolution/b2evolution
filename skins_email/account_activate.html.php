@@ -67,7 +67,7 @@ echo '<p'.emailskin_style( '.p' ).'>'.T_('Your email is: $email$')."</p>\n";
 
 if( $Settings->get( 'validation_process' ) == 'easy' )
 { // ---- EASY activation ---- //
-	$activation_url = get_htsrv_url().'login.php?action=activateaccount'
+	$activation_url = get_htsrv_url().'login.php?action=activateacc_ez'
 		.'&userID=$user_ID$'
 		.'&reminderKey='.$params['reminder_key'];
 
@@ -81,17 +81,20 @@ if( $Settings->get( 'validation_process' ) == 'easy' )
 }
 else
 { // ---- SECURE activation ---- //
-	$activation_url = get_htsrv_url( true ).'login.php?action=validatemail'
+	$activation_url = get_htsrv_url( true ).'login.php?action=activateacc_sec'
 		.$params['blog_param']
 		.'&reqID='.$params['request_id']
 		.'&sessID='.$Session->ID; // used to detect cookie problems
 
 	echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n".get_link_tag( $activation_url, $activation_text, 'div.buttons a+a.button_green' )."\n</div>\n";
 
+// TODO: check why this appears only in secure mode?
 	echo '<p'.emailskin_style( '.p' ).'>'.T_('If this does not work, please copy/paste that link into the address bar of your browser.')."</p>\n";
 
+// TODO: check why this appears only in secure mode?  (this should probably appear only in first notification, no matter if it's secure or not)
 	echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_('We also recommend that you add %s to your contacts in order to make sure you will receive future notifications, especially when someone sends you a private message.'), $Settings->get( 'notification_sender_email' ) )."</p>\n";
 
+	// Note about secure mode:
 	echo '<p'.emailskin_style( '.p+.note' ).'>'.T_('Please note:').' '.T_('For security reasons the link is only valid for your current session (by means of your session cookie).')."</p>\n";
 }
 

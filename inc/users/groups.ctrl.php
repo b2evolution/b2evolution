@@ -264,15 +264,17 @@ switch( $action )
 
 	case 'edit':
 	case 'filter':
-		// Add menu level 3 entries:
-		$AdminUI->add_menu_entries( array( 'users', 'groups' ), array(
-				'general' => array(
-					'text' => T_('General Permissions'),
-					'href' => $admin_url.'?ctrl=groups&amp;action=edit&amp;tab=general&amp;grp_ID='.$edited_Group->ID ),
-				'collection' => array(
-					'text' => T_('Collection Permissions'),
-					'href' => $admin_url.'?ctrl=groups&amp;action=edit&amp;tab=collection&amp;grp_ID='.$edited_Group->ID ),
-			) );
+		if( $edited_Group->ID > 0 )
+		{	// Add menu level 3 entries:
+			$AdminUI->add_menu_entries( array( 'users', 'groups' ), array(
+					'general' => array(
+						'text' => T_('General Permissions'),
+						'href' => $admin_url.'?ctrl=groups&amp;action=edit&amp;tab=general&amp;grp_ID='.$edited_Group->ID ),
+					'collection' => array(
+						'text' => T_('Collection Permissions'),
+						'href' => $admin_url.'?ctrl=groups&amp;action=edit&amp;tab=collection&amp;grp_ID='.$edited_Group->ID ),
+				) );
+		}
 
 		switch( $tab )
 		{

@@ -252,7 +252,17 @@ class custom_tags_plugin extends Plugin
 	function RenderItemAsHtml( & $params )
 	{
 		$content = & $params['data'];
-		$Item = $params['Item'];
+
+		if( !empty( $params['Item'] ) )
+		{	// Get Item from params:
+			$Item = & $params['Item'];
+		}
+		elseif( !empty( $params['Comment'] ) )
+		{	// Get Item from Comment:
+			$Comment = & $params['Comment'];
+			$Item = & $Comment->get_Item();
+		}
+
 		$item_Blog = & $Item->get_Blog();
 
 		if( ! isset( $this->post_search_list ) )
@@ -387,8 +397,11 @@ class custom_tags_plugin extends Plugin
 		}
 
 		$params = array_merge( array(
-				'target_type' => 'Item'
+				'target_type' => 'Item',
+				'js_prefix'   => '', // Use different prefix if you use several toolbars on one page
 			), $params );
+
+		$js_code_prefix = $params['js_prefix'].$this->code;
 
 		switch( $params['target_type'] )
 		{
@@ -457,11 +470,11 @@ class custom_tags_plugin extends Plugin
 
 		?><script type="text/javascript">
 		//<![CDATA[
-		<?php echo $this->code;?>_tagButtons = new Array();
-		<?php echo $this->code;?>_tagOpenTags = new Array();
+		<?php echo $js_code_prefix;?>_tagButtons = new Array();
+		<?php echo $js_code_prefix;?>_tagOpenTags = new Array();
 
 
-		<?php echo $this->code;?>_tagButton = function( id, display, style, tagStart, tagEnd, access, tit, open )
+		<?php echo $js_code_prefix;?>_tagButton = function( id, display, style, tagStart, tagEnd, access, tit, open )
 		{
 			this.id = id;							// used to name the toolbar button
 			this.display = display;		// label on button
@@ -477,7 +490,7 @@ class custom_tags_plugin extends Plugin
 		foreach( $tagButtons as $tagButton )
 		{	// Init each button
 		?>
-		<?php echo $this->code;?>_tagButtons[<?php echo $this->code;?>_tagButtons.length] = new <?php echo $this->code;?>_tagButton(
+		<?php echo $js_code_prefix;?>_tagButtons[<?php echo $js_code_prefix;?>_tagButtons.length] = new <?php echo $js_code_prefix;?>_tagButton(
 				'tag_<?php echo $tagButton['title']; ?>'
 				,'<?php echo $tagButton['name']; ?>', ''
 				,'<?php echo $tagButton['start']; ?>', '<?php echo $tagButton['end']; ?>', ''
@@ -487,41 +500,41 @@ class custom_tags_plugin extends Plugin
 		}
 		?>
 
-		<?php echo $this->code;?>_tagGetButton = function( button, i )
+		<?php echo $js_code_prefix;?>_tagGetButton = function( button, i )
 		{
 			return '<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit
-					+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $this->code;?>_tagInsertTag|b2evoCanvas|'+i+'" value="' + button.display + '" />';
+					+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $js_code_prefix;?>_tagInsertTag|<?php echo $params['js_prefix']; ?>b2evoCanvas|'+i+'" value="' + button.display + '" />';
 		}
 
 		// Memorize a new open tag
-		<?php echo $this->code;?>_tagAddTag = function( button )
+		<?php echo $js_code_prefix;?>_tagAddTag = function( button )
 		{
-			if( <?php echo $this->code;?>_tagButtons[button].tagEnd != '' )
+			if( <?php echo $js_code_prefix;?>_tagButtons[button].tagEnd != '' )
 			{
-				<?php echo $this->code;?>_tagOpenTags[<?php echo $this->code;?>_tagOpenTags.length] = button;
-				document.getElementById(<?php echo $this->code;?>_tagButtons[button].id).style.fontWeight = 'bold';
+				<?php echo $js_code_prefix;?>_tagOpenTags[<?php echo $js_code_prefix;?>_tagOpenTags.length] = button;
+				document.getElementById(<?php echo $js_code_prefix;?>_tagButtons[button].id).style.fontWeight = 'bold';
 			}
 		}
 
 		// Forget about an open tag
-		<?php echo $this->code;?>_tagRemoveTag = function( button )
+		<?php echo $js_code_prefix;?>_tagRemoveTag = function( button )
 		{
-			for ( i = 0; i < <?php echo $this->code;?>_tagOpenTags.length; i++ )
+			for ( i = 0; i < <?php echo $js_code_prefix;?>_tagOpenTags.length; i++ )
 			{
-				if ( <?php echo $this->code;?>_tagOpenTags[i] == button)
+				if ( <?php echo $js_code_prefix;?>_tagOpenTags[i] == button)
 				{
-					<?php echo $this->code;?>_tagOpenTags.splice(i, 1);
-					document.getElementById(<?php echo $this->code;?>_tagButtons[button].id).style.fontWeight = 'normal';
+					<?php echo $js_code_prefix;?>_tagOpenTags.splice(i, 1);
+					document.getElementById(<?php echo $js_code_prefix;?>_tagButtons[button].id).style.fontWeight = 'normal';
 				}
 			}
 		}
 
-		<?php echo $this->code;?>_tagCheckOpenTags = function( button )
+		<?php echo $js_code_prefix;?>_tagCheckOpenTags = function( button )
 		{
 			var tag = 0;
-			for (i = 0; i < <?php echo $this->code;?>_tagOpenTags.length; i++)
+			for (i = 0; i < <?php echo $js_code_prefix;?>_tagOpenTags.length; i++)
 			{
-				if (<?php echo $this->code;?>_tagOpenTags[i] == button)
+				if (<?php echo $js_code_prefix;?>_tagOpenTags[i] == button)
 				{
 					tag++;
 				}
@@ -537,33 +550,33 @@ class custom_tags_plugin extends Plugin
 			}
 		}
 
-		<?php echo $this->code;?>_tagCloseAllTags = function()
+		<?php echo $js_code_prefix;?>_tagCloseAllTags = function()
 		{
-			var count = <?php echo $this->code;?>_tagOpenTags.length;
+			var count = <?php echo $js_code_prefix;?>_tagOpenTags.length;
 			for (o = 0; o < count; o++)
 			{
-				<?php echo $this->code;?>_tagInsertTag(b2evoCanvas, <?php echo $this->code;?>_tagOpenTags[<?php echo $this->code;?>_tagOpenTags.length - 1] );
+				<?php echo $js_code_prefix;?>_tagInsertTag( <?php echo $params['js_prefix']; ?>b2evoCanvas, <?php echo $js_code_prefix;?>_tagOpenTags[<?php echo $js_code_prefix;?>_tagOpenTags.length - 1] );
 			}
 		}
 
-		<?php echo $this->code;?>_tagToolbar = function()
+		<?php echo $js_code_prefix;?>_tagToolbar = function()
 		{
-			var tagcode_toolbar = '<?php echo $this->get_template( 'toolbar_title_before' ).$this->toolbar_label.' '.$this->get_template( 'toolbar_title_after' ); ?>';
-			tagcode_toolbar += '<?php echo $this->get_template( 'toolbar_group_before' ); ?>';
-			for( var i = 0; i < <?php echo $this->code;?>_tagButtons.length; i++ )
+			var tagcode_toolbar = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ).$this->toolbar_label.' '.$this->get_template( 'toolbar_title_after' ) ); ?>';
+			tagcode_toolbar += '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>';
+			for( var i = 0; i < <?php echo $js_code_prefix;?>_tagButtons.length; i++ )
 			{
-				tagcode_toolbar += <?php echo $this->code;?>_tagGetButton( <?php echo $this->code;?>_tagButtons[i], i );
+				tagcode_toolbar += <?php echo $js_code_prefix;?>_tagGetButton( <?php echo $js_code_prefix;?>_tagButtons[i], i );
 			}
-			tagcode_toolbar += '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>';
-			tagcode_toolbar += '<input type="button" id="tag_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $this->code;?>_tagCloseAllTags" title="<?php echo T_('Close all tags') ?>" value="X" />';
-			tagcode_toolbar += '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
-			jQuery( '.<?php echo $this->code; ?>_toolbar' ).html( tagcode_toolbar );
+			tagcode_toolbar += '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ) ); ?>';
+			tagcode_toolbar += '<input type="button" id="tag_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $js_code_prefix;?>_tagCloseAllTags" title="<?php echo TS_('Close all tags') ?>" value="X" />';
+			tagcode_toolbar += '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
+			jQuery( '.<?php echo $js_code_prefix; ?>_toolbar' ).html( tagcode_toolbar );
 		}
 
 		/**
 		 * insertion code
 		 */
-		<?php echo $this->code;?>_tagInsertTag = function( myField, i )
+		<?php echo $js_code_prefix;?>_tagInsertTag = function( myField, i )
 		{
 			// we need to know if something is selected.
 			// First, ask plugins, then try IE and Mozilla.
@@ -591,19 +604,19 @@ class custom_tags_plugin extends Plugin
 
 			if( sel_text )
 			{ // some text selected
-				textarea_wrap_selection( myField, <?php echo $this->code;?>_tagButtons[i].tagStart, <?php echo $this->code;?>_tagButtons[i].tagEnd, 0 );
+				textarea_wrap_selection( myField, <?php echo $js_code_prefix;?>_tagButtons[i].tagStart, <?php echo $js_code_prefix;?>_tagButtons[i].tagEnd, 0 );
 			}
 			else
 			{
-				if( !<?php echo $this->code;?>_tagCheckOpenTags(i) || <?php echo $this->code;?>_tagButtons[i].tagEnd == '')
+				if( !<?php echo $js_code_prefix;?>_tagCheckOpenTags(i) || <?php echo $js_code_prefix;?>_tagButtons[i].tagEnd == '')
 				{
-					textarea_wrap_selection( myField, <?php echo $this->code;?>_tagButtons[i].tagStart, '', 0 );
-					<?php echo $this->code;?>_tagAddTag(i);
+					textarea_wrap_selection( myField, <?php echo $js_code_prefix;?>_tagButtons[i].tagStart, '', 0 );
+					<?php echo $js_code_prefix;?>_tagAddTag(i);
 				}
 				else
 				{
-					textarea_wrap_selection( myField, '', <?php echo $this->code;?>_tagButtons[i].tagEnd, 0 );
-					<?php echo $this->code;?>_tagRemoveTag(i);
+					textarea_wrap_selection( myField, '', <?php echo $js_code_prefix;?>_tagButtons[i].tagEnd, 0 );
+					<?php echo $js_code_prefix;?>_tagRemoveTag(i);
 				}
 			}
 			if(focus_when_finished)
@@ -614,9 +627,9 @@ class custom_tags_plugin extends Plugin
 		//]]>
 		</script><?php
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $js_code_prefix.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script type="text/javascript"><?php echo $this->code;?>_tagToolbar();</script><?php
+		?><script type="text/javascript"><?php echo $js_code_prefix;?>_tagToolbar();</script><?php
 
 		return true;
 	}

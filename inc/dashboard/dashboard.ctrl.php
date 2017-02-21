@@ -24,7 +24,7 @@ load_funcs( 'dashboard/model/_dashboard.funcs.php' );
  */
 global $current_User;
 
-global $dispatcher, $allow_evo_stats, $blog;
+global $dispatcher, $blog;
 
 
 if( empty( $_GET['blog'] ) )

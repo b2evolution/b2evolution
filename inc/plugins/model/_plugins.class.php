@@ -1367,10 +1367,7 @@ class Plugins
 
 		if( empty( $setting_Blog ) )
 		{ // This should be impossible, but make sure $setting_Blog is set
-			global $Settings;
-			$default_blog = $Settings->get('default_blog_ID');
-			$BlogCache = & get_BlogCache();
-			$setting_Blog = $BlogCache->get_by_ID( $default_blog );
+			$setting_Blog = & get_setting_Blog( 'default_blog_ID' );
 		}
 
 		foreach( $renderer_Plugins as $loop_RendererPlugin )
@@ -2104,6 +2101,9 @@ class Plugins
 
 		$name_prefix = isset( $params['name_prefix'] ) ? $params['name_prefix'] : '';
 
+		// Set different prefix if you use several toolbars on one page:
+		$js_prefix = isset( $params['js_prefix'] ) ? $params['js_prefix'] : '';
+
 		$this->restart(); // make sure iterator is at start position
 
 		if( ! is_array($current_renderers) )
@@ -2205,7 +2205,7 @@ class Plugins
 
 			$r .= '<div id="block_renderer_'.$loop_RendererPlugin->code.'">';
 
-			$r .= '<input type="checkbox" class="checkbox" name="'.$name_prefix.'renderers[]" value="'.$loop_RendererPlugin->code.'" id="renderer_'.$loop_RendererPlugin->code.'"';
+			$r .= '<input type="checkbox" class="checkbox" name="'.$name_prefix.'renderers[]" value="'.$loop_RendererPlugin->code.'" id="'.$js_prefix.'renderer_'.$loop_RendererPlugin->code.'"';
 
 			switch( $apply_rendering )
 			{
@@ -2237,8 +2237,14 @@ class Plugins
 					break;
 			}
 
-			$r .= ' title="'.format_to_output($loop_RendererPlugin->short_desc, 'formvalue').'" /> <label for="renderer_'.$loop_RendererPlugin->code.'" title="';
-			$r .= format_to_output($loop_RendererPlugin->short_desc, 'formvalue').'">';
+			$r .= ' title="'.format_to_output( $loop_RendererPlugin->short_desc, 'formvalue' ).'"';
+			if( ! empty( $js_prefix ) )
+			{	// Set prefix, Used in JS code to disable/enable plugin toolbar:
+				$r .= ' data-prefix="'.format_to_output( $js_prefix, 'formvalue' ).'"';
+			}
+			$r .= ' />';
+			$r .= ' <label for="'.$js_prefix.'renderer_'.$loop_RendererPlugin->code.'"';
+			$r .= ' title="'.format_to_output($loop_RendererPlugin->short_desc, 'formvalue').'">';
 			$r .= format_to_output($loop_RendererPlugin->name).'</label>';
 
 			// fp> TODO: the first thing we want here is a TINY javascript popup with the LONG desc. The links to readme and external help should be inside of the tiny popup.

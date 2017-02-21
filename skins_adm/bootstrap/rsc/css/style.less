@@ -77,7 +77,7 @@ div.status_icon {
 // Action icons
 .action_icon, .widget_actions a, .no_icon {
 	font-weight: bold;
-	margin: 0 2px;
+	margin: 2px;
 }
 // Remove spaces between the spam voting buttons
 .btn-group .action_icon {
@@ -391,7 +391,7 @@ div.delete_messages ul {
 .vote_spam {
 	float: left;
 	padding-left: 10px;
-	line-height: 33px;
+	line-height: 34px;
 	a.action_icon {
 		font-size: inherit;
 		.icon {
@@ -404,6 +404,12 @@ div.delete_messages ul {
 	a.action_icon {
 		font-size: 12px;
 	}
+}
+.comment_reply {
+	float: left;
+	display: inline-block;
+	margin-left: 10px;
+	line-height: 34px;
 }
 // Status banner
 .evo_content_block span[class*="status_"] {
@@ -649,7 +655,7 @@ fieldset ul {
 	}
 }
 #itemform_extra {
-	input {
+	input:not( #item_issue_date ) {
 		max-width: 80px;
 	}
 	> div.fieldset > label {
@@ -736,10 +742,14 @@ fieldset ul {
 		// Use this position to fix red triangle when attachment is dragged by mouse:
 		position: relative;
 	}
+	div.results, div.table_scroll {
+		overflow: initial;
+	}
 	table tbody {
 		.dragged {
 			opacity: 0.8;
 			position: absolute;
+			z-index: 1000;
 		}
 		td {
 			cursor: move;
@@ -902,7 +912,12 @@ tr#fileuploader_form td {
 }
 
 h2.user_title {
+	margin-top: 0;
 	margin-bottom: 18px;
+}
+
+h2.user_title::first-line {
+	line-height: 52px;
 }
 
 // phpBB importer
@@ -1326,6 +1341,14 @@ div.level3 nav .nav > li + li {
 	}
 	.legend {
 		margin: 0 1ex;
+		width: 240px;
+		height: 50px;
+		overflow: hidden;
+		label {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
 	}
 }
 .coll_settings_skinshot {
@@ -1430,8 +1453,9 @@ form#thread_checkchanges ul.token-input-list-facebook {
 	}
 }
 
-// Input field to edit order in table column by ajax
-input[name=new_cat_order] {
+// Input field to edit item/cat order in table column by ajax
+input[name=new_cat_order],
+input[name=new_item_order] {
 	width: 100%;
 }
 
@@ -1555,42 +1579,20 @@ table.diff {
 	}
 }
 
-.evo_poll__table {
-	margin-bottom: 14px;
+// Polls table:
+.evo_poll__percent_bar {
 	width: 100%;
-	td {
-		padding: 2px 10px 2px 0;
-		vertical-align: top;
-	}
-	tr td:last-child {
-		padding-right: 0;
-	}
-	input[type=radio], label {
-		margin: 0;
-	}
-	.evo_poll__percent_bar {
+	min-width: 40px;
+	padding-right: 6px;
+	> div {
 		width: 100%;
-		min-width: 40px;
-		padding-right: 6px;
+		vertical-align: middle;
+		display: inline-block;
 		> div {
-			width: 100%;
-			vertical-align: middle;
-			display: inline-block;
-			> div {
-				background: #ffcc66;
-				height: 12px;
-				min-width: 1px;
-			}
+			background: #ffcc66;
+			height: 12px;
+			min-width: 1px;
 		}
-	}
-	.evo_poll__selector {
-		width: 5px;
-	}
-	.evo_poll__title {
-		white-space: nowrap;
-	}
-	.evo_poll_percentage {
-		max-width: 50px;
 	}
 }
 

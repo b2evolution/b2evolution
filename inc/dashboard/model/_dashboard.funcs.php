@@ -38,6 +38,11 @@ function b2evonet_get_updates( $force_short_delay = false )
 		return NULL;
 	}
 
+	if( $Settings->get( 'evonet_last_error' ) > $servertimenow - 5400 )
+	{	// The previous error was less than 90 minutes ago, skip this:
+		return false;
+	}
+
 	if( $debug == 2 )
 	{
 		$update_every = 8;
@@ -193,6 +198,11 @@ function b2evonet_get_updates( $force_short_delay = false )
 		}
 	}
 
+	// Response is an error,
+	// Save current server time of this error to don't repeat it during 90 minutes:
+	$Settings->set( 'evonet_last_error', $servertimenow );
+	$Settings->dbupdate();
+
 	$Timer->pause('evonet: check for updates');
 	return false;
 }
@@ -291,7 +301,7 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		if( ! $is_meta )
 		{	// Display status banner only for normal comments:
 			$Comment->format_status( array(
-					'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+					'template' => '<div class="floatright"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 				) );
 		}
 
@@ -313,7 +323,7 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		}
 		echo $Comment->get_title( array(
 				'author_format' => '<strong>%s</strong>',
-				'link_text'     => 'login',
+				'link_text'     => 'auto',
 				'linked_type'   => $is_meta,
 			) );
 		$comment_Item = & $Comment->get_Item();
@@ -493,7 +503,7 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 		$Item->get_creator_User();
 
 		$Item->format_status( array(
-				'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+				'template' => '<div class="floatright"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 			) );
 
 		echo '<div class="dashboard_float_actions">';

@@ -751,7 +751,7 @@ if( $action == 'dashboard' )
 			}
 			echo '<div class="items_container evo_content_block">';
 
-			$block_item_Widget->title = T_('Recently edited').get_manual_link( 'dashboard-recently-edited-posts' );
+			$block_item_Widget->title = T_('Recently edited posts').get_manual_link( 'dashboard-recently-edited-posts' );
 			$block_item_Widget->disp_template_replaced( 'block_start' );
 
 			while( $Item = & $ItemList->get_item() )
@@ -769,7 +769,7 @@ if( $action == 'dashboard' )
 		NEW:
 		*/
 				$Item->format_status( array(
-						'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+						'template' => '<div class="floatright"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 					) );
 
 				echo '<div class="dashboard_float_actions">';
@@ -1032,6 +1032,8 @@ else
 			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 			$AdminUI->breadcrumbpath_add( T_('Plugins'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			$AdminUI->set_page_manual_link( 'blog-plugin-settings' );
+			// Initialize JS for color picker field on the edit plugin settings form:
+			init_colorpicker_js();
 			break;
 
 		case 'advanced':

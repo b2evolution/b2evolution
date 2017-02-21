@@ -27,6 +27,8 @@ global $Settings;
  */
 global $Debuglog;
 
+global $admin_url;
+
 ?>
 <script type="text/javascript">
 	function show_hide_chapter_prefix(ob)

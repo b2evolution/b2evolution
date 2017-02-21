@@ -22,7 +22,7 @@ class shortlinks_plugin extends Plugin
 	var $code = 'b2evWiLi';
 	var $name = 'Short Links';
 	var $priority = 35;
-	var $version = '6.7.7';
+	var $version = '6.7.9';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -487,7 +487,7 @@ class shortlinks_plugin extends Plugin
 		}
 
 		// Print toolbar on screen:
-		return $this->DisplayCodeToolbar( $Blog );
+		return $this->DisplayCodeToolbar( $Blog, $params );
 	}
 
 
@@ -525,7 +525,7 @@ class shortlinks_plugin extends Plugin
 		}
 
 		// Print toolbar on screen
-		return $this->DisplayCodeToolbar( $Blog );
+		return $this->DisplayCodeToolbar( $Blog, $params );
 	}
 
 
@@ -577,6 +577,10 @@ class shortlinks_plugin extends Plugin
 			return false;
 		}
 
+		$params = array_merge( array(
+				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
+			), $params );
+
 		// Load js to work with textarea:
 		require_js( 'functions.js', 'blog', true, true );
 
@@ -588,24 +592,24 @@ class shortlinks_plugin extends Plugin
 
 		?><script type="text/javascript">
 		//<![CDATA[
-		function shortlinks_toolbar( title )
+		function shortlinks_toolbar( title, prefix )
 		{
-			var r = '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>'
-				+ '<?php echo $this->get_template( 'toolbar_group_before' ); ?>'
+			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>' + title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
+				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>'
 
 				+ '<input type="button" title="<?php echo TS_('Link to a Post') ?>"'
 				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
-				+ ' data-func="shortlinks_load_window" value="<?php echo TS_('Link to a Post') ?>" />'
+				+ ' data-func="shortlinks_load_window|' + prefix + '" value="<?php echo TS_('Link to a Post') ?>" />'
 
-				+ '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
+				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
 
-				jQuery( '.<?php echo $this->code ?>_toolbar' ).html( r );
+				jQuery( '.' + prefix + '<?php echo $this->code ?>_toolbar' ).html( r );
 		}
 
 		/**
 		 * Load main modal window to select collection and posts
 		 */
-		function shortlinks_load_window()
+		function shortlinks_load_window( prefix )
 		{
 			openModalWindow( '<div id="shortlinks_wrapper"></div>', 'auto', '', true,
 				'<?php echo TS_('Link to a Post'); ?>', // Window title
@@ -613,7 +617,7 @@ class shortlinks_plugin extends Plugin
 				true );
 
 			// Load collections:
-			shortlinks_load_colls( '<?php echo empty( $Blog ) ? '' : $Blog->get( 'urlname' ); ?>' );
+			shortlinks_load_colls( '<?php echo empty( $Blog ) ? '' : format_to_js( $Blog->get( 'urlname' ) ); ?>', prefix );
 
 			// Set max-height to keep the action buttons on screen:
 			var modal_window = jQuery( '#shortlinks_wrapper' ).parent();
@@ -821,8 +825,9 @@ class shortlinks_plugin extends Plugin
 		 * Load all available collections for current user:
 		 *
 		 * @param string Current collection urlname
+		 * @param string Prefix to use several toolbars on one page
 		 */
-		function shortlinks_load_colls( current_coll_urlname )
+		function shortlinks_load_colls( current_coll_urlname, prefix )
 		{
 			shortlinks_api_request( 'collections', '#shortlinks_wrapper', function( data )
 			{	// Display the colllections on success request:
@@ -850,6 +855,7 @@ class shortlinks_plugin extends Plugin
 					+ '<div id="shortlinks_posts_block"></div>'
 					+ '<div id="shortlinks_post_block"></div>'
 					+ '<div id="shortlinks_post_form" style="display:none">'
+						+ '<input type="hidden" id="shortlinks_hidden_prefix" value="' + ( prefix ? prefix : '' ) + '" />'
 						+ '<input type="hidden" id="shortlinks_hidden_ID" />'
 						+ '<input type="hidden" id="shortlinks_hidden_cover_link" />'
 						+ '<input type="hidden" id="shortlinks_hidden_teaser_link" />'
@@ -962,6 +968,11 @@ class shortlinks_plugin extends Plugin
 				shortlinks_end_loading( '#shortlinks_posts_list', r );
 			} );
 		}
+
+	if( typeof( b2evo_shortlinks_plugin_initialized ) == 'undefined' )
+	{	// Initialize the code below only once:
+
+		b2evo_shortlinks_plugin_initialized = true;
 
 		// Load the posts of the selected collection:
 		jQuery( document ).on( 'change', '#shortlinks_colls_list select', function()
@@ -1084,7 +1095,7 @@ class shortlinks_plugin extends Plugin
 				tinyMCE.execCommand( 'mceFocus', false, tinyMCE.activeEditor.id );
 			}
 			// Insert tag text in area:
-			textarea_wrap_selection( b2evoCanvas, '[[' + jQuery( '#shortlinks_hidden_urltitle' ).val() + ']]', '', 0 );
+			textarea_wrap_selection( window[ jQuery( '#shortlinks_hidden_prefix' ).val() + 'b2evoCanvas' ], '[[' + jQuery( '#shortlinks_hidden_urltitle' ).val() + ']]', '', 0 );
 			// Close main modal window:
 			closeModalWindow();
 		} );
@@ -1267,7 +1278,7 @@ class shortlinks_plugin extends Plugin
 				tinyMCE.execCommand( 'mceFocus', false, tinyMCE.activeEditor.id );
 			}
 			// Insert tag text in area:
-			textarea_wrap_selection( b2evoCanvas, post_content, '', 0 );
+			textarea_wrap_selection( window[ jQuery( '#shortlinks_hidden_prefix' ).val() + 'b2evoCanvas' ], post_content, '', 0 );
 			// Close main modal window:
 			closeModalWindow();
 		}
@@ -1316,12 +1327,14 @@ class shortlinks_plugin extends Plugin
 			// To prevent link default event:
 			return false;
 		} );
+
+	}
 		//]]>
 		</script><?php
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script type="text/javascript">shortlinks_toolbar( '<?php echo TS_('Short Links:'); ?>' );</script><?php
+		?><script type="text/javascript">shortlinks_toolbar( '<?php echo TS_('Short Links:'); ?>', '<?php echo $params['js_prefix']; ?>' );</script><?php
 
 		return true;
 	}

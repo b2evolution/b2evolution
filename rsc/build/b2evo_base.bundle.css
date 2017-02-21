@@ -246,6 +246,10 @@ span.fa {
 a.action_icon span.fa {
   margin-right: 2px;
 }
+span.fa.action_icon.empty_placeholder {
+  margin-right: 4px;
+  visibility: hidden;
+}
 a.roundbutton .fa,
 a.roundbutton:hover .fa,
 a.roundbutton_text .fa,
@@ -1673,6 +1677,9 @@ div.avatartag.main .avatar_actions {
     max-height: 245px;
   }
 }
+#user_crop_content {
+  padding: 10px;
+}
 #image_crop_block {
   display: table;
 }
@@ -1849,6 +1856,55 @@ textarea.form_textarea_input {
 label.radiooption {
   margin-right: 1em;
 }
+.file_select_wrapper {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-flow: row wrap;
+      -ms-flex-flow: row wrap;
+          flex-flow: row wrap;
+  -webkit-box-align: start;
+  -webkit-align-items: flex-start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+.file_select_wrapper .file_select_item {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-flow: row wrap;
+      -ms-flex-flow: row wrap;
+          flex-flow: row wrap;
+  margin-right: 8px;
+  text-align: center;
+}
+.file_select_wrapper .file_select_item .item_actions {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-shrink: 1;
+      -ms-flex-negative: 1;
+          flex-shrink: 1;
+  -webkit-flex-flow: column wrap;
+      -ms-flex-flow: column wrap;
+          flex-flow: column wrap;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  -webkit-align-content: center;
+      -ms-flex-line-pack: center;
+          align-content: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  text-align: left;
+  margin-left: 8px;
+}
 .eform label {
   font-weight: bold;
 }
@@ -1918,6 +1974,11 @@ input.invisible {
 div.log_container,
 div.action_messages {
   margin: 1ex;
+}
+div.log_container ul.message_group li,
+div.action_messages ul.message_group li {
+  margin-left: 25px;
+  list-style: disc;
 }
 div.log_container ul,
 div.action_messages ul,
@@ -2767,6 +2828,42 @@ div.widget_core_user_avatars.evo_layout_rwd img {
   right: 0;
   bottom: 0;
   margin: auto;
+}
+.textcomplete-dropdown {
+  border: 1px solid #ddd;
+  background-color: #fff;
+  text-align: left;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.textcomplete-dropdown mark {
+  background: none;
+}
+.textcomplete-dropdown li {
+  border-top: 1px solid #ddd;
+  padding: 2px 5px;
+  margin: 0;
+}
+.textcomplete-dropdown li:first-child {
+  border-top: none;
+}
+.textcomplete-dropdown li a {
+  color: #000;
+}
+.textcomplete-dropdown li:hover,
+.textcomplete-dropdown li:hover a,
+.textcomplete-dropdown li:hover mark,
+.textcomplete-dropdown li.active,
+.textcomplete-dropdown li.active a,
+.textcomplete-dropdown li.active mark {
+  color: #fff;
+  background-color: #3b5998;
+  text-decoration: none;
+  cursor: pointer;
+}
+.autocomplete_usernames {
+  display: block;
 }
 .ratings_table {
   margin: 0 10px 10px 0;

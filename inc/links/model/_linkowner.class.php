@@ -66,12 +66,6 @@ class LinkOwner
 	 */
 	var $ID_field_name;
 
-	/**
-	 * Flag to know if link owner is used for temporary object(new creating object)
-	 *
-	 * @var boolean
-	 */
-	var $is_temp = false;
 
 	/**
 	 * Abstract methods that needs to be overriden in every subclass
@@ -111,25 +105,32 @@ class LinkOwner
 	 */
 	function set_object( $link_Object, $tmp_ID = NULL )
 	{
+		$this->link_Object = $link_Object;
+
 		if( empty( $link_Object ) || empty( $link_Object->ID ) )
 		{	// The object is creating currently, we should use a temporary object:
 			if( $tmp_ID )
 			{	// Get already created temporary object:
 				$TemporaryIDCache = & get_TemporaryIDCache();
-				$link_Object = & $TemporaryIDCache->get_by_ID( $tmp_ID, false, false );
+				$tmp_link_Object = & $TemporaryIDCache->get_by_ID( $tmp_ID, false, false );
 			}
 			else
 			{	// Create new temporary object:
-				$link_Object = new TemporaryID();
-				$link_Object->set( 'type', $this->type );
-				$link_Object->dbinsert();
+				global $blog;
+				$tmp_link_Object = new TemporaryID();
+				$tmp_link_Object->set( 'type', $this->type );
+				if( ! empty( $blog ) )
+				{
+					$tmp_link_Object->set( 'coll_ID', $blog );
+				}
+				$tmp_link_Object->dbinsert();
 			}
 
-			// Mark this link owner is using temporary object:
-			$this->is_temp = true;
+			// Mark this link owner is using a temporary object:
+			$this->link_Object->tmp_ID = $tmp_link_Object->ID;
+			$this->link_Object->tmp_coll_ID = $tmp_link_Object->get( 'coll_ID' );
+			$this->link_Object->type = $tmp_link_Object->get( 'type' );
 		}
-
-		$this->link_Object = $link_Object;
 	}
 
 
@@ -266,12 +267,23 @@ class LinkOwner
 		return $SQL;
 	}
 
+
+	/**
+	 * Check if current link owner is used as temporary for new creating object
+	 *
+	 * @return boolean TRUE if link owner is temporary
+	 */
+	function is_temp()
+	{
+		return ! empty( $this->link_Object->tmp_ID );
+	}
+
 	/**
 	 * Get link owner object ID
 	 */
 	function get_ID()
 	{
-		return $this->link_Object->ID;
+		return $this->is_temp() ? $this->link_Object->tmp_ID : $this->link_Object->ID;
 	}
 
 
@@ -282,7 +294,7 @@ class LinkOwner
 	 */
 	function get_ID_field_name()
 	{
-		return $this->is_temp ? 'tmp_ID' : $this->ID_field_name;
+		return $this->is_temp() ? 'tmp_ID' : $this->ID_field_name;
 	}
 
 
@@ -472,14 +484,25 @@ class LinkOwner
 
 
 	/**
+	 * Update owner contents_last_updated_ts if exists
+	 * This must be override in the subclasses if the owner object has contents_last_updated_ts field
+	 */
+	function update_contents_last_updated_ts()
+	{
+		return;
+	}
+
+
+	/**
 	 * This function is called after when some file was unlinked from owner
 	 *
 	 * @param integer Link ID
 	 */
 	function after_unlink_action( $link_ID = 0 )
 	{
-		// Update last touched date of the Owner
+		// Update last touched date content last updated date of the Owner:
 		$this->update_last_touched_date();
+		$this->update_contents_last_updated_ts();
 	}
 
 

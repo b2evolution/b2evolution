@@ -85,6 +85,10 @@ function upg_task_start( $version, $title = '' )
 			task_begin( $title );
 		}
 
+		// Begin a transaction for the upgrade block:
+		global $DB;
+		$DB->begin();
+
 		return true;
 	}
 	else
@@ -105,6 +109,10 @@ function upg_task_end( $print_result = true )
 
 	if( ! empty( $upgrade_db_version ) )
 	{	// Only if the upgrade task is not ended yet:
+
+		// End current transaction of the upgrade block:
+		global $DB;
+		$DB->commit();
 
 		if( $print_result )
 		{	// Print out the end of task:
@@ -814,9 +822,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							ADD COLUMN blog_access_type VARCHAR(10) NOT NULL DEFAULT 'index.php' AFTER blog_locale,
 							ADD COLUMN blog_force_skin tinyint(1) NOT NULL default 0 AFTER blog_default_skin,
 							ADD COLUMN blog_in_bloglist tinyint(1) NOT NULL DEFAULT 1 AFTER blog_disp_bloglist,
-							ADD COLUMN blog_links_blog_ID INT(4) NOT NULL DEFAULT 0,
-							ADD UNIQUE KEY blog_stub (blog_stub)";
+							ADD COLUMN blog_links_blog_ID INT(4) NOT NULL DEFAULT 0";
 		$DB->query( $query );
+		// Use this query separately from above because MariaDB versions 10+ create an error:
+		$DB->query( 'ALTER TABLE T_blogs
+			ADD UNIQUE KEY blog_stub (blog_stub)' );
 
 		$query = "UPDATE T_blogs
 							SET blog_access_type = 'stub',
@@ -1125,7 +1135,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							ADD COLUMN blog_allowcomments VARCHAR(20) NOT NULL default 'post_by_post' AFTER blog_keywords,
 							ADD COLUMN blog_allowblogcss TINYINT(1) NOT NULL default 1 AFTER blog_allowpingbacks,
 							ADD COLUMN blog_allowusercss TINYINT(1) NOT NULL default 1 AFTER blog_allowblogcss,
-							DROP INDEX blog_stub,
 							ADD COLUMN blog_stub VARCHAR(255) NOT NULL DEFAULT 'stub' AFTER blog_staticfilename,
 							ADD COLUMN blog_commentsexpire INT(4) NOT NULL DEFAULT 0 AFTER blog_links_blog_ID,
 							ADD COLUMN blog_media_location ENUM( 'default', 'subdir', 'custom', 'none' ) DEFAULT 'default' NOT NULL AFTER blog_commentsexpire,
@@ -1133,6 +1142,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							ADD COLUMN blog_media_fullpath VARCHAR( 255 ) NOT NULL AFTER blog_media_subdir,
 							ADD COLUMN blog_media_url VARCHAR(255) NOT NULL AFTER blog_media_fullpath";
 		$DB->query( $query );
+		// Use this query separately from above because MariaDB versions 10+ create an error:
+		$DB->query( 'ALTER TABLE T_blogs
+							DROP INDEX blog_stub' );
 
 		$query = "ALTER TABLE T_blogs
 							ADD UNIQUE blog_urlname ( blog_urlname )";
@@ -2603,17 +2615,21 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$query = "ALTER TABLE T_hitlog
 			 CHANGE COLUMN hit_ID hit_ID              INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			 CHANGE COLUMN hit_datetime hit_datetime  DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
-			 ADD COLUMN hit_keyphrase_keyp_ID         INT UNSIGNED DEFAULT NULL AFTER hit_referer_dom_ID,
-			 ADD INDEX hit_remote_addr ( hit_remote_addr ),
-			 ADD INDEX hit_sess_ID        ( hit_sess_ID )";
+			 ADD COLUMN hit_keyphrase_keyp_ID         INT UNSIGNED DEFAULT NULL AFTER hit_referer_dom_ID";
 		$DB->query( $query );
+		// Use this query separately from above because MariaDB versions 10+ create an error:
+		$DB->query( 'ALTER TABLE T_hitlog
+			 ADD INDEX hit_remote_addr ( hit_remote_addr ),
+			 ADD INDEX hit_sess_ID     ( hit_sess_ID )' );
 		echo "OK.<br />\n";
 
 		echo 'Upgrading sessions table... ';
 		$DB->query( "ALTER TABLE T_sessions
 			ALTER COLUMN sess_lastseen SET DEFAULT '2000-01-01 00:00:00',
-			ADD COLUMN sess_hitcount  INT(10) UNSIGNED NOT NULL DEFAULT 1 AFTER sess_key,
-			ADD KEY sess_user_ID (sess_user_ID)" );
+			ADD COLUMN sess_hitcount  INT(10) UNSIGNED NOT NULL DEFAULT 1 AFTER sess_key" );
+		// Use this query separately from above because MariaDB versions 10+ create an error:
+		$DB->query(	'ALTER TABLE T_sessions
+			ADD KEY sess_user_ID (sess_user_ID)' );
 		echo "OK.<br />\n";
 
 		echo 'Creating goal tracking table... ';
@@ -4974,8 +4990,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		task_begin( 'Upgrading Files table...' );
 		$DB->query( 'ALTER TABLE T_files
-			DROP INDEX file,
 			ADD COLUMN file_path_hash char(32) default NULL' );
+		// Use this query separately from above because MariaDB versions 10+ create an error:
+		$DB->query( 'ALTER TABLE T_files
+			DROP INDEX file' );
 		// Change file path length to the max allowed value
 		$DB->query( "ALTER TABLE T_files CHANGE COLUMN file_path file_path VARCHAR(767) NOT NULL DEFAULT ''" );
 		$DB->query( 'UPDATE T_files SET file_path_hash = MD5( CONCAT( file_root_type, file_root_ID, file_path ) )');
@@ -7565,8 +7583,35 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 11800, 'Upgrading collection-user permissions table...' ) )
+	{	// part of 6.7.7-stable
+		$DB->query( 'ALTER TABLE T_coll_user_perms
+			ADD bloguser_perm_analytics tinyint NOT NULL default 0' );
+		$DB->query( 'UPDATE T_coll_user_perms
+			  SET bloguser_perm_analytics = 1
+			WHERE bloguser_perm_properties = 1' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11805, 'Upgrading collection-group permissions table...' ) )
+	{	// part of 6.7.7-stable
+		$DB->query( 'ALTER TABLE T_coll_group_perms
+			ADD bloggroup_perm_analytics tinyint NOT NULL default 0' );
+		$DB->query( 'UPDATE T_coll_group_perms
+			  SET bloggroup_perm_analytics = 1
+			WHERE bloggroup_perm_properties = 1' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 11810, 'Upgrading plugins table...' ) )
+	{	// part of 6.7.7-stable
+		$DB->query( 'ALTER TABLE T_plugins
+			MODIFY plug_priority TINYINT UNSIGNED NOT NULL default 50' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 12000, 'Add new types "Text" and "HTML" for custom fields of item types...' ) )
-	{	// part of 6.7.5-stable
+	{	// part of 6.8.0-alpha
 		$DB->query( 'ALTER TABLE T_items__item_settings
 			MODIFY COLUMN iset_value varchar( 10000 ) NULL' );
 		$DB->query( 'ALTER TABLE T_items__type_custom_field
@@ -7575,8 +7620,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12005, 'Update widget container "Item Single"...' ) )
-	{	// part of 6.7.5-stable
-		$DB->begin();
+	{	// part of 6.8.0-alpha
 		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
 		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_code, wi_order' );
 		$SQL->FROM( 'T_widget' );
@@ -7628,12 +7672,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
 			  VALUES '.implode( ', ', $item_attachments_widget_rows ) );
 		}
-		$DB->commit();
 		upg_task_end();
 	}
 
 	if( upg_task_start( 12010, 'Create new widget container "404 Page"...' ) )
-	{	// part of 6.7.5-stable
+	{	// part of 6.8.0-alpha
 		$coll_IDs = $DB->get_col( 'SELECT blog_ID FROM T_blogs' );
 		if( $coll_IDs )
 		{
@@ -7652,12 +7695,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12015, 'Rename table "T_antispam" to "T_antispam__keyword"...' ) )
-	{	// part of 6.7.5-stable
+	{	// part of 6.8.0-alpha
 		$DB->query( 'RENAME TABLE '.$tableprefix.'antispam TO T_antispam__keyword' );
 		$DB->query( "ALTER TABLE T_antispam__keyword
 			CHANGE aspm_ID     askw_ID     bigint(11) NOT NULL auto_increment,
 			CHANGE aspm_string askw_string varchar(80) NOT NULL,
-			CHANGE aspm_source askw_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported',
+			CHANGE aspm_source askw_source enum( 'local','reported','central' ) COLLATE ascii_general_ci NOT NULL default 'reported'" );
+		// Use this query separately from above because MariaDB versions 10+ create an error:
+		$DB->query( "ALTER TABLE T_antispam__keyword
 			DROP INDEX aspm_string,
 			ADD UNIQUE askw_string ( askw_string )" );
 		upg_task_end();
@@ -7750,7 +7795,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12070, 'Create table for temporary ID...' ) )
+	if( upg_task_start( 12070, 'Create table for temporary IDs...' ) )
 	{	// part of 6.8.0-alpha
 		db_create_table( 'T_temporary_ID', '
 			tmp_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -7782,8 +7827,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12085, 'Update widget container "Item Single"...' ) )
-	{ // part of 6.8.0-alpha
-		$DB->begin();
+	{	// part of 6.8.0-alpha
 		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
 		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_code, wi_order' );
 		$SQL->FROM( 'T_widget' );
@@ -7843,7 +7887,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
 			  VALUES '.implode( ', ', $item_tags_widget_rows ) );
 		}
-		$DB->commit();
 		upg_task_end();
 	}
 
@@ -7878,8 +7921,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12100, 'Update widget container "Item Single" by adding "Item Location" widget...' ) )
-	{ // part of 6.8.0-alpha
-		$DB->begin();
+	{	// part of 6.8.0-alpha
 		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
 		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_code, wi_order' );
 		$SQL->FROM( 'T_widget' );
@@ -7938,7 +7980,269 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
 			  VALUES '.implode( ', ', $item_locations_widget_rows ) );
 		}
-		$DB->commit();
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12105, 'Upgrade items table...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( "ALTER TABLE T_items__item
+			MODIFY post_status ENUM('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NOT NULL DEFAULT 'draft'" );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12110, 'Upgrade comments table...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( "ALTER TABLE T_comments
+			MODIFY comment_status ENUM('published','community','deprecated','protected','private','review','draft','trash') COLLATE ascii_general_ci DEFAULT 'draft' NOT NULL" );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12115, 'Upgrading collections table...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_blogs
+			MODIFY blog_type VARCHAR( 16 ) COLLATE ascii_general_ci DEFAULT "std" NOT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12120, 'Upgrade locales table...' ) )
+	{ // part of 6.8.0-alpha
+		db_add_col( 'T_locales', 'loc_longdatefmt', 'varchar(20) COLLATE ascii_general_ci NOT NULL default "Y-m-d" AFTER loc_datefmt' );
+		db_add_col( 'T_locales', 'loc_extdatefmt', 'varchar(20) COLLATE ascii_general_ci NOT NULL default "Y M d" AFTER loc_longdatefmt' );
+
+		// Update existing locales
+		$DB->query( 'UPDATE T_locales	SET loc_longdatefmt = REPLACE( loc_datefmt, "y", "Y")' );
+		$DB->query( 'UPDATE T_locales	SET loc_extdatefmt = REPLACE( REPLACE( REPLACE( REPLACE( REPLACE( loc_longdatefmt, "m", "M"), ".", " " ), "-", " " ), "/", " "), "\\\\", " ")' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12125, 'Upgrade locales table...' ) )
+	{	// part of 6.8.0-alpha
+		db_add_col( 'T_locales', 'loc_input_datefmt', 'varchar(20) COLLATE ascii_general_ci NOT NULL default "Y-m-d" AFTER loc_extdatefmt' );
+		db_add_col( 'T_locales', 'loc_input_timefmt', 'varchar(20) COLLATE ascii_general_ci NOT NULL default "H:i:s" AFTER loc_shorttimefmt' );
+
+		// Allow only numeric date formats:
+		$SQL = new SQL( 'Get all short date formats"' );
+		$SQL->SELECT( 'loc_locale, loc_datefmt, loc_timefmt' );
+		$SQL->FROM( 'T_locales' );
+		$locales = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+
+		foreach( $locales as $loc_data )
+		{
+			$loc_data_datefmt = $loc_data['loc_datefmt'];
+
+			if( preg_match( '/[^dDjmnYy:\.,\-_\/\\\\ ]/', $loc_data_datefmt ) )
+			{	// If locale date format contains at least one invalid character then use default date format:
+				$loc_data_datefmt = 'Y-m-d';
+			}
+
+			$DB->query( 'UPDATE T_locales
+				  SET loc_input_datefmt = '.$DB->quote( $loc_data_datefmt ).',
+				      loc_input_timefmt = "H:i:s"
+				WHERE loc_locale = '.$DB->quote( $loc_data['loc_locale'] ) );
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12130, 'Create new widget container "Item Single Header"...' ) )
+	{	// part of 6.8.0-alpha
+		$SQL = new SQL( 'Get all collections that have a widget container "Item Single"' );
+		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_order, wi_enabled, wi_code, wi_params, blog_type' );
+		$SQL->FROM( 'T_widget' );
+		$SQL->FROM_add( 'LEFT JOIN T_blogs ON blog_id = wi_coll_ID' );
+		$SQL->WHERE( 'wi_sco_name = "Item Single"' );
+		$SQL->ORDER_BY( 'wi_coll_ID, wi_order' );
+		$coll_item_single_widgets = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+		$coll_widgets = array();
+		foreach( $coll_item_single_widgets as $coll_item_single_widget )
+		{
+			if( ! isset( $coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] ) )
+			{	// If the "Item Single" has no widget "Item Content":
+				$coll_widgets[ $coll_item_single_widget['wi_coll_ID'] ] = $coll_item_single_widget['blog_type'];
+			}
+		}
+
+		$item_info_line_widget_rows = array();
+		foreach( $coll_widgets as $coll_ID => $blog_type )
+		{	// Insert new widget "Item Info Line" to each collection that has a container "Item Single":
+			if( in_array( $blog_type, array( 'forum', 'group' ) ) )
+			{
+				$item_info_line_widget_rows[] = '( '.$coll_ID.', "Item Single Header", 10, "item_info_line", "a:14:{s:5:\"title\";s:0:\"\";s:9:\"flag_icon\";i:1;s:14:\"permalink_icon\";i:0;s:13:\"before_author\";s:10:\"started_by\";s:11:\"date_format\";s:8:\"extended\";s:9:\"post_time\";i:1;s:12:\"last_touched\";i:1;s:8:\"category\";i:0;s:9:\"edit_link\";i:0;s:16:\"widget_css_class\";s:0:\"\";s:9:\"widget_ID\";s:0:\"\";s:16:\"allow_blockcache\";i:0;s:11:\"time_format\";s:4:\"none\";s:12:\"display_date\";s:12:\"date_created\";}" )';
+			}
+			else
+			{
+				$item_info_line_widget_rows[] = '( '.$coll_ID.', "Item Single Header", 10, "item_info_line", NULL )';
+			}
+		}
+		if( count( $item_info_line_widget_rows ) )
+		{	// Insert new widget "Item Info Line" into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code, wi_params )
+			  VALUES '.implode( ', ', $item_info_line_widget_rows ) );
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12135, 'Upgrade table of user field definitions...' ) )
+	{	// part of 6.8.0-alpha
+		$DB->query( 'ALTER TABLE T_users__fielddefs
+			MODIFY ufdf_code varchar(20) COLLATE ascii_bin UNIQUE NOT NULL COMMENT "Code MUST be lowercase ASCII only"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12140, 'Updating file types table...' ) )
+	{	// part of 6.7.10-stable moved here so it also applies to 6.8.3 -> 6.8.4 upgrades
+		$DB->query( 'UPDATE T_filetypes
+				SET ftyp_allowed = "admin"
+			WHERE ftyp_extensions REGEXP "[[:<:]]swf[[:>:]]"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12145, 'Upgrade Temporary IDs table...' ) )
+	{	// part of 6.8.4-stable
+		$DB->query( 'ALTER TABLE T_temporary_ID
+			ADD tmp_coll_ID INT(11) UNSIGNED NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12150, 'Upgrade categories table...' ) )
+	{	// part of 6.8.4-alpha
+		db_add_col( 'T_categories', 'cat_image_file_ID', 'int(10) unsigned  NULL AFTER cat_blog_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12155, 'Renaming notification logo setting...' ) )
+	{ // part of 6.8.5-stable
+		$notification_logo = $DB->get_var( 'SELECT set_value FROM T_settings WHERE set_name = "notification_logo"' );
+		if( !empty( $notification_logo ) )
+		{
+			if( is_numeric( $notification_logo ) )
+			{ // We have a numeric value, it's possible that this is already a file_ID.
+			  // Make sure that the integer is a valid file ID and an image file before setting it as the notification_logo_file_ID.
+				$notification_logo = intval( $notification_logo );
+				$file_type = $DB->get_var( 'SELECT file_type FROM T_files WHERE file_ID = '.$notification_logo );
+				if( $file_type && $file_type == 'image' )
+				{
+					$DB->query( 'INSERT INTO T_settings ( set_name, set_value ) VALUES ( "notification_logo_file_ID", '.$notification_logo.' )' );
+				}
+			}
+
+			// Remove previous notification logo setting
+			$DB->query( 'DELETE FROM T_settings WHERE set_name = "notification_logo"' );
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12160, 'Renaming user setting...' ) )
+	{	// part of 6.8.6-stable
+		$DB->query( 'UPDATE T_users__usersettings
+			  SET uset_name = "user_registered_from_domain"
+			WHERE uset_name = "user_domain"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12161, 'Updating attachment positions...' ) )
+	{	// part of 6.8.7-stable
+		$DB->query( 'UPDATE T_links
+			INNER JOIN T_files ON file_ID = link_file_ID
+			       AND file_type NOT IN ( "image", "audio", "video" )
+			  SET link_position = "attachment"
+			WHERE link_position = "aftermore"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12165, 'Upgrade table of users...' ) )
+	{	// part of 6.9.0-beta
+		db_add_col( 'T_users', 'user_pass_driver', 'VARCHAR(16) NOT NULL default "evo$md5" AFTER user_salt' );
+		$DB->query( 'UPDATE T_users
+			  SET user_pass_driver = "evo$salted"
+			WHERE user_salt != ""' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12170, 'Updating users pass storage...' ) )
+	{	// part of 6.9.0-beta
+		$DB->query( 'ALTER TABLE T_users MODIFY COLUMN user_pass VARBINARY(32)' );
+		$DB->query( 'UPDATE T_users SET user_pass = LOWER( HEX( user_pass ) )' );
+		$DB->query( 'ALTER TABLE T_users MODIFY COLUMN user_pass VARCHAR(64) NOT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12175, 'Upgrade table of users...' ) )
+	{	// part of 6.9.0-beta
+		$DB->query( 'ALTER TABLE T_users
+			MODIFY user_salt VARCHAR(32) NOT NULL default ""' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12180, 'Updating base domains table...' ) )
+	{ // part of 6.9.0-beta
+		$sql = 'SHOW INDEX FROM T_basedomains WHERE KEY_NAME = "dom_type_name"';
+		$indexes = $DB->get_results( $sql, ARRAY_A );
+		if( $DB->num_rows > 0 )
+		{
+			$DB->query( 'ALTER TABLE T_basedomains DROP INDEX dom_type_name' );
+		}
+
+		// update user email domains IDs that will deleted to use related domain IDs that will be retained
+		$DB->query( 'UPDATE T_users a
+				LEFT JOIN (
+					SELECT a.dom_ID, b.dom_ID AS subst_dom_ID
+					FROM T_basedomains a
+					LEFT JOIN T_basedomains b
+						ON a.dom_name = b.dom_name
+							AND ( CASE a.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END ) > ( CASE b.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END )
+					WHERE NOT b.dom_ID IS NULL
+				) c
+					ON c.dom_ID = a.user_email_dom_ID
+				SET a.user_email_dom_ID = c.subst_dom_ID
+				WHERE
+					NOT c.dom_ID IS NULL' );
+
+		// update hitlist log
+		$DB->query( 'UPDATE T_hitlog a
+				LEFT JOIN (
+					SELECT a.dom_ID, b.dom_ID AS subst_dom_ID
+					FROM T_basedomains a
+					LEFT JOIN T_basedomains b
+						ON a.dom_name = b.dom_name
+							AND ( CASE a.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END ) > ( CASE b.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END )
+					WHERE NOT b.dom_ID IS NULL
+				) c
+					ON c.dom_ID = a.hit_referer_dom_ID
+				SET a.hit_referer_dom_ID = c.subst_dom_ID
+				WHERE
+					NOT c.dom_ID IS NULL' );
+
+		// delete duplicate entries, order by status: blocked > suspect > unknown > trusted, keep the first one
+		$DB->query( 'DELETE a
+				FROM T_basedomains a
+				LEFT JOIN T_basedomains b
+					ON a.dom_name = b.dom_name
+						AND ( CASE a.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END ) > ( CASE b.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END )
+				WHERE NOT b.dom_ID IS NULL;' );
+
+		// Add index
+		$DB->query( 'ALTER TABLE T_basedomains ADD UNIQUE INDEX `dom_name` (`dom_name`)' );
+
+		// add comment to user_email_dom_ID
+		$DB->query( 'ALTER TABLE T_users MODIFY user_email_dom_ID int(10) unsigned NULL COMMENT "Used for email statistics"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12185, 'Upgrading posts table...' ) )
+	{	// part of 6.9.0-beta
+		db_add_col( 'T_items__item', 'post_contents_last_updated_ts', 'TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\' AFTER post_last_touched_ts' );
+		$DB->query( 'UPDATE T_items__item
+			SET post_contents_last_updated_ts = post_last_touched_ts' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12186, 'Updating attachment positions...' ) )
+	{	// part of 6.9.0-stable (This is a duplicated 12161 block from 6.8.7-stable)
+		$DB->query( 'UPDATE T_links
+			INNER JOIN T_files ON file_ID = link_file_ID
+			       AND file_type NOT IN ( "image", "audio", "video" )
+			  SET link_position = "attachment"
+			WHERE link_position = "aftermore"' );
 		upg_task_end();
 	}
 
@@ -7946,13 +8250,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
 	 * YOU MUST USE:
-	 * task_begin( 'Descriptive text about action...' );
-	 * task_end();
+	 * if( upg_task_start( 12160, 'Descriptive text about action...' ) )
+	 * {	// part of 6.8.6-stable
+	 *  	// Write new upgrade code here.
+	 *  	upg_task_end();
+	 * }
 	 *
 	 * ALL DB CHANGES MUST BE EXPLICITLY CARRIED OUT. DO NOT RELY ON SCHEMA UPDATES!
 	 * Schema updates do not survive after several incremental changes.
 	 *
-	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 100).
+	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 10).
 	 */
 
 	// Execute general upgrade tasks.

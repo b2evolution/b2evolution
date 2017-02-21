@@ -360,7 +360,7 @@ else
 	}
 }
 
-if( $edited_Item->get_type_setting( 'allow_attachments' ) )
+if( $edited_Item->get_type_setting( 'allow_attachments' ) && $edited_Item->ID > 0 )
 { // ####################### ATTACHMENTS FIELDSETS #########################
 	$LinkOwner = new LinkItem( $edited_Item );
 	if( $LinkOwner->count_links() )
