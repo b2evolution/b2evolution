@@ -8240,13 +8240,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
 	 * YOU MUST USE:
-	 * task_begin( 'Descriptive text about action...' );
-	 * task_end();
+	 * if( upg_task_start( 12160, 'Descriptive text about action...' ) )
+	 * {	// part of 6.8.6-stable
+	 *  	// Write new upgrade code here.
+	 *  	upg_task_end();
+	 * }
 	 *
 	 * ALL DB CHANGES MUST BE EXPLICITLY CARRIED OUT. DO NOT RELY ON SCHEMA UPDATES!
 	 * Schema updates do not survive after several incremental changes.
 	 *
-	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 100).
+	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 10).
 	 */
 
 	// Execute general upgrade tasks.
