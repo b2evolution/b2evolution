@@ -54,16 +54,6 @@ $Results->cols[] = array(
 /*
  * Sub Type column
  */
-function display_subtype( $link_ID )
-{
-	global $LinkOwner, $current_File;
-
-	$Link = $LinkOwner->get_link_by_link_ID( $link_ID );
-	// Instantiate a File object for this line
-	$current_File = $Link->get_File();
-
-	return $Link->get_preview_thumb();
-}
 $Results->cols[] = array(
 						'th' => T_('Icon/Type'),
 						'td_class' => 'shrinkwrap',

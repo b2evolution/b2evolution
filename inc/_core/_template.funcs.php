@@ -3303,4 +3303,24 @@ function init_fontawesome_icons( $icons_type = 'fontawesome', $relative_to = 'rs
 	require_css( '#fontawesome#', $relative_to );
 }
 
+
+/**
+ * Registers headlines for initialization of file multi uploader
+ *
+ * @param boolean|string 'relative' or true (relative to <base>) or 'rsc_url' (relative to $rsc_url) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
+ * @param boolean TRUE to make the links table sortable
+ */
+function init_fileuploader_js( $relative_to = 'rsc_url', $load_sortable_js = true )
+{
+	// Require File Uploader js and css files:
+	require_js( 'multiupload/fileuploader.js', $relative_to );
+	require_css( 'fileuploader.css', $relative_to );
+
+	if( $load_sortable_js )
+	{	// Load JS files to make the links table sortable:
+		require_js( '#jquery#', $relative_to );
+		require_js( 'jquery/jquery.sortable.min.js', $relative_to );
+	}
+}
+
 ?>

@@ -549,6 +549,8 @@ while( $Item = & $ItemList->get_item() )
 				if( ( $Comment = get_comment_from_session( 'unsaved', $comment_type ) ) === NULL )
 				{	// There is no saved Comment in Session
 					$Comment = new Comment();
+					$Comment->set( 'type', $comment_type );
+					$Comment->set( 'item_ID', $Item->ID );
 					$comment_attachments = '';
 					$checked_attachments = '';
 				}
@@ -638,22 +640,9 @@ while( $Item = & $ItemList->get_item() )
 				// memorize all attachments ids
 				$Form->hidden( 'preview_attachments', $comment_attachments );
 			}
-			if( $Item->can_attach() )
-			{	// Display attach file input field:
-				$Form->input_field( array(
-						'label' => T_('Attach files'),
-						'note'  => get_icon( 'help', 'imgtag', array(
-								'data-toggle'    => 'tooltip',
-								'data-placement' => 'top',
-								'data-html'      => 'true',
-								'title'          => htmlspecialchars( get_upload_restriction( array(
-										'block_after'     => '',
-										'block_separator' => '<br /><br />' ) ) )
-							) ),
-						'name'  => 'uploadfile[]',
-						'type'  => 'file'
-					) );
-			}
+
+			// Display attachments fieldset:
+			$Form->attachments_fieldset( $Comment );
 
 			$Form->info( T_('Text Renderers'), $Plugins->get_renderer_checkboxes( $comment_renderers, array(
 					'Blog'         => & $Blog,

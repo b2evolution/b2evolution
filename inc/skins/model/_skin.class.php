@@ -1008,12 +1008,8 @@ class Skin extends DataObject
 						init_datepicker_js( 'blog' );
 					}
 
-					// Require File Uploader js and css:
-					require_js( 'multiupload/fileuploader.js', 'blog' );
-					require_css( 'fileuploader.css', 'blog' );
-					// Load JS files to make the links table sortable:
-					require_js( '#jquery#' );
-					require_js( 'jquery/jquery.sortable.min.js' );
+					// Used to quick upload several files:
+					init_fileuploader_js( 'blog' );
 					break;
 
 				case 'disp_users':
@@ -1193,12 +1189,8 @@ class Skin extends DataObject
 						require_js( 'bozo_validator.js', 'blog' );
 					}
 
-					// Require File Uploader js and css:
-					require_js( 'multiupload/fileuploader.js', 'blog' );
-					require_css( 'fileuploader.css', 'blog' );
-					// Load JS files to make the links table sortable:
-					require_js( '#jquery#' );
-					require_js( 'jquery/jquery.sortable.min.js' );
+					// Used to quick upload several files:
+					init_fileuploader_js( 'blog' );
 					break;
 
 				case 'disp_edit_comment':
@@ -1221,6 +1213,9 @@ class Skin extends DataObject
 
 					// Used to autocomplete usernames in textarea:
 					init_autocomplete_usernames_js( 'blog' );
+
+					// Used to quick upload several files:
+					init_fileuploader_js( 'blog' );
 					break;
 
 				case 'disp_useritems':

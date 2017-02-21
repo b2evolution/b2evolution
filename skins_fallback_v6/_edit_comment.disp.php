@@ -119,24 +119,8 @@ $Form->begin_form( 'evo_comment' );
 
 	$Form->end_fieldset();
 
-	// Display comment attachments
-	$LinkOwner = new LinkComment( $edited_Comment );
-	if( $LinkOwner->count_links() )
-	{ // there are attachments to display
-		if( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) )
-		{
-			$Form->begin_fieldset( T_('Attachments'), array( 'id' => 'comment_attachments' ) );
-			display_attachments( $LinkOwner, array(
-						'block_start' => '<div class="attachment_list results">',
-						'table_start' => '<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0" cellpadding="0">',
-					)  );
-			$Form->end_fieldset();
-		}
-		else
-		{
-			$Form->info( T_('Attachments'), T_('You do not have permission to edit file attachments for this comment') );
-		}
-	}
+	// Display attachments fieldset:
+	$Form->attachments_fieldset( $edited_Comment );
 
 	echo '<div class="edit_actions form-group text-center">';
 	echo_comment_status_buttons( $Form, $edited_Comment );

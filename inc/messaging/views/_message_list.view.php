@@ -334,15 +334,7 @@ if( $is_recipient )
 			}
 
 			// ####################### ATTACHMENTS/LINKS #########################
-			if( is_admin_page() && $current_User->check_perm( 'files', 'view' ) )
-			{	// If current user has a permission to view the files AND it is back-office:
-				load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
-				// Initialize this object as global because this is used in many link functions:
-				global $LinkOwner;
-				$LinkOwner = new LinkMessage( $edited_Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
-				// Display attachments fieldset:
-				display_attachments_fieldset( $Form, $LinkOwner );
-			}
+			$Form->attachments_fieldset( $edited_Message );
 
 		$Form->end_form( array(
 				array( 'submit', 'actionArray[preview]', T_('Preview'), 'SaveButton btn-info' ),

@@ -87,15 +87,7 @@ $Form->end_fieldset();
 
 
 // ####################### ATTACHMENTS/LINKS #########################
-if( $current_User->check_perm( 'files', 'view' ) )
-{	// If current user has a permission to view the files:
-	load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
-	// Initialize this object as global because this is used in many link functions:
-	global $LinkOwner;
-	$LinkOwner = new LinkEmailCampaign( $edited_EmailCampaign );
-	// Display attachments fieldset:
-	display_attachments_fieldset( $Form, $LinkOwner );
-}
+$Form->attachments_fieldset( $edited_EmailCampaign );
 
 
 $buttons = array();

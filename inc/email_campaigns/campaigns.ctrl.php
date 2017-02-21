@@ -338,12 +338,8 @@ if( $action == 'edit' )
 	if( $tab == 'compose' )
 	{	// Require colorbox js:
 		require_js_helper( 'colorbox' );
-		// Require File Uploader js and css:
-		require_js( 'multiupload/fileuploader.js' );
-		require_css( 'fileuploader.css' );
-		// Load JS files to make the links table sortable:
-		require_js( '#jquery#' );
-		require_js( 'jquery/jquery.sortable.min.js' );
+		// Init JS to quick upload several files:
+		init_fileuploader_js();
 	}
 }
 else

@@ -179,19 +179,10 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	<?php
 	$Form->end_fieldset();
 
-	// -------------------------- ATTACHMENTS/LINKS --------------------------
-	if( $current_User->check_perm( 'files', 'view' ) )
-	{	// If current user has a permission to view the files:
-		load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
-		// Initialize this object as global because this is used in many link functions:
-		global $LinkOwner;
-		$LinkOwner = new LinkComment( $edited_Comment );
-		// Display attachments fieldset:
-		display_attachments_fieldset( $Form, $LinkOwner, false, true );
-	}
+	// ####################### ATTACHMENTS/LINKS #########################
+	$Form->attachments_fieldset( $edited_Comment, true );
 
 	// ####################### PLUGIN FIELDSETS #########################
-
 	$Plugins->trigger_event( 'AdminDisplayCommentFormFieldset', array( 'Form' => & $Form, 'Comment' => & $edited_Comment, 'edit_layout' => NULL ) );
 	?>
 

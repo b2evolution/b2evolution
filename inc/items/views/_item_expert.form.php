@@ -268,17 +268,8 @@ $Form->begin_form( '', '', $params );
 
 
 	// ####################### ATTACHMENTS/LINKS #########################
-	if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
-	    $current_User->check_perm( 'files', 'view', false ) )
-	{	// If current user has a permission to view the files AND attachments are allowed for the item type:
-		load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
-		// Initialize this object as global because this is used in many link functions:
-		global $LinkOwner;
-		$LinkOwner = new LinkItem( $edited_Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
-		// Display attachments fieldset:
-		$fold_images_attachments_block = ( $orig_action != 'update_edit' && $orig_action != 'create_edit' ); // don't fold the links block on these two actions
-		display_attachments_fieldset( $Form, $LinkOwner, false, $fold_images_attachments_block );
-	}
+	$fold_images_attachments_block = ( $orig_action != 'update_edit' && $orig_action != 'create_edit' ); // don't fold the links block on these two actions
+	$Form->attachments_fieldset( $edited_Item, $fold_images_attachments_block );
 
 
 	// ############################ CUSTOM FIELDS #############################

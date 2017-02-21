@@ -4461,6 +4461,83 @@ class Form extends Widget
 		// End field:
 		echo $this->end_field( $field_type );
 	}
+
+
+	/**
+	 * Display attachments fieldset
+	 *
+	 * @param object Object of the links owner
+	 * @param boolean TRUE to allow folding for this fieldset, FALSE - otherwise
+	 */
+	function attachments_fieldset( $object, $fold = false )
+	{
+		global $current_User;
+
+		// Get object type to initialize link owner
+		$object_type = get_class( $object );
+
+		if( $object_type != 'Comment' && ! is_logged_in() )
+		{	// User must logged in for all other objects like Item, Message and EmailCampaign:
+			// (for Comment we can allow to attach files by anonymous user depending on collection setting)
+			return;
+		}
+
+		// Declare this object as global because it is used in many link functions:
+		global $LinkOwner;
+
+		// Initialize link owner depending on object type:
+		switch( $object_type )
+		{
+			case 'Comment':
+				$Comment = $object;
+				$comment_Item = & $Comment->get_Item();
+				if( ! $comment_Item->check_blog_settings( 'allow_attachments' ) )
+				{	// Item attachments must be allowed by collection setting depending on user type(anounymous, registered, member and etc.):
+					return;
+				}
+				global $disp;
+				if( ! is_admin_page() && $disp != 'edit_comment' && $Comment->get( 'type' ) == 'meta' )
+				{	// Temp restriction because quick uploader JS code doesn't work twice on same page like we have this case on disp=single:
+					// TODO: When this JS conflict will be fixed this restriction MUST BE DELETED!
+					return;
+				}
+				load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
+				$LinkOwner = new LinkComment( $Comment, $Comment->temp_link_owner_ID );
+				break;
+
+			case 'Item':
+				$Item = $object;
+				if( ! $Item->get_type_setting( 'allow_attachments' ) )
+				{	// Item attachments must be allowed for the item type
+					return;
+				}
+				load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
+				$LinkOwner = new LinkItem( $Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
+				break;
+
+			case 'Message':
+				if( ! is_admin_page() )
+				{	// Message attachments are allowed only on back-office
+					return;
+				}
+				$Message = $object;
+				load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
+				$LinkOwner = new LinkMessage( $Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
+				break;
+
+			case 'EmailCampaign':
+				$EmailCampaign = $object;
+				load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
+				$LinkOwner = new LinkEmailCampaign( $EmailCampaign );
+				break;
+
+			default:
+				debug_die( 'Wrong object type "'.$object_type.'" to display attachments fieldset!' );
+		}
+
+		// Display attachments fieldset:
+		display_attachments_fieldset( $this, $LinkOwner, false, $fold );
+	}
 }
 
 ?>

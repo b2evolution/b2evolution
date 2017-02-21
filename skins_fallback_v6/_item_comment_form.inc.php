@@ -400,26 +400,14 @@ function validateCommentForm(form)
 		$Form->hidden( 'preview_attachments', $comment_attachments );
 	}
 	if( $Item->can_attach() )
-	{	// Display attach file input field
+	{	// Display attach file input field when JavaScript is disabled:
 		echo ( $params['comment_type'] != 'meta' ) ? '<noscript>' : '';
 		$Form->input_field( array( 'label' => T_('Attach files'), 'note' => $params['comment_attach_info'], 'name' => 'uploadfile[]', 'type' => 'file' ) );
 		echo ( $params['comment_type'] != 'meta' ) ? '</noscript>' : '';
-		//if( $current_User->check_perm( 'files', 'view' ) )
-		//{	// If current user has a permission to view the files:
-		if( $params['comment_type'] != 'meta' ) // temp restriction
-		{
-			if( empty( $Comment ) )
-			{
-				$Comment = new Comment();
-			}
-			load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
-			// Initialize this object as global because this is used in many link functions:
-			global $LinkOwner;
-			$LinkOwner = new LinkComment( $Comment, $Comment->temp_link_owner_ID );
-			// Display attachments fieldset:
-			display_attachments_fieldset( $Form, $LinkOwner );
-		}
 	}
+
+	// Display attachments fieldset:
+	$Form->attachments_fieldset( $Comment );
 
 	$comment_options = array();
 
