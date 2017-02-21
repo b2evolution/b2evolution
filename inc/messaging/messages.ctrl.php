@@ -57,7 +57,7 @@ if( param( 'thrd_ID', 'integer', '', true ) )
 	{ // Thread doesn't exists with this ID
 		unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
-		$Messages->add( T_('The requested thread does not exist any longer.'), 'error' );
+		$Messages->add( T_('The private conversation you are trying to access does not exist any longer.'), 'error' );
 		$action = 'nil';
 	}
 	else if( ! $edited_Thread->check_thread_recipient( $current_User->ID ) && ! $perm_abuse_management )
@@ -79,6 +79,10 @@ if( param( 'msg_ID', 'integer', '', true ) )
 		$Messages->add( T_('The requested message does not exist any longer.'), 'error' );
 		$action = 'nil';
 	}
+}
+else
+{	// Create new Message:
+	$edited_Message = new Message();
 }
 
 if( ! $Messages->has_errors() && ( empty( $thrd_ID ) || empty( $edited_Thread ) ) )
@@ -191,6 +195,15 @@ else
 $AdminUI->set_page_manual_link( 'messages-view-thread' );
 
 init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
+
+// Require colorbox js:
+require_js_helper( 'colorbox' );
+// Require File Uploader js and css:
+require_js( 'multiupload/fileuploader.js' );
+require_css( 'fileuploader.css' );
+// Load JS files to make the links table sortable:
+require_js( '#jquery#' );
+require_js( 'jquery/jquery.sortable.min.js' );
 
 // Display messages depending on user email status
 display_user_email_status_message();

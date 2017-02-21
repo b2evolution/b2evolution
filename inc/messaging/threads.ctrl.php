@@ -188,6 +188,15 @@ switch( $action )
 	case 'create':
 	case 'preview':
 		$AdminUI->set_page_manual_link( 'messages-new-thread' );
+
+		// Require colorbox js:
+		require_js_helper( 'colorbox' );
+		// Require File Uploader js and css:
+		require_js( 'multiupload/fileuploader.js' );
+		require_css( 'fileuploader.css' );
+		// Load JS files to make the links table sortable:
+		require_js( '#jquery#' );
+		require_js( 'jquery/jquery.sortable.min.js' );
 		break;
 	default:
 		$AdminUI->set_page_manual_link( 'conversations-list' );

@@ -89,7 +89,7 @@ $params = array_merge( array(
 	if( $Item->status != 'published' )
 	{
 		$Item->format_status( array(
-				'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+				'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 			) );
 	}
 	$Item->title( array(
@@ -118,8 +118,8 @@ $params = array_merge( array(
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
 			// Template params for "Item Tags" widget
-			'widget_item_tags_before'    => '<div class="small text-muted">'.T_('Tags').': ',
-			'widget_item_tags_after'     => '</div>',
+			'widget_item_tags_before'    => '<nav class="small post_tags text-muted">',
+			'widget_item_tags_after'     => '</nav>',
 			'widget_item_tags_separator' => ', ',
 			// Template params for "Small Print" widget
 			'widget_item_small_print_before'         => '<p class="small text-muted">',
@@ -169,7 +169,7 @@ $params = array_merge( array(
 				) );
 			$Item->lastedit_user( array(
 					'before'    => T_('Last edit by '),
-					'after'     => T_(' on ').$Item->get_mod_date( 'F jS, Y' ),
+					'after'     => T_(' on ').$Item->get_mod_date( locale_extdatefmt() ),
 					'link_text' => 'auto',
 				) );
 			'</p>';

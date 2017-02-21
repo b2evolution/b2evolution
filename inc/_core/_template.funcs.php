@@ -184,8 +184,8 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 
 	$allow_collection_redirect = false;
 
-	if( $external_redirect 
-		&& $allow_redirects_to_different_domain == 'all_collections_and_redirected_posts' 
+	if( $external_redirect
+		&& $allow_redirects_to_different_domain == 'all_collections_and_redirected_posts'
 		&& ! $redirected_post )
 	{ // If a redirect is external and we allow to redirect to all collection domains:
 		global $basehost;
@@ -432,7 +432,7 @@ function get_request_title( $params = array() )
 			'contacts_text'       => T_('Contacts'),
 			'login_text'          => /* TRANS: trailing space = verb */ T_('Login '),
 			'register_text'       => T_('Register'),
-			'req_validatemail'    => T_('Account activation'),
+			'req_activate_email'    => T_('Account activation'),
 			'account_activation'  => T_('Account activation'),
 			'lostpassword_text'   => T_('Lost your password?'),
 			'profile_text'        => T_('User Profile'),
@@ -442,7 +442,7 @@ function get_request_title( $params = array() )
 			'user_text'           => T_('User: %s'),
 			'users_text'          => T_('Users'),
 			'closeaccount_text'   => T_('Close account'),
-			'subs_text'           => T_('Notifications'),
+			'subs_text'           => T_('Notifications & Subscriptions'),
 			'visits_text'         => T_('Profile Visits'),
 			'comments_text'       => T_('Latest Comments'),
 			'feedback-popup_text' => T_('Feedback'),
@@ -597,9 +597,9 @@ function get_request_title( $params = array() )
 
 		case 'login':
 			// We are requesting the login form:
-			if( $action == 'req_validatemail' )
+			if( $action == 'req_activate_email' )
 			{
-				$r[] = $params['req_validatemail'];
+				$r[] = $params['req_activate_email'];
 			}
 			else
 			{
@@ -688,15 +688,15 @@ function get_request_title( $params = array() )
 			$cp = param( 'cp', 'integer', 0 ); // Copy post from Front-office
 			if( $action == 'edit_switchtab' || $p > 0 || $post_ID > 0 )
 			{	// Edit post
-				$title = sprintf( T_('Edit %s'), $type_name );
+				$title = sprintf( T_('Edit [%s]'), $type_name );
 			}
 			else if( $cp > 0 )
 			{	// Copy post
-				$title = sprintf( T_('Duplicate %s'), $type_name );
+				$title = sprintf( T_('Duplicate [%s]'), $type_name );
 			}
 			else
 			{	// Create post
-				$title = sprintf( T_('New %s'), $type_name );
+				$title = sprintf( T_('New [%s]'), $type_name );
 			}
 			if( $params['display_edit_links'] && $params['auto_pilot'] != 'seo_title' )
 			{ // Add advanced edit and close icon
@@ -1385,15 +1385,17 @@ function add_js_for_toolbar( $relative_to = 'rsc_url' )
 
 /**
  * Registers headlines required by AJAX forms, but only if javascript forms are enabled in blog settings.
+ *
+ * @deprecated Because we don't need communication.js to work with AJAX forms
  */
 function init_ajax_forms( $relative_to = 'blog' )
 {
-	global $Collection, $Blog;
+	/*global $Collection, $Blog;
 
 	if( !empty($Blog) && $Blog->get_setting('ajax_form_enabled') )
 	{
 		require_js( 'communication.js', $relative_to );
-	}
+	}*/
 }
 
 
@@ -1512,8 +1514,9 @@ function init_datepicker_js( $relative_to = 'rsc_url' )
 	require_js( '#jqueryUI#', $relative_to );
 	require_css( '#jqueryUI_css#', $relative_to );
 
-	$datefmt = locale_datefmt();
-	$datefmt = str_replace( array( 'd', 'j', 'm', 'Y' ), array( 'dd', 'd', 'mm', 'yy' ), $datefmt );
+	$datefmt = locale_input_datefmt();
+	//$datefmt = str_replace( array( 'd', 'j', 'm', 'Y' ), array( 'dd', 'd', 'mm', 'yy' ), $datefmt );
+	$datefmt = php_to_jquery_date_format( $datefmt );
 	add_js_headline( 'jQuery(document).ready( function(){
 		var monthNames = ["'.T_('January').'","'.T_('February').'", "'.T_('March').'",
 						  "'.T_('April').'", "'.T_('May').'", "'.T_('June').'",
@@ -1845,29 +1848,23 @@ function bullet( $bool )
 }
 
 
-
-
 /**
  * Stub: Links to previous and next post in single post mode
  */
 function item_prevnext_links( $params = array() )
 {
-	global $disp;
+	global $disp, $MainList;
 
-	if( $disp == 'download' )
-	{ // Don't display the links on download page
+	if( ! isset( $MainList ) || ! $MainList->single_post || $disp == 'download' )
+	{	// Don't display the links in NOT single post mode and on download page:
 		return;
 	}
 
-	global $MainList;
-
 	$params = array_merge( array( 'target_blog' => 'auto' ), $params );
 
-	if( isset( $MainList ) )
-	{
-		$MainList->prevnext_item_links( $params );
-	}
+	$MainList->prevnext_item_links( $params );
 }
+
 
 /**
  * Stub: Links to previous and next user in single user mode
@@ -2346,7 +2343,7 @@ function display_login_form( $params )
 
 	if( $params['display_abort_link']
 		&& empty( $params['login_required'] )
-		&& $params['action'] != 'req_validatemail'
+		&& $params['action'] != 'req_activate_email'
 		&& strpos( $return_to, $admin_url ) !== 0
 		&& strpos( $ReqHost.$return_to, $admin_url ) !== 0 )
 	{ // No login required, allow to pass through
@@ -2424,9 +2421,9 @@ function display_login_form( $params )
 		}
 
 		$Form->hidden( 'validate_required', $params[ 'validate_required' ] );
-		if( isset( $params[ 'action' ],  $params[ 'reqID' ], $params[ 'sessID' ] ) &&  $params[ 'action' ] == 'validatemail' )
+		if( isset( $params[ 'action' ],  $params[ 'reqID' ], $params[ 'sessID' ] ) &&  $params[ 'action' ] == 'activateacc_sec' )
 		{ // the user clicked the link from the "validate your account" email, but has not been logged in; pass on the relevant data:
-			$Form->hidden( 'action', 'validatemail' );
+			$Form->hidden( 'action', 'activateacc_sec' );
 			$Form->hidden( 'reqID', $params[ 'reqID' ] );
 			$Form->hidden( 'sessID', $params[ 'sessID' ] );
 		}
@@ -2436,17 +2433,17 @@ function display_login_form( $params )
 	// check if should transmit hashed password
 	if( $params[ 'transmit_hashed_password' ] )
 	{ // used by JS-password encryption/hashing:
-		$pwd_salt = $Session->get('core.pwd_salt');
-		if( empty($pwd_salt) )
+		$pepper = $Session->get( 'core.pepper' );
+		if( empty( $pepper ) )
 		{ // Do not regenerate if already set because we want to reuse the previous salt on login screen reloads
 			// fp> Question: the comment implies that the salt is reset even on failed login attemps. Why that? I would only have reset it on successful login. Do experts recommend it this way?
 			// but if you kill the session you get a new salt anyway, so it's no big deal.
 			// At that point, why not reset the salt at every reload? (it may be good to keep it, but I think the reason should be documented here)
-			$pwd_salt = generate_random_key(64);
-			$Session->set( 'core.pwd_salt', $pwd_salt, 86400 /* expire in 1 day */ );
+			$pepper = generate_random_key(64);
+			$Session->set( 'core.pepper', $pepper, 86400 /* expire in 1 day */ );
 			$Session->dbsave(); // save now, in case there's an error later, and not saving it would prevent the user from logging in.
 		}
-		$Form->hidden( 'pwd_salt', $pwd_salt );
+		$Form->hidden( 'pepper', $pepper );
 		// Add container for the hashed password hidden inputs
 		echo '<div id="pwd_hashed_container"></div>'; // gets filled by JS
 	}
@@ -2552,7 +2549,7 @@ function display_login_js_handler( $params )
 		var get_widget_login_hidden_fields = <?php echo $params['get_widget_login_hidden_fields'] ? 'true' : 'false'; ?>;
 		var sessionid = '<?php echo $Session->ID; ?>';
 
-		if( !form.<?php echo $dummy_fields[ 'pwd' ]; ?> || !form.pwd_salt || typeof hex_sha1 == "undefined" && typeof hex_md5 == "undefined" ) {
+		if( !form.<?php echo $dummy_fields[ 'pwd' ]; ?> || !form.pepper || typeof hex_sha1 == "undefined" && typeof hex_md5 == "undefined" ) {
 			return true;
 		}
 
@@ -2578,16 +2575,19 @@ function display_login_js_handler( $params )
 
 				var raw_password = form.<?php echo $dummy_fields[ 'pwd' ]; ?>.value;
 				var salts = parsed_result['salts'];
+				var hash_algo = parsed_result['hash_algo'];
 
 				if( get_widget_login_hidden_fields )
 				{
 					form.crumb_loginform.value = parsed_result['crumb'];
-					form.pwd_salt.value = parsed_result['pwd_salt'];
+					form.pepper.value = parsed_result['pepper'];
 					sessionid = parsed_result['session_id'];
 				}
 
-				for( var index in salts ) {
-					var pwd_hashed = hex_sha1( hex_md5( salts[index] + raw_password ) + form.pwd_salt.value );
+				for( var index in salts )
+				{
+					var pwd_hashed = eval( hash_algo[ index ] );
+					pwd_hashed = hex_sha1( pwd_hashed + form.pepper.value );
 					pwd_container.append( '<input type="hidden" value="' + pwd_hashed + '" name="pwd_hashed[]">' );
 				}
 
@@ -2597,6 +2597,11 @@ function display_login_js_handler( $params )
 				// Append the correct login action as hidden input field
 				pwd_container.append( '<input type="hidden" value="1" name="login_action[login]">' );
 				form.submit();
+			},
+			error: function( jqXHR, textStatus, errorThrown )
+			{	// Display error text on error request:
+				requestSent = false;
+				alert( 'Error: could not get hash Salt from server. Please contact the site admin and check the browser and server error logs. (' + textStatus + ': ' + errorThrown + ')' );
 			}
 		});
 
@@ -2672,7 +2677,7 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 
 	// Display hidden fields
 	$Form->add_crumb( 'lostpassform' );
-	$Form->hidden( 'action', 'retrievepassword' );
+	$Form->hidden( 'action', 'resetpassword' );
 	foreach( $hidden_params as $key => $value )
 	{
 		$Form->hidden( $key, $value );
@@ -2691,12 +2696,12 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 
 	$Form->buttons_input( array( array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Send me a recovery email!'), 'class' => 'btn-primary btn-lg' ) ) );
 
-	echo '<b>'.T_('How to recover your password:').'</b>';
+	echo '<b>'.T_('How to reset your password:').'</b>';
 	echo '<ol>';
-	echo '<li>'.T_('Please enter you login (or email address) above.').'</li>';
+	echo '<li>'.T_('Please enter your login (or email address) above.').'</li>';
 	echo '<li>'.T_('An email will be sent to your registered email address immediately.').'</li>';
-	echo '<li>'.T_('As soon as you receive the email, click on the link therein to change your password.').'</li>';
-	echo '<li>'.T_('Your browser will open a page where you can chose a new password.').'</li>';
+	echo '<li>'.T_('As soon as you receive the email, click on the link therein to reset your password.').'</li>';
+	echo '<li>'.T_('Your browser will open a page where you can set a new password.').'</li>';
 	echo '</ol>';
 	echo '<p class="red"><strong>'.T_('Important: for security reasons, you must do steps 1 and 4 on the same computer and same web browser. Do not close your browser in between.').'</strong></p>';
 
@@ -2773,7 +2778,7 @@ function display_activateinfo( $params )
 		$Form->begin_form( $params[ 'form_class' ] );
 
 		$Form->add_crumb( 'validateform' );
-		$Form->hidden( 'action', 'req_validatemail');
+		$Form->hidden( 'action', 'req_activate_email');
 		$Form->hidden( 'redirect_to', $params[ 'redirect_to' ] );
 		if( $params[ 'inskin' ] )
 		{
@@ -2784,7 +2789,7 @@ function display_activateinfo( $params )
 		{ // Form title in standard form
 			echo '<h4>'.$params['form_title'].'</h4>';
 		}
-		$Form->hidden( 'req_validatemail_submit', 1 ); // to know if the form has been submitted
+		$Form->hidden( 'req_activate_email_submit', 1 ); // to know if the form has been submitted
 
 		$Form->begin_fieldset();
 
@@ -2836,7 +2841,7 @@ function display_activateinfo( $params )
 	echo '<ol start="1" class="expanded">';
 	$instruction =  sprintf( T_('Open your email account for %s and find a message we sent you on %s at %s with the following title:'), $user_email, $last_email_date, $last_email_time );
 	echo '<li>'.$instruction.'<br /><b>'.sprintf( T_('Activate your account: %s'), $current_User->login ).'</b>';
-	$request_validation_url = 'href="'.regenerate_url( '', 'force_request=1&validate_required=true&redirect_to='.$params[ 'redirect_to' ] ).'"';
+	$request_validation_url = 'href="'.regenerate_url( '', 'force_request=1&validate_required=true&redirect_to='.rawurlencode( $params[ 'redirect_to' ] ) ).'"';
 	echo '<p>'.sprintf( T_('NOTE: If you don\'t find it, check your "Junk", "Spam" or "Unsolicited email" folders. If you really can\'t find it, <a %s>request a new activation email</a>.'), $request_validation_url ).'</p></li>';
 	echo '<li>'.sprintf( T_('Add us (%s) to your contacts to make sure you receive future email notifications, especially when someone sends you a private message.'), '<b><span class="nowrap">'.$notification_email.'</span></b>').'</li>';
 	echo '<li><b class="red">'.T_('Click on the activation link in the email.').'</b>';
@@ -2883,7 +2888,7 @@ function display_activateinfo( $params )
 		$Form->begin_form( 'evo_form__login' );
 
 		$Form->add_crumb( 'validateform' );
-		$Form->hidden( 'action', 'validatemail' );
+		$Form->hidden( 'action', 'activateacc_sec' );
 		$Form->hidden( 'redirect_to', url_rel_to_same_host( $redirect_to, get_htsrv_url( true ) ) );
 		$Form->hidden( 'reqID', 1 );
 		$Form->hidden( 'sessID', $Session->ID );
@@ -3258,7 +3263,6 @@ function init_autocomplete_usernames_js( $relative_to = 'rsc_url' )
 
 	require_js( '#jquery#', $relative_to );
 	require_js( 'build/textcomplete.bmin.js', $relative_to );
-	require_css( 'jquery/jquery.textcomplete.css', $relative_to );
 }
 
 

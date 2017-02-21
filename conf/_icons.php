@@ -45,12 +45,13 @@ function get_icon_info( $name )
 			'size' => array( 16, 16 ),
 			'xy' => array( 16, 16 ),
 			'glyph' => 'file',
-			'fa' => 'file'
+			'fa' => 'file-o'
 		);
 		case 'file_empty': return array(    // empty file
 			'alt'  => T_('Empty file'),
 			'size' => array( 16, 16 ),
 			'xy' => array( 32, 16 ),
+			'glyph' => 'file',
 			'fa' => 'file-o'
 		);
 		case 'folder_parent': return array( // go to parent directory
@@ -147,7 +148,7 @@ function get_icon_info( $name )
 			'alt'  => '',
 			'size' => array( 16, 16 ),
 			'xy' => array( 32, 48 ),
-			'fa' => 'file-text'
+			'fa' => 'file-text-o'
 		);
 		case 'file_www': return array(
 			'ext'  => '\.html?',
@@ -203,7 +204,7 @@ function get_icon_info( $name )
 			'alt'  => '',
 			'size' => array( 16, 16 ),
 			'xy' => array( 144, 32 ),
-			'fa' => 'file-text'
+			'fa' => 'file-text-o'
 		);
 		case 'file_tar': return array(
 			'ext'  => '\.tar',
@@ -872,7 +873,7 @@ function get_icon_info( $name )
 			'fa' => 'filter'
 		);
 		case 'reset_filters': return array(
-			'alt'  => T_('Reset all filters'),
+			'alt'  => T_('Reset all filters!'),
 			'size' => array( 16, 16 ),
 			'xy' => array( 144, 112 ),
 			'glyph' => 'filter',
@@ -1048,7 +1049,23 @@ function get_icon_info( $name )
 			'xy' => array( 32, 224 ),
 			'glyph' => 'plus-sign',
 			'fa' => 'plus-circle',
-			'color' => '#0C0'
+			'color' => '#0c0'
+		);
+		case 'add__yellow': return array(
+			'alt'  => T_('Add'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 32, 224 ),
+			'glyph' => 'plus-sign',
+			'fa' => 'plus-circle',
+			'color' => '#fc0'
+		);
+		case 'add__blue': return array(
+			'alt'  => T_('Add'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 32, 224 ),
+			'glyph' => 'plus-sign',
+			'fa' => 'plus-circle',
+			'color' => '#337ab7'
 		);
 
 		case 'add__yellow': return array(

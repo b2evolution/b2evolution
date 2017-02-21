@@ -41,7 +41,7 @@ $schema_queries['T_centralantispam__keyword'] = array(
 		"CREATE TABLE T_centralantispam__keyword (
 			cakw_ID              INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			cakw_keyword         VARCHAR(2000) NULL,
-			cakw_status          ENUM('new', 'published', 'revoked') NOT NULL DEFAULT 'new',
+			cakw_status          ENUM('new', 'published', 'revoked', 'ignored') NOT NULL DEFAULT 'new',
 			cakw_statuschange_ts TIMESTAMP NULL,
 			cakw_lastreport_ts   TIMESTAMP NULL,
 			PRIMARY KEY (cakw_ID),

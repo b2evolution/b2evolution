@@ -151,6 +151,12 @@ switch( $action )
 		// What form button has been pressed?
 		param( 'save', 'string', '' );
 		$exit_after_save = ( $action != 'update_edit' && $action != 'extract_tags' );
+
+		if( $action == 'update_edit' )
+		{	// Get params to restore height and scroll position of item content field:
+			$content_height = intval( param( 'content_height', 'string', 0 ) );
+			$content_scroll = intval( param( 'content_scroll', 'string', 0 ) );
+		}
 		break;
 
 	case 'update_type':
@@ -230,7 +236,7 @@ switch( $action )
 
 		$FileRootCache = & get_FileRootCache();
 		// getting root
-		$root = param( 'root' );
+		$root = param( 'root', 'string' );
 
 		$fm_FileRoot = & $FileRootCache->get_by_ID( $root, true );
 
@@ -256,10 +262,10 @@ switch( $action )
 
 		load_class( 'files/model/_filelist.class.php', 'FileList' );
 		$selected_Filelist = new Filelist( $fm_FileRoot, false );
-		$fm_selected = param( "fm_selected" , "array" );
+		$fm_selected = param( 'fm_selected', 'array:filepath' );
 		foreach( $fm_selected as $l_source_path )
 		{
-			$selected_Filelist->add_by_subpath( urldecode($l_source_path), true );
+			$selected_Filelist->add_by_subpath( $l_source_path, true );
 		}
 		// make sure we have loaded metas for all files in selection!
 		$selected_Filelist->load_meta();
@@ -299,7 +305,7 @@ switch( $action )
 						$new_Chapter->set( 'name', $new_categories[ $fileNum ] );
 						if( $new_Chapter->dbinsert() !== false )
 						{ // Category is created successfully
-							$Messages->add( sprintf( T_('New category %s created.'), '<b>'.$new_categories[ $fileNum ].'</b>' ), 'success' );
+							$Messages->add_to_group( sprintf( T_('New category %s created.'), '<b>'.$new_categories[ $fileNum ].'</b>' ), 'success', T_('Creating posts:') );
 							$ChapterCache->clear();
 						}
 						else
@@ -353,7 +359,7 @@ switch( $action )
 				// Invalidate blog's media BlockCache
 				BlockCache::invalidate_key( 'media_coll_ID', $edited_Item->get_blog_ID() );
 
-				$Messages->add( sprintf( T_('&laquo;%s&raquo; has been posted.'), $l_File->dget('name') ), 'success' );
+				$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; has been posted.'), $l_File->dget('name') ), 'success', T_('Creating posts:') );
 				$fileNum++;
 			}
 			else
@@ -509,7 +515,7 @@ switch( $action )
 		{	// Get item type to set a pge title:
 			$ItemTypeCache = & get_ItemTypeCache();
 			$ItemType = & $ItemTypeCache->get_by_ID( $item_typ_ID );
-			$title = sprintf( T_('New %s'), $ItemType->get_name() );
+			$title = sprintf( T_('New [%s]'), $ItemType->get_name() );
 		}
 
 		$AdminUI->breadcrumbpath_add( $title, '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$item_typ_ID );
@@ -694,8 +700,8 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
-		// Restrict item status to max allowed by item collection:
-		$edited_Item->restrict_status_by_collection();
+		// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:
+		$edited_Item->restrict_status();
 
 		$post_comment_status = $edited_Item->get( 'comment_status' );
 		$post_extracats = postcats_get_byID( $p ); // NOTE: dh> using $edited_Item->get_Chapters here instead fails (empty list, since no postIDlist).
@@ -866,20 +872,20 @@ switch( $action )
 		// We want to highlight the edited object on next list display:
 		$Session->set( 'fadeout_array', array( 'item-'.$edited_Item->ID ) );
 
-		if( $edited_Item->status == 'published' &&
+		if( $edited_Item->status != 'redirected' &&
 		    ! strpos( $redirect_to, 'tab=tracker' ) &&
 		    ! strpos( $redirect_to, 'tab=manual' ) )
-		{	// Where to go after publishing the post?
+		{	// Where to go after creating the post?
 			// yura> When a post is created from "workflow" or "manual" we should display a post list
 
-			// Where do we want to go after publishing?
-			if( $edited_Item->Blog->get_setting( 'enable_goto_blog' ) == 'blog' )
-			{	// go to blog:
+			// Where do we want to go after creating?
+			if( $edited_Item->Blog->get_setting( 'enable_goto_blog' ) == 'blog' && $edited_Item->can_be_displayed() )
+			{	// Redirect to collection home page ONLY if current user can view it:
 				$edited_Item->load_Blog();
 				$redirect_to = $edited_Item->Blog->gen_blogurl();
 			}
-			elseif( $edited_Item->Blog->get_setting( 'enable_goto_blog' ) == 'post' )
-			{	// redirect to post page:
+			elseif( $edited_Item->Blog->get_setting( 'enable_goto_blog' ) == 'post' && $edited_Item->can_be_displayed() )
+			{	// Redirect to item page to view new created item ONLY if current user can view it:
 				$redirect_to = $edited_Item->get_permanent_url();
 			}
 			else// 'no'
@@ -889,9 +895,9 @@ switch( $action )
 			}
 		}
 
-		if( $redirect_to !== NULL ) 
-		{	// The redirect url was NOT set to NULL ( $blog_redirect_setting == 'no' ) 
-	 
+		if( $redirect_to !== NULL )
+		{	// The redirect url was NOT set to NULL ( $blog_redirect_setting == 'no' )
+
 			// TRY TO REDIRECT / EXIT
 			header_redirect( $redirect_to, 303, false, true /* RETURN if forbidden */ );
 
@@ -945,9 +951,6 @@ switch( $action )
 		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
 		// Check permission on post type: (also verifies that post type is enabled and NOT reserved)
 		check_perm_posttype( $item_typ_ID, $post_extracats );
-
-		// Is this post publishing right now?
-		$is_publishing = ( $edited_Item->get( 'status' ) != 'published' && $post_status == 'published' );
 
 		// UPDATE POST:
 		// Set the params we already got:
@@ -1043,7 +1046,7 @@ switch( $action )
 			break;
 		}
 
-		// Where to go after publishing the post?
+		// Where to go after editing the post?
 		if( $edited_Item->status == 'redirected' ||
 		    strpos( $redirect_to, 'tab=tracker' ) )
 		{ // We should show the posts list if:
@@ -1055,23 +1058,18 @@ switch( $action )
 		{	// Use the original $redirect_to if a post is updated from "manual" view tab:
 			$blog_redirect_setting = 'orig';
 		}
-		elseif( $is_publishing )
-		{	// The post's last status wasn't "published", but we're going to publish it now:
-			$edited_Item->load_Blog();
-			$blog_redirect_setting = $edited_Item->Blog->get_setting( 'enable_goto_blog' );
-		}
 		else
-		{ // The post was changed
+		{	// The post was changed:
 			$blog_redirect_setting = $edited_Item->Blog->get_setting( 'editing_goto_blog' );
 		}
 
-		if( $blog_redirect_setting == 'blog' )
-		{ // go to blog:
+		if( $blog_redirect_setting == 'blog' && $edited_Item->can_be_displayed() )
+		{	// Redirect to collection home page ONLY if current user can view it:
 			$edited_Item->load_Blog();
 			$redirect_to = $edited_Item->Blog->gen_blogurl();
 		}
-		elseif( $blog_redirect_setting == 'post' )
-		{ // redirect to post page:
+		elseif( $blog_redirect_setting == 'post' && $edited_Item->can_be_displayed() )
+		{	// Redirect to item page to view new created item ONLY if current user can view it:
 			$redirect_to = $edited_Item->get_permanent_url();
 		}
 		elseif( $blog_redirect_setting == 'orig' )
@@ -1085,9 +1083,9 @@ switch( $action )
 			$redirect_to = NULL;
 		}
 
-		if( $redirect_to !== NULL ) 
-		{	// The redirect url was NOT set to NULL ( $blog_redirect_setting == 'no' ) 
-	 
+		if( $redirect_to !== NULL )
+		{	// The redirect url was NOT set to NULL ( $blog_redirect_setting == 'no' )
+
 			// TRY TO REDIRECT / EXIT
 			header_redirect( $redirect_to, 303, false, true /* RETURN if forbidden */ );
 
@@ -1119,6 +1117,18 @@ switch( $action )
 		if( $Blog->is_item_type_enabled( $ityp_ID ) )
 		{ // Set new post type only if it is enabled for the Blog:
 			$edited_Item->set( 'ityp_ID', $ityp_ID );
+
+			// Check if current post status is still applicable for new post type
+			if( $edited_Item->get( 'pst_ID' ) != NULL )
+			{
+				$ItemTypeCache = & get_ItemTypeCache();
+				$current_ItemType = $ItemTypeCache->get_by_ID( $ityp_ID );
+				if( ! in_array( $edited_Item->get( 'pst_ID' ), $current_ItemType->get_applicable_post_status() ) )
+				{
+					$edited_Item->set( 'pst_ID', NULL );
+					$Messages->add( T_('The current item status is no longer valid for the new item type and has been reset.'), 'warning' );
+				}
+			}
 		}
 
 		// Unset old object of Post Type to reload it on next page
@@ -1337,13 +1347,13 @@ switch( $action )
 		{ // We clicked publish button from the front office
 			header_redirect( $redirect_to );
 		}
-		elseif( $edited_Item->Blog->get_setting( 'enable_goto_blog' ) == 'blog' )
-		{	// Redirect to blog:
+		elseif( $edited_Item->Blog->get_setting( 'enable_goto_blog' ) == 'blog' && $edited_Item->can_be_displayed() )
+		{	// Redirect to collection home page ONLY if current user can view it:
 			$edited_Item->load_Blog();
 			header_redirect( $edited_Item->Blog->gen_blogurl() );
 		}
-		elseif( $edited_Item->Blog->get_setting( 'enable_goto_blog' ) == 'post' )
-		{	// Redirect to post page:
+		elseif( $edited_Item->Blog->get_setting( 'enable_goto_blog' ) == 'post' && $edited_Item->can_be_displayed() )
+		{	// Redirect to item page to view new created item ONLY if current user can view it:
 			header_redirect( $edited_Item->get_permanent_url() );
 		}
 		else// 'no'
@@ -1546,6 +1556,9 @@ function init_list_mode()
 					'itemtype_usage' => implode( ',', get_item_type_usage_by_tab( $tab_type ) ),
 				) );
 			$AdminUI->breadcrumbpath_add( T_( $tab_type ), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab_type='.urlencode( $tab_type ).'&amp;filter=restore' );
+
+			// JS to edit an order of items from list view:
+			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 			break;
 
 		case 'tracker':
@@ -1773,7 +1786,6 @@ if( ( isset( $tab ) && in_array( $tab, array( 'full', 'type', 'tracker' ) ) ) ||
 
 // Load the appropriate blog navigation styles (including calendar, comment forms...):
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
-require_js( 'communication.js' ); // auto requires jQuery
 init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 
 /* fp> I am disabling this. We haven't really used per-blof styles yet and at the moment it creates interference with boostrap Admin

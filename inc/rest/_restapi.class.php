@@ -475,7 +475,8 @@ class RestApi
 				$check_perm_blog_media_browse_group_SQL = new SQL();
 				$check_perm_blog_media_browse_group_SQL->SELECT( 'bloggroup_blog_ID' );
 				$check_perm_blog_media_browse_group_SQL->FROM( 'T_coll_group_perms' );
-				$check_perm_blog_media_browse_group_SQL->WHERE( 'bloggroup_group_ID = '.$current_User->Group->ID );
+				$check_perm_blog_media_browse_group_SQL->WHERE( '( bloggroup_group_ID = '.$current_User->Group->ID.'
+					OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$current_User->ID.' ) )' );
 				$check_perm_blog_media_browse_group_SQL->WHERE_and( 'bloggroup_perm_media_browse <> 0' );
 				$restrict_available_fileroots_sql .= ' OR blog_owner_user_ID = '.$current_User->ID
 					.' OR ( blog_advanced_perms <> 0 AND ( '
@@ -825,7 +826,7 @@ class RestApi
 					}
 
 					$result_data['title'] = $Item->get_title( array( 'link_type' => 'none' ) );
-					$result_data['desc'] = $Item->get_excerpt2();
+					$result_data['desc'] = $Item->get_excerpt();
 					$result_data['permalink'] = $Item->get_permanent_url( '', '', '&' );
 					break;
 
@@ -1792,6 +1793,10 @@ class RestApi
 					case 'sort':
 						$link_controller = 'refresh';
 						break;
+
+					case 'copy':
+						$link_controller = 'copy';
+						break;
 				}
 				break;
 		}
@@ -1854,14 +1859,17 @@ class RestApi
 		$this->link_check_perm();
 
 		// Action: 'unlink - just unlink file from the owner, 'delete' - unlink and delete the file from disk and DB completely
-		$action = param( 'action', 'string', '' );
+
+		// Note: param() currently does not work with DELETE and PUT requests
+		parse_str( file_get_contents('php://input'), $request_params );
+		$action = isset( $request_params['action'] ) ? $request_params['action'] : '';
 
 		$deleted_Link = & $this->get_Link();
 		$LinkOwner = & $deleted_Link->get_LinkOwner();
 
 		if( $link_File = & $deleted_Link->get_File() )
 		{
-			syslog_insert( sprintf( 'File %s was unlinked from %s with ID=%s', '[['.$link_File->get_name().']]', $LinkOwner->type, $LinkOwner->link_Object->ID ), 'info', 'file', $link_File->ID );
+			syslog_insert( sprintf( 'File %s was unlinked from %s with ID=%s', '[['.$link_File->get_name().']]', $LinkOwner->type, $LinkOwner->get_ID() ), 'info', 'file', $link_File->ID );
 		}
 
 		if( $action == 'delete' && $deleted_Link->can_be_file_deleted() )
@@ -1997,6 +2005,28 @@ class RestApi
 			// Use the glyph or font-awesome icons if requested by skin
 			param( 'b2evo_icons_type', 'string', 'fontawesome-glyphicons' );
 
+			global $LinkOwner, $current_File, $disable_evo_flush;
+
+			$link_type = param( 'type', 'string' );
+			$link_object_ID = param( 'object_ID', 'string' );
+
+			$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+
+			// Initialize admin skin:
+			global $current_User, $UserSettings, $is_admin_page, $adminskins_path, $AdminUI;
+			$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+			$is_admin_page = true;
+			require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+			$AdminUI = new AdminUI();
+
+			// Disable function evo_flush() to correct handle a content below:
+			$disable_evo_flush = true;
+
+			// Get the refreshed content:
+			ob_start();
+			$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+			$refreshed_content = ob_get_clean();
+
 			$mask_row = (object) array(
 					'link_ID'       => $Link->ID,
 					'file_ID'       => $current_File->ID,
@@ -2009,6 +2039,7 @@ class RestApi
 					'actions'  => link_actions( $Link->ID, 'last', $link_type ),
 					'position' => display_link_position( $mask_row ),
 				) );
+			$this->add_response( 'list_content', $refreshed_content );
 		}
 
 		// File has been attached successfully:
@@ -2094,6 +2125,73 @@ class RestApi
 		{	// The refresh has been done successfully:
 			$this->halt( 'A list of the links has been refreshed.', 'refresh_success', 200 );
 			// Exit here.
+		}
+	}
+
+
+	/**
+	 * Call link controller to copy Link from one object to another
+	 */
+	private function controller_link_copy()
+	{
+		$dest_type = param( 'dest_type', 'string' );
+		$dest_object_ID = param( 'dest_object_ID', 'string' );
+
+		$dest_LinkOwner = get_link_owner( $dest_type, $dest_object_ID );
+
+		if( ! is_logged_in() || ! $dest_LinkOwner->check_perm( 'edit', false ) )
+		{	// Current user has no permission to copy the requested link:
+			$this->halt( 'You have no permission to list of the links!', 'no_access', 403 );
+			// Exit here.
+		}
+
+		$source_type = param( 'source_type', 'string' );
+		$source_object_ID = param( 'source_object_ID', 'string' );
+		$source_position = trim( param( 'source_position', 'string' ), ',' );
+
+		$source_LinkOwner = get_link_owner( $source_type, $source_object_ID );
+
+		if( ! $source_LinkOwner || ! ( $source_LinkList = $source_LinkOwner->get_attachment_LinkList( 1000, $source_position ) ) )
+		{	// No requested links, Exit here:
+			$this->response = array();
+			return;
+		}
+
+		$dest_position = param( 'dest_position', 'string' );
+
+		$dest_last_order = $dest_LinkOwner->get_last_order() + 1;
+
+		// Limit files per each position, 0 - for unlimit:
+		$limit_position = param( 'limit_position', 'integer', 0 );
+		if( $limit_position )
+		{
+			$position_counts = array();
+		}
+
+		while( $source_Link = & $source_LinkList->get_next() )
+		{	// Copy a Link to new object:
+			if( $limit_position )
+			{
+				if( ! isset( $position_counts[ $source_Link->position ] ) )
+				{
+					$position_counts[ $source_Link->position ] = 0;
+				}
+				if( $position_counts[ $source_Link->position ] >= $limit_position )
+				{	// Skip this because of limit per position:
+					continue;
+				}
+				$position_counts[ $source_Link->position ]++;
+			}
+
+			if( $source_File = & $source_Link->get_File() &&
+			    $new_link_ID = $dest_LinkOwner->add_link( $source_Link->file_ID, ( empty( $dest_position ) ? $source_Link->position : $dest_position ), $dest_last_order++ ) )
+			{
+				$this->add_response( 'links', array(
+						'ID'            => $new_link_ID,
+						'file_type'     => $source_File->get_file_type(),
+						'orig_position' => $source_Link->position,
+					), 'array' );
+			}
 		}
 	}
 

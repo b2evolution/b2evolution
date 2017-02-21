@@ -75,6 +75,32 @@ class LinkCache extends DataObjectCache
 	var $loaded_cache_emailcampaign = array();
 
 	/**
+	 * Cache for messages -> array of object references
+	 * @access private
+	 * @var array
+	 */
+	var $cache_message = array();
+
+	/**
+	 * @access private
+	 * @var array Remember full loads
+	 */
+	var $loaded_cache_message = array();
+
+	/**
+	 * Cache for temporary objects -> array of object references
+	 * @access private
+	 * @var array
+	 */
+	var $cache_temporary = array();
+
+	/**
+	 * @access private
+	 * @var array Remember full loads
+	 */
+	var $loaded_cache_temporary = array();
+
+	/**
 	 * Cache for file -> array of object references
 	 * @access private
 	 * @var array
@@ -144,6 +170,14 @@ class LinkCache extends DataObjectCache
 				$this->cache_emailcampaign[$link_object_ID][$Obj->ID] = & $Obj;
 				break;
 
+			case 'message': // cache indexed by Message ID
+				$this->cache_message[$link_object_ID][$Obj->ID] = & $Obj;
+				break;
+
+			case 'temporary': // cache indexed by Temporary ID
+				$this->cache_temporary[$link_object_ID][$Obj->ID] = & $Obj;
+				break;
+
 			default:
 				return false;
 		}
@@ -211,6 +245,22 @@ class LinkCache extends DataObjectCache
 				if( isset( $this->cache_emailcampaign[$link_object_ID][$Obj->ID] ) )
 				{
 					unset( $this->cache_emailcampaign[$link_object_ID][$Obj->ID] );
+					return true;
+				}
+				break;
+
+			case 'message':
+				if( isset( $this->cache_message[$link_object_ID][$Obj->ID] ) )
+				{
+					unset( $this->cache_message[$link_object_ID][$Obj->ID] );
+					return true;
+				}
+				break;
+
+			case 'temporary':
+				if( isset( $this->cache_temporary[$link_object_ID][$Obj->ID] ) )
+				{
+					unset( $this->cache_temporary[$link_object_ID][$Obj->ID] );
 					return true;
 				}
 				break;
@@ -292,6 +342,40 @@ class LinkCache extends DataObjectCache
 		$this->load_by_emailcampaign_ID( $emailcampaign_ID );
 
 		return $this->cache_emailcampaign[ $emailcampaign_ID ];
+	}
+
+
+	/**
+	 * Returns links for a given Message
+	 *
+	 * Loads if necessary
+	 *
+	 * @param integer Message ID to load links for
+	 * @return array of refs to Link objects
+	 */
+	function & get_by_message_ID( $message_ID )
+	{
+		// Make sure links are loaded:
+		$this->load_by_message_ID( $message_ID );
+
+		return $this->cache_message[ $message_ID ];
+	}
+
+
+	/**
+	 * Returns links for a given temporary object
+	 *
+	 * Loads if necessary
+	 *
+	 * @param integer Temporary ID to load links for
+	 * @return array of refs to Link objects
+	 */
+	function & get_by_temporary_ID( $temporary_ID )
+	{
+		// Make sure links are loaded:
+		$this->load_by_temporary_ID( $temporary_ID );
+
+		return $this->cache_temporary[ $temporary_ID ];
 	}
 
 
@@ -491,6 +575,72 @@ class LinkCache extends DataObjectCache
 
 
 	/**
+	 * Load links for a given Email Campaign
+	 *
+	 * @param integer Message ID to load links for
+	 */
+	function load_by_message_ID( $message_ID )
+	{
+		global $DB, $Debuglog;
+
+		if( isset( $this->loaded_cache_message[ $message_ID ] ) )
+		{
+			$Debuglog->add( "Already loaded <strong>$this->objtype(Message #$message_ID)</strong> into cache", 'dataobjects' );
+			return false;
+		}
+
+		// Remember this special load:
+		$this->cache_message[ $message_ID ] = array();
+		$this->loaded_cache_message[ $message_ID ] = true;
+
+		$Debuglog->add( "Loading <strong>$this->objtype(Message #$message_ID)</strong> into cache", 'dataobjects' );
+
+		$SQL = new SQL( 'Get the links by message ID #'.$message_ID );
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_links' );
+		$SQL->WHERE( 'link_msg_ID  = '.$DB->quote( $message_ID ) );
+		$SQL->ORDER_BY( 'link_file_ID' );
+
+		$this->load_type_by_sql( $SQL, 'message' );
+
+		return true;
+	}
+
+
+	/**
+	 * Load links for a given Temporary ID object
+	 *
+	 * @param integer Temporary ID to load links for
+	 */
+	function load_by_temporary_ID( $temporary_ID )
+	{
+		global $DB, $Debuglog;
+
+		if( isset( $this->loaded_cache_temporary[ $temporary_ID ] ) )
+		{
+			$Debuglog->add( "Already loaded <strong>$this->objtype(Temporary #$temporary_ID)</strong> into cache", 'dataobjects' );
+			return false;
+		}
+
+		// Remember this special load:
+		$this->cache_temporary[ $temporary_ID ] = array();
+		$this->loaded_cache_temporary[ $temporary_ID ] = true;
+
+		$Debuglog->add( "Loading <strong>$this->objtype(Temporary #$temporary_ID)</strong> into cache", 'dataobjects' );
+
+		$SQL = new SQL( 'Get the links by temporary ID #'.$temporary_ID );
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_links' );
+		$SQL->WHERE( 'link_tmp_ID  = '.$DB->quote( $temporary_ID ) );
+		$SQL->ORDER_BY( 'link_file_ID' );
+
+		$this->load_type_by_sql( $SQL, 'temporary' );
+
+		return true;
+	}
+
+
+	/**
 	 * Load links for a given Item list
 	 *
 	 * @todo cache Link targets before letting the Link constructor handle it
@@ -635,7 +785,7 @@ class LinkCache extends DataObjectCache
 	 * Clear the cache **extensively**
 	 *
 	 * @param boolean Keep copy of cache in case we try to re instantiate previous object
-	 * @param string What to clear: 'all', 'user', 'item', 'comment', 'emailcampaign', 'file'
+	 * @param string What to clear: 'all', 'user', 'item', 'comment', 'emailcampaign', 'message', 'file'
 	 * @param integer ID of the clearing object
 	 */
 	function clear( $keep_shadow = false, $object = 'all', $object_ID = 0 )
@@ -653,6 +803,7 @@ class LinkCache extends DataObjectCache
 				$this->cache_user = array();
 				$this->loaded_cache_user = array();
 				$this->loaded_cache_emailcampaign = array();
+				$this->loaded_cache_message = array();
 				$this->cache_file = array();
 				$this->loaded_cache_file = array();
 				break;
@@ -661,6 +812,8 @@ class LinkCache extends DataObjectCache
 			case 'comment':
 			case 'user':
 			case 'emailcampaign':
+			case 'message':
+			case 'temporary':
 			case 'file':
 				// Clear only the selected type of objects
 				if( empty( $object_ID ) )

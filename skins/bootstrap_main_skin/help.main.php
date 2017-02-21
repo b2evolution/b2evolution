@@ -38,16 +38,6 @@ skin_include( '_html_header.inc.php' );
 // If site headers are enabled, they will be included here:
 siteskin_include( '_site_body_header.inc.php' );
 // ------------------------------- END OF SITE HEADER --------------------------------
-
-// Display a picture from skin setting as background image
-global $media_path, $media_url;
-$bg_image = $Skin->get_setting( 'front_bg_image' );
-echo '<div id="bg_picture">';
-if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
-{ // If it exists in media folder
-	echo '<img src="'.$media_url.$bg_image.'" />';
-}
-echo '</div>';
 ?>
 
 
@@ -57,7 +47,7 @@ echo '</div>';
 
 	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
 		<?php
-		if( $Skin->is_visible_container( 'page_top' ) )
+		if( $Skin->show_container_when_access_denied( 'page_top' ) )
 		{ // Display 'Page Top' widget container
 		?>
 		<div class="evo_container evo_container__page_top">
@@ -82,7 +72,7 @@ echo '</div>';
 
 	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
 		<?php
-		if( $Skin->is_visible_container( 'header' ) )
+		if( $Skin->show_container_when_access_denied( 'header' ) )
 		{ // Display 'Header' widget container
 		?>
 		<div class="evo_container evo_container__header">
@@ -106,7 +96,7 @@ echo '</div>';
 
 
 <?php
-if( $Skin->is_visible_container( 'menu' ) )
+if( $Skin->show_container_when_access_denied( 'menu' ) )
 { // Display 'Menu' widget container
 ?>
 <nav class="row">
@@ -192,7 +182,7 @@ if( $Skin->is_visible_container( 'menu' ) )
 		<footer class="col-md-12 center">
 	
 			<?php
-			if( $Skin->is_visible_container( 'footer' ) )
+			if( $Skin->show_container_when_access_denied( 'footer' ) )
 			{ // Display 'Footer' widget container
 			?>
 			<div class="evo_container evo_container__footer">
@@ -201,6 +191,17 @@ if( $Skin->is_visible_container( 'menu' ) )
 				// Display container and contents:
 				skin_container( NT_('Footer'), array(
 						// The following params will be used as defaults for widgets included in this container:
+						'block_start'         => '<span class="evo_widget $wi_class$">',
+						'block_end'           => '</span> ',
+						'block_display_title' => false,
+						'list_start'          => '',
+						'list_end'            => '',
+						'item_start'          => '',
+						'item_end'            => '',
+						'item_selected_start' => '',
+						'item_selected_end'   => '',
+						'link_default_class'  => 'btn btn-default btn-sm',
+						'link_selected_class' => 'btn btn-default btn-sm active',
 					) );
 				// ----------------------------- END OF "Footer" CONTAINER -----------------------------
 			?>
@@ -263,7 +264,6 @@ if( $Skin->is_visible_container( 'menu' ) )
 		</footer><!-- .col -->
 
 	</div><!-- .row -->
-
 
 </div><!-- .container -->
 

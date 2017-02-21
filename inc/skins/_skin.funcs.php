@@ -213,7 +213,7 @@ function skin_init( $disp )
 					$canonical_url = url_add_param( $canonical_url, $page_param[1], '&' );
 				}
 
-				if( ! is_same_url( $ReqURL, $canonical_url ) )
+				if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
 				{	// The requested URL does not look like the canonical URL for this post...
 					// url difference was resolved
 					$url_resolved = false;
@@ -231,7 +231,7 @@ function skin_init( $disp )
 								$MainList->nav_target = $cat_param[1];
 							}
 						}
-						$url_resolved = is_same_url( $ReqURL, $extended_url );
+						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get( 'http_protocol' ) != 'always_redirect' );
 					}
 					if( preg_match( '|[&?]tag=([^&A-Z]+)|', $ReqURI, $tag_param ) )
 					{ // A tag post navigation param is set
@@ -246,7 +246,7 @@ function skin_init( $disp )
 								$MainList->nav_target = $tag_param[1];
 							}
 						}
-						$url_resolved = is_same_url( $ReqURL, $extended_url );
+						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get( 'http_protocol' ) != 'always_redirect' );
 					}
 
 					if( !$url_resolved && $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' && ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) ) )
@@ -297,8 +297,6 @@ function skin_init( $disp )
 			// Save global $Item to $download_Item, because $Item can be rewritten by function get_featured_Item() in some skins
 			$GLOBALS['download_Item'] = & $Item;
 
-			init_ajax_forms( 'blog' ); // auto requires jQuery
-
 			// Initialize JavaScript to download file after X seconds
 			add_js_headline( '
 jQuery( document ).ready( function ()
@@ -331,7 +329,6 @@ var downloadInterval = setInterval( function()
 			break;
 
 		case 'posts':
-			init_ajax_forms( 'blog' ); // auto requires jQuery
 			// fp> if we add this here, we have to exetnd the inner if()
 			// init_ratings_js( 'blog' );
 
@@ -350,7 +347,7 @@ var downloadInterval = setInterval( function()
 						$robots_index = false;
 					}
 				}
-				elseif( array_diff( $active_filters, array( 'cat_array', 'cat_modifier', 'cat_focus', 'posts', 'page' ) ) == array() )
+				elseif( array_diff( $active_filters, array( 'cat_single', 'cat_array', 'cat_modifier', 'cat_focus', 'posts', 'page' ) ) == array() )
 				{ // This is a category page
 					$disp_detail = 'posts-cat';
 					$seo_page_type = 'Category page';
@@ -367,7 +364,7 @@ var downloadInterval = setInterval( function()
 						//      - selecting exactly one cat through catsel[] is NOT OK since not equivalent (will exclude children)
 
 						// echo 'SINGLE CAT PAGE';
-						// fp> add this?: $disp_detail = 'posts-topcat';  // may become 'posts-subcat' below.
+						$disp_detail = 'posts-topcat';  // may become 'posts-subcat' below.
 
 						if( ( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
 							|| $Blog->get_setting( 'relcanonical_cat_urls' ) )
@@ -389,7 +386,7 @@ var downloadInterval = setInterval( function()
 								}
 
 								$canonical_url = $Chapter->get_permanent_url( NULL, NULL, $MainList->get_active_filter('page'), NULL, '&' );
-								if( ! is_same_url($ReqURL, $canonical_url) )
+								if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
 								{	// fp> TODO: we're going to lose the additional params, it would be better to keep them...
 									// fp> what additional params actually?
 									if( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
@@ -430,7 +427,7 @@ var downloadInterval = setInterval( function()
 							|| $Blog->get_setting( 'relcanonical_tag_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url = $Blog->gen_tag_url( $MainList->get_active_filter('tags'), $MainList->get_active_filter('page'), '&' );
-						if( ! is_same_url($ReqURL, $canonical_url) )
+						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
 						{
 							if( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
 							{	// REDIRECT TO THE CANONICAL URL:
@@ -459,7 +456,7 @@ var downloadInterval = setInterval( function()
 							|| $Blog->get_setting( 'relcanonical_archive_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url =  $Blog->gen_archive_url( substr( $m, 0, 4 ), substr( $m, 4, 2 ), substr( $m, 6, 2 ), $w, '&', $MainList->get_active_filter('page') );
-						if( ! is_same_url($ReqURL, $canonical_url) )
+						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
 						{
 							if( $Blog->get_setting( 'canonical_archive_urls' ) && $redir == 'yes' )
 							{	// REDIRECT TO THE CANONICAL URL:
@@ -557,16 +554,12 @@ var downloadInterval = setInterval( function()
 			elseif( !empty( $comment_id ) )
 			{ // comment id is set, try to get comment author user
 				$CommentCache = & get_CommentCache();
-				$Comment = $CommentCache->get_by_ID( $comment_id, false );
-
-				if( $Comment = $CommentCache->get_by_ID( $comment_id, false ) )
+				if( $Comment = & $CommentCache->get_by_ID( $comment_id, false ) )
 				{
 					$recipient_User = & $Comment->get_author_User();
 					if( empty( $recipient_User ) && ( $Comment->allow_msgform ) && ( is_email( $Comment->get_author_email() ) ) )
 					{ // set allow message form to email because comment author (not registered) accepts email
 						$allow_msgform = 'email';
-						param( 'recipient_address', 'string', $Comment->get_author_email() );
-						param( 'recipient_name', 'string', $Comment->get_author_name() );
 					}
 				}
 			}
@@ -648,6 +641,7 @@ var downloadInterval = setInterval( function()
 					$recipients_selected = array( array(
 							'id'    => $recipient_User->ID,
 							'login' => $recipient_User->login,
+							'fullname' => $recipient_User->get_username()
 						) );
 
 					init_tokeninput_js( 'blog' );
@@ -1106,8 +1100,23 @@ var downloadInterval = setInterval( function()
 			display_user_email_status_message();
 			break;
 
+		case 'access_requires_login':
+			global $login_mode;
+
+			if( $Settings->get( 'http_auth_require' ) && ! isset( $_SERVER['PHP_AUTH_USER'] ) )
+			{	// Require HTTP authentication:
+				header( 'WWW-Authenticate: Basic realm="b2evolution"' );
+				header( 'HTTP/1.0 401 Unauthorized' );
+			}
+
+			if( ! empty( $login_mode ) && $login_mode == 'http_basic_auth' )
+			{	// Display this error if user already tried to log in by HTTP basic authentication and it was failed:
+				$Messages->add( T_('Wrong Login/Password provided by browser (HTTP Auth).'), 'error' );
+			}
+			break;
+
 		case 'login':
-			global $Plugins;
+			global $Plugins, $login_mode;
 
 			if( is_logged_in() )
 			{ // User is already logged in
@@ -1132,6 +1141,17 @@ var downloadInterval = setInterval( function()
 			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
 			{ // Redirect to special blog for login/register actions if it is defined in general settings
 				header_redirect( $login_Blog->get( 'loginurl', array( 'glue' => '&' ) ) );
+			}
+
+			if( $Settings->get( 'http_auth_require' ) && ! isset( $_SERVER['PHP_AUTH_USER'] ) )
+			{	// Require HTTP authentication:
+				header( 'WWW-Authenticate: Basic realm="b2evolution"' );
+				header( 'HTTP/1.0 401 Unauthorized' );
+			}
+
+			if( ! empty( $login_mode ) && $login_mode == 'http_basic_auth' )
+			{	// Display this error if user already tried to log in by HTTP basic authentication and it was failed:
+				$Messages->add( T_('Wrong Login/Password provided by browser (HTTP Auth).'), 'error' );
 			}
 
 			$seo_page_type = 'Login form';
@@ -1187,15 +1207,15 @@ var downloadInterval = setInterval( function()
 				$after_email_validation = $Settings->get( 'after_email_validation' );
 				if( $after_email_validation == 'return_to_original' )
 				{ // we want to return to original page after account activation
-					// check if Session 'validatemail.redirect_to' param is still set
-					$redirect_to = $Session->get( 'core.validatemail.redirect_to' );
+					// check if Session 'activateacc.redirect_to' param is still set
+					$redirect_to = $Session->get( 'core.activateacc.redirect_to' );
 					if( empty( $redirect_to ) )
 					{ // Session param is empty try to get general redirect_to param
 						$redirect_to = param( 'redirect_to', 'url', '' );
 					}
 					else
 					{ // cleanup validateemail.redirect_to param from session
-						$Session->delete('core.validatemail.redirect_to');
+						$Session->delete('core.activateacc.redirect_to');
 					}
 				}
 				else
@@ -1384,7 +1404,7 @@ var downloadInterval = setInterval( function()
 			$display_params = array();
 
 			// Restrict comment status by parent item:
-			$edited_Comment->restrict_status_by_item();
+			$edited_Comment->restrict_status();
 			break;
 
 		case 'useritems':
@@ -1689,6 +1709,11 @@ function skin_include( $template_name, $params = array() )
 
 	$timer_name = 'skin_include('.$template_name.')';
 	$Timer->resume( $timer_name );
+
+	if( ! empty( $params['Item'] ) )
+	{	// Get Item from params:
+		$Item = $params['Item'];
+	}
 
 	if( $template_name == '$disp$' )
 	{ // This is a special case.
@@ -2088,7 +2113,7 @@ function skin_description_tag()
 			$r = $Blog->get( 'shortdesc' );
 		}
 	}
-	elseif( $disp_detail == 'posts-cat' || $disp_detail == 'posts-subcat' )
+	elseif( $disp_detail == 'posts-cat' || $disp_detail == 'posts-topcat' || $disp_detail == 'posts-subcat' )
 	{
 		if( $Blog->get_setting( 'categories_meta_description' ) && ( ! empty( $Chapter ) ) )
 		{
@@ -2187,7 +2212,9 @@ function skin_opengraph_tags()
 		}
 
 		$LinkOwner = new LinkItem( $Item );
-		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000 ) )
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, NULL, 'image', array(
+				'sql_select_add' => ', CASE link_position WHEN "cover" THEN 1 WHEN ( "teaser" OR "teaserperm" OR "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
+				'sql_order_by' => 'link_priority ASC, link_order ASC' ) ) )
 		{ // Item has no linked files
 			while( $Link = & $LinkList->get_next() )
 			{
@@ -2250,7 +2277,9 @@ function skin_twitter_tags()
 		}
 
 		$LinkOwner = new LinkItem( $Item );
-		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser', 'image', array( 'sql_order_by' => 'link_position ASC' ) ) )
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, NULL, 'image', array(
+				'sql_select_add' => ', CASE link_position WHEN "cover" THEN 1 WHEN ( "teaser" OR "teaserperm" OR "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
+				'sql_order_by' => 'link_priority ASC, link_order ASC' ) ) )
 		{ // Item has no linked files
 			while( $Link = & $LinkList->get_next() )
 			{
@@ -2272,6 +2301,19 @@ function skin_twitter_tags()
 				{ // Use only image files for og:image tag
 					$twitter_image = $File->get_url();
 					break;
+				}
+			}
+		}
+
+		// Get author's Twitter username
+		if( $creator_User = & $Item->get_creator_User() )
+		{
+			if( $twitter_links = $creator_User->userfield_values_by_code( 'twitter' ) )
+			{
+				preg_match( '/https?:\/\/(www\.)?twitter\.com\/(#!\/)?@?([^\/\?]*)/', $twitter_links[0], $matches );
+				if( isset( $matches[3] ) )
+				{
+					echo '<meta property="twitter:creator" content="@'.$matches[3].'" />'."\n";
 				}
 			}
 		}

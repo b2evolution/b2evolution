@@ -20,7 +20,6 @@ $params = array_merge( array(
 
 init_bubbletip_js( 'blog' ); // Add jQuery bubbletip plugin
 init_results_js( 'blog' ); // Add functions to work with Results tables
-require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
@@ -69,11 +68,14 @@ require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
 		$Blog->disp( 'user_css', 'raw');
 		$Blog->disp_setting( 'head_includes', 'raw');
 	?>
+	<?php $Plugins->trigger_event( 'SkinEndHtmlHead' ); ?>
 </head>
 
 <body<?php skin_body_attrs( array( 'class' => 'low-contrast-linen-wptouch-bg' ) ); ?>>
 <?php
-$Blog->disp_setting( 'body_includes', 'raw');
+$Blog->disp_setting( 'body_includes', 'raw' );
+
+$Plugins->trigger_event( 'SkinBeginHtmlBody' );
 
 // Call BeforeSkinWrapper to display additional info:
 $Plugins->trigger_event( 'BeforeSkinWrapper' );

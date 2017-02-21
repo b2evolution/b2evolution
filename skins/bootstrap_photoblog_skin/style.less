@@ -1,3 +1,23 @@
+// --------- Universal item list widget & Recent posts widget ---------
+@import "../../rsc/less/_universal_item_list_widget.module.less";
+// --------------------------------------------------------------------
+
+// ------------------- Media Index widget --------------------
+@import "../../rsc/less/_coll_media_index_widget.module.less";
+// -----------------------------------------------------------
+
+// ----------- User Avatars (User List) widget ------------
+@import "../../rsc/less/_user_avatars_widget.module.less";
+// --------------------------------------------------------
+
+// -----------------About Author widget -------------------
+@import "../../rsc/less/_about_author_widget.module.less";
+// --------------------------------------------------------
+
+// ------------- Organization Members widget -------------
+@import "../../rsc/less/_org_members_widget.module.less";
+// -------------------------------------------------------
+
 // Header
 .evo_container__header {
 	margin-bottom: 20px;
@@ -196,6 +216,12 @@ textarea.message_text {
 //	}
 }
 
+.evo_comment_avatar img {
+	float: left;
+	border-radius: 50%;
+	margin: 0 10px 10px 0;
+}
+
 div.bSideItem {
 	background: #F7F5FA;
 	border-radius: 5px;
@@ -304,6 +330,11 @@ div.bSideItem {
 }
 .form_footer_notes {
 	margin-top: 0;
+}
+
+// Tags wrapper
+.post_tags {
+	margin: 10px 0;
 }
 
 // Pagination

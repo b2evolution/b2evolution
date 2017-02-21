@@ -27,7 +27,7 @@ $Form->begin_form( 'fform' );
 
 $Form->add_crumb( 'casource' );
 $Form->hidden_ctrl();
-$Form->hidden( 'tab', 'sources' );
+$Form->hidden( 'tab', 'reporters' );
 $Form->hidden( 'casrc_ID', $edited_CaSource->ID );
 
 $Form->begin_fieldset( T_('Edit reporter') );
@@ -43,7 +43,7 @@ $Form->end_form( array( array( 'submit', 'actionArray[source_save]', T_('Save ch
 
 // Reports of the edited source:
 $SQL = new SQL();
-$SQL->SELECT( 'cakw_keyword, carpt_ts' );
+$SQL->SELECT( 'cakw_ID, cakw_keyword, carpt_ts' );
 $SQL->FROM( 'T_centralantispam__report' );
 $SQL->FROM_add( 'INNER JOIN T_centralantispam__keyword ON carpt_cakw_ID = cakw_ID' );
 $SQL->WHERE( 'carpt_casrc_ID = '.$DB->quote( $edited_CaSource->ID ) );
@@ -57,10 +57,26 @@ $Results = new Results( $SQL->get(), 'carpt_', '-D', $UserSettings->get( 'result
 
 $Results->title = T_('Reports');
 
+function get_link_for_keyword( $id, $keyword )
+{
+	global $current_User;
+
+	if( $current_User->check_perm( 'centralantispam', 'edit' ) )
+	{ // Not reserved id AND current User has permission to edit the global settings
+		$ret_keyword = '<a href="'.regenerate_url( 'action,tab,casrc_ID', 'action=keyword_edit&amp;cakw_ID='.$id ).'">'.$keyword.'</a>';
+	}
+	else
+	{
+		$ret_keyword = $keyword;
+	}
+
+	return '<strong>'.$ret_keyword.'</strong>';
+}
+
 $Results->cols[] = array(
 		'th' => T_('Keyword'),
 		'order' => 'cakw_keyword',
-		'td' => '$cakw_keyword$',
+		'td' => '%get_link_for_keyword( #cakw_ID#, #cakw_keyword# )%',
 	);
 
 $Results->cols[] = array(

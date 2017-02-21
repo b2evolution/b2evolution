@@ -47,7 +47,7 @@ class twitter_plugin extends Plugin
 	 */
 	var $code = 'evo_twitter';
 	var $priority = 50;
-	var $version = '6.7.0';
+	var $version = '6.7.9';
 	var $author = 'b2evolution Group';
 
 	/*
@@ -205,7 +205,7 @@ class twitter_plugin extends Plugin
 
 			if( ! empty( $oauth_info['token'] ) && isset( $oauth_info['contact'] ) )
 			{
-				echo '<meta property="twitter:creator" content="@'.$oauth_info['contact'].'" />'."\n";
+				echo '<meta property="twitter:site" content="@'.$oauth_info['contact'].'" />'."\n";
 			}
 			else
 			{
@@ -393,7 +393,7 @@ class twitter_plugin extends Plugin
 
 		if( $target_type == 'blog' )
 		{ // redirect to blog settings
-			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=renderers&blog='.$target_id );
+			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=plugins&blog='.$target_id );
 		}
 		else if ($target_type == 'user' )
 		{ // redirect to user advanced preferences form
@@ -492,7 +492,7 @@ class twitter_plugin extends Plugin
 
 		if( $target_type == 'blog' )
 		{ // Blog settings
-			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=renderers&blog='.$target_id );
+			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=plugins&blog='.$target_id );
 
 			$BlogCache = & get_BlogCache();
 			$Collection = $Blog = $BlogCache->get_by_ID( $target_id );

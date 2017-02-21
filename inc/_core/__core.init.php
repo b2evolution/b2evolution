@@ -763,13 +763,13 @@ class _core_Module extends Module
 				array( 'label' => T_( 'New Comment subscription notifications' ) ), $notifications_array
 				),
 			'comment_moderation_notif' => array_merge(
-				array( 'label' => T_( 'New Comment moderation notifications' ) ), $notifications_array
+				array( 'label' => T_( 'Comment moderation notifications' ) ), $notifications_array
 				),
 			'post_subscription_notif' => array_merge(
 				array( 'label' => T_( 'New Post subscription notifications' ) ), $notifications_array
 				),
 			'post_moderation_notif' => array_merge(
-				array( 'label' => T_( 'New Post moderation notifications' ) ), $notifications_array
+				array( 'label' => T_( 'Post moderation notifications' ) ), $notifications_array
 				),
 			'cross_country_allow_profiles' => array(
 				'label' => T_('Users'),
@@ -1144,12 +1144,14 @@ class _core_Module extends Module
 					$display_separator = true;
 				}
 
-				// Check if user has permission for published, draft or depreceted comments (any of these)
-				if( $current_User->check_perm( 'blog_comments', 'edit', false, $Blog->ID ) )
-				{ // Comments:
+				$perm_comments = $current_User->check_perm( 'blog_comments', 'view', false, $Blog->ID );
+				if( $perm_comments || $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+				{	// Initialize comments menu tab if user can view normal or meta comments of the collection:
 					$entries['blog']['entries']['comments'] = array(
 							'text' => T_('Comments').'&hellip;',
-							'href' => $admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;filter=restore',
+							'href' => $admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;filter=restore'
+								// Set url to meta comments page if user has a perm to view only meta comments:
+								.( $perm_comments ? '' : '&amp;tab3=meta' ),
 						);
 					$display_separator = true;
 				}
@@ -1248,7 +1250,7 @@ class _core_Module extends Module
 										'text' => T_('SEO').'&hellip;',
 										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=seo'.$blog_param,
 									),
-									'renderers' => array(
+									'plugins' => array(
 										'text' => T_('Plugins').'&hellip;',
 										'href' => $admin_url.'?ctrl=coll_settings&amp;tab=plugins'.$blog_param,
 									),
@@ -1769,9 +1771,9 @@ class _core_Module extends Module
 							'text' => T_('Settings'),
 							'href' => '?ctrl=email&amp;tab=settings',
 							'entries' => array(
-								'renderers' => array(
-									'text' => T_('Renderers'),
-									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=renderers' ),
+								'plugins' => array(
+									'text' => T_('Plugins'),
+									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=plugins' ),
 								'envelope' => array(
 									'text' => T_('Envelope'),
 									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=envelope' ),

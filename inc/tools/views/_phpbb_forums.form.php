@@ -15,18 +15,19 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher, $flush_action;
+global $dispatcher, $flush_action, $phpbb_tool_title, $phpbb_version;
 
 phpbb_display_steps( 4 );
 
 $Form = new Form();
 
-$Form->begin_form( 'fform', T_('phpBB Importer').' - '.T_('Step 4: Import forums') );
+$Form->begin_form( 'fform', $phpbb_tool_title.' - '.T_('Step 4: Import forums') );
 evo_flush();
 
 $Form->add_crumb( 'phpbb' );
 $Form->hidden_ctrl();
 $Form->hidden( 'action', 'topics' );
+$Form->hidden( 'ver', get_param( 'ver' ) );
 
 if( $flush_action == 'forums' )
 {
@@ -45,6 +46,8 @@ $Form->begin_fieldset( T_('Report of the forums import') );
 	$Form->info( T_('Count of the imported users'), (int)phpbb_get_var( 'users_count_imported' ) );
 
 	$Form->info( T_('Count of the updated users'), (int)phpbb_get_var( 'users_count_updated' ) );
+
+	$Form->info( T_('Count of the imported / missing avatars'), intval( phpbb_get_var( 'avatars_count_imported' ) ).' / <b class="red">'.intval( phpbb_get_var( 'avatars_count_missing' ) ).'</b>' );
 
 	$BlogCache = & get_BlogCache();
 	$Collection = $Blog = & $BlogCache->get_by_ID( phpbb_get_var( 'blog_ID' ) );

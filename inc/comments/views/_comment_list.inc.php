@@ -27,7 +27,6 @@ global $AdminUI, $UserSettings;
 
 // If rediret_to was not set, create new redirect
 $redirect_to = param( 'redirect_to', 'url', regenerate_url( '', 'filter=restore', '', '&' ) );
-$redirect_to = rawurlencode( $redirect_to );
 $save_context = param( 'save_context', 'boolean', 'true' );
 $show_comments = param( 'show_comments', 'string', 'all' );
 
@@ -58,16 +57,56 @@ else
 	$display_meta_title = true;
 }
 
+// Check if mode "Threaded comments" is active to current filterset:
+$threaded_comments_mode = ! empty( $CommentList->filters['threaded_comments'] );
+
+if( $threaded_comments_mode )
+{	// This is "Threaded comments" mode, Initialize global array to store replies:
+	global $CommentReplies;
+	$CommentReplies = array();
+
+	if( ( get_param( 'reply_ID' ) > 0 ) &&
+	    isset( $item_ID ) &&
+	    ( $Comment = get_comment_from_session( 'preview', $comment_type ) ) &&
+	    ( $Comment->item_ID == $item_ID ) )
+	{	// Put a preview comment in array to display it in proper place:
+		$CommentReplies[ $Comment->in_reply_to_cmt_ID ] = array( $Comment );
+	}
+}
+
 while( $Comment = & $CommentList->get_next() )
 { // Loop through comments:
 	if( ( $show_comments == 'draft' ) && ( $Comment->get( 'status' ) != 'draft' ) )
 	{ // if show only draft comments, and current comment status isn't draft, then continue with the next comment
 		continue;
 	}
+
+	if( $threaded_comments_mode && $Comment->in_reply_to_cmt_ID > 0 )
+	{	// Store the comment replies in a special array:
+		if( !isset( $CommentReplies[ $Comment->in_reply_to_cmt_ID ] ) )
+		{
+			$CommentReplies[ $Comment->in_reply_to_cmt_ID ] = array();
+		}
+		$CommentReplies[ $Comment->in_reply_to_cmt_ID ][] = $Comment;
+		// Skip dispay a comment reply here in order to dispay it after parent comment by function display_comment_replies():
+		continue;
+	}
+
+	// Display a comment:
 	echo_comment( $Comment, $redirect_to, $save_context, $comment_index, $display_meta_title );
 	if( $comment_index !== false )
 	{	// Decrease a comment index only when it is requested:
 		$comment_index--;
+	}
+
+	if( $threaded_comments_mode )
+	{	// Display the comment replies:
+		echo_comment_replies( $Comment->ID, array(
+				'redirect_to'        => $redirect_to,
+				'save_context'       => $save_context,
+				'comment_index'      => $comment_index,
+				'display_meta_title' => $display_meta_title,
+			) );
 	}
 } //end of the loop, don't delete
 

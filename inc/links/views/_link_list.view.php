@@ -24,14 +24,10 @@ global $Collection, $Blog;
  */
 global $LinkOwner;
 
-global $AdminUI, $current_User;
+global $AdminUI, $Skin, $current_User;
 
 // Override $dragdropbutton_ID to enable multiple drag and buton
 global $dragdropbutton_ID;
-
-// Override $debug in order to keep the display of the iframe neat
-global $debug;
-$debug = 0;
 
 if( empty( $Blog ) )
 {
@@ -108,19 +104,19 @@ if( $current_User->check_perm( 'files', 'view' ) )
 						);
 }
 
-if( $LinkOwner->type != 'emailcampaign' )
+if( count( $LinkOwner->get_positions() ) > 1 )
 {	// Don't display a position column for email campaign because it always has only one position 'inline':
 	$Results->cols[] = array(
 						'th' => T_('Position'),
-						'td_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap left',
 						'td' => '%display_link_position( {row} )%',
 					);
 }
 
 // Add attr "id" to handle quick uploader
-$compact_results_params = $AdminUI->get_template( 'compact_results' );
-$compact_results_params['body_start'] = str_replace( '<tbody', '<tbody class="filelist_tbody"', $compact_results_params['body_start'] );
-$compact_results_params['no_results_start'] = str_replace( '<tbody', '<tbody class="filelist_tbody"', $compact_results_params['no_results_start'] );
+$compact_results_params = is_admin_page() ? $AdminUI->get_template( 'compact_results' ) : $Skin->get_template( 'compact_results' );
+$compact_results_params['body_start'] = str_replace( '<tbody', '<tbody id="filelist_tbody"', $compact_results_params['body_start'] );
+$compact_results_params['no_results_start'] = str_replace( '<tbody', '<tbody id="filelist_tbody"', $compact_results_params['no_results_start'] );
 
 $Results->display( $compact_results_params );
 
@@ -143,21 +139,28 @@ else
 // Load FileRoot class to get fileroot ID of collection below:
 load_class( '/files/model/_fileroot.class.php', 'FileRoot' );
 
-switch( $LinkOwner->type )
+$link_owner_type = ( $LinkOwner->type == 'temporary' ) ? $LinkOwner->link_Object->type : $LinkOwner->type;
+
+switch( $link_owner_type )
 {
 	case 'item':
-		$upload_fileroot = FileRoot::gen_ID( 'collection', $Blog->ID );
-		$upload_path = '/quick-uploads/p'.$LinkOwner->link_Object->ID.'/';
+		$upload_fileroot = FileRoot::gen_ID( 'collection', ( $LinkOwner->is_temp() ? $LinkOwner->link_Object->tmp_coll_ID : $Blog->ID ) );
+		$upload_path = '/quick-uploads/'.( $LinkOwner->is_temp() ? 'tmp' : 'p' ).$LinkOwner->get_ID().'/';
 		break;
 
 	case 'comment':
 		$upload_fileroot = FileRoot::gen_ID( 'collection', $Blog->ID );
-		$upload_path = '/quick-uploads/c'.$LinkOwner->link_Object->ID.'/';
+		$upload_path = '/quick-uploads/c'.$LinkOwner->get_ID().'/';
 		break;
 
 	case 'emailcampaign':
-		$upload_fileroot = FileRoot::gen_ID( 'emailcampaign', $LinkOwner->link_Object->ID );
-		$upload_path = '/'.$LinkOwner->link_Object->ID.'/';
+		$upload_fileroot = FileRoot::gen_ID( 'emailcampaign', $LinkOwner->get_ID() );
+		$upload_path = '/'.$LinkOwner->get_ID().'/';
+		break;
+
+	case 'message':
+		$upload_fileroot = FileRoot::gen_ID( 'user', $current_User->ID );
+		$upload_path = '/private_message/'.( $LinkOwner->is_temp() ? 'tmp' : 'pm' ).$LinkOwner->get_ID().'/';
 		break;
 }
 
@@ -182,7 +185,7 @@ display_dragdrop_upload_button( array(
 							.'<a class="qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'
 						.'</div>'
 					.'</td>'
-					.( $LinkOwner->type != 'emailcampaign' ? '<td class="qq-upload-link-position lastcol shrinkwrap"></td>' : '' )
+					.( count( $LinkOwner->get_positions() ) > 1 ? '<td class="qq-upload-link-position lastcol shrinkwrap"></td>' : '' )
 				.'</tr></table>',
 		'display_support_msg'    => false,
 		'additional_dropzone'    => '.filelist_tbody',

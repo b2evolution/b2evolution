@@ -48,30 +48,46 @@ $login = NULL;
 $pass = NULL;
 $pass_md5 = NULL;
 $email_login = false;
+$check_login_crumb = true;
+$report_wrong_pass_hashing = true;
 
 if( isset( $_POST[ $dummy_fields[ 'login' ] ] ) && isset( $_POST[ $dummy_fields[ 'pwd' ] ] ) )
-{ // Trying to log in with a POST
+{	// Trying to log in with a POST:
+	$login_mode = 'post_form';
 	$login = $_POST[ $dummy_fields[ 'login' ] ];
 	$pass = $_POST[ $dummy_fields[ 'pwd' ] ];
 	unset( $_POST[ $dummy_fields[ 'pwd' ] ] ); // password will be hashed below
 }
 elseif( isset( $_GET[ $dummy_fields[ 'login' ] ] ) )
-{ // Trying to log in with a GET; we might only provide a user here.
+{	// Trying to log in with a GET; we might only provide a user here.
+	$login_mode = 'get_request';
 	$login = $_GET[ $dummy_fields[ 'login' ] ];
 	$pass = isset( $_GET[ $dummy_fields[ 'pwd' ] ] ) ? $_GET[ $dummy_fields[ 'pwd' ] ] : '';
 	unset( $_GET[ $dummy_fields[ 'pwd' ] ] ); // password will be hashed below
+}
+elseif( empty( $disable_http_auth ) && $Settings->get( 'http_auth_accept' ) && ! $Session->has_User() && isset( $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'] ) )
+{	// Trying to log in with HTTP basic authentication:
+	$login_mode = 'http_basic_auth';
+	$login = $_SERVER['PHP_AUTH_USER'];
+	$pass = $_SERVER['PHP_AUTH_PW'];
+	// Don't check crumb because it is impossible to send by this auth method:
+	$check_login_crumb = false;
+	// Don't report about not hashing password because it is impossible to send by this auth method:
+	$report_wrong_pass_hashing = false;
+	// Set action to simulate a form submit button like '<input type="submit" name="login_action[login]" >' for correct redirect after successful login:
+	$login_action = array( 'login' => '' );
 }
 
 $Debuglog->add( 'Login: login: '.var_export( htmlspecialchars( $login, ENT_COMPAT, $evo_charset ), true ), '_init_login' );
 $Debuglog->add( 'Login: pass: '.( empty( $pass ) ? '' : 'not' ).' empty', '_init_login' );
 
 // either 'login' (normal) or 'redirect_to_backoffice' may be set here. This also helps to display the login form again, if either login or pass were empty.
-$login_action = param_arrayindex( 'login_action' );
+$login_action_value = param_arrayindex( 'login_action' );
 
 if( ( $login != NULL ) && ( ! is_string( $login ) ) )
 { // Login must be string
 	$login = NULL;
-	if( ! empty( $login_action ) )
+	if( ! empty( $login_action_value ) )
 	{ // This was a login request with an invalid login parameter type, so it must be a doctored request
 		debug_die('The type of the received login parameter is invalid!');
 	}
@@ -79,7 +95,7 @@ if( ( $login != NULL ) && ( ! is_string( $login ) ) )
 if( ( $pass != NULL ) && ( ! is_string( $pass ) ) )
 { // Password must be string
 	$pass = NULL;
-	if( ! empty( $login_action ) )
+	if( ! empty( $login_action_value ) )
 	{ // This was a login request with an invalid pwd parameter type, so it must be a doctored request
 		debug_die('The type of the received password parameter is invalid!');
 	}
@@ -87,7 +103,7 @@ if( ( $pass != NULL ) && ( ! is_string( $pass ) ) )
 
 $UserCache = & get_UserCache();
 
-if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
+if( ! empty( $login_action_value ) || ( ! empty( $login ) && ! empty( $pass ) ) )
 { // User is trying to login right now
 
 	// Stop a request from the blocked IP addresses or Domains
@@ -101,9 +117,11 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 
 	header_nocache();		// Don't take risks here :p
 
-	// Check that this login request is not a CSRF hacked request:
-	$Session->assert_received_crumb( 'loginform' );
-	// fp> NOTE: TODO: now that we require going through the login form (instead of URL params), all the login logic that is here can probably be moved to login.php ?
+	if( $check_login_crumb )
+	{	// Check that this login request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'loginform' );
+		// fp> NOTE: TODO: now that we require going through the login form (instead of URL params), all the login logic that is here can probably be moved to login.php ?
+	}
 
 	// Note: login and password cannot include ' or " or > or <
 	// Note: login cannot include @
@@ -116,10 +134,10 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	 * Handle javascript-hashed password:
 	 * If possible, the login form will hash the entered password with a salt that changes everytime.
 	 */
-	param( 'pwd_salt', 'string', '' ); // just for comparison with the one from Session
-	$pwd_salt_sess = $Session->get('core.pwd_salt');
+	param( 'pepper', 'string', '' ); // just for comparison with the one from Session
+	$pepper_sess = $Session->get( 'core.pepper' );
 
-	// $Debuglog->add( 'Login: salt: '.var_export($pwd_salt, true).', session salt: '.var_export($pwd_salt_sess, true), '_init_login' );
+	// $Debuglog->add( 'Login: salt: '.var_export($pepper, true).', session salt: '.var_export($pepper_sess, true), '_init_login' );
 
 	if( can_use_hashed_password() )
 	{
@@ -138,7 +156,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 			'login' => & $login,
 			'pass' => & $pass,
 			'pass_md5' => & $pass_md5,
-			'pass_salt' => & $pwd_salt_sess,
+			'pass_salt' => & $pepper_sess,
 			'pass_hashed' => & $pwd_hashed,
 			'pass_ok' => & $pass_ok ) ) )
 	{ // clear the UserCache, if a plugin has been called - it may have changed user(s)
@@ -156,7 +174,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		if( is_email( $login ) )
 		{ // we have an email address instead of login name
 			// get user by email and password
-			list( $User, $exists_more ) = $UserCache->get_by_emailAndPwd( $login, $pass, $pwd_hashed, $pwd_salt_sess );
+			list( $User, $exists_more ) = $UserCache->get_by_emailAndPwd( $login, $pass, $pwd_hashed, $pepper_sess );
 			if( $User )
 			{ // user was found
 				$email_login = $User->get( 'login' );
@@ -192,7 +210,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 
 				$Debuglog->add( 'Login: Hashed password available.', '_init_login' );
 
-				if( empty($pwd_salt_sess) )
+				if( empty( $pepper_sess ) )
 				{ // no salt stored in session: either cookie problem or the user had already tried logging in (from another window for example)
 					$Debuglog->add( 'Login: Empty salt_sess!', '_init_login' );
 					if( ($pos = strpos( $pass, '_hashed_' ) ) && substr($pass, $pos+8) == $Session->ID )
@@ -206,31 +224,31 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 						$Debuglog->add( 'Login: Session ID does not match.', '_init_login' );
 					}
 				}
-				elseif( $pwd_salt != $pwd_salt_sess )
+				elseif( $pepper != $pepper_sess )
 				{ // submitted salt differs from the one stored in the session
 					$login_error = T_('The login window has expired. Please try again.');
 					$Debuglog->add( 'Login: Submitted salt and salt from Session do not match.', '_init_login' );
 				}
 				else
 				{ // compare the password, using the salt stored in the Session:
-					#pre_dump( sha1($User->pass.$pwd_salt), $pwd_hashed );
+					#pre_dump( sha1($User->pass.$pepper), $pwd_hashed );
 					foreach( $pwd_hashed as $encrypted_password )
 					{
-						$pass_ok = ( sha1( bin2hex( $User->pass ).$pwd_salt_sess ) == $encrypted_password );
+						$pass_ok = ( sha1( $User->pass.$pepper_sess ) == $encrypted_password );
 						if( $pass_ok )
 						{ // Break after the first matching password
 							break;
 						}
 					}
-					$Session->delete('core.pwd_salt');
+					$Session->delete( 'core.pepper' );
 					$Debuglog->add( 'Login: Compared hashed passwords. Result: '.(int)$pass_ok, '_init_login' );
 				}
 			}
 			else
 			{	// Password NOT hashed by Javascript:
-				$pass_ok = ( $User->pass == md5( $User->salt.$pass, true ) );
+				$pass_ok = $User->check_password( $pass );
 				$Debuglog->add( 'Login: Compared raw passwords. Result: '.(int)$pass_ok, '_init_login' );
-				if( $pass_ok && can_use_hashed_password() )
+				if( $report_wrong_pass_hashing && $pass_ok && can_use_hashed_password() )
 				{	// Report about this unsecure login action:
 					syslog_insert( sprintf( 'User %s logged in without password hashing.', $User->login ), 'error', 'user', $User->ID, 'core', NULL, $User->ID );
 					$Messages->add( T_('WARNING: password hashing did not work. You just logged in insecurely. Please report this to your administrator.'), 'error' );
@@ -263,7 +281,8 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		{ // save the user for later hits
 			$Session->set_User( $current_User );
 
-			if( empty( $current_User->salt ) )
+			$user_PasswordDriver = $current_User->get_PasswordDriver();
+			if( $user_PasswordDriver->get_code() == 'evo$md5' )
 			{
 				$Messages->add( sprintf( T_('For best security, we recommend you <a %s>change your password now</a>. This will allow to re-encrypt your password in our database in a more secure way.'), 'href="'.get_user_pwdchange_url().'"' ), 'warning' );
 			}
@@ -303,7 +322,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 				$attempt_ip = $attempt[1];
 
 				$plugin_country_by_IP = '';
-				if( ! empty( $geoip_Plugin ) && $Country = & $geoip_Plugin->get_country_by_IP( $attempt_ip ) )
+				if( ! empty( $geoip_Plugin ) && $Country = $geoip_Plugin->get_country_by_IP( $attempt_ip ) )
 				{ // Get country by IP if plugin is enabled
 					$plugin_country_by_IP = ' ('.$Country->get_name().')';
 				}
@@ -313,11 +332,11 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 					$attempt_ip .= ' '.gethostbyaddr( $attempt_ip );
 				}
 
-				$Messages->add( sprintf( T_('Someone tried to log in to your account with a wrong password on %s from %s%s'),
+				$Messages->add_to_group( sprintf( T_('Someone tried to log in to your account with a wrong password on %s from %s%s'),
 						date( locale_datefmt().' '.locale_timefmt(), $attempt[0] ),
 						$attempt_ip,
 						$plugin_country_by_IP
-					), 'error' );
+					), 'error', T_('Invalid login attempts:') );
 			}
 			// Clear the attempts list
 			$UserSettings->delete( 'login_attempts', $current_User->ID );
@@ -327,18 +346,33 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	elseif( empty( $login_error ) )
 	{ // if the login_error wasn't set yet, add the default one:
 		// This will cause the login screen to "popup" (again)
-		$login_error = T_('Wrong login/password.');
+		if( $login_mode == 'http_basic_auth' )
+		{	// If wrong login from HTTP basic authentication
+			if( ! empty( $is_login_page ) )
+			{	// Display this error and login form only if user really is requesting a login page:
+				$login_error = T_('Wrong Login/Password provided by browser (HTTP Auth).');
+			}
+		}
+		else
+		{	// If wrong login from standard POST forms or GET request:
+			$login_error = T_('The Login/Password you entered is wrong.');
+		}
 
-		if( isset( $login_attempts ) )
-		{ // Save new login attempt into DB
+		$current_login_pass = $login.':'.( empty( $pwd_hashed ) ? $pass : implode( '', $pwd_hashed ) );
+
+		if( isset( $login_attempts ) && $current_login_pass != $Session->get( 'wrong_loginpass' ) )
+		{	// Save new login attempt into DB only if previous login data were different:
 			if( count( $login_attempts ) == 9 )
-			{ // Unset first attempt to clear a space for new attempt
+			{	// Unset first attempt to clear a space for new attempt:
 				unset( $login_attempts[0] );
 			}
 			$login_attempts[] = $localtimenow.'|'.( array_key_exists( 'REMOTE_ADDR', $_SERVER ) ? $_SERVER['REMOTE_ADDR'] : '' );
 			$UserSettings->set( 'login_attempts', implode( ';', $login_attempts ), $User->ID );
 			$UserSettings->dbupdate();
 		}
+
+		// Save current wrong login/pass in session to know on next login trying that we get new data:
+		$Session->set( 'wrong_loginpass', $current_login_pass );
 	}
 
 }
@@ -397,16 +431,16 @@ $action = param( 'action', 'string', NULL );
 // Check if the user needs to be validated, but is not yet:
 if( check_user_status( 'can_be_validated' ) // user is logged in but not validated and validation is required
 	&& $action != 'logout'
-	&& $action != 'req_validatemail' && $action != 'validatemail' && $validate_required )
+	&& $action != 'req_activate_email' && $action != 'activateacc_sec' && $validate_required )
 { // we're not in that action already:
-	$action = 'req_validatemail'; // for login.php
+	$action = 'req_activate_email'; // for login.php
 	if( $is_admin_page )
 	{
 		$login_error = T_('In order to access the admin interface, you must first activate your account by clicking on the activation link in the email we sent you. <b>See below:</b>');
 	}
 }
 // asimo> If login action is not empty and there was no login error, and action is not logut the we must log in
-if( !empty($login_action) && empty( $login_error ) && ( $action != 'logout' ) )
+if( ! empty( $login_action_value ) && empty( $login_error ) && ( $action != 'logout' ) )
 { // Trigger plugin event that allows the plugins to re-act on the login event:
 	// TODO: dh> these events should provide a flag "login_attempt_failed".
 	if( empty($current_User) )
@@ -417,7 +451,7 @@ if( !empty($login_action) && empty( $login_error ) && ( $action != 'logout' ) )
 	{
 		$Plugins->trigger_event( 'AfterLoginRegisteredUser', array() );
 
-		if( ! empty( $login_action ) )
+		if( ! empty( $login_action_value ) )
 		{ // We're coming from the Login form and need to redirect to the requested page:
 			$redirect_to = param( 'redirect_to', 'url', $baseurl );
 			if( empty( $redirect_to ) ||

@@ -28,8 +28,6 @@ $count_SQL->FROM( 'T_items__tag' );
 
 // filters
 $list_is_filtered = false;
-param( 'tag_filter', 'string', '', true );
-param( 'tag_item_ID', 'string', '', true );
 if( get_param( 'tag_filter' ) )
 { // add tag_name filter
 	$sql_name_where = 'LOWER( tag_name ) LIKE '.$DB->quote( '%'.utf8_strtolower( get_param( 'tag_filter' ) ).'%' );
@@ -89,12 +87,23 @@ $Results->filter_area = array(
 		)
 	);
 
+function tag_td_name( $tag_ID, $tag_name )
+{
+	global $current_User, $admin_url;
+
+	if( $current_User->check_perm( 'options', 'edit' ) )
+	{	// Display tag name as link to edit form only if current user has a perm:
+		$tag_name = '<a href="'.$admin_url.'?ctrl=itemtags&amp;tag_ID='.$tag_ID
+				.'&amp;action=edit&amp;return_to='.urlencode( regenerate_url( 'action', '', '', '&' ) ).'">'
+			.'<b>'.$tag_name.'</b></a>';
+	}
+
+	return $tag_name;
+}
 $Results->cols[] = array(
 		'th'       => T_('Tag'),
 		'order'    => 'tag_name COLLATE utf8_general_ci',
-		'td'       => $current_User->check_perm( 'options', 'edit' ) ?
-									'<a href="'.$admin_url.'?ctrl=itemtags&amp;tag_ID=$tag_ID$&amp;action=edit"><b>$tag_name$</b></a>' :
-									'$tag_name$',
+		'td'       => '%tag_td_name( #tag_ID#, #tag_name# )%',
 	);
 
 $Results->cols[] = array(
@@ -109,19 +118,24 @@ $Results->cols[] = array(
 
 if( $current_User->check_perm( 'options', 'edit' ) )
 {
+	function tag_td_actions( $tag_ID )
+	{
+		global $admin_url;
+		return action_icon( T_('Edit this tag...'), 'edit', $admin_url.'?ctrl=itemtags&amp;tag_ID='.$tag_ID.'&amp;action=edit&amp;return_to='.urlencode( regenerate_url( 'action', '', '', '&' ) ) )
+		      .action_icon( T_('Delete this tag!'), 'delete', regenerate_url( 'tag_ID,action', 'tag_ID='.$tag_ID.'&amp;action=delete&amp;return_to='.urlencode( regenerate_url( 'action', '', '', '&' ) ).'&amp;'.url_crumb( 'tag' ) ) );
+	}
 	$Results->cols[] = array(
 				'th' => T_('Actions'),
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'shrinkwrap',
-			'td' => action_icon( T_('Edit this tag...'), 'edit', $admin_url.'?ctrl=itemtags&amp;tag_ID=$tag_ID$&amp;action=edit' )
-					.action_icon( T_('Delete this tag!'), 'delete', regenerate_url( 'tag_ID,action,tag_filter', 'tag_ID=$tag_ID$&amp;action=delete&amp;'.url_crumb( 'tag' ) ) ),
+			'td' => '%tag_td_actions( #tag_ID# )%',
 		);
 
 	if( $current_User->check_perm( 'options', 'edit' ) )
 	{	// Allow to clean up tags only if current user has a permission to edit tags:
-		$Results->global_icon( T_('Cleanup orphans'), 'cleanup', regenerate_url( 'action', 'action=cleanup' ).'&amp;'.url_crumb( 'tag' ), T_('Cleanup orphans'), 3, 4 );
+		$Results->global_icon( T_('Cleanup orphans'), 'cleanup', regenerate_url( 'action', 'action=cleanup&amp;return_to='.urlencode( regenerate_url( 'action', '', '', '&' ) ) ).'&amp;'.url_crumb( 'tag' ), T_('Cleanup orphans'), 3, 4 );
 	}
-	$Results->global_icon( T_('Add a new tag...'), 'new', regenerate_url( 'action', 'action=new' ), T_('New tag').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+	$Results->global_icon( T_('Add a new tag...'), 'new', regenerate_url( 'action', 'action=new&amp;return_to='.urlencode( regenerate_url( 'action', '', '', '&' ) ) ), T_('New tag').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 $Results->display();

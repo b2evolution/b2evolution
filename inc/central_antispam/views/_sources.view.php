@@ -52,14 +52,18 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('URL'),
 		'order' => 'casrc_baseurl',
-		'td' => '<a href="'.$admin_url.'?ctrl=central_antispam&amp;tab=sources&amp;action=source_edit&amp;casrc_ID=$casrc_ID$">$casrc_baseurl$</a>',
+		'td' => '<a href="'.$admin_url.'?ctrl=central_antispam&amp;tab=reporters&amp;action=source_edit&amp;casrc_ID=$casrc_ID$">$casrc_baseurl$</a>',
 	);
 
 $Results->cols[] = array(
 		'th' => T_('Status'),
 		'order' => 'casrc_status',
 		'th_class' => 'shrinkwrap',
-		'td' => '%ca_get_source_status_title( #casrc_status# )%',
+		'td_class' => 'casource_status_edit',
+		'td' => /* Check permission: */$current_User->check_perm( 'centralantispam', 'edit' ) ?
+			/* Current user can edit source */'<a href="#" rel="$casrc_status$" style="color:#FFF">%ca_get_source_status_title( #casrc_status# )%</a>' :
+			/* No edit, only view the status */'%ca_get_keyword_status_title( #cakw_status# )%',
+		'extra' => array ( 'style' => 'background-color: %ca_get_source_status_color( "#casrc_status#" )%;color:#FFF', 'format_to_output' => false ),
 	);
 
 $Results->cols[] = array(
@@ -75,7 +79,7 @@ function ac_results_source_actions( $casrc_ID )
 {
 	global $central_antispam_Module, $admin_url;
 
-	return action_icon( T_('Edit this reporter...'), 'edit', $admin_url.'?ctrl=central_antispam&amp;tab=sources&amp;action=source_edit&amp;casrc_ID='.$casrc_ID );
+	return action_icon( T_('Edit this reporter...'), 'edit', $admin_url.'?ctrl=central_antispam&amp;tab=reporters&amp;action=source_edit&amp;casrc_ID='.$casrc_ID );
 }
 $Results->cols[] = array(
 		'th' => T_('Actions'),
@@ -86,4 +90,18 @@ $Results->cols[] = array(
 
 // Display results:
 $Results->display();
+
+if( $current_User->check_perm( 'centralantispam', 'edit' ) )
+{	// Check permission to edit central antispam source:
+	// Print JS to edit status of central antispam source:
+	echo_editable_column_js( array(
+		'column_selector' => '.casource_status_edit',
+		'ajax_url'        => get_htsrv_url().'action.php?mname=central_antispam&action=casource_status_edit&'.url_crumb( 'casource' ),
+		'options'         => ca_get_source_statuses(),
+		'new_field_name'  => 'new_status',
+		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',
+		'ID_name'         => 'casrc_ID',
+		'colored_cells'   => true,
+	) );
+}
 ?>

@@ -167,10 +167,12 @@ function blog_update_perms( $object_ID, $context = 'user' )
 		$perm_media_browse = param( 'blog_perm_media_browse_'.$loop_ID, 'integer', 0 );
 		$perm_media_change = param( 'blog_perm_media_change_'.$loop_ID, 'integer', 0 );
 
+		$perm_analytics = param( 'blog_perm_analytics_'.$loop_ID, 'integer', 0 );
+
 		// Update those permissions in DB:
 
 		if( $ismember || $can_be_assignee || count($perm_post) || $perm_delpost || $perm_edit_ts || $perm_delcmts || $perm_recycle_owncmts || $perm_vote_spam_comments || $perm_cmtstatuses ||
-			$perm_meta_comments || $perm_cats || $perm_properties || $perm_admin || $perm_media_upload || $perm_media_browse || $perm_media_change )
+			$perm_meta_comments || $perm_cats || $perm_properties || $perm_admin || $perm_media_upload || $perm_media_browse || $perm_media_change || $perm_analytics )
 		{ // There are some permissions for this user:
 			$ismember = 1;	// Must have this permission
 
@@ -180,7 +182,7 @@ function blog_update_perms( $object_ID, $context = 'user' )
 																$perm_delpost, $perm_edit_ts, $perm_delcmts, $perm_recycle_owncmts, $perm_vote_spam_comments, $perm_cmtstatuses,
 																".$DB->quote( $perm_edit_cmt ).",
 																$perm_meta_comments, $perm_cats, $perm_properties, $perm_admin, $perm_media_upload,
-																$perm_media_browse, $perm_media_change )";
+																$perm_media_browse, $perm_media_change, $perm_analytics )";
 		}
 	}
 
@@ -191,7 +193,7 @@ function blog_update_perms( $object_ID, $context = 'user' )
 											{$prefix}perm_poststatuses, {$prefix}perm_item_type, {$prefix}perm_edit, {$prefix}perm_delpost, {$prefix}perm_edit_ts,
 											{$prefix}perm_delcmts, {$prefix}perm_recycle_owncmts, {$prefix}perm_vote_spam_cmts, {$prefix}perm_cmtstatuses, {$prefix}perm_edit_cmt,
 											{$prefix}perm_meta_comment, {$prefix}perm_cats, {$prefix}perm_properties, {$prefix}perm_admin,
-											{$prefix}perm_media_upload, {$prefix}perm_media_browse, {$prefix}perm_media_change )
+											{$prefix}perm_media_upload, {$prefix}perm_media_browse, {$prefix}perm_media_change, {$prefix}perm_analytics )
 									VALUES ".implode( ',', $inserted_values ) );
 	}
 
@@ -605,7 +607,14 @@ function init_requested_blog( $use_blog_param_first = true )
 
 	// No blog requested by URL param, let's try to match something in the URL:
 	$BlogCache = & get_BlogCache();
-	if( preg_match( '#^'.preg_quote($baseurl).'(index.php/)?([^/]+)#', $ReqHost.$ReqPath, $matches ) )
+
+	$re = "/^https?(.*)/i";
+	$str = preg_quote( $baseurl );
+	$subst = "https?$1";
+
+	$baseurl_regex = preg_replace($re, $subst, $str);
+
+	if( preg_match( '#^'.$baseurl_regex.'(index.php/)?([^/]+)#', $ReqHost.$ReqPath, $matches ) )
 	{ // We have an URL blog name:
 		$Debuglog->add( 'Found a potential URL collection name: '.$matches[2].' (in: '.$ReqHost.$ReqPath.')', 'detectblog' );
 		if( strpos( $matches[2], '.' ) !== false )
@@ -738,7 +747,7 @@ function check_allow_disp( $disp )
 	}
 
 	$messages_content = $Messages->get_string( '', '', '', 'raw' );
-	if( ( strstr( $messages_content, 'disp=activateinfo' ) !== false ) || ( strstr( $messages_content, 'action=req_validatemail' ) !== false ) )
+	if( ( strstr( $messages_content, 'disp=activateinfo' ) !== false ) || ( strstr( $messages_content, 'action=req_activate_email' ) !== false ) )
 	{ // If there is already a message to display activateinfo link, then don't add this message again
 		return;
 	}
@@ -821,6 +830,11 @@ function get_highest_publish_status( $type, $blog, $with_label = true, $restrict
 		debug_die( 'Invalid type parameter!' );
 	}
 
+	if( $restrict_max_allowed_status == 'redirected' && $type == 'comment' )
+	{	// Comment cannot have a status "redirected", force this to "deprecated":
+		$restrict_max_allowed_status = 'deprecated';
+	}
+
 	$BlogCache = & get_BlogCache();
 	$requested_Blog = $BlogCache->get_by_ID( $blog );
 	$default_status = ( $type == 'post' ) ? $requested_Blog->get_setting( 'default_post_status' ) : $requested_Blog->get_setting( 'new_feedback_status' );
@@ -869,16 +883,14 @@ function get_highest_publish_status( $type, $blog, $with_label = true, $restrict
 		return ( $with_label ? array( $curr_status, '' ) : $curr_status );
 	}
 
-	$status_order = get_visibility_statuses( 'ordered-array' );
-	$highest_index = count( $status_order ) - 1;
+	$indexed_statuses = array_reverse( get_visibility_statuses( 'ordered-index' ) );
 	$result = false;
 	// Set this flag to know if we should not allow $max_allowed_status and find next status with lower level:
 	$restricted_status_is_allowed = empty( $restrict_max_allowed_status );
 	// Set this flag to false in order to find first allowed status below:
 	$status_is_allowed = false;
-	for( $index = $highest_index; $index > 0; $index-- )
+	foreach( $indexed_statuses as $curr_status => $status_index )
 	{
-		$curr_status = $status_order[$index][0];
 		if( $curr_status == $restrict_max_allowed_status )
 		{	// Set this var to TRUE to make all next statuses below are allowed because it is a max allowed status:
 			$restricted_status_is_allowed = true;
@@ -889,43 +901,59 @@ function get_highest_publish_status( $type, $blog, $with_label = true, $restrict
 		}
 		if( $restricted_status_is_allowed && $status_is_allowed && $current_User->check_perm( 'blog_'.$type.'!'.$curr_status, 'create', false, $blog ) )
 		{	// The highest available publish status has been found:
-			$result = array( $curr_status, $status_order[$index][1] );
+			$result = $curr_status;
 			break;
 		}
 	}
 
-	if( !$result )
-	{ // There are no available public status
+	if( ! $result )
+	{	// There are no available public status:
 		if( $current_User->check_perm( 'blog_'.$type.'!private', 'create', false, $blog ) )
-		{ // Check private status
-			$result = array( 'private', T_('Make private!') );
+		{	// Check private status:
+			$result = 'private';
 		}
 		else
-		{ // None of the statuses were allowed avove the 'draft' status, so we return the lowest level status.
-			$result = array( 'draft', '' );
+		{	// None of the statuses were allowed above the 'draft' status, so we return the lowest level status:
+			$result = 'draft';
 		}
 	}
 
 	if( $with_label )
-	{
-		return $result;
+	{	// Get label for status updating action:
+		if( $result == 'private' )
+		{	// Set special label for private status because it is not defined in get_visibility_statuses( 'ordered-array' ):
+			$result_label = T_('Make private!');
+		}
+		else
+		{	// Get label by status key:
+			$ordered_statuses = get_visibility_statuses( 'ordered-array' );
+			foreach( $ordered_statuses as $index => $ordered_status )
+			{
+				if( $ordered_status[0] == $result )
+				{
+					$result_label = $ordered_status[1];
+					break;
+				}
+			}
+		}
+		return array( $result, empty( $result_label ) ? '' : $result_label );
 	}
 
-	// Return only the highest available visibility status without label
-	return $result[0];
+	// Return only the highest available visibility status without label:
+	return $result;
 }
 
 
 /**
  * Retrieves all tags from published posts
  *
- * @param integer the id of the blog or array of blog ids. Set NULL to use current blog
+ * @param mixed id of the collection or array of collection ids. Set to NULL to use current blog or '*' to use all collections
  * @param integer maximum number of returned tags
  * @param string a comma separated list of tags to ignore/exclude
  * @param bool true to skip tags from pages, intro posts and sidebar stuff
  * @return array of tags
  */
-function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts = false )
+function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts = false, $post_statuses = array( 'published' ), $get_cat_blog_ID = false )
 {
 	global $DB, $localtimenow;
 
@@ -937,30 +965,54 @@ function get_tags( $blog_ids, $limit = 0, $filter_list = NULL, $skip_intro_posts
 		$blog_ids = $blog;
 	}
 
-	if( is_array( $blog_ids ) )
+	if( $blog_ids == '*' )
+	{ // All collections
+		$where_cat_clause = '1';
+	}
+	elseif( is_array( $blog_ids ) )
 	{ // Get quoted ID list
 		$where_cat_clause = 'cat_blog_ID IN ( '.$DB->quote( $blog_ids ).' )';
 	}
 	else
-	{ // Get list of relevant blogs
-		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ids );
+	{ // Get list of relevant/ aggregated collections
+		$Blog = & $BlogCache->get_by_ID( $blog_ids );
 		$where_cat_clause = trim( $Blog->get_sql_where_aggregate_coll_IDs( 'cat_blog_ID' ) );
+
+		if( $Blog->get_setting( 'aggregate_coll_IDs' ) == '*' )
+		{
+			$blog_ids = '*';
+		}
 	}
 
 	// Build query to get the tags:
 	$tags_SQL = new SQL();
 
-	$tags_SQL->SELECT( 'tag_name, COUNT( DISTINCT itag_itm_ID ) AS tag_count, tag_ID, cat_blog_ID' );
+	if( $blog_ids != '*' || $get_cat_blog_ID )
+	{
+		$tags_SQL->SELECT( 'tag_name, COUNT( DISTINCT itag_itm_ID ) AS tag_count, tag_ID, cat_blog_ID' );
+	}
+	else
+	{
+		$tags_SQL->SELECT( 'tag_name, COUNT( DISTINCT itag_itm_ID ) AS tag_count, tag_ID' );
+	}
 
 	$tags_SQL->FROM( 'T_items__tag' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__item ON itag_itm_ID = post_ID' );
-	$tags_SQL->FROM_add( 'INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID' );
-	$tags_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
-	$tags_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
+
+	if( $blog_ids != '*' || $get_cat_blog_ID )
+	{
+		$tags_SQL->FROM_add( 'INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID' );
+		$tags_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
+	}
+
+	if( $skip_intro_posts )
+	{
+		$tags_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
+	}
 
 	$tags_SQL->WHERE( $where_cat_clause );
-	$tags_SQL->WHERE_and( 'post_status = "published"' );
+	$tags_SQL->WHERE_and( 'post_status IN ("'.implode( '", "', $post_statuses ).'")' );
 	$tags_SQL->WHERE_and( 'post_datestart < '.$DB->quote( remove_seconds( $localtimenow ) ) );
 
 	if( $skip_intro_posts )
@@ -1048,6 +1100,10 @@ function get_inskin_statuses_options( & $edited_Blog, $type )
 				'', // Note
 				'', // Class
 				$status_is_hidden, // Hidden field instead of checkbox?
+				array(
+					'data-toggle' => 'tooltip',
+					'data-placement' => 'top',
+					'title' => get_status_tooltip_title( $status ) )
 			);
 	}
 
@@ -1130,6 +1186,20 @@ function get_visibility_statuses( $format = '', $exclude = array('trash'), $chec
 				);
 			break;
 
+		case 'tooltip-titles':
+			$r = array(
+					'published'  => T_('This is visible by everyone.'),
+					'community'  => T_('This is visible by logged-in users only.'),
+					'protected'  => T_('This is visible by members only.'),
+					'review'     => T_('This is waiting for review and is visible by moderators only.'),
+					'private'    => T_('This is visible only by the owner/author of the post and collection administrators.'),
+					'draft'      => is_admin_page() ? T_('This is a draft.') : T_('This is a draft and is visible only by the owner/author of the post and collection administrators.'),
+					'deprecated' => T_('This is deprecated and visible in the Back-Office only.'),
+					'redirected' => T_('This will redirect to another page when accessed from the Front-Office.'),
+					'trash'      => T_('This is a recycled.'),
+				);
+			break;
+
 		case 'ordered-array': // indexed array, ordered from the lowest to the highest public level
 			$r = array(
 				0 => array( 'deprecated', '', T_('Deprecate!'), 'grey' ),
@@ -1142,11 +1212,11 @@ function get_visibility_statuses( $format = '', $exclude = array('trash'), $chec
 
 		case 'ordered-index': // gives each status index in the statuses ordered array
 			$r = array(
-				'redirected' => 0,
 				'trash'      => 0,
-				'private'    => 0,
-				'draft'      => 0,
+				'redirected' => 0,
 				'deprecated' => 0,
+				'draft'      => 0,
+				'private'    => 0,
 				'review'     => 1,
 				'protected'  => 2,
 				'community'  => 3,
@@ -1271,9 +1341,10 @@ function compare_visibility_status( $first_status, $second_status )
  * @param string permlevel: 'view'/'edit' depending on where we would like to use it
  * @param string Status; Don't restrict this status by max allowed status, for example, if it is already used for the post/comment
  * @param string Restrict max collection allowed status by this. Used for example to restrict a comment status with its post status
+ * @param object Permission object: Item or Comment
  * @return array of restricted statuses
  */
-function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow_status = '', $restrict_max_allowed_status = '' )
+function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow_status = '', $restrict_max_allowed_status = '', $perm_target = NULL )
 {
 	global $current_User;
 
@@ -1308,8 +1379,8 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow
 		$result[] = 'redirected';
 	}
 
-	// 'trash' status is allowed only in case of comments, and only if user has global editall permission
-	if( $prefix == 'blog_comment!' && ! ( is_logged_in() && $current_User->check_perm( 'blogs', 'editall', false ) ) )
+	// 'trash' status is allowed only in case of comments, and only if user has a permission to delete a comment from the given collection
+	if( $prefix == 'blog_comment!' && ! ( is_logged_in() && ! empty( $perm_target ) && $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $perm_target ) ) )
 	{ // not allowed
 		$result[] = 'trash';
 	}
@@ -1334,6 +1405,94 @@ function get_restricted_statuses( $blog_ID, $prefix, $permlevel = 'view', $allow
 	}
 
 	return $result;
+}
+
+
+function get_status_tooltip_title( $status )
+{
+	$visibility_statuses = get_visibility_statuses( 'tooltip-titles', array() );
+
+	if( isset( $visibility_statuses[$status] ) )
+	{
+		return $visibility_statuses[$status];
+	}
+	else
+	{
+		debug_die( 'Invalid status value' );
+	}
+}
+
+/**
+ * Check if item/comment can be displayed with status for current user on front-office
+ *
+ * @param string Status
+ * @param string Type: 'item', 'comment'
+ * @param integer Blog ID
+ * @param integer Creator user ID
+ * @return boolean
+ */
+function can_be_displayed_with_status( $status, $type, $blog_ID, $creator_user_ID )
+{
+	// Get statuses which are visible on front-office:
+	$show_statuses = get_inskin_statuses( $blog_ID, $type );
+
+	if( ! in_array( $status, $show_statuses ) )
+	{	// This Item has a status which cannot be displayed on front-office:
+		return false;
+	}
+
+	global $current_User;
+	$is_logged_in = is_logged_in( false );
+
+	$permname = ( $type == 'item' ? 'blog_post!' : 'blog_comment!' ).$status;
+
+	switch( $status )
+	{
+		case 'published':
+			// Published items/comments are always allowed:
+			$allowed = true;
+			break;
+
+		case 'community':
+			// It is always allowed for logged in users:
+			$allowed = $is_logged_in;
+			break;
+
+		case 'protected':
+			// It is always allowed for members:
+			$allowed = ( $is_logged_in && $current_User->check_perm( 'blog_ismember', 1, false, $blog_ID ) );
+			break;
+
+		case 'private':
+			// It is allowed for users who has global 'editall' permission:
+			$allowed = ( $is_logged_in && $current_User->check_perm( 'blogs', 'editall' ) );
+			if( ! $allowed && $is_logged_in && $current_User->check_perm( $permname, 'create', false, $blog_ID ) )
+			{	// Own private items/comments are allowed if user can create private items/comments:
+				$allowed = ( $current_User->ID == $creator_user_ID );
+			}
+			break;
+
+		case 'review':
+			// It is allowed for users who have at least 'lt' items/comments edit permission :
+			$allowed = ( $is_logged_in && $current_User->check_perm( $permname, 'moderate', false, $blog_ID ) );
+			if( ! $allowed && $is_logged_in && $current_User->check_perm( $permname, 'create', false, $blog_ID ) )
+			{	// Own items/comments with 'review' status are allowed if user can create items/comments with 'review' status
+				$allowed = ( $current_User->ID == $creator_user_ID );
+			}
+			break;
+
+		case 'draft':
+			// In front-office only authors may see their own draft items/comments, but only if the have permission to create draft items/comments:
+			$allowed = ( $is_logged_in && $current_User->check_perm( $permname, 'create', false, $blog_ID )
+				&& $current_User->ID == $creator_user_ID );
+			break;
+
+		default:
+			// Decide the unknown item/comment statuses as not visible for front-office:
+			$allowed = false;
+	}
+
+	return $allowed;
 }
 
 
@@ -1557,19 +1716,18 @@ function blogs_all_results_block( $params = array() )
 	}
 
 	$SQL = new SQL();
-	$SQL->SELECT( 'T_blogs.*, user_login, IF( cufv_user_id IS NULL, 0, 1 ) AS blog_favorite' );
+	$SQL->SELECT( 'DISTINCT blog_ID, T_blogs.*, user_login, IF( cufv_user_id IS NULL, 0, 1 ) AS blog_favorite' );
 	$SQL->FROM( 'T_blogs INNER JOIN T_users ON blog_owner_user_ID = user_ID' );
 	$SQL->FROM_add( 'LEFT JOIN T_coll_user_favs ON ( cufv_blog_ID = blog_ID AND cufv_user_ID = '.$current_User->ID.' )' );
 
 	if( ! $current_User->check_perm( 'blogs', 'view' ) )
 	{ // We do not have perm to view all blogs... we need to restrict to those we're a member of:
 
-		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0'
-			. ' AND blog_ID = bloguser_blog_ID'
-			. ' AND bloguser_user_ID = ' . $current_User->ID . ' )'
-			. ' LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0'
-			. ' AND blog_ID = bloggroup_blog_ID'
-			. ' AND bloggroup_group_ID = ' . $current_User->grp_ID . ' )' );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON ( blog_advanced_perms <> 0 AND blog_ID = bloguser_blog_ID'
+			. ' AND bloguser_user_ID = ' . $current_User->ID . ' )' );
+		$SQL->FROM_add( ' LEFT JOIN T_coll_group_perms ON ( blog_advanced_perms <> 0 AND blog_ID = bloggroup_blog_ID'
+			. ' AND ( bloggroup_group_ID = ' . $current_User->grp_ID
+			. '       OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$current_User->ID.' ) ) )' );
 		$SQL->WHERE( 'blog_owner_user_ID = ' . $current_User->ID
 			. ' OR bloguser_ismember <> 0'
 			. ' OR bloggroup_ismember <> 0' );
@@ -1757,7 +1915,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 				'th' => T_('Actions'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
-				'td' => '%blog_row_actions( #blog_ID# )%',
+				'td' => '%blog_row_actions( {Obj} )%',
 			);
 	}
 }
@@ -2077,19 +2235,20 @@ function blog_row_setting( $blog_ID, $setting_name, $setting_value )
 /**
  * Get available actions for current blog
  *
- * @param integer Blog ID
+ * @param object Blog
  * @return string Action links
  */
-function blog_row_actions( $curr_blog_ID )
+function blog_row_actions( $Blog )
 {
 	global $current_User, $admin_url;
 	$r = '';
 
-	if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
+	if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 	{
-		$r .= action_icon( T_('Edit properties...'), 'properties', $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$curr_blog_ID );
-		$r .= action_icon( T_('Duplicate this collection...'), 'copy', $admin_url.'?ctrl=collections&amp;action=copy&amp;blog='.$curr_blog_ID );
-		$r .= action_icon( T_('Delete this blog...'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete&amp;blog='.$curr_blog_ID.'&amp;'.url_crumb('collection').'&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) ) );
+		$r .= '<a href="'.$Blog->get( 'url' ).'" class="action_icon btn btn-info btn-xs" title="'.T_('View this collection').'">'.T_('View').'</a>';
+		$r .= '<a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog='.$Blog->ID.'" class="action_icon btn btn-primary btn-xs" title="'.T_('Manage this collection...').'">'.T_('Manage').'</a>';
+		$r .= action_icon( T_('Duplicate this collection...'), 'copy', $admin_url.'?ctrl=collections&amp;action=copy&amp;blog='.$Blog->ID );
+		$r .= action_icon( T_('Delete this blog...'), 'delete', $admin_url.'?ctrl=collections&amp;action=delete&amp;blog='.$Blog->ID.'&amp;'.url_crumb('collection').'&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) ) );
 	}
 
 	if( empty($r) )

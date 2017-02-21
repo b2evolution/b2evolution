@@ -33,6 +33,8 @@ $required_mysql_version[ 'sessions' ] = '5.0.3';
  */
 $db_config['aliases']['T_basedomains'] = $tableprefix.'basedomains';
 $db_config['aliases']['T_hitlog'] = $tableprefix.'hitlog';
+$db_config['aliases']['T_hits__aggregate'] = $tableprefix.'hits__aggregate';
+$db_config['aliases']['T_hits__aggregate_sessions'] = $tableprefix.'hits__aggregate_sessions';
 $db_config['aliases']['T_sessions'] = $tableprefix.'sessions';
 $db_config['aliases']['T_track__goal'] = $tableprefix.'track__goal';
 $db_config['aliases']['T_track__goalhit'] = $tableprefix.'track__goalhit';
@@ -137,7 +139,7 @@ class sessions_Module extends Module
 			return;
 		}
 
-		if( ( ! is_admin_page() || ! empty( $activate_collection_toolbar ) ) && ! empty( $Blog ) && $current_User->check_perm( 'stats', 'list' ) )
+		if( ( ! is_admin_page() || ! empty( $activate_collection_toolbar ) ) && ! empty( $Blog ) && $current_User->check_perm( 'stats', 'list', false, $Blog->ID ) )
 		{ // Permission to view stats for user's blogs:
 			$entries = array(
 				'stats_separator' => array( 'separator' => true ),

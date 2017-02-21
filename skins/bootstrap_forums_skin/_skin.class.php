@@ -21,7 +21,7 @@ class bootstrap_forums_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.8.0';
+	var $version = '6.9.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -113,8 +113,8 @@ class bootstrap_forums_Skin extends Skin
 				),
 					'layout_general' => array(
 						'label' => T_('General Layout'),
-						'note' => '',
-						'defaultvalue' => 'right_sidebar',
+						'note' => T_('Select global skin layout.'),
+						'defaultvalue' => 'no_sidebar',
 						'options' => array(
 								'no_sidebar'    => T_('No Sidebar'),
 								'left_sidebar'  => T_('Left Sidebar'),
@@ -124,7 +124,7 @@ class bootstrap_forums_Skin extends Skin
 					),
 					'layout_single' => array(
 						'label' => T_('Single Thread Layout'),
-						'note' => '',
+						'note' => T_('Select skin layout for single threads') . ' (disp=single).',
 						'defaultvalue' => 'no_sidebar',
 						'options' => array(
 								'no_sidebar'    => T_('No Sidebar'),
@@ -135,9 +135,10 @@ class bootstrap_forums_Skin extends Skin
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px',
+						'note' => 'px. ' . T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
+						'size' => '7',
 						'allow_empty' => true,
 					),
 				'section_layout_end' => array(
@@ -154,6 +155,17 @@ class bootstrap_forums_Skin extends Skin
 						'defaultvalue' => 1,
 						'type' => 'checkbox',
 					),
+				   'workflow_display_mode' => array(
+					  'label'    => T_('Workflow column'),
+					  'note'     => '',
+					  'type'     => 'radio',
+					  'field_lines' => true,
+					  'options'  => array(
+						 array( 'status_and_author', T_('Display Status & Item Author') ),
+						 array( 'assignee_and_status', T_('Display Assignee (with Priority color coding) & Status') ),
+					  ),
+					  'defaultvalue' => 'status_and_author',
+				   ),
 				'section_forum_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -291,7 +303,7 @@ class bootstrap_forums_Skin extends Skin
 							array( 'page_top', sprintf( T_('"%s" container'), NT_('Page Top') ),  1 ),
 							array( 'menu',     sprintf( T_('"%s" container'), NT_('Menu') ),      0 ),
 							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ) ),
-						),
+					),
 				'section_access_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -367,7 +379,12 @@ class bootstrap_forums_Skin extends Skin
 					white-space: normal;
 					margin-top: 3px;
 				}
-				.disp_single .single_topic .evo_content_block .panel-body .evo_post__full, .disp_single .evo_comment .panel-body .evo_comment_text p, .disp_single .post_tags {
+				.disp_single .single_topic .evo_content_block .panel-body .evo_post__full,
+				.disp_single .evo_comment .panel-body .evo_comment_text p,
+				.disp_single .post_tags,
+				.disp_single .evo_voting_panel,
+				.disp_single .evo_seen_by
+				{
 					padding-left: 15px;
 				}
 				\n
@@ -484,12 +501,12 @@ class bootstrap_forums_Skin extends Skin
 
 
 	/**
-	 * Check if we can display a widget container
+	 * Check if we can display a widget container when access is denied to collection by current user
 	 *
 	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
 	 * @return boolean TRUE to display
 	 */
-	function is_visible_container( $container_key )
+	function show_container_when_access_denied( $container_key )
 	{
 		global $Collection, $Blog;
 
@@ -523,7 +540,7 @@ class bootstrap_forums_Skin extends Skin
 
 		if( $check_containers )
 		{ // Check if at least one sidebar container is visible
-			return ( $this->is_visible_container( 'sidebar' ) ||  $this->is_visible_container( 'sidebar2' ) );
+			return ( $this->show_container_when_access_denied( 'sidebar' ) ||  $this->show_container_when_access_denied( 'sidebar2' ) );
 		}
 		else
 		{ // We should not check the visibility of the sidebar containers for this case

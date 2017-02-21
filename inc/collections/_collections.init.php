@@ -57,6 +57,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_items__user_data'         => $tableprefix.'items__user_data',
 		'T_items__version'           => $tableprefix.'items__version',
 		'T_items__votes'             => $tableprefix.'items__votes',
+		'T_items__status_type'       => $tableprefix.'items__status_type',
 		'T_links'                    => $tableprefix.'links',
 		'T_links__vote'              => $tableprefix.'links__vote',
 		'T_postcats'                 => $tableprefix.'postcats',
@@ -64,6 +65,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_skins__skin'              => $tableprefix.'skins__skin',
 		'T_subscriptions'            => $tableprefix.'subscriptions',
 		'T_widget'                   => $tableprefix.'widget',
+		'T_temporary_ID'             => $tableprefix.'temporary_ID',
 	) );
 
 /**
@@ -318,6 +320,26 @@ function & get_LinkCache()
 	return $LinkCache;
 }
 
+
+/**
+ * Get the TemporaryIDCache
+ *
+ * @return TemporaryIDCache
+ */
+function & get_TemporaryIDCache()
+{
+	global $TemporaryIDCache;
+
+	if( ! isset( $TemporaryIDCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'links/model/_temporaryid.class.php', 'TemporaryID' );
+		$TemporaryIDCache = new DataObjectCache( 'TemporaryID', false, 'T_temporary_ID', 'tmp_', 'tmp_ID', 'tmp_ID', 'tmp_ID' );
+	}
+
+	return $TemporaryIDCache;
+}
+
+
 /**
  * Get the SkinCache
  *
@@ -503,13 +525,13 @@ class collections_Module extends Module
 				'note' => T_( 'New users automatically get a new blog'),
 				),
 			'perm_max_createblog_num' => array(
-				'label' => T_('Maximum number of blogs allowed'),
+				'label' => T_('Maximum collections'),
 				'user_func' => 'check_createblog_user_perm',
 				'group_funct' => 'check_createblog_group_perm',
 				'perm_block' => 'blogging',
 				'perm_type' => 'text_input',
 				'maxlength' => 2,
-				'note' => T_('Leave empty for no limit'),
+				'note' => T_('Users will not be able to create collections if they already own the maximum number of collections (or more).'),
 				),
 			);
 		return $permissions;
@@ -741,7 +763,7 @@ class collections_Module extends Module
 					'order' => 'group_last' ),
 			);
 
-		$perm_comments = $current_User->check_perm( 'blog_comments', 'edit', false, $blog );
+		$perm_comments = $current_User->check_perm( 'blog_comments', 'view', false, $blog );
 		$perm_cats = $current_User->check_perm( 'blog_cats', '', false, $blog );
 
 		// Posts
@@ -751,14 +773,17 @@ class collections_Module extends Module
 			);
 		$last_group_menu_entry = 'posts';
 
-		if( $perm_comments )
-		{ // User has permission to edit published, draft or deprecated comments (at least one kind)
+		if( $perm_comments || $current_User->check_perm( 'meta_comment', 'view', false, $blog ) )
+		{	// Initialize comments menu tab if user can view normal or meta comments of the collection:
 			$collection_menu_entries['comments'] = array(
 					'text' => T_('Comments'),
-					'href' => $admin_url.'?ctrl=comments&amp;blog='.$blog.'&amp;filter=restore',
+					'href' => $admin_url.'?ctrl=comments&amp;blog='.$blog.'&amp;filter=restore'
+						// Set url to meta comments page if user has a perm to view only meta comments:
+						.( $perm_comments ? '' : '&amp;tab3=meta' ),
 				);
 			$last_group_menu_entry = 'comments';
 		}
+
 		if( $perm_cats )
 		{ // Categories
 			$collection_menu_entries['categories'] = array(
@@ -993,6 +1018,12 @@ class collections_Module extends Module
 				'name'   => T_('Send reminders about posts awaiting moderation'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_post_moderation_reminder.job.php',
+				'params' => NULL,
+			),
+			'monthly-alert-old-contents' => array(
+				'name'   => T_('Monthly alert on old contents'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_monthly_alert_old_contents.job.php',
 				'params' => NULL,
 			),
 		);

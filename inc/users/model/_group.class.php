@@ -95,6 +95,7 @@ class Group extends DataObject
 			$this->set( 'name', T_('New group') );
 			$this->set( 'perm_blogs', 'user' );
 			$this->set( 'perm_stats', 'none' );
+			$this->set( 'usage', 'primary' );
 		}
 		else
 		{
@@ -365,34 +366,27 @@ class Group extends DataObject
 						break;
 
 					case 'view':
-						// User can ask for view perm...
-						if( $permlevel == 'view' )
+						// User can permissions to view all collections
+						if( $permlevel == 'view' || $permlevel == 'list' )
 						{
 							$perm = true;
 							break;
 						}
-						// ... or for any lower priority perm... (no break)
+						break;
 
 					case 'user':
 						// This is for stats. User perm can grant permissions in the User class
 						// Here it will just allow to list
 					case 'list':
 						// User can only ask for list perm
-						if( $permlevel == 'list' )
+						// But for requested collection we should check perm in user/group perms of the collections
+						if( $permlevel == 'list' && $perm_target === NULL )
 						{
-							$perm = true;
+							$perm = check_coll_first_perm( 'perm_analytics', 'group', $this->ID );
 							break;
 						}
 				}
 				break;
-
-			case 'perm_files':
-				if( ! $this->check_perm( 'admin', 'restricted' ) )
-				{
-					$perm = false;
-					break;
-				}
-				// no break, perm_files is pluggable permission
 
 			default:
 

@@ -229,7 +229,7 @@ function create_default_data()
 		VALUES ( 1, 'login_multiple_sessions', '1' ),
 				( 1, 'enable_email', '1' ),
 				( 1, 'created_fromIPv4', '".ip2int( '127.0.0.1' )."' ),
-				( 1, 'user_domain', 'localhost' )" );
+				( 1, 'user_registered_from_domain', 'localhost' )" );
 	task_end();
 
 
@@ -354,6 +354,10 @@ function create_default_data()
 			'use_comment_expiration' => 'never',
 			'use_custom_fields'      => 0,
 		);
+	$post_types[] = array(
+			'name' => 'Bug Report',
+			'allow_html'     => 0,
+		);
 	// Default settings:
 	$post_type_default_settings = array(
 			'name'                     => '',
@@ -403,15 +407,20 @@ function create_default_data()
 
 
 	task_begin( 'Creating default Post Statuses... ' );
-	$DB->query( "
-		INSERT INTO T_items__status ( pst_name )
-		VALUES ( 'New' ),
-					 ( 'In Progress' ),
-					 ( 'Duplicate' ),
-					 ( 'Not A Bug' ),
-					 ( 'In Review' ),
-					 ( 'Fixed' ),
-					 ( 'Closed' )" );
+	$post_status = array( 'New', 'In Progress', 'Duplicate', 'Not A Bug', 'In Review', 'Fixed', 'Closed', 'OK' );
+
+	$DB->query( "INSERT INTO T_items__status ( pst_name )	VALUES ( '".implode( "' ),( '", $post_status )." ')" );
+	task_end();
+
+
+	task_begin( 'Creating default post status and post type associations...' );
+	// Enable all post statuses for post type Bug Report
+	$DB->query( 'INSERT INTO T_items__status_type (its_pst_ID, its_ityp_ID)
+			( SELECT pst_ID, ityp_ID FROM T_items__type, T_items__status WHERE ityp_name = "Bug Report" )' );
+
+	// Enable post status 'New', 'Duplicate', 'In Review' and 'OK' for all post types
+	$DB->query( 'INSERT IGNORE INTO T_items__status_type (its_pst_ID, its_ityp_ID)
+			( SELECT pst_ID, ityp_ID FROM T_items__type, T_items__status WHERE pst_name IN ( "New", "Duplicate", "In Review", "OK" ) )' );
 	task_end();
 
 
@@ -434,18 +443,18 @@ function create_default_data()
 			(10, 'pps', 'Slideshow', 'pps', 'file_pps', 'external', 'registered'),
 			(11, 'zip', 'ZIP archive', 'application/zip', 'file_zip', 'external', 'registered'),
 			(12, 'php php3 php4 php5 php6', 'PHP script', 'application/x-httpd-php', 'file_php', 'text', 'admin'),
-			(13, 'css', 'Style sheet', 'text/css', '', 'text', 'registered'),
+			(13, 'css', 'Style sheet', 'text/css', 'file_document', 'text', 'registered'),
 			(14, 'mp3', 'MPEG audio file', 'audio/mpeg', 'file_sound', 'browser', 'registered'),
 			(15, 'm4a', 'MPEG audio file', 'audio/x-m4a', 'file_sound', 'browser', 'registered'),
 			(16, 'mp4 f4v', 'MPEG video', 'video/mp4', 'file_video', 'browser', 'registered'),
 			(17, 'mov', 'Quicktime video', 'video/quicktime', 'file_video', 'browser', 'registered'),
 			(18, 'm4v', 'MPEG video file', 'video/x-m4v', 'file_video', 'browser', 'registered'),
 			(19, 'flv', 'Flash video file', 'video/x-flv', 'file_video', 'browser', 'registered'),
-			(20, 'swf', 'Flash video file', 'application/x-shockwave-flash', 'file_video', 'browser', 'registered'),
+			(20, 'swf', 'Flash video file', 'application/x-shockwave-flash', 'file_video', 'browser', 'admin'),
 			(21, 'webm', 'WebM video file', 'video/webm', 'file_video', 'browser', 'registered'),
 			(22, 'ogv', 'Ogg video file', 'video/ogg', 'file_video', 'browser', 'registered'),
 			(23, 'm3u8', 'M3U8 video file', 'application/x-mpegurl', 'file_video', 'browser', 'registered'),
-			(24, 'xml', 'XML file', 'application/xml', 'file_document', 'browser', 'admin')
+			(24, 'xml', 'XML file', 'application/xml', 'file_www', 'browser', 'admin')
 		" );
 	task_end();
 
@@ -471,26 +480,6 @@ function create_default_data()
 		VALUES ( '.$DB->quote( 'Default' ).', '.$DB->quote( '#999999' ).' )' );
 	task_end();
 
-
-	task_begin( 'Creating default polls... ' );
-	$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text )
-		VALUES ( 1, "What is your favorite b2evolution feature?" )' );
-	$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
-		VALUES ( 1, "Multiple blogs",          1 ),
-		       ( 1, "Photo Galleries",         2 ),
-		       ( 1, "Forums",                  3 ),
-		       ( 1, "Online Manuals",          4 ),
-		       ( 1, "Newsletters / E-mailing", 5 ),
-		       ( 1, "Easy Maintenance",        6 )' );
-	$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
-		VALUES ( 1, 5, 1 ),
-		       ( 1, 6, 2 ),
-		       ( 1, 7, 2 ),
-		       ( 1, 2, 2 ),
-		       ( 1, 3, 3 ),
-		       ( 1, 4, 3 ),
-		       ( 1, 1, 6 )' );
-	task_end();
 
 	// Update the progress bar status
 	update_install_progress_bar();
@@ -1202,6 +1191,7 @@ function create_default_jobs( $is_upgrade = false )
 	$comment_reminder_key     = 'send-unmoderated-comments-reminders';
 	$messages_reminder_key    = 'send-unread-messages-reminders';
 	$post_reminder_key        = 'send-unmoderated-posts-reminders';
+	$alert_old_contents_key   = 'monthly-alert-old-contents';
 
 	// init insert values
 	$insert_values = array(
@@ -1219,6 +1209,7 @@ function create_default_jobs( $is_upgrade = false )
 			$light_db_maintenance_key => "( ".$DB->quote( form_date( $date, '06:00:00' ) ).", 86400, ".$DB->quote( $light_db_maintenance_key ).", ".$ctsk_params." )",
 			$heavy_db_maintenance_key => "( ".$DB->quote( form_date( $next_sunday, '06:30:00' ) ).", 604800, ".$DB->quote( $heavy_db_maintenance_key ).", ".$ctsk_params." )",
 			$post_reminder_key        => "( ".$DB->quote( form_date( $date, '07:00:00' ) ).", 86400, ".$DB->quote( $post_reminder_key ).", ".$ctsk_params." )",
+			$alert_old_contents_key   => "( ".$DB->quote( form_date( $next_sunday, '07:30:00' ) ).", 604800, ".$DB->quote( $alert_old_contents_key ).", ".$ctsk_params." )",
 		);
 	if( $is_upgrade )
 	{ // Check if these jobs already exist, and don't create another
@@ -1531,6 +1522,28 @@ function create_demo_contents()
 	$DB->query( $query );
 	echo "OK.<br />\n";
 	*/
+
+
+	task_begin( 'Creating default polls... ' );
+	$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text )
+		VALUES ( 1, "What is your favorite b2evolution feature?" )' );
+	$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
+		VALUES ( 1, "Multiple blogs",          1 ),
+		       ( 1, "Photo Galleries",         2 ),
+		       ( 1, "Forums",                  3 ),
+		       ( 1, "Online Manuals",          4 ),
+		       ( 1, "Newsletters / E-mailing", 5 ),
+		       ( 1, "Easy Maintenance",        6 )' );
+	$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
+		VALUES ( 1, 5, 1 ),
+		       ( 1, 6, 2 ),
+		       ( 1, 7, 2 ),
+		       ( 1, 2, 2 ),
+		       ( 1, 3, 3 ),
+		       ( 1, 4, 3 ),
+		       ( 1, 1, 6 )' );
+	task_end();
+
 
 	// Allow all modules to create their own demo contents:
 	modules_call_method( 'create_demo_contents' );

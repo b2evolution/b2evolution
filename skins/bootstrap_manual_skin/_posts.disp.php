@@ -57,7 +57,7 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 	$curr_Chapter = & $ChapterCache->get_by_ID( $cat, false );
 
 	// Go Grab the featured post:
-	$intro_Item = get_featured_Item(); // $intro_Item is used below for comments form
+	$intro_Item = & get_featured_Item(); // $intro_Item is used below for comments form
 
 	if( empty( $intro_Item ) || $intro_Item->get( 'title' ) == '' )
 	{ // Display chapter title only if intro post has no title
@@ -99,6 +99,7 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 				'disp_comment_form' => false,
 				'disp_notification' => false,
 				'item_link_type'    => 'none',
+				'Item'              => $Item,
 			), $Skin->get_template( 'disp_params' ) ) );
 		// ----------------------------END ITEM BLOCK  ----------------------------
 		echo '</div>'; // End of posts display

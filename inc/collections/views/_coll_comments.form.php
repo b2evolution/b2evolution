@@ -18,7 +18,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $edited_Blog, $AdminUI;
+global $edited_Blog, $AdminUI, $Settings;
+$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
 ?>
 <script type="text/javascript">
@@ -256,6 +257,10 @@ $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moder
 				'', // Note
 				'', // Class
 				$status_is_hidden, // Hidden field instead of checkbox?
+				array(
+					'data-toggle' => 'tooltip',
+					'data-placement' => 'top',
+					'title' => get_status_tooltip_title( $status ) )
 			);
 	}
 	$Form->checklist( $checklist_options, 'moderation_statuses', T_('"Require moderation" statuses'), false, false, array( 'note' => T_('Comments with the selected statuses will be considered to require moderation. They will trigger "moderation required" notifications and will appear as such on the collection dashboard.') ) );
@@ -277,11 +282,13 @@ $Form->begin_fieldset( T_('RSS/Atom feeds') . get_manual_link('comment-rss-atom-
 	$Form->text( 'comments_per_feed', $edited_Blog->get_setting('comments_per_feed'), 4, T_('Comments in feeds'),  T_('How many of the latest comments do you want to include in RSS & Atom feeds?'), 4 );
 $Form->end_fieldset();
 
-
-$Form->begin_fieldset( T_('Subscriptions') . get_manual_link('comment-subscriptions') );
-	$Form->checkbox( 'allow_comment_subscriptions', $edited_Blog->get_setting( 'allow_comment_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new comment.') );
-	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
-$Form->end_fieldset();
+if( $notifications_mode != 'off' )
+{
+	$Form->begin_fieldset( T_('Subscriptions') . get_manual_link('comment-subscriptions') );
+		$Form->checkbox( 'allow_comment_subscriptions', $edited_Blog->get_setting( 'allow_comment_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new comment.') );
+		$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
+	$Form->end_fieldset();
+}
 
 
 $Form->begin_fieldset( T_('Registration of commenters') . get_manual_link('comment-registration-of-commenters') );

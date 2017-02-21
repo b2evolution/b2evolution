@@ -25,7 +25,7 @@ $params = array_merge( array(
 		// Controlling the title:
 		'disp_title'                 => true,
 		'item_title_line_before'     => '<div class="evo_post_title">',	// Note: we use an extra class because it facilitates styling
-			'item_title_before'          => '<h2>',	
+			'item_title_before'          => '<h2>',
 			'item_title_after'           => '</h2>',
 			'item_title_single_before'   => '<h1>',	// This replaces the above in case of disp=single or disp=page
 			'item_title_single_after'    => '</h1>',
@@ -76,16 +76,9 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				'restrict_to_image_position' => 'teaser',
 			) );
 	?>
-	
-	<?php 
-		if( ! $Item->is_intro() ) { // Display different layout for intro/featured and regular posts
-			echo '<section class="evo_post__full well">';
-			echo '<div class="evo_post__full_text">';
-		} else {
-			echo '<section class="evo_post__full">';
-			echo '<div class="evo_post__full_text">';
-		}
-	?>
+
+	<div class="evo_post_wrapper <?php if(!$Item->is_intro()){echo 'well';} ?>">
+
 	<header>
 	<?php
 		// ------- Title -------
@@ -124,16 +117,16 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 
 			echo $params['item_title_line_after'];
 		}
-		
+
 		if( ! $Item->is_intro() )
 		{ // Don't display the following for intro posts
 
 			echo '<div class="small text-muted">';
-		
+
 			if( $Item->status != 'published' )
 			{
 				$Item->format_status( array(
-						'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+						'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 					) );
 			}
 			// Permalink:
@@ -145,7 +138,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			$Item->issue_time( array(
 					'before'      => ' '.T_('posted on '),
 					'after'       => ' ',
-					'time_format' => 'M j, Y',
+					'time_format' => locale_extdatefmt(),
 				) );
 
 			// Author
@@ -170,12 +163,13 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				'before'    => ' &bull; ',
 				'after'     => '',
 			) );
-			
+
 			echo '</div>';
 		}
 	?>
-	
+
 	</header>
+
 	<?php
 	if( $disp == 'single' )
 	{
@@ -194,8 +188,9 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
 			// Template params for "Item Tags" widget
-			'widget_item_tags_before'    => '<div class="small">'.T_('Tags').': ',
-			'widget_item_tags_after'     => '</div>',
+			'widget_item_tags_before'    => '<nav class="small post_tags">',
+			'widget_item_tags_after'     => '</nav>',
+			'widget_item_tags_separator' => ' ',
 			// Params for skin file "_item_content.inc.php"
 			'widget_item_content_params' => $params,
 			// Template params for "Item Attachments" widget:
@@ -226,15 +221,12 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	}
 	?>
 
-	<footer>
+	</div> <!-- ../content_end_full_text -->
+
 		<?php
-			if( ! $Item->is_intro() ) // Do NOT apply tags, comments and feedback on intro posts
+			if( ! $Item->is_intro() && $disp == 'posts' ) // Do NOT apply tags, comments and feedback on intro posts
 			{ // List all tags attached to this post:
-				$Item->tags( array(
-						'before'    => '<nav class="small post_tags">',
-						'after'     => '</nav>',
-						'separator' => ' ',
-					) );
+				echo '<footer>';
 		?>
 
 		<nav>
@@ -264,10 +256,11 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 						) );
 		?>
 		</nav>
-		<?php } ?>
-	</footer>
-	
-	</div> <!-- ../content_end_full_text -->
+			<?php
+				echo '</footer>';
+			} ?>
+
+	</div><!-- ../evo_post_wrapper -->
 	</section>  <!-- ../content_end_full -->
 
 	<?php

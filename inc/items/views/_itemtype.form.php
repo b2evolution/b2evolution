@@ -219,6 +219,92 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 	}
 $Form->end_fieldset();
 
+$SQL = new SQL();
+if( $edited_Itemtype->ID )
+{
+	$SQL->SELECT( 'pst_ID, pst_name, its_ityp_ID' );
+	$SQL->FROM( 'T_items__status' );
+	$SQL->FROM_add( 'JOIN T_items__type' );
+	$SQL->FROM_add( 'LEFT JOIN T_items__status_type ON its_ityp_ID = ityp_ID AND its_pst_ID = pst_ID' );
+	$SQL->WHERE( 'ityp_ID = '.$edited_Itemtype->ID );
+}
+else
+{
+	$SQL->SELECT( 'pst_ID, pst_name, NULL AS its_ityp_ID' );
+	$SQL->FROM( 'T_items__status' );
+}
+
+$Results = new Results( $SQL->get(), 'pst_' );
+$Results->title = T_('Item Statuses allowed for this Item Type').get_manual_link( 'item-statuses-allowed-per-item-type' );
+$Results->cols[] = array(
+		'th' => T_('ID'),
+		'th_class' => 'shrinkwrap',
+		'td' => '$pst_ID$',
+		'td_class' => 'center'
+	);
+
+function item_status_type_checkbox( $row )
+{
+	$title = $row->pst_name;
+	$r = '<input type="checkbox"';
+	$r .= ' name="status_'.$row->pst_ID.'"';
+
+	if( isset( $row->its_ityp_ID ) && ! empty( $row->its_ityp_ID ) )
+	{
+		$r .= ' checked="checked"';
+	}
+
+	$r .= ' class="checkbox" value="1" title="'.$title.'" />';
+
+	return $r;
+}
+
+$Results->cols[] = array(
+		'th' => T_('Allowed Item Status'),
+		'th_class' => 'shrinkwrap',
+		'td' => '%item_status_type_checkbox( {row} )%',
+		'td_class' => 'center'
+	);
+
+function get_name_for_itemstatus( $id, $name )
+{
+	global $current_User;
+
+	if( $current_User->check_perm( 'options', 'edit' ) )
+	{ // Not reserved id AND current User has permission to edit the global settings
+		$ret_name = '<a href="'.regenerate_url( 'ctrl,action,ID,pst_ID', 'ctrl=itemstatuses&amp;pst_ID='.$id.'&amp;action=edit' ).'">'.$name.'</a>';
+	}
+	else
+	{
+		$ret_name = $name;
+	}
+
+	return '<strong>'.$ret_name.'</strong>';
+}
+
+$Results->cols[] = array(
+		'th' => T_('Name'),
+		'td' => '%get_name_for_itemstatus( #pst_ID#, #pst_name# )%'
+	);
+
+$display_params = array(
+		'page_url' => 'admin.php?ctrl=itemtypes&ityp_ID='.$edited_Itemtype->ID.'&action=edit'
+	);
+
+$Results->display( $display_params );
+
+
+$item_status_IDs = array();
+if( $Results->result_num_rows > 0 )
+{	// If at least one post status exists in DB:
+	foreach( $Results->rows as $row )
+	{
+		$item_status_IDs[] = $row->pst_ID;
+	}
+}
+$Form->hidden( 'item_status_IDs', implode( ',', $item_status_IDs ) );
+
+
 if( $creating )
 {
 	$Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'SaveButton' ),
@@ -249,15 +335,15 @@ function add_new_custom_field( type, title, title_size )
 	var count_custom = jQuery( 'input[name=count_custom_' + type + ']' ).attr( 'value' );
 	count_custom++;
 	var custom_ID = guidGenerator();
-	jQuery( '#custom_' + type + '_field_list' ).append( '<?php echo str_replace( array( '$ID$', "\n" ), array( 'ffield_custom_\' + type + \'_\' + count_custom + \'', '' ), $Form->fieldstart ); ?>' +
+	jQuery( '#custom_' + type + '_field_list' ).append( '<?php echo str_replace( array( '$ID$' ), array( 'ffield_custom_\' + type + \'_\' + count_custom + \'' ), format_to_js( $Form->fieldstart ) ); ?>' +
 			'<input type="hidden" name="custom_' + type + '_ID' + count_custom + '" value="' + custom_ID + '" />' +
 			'<input type="hidden" name="custom_' + type + '_new' + count_custom + '" value="1" />' +
-			'<?php echo $Form->labelstart; ?><label for="custom_' + type + '_' + count_custom + '"<?php echo empty( $Form->labelclass ) ? '' : ' class="'.$Form->labelclass.'"'; ?>>' + title + ':</label><?php echo str_replace( "\n", '', $Form->labelend ); ?>' +
-			'<?php echo $Form->inputstart; ?>' +
+			'<?php echo format_to_js( $Form->labelstart ); ?><label for="custom_' + type + '_' + count_custom + '"<?php echo empty( $Form->labelclass ) ? '' : ' class="'.$Form->labelclass.'"'; ?>>' + title + ':</label><?php echo format_to_js( $Form->labelend ); ?>' +
+			'<?php echo format_to_js( $Form->inputstart ); ?>' +
 				'<?php echo TS_('Title'); ?> <input type="text" id="custom_' + type + '_' + count_custom + '" name="custom_' + type + '_' + count_custom + '" class="form_text_input form-control new_custom_field_title" maxlength="255" size="' + title_size + '" />' +
 				' <?php echo TS_('Name'); ?> <input type="text" name="custom_' + type + '_fname' + count_custom + '" value="" class="form_text_input form-control custom_field_name" maxlength="255" />' +
 				' <?php echo TS_('Order'); ?> <input type="text" name="custom_' + type + '_order' + count_custom + '" value="" class="form_text_input form-control custom_field_order" maxlength="11" size="3" />' +
-			'<?php echo str_replace( "\n", '', $Form->inputend.$Form->fieldend ); ?>' );
+			'<?php echo format_to_js( $Form->inputend.$Form->fieldend ); ?>' );
 	jQuery( 'input[name=count_custom_' + type + ']' ).attr( 'value', count_custom );
 }
 

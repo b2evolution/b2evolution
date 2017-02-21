@@ -139,7 +139,7 @@ class AdminUI extends AdminUI_general
 							 <span class="icon-bar"></span>
 						</button>
 						<a class="navbar-brand" href="'.$admin_url.'?ctrl=dashboard"'
-								.( $Settings->get( 'site_color' ) != '' ? 'style="color:'.$Settings->get( 'site_color' ).'"' : '' ).'>'
+								.( $Settings->get( 'site_color' ) != '' ? ' style="color:'.$Settings->get( 'site_color' ).'"' : '' ).'>'
 							.$Settings->get( 'site_code' )
 						.'</a>
 				 </div>
@@ -429,18 +429,6 @@ class AdminUI extends AdminUI_general
 				}
 				return $results_template;
 
-			case 'compact_results':
-				// Compact Results list:
-				return array_merge( $this->get_template( 'Results' ), array(
-						'before'           => '<div class="results results_compact panel panel-default">',
-						'header_text'      => '',
-						'head_title'       => '',
-						'no_results_start' => '<div class="table_scroll">'."\n"
-								.'<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0"><tbody>'."\n\n",
-						'no_results_end'   => '<tr class="lastline noresults"><td class="firstcol lastcol">$no_results$</td></tr>'
-								.'</tbody></table></div>'."\n\n",
-					) );
-
 			case 'blockspan_form':
 				// Form settings for filter area:
 				return array(
@@ -679,6 +667,7 @@ class AdminUI extends AdminUI_general
 					'text_primary' => 'btn btn-primary',
 					'text_success' => 'btn btn-success',
 					'text_danger'  => 'btn btn-danger',
+					'text_warning' => 'btn btn-warning',
 					'group'        => 'btn-group',
 				);
 

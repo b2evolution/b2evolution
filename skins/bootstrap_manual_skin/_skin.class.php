@@ -21,7 +21,7 @@ class bootstrap_manual_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.8.0';
+	var $version = '6.9.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -113,9 +113,10 @@ class bootstrap_manual_Skin extends Skin
 				),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px',
+						'note' => 'px. ' . T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
+						'size' => '7',
 						'allow_empty' => true,
 					),
 					'page_navigation' => array(
@@ -395,7 +396,7 @@ class bootstrap_manual_Skin extends Skin
 
 		if( in_array( $disp, array( 'access_requires_login', 'access_denied' ) ) )
 		{ // Display left navigation column on this page when at least one sidebar container is visible:
-			return $this->is_visible_container( 'sidebar' ) || $this->is_visible_container( 'sidebar2' );
+			return $this->show_container_when_access_denied( 'sidebar' ) || $this->show_container_when_access_denied( 'sidebar2' );
 		}
 
 		// Display left navigation column only on these pages:
@@ -404,12 +405,12 @@ class bootstrap_manual_Skin extends Skin
 
 
 	/**
-	 * Check if we can display a widget container
+	 * Check if we can display a widget container when access is denied to collection by current user
 	 *
 	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
 	 * @return boolean TRUE to display
 	 */
-	function is_visible_container( $container_key )
+	function show_container_when_access_denied( $container_key )
 	{
 		global $Collection, $Blog;
 

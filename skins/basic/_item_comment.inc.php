@@ -51,7 +51,7 @@ $Comment = & $params['Comment'];
 			<?php break;
 	}
 
-	$Comment->edit_link( ' &middot; ', ' ', '#', '#', '', '&amp;', true, rawurlencode( $Comment->get_permanent_url() ) ); // Link to backoffice for editing
+	$Comment->edit_link( ' &middot; ', ' ', '#', '#', '', '&amp;', true, $Comment->get_permanent_url() ); // Link to backoffice for editing
 
 	if( $Comment->status != 'published' )
 	{

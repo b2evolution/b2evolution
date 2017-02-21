@@ -8,8 +8,23 @@
 		text-align: right;
 	}
 }
-div.widget_core_coll_tagline {
-	margin-bottom: 30px;
+// div.widget_core_coll_tagline {
+	// margin-bottom: 30px;
+// }
+.evo_container__front_page_primary {
+	padding-bottom: 30px;
+	.evo_widget {
+		margin-top: 30px;
+		div, h1, h2, p {
+			margin-top: 0;
+		}
+		div > p:last-child,
+		&:last-child > h2,
+		&:last-child > ul,
+		& > ul li:last-child {
+			margin-bottom: 0 !important;
+		}
+	}
 }
 .evo_container__front_page_secondary {
 	padding-top: 30px;
@@ -17,7 +32,10 @@ div.widget_core_coll_tagline {
 
 // Secondary Area:
 .secondary_area {
-	background-color: #FFF;
+	// Important for hiding "Slide down" arrow behind this div
+	position: relative;
+	z-index: 1;
+	
 	width: 100%;
 	p {
 		margin-top: 10px;
@@ -38,6 +56,7 @@ html {
 	height: 100%;
 }
 body {
+	overflow-x: visible !important;
 	-webkit-font-smoothing: subpixel-antialiased;
 }
 
@@ -92,23 +111,30 @@ body.pictured {
 		}
 	}
 	// Fix debug info position after skin wrapper:
+	// @FP > I think we don't need this
 	div#debug_info.debug {
 		position: absolute;
 		top: 100%;
 	}
 }
-#bg_picture {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	width: 100%;
+.evo_pictured_layout {
+	//position: fixed;
+	// top: 0;
+	// left: 0;
+	// right: 0;
+	// bottom: 0;
+	// width: 100%;
+	// height: 100%;
+	display: table;
 	height: 100%;
+	min-height: 100%;
+	min-width: 100%;
+	position: relative;
+	width: 100%;
+	background-attachment: fixed;
 	background-size: cover;
 	background-position: center center;
-	z-index: -999999;
-	img {
+	> .evo_pictured__image {
 		display: none;
 		width: 100%;
 	}
@@ -118,10 +144,11 @@ body.pictured {
 		.sitewide_header {
 			margin-bottom: 0;
 		}
-		#bg_picture {
+		.evo_pictured_layout {
 			position: relative;
 			height: auto;
-			img {
+			min-height: auto;
+			> .evo_pictured__image {
 				display: block;
 			}
 		}
@@ -294,6 +321,12 @@ textarea.message_text {
 			color: inherit;
 		}
 	}
+}
+
+.evo_hasbgimg {
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: center;
 }
 
 div.bSideItem {
@@ -492,6 +525,7 @@ body.pictured .secondary_area .widget_core_org_members {
 	position: fixed;
 	bottom: 20px;
 	left: 50%;
+	line-height: 1em;
 	#slide_button {
 		display: inline-block;
 		font-size: 55px;

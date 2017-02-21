@@ -610,11 +610,6 @@ function check_smtp_mailer()
 		return T_( 'SMTP gateway is not enabled.' );
 	}
 
-	if( version_compare( phpversion(), '5.2', '<' ) )
-	{ // Swift Mailer works only with PHP 5.2 and higher
-		return T_( 'PHP version must be 5.2 or higher to enable SMTP gateway.' );
-	}
-
 	$smtp_server_host = $Settings->get( 'smtp_server_host' );
 	$smtp_server_port = $Settings->get( 'smtp_server_port' );
 	if( empty( $smtp_server_host ) || empty( $smtp_server_port ) )
@@ -872,8 +867,7 @@ function evo_mail_smtp( $to, $subject, $message, $headers = array() )
 					// MULTIPLE:
 					if( is_array( $message ) )
 					{ // Body is multiple
-						$Swift_Message->setBody( $message['html'], 'multipart/alternative', $message['charset'] );
-						$Swift_Message->addPart( $message['html'], 'text/html', $message['charset'] );
+						$Swift_Message->setBody( $message['html'], 'text/html', $message['charset'] );
 						$Swift_Message->addPart( $message['text'], 'text/plain', $message['charset'] );
 						break;
 					}
@@ -1053,7 +1047,7 @@ function smtp_email_sending_test()
 		// Exit here.
 	}
 
-	$smtp_message = sprintf( T_( 'Attempting to send a text message to "%s" via external SMTP server...' ), $current_User->get( 'email' ) ).' ';
+	$smtp_message = sprintf( T_( 'Attempting to send a text email to "%s" via external SMTP server...' ), $current_User->get( 'email' ) ).' ';
 
 	// Force temporary to use ONLY SMTP sending:
 	$email_service = $Settings->get( 'email_service' );
@@ -1098,7 +1092,7 @@ function php_email_sending_test()
 {
 	global $Settings, $current_User, $php_mail_sending_log;
 
-	$mail_message = sprintf( T_( 'Attempting to send a text message to "%s" via PHP...' ), $current_User->get( 'email' ) ).' ';
+	$mail_message = sprintf( T_( 'Attempting to send a text email to "%s" via PHP...' ), $current_User->get( 'email' ) ).' ';
 
 	// Force temporary to use ONLY PHP mail sending:
 	$email_service = $Settings->get( 'email_service' );

@@ -319,9 +319,12 @@ class ComponentWidget extends DataObject
 
 		if( ! isset( $r['allow_blockcache'] ) )
 		{
+			$widget_Blog = & $this->get_Blog();
 			$r['allow_blockcache'] = array(
 					'label' => T_( 'Allow caching' ),
-					'note' => T_( 'Uncheck to prevent this widget from ever being cached in the block cache. (The whole page may still be cached.) This is only needed when a widget is poorly handling caching and cache keys.' ),
+					'note' => ( $widget_Blog && $widget_Blog->get_setting( 'cache_enabled_widgets' ) ) ?
+							T_('Uncheck to prevent this widget from ever being cached in the block cache. (The whole page may still be cached.) This is only needed when a widget is poorly handling caching and cache keys.') :
+							T_('Block caching is disabled for this collection.'),
 					'type' => 'checkbox',
 					'defaultvalue' => true,
 				);
@@ -501,8 +504,6 @@ class ComponentWidget extends DataObject
 					'group_end' => '</ul>',
 					'group_item_start' => '<li>',
 					'group_item_end' => '</li>',
-					'group_item_selected_start' => '<li class="selected">',
-					'group_item_selected_end' => '</li>',
 					'notes_start' => '<div class="notes">',
 					'notes_end' => '</div>',
 					'tag_cloud_start' => '<p class="tag_cloud">',
@@ -580,6 +581,8 @@ class ComponentWidget extends DataObject
 		switch( $this->type )
 		{
 			case 'plugin':
+				// Set widget ID param to make it available in plugin function SkinTag():
+				$this->disp_params['wi_ID'] = $this->ID;
 				// Call plugin (will return false if Plugin is not enabled):
 				if( $Plugins->call_by_code( $this->code, $this->disp_params ) )
 				{
@@ -729,8 +732,8 @@ class ComponentWidget extends DataObject
 			if( $check_blog_restriction )
 			{ // Check blog restriction for widget caching
 				$widget_Blog = & $this->get_Blog();
-				if( ! $widget_Blog->get_setting( 'cache_enabled_widgets' ) )
-				{ // Widget/block cache is not allowed by blog setting
+				if( $widget_Blog && ! $widget_Blog->get_setting( 'cache_enabled_widgets' ) )
+				{	// Widget/block cache is not allowed by collection setting:
 					return 'denied';
 				}
 			}
@@ -937,7 +940,7 @@ class ComponentWidget extends DataObject
 		if( $this->Blog === NULL )
 		{ // Get blog only first time
 			$BlogCache = & get_BlogCache();
-			$this->Blog = & $BlogCache->get_by_ID( $this->coll_ID );
+			$this->Blog = & $BlogCache->get_by_ID( $this->coll_ID, false, false );
 		}
 
 		return $this->Blog;

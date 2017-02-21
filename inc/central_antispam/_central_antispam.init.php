@@ -122,9 +122,9 @@ class central_antispam_Module extends Module
 						'text' => T_('Keywords'),
 						'href' => $admin_url.'?ctrl=central_antispam&amp;tab=keywords',
 					),
-					'sources' => array(
+					'reporters' => array(
 						'text' => T_('Reporters'),
-						'href' => $admin_url.'?ctrl=central_antispam&amp;tab=sources',
+						'href' => $admin_url.'?ctrl=central_antispam&amp;tab=reporters',
 					),
 				),
 			) ) );
@@ -200,7 +200,7 @@ class central_antispam_Module extends Module
 	 */
 	function upgrade_b2evo_tables()
 	{
-		global $DB, $tableprefix;
+		global $DB, $tableprefix, $old_db_version;
 
 		// Check if DB tables of this module were installed before:
 		$existing_tables = $DB->get_col( 'SHOW TABLES LIKE "'.$tableprefix.'centralantispam__%"' );
@@ -242,6 +242,80 @@ class central_antispam_Module extends Module
 				PRIMARY KEY carpt_PK (carpt_cakw_ID, carpt_casrc_ID)' );
 			task_end();
 		}
+
+		if( $old_db_version < 12066 )
+		{	// part of 6.8.0-alpha
+			task_begin( 'Upgrade central antispam keywords table...' );
+			$DB->query( 'ALTER TABLE T_centralantispam__keyword
+				MODIFY cakw_status ENUM("new", "published", "revoked", "ignored") NOT NULL DEFAULT "new"' );
+			task_end();
+		}
+	}
+
+
+	/**
+	 * Handle collections module htsrv actions
+	 */
+	function handle_htsrv_action()
+	{
+		global $current_User, $DB, $Session, $localtimenow, $debug, $debug_jslog;
+
+		if( ! is_logged_in() )
+		{	// User must be logged in:
+			bad_request_die( T_( 'You are not logged in.' ) );
+		}
+
+		load_funcs( 'central_antispam/model/_central_antispam.funcs.php' );
+
+		// Do not append Debuglog to response!
+		$debug = false;
+
+		// Do not append Debug JSlog to response!
+		$debug_jslog = false;
+
+		switch( param_action() )
+		{
+			case 'cakeyword_status_edit':
+				// Update status of central antispam keyword from list screen by clicking on the status column:
+
+				// Check that this action request is not a CSRF hacked request:
+				$Session->assert_received_crumb( 'cakeyword' );
+
+				// Check permission:
+				$current_User->check_perm( 'centralantispam', 'edit', true );
+
+				$new_status = param( 'new_status', 'string' );
+				$cakw_ID = param( 'cakw_ID', 'integer', true );
+				$statuschange_ts = date( 'Y-m-d H:i:s', $localtimenow );
+
+				$DB->query( 'UPDATE T_centralantispam__keyword
+						SET cakw_status = '.( empty( $new_status ) ? 'NULL' : $DB->quote( $new_status ) ).',
+								cakw_statuschange_ts = '.$DB->quote( $statuschange_ts ).'
+					WHERE cakw_ID ='.$DB->quote( $cakw_ID ) );
+				echo '<a href="#" rel="'.$new_status.'" style="color:#FFF" color="'.ca_get_keyword_status_color( $new_status ).'" date="'.format_to_output( mysql2localedatetime_spans( $statuschange_ts ), 'htmlspecialchars' ).'">'.ca_get_keyword_status_title( $new_status ).'</a>';
+				break;
+
+			case 'casource_status_edit':
+				// Update status of central antispam source from list screen by clicking on the status column:
+
+				// Check that this action request is not a CSRF hacked request:
+				$Session->assert_received_crumb( 'casource' );
+
+				// Check permission:
+				$current_User->check_perm( 'centralantispam', 'edit', true );
+
+				$new_status = param( 'new_status', 'string' );
+				$casrc_ID = param( 'casrc_ID', 'integer', true );
+
+				$DB->query( 'UPDATE T_centralantispam__source
+						SET casrc_status = '.( empty( $new_status ) ? 'NULL' : $DB->quote( $new_status ) ).'
+					WHERE casrc_ID ='.$DB->quote( $casrc_ID ) );
+				echo '<a href="#" rel="'.$new_status.'" style="color:#FFF" color="'.ca_get_source_status_color( $new_status ).'">'.ca_get_source_status_title( $new_status ).'</a>';
+				break;
+		}
+
+		// EXit here because next code will try to call "header_redirect()":
+		exit(0);
 	}
 }
 

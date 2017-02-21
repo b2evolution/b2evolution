@@ -26,7 +26,7 @@ $params = array_merge( array(
 		// Controlling the title:
 		'disp_title'                 => true,
 		'item_title_line_before'     => '<div class="evo_post_title">',	// Note: we use an extra class because it facilitates styling
-			'item_title_before'          => '<h2>',	
+			'item_title_before'          => '<h2>',
 			'item_title_after'           => '</h2>',
 			'item_title_single_before'   => '<h1>',	// This replaces the above in case of disp=single or disp=page
 			'item_title_single_after'    => '</h1>',
@@ -96,47 +96,25 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 		if( $Item->status != 'published' )
 		{
 			$Item->format_status( array(
-					'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+					'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 				) );
 		}
 
-		// Flag:
-		$Item->flag();
+		// ------------------------- "Item Single - Header" CONTAINER EMBEDDED HERE --------------------------
+		// Display container contents:
+		skin_container( /* TRANS: Widget container name */ NT_('Item Single Header'), array(
+			'widget_context' => 'item',	// Signal that we are displaying within an Item
+			// The following (optional) params will be used as defaults for widgets included in this container:
+			// This will enclose each widget in a block:
+			'block_start' => '<div class="$wi_class$">',
+			'block_end' => '</div>',
+			// This will enclose the title of each widget:
+			'block_title_start' => '<h3>',
+			'block_title_end' => '</h3>',
 
-		// Permalink:
-		$Item->permanent_link( array(
-				'text' => '#icon#',
-			) );
-
-		// We want to display the post time:
-		$Item->issue_time( array(
-				'before'      => ' '.T_('posted on '),
-				'after'       => ' ',
-				'time_format' => 'M j, Y',
-			) );
-
-		// Author
-		$Item->author( array(
-			'before'    => /* TRANS: author name */ ' '.T_('by').' ',
-			'after'     => ' ',
-			'link_text' => $params['author_link_text'],
+			'author_link_text' => $params['author_link_text'],
 		) );
-
-		// Categories
-		$Item->categories( array(
-			'before'          => /* TRANS: category name(s) */ T_('in').' ',
-			'after'           => ' ',
-			'include_main'    => true,
-			'include_other'   => true,
-			'include_external'=> true,
-			'link_categories' => true,
-		) );
-
-		// Link for editing
-		$Item->edit_link( array(
-			'before'    => ' &bull; ',
-			'after'     => '',
-		) );
+		// ----------------------------- END OF "Item Single - Header" CONTAINER -----------------------------
 	?>
 	</div>
 	<?php
@@ -162,8 +140,8 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
 			// Template params for "Item Tags" widget
-			'widget_item_tags_before'    => '<div class="small">'.T_('Tags').': ',
-			'widget_item_tags_after'     => '</div>',
+			'widget_item_tags_before'    => '<nav class="small post_tags">'.T_('Tags').': ',
+			'widget_item_tags_after'     => '</nav>',
 			// Params for skin file "_item_content.inc.php"
 			'widget_item_content_params' => $params,
 			// Template params for "Item Attachments" widget:
@@ -198,12 +176,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 
 		<?php
 			if( ! $Item->is_intro() ) // Do NOT apply tags, comments and feedback on intro posts
-			{ // List all tags attached to this post:
-				$Item->tags( array(
-						'before'    => '<nav class="small post_tags">',
-						'after'     => '</nav>',
-						'separator' => ' ',
-					) );
+			{
 		?>
 
 		<nav class="post_comments_link">
@@ -263,6 +236,19 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 		skin_include( '_item_meta_comments.inc.php', array(
 				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
 				'comment_end'           => '</article>',
+				'comment_post_display'	=> false,	// Do we want ot display the title of the post we're referring to?
+				'comment_post_before'   => '<h3 class="evo_comment_post_title">',
+				'comment_post_after'    => '</h3>',
+				'comment_title_before'  => '<div class="panel-heading"><h4 class="evo_comment_title panel-title">',
+				'comment_title_after'   => '</h4></div><div class="panel-body">',
+				'comment_avatar_before' => '<span class="evo_comment_avatar">',
+				'comment_avatar_after'  => '</span>',
+				'comment_rating_before' => '<div class="evo_comment_rating">',
+				'comment_rating_after'  => '</div>',
+				'comment_text_before'   => '<div class="evo_comment_text">',
+				'comment_text_after'    => '</div>',
+				'comment_info_before'   => '<footer class="evo_comment_footer clear text-muted"><small>',
+				'comment_info_after'    => '</small></footer></div>',
 			) );
 		// ---------------------- END OF META COMMENTS ---------------------
 	}

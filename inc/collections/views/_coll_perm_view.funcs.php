@@ -759,7 +759,7 @@ function colls_groups_perms_results( & $Results, $params = array() )
 					'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'draft\', \''.format_to_output( T_('Permission to post into this blog with draft status'), 'htmlattr' ).'\', \'post\' )%'.
 					'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'deprecated\', \''.format_to_output( T_('Permission to post into this blog with deprecated status'), 'htmlattr' ).'\', \'post\' )%'.
 					'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'redirected\', \''.format_to_output( T_('Permission to post into this blog with redirected status'), 'htmlattr' ).'\', \'post\' )%',
-			'td_class' => 'center',
+			'td_class' => 'center nowrap',
 		);
 
 	$Results->cols[] = array(
@@ -812,8 +812,8 @@ function colls_groups_perms_results( & $Results, $params = array() )
 					'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'draft\', \''.format_to_output( T_('Permission to comment into this blog with draft status'), 'htmlattr' ).'\', \'comment\' )%'.
 					'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'deprecated\', \''.format_to_output( T_('Permission to comment into this blog with deprecated status'), 'htmlattr' ).'\', \'comment\' )%'.
 					'<span style="display: inline-block; min-width: 5px;"></span>'.
-					'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_meta_comment\', \''.format_to_output( T_('Permission to post meta comments into this blog'), 'htmlattr' ).'\' )%',
-			'td_class' => 'center',
+					'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_meta_comment\', \''.format_to_output( T_('Permission to post meta comments into this collection'), 'htmlattr' ).'\' )%',
+			'td_class' => 'center nowrap',
 		);
 
 	$Results->cols[] = array(
@@ -834,7 +834,7 @@ function colls_groups_perms_results( & $Results, $params = array() )
 			'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_delcmts\', \''.format_to_output( T_('Permission to delete comments on this blog'), 'htmlattr' ).'\' )%&nbsp;'.
 					'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_recycle_owncmts\', \''.format_to_output( T_('Permission to recycle comments on their own posts'), 'htmlattr' ).'\' )%&nbsp;'.
 					'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_vote_spam_cmts\', \''.format_to_output( T_('Permission to give a spam vote on any comment'), 'htmlattr' ).'\' )%&nbsp;',
-			'td_class' => 'center',
+			'td_class' => 'center nowrap',
 		);
 
 	$Results->cols[] = array(
@@ -879,6 +879,16 @@ function colls_groups_perms_results( & $Results, $params = array() )
 			'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_media_upload\', \''.format_to_output( T_('Permission to upload into blog\'s media folder'), 'htmlattr' ).'\' )%'.
 					'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_media_browse\', \''.format_to_output( T_('Permission to browse blog\'s media folder'), 'htmlattr' ).'\' )%'.
 					'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_media_change\', \''.format_to_output( T_('Permission to change the blog\'s media folder content'), 'htmlattr' ).'\' )%',
+			'td_class' => 'center',
+		);
+
+	// Analytics:
+	$Results->cols[] = array(
+			'th' => T_('Analytics'),
+			'th_class' => 'checkright',
+			'order' => 'bloggroup_perm_analytics',
+			'default_dir' => 'D',
+			'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_analytics\', \''.format_to_output( T_('Permission to view collection\'s analytics'), 'htmlattr' ).'\' )%',
 			'td_class' => 'center',
 		);
 

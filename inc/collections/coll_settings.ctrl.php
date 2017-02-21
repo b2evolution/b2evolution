@@ -424,7 +424,6 @@ if( $action == 'dashboard' )
 	// Load jquery UI to animate background color on change comment status and to transfer a comment to recycle bin
 	require_js( '#jqueryUI#' );
 
-	require_js( 'communication.js' ); // auto requires jQuery
 	// Load the appropriate blog navigation styles (including calendar, comment forms...):
 	require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
 	// Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
@@ -661,8 +660,8 @@ if( $action == 'dashboard' )
 			echo '<div class="col-xs-12 col-sm-12 col-md-9 col-md-pull-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '2' : '0' ).' col-lg-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '6' : '9' ).' col-lg-pull-0 coll-dashboard-block-3">';
 		}
 
-		if( $current_User->check_perm( 'meta_comment', 'blog', false, $Blog ) )
-		{
+		if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+		{	// If user has a perm to view meta comments of the collection:
 
 			// Latest Meta Comments Block
 			$Timer->start( 'Panel: Latest Meta Comments' );
@@ -752,7 +751,7 @@ if( $action == 'dashboard' )
 			}
 			echo '<div class="items_container evo_content_block">';
 
-			$block_item_Widget->title = T_('Recently edited').get_manual_link( 'dashboard-recently-edited-posts' );
+			$block_item_Widget->title = T_('Recently edited posts').get_manual_link( 'dashboard-recently-edited-posts' );
 			$block_item_Widget->disp_template_replaced( 'block_start' );
 
 			while( $Item = & $ItemList->get_item() )
@@ -770,7 +769,7 @@ if( $action == 'dashboard' )
 		NEW:
 		*/
 				$Item->format_status( array(
-						'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+						'template' => '<div class="floatright"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 					) );
 
 				echo '<div class="dashboard_float_actions">';
@@ -818,7 +817,7 @@ if( $action == 'dashboard' )
 				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$item_title.'</a>';
 				echo '</h3>';
 
-				echo htmlspecialchars( $Item->get_content_excerpt( 150 ), NULL, $evo_charset );
+				echo $Item->get( 'excerpt' );
 
 				echo '</div>';
 
@@ -1033,6 +1032,8 @@ else
 			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
 			$AdminUI->breadcrumbpath_add( T_('Plugins'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			$AdminUI->set_page_manual_link( 'blog-plugin-settings' );
+			// Initialize JS for color picker field on the edit plugin settings form:
+			init_colorpicker_js();
 			break;
 
 		case 'advanced':

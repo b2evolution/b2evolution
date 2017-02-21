@@ -70,6 +70,14 @@ class Link extends DataObject
 			{	// Email Campaign:
 				$this->LinkOwner = & get_link_owner( 'emailcampaign', $db_row->link_ecmp_ID );
 			}
+			elseif( $db_row->link_msg_ID != NULL )
+			{	// Message:
+				$this->LinkOwner = & get_link_owner( 'message', $db_row->link_msg_ID );
+			}
+			elseif( $db_row->link_tmp_ID != NULL )
+			{	// Temporary ID:
+				$this->LinkOwner = & get_link_owner( 'temporary', $db_row->link_tmp_ID );
+			}
 			else
 			{
 				debug_die( 'Wrong link object' );

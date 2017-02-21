@@ -168,7 +168,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 		if( $block = antispam_check($url) )
 		{
 			// Log into system log
-			syslog_insert( sprintf( T_('Antispam: URL "%s" not allowed. The URL contains blacklisted word "%s".'), htmlspecialchars($url), $block ), 'error' );
+			syslog_insert( sprintf( 'Antispam: URL "%s" not allowed. The URL contains blacklisted word "%s".', htmlspecialchars($url), $block ), 'error' );
 
 			return $verbose
 				? sprintf( T_('URL "%s" not allowed: blacklisted word "%s".'), htmlspecialchars($url), $block )
@@ -432,7 +432,7 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 			{	// fopen() returned false because it got a bad HTTP code:
 				$info['error'] = NT_( 'Invalid response' );
 				$info['status'] = $code;
-				return '';
+				return false;
 			}
 
 			$info['error'] = NT_( 'fopen() failed' );
@@ -812,10 +812,20 @@ function is_absolute_url( $url )
  * while others use uppercase (lighttpd).
  * @return boolean
  */
-function is_same_url( $a, $b )
+function is_same_url( $a, $b, $ignore_http_protocol = FALSE )
 {
 	$a = preg_replace_callback('~%[0-9A-F]{2}~', create_function('$m', 'return strtolower($m[0]);'), $a);
 	$b = preg_replace_callback('~%[0-9A-F]{2}~', create_function('$m', 'return strtolower($m[0]);'), $b);
+
+	if( $ignore_http_protocol )
+	{
+		$re = "/^https?\:\/\/(.*)/i";
+		$subst = "$1";
+
+		$a = preg_replace( $re, $subst, $a );
+		$b = preg_replace( $re, $subst, $b );
+	}
+
 	return $a == $b;
 }
 
@@ -936,7 +946,7 @@ function get_link_tag( $url, $text = '', $class = '', $max_url_length = 50 )
 		}
 	}
 
-	$link_attrs = array( 'href' => $url );
+	$link_attrs = array( 'href' => str_replace( '&amp;', '&', $url ) );
 
 	if( ! empty( $class ) )
 	{

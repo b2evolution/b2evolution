@@ -77,8 +77,9 @@ $schema_queries = array(
 		"CREATE TABLE T_users (
 			user_ID int(11) unsigned NOT NULL auto_increment,
 			user_login varchar(20) NOT NULL,
-			user_pass BINARY(16) NOT NULL,
-			user_salt CHAR(8) NOT NULL default '',
+			user_pass VARCHAR(64) NOT NULL,
+			user_salt VARCHAR(32) NOT NULL default '',
+			user_pass_driver VARCHAR(16) NOT NULL default 'evo\$md5',
 			user_grp_ID int(4) NOT NULL default 1,
 			user_email varchar(255) COLLATE ascii_general_ci NOT NULL,
 			user_status enum( 'activated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'new' ) COLLATE ascii_general_ci NOT NULL default 'new',
@@ -101,7 +102,7 @@ $schema_queries = array(
 			user_source varchar(30) NULL,
 			user_created_datetime datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
 			user_lastseen_ts timestamp NULL,
-			user_email_dom_ID int(10) unsigned NULL,
+			user_email_dom_ID int(10) unsigned NULL COMMENT 'Used for email statistics',
 			user_profileupdate_date date NOT NULL DEFAULT '2000-01-01',
 			PRIMARY KEY user_ID (user_ID),
 			UNIQUE user_login (user_login),
@@ -123,7 +124,7 @@ $schema_queries = array(
 			ufdf_suggest    tinyint(1) NOT NULL DEFAULT 0,
 			ufdf_bubbletip  varchar(2000) NULL,
 			ufdf_icon_name  varchar(100) COLLATE ascii_general_ci NULL,
-			ufdf_code       varchar(20) COLLATE ascii_general_ci UNIQUE NOT NULL,
+			ufdf_code       varchar(20) COLLATE ascii_bin UNIQUE NOT NULL COMMENT 'Code MUST be lowercase ASCII only',
 			PRIMARY KEY (ufdf_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -238,8 +239,12 @@ $schema_queries = array(
 		"CREATE TABLE T_locales (
 			loc_locale varchar(20) NOT NULL default '',
 			loc_datefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'y-m-d',
+			loc_longdatefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'Y-m-d',
+			loc_extdatefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'Y M d',
+			loc_input_datefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'Y-m-d',
 			loc_timefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'H:i:s',
 			loc_shorttimefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'H:i',
+			loc_input_timefmt varchar(20) COLLATE ascii_general_ci NOT NULL default 'H:i:s',
 			loc_startofweek TINYINT UNSIGNED NOT NULL DEFAULT 1,
 			loc_name varchar(40) NOT NULL default '',
 			loc_messages varchar(20) NOT NULL default '',
@@ -286,7 +291,7 @@ $schema_queries = array(
 		'Creating plugins table',
 		"CREATE TABLE T_plugins (
 			plug_ID              INT(11) UNSIGNED NOT NULL auto_increment,
-			plug_priority        TINYINT NOT NULL default 50,
+			plug_priority        TINYINT UNSIGNED NOT NULL default 50,
 			plug_classname       VARCHAR(40) COLLATE ascii_general_ci NOT NULL default '',
 			plug_code            VARCHAR(32) COLLATE ascii_general_ci NULL,
 			plug_version         VARCHAR(42) COLLATE ascii_general_ci NOT NULL default '0',
@@ -442,7 +447,7 @@ $schema_queries = array(
 			emlog_result    ENUM( 'ok', 'error', 'blocked', 'simulated' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ok',
 			emlog_subject   VARCHAR(255) DEFAULT NULL,
 			emlog_headers   TEXT DEFAULT NULL,
-			emlog_message   TEXT DEFAULT NULL,
+			emlog_message   MEDIUMTEXT DEFAULT NULL,
 			PRIMARY KEY     (emlog_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 

@@ -25,6 +25,7 @@ function ca_get_keyword_statuses()
 			'new'       => T_('New'),
 			'published' => T_('Published'),
 			'revoked'   => T_('Revoked'),
+			'ignored'   => T_('Ignored'),
 		);
 }
 
@@ -85,6 +86,7 @@ function ca_get_keyword_status_colors()
 			'new'       => '5bc0de',
 			'published' => 'f0ad4e',
 			'revoked'   => '333333',
+			'ignored'   => '00cc00',
 		);
 }
 
@@ -105,5 +107,41 @@ function ca_get_keyword_status_color( $status )
 	$ca_keyword_status_colors = ca_get_keyword_status_colors();
 
 	return isset( $ca_keyword_status_colors[ $status ] ) ? '#'.$ca_keyword_status_colors[ $status ] : 'none';
+}
+
+
+/**
+ * Get status colors of central antispam source
+ *
+ * @return array Color values
+ */
+function ca_get_source_status_colors()
+{
+	return array(
+			'trusted'   => '00cc00',
+			'promising' => 'f0ad4e',
+			'unknown'   => '999999',
+			'suspect'   => 'ff6600',
+			'blocked'   => 'ff0000',
+		);
+}
+
+
+/**
+ * Get status color of central antispam source by status value
+ *
+ * @param string Status value
+ * @return string Color value
+ */
+function ca_get_source_status_color( $status )
+{
+	if( $status == 'NULL' )
+	{
+		$status = '';
+	}
+
+	$ca_source_status_colors = ca_get_source_status_colors();
+
+	return isset( $ca_source_status_colors[ $status ] ) ? '#'.$ca_source_status_colors[ $status ] : 'none';
 }
 ?>

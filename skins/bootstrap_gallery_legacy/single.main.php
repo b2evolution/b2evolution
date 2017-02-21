@@ -148,10 +148,10 @@ siteskin_include( '_site_body_header.inc.php' );
 							'after'     => '',
 						) );
 				?>
-				<?php 	
+				<?php
 					if( $Skin->enabled_status_banner( $single_Item->status ) )
 					{ // Status banner
-						$single_Item->format_status( array( 'template' => '<div class="evo_status evo_status__$status$ badge">$status_title$</div>' ) );						
+						$single_Item->format_status( array( 'template' => '<div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>' ) );
 					}
 					$single_Item->edit_link( array( // Link to backoffice for editing
 							'before'    => '',
@@ -161,7 +161,7 @@ siteskin_include( '_site_body_header.inc.php' );
 						) );
 				?>
 			</span><!-- .nav_album_title -->
-		
+
 			<?php
 				// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
 				item_prevnext_links( array(
@@ -181,14 +181,14 @@ siteskin_include( '_site_body_header.inc.php' );
 					) );
 				// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 			?>
-		
+
 			<div class="clear"></div>
-			
+
 			</nav><!-- .nav_album -->
 			</div><!-- .col -->
 		</div><!-- .row -->
 		<?php
-		} // ------------------- END OF NAVIGATION BAR FOR ALBUM(POST) ------------------- 
+		} // ------------------- END OF NAVIGATION BAR FOR ALBUM(POST) -------------------
 	?>
 
 	<?php
@@ -199,8 +199,8 @@ siteskin_include( '_site_body_header.inc.php' );
 			) );
 		// --------------------------------- END OF MESSAGES ---------------------------------
 	?>
-		
-	<article class="row">	
+
+	<article class="row">
 
 	<?php
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
@@ -331,10 +331,19 @@ siteskin_include( '_site_body_header.inc.php' );
 		<div class="evo_container evo_container__footer">
 		<?php
 			// Display container and contents:
-			skin_container( NT_("Footer"), array(
+			skin_container( NT_('Footer'), array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start'       => '<div class="evo_widget $wi_class$">',
-					'block_end'         => '</div>',
+					'block_start'         => '<span class="evo_widget $wi_class$">',
+					'block_end'           => '</span> ',
+					'block_display_title' => false,
+					'list_start'          => '',
+					'list_end'            => '',
+					'item_start'          => '',
+					'item_end'            => '',
+					'item_selected_start' => '',
+					'item_selected_end'   => '',
+					'link_default_class'  => 'btn btn-default btn-sm',
+					'link_selected_class' => 'btn btn-default btn-sm active',
 				) );
 			// Note: Double quotes have been used around "Footer" only for test purposes.
 		?>
@@ -391,7 +400,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 		?>
 	</div><!-- .col -->
-	
+
 </footer><!-- .row -->
 
 

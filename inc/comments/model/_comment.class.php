@@ -211,6 +211,7 @@ class Comment extends DataObject
 			$this->notif_status = 'noreq';
 			$this->in_reply_to_cmt_ID = 0;
 			$this->set_renderers( array( 'default' ) );
+			$this->set( 'status', 'draft' );
 		}
 		else
 		{
@@ -445,8 +446,11 @@ class Comment extends DataObject
 				return $this->set_param( 'notif_flags', 'string', implode( ',', $notifications_flags ), $make_null );
 
 			case 'status':
+				// We need to set a reminder here to later check if the new status is allowed at dbinsert or dbupdate time ( $this->restrict_status( true ) )
+				// We cannot check immediately because we may be setting the status before having set a main cat_ID -> a collection ID to check the status possibilities
 				// Save previous status temporarily to make some changes on dbinsert(), dbupdate() & dbdelete()
 				$this->previous_status = $this->get( 'status' );
+				return parent::set( 'status', $parvalue, $make_null );
 
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
@@ -580,6 +584,11 @@ class Comment extends DataObject
 		$this->{$vote_type.'_countvotes'} = $vote->votes_count;
 
 		$DB->commit();
+
+		if( $vote_type == 'spam' && $vote_value == 'spam' )
+		{	// This is a voting about spam comment we should inform moderators:
+			$this->send_vote_spam_emails();
+		}
 
 		return;
 	}
@@ -1033,7 +1042,7 @@ class Comment extends DataObject
 				'after_user'   => '#',	// After Member user
 				'format'       => 'htmlbody',
 				'link_to'      => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' 'userpage>userurl'
-				'link_text'    => 'preferredname', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+				'link_text'    => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 				'link_rel'     => '',
 				'link_class'   => '',
 				'thumb_size'   => 'crop-top-32x32',
@@ -1305,8 +1314,10 @@ class Comment extends DataObject
 	/**
 	 * Display author url, delete icon and ban icon if user has proper rights
 	 *
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 * @param boolean true to use ajax button
 	 * @param boolean true to check user permission to edit this comment and antispam screen
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 */
 	function author_url_with_actions( $redirect_to = NULL, $ajax_button = false, $check_perms = true, $save_context = true )
 	{
@@ -1317,7 +1328,7 @@ class Comment extends DataObject
 			{ // Author is anonymous user and we have permission to edit this comment...
 				if( $redirect_to == NULL )
 				{
-					$redirect_to = rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
+					$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 				}
 				$this->deleteurl_link( $redirect_to, $ajax_button, false, '&amp;', $save_context );
 				$this->banurl_link( $redirect_to, $ajax_button, true, '&amp;', $save_context );
@@ -1364,8 +1375,8 @@ class Comment extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 * @param string Glue string for url params
-	 * @param boolean TRUE - to save context(memorized params)
-	 * @param string Redirect url
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 * @return boolean
 	 */
 	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $redirect_to = NULL )
@@ -1399,15 +1410,12 @@ class Comment extends DataObject
 			echo '<a href="'.$admin_url.'?ctrl=comments'.$glue.'blog='.$item_Blog->ID.$glue.'action=edit'.$glue.'comment_ID='.$this->ID;
 		}
 		if( $save_context )
-		{
-			if( $redirect_to != NULL )
-			{
-				echo $glue.'redirect_to='.$redirect_to;
+		{	// Use a param to redirect after action:
+			if( $redirect_to === NULL )
+			{	// Get current url for redirect:
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			else
-			{
-				echo $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
-			}
+			echo $glue.'redirect_to='.rawurlencode( $redirect_to );
 		}
 		echo '" title="'.$title.'"';
 		echo empty( $class ) ? '' : ' class="'.$class.'"';
@@ -1424,9 +1432,12 @@ class Comment extends DataObject
 
 	/**
 	 * Display delete icon for deleting author_url if user has proper rights
+	 *
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 * @param boolean true if create ajax button
 	 * @param boolean true if need permission check, because it wasn't checked before
-	 * @param glue between url params
+	 * @param string glue between url params
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @return link on success, false otherwise
 	 */
 	function deleteurl_link( $redirect_to, $ajax_button = false, $check_perm = true, $glue = '&amp;', $save_context = true )
@@ -1441,19 +1452,19 @@ class Comment extends DataObject
 		}
 
 		if( $save_context )
-		{
-			if( $redirect_to == NULL )
-			{
-				$redirect_to = rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
+		{	// Use a param to redirect after action:
+			if( $redirect_to === NULL )
+			{	// Get current url for redirect:
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			$redirect_to = $glue.'redirect_to='.$redirect_to;
+			$redirect_to = $glue.'redirect_to='.rawurlencode( $redirect_to );
 		}
 		else
-		{
+		{	// Don't allow a redirect after action:
 			$redirect_to = '';
 		}
 
-		$delete_url = $admin_url.'?ctrl=comments&amp;action=delete_url&amp;comment_ID='.$this->ID.'&amp;'.url_crumb('comment').$redirect_to;
+		$delete_url = $admin_url.'?ctrl=comments'.$glue.'action=delete_url'.$glue.'comment_ID='.$this->ID.$glue.url_crumb( 'comment' ).$redirect_to;
 		if( $ajax_button )
 		{
 			echo ' <a href="'.$delete_url.'" onclick="delete_comment_url('.$this->ID.'); return false;">'.get_icon( 'remove' ).'</a>';
@@ -1468,9 +1479,11 @@ class Comment extends DataObject
 	/**
 	 * Display ban icon, which goes to the antispam screen with keyword=author_url
 	 *
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 * @param boolean true if create ajax button
 	 * @param boolean true if need permission check, because it wasn't check before
-	 * @param glue between url params
+	 * @param string glue between url params
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @return link on success, false otherwise
 	 */
 	function banurl_link( $redirect_to, $ajax_button = false, $check_perm = true, $glue = '&amp;', $save_context = true )
@@ -1487,21 +1500,21 @@ class Comment extends DataObject
 		}
 
 		if( $save_context )
-		{
-			if( $redirect_to == NULL )
-			{
-				$redirect_to = rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
+		{	// Use a param to redirect after action:
+			if( $redirect_to === NULL )
+			{	// Get current url for redirect:
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			$redirect_to = $glue.'redirect_to='.$redirect_to;
+			$redirect_to = $glue.'redirect_to='.rawurlencode( $redirect_to );
 		}
 		else
-		{
+		{	// Don't allow a redirect after action:
 			$redirect_to = '';
 		}
 
 		// TODO: really ban the base domain! - not by keyword
 		$ban_domain = get_ban_domain( $this->get_author_url() );
-		$ban_url = $admin_url.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( $ban_domain ).$redirect_to.'&amp;'.url_crumb('antispam');
+		$ban_url = $admin_url.'?ctrl=antispam'.$glue.'action=ban'.$glue.'keyword='.rawurlencode( $ban_domain ).$redirect_to.$glue.url_crumb( 'antispam' );
 
 		if( $ajax_button )
 		{
@@ -1524,10 +1537,10 @@ class Comment extends DataObject
 	 * @param string class name
 	 * @param boolean true to make this a button instead of a link
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
 	 * @param string confirmation text
-	 * @param string Redirect url
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 */
 	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $button = false, $glue = '&amp;', $save_context = true, $ajax_button = false, $confirm_text = '#', $redirect_to = NULL )
 	{
@@ -1562,15 +1575,12 @@ class Comment extends DataObject
 
 		$url = $admin_url.'?ctrl=comments'.$glue.'action=delete'.$glue.'comment_ID='.$this->ID.$glue.url_crumb('comment');
 		if( $save_context )
-		{
-			if( $redirect_to != NULL )
-			{
-				$url .= $glue.'redirect_to='.$redirect_to;
+		{	// Use a param to redirect after action:
+			if( $redirect_to === NULL )
+			{	// Get current url for redirect:
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			else
-			{
-				$url .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
-			}
+			$url .= $glue.'redirect_to='.rawurlencode( $redirect_to );
 		}
 
 		echo $before;
@@ -1627,8 +1637,10 @@ class Comment extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
+	 * @return string A link to deprecate this comment
 	 */
 	function get_deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
@@ -1684,7 +1696,7 @@ class Comment extends DataObject
 	 * @param string a vote value
 	 * @param string class name
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
 	 * @param array Params
 	 */
@@ -1761,7 +1773,7 @@ class Comment extends DataObject
 
 		$r = '<a href="'.$admin_url.'?ctrl=comments'.$glue.'action='.$vote_type.$glue.'value='.$vote_value.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
 		if( $save_context )
-		{
+		{	// Use a param to redirect after action:
 			$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
 		}
 		$r .= '"';
@@ -1786,8 +1798,9 @@ class Comment extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 */
 	function deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
@@ -1810,7 +1823,7 @@ class Comment extends DataObject
 	 * @param string to display before link
 	 * @param string to display after link
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
 	 * @param array Params
 	 */
@@ -1845,7 +1858,7 @@ class Comment extends DataObject
 		echo $before;
 
 		$style = $params['display'] ? '' : ' style="display:none"';
-		echo '<div id="vote_spam_'.$this->ID.'" class="vote_spam"'.$style.'>';
+		echo '<div id="vote_spam_'.$this->ID.'" class="vote_spam nowrap"'.$style.'>';
 
 		$vote_result = $this->get_vote_spam_disabled();
 
@@ -1889,7 +1902,7 @@ class Comment extends DataObject
 	 * @param string to display before link
 	 * @param string to display after link
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
 	 * @param array Params
 	 */
@@ -1929,7 +1942,7 @@ class Comment extends DataObject
 
 		if( $params['display_wrapper'] )
 		{	// Display wrapper:
-			echo '<span id="vote_helpful_'.$this->ID.'" class="evo_voting_panel '.( empty( $params['class'] ) ? '' : ' '.$params['class'] ).'">';
+			echo '<span id="vote_helpful_'.$this->ID.'" class="nowrap evo_voting_panel'.( empty( $params['class'] ) ? '' : ' '.$params['class'] ).'">';
 		}
 
 		echo $params['before_title'];
@@ -1993,12 +2006,18 @@ class Comment extends DataObject
 			return false;
 		}
 
-		global $current_User;
+		global $current_User, $blog;
 
 		if( is_null( $current_status ) )
 		{ // Use status of comment if param is NULL
 			$current_status = $this->status;
 		}
+
+		$comment_Item = & $this->get_Item();
+		// Comment status cannot be more than post status, restrict it:
+		$restrict_max_allowed_status = ( $comment_Item ? $comment_Item->status : '' );
+		// Get those statuses which are not allowed for the current User to edit comment in this blog:
+		$restricted_statuses = get_restricted_statuses( $blog, 'blog_comment!', 'edit', $current_status, $restrict_max_allowed_status );
 
 		$status_order = get_visibility_statuses( 'ordered-array' );
 		$status_index = get_visibility_statuses( 'ordered-index', array( 'redirected' ) );
@@ -2012,7 +2031,14 @@ class Comment extends DataObject
 		while( !$has_perm && ( $publish ? ( $curr_index < 4 ) : ( $curr_index > 0 ) ) )
 		{ // Check until the user has permission or there is no more status to check
 			$curr_index = $publish ? ( $curr_index + 1 ) : ( $curr_index - 1 );
-			$has_perm = $current_User->check_perm( 'comment!'.$status_order[$curr_index][0], 'moderate', false, $this );
+			if( in_array( $status_order[$curr_index][0], $restricted_statuses ) )
+			{	// The status is restricted for this comment by its item or collection settings:
+				$has_perm = false;
+			}
+			else
+			{	// Check if current user can moderate this comment to the next/prev status:
+				$has_perm = $current_User->check_perm( 'comment!'.$status_order[$curr_index][0], 'moderate', false, $this );
+			}
 		}
 		if( $has_perm )
 		{ // An available status has been found
@@ -2032,8 +2058,9 @@ class Comment extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 */
 	function get_publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
@@ -2056,24 +2083,17 @@ class Comment extends DataObject
 		$r = $before;
 		$r .= '<a href="'.$admin_url.'?ctrl=comments'.$glue.'action=publish'.$glue.'publish_status='.$publish_status.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
 		if( $save_context )
-		{
-			if( $redirect_to != NULL )
-			{
-				$r .= $glue.'redirect_to='.$redirect_to;
+		{	// Use a param to redirect after action:
+			if( $redirect_to === NULL )
+			{	// Get current url for redirect:
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			else
-			{
-				$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
-			}
+			$r .= $glue.'redirect_to='.rawurlencode( $redirect_to );
 		}
 		$r .= '"';
 
 		if( $ajax_button )
-		{
-			if( $save_context && ( $redirect_to == NULL ) )
-			{
-				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
-			}
+		{	// This is AJAX button:
 			$r .= ' onclick="setCommentStatus('.$this->ID.', \''.$publish_status.'\', \''.request_from().'\', \''.$redirect_to.'\'); return false;"';
 		}
 
@@ -2098,6 +2118,7 @@ class Comment extends DataObject
 	{
 		global $admin_url;
 
+		// Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside:
 		$redirect_to = $params['redirect_to'];
 		$new_status = $params['status'];
 		$action = $params['action'];
@@ -2107,24 +2128,17 @@ class Comment extends DataObject
 		$r = $params['before'];
 		$r .= '<a href="'.$admin_url.'?ctrl=comments'.$glue.'action='.$action.$glue.$status_param.'='.$new_status.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
 		if( $params['save_context'] )
-		{
-			if( $redirect_to != NULL )
-			{
-				$r .= $glue.'redirect_to='.$redirect_to;
+		{	// Allow to redirect after action:
+			if( $redirect_to === NULL )
+			{	// Use current url to redirect ater action:
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			else
-			{
-				$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
-			}
+			$r .= $glue.'redirect_to='.rawurlencode( $redirect_to );
 		}
 		$r .= '"';
 
 		if( $params['ajax_button'] )
-		{
-			if( $params['save_context'] && ( $redirect_to == NULL ) )
-			{
-				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
-			}
+		{	// This is AJAX button:
 			$comment_type = $this->is_meta() ? 'meta' : 'feedback';
 			$r .= ' onclick="setCommentStatus('.$this->ID.', \''.$new_status.'\', \''.request_from().'\', \''.$redirect_to.'\' ); return false;"';
 		}
@@ -2149,8 +2163,9 @@ class Comment extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 * @return boolean TRUE - if the publish link is available
 	 */
 	function publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
@@ -2464,20 +2479,7 @@ class Comment extends DataObject
 	function get_permanent_url( $glue = '&amp;', $meta_anchor = '#' )
 	{
 		$this->get_Item();
-
-		if( $this->is_meta() )
-		{ // Meta comment is not published on front-office, Get url to back-office
-			global $admin_url;
-			if( $meta_anchor == '#' )
-			{	// Use default anchor:
-				$meta_anchor = '#'.$this->get_anchor();
-			}
-			return $admin_url.'?ctrl=items'.$glue.'blog='.$this->Item->get_blog_ID().$glue.'p='.$this->Item->ID.$glue.'comment_type=meta'.$meta_anchor;
-		}
-		else
-		{ // Normal comment
-			return $this->Item->get_single_url( 'auto', '', $glue ).'#'.$this->get_anchor();
-		}
+		return $this->Item->get_single_url( 'auto', '', $glue ).'#'.$this->get_anchor();
 	}
 
 
@@ -2796,8 +2798,11 @@ class Comment extends DataObject
 				$params[ $param_key ] = & $params[ $param_key ];
 			}
 
+			// Prepare params before rendering comment attachment:
+			$Plugins->trigger_event_first_true_with_params( 'PrepareForRenderCommentAttachment', $params );
+
 			if( count( $Plugins->trigger_event_first_true( 'RenderCommentAttachment', $params ) ) != 0 )
-			{ // File was processed by plugin
+			{	// This attachment has been rendered by a plugin (to $params['data']), Skip this from core rendering:
 				if( $link_position == 'teaser' )
 				{ // Image should be displayed above content
 					$images_above_content .= $r;
@@ -2809,6 +2814,7 @@ class Comment extends DataObject
 				unset( $attachments[ $index ] );
 				continue;
 			}
+
 			if( $File->is_image() )
 			{ // File is image
 				if( $params['attachments_mode'] == 'view' )
@@ -3000,12 +3006,12 @@ class Comment extends DataObject
 				break;
 
 			case 'meta': // Display a meta comment:
-				$type = T_('Meta comment');
+				$href = '';
 				if( $params['linked_type'] )
 				{	// Make a comment type as link to permanent url:
-					$type = '<a href="'.$this->get_permanent_url().'">'.$type.'</a>';
+					$href = 'href="'.$this->get_permanent_url().'"';
 				}
-				return sprintf( T_('%s from %s'), $type, $author );
+				return sprintf( T_('<a %s>Meta comment</a> from %s'), $href, $author );
 		}
 
 		return sprintf( $s, $author );
@@ -3298,16 +3304,17 @@ class Comment extends DataObject
 	/**
 	 * Display status of item in a formatted way, following a provided template
 	 *
-	 * There are 2 possible variables:
+	 * There are 3 possible variables:
 	 * - $status$ = the raw status
 	 * - $status_title$ = the human readable text version of the status (translated to current language)
+	 * - $tooltip_title$ = the human readable text version of the status for tooltip
 	 *
 	 * @param array Params
 	 */
 	function format_status( $params = array() )
 	{
 		$params = array_merge( array(
-				'template'     => '<div class="evo_status evo_status_$status$">$status_title$</div>',
+				'template'     => '<div class="evo_status evo_status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$>$status_title$</div>',
 				'format'       => 'htmlbody', // Output format, see {@link format_to_output()}
 				'status'       => NULL,
 				'status_title' => NULL,
@@ -3328,8 +3335,8 @@ class Comment extends DataObject
 			$params['status_title'] = $this->get( 't_status' );
 		}
 
-		$r = str_replace( array( '$status$', '$status_title$' ),
-			array( $params['status'], $params['status_title'] ),
+		$r = str_replace( array( '$status$', '$status_title$', '$tooltip_title$' ),
+			array( $params['status'], $params['status_title'], get_status_tooltip_title( $params['status'] ) ),
 			$params['template'] );
 
 		echo format_to_output( $r, $params['format'] );
@@ -3427,13 +3434,13 @@ class Comment extends DataObject
 		{	// Only change DB flag to "members_notified" but do NOT actually send notifications:
 			$force_members = false;
 			$notified_flags[] = 'members_notified';
-			$Messages->add( T_('Marking email notifications for members as sent.'), 'note' );
+			$Messages->add_to_group( T_('Marking email notifications for members as sent.'), 'note', T_('Sending notifications:') );
 		}
 		if( $force_community == 'mark' )
 		{	// Only change DB flag to "community_notified" but do NOT actually send notifications:
 			$force_community = false;
 			$notified_flags[] = 'community_notified';
-			$Messages->add( T_('Marking email notifications for community as sent.'), 'note' );
+			$Messages->add_to_group( T_('Marking email notifications for community as sent.'), 'note', T_('Sending notifications:') );
 		}
 		if( ! empty( $notified_flags ) )
 		{	// Save the marked processing status to DB:
@@ -3445,7 +3452,7 @@ class Comment extends DataObject
 		if( ( $force_members != 'force' && $force_community != 'force' ) &&
 		    $this->check_notifications_flags( array( 'members_notified', 'community_notified' ) ) )
 		{	// All possible notifications have already been sent:
-			$Messages->add( T_('All possible notifications have already been sent: skipping notifications...'), 'note' );
+			$Messages->add_to_group( T_('All possible notifications have already been sent: skipping notifications...'), 'note', T_('Sending notifications:') );
 			return false;
 		}
 
@@ -3489,7 +3496,7 @@ class Comment extends DataObject
 			// Save cronjob to DB:
 			if( $comment_Cronjob->dbinsert() )
 			{
-				$Messages->add( T_('Scheduling email notifications for subscribers.'), 'note' );
+				$Messages->add_to_group( T_('Scheduling email notifications for subscribers.'), 'note', T_('Sending notifications:') );
 
 				// Memorize the cron job ID which is going to handle this post:
 				$this->set( 'notif_ctsk_ID', $comment_Cronjob->ID );
@@ -3579,7 +3586,7 @@ class Comment extends DataObject
 		// Update comment notification params:
 		$this->dbupdate();
 
-		$Messages->add( sprintf( T_('Sending %d email notifications to moderators.'), count( $notify_users ) ), 'note' );
+		$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), count( $notify_users ) ), 'note', T_('Sending notifications:') );
 
 		return $notified_user_IDs;
 	}
@@ -3613,7 +3620,7 @@ class Comment extends DataObject
 
 		if( ! $comment_item_Blog->get_setting( 'allow_item_subscriptions' ) )
 		{	// Subscriptions not enabled!
-			$Messages->add( T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.'), 'note' );
+			$Messages->add_to_group( T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.'), 'note', T_('Sending notifications:') );
 			return array();
 		}
 
@@ -3621,27 +3628,27 @@ class Comment extends DataObject
 		{	// Don't send notifications about comments with not allowed status:
 			$status_titles = get_visibility_statuses( '', array() );
 			$status_title = isset( $status_titles[ $this->get( 'status' ) ] ) ? $status_titles[ $this->get( 'status' ) ] : $this->get( 'status' );
-			$Messages->add( sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title ), 'note' );
+			$Messages->add_to_group( sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title ), 'note', T_('Sending notifications:') );
 			return array();
 		}
 
 		if( $force_members == 'skip' && $force_community == 'skip' )
 		{	// Skip subscriber notifications because of it is forced by param:
-			$Messages->add( T_('Skipping email notifications to subscribers.'), 'note' );
+			$Messages->add_to_group( T_('Skipping email notifications to subscribers.'), 'note', T_('Sending notifications:') );
 			return array();
 		}
 
 		if( $force_members == 'force' && $force_community == 'force' )
 		{	// Force to members and community:
-			$Messages->add( T_('Force sending email notifications to subscribers...'), 'note' );
+			$Messages->add_to_group( T_('Force sending email notifications to subscribers...'), 'note', T_('Sending notifications:') );
 		}
 		elseif( $force_members == 'force' )
 		{	// Force to members only:
-			$Messages->add( T_('Force sending email notifications to subscribed members...'), 'note' );
+			$Messages->add_to_group( T_('Force sending email notifications to subscribed members...'), 'note', T_('Sending notifications:') );
 		}
 		elseif( $force_community == 'force' )
 		{	// Force to community only:
-			$Messages->add( T_('Force sending email notifications to other subscribers...'), 'note' );
+			$Messages->add_to_group( T_('Force sending email notifications to other subscribers...'), 'note', T_('Sending notifications:') );
 		}
 
 		$notify_members = false;
@@ -3668,18 +3675,18 @@ class Comment extends DataObject
 
 		if( ! $notify_members && ! $notify_community )
 		{	// Everyone has already been notified, nothing to do:
-			$Messages->add( T_('Skipping email notifications to subscribers because they were already notified.'), 'note' );
+			$Messages->add_to_group( T_('Skipping email notifications to subscribers because they were already notified.'), 'note', T_('Sending notifications:') );
 			return array();
 		}
 
 		if( $notify_members && $force_members == 'skip' )
 		{	// Skip email notifications to members because it is forced by param:
-			$Messages->add( T_('Skipping email notifications to subscribed members.'), 'note' );
+			$Messages->add_to_group( T_('Skipping email notifications to subscribed members.'), 'note', T_('Sending notifications:') );
 			$notify_members = false;
 		}
 		if( $notify_community && $force_community == 'skip' )
 		{	// Skip email notifications to community because it is forced by param:
-			$Messages->add( T_('Skipping email notifications to other subscribers.'), 'note' );
+			$Messages->add_to_group( T_('Skipping email notifications to other subscribers.'), 'note', T_('Sending notifications:') );
 			$notify_community = false;
 		}
 
@@ -3767,7 +3774,9 @@ class Comment extends DataObject
 			$meta_SQL->FROM_add( 'LEFT JOIN T_groups__groupsettings ON user_grp_ID = gset_grp_ID AND gset_name = "perm_admin"' );
 			$meta_SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON user_ID = uset_user_ID AND uset_name = "notify_meta_comments"' );
 			$meta_SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON bloguser_user_ID = user_ID AND bloguser_blog_ID = '.$comment_item_Blog->ID );
-			$meta_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON bloggroup_group_ID = user_grp_ID AND bloggroup_blog_ID = '.$comment_item_Blog->ID );
+			$meta_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON bloggroup_blog_ID = '.$comment_item_Blog->ID.'
+				AND ( bloggroup_group_ID = user_grp_ID
+				      OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = user_ID ) )' );
 			// Check if users have access to the back-office:
 			$meta_SQL->WHERE( '( gset_value = "normal" OR gset_value = "restricted" )' );
 			// Check if the users would like to receive notifications about new meta comments:
@@ -3813,9 +3822,10 @@ class Comment extends DataObject
 		$members_count = 0;
 		$community_count = 0;
 		foreach( $notify_users as $user_ID => $notify_type )
-		{	// Check each subscribed user if we can send notification to him depending on current request and item settings:
+		{	// Check for each subscribed User, if we can send a notification to him depending on current request and Item settings:
+
 			if( ! ( $notify_User = & $UserCache->get_by_ID( $user_ID, false, false ) ) )
-			{	// Wrong user, Skip it:
+			{	// Invalid User, Skip it:
 				unset( $notify_users[ $user_ID ] );
 				continue;
 			}
@@ -3857,12 +3867,12 @@ class Comment extends DataObject
 		}
 
 		if( $notify_members )
-		{	// Display a message to know how much members are notified:
-			$Messages->add( sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count ), 'note' );
+		{	// Display a message to know how many members are notified:
+			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count ), 'note', T_('Sending notifications:') );
 		}
 		if( $notify_community )
-		{	// Display a message to know how much community users are notified:
-			$Messages->add( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), 'note' );
+		{	// Display a message to know how many community users are notified:
+			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), 'note', T_('Sending notifications:') );
 		}
 
 		if( empty( $notify_users ) )
@@ -3911,8 +3921,8 @@ class Comment extends DataObject
 		// Get author email address. It will be visible for moderators/blog/post owners only -- NOT for other subscribers
 		if( $this->get_author_User() )
 		{ // Comment from a registered user:
-			$reply_to = $this->author_User->get('email');
-			$author_name = $this->author_User->get('login');
+			$reply_to = $this->author_User->get( 'email' );
+			$author_name = $this->author_User->get_username();
 			$author_user_ID = $this->author_User->ID;
 		}
 		elseif( ! empty( $this->author_email ) )
@@ -4037,6 +4047,75 @@ class Comment extends DataObject
 
 
 	/**
+	 * Send "comment spam" emails for those users who have permission to moderate this comment.
+	 */
+	function send_vote_spam_emails()
+	{
+		global $current_User, $Settings, $UserSettings;
+
+		if( ! is_logged_in() )
+		{	// Only loggen in users can vote on comments
+			return;
+		}
+
+		if( $this->is_meta() )
+		{	// Meta comments have no spam voting
+			return;
+		}
+
+		$UserCache = & get_UserCache();
+
+		$comment_Item = & $this->get_Item();
+		$comment_item_Blog = & $comment_Item->get_Blog();
+		$coll_owner_User = $comment_item_Blog->get_owner_User();
+
+		$moderators = array();
+
+		$moderators_to_notify = $comment_item_Blog->get_comment_moderator_user_data();
+
+		foreach( $moderators_to_notify as $moderator )
+		{
+			$notify_moderator = is_null( $moderator->notify_spam_cmt_moderation ) ? $Settings->get( 'def_notify_spam_cmt_moderation' ) : $moderator->notify_spam_cmt_moderation;
+			if( $notify_moderator )
+			{	// Include user to notify because of enabled setting:
+				$moderators[] = $moderator->user_ID;
+			}
+		}
+		if( $UserSettings->get( 'notify_spam_cmt_moderation', $coll_owner_User->ID ) && is_email( $coll_owner_User->get( 'email' ) ) )
+		{	// Include collection owner:
+			$moderators[] = $coll_owner_User->ID;
+		}
+
+		$email_subject = sprintf( T_('[%s] Spam comment may need moderation on "%s"'), $comment_item_Blog->get( 'shortname' ), $comment_Item->get( 'title' ) );
+		$email_template_params = array(
+				'Comment'  => $this,
+				'Blog'     => $comment_item_Blog,
+				'Item'     => $comment_Item,
+				'voter_ID' => $current_User->ID,
+			);
+
+		// Load all moderators, and check each edit permission on this comment:
+		$UserCache->load_list( $moderators );
+		foreach( $moderators as $moderator_ID )
+		{
+			if( $moderator_ID == $current_User->ID )
+			{	// Don't send email to the voter:
+				continue;
+			}
+			$moderator_User = $UserCache->get_by_ID( $moderator_ID, false );
+			if( $moderator_User && $moderator_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) )
+			{	// If moderator has a permission to edit this comment:
+				$moderator_Group = $moderator_User->get_Group();
+				$email_template_params['notify_full'] = $moderator_Group->check_perm( 'comment_moderation_notif', 'full' );
+
+				// Send email to the moderator:
+				send_mail_to_User( $moderator_ID, $email_subject, 'comment_spam', $email_template_params );
+			}
+		}
+	}
+
+
+	/**
 	 * Handle quick moderation secret param: checks if comment secret should expire after first comment moderation, and delete the secret if required
 	 * This should be called after every kind of commment moderation
 	 */
@@ -4108,8 +4187,11 @@ class Comment extends DataObject
 	{
 		global $Plugins, $DB;
 
-		// Restrict comment status by parent item:
-		$this->restrict_status_by_item( true );
+		if( isset( $this->previous_status ) )
+		{	// Restrict comment status by parent item:
+			// (ONLY if current request is updating comment status)
+			$this->restrict_status( true );
+		}
 
 		$dbchanges = $this->dbchanges;
 
@@ -4139,8 +4221,8 @@ class Comment extends DataObject
 				$ItemCache = & get_ItemCache();
 				$ItemCache->clear();
 				if( $previous_Item = & $ItemCache->get_by_ID( $this->previous_item_ID, false, false ) )
-				{ // Update last touched date of previous item
-					$previous_Item->update_last_touched_date( false );
+				{	// Update last touched date of previous item:
+					$previous_Item->update_last_touched_date( false, true, true );
 				}
 				// Also update new post
 				$update_item_last_touched_date = true;
@@ -4155,7 +4237,7 @@ class Comment extends DataObject
 				}
 			}
 
-			$this->update_last_touched_date( $update_item_last_touched_date );
+			$this->update_last_touched_date( $update_item_last_touched_date, $update_item_last_touched_date );
 
 			$DB->commit();
 
@@ -4183,8 +4265,11 @@ class Comment extends DataObject
 		global $Plugins;
 		global $Settings;
 
-		// Restrict comment status by parent item:
-		$this->restrict_status_by_item( true );
+		if( isset( $this->previous_status ) )
+		{	// Restrict comment status by parent item:
+			// (ONLY if current request is updating comment status)
+			$this->restrict_status( true );
+		}
 
 		// Get karma percentage (interval -100 - 100)
 		$spam_karma = $Plugins->trigger_karma_collect( 'GetSpamKarmaForComment', array( 'Comment' => & $this ) );
@@ -4221,7 +4306,7 @@ class Comment extends DataObject
 		{
 			if( $this->is_published() )
 			{ // Update last touched date of item if comment is created in published status
-				$this->update_last_touched_date();
+				$this->update_last_touched_date( true, true );
 			}
 			$Plugins->trigger_event( 'AfterCommentInsert', $params = array( 'Comment' => & $this, 'dbchanges' => $dbchanges ) );
 		}
@@ -4282,8 +4367,8 @@ class Comment extends DataObject
 		if( $r )
 		{
 			if( $was_published )
-			{ // Update last touched date of item if a published comment was deleted
-				$this->update_last_touched_date();
+			{	// Update last touched date and content last updated date of item if a published comment was deleted:
+				$this->update_last_touched_date( true, true );
 			}
 			if( $use_transaction )
 			{
@@ -4355,7 +4440,16 @@ class Comment extends DataObject
 		}
 		$class = ' class="'.trim( $class ).'"';
 
-		$url = url_add_param( $this->Item->get_permanent_url(), 'reply_ID='.$this->ID.'&amp;redir=no' ).'#form_p'.$this->Item->ID;
+		// Initialize an url to reply on comment:
+		if( is_admin_page() )
+		{	// for back-office:
+			global $admin_url;
+			$url = $admin_url.'?ctrl=items&amp;blog='.$this->Item->Blog->ID.'&amp;p='.$this->Item->ID.( $this->is_meta() ? '&amp;comment_type=meta' : '' ).'&amp;reply_ID='.$this->ID.'#comment_checkchanges';
+		}
+		else
+		{	// for front-office:
+			$url = url_add_param( $this->Item->get_permanent_url(), 'reply_ID='.$this->ID.( $this->is_meta() ? '&amp;comment_type=meta' : '' ).'&amp;redir=no' ).'#'.( $this->is_meta() ? 'meta_' : '' ).'form_p'.$this->Item->ID;
+		}
 
 		echo $before;
 
@@ -4414,8 +4508,9 @@ class Comment extends DataObject
 	 * Update field last_touched_ts
 	 *
 	 * @param boolean update comment's post last touched ts as well or not
+	 * @param boolean Use TRUE to update field contents_last_updated_ts of the comment's item
 	 */
-	function update_last_touched_date( $update_item_date = true )
+	function update_last_touched_date( $update_item_last_touched_ts = true, $update_item_contents_last_updated_ts = false )
 	{
 		global $localtimenow, $current_User;
 
@@ -4439,9 +4534,9 @@ class Comment extends DataObject
 			$this->dbupdate();
 		}
 
-		if( $update_item_date )
-		{ // Update last touched data of the Item
-			$comment_Item->update_last_touched_date();
+		if( $update_item_last_touched_ts || $update_item_contents_last_updated_ts )
+		{	// Update last touched timestamp or content last update timestamp of the Item:
+			$comment_Item->update_last_touched_date( true, $update_item_last_touched_ts, $update_item_contents_last_updated_ts );
 		}
 	}
 
@@ -4517,21 +4612,29 @@ class Comment extends DataObject
 	/*
 	 * Get max allowed comment status depending on parent item status
 	 *
+	 * @param string Status key to check if it is allowed, NULL- to use current comment status
 	 * @return string Status key
 	 */
-	function get_allowed_status()
+	function get_allowed_status( $current_status = NULL )
 	{
 		$comment_Item = & $this->get_Item();
 		$item_Blog = & $comment_Item->get_Blog();
 
-		// Current comment status:
-		$current_status = $this->get( 'status' );
+		if( $current_status === NULL )
+		{	// Use current comment status:
+			$current_status = $this->get( 'status' );
+		}
 
 		// Restrict status to max allowed for item collection:
-		$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->status );
+		$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->get( 'status' ) );
+		if( empty( $item_restricted_status ) )
+		{	// If max allowed status is not detected because for example current User has no perm to item status,
+			// then use current status of the Item in order to restrict max comment status below:
+			$item_restricted_status = $comment_Item->get( 'status' );
+		}
 
 		// Comment status cannot be more than post status, restrict it:
-		$restricted_statuses = get_restricted_statuses( $item_Blog->ID, 'blog_comment!', 'edit', '', $item_restricted_status );
+		$restricted_statuses = get_restricted_statuses( $item_Blog->ID, 'blog_comment!', 'edit', '', $item_restricted_status, $this );
 
 		// Get all visibility statuses:
 		$visibility_statuses = get_visibility_statuses( '', $restricted_statuses );
@@ -4577,11 +4680,11 @@ class Comment extends DataObject
 
 
 	/**
-	 * Restrict comment status by parent item
+	 * Restrict Comment status by parent Item status AND its Collection access restriction AND by CURRENT USER write perm
 	 *
 	 * @param boolean TRUE to update status
 	 */
-	function restrict_status_by_item( $update_status = false )
+	function restrict_status( $update_status = false )
 	{
 		global $current_User;
 
@@ -4590,15 +4693,19 @@ class Comment extends DataObject
 
 		$commented_Item = & $this->get_Item();
 
-		// Do not restrict if meta comment and user has the proper permission. Change meta comment status to 'protected'.
-		if( $this->is_meta() && $commented_Item &&
-		    ! $current_User->check_perm( 'meta_comment', 'view', false, $commented_Item ) )
-		{
-			$comment_allowed_status = 'protected';
+		if( $this->is_meta() )
+		{	// Meta comment:
+			if( ! is_logged_in() || ( $commented_Item && ! $current_User->check_perm( 'meta_comment', 'view', false, $commented_Item->get_blog_ID() ) ) )
+			{	// Change meta comment status to 'protected' if user has no perm to view them:
+				$comment_allowed_status = 'protected';
+			}
+			else
+			{	// Do not restrict if meta comment and user has the proper permission:
+				$comment_allowed_status = $current_status;
+			}
 		}
 		else
-		{
-			// Restrict status to max allowed by parent item:
+		{	// Restrict status of normal comment to max allowed by parent item:
 			$comment_allowed_status = $this->get_allowed_status();
 			if( empty( $comment_allowed_status ) && $commented_Item && ( $item_Blog = & $commented_Item->get_Blog() ) )
 			{	// If min allowed status is not found then use what default status is allowed:
@@ -4614,7 +4721,7 @@ class Comment extends DataObject
 		{	// Only change status to update it on the edit forms and Display a warning:
 			$this->status = $comment_allowed_status;
 
-			if( $current_status != $this->get( 'status' ) )
+			if( $current_status != $this->get( 'status' ) && ! $this->is_meta() )
 			{	// If current comment status cannot be used because it is restricted by parent item:
 				global $Messages;
 
@@ -4648,6 +4755,25 @@ class Comment extends DataObject
 
 		// TRUE if all requested flags are in current item notifications flags:
 		return ( count( array_diff( $flags, $this->get( 'notif_flags' ) ) ) == 0 );
+	}
+
+
+	/**
+	 * Check if this comment can be displayed for current user on front-office
+	 *
+	 * @return boolean
+	 */
+	function can_be_displayed()
+	{
+		if( empty( $this->ID ) )
+		{	// Comment is not created yet, so it cannot be displayed:
+			return false;
+		}
+
+		// Load Item of this comment to get a collection ID:
+		$Item = & $this->get_Item();
+
+		return can_be_displayed_with_status( $this->get( 'status' ), 'comment', $Item->get_blog_ID(), $this->author_user_ID );
 	}
 }
 

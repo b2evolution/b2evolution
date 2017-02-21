@@ -21,6 +21,10 @@ require_once $inc_path.'_main.inc.php';
 
 global $Session, $modules;
 
+// Don't check new updates from b2evolution.net (@see b2evonet_get_updates()),
+// in order to don't break the response data:
+$allow_evo_stats = false;
+
 // Module name param must exists
 $module_name = param( 'mname', 'string', true );
 

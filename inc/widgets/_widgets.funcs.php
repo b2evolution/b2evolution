@@ -62,6 +62,9 @@ function add_basic_widget( $blog_ID, $container_name, $code, $type, $order, $par
  *
  * @param integer should never be 0
  * @param boolean should be true only when it's called after initial install
+ * fp> TODO: $initial_install is used to know if we want to trust globals like $blog_photoblog_ID and $blog_forums_ID. We don't want that. 
+ *           We should pass a $context array with values like 'photo_source_coll_ID' => 4. 
+ *           Also, checking $blog_forums_ID is unnecessary complexity. We can check the colleciton kind == forum
  * @param string Kind of blog ( 'std', 'photo', 'group', 'forum' )
  */
 function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
@@ -147,11 +150,22 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		}
 	}
 
+	/* Item Single Header */
+	if( in_array( $kind, array( 'forum', 'group' ) ) )
+	{
+		add_basic_widget( $blog_id, 'Item Single Header', 'item_info_line', 'core', 10, 'a:14:{s:5:"title";s:0:"";s:9:"flag_icon";i:1;s:14:"permalink_icon";i:0;s:13:"before_author";s:10:"started_by";s:11:"date_format";s:8:"extended";s:9:"post_time";i:1;s:12:"last_touched";i:1;s:8:"category";i:0;s:9:"edit_link";i:0;s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;s:11:"time_format";s:4:"none";s:12:"display_date";s:12:"date_created";}' );
+		add_basic_widget( $blog_id, 'Item Single Header', 'item_tags', 'core', 20 );
+		add_basic_widget( $blog_id, 'Item Single Header', 'item_seen_by', 'core', 30 );
+	}
+	else
+	{
+		add_basic_widget( $blog_id, 'Item Single Header', 'item_info_line', 'core', 10 );
+	}
 
 	/* Item Single */
 	add_basic_widget( $blog_id, 'Item Single', 'item_content', 'core', 10 );
 	add_basic_widget( $blog_id, 'Item Single', 'item_attachments', 'core', 15 );
-	if( $blog_id != $blog_a_ID && $kind != 'forum' && ( empty( $events_blog_ID ) || $blog_id != $events_blog_ID ) )
+	if( $blog_id != $blog_a_ID && ( empty( $events_blog_ID ) || $blog_id != $events_blog_ID ) && ! in_array( $kind, array( 'forum', 'group' ) ) )
 	{ // Item Tags
 		add_basic_widget( $blog_id, 'Item Single', 'item_tags', 'core', 20 );
 	}
@@ -167,10 +181,10 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	{ // Small Print
 		add_basic_widget( $blog_id, 'Item Single', 'item_small_print', 'core', 40, array( 'format' => ( $blog_id == $blog_a_ID ? 'standard' : 'revision' ) ) );
 	}
-	// Seen by
-	add_basic_widget( $blog_id, 'Item Single', 'item_seen_by', 'core', 50, NULL,
-		// Disable this widget for "forum" collections by default:
-		$kind == 'forum' ? 0 : 1 );
+	if( ! in_array( $kind, array( 'forum', 'group' ) ) )
+	{ // Seen by
+		add_basic_widget( $blog_id, 'Item Single', 'item_seen_by', 'core', 50 );
+	}
 	if( $kind != 'forum' )
 	{	// Item voting panel:
 		add_basic_widget( $blog_id, 'Item Single', 'item_vote', 'core', 60 );

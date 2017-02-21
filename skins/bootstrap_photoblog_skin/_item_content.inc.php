@@ -41,9 +41,8 @@ $params = array_merge( array(
 		'excerpt_more_text'        => T_('more').' &raquo;',
 
 		// In case we display a full version of the post:
-		'content_start_full_text'  => '<div class="evo_post__full_text panel-body">',
-		'content_start_full_text_intro'  => '<div class="evo_post__full_text">',
-		'content_end_full_text'    => '</div>',
+		'content_start_full_text'  => '<section class="evo_post__full"><div class="evo_post__full_text clearfix">',
+		'content_end_full_text'    => '</div></div>',
 
 		'before_content_teaser'    => '',
 		'after_content_teaser'     => '',
@@ -183,7 +182,7 @@ switch( $content_mode )
 	case 'normal':
 	default:
 		// Normal dislpay:  (and Full display if force_more is true)
-		
+
 		/* This is written in _item.block.inc.php
 		if( ! $Item->is_intro() ) { // Display different layout for intro/featured and regular posts
 			echo $params['content_start_full'];
@@ -194,14 +193,12 @@ switch( $content_mode )
 
 		if( $params['content_display_full'] )
 		{	// We want to display text, not just images:
-	
-			/* This is written in _item.block.inc.php
+
+			/* This is written in _item.block.inc.php */
 			if( ! $Item->is_intro() ) { // Display different layout for intro/featured and regular posts
 				echo $params['content_start_full_text'];
-			} else {
-				echo $params['content_start_full_text_intro'];
 			}
-			*/
+
 
 			// URL link, if the post has one:
 			if( $params['url_link_position'] == 'top' )
@@ -276,8 +273,6 @@ switch( $content_mode )
 			// echo $params['content_end_full_text'];  <-- We want to show this after the content footer in _item.block.inc.php
 		}
 
-		// Display location info
-		$Item->location( '<div class="evo_post_location"><strong>'.T_('Location').': </strong>', '</div>' );
 
 		// echo $params['content_end_full']; <-- We want to show this after the content footer in _item.block.inc.php
 }

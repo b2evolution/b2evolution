@@ -31,7 +31,7 @@ class LinkEmailCampaign extends LinkOwner
 	function __construct( $EmailCampaign )
 	{
 		// call parent contsructor
-		parent::__construct( $EmailCampaign, 'emailcampaign' );
+		parent::__construct( $EmailCampaign, 'emailcampaign', 'ecmp_ID' );
 		$this->EmailCampaign = & $this->link_Object;
 
 		$this->_trans = array(
@@ -110,7 +110,7 @@ class LinkEmailCampaign extends LinkOwner
 		}
 
 		$edited_Link = new Link();
-		$edited_Link->set( 'ecmp_ID', $this->EmailCampaign->ID );
+		$edited_Link->set( $this->get_ID_field_name(), $this->get_ID() );
 		$edited_Link->set( 'file_ID', $file_ID );
 		$edited_Link->set( 'position', $position );
 		$edited_Link->set( 'order', $order );
@@ -120,7 +120,7 @@ class LinkEmailCampaign extends LinkOwner
 			$File = $FileCache->get_by_ID( $file_ID, false, false );
 			$file_name = empty( $File ) ? '' : $File->get_name();
 			$file_dir = $File->dir_or_file();
-			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s',  ucfirst( $file_dir ), '[['.$file_name.']]', $this->type, $this->link_Object->ID ), 'info', 'file', $file_ID );
+			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s',  ucfirst( $file_dir ), '[['.$file_name.']]', $this->type, $this->get_ID() ), 'info', 'file', $file_ID );
 
 			// Reset the Links:
 			$this->Links = NULL;
@@ -143,15 +143,6 @@ class LinkEmailCampaign extends LinkOwner
 
 
 	/**
-	 * Get where condition for select query to get Email Campaign links
-	 */
-	function get_where_condition()
-	{
-		return 'link_ecmp_ID = '.$this->EmailCampaign->ID;
-	}
-
-
-	/**
 	 * Get Email Campaign parameter
 	 *
 	 * @param string parameter name to get
@@ -161,7 +152,7 @@ class LinkEmailCampaign extends LinkOwner
 		switch( $parname )
 		{
 			case 'name':
-				return 'post';
+				return 'emailcampaign';
 		}
 		return parent::get( $parname );
 	}
@@ -202,9 +193,9 @@ class LinkEmailCampaign extends LinkOwner
 
 		if( ! empty( $link_ID ) )
 		{	// Find inline image placeholders if link ID is defined:
-			preg_match_all( '/\[(image|file|inline|video|audio):'.$link_ID.':?[^\]]*\]/i', $this->EmailCampaign->email_text, $inline_images );
+			preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):'.$link_ID.':?[^\]]*\]/i', $this->EmailCampaign->email_text, $inline_images );
 			if( ! empty( $inline_images[0] ) )
-			{	// There are inline image placeholders in the post content:
+			{	// There are inline image placeholders in the email content:
 				$this->EmailCampaign->set( 'email_text', str_replace( $inline_images[0], '', $this->EmailCampaign->email_text ) );
 				$this->EmailCampaign->dbupdate();
 				return;

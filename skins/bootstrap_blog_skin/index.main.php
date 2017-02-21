@@ -186,10 +186,11 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 			skin_include( '_item_block.inc.php', array(
 					'feature_block' => true,
-					'content_mode' => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
-					'intro_mode'   => 'normal',	// Intro posts will be displayed in normal mode
-					'item_class'   => ($Item->is_intro() ? 'well evo_intro_post' : 'well evo_featured_post').( empty( $intro_item_style ) ? '' : ' evo_hasbgimg' ),
-					'item_style'   => $intro_item_style
+					'content_mode'  => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
+					'intro_mode'    => 'normal',	// Intro posts will be displayed in normal mode
+					'item_class'    => ($Item->is_intro() ? 'well evo_intro_post' : 'well evo_featured_post').( empty( $intro_item_style ) ? '' : ' evo_hasbgimg' ),
+					'item_style'    => $intro_item_style,
+					'Item'          => $Item,
 				) );
 			// ----------------------------END ITEM BLOCK  ----------------------------
 		}
@@ -369,10 +370,19 @@ siteskin_include( '_site_body_header.inc.php' );
 		<div class="evo_container evo_container__footer">
 		<?php
 			// Display container and contents:
-			skin_container( NT_("Footer"), array(
+			skin_container( NT_('Footer'), array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start'       => '<div class="evo_widget $wi_class$">',
-					'block_end'         => '</div>',
+					'block_start'         => '<span class="evo_widget $wi_class$">',
+					'block_end'           => '</span> ',
+					'block_display_title' => false,
+					'list_start'          => '',
+					'list_end'            => '',
+					'item_start'          => '',
+					'item_end'            => '',
+					'item_selected_start' => '',
+					'item_selected_end'   => '',
+					'link_default_class'  => 'btn btn-default btn-sm',
+					'link_selected_class' => 'btn btn-default btn-sm active',
 				) );
 			// Note: Double quotes have been used around "Footer" only for test purposes.
 		?>

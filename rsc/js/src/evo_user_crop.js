@@ -57,15 +57,16 @@ function user_crop_avatar( user_ID, file_ID, user_tab_from )
 			[ evo_js_lang_crop, 'btn-primary' ],
 			true );
 
-	// Get content size
-	var modal_body_padding = {
-		top: parseInt( jQuery( 'div.modal-dialog div.modal-body' ).css( 'paddingTop' ) ),
-		right: parseInt( jQuery( 'div.modal-dialog div.modal-body' ).css( 'paddingRight' ) ),
-		bottom: parseInt( jQuery( 'div.modal-dialog div.modal-body' ).css( 'paddingBottom' ) ),
-		left: parseInt( jQuery( 'div.modal-dialog div.modal-body' ).css( 'paddingLeft' ) )
+	// Get content size:
+	var content_wrapper = jQuery( 'div.modal-dialog div.modal-body' ).length ? jQuery( 'div.modal-dialog div.modal-body' ) : jQuery( '#overlay_page' );
+	var content_wrapper_padding = {
+		top: parseInt( content_wrapper.css( 'paddingTop' ) ),
+		right: parseInt( content_wrapper.css( 'paddingRight' ) ),
+		bottom: parseInt( content_wrapper.css( 'paddingBottom' ) ),
+		left: parseInt( content_wrapper.css( 'paddingLeft' ) )
 	};
-	var content_height = parseInt( jQuery( 'div.modal-dialog div.modal-body' ).css('min-height') ) - ( modal_body_padding.top + modal_body_padding.bottom );
-	var content_width = modal_width - ( modal_body_padding.left + modal_body_padding.right );
+	var content_height = ( jQuery( 'div.modal-dialog div.modal-body' ).length ? parseInt( content_wrapper.css('min-height') ) : modal_height - 100 ) - ( content_wrapper_padding.top + content_wrapper_padding.bottom );
+	var content_width = modal_width - ( content_wrapper_padding.left + content_wrapper_padding.right );
 
 	// Initialize params for ajax request:
 	var ajax_data = {

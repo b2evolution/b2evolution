@@ -40,7 +40,7 @@ $params = array_merge( array(
 		'excerpt_more_text'        => T_('more').' &raquo;',
 
 		// In case we display a full version of the post:
-		'content_start_full_text'  => '<div class="evo_post__full_text">',
+		'content_start_full_text'  => '<div class="evo_post__full_text clearfix">',
 		'content_end_full_text'    => '</div>',
 
 		'before_content_teaser'    => '',
@@ -49,7 +49,7 @@ $params = array_merge( array(
 		'after_content_extension'  => '',
 
 		'before_images'            => '<div class="evo_post_images raised">',
-		'before_image'             => '<figure class="evo_image_block">',
+		'before_image'             => '<figure class="evo_image_block raised">',
 		'before_image_legend'      => '<figcaption class="evo_image_legend">',
 		'after_image_legend'       => '</figcaption>',
 		'after_image'              => '</figure>',
@@ -349,8 +349,6 @@ switch( $content_mode )
 			echo $params['content_end_full_text'];
 		}
 
-		// Display location info
-		$Item->location( '<div class="evo_post_location"><strong>'.T_('Location').': </strong>', '</div>' );
 
 		echo $params['content_end_full'];
 
