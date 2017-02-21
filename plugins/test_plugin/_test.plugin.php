@@ -650,7 +650,13 @@ class test_plugin extends Plugin
 	 */
 	function AdminEndHtmlHead( & $params )
 	{
-		echo '<!-- This comment was added by the TEST plugin -->';
+		echo '<!-- This comment was added by the TEST plugin event "AdminEndHtmlHead" with function "echo" -->';
+
+		add_headline( '<!-- This comment was added by the TEST plugin event "AdminEndHtmlHead" with function "add_headline"-->' );
+
+		add_js_headline( 'console.log( "This JavaScript log was added by the TEST plugin event \'AdminEndHtmlHead\' with function \'add_js_headline\'" )' );
+
+		add_css_headline( '/* This CSS was added by the TEST plugin event \'AdminEndHtmlHead\' with function "add_css_headline" */' );
 
 		return true;
 	}
