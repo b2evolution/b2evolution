@@ -8236,6 +8236,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12186, 'Updating attachment positions...' ) )
+	{	// part of 6.9.0-stable (This is a duplicated 12161 block from 6.8.7-stable)
+		$DB->query( 'UPDATE T_links
+			INNER JOIN T_files ON file_ID = link_file_ID
+			       AND file_type NOT IN ( "image", "audio", "video" )
+			  SET link_position = "attachment"
+			WHERE link_position = "aftermore"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
