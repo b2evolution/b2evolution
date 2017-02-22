@@ -69,7 +69,7 @@ if( $action == 'edit_links' || $action == 'sort_links' )
 { // set LinkOwner from params
 	$link_type = param( 'link_type', 'string', 'item', true );
 	$object_ID = param( 'link_object_ID', 'integer', 0, true );
-	$LinkOwner = get_link_owner( $link_type, $object_ID );
+	$LinkOwner = get_LinkOwner( $link_type, $object_ID );
 	if( empty( $Blog ) )
 	{ // Load the blog we're in:
 		$Collection = $Blog = & $LinkOwner->get_Blog();

@@ -60,14 +60,11 @@ $Results->cols[] = array(
 						'td_class' => 'shrinkwrap link_id_cell',
 					);
 
-if( is_logged_in() && $current_User->check_perm( 'files', 'view' ) )
-{
-	$Results->cols[] = array(
-							'th' => T_('Actions'),
-							'td_class' => 'shrinkwrap',
-							'td' => '%link_actions( #link_ID#, {ROW_IDX_TYPE}, "'.$LinkOwner->type.'" )%',
-						);
-}
+$Results->cols[] = array(
+						'th' => T_('Actions'),
+						'td_class' => 'shrinkwrap',
+						'td' => '%link_actions( #link_ID#, {ROW_IDX_TYPE}, "'.$LinkOwner->type.'" )%',
+					);
 
 if( count( $LinkOwner->get_positions() ) > 1 )
 {	// Don't display a position column for email campaign because it always has only one position 'inline':

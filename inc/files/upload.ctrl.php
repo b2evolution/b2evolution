@@ -342,7 +342,7 @@ if( ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
 			// Allow to insert/link new upload into currently edited link object:
 			if( $mode == 'upload' && !empty( $link_object_ID ) && !empty( $link_type ) )
 			{	// The filemanager has been opened from a link owner object, offer to insert an img tag into original object.
-				$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+				$LinkOwner = get_LinkOwner( $link_type, $link_object_ID );
 				// TODO: Add plugin hook to allow generating JS insert code(s)
 				$img_tag = format_to_output( $uploadedFile->get_tag(), 'formvalue' );
 				if( $uploadedFile->is_image() )

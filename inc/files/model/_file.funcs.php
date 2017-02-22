@@ -2254,10 +2254,12 @@ function display_dragdrop_upload_button( $params = array() )
 			'filename_select'        => '', // Append this text before file name on success uploading of new file
 		), $params );
 
+	$LinkOwner = & $params['LinkOwner'];
+
 	$FileRootCache = & get_FileRootCache();
 	$fm_FileRoot = $FileRootCache->get_by_ID( $params['fileroot_ID'] );
 
-	if( ! is_logged_in() || ! $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
+	if( ! check_perm_upload_files( $LinkOwner, $fm_FileRoot ) )
 	{	// Don't display the button if current user has no permission to upload to the selected file root:
 		return;
 	}
@@ -2269,9 +2271,9 @@ function display_dragdrop_upload_button( $params = array() )
 
 	echo $params['before'];
 
-	if( $params['LinkOwner'] !== NULL && $params['LinkOwner']->is_temp() )
+	if( $LinkOwner !== NULL && $LinkOwner->is_temp() )
 	{	// Use this field to know a form is submitted with temporary link owner(when object is creating and still doesn't exist in DB):
-		echo '<input type="hidden" name="temp_link_owner_ID" value="'.$params['LinkOwner']->get_ID().'" />';
+		echo '<input type="hidden" name="temp_link_owner_ID" value="'.$LinkOwner->get_ID().'" />';
 	}
 
 	?>
@@ -2304,9 +2306,9 @@ function display_dragdrop_upload_button( $params = array() )
 		} );
 
 		<?php
-		if( $params['LinkOwner'] !== NULL )
+		if( $LinkOwner !== NULL )
 		{	// Add params to link a file right after uploading:
-			echo 'url += "&link_owner='.$params['LinkOwner']->type.'_'.$params['LinkOwner']->get_ID().'_'.intval( $params['LinkOwner']->is_temp() ).'"';
+			echo 'url += "&link_owner='.$LinkOwner->type.'_'.$LinkOwner->get_ID().'_'.intval( $LinkOwner->is_temp() ).'"';
 		}
 		?>
 
@@ -2940,5 +2942,31 @@ function get_root_path_by_abspath( $abspath, $is_cache_path = false )
 
 	// Data are not found correctly:
 	return false;
+}
+
+
+/**
+ * Check if current user has an access to upload new files
+ *
+ * @param object Link Owner
+ * @param object File Root
+ * @param boolean TRUE to assert if user dosn't have the required permission
+ * @return boolean
+ */
+function check_perm_upload_files( $LinkOwner, $FileRoot, $assert = false )
+{
+	if( empty( $LinkOwner ) )
+	{	// Check perm when we upload new files by file manager without linking to any object:
+		if( ! is_logged_in() && $assert )
+		{	// Halt the denied access:
+			debug_die( 'You have no permission to upload new files!' );
+		}
+		global $current_User;
+		return $current_User->check_perm( 'files', 'add', $assert, $FileRoot );
+	}
+	else
+	{	// Check perm when we upload new files for the object like Item, Comment, Message or EmailCampaign:
+		return $LinkOwner->check_perm( 'add', $assert, $FileRoot );
+	}
 }
 ?>

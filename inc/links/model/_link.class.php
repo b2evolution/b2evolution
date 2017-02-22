@@ -56,27 +56,27 @@ class Link extends DataObject
 			// source of link:
 			if( $db_row->link_itm_ID != NULL )
 			{	// Item:
-				$this->LinkOwner = & get_link_owner( 'item', $db_row->link_itm_ID );
+				$this->LinkOwner = & get_LinkOwner( 'item', $db_row->link_itm_ID );
 			}
 			elseif( $db_row->link_cmt_ID != NULL )
 			{	// Comment:
-				$this->LinkOwner = & get_link_owner( 'comment', $db_row->link_cmt_ID );
+				$this->LinkOwner = & get_LinkOwner( 'comment', $db_row->link_cmt_ID );
 			}
 			elseif( $db_row->link_usr_ID != NULL )
 			{	// User:
-				$this->LinkOwner = & get_link_owner( 'user', $db_row->link_usr_ID );
+				$this->LinkOwner = & get_LinkOwner( 'user', $db_row->link_usr_ID );
 			}
 			elseif( $db_row->link_ecmp_ID != NULL )
 			{	// Email Campaign:
-				$this->LinkOwner = & get_link_owner( 'emailcampaign', $db_row->link_ecmp_ID );
+				$this->LinkOwner = & get_LinkOwner( 'emailcampaign', $db_row->link_ecmp_ID );
 			}
 			elseif( $db_row->link_msg_ID != NULL )
 			{	// Message:
-				$this->LinkOwner = & get_link_owner( 'message', $db_row->link_msg_ID );
+				$this->LinkOwner = & get_LinkOwner( 'message', $db_row->link_msg_ID );
 			}
 			elseif( $db_row->link_tmp_ID != NULL )
 			{	// Temporary ID:
-				$this->LinkOwner = & get_link_owner( 'temporary', $db_row->link_tmp_ID );
+				$this->LinkOwner = & get_LinkOwner( 'temporary', $db_row->link_tmp_ID );
 			}
 			else
 			{

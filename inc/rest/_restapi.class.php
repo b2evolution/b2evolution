@@ -1842,7 +1842,7 @@ class RestApi
 
 		$LinkOwner = & $Link->get_LinkOwner();
 
-		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
+		if( ! $LinkOwner->check_perm( 'edit', false ) )
 		{	// Current user has no permission to unlink the requested link:
 			$this->halt( 'You have no permission to edit the requested link!', 'no_access', 403 );
 			// Exit here.
@@ -1979,9 +1979,9 @@ class RestApi
 		$root = param( 'root', 'string' );
 		$file_path = param( 'path', 'string' );
 
-		$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+		$LinkOwner = & get_LinkOwner( $link_type, $link_object_ID );
 
-		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
+		if( ! $LinkOwner->check_perm( 'edit', false ) )
 		{	// Current user has no permission to unlink the requested link:
 			$this->halt( 'You have no permission to attach a file!', 'no_access', 403 );
 			// Exit here.
@@ -2010,7 +2010,7 @@ class RestApi
 			$link_type = param( 'type', 'string' );
 			$link_object_ID = param( 'object_ID', 'string' );
 
-			$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+			$LinkOwner = & get_LinkOwner( $link_type, $link_object_ID );
 
 			// Initialize admin skin:
 			global $current_User, $UserSettings, $is_admin_page, $adminskins_path, $AdminUI;
@@ -2058,9 +2058,9 @@ class RestApi
 		$link_type = param( 'type', 'string' );
 		$link_object_ID = param( 'object_ID', 'string' );
 
-		$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+		$LinkOwner = get_LinkOwner( $link_type, $link_object_ID );
 
-		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
+		if( ! $LinkOwner->check_perm( 'view', false ) )
 		{	// Current user has no permission to unlink the requested link:
 			$this->halt( 'You have no permission to list of the links!', 'no_access', 403 );
 			// Exit here.
@@ -2101,7 +2101,7 @@ class RestApi
 
 		// Initialize admin skin:
 		global $current_User, $UserSettings, $is_admin_page, $adminskins_path, $AdminUI;
-		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		$admin_skin = is_logged_in() ? $UserSettings->get( 'admin_skin', $current_User->ID ) : 'bootstrap';
 		$is_admin_page = true;
 		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
 		$AdminUI = new AdminUI();
@@ -2137,9 +2137,9 @@ class RestApi
 		$dest_type = param( 'dest_type', 'string' );
 		$dest_object_ID = param( 'dest_object_ID', 'string' );
 
-		$dest_LinkOwner = get_link_owner( $dest_type, $dest_object_ID );
+		$dest_LinkOwner = get_LinkOwner( $dest_type, $dest_object_ID );
 
-		if( ! is_logged_in() || ! $dest_LinkOwner->check_perm( 'edit', false ) )
+		if( ! $dest_LinkOwner->check_perm( 'edit', false ) )
 		{	// Current user has no permission to copy the requested link:
 			$this->halt( 'You have no permission to list of the links!', 'no_access', 403 );
 			// Exit here.
@@ -2149,7 +2149,7 @@ class RestApi
 		$source_object_ID = param( 'source_object_ID', 'string' );
 		$source_position = trim( param( 'source_position', 'string' ), ',' );
 
-		$source_LinkOwner = get_link_owner( $source_type, $source_object_ID );
+		$source_LinkOwner = get_LinkOwner( $source_type, $source_object_ID );
 
 		if( ! $source_LinkOwner || ! ( $source_LinkList = $source_LinkOwner->get_attachment_LinkList( 1000, $source_position ) ) )
 		{	// No requested links, Exit here:

@@ -50,25 +50,62 @@ class LinkComment extends LinkOwner
 	}
 
 	/**
-	 * Check current User Comment permissions
+	 * Check current User has an access to work with attachments of the link Comment
 	 *
 	 * @param string permission level
 	 * @param boolean true to assert if user dosn't have the required permission
+	 * @param object File Root to check permission to add/upload new files
+	 * @return boolean
 	 */
-	function check_perm( $permlevel, $assert = false )
+	function check_perm( $permlevel, $assert = false, $FileRoot = NULL )
 	{
 		global $current_User;
 
-		if( $this->is_temp() )
+		if( ! is_logged_in() )
+		{	// User must be logged in:
+			$r = false;
+
+			// Except of one case when we can allow attach files to comments even for anonymous users depending on collection setting:
+			if( $comment_Item = & $this->link_Object->get_Item() )
+			{	// Check collection setting if comment has a parent Item(This is a created comment from DB):
+				$r = $comment_Item->check_blog_settings( 'allow_attachments' );
+			}
+			elseif( ! empty( $this->link_Object->tmp_coll_ID ) )
+			{	// If comment has still no parent Item (This is a new creating comment)
+				$BlogCache = & get_BlogCache();
+				if( $comment_Blog = & $BlogCache->get_by_ID( $this->link_Object->tmp_coll_ID, false, false ) )
+				{	// If comment collection allow attachments from anonymous users:
+					$r = ( $comment_Blog->get_setting( 'allow_attachments' ) == 'any' );
+				}
+			}
+
+			if( $r )
+			{	// Anonymous users have an access to work with comment attachments:
+				return true;
+			}
+		}
+
+		if( $permlevel == 'add' )
+		{	// Check permission to add/upload new files:
+			$r = is_logged_in() && $current_User->check_perm( 'files', $permlevel, $assert, $FileRoot );
+		}
+		elseif( $this->is_temp() )
 		{	// Check permission for new creating comment:
-			return $current_User->check_perm( 'blog_comments', $permlevel, $assert, $this->link_Object->tmp_coll_ID );
+			$r = is_logged_in();// && $current_User->check_perm( 'blog_comments', $permlevel, $assert, $this->link_Object->tmp_coll_ID );
 		}
 		else
 		{	// Check permission for existing comment in DB:
 			$this->load_Blog();
-			return ( $this->Comment->is_meta() && $current_User->check_perm( 'meta_comment', $permlevel, $assert, $this->Comment ) )
+			$r = is_logged_in() && ( $this->Comment->is_meta() && $current_User->check_perm( 'meta_comment', $permlevel, $assert, $this->Comment ) )
 				|| $current_User->check_perm( 'blog_comments', $permlevel, $assert, $this->Blog->ID );
 		}
+
+		if( ! $r && $assert )
+		{	// Halt the denied access:
+			debug_die( 'You have no permission for comment attachments!' );
+		}
+
+		return $r;
 	}
 
 	/**

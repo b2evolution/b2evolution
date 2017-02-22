@@ -27,73 +27,92 @@ load_class( 'links/model/_temporaryid.class.php', 'TemporaryID' );
  *
  * @param string link type ( item, comment, ... )
  * @param integer the corresponding object ID
+ * @return object|NULL Link Owner
  */
-function & get_link_owner( $link_type, $object_ID )
+function & get_LinkOwner( $link_type, $object_ID )
 {
+	$LinkOwner = NULL;
+
+	if( empty( $object_ID ) )
+	{	// ID must be defined to get Link Owner:
+		return $LinkOwner;
+	}
+
 	switch( $link_type )
 	{
 		case 'item':
 			// Create LinkItem object:
 			$ItemCache = & get_ItemCache();
-			$Item = $ItemCache->get_by_ID( $object_ID, false );
-			$LinkOwner = new LinkItem( $Item );
+			if( $Item = & $ItemCache->get_by_ID( $object_ID, false ) )
+			{	// If Item is found in DB by ID:
+				$LinkOwner = new LinkItem( $Item );
+			}
 			break;
 
 		case 'comment':
 			// Create LinkComment object:
 			$CommentCache = & get_CommentCache();
-			$Comment = $CommentCache->get_by_ID( $object_ID, false );
-			$LinkOwner = new LinkComment( $Comment );
+			if( $Comment = & $CommentCache->get_by_ID( $object_ID, false ) )
+			{	// If Comment is found in DB by ID:
+				$LinkOwner = new LinkComment( $Comment );
+			}
 			break;
 
 		case 'user':
 			// Create LinkUser object:
 			$UserCache = & get_UserCache();
-			$User = $UserCache->get_by_ID( $object_ID, false );
-			$LinkOwner = new LinkUser( $User );
+			if( $User = & $UserCache->get_by_ID( $object_ID, false ) )
+			{	// If User is found in DB by ID:
+				$LinkOwner = new LinkUser( $User );
+			}
 			break;
 
 		case 'emailcampaign':
 			// Create LinkEmailCampaign object:
 			$EmailCampaignCache = & get_EmailCampaignCache();
-			$EmailCampaign = $EmailCampaignCache->get_by_ID( $object_ID, false );
-			$LinkOwner = new LinkEmailCampaign( $EmailCampaign );
+			if( $EmailCampaign = $EmailCampaignCache->get_by_ID( $object_ID, false ) )
+			{
+				$LinkOwner = new LinkEmailCampaign( $EmailCampaign );
+			}
 			break;
 
 		case 'message':
 			// Create LinkMessage object:
 			$MessageCache = & get_MessageCache();
-			$Message = $MessageCache->get_by_ID( $object_ID, false );
-			$LinkOwner = new LinkMessage( $Message );
+			if( $Message = & $MessageCache->get_by_ID( $object_ID, false ) )
+			{	// If Message is found in DB by ID:
+				$LinkOwner = new LinkMessage( $Message );
+			}
 			break;
 
 		case 'temporary':
 			// Create Link temporary object:
 			$TemporaryIDCache = & get_TemporaryIDCache();
-			$TemporaryID = $TemporaryIDCache->get_by_ID( $object_ID, false );
-			switch( $TemporaryID->get( 'type' ) )
-			{
-				case 'message':
-					$LinkOwner = new LinkMessage( new Message(), $object_ID );
-					break;
+			if( $TemporaryID = & $TemporaryIDCache->get_by_ID( $object_ID, false ) )
+			{	// If TemporaryID is found in DB by ID:
+				switch( $TemporaryID->get( 'type' ) )
+				{
+					case 'message':
+						load_class( 'messaging/model/_message.class.php', 'Message' );
+						$LinkOwner = new LinkMessage( new Message(), $object_ID );
+						break;
 
-				case 'item':
-					load_class( 'items/model/_item.class.php', 'Item' );
-					$LinkOwner = new LinkItem( new Item(), $object_ID );
-					break;
+					case 'item':
+						load_class( 'items/model/_item.class.php', 'Item' );
+						$LinkOwner = new LinkItem( new Item(), $object_ID );
+						break;
 
-				case 'comment':
-					load_class( 'comments/model/_comment.class.php', 'Comment' );
-					$LinkOwner = new LinkComment( new Comment(), $object_ID );
-					break;
+					case 'comment':
+						load_class( 'comments/model/_comment.class.php', 'Comment' );
+						$LinkOwner = new LinkComment( new Comment(), $object_ID );
+						break;
+				}
+				$LinkOwner->tmp_ID = $object_ID;
+				$LinkOwner->type = 'temporary';
 			}
-			$LinkOwner->tmp_ID = $object_ID;
-			$LinkOwner->type = 'temporary';
 			break;
-
-		default:
-			$LinkOwner = NULL;
 	}
+
 	return $LinkOwner;
 }
 
@@ -116,8 +135,8 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 		return;
 	}
 
-	if( ( is_logged_in() && ! $LinkOwner->check_perm( 'edit', false ) ) )
-	{	// Current user has no perm to view files:
+	if( ! $LinkOwner->check_perm( 'edit', false ) )
+	{	// Current user has no perm to edit the link owner:
 		return;
 	}
 
@@ -417,7 +436,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 									 'onclick' => 'return evo_link_change_order( this, '.$link_ID.', \'move_down\' )' ) );
 	}
 
-	if( $current_File && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
+	if( $current_File && is_logged_in() && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
 	{ // Locate file
 		$title = $current_File->dir_or_file( T_('Locate this directory!'), T_('Locate this file!') );
 		$url = $current_File->get_linkedit_url( $LinkOwner->type, $LinkOwner->get_ID() );

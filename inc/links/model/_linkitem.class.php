@@ -51,18 +51,34 @@ class LinkItem extends LinkOwner
 	}
 
 	/**
-	 * Check current User Item permission
+	 * Check current User has an access to work with attachments of the link Item
 	 *
-	 * @param string permission level
-	 * @param boolean true to assert if user dosn't have the required permission
+	 * @param string Permission level
+	 * @param boolean TRUE to assert if user dosn't have the required permission
+	 * @param object File Root to check permission to add/upload new files
+	 * @return boolean
 	 */
-	function check_perm( $permlevel, $assert = false )
+	function check_perm( $permlevel, $assert = false, $FileRoot = NULL )
 	{
 		global $current_User;
 
+		if( ! is_logged_in() )
+		{	// User must be logged in:
+			if( $assert )
+			{	// Halt the denied access:
+				debug_die( 'You have no permission for item attachments!' );
+			}
+			return false;
+		}
+
+		if( $permlevel == 'add' )
+		{	// Check permission to add/upload new files:
+			return $current_User->check_perm( 'files', $permlevel, $assert, $FileRoot );
+		}
+
 		if( $this->is_temp() )
 		{	// Check permission for new creating item:
-			return $current_User->check_perm( 'blog_post_statuses', 'edit', false, $this->link_Object->tmp_coll_ID );
+			return $current_User->check_perm( 'blog_post_statuses', $permlevel, $assert, $this->link_Object->tmp_coll_ID );
 		}
 		else
 		{	// Check permission for existing item in DB:
