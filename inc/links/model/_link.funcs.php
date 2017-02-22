@@ -856,24 +856,33 @@ function link_vote( $link_ID, $user_ID, $vote_action, $checked = 1 )
 }
 
 
-function sort_links_by_filename( $a, $b )
+/**
+ * Callback for function usort() to sort link objects by their file names
+ *
+ * @param object First Link object
+ * @param object Second Link object
+ * @return integer -1 if first file name is less than second,
+ *                  1 if first file name is greater than second,
+ *                  0 if they are equal.
+ */
+function sort_links_by_filename( $a_Link, $b_Link )
 {
-	$a_File = $a->get_File();
-	$b_File = $b->get_File();
+	$a_File = $a_Link->get_File();
+	$b_File = $b_Link->get_File();
 
-	$a_type = $a_File->dir_or_file();
-	$b_type = $b_File->dir_or_file();
+	$a_type = $a_File->dir_or_file( 'directory', 'file' );
+	$b_type = $b_File->dir_or_file( 'directory', 'file' );
 
 	if( $a_type === $b_type )
-	{
+	{	// Compare only two equal types:
 		$r = strnatcmp( $a_File->_name, $b_File->_name );
 	}
 	elseif( $a_type == 'directory' )
-	{
+	{	// Directories must be before(on the top) files:
 		$r = -1;
 	}
 	else
-	{
+	{	// Files must be after(at the bottom) directories:
 		$r = 1;
 	}
 
