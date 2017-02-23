@@ -64,7 +64,11 @@ $params = param( 'params', 'array', array() );
 switch( $action )
 {
 	case 'get_comment_form':
-		// display comment form
+		// Display comment form:
+
+		// Use the glyph or font-awesome icons if requested by skin
+		param( 'b2evo_icons_type', 'string', '' );
+
 		$ItemCache = & get_ItemCache();
 		$Item = $ItemCache->get_by_ID( $item_ID );
 		$BlogCache = & get_BlogCache();
