@@ -464,7 +464,7 @@ class LinkCache extends DataObjectCache
 			$SQL->SELECT( '*' );
 			$SQL->FROM( 'T_links' );
 			$SQL->WHERE( 'link_itm_ID  = '.$DB->quote( $item_ID ) );
-			$SQL->ORDER_BY( 'link_ltype_ID, link_file_ID' );
+			$SQL->ORDER_BY( 'link_order' );
 			$SQL->append( 'FOR UPDATE' ); // fp: we specify FOR UPDATE because we need to lock all changes to the link_order column. 
 			// fp: Note: FOR UPDATE won't do anything if we're not in a transaction (which is good)
 
@@ -500,7 +500,7 @@ class LinkCache extends DataObjectCache
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_cmt_ID  = '.$DB->quote( $comment_ID ) );
-		$SQL->ORDER_BY( 'link_file_ID' );
+		$SQL->ORDER_BY( 'link_order' );
 
 		$this->load_type_by_sql( $SQL, 'comment' );
 
@@ -533,7 +533,7 @@ class LinkCache extends DataObjectCache
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_usr_ID  = '.$DB->quote( $user_ID ) );
-		$SQL->ORDER_BY( 'link_file_ID' );
+		$SQL->ORDER_BY( 'link_order' );
 
 		$this->load_type_by_sql( $SQL, 'user' );
 
@@ -566,7 +566,7 @@ class LinkCache extends DataObjectCache
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_ecmp_ID  = '.$DB->quote( $emailcampaign_ID ) );
-		$SQL->ORDER_BY( 'link_file_ID' );
+		$SQL->ORDER_BY( 'link_order' );
 
 		$this->load_type_by_sql( $SQL, 'emailcampaign' );
 
@@ -599,7 +599,7 @@ class LinkCache extends DataObjectCache
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_msg_ID  = '.$DB->quote( $message_ID ) );
-		$SQL->ORDER_BY( 'link_file_ID' );
+		$SQL->ORDER_BY( 'link_order' );
 
 		$this->load_type_by_sql( $SQL, 'message' );
 
@@ -632,7 +632,7 @@ class LinkCache extends DataObjectCache
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_tmp_ID  = '.$DB->quote( $temporary_ID ) );
-		$SQL->ORDER_BY( 'link_file_ID' );
+		$SQL->ORDER_BY( 'link_order' );
 
 		$this->load_type_by_sql( $SQL, 'temporary' );
 
@@ -671,7 +671,7 @@ class LinkCache extends DataObjectCache
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_itm_ID IN ('.$item_list.')' );
-		$SQL->ORDER_BY( 'link_ID' );
+		$SQL->ORDER_BY( 'link_itm_ID, link_order' );
 
 		$this->load_type_by_sql( $SQL, 'item' );
 
@@ -709,7 +709,7 @@ class LinkCache extends DataObjectCache
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_cmt_ID IN ( '.$comment_list.' )' );
-		$SQL->ORDER_BY( 'link_ID' );
+		$SQL->ORDER_BY( 'link_cmt_ID, link_order' );
 
 		$this->load_type_by_sql( $SQL, 'comment' );
 	}
