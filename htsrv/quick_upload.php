@@ -484,10 +484,7 @@ if( $upload )
 					'file_ID'       => $newFile->ID,
 					'link_position' => $new_Link->get( 'position' ),
 				);
-			if( count( $LinkOwner->get_positions() ) > 1 )
-			{	// Email campaign always has only one postion, so we don't need these data:
-				$message['link_position'] = display_link_position( $mask_row );
-			}
+			$message['link_position'] = display_link_position( $mask_row );
 		}
 
 		out_echo( $message, $specialchars );

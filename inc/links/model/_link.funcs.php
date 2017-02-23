@@ -74,6 +74,7 @@ function & get_link_owner( $link_type, $object_ID )
 			switch( $TemporaryID->get( 'type' ) )
 			{
 				case 'message':
+					load_class( 'messaging/model/_message.class.php', 'Message' );
 					$LinkOwner = new LinkMessage( new Message(), $object_ID );
 					break;
 
@@ -465,9 +466,15 @@ function display_link_position( & $row )
 	global $LinkOwner;
 	global $current_File;
 
-	$r = '<select id="display_position_'.$row->link_ID.'">'
-			.Form::get_select_options_string( $LinkOwner->get_positions( $row->file_ID ), $row->link_position, true)
-		.'</select>';
+	$r = '';
+
+	if( count( $LinkOwner->get_positions() ) > 1 )
+	{	// Display a selector for link positions only if owner can has several positions:
+		// (e.g. Message and EmailCampaign support only one position "Inline", so we don't need to display this selector there)
+		$r .= '<select id="display_position_'.$row->link_ID.'">'
+				.Form::get_select_options_string( $LinkOwner->get_positions( $row->file_ID ), $row->link_position, true)
+			.'</select>';
+	}
 
 	if( $current_File )
 	{ // Display icon to insert image|video into post inline
