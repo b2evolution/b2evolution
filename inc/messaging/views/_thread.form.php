@@ -141,8 +141,7 @@ if( !empty( $thrd_recipients_array ) )
 	{
 		$recipients_selected[] = array(
 			'id'    => $recipient_ID,
-			'login' => $thrd_recipients_array['login'][$rnum],
-			'fullname' => $thrd_recipients_array['fullname'][$rnum]
+			'login' => $thrd_recipients_array['login'][$rnum]
 		);
 	}
 }

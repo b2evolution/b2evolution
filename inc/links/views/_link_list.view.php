@@ -101,14 +101,12 @@ if( $current_User->check_perm( 'files', 'view' ) )
 						);
 }
 
-if( count( $LinkOwner->get_positions() ) > 1 )
-{	// Don't display a position column for email campaign because it always has only one position 'inline':
-	$Results->cols[] = array(
-						'th' => T_('Position'),
-						'td_class' => 'shrinkwrap left',
-						'td' => '%display_link_position( {row} )%',
-					);
-}
+$Results->cols[] = array(
+					'th' => T_('Position'),
+					'th_class' => 'shrinkwrap',
+					'td_class' => 'nowrap '.( count( $LinkOwner->get_positions() ) > 1 ? 'left' : 'center' ),
+					'td' => '%display_link_position( {row} )%',
+				);
 
 // Add attr "id" to handle quick uploader
 $compact_results_params = is_admin_page() ? $AdminUI->get_template( 'compact_results' ) : $Skin->get_template( 'compact_results' );
@@ -181,7 +179,7 @@ display_dragdrop_upload_button( array(
 							.'<a class="qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'
 						.'</div>'
 					.'</td>'
-					.( count( $LinkOwner->get_positions() ) > 1 ? '<td class="qq-upload-link-position lastcol shrinkwrap"></td>' : '' )
+					.'<td class="qq-upload-link-position lastcol nowrap '.( count( $LinkOwner->get_positions() ) > 1 ? 'left' : 'center' ).'"></td>'
 				.'</tr></table>',
 		'display_support_msg'    => false,
 		'additional_dropzone'    => '#filelist_tbody',
