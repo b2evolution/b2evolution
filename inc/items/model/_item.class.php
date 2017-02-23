@@ -1507,9 +1507,11 @@ class Item extends ItemLight
 	/**
 	 * Template function: Check if user can attach files to this post comments
 	 *
+	 * @param boolean|integer ID of Temporary object to count also temporary attached files to new creating comment,
+	 *                        FALSE to count ONLY attachments of the created comments
 	 * @return boolean true if user can attach files to this post comments, false if s/he cannot
 	 */
-	function can_attach()
+	function can_attach( $link_tmp_ID = false )
 	{
 		global $Settings;
 
@@ -1523,7 +1525,7 @@ class Item extends ItemLight
 				global $DB, $current_User, $Session;
 
 				// Get a number of attachments for current user on this post
-				$attachments_count = $this->get_attachments_number();
+				$attachments_count = $this->get_attachments_number( NULL, $link_tmp_ID );
 
 				// Get the attachments from preview comment
 				global $checked_attachments;
@@ -1601,9 +1603,11 @@ class Item extends ItemLight
 	 * Get a number of attachments on this post
 	 *
 	 * @param object User
+	 * @param boolean|integer ID of Temporary object to count also temporary attached files to new creating comment,
+	 *                        FALSE to count ONLY attachments of the created comments
 	 * @return integer Number of attachments
 	 */
-	function get_attachments_number( $User = NULL )
+	function get_attachments_number( $User = NULL, $link_tmp_ID = false )
 	{
 		global $DB, $cache_item_attachments_number;
 
@@ -1618,21 +1622,26 @@ class Item extends ItemLight
 			$cache_item_attachments_number = array();
 		}
 
-		if( isset( $cache_item_attachments_number[$User->ID] ) )
-		{	// Get a number of attachments from cache variable
-			return $cache_item_attachments_number[$User->ID];
+		if( isset( $cache_item_attachments_number[ $User->ID ][ $link_tmp_ID ] ) )
+		{	// Get a number of attachments from cache variable:
+			return $cache_item_attachments_number[ $User->ID ][ $link_tmp_ID ];
 		}
 
-		// Get a number of attachments from DB
-		$SQL = new SQL();
+		// Get a number of attachments from DB:
+		$SQL = new SQL( 'Get a number of comment attachments per item #'.$this->ID.' by user #'.$User->ID );
 		$SQL->SELECT( 'COUNT( link_ID )' );
 		$SQL->FROM( 'T_links' );
-		$SQL->FROM_add( 'INNER JOIN T_comments ON comment_ID = link_cmt_ID' );
+		$SQL->FROM_add( 'LEFT JOIN T_comments ON comment_ID = link_cmt_ID' );
 		$SQL->WHERE( 'link_creator_user_ID = '.$DB->quote( $User->ID ) );
-		$SQL->WHERE_and( 'comment_item_ID = '.$DB->quote( $this->ID ) );
-		$cache_item_attachments_number[$User->ID] = (int)$DB->get_var( $SQL->get() );
+		$sql_where = 'comment_item_ID = '.$DB->quote( $this->ID );
+		if( $link_tmp_ID )
+		{	// Count also the attached files to new creating comment:
+			$sql_where .= ' OR ( comment_item_ID IS NULL AND link_tmp_ID = '.$DB->quote( $link_tmp_ID ).' )';
+		}
+		$SQL->WHERE_and( $sql_where );
+		$cache_item_attachments_number[ $User->ID ][ $link_tmp_ID ] = intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
 
-		return $cache_item_attachments_number[$User->ID];
+		return $cache_item_attachments_number[ $User->ID ][ $link_tmp_ID ];
 	}
 
 

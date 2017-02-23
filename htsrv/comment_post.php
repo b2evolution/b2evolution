@@ -259,6 +259,8 @@ else
 	$Comment->set( 'author_url', $url );
 	$Comment->set( 'allow_msgform', $comment_allow_msgform );
 }
+// Set temporary ID to keep the attached files after redirect to preview comment or to correct some form errors:
+$Comment->temp_link_owner_ID = param( 'temp_link_owner_ID', 'integer', NULL );
 
 if( ! $Comment->is_meta() && $commented_Item->can_rate() )
 {	// Comment rating:
@@ -303,7 +305,7 @@ if( !empty( $preview_attachments ) )
 	}
 }
 
-if( $commented_Item->can_attach() && !empty( $_FILES['uploadfile'] ) && !empty( $_FILES['uploadfile']['size'] ) && !empty( $_FILES['uploadfile']['size'][0] ) )
+if( $commented_Item->can_attach( $Comment->temp_link_owner_ID ) && !empty( $_FILES['uploadfile'] ) && !empty( $_FILES['uploadfile']['size'] ) && !empty( $_FILES['uploadfile']['size'][0] ) )
 { // attaching files is permitted
 	$FileRootCache = & get_FileRootCache();
 	if( is_logged_in() )
@@ -415,7 +417,6 @@ if( $action == 'preview' )
 	$Comment->set( 'original_content', html_entity_decode( $original_comment ) ); // used in the textarea input field again
 	$Comment->set( 'preview_attachments', $preview_attachments ); // memorize attachments
 	$Comment->set( 'checked_attachments', $checked_attachments ); // memorize checked attachments
-	$Comment->set( 'temp_link_owner_ID', param( 'temp_link_owner_ID', 'integer', NULL ) );
 	$Comment->set( 'email_is_detected', $comments_email_is_detected ); // used to change a style of the comment
 	// Set Comment Item object to NULL, so this way the Item object won't be serialized, but the item_ID is still set
 	$Comment->Item = NULL;

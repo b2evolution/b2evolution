@@ -72,7 +72,7 @@ class LinkComment extends LinkOwner
 		if( $permlevel == 'add' )
 		{	// Check permission to add/upload new files:
 			$comment_Item = & $this->get_Item();
-			$r = $comment_Item->can_attach();
+			$r = $comment_Item->can_attach( $this->is_temp() ? $this->get_ID() : false );
 		}
 		elseif( $this->is_temp() )
 		{	// Check permission for new creating comment:
