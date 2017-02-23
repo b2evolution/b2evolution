@@ -78,7 +78,7 @@ class LinkItem extends LinkOwner
 
 		if( $this->is_temp() )
 		{	// Check permission for new creating item:
-			return $current_User->check_perm( 'blog_post_statuses', $permlevel, $assert, $this->link_Object->tmp_coll_ID );
+			return $current_User->check_perm( 'blog_post_statuses', $permlevel, $assert, $this->get_blog_ID() );
 		}
 		else
 		{	// Check permission for existing item in DB:
@@ -176,7 +176,7 @@ class LinkItem extends LinkOwner
 			}
 			else
 			{
-				$this->Links = $LinkCache->get_by_item_ID( $this->Item->ID );
+				$this->Links = $LinkCache->get_by_item_ID( $this->get_ID() );
 			}
 		}
 	}
@@ -231,21 +231,19 @@ class LinkItem extends LinkOwner
 	}
 
 	/**
-	 * Set Blog
+	 * Load collection of the onwer Item
 	 */
 	function load_Blog()
 	{
-		if( is_null( $this->Blog ) )
-		{
-			$Item = $this->Item;
-			if( $Item->ID == 0 )
-			{	// This is a request of new creating Item (for example, preview mode),
-				// We should use current collection, because new Item has no category ID yet here to load Collection:
-				global $Blog;
-				$this->Blog = $Blog;
+		if( $this->Blog === NULL )
+		{	// Try to get Item from DB and store in cache to next requests:
+			if( $this->is_temp() )
+			{	// If new Comment is creating
+				$BlogCache = & get_BlogCache();
+				$this->Blog = & $BlogCache->get_by_ID( $this->link_Object->tmp_coll_ID, false, false );
 			}
 			else
-			{	// Use Collection of the existing Item:
+			{	// If existing Item is editing
 				$this->Blog = & $this->Item->get_Blog();
 			}
 		}
@@ -279,24 +277,23 @@ class LinkItem extends LinkOwner
 			global $admin_url;
 			if( $this->is_temp() )
 			{	// New creating Item:
-				return $admin_url.'?ctrl=items&amp;blog='.$this->link_Object->tmp_coll_ID.'&amp;action=new';
+				return $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;action=new';
 			}
 			else
 			{	// The edited Item:
-				$this->load_Blog();
-				return $admin_url.'?ctrl=items&amp;blog='.$this->Blog->ID.'&amp;action=edit&amp;p='.$this->Item->ID;
+				return $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;action=edit&amp;p='.$this->get_ID();
 			}
 		}
 		else
 		{	// Front-office:
-			global $Blog;
+			$item_Blog = & $this->get_Blog();
 			if( $this->is_temp() )
 			{	// New creating Item:
-				return url_add_param( $Blog->get( 'url' ), 'disp=edit' );
+				return url_add_param( $item_Blog->get( 'url' ), 'disp=edit' );
 			}
 			else
-			{	// The edited Item:
-				return url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;p='.$this->Item->ID );
+			{	// The editing Item:
+				return url_add_param( $item_Blog->get( 'url' ), 'disp=edit&amp;p='.$this->get_ID() );
 			}
 		}
 	}
@@ -311,24 +308,23 @@ class LinkItem extends LinkOwner
 			global $admin_url;
 			if( $this->is_temp() )
 			{	// New creating Item:
-				return $admin_url.'?ctrl=items&amp;blog='.$this->link_Object->tmp_coll_ID.'&amp;action=new';
+				return $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;action=new';
 			}
 			else
-			{	// The edited Item:
-				$this->load_Blog();
-				return $admin_url.'?ctrl=items&amp;blog='.$this->Blog->ID.'&amp;p='.$this->Item->ID;
+			{	// The editing Item:
+				return $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->get_ID();
 			}
 		}
 		else
 		{	// Front-office:
-			global $Blog;
 			if( $this->is_temp() )
 			{	// New creating Item:
-				return url_add_param( $Blog->get( 'url' ), 'disp=edit' );
+				$item_Blog = & $this->get_Blog();
+				return url_add_param( $item_Blog->get( 'url' ), 'disp=edit' );
 			}
 			else
-			{	// The edited Item:
-				return url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;p='.$this->Item->ID );
+			{	// The editing Item:
+				return $this->Item->get_permanent_url();
 			}
 		}
 	}

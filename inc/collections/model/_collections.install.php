@@ -520,6 +520,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			tmp_ID      INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			tmp_type    VARCHAR(32) COLLATE ascii_general_ci NOT NULL,
 			tmp_coll_ID INT(11) UNSIGNED NULL,
+			tmp_item_ID INT(11) UNSIGNED NULL COMMENT 'Link to parent Item of Comment in order to enable permission checks',
 			PRIMARY KEY (tmp_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 

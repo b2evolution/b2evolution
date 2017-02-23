@@ -106,12 +106,12 @@ $link_owner_type = ( $LinkOwner->type == 'temporary' ) ? $LinkOwner->link_Object
 switch( $link_owner_type )
 {
 	case 'item':
-		$upload_fileroot = FileRoot::gen_ID( 'collection', ( $LinkOwner->is_temp() ? $LinkOwner->link_Object->tmp_coll_ID : $Blog->ID ) );
+		$upload_fileroot = FileRoot::gen_ID( 'collection', $LinkOwner->get_blog_ID() );
 		$upload_path = '/quick-uploads/'.( $LinkOwner->is_temp() ? 'tmp' : 'p' ).$LinkOwner->get_ID().'/';
 		break;
 
 	case 'comment':
-		$upload_fileroot = FileRoot::gen_ID( 'collection', ( $LinkOwner->is_temp() ? $LinkOwner->link_Object->tmp_coll_ID : $Blog->ID ) );
+		$upload_fileroot = FileRoot::gen_ID( 'collection', $LinkOwner->get_blog_ID() );
 		$upload_path = '/quick-uploads/'.( $LinkOwner->is_temp() ? 'tmp' : 'c' ).$LinkOwner->get_ID().'/';
 		break;
 
