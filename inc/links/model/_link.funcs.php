@@ -457,28 +457,32 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 
 
 /**
- * Display link position edit action
+ * Display link position edit actions
  *
- * @param $row
+ * @param object Row of SQL query from T_links and T_files
+ * @return string
  */
 function display_link_position( & $row )
 {
 	global $LinkOwner;
-	global $current_File;
 
 	$r = '';
 
-	if( count( $LinkOwner->get_positions() ) > 1 )
+	// Get available link position for current link owner and file:
+	$available_positions = $LinkOwner->get_positions( $row->file_ID );
+
+	if( count( $available_positions ) > 1 )
 	{	// Display a selector for link positions only if owner can has several positions:
 		// (e.g. Message and EmailCampaign support only one position "Inline", so we don't need to display this selector there)
 		$r .= '<select id="display_position_'.$row->link_ID.'">'
-				.Form::get_select_options_string( $LinkOwner->get_positions( $row->file_ID ), $row->link_position, true)
+				.Form::get_select_options_string( $available_positions, $row->link_position, true)
 			.'</select>';
 	}
 
-	if( $current_File )
-	{ // Display icon to insert image|video into post inline
-		$type = $current_File->get_file_type();
+	if( isset( $available_positions['inline'] ) )
+	{	// If link owner support inline position,
+		// Display icon to insert image, audio, video or file inline tag into content:
+		$type = $row->file_type;
 
 		// valid file types: audio, video, image, other. See @link File::set_file_type()
 		switch( $type )
@@ -504,18 +508,14 @@ function display_link_position( & $row )
 						'onclick' => 'evo_link_insert_inline( \'image\', '.$row->link_ID.', \'\' )',
 						'style'   => 'cursor:default;'
 					) );
-		}
 
-		if( $type == 'image' )
-		{
 			$r .= ' '.get_icon( 'add__yellow', 'imgtag', array(
 						'title'   => T_('Insert [thumbnail:] tag into the post'),
 						'onclick' => 'evo_link_insert_inline( \'thumbnail\', '.$row->link_ID.', \'medium:left\' )',
 						'style'   => 'cursor:default;'
 					) );
 		}
-
-		if( $type == 'audio' || $type == 'video'  || $type == 'file' )
+		elseif( $type == 'audio' || $type == 'video' || $type == 'file' )
 		{
 			$r .= ' '.get_icon( 'add__blue', 'imgtag', array(
 						'title'   => sprintf( T_('Insert %s tag into the post'), '['.$type.':]' ),
@@ -523,7 +523,6 @@ function display_link_position( & $row )
 						'style'   => 'cursor:default;'
 					) );
 		}
-
 	}
 
 	return str_replace( array( "\r", "\n" ), '', $r );
