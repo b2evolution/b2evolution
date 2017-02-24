@@ -288,8 +288,8 @@ class Message extends DataObject
 			// so we do a quick copying of all links from source message to current:
 			global $DB;
 			$DB->query( 'INSERT INTO T_links
-			     ( link_msg_ID,   link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_file_ID, link_ltype_ID, link_position, link_order )
-			SELECT '.$this->ID.', link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_file_ID, link_ltype_ID, link_position, link_order
+			     ( link_msg_ID,   link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_file_ID, link_position, link_order )
+			SELECT '.$this->ID.', link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_file_ID, link_position, link_order
 			  FROM T_links
 			 WHERE link_msg_ID = '.$source_msg_ID );
 		}

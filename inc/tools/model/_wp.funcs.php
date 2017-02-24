@@ -1105,7 +1105,6 @@ function wpxml_parser( $file )
 				'link_cmt_ID'           => (int) $link->link_cmt_ID,
 				'link_usr_ID'           => (int) $link->link_usr_ID,
 				'link_file_ID'          => (int) $link->link_file_ID,
-				'link_ltype_ID'         => (int) $link->link_ltype_ID,
 				'link_position'         => (string) $link->link_position,
 				'link_order'            => (int) $link->link_order,
 			);

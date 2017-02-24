@@ -813,9 +813,9 @@ switch( $action )
 					if( $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $original_Item ) )
 					{	// Current user must has a permission to view an original item
 						$DB->query( 'INSERT INTO T_links ( link_datecreated, link_datemodified, link_creator_user_ID,
-								link_lastedit_user_ID, link_itm_ID, link_file_ID, link_ltype_ID, link_position, link_order )
+								link_lastedit_user_ID, link_itm_ID, link_file_ID, link_position, link_order )
 							SELECT '.$DB->quote( date2mysql( $localtimenow ) ).', '.$DB->quote( date2mysql( $localtimenow ) ).', '.$current_User->ID.',
-								'.$current_User->ID.', '.$edited_Item->ID.', link_file_ID, link_ltype_ID, link_position, link_order
+								'.$current_User->ID.', '.$edited_Item->ID.', link_file_ID, link_position, link_order
 									FROM T_links
 									WHERE link_itm_ID = '.$original_Item->ID );
 					}

@@ -22,7 +22,6 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
  */
 class Link extends DataObject
 {
-	var $ltype_ID = 0;
 	var $file_ID = 0;
 	var $position;
 	var $order;
@@ -50,8 +49,7 @@ class Link extends DataObject
 
 		if( $db_row != NULL )
 		{
-			$this->ID       = $db_row->link_ID;
-			$this->ltype_ID = $db_row->link_ltype_ID;
+			$this->ID = $db_row->link_ID;
 
 			// source of link:
 			if( $db_row->link_itm_ID != NULL )
