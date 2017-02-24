@@ -59,9 +59,10 @@ class LinkUser extends LinkOwner
 	/**
 	 * Get all positions ( key, display ) pairs where link can be displayed
 	 *
+	 * @param integer File ID
 	 * @return array
 	 */
-	function get_positions()
+	function get_positions( $file_ID = NULL )
 	{
 		return array();
 	}

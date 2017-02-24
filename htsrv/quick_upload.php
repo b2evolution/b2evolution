@@ -482,6 +482,7 @@ if( $upload )
 			$mask_row = (object) array(
 					'link_ID'       => $new_Link->ID,
 					'file_ID'       => $newFile->ID,
+					'file_type'     => $newFile->get_file_type(),
 					'link_position' => $new_Link->get( 'position' ),
 				);
 			$message['link_position'] = display_link_position( $mask_row );
