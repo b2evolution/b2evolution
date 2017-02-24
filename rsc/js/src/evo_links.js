@@ -100,17 +100,22 @@ function evo_link_change_position( selectInput, url, crumb )
  *
  * @param string Type: 'image', 'file', 'video'
  * @param integer File ID
- * @param string Caption text
+ * @param string Options text
  */
-function evo_link_insert_inline( type, link_ID, option )
+function evo_link_insert_inline( type, link_ID, options, replace )
 {
+	if( replace == undefined )
+	{
+		replace = 0;
+	}
+
 	if( typeof( b2evoCanvas ) != 'undefined' )
 	{ // Canvas exists
 		var insert_tag = '[' + type + ':' + link_ID;
 
-		if( option.length )
+		if( options.length )
 		{
-			insert_tag += ':' + option;
+			insert_tag += ':' + options;
 		}
 
 		insert_tag += ']';
@@ -128,7 +133,7 @@ function evo_link_insert_inline( type, link_ID, option )
 		}
 
 		// Insert an image tag
-		textarea_wrap_selection( b2evoCanvas, insert_tag, '', 0, window.document );
+		textarea_wrap_selection( b2evoCanvas, insert_tag, '', replace, window.document );
 	}
 }
 
@@ -165,12 +170,7 @@ function evo_link_delete( event_object, type, link_ID, action )
 		}
 
 		// Remove attachment row from table:
-		var rows = jQuery( 'a[data-link-id=' + link_ID + ']' ).closest( 'tr' );
-		jQuery.each( rows, function( i, row ) {
-			var row = jQuery( row );
-			row.remove();
-		});
-
+		jQuery( event_object ).closest( 'tr' ).remove();
 
 		// Update the attachment block height after deleting row:
 		evo_link_fix_wrapper_height();
@@ -195,19 +195,16 @@ function evo_link_change_order( event_object, link_ID, action )
 	function( data )
 	{
 		// Change an order in the attachments table
-		var rows = jQuery( 'a[data-link-id=' + link_ID + ']' ).closest( 'tr' );
-		jQuery.each( rows, function( i, row ) {
-			var row = jQuery( row );
-			if( action == 'move_up' )
-			{	// Move up:
-				row.prev().before( row );
-			}
-			else
-			{	// Move down:
-				row.next().after( row );
-			}
-			evoFadeSuccess( row );
-		} );
+		var row = jQuery( event_object ).closest( 'tr' );
+		if( action == 'move_up' )
+		{	// Move up:
+			row.prev().before( row );
+		}
+		else
+		{	// Move down:
+			row.next().after( row );
+		}
+		evoFadeSuccess( row );
 	},
 	'POST' );
 

@@ -60,7 +60,7 @@ $Form->labelend = "</strong>\n";
 
 
 // ================================ START OF EDIT FORM ================================
-
+echo_image_insert_modal();
 $iframe_name = NULL;
 $params = array();
 if( !empty( $bozo_start_modified ) )

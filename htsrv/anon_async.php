@@ -1401,6 +1401,79 @@ switch( $action )
 		}
 		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
 
+	case 'get_insert_image_form':
+	case 'get_edit_image_form':
+		$BlogCache = & get_BlogCache();
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
+		$skin_ID = $Blog->get_skin_ID();
+		$SkinCache = & get_SkinCache();
+		$Skin = & $SkinCache->get_by_ID( $skin_ID );
+		$restrict_tag = false;
+
+		if( $action == 'get_insert_image_form' )
+		{
+			$tag_type = param( 'tag_type', 'string', 'image' );
+			$link_ID = param( 'link_ID', 'integer', true );
+			$replace = 0;
+
+			$image_caption = NULL;
+			$image_class = NULL;
+			$image_disable_caption = false;
+			$thumbnail_size = 'medium';
+			$thumbnail_alignment = 'left';
+			$thumbnail_class = NULL;
+			$inline_class = NULL;
+		}
+		else
+		{
+			$restrict_tag = true;
+			$short_tag = param( 'short_tag', 'string', true );
+			$short_tag = rawurldecode( $short_tag );
+			$replace = 1;
+
+			$parts = trim( $short_tag, '[]' );
+			$parts = explode( ':', $parts );
+
+			$tag_type = $parts[0];
+			$link_ID = $parts[1];
+
+			switch( $tag_type )
+			{
+				case 'image':
+					$image_caption = isset( $parts[2] ) ? $parts[2] : NULL;
+					$image_class = isset( $parts[3] ) ? $parts[3] : NULL;
+					$image_disable_caption = ( isset( $image_caption ) && $image_caption == '-' );
+					$image_caption = $image_caption == '-' ? NULL : $image_caption; // disable caption, reset caption to empty string
+					break;
+
+				case 'thumbnail':
+					$thumbnail_size = isset( $parts[2] ) ? $parts[2] : 'medium';
+					$thumbnail_alignment = isset( $parts[3] ) ? $parts[3] : 'left';
+					$thumbnail_class = isset( $parts[4] ) ? $parts[4] : NULL;
+					break;
+
+				case 'inline':
+					$inline_class = isset( $parts[2] ) ? $parts[2] : NULL;
+					break;
+			}
+		}
+
+		$LinkCache = & get_LinkCache();
+		if( ( $Link = & $LinkCache->get_by_ID( $link_ID ) ) === false )
+		{ // Bad request with incorrect link ID
+			echo '';
+			exit(0);
+		}
+
+		if( ( $File = & $Link->get_File() ) && empty( $File ) )
+		{ // File no longer available
+			echo '';
+			exit(0);
+		}
+
+		require $inc_path.'items/views/_item_image.form.php';
+		break;
+
 	case 'set_object_link_position':
 		// Change a position of a link on the edit item screen (fieldset "Images & Attachments")
 

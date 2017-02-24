@@ -105,100 +105,8 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 			}
 
 			if( selected && ( selectedType == 'image' ) ) {
-				var selectedData = getRenderedNodeData( selected );
-
-				win = editor.windowManager.open( {
-					title: 'Edit Image',
-					body: [
-						{
-							type: 'textbox',
-							name: 'caption',
-							label: 'Caption',
-							minWidth: 500,
-							value: selectedData.caption && !selectedData.disableCaption ? selectedData.caption : null,
-							disabled: selectedData.disableCaption
-						},
-						{
-							type: 'checkbox',
-							name: 'disableCaption',
-							label: 'Disable caption',
-							checked: selectedData.disableCaption,
-						},
-						{
-							type: 'textbox',
-							name: 'extraClass',
-							label: 'Additional class:',
-							minWidth: 500,
-							value: selectedData.extraClass ? selectedData.extraClass : null
-						},
-					],
-					buttons: [
-						{
-							text: 'Update',
-							onclick: function() {
-								var captionCtrl = win.find('#caption')[0];
-								var disableCaptionCtrl = win.find('#disableCaption')[0];
-								var classCtrl = win.find('#extraClass')[0];
-								var tag = '[image:' + selectedData.linkId;
-
-								if( disableCaptionCtrl.checked() || captionCtrl.value() == '-' ) {
-									tag += ':-';
-								} else {
-									tag += ':' + captionCtrl.value();
-								}
-								tag += classCtrl.value() ? ':' + classCtrl.value() : '';
-								tag += ']';
-
-								// Get rendered tag and output directly
-								var renderedTag = getRenderedTag( tag );
-
-								if( renderedTag === false )
-								{
-									getRenderedTags( [ tag ], function( rTags ) {
-											for( var i = 0; i < renderedTags.length; i++ ) {
-												if( renderedTags[i].shortTag == tag )	{
-													renderedTag = renderedTags[i];
-													break;
-												}
-											}
-
-											if( renderedTag )	{
-												if( selected ) {
-													editor.dom.replace( renderedTag.node, selected, false );
-												} else {
-													editor.insertContent( renderedTag.html );
-												}
-
-												editor.windowManager.close();
-											}
-										} );
-								}
-								else
-								{
-									if( selected ) {
-										editor.dom.replace( renderedTag.node, selected, false );
-									}	else {
-										editor.insertContent( renderedTag.html );
-									}
-
-									editor.windowManager.close();
-								}
-							}
-						},
-						{
-							text: 'Cancel',
-							onclick: 'close'
-						},
-					]
-				} );
-
-				var disableCaptionCtrl = win.find( '#disableCaption' )[0];
-				var captionCtrl = win.find( '#caption' )[0];
-
-				disableCaptionCtrl.on( 'click', function( event ) {
-					captionCtrl.disabled( disableCaptionCtrl.checked() );
-				} );
-
+				var shortTag = getShortTagFromRenderedNode( selected );
+				evo_item_image_edit( editor.settings.blog_ID, shortTag );
 			} else {
 				var root, path, fm_highlight;
 				openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="Loading..."></span>',
@@ -685,6 +593,12 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 		} else {
 			return false;
 		}
+	}
+
+
+	function getShortTagFromRenderedNode( node )
+	{
+		return node.getAttribute( 'data-evo-tag' );
 	}
 
 

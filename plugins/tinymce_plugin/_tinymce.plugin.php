@@ -42,7 +42,7 @@ class tinymce_plugin extends Plugin
 
 	var $collection = NULL;
 	var $post_ID = NULL;
-
+	var $blog_ID = NULL;
 
 	function PluginInit( & $params )
 	{
@@ -597,7 +597,7 @@ class tinymce_plugin extends Plugin
 											{
 												var value = params.before + sel + params.after;
 											}
-											inst.selection.setContent(value);
+											inst.selection.setContent( value );
 
 											return true;
 										}, true );
@@ -694,6 +694,7 @@ class tinymce_plugin extends Plugin
 		global $localtimenow, $debug, $rsc_url, $rsc_path, $skins_url;
 		global $UserSettings;
 		global $ReqHost;
+
 		global $baseurl;
 
 		$tmce_plugins_array = array(
@@ -860,6 +861,7 @@ class tinymce_plugin extends Plugin
 
 		// Configuration: -- http://wiki.moxiecode.com/index.php/TinyMCE:Configuration
 		$init_options = array();
+		$init_options[] = 'blog_ID: '.( !empty($Blog) ? $Blog->ID : 'null' );
 		$init_options[] = 'selector: "textarea#'.$content_id.'"';
 		if( $this->Settings->get( 'use_gzip_compressor' ) )
 		{	// Load script to use gzip compressor:
@@ -1061,7 +1063,7 @@ class tinymce_plugin extends Plugin
 
 	function htsrv_insert_inline( $params )
 	{
-		global $UserSettings, $current_User, $adminskins_path, $AdminUI, $is_admin_page;
+		global $UserSettings, $current_User, $adminskins_path, $AdminUI, $is_admin_page, $blog;
 
 		$is_admin_page = true;
 		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
@@ -1075,6 +1077,11 @@ class tinymce_plugin extends Plugin
 		}
 		$ItemCache = & get_ItemCache();
 		$edited_Item = & $ItemCache->get_by_ID( $params['post_ID'] );
+
+		if( empty( $blog ) )
+		{
+			$blog = $edited_Item->get_Blog()->ID;
+		}
 
 		if( isset( $GLOBALS['files_Module'] )
 		&& $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item )

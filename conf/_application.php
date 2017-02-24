@@ -31,12 +31,12 @@ $app_version_long = $app_version.'-'.$app_date;
 /**
  * This is used to check if the database is up to date.
  *
- * This will be incrememented by 5 with each change in {@link upgrade_b2evo_tables()}
+ * This will be incrememented by 10 with each change in {@link upgrade_b2evo_tables()}
  * in order to leave space for maintenance releases.
  *
  * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 12185;
+$new_db_version = 12186;
 
 /**
  * Minimum PHP version required for b2evolution to function properly. It will contain each module own minimum PHP version as well.

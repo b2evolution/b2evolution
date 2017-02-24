@@ -465,7 +465,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
  */
 function display_link_position( & $row )
 {
-	global $LinkOwner;
+	global $LinkOwner, $blog;
 	global $current_File;
 
 	$r = '<select id="display_position_'.$row->link_ID.'">'
@@ -496,20 +496,12 @@ function display_link_position( & $row )
 		if( $type == 'image' )
 		{
 			$r .= ' '.get_icon( 'add', 'imgtag', array(
-						'title'   => sprintf( T_('Insert %s tag into the post'), '['.$type.':]' ),
-						'onclick' => 'evo_link_insert_inline( \'image\', '.$row->link_ID.', \'\' )',
-						'style'   => 'cursor:default;'
-					) );
+					'title'   => sprintf( T_('Insert %s into the post'), $type ),
+					'onclick' => 'evo_item_image_insert( '.$blog.', \'image\', '.$row->link_ID.' )',
+					'style'   => 'cursor:default;'
+				) );
 		}
 
-		if( $type == 'image' )
-		{
-			$r .= ' '.get_icon( 'add__yellow', 'imgtag', array(
-						'title'   => T_('Insert [thumbnail:] tag into the post'),
-						'onclick' => 'evo_link_insert_inline( \'thumbnail\', '.$row->link_ID.', \'medium:left\' )',
-						'style'   => 'cursor:default;'
-					) );
-		}
 
 		if( $type == 'audio' || $type == 'video'  || $type == 'file' )
 		{
