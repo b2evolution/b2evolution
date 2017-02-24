@@ -782,18 +782,14 @@ qq.extend(qq.FileUploader.prototype, {
 		else // table
 		{
 			jQuery( fileElement ).attr( 'rel', this._formatFileName(fileName) );
-			var tr_prev = jQuery( '#filelist_tbody tr:last' );
-			var tr_class = 'even';
-			if( tr_prev.hasClass( 'even' ) )
-			{
-				tr_class = 'odd';
-			}
+			var tr_prev = jQuery( this._listElement ).find( 'tr:last' );
+			var tr_class = ( tr_prev.hasClass( 'even' ) ? 'odd' : 'even' );
 			var item_tbody = jQuery( item ).children( 'tbody' ).eq(0);
 			item_tbody.children( 'tr' ).attr( {
 					rel: 'file_upload_' + id,
 					class: tr_class
 				} );
-			jQuery( '#filelist_tbody' ).append( item_tbody.html() );
+			jQuery( this._listElement ).append( item_tbody.html() );
 		}
 	},
 	_getItemByFileId: function(id){
@@ -810,7 +806,7 @@ qq.extend(qq.FileUploader.prototype, {
 		}
 		else // table
 		{
-			return jQuery( 'tr[rel=file_upload_' + id + ']' ).get( 0 );
+			return jQuery( this._listElement ).find( 'tr[rel=file_upload_' + id + ']' ).get( 0 );
 		}
 	},
 	/**

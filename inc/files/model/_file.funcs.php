@@ -2252,6 +2252,7 @@ function display_dragdrop_upload_button( $params = array() )
 			'resize_frame'           => false, // Resize frame on upload new image
 			'table_headers'          => '', // Use this html text as table headers when first file is loaded
 			'filename_select'        => '', // Append this text before file name on success uploading of new file
+			'fieldset_prefix'        => '', // Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
 		), $params );
 
 	$LinkOwner = & $params['LinkOwner'];
@@ -2277,7 +2278,7 @@ function display_dragdrop_upload_button( $params = array() )
 	}
 
 	?>
-	<div id="file-uploader" style="width:100%">
+	<div id="<?php echo $params['fieldset_prefix']; ?>file-uploader" style="width:100%">
 		<noscript>
 			<p><?php echo T_('Please enable JavaScript to use file uploader.'); ?></p>
 		</noscript>
@@ -2295,32 +2296,32 @@ function display_dragdrop_upload_button( $params = array() )
 			var file_uploader_note_text = '<?php echo TS_('Your browser does not support full upload functionality: You can only upload files one by one and you cannot use Drag & Drop.') ?>';
 		}
 
-		var url = <?php echo '"'.$quick_upload_url.'&'.url_crumb( 'file' ).'"'; ?>;
-		var root_and_path = '<?php echo $root_and_path ?>';
+		var <?php echo $params['fieldset_prefix']; ?>url = <?php echo '"'.$quick_upload_url.'&'.url_crumb( 'file' ).'"'; ?>;
+		var <?php echo $params['fieldset_prefix']; ?>root_and_path = '<?php echo $root_and_path ?>';
 
 		jQuery( '#fm_dirtree input[type=radio]' ).click( function()
 		{
-			url = "<?php echo $quick_upload_url; ?>"+"&root_and_path="+this.value+"&"+"<?php echo url_crumb( 'file' ); ?>";
-			root_and_path = this.value;
-			uploader.setParams({root_and_path: root_and_path});
+			<?php echo $params['fieldset_prefix']; ?>url = "<?php echo $quick_upload_url; ?>"+"&root_and_path="+this.value+"&"+"<?php echo url_crumb( 'file' ); ?>";
+			<?php echo $params['fieldset_prefix']; ?>root_and_path = this.value;
+			<?php echo $params['fieldset_prefix']; ?>uploader.setParams({root_and_path: <?php echo $params['fieldset_prefix']; ?>root_and_path});
 		} );
 
 		<?php
 		if( $LinkOwner !== NULL )
 		{	// Add params to link a file right after uploading:
-			echo 'url += "&link_owner='.$LinkOwner->type.'_'.$LinkOwner->get_ID().'_'.intval( $LinkOwner->is_temp() ).'"';
+			echo $params['fieldset_prefix'].'url += "&link_owner='.$LinkOwner->type.'_'.$LinkOwner->get_ID().'_'.intval( $LinkOwner->is_temp() ).'"';
 		}
 		?>
 
 		jQuery( document ).ready( function()
 		{
-			uploader = new qq.FileUploader(
+			<?php echo $params['fieldset_prefix']; ?>uploader = new qq.FileUploader(
 			{
-				element: document.getElementById( 'file-uploader' ),
+				element: document.getElementById( '<?php echo $params['fieldset_prefix']; ?>file-uploader' ),
 				listElement: <?php echo $params['listElement']; ?>,
 				list_style: '<?php echo $params['list_style']; ?>',
 				additional_dropzone: '<?php echo $params['additional_dropzone']; ?>',
-				action: url,
+				action: <?php echo $params['fieldset_prefix']; ?>url,
 				sizeLimit: <?php echo ( $Settings->get( 'upload_maxkb' ) * 1024 ); ?>,
 				debug: false,
 				messages: {
@@ -2332,7 +2333,7 @@ function display_dragdrop_upload_button( $params = array() )
 				},
 				onSubmit: function( id, fileName )
 				{
-					var noresults_row = jQuery( 'tr.noresults' );
+					var noresults_row = jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table tr.noresults' );
 					if( noresults_row.length )
 					{ // Add table headers and remove "No results" row
 						<?php
@@ -2367,7 +2368,7 @@ function display_dragdrop_upload_button( $params = array() )
 						?>
 						if( responseJSON.success.status != undefined && responseJSON.success.status == 'rename' )
 						{
-							jQuery('#saveBtn').show();
+							jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table #saveBtn' ).show();
 						}
 						<?php } ?>
 					}
@@ -2376,7 +2377,7 @@ function display_dragdrop_upload_button( $params = array() )
 					if( $params['list_style'] == 'table' )
 					{ // Table view
 					?>
-					var this_row = jQuery( 'tr[rel=file_upload_' + id + ']' );
+					var this_row = jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table tr[rel=file_upload_' + id + ']' );
 
 					if( responseJSON.success == undefined || responseJSON.success.status == 'error' || responseJSON.success.status == 'fatal' )
 					{ // Failed
@@ -2461,7 +2462,7 @@ function display_dragdrop_upload_button( $params = array() )
 								+ '<div style="display:none"><?php echo TS_('Revert'); ?></div>'
 								+ '</a>'
 								+ warning );
-							var old_file_obj = jQuery( 'input[type=hidden][value="' + responseJSON.success.oldpath + '"]' );
+							var old_file_obj = jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table input[type=hidden][value="' + responseJSON.success.oldpath + '"]' );
 							if( old_file_obj.length > 0 )
 							{
 								old_file_obj.parent().append( ' <span class="orange"><?php echo TS_('(Old File)'); ?></span>' );
@@ -2485,24 +2486,24 @@ function display_dragdrop_upload_button( $params = array() )
 					else
 					{ // Simple list
 					?>
-						jQuery( uploader._getItemByFileId( id ) ).append( text );
+						jQuery( <?php echo $params['fieldset_prefix']; ?>uploader._getItemByFileId( id ) ).append( text );
 						if( responseJSON.success == undefined && responseJSON != '' )
 						{ // Disppay the fatal errors
-							jQuery( uploader._getItemByFileId( id ) ).append( responseJSON );
+							jQuery( <?php echo $params['fieldset_prefix']; ?>uploader._getItemByFileId( id ) ).append( responseJSON );
 						}
 					<?php
 					}
 
 					if( $params['resize_frame'] )
-					{ // Resize frame after upload new image
+					{	// Resize attachments fieldset after upload new image:
 					?>
-					update_iframe_height();
-					jQuery( 'img' ).on( 'load', function() { update_iframe_height(); } );
+					update_iframe_height( '<?php echo $params['fieldset_prefix']; ?>' );
+					jQuery( document ).on( 'load', '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table img', function() { update_iframe_height( '<?php echo $params['fieldset_prefix']; ?>' ); } );
 					<?php } ?>
 				},
 				template: '<?php echo str_replace( '#button_text#', "' + button_text + '", $params['template_button'] ); ?>',
 				fileTemplate: '<?php echo $params['template_filerow']; ?>',
-				params: { root_and_path: root_and_path }
+				params: { root_and_path: <?php echo $params['fieldset_prefix']; ?>root_and_path }
 			} );
 		} );
 
@@ -2510,10 +2511,10 @@ function display_dragdrop_upload_button( $params = array() )
 		if( $params['resize_frame'] )
 		{ // Resize frame after upload new image
 		?>
-		function update_iframe_height()
+		function update_iframe_height( fieldset_prefix )
 		{
-			var table_height = jQuery( '#attachments_fieldset_table' ).height();
-			jQuery( '#attachments_fieldset_wrapper' ).css( { 'height': table_height, 'max-height': table_height } );
+			var table_height = jQuery( '#' + fieldset_prefix + 'attachments_fieldset_table' ).height();
+			jQuery( '#' + fieldset_prefix + 'attachments_fieldset_wrapper' ).css( { 'height': table_height, 'max-height': table_height } );
 		}
 		<?php } ?>
 
@@ -2522,14 +2523,14 @@ function display_dragdrop_upload_button( $params = array() )
 		{
 		// A click event for button to replace old file with name
 		?>
-		jQuery( document ).on( 'click', '.qq-conflict-replace', function()
+		jQuery( document ).on( 'click', '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table .qq-conflict-replace', function()
 		{
 			var this_obj = jQuery( this );
 
 			var is_replace = this_obj.children( 'div:first' ).is( ':visible' );
 
 			var old_file_name = this_obj.attr( 'old' );
-			var old_file_obj = jQuery( 'input[type=hidden][value="' + old_file_name + '"]' );
+			var old_file_obj = jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table input[type=hidden][value="' + old_file_name + '"]' );
 			// Element found with old file name on the page
 			var old_file_exists = ( old_file_obj.length > 0 );
 			this_obj.hide();

@@ -401,13 +401,13 @@ function validateCommentForm(form)
 	}
 	if( $Item->can_attach() )
 	{	// Display attach file input field when JavaScript is disabled:
-		echo ( $params['comment_type'] != 'meta' ) ? '<noscript>' : '';
+		echo '<noscript>';
 		$Form->input_field( array( 'label' => T_('Attach files'), 'note' => $params['comment_attach_info'], 'name' => 'uploadfile[]', 'type' => 'file' ) );
-		echo ( $params['comment_type'] != 'meta' ) ? '</noscript>' : '';
+		echo '</noscript>';
 	}
 
 	// Display attachments fieldset:
-	$Form->attachments_fieldset( $Comment );
+	$Form->attachments_fieldset( $Comment, false, $Comment->is_meta() ? 'meta_' : '' );
 
 	$comment_options = array();
 

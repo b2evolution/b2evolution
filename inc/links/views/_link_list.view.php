@@ -31,6 +31,12 @@ if( empty( $Blog ) )
 	$Collection = $Blog = & $LinkOwner->get_Blog();
 }
 
+if( ! isset( $fieldset_prefix ) )
+{	// Define default fieldset prefix:
+	// (used to display several fieldset on same page, e.g. for normal and meta comments)
+	$fieldset_prefix = '';
+}
+
 // Name of the iframe we want some actions to come back to:
 $iframe_name = param( 'iframe_name', 'string', '', true );
 $link_type = param( 'link_type', 'string', 'item', true );
@@ -85,7 +91,7 @@ $Results->display( $compact_results_params );
 // Print out JavaScript to change a link position:
 echo_link_position_js();
 // Print out JavaScript to make links table sortable:
-echo_link_sortable_js();
+echo_link_sortable_js( $fieldset_prefix );
 
 if( $Results->total_pages == 0 )
 { // If no results we should get a template of headers in order to add it on first quick upload
@@ -128,11 +134,11 @@ switch( $link_owner_type )
 
 // Display a button to quick upload the files by drag&drop method
 display_dragdrop_upload_button( array(
-		'before' => '<div id="fileuploader_form">',
+		'before' => '<div class="evo_fileuploader_form">',
 		'after'  => '</div>',
 		'fileroot_ID'      => $upload_fileroot,
 		'path'             => $upload_path,
-		'listElement'      => 'jQuery( "#filelist_tbody" ).get(0)',
+		'listElement'      => 'jQuery( "#filelist_tbody", "#'.$fieldset_prefix.'attachments_fieldset_table" ).get(0)',
 		'list_style'       => 'table',
 		'template_filerow' => '<table><tr>'
 					.'<td class="firstcol shrinkwrap qq-upload-image"><span class="qq-upload-spinner">&nbsp;</span></td>'
@@ -149,7 +155,7 @@ display_dragdrop_upload_button( array(
 					.( count( $LinkOwner->get_positions() ) > 1 ? '<td class="qq-upload-link-position lastcol shrinkwrap"></td>' : '' )
 				.'</tr></table>',
 		'display_support_msg'    => false,
-		'additional_dropzone'    => '#filelist_tbody',
+		'additional_dropzone'    => '#'.$fieldset_prefix.'attachments_fieldset_table #filelist_tbody',
 		'filename_before'        => '',
 		'LinkOwner'              => $LinkOwner,
 		'display_status_success' => false,
@@ -157,9 +163,10 @@ display_dragdrop_upload_button( array(
 		'conflict_file_format'   => 'full_path_link',
 		'resize_frame'           => true,
 		'table_headers'          => $table_headers,
+		'fieldset_prefix'        => $fieldset_prefix,
 	) );
 ?>
 <script type="text/javascript">
 // Initialize attachments fieldset to set proper height and handler to resize it:
-evo_link_initialize_fieldset();
+evo_link_initialize_fieldset( '<?php echo $fieldset_prefix; ?>' );
 </script>

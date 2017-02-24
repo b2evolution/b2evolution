@@ -4468,8 +4468,9 @@ class Form extends Widget
 	 *
 	 * @param object Object of the links owner
 	 * @param boolean TRUE to allow folding for this fieldset, FALSE - otherwise
+	 * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
 	 */
-	function attachments_fieldset( $object, $fold = false )
+	function attachments_fieldset( $object, $fold = false, $fieldset_prefix = '' )
 	{
 		global $current_User;
 
@@ -4493,12 +4494,6 @@ class Form extends Widget
 				$comment_Item = & $Comment->get_Item();
 				if( ! $comment_Item->check_blog_settings( 'allow_attachments' ) )
 				{	// Item attachments must be allowed by collection setting depending on user type(anounymous, registered, member and etc.):
-					return;
-				}
-				global $disp;
-				if( ! is_admin_page() && $disp != 'edit_comment' && $Comment->get( 'type' ) == 'meta' )
-				{	// Temp restriction because quick uploader JS code doesn't work twice on same page like we have this case on disp=single:
-					// TODO: When this JS conflict will be fixed this restriction MUST BE DELETED!
 					return;
 				}
 				load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
@@ -4536,7 +4531,7 @@ class Form extends Widget
 		}
 
 		// Display attachments fieldset:
-		display_attachments_fieldset( $this, $LinkOwner, false, $fold );
+		display_attachments_fieldset( $this, $LinkOwner, false, $fold, $fieldset_prefix );
 	}
 }
 

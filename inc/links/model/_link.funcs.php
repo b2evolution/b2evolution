@@ -124,8 +124,9 @@ function & get_LinkOwner( $link_type, $object_ID )
  * @param object LinkOwner object
  * @param boolean true if creating new owner object, false otherwise
  * @param boolean true to allow folding for this fieldset, false otherwise
+ * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
  */
-function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false, $fold = false )
+function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false, $fold = false, $fieldset_prefix = '' )
 {
 	global $admin_url, $inc_path;
 	global $current_User, $action;
@@ -237,9 +238,9 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 			'deny_fold' => ( $links_count > 0 )
 		) );
 
-	echo '<div id="attachments_fieldset_wrapper">';
-		echo '<div id="attachments_fieldset_block">';
-			echo '<div id="attachments_fieldset_table">';
+	echo '<div id="'.$fieldset_prefix.'attachments_fieldset_wrapper" class="evo_attachments_fieldset__wrapper">';
+		echo '<div id="'.$fieldset_prefix.'attachments_fieldset_block" class="evo_attachments_fieldset__block">';
+			echo '<div id="'.$fieldset_prefix.'attachments_fieldset_table" class="evo_attachments_fieldset__table">';
 				require $inc_path.'links/views/_link_list.view.php';
 			echo '</div>';
 		echo '</div>';
@@ -579,14 +580,16 @@ jQuery( document ).on( 'change', 'select[id^=display_position_]', {
 
 /**
  * Print out JavaScript to make the links table sortable
+ *
+ * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
  */
-function echo_link_sortable_js()
+function echo_link_sortable_js( $fieldset_prefix = '' )
 {
 ?>
 <script type="text/javascript">
 jQuery( document ).ready( function()
 {
-	jQuery( '#attachments_fieldset_table table' ).sortable(
+	jQuery( '#<?php echo $fieldset_prefix; ?>attachments_fieldset_table table' ).sortable(
 	{
 		containerSelector: 'table',
 		itemPath: '> tbody',
@@ -602,12 +605,12 @@ jQuery( document ).ready( function()
 		},
 		onDrop: function( $item, container, _super )
 		{
-			jQuery( '#attachments_fieldset_table table tr' ).removeClass( 'odd even' );
-			jQuery( '#attachments_fieldset_table table tr:odd' ).addClass( 'even' );
-			jQuery( '#attachments_fieldset_table table tr:even' ).addClass( 'odd' );
+			jQuery( '#<?php echo $fieldset_prefix; ?>attachments_fieldset_table table tr' ).removeClass( 'odd even' );
+			jQuery( '#<?php echo $fieldset_prefix; ?>attachments_fieldset_table table tr:odd' ).addClass( 'even' );
+			jQuery( '#<?php echo $fieldset_prefix; ?>attachments_fieldset_table table tr:even' ).addClass( 'odd' );
 
 			var link_IDs = '';
-			jQuery( '#attachments_fieldset_table table tr' ).each( function()
+			jQuery( '#<?php echo $fieldset_prefix; ?>attachments_fieldset_table table tr' ).each( function()
 			{
 				var link_ID_cell = jQuery( this ).find( '.link_id_cell' );
 				if( link_ID_cell.length > 0 )

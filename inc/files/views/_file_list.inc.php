@@ -549,7 +549,7 @@ $Form->begin_form();
 	if( $Settings->get( 'upload_enabled' ) && $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
 	{ // Upload is enabled and we have permission to use it...
 	?>
-		<tr id="fileuploader_form" class="listfooter firstcol lastcol">
+		<tr class="evo_fileuploader_form listfooter firstcol lastcol">
 			<td colspan="<?php echo $filetable_cols ?>">
 			<?php
 			if( isset( $LinkOwner ) && $LinkOwner->check_perm( 'edit' ) )
