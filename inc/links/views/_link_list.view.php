@@ -159,3 +159,7 @@ display_dragdrop_upload_button( array(
 		'table_headers'          => $table_headers,
 	) );
 ?>
+<script type="text/javascript">
+// Initialize attachments fieldset to set proper height and handler to resize it:
+evo_link_initialize_fieldset();
+</script>

@@ -13,8 +13,10 @@
  */
 
 
-// Initialize attachments block:
-jQuery( document ).ready( function()
+/**
+ * Initialize attachments fieldset to set proper height and handler to resize it
+ */
+function evo_link_initialize_fieldset()
 {
 	if( jQuery( '#attachments_fieldset_table' ).length > 0 )
 	{	// Only if the attachments block exists on the loading page:
@@ -38,7 +40,7 @@ jQuery( document ).ready( function()
 			jQuery( '#attachments_fieldset_wrapper' ).css( 'height', height > max_height ? max_height : height );
 		} );
 	}
-} );
+}
 
 
 /**

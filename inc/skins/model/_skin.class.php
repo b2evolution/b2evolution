@@ -1010,6 +1010,9 @@ class Skin extends DataObject
 
 					// Used to quick upload several files:
 					init_fileuploader_js( 'blog' );
+
+					// Used to change link position:
+					require_js( 'backoffice.js', 'blog' );
 					break;
 
 				case 'disp_users':
@@ -1174,7 +1177,7 @@ class Skin extends DataObject
 					// Used to display a tooltip to the right of plugin help icon:
 					init_plugins_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 
-					// Used to switch to advanced editing:
+					// Used to switch to advanced editing and for link position changing:
 					require_js( 'backoffice.js', 'blog' );
 
 					// Used to automatically checks the matching extracat when we select a new main cat:

@@ -1042,8 +1042,10 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
 	}
 
 	if( in_array( $js_file, array( '#jqueryUI#', 'communication.js', 'functions.js' ) ) )
-	{ // Dependency : ensure jQuery is loaded
-		require_js( '#jquery#', $relative_to, $async, $output, $version );
+	{	// Dependency : ensure jQuery is loaded
+		// Don't use TRUE for $async and $output because it may loads jQuery twice on AJAX request, e.g. on comment AJAX form,
+		// and all jQuery UI libraries(like resizable, sortable and etc.) will not work, e.g. on attachments fieldset
+		require_js( '#jquery#', $relative_to, false, false, $version );
 	}
 
 	// Get library url of JS file by alias name
@@ -3321,7 +3323,7 @@ function init_fileuploader_js( $relative_to = 'rsc_url', $load_sortable_js = tru
 
 	if( $load_sortable_js )
 	{	// Load JS files to make the links table sortable:
-		require_js( '#jquery#', $relative_to );
+		require_js( '#jqueryUI#', $relative_to );
 		require_js( 'jquery/jquery.sortable.min.js', $relative_to );
 	}
 }
