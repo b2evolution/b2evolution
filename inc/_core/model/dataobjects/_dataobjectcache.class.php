@@ -527,7 +527,7 @@ class DataObjectCache
 	 * @param integer ID of object to load
 	 * @param boolean true if function should die on error
 	 * @param boolean true if function should die on empty/null
-	 * @return DataObject reference on cached object or NULL if not found
+	 * @return object|NULL|boolean Reference on cached object, NULL - if request with empty ID, FALSE - if requested object does not exist
 	 */
 	function & get_by_ID( $req_ID, $halt_on_error = true, $halt_on_empty = true )
 	{
@@ -536,7 +536,7 @@ class DataObjectCache
 		$req_ID = intval( $req_ID );
 
 		if( empty( $req_ID ) )
-		{
+		{	// Don't allow request with empty ID:
 			if( $halt_on_empty )
 			{
 				debug_die( "Requested $this->objtype from $this->dbtablename without ID!" );
@@ -599,7 +599,7 @@ class DataObjectCache
 	 * @param integer ID of object to load
 	 * @param boolean true if function should die on error
 	 * @param boolean true if function should die on empty/null
-	 * @return reference on cached object
+	 * @return object|NULL|boolean Reference on cached object, NULL - if request with empty name, FALSE - if requested object does not exist
 	 */
 	function & get_by_name( $req_name, $halt_on_error = true, $halt_on_empty = true )
 	{
@@ -610,9 +610,12 @@ class DataObjectCache
 			debug_die( 'DataObjectCache::get_by_name() : No name field to query on' );
 		}
 
-		if( empty($req_name) )
-		{
-			if($halt_on_empty) { debug_die( "Requested $this->objtype from $this->dbtablename without name!" ); }
+		if( empty( $req_name ) )
+		{	// Don't allow request with empty name:
+			if( $halt_on_empty )
+			{
+				debug_die( "Requested $this->objtype from $this->dbtablename without name!" );
+			}
 			$r = NULL;
 			return $r;
 		}
@@ -630,7 +633,6 @@ class DataObjectCache
 			{	// Object is not already in cache:
 				$Debuglog->add( 'Adding to cache...', 'dataobjects' );
 				//$Obj = new $this->objtype( $row ); // COPY !!
-				//if( ! $this->add( $this->new_obj( $db_row ) ) )
 				if( ! $this->add( $this->new_obj( $db_row ) ) )
 				{	// could not add
 					$Debuglog->add( 'Could not add() object to cache!', 'dataobjects' );
@@ -645,7 +647,7 @@ class DataObjectCache
 			{
 				debug_die( "Requested $this->objtype does not exist!" );
 			}
-			$r = NULL;
+			$r = false;
 			return $r;
 		}
 
