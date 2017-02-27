@@ -149,6 +149,8 @@ switch( $display_mode )
 	case 'normal':
 	default : // take usual approach
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+		// Initialize JS for color picker field on the edit plugin settings form:
+		init_colorpicker_js();
 }
 
 // Get Skin used by current Blog:
@@ -648,7 +650,10 @@ switch( $action )
 				// Display VIEW:
 				$AdminUI->disp_view( 'widgets/views/_widget.form.php' );
 				$output = ob_get_clean();
-				send_javascript_message( array( 'widgetSettings' => array( $output, $edited_ComponentWidget->get( 'type' ), $edited_ComponentWidget->get( 'code' ) ) ) );
+				send_javascript_message( array(
+						'widgetSettings' => array( $output, $edited_ComponentWidget->get( 'type' ), $edited_ComponentWidget->get( 'code' ) ),
+						'evo_initialize_colorpicker_inputs' => array(),
+					) );
 				break;
 
 			case 'normal' :
