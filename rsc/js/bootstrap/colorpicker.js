@@ -4,9 +4,18 @@
  * @version $Id: colorpicker.js 8373 2015-02-28 21:44:37Z fplanque $
  */
 
-jQuery(document).ready( function()
+var colorpicker_num = 1;
+jQuery( document ).ready( function()
 {
-	var colorpicker_num = 1;
+	evo_initialize_colorpicker_inputs();
+} );
+
+
+/**
+ * Initialize color picker for all inputs on the loaded page
+ */
+function evo_initialize_colorpicker_inputs()
+{
 	jQuery( '.form_color_input' ).each( function ()
 	{
 		var colorpicker_ID = 'farbtastic_colorpicker_' + colorpicker_num;
@@ -44,4 +53,4 @@ jQuery(document).ready( function()
 
 		colorpicker_num++;
 	} );
-} );
+}
