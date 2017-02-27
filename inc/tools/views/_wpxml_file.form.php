@@ -37,7 +37,7 @@ $Table->cols = array(
 	array( 'th' => T_('Date'), 'td_class' => 'shrinkwrap' ),
 );
 
-$Table->title = T_('Potential files to be imported').get_manual_link('file-importer');
+$Table->title = T_('Potential files to be imported').get_manual_link( 'xml-importer' );
 $Table->title .= ' - '.action_icon( T_('Refresh'), 'refresh', $admin_url.'?ctrl=wpimportxml', T_('Refresh'), 3, 4 );
 
 $FileRootCache = & get_FileRootCache();
