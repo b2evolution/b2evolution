@@ -70,7 +70,7 @@ $AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=tools&amp;tab3=imp
 $AdminUI->breadcrumbpath_add( T_('WordPress XML Importer'), $admin_url.'?ctrl=wpimportxml' );
 
 // Set an url for manual page:
-$AdminUI->set_page_manual_link( 'wordpress-import' );
+$AdminUI->set_page_manual_link( 'xml-importer' );
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
