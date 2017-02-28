@@ -397,14 +397,14 @@ function wpxml_import()
 				{
 					case 'shared':
 						// Shared files
-						$file_root_ID = 0;
+						$file['file_root_ID'] = 0;
 						break;
 
 					case 'user':
 						// User's files
 						if( isset( $authors_IDs[ $file['file_root_ID'] ] ) )
 						{ // If owner of this file exists in our DB
-							$file_root_ID = $authors_IDs[ $file['file_root_ID'] ];
+							$file['file_root_ID'] = $authors_IDs[ $file['file_root_ID'] ];
 							break;
 						}
 						// Otherwise we should upload this file into blog's folder:
@@ -412,51 +412,18 @@ function wpxml_import()
 					default: // 'collection', 'absolute', 'skins'
 						// The files from other blogs and from other places must be moved in the folder of the current blog
 						$file['file_root_type'] = 'collection';
-						$file_root_ID = $wp_blog_ID;
+						$file['file_root_ID'] = $wp_blog_ID;
 						break;
 				}
 
 				// Source of the importing file:
 				$file_source_path = $attached_files_path.$file['zip_path'].$file['file_path'];
 
-				// Get FileRoot by type and ID
-				$FileRootCache = & get_FileRootCache();
-				$FileRoot = & $FileRootCache->get_by_type_and_ID( $file['file_root_type'], $file_root_ID );
-				if( is_dir( $file_source_path ) )
-				{ // Folder
-					$file_destination_path = $FileRoot->ads_path;
+				// Try to import file from source path:
+				if( $File = & wpxml_create_File( $file_source_path, $file ) )
+				{	// Store the created File in array because it will be linked to the Items below:
+					$files[ $file['file_ID'] ] = $File;
 				}
-				else
-				{ // File
-					$file_destination_path = $FileRoot->ads_path.$file['file_path'];
-				}
-
-				if( ! file_exists( $file_source_path ) )
-				{	// File doesn't exist
-					echo '<p class="orange">'.sprintf( T_('Unable to copy file %s, because it does not exist.'), '<code>'.$file_source_path.'</code>' ).'</p>';
-					// Skip it:
-					continue;
-				}
-				else if( ! copy_r( $file_source_path, $file_destination_path ) )
-				{	// No permission to copy to the destination folder
-					if( is_dir( $file_source_path ) )
-					{ // Folder
-						echo '<p class="orange">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$file_destination_path.'</code>' ).'</p>';
-					}
-					else
-					{ // File
-						echo '<p class="orange">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$file_destination_path.'</code>' ).'</p>';
-					}
-					// Skip it:
-					continue;
-				}
-
-				// Create new File object, It will be linked to the items below
-				$File = new File( $file['file_root_type'], $file_root_ID, $file['file_path'] );
-				$File->set( 'title', $file['file_title'] );
-				$File->set( 'alt', $file['file_alt'] );
-				$File->set( 'desc', $file['file_desc'] );
-				$files[ $file['file_ID'] ] = $File;
 
 				$files_count++;
 			}
@@ -701,15 +668,73 @@ function wpxml_import()
 			$posts[ $post['post_id'] ] = $Item->ID;
 
 			if( ! empty( $files ) && ! empty( $post['links'] ) )
-			{ // Link the files to the Item if it has them
+			{	// Link the files to the Item if it has them:
+				$LinkOwner = new LinkItem( $Item );
 				foreach( $post['links'] as $link )
 				{
 					if( isset( $files[ $link['link_file_ID'] ] ) )
-					{ // Link a file to Item
+					{	// Link a File to Item:
 						$File = $files[ $link['link_file_ID'] ];
-						$LinkOwner = new LinkItem( $Item );
 						$File->link_to_Object( $LinkOwner, $link['link_order'], $link['link_position'] );
 					}
+				}
+			}
+
+			if( isset( $post['postmeta'] ) )
+			{	// Link the files to the Item from meta data:
+				$LinkOwner = new LinkItem( $Item );
+				$post_imported_files = array();
+				foreach( $post['postmeta'] as $postmeta )
+				{
+					if( ! isset( $postmeta['key'] ) || ! isset( $postmeta['value'] ) )
+					{	// Skip wrong meta data:
+						continue;
+					}
+					$post_file_name = '';
+					$file_params = array(
+							'file_root_type' => 'collection',
+							'file_root_ID'   => $wp_blog_ID,
+						);
+
+					if( $postmeta['key'] == '_wp_attached_file' )
+					{	// Get file name from the string meta data:
+						$post_file_name = $postmeta['value'];
+					}
+					elseif( $postmeta['key'] == '_wp_attachment_metadata' )
+					{	// Try to get file name from the serialized meta data:
+						$postmeta_value = @unserialize( $postmeta['value'] );
+						if( isset( $postmeta_value['file'] ) )
+						{	// Set file name:
+							$post_file_name = $postmeta_value['file'];
+						}
+						if( isset( $postmeta_value['image_meta']['title'] ) )
+						{	// Set file title:
+							$file_params['title'] = $postmeta_value['image_meta']['title'];
+						}
+						if( isset( $postmeta_value['image_meta']['caption'] ) )
+						{	// Set file title:
+							$file_params['file_desc'] = $postmeta_value['image_meta']['caption'];
+						}
+					}
+					if( empty( $post_file_name ) || in_array( $post_file_name, $post_imported_files ) )
+					{	// Skip empty file name or if it has been already imported:
+						continue;
+					}
+
+					// Set file path where we should store the importing file relating to the collection folder:
+					$file_params['file_path'] = 'quick-uploads/p'.$Item->ID.'/'.$post_file_name;
+
+					// Source of the importing file:
+					$file_source_path = $attached_files_path.$post_file_name;
+
+					// Try to import file from source path:
+					if( $File = & wpxml_create_File( $file_source_path, $file_params ) )
+					{	// Store the created File in array because it will be linked to the Items below:
+						$File->link_to_Object( $LinkOwner, 1, 'teaser' );
+					}
+
+					// Remember this file name to don't import same file twice because meta data "_wp_attached_file" and "_wp_attachment_metadata" contain same data:
+					$post_imported_files[] = $post_file_name;
 				}
 			}
 
@@ -1384,6 +1409,71 @@ function wpxml_convert_value( $value )
 	}
 
 	return $value;
+}
+
+
+/**
+ * Create object File from source path
+ *
+ * @param string Source file path
+ * @param array Params
+ * @return object|boolean File or FALSE
+ */
+function & wpxml_create_File( $file_source_path, $params )
+{
+	$params = array_merge( array(
+			'file_root_type' => 'collection',
+			'file_root_ID'   => '',
+			'file_path'      => '',
+			'file_title'     => '',
+			'file_alt'       => '',
+			'file_desc'      => '',
+		), $params );
+
+	// Set false to return failed result by reference
+	$File = false;
+
+	// Get FileRoot by type and ID
+	$FileRootCache = & get_FileRootCache();
+	$FileRoot = & $FileRootCache->get_by_type_and_ID( $params['file_root_type'], $params['file_root_ID'] );
+	if( is_dir( $file_source_path ) )
+	{	// Folder
+		$file_destination_path = $FileRoot->ads_path;
+	}
+	else
+	{	// File
+		$file_destination_path = $FileRoot->ads_path.$params['file_path'];
+	}
+
+	if( ! file_exists( $file_source_path ) )
+	{	// File doesn't exist
+		echo '<p class="orange">'.sprintf( T_('Unable to copy file %s, because it does not exist.'), '<code>'.$file_source_path.'</code>' ).'</p>';
+		// Skip it:
+		return $File;
+	}
+	else if( ! copy_r( $file_source_path, $file_destination_path ) )
+	{	// No permission to copy to the destination folder
+		if( is_dir( $file_source_path ) )
+		{	// Folder
+			echo '<p class="orange">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$file_destination_path.'</code>' ).'</p>';
+		}
+		else
+		{	// File
+			echo '<p class="orange">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$file_destination_path.'</code>' ).'</p>';
+		}
+		// Skip it:
+		return $File;
+	}
+
+	// Create new File object:
+	$File = new File( $params['file_root_type'], $params['file_root_ID'], $params['file_path'] );
+	$File->set( 'title', $params['file_title'] );
+	$File->set( 'alt', $params['file_alt'] );
+	$File->set( 'desc', $params['file_desc'] );
+
+	evo_flush();
+
+	return $File;
 }
 
 ?>
