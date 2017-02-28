@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function wpxml_import()
 {
-	global $DB, $tableprefix;
+	global $DB, $tableprefix, $media_path;
 
 	// Load classes:
 	load_class( 'regional/model/_country.class.php', 'Country' );
@@ -37,6 +37,11 @@ function wpxml_import()
 	// Should we delete files on 'replace' mode?
 	$delete_files = param( 'delete_files', 'integer', 0 );
 
+	// Search for attached files in this folder:
+	$attached_files_folder = trim( param( 'attached_files_folder', 'filepath', 'b2evolution_export_files' ), '/' );
+	// Use this folder to upload files if they exist in the selected subfolder:
+	$attached_files_path = $media_path.'import/'.$attached_files_folder.'/';
+
 	$XML_file_path = get_param( 'wp_file' );
 	$XML_file_name = basename( $XML_file_path );
 
@@ -47,9 +52,6 @@ function wpxml_import()
 		{ // Errors are in XML file
 			return;
 		}
-
-		// Use this folder to upload files if they exist in subfolder "/b2evolution_export_files"
-		$attached_files_path = dirname( $XML_file_path );
 	}
 	else if( preg_match( '/\.zip$/i', $XML_file_name ) )
 	{ // ZIP format
@@ -88,11 +90,11 @@ function wpxml_import()
 		}
 
 		// Use this folder to upload files, $ZIP_folder_path must be deleted after import
-		$attached_files_path = $ZIP_folder_path;
+		$attached_files_path = $ZIP_folder_path.'/'.$attached_files_folder.'/';
 	}
 	else
 	{ // Unrecognized extension
-		echo '<p style="color:red">'.sprintf( T_( '%s has an unrecognized extension.' ), '<b>'.$xml_file['name'].'</b>' ).'</p>';
+		echo '<p style="color:red">'.sprintf( T_( '%s has an unrecognized extension.' ), '<code>'.$xml_file['name'].'</code>' ).'</p>';
 		return;
 	}
 
@@ -380,14 +382,12 @@ function wpxml_import()
 		echo T_('Importing the files... ');
 		evo_flush();
 
-		if( ! file_exists( $attached_files_path.'/b2evolution_export_files' ) )
-		{ // Display an error if files are attached but folder doesn't exist
-			echo '<p class="red">'.sprintf( T_('No folder %s found. It must exists to import the attached files properly.'), '<b>'.$attached_files_path.'/b2evolution_export_files'.'</b>' ).'</p>';
+		if( ! file_exists( $attached_files_path ) )
+		{	// Display an error if files are attached but folder doesn't exist:
+			echo '<p class="red">'.sprintf( T_('No folder %s found. It must exists to import the attached files properly.'), '<code>'.$attached_files_path.'</code>' ).'</p>';
 		}
 		else
-		{ // The attached files are located in this subfolder
-			$subfolder_path = '/b2evolution_export_files';
-
+		{	// Try to import files from the selected subfolder:
 			$files_count = 0;
 			$files = array();
 
@@ -416,10 +416,13 @@ function wpxml_import()
 						break;
 				}
 
+				// Source of the importing file:
+				$file_source_path = $attached_files_path.$file['zip_path'].$file['file_path'];
+
 				// Get FileRoot by type and ID
 				$FileRootCache = & get_FileRootCache();
 				$FileRoot = & $FileRootCache->get_by_type_and_ID( $file['file_root_type'], $file_root_ID );
-				if( is_dir( $attached_files_path.$subfolder_path.'/'.$file['zip_path'].$file['file_path'] ) )
+				if( is_dir( $file_source_path ) )
 				{ // Folder
 					$file_destination_path = $FileRoot->ads_path;
 				}
@@ -428,23 +431,23 @@ function wpxml_import()
 					$file_destination_path = $FileRoot->ads_path.$file['file_path'];
 				}
 
-				if( ! file_exists( $attached_files_path.$subfolder_path.'/'.$file['zip_path'].$file['file_path'] ) )
-				{ // File doesn't exist
-					echo '<p class="orange">'.sprintf( T_('Unable to copy file %s, because it does not exist.'), '<b>'.$file['zip_path'].$file['file_path'].'</b>' ).'</p>';
-					// Skip it
+				if( ! file_exists( $file_source_path ) )
+				{	// File doesn't exist
+					echo '<p class="orange">'.sprintf( T_('Unable to copy file %s, because it does not exist.'), '<code>'.$file_source_path.'</code>' ).'</p>';
+					// Skip it:
 					continue;
 				}
-				else if( ! copy_r( $attached_files_path.$subfolder_path.'/'.$file['zip_path'].$file['file_path'], $file_destination_path ) )
-				{ // No permission to copy to this folder
-					if( is_dir( $attached_files_path.$subfolder_path.'/'.$file['zip_path'].$file['file_path'] ) )
+				else if( ! copy_r( $file_source_path, $file_destination_path ) )
+				{	// No permission to copy to the destination folder
+					if( is_dir( $file_source_path ) )
 					{ // Folder
-						echo '<p class="orange">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<b>'.$file['zip_path'].$file['file_path'].'</b>', '<b>'.$file_destination_path.'</b>' ).'</p>';
+						echo '<p class="orange">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$file_destination_path.'</code>' ).'</p>';
 					}
 					else
 					{ // File
-						echo '<p class="orange">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<b>'.$file['zip_path'].$file['file_path'].'</b>', '<b>'.$file_destination_path.'</b>' ).'</p>';
+						echo '<p class="orange">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$file_destination_path.'</code>' ).'</p>';
 					}
-					// Skip it
+					// Skip it:
 					continue;
 				}
 
