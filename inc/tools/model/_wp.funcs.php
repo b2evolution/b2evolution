@@ -268,7 +268,11 @@ function wpxml_import()
 		$authors_count = 0;
 		foreach( $xml_data['authors'] as $author )
 		{
-			if( empty( $existing_users[ (string) $author['author_login'] ] ) )
+			// Replace unauthorized chars of username:
+			$author_login = preg_replace( '/([^a-z0-9_])/i', '_', $author['author_login'] );
+			$author_login = utf8_substr( utf8_strtolower( $author_login ), 0, 20 );
+
+			if( empty( $existing_users[ $author_login ] ) )
 			{	// Insert new user into DB if User doesn't exist with current login name
 
 				$GroupCache = & get_GroupCache();
@@ -303,7 +307,7 @@ function wpxml_import()
 				$author_regions = wp_get_regional_data( $author['author_country'], $author['author_region'], $author['author_subregion'], $author['author_city'] );
 
 				$User = new User();
-				$User->set( 'login', $author['author_login'] );
+				$User->set( 'login', $author_login );
 				$User->set( 'email', trim( $author['author_email'] ) );
 				$User->set( 'firstname', $author['author_first_name'] );
 				$User->set( 'lastname', $author['author_last_name'] );
@@ -358,10 +362,10 @@ function wpxml_import()
 			}
 			else
 			{	// Get ID of existing user
-				$user_ID = $existing_users[ (string) $author['author_login'] ];
+				$user_ID = $existing_users[ $author_login ];
 			}
 			// Save user ID of current author
-			$authors[ $author['author_login'] ] = (string) $user_ID;
+			$authors[ $author_login ] = (string) $user_ID;
 			$authors_IDs[ $author['author_id'] ] = (string) $user_ID;
 		}
 
