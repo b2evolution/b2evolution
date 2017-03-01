@@ -205,7 +205,7 @@ class files_Module extends Module
 				'label' => T_('Files'),
 				'user_func'  => 'check_files_user_perm',
 				'group_func' => 'check_files_group_perm',
-				'perm_block' => 'additional',
+				'perm_block' => 'file',
 				'options'  => array(
 						// format: array( radio_button_value, radio_button_label, radio_button_note )
 						array( 'none', T_('No Access') ),
@@ -222,7 +222,7 @@ class files_Module extends Module
 				'label' => T_('Access to shared root'),
 				'user_func'  => 'check_sharedroot_user_perm',
 				'group_func' => 'check_sharedroot_group_perm',
-				'perm_block' => 'additional',
+				'perm_block' => 'file',
 				'options'  => array(
 						// format: array( radio_button_value, radio_button_label, radio_button_note )
 						array( 'none', T_('No Access') ),
@@ -238,7 +238,7 @@ class files_Module extends Module
 				'label' => T_('Access to import root'),
 				'user_func'  => 'check_importroot_user_perm',
 				'group_func' => 'check_importroot_group_perm',
-				'perm_block' => 'additional',
+				'perm_block' => 'file',
 				'options'  => array(
 						// format: array( radio_button_value, radio_button_label, radio_button_note )
 						array( 'none', T_('No Access') ),
@@ -253,7 +253,7 @@ class files_Module extends Module
 				'label' => T_('Access to skins root'),
 				'user_func' => 'check_skinsroot_user_perm',
 				'group_func' => 'check_skinsroot_group_perm',
-				'perm_block' => 'additional',
+				'perm_block' => 'file',
 				'options' => array(
 						// format: array( radio_button_value, radio_button_label, radio_button_note )
 						array( 'none', T_('No Access') ),

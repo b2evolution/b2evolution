@@ -198,6 +198,10 @@ $Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_prope
 
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('File permissions').get_manual_link('group_properties_file_permissions'), array( 'id' => 'file', 'style' => $primary_panels_style ) );
+	display_pluggable_permissions( $Form, 'file' );
+$Form->end_fieldset();
+
 $Form->begin_fieldset( T_('System admin permissions').get_manual_link('group_properties_system_permissions'), array( 'id' => 'system', 'style' => $primary_panels_style ) );
 
 	// Display pluggable permissions:
