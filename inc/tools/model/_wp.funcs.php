@@ -37,11 +37,6 @@ function wpxml_import()
 	// Should we delete files on 'replace' mode?
 	$delete_files = param( 'delete_files', 'integer', 0 );
 
-	// Search for attached files in this hasrcoded folder:
-	$attached_files_folder = 'b2evolution_export_files';
-	// Use this folder to upload files if they exist in the selected subfolder:
-	$attached_files_path = $media_path.'import/'.$attached_files_folder.'/';
-
 	$XML_file_path = get_param( 'wp_file' );
 	$XML_file_name = basename( $XML_file_path );
 
@@ -58,6 +53,7 @@ function wpxml_import()
 		// Extract ZIP and check WordPress XML file
 		global $media_path;
 
+		// $ZIP_folder_path must be deleted after import!
 		$ZIP_folder_path = $media_path.'import/temp-'.md5( rand() );
 
 		if( ! unpack_archive( $XML_file_path, $ZIP_folder_path, true, $XML_file_name ) )
@@ -88,15 +84,15 @@ function wpxml_import()
 			rmdir_r( $ZIP_folder_path );
 			return;
 		}
-
-		// Use this folder to upload files, $ZIP_folder_path must be deleted after import
-		$attached_files_path = $ZIP_folder_path.'/'.$attached_files_folder.'/';
 	}
 	else
 	{ // Unrecognized extension
 		echo '<p style="color:red">'.sprintf( T_( '%s has an unrecognized extension.' ), '<code>'.$xml_file['name'].'</code>' ).'</p>';
 		return;
 	}
+
+	// Get a path with attached files for the XML file:
+	$attached_files_path = wpxml_get_attachments_folder( $XML_file_path );
 
 	// Parse WordPress XML file into array
 	$xml_data = wpxml_parser( $XML_file_path );
@@ -383,9 +379,9 @@ function wpxml_import()
 		echo T_('Importing the files... ');
 		evo_flush();
 
-		if( ! file_exists( $attached_files_path ) )
+		if( ! $attached_files_path || ! file_exists( $attached_files_path ) )
 		{	// Display an error if files are attached but folder doesn't exist:
-			echo '<p class="red">'.sprintf( T_('No folder %s found. It must exists to import the attached files properly.'), '<code>'.$attached_files_path.'</code>' ).'</p>';
+			echo '<p class="red">'.sprintf( T_('No attachments folder %s found. It must exists to import the attached files properly.'), ( $attached_files_path ? '<code>'.$attached_files_path.'</code>' : '' ) ).'</p>';
 		}
 		else
 		{	// Try to import files from the selected subfolder:
@@ -1347,31 +1343,41 @@ function wpxml_get_import_files()
 		$file_paths = array();
 		$file_type = '';
 		if( is_array( $file ) )
-		{ // It is a folder, Find xml file inside
+		{	// It is a folder, Find xml files inside:
 			foreach( $file as $key => $sub_file )
 			{
-				if( $key == 'b2evolution_export_files' && is_array( $sub_file ) )
-				{ // Probably it is folder with the attached files
-					$file_type = T_('Complete export (text+attachments)');
-				}
-				elseif( is_string( $sub_file ) && preg_match( '/\.(xml|txt)$/i', $sub_file ) )
-				{ // Probably it is a file with import data
+				if( is_string( $sub_file ) && preg_match( '/\.(xml|txt)$/i', $sub_file ) )
+				{
 					$file_paths[] = $sub_file;
 				}
 			}
 		}
 		elseif( is_string( $file ) )
-		{ // File in the root, Single XML file
+		{	// File in the root:
 			$file_paths[] = $file;
 		}
 
 		foreach( $file_paths as $file_path )
 		{
 			if( ! empty( $file_path ) && preg_match( '/\.(xml|txt|zip)$/i', $file_path, $file_matches ) )
-			{ // This file can be a file with import data
+			{	// This file can be a file with import data
 				if( empty( $file_type ) )
-				{ // Set type from file extension
-					$file_type = $file_matches[1] == 'zip' ? T_('Compressed Archive') : T_('Basic export (text only)');
+				{	// Set type from file extension
+					if( $file_matches[1] == 'zip' )
+					{
+						$file_type = T_('Compressed Archive');
+					}
+					else
+					{
+						if( $file_attachments_folder = wpxml_get_attachments_folder( $file_path ) )
+						{	// Probably it is a file with attachments folder:
+							$file_type = sprintf( T_('Complete export (attachments folder: %s)'), '<code>'.basename( $file_attachments_folder ).'</code>' );
+						}
+						else
+						{	// Single XML file without attachments folder:
+							$file_type = T_('Basic export (no attachments folder found)');
+						}
+					}
 				}
 				$import_files[] = array(
 						'path' => $file_path,
@@ -1475,6 +1481,58 @@ function & wpxml_create_File( $file_source_path, $params )
 	evo_flush();
 
 	return $File;
+}
+
+
+/**
+ * Find attachments folder path for given XML file path
+ *
+ * @param string File path
+ * @return string Folder path
+ */
+function wpxml_get_attachments_folder( $file_path )
+{
+	$file_name = basename( $file_path );
+	$file_folder_path = dirname( $file_path ).'/';
+	$folder_full_name = preg_replace( '#\.[^\.]+$#', '', $file_name );
+	$folder_part_name = preg_replace( '#_[^_]+$#', '', $folder_full_name );
+
+	// Find and get first existing folder with attachments:
+	if( is_dir( $file_folder_path.$folder_full_name ) )
+	{	// 1st priority folder:
+		return $file_folder_path.$folder_full_name.'/';
+	}
+	if( is_dir( $file_folder_path.$folder_part_name.'_files' ) )
+	{	// 2nd priority folder:
+		return $file_folder_path.$folder_part_name.'_files/';
+	}
+	if( is_dir( $file_folder_path.$folder_part_name.'_attachments' ) )
+	{	// 3rd priority folder:
+		return $file_folder_path.$folder_part_name.'_attachments/';
+	}
+	if( is_dir( $file_folder_path.'b2evolution_export_files' ) )
+	{	// 4th priority folder:
+		return $file_folder_path.'b2evolution_export_files/';
+	}
+	if( is_dir( $file_folder_path.'export_files' ) )
+	{	// 5th priority folder:
+		return $file_folder_path.'export_files/';
+	}
+	if( is_dir( $file_folder_path.'import_files' ) )
+	{	// 6th priority folder:
+		return $file_folder_path.'import_files/';
+	}
+	if( is_dir( $file_folder_path.'files' ) )
+	{	// 7th priority folder:
+		return $file_folder_path.'files/';
+	}
+	if( is_dir( $file_folder_path.'attachments' ) )
+	{	// 8th priority folder:
+		return $file_folder_path.'attachments/';
+	}
+
+	// File has no attachments folder
+	return false;
 }
 
 ?>
