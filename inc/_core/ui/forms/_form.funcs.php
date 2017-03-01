@@ -335,7 +335,7 @@ function file_select_item( $file_ID, $params = array() )
 	}
 	else
 	{
-		$r .= '<div class="bg-danger">File Not Found</div>';
+		$r .= '<div class="bg-danger">'.T_('You have no permission to see this file.').'</div>';
 	}
 	$blog_param = empty( $blog ) ? '' : '&amp;blog='.$blog;
 	if( $params['max_file_num'] > 1 )

@@ -611,7 +611,6 @@ class _core_Module extends Module
 			'perm_options' => $permoptions,
 			'perm_spamblacklist' => $permspam,
 			'perm_slugs' => $permslugs,
-			'perm_templates' => $permtemplates,
 			'perm_emails' => $permemails,
 			'pm_notif' => $def_notification,
 			'comment_subscription_notif' => $def_notification,
@@ -747,14 +746,6 @@ class _core_Module extends Module
 				'options'  => array( $none_option, $view_details, $edit_option ),
 				'perm_type' => 'radiobox',
 				'field_lines' => false,
-				),
-			'perm_templates' => array(
-				'label' => T_('Skins'),
-				'user_func'  => 'check_template_user_perm',
-				'group_func' => 'check_template_group_perm',
-				'perm_block' => 'core3',
-				'perm_type' => 'checkbox',
-				'note' => T_( 'Check to allow access to skin files.' ),
 				),
 			'pm_notif' => array_merge(
 				array( 'label' => T_( 'New Private Message notifications' ) ), $notifications_array

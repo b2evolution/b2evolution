@@ -181,7 +181,7 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 	<div class="row">
 
 		<footer class="col-md-12 center">
-	
+
 			<?php
 			if( $Skin->show_container_when_access_denied( 'footer' ) )
 			{ // Display 'Footer' widget container
@@ -208,7 +208,7 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 			?>
 			</div>
 			<?php } ?>
-	
+
 			<p>
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
