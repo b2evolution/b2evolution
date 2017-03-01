@@ -313,8 +313,9 @@ function wpxml_import()
 				$User->set( 'email', trim( $author['author_email'] ) );
 				$User->set( 'firstname', $author['author_first_name'] );
 				$User->set( 'lastname', $author['author_last_name'] );
-				$User->set( 'pass', hex2bin( $author['author_pass'] ) );
+				$User->set( 'pass', $author['author_pass'] );
 				$User->set( 'salt', '' );
+				$User->set( 'pass_driver', 'evo$md5' );
 				$User->set_Group( $UserGroup );
 				$User->set( 'status', !empty( $author['author_status'] ) ? $author['author_status'] : 'autoactivated' );
 				$User->set( 'nickname', $author['author_nickname'] );
