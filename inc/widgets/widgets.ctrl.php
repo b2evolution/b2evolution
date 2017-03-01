@@ -271,12 +271,12 @@ switch( $action )
 							$edited_ComponentWidget->get_cache_status( true )
 						);
 					if( $action == 'update' )
-					{ // Close window after update, and don't close it when user wants continue editing after updating
+					{	// Close window after update, and don't close it when user wants continue editing after updating:
 						$methods['closeWidgetSettings'] = array();
 					}
 					else
-					{ // Scroll to messages after update
-						$methods['showMessagesWidgetSettings'] = array();
+					{	// Scroll to messages after update:
+						$methods['showMessagesWidgetSettings'] = array( 'success' );
 					}
 					send_javascript_message( $methods, true );
 					break;
@@ -292,8 +292,8 @@ switch( $action )
 			}
 		}
 		elseif( $display_mode == 'js' )
-		{ // send errors back as js
-			send_javascript_message( array( 'showMessagesWidgetSettings' => array() ), true );
+		{	// Send errors back as js:
+			send_javascript_message( array( 'showMessagesWidgetSettings' => array( 'failed' ) ), true );
 		}
 		break;
 
