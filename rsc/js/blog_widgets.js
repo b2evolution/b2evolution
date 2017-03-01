@@ -429,7 +429,7 @@ function widgetSettings( the_html, wi_type, wi_code )
 	jQuery( '#screen_mask' ).fadeTo(1,0.5).fadeIn(200);
 	jQuery( '#widget_settings' ).html( the_html ).addClass( 'widget_settings_active edit_widget_' + wi_type + '_' + wi_code );
 	jQuery( '#widget_settings' ).prepend( jQuery( '#server_messages' ) );
-	AttachServerRequest( 'form' ); // send form via hidden iframe
+	AttachServerRequest( 'widget_checkchanges' ); // send form via hidden iframe
 
 	// Create modal header for bootstrap skin
 	var page_title = jQuery( '#widget_settings' ).find( 'h2.page-title:first' );
@@ -469,6 +469,18 @@ function widgetSettingsCallback( wi_ID, wi_name, wi_cache_status )
 
 function closeWidgetSettings()
 {
+	if( typeof( bozo ) != 'undefined' )
+	{	// Display a confirmation of bozo validator before closing a modified widget edit form:
+		if( bozo.validate_close() && ! confirm( bozo.validate_close() ) )
+		{	// Don't close a modified widget edit form without confirmation:
+			return false;
+		}
+		else
+		{	// After confirmation we should reset bozo validator modification counter to don't display a confirmation twice on page closing/refreshing:
+			bozo.reset_changes();
+		}
+	}
+
 	jQuery( '#widget_settings' ).hide(); // removeClass( 'widget_settings_active' );
 	jQuery( '#server_messages' ).insertBefore( '.available_widgets' );
 	jQuery( '#widget_settings' ).remove();
@@ -476,8 +488,14 @@ function closeWidgetSettings()
 	return false;
 }
 
-function showMessagesWidgetSettings()
+function showMessagesWidgetSettings( result )
 {
+	if( typeof( result ) != 'undefined' && result == 'success' && typeof( bozo ) != 'undefined' )
+	{	// Reset bozo validator modification counter on successful updating widget settings,
+		// in order to allow close widget settings form popup without unexpected JS confirmation:
+		bozo.reset_changes();
+	}
+
 	jQuery( '#widget_settings' ).animate( {
 			scrollTop: jQuery( '#widget_settings' ).scrollTop() +  + jQuery( '#server_messages' ).position().top - 20
 		}, 100 );
