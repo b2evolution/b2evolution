@@ -166,8 +166,6 @@ if( ! empty( $import_files ) )
 					'id'    => 'import_type_append' ),
 			), '', array( 'lines' => true ) );
 
-	$Form->text_input( 'attached_files_folder', param( 'attached_files_folder', 'filepath', 'b2evolution_export_files' ), 100, T_('Search for attached files in'), T_('If you import ZIP archive this folder must be located inside archive.'), array( 'input_prefix' => '<code>'.$media_subdir.'import/</code> ' ) );
-
 	$Form->end_fieldset();
 
 	$Form->buttons( array( array( 'submit', 'submit', T_('Continue!'), 'SaveButton' ) ) );

@@ -37,8 +37,8 @@ function wpxml_import()
 	// Should we delete files on 'replace' mode?
 	$delete_files = param( 'delete_files', 'integer', 0 );
 
-	// Search for attached files in this folder:
-	$attached_files_folder = trim( param( 'attached_files_folder', 'filepath', 'b2evolution_export_files' ), '/' );
+	// Search for attached files in this hasrcoded folder:
+	$attached_files_folder = 'b2evolution_export_files';
 	// Use this folder to upload files if they exist in the selected subfolder:
 	$attached_files_path = $media_path.'import/'.$attached_files_folder.'/';
 
