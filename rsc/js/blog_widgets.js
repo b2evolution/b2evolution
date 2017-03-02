@@ -187,6 +187,16 @@ jQuery(document).ready( function()
 		jQuery( this ).closest( 'form' ).find( '.widget_checkbox.widget_checkbox_enabled input[type=checkbox]' ).prop( 'checked', false );
 		jQuery( this ).closest( 'form' ).find( '.widget_checkbox:not(.widget_checkbox_enabled) input[type=checkbox]' ).prop( 'checked', true );
 	} );
+
+	// Close widget settings or available widgets popup windows if Escape key is pressed:
+	jQuery( document ).keyup( function(e)
+	{
+		if( e.keyCode == 27 )
+		{
+			closeWidgetSettings();
+			closeAvailableWidgets();
+		}
+	});
 } );
 
 
@@ -449,16 +459,6 @@ function widgetSettings( the_html, wi_type, wi_code )
 	}
 
 	jQuery( '#widget_settings a.close_link' ).bind( 'click', closeWidgetSettings );
-
-	// Close widget Settings if Escape key is pressed:
-	var keycode_esc = 27;
-	jQuery(document).keyup(function(e)
-	{
-		if( e.keyCode == keycode_esc )
-		{
-			closeWidgetSettings();
-		}
-	});
 }
 
 function widgetSettingsCallback( wi_ID, wi_name, wi_cache_status )
@@ -467,9 +467,16 @@ function widgetSettingsCallback( wi_ID, wi_name, wi_cache_status )
 	jQuery( '#wi_ID_' + wi_ID + ' .widget_cache_status' ).html( getWidgetCacheIcon( 'wi_ID_'+wi_ID, wi_cache_status ) );
 }
 
-function closeWidgetSettings()
+function closeWidgetSettings( action )
 {
-	if( typeof( bozo ) != 'undefined' )
+	if( ! jQuery( '#widget_settings' ).is( ':visible' ) )
+	{	// Close popup window with widget settings only if it is really opened,
+		// in order to don't hide #screen_mask when available widgets popup is opened currently:
+		return false;
+	}
+
+	if( typeof( bozo ) != 'undefined' &&
+	    ( typeof( action ) == 'undefined' || action != 'update' ) ) // Don't use bozo validator when form is updating
 	{	// Display a confirmation of bozo validator before closing a modified widget edit form:
 		if( bozo.validate_close() && ! confirm( bozo.validate_close() ) )
 		{	// Don't close a modified widget edit form without confirmation:
@@ -547,17 +554,6 @@ function convertAvailableList()
 		return false;
 	});
 
-	// Close Overlay if Escape key is pressed:
-	var keycode_esc = 27;
-	jQuery(document).keyup(function(e)
-	{
-		if( e.keyCode == keycode_esc )
-		{
-			closeAvailableWidgets();
-			return false;
-		}
-	});
-
 	jQuery( ".available_widgets li" ).each( function()
 	{ // shuffle things around
 		jQuery( this ).addClass( "new_widget" ); // add hook for detecting new widgets
@@ -579,7 +575,13 @@ function convertAvailableList()
  */
 function closeAvailableWidgets()
 {
-	jQuery('.available_widgets').removeClass( 'available_widgets_active' );
+	if( ! jQuery( '.available_widgets' ).is( ':visible' ) )
+	{	// Close popup window with available widgets only if it is really opened,
+		// in order to don't hide #screen_mask when widget edit form is opened currently:
+		return false;
+	}
+
+	jQuery( '.available_widgets' ).removeClass( 'available_widgets_active' );
 	jQuery( '#screen_mask' ).remove();
 }
 

@@ -1496,6 +1496,9 @@ label.radiooption {
   text-align: left;
   margin-left: 8px;
 }
+.file_select_wrapper .file_select_item .item_actions a.btn {
+  margin-bottom: 5px;
+}
 div.log_container ul,
 div.action_messages ul,
 div.log_container ol,
