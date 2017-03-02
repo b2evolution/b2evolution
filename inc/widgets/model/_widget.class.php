@@ -432,7 +432,7 @@ class ComponentWidget extends DataObject
 			return;
 		}
 
-		// Generate widget defaults array:
+		// Generate widget defaults (editable params) array:
 		$widget_defaults = array();
 		$defs = $this->get_param_definitions( array() );
 		foreach( $defs as $parname => $parmeta )
@@ -454,7 +454,8 @@ class ComponentWidget extends DataObject
 		// Load DB configuration:
 		$this->load_param_array();
 
-		// Merge basic defaults < widget defaults < container params < DB params
+		// DEFAULT CONTAINER PARAMS:
+		// Merge basic defaults < widget defaults (editable params) < container params < DB params
 		// note: when called with skin_widget it falls back to basic defaults < widget defaults < calltime params < array()
 		$params = array_merge( array(
 					'widget_context' => 'general',		// general | item
@@ -473,14 +474,21 @@ class ComponentWidget extends DataObject
 					'list_end' => '</ul>',
 					'item_start' => '<li>',
 					'item_end' => '</li>',
-					'link_default_class' => 'default',
-					'link_selected_class' => 'selected',
-					'item_text_start' => '',
-					'item_text_end' => '',
-					'item_text' => '%s',
+						'link_default_class' => 'default',
+						'link_selected_class' => 'selected',
+						'item_text_start' => '',
+						'item_text_end' => '',
+						'item_text' => '%s',
 					'item_selected_start' => '<li class="selected">',
 					'item_selected_end' => '</li>',
 					'item_selected_text' => '%s',
+
+					// Automatically detect whether we are displaying menu links as list elements or as standalone buttons:
+					'inlist' => 'auto',		// may alose be true or false
+					// Button styles used for Menu Links / Buttons widgets:
+					'button_default_class' => 'btn btn-default',
+					'button_selected_class' => 'btn btn-default active',
+
 					'grid_start' => '<table cellspacing="1" class="widget_grid">',
 						'grid_colstart' => '<tr>',
 							'grid_cellstart' => '<td>',

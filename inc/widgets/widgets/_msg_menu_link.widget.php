@@ -260,9 +260,6 @@ class msg_menu_link_Widget extends ComponentWidget
 				debug_die( 'Invalid params!' );
 		}
 
-		// Default link class
-		$link_class = $this->disp_params['link_default_class'];
-
 		// Allow to higlight current menu item only when it is linked to current collection:
 		$highlight_current = ( $current_Blog->ID == $Blog->ID );
 
@@ -306,30 +303,70 @@ class msg_menu_link_Widget extends ComponentWidget
 			}
 		}
 
+		// Are we displaying a link in a list or a standalone button?
+		// "Menu" Containers are 'inlist'. Some sub-containers will also be 'inlist' (displaying a local menu).
+		// fp> Maybe this should be moved up to container level? 
+		$inlist = $this->disp_params['inlist'];
+		if( $inlist == 'auto' )
+		{
+			if( empty( $this->disp_params['list_start'] ) )
+			{	// We're not starting a list. This means (very high probability) that we are already in a list:
+				$inlist = true;
+			}
+			else
+			{	// We have no override for list start. This means (very high probability) that we are displaying a standalone link -> we want a button for this widget
+				$inlist = false;
+			}				
+		}
+
 		echo $this->disp_params['block_start'];
 		echo $this->disp_params['block_body_start'];
-		echo $this->disp_params['list_start'];
 
-		if( $highlight_current )
-		{	// Use template and class to highlight current menu item:
-			$link_class = $this->disp_params['link_selected_class'];
-			echo $this->disp_params['item_selected_start'];
+		if( $inlist )
+		{ // Classic menu link display:
+
+			// It's debatable whether of not we want 'list_start' here but it doesn't hurt to keep it (will be empty under typical circumstances):
+			echo $this->disp_params['list_start'];
+
+			if( $highlight_current )
+			{	// Use template and class to highlight current menu item:
+				echo $this->disp_params['item_selected_start'];
+				$link_class = $this->disp_params['link_selected_class'];
+			}
+			else
+			{	// Use normal template:
+				echo $this->disp_params['item_start'];
+				$link_class = $this->disp_params['link_default_class'];
+			}
+
+			echo '<a href="'.$url.'" class="'.$link_class.'">'.$text.$badge.'</a>';
+			
+			if( $highlight_current )
+			{	// Use template to highlight current menu item:
+				echo $this->disp_params['item_selected_end'];
+			}
+			else
+			{	// Use normal template:
+				echo $this->disp_params['item_end'];
+			}
+
+			echo $this->disp_params['list_end'];
 		}
 		else
-		{	// Use normal template:
-			echo $this->disp_params['item_start'];
-		}
-		echo '<a href="'.$url.'" class="'.$link_class.'">'.$text.$badge.'</a>';
-		if( $highlight_current )
-		{	// Use template to highlight current menu item:
-			echo $this->disp_params['item_selected_end'];
-		}
-		else
-		{	// Use normal template:
-			echo $this->disp_params['item_end'];
+		{	// "out-of list" button display:
+
+			if( $highlight_current )
+			{	// Use template and class to highlight current menu item:
+				$button_class = $this->disp_params['button_selected_class'];
+			}
+			else
+			{	// Use normal template:
+				$button_class = $this->disp_params['button_default_class'];
+			}
+
+			echo '<a href="'.$url.'" class="'.$button_class.'">'.$text.$badge.'</a>';			
 		}
 
-		echo $this->disp_params['list_end'];
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
 
