@@ -562,26 +562,6 @@ class Skin extends DataObject
 
 
 	/**
-	 * Add initial files on skin select
-	 *
-	 * Called when collection changes to current skin
-	 */
-	function add_init_files()
-	{
-		foreach( $this->get_param_definitions( array('for_editing'=>true) ) as $parname => $parmeta )
-		{
-			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'fileselect' )
-			{
-				if( $this->get_setting( $parname ) === NULL && isset( $parmeta['initialize_with'] ) && $init_File = & get_file_by_abspath( $parmeta['initialize_with'], true ) )
-				{ // Only use initial value if the parameter is not yet set, empty string value should remain empty
-					$this->set_setting( $parname, $init_File->ID );
-				}
-			}
-		}
-	}
-
-
-	/**
 	 * Display skinshot for skin folder in various places.
 	 *
 	 * Including for NON installed skins.
@@ -778,6 +758,13 @@ class Skin extends DataObject
 				}
 			}
 			return $options;
+		}
+		elseif( isset( $params[ $parname ]['type'] ) &&
+						$params[ $parname ]['type'] == 'fileselect' &&
+						! empty( $params[ $parname ]['initialize_with'] ) &&
+						$default_File = & get_file_by_abspath( $params[ $parname ]['initialize_with'], true ) )
+		{ // Get default value for fileselect
+			return $default_File->ID;
 		}
 
 		return NULL;

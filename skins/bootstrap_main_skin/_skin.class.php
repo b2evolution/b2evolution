@@ -129,7 +129,6 @@ class bootstrap_main_Skin extends Skin
 				),
 					'front_bg_image_file_ID' => array(
 						'label' => T_('Background image'),
-						'defaultvalue' => NULL,
 						'type' => 'fileselect',
 						'initialize_with' => 'shared/global/sunset/sunset.jpg',
 						'thumbnail_size' => 'fit-320x320'

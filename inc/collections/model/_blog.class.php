@@ -687,11 +687,6 @@ class Blog extends DataObject
 		if( param( 'normal_skin_ID', 'integer', NULL ) !== NULL )
 		{ // Normal skin ID:
 			$this->set_setting( 'normal_skin_ID', get_param( 'normal_skin_ID' ) );
-			$SkinCache = & get_SkinCache();
-			if( $selected_Skin = $SkinCache->get_by_ID( get_param( 'normal_skin_ID' ) ) )
-			{
-				$selected_Skin->add_init_files();
-			}
 		}
 
 		if( param( 'mobile_skin_ID', 'integer', NULL ) !== NULL )
