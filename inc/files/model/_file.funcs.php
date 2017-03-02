@@ -2960,6 +2960,14 @@ function get_root_path_by_abspath( $abspath, $is_cache_path = false )
 	return false;
 }
 
+
+/**
+ * Get a File object or create one given an absolute path
+ *
+ * @param string Absolute path of file
+ * @param boolean create meta data in DB if it doesn't exist yet? (generates a $File->ID)
+ * @return mixed File a {@link File} object OR NULL if file does not exist
+ */
 function & get_file_by_abspath( $abspath, $force_create_meta = false )
 {
 	$root_path = get_root_path_by_abspath( $abspath );
