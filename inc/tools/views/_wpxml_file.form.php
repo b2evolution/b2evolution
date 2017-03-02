@@ -15,7 +15,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $admin_url, $media_subdir;
+global $admin_url, $media_subdir, $media_path;
 
 $Form = new Form( NULL, '', 'post', NULL, 'multipart/form-data' );
 
@@ -92,6 +92,8 @@ else
 	// BODY START:
 	$Table->display_body_start();
 
+	$media_path_length = strlen( $media_path.'import/' );
+
 	foreach( $import_files as $import_file )
 	{
 		$Table->display_line_start();
@@ -103,7 +105,7 @@ else
 
 		// File
 		$Table->display_col_start();
-		echo basename( $import_file['path'] );
+		echo substr( $import_file['path'], $media_path_length );
 		$Table->display_col_end();
 
 		// Type

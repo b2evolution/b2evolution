@@ -41,10 +41,10 @@ function wpxml_import()
 	$XML_file_name = basename( $XML_file_path );
 
 	if( preg_match( '/\.(xml|txt)$/i', $XML_file_name ) )
-	{ // XML format
-		// Check WordPress XML file
+	{	// XML format
+		// Check WordPress XML file:
 		if( ! wpxml_check_xml_file( $XML_file_path ) )
-		{ // Errors are in XML file
+		{	// Errors are in XML file
 			return;
 		}
 	}
@@ -57,29 +57,50 @@ function wpxml_import()
 		$ZIP_folder_path = $media_path.'import/temp-'.md5( rand() );
 
 		if( ! unpack_archive( $XML_file_path, $ZIP_folder_path, true, $XML_file_name ) )
-		{ // Errors on unpack ZIP file
+		{	// Errors on unpack ZIP file:
 			return;
 		}
 
-		// Find valid XML file in ZIP package
+		// Find valid XML file in ZIP package:
 		$ZIP_files_list = scandir( $ZIP_folder_path );
 		$xml_exists_in_zip = false;
-		foreach( $ZIP_files_list as $ZIP_file )
-		{
-			if( preg_match( '/\.(xml|txt)$/i', $ZIP_file ) )
-			{ // XML file is found in ZIP package
-				if( wpxml_check_xml_file( $ZIP_folder_path.'/'.$ZIP_file ) )
-				{ // XML file is valid
-					$XML_file_path = $ZIP_folder_path.'/'.$ZIP_file;
-					$xml_exists_in_zip = true;
-					break;
+		for( $i = 1; $i <= 2; $i++ )
+		{	// Run searcher 1st time to find XML file in a root of ZIP archive
+			// and 2nd time to find XML file in 1 level subfolders of the root:
+			foreach( $ZIP_files_list as $ZIP_file )
+			{
+				if( $ZIP_file == '.' || $ZIP_file == '..' )
+				{	// Skip reserved dir names of the current path:
+					continue;
+				}
+				if( $i == 2 && is_dir( $ZIP_folder_path.'/'.$ZIP_file ) )
+				{	// This is a subfolder, Scan it to find XML files inside:
+					$ZIP_folder_current_path = $ZIP_folder_path.'/'.$ZIP_file;
+					$ZIP_folder_files = scandir( $ZIP_folder_current_path );
+				}
+				else
+				{	// This is a single file or folder:
+					$ZIP_folder_files = array( $ZIP_file );
+					$ZIP_folder_current_path = $ZIP_folder_path;
+				}
+				foreach( $ZIP_folder_files as $ZIP_file )
+				{
+					if( preg_match( '/\.(xml|txt)$/i', $ZIP_file ) )
+					{	// XML file is found in ZIP package:
+						if( wpxml_check_xml_file( $ZIP_folder_current_path.'/'.$ZIP_file ) )
+						{	// XML file is valid:
+							$XML_file_path = $ZIP_folder_current_path.'/'.$ZIP_file;
+							$xml_exists_in_zip = true;
+							break 3;
+						}
+					}
 				}
 			}
 		}
 
 		if( ! $xml_exists_in_zip )
 		{ // No XML is detected in ZIP package
-			echo '<p style="color:red">'.T_( 'XML file is not detected in your ZIP package.' ).'</p>';
+			echo '<p class="text-danger">'.T_( 'XML file is not detected in your ZIP package.' ).'</p>';
 			// Delete temporary folder that contains the files from extracted ZIP package
 			rmdir_r( $ZIP_folder_path );
 			return;
@@ -87,7 +108,7 @@ function wpxml_import()
 	}
 	else
 	{ // Unrecognized extension
-		echo '<p style="color:red">'.sprintf( T_( '%s has an unrecognized extension.' ), '<code>'.$xml_file['name'].'</code>' ).'</p>';
+		echo '<p class="text-danger">'.sprintf( T_( '%s has an unrecognized extension.' ), '<code>'.$xml_file['name'].'</code>' ).'</p>';
 		return;
 	}
 
@@ -226,11 +247,11 @@ function wpxml_import()
 				{
 					if( ! ( $deleted_File = & $FileCache->get_by_ID( $deleted_file_ID, false, false ) ) )
 					{ // Incorrect file ID
-						echo '<p class="red">'.sprintf( T_('No file #%s found in DB. It cannot be deleted.'), $deleted_file_ID ).'</p>';
+						echo '<p class="text-danger">'.sprintf( T_('No file #%s found in DB. It cannot be deleted.'), $deleted_file_ID ).'</p>';
 					}
 					if( ! $deleted_File->unlink() )
 					{ // No permission to delete file
-						echo '<p class="red">'.sprintf( T_('Could not delete the file %s.'), '<code>'.$deleted_File->get_full_path().'</code>' ).'</p>';
+						echo '<p class="text-danger">'.sprintf( T_('Could not delete the file %s.'), '<code>'.$deleted_File->get_full_path().'</code>' ).'</p>';
 					}
 					// Clear cache to save memory
 					$FileCache->clear();
@@ -381,7 +402,7 @@ function wpxml_import()
 
 		if( ! $attached_files_path || ! file_exists( $attached_files_path ) )
 		{	// Display an error if files are attached but folder doesn't exist:
-			echo '<p class="red">'.sprintf( T_('No attachments folder %s found. It must exists to import the attached files properly.'), ( $attached_files_path ? '<code>'.$attached_files_path.'</code>' : '' ) ).'</p>';
+			echo '<p class="text-danger">'.sprintf( T_('No attachments folder %s found. It must exists to import the attached files properly.'), ( $attached_files_path ? '<code>'.$attached_files_path.'</code>' : '' ) ).'</p>';
 		}
 		else
 		{	// Try to import files from the selected subfolder:
@@ -420,9 +441,9 @@ function wpxml_import()
 				if( $File = & wpxml_create_File( $file_source_path, $file ) )
 				{	// Store the created File in array because it will be linked to the Items below:
 					$files[ $file['file_ID'] ] = $File;
-				}
 
-				$files_count++;
+					$files_count++;
+				}
 			}
 
 			echo sprintf( T_('%d records'), $files_count ).'<br />';
@@ -563,6 +584,8 @@ function wpxml_import()
 
 		foreach( $xml_data['posts'] as $post )
 		{
+			echo '<p>'.sprintf( T_('Importing post: %s'), '#'.$post['post_id'].' - '.$post['post_title'] );
+
 			$author_ID = isset( $authors[ (string) $post['post_author'] ] ) ? $authors[ (string) $post['post_author'] ] : 1;
 			$last_edit_user_ID = isset( $authors[ (string) $post['post_lastedit_user'] ] ) ? $authors[ (string) $post['post_lastedit_user'] ] : $author_ID;
 
@@ -669,10 +692,19 @@ function wpxml_import()
 				$LinkOwner = new LinkItem( $Item );
 				foreach( $post['links'] as $link )
 				{
+					$file_is_linked = false;
 					if( isset( $files[ $link['link_file_ID'] ] ) )
 					{	// Link a File to Item:
 						$File = $files[ $link['link_file_ID'] ];
-						$File->link_to_Object( $LinkOwner, $link['link_order'], $link['link_position'] );
+						if( $File->link_to_Object( $LinkOwner, $link['link_order'], $link['link_position'] ) )
+						{	// If file is linked to the post:
+							echo '<p class="text-success">'.sprintf( T_('File %s has been linked to this post.'), '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
+							$file_is_linked = true;
+						}
+					}
+					if( ! $file_is_linked )
+					{	// If file could not be linked to the post:
+						echo '<p class="text-warning">'.sprintf( T_('Link %s could not be attached to this post because file %s is not found.'), '#'.$link['link_ID'], '#'.$link['link_file_ID'] ).'</p>';
 					}
 				}
 			}
@@ -739,6 +771,8 @@ function wpxml_import()
 			{ // Set comments
 				$comments[ $Item->ID ] = $post['comments'];
 			}
+
+			echo '</p>';
 		}
 
 		foreach( $xml_data['posts'] as $post )
@@ -842,7 +876,7 @@ function wpxml_import()
 		echo sprintf( T_('%d records'), $comments_count ).'<br />';
 	}
 
-	echo '<p>'.T_('Import complete.').'</p>';
+	echo '<br /><p class="text-success">'.T_('Import complete.').'</p>';
 
 	$DB->commit();
 }
@@ -1176,7 +1210,7 @@ function wpxml_check_xml_file( $file, $halt = false )
 		}
 		else
 		{
-			echo '<p style="color:red">'.T_('There was an error when reading this WXR file.').'</p>';
+			echo '<p class="text-danger">'.T_('There was an error when reading this WXR file.').'</p>';
 			return false;
 		}
 	}
@@ -1190,7 +1224,7 @@ function wpxml_check_xml_file( $file, $halt = false )
 		}
 		else
 		{
-			echo '<p style="color:red">'.T_('This does not appear to be a WXR file, missing/invalid WXR version number.').'</p>';
+			echo '<p class="text-danger">'.T_('This does not appear to be a WXR file, missing/invalid WXR version number.').'</p>';
 			return false;
 		}
 	}
@@ -1204,7 +1238,7 @@ function wpxml_check_xml_file( $file, $halt = false )
 		}
 		else
 		{
-			echo '<p style="color:red">'.T_('This does not appear to be a WXR file, missing/invalid WXR version number.').'</p>';
+			echo '<p class="text-danger">'.T_('This does not appear to be a WXR file, missing/invalid WXR version number.').'</p>';
 			return false;
 		}
 	}
@@ -1454,7 +1488,7 @@ function & wpxml_create_File( $file_source_path, $params )
 
 	if( ! file_exists( $file_source_path ) )
 	{	// File doesn't exist
-		echo '<p class="orange">'.sprintf( T_('Unable to copy file %s, because it does not exist.'), '<code>'.$file_source_path.'</code>' ).'</p>';
+		echo '<p class="text-warning">'.sprintf( T_('Unable to copy file %s, because it does not exist.'), '<code>'.$file_source_path.'</code>' ).'</p>';
 		// Skip it:
 		return $File;
 	}
@@ -1462,11 +1496,11 @@ function & wpxml_create_File( $file_source_path, $params )
 	{	// No permission to copy to the destination folder
 		if( is_dir( $file_source_path ) )
 		{	// Folder
-			echo '<p class="orange">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$file_destination_path.'</code>' ).'</p>';
+			echo '<p class="text-warning">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$file_destination_path.'</code>' ).'</p>';
 		}
 		else
 		{	// File
-			echo '<p class="orange">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$file_destination_path.'</code>' ).'</p>';
+			echo '<p class="text-warning">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$file_destination_path.'</code>' ).'</p>';
 		}
 		// Skip it:
 		return $File;
@@ -1477,6 +1511,8 @@ function & wpxml_create_File( $file_source_path, $params )
 	$File->set( 'title', $params['file_title'] );
 	$File->set( 'alt', $params['file_alt'] );
 	$File->set( 'desc', $params['file_desc'] );
+
+	echo '<p class="text-success">'.sprintf( T_('File %s has been imported to %s successfully.'), '<code>'.$file_source_path.'</code>', '<code>'.$file_destination_path.'</code>' ).'</p>';
 
 	evo_flush();
 
