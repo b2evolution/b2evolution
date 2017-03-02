@@ -272,7 +272,7 @@ switch( $action )
 						);
 					if( $action == 'update' )
 					{	// Close window after update, and don't close it when user wants continue editing after updating:
-						$methods['closeWidgetSettings'] = array();
+						$methods['closeWidgetSettings'] = array( $action );
 					}
 					else
 					{	// Scroll to messages after update:
