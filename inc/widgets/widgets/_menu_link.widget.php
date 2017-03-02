@@ -86,7 +86,7 @@ class menu_link_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Menu link');
+		return T_('Menu link or button');
 	}
 
 

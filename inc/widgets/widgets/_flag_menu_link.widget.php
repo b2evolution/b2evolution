@@ -51,7 +51,7 @@ class flag_menu_link_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Flagged Items Menu Link');
+		return T_('Flagged Items Menu link or button');
 	}
 
 

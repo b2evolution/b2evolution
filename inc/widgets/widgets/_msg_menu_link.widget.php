@@ -56,7 +56,7 @@ class msg_menu_link_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Messaging Menu link');
+		return T_('Messaging Menu link or button');
 	}
 
 

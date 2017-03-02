@@ -50,7 +50,7 @@ class profile_menu_link_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('My Profile Menu link');
+		return T_('My Profile Menu link or button');
 	}
 
 
