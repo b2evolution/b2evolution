@@ -316,7 +316,6 @@ if( $is_pictured_page )
 						// The following params will be used as defaults for widgets included in this container:
 						'block_start'         => '<span class="evo_widget $wi_class$">',
 						'block_end'           => '</span> ',
-						'block_display_title' => false,
 						'list_start'          => '',
 						'list_end'            => '',
 						'item_start'          => '',
