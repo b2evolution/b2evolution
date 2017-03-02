@@ -594,7 +594,7 @@ $Form->begin_form();
 
 			$template_filerow = '<table><tr>'
 				.'<td class="checkbox firstcol qq-upload-checkbox">&nbsp;</td>'
-				.'<td class="icon_type qq-upload-image"><span class="qq-upload-spinner">&nbsp;</span></td>';
+				.'<td class="icon_type text-nowrap qq-upload-image"><span class="qq-upload-spinner">&nbsp;</span></td>';
 			if( $fm_flatmode )
 			{
 				$template_filerow .= '<td class="filepath">'.( empty( $path ) ? './' : $path ).'</td>';
