@@ -202,7 +202,7 @@ class files_Module extends Module
 		// 'options' is permission options
 		$permissions = array(
 			'perm_files' => array(
-				'label' => T_('Files'),
+				'label' => T_('General file access'),
 				'user_func'  => 'check_files_user_perm',
 				'group_func' => 'check_files_group_perm',
 				'perm_block' => 'file',
