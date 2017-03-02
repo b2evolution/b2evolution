@@ -230,7 +230,7 @@ function wpxml_import()
 					}
 					if( ! $deleted_File->unlink() )
 					{ // No permission to delete file
-						echo '<p class="red">'.sprintf( T_('Could not delete the file &laquo;%s&raquo;.'), $deleted_File->get_full_path() ).'</p>';
+						echo '<p class="red">'.sprintf( T_('Could not delete the file %s.'), '<code>'.$deleted_File->get_full_path().'</code>' ).'</p>';
 					}
 					// Clear cache to save memory
 					$FileCache->clear();

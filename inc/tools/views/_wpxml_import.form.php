@@ -23,9 +23,11 @@ $Form->begin_form( 'fform', T_('WordPress XML Importer') );
 
 $Form->begin_fieldset( T_('Report of the import') );
 
+	echo '<p><b>'.T_('Source file').':</b> <code>'.get_param( 'wp_file' ).'</code></br>';
+
 	$BlogCache = & get_BlogCache();
 	$Collection = $Blog = & $BlogCache->get_by_ID( $wp_blog_ID );
-	$Form->info( T_('Collection'), $Blog->get_name() );
+	echo '<b>'.T_('Destination collection').':</b> '.$Blog->get_name().'</p>';
 
 	// Import the data and display a report on the screen
 	wpxml_import();

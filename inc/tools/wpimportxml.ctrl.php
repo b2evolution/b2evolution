@@ -37,7 +37,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'wpxml' );
 
 		$wp_blog_ID = param( 'wp_blog_ID', 'integer', 0 );
-		param_check_not_empty( 'wp_blog_ID', T_('Please select a blog!') );
+		param_check_not_empty( 'wp_blog_ID', T_('Please select a collection!') );
 
 		// XML File
 		$xml_file = param( 'wp_file', 'string', '' );

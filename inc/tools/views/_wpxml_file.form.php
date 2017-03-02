@@ -136,7 +136,7 @@ if( ! empty( $import_files ) )
 
 	$BlogCache = & get_BlogCache();
 	$BlogCache->load_all( 'shortname,name', 'ASC' );
-	$BlogCache->none_option_text = '&nbsp;';
+	$BlogCache->none_option_text = T_('Please select...');
 
 	$Form->select_input_object( 'wp_blog_ID', param( 'wp_blog_ID', 'integer', 0 ), $BlogCache, T_('Destination collection'), array(
 			'note' => T_('This blog will be used for import.').' <a href="'.$admin_url.'?ctrl=collections&action=new">'.T_('Create new blog').' &raquo;</a>',
@@ -149,13 +149,13 @@ if( ! empty( $import_files ) )
 				array(
 					'value' => 'replace',
 					'label' => T_('Replace existing contents'),
-					'note'  => T_('WARNING: this option will permanently remove existing Posts, comments, categories and tags from the selected blog.'),
+					'note'  => T_('WARNING: this option will permanently remove existing posts, comments, categories and tags from the selected collection.'),
 					'id'    => 'import_type_replace' ),
 			), '', array( 'lines' => true ) );
 
 	echo '<div id="checkbox_delete_files"'.( $import_type == 'replace' ? '' : ' style="display:none"' ).'>';
 	$Form->checkbox_input( 'delete_files', param( 'delete_files', 'integer', 0 ), '', array(
-		'input_suffix' => '<label for="delete_files">'.T_(' Also delete files that will no longer be referenced in the target blog after replacing its contents').'</label>',
+		'input_suffix' => '<label for="delete_files">'.T_(' Also delete files that will no longer be referenced in the destination collection after replacing its contents').'</label>',
 		'input_prefix' => '<span style="margin-left:25px"></span>') );
 	echo '</div>';
 
@@ -210,6 +210,11 @@ function import_files_window()
 	} );
 	return false;
 }
+
+jQuery( document ).on( 'click', '#modal_window button[data-dismiss=modal]', function()
+{	// Reload page on closing modal window to display new uploaded files:
+	location.reload();
+} );
 <?php
 }
 ?>
