@@ -68,6 +68,10 @@ ul, ol {
 		}
 	}
 }
+.evo_widget .btn {
+	margin-top: 4px;
+	margin-bottom: 4px;
+}
 
 // Keep almost same style for active disabled buttons (used by TinyMCE plugin)
 .btn.active[disabled] {
@@ -918,4 +922,21 @@ div.edit_toolbars, div.message_toolbars {
 	background-size: 14px 14px;
 	background-repeat: no-repeat;
 	background-position: left 5px center;
+}
+
+// Widgets container "Page Top":
+.evo_container__page_top {
+	// Align right all text on top-right widget container (useful for buttons of menu linkwidgets):
+	text-align: right;
+}
+
+// Widgets containers "Sidebar" and "Sidebar 2":
+.evo_container__sidebar, .evo_container__sidebar2 {
+	// .widget_core_menu_link
+	// .widget_core_msg_menu_link
+	// .widget_core_profile_menu_link
+	// .widget_core_flag_menu_link
+	.evo_widget[class$=_menu_link] a.btn {
+		width: 100%;
+	}
 }
