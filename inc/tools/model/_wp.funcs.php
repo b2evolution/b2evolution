@@ -47,6 +47,9 @@ function wpxml_import()
 		{	// Errors are in XML file
 			return;
 		}
+
+		// Do NOT use first found folder for attachments:
+		$use_first_folder_for_attachments = false;
 	}
 	else if( preg_match( '/\.zip$/i', $XML_file_name ) )
 	{ // ZIP format
@@ -105,6 +108,9 @@ function wpxml_import()
 			rmdir_r( $ZIP_folder_path );
 			return;
 		}
+
+		// Use first found folder for attachments when no reserved folders not found in ZIP before:
+		$use_first_folder_for_attachments = true;
 	}
 	else
 	{ // Unrecognized extension
@@ -113,7 +119,7 @@ function wpxml_import()
 	}
 
 	// Get a path with attached files for the XML file:
-	$attached_files_path = wpxml_get_attachments_folder( $XML_file_path );
+	$attached_files_path = wpxml_get_attachments_folder( $XML_file_path, $use_first_folder_for_attachments );
 
 	// Parse WordPress XML file into array
 	$xml_data = wpxml_parser( $XML_file_path );
@@ -1524,9 +1530,10 @@ function & wpxml_create_File( $file_source_path, $params )
  * Find attachments folder path for given XML file path
  *
  * @param string File path
+ * @param boolean TRUE to use first found folder if no reserved folders not found before
  * @return string Folder path
  */
-function wpxml_get_attachments_folder( $file_path )
+function wpxml_get_attachments_folder( $file_path, $first_folder = false )
 {
 	$file_name = basename( $file_path );
 	$file_folder_path = dirname( $file_path ).'/';
@@ -1565,6 +1572,22 @@ function wpxml_get_attachments_folder( $file_path )
 	if( is_dir( $file_folder_path.'attachments' ) )
 	{	// 8th priority folder:
 		return $file_folder_path.'attachments/';
+	}
+
+	if( $first_folder )
+	{	// Try to use first found folder:
+		$files = scandir( $file_folder_path );
+		foreach( $files as $file )
+		{
+			if( $file == '.' || $file == '..' )
+			{	// Skip reserved dir names of the current path:
+				continue;
+			}
+			if( is_dir( $file_folder_path.$file ) )
+			{	// 9th priority folder:
+				return $file_folder_path.$file.'/';
+			}
+		}
 	}
 
 	// File has no attachments folder
