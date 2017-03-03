@@ -15,44 +15,29 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * Import WordPress data from XML file into b2evolution database
+ * Get data to start import from wordpress XML/ZIP file
+ *
+ * @param string Path of XML/ZIP file
+ * @return array|boolean Data array: ( 'XML_file_path', 'attached_files_path', 'temp_zip_folder_path' ) OR FALSE on failed request
  */
-function wpxml_import()
+function wpxml_get_import_data( $XML_file_path )
 {
-	global $DB, $tableprefix, $media_path;
-
-	// Load classes:
-	load_class( 'regional/model/_country.class.php', 'Country' );
-	load_class( 'regional/model/_region.class.php', 'Region' );
-	load_class( 'regional/model/_subregion.class.php', 'Subregion' );
-	load_class( 'regional/model/_city.class.php', 'City' );
-
-	// Set Blog from request blog ID
-	$wp_blog_ID = param( 'wp_blog_ID', 'integer', 0 );
-	$BlogCache = & get_BlogCache();
-	$wp_Blog = & $BlogCache->get_by_ID( $wp_blog_ID );
-
-	// The import type ( replace | append )
-	$import_type = param( 'import_type', 'string', 'replace' );
-	// Should we delete files on 'replace' mode?
-	$delete_files = param( 'delete_files', 'integer', 0 );
-
-	$XML_file_path = get_param( 'wp_file' );
 	$XML_file_name = basename( $XML_file_path );
+	$ZIP_folder_path = NULL;
 
 	if( preg_match( '/\.(xml|txt)$/i', $XML_file_name ) )
 	{	// XML format
 		// Check WordPress XML file:
 		if( ! wpxml_check_xml_file( $XML_file_path ) )
 		{	// Errors are in XML file
-			return;
+			return false;
 		}
 
 		// Do NOT use first found folder for attachments:
 		$use_first_folder_for_attachments = false;
 	}
 	else if( preg_match( '/\.zip$/i', $XML_file_name ) )
-	{ // ZIP format
+	{	// ZIP format
 		// Extract ZIP and check WordPress XML file
 		global $media_path;
 
@@ -61,7 +46,7 @@ function wpxml_import()
 
 		if( ! unpack_archive( $XML_file_path, $ZIP_folder_path, true, $XML_file_name ) )
 		{	// Errors on unpack ZIP file:
-			return;
+			return false;
 		}
 
 		// Find valid XML file in ZIP package:
@@ -102,24 +87,61 @@ function wpxml_import()
 		}
 
 		if( ! $xml_exists_in_zip )
-		{ // No XML is detected in ZIP package
+		{	// No XML is detected in ZIP package:
 			echo '<p class="text-danger">'.T_( 'XML file is not detected in your ZIP package.' ).'</p>';
-			// Delete temporary folder that contains the files from extracted ZIP package
+			// Delete temporary folder that contains the files from extracted ZIP package:
 			rmdir_r( $ZIP_folder_path );
-			return;
+			return false;
 		}
 
 		// Use first found folder for attachments when no reserved folders not found in ZIP before:
 		$use_first_folder_for_attachments = true;
 	}
 	else
-	{ // Unrecognized extension
+	{	// Unrecognized extension:
 		echo '<p class="text-danger">'.sprintf( T_( '%s has an unrecognized extension.' ), '<code>'.$xml_file['name'].'</code>' ).'</p>';
-		return;
+		return false;
 	}
 
 	// Get a path with attached files for the XML file:
 	$attached_files_path = wpxml_get_attachments_folder( $XML_file_path, $use_first_folder_for_attachments );
+
+	return array(
+			'XML_file_path'        => $XML_file_path,
+			'attached_files_path'  => $attached_files_path,
+			'temp_zip_folder_path' => $ZIP_folder_path,
+		);
+}
+
+
+/**
+ * Import WordPress data from XML file into b2evolution database
+ *
+ * @param string Path of XML file
+ * @param string|boolean Path of folder with attachments, may be FALSE if folder is not found
+ * @param string|NULL Temporary folder of unpacked ZIP archive
+ */
+function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder_path = NULL )
+{
+	global $DB, $tableprefix, $media_path;
+
+	pre_dump( $XML_file_path, $attached_files_path, $ZIP_folder_path );
+
+	// Load classes:
+	load_class( 'regional/model/_country.class.php', 'Country' );
+	load_class( 'regional/model/_region.class.php', 'Region' );
+	load_class( 'regional/model/_subregion.class.php', 'Subregion' );
+	load_class( 'regional/model/_city.class.php', 'City' );
+
+	// Set Blog from request blog ID
+	$wp_blog_ID = param( 'wp_blog_ID', 'integer', 0 );
+	$BlogCache = & get_BlogCache();
+	$wp_Blog = & $BlogCache->get_by_ID( $wp_blog_ID );
+
+	// The import type ( replace | append )
+	$import_type = param( 'import_type', 'string', 'replace' );
+	// Should we delete files on 'replace' mode?
+	$delete_files = param( 'delete_files', 'integer', 0 );
 
 	// Parse WordPress XML file into array
 	$xml_data = wpxml_parser( $XML_file_path );
@@ -453,11 +475,6 @@ function wpxml_import()
 			}
 
 			echo sprintf( T_('%d records'), $files_count ).'<br />';
-
-			if( isset( $ZIP_folder_path ) && file_exists( $ZIP_folder_path ) )
-			{ // This folder was created only to extract files from ZIP package, Remove it now
-				rmdir_r( $ZIP_folder_path );
-			}
 		}
 	}
 
@@ -880,6 +897,11 @@ function wpxml_import()
 		}
 
 		echo sprintf( T_('%d records'), $comments_count ).'<br />';
+	}
+
+	if( ! empty( $ZIP_folder_path ) && file_exists( $ZIP_folder_path ) )
+	{	// This folder was created only to extract files from ZIP package, Remove it now:
+		rmdir_r( $ZIP_folder_path );
 	}
 
 	echo '<br /><p class="text-success">'.T_('Import complete.').'</p>';
