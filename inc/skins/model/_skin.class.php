@@ -1235,6 +1235,32 @@ class Skin extends DataObject
 					require_once $inc_path.'_filters.inc.php';
 					break;
 
+				case 'disp_download':
+					// Specific features for disp=download:
+					global $Collection, $Blog;
+
+					require_js( '#jquery#', 'blog' );
+
+					// Initialize JavaScript to download file after X seconds
+					add_js_headline( '
+jQuery( document ).ready( function ()
+{
+	jQuery( "#download_timer_js" ).show();
+} );
+
+var b2evo_download_timer = '.intval( $Blog->get_setting( 'download_delay' ) ).';
+var downloadInterval = setInterval( function()
+{
+	jQuery( "#download_timer" ).html( b2evo_download_timer );
+	if( b2evo_download_timer == 0 )
+	{	// Stop timer and download a file:
+		clearInterval( downloadInterval );
+		jQuery( "#download_help_url" ).show();
+	}
+	b2evo_download_timer--;
+}, 1000 );' );
+					break;
+
 				default:
 					// We no longer want to do this because of 'disp_auto':
 					// debug_die( 'This skin has requested an unknown feature: \''.$feature.'\'. Maybe this skin requires a more recent version of b2evolution.' );
