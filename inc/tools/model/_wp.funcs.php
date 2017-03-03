@@ -125,8 +125,6 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 {
 	global $DB, $tableprefix, $media_path;
 
-	pre_dump( $XML_file_path, $attached_files_path, $ZIP_folder_path );
-
 	// Load classes:
 	load_class( 'regional/model/_country.class.php', 'Country' );
 	load_class( 'regional/model/_region.class.php', 'Region' );
