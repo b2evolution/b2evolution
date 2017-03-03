@@ -583,6 +583,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			'publish'    => 'published',
 			'pending'    => 'review',
 			'draft'      => 'draft',
+			'inherit'    => 'draft',
 			'trash'      => 'deprecated',
 			// These statuses don't exist in WP, but we handle them if they will appear once
 			'community'  => 'community',
