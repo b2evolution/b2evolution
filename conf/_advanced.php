@@ -871,9 +871,9 @@ $library_cdn_urls = array(
 		// jqueryUI is commented out because b2evo uses only a subset... ?
 		//'#jqueryUI#' => array( '//code.jquery.com/ui/1.10.4/jquery-ui.min.js', '//code.jquery.com/ui/1.10.4/jquery-ui.js' ),
 		//'#jqueryUI_css#' => array( '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.min.css', '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css' ),
-		'#bootstrap#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js', '//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.js' ),
-		'#bootstrap_css#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css', '//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.css' ),
-		'#bootstrap_theme_css#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css', '//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.css' ),
+		'#bootstrap#' => array( '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.js' ),
+		'#bootstrap_css#' => array( '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css', '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css' ),
+		'#bootstrap_theme_css#' => array( '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css', '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.css' ),
 		// The following are other possible public shared CDNs we are aware of
 		// but it is not clear whether or not they are:
 		// - Future proof (will they continue to serve old versions of the library in the future?)
