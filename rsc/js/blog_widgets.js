@@ -227,6 +227,7 @@ function makeDraggable( selector )
 		zIndex: 999, // z-index whilst dragging
 		opacity: .8, // opacity whilst dragging
 		cursor: "move", // change the cursor whilst dragging
+		cancel: 'input,textarea,button,select,option,a,span.fa,span.widget_checkbox', // prevents dragging from starting on specified elements
 		start: function()
 		{	// Hide original row during dragging:
 			jQuery( this ).hide();
