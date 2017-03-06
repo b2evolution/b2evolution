@@ -1815,6 +1815,9 @@ function check_file_exists( $fm_FileRoot, $path, $newName, $image_info = NULL )
 	$FileCache = & get_FileCache();
 	$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
 
+	// Unset this flag to check for each file even if it is the same from cache:
+	unset( $newFile->_exists );
+
 	$num_ext = 0;
 	$oldName = $newName;
 

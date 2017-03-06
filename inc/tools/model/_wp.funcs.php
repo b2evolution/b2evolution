@@ -735,6 +735,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			{	// Link the files to the Item from meta data:
 				$LinkOwner = new LinkItem( $Item );
 				$post_imported_files = array();
+				$link_order = 1;
 				foreach( $post['postmeta'] as $postmeta )
 				{
 					if( ! isset( $postmeta['key'] ) || ! isset( $postmeta['value'] ) )
@@ -773,7 +774,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 					}
 
 					// Set file path where we should store the importing file relating to the collection folder:
-					$file_params['file_path'] = 'quick-uploads/p'.$Item->ID.'/'.$post_file_name;
+					$file_params['file_path'] = 'quick-uploads/p'.$Item->ID.'/'.preg_replace( '#^.+[/\\\\]#', '', $post_file_name );
 
 					// Source of the importing file:
 					$file_source_path = $attached_files_path.$post_file_name;
@@ -781,7 +782,8 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 					// Try to import file from source path:
 					if( $File = & wpxml_create_File( $file_source_path, $file_params ) )
 					{	// Store the created File in array because it will be linked to the Items below:
-						$File->link_to_Object( $LinkOwner, 1, 'teaser' );
+						$File->link_to_Object( $LinkOwner, $link_order, 'teaser' );
+						$link_order++;
 					}
 
 					// Remember this file name to don't import same file twice because meta data "_wp_attached_file" and "_wp_attachment_metadata" contain same data:
@@ -1501,25 +1503,27 @@ function & wpxml_create_File( $file_source_path, $params )
 	// Set false to return failed result by reference
 	$File = false;
 
-	// Get FileRoot by type and ID
-	$FileRootCache = & get_FileRootCache();
-	$FileRoot = & $FileRootCache->get_by_type_and_ID( $params['file_root_type'], $params['file_root_ID'] );
-	if( is_dir( $file_source_path ) )
-	{	// Folder
-		$file_destination_path = $FileRoot->ads_path;
-	}
-	else
-	{	// File
-		$file_destination_path = $FileRoot->ads_path.$params['file_path'];
-	}
-
 	if( ! file_exists( $file_source_path ) )
 	{	// File doesn't exist
 		echo '<p class="text-warning">'.sprintf( T_('Unable to copy file %s, because it does not exist.'), '<code>'.$file_source_path.'</code>' ).'</p>';
 		// Skip it:
 		return $File;
 	}
-	else if( ! copy_r( $file_source_path, $file_destination_path ) )
+
+	// Get FileRoot by type and ID
+	$FileRootCache = & get_FileRootCache();
+	$FileRoot = & $FileRootCache->get_by_type_and_ID( $params['file_root_type'], $params['file_root_ID'] );
+
+	// Get file name with a fixed name if file with such name already exists in the destination path:
+	$dest_file = basename( $params['file_path'] );
+	$dest_folder = dirname( $params['file_path'] );
+	if( $dest_folder == '.' )
+	{
+		$dest_folder = '/';
+	}
+	list( $File, $old_file_thumb ) = check_file_exists( $FileRoot, $dest_folder, $dest_file );
+
+	if( ! $File || ! copy_r( $file_source_path, $File->get_full_path() ) )
 	{	// No permission to copy to the destination folder
 		if( is_dir( $file_source_path ) )
 		{	// Folder
@@ -1533,13 +1537,13 @@ function & wpxml_create_File( $file_source_path, $params )
 		return $File;
 	}
 
-	// Create new File object:
-	$File = new File( $params['file_root_type'], $params['file_root_ID'], $params['file_path'] );
+	// Set additional params for new creating File object:
 	$File->set( 'title', $params['file_title'] );
 	$File->set( 'alt', $params['file_alt'] );
 	$File->set( 'desc', $params['file_desc'] );
+	$File->dbsave();
 
-	echo '<p class="text-success">'.sprintf( T_('File %s has been imported to %s successfully.'), '<code>'.$file_source_path.'</code>', '<code>'.$file_destination_path.'</code>' ).'</p>';
+	echo '<p class="text-success">'.sprintf( T_('File %s has been imported to %s successfully.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
 
 	evo_flush();
 
