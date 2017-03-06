@@ -1233,11 +1233,11 @@ function wpxml_check_xml_file( $file, $halt = false )
 	{ // halt/display if loading produces an error
 		if( $halt )
 		{
-			debug_die( 'There was an error when reading this WXR file.' );
+			debug_die( 'There was an error when reading this XML file.' );
 		}
 		else
 		{
-			echo '<p class="text-danger">'.T_('There was an error when reading this WXR file.').'</p>';
+			echo '<p class="text-danger">'.T_('There was an error when reading this XML file.').'</p>';
 			return false;
 		}
 	}
@@ -1247,11 +1247,11 @@ function wpxml_check_xml_file( $file, $halt = false )
 	{
 		if( $halt )
 		{
-			debug_die( 'This does not appear to be a WXR file, missing/invalid WXR version number.' );
+			debug_die( 'This does not appear to be a XML file, missing/invalid WXR version number.' );
 		}
 		else
 		{
-			echo '<p class="text-danger">'.T_('This does not appear to be a WXR file, missing/invalid WXR version number.').'</p>';
+			echo '<p class="text-danger">'.T_('This does not appear to be a XML file, missing/invalid WXR version number.').'</p>';
 			return false;
 		}
 	}
@@ -1261,11 +1261,11 @@ function wpxml_check_xml_file( $file, $halt = false )
 	{ // confirm that we are dealing with the correct file format
 		if( $halt )
 		{
-			debug_die( 'This does not appear to be a WXR file, missing/invalid WXR version number.' );
+			debug_die( 'This does not appear to be a XML file, missing/invalid WXR version number.' );
 		}
 		else
 		{
-			echo '<p class="text-danger">'.T_('This does not appear to be a WXR file, missing/invalid WXR version number.').'</p>';
+			echo '<p class="text-danger">'.T_('This does not appear to be a XML file, missing/invalid WXR version number.').'</p>';
 			return false;
 		}
 	}
