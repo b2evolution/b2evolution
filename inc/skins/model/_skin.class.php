@@ -1869,6 +1869,74 @@ var downloadInterval = setInterval( function()
 		global $app_version_long;
 		require_js( $js_file, 'relative', false, false, $this->folder.'+'.$this->version.'+'.$app_version_long );
 	}
+	
+	
+    /**
+     * Web safe fonts for default skin usage
+     *
+     * Used for font customization
+     */
+    private $font_definitions = array(
+        'system_arial' => array( 'Arial', 'Arial, Helvetica, sans-serif' ),
+        'system_arialblack' => array( 'Arial Black', '\'Arial Black\', Gadget, sans-serif' ),
+        'system_arialnarrow' => array( 'Arial Narrow', '\'Arial Narrow\', sans-serif' ),
+        'system_centrygothic' => array( 'Century Gothic', 'Century Gothic, sans-serif' ),
+        'system_copperplategothiclight' => array( 'Copperplate Gothic Light', 'Copperplate Gothic Light, sans-serif' ),
+        'system_couriernew' => array( 'Courier New', '\'Courier New\', Courier, monospace' ),
+        'system_georgia' => array( 'Georgia', 'Georgia, Serif' ),
+        'system_helveticaneue' => array( 'Helvetica Neue', '\'Helvetica Neue\',Helvetica,Arial,sans-serif' ),
+        'system_impact' => array( 'Impact', 'Impact, Charcoal, sans-serif' ),
+        'system_lucidaconsole' => array( 'Lucida Console', '\'Lucida Console\', Monaco, monospace' ),
+        'system_lucidasansunicode' => array( 'Lucida Sans Unicode', '\'Lucida Sans Unicode\', \'Lucida Grande\', sans-serif' ),
+        'system_palatinolinotype' => array( 'Palatino Linotype', '\'Palatino Linotype\', \'Book Antiqua\', Palatino, serif' ),
+        'system_tahoma' => array( 'Tahoma', 'Tahoma, Geneva, sans-serif' ),
+        'system_timesnewroman' => array( 'Times New Roman', '\'Times New Roman\', Times, serif' ),
+        'system_trebuchetms' => array( 'Trebuchet MS', '\'Trebuchet MS\', Helvetica, sans-serif' ),
+        'system_verdana' => array( 'Verdana', 'Verdana, Geneva, sans-serif' ),
+    );
+	
+	
+    /**
+     * Returns an option list for font customization
+     *
+     * Uses: $this->font_definitions
+     */
+    function get_font_definitions()
+    {
+        // Pull font array keys
+        $font_options = array_keys($this->font_definitions);
+
+        // Pull first value from each array key
+        $font_names = array();
+        foreach ($this->font_definitions as $f) {
+            $font_names[] = current($f);
+        }
+
+        // Create array in format: 'system_arial' => 'arial', etc.
+        $dropdown_option_list = array_combine($font_options, $font_names);
+
+        return $dropdown_option_list;
+    }
+	
+	
+    /**
+     * Returns a CSS code for font customization
+     *
+     * Uses: $this->font_definitions
+     */
+    function apply_selected_font( $target_element, $font_family_param, $text_size_param = NULL )
+    {
+        // Select the font's CSS string
+        $selected_font_css = $this->font_definitions[ $this->get_setting( $font_family_param ) ][1];
+		
+		// If $text_size_param is passed, add font-size property
+		$text_size_param != NULL ? $text_size_param_css = 'font-size: ' . $text_size_param  : $text_size_param_css = '';
+		
+        // Prepare the complete CSS for font customization
+        $custom_css = "$target_element { font-family: $selected_font_css; $text_size_param_css }\n";
+
+        return $custom_css;
+    }
 }
 
 ?>

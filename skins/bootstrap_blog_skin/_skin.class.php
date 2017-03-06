@@ -135,6 +135,13 @@ class bootstrap_blog_Skin extends Skin
 						'type' => 'integer',
 						'allow_empty' => true,
 					),
+					'font_family' => array(
+						'label' => T_('Font Family'),
+						'note' => '',
+						'defaultvalue' => 'system_helveticaneue',
+						'options' => $this->get_font_definitions(),
+						'type' => 'select',
+					),
 					'font_size' => array(
 						'label' => T_('Font size'),
 						'note' => T_('Select content font size.'),
@@ -504,6 +511,9 @@ class bootstrap_blog_Skin extends Skin
 					break;
 			}
 		}
+
+		// Font family customization
+		$custom_css .= $this->apply_selected_font( '#skin_wrapper', 'font_family' );
 
 		if( ! empty( $custom_css ) )
 		{	// Function for custom_css:
