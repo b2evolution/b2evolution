@@ -1691,6 +1691,10 @@ var downloadInterval = setInterval( function()
 					case 'modal_window_js_func':
 						// JavaScript function to initialize Modal windows, @see echo_user_ajaxwindow_js()
 						return 'echo_modalwindow_js_bootstrap';
+
+					case 'colorbox_css_file':
+						// CSS file of colorbox, @see require_js_helper( 'colorbox' )
+						return 'colorbox-bootstrap.min.css';
 				}
 				break;
 		}
@@ -1825,6 +1829,10 @@ var downloadInterval = setInterval( function()
 				//   - 'children' - Get items from current category and from all its sub-categories recirsively
 				//   - 'parent' - Get items ONLY from current category WITHOUT sub-categories
 				return 'children';
+
+			case 'colorbox_css_file':
+				// CSS file of colorbox, @see require_js_helper( 'colorbox' )
+				return 'colorbox-regular.min.css';
 
 			case 'autocomplete_plugin':
 				// Plugin name to autocomplete user logins: 'hintbox', 'typeahead'

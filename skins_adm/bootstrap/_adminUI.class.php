@@ -686,17 +686,14 @@ class AdminUI extends AdminUI_general
 			case 'tooltip_plugin':
 				// Plugin name for tooltips: 'bubbletip' or 'popover'
 				return 'popover';
-				break;
 
 			case 'autocomplete_plugin':
 				// Plugin name to autocomplete the fields: 'hintbox', 'typeahead'
 				return 'typeahead';
-				break;
 
 			case 'modal_window_js_func':
 				// JavaScript function to initialize Modal windows, @see echo_user_ajaxwindow_js()
 				return 'echo_modalwindow_js_bootstrap';
-				break;
 
 			case 'plugin_template':
 				// Template for plugins
@@ -723,12 +720,14 @@ class AdminUI extends AdminUI_general
 						'page_current_before' => '<li class="active"><span>',
 						'page_current_after'  => '</span></li>',
 					);
-				break;
 
 			case 'blog_base.css':
 				// File name of blog_base.css that are used on several back-office pages
 				return 'bootstrap-blog_base.css';
-				break;
+
+			case 'colorbox_css_file':
+				// CSS file of colorbox, @see require_js_helper( 'colorbox' )
+				return 'colorbox-bootstrap.min.css';
 
 			default:
 				// Delegate to parent class:

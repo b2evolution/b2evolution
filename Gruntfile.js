@@ -63,6 +63,10 @@ module.exports = function(grunt) {
 
 					// Helper pages
 					'rsc/build/b2evo_helper_screens.css':    'rsc/less/b2evo_helper_screens.less',
+
+					// Colorbox
+					'rsc/css/colorbox/colorbox-regular.css':   'rsc/css/colorbox/colorbox-regular.less',
+					'rsc/css/colorbox/colorbox-bootstrap.css': 'rsc/css/colorbox/colorbox-bootstrap.less',
 				}
 			},
 
