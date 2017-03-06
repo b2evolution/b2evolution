@@ -65,7 +65,8 @@ $Results = new Results( $SQL->get(), 'cakw_', '---D', $UserSettings->get( 'resul
 
 $Results->title = T_('Keywords');
 
-$Results->global_icon( T_('Import from local antispam list...'), 'new', regenerate_url( 'action', 'action=import' ), T_('Import from local antispam list...'), 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+$Results->global_icon( T_('Add keyword'), 'new', regenerate_url( 'action', 'action=keyword_new' ), T_('Add keyword'), 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+$Results->global_icon( T_('Import from local antispam list...'), 'new', regenerate_url( 'action', 'action=import' ), T_('Import from local antispam list...'), 3, 4, array( 'class' => 'action_icon btn-default' ) );
 
 
 /**
