@@ -6401,7 +6401,7 @@ function get_htsrv_url( $force_https = false )
 	}
 	else
 	{	// For current collection:
-		return $Blog->get_htsrv_url( $force_https );
+		return $Blog->get_local_htsrv_url( NULL, $force_https );
 	}
 }
 
