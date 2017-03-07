@@ -8263,7 +8263,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 12210, 'Create new widget container "Forum Front Secondary Area" for forums...' ) )
-	{
+	{ // part of 6.9.1-beta
 		$DB->begin();
 		$SQL = new SQL( 'Get all "forum" collections' );
 		$SQL->SELECT( 'blog_ID' );
@@ -8297,6 +8297,36 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			  VALUES '.implode( ', ', $item_tags_widget_rows ) );
 		}
 		$DB->commit();
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12220, 'Create new widget container "Item Page"...' ) )
+	{ // part of 6.9.1-beta
+		// Get all collections
+		$collections = $DB->get_col( 'SELECT blog_ID FROM T_blogs ORDER BY blog_ID ASC' );
+		$coll_widgets = array();
+
+		// Default widget for Item Page
+		$item_page_widgets = array(
+				'item_content' => 10,
+				'item_attachments' => 15,
+				'item_seen_by' => 50,
+				'item_vote' => 60
+			);
+
+		foreach( $collections as $collection_ID )
+		{
+			foreach( $item_page_widgets as $page_widget => $widget_order )
+			{
+				$coll_widgets[] = '( '.$collection_ID.', "Item Page", '.$widget_order.', "'.$page_widget.'" )';
+			}
+		}
+
+		if( count( $coll_widgets ) )
+		{	// Insert new widgets into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
+			  VALUES '.implode( ', ', $coll_widgets ) );
+		}
 		upg_task_end();
 	}
 
