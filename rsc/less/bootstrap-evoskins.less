@@ -68,9 +68,15 @@ ul, ol {
 		}
 	}
 }
-.evo_widget .btn {
-	margin-top: 4px;
-	margin-bottom: 4px;
+.evo_widget{
+	.btn { // we need this to give space to buttons on successive widget lines
+		margin-top: 4px;
+		margin-bottom: 4px;
+	}
+	.input-group .btn { // In this case we need to cancel the previous -- eg: search form widget
+		margin-top: 0;
+		margin-bottom: 0;
+	}
 }
 
 // Keep almost same style for active disabled buttons (used by TinyMCE plugin)
