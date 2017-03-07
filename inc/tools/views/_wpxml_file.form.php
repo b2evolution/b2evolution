@@ -168,7 +168,7 @@ if( ! empty( $import_files ) )
 					'id'    => 'import_type_append' ),
 			), '', array( 'lines' => true ) );
 
-	$Form->checkbox_input( 'import_img', 1, '', array( 'input_suffix' => T_('After import, try to match any remaining <img> tags with imported attachments based on filename') ) );
+	$Form->checkbox_input( 'import_img', 1, '', array( 'input_suffix' => T_('Try to match any remaining <img> tags with imported attachments based on filename') ) );
 
 	$Form->end_fieldset();
 

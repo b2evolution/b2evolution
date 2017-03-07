@@ -861,6 +861,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			{	// If [caption ...] tag is detected
 				foreach( $caption_matches[1] as $caption_post_ID )
 				{
+					$file_is_linked = false;
 					if( isset( $attachment_IDs[ $caption_post_ID ] ) && isset( $files[ $attachment_IDs[ $caption_post_ID ] ] ) )
 					{
 						$File = $files[ $attachment_IDs[ $caption_post_ID ] ];
@@ -869,8 +870,13 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 							echo '<p class="text-success">'.sprintf( T_('File %s has been linked to this post.'), '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
 							// Replace this caption tag from content with b2evolution format:
 							$updated_post_content = preg_replace( '#\[caption[^\]]+id="attachment_'.$caption_post_ID.'"[^\]]+\].+?\[/caption\]#i', ( $File->is_image() ? '[image:'.$link_ID.']' : '[file:'.$link_ID.']' ), $updated_post_content );
+							$file_is_linked = true;
 							$link_order++;
 						}
+					}
+					if( ! $file_is_linked )
+					{	// If file could not be linked to the post:
+						echo '<p class="text-warning">'.sprintf( T_('Caption file %s could not be attached to this post because it is not found in the source attachments folder.'), '#'.$caption_post_ID ).'</p>';
 					}
 				}
 			}
@@ -882,6 +888,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				{	// If <img /> tag is detected
 					foreach( $img_matches[1] as $img_url )
 					{
+						$file_is_linked = false;
 						$img_file_name = basename( $img_url );
 						if( isset( $all_wp_attachments[ $img_file_name ], $files[ $all_wp_attachments[ $img_file_name ] ] ) )
 						{
@@ -891,8 +898,13 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 								echo '<p class="text-success">'.sprintf( T_('File %s has been linked to this post.'), '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
 								// Replace this img tag from content with b2evolution format:
 								$updated_post_content = preg_replace( '#<img[^>]+src="[^"]+'.preg_quote( $img_file_name ).'"[^>]+>#i', '[image:'.$link_ID.']', $updated_post_content );
+								$file_is_linked = true;
 								$link_order++;
 							}
+						}
+						if( ! $file_is_linked )
+						{	// If file could not be linked to the post:
+							echo '<p class="text-warning">'.sprintf( T_('File of image url %s could not be attached to this post because it is not found in the source attachments folder.'), '<code>'.$img_url.'</code>' ).'</p>';
 						}
 					}
 				}
