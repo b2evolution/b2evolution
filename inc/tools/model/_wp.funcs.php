@@ -421,6 +421,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 	}
 
 	/* Import files, Copy them all to media folder */
+	$files = array();
 	if( isset( $xml_data['files'] ) && count( $xml_data['files'] ) > 0 )
 	{
 		echo T_('Importing the files... ');
@@ -433,7 +434,6 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		else
 		{	// Try to import files from the selected subfolder:
 			$files_count = 0;
-			$files = array();
 
 			foreach( $xml_data['files'] as $file )
 			{
@@ -601,12 +601,100 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		$SQL->FROM( 'T_items__type' );
 		$post_types = $DB->get_assoc( $SQL->get() );
 
+		echo T_('Importing the files from attachment posts... ');
+		evo_flush();
+
+		$attachment_IDs = array();
+		$attachments_count = 0;
+		foreach( $xml_data['posts'] as $post )
+		{	// Import ONLY attachment posts here, all other posts are imported below:
+			if( $post['post_type'] != 'attachment' )
+			{	// Skip not attachment post:
+				continue;
+			}
+
+			echo '<p>'.sprintf( T_('Importing attachment: %s'), '#'.$post['post_id'].' - "'.$post['post_title'].'"' );
+
+			if( isset( $post['postmeta'] ) )
+			{	// Link the files to the Item from meta data:
+				$attch_imported_files = array();
+				foreach( $post['postmeta'] as $postmeta )
+				{
+					if( ! isset( $postmeta['key'] ) || ! isset( $postmeta['value'] ) )
+					{	// Skip wrong meta data:
+						continue;
+					}
+					$attch_file_name = '';
+					$file_params = array(
+							'file_root_type' => 'collection',
+							'file_root_ID'   => $wp_blog_ID,
+							'file_title'     => $post['post_title'],
+							'file_desc'      => empty( $post['post_content'] ) ? $post['post_excerpt'] : $post['post_content'],
+						);
+
+					if( $postmeta['key'] == '_wp_attached_file' )
+					{	// Get file name from the string meta data:
+						$attch_file_name = $postmeta['value'];
+					}
+					elseif( $postmeta['key'] == '_wp_attachment_metadata' )
+					{	// Try to get file name from the serialized meta data:
+						$postmeta_value = @unserialize( $postmeta['value'] );
+						if( isset( $postmeta_value['file'] ) )
+						{	// Set file name:
+							$attch_file_name = $postmeta_value['file'];
+						}
+					}
+					if( empty( $attch_file_name ) || in_array( $attch_file_name, $attch_imported_files ) )
+					{	// Skip empty file name or if it has been already imported:
+						continue;
+					}
+
+					// Set file path where we should store the importing file relating to the collection folder:
+					$file_params['file_path'] = preg_replace( '#^.+[/\\\\]#', '', $attch_file_name );
+
+					// Source of the importing file:
+					$file_source_path = $attached_files_path.$attch_file_name;
+
+					// Try to import file from source path:
+					if( $File = & wpxml_create_File( $file_source_path, $file_params ) )
+					{	// Store the created File in array because it will be linked to the Items below:
+						$attachment_IDs[ $post['post_id'] ] = $File->ID;
+						$files[ $File->ID ] = $File;
+						$attachments_count++;
+						// Break here because such post can contains only one file:
+						break;
+					}
+
+					$attch_imported_files[] = $attch_file_name;
+				}
+			}
+
+			echo '</p>';
+			$attachments_count++;
+		}
+
+		echo sprintf( T_('%d records'), $attachments_count ).'<br />';
+
 		echo T_('Importing the posts... ');
 		evo_flush();
 
+		$posts_count = 0;
 		foreach( $xml_data['posts'] as $post )
 		{
-			echo '<p>'.sprintf( T_('Importing post: %s'), '#'.$post['post_id'].' - '.$post['post_title'] );
+			if( $post['post_type'] == 'revision' )
+			{	// Ignore post with type "revision":
+				echo '<p class="text-warning">'.sprintf( T_('Ignore post "%s" because of post type is %s'),
+						'#'.$post['post_id'].' - '.$post['post_title'],
+						'<code>'.$post['post_type'].'</code>' )
+					.'</p>';
+				continue;
+			}
+			elseif( $post['post_type'] == 'attachment' )
+			{	// Skip attachment post because it shoul be imported above:
+				continue;
+			}
+
+			echo '<p>'.sprintf( T_('Importing post: %s'), '#'.$post['post_id'].' - "'.$post['post_title'].'"' );
 
 			$author_ID = isset( $authors[ (string) $post['post_author'] ] ) ? $authors[ (string) $post['post_author'] ] : 1;
 			$last_edit_user_ID = isset( $authors[ (string) $post['post_lastedit_user'] ] ) ? $authors[ (string) $post['post_lastedit_user'] ] : $author_ID;
@@ -648,12 +736,14 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			// Get regional IDs by their names
 			$item_regions = wp_get_regional_data( $post['post_country'], $post['post_region'], $post['post_subregion'], $post['post_city'] );
 
+			$post_content = $post['post_content'];
+
 			$Item = new Item();
 			$Item->set( 'main_cat_ID', $post_main_cat_ID );
 			$Item->set( 'creator_user_ID', $author_ID );
 			$Item->set( 'lastedit_user_ID', $last_edit_user_ID );
 			$Item->set( 'title', $post['post_title'] );
-			$Item->set( 'content', $post['post_content'] );
+			$Item->set( 'content', $post_content );
 			$Item->set( 'excerpt', $post['post_excerpt'] );
 			$Item->set( 'datestart', $post['post_date'] );
 			$Item->set( 'datecreated', !empty( $post['post_datecreated'] ) ? $post['post_datecreated'] : $post['post_date'] );
@@ -664,9 +754,9 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			// If 'comment_status' has the unappropriate value set it to 'open'
 			$Item->set( 'comment_status', ( in_array( $post['comment_status'], array( 'open', 'closed', 'disabled' ) ) ? $post['comment_status'] : 'open' ) );
 			$Item->set( 'ityp_ID', $post_type_ID );
-			if( empty( $post['post_excerpt'] ) && !empty( $post['post_content'] ) )
+			if( empty( $post['post_excerpt'] ) && !empty( $post_content ) )
 			{	// Generate excerpt
-				$Item->set( 'excerpt', excerpt( $post['post_content'] ) );
+				$Item->set( 'excerpt', excerpt( $post_content ) );
 				$Item->set( 'excerpt_autogenerated', '1' );
 			}
 			$Item->set( 'extra_cat_IDs', $post_extra_cat_IDs );
@@ -709,6 +799,33 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			$Item->dbinsert();
 			$posts[ $post['post_id'] ] = $Item->ID;
 
+			// Extract files from content tag [caption ...]:
+			if( preg_match_all( '#\[caption[^\]]+id="attachment_(\d+)"[^\]]+\].+?\[/caption\]#i', $post_content, $caption_matches ) )
+			{	// If file tag is detected
+				$LinkOwner = new LinkItem( $Item );
+				$updated_post_content = $post_content;
+				$link_order = 1;
+				foreach( $caption_matches[1] as $caption_post_ID )
+				{
+					if( isset( $attachment_IDs[ $caption_post_ID ] ) && isset( $files[ $attachment_IDs[ $caption_post_ID ] ] ) )
+					{
+						$File = $files[ $attachment_IDs[ $caption_post_ID ] ];
+						if( $link_ID = $File->link_to_Object( $LinkOwner, $link_order, 'inline' ) )
+						{	// If file is linked to the post
+							echo '<p class="text-success">'.sprintf( T_('File %s has been linked to this post.'), '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
+							// Replace this tag from content with b2evolution format:
+							$updated_post_content = preg_replace( '#\[caption[^\]]+id="attachment_'.$caption_post_ID.'"[^\]]+\].+?\[/caption\]#i', ( $File->is_image() ? '[image:'.$link_ID.']' : '[file:'.$link_ID.']' ), $updated_post_content );
+							$link_order++;
+						}
+					}
+				}
+				if( $updated_post_content != $post_content )
+				{	// Update new content:
+					$Item->set( 'content', $updated_post_content );
+					$Item->dbupdate();
+				}
+			}
+
 			if( ! empty( $files ) && ! empty( $post['links'] ) )
 			{	// Link the files to the Item if it has them:
 				$LinkOwner = new LinkItem( $Item );
@@ -731,77 +848,18 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				}
 			}
 
-			if( isset( $post['postmeta'] ) )
-			{	// Link the files to the Item from meta data:
-				$LinkOwner = new LinkItem( $Item );
-				$post_imported_files = array();
-				$link_order = 1;
-				foreach( $post['postmeta'] as $postmeta )
-				{
-					if( ! isset( $postmeta['key'] ) || ! isset( $postmeta['value'] ) )
-					{	// Skip wrong meta data:
-						continue;
-					}
-					$post_file_name = '';
-					$file_params = array(
-							'file_root_type' => 'collection',
-							'file_root_ID'   => $wp_blog_ID,
-						);
-
-					if( $postmeta['key'] == '_wp_attached_file' )
-					{	// Get file name from the string meta data:
-						$post_file_name = $postmeta['value'];
-					}
-					elseif( $postmeta['key'] == '_wp_attachment_metadata' )
-					{	// Try to get file name from the serialized meta data:
-						$postmeta_value = @unserialize( $postmeta['value'] );
-						if( isset( $postmeta_value['file'] ) )
-						{	// Set file name:
-							$post_file_name = $postmeta_value['file'];
-						}
-						if( isset( $postmeta_value['image_meta']['title'] ) )
-						{	// Set file title:
-							$file_params['title'] = $postmeta_value['image_meta']['title'];
-						}
-						if( isset( $postmeta_value['image_meta']['caption'] ) )
-						{	// Set file title:
-							$file_params['file_desc'] = $postmeta_value['image_meta']['caption'];
-						}
-					}
-					if( empty( $post_file_name ) || in_array( $post_file_name, $post_imported_files ) )
-					{	// Skip empty file name or if it has been already imported:
-						continue;
-					}
-
-					// Set file path where we should store the importing file relating to the collection folder:
-					$file_params['file_path'] = 'quick-uploads/p'.$Item->ID.'/'.preg_replace( '#^.+[/\\\\]#', '', $post_file_name );
-
-					// Source of the importing file:
-					$file_source_path = $attached_files_path.$post_file_name;
-
-					// Try to import file from source path:
-					if( $File = & wpxml_create_File( $file_source_path, $file_params ) )
-					{	// Store the created File in array because it will be linked to the Items below:
-						$File->link_to_Object( $LinkOwner, $link_order, 'teaser' );
-						$link_order++;
-					}
-
-					// Remember this file name to don't import same file twice because meta data "_wp_attached_file" and "_wp_attachment_metadata" contain same data:
-					$post_imported_files[] = $post_file_name;
-				}
-			}
-
 			if( !empty( $post['comments'] ) )
 			{ // Set comments
 				$comments[ $Item->ID ] = $post['comments'];
 			}
 
 			echo '</p>';
+			$posts_count++;
 		}
 
 		foreach( $xml_data['posts'] as $post )
 		{	// Set post parents
-			if( !empty( $post['post_parent'] ) && isset( $posts[ (string) $post['post_parent'] ] ) )
+			if( !empty( $post['post_parent'] ) && isset( $posts[ (string) $post['post_parent'] ], $posts[ (string) $post['post_id'] ] ) )
 			{
 				mysqli_query($DB->dbhandle, 'UPDATE '.$tableprefix.'items__item
 						  SET post_parent_ID = '.$DB->quote( $posts[ (string) $post['post_parent'] ] ).'
@@ -809,7 +867,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			}
 		}
 
-		echo sprintf( T_('%d records'), count( $xml_data['posts'] ) ).'<br />';
+		echo sprintf( T_('%d records'), $posts_count ).'<br />';
 	}
 
 
