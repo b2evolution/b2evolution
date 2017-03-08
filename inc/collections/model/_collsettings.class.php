@@ -221,6 +221,7 @@ class CollectionSettings extends AbstractSettings
 			'image_size_messaging' => 'crop-top-32x32', // Used in disp = threads
 			'search_per_page'      => 20, // Number of results per page on disp=search
 			'latest_comments_num'  => 20, // Number of the shown comments on disp=comments
+			'msgform_display_recipient' => 1, // Display a "Message to:" line on disp=msgform
 
 		// Time frame settings:
 			'timestamp_min' => 'yes',

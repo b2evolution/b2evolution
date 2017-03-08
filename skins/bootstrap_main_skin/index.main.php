@@ -282,7 +282,7 @@ if( $is_pictured_page )
 					'front_block_title_start'       => '<h2>',
 					'front_block_title_end'         => '</h2>',
 					// Form "Sending a message"
-					'msgform_form_title' => T_('Sending a message'),
+					'msgform_form_title' => T_('Contact'),
 				) );
 			// Note: you can customize any of the sub templates included here by
 			// copying the matching php file into your skin directory.
