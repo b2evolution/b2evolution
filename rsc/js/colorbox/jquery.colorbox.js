@@ -420,7 +420,7 @@
 		var w = ( prevSettings.pw == undefined || settings.w > prevSettings.pw ) ? settings.w : prevSettings.pw;
 		var h = ( prevSettings.ph == undefined || settings.h > prevSettings.ph ) ? settings.h : prevSettings.ph;
 
-		var voting_wrapper = $('#colorbox div.voting_wrapper');
+		var voting_wrapper = $('#colorbox .voting_wrapper');
 		var bottomMargin = parseInt( $content.css( 'border-bottom' ) );
 
 		$infoBar.css({ 'minHeight': infobarHeight + 'px' });
@@ -933,7 +933,7 @@
 
 	publicMethod.resizeVoting = function() {
 
-		var voting_wrapper = $('#colorbox div.voting_wrapper');
+		var voting_wrapper = $('#colorbox .voting_wrapper');
 		var w = $wrap.parent().width();
 		if( w <= 480 )
 		{

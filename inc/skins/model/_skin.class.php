@@ -1869,8 +1869,8 @@ var downloadInterval = setInterval( function()
 		global $app_version_long;
 		require_js( $js_file, 'relative', false, false, $this->folder.'+'.$this->version.'+'.$app_version_long );
 	}
-	
-	
+
+
     /**
      * Web safe fonts for default skin usage
      *
@@ -1894,8 +1894,8 @@ var downloadInterval = setInterval( function()
         'system_trebuchetms' => array( 'Trebuchet MS', '\'Trebuchet MS\', Helvetica, sans-serif' ),
         'system_verdana' => array( 'Verdana', 'Verdana, Geneva, sans-serif' ),
     );
-	
-	
+
+
     /**
      * Returns an option list for font customization
      *
@@ -1917,8 +1917,8 @@ var downloadInterval = setInterval( function()
 
         return $dropdown_option_list;
     }
-	
-	
+
+
     /**
      * Returns a CSS code for font customization
      *
@@ -1928,10 +1928,10 @@ var downloadInterval = setInterval( function()
     {
         // Select the font's CSS string
         $selected_font_css = $this->font_definitions[ $this->get_setting( $font_family_param ) ][1];
-		
+
 		// If $text_size_param is passed, add font-size property
 		$text_size_param != NULL ? $text_size_param_css = 'font-size: ' . $text_size_param  : $text_size_param_css = '';
-		
+
         // Prepare the complete CSS for font customization
         $custom_css = "$target_element { font-family: $selected_font_css; $text_size_param_css }\n";
 
