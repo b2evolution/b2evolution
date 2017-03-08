@@ -287,7 +287,6 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 	{ // Permission to edit advanced admin settings
 		global $rsc_url, $media_url, $skins_url, $plugins_url, $htsrv_url, $htsrv_url_sensitive;
 
-		$absolute_url_note = T_('Enter path to %s folder ending with / -- This may be located in a CDN zone');
 		$assets_url_data = array();
 		// media url:
 		$assets_url_data['media_assets_url_type'] = array(
@@ -372,6 +371,11 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 						.'</span>';
 				}
 
+				$absolute_url_note = T_('Enter path to %s folder ending with /');
+				if( ! in_array( $asset_url_type, array( 'plugins_assets_url_type', 'htsrv_assets_url_type' ) ) )
+				{
+					$absolute_url_note .= ' -- '.T_('This may be located in a CDN zone');
+				}
 				$Form->radio( $asset_url_type, $edited_Blog->get_setting( $asset_url_type ), array(
 					array( 'relative', (
 							in_array( $asset_url_type, array( 'skins_assets_url_type', 'media_assets_url_type', 'htsrv_assets_url_type' ) ) ?
