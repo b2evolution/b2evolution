@@ -724,7 +724,8 @@ class Item extends ItemLight
 		}
 
 		// SLUG:
-		if( param( 'post_urltitle', 'string', NULL ) !== NULL ) {
+		if( param( 'post_urltitle', 'string', NULL ) !== NULL )
+		{
 			$this->set_from_Request( 'urltitle' );
 		}
 
