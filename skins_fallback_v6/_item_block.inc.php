@@ -140,7 +140,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
 			// Template params for "Item Tags" widget
-			'widget_item_tags_before'    => '<nav class="small post_tags">'.T_('Tags').': ',
+			'widget_item_tags_before'    => '<nav class="small post_tags">',
 			'widget_item_tags_after'     => '</nav>',
 			// Params for skin file "_item_content.inc.php"
 			'widget_item_content_params' => $params,
