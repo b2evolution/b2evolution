@@ -3700,6 +3700,8 @@ class Form extends Widget
 				'remove_file_text' => T_('Remove file'),
 				'edit_file_text' => T_('Select another'),
 				'max_file_num' => 1,
+				'file_type' => 'image',
+				'initialize_with' => '',
 
 				'window_title' => T_('Attach files'),
 				'value_separator' => ';',
@@ -3710,6 +3712,14 @@ class Form extends Widget
 
 			$FileCache = & get_FileCache();
 			$counter = 0;
+
+			if( ! isset( $field_value ) && ! empty( $field_params['initialize_with'] ) )
+			{
+				if( $initial_File = & get_file_by_abspath( $field_params['initialize_with'], true ) )
+				{
+					$field_value = $initial_File->ID;
+				}
+			}
 
 			$field_values = empty( $field_value ) ? $field_value : explode( $field_params['value_separator'], $field_value );
 
@@ -3723,6 +3733,7 @@ class Form extends Widget
 					.'" data-thumb-size="'.$field_params['size_name']
 					.'" data-root="'.$field_params['root']
 					.'" data-path="'.$field_params['path']
+					.'" data-file-type="'.$field_params['file_type']
 					.'" data-overflow-mode="'.$field_params['overflow_mode'].'">';
 
 			if( ! empty( $field_values ) )
@@ -3759,7 +3770,7 @@ class Form extends Widget
 			{
 				$r .= '
 						<script type="text/javascript">
-						var fsel_size, fsel_name, fsel_obj, fsel_replace = false;
+						var fsel_size, fsel_name, fsel_type, fsel_obj, fsel_replace = false;
 
 						function file_select_attachment_window( event_object, replace_item, fm_highlight )
 						{
@@ -3768,6 +3779,7 @@ class Form extends Widget
 							field_object = jQuery( event_object ).closest( ".file_select_wrapper" );
 							fsel_size = field_object.data( "thumbSize" );
 							fsel_name = field_object.attr( "name" );
+							fsel_type = field_object.data( "fileType" );
 							root = field_object.data( "root" );
 							path = field_object.data( "path" );
 
@@ -3784,10 +3796,12 @@ class Form extends Widget
 									"root": typeof( root ) == "undefined" ? "" : root,
 									"path": typeof( path ) == "undefined" ? "" : path,
 									"fm_highlight": typeof( fm_highlight ) == "undefined" ? "" : fm_highlight,
-									"field_name": field_object.attr( "name" )
+									"field_name": field_object.attr( "name" ),
+									"file_type": field_object.data( "fileType" ),
 								},
 								success: function(result)
 								{
+									result = ajax_debug_clear( result );
 									openModalWindow( result, "90%", "80%", true, "'.$field_params['window_title'].'", "" );
 								}
 							} );

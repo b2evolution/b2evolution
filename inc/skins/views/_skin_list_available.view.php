@@ -13,9 +13,9 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $skins_path, $admin_url, $redirect_to, $action, $kind, $blog;
+global $skins_path, $admin_url, $redirect_to, $action, $kind, $blog, $skin_type;
 
-$skin_type = param( 'skin_type', 'string', '' );
+$sel_skin_type = param( 'sel_skin_type', 'string', $skin_type );
 $tab = get_param( 'tab' );
 $collection_kind = param( 'collection_kind', 'string', NULL );
 
@@ -46,12 +46,6 @@ switch( $skin_type )
 		break;
 	case 'tablet':
 		$skin_type_title = /* TRANS: Skin type name */ T_('Tablet');
-		break;
-	case 'feed':
-		$skin_type_title = /* TRANS: Skin type name */ T_('Feed');
-		break;
-	case 'sitemap':
-		$skin_type_title = /* TRANS: Skin type name */ T_('Sitemap');
 		break;
 	default:
 		$skin_type_title = '';
@@ -87,10 +81,11 @@ $Form = new Form( $admin_url, '', 'get', 'blockspan' );
 $Form->hidden_ctrl();
 $Form->hidden( 'action', $action );
 $Form->hidden( 'redirect_to', $redirect_to );
+$Form->hidden( 'skin_type', get_param( 'skin_type' ) );
 $Form->hidden( 'kind', get_param( 'kind' ) );
 $Form->hidden( 'tab', $tab );
 $Form->begin_form( 'skin_selector_filters' );
-$Form->select_input_array( 'skin_type', $skin_type, array(
+$Form->select_input_array( 'sel_skin_type', $sel_skin_type, array(
 		''        => T_('All skins'),
 		'normal'  => T_('Normal skins'),
 		'mobile'  => T_('Mobile skins'),
@@ -198,8 +193,10 @@ foreach( $skin_folders as $skin_folder )
 			continue;
 		}
 
-		if( ! empty( $skin_type ) && $folder_Skin->type != $skin_type )
-		{ // Filter skin by selected type:
+		if( ! empty( $sel_skin_type ) && $folder_Skin->type != $sel_skin_type &&
+		    ( $folder_Skin->type != 'rwd' || ! in_array( $sel_skin_type, array( 'normal', 'mobile', 'tablet' ) ) ) )
+		{	// Filter skin by selected type;
+			// For normal, mobile, tablet skins also displays rwd skins:
 			continue;
 		}
 
@@ -210,7 +207,7 @@ foreach( $skin_folders as $skin_folder )
 		}
 
 		$redirect_to_after_install = $redirect_to;
-		$skin_compatible = ( empty( $kind ) || $folder_Skin->type == 'normal' );
+		$skin_compatible = ( empty( $kind ) || $folder_Skin->type == 'normal' || $folder_Skin->type == 'rwd' );
 		if( ! empty( $kind ) && $skin_compatible )
 		{	// If we are installing skin for a new collection we're currently creating:
 			$coll_url_suffix = get_param( 'sec_ID' ) ? '&sec_ID='.get_param( 'sec_ID' ) : '';
@@ -221,6 +218,7 @@ foreach( $skin_folders as $skin_folder )
 			'function'        => 'install',
 			'function_url'    => $admin_url.'?ctrl=skins&amp;action=create&amp;tab='.$tab
 			                     .( empty( $blog ) ? '' : '&amp;blog='.$blog )
+			                     .( empty( $skin_type ) ? '' : '&amp;skin_type='.$skin_type )
 			                     .'&amp;skin_folder='.rawurlencode( $skin_folder )
 			                     .'&amp;redirect_to='.rawurlencode( $redirect_to_after_install )
 			                     .'&amp;'.url_crumb( 'skin' ),

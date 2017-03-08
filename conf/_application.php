@@ -15,13 +15,13 @@ $app_shortname = 'b2evo';
  * Note: This has to be compatible with {@link http://us2.php.net/en/version-compare}.
  * @global string
  */
-$app_version = '6.9.0-beta';
+$app_version = '6.9.1-beta';
 
 /**
  * Release date (ISO)
  * @global string
  */
-$app_date = '2017-02-17';
+$app_date = '2017-03-07';
 
 /**
  * Long version string for checking differences

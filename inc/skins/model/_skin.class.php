@@ -804,6 +804,13 @@ class Skin extends DataObject
 			}
 			return $options;
 		}
+		elseif( isset( $params[ $parname ]['type'] ) &&
+						$params[ $parname ]['type'] == 'fileselect' &&
+						! empty( $params[ $parname ]['initialize_with'] ) &&
+						$default_File = & get_file_by_abspath( $params[ $parname ]['initialize_with'], true ) )
+		{ // Get default value for fileselect
+			return $default_File->ID;
+		}
 
 		return NULL;
 	}
@@ -1304,6 +1311,32 @@ class Skin extends DataObject
 					require_once $inc_path.'_filters.inc.php';
 					break;
 
+				case 'disp_download':
+					// Specific features for disp=download:
+					global $Collection, $Blog;
+
+					require_js( '#jquery#', 'blog' );
+
+					// Initialize JavaScript to download file after X seconds
+					add_js_headline( '
+jQuery( document ).ready( function ()
+{
+	jQuery( "#download_timer_js" ).show();
+} );
+
+var b2evo_download_timer = '.intval( $Blog->get_setting( 'download_delay' ) ).';
+var downloadInterval = setInterval( function()
+{
+	jQuery( "#download_timer" ).html( b2evo_download_timer );
+	if( b2evo_download_timer == 0 )
+	{	// Stop timer and download a file:
+		clearInterval( downloadInterval );
+		jQuery( "#download_help_url" ).show();
+	}
+	b2evo_download_timer--;
+}, 1000 );' );
+					break;
+
 				default:
 					// We no longer want to do this because of 'disp_auto':
 					// debug_die( 'This skin has requested an unknown feature: \''.$feature.'\'. Maybe this skin requires a more recent version of b2evolution.' );
@@ -1748,6 +1781,10 @@ class Skin extends DataObject
 					case 'modal_window_js_func':
 						// JavaScript function to initialize Modal windows, @see echo_user_ajaxwindow_js()
 						return 'echo_modalwindow_js_bootstrap';
+
+					case 'colorbox_css_file':
+						// CSS file of colorbox, @see require_js_helper( 'colorbox' )
+						return 'colorbox-bootstrap.min.css';
 				}
 				break;
 		}
@@ -1883,6 +1920,10 @@ class Skin extends DataObject
 				//   - 'parent' - Get items ONLY from current category WITHOUT sub-categories
 				return 'children';
 
+			case 'colorbox_css_file':
+				// CSS file of colorbox, @see require_js_helper( 'colorbox' )
+				return 'colorbox-regular.min.css';
+
 			case 'autocomplete_plugin':
 				// Plugin name to autocomplete user logins: 'hintbox', 'typeahead'
 				return 'hintbox';
@@ -1918,6 +1959,74 @@ class Skin extends DataObject
 		global $app_version_long;
 		require_js( $js_file, 'relative', false, false, $this->folder.'+'.$this->version.'+'.$app_version_long );
 	}
+	
+	
+    /**
+     * Web safe fonts for default skin usage
+     *
+     * Used for font customization
+     */
+    private $font_definitions = array(
+        'system_arial' => array( 'Arial', 'Arial, Helvetica, sans-serif' ),
+        'system_arialblack' => array( 'Arial Black', '\'Arial Black\', Gadget, sans-serif' ),
+        'system_arialnarrow' => array( 'Arial Narrow', '\'Arial Narrow\', sans-serif' ),
+        'system_centrygothic' => array( 'Century Gothic', 'Century Gothic, sans-serif' ),
+        'system_copperplategothiclight' => array( 'Copperplate Gothic Light', 'Copperplate Gothic Light, sans-serif' ),
+        'system_couriernew' => array( 'Courier New', '\'Courier New\', Courier, monospace' ),
+        'system_georgia' => array( 'Georgia', 'Georgia, Serif' ),
+        'system_helveticaneue' => array( 'Helvetica Neue', '\'Helvetica Neue\',Helvetica,Arial,sans-serif' ),
+        'system_impact' => array( 'Impact', 'Impact, Charcoal, sans-serif' ),
+        'system_lucidaconsole' => array( 'Lucida Console', '\'Lucida Console\', Monaco, monospace' ),
+        'system_lucidasansunicode' => array( 'Lucida Sans Unicode', '\'Lucida Sans Unicode\', \'Lucida Grande\', sans-serif' ),
+        'system_palatinolinotype' => array( 'Palatino Linotype', '\'Palatino Linotype\', \'Book Antiqua\', Palatino, serif' ),
+        'system_tahoma' => array( 'Tahoma', 'Tahoma, Geneva, sans-serif' ),
+        'system_timesnewroman' => array( 'Times New Roman', '\'Times New Roman\', Times, serif' ),
+        'system_trebuchetms' => array( 'Trebuchet MS', '\'Trebuchet MS\', Helvetica, sans-serif' ),
+        'system_verdana' => array( 'Verdana', 'Verdana, Geneva, sans-serif' ),
+    );
+	
+	
+    /**
+     * Returns an option list for font customization
+     *
+     * Uses: $this->font_definitions
+     */
+    function get_font_definitions()
+    {
+        // Pull font array keys
+        $font_options = array_keys($this->font_definitions);
+
+        // Pull first value from each array key
+        $font_names = array();
+        foreach ($this->font_definitions as $f) {
+            $font_names[] = current($f);
+        }
+
+        // Create array in format: 'system_arial' => 'arial', etc.
+        $dropdown_option_list = array_combine($font_options, $font_names);
+
+        return $dropdown_option_list;
+    }
+	
+	
+    /**
+     * Returns a CSS code for font customization
+     *
+     * Uses: $this->font_definitions
+     */
+    function apply_selected_font( $target_element, $font_family_param, $text_size_param = NULL )
+    {
+        // Select the font's CSS string
+        $selected_font_css = $this->font_definitions[ $this->get_setting( $font_family_param ) ][1];
+		
+		// If $text_size_param is passed, add font-size property
+		$text_size_param != NULL ? $text_size_param_css = 'font-size: ' . $text_size_param  : $text_size_param_css = '';
+		
+        // Prepare the complete CSS for font customization
+        $custom_css = "$target_element { font-family: $selected_font_css; $text_size_param_css }\n";
+
+        return $custom_css;
+    }
 }
 
 ?>

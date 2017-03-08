@@ -86,7 +86,7 @@ class menu_link_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Menu link');
+		return T_('Menu link or button');
 	}
 
 
@@ -239,9 +239,6 @@ class menu_link_Widget extends ComponentWidget
 		global $disp;
 
 		$this->init_display( $params );
-
-		// Default link class
-		$link_class = $this->disp_params['link_default_class'];
 
 		$blog_ID = intval( $this->disp_params['blog_ID'] );
 		if( $blog_ID > 0 )
@@ -532,32 +529,8 @@ class menu_link_Widget extends ComponentWidget
 			$text = $this->disp_params['link_text'];
 		}
 
-		echo $this->disp_params['block_start'];
-		echo $this->disp_params['block_body_start'];
-		echo $this->disp_params['list_start'];
-
-		if( $highlight_current )
-		{	// Use template and class to highlight current menu item:
-			$link_class = $this->disp_params['link_selected_class'];
-			echo $this->disp_params['item_selected_start'];
-		}
-		else
-		{	// Use normal template:
-			echo $this->disp_params['item_start'];
-		}
-		echo '<a href="'.$url.'" class="'.$link_class.'">'.$text.'</a>';
-		if( $highlight_current )
-		{	// Use template to highlight current menu item:
-			echo $this->disp_params['item_selected_end'];
-		}
-		else
-		{	// Use normal template:
-			echo $this->disp_params['item_end'];
-		}
-
-		echo $this->disp_params['list_end'];
-		echo $this->disp_params['block_body_end'];
-		echo $this->disp_params['block_end'];
+		// Display a layout with menu link:
+		echo $this->get_layout_menu_link( $url, $text, $highlight_current );
 
 		return true;
 	}

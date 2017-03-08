@@ -19,6 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 param( 'tab', 'string', '', true );
+param( 'skin_type', 'string', 'normal' );
 
 param_action( 'list' );
 
@@ -599,32 +600,36 @@ switch( $action )
 				}
 				else
 				{	// Redirect to admin skins page if we change the skin for another device type:
-					header_redirect( $admin_url.'?ctrl=collections&tab=site_skin' );
+					header_redirect( $admin_url.'?ctrl=collections&tab=site_skin&skin_type='.$updated_skin_type );
 				}
 			}
 		}
 		else
 		{	// Update site skin settings:
+			if( ! in_array( $skin_type, array( 'normal', 'mobile', 'tablet' ) ) )
+			{
+				debug_die( 'Wrong skin type: '.$skin_type );
+			}
+
 			$SkinCache = & get_SkinCache();
-			$normal_Skin = & $SkinCache->get_by_ID( $Settings->get( 'normal_skin_ID' ) );
-			$mobile_Skin = & $SkinCache->get_by_ID( $Settings->get( 'mobile_skin_ID' ) );
-			$tablet_Skin = & $SkinCache->get_by_ID( $Settings->get( 'tablet_skin_ID' ) );
+			$edited_Skin = & $SkinCache->get_by_ID( $Settings->get( $skin_type.'_skin_ID', ( $skin_type != 'normal' ) ), false, false );
 
 			// Unset global blog vars in order to work with site skin:
 			unset( $Blog, $blog, $global_param_list['blog'], $edited_Blog );
 
-			$normal_Skin->load_params_from_Request();
-			$mobile_Skin->load_params_from_Request();
-			$tablet_Skin->load_params_from_Request();
+			if( ! $edited_Skin )
+			{	// Redirect to don't try update empty skin params:
+				header_redirect( $admin_url.'?ctrl=collections&tab=site_skin&skin_type='.$skin_type, 303 ); // Will EXIT
+			}
+
+			$edited_Skin->load_params_from_Request();
 
 			if(	! param_errors_detected() )
 			{	// Update settings:
-				$normal_Skin->dbupdate_settings();
-				$mobile_Skin->dbupdate_settings();
-				$tablet_Skin->dbupdate_settings();
+				$edited_Skin->dbupdate_settings();
 				$Messages->add( T_('Skin settings have been updated'), 'success' );
 				// Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( $admin_url.'?ctrl=collections&tab=site_skin', 303 ); // Will EXIT
+				header_redirect( $admin_url.'?ctrl=collections&tab=site_skin&skin_type='.$skin_type, 303 ); // Will EXIT
 			}
 		}
 		break;
@@ -638,7 +643,7 @@ switch( $tab )
 			// Check minimum permission:
 			$current_User->check_perm( 'options', 'view', true );
 
-			$AdminUI->set_path( 'site', 'skin', 'site_skin' );
+			$AdminUI->set_path( 'site', 'skin', 'skin_'.$skin_type );
 
 			$AdminUI->breadcrumbpath_init( false );
 			$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );

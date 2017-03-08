@@ -487,6 +487,8 @@ class Plugin
 	 *        'root': default root
 	 *		  'path': default path
 	 *        'thumbnail_size': thumbnail size
+	 *        'max_file_num': maximum number of files
+	 *        'initialize_with': initial value
 	 *     'info': a form info field with label and info text see {@link Form::info()}; you must set 'info' for text.
 	 *     'color': a form color picker field, use 'defaultvalue' in format '#FFFFFF'
 	 * 'note' (gets displayed as a note to the param field),

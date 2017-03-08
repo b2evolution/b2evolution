@@ -8246,6 +8246,90 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12190, 'Upgrade skins table...' ) )
+	{	// part of 6.9.0-beta
+		$DB->query( 'ALTER TABLE T_skins__skin
+			MODIFY skin_type enum("normal","feed","sitemap","mobile","tablet","rwd") COLLATE ascii_general_ci NOT NULL default "normal"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12200, 'Updating group permissions...' ) )
+	{ // part of 6.9.0-beta
+		$DB->query( 'UPDATE T_groups__groupsettings
+			SET gset_name = "perm_skins_root",
+				gset_value = CASE gset_value WHEN "allowed" THEN "edit" ELSE "none" END
+			WHERE gset_name = "perm_templates"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12210, 'Create new widget container "Forum Front Secondary Area" for forums...' ) )
+	{ // part of 6.9.1-beta
+		$DB->begin();
+		$SQL = new SQL( 'Get all "forum" collections' );
+		$SQL->SELECT( 'blog_ID' );
+		$SQL->FROM( 'T_blogs' );
+		$SQL->WHERE( 'blog_type = "forum"' );
+		$forum_collections = $DB->get_col( $SQL->get() );
+
+		$item_tags_widget_rows = array();
+		foreach( $forum_collections as $coll_ID )
+		{	// Insert new widget "Collection Activity Stats" to each forum collection
+			$widget_order = 10;
+			$item_tags_widget_rows[] = '( '.$coll_ID.', "Forum Front Secondary Area", '.$widget_order.', "coll_activity_stats" )';
+			// Check and update not unique widget orders just to make sure:
+			$not_unique_widget_ID = $DB->get_var( 'SELECT wi_ID
+				FROM T_widget
+				WHERE wi_coll_ID = '.$coll_ID.'
+					AND wi_sco_name = "Forum Front Secondary Area"
+					AND wi_order = '.$widget_order );
+			if( $not_unique_widget_ID > 0 )
+			{	// The collection has no unique widget order, move all widgets with wi_order >= 10:
+				$DB->query( 'UPDATE T_widget
+						SET wi_order = wi_order + 1
+						WHERE wi_coll_ID ='.$coll_ID.'
+						AND wi_sco_name = "Forum Front Secondary Area"
+						AND wi_order >= '.$widget_order );
+			}
+		}
+		if( count( $item_tags_widget_rows ) )
+		{	// Insert new widgets "Item Tags" into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
+			  VALUES '.implode( ', ', $item_tags_widget_rows ) );
+		}
+		$DB->commit();
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12220, 'Create new widget container "Item Page"...' ) )
+	{ // part of 6.9.1-beta
+		// Get all collections
+		$collections = $DB->get_col( 'SELECT blog_ID FROM T_blogs ORDER BY blog_ID ASC' );
+		$coll_widgets = array();
+
+		// Default widget for Item Page
+		$item_page_widgets = array(
+				'item_content' => 10,
+				'item_attachments' => 15,
+				'item_seen_by' => 50,
+				'item_vote' => 60
+			);
+
+		foreach( $collections as $collection_ID )
+		{
+			foreach( $item_page_widgets as $page_widget => $widget_order )
+			{
+				$coll_widgets[] = '( '.$collection_ID.', "Item Page", '.$widget_order.', "'.$page_widget.'" )';
+			}
+		}
+
+		if( count( $coll_widgets ) )
+		{	// Insert new widgets into DB:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_code )
+			  VALUES '.implode( ', ', $coll_widgets ) );
+		}
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 6.8.0-alpha
 		db_create_table( 'T_section', '

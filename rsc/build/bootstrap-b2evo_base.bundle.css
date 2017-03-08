@@ -1496,6 +1496,9 @@ label.radiooption {
   text-align: left;
   margin-left: 8px;
 }
+.file_select_wrapper .file_select_item .item_actions a.btn {
+  margin-bottom: 5px;
+}
 div.log_container ul,
 div.action_messages ul,
 div.log_container ol,
@@ -3475,6 +3478,10 @@ ol {
 .btn.btn-danger .fa {
   color: #FFF !important;
 }
+.evo_widget .btn {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
 .btn.active[disabled] {
   opacity: 1;
   color: #333;
@@ -4244,4 +4251,11 @@ div.message_toolbars {
   background-size: 14px 14px;
   background-repeat: no-repeat;
   background-position: left 5px center;
+}
+.evo_container__page_top {
+  text-align: right;
+}
+.evo_container__sidebar .evo_widget[class$=_menu_link] a.btn,
+.evo_container__sidebar2 .evo_widget[class$=_menu_link] a.btn {
+  width: 100%;
 }

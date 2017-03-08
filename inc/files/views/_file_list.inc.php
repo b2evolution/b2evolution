@@ -58,7 +58,7 @@ global $fm_mode, $fm_hide_dirtree, $create_name, $ads_list_path, $mode;
 global $linkctrl, $linkdata;
 
 // Name of the iframe we want some actions to come back to:
-global $iframe_name, $field_name;
+global $iframe_name, $field_name, $file_type;
 
 $Form = new Form( NULL, 'FilesForm', 'post', 'none' );
 $Form->begin_form();
@@ -331,7 +331,7 @@ $Form->begin_form();
 					echo ' ';
 				}
 
-				if( $fm_mode == 'file_select' && !empty( $field_name )  && !$lFile->is_dir() && $lFile->is_image() )
+				if( $fm_mode == 'file_select' && !empty( $field_name )  && !$lFile->is_dir() && $lFile->get( 'type' ) == $file_type )
 				{
 					$sfile_root = FileRoot::gen_ID( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID() );
 					$sfile_path = $lFile->get_rdfp_rel_path();
@@ -594,7 +594,7 @@ $Form->begin_form();
 
 			$template_filerow = '<table><tr>'
 				.'<td class="checkbox firstcol qq-upload-checkbox">&nbsp;</td>'
-				.'<td class="icon_type qq-upload-image"><span class="qq-upload-spinner">&nbsp;</span></td>';
+				.'<td class="icon_type text-nowrap qq-upload-image"><span class="qq-upload-spinner">&nbsp;</span></td>';
 			if( $fm_flatmode )
 			{
 				$template_filerow .= '<td class="filepath">'.( empty( $path ) ? './' : $path ).'</td>';

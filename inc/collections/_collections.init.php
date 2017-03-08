@@ -754,9 +754,17 @@ class collections_Module extends Module
 						'text' => T_('Site skin'),
 						'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin',
 						'entries' => array(
-							'site_skin' => array(
-								'text' => T_('Skins for this site'),
+							'skin_normal' => array(
+								'text' => T_('Default'),
 								'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin'
+							),
+							'skin_mobile' => array(
+								'text' => T_('Phone'),
+								'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin&amp;skin_type=mobile'
+							),
+							'skin_tablet' => array(
+								'text' => T_('Tablet'),
+								'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin&amp;skin_type=tablet'
 							),
 							'manage_skins' => array(
 								'text' => T_('Manage skins'),
@@ -910,9 +918,17 @@ class collections_Module extends Module
 						'text' => T_('Skin'),
 						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog,
 						'entries' => array(
-							'coll_skin' => array(
-								'text' => T_('Skins for this blog'),
+							'skin_normal' => array(
+								'text' => T_('Default'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog
+							),
+							'skin_mobile' => array(
+								'text' => T_('Phone'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog.'&amp;skin_type=mobile'
+							),
+							'skin_tablet' => array(
+								'text' => T_('Tablet'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog.'&amp;skin_type=tablet'
 							)
 						),
 					),

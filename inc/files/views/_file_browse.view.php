@@ -72,8 +72,8 @@ if( isset( $edited_User ) )
 
 	global $mode, $AdminUI;
 
-	if( $mode != 'upload' || ! isset( $AdminUI->skin_name ) || $AdminUI->skin_name != 'bootstrap' )
-	{ // Don't display a close icon, because it is already displayed on bootstrap modal window header
+	if( ! isset( $AdminUI->skin_name ) || $AdminUI->skin_name != 'bootstrap' )
+	{	// Don't display a close icon, because it is already displayed on bootstrap modal window header:
 		if( ! empty( $LinkOwner ) )
 		{ // Get an url to return to owner(post/comment) editing
 			$icon_close_url = $LinkOwner->get_edit_url();

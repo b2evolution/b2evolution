@@ -56,7 +56,7 @@ class msg_menu_link_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Messaging Menu link');
+		return T_('Messaging Menu link or button');
 	}
 
 
@@ -260,9 +260,6 @@ class msg_menu_link_Widget extends ComponentWidget
 				debug_die( 'Invalid params!' );
 		}
 
-		// Default link class
-		$link_class = $this->disp_params['link_default_class'];
-
 		// Allow to higlight current menu item only when it is linked to current collection:
 		$highlight_current = ( $current_Blog->ID == $Blog->ID );
 
@@ -306,32 +303,8 @@ class msg_menu_link_Widget extends ComponentWidget
 			}
 		}
 
-		echo $this->disp_params['block_start'];
-		echo $this->disp_params['block_body_start'];
-		echo $this->disp_params['list_start'];
-
-		if( $highlight_current )
-		{	// Use template and class to highlight current menu item:
-			$link_class = $this->disp_params['link_selected_class'];
-			echo $this->disp_params['item_selected_start'];
-		}
-		else
-		{	// Use normal template:
-			echo $this->disp_params['item_start'];
-		}
-		echo '<a href="'.$url.'" class="'.$link_class.'">'.$text.$badge.'</a>';
-		if( $highlight_current )
-		{	// Use template to highlight current menu item:
-			echo $this->disp_params['item_selected_end'];
-		}
-		else
-		{	// Use normal template:
-			echo $this->disp_params['item_end'];
-		}
-
-		echo $this->disp_params['list_end'];
-		echo $this->disp_params['block_body_end'];
-		echo $this->disp_params['block_end'];
+		// Display a layout with menu link:
+		echo $this->get_layout_menu_link( $url, $text.$badge, $highlight_current );
 
 		return true;
 	}

@@ -15,7 +15,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $admin_url, $media_subdir;
+global $admin_url, $media_subdir, $media_path;
 
 $Form = new Form( NULL, '', 'post', NULL, 'multipart/form-data' );
 
@@ -92,6 +92,8 @@ else
 	// BODY START:
 	$Table->display_body_start();
 
+	$media_path_length = strlen( $media_path.'import/' );
+
 	foreach( $import_files as $import_file )
 	{
 		$Table->display_line_start();
@@ -103,7 +105,7 @@ else
 
 		// File
 		$Table->display_col_start();
-		echo basename( $import_file['path'] );
+		echo substr( $import_file['path'], $media_path_length );
 		$Table->display_col_end();
 
 		// Type
@@ -136,7 +138,7 @@ if( ! empty( $import_files ) )
 
 	$BlogCache = & get_BlogCache();
 	$BlogCache->load_all( 'shortname,name', 'ASC' );
-	$BlogCache->none_option_text = '&nbsp;';
+	$BlogCache->none_option_text = T_('Please select...');
 
 	$Form->select_input_object( 'wp_blog_ID', param( 'wp_blog_ID', 'integer', 0 ), $BlogCache, T_('Destination collection'), array(
 			'note' => T_('This blog will be used for import.').' <a href="'.$admin_url.'?ctrl=collections&action=new">'.T_('Create new blog').' &raquo;</a>',
@@ -149,13 +151,13 @@ if( ! empty( $import_files ) )
 				array(
 					'value' => 'replace',
 					'label' => T_('Replace existing contents'),
-					'note'  => T_('WARNING: this option will permanently remove existing Posts, comments, categories and tags from the selected blog.'),
+					'note'  => T_('WARNING: this option will permanently remove existing posts, comments, categories and tags from the selected collection.'),
 					'id'    => 'import_type_replace' ),
 			), '', array( 'lines' => true ) );
 
 	echo '<div id="checkbox_delete_files"'.( $import_type == 'replace' ? '' : ' style="display:none"' ).'>';
 	$Form->checkbox_input( 'delete_files', param( 'delete_files', 'integer', 0 ), '', array(
-		'input_suffix' => '<label for="delete_files">'.T_(' Also delete files that will no longer be referenced in the target blog after replacing its contents').'</label>',
+		'input_suffix' => '<label for="delete_files">'.T_(' Also delete files that will no longer be referenced in the destination collection after replacing its contents').'</label>',
 		'input_prefix' => '<span style="margin-left:25px"></span>') );
 	echo '</div>';
 
@@ -165,8 +167,6 @@ if( ! empty( $import_files ) )
 					'label' => T_('Append to existing contents'),
 					'id'    => 'import_type_append' ),
 			), '', array( 'lines' => true ) );
-
-	$Form->text_input( 'attached_files_folder', param( 'attached_files_folder', 'filepath', 'b2evolution_export_files' ), 100, T_('Search for attached files in'), T_('If you import ZIP archive this folder must be located inside archive.'), array( 'input_prefix' => '<code>'.$media_subdir.'import/</code> ' ) );
 
 	$Form->end_fieldset();
 
@@ -212,6 +212,11 @@ function import_files_window()
 	} );
 	return false;
 }
+
+jQuery( document ).on( 'click', '#modal_window button[data-dismiss=modal]', function()
+{	// Reload page on closing modal window to display new uploaded files:
+	location.reload();
+} );
 <?php
 }
 ?>
