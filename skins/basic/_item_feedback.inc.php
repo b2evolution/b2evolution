@@ -179,24 +179,23 @@ while( $Comment = & $CommentList->get_next() )
 }
 
 // ------------------ COMMENT FORM INCLUDED HERE ------------------
-if( $disp_comment_form )
-{ // We want to display the comments form:
-	if( $Item->can_comment( '<p><em>', '</em></p>', '#', '#', '<h4>'.T_('Leave a comment').':</h4>' ) )
-	{ // User can leave a comment
-		if( $Blog->get_ajax_form_enabled() )
-		{
-			$json_params = array(
-				'action' => 'get_comment_form',
-				'p' => $Item->ID,
-				'blog' => $Blog->ID,
-				'disp' => $disp,
-				'params' => $params );
-			display_ajax_form( $json_params );
-		}
-		else
-		{
-			skin_include( '_item_comment_form.inc.php', $params );
-		}
+if( $disp_comment_form && // if enabled by skin param
+    $Blog->get_setting( 'allow_comments' ) != 'never' && // if enabled by collection setting
+    $Item->get_type_setting( 'use_comments' ) ) // if enabled by item type setting
+{	// Display a comment form only if it is enabled:
+	if( $Blog->get_ajax_form_enabled() )
+	{
+		$json_params = array(
+			'action' => 'get_comment_form',
+			'p' => $Item->ID,
+			'blog' => $Blog->ID,
+			'disp' => $disp,
+			'params' => $params );
+		display_ajax_form( $json_params );
+	}
+	else
+	{
+		skin_include( '_item_comment_form.inc.php', $params );
 	}
 	// Note: You can customize the default item comment form by copying the generic
 	// /skins/_item_comment_form.inc.php file into the current skin folder.

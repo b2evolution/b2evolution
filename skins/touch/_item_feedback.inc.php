@@ -282,22 +282,26 @@ if( $Item->can_see_comments( true ) )
 }
 
 // ------------------ COMMENT FORM INCLUDED HERE ------------------
-if( $Blog->get_ajax_form_enabled() && ( $Blog->get_setting( 'allow_comments' ) != 'never' ) )
-{
-	$json_params = array(
-		'action' => 'get_comment_form',
-		'p' => $Item->ID,
-		'blog' => $Blog->ID,
-		'disp' => $disp,
-		'params' => $params );
-	display_ajax_form( $json_params );
+if( $Blog->get_setting( 'allow_comments' ) != 'never' && // if enabled by collection setting
+    $Item->get_type_setting( 'use_comments' ) ) // if enabled by item type setting
+{	// Display a comment form only if it is enabled:
+	if( $Blog->get_ajax_form_enabled() )
+	{
+		$json_params = array(
+			'action' => 'get_comment_form',
+			'p' => $Item->ID,
+			'blog' => $Blog->ID,
+			'disp' => $disp,
+			'params' => $params );
+		display_ajax_form( $json_params );
+	}
+	else
+	{
+		skin_include( '_item_comment_form.inc.php', $params );
+	}
+	// Note: You can customize the default item comment form by copying the generic
+	// /skins/_item_comment_form.inc.php file into the current skin folder.
 }
-else
-{
-	skin_include( '_item_comment_form.inc.php', $params );
-}
-// Note: You can customize the default item comment form by copying the generic
-// /skins/_item_comment_form.inc.php file into the current skin folder.
 // ---------------------- END OF COMMENT FORM ---------------------
 
 // ----------- Register for item's comment notification -----------
