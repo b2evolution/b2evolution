@@ -717,7 +717,7 @@ class Item extends ItemLight
 
 				if( $editing || $this->dateset == 1 )
 				{ // We can use user date:
-					if( param_date( 'item_issue_date', T_('Please enter a valid issue date.'), true )
+					if( param_date( 'item_issue_date', sprintf( T_('Please enter a valid issue date using the following format: %s'), '<code>'.locale_input_datefmt().'</code>' ), true )
 						&& param_time( 'item_issue_time' ) )
 					{ // only set it, if a (valid) date and time was given:
 						$this->set( 'issue_date', form_date( get_param( 'item_issue_date' ), get_param( 'item_issue_time' ) ) ); // TODO: cleanup...
@@ -3082,7 +3082,7 @@ class Item extends ItemLight
 			$link_rel = isset( $params['image_link_rel'] ) ? $params['image_link_rel'] : '';
 		}
 		else
-		{ // We're linking to the original image, let lighbox (or clone) quick in:
+		{ // We're linking to the original image, let lightbox (or clone) kick in:
 			$link_title =  ( empty( $params['image_link_title'] ) && !isset( $params['hide_image_link_title'] ) ) ? '#desc#' : $params['image_link_title'];	// This title will be used by lightbox (colorbox for instance)
 			$link_rel = isset( $params['image_link_rel'] ) ? $params['image_link_rel'] : 'lightbox[p'.$this->ID.']';	// Make one "gallery" per post.
 		}

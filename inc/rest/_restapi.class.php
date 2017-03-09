@@ -2030,6 +2030,7 @@ class RestApi
 			$mask_row = (object) array(
 					'link_ID'       => $Link->ID,
 					'file_ID'       => $current_File->ID,
+					'file_type'     => $current_File->get_file_type(),
 					'link_position' => $Link->get( 'position' ),
 				);
 			$this->add_response( 'link', array(
