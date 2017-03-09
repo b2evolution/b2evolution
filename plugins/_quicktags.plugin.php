@@ -349,19 +349,19 @@ class quicktags_plugin extends Plugin
 
 		function <?php echo $params['js_prefix']; ?>b2evoToolbar( title )
 		{
-			var r = '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>'
-				+ '<?php echo $this->get_template( 'toolbar_group_before' ); ?>';
+			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>' + title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
+				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>';
 			for (var i = 0; i < <?php echo $params['js_prefix']; ?>b2evoButtons.length; i++)
 			{
 				r += <?php echo $params['js_prefix']; ?>b2evoGetButton( <?php echo $params['js_prefix']; ?>b2evoButtons[i], i );
 				if( <?php echo $params['js_prefix']; ?>b2evoButtons[i].grp_pos == 'last' && i > 0 && i < <?php echo $params['js_prefix']; ?>b2evoButtons.length - 1 )
 				{ // Separator between groups
-					r += '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>';
+					r += '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ) ); ?>';
 				}
 			}
-			r += '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>'
+			r += '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ) ); ?>'
 				+ '<input type="button" id="b2evo_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $params['js_prefix']; ?>b2evoCloseAllTags" title="<?php echo format_to_output( T_('Close all tags'), 'htmlattr' ); ?>" value="<?php echo ($simple ? 'close all tags' : 'X') ?>" />'
-				+ '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
+				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
 
 			jQuery( '.<?php echo $params['js_prefix'].$this->code ?>_toolbar' ).html( r );
 		}
@@ -457,7 +457,7 @@ class quicktags_plugin extends Plugin
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script type="text/javascript"><?php echo $params['js_prefix']; ?>b2evoToolbar( '<?php echo 'HTML: '; ?>' );</script><?php
+		?><script type="text/javascript"><?php echo $params['js_prefix']; ?>b2evoToolbar( 'HTML: ' );</script><?php
 
 		return true;
 	}

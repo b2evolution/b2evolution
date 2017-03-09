@@ -103,7 +103,7 @@ class item_tags_Widget extends ComponentWidget
 					'label' => T_( 'Before List' ),
 					'size' => 40,
 					'note' => T_( 'Label before the list of tags' ),
-					'defaultvalue' => 'Tags:'
+					'defaultvalue' => T_('Tags').': '
 				)
 			), parent::get_param_definitions( $params ) );
 

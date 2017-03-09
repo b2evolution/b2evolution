@@ -5811,6 +5811,7 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 		foreach( $methods as $method => $param_list )
 		{	// loop through each requested method
 			$params = array();
+			$internal_scripts = array();
 			if( !is_array( $param_list ) )
 			{	// lets make it an array
 				$param_list = array( $param_list );
@@ -5822,13 +5823,24 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 					$param = json_encode( $param );
 				}
 				elseif( !is_numeric( $param ) )
-				{	// this is a string, quote it:
+				{	// This is a string
+					if( preg_match_all( '#<script[^>]*>(.+?)</script>#is', $param, $match_scripts ) )
+					{	// Extract internal scripts from content:
+						$param = preg_replace( '#<script[^>]*>(.+?)</script>#is', '', $param );
+						$internal_scripts = array_merge( $internal_scripts, $match_scripts[1] );
+					}
+					// Quote the string to javascript format:
 					$param = '\''.format_to_js( $param ).'\'';
 				}
 				$params[] = $param;// add param to the list
 			}
-			// add method and parameters
+			// Add method and parameters:
 			$output .= $target.$method.'('.implode( ',', $params ).');'."\n";
+			// Append all internal scripts from content on order to execute this properly:
+			foreach( $internal_scripts as $internal_script )
+			{
+				$output .= "\n// Internal script from {$target}{$method}():\n".$internal_script;
+			}
 		}
 	}
 
@@ -6389,7 +6401,7 @@ function get_htsrv_url( $force_https = false )
 	}
 	else
 	{	// For current collection:
-		return $Blog->get_htsrv_url( $force_https );
+		return $Blog->get_local_htsrv_url( NULL, $force_https );
 	}
 }
 
@@ -7009,6 +7021,22 @@ if( !function_exists( 'array_walk_recursive' ) )
 		}
 
 		return true;
+	}
+}
+
+
+/**
+ * Provide hex2bin for older versions of PHP (< 5.4)
+ *
+ * Decodes a hexadecimally encoded binary string
+ * @param string Hexadecimal representation of data
+ * @return string The binary representation of the given data or FALSE on failure
+ */
+if( !function_exists( 'hex2bin' ) )
+{
+	function hex2bin( $hex )
+	{
+		return pack( 'H*', $hex );
 	}
 }
 

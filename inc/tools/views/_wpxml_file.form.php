@@ -15,7 +15,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $admin_url, $media_path;
+global $admin_url, $media_subdir;
 
 $Form = new Form( NULL, '', 'post', NULL, 'multipart/form-data' );
 
@@ -37,7 +37,7 @@ $Table->cols = array(
 	array( 'th' => T_('Date'), 'td_class' => 'shrinkwrap' ),
 );
 
-$Table->title = T_('Potential files to be imported').get_manual_link('file-importer');
+$Table->title = T_('Potential files to be imported').get_manual_link( 'xml-importer' );
 $Table->title .= ' - '.action_icon( T_('Refresh'), 'refresh', $admin_url.'?ctrl=wpimportxml', T_('Refresh'), 3, 4 );
 
 $FileRootCache = & get_FileRootCache();
@@ -63,25 +63,29 @@ if( $import_perm_view )
 		).' <span class="note">(popup)</span>';
 }
 $Table->display_init();
-// TABLE START:
-$Table->display_list_start();
+
+echo $Table->params['before'];
+
 // TITLE:
 $Table->display_head();
 
 if( empty( $import_files ) )
-{ // No files to import
+{	// No files to import:
+	$Table->total_pages = 0;
+	$Table->no_results_text = '<div class="center">'.T_('We have not found any suitable file to perform the blog import. Please read the details at the manual page.').get_manual_link( 'xml-importer' ).'</div>';
 
 	// BODY START:
 	$Table->display_body_start();
-
-	$Table->display_line_start();
-	$Table->display_col_start();
-	echo '<p class="center">'.T_('We have not found any suitable file to perform the blog import. Please read the details at the manual page.').get_manual_link('file-importer').'</p>';
-	$Table->display_col_end();
-	$Table->display_line_end();
+	$Table->display_list_start();
+	$Table->display_list_end();
+	// BODY END:
+	$Table->display_body_end();
 }
 else
-{ // Display the files to import in table
+{	// Display the files to import in table:
+
+	// TABLE START:
+	$Table->display_list_start();
 
 	// COLUMN HEADERS:
 	$Table->display_col_headers();
@@ -116,12 +120,15 @@ else
 
 		evo_flush();
 	}
+
+	// BODY END:
+	$Table->display_body_end();
+
+	// TABLE END:
+	$Table->display_list_end();
 }
 
-// BODY END / TABLE END:
-$Table->display_body_end();
-$Table->display_list_end();
-
+echo $Table->params['after'];
 
 if( ! empty( $import_files ) )
 {

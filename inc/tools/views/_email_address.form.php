@@ -61,7 +61,7 @@ $email_status_icons = emadr_get_status_icons();
 foreach( $email_status_icons as $status => $icon )
 {	// Init js array with email status icons
 ?>
-email_status_icons['<?php echo $status; ?>'] = '<?php echo $icon; ?>';
+email_status_icons['<?php echo $status; ?>'] = '<?php echo format_to_js( $icon ); ?>';
 <?php } ?>
 
 jQuery( '#emadr_status' ).change( function()

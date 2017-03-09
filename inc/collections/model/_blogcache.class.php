@@ -534,8 +534,8 @@ class BlogCache extends DataObjectCache
 
 		if( $Settings->get( 'subscribe_new_blogs' ) == 'public' )
 		{	// If a subscribing is available only for the public collections:
-			$blog_cache_SQL->WHERE_and( '( blog_ID NOT IN ( SELECT cset_coll_ID FROM evo_coll_settings WHERE cset_name = "allow_access" AND cset_value = "members" ) ) OR
-				( blog_ID IN ( SELECT cset_coll_ID FROM evo_coll_settings WHERE cset_name = "allow_access" AND cset_value = "members" ) AND (
+			$blog_cache_SQL->WHERE_and( '( blog_ID NOT IN ( SELECT cset_coll_ID FROM T_coll_settings WHERE cset_name = "allow_access" AND cset_value = "members" ) ) OR
+				( blog_ID IN ( SELECT cset_coll_ID FROM T_coll_settings WHERE cset_name = "allow_access" AND cset_value = "members" ) AND (
 					( SELECT bloguser_user_ID
 					    FROM T_coll_user_perms
 					   WHERE bloguser_blog_ID = blog_ID

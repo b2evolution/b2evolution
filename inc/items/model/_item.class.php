@@ -724,7 +724,8 @@ class Item extends ItemLight
 		}
 
 		// SLUG:
-		if( param( 'post_urltitle', 'string', NULL ) !== NULL ) {
+		if( param( 'post_urltitle', 'string', NULL ) !== NULL )
+		{
 			$this->set_from_Request( 'urltitle' );
 		}
 
@@ -3074,7 +3075,7 @@ class Item extends ItemLight
 			$link_rel = isset( $params['image_link_rel'] ) ? $params['image_link_rel'] : '';
 		}
 		else
-		{ // We're linking to the original image, let lighbox (or clone) quick in:
+		{ // We're linking to the original image, let lightbox (or clone) kick in:
 			$link_title =  ( empty( $params['image_link_title'] ) && !isset( $params['hide_image_link_title'] ) ) ? '#desc#' : $params['image_link_title'];	// This title will be used by lightbox (colorbox for instance)
 			$link_rel = isset( $params['image_link_rel'] ) ? $params['image_link_rel'] : 'lightbox[p'.$this->ID.']';	// Make one "gallery" per post.
 		}
@@ -7503,17 +7504,18 @@ class Item extends ItemLight
 		global $DB, $localtimenow;
 
 		$this->load_Blog();
-		$comment_inskin_statuses = explode( ',', $this->Blog->get_setting( 'comment_inskin_statuses' ) );
 
-		// Count each published comments rating grouped by active/expired status and by rating value
-		$sql = 'SELECT comment_rating, count( comment_ID ) AS cnt,
-					IF( iset_value IS NULL OR iset_value = "" OR TIMESTAMPDIFF(SECOND, comment_date, '.$DB->quote( date2mysql( $localtimenow ) ).') < iset_value, "active", "expired" ) as expiry_status
-						FROM T_comments
-						LEFT JOIN T_items__item_settings ON iset_item_ID = comment_item_ID AND iset_name = "comment_expiry_delay"
-						WHERE comment_item_ID = '.$this->ID.' AND comment_status IN ("'.implode('","', $comment_inskin_statuses) .'")
-						GROUP BY expiry_status, comment_rating
-						ORDER BY comment_rating DESC';
-		$results = $DB->get_results( $sql );
+		// Count each published comments rating grouped by active/expired status and by rating value:
+		$SQL = new SQL( 'Count each published comments rating grouped by active/expired status and by rating value' );
+		$SQL->SELECT( 'comment_rating, count( comment_ID ) AS cnt,' );
+		$SQL->SELECT_add( 'IF( iset_value IS NULL OR iset_value = "" OR TIMESTAMPDIFF(SECOND, comment_date, '.$DB->quote( date2mysql( $localtimenow ) ).') < iset_value, "active", "expired" ) as expiry_status' );
+		$SQL->FROM( 'T_comments' );
+		$SQL->FROM_add( 'LEFT JOIN T_items__item_settings ON iset_item_ID = comment_item_ID AND iset_name = "comment_expiry_delay"' );
+		$SQL->WHERE( 'comment_item_ID = '.$this->ID );
+		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $this->Blog->ID, 'comment' ), 'comment_', $this->Blog->ID, 'blog_comment!' ) );
+		$SQL->GROUP_BY( 'expiry_status, comment_rating' );
+		$SQL->ORDER_BY( 'comment_rating DESC' );
+		$results = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
 
 		// init rating arrays
 		$ratings = array();
@@ -7540,7 +7542,7 @@ class Item extends ItemLight
 		}
 
 		// Count active and overall rating values
-		foreach($results as $rating)
+		foreach( $results as $rating )
 		{
 			$index = ( $rating->comment_rating == 0 ) ? 'unrated' : $rating->comment_rating;
 			$ratings[$index] += $rating->cnt;

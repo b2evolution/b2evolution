@@ -297,25 +297,6 @@ function skin_init( $disp )
 			// Save global $Item to $download_Item, because $Item can be rewritten by function get_featured_Item() in some skins
 			$GLOBALS['download_Item'] = & $Item;
 
-			// Initialize JavaScript to download file after X seconds
-			add_js_headline( '
-jQuery( document ).ready( function ()
-{
-	jQuery( "#download_timer_js" ).show();
-} );
-
-var b2evo_download_timer = '.intval( $Blog->get_setting( 'download_delay' ) ).';
-var downloadInterval = setInterval( function()
-{
-	jQuery( "#download_timer" ).html( b2evo_download_timer );
-	if( b2evo_download_timer == 0 )
-	{ // Stop timer and download a file
-		clearInterval( downloadInterval );
-		jQuery( "#download_help_url" ).show();
-	}
-	b2evo_download_timer--;
-}, 1000 );' );
-
 			// Use meta tag to download file when JavaScript is NOT enabled
 			add_headline( '<meta http-equiv="refresh" content="'.intval( $Blog->get_setting( 'download_delay' ) )
 				.'; url='.$download_Link->get_download_url( array( 'type' => 'action' ) ).'" />' );

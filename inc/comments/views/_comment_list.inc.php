@@ -27,7 +27,6 @@ global $AdminUI, $UserSettings;
 
 // If rediret_to was not set, create new redirect
 $redirect_to = param( 'redirect_to', 'url', regenerate_url( '', 'filter=restore', '', '&' ) );
-$redirect_to = rawurlencode( $redirect_to );
 $save_context = param( 'save_context', 'boolean', 'true' );
 $show_comments = param( 'show_comments', 'string', 'all' );
 

@@ -701,8 +701,8 @@ $json_response = fetch_remote_page( $api_url, $api_info );
 $api_result = false;
 if( $json_response !== false )
 {	// Try to decode REST API json data:
-	json_decode( $json_response );
-	$api_result = ( json_last_error() === JSON_ERROR_NONE );
+	$decoded_response = @json_decode( $json_response );
+	$api_result = ! empty( $decoded_response );
 }
 if( $api_result )
 {	// Response is correct json data:
@@ -713,7 +713,7 @@ else
 {	// Response is not json data:
 	if( ! empty( $api_info['error'] ) )
 	{	// Display error message from function fetch_remote_page():
-		$api_error = ' <b>'.sprintf( T_('Error: %s'), $info['error'] ).'; '.sprintf( T_('Status code: %s'), $info['status'] ).'</b>';
+		$api_error = ' <b>'.sprintf( T_('Error: %s'), $api_info['error'] ).'; '.sprintf( T_('Status code: %s'), $api_info['status'] ).'</b>';
 	}
 	else
 	{	// Display error message from other places:
@@ -722,7 +722,7 @@ else
 	}
 	init_system_check( $api_title, T_('Failed'), $api_url );
 	disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.' )
-		.' '.sprintf( T_('Probably you should update a file %s to the latest version or check permissions to use this file.'), '<code>.htaccess</code>' )
+		.' '.T_('You should probably update your <code>.htaccess</code> file to the latest version and check the file permissions of this file.')
 		.$api_error );
 }
 

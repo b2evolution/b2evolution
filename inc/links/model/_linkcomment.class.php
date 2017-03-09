@@ -66,9 +66,10 @@ class LinkComment extends LinkOwner
 	/**
 	 * Get all positions ( key, display name ) pairs where link can be displayed
 	 *
+	 * @param integer File ID
 	 * @return array
 	 */
-	function get_positions()
+	function get_positions( $file_ID = NULL )
 	{
 		// Should be ordered like the ENUM.
 		return array(
@@ -115,8 +116,8 @@ class LinkComment extends LinkOwner
 			$FileCache = & get_FileCache();
 			$File = $FileCache->get_by_ID( $file_ID, false, false );
 			$file_name = empty( $File ) ? '' : $File->get_name();
-			$file_dir = $File->dir_or_file();
-			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s', ucfirst( $file_dir ), '[['.$file_name.']]', $this->type, $this->get_ID() ), 'info', 'file', $file_ID );
+			$file_dir = $File->dir_or_file( 'Directory', 'File' );
+			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s', $file_dir, '[['.$file_name.']]', $this->type, $this->get_ID() ), 'info', 'file', $file_ID );
 
 			if( $update_owner )
 			{ // Update last touched date of the Comment & Item

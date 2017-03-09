@@ -415,17 +415,17 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	{ // this should only happen when the slug is auto generated
 		global $Collection, $Blog;
 		if( isset( $Blog ) )
-		{ // Get max length of slug from current blog setting
+		{	// Get max length of slug from current blog setting:
 			$count_of_words = $Blog->get_setting('slug_limit');
 		}
 		if( empty( $count_of_words ) )
-		{ // Use 5 words to limit slug by default
+		{	// Use 5 words to limit slug by default:
 			$count_of_words = 5;
 		}
 
-		$title_words = array();
+		// Limit slug with max count of words:
 		$title_words = explode( '-', $urltitle );
-		if( count($title_words) > $count_of_words )
+		if( count( $title_words ) > $count_of_words )
 		{
 			$urltitle = '';
 			for( $i = 0; $i < $count_of_words; $i++ )
@@ -433,20 +433,18 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 				$urltitle .= $title_words[$i].'-';
 			}
 			//delete last '-'
-			$urltitle = substr( $urltitle, 0, strlen($urltitle) - 1 );
+			$urltitle = substr( $urltitle, 0, strlen( $urltitle ) - 1 );
 		}
-
-		// echo 'leaving 5 words: '.$urltitle.'<br />';
 	}
 
-	// Normalize to 200 chars + a number
+	// Normalize to 200 chars + a number:
 	preg_match( '/^(.*?)((-|_)+([0-9]+))?$/', $urltitle, $matches );
 	$urlbase = substr( $matches[1], 0, 200 );
 	// strip a possible dash at the end of the URL title:
 	$urlbase = rtrim( $urlbase, '-' );
 	$urltitle = $urlbase;
-	if( ! empty( $matches[4] ) )
-	{
+	if( isset( $matches[4] ) && $matches[4] !== '' )
+	{	// Append only NOT empty string after last dash:
 		$urltitle .= '-'.$matches[4];
 	}
 
@@ -1875,7 +1873,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 		{ // Use dropdown for bootstrap skin
 			$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
 			$Form->hidden( 'post_status', $edited_Item->status );
-			echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="top" data-container="body" title="'.get_status_tooltip_title( $edited_Item->status ).'">';
+			echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="left" data-container="body" title="'.get_status_tooltip_title( $edited_Item->status ).'">';
 			echo '<button type="button" class="btn btn-status-'.$edited_Item->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
 							.'<span>'.$status_options[ $edited_Item->status ].'</span>'
 						.' <span class="caret"></span></button>';
@@ -2666,7 +2664,7 @@ function echo_slug_filler()
 		{
 			if(!slug_changed)
 			{
-				jQuery( '#post_urltitle' ).val( jQuery( '#post_title' ).val() );
+				jQuery( '#post_urltitle' ).val( jQuery( '#post_title' ).val().replace( /,/g, ' ' ) );
 			}
 		} );
 
@@ -2849,7 +2847,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
  * Display a comment corresponding the given comment id
  *
  * @param object Comment object
- * @param string where to redirect after comment edit
+ * @param string where to redirect after comment edit. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
  * @param boolean true to set the new redirect param, false otherwise
  * @param integer Comment index in the current list, FALSE - to don't display a comment index
  * @param integer A reply level (Used on mode "Threaded comments" to shift a comment block to right)

@@ -2337,7 +2337,7 @@ function display_dragdrop_upload_button( $params = array() )
 						if( $params['table_headers'] != '' )
 						{ // Append table headers if they are defined
 						?>
-						noresults_row.parent().parent().prepend( '<?php echo str_replace( array( "'", "\n" ), array( "\'", '' ), $params['table_headers'] ); ?>' );
+						noresults_row.parent().parent().prepend( '<?php echo format_to_js( $params['table_headers'] ); ?>' );
 						<?php } ?>
 						noresults_row.remove();
 					}
@@ -2384,14 +2384,14 @@ function display_dragdrop_upload_button( $params = array() )
 							text = '<?php echo TS_('Server dropped the connection.'); ?>';
 						}
 						this_row.find( '.qq-upload-file' ).append( ' <span class="result_error">' + text + '</span>' );
-						this_row.find( '.qq-upload-image, td.size' ).prepend( '<?php echo get_icon( 'warning_yellow' ); ?>' );
+						this_row.find( '.qq-upload-image, td.size' ).prepend( '<?php echo format_to_js( get_icon( 'warning_yellow' ) ); ?>' );
 					}
 					else
 					{ // Success/Conflict
 						var table_view = typeof( responseJSON.success.link_ID ) != 'undefined' ? 'link' : 'file';
 
-						var filename_before = '<?php echo str_replace( "'", "\'", $params['filename_before'] ); ?>';
-						var filename_select = '<?php echo str_replace( "'", "\'", $params['filename_select'] ); ?>';
+						var filename_before = '<?php echo format_to_js( $params['filename_before'] ); ?>';
+						var filename_select = '<?php echo format_to_js( $params['filename_select'] ); ?>';
 						if( filename_before != '' )
 						{
 							filename_before = filename_before.replace( '$file_path$', decodeURIComponent( responseJSON.success.path ) );

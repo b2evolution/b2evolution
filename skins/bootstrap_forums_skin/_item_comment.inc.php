@@ -291,7 +291,7 @@ echo $params['comment_body_after'];
 	$Comment->vote_spam( '', '', '&amp;', true, true );
 
 	echo '<span class="pull-left">';
-		$comment_redirect_url = rawurlencode( $Comment->get_permanent_url() );
+		$comment_redirect_url = $Comment->get_permanent_url();
 		$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), button_class( 'text' ).' comment_edit_btn', '&amp;', true, $comment_redirect_url ); /* Link for editing */
 	echo '</span>';
 	echo '<div class="action_btn_group">';
@@ -304,7 +304,7 @@ echo $params['comment_body_after'];
 				'redirect_to' => $comment_redirect_url,
 				'detect_last' => !$delete_button_is_displayed,
 			) );
-		$Comment->delete_link( '', '', '#', T_('Delete this reply'), button_class( 'text' ), false, '&amp;', true, false, '#', rawurlencode( $commented_Item->get_permanent_url() ) ); /* Link to backoffice for deleting */
+		$Comment->delete_link( '', '', '#', T_('Delete this reply'), button_class( 'text' ), false, '&amp;', true, false, '#', $commented_Item->get_permanent_url() ); /* Link to backoffice for deleting */
 
 		echo '</span>';
 	echo '</div>';

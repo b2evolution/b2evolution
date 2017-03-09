@@ -1246,6 +1246,7 @@ class Blog extends DataObject
 					'media_assets_url_type'   => array( 'url' => 'media_assets_absolute_url',   'folder' => '/media/' ),
 					'skins_assets_url_type'   => array( 'url' => 'skins_assets_absolute_url',   'folder' => '/skins/' ),
 					'plugins_assets_url_type' => array( 'url' => 'plugins_assets_absolute_url', 'folder' => '/plugins/' ),
+					'htsrv_assets_url_type'   => array( 'url' => 'htsrv_assets_absolute_url',   'folder' => '/htsrv/' ),
 				);
 
 				foreach( $assets_url_data as $asset_url_type => $asset_url_data )
@@ -1834,6 +1835,13 @@ class Blog extends DataObject
 				.( empty( $htsrv_url_parts['port'] ) ? '' : ':'.$htsrv_url_parts['port'] )
 				.( empty( $htsrv_url_parts['path'] ) ? '' : $htsrv_url_parts['path'] );
 
+			if( isset( $coll_url_parts['scheme'], $htsrv_url_parts['scheme'] ) &&
+			    $coll_url_parts['scheme'] != $htsrv_url_parts['scheme'] )
+			{	// If this collection uses an url with scheme like "https://" then
+				// htsrv url must also uses the same url scheme to avoid restriction by secure reason:
+				$required_htsrv_url = $coll_url_parts['scheme'].substr( $required_htsrv_url, strlen( $htsrv_url_parts['scheme'] ) );
+			}
+
 			// Replace domain + path of htsrv URL with current request:
 			$this->htsrv_urls[ $force_https ] = substr_replace( $required_htsrv_url, $coll_domain, strpos( $required_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) );
 
@@ -1842,6 +1850,33 @@ class Blog extends DataObject
 		}
 
 		return $this->htsrv_urls[ $force_https ];
+	}
+
+
+	/**
+	 * Get the URL of the htsrv folder, on the current collection's domain (which is NOT always the same as the $baseurl domain!).
+	 *
+	 * @param string NULL to use current htsrv_assets_url_type setting. Use 'basic', 'relative' or 'absolute' to force.
+	 * @param boolean TRUE to use https URL
+	 * @return string URL to /htsrv/ folder
+	 */
+	function get_local_htsrv_url( $url_type = NULL, $force_https = false )
+	{
+		$url_type = is_null( $url_type ) ? $this->get_setting( 'htsrv_assets_url_type' ) : $url_type;
+
+		if( $url_type == 'relative' )
+		{	// Relative URL:
+			return $this->get_htsrv_url( $force_https );
+		}
+		elseif( $url_type == 'absolute' )
+		{	// Absolute URL:
+			return $this->get_setting( 'htsrv_assets_absolute_url' );
+		}
+		else// == 'basic'
+		{	// Basic Config URL from config:
+			global $htsrv_url_sensitive, $htsrv_url;
+			return $force_https ? $htsrv_url_sensitive : $htsrv_url;
+		}
 	}
 
 

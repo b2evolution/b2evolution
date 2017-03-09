@@ -335,7 +335,7 @@ function file_select_item( $file_ID, $params = array() )
 	}
 	else
 	{
-		$r .= '<div class="bg-danger">File Not Found</div>';
+		$r .= '<div class="bg-danger">'.T_('Not found').'</div>';
 	}
 	$blog_param = empty( $blog ) ? '' : '&amp;blog='.$blog;
 	if( $params['max_file_num'] > 1 )
@@ -346,16 +346,18 @@ function file_select_item( $file_ID, $params = array() )
 	{
 		$r .= '<div class="item_actions">';
 	}
-	$r .= action_icon( $params['remove_file_text'], 'remove',
-			'', T_('Remove'), NULL, $params['max_file_num'] > 1 ? NULL : 4,
-			array( 'onclick' => 'return file_select_delete( this );' ),
-			array( 'class' => 'remove_file_icon' ) );
-	//$r .= $params['max_file_num'] > 1 ? '' : '<br>';
+	// Display a button to select another file:
 	$r .= action_icon( $params['edit_file_text'], 'edit',
-			'', T_('Select another'), NULL, $params['max_file_num'] > 1 ? NULL : 4,
-			array( 'onclick' => 'return window.parent.file_select_attachment_window( this, true );' ),
+			'', ' '.T_('Select another'), NULL, $params['max_file_num'] > 1 ? NULL : 4,
+			array( 'onclick' => 'return window.parent.file_select_attachment_window( this, true );',
+			       'class' => 'btn btn-sm btn-info' ),
 			array( 'class' => 'edit_file_icon' ) );
-	//$r .= $params['max_file_num'] > 1 ? '' : '</div>';
+	// Display a button to remove current selected file:
+	$r .= action_icon( $params['remove_file_text'], 'remove',
+			'', ' '.T_('Remove'), NULL, $params['max_file_num'] > 1 ? NULL : 4,
+			array( 'onclick' => 'return file_select_delete( this );',
+			       'class' => 'btn btn-sm btn-default' ),
+			array( 'class' => 'remove_file_icon' ) );
 	$r .= '</div>';
 	$r .= $params['max_file_num'] > 1 ? '</div>' : '';
 	$r .= $params['field_item_end'];
