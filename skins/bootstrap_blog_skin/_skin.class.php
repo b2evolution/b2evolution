@@ -143,8 +143,8 @@ class bootstrap_blog_Skin extends Skin
 						'type' => 'select',
 					),
 					'font_size' => array(
-						'label' => T_('Font size'),
-						'note' => T_('Select content font size.'),
+						'label' => T_('Default font size'),
+						'note' => T_('Select default font size.'),
 						'defaultvalue' => 'default',
 						'options' => array(
 								'default'        => T_('Default (14px)'),
@@ -152,6 +152,23 @@ class bootstrap_blog_Skin extends Skin
 								'medium'         => T_('Medium (18px)'),
 								'large'          => T_('Large (20px)'),
 								'very_large'     => T_('Very large (22px)'),
+							),
+						'type' => 'select',
+					),
+					'font_weight' => array(
+						'label' => T_('Default font weight'),
+						'note' => T_('Select default font weight.'),
+						'defaultvalue' => '400',
+						'options' => array(
+								'100' => T_('100'),
+								'200' => T_('200'),
+								'300' => T_('300'),
+								'400' => T_('400 (normal)'),
+								'500' => T_('500'),
+								'600' => T_('600'),
+								'700' => T_('700 (bold)'),
+								'800' => T_('800'),
+								'900' => T_('900'),
 							),
 						'type' => 'select',
 					),
@@ -513,7 +530,7 @@ class bootstrap_blog_Skin extends Skin
 		}
 
 		// Font family customization
-		$custom_css .= $this->apply_selected_font( '#skin_wrapper', 'font_family' );
+		$custom_css .= $this->apply_selected_font( '#skin_wrapper', 'font_family', NULL, 'font_weight' );
 
 		if( ! empty( $custom_css ) )
 		{	// Function for custom_css:

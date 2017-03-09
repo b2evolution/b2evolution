@@ -739,6 +739,18 @@ class Skin extends DataObject
 			return $value;
 		}
 
+		return $this->get_setting_default_value( $parname );
+	}
+
+
+	/**
+	 * Get a skin specific param default value
+	 *
+	 * @param string Setting name
+	 * @return string|array|NULL
+	 */
+	function get_setting_default_value( $parname )
+	{
 		// Try default values:
 		$params = $this->get_param_definitions( NULL );
 		if( isset( $params[ $parname ]['defaultvalue'] ) )
@@ -1924,18 +1936,50 @@ var downloadInterval = setInterval( function()
      *
      * Uses: $this->font_definitions
      */
-    function apply_selected_font( $target_element, $font_family_param, $text_size_param = NULL )
+    function apply_selected_font( $target_element, $font_family_param, $text_size_param = NULL, $font_weight_param = NULL )
     {
-        // Select the font's CSS string
-        $selected_font_css = $this->font_definitions[ $this->get_setting( $font_family_param ) ][1];
+		$font_css = array();
+
+		// Get default font family and font-weight
+		$default_font_family = $this->get_setting_default_value( $font_family_param );
+		$default_font_weight = $this->get_setting_default_value( $font_weight_param );
+
+        // Select the font family CSS string
+		$selected_font_family = $this->get_setting( $font_family_param );
+		if( $selected_font_family != $default_font_family )
+		{
+			$selected_font_css = $this->font_definitions[$selected_font_family][1];
+			$font_css[] = "font-family: $selected_font_css;";
+		}
 
 		// If $text_size_param is passed, add font-size property
-		$text_size_param != NULL ? $text_size_param_css = 'font-size: ' . $text_size_param  : $text_size_param_css = '';
+		if( ! is_null( $text_size_param ) )
+		{
+			$selected_text_size = $this->get_setting( $text_size_param );
+			$font_css[] = 'font-size: '.$selected_text_size.';';
+		}
+
+		// If $font_weight_param is passed, add font-weight property
+		if( ! is_null( $font_weight_param ) )
+		{
+			$selected_font_weight = $this->get_setting( $font_weight_param );
+			if( $selected_font_weight != $default_font_weight )
+			{
+				$font_css[] = 'font-weight: '.$selected_font_weight.';';
+			}
+		}
 
         // Prepare the complete CSS for font customization
-        $custom_css = "$target_element { font-family: $selected_font_css; $text_size_param_css }\n";
+		if( ! empty( $font_css ) )
+		{
+        	$custom_css = "$target_element { ".implode( ' ', $font_css )." }\n";
+		}
+		else
+		{
+			$custom_css = '';
+		}
 
-        return $custom_css;
+		return $custom_css;
     }
 }
 
