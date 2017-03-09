@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2017-01-16 23:22+0100\n"
+"POT-Creation-Date: 2017-03-09 00:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Alexander Osokin <alex.osokin@gmail.com>, 2017\n"
 "Language-Team: Russian (Russia) (https://www.transifex.com/fplanque/teams/23/ru_RU/)\n"
@@ -603,17 +603,17 @@ msgstr "Удалить"
 msgid "Action for selected elements"
 msgstr "Действие для выбранных элементов"
 
-#: ../../../conf/_icons.php:1066 ../htsrv/viewfile.php:157
+#: ../../../conf/_icons.php:1066 ../htsrv/viewfile.php:152
 #: ../../../inc/users/model/_user.class.php:5075
 msgid "Rotate this picture 90&deg; to the right"
 msgstr "Повернуть это фото на 90&deg; по часовой стрелке"
 
-#: ../../../conf/_icons.php:1072 ../htsrv/viewfile.php:155
+#: ../../../conf/_icons.php:1072 ../htsrv/viewfile.php:150
 #: ../../../inc/users/model/_user.class.php:5073
 msgid "Rotate this picture 90&deg; to the left"
 msgstr "Повернуть это фото на 90&deg; против часовой стрелки"
 
-#: ../../../conf/_icons.php:1078 ../htsrv/viewfile.php:156
+#: ../../../conf/_icons.php:1078 ../htsrv/viewfile.php:151
 #: ../../../inc/users/model/_user.class.php:5074
 msgid "Rotate this picture 180&deg;"
 msgstr "Повернуть это фото на 180&deg;"
@@ -780,7 +780,7 @@ msgstr "Определенные критерии"
 #: ../../../inc/_core/__core.init.php:167 ../inc/_core/__core.init.php:186
 #: ../../../inc/_core/__core.init.php:205 ../inc/_core/__core.init.php:492
 #: ../../../inc/antispam/model/_antispam.funcs.php:782
-#: ../../../inc/files/model/_file.class.php:844
+#: ../../../inc/files/model/_file.class.php:845
 #: ../../../inc/files/model/_file.funcs.php:1956
 #: ../../../inc/items/model/_item.funcs.php:3283
 #: ../../../inc/items/model/_item.funcs.php:3289
@@ -1745,7 +1745,7 @@ msgstr "Отправленный URL недопустим:"
 msgid "Please do not send empty comment"
 msgstr "Пожалуйста, не отправляйте пустых комментариев"
 
-#: ../../../htsrv/viewfile.php:118 ../inc/items/model/_item.funcs.php:1849
+#: ../../../htsrv/viewfile.php:113 ../inc/items/model/_item.funcs.php:1849
 #: ../../../inc/items/views/_item_list_full.view.php:672
 #: ../../../inc/messaging/views/_message_list.view.php:337
 #: ../../../inc/messaging/views/_thread.form.php:140
@@ -1757,7 +1757,7 @@ msgstr "Пожалуйста, не отправляйте пустых комм�
 msgid "Preview"
 msgstr "Предпросмотр"
 
-#: ../../../htsrv/viewfile.php:190 ../inc/files/views/_file_links.view.php:63
+#: ../../../htsrv/viewfile.php:185 ../inc/files/views/_file_links.view.php:63
 #: ../../../inc/files/views/_file_move_copy.form.php:46
 #: ../../../inc/files/views/_file_rename.form.php:42
 #: ../../../inc/links/views/_link_list.inc.php:41
@@ -1765,7 +1765,7 @@ msgstr "Предпросмотр"
 msgid "File"
 msgstr "Файл"
 
-#: ../../../htsrv/viewfile.php:192 ../inc/_core/_misc.funcs.php:5813
+#: ../../../htsrv/viewfile.php:187 ../inc/_core/_misc.funcs.php:5813
 #: ../../../inc/collections/views/_coll_general.form.php:116
 #: ../../../inc/files/views/_file_links.view.php:98
 #: ../../../inc/items/model/_item.funcs.php:4055
@@ -1800,7 +1800,7 @@ msgstr "Файл"
 msgid "Title"
 msgstr "Заголовок"
 
-#: ../../../htsrv/viewfile.php:196 ../inc/chapters/views/_chapter.form.php:60
+#: ../../../htsrv/viewfile.php:191 ../inc/chapters/views/_chapter.form.php:60
 #: ../../../inc/collections/views/_coll_general.form.php:243
 #: ../../../inc/items/views/_itemtype.form.php:55
 #: ../../../inc/maintenance/views/_upgrade.form.php:41
@@ -1810,28 +1810,28 @@ msgstr "Заголовок"
 msgid "Description"
 msgstr "Описание"
 
-#: ../../../htsrv/viewfile.php:202
+#: ../../../htsrv/viewfile.php:197
 msgid "Empty file!"
 msgstr "Пустой файл!"
 
-#: ../../../htsrv/viewfile.php:207
+#: ../../../htsrv/viewfile.php:202
 #, php-format
 msgid "%d lines"
 msgstr "%d строк"
 
-#: ../../../htsrv/viewfile.php:216 ../htsrv/viewfile.php:246
+#: ../../../htsrv/viewfile.php:211 ../htsrv/viewfile.php:241
 msgid "Hide line numbers"
 msgstr "Скрыть номера строк"
 
-#: ../../../htsrv/viewfile.php:216 ../htsrv/viewfile.php:231
+#: ../../../htsrv/viewfile.php:211 ../htsrv/viewfile.php:226
 msgid "Show line numbers"
 msgstr "Показать номера строк"
 
-#: ../../../htsrv/viewfile.php:283
+#: ../../../htsrv/viewfile.php:278
 msgid "End Of File"
 msgstr "Конец файла"
 
-#: ../../../htsrv/viewfile.php:288 ../htsrv/viewfile.php:294
+#: ../../../htsrv/viewfile.php:283 ../htsrv/viewfile.php:289
 #, php-format
 msgid "The file &laquo;%s&raquo; could not be accessed!"
 msgstr "Файл &laquo;%s&raquo; недоступен!"
@@ -3157,166 +3157,167 @@ msgstr ""
 "Это может быть отредактировано только пользователями с правами Админа "
 "Пользователей."
 
-#: ../../../inc/_core/_param.funcs.php:177 ../inc/skins/_skin.funcs.php:1388
+#: ../../../inc/_core/_param.funcs.php:184 ../inc/skins/_skin.funcs.php:1388
 #, php-format
 msgid "Parameter &laquo;%s&raquo; is required!"
 msgstr "Требуется &laquo;%s&raquo; параметр!"
 
-#: ../../../inc/_core/_param.funcs.php:286 ../inc/_core/_param.funcs.php:355
-#: ../../../inc/_core/_param.funcs.php:393 ../inc/_core/_param.funcs.php:456
+#: ../../../inc/_core/_param.funcs.php:293 ../inc/_core/_param.funcs.php:310
+#: ../../../inc/_core/_param.funcs.php:372 ../inc/_core/_param.funcs.php:392
+#: ../../../inc/_core/_param.funcs.php:430 ../inc/_core/_param.funcs.php:493
 #, php-format
 msgid "Illegal value received for parameter &laquo;%s&raquo;!"
 msgstr "Получено недопустимое значение параметра &laquo;%s&raquo;!"
 
-#: ../../../inc/_core/_param.funcs.php:625
+#: ../../../inc/_core/_param.funcs.php:662
 #, php-format
 msgid "The field &laquo;%s&raquo; cannot be empty."
 msgstr "Поле &laquo;%s&raquo; не может быть пустым."
 
-#: ../../../inc/_core/_param.funcs.php:626
+#: ../../../inc/_core/_param.funcs.php:663
 msgid "This field cannot be empty."
 msgstr "Это поле не может быть пустым."
 
-#: ../../../inc/_core/_param.funcs.php:696
+#: ../../../inc/_core/_param.funcs.php:733
 msgid "The number value is invalid."
 msgstr "Недопустимое числовое значение."
 
-#: ../../../inc/_core/_param.funcs.php:724
+#: ../../../inc/_core/_param.funcs.php:761
 msgid "The decimal value is invalid."
 msgstr "Недопустимое десятичное значение."
 
-#: ../../../inc/_core/_param.funcs.php:791
+#: ../../../inc/_core/_param.funcs.php:828
 #: ../inc/users/model/_user.funcs.php:1482
 msgid "The email address is invalid."
 msgstr "Email адрес недопустим."
 
-#: ../../../inc/_core/_param.funcs.php:808
+#: ../../../inc/_core/_param.funcs.php:845
 msgid "Please choose a username."
 msgstr "Выберите имя пользователя."
 
-#: ../../../inc/_core/_param.funcs.php:817
+#: ../../../inc/_core/_param.funcs.php:854
 msgid "Logins cannot start with \"usr_\", this prefix is reserved for system use."
 msgstr ""
 "Логины не могут начинаться с \"usr_\", этот префикс зарезервирован для "
 "системного использования."
 
-#: ../../../inc/_core/_param.funcs.php:821
+#: ../../../inc/_core/_param.funcs.php:858
 msgid ""
 "Logins can only contain letters, digits and the following characters: _ ."
 msgstr ""
 "Имя пользователя может состоять из латинских букв A-Z, цифр, символов "
 "подчеркивания ( _ ) и точки ( . )"
 
-#: ../../../inc/_core/_param.funcs.php:825
+#: ../../../inc/_core/_param.funcs.php:862
 #, php-format
 msgid "Logins cannot contain whitespace and the following characters: %s"
 msgstr "Логины не могут содержать пробелы и следующие символы: %s"
 
-#: ../../../inc/_core/_param.funcs.php:854
+#: ../../../inc/_core/_param.funcs.php:891
 #, php-format
 msgid "There is no user with username &laquo;%s&raquo;."
 msgstr "Пользователя с логином &laquo;%s&raquo; не существует."
 
 #. TRANS: %s contains error details
-#: ../../../inc/_core/_param.funcs.php:898
+#: ../../../inc/_core/_param.funcs.php:935
 #, php-format
 msgid "Supplied URL is invalid. (%s)"
 msgstr "Неправильно указан URL. (%s)"
 
-#: ../../../inc/_core/_param.funcs.php:915
+#: ../../../inc/_core/_param.funcs.php:952
 #, php-format
 msgid "Please enter a valid URL, like for example: %s."
 msgstr "Пожалуйста, введите правильный URL, например: %s."
 
-#: ../../../inc/_core/_param.funcs.php:1152
+#: ../../../inc/_core/_param.funcs.php:1189
 msgid "The color value is invalid."
 msgstr "Недопустимое значение цвета."
 
-#: ../../../inc/_core/_param.funcs.php:1247
+#: ../../../inc/_core/_param.funcs.php:1284
 msgid "Please enter a valid time."
 msgstr "Пожалуйста, введите корректное время."
 
-#: ../../../inc/_core/_param.funcs.php:1433
+#: ../../../inc/_core/_param.funcs.php:1470
 msgid "The phone number is invalid."
 msgstr "Номер телефона недопустим."
 
-#: ../../../inc/_core/_param.funcs.php:1454
+#: ../../../inc/_core/_param.funcs.php:1491
 #, php-format
 msgid "Please enter a valid phone number like for example: %s."
 msgstr "Пожалуйста введите правильный телефонный номер, например: %s."
 
-#: ../../../inc/_core/_param.funcs.php:1470
+#: ../../../inc/_core/_param.funcs.php:1507
 #: ../inc/users/model/_user.funcs.php:1563
 msgid "Passwords cannot contain the characters &lt;, &gt; and &amp;."
 msgstr "Пароли не могут содержать символы &lt;, &gt; и &amp;."
 
-#: ../../../inc/_core/_param.funcs.php:1471
+#: ../../../inc/_core/_param.funcs.php:1508
 msgid "Please enter your new password."
 msgstr "Введите ваш новый пароль."
 
-#: ../../../inc/_core/_param.funcs.php:1472
+#: ../../../inc/_core/_param.funcs.php:1509
 msgid "Please enter your new password twice."
 msgstr "Введите ваш новый пароль дважды."
 
-#: ../../../inc/_core/_param.funcs.php:1473
+#: ../../../inc/_core/_param.funcs.php:1510
 #: ../inc/users/model/_user.funcs.php:1543
 msgid "You typed two different passwords."
 msgstr "Вы ввели два различных пароля."
 
-#: ../../../inc/_core/_param.funcs.php:1474
+#: ../../../inc/_core/_param.funcs.php:1511
 #: ../inc/users/model/_user.funcs.php:1551
 #, php-format
 msgid "The minimum password length is %d characters."
 msgstr "Минимальная длина пароля %d символов."
 
-#: ../../../inc/_core/_param.funcs.php:1530
+#: ../../../inc/_core/_param.funcs.php:1567
 msgid "This field should be a single word; A-Z only."
 msgstr ""
 "Это значение должно быть одиночным словом с латинскими буквами от A до Z."
 
-#: ../../../inc/_core/_param.funcs.php:2159 ../inc/_core/_param.funcs.php:2163
+#: ../../../inc/_core/_param.funcs.php:2196 ../inc/_core/_param.funcs.php:2200
 msgid "Invalid XHTML."
 msgstr "Недопустимая разметка XHTML."
 
-#: ../../../inc/_core/_param.funcs.php:2191 ../inc/_core/_param.funcs.php:2196
+#: ../../../inc/_core/_param.funcs.php:2228 ../inc/_core/_param.funcs.php:2233
 msgid "Please select a gender."
 msgstr "Пожалуйста, выберите ваш пол."
 
-#: ../../../inc/_core/_param.funcs.php:2401
+#: ../../../inc/_core/_param.funcs.php:2438
 msgid "Illegal content found (spam?)"
 msgstr "Обнаружено недопустимое содержание (спам?)"
 
-#: ../../../inc/_core/_param.funcs.php:2402
+#: ../../../inc/_core/_param.funcs.php:2439
 #, php-format
 msgid "Illegal content found: blacklisted word \"%s\"."
 msgstr "Обнаружено запрещенное слово: \"%s\"."
 
-#: ../../../inc/_core/_param.funcs.php:2407
+#: ../../../inc/_core/_param.funcs.php:2444
 msgid "Illegal content found (spam?)."
 msgstr "Обнаружено недопустимое содержание (спам?)."
 
-#: ../../../inc/_core/_param.funcs.php:2408
+#: ../../../inc/_core/_param.funcs.php:2445
 #, php-format
 msgid "Illegal content found: blacklisted word &laquo;%s&raquo;."
 msgstr "Обнаружено запрещенное слово: \"%s\"."
 
-#: ../../../inc/_core/_param.funcs.php:2455
+#: ../../../inc/_core/_param.funcs.php:2492
 msgid "Illegal CSS markup found: "
 msgstr "Обнаружена запрещенная разметка \"CSS\": "
 
-#: ../../../inc/_core/_param.funcs.php:2466
+#: ../../../inc/_core/_param.funcs.php:2503
 msgid "Illegal javascript markup found: "
 msgstr "Обнаружена запрещенная разметка \"javascript\": "
 
-#: ../../../inc/_core/_param.funcs.php:2473
+#: ../../../inc/_core/_param.funcs.php:2510
 msgid "Illegal frame markup found: "
 msgstr "Обнаружена запрещенная разметка \"frame\": "
 
-#: ../../../inc/_core/_param.funcs.php:2480
+#: ../../../inc/_core/_param.funcs.php:2517
 msgid "Illegal object markup found: "
 msgstr "Обнаружена запрещенная разметка \"object\": "
 
-#: ../../../inc/_core/_param.funcs.php:2493
+#: ../../../inc/_core/_param.funcs.php:2530
 #, php-format
 msgid ""
 "(Note: To get rid of the above validation warnings, you can deactivate "
@@ -3647,7 +3648,7 @@ msgid "Next"
 msgstr "Следующие"
 
 #: ../../../inc/_core/_template.funcs.php:1214
-#: ../../../inc/files/model/_file.class.php:2089
+#: ../../../inc/files/model/_file.class.php:2090
 #: ../../../inc/files/views/_file_list.inc.php:282
 msgid "Open in a new window"
 msgstr "Открыть в новом окне"
@@ -4223,7 +4224,7 @@ msgstr "Запись"
 #: ../../../inc/cron/cronjobs.ctrl.php:32
 #: ../../../inc/email_campaigns/campaigns.ctrl.php:34
 #: ../../../inc/files/file_types.ctrl.php:31 ../inc/files/files.ctrl.php:105
-#: ../../../inc/files/files.ctrl.php:367
+#: ../../../inc/files/files.ctrl.php:361
 #: ../inc/items/item_statuses.ctrl.php:43
 #: ../../../inc/items/item_tags.ctrl.php:37
 #: ../inc/items/item_types.ctrl.php:53 ../../../inc/links/links.ctrl.php:53
@@ -4320,7 +4321,7 @@ msgstr "Фильтры"
 
 #: ../../../inc/_core/ui/_uiwidget.class.php:902
 #: ../../../inc/_core/ui/_uiwidget.class.php:935
-#: ../../../inc/files/model/_filelist.class.php:658
+#: ../../../inc/files/model/_filelist.class.php:664
 msgid "Change Order"
 msgstr "Изменить порядок"
 
@@ -6254,7 +6255,7 @@ msgid "Send reminders about posts awaiting moderation"
 msgstr "Отправка напоминаний о записях, ожидающих модерации"
 
 #: ../../../inc/collections/_collections.init.php:1034
-#: ../../../inc/files/files.ctrl.php:367 ../inc/links/links.ctrl.php:53
+#: ../../../inc/files/files.ctrl.php:361 ../inc/links/links.ctrl.php:53
 #: ../../../inc/users/views/_invitation.view.php:49
 #: ../../../inc/users/views/_invitation.view.php:57
 #: ../../../inc/users/views/_invitation.view.php:59
@@ -7926,7 +7927,7 @@ msgid "Custom location"
 msgstr "Пользовательское размещение"
 
 #: ../../../inc/collections/views/_coll_advanced.form.php:151
-#: ../../../inc/files/model/_file.class.php:487
+#: ../../../inc/files/model/_file.class.php:488
 msgid "directory"
 msgstr "папка"
 
@@ -11124,14 +11125,10 @@ msgstr "Трекбек от %s"
 msgid "Pingback from %s"
 msgstr "Пинг от %s"
 
-#: ../../../inc/comments/model/_comment.class.php:3005
-msgid "Meta comment"
-msgstr "Мета комментарий"
-
 #: ../../../inc/comments/model/_comment.class.php:3010
 #, php-format
-msgid "%s from %s"
-msgstr "%s из %s"
+msgid "<a %s>Meta comment</a> from %s"
+msgstr ""
 
 #: ../../../inc/comments/model/_comment.class.php:3127
 msgid "Bad"
@@ -12004,7 +12001,7 @@ msgstr "Созданы новые записи: %d"
 msgid "Post by email report"
 msgstr "Отчет публикации по email"
 
-#: ../../../inc/cron/jobs/_post_moderation_reminder.job.php:329
+#: ../../../inc/cron/jobs/_post_moderation_reminder.job.php:336
 msgid "Post moderation reminder"
 msgstr "Уведомление о модерации записи"
 
@@ -12301,7 +12298,7 @@ msgstr "Блоги"
 #: ../inc/files/_files.init.php:490 ../../../inc/files/_files.init.php:526
 #: ../inc/files/file_moderation.ctrl.php:39
 #: ../../../inc/files/file_settings.ctrl.php:188
-#: ../../../inc/files/file_types.ctrl.php:193 ../inc/files/files.ctrl.php:1534
+#: ../../../inc/files/file_types.ctrl.php:193 ../inc/files/files.ctrl.php:1532
 #: ../../../inc/files/upload.ctrl.php:402
 #: ../../../inc/items/views/_item_list_full.view.php:292
 msgid "Files"
@@ -12934,298 +12931,298 @@ msgstr ""
 "обработан посредством b2evolution. Пожалуйста, проверьте и увеличьте "
 "переменную &laquo;%s&raquo;."
 
-#: ../../../inc/files/files.ctrl.php:410
+#: ../../../inc/files/files.ctrl.php:404
 msgid "Directory creation is disabled."
 msgstr "Создание папок запрещено."
 
-#: ../../../inc/files/files.ctrl.php:416
+#: ../../../inc/files/files.ctrl.php:410
 msgid "Cannot create a directory without name."
 msgstr "Невозможно создать папку без имени."
 
-#: ../../../inc/files/files.ctrl.php:438
+#: ../../../inc/files/files.ctrl.php:432
 msgid ""
 "The new file access path is too long, shorter folder names would be "
 "required."
 msgstr "Новый путь файла очень длинный, требуются более короткие имена папок."
 
-#: ../../../inc/files/files.ctrl.php:444 ../inc/files/files.ctrl.php:494
+#: ../../../inc/files/files.ctrl.php:438 ../inc/files/files.ctrl.php:488
 #: ../../../inc/xmlrpc/model/_xmlrpcs.funcs.php:243
 #, php-format
 msgid "The file &laquo;%s&raquo; already exists."
 msgstr "Файл &laquo;%s&raquo; уже существует."
 
-#: ../../../inc/files/files.ctrl.php:450
+#: ../../../inc/files/files.ctrl.php:444
 #, php-format
 msgid "Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;."
 msgstr "Невозможно создать папку &laquo;%s&raquo; в &laquo;%s&raquo;."
 
-#: ../../../inc/files/files.ctrl.php:455
+#: ../../../inc/files/files.ctrl.php:449
 #, php-format
 msgid "The directory &laquo;%s&raquo; has been created."
 msgstr "Папка &laquo;%s&raquo; была создана."
 
-#: ../../../inc/files/files.ctrl.php:472
+#: ../../../inc/files/files.ctrl.php:466
 msgid "File creation is disabled."
 msgstr "Создание файла запрещено."
 
-#: ../../../inc/files/files.ctrl.php:478
+#: ../../../inc/files/files.ctrl.php:472
 msgid "Cannot create a file without name."
 msgstr "Невозможно создать файл без имени."
 
-#: ../../../inc/files/files.ctrl.php:500
+#: ../../../inc/files/files.ctrl.php:494
 #, php-format
 msgid "Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;."
 msgstr "Невозможно создать файл &laquo;%s&raquo; в &laquo;%s&raquo;."
 
-#: ../../../inc/files/files.ctrl.php:505
+#: ../../../inc/files/files.ctrl.php:499
 #, php-format
 msgid "The file &laquo;%s&raquo; has been created."
 msgstr "Файл &laquo;%s&raquo; был создан."
 
-#: ../../../inc/files/files.ctrl.php:537
+#: ../../../inc/files/files.ctrl.php:531
 msgid "Your user settings have been updated."
 msgstr "Ваши пользовательские настройки были обновлены."
 
-#: ../../../inc/files/files.ctrl.php:567 ../inc/files/files.ctrl.php:1150
+#: ../../../inc/files/files.ctrl.php:561 ../inc/files/files.ctrl.php:1148
 #, php-format
 msgid "You are not allowed to edit &laquo;%s&raquo;."
 msgstr "Вам не разрешено редактировать &laquo;%s&raquo;."
 
-#: ../../../inc/files/files.ctrl.php:582
+#: ../../../inc/files/files.ctrl.php:576
 #, php-format
 msgid "The file &laquo;%s&raquo; has been updated."
 msgstr "Файл &laquo;%s&raquo; был обновлен."
 
-#: ../../../inc/files/files.ctrl.php:586
+#: ../../../inc/files/files.ctrl.php:580
 #, php-format
 msgid "The file &laquo;%s&raquo; could not be updated."
 msgstr "Файл &laquo;%s&raquo; не может быть обновлен!"
 
-#: ../../../inc/files/files.ctrl.php:652 ../inc/files/files.ctrl.php:799
-#: ../../../inc/files/files.ctrl.php:945 ../inc/files/files.ctrl.php:1032
-#: ../../../inc/files/files.ctrl.php:1274 ../inc/files/files.ctrl.php:1349
-#: ../../../inc/files/files.ctrl.php:1385 ../inc/files/files.ctrl.php:1434
+#: ../../../inc/files/files.ctrl.php:646 ../inc/files/files.ctrl.php:793
+#: ../../../inc/files/files.ctrl.php:943 ../inc/files/files.ctrl.php:1030
+#: ../../../inc/files/files.ctrl.php:1272 ../inc/files/files.ctrl.php:1347
+#: ../../../inc/files/files.ctrl.php:1383 ../inc/files/files.ctrl.php:1432
 #: ../../../inc/files/views/_file_list.inc.php:767
 msgid "Nothing selected."
 msgstr "Ничего не выбрано."
 
-#: ../../../inc/files/files.ctrl.php:665
+#: ../../../inc/files/files.ctrl.php:659
 msgid "Please provide the name of the archive."
 msgstr "Пожалуйста, введите имя архива."
 
-#: ../../../inc/files/files.ctrl.php:668
+#: ../../../inc/files/files.ctrl.php:662
 msgid "File name must end with .zip"
 msgstr "Имя файла должно оканчиваться на .zip"
 
-#: ../../../inc/files/files.ctrl.php:725
+#: ../../../inc/files/files.ctrl.php:719
 #, php-format
 msgid "ZIP archive \"%s\" has been created."
 msgstr "ZIP архив \"%s\" был создан."
 
-#: ../../../inc/files/files.ctrl.php:741 ../inc/files/files.ctrl.php:964
-#: ../../../inc/files/files.ctrl.php:1002
+#: ../../../inc/files/files.ctrl.php:735 ../inc/files/files.ctrl.php:962
+#: ../../../inc/files/files.ctrl.php:1000
 msgid "cannot be deleted because of the following relations"
 msgstr "невозможно удалить из-за следующих связей"
 
-#: ../../../inc/files/files.ctrl.php:749 ../inc/files/files.ctrl.php:972
+#: ../../../inc/files/files.ctrl.php:743 ../inc/files/files.ctrl.php:970
 #, php-format
 msgid "The directory &laquo;%s&raquo; has been deleted."
 msgstr "Папка &laquo;%s&raquo; была удалена."
 
-#: ../../../inc/files/files.ctrl.php:750 ../inc/files/files.ctrl.php:973
+#: ../../../inc/files/files.ctrl.php:744 ../inc/files/files.ctrl.php:971
 #, php-format
 msgid "The file &laquo;%s&raquo; has been deleted."
 msgstr "Файл &laquo;%s&raquo; был удален."
 
-#: ../../../inc/files/files.ctrl.php:755 ../inc/files/files.ctrl.php:978
+#: ../../../inc/files/files.ctrl.php:749 ../inc/files/files.ctrl.php:976
 #, php-format
 msgid "Could not delete the directory &laquo;%s&raquo; (not empty?)."
 msgstr "Невозможно удалить папку &laquo;%s&raquo; (не пустая?)."
 
-#: ../../../inc/files/files.ctrl.php:756 ../inc/files/files.ctrl.php:979
+#: ../../../inc/files/files.ctrl.php:750 ../inc/files/files.ctrl.php:977
 #: ../../../inc/tools/model/_wp.funcs.php:235
 #, php-format
 msgid "Could not delete the file &laquo;%s&raquo;."
 msgstr "Невозможно удалить файл &laquo;%s&raquo;."
 
-#: ../../../inc/files/files.ctrl.php:780 ../inc/files/files.ctrl.php:938
-#: ../../../inc/files/files.ctrl.php:1427
+#: ../../../inc/files/files.ctrl.php:774 ../inc/files/files.ctrl.php:936
+#: ../../../inc/files/files.ctrl.php:1425
 msgid "You have no permission to edit/modify files."
 msgstr "У вас нет прав на редактирование / изменение файлов."
 
-#: ../../../inc/files/files.ctrl.php:845
+#: ../../../inc/files/files.ctrl.php:839
 #, php-format
 msgid "&laquo;%s&raquo; has not been renamed"
 msgstr "&laquo;%s&raquo; не был переименован"
 
-#: ../../../inc/files/files.ctrl.php:851 ../inc/files/files.ctrl.php:1238
+#: ../../../inc/files/files.ctrl.php:845 ../inc/files/files.ctrl.php:1236
 #, php-format
 msgid "&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;"
 msgstr "&laquo;%s&raquo; не может быть переименован в &laquo;%s&raquo;"
 
-#: ../../../inc/files/files.ctrl.php:856 ../inc/files/files.ctrl.php:1229
+#: ../../../inc/files/files.ctrl.php:850 ../inc/files/files.ctrl.php:1227
 #, php-format
 msgid "&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;"
 msgstr "&laquo;%s&raquo; был успешно переименован в &laquo;%s&raquo;"
 
-#: ../../../inc/files/files.ctrl.php:866 ../inc/files/files.ctrl.php:1291
+#: ../../../inc/files/files.ctrl.php:860 ../inc/files/files.ctrl.php:1289
 #, php-format
 msgid "&laquo;%s&raquo; has not been copied"
 msgstr "&laquo;%s&raquo; не был скопирован"
 
-#: ../../../inc/files/files.ctrl.php:876 ../inc/files/files.ctrl.php:1301
+#: ../../../inc/files/files.ctrl.php:870 ../inc/files/files.ctrl.php:1299
 #, php-format
 msgid "&laquo;%s&raquo; could not be copied to &laquo;%s&raquo;"
 msgstr "&laquo;%s&raquo; не может скопироваться в &laquo;%s&raquo;"
 
-#: ../../../inc/files/files.ctrl.php:880 ../inc/files/files.ctrl.php:1305
+#: ../../../inc/files/files.ctrl.php:878 ../inc/files/files.ctrl.php:1303
 #, php-format
 msgid "&laquo;%s&raquo; has been successfully copied to &laquo;%s&raquo;"
 msgstr "&laquo;%s&raquo; был удачно скопирован в &laquo;%s&raquo;"
 
-#: ../../../inc/files/files.ctrl.php:890
+#: ../../../inc/files/files.ctrl.php:888
 #, php-format
 msgid "&laquo;%s&raquo; has not been moved"
 msgstr "&laquo;%s&raquo; не был перемещен"
 
-#: ../../../inc/files/files.ctrl.php:897
+#: ../../../inc/files/files.ctrl.php:895
 #, php-format
 msgid "&laquo;%s&raquo; could not be moved to &laquo;%s&raquo;"
 msgstr "&laquo;%s&raquo; не может быть перемещен в &laquo;%s&raquo;"
 
-#: ../../../inc/files/files.ctrl.php:901
+#: ../../../inc/files/files.ctrl.php:899
 #, php-format
 msgid "&laquo;%s&raquo; has been successfully moved to &laquo;%s&raquo;"
 msgstr "&laquo;%s&raquo; был удачно перемещен в &laquo;%s&raquo;"
 
-#: ../../../inc/files/files.ctrl.php:1050 ../inc/items/items.ctrl.php:214
+#: ../../../inc/files/files.ctrl.php:1048 ../inc/items/items.ctrl.php:214
 #: ../../../inc/items/items.ctrl.php:249
 msgid "No destination blog is selected."
 msgstr "Блог назначения не выбран."
 
-#: ../../../inc/files/files.ctrl.php:1059
+#: ../../../inc/files/files.ctrl.php:1057
 msgid "Sorry, you have no permission to post into this blog."
 msgstr "Извините, у вас нет разрешений на запись в этом блоге."
 
-#: ../../../inc/files/files.ctrl.php:1109
+#: ../../../inc/files/files.ctrl.php:1107
 #, php-format
 msgid "&laquo;%s&raquo; has been attached."
 msgstr "&laquo;%s&raquo; был прикреплен."
 
-#: ../../../inc/files/files.ctrl.php:1117 ../inc/items/items.ctrl.php:794
+#: ../../../inc/files/files.ctrl.php:1115 ../inc/items/items.ctrl.php:794
 msgid "Couldn't create the new post"
 msgstr "Нельзя создать новую запись"
 
-#: ../../../inc/files/files.ctrl.php:1206
+#: ../../../inc/files/files.ctrl.php:1204
 #, php-format
 msgid "File properties for &laquo;%s&raquo; have been updated."
 msgstr "Свойства файла &laquo;%s&raquo; были изменены."
 
-#: ../../../inc/files/files.ctrl.php:1210
+#: ../../../inc/files/files.ctrl.php:1208
 #, php-format
 msgid "File properties for &laquo;%s&raquo; have not changed."
 msgstr "Свойства файла &laquo;%s&raquo; не были изменены."
 
-#: ../../../inc/files/files.ctrl.php:1320
+#: ../../../inc/files/files.ctrl.php:1318
 #: ../inc/files/model/_file.funcs.php:1422
 #, php-format
 msgid "Your profile picture must have a minimum size of %dx%d pixels."
 msgstr "Ваше фото должно иметь минимальный размер %dx%d пикселей."
 
-#: ../../../inc/files/files.ctrl.php:1334
+#: ../../../inc/files/files.ctrl.php:1332
 msgid "Your profile picture has been changed."
 msgstr "Ваше фото было изменено."
 
-#: ../../../inc/files/files.ctrl.php:1446
+#: ../../../inc/files/files.ctrl.php:1444
 msgid "You have to give a default permission!"
 msgstr "Вы должны дать разрешения по умолчанию!"
 
-#: ../../../inc/files/files.ctrl.php:1453
+#: ../../../inc/files/files.ctrl.php:1451
 msgid "Read-only"
 msgstr "Только чтение"
 
-#: ../../../inc/files/files.ctrl.php:1454
+#: ../../../inc/files/files.ctrl.php:1452
 msgid "Read and write"
 msgstr "Чтение и запись"
 
-#: ../../../inc/files/files.ctrl.php:1468 ../inc/files/files.ctrl.php:1490
+#: ../../../inc/files/files.ctrl.php:1466 ../inc/files/files.ctrl.php:1488
 #, php-format
 msgid "Permissions for &laquo;%s&raquo; have not been changed."
 msgstr "Разрешения для &laquo;%s&raquo; не были изменены."
 
-#: ../../../inc/files/files.ctrl.php:1481
+#: ../../../inc/files/files.ctrl.php:1479
 #, php-format
 msgid "Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;."
 msgstr "Ошибка установки разрешений &laquo;%s&raquo; для &laquo;%s&raquo;."
 
-#: ../../../inc/files/files.ctrl.php:1494
+#: ../../../inc/files/files.ctrl.php:1492
 #, php-format
 msgid "Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;."
 msgstr "Разрешения для &laquo;%s&raquo; изменены на &laquo;%s&raquo;."
 
-#: ../../../inc/files/files.ctrl.php:1538 ../inc/files/upload.ctrl.php:406
+#: ../../../inc/files/files.ctrl.php:1536 ../inc/files/upload.ctrl.php:406
 #, php-format
 msgid "You are ready to post files from %s into %s..."
 msgstr "Все готово для публикации файлов из %s в блог %s..."
 
-#: ../../../inc/files/model/_file.class.php:294
+#: ../../../inc/files/model/_file.class.php:295
 #, php-format
 msgid "%d linked items"
 msgstr "%d связанных записей"
 
-#: ../../../inc/files/model/_file.class.php:296
+#: ../../../inc/files/model/_file.class.php:297
 #, php-format
 msgid "%d linked comments"
 msgstr "%d связанных комментариев"
 
-#: ../../../inc/files/model/_file.class.php:298
+#: ../../../inc/files/model/_file.class.php:299
 #, php-format
 msgid "%d linked users (profile pictures)"
 msgstr "%d связанных пользователей (фото)"
 
-#: ../../../inc/files/model/_file.class.php:492
+#: ../../../inc/files/model/_file.class.php:493
 #: ../../../inc/files/views/_file_browse.view.php:360
 msgid "file"
 msgstr "файл"
 
-#: ../../../inc/files/model/_file.class.php:689
+#: ../../../inc/files/model/_file.class.php:690
 #, php-format
 msgid "Directory &laquo;%s&raquo;"
 msgstr "Папка &laquo;%s&raquo;"
 
-#: ../../../inc/files/model/_file.class.php:693
+#: ../../../inc/files/model/_file.class.php:694
 #, php-format
 msgid "File &laquo;%s&raquo;"
 msgstr "Файл &laquo;%s&raquo;"
 
-#: ../../../inc/files/model/_file.class.php:833
+#: ../../../inc/files/model/_file.class.php:834
 #: ../../../inc/files/views/_file_list.inc.php:213
 msgid "Directory"
 msgstr "Папка"
 
 #. TRANS: short for '<directory>'
-#: ../../../inc/files/model/_file.class.php:1138
+#: ../../../inc/files/model/_file.class.php:1139
 #: ../../../inc/files/model/_filelist.class.php:457
 msgid "&lt;dir&gt;"
 msgstr "&lt;папка&gt;"
 
-#: ../../../inc/files/model/_file.class.php:2780
+#: ../../../inc/files/model/_file.class.php:2781
 msgid "Comment "
 msgstr "Комментарий"
 
-#: ../../../inc/files/model/_file.class.php:2837
+#: ../../../inc/files/model/_file.class.php:2838
 #: ../../../inc/links/model/_link.funcs.php:419
 #: ../../../inc/links/views/_link_list.inc.php:137
 msgid "Locate this directory!"
 msgstr "Найти эту папку!"
 
-#: ../../../inc/files/model/_file.class.php:2841
+#: ../../../inc/files/model/_file.class.php:2842
 #: ../../../inc/links/model/_link.funcs.php:419
 #: ../../../inc/links/views/_link_list.inc.php:139
 msgid "Locate this file!"
 msgstr "Найти этот файл!"
 
-#: ../../../inc/files/model/_file.class.php:3061
+#: ../../../inc/files/model/_file.class.php:3062
 #: ../../../inc/items/views/_item_history_compare.view.php:43
 #: ../../../inc/tools/views/_email_sent.view.php:130
 #: ../../../inc/tools/views/_email_sent_details.view.php:38
@@ -13234,7 +13231,7 @@ msgstr "Найти этот файл!"
 msgid "Deleted user"
 msgstr "Удаленный пользователь"
 
-#: ../../../inc/files/model/_file.class.php:3089
+#: ../../../inc/files/model/_file.class.php:3090
 #, php-format
 msgid "%d times by %s"
 msgstr "%d раз пользователями %s"
@@ -13674,24 +13671,24 @@ msgstr "Свойства файла"
 msgid "Cannot open directory &laquo;%s&raquo;!"
 msgstr "Невозможно открыть папку &laquo;%s&raquo;!"
 
-#: ../../../inc/files/model/_filelist.class.php:746
+#: ../../../inc/files/model/_filelist.class.php:752
 #, php-format
 msgid "The filter &laquo;%s&raquo; is not a regular expression."
 msgstr "Фильтр &laquo;%s&raquo; - не регулярное выражение."
 
-#: ../../../inc/files/model/_filelist.class.php:789
+#: ../../../inc/files/model/_filelist.class.php:795
 msgid "No filter"
 msgstr "Нет фильтра"
 
-#: ../../../inc/files/model/_filelist.class.php:794
+#: ../../../inc/files/model/_filelist.class.php:800
 msgid "regular expression"
 msgstr "регулярное выражение"
 
-#: ../../../inc/files/model/_filelist.class.php:1211
+#: ../../../inc/files/model/_filelist.class.php:1219
 msgid "No directory."
 msgstr "Нет папки."
 
-#: ../../../inc/files/model/_filelist.class.php:1237
+#: ../../../inc/files/model/_filelist.class.php:1245
 msgid "Change to this directory"
 msgstr "Перейти к этой папке"
 
@@ -34304,6 +34301,9 @@ msgid ""
 "been created yet. You can automatically generate it by filling out the form "
 "below."
 msgstr ""
+"Файл основной конфигурации (<code>/conf/_basic_config.php</code>) еще не был"
+" создан. Вы можете сгенерировать его автоматически, заполнив форму, "
+"расположенную ниже."
 
 #: ../../../install/index.php:564
 msgid "This is the minimum info we need to set up b2evolution on this server:"
