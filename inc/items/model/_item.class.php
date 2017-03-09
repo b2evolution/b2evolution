@@ -710,7 +710,7 @@ class Item extends ItemLight
 
 				if( $editing || $this->dateset == 1 )
 				{ // We can use user date:
-					if( param_date( 'item_issue_date', T_('Please enter a valid issue date.'), true )
+					if( param_date( 'item_issue_date', sprintf( T_('Please enter a valid issue date using the following format: %s'), '<code>'.locale_input_datefmt().'</code>' ), true )
 						&& param_time( 'item_issue_time' ) )
 					{ // only set it, if a (valid) date and time was given:
 						$this->set( 'issue_date', form_date( get_param( 'item_issue_date' ), get_param( 'item_issue_time' ) ) ); // TODO: cleanup...
