@@ -136,7 +136,7 @@ class ItemList2 extends ItemListLight
 		// Get issue date, using the user's locale (because it's entered like this in the form):
 		locale_temp_switch( $current_User->locale );
 
-		param_date( 'item_issue_date', T_('Please enter a valid issue date.'), false );
+		param_date( 'item_issue_date', sprintf( T_('Please enter a valid issue date using the following format: %s'), '<code>'.locale_input_datefmt().'</code>' ), false );
 		// TODO: dh> get_param() is always true here, also on invalid dates:
 		if( strlen(get_param('item_issue_date')) )
 		{ // only set it, if a date was given:

@@ -482,7 +482,7 @@ function display_link_position( & $row )
 	if( isset( $available_positions['inline'] ) )
 	{	// If link owner support inline position,
 		// Display icon to insert image, audio, video or file inline tag into content:
-		$type = $row->file_type;
+		$type = isset( $row->file_type ) ? $row->file_type : 'file';
 
 		// valid file types: audio, video, image, other. See @link File::set_file_type()
 		switch( $type )

@@ -1880,21 +1880,20 @@ function get_default_avatar_url( $gender = '', $size = NULL )
 			break;
 	}
 
-	if( $size !== NULL )
-	{ // Get a thumbnail url
-		$FileCache = & get_FileCache();
-		if( $File = & $FileCache->get_by_root_and_path( 'shared', 0, $avatar_url ) )
-		{
-			if( $File->is_image() )
-			{ // Check if the default avatar files are real images and not broken by some reason
-				return $File->get_thumb_url( $size, '&' );
-			}
-		}
+	$FileCache = & get_FileCache();
+	if( ! ( $File = & $FileCache->get_by_root_and_path( 'shared', 0, $avatar_url ) ) )
+	{	// Return the full size image URL without further ado if the requested file doesn't exist:
+		global $media_url;
+		return $media_url.'shared/global'.$avatar_url;
 	}
 
-	// We couldn't get a thumbnail url OR access the folder, Return the full size image URL without further ado:
-	global $media_url;
-	return $media_url.'shared/global'.$avatar_url;
+	if( $size !== NULL && $File->is_image() )
+	{	// Get a thumbnail url only if the default avatar file is a real image:
+		return $File->get_thumb_url( $size, '&' );
+	}
+
+	// Return original file URL if we don't want or couldn't get a thumbnail url:
+	return $File->get_url();
 }
 
 

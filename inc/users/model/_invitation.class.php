@@ -87,7 +87,7 @@ class Invitation extends DataObject
 		$this->set_from_Request( 'code', 'ivc_code' );
 
 		// Expire date
-		if( param_date( 'ivc_expire_date', T_('Please enter a valid date.'), true ) && ( param_time( 'ivc_expire_time' ) ) )
+		if( param_date( 'ivc_expire_date', sprintf( T_('Please enter a valid date using the following format: %s'), '<code>'.locale_input_datefmt().'</code>' ), true ) && ( param_time( 'ivc_expire_time' ) ) )
 		{ // If date and time were both correct we may set the 'expire_ts' value
 			$this->set( 'expire_ts', form_date( get_param( 'ivc_expire_date' ), get_param( 'ivc_expire_time' ) ) );
 		}
