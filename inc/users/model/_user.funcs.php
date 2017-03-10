@@ -1880,21 +1880,20 @@ function get_default_avatar_url( $gender = '', $size = NULL )
 			break;
 	}
 
-	if( $size !== NULL )
-	{ // Get a thumbnail url
-		$FileCache = & get_FileCache();
-		if( $File = & $FileCache->get_by_root_and_path( 'shared', 0, $avatar_url ) )
-		{
-			if( $File->is_image() )
-			{ // Check if the default avatar files are real images and not broken by some reason
-				return $File->get_thumb_url( $size, '&' );
-			}
-		}
+	$FileCache = & get_FileCache();
+	if( ! ( $File = & $FileCache->get_by_root_and_path( 'shared', 0, $avatar_url ) ) )
+	{	// Return the full size image URL without further ado if the requested file doesn't exist:
+		global $media_url;
+		return $media_url.'shared/global'.$avatar_url;
 	}
 
-	// We couldn't get a thumbnail url OR access the folder, Return the full size image URL without further ado:
-	global $media_url;
-	return $media_url.'shared/global'.$avatar_url;
+	if( $size !== NULL && $File->is_image() )
+	{	// Get a thumbnail url only if the default avatar file is a real image:
+		return $File->get_thumb_url( $size, '&' );
+	}
+
+	// Return original file URL if we don't want or couldn't get a thumbnail url:
+	return $File->get_url();
 }
 
 
@@ -4100,9 +4099,9 @@ function display_voting_form( $params = array() )
 		}
 	}
 
-	echo '<div class="voting_wrapper">';
+	echo '<span class="voting_wrapper">';
 
-	echo '<div class="vote_title">';
+	echo '<span class="vote_title_panel">';
 	echo '<span class="vote_title">'.$vote_numbers.'<span class="vote_title_text">'.$params['title_text'].'</span></span>';
 	$blog_param = empty( $blog ) ? '' : '&blog='.$blog;
 	// Set this url for case when JavaScript is not enabled:
@@ -4114,9 +4113,9 @@ function display_voting_form( $params = array() )
 	{	// Append a redirect param:
 		$url .= '&redirect_to='.$redirect_to;
 	}
-	echo '</div>';// END OF <div class="vote_title">
+	echo '</span>';// END OF <span class="vote_title_panel">
 
-	echo '<div class="btn-group">';
+	echo '<span class="btn-group">';
 	if( ! empty( $params['widget_ID'] ) )
 	{	// Append widget ID for action URL:
 		$url .= '&widget_ID='.intval( $params['widget_ID'] );
@@ -4141,9 +4140,9 @@ function display_voting_form( $params = array() )
 	{	// Display 'Dont like' icon:
 		echo action_icon( '', $icon_dontlike, $url.'&vote_action=dontlike', '', 0, 0, array(), $params_dontlike );
 	}
-	echo '</div>';// END OF <div class="btn-group">
+	echo '</span>';// END OF <span class="btn-group">
 
-	echo '<div class="vote_others">';
+	echo '<span class="vote_others">';
 	if( $params['display_inappropriate'] || $params['display_spam'] )
 	{	// Display separator between icons and checkboxes:
 		echo '<span class="separator">&nbsp;</span>';
@@ -4177,9 +4176,9 @@ function display_voting_form( $params = array() )
 	{	// Create a hidden input with skin ID:
 		echo '<input type="hidden" id="skinID" value="'.$params['skin_ID'].'" />';
 	}
-	echo '</div>';// END OF <div class="vote_others">
+	echo '</span>';// END OF <span class="vote_others">
 
-	echo '</div>';// END OF <div class="voting_wrapper">
+	echo '</span>';// END OF <span class="voting_wrapper">
 }
 
 
@@ -6246,7 +6245,7 @@ function get_PasswordDriver( $driver_code = '' )
 	// Get password drivers config:
 	$config_password_drivers = get_password_drivers();
 
-	// 
+	//
 	$allowed_password_drivers = $enabled_password_drivers;
 
 	if( ! empty( $driver_code )

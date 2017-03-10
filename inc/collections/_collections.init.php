@@ -656,58 +656,6 @@ class collections_Module extends Module
 
 
 	/**
-	 * Build teh evobar menu
-	 */
-	function build_evobar_menu()
-	{
-		/**
-		 * @var Menu
-		 */
-		global $topleft_Menu, $topright_Menu;
-		global $current_User;
-		global $home_url, $admin_url, $debug, $seo_page_type, $robots_index;
-		global $Collection, $Blog, $blog;
-
-		global $Settings;
-
-		if( ! $current_User->check_perm( 'admin', 'normal' ) )
-		{
-			return;
-		}
-
-		$entries = array();
-		$entries['b2evonet'] = array(
-								'text' => T_('Open b2evolution.net'),
-								'href' => 'http://b2evolution.net/',
-								'target' => '_blank',
-							);
-		$entries['forums'] = array(
-								'text' => T_('Open Support forums'),
-								'href' => 'http://forums.b2evolution.net/',
-								'target' => '_blank',
-							);
-		$entries['manual'] = array(
-								'text' => T_('Open Online manual'),
-								'href' => get_manual_url( NULL ),
-								'target' => '_blank',
-							);
-		$entries[] = array( 'separator' => true );
-		$entries['twitter'] = array(
-								'text' => T_('b2evolution on twitter'),
-								'href' => 'http://twitter.com/b2evolution',
-								'target' => '_blank',
-							);
-		$entries['facebook'] = array(
-								'text' => T_('b2evolution on facebook'),
-								'href' => 'http://www.facebook.com/b2evolution',
-								'target' => '_blank',
-							);
-
-		$topleft_Menu->add_menu_entries( 'b2evo', $entries );
-	}
-
-
-	/**
 	 * Builds the 1st half of the menu. This is the one with the most important features
 	 */
 	function build_menu_1()

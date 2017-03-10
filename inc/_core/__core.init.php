@@ -998,6 +998,11 @@ class _core_Module extends Module
 
 		$perm_admin_normal = $current_User->check_perm( 'admin', 'normal' );
 		$perm_admin_restricted = $current_User->check_perm( 'admin', 'restricted' );
+		$perm_users_view = $current_User->check_perm( 'users', 'view' );
+		$perm_options = $current_User->check_perm( 'options', 'view' );
+		$perm_spam = $perm_options && $current_User->check_perm( 'spamblacklist', 'view' );
+		$perm_emails = $current_User->check_perm( 'emails', 'view' );
+		$perm_maintenance = $current_User->check_perm( 'perm_maintenance', 'upgrade' );
 		$entries = NULL;
 
 		$working_blog = get_working_blog();
@@ -1014,49 +1019,188 @@ class _core_Module extends Module
 				$collection_url = $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog='.$working_blog;
 			}
 		}
+
 		if( $perm_admin_normal || $perm_admin_restricted )
 		{ // Normal OR Restricted Access to Admin:
 			$entries = array();
-			if( $perm_admin_normal )
-			{ // Only for normal access
-				$entries['b2evo'] = array(
-						'text' => '<strong>b2evolution</strong>',
-						'href' => $home_url,
-						'entry_class' => 'rwdhide'
+
+			// ---- START OF "Site" MENU ----:
+			$entries['site'] = array(
+				'text' => T_('Site'),
+				'href' => is_admin_page() ? $baseurl : $admin_url,
+				'title' => is_admin_page() ? T_('Go to the site home page (Front-office)') : T_('Go to the site dashboard (Back-office)'),
+				'entries' => array(
+					'front' => array(
+						'text' => T_('Site Front Page'),
+						'href' => $baseurl,
+						'title' => T_('Go to the site home page (Front-office)'),
+					),
+					'dashboard' => array(
+						'text' => T_('Site Dashboard'),
+						'href' => $admin_url,
+						'title' => T_('Go to the site dashboard (Back-office)'),
+					)
+				)
+			);
+
+			// More site options:
+			if( $perm_users_view )
+			{
+				$entries['site']['entries'][] = array( 'separator' => true );
+				$entries['site']['entries']['users'] = array(
+						'text' => T_('Users').'&hellip;',
+						'href' => $admin_url.'?ctrl=users',
 					);
 			}
-			$entries['front'] = array(
-					'text' => /* TRANS: evobar menu link. <u>...</u> marks the part to hide on small screens */ T_('Front<u>-office</u>'),
-					'href' => $baseurl,
-					'title' => T_('Go to the site home page (Front-office)'),
-				);
-			$entries['dashboard'] = array(
-					'text' => /* TRANS: evobar menu link. <u>...</u> marks the part to hide on small screens */ T_('Back<u>-office</u>'),
-					'href' => $admin_url,
-					'title' => T_('Go to the site dashboard (Back-office)'),
-				);
-			if( $perm_admin_normal )
-			{ // Only for normal access
-				$entries['write'] = array(
-						'text' => '<span class="fa fa-plus-square"></span> '.T_('Post'),
-						'title' => T_('No blog is currently selected'),
-						'disabled' => true,
-						'entry_class' => 'rwdhide',
+
+			// PLACE HOLDER FOR MESSAGING MODULE:
+			$entries['site']['entries']['messaging'] = NULL;
+
+			// PLACE HOLDER FOR FILES MODULE:
+			$entries['site']['entries']['files'] = NULL;
+
+			if( $perm_spam || $perm_options || $perm_maintenance || $perm_emails )
+			{
+				$entries['site']['entries'][] = array( 'separator' => true );
+
+				if( $perm_emails )
+				{
+					$entries['site']['entries']['email'] = array(
+							'text' => T_('Emails'),
+							'href' => $admin_url.'?ctrl=campaigns',
+							'entries' => array(
+								'campaigns' => array(
+									'text' => T_('Campaigns').'&hellip;',
+									'href' => $admin_url.'?ctrl=campaigns' ),
+								'settings' => array(
+									'text' => T_('Settings').'&hellip;',
+									'href' => $admin_url.'?ctrl=email&amp;tab=settings' ),
+								'blocked' => array(
+									'text' => T_('Addresses').'&hellip;',
+									'href' => $admin_url.'?ctrl=email' ),
+								'sent' => array(
+									'text' => T_('Sent').'&hellip;',
+									'href' => $admin_url.'?ctrl=email&amp;tab=sent' ),
+								'return' => array(
+									'text' => T_('Returned').'&hellip;',
+									'href' => $admin_url.'?ctrl=email&amp;tab=return' ),
+								)
+						);
+				}
+
+				$entries['site']['entries']['system'] = array(
+						'text' => T_('System'),
+						'href' => $admin_url.'?ctrl=system',
+					);
+
+				if( $perm_options )
+				{
+					$entries['site']['entries']['system']['entries']['status'] = array(
+							'text' => T_('Status').'&hellip;',
+							'href' => $admin_url.'?ctrl=system',
+						);
+					$entries['site']['entries']['system']['entries']['crontab'] = array(
+							'text' => T_('Scheduler').'&hellip;',
+							'href' => $admin_url.'?ctrl=crontab',
+						);
+				}
+
+				if( $perm_spam )
+				{
+					$entries['site']['entries']['system']['entries']['antispam'] = array(
+							'text' => T_('Antispam').'&hellip;',
+							'href' => $admin_url.'?ctrl=antispam',
+						);
+				}
+			}
+
+			if( $perm_options )
+			{	// Global settings:
+				$entries['site']['entries']['system']['entries']['regional'] = array(
+						'text' => T_('Regional').'&hellip;',
+						'href' => $admin_url.'?ctrl=regional',
+					);
+				$entries['site']['entries']['system']['entries']['skins'] = array(
+						'text' => T_('Skins').'&hellip;',
+						'href' => $admin_url.'?ctrl=skins&amp;tab=system'
+					);
+				$entries['site']['entries']['system']['entries']['plugins'] = array(
+						'text' => T_('Plugins').'&hellip;',
+						'href' => $admin_url.'?ctrl=plugins',
+					);
+				$entries['site']['entries']['system']['entries']['remote'] = array(
+						'text' => T_('Remote publishing').'&hellip;',
+						'href' => $admin_url.'?ctrl=remotepublish',
+					);
+				$entries['site']['entries']['system']['entries']['maintenance'] = array(
+						'text' => T_('Maintenance').'&hellip;',
+						'href' => $admin_url.'?ctrl=tools',
+					);
+				$entries['site']['entries']['system']['entries']['syslog'] = array(
+						'text' => T_('System log'),
+						'href' => $admin_url.'?ctrl=syslog',
 					);
 			}
+
+			// PLACE HOLDER FOR SESSIONS MODULE:
+			$entries['site']['entries']['stats_separator'] = NULL;
+			$entries['site']['entries']['stats'] = NULL;
+			$entries['site']['entries']['stats_page'] = NULL;
+
+			// b2evolution info links:
+			$entries['site']['entries'][] = array( 'separator' => true );
+			$entries['site']['entries']['b2evo'] = array(
+				'text' => 'b2evolution',
+				'href' => $home_url,
+				'entries' => array(
+					'b2evonet' => array(
+							'text' => T_('Open b2evolution.net'),
+							'href' => 'http://b2evolution.net/',
+							'target' => '_blank',
+						),
+					'forums' => array(
+							'text' => T_('Open Support forums'),
+							'href' => 'http://forums.b2evolution.net/',
+							'target' => '_blank',
+						),
+					'manual' => array(
+							'text' => T_('Open Online manual'),
+							'href' => get_manual_url( NULL ),
+							'target' => '_blank',
+						),
+					'sep' => array( 'separator' => true ),
+					'twitter' => array(
+							'text' => T_('b2evolution on twitter'),
+							'href' => 'http://twitter.com/b2evolution',
+							'target' => '_blank',
+						),
+					'facebook' => array(
+							'text' => T_('b2evolution on facebook'),
+							'href' => 'http://www.facebook.com/b2evolution',
+							'target' => '_blank',
+						)
+					)
+				);
+			// ---- END OF "Site" MENU ----
+
 			if( $working_blog )
-			{ // Display a link to manage first available collection
+			{	// Display a link to manage first available collection:
 				$entries['blog'] = array(
 					'text' => T_('Collection'),
 					'href' => $collection_url,
 					'disabled' => true,
 				);
 			}
-			$entries['tools'] = array(
-					'text' => T_('More'),
-					'href' => $admin_url.'#',
-					'disabled' => true,
-				);
+
+			if( $perm_admin_normal )
+			{	// Only for normal access display a menu item to create new:
+				$entries['post'] = array(
+						'text' => get_icon( 'new' ).' '.T_('Post'),
+						'title' => T_('No blog is currently selected'),
+						'disabled' => true,
+						'entry_class' => 'rwdhide',
+					);
+			}
 		}
 
 
@@ -1064,26 +1208,38 @@ class _core_Module extends Module
 		{ // A blog is currently selected AND we can activate toolbar items for selected collection:
 			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 			{ // We have permission to add a post with at least one status:
-				$write_item_url = $Blog->get_write_item_url();
-				if( $write_item_url )
-				{ // write item URL is not empty, so it's sure that user can create new post
-					if( !$perm_admin_normal )
-					{
-						$entries['write'] = array(
-							'text' => '<span class="fa fa-plus-square"></span> '.T_('Post'),
+				global $disp, $Item;
+				if( ( $disp == 'single' || $disp == 'page' ) &&
+				    isset( $Item ) &&
+				    $edit_item_url = $Item->get_edit_url() )
+				{	// If curent user has a permission to edit a current viewing post:
+					$entries['post'] = array(
+							'text'        => '<span class="fa fa-pencil-square"></span> '.T_('Edit'),
+							'href'        => $edit_item_url,
+							'title'       => T_('Edit current post'),
+							'entry_class' => 'rwdhide',
+						);
+				}
+				elseif( $write_item_url = $Blog->get_write_item_url() )
+				{	// If a write item URL is not empty, so it's sure that user can create new post:
+					if( ! $perm_admin_normal )
+					{	// Initialize this menu item when user has no back-office access but can create new post:
+						$entries['post'] = array(
+							'text'        => get_icon( 'new' ).' '.T_('Post'),
+							'entry_class' => 'rwdhide',
 						);
 					}
-					$entries['write']['href'] = $write_item_url;
-					$entries['write']['disabled'] = false;
-					$entries['write']['title'] = T_('Write a new post into this blog');
+					$entries['post']['href'] = $write_item_url;
+					$entries['post']['disabled'] = false;
+					$entries['post']['title'] = T_('Write a new post into this blog');
 				}
 			}
 
 			if( $perm_admin_normal && $working_blog )
 			{
-				if( empty( $write_item_url ) )
-				{ // Display restricted message on this blog
-					$entries['write']['title'] = T_('You don\'t have permission to post into this blog');
+				if( empty( $write_item_url ) && empty( $edit_item_url ) )
+				{	// Display a restricted message to create new post on this collection:
+					$entries['post']['title'] = T_('You don\'t have permission to post into this blog');
 				}
 
 				// BLOG MENU:
@@ -1288,6 +1444,54 @@ class _core_Module extends Module
 			}
 		}
 
+		if( ! is_admin_page() && ! empty( $Blog ) )
+		{	// Only front-office collection pages:
+			if( $debug )
+			{	// Display a menu to turn on/off the debug widget containers:
+				global $Session;
+				$containers_status = $Session->get( 'display_containers_'.$Blog->ID );
+				$entries['containers'] = array(
+					'text'        => '<span class="fa fa-cubes"></span> '.( $containers_status ? T_('Hide') : T_('Show') ),
+					'href'        => url_add_param( regenerate_url( 'display_containers' ), 'display_containers='.( $containers_status ? 'hide' : 'show' ) ),
+					'entry_class' => 'rwdhide',
+				);
+			}
+
+			if( $perm_admin_restricted && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			{	// If current user has an access to back-office and to edit collection properties:
+				$entries['skin'] = array(
+					'text' => '<span class="fa fa-sliders"></span> '.T_('Skin'),
+					'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$Blog->ID,
+				);
+
+				// Display menu item "Features" with depending on $disp:
+				global $disp, $disp_detail;
+				switch( $disp )
+				{
+					case 'front':
+						$coll_features_url = $admin_url.'?ctrl=coll_settings&amp;tab=home&amp;blog='.$Blog->ID;
+						break;
+					case 'posts':
+					case 'single':
+					case 'page':
+						$coll_features_url = $admin_url.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$Blog->ID;
+						break;
+					case 'comments':
+						$coll_features_url = $admin_url.'?ctrl=coll_settings&amp;tab=comments&amp;blog='.$Blog->ID;
+						break;
+					case 'users':
+						$coll_features_url = $admin_url.'?ctrl=coll_settings&amp;tab=userdir&amp;blog='.$Blog->ID;
+						break;
+					default:
+						$coll_features_url = $admin_url.'?ctrl=coll_settings&amp;tab=other&amp;blog='.$Blog->ID;
+						break;
+				}
+				$entries['features'] = array(
+					'text' => '<span class="fa fa-cog"></span> '.T_('Features'),
+					'href' => $coll_features_url,
+				);
+			}
+		}
 
 		if( $perm_admin_restricted )
 		{
@@ -1391,117 +1595,6 @@ class _core_Module extends Module
 						'href' => url_add_param( regenerate_url( 'display_containers' ), 'display_includes=show' ),
 					);
 				}
-			}
-
-			// MORE menu:
-			if( $current_User->check_perm( 'users', 'view' ) )
-			{ // Users:
-				$entries['tools']['disabled'] = false;
-				$entries['tools']['entries']['users'] = array(
-						'text' => T_('Users').'&hellip;',
-						'href' => $admin_url.'?ctrl=users',
-					);
-			}
-
-			// PLACE HOLDER FOR MESSAGING MODULE:
-			$entries['tools']['entries']['messaging'] = NULL;
-
-			// PLACE HOLDER FOR FILES MODULE:
-			$entries['tools']['entries']['files'] = NULL;
-
-			$perm_options = $current_User->check_perm( 'options', 'view' );
-			$perm_spam = $perm_options && $current_User->check_perm( 'spamblacklist', 'view' );
-			$perm_emails = $current_User->check_perm( 'emails', 'view' );
-			$perm_maintenance = $current_User->check_perm( 'perm_maintenance', 'upgrade' );
-
-			if( $perm_spam || $perm_options || $perm_maintenance )
-			{
-				$entries['tools']['entries'][] = array( 'separator' => true );
-
-				if( $perm_emails )
-				{
-					$entries['tools']['entries']['email'] = array(
-							'text' => T_('Emails'),
-							'href' => $admin_url.'?ctrl=campaigns',
-							'entries' => array(
-								'campaigns' => array(
-									'text' => T_('Campaigns').'&hellip;',
-									'href' => $admin_url.'?ctrl=campaigns' ),
-								'settings' => array(
-									'text' => T_('Settings').'&hellip;',
-									'href' => $admin_url.'?ctrl=email&amp;tab=settings' ),
-								'blocked' => array(
-									'text' => T_('Addresses').'&hellip;',
-									'href' => $admin_url.'?ctrl=email' ),
-								'sent' => array(
-									'text' => T_('Sent').'&hellip;',
-									'href' => $admin_url.'?ctrl=email&amp;tab=sent' ),
-								'return' => array(
-									'text' => T_('Returned').'&hellip;',
-									'href' => $admin_url.'?ctrl=email&amp;tab=return' ),
-								)
-						);
-				}
-
-				$entries['tools']['disabled'] = false;
-
-				$entries['tools']['entries']['system'] = array(
-						'text' => T_('System'),
-						'href' => $admin_url.'?ctrl=system',
-					);
-
-				if( $perm_options )
-				{
-					$entries['tools']['entries']['system']['entries']['status'] = array(
-							'text' => T_('Status').'&hellip;',
-							'href' => $admin_url.'?ctrl=system',
-						);
-				}
-
-				if( $perm_options )
-				{
-						$entries['tools']['entries']['system']['entries']['crontab'] = array(
-									'text' => T_('Scheduler').'&hellip;',
-									'href' => $admin_url.'?ctrl=crontab',
-								);
-				}
-
-				if( $perm_spam )
-				{
-					$entries['tools']['entries']['system']['entries']['antispam'] = array(
-							'text' => T_('Antispam').'&hellip;',
-							'href' => $admin_url.'?ctrl=antispam',
-						);
-				}
-			}
-
-
-			if( $perm_options )
-			{ // Global settings:
-				$entries['tools']['entries']['system']['entries']['regional'] = array(
-						'text' => T_('Regional').'&hellip;',
-						'href' => $admin_url.'?ctrl=regional',
-					);
-				$entries['tools']['entries']['system']['entries']['skins'] = array(
-						'text' => T_('Skins').'&hellip;',
-						'href' => $admin_url.'?ctrl=skins&amp;tab=system'
-					);
-				$entries['tools']['entries']['system']['entries']['plugins'] = array(
-						'text' => T_('Plugins').'&hellip;',
-						'href' => $admin_url.'?ctrl=plugins',
-					);
-				$entries['tools']['entries']['system']['entries']['remote'] = array(
-						'text' => T_('Remote publishing').'&hellip;',
-						'href' => $admin_url.'?ctrl=remotepublish',
-					);
-				$entries['tools']['entries']['system']['entries']['maintenance'] = array(
-						'text' => T_('Maintenance').'&hellip;',
-						'href' => $admin_url.'?ctrl=tools',
-					);
-				$entries['tools']['entries']['system']['entries']['syslog'] = array(
-						'text' => T_('System log'),
-						'href' => '?ctrl=syslog',
-					);
 			}
 		}
 

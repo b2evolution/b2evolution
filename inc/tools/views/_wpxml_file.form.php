@@ -168,6 +168,8 @@ if( ! empty( $import_files ) )
 					'id'    => 'import_type_append' ),
 			), '', array( 'lines' => true ) );
 
+	$Form->checkbox_input( 'import_img', 1, '', array( 'input_suffix' => T_('Try to match any remaining <code>&lt;img&gt;</code> tags with imported attachments based on filename') ) );
+
 	$Form->end_fieldset();
 
 	$Form->buttons( array( array( 'submit', 'submit', T_('Continue!'), 'SaveButton' ) ) );

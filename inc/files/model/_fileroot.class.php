@@ -99,13 +99,13 @@ class FileRoot
 
 			case 'collection':
 				$BlogCache = & get_BlogCache();
-				if( ! ( $Collection = $Blog = & $BlogCache->get_by_ID( $root_in_type_ID, false, false ) ) )
-				{	// Blog not found
+				if( ! ( $fileroot_Blog = & $BlogCache->get_by_ID( $root_in_type_ID, false, false ) ) )
+				{	// Collection not found
 					return false;
 				}
-				$this->name = $Blog->get( 'shortname' ); //.' ('. /* TRANS: short for "blog" */ T_('b').')';
-				$this->ads_path = $Blog->get_media_dir( $create );
-				$this->ads_url = $Blog->get_media_url();
+				$this->name = $fileroot_Blog->get( 'shortname' ); //.' ('. /* TRANS: short for "blog" */ T_('b').')';
+				$this->ads_path = $fileroot_Blog->get_media_dir( $create );
+				$this->ads_url = $fileroot_Blog->get_media_url();
 				return;
 
 			case 'shared':
@@ -133,13 +133,13 @@ class FileRoot
 				{
 					$this->name = T_('Shared');
 					$this->ads_path = $ads_shared_dir;
-					if( isset($Blog) )
-					{	// (for now) Let's make shared files appear as being part of the currently displayed blog:
-						$this->ads_url = $Blog->get_local_media_url().'shared/global/';
+					if( isset( $Blog ) && ! is_admin_page() )
+					{	// (for now) Let's make shared files appear as being part of the currently displayed collection:
+						$this->ads_url = $Blog->get_local_media_url().$rds_shared_subdir;
 					}
 					else
-					{
-						$this->ads_url = $media_url.'shared/global/';
+					{	// If back-office or current collection is not defined:
+						$this->ads_url = $media_url.$rds_shared_subdir;
 					}
 				}
 				return;
@@ -159,12 +159,12 @@ class FileRoot
 					global $skins_path, $skins_url;
 					$this->name = T_('Skins');
 					$this->ads_path = $skins_path;
-					if( isset($Blog) )
-					{ // (for now) Let's make skin files appear as being part of the currently displayed blog:
+					if( isset( $Blog ) && ! is_admin_page() )
+					{	// (for now) Let's make skin files appear as being part of the currently displayed collection:
 						$this->ads_url = $Blog->get_local_skins_url();
 					}
 					else
-					{
+					{	// If back-office or current collection is not defined:
 						$this->ads_url = $skins_url;
 					}
 				}

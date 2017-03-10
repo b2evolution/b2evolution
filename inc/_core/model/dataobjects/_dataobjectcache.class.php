@@ -650,47 +650,6 @@ class DataObjectCache
 			$r = false;
 			return $r;
 		}
-
-/* fp> code below  by blueyed, undocumented, except for cache insertion in instantiate which is self labeled as dirty
-		if( isset($this->cache_name[$req_name]) )
-		{
-			return $this->cache_name[$req_name];
-		}
-
-		if( ! $this->all_loaded )
-		{
-			// Load just the requested object:
-			$Debuglog->add( "Loading <strong>$this->objtype($req_name)</strong>", 'dataobjects' );
-			$SQL = $this->get_SQL_object();
-			$SQL->WHERE_and($this->name_field.' = '.$DB->quote($req_name));
-
-			if( $db_row = $DB->get_row( $SQL->get(), OBJECT, 0, 'DataObjectCache::get_by_name()' ) )
-			{
-				$resolved_ID = $db_row->{$this->dbIDname};
-				$Debuglog->add( 'success; ID = '.$resolved_ID, 'dataobjects' );
-				if( ! isset( $this->cache[$resolved_ID] ) )
-				{	// Object is not already in cache:
-					$Debuglog->add( 'Adding to cache...', 'dataobjects' );
-					//$Obj = new $this->objtype( $row ); // COPY !!
-					//if( ! $this->add( $this->new_obj( $db_row ) ) )
-					if( ! $this->add( $this->new_obj( $db_row ) ) )
-					{	// could not add
-						$Debuglog->add( 'Could not add() object to cache!', 'dataobjects' );
-					}
-				}
-				$this->cache_name[$req_name] = $this->cache[$resolved_ID];
-				return $this->cache[$resolved_ID];
-			}
-		}
-
-		$Debuglog->add( 'Could not get DataObject by name.', 'dataobjects' );
-		if( $halt_on_error )
-		{
-			debug_die( "Requested $this->objtype does not exist!" );
-		}
-		$r = NULL;
-		return $r;
-*/
 	}
 
 

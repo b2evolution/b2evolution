@@ -3482,6 +3482,10 @@ ol {
   margin-top: 4px;
   margin-bottom: 4px;
 }
+.evo_widget .input-group .btn {
+  margin-top: 0;
+  margin-bottom: 0;
+}
 .btn.active[disabled] {
   opacity: 1;
   color: #333;

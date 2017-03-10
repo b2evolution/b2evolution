@@ -283,25 +283,25 @@
   border-top-right-radius: 4px;
   border-bottom-right-radius: 4px;
 }
-#cboxVoting .voting_wrapper div.btn-group {
+#cboxVoting .voting_wrapper span.btn-group {
   display: inline-block;
   width: 160px;
   text-align: center;
   margin: 0;
   white-space: nowrap;
 }
-#cboxVoting .voting_wrapper div.btn-group .voting_btn {
+#cboxVoting .voting_wrapper span.btn-group .voting_btn {
   border: 1px solid #adadad;
   margin-left: -1px;
   background-color: #ffffff;
 }
-#cboxVoting .voting_wrapper div.btn-group .voting_btn:hover {
+#cboxVoting .voting_wrapper span.btn-group .voting_btn:hover {
   background-color: #e6e6e6;
 }
-#cboxVoting .voting_wrapper div.btn-group .voted {
+#cboxVoting .voting_wrapper span.btn-group .voted {
   background-color: #e6e6e6;
 }
-#cboxVoting .voting_wrapper div.vote_title {
+#cboxVoting .voting_wrapper span.vote_title_panel {
   display: inline-block;
   width: calc(50% - 80px);
   white-space: nowrap;
@@ -309,13 +309,13 @@
   text-align: right;
   min-width: 200px;
 }
-#cboxVoting .voting_wrapper div.vote_others {
+#cboxVoting .voting_wrapper span.vote_others {
   display: inline-block;
   white-space: nowrap;
   margin-top: 3px;
   min-width: 200px;
 }
-#cboxVoting .voting_wrapper div.vote_others span.separator {
+#cboxVoting .voting_wrapper span.vote_others span.separator {
   display: none;
 }
 #cboxVoting .voting_wrapper.compact {
@@ -328,7 +328,7 @@
   display: block;
   margin: 3px auto 0;
 }
-#cboxVoting .voting_wrapper.compact div.vote_title {
+#cboxVoting .voting_wrapper.compact span.vote_title_panel {
   text-align: center;
   margin-top: 0;
 }

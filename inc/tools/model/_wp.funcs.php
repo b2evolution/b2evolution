@@ -140,6 +140,9 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 	$import_type = param( 'import_type', 'string', 'replace' );
 	// Should we delete files on 'replace' mode?
 	$delete_files = param( 'delete_files', 'integer', 0 );
+	// Should we try to match <img> tags with imported attachments based on filename in post content after import?
+	$import_img = param( 'import_img', 'integer', 0 );
+	$all_wp_attachments = array();
 
 	// Parse WordPress XML file into array
 	$xml_data = wpxml_parser( $XML_file_path );
@@ -468,6 +471,19 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				{	// Store the created File in array because it will be linked to the Items below:
 					$files[ $file['file_ID'] ] = $File;
 
+					if( $import_img )
+					{	// Collect file name in array to link with post below:
+						$file_name = basename( $file['file_path'] );
+						if( isset( $all_wp_attachments[ $file_name ] ) )
+						{	// Don't use this file if more than one use same name, e.g. from different folders:
+							$all_wp_attachments[ $file_name ] = false;
+						}
+						else
+						{	// This is a first detected file with current name:
+							$all_wp_attachments[ $file_name ] = $File->ID;
+						}
+					}
+
 					$files_count++;
 				}
 			}
@@ -660,6 +676,20 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 					{	// Store the created File in array because it will be linked to the Items below:
 						$attachment_IDs[ $post['post_id'] ] = $File->ID;
 						$files[ $File->ID ] = $File;
+
+						if( $import_img )
+						{	// Collect file name in array to link with post below:
+							$file_name = basename( $file_source_path );
+							if( isset( $all_wp_attachments[ $file_name ] ) )
+							{	// Don't use this file if more than one use same name, e.g. from different folders:
+								$all_wp_attachments[ $file_name ] = false;
+							}
+							else
+							{	// This is a first detected file with current name:
+								$all_wp_attachments[ $file_name ] = $File->ID;
+							}
+						}
+
 						$attachments_count++;
 						// Break here because such post can contains only one file:
 						break;
@@ -799,36 +829,12 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			$Item->dbinsert();
 			$posts[ $post['post_id'] ] = $Item->ID;
 
-			// Extract files from content tag [caption ...]:
-			if( preg_match_all( '#\[caption[^\]]+id="attachment_(\d+)"[^\]]+\].+?\[/caption\]#i', $post_content, $caption_matches ) )
-			{	// If file tag is detected
-				$LinkOwner = new LinkItem( $Item );
-				$updated_post_content = $post_content;
-				$link_order = 1;
-				foreach( $caption_matches[1] as $caption_post_ID )
-				{
-					if( isset( $attachment_IDs[ $caption_post_ID ] ) && isset( $files[ $attachment_IDs[ $caption_post_ID ] ] ) )
-					{
-						$File = $files[ $attachment_IDs[ $caption_post_ID ] ];
-						if( $link_ID = $File->link_to_Object( $LinkOwner, $link_order, 'inline' ) )
-						{	// If file is linked to the post
-							echo '<p class="text-success">'.sprintf( T_('File %s has been linked to this post.'), '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
-							// Replace this tag from content with b2evolution format:
-							$updated_post_content = preg_replace( '#\[caption[^\]]+id="attachment_'.$caption_post_ID.'"[^\]]+\].+?\[/caption\]#i', ( $File->is_image() ? '[image:'.$link_ID.']' : '[file:'.$link_ID.']' ), $updated_post_content );
-							$link_order++;
-						}
-					}
-				}
-				if( $updated_post_content != $post_content )
-				{	// Update new content:
-					$Item->set( 'content', $updated_post_content );
-					$Item->dbupdate();
-				}
-			}
+			$LinkOwner = new LinkItem( $Item );
+			$updated_post_content = $post_content;
+			$link_order = 1;
 
 			if( ! empty( $files ) && ! empty( $post['links'] ) )
 			{	// Link the files to the Item if it has them:
-				$LinkOwner = new LinkItem( $Item );
 				foreach( $post['links'] as $link )
 				{
 					$file_is_linked = false;
@@ -836,9 +842,11 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 					{	// Link a File to Item:
 						$File = $files[ $link['link_file_ID'] ];
 						if( $File->link_to_Object( $LinkOwner, $link['link_order'], $link['link_position'] ) )
-						{	// If file is linked to the post:
+						{	// If file has been linked to the post
 							echo '<p class="text-success">'.sprintf( T_('File %s has been linked to this post.'), '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
 							$file_is_linked = true;
+							// Update link order to the latest for two other ways([caption] and <img />) below:
+							$link_order = $link['link_order'];
 						}
 					}
 					if( ! $file_is_linked )
@@ -846,6 +854,66 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 						echo '<p class="text-warning">'.sprintf( T_('Link %s could not be attached to this post because file %s is not found.'), '#'.$link['link_ID'], '#'.$link['link_file_ID'] ).'</p>';
 					}
 				}
+			}
+
+			// Try to extract files from content tag [caption ...]:
+			if( preg_match_all( '#\[caption[^\]]+id="attachment_(\d+)"[^\]]+\].+?\[/caption\]#i', $updated_post_content, $caption_matches ) )
+			{	// If [caption ...] tag is detected
+				foreach( $caption_matches[1] as $caption_post_ID )
+				{
+					$file_is_linked = false;
+					if( isset( $attachment_IDs[ $caption_post_ID ] ) && isset( $files[ $attachment_IDs[ $caption_post_ID ] ] ) )
+					{
+						$File = $files[ $attachment_IDs[ $caption_post_ID ] ];
+						if( $link_ID = $File->link_to_Object( $LinkOwner, $link_order, 'inline' ) )
+						{	// If file has been linked to the post
+							echo '<p class="text-success">'.sprintf( T_('File %s has been linked to this post.'), '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
+							// Replace this caption tag from content with b2evolution format:
+							$updated_post_content = preg_replace( '#\[caption[^\]]+id="attachment_'.$caption_post_ID.'"[^\]]+\].+?\[/caption\]#i', ( $File->is_image() ? '[image:'.$link_ID.']' : '[file:'.$link_ID.']' ), $updated_post_content );
+							$file_is_linked = true;
+							$link_order++;
+						}
+					}
+					if( ! $file_is_linked )
+					{	// If file could not be linked to the post:
+						echo '<p class="text-warning">'.sprintf( T_('Caption file %s could not be attached to this post because it is not found in the source attachments folder.'), '#'.$caption_post_ID ).'</p>';
+					}
+				}
+			}
+
+			// Try to extract files from html tag <img />:
+			if( $import_img && count( $all_wp_attachments ) )
+			{	// Only if it is requested and at least one attachment has been detected above:
+				if( preg_match_all( '#<img[^>]+src="([^"]+)"[^>]+>#i', $updated_post_content, $img_matches ) )
+				{	// If <img /> tag is detected
+					foreach( $img_matches[1] as $img_url )
+					{
+						$file_is_linked = false;
+						$img_file_name = basename( $img_url );
+						if( isset( $all_wp_attachments[ $img_file_name ], $files[ $all_wp_attachments[ $img_file_name ] ] ) )
+						{
+							$File = $files[ $all_wp_attachments[ $img_file_name ] ];
+							if( $link_ID = $File->link_to_Object( $LinkOwner, $link_order, 'inline' ) )
+							{	// If file has been linked to the post
+								echo '<p class="text-success">'.sprintf( T_('File %s has been linked to this post.'), '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
+								// Replace this img tag from content with b2evolution format:
+								$updated_post_content = preg_replace( '#<img[^>]+src="[^"]+'.preg_quote( $img_file_name ).'"[^>]+>#i', '[image:'.$link_ID.']', $updated_post_content );
+								$file_is_linked = true;
+								$link_order++;
+							}
+						}
+						if( ! $file_is_linked )
+						{	// If file could not be linked to the post:
+							echo '<p class="text-warning">'.sprintf( T_('File of image url %s could not be attached to this post because it is not found in the source attachments folder.'), '<code>'.$img_url.'</code>' ).'</p>';
+						}
+					}
+				}
+			}
+
+			if( $updated_post_content != $post_content )
+			{	// Update new content:
+				$Item->set( 'content', $updated_post_content );
+				$Item->dbupdate();
 			}
 
 			if( !empty( $post['comments'] ) )

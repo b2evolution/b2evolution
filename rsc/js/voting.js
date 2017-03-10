@@ -180,10 +180,10 @@ function votingAdjust()
 	$voting = jQuery("#cboxVoting");
 
 	var prevWidth = $prev.width();
-	var voting_wrapper = $('#colorbox div.voting_wrapper');
-	var voting_buttons = $('#colorbox div.voting_wrapper > div.btn-group');
-	var voting_title = $('#colorbox div.vote_title');
-	var voting_others = $('#colorbox div.vote_others');
+	var voting_wrapper = $('#colorbox .voting_wrapper');
+	var voting_buttons = $('#colorbox .voting_wrapper > .btn-group');
+	var voting_title = $('#colorbox .vote_title_panel');
+	var voting_others = $('#colorbox .vote_others');
 	var voting_separator = $('#colorbox .separator');
 
 	var w = $wrap.parent().width();

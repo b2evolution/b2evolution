@@ -115,15 +115,20 @@ if( isset($GLOBALS['files_Module']) )
 {
 	load_funcs( 'files/model/_image.funcs.php' );
 	$params['force_keys_as_values'] = true;
-	
+
 	$Form->begin_fieldset( T_('User directory').get_manual_link( 'user-directory-other' ) );
 			$Form->select_input_array( 'image_size_user_list', $edited_Blog->get_setting( 'image_size_user_list' ), get_available_thumb_sizes(), T_('Profile picture size'), '', $params );
 	$Form->end_fieldset();
-		
+
 	$Form->begin_fieldset( T_('Messaging pages').get_manual_link( 'messaging-other' ) );
 			$Form->select_input_array( 'image_size_messaging', $edited_Blog->get_setting( 'image_size_messaging' ), get_available_thumb_sizes(), T_('Profile picture size'), '', $params );
 	$Form->end_fieldset();
 }
+
+$Form->begin_fieldset( T_('Contact form').' (disp=msgform)'.get_manual_link( 'contact-form' ) );
+	$Form->text_input( 'msgform_title', $edited_Blog->get_setting( 'msgform_title' ), 80, T_('Page Title'), T_('Leave empty for default') );
+	$Form->checkbox( 'msgform_display_recipient', $edited_Blog->get_setting( 'msgform_display_recipient' ), T_('Display recipient'), T_('Check to show a "Message to:" line.') );
+$Form->end_fieldset();
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 

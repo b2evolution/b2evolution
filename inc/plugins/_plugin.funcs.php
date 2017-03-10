@@ -490,8 +490,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			$params['size_name'] = isset( $parmeta['thumbnail_size'] ) ? $parmeta['thumbnail_size'] : 'crop-64x64';
 			$params['max_file_num'] = isset( $parmeta['max_file_num'] ) ? $parmeta['max_file_num'] : 1;
 			$params['initialize_with'] = isset( $parmeta['initialize_with'] ) ? $parmeta['initialize_with'] : '';
+			$params['note'] = isset( $parmeta['note'] ) ? $parmeta['note'] : '';
 
-			$Form->fileselect( $input_name, $set_value, $set_label, '', $params );
+			$Form->fileselect( $input_name, $set_value, $set_label, $params['note'], $params );
 			break;
 
 		default:

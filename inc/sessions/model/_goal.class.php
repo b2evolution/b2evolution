@@ -146,7 +146,7 @@ class Goal extends DataObject
 		}
 
 		// Temporary Start
-		$temp_start_date = param_date( 'goal_temp_start_date', T_('Please enter a valid date.'), false );
+		$temp_start_date = param_date( 'goal_temp_start_date', sprintf( T_('Please enter a valid date using the following format: %s'), '<code>'.locale_input_datefmt().'</code>' ), false );
 		if( ! empty( $temp_start_date ) )
 		{
 			$temp_start_time = param( 'goal_temp_start_time', 'string' );
@@ -159,7 +159,7 @@ class Goal extends DataObject
 		}
 
 		// Temporary End
-		$temp_end_date = param_date( 'goal_temp_end_date', T_('Please enter a valid date.'), false );
+		$temp_end_date = param_date( 'goal_temp_end_date', sprintf( T_('Please enter a valid date using the following format: %s'), '<code>'.locale_input_datefmt().'</code>' ), false );
 		if( ! empty( $temp_end_date ) )
 		{
 			$temp_end_time = param( 'goal_temp_end_time', 'string' );

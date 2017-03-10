@@ -268,14 +268,14 @@
 #cboxVoting .voting_wrapper .separator {
   display: inline-block;
 }
-#cboxVoting .voting_wrapper div.btn-group {
+#cboxVoting .voting_wrapper span.btn-group {
   display: inline-block;
   min-width: 50px;
   text-align: center;
   margin: 0;
   white-space: nowrap;
 }
-#cboxVoting .voting_wrapper div.vote_title {
+#cboxVoting .voting_wrapper span.vote_title_panel {
   display: inline-block;
   width: calc(50% - 30px);
   white-space: nowrap;
@@ -283,7 +283,7 @@
   text-align: right;
   min-width: 200px;
 }
-#cboxVoting .voting_wrapper div.vote_others {
+#cboxVoting .voting_wrapper span.vote_others {
   display: inline-block;
   white-space: nowrap;
   margin-top: 3px;
@@ -299,19 +299,20 @@
   display: block;
   margin: 3px auto 0;
 }
-#cboxVoting .voting_wrapper.compact div.vote_title {
+#cboxVoting .voting_wrapper.compact span.vote_title_panel {
   text-align: center;
   margin-top: 0;
+  margin-right: 0;
 }
-#cboxVoting div.vote_title {
+#cboxVoting span.vote_title_panel {
   display: inline-block;
   text-align: right;
   padding-right: 6px;
 }
-#cboxVoting div.btn-group {
+#cboxVoting span.btn-group {
   display: inline-block;
 }
-#cboxVoting div.vote_others {
+#cboxVoting span.vote_others {
   display: inline-block;
 }
 #cboxOpen {

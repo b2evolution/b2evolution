@@ -427,7 +427,7 @@ function get_request_title( $params = array() )
 			'postidx_text'        => T_('Post Index'),
 			'search_text'         => T_('Search'),
 			'sitemap_text'        => T_('Site Map'),
-			'msgform_text'        => T_('Sending a message'),
+			'msgform_text'        => T_('Contact'),
 			'messages_text'       => T_('Messages'),
 			'contacts_text'       => T_('Contacts'),
 			'login_text'          => /* TRANS: trailing space = verb */ T_('Login '),
@@ -561,18 +561,16 @@ function get_request_title( $params = array() )
 
 		case 'msgform':
 			// We are requesting the message form:
-			$r[] = $params['msgform_text'];
+			$msgform_title = utf8_trim( $Blog->get_setting( 'msgform_title' ) );
+			$r[] = empty( $msgform_title ) ? $params['msgform_text'] : $msgform_title;
 			break;
 
 		case 'threads':
 		case 'messages':
 			// We are requesting the messages form
+			global $disp_detail;
 			$thrd_ID = param( 'thrd_ID', 'integer', 0 );
-			if( empty( $thrd_ID ) )
-			{
-				$r[] = $params['messages_text'];
-			}
-			else
+			if( ! empty( $thrd_ID ) )
 			{	// We get a thread title by ID
 				load_class( 'messaging/model/_thread.class.php', 'Thread' );
 				$ThreadCache = & get_ThreadCache();
@@ -581,12 +579,19 @@ function get_request_title( $params = array() )
 					if( $params['auto_pilot'] == 'seo_title' )
 					{	// Display thread title only for tag <title>
 						$r[] = $Thread->title;
+						break;
 					}
 				}
-				else
-				{	// Bad request with not existing thread
-					$r[] = strip_tags( $params['messages_text'] );
-				}
+			}
+
+			if( $disp_detail == 'msgform' )
+			{	// disp=msgform for logged in user:
+				$msgform_title = utf8_trim( $Blog->get_setting( 'msgform_title' ) );
+				$r[] = empty( $msgform_title ) ? $params['msgform_text'] : $msgform_title;
+			}
+			else
+			{
+				$r[] = strip_tags( $params['messages_text'] );
 			}
 			break;
 
@@ -1252,7 +1257,7 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				global $b2evo_icons_type, $blog;
 				$blog_param = empty( $blog ) ? '' : '&blog='.$blog;
 				// Colorbox params to translate the strings:
-				$colorbox_strings_params = 'current: "'.TS_('{current} / {total}').'",
+				$colorbox_strings_params = 'current: "{current} / {total}",
 					previous: "'.TS_('Previous').'",
 					next: "'.TS_('Next').'",
 					close: "'.TS_('Close').'",
