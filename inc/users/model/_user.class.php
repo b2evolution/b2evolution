@@ -2096,14 +2096,15 @@ class User extends DataObject
 		global $Collection, $Blog;
 
 		if( ! $Settings->get( 'fm_enable_roots_user' ) )
-		{ // User directories are disabled:
+		{	// User directories are disabled:
 			$Debuglog->add( 'Attempt to access user media URL, but this feature is disabled', 'files' );
 			return false;
 		}
 
-		if( ! empty( $Blog ) )
-		{ // We are currently looking at a blog. We are going to consider (for now) that we want the users and their files
-			// to appear as being part of that blog.
+		if( ! empty( $Blog ) && ! is_admin_page() )
+		{	// We are currently looking at a collection on front-office.
+			// We are going to consider (for now) that we want the users and their files
+			// to appear as being part of that collection.
 			return $Blog->get_local_media_url().$this->get_media_subpath();
 		}
 
