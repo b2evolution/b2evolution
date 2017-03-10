@@ -317,11 +317,8 @@ class messaging_Module extends Module
 
 		if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
 		{
-			if( ! empty( $topleft_Menu->_menus['entries']['tools']['entries'] ) )
+			if( ! empty( $topleft_Menu->_menus['entries']['site']['entries'] ) )
 			{
-				// TODO: this is hackish and would require a proper function call
-				$topleft_Menu->_menus['entries']['tools']['disabled'] = false;
-
 				$left_entries['messaging'] = array(
 						'text' => T_('Messages').'&hellip;',
 						'href' => $admin_url.'?ctrl=threads',
@@ -361,7 +358,7 @@ class messaging_Module extends Module
 			}
 		}
 
-		$topleft_Menu->add_menu_entries( 'tools', $left_entries );
+		$topleft_Menu->add_menu_entries( 'site', $left_entries );
 		$topright_Menu->insert_menu_entries_after( array( 'userprefs', 'name' ), $right_entries );
 	}
 

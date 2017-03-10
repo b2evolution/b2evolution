@@ -173,10 +173,6 @@ class sessions_Module extends Module
 
 		if( $current_User->check_perm( 'stats', 'view' ) )
 		{	// We have permission to view all stats
-
-			// TODO: this is hackish and would require a proper function call
-			$topleft_Menu->_menus['entries']['tools']['disabled'] = false;
-
 			$entries = array(
 				'stats_separator' => array( 'separator' => true ),
 				'stats' => array(
@@ -223,7 +219,7 @@ class sessions_Module extends Module
 					);
 			}
 
-			$topleft_Menu->add_menu_entries( 'tools', $entries );
+			$topleft_Menu->add_menu_entries( 'site', $entries );
 		}
 	}
 

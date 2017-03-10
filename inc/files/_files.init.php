@@ -549,16 +549,13 @@ class files_Module extends Module
 			if( $current_User->check_perm( 'files', 'view', false, NULL ) )
 			{	// Manage files generally:
 
-				// TODO: this is hackish and would require a proper function call
-				$topleft_Menu->_menus['entries']['tools']['disabled'] = false;
-
 				// FM enabled and permission to view files:
 				$entries['files'] = array(
 						'text' => T_('Files').'&hellip;',
 						'href' => $admin_url.'?ctrl=files',
 					);
 
-				$topleft_Menu->add_menu_entries( 'tools', $entries );
+				$topleft_Menu->add_menu_entries( 'site', $entries );
 			}
 		}
 	}
