@@ -1446,16 +1446,13 @@ class _core_Module extends Module
 
 		if( ! is_admin_page() && ! empty( $Blog ) )
 		{	// Only front-office collection pages:
-			if( $debug )
-			{	// Display a menu to turn on/off the debug widget containers:
-				global $Session;
-				$containers_status = $Session->get( 'display_containers_'.$Blog->ID );
-				$entries['containers'] = array(
-					'text'        => '<span class="fa fa-cubes"></span> '.( $containers_status ? T_('Hide') : T_('Show') ),
-					'href'        => url_add_param( regenerate_url( 'display_containers' ), 'display_containers='.( $containers_status ? 'hide' : 'show' ) ),
-					'entry_class' => 'rwdhide',
-				);
-			}
+			global $Session;
+			$containers_status = $Session->get( 'display_containers_'.$Blog->ID );
+			$entries['containers'] = array(
+				'text'        => '<span class="fa fa-cubes"></span> '.( $containers_status ? T_('Hide') : T_('Show') ),
+				'href'        => url_add_param( regenerate_url( 'display_containers' ), 'display_containers='.( $containers_status ? 'hide' : 'show' ) ),
+				'entry_class' => 'rwdhide',
+			);
 
 			if( $perm_admin_restricted && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			{	// If current user has an access to back-office and to edit collection properties:
