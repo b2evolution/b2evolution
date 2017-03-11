@@ -3124,6 +3124,8 @@ msgstr "Priorité"
 #: ../../../inc/_core/_misc.funcs.php:5921
 msgid "Number of members who have viewed the post (If tracking enabled)"
 msgstr ""
+"Nombre de membre ayant visualisé le post (Si suivi des contenus non-lus "
+"actif)"
 
 #: ../../../inc/_core/_misc.funcs.php:5922 ../inc/_core/_misc.funcs.php:5942
 msgid "Random order!"
@@ -3420,6 +3422,9 @@ msgid ""
 "To get rid of the above validation warnings, you can deactivate unwanted "
 "validation rules in your <a %s>Group settings</a>."
 msgstr ""
+"Pour vous débarrasser des avertissements de la validation précédente, vous "
+"pouvez désactiver les règles de validation non désirables dans vos <a "
+"%s>Réglages du groupe</a>."
 
 #: ../../../inc/_core/_template.funcs.php:224
 msgid "A redirection to an external URL was blocked for security reasons."
@@ -4958,6 +4963,8 @@ msgstr "Tentatives de connexion invalides:"
 #: ../../../inc/skins/_skin.funcs.php:1135
 msgid "Wrong Login/Password provided by browser (HTTP Auth)."
 msgstr ""
+"L'Identifiant/Mot de passe fournis par le navigateur sont incorrects (HTTP "
+"Auth)."
 
 #: ../../../inc/_init_login.inc.php:358
 msgid "The Login/Password you entered is wrong."
@@ -5233,7 +5240,7 @@ msgstr "Fait."
 #: ../../../inc/antispam/model/_antispam.funcs.php:411
 #, php-format
 msgid "No %s comments match the keyword %s."
-msgstr ""
+msgstr "Aucun commentaire de type %s ne correspond au mot clef %s."
 
 #: ../../../inc/antispam/model/_antispam.funcs.php:415
 #, php-format
@@ -5406,7 +5413,7 @@ msgstr "Confirmez l'interdiction & la suppression"
 #: ../../../inc/antispam/views/_antispam_ban.form.php:90
 #, php-format
 msgid "No <strong>log-hits</strong> match the keyword %s."
-msgstr ""
+msgstr "Aucun <strong>log-hit</strong> ne correspond au mot clef %s."
 
 #: ../../../inc/antispam/views/_antispam_ban.form.php:98
 #, php-format
@@ -5436,7 +5443,7 @@ msgstr "URL cible"
 #: ../../../inc/antispam/views/_antispam_ban.form.php:145
 #, php-format
 msgid "No <strong>comments</strong> match the keyword %s."
-msgstr ""
+msgstr "Aucun <strong>commentaire</strong> ne correspond au mot clef %s."
 
 #: ../../../inc/antispam/views/_antispam_ban.form.php:196
 #, php-format
@@ -5505,7 +5512,7 @@ msgstr "URL"
 #: ../../../inc/antispam/views/_antispam_ban.form.php:246
 #, php-format
 msgid "No <strong>users</strong> match the keyword %s"
-msgstr ""
+msgstr "Aucun <strong>utilisateur</strong> ne correspond au mot clef %s"
 
 #: ../../../inc/antispam/views/_antispam_ban.form.php:252
 #, php-format
@@ -5515,7 +5522,7 @@ msgstr "Le mot clef [%s] <strong>figure déjà</strong> sur la blacklist."
 #: ../../../inc/antispam/views/_antispam_ban.form.php:260
 #, php-format
 msgid "<strong>Blacklist</strong> the keyword %s locally."
-msgstr ""
+msgstr "<strong>Blacklister</strong> le mot clef %s localement."
 
 #: ../../../inc/antispam/views/_antispam_ban.form.php:271
 #, php-format
@@ -5523,6 +5530,8 @@ msgid ""
 "<strong>Report</strong> the keyword %s as abuse to Central Antispam Server "
 "(%s)."
 msgstr ""
+"<strong>Rapporter</strong> le mot clef %s comme abus au serveur antispam "
+"central (%s)."
 
 #: ../../../inc/antispam/views/_antispam_ban.form.php:273
 #: ../../../inc/antispam/views/_antispam_settings.form.php:49
@@ -5749,6 +5758,8 @@ msgid ""
 "User generated content containing keywords from the Antispam Blacklist will "
 "be rejected."
 msgstr ""
+"Les contenus utilisateurs contenant des mots clefs figurant sur la liste "
+"noire antispam seront rejetés."
 
 #: ../../../inc/antispam/views/_antispam_list.view.php:30
 #, php-format
@@ -6026,7 +6037,7 @@ msgstr ""
 #: ../../../inc/central_antispam/_central_antispam.init.php:118
 #: ../../../inc/central_antispam/central_antispam.ctrl.php:304
 msgid "Central Antispam"
-msgstr ""
+msgstr "Antispam Centralisé"
 
 #: ../../../inc/central_antispam/_central_antispam.init.php:126
 #: ../../../inc/central_antispam/central_antispam.ctrl.php:323
@@ -6108,16 +6119,16 @@ msgstr "Publié"
 
 #: ../../../inc/central_antispam/model/_central_antispam.funcs.php:27
 msgid "Revoked"
-msgstr ""
+msgstr "Révoqué"
 
 #: ../../../inc/central_antispam/model/_central_antispam.funcs.php:28
 msgid "Ignored"
-msgstr ""
+msgstr "Ignoré"
 
 #: ../../../inc/central_antispam/model/_central_antispam.funcs.php:57
 #: ../../../inc/central_antispam/views/_keywords.view.php:136
 msgid "Promising"
-msgstr ""
+msgstr "Prometteur"
 
 #: ../../../inc/central_antispam/model/_keyword.class.php:80
 msgid "You must provide a keyword!"
@@ -6418,7 +6429,7 @@ msgstr ""
 
 #: ../../../inc/chapters/views/_chapter.form.php:61
 msgid "Category image"
-msgstr ""
+msgstr "Image de la categorie"
 
 #: ../../../inc/chapters/views/_chapter.form.php:63
 msgid "May be used as a title tag and/or meta description."
@@ -6643,13 +6654,15 @@ msgstr "Les nouveaux utilisateurs obtiennent automatiquement un nouveau blog."
 
 #: ../../../inc/collections/_collections.init.php:528
 msgid "Maximum collections"
-msgstr ""
+msgstr "Collections maximum"
 
 #: ../../../inc/collections/_collections.init.php:534
 msgid ""
 "Users will not be able to create collections if they already own the maximum"
 " number of collections (or more)."
 msgstr ""
+"Les utilisateurs ne pourront plus créer de collections si ils possèdent déjà"
+" le nombre maximum (ou plus)."
 
 #: ../../../inc/collections/_collections.init.php:622
 msgid "Open b2evolution.net"
@@ -6781,7 +6794,7 @@ msgstr "Envoyer des rappels à propos des posts en attente de modération"
 
 #: ../../../inc/collections/_collections.init.php:1032
 msgid "Monthly alert on old contents"
-msgstr ""
+msgstr "Alerte mensuelle sur les contenus inactifs"
 
 #: ../../../inc/collections/_collections.init.php:1072
 #: ../../../inc/files/files.ctrl.php:363 ../inc/links/links.ctrl.php:53
@@ -6982,11 +6995,11 @@ msgstr ""
 #: ../../../inc/collections/_demo_content.funcs.php:497
 #, php-format
 msgid "The sample organization %s has been created."
-msgstr ""
+msgstr "L'organisation d'exemple %s a été créée."
 
 #: ../../../inc/collections/_demo_content.funcs.php:756
 msgid "Anonymous Demo User"
-msgstr ""
+msgstr "Utilisateur Demo Anonyme"
 
 #: ../../../inc/collections/_demo_content.funcs.php:771
 #: ../../../inc/collections/_demo_content.funcs.php:2335
@@ -7046,19 +7059,19 @@ msgstr "Modifiez ceci à votre convenance"
 #: ../../../inc/collections/_demo_content.funcs.php:866
 #: ../../../inc/collections/model/_blog.class.php:429
 msgid "Public Blog"
-msgstr ""
+msgstr "Blog Publix"
 
 #: ../../../inc/collections/_demo_content.funcs.php:869
 msgid "This blog is completely public..."
-msgstr ""
+msgstr "c"
 
 #: ../../../inc/collections/_demo_content.funcs.php:901
 msgid "Members-Only Blog"
-msgstr ""
+msgstr "Blog réservé aux membres"
 
 #: ../../../inc/collections/_demo_content.funcs.php:904
 msgid "This blog has restricted access..."
-msgstr ""
+msgstr "Ce blog est à accès restreint..."
 
 #: ../../../inc/collections/_demo_content.funcs.php:932
 msgid "This is a photoblog, optimized for displaying photos."
@@ -7089,11 +7102,11 @@ msgstr "Signature pour ce manuel en ligne"
 #: ../../../inc/collections/_demo_content.funcs.php:983
 #: ../../../inc/collections/model/_blog.class.php:350
 msgid "Tracker Title"
-msgstr ""
+msgstr "Titre du Tr"
 
 #: ../../../inc/collections/_demo_content.funcs.php:986
 msgid "Tagline for Tracker"
-msgstr ""
+msgstr "v"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1034
 msgid "Contributors"
@@ -7945,16 +7958,16 @@ msgstr "Second post sports"
 
 #: ../../../inc/collections/_demo_content.funcs.php:2218
 msgid "Bug"
-msgstr ""
+msgstr "Bug"
 
 #: ../../../inc/collections/_demo_content.funcs.php:2219
 msgid "Feature Request"
-msgstr ""
+msgstr "Demande d'amélioration"
 
 #: ../../../inc/collections/_demo_content.funcs.php:2257
 #, php-format
 msgid "Task %s"
-msgstr ""
+msgstr "Tâche %s"
 
 #: ../../../inc/collections/_demo_content.funcs.php:2258
 #, php-format
@@ -8123,7 +8136,7 @@ msgstr "Rédiger un nouveau post..."
 
 #: ../../../inc/collections/coll_settings.ctrl.php:764
 msgid "Recently edited posts"
-msgstr ""
+msgstr "Posts édités récemment"
 
 #: ../../../inc/collections/coll_settings.ctrl.php:825
 #: ../../../inc/dashboard/model/_dashboard.funcs.php:528
@@ -8636,7 +8649,7 @@ msgstr ""
 #: ../../../inc/collections/model/_blog.class.php:2388
 #, php-format
 msgid "Media directory &laquo;%s&raquo; could not be created."
-msgstr ""
+msgstr "Le dossier media &laquo;%s&raquo; n'a pas pu être créé."
 
 #: ../../../inc/collections/model/_blog.class.php:2389
 msgid "Collection media directory creation errors"
@@ -8644,12 +8657,13 @@ msgstr ""
 
 #: ../../../inc/collections/model/_blog.class.php:2397
 msgid "Collection media directories created:"
-msgstr ""
+msgstr "Dossiers media de collection créés:"
 
 #: ../../../inc/collections/model/_blog.class.php:2397
 #, php-format
 msgid "Media directory &laquo;%s&raquo; has been created with permissions %s."
 msgstr ""
+"Le dossier média &laquo;%s&raquo;  a été créé avec les permissions %s."
 
 #: ../../../inc/collections/model/_blog.class.php:2805
 #, php-format
@@ -8668,13 +8682,14 @@ msgstr ""
 #: ../../../inc/collections/model/_blog.class.php:3141
 #: ../../../inc/collections/model/_blog.class.php:3154
 msgid "New collection created:"
-msgstr ""
+msgstr "Nouvelle Collection créée;"
 
 #: ../../../inc/collections/model/_blog.class.php:3097
 #, php-format
 msgid ""
 "The new collection has been associated with the stub file &laquo;%s&raquo;."
 msgstr ""
+"La nouvelle collection a été associée avec le fichier stub &laquo;%s&raquo;."
 
 #: ../../../inc/collections/model/_blog.class.php:3101
 #, php-format
@@ -8692,11 +8707,11 @@ msgstr "Non catégorisé"
 
 #: ../../../inc/collections/model/_blog.class.php:3135
 msgid "A default category has been created for this collection."
-msgstr ""
+msgstr "Une catégorie par défaut a été créée pour cette collection."
 
 #: ../../../inc/collections/model/_blog.class.php:3141
 msgid "Default widgets have been set-up for this collection."
-msgstr ""
+msgstr "Des widgets par défaut ont été configurés pour cette collection."
 
 #: ../../../inc/collections/model/_blog.class.php:3169
 #, php-format
@@ -9145,48 +9160,56 @@ msgstr "Enregistrer comme Redirigé!"
 
 #: ../../../inc/collections/model/_blog.funcs.php:1191
 msgid "This is visible by everyone."
-msgstr ""
+msgstr "Ceci est visible par tous."
 
 #: ../../../inc/collections/model/_blog.funcs.php:1192
 msgid "This is visible by logged-in users only."
-msgstr ""
+msgstr "Ceci est visible par les utilisateurs identifiés uniquement."
 
 #: ../../../inc/collections/model/_blog.funcs.php:1193
 msgid "This is visible by members only."
-msgstr ""
+msgstr "Visible par les membres de la collection uniquement."
 
 #: ../../../inc/collections/model/_blog.funcs.php:1194
 msgid "This is waiting for review and is visible by moderators only."
 msgstr ""
+"Ceci est en attente de validation et est visible uniquement par les "
+"modérateurs."
 
 #: ../../../inc/collections/model/_blog.funcs.php:1195
 msgid ""
 "This is visible only by the owner/author of the post and collection "
 "administrators."
 msgstr ""
+"Ceci est visible uniquement par le créateur/propriétaire du post et les "
+"administrateurs de la collection."
 
 #: ../../../inc/collections/model/_blog.funcs.php:1196
 msgid ""
 "This is a draft and is visible only by the owner/author of the post and "
 "collection administrators."
 msgstr ""
+"Ceci est un brouillon et est visible uniquement par le créateur/propriétaire"
+" du post et les administrateurs de la collection."
 
 #: ../../../inc/collections/model/_blog.funcs.php:1196
 msgid "This is a draft."
-msgstr ""
+msgstr "Ceci est un brouillon."
 
 #: ../../../inc/collections/model/_blog.funcs.php:1197
 msgid "This is deprecated and visible in the Back-Office only."
-msgstr ""
+msgstr "Ceci est déprécié et visible uniquement dans le Back-Office."
 
 #: ../../../inc/collections/model/_blog.funcs.php:1198
 msgid ""
 "This will redirect to another page when accessed from the Front-Office."
 msgstr ""
+"Ceci va rediriger vers une autre page lorsqu'on tente d'y accéder par le "
+"Front-Office."
 
 #: ../../../inc/collections/model/_blog.funcs.php:1199
 msgid "This is a recycled."
-msgstr ""
+msgstr "Ceci est recyclé."
 
 #: ../../../inc/collections/model/_blog.funcs.php:1205
 #: ../../../inc/comments/model/_comment.class.php:1677
@@ -9437,7 +9460,7 @@ msgstr "Voir cette collection"
 
 #: ../../../inc/collections/model/_blog.funcs.php:2249
 msgid "Manage"
-msgstr ""
+msgstr "Gérer"
 
 #: ../../../inc/collections/model/_blog.funcs.php:2249
 msgid "Manage this collection..."
@@ -15125,7 +15148,7 @@ msgstr "&laquo;%s&raquo; a été déplacé vers &laquo;%s&raquo;"
 #: ../../../inc/files/files.ctrl.php:968 ../inc/files/files.ctrl.php:976
 #: ../../../inc/files/files.ctrl.php:982
 msgid "Deleting files..."
-msgstr ""
+msgstr "Suppression des fichiers..."
 
 #: ../../../inc/files/files.ctrl.php:1053 ../inc/items/items.ctrl.php:220
 #: ../../../inc/items/items.ctrl.php:255
@@ -15143,7 +15166,7 @@ msgstr "&laquo;%s&raquo; a été attaché."
 
 #: ../../../inc/files/files.ctrl.php:1112
 msgid "Creating post:"
-msgstr ""
+msgstr "Création du post:"
 
 #: ../../../inc/files/files.ctrl.php:1120 ../inc/items/items.ctrl.php:800
 msgid "Couldn't create the new post"
@@ -15818,7 +15841,7 @@ msgstr "ou"
 
 #: ../../../inc/files/upload.ctrl.php:372
 msgid "Uploading files:"
-msgstr ""
+msgstr "Téléchargement des fichiers:"
 
 #: ../../../inc/files/views/_file_browse.view.php:51
 #, php-format
@@ -16363,7 +16386,7 @@ msgstr "Dupliquer et utiliser comme photo de profil"
 #: ../../../inc/files/views/_file_list.inc.php:343
 #: ../../../inc/files/views/_file_list.inc.php:585
 msgid "Select file"
-msgstr ""
+msgstr "Sélectionner fichier"
 
 #: ../../../inc/files/views/_file_list.inc.php:447
 msgid "Edit permissions"
@@ -16429,7 +16452,7 @@ msgstr "Le fichier a été lié."
 
 #: ../../../inc/files/views/_file_list.inc.php:866
 msgid "The file has been selected."
-msgstr ""
+msgstr "Le fichier a été sélectionné."
 
 #: ../../../inc/files/views/_file_move_copy.form.php:22
 msgid "Cancel move/copy!"
@@ -16977,7 +17000,7 @@ msgstr "La tag précédemment nommé \"%s\" a été fusionné avec la tag exista
 #: ../../../inc/items/item_tags.ctrl.php:246
 #: ../inc/items/item_tags.ctrl.php:251
 msgid "Deleting orphan tags:"
-msgstr ""
+msgstr "Suppression des tags orphelins"
 
 #: ../../../inc/items/item_tags.ctrl.php:246
 #, php-format
@@ -17053,7 +17076,7 @@ msgstr "Désolé, vous n'avez la permission de poster pour l'instant."
 
 #: ../../../inc/items/items.ctrl.php:308 ../inc/items/items.ctrl.php:362
 msgid "Creating posts:"
-msgstr ""
+msgstr "Création des posts:"
 
 #: ../../../inc/items/items.ctrl.php:308
 #, php-format
@@ -17842,16 +17865,16 @@ msgstr ""
 
 #: ../../../inc/items/model/_item.class.php:8855
 msgid "Voting:"
-msgstr ""
+msgstr "Votes:"
 
 #: ../../../inc/items/model/_item.class.php:9082
 #, php-format
 msgid "%s Likes"
-msgstr ""
+msgstr "%s \"j'aime\""
 
 #: ../../../inc/items/model/_item.class.php:9082
 msgid "No likes"
-msgstr ""
+msgstr "Pas de \"j'aime\""
 
 #: ../../../inc/items/model/_item.funcs.php:510
 #, php-format
@@ -18365,7 +18388,7 @@ msgstr "Limité à %d jours"
 #: ../../../inc/widgets/widgets/_coll_current_filters.widget.php:106
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:128
 msgid "Flagged"
-msgstr ""
+msgstr "Marqué"
 
 #: ../../../inc/items/model/_itemstatus.class.php:58
 #: ../../../inc/items/model/_itemtype.class.php:141
@@ -18978,7 +19001,7 @@ msgstr ""
 
 #: ../../../inc/items/views/_item_list_full.view.php:476
 msgid "Valid"
-msgstr ""
+msgstr "Valide"
 
 #: ../../../inc/items/views/_item_list_full.view.php:480
 #: ../../../inc/items/views/_item_list_full.view.php:494
@@ -19320,19 +19343,19 @@ msgstr "b2evolution va automatiquement ajouter .main.php ou .disp.php"
 
 #: ../../../inc/items/views/_itemtype.form.php:65
 msgid "Use of Instructions"
-msgstr ""
+msgstr "Utilisation des instructions"
 
 #: ../../../inc/items/views/_itemtype.form.php:67
 msgid "In front-office edit screen"
-msgstr ""
+msgstr "Dans l'écran d'édition du front-office"
 
 #: ../../../inc/items/views/_itemtype.form.php:68
 msgid "In back-office edit screen"
-msgstr ""
+msgstr "Dans l'écran d'édition du back-office"
 
 #: ../../../inc/items/views/_itemtype.form.php:69
 msgid "Display instructions"
-msgstr ""
+msgstr "Affichage des instructions"
 
 #: ../../../inc/items/views/_itemtype.form.php:70
 msgid "Instructions"
@@ -19753,6 +19776,8 @@ msgid ""
 "You can use the (+) icons to change the position to inline and automatically"
 " insert a short tag at the current cursor position."
 msgstr ""
+"Vous pouvez utiliser les icônes (+) pour changer la position en \"inline\" "
+"et automatiquement insérer un tag court à la position actuelle du curseur."
 
 #: ../../../inc/links/model/_link.funcs.php:639
 msgid "Comment on"
@@ -19760,7 +19785,7 @@ msgstr "Commentaire sur:"
 
 #: ../../../inc/links/model/_link.funcs.php:641
 msgid "Email campaign"
-msgstr ""
+msgstr "Campagne Email"
 
 #: ../../../inc/links/model/_link.funcs.php:759
 msgid "Are you sure want to unlink this file?"
@@ -19920,7 +19945,7 @@ msgstr "Image à défaut"
 
 #: ../../../inc/links/model/_linkitem.class.php:110
 msgid "Attachment"
-msgstr ""
+msgstr "Fichier attaché"
 
 #: ../../../inc/links/model/_linkmessage.class.php:41
 msgid "Link this image to your message."
@@ -20121,15 +20146,15 @@ msgstr "Voir ci-dessous."
 
 #: ../../../inc/locales/_locale_settings.form.php:107
 msgid "Long date format"
-msgstr ""
+msgstr "Format de date long"
 
 #: ../../../inc/locales/_locale_settings.form.php:110
 msgid "Extended date format"
-msgstr ""
+msgstr "Format de date étendu"
 
 #: ../../../inc/locales/_locale_settings.form.php:113
 msgid "Input date format"
-msgstr ""
+msgstr "Format de saisie de date"
 
 #: ../../../inc/locales/_locale_settings.form.php:116
 #: ../../../inc/widgets/widgets/_item_info_line.widget.php:140
@@ -20142,7 +20167,7 @@ msgstr "Format d'heure court"
 
 #: ../../../inc/locales/_locale_settings.form.php:122
 msgid "Input time format"
-msgstr ""
+msgstr "Format de saisie d'heure"
 
 #: ../../../inc/locales/_locale_settings.form.php:125
 msgid "Day at the start of the week."
@@ -20425,15 +20450,15 @@ msgstr "Fmt date"
 
 #: ../../../inc/locales/_locale_settings.form.php:285
 msgid "Long date fmt"
-msgstr ""
+msgstr "Fmt date long"
 
 #: ../../../inc/locales/_locale_settings.form.php:286
 msgid "Extended date fmt"
-msgstr ""
+msgstr "Fmt date étendu"
 
 #: ../../../inc/locales/_locale_settings.form.php:287
 msgid "Input date fmt"
-msgstr ""
+msgstr "Fmt saisie date"
 
 #: ../../../inc/locales/_locale_settings.form.php:288
 msgid "Time fmt"
@@ -20445,7 +20470,7 @@ msgstr "Fmt heure court"
 
 #: ../../../inc/locales/_locale_settings.form.php:290
 msgid "Input time fmt"
-msgstr ""
+msgstr "Fmt saisie heure"
 
 #: ../../../inc/locales/_locale_settings.form.php:291
 msgid ""
@@ -20872,7 +20897,7 @@ msgstr "Création des dossiers/fichiers de sauvegarde..."
 #: ../../../inc/maintenance/model/_backup.class.php:376
 #, php-format
 msgid "Config file %s cannot be read."
-msgstr ""
+msgstr "Le fichier de configuration %s ne peut être lu."
 
 #: ../../../inc/maintenance/model/_backup.class.php:399
 #, php-format
@@ -24852,7 +24877,7 @@ msgstr "Rép HTTP"
 
 #: ../../../inc/sessions/views/_stats_view.funcs.php:177
 msgid "HTTP meth"
-msgstr ""
+msgstr "Meth HTTP"
 
 #: ../../../inc/sessions/views/_stats_view.funcs.php:195
 msgid "Agent Name"
@@ -26512,7 +26537,7 @@ msgstr ""
 #: ../inc/tools/system.ctrl.php:93 ../../../inc/tools/system.ctrl.php:716
 #, php-format
 msgid "Status code: %s"
-msgstr ""
+msgstr "Code de statut: %s"
 
 #: ../../../inc/tools/model/_phpbb.funcs.php:2326
 #, php-format
@@ -27815,11 +27840,11 @@ msgstr ""
 
 #: ../../../inc/tools/views/_email_other.form.php:46
 msgid "Press \"Next\" after each chunk"
-msgstr ""
+msgstr "Appuyez sur \"Next\" après chaque bloc"
 
 #: ../../../inc/tools/views/_email_other.form.php:47
 msgid "A scheduled job will send chunks"
-msgstr ""
+msgstr "Une tâche planifiée va envoyer les blocs"
 
 #: ../../../inc/tools/views/_email_other.form.php:49
 msgid "Sending"
@@ -27894,7 +27919,7 @@ msgstr "Dossier IMAP"
 
 #: ../../../inc/tools/views/_email_return_settings.form.php:90
 msgid "Which folder holds your returned email."
-msgstr ""
+msgstr "Quel dossier contient vos emails retournés"
 
 #: ../../../inc/tools/views/_email_return_settings.form.php:92
 msgid "Ignore emails that have already been read"
@@ -28050,7 +28075,7 @@ msgstr "Partagé avec les réglages du site"
 
 #: ../../../inc/tools/views/_email_smtp.form.php:49
 msgid "SMTP server connection"
-msgstr ""
+msgstr "Connexion au serveur SMTP"
 
 #: ../../../inc/tools/views/_email_smtp.form.php:50
 msgid "Send test email via SMTP"
@@ -41136,7 +41161,7 @@ msgstr ""
 #: ../../../skins/horizon_blog_skin/_skin.class.php:148
 #: ../../../skins/horizon_main_skin/_skin.class.php:201
 msgid "Footer color"
-msgstr ""
+msgstr "Couleur du footer"
 
 #: ../../../skins/horizon_main_skin/_skin.class.php:102
 msgid "Image Section Settings"

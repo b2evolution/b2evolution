@@ -977,7 +977,7 @@ class collections_Module extends Module
 				'params' => NULL,
 			),
 			'monthly-alert-old-contents' => array(
-				'name'   => T_('Monthly alert on old contents'),
+				'name'   => T_('Monthly alert on stale contents'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_monthly_alert_old_contents.job.php',
 				'params' => NULL,
