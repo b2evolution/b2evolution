@@ -1205,7 +1205,8 @@ class _core_Module extends Module
 
 
 		if( ( ! is_admin_page() || ! empty( $activate_collection_toolbar ) ) && ! empty( $Blog ) )
-		{ // A blog is currently selected AND we can activate toolbar items for selected collection:
+		{ // A collection is currently selected AND we can activate toolbar items for selected collection:
+
 			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 			{ // We have permission to add a post with at least one status:
 				global $disp, $Item;
@@ -1221,7 +1222,7 @@ class _core_Module extends Module
 						);
 				}
 				elseif( $write_item_url = $Blog->get_write_item_url() )
-				{	// If a write item URL is not empty, so it's sure that user can create new post:
+				{	// If write item URL is not empty, it's sure that user can create new post:
 					if( ! $perm_admin_normal )
 					{	// Initialize this menu item when user has no back-office access but can create new post:
 						$entries['post'] = array(
@@ -1318,7 +1319,7 @@ class _core_Module extends Module
 					$entries['blog']['entries'][] = array( 'separator' => true );
 				}
 
-				// PLACE HOLDER FOR FILES MODULE:
+				// PLACEHOLDER FOR FILES MODULE:
 				$entries['blog']['entries']['files'] = NULL;
 
 				// BLOG SETTINGS:
@@ -1362,7 +1363,7 @@ class _core_Module extends Module
 						);
 
 					if( ! is_admin_page() )
-					{ // Display a menu to turn on/off the debug containers
+					{ // Display an option to turn on/off containers display:
 						global $ReqURI, $Session;
 
 						if( $Session->get( 'display_containers_'.$Blog->ID ) == 1 )
@@ -1446,16 +1447,17 @@ class _core_Module extends Module
 
 		if( ! is_admin_page() && ! empty( $Blog ) )
 		{	// Only front-office collection pages:
-			if( $debug )
-			{	// Display a menu to turn on/off the debug widget containers:
-				global $Session;
-				$containers_status = $Session->get( 'display_containers_'.$Blog->ID );
-				$entries['containers'] = array(
-					'text'        => '<span class="fa fa-cubes"></span> '.( $containers_status ? T_('Hide') : T_('Show') ),
-					'href'        => url_add_param( regenerate_url( 'display_containers' ), 'display_containers='.( $containers_status ? 'hide' : 'show' ) ),
-					'entry_class' => 'rwdhide',
-				);
-			}
+
+
+			// Display an option to turn on/off containers display:
+			global $Session;
+			$containers_status = $Session->get( 'display_containers_'.$Blog->ID );
+			$entries['containers'] = array(
+				'text'        => '<span class="fa fa-cubes"></span> '.( $containers_status ? T_('Hide') : T_('Show') ),
+				'href'        => url_add_param( regenerate_url( 'display_containers' ), 'display_containers='.( $containers_status ? 'hide' : 'show' ) ),
+				'entry_class' => 'rwdhide',
+			);
+
 
 			if( $perm_admin_restricted && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			{	// If current user has an access to back-office and to edit collection properties:
