@@ -385,7 +385,7 @@ echo '<div class="profile_column_right">';
 
 	$profileForm->begin_fieldset( T_( 'Reputation' ) );
 
-		$profileForm->info( T_('Joined'), mysql2localedate( $User->datecreated ) );
+		$profileForm->info( T_('Registration date'), mysql2localedate( $User->datecreated ) );
 
 		if( $Blog->get_setting( 'userdir_lastseen' ) )
 		{	// Display last visit only if it is enabled by current collection:
