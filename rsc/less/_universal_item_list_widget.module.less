@@ -180,15 +180,17 @@ div.widget_core_coll_related_post_list {
 
 			div.item_content,
 			div.item_excerpt {
-				p {
-					margin: 0;
-					&:last-of-type {
-						display: inline;
-						&:after {
-							content: '...';
-						}
-					}
-				}
+
+				// No longer needed ince we have &hellip; in th output code:
+				// p {
+				//	margin: 0;
+				//	&:last-of-type {
+				//		display: inline;
+				//		&:after {
+				//			content: '...';
+				//		}
+				//	}
+				// }
 
 				// Special blockquote style for teaser layout
 				blockquote {
