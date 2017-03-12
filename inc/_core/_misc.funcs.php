@@ -602,8 +602,9 @@ function strmaxlen( $str, $maxlen = 50, $tail = NULL, $format = 'raw', $cut_at_w
 function strmaxwords( $str, $maxwords = 50, $params = array() )
 {
 	$params = array_merge( array(
-			'continued_link' => '',
-			'continued_text' => '&hellip;',
+			'continued_link'  => '',
+			'continued_text'  => '&hellip;',
+			'continued_class' => '',
 			'always_continue' => false,
 		), $params );
 	$open = false;
@@ -644,20 +645,13 @@ function strmaxwords( $str, $maxwords = 50, $params = array() )
 
 	// restrict content to required number of words and balance the tags out
 	$str = balance_tags( utf8_substr( $str, 0, $i ) );
+	// remove empty tags:
+	$str = preg_replace( '~<([\s]+?)[^>]*?></\1>~is', '', $str );
 
 	if( $params['always_continue'] || $maxwords == false )
 	{ // we want a continued text
-		if( $params['continued_link'] )
-		{ // we have a url
-			$str .= ' <a href="'.$params['continued_link'].'">'.$params['continued_text'].'</a>';
-		}
-		else
-		{ // we don't have a url
-			$str .= ' '.$params['continued_text'];
-		}
+		$str .= ' <a href="'.$params['continued_link'].'" class="'.$params['continued_class'].'">'.$params['continued_text'].'</a>';
 	}
-	// remove empty tags
-	$str = preg_replace( '~<([\s]+?)[^>]*?></\1>~is', '', $str );
 
 	return $str;
 }

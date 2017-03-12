@@ -172,9 +172,14 @@ div.widget_core_coll_related_post_list {
 			}
 		}
 	}
+	
 	// With teaser specific layout (with "..." button)
-	&.evo_noexcerpt.evo_withteaser,&.evo_withexcerpt.evo_withteaser,&.evo_withexcerpt.evo_noteaser {
-			div.item_content,div.item_excerpt {
+	&.evo_noexcerpt.evo_withteaser,
+	&.evo_withexcerpt.evo_withteaser,
+	&.evo_withexcerpt.evo_noteaser {
+
+			div.item_content,
+			div.item_excerpt {
 				p {
 					margin: 0;
 					&:last-of-type {
@@ -184,14 +189,25 @@ div.widget_core_coll_related_post_list {
 						}
 					}
 				}
+
 				// Special blockquote style for teaser layout
 				blockquote {
 					display: block;
 					margin: 0;
 					padding: 5px 15px;
 				}
-				// Simulation of bootstrap's btn-default class
+
+				> a.btn {
+					// In v6.8.9+ we are using a real bootstrap button but we want the bg to be transparent.
+					background-color: transparent;
+					&:hover {
+						background-color: #e6e6e6;				
+						color: #333;
+					}
+				}
 				> a {
+					// TODO: check if we still need the following. -- Maybe for non-bootstrap skins?
+					// Simulation of bootstrap's btn-default class:
 					margin-left: -3px;
 					display: inline-block;
 					height: 22px;
@@ -221,6 +237,7 @@ div.widget_core_coll_related_post_list {
 					}
 				}
 		}
+
 		// Special blockquote style for teaser layout
 		&.evo_1pic__special ul li div.item_content {
 			blockquote {
@@ -228,6 +245,7 @@ div.widget_core_coll_related_post_list {
 			}
 		}
 	}
+	
 	// If special placement, without teaser, without excerpt
 	&.evo_1pic__special.evo_noexcerpt.evo_noteaser {
 		div.item_title a {
