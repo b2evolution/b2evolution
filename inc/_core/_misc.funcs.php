@@ -602,11 +602,13 @@ function strmaxlen( $str, $maxlen = 50, $tail = NULL, $format = 'raw', $cut_at_w
 function strmaxwords( $str, $maxwords = 50, $params = array() )
 {
 	$params = array_merge( array(
+			'cutting_mark'    => '&hellip;',
 			'continued_link'  => '',
 			'continued_text'  => '&hellip;',
 			'continued_class' => '',
 			'always_continue' => false,
 		), $params );
+
 	$open = false;
 	$have_seen_non_whitespace = false;
 	$end = utf8_strlen( $str );
@@ -623,7 +625,7 @@ function strmaxwords( $str, $maxwords = 50, $params = array() )
 
 			case ctype_space($char):
 				if( ! $open )
-				{ // it's a word gap
+				{	// it's a word gap:
 					// Eat any other whitespace.
 					while( isset($str[$i+1]) && ctype_space($str[$i+1]) )
 					{
@@ -640,15 +642,28 @@ function strmaxwords( $str, $maxwords = 50, $params = array() )
 				$have_seen_non_whitespace = true;
 				break;
 		}
-		if( $maxwords < 1 ) break;
+
+		if( $maxwords < 1 )
+		{	// We have reached the cutting point:
+			break;
+		} 
 	}
 
-	// restrict content to required number of words and balance the tags out
-	$str = balance_tags( utf8_substr( $str, 0, $i ) );
-	// remove empty tags:
-	$str = preg_replace( '~<([\s]+?)[^>]*?></\1>~is', '', $str );
+	if( $maxwords < 1 )
+	{	// Cutting is necessary:
+		// restrict content to required number of words:
+		$str = utf8_substr( $str, 0, $i );
 
-	if( $params['always_continue'] || $maxwords == false )
+		// Add a cutting mark:
+		$str .= $params['cutting_mark'];
+
+		// balance the tags out:
+		$str = balance_tags( $str );
+		// remove empty tags:
+		$str = preg_replace( '~<([\s]+?)[^>]*?></\1>~is', '', $str );
+	}
+
+	if( $params['always_continue'] || $maxwords <1 )
 	{ // we want a continued text
 		$str .= ' <a href="'.$params['continued_link'].'" class="'.$params['continued_class'].'">'.$params['continued_text'].'</a>';
 	}
