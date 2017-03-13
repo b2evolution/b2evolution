@@ -4941,7 +4941,9 @@ class Blog extends DataObject
 		}
 
 		// Get the declarations of the widgets that the skin wants to use:
-		$skin_widgets = $coll_Skin->get_default_widgets( $this->get( 'type' ), $context );
+		$skin_widgets = $coll_Skin->get_skin_default_widgets( $this->get( 'type' ), $context );
+
+// TODO: fp>yura: do a SMART merge with values from $coll_Skin->get_b2evo_default_widgets( $this->get( 'type' ), $context );
 
 		if( empty( $skin_widgets ) )
 		{	// No skin default widgets:

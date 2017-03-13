@@ -103,20 +103,18 @@ class bootstrap_blog_Skin extends Skin
 	/**
 	 * Get the declarations of the widgets that the skin wants to use.
 	 *
-	 * The skin class defines a default set of widgets to used. Skins should override this.
-	 *
 	 * @param string Collection kind: 'std', 'main', 'photo', 'group', 'forum', 'manual'
 	 * @param array Additional params. Example value 'init_as_blog_b' => true
 	 * @return array Array of default widgets:
 	 *               - Key - Container name, 
-	 *               - Value - array of widgets:
+	 *               - Value - array of widgets: (OR SPECIAL VALUES)
 	 *                         0 - Type: 'core', 'plugin'.
 	 *                         1 - Code.
 	 *                         2 - Params: Array with params: Key - param code, Value - param value; NULL - for default params. (Default = NULL)
 	 *                         3 - Order. (Default is started from 1 and incremented inside container)
 	 *                         4 - Enabled? 1 or 0. (Default = 1)
 	 */
-	function get_default_widgets( $coll_kind, $context = array() )
+	function get_skin_default_widgets( $coll_kind, $context = array() )
 	{
 		global $DB;
 

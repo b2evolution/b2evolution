@@ -214,7 +214,7 @@ class Skin extends DataObject
 
 
 	/**
-	 * Get the declarations of the widgets that the skin wants to use.
+	 * Get the declarations of the widgets that the skin recommends by default.
 	 *
 	 * The skin class defines a default set of widgets to used. Skins should override this.
 	 *
@@ -229,7 +229,29 @@ class Skin extends DataObject
 	 *                         3 - Order. (Default is started from 1 and incremented inside container)
 	 *                         4 - Enabled? 1 or 0. (Default = 1)
 	 */
-	function get_default_widgets( $coll_kind, $context = array() )
+	function get_skin_default_widgets( $coll_kind, $context = array() )
+	{
+		return $this->get_b2evo_default_widgets( $coll_kind, $context );
+	}
+
+
+	/**
+	 * Get the declarations of the widgets that b2evolution recommends by default.
+	 *
+	 * This will be used when the skin doesn't defien its own, or when the skins wants to use the b2evo defaults.
+	 *
+	 * @param string Collection kind: 'std', 'main', 'photo', 'group', 'forum', 'manual'
+	 * @param array Additional params. Example value 'init_as_blog_b' => true
+	 * @return array Array of default widgets:
+	 *               - Key - Container name, 
+	 *               - Value - array of widgets:
+	 *                         0 - Type: 'core', 'plugin'.
+	 *                         1 - Code.
+	 *                         2 - Params: Array with params: Key - param code, Value - param value; NULL - for default params. (Default = NULL)
+	 *                         3 - Order. (Default is started from 1 and incremented inside container)
+	 *                         4 - Enabled? 1 or 0. (Default = 1)
+	 */
+	function get_b2evo_default_widgets( $coll_kind, $context = array() )
 	{
 		global $DB;
 
