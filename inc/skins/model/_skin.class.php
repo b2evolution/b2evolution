@@ -222,7 +222,7 @@ class Skin extends DataObject
 	 * @param array Additional params. Example value 'init_as_blog_b' => true
 	 * @return array Array of default widgets:
 	 *               - Key - Container name, 
-	 *               - Value - array of widgets:
+	 *               - Value - array of widgets: (OR SPECIAL VALUES)
 	 *                         0 - Type: 'core', 'plugin'.
 	 *                         1 - Code.
 	 *                         2 - Params: Array with params: Key - param code, Value - param value; NULL - for default params. (Default = NULL)
@@ -232,6 +232,8 @@ class Skin extends DataObject
 	function get_skin_default_widgets( $coll_kind, $context = array() )
 	{
 		return $this->get_b2evo_default_widgets( $coll_kind, $context );
+// TODO: fp>yura > after you implement the SMART merge, this should become:
+//    return array( '*' => true );
 	}
 
 
