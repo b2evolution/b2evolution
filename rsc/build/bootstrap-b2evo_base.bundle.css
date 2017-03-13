@@ -1816,6 +1816,13 @@ div.widget_core_coll_related_post_list.evo_1pic__special ul li div.item_title {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+div.widget_core_coll_item_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
+div.widget_core_coll_featured_posts.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
+div.widget_core_coll_post_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
+div.widget_core_coll_page_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
+div.widget_core_coll_related_post_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
+  font-size: 22px;
+}
 div.widget_core_coll_item_list.evo_layout_list div.item_first_image,
 div.widget_core_coll_featured_posts.evo_layout_list div.item_first_image,
 div.widget_core_coll_post_list.evo_layout_list div.item_first_image,
@@ -1880,6 +1887,18 @@ div.widget_core_coll_page_list.evo_withteaser.evo_1pic__special ul li div.item_t
 div.widget_core_coll_related_post_list.evo_withteaser.evo_1pic__special ul li div.item_title a {
   text-decoration: underline;
 }
+div.widget_core_coll_item_list.evo_withexcerpt.evo_1pic__special ul li div.item_content blockquote,
+div.widget_core_coll_featured_posts.evo_withexcerpt.evo_1pic__special ul li div.item_content blockquote,
+div.widget_core_coll_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_content blockquote,
+div.widget_core_coll_page_list.evo_withexcerpt.evo_1pic__special ul li div.item_content blockquote,
+div.widget_core_coll_related_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_content blockquote,
+div.widget_core_coll_item_list.evo_withteaser.evo_1pic__special ul li div.item_content blockquote,
+div.widget_core_coll_featured_posts.evo_withteaser.evo_1pic__special ul li div.item_content blockquote,
+div.widget_core_coll_post_list.evo_withteaser.evo_1pic__special ul li div.item_content blockquote,
+div.widget_core_coll_page_list.evo_withteaser.evo_1pic__special ul li div.item_content blockquote,
+div.widget_core_coll_related_post_list.evo_withteaser.evo_1pic__special ul li div.item_content blockquote {
+  margin-left: 86px;
+}
 div.widget_core_coll_item_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt,
 div.widget_core_coll_featured_posts.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt,
 div.widget_core_coll_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt,
@@ -1891,6 +1910,50 @@ div.widget_core_coll_post_list.evo_withteaser.evo_1pic__special ul li div.item_e
 div.widget_core_coll_page_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt,
 div.widget_core_coll_related_post_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt {
   margin-top: -2px;
+}
+div.widget_core_coll_item_list.evo_withexcerpt.evo_1pic__special ul li div.item_content p,
+div.widget_core_coll_featured_posts.evo_withexcerpt.evo_1pic__special ul li div.item_content p,
+div.widget_core_coll_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_content p,
+div.widget_core_coll_page_list.evo_withexcerpt.evo_1pic__special ul li div.item_content p,
+div.widget_core_coll_related_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_content p,
+div.widget_core_coll_item_list.evo_withteaser.evo_1pic__special ul li div.item_content p,
+div.widget_core_coll_featured_posts.evo_withteaser.evo_1pic__special ul li div.item_content p,
+div.widget_core_coll_post_list.evo_withteaser.evo_1pic__special ul li div.item_content p,
+div.widget_core_coll_page_list.evo_withteaser.evo_1pic__special ul li div.item_content p,
+div.widget_core_coll_related_post_list.evo_withteaser.evo_1pic__special ul li div.item_content p,
+div.widget_core_coll_item_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p,
+div.widget_core_coll_featured_posts.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p,
+div.widget_core_coll_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p,
+div.widget_core_coll_page_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p,
+div.widget_core_coll_related_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p,
+div.widget_core_coll_item_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt p,
+div.widget_core_coll_featured_posts.evo_withteaser.evo_1pic__special ul li div.item_excerpt p,
+div.widget_core_coll_post_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt p,
+div.widget_core_coll_page_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt p,
+div.widget_core_coll_related_post_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt p {
+  margin: 0;
+}
+div.widget_core_coll_item_list.evo_withexcerpt.evo_1pic__special ul li div.item_content p:last-of-type,
+div.widget_core_coll_featured_posts.evo_withexcerpt.evo_1pic__special ul li div.item_content p:last-of-type,
+div.widget_core_coll_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_content p:last-of-type,
+div.widget_core_coll_page_list.evo_withexcerpt.evo_1pic__special ul li div.item_content p:last-of-type,
+div.widget_core_coll_related_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_content p:last-of-type,
+div.widget_core_coll_item_list.evo_withteaser.evo_1pic__special ul li div.item_content p:last-of-type,
+div.widget_core_coll_featured_posts.evo_withteaser.evo_1pic__special ul li div.item_content p:last-of-type,
+div.widget_core_coll_post_list.evo_withteaser.evo_1pic__special ul li div.item_content p:last-of-type,
+div.widget_core_coll_page_list.evo_withteaser.evo_1pic__special ul li div.item_content p:last-of-type,
+div.widget_core_coll_related_post_list.evo_withteaser.evo_1pic__special ul li div.item_content p:last-of-type,
+div.widget_core_coll_item_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p:last-of-type,
+div.widget_core_coll_featured_posts.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p:last-of-type,
+div.widget_core_coll_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p:last-of-type,
+div.widget_core_coll_page_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p:last-of-type,
+div.widget_core_coll_related_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p:last-of-type,
+div.widget_core_coll_item_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt p:last-of-type,
+div.widget_core_coll_featured_posts.evo_withteaser.evo_1pic__special ul li div.item_excerpt p:last-of-type,
+div.widget_core_coll_post_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt p:last-of-type,
+div.widget_core_coll_page_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt p:last-of-type,
+div.widget_core_coll_related_post_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt p:last-of-type {
+  display: inline;
 }
 div.widget_core_coll_item_list.evo_withexcerpt ul li,
 div.widget_core_coll_featured_posts.evo_withexcerpt ul li,
@@ -1978,30 +2041,6 @@ div.widget_core_coll_post_list.evo_withteaser a.btn:hover,
 div.widget_core_coll_page_list.evo_withteaser a.btn:hover,
 div.widget_core_coll_related_post_list.evo_withteaser a.btn:hover {
   background-color: #e6e6e6;
-}
-div.widget_core_coll_item_list.evo_noexcerpt.evo_withteaser.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_featured_posts.evo_noexcerpt.evo_withteaser.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_post_list.evo_noexcerpt.evo_withteaser.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_page_list.evo_noexcerpt.evo_withteaser.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_related_post_list.evo_noexcerpt.evo_withteaser.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_item_list.evo_withexcerpt.evo_withteaser.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_featured_posts.evo_withexcerpt.evo_withteaser.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_post_list.evo_withexcerpt.evo_withteaser.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_page_list.evo_withexcerpt.evo_withteaser.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_related_post_list.evo_withexcerpt.evo_withteaser.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_item_list.evo_withexcerpt.evo_noteaser.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_featured_posts.evo_withexcerpt.evo_noteaser.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_post_list.evo_withexcerpt.evo_noteaser.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_page_list.evo_withexcerpt.evo_noteaser.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_related_post_list.evo_withexcerpt.evo_noteaser.evo_1pic__special ul li div.item_content blockquote {
-  margin-left: 86px;
-}
-div.widget_core_coll_item_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
-div.widget_core_coll_featured_posts.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
-div.widget_core_coll_post_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
-div.widget_core_coll_page_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
-div.widget_core_coll_related_post_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
-  font-size: 22px;
 }
 div.widget_core_coll_item_list img,
 div.widget_core_coll_featured_posts img,
