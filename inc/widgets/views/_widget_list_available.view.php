@@ -62,6 +62,7 @@ $core_componentwidget_defs = array(
 	'multipurpose' => array(
 			'image',
 			'coll_avatar',
+			'text_block',
 			'free_html',
 			'user_links',
 			'social_links'

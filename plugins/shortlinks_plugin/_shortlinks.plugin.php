@@ -117,22 +117,10 @@ class shortlinks_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		if( !empty( $params['Item'] ) )
-		{ // Get Item from params
-			$Item = & $params['Item'];
-		}
-		elseif( !empty( $params['Comment'] ) )
-		{ // Get Item from Comment
-			$Comment = & $params['Comment'];
-			$Item = & $Comment->get_Item();
-		}
-		else
-		{ // Item and Comment are not defined, Exit here
-			return;
-		}
-		$item_Blog = & $Item->get_Blog();
+		// Get collection from given params:
+		$setting_Blog = $this->get_Blog_from_params( $params );
 
-		$this->setting_link_without_brackets = $this->get_coll_setting( 'link_without_brackets', $item_Blog );
+		$this->setting_link_without_brackets = $this->get_coll_setting( 'link_without_brackets', $setting_Blog );
 
 		return $this->render_content( $content );
 	}

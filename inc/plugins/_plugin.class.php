@@ -3819,6 +3819,35 @@ class Plugin
 	 */
 
 	/**
+	 * Get collection from given params
+	 *
+	 * @param array Params: 'Item', 'Comment', 'Blog'
+	 * @return object|false Collection object or FALSE with wrong params
+	 */
+	function & get_Blog_from_params( $params )
+	{
+		$setting_Blog = false;
+
+		if( ! empty( $params['Item'] ) )
+		{	// Get Blog from given Item:
+			$Item = & $params['Item'];
+			$setting_Blog = & $Item->get_Blog();
+		}
+		elseif( ! empty( $params['Comment'] ) )
+		{	// Get Blog from given Comment:
+			$Comment = & $params['Comment'];
+			$Item = & $Comment->get_Item();
+			$setting_Blog = & $Item->get_Blog();
+		}
+		elseif( ! empty( $params['Blog'] ) )
+		{	// Get Blog from params:
+			$setting_Blog = & $params['Blog'];
+		}
+
+		return $setting_Blog;
+	}
+
+	/**
 	 * Get a skin specific param value from current Blog
 	 *
 	 * @param string Setting name

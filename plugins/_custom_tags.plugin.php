@@ -253,21 +253,12 @@ class custom_tags_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		if( !empty( $params['Item'] ) )
-		{	// Get Item from params:
-			$Item = & $params['Item'];
-		}
-		elseif( !empty( $params['Comment'] ) )
-		{	// Get Item from Comment:
-			$Comment = & $params['Comment'];
-			$Item = & $Comment->get_Item();
-		}
-
-		$item_Blog = & $Item->get_Blog();
+		// Get collection from given params:
+		$setting_Blog = $this->get_Blog_from_params( $params );
 
 		if( ! isset( $this->post_search_list ) )
 		{
-			$search_list = $this->get_coll_setting( 'coll_post_search_list', $item_Blog );
+			$search_list = $this->get_coll_setting( 'coll_post_search_list', $setting_Blog );
 			if( ! $search_list )
 			{
 				$search_list = $this->default_search_list;
@@ -277,7 +268,7 @@ class custom_tags_plugin extends Plugin
 
 		if( ! isset( $this->post_replace_list ) )
 		{
-			$replace_list = $this->get_coll_setting( 'coll_post_replace_list', $item_Blog );
+			$replace_list = $this->get_coll_setting( 'coll_post_replace_list', $setting_Blog );
 			if( ! $replace_list )
 			{
 				$replace_list = $this->default_replace_list;
