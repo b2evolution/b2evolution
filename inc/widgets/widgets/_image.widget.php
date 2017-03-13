@@ -50,7 +50,7 @@ class image_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Image');
+		return T_('Free Image');
 	}
 
 
@@ -78,7 +78,7 @@ class image_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Include an image.');
+		return T_('Display an image of your choice.');
 	}
 
 

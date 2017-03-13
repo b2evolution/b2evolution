@@ -47,25 +47,27 @@ foreach( $Plugin_array as $k => $Plugin )
 unset( $Plugin_array );
 
 $widget_groups = array (
-	'multipurpose' => T_('Multi-Purpose Widgets'),
-	'menu_item'    => T_('Menu Item Widgets'),
-	'navigation'   => T_('Navigation Widgets'),
-	'content'      => T_('Content Listing Widgets'),
-	'infoitem'     => T_('Info about a specific Item'),
-	'collection'   => T_('Collection Support Widgets'),
-	'site'         => T_('Site Support Widgets'),
-	'user'         => T_('User Support Widgets'),
+	'free_content' => T_('Free Content'),
+	'menu_item'    => T_('Menu Items / Buttons'),
+	'navigation'   => T_('Navigation'),
+	'content'      => T_('Listing Contents'),
+	'infoitem'     => T_('Item Details'),
+	'collection'   => T_('Collection Details'),
+	'about_user'   => T_('User Details'),
+	'user'         => T_('User Related'),
 	'other'        => T_('Other'),
 );
 
 $core_componentwidget_defs = array(
-	'multipurpose' => array(
-			'image',
-			'coll_avatar',
+	'free_content' => array(
 			'text_block',
 			'free_html',
-			'user_links',
-			'social_links'
+			'image',
+			'social_links',
+		),
+	'about_user' => array(
+			'coll_avatar',		// Avatar of User
+			'user_links',		// Social links of coll owner
 		),
 	'menu_item' => array(
 			'menu_link',
@@ -114,21 +116,19 @@ $core_componentwidget_defs = array(
 			'coll_subscription',
 			'coll_activity_stats',
 		),
-	'site' => array(
-			'colls_list_public',
-			'colls_list_owner',
-			'user_avatars',
-		),
 	'user' => array(
+			'user_avatars',
+			'org_members',
 			'user_login',
 			'user_register',
 			'user_tools',
+			'online_users',
 		),
 	'other' => array(
-			'org_members',
-			'online_users',
-			'mobile_skin_switcher',
 			'poll',
+			'colls_list_public',
+			'colls_list_owner',
+			'mobile_skin_switcher',
 			'page_404_not_found',
 		),
 );

@@ -50,7 +50,7 @@ class text_block_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		$title = T_( 'Text block' );
+		$title = T_( 'Free Text' );
 		return $title;
 	}
 
@@ -77,7 +77,7 @@ class text_block_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Custom text/HTML of your choice.');
+		return T_('Dusplay custom text, with renderers applied (Markdown, etc.)');
 	}
 
 
