@@ -609,33 +609,36 @@ function strmaxwords( $str, $maxwords = 50, $params = array() )
 			'always_continue' => false,
 		), $params );
 
-	$open = false;
+	// STATE MACHINE:
+	$in_tag = false;
 	$have_seen_non_whitespace = false;
-	$end = utf8_strlen( $str );
+	$end = strlen( $str );  // If we use utf8_strlen here(), we also need to access UTF chars below
 	for( $i = 0; $i < $end; $i++ )
 	{
-		switch( $char = $str[$i] )
+		switch( $char = $str[$i] )		// This is NOT UTF-8
 		{
 			case '<' :	// start of a tag
-				$open = true;
-				break;
-			case '>' : // end of a tag
-				$open = false;
+				$in_tag = true;
 				break;
 
-			case ctype_space($char):
-				if( ! $open )
+			case '>' : // end of a tag
+				$in_tag = false;
+				break;
+
+			case ctype_space($char): // This is a whitespace char...
+				if( ! $in_tag )
 				{	// it's a word gap:
-					// Eat any other whitespace.
+					// Eat any additional whitespace:
 					while( isset($str[$i+1]) && ctype_space($str[$i+1]) )
 					{
 						$i++;
 					}
 					if( isset($str[$i+1]) && $have_seen_non_whitespace )
-					{ // only decrement words, if there's a non-space char left.
+					{ // only decrement words, if there's been at least one non-space char before.
 						--$maxwords;
 					}
 				}
+				// ignore white space in a tag...
 				break;
 
 			default:
@@ -663,7 +666,7 @@ function strmaxwords( $str, $maxwords = 50, $params = array() )
 		$str = preg_replace( '~<([\s]+?)[^>]*?></\1>~is', '', $str );
 	}
 
-	if( $params['always_continue'] || $maxwords <1 )
+	if( $params['always_continue'] || $maxwords < 1 )
 	{ // we want a continued text
 		$str .= ' <a href="'.$params['continued_link'].'" class="'.$params['continued_class'].'">'.$params['continued_text'].'</a>';
 	}
