@@ -20,7 +20,6 @@
   margin-top: 0;
 }
 .evo_container__front_page_primary .evo_widget div > p:last-child,
-.evo_container__front_page_primary .evo_widget:last-child > h2,
 .evo_container__front_page_primary .evo_widget:last-child > ul,
 .evo_container__front_page_primary .evo_widget > ul li:last-child {
   margin-bottom: 0 !important;
