@@ -231,9 +231,7 @@ class Skin extends DataObject
 	 */
 	function get_skin_default_widgets( $coll_kind, $context = array() )
 	{
-		return $this->get_b2evo_default_widgets( $coll_kind, $context );
-// TODO: fp>yura > after you implement the SMART merge, this should become:
-//    return array( '*' => true );
+		return array( '*' => true );
 	}
 
 

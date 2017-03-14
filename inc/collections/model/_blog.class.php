@@ -4943,7 +4943,41 @@ class Blog extends DataObject
 		// Get the declarations of the widgets that the skin wants to use:
 		$skin_widgets = $coll_Skin->get_skin_default_widgets( $this->get( 'type' ), $context );
 
-// TODO: fp>yura: do a SMART merge with values from $coll_Skin->get_b2evo_default_widgets( $this->get( 'type' ), $context );
+		// Check if the skin wants to use all b2evolution default widgets:
+		if( isset( $skin_widgets['*'] ) )
+		{	// Depending on how the skin want to use this:
+			$use_all_b2evo_default_widgets = $skin_widgets['*'];
+			unset( $skin_widgets['*'] );
+		}
+		else
+		{	// Use all default widgets if the skin does NOT say about this:
+			$use_all_b2evo_default_widgets = true;
+		}
+
+		// Get the declarations of the widgets that b2evolution recommends by default:
+		$b2evo_default_widgets = $coll_Skin->get_b2evo_default_widgets( $this->get( 'type' ), $context );
+
+		// Merge the skin widget declarations with b2evolution default widgets:
+		foreach( $b2evo_default_widgets as $container_name => $widgets )
+		{
+			if( // The skin says to use all b2evolution default widgets:
+			    $use_all_b2evo_default_widgets ||
+			    // The skin wants to use default widget declarations for this container:
+			    ( isset( $skin_widgets[ $container_name ] ) &&
+			      $skin_widgets[ $container_name ] === true ) )
+			{	// Merge widgets from b2evolution default declarations to the skin:
+				$skin_widgets[ $container_name ] = $widgets;
+			}
+		}
+
+		// Set empty containers if they are not detected in b2evolution default widget declrations:
+		foreach( $skin_widgets as $container_name => $widgets )
+		{
+			if( $widgets === true )
+			{
+				$skin_widgets[ $container_name ] = array();
+			}
+		}
 
 		if( empty( $skin_widgets ) )
 		{	// No skin default widgets:
