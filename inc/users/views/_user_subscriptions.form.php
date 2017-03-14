@@ -335,12 +335,18 @@ if( $notifications_mode != 'off' )
 	$Form->begin_fieldset( T_('Individual post subscriptions').( is_admin_page() ? get_manual_link( 'user-post-subscriptions-panel' ) : '' ) );
 
 		$sql = 'SELECT DISTINCT post_ID, blog_ID, blog_shortname
-					FROM T_items__subscriptions
-						INNER JOIN T_items__item ON isub_item_ID = post_ID
-						INNER JOIN T_categories ON post_main_cat_ID = cat_ID
-						INNER JOIN T_blogs ON cat_blog_ID = blog_ID
-					WHERE isub_user_ID = '.$edited_User->ID.' AND isub_comments <> 0
-					ORDER BY blog_ID, post_ID ASC';
+				FROM T_items__item
+				INNER JOIN T_categories ON cat_ID = post_main_cat_ID
+				INNER JOIN T_blogs ON blog_ID = cat_blog_ID
+				INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = blog_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = "1" )
+				LEFT JOIN T_coll_settings AS opt ON ( opt.cset_coll_ID = blog_ID AND opt.cset_name = "opt_out_item_subscription" )
+				LEFT JOIN T_items__subscriptions ON ( isub_item_ID = post_ID AND isub_user_ID = '.$edited_User->ID.' )
+				LEFT JOIN T_coll_group_perms ON (bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND opt.cset_value = "1" )
+				LEFT JOIN T_coll_user_perms ON (bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND opt.cset_value = "1" )
+				LEFT JOIN T_users ON (user_grp_ID = bloggroup_group_ID AND user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
+				LEFT JOIN T_users__secondary_user_groups ON (sug_grp_ID = bloggroup_group_ID AND sug_user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
+				WHERE ( sug_user_ID = '.$edited_User->ID.' OR bloguser_user_ID = '.$edited_User->ID.' OR user_ID = '.$edited_User->ID.' )
+					AND ( isub_comments <> 0 OR isub_item_ID IS NULL )';
 		$individual_posts_subs = $DB->get_results( $sql );
 		$subs_item_IDs = array();
 		if( empty( $individual_posts_subs ) )
