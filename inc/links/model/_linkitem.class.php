@@ -140,9 +140,13 @@ class LinkItem extends LinkOwner
 				return 'teaser';
 			}
 		}
-		else
-		{ // If file is not image then always use "aftermore"
+		elseif( $File->is_video() || $File->is_audio() )
+		{	// If file is video or audio then always use "aftermore":
 			return 'aftermore';
+		}
+		else
+		{	// All other file types must use "attachment" position by default:
+			return 'attachment';
 		}
 	}
 
