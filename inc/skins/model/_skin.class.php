@@ -424,13 +424,13 @@ class Skin extends DataObject
 				$declared_widgets['Sidebar'][] = array( 'core', 'coll_search_form' );
 				$declared_widgets['Sidebar'][] = array( 'core', 'coll_category_list' );
 
-				if( $context['init_as_home'] )
+				if( ! empty( $context['coll_home_ID'] ) && $context['init_as_home'] )
 				{ // Advertisements, Install only for blog #1 home blog
 					$advertisement_type_ID = $DB->get_var( 'SELECT ityp_ID FROM T_items__type WHERE ityp_name = "Advertisement"' );
 					$declared_widgets['Sidebar'][] = array( 'core', 'coll_item_list', array(
 							'title' => 'Advertisement (Demo)',
 							'item_type' => empty( $advertisement_type_ID ) ? '#' : $advertisement_type_ID,
-							'blog_ID' => $blog_id,
+							'blog_ID' => $context['coll_home_ID'],
 							'order_by' => 'RAND',
 							'limit' => 1,
 							'disp_title' => false,
