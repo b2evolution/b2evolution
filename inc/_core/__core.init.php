@@ -1195,7 +1195,6 @@ class _core_Module extends Module
 			// ---- "Page" MENU ----
 			$entries['page'] = array(
 					'text' => T_('Page'),
-					'href' => '#',
 					'entries' => array(
 						// PLACE HOLDER FOR ENTRY "Edit contents":
 						'edit'       => NULL,
@@ -1492,9 +1491,10 @@ class _core_Module extends Module
 			global $Session;
 			$containers_status = $Session->get( 'display_containers_'.$Blog->ID );
 			$entries['containers'] = array(
-				'text'        => '<span class="fa fa-cubes"></span> '.( $containers_status ? T_('Hide') : T_('Show') ),
+				'text'        => '<span class="fa fa-cubes"></span> '.T_('Widgets'),
 				'href'        => url_add_param( regenerate_url( 'display_containers' ), 'display_containers='.( $containers_status ? 'hide' : 'show' ) ),
 				'entry_class' => 'rwdhide',
+				'class'       => ( $containers_status ? 'active' : '' ),
 			);
 
 
