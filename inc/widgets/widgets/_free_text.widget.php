@@ -22,7 +22,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  *
  * @package evocore
  */
-class text_block_Widget extends ComponentWidget
+class free_text_Widget extends ComponentWidget
 {
 	/**
 	 * Constructor
@@ -30,7 +30,7 @@ class text_block_Widget extends ComponentWidget
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'text_block' );
+		parent::__construct( $db_row, 'core', 'free_text' );
 	}
 
 
@@ -41,7 +41,7 @@ class text_block_Widget extends ComponentWidget
 	 */
 	function get_help_url()
 	{
-		return get_manual_url( 'text-block-widget' );
+		return get_manual_url( 'free-text-widget' );
 	}
 
 
@@ -77,7 +77,7 @@ class text_block_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Dusplay custom text, with renderers applied (Markdown, etc.)');
+		return T_('Display custom text, with renderers applied (Markdown, etc.)');
 	}
 
 

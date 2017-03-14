@@ -60,7 +60,7 @@ $widget_groups = array (
 
 $core_componentwidget_defs = array(
 	'free_content' => array(
-			'text_block',
+			'free_text',
 			'free_html',
 			'image',
 			'social_links',
