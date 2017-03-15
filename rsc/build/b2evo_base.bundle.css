@@ -1272,6 +1272,9 @@ div#evo_toolbar .actions_right {
 .evobar-menu a.active:hover {
   background-color: #ffffcc;
   border-radius: 4px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin: 1px 0;
 }
 .evobar-menu [class^=evobar-icon-] {
   margin-left: 6px;
