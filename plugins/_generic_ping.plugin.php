@@ -167,6 +167,12 @@ class generic_ping_plugin extends Plugin
 		global $debug;
 		global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
 
+		if( ! defined( 'CANUSEXMLRPC' ) || CANUSEXMLRPC !== true )
+		{	// Could not use xmlrpc client because server has no the requested extensions:
+			$params['xmlrpcresp'] = CANUSEXMLRPC;
+			return false;
+		}
+
 		$url = $this->parse_ping_url( $this->Settings->get( 'ping_service_url' ) );
 
 		$Item = $params['Item'];

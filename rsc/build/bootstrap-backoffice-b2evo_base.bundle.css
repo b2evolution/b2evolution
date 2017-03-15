@@ -1089,11 +1089,6 @@ ul.jslog_error {
   -khtml-border-radius: 3px;
   z-index: 11000;
 }
-html,
-body {
-  width: auto !important;
-  overflow-x: hidden !important;
-}
 div.dev-blocks {
   border: 1px solid #f00;
   margin: 0;

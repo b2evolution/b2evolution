@@ -169,6 +169,10 @@ function antispam_report_abuse( $abuse_string )
 
 	// Construct XML-RPC client:
 	load_funcs( 'xmlrpc/model/_xmlrpc.funcs.php' );
+	if( ! defined( 'CANUSEXMLRPC' ) || CANUSEXMLRPC !== true )
+	{	// Could not use xmlrpc client because server has no the requested extensions:
+		return false;
+	}
 	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port );
 	// yura: I commented this because xmlrpc_client prints the debug info on screen and it breaks header_redirect()
 	// $client->debug = $debug;

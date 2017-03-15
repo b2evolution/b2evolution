@@ -810,25 +810,18 @@ class coll_item_list_Widget extends ComponentWidget
 			$content = $disp_Item->get_content_teaser( 1, false, 'htmlbody' );
 
 			if( $words = $this->disp_params['disp_teaser_maxwords'] )
-			{ // limit number of words
+			{ // limit number of words:
+
 				$content = strmaxwords( $content, $words, array(
 						'continued_link'  => $disp_Item->get_permanent_url(),
 						'continued_text'  => $this->disp_params['item_readmore_text'],
 						'continued_class' => $this->disp_params['item_readmore_class'],
-						'always_continue' => false,
+						'always_continue' => true, // Because Item::has_content_parts() is not optimized, we cannot be sure if the content has been cut because of max words or becaus eof [teaserbreak], so in doubt, we display a read more link all the time. Additionally: if there are images "after more", we also need the "more "link.
 					 ) );
 			}
+			
 			echo $this->disp_params['item_content_before'].$content.$this->disp_params['item_content_after'];
 			$content_is_displayed = true;
-
-			/* fp> does that really make sense?
-				we're no longer in a linkblog/linkroll use case here, are we?
-			$disp_Item->more_link( array(
-					'before'    => '',
-					'after'     => '',
-					'link_text' => T_('more').' &raquo;',
-				) );
-				*/
 		}
 
 		// DISPLAY PICTURES:
