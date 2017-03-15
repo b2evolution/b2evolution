@@ -731,10 +731,18 @@ $api_title = 'XML-RPC';
 $api_file = 'xmlrpc.php';
 $api_url = $baseurl.$api_file;
 load_funcs( 'xmlrpc/model/_xmlrpc.funcs.php' );
-$url_data = parse_url( $api_url );
-$client = new xmlrpc_client( $api_file, $url_data['host'], ( isset( $url_data['port'] ) ? $url_data['port'] : '' ) );
-$message = new xmlrpcmsg( 'system.listMethods' );
-$result = $client->send( $message );
+if( defined( 'CANUSEXMLRPC' ) && CANUSEXMLRPC === true )
+{	// Try XML-RPC API only if current server can use it:
+	$url_data = parse_url( $api_url );
+	$client = new xmlrpc_client( $api_file, $url_data['host'], ( isset( $url_data['port'] ) ? $url_data['port'] : '' ) );
+	$message = new xmlrpcmsg( 'system.listMethods' );
+	$result = $client->send( $message );
+}
+else
+{	// Get an error message if current server cannot use XML-RPC:
+	$result = false;
+	$xmlrpc_error_message = CANUSEXMLRPC;
+}
 if( $result && ! $result->faultCode() )
 {	// XML-RPC request is successful:
 	init_system_check( $api_title, 'OK', $api_url );
@@ -742,7 +750,10 @@ if( $result && ! $result->faultCode() )
 }
 else
 {	// Some error on XML-RPC request:
-	$xmlrpc_error_message = $result->faultString();
+	if( $result )
+	{	// Get an error message of XML-RPC request:
+		$xmlrpc_error_message = $result->faultString();
+	}
 	if( $xmlrpc_error_message == 'XML-RPC services are disabled on this system.' )
 	{	// Exception for this error:
 		$api_status_title = T_('Disabled');

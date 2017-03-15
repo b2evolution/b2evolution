@@ -95,7 +95,11 @@ function b2evonet_get_updates( $force_short_delay = false )
 	$Settings->dbupdate();
 
 	// Construct XML-RPC client:
-	load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
+	load_funcs( 'xmlrpc/model/_xmlrpc.funcs.php' );
+	if( ! defined( 'CANUSEXMLRPC' ) || CANUSEXMLRPC !== true )
+	{	// Could not use xmlrpc client because server has no the requested extensions:
+		return false;
+	}
 	$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port );
 	if( $debug > 1 )
 	{
