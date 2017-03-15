@@ -733,8 +733,7 @@ $api_url = $baseurl.$api_file;
 load_funcs( 'xmlrpc/model/_xmlrpc.funcs.php' );
 if( defined( 'CANUSEXMLRPC' ) && CANUSEXMLRPC === true )
 {	// Try XML-RPC API only if current server can use it:
-	$url_data = parse_url( $api_url );
-	$client = new xmlrpc_client( $api_file, $url_data['host'], ( isset( $url_data['port'] ) ? $url_data['port'] : '' ) );
+	$client = new xmlrpc_client( $api_url );
 	$message = new xmlrpcmsg( 'system.listMethods' );
 	$result = $client->send( $message );
 }
