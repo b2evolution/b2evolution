@@ -4960,8 +4960,10 @@ class Blog extends DataObject
 		// Merge the skin widget declarations with b2evolution default widgets:
 		foreach( $b2evo_default_widgets as $container_name => $widgets )
 		{
-			if( // The skin says to use all b2evolution default widgets:
-			    $use_all_b2evo_default_widgets ||
+			if( // The skin has no widget declarations for this container and it allows to use b2evolution default widgets:
+			    ( ! isset( $skin_widgets[ $container_name ] ) &&
+			      $use_all_b2evo_default_widgets )
+			    ||
 			    // The skin wants to use default widget declarations for this container:
 			    ( isset( $skin_widgets[ $container_name ] ) &&
 			      $skin_widgets[ $container_name ] === true ) )
@@ -4970,12 +4972,16 @@ class Blog extends DataObject
 			}
 		}
 
-		// Set empty containers if they are not detected in b2evolution default widget declrations:
+		// Check all skin widget containers to be sure they all are proper arrays and not other values like true, false and etc.:
 		foreach( $skin_widgets as $container_name => $widgets )
 		{
 			if( $widgets === true )
-			{
+			{	// Set empty container if it has not been detected in b2evolution default widget declrations above:
 				$skin_widgets[ $container_name ] = array();
+			}
+			elseif( ! is_array( $widgets ) )
+			{	// Ignore all other not array, probably it is a boolean false or some other string value which should be ignored indeed:
+				unset( $skin_widgets[ $container_name ] );
 			}
 		}
 
