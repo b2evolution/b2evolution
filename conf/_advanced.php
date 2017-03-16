@@ -948,10 +948,12 @@ $check_browser_version = false;
 
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
+$evonetsrv_protocol = 'http';
 $evonetsrv_host = 'rpc.b2evo.net';
 $evonetsrv_port = 80;
 $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
 
+$antispamsrv_protocol = 'http';
 $antispamsrv_host = 'antispam.b2evo.net';
 $antispamsrv_port = 80;
 $antispamsrv_uri = '/evonetsrv/xmlrpc.php';
