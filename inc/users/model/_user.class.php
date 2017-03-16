@@ -1931,27 +1931,29 @@ class User extends DataObject
 	/*
 	 * Get the total size of files uploaded by the user
 	 *
+	 * @param string File type: 'image', 'video', 'audio', 'other'; NULL - for all file types
 	 * @return integer total size in bytes
 	 */
 	function get_total_upload( $type = NULL )
 	{
-		global $DB;
-
-		$files_SQL = new SQL();
-		$files_SQL->SELECT( 'file_ID' );
-		$files_SQL->FROM( 'T_files' );
-		$files_SQL->WHERE( 'file_creator_user_ID = '.$this->ID );
-		if( ! is_null( $type ) )
-		{
-			$files_SQL->WHERE_and( 'file_type = '.$DB->quote( $type ) );
+		if( empty( $this->ID ) )
+		{	// User must be saved in DB:
+			return 0;
 		}
-		$files = $DB->get_col( $files_SQL->get() );
 
 		$FileCache = & get_FileCache();
+		$FileCache->clear();
+		$files_sql_where = 'file_creator_user_ID = '.$this->ID;
+		if( $type !== NULL )
+		{	// Restrict files by type:
+			global $DB;
+			$files_sql_where .= ' AND file_type = '.$DB->quote( $type );
+		}
+		$FileCache->load_where( $files_sql_where );
+
 		$total_upload_size = 0;
-		foreach( $files as $file_ID )
+		foreach( $FileCache->cache as $user_File )
 		{
-			$user_File = $FileCache->get_by_ID( $file_ID );
 			$total_upload_size += $user_File->get_size();
 		}
 
