@@ -206,7 +206,7 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'file-type-editing' );
 		break;
 	default:
-		$AdminUI->set_page_manual_link( 'file-types' );
+		$AdminUI->set_page_manual_link( 'file-types-list' );
 		break;
 }
 
