@@ -736,11 +736,13 @@ if( defined( 'CANUSEXMLRPC' ) && CANUSEXMLRPC === true )
 	$client = new xmlrpc_client( $api_url );
 	$message = new xmlrpcmsg( 'system.listMethods' );
 	$result = $client->send( $message );
+	$api_error_type = T_('This API doesn\'t work properly on this server.');
 }
 else
-{	// Get an error message if current server cannot use XML-RPC:
+{	// Get an error message if current server cannot use XML-RPC client:
 	$result = false;
 	$xmlrpc_error_message = CANUSEXMLRPC;
+	$api_error_type = T_('This server cannot use XML-RPC client.');
 }
 if( $result && ! $result->faultCode() )
 {	// XML-RPC request is successful:
@@ -764,7 +766,7 @@ else
 		$api_status_type = 'warning';
 	}
 	init_system_check( $api_title, $api_status_title, $api_url );
-	disp_system_check( $api_status_type, T_('This API doesn\'t work properly on this server.').' <b>'.sprintf( T_( 'Error: %s' ), $xmlrpc_error_message ).'</b>' );
+	disp_system_check( $api_status_type, $api_error_type.' <b>'.sprintf( T_( 'Error: %s' ), $xmlrpc_error_message ).'</b>' );
 }
 
 // AJAX anon_async.php:
