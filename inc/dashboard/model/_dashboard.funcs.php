@@ -23,7 +23,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 function b2evonet_get_updates( $force_short_delay = false )
 {
 	global $allow_evo_stats; // Possible values: true, false, 'anonymous'
-	global $DB, $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri, $servertimenow, $evo_charset;
+	global $DB, $debug, $evonetsrv_protocol, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri, $servertimenow, $evo_charset;
 	global $Messages, $Settings, $baseurl, $instance_name, $app_name, $app_version, $app_date;
 	global $Debuglog;
 	global $Timer;
@@ -100,7 +100,7 @@ function b2evonet_get_updates( $force_short_delay = false )
 	{	// Could not use xmlrpc client because server has no the requested extensions:
 		return false;
 	}
-	$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port );
+	$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port, $evonetsrv_protocol );
 	if( $debug > 1 )
 	{
 		$client->debug = 1;
