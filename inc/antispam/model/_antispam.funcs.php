@@ -151,7 +151,7 @@ function antispam_check( $haystack )
  */
 function antispam_report_abuse( $abuse_string )
 {
-	global $debug, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri, $antispam_test_for_real;
+	global $debug, $antispamsrv_protocol, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri, $antispam_test_for_real;
 	global $baseurl, $Messages, $Settings;
 	global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
 
@@ -169,7 +169,11 @@ function antispam_report_abuse( $abuse_string )
 
 	// Construct XML-RPC client:
 	load_funcs( 'xmlrpc/model/_xmlrpc.funcs.php' );
-	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port );
+	if( ! defined( 'CANUSEXMLRPC' ) || CANUSEXMLRPC !== true )
+	{	// Could not use xmlrpc client because server has no the requested extensions:
+		return false;
+	}
+	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port, $antispamsrv_protocol );
 	// yura: I commented this because xmlrpc_client prints the debug info on screen and it breaks header_redirect()
 	// $client->debug = $debug;
 
@@ -213,12 +217,12 @@ function antispam_report_abuse( $abuse_string )
  */
 function antispam_poll_abuse()
 {
-	global $Messages, $Settings, $baseurl, $debug, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri;
+	global $Messages, $Settings, $baseurl, $debug, $antispamsrv_protocol, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri;
 	global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
 
 	// Construct XML-RPC client:
 	load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
-	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port );
+	$client = new xmlrpc_client( $antispamsrv_uri, $antispamsrv_host, $antispamsrv_port, $antispamsrv_protocol );
 	// yura: I commented this because xmlrpc_client prints the debug info on screen and it breaks header_redirect()
 	// $client->debug = $debug;
 

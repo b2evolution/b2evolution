@@ -1145,7 +1145,6 @@ class _core_Module extends Module
 			// PLACE HOLDER FOR SESSIONS MODULE:
 			$entries['site']['entries']['stats_separator'] = NULL;
 			$entries['site']['entries']['stats'] = NULL;
-			$entries['site']['entries']['stats_page'] = NULL;
 
 			// b2evolution info links:
 			$entries['site']['entries'][] = array( 'separator' => true );
@@ -1183,6 +1182,7 @@ class _core_Module extends Module
 				);
 			// ---- END OF "Site" MENU ----
 
+			// ---- "Collection" MENU ----
 			if( $working_blog )
 			{	// Display a link to manage first available collection:
 				$entries['blog'] = array(
@@ -1192,6 +1192,19 @@ class _core_Module extends Module
 				);
 			}
 
+			// ---- "Page" MENU ----
+			$entries['page'] = array(
+					'text' => T_('Page'),
+					'entries' => array(
+						// PLACE HOLDER FOR ENTRY "Edit contents":
+						'edit'       => NULL,
+						// PLACE HOLDERS FOR SESSIONS MODULE:
+						'stats_sep'  => NULL,
+						'stats_page' => NULL,
+					)
+				);
+
+			// ---- "Post"/"Edit" MENU ----
 			if( $perm_admin_normal )
 			{	// Only for normal access display a menu item to create new:
 				$entries['post'] = array(
@@ -1205,13 +1218,34 @@ class _core_Module extends Module
 
 
 		if( ( ! is_admin_page() || ! empty( $activate_collection_toolbar ) ) && ! empty( $Blog ) )
-		{ // A blog is currently selected AND we can activate toolbar items for selected collection:
+		{ // A collection is currently selected AND we can activate toolbar items for selected collection:
+
 			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 			{ // We have permission to add a post with at least one status:
-				global $disp, $Item;
-				if( ( $disp == 'single' || $disp == 'page' ) &&
+				global $disp, $ctrl, $action, $Item, $edited_Item;
+				if( ( $disp == 'edit' || $ctrl == 'items' ) &&
+				    isset( $edited_Item ) &&
+				    $edited_Item->ID > 0 &&
+				    $view_item_url = $edited_Item->get_permanent_url() )
+				{	// If curent user has a permission to edit a current viewing post:
+					$entries['post'] = array(
+							'text'        => get_icon( 'permalink' ).' '.T_('Permalink'),
+							'href'        => $view_item_url,
+							'title'       => T_('Permanent link to full entry'),
+							'entry_class' => 'rwdhide',
+						);
+				}
+				elseif(
+				  // Front-office post view page:
+				  ( ( $disp == 'single' || $disp == 'page' ) &&
 				    isset( $Item ) &&
-				    $edit_item_url = $Item->get_edit_url() )
+				    $edit_item_url = $Item->get_edit_url() ) ||
+				  // Back-office post view page:
+				  ( $ctrl == 'items' && $action == 'view' &&
+				    get_param( 'p' ) > 0 &&
+				    $ItemCache = & get_ItemCache() &&
+				    $Item = & $ItemCache->get_by_ID( get_param( 'p' ), false, false ) &&
+				   $edit_item_url = $Item->get_edit_url() ) )
 				{	// If curent user has a permission to edit a current viewing post:
 					$entries['post'] = array(
 							'text'        => '<span class="fa fa-pencil-square"></span> '.T_('Edit'),
@@ -1219,9 +1253,14 @@ class _core_Module extends Module
 							'title'       => T_('Edit current post'),
 							'entry_class' => 'rwdhide',
 						);
+					$entries['page']['entries']['edit'] = array(
+							'text'  => T_('Edit contents').'&hellip;',
+							'title' => T_('Edit current post'),
+							'href'  => $edit_item_url,
+						);
 				}
 				elseif( $write_item_url = $Blog->get_write_item_url() )
-				{	// If a write item URL is not empty, so it's sure that user can create new post:
+				{	// If write item URL is not empty, it's sure that user can create new post:
 					if( ! $perm_admin_normal )
 					{	// Initialize this menu item when user has no back-office access but can create new post:
 						$entries['post'] = array(
@@ -1235,9 +1274,9 @@ class _core_Module extends Module
 				}
 			}
 
-			if( $perm_admin_normal && $working_blog )
+			if( $perm_admin_restricted && $working_blog )
 			{
-				if( empty( $write_item_url ) && empty( $edit_item_url ) )
+				if( empty( $write_item_url ) && empty( $edit_item_url ) && empty( $view_item_url ) )
 				{	// Display a restricted message to create new post on this collection:
 					$entries['post']['title'] = T_('You don\'t have permission to post into this blog');
 				}
@@ -1256,13 +1295,13 @@ class _core_Module extends Module
 
 					// Collection front page
 					$entries['blog']['entries']['coll_front'] = array(
-							'text' => T_('Collection Front Page').'&hellip;',
+							'text' => /* TRANS: %s is collection short name */ sprintf( T_('%s Front Page'), $Blog->get( 'shortname' ) ).'&hellip;',
 							'href' => $Blog->get( 'url' )
 						);
 
 					// Collection dashboard
 					$entries['blog']['entries']['coll_dashboard'] = array(
-							'text' => T_('Collection Dashboard').'&hellip;',
+							'text' => /* TRANS: %s is collection short name */ sprintf( T_('%s Dashboard'), $Blog->get( 'shortname' ) ).'&hellip;',
 							'href' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog='.$Blog->ID
 						);
 
@@ -1318,7 +1357,7 @@ class _core_Module extends Module
 					$entries['blog']['entries'][] = array( 'separator' => true );
 				}
 
-				// PLACE HOLDER FOR FILES MODULE:
+				// PLACEHOLDER FOR FILES MODULE:
 				$entries['blog']['entries']['files'] = NULL;
 
 				// BLOG SETTINGS:
@@ -1362,7 +1401,7 @@ class _core_Module extends Module
 						);
 
 					if( ! is_admin_page() )
-					{ // Display a menu to turn on/off the debug containers
+					{ // Display an option to turn on/off containers display:
 						global $ReqURI, $Session;
 
 						if( $Session->get( 'display_containers_'.$Blog->ID ) == 1 )
@@ -1446,22 +1485,25 @@ class _core_Module extends Module
 
 		if( ! is_admin_page() && ! empty( $Blog ) )
 		{	// Only front-office collection pages:
-			if( $debug )
-			{	// Display a menu to turn on/off the debug widget containers:
-				global $Session;
-				$containers_status = $Session->get( 'display_containers_'.$Blog->ID );
-				$entries['containers'] = array(
-					'text'        => '<span class="fa fa-cubes"></span> '.( $containers_status ? T_('Hide') : T_('Show') ),
-					'href'        => url_add_param( regenerate_url( 'display_containers' ), 'display_containers='.( $containers_status ? 'hide' : 'show' ) ),
-					'entry_class' => 'rwdhide',
-				);
-			}
+
+
+			// Display an option to turn on/off containers display:
+			global $Session;
+			$containers_status = $Session->get( 'display_containers_'.$Blog->ID );
+			$entries['containers'] = array(
+				'text'        => '<span class="fa fa-cubes"></span> '.T_('Widgets'),
+				'href'        => url_add_param( regenerate_url( 'display_containers' ), 'display_containers='.( $containers_status ? 'hide' : 'show' ) ),
+				'entry_class' => 'rwdhide',
+				'class'       => ( $containers_status ? 'active' : '' ),
+			);
+
 
 			if( $perm_admin_restricted && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			{	// If current user has an access to back-office and to edit collection properties:
 				$entries['skin'] = array(
 					'text' => '<span class="fa fa-sliders"></span> '.T_('Skin'),
 					'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$Blog->ID,
+					'entry_class' => 'rwdhide',
 				);
 
 				// Display menu item "Features" with depending on $disp:
@@ -1489,6 +1531,7 @@ class _core_Module extends Module
 				$entries['features'] = array(
 					'text' => '<span class="fa fa-cog"></span> '.T_('Features'),
 					'href' => $coll_features_url,
+					'entry_class' => 'rwdhide',
 				);
 			}
 		}
@@ -1556,6 +1599,24 @@ class _core_Module extends Module
 						'text' => $debug_text,
 						'disabled' => true,
 					);
+			}
+
+			if( ! empty( $dev_entries ) )
+			{	// Use the same dev entries in "Page" menu:
+				if( empty( $entries['page']['entries'] ) )
+				{
+					$entries['page']['entries'] = array();
+					$page_dev_entries = $dev_entries;
+				}
+				else
+				{
+					$page_dev_entries = array_merge( array( array( 'separator' => true ) ), $dev_entries );
+				}
+				if( isset( $page_dev_entries['coll'] ) )
+				{	// Don't display collection debug info in "Page" menu:
+					unset( $page_dev_entries['coll'] );
+				}
+				$entries['page']['entries'] = array_merge( $entries['page']['entries'], $page_dev_entries );
 			}
 
 			if( ( $dev_menu || $debug ) && ! is_admin_page() && ! empty( $Blog ) )

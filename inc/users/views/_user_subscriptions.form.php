@@ -216,13 +216,21 @@ if( $notifications_mode != 'off' )
 	$Form->begin_fieldset( T_('Collection subscriptions').( is_admin_page() ? get_manual_link( 'user-coll-subscriptions-panel' ) : '' ), array( 'id' => 'subs' ) );
 
 			// Get those blogs for which we have already subscriptions (for this user)
-			$blog_subs_SQL = new SQL( 'Get those blogs for which we have already subscriptions for this user #'.$edited_User->ID );
-			$blog_subs_SQL->SELECT( 'blog_ID, sub_items, sub_comments' );
-			$blog_subs_SQL->FROM( 'T_blogs' );
-			$blog_subs_SQL->FROM_add( 'INNER JOIN T_subscriptions ON blog_ID = sub_coll_ID AND sub_user_ID = '.$edited_User->ID );
-			$blog_subs_SQL->WHERE( 'sub_items = 1' );
-			$blog_subs_SQL->WHERE_or( 'sub_comments = 1' );
-			$blog_subs = $DB->get_results( $blog_subs_SQL->get(), OBJECT, $blog_subs_SQL->title );
+			$sql = 'SELECT DISTINCT blog_ID, blog_shortname,
+						MAX( IF( sub_items IS NULL, IF( opt.cset_name = "opt_out_subscription", 1, 0 ), sub_items ) ) AS sub_items,
+						MAX( IF( sub_comments IS NULL, IF( opt.cset_name = "opt_out_comment_subscription", 1, 0 ), sub_comments ) ) AS sub_comments
+					FROM T_blogs
+					INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = blog_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = "1" )
+					LEFT JOIN T_coll_settings AS opt ON ( opt.cset_coll_ID = blog_ID AND opt.cset_name IN ( "opt_out_subscription", "opt_out_comment_subscription" ) )
+					LEFT JOIN T_subscriptions ON ( sub_coll_ID = blog_ID AND sub_user_ID = '.$edited_User->ID.' )
+					LEFT JOIN T_coll_group_perms ON (bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND opt.cset_value = "1" )
+					LEFT JOIN T_coll_user_perms ON (bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND opt.cset_value = "1" )
+					LEFT JOIN T_users ON (user_grp_ID = bloggroup_group_ID AND user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
+					LEFT JOIN T_users__secondary_user_groups ON (sug_grp_ID = bloggroup_group_ID AND sug_user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
+					WHERE ( sug_user_ID = '.$edited_User->ID.' OR bloguser_user_ID = '.$edited_User->ID.' OR user_ID = '.$edited_User->ID.' OR sub_user_ID = '.$edited_User->ID.' )
+						AND ( sub_items <> 0 OR sub_comments <> 0 OR sub_coll_ID IS NULL )
+						AND ( CASE opt.cset_value WHEN 1 THEN blog_advanced_perms = 1 ELSE TRUE END )';
+			$blog_subs = $DB->get_results( $sql );
 
 			$BlogCache = & get_BlogCache();
 			$subs_blog_IDs = array();
@@ -327,12 +335,18 @@ if( $notifications_mode != 'off' )
 	$Form->begin_fieldset( T_('Individual post subscriptions').( is_admin_page() ? get_manual_link( 'user-post-subscriptions-panel' ) : '' ) );
 
 		$sql = 'SELECT DISTINCT post_ID, blog_ID, blog_shortname
-					FROM T_items__subscriptions
-						INNER JOIN T_items__item ON isub_item_ID = post_ID
-						INNER JOIN T_categories ON post_main_cat_ID = cat_ID
-						INNER JOIN T_blogs ON cat_blog_ID = blog_ID
-					WHERE isub_user_ID = '.$edited_User->ID.' AND isub_comments <> 0
-					ORDER BY blog_ID, post_ID ASC';
+				FROM T_items__item
+				INNER JOIN T_categories ON cat_ID = post_main_cat_ID
+				INNER JOIN T_blogs ON blog_ID = cat_blog_ID
+				INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = blog_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = "1" )
+				LEFT JOIN T_coll_settings AS opt ON ( opt.cset_coll_ID = blog_ID AND opt.cset_name = "opt_out_item_subscription" )
+				LEFT JOIN T_items__subscriptions ON ( isub_item_ID = post_ID AND isub_user_ID = '.$edited_User->ID.' )
+				LEFT JOIN T_coll_group_perms ON (bloggroup_blog_ID = blog_ID AND bloggroup_ismember = 1 AND opt.cset_value = "1" )
+				LEFT JOIN T_coll_user_perms ON (bloguser_blog_ID = blog_ID AND bloguser_ismember = 1 AND opt.cset_value = "1" )
+				LEFT JOIN T_users ON (user_grp_ID = bloggroup_group_ID AND user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
+				LEFT JOIN T_users__secondary_user_groups ON (sug_grp_ID = bloggroup_group_ID AND sug_user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
+				WHERE ( sug_user_ID = '.$edited_User->ID.' OR bloguser_user_ID = '.$edited_User->ID.' OR user_ID = '.$edited_User->ID.' )
+					AND ( isub_comments <> 0 OR isub_item_ID IS NULL )';
 		$individual_posts_subs = $DB->get_results( $sql );
 		$subs_item_IDs = array();
 		if( empty( $individual_posts_subs ) )

@@ -36,7 +36,10 @@ switch( $target )
 	case 'local':
 		$test_user = 'admin';
 		$test_pass = $install_password;
-		pre_dump( $test_user, $test_pass );
+		if( ! defined( 'CANUSEXMLRPC' ) || CANUSEXMLRPC !== true )
+		{	// Could not use xmlrpc client because server has no the requested extensions:
+			die( 'Could not use xmlrpc client because of server error: '.( defined( 'CANUSEXMLRPC' ) ? CANUSEXMLRPC : 'Unknown' ) );
+		}
 		$client = new xmlrpc_client( $basesubpath.$xmlsrv_subdir.'xmlrpc.php', $basehost, substr( $baseport, 1 ) );
 		break;
 

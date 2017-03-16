@@ -1,13 +1,13 @@
 <?php
 /**
- * This file implements the xyz Widget class.
+ * This file implements Text block Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2017 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -22,7 +22,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  *
  * @package evocore
  */
-class free_html_Widget extends ComponentWidget
+class free_text_Widget extends ComponentWidget
 {
 	/**
 	 * Constructor
@@ -30,7 +30,7 @@ class free_html_Widget extends ComponentWidget
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'free_html' );
+		parent::__construct( $db_row, 'core', 'free_text' );
 	}
 
 
@@ -41,7 +41,7 @@ class free_html_Widget extends ComponentWidget
 	 */
 	function get_help_url()
 	{
-		return get_manual_url( 'free-html-widget' );
+		return get_manual_url( 'free-text-widget' );
 	}
 
 
@@ -50,7 +50,7 @@ class free_html_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		$title = T_( 'Free HTML' );
+		$title = T_( 'Free Text' );
 		return $title;
 	}
 
@@ -77,7 +77,7 @@ class free_html_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display any HTML snippet of your choice.');
+		return T_('Display custom text, with renderers applied (Markdown, etc.)');
 	}
 
 
@@ -89,7 +89,25 @@ class free_html_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		// Demo data:
+		global $Plugins;
+
+		// Initialize checkboxes options for text renderers setting:
+		$renderers = $Plugins->get_renderer_options( 'default', array(
+				'Blog'         => $this->get_Blog(),
+				'setting_name' => 'coll_apply_rendering',
+			) );
+		$renderer_checkbox_options = array();
+		foreach( $renderers as $renderer )
+		{
+			$renderer_checkbox_options[] = array(
+				$renderer['code'],
+				$renderer['name'].' '.$renderer['help_link'],
+				$renderer['checked'],
+				'',
+				$renderer['disabled']
+			);
+		}
+
 		$r = array_merge( array(
 				'title' => array(
 					'label' => T_('Block title'),
@@ -100,7 +118,12 @@ class free_html_Widget extends ComponentWidget
 					'label' => T_('Block content'),
 					'rows' => 10,
 				),
-			), parent::get_param_definitions( $params )	);
+				'renderers' => array(
+					'label' => T_('Text Renderers'),
+					'type' => 'checklist',
+					'options' => $renderer_checkbox_options,
+				),
+			), parent::get_param_definitions( $params ) );
 
 		return $r;
 
@@ -114,7 +137,7 @@ class free_html_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Collection, $Blog;
+		global $Plugins;
 
 		$this->init_display( $params );
 
@@ -125,7 +148,8 @@ class free_html_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		echo format_to_output( $this->disp_params['content'] );
+		// Display the rendered block content:
+		echo $this->get_rendered_content( $this->disp_params['content'] );
 
 		echo $this->disp_params['block_body_end'];
 

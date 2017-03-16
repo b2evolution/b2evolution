@@ -2674,6 +2674,11 @@ class Item extends ItemLight
 	 * Does the post have different content parts (teaser/extension, divided by "[teaserbreak]")?
 	 * This is also true for posts that have images with "aftermore" position.
 	 *
+	 * @todo fp> This is a heavy operation! We should probably store the presence of `[teaserbreak]` in a var so that future cals do not rexecute again.
+	 *           BUT first we need to know why we're interested in $params['disppage'], $params['format']  (or better said: in wgat case are we using different values for this?)
+	 *           ALSO we should probably store the position of [teaserbreak] for even better performance
+	 *           ALSO we may want to store that at UPDATE time, into the DB, so we have super fast access to it.
+	 *
 	 * @access public
 	 * @return boolean
 	 */
@@ -2687,8 +2692,8 @@ class Item extends ItemLight
 
 		$content_page = $this->get_content_page( $params['disppage'], $params['format'] );
 
-		// Remove <code> and <pre> blocks from content to don't check [teaserbreak] there
-		$content_page = preg_replace( '~<(code|pre)[^>]*>.*?</\1>~is', '', $content_page );
+		// Replace <code> and <pre> blocks from content because we're not interested in [teaserbreak] in there
+		$content_page = preg_replace( '~<(code|pre)[^>]*>.*?</\1>~is', '*', $content_page );
 
 		return strpos( $content_page, '[teaserbreak]' ) !== false
 			|| $this->get_images( array( 'restrict_to_image_position' => 'aftermore' ) );
@@ -6802,20 +6807,69 @@ class Item extends ItemLight
 
 		// Get list of users who want to be notified:
 		// TODO: also use extra cats/blogs??
-		$SQL = new SQL( 'Get list of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID() );
-		$SQL->SELECT( 'DISTINCT sub_user_ID' );
-		$SQL->FROM( 'T_subscriptions' );
-		$SQL->WHERE( 'sub_coll_ID = '.$this->get_blog_ID() );
-		$SQL->WHERE_and( 'sub_items <> 0' );
+		$sql = 'SELECT user_ID
+				FROM (
+					SELECT DISTINCT sub_user_ID AS user_ID
+					FROM T_subscriptions
+					WHERE sub_coll_ID = '.$this->get_blog_ID().'
+					AND sub_items <> 0
+
+					UNION
+
+					SELECT user_ID
+					FROM T_coll_settings AS opt
+					INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+					INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+					LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+					LEFT JOIN T_users ON ( user_grp_ID = bloggroup_group_ID )
+					LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = user_ID )
+					WHERE opt.cset_coll_ID = '.$this->get_blog_ID().'
+						AND opt.cset_name = "opt_out_subscription"
+						AND opt.cset_value = 1
+						AND NOT user_ID IS NULL
+						AND ( ( sub_items IS NULL OR sub_items = 1 ) )
+
+					UNION
+
+					SELECT sug_user_ID
+					FROM T_coll_settings AS opt
+					INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+					INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+					LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+					LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
+					LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = sug_user_ID )
+					WHERE opt.cset_coll_ID = '.$this->get_blog_ID().'
+						AND opt.cset_name = "opt_out_subscription"
+						AND opt.cset_value = 1
+						AND NOT sug_user_ID IS NULL
+						AND ( ( sub_items IS NULL OR sub_items = 1 ) )
+
+					UNION
+
+					SELECT bloguser_user_ID
+					FROM T_coll_settings AS opt
+					INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+					INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+					LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = opt.cset_coll_ID AND bloguser_ismember = 1 )
+					LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = bloguser_user_ID )
+					WHERE opt.cset_coll_ID = '.$this->get_blog_ID().'
+						AND opt.cset_name = "opt_out_subscription"
+						AND opt.cset_value = 1
+						AND NOT bloguser_user_ID IS NULL
+						AND ( ( sub_items IS NULL OR sub_items = 1 ) )
+				) AS users
+				WHERE NOT user_ID IS NULL';
+
 		if( ! empty( $already_notified_user_IDs ) )
-		{	// Create condition to not select already notified moderator users:
-			$SQL->WHERE_and( 'sub_user_ID NOT IN ( '.implode( ',', $already_notified_user_IDs ).' )' );
+		{
+			$sql .= ' AND user_ID NOT IN ( '.implode( ',', $already_notified_user_IDs ).' )';
 		}
 		if( $executed_by_userid !== NULL )
-		{	// Don't notify the user who just created/updated this post:
-			$SQL->WHERE_and( 'sub_user_ID != '.$DB->quote( $executed_by_userid ) );
+		{
+			$sql .= ' AND user_ID != '.$DB->quote( $executed_by_userid );
 		}
-		$notify_users = $DB->get_col( $SQL->get(), 0, $SQL->title );
+
+		$notify_users = $DB->get_col( $sql, 0, 'Get users to be notified', 0, 'Get list of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID() );
 
 		$Debuglog->add( 'Number of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID().' = '.count($notify_users), 'notifications' );
 		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice($notify_users, 0, 10) ), 'notifications' );
@@ -7041,7 +7095,7 @@ class Item extends ItemLight
 					$ping_messages[] = sprintf( T_('Pinging %s...'), $Plugin->ping_service_name );
 					$params = array( 'Item' => & $this, 'xmlrpcresp' => NULL, 'display' => false );
 
-					$r = $r && ( $Plugin->ItemSendPing( $params ) );
+					$r = $Plugin->ItemSendPing( $params ) && $r;
 
 					if( ! empty( $params['xmlrpcresp'] ) )
 					{

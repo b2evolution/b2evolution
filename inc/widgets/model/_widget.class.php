@@ -1222,5 +1222,70 @@ class ComponentWidget extends DataObject
 
 		return $r;
 	}
+
+
+	/**
+	 * Get the list of validated renderers for this Widget. This includes stealth plugins etc.
+	 *
+	 * @return array List of validated renderer codes
+	 */
+	function get_renderers_validated()
+	{
+		if( ! isset( $this->renderers_validated ) )
+		{
+			global $Plugins;
+
+			$widget_Blog = & $this->get_Blog();
+
+			// Convert active renderers options for plugin functions below:
+			$widget_renderers = array_keys( $this->disp_params['renderers'] );
+
+			$this->renderers_validated = $Plugins->validate_renderer_list( $widget_renderers, array(
+					'Blog'         => & $widget_Blog,
+					'setting_name' => 'coll_apply_rendering'
+				) );
+		}
+
+		return $this->renderers_validated;
+	}
+
+
+	/**
+	 * Get content which is rendered with plugins
+	 *
+	 * @param string Source content
+	 * @return string Rendered content
+	 */
+	function get_rendered_content( $content )
+	{
+		if( ! isset( $this->disp_params['renderers'] ) )
+		{	// This widget has no render settings, Return original content:
+			return $content;
+		}
+
+		global $Plugins;
+
+		$widget_Blog = & $this->get_Blog();
+		$widget_renderers = $this->get_renderers_validated();
+
+		// Do some optional filtering on the content
+		// Typically stuff that will help the content to validate
+		// Useful for code display.
+		// Will probably be used for validation also.
+		$Plugins_admin = & get_Plugins_admin();
+		$params = array(
+				'object_type' => 'Widget',
+				'object'      => & $this,
+				'object_Blog' => & $widget_Blog
+			);
+		$fake_title = '';
+		$Plugins_admin->filter_contents( $fake_title /* by ref */, $content /* by ref */, $widget_renderers, $params /* by ref */ );
+
+		// Render block content with selected plugins:
+		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog ), 'Render' );
+		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog ), 'Display' );
+
+		return $content;
+	}
 }
 ?>

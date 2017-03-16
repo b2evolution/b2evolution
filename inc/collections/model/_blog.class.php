@@ -859,7 +859,7 @@ class Blog extends DataObject
 			$this->set_setting( 'default_post_status', param( 'default_post_status', 'string', NULL ) );
 
 			param( 'old_content_alert', 'integer', NULL );
-			param_check_range( 'old_content_alert', 1, 12, T_('Old content alert must be numeric (1-12).'), false );
+			param_check_range( 'old_content_alert', 1, 12, T_('Stale content alert must be a number of months.').'(1 - 12)', false );
 			$this->set_setting( 'old_content_alert', get_param( 'old_content_alert' ), true );
 
 			$this->set_setting( 'post_categories', param( 'post_categories', 'string', NULL ) );
@@ -1020,8 +1020,11 @@ class Blog extends DataObject
 			{
 				// Subscriptions:
 				$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'opt_out_subscription', param( 'opt_out_subscription', 'integer', 0 ) );
 				$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'opt_out_comment_subscription', param( 'opt_out_comment_subscription', 'integer', 0 ) );
 				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'opt_out_item_subscription', param( 'opt_out_item_subscription', 'integer', 0 ) );
 			}
 
 			// Sitemaps:

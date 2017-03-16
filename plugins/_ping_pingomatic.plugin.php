@@ -64,6 +64,12 @@ class ping_pingomatic_plugin extends Plugin
 		global $debug;
 		global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
 
+		if( ! defined( 'CANUSEXMLRPC' ) || CANUSEXMLRPC !== true )
+		{	// Could not use xmlrpc client because server has no the requested extensions:
+			$params['xmlrpcresp'] = CANUSEXMLRPC;
+			return false;
+		}
+
 		$item_Blog = $params['Item']->get_Blog();
 
 		$client = new xmlrpc_client( '/', 'rpc.pingomatic.com', 80 );

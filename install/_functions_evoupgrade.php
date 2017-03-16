@@ -8217,7 +8217,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				FROM T_basedomains a
 				LEFT JOIN T_basedomains b
 					ON a.dom_name = b.dom_name
-						AND ( CASE a.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END ) > ( CASE b.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END )
+						AND (
+							( CASE a.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END ) > ( CASE b.dom_status WHEN "blocked" THEN 1 WHEN "suspect" THEN 2 WHEN "unknown" THEN 3 ELSE 4 END )
+							OR ( a.dom_status = b.dom_status AND a.dom_ID > b.dom_ID )
+						)
 				WHERE NOT b.dom_ID IS NULL;' );
 
 		// Add index

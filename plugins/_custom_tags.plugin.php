@@ -41,10 +41,22 @@ class custom_tags_plugin extends Plugin
 	var $email_replace_list;
 
 	var $default_search_list = '[warning] #\[warning](.+?)\[/warning]#is
-[info] #\[info](.+?)\[/info]#is';
+[info] #\[info](.+?)\[/info]#is
+[clear] #\[clear]#is
+[left] #\[left](.+?)\[/left]#is
+[right] #\[right](.+?)\[/right]#is
+[center] #\[center](.+?)\[/center]#is
+[justify] #\[justify](.+?)\[/justify]#is
+[note] #\[note](.+?)\[/note]#is';
 
 	var $default_replace_list = '<div class="alert alert-warning">$1</div>
-<div class="alert alert-info">$1</div>';
+<div class="alert alert-info">$1</div>
+<div class="clear"></div>
+<div class="left">$1</div>
+<div class="right">$1</div>
+<div class="center">$1</div>
+<div class="justify">$1</div>
+<span class="note">$1</span>';
 
 
 	/**
@@ -75,14 +87,13 @@ class custom_tags_plugin extends Plugin
 		foreach( $search_list_array as $l => $line )
 		{
 			$line = explode( ' ', $line, 2 );
-			$regexp = $line[1];
-			if( empty( $regexp ) )
+			if( empty( $line[1] ) )
 			{ // Bad format of search string
 				unset( $search_list_array[$l] );
 			}
 			else
 			{ // Replace this line with regex value (to delete a button name)
-				$search_list_array[ $l ] = $regexp;
+				$search_list_array[ $l ] = $line[1];
 			}
 		}
 
@@ -253,21 +264,12 @@ class custom_tags_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		if( !empty( $params['Item'] ) )
-		{	// Get Item from params:
-			$Item = & $params['Item'];
-		}
-		elseif( !empty( $params['Comment'] ) )
-		{	// Get Item from Comment:
-			$Comment = & $params['Comment'];
-			$Item = & $Comment->get_Item();
-		}
-
-		$item_Blog = & $Item->get_Blog();
+		// Get collection from given params:
+		$setting_Blog = $this->get_Blog_from_params( $params );
 
 		if( ! isset( $this->post_search_list ) )
 		{
-			$search_list = $this->get_coll_setting( 'coll_post_search_list', $item_Blog );
+			$search_list = $this->get_coll_setting( 'coll_post_search_list', $setting_Blog );
 			if( ! $search_list )
 			{
 				$search_list = $this->default_search_list;
@@ -277,7 +279,7 @@ class custom_tags_plugin extends Plugin
 
 		if( ! isset( $this->post_replace_list ) )
 		{
-			$replace_list = $this->get_coll_setting( 'coll_post_replace_list', $item_Blog );
+			$replace_list = $this->get_coll_setting( 'coll_post_replace_list', $setting_Blog );
 			if( ! $replace_list )
 			{
 				$replace_list = $this->default_replace_list;
@@ -641,10 +643,10 @@ class custom_tags_plugin extends Plugin
 		foreach( $search_list as $line )
 		{	// Init buttons from regexp lines
 			$line = explode( ' ', $line, 2 );
-			$button_name = $line[0];
-			$button_exp = $line[1];
-			if( !empty( $button_name ) && !empty( $button_exp ) )
+			if( !empty( $line[0] ) && !empty( $line[1] ) )
 			{
+				$button_name = $line[0];
+				$button_exp = $line[1];
 				$start = preg_replace( '#(.+)\[([a-z0-1=\*\\\\]+)((\(.*\))*)\](.+)#is', '[$2]', $button_exp );
 				$end = preg_replace( '#(.+)\[\/(.+)\](.+)#is', '[/$2]', $button_exp );
 				$tagButtons[ $button_name ] = array(

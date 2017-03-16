@@ -797,6 +797,17 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 
 		case 'Widget':
 			$error_value = NULL;
+			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'checklist' && $parname == 'renderers' )
+			{	// Save "stealth" and "always" plugin render options:
+				// (they are hidden or disabled checkboxes of the form and cannot be submitted automatically)
+				global $Plugins;
+				$widget_Blog = & $Obj->get_Blog();
+				$l_value = $Plugins->validate_renderer_list( array_keys( $l_value ), array(
+						'Blog'         => & $widget_Blog,
+						'setting_name' => 'coll_apply_rendering',
+					) );
+				$l_value = array_fill_keys( $l_value, 1 );
+			}
 			$Obj->set( $parname, $l_value );
 			break;
 

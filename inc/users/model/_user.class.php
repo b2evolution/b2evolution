@@ -1288,31 +1288,52 @@ class User extends DataObject
 				if( $notifications_mode != 'off' )
 				{
 					/**
-					* Update the subscriptions:
-					*/
+					 * Update the subscriptions:
+					 */
 					$subs_blog_IDs = param( 'subs_blog_IDs', 'string', true );
 					$subs_item_IDs = param( 'subs_item_IDs', 'string', true );
 
 					// Work the blogs:
+					$BlogCache = & get_BlogCache();
 					$subscription_values = array();
+					$opt_out_values = array();
 					$unsubscribed = array();
-					$subs_blog_IDs = explode( ',', $subs_blog_IDs );
-					foreach( $subs_blog_IDs as $loop_blog_ID )
+					if( $subs_blog_IDs )
 					{
-						// Make sure no dirty hack is coming in here:
-						$loop_blog_ID = intval( $loop_blog_ID );
+						$subs_blog_IDs = explode( ',', $subs_blog_IDs );
 
-						// Get checkbox values:
-						$sub_items    = param( 'sub_items_'.$loop_blog_ID,    'integer', 0 );
-						$sub_comments = param( 'sub_comments_'.$loop_blog_ID, 'integer', 0 );
+						foreach( $subs_blog_IDs as $loop_blog_ID )
+						{
+							// Make sure no dirty hack is coming in here:
+							$loop_blog_ID = intval( $loop_blog_ID );
 
-						if( $sub_items || $sub_comments )
-						{	// We have a subscription for this blog
-							$subscription_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_comments )";
-						}
-						else
-						{	// No subscription here:
-							$unsubscribed[] = $loop_blog_ID;
+							// Get checkbox values:
+							$sub_items    = param( 'sub_items_'.$loop_blog_ID,    'integer', 0 );
+							$sub_comments = param( 'sub_comments_'.$loop_blog_ID, 'integer', 0 );
+
+							if( $sub_items || $sub_comments )
+							{	// We have a subscription for this blog
+								$subscription_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_comments )";
+							}
+							else
+							{	// No subscription here:
+
+								// Check if opt-out and user is a member
+								$Blog = & $BlogCache->get_by_ID( $loop_blog_ID );
+
+								if( $Blog->get( 'advanced_perms' )
+										&& ( ( $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ) || ( $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ) )
+										&& $this->check_perm( 'blog_ismember', 'view', true, $loop_blog_ID ) )
+								{
+									$opt_item = $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ? $sub_items : 0;
+									$opt_comment = $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ? $sub_comments : 0;
+									$opt_out_values[] = "( $loop_blog_ID, $this->ID, $opt_item, $opt_comment )";
+								}
+								else
+								{
+									$unsubscribed[] = $loop_blog_ID;
+								}
+							}
 						}
 					}
 
@@ -1321,6 +1342,12 @@ class User extends DataObject
 					{	// We need to record values:
 						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
 													VALUES '.implode( ', ', $subscription_values ) );
+					}
+
+					if( count( $opt_out_values ) )
+					{
+						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
+													VALUES '.implode( ', ', $opt_out_values ) );
 					}
 
 					if( count( $unsubscribed ) )
@@ -1333,15 +1360,40 @@ class User extends DataObject
 					// Individual post subscriptions
 					if( !empty( $subs_item_IDs ) )
 					{ // user was subscribed to at least one post update notification
+						$ItemCache = & get_ItemCache();
 						$subs_item_IDs = explode( ',', $subs_item_IDs );
+						$opt_out_values = array();
 						$unsubscribed = array();
 						foreach( $subs_item_IDs as $loop_item_ID )
 						{
+							$isub_comments = param( 'items_subs_'.$loop_item_ID, 'integer', 0 );
+
 							if( !param( 'item_sub_'.$loop_item_ID, 'integer', 0 ) )
 							{ // user wants to unsubscribe from this post notifications
-								$unsubscribed[] = $loop_item_ID;
+								$Item = $ItemCache->get_by_ID( $loop_item_ID );
+								$blog_ID = $Item->get_blog_ID();
+								$Blog = $BlogCache->get_by_ID( $blog_ID );
+
+								if( $Blog->get( 'advanced_perms' )
+										&& $Blog->get_setting( 'allow_item_subscriptions' )
+										&& $Blog->get_setting( 'opt_out_item_subscription' )
+										&& $this->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
+								{
+									$opt_out_values[] = "( $loop_item_ID, $this->ID, $isub_comments )";
+								}
+								else
+								{
+									$unsubscribed[] = $loop_item_ID;
+								}
+
 							}
 						}
+						if( !empty( $opt_out_values ) )
+						{
+							$DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
+													VALUES '.implode( ', ', $opt_out_values ) );
+						}
+
 						if( !empty( $unsubscribed ) )
 						{ // unsubscribe list is not empty, delete not wanted subscriptions
 							$DB->query( 'DELETE FROM T_items__subscriptions
@@ -1937,27 +1989,29 @@ class User extends DataObject
 	/*
 	 * Get the total size of files uploaded by the user
 	 *
+	 * @param string File type: 'image', 'video', 'audio', 'other'; NULL - for all file types
 	 * @return integer total size in bytes
 	 */
 	function get_total_upload( $type = NULL )
 	{
-		global $DB;
-
-		$files_SQL = new SQL();
-		$files_SQL->SELECT( 'file_ID' );
-		$files_SQL->FROM( 'T_files' );
-		$files_SQL->WHERE( 'file_creator_user_ID = '.$this->ID );
-		if( ! is_null( $type ) )
-		{
-			$files_SQL->WHERE_and( 'file_type = '.$DB->quote( $type ) );
+		if( empty( $this->ID ) )
+		{	// User must be saved in DB:
+			return 0;
 		}
-		$files = $DB->get_col( $files_SQL->get() );
 
 		$FileCache = & get_FileCache();
+		$FileCache->clear();
+		$files_sql_where = 'file_creator_user_ID = '.$this->ID;
+		if( $type !== NULL )
+		{	// Restrict files by type:
+			global $DB;
+			$files_sql_where .= ' AND file_type = '.$DB->quote( $type );
+		}
+		$FileCache->load_where( $files_sql_where );
+
 		$total_upload_size = 0;
-		foreach( $files as $file_ID )
+		foreach( $FileCache->cache as $user_File )
 		{
-			$user_File = $FileCache->get_by_ID( $file_ID );
 			$total_upload_size += $user_File->get_size();
 		}
 

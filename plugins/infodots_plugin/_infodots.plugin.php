@@ -190,6 +190,11 @@ class infodots_plugin extends Plugin
 	 */
 	function RenderItemAsHtml( & $params )
 	{
+		if( empty( $params['Item'] ) )
+		{	// This plugin can works only with items:
+			return false;
+		}
+
 		$params['data'] = $this->render_infodot_captions( 'itm_'.$params['Item']->ID, $params['data'] );
 
 		return true;
