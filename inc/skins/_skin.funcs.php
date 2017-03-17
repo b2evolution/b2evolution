@@ -2801,6 +2801,10 @@ function skin_body_attrs( $params = array() )
 		{
 			$classes[] = 'dev_show_containers';
 		}
+		if( $Session->get( 'designer_mode_'.$Blog->ID ) )
+		{
+			$classes[] = 'dev_designer_mode';
+		}
 	}
 
 	if( ! empty( $classes ) )

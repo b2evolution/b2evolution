@@ -70,6 +70,17 @@ elseif( $display_containers == 'hide' )
 	$Session->delete( 'display_containers_'.$blog );
 }
 
+// Enable/Disable designer mode:
+$designer_mode = param( 'designer_mode', 'string' );
+if( $designer_mode == 'enable' )
+{
+	$Session->set( 'designer_mode_'.$blog, 1 );
+}
+elseif( $designer_mode == 'disable' )
+{
+	$Session->delete( 'designer_mode_'.$blog );
+}
+
 // Show/Hide the includes:
 $display_includes = param( 'display_includes', 'string' );
 if( $display_includes == 'show' )

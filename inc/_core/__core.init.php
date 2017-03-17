@@ -1418,6 +1418,21 @@ class _core_Module extends Module
 								'href' => url_add_param( regenerate_url( 'display_containers' ), 'display_containers=show' ),
 							);
 						}
+
+						if( $Session->get( 'designer_mode_'.$Blog->ID ) == 1 )
+						{ // To hide the debug containers
+							$entries['blog']['entries']['designer'] = array(
+								'text' => T_('Disable designer mode'),
+								'href' => regenerate_url( 'designer_mode', 'designer_mode=disable' ),
+							);
+						}
+						else
+						{ // To show the debug containers
+							$entries['blog']['entries']['designer'] = array(
+								'text' => T_('Enable designer mode'),
+								'href' => regenerate_url( 'designer_mode', 'designer_mode=enable' ),
+							);
+						}
 					}
 
 					$entries['blog']['entries']['general'] = array(
@@ -1489,12 +1504,12 @@ class _core_Module extends Module
 
 			// Display an option to turn on/off containers display:
 			global $Session;
-			$containers_status = $Session->get( 'display_containers_'.$Blog->ID );
+			$designer_mode = $Session->get( 'designer_mode_'.$Blog->ID );
 			$entries['containers'] = array(
-				'text'        => '<span class="fa fa-cubes"></span> '.T_('Widgets'),
-				'href'        => url_add_param( regenerate_url( 'display_containers' ), 'display_containers='.( $containers_status ? 'hide' : 'show' ) ),
+				'text'        => '<span class="fa fa-cubes"></span> '.( $designer_mode ? T_('Exit Designer') : T_('Designer Mode') ),
+				'href'        => regenerate_url( 'designer_mode', 'designer_mode='.( $designer_mode ? 'disable' : 'enable' ) ),
 				'entry_class' => 'rwdhide',
-				'class'       => ( $containers_status ? 'active' : '' ),
+				'class'       => ( $designer_mode ? 'active' : '' ),
 			);
 
 

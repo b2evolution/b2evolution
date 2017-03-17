@@ -618,8 +618,11 @@ class ComponentWidget extends DataObject
 
 		$this->init_display( $params );
 
-		// Display the debug conatainers when $debug = 2 OR when it is turned on from evo menu under "Blog" -> "Show/Hide containers"
+		// Display the debug containers when $debug = 2 OR when it is turned on from evo menu under "Collection" -> "Show/Hide containers"
 		$display_containers = $Session->get( 'display_containers_'.$Blog->ID ) == 1 || $debug == 2;
+
+		// Enable the desinger mode when it is turned on from evo menu under "Designer Mode/Exit Designer" or "Collection" -> "Enable/Disable designer mode"
+		$enable_designer_mode = $Session->get( 'designer_mode_'.$Blog->ID ) == 1;
 
 		if( ! $Blog->get_setting('cache_enabled_widgets')
 		    || ! $this->disp_params['allow_blockcache']
@@ -634,7 +637,17 @@ class ComponentWidget extends DataObject
 							.'Widget: <b>'.$this->get_name().'</b> - Cache OFF <i class="fa fa-info">?</i></div>'."\n";
 			}
 
+			if( $enable_designer_mode )
+			{	// Display the designer overlay:
+				echo '<span class="dev-blocks dev-blocks--design">';
+			}
+
 			$this->display( $params );
+
+			if( $enable_designer_mode )
+			{	// End of the designer overlay:
+				echo '</span>';
+			}
 
 			if( $display_containers )
 			{ // DEBUG:
@@ -663,7 +676,17 @@ class ComponentWidget extends DataObject
 								.'Widget: <b>'.$this->get_name().'</b> - FROM cache <i class="fa fa-info">?</i></div>'."\n";
 				}
 
+				if( $enable_designer_mode )
+				{	// Display the designer overlay:
+					echo '<span class="dev-blocks dev-blocks--design">';
+				}
+
 				echo $content;
+
+				if( $enable_designer_mode )
+				{	// End of the designer overlay:
+					echo '</span>';
+				}
 
 				if( $display_containers )
 				{ // DEBUG:
@@ -681,12 +704,22 @@ class ComponentWidget extends DataObject
 								.'Widget: <b>'.$this->get_name().'</b> - NOT in cache <i class="fa fa-info">?</i></div>'."\n";
 				}
 
+				if( $enable_designer_mode )
+				{	// Display the designer overlay:
+					echo '<span class="dev-blocks dev-blocks--design">';
+				}
+
 				$this->BlockCache->start_collect();
 
 				$this->display( $params );
 
 				// Save collected cached data if needed:
 				$this->BlockCache->end_collect();
+
+				if( $enable_designer_mode )
+				{	// End of the designer overlay:
+					echo '</span>';
+				}
 
 				if( $display_containers )
 				{ // DEBUG:
