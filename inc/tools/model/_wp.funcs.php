@@ -18,23 +18,27 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Get data to start import from wordpress XML/ZIP file
  *
  * @param string Path of XML/ZIP file
- * @return array|boolean Data array: ( 'XML_file_path', 'attached_files_path', 'temp_zip_folder_path' ) OR FALSE on failed request
+ * @return array Data array:
+ *                 'error' - FALSE on success OR error message ,
+ *                 'XML_file_path' - Path to XML file,
+ *                 'attached_files_path' - Path to attachments folder,
+ *                 'temp_zip_folder_path' - Path to temp extracted ZIP files
  */
 function wpxml_get_import_data( $XML_file_path )
 {
+	// Start to collect all printed errors from buffer:
+	ob_start();
+
 	$XML_file_name = basename( $XML_file_path );
 	$ZIP_folder_path = NULL;
+
+	// Do NOT use first found folder for attachments:
+	$use_first_folder_for_attachments = false;
 
 	if( preg_match( '/\.(xml|txt)$/i', $XML_file_name ) )
 	{	// XML format
 		// Check WordPress XML file:
-		if( ! wpxml_check_xml_file( $XML_file_path ) )
-		{	// Errors are in XML file
-			return false;
-		}
-
-		// Do NOT use first found folder for attachments:
-		$use_first_folder_for_attachments = false;
+		wpxml_check_xml_file( $XML_file_path );
 	}
 	else if( preg_match( '/\.zip$/i', $XML_file_name ) )
 	{	// ZIP format
@@ -44,54 +48,55 @@ function wpxml_get_import_data( $XML_file_path )
 		// $ZIP_folder_path must be deleted after import!
 		$ZIP_folder_path = $media_path.'import/temp-'.md5( rand() );
 
-		if( ! unpack_archive( $XML_file_path, $ZIP_folder_path, true, $XML_file_name ) )
-		{	// Errors on unpack ZIP file:
-			return false;
-		}
+		if( unpack_archive( $XML_file_path, $ZIP_folder_path, true, $XML_file_name ) )
+		{	// If ZIP archive is unpacked successfully:
 
-		// Find valid XML file in ZIP package:
-		$ZIP_files_list = scandir( $ZIP_folder_path );
-		$xml_exists_in_zip = false;
-		for( $i = 1; $i <= 2; $i++ )
-		{	// Run searcher 1st time to find XML file in a root of ZIP archive
-			// and 2nd time to find XML file in 1 level subfolders of the root:
-			foreach( $ZIP_files_list as $ZIP_file )
-			{
-				if( $ZIP_file == '.' || $ZIP_file == '..' )
-				{	// Skip reserved dir names of the current path:
-					continue;
-				}
-				if( $i == 2 && is_dir( $ZIP_folder_path.'/'.$ZIP_file ) )
-				{	// This is a subfolder, Scan it to find XML files inside:
-					$ZIP_folder_current_path = $ZIP_folder_path.'/'.$ZIP_file;
-					$ZIP_folder_files = scandir( $ZIP_folder_current_path );
-				}
-				else
-				{	// This is a single file or folder:
-					$ZIP_folder_files = array( $ZIP_file );
-					$ZIP_folder_current_path = $ZIP_folder_path;
-				}
-				foreach( $ZIP_folder_files as $ZIP_file )
+			// 
+			$XML_file_path = false;
+
+			// Find valid XML file in ZIP package:
+			$ZIP_files_list = scandir( $ZIP_folder_path );
+			$xml_exists_in_zip = false;
+			for( $i = 1; $i <= 2; $i++ )
+			{	// Run searcher 1st time to find XML file in a root of ZIP archive
+				// and 2nd time to find XML file in 1 level subfolders of the root:
+				foreach( $ZIP_files_list as $ZIP_file )
 				{
-					if( preg_match( '/\.(xml|txt)$/i', $ZIP_file ) )
-					{	// XML file is found in ZIP package:
-						if( wpxml_check_xml_file( $ZIP_folder_current_path.'/'.$ZIP_file ) )
-						{	// XML file is valid:
+					if( $ZIP_file == '.' || $ZIP_file == '..' )
+					{	// Skip reserved dir names of the current path:
+						continue;
+					}
+					if( $i == 2 )
+					{	// This is 2nd time to find XML file in 1 level subfolders of the root:
+						if( is_dir( $ZIP_folder_path.'/'.$ZIP_file ) )
+						{	// This is a subfolder, Scan it to find XML files inside:
+							$ZIP_folder_current_path = $ZIP_folder_path.'/'.$ZIP_file;
+							$ZIP_folder_files = scandir( $ZIP_folder_current_path );
+						}
+						else
+						{	// Skip files:
+							continue;
+						}
+					}
+					else
+					{	// This is a single file or folder:
+						$ZIP_folder_files = array( $ZIP_file );
+						$ZIP_folder_current_path = $ZIP_folder_path;
+					}
+					foreach( $ZIP_folder_files as $ZIP_file )
+					{
+						if( preg_match( '/\.(xml|txt)$/i', $ZIP_file ) )
+						{	// XML file is found in ZIP package:
 							$XML_file_path = $ZIP_folder_current_path.'/'.$ZIP_file;
-							$xml_exists_in_zip = true;
-							break 3;
+							if( wpxml_check_xml_file( $XML_file_path ) )
+							{	// XML file is valid:
+								$xml_exists_in_zip = true;
+								break 3;
+							}
 						}
 					}
 				}
 			}
-		}
-
-		if( ! $xml_exists_in_zip )
-		{	// No XML is detected in ZIP package:
-			echo '<p class="text-danger">'.T_( 'XML file is not detected in your ZIP package.' ).'</p>';
-			// Delete temporary folder that contains the files from extracted ZIP package:
-			rmdir_r( $ZIP_folder_path );
-			return false;
 		}
 
 		// Use first found folder for attachments when no reserved folders not found in ZIP before:
@@ -100,13 +105,29 @@ function wpxml_get_import_data( $XML_file_path )
 	else
 	{	// Unrecognized extension:
 		echo '<p class="text-danger">'.sprintf( T_( '%s has an unrecognized extension.' ), '<code>'.$xml_file['name'].'</code>' ).'</p>';
-		return false;
 	}
 
-	// Get a path with attached files for the XML file:
-	$attached_files_path = wpxml_get_attachments_folder( $XML_file_path, $use_first_folder_for_attachments );
+	if( $XML_file_path )
+	{	// Get a path with attached files for the XML file:
+		$attached_files_path = wpxml_get_attachments_folder( $XML_file_path, $use_first_folder_for_attachments );
+	}
+	else
+	{	// Wrong source file:
+		$attached_files_path = false;
+	}
+
+	if( isset( $xml_exists_in_zip ) && $xml_exists_in_zip === false && file_exists( $ZIP_folder_path ) )
+	{	// No XML is detected in ZIP package:
+		echo '<p class="text-danger">'.T_( 'Correct XML file is not detected in your ZIP package.' ).'</p>';
+		// Delete temporary folder that contains the files from extracted ZIP package:
+		rmdir_r( $ZIP_folder_path );
+	}
+
+	// Get all printed errors:
+	$errors = ob_get_clean();
 
 	return array(
+			'errors'               => empty( $errors ) ? false : $errors,
 			'XML_file_path'        => $XML_file_path,
 			'attached_files_path'  => $attached_files_path,
 			'temp_zip_folder_path' => $ZIP_folder_path,

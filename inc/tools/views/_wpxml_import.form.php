@@ -50,12 +50,13 @@ $Form->begin_fieldset( T_('Report of the import') );
 
 	echo '</p>';
 
-	if( $wpxml_import_data !== false )
+	if( $wpxml_import_data['errors'] === false )
 	{	// Import the data and display a report on the screen:
 		wpxml_import( $wpxml_import_data['XML_file_path'], $wpxml_import_data['attached_files_path'], $wpxml_import_data['temp_zip_folder_path'] );
 	}
 	else
-	{	// Display an error if import cannot be done:
+	{	// Display errors if import cannot be done:
+		echo $wpxml_import_data['errors'];
 		echo '<br /><p class="text-danger">'.T_('Import failed.').'</p>';
 	}
 
