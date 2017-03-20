@@ -3344,6 +3344,10 @@ ol {
 .table-hover > tbody > tr:hover {
   background-color: #ffc;
 }
+.btn {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
 .btn.btn-success .fa,
 .btn.btn-danger .fa {
   color: #FFF !important;
@@ -3353,6 +3357,10 @@ ol {
   margin-bottom: 4px;
 }
 .evo_widget .input-group .btn {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.input-group .btn {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -3826,11 +3834,23 @@ select:focus:invalid:focus {
   position: relative;
   top: -4px;
 }
-.panel-heading .btn {
-  margin: -6px 0 0 6px;
-}
 .panel-heading .btn-group {
   margin-left: 6px;
+}
+.panel-heading .panel_heading_action_icons {
+  margin-top: -6px;
+}
+.panel-heading .panel_heading_action_icons .btn {
+  margin: 0 3px 3px 0;
+}
+.panel-heading .panel_heading_action_icons .btn:last-child {
+  margin: 0 0 3px 0;
+}
+.panel-heading .panel_heading_action_icons .btn-group {
+  margin: 0 6px 0 0;
+}
+.panel-heading .panel_heading_action_icons .btn-group .btn {
+  margin: 0 0 3px 0;
 }
 legend.panel-heading {
   font-size: 16px;

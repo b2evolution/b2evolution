@@ -195,7 +195,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 				array( 'target' => '_blank' ) );
 	}
 
-	$fieldset_title .= '<span class="floatright">&nbsp;'
+	$fieldset_title .= '<span class="floatright panel_heading_action_icons">&nbsp;'
 
 			.action_icon( T_('Refresh'), 'refresh', $LinkOwner->get_edit_url(),
 				T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\' )' ) )
