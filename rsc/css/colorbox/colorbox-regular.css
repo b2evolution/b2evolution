@@ -32,14 +32,12 @@
 #cboxLoadedContent {
   overflow: auto;
   box-sizing: border-box;
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
   -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-align: center;
+      align-items: center;
 }
 #cboxTitle {
   margin: 0;
@@ -127,26 +125,21 @@
   position: absolute;
   bottom: 0;
   width: 100%;
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
   -webkit-flex-direction: row;
-      -ms-flex-direction: row;
-          flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
   -webkit-flex-wrap: nowrap;
       -ms-flex-wrap: nowrap;
           flex-wrap: nowrap;
-  -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  -webkit-box-align: center;
+  -ms-flex-pack: justify;
+      justify-content: space-between;
   -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-align: center;
+      align-items: center;
 }
 #cboxCurrent {
   color: #949494;
@@ -161,29 +154,24 @@
   line-height: 17px;
 }
 #cboxNavigation {
-  -webkit-flex-basis: auto;
-      -ms-flex-preferred-size: auto;
+  -ms-flex-preferred-size: auto;
+          -webkit-flex-basis: auto;
           flex-basis: auto;
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
   -webkit-flex-direction: row;
-      -ms-flex-direction: row;
-          flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
   -webkit-flex-wrap: nowrap;
       -ms-flex-wrap: nowrap;
           flex-wrap: nowrap;
-  -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  -webkit-box-align: center;
+  -ms-flex-pack: justify;
+      justify-content: space-between;
   -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-align: center;
+      align-items: center;
   min-width: 46px;
 }
 #cboxPrevious,
@@ -209,8 +197,8 @@
   width: 23px;
   height: 23px;
   text-indent: -9999px;
-  -webkit-flex-basis: auto;
-      -ms-flex-preferred-size: auto;
+  -ms-flex-preferred-size: auto;
+          -webkit-flex-basis: auto;
           flex-basis: auto;
   background-position-x: -24px;
   background-position-y: -272px;
@@ -289,7 +277,6 @@
 }
 #cboxVoting .voting_wrapper span.vote_title_panel {
   display: inline-block;
-  width: -webkit-calc(50% - 30px);
   width: calc(50% - 30px);
   white-space: nowrap;
   margin-top: 3px;

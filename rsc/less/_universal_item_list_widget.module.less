@@ -14,13 +14,15 @@ div.widget_core_coll_related_post_list {
 	// Flow layout
 	&.evo_layout_flow {
 		.widget_flow_blocks {
+			// Important for centering inner blocks
 			display: inline-block;
 			text-align: center;
-			> div {
+			width: 100%;
 			
-				// Inner blocks div style
+			// Inner blocks div style (should be the same as .widget_rwd_content)
+			> div {
 				padding: 8px;
-				margin: 14px 0;
+				margin: 14px;
 				overflow: hidden;
 				background-color: #fafafa;
 				border-radius: 4px;
