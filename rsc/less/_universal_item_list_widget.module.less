@@ -5,61 +5,34 @@
 @placeholder-background-color: #f0f0f0; // Background color of the Placeholder
 @placeholder-icon-color: #dcdcdc; // Color of the icon inside the Placeholder element
 
-div.widget_core_coll_item_list, // Universal item list widget
-div.widget_core_coll_featured_posts, //Featured posts widget
-div.widget_core_coll_post_list, // Simple posts list widget
-div.widget_core_coll_page_list, // Simple page list widget
-div.widget_core_coll_related_post_list { // Simple related posts widget
+div.widget_core_coll_item_list,
+div.widget_core_coll_featured_posts,
+div.widget_core_coll_post_list,
+div.widget_core_coll_page_list,
+div.widget_core_coll_related_post_list {
 
-	// RWD blocks and Flowing blocks layout
-	&.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content,
-	&.evo_layout_flow .widget_flow_blocks > div {
-	// Inner blocks div style
-		padding: 8px;
-		margin: 14px 0;
-		overflow: hidden;
-		background-color: #fafafa;
-		border-radius: 4px;
-	}
-	&.evo_layout_flow .widget_flow_blocks {
-		display: inline-block;
-		text-align: center;
-		> div {
-			margin-left: 14px;
-			margin-right: 14px;
-			text-align: left;
-			width: 250px; // Fixed widget for flowing blocks
-		}
-	}
+	// Flow layout
+	&.evo_layout_flow {
+		.widget_flow_blocks {
+			display: inline-block;
+			text-align: center;
+			> div {
+			
+				// Inner blocks div style
+				padding: 8px;
+				margin: 14px 0;
+				overflow: hidden;
+				background-color: #fafafa;
+				border-radius: 4px;
+				text-align: left;
+				width: 250px; // Fixed widget for flowing blocks
 
-	// RWD blocks layout
-	&.evo_layout_rwd {
-		
-		// With teaser or with excerpt
-		&.evo_withteaser,
-		&.evo_withexcerpt {
-			.widget_rwd_blocks .widget_rwd_content .item_title {
-				font-size: 16px;
-				font-weight: 700;
-				line-height: 1.5em;
-				margin: 10px 0 5px;
+				display: inline-block;
+				float: none; // We removed default bootstrap's style here because of the issue with floated divs with uneven heights in multiple rows
+				vertical-align: top;
 			}
 		}
-	}
-	
-	// RWD blocks and Flowing blocks layout
-	&.evo_layout_rwd .widget_rwd_blocks,
-	&.evo_layout_flow .widget_flow_blocks {
-		// Inner divs style
-		> div {
-			display: inline-block;
-			float: none; // We removed default bootstrap's style here because of the issue with floated divs with uneven heights in multiple rows
-			vertical-align: top;
-		}
-	}
-	
-	// Flowing blocks layout
-	&.evo_layout_flow {
+		
 		// With teaser or with excerpt
 		&.evo_withteaser,
 		&.evo_withexcerpt {
@@ -69,6 +42,48 @@ div.widget_core_coll_related_post_list { // Simple related posts widget
 					font-weight: 700;
 					line-height: 1.5em;
 					margin: 10px 0 5px;
+				}
+			}
+		}
+	}
+	
+	// RWD layout
+	&.evo_layout_rwd {
+
+		.widget_rwd_content {
+			padding: 8px;
+			margin: 14px 0;
+			overflow: hidden;
+			background-color: #fafafa;
+			border-radius: 4px;
+		}
+		// With teaser or with excerpt
+		&.evo_withteaser, &.evo_withexcerpt {
+			// Wrapper div
+			.widget_rwd_blocks {
+				//
+				> div {
+					display: inline-block;
+					float: none; // We removed default bootstrap's style here because of the issue with floated divs with uneven heights in multiple rows
+					vertical-align: top;
+				}
+
+				.widget_rwd_content {
+
+					// Important for limiting the max image size to it's parent's max width
+					.item_first_image img {
+						max-width: 100%;
+						max-height: 380px;
+						width:auto;
+						height:auto;
+						margin: auto;
+					}
+					.item_title {
+						font-size: 16px;
+						font-weight: 700;
+						line-height: 1.5em;
+						margin: 10px 0 5px;
+					}
 				}
 			}
 		}
@@ -88,7 +103,8 @@ div.widget_core_coll_related_post_list { // Simple related posts widget
 				list-style: none;
 				height: auto;
 				// display: table; - testing if this can be replaced with display: block;
-				display: block;
+				display: inline-block;
+				width: 100%;
 				clear: both;
 				margin: 5px 0;
 				padding: 0;
@@ -130,11 +146,17 @@ div.widget_core_coll_related_post_list { // Simple related posts widget
 				}
 			}
 		}
+		// If special placement, without teaser, without excerpt
+		&.evo_noexcerpt.evo_noteaser {
+			div.item_title a {
+				font-size: 22px;
+			}
+		}
 	}
-
+	
 	// First image when selected "Display first image"
 	&.evo_layout_list div.item_first_image {
-		float: left; 
+		float: left;
 		margin-right: 6px;
 	}
 
@@ -142,8 +164,8 @@ div.widget_core_coll_related_post_list { // Simple related posts widget
 	&.evo_pics {
 		div.item_images {
 			display: inline-block;
+			//margin-top: 6px;
 			img {
-				// margin-right: 6px; old style
 				margin: 6px 6px 0 0;
 			}
 		}
@@ -156,20 +178,35 @@ div.widget_core_coll_related_post_list { // Simple related posts widget
 		}
 		div.item_images {
 			float: left;
+			//margin: 6px 6px 6px 0;
 		}
 	}
 	// With excerpt or with teaser
-	&.evo_withexcerpt,
-	&.evo_withteaser {
+	&.evo_withexcerpt, &.evo_withteaser {
 		// Special treatment - remove bullets
 		&.evo_1pic__special ul li {
-			list-style: none;	
+			list-style: none;
 			display: table;
 			div.item_title a {
 				text-decoration: underline;
 			}
+			div.item_content {
+				blockquote {
+					margin-left: 86px;
+				}
+			}
 			div.item_excerpt {
 				margin-top: -2px;
+			}
+			// We need this code to convert the last line of <p> into "inline", so that the "..." button can be IN LINE with the last <p>
+			div.item_content,
+			div.item_excerpt {
+				p {
+					margin: 0;
+					&:last-of-type {
+						display: inline;
+					}
+				}
 			}
 		}
 		ul li {
@@ -190,86 +227,29 @@ div.widget_core_coll_related_post_list { // Simple related posts widget
 				}
 			}
 		}
-		// With teaser or with excerpt, ONLY when all images are shown
-		&.evo_pics div.item_images {
-			margin-top: 6px;
-			img {
-				margin: 0 6px 6px 0;
-			}
-		}
-	}
-	// With teaser specific layout (with "..." button)
-	&.evo_noexcerpt.evo_withteaser {
-			div.item_content {
-				p {
-					margin: 0;
-					&:last-of-type {
-						display: inline;
-						&:after {
-							content: '...';
-						}
-					}
-				}
-				// Special blockquote style for teaser layout
-				blockquote {
-					display: block;
-					margin: 0;
-					padding: 5px 15px;
-				}
-				// Simulation of bootstrap's btn-default class
-				> a { 
-					margin-left: -3px;
-					display: inline-block;
-					height: 22px;
-					float: right;
-					padding: 0px 4px 0px 4px;
-					font-size: 20px;
-					line-height: 13px;
-					white-space: nowrap;
-					vertical-align: middle;
-					-ms-touch-action: manipulation;
-					touch-action: manipulation;
-					cursor: pointer;
-					-webkit-user-select: none;
-					-moz-user-select: none;
-					-ms-user-select: none;
-					user-select: none;
-					background-image: none;
-					border: 1px solid transparent;
-					color: @teaser-specific-button-color;
-					border-radius: 4px;
-					border: 1px solid #ccc;
-					&:hover {
-						border: 1px solid #adadad;
-						color: #333;
-						background-color: #e6e6e6;
-						text-decoration: none;
-					}
-				}
-		} 
 		// Special blockquote style for teaser layout
-		&.evo_1pic__special ul li div.item_content {
-			blockquote {
-				margin-left: 86px;
+		blockquote {
+			display: block;
+			margin: 0;
+			padding: 5px 15px;
+		}
+		a.btn {
+			// In v6.8.9+ we are using a real bootstrap button but we want the bg to be transparent.
+			background-color: transparent;
+			float: right;
+			height: 22px;
+			line-height: 13px;
+			padding: 0px 4px 0px 4px;
+			&:hover {
+				// We need this because .btn.btn-default from Bootstraps' CSS can't override the overly precise "background-color: transparent" stated above
+				background-color: #e6e6e6;
 			}
 		}
 	}
-	// If special placement, without teaser, without excerpt
-	&.evo_1pic__special.evo_noexcerpt.evo_noteaser {
-		div.item_title a {
-			font-size: 22px;
-		}
-		// Without teaser, without excerpt, ONLY when all images are shown
-		&.evo_pics div.item_images {
-			margin-top: 6px;
-			img {
-				margin: 0 6px 6px 0;
-			}
-		}
-	}
+	
 	img {
 		border-radius: 3px;
-		// Important for limiting the max image size to it's parent's max width
+		// Preventing images to exceed the parent's width
 		max-width: 100%;
 		max-height: 380px;
 		width:auto;
@@ -280,16 +260,16 @@ div.widget_core_coll_related_post_list { // Simple related posts widget
 	&.evo_withgroup > ul > li {
 		font-size: 17px;
 	}
-	
+
 	div.item_first_image {
 		text-align: center;
 	}
 }
 
 // Only when in Sidebar or Sidebar 2
-div.evo_container__sidebar, 
+div.evo_container__sidebar,
 div.evo_container__sidebar2 {
-	div.widget_core_coll_item_list, 
+	div.widget_core_coll_item_list,
 	div.widget_core_coll_post_list {
 		// If special placement, without teaser, without excerpt
 		&.evo_1pic__special.evo_noexcerpt.evo_noteaser {
@@ -302,7 +282,7 @@ div.evo_container__sidebar2 {
 
 // Responsive layout of the post title when no teaser, no excerpt and special placement
 @media (max-width: 1599px) {
-		div.widget_core_coll_item_list, 
+		div.widget_core_coll_item_list,
 		div.widget_core_coll_post_list {
 			&.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
 				font-size: 20px;
@@ -310,7 +290,7 @@ div.evo_container__sidebar2 {
 		}
 }
 @media (max-width: 1199px) {
-		div.widget_core_coll_item_list, 
+		div.widget_core_coll_item_list,
 		div.widget_core_coll_post_list {
 			&.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
 				font-size: 18px;
