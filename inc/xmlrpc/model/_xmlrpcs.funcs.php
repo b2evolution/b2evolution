@@ -364,7 +364,7 @@ function _wp_mw_get_item_struct( & $Item )
 	if( isset($Item->parent_ID) )
 	{
 		$ItemCache = & get_ItemCache();
-		if( $parent_Item = & $ItemCache->get_by_ID( $Item->parent_ID, false, false ) );
+		if( $parent_Item = & $ItemCache->get_by_ID( $Item->parent_ID, false, false ) )
 		{
 			$parent_title = $parent_Item->title;
 		}

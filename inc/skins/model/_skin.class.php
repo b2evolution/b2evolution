@@ -299,18 +299,21 @@ class Skin extends DataObject
 		 */
 		global $Collection, $Blog;
 		global $admin_url, $rsc_url;
-		global $Timer, $Session;
+		global $Timer, $Session, $debug, $current_User;
 
 		$timer_name = 'skin_container('.$sco_name.')';
 		$Timer->start( $timer_name );
 
-		$display_containers = $Session->get( 'display_containers_'.$Blog->ID ) == 1;
+		$display_containers = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_containers_'.$Blog->ID ) );
 
 		if( $display_containers )
 		{ // Wrap container in visible container:
-			echo '<div class="dev-blocks dev-blocks--container">';
-			echo '<div class="dev-blocks-name"><span class="dev-blocks-action"><a href="'
-						.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'">Edit</a></span>Container: <b>'.$sco_name.'</b></div>';
+			echo '<div class="dev-blocks dev-blocks--container"><div class="dev-blocks-name">';
+			if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			{	// Display a link to edit this widget only if current user has a permission:
+				echo '<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'">Edit</a></span>';
+			}
+			echo 'Container: <b>'.$sco_name.'</b></div>';
 		}
 
 		/**
@@ -1460,7 +1463,7 @@ var downloadInterval = setInterval( function()
 									.'</ul></div>',
 								'header_text_single' => '',
 							'header_end' => '',
-							'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
+							'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
 							'global_icons_class' => 'btn btn-default btn-sm',
 							'filters_start'        => '<div class="filters panel-body">',
 							'filters_end'          => '</div>',
