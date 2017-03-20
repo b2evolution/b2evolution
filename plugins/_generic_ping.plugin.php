@@ -76,7 +76,7 @@ class generic_ping_plugin extends Plugin
 					'defaultvalue' => '',
 					'type' => 'text',
 					'size' => 50,
-					'note' => T_('The URL of the ping service.').' '.sprintf('E.g. &laquo;%s&raquo;', 'rpc.weblogs.com/RPC2 or rpc.foobar.com:8080 or https://rpc.foobar.com:8080'),
+					'note' => T_('The URL of the ping service.').' '.sprintf( T_('E.g. %s'), '<code>rpc.weblogs.com/RPC2</code>, <code>rpc.foobar.com:8080</code> '.T_('or').' <code>https://rpc.foobar.com:8080</code>'),
 				),
 			'ping_service_extended' => array(
 					'label' => T_('Extended ping?'),
