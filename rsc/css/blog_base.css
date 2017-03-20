@@ -445,12 +445,50 @@ div.evo_container__sidebar2 div.widget_core_coll_post_list.evo_1pic__special.evo
     font-size: 18px;
   }
 }
-div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_content {
-  margin: 14px 0;
+div.widget_core_coll_media_index.evo_layout_list ul li img {
+  margin: 0 6px 6px 0;
 }
-div.widget_core_coll_media_index.evo_layout_rwd img {
-  width: 100%;
+div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_blocks > div,
+div.widget_core_coll_media_index.evo_layout_flow .widget_flow_blocks > div {
+  display: inline-block;
+  float: none;
+  vertical-align: top;
+}
+div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content,
+div.widget_core_coll_media_index.evo_layout_flow .widget_flow_blocks > div {
+  padding: 8px;
+  margin: 14px 0;
+  overflow: hidden;
+  background-color: #fafafa;
+  border-radius: 4px;
+}
+div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content img,
+div.widget_core_coll_media_index.evo_layout_flow .widget_flow_blocks > div img {
+  max-width: 100%;
+  max-height: 380px;
+  width: auto;
   height: auto;
+  margin: auto;
+  min-height: 32px;
+  min-width: 32px;
+  display: block;
+  border-radius: 3px;
+}
+div.widget_core_coll_media_index.evo_layout_rwd .widget_rwd_blocks .widget_rwd_content span.note,
+div.widget_core_coll_media_index.evo_layout_flow .widget_flow_blocks > div span.note {
+  margin-top: 8px;
+  display: block;
+}
+div.widget_core_coll_media_index.evo_layout_flow .widget_flow_blocks {
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+}
+div.widget_core_coll_media_index.evo_layout_flow .widget_flow_blocks > div {
+  margin-left: 14px;
+  margin-right: 14px;
+  text-align: left;
+  width: 250px;
 }
 div.widget_core_user_avatars.evo_layout_rwd .widget_rwd_content {
   margin: 14px 0;
@@ -467,6 +505,21 @@ div.widget_core_user_avatars.evo_layout_rwd img {
   text-align: center;
   margin-top: 20px;
   margin-bottom: 30px;
+}
+.widget_core_org_members.evo_layout_flow .widget_flow_blocks {
+  display: inline-block;
+  text-align: center;
+}
+.widget_core_org_members.evo_layout_flow .widget_flow_blocks > div {
+  display: inline-block;
+  float: none;
+  margin-left: 14px;
+  margin-right: 14px;
+  vertical-align: top;
+  width: 250px;
+}
+.widget_core_org_members.evo_layout_flow .widget_flow_blocks > div img {
+  border-radius: 50%;
 }
 .widget_core_org_members img {
   display: inline-block;
